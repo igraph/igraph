@@ -92,6 +92,3 @@ SEXP REST_ba_game(SEXP pn, SEXP pm, SEXP outseq, SEXP poutpref) {
   return result;
 }
 
-/**
- */
-

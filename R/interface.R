@@ -90,3 +90,28 @@ get.edge.attribute <- function(graph, attrname, from=NULL, to=NULL)
 
 set.edge.attribute <- function(graph, attrname, from=NULL, to=NULL, value)
   UseMethod(paste(sep="", "set.edge.attribute.", graph$gal$type))
+
+###################################################################
+# Interface object for C functions
+###################################################################
+
+igraph.c.interface <- list("graph.empty"=graph.empty,
+                           "add.edges"=add.edges,
+                           "add.vertices"=add.vertices,
+                           "delete.edges"=delete.edges,
+                           "delete.vertices"=delete.vertices,
+                           "vcount"=vcount,
+                           "ecount"=ecount,
+                           "neighbors"=neighbors,
+                           "add.graph.attribute"=add.graph.attribute,
+                           "delete.graph.attribute"=delete.graph.attribute,
+                           "set.graph.attribute"=set.graph.attribute,
+                           "get.graph.attribute"=get.graph.attribute,
+                           "add.vertex.attribute"=add.vertex.attribute,
+                           "delete.vertex.attribute"=delete.vertex.attribute,
+                           "set.vertex.attribute"=set.vertex.attribute,
+                           "get.vertex.attribute"=get.vertex.attribute,
+                           "add.edge.attribute"=add.edge.attribute,
+                           "delete.edge.attribute"=delete.edge.attribute,
+                           "set.edge.attribute"=set.edge.attribute,
+                           "get.edge.attribute"=get.edge.attribute)

@@ -52,6 +52,45 @@ SEXP REST_add_edges_adjacencylist(SEXP data, SEXP edges,
 				  SEXP pdirected);
 
 /* -------------------------------------------------- */
+/* Games                                              */
+/* -------------------------------------------------- */
+
+SEXP REST_ba_game(SEXP pn, SEXP pm, SEXP outseq, SEXP poutpref);
+
+/* -------------------------------------------------- */
+/* Structural properties                              */
+/* -------------------------------------------------- */
+
+SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn);
+SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode);
+SEXP REST_clusters(SEXP interface, SEXP graph);
+
+/* -------------------------------------------------- */
+/* The C igraph interface                             */
+/* -------------------------------------------------- */
+
+/* Order is important here!! See interface.R */
+
+typedef 
+enum REST_CALL_LIST { graph_empty, add_edges, add_vertices, 
+		      delete_edges, delete_vertices, vcount, ecount,
+		      neighbors, 
+		      add_graph_attribute, delete_graph_attribute,
+		      set_graph_attribute, get_graph_attribute, 
+		      add_vertex_attribute, delete_vertex_attribute, 
+		      set_vertex_attribute, get_vertex_attribute,
+		      add_edge_attribute, delete_edge_attribute,
+		      set_edge_attribute, get_edge_attribute } REST_CALL_T;
+
+#define REST_CALL1(call) EVAL(lang1(VECTOR_ELT(interface, call),p1))
+#define REST_CALL2(call,p1) EVAL(lang2(VECTOR_ELT(interface, call),p1))
+#define REST_CALL3(call,p1,p2) EVAL(lang3(VECTOR_ELT(interface, call),p1,p2))
+#define REST_CALL4(call,p1,p2,p3) EVAL(lang4(VECTOR_ELT(interface, call),p1,p2,p3))
+
+#define VCOUNT(graph) REST_CALL2(vcount, graph)
+#define NEIGHBORS(graph, v, m) REST_CALL4(neighbors, graph, ScalarReal(v), m)
+
+/* -------------------------------------------------- */
 /* INTERNALS                                          */
 /* -------------------------------------------------- */
 

@@ -144,7 +144,7 @@ delete.vertices.adjacencylist.default <- function(graph, v) {
 ###################################################################
 
 vcount.adjacencylist.default <- function(graph) {
-  res <- length(graph$data$out)
+  res <- as.double(length(graph$data$out))
   res
 }
 
@@ -152,7 +152,7 @@ ecount.adjacencylist.default <- function(graph) {
   if (length(graph)==0) {
     res <- 0
   } else {
-    res <- sum(sapply(graph$data$out, length))
+    res <- as.double(sum(sapply(graph$data$out, length)))
     if (!is.directed(graph)) {
       res <- res/2
     }

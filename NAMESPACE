@@ -1,5 +1,5 @@
 
-export(igraph.par)
+# The igraph interface
 
 export(graph.empty, add.edges, add.vertices, delete.edges,
        delete.vertices, vcount, ecount, neighbors)
@@ -10,6 +10,8 @@ export(add.graph.attribute,delete.graph.attribute,
        get.vertex.attribute,set.vertex.attribute,
        add.edge.attribute,delete.edge.attribute,
        get.edge.attribute,set.edge.attribute)
+
+# igraph storage types, adjacency list
 
 S3method(graph.empty, adjacencylist.default)
 S3method(add.edges, adjacencylist.default)
@@ -33,14 +35,41 @@ S3method(delete.edge.attribute, adjacencylist.default)
 S3method(get.edge.attribute, adjacencylist.default)
 S3method(set.edge.attribute, adjacencylist.default)
 
-
+# common functions, attribute related
 
 export(is.directed, igraph.type)
 
+# common functions, screen related 
+
 export(print.graph)
+
+# common functions, basic structural info
 
 export(are.connected)
 
-export(graph)
+# common functions, graph generators
 
-export(ba.game, barabasi.game)
+export(graph, graph.star, graph.lattice, graph.ring)
+
+# common functions, graph generators, games
+
+export(ba.game, barabasi.game, erdos.renyi.game, random.graph.game,
+       degree.sequence.game)
+
+# common functions, (not so basic) structural properties
+
+export(diameter, degree, degree.distribution, closeness, shortest.paths)
+
+# common functions, components and similar
+
+export(clusters, cluster.distribution, subcomponent, subgraph)
+
+# common: conversion
+
+export(get.adjacency, get.edgelist, simplify)
+
+# plotting
+
+export(tkplot, layout.random, layout.circle, layout.fruchterman.reingold,
+       tkplot.close, tkplot.off, tkplot.fit.to.screen, tkplot.reshape,
+       tkplot.export.postscript, tkplot.getcoords, tkplot.center)

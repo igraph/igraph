@@ -19,47 +19,39 @@
 #
 ###################################################################
 
-###################################################################
-# Convert graphs to human readable forms
-###################################################################
+get.adjacency <- function(graph) {
 
-print.graph <- function(graph) {
-
-  ec <- ecount(graph)
   vc <- vcount(graph)
-  
-  # From summary.graph
-  cat("Vertices:", vc, "\n")
-  cat("Edges:", ec, "\n")
-  cat("Directed:", is.directed(graph), "\n")
-  cat("Type:", igraph.type(graph), "\n")
+  res <- matrix(0, vc, vc)
 
-  arrow <- ifelse(is.directed(graph), "->", "--")
-  if (ec != 0) {
-    cat("\nEdges:\n")
-    idx <- 1
+  if (vc != 0) {
+    for (i in 1:vc) {
+      neis <- neighbors(graph, i, "out")
+      for (n in neis) { res[i, n] <- res[i, n] + 1 }
+    }
+  }
+
+  res
+}
+
+get.edgelist <- function(graph) {
+
+  res <- matrix(0, ecount(graph), 2)
+  vc <- vcount(graph)
+  ix <- 1
+  
+  if (vc != 0) {
     for (i in 1:vc) {
       neis <- neighbors(graph, i, "out")
       if (!is.directed(graph)) {
         no.loops <- sum(neis==i)
         neis <- c(neis[ neis > i ], rep(i, no.loops/2))
       }
-      for (j in neis) {
-        cat(sep="", "[", idx, "] ", i, " ", arrow, " ", j, "\n")
-        idx <- idx + 1
-      }
+      res[seq(ix, length=length(neis)),1] <- i
+      res[seq(ix, length=length(neis)),2] <- neis
+      ix <- ix + length(neis)
     }
   }
-  
-  invisible(graph)
-}
 
-summary.graph <- function(graph) {
-
-  cat("Vertices:", vcount(graph), "\n")
-  cat("Edges:", ecount(graph), "\n")
-  cat("Directed:", is.directed(graph), "\n")
-  cat("Type:", igraph.type(graph), "\n")
-  
-  invisible(graph)
+  res
 }

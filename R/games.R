@@ -67,3 +67,97 @@ ba.game <- function(n, m=NULL, out.dist=NULL, out.seq=NULL,
 }
 
 barabasi.game <- ba.game
+
+erdos.renyi.game <- function(n, p, directed=FALSE, loops=FALSE, ...) {
+
+  n <- as.numeric(n)
+  p <- as.numeric(p)
+
+  if (n<0) {
+    stop("`n' should be positive")
+  }
+  if (p<0 || p>1) {
+    stop("`p' should be between zero and one")
+  }
+
+  if (p==0 || n==1) {
+    res <- graph.empty(n=n, directed=directed, ...)
+  } else {
+    # generate enough waiting times
+    possible.edges <-
+      if ( directed && loops) n**2
+      else if ( directed && !loops) n*(n-1)
+      else if (!directed && loops) n*(n+1)/2
+      else n*(n-1)/2
+    s <- cumsum(rgeom(possible.edges*p*1.1, p)+1)-1
+    while (s[length(s)] < possible.edges) {
+      more <- cumsum(rgeom(possible.edges*p*0.05, p)+1)+s[length(s)]
+      s <- c(s, more)
+    }
+    s <- s [ s <= possible.edges ]
+
+    # ok, calculate the edges
+    if (directed && loops) {
+      from <- s %/% n + 1
+      to <- s %% n + 1
+    } else if (directed && !loops) {
+      from <- s %/% n + 1
+      to <- s %% (n-1) + 1
+      to [ from == to ] <- n
+    } else if (!directed && loops) {
+      from <- ceiling((sqrt(8*s+1)-1)/2)
+      to <- s-from*(from-1)/2
+    } else {
+      from <- ceiling((sqrt(8*s+1)-1)/2)+1
+      to <- s-(from-1)*(from-2)/2
+    }
+    
+    # ok, create graph
+    res <- graph( as.numeric(t(matrix(c(from, to), nc=2))),
+                 directed=directed, n=n, ...)
+  }
+  
+  res
+}
+
+random.graph.game <- erdos.renyi.game
+
+degree.sequence.game <- function(out.deg, in.deg=NULL, method="simple", ...) {
+
+  if (any(out.deg < 0)) {
+    stop("Negative degree not allowed in `out.deg'")
+  }
+  if (!is.null(in.deg) && any(in.deg<0)) {
+    stop("Negative degree not allowed in `in.deg'")
+  }
+  if (is.null(in.deg) && sum(out.deg) %% 2 != 0) {
+    stop("Total degree should be even")
+  }
+  if (!is.null(in.deg) && length(out.deg) != length(in.deg)) {
+    stop("Length of `in.deg' should match length of `out.deg'")
+  }
+  if (!is.null(in.deg) && sum(in.deg) != sum(out.deg)) {
+    stop("Total in-degree should match total out-degree")
+  }
+  if (method != "simple") {
+    stop("Invalid `method', see docs")
+  }
+
+  if (is.null(in.deg)) {
+    directed <- FALSE
+    edges <- rep(1:length(out.deg), times=out.deg)
+    edges <- sample(edges, length(edges))
+  } else {
+    directed <- TRUE
+    from <- rep(1:length(out.deg), times=out.deg)
+    to <- rep(1:length(in.deg), times=in.deg)
+    from <- sample(from, length(from))
+    to <- sample(to, length(to))
+    edges <- as.numeric(t(matrix(c(from, to), nc=2)))
+  }
+
+  res <- graph.empty(n=length(out.deg), directed=directed, ...)
+  res <- add.edges(res, edges)  
+  
+  res
+}

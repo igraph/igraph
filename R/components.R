@@ -20,46 +20,36 @@
 ###################################################################
 
 ###################################################################
-# Convert graphs to human readable forms
+# Connected components, subgraphs, kinda
 ###################################################################
 
-print.graph <- function(graph) {
+clusters <- function(graph, mode="weak") {
 
-  ec <- ecount(graph)
-  vc <- vcount(graph)
-  
-  # From summary.graph
-  cat("Vertices:", vc, "\n")
-  cat("Edges:", ec, "\n")
-  cat("Directed:", is.directed(graph), "\n")
-  cat("Type:", igraph.type(graph), "\n")
-
-  arrow <- ifelse(is.directed(graph), "->", "--")
-  if (ec != 0) {
-    cat("\nEdges:\n")
-    idx <- 1
-    for (i in 1:vc) {
-      neis <- neighbors(graph, i, "out")
-      if (!is.directed(graph)) {
-        no.loops <- sum(neis==i)
-        neis <- c(neis[ neis > i ], rep(i, no.loops/2))
-      }
-      for (j in neis) {
-        cat(sep="", "[", idx, "] ", i, " ", arrow, " ", j, "\n")
-        idx <- idx + 1
-      }
-    }
+  if (is.directed(graph) && mode=="strong") {
+    res <- .Call("REST_strong_components", igraph.c.interface, graph, 
+                 PACKAGE="igraph")
+  } else {
+    res <- .Call("REST_clusters", igraph.c.interface, graph,
+                 PACKAGE="igraph")
   }
-  
-  invisible(graph)
+
+  res
 }
 
-summary.graph <- function(graph) {
-
-  cat("Vertices:", vcount(graph), "\n")
-  cat("Edges:", ecount(graph), "\n")
-  cat("Directed:", is.directed(graph), "\n")
-  cat("Type:", igraph.type(graph), "\n")
+cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
+                                 ...) {
   
-  invisible(graph)
+  cs <- clusters(graph, ...)$csize;
+  hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities;
+  if (mul.size) {
+    hi <- hi*1:max(cs)
+    hi <- hi/sum(hi)
+  }
+  if (!cumulative) {
+    res <- hi
+  } else {
+    res <- rev(cumsum(rev(hi)));
+  }
+  
+  res
 }
