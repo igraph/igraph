@@ -355,8 +355,9 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
 	  strtod(currentpos, &currentpos);
 	} else if (!strncasecmp(currentpos, "ic", 2)) {
 	  /* interior color of vertex */
+	  SEXP color;
 	  currentpos+=2;
-	  SEXP color=REST_i_pajek_color(&currentpos);
+	  color=REST_i_pajek_color(&currentpos);
 	  if (attr_ic==0) {
 	    PROTECT(attr_ic=NEW_LIST(no_of_nodes)); unprot++;
 	  }
