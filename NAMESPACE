@@ -1,0 +1,40 @@
+
+export(igraph.par)
+
+export(graph.empty, add.edges, add.vertices, delete.edges,
+       delete.vertices, vcount, ecount, neighbors)
+
+export(add.graph.attribute,delete.graph.attribute,
+       get.graph.attribute,set.graph.attribute,
+       add.vertex.attribute,delete.vertex.attribute,
+       get.vertex.attribute,set.vertex.attribute,
+       add.edge.attribute,delete.edge.attribute,
+       get.edge.attribute,set.edge.attribute)
+
+S3method(graph.empty, adjacencylist.default)
+S3method(add.edges, adjacencylist.default)
+S3method(add.vertices, adjacencylist.default)
+S3method(delete.edges, adjacencylist.default)
+S3method(delete.vertices, adjacencylist.default)
+S3method(vcount, adjacencylist.default)
+S3method(ecount, adjacencylist.default)
+S3method(neighbors, adjacencylist.default)
+       
+S3method(add.graph.attribute, adjacencylist.default)
+S3method(delete.graph.attribute, adjacencylist.default)
+S3method(get.graph.attribute, adjacencylist.default)
+S3method(set.graph.attribute, adjacencylist.default)
+S3method(add.vertex.attribute, adjacencylist.default)
+S3method(delete.vertex.attribute, adjacencylist.default)
+S3method(get.vertex.attribute, adjacencylist.default)
+S3method(set.vertex.attribute, adjacencylist.default)
+S3method(add.edge.attribute, adjacencylist.default)
+S3method(delete.edge.attribute, adjacencylist.default)
+S3method(get.edge.attribute, adjacencylist.default)
+S3method(set.edge.attribute, adjacencylist.default)
+
+
+
+export(is.directed, igraph.type)
+
+export(print.graph)
