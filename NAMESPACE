@@ -87,6 +87,9 @@ export(ba.game, barabasi.game, erdos.renyi.game, random.graph.game,
 
 export(diameter, degree, degree.distribution, closeness, shortest.paths)
 
+S3method(degree, default)
+S3method(degree, adjacencylist)
+
 # common functions, components and similar
 
 export(clusters, cluster.distribution, subcomponent, subgraph, betweenness)

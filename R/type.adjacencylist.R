@@ -337,6 +337,36 @@ set.edge.attribute.adjacencylist.default <- function(graph, attrname,
 }
 
 ###################################################################
+# Reimplementations for speedup
+###################################################################
+
+degree.adjacencylist <- function(graph, v=1:vcount(graph), mode="total",
+                                 loops=TRUE) {
+
+  res <- numeric(length(v))
+  if (!is.directed(graph) || mode %in% c("total", "out")) {
+    if (loops) {
+      res <- res + sapply(graph$data$out[v], length)
+    } else {
+      res <- res + sapply(sapply(seq(along=v), function(a)
+                                 graph$data$out[[a]][graph$data$out[[a]]!=a]),
+                          length)
+    }
+  }
+  if (is.directed(graph) && mode %in% c("total", "in")) {
+    if (loops) {
+      res <- res + sapply(graph$data$inc[v], length)
+    } else {
+      res <- res + sapply(sapply(seq(along=v), function(a)
+                                 graph$data$inc[[a]][graph$data$inc[[a]]!=a]),
+                          length)
+    }
+  }
+  
+  res
+}
+
+###################################################################
 # Internal functions
 ###################################################################
 

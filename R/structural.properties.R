@@ -32,6 +32,13 @@ diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
 }
 
 degree <- function(graph, v=1:vcount(graph), mode="total", loops=TRUE) {
+  tmp <- numeric()
+  class(tmp) <- graph$gal$type
+  UseMethod("degree", tmp)
+}
+  
+degree.default <- function(graph, v=1:vcount(graph), mode="total",
+                           loops=TRUE) {
 
   res <- numeric(length(v))
   if (!is.directed(graph) || mode %in% c("out", "total")) {
