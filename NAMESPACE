@@ -35,6 +35,32 @@ S3method(delete.edge.attribute, adjacencylist.default)
 S3method(get.edge.attribute, adjacencylist.default)
 S3method(set.edge.attribute, adjacencylist.default)
 
+# igraph storage types, postresql database
+
+S3method(graph.empty, pgsql.default)
+S3method(add.edges, pgsql.default)
+S3method(add.vertices, pgsql.default)
+S3method(delete.edges, pgsql.default)
+S3method(delete.vertices, pgsql.default)
+S3method(vcount, pgsql.default)
+S3method(ecount, pgsql.default)
+S3method(neighbors, pgsql.default)
+       
+S3method(add.graph.attribute, pgsql.default)
+S3method(delete.graph.attribute, pgsql.default)
+S3method(get.graph.attribute, pgsql.default)
+S3method(set.graph.attribute, pgsql.default)
+S3method(add.vertex.attribute, pgsql.default)
+S3method(delete.vertex.attribute, pgsql.default)
+S3method(get.vertex.attribute, pgsql.default)
+S3method(set.vertex.attribute, pgsql.default)
+S3method(add.edge.attribute, pgsql.default)
+S3method(delete.edge.attribute, pgsql.default)
+S3method(get.edge.attribute, pgsql.default)
+S3method(set.edge.attribute, pgsql.default)
+
+export(pgsql.list.graphs, pgsql.get.graph, pgsql.clear)
+
 # common functions, attribute related
 
 export(g.a, "g.a<-", v.a, "v.a<-", e.a, "e.a<-")
@@ -42,7 +68,7 @@ export(is.directed, igraph.type)
 
 # common functions, screen related 
 
-export(print.graph)
+export(print.graph, summary.graph)
 
 # common functions, basic structural info
 
@@ -79,7 +105,11 @@ export(tkplot,
        tkplot.export.postscript, tkplot.getcoords, tkplot.center,
        tkplot.rotate)
 
-# foreign file formars
+# parameters
+
+export(igraph.par)
+
+# foreign file formats
 
 export(read.graph)
 
