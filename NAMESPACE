@@ -83,3 +83,6 @@ export(tkplot,
 
 export(read.graph)
 
+# fitting
+
+export(power.law.fit)
