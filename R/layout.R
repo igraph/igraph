@@ -1,6 +1,6 @@
 
-#   SimpleGraph R package
-#   Copyright (C) 2003, 2004  Gabor Csardi <csardi@rmki.kfki.hu>
+#   IGraph R package
+#   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
 #   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
 #   
 #   This program is free software; you can redistribute it and/or modify
@@ -279,3 +279,32 @@ layout.spring<-function(graph, ..., params=list()) {
   cbind(x,y)
 }
 
+i.layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
+                          zmin=NULL, zmax=NUL) {
+
+  if (!is.null(xmin) && !is.null(xmax)) {
+    layout[,1] <- .layout.norm.col(layout[,1], xmin, xmax)
+  }
+
+  if (!is.null(ymin) && !is.null(ymax)) {
+    layout[,2] <- .layout.norm.col(layout[,2], ymin, ymax)
+  }
+  
+  if (!is.null(zmin) && !is.null(zmax)) {
+    layout[,3] <- .layout.norm.col(layout[,3], zmin, zmax)
+  }
+
+  layout
+}
+
+.layout.norm.col <- function(v, min, max) {
+
+  vr <- range(v)
+  if (vr[1]==vr[2]) {
+    fac <- 1
+  } else {
+    fac <- (max-min)/(vr[2]-vr[1])
+  }
+
+  (v-vr[1]) * fac + min
+}

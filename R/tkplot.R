@@ -1,6 +1,6 @@
 
-#   SimpleGraph R package
-#   Copyright (C) 2003, 2004  Gabor Csardi <csardi@rmki.kfki.hu>
+#   IGraph R package
+#   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
 #   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
 #   
 #   This program is free software; you can redistribute it and/or modify
@@ -37,52 +37,28 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                    labels=NULL, label.color="darkblue",
                    label.font=NULL, label.degree=-pi/4, label.dist=0,
                    vertex.color="SkyBlue2", vertex.size=15,
-                   edge.color="darkgrey", edge.width=1) {
+                   edge.color="darkgrey", edge.width=1, ...) {
 
   # Libraries
   require(tcltk) || stop("tcl/tk library not available")
 
   # Layout
-  if (is.function(layout)) {
-    layout <- layout(graph, layout.par)
-  } else if (is.character(layout) && length(layout)==1 &&
-             substr(layout, 1, 2)=="a:") {
-    layout <- matrix(unlist(get.vertex.attribute(graph, substring(layout,3))),
-                     nr=vcount(graph), byrow=TRUE)[,1:2]
-  }
+  layout <- i.get.layout(graph, layout, layout.par)
 
   # Vertex color
-  if (length(vertex.color)==1 && substr(vertex.color, 1, 2)=="a:") {
-    vertex.color <- as.character(get.vertex.attribute
-                                 (graph, substring(vertex.color,3)))
-  }
-
+  vertex.color <- i.get.vertex.color(graph, vertex.color)
+  
   # Vertex size
-  if (is.character(vertex.size) &&
-      length(vertex.size)==1 && substr(vertex.size, 1, 2)=="a:") {
-    vertex.size <- as.numeric(get.vertex.attribute
-                                 (graph, substring(vertex.size,3)))
-  }
-
+  vertex.size <- i.get.vertex.size(graph, vertex.size)
+  
   # Edge color
-  if (length(edge.color)==1 && substr(edge.color, 1, 2)=="a:") {
-    edge.color <- as.character(get.edge.attribute
-                               (graph, substring(edge.color,3)))
-  }
+  edge.color <- i.get.edge.color(graph, edge.color)
 
   # Edge width
-  if (is.character(edge.width) &&
-      length(edge.width)==1 && substr(edge.width, 1, 2)=="a:") {
-    edge.width <- as.character(get.edge.attribute
-                               (graph, substring(edge.width,3)))
-  }
+  edge.width <- i.get.edge.width(graph, edge.width)
 
   # Label degree
-  if (is.character(label.degree) &&
-      length(label.degree)==1 && substr(label.degree, 1, 2)=="a:") {
-    label.degree <- as.numeric(get.vertex.attribute
-                               (graph, substring(label.degree,3)))
-  }
+  label.degree <- i.get.label.degree(graph, label.degree)
   
   # Label font
   if (is.null(label.font)) {
@@ -115,7 +91,7 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
 
   # The main pull-down menu
   main.menu <- tkmenu(top)
-  tkadd(main.menu, "command", label="Quit", command=function() {
+  tkadd(main.menu, "command", label="Close", command=function() {
     tkplot.close(tkp.id, TRUE)})
   layout.menu <- .tkplot.layout.menu(tkp.id, main.menu)
   tkadd(main.menu, "cascade", label="Layout", menu=layout.menu)
@@ -540,26 +516,28 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   vertex.color <- ifelse(length(tkp$params$vertex.color)>1,
                          tkp$params$vertex.color[id],
                          tkp$params$vertex.color)
-  label.degree <- ifelse(length(tkp$params$label.degree)>1,
-                         tkp$params$label.degree[id],
-                         tkp$params$label.degree)
-  label.dist <- tkp$params$label.dist
-  label.x <- x+label.dist*cos(label.degree)*
-    (vertex.size+6+4*(ceiling(log10(id+1))))
-  label.y <- y+label.dist*sin(label.degree)*
-    (vertex.size+6+4*(ceiling(log10(id+1))))
   item <- tkcreate(tkp$canvas, "oval", x-vertex.size, y-vertex.size,
                    x+vertex.size, y+vertex.size, width=1,
                    outline="black",  fill=vertex.color,
                    activefill="red", activeoutline="yellow", activewidth=2)
   tkaddtag(tkp$canvas, "vertex", "withtag", item)
   tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", item)
-  litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
-                    text=as.character(label), state="normal",
-                    fill=tkp$params$label.color, activefill="red",
-                    font=tkp$params$label.font)
-  tkaddtag(tkp$canvas, "label", "withtag", litem)
-  tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", litem)
+  if (!is.na(label)) {
+    label.degree <- ifelse(length(tkp$params$label.degree)>1,
+                           tkp$params$label.degree[id],
+                           tkp$params$label.degree)
+    label.dist <- tkp$params$label.dist
+    label.x <- x+label.dist*cos(label.degree)*
+      (vertex.size+6+4*(ceiling(log10(id+1))))
+    label.y <- y+label.dist*sin(label.degree)*
+      (vertex.size+6+4*(ceiling(log10(id+1))))
+    litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
+                      text=as.character(label), state="normal",
+                      fill=tkp$params$label.color, activefill="red",
+                      font=tkp$params$label.font)
+    tkaddtag(tkp$canvas, "label", "withtag", litem)
+    tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", litem)
+  }
   item
 }
 
@@ -569,15 +547,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   n <- vcount(tkp$graph)
 
   # Labels
-  if (is.null(tkp$labels)) {
-    labels <- 1:n
-  } else if (is.character(tkp$labels) && length(tkp$labels)==1 &&
-             substr(tkp$labels, 1, 2)=="a:") {
-    labels <- get.vertex.attribute(tkp$graph, substring(tkp$labels, 3))
-  } else {
-    labels <- tkp$labels
-  }
-  
+  labels <- i.get.labels(tkp$graph, tkp$labels)
+
   mapply(function(v, l, x, y) .tkplot.create.vertex(tkp.id, v, l, x, y),
          1:n, labels, tkp$coords[,1], tkp$coords[,2])
 }

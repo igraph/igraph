@@ -108,6 +108,8 @@ export(tkplot,
        tkplot.export.postscript, tkplot.getcoords, tkplot.center,
        tkplot.rotate)
 
+export(plot.graph)
+
 # parameters
 
 export(igraph.par)
