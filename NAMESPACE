@@ -38,3 +38,9 @@ S3method(set.edge.attribute, adjacencylist.default)
 export(is.directed, igraph.type)
 
 export(print.graph)
+
+export(are.connected)
+
+export(graph)
+
+export(ba.game, barabasi.game)
