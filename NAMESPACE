@@ -71,6 +71,10 @@ export(get.adjacency, get.edgelist, simplify)
 
 # plotting
 
-export(tkplot, layout.random, layout.circle, layout.fruchterman.reingold,
+export(layout.random, layout.circle, layout.fruchterman.reingold,
+       layout.kamada.kawai, layout.spring)
+
+export(tkplot, 
        tkplot.close, tkplot.off, tkplot.fit.to.screen, tkplot.reshape,
-       tkplot.export.postscript, tkplot.getcoords, tkplot.center)
+       tkplot.export.postscript, tkplot.getcoords, tkplot.center,
+       tkplot.rotate)

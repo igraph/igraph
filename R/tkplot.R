@@ -35,8 +35,8 @@ if (!exists(".tkplot.env")) {
 
 tkplot <- function(graph, layout=layout.random, layout.par=list(),
                    labels=NULL, label.color="darkblue",
-                   label.font=NULL, label.degree=-pi/4,
-                   vertex.color="SkyBlue2", vertex.size=6,
+                   label.font=NULL, label.degree=-pi/4, label.dist=0,
+                   vertex.color="SkyBlue2", vertex.size=15,
                    edge.color="darkgrey", edge.width=1) {
 
   # Libraries
@@ -99,7 +99,8 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   params <- list(vertex.color=vertex.color, vertex.size=vertex.size,
                  edge.color=edge.color, label.color=label.color,
                  labels.state=1, edge.width=edge.width, padding=30,
-                 grid=0, label.font=label.font, label.degree=label.degree)
+                 grid=0, label.font=label.font, label.degree=label.degree,
+                 label.dist=label.dist)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
@@ -134,6 +135,16 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
 #   tkadd(view.menu, "checkbutton", label="Grid",
 #         variable=view.menu.grid, command=function() {
 #           .tkplot.toggle.grid(tkp.id)})
+  tkadd(view.menu, "separator")
+  rotate.menu <- tkmenu(view.menu)
+  tkadd(view.menu, "cascade", label="Rotate", menu=rotate.menu)
+  sapply(c(-90,-45,-15,-5,-1,1,5,15,45,90),
+         function(deg) {
+           tkadd(rotate.menu, "command",
+                 label=paste(deg, "degree"), command=function() {
+                   tkplot.rotate(tkp.id, deg=deg)
+                 })
+         })
   export.menu <- tkmenu(main.menu)
   tkadd(main.menu, "cascade", label="Export", menu=export.menu)
   tkadd(export.menu, "command", label="Postscript", command=function() {
@@ -154,10 +165,16 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
 ###################################################################  
   
   tkitembind(canvas, "vertex||label", "<1>", function(x, y) {
+    tkp <- .tkplot.get(tkp.id)
     canvas <- .tkplot.get(tkp.id, "canvas")
     tkdtag(canvas, "selected")
     tkaddtag(canvas, "selected", "withtag", "current")
-    tkitemraise(canvas,"current")
+                                        # get the id
+    tags <- as.character(tkgettags(tkp$canvas, "selected"))
+    id <- as.numeric(strsplit(tags[pmatch("v-", tags)],
+                              "-", fixed=TRUE)[[1]][2])
+    if (is.na(id)) { return() }
+    tkitemraise(canvas, paste(sep="", "v-", id))
   })
   tkitembind(canvas, "vertex||label", "<ButtonRelease-1>", function(x, y) {
     canvas <- .tkplot.get(tkp.id, "canvas")
@@ -257,121 +274,10 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   eval(parse(text=cmd), .tkplot.env)
 }
 
-###################################################################
-# Other public functions, layouts
-###################################################################
-
-layout.random <- function(graph, params) {
-  res <- matrix( runif(vcount(graph)*2, -1, 1), nc=2)
-  res
-}
-
 .tkplot.addlayout("random",
                   list(name="Random", f=layout.random, params=list()))
-
-layout.circle <- function(graph, params) {
-  n <- vcount(graph)
-  phi <- seq(0, by=2*pi/n, length=n)
-  res <- matrix(c(cos(phi), sin(phi)), nc=2)
-
-  res
-}
-
 .tkplot.addlayout("circle",
                   list(name="Circle", f=layout.circle, params=list()))
-
-layout.fruchterman.reingold <- function(graph, ..., params=list()) {
-
-  if (length(params)==0) {
-    params <- list(...)
-  }
-
-  if (is.null(params$niter))     { params$niter   <- 100 }
-  if (is.null(params$coolexp))   { params$coolexp <- 1.5 }
-  if (is.null(params$frame))     { params$frame   <- "rectangle" }
-  if (is.null(params$initial) ||
-      !params$initial)           { params$initial <- layout.random(graph) }
-  if (is.null(params$temp))      { params$temp    <- 1/10 }
-  
-  edges <- get.edgelist(graph)
-
-  len <- function(vect) sqrt(sum(vect*vect))
-  norm <- function(vect) vect/len(vect)
-  
-  # parameters
-  W <- L <- 1
-
-  # initialization
-  coords <- params$initial
-  coords[,1] <- coords[,1] * W
-  coords[,2] <- coords[,2] * L
-  area <- W*L
-  k <- sqrt(area/vcount(graph))
-  t <- t.begin <- c(params$temp, params$temp)
-
-  # attractive & repulsive "forces"
-  fa <- function(x) x*x/k
-  fr <- function(x) k*k/x
-
-  # cooling function
-  cool <- function(t, i) t.begin * (i/params$niter)**params$coolexp
-  
-  for (i in 1:params$niter) {
-    
-    disp <- matrix(0, NROW(coords), NCOL(coords))
-    
-    # calculate repulsive forces
-    for (v in 1:(vcount(graph)-1)) {
-      for (u in (v+1):vcount(graph)) {
-        delta <- coords[v,]-coords[u,]
-        if (sum(abs(delta))==0) {
-          coords[u,] <- coords[u,] + runif(2, -W/1000, W/1000)
-          delta <- coords[v,]-coords[u,]
-        }
-        vel <- norm(delta) * fr(len(delta))
-        disp[v,] <- disp[v,] + vel
-        disp[u,] <- disp[u,] - vel
-      }
-    }
-    
-    # calculate attractive forces
-    for (e in seq(along=edges[,1])) {
-      delta <- coords[edges[e,1],]-coords[edges[e,2],]
-      vel <- norm(delta) * fa(len(delta))
-      disp[edges[e,1],] <- disp[edges[e,1],] - vel
-      disp[edges[e,2],] <- disp[edges[e,2],] + vel
-    }
-
-    # limit the maximum displacement to the temperature t
-    # and then prevent from being displaced outside frame
-    for (v in 1:vcount(graph)) {
-      real.disp <- norm(disp[v,]) *
-        c(min(abs(disp[v,1]), t[1]), min(abs(disp[v,2]), t[2]))
-      coords[v,] <- coords[v,] + real.disp
-
-      if (params$frame=="rectangle") {
-        coords[v,1] <- min(W/2, max(-W/2, coords[v,1]))
-        coords[v,2] <- min(L/2, max(-L/2, coords[v,2]))
-      } else if (params$frame=="circle") {
-        l <- len(coords[v,])
-        if (l > W) {
-          phi <- atan2(coords[v,1], coords[v,2])
-          coords[v,1] <- W*cos(phi)/l
-          coords[v,2] <- W*sin(phi)/l
-        }
-      }
-    }
-    
-    # cool down
-    t <- cool(t, i)
-    
-  } # for i in 1:iterations
-
-  res <- coords
-  
-  res
-}
-
 .tkplot.addlayout("fruchterman.reingold",
                   list(name="Fruchterman-Reingold",
                        f=layout.fruchterman.reingold,
@@ -395,8 +301,49 @@ layout.fruchterman.reingold <- function(graph, ..., params=list()) {
                          )
                        )
                   )
-
-
+.tkplot.addlayout("kamada.kawai",
+                  list(name="Kamada-Kawai",
+                       f=layout.kamada.kawai,
+                       params=list(
+                         niter=list(name="Number of iterations",
+                           type="numeric",
+                           default=1000),
+                         initemp=list(name="Initial temperature",
+                           type="numeric",
+                           default=10),
+                         coolexp=list(name="Cooling exponent",
+                           type="numeric",
+                           default=0.99)
+                         )
+                       )
+                  )
+.tkplot.addlayout("spring",
+                  list(name="Spring Embedder",
+                       f=layout.spring,
+                       params=list(
+                         mass=list(names="The vertex mass",
+                           type="numeric",
+                           default=0.1),
+                         equil=list(names="The equilibrium spring extension",
+                           type="numeric",
+                           default=1),
+                         k=list(names="The spring coefficient",
+                           type="numeric",
+                           default=0.001),
+                         repeqdis=list(names="Repulsion balance point",
+                           type="numeric",
+                           default=0.1),
+                         kfr=list(names="Friction base coefficient",
+                           type="numeric",
+                           default=0.01),
+                         repulse=list(names="Use repulsion",
+                           type="logical",
+                           default=FALSE)
+                         )
+                       )
+                  )
+                         
+                       
 ###################################################################
 # Other public functions, misc.
 ###################################################################
@@ -494,6 +441,29 @@ tkplot.getcoords <- function(tkp.id, norm=FALSE) {
   coords
 }
 
+tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
+  coords <- .tkplot.get(tkp.id, "coords")
+
+  if (is.null(degree) && is.null(rad)) {
+    rad <- pi/2
+  } else if (is.null(rad) && !is.null(degree)) {
+    rad <- degree/180*pi
+  }
+  
+  center <- c(mean(range(coords[,1])), mean(range(coords[,2])))
+  phi <- atan2(coords[,2]-center[2], coords[,1]-center[1])
+  r   <- sqrt((coords[,1]-center[1])**2 + (coords[,2]-center[2])**2)
+
+  phi <- phi + rad
+
+ coords[,1] <- r * cos(phi)
+  coords[,2] <- r * sin(phi)
+  
+  .tkplot.set(tkp.id, "coords", coords)
+  tkplot.center(tkp.id)
+  invisible(TRUE)
+}
+
 ###################################################################
 # Internal functions, handling the internal environment
 ###################################################################
@@ -573,8 +543,11 @@ tkplot.getcoords <- function(tkp.id, norm=FALSE) {
   label.degree <- ifelse(length(tkp$params$label.degree)>1,
                          tkp$params$label.degree[id],
                          tkp$params$label.degree)
-  label.x <- x+cos(label.degree)*(vertex.size+6+4*(ceiling(log10(id+1))))
-  label.y <- y+sin(label.degree)*(vertex.size+6+4*(ceiling(log10(id+1))))
+  label.dist <- tkp$params$label.dist
+  label.x <- x+label.dist*cos(label.degree)*
+    (vertex.size+6+4*(ceiling(log10(id+1))))
+  label.y <- y+label.dist*sin(label.degree)*
+    (vertex.size+6+4*(ceiling(log10(id+1))))
   item <- tkcreate(tkp$canvas, "oval", x-vertex.size, y-vertex.size,
                    x+vertex.size, y+vertex.size, width=1,
                    outline="black",  fill=vertex.color,
@@ -617,8 +590,11 @@ tkplot.getcoords <- function(tkp.id, norm=FALSE) {
   label.degree <- ifelse(length(tkp$params$label.degree)>1,
                          tkp$params$label.degree[id],
                          tkp$params$label.degree)
-  label.x <- x+cos(label.degree)*(vertex.size+6+4*(ceiling(log10(id+1))))
-  label.y <- y+sin(label.degree)*(vertex.size+6+4*(ceiling(log10(id+1))))
+  label.dist <- tkp$params$label.dist
+  label.x <- x+label.dist*cos(label.degree)*
+    (vertex.size+6+4*(ceiling(log10(id+1))))
+  label.y <- y+label.dist*sin(label.degree)*
+    (vertex.size+6+4*(ceiling(log10(id+1))))
   tkcoords(tkp$canvas, paste("label&&v-", id, sep=""),
            label.x, label.y)
 }

@@ -66,6 +66,14 @@ SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode);
 SEXP REST_clusters(SEXP interface, SEXP graph);
 
 /* -------------------------------------------------- */
+/* Layouts, mostly from SNA                           */
+/* -------------------------------------------------- */
+
+SEXP REST_layout_kamadakawai(SEXP pn, SEXP pniter, 
+			     SEXP pelen, SEXP pinitemp, SEXP pcoolexp, 
+			     SEXP pkkconst, SEXP psigma, SEXP px, SEXP py);
+
+/* -------------------------------------------------- */
 /* The C igraph interface                             */
 /* -------------------------------------------------- */
 
