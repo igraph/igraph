@@ -37,6 +37,7 @@ S3method(set.edge.attribute, adjacencylist.default)
 
 # common functions, attribute related
 
+export(g.a, "g.a<-", v.a, "v.a<-", e.a, "e.a<-")
 export(is.directed, igraph.type)
 
 # common functions, screen related 

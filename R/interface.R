@@ -91,6 +91,13 @@ get.edge.attribute <- function(graph, attrname, from=NULL, to=NULL)
 set.edge.attribute <- function(graph, attrname, from=NULL, to=NULL, value)
   UseMethod(paste(sep="", "set.edge.attribute.", graph$gal$type))
 
+g.a <- get.graph.attribute
+"g.a<-" <- set.graph.attribute
+v.a <- get.vertex.attribute
+"v.a<-" <- set.vertex.attribute
+e.a <- get.edge.attribute
+"e.a<-" <- set.edge.attribute
+
 ###################################################################
 # Interface object for C functions
 ###################################################################
