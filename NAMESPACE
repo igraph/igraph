@@ -76,7 +76,7 @@ export(are.connected)
 
 # common functions, graph generators
 
-export(graph, graph.star, graph.lattice, graph.ring)
+export(graph, graph.star, graph.lattice, graph.ring, graph.tree)
 
 # common functions, graph generators, games
 

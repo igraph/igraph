@@ -110,3 +110,18 @@ graph.ring <- function(n, circular=TRUE, directed=FALSE, mutual=FALSE, ...) {
                        mutual=mutual, ...)
   res
 }
+
+###################################################################
+# Trees, regular
+###################################################################
+
+graph.tree <- function(n, children=2, ...) {
+
+  edges <- matrix(0, nc=2, nr=n-1)
+  edges[,1] <- rep(1:n, each=children, length.out=n-1)
+  edges[,2] <- 2:n
+  
+  res <- graph(n=n, as.numeric(t(edges)), ...)
+
+  res
+}
