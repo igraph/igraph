@@ -128,3 +128,16 @@ simplify <- function(graph, remove.loops=TRUE,
   res
 }
 
+betweenness <- function(graph, v=1:vcount(graph), directed=TRUE) {
+
+  res <- .Call("REST_betweenness", igraph.c.interface,
+               graph, directed, PACKAGE="igraph")
+
+  res <- res[v]
+  
+  if (!directed || !is.directed(graph)) {
+    res <- res/2
+  }
+
+  res  
+}

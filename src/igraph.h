@@ -64,6 +64,14 @@ SEXP REST_ba_game(SEXP pn, SEXP pm, SEXP outseq, SEXP poutpref);
 SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn);
 SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode);
 SEXP REST_clusters(SEXP interface, SEXP graph);
+SEXP REST_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
+
+/* -------------------------------------------------- */
+/* Read and write foreign formats                     */
+/* -------------------------------------------------- */
+
+SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
+		       SEXP pattributes);
 
 /* -------------------------------------------------- */
 /* Layouts, mostly from SNA                           */
@@ -77,30 +85,28 @@ SEXP REST_layout_kamadakawai(SEXP pn, SEXP pniter,
 /* The C igraph interface                             */
 /* -------------------------------------------------- */
 
-/* Order is important here!! See interface.R */
-
-typedef 
-enum REST_CALL_LIST { graph_empty, add_edges, add_vertices, 
-		      delete_edges, delete_vertices, vcount, ecount,
-		      neighbors, 
-		      add_graph_attribute, delete_graph_attribute,
-		      set_graph_attribute, get_graph_attribute, 
-		      add_vertex_attribute, delete_vertex_attribute, 
-		      set_vertex_attribute, get_vertex_attribute,
-		      add_edge_attribute, delete_edge_attribute,
-		      set_edge_attribute, get_edge_attribute } REST_CALL_T;
-
-#define REST_CALL1(call) EVAL(lang1(VECTOR_ELT(interface, call),p1))
-#define REST_CALL2(call,p1) EVAL(lang2(VECTOR_ELT(interface, call),p1))
-#define REST_CALL3(call,p1,p2) EVAL(lang3(VECTOR_ELT(interface, call),p1,p2))
-#define REST_CALL4(call,p1,p2,p3) EVAL(lang4(VECTOR_ELT(interface, call),p1,p2,p3))
-
-#define VCOUNT(graph) REST_CALL2(vcount, graph)
-#define NEIGHBORS(graph, v, m) REST_CALL4(neighbors, graph, ScalarReal(v), m)
+#define VCOUNT(graph) EVAL(lang3(interface, \
+  ScalarString(CREATE_STRING_VECTOR("vcount")), AS_LIST(list1(graph))))
+#define NEIGHBORS(graph, v, m) EVAL(lang3(interface, \
+  ScalarString(CREATE_STRING_VECTOR("neighbors")), AS_LIST(list3(graph, ScalarReal(v), m))))
+#define ADD_VERTICES(graph, nv) EVAL(lang3(interface, \
+  ScalarString(CREATE_STRING_VECTOR("add.vertices")), AS_LIST(list2(graph, ScalarReal(nv)))))
+#define GRAPH_EMPTY(args) EVAL(lang3(interface, \
+  ScalarString(CREATE_STRING_VECTOR("graph.empty")), args))
+#define ADD_EDGES(graph, edges) EVAL(lang3(interface, \
+  ScalarString(CREATE_STRING_VECTOR("add.edges")), AS_LIST(list2(graph, edges))))
+#define ADD_VERTEX_ATTRIBUTE(graph, attrname, default) EVAL(lang3(interface, \
+  ScalarString(CREATE_STRING_VECTOR("add.vertex.attribute")), \
+  AS_LIST(list3(graph, ScalarString(CREATE_STRING_VECTOR(attrname)), default))))
+#define SET_VERTEX_ATTRIBUTE(graph, attrname, v, newvalue) EVAL(lang3(interface, \
+  ScalarString(CREATE_STRING_VECTOR("set.vertex.attribute")), \
+  AS_LIST(list4(graph, ScalarString(CREATE_STRING_VECTOR(attrname)), v, newvalue))))
 
 /* -------------------------------------------------- */
 /* INTERNALS                                          */
 /* -------------------------------------------------- */
+
+SEXP REST_i_get_list_element(SEXP list, const char *str);
 
 /* -------------------------------------------------- */
 

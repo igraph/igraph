@@ -63,7 +63,7 @@ export(diameter, degree, degree.distribution, closeness, shortest.paths)
 
 # common functions, components and similar
 
-export(clusters, cluster.distribution, subcomponent, subgraph)
+export(clusters, cluster.distribution, subcomponent, subgraph, betweenness)
 
 # common: conversion
 
@@ -78,3 +78,8 @@ export(tkplot,
        tkplot.close, tkplot.off, tkplot.fit.to.screen, tkplot.reshape,
        tkplot.export.postscript, tkplot.getcoords, tkplot.center,
        tkplot.rotate)
+
+# foreign file formars
+
+export(read.graph)
+

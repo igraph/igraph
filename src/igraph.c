@@ -37,6 +37,7 @@ SEXP REST_i_get_list_element(SEXP list, const char *str) {
   }
   
   names = getAttrib(list, R_NamesSymbol);
+  if (isNull(names)) { return elmt; }
   for (i = 0; i < length(list); i++)
     if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
       elmt = VECTOR_ELT(list, i);

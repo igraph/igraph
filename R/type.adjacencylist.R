@@ -23,7 +23,7 @@
 # Building graphs 
 ###################################################################
 
-graph.empty.adjacencylist.default <- function(type="adjacencylist", ...) {
+graph.empty.adjacencylist.default <- function(..., type="adjacencylist") {
   
   gal <- list(type="adjacencylist", ...)
   if (!"directed" %in% names(gal)) {
@@ -235,12 +235,16 @@ delete.vertex.attribute.adjacencylist.default <- function(graph, attrname) {
 }
 
 get.vertex.attribute.adjacencylist.default <- function(graph, attrname,
-                                                       v=1:vcount(graph)) {
+                                                       v=NULL) {
   if (is.null(graph$val[[attrname]])) {
     stop("no such attribute: ", attrname)
   }
 
-  res <- graph$val[[attrname]][v]
+  if (is.null(v)) {
+    res <- graph$val[[attrname]]
+  } else {
+    res <- graph$val[[attrname]][v]
+  }
   if (length(res)==1) {
     res <- res[[1]]
   }
@@ -249,13 +253,16 @@ get.vertex.attribute.adjacencylist.default <- function(graph, attrname,
 }
 
 set.vertex.attribute.adjacencylist.default <- function(graph, attrname,
-                                                       v, value) {
+                                                       v=NULL, value) {
   if (is.null(graph$val[[attrname]])) {
     stop("no such attribute: ", attrname)
   }
 
   res <- graph
-  graph$val[[attrname]][v] <- value
+  if (is.null(v)) {
+    v <- 1:vcount(graph)
+  }
+  res$val[[attrname]][v] <- value
   
   res
 }
