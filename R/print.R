@@ -34,13 +34,13 @@ print.graph <- function(graph) {
   arrow <- ifelse(is.directed(graph), "->", "--")
   if (ecount(graph) != 0) {
     cat("\nEdges:\n")
+    idx <- 1
     for (i in 1:vcount(graph)) {
       neis <- neighbors(graph, i, "out")
       if (!is.directed(graph)) {
         no.loops <- sum(neis==i)
         neis <- c(neis[ neis > i ], rep(i, no.loops/2))
       }
-      idx <- 1
       for (j in neis) {
         cat(sep="", "[", idx, "] ", i, " ", arrow, " ", j, "\n")
         idx <- idx + 1

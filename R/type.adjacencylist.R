@@ -126,19 +126,16 @@ delete.vertices.adjacencylist.default <- function(graph, v) {
   res <- graph
   v <- as.numeric(v)
   res$data$out <- .Call("REST_neighborlist_delete_vertices", res$data$out, v,
-                        graph$gal$named, PACKAGE="simplegraph")
+                        graph$gal$named, PACKAGE="igraph")
   if (is.directed(graph)) {
     res$data$inc <- .Call("REST_neighborlist_delete_vertices", res$data$inc, v,
-                          graph$gal$named, PACKAGE="simplegraph")
+                          graph$gal$named, PACKAGE="igraph")
   }
   res$gal$n <- length(res$data$out)
   if (length(res$val) != 0 && length(v)>0 ) {
     res$val <- res$val[-v]
   }
   
-  if (graph.verbose) {
-    print("debug: `delete.vertices.adjacencylist.default' finished")
-  }
   res
 }
 
