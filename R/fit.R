@@ -43,9 +43,14 @@ power.law.fit <- function(x, xmin=NULL, start=2, ...) {
     warning("too small values eliminated from vector")
     n <- length(x)
   }
-
+  
   mlogl <- function(alpha) {
-    -n*log(alpha-1)-sum(lbeta(x, alpha))
+    if (xmin > 1) {
+      C <- 1/(1/(alpha-1)-sum(beta(1:(xmin-1), alpha)))
+    } else {
+      C <- alpha-1
+    }
+    -n*log(C)-sum(lbeta(x, alpha))
   }
 
   alpha <- mle(mlogl, start=list(alpha=start), ...)
