@@ -20,13 +20,14 @@
 ###################################################################
 
 ###################################################################
-# Pajek file
+# Reading foreign file formats
 ###################################################################
 
 read.graph <- function(file, format="pajek", ...) {
 
   res <- switch(format,
                 "pajek"=read.graph.pajek(file, format, ...),
+                "edgelist"=read.graph.edgelist(file, format, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -36,6 +37,7 @@ write.graph <- function(graph, file, format="pajek", ...) {
   
   res <- switch(format,
                 "pajek"=write.graph.pajek(graph, file, format, ...),
+                "edgelist"=read.graph.edgelist(graph, file, format, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -54,3 +56,31 @@ read.graph.pajek <- function(filename, format="pajek", attributes=TRUE, ...) {
   res
 }
 
+################################################################
+# Plain edge list format, not sorted
+################################################################
+
+read.graph.edgelist <- function(filename, format="edgelist", ...) {
+
+  res <- graph.empty(...)
+
+  if (is.character(filename)) {
+    filename <- file(filename)
+  }
+  if (!isOpen(filename)) {
+    open(filename)
+  }
+  
+  edges <- scan(filename, nmax=20000)
+  while(length(edges)>0) {
+    m <- max(edges)
+    v <- vcount(res)
+    if (m>v) {
+      res <- add.vertices(res, m-v)
+    }
+    res <- add.edges(res, edges)
+    edges <- scan(filename, nmax=20000)
+  }
+
+  res
+}
