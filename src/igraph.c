@@ -48,11 +48,14 @@ REST_i_ptrtable_t REST_i_table_adjacencylist= {
 
 REST_i_ptrtable_t REST_i_getptrtable(SEXP graph) {
 
+  SEXP gal, type;
+  const char * type_str;
+
   if (graph==0) { return REST_i_table_default; }
   
-  SEXP gal=REST_i_get_list_element(graph, "gal");
-  SEXP type=REST_i_get_list_element(gal, "type");
-  const char* type_str=CHAR(STRING_ELT(type, 0));
+  gal=REST_i_get_list_element(graph, "gal");
+  type=REST_i_get_list_element(gal, "type");
+  type_str=CHAR(STRING_ELT(type, 0));
 
   if (!strcmp(type_str, "adjacencylist")) {
     return REST_i_table_adjacencylist;
