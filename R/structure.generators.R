@@ -35,6 +35,31 @@ graph <- function( edges, ... ) {
   res
 }
 
+graph.adjacency <- function( adjmatrix, directed=TRUE, ... ) {
+
+  if (!is.matrix(adjmatrix) || nrow(adjmatrix) != ncol(adjmatrix)) {
+    stop("Invarid argument, should be a square matrix")
+  }
+  if (any(adjmatrix != t(adjmatrix)) && !directed) {
+    warning("Non symmetric matrix symmetrized for undirected graph")
+    adjmatrix <- (adjmatrix+t(adjmatrix))/2
+  }
+  
+  res <- graph.empty(directed=directed, ...)
+
+  res <- add.vertices(res, nrow(adjmatrix))
+
+  edges <- unlist(mapply(function(f, t)
+                         { c(t(matrix((c(rep(f,length(t)), t)), nc=2))) },
+                         1:nrow(adjmatrix),
+                         apply(adjmatrix, 1, function(r) { which(r>0) } ),
+                         SIMPLIFY=FALSE))
+  res <- add.edges(res, edges)
+
+  res
+}
+  
+
 graph.star <- function(n, mode="in", center=1, directed=TRUE, ...) {
 
   if (mode=="out") {
