@@ -41,12 +41,6 @@ eb.community <- function(graph, directed=TRUE) {
   res
 }
 
-# TODO
-
-optimal.community <- function(graph, edges) {
-
-}
-
 cut.community <- function(graph, edges, after.removing) {
 
   if (after.removing >= nrow(edges)) { 
@@ -56,5 +50,35 @@ cut.community <- function(graph, edges, after.removing) {
 		  directed=is.directed(graph) )
   }
 
+  res
+}
+
+edge.type.matrix <- function(graph, types) {
+
+  if (vcount(graph) != length(types)) {
+    stop("'graph' and/or 'types' invalid, they should be of the same length")
+  }
+
+  no.of.types <- max(types)
+  res <- matrix(0, nr=no.of.types, nc=no.of.types)
+
+  el <- get.edgelist(graph)
+  if (length(el) != 0) {
+    for (i in 1:nrow(el)) {
+      res[ types[el[i,1]], types[el[i,2]] ] <-
+        res[ types[el[i,1]], types[el[i,2]] ] + 1
+    }
+    res <- res / sum(res)
+  }
+  
+  res
+}
+
+modularity <- function(graph, types) {
+
+  etm <- edge.type.matrix(graph, types)
+
+  res <- sum(diag(etm)) - sum(etm %*% etm)
+  
   res
 }

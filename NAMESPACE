@@ -126,5 +126,4 @@ export(power.law.fit)
 
 # community structure
 
-export(eb.community, optimal.community, cut.community)
-
+export(edge.type.matrix, eb.community, cut.community, modularity)
