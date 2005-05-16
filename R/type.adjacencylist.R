@@ -286,7 +286,7 @@ add.edge.attribute.adjacencylist.default <- function(graph,
 }
 
 delete.edge.attribute.adjacencylist.default <- function(graph, attrname) {
-  if (is.null(graph$eal[[attr]])) {
+  if (is.null(graph$eal[[attrname]])) {
     stop("No such edge attribute")
   }
 

@@ -41,9 +41,9 @@ char *REST_i_next_line(SEXP lines, long int *currentline) {
     }
     (*currentline)++;
   }
-  if (l) 
-    { return result; } 
-  else 
+  if (l)
+    { return result; }
+  else
     { return 0; }
 }
 
@@ -58,9 +58,9 @@ char *REST_i_next_star_line(SEXP lines, long int *currentline) {
     l= (*result=='*');
     (*currentline)++;
   }
-  if (l) 
-    { return result; } 
-  else 
+  if (l)
+    { return result; }
+  else
     { return 0; }
 }
 
@@ -203,7 +203,7 @@ SEXP REST_i_pajek_color(char **posp) {
   }
 }
     
-SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other, 
+SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
 		       SEXP pattributes) {
 
   SEXP result;
@@ -219,6 +219,9 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
   long int unprot=0;
   SEXP edgevec;
   long int i, j;
+
+  SEXP graph;
+  REST_i_ptrtable_t ptrtable;
 
   Rboolean attributes;
   /* do we have these attributes already? */
@@ -243,7 +246,7 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
   }
   
   /* Number of vertices */
-  if (currentpos == 0 || 
+  if (currentpos == 0 ||
       strncasecmp(currentpos, "*vertices", 9)) {
     error("invalid file format, can't find '*Vertices'");
   }
@@ -267,7 +270,7 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
       currentpos=REST_i_skip_space(tail);
       if (*currentpos != '\0') {
 	/* label */
-	SET_VECTOR_ELT(attr_name, vid-1, 
+	SET_VECTOR_ELT(attr_name, vid-1,
 		       ScalarString(REST_i_get_quoted_string(&currentpos)));
 	currentpos=REST_i_skip_space(currentpos);
       }
@@ -319,7 +322,7 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
 	  /* where edges can join the shape, polar coords */
 	  currentpos+=5;
 	  strtod(currentpos, &currentpos);
-	  strtod(currentpos, &currentpos);	
+	  strtod(currentpos, &currentpos);
 	} else if (!strncasecmp(currentpos, "lphi", 4)) {
 	  /* position of label in degrees */
 	  currentpos+=4;
@@ -329,15 +332,15 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
 	  currentpos+=4;
 	  REST_i_get_quoted_string(&currentpos);
 	} else if (!strncasecmp(currentpos, "cart", 4)) {
-	  /* where edges can join the shape, cartesian coords */ 
+	  /* where edges can join the shape, cartesian coords */
 	  currentpos+=4;
 	  strtod(currentpos, &currentpos);
-	  strtod(currentpos, &currentpos);	
+	  strtod(currentpos, &currentpos);
 	} else if (!strncasecmp(currentpos, "circ", 4)) {
 	  /* where edges can join the shape, ??? */
 	  currentpos+=4;
 	  strtod(currentpos, &currentpos);
-	  strtod(currentpos, &currentpos);	
+	  strtod(currentpos, &currentpos);
 	} else if (!strncasecmp(currentpos, "box", 3)) {
 	  /* shape */
 	  currentpos+=3;
@@ -398,7 +401,7 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
       }
 
       currentline++;
-      currentpos=REST_i_next_line(lines, &currentline);    
+      currentpos=REST_i_next_line(lines, &currentline);
     }
   } /* if (! attributes) */
 
@@ -442,11 +445,11 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
 	if (arcs) { directed=1; } else { directed=2; }
       }
 
-    } else if (!strncasecmp(currentpos, "*arcs", 5) || 
+    } else if (!strncasecmp(currentpos, "*arcs", 5) ||
 	       !strncasecmp(currentpos, "*edges", 6)) {
       Rboolean arcs;
       long int startsize=dqueue_size(&edges);
-      if (!strncasecmp(currentpos, "*arcs", 5)) 
+      if (!strncasecmp(currentpos, "*arcs", 5))
 	{ arcs=TRUE; } else { arcs=FALSE; }
       
       currentline++;
@@ -454,7 +457,7 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
       while (currentpos != 0 && *currentpos != '*') {
 	char *tail;
 	dqueue_push(&edges, strtol(currentpos, &tail, 0));
-	dqueue_push(&edges, strtol(tail, 0, 0));    
+	dqueue_push(&edges, strtol(tail, 0, 0));
 	currentline++;
 	currentpos=REST_i_next_line(lines, &currentline);
       }
@@ -499,32 +502,44 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
     SET_NAMES(tmp, names);
     UNPROTECT(2);
     /* TODO: dirty Hack: calling 'interface' explicitly */
-    PROTECT(other=EVAL(lang3(interface, 
+    PROTECT(other=EVAL(lang3(interface,
 			     ScalarString(CREATE_STRING_VECTOR("c")),
 			     AS_LIST(list2(tmp, other)))));
     unprot++;
   }
 
-  PROTECT(result=ADD_EDGES(ADD_VERTICES(GRAPH_EMPTY(other), no_of_nodes),
-			   edgevec)); unprot++;
-   
+  ptrtable = REST_i_getptrtable(0); /* default */
+  graph=ptrtable.graph_empty(interface, other);
+  ptrtable = REST_i_getptrtable(graph);
+  PROTECT(result=
+	  ptrtable.add_edges(interface, 
+			     ptrtable.add_vertices(interface, graph, 
+						   no_of_nodes),
+			     edgevec)); unprot++;
+  
   /* add the attributes */
   if (attr_coords != 0) {
     UNPROTECT(1);
-    PROTECT(result=SET_VERTEX_ATTRIBUTE
-	    (ADD_VERTEX_ATTRIBUTE(result, "coords", ScalarReal(NA_REAL)),
+    PROTECT(result=ptrtable.set_vertex_attribute
+	    (interface, ptrtable.add_vertex_attribute(interface, result, 
+						      "coords", 
+						      ScalarReal(NA_REAL)),
 	     "coords", NULL_USER_OBJECT, attr_coords));
   }
   if (attr_name != 0) {
     UNPROTECT(1);
-    PROTECT(result=SET_VERTEX_ATTRIBUTE
-	    (ADD_VERTEX_ATTRIBUTE(result, "name", ScalarReal(NA_REAL)),
+    PROTECT(result=ptrtable.set_vertex_attribute
+	    (interface, ptrtable.add_vertex_attribute(interface, 
+						      result, "name", 
+						      ScalarReal(NA_REAL)),
 	    "name", NULL_USER_OBJECT, attr_name));
   }
   if (attr_ic != 0) {
     UNPROTECT(1);
-    PROTECT(result=SET_VERTEX_ATTRIBUTE
-	    (ADD_VERTEX_ATTRIBUTE(result, "color", ScalarReal(NA_REAL)),
+    PROTECT(result=ptrtable.set_vertex_attribute
+	    (interface, ptrtable.add_vertex_attribute(interface, result, 
+						      "color", 
+						      ScalarReal(NA_REAL)),
 	     "color", NULL_USER_OBJECT, attr_ic));
   }
   

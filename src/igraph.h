@@ -65,6 +65,13 @@ SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn);
 SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode);
 SEXP REST_clusters(SEXP interface, SEXP graph);
 SEXP REST_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
+SEXP REST_edge_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
+
+/* -------------------------------------------------- */
+/* Community Structure                                */
+/* -------------------------------------------------- */
+
+SEXP REST_eb_community(SEXP interface, SEXP graph, SEXP pdirected);
 
 /* -------------------------------------------------- */
 /* Read and write foreign formats                     */
@@ -85,22 +92,42 @@ SEXP REST_layout_kamadakawai(SEXP pn, SEXP pniter,
 /* The C igraph interface                             */
 /* -------------------------------------------------- */
 
-#define VCOUNT(graph) EVAL(lang3(interface, \
-  ScalarString(CREATE_STRING_VECTOR("vcount")), AS_LIST(list1(graph))))
-#define NEIGHBORS(graph, v, m) EVAL(lang3(interface, \
-  ScalarString(CREATE_STRING_VECTOR("neighbors")), AS_LIST(list3(graph, ScalarReal(v), m))))
-#define ADD_VERTICES(graph, nv) EVAL(lang3(interface, \
-  ScalarString(CREATE_STRING_VECTOR("add.vertices")), AS_LIST(list2(graph, ScalarReal(nv)))))
-#define GRAPH_EMPTY(args) EVAL(lang3(interface, \
-  ScalarString(CREATE_STRING_VECTOR("graph.empty")), args))
-#define ADD_EDGES(graph, edges) EVAL(lang3(interface, \
-  ScalarString(CREATE_STRING_VECTOR("add.edges")), AS_LIST(list2(graph, edges))))
-#define ADD_VERTEX_ATTRIBUTE(graph, attrname, default) EVAL(lang3(interface, \
-  ScalarString(CREATE_STRING_VECTOR("add.vertex.attribute")), \
-  AS_LIST(list3(graph, ScalarString(CREATE_STRING_VECTOR(attrname)), default))))
-#define SET_VERTEX_ATTRIBUTE(graph, attrname, v, newvalue) EVAL(lang3(interface, \
-  ScalarString(CREATE_STRING_VECTOR("set.vertex.attribute")), \
-  AS_LIST(list4(graph, ScalarString(CREATE_STRING_VECTOR(attrname)), v, newvalue))))
+typedef SEXP (*VCOUNT_t)(SEXP, SEXP);
+typedef SEXP (*ECOUNT_t)(SEXP, SEXP);
+typedef SEXP (*NEIGHBORS_t)(SEXP, SEXP, long int, SEXP);
+typedef SEXP (*ADD_VERTICES_t)(SEXP, SEXP, long int);
+typedef SEXP (*GRAPH_EMPTY_t)(SEXP, SEXP);
+typedef SEXP (*ADD_EDGES_t)(SEXP, SEXP, SEXP);
+typedef SEXP (*ADD_VERTEX_ATTRIBUTE_t)(SEXP, SEXP, const char*, SEXP);
+typedef SEXP (*SET_VERTEX_ATTRIBUTE_t)(SEXP, SEXP, const char*, SEXP, SEXP);
+
+typedef struct {
+  VCOUNT_t vcount;
+  ECOUNT_t ecount;
+  NEIGHBORS_t neighbors;
+  ADD_VERTICES_t add_vertices;
+  GRAPH_EMPTY_t graph_empty;
+  ADD_EDGES_t add_edges;
+  ADD_VERTEX_ATTRIBUTE_t add_vertex_attribute;
+  SET_VERTEX_ATTRIBUTE_t set_vertex_attribute;
+} REST_i_ptrtable_t;
+
+extern REST_i_ptrtable_t REST_i_table_default;
+extern REST_i_ptrtable_t REST_i_table_adjacencylist;
+
+REST_i_ptrtable_t REST_i_getptrtable(SEXP graph);
+
+SEXP REST_i_default_vcount(SEXP, SEXP);
+SEXP REST_i_default_ecount(SEXP, SEXP);
+SEXP REST_i_default_neighbors(SEXP, SEXP, long int, SEXP);
+SEXP REST_i_default_add_vertices(SEXP, SEXP, long int);
+SEXP REST_i_default_graph_empty(SEXP, SEXP);
+SEXP REST_i_default_add_edges(SEXP, SEXP, SEXP);
+SEXP REST_i_default_add_vertex_attribute(SEXP, SEXP, const char*, SEXP);
+SEXP REST_i_default_set_vertex_attribute(SEXP, SEXP, const char*, SEXP, SEXP);
+
+SEXP REST_i_adjacencylist_vcount(SEXP, SEXP);
+SEXP REST_i_adjacencylist_neighbors(SEXP, SEXP, long int, SEXP);
 
 /* -------------------------------------------------- */
 /* INTERNALS                                          */

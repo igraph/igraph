@@ -22,6 +22,63 @@
 
 #include "igraph.h"
 
+SEXP REST_i_adjacencylist_vcount(SEXP interface, SEXP graph) {
+  SEXP data=REST_i_get_list_element(graph, "data");
+  SEXP out=REST_i_get_list_element(data, "out");
+  SEXP result;
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  R(result)=GET_LENGTH(out);
+  UNPROTECT(1);
+  return result;  
+}
+
+SEXP REST_i_adjacencylist_neighbors(SEXP interface, SEXP graph, 
+				    long int vertex, SEXP mode) {
+  
+  SEXP result;
+  SEXP dir;
+  SEXP out, inc;
+
+  dir=REST_i_get_list_element(graph, "gal");
+  dir=REST_i_get_list_element(dir, "directed");
+
+  if (LOGICAL(dir)[0]) {
+    if (!strcmp(STRING_VALUE(mode), "in")) {
+      inc=REST_i_get_list_element(graph, "data");
+      inc=VECTOR_ELT(REST_i_get_list_element(inc, "inc"), vertex-1);
+      PROTECT(result=NEW_NUMERIC(GET_LENGTH(inc)));
+      memcpy(REAL(result), REAL(inc), sizeof(double) * GET_LENGTH(result));
+    } else if (!strcmp(STRING_VALUE(mode), "out")) {
+      out=REST_i_get_list_element(graph, "data");
+      out=VECTOR_ELT(REST_i_get_list_element(out, "out"), vertex-1);
+      PROTECT(result=NEW_NUMERIC(GET_LENGTH(out)));
+      memcpy(REAL(result), REAL(out), sizeof(double) * GET_LENGTH(result));
+    } else {
+      long int len;
+      inc=REST_i_get_list_element(graph, "data");
+      inc=VECTOR_ELT(REST_i_get_list_element(inc, "inc"), vertex-1);
+      out=REST_i_get_list_element(graph, "data");
+      out=VECTOR_ELT(REST_i_get_list_element(out, "out"), vertex-1);
+      len=GET_LENGTH(inc)+GET_LENGTH(out);
+      PROTECT(result=NEW_NUMERIC(len));
+      memcpy(REAL(result), REAL(inc), sizeof(double)*GET_LENGTH(inc));
+      memcpy(REAL(result) + GET_LENGTH(inc), REAL(out), 
+	     sizeof(double)*GET_LENGTH(out));
+    }
+  } else {
+    out=REST_i_get_list_element(graph, "data");
+    out=VECTOR_ELT(REST_i_get_list_element(out, "out"), vertex-1);
+    PROTECT(result=NEW_NUMERIC(GET_LENGTH(out)));
+    memcpy(REAL(result), REAL(out), sizeof(double) * GET_LENGTH(result));
+  }
+  
+  UNPROTECT(1);
+  return result;
+}    
+
+
+
 /**
  */
 

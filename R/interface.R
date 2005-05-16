@@ -83,7 +83,7 @@ add.edge.attribute <- function(graph, attrname, default=NA)
   UseMethod(paste(sep="", "add.edge.attribute.", graph$gal$type))
 
 delete.edge.attribute <- function(graph, attrname)
-  UseMethod(paste(sep="", "delte.edge.attribute.", graph$gal$type))
+  UseMethod(paste(sep="", "delete.edge.attribute.", graph$gal$type))
 
 get.edge.attribute <- function(graph, attrname, from=NULL, to=NULL)
   UseMethod(paste(sep="", "get.edge.attribute.", graph$gal$type))

@@ -24,6 +24,96 @@
 
 #include "assert.h"
 
+REST_i_ptrtable_t REST_i_table_default= { 
+  REST_i_default_vcount,
+  REST_i_default_ecount,
+  REST_i_default_neighbors,
+  REST_i_default_add_vertices,
+  REST_i_default_graph_empty,
+  REST_i_default_add_edges,
+  REST_i_default_add_vertex_attribute,
+  REST_i_default_set_vertex_attribute
+};
+
+REST_i_ptrtable_t REST_i_table_adjacencylist= { 
+  REST_i_adjacencylist_vcount,
+  REST_i_default_ecount,
+  REST_i_adjacencylist_neighbors,
+  REST_i_default_add_vertices,
+  REST_i_default_graph_empty,
+  REST_i_default_add_edges,
+  REST_i_default_add_vertex_attribute,
+  REST_i_default_set_vertex_attribute
+};					      
+
+REST_i_ptrtable_t REST_i_getptrtable(SEXP graph) {
+
+  if (graph==0) { return REST_i_table_default; }
+  
+  SEXP gal=REST_i_get_list_element(graph, "gal");
+  SEXP type=REST_i_get_list_element(gal, "type");
+  const char* type_str=CHAR(STRING_ELT(type, 0));
+
+  if (!strcmp(type_str, "adjacencylist")) {
+    return REST_i_table_adjacencylist;
+  } else {
+    return REST_i_table_default;
+  }
+}
+
+SEXP REST_i_default_vcount(SEXP interface, SEXP graph) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("vcount")), 
+	     AS_LIST(list1(graph))));
+}
+
+SEXP REST_i_default_ecount(SEXP interface, SEXP graph) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("ecount")), 
+	     AS_LIST(list1(graph))));
+}
+
+SEXP REST_i_default_neighbors(SEXP interface, SEXP graph, long int v, SEXP m) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("neighbors")), 
+	     AS_LIST(list3(graph, ScalarReal(v), m))));
+}
+
+SEXP REST_i_default_add_vertices(SEXP interface, SEXP graph, long int nv) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("add.vertices")), 
+	     AS_LIST(list2(graph, ScalarReal(nv)))));
+}
+
+SEXP REST_i_default_graph_empty(SEXP interface, SEXP args) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("graph.empty")), args));
+}
+
+SEXP REST_i_default_add_edges(SEXP interface, SEXP graph, SEXP edges) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("add.edges")), 
+	     AS_LIST(list2(graph, edges))));
+}
+
+SEXP REST_i_default_add_vertex_attribute(SEXP interface, SEXP graph, 
+					 const char* attrname, 
+					 SEXP defaultval) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("add.vertex.attribute")),
+	     AS_LIST(list3(graph, ScalarString(CREATE_STRING_VECTOR(attrname)),
+			   defaultval))));
+}
+
+SEXP REST_i_default_set_vertex_attribute(SEXP interface, SEXP graph, 
+					 const char* attrname, SEXP v, 
+					 SEXP newvalue) {
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("set.vertex.attribute")),
+	     AS_LIST(list4(graph, ScalarString(CREATE_STRING_VECTOR(attrname)),
+			   v, newvalue))));
+}
+
 /**
  * From the R manual.
  */

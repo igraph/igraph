@@ -24,6 +24,8 @@
 
 SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn) {
 
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+
   SEXP result;
   long int no_of_nodes;
   long int i, j;
@@ -36,7 +38,7 @@ SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn) {
   SEXP tmp;
   SEXP dirmode;
 
-  no_of_nodes=R(VCOUNT(graph));
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
   unconn=LOGICAL(punconn)[0];
   
   if (LOGICAL(pdirected)[0]) {
@@ -61,7 +63,7 @@ SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn) {
       long int actdist=dqueue_pop(&q);
       if (actdist>dia) { dia=actdist; }
       
-      tmp=NEIGHBORS(graph, actnode+1, dirmode);
+      tmp=ptrtable.neighbors(interface,graph, actnode+1, dirmode);
       for (j=0; j<GET_LENGTH(tmp); j++) {
 	long int neighbor=REAL(tmp)[j]-1;
 	if (already_added[neighbor] == i+1) { continue; }
@@ -91,6 +93,8 @@ SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn) {
 
 SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode) {
   
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+
   SEXP result;
   
   long int no_of_nodes;
@@ -103,7 +107,7 @@ SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode) {
   long int nodes_to_calc;
   SEXP tmp;
 
-  no_of_nodes=R(VCOUNT(graph));
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
   nodes_to_calc=GET_LENGTH(nodes);
 
   PROTECT(result=NEW_NUMERIC(nodes_to_calc));
@@ -125,7 +129,7 @@ SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode) {
       long int actdist=dqueue_pop(&q);
       REAL(result)[i] += actdist;
 
-      tmp=NEIGHBORS(graph, act+1, pmode);
+      tmp=ptrtable.neighbors(interface,graph, act+1, pmode);
       for (j=0; j<GET_LENGTH(tmp); j++) {
 	long int neighbor=REAL(tmp)[j]-1;
 	if (already_counted[neighbor] == i+1) { continue; }
@@ -148,6 +152,8 @@ SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode) {
 
 SEXP REST_clusters(SEXP interface, SEXP graph) {
 
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+
   SEXP result;
   SEXP names;
   
@@ -162,7 +168,7 @@ SEXP REST_clusters(SEXP interface, SEXP graph) {
   SEXP tmp;
   SEXP mode;
 
-  no_of_nodes=R(VCOUNT(graph));
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
   already_added=(char*) R_alloc(no_of_nodes, sizeof(char));
   memset(already_added, 0, no_of_nodes*sizeof(char));
   PROTECT(mode=NEW_CHARACTER(1));
@@ -192,7 +198,7 @@ SEXP REST_clusters(SEXP interface, SEXP graph) {
     
     while ( !dqueue_empty(&q) ) {
       long int act_node=dqueue_pop(&q);
-      tmp=NEIGHBORS(graph, act_node+1, mode);
+      tmp=ptrtable.neighbors(interface,graph, act_node+1, mode);
       for (i=0; i<GET_LENGTH(tmp); i++) {
 	long int neighbor=REAL(tmp)[i]-1;
 	if (already_added[neighbor]==1) { continue; }
@@ -227,6 +233,8 @@ SEXP REST_clusters(SEXP interface, SEXP graph) {
 
 SEXP REST_strong_components(SEXP interface, SEXP graph) {
 
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+
   SEXP result;
   SEXP names;
 
@@ -245,7 +253,7 @@ SEXP REST_strong_components(SEXP interface, SEXP graph) {
   SEXP modein, modeout;
   SEXP tmp;
 
-  no_of_nodes=R(VCOUNT(graph));
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
   PROTECT(modein =ScalarString(CREATE_STRING_VECTOR("in")));
   PROTECT(modeout=ScalarString(CREATE_STRING_VECTOR("out")));  
 
@@ -265,12 +273,12 @@ SEXP REST_strong_components(SEXP interface, SEXP graph) {
   dqueue_init(&q, 100);
 
   for (i=0; i<no_of_nodes; i++) {
-    if (next_nei[i] > GET_LENGTH(NEIGHBORS(graph, i+1, modeout))) { continue; }
+    if (next_nei[i] > GET_LENGTH(ptrtable.neighbors(interface,graph, i+1, modeout))) { continue; }
     
     dqueue_push(&q, i);
     while (!dqueue_empty(&q)) {
       long int act_node=dqueue_back(&q);
-      tmp=NEIGHBORS(graph, act_node+1, modeout);
+      tmp=ptrtable.neighbors(interface,graph, act_node+1, modeout);
       if (next_nei[act_node]==0) {
 	/* this is the first time we've met this vertex */
 	next_nei[act_node]++;
@@ -312,7 +320,7 @@ SEXP REST_strong_components(SEXP interface, SEXP graph) {
     
     while (!dqueue_empty(&q)) {
       long int act_node=dqueue_pop_back(&q);
-      tmp=NEIGHBORS(graph, act_node+1, modein);
+      tmp=ptrtable.neighbors(interface,graph, act_node+1, modein);
       for (i=0; i<GET_LENGTH(tmp); i++) {
 	long int neighbor=REAL(tmp)[i]-1;
 	if (next_nei[neighbor] != 0) { continue; }
@@ -347,6 +355,8 @@ SEXP REST_strong_components(SEXP interface, SEXP graph) {
 
 SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode) {
   
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+
   SEXP result;
   SEXP dim;
   
@@ -359,7 +369,7 @@ SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode) {
   long int i, j;
   SEXP tmp;
 
-  no_of_nodes=R(VCOUNT(graph));
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
   no_of_from=GET_LENGTH(from);
   
   already_counted=(long int*) R_alloc(no_of_nodes, sizeof(long int));
@@ -385,7 +395,7 @@ SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode) {
       long int actdist=dqueue_pop(&q);
       RMATRIX(result, act, i+1)=actdist;
       
-      tmp=NEIGHBORS(graph, act, pmode);
+      tmp=ptrtable.neighbors(interface,graph, act, pmode);
       for (j=0; j<GET_LENGTH(tmp); j++) {
 	long int neighbor=REAL(tmp)[j];
 	if (already_counted[neighbor-1] == i+1) { continue; }
@@ -415,6 +425,8 @@ SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode) {
 
 SEXP REST_subcomponent(SEXP interface, SEXP graph, SEXP pvertex, SEXP pmode) {
   
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+
   SEXP result;
   
   long int no_of_nodes;
@@ -425,7 +437,7 @@ SEXP REST_subcomponent(SEXP interface, SEXP graph, SEXP pvertex, SEXP pmode) {
   long int i,j;
   SEXP tmp;
   
-  no_of_nodes=R(VCOUNT(graph));
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
   vertex=R(pvertex);
 
   already_added=(char*) R_alloc(no_of_nodes, sizeof(char));
@@ -441,7 +453,7 @@ SEXP REST_subcomponent(SEXP interface, SEXP graph, SEXP pvertex, SEXP pmode) {
   while (!dqueue_empty(&q)) {
     long int actnode=dqueue_pop(&q);
     
-    tmp=NEIGHBORS(graph, actnode, pmode);
+    tmp=ptrtable.neighbors(interface,graph, actnode, pmode);
     for (i=0; i<GET_LENGTH(tmp); i++) {
       long int neighbor=REAL(tmp)[i];
       

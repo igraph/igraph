@@ -92,7 +92,8 @@ S3method(degree, adjacencylist)
 
 # common functions, components and similar
 
-export(clusters, cluster.distribution, subcomponent, subgraph, betweenness)
+export(clusters, cluster.distribution, subcomponent, subgraph, betweenness,
+       edge.betweenness)
 
 # common: conversion
 
@@ -116,8 +117,14 @@ export(igraph.par)
 
 # foreign file formats
 
-export(read.graph, read.graph.pajek, read.graph.edgelist)
+export(read.graph, read.graph.pajek, 
+       read.graph.edgelist)
 
 # fitting
 
 export(power.law.fit)
+
+# community structure
+
+export(eb.community, optimal.community, cut.community)
+
