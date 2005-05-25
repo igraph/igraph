@@ -423,6 +423,70 @@ SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode) {
   return result;
 }
 
+SEXP REST_get_shortest_paths(SEXP interface, SEXP graph, SEXP pfrom, SEXP pmode) {
+  
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+
+  SEXP result;
+  
+  long int no_of_nodes;
+  long int *father;
+  long int from;
+  
+  dqueue_t q;
+
+  long int i, j;
+  SEXP tmp;
+
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
+  from=R(pfrom);
+  
+  father=(long int*) R_alloc(no_of_nodes, sizeof(long int));
+  memset(father, 0, no_of_nodes*sizeof(long int));
+
+  dqueue_init(&q, 100);
+
+  dqueue_push(&q, from);
+  father[ from-1 ] = from;
+  
+  while (!dqueue_empty(&q)) {
+	  long int act=dqueue_pop(&q);
+	  
+	  tmp=ptrtable.neighbors(interface,graph, act, pmode);
+	  for (j=0; j<GET_LENGTH(tmp); j++) {
+		  long int neighbor=REAL(tmp)[j];
+		  if (father[neighbor-1] != 0) { continue; }
+		  father[neighbor-1] = act;
+		  dqueue_push(&q, neighbor);
+	  }
+  }
+    
+  /* Create result object */
+  PROTECT(result=NEW_LIST(no_of_nodes));
+  for (j=0; j<no_of_nodes; j++) {
+	  if (father[j]==0) {
+		  SET_VECTOR_ELT(result, j, NEW_NUMERIC(0));
+	  } else {
+		  long int act=j+1;
+		  while (father[act-1] != act) {
+			  dqueue_push(&q, father[act-1]);
+			  act=father[act-1];
+		  }
+		  act=dqueue_size(&q);
+		  SET_VECTOR_ELT(result, j, NEW_NUMERIC(act+1));
+		  REAL(VECTOR_ELT(result, j))[0] = j+1;
+		  for (i=1; i<=act; i++) {
+			  REAL(VECTOR_ELT(result, j))[i] = dqueue_pop(&q);
+		  }
+	  }
+  }
+  
+  /* Clean */
+  dqueue_destroy(&q);
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP REST_subcomponent(SEXP interface, SEXP graph, SEXP pvertex, SEXP pmode) {
   
   REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);

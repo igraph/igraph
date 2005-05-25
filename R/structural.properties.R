@@ -93,6 +93,14 @@ shortest.paths <- function(graph, v=1:vcount(graph), mode="all") {
   res
 }
 
+get.shortest.paths <- function(graph, from=1, mode="all") {
+
+  res <- .Call("REST_get_shortest_paths", igraph.c.interface, graph,
+               as.double(from), as.character(mode), PACKAGE="igraph")
+
+  res
+}
+
 subcomponent <- function(graph, v, mode="all") {
 
   res <- .Call("REST_subcomponent", igraph.c.interface, graph, v, mode,

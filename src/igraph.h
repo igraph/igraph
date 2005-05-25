@@ -66,7 +66,9 @@ SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode);
 SEXP REST_clusters(SEXP interface, SEXP graph);
 SEXP REST_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
 SEXP REST_edge_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
-
+SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
+SEXP REST_get_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
+ 
 /* -------------------------------------------------- */
 /* Community Structure                                */
 /* -------------------------------------------------- */
