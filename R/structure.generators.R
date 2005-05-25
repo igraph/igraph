@@ -40,10 +40,6 @@ graph.adjacency <- function( adjmatrix, directed=TRUE, ... ) {
   if (!is.matrix(adjmatrix) || nrow(adjmatrix) != ncol(adjmatrix)) {
     stop("Invarid argument, should be a square matrix")
   }
-  if (any(adjmatrix != t(adjmatrix)) && !directed) {
-    warning("Non symmetric matrix symmetrized for undirected graph")
-    adjmatrix <- (adjmatrix+t(adjmatrix))/2
-  }
   
   res <- graph.empty(directed=directed, ...)
 

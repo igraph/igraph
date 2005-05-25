@@ -234,10 +234,6 @@ SEXP REST_edge_betweenness (SEXP interface, SEXP graph, SEXP pdirected) {
 	if (distance[neighbor-1]==distance[actnode-1]-1) { 	  
 	  tmpscore[neighbor-1] += (tmpscore[actnode-1]+1)/friends;
 	  RMATRIX(result,neighbor, actnode) += (tmpscore[actnode-1]+1)/friends;
-	  if (! LOGICAL(pdirected)[0]) {
-	    RMATRIX(result, actnode, neighbor) += 
-	      (tmpscore[actnode-1]+1)/friends;
-	  }
 	}
       }
     }

@@ -30,6 +30,8 @@ eb.community <- function(graph, directed=TRUE) {
   res <- matrix(0, nc=2, nr=all.edges);
 
   for (i in 1:all.edges) {
+
+    print(i)
     
     max.eb <- which.max(edge.betweenness(graph, directed=directed))
     res[i,1] <- (max.eb-1) %%  all.nodes + 1
@@ -81,4 +83,28 @@ modularity <- function(graph, types) {
   res <- sum(diag(etm)) - sum(etm %*% etm)
   
   res
+}
+
+eb.community2 <- function(graph, directed=TRUE) {
+
+  all.nodes <- vcount(graph)
+  all.edges <- ecount(graph)
+  cno <- length(clusters(graph)$csize)
+  res <- numeric()
+
+  for (i in 1:all.edges) {
+
+    print(i)
+    
+    max.eb <- which.max(edge.betweenness(graph, directed=directed))
+    from <- (max.eb-1) %%  all.nodes + 1
+    to <- (max.eb-1) %/% all.nodes + 1
+
+    res <- c(res, from, to)
+    graph <- delete.edges(graph, c(from, to))
+    cno2 <- length(clusters(graph)$csize)
+    if (cno2 > cno) { break }
+  }
+  
+  matrix(res, nc=2, byrow=TRUE)
 }
