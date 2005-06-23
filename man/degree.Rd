@@ -2,22 +2,39 @@
 \alias{degree}
 \alias{degree.distribution}
 \title{Degree and degree distribution of the vertices}
-\description{}
+\description{The degree of a vertex is its most basic structural
+  property, the number of its adjacent edges.}
 \usage{
 degree(graph, v = 1:vcount(graph), mode = "total", loops = TRUE) 
 degree.distribution(graph, cumulative = FALSE, \dots) 
 }
 \arguments{
-  \item{graph}{}
-  \item{v}{}
-  \item{mode}{}
-  \item{loops}{}
-  \item{cumulative}{}
+  \item{graph}{The graph to analyze.}
+  \item{v}{The ids of vertices of which the degree will be calculated.}
+  \item{mode}{Character string, \dquote{out} for out-degree, \dquote{in} for
+    in-degree or \dquote{total} for the sum of the two. For undirected
+    graphs this argument is ignored.}
+  \item{loops}{Logical; whether the loop edges are also counted.}
+  \item{cumulative}{Logical; whether the cumulative degree distribution
+    is to be calculated.}
 }
-\details{}
-\value{}
-\references{}
+% \details{}
+\value{
+  For \code{degree} a numeric vector of the same length as argument
+  \code{v}.
+
+  For \code{degree.distribution} a numeric vector of the same length as
+  the maximum degree plus one. The first element is the relative
+  frequency of vertices with degree zero, the second with degree one,
+  etc. 
+}
+% \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{}
-\examples{}
+% \seealso{}
+\examples{
+g <- graph.ring(10)
+degree(g)
+g2 <- erdos.renyi.game(1000, 10/1000)
+degree.distribution(g2)
+}
 \keyword{graphs}

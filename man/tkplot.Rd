@@ -9,7 +9,10 @@
 \alias{tkplot.center}
 \alias{tkplot.rotate}
 \title{Interactive plotting of graphs}
-\description{}
+\description{\code{tkplot} and its companion functions serve as an
+  interactive graph drawing facility. Not all parameters of the plot can
+  be changed interactively right now though, eg. the colors of vertices,
+  edges, and also others have to be pre-defined.}
 \usage{
 tkplot (graph, layout = layout.random, layout.par = list(), 
     labels = NULL, label.color = "darkblue", label.font = NULL, 
@@ -26,31 +29,107 @@ tkplot.center(tkp.id)
 tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
 }
 \arguments{
-  \item{graph}{}
-  \item{layout}{}
-  \item{layout.par}{}
-  \item{labels}{}
-  \item{label.color}{}
-  \item{label.font}{}
-  \item{label.degree}{}
-  \item{label.dist}{}
-  \item{vertex.color}{}
-  \item{vertex.size}{}
-  \item{edge.color}{}
-  \item{edge.width}{}
-  \item{tkp.id}{}
-  \item{window.close}{}
-  \item{width}{}
-  \item{height}{}
-  \item{newlayout}{}
-  \item{norm}{}
-  \item{degree}{}
-  \item{rad}{}
+  \item{graph}{The \code{graph} to plot.}
+  \item{layout}{Either a function, or a character string or a numeric
+    matrix. It specifies how the vertices will be placed on the plot.
+
+    If it is a function, this function will be called with the
+    \code{graph} and \code{layout.param} as parameters to determine the
+    actual coordinates.
+
+    If it is a character sting starting with \dquote{\code{a:}} then the
+    remaining part of the string specifies the name of the vertex
+    attribute to use as coordinates.
+
+    If it is a numeric matrix, then the matrix has to have one line for
+    each vertex, specifying its coordinates. The matrix should have at
+    least two columns, for the \code{x} and \code{y} coordinates, but it
+    can also have more (eg. for a future \code{z} coordinate).
+  }
+  \item{layout.par}{
+    A named list specifying the optional parameters of the layout
+    function, only used if the \code{layout} argument is a
+    function. The parameters themselves are layout function dependent,
+    they are discussed in the \code{\link{layout}} manual page. 
+  }
+  \item{labels}{Gives the labels to use for the vertices. It can be a
+    numeric or character vector. If \code{NA} the plot will have no
+    labels, if \code{NULL} numeric ids starting from one will be
+    used. If a character vector of length one with prefix
+    \dquote{\code{a:}} is given then the corresponding vertex attribute
+    (without the \dquote{\code{a:}} prefix) is used for the labels.}
+  \item{label.color}{The color of the labels. If it is a character
+    scalar with prefix \dquote{\code{a:}} then the corresponding vertex
+    attribute will be used. Otherwise if it is a vector of length one
+    then all labels will be the same color. It can also be a character
+    or numeric vector of the same length as the number of
+    vertices. Colors can be given as strings or integers, in the latter
+    case the actual color palette will be used.}
+  \item{label.font}{The font for the labels, a tkfont object, by default
+    16pt Helvetica bold is used.}
+  \item{label.degree}{Governs the placement of the vertex labels. 0
+    is right, pi/2 is down, pi is left. This argument can be a constant
+    (for all labels) or a numeric vector. If it is a constant string
+    with prefix \dquote{\code{a:}} then the corresponding vertex
+    argument will be used.} 
+  \item{label.dist}{Numeric constant, gives the distance between the
+    labels and the vertices. 1 is some \dquote{ideal} distance,
+    based on the vertex and label sizes. Use 0 for drawing the labels on
+    the vertices.}
+  \item{vertex.color}{The color of the vertices, either a character
+    constant with prefix \dquote{\code{a:}} for using an attribute or
+    without it: a constant color for all vertices, or a numeric or
+    character or numeric vector giving the different colors for the
+    vertices.} 
+  \item{vertex.size}{The size of the vertices. Either a numeric
+    constant, or a numeric vector, or a string with prefix
+    \quote{\code{a:}} giving the vertex attribute to use.}
+  \item{edge.color}{The color of the edges. Either a character vector
+    with prefix \dquote{\code{a:}} naming the edge attribute to use or
+    one without it, or a numeric or character vector giving the colors
+    for each edge.
+  }
+  \item{edge.width}{The width of the edges. Either a numeric constant or
+  a numeric vector, or a string with prefix \dquote{\code{a:}} giving
+  the edge attribute to use.}
+  \item{tkp.id}{The id of the tkplot window to close.}
+  \item{window.close}{Leave this on the default value.}
+  \item{width}{The width of the rectangle for generating new
+    coordinates.}
+  \item{height}{The height of the rectangle for generating new
+    coordinates.}
+  \item{newlayout}{The new layout, see the \code{layout} parameter of
+    tkplot.}
+  \item{norm}{Logical, should we norm the coordinates.}
+  \item{degree}{The degree to rotate the plot.}
+  \item{rad}{The degree to rotate the plot, in radian.}
 }
-\details{}
-\value{}
-\references{}
+% \details{}
+\value{
+  \code{tkplot} returns an integer, the id of the plot, this can be used
+  to manipulate it from the command line.
+
+  \code{tkplot.close} does not return a value (?).
+
+  \code{tkplot.off} returns TRUE.
+
+  \code{tkplot.fit.to.screen} returns TRUE.
+
+  \code{tkplot.reshape} does not return a value (?).
+
+  \code{tkplot.export.postscript} does not return a value (?).
+
+  \code{tkplot.getcoords} returns a matrix with the coordinates.
+
+  \code{tkplot.center} returns TRUE.
+
+  \code{tkplot.rotate} returns TRUE.
+}
+% \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{}
-\examples{}
+\seealso{\code{\link{plot.graph}}, \code{\link{layout}}}
+\examples{
+g <- graph.ring(10)
+\dontrun{tkplot(g)}
+}
 \keyword{graphs}
