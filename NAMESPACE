@@ -94,7 +94,7 @@ S3method(degree, adjacencylist)
 # common functions, components and similar
 
 export(clusters, cluster.distribution, subcomponent, subgraph, betweenness,
-       edge.betweenness)
+       edge.betweenness, is.connected)
 
 # common: conversion
 

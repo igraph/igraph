@@ -53,3 +53,17 @@ cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
   
   res
 }
+
+is.connected <- function(graph, mode="weak") {
+
+  if (is.directed(graph) && mode=="strong") {
+    # This might be non-optimal ????
+    res <- (length(clusters(graph, mode="strong")$csize) == 1)
+  } else {
+    res <- .Call("REST_isconnected", igraph.c.interface, graph,
+                 PACKAGE="igraph")
+  }
+
+  as.logical(res)
+}
+      

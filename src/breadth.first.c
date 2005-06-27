@@ -231,6 +231,58 @@ SEXP REST_clusters(SEXP interface, SEXP graph) {
   return result;
 }
 
+SEXP REST_isconnected(SEXP interface, SEXP graph) {
+
+  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+  
+  SEXP result;
+  
+  long int no_of_nodes;
+  char *already_added;
+
+  dqueue_t q;
+  
+  long int i, j;
+  SEXP mode;
+  
+  no_of_nodes=R(ptrtable.vcount(interface, graph));
+  already_added=(char*) R_alloc(no_of_nodes, sizeof(char));
+  memset(already_added, 0, no_of_nodes*sizeof(char));
+  PROTECT(mode=NEW_CHARACTER(1));
+  SET_STRING_ELT(mode, 0, CREATE_STRING_VECTOR("all"));
+  
+  /* Result */
+
+  PROTECT(result=NEW_LOGICAL(1));
+  LOGICAL(result)[0]=TRUE;
+  
+  /* Try to find at least two clusters */
+  already_added[0]=1;
+  dqueue_push(&q, 0);
+  
+  j=1;
+  while ( !dqueue_empty(&q)) {
+    long int actnode=dqueue_pop(&q);
+    SEXP neis=ptrtable.neighbors(interface, graph, actnode+1, mode);
+    for (i=0; i <GET_LENGTH(neis); i++) {
+      long int neighbor=REAL(neis)[i]-1;
+      if (already_added[neighbor] != 0) { continue; }
+      dqueue_push(&q, neighbor);
+      j++;
+      already_added[neighbor]++;
+    }
+  }
+  
+  /* Connected? */
+  if (j != no_of_nodes) {
+    LOGICAL(result)[0]=FALSE;
+  }
+
+  dqueue_destroy(&q);
+  UNPROTECT(2);
+  return result;
+}
+
 SEXP REST_strong_components(SEXP interface, SEXP graph) {
 
   REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
