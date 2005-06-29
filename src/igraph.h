@@ -68,6 +68,7 @@ SEXP REST_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
 SEXP REST_edge_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
 SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
 SEXP REST_get_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
+SEXP REST_cocitation(SEXP interface, SEXP graph, SEXP mode);
  
 /* -------------------------------------------------- */
 /* Community Structure                                */
@@ -89,6 +90,12 @@ SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
 SEXP REST_layout_kamadakawai(SEXP pn, SEXP pniter, 
 			     SEXP pelen, SEXP pinitemp, SEXP pcoolexp, 
 			     SEXP pkkconst, SEXP psigma, SEXP px, SEXP py);
+
+/* -------------------------------------------------- */
+/* Other, not graph related                           */
+/* -------------------------------------------------- */
+
+SEXP REST_running_mean(SEXP data, SEXP pbinwidth);
 
 /* -------------------------------------------------- */
 /* The C igraph interface                             */
