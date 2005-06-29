@@ -87,7 +87,8 @@ export(ba.game, barabasi.game, erdos.renyi.game, random.graph.game,
 # common functions, (not so basic) structural properties
 
 export(diameter, degree, degree.distribution, closeness,
-       shortest.paths, get.shortest.paths, cocitation, bibcoupling) 
+       shortest.paths, get.shortest.paths, cocitation, bibcoupling,
+       evcent) 
 
 S3method(degree, default)
 S3method(degree, adjacencylist)
