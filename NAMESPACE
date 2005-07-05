@@ -61,6 +61,9 @@ S3method(set.edge.attribute, pgsql.default)
 
 export(pgsql.list.graphs, pgsql.get.graph, pgsql.clear)
 
+# common functions, basic not structural operations
+export(is.graph)
+
 # common functions, attribute related
 
 export(g.a, "g.a<-", v.a, "v.a<-", e.a, "e.a<-")
