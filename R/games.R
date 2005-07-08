@@ -82,14 +82,33 @@ erdos.renyi.game <- function(n, p, directed=FALSE, loops=FALSE, ...) {
 
   if (p==0 || n==1) {
     res <- graph.empty(n=n, directed=directed, ...)
+  } else if (p==1) {
+    # full graph, nothing is random, i should have a graph.full function...
+    if (directed && loops) {
+      from <- rep(1:n, each=n)
+      to <- rep(1:n, n)
+    } else if (directed && !loops) {
+      from <- rep(1:n, each=n-1)
+      to <- rep(1:(n-1), n)
+      to [ from == to ] <- n      
+    } else if (!directed && loops) {
+      from <- rep(1:n, n:1)
+      to <- n+1-sequence(n:1)
+    } else {
+      from <- rep(1:(n-1), (n-1):1)
+      to <- n+1-sequence((n-1):1)
+    }
+    res <- graph( as.numeric(t(matrix(c(from, to), nc=2))),
+                 directed=directed, n=n, ...)       
   } else {
+    # real random graph, this is the general case
     # generate enough waiting times
     possible.edges <-
       if ( directed && loops) n**2
       else if ( directed && !loops) n*(n-1)
       else if (!directed && loops) n*(n+1)/2
       else n*(n-1)/2
-    s <- cumsum(rgeom(possible.edges*p*1.1, p)+1)-1
+    s <- cumsum(rgeom(possible.edges*p*1.1, p)+1)
     while (s[length(s)] < possible.edges) {
       more <- cumsum(rgeom(possible.edges*p*0.05, p)+1)+s[length(s)]
       s <- c(s, more)
@@ -98,10 +117,10 @@ erdos.renyi.game <- function(n, p, directed=FALSE, loops=FALSE, ...) {
 
     # ok, calculate the edges
     if (directed && loops) {
-      from <- s %/% n + 1
-      to <- s %% n + 1
+      from <- (s-1) %/% n + 1
+      to <- (s-1) %% n + 1
     } else if (directed && !loops) {
-      from <- s %/% n + 1
+      from <- (s-1) %/% (n-1) + 1
       to <- s %% (n-1) + 1
       to [ from == to ] <- n
     } else if (!directed && loops) {
