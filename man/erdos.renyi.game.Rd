@@ -16,6 +16,7 @@ erdos.renyi.game(n, p, directed = FALSE, loops = FALSE, \dots)
   \item{directed}{Logical, whether the graph will be directed, defaults
     to FALSE.}
   \item{loops}{Logical, whether to add loop edges, defaults to FALSE.}
+  \item{\dots}{Additional arguments, used as graph attributes.}
 }
 \details{
   The additional arguments are added as graph arguments.

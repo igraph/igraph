@@ -10,8 +10,8 @@ closeness(graph, v = 1:vcount(graph), mode = "all")
   \item{graph}{The graph to analyze.}
   \item{v}{The vertices for which closeness will be calculated.}
   \item{mode}{Character string, defined the types of the paths used for
-    measuring the distance in directed graphs. \dquote{in} measures the
-    paths \emph{to} a vertex, \dquote{out} measures paths \emph{from} a
+    measuring the distance in directed graphs. \dQuote{in} measures the
+    paths \emph{to} a vertex, \dQuote{out} measures paths \emph{from} a
     vertex, \emph{all} uses undirected paths. This argument is ignored
     for undirected graphs.}
 }
@@ -19,10 +19,10 @@ closeness(graph, v = 1:vcount(graph), mode = "all")
   of the average length of the shortest paths to/from all the other
   vertices in the graph:
 
-  \deqn{\frac{|V|-1}{\sum_{i\ne v} d_vi}}{(|V|-1)/sum( d(v,i), i != v)}
+  \deqn{(|V|-1)/sum( d(v,i), i != v)}{$$\frac{|V|-1}{\sum_{i\ne v} d_vi}$$}
 
-  If there is no (directed) path between vertex \eqn{v}{\code{v}} and
-  \eqn{i}{\code{i}} then the total number of vertices is used in the
+  If there is no (directed) path between vertex \eqn{\code{v}}{$v$} and
+  \eqn{\code{i}}{$i$} then the total number of vertices is used in the
   formula instead of the path length.
 }
 \value{Numeric vector with te closeness values of all the vertices in

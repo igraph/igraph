@@ -10,10 +10,10 @@ subcomponent(graph, v, mode = "all")
 \arguments{
   \item{graph}{The graph to analyze.}
   \item{v}{The vertex to start the search from.}
-  \item{mode}{Character string, either \dquote{in}, dquote{out} or
-    \dquote{all}. If \dquote{in} all vertices from which \code{v} is
-    reachable are listed. If \dquote{out} all vertices reachable from
-    \code{v} are returned. If \dquote{all} returns the union of
+  \item{mode}{Character string, either \dQuote{in}, dQuote{out} or
+    \dQuote{all}. If \dQuote{in} all vertices from which \code{v} is
+    reachable are listed. If \dQuote{out} all vertices reachable from
+    \code{v} are returned. If \dQuote{all} returns the union of
     these. It is ignored for undirected graphs.} 
 }
 \details{A breadh-first search is conducted starting from vertex

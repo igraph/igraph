@@ -22,10 +22,10 @@ igraph.type(graph)
   \item{graph}{The graph.}
   \item{v}{The vertex of which the neighbors are queried.}
   \item{mode}{Character string, specifying the type of neighboring
-    vertices to list in a directed graph. If \dquote{out} the vertices
-    \emph{to} which an edge exist are listed, if \dquote{in} the
+    vertices to list in a directed graph. If \dQuote{out} the vertices
+    \emph{to} which an edge exist are listed, if \dQuote{in} the
     vertices \emph{from} which an edge is directed are listed,
-    \dquote{all} lists all the vertices. This argument is ignored for
+    \dQuote{all} lists all the vertices. This argument is ignored for
     undirected graphs.} 
   \item{v1}{The id of the first vertex. For directed graphs only edges
     pointing from \code{v1} to \code{v2} are searched.}

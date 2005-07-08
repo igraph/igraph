@@ -11,12 +11,15 @@ degree.distribution(graph, cumulative = FALSE, \dots)
 \arguments{
   \item{graph}{The graph to analyze.}
   \item{v}{The ids of vertices of which the degree will be calculated.}
-  \item{mode}{Character string, \dquote{out} for out-degree, \dquote{in} for
-    in-degree or \dquote{total} for the sum of the two. For undirected
+  \item{mode}{Character string, \dQuote{out} for out-degree, \dQuote{in} for
+    in-degree or \dQuote{total} for the sum of the two. For undirected
     graphs this argument is ignored.}
   \item{loops}{Logical; whether the loop edges are also counted.}
   \item{cumulative}{Logical; whether the cumulative degree distribution
     is to be calculated.}
+  \item{\dots}{Additional arguments to pass to \code{degree},
+    eg. \code{mode} is useful but also \code{v} and \code{loops} make
+    sense.}
 }
 % \details{}
 \value{

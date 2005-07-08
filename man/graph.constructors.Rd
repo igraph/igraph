@@ -53,6 +53,8 @@ graph.tree(n, children = 2, \dots)
     edges, \code{in}: the edges point \emph{to} the center, \code{out}:
     the edges point \emph{from} the center, \code{undirected}: the edges
     are undirected.}
+  \item{center}{For \code{graph.star} the center vertex of the graph, by
+    default the first vertex.}
   \item{dimvector}{A vector giving the size of the lattice in each
     dimension, for \code{graph.lattice}.}
   \item{nei}{The distance within which (inclusive) the neighbors on the
@@ -65,6 +67,7 @@ graph.tree(n, children = 2, \dots)
   \item{dim}{Integer constant, the dimension of the lattice.}
   \item{children}{Integer constant, the number of children of a vertex
     for \code{graph.tree}.}
+  \item{\dots}{Additional arguments, added as graph attributes.}
 }
 \details{All these functions create graphs in a deterministic way.
 

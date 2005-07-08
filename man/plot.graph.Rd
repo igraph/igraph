@@ -37,7 +37,9 @@ plot.graph(graph, layout = layout.random, layout.par = list(),
     \code{\link{tkplot}}.} 
   \item{axes}{Logical, whether to plot axes, defaults to FALSE.}
   \item{xlab}{The label of the horizontal axis. Defaults to the empty string.}
-  \item{ylab}{The label of the vertical axis. Defaults to the empty string.}
+  \item{ylab}{The label of the vertical axis. Defaults to the empty
+    string.}
+  \item{\dots}{Additional arguments, passed to \code{\link{plot}}.}
 }
 \details{The additional arguments specified are passed to the
   \code{plot} function.}

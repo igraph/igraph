@@ -17,22 +17,22 @@ edge.betweenness(graph, directed = TRUE)
   \item{directed}{Logical, whether directed paths should be considered
     while determining the shortest paths.}
 }
-\details{The vertex betweenness of vertex \eqn{v}{\code{v}} is defined
+\details{The vertex betweenness of vertex \eqn{\code{v}}{$v$} is defined
   by
 
-  \deqn{\sum_{i\ne j, i\ne v, j\ne v} g_{ivj}/g_{ij}}
-  {sum( g_ivj / g_ij, i!=j,i!=v,j!=v)}
+  \deqn{sum( g_ivj / g_ij, i!=j,i!=v,j!=v)}
+  {$$\sum_{i\ne j, i\ne v, j\ne v} g_{ivj}/g_{ij}$$}
   
-  The edge betweenness of edge \eqn{e}{\code{e}} is defined by
+  The edge betweenness of edge \eqn{\code{e}}{$e$} is defined by
 
-  \deqn{\sum_{i\ne j} g{iej}/g_{ij}}{sum( g_iej / g_ij, i!=j)}.  
+  \deqn{sum( g_iej / g_ij, i!=j)}{$$\sum_{i\ne j} g{iej}/g_{ij}$$}.  
 }
 \value{A numeric vector with the betweenness score for each vertex in
   \code{v} for \code{betweenness}.
 
   A quadratic matrix of size \code{vcount(graph)} by
   \code{vcount(graph)} for \code{edge.betweenness}. The betweenness
-  score of edge \eqn{(i,j)}{\code{(i,j)}} is contained in element (i,j)
+  score of edge \eqn{\code{(i,j)}}{$(i,j)$} is contained in element (i,j)
   in the matrix.
 
   For calculating the betweenness a similar algorithm to the one

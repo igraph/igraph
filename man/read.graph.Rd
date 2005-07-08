@@ -14,7 +14,8 @@ read.graph(file, format = "pajek", \dots)
   \item{file}{The connection to read from. This can be a local file, or
     a \code{http} or \code{ftp} URI.}
   \item{format}{Character constant giving the file format. Right now
-    \dquote{pajek} and \dquote{edgelist} are supported. }
+    \dQuote{pajek} and \dQuote{edgelist} are supported. }
+  \item{\dots}{Additional arguments, these are used as graph attributes.}
 }
 \details{
   The \code{read.graph} function may have additional arguments depending
@@ -53,8 +54,9 @@ read.graph(file, format = "pajek", \dots)
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{ \code{\link{write.graph}} }
 \examples{
-g <- read.graph(format="pajek",
-                "http://vlado.fmf.uni-lj.si/pub/networks/data/Erdos/Erdos02.net")
-
+\dontrun{g <- read.graph(format="pajek",
+         "http://vlado.fmf.uni-lj.si/pub/networks/data/Erdos/Erdos02.net")
+diameter(g)
+}
 }
 \keyword{graphs}

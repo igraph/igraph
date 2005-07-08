@@ -11,13 +11,15 @@
 \usage{
 layout.random(graph, params)
 layout.circle(graph, params)
-layout.fruchterman.reingold(graph, params)
-layout.kamada.kawai(graph, params)
-layout.spring(graph, params)
+layout.fruchterman.reingold(graph, \dots, params)
+layout.kamada.kawai(graph, \dots, params)
+layout.spring(graph, \dots, params)
 }
 \arguments{
   \item{graph}{The graph to place.}
   \item{params}{The list of function dependent parameters.}
+  \item{\dots}{Function dependent parameters, this is an alternative
+    notation to the \code{params} argument.}
 }
 \details{
   These functions calculate the coordinates of the vertices for a graph
@@ -53,7 +55,7 @@ layout.spring(graph, params)
     \item{initemp}{The initial temperature (10).}
     \item{coolexp}{The cooling exponent (0.99).}
     \item{kkconst}{Sets the Kamada-Kawai vertex attraction
-      constant (vcount(graph)^2).}
+      constant (vcount(graph)**2).}
   }
 
   \code{layout.spring} is a spring embedder algorithm. This function was

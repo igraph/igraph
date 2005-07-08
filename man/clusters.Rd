@@ -11,14 +11,16 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
-  \item{mode}{Character string, either \dquote{weak} or \dquote{strong}.
-    For directed graphs \dquote{weak} implies weakly, \dquote{strong}
+  \item{mode}{Character string, either \dQuote{weak} or \dQuote{strong}.
+    For directed graphs \dQuote{weak} implies weakly, \dQuote{strong}
     strongly connected components to search. It is ignored for
     undirected graphs.}
   \item{cumulative}{Logical, if TRUE the cumulative distirubution
     (realtive frequency) is calculated.}
   \item{mul.size}{Logical. If TRUE the relative frequencies will be
     multiplied by the cluster sizes.}
+  \item{\dots}{Additional attributes to pass to \code{cluster}, right
+    noe only \code{mode} makes sense.}
 }
 \details{
   \code{is.connected} decides whether the graph is weakly or strongly

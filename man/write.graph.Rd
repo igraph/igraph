@@ -14,6 +14,7 @@ write.graph(graph, file, format="edgelist", \dots)
     graph to.}
   \item{format}{Character string giving the file format. Right now only
     \code{edgelist} is implemented.}
+  \item{\dots}{Other, format specific arguments, not used right now.}
 }
 \details{
   The \code{edgelist} format is a simple text file, with one edge in a

@@ -27,7 +27,7 @@ substructures).  This is also intelligible from an algebraic point of
 view, with the first eigenvector being closely related to the best
 rank-1 approximation of the adjacency matrix (a relationship which is
 easy to see in the special case of a diagonalizable symmetric real
-matrix via the \eqn{S \Lambda S^{-1}}{SLS^-1} decomposition).)  
+matrix via the \eqn{SLS^-1}{$S \Lambda S^{-1}$} decomposition).)  
 }
 \value{
   A vector containing the centrality scores.

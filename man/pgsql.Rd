@@ -26,6 +26,7 @@ pgsql.clear(all = FALSE, host = igraph.par("pgsql.host"),
   \item{gname}{Character constant, the name of the graph.}
   \item{all}{Logical constant, whether to erase all graphs from the
     database.}
+  \item{\dots}{Not used rigth now.}
 }
 \details{
   \code{pgsql.list.graphs} simply lists the ids of the graphs in a

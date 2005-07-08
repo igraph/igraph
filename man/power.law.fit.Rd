@@ -13,6 +13,8 @@ power.law.fit(x, xmin = NULL, start = 2, \dots)
     possible to fit only the tail of the distribution. }
   \item{start}{The initial value of the exponent for the minimizing
     function. Ususally it is safe to leave this untouched.}
+  \item{\dots}{Additional arguments, passed to the maximum likelyhood
+    optimizing function, \code{\link{mle}}.}
 }
 \details{
   A Yule distribution is fitted with maximum likelyhood

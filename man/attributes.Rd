@@ -46,6 +46,8 @@ e.a(graph, attrname, from = NULL, to = NULL) <- value
   \item{attrname}{Character constant, the name of the attribute.}
   \item{default}{The default value of the attribute, arbitrary object.}
   \item{value}{The new value of the attribute.}
+  \item{v}{Numeric vector, the vertices for which the attribute is
+    queried or set. Default is \code{NULL} which means all vertices.}
   \item{from}{The tail of the edge.}
   \item{to}{The head of the edge.}
 }

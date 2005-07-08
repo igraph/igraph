@@ -17,6 +17,8 @@ ba.game(n, m = NULL, out.dist = NULL, out.seq = NULL, out.pref = FALSE,
   \item{out.pref}{Logical, if true the total degree is used for
     calculating the citation probability, otherwise the in-degree is
     used. }
+  \item{\dots}{Additional attributes, these are added to the graph as
+    graph attributes}
 }
 \details{
   The out-degree of the vertices is determined by the \code{m},

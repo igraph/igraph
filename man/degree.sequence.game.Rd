@@ -13,9 +13,11 @@ degree.sequence.game(out.deg, in.deg = NULL, method = "simple", \dots)
   as the sum of \code{in.deg}.}
   \item{in.deg}{For directed graph, the in-degree sequence.}
   \item{method}{Character, the method for generating the graph. Right
-    now only \dquote{simple} is implemented.}
+    now only \dQuote{simple} is implemented.}
+  \item{\dots}{Additional arguments, these are used as graph
+    attributes.}
 }
-\details{The dquote{simple} method simply connects the out-stubs of the
+\details{The dQuote{simple} method simply connects the out-stubs of the
   edges (undirected graphs) or the out-stubs and in-stubs (directed
   graphs) together. This way loops edges and also multiple edges will be
   generated.}

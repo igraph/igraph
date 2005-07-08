@@ -37,7 +37,7 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
     \code{graph} and \code{layout.param} as parameters to determine the
     actual coordinates.
 
-    If it is a character sting starting with \dquote{\code{a:}} then the
+    If it is a character sting starting with \dQuote{\code{a:}} then the
     remaining part of the string specifies the name of the vertex
     attribute to use as coordinates.
 
@@ -56,10 +56,10 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
     numeric or character vector. If \code{NA} the plot will have no
     labels, if \code{NULL} numeric ids starting from one will be
     used. If a character vector of length one with prefix
-    \dquote{\code{a:}} is given then the corresponding vertex attribute
-    (without the \dquote{\code{a:}} prefix) is used for the labels.}
+    \dQuote{\code{a:}} is given then the corresponding vertex attribute
+    (without the \dQuote{\code{a:}} prefix) is used for the labels.}
   \item{label.color}{The color of the labels. If it is a character
-    scalar with prefix \dquote{\code{a:}} then the corresponding vertex
+    scalar with prefix \dQuote{\code{a:}} then the corresponding vertex
     attribute will be used. Otherwise if it is a vector of length one
     then all labels will be the same color. It can also be a character
     or numeric vector of the same length as the number of
@@ -70,14 +70,14 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \item{label.degree}{Governs the placement of the vertex labels. 0
     is right, pi/2 is down, pi is left. This argument can be a constant
     (for all labels) or a numeric vector. If it is a constant string
-    with prefix \dquote{\code{a:}} then the corresponding vertex
+    with prefix \dQuote{\code{a:}} then the corresponding vertex
     argument will be used.} 
   \item{label.dist}{Numeric constant, gives the distance between the
-    labels and the vertices. 1 is some \dquote{ideal} distance,
+    labels and the vertices. 1 is some \dQuote{ideal} distance,
     based on the vertex and label sizes. Use 0 for drawing the labels on
     the vertices.}
   \item{vertex.color}{The color of the vertices, either a character
-    constant with prefix \dquote{\code{a:}} for using an attribute or
+    constant with prefix \dQuote{\code{a:}} for using an attribute or
     without it: a constant color for all vertices, or a numeric or
     character or numeric vector giving the different colors for the
     vertices.} 
@@ -85,12 +85,12 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
     constant, or a numeric vector, or a string with prefix
     \quote{\code{a:}} giving the vertex attribute to use.}
   \item{edge.color}{The color of the edges. Either a character vector
-    with prefix \dquote{\code{a:}} naming the edge attribute to use or
+    with prefix \dQuote{\code{a:}} naming the edge attribute to use or
     one without it, or a numeric or character vector giving the colors
     for each edge.
   }
   \item{edge.width}{The width of the edges. Either a numeric constant or
-  a numeric vector, or a string with prefix \dquote{\code{a:}} giving
+  a numeric vector, or a string with prefix \dQuote{\code{a:}} giving
   the edge attribute to use.}
   \item{tkp.id}{The id of the tkplot window to close.}
   \item{window.close}{Leave this on the default value.}
@@ -103,6 +103,7 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \item{norm}{Logical, should we norm the coordinates.}
   \item{degree}{The degree to rotate the plot.}
   \item{rad}{The degree to rotate the plot, in radian.}
+  \item{\dots}{Not used right now.}
 }
 % \details{}
 \value{
