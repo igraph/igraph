@@ -33,11 +33,11 @@ read.graph <- function(file, format="pajek", ...) {
   res
 }
 
-write.graph <- function(graph, file, format="pajek", ...) {
+write.graph <- function(graph, file, format="edgelist", ...) {
   
   res <- switch(format,
-                "pajek"=write.graph.pajek(graph, file, format, ...),
-                "edgelist"=read.graph.edgelist(graph, file, format, ...),
+#                "pajek"=write.graph.pajek(graph, file, format, ...),
+                "edgelist"=write.graph.edgelist(graph, file, format, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -83,4 +83,44 @@ read.graph.edgelist <- function(filename, format="edgelist", ...) {
   }
 
   res
+}
+
+################################################################
+# Write an edgelist format, sorted
+################################################################
+
+write.graph.edgelist <- function(graph, file, format="edgelist",
+                                 ...) {
+
+  if (is.character(file)) {
+    file <- file(file, open="w+")
+  }
+  
+  closeit <- FALSE
+  if (!isOpen(file)) {
+    file <- open(file)
+    closeit <- TRUE
+  }
+  
+  vc <- vcount(graph)
+  for (i in 1:vc) {
+    neis <- neighbors(graph, i, "out")
+    if (!is.directed(graph)) {
+      no.loops <- sum(neis==i)
+      neis <- c(neis[neis > i], rep(i, no.loops/2))
+    }
+    neis <- sort(neis)
+    for (n in neis) {
+      cat(i,    file=file)
+      cat(" ",  file=file)
+      cat(n,    file=file)
+      cat("\n", file=file)
+    }
+  }
+
+  if (closeit) {
+    close(file)
+  }
+
+  invisible(NULL)
 }

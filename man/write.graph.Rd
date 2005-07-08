@@ -1,0 +1,31 @@
+\name{write.graph}
+\alias{write.graph}
+\alias{write.graph.edgelist}
+\title{Writing the graph to a file in some format}
+\description{\code{write.graph} is a general function for exporting
+  graphs to foreign file formats, however not many formats are
+  implemented right now.}
+\usage{
+write.graph(graph, file, format="edgelist", \dots)
+}
+\arguments{
+  \item{graph}{The graph to export.}
+  \item{file}{A connection or a string giving the file name to write the
+    graph to.}
+  \item{format}{Character string giving the file format. Right now only
+    \code{edgelist} is implemented.}
+}
+\details{
+  The \code{edgelist} format is a simple text file, with one edge in a
+  line, the two vertex ids separated by a space character. The file is
+  sorted by the first and the second column.
+}
+\value{A NULL, invisibly.}
+% \references{}
+\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\seealso{ \code{\link{read.graph}} }
+\examples{
+g <- graph.ring(10)
+\dontrun{write.graph(g, "/tmp/g.txt", "edgelist")}
+}
+\keyword{graphs}

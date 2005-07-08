@@ -14,6 +14,9 @@
 \alias{g.a}
 \alias{v.a}
 \alias{e.a}
+\alias{g.a<-}
+\alias{v.a<-}
+\alias{e.a<-}
 \title{Graph, vertex and edge attributes}
 \description{Graph attributes are arbitrary valued assigned to graph
   objects, while vertex attributes are assigned to vertices and edge

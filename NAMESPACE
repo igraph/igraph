@@ -124,7 +124,7 @@ export(igraph.par)
 # foreign file formats
 
 export(read.graph, read.graph.pajek, 
-       read.graph.edgelist)
+       read.graph.edgelist, write.graph, write.graph.edgelist)
 
 # fitting
 

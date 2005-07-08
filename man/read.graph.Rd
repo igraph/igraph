@@ -51,7 +51,7 @@ read.graph(file, format = "pajek", \dots)
   the Social Sciences 27, Cambridge University Press, 2005. ISBN:0521602629.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-% \seealso{}
+\seealso{ \code{\link{write.graph}} }
 \examples{
 g <- read.graph(format="pajek",
                 "http://vlado.fmf.uni-lj.si/pub/networks/data/Erdos/Erdos02.net")
