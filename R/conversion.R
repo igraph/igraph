@@ -27,6 +27,11 @@ get.adjacency <- function(graph) {
   if (vc != 0) {
     for (i in 1:vc) {
       neis <- neighbors(graph, i, "out")
+      if (!is.directed(graph)) {
+        loops <- sum(neis==i)
+        neis <- neis[ neis!= i]
+        neis <- c(neis, rep(i, loops/2))
+      }
       for (n in neis) { res[i, n] <- res[i, n] + 1 }
     }
   }
