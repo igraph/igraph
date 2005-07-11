@@ -8,8 +8,8 @@
 plot.graph(graph, layout = layout.random, layout.par = list(), 
     labels = NULL, label.color = "darkblue", label.font = NULL, 
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
-    vertex.size = 15, edge.color = "darkgrey", edge.width = 1, 
-    axes = FALSE, xlab = "", ylab = "", \dots)
+    vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
+    edge.labels = NA, axes = FALSE, xlab = "", ylab = "", \dots)
 }
 \arguments{
   \item{graph}{The graph to plot.}
@@ -34,7 +34,11 @@ plot.graph(graph, layout = layout.random, layout.par = list(),
   \item{edge.color}{The color(s) of the edges. See the same argument of
     \code{\link{tkplot}}. }
   \item{edge.width}{The width(s) of the edges. See the same argument of
-    \code{\link{tkplot}}.} 
+    \code{\link{tkplot}}.}
+  \item{edge.labels}{Labels for the edges, this will be converted to a
+    character vector. The default is \code{NA} which suppresses edge
+    labels. The vector might contain \code{NA}'s as well to suppress
+    labels for some edges.}  
   \item{axes}{Logical, whether to plot axes, defaults to FALSE.}
   \item{xlab}{The label of the horizontal axis. Defaults to the empty string.}
   \item{ylab}{The label of the vertical axis. Defaults to the empty

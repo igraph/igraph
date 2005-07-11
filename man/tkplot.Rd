@@ -17,7 +17,8 @@
 tkplot (graph, layout = layout.random, layout.par = list(), 
     labels = NULL, label.color = "darkblue", label.font = NULL, 
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
-    vertex.size = 15, edge.color = "darkgrey", edge.width = 1, \dots)
+    vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
+    edge.labels=NA, \dots)
 
 tkplot.close(tkp.id, window.close = TRUE) 
 tkplot.off()
@@ -92,6 +93,10 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \item{edge.width}{The width of the edges. Either a numeric constant or
   a numeric vector, or a string with prefix \dQuote{\code{a:}} giving
   the edge attribute to use.}
+  \item{edge.labels}{Labels for the edges, this will be converted to a
+    character vector. The default is \code{NA} which suppresses edge
+    labels. The vector might contain \code{NA}'s as well to suppress
+    labels for some edges.}  
   \item{tkp.id}{The id of the tkplot window to close.}
   \item{window.close}{Leave this on the default value.}
   \item{width}{The width of the rectangle for generating new
@@ -105,7 +110,34 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \item{rad}{The degree to rotate the plot, in radian.}
   \item{\dots}{Not used right now.}
 }
-% \details{}
+\details{
+  \code{tkplot} is an interactive graph drawing facility. It is not very
+  well developed at this stage, but it should be still useful.
+
+  It's hangling should be quite straightforward most of the time, here
+  are some remarks and hints.
+
+  There are different popup menus, activated by the right mouse button,
+  for vertices and edges. Both operate on the current selection if the
+  vertex/edge under the cursor is part of the selection and operate on
+  the vertex/edge under the cursor if it is not.
+
+  One selection can be active at a time, either a vertex or an edge
+  selection. A vertex/edge can be added to a selection by holding the
+  \code{control} key while clicking on it with the left mouse
+  button. Doing this again deselect the vertex/edge.
+
+  Selections can be made also from the \code{Select} menu. The `Select
+  some vertices' dialog allows to give an expression for the vertices to
+  be selected: this can be a list of numeric R expessions separated by
+  commas, like `\code{1,2:10,12,14,15}' for example. Similarly in the
+  `Select some edges' dialog two such lists can be given and all edges
+  connecting a vertex in the first list to one in the second list will
+  be selected.
+
+  In the color dialog a color name like 'orange' or RGB notation can
+  also be used.
+}
 \value{
   \code{tkplot} returns an integer, the id of the plot, this can be used
   to manipulate it from the command line.
