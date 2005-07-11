@@ -24,6 +24,7 @@ plot.graph <- function(graph, layout=layout.random, layout.par=list(),
                        label.font=NULL, label.degree=-pi/4, label.dist=0,
                        vertex.color="SkyBlue2", vertex.size=15,
                        edge.color="darkgrey", edge.width=1,
+                       edge.labels=NA, 
                        # SPECIFIC: #####################################
                        axes=FALSE, xlab="", ylab="",
                        ...) {
@@ -36,6 +37,7 @@ plot.graph <- function(graph, layout=layout.random, layout.par=list(),
   edge.width <- i.get.edge.width(graph, edge.width)
   label.degree <- i.get.label.degree(graph, label.degree)
   labels <- i.get.labels(graph, labels)
+  edge.labels <- i.get.edge.labels(graph, edge.labels)
 
   # create the plot
   plot(0, 0, type="n", xlab=xlab, ylab=ylab, asp=1, xlim=c(-1,1), ylim=c(-1,1),
@@ -69,6 +71,11 @@ plot.graph <- function(graph, layout=layout.random, layout.par=list(),
   arrow.code <- ifelse(is.directed(graph), 2, 0)
   arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.code,
          col=edge.color, lwd=edge.width)
+  x <- (x0+x1)/2
+  y <- (y0+y1)/2
+  text(x, y, labels=edge.labels, col=label.color)
+  # add the edge labels 
+
   rm(x0, y0, x1, y1)
   
   # add the vertices

@@ -37,7 +37,8 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                    labels=NULL, label.color="darkblue",
                    label.font=NULL, label.degree=-pi/4, label.dist=0,
                    vertex.color="SkyBlue2", vertex.size=15,
-                   edge.color="darkgrey", edge.width=1, ...) {
+                   edge.color="darkgrey", edge.width=1,
+                   edge.labels=NA, ...) {
 
   # Libraries
   require(tcltk) || stop("tcl/tk library not available")
@@ -57,6 +58,9 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   # Edge width
   edge.width <- i.get.edge.width(graph, edge.width)
 
+  # Edge labels
+  edge.labels <- i.get.edge.labels(graph, edge.labels)
+  
   # Label degree
   label.degree <- i.get.label.degree(graph, label.degree)
   
@@ -76,16 +80,81 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                  edge.color=edge.color, label.color=label.color,
                  labels.state=1, edge.width=edge.width, padding=30,
                  grid=0, label.font=label.font, label.degree=label.degree,
-                 label.dist=label.dist)
+                 label.dist=label.dist, edge.labels=edge.labels)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
   tkadd(popup.menu, "command", label="Fit to screen", command=function() {
     tkplot.fit.to.screen(tkp.id)})  
+
+  # Different popup menu for vertices
+  vertex.popup.menu <- tkmenu(canvas)
+  tkadd(vertex.popup.menu, "command", label="Vertex color",
+        command=function() {
+          tkp <- .tkplot.get(tkp.id)
+          vids <- .tkplot.get.selected.vertices(tkp.id)
+          if (length(vids)==0) return(FALSE)
+          
+          initialcolor <- ifelse(length(tkp$params$vertex.color)>1,
+                                 tkp$params$vertex.color[vids[1]],
+                                 tkp$params$vertex.color)
+          color <- .tkplot.select.color(initialcolor)
+          if (color=="") return(FALSE) # Cancel
+          
+          .tkplot.update.vertex.color(tkp.id, vids, color)
+        })
+  tkadd(vertex.popup.menu, "command", label="Vertex size",
+        command=function() {
+          tkp <- .tkplot.get(tkp.id)
+          vids <- .tkplot.get.selected.vertices(tkp.id)
+          if (length(vids)==0) return(FALSE)
+
+          initialsize <- ifelse(length(tkp$params$vertex.size)>1,
+                                tkp$params$vertex.size[vids[1]],
+                                tkp$params$vertex.size)
+          size <- .tkplot.select.number("Vertex size", initialsize, 1, 20)
+          if (is.na(size)) return(FALSE)
+
+          .tkplot.update.vertex.size(tkp.id, vids, size)
+        })
+  
+  # Different popup menu for edges
+  edge.popup.menu <- tkmenu(canvas)
+  tkadd(edge.popup.menu, "command", label="Edge color",
+        command=function() {
+          tkp <- .tkplot.get(tkp.id)
+          eids <- .tkplot.get.selected.edges(tkp.id)
+          if (length(eids)==0) return(FALSE)
+          
+          initialcolor <- ifelse(length(tkp$params$edge.color)>1,
+                                 tkp$params$edge.color[eids[1]],
+                                 tkp$params$edge.color)
+          color <- .tkplot.select.color(initialcolor)
+          if (color=="") return(FALSE) # Cancel
+
+          .tkplot.update.edge.color(tkp.id, eids, color)          
+        })
+  tkadd(edge.popup.menu, "command", label="Edge width",
+        command=function() {
+          tkp <- .tkplot.get(tkp.id)
+          eids <- .tkplot.get.selected.edges(tkp.id)
+          if (length(eids)==0) return(FALSE)
+          
+          initialwidth <- ifelse(length(tkp$params$edge.width)>1,
+                                 tkp$params$edge.width[eids[1]],
+                                 tkp$params$edge.width)
+          width <- .tkplot.select.number("Edge width", initialwidth, 1, 10)
+          if (is.na(width)) return(FALSE) # Cancel
+
+          .tkplot.update.edge.width(tkp.id, eids, width)
+        })
+          
   
   # Create plot object
   tkp <- list(top=top, canvas=canvas, graph=graph, coords=layout,
-              labels=labels, params=params, popup.menu=popup.menu)
+              labels=labels, params=params, popup.menu=popup.menu,
+              vertex.popup.menu=vertex.popup.menu,
+              edge.popup.menu=edge.popup.menu)
   tkp.id <- .tkplot.new(tkp)
   tktitle(top) <- paste("Graph plot", as.character(tkp.id))
 
@@ -93,6 +162,8 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   main.menu <- tkmenu(top)
   tkadd(main.menu, "command", label="Close", command=function() {
     tkplot.close(tkp.id, TRUE)})
+  select.menu <- .tkplot.select.menu(tkp.id, main.menu)
+  tkadd(main.menu, "cascade", label="Select", menu=select.menu)  
   layout.menu <- .tkplot.layout.menu(tkp.id, main.menu)
   tkadd(main.menu, "cascade", label="Layout", menu=layout.menu)
   view.menu <- tkmenu(main.menu)
@@ -139,22 +210,44 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
 ###################################################################
 # The callbacks for interactive editing
 ###################################################################  
-  
-  tkitembind(canvas, "vertex||label", "<1>", function(x, y) {
+
+  tkitembind(canvas, "vertex||label||edge", "<1>", function(x, y) {
     tkp <- .tkplot.get(tkp.id)
     canvas <- .tkplot.get(tkp.id, "canvas")
-    tkdtag(canvas, "selected")
-    tkaddtag(canvas, "selected", "withtag", "current")
-                                        # get the id
-    tags <- as.character(tkgettags(tkp$canvas, "selected"))
-    id <- as.numeric(strsplit(tags[pmatch("v-", tags)],
-                              "-", fixed=TRUE)[[1]][2])
-    if (is.na(id)) { return() }
-    tkitemraise(canvas, paste(sep="", "v-", id))
+    .tkplot.deselect.all(tkp.id)
+    .tkplot.select.current(tkp.id)
+#     tkitemraise(canvas, "current")
   })
-  tkitembind(canvas, "vertex||label", "<ButtonRelease-1>", function(x, y) {
+  tkitembind(canvas, "vertex||label||edge", "<Control-1>", function(x,y) {
     canvas <- .tkplot.get(tkp.id, "canvas")
-    tkdtag(canvas, "selected")
+    curtags <- as.character(tkgettags(canvas, "current"))
+    seltags <- as.character(tkgettags(canvas, "selected"))
+    if ("vertex" %in% curtags && "vertex" %in% seltags) {
+      if ("selected" %in% curtags) {
+        .tkplot.deselect.current(tkp.id)
+      } else {
+        .tkplot.select.current(tkp.id)
+      }
+    } else if ("edge" %in% curtags && "edge" %in% seltags) {
+      if ("selected" %in% curtags) {
+        .tkplot.deselect.current(tkp.id)
+      } else {
+        .tkplot.select.current(tkp.id)
+      }
+    } else if ("label" %in% curtags && "vertex" %in% seltags) {
+      vtag <- curtags[pmatch("v-", curtags)]
+      tkid <- as.numeric(tkfind(canvas, "withtag",
+                                paste(sep="", "vertex&&", vtag)))
+      vtags <- as.character(tkgettags(canvas, tkid))
+      if ("selected" %in% vtags) {
+        .tkplot.deselect.vertex(tkp.id, tkid)
+      } else {
+        .tkplot.select.vertex(tkp.id, tkid)
+      }
+    } else {
+      .tkplot.deselect.all(tkp.id)
+      .tkplot.select.current(tkp.id)
+    }
   })
   tkitembind(canvas, "vertex||edge||label", "<Shift-Alt-1>", function(x, y) {
     canvas <- .tkplot.get(tkp.id, "canvas")
@@ -163,15 +256,39 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   tkitembind(canvas, "vertex||edge||label", "<Alt-1>", function(x, y) {
     canvas <- .tkplot.get(tkp.id, "canvas")
     tkitemraise(canvas, "current")
-  })
-  tkbind(top, "<3>", function(x, y) {
-    menu <- .tkplot.get(tkp.id, "popup.menu")
+  })  
+  tkbind(canvas, "<3>", function(x, y) {
     canvas <- .tkplot.get(tkp.id, "canvas")
+    tags <- as.character(tkgettags(canvas, "current"))
+    if ("label" %in% tags) {
+      vtag <- tags[ pmatch("v-", tags) ]
+      vid <- as.character(tkfind(canvas, "withtag",
+                                 paste(sep="", "vertex&&", vtag)))
+      tags <- as.character(tkgettags(canvas, vid))
+    }
+    if ("selected" %in% tags) {
+      # The selection is active
+    } else {
+      # Delete selection, single object
+      .tkplot.deselect.all(tkp.id)
+      .tkplot.select.current(tkp.id)
+    }
+    tags <- as.character(tkgettags(canvas, "selected"))
+    ## TODO: what if different types of objects are selected
+    if ("vertex" %in% tags || "label" %in% tags) {
+      menu <- .tkplot.get(tkp.id, "vertex.popup.menu")
+    } else if ("edge" %in% tags) {
+      menu <- .tkplot.get(tkp.id, "edge.popup.menu")
+    } else {
+      menu <- .tkplot.get(tkp.id, "popup.menu")
+    }
     x <- as.integer(x) + as.integer(tkwinfo("rootx", canvas))
     y <- as.integer(y) + as.integer(tkwinfo("rooty", canvas))
     .Tcl(paste("tk_popup", .Tcl.args(menu, x, y)))
   })
-  tkitembind(canvas, "vertex", "<B1-Motion>", function(x, y) {
+  if (tkp$params$label.dist==0) tobind <- "vertex||label"
+  else tobind <- "vertex"
+  tkitembind(canvas, tobind, "<B1-Motion>", function(x, y) {
     tkp <- .tkplot.get(tkp.id)
     x <- as.numeric(x)
     y <- as.numeric(y)
@@ -190,20 +307,22 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                                         # move the vertex
     .tkplot.set.vertex.coords(tkp.id, id, x, y)
     .tkplot.update.vertex(tkp.id, id, x, y)
-  })  
-  tkitembind(canvas, "label", "<B1-Motion>", function(x,y) {
-    tkp <- .tkplot.get(tkp.id)
-    x <- as.numeric(x)
-    y <- as.numeric(y)
-                                        # get the id
-    tags <- as.character(tkgettags(tkp$canvas, "selected"))
-    id <- as.numeric(strsplit(tags[pmatch("v-", tags)],
-                              "-", fixed=TRUE)[[1]][2])
-    if (is.na(id)) { return() }
-    phi <- pi+atan2(tkp$coords[id,2]-y, tkp$coords[id,1]-x)
-    .tkplot.set.label.degree(tkp.id, id, phi)
-    .tkplot.update.label(tkp.id, id, tkp$coords[id,1], tkp$coords[id,2])
   })
+  if (tkp$params$label.dist!=0) {
+    tkitembind(canvas, "label", "<B1-Motion>", function(x,y) {
+      tkp <- .tkplot.get(tkp.id)
+      x <- as.numeric(x)
+      y <- as.numeric(y)
+                                        # get the id
+      tags <- as.character(tkgettags(tkp$canvas, "selected"))
+      id <- as.numeric(strsplit(tags[pmatch("v-", tags)],
+                                "-", fixed=TRUE)[[1]][2])
+      if (is.na(id)) { return() }
+      phi <- pi+atan2(tkp$coords[id,2]-y, tkp$coords[id,1]-x)
+      .tkplot.set.label.degree(tkp.id, id, phi)
+      .tkplot.update.label(tkp.id, id, tkp$coords[id,1], tkp$coords[id,2])
+    })
+  }
   
   # We don't need these any more, they are stored in the environment
   rm(tkp, params, layout, vertex.color, edge.color, top, canvas,
@@ -432,7 +551,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
   phi <- phi + rad
 
- coords[,1] <- r * cos(phi)
+  coords[,1] <- r * cos(phi)
   coords[,2] <- r * sin(phi)
   
   .tkplot.set(tkp.id, "coords", coords)
@@ -518,8 +637,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
                          tkp$params$vertex.color)
   item <- tkcreate(tkp$canvas, "oval", x-vertex.size, y-vertex.size,
                    x+vertex.size, y+vertex.size, width=1,
-                   outline="black",  fill=vertex.color,
-                   activefill="red", activeoutline="yellow", activewidth=2)
+                   outline="black",  fill=vertex.color)
   tkaddtag(tkp$canvas, "vertex", "withtag", item)
   tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", item)
   if (!is.na(label)) {
@@ -531,9 +649,13 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
       (vertex.size+6+4*(ceiling(log10(id+1))))
     label.y <- y+label.dist*sin(label.degree)*
       (vertex.size+6+4*(ceiling(log10(id+1))))
+    if (label.dist==0)
+      { afill <- tkp$params$label.color }
+    else
+      { afill <- "red" }
     litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
                       text=as.character(label), state="normal",
-                      fill=tkp$params$label.color, activefill="red",
+                      fill=tkp$params$label.color, activefill=afill,
                       font=tkp$params$label.font)
     tkaddtag(tkp$canvas, "label", "withtag", litem)
     tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", litem)
@@ -621,6 +743,20 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
            tags=c("edge", paste(sep="", "edge-", id),
              paste(sep="", "from-", from),
              paste(sep="", "to-", to)))
+
+  edge.label <- ifelse(length(tkp$params$edge.labels)>1,
+                       tkp$params$edge.labels[id],
+                       tkp$params$edge.labels)
+  if (!is.na(edge.label)) {
+    label.x <- (to.c[1]+from.c[1])/2
+    label.y <- (to.c[2]+from.c[2])/2
+    litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
+                      text=as.character(edge.label), state="normal",
+                      fill=tkp$params$label.color,
+                      font=tkp$params$label.font)
+    tkaddtag(tkp$canvas, "label", "withtag", litem)
+    tkaddtag(tkp$canvas, paste(sep="", "edge-", id), "withtag", litem)
+  }
 }
 
 # Creates all edges
@@ -651,6 +787,18 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     to.c[2] <- from.c[2] + (r-vertex.size)*sin(phi)
   }
   tkcoords(tkp$canvas, itemid, from.c[1], from.c[2], to.c[1], to.c[2])
+
+  edgeid <- as.numeric(substring(tags[ pmatch("edge-", tags) ], 6))
+  edge.label <- ifelse(length(tkp$params$edge.labels)>1,
+                       tkp$params$edge.labels[edgeid],
+                       tkp$params$edge.labels)
+  if (!is.na(edge.label)) {
+    label.x <- (to.c[1]+from.c[1])/2
+    label.y <- (to.c[2]+from.c[2])/2
+    litem <- as.numeric(tkfind(tkp$canvas, "withtag",
+                               paste(sep="", "label&&edge-", edgeid)))
+    tkcoords(tkp$canvas, litem, label.x, label.y)
+  }
 }
 
 .tkplot.toggle.labels <- function(tkp.id) {
@@ -673,9 +821,356 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   }
 }
 
+.tkplot.update.vertex.color <- function(tkp.id, vids, newcolor) {
+  tkp <- .tkplot.get(tkp.id)
+  colors <- tkp$params$vertex.color
+  if (length(colors)==1 && length(vids)==vcount(tkp$graph)) {
+    ## Uniform color -> uniform color
+    .tkplot.set(tkp.id, "params$vertex.color", newcolor)
+  } else if (length(colors)==1) {
+    ## Uniform color -> nonuniform color
+    colors <- rep(colors, vcount(tkp$graph))
+    colors[vids] <- newcolor
+    .tkplot.set(tkp.id, "params$vertex.color", colors)
+  } else if (length(vids)==vcount(tkp$graph)) {
+    ## Non-uniform -> uniform
+    .tkplot.set(tkp.id, "params$vertex.color", newcolor)
+  } else {
+    ## Non-uniform -> non-uniform
+    colors[vids] <- newcolor
+    .tkplot.set(tkp.id, "params$vertex.color", colors)
+  }
+
+  tkitemconfigure(tkp$canvas, "selected&&vertex", "-fill", newcolor)
+}
+
+.tkplot.update.edge.color <- function(tkp.id, eids, newcolor) {
+  tkp <- .tkplot.get(tkp.id)
+  colors <- tkp$params$edge.color
+  if (length(colors)==1 && length(eids)==ecount(tkp$graph)) {
+    ## Uniform color -> uniform color
+    .tkplot.set(tkp.id, "params$edge.color", newcolor)
+  } else if (length(colors)==1) {
+    ## Uniform color -> nonuniform color
+    colors <- rep(colors, ecount(tkp$graph))
+    colors[eids] <- newcolor
+    .tkplot.set(tkp.id, "params$edge.color", colors)
+  } else if (length(eids)==ecount(tkp$graph)) {
+    ## Non-uniform -> uniform
+    .tkplot.set(tkp.id, "params$edge.color", newcolor)
+  } else {
+    ## Non-uniform -> non-uniform
+    colors[eids] <- newcolor
+    .tkplot.set(tkp.id, "params$edge.color", colors)
+  }
+
+  tkitemconfigure(tkp$canvas, "selected&&edge", "-fill", newcolor)
+}
+
+.tkplot.update.edge.width <- function(tkp.id, eids, newwidth) {
+  tkp <- .tkplot.get(tkp.id)
+  widths <- tkp$params$edge.width
+  if (length(widths)==1 && length(eids)==ecount(tkp$graph)) {
+    ## Uniform width -> uniform width
+    .tkplot.set(tkp.id, "params$edge.width", newwidth)
+  } else if (length(widths)==1) {
+    ## Uniform width -> nonuniform width
+    widths <- rep(widths, ecount(tkp$graph))
+    widths[eids] <- newwidth
+    .tkplot.set(tkp.id, "params$edge.width", widths)
+  } else if (length(eids)==ecount(tkp$graph)) {
+    ## Non-uniform -> uniform
+    .tkplot.set(tkp.id, "params$edge.width", newwidth)
+  } else {
+    ## Non-uniform -> non-uniform
+    widths[eids] <- newwidth
+    .tkplot.set(tkp.id, "params$edge.width", widths)
+  }
+
+  tkitemconfigure(tkp$canvas, "selected&&edge", "-width", newwidth)
+}
+  
+
+.tkplot.update.vertex.size <- function(tkp.id, vids, newsize) {
+  tkp <- .tkplot.get(tkp.id)
+  sizes <- tkp$params$vertex.size
+  if (length(sizes)==1 && length(vids)==vcount(tkp$graph)) {
+    ## Uniform -> uniform
+    .tkplot.set(tkp.id, "params$vertex.size", newsize)
+  } else if (length(sizes)==1) {
+    ## Uniform size -> nonuniform size
+    sizes <- rep(sizes, vcount(tkp$graph))
+    sizes[vids] <- newsize
+    .tkplot.set(tkp.id, "params$vertex.size", sizes)
+  } else if (length(vids)==vcount(tkp$graph)) {
+    ## Non-uniform -> uniform
+    .tkplot.set(tkp.id, "params$vertex.size", newsize)
+  } else {
+    ## Non-uniform -> non-uniform
+    sizes[vids] <- newsize
+    .tkplot.set(tkp.id, "params$vertex.size", sizes)
+  }
+
+  sapply(vids, function(id) {
+    .tkplot.update.vertex(tkp.id, id, tkp$coords[id,1], tkp$coords[id,2])
+  })
+}
+
+.tkplot.get.numeric.vector <- function(...) {
+  labels <- list(...)
+  if (length(labels)==0) return(FALSE)
+  
+  answers <- as.list(rep("", length(labels)))
+  dialog <- tktoplevel()
+  vars <- lapply(answers, tclVar)
+
+  retval <- list()
+
+  OnOK <- function() {
+    retval <<- lapply(vars, tclvalue)
+    tkdestroy(dialog)
+  }
+  
+  OK.but <- tkbutton(dialog, text="   OK   ", command=OnOK)
+  for (i in seq(along=labels)) {
+    tkgrid(tklabel(dialog, text=labels[[i]]))
+    tmp <- tkentry(dialog, width="40",textvariable=vars[[i]])
+    tkgrid(tmp)
+    tkbind(tmp, "<Return>", OnOK)
+  }
+  tkgrid(OK.but)
+  tkwait.window(dialog)
+
+  retval <- lapply(retval, function(v)
+                   { eval(parse(text=paste("c(", v, ")"))) })
+  return (retval)
+}
+
+.tkplot.select.number <- function(label, initial, low=1, high=100) {
+  dialog <- tktoplevel()
+  SliderValue <- tclVar(as.character(initial))
+  SliderValueLabel <- tklabel(dialog,text=as.character(tclvalue(SliderValue)))
+  tkgrid(tklabel(dialog,text=label), SliderValueLabel)
+  tkconfigure(SliderValueLabel, textvariable=SliderValue)
+  slider <- tkscale(dialog, from=high, to=low,
+                    showvalue=F, variable=SliderValue,
+                    resolution=1, orient="horizontal")  
+  OnOK <- function() {
+    SliderValue <<- as.numeric(tclvalue(SliderValue))
+    tkdestroy(dialog)
+  }
+  OnCancel <- function() {
+    SliderValue <<- NA
+    tkdestroy(dialog)
+  }
+  OK.but <- tkbutton(dialog, text="   OK   ", command=OnOK)
+  cancel.but <- tkbutton(dialog, text=" Cancel ", command=OnCancel)
+  tkgrid(slider)
+  tkgrid(OK.but, cancel.but)
+  
+  tkwait.window(dialog)
+  return(SliderValue)
+}
+  
+###################################################################
+# Internal functions, vertex and edge selection
+###################################################################
+
+.tkplot.deselect.all <- function(tkp.id) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  ids <- as.numeric(tkfind(canvas, "withtag", "selected"))
+  for (i in ids) {
+    .tkplot.deselect.this(tkp.id, i)
+  }
+}
+
+.tkplot.select.all.vertices <- function(tkp.id) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  vertices <- as.numeric(tkfind(canvas, "withtag", "vertex"))
+  for (i in vertices) {
+    .tkplot.select.vertex(tkp.id, i)
+  }
+}
+
+.tkplot.select.some.vertices <- function(tkp.id, vids) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  vids <- unique(vids)
+  for (i in vids) {
+    tkid <- as.numeric(tkfind(canvas, "withtag",
+                              paste(sep="", "vertex&&v-", i)))
+    .tkplot.select.vertex(tkp.id, tkid)
+  }
+}
+
+.tkplot.select.all.edges <- function(tkp.id, vids) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  edges <- as.numeric(tkfind(canvas, "withtag", "edge"))
+  for (i in edges) {
+    .tkplot.select.edge(tkp.id, i)
+  }
+}
+
+.tkplot.select.some.edges <- function(tkp.id, from, to) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  fromtags <- sapply(from, function(i) { paste(sep="", "from-", i) })
+  totags <- sapply(from, function(i) { paste(sep="", "to-", i) })
+  edges <- as.numeric(tkfind(canvas, "withtag", "edge"))
+  for (i in edges) {
+    tags <- as.character(tkgettags(canvas, i))
+    ftag <- tags[ pmatch("from-", tags) ]
+    ttag <- tags[ pmatch("to-", tags) ]
+    if (ftag %in% fromtags && ttag %in% totags) {
+      .tkplot.select.edge(tkp.id, i)
+    }
+  }
+}
+
+.tkplot.select.vertex <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkaddtag(canvas, "selected", "withtag", tkid)
+  tkitemconfigure(canvas, tkid, "-outline", "red",
+                  "-width", 2)
+}
+
+.tkplot.select.edge <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkaddtag(canvas, "selected", "withtag", tkid)
+  tkitemconfigure(canvas, tkid, "-dash", "-")
+}
+
+.tkplot.select.label <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkaddtag(canvas, "selected", "withtag", tkid)
+}  
+
+.tkplot.deselect.vertex <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkdtag(canvas, tkid, "selected")
+  tkitemconfigure(canvas, tkid, "-outline", "black",
+                  "-width", 1)
+}
+
+.tkplot.deselect.edge <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkdtag(canvas, tkid, "selected")
+  tkitemconfigure(canvas, tkid, "-dash", "")
+}
+
+.tkplot.deselect.label <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkdtag(canvas, tkid, "selected")
+}
+
+.tkplot.select.current <- function(tkp.id) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkid <- as.numeric(tkfind(canvas, "withtag", "current"))
+  .tkplot.select.this(tkp.id, tkid)
+}
+
+.tkplot.deselect.current <- function(tkp.id) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkid <- as.numeric(tkfind(canvas, "withtag", "current"))
+  .tkplot.deselect.this(tkp.id, tkid)
+}
+
+.tkplot.select.this <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tags <- as.character(tkgettags(canvas, tkid))
+  if ("vertex" %in% tags) {
+    .tkplot.select.vertex(tkp.id, tkid)
+  } else if ("edge" %in% tags) {
+    .tkplot.select.edge(tkp.id, tkid)
+  } else if ("label" %in% tags) {
+    tkp <- .tkplot.get(tkp.id)
+    if (tkp$params$label.dist == 0) {
+      id <- tags[pmatch("v-", tags)]
+      tkid <- as.character(tkfind(canvas, "withtag",
+                                  paste(sep="", "vertex&&", id)))
+      .tkplot.select.vertex(tkp.id, tkid)
+    } else {
+      .tkplot.select.label(tkp.id, tkid)
+    }
+  } 
+}
+
+.tkplot.deselect.this <- function(tkp.id, tkid) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tags <- as.character(tkgettags(canvas, tkid))
+  if ("vertex" %in% tags) {
+    .tkplot.deselect.vertex(tkp.id, tkid)
+  } else if ("edge" %in% tags) {
+    .tkplot.deselect.edge(tkp.id, tkid)
+  } else if ("label" %in% tags) {
+    tkp <- .tkplot.get(tkp.id)
+    if (tkp$params$label.dist == 0) {
+      id <- tags[pmatch("v-", tags)]
+      tkid <- as.character(tkfind(canvas, "withtag",
+                                  paste(sep="", "vertex&&", id)))
+      .tkplot.deselect.vertex(tkp.id, tkid)
+    } else {
+      .tkplot.deselect.label(tkp.id, tkid)
+    }
+  }
+}
+
+.tkplot.get.selected.vertices <- function(tkp.id) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkids <- as.numeric(tkfind(canvas, "withtag", "vertex&&selected"))
+
+  ids <- sapply(tkids, function(tkid) {
+    tags <- as.character(tkgettags(canvas, tkid))
+    id <- as.numeric(substring(tags [pmatch("v-", tags)], 3))
+    id})
+
+  ids
+}
+
+.tkplot.get.selected.edges <- function(tkp.id) {
+  canvas <- .tkplot.get(tkp.id, "canvas")
+  tkids <- as.numeric(tkfind(canvas, "withtag", "edge&&selected"))
+
+  ids <- sapply(tkids, function(tkid) {
+    tags <- as.character(tkgettags(canvas, tkid))
+    id <- as.numeric(substring(tags [pmatch("edge-", tags)], 6))
+    id})
+
+  ids
+}
+
 ###################################################################
 # Internal functions: manipulating the UI
 ###################################################################
+
+.tkplot.select.menu <- function(tkp.id, main.menu) {
+  select.menu <- tkmenu(main.menu)
+
+  tkadd(select.menu, "command", label="Select all vertices",
+        command=function() {
+          .tkplot.deselect.all(tkp.id)
+          .tkplot.select.all.vertices(tkp.id)
+        })
+  tkadd(select.menu, "command", label="Select all edges",
+        command=function() {
+          .tkplot.deselect.all(tkp.id)
+          .tkplot.select.all.edges(tkp.id)
+        })
+  tkadd(select.menu, "command", label="Select some vertices...",
+        command=function() {
+          vids <- .tkplot.get.numeric.vector("Select vertices")
+          .tkplot.select.some.vertices(tkp.id, vids[[1]])
+        })
+  tkadd(select.menu, "command", label="Select some edges...",
+        command=function() {
+          fromto <- .tkplot.get.numeric.vector("Select edges from vertices",
+                                               "to vertices")
+          .tkplot.select.some.edges(tkp.id, fromto[[1]], fromto[[2]])
+        })
+  tkadd(select.menu, "separator")
+  tkadd(select.menu, "command", label="Deselect everything",
+        command=function() { .tkplot.deselect.all(tkp.id) })
+
+  select.menu
+}
 
 .tkplot.layout.menu <- function(tkp.id, main.menu) {
   layout.menu <- tkmenu(main.menu)
@@ -782,3 +1277,9 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
          row=row, column=1)
 }
 
+.tkplot.select.color <- function(initialcolor) {
+  
+  color <- tclvalue(tkcmd("tk_chooseColor", initialcolor=initialcolor,
+                          title="Choose a color"))
+  return(color);
+}

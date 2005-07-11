@@ -86,6 +86,16 @@ i.get.edge.width <- function(graph, edge.width) {
   edge.width
 }
 
+i.get.edge.labels <- function(graph, edge.labels) {
+
+  if (is.character(edge.labels) &&
+      length(edge.labels)==1 && substr(edge.labels, 1, 2)=="a:") {
+    edge.labels <- as.character(get.edge.attribute
+                               (graph, substring(edge.labels,3)))
+  }
+  edge.labels
+}
+
 i.get.label.degree <- function(graph, label.degree) {
 
   if (is.character(label.degree) &&
