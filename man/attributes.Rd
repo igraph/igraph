@@ -24,26 +24,28 @@
 \usage{
 add.graph.attribute(graph, attrname, default = NA)
 delete.graph.attribute(graph, attrname)
-get.graph.attribute(graph, attrname)
+get.graph.attribute(graph, attrname=NULL)
 set.graph.attribute(graph, attrname, value)
 add.vertex.attribute(graph, attrname, default = NA)
 delete.vertex.attribute(graph, attrname)
-get.vertex.attribute(graph, attrname, v = NULL)
+get.vertex.attribute(graph, attrname=NULL, v = NULL)
 set.vertex.attribute(graph, attrname, v = NULL, value)
 add.edge.attribute(graph, attrname, default = NA)
 delete.edge.attribute(graph, attrname)
-get.edge.attribute(graph, attrname, from = NULL, to = NULL)
+get.edge.attribute(graph, attrname=NULL, from = NULL, to = NULL)
 set.edge.attribute(graph, attrname, from = NULL, to = NULL, value)
-g.a(graph, attrname)
+g.a(graph, attrname=NULL)
 g.a(graph, attrname) <- value
-v.a(graph, attrname, v = NULL)
+v.a(graph, attrname=NULL, v = NULL)
 v.a(graph, attrname, v = NULL) <- value
-e.a(graph, attrname, from = NULL, to = NULL)
+e.a(graph, attrname=NULL, from = NULL, to = NULL)
 e.a(graph, attrname, from = NULL, to = NULL) <- value
 }
 \arguments{
   \item{graph}{The graph to work on.}
-  \item{attrname}{Character constant, the name of the attribute.}
+  \item{attrname}{Character constant, the name of the attribute. For
+    queries this can be \code{NULL}, in this case the existing (graph,
+    vertex or edge) attributes will be listed.}
   \item{default}{The default value of the attribute, arbitrary object.}
   \item{value}{The new value of the attribute.}
   \item{v}{Numeric vector, the vertices for which the attribute is

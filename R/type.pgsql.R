@@ -205,14 +205,21 @@ delete.graph.attribute.pgsql.default <- function(graph, attrname) {
   graph
 }
 
-get.graph.attribute.pgsql.default <- function(graph, attrname) {
+get.graph.attribute.pgsql.default <- function(graph, attrname=NULL) {
 
-  qres <- dbGetQuery(graph$data$conn, "select value from gal where gname=",
-                     graph$data$gname, "and name=", sQuote(attrname))
-  if (length(qres$value)==0) {
-    res <- NULL
+  if (is.null(attrname)) {
+    qres <- dbGetQuery(graph$data$conn,
+                       "select distinct name from gal where gname=",
+                       graph$data$gname)
+    res <- qres[,"name"]
   } else {
-    res <- unserialize(as.character(qres[1]))
+    qres <- dbGetQuery(graph$data$conn, "select value from gal where gname=",
+                       graph$data$gname, "and name=", sQuote(attrname))
+    if (length(qres$value)==0) {
+      res <- NULL
+    } else {
+      res <- unserialize(as.character(qres[1]))
+    }
   }
   
   res
@@ -260,35 +267,42 @@ delete.vertex.attribute.pgsql.default <- function(graph, attrname) {
   graph
 }
 
-get.vertex.attribute.pgsql.default <- function(graph, attrname, v=NULL) {
+get.vertex.attribute.pgsql.default <- function(graph, attrname=NULL, v=NULL) {
 
-  dbSendQuery(graph$data$conn, "BEGIN")
-  if (is.null(v)) {
+  if (is.null(attrname)) {
     qres <- dbGetQuery(graph$data$conn,
-                       "select value from val where gname=",
-                       graph$data$gname,
-                       "and name=", sQuote(attrname),
-                       "and v<>0 order by v")
-    res <- unname(sapply(qres$value, unserialize, simplify=FALSE))
+                       "select distinct name from val where gname=",
+                       graph$data$gname)
+    res <- qres[,"name"]
   } else {
-    res <- vector(length(v), mode="list")
-    for (i in seq(along=v)) {
+    dbSendQuery(graph$data$conn, "BEGIN")
+    if (is.null(v)) {
       qres <- dbGetQuery(graph$data$conn,
                          "select value from val where gname=",
-                         graph$data$gname, "and name=", sQuote(attrname),
-                         "and v=", v[i])
-      res[[i]] <- unname(unserialize(qres$value))
-      rm(qres)
+                         graph$data$gname,
+                         "and name=", sQuote(attrname),
+                         "and v<>0 order by v")
+      res <- unname(sapply(qres$value, unserialize, simplify=FALSE))
+    } else {
+      res <- vector(length(v), mode="list")
+      for (i in seq(along=v)) {
+        qres <- dbGetQuery(graph$data$conn,
+                           "select value from val where gname=",
+                           graph$data$gname, "and name=", sQuote(attrname),
+                           "and v=", v[i])
+        res[[i]] <- unname(unserialize(qres$value))
+        rm(qres)
+      }
     }
-  }
-  dbSendQuery(graph$data$conn, "COMMIT")
-
-  if (length(res)==0) {
-    stop("no such attribute: ", attrname)
-  }
-  
-  if (length(res)==1) {
-    res <- res[[1]]
+    dbSendQuery(graph$data$conn, "COMMIT")
+    
+    if (length(res)==0) {
+      stop("no such attribute: ", attrname)
+    }
+    
+    if (length(res)==1) {
+      res <- res[[1]]
+    }
   }
 
   res
@@ -326,7 +340,7 @@ delete.edge.attribute.pgsql.default <- function(graph, attrname) {
 }
 
 # TODO
-get.edge.attribute.pgsql.default <- function(graph, attrname,
+get.edge.attribute.pgsql.default <- function(graph, attrname=NULL,
                                              from=NULL, to=NULL) {
   error("This storage type does not support edge attributes (yet)")
 }

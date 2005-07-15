@@ -196,8 +196,13 @@ delete.graph.attribute.adjacencylist.default <- function(graph, attrname) {
   res
 }
 
-get.graph.attribute.adjacencylist.default <- function(graph, attrname) {
-  res <- graph$gal[[attrname]]
+get.graph.attribute.adjacencylist.default <- function(graph, attrname=NULL) {
+  if(is.null(attrname)) {
+    res <- names(graph$gal)
+  } else {
+    res <- graph$gal[[attrname]]
+  }
+
   res
 }
 
@@ -234,19 +239,24 @@ delete.vertex.attribute.adjacencylist.default <- function(graph, attrname) {
   res
 }
 
-get.vertex.attribute.adjacencylist.default <- function(graph, attrname,
+get.vertex.attribute.adjacencylist.default <- function(graph, attrname=NULL,
                                                        v=NULL) {
-  if (is.null(graph$val[[attrname]])) {
-    stop("no such attribute: ", attrname)
-  }
 
-  if (is.null(v)) {
-    res <- graph$val[[attrname]]
+  if (is.null(attrname)) {
+    res <- names(g$val)
   } else {
-    res <- graph$val[[attrname]][v]
-  }
-  if (length(res)==1) {
-    res <- res[[1]]
+    if (is.null(graph$val[[attrname]])) {
+      stop("no such attribute: ", attrname)
+    }
+    
+    if (is.null(v)) {
+      res <- graph$val[[attrname]]
+    } else {
+      res <- graph$val[[attrname]][v]
+    }
+    if (length(res)==1) {
+      res <- res[[1]]
+    }
   }
 
   res
@@ -296,19 +306,23 @@ delete.edge.attribute.adjacencylist.default <- function(graph, attrname) {
   res
 }
 
-get.edge.attribute.adjacencylist.default <- function(graph, attrname,
+get.edge.attribute.adjacencylist.default <- function(graph, attrname=NULL,
                                                      from=NULL, to=NULL) {
-  ind <- as.character(get.edge.names.adjacencylist.default(graph,
-                                                           from=from, to=to))
-  res <- vector(mode="list", length(ind))
-  default <- attributes(graph$eal[[attrname]])$default
-  for (i in seq(along=ind)) {
-    tmp <- graph$eal[[attrname]][[ ind[i] ]]
-    res[[i]] <- ifelse(is.null(tmp), default, tmp)
-  }
-
-  if (length(res)==1) {
-    res <- res[[1]]
+  if (is.null(attrname)) {
+    res <- names(g$eal)
+  } else {  
+    ind <- as.character(get.edge.names.adjacencylist.default(graph,
+                                                             from=from, to=to))
+    res <- vector(mode="list", length(ind))
+    default <- attributes(graph$eal[[attrname]])$default
+    for (i in seq(along=ind)) {
+      tmp <- graph$eal[[attrname]][[ ind[i] ]]
+      res[[i]] <- ifelse(is.null(tmp), default, tmp)
+    }
+    
+    if (length(res)==1) {
+      res <- res[[1]]
+    }
   }
   
   res

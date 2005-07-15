@@ -39,7 +39,8 @@ i.get.layout <- function(graph, layout, layout.par) {
 i.get.vertex.color <- function(graph, vertex.color) {
 
   if (length(vertex.color)==1 && substr(vertex.color, 1, 2)=="a:") {
-    vertex.color <- get.vertex.attribute(graph, substring(vertex.color,3))
+    vertex.color <- unlist(get.vertex.attribute(graph,
+                                                substring(vertex.color,3)))
   }
 
   if (is.numeric(vertex.color)) {
@@ -113,7 +114,7 @@ i.get.labels <- function(graph, labels) {
   } else if (is.na(labels[1])) {
   } else if (is.character(labels) && length(labels)==1 &&
              substr(labels, 1, 2)=="a:") {
-    labels <- get.vertex.attribute(graph, substring(labels, 3))
+    labels <- unlist(get.vertex.attribute(graph, substring(labels, 3)))
   }
   labels
 }
