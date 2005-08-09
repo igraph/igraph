@@ -257,3 +257,30 @@ SEXP REST_neighborlist_delete_vertices(SEXP neilist, SEXP vids) {
   UNPROTECT(1);
   return result;
 }
+
+/**
+ */
+SEXP REST_i_adjacencylist_ecount(SEXP interface, SEXP graph) {
+  
+  SEXP neilist;
+  SEXP result;
+  
+  long int no_of_nodes;
+  long int sum=0;
+  long int i;
+  
+  neilist=REST_i_get_list_element(graph, "data");
+  neilist=REST_i_get_list_element(neilist, "out");
+  no_of_nodes = GET_LENGTH(neilist);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+
+  for (i=0; i<no_of_nodes; i++) {
+    sum += GET_LENGTH(VECTOR_ELT(neilist, i));
+  }
+  
+  R(result)=sum;
+  
+  UNPROTECT(1);
+  return result;
+}

@@ -36,11 +36,11 @@ graph.empty.adjacencylist.default <- function(..., type="adjacencylist") {
   data <- list(out=list(),inc=list())
   val <- list()
   eal <- list()
-  
+
   res <- list(data=data, gal=gal, val=val, eal=eal)
   class(res) <- "graph"
   res <- add.vertices(res, realn)
-  
+
   res
 }
 
@@ -141,16 +141,26 @@ vcount.adjacencylist.default <- function(graph) {
 }
 
 ecount.adjacencylist.default <- function(graph) {
-  if (vcount(graph)==0) {
-    res <- 0
-  } else {
-    res <- as.double(sum(sapply(graph$data$out, length)))
-    if (!is.directed(graph)) {
-      res <- res/2
-    }
+  res <- .Call("REST_i_adjacencylist_ecount", igraph.c.interface,
+               graph, PACAKGE="igraph")
+
+  if (!is.directed(graph)) {
+    res <- res/2
   }
+  
   res
 }
+  
+#  if (vcount(graph)==0) {
+#    res <- 0
+#  } else {
+#    res <- as.double(sum(sapply(graph$data$out, length)))
+#    if (!is.directed(graph)) {
+#      res <- res/2
+#    }
+#  }
+#  res
+
 
 neighbors.adjacencylist.default <- function(graph, v, mode="out") {
 

@@ -136,6 +136,7 @@ SEXP REST_i_default_add_vertex_attribute(SEXP, SEXP, const char*, SEXP);
 SEXP REST_i_default_set_vertex_attribute(SEXP, SEXP, const char*, SEXP, SEXP);
 
 SEXP REST_i_adjacencylist_vcount(SEXP, SEXP);
+SEXP REST_i_adjacencylist_ecount(SEXP, SEXP);
 SEXP REST_i_adjacencylist_neighbors(SEXP, SEXP, long int, SEXP);
 
 /* -------------------------------------------------- */
