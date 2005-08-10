@@ -5,7 +5,7 @@
 \alias{eb.community2}
 \alias{edge.type.matrix}
 \alias{modularity}
-\title{Undocumented function for community structure detection}
+\title{Undocumented functions for community structure detection}
 \description{These functions are alpha code and also their syntax is
   expected to change. Don't use them!}
 \usage{
