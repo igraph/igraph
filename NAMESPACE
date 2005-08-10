@@ -85,7 +85,7 @@ export(graph, graph.adjacency, graph.star, graph.lattice, graph.ring,
 # common functions, graph generators, games
 
 export(ba.game, barabasi.game, erdos.renyi.game, random.graph.game,
-       degree.sequence.game)
+       degree.sequence.game, growing.random.game, aging.prefatt.game)
 
 # common functions, (not so basic) structural properties
 
@@ -138,3 +138,8 @@ export(edge.type.matrix, eb.community, cut.community, modularity,
 # other, not graph related
 
 export(running.mean)
+
+# measuring dynamics
+
+export(measure.dynamics.idage)
+

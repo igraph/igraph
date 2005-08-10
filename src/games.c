@@ -92,3 +92,47 @@ SEXP REST_ba_game(SEXP pn, SEXP pm, SEXP outseq, SEXP poutpref) {
   return result;
 }
 
+SEXP REST_growing_random_game(SEXP pn, SEXP pm, SEXP pcitation) {
+
+  SEXP result;
+  
+  long int no_of_nodes;
+  long int no_of_neighbors;
+  long int no_of_edges;
+  int citation;
+  
+  long int resp=0;
+
+  long int i,j;
+
+  no_of_nodes=R(pn);
+  no_of_neighbors=R(pm);
+  no_of_edges=(no_of_nodes-1) * no_of_neighbors;
+  citation=LOGICAL(pcitation)[0];
+    
+  PROTECT(result=NEW_NUMERIC(no_of_edges*2));
+
+  GetRNGstate();
+
+  for (i=2; i<=no_of_nodes; i++) {
+    for (j=0; j<no_of_neighbors; j++) {
+      if (citation) {
+	long int to=RNG_INTEGER(1, i-1);
+	REAL(result)[resp++] = i;
+	REAL(result)[resp++] = to;
+      } else {
+	long int from=RNG_INTEGER(1, i);
+	long int to=RNG_INTEGER(1,i);
+	REAL(result)[resp++] = from;
+	REAL(result)[resp++] = to;
+      }
+    }
+    R_CheckUserInterrupt();
+  }
+  
+  PutRNGstate();
+  
+  /* Clean */
+  UNPROTECT(1);
+  return result;
+}

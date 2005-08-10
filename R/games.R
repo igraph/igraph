@@ -180,3 +180,67 @@ degree.sequence.game <- function(out.deg, in.deg=NULL, method="simple", ...) {
   
   res
 }
+
+growing.random.game <- function(n, m=1, citation=FALSE, ...) {
+
+  n <- as.numeric(n)
+  m <- as.numeric(m)
+
+  res <- graph.empty(n=n, ...)
+  res <- add.edges(res, .Call("REST_growing_random_game", n, m,
+                              citation, PACKAGE="igraph"))
+
+  res
+}
+                              
+aging.prefatt.game <- function(n, m=1, aging.type="exponential",
+                               params=list(), ...) {
+
+  if (! aging.type %in% c("exponential", "powerlaw")) {
+    stop("Invalid aging type.")
+  }
+  
+  probs <- rep(1, times=n)
+  ind <- rep(0, times=n)
+  born <- 1:n
+  edges <- numeric( (n-1)*m )
+  edgep <- 1
+
+  if (aging.type=="exponential") {
+    aging.exp <- params[["aging.exp"]]
+    if (is.null(aging.exp)) { aging.exp <- 1 }
+  } else if (aging.type=="powerlaw") {
+    aging.exp <- params[["aging.exp"]]
+    if (is.null(aging.exp)) { aging.exp <- 1 }
+  }
+  
+  for (step in 2:n) {
+
+    # choose neighbors
+    newneis <- sample(1:(step-1), m, replace=TRUE,
+                      prob=probs[1:(step-1)])
+    
+    # aging in probs
+    if (aging.type=="exponential") {
+      probs[1:(step-1)] <- probs[1:(step-1)] * exp(-aging.exp)
+    } else if (aging.type=="powerlaw") {
+      probs[1:(step-1)] <- probs[1:(step-1)] *
+        ((step:2)/((step-1):1))^-aging.exp
+    }
+      
+    # add the edges, recalculate probs
+    for (nei in newneis) {
+      if (aging.type=="exponential") {
+        probs[nei] <- probs[nei] * ((ind[nei]+1)+1)/(ind[nei]+1)
+      } else if (aging.type=="powerlaw") {
+        probs[nei] <- probs[nei] * ((ind[nei]+1)+1)/(ind[nei]+1)
+      }
+      ind[nei] <- ind[nei]+1
+      edges[edgep] <- step; edgep <- edgep + 1
+      edges[edgep] <- nei ; edgep <- edgep + 1
+    }
+    
+  }
+
+  graph(edges, n=n, ...)
+}

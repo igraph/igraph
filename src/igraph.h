@@ -92,6 +92,15 @@ SEXP REST_layout_kamadakawai(SEXP pn, SEXP pniter,
 			     SEXP pkkconst, SEXP psigma, SEXP px, SEXP py);
 
 /* -------------------------------------------------- */
+/* Dynamics measurement                               */
+/* -------------------------------------------------- */
+
+SEXP REST_measure_dynamics_idage(SEXP interface, SEXP graph, SEXP st,
+				 SEXP pagebins, SEXP pmaxind, SEXP psd);
+SEXP REST_measure_dynamics_idage_st(SEXP interface, SEXP graph, SEXP akl,
+				    SEXP pagebins, SEXP pmaxind);
+
+/* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
 

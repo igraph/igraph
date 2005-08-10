@@ -38,6 +38,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
   res <- switch(format,
 #                "pajek"=write.graph.pajek(graph, file, format, ...),
                 "edgelist"=write.graph.edgelist(graph, file, format, ...),
+                "lgl"=write.graph.lgl(graph, file, format, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -124,3 +125,41 @@ write.graph.edgelist <- function(graph, file, format="edgelist",
 
   invisible(NULL)
 }
+
+################################################################
+# Write an LGL format, quite simple
+################################################################
+
+write.graph.lgl <- function(graph, file, format="lgl", ...) {
+  
+  if (is.character(file)) {
+    file <- file(file, open="w+")
+  }
+  
+  closeit <- FALSE
+  if (!isOpen(file)) {
+    file <- open(file)
+    closeit <- TRUE
+  }
+
+  vc <- vcount(graph)
+  for (i in 1:vc) {
+    neis <- neighbors(graph, i, "out")
+    if (!is.directed(graph)) {
+      neis <- neis [ neis < i ]
+    }
+    if (length(neis) > 0) {
+      neis <- sort(neis)
+      cat("# ", file=file)
+      cat(i,    file=file)
+      cat("\n", file=file)
+      for (n in neis) {
+        cat(n,    file=file)
+        cat("\n", file=file)
+      }
+    }
+  }
+
+  invisible(NULL)
+}
+      
