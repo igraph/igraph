@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
-   SimpleGraph R package.
-   Copyright (C) 2003, 2004  Gabor Csardi <csardi@rmki.kfki.hu>
+   IGraph R package.
+   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,8 @@ REST_i_ptrtable_t REST_i_table_default= {
   REST_i_default_graph_empty,
   REST_i_default_add_edges,
   REST_i_default_add_vertex_attribute,
-  REST_i_default_set_vertex_attribute
+  REST_i_default_set_vertex_attribute,
+  REST_i_default_get_edge_attribute
 };
 
 REST_i_ptrtable_t REST_i_table_adjacencylist= { 
@@ -43,7 +44,8 @@ REST_i_ptrtable_t REST_i_table_adjacencylist= {
   REST_i_default_graph_empty,
   REST_i_default_add_edges,
   REST_i_default_add_vertex_attribute,
-  REST_i_default_set_vertex_attribute
+  REST_i_default_set_vertex_attribute,
+  REST_i_default_get_edge_attribute
 };					      
 
 REST_i_ptrtable_t REST_i_getptrtable(SEXP graph) {
@@ -79,13 +81,13 @@ SEXP REST_i_default_ecount(SEXP interface, SEXP graph) {
 SEXP REST_i_default_neighbors(SEXP interface, SEXP graph, long int v, SEXP m) {
   EVAL(lang3(interface,
 	     ScalarString(CREATE_STRING_VECTOR("neighbors")), 
-	     AS_LIST(list3(graph, ScalarReal(v), m))));
+	     AS_LIST(list3(graph, ScalarReal((double)v), m))));
 }
 
 SEXP REST_i_default_add_vertices(SEXP interface, SEXP graph, long int nv) {
   EVAL(lang3(interface,
 	     ScalarString(CREATE_STRING_VECTOR("add.vertices")), 
-	     AS_LIST(list2(graph, ScalarReal(nv)))));
+	     AS_LIST(list2(graph, ScalarReal((double)nv)))));
 }
 
 SEXP REST_i_default_graph_empty(SEXP interface, SEXP args) {
@@ -115,6 +117,17 @@ SEXP REST_i_default_set_vertex_attribute(SEXP interface, SEXP graph,
 	     ScalarString(CREATE_STRING_VECTOR("set.vertex.attribute")),
 	     AS_LIST(list4(graph, ScalarString(CREATE_STRING_VECTOR(attrname)),
 			   v, newvalue))));
+}
+
+SEXP REST_i_default_get_edge_attribute(SEXP interface, SEXP graph,
+				       SEXP attr, long int from, 
+				       long int to) {
+  
+  EVAL(lang3(interface,
+	     ScalarString(CREATE_STRING_VECTOR("get.edge.attribute")),
+	     AS_LIST(list4(graph, attr, 
+			   ScalarReal((double)from), 
+			   ScalarReal((double)to)))));
 }
 
 /**
@@ -1471,6 +1484,205 @@ int indheap_i_switch(indheap_t* h, long int e1, long int e2) {
     tmp=h->index_begin[e1];
     h->index_begin[e1]=h->index_begin[e2];
     h->index_begin[e2]=tmp;
+  }
+
+  return 0;
+}
+
+
+/**
+ */
+
+int d_indheap_init           (d_indheap_t* h, long int alloc_size) {
+ if (alloc_size <= 0 ) { alloc_size=1; }
+  h->stor_begin=Calloc(alloc_size, double);
+  h->stor_end=h->stor_begin + alloc_size;
+  h->end=h->stor_begin;
+  h->destroy=1;
+  h->index_begin=Calloc(alloc_size, long int);
+  h->index2_begin=Calloc(alloc_size, long int);
+  
+  return 0;  
+}
+
+/**
+ */
+
+int d_indheap_destroy        (d_indheap_t* h) {  
+  if (h->destroy) {
+    assert( h->stor_begin != NULL);
+    Free(h->stor_begin);
+    Free(h->index_begin);
+    Free(h->index2_begin);
+  }
+  return 0;
+}
+
+int d_indheap_empty          (d_indheap_t* h) {
+  return h->stor_begin == h->end;
+}
+
+/**
+ */
+
+int d_indheap_push           (d_indheap_t* h, double elem, 
+			      long int idx, long int idx2) {
+  assert(h != NULL);
+	
+  /* full, allocate more storage */
+  if (h->stor_end == h->end) {
+    long int new_size = d_indheap_size(h) * 2;
+    if (new_size == 0) { new_size = 1; }
+    d_indheap_reserve(h, new_size);
+  }
+	
+  *(h->end) = elem;
+  h->end += 1;
+  *(h->index_begin+d_indheap_size(h)-1)=idx ;
+  *(h->index2_begin+d_indheap_size(h)-1)=idx2 ;
+
+  /* maintain d_indheap */
+  d_indheap_i_shift_up(h, d_indheap_size(h)-1);
+	
+  return 0;
+}
+
+/**
+ */
+
+double d_indheap_max       (d_indheap_t* h) {
+  assert(h != NULL);
+  assert(h->stor_begin != NULL);
+  assert(h->stor_begin != h->end);
+  
+  return h->stor_begin[0];
+}
+
+/**
+ */
+
+double d_indheap_delete_max(d_indheap_t* h) {
+  double tmp;
+
+  assert(h != NULL);
+  assert(h->stor_begin != NULL);
+
+  tmp=h->stor_begin[0];
+  d_indheap_i_switch(h, 0, d_indheap_size(h)-1);
+  h->end -= 1;
+  d_indheap_i_sink(h, 0);
+  
+  return tmp;
+}
+
+/**
+ */
+
+long int d_indheap_size      (d_indheap_t* h) {
+  assert (h != NULL);
+  return h->end - h->stor_begin;
+}
+
+/**
+ */
+
+int d_indheap_reserve        (d_indheap_t* h, long int size) {
+  long int actual_size=d_indheap_size(h);
+  assert(h != NULL);
+  
+  if (size <= actual_size) { return 0; }
+  
+  h->stor_begin=Realloc(h->stor_begin, size, double);
+  h->stor_end=h->stor_begin + size;
+  h->end=h->stor_begin+actual_size;
+  h->index_begin=Realloc(h->index_begin, size, long int);
+  h->index2_begin=Realloc(h->index2_begin, size, long int);
+  
+  return 0;
+}
+
+int d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2) {
+  (*idx)=h->index_begin[0];
+  (*idx2)=h->index2_begin[0];
+
+  return 0;
+}
+
+/**
+ */
+
+int d_indheap_i_build(d_indheap_t* h, long int head) {
+
+  long int size=d_indheap_size(h);
+  if (RIGHTCHILD(head) < size) { 
+    /* both subtrees */
+    d_indheap_i_build(h, LEFTCHILD(head) );
+    d_indheap_i_build(h, RIGHTCHILD(head));
+    d_indheap_i_sink(h, head);
+  } else if (LEFTCHILD(head) < size) {
+    /* only left */
+    d_indheap_i_build(h, LEFTCHILD(head));
+    d_indheap_i_sink(h, head);
+  } else {
+    /* none */
+  }
+  return 0;
+}
+
+/**
+ */
+
+int d_indheap_i_shift_up(d_indheap_t *h, long int elem) {
+  
+  if (elem==0 || h->stor_begin[elem] < h->stor_begin[PARENT(elem)]) { 
+    /* at the top */
+  } else {
+    d_indheap_i_switch(h, elem, PARENT(elem));
+    d_indheap_i_shift_up(h, PARENT(elem));
+  }
+  return 0;
+}
+
+/**
+ */
+
+int d_indheap_i_sink(d_indheap_t* h, long int head) {
+
+  long int size=d_indheap_size(h);
+  if (LEFTCHILD(head) >= size) { 
+    /* no subtrees */
+  } else if (RIGHTCHILD(head) == size ||
+	     h->stor_begin[LEFTCHILD(head)]>=h->stor_begin[RIGHTCHILD(head)]) {
+    /* sink to the left if needed */
+    if (h->stor_begin[head] < h->stor_begin[LEFTCHILD(head)]) {
+      d_indheap_i_switch(h, head, LEFTCHILD(head));
+      d_indheap_i_sink(h, LEFTCHILD(head));
+    }
+  } else {
+    /* sink to the right */
+    if (h->stor_begin[head] < h->stor_begin[RIGHTCHILD(head)]) {
+      d_indheap_i_switch(h, head, RIGHTCHILD(head));
+      d_indheap_i_sink(h, RIGHTCHILD(head));
+    }
+  }
+
+  return 0;
+}
+
+int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2) {
+  if (e1!=e2) {
+    long int tmpi;
+    double tmp=h->stor_begin[e1];
+    h->stor_begin[e1]=h->stor_begin[e2];
+    h->stor_begin[e2]=tmp;
+    
+    tmpi=h->index_begin[e1];
+    h->index_begin[e1]=h->index_begin[e2];
+    h->index_begin[e2]=tmpi;
+
+    tmpi=h->index2_begin[e1];
+    h->index2_begin[e1]=h->index2_begin[e2];
+    h->index2_begin[e2]=tmpi;
   }
 
   return 0;

@@ -317,7 +317,8 @@ delete.edge.attribute.adjacencylist.default <- function(graph, attrname) {
 }
 
 get.edge.attribute.adjacencylist.default <- function(graph, attrname=NULL,
-                                                     from=NULL, to=NULL) {
+                                                     from=NULL,
+                                                     to=NULL) {
   if (is.null(attrname)) {
     res <- names(g$eal)
   } else {  
@@ -334,7 +335,7 @@ get.edge.attribute.adjacencylist.default <- function(graph, attrname=NULL,
       res <- res[[1]]
     }
   }
-  
+
   res
 }
 

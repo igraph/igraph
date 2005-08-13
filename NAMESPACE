@@ -143,3 +143,6 @@ export(running.mean)
 
 export(measure.dynamics.idage)
 
+# minimum spanning tree
+
+export(minimum.spanning.tree)

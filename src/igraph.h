@@ -69,7 +69,9 @@ SEXP REST_edge_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
 SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
 SEXP REST_get_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
 SEXP REST_cocitation(SEXP interface, SEXP graph, SEXP mode);
- 
+SEXP REST_minimum_spanning_tree_unweighted(SEXP interface, SEXP graph);
+SEXP REST_minimum_spanning_tree_prim(SEXP interface, SEXP graph);
+
 /* -------------------------------------------------- */
 /* Community Structure                                */
 /* -------------------------------------------------- */
@@ -118,6 +120,7 @@ typedef SEXP (*GRAPH_EMPTY_t)(SEXP, SEXP);
 typedef SEXP (*ADD_EDGES_t)(SEXP, SEXP, SEXP);
 typedef SEXP (*ADD_VERTEX_ATTRIBUTE_t)(SEXP, SEXP, const char*, SEXP);
 typedef SEXP (*SET_VERTEX_ATTRIBUTE_t)(SEXP, SEXP, const char*, SEXP, SEXP);
+typedef SEXP (*GET_EDGE_ATTRIBUTE_t)(SEXP, SEXP, SEXP, long int, long int);
 
 typedef struct {
   VCOUNT_t vcount;
@@ -128,6 +131,7 @@ typedef struct {
   ADD_EDGES_t add_edges;
   ADD_VERTEX_ATTRIBUTE_t add_vertex_attribute;
   SET_VERTEX_ATTRIBUTE_t set_vertex_attribute;
+  GET_EDGE_ATTRIBUTE_t get_edge_attribute;
 } REST_i_ptrtable_t;
 
 extern REST_i_ptrtable_t REST_i_table_default;
@@ -143,6 +147,7 @@ SEXP REST_i_default_graph_empty(SEXP, SEXP);
 SEXP REST_i_default_add_edges(SEXP, SEXP, SEXP);
 SEXP REST_i_default_add_vertex_attribute(SEXP, SEXP, const char*, SEXP);
 SEXP REST_i_default_set_vertex_attribute(SEXP, SEXP, const char*, SEXP, SEXP);
+SEXP REST_i_default_get_edge_attribute(SEXP, SEXP, SEXP, long int, long int);
 
 SEXP REST_i_adjacencylist_vcount(SEXP, SEXP);
 SEXP REST_i_adjacencylist_ecount(SEXP, SEXP);
@@ -307,6 +312,36 @@ int indheap_i_build(indheap_t* h, long int head);
 int indheap_i_shift_up(indheap_t* h, long int elem);
 int indheap_i_sink(indheap_t* h, long int head);
 int indheap_i_switch(indheap_t* h, long int e1, long int e2);
+
+/* This is a heap containing double elements and 
+   two indices, its intended usage is the storage of
+   weighted edges.
+*/
+
+typedef struct s_indheap_d {
+  double* stor_begin;
+  double* stor_end;
+  double* end;
+  int destroy;
+  long int* index_begin;
+  long int* index2_begin;
+} d_indheap_t;
+
+int d_indheap_init           (d_indheap_t* h, long int size);
+int d_indheap_destroy        (d_indheap_t* h);
+int d_indheap_empty          (d_indheap_t* h);
+int d_indheap_push           (d_indheap_t* h, double elem, 
+			      long int idx, long int idx2);
+double d_indheap_max       (d_indheap_t* h);
+double d_indheap_delete_max(d_indheap_t* h);
+long int d_indheap_size      (d_indheap_t* h);
+int d_indheap_reserve        (d_indheap_t* h, long int size);
+int d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2);
+
+int d_indheap_i_build(d_indheap_t* h, long int head);
+int d_indheap_i_shift_up(d_indheap_t* h, long int elem);
+int d_indheap_i_sink(d_indheap_t* h, long int head);
+int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
 
 #endif
 
