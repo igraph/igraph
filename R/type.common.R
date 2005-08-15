@@ -50,5 +50,9 @@ delete.edges.common <- function(graph, edges) {
 }
 
 neighbors.common <- function(graph, v, mode) {
+  if (! mode %in% c("out", "in", "all")) {
+    stop("invalid mode parameter")
+  }
+
   invisible(TRUE)
 }

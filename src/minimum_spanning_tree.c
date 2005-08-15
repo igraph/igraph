@@ -93,7 +93,7 @@ SEXP REST_minimum_spanning_tree_prim(SEXP interface,
   d_indheap_t heap;
   dqueue_t edges;
 
-  SEXP mode, weight, tmp;
+  SEXP mode, weight, tmp, tmp2;
   long int i, j;
   
   no_of_nodes=R(ptrtable.vcount(interface, graph));
@@ -111,14 +111,14 @@ SEXP REST_minimum_spanning_tree_prim(SEXP interface,
 
     already_added[i-1]=1;
     tmp=ptrtable.neighbors(interface, graph, i, mode);
+    tmp2=ptrtable.get_edge_attribute(interface, graph, weight, 
+				     ScalarReal((double)i),
+				     NULL_USER_OBJECT);
     /* add all edges of the first vertex */
     for (j=0; j<GET_LENGTH(tmp); j++) {
       long int neighbor=REAL(tmp)[j];
       if (already_added[neighbor-1] == 0) {
-	double w=R(AS_NUMERIC(ptrtable.get_edge_attribute(interface, graph, 
-							  weight, i, 
-							  neighbor)));
-	d_indheap_push(&heap, -w, i, neighbor);
+	d_indheap_push(&heap, -REAL(tmp2)[j], i, neighbor);
       }
     }
 
@@ -136,14 +136,14 @@ SEXP REST_minimum_spanning_tree_prim(SEXP interface,
 	dqueue_push(&edges, from);
 	dqueue_push(&edges, to);
 	tmp=ptrtable.neighbors(interface, graph, to, mode);
+	tmp2=ptrtable.get_edge_attribute(interface, graph, weight, 
+					 ScalarReal((double)to), 
+					 NULL_USER_OBJECT);
 	/* add all outgoing edges */
 	for (j=0; j<GET_LENGTH(tmp); j++) {
 	  long int neighbor=REAL(tmp)[j];
 	  if (already_added[neighbor-1] == 0) {
-	    double w=R(AS_NUMERIC(ptrtable.get_edge_attribute(interface, graph,
-							      weight, to, 
-							      neighbor)));
-	    d_indheap_push(&heap, -w, to, neighbor);
+	    d_indheap_push(&heap, -REAL(tmp2)[j], to, neighbor);
 	  }
 	} /* for */
       } /* if !already_added */

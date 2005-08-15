@@ -35,6 +35,30 @@ S3method(delete.edge.attribute, adjacencylist.default)
 S3method(get.edge.attribute, adjacencylist.default)
 S3method(set.edge.attribute, adjacencylist.default)
 
+# igraph storage types, edge list
+
+S3method(graph.empty, edgelist.default)
+S3method(add.edges, edgelist.default)
+S3method(add.vertices, edgelist.default)
+S3method(delete.edges, edgelist.default)
+S3method(delete.vertices, edgelist.default)
+S3method(vcount, edgelist.default)
+S3method(ecount, edgelist.default)
+S3method(neighbors, edgelist.default)
+       
+S3method(add.graph.attribute, edgelist.default)
+S3method(delete.graph.attribute, edgelist.default)
+S3method(get.graph.attribute, edgelist.default)
+S3method(set.graph.attribute, edgelist.default)
+S3method(add.vertex.attribute, edgelist.default)
+S3method(delete.vertex.attribute, edgelist.default)
+S3method(get.vertex.attribute, edgelist.default)
+S3method(set.vertex.attribute, edgelist.default)
+S3method(add.edge.attribute, edgelist.default)
+S3method(delete.edge.attribute, edgelist.default)
+S3method(get.edge.attribute, edgelist.default)
+S3method(set.edge.attribute, edgelist.default)
+
 # igraph storage types, postresql database
 
 S3method(graph.empty, pgsql.default)

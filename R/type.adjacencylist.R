@@ -253,7 +253,7 @@ get.vertex.attribute.adjacencylist.default <- function(graph, attrname=NULL,
                                                        v=NULL) {
 
   if (is.null(attrname)) {
-    res <- names(g$val)
+    res <- names(graph$val)
   } else {
     if (is.null(graph$val[[attrname]])) {
       stop("no such attribute: ", attrname)
@@ -320,7 +320,7 @@ get.edge.attribute.adjacencylist.default <- function(graph, attrname=NULL,
                                                      from=NULL,
                                                      to=NULL) {
   if (is.null(attrname)) {
-    res <- names(g$eal)
+    res <- names(graph$eal)
   } else {  
     ind <- as.character(get.edge.names.adjacencylist.default(graph,
                                                              from=from, to=to))
@@ -349,10 +349,10 @@ set.edge.attribute.adjacencylist.default <- function(graph, attrname,
   res <- graph
   
   if (is.null(from) && is.null(to)) {
-    graph$eal[[attrname]] <- new.env(hash=TRUE)
+    res$eal[[attrname]] <- new.env(hash=TRUE)
     attributes(res$eal[[attrname]])$default <- value
   } else {
-    ind <- as.character(get.edge.names.adjacencylist.default(graph,
+    ind <- as.character(get.edge.names.adjacencylist.default(res,
                                                              from=from, to=to))
     for (i in seq(along=ind)) {
       res$eal[[attrname]][[ ind[i] ]] <- value
