@@ -52,7 +52,7 @@ neighbors <- function(graph, v, mode="out")
   UseMethod(paste(sep="", "neighbors.", graph$gal$type))
 
 ###################################################################
-# Attributes
+# Attributes, level 2
 ###################################################################
   
 add.graph.attribute <- function(graph, attrname, default=NA)
@@ -97,6 +97,28 @@ v.a <- get.vertex.attribute
 "v.a<-" <- set.vertex.attribute
 e.a <- get.edge.attribute
 "e.a<-" <- set.edge.attribute
+
+###################################################################
+# Iterators, level 2
+###################################################################
+
+igraph.iterator <- function(graph, type="vid")
+  UseMethod(paste(sep="", "igraph.iterator.", graph$gal$type))
+
+igraph.next <- function(graph, it)
+  UseMethod(paste(sep="", "igraph.next.", graph$gal$type))
+
+igraph.get <- function(graph, it)
+  UseMethod(paste(sep="", "igraph.get.", graph$gal$type))
+
+igraph.end <- function(graph, it)
+  UseMethod(paste(sep="", "igraph.end.", graph$gal$type))
+
+igraph.prev <- function(graph, it)
+  UseMethod(paste(sep="", "igraph.prev.", graph$gal$type))
+
+igraph.getattr <- function(graph, it, attr)
+  UseMethod(paste(sep="", "igraph.getattr.", graph$gal$type))
 
 ###################################################################
 # Interface object for C functions

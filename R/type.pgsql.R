@@ -20,6 +20,7 @@
 ###################################################################
 
 # TODO: clean disconnect
+# TODO: proper id generation when graph changes
 
 igraph.par("pgsql.host", "localhost")
 igraph.par("pgsql.dbname", "igraph")
@@ -43,6 +44,7 @@ graph.empty.pgsql.default <- function(..., type="pgsql",
   }
   realn <- ifelse(is.null(gal$n), 0, gal$n)
   gal$n <- 0
+  gal$id <- igraph.i.create.id()
 
   # connect only if not connected
   conn <- connect.if.needed(host, dbname, user)

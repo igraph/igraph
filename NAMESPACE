@@ -11,6 +11,9 @@ export(add.graph.attribute,delete.graph.attribute,
        add.edge.attribute,delete.edge.attribute,
        get.edge.attribute,set.edge.attribute)
 
+export(igraph.iterator, igraph.next, igraph.get, igraph.end,
+       igraph.prev, igraph.getattr)
+
 # igraph storage types, adjacency list
 
 S3method(graph.empty, adjacencylist.default)
@@ -35,6 +38,13 @@ S3method(delete.edge.attribute, adjacencylist.default)
 S3method(get.edge.attribute, adjacencylist.default)
 S3method(set.edge.attribute, adjacencylist.default)
 
+S3method(igraph.iterator, adjacencylist.default)
+S3method(igraph.next, adjacencylist.default)
+S3method(igraph.get, adjacencylist.default)
+S3method(igraph.end, adjacencylist.default)
+S3method(igraph.prev, adjacencylist.default)
+S3method(igraph.getattr, adjacencylist.default)
+
 # igraph storage types, edge list
 
 S3method(graph.empty, edgelist.default)
@@ -58,6 +68,13 @@ S3method(add.edge.attribute, edgelist.default)
 S3method(delete.edge.attribute, edgelist.default)
 S3method(get.edge.attribute, edgelist.default)
 S3method(set.edge.attribute, edgelist.default)
+
+S3method(igraph.iterator, edgelist.default)
+S3method(igraph.next, edgelist.default)
+S3method(igraph.get, edgelist.default)
+S3method(igraph.end, edgelist.default)
+S3method(igraph.prev, edgelist.default)
+S3method(igraph.getattr, edgelist.default)
 
 # igraph storage types, postresql database
 
