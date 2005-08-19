@@ -39,11 +39,6 @@ S3method(get.edge.attribute, adjacencylist.default)
 S3method(set.edge.attribute, adjacencylist.default)
 
 S3method(igraph.iterator, adjacencylist.default)
-S3method(igraph.next, adjacencylist.default)
-S3method(igraph.get, adjacencylist.default)
-S3method(igraph.end, adjacencylist.default)
-S3method(igraph.prev, adjacencylist.default)
-S3method(igraph.getattr, adjacencylist.default)
 
 # igraph storage types, edge list
 
@@ -70,11 +65,6 @@ S3method(get.edge.attribute, edgelist.default)
 S3method(set.edge.attribute, edgelist.default)
 
 S3method(igraph.iterator, edgelist.default)
-S3method(igraph.next, edgelist.default)
-S3method(igraph.get, edgelist.default)
-S3method(igraph.end, edgelist.default)
-S3method(igraph.prev, edgelist.default)
-S3method(igraph.getattr, edgelist.default)
 
 # igraph storage types, postresql database
 

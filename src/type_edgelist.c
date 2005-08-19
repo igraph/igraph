@@ -188,3 +188,114 @@ SEXP REST_edgelist_delete_vertices(SEXP edges, SEXP pnonodes, SEXP vids) {
   UNPROTECT(2);
   return result;
 }
+
+/**
+ */
+
+SEXP REST_edgelist_iterator(SEXP interface, SEXP graph, SEXP ptype) {
+  
+  SEXP result;
+  SEXP names, attrnames;
+  SEXP graph_type, graph_id;
+  
+  char * type;
+  int prot=0;
+
+  graph_type=REST_i_get_list_element(graph, "gal");
+  graph_id=REST_i_get_list_element(graph_type, "id");
+  graph_type=REST_i_get_list_element(graph_type, "type");
+
+  type = CHAR(STRING_ELT(ptype, 0));
+  if (!strncmp(type, "vid", 3)) {
+
+    PROTECT(result=NEW_LIST(2));
+    SET_VECTOR_ELT(result, 0, NEW_LIST(3));
+    SET_VECTOR_ELT(result, 1, NEW_NUMERIC(1));
+    SET_VECTOR_ELT(VECTOR_ELT(result, 0), 0, duplicate(graph_type));
+    SET_VECTOR_ELT(VECTOR_ELT(result, 0), 1, duplicate(ptype));
+    SET_VECTOR_ELT(VECTOR_ELT(result, 0), 2, duplicate(graph_id));
+    R(VECTOR_ELT(result, 1))=1.0;
+
+    PROTECT(attrnames=NEW_CHARACTER(3));
+    SET_STRING_ELT(attrnames, 0, CREATE_STRING_VECTOR("graph.type"));
+    SET_STRING_ELT(attrnames, 1, CREATE_STRING_VECTOR("type"));
+    SET_STRING_ELT(attrnames, 2, CREATE_STRING_VECTOR("id"));
+    SET_NAMES(VECTOR_ELT(result, 0), attrnames);
+    
+    prot+=2;
+  } else if (!strncmp(type, "eid", 3)) {
+
+    PROTECT(result=NEW_LIST(2));
+    SET_VECTOR_ELT(result, 0, NEW_LIST(3));
+    SET_VECTOR_ELT(result, 1, NEW_NUMERIC(1));
+    SET_VECTOR_ELT(VECTOR_ELT(result, 0), 0, duplicate(graph_type));
+    SET_VECTOR_ELT(VECTOR_ELT(result, 0), 1, duplicate(ptype));
+    SET_VECTOR_ELT(VECTOR_ELT(result, 0), 2, duplicate(graph_id));
+    R(VECTOR_ELT(result, 1))=1.0;
+
+    PROTECT(attrnames=NEW_CHARACTER(3));
+    SET_STRING_ELT(attrnames, 0, CREATE_STRING_VECTOR("graph.type"));
+    SET_STRING_ELT(attrnames, 1, CREATE_STRING_VECTOR("type"));
+    SET_STRING_ELT(attrnames, 2, CREATE_STRING_VECTOR("id"));
+    SET_NAMES(VECTOR_ELT(result, 0), attrnames);
+    
+    prot+=2;
+    
+  } else {
+    error("Unknown iterator type");
+  }
+  
+  /* set names attribute for result & class*/
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("attr"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("data"));
+  SET_NAMES(result, names);  				 
+  SET_CLASS(result, ScalarString(CREATE_STRING_VECTOR("igraph.iterator")));
+  
+  UNPROTECT(prot+1);
+  return result;
+}
+
+/**
+ */
+
+SEXP REST_edgelist_next(SEXP interface, SEXP graph, SEXP it) {
+
+  SEXP result, data, ptype;
+  char *type;
+  int prot=0;
+  
+  ptype=REST_i_get_list_element(REST_i_get_list_element(it, "attr"), "type");
+  type=CHAR(STRING_ELT(ptype, 0));
+  if (!strncmp(type, "vid", 3)) {
+    long int no_of_nodes=
+      R(REST_i_get_list_element(REST_i_get_list_element(graph, "gal"), "n"));
+    PROTECT(result=duplicate(it));      
+    data=REST_i_get_list_element(result, "data");
+    R(data) += 1;
+    if (R(data) > no_of_nodes+1) {
+      error("No more elements");
+    }
+    prot++;
+  } else if (!strncmp(type, "eid", 3)) {
+    long int no_of_edges=
+      I(GET_DIM(REST_i_get_list_element
+		(REST_i_get_list_element(graph, "data"), "data")));
+    PROTECT(result=duplicate(it));      
+    data=REST_i_get_list_element(result, "data");
+    R(data) += 1;
+    if (R(data) > no_of_edges+1) {
+      error("No more elements");
+    }
+    prot++;
+  } else {
+    error("Unknown iterator type");
+  }
+
+  UNPROTECT(prot);
+  return result;
+}
+    
+
+    
+  

@@ -360,186 +360,136 @@ set.edge.attribute.adjacencylist.default <- function(graph, attrname,
 ###################################################################
 
 igraph.iterator.adjacencylist.default <- function(graph, type="vid") {
+
+  res <- list(type=type, graph.type=igraph.type(graph),
+              graph.id=g.a(graph, "id"))
   if (type=="vid") {
-    attr <- list(graph.type=igraph.type(graph),
-                 type=type, id=g.a(graph, "id"))
-    data <- 1
+    res[[1]] <- 1
+    res[[2]] <- igraph.adjacencylist.vid.next
+    res[[3]] <- igraph.adjacencylist.vid.end
+    res[[4]] <- igraph.adjacencylist.vid.get
+    res[[5]] <- igraph.adjacencylist.vid.prev
+    res[[6]] <- igraph.adjacencylist.vid.getattr
   } else if (type=="eid") {
-    attr <- list(graph.type=igraph.type(graph),
-                 type=type, id=g.a(graph, "id"))
-    ec <- ecount(graph)
-    if (ec==0) {
-      data <- c(-1, -1)
-    } else {
-      vid <- 1
-      nei <- 1
-      if (is.directed(graph)) {
-        while (length(graph$data$out[[vid]])==0) {
-          vid <- vid + 1
-        }
-      } else {
-        neis <- graph$data$out[[vid]]
-        nei <- which(neis >= vid)[1]
-        while (is.na(nei)) {
-          vid <- vid + 1
-          neis <- graph$data$out[[vid]]
-          nei <- which(neis >= vid)
-        }
-      }
-      data <- c(vid, nei)
-    }
-  } else {
-    stop("Unknown iterator type")
-  }
-  
-  res <- list(data=data, attr=attr) 
-  class(res) <- "igraph.iterator"
-  
-  res
-}
-
-igraph.next.adjacencylist.default <- function(graph, it) {
-  if (g.a(graph, "id")!=it$attr$id) {
-    stop("Invalid iterator")
-  }
-  res <- it
-  if (res$attr$type == "vid") {
-    res$data <- res$data+1
-    if (res$data > vcount(graph)+1) {
-      stop("No more elements")
-    }
-  } else if (res$attr$type == "eid") {
-    if (res$data[1] == -1) {
-      stop("No more elements")
-    }
     if (is.directed(graph)) {
-      res$data[2] <- res$data[2] + 1
-      while (res$data[1] <= vcount(graph) &&
-             length(graph$data$out[[res$data[1]]]) < res$data[2]) {
-        res$data[1] <- res$data[1] + 1
-        res$data[2] <- 1
-      }
-      if (res$data[1] > vcount(graph)) {
-        res$data <- c(-1, -1)
-      }
+      res[[1]] <- igraph.adjacencylist.find.next.edge.directed(graph, c(1,1))
+      res[[2]] <- igraph.adjacencylist.eid.next.directed
     } else {
-      vid <- res$data[1]
-      nei <- res$data[2]+1
-      l <- FALSE
-      while (!l && vid <= vcount(graph)) {
-        neis <- graph$data$out[[vid]]
-        if (length(neis) < nei) {
-          vid <- vid + 1
-          nei <- 1
-        } else if (length(neis) >= nei && neis[nei] > vid) {
-          l <- TRUE
-        } else if (neis[nei] < vid) {
-          nei <- nei + 1
-        } else if (neis[nei] == vid &&
-                   which(which(neis == vid) == nei) %% 2 == 0) {
-          l <- TRUE
-        } else {
-          nei <- nei + 1
-        }
-      }
-      if (vid > vcount(graph)) {
-        res$data <- c(-1, -1)
-      } else {
-        res$data <- c(vid, nei)
-      }
+      res[[1]] <- igraph.adjacencylist.find.next.edge.undirected(graph, c(1,1))
+      res[[2]] <- igraph.adjacencylist.eid.next.undirected
     }
-  } else {
-    stop("Invalid iterator type")
+    res[[3]]  <- igraph.adjacencylist.eid.end
+    res[[4]] <- igraph.adjacencylist.eid.get
+    res[[5]] <- igraph.adjacencylist.eid.prev
+    res[[6]] <- igraph.adjacencylist.eid.getattr
   }
   
+  class(res) <- "igraph.iterator"  
   res
 }
 
-igraph.prev.adjacencylist.default <- function(graph, it) {
-  if (g.a(graph, "id")!=it$attr$id) {
-    stop("Invalid iterator")
-  }
-  res <- it
-  if (it$attr$type == "vid") {
-    res$data <- res$data-1
-    if (res$data==0) {
-      stop("No previous element")
-    } 
-#  } else if (it$attr$type == "eid") {
-    # TODO
-  } else {
-    stop("Invalid iterator type")
-  }
-  
-  res
+igraph.adjacencylist.vid.next <- function(graph, it) {
+  it[[1]] <- it[[1]] + 1
+  it
 }
 
-igraph.end.adjacencylist.default <- function(graph, it) {
-  if (g.a(graph, "id") != it$att$id) {
-    stop("Invalid iterator")
-  }
-  if (it$attr$type == "vid") {
-    res <- (it$data==vcount(graph)+1)
-  } else if (it$attr$type == "eid") {
-    res <- (it$data[1] == -1)
-  } else {
-    stop("Invalid iterator type")
-  }
-
-  res
+igraph.adjacencylist.vid.prev <- function(graph, it) {
+  it[[1]] <- it[[1]] - 1
+  it
 }
 
-igraph.get.adjacencylist.default <- function(graph, it) {
-  if (g.a(graph, "id") != it$att$id) {
-    stop("Invalid iterator")
-  }
-  if (igraph.end(graph, it)) {
-    stop("No more elements")
-  }
-  if (it$attr$type == "vid") {
-    res <- it$data
-  } else if (it$attr$type == "eid") {
-    res <- unname(c(it$data[1], graph$data$out[[it$data[1]]][it$data[2]]))
+igraph.adjacencylist.vid.end <- function(graph, it) {
+  it[[1]] > graph$gal$n
+}
+
+igraph.adjacencylist.vid.get <- function(graph, it) {
+  it[[1]]
+}
+
+igraph.adjacencylist.vid.getattr <- function(graph, it, attr=NULL) {
+  if (is.null(attr)) {
+    lapply(graph$val, "[[", it[[1]])
   } else {
-    stop("Invalid iterator type")
-  }
-  
-  res
-} 
+    graph$val[[attr]][[it[[1]]]]
+  } 
+}
 
-igraph.getattr.adjacencylist.default <- function(graph, it, attr=NULL) {
-  if (g.a(graph, "id") != it$att$id) {
-    stop("Invalid iterator")
-  }
+igraph.adjacencylist.eid.next.directed <- function(graph, it) {
+  it[[1]][2] <- it[[1]][2] + 1
+  it[[1]] <- igraph.adjacencylist.find.next.edge.directed(graph, it[[1]])
+  it
+}
 
-  if (igraph.end(graph, it)) {
-    stop("No more elements")
-  }
-  if (it$attr$type == "vid") {
-    if (is.null(attr)) {
-      res <- lapply(graph$val, "[[", it$data)
-    } else {
-      res <- graph$val[[attr]][[it$data]]
-    }
-  } else if (it$attr$type == "eid") {
-    if (is.null(attr)) {
-      res <- list()
-      for (n in names(graph$eal)) {
-        res[[n]] <-
-          graph$eal[[n]][[names(graph$data$out[[it$data[1]]])[it$data[2]]]]
-        if (is.null(res[[n]])) {
-          res[[n]] <- attributes(graph$eal[[n]])$default
-        }
+igraph.adjacencylist.eid.next.undirected <- function(graph, it) {
+  it[[1]][2] <- it[[1]][2] + 1
+  it[[1]] <- igraph.adjacencylist.find.next.edge.undirected(graph, it[[1]])
+  it
+}
+
+igraph.adjacencylist.eid.prev <- function(graph, it) {
+  it[[1]][2] <- it[[1]][2] - 1
+  it[[1]] <- igraph.adjacencylist.find.prev.edge(graph, it[[1]])
+  it
+}
+
+igraph.adjacencylist.eid.end <- function(graph, it) {
+  it[[1]][1] > graph$gal$n
+}
+
+igraph.adjacencylist.eid.get <- function(graph, it) {
+  unname(c(it[[1]][1], graph$data$out[[ it[[1]][1] ]][ it[[1]][2] ]))
+}
+
+igraph.adjacencylist.eid.getattr <- function(graph, it, attr=NULL) {
+  ## TODO: default attributes
+  if (is.null(attr)) {
+    res <- list()
+    for (n in names(graph$eal)) {
+      res[[n]] <-
+        graph$eal[[n]][[names(graph$data$out[[it[[1]][1]]])[it[[1]][2]]]]
+      if (is.null(res[[n]])) {
+        res[[n]] <- attributes(graph$eal[[n]])$default
       }
-    } else {
-      res <-
-        graph$eal[[attr]][[names(graph$data$out[[it$data[1]]])[it$data[2]]]]
     }
   } else {
-    stop("Invalid iterator type")
+    res <-
+      graph$eal[[attr]][[names(graph$data$out[[it[[1]][1]]])[it[[1]][2]]]]
   }
-  
-  res
+}
+
+igraph.adjacencylist.find.next.edge.directed <- function(graph, from=c(1,1)) {
+
+  while (from[1] <= vcount(graph) &&
+         length(graph$data$out[[from[1]]]) < from[2]) {
+    from[1] <- from[1] + 1
+    from[2] <- 1
+  }
+  from
+}
+
+igraph.adjacencylist.find.next.edge.undirected <- function(graph,
+                                                           from=c(1,1)) {
+
+  vid <- from[1]
+  nei <- from[2]
+  l <- FALSE
+  while (!l && vid <= vcount(graph)) {
+    neis <- graph$data$out[[vid]]
+    if (length(neis) < nei) {
+      vid <- vid + 1
+      nei <- 1
+    } else if (length(neis) >= nei && neis[nei] > vid) {
+      l <- TRUE
+    } else if (neis[nei] < vid) {
+      nei <- nei + 1
+    } else if (neis[nei] == vid &&
+               which(which(neis == vid) == nei) %% 2 == 0) {
+      l <- TRUE
+    } else {
+      nei <- nei + 1
+    }
+  }
+  c(vid, nei)
 }
 
 ###################################################################

@@ -347,128 +347,98 @@ set.edge.attribute.edgelist.default <- function(graph, attrname,
 ###################################################################
 
 igraph.iterator.edgelist.default <- function(graph, type="vid") {
+
+  res <- list(type=type, graph.type=igraph.type(graph),
+              graph.id=g.a(graph, "id"))
   if (type=="vid") {
-    attr <- list(graph.type=igraph.type(graph),
-                 type=type, id=g.a(graph, "id"))
-    data <- 1
+    res$"next"  <- igraph.edgelist.vid.next
+    res$prev    <- igraph.edgelist.vid.prev
+    res$end     <- igraph.edgelist.vid.end
+    res$get     <- igraph.edgelist.vid.get
+    res$getattr <- igraph.edgelist.vid.getattr 
+    res$data <- c(1,1)
   } else if (type=="eid") {
-    attr <- list(graph.type=igraph.type(graph),
-                 type=type, id=g.a(graph, "id"))
-    data <- 1
-  } else {
-    stop("Unknown iterator type")
+    res$"next"  <- igraph.edgelist.eid.next
+    res$prev    <- igraph.edgelist.eid.prev
+    res$end     <- igraph.edgelist.eid.end
+    res$get     <- igraph.edgelist.eid.get
+    res$getattr <- igraph.edgelist.eid.getattr
+    res$data <- 1
   }
 
-  res <- list(data=data, attr=attr)
   class(res) <- "igraph.iterator"
-
   res
 }
 
-igraph.next.edgelist.default <- function(graph, it) {
-  if (g.a(graph, "id") != it$attr$id) {
-    stop("Invalid iterator")
+igraph.edgelist.vid.next <- function(graph, it) {
+  # TODO: binary search
+  it$data[1] <- it$data[1] + 1
+  while(it$data[2] <= nrow(graph$data$data) &&
+        graph$data$data[ it$data[2],1 ] < it$data[1]) {
+    it$data[2] <- it$data[2] + 1
   }
-  res <- it
-  if (res$attr$type == "vid") {
-    res$data <- res$data+1
-    if (res$data > vcount(graph)+1) {
-      stop("No more elements")
+  it
+}
+
+igraph.edgelist.vid.prev <- function(graph, it) {
+  # TODO: binary search
+  it$data[1] <- it$data[1] - 1
+  while (it$data[2] >= 1 &&
+         graph$data$data[ it$data[2],1 ] >= it$data[1]) {
+    it$data[2] <- it$data[2] - 1
+  }
+  it$data[2] <- it$data[2] + 1
+  it
+}
+
+igraph.edgelist.vid.end <- function(graph, it) {
+  it$data[1] > graph$gal$n
+}
+
+igraph.edgelist.vid.get <- function(graph, it) {
+  it$data[1]
+}
+
+igraph.edgelist.vid.getattr <- function(graph, it, attr=NULL) {
+  if (is.null(attr)) {
+    lapply(graph$val, "[[", it$data[1])
+  } else {
+    graph$val[[attr]][[it$data[1]]]
+  } 
+}
+
+igraph.edgelist.eid.next <- function(graph, it) {
+  it$data <- it$data + 1
+  it
+}
+
+igraph.edgelist.eid.prev <- function(graph, it) {
+  it$data <- it$data - 1
+  it
+}
+
+igraph.edgelist.eid.end <- function(graph, it) {
+  it$data > nrow(graph$data$data)
+}
+
+igraph.edgelist.eid.get <- function(graph, it) {
+  graph$data$data[it$data,]
+}
+
+igraph.edgelist.eid.getattr <- function(graph, it, attr=NULL) {
+  if (is.null(attr)) {
+    res <- lapply(graph$eal, "[[", it$data)
+    defs <- lapply(lapply(graph$eal, attributes), "[[", "default")
+    n <- lapply(res, is.null)
+    res[n] <- defs[n]
+
+  } else {
+    res <- graph$eal[[attr]][[it$data]]
+    if (is.null(res)) {
+      res <- attributes(graph$eal[[attr]])$default
     }
-  } else if (res$attr$type == "eid") {
-    res$data <- res$data+1
-    if (res$data > ecount(graph)+1) {
-      stop("No more elements")
-    }
-  } else {
-    stop("Unknown iterator type")
-  }
-
-  res
+  } 
 }
-
-igraph.prev.edgelist.default <- function(graph, it) {
-  if (g.a(graph, "id")!=it$attr$id) {
-    stop("Invalid iterator")
-  }
-  res <- it
-  if (it$attr$type == "vid") {
-    res$data <- res$data-1
-    if (res$data==0) {
-      stop("No previous element")
-    } 
-  } else if (it$attr$type == "eid") {
-    res$data <- res$data-1
-    if (res$data==0) {
-      stop("No previous element")
-    }                                         
-  } else {
-    stop("Invalid iterator type")
-  }
-  
-  res
-}
-
-igraph.end.edgelist.default <- function(graph, it) {
-  if (g.a(graph, "id") != it$att$id) {
-    stop("Invalid iterator")
-  }
-  if (it$attr$type == "vid") {
-    res <- (it$data==vcount(graph)+1)
-  } else if (it$attr$type == "eid") {
-    res <- (it$data==ecount(graph)+1)
-  } else {
-    stop("Invalid iterator type")
-  }
-
-  res
-}
-
-igraph.get.edgelist.default <- function(graph, it) {
-  if (g.a(graph, "id") != it$att$id) {
-    stop("Invalid iterator")
-  }
-  if (igraph.end(graph, it)) {
-    stop("No more elements")
-  }
-  if (it$attr$type == "vid") {
-    res <- it$data
-  } else if (it$attr$type == "eid") {
-    res <- graph$data$data[it$data,]
-  } else {
-    stop("Invalid iterator type")
-  }
-  
-  res
-} 
-
-igraph.getattr.edgelist.default <- function(graph, it, attr=NULL) {
-  if (g.a(graph, "id") != it$att$id) {
-    stop("Invalid iterator")
-  }
-
-  if (igraph.end(graph, it)) {
-    stop("No more elements")
-  }
-  if (it$attr$type == "vid") {
-    if (is.null(attr)) {
-      res <- lapply(graph$val, "[[", it$data)
-    } else {
-      res <- graph$val[[attr]][[it$data]]
-    }
-  } else if (it$attr$type == "eid") {
-    if (is.null(attr)) {
-      res <- lapply(graph$eal, "[[", it$data)
-    } else {
-      res <- graph$eal[[attr]][[it$data]]
-    }
-  } else {
-    stop("Invalid iterator type")
-  }
-  
-  res
-}
-
 
 ###################################################################
 # Internal
