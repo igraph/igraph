@@ -221,13 +221,20 @@ set.graph.attribute.adjacencylist.default <- function(graph, attrname, value) {
 }
 
 add.vertex.attribute.adjacencylist.default <- function(graph,
-                                                       attrname, default=NA) {
+                                                       attrname,
+                                                       type="simple",
+                                                       default=NA) {
   if (!is.null(graph$val[[attrname]])) {
     stop("attribute '", attrname, "' already present")
   }
 
   res <- graph
-  res$val[[attrname]] <- replicate(vcount(graph), default, simplify=FALSE)
+  vc <- vcount(graph)
+  if (type="complex") {
+    res$val[[attrname]] <- replicate(vc, default, simplify=FALSE)
+  } else {
+    res$val[[attrname]] <- rep(default, vc)
+  }
   
   res
 }

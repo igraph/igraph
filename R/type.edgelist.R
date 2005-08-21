@@ -215,13 +215,20 @@ set.graph.attribute.edgelist.default <- function(graph, attrname, value) {
 }
 
 add.vertex.attribute.edgelist.default <- function(graph,
-                                                       attrname, default=NA) {
+                                                  attrname,
+                                                  type="simple",
+                                                  default=NA) {
   if (!is.null(graph$val[[attrname]])) {
     stop("attribute '", attrname, "' already present")
   }
 
   res <- graph
-  res$val[[attrname]] <- replicate(vcount(graph), default, simplify=FALSE)
+  vc <- vcount(graph)
+  if (type=="simple") {
+    res$val[[attrname]] <- replicate(vc, default, simplify=FALSE)
+  } else {
+    res$val[[attrname]] <- rep(default, vc)
+  }  
   
   res
 }
@@ -275,15 +282,22 @@ set.vertex.attribute.edgelist.default <- function(graph, attrname,
 }
 
 add.edge.attribute.edgelist.default <- function(graph,
-                                                attrname, default=NA) {
+                                                attrname,
+                                                type="simple",
+                                                default=NA) {
   res <- graph
 
   if (is.null(res$eal)) {
     res$eal <- list()
   }
 
-  res$eal[[attrname]] <- vector(mode="list", ecount(graph))
-  attributes(res$eal[[attrname]])$default <- default
+  ec <- ecount(graph)
+  if (type=="complex") {
+    res$eal[[attrname]] <- vector(mode="list", ec)
+  } else {
+    res$eal[[attrname]] <- rep(default, ec)
+    attributes(res$eal[[attrname]])$default <- default
+  }
 
   res
 }
@@ -330,15 +344,11 @@ set.edge.attribute.edgelist.default <- function(graph, attrname,
 
   res <- graph
 
-  if (is.null(from) && is.null(to)) {
-    res$eal[[attrname]] <- vector(mode="list", ecount(graph))
-    attributes(res$eal[[attrname]])$default <- value
-  } else {
-    ind <- edgelist.get.edge.indices(res, from=from, to=to)
-    for (i in seq(along=ind)) {
-      res$eal[[attrname]][[ ind[i] ]] <- value
-    }
+  ind <- edgelist.get.edge.indices(res, from=from, to=to)
+  for (i in seq(along=ind)) {
+    res$eal[[attrname]][[ ind[i] ]] <- value
   }
+
   res
 }
 
@@ -351,19 +361,19 @@ igraph.iterator.edgelist.default <- function(graph, type="vid") {
   res <- list(type=type, graph.type=igraph.type(graph),
               graph.id=g.a(graph, "id"))
   if (type=="vid") {
-    res$"next"  <- igraph.edgelist.vid.next
-    res$prev    <- igraph.edgelist.vid.prev
-    res$end     <- igraph.edgelist.vid.end
-    res$get     <- igraph.edgelist.vid.get
-    res$getattr <- igraph.edgelist.vid.getattr 
-    res$data <- c(1,1)
+    res[[1]] <- c(1,1)
+    res[[2]] <- igraph.edgelist.vid.next
+    res[[3]] <- igraph.edgelist.vid.end
+    res[[4]] <- igraph.edgelist.vid.get
+    res[[5]] <- igraph.edgelist.vid.prev
+    res[[6]] <- igraph.edgelist.vid.getattr 
   } else if (type=="eid") {
-    res$"next"  <- igraph.edgelist.eid.next
-    res$prev    <- igraph.edgelist.eid.prev
-    res$end     <- igraph.edgelist.eid.end
-    res$get     <- igraph.edgelist.eid.get
-    res$getattr <- igraph.edgelist.eid.getattr
-    res$data <- 1
+    res[[1]] <- 1
+    res[[2]] <- igraph.edgelist.eid.next
+    res[[3]] <- igraph.edgelist.eid.end
+    res[[4]] <- igraph.edgelist.eid.get
+    res[[5]] <- igraph.edgelist.eid.prev
+    res[[6]] <- igraph.edgelist.eid.getattr
   }
 
   class(res) <- "igraph.iterator"
@@ -372,71 +382,64 @@ igraph.iterator.edgelist.default <- function(graph, type="vid") {
 
 igraph.edgelist.vid.next <- function(graph, it) {
   # TODO: binary search
-  it$data[1] <- it$data[1] + 1
-  while(it$data[2] <= nrow(graph$data$data) &&
-        graph$data$data[ it$data[2],1 ] < it$data[1]) {
-    it$data[2] <- it$data[2] + 1
+  it[[1]][1] <- it[[1]][1] + 1
+  while(it[[1]][2] <= nrow(graph$data$data) &&
+        graph$data$data[ it[[1]][2],1 ] < it[[1]][1]) {
+    it[[1]][2] <- it[[1]][2] + 1
   }
   it
 }
 
 igraph.edgelist.vid.prev <- function(graph, it) {
   # TODO: binary search
-  it$data[1] <- it$data[1] - 1
-  while (it$data[2] >= 1 &&
-         graph$data$data[ it$data[2],1 ] >= it$data[1]) {
-    it$data[2] <- it$data[2] - 1
+  it[[1]][1] <- it[[1]][1] - 1
+  while (it[[1]][2] >= 1 &&
+         graph$data$data[ it[[1]][2],1 ] >= it[[1]][1]) {
+    it[[1]][2] <- it[[1]][2] - 1
   }
-  it$data[2] <- it$data[2] + 1
+  it[[1]][2] <- it[[1]][2] + 1
   it
 }
 
 igraph.edgelist.vid.end <- function(graph, it) {
-  it$data[1] > graph$gal$n
+  it[[1]][1] > graph$gal$n
 }
 
 igraph.edgelist.vid.get <- function(graph, it) {
-  it$data[1]
+  it[[1]][1]
 }
 
 igraph.edgelist.vid.getattr <- function(graph, it, attr=NULL) {
   if (is.null(attr)) {
-    lapply(graph$val, "[[", it$data[1])
+    lapply(graph$val, "[[", it[[1]][1])
   } else {
-    graph$val[[attr]][[it$data[1]]]
+    graph$val[[attr]][[it[[1]][1]]]
   } 
 }
 
 igraph.edgelist.eid.next <- function(graph, it) {
-  it$data <- it$data + 1
+  it[[1]] <- it[[1]] + 1
   it
 }
 
 igraph.edgelist.eid.prev <- function(graph, it) {
-  it$data <- it$data - 1
+  it[[1]] <- it[[1]] - 1
   it
 }
 
 igraph.edgelist.eid.end <- function(graph, it) {
-  it$data > nrow(graph$data$data)
+  it[[1]] > nrow(graph$data$data)
 }
 
 igraph.edgelist.eid.get <- function(graph, it) {
-  graph$data$data[it$data,]
+  graph$data$data[it[[1]],]
 }
 
 igraph.edgelist.eid.getattr <- function(graph, it, attr=NULL) {
   if (is.null(attr)) {
-    res <- lapply(graph$eal, "[[", it$data)
-    defs <- lapply(lapply(graph$eal, attributes), "[[", "default")
-    n <- lapply(res, is.null)
-    res[n] <- defs[n]
-
+    res <- lapply(graph$eal, "[[", it[[1]])
   } else {
-    res <- graph$eal[[attr]][[it$data]]
-    if (is.null(res)) {
-      res <- attributes(graph$eal[[attr]])$default
-    }
+    res <- graph$eal[[attr]][[it[[1]]]]
   } 
 }
 

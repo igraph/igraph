@@ -67,7 +67,7 @@ get.graph.attribute <- function(graph, attrname=NULL)
 set.graph.attribute <- function(graph, attrname, value)
   UseMethod(paste(sep="", "set.graph.attribute.", graph$gal$type))
 
-add.vertex.attribute <- function(graph, attrname, default=NA)
+add.vertex.attribute <- function(graph, attrname, type="simple", default=NA)
   UseMethod(paste(sep="", "add.vertex.attribute.", graph$gal$type))
 
 delete.vertex.attribute <- function(graph, attrname)
@@ -79,7 +79,7 @@ get.vertex.attribute <- function(graph, attrname=NULL, v=NULL)
 set.vertex.attribute <- function(graph, attrname, v=NULL, value)
   UseMethod(paste(sep="", "set.vertex.attribute.", graph$gal$type))
 
-add.edge.attribute <- function(graph, attrname, default=NA)
+add.edge.attribute <- function(graph, attrname, type="simple", default=NA)
   UseMethod(paste(sep="", "add.edge.attribute.", graph$gal$type))
 
 delete.edge.attribute <- function(graph, attrname)
