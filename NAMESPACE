@@ -152,6 +152,7 @@ export(diameter, degree, degree.distribution, closeness,
 
 S3method(degree, default)
 S3method(degree, adjacencylist)
+S3method(degree, indexededgelist)
 
 # common functions, components and similar
 

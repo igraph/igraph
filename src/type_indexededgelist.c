@@ -233,3 +233,74 @@ SEXP REST_indexededgelist_delete_vertices(SEXP interface, SEXP graph,
   UNPROTECT(1);
   return result;  
 }
+
+/**
+ */
+
+SEXP REST_indexededgelist_degree(SEXP interface, SEXP graph, 
+				 SEXP vids, SEXP pmode, SEXP ploops) {
+  
+  SEXP result;
+  SEXP data, os, is;
+  long int nodes_to_calc;
+  long int i, j;
+  long int mode;
+  int loops;
+  
+  nodes_to_calc=GET_LENGTH(vids);
+  mode=R(pmode);
+  loops=LOGICAL(ploops)[0];
+  
+  data=REST_i_get_list_element(graph, "data");
+  os=REST_i_get_list_element(data, "os");
+  is=REST_i_get_list_element(data, "is");
+  
+  PROTECT(result=NEW_NUMERIC(nodes_to_calc));
+  memset(REAL(result), 0, nodes_to_calc*sizeof(double));
+
+  if (loops) {
+    if (mode & 1) {
+      for (i=0; i<nodes_to_calc; i++) {
+	long int vid=REAL(vids)[i];
+	REAL(result)[i] += (REAL(os)[vid+1-1]-REAL(os)[vid-1]);
+      }
+    }
+    if (mode & 2) {
+      for (i=0; i<nodes_to_calc; i++) {
+	long int vid=REAL(vids)[i];
+	REAL(result)[i] += (REAL(is)[vid+1-1]-REAL(is)[vid-1]);
+      }
+    }
+  } else { /* no loops */
+    SEXP oi=REST_i_get_list_element(data, "oi");
+    SEXP ii=REST_i_get_list_element(data, "ii");
+    SEXP el=REST_i_get_list_element(data, "el");
+    long int no_of_edges=GET_LENGTH(el)/2;
+    if (mode & 1) {
+      for (i=0; i<nodes_to_calc; i++) {
+	long int vid=REAL(vids)[i];
+	REAL(result)[i] += (REAL(os)[vid+1-1]-REAL(os)[vid-1]);
+	for (j=REAL(os)[vid-1]; j<REAL(os)[vid+1-1]; j++) {
+	  if (REAL(el)[ (long int)REAL(oi)[j-1]+no_of_edges-1 ]==vid) {
+	    REAL(result)[i] -= 1;
+	  }
+	}
+      }
+    }
+    if (mode & 2) {
+      for (i=0; i<nodes_to_calc; i++) {
+	long int vid=REAL(vids)[i];
+	REAL(result)[i] += (REAL(is)[vid+1-1]-REAL(is)[vid-1]);
+	for (j=REAL(is)[vid-1]; j<REAL(is)[vid+1-1]; j++) {
+	  if (REAL(el)[ (long int)REAL(ii)[j-1]-1 ]==vid) {
+	    REAL(result)[i] -= 1;
+	  }
+	}
+      }
+    } 
+  }  /* loops */
+
+  UNPROTECT(1);
+  return result;
+}
+   

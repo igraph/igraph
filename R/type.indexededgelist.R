@@ -187,7 +187,7 @@ neighbors.indexededgelist.default <- function(graph, v, mode="out") {
   if (!is.directed(graph)) {
     mode <- 3
   } else {
-    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+    mode <- switch(mode, "out"=1, "in"=2, "total"=3, "all"=3)
   }
   
   res <- .Call("REST_indexededgelist_neighbors", igraph.c.interface,
@@ -454,6 +454,24 @@ igraph.indexededgelist.eid.getattr <- function(graph, it, attr=NULL) {
     graph$eal[[attr]][it[[1]]]
   }   
 }
+
+###################################################################
+# Reimplementations for speedup
+###################################################################
+
+degree.indexededgelist <- function(graph, v=1:vcount(graph),
+                                   mode="total", loops=TRUE) {
+
+  v <- as.numeric(v)
+  mode <- switch(mode, "out"=1, "in"=2, "total"=3, "all"=3)
+  res <- .Call("REST_indexededgelist_degree", igraph.c.interface,
+               graph, v, as.numeric(mode), loops)
+
+  res
+}
+  
+                                   
+                                   
 
 ###################################################################
 # Internal functions
