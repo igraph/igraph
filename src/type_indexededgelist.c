@@ -304,3 +304,33 @@ SEXP REST_indexededgelist_degree(SEXP interface, SEXP graph,
   return result;
 }
    
+/**
+ */
+
+SEXP REST_i_indexededgelist_neighbors(SEXP interface, SEXP graph, 
+				      long int vertex, SEXP pmode){
+  
+  double mode;
+  SEXP dir;
+  const char *str;
+
+  dir=REST_i_get_list_element(graph, "gal");
+  dir=REST_i_get_list_element(dir, "directed");
+  
+  if (LOGICAL(dir)[0]) {
+    str=CHAR(STRING_ELT(pmode, 0));  
+    if (!strcmp(str, "out")) {
+      mode=1;
+    } else if (!strcmp(str, "in")) {
+      mode=2;
+    } else if (!strcmp(str, "all") || !strcmp(str,"total")) {
+      mode=3;
+    }
+  } else {
+    mode=3;
+  }
+
+  return REST_indexededgelist_neighbors(interface, graph, 
+					ScalarReal((double)vertex), 
+					ScalarReal(mode));
+}

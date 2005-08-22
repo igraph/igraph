@@ -60,6 +60,18 @@ REST_i_ptrtable_t REST_i_table_edgelist= {
   REST_i_default_get_edge_attribute
 };					      
 
+REST_i_ptrtable_t REST_i_table_indexededgelist= { 
+  REST_i_default_vcount,
+  REST_i_default_ecount,
+  REST_i_indexededgelist_neighbors,
+  REST_i_default_add_vertices,
+  REST_i_default_graph_empty,
+  REST_i_default_add_edges,
+  REST_i_default_add_vertex_attribute,
+  REST_i_default_set_vertex_attribute,
+  REST_i_default_get_edge_attribute
+};					      
+
 REST_i_ptrtable_t REST_i_getptrtable(SEXP graph) {
 
   SEXP gal, type;
@@ -75,6 +87,8 @@ REST_i_ptrtable_t REST_i_getptrtable(SEXP graph) {
     return REST_i_table_adjacencylist;
   } else if (!strcmp(type_str, "edgelist")) {
     return REST_i_table_edgelist;
+  } else if (!strcmp(type_str, "indexededgelist")) {
+    return REST_i_table_indexededgelist;
   } else {
     return REST_i_table_default;
   }

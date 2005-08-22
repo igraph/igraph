@@ -157,6 +157,8 @@ SEXP REST_i_adjacencylist_vcount(SEXP, SEXP);
 SEXP REST_i_adjacencylist_ecount(SEXP, SEXP);
 SEXP REST_i_adjacencylist_neighbors(SEXP, SEXP, long int, SEXP);
 
+SEXP REST_i_indexededgelist_neighbors(SEXP, SEXP, long int, SEXP);
+
 /* -------------------------------------------------- */
 /* INTERNALS                                          */
 /* -------------------------------------------------- */
