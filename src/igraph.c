@@ -36,30 +36,6 @@ REST_i_ptrtable_t REST_i_table_default= {
   REST_i_default_get_edge_attribute
 };
 
-REST_i_ptrtable_t REST_i_table_adjacencylist= { 
-  REST_i_adjacencylist_vcount,
-  REST_i_default_ecount,
-  REST_i_adjacencylist_neighbors,
-  REST_i_default_add_vertices,
-  REST_i_default_graph_empty,
-  REST_i_default_add_edges,
-  REST_i_default_add_vertex_attribute,
-  REST_i_default_set_vertex_attribute,
-  REST_i_default_get_edge_attribute
-};					      
-
-REST_i_ptrtable_t REST_i_table_edgelist= { 
-  REST_i_default_vcount,
-  REST_i_default_ecount,
-  REST_i_default_neighbors,
-  REST_i_default_add_vertices,
-  REST_i_default_graph_empty,
-  REST_i_default_add_edges,
-  REST_i_default_add_vertex_attribute,
-  REST_i_default_set_vertex_attribute,
-  REST_i_default_get_edge_attribute
-};					      
-
 REST_i_ptrtable_t REST_i_table_indexededgelist= { 
   REST_i_default_vcount,
   REST_i_default_ecount,
@@ -83,11 +59,7 @@ REST_i_ptrtable_t REST_i_getptrtable(SEXP graph) {
   type=REST_i_get_list_element(gal, "type");
   type_str=CHAR(STRING_ELT(type, 0));
 
-  if (!strcmp(type_str, "adjacencylist")) {
-    return REST_i_table_adjacencylist;
-  } else if (!strcmp(type_str, "edgelist")) {
-    return REST_i_table_edgelist;
-  } else if (!strcmp(type_str, "indexededgelist")) {
+  if (!strcmp(type_str, "indexededgelist")) {
     return REST_i_table_indexededgelist;
   } else {
     return REST_i_table_default;

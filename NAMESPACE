@@ -14,59 +14,7 @@ export(add.graph.attribute,delete.graph.attribute,
 export(igraph.iterator, igraph.next, igraph.get, igraph.end,
        igraph.prev, igraph.getattr)
 
-# igraph storage types, adjacency list
-
-S3method(graph.empty, adjacencylist.default)
-S3method(add.edges, adjacencylist.default)
-S3method(add.vertices, adjacencylist.default)
-S3method(delete.edges, adjacencylist.default)
-S3method(delete.vertices, adjacencylist.default)
-S3method(vcount, adjacencylist.default)
-S3method(ecount, adjacencylist.default)
-S3method(neighbors, adjacencylist.default)
-       
-S3method(add.graph.attribute, adjacencylist.default)
-S3method(delete.graph.attribute, adjacencylist.default)
-S3method(get.graph.attribute, adjacencylist.default)
-S3method(set.graph.attribute, adjacencylist.default)
-S3method(add.vertex.attribute, adjacencylist.default)
-S3method(delete.vertex.attribute, adjacencylist.default)
-S3method(get.vertex.attribute, adjacencylist.default)
-S3method(set.vertex.attribute, adjacencylist.default)
-S3method(add.edge.attribute, adjacencylist.default)
-S3method(delete.edge.attribute, adjacencylist.default)
-S3method(get.edge.attribute, adjacencylist.default)
-S3method(set.edge.attribute, adjacencylist.default)
-
-S3method(igraph.iterator, adjacencylist.default)
-
-# igraph storage types, edge list
-
-S3method(graph.empty, edgelist.default)
-S3method(add.edges, edgelist.default)
-S3method(add.vertices, edgelist.default)
-S3method(delete.edges, edgelist.default)
-S3method(delete.vertices, edgelist.default)
-S3method(vcount, edgelist.default)
-S3method(ecount, edgelist.default)
-S3method(neighbors, edgelist.default)
-       
-S3method(add.graph.attribute, edgelist.default)
-S3method(delete.graph.attribute, edgelist.default)
-S3method(get.graph.attribute, edgelist.default)
-S3method(set.graph.attribute, edgelist.default)
-S3method(add.vertex.attribute, edgelist.default)
-S3method(delete.vertex.attribute, edgelist.default)
-S3method(get.vertex.attribute, edgelist.default)
-S3method(set.vertex.attribute, edgelist.default)
-S3method(add.edge.attribute, edgelist.default)
-S3method(delete.edge.attribute, edgelist.default)
-S3method(get.edge.attribute, edgelist.default)
-S3method(set.edge.attribute, edgelist.default)
-
-S3method(igraph.iterator, edgelist.default)
-
-# igraph storage types, edge list
+# igraph storage types, indexed edge list
 
 S3method(graph.empty, indexededgelist.default)
 S3method(add.edges, indexededgelist.default)
@@ -91,32 +39,6 @@ S3method(get.edge.attribute, indexededgelist.default)
 S3method(set.edge.attribute, indexededgelist.default)
 
 S3method(igraph.iterator, indexededgelist.default)
-
-# igraph storage types, postresql database
-
-S3method(graph.empty, pgsql.default)
-S3method(add.edges, pgsql.default)
-S3method(add.vertices, pgsql.default)
-S3method(delete.edges, pgsql.default)
-S3method(delete.vertices, pgsql.default)
-S3method(vcount, pgsql.default)
-S3method(ecount, pgsql.default)
-S3method(neighbors, pgsql.default)
-       
-S3method(add.graph.attribute, pgsql.default)
-S3method(delete.graph.attribute, pgsql.default)
-S3method(get.graph.attribute, pgsql.default)
-S3method(set.graph.attribute, pgsql.default)
-S3method(add.vertex.attribute, pgsql.default)
-S3method(delete.vertex.attribute, pgsql.default)
-S3method(get.vertex.attribute, pgsql.default)
-S3method(set.vertex.attribute, pgsql.default)
-S3method(add.edge.attribute, pgsql.default)
-S3method(delete.edge.attribute, pgsql.default)
-S3method(get.edge.attribute, pgsql.default)
-S3method(set.edge.attribute, pgsql.default)
-
-export(pgsql.list.graphs, pgsql.get.graph, pgsql.clear)
 
 # common functions, basic not structural operations
 export(is.graph)
@@ -151,7 +73,6 @@ export(diameter, degree, degree.distribution, closeness,
        evcent) 
 
 S3method(degree, default)
-S3method(degree, adjacencylist)
 S3method(degree, indexededgelist)
 
 # common functions, components and similar

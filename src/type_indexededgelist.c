@@ -212,14 +212,18 @@ SEXP REST_indexededgelist_delete_vertices(SEXP interface, SEXP graph,
     long int vid=REAL(vids)[i];
     for (j=REAL(os)[vid-1]; j<REAL(os)[vid+1-1]; j++) {
       long int idx=REAL(oi)[j-1];
-      REAL(el)[idx-1]=0;
-      dqueue_push(&q, idx);
+      if (REAL(el)[idx-1] != 0) {
+	dqueue_push(&q, idx);
+	REAL(el)[idx-1]=0;
+      }
     }
     if (!directed) {
       for (j=REAL(is)[vid-1]; j<REAL(is)[vid+1-1]; j++) {
 	long int idx=REAL(ii)[j-1];
-	REAL(el)[idx-1]=0;
-	dqueue_push(&q, idx);
+	if (REAL(el)[idx-1] != 0) {
+	  dqueue_push(&q, idx);
+	  REAL(el)[idx-1]=0;
+	}
       }
     }
   }

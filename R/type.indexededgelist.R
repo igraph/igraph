@@ -143,13 +143,16 @@ delete.vertices.indexededgelist.default <- function(graph, v) {
                        is.directed(graph),
                        PACKAGE="igraph")
     if (length(to.delete)>=1) {
-      res$data$el <- res$data$el[-to.delete]
+      res$data$el <- res$data$el[-to.delete,]
       ## eal
       for (n in names(res$eal)) {
         tmp <- attributes(res$eal[[n]])
         res$eal[[n]] <- res$eal[[n]][ -to.delete ]
         attributes(res$eal[[n]]) <- tmp
       }
+    }
+    if (is.null(dim(res$data$el))) {
+      dim(res$data$el) <- c(1,2)
     }
     res$data$oi <- as.numeric(order(res$data$el[,1], res$data$el[,2]))
     res$data$ii <- as.numeric(order(res$data$el[,2], res$data$el[,1]))

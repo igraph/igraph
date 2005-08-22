@@ -44,17 +44,6 @@
 #define RNG_REAL(low, high)    (unif_rand()*(high-low)+low)
 
 /* -------------------------------------------------- */
-/* BASIC GRAPH OPERATIONS                             */
-/* -------------------------------------------------- */
-
-SEXP REST_neighborlist_delete_vertices(SEXP neilist, SEXP vids);
-SEXP REST_add_edges_adjacencylist(SEXP data, SEXP edges, 
-				  SEXP pdirected);
-
-SEXP REST_edgelist_delete_edges_sorted(SEXP edges, SEXP deleted);
-SEXP REST_edgelist_neighbors(SEXP edges, SEXP pvert, SEXP pmode);
-
-/* -------------------------------------------------- */
 /* Games                                              */
 /* -------------------------------------------------- */
 
@@ -138,8 +127,7 @@ typedef struct {
 } REST_i_ptrtable_t;
 
 extern REST_i_ptrtable_t REST_i_table_default;
-extern REST_i_ptrtable_t REST_i_table_adjacencylist;
-extern REST_i_ptrtable_t REST_i_table_edgelist;
+extern REST_i_ptrtable_t REST_i_table_indexededgelist;
 
 REST_i_ptrtable_t REST_i_getptrtable(SEXP graph);
 
@@ -152,10 +140,6 @@ SEXP REST_i_default_add_edges(SEXP, SEXP, SEXP);
 SEXP REST_i_default_add_vertex_attribute(SEXP, SEXP, const char*, SEXP);
 SEXP REST_i_default_set_vertex_attribute(SEXP, SEXP, const char*, SEXP, SEXP);
 SEXP REST_i_default_get_edge_attribute(SEXP, SEXP, SEXP, SEXP, SEXP);
-
-SEXP REST_i_adjacencylist_vcount(SEXP, SEXP);
-SEXP REST_i_adjacencylist_ecount(SEXP, SEXP);
-SEXP REST_i_adjacencylist_neighbors(SEXP, SEXP, long int, SEXP);
 
 SEXP REST_i_indexededgelist_neighbors(SEXP, SEXP, long int, SEXP);
 
