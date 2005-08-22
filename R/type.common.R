@@ -65,11 +65,3 @@ add.vertices.common <- function(graph, nv) {
 delete.edges.common <- function(graph, edges) {
   invisible(TRUE)
 }
-
-neighbors.common <- function(graph, v, mode) {
-  if (! mode %in% c("out", "in", "all")) {
-    stop("invalid mode parameter")
-  }
-
-  invisible(TRUE)
-}

@@ -19,10 +19,8 @@
 #
 ###################################################################
 
-# TODO: directed & undirected case
-
 ###################################################################
-# Building graphs 
+## Building graphs 
 ###################################################################
 
 graph.empty.indexededgelist.default <- function(...,
@@ -63,8 +61,14 @@ add.edges.indexededgelist.default <- function(graph, edges) {
                           byrow=TRUE)
      for (n in names(res$eal)) {
        tmp <- attributes(res$eal[[n]])
-       res$eal[[n]] <- append(res$eal[[n]], vector(mode="list",
-                                                   length(edges)/2))
+       default <- tmp$default
+       if (is.list(res$eal[[n]])) {
+         res$eal[[n]] <- append(res$eal[[n]],
+                                replicate(length(edges)/2, default,
+                                          simplify=FALSE))
+       } else {
+         res$eal[[n]] <- c(res$eal[[n]], rep(default, length(edges)/2))
+       }
        attributes(res$eal[[n]]) <- tmp
      }
     res$data$oi <- as.numeric(order(edges[,1], edges[,2]))
@@ -76,78 +80,124 @@ add.edges.indexededgelist.default <- function(graph, edges) {
   res
 }
 
- add.vertices.indexededgelist.default <- function(graph, nv) {
+add.vertices.indexededgelist.default <- function(graph, nv) {
 
-   add.vertices.common(graph, nv)
+  add.vertices.common(graph, nv)
+  
+  res <- graph
+  res$gal$id <- igraph.i.create.id()
+  res$gal$n <- res$gal$n + nv
+  
+  # val
+  if (length(res$val) != 0) {
+    res$val <- append(res$val, rep(list(list()), nv))
+  }
+  
+  # update start indices
+  ec <- ecount(graph)
+  res$data$os <- c(res$data$os, rep(ec+1, nv))
+  res$data$is <- c(res$data$is, rep(ec+1, nv))
+  
+  res
+}
 
-   res <- graph
-   res$gal$id <- igraph.i.create.id()
-   res$gal$n <- res$gal$n + nv
+delete.edges.indexededgelist.default <- function(graph, edges) {
 
-   # val
-   if (length(res$val) != 0) {
-     res$val <- append(res$val, rep(list(list()), nv))
-   }
+  delete.edges.common(graph, edges)
 
-   # update start indices
-   ec <- ecount(graph)
-   res$data$os <- c(res$data$os, rep(ec+1, nv))
-   res$data$is <- c(res$data$is, rep(ec+1, nv))
+  res <- graph
+  res$gal$id <- igraph.i.create.id()
 
-   res
- }
+  if (length(edges) > 0) {
+    to.delete <- .Call("REST_indexededgelist_delete_edges",
+                       igraph.c.interface, res, edges,
+                       is.directed(graph),
+                       PACKAGE="igraph")
+    if (length(to.delete)>=1) {
+      res$data$el <- res$data$el[-to.delete,]
+      res$data$oi <- as.numeric(order(res$data$el[,1], res$data$el[,2]))
+      res$data$ii <- as.numeric(order(res$data$el[,2], res$data$el[,1]))
+      res$data$os <- indexededgelist.create.out.index(res)
+      res$data$is <- indexededgelist.create.in.index(res)
 
- delete.edges.indexededgelist.default <- function(graph, edges) {
-   ## TODO
-   stop("Not implemented yet")
- }
+      ## edge attributes
+      for (n in names(graph$eal)) {
+        tmp <- attributes(res$eal[[n]])
+        res$eal[[n]] <- res$eal[[n]] [-to.delete]
+        attributes(res$eal[[n]]) <- tmp
+      }
+    }
+  }
 
- delete.vertices.indexededgelist.default <- function(graph, v) {
-   ## TODO
-   stop("Not implemented yet")
- }
+  res
+}
 
- ###################################################################
- # Structure query
- ###################################################################
+delete.vertices.indexededgelist.default <- function(graph, v) {
 
- vcount.indexededgelist.default <- function(graph) {
+  res <- graph
+  res$gal$id <- igraph.i.create.id()
+  v <- as.numeric(v)
+  if (length(v)>0) {
+    to.delete <- .Call("REST_indexededgelist_delete_vertices",
+                       igraph.c.interface, res, v,
+                       is.directed(graph),
+                       PACKAGE="igraph")
+    if (length(to.delete)>=1) {
+      res$data$el <- res$data$el[-to.delete]
+      ## eal
+      for (n in names(res$eal)) {
+        tmp <- attributes(res$eal[[n]])
+        res$eal[[n]] <- res$eal[[n]][ -to.delete ]
+        attributes(res$eal[[n]]) <- tmp
+      }
+    }
+    res$data$oi <- as.numeric(order(res$data$el[,1], res$data$el[,2]))
+    res$data$ii <- as.numeric(order(res$data$el[,2], res$data$el[,1]))
+    res$data$os <- indexededgelist.create.out.index(res)
+    res$data$is <- indexededgelist.create.in.index(res)
+
+    ## val
+    for (n in names(res$val)) {
+      tmp <- attributes(res$val[[n]])
+      res$val[[n]] <- res$val[[n]] [-v]
+      attributes(res$val[[n]]) <- tmp
+    }
+  }
+
+  res
+}
+
+###################################################################
+## Structure query
+###################################################################
+
+vcount.indexededgelist.default <- function(graph) {
    res <- graph$gal$n
    res
  }
 
- ecount.indexededgelist.default <- function(graph) {
-   res <- length(graph$data$el)/2
-   res
- }
+ecount.indexededgelist.default <- function(graph) {
+  res <- length(graph$data$el)/2
+  res
+}
 
- neighbors.indexededgelist.default <- function(graph, v, mode="out") {
-
-   neighbors.common(graph, v, mode)
-
-   v <- as.numeric(v)
-
-   res <- numeric()
-   if (mode %in% c("in", "all")) {
-     if (graph$data$is[v] < graph$data$is[v+1]) {
-       idx <- graph$data$is[v] : (graph$data$is[v+1]-1)
-       idx <- graph$data$ii[idx]
-       res <- c(res, graph$data$el[idx, 1])
-     }
-   }
-   if (mode %in% c("out", "all")) {
-     if (graph$data$os[v] < graph$data$os[v+1]) {
-       idx <- graph$data$os[v] : (graph$data$os[v+1]-1)
-       idx <- graph$data$oi[idx]
-       res <- c(res, graph$data$el[idx, 2])
-     }
-   }
-
-   res
- }
+neighbors.indexededgelist.default <- function(graph, v, mode="out") {
+  
+  v <- as.numeric(v)
+  if (!is.directed(graph)) {
+    mode <- 3
+  } else {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
+  
+  res <- .Call("REST_indexededgelist_neighbors", igraph.c.interface,
+               graph, v, mode, PACKAGE="igraph")
+  
+  res
+}
 
 ###################################################################
-# Attributes
+## Attributes
 ###################################################################
 
 add.graph.attribute.indexededgelist.default <- function(graph,
@@ -276,7 +326,7 @@ add.edge.attribute.indexededgelist.default <- function(graph,
   ec <- ecount(res)
   if (type=="complex") {
     res$eal[[attrname]] <- replicate(ec, default, simplify=FALSE)
-  } else if (type=="simple") {
+  } else {
     res$eal[[attrname]] <- rep(default, ec)
   }
   attributes(res$eal[[attrname]])$default <- default
@@ -427,28 +477,44 @@ indexededgelist.create.in.index <- function(graph) {
 
 indexededgelist.get.edge.index <- function(graph, from=NULL, to=NULL)
 {
-  ## TODO: more edges at the same time
+  ## TODO: more edges at the same time, possibly in C
   if (is.null(from) && is.null(to)) {
     res <- seq(along=graph$data$el[,1])
   } else if(is.null(from)) {
+    res <- numeric()
     if(graph$data$is[to] < graph$data$is[to+1]) {
       res <- graph$data$ii[ graph$data$is[to] :
                            (graph$data$is[to+1]-1) ]
-    } else {
-      res <- numeric()
+    }
+    if (!is.directed(graph) && graph$data$os[to] <
+        graph$data$os[to+1]) {
+      res <- c(res, graph$data$oi[ graph$data$os[to] :
+                                  (graph$data$os[to+1]-1) ])
     }
   } else if (is.null(to)) {
     if (graph$data$os[from] < graph$data$os[from+1]) {
       res <- graph$data$oi[ graph$data$os[from] :
                            (graph$data$os[from+1]-1) ]
-    } else {
-      res <- numeric()
-      }
+    }
+    if (!is.directed(graph) && graph$data$is[from] <
+        graph$data$is[from+1]) {
+      res <- c(res, graph$data$ii[ graph$data$is[from] :
+                                  (graph$data$is[from+1]-1) ])
+    }
   } else {
-    idx <- graph$data$os[from] : (graph$data$os[from+1]-1)
-    idx <- idx [graph$data$el[ graph$data$oi[idx], 2] == to]
-    res <- graph$data$oi[idx]
+    res <- numeric()
+    if (graph$data$os[from] < graph$data$os[from+1]) {
+      idx <- graph$data$os[from] : (graph$data$os[from+1]-1)
+      idx <- idx [graph$data$el[ graph$data$oi[idx], 2] == to]
+      res <- graph$data$oi[idx]
+    }
+    if (!is.directed(graph) && graph$data$is[from] <
+        graph$data$is[from+1]) {
+      idx <- graph$data$is[from] : (graph$data$is[from+1]-1)
+      idx <- idx [graph$data$el[ graph$data$ii[idx], 2] == to]
+      res <- c(res, graph$data$ii[idx])
+    }
   }
-  
+
   res
 }

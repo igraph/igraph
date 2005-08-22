@@ -154,8 +154,6 @@ ecount.edgelist.default <- function(graph) {
 
 neighbors.edgelist.default <- function(graph, v, mode="out") {
 
-  neighbors.common(graph, v, mode)
-
   v <- as.numeric(v)
   if (is.directed(graph)) {
     mode=switch(mode, "out"=1, "in"=2, "all"=3)

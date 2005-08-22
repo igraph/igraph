@@ -158,8 +158,6 @@ ecount.adjacencylist.default <- function(graph) {
   
 neighbors.adjacencylist.default <- function(graph, v, mode="out") {
 
-  neighbors.common(graph, v, mode)
-
   if (is.directed(graph)) {
     res <- numeric()
     if (mode %in% c("out", "all")) {
@@ -230,7 +228,7 @@ add.vertex.attribute.adjacencylist.default <- function(graph,
 
   res <- graph
   vc <- vcount(graph)
-  if (type="complex") {
+  if (type=="complex") {
     res$val[[attrname]] <- replicate(vc, default, simplify=FALSE)
   } else {
     res$val[[attrname]] <- rep(default, vc)
