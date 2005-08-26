@@ -21,8 +21,6 @@
 
 igraph.pars <- new.env()
 
-igraph.pars$default.type <- "indexededgelist"
-
 igraph.par <- function(parid, parvalue=NULL) {
 
   if (is.null(parvalue)) {

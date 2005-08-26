@@ -21,43 +21,63 @@
 */
 
 #include "igraph.h"
+#include "memory.h"
 
-SEXP REST_cocitation(SEXP interface, SEXP graph, SEXP mode) {
+int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids, 
+			   integer_t mode);
 
-  REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph);
+int igraph_cocitation(igraph_t *graph, matrix_t *res, vector_t *vids) {
+  return igraph_cocitation_real(graph, res, vids, 1);
+}
 
-  SEXP result;
-  SEXP dim;
+int igraph_bibcoupling(igraph_t *graph, matrix_t *res, vector_t *vids) {
+  return igraph_cocitation_real(graph, res, vids, 2);
+}
 
-  long int no_of_nodes;
-  
+int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids, 
+			   integer_t mode) {
+
+  long int no_of_nodes=igraph_vcount(graph);
   long int from, i, j;
+  bool_t *calc;
+  matrix_t tmpres;
+  vector_t neis;
   
-  no_of_nodes=R(ptrtable.vcount(interface, graph));
+  calc=Calloc(no_of_nodes, bool_t);
+  for (i=0; i<vector_size(vids); i++) {
+    calc[ (long int) VECTOR(*vids)[i] ] = 1;
+  }
   
+  matrix_init(&tmpres, no_of_nodes, no_of_nodes);
+  vector_init(&neis, 0);
+
   /* The result */
   
-  PROTECT(result=NEW_NUMERIC(no_of_nodes*no_of_nodes));
-  PROTECT(dim=NEW_INTEGER(2));
-  INTEGER(dim)[0]=no_of_nodes;
-  INTEGER(dim)[1]=no_of_nodes;
-  SET_DIM(result, dim);
-  memset(REAL(result), 0, no_of_nodes*no_of_nodes*sizeof(double));
-  
   for (from=0; from<no_of_nodes; from++) {
-    SEXP neis=ptrtable.neighbors(interface, graph, from+1, mode);
-    for (i=0; i < GET_LENGTH(neis)-1; i++) {
-      for (j=i+1; j<GET_LENGTH(neis); j++) {
-	RMATRIX(result, (long int)REAL(neis)[i], (long int)REAL(neis)[j]) += 1;
-	RMATRIX(result, (long int)REAL(neis)[j], (long int)REAL(neis)[i]) += 1;
+    igraph_neighbors(graph, &neis, from, mode);
+    for (i=0; i < vector_size(&neis)-1; i++) {
+      if (calc[ (long int)VECTOR(neis)[i] ]) {
+	for (j=i+1; j<vector_size(&neis); j++) {
+	  MATRIX(tmpres, (long int)VECTOR(neis)[i], 
+		 (long int)VECTOR(neis)[j]) += 1;
+	  MATRIX(tmpres, (long int)VECTOR(neis)[j], 
+		 (long int)VECTOR(neis)[i]) += 1;
+	}
       }
     }
   }
+
+  /* Copy result */
+  matrix_resize(res, vector_size(vids), no_of_nodes);
+  for (i=0; i<vector_size(vids); i++) {
+    for (j=0; j<no_of_nodes; j++) {
+      MATRIX(*res, i, j) = MATRIX(tmpres, (long int) VECTOR(*vids)[i], j);
+    }
+  }  
   
   /* Clean up */
+  matrix_destroy(&tmpres);
+  vector_destroy(&neis);
   
-  UNPROTECT(2);
-  return result;
+  return 0;
 }
- 
-  

@@ -19,22 +19,13 @@
 #
 ###################################################################
 
-cocitation <- function(graph, v=1:vcount(graph)) {
-  
-  res <- .Call("REST_cocitation", igraph.c.interface, graph, "out", 
-               PACKAGE="igraph")
+cocitation <- function(graph, v=0:(vcount(graph)-1)) {
 
-  res <- res[v,]
-
-  res
+  .Call("R_igraph_cocitation", graph, as.numeric(v),
+        PACKAGE="igraph")
 }
 
-bibcoupling <- function(graph, v=1:vcount(graph)) {
-
-  res <- .Call("REST_cocitation", igraph.c.interface, graph, "in", 
-               PACKAGE="igraph")
-
-  res <- res[v,]
-
-  res
+bibcoupling <- function(graph, v=0:(vcount(graph)-1)) {
+  .Call("R_igraph_bibcoupling", graph, as.numeric(v),
+        PACKAGE="igraph")
 }

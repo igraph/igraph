@@ -22,48 +22,48 @@
 ba.game <- function(n, m=NULL, out.dist=NULL, out.seq=NULL,
                     out.pref=FALSE, ...) {
 
-  # Checks
-  if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
-    warning("if `out.seq' is given `m' and `out.dist' should be NULL")
-    m <- out.dist <- NULL
-  }
-  if (is.null(out.seq) && !is.null(out.dist) && !is.null(m)) {
-    warning("if `out.dist' is given `m' will be ignored")
-    m <- NULL
-  }
-  if (!is.null(out.seq) && length(out.seq) != n) {
-    stop("`out.seq' should be of length `n'")
-  }
-  if (!is.null(out.seq) && min(out.seq)<0) {
-    stop("negative elements in `out.seq'");
-  }
-  if (!is.null(m) && m<0) {
-    stop("`m' is negative")
-  }
-  if (!is.null(m) && m==0) {
-    warning("`m' is zero, graph will be empty")
-  }
+##   # Checks
+##   if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
+##     warning("if `out.seq' is given `m' and `out.dist' should be NULL")
+##     m <- out.dist <- NULL
+##   }
+##   if (is.null(out.seq) && !is.null(out.dist) && !is.null(m)) {
+##     warning("if `out.dist' is given `m' will be ignored")
+##     m <- NULL
+##   }
+##   if (!is.null(out.seq) && length(out.seq) != n) {
+##     stop("`out.seq' should be of length `n'")
+##   }
+##   if (!is.null(out.seq) && min(out.seq)<0) {
+##     stop("negative elements in `out.seq'");
+##   }
+##   if (!is.null(m) && m<0) {
+##     stop("`m' is negative")
+##   }
+##   if (!is.null(m) && m==0) {
+##     warning("`m' is zero, graph will be empty")
+##   }
 
-  if (is.null(m) && is.null(out.dist) && is.null(out.seq)) {
-    m <- 1
-  }
+##   if (is.null(m) && is.null(out.dist) && is.null(out.seq)) {
+##     m <- 1
+##   }
   
-  n <- as.numeric(n)
-  if (!is.null(m)) { m <- as.numeric(m) }
-  if (!is.null(out.dist)) { out.dist <- as.numeric(out.dist) }
-  if (!is.null(out.dist)) { out.seq <- as.numeric(out.seq) }
-  out.pref <- as.logical(out.pref)
+##   n <- as.numeric(n)
+##   if (!is.null(m)) { m <- as.numeric(m) }
+##   if (!is.null(out.dist)) { out.dist <- as.numeric(out.dist) }
+##   if (!is.null(out.dist)) { out.seq <- as.numeric(out.seq) }
+##   out.pref <- as.logical(out.pref)
 
-  if (!is.null(out.dist)) {
-    out.seq <- as.numeric(sample(0:(length(out.dist)-1), n,
-                                 replace=TRUE, prob=out.dist))
-  }
+##   if (!is.null(out.dist)) {
+##     out.seq <- as.numeric(sample(0:(length(out.dist)-1), n,
+##                                  replace=TRUE, prob=out.dist))
+##   }
   
-  res <- graph.empty(n=n, ...)
-  res <- add.edges(res, .Call("REST_ba_game", n, m, out.seq, out.pref,
-                              PACKAGE="igraph"))
+##   res <- graph.empty(n=n, ...)
+##   res <- add.edges(res, .Call("REST_ba_game", n, m, out.seq, out.pref,
+##                               PACKAGE="igraph"))
   
-  res
+##   res
 }
 
 barabasi.game <- ba.game
@@ -98,7 +98,7 @@ erdos.renyi.game <- function(n, p, directed=FALSE, loops=FALSE, ...) {
       from <- rep(1:(n-1), (n-1):1)
       to <- n+1-sequence((n-1):1)
     }
-    res <- graph( as.numeric(t(matrix(c(from, to), nc=2))),
+    res <- graph( as.numeric(t(matrix(c(from, to)-1, nc=2))),
                  directed=directed, n=n, ...)       
   } else {
     # real random graph, this is the general case
@@ -132,7 +132,7 @@ erdos.renyi.game <- function(n, p, directed=FALSE, loops=FALSE, ...) {
     }
     
     # ok, create graph
-    res <- graph( as.numeric(t(matrix(c(from, to), nc=2))),
+    res <- graph( as.numeric(t(matrix(c(from, to)-1, nc=2))),
                  directed=directed, n=n, ...)
   }
   
@@ -164,15 +164,15 @@ degree.sequence.game <- function(out.deg, in.deg=NULL, method="simple", ...) {
 
   if (is.null(in.deg)) {
     directed <- FALSE
-    edges <- rep(1:length(out.deg), times=out.deg)
-    edges <- sample(edges, length(edges))
+    edges <- rep(1:length(out.deg), times=out.deg)-1
+    edges <- sample(edges, length(edges))-1
   } else {
     directed <- TRUE
     from <- rep(1:length(out.deg), times=out.deg)
     to <- rep(1:length(in.deg), times=in.deg)
     from <- sample(from, length(from))
     to <- sample(to, length(to))
-    edges <- as.numeric(t(matrix(c(from, to), nc=2)))
+    edges <- as.numeric(t(matrix(c(from, to), nc=2)))-1
   }
 
   res <- graph.empty(n=length(out.deg), directed=directed, ...)
@@ -181,18 +181,12 @@ degree.sequence.game <- function(out.deg, in.deg=NULL, method="simple", ...) {
   res
 }
 
-growing.random.game <- function(n, m=1, citation=FALSE, ...) {
-
-  n <- as.numeric(n)
-  m <- as.numeric(m)
-
-  res <- graph.empty(n=n, ...)
-  res <- add.edges(res, .Call("REST_growing_random_game", n, m,
-                              citation, PACKAGE="igraph"))
-
-  res
+growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
+  .Call("R_igraph_growing_random_game", as.numeric(n), as.numeric(m),
+        as.logical(directed), as.logical(citation),
+        PACKAGE="igraph")
 }
-                              
+  
 aging.prefatt.game <- function(n, m=1, aging.type="exponential",
                                params=list(), ...) {
 
@@ -242,5 +236,5 @@ aging.prefatt.game <- function(n, m=1, aging.type="exponential",
     
   }
 
-  graph(edges, n=n, ...)
+  graph(edges-1, n=n, ...)
 }

@@ -49,7 +49,7 @@ layout.fruchterman.reingold <- function(graph, ..., params=list()) {
       !params$initial)           { params$initial <- layout.random(graph) }
   if (is.null(params$temp))      { params$temp    <- 1/10 }
   
-  edges <- get.edgelist(graph)
+  edges <- get.edgelist(graph)+1
 
   len <- function(vect) sqrt(sum(vect*vect))
   norm <- function(vect) vect/len(vect)
@@ -132,29 +132,29 @@ layout.fruchterman.reingold <- function(graph, ..., params=list()) {
 
 layout.kamada.kawai<-function(graph, ..., params=list()) {
 
-  if (length(params)==0) {
-    params <- list(...)
-  }
+##   if (length(params)==0) {
+##     params <- list(...)
+##   }
 
-  vc <- vcount(graph)
-  if (is.null(params$niter))      { params$niter   <- 1000 }
-  if (is.null(params$sigma))      { params$sigma   <- vc/4 }
-  if (is.null(params$initemp))    { params$initemp <- 10   }
-  if (is.null(params$coolexp))    { params$coolexp <- 0.99 }
-  if (is.null(params$kkconst))    { params$kkconst <- vc^2 }
-  params$elen <- shortest.paths(graph)
-  diag(params$elen) <- sqrt(vc)
-  #Obtain locations
-  x <- rnorm(vc,0,vc/4)
-  y <- rnorm(vc,0,vc/4)
-  pos <- .Call("REST_layout_kamadakawai", as.double(vc),
-               as.integer(params$niter), as.double(params$elen),
-               as.double(params$initemp),as.double(params$coolexp),
-               as.double(params$kkconst),as.double(params$sigma),
-               as.double(x), as.double(y), PACKAGE="igraph")
+##   vc <- vcount(graph)
+##   if (is.null(params$niter))      { params$niter   <- 1000 }
+##   if (is.null(params$sigma))      { params$sigma   <- vc/4 }
+##   if (is.null(params$initemp))    { params$initemp <- 10   }
+##   if (is.null(params$coolexp))    { params$coolexp <- 0.99 }
+##   if (is.null(params$kkconst))    { params$kkconst <- vc^2 }
+##   params$elen <- shortest.paths(graph)
+##   diag(params$elen) <- sqrt(vc)
+##   #Obtain locations
+##   x <- rnorm(vc,0,vc/4)
+##   y <- rnorm(vc,0,vc/4)
+##   pos <- .Call("REST_layout_kamadakawai", as.double(vc),
+##                as.integer(params$niter), as.double(params$elen),
+##                as.double(params$initemp),as.double(params$coolexp),
+##                as.double(params$kkconst),as.double(params$sigma),
+##                as.double(x), as.double(y), PACKAGE="igraph")
 
-  #Return to x,y coords
-  cbind(pos[,1],pos[,2])
+##   #Return to x,y coords
+##   cbind(pos[,1],pos[,2])
 }
 
 # FROM SNA 0.5

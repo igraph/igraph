@@ -19,7 +19,7 @@
 #
 ###################################################################
 
-plot.graph <- function(graph, layout=layout.random, layout.par=list(),
+plot.igraph <- function(graph, layout=layout.random, layout.par=list(),
                        labels=NULL, label.color="darkblue",
                        label.font=NULL, label.degree=-pi/4, label.dist=0,
                        vertex.color="SkyBlue2", vertex.size=15,
@@ -48,16 +48,16 @@ plot.graph <- function(graph, layout=layout.random, layout.par=list(),
   
   # add the edges
   # TODO: loops
-  x0 <- layout[,1][get.edgelist(graph)[,1]]
-  y0 <- layout[,2][get.edgelist(graph)[,1]]
-  x1 <- layout[,1][get.edgelist(graph)[,2]]
-  y1 <- layout[,2][get.edgelist(graph)[,2]]
+  x0 <- layout[,1][get.edgelist(graph)[,1]+1]
+  y0 <- layout[,2][get.edgelist(graph)[,1]+1]
+  x1 <- layout[,1][get.edgelist(graph)[,2]+1]
+  y1 <- layout[,2][get.edgelist(graph)[,2]+1]
 
   # we do this for undirected graphs also because some
   # graphics drivers do not handle 'depth' properly (or at all)
   if (length(vertex.size)!=1) {
-    vsize.from <- vertex.size[get.edgelist(graph)[,1]]
-    vsize.to   <- vertex.size[get.edgelist(graph)[,2]]
+    vsize.from <- vertex.size[get.edgelist(graph)[,1]+1]
+    vsize.to   <- vertex.size[get.edgelist(graph)[,2]+1]
   } else {
     vsize.from <- vsize.to <- vertex.size
   }

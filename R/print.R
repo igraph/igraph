@@ -23,7 +23,8 @@
 # Convert graphs to human readable forms
 ###################################################################
 
-print.graph <- function(graph) {
+## TODO: faster with get.edgelist
+print.igraph <- function(graph) {
 
   ec <- ecount(graph)
   vc <- vcount(graph)
@@ -32,13 +33,12 @@ print.graph <- function(graph) {
   cat("Vertices:", vc, "\n")
   cat("Edges:", ec, "\n")
   cat("Directed:", is.directed(graph), "\n")
-  cat("Type:", igraph.type(graph), "\n")
 
   arrow <- ifelse(is.directed(graph), "->", "--")
   if (ec != 0) {
     cat("\nEdges:\n")
     idx <- 1
-    for (i in 1:vc) {
+    for (i in 0:(vc-1)) {
       neis <- neighbors(graph, i, "out")
       if (!is.directed(graph)) {
         no.loops <- sum(neis==i)
@@ -54,12 +54,11 @@ print.graph <- function(graph) {
   invisible(graph)
 }
 
-summary.graph <- function(graph) {
+summary.igraph <- function(graph) {
 
   cat("Vertices:", vcount(graph), "\n")
   cat("Edges:", ecount(graph), "\n")
   cat("Directed:", is.directed(graph), "\n")
-  cat("Type:", igraph.type(graph), "\n")
   
   invisible(graph)
 }

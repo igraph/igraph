@@ -110,7 +110,7 @@ i.get.label.degree <- function(graph, label.degree) {
 i.get.labels <- function(graph, labels) {
 
   if (is.null(labels)) {
-    labels <- 1:vcount(graph)
+    labels <- 0:(vcount(graph)-1)
   } else if (is.na(labels[1])) {
   } else if (is.character(labels) && length(labels)==1 &&
              substr(labels, 1, 2)=="a:") {

@@ -23,90 +23,55 @@
 # Structure building
 ###################################################################
 
-graph.empty <- function(..., type=igraph.par("default.type"))
-  UseMethod(paste(sep="", "graph.empty.", type))
+graph.empty <- function(n=0, directed=TRUE) {
+  .Call("R_igraph_empty", as.numeric(n), as.logical(directed),
+        PACKAGE="igraph")
+}
 
-add.edges <- function(graph, edges)
-  UseMethod(paste(sep="", "add.edges.", graph$gal$type))
+add.edges <- function(graph, edges) {
+  .Call("R_igraph_add_edges", graph, as.numeric(edges),
+        PACKAGE="igraph")
+}
 
-add.vertices <- function(graph, nv)
-  UseMethod(paste(sep="", "add.vertices.", graph$gal$type))
+add.vertices <- function(graph, nv) {
+  .Call("R_igraph_add_vertices", graph, as.numeric(nv),
+        PACKAGE="igraph")
+}
 
-delete.edges <- function(graph, edges)
-  UseMethod(paste(sep="", "delete.edges.", graph$gal$type))
+delete.edges <- function(graph, edges) {
+  .Call("R_igraph_delete_edges", graph, as.numeric(edges),
+        PACKAGE="igraph")
+}
 
-delete.vertices <- function(graph, v)
-  UseMethod(paste(sep="", "delete.vertices.", graph$gal$type))
+delete.vertices <- function(graph, v) {
+  .Call("R_igraph_delete_vertices", graph, as.numeric(v),
+        PACKAGE="igraph")
+}
 
 ###################################################################
 # Structure query
 ###################################################################
   
-vcount <- function(graph)
-  UseMethod(paste(sep="", "vcount.", graph$gal$type))
+vcount <- function(graph) {
+  .Call("R_igraph_vcount", graph,
+        PACKAGE="igraph")
+}
   
-ecount <- function(graph)
-  UseMethod(paste(sep="", "ecount.", graph$gal$type))
-  
-neighbors <- function(graph, v, mode="out")
-  UseMethod(paste(sep="", "neighbors.", graph$gal$type))
+ecount <- function(graph) {
+  .Call("R_igraph_ecount", graph,
+        PACKAGE="igraph")
+}
+ 
+neighbors <- function(graph, v, mode=1) {
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+  }
+  .Call("R_igraph_neighbors", graph, as.numeric(v),
+        as.numeric(mode),
+        PACKAGE="igraph")
+}
 
-###################################################################
-# Attributes, level 2
-###################################################################
-  
-add.graph.attribute <- function(graph, attrname, default=NA)
-  UseMethod(paste(sep="", "add.graph.attribute.", graph$gal$type))
-
-delete.graph.attribute <- function(graph, attrname)
-  UseMethod(paste(sep="", "delete.graph.attribute.", graph$gal$type))
-
-get.graph.attribute <- function(graph, attrname=NULL)
-  UseMethod(paste(sep="", "get.graph.attribute.", graph$gal$type))
-
-set.graph.attribute <- function(graph, attrname, value)
-  UseMethod(paste(sep="", "set.graph.attribute.", graph$gal$type))
-
-add.vertex.attribute <- function(graph, attrname, type="simple", default=NA)
-  UseMethod(paste(sep="", "add.vertex.attribute.", graph$gal$type))
-
-delete.vertex.attribute <- function(graph, attrname)
-  UseMethod(paste(sep="", "delete.vertex.attribute.", graph$gal$type))
-
-get.vertex.attribute <- function(graph, attrname=NULL, v=NULL)
-  UseMethod(paste(sep="", "get.vertex.attribute.", graph$gal$type))
-
-set.vertex.attribute <- function(graph, attrname, v=NULL, value)
-  UseMethod(paste(sep="", "set.vertex.attribute.", graph$gal$type))
-
-add.edge.attribute <- function(graph, attrname, type="simple", default=NA)
-  UseMethod(paste(sep="", "add.edge.attribute.", graph$gal$type))
-
-delete.edge.attribute <- function(graph, attrname)
-  UseMethod(paste(sep="", "delete.edge.attribute.", graph$gal$type))
-
-get.edge.attribute <- function(graph, attrname=NULL, from=NULL, to=NULL)
-  UseMethod(paste(sep="", "get.edge.attribute.", graph$gal$type))
-
-set.edge.attribute <- function(graph, attrname, from=NULL, to=NULL, value)
-  UseMethod(paste(sep="", "set.edge.attribute.", graph$gal$type))
-
-g.a <- get.graph.attribute
-"g.a<-" <- set.graph.attribute
-v.a <- get.vertex.attribute
-"v.a<-" <- set.vertex.attribute
-e.a <- get.edge.attribute
-"e.a<-" <- set.edge.attribute
-
-###################################################################
-# Iterators, level 2
-###################################################################
-
-igraph.iterator <- function(graph, type="vid")
-  UseMethod(paste(sep="", "igraph.iterator.", graph$gal$type))
-
-###################################################################
-# Interface object for C functions
-###################################################################
-
-igraph.c.interface <- do.call
+is.directed <- function(graph) {
+  .Call("R_igraph_is_directed", graph,
+        PACKAGE="igraph")
+}

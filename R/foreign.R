@@ -23,10 +23,10 @@
 # Reading foreign file formats
 ###################################################################
 
-read.graph <- function(file, format="pajek", ...) {
+read.graph <- function(file, format="edgelist", ...) {
 
   res <- switch(format,
-                "pajek"=read.graph.pajek(file, format, ...),
+#                "pajek"=read.graph.pajek(file, format, ...),
                 "edgelist"=read.graph.edgelist(file, format, ...),
                 stop(paste("Unknown file format:",format))
                 )
@@ -51,8 +51,8 @@ write.graph <- function(graph, file, format="edgelist", ...) {
 
 read.graph.pajek <- function(filename, format="pajek", attributes=TRUE, ...) {
 
-  lines <- readLines(filename)
-  res <- .Call("REST_import_pajek", igraph.c.interface, lines, list(...), attributes)
+##   lines <- readLines(filename)
+##   res <- .Call("REST_import_pajek", igraph.c.interface, lines, list(...), attributes)
 
   res
 }
@@ -74,7 +74,7 @@ read.graph.edgelist <- function(filename, format="edgelist", ...) {
   
   edges <- scan(filename, nmax=20000)
   while(length(edges)>0) {
-    m <- max(edges)
+    m <- max(edges)+1
     v <- vcount(res)
     if (m>v) {
       res <- add.vertices(res, m-v)
@@ -104,7 +104,7 @@ write.graph.edgelist <- function(graph, file, format="edgelist",
   }
   
   vc <- vcount(graph)
-  for (i in 1:vc) {
+  for (i in 0:(vc-1)) {
     neis <- neighbors(graph, i, "out")
     if (!is.directed(graph)) {
       no.loops <- sum(neis==i)
@@ -143,7 +143,7 @@ write.graph.lgl <- function(graph, file, format="lgl", ...) {
   }
 
   vc <- vcount(graph)
-  for (i in 1:vc) {
+  for (i in 0:(vc-1)) {
     neis <- neighbors(graph, i, "out")
     if (!is.directed(graph)) {
       neis <- neis [ neis < i ]
@@ -151,10 +151,10 @@ write.graph.lgl <- function(graph, file, format="lgl", ...) {
     if (length(neis) > 0) {
       neis <- sort(neis)
       cat("# ", file=file)
-      cat(i,    file=file)
+      cat(i+1,    file=file)
       cat("\n", file=file)
       for (n in neis) {
-        cat(n,    file=file)
+        cat(n+1,    file=file)
         cat("\n", file=file)
       }
     }

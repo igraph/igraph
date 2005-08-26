@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
-   IGraph R package.
-   Copyright (C) 2003, 2004  Gabor Csardi <csardi@rmki.kfki.hu>
+   IGraph library.
+   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -23,315 +23,189 @@
 #ifndef RESTGAME_H
 #define RESTGAME_H
 
-#include <R.h>
-#include <Rinternals.h>
-#include <Rdefines.h>
+#include "types.h"
 
-/* Atmenetileg amig megoldodik a memoriafelszabaditas */
-#define R_CheckUserInterrupt(); ;
-
-#define I(x) (INTEGER(x)[0])
-#define R(x) (REAL(x)[0])
-
-#define RMATRIX(x, i, j) (REAL(x) [i-1 + \
-        INTEGER(GET_DIM(x))[0] * (j-1)])
-
-#define IMATRIX(x, i, j) (INTEGER(x) [i-1 + \
-        INTEGER(GET_DIM(x))[0] * (j-1)])
-
-/* dangerous! */
-#define RNG_INTEGER(low, high) ((long int)(unif_rand()*(high-low+1)+low))
-#define RNG_REAL(low, high)    (unif_rand()*(high-low)+low)
+typedef struct igraph_s {
+  integer_t n;			/* Number of vertices           */
+  bool_t directed;		/* Is it directed?              */
+  vector_t from;		/* The edge list, first column  */
+  vector_t to;                  /* The edge list, second column */
+  vector_t oi;			/* Out index                    */
+  vector_t ii;			/* In index                     */
+  vector_t os;			/* Out index start              */
+  vector_t is;			/* In index start               */
+} igraph_t;
 
 /* -------------------------------------------------- */
-/* Games                                              */
+/* Interface                                          */
 /* -------------------------------------------------- */
 
-SEXP REST_ba_game(SEXP pn, SEXP pm, SEXP outseq, SEXP poutpref);
+int igraph_empty(igraph_t *graph, integer_t n, bool_t directed);
+int igraph_destroy(igraph_t *graph);
+int igraph_add_edges(igraph_t *graph, vector_t *edges);
+int igraph_add_vertices(igraph_t *graph, integer_t nv);
+int igraph_delete_edges(igraph_t *graph, vector_t *edges);
+int igraph_delete_vertices(igraph_t *graph, vector_t *vertices);
+integer_t igraph_vcount(igraph_t *graph);
+integer_t igraph_ecount(igraph_t *graph);
+int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t vid, 
+		   integer_t mode); 
+bool_t igraph_is_directed(igraph_t *graph);
+int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
+		  integer_t mode, bool_t loops);
+
+/* TODO: attributes */
+/* TODO: iterators  */
+
+/* -------------------------------------------------- */
+/* Error handling                                     */
+/* -------------------------------------------------- */
+
+int igraph_error(const char *msg);
+
+/* -------------------------------------------------- */
+/* Constructors, deterministic                        */
+/* -------------------------------------------------- */
+
+int igraph_create(igraph_t *graph, vector_t *edges, integer_t n, 
+		  bool_t directed);
+int igraph_adjacency(igraph_t *graph, vector_t *adjmatrix,
+		     integer_t dirmode);
+int igraph_star(igraph_t *graph, integer_t n, integer_t mode, 
+		integer_t center, bool_t directed);
+int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei, 
+		   bool_t directed, bool_t mutual, bool_t circular);
+int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual);
+int igraph_tree(igraph_t *graph, integer_t n, integer_t children);
+
+/* -------------------------------------------------- */
+/* Constructors, games (=stochastic)                  */
+/* -------------------------------------------------- */
+
+int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
+			 vector_t *outdist, vector_t *outseq,
+			 bool_t poutpref);
+int igraph_erdos_renyi_game(igraph_t *graph, integer_t n, real_t p,
+			    bool_t directed, bool_t loops);
+int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
+				vector_t *in_deg, integer_t method);
+int igraph_growing_random_game(igraph_t *graph, integer_t n, 
+			       integer_t m, bool_t directed, bool_t citation);
+int igraph_aging_prefatt_game(igraph_t *graph, integer_t n, integer_t m,
+			      integer_t aging_type, real_t aging_exp);
+
+/* -------------------------------------------------- */
+/* Basic query functions                              */
+/* -------------------------------------------------- */
+
+bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2);
 
 /* -------------------------------------------------- */
 /* Structural properties                              */
 /* -------------------------------------------------- */
 
-SEXP REST_diameter(SEXP interface, SEXP graph, SEXP pdirected, SEXP punconn);
-SEXP REST_closeness(SEXP interface, SEXP graph, SEXP nodes, SEXP pmode);
-SEXP REST_clusters(SEXP interface, SEXP graph);
-SEXP REST_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
-SEXP REST_edge_betweenness (SEXP interface, SEXP graph, SEXP pdirected);
-SEXP REST_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
-SEXP REST_get_shortest_paths(SEXP interface, SEXP graph, SEXP from, SEXP pmode);
-SEXP REST_cocitation(SEXP interface, SEXP graph, SEXP mode);
-SEXP REST_minimum_spanning_tree_unweighted(SEXP interface, SEXP graph);
-SEXP REST_minimum_spanning_tree_prim(SEXP interface, SEXP graph);
+int igraph_diameter(igraph_t *graph, integer_t *res, 
+		    bool_t directed, bool_t unconn);
+int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst);
+int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
+				      vector_t *weights);
+int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids, 
+		     integer_t mode);
+int igraph_shortest_paths(igraph_t *graph, matrix_t *res, 
+			  vector_t *from, integer_t mode);
+int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
+			      vector_t *from, integer_t mode);
+int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vid, 
+			integer_t mode);
+int igraph_subgraph(igraph_t *graph, igraph_t *res, integer_t  mode);
+int igraph_simplify(igraph_t *graph, bool_t remove_loops, 
+		    bool_t remove_multiple); 
+int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids, 
+			bool_t directed);
+int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 
+			     bool_t directed);
+/* TODO: degree.distribution (?) */
+
+/* -------------------------------------------------- */
+/* Components                                         */
+/* -------------------------------------------------- */
+
+int igraph_clusters(igraph_t *graph, vector_t *membership, vector_t *csize, 
+		    integer_t mode);
+int igraph_is_connected(igraph_t *graph, bool_t *res, integer_t mode);
+/* TODO: cluster.distribution (?) */
+
+/* -------------------------------------------------- */
+/* Layouts                                            */
+/* -------------------------------------------------- */
+
+int igraph_layout_random(igraph_t *graph, vector_t *res);
+int igraph_layout_circle(igraph_t *graph, vector_t *res);
+int igraph_layout_fruchterman_reingold(igraph_t *graph, vector_t *res, 
+				       integer_t niter, real_t coolexp,
+				       integer_t frame, vector_t *initial,
+				       real_t initemp);
+int igraph_layout_kamada_kawai(igraph_t *graph, vector_t *res,
+			       integer_t niter, real_t sigma, 
+			       real_t initemp, real_t coolexp,
+			       real_t kkconst);
+int igraph_layout_springs(igraph_t *graph, vector_t *res,
+			  real_t mass, real_t equil, real_t k,
+			  real_t repeqdis, real_t kfr, bool_t repulse);
+
+/* -------------------------------------------------- */
+/* Centrality                                         */
+/* -------------------------------------------------- */
+
+/* TODO: evcent */
+
+/* -------------------------------------------------- */
+/* Cocitation                                         */
+/* -------------------------------------------------- */
+
+int igraph_cocitation(igraph_t *graph, matrix_t *res, vector_t *vids);
+int igraph_bibcoupling(igraph_t *graph, matrix_t *res, vector_t *vids);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */
 /* -------------------------------------------------- */
 
-SEXP REST_eb_community(SEXP interface, SEXP graph, SEXP pdirected);
+/* TODO: eb.community */
+/* TODO: cut.community */
+/* TODO: edge.type.matrix */
+/* TODO: modularity */
+/* TODO:  */
+
+/* -------------------------------------------------- */
+/* Conversion                                         */
+/* -------------------------------------------------- */
+
+int igraph_get_adjacency(igraph_t *graph, vector_t *res);
+int igraph_get_edgelist(igraph_t *graph, vector_t *res);
 
 /* -------------------------------------------------- */
 /* Read and write foreign formats                     */
 /* -------------------------------------------------- */
 
-SEXP REST_import_pajek(SEXP interface, SEXP lines, SEXP other,
-		       SEXP pattributes);
-
-/* -------------------------------------------------- */
-/* Layouts, mostly from SNA                           */
-/* -------------------------------------------------- */
-
-SEXP REST_layout_kamadakawai(SEXP pn, SEXP pniter, 
-			     SEXP pelen, SEXP pinitemp, SEXP pcoolexp, 
-			     SEXP pkkconst, SEXP psigma, SEXP px, SEXP py);
+int igraph_read_graph(const char *filename, integer_t format);
+int igraph_write_graph(igraph_t *graph, const char *filename, 
+		       integer_t format);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 
-SEXP REST_measure_dynamics_idage(SEXP interface, SEXP graph, SEXP st,
-				 SEXP pagebins, SEXP pmaxind, SEXP psd);
-SEXP REST_measure_dynamics_idage_st(SEXP interface, SEXP graph, SEXP akl,
-				    SEXP pagebins, SEXP pmaxind);
+int igraph_measure_dynamics_idage(igraph_t *graph, real_t *res, 
+				  vector_t *st, integer_t agebins,
+				  integer_t maxind, bool_t sd);
+int igraph_measure_dynamics_idage_st(igraph_t *graph, real_t *res,
+				     vector_t *akl, integer_t agebins,
+				     integer_t maxind);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
 
-SEXP REST_running_mean(SEXP data, SEXP pbinwidth);
-
-/* -------------------------------------------------- */
-/* The C igraph interface                             */
-/* -------------------------------------------------- */
-
-typedef SEXP (*VCOUNT_t)(SEXP, SEXP);
-typedef SEXP (*ECOUNT_t)(SEXP, SEXP);
-typedef SEXP (*NEIGHBORS_t)(SEXP, SEXP, long int, SEXP);
-typedef SEXP (*ADD_VERTICES_t)(SEXP, SEXP, long int);
-typedef SEXP (*GRAPH_EMPTY_t)(SEXP, SEXP);
-typedef SEXP (*ADD_EDGES_t)(SEXP, SEXP, SEXP);
-typedef SEXP (*ADD_VERTEX_ATTRIBUTE_t)(SEXP, SEXP, const char*, SEXP);
-typedef SEXP (*SET_VERTEX_ATTRIBUTE_t)(SEXP, SEXP, const char*, SEXP, SEXP);
-typedef SEXP (*GET_EDGE_ATTRIBUTE_t)(SEXP, SEXP, SEXP, SEXP, SEXP);
-
-typedef struct {
-  VCOUNT_t vcount;
-  ECOUNT_t ecount;
-  NEIGHBORS_t neighbors;
-  ADD_VERTICES_t add_vertices;
-  GRAPH_EMPTY_t graph_empty;
-  ADD_EDGES_t add_edges;
-  ADD_VERTEX_ATTRIBUTE_t add_vertex_attribute;
-  SET_VERTEX_ATTRIBUTE_t set_vertex_attribute;
-  GET_EDGE_ATTRIBUTE_t get_edge_attribute;
-} REST_i_ptrtable_t;
-
-extern REST_i_ptrtable_t REST_i_table_default;
-extern REST_i_ptrtable_t REST_i_table_indexededgelist;
-
-REST_i_ptrtable_t REST_i_getptrtable(SEXP graph);
-
-SEXP REST_i_default_vcount(SEXP, SEXP);
-SEXP REST_i_default_ecount(SEXP, SEXP);
-SEXP REST_i_default_neighbors(SEXP, SEXP, long int, SEXP);
-SEXP REST_i_default_add_vertices(SEXP, SEXP, long int);
-SEXP REST_i_default_graph_empty(SEXP, SEXP);
-SEXP REST_i_default_add_edges(SEXP, SEXP, SEXP);
-SEXP REST_i_default_add_vertex_attribute(SEXP, SEXP, const char*, SEXP);
-SEXP REST_i_default_set_vertex_attribute(SEXP, SEXP, const char*, SEXP, SEXP);
-SEXP REST_i_default_get_edge_attribute(SEXP, SEXP, SEXP, SEXP, SEXP);
-
-SEXP REST_i_indexededgelist_neighbors(SEXP, SEXP, long int, SEXP);
-
-/* -------------------------------------------------- */
-/* INTERNALS                                          */
-/* -------------------------------------------------- */
-
-SEXP REST_i_get_list_element(SEXP list, const char *str);
-
-/* -------------------------------------------------- */
-
-/**
- */
-
-typedef struct s_dqueue {
-  long int *begin;
-  long int *end;
-  long int *stor_begin;
-  long int *stor_end;
-} dqueue_t;
-
-int dqueue_init    (dqueue_t* q, long int size);
-int dqueue_destroy (dqueue_t* q);
-int dqueue_empty   (dqueue_t* q);
-int dqueue_clear   (dqueue_t* q);
-int dqueue_full    (dqueue_t* q);
-long int dqueue_size    (dqueue_t* q);
-long int dqueue_pop     (dqueue_t* q);
-long int dqueue_pop_back(dqueue_t* q);
-long int dqueue_head    (dqueue_t* q);
-long int dqueue_back    (dqueue_t* q);
-int dqueue_push    (dqueue_t* q, long int elem);
-
-/**
- */
-
-typedef struct s_clustset {
-  long int allocated_size;
-  long int no_of_nodes;
-  long int no_of_clusters;
-  long int *parent;
-} clustset_t;
-
-int clustset_init    (clustset_t* cs, long int size);
-int clustset_destroy (clustset_t* cs);
-long int clustset_in_which(clustset_t* cs, long int which);
-long int clustset_addnode (clustset_t* cs);
-long int clustset_rng     (clustset_t* cs);
-long int clustset_merge   (clustset_t* cs, long int first,  long int second);
-long int clustset_size    (clustset_t* cs);
-long int clustset_nodes   (clustset_t* cs);
-long int clustset_csize   (clustset_t* cs, long int which);
-dqueue_t* clustset_csizes  (clustset_t* cs);
-
-/**
- */
-
-typedef struct s_vector {
-  long int* stor_begin;
-  long int* stor_end;
-  long int* end;
-} vector_t;
-
-int vector_init      (vector_t* v, long int size);
-int vector_destroy   (vector_t* v);
-int vector_reserve   (vector_t* v, long int size);
-int vector_empty     (vector_t* v);
-long int vector_size      (vector_t* v);
-int vector_clear     (vector_t* v);
-int vector_null      (vector_t* v);
-int vector_push_back (vector_t* v, long int e);
-long int vector_e         (vector_t* v, long int pos);
-int vector_set       (vector_t* v, long int pos, long int value);
-int vector_add       (vector_t* v, long int pos, long int value);
-int vector_replace_first(vector_t* v, long int old, long int new);
-long int vector_pop_back(vector_t* v);
-long int vector_find(vector_t* v, long int elem);
-int vector_change(vector_t* v, long int pos1, long int pos2);
-
-typedef struct s_stack {
-  long int* stor_begin;
-  long int* stor_end;
-  long int* end;
-} stack_t;
-
-int stack_init       (stack_t* s, long int size);
-int stack_destroy    (stack_t* s);
-int stack_reserve    (stack_t* s, long int size);
-int stack_empty      (stack_t* s);
-long int stack_size       (stack_t* s);
-int stack_clear      (stack_t* s);
-int stack_push       (stack_t* s, long int elem);
-long int stack_pop        (stack_t* s);
-
-typedef struct s_multiset {
-  long int* stor_begin;
-  long int* stor_end;
-  long int*end;
-} multiset_t;
-
-int multiset_init    (multiset_t* m, long int size);
-int multiset_destroy (multiset_t* m);
-int multiset_reserve (multiset_t* m, long int size);
-int multiset_add     (multiset_t* m, long int elem);
-int multiset_clear   (multiset_t* m);
-long int multiset_choose  (multiset_t* m);
-long int multiset_choose_random(multiset_t* m);
-long int multiset_choose_remove (multiset_t* m);
-long int multiset_choose_remove_random(multiset_t* m);
-long int multiset_size(multiset_t* m);
-int multiset_remove (multiset_t* m, long int elem);
-int multiset_remove_all (multiset_t* m, long int elem);
-long int* multiset_get_vector(multiset_t * m);
-long int multiset_count(multiset_t* m, long int elem);
-long int multiset_count_different(multiset_t* m, long int elem);
-long int multiset_choose_random_different(multiset_t* m, long int elem);
-
-typedef struct s_heap {
-  long int* stor_begin;
-  long int* stor_end;
-  long int* end;
-  int destroy;
-} heap_t;
-
-int heap_init           (heap_t* h, long int size);
-int heap_init_array     (heap_t *t, long int* data, long int len);
-int heap_destroy        (heap_t* h);
-int heap_empty          (heap_t* h);
-int heap_push           (heap_t* h, long int elem);
-long int heap_max       (heap_t* h);
-long int heap_delete_max(heap_t* h);
-long int heap_size      (heap_t* h);
-int heap_reserve        (heap_t* h, long int size);
-
-int heap_i_build(long int* arr, long int size, long int head);
-int heap_i_shift_up(long int* arr, long int size, long int elem);
-int heap_i_sink(long int* arr, long int size, long int head);
-int heap_i_switch(long int* arr, long int e1, long int e2);
-
-typedef struct s_indheap {
-  long int* stor_begin;
-  long int* stor_end;
-  long int* end;
-  int destroy;
-  long int* index_begin;
-} indheap_t;
-
-int indheap_init           (indheap_t* h, long int size);
-int indheap_init_array     (indheap_t *t, long int* data, long int len);
-int indheap_destroy        (indheap_t* h);
-int indheap_empty          (indheap_t* h);
-int indheap_push           (indheap_t* h, long int elem);
-long int indheap_max       (indheap_t* h);
-long int indheap_delete_max(indheap_t* h);
-long int indheap_size      (indheap_t* h);
-int indheap_reserve        (indheap_t* h, long int size);
-long int indheap_max_index(indheap_t *h);
-
-int indheap_i_build(indheap_t* h, long int head);
-int indheap_i_shift_up(indheap_t* h, long int elem);
-int indheap_i_sink(indheap_t* h, long int head);
-int indheap_i_switch(indheap_t* h, long int e1, long int e2);
-
-/* This is a heap containing double elements and 
-   two indices, its intended usage is the storage of
-   weighted edges.
-*/
-
-typedef struct s_indheap_d {
-  double* stor_begin;
-  double* stor_end;
-  double* end;
-  int destroy;
-  long int* index_begin;
-  long int* index2_begin;
-} d_indheap_t;
-
-int d_indheap_init           (d_indheap_t* h, long int size);
-int d_indheap_destroy        (d_indheap_t* h);
-int d_indheap_empty          (d_indheap_t* h);
-int d_indheap_push           (d_indheap_t* h, double elem, 
-			      long int idx, long int idx2);
-double d_indheap_max       (d_indheap_t* h);
-double d_indheap_delete_max(d_indheap_t* h);
-long int d_indheap_size      (d_indheap_t* h);
-int d_indheap_reserve        (d_indheap_t* h, long int size);
-int d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2);
-
-int d_indheap_i_build(d_indheap_t* h, long int head);
-int d_indheap_i_shift_up(d_indheap_t* h, long int elem);
-int d_indheap_i_sink(d_indheap_t* h, long int head);
-int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
+int igraph_running_mean(vector_t *data, vector_t *res, integer_t binwidth);
 
 #endif
-

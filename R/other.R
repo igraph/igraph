@@ -21,13 +21,12 @@
 
 running.mean <- function(v, binwidth) {
 
+  v <- as.numeric(v)
+  binwidth <- as.numeric(binwidth)
   if (length(v) < binwidth) {
     stop("Vector too short for this binwidth.")
   }
   
-  res <- .Call("REST_running_mean", as.numeric(v), as.numeric(binwidth),
-               PACKAGE="igraph");
-  
-  res
+  .Call("R_igraph_running_mean", v, binwidth,
+       PACKAGE="igraph");
 }
-

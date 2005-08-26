@@ -22,31 +22,31 @@
 minimum.spanning.tree <- function(graph, weights=NULL,
                                   algorithm="prim", ...) {
 
-  if (! algorithm %in% c("prim")) {
-    stop("Invalid algorithm")
-  }
+##   if (! algorithm %in% c("prim")) {
+##     stop("Invalid algorithm")
+##   }
 
-  if (is.null(weights)) {
-    if ("weight" %in% get.edge.attribute(graph)) {
-      weights <- "weight"
-    } else {
-      weights <- FALSE
-    }
-  } else if (is.logical(weights) && weights) {
-    weights <- "weight"
-  }
+##   if (is.null(weights)) {
+##     if ("weight" %in% get.edge.attribute(graph)) {
+##       weights <- "weight"
+##     } else {
+##       weights <- FALSE
+##     }
+##   } else if (is.logical(weights) && weights) {
+##     weights <- "weight"
+##   }
   
-  if (is.logical(weights) && !weights) {
-    res <- .Call("REST_minimum_spanning_tree_unweighted",
-                 igraph.c.interface, graph,
-                 PACKAGE="igraph")
-  } else if (algorithm == "prim") {
-    res <- .Call("REST_minimum_spanning_tree_prim", igraph.c.interface,
-                 graph, PACKAGE="igraph")
-  } 
+##   if (is.logical(weights) && !weights) {
+##     res <- .Call("REST_minimum_spanning_tree_unweighted",
+##                  igraph.c.interface, graph,
+##                  PACKAGE="igraph")
+##   } else if (algorithm == "prim") {
+##     res <- .Call("REST_minimum_spanning_tree_prim", igraph.c.interface,
+##                  graph, PACKAGE="igraph")
+##   } 
 
-  # Convert edge list to graph
-  res <- graph(res, n=vcount(graph), directed=FALSE, ...)
+##   # Convert edge list to graph
+##   res <- graph(res, n=vcount(graph), directed=FALSE, ...)
 
-  res
+##   res
 }

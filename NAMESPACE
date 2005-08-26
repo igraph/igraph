@@ -4,124 +4,56 @@
 export(graph.empty, add.edges, add.vertices, delete.edges,
        delete.vertices, vcount, ecount, neighbors)
 
-export(add.graph.attribute,delete.graph.attribute,
-       get.graph.attribute,set.graph.attribute,
-       add.vertex.attribute,delete.vertex.attribute,
-       get.vertex.attribute,set.vertex.attribute,
-       add.edge.attribute,delete.edge.attribute,
-       get.edge.attribute,set.edge.attribute)
+# basic functions, printing
 
-export(igraph.iterator, igraph.next, igraph.get, igraph.end,
-       igraph.prev, igraph.getattr)
+export(is.igraph, are.connected, print.igraph, summary.igraph)
 
-# igraph storage types, indexed edge list
+# structure generators
 
-S3method(graph.empty, indexededgelist.default)
-S3method(add.edges, indexededgelist.default)
-S3method(add.vertices, indexededgelist.default)
-S3method(delete.edges, indexededgelist.default)
-S3method(delete.vertices, indexededgelist.default)
-S3method(vcount, indexededgelist.default)
-S3method(ecount, indexededgelist.default)
-S3method(neighbors, indexededgelist.default)
-       
-S3method(add.graph.attribute, indexededgelist.default)
-S3method(delete.graph.attribute, indexededgelist.default)
-S3method(get.graph.attribute, indexededgelist.default)
-S3method(set.graph.attribute, indexededgelist.default)
-S3method(add.vertex.attribute, indexededgelist.default)
-S3method(delete.vertex.attribute, indexededgelist.default)
-S3method(get.vertex.attribute, indexededgelist.default)
-S3method(set.vertex.attribute, indexededgelist.default)
-S3method(add.edge.attribute, indexededgelist.default)
-S3method(delete.edge.attribute, indexededgelist.default)
-S3method(get.edge.attribute, indexededgelist.default)
-S3method(set.edge.attribute, indexededgelist.default)
+export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice, graph.ring)
 
-S3method(igraph.iterator, indexededgelist.default)
+# games
 
-# common functions, basic not structural operations
-export(is.graph)
-
-# common functions, attribute related
-
-export(g.a, "g.a<-", v.a, "v.a<-", e.a, "e.a<-")
-export(is.directed, igraph.type)
-
-# common functions, screen related 
-
-export(print.graph, summary.graph)
-
-# common functions, basic structural info
-
-export(are.connected)
-
-# common functions, graph generators
-
-export(graph, graph.adjacency, graph.star, graph.lattice, graph.ring,
-       graph.tree)
-
-# common functions, graph generators, games
-
-export(ba.game, barabasi.game, erdos.renyi.game, random.graph.game,
-       degree.sequence.game, growing.random.game, aging.prefatt.game)
-
-# common functions, (not so basic) structural properties
-
-export(diameter, degree, degree.distribution, closeness,
-       shortest.paths, get.shortest.paths, cocitation, bibcoupling,
-       evcent) 
-
-S3method(degree, default)
-S3method(degree, indexededgelist)
-
-# common functions, components and similar
-
-export(clusters, cluster.distribution, subcomponent, subgraph, betweenness,
-       edge.betweenness, is.connected)
-
-# common: conversion
-
-export(get.adjacency, get.edgelist, simplify)
-
-# plotting
-
-export(layout.random, layout.circle, layout.fruchterman.reingold,
-       layout.kamada.kawai, layout.spring)
-
-export(tkplot, 
-       tkplot.close, tkplot.off, tkplot.fit.to.screen, tkplot.reshape,
-       tkplot.export.postscript, tkplot.getcoords, tkplot.center,
-       tkplot.rotate)
-
-export(plot.graph)
-
-# parameters
-
-export(igraph.par)
-
-# foreign file formats
-
-export(read.graph, read.graph.pajek, 
-       read.graph.edgelist, write.graph, write.graph.edgelist)
-
-# fitting
-
-export(power.law.fit)
+export(erdos.renyi.game, random.graph.game, degree.sequence.game,
+       aging.prefatt.game, growing.random.game)
 
 # community structure
 
-export(edge.type.matrix, eb.community, cut.community, modularity,
-       eb.community2)
+export(eb.community, cut.community, edge.type.matrix,
+       modularity, eb.community2)
 
-# other, not graph related
+# conversion
 
-export(running.mean)
+export(get.adjacency, get.edgelist)
 
-# measuring dynamics
+# fitting, other
 
-export(measure.dynamics.idage)
+export(power.law.fit, running.mean)
 
-# minimum spanning tree
+# foreign formats
 
-export(minimum.spanning.tree)
+export(read.graph, write.graph, read.graph.edgelist,
+       write.graph.edgelist, write.graph.lgl)
+
+# layouts
+
+export(layout.random, layout.circle, layout.fruchterman.reingold,
+       layout.spring)
+
+# structural properties
+
+export(subgraph, simplify, degree, degree.distribution, diameter,
+       closeness, subcomponent, betweenness, bibcoupling, cocitation,
+       shortest.paths)
+
+# plotting
+
+export(plot.igraph, tkplot)
+
+# components
+
+export(clusters, cluster.distribution, is.connected)
+
+# centrality
+
+export(evcent)

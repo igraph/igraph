@@ -19,9 +19,9 @@
 #
 ###################################################################
 
-is.graph <- function(graph) {
+is.igraph <- function(graph) {
 
-  res <- (class(graph) == "graph")
+  res <- (class(graph) == "igraph")
 
   res
 }

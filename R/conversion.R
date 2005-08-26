@@ -25,14 +25,14 @@ get.adjacency <- function(graph) {
   res <- matrix(0, vc, vc)
 
   if (vc != 0) {
-    for (i in 1:vc) {
+    for (i in 0:(vc-1)) {
       neis <- neighbors(graph, i, "out")
       if (!is.directed(graph)) {
         loops <- sum(neis==i)
         neis <- neis[ neis!= i]
         neis <- c(neis, rep(i, loops/2))
       }
-      for (n in neis) { res[i, n] <- res[i, n] + 1 }
+      for (n in neis) { res[i+1, n+1] <- res[i+1, n+1] + 1 }
     }
   }
 
@@ -46,7 +46,7 @@ get.edgelist <- function(graph) {
   ix <- 1
   
   if (vc != 0) {
-    for (i in 1:vc) {
+    for (i in 0:(vc-1)) {
       neis <- neighbors(graph, i, "out")
       if (!is.directed(graph)) {
         no.loops <- sum(neis==i)

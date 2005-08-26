@@ -24,18 +24,13 @@
 ###################################################################
 
 clusters <- function(graph, mode="weak") {
-
-  if (is.directed(graph) && mode=="strong") {
-    res <- .Call("REST_strong_components", igraph.c.interface, graph, 
-                 PACKAGE="igraph")
-  } else {
-    res <- .Call("REST_clusters", igraph.c.interface, graph,
-                 PACKAGE="igraph")
+  if (is.character(mode)) {
+    mode <- switch(mode, "weak"=1, "strong"=2)
   }
-
-  res
+  .Call("R_igraph_clusters", graph, as.numeric(mode),
+        PACKAGE="igraph")
 }
-
+  
 cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
                                  ...) {
   
@@ -55,15 +50,10 @@ cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
 }
 
 is.connected <- function(graph, mode="weak") {
-
-  if (is.directed(graph) && mode=="strong") {
-    # This might be non-optimal ????
-    res <- (length(clusters(graph, mode="strong")$csize) == 1)
-  } else {
-    res <- .Call("REST_isconnected", igraph.c.interface, graph,
-                 PACKAGE="igraph")
+  if (is.character(mode)) {
+    mode <- switch(mode, "weak"=1, "strong"=2)
   }
-
-  as.logical(res)
+  .Call("R_igraph_is_connected", graph, as.numeric(mode),
+        PACKAGE="igraph")
 }
-      
+

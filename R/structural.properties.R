@@ -24,45 +24,21 @@
 ###################################################################
 
 diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
-
-  res <- .Call("REST_diameter", igraph.c.interface,
-               graph, as.logical(directed), as.logical(unconnected),
-               PACKAGE="igraph")
-  res
+  .Call("R_igraph_diameter", graph, as.logical(directed),
+        as.logical(unconnected),
+        PACKAGE="igraph")
 }
 
-degree <- function(graph, v=1:vcount(graph), mode="total", loops=TRUE) {
-  tmp <- numeric()
-  class(tmp) <- graph$gal$type
-  UseMethod("degree", tmp)
+degree <- function(graph, v=0:(vcount(graph)-1),
+                   mode="total", loops=TRUE){
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+  }
+  
+  .Call("R_igraph_degree", graph, as.numeric(v), as.numeric(mode),
+        as.logical(loops), PACKAGE="igraph")
 }
   
-degree.default <- function(graph, v=1:vcount(graph), mode="total",
-                           loops=TRUE) {
-
-  res <- numeric(length(v))
-  if (!is.directed(graph) || mode %in% c("out", "total")) {
-    for (i in seq(along=v)) {
-      tmp <- neighbors(graph, v[i], "out")
-      if (!loops)
-        { res[i] <- sum(tmp != v[i]) }
-      else
-        { res[i] <- length(tmp) }
-    }
-  }
-  if (is.directed(graph) && mode %in% c("in", "total")) {
-    for (i in seq(along=v)) {
-      tmp <- neighbors(graph, v[i], "in")
-      if (!loops)
-        { res[i] <- res[i] + sum(tmp != v[i]) }
-      else
-        { res[i] <- res[i]+ length(tmp) }
-    }
-  }
-
-  res
-}
-
 degree.distribution <- function(graph, cumulative=FALSE, ...) {
   
   cs <- degree(graph, ...)
@@ -76,41 +52,43 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
   res
 }
 
-closeness <- function(graph, v=1:vcount(graph), mode="all") {
-
-  res <- .Call("REST_closeness", igraph.c.interface,
-               graph, as.numeric(v), as.character(mode),
-               PACKAGE="igraph")
-  res
+closeness <- function(graph, v=0:(vcount(graph)-1), mode="all") {
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
+  
+  .Call("R_igraph_closeness", graph, as.numeric(v), as.numeric(mode),
+        PACKAGE="igraph")
 }
 
-shortest.paths <- function(graph, v=1:vcount(graph), mode="all") {
+shortest.paths <- function(graph, v=0:(vcount(graph)-1), mode="all") {
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
 
-  res <- .Call("REST_shortest_paths", igraph.c.interface, graph,
-               as.double(v), mode,
-               PACKAGE="igraph")
-  
-  res
+  .Call("R_igraph_shortest_paths", graph, as.double(v), as.numeric(mode),
+        PACKAGE="igraph")
 }
 
 get.shortest.paths <- function(graph, from=1, mode="all") {
 
-  res <- .Call("REST_get_shortest_paths", igraph.c.interface, graph,
-               as.double(from), as.character(mode), PACKAGE="igraph")
+##   res <- .Call("REST_get_shortest_paths", igraph.c.interface, graph,
+##                as.double(from), as.character(mode), PACKAGE="igraph")
 
-  res
+##   res
 }
 
 subcomponent <- function(graph, v, mode="all") {
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
 
-  res <- .Call("REST_subcomponent", igraph.c.interface, graph, v, mode,
-               PACKAGE="igraph")
-  
-  res
+  .Call("R_igraph_subcomponent", graph, as.numeric(v), as.numeric(mode),
+        PACKAGE="igraph")
 }
 
 subgraph <- function(graph, v) {
-  res <- delete.vertices(graph, (1:vcount(graph))[-v])
+  res <- delete.vertices(graph, (0:(vcount(graph)-1))[-v-1])
   res
 }
 
@@ -121,7 +99,7 @@ simplify <- function(graph, remove.loops=TRUE,
   vc <- vcount(res)
   if (remove.loops && vc > 0) {
     remove <- numeric()
-    for (i in 1:vc) {
+    for (i in 0:(vc-1)) {
       neis <- neighbors(graph, i, "out")
       loops <- sum(neis==i)
       if (is.directed(graph)) { loops <- loops*2 }
@@ -131,9 +109,11 @@ simplify <- function(graph, remove.loops=TRUE,
   }
   if (remove.multiple) {
     remove <- numeric()
-    for (i in 1:vc) {
+    for (i in 0:(vc-1)) {
       neis <- neighbors(graph, i, "out")
-      dup <- neis[ duplicated(neis) ]
+      dup <- neis[ duplicated(neis) & neis > i ]
+      l <- sum(neis==i)
+      if (l>2) { dup <- c(dup, rep(i, l/4)) }
       remove <- c(remove, as.numeric(t(matrix(c(rep(i,length(dup)),
                                                 dup), nc=2))))
     }
@@ -143,28 +123,21 @@ simplify <- function(graph, remove.loops=TRUE,
   res
 }
 
-betweenness <- function(graph, v=1:vcount(graph), directed=TRUE) {
-
-  res <- .Call("REST_betweenness", igraph.c.interface,
-               graph, directed, PACKAGE="igraph")
-
-  res <- res[v]
+betweenness <- function(graph, v=0:(vcount(graph)-1), directed=TRUE) {
   
-  if (!directed || !is.directed(graph)) {
-    res <- res/2
-  }
-
-  res  
+  .Call("R_igraph_betweenness", graph, as.numeric(v),
+        as.logical(directed),
+        PACKAGE="igraph")
 }
 
 edge.betweenness <- function(graph, directed=TRUE) {
 
-  res <- .Call("REST_edge_betweenness", igraph.c.interface,
-               graph, directed, PACKAGE="igraph")
+##   res <- .Call("REST_edge_betweenness", igraph.c.interface,
+##                graph, directed, PACKAGE="igraph")
 
-  if (!directed || !is.directed(graph)) {
-    res <- res/2
-  }
+##   if (!directed || !is.directed(graph)) {
+##     res <- res/2
+##   }
 
-  res
+##   res
 }

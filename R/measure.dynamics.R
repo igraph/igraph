@@ -23,46 +23,46 @@
 measure.dynamics.idage <- function(graph, agebins=300,
                                    iterations=5, sd=FALSE) {
 
-  maxind <- max(degree(graph, mode="in"))
+##   maxind <- max(degree(graph, mode="in"))
 
-  st <- rep(1, vcount(graph))
+##   st <- rep(1, vcount(graph))
 
-  # Should we calculate the standard deviation?
-  if (sd && iterations==0)
-    { sd.real <- TRUE }
-  else
-    { sd.real <- FALSE }
+##   # Should we calculate the standard deviation?
+##   if (sd && iterations==0)
+##     { sd.real <- TRUE }
+##   else
+##     { sd.real <- FALSE }
   
-  mes <- .Call("REST_measure_dynamics_idage", igraph.c.interface, graph,
-               st, as.numeric(agebins), as.numeric(maxind), sd=sd.real,
-               PACKAGE="igraph")
-  mes[[1]] <- mes[[1]]/mes[[1]][1,1]  
+##   mes <- .Call("REST_measure_dynamics_idage", igraph.c.interface, graph,
+##                st, as.numeric(agebins), as.numeric(maxind), sd=sd.real,
+##                PACKAGE="igraph")
+##   mes[[1]] <- mes[[1]]/mes[[1]][1,1]  
   
-  for (i in seq(along=numeric(iterations))) {
+##   for (i in seq(along=numeric(iterations))) {
 
-    mes[[1]][is.nan(mes[[1]])] <- 0
-    st <- .Call("REST_measure_dynamics_idage_st", igraph.c.interface,
-                graph, mes[[1]], as.numeric(agebins), as.numeric(maxind),
-                PACKAGE="igraph")
+##     mes[[1]][is.nan(mes[[1]])] <- 0
+##     st <- .Call("REST_measure_dynamics_idage_st", igraph.c.interface,
+##                 graph, mes[[1]], as.numeric(agebins), as.numeric(maxind),
+##                 PACKAGE="igraph")
 
-    # Should we also calculate the standard deviation?
-    if (sd && i==tail(seq(along=numeric(iterations)),1) )
-      { sd.real <- TRUE }
-    else
-      { sd.real <- FALSE }
+##     # Should we also calculate the standard deviation?
+##     if (sd && i==tail(seq(along=numeric(iterations)),1) )
+##       { sd.real <- TRUE }
+##     else
+##       { sd.real <- FALSE }
     
-    mes <- .Call("REST_measure_dynamics_idage", igraph.c.interface, graph,
-                 st, as.numeric(agebins), as.numeric(maxind), sd=sd.real,
-                 PACKAGE="igraph")
-    if (sd.real) {
-      mes[[2]] <- mes[[2]]/mes[[1]][1,1]
-    }
-#    mes[[3]][2:length(mes[[3]])] <- mes[[3]][2:length(mes[[3]])]/mes[[1]][1,1]
-    mes[[1]] <- mes[[1]]/mes[[1]][1,1]
-  }
+##     mes <- .Call("REST_measure_dynamics_idage", igraph.c.interface, graph,
+##                  st, as.numeric(agebins), as.numeric(maxind), sd=sd.real,
+##                  PACKAGE="igraph")
+##     if (sd.real) {
+##       mes[[2]] <- mes[[2]]/mes[[1]][1,1]
+##     }
+## #    mes[[3]][2:length(mes[[3]])] <- mes[[3]][2:length(mes[[3]])]/mes[[1]][1,1]
+##     mes[[1]] <- mes[[1]]/mes[[1]][1,1]
+##   }
 
-  res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
-#  res$ize <- mes[[3]]
-  res
+##   res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+## #  res$ize <- mes[[3]]
+##   res
 }
 

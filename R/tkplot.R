@@ -96,7 +96,7 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
           if (length(vids)==0) return(FALSE)
           
           initialcolor <- ifelse(length(tkp$params$vertex.color)>1,
-                                 tkp$params$vertex.color[vids[1]],
+                                 tkp$params$vertex.color[vids[1]+1],
                                  tkp$params$vertex.color)
           color <- .tkplot.select.color(initialcolor)
           if (color=="") return(FALSE) # Cancel
@@ -110,7 +110,7 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
           if (length(vids)==0) return(FALSE)
 
           initialsize <- ifelse(length(tkp$params$vertex.size)>1,
-                                tkp$params$vertex.size[vids[1]],
+                                tkp$params$vertex.size[vids[1]+1],
                                 tkp$params$vertex.size)
           size <- .tkplot.select.number("Vertex size", initialsize, 1, 20)
           if (is.na(size)) return(FALSE)
@@ -318,9 +318,9 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
       id <- as.numeric(strsplit(tags[pmatch("v-", tags)],
                                 "-", fixed=TRUE)[[1]][2])
       if (is.na(id)) { return() }
-      phi <- pi+atan2(tkp$coords[id,2]-y, tkp$coords[id,1]-x)
+      phi <- pi+atan2(tkp$coords[id+1,2]-y, tkp$coords[id+1,1]-x)
       .tkplot.set.label.degree(tkp.id, id, phi)
-      .tkplot.update.label(tkp.id, id, tkp$coords[id,1], tkp$coords[id,2])
+      .tkplot.update.label(tkp.id, id, tkp$coords[id+1,1], tkp$coords[id+1,2])
     })
   }
   
@@ -599,7 +599,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 }
 
 .tkplot.set.vertex.coords <- function(tkp.id, id, x, y) {
-  cmd <- paste(sep="", "tkp.", tkp.id, "$coords[",id,",]<-c(",x,",",y,")")
+  cmd <- paste(sep="", "tkp.", tkp.id, "$coords[",id+1,",]<-c(",x,",",y,")")
   eval(parse(text=cmd), .tkplot.env)
   TRUE
 }
@@ -609,7 +609,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   
   if (length(tkp$params$label.degree)==1) {
     label.degree <- rep(tkp$params$label.degree, times=vcount(tkp$graph))
-    label.degree[id] <- phi
+    label.degree[id+1] <- phi
     assign("tmp", label.degree, .tkplot.env)
     cmd <- paste(sep="", "tkp.", tkp.id, "$params$label.degree <- tmp")
     eval(parse(text=cmd), .tkplot.env)
@@ -630,10 +630,10 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 .tkplot.create.vertex <- function(tkp.id, id, label, x=0, y=0) {
   tkp <- .tkplot.get(tkp.id)
   vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                        tkp$params$vertex.size[id],
+                        tkp$params$vertex.size[id+1],
                         tkp$params$vertex.size)
   vertex.color <- ifelse(length(tkp$params$vertex.color)>1,
-                         tkp$params$vertex.color[id],
+                         tkp$params$vertex.color[id+1],
                          tkp$params$vertex.color)
   item <- tkcreate(tkp$canvas, "oval", x-vertex.size, y-vertex.size,
                    x+vertex.size, y+vertex.size, width=1,
@@ -642,7 +642,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", item)
   if (!is.na(label)) {
     label.degree <- ifelse(length(tkp$params$label.degree)>1,
-                           tkp$params$label.degree[id],
+                           tkp$params$label.degree[id+1],
                            tkp$params$label.degree)
     label.dist <- tkp$params$label.dist
     label.x <- x+label.dist*cos(label.degree)*
@@ -672,16 +672,16 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   labels <- i.get.labels(tkp$graph, tkp$labels)
 
   mapply(function(v, l, x, y) .tkplot.create.vertex(tkp.id, v, l, x, y),
-         1:n, labels, tkp$coords[,1], tkp$coords[,2])
+         0:(n-1), labels, tkp$coords[,1], tkp$coords[,2])
 }
 
 .tkplot.update.label <- function(tkp.id, id, x, y) {
   tkp <- .tkplot.get(tkp.id)
   vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                        tkp$params$vertex.size[id],
+                        tkp$params$vertex.size[id+1],
                         tkp$params$vertex.size)
   label.degree <- ifelse(length(tkp$params$label.degree)>1,
-                         tkp$params$label.degree[id],
+                         tkp$params$label.degree[id+1],
                          tkp$params$label.degree)
   label.dist <- tkp$params$label.dist
   label.x <- x+label.dist*cos(label.degree)*
@@ -695,7 +695,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 .tkplot.update.vertex <- function(tkp.id, id, x, y) {
   tkp <- .tkplot.get(tkp.id)
   vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                        tkp$params$vertex.size[id],
+                        tkp$params$vertex.size[id+1],
                         tkp$params$vertex.size)
   # Vertex
   tkcoords(tkp$canvas, paste("vertex&&v-", id, sep=""),
@@ -720,7 +720,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 .tkplot.update.vertices <- function(tkp.id) {
   tkp <- .tkplot.get(tkp.id)
   n <- vcount(tkp$graph)
-  mapply(function(v, x, y) .tkplot.update.vertex(tkp.id, v, x, y), 1:n,
+  mapply(function(v, x, y) .tkplot.update.vertex(tkp.id, v, x, y), 0:(n-1),
          tkp$coords[,1], tkp$coords[,2])
 }
 
@@ -728,8 +728,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 .tkplot.create.edge <- function(tkp.id, from, to, id) {
   tkp <- .tkplot.get(tkp.id)  
   arrow <- ifelse(is.directed(tkp$graph), "last", "none")
-  from.c <- tkp$coords[from,]
-  to.c   <- tkp$coords[to,]
+  from.c <- tkp$coords[from+1,]
+  to.c   <- tkp$coords[to+1,]
   edge.color <- ifelse(length(tkp$params$edge.color)>1,
                        tkp$params$edge.color[id],
                        tkp$params$edge.color)
@@ -775,13 +775,13 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   tags <- as.character(tkgettags(tkp$canvas, itemid))
   from <- as.numeric(substring(grep("from-", tags, value=TRUE, fixed=TRUE),6))
   to <- as.numeric(substring(grep("to-", tags, value=TRUE, fixed=TRUE),4))
-  from.c <- tkp$coords[from,]
-  to.c <- tkp$coords[to,]
+  from.c <- tkp$coords[from+1,]
+  to.c <- tkp$coords[to+1,]
   if (is.directed(tkp$graph)) {
     phi <- atan2(to.c[2]-from.c[2], to.c[1]-from.c[1])
     r <- sqrt( (to.c[1]-from.c[1])^2 + (to.c[2]-from.c[2])^2 )
     vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
-                          tkp$params$vertex.size[to],
+                          tkp$params$vertex.size[to+1],
                           tkp$params$vertex.size)
     to.c[1] <- from.c[1] + (r-vertex.size)*cos(phi)
     to.c[2] <- from.c[2] + (r-vertex.size)*sin(phi)
@@ -830,14 +830,14 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   } else if (length(colors)==1) {
     ## Uniform color -> nonuniform color
     colors <- rep(colors, vcount(tkp$graph))
-    colors[vids] <- newcolor
+    colors[vids+1] <- newcolor
     .tkplot.set(tkp.id, "params$vertex.color", colors)
   } else if (length(vids)==vcount(tkp$graph)) {
     ## Non-uniform -> uniform
     .tkplot.set(tkp.id, "params$vertex.color", newcolor)
   } else {
     ## Non-uniform -> non-uniform
-    colors[vids] <- newcolor
+    colors[vids+1] <- newcolor
     .tkplot.set(tkp.id, "params$vertex.color", colors)
   }
 
@@ -900,19 +900,19 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   } else if (length(sizes)==1) {
     ## Uniform size -> nonuniform size
     sizes <- rep(sizes, vcount(tkp$graph))
-    sizes[vids] <- newsize
+    sizes[vids+1] <- newsize
     .tkplot.set(tkp.id, "params$vertex.size", sizes)
   } else if (length(vids)==vcount(tkp$graph)) {
     ## Non-uniform -> uniform
     .tkplot.set(tkp.id, "params$vertex.size", newsize)
   } else {
     ## Non-uniform -> non-uniform
-    sizes[vids] <- newsize
+    sizes[vids+1] <- newsize
     .tkplot.set(tkp.id, "params$vertex.size", sizes)
   }
 
   sapply(vids, function(id) {
-    .tkplot.update.vertex(tkp.id, id, tkp$coords[id,1], tkp$coords[id,2])
+    .tkplot.update.vertex(tkp.id, id, tkp$coords[id+1,1], tkp$coords[id+1,2])
   })
 }
 
