@@ -54,8 +54,73 @@ bool_t igraph_is_directed(igraph_t *graph);
 int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
 		  integer_t mode, bool_t loops);
 
+/* -------------------------------------------------- */
+/* Iterators                                          */
+/* -------------------------------------------------- */
+
+struct igraph_iterator_t;
+
+typedef struct igraph_iterator_t {
+  integer_t type;
+  void *data;
+  int (*next)(igraph_t *graph, struct igraph_iterator_t *it);
+  int (*prev)(igraph_t *graph, struct igraph_iterator_t *it);
+  bool_t (*end)(igraph_t *graph, struct igraph_iterator_t *it);
+  integer_t (*getvertex)(igraph_t *graph, struct igraph_iterator_t *it);
+  integer_t (*getvertexfrom)(igraph_t *graph, struct igraph_iterator_t *it);
+  integer_t (*getvertexto)(igraph_t *graph, struct igraph_iterator_t *it);
+  integer_t (*getvertexnei)(igraph_t *graph, struct igraph_iterator_t *it);
+  integer_t (*getedge)(igraph_t *graph, struct igraph_iterator_t *it);
+} igraph_iterator_t;
+
+/* The constructors & destructor */
+int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it);
+int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it);
+int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
+			  integer_t vid, integer_t mode);
+
+int igraph_iterator_destroy(igraph_t *graph, igraph_iterator_t *it);
+
+/* Generics, common functions */
+int igraph_next(igraph_t *graph, igraph_iterator_t *it);
+int igraph_prev(igraph_t *graph, igraph_iterator_t *it);
+bool_t igraph_end(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_nei(igraph_t *graph, igraph_iterator_t *it);
+
+/* Generics, vertices */
+integer_t igraph_get_vertex(igraph_t *graph, igraph_iterator_t *it);
+
+/* Generics, edges */
+integer_t igraph_get_vertex_from(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_to(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_edge(igraph_t *graph, igraph_iterator_t *it);
+
+/* Specifics, simple vertex iterator */
+int igraph_next_vid(igraph_t *graph, igraph_iterator_t *it);
+int igraph_prev_vid(igraph_t *graph, igraph_iterator_t *it);
+bool_t igraph_end_vid(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_vid(igraph_t *graph, igraph_iterator_t *it);
+
+/* Specifics, simple edge iterator */
+int igraph_next_eid(igraph_t *graph, igraph_iterator_t *it);
+int igraph_prev_eid(igraph_t *graph, igraph_iterator_t *it);
+bool_t igraph_end_eid(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_from_eid(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_to_eid(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_edge_eid(igraph_t *graph, igraph_iterator_t *it); 
+
+/* Iterates over the edges to and/or from a vertex */
+int igraph_next_eneis(igraph_t *graph, igraph_iterator_t *it);
+int igraph_prev_eneis(igraph_t *graph, igraph_iterator_t *it);
+bool_t igraph_end_eneis(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_from_eneis(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_to_eneis(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it); 
+int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it, 
+			      integer_t vid, integer_t mode);
+integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it);
+
 /* TODO: attributes */
-/* TODO: iterators  */
 
 /* -------------------------------------------------- */
 /* Error handling                                     */
@@ -83,8 +148,7 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children);
 /* -------------------------------------------------- */
 
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
-			 vector_t *outdist, vector_t *outseq,
-			 bool_t poutpref);
+			 vector_t *outseq, bool_t outpref, bool_t directed);
 int igraph_erdos_renyi_game(igraph_t *graph, integer_t n, real_t p,
 			    bool_t directed, bool_t loops);
 int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
@@ -145,7 +209,7 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, vector_t *res,
 				       integer_t niter, real_t coolexp,
 				       integer_t frame, vector_t *initial,
 				       real_t initemp);
-int igraph_layout_kamada_kawai(igraph_t *graph, vector_t *res,
+int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,
 			       real_t kkconst);

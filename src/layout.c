@@ -21,6 +21,7 @@
 */
 
 #include "igraph.h"
+#include "random.h"
 
 int igraph_layout_random(igraph_t *graph, vector_t *res) {
   /* TODO */
@@ -40,11 +41,70 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, vector_t *res,
   return 0;
 }
 
-int igraph_layout_kamada_kawai(igraph_t *graph, vector_t *res,
+int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,
 			       real_t kkconst) {
-  /* TODO */
+
+  real_t temp, candx, candy;
+  real_t dpot, odis, ndis, osqd, nsqd;
+  long int n,i,j,k;
+  matrix_t elen;
+  vector_t vids;
+
+  /* Define various things */
+  n=igraph_vcount(graph);
+
+  /* Calculate elen, initial x & y */
+
+  RNG_BEGIN();
+
+  matrix_resize(res, n, 2);
+  matrix_init(&elen, n, n);
+  vector_init_seq(&vids, 0, n-1);
+  igraph_shortest_paths(graph, &elen, &vids, 3);
+  vector_destroy(&vids);
+  for (i=0; i<n; i++) {
+    MATRIX(elen, i, i) = sqrt(n);
+    MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
+    MATRIX(*res, i, 1) = RNG_NORMAL(0, n/4.0);
+  }
+  
+  /*Perform the annealing loop*/
+  temp=initemp;
+  for(i=0;i<niter;i++){
+    /*Update each vertex*/
+    for(j=0;j<n;j++){
+      /*Draw the candidate via a gaussian perturbation*/
+      candx=RNG_NORMAL(MATRIX(*res, j, 0),sigma*temp/initemp);
+      candy=RNG_NORMAL(MATRIX(*res, j, 1),sigma*temp/initemp);
+      /*Calculate the potential difference for the new position*/
+      dpot=0.0;
+      for(k=0;k<n;k++)  /*Potential differences for pairwise effects*/
+        if(j!=k){
+          odis=sqrt((MATRIX(*res, j, 0)-MATRIX(*res, k, 0))*
+		    (MATRIX(*res, j, 0)-MATRIX(*res, k, 0))+
+		    (MATRIX(*res, j, 1)-MATRIX(*res, k, 1))*
+		    (MATRIX(*res, j, 1)-MATRIX(*res, k, 1)));
+          ndis=sqrt((candx-MATRIX(*res, k, 0))*(candx-MATRIX(*res, k, 0))+
+		    (candy-MATRIX(*res, k, 1))*(candy-MATRIX(*res, k, 1)));
+          osqd=(odis-MATRIX(elen, j, k))*(odis-MATRIX(elen, j, k));
+          nsqd=(ndis-MATRIX(elen, j, k))*(ndis-MATRIX(elen, j, k));
+          dpot+=kkconst*(osqd-nsqd)/(MATRIX(elen, j, k)*MATRIX(elen, j, k));
+        }
+      /*Make a keep/reject decision*/
+      if(log(RNG_UNIF(0.0,1.0))<dpot/temp){
+        MATRIX(*res, j, 0)=candx;
+        MATRIX(*res, j, 1)=candy;
+      }
+    }
+    /*Cool the system*/
+    temp*=coolexp;
+  }
+
+  RNG_END();
+  matrix_destroy(&elen);
+
   return 0;
 }
 
@@ -54,68 +114,3 @@ int igraph_layout_springs(igraph_t *graph, vector_t *res,
   /* TODO */
   return 0;
 }
-
-/* #include <Rmath.h> */
-
-/* SEXP REST_layout_kamadakawai(SEXP pn, SEXP pniter,  */
-/* 			     SEXP pelen, SEXP pinitemp, SEXP pcoolexp,  */
-/* 			     SEXP pkkconst, SEXP psigma, SEXP px, SEXP py) { */
-
-/*   SEXP result, dim; */
-
-/*   double initemp, coolexp, sigma, temp, candx, candy; */
-/*   double dpot, odis, ndis, osqd, nsqd, kkconst; */
-/*   int niter; */
-/*   long int n,i,j,k; */
-/*   double *x, *y, *elen; */
-
-/*   /\*Define various things*\/ */
-/*   n=R(pn); */
-/*   niter=I(pniter); */
-/*   initemp=R(pinitemp); */
-/*   coolexp=R(pcoolexp); */
-/*   kkconst=R(pkkconst); */
-/*   sigma=R(psigma); */
-/*   x=REAL(px); */
-/*   y=REAL(py); */
-/*   elen=REAL(pelen); */
-/*   GetRNGstate();   /\*Get the RNG state*\/ */
-
-/*   PROTECT(result=NEW_NUMERIC(n*2)); */
-/*   PROTECT(dim=NEW_INTEGER(2)); */
-/*   INTEGER(dim)[0]=n; */
-/*   INTEGER(dim)[1]=2; */
-/*   SET_DIM(result, dim); */
-
-/*   /\*Perform the annealing loop*\/ */
-/*   temp=initemp; */
-/*   for(i=0;i<niter;i++){ */
-/*     /\*Update each vertex*\/ */
-/*     for(j=0;j<n;j++){ */
-/*       /\*Draw the candidate via a gaussian perturbation*\/ */
-/*       candx=rnorm(x[j],sigma*temp/initemp); */
-/*       candy=rnorm(y[j],sigma*temp/initemp); */
-/*       /\*Calculate the potential difference for the new position*\/ */
-/*       dpot=0.0; */
-/*       for(k=0;k<n;k++)  /\*Potential differences for pairwise effects*\/ */
-/*         if(j!=k){ */
-/*           odis=sqrt((x[j]-x[k])*(x[j]-x[k])+(y[j]-y[k])*(y[j]-y[k])); */
-/*           ndis=sqrt((candx-x[k])*(candx-x[k])+(candy-y[k])*(candy-y[k])); */
-/*           osqd=(odis-elen[j+k*n])*(odis-elen[j+k*n]); */
-/*           nsqd=(ndis-elen[j+k*n])*(ndis-elen[j+k*n]); */
-/*           dpot+=kkconst*(osqd-nsqd)/(elen[j+k*n]*elen[j+k*n]); */
-/*         } */
-/*       /\*Make a keep/reject decision*\/ */
-/*       if(log(runif(0.0,1.0))<dpot/temp){ */
-/*         REAL(result)[j  ]=x[j]=candx; */
-/*         REAL(result)[j+n]=y[j]=candy; */
-/*       } */
-/*     } */
-/*     /\*Cool the system*\/ */
-/*     temp*=coolexp; */
-/*   } */
-/*   PutRNGstate();   /\*Update the RNG*\/ */
-
-/*   UNPROTECT(2); */
-/*   return result; */
-/* } */

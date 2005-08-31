@@ -130,14 +130,8 @@ betweenness <- function(graph, v=0:(vcount(graph)-1), directed=TRUE) {
         PACKAGE="igraph")
 }
 
-edge.betweenness <- function(graph, directed=TRUE) {
+edge.betweenness <- function(graph, v=0:(ecount(graph)-1), directed=TRUE) {
 
-##   res <- .Call("REST_edge_betweenness", igraph.c.interface,
-##                graph, directed, PACKAGE="igraph")
-
-##   if (!directed || !is.directed(graph)) {
-##     res <- res/2
-##   }
-
-##   res
+  .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
+        PACKAGE="igraph")[ v+1 ]  
 }

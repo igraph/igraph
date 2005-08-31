@@ -526,3 +526,94 @@ SEXP R_igraph_lattice(SEXP pdimvector, SEXP pnei, SEXP pdirected,
   UNPROTECT(1);
   return result;  
 }
+
+SEXP R_igraph_barabasi_game(SEXP pn, SEXP pm, SEXP poutseq,
+			    SEXP poutpref, SEXP pdirected) {
+  
+  igraph_t g;
+  integer_t n=REAL(pn)[0];
+  integer_t m=REAL(pm)[0]; 
+  vector_t outseq=vector_as_vector(REAL(poutseq), GET_LENGTH(poutseq));
+  bool_t outpref=LOGICAL(poutpref)[0];
+  bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result;
+  
+  igraph_barabasi_game(&g, n, m, &outseq, outpref, directed);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+  
+SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp, 
+				  SEXP pcoolexp, SEXP pkkconst, SEXP psigma) {
+  
+  igraph_t g;
+  integer_t niter=REAL(pniter)[0];
+  real_t initemp=REAL(pinitemp)[0];
+  real_t coolexp=REAL(pcoolexp)[0];
+  real_t kkconst=REAL(pkkconst)[0];
+  real_t sigma=REAL(psigma)[0];
+  matrix_t res;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  matrix_init(&res, 0, 0);
+  igraph_layout_kamada_kawai(&g, &res, niter, sigma, 
+			     initemp, coolexp, kkconst);
+  PROTECT(result=R_matrix_to_SEXP(&res));
+  matrix_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}
+  
+SEXP R_igraph_minimum_spanning_tree_unweighted(SEXP graph) {
+  
+  igraph_t g;
+  igraph_t mst;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_minimum_spanning_tree_unweighted(&g, &mst);
+  PROTECT(result=R_igraph_to_SEXP(&mst));
+  igraph_destroy(&mst);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_minimum_spanning_tree_prim(SEXP graph, SEXP pweights) {
+  
+  igraph_t g;
+  igraph_t mst;
+  vector_t weights=vector_as_vector(REAL(pweights), GET_LENGTH(pweights));
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_minimum_spanning_tree_prim(&g, &mst, &weights);
+  PROTECT(result=R_igraph_to_SEXP(&mst));
+  igraph_destroy(&mst);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_edge_betweenness(SEXP graph, SEXP pdirected) {
+  
+  igraph_t g;
+  vector_t res;
+  bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  vector_init(&res, 0);
+  igraph_edge_betweenness(&g, &res, directed);
+  PROTECT(result=NEW_NUMERIC(vector_size(&res)));
+  vector_copy_to(&res, REAL(result));
+  
+  vector_destroy(&res);
+  UNPROTECT(1);
+  return result;
+}

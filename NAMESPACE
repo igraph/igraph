@@ -15,7 +15,7 @@ export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice, graph.ring
 # games
 
 export(erdos.renyi.game, random.graph.game, degree.sequence.game,
-       aging.prefatt.game, growing.random.game)
+       aging.prefatt.game, growing.random.game, barabasi.game)
 
 # community structure
 
@@ -38,13 +38,13 @@ export(read.graph, write.graph, read.graph.edgelist,
 # layouts
 
 export(layout.random, layout.circle, layout.fruchterman.reingold,
-       layout.spring)
+       layout.spring, layout.kamada.kawai)
 
 # structural properties
 
 export(subgraph, simplify, degree, degree.distribution, diameter,
        closeness, subcomponent, betweenness, bibcoupling, cocitation,
-       shortest.paths)
+       shortest.paths, minimum.spanning.tree, edge.betweenness)
 
 # plotting
 

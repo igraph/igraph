@@ -342,9 +342,6 @@ bool_t igraph_is_directed(igraph_t *graph) {
 int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
 		  integer_t pmode, bool_t loops) {
 
-/* SEXP REST_indexededgelist_degree(SEXP interface, SEXP graph,  */
-/* 				 SEXP vids, SEXP pmode, SEXP ploops) { */
-  
   long int nodes_to_calc;
   long int i, j;
   long int mode;

@@ -22,74 +22,73 @@
 
 #include "igraph.h"
 #include "random.h"
+#include "memory.h"
 
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
-			 vector_t *outdist, vector_t *outseq,
-			 bool_t outpref) {
+			 vector_t *outseq, bool_t outpref, bool_t directed) {
 
 /* SEXP REST_ba_game(SEXP pn, SEXP pm, SEXP outseq, SEXP poutpref) { */
   
-/*   long int no_of_nodes=n; */
-/*   long int no_of_neighbors; */
-/*   int outpref; */
-/*   long int *bag; */
-/*   long int bagp; */
-/*   long int no_of_edges; */
+  long int no_of_nodes=n;
+  long int no_of_neighbors;
+  long int *bag;
+  long int bagp;
+  long int no_of_edges;
+  vector_t edges;
   
-/*   long int resp=0; */
+  long int resp=0;
 
-/*   long int i,j; */
+  long int i,j;
 
-/*   if (!isNull(pm)) { no_of_neighbors=R(pm); } */
-/*   outpref=LOGICAL(poutpref)[0]; */
+  if (vector_size(outseq) == 0) {
+    no_of_neighbors=m;
+    bag=Calloc(no_of_nodes * no_of_neighbors + no_of_nodes +
+	       outpref * no_of_nodes * no_of_neighbors,
+	       long int);
+    no_of_edges=(no_of_nodes-1)*no_of_neighbors;
+  } else {
+    no_of_edges=0;
+    for (i=1; i<vector_size(outseq); i++) {
+      no_of_edges+=VECTOR(*outseq)[i];
+    }
+    bag=Calloc(no_of_nodes + no_of_edges + outpref * no_of_edges,
+	       long int);
+  }
   
-/*   if (isNull(outseq)) { */
-/*     bag=(long int*) R_alloc(no_of_nodes * no_of_neighbors + no_of_nodes + */
-/* 			    outpref * no_of_nodes * no_of_neighbors, */
-/* 			    sizeof(long int)); */
-/*     no_of_edges=(no_of_nodes-1)*no_of_neighbors; */
-/*   } else { */
-/*     no_of_edges=0; */
-/*     for (i=1; i<GET_LENGTH(outseq); i++) { */
-/*        no_of_edges+=REAL(outseq)[i]; */
-/*     } */
-/*     bag=(long int*) R_alloc(no_of_nodes + no_of_edges + outpref * no_of_edges, */
-/* 			    sizeof(long int)); */
-/*   } */
+  vector_init(&edges, no_of_edges*2);
   
-/*   PROTECT(result=NEW_NUMERIC(no_of_edges*2)); */
+  /* The first node */
+
+  bagp=0;
+  bag[bagp++]=0;
   
-/*   /\* The first node *\/ */
+  RNG_BEGIN();
 
-/*   bagp=0; */
-/*   bag[bagp++]=0; */
+  /* and the others */
   
-/*   GetRNGstate(); */
+  for (i=1; i<no_of_nodes; i++) {
+    /* draw edges */
+    if (vector_size(outseq)!=0) { no_of_neighbors=VECTOR(*outseq)[i]; }
+    for (j=0; j<no_of_neighbors; j++) {
+      long int to=bag[RNG_INTEGER(0, bagp-1)];
+      VECTOR(edges)[resp++] = i;
+      VECTOR(edges)[resp++] = to;
+    }
+    /* update bag */
+    bag[bagp++] = i;
+    for (j=0; j<no_of_neighbors; j++) {
+      bag[bagp++] = VECTOR(edges)[resp-2*j-1];
+      if (outpref) {
+	bag[bagp++] = i;
+      }
+    }
+  }
 
-/*   /\* and the others *\/ */
-  
-/*   for (i=1; i<no_of_nodes; i++) { */
-/*     /\* draw edges *\/ */
-/*     if (isNull(pm)) { no_of_neighbors=(long int) (REAL(outseq)[i]); } */
-/*     for (j=0; j<no_of_neighbors; j++) { */
-/*       long int to=bag[RNG_INTEGER(0, bagp-1)]; */
-/*       REAL(result)[resp++] = i+1; */
-/*       REAL(result)[resp++] = to+1; */
-/*     } */
-/*     /\* update bag *\/ */
-/*     bag[bagp++] = i; */
-/*     for (j=0; j<no_of_neighbors; j++) { */
-/*       bag[bagp++] = (long int) REAL(result)[resp-2*j-1]-1; */
-/*       if (outpref) { */
-/* 	bag[bagp++] = i; */
-/*       } */
-/*     } */
-/*     R_CheckUserInterrupt(); */
-/*   } */
+  RNG_END();
 
-/*   PutRNGstate(); */
-
-  /* This is it, clean */
+  Free(bag);  
+  igraph_create(graph, &edges, 0, directed);
+  vector_destroy(&edges);
 
   return 0;
 }

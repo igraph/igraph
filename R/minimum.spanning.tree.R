@@ -20,33 +20,15 @@
 ###################################################################
 
 minimum.spanning.tree <- function(graph, weights=NULL,
-                                  algorithm="prim", ...) {
+                                  algorithm="unweighted", ...) {
 
-##   if (! algorithm %in% c("prim")) {
-##     stop("Invalid algorithm")
-##   }
-
-##   if (is.null(weights)) {
-##     if ("weight" %in% get.edge.attribute(graph)) {
-##       weights <- "weight"
-##     } else {
-##       weights <- FALSE
-##     }
-##   } else if (is.logical(weights) && weights) {
-##     weights <- "weight"
-##   }
-  
-##   if (is.logical(weights) && !weights) {
-##     res <- .Call("REST_minimum_spanning_tree_unweighted",
-##                  igraph.c.interface, graph,
-##                  PACKAGE="igraph")
-##   } else if (algorithm == "prim") {
-##     res <- .Call("REST_minimum_spanning_tree_prim", igraph.c.interface,
-##                  graph, PACKAGE="igraph")
-##   } 
-
-##   # Convert edge list to graph
-##   res <- graph(res, n=vcount(graph), directed=FALSE, ...)
-
-##   res
+  if (algorithm=="unweighted") {
+    .Call("R_igraph_minimum_spanning_tree_unweighted", graph,
+          PACKAGE="igraph")
+  } else if (algorithm=="prim") {
+    .Call("R_igraph_minimum_spanning_tree_prim", graph, as.numeric(weights),
+          PACKAGE="igraph")    
+  } else {
+    error("Invalid algorithm")
+  }
 }

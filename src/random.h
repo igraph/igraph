@@ -25,10 +25,22 @@
 
 #include <stdlib.h>
 
-/* TODO: better random number generation, include interfaces */
+#ifdef USING_R
+
+#define RNG_BEGIN()       GetRNGstate()
+#define RNG_END()         PutRNGstate()
+#define RNG_INTEGER(l, h) ((long int)(unif_rand()*((h)-(l)+1)+(l)))
+#define RNG_NORMAL(m, s)  (norm_rand()*(s)+(m))
+#define RNG_UNIF(l, h)    (unif_rand()*((h)-(l))+(l))
+
+#else
 
 #define RNG_BEGIN()
-#define RNG_END()
-#define RNG_INTEGER(l, h) ((long int)((double)rand()/RAND_MAX*((h)-(l)+1)+(l)))
+#define RNG_END()  
+#define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
+#define RNG_NORMAL(m, s)  (igraph_norm_rand()*(s)+(m))
+#define RNG_UNIF(l, h)    (rand()/((double)RAND_MAX+1)*(double)((h)-(l))+l)
+double igraph_norm_rand(void);
+#endif
 
 #endif

@@ -467,6 +467,16 @@ real_t vector_prod(vector_t *v) {
   return res;
 }
 
+int vector_init_seq(vector_t *v, real_t from, real_t to) {
+  real_t *p;
+  vector_init(v, to-from+1);
+  for (p=v->stor_begin; p<v->end; p++) {
+    *p = from++;
+  }
+  
+  return 0;
+}
+
 int matrix_init(matrix_t *m, long int nrow, long int ncol) {
   vector_init(&m->data, nrow*ncol);
   m->nrow=nrow;
