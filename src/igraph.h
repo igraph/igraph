@@ -177,7 +177,7 @@ int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids,
 		     integer_t mode);
 int igraph_shortest_paths(igraph_t *graph, matrix_t *res, 
 			  vector_t *from, integer_t mode);
-int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
+int igraph_get_shortest_paths(igraph_t *graph, vector_t **res,
 			      vector_t *from, integer_t mode);
 int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vid, 
 			integer_t mode);
