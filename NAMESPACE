@@ -44,7 +44,8 @@ export(layout.random, layout.circle, layout.fruchterman.reingold,
 
 export(subgraph, simplify, degree, degree.distribution, diameter,
        closeness, subcomponent, betweenness, bibcoupling, cocitation,
-       shortest.paths, minimum.spanning.tree, edge.betweenness)
+       shortest.paths, minimum.spanning.tree, edge.betweenness,
+       get.shortest.paths)
 
 # plotting
 
@@ -57,3 +58,8 @@ export(clusters, cluster.distribution, is.connected)
 # centrality
 
 export(evcent)
+
+# dynamics measurement
+
+export(measure.dynamics.idage)
+

@@ -21,226 +21,192 @@
 */
 
 #include "igraph.h"
+#include "memory.h"
 
-int igraph_measure_dynamics_idage(igraph_t *graph, real_t *res, 
-				  vector_t *st, integer_t agebins,
-				  integer_t maxind, bool_t sd) {
-  /* TODO */
+int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl,
+				  matrix_t *sd,
+				  vector_t *st, integer_t pagebins,
+				  integer_t pmaxind, bool_t lsd) {
+
+  long int agebins=pagebins;
+  long int maxind=pmaxind;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth;
+  
+  int *indegree;
+  matrix_t ntkl, ch, normfact, notnull;
+  vector_t neis;
+  
+  long int node;
+  long int i, j, k;
+  long int edges=0;
+
+/*   int mptr=1; int m_x=3, m_y=10; */
+  
+  binwidth = no_of_nodes/agebins+1;
+
+  vector_init(&neis, 0);
+  indegree=Calloc(no_of_nodes, int);
+  matrix_resize(akl, maxind+1, agebins);
+  matrix_null(akl);
+  if (lsd) {
+    matrix_resize(sd, maxind+1, agebins);
+    matrix_null(sd);
+  }
+/*   SET_VECTOR_ELT(result, 2, NEW_NUMERIC(10000)); */
+/*   memset(REAL(VECTOR_ELT(result,2)), 0, sizeof(double)*10000); */
+  matrix_init(&ntkl, maxind+1, agebins+1);
+  matrix_init(&ch, maxind+1, agebins+1);
+  matrix_init(&normfact, maxind+1, agebins);
+  matrix_init(&notnull, maxind+1, agebins);
+
+  for (node=0; node<no_of_nodes; node++) {
+    
+    /* inspect the edges */
+   
+    igraph_neighbors(graph, &neis, node, 1);
+    for (i=0; i<vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+/*       if (xidx+1 >= maxind+1 || yidx >=agebins) {  */
+/* 	printf("GEBAASZ: %li %li %li %li %li %li\n", node, to, xidx+1, maxind+1, yidx, agebins);  */
+/*       } */
+      
+      double xk=VECTOR(*st)[node]/MATRIX(ntkl, xidx, yidx);
+      double oldm=MATRIX(*akl, xidx, yidx);
+      MATRIX(notnull, xidx, yidx) += 1;
+      MATRIX(*akl, xidx, yidx) += (xk-oldm)/MATRIX(notnull, xidx, yidx);
+      if (lsd) {
+	MATRIX(*sd, xidx, yidx) += (xk-oldm)*(xk-MATRIX(*akl, xidx, yidx));
+      }
+
+/*       if (xidx==m_x && yidx==m_y) { */
+/* 	REAL(VECTOR_ELT(result, 2))[mptr++] = xk; */
+/*       } */
+
+      indegree[to] ++;
+      MATRIX(ntkl, xidx, yidx)--;
+      if (MATRIX(ntkl,xidx, yidx)==0) {
+	MATRIX(normfact, xidx, yidx) += (edges-MATRIX(ch, xidx, yidx)+1);
+	MATRIX(ch, xidx, yidx)=edges;
+      }
+      MATRIX(ntkl, xidx+1, yidx)++;
+      if (MATRIX(ntkl, xidx+1, yidx)==1) {
+	MATRIX(ch, xidx+1, yidx)=edges;
+      }
+      edges++;
+    }
+
+    /* new node, aging */
+    MATRIX(ntkl, 0, 0)++;
+    if (MATRIX(ntkl, 0, 0)==1) {
+      MATRIX(ch, 0, 0)=edges;
+    }
+    for (k=1; node-binwidth*k+1 >=1; k++) {
+      long int shnode=node-binwidth*k;
+      long int deg=indegree[shnode];
+      MATRIX(ntkl, deg, k-1)--;
+      if (MATRIX(ntkl, deg, k-1)==0) {
+	MATRIX(normfact, deg, k-1) += (edges-MATRIX(ch, deg, k-1)+1);
+	MATRIX(ch, deg, k-1)=edges;
+      }
+      MATRIX(ntkl, deg, k)++;
+      if (MATRIX(ntkl, deg, k)==1) {
+	MATRIX(ch, deg, k)=edges;
+      }
+/*       if (deg >= maxind+1 || k >=agebins) {  */
+/* 	printf("GEBAASZ 2: %li %li %li %li %li\n", node, */
+/* 	       deg, maxind+1, k, agebins); */
+/*       } */
+    }
+  }
+
+  /* Ok, measurement done, update change */
+  for (i=0; i<maxind+1; i++) {
+    for (j=0; j<agebins; j++) {
+      if (MATRIX(ntkl, i, j) != 0) {
+	MATRIX(normfact, i, j) += (edges-MATRIX(ch, i, j)+1);
+      }
+      MATRIX(*akl, i, j) *= MATRIX(notnull, i, j) / MATRIX(normfact, i, j);
+      if (lsd) {
+	MATRIX(*sd, i, j) +=
+	  MATRIX(*akl, i, j)*MATRIX(*akl,i,j)*
+	  (MATRIX(normfact,i,j)/MATRIX(notnull,i,j)-1);
+	if (MATRIX(normfact,i,j) > 0) {
+	  MATRIX(*sd, i, j) =
+	    sqrt(MATRIX(*sd, i, j)/(MATRIX(normfact,i,j)-1));
+	  MATRIX(*sd, i, j) =
+	    2 * MATRIX(*sd,i,j)/sqrt(MATRIX(normfact,i,j));
+	}
+      }
+    }
+  }
+
+/*   REAL(VECTOR_ELT(result,2))[0]=RMATRIX(normfact, m_x, m_y); */
+/*   for (i=1; i<mptr; i++) { */
+/*     REAL(VECTOR_ELT(result, 2))[i] /= RMATRIX(normfact, m_x, m_y); */
+/*   } */
+  
+  Free(indegree);
+  matrix_destroy(&ntkl);
+  matrix_destroy(&ch);
+  matrix_destroy(&normfact);
+  matrix_destroy(&notnull);
+  vector_destroy(&neis);
+
   return 0;
 }
 
-int igraph_measure_dynamics_idage_st(igraph_t *graph, real_t *res,
-				     vector_t *akl, integer_t agebins,
-				     integer_t maxind) {
-  /* TODO */
+int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
+				     matrix_t *akl) {
+
+  long int maxind=matrix_nrow(akl);
+  long int agebins=matrix_ncol(akl);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth;
+  
+  int *indegree;
+  vector_t neis;
+  
+  long int node;
+  long int i, j, k;
+
+  vector_init(&neis, 0);
+  
+  indegree=Calloc(no_of_nodes, int);
+  binwidth=no_of_nodes/agebins+1;
+  
+  vector_resize(res, no_of_nodes);
+  vector_null(res);
+  VECTOR(*res)[0]=MATRIX(*akl, 0, 0);
+
+  for (node=1; node<no_of_nodes; node++) {
+    
+    /* new node, aging */
+    VECTOR(*res)[node] = VECTOR(*res)[node-1] + MATRIX(*akl, 0, 0);
+    for (k=1; node-binwidth*k+1 >= 1; k++) {
+      long int shnode=node-binwidth*k;
+      long int deg=indegree[shnode];
+      VECTOR(*res)[node] += -MATRIX(*akl, deg, k-1)+MATRIX(*akl, deg, k);
+    }
+    
+    /* inspect the outgoing edges */
+    igraph_neighbors(graph, &neis, node, 1);
+    for (i=0; i<vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+      
+      indegree[to] ++;
+      
+      VECTOR(*res)[node] +=
+	-MATRIX(*akl, xidx, yidx) + MATRIX(*akl, xidx+1, yidx);
+    }
+  }
+  
+  vector_destroy(&neis);
+  Free(indegree);
+  
   return 0;
 }
-
-/* SEXP REST_measure_dynamics_idage(SEXP interface, SEXP graph, SEXP st, */
-/* 				 SEXP pagebins, SEXP pmaxind, SEXP psd) { */
-  
-/*   REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph); */
-  
-/*   SEXP result; */
-/*   SEXP akl, sd; */
-/*   long int agebins; */
-/*   long int maxind; */
-/*   long int no_of_nodes; */
-/*   long int binwidth; */
-  
-/*   int *indegree; */
-/*   SEXP ntkl, ch, normfact, notnull; */
-/*   SEXP tmp, outmode; */
-/*   SEXP neis; */
-  
-/*   long int node; */
-/*   long int i, j, k; */
-/*   long int edges=0; */
-/*   int lsd; */
-
-/* /\*   int mptr=1; int m_x=3, m_y=10; *\/ */
-  
-/*   agebins=R(pagebins); */
-/*   maxind=R(pmaxind); */
-/*   no_of_nodes=R(ptrtable.vcount(interface, graph)); */
-/*   indegree=(int*) R_alloc(no_of_nodes, sizeof(int)); */
-/*   memset(indegree, 0, sizeof(int)*no_of_nodes); */
-/*   binwidth=(long int) ceil(((double)(no_of_nodes-1))/agebins); */
-/*   lsd=LOGICAL(psd)[0]; */
-
-/*   PROTECT(result=NEW_LIST(3)); */
-/*   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(agebins*(maxind+1))); */
-/*   akl=VECTOR_ELT(result, 0); */
-/*   if (lsd) {  */
-/*     SET_VECTOR_ELT(result, 1, NEW_NUMERIC(agebins*(maxind+1))); */
-/*     sd=VECTOR_ELT(result, 1); */
-/*   } else { */
-/*     SET_VECTOR_ELT(result, 1, NULL_USER_OBJECT); */
-/*   } */
-/* /\*   SET_VECTOR_ELT(result, 2, NEW_NUMERIC(10000)); *\/ */
-/* /\*   memset(REAL(VECTOR_ELT(result,2)), 0, sizeof(double)*10000); *\/ */
-/*   PROTECT(ntkl=NEW_NUMERIC(agebins*(maxind+1))); */
-/*   PROTECT(ch=NEW_NUMERIC(agebins*(maxind+1))); */
-/*   PROTECT(normfact=NEW_NUMERIC(agebins*(maxind+1))); */
-/*   PROTECT(notnull=NEW_NUMERIC(agebins*(maxind+1))); */
-/*   memset(REAL(akl), 0, sizeof(double)*agebins*(maxind+1)); */
-/*   memset(REAL(ntkl), 0, sizeof(double)*agebins*(maxind+1)); */
-/*   memset(REAL(ch), 0, sizeof(double)*agebins*(maxind+1)); */
-/*   memset(REAL(normfact), 0, sizeof(double)*agebins*(maxind+1)); */
-/*   memset(REAL(notnull), 0, sizeof(double)*agebins*(maxind+1)); */
-
-/*   PROTECT(tmp=NEW_INTEGER(2)); */
-/*   INTEGER(tmp)[0]=maxind+1; */
-/*   INTEGER(tmp)[1]=agebins; */
-/*   SET_DIM(akl, tmp); */
-/*   SET_DIM(ntkl, tmp); */
-/*   SET_DIM(ch, tmp); */
-/*   SET_DIM(normfact, tmp); */
-/*   SET_DIM(notnull, tmp); */
-/*   if (lsd) { */
-/*     SET_DIM(sd, tmp); */
-/*   } */
-  
-/*   PROTECT(outmode=ScalarString(CREATE_STRING_VECTOR("out"))); */
-
-/*   for (node=1; node<=no_of_nodes; node++) { */
-    
-/*     /\* inspect the edges *\/ */
-/*     neis=ptrtable.neighbors(interface, graph, node, outmode); */
-/*     for (i=0; i<GET_LENGTH(neis); i++) { */
-/*       long int to=REAL(neis)[i]; */
-/*       long int xidx=indegree[to-1]+1; */
-/*       long int yidx=(long int) ceil(((double)(node-to))/binwidth); */
-      
-/*       double xk=REAL(st)[node-1]/RMATRIX(ntkl, xidx, yidx); */
-/*       double oldm=RMATRIX(akl, xidx, yidx); */
-/*       RMATRIX(notnull, xidx, yidx) += 1; */
-/*       RMATRIX(akl, xidx, yidx) += (xk-oldm)/RMATRIX(notnull, xidx, yidx); */
-/*       if (lsd) { */
-/* 	RMATRIX(sd, xidx, yidx) += (xk-oldm)*(xk-RMATRIX(akl, xidx, yidx)); */
-/*       } */
-
-/* /\*       if (xidx==m_x && yidx==m_y) { *\/ */
-/* /\* 	REAL(VECTOR_ELT(result, 2))[mptr++] = xk; *\/ */
-/* /\*       } *\/ */
-
-/*       indegree[to-1] ++; */
-/*       RMATRIX(ntkl, xidx, yidx)--; */
-/*       if (RMATRIX(ntkl,xidx, yidx)==0) { */
-/* 	RMATRIX(normfact, xidx, yidx) += (edges-RMATRIX(ch, xidx, yidx)+1); */
-/* 	RMATRIX(ch, xidx, yidx)=edges; */
-/*       } */
-/*       RMATRIX(ntkl, xidx+1, yidx)++; */
-/*       if (RMATRIX(ntkl, xidx+1, yidx)==1) { */
-/* 	RMATRIX(ch, xidx+1, yidx)=edges; */
-/*       } */
-/*       edges++; */
-/*     } */
-
-/*     /\* new node, aging *\/ */
-/*     RMATRIX(ntkl, 1, 1)++; */
-/*     if (RMATRIX(ntkl, 1, 1)==1) { */
-/*       RMATRIX(ch, 1, 1)=edges; */
-/*     } */
-/*     for (k=1; node-1-binwidth*k+1 >=1; k++) { */
-/*       long int shnode=node-1-binwidth*k+1; */
-/*       long int deg=indegree[shnode-1]+1; */
-/*       RMATRIX(ntkl, deg, k)--; */
-/*       if (RMATRIX(ntkl, deg, k)==0) { */
-/* 	RMATRIX(normfact, deg, k) += (edges-RMATRIX(ch, deg, k)+1); */
-/* 	RMATRIX(ch, deg, k)=edges; */
-/*       } */
-/*       RMATRIX(ntkl, deg, k+1)++; */
-/*       if (RMATRIX(ntkl, deg, k+1)==1) { */
-/* 	RMATRIX(ch, deg, k+1)=edges; */
-/*       } */
-/*     } */
-/*   } */
-
-/*   /\* Ok, measurement done, update change *\/ */
-/*   for (i=1; i<=maxind+1; i++) { */
-/*     for (j=1; j<=agebins; j++) { */
-/*       if (RMATRIX(ntkl, i, j) != 0) { */
-/* 	RMATRIX(normfact, i, j) += (edges-RMATRIX(ch, i, j)+1); */
-/*       } */
-/*       RMATRIX(akl, i, j) *= RMATRIX(notnull, i, j) / RMATRIX(normfact, i, j); */
-/*       if (lsd) { */
-/* 	RMATRIX(sd, i, j) +=  */
-/* 	  RMATRIX(akl, i, j)*RMATRIX(akl,i,j)* */
-/* 	  (RMATRIX(normfact,i,j)/RMATRIX(notnull,i,j)-1); */
-/* 	if (RMATRIX(normfact,i,j) > 0) { */
-/* 	  RMATRIX(sd, i, j) =  */
-/* 	    sqrt(RMATRIX(sd, i, j)/(RMATRIX(normfact,i,j)-1)); */
-/* 	  RMATRIX(sd, i, j) =  */
-/* 	    2 * RMATRIX(sd,i,j)/sqrt(RMATRIX(normfact,i,j)); */
-/* 	} */
-/*       } */
-/*     } */
-/*   } */
-
-/* /\*   REAL(VECTOR_ELT(result,2))[0]=RMATRIX(normfact, m_x, m_y); *\/ */
-/* /\*   for (i=1; i<mptr; i++) { *\/ */
-/* /\*     REAL(VECTOR_ELT(result, 2))[i] /= RMATRIX(normfact, m_x, m_y); *\/ */
-/* /\*   } *\/ */
-  
-/*   UNPROTECT(7); */
-/*   return result; */
-/* } */
-
-/* SEXP REST_measure_dynamics_idage_st(SEXP interface, SEXP graph, SEXP akl, */
-/* 				    SEXP pagebins, SEXP pmaxind) { */
-
-/*   REST_i_ptrtable_t ptrtable = REST_i_getptrtable(graph); */
-
-/*   SEXP result; */
-/*   long int agebins; */
-/*   long int maxind; */
-/*   long int no_of_nodes; */
-/*   long int binwidth; */
-  
-/*   int *indegree; */
-/*   SEXP outmode, neis; */
-  
-/*   long int node; */
-/*   long int i, j, k; */
-  
-/*   agebins=R(pagebins); */
-/*   maxind=R(pmaxind); */
-/*   no_of_nodes=R(ptrtable.vcount(interface, graph)); */
-/*   indegree=(int*) R_alloc(no_of_nodes, sizeof(int)); */
-/*   memset(indegree, 0, sizeof(int)*no_of_nodes); */
-/*   binwidth=(long int) ceil(((double)(no_of_nodes-1))/agebins); */
-  
-/*   PROTECT(result=NEW_NUMERIC(no_of_nodes)); */
-/*   memset(REAL(result), 0, sizeof(double)*no_of_nodes); */
-/*   PROTECT(outmode=ScalarString(CREATE_STRING_VECTOR("out"))); */
-/*   REAL(result)[0]=RMATRIX(akl, 1, 1); */
-
-/*   for (node=2; node<=no_of_nodes; node++) { */
-    
-/*     /\* new node, aging *\/ */
-/*     REAL(result)[node-1] = REAL(result)[node-2] + RMATRIX(akl, 1, 1); */
-/*     for (k=1; node-1-binwidth*k+1 >= 1; k++) { */
-/*       long int shnode=node-1-binwidth*k+1; */
-/*       long int deg=indegree[shnode-1]+1; */
-/*       REAL(result)[node-1] += -RMATRIX(akl, deg, k)+RMATRIX(akl, deg, k+1); */
-/*     } */
-    
-/*     /\* inspect the outgoing edges *\/ */
-/*     neis=ptrtable.neighbors(interface, graph, node, outmode); */
-/*     for (i=0; i<GET_LENGTH(neis); i++) { */
-/*       long int to=REAL(neis)[i]; */
-/*       long int xidx=indegree[to-1]+1; */
-/*       long int yidx=(long int) ceil(((double)(node-to))/binwidth); */
-      
-/*       indegree[to-1] ++; */
-      
-/*       REAL(result)[node-1] +=  */
-/* 	-RMATRIX(akl, xidx, yidx) + RMATRIX(akl, xidx+1, yidx); */
-/*     } */
-/*   } */
-  
-/*   UNPROTECT(2); */
-/*   return result; */
-/* } */
-

@@ -29,6 +29,7 @@
 /* Edge iterators */
 #define IGRAPH_ITERATOR_EID   1001
 #define IGRAPH_ITERATOR_ENEIS 1002
+#define IGRAPH_ITERATOR_EFROMORDER 1003
 
 /* Constructors */
 int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it) {  
@@ -55,6 +56,21 @@ int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it) {
   it->getvertexfrom=igraph_get_vertex_from_eid;
   it->getvertexto=igraph_get_vertex_to_eid;
   it->getedge=igraph_get_edge_eid;
+  it->getvertexnei=0;
+  return 0;
+}
+
+int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it) {
+  it->type=IGRAPH_ITERATOR_EFROMORDER;
+  it->data=Calloc(1, real_t);
+  ((real_t*)it->data)[0]=0;
+  it->next=igraph_next_efromorder;
+  it->prev=igraph_prev_efromorder;
+  it->end=igraph_end_vid;
+  it->getvertex=0;
+  it->getvertexfrom=igraph_get_vertex_from_efromorder;
+  it->getvertexto=igraph_get_vertex_to_efromorder;
+  it->getedge=igraph_get_edge_efromorder;
   it->getvertexnei=0;
   return 0;
 }
@@ -108,6 +124,9 @@ int igraph_iterator_destroy(igraph_t *graph, igraph_iterator_t *it) {
     free(it->data); 
     break;
   case IGRAPH_ITERATOR_ENEIS:
+    Free(it->data);
+    break;
+  case IGRAPH_ITERATOR_EFROMORDER:
     Free(it->data);
     break;
   }
@@ -197,6 +216,34 @@ integer_t igraph_get_vertex_to_eid(igraph_t *graph, igraph_iterator_t *it) {
 
 integer_t igraph_get_edge_eid(igraph_t *graph, igraph_iterator_t *it) {
   return ((real_t*)it->data)[0];
+}
+
+int igraph_next_efromorder(igraph_t *graph, igraph_iterator_t *it) {
+  ((real_t*)it->data)[0] += 1;
+}
+
+int igraph_prev_efromorder(igraph_t *graph, igraph_iterator_t *it) {
+  ((real_t*)it->data)[0] -= 1;  
+}
+
+bool_t igraph_end_efromorder(igraph_t *graph, igraph_iterator_t *it) {
+  return ((real_t*)it->data)[0] >= igraph_ecount(graph);
+}
+
+integer_t igraph_get_vertex_from_efromorder(igraph_t *graph, 
+					    igraph_iterator_t *it) {
+  long int idx=VECTOR(graph->oi)[ (long int) ((real_t*)it->data)[0] ];
+  return VECTOR(graph->from)[ idx ];
+}
+
+integer_t igraph_get_vertex_to_efromorder(igraph_t *graph, 
+					  igraph_iterator_t *it) {
+  long int idx=VECTOR(graph->oi)[ (long int) ((real_t*)it->data)[0] ];
+  return VECTOR(graph->to)[ idx ];
+}
+
+integer_t igraph_get_edge_efromorder(igraph_t *graph, igraph_iterator_t *it) {
+  return VECTOR(graph->oi)[ (long int) ((real_t*)it->data)[0] ];
 }
 
 /* Iterates over the edges to and/or from a vertex */

@@ -24,6 +24,7 @@
 #define REST_RANDOM_H
 
 #include <stdlib.h>
+#include <time.h>
 
 #ifdef USING_R
 
@@ -35,7 +36,7 @@
 
 #else
 
-#define RNG_BEGIN()
+#define RNG_BEGIN()       srand(time(0))
 #define RNG_END()  
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 #define RNG_NORMAL(m, s)  (igraph_norm_rand()*(s)+(m))

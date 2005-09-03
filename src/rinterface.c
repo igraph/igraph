@@ -79,6 +79,14 @@ SEXP R_igraph_to_SEXP(igraph_t *graph) {
   return result;
 }
 
+int R_SEXP_to_matrix(SEXP pakl, matrix_t *akl) {
+  akl->data=vector_as_vector(REAL(pakl), GET_LENGTH(pakl));
+  akl->nrow=INTEGER(GET_DIM(pakl))[0];
+  akl->ncol=INTEGER(GET_DIM(pakl))[1];
+
+  return 0;
+}
+ 
 int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
   
   res->n=REAL(VECTOR_ELT(graph, 0))[0];
@@ -95,6 +103,7 @@ int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
 			   GET_LENGTH(VECTOR_ELT(graph, 6)));
   res->is=vector_as_vector(REAL(VECTOR_ELT(graph, 7)), 
 			   GET_LENGTH(VECTOR_ELT(graph, 7)));
+  return 0;
 }
 
 int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
@@ -113,6 +122,7 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
 		   GET_LENGTH(VECTOR_ELT(graph, 6)));
   vector_init_copy(&res->is, REAL(VECTOR_ELT(graph, 7)),
 		   GET_LENGTH(VECTOR_ELT(graph, 7)));
+  return 0;
 }
 
 SEXP R_igraph_empty(SEXP pn, SEXP pdirected) {
@@ -614,6 +624,80 @@ SEXP R_igraph_edge_betweenness(SEXP graph, SEXP pdirected) {
   vector_copy_to(&res, REAL(result));
   
   vector_destroy(&res);
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pst, SEXP pagebins,
+				     SEXP pmaxind, SEXP plsd) {
+  
+  igraph_t g;
+  matrix_t akl, sd;
+  vector_t st=vector_as_vector(REAL(pst), GET_LENGTH(pst));
+  integer_t agebins=REAL(pagebins)[0];
+  integer_t maxind=REAL(pmaxind)[0];
+  bool_t lsd=LOGICAL(plsd)[0];
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  matrix_init(&akl, 0, 0);
+  matrix_init(&sd, 0, 0);
+  igraph_measure_dynamics_idage(&g, &akl, &sd, &st, agebins, maxind, lsd);
+  
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_matrix_to_SEXP(&akl));
+  matrix_destroy(&akl);
+  SET_VECTOR_ELT(result, 1, R_matrix_to_SEXP(&sd));
+  matrix_destroy(&sd);
+
+  UNPROTECT(1);
+  return result;
+}
+  
+SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
+  
+  igraph_t g;
+  matrix_t akl;
+  vector_t res;
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_matrix(pakl, &akl);
+  vector_init(&res, 0);
+  igraph_measure_dynamics_idage_st(&g, &res, &akl);
+  
+  PROTECT(result=NEW_NUMERIC(vector_size(&res)));
+  vector_copy_to(&res, REAL(result));
+  
+  vector_destroy(&res);
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pmode) {
+
+  igraph_t g;
+  integer_t from=REAL(pfrom)[0];
+  integer_t mode=REAL(pmode)[0];
+  vector_t *vects;
+  long int no_of_nodes, i;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  no_of_nodes=igraph_vcount(&g);
+  vects=Calloc(no_of_nodes, vector_t);
+  for (i=0; i<no_of_nodes; i++) {
+    vector_init(&vects[i], 0);
+  }
+  igraph_get_shortest_paths(&g, vects, from, mode);
+  PROTECT(result=NEW_LIST(no_of_nodes));
+  for (i=0; i<no_of_nodes; i++) {
+    SET_VECTOR_ELT(result, i, NEW_NUMERIC(vector_size(&vects[i])));
+    vector_copy_to(&vects[i], REAL(VECTOR_ELT(result, i)));
+    vector_destroy(&vects[i]);
+  }
+  
+  Free(vects);
   UNPROTECT(1);
   return result;
 }

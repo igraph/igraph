@@ -76,6 +76,7 @@ typedef struct igraph_iterator_t {
 /* The constructors & destructor */
 int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it);
+int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
 			  integer_t vid, integer_t mode);
 
@@ -108,6 +109,17 @@ bool_t igraph_end_eid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_from_eid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_to_eid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_edge_eid(igraph_t *graph, igraph_iterator_t *it); 
+
+/* Specifics, edge iterator according to the 'from' order */
+int igraph_next_efromorder(igraph_t *graph, igraph_iterator_t *it);
+int igraph_prev_efromorder(igraph_t *graph, igraph_iterator_t *it);
+bool_t igraph_end_efromorder(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_from_efromorder(igraph_t *graph, 
+					    igraph_iterator_t *it);
+integer_t igraph_get_vertex_to_efromorder(igraph_t *graph, 
+					  igraph_iterator_t *it);
+integer_t igraph_get_edge_efromorder(igraph_t *graph, igraph_iterator_t *it);
+
 
 /* Iterates over the edges to and/or from a vertex */
 int igraph_next_eneis(igraph_t *graph, igraph_iterator_t *it);
@@ -177,8 +189,8 @@ int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids,
 		     integer_t mode);
 int igraph_shortest_paths(igraph_t *graph, matrix_t *res, 
 			  vector_t *from, integer_t mode);
-int igraph_get_shortest_paths(igraph_t *graph, vector_t **res,
-			      vector_t *from, integer_t mode);
+int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
+			      integer_t from, integer_t mode);
 int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vid, 
 			integer_t mode);
 int igraph_subgraph(igraph_t *graph, igraph_t *res, integer_t  mode);
@@ -259,12 +271,12 @@ int igraph_write_graph(igraph_t *graph, const char *filename,
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 
-int igraph_measure_dynamics_idage(igraph_t *graph, real_t *res, 
+int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl, 
+				  matrix_t *sd,
 				  vector_t *st, integer_t agebins,
-				  integer_t maxind, bool_t sd);
-int igraph_measure_dynamics_idage_st(igraph_t *graph, real_t *res,
-				     vector_t *akl, integer_t agebins,
-				     integer_t maxind);
+				  integer_t maxind, bool_t lsd);
+int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
+				     matrix_t *akl);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */

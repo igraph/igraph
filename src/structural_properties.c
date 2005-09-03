@@ -310,69 +310,62 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
   return 0;
 }
 
-int igraph_get_shortest_paths(igraph_t *graph, vector_t **res,
-			      vector_t *from, integer_t mode) {
+int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
+			      integer_t from, integer_t mode) {
 
-/* SEXP REST_get_shortest_paths(SEXP interface, SEXP graph, SEXP pfrom, SEXP pmode) { */
+  long int no_of_nodes=igraph_vcount(graph);
+  long int *father;
   
-/*   SEXP result; */
-  
-/*   long int no_of_nodes; */
-/*   long int *father; */
-/*   long int from; */
-  
-/*   dqueue_t q; */
+  dqueue_t q;
 
-/*   long int i, j; */
-/*   SEXP tmp; */
-
-/*   no_of_nodes=R(ptrtable.vcount(interface, graph)); */
-/*   from=R(pfrom); */
+  long int i, j;
+  vector_t tmp;
   
-/*   father=(long int*) R_alloc(no_of_nodes, sizeof(long int)); */
-/*   memset(father, 0, no_of_nodes*sizeof(long int)); */
+  father=Calloc(no_of_nodes, long int);
+  vector_init(&tmp, 0);
+  dqueue_init(&q, 100);
 
-/*   dqueue_init(&q, 100); */
-
-/*   dqueue_push(&q, from); */
-/*   father[ from-1 ] = from; */
+  dqueue_push(&q, from+1);
+  father[ (long int)from ] = from+1;
   
-/*   while (!dqueue_empty(&q)) { */
-/* 	  long int act=dqueue_pop(&q); */
-	  
-/* 	  tmp=ptrtable.neighbors(interface,graph, act, pmode); */
-/* 	  for (j=0; j<GET_LENGTH(tmp); j++) { */
-/* 		  long int neighbor=REAL(tmp)[j]; */
-/* 		  if (father[neighbor-1] != 0) { continue; } */
-/* 		  father[neighbor-1] = act; */
-/* 		  dqueue_push(&q, neighbor); */
-/* 	  } */
-/*   } */
+  while (!dqueue_empty(&q)) {
+    long int act=dqueue_pop(&q);
     
-/*   /\* Create result object *\/ */
-/*   PROTECT(result=NEW_LIST(no_of_nodes)); */
-/*   for (j=0; j<no_of_nodes; j++) { */
-/* 	  if (father[j]==0) { */
-/* 		  SET_VECTOR_ELT(result, j, NEW_NUMERIC(0)); */
-/* 	  } else { */
-/* 		  long int act=j+1; */
-/* 		  while (father[act-1] != act) { */
-/* 			  dqueue_push(&q, father[act-1]); */
-/* 			  act=father[act-1]; */
-/* 		  } */
-/* 		  act=dqueue_size(&q); */
-/* 		  SET_VECTOR_ELT(result, j, NEW_NUMERIC(act+1)); */
-/* 		  REAL(VECTOR_ELT(result, j))[0] = j+1; */
-/* 		  for (i=1; i<=act; i++) { */
-/* 			  REAL(VECTOR_ELT(result, j))[i] = dqueue_pop(&q); */
-/* 		  } */
-/* 	  } */
-/*   } */
+    igraph_neighbors(graph, &tmp, act-1, mode);
+    for (j=0; j<vector_size(&tmp); j++) {
+      long int neighbor=VECTOR(tmp)[j]+1;
+      if (father[neighbor-1] != 0) { continue; }
+      father[neighbor-1] = act;
+      dqueue_push(&q, neighbor);
+    }
+  }
   
-/*   /\* Clean *\/ */
-/*   dqueue_destroy(&q); */
-
-  /* TODO */
+    
+  for (j=0; j<no_of_nodes; j++) {
+    vector_clear(&res[j]);
+    if (father[j]!=0) {
+      long int act=j+1;
+      long int size=0;
+      while (father[act-1] != act) {
+	size++;
+	act=father[act-1];
+      }
+      size++;
+      vector_resize(&res[j], size);
+      VECTOR(res[j])[--size]=j;
+      act=j+1;
+      while (father[act-1] != act) {
+	VECTOR(res[j])[--size]=father[act-1]-1;
+	act=father[act-1];
+      }
+    }
+  }
+  
+  /* Clean */
+  Free(father);
+  dqueue_destroy(&q);
+  vector_destroy(&tmp);
+  
   return 0;
 }
 
