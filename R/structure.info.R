@@ -20,9 +20,7 @@
 ###################################################################
 
 are.connected <- function(graph, v1, v2) {
-  res <- v2 %in% neighbors(graph, v1, "out")
-  res
+  .Call("R_igraph_are_connected", graph, as.numeric(v1),
+        as.numeric(v2),
+        PACKAGE="igraph")
 }
-
-
-    

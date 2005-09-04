@@ -75,6 +75,8 @@ typedef struct igraph_iterator_t {
 
 /* The constructors & destructor */
 int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it);
+int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it, 
+			  integer_t vid, integer_t mode);
 int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
@@ -101,6 +103,11 @@ int igraph_next_vid(igraph_t *graph, igraph_iterator_t *it);
 int igraph_prev_vid(igraph_t *graph, igraph_iterator_t *it);
 bool_t igraph_end_vid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_vid(igraph_t *graph, igraph_iterator_t *it);
+
+/* Iterates over the neighbors of a vertex */
+int igraph_next_vneis(igraph_t *graph, igraph_iterator_t *it);
+int igraph_end_vneis(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it);
 
 /* Specifics, simple edge iterator */
 int igraph_next_eid(igraph_t *graph, igraph_iterator_t *it);
@@ -193,9 +200,6 @@ int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
 			      integer_t from, integer_t mode);
 int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vid, 
 			integer_t mode);
-int igraph_subgraph(igraph_t *graph, igraph_t *res, integer_t  mode);
-int igraph_simplify(igraph_t *graph, bool_t remove_loops, 
-		    bool_t remove_multiple); 
 int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids, 
 			bool_t directed);
 int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 

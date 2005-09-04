@@ -27,8 +27,6 @@
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
 			 vector_t *outseq, bool_t outpref, bool_t directed) {
 
-/* SEXP REST_ba_game(SEXP pn, SEXP pm, SEXP outseq, SEXP poutpref) { */
-  
   long int no_of_nodes=n;
   long int no_of_neighbors;
   long int *bag;

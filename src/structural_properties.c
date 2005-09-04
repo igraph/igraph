@@ -406,17 +406,6 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
   return 0;
 }
 
-int igraph_subgraph(igraph_t *graph, igraph_t *res, integer_t  mode) {
-  /* TODO */
-  return 0;
-}
-
-int igraph_simplify(igraph_t *graph, bool_t remove_loops, 
-		    bool_t remove_multiple) {
-  /* TODO */
-  return 0;
-}
-
 int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids, 
 			bool_t directed) {
 

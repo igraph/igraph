@@ -21,50 +21,58 @@
 
 
 measure.dynamics.idage <- function(graph, agebins=300,
-                                   iterations=5, sd=FALSE) {
+                                   iterations=5, sd=FALSE,
+                                   estind=NULL, estage=NULL) {
 
   maxind <- max(degree(graph, mode="in"))
 
   st <- rep(1, vcount(graph))
 
-  # Should we calculate the standard deviation?
-  if (sd && iterations==0)
-    { sd.real <- TRUE }
-  else
-    { sd.real <- FALSE }
-  
-  mes <- .Call("R_igraph_measure_dynamics_idage", graph,
-               as.numeric(st), as.numeric(agebins),
-               as.numeric(maxind), sd.real,
-               PACKAGE="igraph")
-  mes[[1]] <- mes[[1]]/mes[[1]][1,1]  
-  
   for (i in seq(along=numeric(iterations))) {
+
+    # Standard deviation only at the last iteration
+    if (sd && i==iterations) {
+      sd.real <- TRUE
+    } else {
+      sd.real <- FALSE
+    }
+
+    if (i==iterations && !is.null(estind) && !is.null(estage)) {
+      mes <- .Call("R_igraph_measure_dynamics_idage_debug", graph,
+                   as.numeric(st), as.numeric(agebins),
+                   as.numeric(maxind), sd.real, as.numeric(estind),
+                   as.numeric(estage),
+                   PACKAGE="igraph")
+    } else {
+      mes <- .Call("R_igraph_measure_dynamics_idage", graph,
+                   as.numeric(st), as.numeric(agebins),
+                   as.numeric(maxind), sd.real,
+                   PACKAGE="igraph")
+    }
+
+    mes[[1]] <- mes[[1]]/mes[[1]][1,1]    
 
     mes[[1]][!is.finite(mes[[1]])] <- 0
     st <- .Call("R_igraph_measure_dynamics_idage_st", graph,
                 mes[[1]], 
                 PACKAGE="igraph")
-
-    # Should we also calculate the standard deviation?
-    if (sd && i==tail(seq(along=numeric(iterations)),1) )
-      { sd.real <- TRUE }
-    else
-      { sd.real <- FALSE }
-    
-    mes <- .Call("R_igraph_measure_dynamics_idage", graph,
-                 as.numeric(st), as.numeric(agebins),
-                 as.numeric(maxind), sd.real,
-                 PACKAGE="igraph")
-    if (sd.real) {
-      mes[[2]] <- mes[[2]]/mes[[1]][1,1]
-    }
-#    mes[[3]][2:length(mes[[3]])] <- mes[[3]][2:length(mes[[3]])]/mes[[1]][1,1]
-    mes[[1]] <- mes[[1]]/mes[[1]][1,1]
   }
 
-  res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
-#  res$ize <- mes[[3]]
+  if (sd.real) {
+    mes[[2]] <- mes[[2]]/mes[[1]][1,1]
+  }
+  if (!is.null(estind) && !is.null(estage)) {
+    mes[[3]] <- mes[[3]]/mes[[1]][1,1]
+    mes[[3]] <- mes[[3]][-length(mes[[3]])]
+  }
+  mes[[1]] <- mes[[1]]/mes[[1]][1,1]
+
+  if (!is.null(estind) && !is.null(estage)) {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], est=mes[[3]])
+  } else {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], est=NULL)
+  }
+  
   res
 }
 

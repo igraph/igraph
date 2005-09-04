@@ -653,6 +653,41 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pst, SEXP pagebins,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst, 
+					   SEXP pagebins, SEXP pmaxind, 
+					   SEXP plsd, SEXP pest_ind, 
+					   SEXP pest_age) {
+  igraph_t g;
+  matrix_t akl, sd;
+  vector_t st=vector_as_vector(REAL(pst), GET_LENGTH(pst));
+  integer_t agebins=REAL(pagebins)[0];
+  integer_t maxind=REAL(pmaxind)[0];
+  bool_t lsd=LOGICAL(plsd)[0];
+  integer_t est_ind=REAL(pest_ind)[0];
+  integer_t est_age=REAL(pest_age)[0];
+  vector_t estimates;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  matrix_init(&akl, 0, 0);
+  matrix_init(&sd, 0, 0);
+  vector_init(&estimates, 0);
+  igraph_measure_dynamics_idage_debug(&g, &akl, &sd, &st, agebins, maxind, lsd,
+				      &estimates, est_ind, est_age);
+  
+  PROTECT(result=NEW_LIST(3));
+  SET_VECTOR_ELT(result, 0, R_matrix_to_SEXP(&akl));
+  matrix_destroy(&akl);
+  SET_VECTOR_ELT(result, 1, R_matrix_to_SEXP(&sd));
+  matrix_destroy(&sd);
+  SET_VECTOR_ELT(result, 2, NEW_NUMERIC(vector_size(&estimates)));
+  vector_copy_to(&estimates, REAL(VECTOR_ELT(result, 2)));
+  vector_destroy(&estimates);
+
+  UNPROTECT(1);
+  return result;
+}
   
 SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
   
@@ -698,6 +733,21 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pmode) {
   }
   
   Free(vects);
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_are_connected(SEXP graph, SEXP pv1, SEXP pv2) {
+  
+  igraph_t g;
+  integer_t v1=REAL(pv1)[0];
+  integer_t v2=REAL(pv2)[0];
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  PROTECT(result=NEW_LOGICAL(1));
+  LOGICAL(result)[0]=igraph_are_connected(&g, v1, v2);
+  
   UNPROTECT(1);
   return result;
 }

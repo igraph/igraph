@@ -247,6 +247,5 @@ int igraph_is_connected_weak(igraph_t *graph, bool_t *res) {
   dqueue_destroy(&q);
   vector_destroy(&neis);
 
-  /* TODO */
   return 0;
 }

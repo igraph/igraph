@@ -23,6 +23,18 @@
 #include "igraph.h"
 
 bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
-  /* TODO */
-  return 0;
+
+  igraph_iterator_t it;
+  bool_t res=0;
+
+  igraph_iterator_vneis(graph, &it, v1, 1);
+  
+  while (!res && !igraph_end(graph, &it)) {
+    res= (igraph_get_vertex(graph, &it) == v2);
+    igraph_next(graph, &it);
+  }
+  
+  igraph_iterator_destroy(graph, &it);  
+  
+  return res;
 }
