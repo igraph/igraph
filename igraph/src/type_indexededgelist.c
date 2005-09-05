@@ -29,6 +29,21 @@
 int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index, 
 			  integer_t nodes);
 
+/** 
+ * \ingroup interface
+ * \brief Creates an empty graph with some vertices and no edges.
+ *
+ * The most basic constructor, all the other constructors should call
+ * this to create a minimal graph object.
+ * @param graph Pointer to a not-yet initialized graph object.
+ * @param n The number of vertices in the graph, a non-negative
+ *          integer number is expected.
+ * @param directed Whether the graph is directed or not.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|)</code> for a graph with
+ * <code>|V|</code> vertices (and no edges).
+ */
 int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
 
   graph->n=0;
@@ -46,6 +61,20 @@ int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
   return 0;
 }
 
+/**
+ * \ingroup interface
+ * \brief Frees the memory allocated for a graph object. 
+ * 
+ * This function should be called for every graph object exactly once.
+ *
+ * This function invalidates all iterators (of course), but the
+ * iterators of are graph should be destroyed before the graph itself
+ * anyway. 
+ * @param graph Pointer to the graph to free.
+ * @return Error code.
+ * 
+ * Time complexity: operating system specific.
+ */
 int igraph_destroy(igraph_t *graph) {
   vector_destroy(&graph->from);
   vector_destroy(&graph->to);
@@ -56,6 +85,26 @@ int igraph_destroy(igraph_t *graph) {
   return 0;
 }
 
+/**
+ * \ingroup interface
+ * \brief Adds edges to a graph object. 
+ * 
+ * The edges are given in a vector, the
+ * first two elements define the first edge (the order is
+ * <code>from</code>, <code>to</code> for directed graphs). The vector
+ * should contain even number of integer numbers between zero and the
+ * number of vertices in the graph minus one (inclusive). If you also
+ * want to add new vertices, call igraph_add_vertices() first.
+ * @param graph The graph to which the edges will be added.
+ * @param edges The edges themselves.
+ * @return Error code.
+ *
+ * This function invalidates all iterators.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code> where <code>|V|</code>
+ * is the number of vertices and <code>|E|</code> is the number of
+ * edges in the \em new, extended graph.
+ */
 int igraph_add_edges(igraph_t *graph, vector_t *edges) {
   long int no_of_edges=vector_size(&graph->from);
   long int edges_to_add=vector_size(edges)/2;
@@ -85,6 +134,20 @@ int igraph_add_edges(igraph_t *graph, vector_t *edges) {
   return 0;
 }
 
+/**
+ * \ingroup interface
+ * \brief Adds vertices to a graph. 
+ *
+ * This function invalidates all iterators.
+ *
+ * @param graph The graph object to extend.
+ * @param nv Non-negative integer giving the number of 
+ *           vertices to add.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|)</code> where <code>|V|</code> is
+ * the number of vertices in the \em new, extended graph.
+ */
 int igraph_add_vertices(igraph_t *graph, integer_t nv) {
   long int ec=igraph_ecount(graph);
   long int i;
@@ -100,6 +163,27 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
   return 0;
 }
 
+/**
+ * \ingroup interface
+ * \brief Removes edges from a graph.
+ *
+ * The edges to remove are given in a vector, the first two numbers
+ * define the first edge, etc. The vector should contain even number
+ * of elements. If an edge to remove is not included in the graph,
+ * that edge will be ignored. (Perhaps not the best approach, this
+ * will likely change, as soon as there will be error handling.
+ * This function cannot remove vertices, they will be kept, even if
+ * they lose all their edges.
+ *
+ * This function invalidates all iterators.
+ * @param graph The graph to work on.
+ * @param edges The edges to remove.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code> where <code>|V|</code>
+ * and <code>|E|</code> are the number of vertices and edges in the
+ * \em original graph, respectively.
+ */
 int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
 
   int directed=graph->directed;
@@ -173,6 +257,25 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
   return 0;
 }
 
+/**
+ * \ingroup interface
+ * \brief Removes vertices (with all their edges) from the graph.
+ *
+ * This function changes the ids of the vertices (except in some very
+ * special cases, but these should not be relied on anyway).
+ *
+ * This function invalidates all iterators.
+ * 
+ * @param graph The graph to work on.
+ * @param vertices The ids of the vertices to remove in a 
+ *                 vector. The vector may contain the same id more
+ *                 than once.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
+ * <code>|E|</code> are the number of vertices and edges in the
+ * original graph.
+ */
 int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
 
   long int no_of_edges=igraph_ecount(graph);
@@ -246,14 +349,57 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
   return 0;
 }
 
+/**
+ * \ingroup interface
+ * \brief The number of vertices in a graph
+ * 
+ * @param graph The graph.
+ * @return Number of vertices.
+ *
+ * Time complexity: <code>O(1)</code>
+ */
 integer_t igraph_vcount(igraph_t *graph) {
   return graph->n;
 }
 
+/**
+ * \ingroup interface
+ * \brief The number of edges in a graph
+ * 
+ * @param graph The graph.
+ * @return Number of edges.
+ *
+ * Time complexity: <code>O(1)</code>
+ */
 integer_t igraph_ecount(igraph_t *graph) {
   return vector_size(&graph->from);
 }
 
+/**
+ * \ingroup interface
+ * \brief Adjacent vertices to a vertex.
+ *
+ * @param graph The graph to work on.
+ * @param neis This vector will contain the result. The vector should
+ *        be initialized before and will be resized.
+ * @param pnode The id of the node of which the adjacent vertices are
+ *        searched. 
+ * @param pmode Defines the way adjacent vertices are searched for
+ *        directed graphs. It can have the following values:
+ *        - <b>1</b>, vertices reachable by an edge from the specified
+ *          vertex are searched,
+ *        - <b>2</b>, vertices from which the specified vertex is reachable
+ *          are searched.
+ *        - <b>3</b>, both kind of vertices are searched.
+ *        This parameter is ignored for undirected graphs.
+ * @return Error code.
+ * 
+ * Note: the 1, 2, 3 values are likely to be substituted by some
+ * meaningful constants.
+ *
+ * Time complexity: <code>O(d)</code>, <code>d</code> is the number
+ * of adjacent vertices to the queried vertex.
+ */
 int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode, 
 		     integer_t pmode) {
 
@@ -296,6 +442,11 @@ int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode,
   return 0;
 }
 
+/**
+ * \ingroup internal
+ * 
+ */
+
 int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index, 
 			  integer_t nodes) {
   
@@ -335,10 +486,46 @@ int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index,
   return 0;
 }
 
+/**
+ * \ingroup interface
+ * \brief Is this a directed graph?
+ *
+ * @param graph The graph.
+ * @return Logical value, <code>TRUE</code> if the graph is directed,
+ * <code>FALSE</code> otherwise.
+ *
+ * Time complexity: <code>O(1)</code>
+ */
+
 bool_t igraph_is_directed(igraph_t *graph) {
   return graph->directed;
 }
 
+/**
+ * \ingroup interface
+ * \brief The degree of some vertices in a graph.
+ *
+ * This function calculates the in-, out- or total degree of the
+ * specified vertices. 
+ * @param graph The graph.
+ * @param res Vector, this will contain the result. It should be
+ *        initialized and will be resized to be the appropriate size.
+ * @param vids Vector, giving the vertex ids of which the degree will
+ *        be calculated.
+ * @param pmode Defined the type of the degree.
+ *        - <b>1</b>, out-degree,
+ *        - <b>2</b>, in-degree,
+ *        - <b>3</b>, total degree (sum of the in- and out-degree).
+ *        This parameter is ignored for undirected graphs. 
+ * @param loops Boolean, gives whether the self-loops should be
+ *        counted.
+ *
+ * Time complexity: <code>O(v)</code> if <code>loops</code> is
+ * <code>TRUE</code>, and <code>O(v*d)</code>
+ * otherwise. <code>v</code> is the number vertices for which the
+ * degree will be calculated, and <code>d</code> is their (average)
+ * degree. 
+ */
 int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
 		  integer_t pmode, bool_t loops) {
 
@@ -348,6 +535,9 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
   
   nodes_to_calc=vector_size(vids);
   mode=pmode;
+  if (!igraph_is_directed(graph)) {
+    mode=3;
+  }
 
   vector_resize(res, nodes_to_calc);
   vector_null(res);
@@ -399,34 +589,34 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
 
 /* #include <stdio.h> */
 
-int print_vector(vector_t *v) {
-  long int i;
-  for (i=0; i<vector_size(v); i++) {
-    printf("%f ", VECTOR(*v)[i]);
-  }
-  printf("\n");
+/* int print_vector(vector_t *v) { */
+/*   long int i; */
+/*   for (i=0; i<vector_size(v); i++) { */
+/*     printf("%f ", VECTOR(*v)[i]); */
+/*   } */
+/*   printf("\n"); */
   
-  return 0;
-}
+/*   return 0; */
+/* } */
 
-int print_igraph(igraph_t *graph) {
-  printf("Nodes: %li\n", (long int)graph->n);
-  printf("Directed: %i\n", (int)graph->directed);
-  printf("From:\n");
-  print_vector(&graph->from);
-  printf("To:\n");
-  print_vector(&graph->to);
-  printf("Oi:\n");
-  print_vector(&graph->oi);
-  printf("Ii:\n");
-  print_vector(&graph->ii);
-  printf("Os:\n");
-  print_vector(&graph->os);
-  printf("Is:\n");
-  print_vector(&graph->is);
-  printf("--------------------------------------\n");
-  return 0;
-}
+/* int print_igraph(igraph_t *graph) { */
+/*   printf("Nodes: %li\n", (long int)graph->n); */
+/*   printf("Directed: %i\n", (int)graph->directed); */
+/*   printf("From:\n"); */
+/*   print_vector(&graph->from); */
+/*   printf("To:\n"); */
+/*   print_vector(&graph->to); */
+/*   printf("Oi:\n"); */
+/*   print_vector(&graph->oi); */
+/*   printf("Ii:\n"); */
+/*   print_vector(&graph->ii); */
+/*   printf("Os:\n"); */
+/*   print_vector(&graph->os); */
+/*   printf("Is:\n"); */
+/*   print_vector(&graph->is); */
+/*   printf("--------------------------------------\n"); */
+/*   return 0; */
+/* } */
 
 /* int main() { */
   

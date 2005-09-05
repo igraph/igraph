@@ -23,6 +23,26 @@
 #include "igraph.h"
 #include "memory.h"
 
+/**
+ * \ingroup structural
+ * \brief Calculates the diameter of a graph (longest geodesic).
+ *
+ * @param graph The graph object.
+ * @param res Pointer to an integer, this will contain the result.
+ * @param directed Boolean, whether to consider directed
+ *        paths. Ignored for undirected graphs.
+ * @param unconn What to do if the graph is not connected. If
+ *        <code>TRUE</code> the longest geodesic within a component
+ *        will be returned, otherwise the number of vertices is
+ *        returned. (The ratio behind the latter is that this is
+ *        always longer than the longest possible diameter is a
+ *        graph.) 
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V||E|)</code>, the number of vertices
+ * times the number of edges.
+ */
+
 int igraph_diameter(igraph_t *graph, integer_t *res, 
 		    bool_t directed, bool_t unconn) {
 

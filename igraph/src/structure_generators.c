@@ -23,6 +23,26 @@
 #include "igraph.h"
 #include "memory.h"
 
+/**
+ * \ingroup generators
+ * \brief Creates a graph with the specified edges.
+ * 
+ * @param graph An uninitialized graph object.
+ * @param edges The edges to add, the first two elements are the first
+ *        edge, etc.
+ * @param n The number of vertices in the graph, if smaller or equal
+ *        to the highest vertex id in the <code>edges</code> vector it
+ *        will be increased automatically. So it is safe to give 0
+ *        here.
+ * @param directed Boolean, whether to create a directed graph or
+ *        not. If yes, then the first edge points from the first
+ *        vertex id in <code>edges</code> to the second, etc.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
+ * number of vertices, <code>|E|</code> the number of edges in the
+ * graph.
+ */
 int igraph_create(igraph_t *graph, vector_t *edges, integer_t n, 
 		  bool_t directed) {
 
@@ -118,8 +138,32 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
   return 0;
 }
 
-
-
+/**
+ * \ingroup generators 
+ * \brief Creating all kinds of lattices.
+ *
+ * This function can create most kind of regular lattices.
+ * @param graph An uninitialized graph object.
+ * @param dimvector Vector giving the sizes of the lattice in each of
+ *        its dimensions. IE. the dimension of the lattice will be the
+ *        same as the length of this vector.
+ * @param nei Integer value giving the distance (number of steps)
+ *        within which two vertices will be connected. Not implemented
+ *        yet. 
+ * @param directed Boolean, whether to create a directed graph. The
+ *        direction of the edges is determined by the generation
+ *        algorithm and is unlikely to suit you, so this isn't a very
+ *        useful option.
+ * @param mutual Boolean, if the graph is directed this gives whether
+ *        to create all connections as mutual.
+ * @param circular Boolean, defines whether the generated lattice is
+ *        periodic.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code> (as far as i remember),
+ * <code>|V|</code> and <code>|E|</code> are the number of vertices
+ * and edges in the generated graph.
+ */
 int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei, 
 		   bool_t directed, bool_t mutual, bool_t circular) {
 

@@ -24,6 +24,29 @@
 #include "random.h"
 #include "memory.h"
 
+/**
+ * \ingroup generators
+ * \brief Generates a graph based on the Barabási-Albert model.
+ *
+ * @param graph An uninitialized graph object.
+ * @param n The number of vertices in the graph.
+ * @param m The number of outgoing edges generated for each
+ *        vertex. (Only if <code>outseq</code> is not given.)
+ * @param outseq Gives the (out-)degrees of the vertices. If this is
+ *        constant, this can be an empty (but initialized!) vector,
+ *        in this case <code>m</code> contains the constant
+ *        out-degree. 
+ * @param outpref Boolean, if true not only the in- but also the out-degree
+ *        of a vertex increases its citation probability. Ie. the
+ *        citation probability is determined by the total degree of
+ *        the vertices.
+ * @param directed Boolean, whether to generate a directed graph.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges.
+ */
+
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
 			 vector_t *outseq, bool_t outpref, bool_t directed) {
 
@@ -103,6 +126,26 @@ int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
   return 0;
 }
 
+/**
+ * \ingroup generators
+ * \brief Generates a growing random graph.
+ *
+ * This function simulates a growing random graph. In each discrete
+ * time step a new vertex is added and a number of new edges are also
+ * added. These graphs are known to be different from standard (not
+ * growing) random graphs.
+ * @param graph Uninitialized graph object.
+ * @param n The number of vertices in the graph.
+ * @param m The number of edges to add in a time step (ie. after
+ *        adding a vertex.
+ * @param directed Boolean, whether to generate a directed graph.
+ * @param citation Boolean, if <code>TRUE</code> the edges always
+ *        originate from the most recently added vertex.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges.
+ */
 int igraph_growing_random_game(igraph_t *graph, integer_t n, 
 			       integer_t m, bool_t directed,
 			       bool_t citation) {

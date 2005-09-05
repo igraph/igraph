@@ -22,6 +22,21 @@
 
 #include "igraph.h"
 
+/**
+ * \ingroup structural
+ * \brief Decides whether two vertices are connected 
+ *
+ * @param graph The graph object.
+ * @param v1 The first vertex.
+ * @param v2 The second vertex.
+ * @return Boolean, <code>TRUE</code> if there is an edge from
+ *         <code>v1</code> to <code>v2</code>.
+ * 
+ * The function is of course symmetric for undirected graphs.
+ *
+ * Time complexity: <code>O(d)</code>, <code>d</code> is the
+ * out-degree of <code>v1</code>.
+ */
 bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
 
   igraph_iterator_t it;

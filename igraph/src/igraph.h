@@ -25,15 +25,157 @@
 
 #include "types.h"
 
+/** \defgroup interface The basic igraph interface */
+/** \defgroup generators Graph generators */
+/** \defgroup structural Structural properties of graphs */
+/** \defgroup iterators Vertex and edge iterators */
+/** \defgroup internal Internal functions and data types */
+
+/** 
+ * \mainpage The <em>igraph</em> library manual
+ *
+ * \section toc Table of Contents
+ * - \ref intro
+ * - \ref features
+ * - \ref installation
+ * - \ref license
+ * - \ref tutorial
+ *
+ * \section intro Introduction
+ * This is another library for creating and manipulating graphs. Its
+ * aim is performance above all. There is simply no
+ * other graph library out there which can be handle graphs of the
+ * size the author is confronted with efficiently. Whenever possible \a igraph
+ * tries to be also user friendly and portable. 
+ *
+ * \a igraph started as an additional package to the GNU R
+ * statistical environment, and still some functions which are hard to
+ * implement in C are available only in R (like interactive
+ * graphics). Most functions are however now written in C and they can
+ * be compiled without R as a separate library. Still the author
+ * highly recommends R, as it is a sophisticated, well desinged,
+ * modern system.
+ *
+ * The advantage of the C version is that it is portable, can
+ * be used with other mathematical software (as soon as somebody
+ * writes the interfaces to it), and can be used for large scale
+ * scientific computation in the Condor environment we are
+ * using.
+ *
+ * \section features Features
+ * - \a igraph contains functions for generating regular and
+ *   random graphs according to known algorithms and models in the
+ *   network theory literature.
+ * - \a igraph provides routines for manipulating graphs,
+ *   adding and removing edges and vertices. 
+ * - a set of structural property calculation functions like
+ *   degree, betweenness, etc. are also included. 
+ * - force based layout generators are included for smaller graphs,
+ *   another method is expected to be added for large graphs soon.
+ * - a set of conversion functions are also included and will be
+ *   extended shortly.
+ * - \a igraph iterators provide a simple and efficient way
+ *   of walking through graphs.
+ * - the documentation will be finished shortly, for every function
+ *   its time complexity is stated.
+ *
+ * \section installation Installation
+ * First download the latest version of \a igraph and
+ * uncompress it to a temporary directory:
+ * \verbatim wget http://geza.kzoo.edu/~csardi/igraph_latest.tar.gz
+ tar xzf igraph_latest.tar.gz 
+ cd igraph-latest \endverbatim
+ * \subsection installation-r Installation as an R package
+ * This is very simple, the \a igraph directory in the
+ * tarball contains a complete R package. Eg. in Linux you can install
+ * it like
+ * \verbatim R CMD INSTALL -l ~/.R/library igraph \endverbatim
+ * 
+ * Alternatively you can create a tarball from the \a igraph
+ * directory and create a standard R package:
+ * \verbatim R CMD build igraph 
+ R CMD INSTALL -l ~/.R/library igraph_*.tar.gz \endverbatim
+ *
+ * Consult your R documentation.
+ * 
+ * \subsection installation-lib Installation as a library
+ * Simply typing \c make should work on most systems. At the
+ * end of the compilation you will need the
+ * \c libigraph.so.* file and the header files in the
+ * \c include directory, copy these to appropriate places on
+ * your system. 
+ *
+ * An autoconf system might be added later.
+ *
+ * \section license License
+ *
+ * Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
+ * MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * \section tutorial A short tutorial
+ * This is under development.
+ *
+ */
+
+/**
+ * \ingroup internal
+ * \struct igraph_t
+ * \brief The internal data structure for storing graphs.
+ *
+ * It is simple and efficient. It has the following members:
+ * - <b>n</b> The number of vertices, reduntant.
+ * - <b>directed</b> Whether the graph is directed.
+ * - <b>from</b> The first column of the edge list.
+ * - <b>to</b> The second column of the edge list.
+ * - <b>oi</b> The index of the edge list by the first column. Thus
+ *   the first edge according to this order goes from
+ *   \c from[oi[0]] to \c to[oi[0]]. The length of
+ *   this vector is the same as the number of edges in the graph.
+ * - <b>ii</b> The index of the edge list by the second column. 
+ *   The length of this vector is the same as the number of edges.
+ * - <b>os</b> Contains pointers to the edgelist (\c from
+ *   and \c to for every vertex. The first edge \em from
+ *   vertex \c v is edge no. \c from[oi[os[v]]] if 
+ *   \c os[v]<os[v+1]. If \c os[v]==os[v+1] then
+ *   there are no edges \em from node \c v. Its length is
+ *   the number of vertices plus one, the last element is always the 
+ *   same as the number of edges and is contained only to ease the
+ *   queries.
+ * - <b>is</b> This is basically the same as <b>os</b>, but this time
+ *   for the incoming edges.
+ * 
+ * For undirected graph, the same edge list is stored, ie. an
+ * undirected edge is stored only once, and for checking whether there
+ * is an undirected edge from \c v1 to \c v2 one
+ * should search for both \c from=v1, \c to=v2 and 
+ * \c from=v2, \c to=v1.
+ *
+ * The storage requirements for a graph with \c |V| vertices
+ * and \c |E| edges is \c O(|E|+|V|).
+ */
 typedef struct igraph_s {
-  integer_t n;			/* Number of vertices           */
-  bool_t directed;		/* Is it directed?              */
-  vector_t from;		/* The edge list, first column  */
-  vector_t to;                  /* The edge list, second column */
-  vector_t oi;			/* Out index                    */
-  vector_t ii;			/* In index                     */
-  vector_t os;			/* Out index start              */
-  vector_t is;			/* In index start               */
+  integer_t n;
+  bool_t directed;
+  vector_t from;
+  vector_t to;
+  vector_t oi;
+  vector_t ii;
+  vector_t os;
+  vector_t is;
 } igraph_t;
 
 /* -------------------------------------------------- */

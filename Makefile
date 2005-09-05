@@ -1,6 +1,6 @@
 
 CC=cc
-CFLAGS=-O6
+CFLAGS=-O6 -Wall
 CPPFLAGS=
 LDFLAGS=-lm
 
