@@ -1,0 +1,13 @@
+AC_INIT(igraph, 0.1, csardi@rmki.kfki.hu)
+AC_CONFIG_SRCDIR(src/games.c)
+AM_INIT_AUTOMAKE(igraph, 0.1)
+AM_CONFIG_HEADER(config.h)
+
+AC_PROG_CC
+AC_PROG_LIBTOOL
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h string.h time.h unistd.h])
+
+AC_CONFIG_FILES([Makefile src/Makefile])
+AC_OUTPUT

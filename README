@@ -1,0 +1,13 @@
+
+The igraph library
+------------------
+
+igraph is a library for creating and manipulating graphs. 
+It is intended to be as powerful (ie. fast) as possible to enable the
+analysis of large graphs. 
+
+It was started as an additional package to the GNU R system, but most
+of its functions can also be used as a separate library.
+
+See the additional HTML files for installation instructions, 
+and documentation. 
