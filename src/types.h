@@ -73,7 +73,7 @@ int vector_push_back (vector_t* v, real_t e);
 real_t vector_e         (vector_t* v, long int pos);
 int vector_set       (vector_t* v, long int pos, real_t value);
 int vector_add       (vector_t* v, long int pos, real_t value);
-int vector_replace_first(vector_t* v, real_t old, real_t new);
+int vector_replace_first(vector_t* v, real_t old, real_t newe);
 real_t vector_pop_back(vector_t* v);
 long int vector_find(vector_t* v, real_t elem);
 int vector_change(vector_t* v, long int pos1, long int pos2);

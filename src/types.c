@@ -320,12 +320,12 @@ int vector_null      (vector_t* v) {
 /**
  */
 
-int vector_replace_first(vector_t* v, real_t old, real_t new) {
+int vector_replace_first(vector_t* v, real_t old, real_t newe) {
   long int i;
   assert( v != NULL);
   for (i=0; i<vector_size(v); i++) {
     if (vector_e(v, i)==old) {
-      vector_set(v, i, new);
+      vector_set(v, i, newe);
       return 0;
     }
   }
