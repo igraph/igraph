@@ -84,12 +84,11 @@ typedef struct igraph_iterator_eneis_data_t {
 } igraph_iterator_eneis_data_t;
 
 int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
-			  integer_t vid, integer_t pmode) {  
+			  integer_t vid, igraph_neimode_t mode) {  
 
   igraph_iterator_eneis_data_t *data;
-  long int mode=pmode;
   if (!igraph_is_directed(graph)) {
-    mode=3;
+    mode=IGRAPH_ALL;
   }
   
   it->type=IGRAPH_ITERATOR_ENEIS;
@@ -106,12 +105,12 @@ int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it,
   data=it->data;
   data->vid=vid;
   data->mode=mode;
-  if (mode & 1) {
+  if (mode & IGRAPH_OUT) {
     data->oidx=VECTOR(graph->os)[(long int)vid];
   } else {
     data->oidx=igraph_ecount(graph);
   }
-  if (mode & 2) {
+  if (mode & IGRAPH_IN) {
     data->iidx=VECTOR(graph->is)[(long int)vid];
   } else {
     data->iidx=igraph_ecount(graph);
@@ -123,11 +122,10 @@ int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it,
 typedef igraph_iterator_eneis_data_t igraph_iterator_vneis_data_t;
 
 int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it, 
-			  integer_t vid, integer_t pmode) {
+			  integer_t vid, igraph_neimode_t mode) {
   igraph_iterator_vneis_data_t *data;
-  long int mode=pmode;
   if (!igraph_is_directed(graph)) {
-    mode=3;
+    mode=IGRAPH_ALL;
   }
   it->type=IGRAPH_ITERATOR_VNEIS;
   it->next=igraph_next_vneis;
@@ -143,12 +141,12 @@ int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it,
   data=it->data;
   data->vid=vid;
   data->mode=mode;
-  if (mode & 1) {
+  if (mode & IGRAPH_OUT) {
     data->oidx=VECTOR(graph->os)[(long int)vid];
   } else {
     data->oidx=igraph_ecount(graph);
   }
-  if (mode & 2) {
+  if (mode & IGRAPH_IN) {
     data->iidx=VECTOR(graph->is)[(long int)vid];
   } else {
     data->iidx=igraph_ecount(graph);
@@ -319,20 +317,19 @@ integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it) {
 
 /* Iterates over the edges to and/or from a vertex */
 int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it, 
-			      integer_t vid, integer_t pmode) {
+			      integer_t vid, igraph_neimode_t mode) {
   igraph_iterator_eneis_data_t *data=it->data;
-  long int mode=pmode;
   if (!igraph_is_directed(graph)) {
-    mode=3;
+    mode=IGRAPH_ALL;
   }
   data->vid=vid;
   data->mode=mode;
-  if (mode & 1) {
+  if (mode & IGRAPH_OUT) {
     data->oidx=VECTOR(graph->os)[(long int)vid];
   } else {
     data->oidx=igraph_ecount(graph);
   }
-  if (mode & 2) {
+  if (mode & IGRAPH_IN) {
     data->iidx=VECTOR(graph->is)[(long int)vid];
   } else {
     data->iidx=igraph_ecount(graph);

@@ -60,7 +60,7 @@ int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl,
     
     /* inspect the edges */
    
-    igraph_neighbors(graph, &neis, node, 1);
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
     for (i=0; i<vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=indegree[to];
@@ -172,7 +172,7 @@ int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
     }
     
     /* inspect the outgoing edges */
-    igraph_neighbors(graph, &neis, node, 1);
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
     for (i=0; i<vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=indegree[to];
@@ -233,7 +233,7 @@ int igraph_measure_dynamics_idage_debug(igraph_t *graph, matrix_t *akl,
     
     /* inspect the edges */
    
-    igraph_neighbors(graph, &neis, node, 1);
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
     for (i=0; i<vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=indegree[to];

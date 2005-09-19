@@ -25,44 +25,31 @@ graph <- function( edges, n=max(edges)+1, directed=TRUE ) {
         PACKAGE="igraph")
 }
 
-graph.adjacency <- function( adjmatrix, directed=TRUE, ... ) {
-
-  if (!is.matrix(adjmatrix) || nrow(adjmatrix) != ncol(adjmatrix)) {
-    stop("Invarid argument, should be a square matrix")
-  }
-  
-  res <- graph.empty(directed=directed, ...)
-
-  res <- add.vertices(res, nrow(adjmatrix))
-
-  edges <- unlist(mapply(function(f, t)
-                         { c(t(matrix((c(rep(f,length(t)), t)), nc=2))) },
-                         1:nrow(adjmatrix),
-                         apply(adjmatrix, 1, function(r) { which(r>0) } ),
-                         SIMPLIFY=FALSE))
-  res <- add.edges(res, edges-1)
-
-  res
+graph.adjacency <- function( adjmatrix, mode="directed" ) {
+  mode <- switch(mode,
+                 "directed"=0,
+                 "undirected"=1,
+                 "max"=1,
+                 "upper"=2,
+                 "lower"=3,
+                 "min"=4,
+                 "plus"=5)
+  attrs <- attributes(adjmatrix)
+  adjmatrix <- as.numeric(adjmatrix)
+  attributes(adjmatrix) <- attrs
+  .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),
+        PACKAGE="igraph")
 }
   
 
-graph.star <- function(n, mode="in", center=0, directed=TRUE, ...) {
+graph.star <- function(n, mode="in", center=0 ) {
 
-  if (mode=="out") {
-    edges <- c(rep(center, n-1), (0:(n-1))[-center-1])
-  } else {
-    edges <- c((0:(n-1))[-center-1], rep(center, n-1))
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=0, "in"=1, "undirected"=2)
   }
-
-  edges <- as.numeric(t(matrix(edges, nc=2)))
-  
-  if (mode=="undirected") {
-    directed <- FALSE
-  }
-  
-  res <- graph(edges, directed=directed, n=n, ...)
-  
-  res
+  .Call("R_igraph_star", as.numeric(n), as.numeric(mode),
+        as.numeric(center),
+        PACKAGE="igraph")
 }
 
 ###################################################################
@@ -115,25 +102,27 @@ graph.lattice <- function(dimvector=NULL,length=NULL, dim=NULL, nei=1,
   
 ##   res
   .Call("R_igraph_lattice", as.numeric(dimvector), as.numeric(nei),
-        as.logical(directed), as.logical(mutual), as.logical(circular))
+        as.logical(directed), as.logical(mutual),
+        as.logical(circular),
+        PACKAGE="igraph")
 }
 
-graph.ring <- function(n, circular=TRUE, directed=FALSE, mutual=FALSE) {
-  graph.lattice(dimvector=n, circular=circular, directed=directed,
-                mutual=mutual)
+graph.ring <- function(n, directed=FALSE, mutual=FALSE, circular=TRUE) {
+  .Call("R_igraph_ring", as.numeric(n), as.logical(directed),
+        as.logical(mutual), as.logical(circular),
+        PACKAGE="igraph")
 }
 
 ###################################################################
 # Trees, regular
 ###################################################################
 
-graph.tree <- function(n, children=2, ...) {
+graph.tree <- function(n, children=2, mode="out") {
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=0, "in"=1, "undirected"=2);
+  }
 
-  edges <- matrix(0, nc=2, nr=n-1)
-  edges[,1] <- rep(1:n, each=children, length.out=n-1)
-  edges[,2] <- 2:n
-  
-  res <- graph(n=n, as.numeric(t(edges))-1, ...)
-
-  res
+  .Call("R_igraph_tree", as.numeric(n), as.numeric(children),
+        as.numeric(mode),
+        PACKAGE="igraph")
 }

@@ -29,6 +29,12 @@ diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
         PACKAGE="igraph")
 }
 
+average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
+  .Call("R_igraph_average_path_length", graph, as.logical(directed),
+        as.logical(unconnected),
+        PACKAGE="igraph")
+}
+
 degree <- function(graph, v=0:(vcount(graph)-1),
                    mode="total", loops=TRUE){
   if (is.character(mode)) {
@@ -90,8 +96,8 @@ subcomponent <- function(graph, v, mode="all") {
 }
 
 subgraph <- function(graph, v) {
-  res <- delete.vertices(graph, (0:(vcount(graph)-1))[-v-1])
-  res
+  .Call("R_igraph_subgraph", graph, as.numeric(v),
+        PACKAGE="igraph")
 }
 
 simplify <- function(graph, remove.loops=TRUE,

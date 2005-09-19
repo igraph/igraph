@@ -22,18 +22,44 @@
 
 #include "igraph.h"
 #include "random.h"
+#include <math.h>
 
-int igraph_layout_random(igraph_t *graph, vector_t *res) {
-  /* TODO */
+int igraph_layout_random(igraph_t *graph, matrix_t *res) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+
+  matrix_resize(res, no_of_nodes, 2);
+
+  RNG_BEGIN();
+
+  for (i=0; i<no_of_nodes; i++) {
+    MATRIX(*res, i, 0)=RNG_UNIF(-1, 1);
+    MATRIX(*res, i, 1)=RNG_UNIF(-1, 1);
+  }
+
+  RNG_END();
+  
   return 0;
 }
 
-int igraph_layout_circle(igraph_t *graph, vector_t *res) {
-  /* TODO */
+int igraph_layout_circle(igraph_t *graph, matrix_t *res) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+
+  matrix_resize(res, no_of_nodes, 2);  
+
+  for (i=0; i<no_of_nodes; i++) {
+    real_t phi=2*M_PI/no_of_nodes*i;
+    MATRIX(*res, i, 0)=cos(phi);
+    MATRIX(*res, i, 1)=sin(phi);
+  }
+  
   return 0;
 }
 
-int igraph_layout_fruchterman_reingold(igraph_t *graph, vector_t *res, 
+int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res, 
 				       integer_t niter, real_t coolexp,
 				       integer_t frame, vector_t *initial,
 				       real_t initemp) {
@@ -108,7 +134,7 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
   return 0;
 }
 
-int igraph_layout_springs(igraph_t *graph, vector_t *res,
+int igraph_layout_springs(igraph_t *graph, matrix_t *res,
 			  real_t mass, real_t equil, real_t k,
 			  real_t repeqdis, real_t kfr, bool_t repulse) {
   /* TODO */

@@ -87,6 +87,39 @@ int igraph_destroy(igraph_t *graph) {
 
 /**
  * \ingroup interface
+ * \brief Creates an exact (deep) copy of a graph.
+ * 
+ * This function deeply copies a graph object to create an exact
+ * replica of it. The new replica should be destroyed by calling
+ * igraph_destroy() on it when not needed any more.
+ * 
+ * You can also create a shallow copy of a graph by simply using the
+ * standard assignment operator, but be careful and do <em>not</em>
+ * destroy a shallow replica. To avoid this mistake creating shallow
+ * copies is not recommended.
+ * @param to Pointer to an uninitialized graph object.
+ * @param from Pointer to the graph object to copy.
+ * @return Error code.
+ *
+ * Time complexity:  <code>O(|V|+|E|)</code> for a graph with
+ * <code>|V|</code> vertices and <code>|E|</code> edges.
+ */
+
+int igraph_copy(igraph_t *to, igraph_t *from) {
+  to->n=from->n;
+  to->directed=from->directed;
+  vector_copy(&to->from, &from->from);
+  vector_copy(&to->to, &from->to);
+  vector_copy(&to->oi, &from->oi);
+  vector_copy(&to->ii, &from->ii);
+  vector_copy(&to->os, &from->os);
+  vector_copy(&to->is, &from->is);
+
+  return 0;
+}
+
+/**
+ * \ingroup interface
  * \brief Adds edges to a graph object. 
  * 
  * The edges are given in a vector, the
@@ -384,30 +417,26 @@ integer_t igraph_ecount(igraph_t *graph) {
  *        be initialized before and will be resized.
  * @param pnode The id of the node of which the adjacent vertices are
  *        searched. 
- * @param pmode Defines the way adjacent vertices are searched for
+ * @param mode Defines the way adjacent vertices are searched for
  *        directed graphs. It can have the following values:
- *        - <b>1</b>, vertices reachable by an edge from the specified
+ *        - <b>IGRAPH_OUT</b>, vertices reachable by an edge from the specified
  *          vertex are searched,
- *        - <b>2</b>, vertices from which the specified vertex is reachable
- *          are searched.
- *        - <b>3</b>, both kind of vertices are searched.
+ *        - <b>IGRAPH_IN</b>, vertices from which the specified 
+ *          vertex is reachable are searched.
+ *        - <b>IGRAPH_ALL</b>, both kind of vertices are searched.
  *        This parameter is ignored for undirected graphs.
  * @return Error code.
  * 
- * Note: the 1, 2, 3 values are likely to be substituted by some
- * meaningful constants.
- *
  * Time complexity: <code>O(d)</code>, <code>d</code> is the number
  * of adjacent vertices to the queried vertex.
  */
 int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode, 
-		     integer_t pmode) {
+		     igraph_neimode_t mode) {
 
   long int length=0, idx=0;   
   long int no_of_edges;
   long int i;
 
-  int mode=pmode;
   long int node=pnode;
 
   no_of_edges=vector_size(&graph->from);
@@ -417,22 +446,22 @@ int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode,
 
   /* Calculate needed space first & allocate it*/
 
-  if (mode & 1) {
+  if (mode & IGRAPH_OUT) {
     length += (VECTOR(graph->os)[node+1] - VECTOR(graph->os)[node]);
   }
-  if (mode & 2) {
+  if (mode & IGRAPH_IN) {
     length += (VECTOR(graph->is)[node+1] - VECTOR(graph->is)[node]);
   }
   
   vector_resize(neis, length);
   
-  if (mode & 1) {
+  if (mode & IGRAPH_OUT) {
     for (i=VECTOR(graph->os)[node]; i<VECTOR(graph->os)[node+1]; i++) {
       VECTOR(*neis)[idx++] = 
 	VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
     }
   }
-  if (mode & 2) {
+  if (mode & IGRAPH_IN) {
     for (i=VECTOR(graph->is)[node]; i<VECTOR(graph->is)[node+1]; i++) {
       VECTOR(*neis)[idx++] =
 	VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
@@ -512,10 +541,10 @@ bool_t igraph_is_directed(igraph_t *graph) {
  *        initialized and will be resized to be the appropriate size.
  * @param vids Vector, giving the vertex ids of which the degree will
  *        be calculated.
- * @param pmode Defined the type of the degree.
- *        - <b>1</b>, out-degree,
- *        - <b>2</b>, in-degree,
- *        - <b>3</b>, total degree (sum of the in- and out-degree).
+ * @param mode Defines the type of the degree.
+ *        - <b>IGRAPH_OUT</b>, out-degree,
+ *        - <b>IGRAPH_IN</b>, in-degree,
+ *        - <b>IGRAPH_ALL</b>, total degree (sum of the in- and out-degree).
  *        This parameter is ignored for undirected graphs. 
  * @param loops Boolean, gives whether the self-loops should be
  *        counted.
@@ -527,36 +556,34 @@ bool_t igraph_is_directed(igraph_t *graph) {
  * degree. 
  */
 int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
-		  integer_t pmode, bool_t loops) {
+		  igraph_neimode_t mode, bool_t loops) {
 
   long int nodes_to_calc;
   long int i, j;
-  long int mode;
   
   nodes_to_calc=vector_size(vids);
-  mode=pmode;
   if (!igraph_is_directed(graph)) {
-    mode=3;
+    mode=IGRAPH_ALL;
   }
 
   vector_resize(res, nodes_to_calc);
   vector_null(res);
 
   if (loops) {
-    if (mode & 1) {
+    if (mode & IGRAPH_OUT) {
       for (i=0; i<nodes_to_calc; i++) {
 	long int vid=VECTOR(*vids)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
       }
     }
-    if (mode & 2) {
+    if (mode & IGRAPH_IN) {
       for (i=0; i<nodes_to_calc; i++) {
 	long int vid=VECTOR(*vids)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
       }
     }
   } else { /* no loops */
-    if (mode & 1) {
+    if (mode & IGRAPH_OUT) {
       for (i=0; i<nodes_to_calc; i++) {
 	long int vid=VECTOR(*vids)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
@@ -567,7 +594,7 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
 	}
       }
     }
-    if (mode & 2) {
+    if (mode & IGRAPH_IN) {
       for (i=0; i<nodes_to_calc; i++) {
 	long int vid=VECTOR(*vids)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);

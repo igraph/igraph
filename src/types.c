@@ -28,6 +28,8 @@
 #include <string.h> 		/* memcpy & co. */
 
 /**
+ * \ingroup dqueue
+ * \brief Initialized a double ended queue.
  */
 
 int dqueue_init (dqueue_t* q, long int size) {
@@ -41,6 +43,8 @@ int dqueue_init (dqueue_t* q, long int size) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Destroys a double ended queue.
  */
 
 int dqueue_destroy (dqueue_t* q) {
@@ -50,6 +54,8 @@ int dqueue_destroy (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Decides whether the queue is empty.
  */
 
 int dqueue_empty (dqueue_t* q) {
@@ -57,6 +63,8 @@ int dqueue_empty (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Removes all elements from the queue.
  */
 
 int dqueue_clear   (dqueue_t* q) {
@@ -67,6 +75,11 @@ int dqueue_clear   (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Checks whether the queue is full.
+ *
+ * If a queue is full the next dqueue_push() operation will allocate
+ * more memory.
  */
 
 int dqueue_full (dqueue_t* q) {
@@ -74,6 +87,8 @@ int dqueue_full (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Returns the number of elements in the queue.
  */
 
 long int dqueue_size (dqueue_t* q) {
@@ -87,6 +102,8 @@ long int dqueue_size (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Returns the element at the head of the queue.
  */
 
 real_t dqueue_head (dqueue_t* q) {
@@ -95,6 +112,8 @@ real_t dqueue_head (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Returns the element at the tail of the queue.
  */
 
 real_t dqueue_back (dqueue_t* q) {
@@ -103,6 +122,8 @@ real_t dqueue_back (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Returns and removes the element at the head of the queue.
  */
 
 real_t dqueue_pop (dqueue_t* q) {
@@ -120,6 +141,8 @@ real_t dqueue_pop (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Returns and removes the element at the tail of the queue.
  */
 
 real_t dqueue_pop_back (dqueue_t* q) {
@@ -140,6 +163,8 @@ real_t dqueue_pop_back (dqueue_t* q) {
 }
 
 /**
+ * \ingroup dqueue
+ * \brief Appends an element to the back of the queue.
  */
 
 int dqueue_push (dqueue_t* q, real_t elem) {
@@ -187,6 +212,22 @@ int dqueue_push (dqueue_t* q, real_t elem) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Initializes a vector object.
+ * 
+ * Every vector needs to be initialized before it can be used, and
+ * there are a number initialization functions, the others are
+ * vector_init_copy(), vector_init_seq() and vector_copy().
+ * 
+ * Every vector object initialized by this function should be
+ * destroyed (ie. the memory allocated for it should be freed) when it
+ * is not needed any more, the vector_destroy() function is
+ * responsible for this.
+ * @param v Pointer to a not yet initialized vector object.
+ * @param size The size of the vector.
+ * @return error code.
+ * 
+ * Time complexity: operating system dependent.
  */
 
 int vector_init      (vector_t* v, int long size) {	
@@ -201,6 +242,18 @@ int vector_init      (vector_t* v, int long size) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Destroys a vector object
+ *
+ * All vectors initialized by vector_init() should be properly
+ * destroyed by this function. A destroyed vector needs to be
+ * reinitialized by vector_init(), vector_init_copy() or
+ * vector_as_vector() before using it again.
+ * @param v Pointer to the (previously initialized) vector object to
+ *        destroy. 
+ * @return Error code.
+ * 
+ * Time complexity: operating system dependent.
  */
 
 int vector_destroy   (vector_t* v) {
@@ -214,6 +267,26 @@ int vector_destroy   (vector_t* v) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Reserves memory for a vector
+ * 
+ * \a igraph vectors are flexible, they can grow and shrink. Growing
+ * however occasionally needs the data in the vector to be copyed.
+ * In order to avoid you can call this function to reserve space for
+ * future growth of the vector. 
+ * 
+ * Note that this function does <em>not</em> change the size of the
+ * vector, let us see a small example to clarify things: if you
+ * reserve space for 100 elements and the size of your
+ * vector was (and still is) 60, then you can surely add additional 40
+ * elements to your vector before it will be copied.
+ * @param v The vector object.
+ * @param size The new <em>allocated</em> size of the vector.
+ * @return Error code.
+ *
+ * Time complexity: operating system dependent, should be around
+ * <code>O(n)</code>, <code>n</code> is the new allocated size of the
+ * vector.
  */
 
 int vector_reserve   (vector_t* v, long int size) {
@@ -230,6 +303,14 @@ int vector_reserve   (vector_t* v, long int size) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Decides whether the size of the vector is zero.
+ *
+ * @param v The vector object.
+ * @return Non-zero number if the size of the vector is not zero and
+ *         zero otherwise.
+ * 
+ * Time complexity: <code>O(1)</code>.
  */
 
 int vector_empty     (vector_t* v) {
@@ -240,6 +321,13 @@ int vector_empty     (vector_t* v) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Gives the size (=length) of the vector.
+ * 
+ * @param v The vector object
+ * @return The size of the vector.
+ *
+ * Time complexity: <code>O(1)</code>. 
  */
 
 long int vector_size      (vector_t* v) {
@@ -249,6 +337,16 @@ long int vector_size      (vector_t* v) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Removes all elements from a vector.
+ * 
+ * This function simply sets the size of the vector to zero, it does
+ * not free any allocated memory. For that you have to call
+ * vector_destroy().
+ * @param v The vector object.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(1)</code>.
  */
 
 int vector_clear     (vector_t* v) {
@@ -260,6 +358,24 @@ int vector_clear     (vector_t* v) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Appends one elements to a vector.
+ * 
+ * This function resizes the vector to be one element longer and
+ * sets the very last element in the vector to <code>e</code>.
+ * @param v The vector object.
+ * @param e The element to append to the vector.
+ * @return Error code.
+ * 
+ * Time complexity: operating system dependent. What is important that
+ * it can be assumed that <code>n</code> subsequent calls to this
+ * function has time complexity <code>O(n)</code>, even if there
+ * hadn't been any space reserved for the new elements by
+ * vector_reserve(). This is 
+ * implemented by a trick similar to the C++ <code>vector</code>
+ * class: each time more memory is allocated for a vector, the size of
+ * the additionally allocated memory is the same as the vector's
+ * current length.
  */
 
 int vector_push_back (vector_t* v, real_t e) {
@@ -279,6 +395,7 @@ int vector_push_back (vector_t* v, real_t e) {
 }
 
 /**
+ * \ingroup internal
  */
 
 real_t vector_e         (vector_t* v, long int pos) {
@@ -288,6 +405,7 @@ real_t vector_e         (vector_t* v, long int pos) {
 }
 
 /**
+ * \ingroup internal
  */
 
 int vector_set       (vector_t* v, long int pos, real_t value) {
@@ -298,6 +416,7 @@ int vector_set       (vector_t* v, long int pos, real_t value) {
 }
 
 /**
+ * \ingroup internal
  */
 
 int vector_add       (vector_t* v, long int pos, real_t value) {
@@ -308,6 +427,13 @@ int vector_add       (vector_t* v, long int pos, real_t value) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Sets each element in the vector to zero.
+ * 
+ * @param v The vector object.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(n)</code>, the size of the vector.
  */
 
 int vector_null      (vector_t* v) {
@@ -318,6 +444,7 @@ int vector_null      (vector_t* v) {
 }
 
 /**
+ * \ingroup internal
  */
 
 int vector_replace_first(vector_t* v, real_t old, real_t newe) {
@@ -333,6 +460,7 @@ int vector_replace_first(vector_t* v, real_t old, real_t newe) {
 }
 
 /**
+ * \ingroup internal
  */
 
 long int vector_find(vector_t* v, real_t elem) {
@@ -348,6 +476,7 @@ long int vector_find(vector_t* v, real_t elem) {
 }
 
 /**
+ * \ingroup internal
  */
 
 real_t vector_pop_back(vector_t* v) {
@@ -360,6 +489,7 @@ real_t vector_pop_back(vector_t* v) {
 }
 
 /**
+ * \ingroup internal
  */
 
 int vector_change(vector_t* v, long int pos1, long int pos2) {
@@ -372,6 +502,7 @@ int vector_change(vector_t* v, long int pos1, long int pos2) {
 }
 
 /**
+ * \ingroup internal
  */
 
 int vector_order(vector_t* v, vector_t* res, integer_t nodes) {
@@ -408,6 +539,22 @@ int vector_order(vector_t* v, vector_t* res, integer_t nodes) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Resize the vector.
+ *
+ * Note that this function does not free any memory, just sets the
+ * size of the vector to the given one. It can on the other hand 
+ * allocate more memory if the new size is larger than the previous
+ * one. In this case the newly appeared elements in the vectors are
+ * <em>not</em> set to zero, they are uninitialized.
+ * @param v The vector object
+ * @param newsize The new size of the vector.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(1)</code> if the new size is smaller,
+ * operating system dependent if it is larger. In the latter case it
+ * is usually around <code>O(n)</code>, <code>n</code> is the new size
+ * of the vector.
  */
 
 int vector_resize(vector_t* v, long int newsize) {
@@ -417,12 +564,22 @@ int vector_resize(vector_t* v, long int newsize) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Gives the maximum element of the vector.
+ *
+ * If the size of the vector is zero, an arbitrary number is
+ * returned.
+ * @param v The vector object.
+ * @return The maximum element.
+ *
+ * Time complexity: <code>O(n)</code>, <code>n</code> is the size of
+ * the vector. 
  */
 
 real_t vector_max(vector_t* v) {
   real_t max=*(v->stor_begin);
   real_t *ptr=v->stor_begin+1;
-  while (ptr < v->stor_end) {
+  while (ptr < v->end) {
     if ((*ptr) > max) {
       max=*ptr;
     }
@@ -432,6 +589,7 @@ real_t vector_max(vector_t* v) {
 }
 
 /**
+ * \ingroup internal
  */
 
 vector_t vector_as_vector(real_t* data, long int length) {
@@ -442,6 +600,19 @@ vector_t vector_as_vector(real_t* data, long int length) {
   return v;
 }
 
+/**
+ * \ingroup vector
+ * \brief Initializes a vector from an ordinary C array.
+ * 
+ * @param v Pointer to an uninitialized vector object.
+ * @param data A regular C array.
+ * @param length The length of the C array.
+ * @return Error code.
+ * 
+ * Time complexity: operating system specific, usually
+ * <code>O(length)</code>.
+ */
+
 int vector_init_copy(vector_t *v, real_t *data, long int length) {
   v->stor_begin=Calloc(length, real_t);
   v->stor_end=v->stor_begin+length;
@@ -451,12 +622,59 @@ int vector_init_copy(vector_t *v, real_t *data, long int length) {
   return 0;
 }
 
+/**
+ * \ingroup vector
+ * \brief Copies the contents of a vector to a C array.
+ * 
+ * The C array should have sufficient length.
+ * @param v The vector object.
+ * @param to The C array.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(n)</code>, <code>n</code> is the size of
+ * the vector.
+ */
+
 int vector_copy_to(vector_t *v, real_t* to) {
   if (v->end != v->stor_begin) {
     memcpy(to, v->stor_begin, sizeof(real_t) * (v->end - v->stor_begin));
   }
   return 0;
 }
+
+/**
+ * \ingroup vector
+ * \brief Initializes a vector from another vector object.
+ * 
+ * The contents of the existing vector object will be copied to
+ * the new one.
+ * @param to Pointer to a not yet initialized vector object.
+ * @param from The original vector object to copy.
+ * @return Error code.
+ * 
+ * Time complexity: operating system dependent, usually
+ * <code>O(n)</code>, <code>n</code> is the size of the vector.
+ */
+
+int vector_copy(vector_t *to, vector_t *from) {
+  to->stor_begin=Calloc(vector_size(from), real_t);
+  to->stor_end=to->stor_begin+vector_size(from);
+  to->end=to->stor_end;
+  memcpy(to->stor_begin, from->stor_begin, vector_size(from)*sizeof(real_t));
+  
+  return 0;
+}
+
+/**
+ * \ingroup vector
+ * \brief Calculates the product of the elements in the vector.
+ * 
+ * For the empty vector one (1) is returned.
+ * @param v The vector object.
+ * @return The product of the elements.
+ * 
+ * Time complexity: <code>O(n)</code>, the size of the vector.
+ */
 
 real_t vector_prod(vector_t *v) {
   real_t res=1;
@@ -466,6 +684,21 @@ real_t vector_prod(vector_t *v) {
   }
   return res;
 }
+
+/**
+ * \ingroup vector
+ * \brief Initializes a vector with a sequence.
+ * 
+ * The vector will contain the numbers <code>from</code>,
+ * <code>from+1</code>, ..., <code>to</code>.
+ * @param v Pointer to an uninitialized vector object.
+ * @param from The lower limit in the sequence (inclusive).
+ * @param to The upper limit in the sequence (inclusive).
+ * @return Error code.
+ *
+ * Time complexity: <code>O(n)</code>, the number of elements in the
+ * vector. 
+ */
 
 int vector_init_seq(vector_t *v, real_t from, real_t to) {
   real_t *p;
@@ -477,15 +710,62 @@ int vector_init_seq(vector_t *v, real_t from, real_t to) {
   return 0;
 }
 
+/**
+ * \ingroup matrix
+ * \brief Initializes a matrix.
+ * 
+ * Every matrix needs to be initialized before using it, this is done
+ * by calling this function. A matrix has to be destroyed if it is not
+ * needed any more, see matrix_destroy().
+ * @param m Pointer to a not yet initialized matrix object to be
+ *        initialized. 
+ * @param nrow The number of rows in the matrix.
+ * @param ncol The number of columns in the matrix.
+ * @return Error code.
+ *
+ * Time complexity: ususally <code>O(n)</code>, <code>n</code> is the
+ * number of elements in the matrix.
+ */
 int matrix_init(matrix_t *m, long int nrow, long int ncol) {
   vector_init(&m->data, nrow*ncol);
   m->nrow=nrow;
   m->ncol=ncol;
 }
 
+/** 
+ * \ingroup matrix
+ * \brief Destroys a matrix object.
+ * 
+ * This function frees all the memory allocated for a matrix
+ * object. The destroyed object needs to be reinitialized before using
+ * it again.
+ * @param m The matrix to destroy.
+ * @return Error code.
+ *
+ * Time complexity: operating system dependent.
+ */ 
+
 int matrix_destroy(matrix_t *m) {
   vector_destroy(&m->data);
 }
+
+/**
+ * \ingroup matrix
+ * \brief Resizes a matrix.
+ *
+ * This function resizes a matrix by adding more elements to it.
+ * The matrix contains arbitrary data after resizing it.
+ * Ie. after calling this function you cannot expect that element
+ * <code>(i,j)</code> in the matrix remains the same as before. 
+ * @param m Pointer to an already initialized matrix object.
+ * @param nrow The number of rows in the resized matrix.
+ * @param ncol The number of columns in the resized matrix.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(1)</code> if the matrix gets smaller,
+ * usually <code>O(n)</code> if it gets larger, <code>n</code> is the
+ * number of elements in the resized matrix.
+ */
 
 int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
   vector_resize(&m->data, nrow*ncol);
@@ -493,28 +773,87 @@ int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
   m->ncol=ncol;
 }
 
+/**
+ * \ingroup matrix
+ * \brief The number of elements in a matrix.
+ * 
+ * @param m Pointer to an initialized matrix object.
+ * @return The size of the matrix.
+ *
+ * Time complexity: <code>O(1)</code>.
+ */
+
 long int matrix_size(matrix_t *m) {
   return (m->nrow) * (m->ncol);
 }
+
+/**
+ * \ingroup matrix
+ * \brief The number of rows in a matrix.
+ * 
+ * @param m Pointer to an initialized matrix object.
+ * @return The number of rows in the matrix.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
 
 long int matrix_nrow(matrix_t *m) {
   return m->nrow;
 }
 
+/**
+ * \ingroup matrix
+ * \brief The number of columns in a matrix.
+ * 
+ * @param m Pointer to an initialized matrix object.
+ * @return The number of columns in the matrix.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
+
 long int matrix_ncol(matrix_t *m) {
   return m->ncol;
 }
+
+/** 
+ * \ingroup matrix
+ * \brief Copies a matrix to a regular C array.
+ *
+ * The matrix is copied columnwise, as this is the format most
+ * programs and languages use.
+ * The C array should be of sufficient size, there are (of course) not
+ * range checks done.
+ * @param m Pointer to an initialized matrix object.
+ * @param to Pointer to a C array, the place to copy the data to.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(n)</code>, <code>n</code> is the number of 
+ * elements in the matrix.
+ */
 
 int matrix_copy_to(matrix_t *m, real_t *to) {
   vector_copy_to(&m->data, to);
   return 0;
 }
 
+/** 
+ * \ingroup matrix
+ * \brief Sets all element in a matrix to zero.
+ * 
+ * @param m Pointer to an initialized matrix object.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(n)</code>, <code>n</code> is the number of 
+ * elements in the matrix.
+ */
+
 int matrix_null(matrix_t *m) {
   vector_null(&m->data);
 }
 
 /**
+ * \ingroup stack
+ * \brief Initializes a stack.
  */
 
 int stack_init       (stack_t* s, long int size) {
@@ -529,6 +868,8 @@ int stack_init       (stack_t* s, long int size) {
 }
 
 /**
+ * \ingroup stack
+ * \brief Destroys a stack object.
  */
 
 int stack_destroy    (stack_t* s) {
@@ -541,6 +882,8 @@ int stack_destroy    (stack_t* s) {
 }
 
 /**
+ * \ingroup stack
+ * \brief Reserves memory for a stack object.
  * \todo
  */
 
@@ -549,6 +892,8 @@ int stack_reserve    (stack_t* s, long int size) {
 }
 
 /**
+ * \ingroup stack
+ * \brief Decides whether a stack object is empty.
  */
 
 int stack_empty      (stack_t* s) {
@@ -560,6 +905,8 @@ int stack_empty      (stack_t* s) {
 }
 
 /**
+ * \ingroup stack
+ * \brief Returns the number of elements in a stack.
  */
 
 long int stack_size       (stack_t* s) {
@@ -570,6 +917,8 @@ long int stack_size       (stack_t* s) {
 }
 
 /**
+ * \ingroup stack
+ * \brief Removes all elements from a stack.
  */
 
 int stack_clear      (stack_t* s) {
@@ -581,6 +930,8 @@ int stack_clear      (stack_t* s) {
 }
 
 /**
+ * \ingroup stack
+ * \brief Places an element on the top of a stack.
  */
 
 int stack_push       (stack_t* s, real_t elem) {
@@ -612,6 +963,8 @@ int stack_push       (stack_t* s, real_t elem) {
 }
 
 /**
+ * \ingroup stack
+ * \brief Removes and returns an element from the top of a stack.
  */
 
 real_t stack_pop        (stack_t* s) {
@@ -627,6 +980,8 @@ real_t stack_pop        (stack_t* s) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Initializes a multiset object.
  */
 
 int multiset_init    (multiset_t* m, long int size) {
@@ -640,6 +995,8 @@ int multiset_init    (multiset_t* m, long int size) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Destroys a multiset object.
  */
 
 int multiset_destroy (multiset_t* m) {
@@ -653,6 +1010,8 @@ int multiset_destroy (multiset_t* m) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Reserves memory for a multiset object.
  */
 
 int multiset_reserve (multiset_t* m, long int size) {
@@ -672,6 +1031,8 @@ int multiset_reserve (multiset_t* m, long int size) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Adds an elements to a multiset object.
  */
 
 int multiset_add     (multiset_t* m, real_t elem) {
@@ -690,6 +1051,8 @@ int multiset_add     (multiset_t* m, real_t elem) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Selects an element from a multiset object.
  */
 
 real_t multiset_choose  (multiset_t* m) {
@@ -700,6 +1063,8 @@ real_t multiset_choose  (multiset_t* m) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Removes and returns an element from a multiset object.
  */
 
 real_t multiset_choose_remove (multiset_t* m) {
@@ -715,6 +1080,8 @@ real_t multiset_choose_remove (multiset_t* m) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Gives the number of element in a multiset object.
  */
 
 long int multiset_size(multiset_t* m) {
@@ -724,6 +1091,8 @@ long int multiset_size(multiset_t* m) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Removes an instance of an element from a multiset object.
  */
 
 int multiset_remove (multiset_t* m, real_t elem) {
@@ -741,6 +1110,8 @@ int multiset_remove (multiset_t* m, real_t elem) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Removes all instances of an element from a multiset object.
  */
 
 int multiset_remove_all (multiset_t* m, real_t elem) {
@@ -759,6 +1130,10 @@ int multiset_remove_all (multiset_t* m, real_t elem) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Returns the C array of all the elements in a multiset.
+ *
+ * You should consider the returnes array as read-only.
  */
 
 real_t* multiset_get_vector(multiset_t* m) {
@@ -768,6 +1143,8 @@ real_t* multiset_get_vector(multiset_t* m) {
 }
      
 /**
+ * \ingroup multiset
+ * \brief Selects a random element from a multiset object.
  */
 
 real_t multiset_choose_random(multiset_t* m) {
@@ -781,6 +1158,8 @@ real_t multiset_choose_random(multiset_t* m) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Selects and removes a random element from a multiset object.
  */
 
 real_t multiset_choose_remove_random(multiset_t* m) {
@@ -800,6 +1179,8 @@ real_t multiset_choose_remove_random(multiset_t* m) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Removes all elements in a multiset object.
  */
 
 int multiset_clear   (multiset_t* m) {
@@ -812,6 +1193,9 @@ int multiset_clear   (multiset_t* m) {
   
 
 /**
+ * \ingroup multiset
+ * \brief Counts the number of instances of an element in a multiset
+ * object. 
  */
 
 long int multiset_count(multiset_t* m, real_t elem) {
@@ -830,6 +1214,9 @@ long int multiset_count(multiset_t* m, real_t elem) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Counts the number of instances different from an element in
+ * a multiset object.
  */
 
 long int multiset_count_different(multiset_t* m, real_t elem) {
@@ -848,6 +1235,9 @@ long int multiset_count_different(multiset_t* m, real_t elem) {
 }
 
 /**
+ * \ingroup multiset
+ * \brief Selects a random element which is different than a given one
+ * in the multiset object.
  */
 
 real_t multiset_choose_random_different(multiset_t* m, real_t elem) {
@@ -878,6 +1268,8 @@ real_t multiset_choose_random_different(multiset_t* m, real_t elem) {
 #define RIGHTCHILD(x) (((x)+1)*2)
   
 /**
+ * \ingroup heap
+ * \brief Initializes an empty heap object.
  */
 
 int heap_init           (heap_t* h, long int alloc_size) {
@@ -891,6 +1283,9 @@ int heap_init           (heap_t* h, long int alloc_size) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Initializes a heap object from an array, the heap is also
+ * built of course.
  */
 
 int heap_init_array     (heap_t *h, real_t* data, long int len) {
@@ -907,6 +1302,8 @@ int heap_init_array     (heap_t *h, real_t* data, long int len) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Destroys an initialized heap object.
  */
 
 int heap_destroy        (heap_t* h) {  
@@ -917,12 +1314,18 @@ int heap_destroy        (heap_t* h) {
   return 0;
 }
 
+/**
+ * \ingroup heap
+ * \brief Decides whether a heap object is empty.
+ */
 
 int heap_empty          (heap_t* h) {
   return h->stor_begin == h->end;
 }
 
 /**
+ * \ingroup heap
+ * \brief Adds an element to a heap object.
  */
 
 int heap_push           (heap_t* h, real_t elem) {
@@ -945,6 +1348,8 @@ int heap_push           (heap_t* h, real_t elem) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Returns the largest element in a heap.
  */
 
 real_t heap_max       (heap_t* h) {
@@ -956,6 +1361,8 @@ real_t heap_max       (heap_t* h) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Returns and removes the largest element in a heap.
  */
 
 real_t heap_delete_max(heap_t* h) {
@@ -973,6 +1380,8 @@ real_t heap_delete_max(heap_t* h) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Gives the number of elements in a heap.
  */
 
 long int heap_size      (heap_t* h) {
@@ -981,6 +1390,8 @@ long int heap_size      (heap_t* h) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Allocates more memory for a heap if needed.
  */
 
 int heap_reserve        (heap_t* h, long int size) {
@@ -997,6 +1408,8 @@ int heap_reserve        (heap_t* h, long int size) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Build a heap, this should not be called directly.
  */
 
 int heap_i_build(real_t* arr, long int size, long int head) {
@@ -1017,6 +1430,9 @@ int heap_i_build(real_t* arr, long int size, long int head) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Shift an element upwards in a heap, this should not be
+ * called directly.
  */
 
 int heap_i_shift_up(real_t* arr, long int size, long int elem) {
@@ -1031,6 +1447,9 @@ int heap_i_shift_up(real_t* arr, long int size, long int elem) {
 }
 
 /**
+ * \ingroup heap
+ * \brief Moves an element down in a heap, this function should not be
+ * called directly.
  */
 
 int heap_i_sink(real_t* arr, long int size, long int head) {
@@ -1055,6 +1474,12 @@ int heap_i_sink(real_t* arr, long int size, long int head) {
   return 0;
 }
 
+/**
+ * \ingroup heap
+ * \brief Switches two elements in a heap, this function should not be
+ * called directly.
+ */
+
 int heap_i_switch(real_t* arr, long int e1, long int e2) {
   if (e1!=e2) {
     real_t tmp=arr[e1];
@@ -1066,6 +1491,8 @@ int heap_i_switch(real_t* arr, long int e1, long int e2) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Initializes an indexed heap.
  */
 
 int indheap_init           (indheap_t* h, long int alloc_size) {
@@ -1080,6 +1507,8 @@ int indheap_init           (indheap_t* h, long int alloc_size) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Initializes and build an indexed heap from a C array.
  */
 
 int indheap_init_array     (indheap_t *h, real_t* data, long int len) {
@@ -1102,6 +1531,8 @@ int indheap_init_array     (indheap_t *h, real_t* data, long int len) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Destroys an initialized indexed heap. 
  */
 
 int indheap_destroy        (indheap_t* h) {  
@@ -1113,11 +1544,18 @@ int indheap_destroy        (indheap_t* h) {
   return 0;
 }
 
+/**
+ * \ingroup indheap
+ * \brief Checks whether a heap is empty.
+ */
+
 int indheap_empty          (indheap_t* h) {
   return h->stor_begin == h->end;
 }
 
 /**
+ * \ingroup indheap
+ * \brief Adds an element to an indexed heap.
  */
 
 int indheap_push           (indheap_t* h, real_t elem) {
@@ -1141,6 +1579,8 @@ int indheap_push           (indheap_t* h, real_t elem) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Returns the largest element in an indexed heap.
  */
 
 real_t indheap_max       (indheap_t* h) {
@@ -1152,6 +1592,8 @@ real_t indheap_max       (indheap_t* h) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Removes the largest element from an indexed heap.
  */
 
 real_t indheap_delete_max(indheap_t* h) {
@@ -1169,6 +1611,8 @@ real_t indheap_delete_max(indheap_t* h) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Gives the number of elements in an indexed heap.
  */
 
 long int indheap_size      (indheap_t* h) {
@@ -1177,6 +1621,8 @@ long int indheap_size      (indheap_t* h) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Reserves more memory for an indexed heap.
  */
 
 int indheap_reserve        (indheap_t* h, long int size) {
@@ -1193,11 +1639,19 @@ int indheap_reserve        (indheap_t* h, long int size) {
   return 0;
 }
 
+/**
+ * \ingroup indheap
+ * \brief Returns the index of the largest element in an indexed heap.
+ */
+
 long int indheap_max_index(indheap_t *h) {
   return h->index_begin[0];  
 }
 
 /**
+ * \ingroup indheap
+ * \brief Builds an indexed heap, this function should not be called
+ * directly. 
  */
 
 int indheap_i_build(indheap_t* h, long int head) {
@@ -1219,6 +1673,9 @@ int indheap_i_build(indheap_t* h, long int head) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Moves an element up in the heap, don't call this function
+ * directly. 
  */
 
 int indheap_i_shift_up(indheap_t *h, long int elem) {
@@ -1233,6 +1690,9 @@ int indheap_i_shift_up(indheap_t *h, long int elem) {
 }
 
 /**
+ * \ingroup indheap
+ * \brief Moves an element down in the heap, don't call this function
+ * directly. 
  */
 
 int indheap_i_sink(indheap_t* h, long int head) {
@@ -1258,6 +1718,12 @@ int indheap_i_sink(indheap_t* h, long int head) {
   return 0;
 }
 
+/**
+ * \ingroup indheap
+ * \brief Switches two elements in a heap, don't call this function
+ * directly. 
+ */
+
 int indheap_i_switch(indheap_t* h, long int e1, long int e2) {
   if (e1!=e2) {
     real_t tmp=h->stor_begin[e1];
@@ -1274,6 +1740,8 @@ int indheap_i_switch(indheap_t* h, long int e1, long int e2) {
 
 
 /**
+ * \ingroup doubleindheap
+ * \brief Initializes an empty doubly indexed heap object.
  */
 
 int d_indheap_init           (d_indheap_t* h, long int alloc_size) {
@@ -1289,6 +1757,8 @@ int d_indheap_init           (d_indheap_t* h, long int alloc_size) {
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Destroys an initialized doubly indexed heap object.
  */
 
 int d_indheap_destroy        (d_indheap_t* h) {  
@@ -1301,11 +1771,18 @@ int d_indheap_destroy        (d_indheap_t* h) {
   return 0;
 }
 
+/**
+ * \ingroup doubleindheap
+ * \brief Decides whether a heap is empty.
+ */
+
 int d_indheap_empty          (d_indheap_t* h) {
   return h->stor_begin == h->end;
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Adds an element to the heap.
  */
 
 int d_indheap_push           (d_indheap_t* h, real_t elem, 
@@ -1331,6 +1808,8 @@ int d_indheap_push           (d_indheap_t* h, real_t elem,
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Returns the largest element in the heap.
  */
 
 real_t d_indheap_max       (d_indheap_t* h) {
@@ -1342,6 +1821,8 @@ real_t d_indheap_max       (d_indheap_t* h) {
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Removes the largest element from the heap.
  */
 
 real_t d_indheap_delete_max(d_indheap_t* h) {
@@ -1359,6 +1840,8 @@ real_t d_indheap_delete_max(d_indheap_t* h) {
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Gives the number of elements in the heap.
  */
 
 long int d_indheap_size      (d_indheap_t* h) {
@@ -1367,6 +1850,8 @@ long int d_indheap_size      (d_indheap_t* h) {
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Allocates memory for a heap.
  */
 
 int d_indheap_reserve        (d_indheap_t* h, long int size) {
@@ -1384,6 +1869,11 @@ int d_indheap_reserve        (d_indheap_t* h, long int size) {
   return 0;
 }
 
+/**
+ * \ingroup doubleindheap
+ * \brief Gives the indices of the maximal element in the heap.
+ */
+
 int d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2) {
   (*idx)=h->index_begin[0];
   (*idx2)=h->index2_begin[0];
@@ -1392,6 +1882,8 @@ int d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2) {
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Builds the heap, don't call it directly.
  */
 
 int d_indheap_i_build(d_indheap_t* h, long int head) {
@@ -1413,6 +1905,8 @@ int d_indheap_i_build(d_indheap_t* h, long int head) {
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Moves an element up in the heap, don't call it directly.
  */
 
 int d_indheap_i_shift_up(d_indheap_t *h, long int elem) {
@@ -1427,6 +1921,8 @@ int d_indheap_i_shift_up(d_indheap_t *h, long int elem) {
 }
 
 /**
+ * \ingroup doubleindheap
+ * \brief Moves an element down in the heap, don't call it directly.
  */
 
 int d_indheap_i_sink(d_indheap_t* h, long int head) {
@@ -1451,6 +1947,11 @@ int d_indheap_i_sink(d_indheap_t* h, long int head) {
 
   return 0;
 }
+
+/**
+ * \ingroup doubleindheap
+ * \brief Switches two elements in the heap, don't call it directly.
+ */
 
 int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2) {
   if (e1!=e2) {

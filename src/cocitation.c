@@ -24,18 +24,72 @@
 #include "memory.h"
 
 int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids, 
-			   integer_t mode);
+			   igraph_neimode_t mode);
+
+/**
+ * \ingroup structural
+ * \brief Cocitation coupling
+ * 
+ * Two vertices are cocited if there is another vertex citing both of
+ * them. igraph_cocitation() siply counts how many types two vertices are
+ * cocited. The bibliographic coupling of two vertices is the number
+ * of other vertices they both cite, igraph_bibcoupling() calculates
+ * this.
+ * The cocitation score for each given vertex and all other vertices
+ * in the graph will be calculated.
+ * @param graph The graph object to analyze.
+ * @param res Pointer to a matrix, the result of the calculation will
+ *        be stored here. The number of its rows is the same as the
+ *        number of vertex ids in <code>vids</code>, the number of
+ *        columns is the number of vertices in the graph.
+ * @param vids The vertex ids of the vertices for which the
+ *        calculation will be done.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|d^2</code>, |V| is the number of
+ * vertices in the graph, <code>d</code> is the (maximum) degree of
+ * the vertices in the graph.
+ *
+ * \sa igraph_bibcoupling()
+ */
 
 int igraph_cocitation(igraph_t *graph, matrix_t *res, vector_t *vids) {
-  return igraph_cocitation_real(graph, res, vids, 1);
+  return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT);
 }
 
+/**
+ * \ingroup structural
+ * \brief Bibliographic coupling
+ * 
+ * Two vertices are cocited if there is another vertex citing both of
+ * them. igraph_cocitation() siply counts how many types two vertices are
+ * cocited. The bibliographic coupling of two vertices is the number
+ * of other vertices they both cite, igraph_bibcoupling() calculates
+ * this.
+ * The bibliographic coupling  score for each given vertex and all
+ * other vertices in the graph will be calculated.
+ * @param graph The graph object to analyze.
+ * @param res Pointer to a matrix, the result of the calculation will
+ *        be stored here. The number of its rows is the same as the
+ *        number of vertex ids in <code>vids</code>, the number of
+ *        columns is the number of vertices in the graph.
+ * @param vids The vertex ids of the vertices for which the
+ *        calculation will be done.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|d^2</code>, |V| is the number of
+ * vertices in the graph, <code>d</code> is the (maximum) degree of
+ * the vertices in the graph.
+ *
+ * \sa igraph_cocitation()
+ */
+
 int igraph_bibcoupling(igraph_t *graph, matrix_t *res, vector_t *vids) {
-  return igraph_cocitation_real(graph, res, vids, 2);
+  return igraph_cocitation_real(graph, res, vids, IGRAPH_IN);
 }
 
 int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids, 
-			   integer_t mode) {
+			   igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int from, i, j;

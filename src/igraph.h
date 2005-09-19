@@ -37,11 +37,54 @@ __BEGIN_DECLS
 
 #include "types.h"
 
-/** \defgroup interface The basic igraph interface */
-/** \defgroup generators Graph generators */
-/** \defgroup structural Structural properties of graphs */
-/** \defgroup iterators Vertex and edge iterators */
-/** \defgroup internal Internal functions and data types */
+/** \defgroup types Basic data types.
+ * \brief Important data types for vectors, matrices and graphs.
+ */ 
+
+/** \defgroup interface The basic igraph interface 
+ * \brief This is the very minimal API in \a igraph. All the other
+ * functions use this minimal set for creating and manipulating the
+ * graphs. 
+ * 
+ * This is a very important principle since it makes possible to
+ * implement other data representations by implementing only this
+ * minimal set.
+ */
+
+/** \defgroup generators Graph generators 
+ * \brief Graph generators create graphs.
+ * 
+ * Almost all functions which create graph objects are documented
+ * here. The exceptions are <code>subgraph</code> and alike, these 
+ * create graphs based on another graph.
+ */
+
+/** \defgroup structural Structural properties of graphs 
+ * \brief These functions usually calculate some structural property
+ * of a graph, like its diameter, the degree of the nodes, etc.
+ */
+
+/** 
+ * \defgroup iterators Vertex and edge iterators
+ * \brief Iterators provide a method to walk through some edges or
+ * vertices of the graph.
+ * 
+ * This documentation is not yet written, as it is possible that the concept 
+ * of iterators will be reinterpreted soon.
+ */
+
+/**
+ * \defgroup nongraph Non-graph related functions
+ * \brief These functions are not directly graph related but they 
+ * are either used by the graph related routines or are just useful 
+ * themselves.
+ */
+
+/** \defgroup internal Internal functions and data types
+ * \brief Everything documented here should be of interest of
+ * \a igraph developers only.
+ */
+
 
 /** 
  * \mainpage The <em>igraph</em> library manual
@@ -72,7 +115,7 @@ __BEGIN_DECLS
  * be used with other mathematical software (as soon as somebody
  * writes the interfaces to it), and can be used for large scale
  * scientific computation in the Condor environment we are
- * using.
+ * using here at KFKI.
  *
  * \section features Features
  * - \a igraph contains functions for generating regular and
@@ -96,28 +139,27 @@ __BEGIN_DECLS
  * uncompress it to a temporary directory:
  * \verbatim wget http://geza.kzoo.edu/~csardi/igraph_latest.tar.gz
  tar xzf igraph_latest.tar.gz 
- cd igraph-latest \endverbatim
+ cd igraph-latest 
+\endverbatim
  * \subsection installation-r Installation as an R package
  * This is very simple, the \a igraph directory in the
  * tarball contains a complete R package. Eg. in Linux you can install
  * it like
  * \verbatim R CMD INSTALL -l ~/.R/library igraph \endverbatim
  * 
- * Alternatively you can create a tarball from the \a igraph
- * directory and create a standard R package:
- * \verbatim R CMD build igraph 
- R CMD INSTALL -l ~/.R/library igraph_*.tar.gz \endverbatim
+ * Alternatively you can download the R package version of \a igraph only.
  *
- * Consult your R documentation.
+ * Also, consult your R documentation.
  * 
  * \subsection installation-lib Installation as a library
- * Simply typing \c make should work on most systems. At the
- * end of the compilation you will need the
- * \c libigraph.so.* file and the header files in the
- * \c include directory, copy these to appropriate places on
- * your system. 
- *
- * An autoconf system might be added later.
+ * Simply typing
+ * \verbatim ./configure
+ make
+ make install \endverbatim 
+ * (the latter as root) should work on most systems. You can try
+ * \verbatim ./configure --help \endverbatim
+ * to see installations options, and reading the <code>INSTALL</code> 
+ * file. 
  *
  * \section license License
  *
@@ -139,7 +181,8 @@ __BEGIN_DECLS
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * \section tutorial A short tutorial
- * This is under development.
+ * This is under development. Until it is done, you can just read
+ * through the documentation of each modules in the Modules section.
  *
  */
 
@@ -191,11 +234,32 @@ typedef struct igraph_s {
 } igraph_t;
 
 /* -------------------------------------------------- */
+/* Constants                                          */
+/* -------------------------------------------------- */
+
+typedef enum { IGRAPH_OUT=1, IGRAPH_IN=2, IGRAPH_ALL=3,
+	       IGRAPH_TOTAL=3 } igraph_neimode_t;
+
+typedef enum { IGRAPH_WEAK=1, IGRAPH_STRONG=2 } igraph_connectedness_t;
+
+typedef enum { IGRAPH_ADJ_DIRECTED=0, 
+	       IGRAPH_ADJ_UNDIRECTED=1, IGRAPH_ADJ_MAX=1,
+               IGRAPH_ADJ_UPPER, IGRAPH_ADJ_LOWER, IGRAPH_ADJ_MIN,
+	       IGRAPH_ADJ_PLUS } igraph_adjacency_t;
+
+typedef enum { IGRAPH_STAR_OUT=0, IGRAPH_STAR_IN,
+	       IGRAPH_STAR_UNDIRECTED } igraph_star_mode_t;
+
+typedef enum { IGRAPH_TREE_OUT=0, IGRAPH_TREE_IN,
+	       IGRAPH_TREE_UNDIRECTED } igraph_tree_mode_t;
+
+/* -------------------------------------------------- */
 /* Interface                                          */
 /* -------------------------------------------------- */
 
 int igraph_empty(igraph_t *graph, integer_t n, bool_t directed);
 int igraph_destroy(igraph_t *graph);
+int igraph_copy(igraph_t *to, igraph_t *from);
 int igraph_add_edges(igraph_t *graph, vector_t *edges);
 int igraph_add_vertices(igraph_t *graph, integer_t nv);
 int igraph_delete_edges(igraph_t *graph, vector_t *edges);
@@ -203,10 +267,10 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices);
 integer_t igraph_vcount(igraph_t *graph);
 integer_t igraph_ecount(igraph_t *graph);
 int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t vid, 
-		   integer_t mode); 
+		     igraph_neimode_t mode); 
 bool_t igraph_is_directed(igraph_t *graph);
 int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
-		  integer_t mode, bool_t loops);
+		  igraph_neimode_t mode, bool_t loops);
 
 /* -------------------------------------------------- */
 /* Iterators                                          */
@@ -230,11 +294,11 @@ typedef struct igraph_iterator_t {
 /* The constructors & destructor */
 int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it, 
-			  integer_t vid, integer_t mode);
+			  integer_t vid, igraph_neimode_t mode);
 int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
-			  integer_t vid, integer_t mode);
+			  integer_t vid, igraph_neimode_t mode);
 
 int igraph_iterator_destroy(igraph_t *graph, igraph_iterator_t *it);
 
@@ -290,7 +354,7 @@ integer_t igraph_get_vertex_from_eneis(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_to_eneis(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it); 
 int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it, 
-			      integer_t vid, integer_t mode);
+			      integer_t vid, igraph_neimode_t mode);
 integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it);
 
 /* TODO: attributes */
@@ -307,14 +371,16 @@ int igraph_error(const char *msg);
 
 int igraph_create(igraph_t *graph, vector_t *edges, integer_t n, 
 		  bool_t directed);
-int igraph_adjacency(igraph_t *graph, vector_t *adjmatrix,
-		     integer_t dirmode);
-int igraph_star(igraph_t *graph, integer_t n, integer_t mode, 
-		integer_t center, bool_t directed);
+int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
+		     igraph_adjacency_t mode);
+int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode, 
+		integer_t center);
 int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei, 
 		   bool_t directed, bool_t mutual, bool_t circular);
-int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual);
-int igraph_tree(igraph_t *graph, integer_t n, integer_t children);
+int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, 
+		bool_t mutual, bool_t circular);
+int igraph_tree(igraph_t *graph, integer_t n, integer_t children, 
+		igraph_tree_mode_t type);
 
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */
@@ -347,17 +413,19 @@ int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst);
 int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
 				      vector_t *weights);
 int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids, 
-		     integer_t mode);
+		     igraph_neimode_t mode);
 int igraph_shortest_paths(igraph_t *graph, matrix_t *res, 
-			  vector_t *from, integer_t mode);
+			  vector_t *from, igraph_neimode_t mode);
 int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
-			      integer_t from, integer_t mode);
+			      integer_t from, igraph_neimode_t mode);
 int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vid, 
-			integer_t mode);
+			igraph_neimode_t mode);
 int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids, 
 			bool_t directed);
 int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 
 			     bool_t directed);
+int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids);
+
 /* TODO: degree.distribution (?) */
 
 /* -------------------------------------------------- */
@@ -365,17 +433,18 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
 /* -------------------------------------------------- */
 
 int igraph_clusters(igraph_t *graph, vector_t *membership, vector_t *csize, 
-		    integer_t mode);
-int igraph_is_connected(igraph_t *graph, bool_t *res, integer_t mode);
+		    igraph_connectedness_t mode);
+int igraph_is_connected(igraph_t *graph, bool_t *res, 
+			igraph_connectedness_t mode);
 /* TODO: cluster.distribution (?) */
 
 /* -------------------------------------------------- */
 /* Layouts                                            */
 /* -------------------------------------------------- */
 
-int igraph_layout_random(igraph_t *graph, vector_t *res);
-int igraph_layout_circle(igraph_t *graph, vector_t *res);
-int igraph_layout_fruchterman_reingold(igraph_t *graph, vector_t *res, 
+int igraph_layout_random(igraph_t *graph, matrix_t *res);
+int igraph_layout_circle(igraph_t *graph, matrix_t *res);
+int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res, 
 				       integer_t niter, real_t coolexp,
 				       integer_t frame, vector_t *initial,
 				       real_t initemp);
@@ -383,7 +452,7 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,
 			       real_t kkconst);
-int igraph_layout_springs(igraph_t *graph, vector_t *res,
+int igraph_layout_springs(igraph_t *graph, matrix_t *res,
 			  real_t mass, real_t equil, real_t k,
 			  real_t repeqdis, real_t kfr, bool_t repulse);
 

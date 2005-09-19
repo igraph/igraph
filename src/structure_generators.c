@@ -59,15 +59,235 @@ int igraph_create(igraph_t *graph, vector_t *edges, integer_t n,
   return 0;
 }
 
-int igraph_adjacency(igraph_t *graph, vector_t *adjmatrix,
-		     integer_t dirmode) {
-  /* TODO */
+int igraph_i_adjacency_directed(matrix_t *adjmatrix, vector_t *edges) {
+  
+  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int i, j, k;
+  
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=0; j<no_of_nodes; j++) {
+      long int M=MATRIX(*adjmatrix, i, j);
+      for (k=0; k<M; k++) {
+	vector_push_back(edges, i);
+	vector_push_back(edges, j);
+      }
+    }
+  }
+  
   return 0;
 }
 
-int igraph_star(igraph_t *graph, integer_t n, integer_t mode, 
-		integer_t center, bool_t directed) {
-  /* TODO */
+int igraph_i_adjacency_max(matrix_t *adjmatrix, vector_t *edges) {
+  
+  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int i, j, k;
+  
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=i; j<no_of_nodes; j++) {
+      long int M1=MATRIX(*adjmatrix, i, j);
+      long int M2=MATRIX(*adjmatrix, j, i);
+      if (M1<M2) { M1=M2; }
+      for (k=0; k<M1; k++) {
+	vector_push_back(edges, i);
+	vector_push_back(edges, j);
+      }
+    }
+  }
+  
+  return 0;
+}
+
+int igraph_i_adjacency_upper(matrix_t *adjmatrix, vector_t *edges) {
+  
+  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int i, j, k;
+  
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=i; j<no_of_nodes; j++) {
+      long int M=MATRIX(*adjmatrix, i, j);
+      for (k=0; k<M; k++) {
+	vector_push_back(edges, i);
+	vector_push_back(edges, j);
+      }
+    }
+  }
+  return 0;
+}
+
+int igraph_i_adjacency_lower(matrix_t *adjmatrix, vector_t *edges) {
+
+  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int i, j, k;
+  
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=0; j<=i; j++) {
+      long int M=MATRIX(*adjmatrix, i, j);
+      for (k=0; k<M; k++) {
+	vector_push_back(edges, i);
+	vector_push_back(edges, j);
+      }
+    }
+  }
+  return 0;
+}
+
+int igraph_i_adjacency_min(matrix_t *adjmatrix, vector_t *edges) {
+  
+  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int i, j, k;
+  
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=i; j<no_of_nodes; j++) {
+      long int M1=MATRIX(*adjmatrix, i, j);
+      long int M2=MATRIX(*adjmatrix, j, i);
+      if (M1>M2) { M1=M2; }
+      for (k=0; k<M1; k++) {
+	vector_push_back(edges, i);
+	vector_push_back(edges, j);
+      }
+    }
+  }
+  
+  return 0;
+}
+
+/**
+ * \ingroup generators
+ * \brief Creates a graph object from an adjacency matrix.
+ * 
+ * @param graph Pointer to an uninitialized graph object.
+ * @param adjmatrix The adjacency matrix. How it is interpreted
+ *        depends on the <code>mode</code> argument.
+ * @param mode Constant to specify how the given matrix is interpreted
+ *        as an adjacency matrix. Possible values (<code>A(i,j)</code>
+ *        is the element in row <code>i</code> and column
+ *        <code>j</code> in the adjacency matrix
+ *        (<code>adjmatrix</code>): 
+ *        - <b>IGRAPH_ADJ_DIRECTED</b>, the graph will be directed and
+ *          an element gives the number of edges between two vertex.
+ *        - <b>IGRAPH_ADJ_UNDIRECTED</b>, this is the same as
+ *          <b>IGRAPH_ADJ_MAX</b>, for convenience.
+ *        - <b>IGRAPH_ADJ_MAX</b>, undirected graph will be created
+ *          and the number of edges between vertex <code>i</code> and
+ *          <code>j</code> is <code>max(A(i,j), A(j,i))</code>.
+ *        - <b>IGRAPH_ADJ_MIN</b>, undirected graph will be created
+ *          with <code>min(A(i,j), A(j,i))</code> edges between vertex
+ *          <code>i</code> and <code>j</code>.
+ *        - <b>IGRAPH_ADJ_PLUS</b>, undirected graph will be created 
+ *          with <code>A(i,j)+A(j,i)</code> edges between vertex
+ *          <code>i</code> and <code>j</code>. 
+ *        - <b>IGRAPH_ADJ_UPPER</b>, undirected graph will be created,
+ *          only the upper right triangle (including the diagonal) is
+ *          used for the number of edges.
+ *        - <b>IGRAPH_ADJ_LOWER</b>, undirected graph will be created,
+ *          only the lower left triangle (including the diagonal) is 
+ *          used for creating the edges.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V||V|+|E|)</code>, <code>|V|</code> and
+ * <code>|E|</code> are number of vertices and edges in the graph.
+ */
+
+int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
+		     igraph_adjacency_t mode) {
+
+  vector_t edges;
+  long int no_of_nodes;
+  int retval;
+
+  /* Some checks */
+  if (matrix_nrow(adjmatrix) != matrix_ncol(adjmatrix)) {
+    igraph_error("Non-square matrix");
+  }
+
+  vector_init(&edges, 0);
+  
+  /* Collect the edges */
+  no_of_nodes=matrix_nrow(adjmatrix);
+  switch (mode) {
+  case IGRAPH_ADJ_DIRECTED:
+    retval=igraph_i_adjacency_directed(adjmatrix, &edges);
+    break;
+  case IGRAPH_ADJ_MAX:
+    retval=igraph_i_adjacency_max(adjmatrix, &edges);
+    break;
+  case IGRAPH_ADJ_UPPER:
+    retval=igraph_i_adjacency_upper(adjmatrix, &edges);
+    break;
+  case IGRAPH_ADJ_LOWER:
+    retval=igraph_i_adjacency_lower(adjmatrix, &edges);
+    break;
+  case IGRAPH_ADJ_MIN:
+    retval=igraph_i_adjacency_min(adjmatrix, &edges);
+    break;
+  case IGRAPH_ADJ_PLUS:
+    retval=igraph_i_adjacency_directed(adjmatrix, &edges);
+    break;
+  }
+
+  igraph_create(graph, &edges, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED));
+  vector_destroy(&edges);
+  
+  return retval;
+}
+
+/**
+ * \ingroup generators
+ * \brief Created a \a star graph, every vertex connect to the center
+ * only.
+ *
+ * @param graph Pointer to an uninitialized graph object, this will
+ *        be the result.
+ * @param n Integer constant, the number of vertices in the graph.
+ * @param mode Contant, gives the type of the star graph to
+ *        create. Possible values:
+ *        - <b>IGRAPH_STAR_OUT</b>, directed star graph, edges point
+ *          <em>from</em> the center to the other vertices.
+ *        - <b>IGRAPH_STAR_IN</b>, directed star graph, edges point
+ *          <em>to</em> the center from the other vertices.
+ *        - <b>IGRAPH_STAR_UNDIRECTED</b>, an undirected star graph is
+ *          created. 
+ * @param center Id of the vertex which will be the center of the
+ *          graph. 
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|)</code>, the number of vertices in the
+ * graph.
+ *
+ * \sa igraph_lattice(), igraph_ring(), igraph_tree() for creating
+ * other regular structures.
+ */
+
+int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode, 
+		integer_t center) {
+
+  vector_t edges;
+  long int i;
+
+  vector_init(&edges, (n-1)*2);
+  if (mode == IGRAPH_STAR_OUT) {
+    for (i=0; i<center; i++) {
+      VECTOR(edges)[2*i]=center;
+      VECTOR(edges)[2*i+1]=i;
+    }
+    for (i=center+1; i<n; i++) {
+      VECTOR(edges)[2*(i-1)]=center;
+      VECTOR(edges)[2*(i-1)+1]=i;
+    }
+  } else {
+    for (i=0; i<center; i++) {
+      VECTOR(edges)[2*i+1]=center;
+      VECTOR(edges)[2*i]=i;
+    }
+    for (i=center+1; i<n; i++) {
+      VECTOR(edges)[2*(i-1)+1]=center;
+      VECTOR(edges)[2*(i-1)]=i;
+    }
+  }
+  
+  igraph_create(graph, &edges, 0, (mode != IGRAPH_STAR_UNDIRECTED));
+  vector_destroy(&edges);
+  
   return 0;
 }
 
@@ -242,13 +462,96 @@ int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei,
   return 0;
 }
 
-int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual) {
-  /* TODO */
+/**
+ * \ingroup generators
+ * \brief Creates a \a ring graph, a one dimensional lattice.
+ * 
+ * @param graph Pointer to an uninitialized graph object.
+ * @param n The number of vertices in the ring.
+ * @param directed Logical, whether to create a directed ring.
+ * @param mutual Logical, whether to create mutual edges in a directed
+ *        ring. It is ignored for undirected graphs.
+ * @param circular Logical, if false, the ring will be open (this is
+ *        not a real <em>ring</em> actually).
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|)</code>, the number of vertices in the
+ * graph.
+ *
+ * \sa igraph_lattice() for generating more general lattices.
+ */
+
+int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
+		bool_t circular) {
+  
+  vector_t v;
+  
+  vector_init(&v, 1);
+  VECTOR(v)[0]=n;
+  
+  igraph_lattice(graph, &v, 1, directed, mutual, circular);
+  vector_destroy(&v);		 
+  
   return 0;
 }
 
-int igraph_tree(igraph_t *graph, integer_t n, integer_t children) {
-  /* TODO */
+/**
+ * \ingroup generators
+ * \brief Creates a tree in which almost all vertices has the same
+ * number of children.
+ *
+ * @param graph Pointer to an uninitialized graph object.
+ * @param n Integer, the number of vertices in the graph.
+ * @param children Integer, the number of children of a vertex in the
+ *        tree. 
+ * @param type Constant, gives whether to create a directed tree, and
+ *        if this is the case, also its orientation. Possible values:
+ *        - <b>IGRAPH_TREE_OUT</b>, directed tree, the edges point
+ *          from the parents to their children,
+ *        - <b>IGRAPH_TREE_IN</b>, directed tree, the edges point from
+ *          the children to their parents.
+ *        - <b>IGRAPH_TREE_UNDIRECTED</b>, undirected tree.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges in the graph.
+ * 
+ * \sa igraph_lattice(), igraph_star() for creating other regular
+ * structures. 
+ */
+
+int igraph_tree(igraph_t *graph, integer_t n, integer_t children, 
+		igraph_tree_mode_t type) {
+  
+  vector_t edges;
+  long int i, j;
+  long int idx=0;
+  long int to=1;
+  
+  vector_init(&edges, 2*(n-1));
+  
+  i=0;
+  if (type == IGRAPH_TREE_OUT) {
+    while (idx<2*(n-1)) {
+      for (j=0; j<children && idx<2*(n-1); j++) {
+	VECTOR(edges)[idx++]=i;
+	VECTOR(edges)[idx++]=to++;
+      }
+      i++;
+    }
+  } else {
+    while (idx<2*(n-1)) {
+      for (j=0; j<children && idx<2*(n-1); j++) {
+	VECTOR(edges)[idx++]=to++;
+	VECTOR(edges)[idx++]=i;
+      }
+      i++;
+    }
+  }
+      
+  igraph_create(graph, &edges, 0, type!=IGRAPH_TREE_UNDIRECTED);
+  
+  vector_destroy(&edges);
   return 0;
 }
 

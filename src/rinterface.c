@@ -751,3 +751,135 @@ SEXP R_igraph_are_connected(SEXP graph, SEXP pv1, SEXP pv2) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_graph_adjacency(SEXP adjmatrix, SEXP pmode) {
+  
+  igraph_t g;
+  matrix_t adjm;
+  integer_t mode=REAL(pmode)[0];
+  SEXP result;
+  
+  R_SEXP_to_matrix(adjmatrix, &adjm);
+  igraph_adjacency(&g, &adjm, mode);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_average_path_length(SEXP graph, SEXP pdirected, 
+				  SEXP punconnected) {
+  
+  igraph_t g;
+  bool_t directed=LOGICAL(pdirected)[0];
+  bool_t unconnected=LOGICAL(punconnected)[0];
+  real_t res;
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  igraph_average_path_length(&g, &res, directed, unconnected);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_star(SEXP pn, SEXP pmode, SEXP pcenter) {
+
+  igraph_t g;
+  integer_t n=REAL(pn)[0];
+  integer_t mode=REAL(pmode)[0];
+  integer_t center=REAL(pcenter)[0];
+  SEXP result;
+  
+  igraph_star(&g, n, mode, center);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_ring(SEXP pn, SEXP pdirected, SEXP pmutual, SEXP pcircular) {
+
+  igraph_t g;
+  integer_t n=REAL(pn)[0];
+  bool_t directed=LOGICAL(pdirected)[0];
+  bool_t mutual=LOGICAL(pmutual)[0];
+  bool_t circular=LOGICAL(pcircular)[0];
+  SEXP result;
+  
+  igraph_ring(&g, n, directed, mutual, circular);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_tree(SEXP pn, SEXP pchildren, SEXP pmode) {
+  
+  igraph_t g;
+  integer_t n=REAL(pn)[0];
+  integer_t children=REAL(pchildren)[0];
+  integer_t mode=REAL(pmode)[0];
+  SEXP result;
+
+  igraph_tree(&g, n, children, mode);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_subgraph(SEXP graph, SEXP pvids) {
+  
+  igraph_t g;
+  igraph_t sub;
+  vector_t vids=vector_as_vector(REAL(pvids), GET_LENGTH(pvids));
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_subgraph(&g, &sub, &vids);
+  PROTECT(result=R_igraph_to_SEXP(&sub));
+  igraph_destroy(&sub);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_layout_random(SEXP graph) {
+  
+  igraph_t g;
+  matrix_t res;
+  SEXP result=R_NilValue;
+  
+  R_SEXP_to_igraph(graph, &g);
+  matrix_init(&res, 0, 0);
+  igraph_layout_random(&g, &res);
+  PROTECT(result=R_matrix_to_SEXP(&res));
+  matrix_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_layout_circle(SEXP graph) {
+  
+  igraph_t g;
+  matrix_t res;
+  SEXP result=R_NilValue;
+  
+  R_SEXP_to_igraph(graph, &g);
+  matrix_init(&res, 0, 0);
+  igraph_layout_circle(&g, &res);
+  PROTECT(result=R_matrix_to_SEXP(&res));
+  matrix_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}

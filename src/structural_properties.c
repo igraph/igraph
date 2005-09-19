@@ -35,7 +35,7 @@
  *        <code>TRUE</code> the longest geodesic within a component
  *        will be returned, otherwise the number of vertices is
  *        returned. (The ratio behind the latter is that this is
- *        always longer than the longest possible diameter is a
+ *        always longer than the longest possible diameter in a
  *        graph.) 
  * @return Error code.
  *
@@ -56,7 +56,7 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
   integer_t dirmode;
 
   *res=0;  
-  if (directed) { dirmode=1; } else { dirmode=3; }
+  if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
   already_added=Calloc(no_of_nodes, long int);
   dqueue_init(&q, 100);
   vector_init(&neis, 0);
@@ -97,6 +97,113 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
 
   return 0;
 }
+
+/**
+ * \ingroup structural
+ * \brief Calculates the average geodesic length in a graph.
+ *
+ * @param graph The graph object.
+ * @param res Pointer to a real number, this will contain the result.
+ * @param directed Boolean, whether to consider directed
+ *        paths. Ignored for undirected graphs.
+ * @param unconn What to do if the graph is not connected. If
+ *        <code>TRUE</code> the average of thr geodesics within the components
+ *        will be returned, otherwise the number of vertices is
+ *        used for the length of non-existing geodesics. (The ratio
+ *        behind this is that this is always longer than the longest
+ *        possible geodesic in a graph.) 
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V||E|)</code>, the number of vertices
+ * times the number of edges.
+ */
+
+int igraph_average_path_length(igraph_t *graph, real_t *res,
+			       bool_t directed, bool_t unconn) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i, j;
+  long int *already_added;
+  long int nodes_reached;
+  long int normfact=0;
+
+  dqueue_t q;
+  vector_t neis;
+  integer_t dirmode;
+
+  *res=0;  
+  if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
+  already_added=Calloc(no_of_nodes, long int);
+  dqueue_init(&q, 100);
+  vector_init(&neis, 0);
+  
+  for (i=0; i<no_of_nodes; i++) {
+    nodes_reached=1;
+    dqueue_push(&q, i);
+    dqueue_push(&q, 0);
+    already_added[i]=i+1;
+    nodes_reached++;
+    
+    while (!dqueue_empty(&q)) {
+      long int actnode=dqueue_pop(&q);
+      long int actdist=dqueue_pop(&q);
+      *res += actdist;
+	
+      igraph_neighbors(graph, &neis, actnode, dirmode);
+      for (j=0; j<vector_size(&neis); j++) {
+	long int neighbor=VECTOR(neis)[j];
+	if (already_added[neighbor] == i+1) { continue; }
+	already_added[neighbor]=i+1;
+	nodes_reached++;
+	dqueue_push(&q, neighbor);
+	dqueue_push(&q, actdist+1);
+      }
+    } /* while !dqueue_empty */
+    
+    /* not connected, return largest possible */
+    if (nodes_reached != no_of_nodes && !unconn) {
+      *res += (no_of_nodes * (no_of_nodes-nodes_reached));
+      nodes_reached=no_of_nodes;
+      break;
+    }    
+    normfact += nodes_reached;
+  } /* for i<no_of_nodes */
+  
+  *res /= (normfact-no_of_nodes);
+
+  /* clean */
+  Free(already_added);
+  dqueue_destroy(&q);
+  vector_destroy(&neis);
+
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \brief Calculates one minimum spanning tree of an unweighted graph.
+ * 
+ * If the graph has more minimum spanning trees (this is always the
+ * case, except if it is a forest) this implementation returns only
+ * the same one.
+ * 
+ * Directed graphs are considered as undirected for this computation.
+ *
+ * If the graph is not connected then its minimum spanning forest is
+ * returned. This is the set of the minimum spanning trees of each
+ * component.
+ * @param graph The graph object.
+ * @param mst The minimum spanning tree, another graph object. Do
+ *        <em>not</em> initialize this object before passing it to
+ *        this function, but be sure to call igraph_destroy() on it if
+ *        you don't need it any more.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
+ * number of vertices, <code>|E|</code> the number of edges in the
+ * graph. 
+ *
+ * \sa igraph_minimum_spanning_tree_prim() for weighted graphs.
+ */
 
 int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
 
@@ -144,6 +251,41 @@ int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
 
   return 0;
 }
+
+/**
+ * \ingroup structural
+ * \brief Calculates one minimum spanning tree of a weighted graph.
+ *
+ * This function uses Prim's method for carrying out the computation,
+ * see Prim, R.C.: Shortest connection networks and some
+ * generalizations, <em>Bell System Technical Journal</em>, Vol. 36,
+ * 1957, 1389--1401.
+ * 
+ * If the graph has more than one minimum spanning tree, the current
+ * implementation returns always the same one.
+ *
+ * Directed graphs are considered as undirected for this computation. 
+ * 
+ * If the graph is not connected then its minimum spanning forest is
+ * returned. This is the set of the minimum spanning trees of each
+ * component.
+ * 
+ * @param graph The graph object.
+ * @param mst The result of the computation, a graph object containing
+ *        the minimum spanning tree of the graph.
+ *        Do <em>not</em> initialize this object before passing it to
+ *        this function, but be sure to call igraph_destroy() on it if
+ *        you don't need it any more.
+ * @param weights A vector containing the weights of the the edges.
+ *        in the same order as the simple edge iterator visits them.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
+ * number of vertices, <code>|E|</code> the number of edges in the
+ * graph. 
+ *
+ * \sa igraph_minimum_spanning_tree_unweighted() for unweighted graphs.
+ */
 
 int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
 				      vector_t *weights) {
@@ -218,8 +360,44 @@ int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
   return 0;
 }
 
+/**
+ * \ingroup structural
+ * \brief Cloness centrality calculations for some vertices.
+ *
+ * The closeness centerality of a vertex measures how easily other
+ * vertices can be reached from it (or the other way: how easily it
+ * can be reached from the other vertices). It is defined as the
+ * number of the number of vertices minus one divided by the sum of the
+ * lengths of all geodesics from/to the given vertex.
+ *
+ * If the graph is not connected, and there is no path between two
+ * vertices, the number of vertices is used instead the length of the
+ * geodesic. This is always longer than the longest possible geodesic.
+ * 
+ * @param graph The graph object.
+ * @param res The result of the computatuion, a vector containing the
+ *        closeness centrality scores for the given vertices.
+ * @param vids Vector giving the vertices for which the closeness
+ *        centrality scores will be computed.
+ * @param mode The type of shortest paths to be use for the
+ *        calculation in directed graphs. Possible values: 
+ *        - <b>IGRAPH_OUT</b>, the lengths of the outgoing paths are
+ *          calculated. 
+ *        - <b>IGRAPH_IN</b>, the lengths of the incoming paths are
+ *          calculated. 
+ *        - <b>IGRAPH_ALL</b>, the directed graph is considered as an
+ *          undirected one for the computation.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(n|E|)</code>, <code>n</code> is the number
+ * of vertices for which the calculation is done and |E| is the number
+ * of edges in the graph.
+ *
+ * \sa Other centrality types: igraph_degree(), igraph_betweenness().
+ */
+
 int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids, 
-		     integer_t mode) {
+		     igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int *already_counted;
@@ -271,8 +449,38 @@ int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids,
   return 0;
 }
 
+/**
+ * \ingroup structural
+ * \brief The length of the shortest paths between vertices.
+ *
+ * @param graph The graph object.
+ * @param res The result of the calculation, a matrix. It has the same
+ *        number of rows as the length of the <code>from</code>
+ *        argument, and its number of columns is the number of
+ *        vertices in the graph. One row of the matrix shows the
+ *        distances from/to a given vertex to all the others in the
+ *        graph, the order is fixed by the vertex ids.
+ * @param from Vector of the vertex ids for which the path length
+ *        calculations are done.
+ * @param mode The type of shortest paths to be use for the
+ *        calculation in directed graphs. Possible values: 
+ *        - <b>IGRAPH_OUT</b>, the lengths of the outgoing paths are
+ *          calculated. 
+ *        - <b>IGRAPH_IN</b>, the lengths of the incoming paths are
+ *          calculated. 
+ *        - <b>IGRAPH_ALL</b>, the directed graph is considered as an
+ *          undirected one for the computation.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(n(|V|+|E|))</code>, <code>n</code> is the
+ * number of vertices to calculate, <code>|V|</code> and
+ * <code>|E|</code> are the number of vertices and edges in the graph.
+ *
+ * \sa igraph_get_shortest_paths() to get the paths themselves.
+ */
+
 int igraph_shortest_paths(igraph_t *graph, matrix_t *res, 
-			  vector_t *from, integer_t mode) {
+			  vector_t *from, igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_from=vector_size(from);
@@ -330,8 +538,41 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
   return 0;
 }
 
+/**
+ * \ingroup structural
+ * \brief Calculates the shortest paths from/to one vertex.
+ * 
+ * If there is more than one geodesic between two vertices, this
+ * function gives only one of them. 
+ * @param graph The graph object.
+ * @param res The result, this is a pointer array to vector
+ *        objects. These should be initialized before passing them to
+ *        the function, which will properly erase and/or resize them
+ *        and fill the ids of the vertices along the geodesics from/to
+ *        the vertices.
+ * @param from The id of the vertex from/to which the geodesics are
+ *        calculated. 
+ * @param mode The type of shortest paths to be use for the
+ *        calculation in directed graphs. Possible values: 
+ *        - <b>IGRAPH_OUT</b>, the lengths of the outgoing paths are
+ *          calculated. 
+ *        - <b>IGRAPH_IN</b>, the lengths of the incoming paths are
+ *          calculated. 
+ *        - <b>IGRAPH_ALL</b>, the directed graph is considered as an
+ *          undirected one for the computation.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
+ * number of vertices, <code>|E|</code> the number of edges in the
+ * graph. 
+ *
+ * \sa igraph_shortest_paths() if you only need the path length but
+ * not the paths themselves.
+ */
+ 
+
 int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
-			      integer_t from, integer_t mode) {
+			      integer_t from, igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int *father;
@@ -389,8 +630,34 @@ int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
   return 0;
 }
 
+/** 
+ * \ingroup structural
+ * \brief The vertices in the same component as a given vertex.
+ *
+ * @param graph The graph object.
+ * @param res The result, vector with the ids of the vertices in the
+ *        same component. 
+ * @param vertex The id of the vertex of which the component is
+ *        searched. 
+ * @param mode Type of the component for directed graphs, possible values:
+ *        - <b>IGRAPH_OUT</b>, the set of vertices reachable
+ *          <em>from</em> the <code>vertex</code>,
+ *        - <b>IGRAPH_IN</b>, the set of vertices from which the
+ *          <code>vertex</code> is reachable.
+ *        - <b>IGRAPH_ALL</b>, the graph is considered as an
+ *          undirected graph. Note that this is <em>not</em> the same
+ *          as the union of the previous two.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, <code><|V|</code> and
+ * <code>|E|</code> are the number of vertices and edges in the graph.
+ * 
+ * \sa igraph_subgraph() if you want a graph object consisting only
+ * a given set of vertices and the edges between them.
+ */
+
 int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex, 
-			integer_t mode) {
+			igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   dqueue_t q;
@@ -426,6 +693,33 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
   return 0;
 }
 
+/**
+ * \ingroup structural
+ * \brief Betweenness centrality of some vertices.
+ * 
+ * The betweenness centrality of a vertex is the number of geodesics
+ * going through it. If there are more than one geodesics between two
+ * vertices, the value of these geodesics are weighted by one over the 
+ * number of geodesics.
+ * @param graph The graph object.
+ * @param res The result of the computation, vector containing the
+ *        betweenness scores for the specified vertices.
+ * @param vids The vertices of which the betweenness centrality scores
+ *        will be calculated.
+ * @param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V||E|)</code>, <code>|V|</code> and
+ * <code>|E|</code> are the number of vertices and edges in the graph.
+ * Note that the time complexy is independent of the number of
+ * vertices for which the score is calculated.
+ *
+ * \sa Other centrality types: igraph_degree(), igraph_closeness().
+ *     See igraph_edge_betweenness() for calculating the betweenness score
+ *     of the edges in a graph.
+ */
+
 int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids, 
 			bool_t directed) {
 
@@ -441,7 +735,10 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   integer_t modein, modeout;
   real_t *tmpres;
 
-  if (directed) { modeout=1; modein=2; } else { modeout=modein=3; }
+  if (directed) 
+    { modeout=IGRAPH_OUT; modein=IGRAPH_IN; } 
+  else 
+    { modeout=modein=IGRAPH_ALL; }
 
   distance=Calloc(no_of_nodes, long int);
   nrgeo=Calloc(no_of_nodes, long int);
@@ -540,6 +837,29 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   return 0;
 }
 
+/**
+ * \ingroup structural
+ * \brief Betweenness centrality of the edges.
+ * 
+ * The betweenness centrality of an edge is the number of geodesics
+ * going through it. If there are more than one geodesics between two
+ * vertices, the value of these geodesics are weighted by one over the 
+ * number of geodesics.
+ * @param graph The graph object.
+ * @param result The result of the computation, vector containing the
+ *        betweenness scores for the edges.
+ * @param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V||E|)</code>, <code>|V|</code> and
+ * <code>|E|</code> are the number of vertices and edges in the graph.
+ *
+ * \sa Other centrality types: igraph_degree(), igraph_closeness().
+ *     See igraph_edge_betweenness() for calculating the betweenness score
+ *     of the edges in a graph.
+ */
+
 int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 
 			     bool_t directed) {
   
@@ -557,10 +877,10 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
   integer_t modein, modeout;
 
   if (directed) {
-    modeout=1;
-    modein=2;
+    modeout=IGRAPH_OUT;
+    modein=IGRAPH_IN;
   } else {
-    modeout=modein=3;
+    modeout=modein=IGRAPH_ALL;
   }
   
   distance=Calloc(no_of_nodes, long int);
@@ -655,5 +975,58 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
     }
   }
   
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \brief Creates a subgraph with the specified vertices.
+ * 
+ * This function collects the specified vertices and all edges between
+ * them to a new graph.
+ * As the vertex ids in a graph always start with one, this function
+ * very likely needs to reassign ids to the vertices.
+ * @param graph The graph object.
+ * @param res The subgraph, another graph object will be stored here,
+ *        do <em>not</em> initialize this object before calling this
+ *        function, and call igraph_destroy() on it if you don't need
+ *        it any more.
+ * @param vids Vector with the vertex ids to put in the subgraph.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
+ * <code>|E|</code> are the number of vertices and edges in the
+ * original graph.
+ *
+ * \sa igraph_delete_vertices() to delete the specified set of
+ * vertices from a graph, the opposite of this function.
+ */
+
+int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  vector_t delete;
+  char *remain;
+  long int i;
+
+  vector_init(&delete, 0);
+  vector_reserve(&delete, no_of_nodes-vector_size(vids));
+  remain=Calloc(no_of_nodes, char);
+  
+  for (i=0; i<vector_size(vids); i++) {
+    remain[ (long int) VECTOR(*vids)[i] ] = 1;
+  }
+
+  for (i=0; i<no_of_nodes; i++) {
+    if (remain[i] == 0) {
+      vector_push_back(&delete, i);
+    }
+  }
+
+  Free(remain);
+  igraph_copy(res, graph);
+  igraph_delete_vertices(res, &delete);
+  
+  vector_destroy(&delete);
   return 0;
 }

@@ -31,6 +31,11 @@ typedef int    bool_t;
 /* double ended queue, very useful                    */
 /* -------------------------------------------------- */
 
+/**
+ * \defgroup dqueue Double ended queue data type.
+ * \ingroup internal
+ */
+
 typedef struct s_dqueue {
   real_t *begin;
   real_t *end;
@@ -54,12 +59,47 @@ int dqueue_push    (dqueue_t* q, real_t elem);
 /* Flexible vector                                    */
 /* -------------------------------------------------- */
 
+/** \defgroup vector Vector, dealing with arrays efficiently.
+ * \ingroup types
+ * 
+ * The <code>vector_t</code> data type is a simple and efficient
+ * interface to arrays containing real numbers. It is something
+ * similar as (but much simpler than) the <code>vector</code> template
+ * in the C++ standard library.
+ *
+ * Vectors are used extensively in \a igraph, all functions which
+ * expects or returns a list of numbers use <code>vector_t</code> to
+ * achive this.
+ * 
+ * The <code>vector_t</code> type susally uses <code>O(n)</code> space
+ * to store <code>n</code> elements. Sometimes it uses more, this is
+ * because vectors can shrink, but even if they shrink, the current
+ * implementation does not free a single bit of memory.
+ */
+
 typedef struct s_vector {
   real_t* stor_begin;
   real_t* stor_end;
   real_t* end;
 } vector_t;
 
+/**
+ * \ingroup vector
+ * \brief Accessing an element of a vector
+ * 
+ * Usage: 
+ * \verbatim VECTOR(v)[0] \endverbatim 
+ * to access the first element of the vector, you can also use this in
+ * assignments, like: 
+ * \verbatim VECTOR(v)[10]=5; \endverbatim
+ *
+ * Note that there are no range checks right now.
+ * This functionality might be redefined later as a real function
+ * instead of a <code>#define</code>. 
+ * @param v The vector object.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
 #define VECTOR(v) ((v).stor_begin) /* DIRTY */
 int vector_init      (vector_t* v, long int size);
 int vector_init_copy (vector_t* v, real_t* data, long int length);
@@ -82,6 +122,7 @@ int vector_resize(vector_t* v, long int newsize);
 real_t vector_max(vector_t* v);
 vector_t vector_as_vector(real_t *start, long int length);
 int vector_copy_to(vector_t *v, real_t* to);
+int vector_copy(vector_t *to, vector_t *from);
 real_t vector_prod(vector_t *v);
 int vector_init_seq(vector_t *v, real_t from, real_t to);
 
@@ -89,11 +130,32 @@ int vector_init_seq(vector_t *v, real_t from, real_t to);
 /* Matrix, very similar to vector                     */
 /* -------------------------------------------------- */
 
+/** \defgroup matrix Matrix type, for storing real matrices efficienly. 
+ * \ingroup types
+ * 
+ * This type is just an interface to vector.
+ *
+ * The <code>matrix_t</code> type ususally stores <code>n</code>
+ * elements in <code>O(n)</code> space, but not always, see the
+ * documentation of the vector type.
+ */
 typedef struct s_matrix {
   vector_t data;
   long int nrow, ncol;
 } matrix_t;
 
+/**
+ * \ingroup matrix
+ * \brief Accessing an element of a matrix.
+ *
+ * Note that there are no range checks right now. 
+ * This functionality might be redefines as a proper function later. 
+ * @param m The matrix object.
+ * @param i The index of the row, starting with zero.
+ * @param j The index of the column, starting with zero.
+ *
+ * Time complexity: <code>O(1)</code>.
+ */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 int matrix_init(matrix_t *m, long int nrow, long int ncol);
 int matrix_destroy(matrix_t *m);
@@ -107,6 +169,11 @@ int matrix_null(matrix_t *m);
 /* -------------------------------------------------- */
 /* Plain stack                                        */
 /* -------------------------------------------------- */
+
+/**
+ * \defgroup stack Stack data type.
+ * \ingroup internal
+ */
 
 typedef struct s_stack {
   real_t* stor_begin;
@@ -126,6 +193,11 @@ real_t stack_pop        (stack_t* s);
 /* -------------------------------------------------- */
 /* Multi set                                          */
 /* -------------------------------------------------- */
+
+/**
+ * \defgroup multiset Multiset data type.
+ * \ingroup internal
+ */
 
 typedef struct s_multiset {
   real_t* stor_begin;
@@ -154,6 +226,11 @@ real_t multiset_choose_random_different(multiset_t* m, real_t elem);
 /* Heap                                               */
 /* -------------------------------------------------- */
 
+/**
+ * \defgroup heap Heap data type.
+ * \ingroup internal
+ */
+
 typedef struct s_heap {
   real_t* stor_begin;
   real_t* stor_end;
@@ -179,6 +256,11 @@ int heap_i_switch(real_t* arr, long int e1, long int e2);
 /* -------------------------------------------------- */
 /* Indexed heap                                       */
 /* -------------------------------------------------- */
+
+/**
+ * \defgroup indheap Indexed heap data type.
+ * \ingroup internal
+ */
 
 typedef struct s_indheap {
   real_t* stor_begin;
@@ -212,6 +294,11 @@ int indheap_i_switch(indheap_t* h, long int e1, long int e2);
    two indices, its intended usage is the storage of
    weighted edges.
 */
+
+/**
+ * \defgroup doubleindheap Doubly indexed heap data type.
+ * \ingroup internal
+ */
 
 typedef struct s_indheap_d {
   real_t* stor_begin;

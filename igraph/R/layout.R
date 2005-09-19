@@ -24,16 +24,13 @@
 ###################################################################
 
 layout.random <- function(graph, params) {
-  res <- matrix( runif(vcount(graph)*2, -1, 1), nc=2)
-  res
+  .Call("R_igraph_layout_random", graph,
+        PACKAGE="igraph")
 }
 
 layout.circle <- function(graph, params) {
-  n <- vcount(graph)
-  phi <- seq(0, by=2*pi/n, length=n)
-  res <- matrix(c(cos(phi), sin(phi)), nc=2)
-
-  res
+  .Call("R_igraph_layout_circle", graph,
+        PACKAGE="igraph")
 }
 
 layout.fruchterman.reingold <- function(graph, ..., params=list()) {

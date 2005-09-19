@@ -29,17 +29,39 @@ int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
 int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
 			   vector_t *csize);
 
+/**
+ * \ingroup structural
+ * \brief Calculates the (weakly or strongly) connected components in
+ * a graph. 
+ *
+ * @param graph The graph object to analyze.
+ * @param membership First half of the result will be stored here. For
+ *        every vertex the id of its component is given. The vector
+ *        has to be preinitialized and will be resized.
+ * @param csize The second half of the result. For every component it
+ *        gives its size, the order is defined by the component ids.
+ *        The vector has to be preinitialized and will be resized.
+ * @param mode For directed graph this specifies whether to calculate
+ *        weakly or strongly connected components. Possible values: 
+ *        <b>IGRAPH_WEAK</B>, <b>IGRAPH_STRONG</b>. This argument is
+ *        igrored for undirected graphs.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
+ * <code>|E|</code> are the number of vertices and edges in the graph.
+ */
+
 int igraph_clusters(igraph_t *graph, vector_t *membership, vector_t *csize, 
-		    integer_t mode) {
-  if (mode==1 || !igraph_is_directed(graph)) {
+		    igraph_connectedness_t mode) {
+  if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
     return igraph_clusters_weak(graph, membership, csize);
-  } else if (mode==2) {
+  } else if (mode==IGRAPH_STRONG) {
     return igraph_clusters_strong(graph, membership, csize);
   }
   
   return 1;
 }
-  
+
 int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
 			 vector_t *csize) {
 
@@ -73,7 +95,7 @@ int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
     
     while ( !dqueue_empty(&q) ) {
       long int act_node=dqueue_pop(&q);
-      igraph_neighbors(graph, &neis, act_node, 3);
+      igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL);
       for (i=0; i<vector_size(&neis); i++) {
 	long int neighbor=VECTOR(neis)[i];
 	if (already_added[neighbor]==1) { continue; }
@@ -111,8 +133,6 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
   vector_t out;
   vector_t tmp;
 
-  printf("OK\n");
-
   /* The result */
   
   vector_resize(membership, no_of_nodes);
@@ -128,13 +148,13 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
   vector_init(&tmp, 0);
 
   for (i=0; i<no_of_nodes; i++) {
-    igraph_neighbors(graph, &tmp, i, 1);
+    igraph_neighbors(graph, &tmp, i, IGRAPH_OUT);
     if (next_nei[i] > vector_size(&tmp)) { continue; }
     
     dqueue_push(&q, i);
     while (!dqueue_empty(&q)) {
       long int act_node=dqueue_back(&q);
-      igraph_neighbors(graph, &tmp, act_node, 1);
+      igraph_neighbors(graph, &tmp, act_node, IGRAPH_OUT);
       if (next_nei[act_node]==0) {
 	/* this is the first time we've met this vertex */
 	next_nei[act_node]++;
@@ -168,7 +188,7 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
     
     while (!dqueue_empty(&q)) {
       long int act_node=dqueue_pop_back(&q);
-      igraph_neighbors(graph, &tmp, act_node, 2);
+      igraph_neighbors(graph, &tmp, act_node, IGRAPH_IN);
       for (i=0; i<vector_size(&tmp); i++) {
 	long int neighbor=VECTOR(tmp)[i];
 	if (next_nei[neighbor] != 0) { continue; }
@@ -194,10 +214,29 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
 
 int igraph_is_connected_weak(igraph_t *graph, bool_t *res);
 
-int igraph_is_connected(igraph_t *graph, bool_t *res, integer_t mode) {
-  if (mode==1 || !igraph_is_directed(graph)) {
+/**
+ * \ingroup structural
+ * \brief Decides whether the graph is (weakly or strongly) connected.
+ * 
+ * @param graph The graph object to analyze.
+ * @param res Pointer to a logical variable, the result will be stored
+ *        here. 
+ * @param mode For directed graph this specifies whether to calculate
+ *        weak or strong connectedness. Possible values: 
+ *        <b>IGRAPH_WEAK</B>, <b>IGRAPH_STRONG</b>. This argument is
+ *        igrored for undirected graphs.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges in the graph.
+ */
+
+
+int igraph_is_connected(igraph_t *graph, bool_t *res, 
+			igraph_connectedness_t mode) {
+  if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
     return igraph_is_connected_weak(graph, res);
-  } else if (mode==2) {
+  } else if (mode==IGRAPH_STRONG) {
     vector_t membership;
     vector_t csize;
     int retval;
@@ -230,7 +269,7 @@ int igraph_is_connected_weak(igraph_t *graph, bool_t *res) {
   j=1;
   while ( !dqueue_empty(&q)) {
     long int actnode=dqueue_pop(&q);
-    igraph_neighbors(graph, &neis, actnode, 3);
+    igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL);
     for (i=0; i <vector_size(&neis); i++) {
       long int neighbor=VECTOR(neis)[i];
       if (already_added[neighbor] != 0) { continue; }
