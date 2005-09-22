@@ -123,7 +123,7 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j;
   long int *already_added;
-  long int nodes_reached;
+  long int nodes_reached=0;
   long int normfact=0;
 
   dqueue_t q;
@@ -137,38 +137,37 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
   vector_init(&neis, 0);
   
   for (i=0; i<no_of_nodes; i++) {
-    nodes_reached=1;
+    nodes_reached=0;
     dqueue_push(&q, i);
     dqueue_push(&q, 0);
     already_added[i]=i+1;
-    nodes_reached++;
     
     while (!dqueue_empty(&q)) {
       long int actnode=dqueue_pop(&q);
       long int actdist=dqueue_pop(&q);
-      *res += actdist;
-	
+    
       igraph_neighbors(graph, &neis, actnode, dirmode);
       for (j=0; j<vector_size(&neis); j++) {
 	long int neighbor=VECTOR(neis)[j];
 	if (already_added[neighbor] == i+1) { continue; }
 	already_added[neighbor]=i+1;
 	nodes_reached++;
+	*res += actdist+1;
+	normfact++;
 	dqueue_push(&q, neighbor);
 	dqueue_push(&q, actdist+1);
       }
     } /* while !dqueue_empty */
     
     /* not connected, return largest possible */
-    if (nodes_reached != no_of_nodes && !unconn) {
-      *res += (no_of_nodes * (no_of_nodes-nodes_reached));
-      nodes_reached=no_of_nodes;
-      break;
+    if (!unconn) {
+      *res += (no_of_nodes * (no_of_nodes-1-nodes_reached));
+      normfact += no_of_nodes-1-nodes_reached;
     }    
-    normfact += nodes_reached;
   } /* for i<no_of_nodes */
-  
-  *res /= (normfact-no_of_nodes);
+
+  printf("%f / %li\n", *res, normfact);
+  *res /= normfact;
 
   /* clean */
   Free(already_added);
