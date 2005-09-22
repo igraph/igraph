@@ -51,7 +51,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
 			 vector_t *outseq, bool_t outpref, bool_t directed) {
 
   long int no_of_nodes=n;
-  long int no_of_neighbors;
+  long int no_of_neighbors=m;
   long int *bag;
   long int bagp;
   long int no_of_edges;

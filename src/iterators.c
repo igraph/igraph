@@ -264,10 +264,12 @@ integer_t igraph_get_edge_eid(igraph_t *graph, igraph_iterator_t *it) {
 
 int igraph_next_efromorder(igraph_t *graph, igraph_iterator_t *it) {
   ((real_t*)it->data)[0] += 1;
+  return 0;
 }
 
 int igraph_prev_efromorder(igraph_t *graph, igraph_iterator_t *it) {
   ((real_t*)it->data)[0] -= 1;  
+  return 0;
 }
 
 bool_t igraph_end_efromorder(igraph_t *graph, igraph_iterator_t *it) {
@@ -296,6 +298,7 @@ int igraph_next_vneis(igraph_t *graph, igraph_iterator_t *it) {
   if (data->oidx > VECTOR(graph->os)[ (long int)data->vid+1 ]) {
     data->iidx ++;
   }
+  return 0;
 }
 
 int igraph_end_vneis(igraph_t *graph, igraph_iterator_t *it) {
@@ -344,6 +347,7 @@ int igraph_next_eneis(igraph_t *graph, igraph_iterator_t *it) {
   if (data->oidx > VECTOR(graph->os)[ (long int)data->vid+1 ]) {
     data->iidx ++;
   }     
+  return 0;
 }
 
 bool_t igraph_end_eneis(igraph_t *graph, igraph_iterator_t *it) {

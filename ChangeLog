@@ -1,0 +1,28 @@
+2005-09-22  Gabor Csardi  <csardi@szaffi>
+
+	* src/igraph.h (igraph_average_path_length): added prototype,
+	this (likely) eliminates a serious bug 
+
+	* src/igraph.h :
+	* src/components.c :
+	* src/games.c :
+	* src/random.h :
+	* src/iterators.c :
+	* src/measure_dynamics.c :
+	* src/other.c :
+	* src/rinterface.c :
+	* src/structural_properties.c :
+	* src/structure_generators.c :
+	* src/types.c :
+	cosmetics, defining implicit functions, eliminating unused
+	variables, adding return value for non-void functions
+
+	* src/random.h : added prototype for unif_rand(),
+	norm_rand(), this eliminates the random number generation bug
+	* src/Makevars : USING_R defined to use R random number
+	generation if compiling as an R package
+
+	* igraph/R/tkplot.R (.tkplot.layout.dialog): padx, pady removed
+	from layout dialogs, they don't work with older Tk libraries
+
+	

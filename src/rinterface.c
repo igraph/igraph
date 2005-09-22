@@ -29,7 +29,6 @@
 SEXP R_matrix_to_SEXP(matrix_t *m) {
 
   SEXP result, dim; 
-  long int nrow, ncol;
   
   PROTECT(result=NEW_NUMERIC(matrix_size(m)));
   matrix_copy_to(m, REAL(result));

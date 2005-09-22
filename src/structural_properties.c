@@ -23,6 +23,8 @@
 #include "igraph.h"
 #include "memory.h"
 
+#include <string.h>
+
 /**
  * \ingroup structural
  * \brief Calculates the diameter of a graph (longest geodesic).
@@ -166,7 +168,6 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
     }    
   } /* for i<no_of_nodes */
 
-  printf("%f / %li\n", *res, normfact);
   *res /= normfact;
 
   /* clean */
@@ -298,7 +299,7 @@ int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
   
   igraph_iterator_t it;
 
-  long int i, j;
+  long int i;
 
   already_added=Calloc(no_of_nodes, char);
   
@@ -578,7 +579,7 @@ int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
   
   dqueue_t q;
 
-  long int i, j;
+  long int j;
   vector_t tmp;
   
   father=Calloc(no_of_nodes, long int);
@@ -661,7 +662,7 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
   long int no_of_nodes=igraph_vcount(graph);
   dqueue_t q;
   char *already_added;
-  long int i,j;
+  long int i;
   vector_t tmp;
   
   vector_init(&tmp, 0);

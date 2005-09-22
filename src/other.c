@@ -20,7 +20,7 @@
 
 */
 
-#include "types.h"
+#include "igraph.h"
 
 /**
  * \ingroup nongraph

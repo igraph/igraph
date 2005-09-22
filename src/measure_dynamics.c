@@ -23,6 +23,8 @@
 #include "igraph.h"
 #include "memory.h"
 
+#include <math.h>
+
 int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl,
 				  matrix_t *sd,
 				  vector_t *st, integer_t pagebins,
@@ -141,7 +143,6 @@ int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl,
 int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
 				     matrix_t *akl) {
 
-  long int maxind=matrix_nrow(akl);
   long int agebins=matrix_ncol(akl);
   long int no_of_nodes=igraph_vcount(graph);
   long int binwidth;
@@ -150,7 +151,7 @@ int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
   vector_t neis;
   
   long int node;
-  long int i, j, k;
+  long int i, k;
 
   vector_init(&neis, 0);
   

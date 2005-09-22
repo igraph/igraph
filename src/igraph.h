@@ -425,6 +425,8 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
 int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 
 			     bool_t directed);
 int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids);
+int igraph_average_path_length(igraph_t *graph, real_t *res,
+			       bool_t directed, bool_t unconn);
 
 /* TODO: degree.distribution (?) */
 
@@ -504,6 +506,12 @@ int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl,
 				  integer_t maxind, bool_t lsd);
 int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
 				     matrix_t *akl);
+int igraph_measure_dynamics_idage_debug(igraph_t *graph, matrix_t *akl,
+					matrix_t *sd,
+					vector_t *st, integer_t pagebins,
+					integer_t pmaxind, bool_t lsd,
+					vector_t *estimates, 
+					integer_t est_ind, integer_t est_age);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */

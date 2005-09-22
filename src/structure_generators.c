@@ -193,7 +193,7 @@ int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
 
   vector_t edges;
   long int no_of_nodes;
-  int retval;
+  int retval=0;
 
   /* Some checks */
   if (matrix_nrow(adjmatrix) != matrix_ncol(adjmatrix)) {
@@ -392,7 +392,6 @@ int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei,
   vector_t edges;
   long int *coords, *weights;
   long int i, j;
-  long int resp=0;
   int carry, pos;
 
   /* init coords & weights */

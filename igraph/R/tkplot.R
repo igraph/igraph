@@ -1217,7 +1217,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     tkplot.reshape(tkp.id, layout$f, params=realparams)
   }
   
-  dialog <- tktoplevel(.tkplot.get(tkp.id, "top"), padx=10, pady=10)
+  dialog <- tktoplevel(.tkplot.get(tkp.id, "top"))
   
   tkwm.title(dialog, paste("Layout parameters for graph plot", tkp.id))
   tkwm.transient(dialog, .tkplot.get(tkp.id, "top"))

@@ -730,6 +730,7 @@ int matrix_init(matrix_t *m, long int nrow, long int ncol) {
   vector_init(&m->data, nrow*ncol);
   m->nrow=nrow;
   m->ncol=ncol;
+  return 0;
 }
 
 /** 
@@ -747,6 +748,7 @@ int matrix_init(matrix_t *m, long int nrow, long int ncol) {
 
 int matrix_destroy(matrix_t *m) {
   vector_destroy(&m->data);
+  return 0;
 }
 
 /**
@@ -771,6 +773,7 @@ int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
   vector_resize(&m->data, nrow*ncol);
   m->nrow=nrow;
   m->ncol=ncol;
+  return 0;
 }
 
 /**
@@ -849,6 +852,7 @@ int matrix_copy_to(matrix_t *m, real_t *to) {
 
 int matrix_null(matrix_t *m) {
   vector_null(&m->data);
+  return 0;
 }
 
 /**

@@ -28,6 +28,11 @@
 
 #ifdef USING_R
 
+void GetRNGstate(void);
+void PutRNGstate(void);
+double  unif_rand(void);
+double  norm_rand(void);
+
 #define RNG_BEGIN()       GetRNGstate()
 #define RNG_END()         PutRNGstate()
 #define RNG_INTEGER(l, h) ((long int)(unif_rand()*((h)-(l)+1)+(l)))
