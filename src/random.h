@@ -32,21 +32,28 @@ void GetRNGstate(void);
 void PutRNGstate(void);
 double  unif_rand(void);
 double  norm_rand(void);
+double  Rf_rgeom(double);
+#define rgeom Rf_rgeom
 
 #define RNG_BEGIN()       GetRNGstate()
 #define RNG_END()         PutRNGstate()
 #define RNG_INTEGER(l, h) ((long int)(unif_rand()*((h)-(l)+1)+(l)))
 #define RNG_NORMAL(m, s)  (norm_rand()*(s)+(m))
 #define RNG_UNIF(l, h)    (unif_rand()*((h)-(l))+(l))
+#define RNG_GEOM(p)       (rgeom(p))
 
 #else
+
+double igraph_norm_rand(void);
+double igraph_rgeom(double);
 
 #define RNG_BEGIN()       srand(time(0))
 #define RNG_END()  
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 #define RNG_NORMAL(m, s)  (igraph_norm_rand()*(s)+(m))
 #define RNG_UNIF(l, h)    (rand()/((double)RAND_MAX+1)*(double)((h)-(l))+l)
-double igraph_norm_rand(void);
+#define RNG_GEOM(p)       (igraph_rgeom(p))
+
 #endif
 
 #endif

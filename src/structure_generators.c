@@ -554,6 +554,80 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
   return 0;
 }
 
+/**
+ * \ingroup generators
+ * \brief Creates a full graph (directed or undirected, with or
+ * without loops). 
+ * 
+ * In a full graph every possible edge is present, every vertex is
+ * connected to every other vertex. 
+ * 
+ * @param graph Pointer to an uninitialized graph object.
+ * @param n Integer, the number of vertices in the graph.
+ * @param directed Logical, whether to create a directed graph.
+ * @param loops Logical, whether to include self-edges (loops).
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
+ * number of vertices, <code>|E|</code> the number of edges in the
+ * graph. Of course this is the same as <code>O(|E|)=O(|V||V|)</code>
+ * here. 
+ * 
+ * \sa igraph.lattice(), igraph.star(), igraph.tree() for creating
+ * other regular structures.
+ */
+
+int igraph_full(igraph_t *graph, integer_t n, bool_t directed, bool_t loops) {
+  
+  vector_t edges;
+  long int i, j;
+  
+  vector_init(&edges, 0);
+  if (directed && loops) {
+    vector_reserve(&edges, n*n);
+    for (i=0; i<n; i++) {
+      for (j=0; j<n; j++) {
+	vector_push_back(&edges, i);
+	vector_push_back(&edges, j);
+      }
+    }
+  } else if (directed && !loops) {
+    vector_reserve(&edges, n*(n-1));
+    for (i=0; i<n; i++) {
+      for (j=0; j<i; j++) {
+	vector_push_back(&edges, i);
+	vector_push_back(&edges, j);
+      }
+      for (j=i+1; j<n; j++) {
+	vector_push_back(&edges, i);
+	vector_push_back(&edges, j);
+      }
+    }
+  } else if (!directed && loops) {
+    vector_reserve(&edges, n*(n+1)/2);
+    for (i=0; i<n; i++) {
+      for (j=i; j<n; j++) {
+	vector_push_back(&edges, i);
+	vector_push_back(&edges, j);
+      }
+    }
+  } else {
+    vector_reserve(&edges, n*(n-1)/2);
+    for (i=0; i<n; i++) {
+      for (j=i+1; j<n; j++) {
+	vector_push_back(&edges, i);
+	vector_push_back(&edges, j);
+      }
+    }
+  }
+  
+  igraph_create(graph, &edges, n, directed);
+  vector_destroy(&edges);
+  
+  return 0;
+}
+
+
 /**********************************************************
  * Testing purposes                                       *
  *********************************************************/

@@ -1,3 +1,21 @@
+2005-09-23  Gabor Csardi  <csardi@szaffi>
+
+	* src/games.c (igraph_erdos_renyi_game) :
+	* igraph/R/games.R (erdos.renyi.game) :
+	* src/rinterface.c :
+	implemented in C instead of R, bugs also eliminated
+
+	* src/structure_generators.c (igraph_full) :
+	* igraph/R/structure.generators.R (igraph.full) :
+	* src/rinterface.c :
+	implemented
+
+	* src/random.h :
+	* src/random.c :
+	geometric random numbers added
+
+	* src/types.c (vector_tail) : implemented
+
 2005-09-22  Gabor Csardi  <csardi@szaffi>
 
 	* src/igraph.h (igraph_average_path_length): added prototype,

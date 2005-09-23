@@ -10,7 +10,8 @@ export(is.igraph, are.connected, print.igraph, summary.igraph)
 
 # structure generators
 
-export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice, graph.ring)
+export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice,
+       graph.ring, graph.full)
 
 # games
 

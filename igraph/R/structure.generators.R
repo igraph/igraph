@@ -52,6 +52,12 @@ graph.star <- function(n, mode="in", center=0 ) {
         PACKAGE="igraph")
 }
 
+graph.full <- function(n, directed=FALSE, loops=FALSE) {
+  .Call("R_igraph_full", as.numeric(n), as.logical(directed),
+        as.logical(loops),
+        PACKAGE="igraph")
+}
+
 ###################################################################
 # Lattices, every kind
 ###################################################################

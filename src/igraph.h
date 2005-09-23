@@ -381,6 +381,7 @@ int igraph_ring(igraph_t *graph, integer_t n, bool_t directed,
 		bool_t mutual, bool_t circular);
 int igraph_tree(igraph_t *graph, integer_t n, integer_t children, 
 		igraph_tree_mode_t type);
+int igraph_full(igraph_t *graph, integer_t n, bool_t directed, bool_t loops);
 
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */

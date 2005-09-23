@@ -476,6 +476,21 @@ long int vector_find(vector_t* v, real_t elem) {
 }
 
 /**
+ * \ingroup vector
+ * \brief Returns the last element in a vector.
+ *
+ * It is an error to call this function on an empty vector.
+ * @param v The vector object.
+ * @return The last element.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
+
+real_t vector_tail(vector_t *v) {
+  return *((v->end)-1);
+}
+
+/**
  * \ingroup internal
  */
 

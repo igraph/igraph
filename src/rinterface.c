@@ -882,3 +882,36 @@ SEXP R_igraph_layout_circle(SEXP graph) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_erdos_renyi_game(SEXP pn, SEXP pp, SEXP pdirected, SEXP ploops) {
+  
+  igraph_t g;
+  integer_t n=REAL(pn)[0];
+  real_t p=REAL(pp)[0];
+  bool_t directed=LOGICAL(pdirected)[0];
+  bool_t loops=LOGICAL(ploops)[0];
+  SEXP result;
+  
+  igraph_erdos_renyi_game(&g, n, p, directed, loops);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_full(SEXP pn, SEXP pdirected, SEXP ploops) {
+  
+  igraph_t g;
+  integer_t n=REAL(pn)[0];
+  bool_t directed=LOGICAL(pdirected)[0];
+  bool_t loops=LOGICAL(ploops)[0];
+  SEXP result;
+  
+  igraph_full(&g, n, directed, loops);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}

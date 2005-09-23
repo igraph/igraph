@@ -24,6 +24,8 @@
 #include "random.h"
 #include "memory.h"
 
+#include <math.h>
+
 /**
  * \ingroup generators
  * \brief Generates a graph based on the Barabási-Albert model.
@@ -114,10 +116,102 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
   return 0;
 }
 
+/**
+ * \ingroup generators
+ * \brief Generates a random (Erdos-Renyi) graph.
+ * 
+ * @param graph Pointer to an uninitialized graph object.
+ * @param n The number of vertices in the graph.
+ * @param p The probability that an edge is present.
+ * @param directed Logical, whether to generate a directed graph.
+ * @param loops Logical, whether to generate loops (self) edges.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges in the graph.
+ * 
+ * \sa barabasi_game(), growing_random_game()
+ */
+ 
+
 int igraph_erdos_renyi_game(igraph_t *graph, integer_t n, real_t p,
 			    bool_t directed, bool_t loops) {
-  /* TODO */
-  return 0;
+
+  long int no_of_nodes=n;
+  vector_t edges;
+  vector_t s;
+  int retval=0;
+  
+  if (p==0.0 || no_of_nodes<=1) {
+    retval=igraph_empty(graph, n, directed);
+  } else if (p==1.0) { 
+    retval=igraph_full(graph, n, directed, loops);
+  } else {
+
+    long int i;
+    double maxedges;
+    if (directed && loops) 
+      { maxedges = n * n; }
+    else if (directed && !loops)
+      { maxedges = n * (n-1); }
+    else if (!directed && loops) 
+      { maxedges = n * (n+1)/2; }
+    else 
+      { maxedges = n * (n-1)/2; }
+    
+    vector_init(&s, 0);
+    vector_reserve(&s, maxedges*p*1.1);
+
+    RNG_BEGIN();
+
+    vector_push_back(&s, RNG_GEOM(p)+1);
+    while (vector_tail(&s) < maxedges) {
+      vector_push_back(&s, vector_tail(&s)+RNG_GEOM(p)+1);
+    }
+    if (vector_tail(&s) > maxedges+1) {
+      vector_pop_back(&s);
+    }
+
+    RNG_END();
+
+    vector_init(&edges, 0);
+    vector_reserve(&edges, vector_size(&s)*2);
+
+    if (directed && loops) {
+      for (i=0; i<vector_size(&s); i++) {
+	vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))/no_of_nodes);
+	vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))%no_of_nodes);
+      }
+    } else if (directed && !loops) {
+      for (i=0; i<vector_size(&s); i++) {
+	long int from=((long int)(VECTOR(s)[i]-1))/(no_of_nodes-1);
+	long int to=((long int)VECTOR(s)[i])%(no_of_nodes-1);
+	if (from==to) {
+	  to=no_of_nodes-1;
+	}
+	vector_push_back(&edges, from);
+	vector_push_back(&edges, to);
+      }
+    } else if (!directed && loops) {
+      for (i=0; i<vector_size(&s); i++) {
+	real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
+	vector_push_back(&edges, from-1);
+	vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
+      }
+    } else {
+      for (i=0; i<vector_size(&s); i++) {
+	real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
+	vector_push_back(&edges, from-1);
+	vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
+      }
+    }      
+
+    vector_destroy(&s);
+    retval=igraph_create(graph, &edges, n, directed);
+    vector_destroy(&edges);
+  }
+
+  return retval;
 }
 
 int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
