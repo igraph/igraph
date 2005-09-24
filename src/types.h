@@ -119,6 +119,7 @@ real_t vector_pop_back(vector_t* v);
 long int vector_find(vector_t* v, real_t elem);
 int vector_change(vector_t* v, long int pos1, long int pos2);
 int vector_order(vector_t* v, vector_t* res, integer_t maxval);
+int vector_sort(vector_t *v);
 int vector_resize(vector_t* v, long int newsize);
 real_t vector_max(vector_t* v);
 vector_t vector_as_vector(real_t *start, long int length);

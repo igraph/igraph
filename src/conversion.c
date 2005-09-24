@@ -22,12 +22,133 @@
 
 #include "igraph.h"
 
-int igraph_get_adjacency(igraph_t *graph, vector_t *res) {
-  /* TODO */
-  return 0;
+/**
+ * \ingroup conversion
+ * \brief Returns the adjacency matrix of a graph
+ * 
+ * The result is an incidence matrix, it contains numbers higher
+ * than one, if there are multiple edges in the graph.
+ * @param graph Pointer to the graph to convert
+ * @param res Pointer to an initialized matrix object, it will be
+ *        resized if needed.
+ * @param type Constant giving the type of the adjacency matrix to
+ *        create for undirected graphs. It is ignored for directed
+ *        graphs. Possible values:
+ *        - <b>IGRAPH_GET_ADJACENCY_UPPER</b>, the upper right
+ *          triangle of the matrix is used.
+ *        - <b>IGRAPH_GET_ADJACENCY_LOWER</b>, the lower left 
+ *          triangle of the matrix is used.
+ *        - <b>IGRAPH_GET_ADJACENCY_BOTH</b>, the whole matrix is
+ *          used, a symmetric matrix is returned.
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V||V|)</code>, <code>|V|</code> is the
+ * number of vertices in the graph.
+ */
+
+int igraph_get_adjacency(igraph_t *graph, matrix_t *res,
+			 igraph_get_adjacency_t type) {
+  
+  igraph_iterator_t edgeit;
+  long int no_of_nodes=igraph_vcount(graph);
+  bool_t directed=igraph_is_directed(graph);
+  int retval=0;
+  long int from, to;
+  
+  matrix_resize(res, no_of_nodes, no_of_nodes);
+  matrix_null(res);
+  igraph_iterator_eid(graph, &edgeit);
+  
+  if (directed) {
+    while (!igraph_end(graph, &edgeit)) {
+      from=igraph_get_vertex_from(graph, &edgeit);
+      to=igraph_get_vertex_to(graph, &edgeit);
+      MATRIX(*res, from, to) += 1;
+      igraph_next(graph, &edgeit);
+    }
+  } else if (type==IGRAPH_GET_ADJACENCY_UPPER) {
+    while (!igraph_end(graph, &edgeit)) {  
+      from=igraph_get_vertex_from(graph, &edgeit);
+      to=igraph_get_vertex_to(graph, &edgeit);
+      if (to < from) {
+	MATRIX(*res, to, from) += 1;
+      } else {
+	MATRIX(*res, from, to) += 1;    
+      }
+      igraph_next(graph, &edgeit);
+    }
+  } else if (type==IGRAPH_GET_ADJACENCY_LOWER) {
+    while (!igraph_end(graph, &edgeit)) {
+      from=igraph_get_vertex_from(graph, &edgeit);
+      to=igraph_get_vertex_to(graph, &edgeit);
+      if (to < from) {
+	MATRIX(*res, from, to) += 1;
+      } else {
+	MATRIX(*res, to, from) += 1;
+      }
+      igraph_next(graph, &edgeit);
+    }
+  } else if (type==IGRAPH_GET_ADJACENCY_BOTH) {
+    while (!igraph_end(graph, &edgeit)) {
+      from=igraph_get_vertex_from(graph, &edgeit);
+      to=igraph_get_vertex_to(graph, &edgeit);
+      MATRIX(*res, from, to) += 1;
+      if (from != to) {
+	MATRIX(*res, to, from) += 1;
+      }
+      igraph_next(graph, &edgeit);
+    }
+  } else {
+    retval=1;
+  }
+
+  igraph_iterator_destroy(graph, &edgeit);
+
+  return retval;
 }
 
-int igraph_get_edgelist(igraph_t *graph, vector_t *res) {
-  /* TODO */
+/**
+ * \ingroup conversion
+ * \brief Returns the list of edges in a graph
+ * 
+ * @param graph Pointer to the graph object
+ * @param res Pointer to an initialized vector object, it will be
+ *        resized.
+ * @param bycol Logical, if true the edges will be returned
+ *        columnwise, eg. the first edge is
+ *        <code>res[0]->res[|E|]</code>, the second is
+ *        <code>res[1]->res[|E|+1]</code>, etc.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|E|)</code>, the number of edges in the
+ * graph.
+ */
+
+int igraph_get_edgelist(igraph_t *graph, vector_t *res, bool_t bycol) {
+
+  igraph_iterator_t edgeit;
+  long int no_of_edges=igraph_ecount(graph);
+  long int vptr=0;
+  
+  vector_resize(res, no_of_edges*2);
+  igraph_iterator_eid(graph, &edgeit);
+  
+  if (bycol) {
+    while (!igraph_end(graph, &edgeit)) {
+      VECTOR(*res)[vptr]=igraph_get_vertex_from(graph, &edgeit);
+      VECTOR(*res)[vptr+no_of_edges]=igraph_get_vertex_to(graph, &edgeit);
+      vptr++;
+      igraph_next(graph, &edgeit);
+    }
+  } else {
+    while (!igraph_end(graph, &edgeit)) {
+      VECTOR(*res)[vptr++]=igraph_get_vertex_from(graph, &edgeit);
+      VECTOR(*res)[vptr++]=igraph_get_vertex_to(graph, &edgeit);
+      igraph_next(graph, &edgeit);
+    }
+  }
+  
+  igraph_iterator_destroy(graph, &edgeit);
+  
   return 0;
 }

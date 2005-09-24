@@ -100,35 +100,37 @@ subgraph <- function(graph, v) {
         PACKAGE="igraph")
 }
 
-simplify <- function(graph, remove.loops=TRUE,
-                     remove.multiple=TRUE) {
+simplify <- function(graph, remove.multiple=TRUE,
+                     remove.loops=TRUE) {
+  .Call("R_igraph_simplify", graph, as.logical(remove.multiple),
+        as.logical(remove.loops), PACKAGE="igraph")
 
-  res <- graph
-  vc <- vcount(res)
-  if (remove.loops && vc > 0) {
-    remove <- numeric()
-    for (i in 0:(vc-1)) {
-      neis <- neighbors(graph, i, "out")
-      loops <- sum(neis==i)
-      if (is.directed(graph)) { loops <- loops*2 }
-      remove <- c(remove, rep(i, loops))
-    }
-    res <- delete.edges(res, remove)  
-  }
-  if (remove.multiple) {
-    remove <- numeric()
-    for (i in 0:(vc-1)) {
-      neis <- neighbors(graph, i, "out")
-      dup <- neis[ duplicated(neis) & neis > i ]
-      l <- sum(neis==i)
-      if (l>2) { dup <- c(dup, rep(i, l/4)) }
-      remove <- c(remove, as.numeric(t(matrix(c(rep(i,length(dup)),
-                                                dup), nc=2))))
-    }
-    res <- delete.edges(res, remove)  
-  }  
+##   res <- graph
+##   vc <- vcount(res)
+##   if (remove.loops && vc > 0) {
+##     remove <- numeric()
+##     for (i in 0:(vc-1)) {
+##       neis <- neighbors(graph, i, "out")
+##       loops <- sum(neis==i)
+##       if (is.directed(graph)) { loops <- loops*2 }
+##       remove <- c(remove, rep(i, loops))
+##     }
+##     res <- delete.edges(res, remove)  
+##   }
+##   if (remove.multiple) {
+##     remove <- numeric()
+##     for (i in 0:(vc-1)) {
+##       neis <- neighbors(graph, i, "out")
+##       dup <- neis[ duplicated(neis) & neis > i ]
+##       l <- sum(neis==i)
+##       if (l>2) { dup <- c(dup, rep(i, l/4)) }
+##       remove <- c(remove, as.numeric(t(matrix(c(rep(i,length(dup)),
+##                                                 dup), nc=2))))
+##     }
+##     res <- delete.edges(res, remove)  
+##   }  
   
-  res
+##   res
 }
 
 betweenness <- function(graph, v=0:(vcount(graph)-1), directed=TRUE) {

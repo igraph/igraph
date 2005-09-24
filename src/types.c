@@ -26,6 +26,7 @@
 
 #include <assert.h>
 #include <string.h> 		/* memcpy & co. */
+#include <stdlib.h>
 
 /**
  * \ingroup dqueue
@@ -551,6 +552,34 @@ int vector_order(vector_t* v, vector_t* res, integer_t nodes) {
   Free(ptr);
   Free(rad);
   return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int vector_sort_cmp(const void *a, const void *b) {
+  const real_t *da = (const real_t *) a;
+  const real_t *db = (const real_t *) b;
+
+  return (*da > *db) - (*da < *db);
+}
+
+/**
+ * \ingroup vector
+ * \brief Sorts the elements of the vector into ascending order.
+ * 
+ * This function uses the built-in sort function of the C library.
+ * @param v Pointer to an initialized vector object.
+ * @return Error code.
+ *
+ * Time complexity: should be <code>O(nlogn)</code> for <code>n</code>
+ * elements.
+ */
+
+int vector_sort(vector_t *v) {
+  qsort(v->stor_begin, vector_size(v), sizeof(real_t), vector_sort_cmp);
+  return  0;
 }
 
 /**

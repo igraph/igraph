@@ -614,17 +614,17 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
  * Testing purposes, indexed edgelist type                *
  *********************************************************/
 
-/* #include <stdio.h> */
+#include <stdio.h>
 
-/* int print_vector(vector_t *v) { */
-/*   long int i; */
-/*   for (i=0; i<vector_size(v); i++) { */
-/*     printf("%f ", VECTOR(*v)[i]); */
-/*   } */
-/*   printf("\n"); */
+int print_vector(vector_t *v) {
+  long int i;
+  for (i=0; i<vector_size(v); i++) {
+    printf("%f ", VECTOR(*v)[i]);
+  }
+  printf("\n");
   
-/*   return 0; */
-/* } */
+  return 0;
+}
 
 /* int print_igraph(igraph_t *graph) { */
 /*   printf("Nodes: %li\n", (long int)graph->n); */

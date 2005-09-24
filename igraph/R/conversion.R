@@ -19,44 +19,16 @@
 #
 ###################################################################
 
-get.adjacency <- function(graph) {
-
-  vc <- vcount(graph)
-  res <- matrix(0, vc, vc)
-
-  if (vc != 0) {
-    for (i in 0:(vc-1)) {
-      neis <- neighbors(graph, i, "out")
-      if (!is.directed(graph)) {
-        loops <- sum(neis==i)
-        neis <- neis[ neis!= i]
-        neis <- c(neis, rep(i, loops/2))
-      }
-      for (n in neis) { res[i+1, n+1] <- res[i+1, n+1] + 1 }
-    }
+get.adjacency <- function(graph, type="both") {
+  if (is.character(type)) {
+    type <- switch(type, "upper"=0, "lower"=1, "both"=2)
   }
-
-  res
+  
+  .Call("R_igraph_get_adjacency", graph, as.numeric(type),
+        PACKAGE="igraph")
 }
 
 get.edgelist <- function(graph) {
-
-  res <- matrix(0, ecount(graph), 2)
-  vc <- vcount(graph)
-  ix <- 1
-  
-  if (vc != 0) {
-    for (i in 0:(vc-1)) {
-      neis <- neighbors(graph, i, "out")
-      if (!is.directed(graph)) {
-        no.loops <- sum(neis==i)
-        neis <- c(neis[ neis > i ], rep(i, no.loops/2))
-      }
-      res[seq(ix, length=length(neis)),1] <- i
-      res[seq(ix, length=length(neis)),2] <- neis
-      ix <- ix + length(neis)
-    }
-  }
-
-  res
+  matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
+               PACKAGE="igraph"), nc=2)
 }

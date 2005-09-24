@@ -935,3 +935,54 @@ SEXP R_igraph_random_sample(SEXP plow, SEXP phigh, SEXP plength) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_get_edgelist(SEXP graph, SEXP pbycol) {
+  
+  igraph_t g;
+  vector_t res;
+  bool_t bycol=LOGICAL(pbycol)[0];
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  vector_init(&res, 0);
+  igraph_get_edgelist(&g, &res, bycol);
+  PROTECT(result=NEW_NUMERIC(vector_size(&res)));
+  vector_copy_to(&res, REAL(result));
+  vector_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}
+  
+SEXP R_igraph_get_adjacency(SEXP graph, SEXP ptype) {
+  
+  igraph_t g;
+  matrix_t res;
+  integer_t type=REAL(ptype)[0];
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  matrix_init(&res, 0, 0);
+  igraph_get_adjacency(&g, &res, type);
+  PROTECT(result=R_matrix_to_SEXP(&res));
+  matrix_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}
+  
+SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
+  
+  igraph_t g;
+  bool_t multiple=LOGICAL(pmultiple)[0];
+  bool_t loops=LOGICAL(ploops)[0];
+  SEXP result;
+  
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_simplify(&g, multiple, loops);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}

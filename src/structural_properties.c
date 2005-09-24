@@ -1030,3 +1030,60 @@ int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids) {
   vector_destroy(&delete);
   return 0;
 }
+
+/**
+ * \ingroup structural
+ * \brief Removes loop and/or multiple edges from the graph.
+ * 
+ * @param graph The graph object.
+ * @param multiple Logical, if true multiple edges will be removed. 
+ * @param loops Logical, if true, loops (self edges) will be removed.
+ * @return Error code. 
+ *
+ * Time complexity: <code>O(|V|+|E|)</code> for removing the loops,
+ * <code>O(|V|d*log(d)+|E|)</code> for removing the multiple
+ * edges. <code>|V|</code> and <code>|E|</code> are the number of
+ * vertices and edges in the graph, <code>d</code> is the highest
+ * out-degree in the graph.
+ */
+
+int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops) {
+
+  vector_t edges;
+  vector_t neis;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i, j;
+  
+  vector_init(&edges, 0);
+  vector_init(&neis, 0);
+
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_neighbors(graph, &neis, i, IGRAPH_OUT);
+
+    if (loops) {
+      for (j=0; j<vector_size(&neis); j++) {
+	if (VECTOR(neis)[j]==i) {
+	  vector_push_back(&edges, i);
+	  vector_push_back(&edges, i);
+	}
+      }
+    } /* if loops */
+    
+    if (multiple) {
+      vector_sort(&neis);
+      for (j=1; j<vector_size(&neis); j++) {
+	if (VECTOR(neis)[j]==VECTOR(neis)[j-1]) {
+	  vector_push_back(&edges, i);
+	  vector_push_back(&edges, VECTOR(neis)[j]);
+	}
+      }
+    }
+  }
+
+  print_vector(&edges);
+  vector_destroy(&neis);
+  igraph_delete_edges(graph, &edges);
+  vector_destroy(&edges);
+
+  return 0;
+}

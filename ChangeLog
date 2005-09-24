@@ -1,6 +1,20 @@
 2005-09-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* igraph/random.h (RNG_UNIF01()) : introduced
+	* src/conversion.c (igraph_get_edgelist) : new function
+	* src/rinterface.c (R_igraph_get_edgelist) : interface
+	* igraph/R/conversion.R (get.edgelist) : interface
+
+	* src/conversion.c (igraph_get_adjacency) : new function
+	* src/rinterface.c (R_igraph_get_adjacency) : interface
+	* igraph/R/conversion.R (get.adjacency) : interface
+
+	* src/structural_properties.c (igraph_simplify) : new function
+	* src/rinterface.c (R_igraph_simplify) : interface
+	* igraph/R/conversion.R (simplify) : interface
+	
+2005-09-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/random.h (RNG_UNIF01()) : introduced
 	
 	* src/games.c (erdos_renyi_game) : gnm & gnp type
 	(erdos_renyi_game_gnp, erdos_renyi_game_gnm) : new functions
@@ -11,7 +25,7 @@
 	new functions
 	* igraph/R/other.R (igraph.sample) : interface
 	* src/rinterface.c (R_igraph_random_sample) : interface
-	
+
 2005-09-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_erdos_renyi_game) :

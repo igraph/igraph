@@ -1,9 +1,8 @@
 o write R documentation
-o convert all functios from R to pure C
 o add graph, vertex & edge attributes
 o add methods for reading & saving a file together with its attributes
 o add conversion methods for different file formats
+o comunity detection algorithms
 o add 3d layout functions
 o multicompartmental layout functions
-o implement other, the G(|V|,n) Erdos-Renyi model
 o error handling

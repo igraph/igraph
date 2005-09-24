@@ -74,6 +74,11 @@ __BEGIN_DECLS
  */
 
 /**
+ * \defgroup conversion Convert a graph to an edge list or adjacency matrix
+ * \brief 
+ */
+
+/**
  * \defgroup nongraph Non-graph related functions
  * \brief These functions are not directly graph related but they 
  * are either used by the graph related routines or are just useful 
@@ -256,6 +261,10 @@ typedef enum { IGRAPH_TREE_OUT=0, IGRAPH_TREE_IN,
 typedef enum { IGRAPH_ERDOS_RENYI_GNP=0, 
 	       IGRAPH_ERDOS_RENYI_GNM } igraph_erdos_renyi_t;
 
+typedef enum { IGRAPH_GET_ADJACENCY_UPPER=0,
+	       IGRAPH_GET_ADJACENCY_LOWER,
+	       IGRAPH_GET_ADJACENCY_BOTH } igraph_get_adjacency_t;
+
 /* -------------------------------------------------- */
 /* Interface                                          */
 /* -------------------------------------------------- */
@@ -434,6 +443,7 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
 int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids);
 int igraph_average_path_length(igraph_t *graph, real_t *res,
 			       bool_t directed, bool_t unconn);
+int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops);
 
 /* TODO: degree.distribution (?) */
 
@@ -492,8 +502,9 @@ int igraph_bibcoupling(igraph_t *graph, matrix_t *res, vector_t *vids);
 /* Conversion                                         */
 /* -------------------------------------------------- */
 
-int igraph_get_adjacency(igraph_t *graph, vector_t *res);
-int igraph_get_edgelist(igraph_t *graph, vector_t *res);
+int igraph_get_adjacency(igraph_t *graph, matrix_t *res,
+			 igraph_get_adjacency_t type);
+int igraph_get_edgelist(igraph_t *graph, vector_t *res, bool_t bycol);
 
 /* -------------------------------------------------- */
 /* Read and write foreign formats                     */
