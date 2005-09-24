@@ -11,6 +11,8 @@
 	* src/structural_properties.c (igraph_simplify) : new function
 	* src/rinterface.c (R_igraph_simplify) : interface
 	* igraph/R/conversion.R (simplify) : interface
+
+	* src/types.c (vector_sort) : new function
 	
 2005-09-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
