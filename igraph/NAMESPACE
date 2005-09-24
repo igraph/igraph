@@ -29,7 +29,7 @@ export(get.adjacency, get.edgelist)
 
 # fitting, other
 
-export(power.law.fit, running.mean)
+export(power.law.fit, running.mean, igraph.sample)
 
 # foreign formats
 

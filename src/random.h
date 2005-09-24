@@ -23,6 +23,8 @@
 #ifndef REST_RANDOM_H
 #define REST_RANDOM_H
 
+#include "types.h"
+
 #include <stdlib.h>
 #include <time.h>
 
@@ -40,6 +42,7 @@ double  Rf_rgeom(double);
 #define RNG_INTEGER(l, h) ((long int)(unif_rand()*((h)-(l)+1)+(l)))
 #define RNG_NORMAL(m, s)  (norm_rand()*(s)+(m))
 #define RNG_UNIF(l, h)    (unif_rand()*((h)-(l))+(l))
+#define RNG_UNIF01()      (unif_rand())
 #define RNG_GEOM(p)       (rgeom(p))
 
 #else
@@ -52,6 +55,7 @@ double igraph_rgeom(double);
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 #define RNG_NORMAL(m, s)  (igraph_norm_rand()*(s)+(m))
 #define RNG_UNIF(l, h)    (rand()/((double)RAND_MAX+1)*(double)((h)-(l))+l)
+#define RNG_UNIF01()      (RNG_UNIF(0,1))
 #define RNG_GEOM(p)       (igraph_rgeom(p))
 
 #endif

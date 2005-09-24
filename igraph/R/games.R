@@ -69,10 +69,14 @@ ba.game <- function(n, m=NULL, out.dist=NULL, out.seq=NULL,
 
 barabasi.game <- ba.game
 
-erdos.renyi.game <- function(n, p, directed=FALSE, loops=FALSE, ...) {
+erdos.renyi.game <- function(n, p.or.m, type="gnp",
+                             directed=FALSE, loops=FALSE, ...) {
+  if (is.character(type)) {
+    type <- switch(type, "gnp"=0, "gnm"=1)
+  }
 
-  .Call("R_igraph_erdos_renyi_game", as.numeric(n), as.numeric(p),
-        as.logical(directed), as.logical(loops),
+  .Call("R_igraph_erdos_renyi_game", as.numeric(n), as.numeric(type),
+        as.numeric(p.or.m), as.logical(directed), as.logical(loops),
         PACKAGE="igraph")
 }
 

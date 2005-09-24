@@ -117,25 +117,11 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
 }
 
 /**
- * \ingroup generators
- * \brief Generates a random (Erdos-Renyi) graph.
- * 
- * @param graph Pointer to an uninitialized graph object.
- * @param n The number of vertices in the graph.
- * @param p The probability that an edge is present.
- * @param directed Logical, whether to generate a directed graph.
- * @param loops Logical, whether to generate loops (self) edges.
- * @return Error code.
- * 
- * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
- * plus the number of edges in the graph.
- * 
- * \sa barabasi_game(), growing_random_game()
+ * \ingroup internal
  */
- 
 
-int igraph_erdos_renyi_game(igraph_t *graph, integer_t n, real_t p,
-			    bool_t directed, bool_t loops) {
+int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
+				bool_t directed, bool_t loops) {
 
   long int no_of_nodes=n;
   vector_t edges;
@@ -211,6 +197,121 @@ int igraph_erdos_renyi_game(igraph_t *graph, integer_t n, real_t p,
     vector_destroy(&edges);
   }
 
+  return retval;
+}
+
+int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
+				bool_t directed, bool_t loops) {
+
+  long int no_of_nodes=n;
+  long int no_of_edges=m;
+  vector_t edges;
+  vector_t s;
+  int retval=0;
+  
+  if (m==0.0 || no_of_nodes<=1) {
+    retval=igraph_empty(graph, n, directed);
+  } else {
+
+    long int i;    
+    double maxedges;
+    if (directed && loops) 
+      { maxedges = n * n; }
+    else if (directed && !loops)
+      { maxedges = n * (n-1); }
+    else if (!directed && loops) 
+      { maxedges = n * (n+1)/2; }
+    else 
+      { maxedges = n * (n-1)/2; }
+
+    if (maxedges <= no_of_edges) {
+      retval=igraph_full(graph, n, directed, loops);
+    } else {
+    
+      vector_init(&s, 0);
+
+      igraph_random_sample(&s, 1, maxedges, no_of_edges);
+      
+      vector_init(&edges, 0);
+      vector_reserve(&edges, vector_size(&s)*2);
+      
+      if (directed && loops) {
+	for (i=0; i<vector_size(&s); i++) {
+	  vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))/no_of_nodes);
+	  vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))%no_of_nodes);
+	}
+      } else if (directed && !loops) {
+	for (i=0; i<vector_size(&s); i++) {
+	  long int from=((long int)(VECTOR(s)[i]-1))/(no_of_nodes-1);
+	  long int to=((long int)VECTOR(s)[i])%(no_of_nodes-1);
+	  if (from==to) {
+	    to=no_of_nodes-1;
+	  }
+	  vector_push_back(&edges, from);
+	  vector_push_back(&edges, to);
+	}
+      } else if (!directed && loops) {
+	for (i=0; i<vector_size(&s); i++) {
+	  real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
+	  vector_push_back(&edges, from-1);
+	  vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
+	}
+      } else {
+	for (i=0; i<vector_size(&s); i++) {
+	  real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
+	  vector_push_back(&edges, from-1);
+	  vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
+	}
+      }  
+
+      vector_destroy(&s);
+      retval=igraph_create(graph, &edges, n, directed);
+      vector_destroy(&edges);
+    }
+  }
+  
+  return retval;
+}
+
+/**
+ * \ingroup generators
+ * \brief Generates a random (Erdos-Renyi) graph.
+ * 
+ * @param graph Pointer to an uninitialized graph object.
+ * @param type The type of the random graph, possible values:
+ *        - <b>IGRAPH_ERDOS_RENYI_GNM</b>, <code>G(n,m)</code> graph, 
+ *          <code>m</code> edges are
+ *          selected uniformly randomly in a graph with <code>n</code>
+ *          vertices.
+ *        - <b>IGRAPH_ERDOS_RENYI_GNP</b>, <code>G(n,p)</code> graph,
+ *          every possible edge is included in the graph with
+ *          probability <code>p</code>.
+ * @param n The number of vertices in the graph.
+ * @param p_or_m This is the <code>p</code> parameter for
+ *        <code>G(n,p)</code> graphs and the <code>m</code>
+ *        parameter for <code>G(n,m)</code> graphs.
+ * @param directed Logical, whether to generate a directed graph.
+ * @param loops Logical, whether to generate loops (self) edges.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges in the graph.
+ * 
+ * \sa barabasi_game(), growing_random_game()
+ */
+
+int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
+			    integer_t n, real_t p_or_m,
+			    bool_t directed, bool_t loops) {
+  int retval=0;
+  if (type == IGRAPH_ERDOS_RENYI_GNP) {
+    retval=igraph_erdos_renyi_game_gnp(graph, n, p_or_m, directed, loops);
+  } else if (type == IGRAPH_ERDOS_RENYI_GNM) {
+    retval=igraph_erdos_renyi_game_gnm(graph, n, p_or_m, directed, loops);
+  } else {
+    retval=-1;
+  }
+  
   return retval;
 }
 

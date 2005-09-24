@@ -30,3 +30,13 @@ running.mean <- function(v, binwidth) {
   .Call("R_igraph_running_mean", v, binwidth,
        PACKAGE="igraph");
 }
+
+igraph.sample <- function(low, high, length) {
+  if (length>high-low) {
+    stop("length too big for this interval")
+  }
+  
+  .Call("R_igraph_random_sample", as.numeric(low), as.numeric(high),
+        as.numeric(length),
+        PACKAGE="igraph")
+}

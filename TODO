@@ -6,3 +6,4 @@ o add conversion methods for different file formats
 o add 3d layout functions
 o multicompartmental layout functions
 o implement other, the G(|V|,n) Erdos-Renyi model
+o error handling

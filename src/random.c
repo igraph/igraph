@@ -22,6 +22,155 @@
 
 #include "random.h"
 
+#include <math.h>
+double trunc(double);
+double round(double);
+
+/**
+ * \ingroup internal
+ * 
+ * This function appends the rest of the needed random number to the 
+ * result vector.
+ */
+
+int igraph_random_sample_alga(vector_t *res, integer_t l, integer_t h, 
+			      integer_t length) {
+  real_t N=h-l+1;
+  real_t n=length;
+  
+  real_t top=N-n;
+  real_t Nreal=N;
+  real_t S=0;
+  real_t V, quot;
+
+  while (n>=2) {
+    V=RNG_UNIF01();
+    quot=top/Nreal;
+    while (quot>V) {
+      S+=1;
+      top=-1.0+top;
+      Nreal=-1.0+Nreal;
+      quot=(quot*top)/Nreal;
+    }
+    l+=S;
+    vector_push_back(res, l);
+    Nreal=-1.0+Nreal; n=-1+n; S=1;
+  }
+  
+  S=trunc(round(Nreal)*RNG_UNIF01())+1;
+  l+=S;
+  vector_push_back(res, l);
+  
+  return 0;
+}
+
+/**
+ * \ingroup nongraph
+ * \brief Generates an increasing random sequence of integers.
+ * 
+ * This function generates an incresing sequence of random integer
+ * numbers from a given interval. The algorithm is taken literally
+ * from Jeffrey Scott Vitter: 'An Efficient Algorithm for Sequential
+ * Random Sampling', <em>ACM Transactions on Mathematical Software</em>, 13/1,
+ * 58--67. This method can be used for generating numbers from a
+ * <em>very</em> large interval, it is primilarly created for randomly
+ * selecting some edges from the sometimes huge set of possible edges
+ * in a large graph.
+ * @param res Pointer to an initialized vector, this will hold the
+ *        result. It will be resized to the proper size.
+ * @param l The lower limit of the generation interval (inclusive).
+ * @param h The upper limit of the generation interval (inclusive).
+ * @param length The number of random integers to generate.
+ * @return Error code.
+ *
+ * Time complexity: according to the referenced paper, the expected
+ * running time is <code>O(length)</code>.
+ */
+
+int igraph_random_sample(vector_t *res, integer_t l, integer_t h, 
+			 integer_t length) {
+  real_t N=h-l+2;
+  real_t n=length;
+  int retval;
+
+  real_t nreal=length;
+  real_t ninv=1.0/nreal;
+  real_t Nreal=N;
+  real_t Vprime;
+  real_t qu1=-n+1+N;
+  real_t qu1real=-nreal+1.0+Nreal;
+  real_t negalphainv=-13;
+  real_t threshold=-negalphainv*n;
+  real_t S;
+
+  RNG_BEGIN();
+  
+  Vprime=exp(log(RNG_UNIF01())*ninv);
+  vector_clear(res);
+  vector_reserve(res, length);  
+
+  while (n>1 && threshold < N) {
+    real_t X, U;
+    real_t limit, t;
+    real_t negSreal, y1, y2, top, bottom;
+    real_t nmin1inv=1.0/(-1.0+nreal);
+    while (1) {
+      while(1) {
+	X=Nreal*(-Vprime+1.0);
+	S=trunc(X);
+	if (S <qu1) { break; }
+	Vprime = exp(log(RNG_UNIF01())*ninv);
+      }
+      U=RNG_UNIF01();
+      negSreal=-S;
+      
+      y1=exp(log(U*Nreal/qu1real)*nmin1inv);
+      Vprime=y1*(-X/Nreal+1.0)*(qu1real/(negSreal+qu1real));
+      if (Vprime <= 1.0) { break; }
+      
+      y2=1.0;
+      top=-1.0+Nreal;
+      if (-1+n > S) {
+	bottom=-nreal+Nreal; 
+	limit=-S+N;
+      } else {
+	bottom=-1.0+negSreal+Nreal;
+	limit=qu1;
+      }
+      for (t=-1+N; t>=limit; t--) {
+	y2=(y2*top)/bottom;
+	top=-1.0+top;
+	bottom=-1.0+bottom;
+      }
+      if (Nreal/(-X+Nreal) >= y1*exp(log(y2)*nmin1inv)) {
+	Vprime=exp(log(RNG_UNIF01())*nmin1inv);
+	break;
+      }
+      Vprime=exp(log(RNG_UNIF01())*ninv);
+    }
+    
+    l+=S;
+    vector_push_back(res, l);
+    N=-S+(-1+N);   Nreal=negSreal+(-1.0+Nreal);
+    n=-1+n;   nreal=-1.0+nreal; ninv=nmin1inv;
+    qu1=-S+qu1; qu1real=negSreal+qu1real;
+    threshold=threshold+negalphainv;
+  }
+  
+  if (n>1) {
+    retval=igraph_random_sample_alga(res, l, h, n);
+  } else {
+    retval=0;
+    S=trunc(N*Vprime);
+    l+=S;
+    vector_push_back(res, l);
+  }
+
+  RNG_END();
+  
+  return retval;
+}
+  
 #ifdef USING_R
 
 #else

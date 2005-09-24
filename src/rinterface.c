@@ -883,16 +883,18 @@ SEXP R_igraph_layout_circle(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_erdos_renyi_game(SEXP pn, SEXP pp, SEXP pdirected, SEXP ploops) {
+SEXP R_igraph_erdos_renyi_game(SEXP pn, SEXP ptype,
+			       SEXP pporm, SEXP pdirected, SEXP ploops) {
   
   igraph_t g;
   integer_t n=REAL(pn)[0];
-  real_t p=REAL(pp)[0];
+  integer_t type=REAL(ptype)[0];
+  real_t porm=REAL(pporm)[0];
   bool_t directed=LOGICAL(pdirected)[0];
   bool_t loops=LOGICAL(ploops)[0];
   SEXP result;
   
-  igraph_erdos_renyi_game(&g, n, p, directed, loops);
+  igraph_erdos_renyi_game(&g, type, n, porm, directed, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
@@ -912,6 +914,24 @@ SEXP R_igraph_full(SEXP pn, SEXP pdirected, SEXP ploops) {
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_random_sample(SEXP plow, SEXP phigh, SEXP plength) {
+  
+  vector_t res;
+  integer_t low=REAL(plow)[0];
+  integer_t high=REAL(phigh)[0];
+  integer_t length=REAL(plength)[0];
+  SEXP result;
+
+  vector_init(&res, 0);
+  igraph_random_sample(&res, low, high, length);
+  PROTECT(result=NEW_NUMERIC(vector_size(&res)));
+  vector_copy_to(&res, REAL(result));
+  vector_destroy(&res);
+
   UNPROTECT(1);
   return result;
 }

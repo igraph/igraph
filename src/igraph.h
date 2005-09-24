@@ -253,6 +253,9 @@ typedef enum { IGRAPH_STAR_OUT=0, IGRAPH_STAR_IN,
 typedef enum { IGRAPH_TREE_OUT=0, IGRAPH_TREE_IN,
 	       IGRAPH_TREE_UNDIRECTED } igraph_tree_mode_t;
 
+typedef enum { IGRAPH_ERDOS_RENYI_GNP=0, 
+	       IGRAPH_ERDOS_RENYI_GNM } igraph_erdos_renyi_t;
+
 /* -------------------------------------------------- */
 /* Interface                                          */
 /* -------------------------------------------------- */
@@ -389,8 +392,11 @@ int igraph_full(igraph_t *graph, integer_t n, bool_t directed, bool_t loops);
 
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
 			 vector_t *outseq, bool_t outpref, bool_t directed);
-int igraph_erdos_renyi_game(igraph_t *graph, integer_t n, real_t p,
+int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
+			    integer_t n, real_t p,
 			    bool_t directed, bool_t loops);
+int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
+				bool_t directed, bool_t loops);
 int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
 				vector_t *in_deg, integer_t method);
 int igraph_growing_random_game(igraph_t *graph, integer_t n, 
@@ -519,6 +525,8 @@ int igraph_measure_dynamics_idage_debug(igraph_t *graph, matrix_t *akl,
 /* -------------------------------------------------- */
 
 int igraph_running_mean(vector_t *data, vector_t *res, integer_t binwidth);
+int igraph_random_sample(vector_t *res, integer_t l, integer_t h, 
+			 integer_t length);
 
 __END_DECLS
   
