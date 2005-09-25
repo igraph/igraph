@@ -69,8 +69,35 @@ __BEGIN_DECLS
  * \brief Iterators provide a method to walk through some edges or
  * vertices of the graph.
  * 
- * This documentation is not yet written, as it is possible that the concept 
- * of iterators will be reinterpreted soon.
+ * An iterator is a method for walking through the edges or the
+ * vertices of a graph, or often just on a subset of them. Iterators
+ * might ordered which means that the vertices or edges are visited in
+ * a specific order. Iterator are meant to be very powerful, usually
+ * all iterator operations have time complexity <code>O(1)</code>,
+ * ie. they work in constant time. (But see also the specifics and
+ * exceptions at the documentation of the different iterators.)
+ *
+ * There are three classes of iterators:
+ * - <b>vertex iterators</b> walk through vertices,
+ * - <b>edge iterators</b> walk through edges,
+ * - <b>general iterators</b> can walk through graphs in general by
+ *   visiting both edges and vertices. (There is no general iterator
+ *   implemented yet.)
+ * 
+ * These three classes are usually handled together with an
+ * abstraction, ie. all three types of operators use the igraph_end()
+ * function to check whether it has had reach the very last element to
+ * visit.
+ *
+ * There are two kinds of function handling iterators: <b>specific</b>
+ * iterator functions work only on a given type of iterator, these
+ * have the name of the iterator in their names; <b>generic</b>
+ * iterator functions work on all types of iterators (which implement
+ * the generic function in question).
+ *
+ * An iterator is always created by a specific function, this also
+ * fixes the type of the iterator, After this usually only generic
+ * functions are called on it for stepping and quering the iterator.
  */
 
 /**
@@ -302,6 +329,7 @@ typedef struct igraph_iterator_t {
   int (*next)(igraph_t *graph, struct igraph_iterator_t *it);
   int (*prev)(igraph_t *graph, struct igraph_iterator_t *it);
   bool_t (*end)(igraph_t *graph, struct igraph_iterator_t *it);
+  int (*reset)(igraph_t *graph, struct igraph_iterator_t *it);
   integer_t (*getvertex)(igraph_t *graph, struct igraph_iterator_t *it);
   integer_t (*getvertexfrom)(igraph_t *graph, struct igraph_iterator_t *it);
   integer_t (*getvertexto)(igraph_t *graph, struct igraph_iterator_t *it);
@@ -325,6 +353,7 @@ int igraph_next(igraph_t *graph, igraph_iterator_t *it);
 int igraph_prev(igraph_t *graph, igraph_iterator_t *it);
 bool_t igraph_end(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_nei(igraph_t *graph, igraph_iterator_t *it);
+int igraph_reset(igraph_t *graph, igraph_iterator_t *it);
 
 /* Generics, vertices */
 integer_t igraph_get_vertex(igraph_t *graph, igraph_iterator_t *it);
@@ -339,11 +368,13 @@ int igraph_next_vid(igraph_t *graph, igraph_iterator_t *it);
 int igraph_prev_vid(igraph_t *graph, igraph_iterator_t *it);
 bool_t igraph_end_vid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_vid(igraph_t *graph, igraph_iterator_t *it);
+int igraph_reset_vid(igraph_t *graph, igraph_iterator_t *it);
 
 /* Iterates over the neighbors of a vertex */
 int igraph_next_vneis(igraph_t *graph, igraph_iterator_t *it);
 int igraph_end_vneis(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it);
+int igraph_reset_vneis(igraph_t *graph, igraph_iterator_t *it);
 
 /* Specifics, simple edge iterator */
 int igraph_next_eid(igraph_t *graph, igraph_iterator_t *it);
@@ -352,6 +383,7 @@ bool_t igraph_end_eid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_from_eid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_to_eid(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_edge_eid(igraph_t *graph, igraph_iterator_t *it); 
+int igraph_reset_eid(igraph_t *graph, igraph_iterator_t *it);
 
 /* Specifics, edge iterator according to the 'from' order */
 int igraph_next_efromorder(igraph_t *graph, igraph_iterator_t *it);
@@ -362,6 +394,7 @@ integer_t igraph_get_vertex_from_efromorder(igraph_t *graph,
 integer_t igraph_get_vertex_to_efromorder(igraph_t *graph, 
 					  igraph_iterator_t *it);
 integer_t igraph_get_edge_efromorder(igraph_t *graph, igraph_iterator_t *it);
+int igraph_reset_efromorder(igraph_t *graph, igraph_iterator_t *it);
 
 
 /* Iterates over the edges to and/or from a vertex */
@@ -374,6 +407,7 @@ integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it, 
 			      integer_t vid, igraph_neimode_t mode);
 integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it);
+int igraph_reset_eneis(igraph_t *graph, igraph_iterator_t *it);
 
 /* TODO: attributes */
 
