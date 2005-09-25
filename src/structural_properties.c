@@ -1080,7 +1080,6 @@ int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops) {
     }
   }
 
-  print_vector(&edges);
   vector_destroy(&neis);
   igraph_delete_edges(graph, &edges);
   vector_destroy(&edges);

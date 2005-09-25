@@ -986,3 +986,26 @@ SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter, 
+					  SEXP pmaxdelta, SEXP parea,
+					  SEXP pcoolexp, SEXP prepulserad) {
+  igraph_t g;
+  integer_t niter=REAL(pniter)[0];
+  real_t maxdelta=REAL(pmaxdelta)[0];
+  real_t area=REAL(parea)[0];
+  real_t coolexp=REAL(pcoolexp)[0];
+  real_t repulserad=REAL(prepulserad)[0];
+  matrix_t res;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  matrix_init(&res, 0, 0);
+  igraph_layout_fruchterman_reingold(&g, &res, niter, maxdelta, area, 
+				     coolexp, repulserad, 0);
+  PROTECT(result=R_matrix_to_SEXP(&res));
+  matrix_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}

@@ -1,3 +1,5 @@
+o rewrite (?) and document iterators
+o write tutorial
 o write R documentation
 o add graph, vertex & edge attributes
 o add methods for reading & saving a file together with its attributes
@@ -6,3 +8,5 @@ o comunity detection algorithms
 o add 3d layout functions
 o multicompartmental layout functions
 o error handling
+o function for merge networks
+o add data sets to the R package

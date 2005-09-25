@@ -74,6 +74,12 @@ __BEGIN_DECLS
  */
 
 /**
+ * \defgroup layout Layout functions for graph drawing
+ * \brief These functions place the vertices of a graph in 2D and 3D,
+ * trying to please the eye as much as possible.
+ */
+
+/**
  * \defgroup conversion Convert a graph to an edge list or adjacency matrix
  * \brief 
  */
@@ -463,10 +469,10 @@ int igraph_is_connected(igraph_t *graph, bool_t *res,
 
 int igraph_layout_random(igraph_t *graph, matrix_t *res);
 int igraph_layout_circle(igraph_t *graph, matrix_t *res);
-int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res, 
-				       integer_t niter, real_t coolexp,
-				       integer_t frame, vector_t *initial,
-				       real_t initemp);
+int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
+				       integer_t niter, real_t maxdelta,
+				       real_t area, real_t coolexp, 
+				       real_t repulserad, bool_t use_seed);
 int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,

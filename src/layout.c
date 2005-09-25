@@ -24,6 +24,18 @@
 #include "random.h"
 #include <math.h>
 
+/**
+ * \ingroup layout
+ * \brief Places the vertices uniform randomly on a plane.
+ * 
+ * @param graph Pointer to an initialized graph object.
+ * @param res Pointer to an initialized graph object. This will
+ *        contain the result and will be resized in needed.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|)</code>, the number of vertices.
+ */
+
 int igraph_layout_random(igraph_t *graph, matrix_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -43,6 +55,19 @@ int igraph_layout_random(igraph_t *graph, matrix_t *res) {
   return 0;
 }
 
+/**
+ * \ingroup layout
+ * \brief Places the vertices uniformly on a circle, in the order of
+ * vertex ids.
+ * 
+ * @param graph Pointer to an initialized graph object.
+ * @param res Pointer to an initialized graph object. This will
+ *        contain the result and will be resized in needed.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|)</code>, the number of vertices.
+ */
+
 int igraph_layout_circle(igraph_t *graph, matrix_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -59,13 +84,139 @@ int igraph_layout_circle(igraph_t *graph, matrix_t *res) {
   return 0;
 }
 
-int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res, 
-				       integer_t niter, real_t coolexp,
-				       integer_t frame, vector_t *initial,
-				       real_t initemp) {
-  /* TODO */
+/**
+ * \ingroup layout
+ * \brief Places the vertices on a plane according to the
+ * Fruchterman-Reingold algorithm.
+ *
+ * This is a force-directed layout, see Fruchterman, T.M.J. and
+ * Reingold, E.M.: Graph Drawing by Force-directed Placement.
+ * <em>Software -- Practice and Experience</em>, 21/11, 1129--1164,
+ * 1991. 
+ * This function was ported from the SNA R package.
+ * @param graph Pointer to an initialized graph object.
+ * @param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized in needed.
+ * @param niter The number of iterations to do.
+ * @param maxdelta The maximum distance to move a vertex in an
+ *        iteration.
+ * @param area The area parameter of the algorithm.
+ * @param coolexp The cooling exponent of the simulated annealing.
+ * @param repulserad Determines the radius at which
+ *        vertex-vertex repulsion cancels out attraction of
+ *        adjacent vertices.
+ * @param use_seed Logical, if true the supplied values in the
+ *        <code>res</code> argument are used as an initial layout, if
+ *        false a random initial layout is used.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|^2)</code> in each iteration,
+ * <code>|V|</code> is the number of vertices in the graph.
+ */
+
+int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
+				       integer_t niter, real_t maxdelta,
+				       real_t area, real_t coolexp, 
+				       real_t repulserad, bool_t use_seed) {
+  real_t frk,t,ded,xd,yd;
+  real_t rf,af;
+  long int i,j,k;
+
+  long int no_of_nodes=igraph_vcount(graph);
+  matrix_t dxdy;
+  igraph_iterator_t edgeit;
+  
+  matrix_resize(res, no_of_nodes, 2);
+  if (!use_seed) {
+    igraph_layout_random(graph, res);
+  }
+  matrix_init(&dxdy, no_of_nodes, 2);
+  
+  frk=sqrt(area/no_of_nodes);
+
+  for(i=niter;i>0;i--) {
+    /* Set the temperature (maximum move/iteration) */
+    t=maxdelta*pow(i/(double)niter,coolexp);
+    /* Clear the deltas */
+    matrix_null(&dxdy);
+    /* Increment deltas for each undirected pair */
+    for(j=0;j<no_of_nodes;j++) {
+      for(k=j+1;k<no_of_nodes;k++){
+        /* Obtain difference vector */
+        xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
+        yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
+        ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
+        xd/=ded;                /* Rescale differences to length 1 */
+        yd/=ded;
+        /* Calculate repulsive "force" */
+        rf=frk*frk*(1.0/ded-ded*ded/repulserad);
+        MATRIX(dxdy, j, 0)+=xd*rf; /* Add to the position change vector */
+        MATRIX(dxdy, k, 0)-=xd*rf;
+        MATRIX(dxdy, j, 1)+=yd*rf;
+        MATRIX(dxdy, k, 1)-=yd*rf;
+      }
+    }
+    /* Calculate the attractive "force" */
+    igraph_iterator_eid(graph, &edgeit);
+    while (!igraph_end(graph, &edgeit)) {
+      j=igraph_get_vertex_from(graph, &edgeit);
+      k=igraph_get_vertex_to(graph, &edgeit);
+      xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
+      yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
+      ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
+      xd/=ded;                /* Rescale differences to length 1 */
+      yd/=ded;
+      af=ded*ded/frk;
+      MATRIX(dxdy, j, 0)-=xd*af; /* Add to the position change vector */
+      MATRIX(dxdy, k, 0)+=xd*af;
+      MATRIX(dxdy, j, 1)-=yd*af;
+      MATRIX(dxdy, k, 1)+=yd*af;
+      igraph_next(graph, &edgeit);
+    }
+    igraph_iterator_destroy(graph, &edgeit);
+    
+    /* Dampen motion, if needed, and move the points */   
+    for(j=0;j<no_of_nodes;j++){
+      ded=sqrt(MATRIX(dxdy, j, 0)*MATRIX(dxdy, j, 0)+
+	       MATRIX(dxdy, j, 1)*MATRIX(dxdy, j, 1));    
+      if(ded>t){		/* Dampen to t */
+        ded=t/ded;
+        MATRIX(dxdy, j, 0)*=ded;
+        MATRIX(dxdy, j, 1)*=ded;
+      }
+      MATRIX(*res, j, 0)+=MATRIX(dxdy, j, 0); /* Update positions */
+      MATRIX(*res, j, 1)+=MATRIX(dxdy, j, 1);
+    }
+  }
+  
+  matrix_destroy(&dxdy);
+  
   return 0;
 }
+
+/**
+ * \ingroup layout
+ * \brief Places the vertices on a plane according the Kamada-Kawai
+ * algorithm. 
+ *
+ * This is a force directed layout, see  Kamada, T. and Kawai, S.: An
+ * Algorithm for Drawing General Undirected Graphs. <em>Information
+ * Processing Letters</em>, 31/1, 7--15, 1989.
+ * This function was ported from the SNA R package.
+ * @param graph A graph object.
+ * @param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized if needed.
+ * @param niter The number of iterations to perform.
+ * @param sigma Sets the base standard deviation of position
+ *        change proposals. 
+ * @param initemp Sets the initial temperature for the annealing.
+ * @param coolexp The cooling exponent of the annealing.
+ * @param kkconst The Kamada-Kawai vertex attraction constant.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|^2)</code> for each iteration,
+ * <code>|V|</code> is the number of vertices in the graph.
+ */
 
 int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 			       integer_t niter, real_t sigma, 

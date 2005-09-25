@@ -39,90 +39,18 @@ layout.fruchterman.reingold <- function(graph, ..., params=list()) {
     params <- list(...)
   }
 
-  if (is.null(params$niter))     { params$niter   <- 100 }
-  if (is.null(params$coolexp))   { params$coolexp <- 1.5 }
-  if (is.null(params$frame))     { params$frame   <- "rectangle" }
-  if (is.null(params$initial) ||
-      !params$initial)           { params$initial <- layout.random(graph) }
-  if (is.null(params$temp))      { params$temp    <- 1/10 }
+  vc <- vcount(graph)
+  if (is.null(params$niter))     { params$niter      <- 500  }
+  if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
+  if (is.null(params$area))      { params$area       <- vc^2 }
+  if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
+  if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
   
-  edges <- get.edgelist(graph)+1
-
-  len <- function(vect) sqrt(sum(vect*vect))
-  norm <- function(vect) vect/len(vect)
-  
-  # parameters
-  W <- L <- 1
-
-  # initialization
-  coords <- params$initial
-  coords[,1] <- coords[,1] * W
-  coords[,2] <- coords[,2] * L
-  area <- W*L
-  k <- sqrt(area/vcount(graph))
-  t <- t.begin <- c(params$temp, params$temp)
-
-  # attractive & repulsive "forces"
-  fa <- function(x) x*x/k
-  fr <- function(x) k*k/x
-
-  # cooling function
-  cool <- function(t, i) t.begin * (i/params$niter)**params$coolexp
-  
-  for (i in 1:params$niter) {
-    
-    disp <- matrix(0, NROW(coords), NCOL(coords))
-    
-    # calculate repulsive forces
-    for (v in 1:(vcount(graph)-1)) {
-      for (u in (v+1):vcount(graph)) {
-        delta <- coords[v,]-coords[u,]
-        if (sum(abs(delta))==0) {
-          coords[u,] <- coords[u,] + runif(2, -W/1000, W/1000)
-          delta <- coords[v,]-coords[u,]
-        }
-        vel <- norm(delta) * fr(len(delta))
-        disp[v,] <- disp[v,] + vel
-        disp[u,] <- disp[u,] - vel
-      }
-    }
-    
-    # calculate attractive forces
-    for (e in seq(along=edges[,1])) {
-      delta <- coords[edges[e,1],]-coords[edges[e,2],]
-      vel <- norm(delta) * fa(len(delta))
-      disp[edges[e,1],] <- disp[edges[e,1],] - vel
-      disp[edges[e,2],] <- disp[edges[e,2],] + vel
-    }
-
-    # limit the maximum displacement to the temperature t
-    # and then prevent from being displaced outside frame
-    for (v in 1:vcount(graph)) {
-      real.disp <- norm(disp[v,]) *
-        c(min(abs(disp[v,1]), t[1]), min(abs(disp[v,2]), t[2]))
-      coords[v,] <- coords[v,] + real.disp
-
-      if (params$frame=="rectangle") {
-        coords[v,1] <- min(W/2, max(-W/2, coords[v,1]))
-        coords[v,2] <- min(L/2, max(-L/2, coords[v,2]))
-      } else if (params$frame=="circle") {
-        l <- len(coords[v,])
-        if (l > W) {
-          phi <- atan2(coords[v,1], coords[v,2])
-          coords[v,1] <- W*cos(phi)/l
-          coords[v,2] <- W*sin(phi)/l
-        }
-      }
-    }
-    
-    # cool down
-    t <- cool(t, i)
-    
-  } # for i in 1:iterations
-
-  res <- coords
-  
-  res
+  .Call("R_igraph_layout_fruchterman_reingold", graph,
+        as.double(params$niter), as.double(params$maxdelta),
+        as.double(params$area), as.double(params$coolexp),
+        as.double(params$repulserad),
+        PACKAGE="igraph")
 }
 
 # FROM SNA 0.5

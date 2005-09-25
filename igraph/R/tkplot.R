@@ -379,20 +379,21 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                        params=list(
                          niter=list(name="Number of iterations",
                            type="numeric",
-                           default=100),
+                           default=500),
+                         maxdelta=list(name="Maximum change (n)",
+                           type="expression",
+                           default=expression(vcount(.tkplot.g))),
+                         area=list(name="Area parameter (n^2)",
+                           type="expression",
+                           default=expression(vcount(.tkplot.g)^2)),
                          coolexp=list(name="Cooling exponent",
                            type="numeric",
-                           default=1.5),
-                         frame=list(name="Frame shape",
-                           type="choice",
-                           default="rectangle",
-                           values=c("rectangle", "circle")),
-                         initial=list(name="Use current as initial layout",
-                           type="initial",
-                           default=TRUE),
-                         temp=list(name="Initial temperature",
-                           type="numeric",
-                           default=1/10)
+                           default=3),                         
+                         repulserad=list(name="Cancellation radius (n^3)",
+                           type="expression",
+                           # FIXME: this should be area * n, but parameters
+                           # can't depend on each other....
+                           default=expression(vcount(.tkplot.g)^3))
                          )
                        )
                   )
@@ -1257,7 +1258,12 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
       tkgrid(tkcheckbutton(dialog, onvalue="TRUE", offvalue="FALSE",
                            variable=values[[i]]),
              row=row, column=1, sticky="nw", padx=5, pady=5)
-    }
+    } else if (layout$param[[i]]$type=="expression") {
+      values[[i]] <- tkentry(dialog)
+      .tkplot.g <- .tkplot.get(tkp.id, "graph")
+      tkinsert(values[[i]], 0, as.character(eval(layout$params[[i]]$default)))
+      tkgrid(values[[i]], row=row, column=1, sticky="nw", padx=5, pady=5)
+    }      
 
     row <- row + 1
     
