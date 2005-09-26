@@ -126,7 +126,7 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
   long int i, j;
   long int *already_added;
   long int nodes_reached=0;
-  long int normfact=0;
+  real_t normfact=0.0;
 
   dqueue_t q;
   vector_t neis;
@@ -155,7 +155,7 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
 	already_added[neighbor]=i+1;
 	nodes_reached++;
 	*res += actdist+1;
-	normfact++;
+	normfact+=1;
 	dqueue_push(&q, neighbor);
 	dqueue_push(&q, actdist+1);
       }

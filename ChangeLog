@@ -1,5 +1,8 @@
 2005-09-26  Gabor Csardi  <csardi@szaffi>
 
+	* src/structural_properties.c (igraph_average_path_length) :
+	normfact double instead of long int, the saga of this bug ends here
+
 	* src/random.c (fsign, imax2, imin2, R_FINITE, ISNAN) : new, from
 	the R source code
 
