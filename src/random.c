@@ -475,6 +475,71 @@ double igraph_qnorm5(double p, double mu, double sigma, int lower_tail, int log_
     return mu + sigma * val;
 }
 
+double fsign(double x, double y)
+{
+#ifdef IEEE_754
+    if (ISNAN(x) || ISNAN(y))
+        return x + y;
+#endif
+    return ((y >= 0) ? fabs(x) : -fabs(x));
+}
+
+int imax2(int x, int y)
+{
+    return (x < y) ? y : x;
+}
+
+int imin2(int x, int y)
+{
+    return (x < y) ? x : y;
+}
+
+#ifdef HAVE_WORKING_ISFINITE
+/* isfinite is defined in <math.h> according to C99 */
+# define R_FINITE(x)    isfinite(x)
+#elif HAVE_WORKING_FINITE
+/* include header needed to define finite() */
+#  ifdef HAVE_IEEE754_H
+#   include <ieee754.h>         /* newer Linuxen */
+#  else
+#   ifdef HAVE_IEEEFP_H
+#    include <ieeefp.h>         /* others [Solaris], .. */
+#   endif
+#  endif
+# define R_FINITE(x)    finite(x)
+#else
+# define R_FINITE(x)    R_finite(x)
+#endif
+
+int R_finite(double x)
+{
+#ifdef HAVE_WORKING_ISFINITE
+    return isfinite(x);
+#elif HAVE_WORKING_FINITE
+    return finite(x);
+#else
+/* neither finite nor isfinite work. Do we really need the AIX exception? */
+# ifdef _AIX
+#  include <fp.h>
+     return FINITE(x);
+# else
+    return (!isnan(x) & (x != 1/0.0) & (x != -1.0/0.0));
+# endif
+#endif
+}
+
+int R_isnancpp(double x)
+{
+   return (isnan(x)!=0);
+}
+
+#ifdef __cplusplus
+  int R_isnancpp(double); /* in arithmetic.c */
+#  define ISNAN(x)     R_isnancpp(x)
+#else
+#  define ISNAN(x)     (isnan(x)!=0)
+#endif
+
 double igraph_norm_rand(void) {
   
   double u1;
@@ -551,8 +616,8 @@ double igraph_exp_rand(void)
 
     a = 0.;
     /* precaution if u = 0 is ever returned */
-    u = unif_rand();
-    while(u <= 0.0 || u >= 1.0) u = unif_rand();
+    u = RNG_UNIF01();
+    while(u <= 0.0 || u >= 1.0) u = RNG_UNIF01();
     for (;;) {
 	u += u;
 	if (u > 1.0)
@@ -565,10 +630,10 @@ double igraph_exp_rand(void)
 	return a + u;
 
     i = 0;
-    ustar = unif_rand();
+    ustar = RNG_UNIF01();
     umin = ustar;
     do {
-	ustar = unif_rand();
+	ustar = RNG_UNIF01();
 	if (ustar < umin)
 	    umin = ustar;
 	i++;
@@ -690,7 +755,7 @@ double igraph_rpois(double mu)
 
 	    repeat {
 		/* Step U. uniform sample for inversion method */
-		u = unif_rand();
+		u = RNG_UNIF01();
 		if (u <= p0)
 		    return 0.;
 
@@ -725,7 +790,7 @@ double igraph_rpois(double mu)
 /* Only if mu >= 10 : ----------------------- */
 
     /* Step N. normal sample */
-    g = mu + s * norm_rand();/* norm_rand() ~ N(0,1), standard normal */
+    g = mu + s * igraph_norm_rand();/* norm_rand() ~ N(0,1), standard normal */
 
     if (g >= 0.) {
 	pois = floor(g);
@@ -735,7 +800,7 @@ double igraph_rpois(double mu)
 	/* Step S. squeeze acceptance */
 	fk = pois;
 	difmuk = mu - fk;
-	u = unif_rand(); /* ~ U(0,1) - sample */
+	u = RNG_UNIF01(); /* ~ U(0,1) - sample */
 	if (d * u >= difmuk * difmuk * difmuk)
 	    return pois;
     }
@@ -771,11 +836,11 @@ double igraph_rpois(double mu)
     repeat {
 	/* Step E. Exponential Sample */
 
-	E = exp_rand();	/* ~ Exp(1) (standard exponential) */
+	E = igraph_exp_rand();	/* ~ Exp(1) (standard exponential) */
 
 	/*  sample t from the laplace 'hat'
 	    (if t <= -0.6744 then pk < fk for all mu >= 10.) */
-	u = 2 * unif_rand() - 1.;
+	u = 2 * RNG_UNIF01() - 1.;
 	t = 1.8 + fsign(E, u);
 	if (t > -0.6744) {
 	    pois = floor(mu + s * t);

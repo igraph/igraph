@@ -1,3 +1,8 @@
+2005-09-26  Gabor Csardi  <csardi@szaffi>
+
+	* src/random.c (fsign, imax2, imin2, R_FINITE, ISNAN) : new, from
+	the R source code
+
 2005-09-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/layout.c (igraph_layout_fruchterman_reingold) : implemented
