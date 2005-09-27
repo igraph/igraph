@@ -728,7 +728,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   long int *distance;
   long int *nrgeo;
   double *tmpscore;
-  stack_t stack;
+  igraph_stack_t stack;
   long int source;
   long int j;
   vector_t tmp;
@@ -750,7 +750,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   vector_null(res);
 
   dqueue_init(&q, 100);
-  stack_init(&stack, no_of_nodes);
+  igraph_stack_init(&stack, no_of_nodes);
 
   /* here we go */
   
@@ -759,7 +759,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
     memset(distance, 0, no_of_nodes*sizeof(long int));
     memset(nrgeo, 0, no_of_nodes*sizeof(long int));
     memset(tmpscore, 0, no_of_nodes*sizeof(double));
-    stack_clear(&stack); /* it should be empty anyway... */
+    igraph_stack_clear(&stack); /* it should be empty anyway... */
     
     dqueue_push(&q, source);
     nrgeo[source]=1;
@@ -781,7 +781,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
 	  nrgeo[neighbor]++;
 	  distance[neighbor]=distance[actnode]+1;
 	  dqueue_push(&q, neighbor);
-	  stack_push(&stack, neighbor);
+	  igraph_stack_push(&stack, neighbor);
 	}
       }
     } /* while !dqueue_empty */
@@ -789,8 +789,8 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
     /* Ok, we've the distance of each node and also the number of
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
-    while (!stack_empty(&stack)) {
-      long int actnode=stack_pop(&stack);
+    while (!igraph_stack_empty(&stack)) {
+      long int actnode=igraph_stack_pop(&stack);
       long int friends=0;
       if (distance[actnode]<=1) { continue; } /* skip source node */
       
@@ -831,7 +831,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   Free(nrgeo);
   Free(tmpscore);
   dqueue_destroy(&q);
-  stack_destroy(&stack);
+  igraph_stack_destroy(&stack);
   vector_destroy(&tmp);
 
   return 0;
@@ -869,7 +869,7 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
   long int *distance;
   long int *nrgeo;
   double *tmpscore;
-  stack_t stack;
+  igraph_stack_t stack;
   long int source;
   long int j;
 
@@ -891,7 +891,7 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
   vector_null(result);
 
   dqueue_init(&q, 100);
-  stack_init(&stack, no_of_nodes);
+  igraph_stack_init(&stack, no_of_nodes);
   igraph_iterator_eneis(graph, &it, 0, modeout);
 
   /* here we go */
@@ -901,7 +901,7 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
     memset(distance, 0, no_of_nodes*sizeof(long int));
     memset(nrgeo, 0, no_of_nodes*sizeof(long int));
     memset(tmpscore, 0, no_of_nodes*sizeof(double));
-    stack_clear(&stack); /* it should be empty anyway... */
+    igraph_stack_clear(&stack); /* it should be empty anyway... */
     
     dqueue_push(&q, source);
     nrgeo[source]=1;
@@ -923,7 +923,7 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
 	  nrgeo[neighbor]++;
 	  distance[neighbor]=distance[actnode]+1;
 	  dqueue_push(&q, neighbor);
-	  stack_push(&stack, neighbor);
+	  igraph_stack_push(&stack, neighbor);
 	}
 	igraph_next(graph, &it);
       }
@@ -932,8 +932,8 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
     /* Ok, we've the distance of each node and also the number of
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
-    while (!stack_empty(&stack)) {
-      long int actnode=stack_pop(&stack);
+    while (!igraph_stack_empty(&stack)) {
+      long int actnode=igraph_stack_pop(&stack);
       long int friends=0;
       if (distance[actnode]<1) { continue; } /* skip source node */
       
@@ -966,7 +966,7 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
   Free(nrgeo);
   Free(tmpscore);
   dqueue_destroy(&q);
-  stack_destroy(&stack);
+  igraph_stack_destroy(&stack);
 
   /* divide by 2 for undirected graph */
   if (!directed || !igraph_is_directed(graph)) {

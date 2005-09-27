@@ -1,3 +1,9 @@
+2005-09-27  Gabor Csardi  <csardi@szaffi>
+
+	* src/types.c (stack_t, stack_*) : renamed to igraph_stack_t
+	* src/types.h (stack_t, stack_*) : same
+	* src/structural_properties.c (stack_t, stack_*) : same
+
 2005-09-26  Gabor Csardi  <csardi@szaffi>
 
 	* src/structural_properties.c (igraph_average_path_length) :

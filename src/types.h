@@ -181,16 +181,16 @@ typedef struct s_stack {
   real_t* stor_begin;
   real_t* stor_end;
   real_t* end;
-} stack_t;
+} igraph_stack_t;
 
-int stack_init       (stack_t* s, long int size);
-int stack_destroy    (stack_t* s);
-int stack_reserve    (stack_t* s, long int size);
-int stack_empty      (stack_t* s);
-long int stack_size       (stack_t* s);
-int stack_clear      (stack_t* s);
-int stack_push       (stack_t* s, real_t elem);
-real_t stack_pop        (stack_t* s);
+int igraph_stack_init       (igraph_stack_t* s, long int size);
+int igraph_stack_destroy    (igraph_stack_t* s);
+int igraph_stack_reserve    (igraph_stack_t* s, long int size);
+int igraph_stack_empty      (igraph_stack_t* s);
+long int igraph_stack_size       (igraph_stack_t* s);
+int igraph_stack_clear      (igraph_stack_t* s);
+int igraph_stack_push       (igraph_stack_t* s, real_t elem);
+real_t igraph_stack_pop        (igraph_stack_t* s);
 
 /* -------------------------------------------------- */
 /* Multi set                                          */

@@ -904,7 +904,7 @@ int matrix_null(matrix_t *m) {
  * \brief Initializes a stack.
  */
 
-int stack_init       (stack_t* s, long int size) {
+int igraph_stack_init       (igraph_stack_t* s, long int size) {
         long int alloc_size= size > 0 ? size : 1;
 	assert (s != NULL);
 	if (size < 0) { size=0; }
@@ -920,7 +920,7 @@ int stack_init       (stack_t* s, long int size) {
  * \brief Destroys a stack object.
  */
 
-int stack_destroy    (stack_t* s) {
+int igraph_stack_destroy    (igraph_stack_t* s) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	Free(s->stor_begin);
@@ -935,7 +935,7 @@ int stack_destroy    (stack_t* s) {
  * \todo
  */
 
-int stack_reserve    (stack_t* s, long int size) {
+int igraph_stack_reserve    (igraph_stack_t* s, long int size) {
   return 0;
 }
 
@@ -944,7 +944,7 @@ int stack_reserve    (stack_t* s, long int size) {
  * \brief Decides whether a stack object is empty.
  */
 
-int stack_empty      (stack_t* s) {
+int igraph_stack_empty      (igraph_stack_t* s) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	assert (s->end != NULL);
@@ -957,7 +957,7 @@ int stack_empty      (stack_t* s) {
  * \brief Returns the number of elements in a stack.
  */
 
-long int stack_size       (stack_t* s) {
+long int igraph_stack_size       (igraph_stack_t* s) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	
@@ -969,7 +969,7 @@ long int stack_size       (stack_t* s) {
  * \brief Removes all elements from a stack.
  */
 
-int stack_clear      (stack_t* s) {
+int igraph_stack_clear      (igraph_stack_t* s) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	s->end = s->stor_begin;
@@ -982,7 +982,7 @@ int stack_clear      (stack_t* s) {
  * \brief Places an element on the top of a stack.
  */
 
-int stack_push       (stack_t* s, real_t elem) {
+int igraph_stack_push       (igraph_stack_t* s, real_t elem) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	if (s->end == s->stor_end) {
@@ -990,10 +990,10 @@ int stack_push       (stack_t* s, real_t elem) {
 		
 	        real_t *bigger=NULL, *old=s->stor_begin;
 		
-		bigger = Calloc(2*stack_size(s)+1, real_t);
+		bigger = Calloc(2*igraph_stack_size(s)+1, real_t);
 		
 		memcpy(bigger, s->stor_begin, 
-		       stack_size(s)*sizeof(real_t));
+		       igraph_stack_size(s)*sizeof(real_t));
 
 		s->end        = bigger + (s->stor_end - s->stor_begin);
 		s->stor_end   = bigger + 2*(s->stor_end - s->stor_begin)+1;
@@ -1015,7 +1015,7 @@ int stack_push       (stack_t* s, real_t elem) {
  * \brief Removes and returns an element from the top of a stack.
  */
 
-real_t stack_pop        (stack_t* s) {
+real_t igraph_stack_pop        (igraph_stack_t* s) {
 
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
