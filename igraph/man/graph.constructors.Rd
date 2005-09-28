@@ -6,6 +6,7 @@
 \alias{graph.lattice}
 \alias{graph.ring}
 \alias{graph.tree}
+\alias{graph.full}
 \title{Various methods for creating graphs}
 \description{These method can create various (mostly regular) graphs:
   empty graphs, graphs with the given edges, graphs from adjacency
@@ -25,6 +26,7 @@ graph.lattice(length, dim, nei = 1, directed = FALSE, mutual = FALSE,
               circular = FALSE, \dots)
 graph.ring(n, circular = TRUE, directed = FALSE, mutual = FALSE, \dots)
 graph.tree(n, children = 2, \dots)
+graph.full(n, directed = FALSE, loops = FALSE)
 }
 \arguments{
   \item{type}{The storage type of the graph, this defines how its data
@@ -34,16 +36,13 @@ graph.tree(n, children = 2, \dots)
       \item{\code{adjacencylist}}{the neighbor of each
 	node is stored in a list, this type is immutable, graph
 	modifying operations create a new graph}
-      \item{\code{pgsql}}{the graph is stored in a PostgreSQL
-	database. This type is mutable, the graph can be modified in
-	place.}
     }
   }
   \item{edges}{Numeric vector defining the edges, the first edge points
     from the first element to the second, the second edge from the third
   to the fourth, etc.}
   \item{adjmatrix}{A square adjacency matrix.}
-  \item{directed}{Logical, if TRUE a directed matrix will be
+  \item{directed}{Logical, if TRUE a directed graph will be
     created. Note that for while most constructors the default is TRUE,
     for \code{graph.lattice} and \code{graph.ring} it is FALSE. For
     \code{graph.star} the \code{mode} argument should be used for
@@ -67,6 +66,8 @@ graph.tree(n, children = 2, \dots)
   \item{dim}{Integer constant, the dimension of the lattice.}
   \item{children}{Integer constant, the number of children of a vertex
     for \code{graph.tree}.}
+  \item{loops}{If TRUE also loops edges (self edges) are added.}
+  \item{graph}{An object.}
   \item{\dots}{Additional arguments, added as graph attributes.}
 }
 \details{All these functions create graphs in a deterministic way.
@@ -87,6 +88,9 @@ graph.tree(n, children = 2, \dots)
   it creates a one dimensional circular lattice.
 
   \code{graph.tree} creates regular trees.
+
+  \code{graph.full} simply created full graphs.
+
 }
 \value{Every function documented here returns a \code{graph} object.}
 %\references{}
@@ -102,5 +106,6 @@ g5 <- graph.lattice(c(5,5,5))
 g6 <- graph.lattice(length=5, dim=3)
 g7 <- graph.ring(10)
 g8 <- graph.tree(10, 2)
+g9 <- graph.full(5, loops=TRUE)
 }
 \keyword{graphs}

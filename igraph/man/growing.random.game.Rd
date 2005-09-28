@@ -4,15 +4,15 @@
 \description{This function creates a random graph by simulating its
   stochastic evolution.}
 \usage{
-growing.random.game(n, m=1, citation=FALSE, \dots)
+growing.random.game(n, m=1, directed=TRUE, citation=FALSE)
 }
 \arguments{
   \item{n}{Numeric constant, number of vertices in the graph.}
   \item{m}{Numeric constant, number of edges added in each time step.}
+  \item{directed}{Logical, whether to create a directed graph.}
   \item{citation}{Logical. If \code{TRUE} a citation graph is created,
     ie. in each time step the added edges are originating from the new
     vertex. }
-  \item{\dots}{Additional arguments, passed to the graph constructor.}
 }
 \details{
   This is discrete time step model, in each time step a new vertex is
@@ -27,7 +27,7 @@ growing.random.game(n, m=1, citation=FALSE, \dots)
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\code{\link{ba.game}}, \code{\link{erdos.renyi.game}}}
+\seealso{\code{\link{barabasi.game}}, \code{\link{erdos.renyi.game}}}
 \examples{
 g <- growing.random.game(500, citation=FALSE)
 g2 <- growing.random.game(500, citation=TRUE)

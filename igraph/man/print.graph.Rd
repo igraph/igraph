@@ -1,20 +1,22 @@
-\name{print.graph}
-\alias{print.graph}
-\alias{summary.graph}
+\name{print.igraph}
+\alias{print.igraph}
+\alias{summary.igraph}
 \title{Print graphs to the terminal}
 \description{These functions attempt to print a graph to the terminal in
   a human readable form.}
 \usage{
-\method{print}{graph}(graph)
-\method{summary}{graph}(graph)
+\method{print}{igraph}(x, \dots)
+\method{summary}{igraph}(object, \dots)
 }
 \arguments{
-  \item{graph}{The graph to print.}
+  \item{x}{The graph to print.}
+  \item{object}{The graph of which the summary will be printed.}
+  \item{\dots}{Ignored.}
 }
 \details{
-  \code{summary.graph} prints the number of vertices, edges, whether the
+  \code{summary.igraph} prints the number of vertices, edges, whether the
   graph is directed and its storage type.
-  \code{print.graph} prints the same information as \code{summary.graph}
+  \code{print.igraph} prints the same information as \code{summary.graph}
   and also the edges.
 }
 \value{Both functions return the graph invisibly.}

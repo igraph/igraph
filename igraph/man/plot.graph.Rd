@@ -1,18 +1,18 @@
-\name{plot.graph}
-\alias{plot.graph}
+\name{plot.igraph}
+\alias{plot.igraph}
 \title{Plotting of graphs}
 \description{\code{plot.graph} is able to plot graphs to any R
   device. It is the non-interactive companion of the \code{tkplot}
   function.}
 \usage{
-plot.graph(graph, layout = layout.random, layout.par = list(), 
+plot.igraph(x, layout = layout.random, layout.par = list(), 
     labels = NULL, label.color = "darkblue", label.font = NULL, 
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
     vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
     edge.labels = NA, axes = FALSE, xlab = "", ylab = "", \dots)
 }
 \arguments{
-  \item{graph}{The graph to plot.}
+  \item{x}{The graph to plot.}
   \item{layout}{The coordinates of the vertices, or the method to
     calculate them. See the same argument of \code{\link{tkplot}}.}
   \item{layout.par}{List, the parameters of the layout function. See the

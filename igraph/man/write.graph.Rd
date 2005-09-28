@@ -1,6 +1,7 @@
 \name{write.graph}
 \alias{write.graph}
 \alias{write.graph.edgelist}
+\alias{write.graph.lgl}
 \title{Writing the graph to a file in some format}
 \description{\code{write.graph} is a general function for exporting
   graphs to foreign file formats, however not many formats are
@@ -20,6 +21,9 @@ write.graph(graph, file, format="edgelist", \dots)
   The \code{edgelist} format is a simple text file, with one edge in a
   line, the two vertex ids separated by a space character. The file is
   sorted by the first and the second column.
+
+  The \code{lgl} format is also a simple text file, this is the
+  format expected by the 'Large Graph Layout' layout generator software.
 }
 \value{A NULL, invisibly.}
 % \references{}

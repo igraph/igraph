@@ -160,7 +160,7 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\code{\link{plot.graph}}, \code{\link{layout}}}
+\seealso{\code{\link{plot.igraph}}, \code{\link{layout}}}
 \examples{
 g <- graph.ring(10)
 \dontrun{tkplot(g)}

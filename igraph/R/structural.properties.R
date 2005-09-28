@@ -76,7 +76,7 @@ shortest.paths <- function(graph, v=0:(vcount(graph)-1), mode="all") {
         PACKAGE="igraph")
 }
 
-get.shortest.paths <- function(graph, from=1, mode="all") {
+get.shortest.paths <- function(graph, from, mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
@@ -140,8 +140,8 @@ betweenness <- function(graph, v=0:(vcount(graph)-1), directed=TRUE) {
         PACKAGE="igraph")
 }
 
-edge.betweenness <- function(graph, v=0:(ecount(graph)-1), directed=TRUE) {
+edge.betweenness <- function(graph, e=0:(ecount(graph)-1), directed=TRUE) {
 
   .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
-        PACKAGE="igraph")[ v+1 ]  
+        PACKAGE="igraph")[ e+1 ]  
 }

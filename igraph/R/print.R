@@ -24,23 +24,23 @@
 ###################################################################
 
 ## TODO: faster with get.edgelist
-print.igraph <- function(graph) {
-
-  ec <- ecount(graph)
-  vc <- vcount(graph)
+print.igraph <- function(x, ...) {
+  
+  ec <- ecount(x)
+  vc <- vcount(x)
   
   # From summary.graph
   cat("Vertices:", vc, "\n")
   cat("Edges:", ec, "\n")
-  cat("Directed:", is.directed(graph), "\n")
+  cat("Directed:", is.directed(x), "\n")
 
-  arrow <- ifelse(is.directed(graph), "->", "--")
+  arrow <- ifelse(is.directed(x), "->", "--")
   if (ec != 0) {
     cat("\nEdges:\n")
     idx <- 1
     for (i in 0:(vc-1)) {
-      neis <- neighbors(graph, i, "out")
-      if (!is.directed(graph)) {
+      neis <- neighbors(x, i, "out")
+      if (!is.directed(x)) {
         no.loops <- sum(neis==i)
         neis <- c(neis[ neis > i ], rep(i, no.loops/2))
       }
@@ -51,14 +51,14 @@ print.igraph <- function(graph) {
     }
   }
   
-  invisible(graph)
+  invisible(x)
 }
 
-summary.igraph <- function(graph) {
+summary.igraph <- function(object, ...) {
 
-  cat("Vertices:", vcount(graph), "\n")
-  cat("Edges:", ecount(graph), "\n")
-  cat("Directed:", is.directed(graph), "\n")
+  cat("Vertices:", vcount(object), "\n")
+  cat("Edges:", ecount(object), "\n")
+  cat("Directed:", is.directed(object), "\n")
   
-  invisible(graph)
+  invisible(object)
 }

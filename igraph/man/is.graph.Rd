@@ -1,10 +1,10 @@
-\name{is.graph}
-\alias{is.graph}
+\name{is.igraph}
+\alias{is.igraph}
 \title{Is this object a graph?}
 \description{\code{is.graph} makes its decision based on the class
   attribute of the object.}
 \usage{
-is.graph(graph)
+is.igraph(graph)
 }
 \arguments{
   \item{graph}{An R object.}
@@ -18,7 +18,7 @@ is.graph(graph)
 % \seealso{}
 \examples{
 g <- graph.ring(10)
-is.graph(g)
-is.graph(numeric(10))
+is.igraph(g)
+is.igraph(numeric(10))
 }
 \keyword{graphs}

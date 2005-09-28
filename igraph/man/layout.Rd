@@ -85,7 +85,7 @@ layout.spring(graph, \dots, params)
   Undirected Graphs.'' Information Processing Letters, 31(1):7-15. 
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\code{\link{plot.graph}}, \code{\link{tkplot}}}
+\seealso{\code{\link{plot.igraph}}, \code{\link{tkplot}}}
 \examples{
 g <- graph.ring(10)
 layout.random(g)

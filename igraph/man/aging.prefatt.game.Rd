@@ -38,7 +38,7 @@ aging.prefatt.game(n, m=1, aging.type="exponential", params=list(), \dots)
 \value{A new graph.}
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\code{\link{ba.game}}, \code{\link{erdos.renyi.game}}}
+\seealso{\code{\link{barabasi.game}}, \code{\link{erdos.renyi.game}}}
 \examples{
 g <- aging.prefatt.game(100, aging.type="exponential",
      params=list(aging.exp=1/100))

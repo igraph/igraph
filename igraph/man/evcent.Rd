@@ -46,7 +46,7 @@ unless you really mean to do so.}
 % \seealso{}
 \examples{
 #Generate some test data
-g <- graph.ring(10, mode="undirected")
+g <- graph.ring(10, directed=FALSE)
 #Compute eigenvector centrality scores
 evcent(g)
 }

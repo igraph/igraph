@@ -8,8 +8,8 @@
   of other vertices they both cite, \code{bibcoupling} calculates this.
 }
 \usage{
-cocitation(graph, v = 1:vcount(graph))
-bibcoupling(graph, v = 1:vcount(graph))
+cocitation(graph, v = 0:(vcount(graph)-1))
+bibcoupling(graph, v = 0:(vcount(graph)-1))
 }
 \arguments{
   \item{graph}{The graph object to analyze}

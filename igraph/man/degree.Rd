@@ -5,7 +5,7 @@
 \description{The degree of a vertex is its most basic structural
   property, the number of its adjacent edges.}
 \usage{
-degree(graph, v = 1:vcount(graph), mode = "total", loops = TRUE) 
+degree(graph, v = 0:(vcount(graph)-1), mode = "total", loops = TRUE) 
 degree.distribution(graph, cumulative = FALSE, \dots) 
 }
 \arguments{

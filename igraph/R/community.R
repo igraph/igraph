@@ -23,7 +23,7 @@
 # Community structure
 ###################################################################
 
-eb.community <- function(graph, directed=TRUE) {
+community.eb <- function(graph, directed=TRUE) {
 
   all.nodes <- vcount(graph)
   all.edges <- ecount(graph)
@@ -43,7 +43,7 @@ eb.community <- function(graph, directed=TRUE) {
   res
 }
 
-cut.community <- function(graph, edges, after.removing) {
+community.cut <- function(graph, edges, after.removing) {
 
   if (after.removing >= nrow(edges)) { 
     res <- graph.empty(directed=is.directed(graph))
@@ -85,7 +85,7 @@ modularity <- function(graph, types) {
   res
 }
 
-eb.community2 <- function(graph, directed=TRUE) {
+community.eb2 <- function(graph, directed=TRUE) {
 
   all.nodes <- vcount(graph)
   all.edges <- ecount(graph)

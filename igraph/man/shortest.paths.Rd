@@ -1,14 +1,16 @@
 \name{shortest.paths}
 \alias{shortest.paths}
 \alias{get.shortest.paths}
+\alias{average.path.length}
 \title{Shortest (directed or undirected) paths between vertices}
 \description{\code{shortest.paths} calculates the length of all the
   shortest paths from or to the vertices in the
   network. \code{get.shortest.paths} calculates one shortest path (the
   path itself, and not just its length) from or to the given vertex.}
 \usage{
-shortest.paths(graph, v = 1:vcount(graph), mode = "all")
-get.shortest.paths(graph, from = 1, mode = "all")
+shortest.paths(graph, v = 0:(vcount(graph)-1), mode = "all")
+get.shortest.paths(graph, from, mode = "all")
+average.path.length(graph, directed=TRUE, unconnected=TRUE)
 }
 \arguments{
   \item{graph}{The graph to work on.}
@@ -23,6 +25,14 @@ get.shortest.paths(graph, from = 1, mode = "all")
   \item{from}{Numeric constant, the vertex from or to the shortest paths
     will be calculated. Note that right now this is not a vector of
     vertex ids, but only a single vertex.}
+  \item{directed}{Whether to consider directed paths in directed graphs,
+    this argument is ignored for undirected graphs.}
+  \item{unconnected}{What to do if the graph is unconnected (not
+    strongly connected if directed paths are considered). If TRUE only
+    the lengths of the existing paths are considered and averaged; if
+    FALSE the length of the missing paths are counted having length
+    \code{vcount(graph)}, one longer than the longest possible geodesic
+    in the network.}
 }
 \details{The shortest paths (also called geodesics) are calculated by
   using breath-first search in the graph. Right now edge weights are not
@@ -48,7 +58,9 @@ get.shortest.paths(graph, from = 1, mode = "all")
   also contains the \code{from} and \code{i} vertices. If the
   \code{from} is the same as \code{i} then it is only included once.
   If there is no path between  two vertices then a numeric vector of
-  length zero is returned as the list element. 
+  length zero is returned as the list element.
+
+  For \code{average.path.length} a single number is returned.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
@@ -57,5 +69,6 @@ get.shortest.paths(graph, from = 1, mode = "all")
 g <- graph.ring(10)
 shortest.paths(g)
 get.shortest.paths(g, 5)
+average.path.length(g)
 }
 \keyword{graphs}

@@ -5,11 +5,16 @@
 \description{Sometimes it is useful to have a standard representation of
   a graph, like an adjacency matrix or an edge list.}
 \usage{
-get.adjacency(graph)
+get.adjacency(graph, type="both")
 get.edgelist(graph)
 }
 \arguments{
   \item{graph}{The graph to convert.}
+  \item{type}{Gives how to create the adjacency matrix. It is ignored
+    for directed graphs. Possible values: \code{upper}: the upper right
+    triangle of the matrix is used, \code{lower}: the lower left
+    triangle of the matrix is used. \code{both}: the whole matrix is
+    used, a symmetric matrix is returned.}
 }
 \details{
   \code{get.adjacency} returns the adjacency matrix of a graph.

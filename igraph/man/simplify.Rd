@@ -4,7 +4,7 @@
 \description{\code{simplify} removes the multiple and/or loop edges from
 a graph.}
 \usage{
-simplify(graph, remove.loops = TRUE, remove.multiple = TRUE)
+simplify(graph, remove.multiple = TRUE, remove.loops = TRUE)
 }
 \arguments{
   \item{graph}{The graph to work on.}

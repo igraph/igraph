@@ -7,7 +7,8 @@
     function} governing the evolution of the network.
 }
 \usage{
-measure.dynamics.idage(graph, agebins=300, iterations=5, sd=FALSE)
+measure.dynamics.idage(graph, agebins=300, iterations=5, sd=FALSE,
+                       estind=NULL, estage=NULL)
 }
 \arguments{
   \item{graph}{The graph of which the evolution is quantified. It is
@@ -19,6 +20,8 @@ measure.dynamics.idage(graph, agebins=300, iterations=5, sd=FALSE)
     while calculating the attractiveness and the total attractiveness
     function.}
   \item{sd}{Logical, should an estimation of the error also calculated.}
+  \item{estind}{}
+  \item{estage}{}
 }
 \details{
   The functions should be considered as experimental, so no
@@ -34,7 +37,7 @@ measure.dynamics.idage(graph, agebins=300, iterations=5, sd=FALSE)
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 % seealso{}
 \examples{
-g <- ba.game(10000)
+g <- barabasi.game(10000)
 mes <- measure.dynamics.idage(g, 20, sd=TRUE)
 }
 \keyword{graphs}

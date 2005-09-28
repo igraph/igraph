@@ -1,13 +1,12 @@
-\name{ba.game}
-\alias{ba.game}
+\name{barabasi.game}
 \alias{barabasi.game}
 \title{Generate scale-free graphs according to the Barabasi-Albert
   model}
 \description{The BA-model is a very simple stochastic algorithm for
   building a graph.}
 \usage{
-ba.game(n, m = NULL, out.dist = NULL, out.seq = NULL, out.pref = FALSE, 
-        \dots) 
+barabasi.game(n, m = NULL, out.dist = NULL, out.seq = NULL, out.pref = FALSE, 
+              directed=TRUE) 
 }
 \arguments{
   \item{n}{Number of vertices.}
@@ -17,8 +16,7 @@ ba.game(n, m = NULL, out.dist = NULL, out.seq = NULL, out.pref = FALSE,
   \item{out.pref}{Logical, if true the total degree is used for
     calculating the citation probability, otherwise the in-degree is
     used. }
-  \item{\dots}{Additional attributes, these are added to the graph as
-    graph attributes}
+  \item{directed}{Whether to create a directed graph.}
 }
 \details{
   The out-degree of the vertices is determined by the \code{m},
@@ -42,7 +40,7 @@ ba.game(n, m = NULL, out.dist = NULL, out.seq = NULL, out.pref = FALSE,
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{random.graph.game}}}
 \examples{
-g <- ba.game(1000)
+g <- barabasi.game(1000)
 degree.distribution(g)
 }
 \keyword{graphs}

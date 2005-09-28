@@ -7,12 +7,14 @@
   edge. 
 }
 \usage{
-betweenness(graph, v = 1:vcount(graph), directed = TRUE)
-edge.betweenness(graph, directed = TRUE)
+betweenness(graph, v = 0:(vcount(graph)-1), directed = TRUE)
+edge.betweenness(graph, e=0:(ecount(graph)-1), directed = TRUE)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
   \item{v}{The vertices for which the vertex betweenness will be
+    calculated.}
+  \item{e}{The edges for which the edge betweenness will be
     calculated.}
   \item{directed}{Logical, whether directed paths should be considered
     while determining the shortest paths.}
@@ -30,10 +32,8 @@ edge.betweenness(graph, directed = TRUE)
 \value{A numeric vector with the betweenness score for each vertex in
   \code{v} for \code{betweenness}.
 
-  A quadratic matrix of size \code{vcount(graph)} by
-  \code{vcount(graph)} for \code{edge.betweenness}. The betweenness
-  score of edge \eqn{\code{(i,j)}}{$(i,j)$} is contained in element (i,j)
-  in the matrix.
+  A numeric vector with the edge betweenness score for each edge in
+  \code{e} for \code{edge.betweenness}.
 
   For calculating the betweenness a similar algorithm to the one
   proposed by Brandes is used.

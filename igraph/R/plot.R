@@ -19,7 +19,7 @@
 #
 ###################################################################
 
-plot.igraph <- function(graph, layout=layout.random, layout.par=list(),
+plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        labels=NULL, label.color="darkblue",
                        label.font=NULL, label.degree=-pi/4, label.dist=0,
                        vertex.color="SkyBlue2", vertex.size=15,
@@ -29,6 +29,8 @@ plot.igraph <- function(graph, layout=layout.random, layout.par=list(),
                        axes=FALSE, xlab="", ylab="",
                        ...) {
 
+  graph <- x
+  
   # Interpret parameters
   layout <- i.get.layout(graph, layout, layout.par)
   vertex.color <- i.get.vertex.color(graph, vertex.color)

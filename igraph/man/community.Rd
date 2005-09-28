@@ -1,17 +1,17 @@
 \name{community}
 \alias{community}
-\alias{cut.community}
-\alias{eb.community}
-\alias{eb.community2}
+\alias{community.cut}
+\alias{community.eb}
+\alias{community.eb2}
 \alias{edge.type.matrix}
 \alias{modularity}
 \title{Undocumented functions for community structure detection}
 \description{These functions are alpha code and also their syntax is
   expected to change. Don't use them!}
 \usage{
-eb.community(graph, directed = TRUE)
-eb.community2(graph, directed = TRUE)
-cut.community(graph, edges, after.removing)
+community.eb(graph, directed = TRUE)
+community.eb2(graph, directed = TRUE)
+community.cut(graph, edges, after.removing)
 edge.type.matrix(graph, types)
 modularity(graph, types)
 }

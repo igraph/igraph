@@ -4,7 +4,6 @@
 \alias{neighbors}
 \alias{is.directed}
 \alias{are.connected}
-\alias{igraph.type}
 \title{Gaining information about graph structure}
 \description{Functions for exploring the basic structure of a network:
   number of vertices and edges, the neighbors of a node, test whether
@@ -13,10 +12,9 @@
 \usage{
 vcount(graph)
 ecount(graph)
-neighbors(graph, v, mode = "out")
+neighbors(graph, v, mode = 1)
 is.directed(graph)
 are.connected(graph, v1, v2)
-igraph.type(graph)
 }
 \arguments{
   \item{graph}{The graph.}
@@ -49,13 +47,12 @@ igraph.type(graph)
   \code{are.connected} decides whether there is an edge from \code{v1}
   to \code{v2}. 
   
-  \code{igraph.type} gives the storage type of the graph.
 }
 \value{
   \code{vcount} and \code{ecount} return integer
   constants. \code{neighbors} returns an integer
   vector. \code{is.directed} and \code{are.connected} return boolean
-  constants. \code{igraph.type} returns a character string.
+  constants.
 }
 %\references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
@@ -65,9 +62,7 @@ g <- graph.ring(10)
 vcount(g)
 ecount(g)
 neighbors(g, 5)
-is.directed(g)
 are.connected(g, 1, 2)
 are.connected(g, 2, 4)
-igraph.type(g)
 }
 \keyword{graphs}

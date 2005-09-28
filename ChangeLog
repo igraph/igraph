@@ -1,3 +1,18 @@
+2005-09-28  Gabor Csardi  <csardi@szaffi>
+
+	* igraph/R/structural.properties.R (get.shortest.paths) : from is
+	a required parameter
+
+	* igraph/R/plot.R (plot.igraph) : graph argument renamed to x to
+	be conform with the R generic
+
+	* igraph/R/print.R (print.igraph, summary.igraph) : arguments
+	renamed to be conform with the R generic
+
+	* igraph/R/community.R (eb.comunity, eb.community2)
+	(cut.community) : renamed to community.eb, community.eb2,
+	community.cut
+
 2005-09-27  Gabor Csardi  <csardi@szaffi>
 
 	* src/types.c (stack_t, stack_*) : renamed to igraph_stack_t
