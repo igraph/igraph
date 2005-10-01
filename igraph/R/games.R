@@ -105,7 +105,7 @@ degree.sequence.game <- function(out.deg, in.deg=NULL, method="simple", ...) {
 
   if (is.null(in.deg)) {
     directed <- FALSE
-    edges <- rep(1:length(out.deg), times=out.deg)-1
+    edges <- rep(1:length(out.deg), times=out.deg)
     edges <- sample(edges, length(edges))-1
   } else {
     directed <- TRUE
@@ -117,7 +117,7 @@ degree.sequence.game <- function(out.deg, in.deg=NULL, method="simple", ...) {
   }
 
   res <- graph.empty(n=length(out.deg), directed=directed, ...)
-  res <- add.edges(res, edges)  
+  res <- add.edges(res, as.numeric(edges))
   
   res
 }

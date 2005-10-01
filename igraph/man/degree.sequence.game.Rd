@@ -26,10 +26,10 @@ degree.sequence.game(out.deg, in.deg = NULL, method = "simple", \dots)
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{erdos.renyi.game}}, \code{\link{barabasi.game}}}
 \examples{
-%g <- degree.sequence.game(rep(2,100))
-%degree(g)
-%g2 <- degree.sequence.game(1:10, 10:1)
-%degree(g2, mode="out")
-% degree(g2, mode="in")
+g <- degree.sequence.game(rep(2,100))
+degree(g)
+g2 <- degree.sequence.game(1:10, 10:1)
+degree(g2, mode="out")
+degree(g2, mode="in")
 }
 \keyword{graphs}

@@ -6,7 +6,7 @@ export(graph.empty, add.edges, add.vertices, delete.edges,
 
 # basic functions, printing
 
-export(is.igraph, are.connected, print.igraph, summary.igraph)
+export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed)
 
 # structure generators
 

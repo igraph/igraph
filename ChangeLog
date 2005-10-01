@@ -1,5 +1,12 @@
 2005-09-28  Gabor Csardi  <csardi@szaffi>
 
+	* igraph/R/games.R (degree.sequence.game) : undirected bug
+	corrected
+
+	* igraph/R/basic.R (is.directed) : new function
+
+2005-09-28  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* igraph/R/structural.properties.R (get.shortest.paths) : from is
 	a required parameter
 
@@ -13,13 +20,13 @@
 	(cut.community) : renamed to community.eb, community.eb2,
 	community.cut
 
-2005-09-27  Gabor Csardi  <csardi@szaffi>
+2005-09-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/types.c (stack_t, stack_*) : renamed to igraph_stack_t
 	* src/types.h (stack_t, stack_*) : same
 	* src/structural_properties.c (stack_t, stack_*) : same
 
-2005-09-26  Gabor Csardi  <csardi@szaffi>
+2005-09-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_average_path_length) :
 	normfact double instead of long int, the saga of this bug ends here

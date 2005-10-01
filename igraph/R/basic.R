@@ -25,3 +25,9 @@ is.igraph <- function(graph) {
 
   res
 }
+
+is.directed <- function(graph) {
+
+  .Call("R_igraph_is_directed", graph,
+        PACKAGE="igraph")
+}
