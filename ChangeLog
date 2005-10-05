@@ -1,4 +1,13 @@
-2005-09-28  Gabor Csardi  <csardi@szaffi>
+2005-10-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c  (igraph_degree_sequence_game)
+	(igraph_degree_sequence_game_simple) : ported from R
+	* igraph/R/games.R (degree.sequence.game) : interface
+	* src/rinterface.c (R_igraph_degree_sequence_game) : interface
+	
+	* src/types.h (vector_sum) : new function
+
+2005-09-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* igraph/R/games.R (degree.sequence.game) : undirected bug
 	corrected

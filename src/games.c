@@ -315,10 +315,135 @@ int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
   return retval;
 }
 
-int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
-				vector_t *in_deg, integer_t method) {
-  /* TODO */
+int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
+				       vector_t *in_seq) {
+
+  long int outsum=0, insum=0;
+  bool_t directed=(vector_size(in_seq)!=0);
+  long int no_of_nodes, no_of_edges;
+  long int *bag1=0, *bag2=0;
+  long int bagp1=0, bagp2=0;
+  vector_t edges;
+  long int i,j;
+
+  if (directed && 
+      vector_size(out_seq) != vector_size(in_seq)) { 
+    igraph_error("Length of `out_seq' and  `in_seq' should match or directed graphs");
+  }
+  
+  outsum=vector_sum(out_seq);
+  insum=vector_sum(in_seq);
+
+  if (!directed && outsum % 2 != 0) {
+    igraph_error("Total degree should be even for undirected graphs");
+  }
+  
+  if (directed && outsum != insum) {
+    igraph_error("The total in-degree should match the total out-degree for directed graphs");
+  }
+
+  no_of_nodes=vector_size(out_seq);
+  if (directed) {
+    no_of_edges=outsum;
+  } else {
+    no_of_edges=outsum/2;
+  }
+
+  bag1=Calloc(outsum, long int);
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=0; j<VECTOR(*out_seq)[i]; j++) {
+      bag1[bagp1++]=i;
+    }
+  }
+  if (directed) {
+    bag2=Calloc(insum, long int);
+    for (i=0; i<no_of_nodes; i++) {
+      for (j=0; j<VECTOR(*in_seq)[i]; j++) {
+	bag2[bagp2++]=i;
+      }
+    }
+  }
+
+  RNG_BEGIN();
+
+  vector_init(&edges, 0);
+  vector_reserve(&edges, no_of_edges);
+  if (directed) {
+    for (i=0; i<no_of_edges; i++) {
+      long int from=RNG_INTEGER(0, bagp1-1);
+      long int to=RNG_INTEGER(0, bagp2-1);
+      vector_push_back(&edges, bag1[from]);
+      vector_push_back(&edges, bag2[to]);
+      bag1[from]=bag1[bagp1-1];
+      bag2[to]=bag2[bagp2-1];
+      bagp1--; bagp2--;
+    }
+  } else {
+    for (i=0; i<no_of_edges; i++) {
+      long int from=RNG_INTEGER(0, bagp1-1);
+      long int to;
+      vector_push_back(&edges, bag1[from]);
+      bag1[from]=bag1[bagp1-1];
+      bagp1--;
+      to=RNG_INTEGER(0, bagp1-1);
+      vector_push_back(&edges, bag1[to]);
+      bag1[to]=bag1[bagp1-1];
+      bagp1--;
+    }
+  }
+  
+  RNG_END();
+
+  Free(bag1);
+  if (directed) {
+    Free(bag2);
+  }
+
+  igraph_create(graph, &edges, no_of_nodes, directed);
+  vector_destroy(&edges);
+  
   return 0;
+}
+
+/**
+ * \ingroup generators
+ * \brief Generates a random graph with a given degree sequence 
+ * 
+ * @param graph Pointer to an uninitialized graph object.
+ * @param out_deg The degree sequence for an undirected graph (if
+ *        <code>in_seq</code> is of length zero), or the out-degree
+ *        sequence of a directed graph (if <code>in_deq</code> is not
+ *        of length zero.
+ * @param in_deg It is either a zero-length vector (if an undirected
+ *        graph is generated), or the in-degree sequence.
+ * @param method The method to generate the graph. Possible values: 
+ *        <b>IGRAPH_DEGSEQ_SIMPLE</b>, for undirected graphs this
+ *        method puts all vertex ids in a bag, the multiplicity of a
+ *        vertex in the bag is the same as its degree. Then it 
+ *        draws pairs from the bag, until it is empty. This method can 
+ *        generate both loop (self) edges and multiple edges.
+ *        For directed graphs, the algorithm is basically the same,
+ *        but two separate bags are used for the in- and out-degrees. 
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges.
+ * 
+ * \sa barabasi_game(), erdos_renyi_game()
+ */
+
+int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
+				vector_t *in_deg, igraph_degseq_t method) {
+
+  int retval;
+
+  if (method==IGRAPH_DEGSEQ_SIMPLE) {
+    retval=igraph_degree_sequence_game_simple(graph, out_deg, in_deg);
+  } else {
+    retval=igraph_error("Invalid method");
+  }
+
+  return retval;
 }
 
 /**

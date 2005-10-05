@@ -711,6 +711,27 @@ int vector_copy(vector_t *to, vector_t *from) {
 
 /**
  * \ingroup vector
+ * \brief Calculates the sum of the elements in the vector.
+ *
+ * For the empty vector 0.0 is returned.
+ * @param v The vector object.
+ * @return The sum of the elements.
+ * 
+ * 
+ * Time complexity: <code>O(n)</code>, the size of the vector.
+ */
+
+real_t vector_sum(vector_t *v) {
+  real_t res=0;
+  real_t *p;
+  for (p=v->stor_begin; p<v->end; p++) {
+    res += *p;
+  }
+  return res;
+}
+
+/**
+ * \ingroup vector
  * \brief Calculates the product of the elements in the vector.
  * 
  * For the empty vector one (1) is returned.

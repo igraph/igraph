@@ -125,6 +125,7 @@ real_t vector_max(vector_t* v);
 vector_t vector_as_vector(real_t *start, long int length);
 int vector_copy_to(vector_t *v, real_t* to);
 int vector_copy(vector_t *to, vector_t *from);
+real_t vector_sum(vector_t *v);
 real_t vector_prod(vector_t *v);
 int vector_init_seq(vector_t *v, real_t from, real_t to);
 

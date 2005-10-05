@@ -1009,3 +1009,20 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_degree_sequence_game(SEXP pout_seq, SEXP pin_seq, 
+				   SEXP pmethod) {
+  igraph_t g;
+  vector_t outseq=vector_as_vector(REAL(pout_seq), GET_LENGTH(pout_seq));
+  vector_t inseq=vector_as_vector(REAL(pin_seq), GET_LENGTH(pin_seq));
+  integer_t method=REAL(pmethod)[0];
+  SEXP result;
+
+  igraph_degree_sequence_game(&g, &outseq, &inseq, method);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+  

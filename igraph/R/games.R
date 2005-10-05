@@ -82,44 +82,16 @@ erdos.renyi.game <- function(n, p.or.m, type="gnp",
 
 random.graph.game <- erdos.renyi.game
 
-degree.sequence.game <- function(out.deg, in.deg=NULL, method="simple", ...) {
+degree.sequence.game <- function(out.deg, in.deg=numeric(0),
+                                 method="simple", ...) {
 
-  if (any(out.deg < 0)) {
-    stop("Negative degree not allowed in `out.deg'")
-  }
-  if (!is.null(in.deg) && any(in.deg<0)) {
-    stop("Negative degree not allowed in `in.deg'")
-  }
-  if (is.null(in.deg) && sum(out.deg) %% 2 != 0) {
-    stop("Total degree should be even")
-  }
-  if (!is.null(in.deg) && length(out.deg) != length(in.deg)) {
-    stop("Length of `in.deg' should match length of `out.deg'")
-  }
-  if (!is.null(in.deg) && sum(in.deg) != sum(out.deg)) {
-    stop("Total in-degree should match total out-degree")
-  }
-  if (method != "simple") {
-    stop("Invalid `method', see docs")
+  if (is.character(method)) {
+    method <- switch(method, "simple"=0)
   }
 
-  if (is.null(in.deg)) {
-    directed <- FALSE
-    edges <- rep(1:length(out.deg), times=out.deg)
-    edges <- sample(edges, length(edges))-1
-  } else {
-    directed <- TRUE
-    from <- rep(1:length(out.deg), times=out.deg)
-    to <- rep(1:length(in.deg), times=in.deg)
-    from <- sample(from, length(from))
-    to <- sample(to, length(to))
-    edges <- as.numeric(t(matrix(c(from, to), nc=2)))-1
-  }
-
-  res <- graph.empty(n=length(out.deg), directed=directed, ...)
-  res <- add.edges(res, as.numeric(edges))
-  
-  res
+  .Call("R_igraph_degree_sequence_game", as.numeric(out.deg),
+        as.numeric(in.deg), as.numeric(method),
+        PACKAGE="igraph")
 }
 
 growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {

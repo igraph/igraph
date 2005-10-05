@@ -298,6 +298,8 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER=0,
 	       IGRAPH_GET_ADJACENCY_LOWER,
 	       IGRAPH_GET_ADJACENCY_BOTH } igraph_get_adjacency_t;
 
+typedef enum { IGRAPH_DEGSEQ_SIMPLE=0 } igraph_degseq_t;
+
 /* -------------------------------------------------- */
 /* Interface                                          */
 /* -------------------------------------------------- */
@@ -447,7 +449,7 @@ int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
 int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
 				bool_t directed, bool_t loops);
 int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
-				vector_t *in_deg, integer_t method);
+				vector_t *in_deg, igraph_degseq_t method);
 int igraph_growing_random_game(igraph_t *graph, integer_t n, 
 			       integer_t m, bool_t directed, bool_t citation);
 int igraph_aging_prefatt_game(igraph_t *graph, integer_t n, integer_t m,
