@@ -733,7 +733,6 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   long int j;
   vector_t tmp;
   integer_t modein, modeout;
-  real_t *tmpres;
 
   if (directed) 
     { modeout=IGRAPH_OUT; modein=IGRAPH_IN; } 
@@ -743,7 +742,6 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   distance=Calloc(no_of_nodes, long int);
   nrgeo=Calloc(no_of_nodes, long int);
   tmpscore=Calloc(no_of_nodes, double);
-  tmpres=Calloc(no_of_nodes, real_t);
 
   vector_init(&tmp, 0);
   vector_resize(res, vector_size(vids));

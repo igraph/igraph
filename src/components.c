@@ -262,6 +262,7 @@ int igraph_is_connected_weak(igraph_t *graph, bool_t *res) {
   
   long int i, j;
 
+  dqueue_init(&q, 10);
   already_added=Calloc(no_of_nodes, char);
   vector_init(&neis, 0);
   
