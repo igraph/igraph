@@ -35,16 +35,14 @@ layout.spring(graph, \dots, params)
   proposed by Fruchterman and Reingold, see references. Parameters and
   their default values:
   \itemize{
-    \item{niter}{Numeric, the number of iterations to perform (100).}
+    \item{niter}{Numeric, the number of iterations to perform (500).}
     \item{coolexp}{Numeric, the cooling exponent for the simulated
-      annealing (1.5).}
-    \item{frame}{Character, the type of the frame to place the
-      vertices. It is either \code{rectangle} or \code{circle}
-      (rectangle). }
-    \item{initial}{Numeric matrix, the layout to start with (random).}
-    \item{temp}{The initial temperature for the simulated annealing
-      (0.1).} 
+      annealing (3).}
+    \item{maxdelta}{Maximum change (\code{vcount(graph)}).}
+    \item{area}{Area parameter (\code(vcount(graph)^2).}
+    \item{repulserad}{Cancellation radius (\code{area}*vcount(graph)).}
   }
+  This function was ported from the SNA package.
 
   \code{layout.kamada.kawai} is other force based algorithm. This was
   ported from the SNA package. Parameters and default values:

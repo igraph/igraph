@@ -20,11 +20,9 @@ erdos.renyi.game(n, p.or.m, type="gnp",
   \item{directed}{Logical, whether the graph will be directed, defaults
     to FALSE.}
   \item{loops}{Logical, whether to add loop edges, defaults to FALSE.}
-  \item{\dots}{Additional arguments, used as graph attributes.}
+  \item{\dots}{Additional arguments, ignored.}
 }
 \details{
-  The additional arguments are added as graph arguments.
-
   \code{random.graph.game} is an alias to this function.
 }
 \value{A graph object.}

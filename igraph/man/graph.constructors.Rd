@@ -68,7 +68,7 @@ graph.full(n, directed = FALSE, loops = FALSE)
     for \code{graph.tree}.}
   \item{loops}{If TRUE also loops edges (self edges) are added.}
   \item{graph}{An object.}
-  \item{\dots}{Additional arguments, added as graph attributes.}
+  \item{\dots}{Additional arguments, ignored right now.}
 }
 \details{All these functions create graphs in a deterministic way.
 
@@ -89,7 +89,7 @@ graph.full(n, directed = FALSE, loops = FALSE)
 
   \code{graph.tree} creates regular trees.
 
-  \code{graph.full} simply created full graphs.
+  \code{graph.full} simply creates full graphs.
 
 }
 \value{Every function documented here returns a \code{graph} object.}

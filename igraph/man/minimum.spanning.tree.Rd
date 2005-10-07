@@ -11,26 +11,16 @@ minimum.spanning.tree(graph, weights=NULL, algorithm="unweighted", \dots)
 }
 \arguments{
   \item{graph}{The graph object to analyze.}
-  \item{weights}{Logical. If \code{TRUE}, the spanning tree is
-    calculated based of the weights given in the \code{weight} edge
-    attribute. If \code{FALSE} every edge is treated as having weight
-    one. By default (\code{NULL}) this option is set to \code{TRUE} if
-    the graph has an edge attribute called \code{weight} and to
-    \code{FALSE} otherwise.
+  \item{weights}{Numeric algorithm giving the weights of the edges in
+    the graph. The order should be the same as for given by
+    \code{\link{get.edgelist}}. This is ignored for the \code{unweighted}
+    algorithm.
   }
-  \item{algorithm}{The algorithm to use for the weighted
-    calculation. For unweighted graphs a simple breath-first search is
-    used, always. Right now only Prim's algorithm is implemented
-    (\code{prim}), but this gives satisfactory results.}
-  \item{\dots}{Additional arguments to be passed to the graph
-    constructor.}
+  \item{algorithm}{The algorithm to use for
+    calculation. \code{unweighted} can be used for unwieghted graphs,
+    and \code{prim} runs Prim's algorithm for weighted graphs.
 }
 \details{
-  Some remarks.
-
-  The calculation is quite slow for adjacency lists, because of the poor
-  implementation of edge attributes.
-
   If the graph is unconnected a minimum spanning forest is returned.
 }
 \value{

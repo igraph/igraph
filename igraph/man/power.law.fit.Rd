@@ -17,7 +17,7 @@ power.law.fit(x, xmin = NULL, start = 2, \dots)
     optimizing function, \code{\link{mle}}.}
 }
 \details{
-  A Yule distribution is fitted with maximum likelyhood
+  A power-law distribution is fitted with maximum likelyhood
   methods as recommended by Newman and (by default) the 
   BFGS optimization (see \link[stats4]{mle}) algorithm is applied.
 
@@ -33,6 +33,6 @@ power.law.fit(x, xmin = NULL, start = 2, \dots)
 # This should approximately yield the correct exponent 3
 g <- barabasi.game(1000)
 d <- degree(g, mode="in")
-power.law.fit(d+1)
+power.law.fit(d+1, 20)
 }
 \keyword{graphs}
