@@ -1,3 +1,7 @@
+2005-10-10  Tamas Nepusz <ntamas@rmki.kfki.hu>
+
+	* src/cocitation.c (igraph_cocitation_real) : memory leak removed
+
 2005-10-06  Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 	* src/components.c (igraph_is_connected_weak) : q initialized

@@ -132,6 +132,7 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids,
   /* Clean up */
   matrix_destroy(&tmpres);
   vector_destroy(&neis);
+  Free(calc);
   
   return 0;
 }
