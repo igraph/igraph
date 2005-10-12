@@ -34,7 +34,7 @@ SUBGROUPING            = YES
 #---------------------------------------------------------------------------
 EXTRACT_ALL            = NO
 EXTRACT_PRIVATE        = NO
-EXTRACT_STATIC         = NO
+EXTRACT_STATIC         = YES
 EXTRACT_LOCAL_CLASSES  = YES
 EXTRACT_LOCAL_METHODS  = YES
 HIDE_UNDOC_MEMBERS     = YES
@@ -71,7 +71,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = src
+INPUT                  = src interfaces/python
 FILE_PATTERNS          = *.c \
                          *.h
 RECURSIVE              = NO

@@ -1,0 +1,17 @@
+This package was debianized by Tamas Nepusz <ntamas@rmki.kfki.hu> on Tue, 10 Oct 2005 23:13:01 +0100.
+
+It was downloaded from http://geza.kzoo.edu/~csardi/igraph/
+
+Upstream Authors:
+Gabor Csardi <csardi@rmki.kfki.hu>
+
+Copyright:
+
+Copyright (C) 2003-2005 Nicolas Rougier
+
+License:
+
+You are free to distribute this software under the terms of
+the GNU General Public License.
+On Debian systems, the complete text of the GNU General Public
+License can be found in the file `/usr/share/common-licenses/GPL'.

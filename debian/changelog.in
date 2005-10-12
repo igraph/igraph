@@ -1,0 +1,5 @@
+igraph (@VERSION@) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Tamas Nepusz <ntamas@rmki.kfki.hu>  Tue, 10 Oct 2005 23:14:00 +0100

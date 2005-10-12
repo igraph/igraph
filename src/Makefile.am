@@ -1,4 +1,3 @@
-
 lib_LTLIBRARIES         = libigraph.la
 
 libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \

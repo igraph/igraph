@@ -9,5 +9,47 @@ AC_PROG_LIBTOOL
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h time.h unistd.h])
 
-AC_CONFIG_FILES([Makefile src/Makefile])
+use_python=yes
+AC_ARG_ENABLE(python, [  --disable-python        Disable Python interface],
+              [use_python=$enableval], [use_python=yes])
+
+if test $use_python = yes; then
+  AC_MSG_CHECKING(for Python >= 2.4)
+  AM_PYTHON_CHECK_VERSION(python, 2.4, [
+    HAVE_PYTHON=1
+    AC_SUBST([PYTHON_PREFIX], ['${prefix}'])
+    AC_SUBST([PYTHON_EXEC_PREFIX], ['${exec_prefix}'])
+    AC_SUBST([PYTHON_VERSION], [`python -c "import sys; print sys.version[[:3]]"`])
+		AC_SUBST([pythondir], [$PYTHON_PREFIX"/lib/python"$PYTHON_VERSION/site-packages])
+    AC_MSG_RESULT([found, ${PYTHON_VERSION}])
+  ], [
+    AC_MSG_RESULT(not found -- disabling Python interface)
+    HAVE_PYTHON=0
+    use_python=no
+  ])
+
+  if test $HAVE_PYTHON -gt 0; then
+    AC_MSG_CHECKING(Python development include files)
+    PYTHON_PREFIX=`python -c "import sys; print sys.prefix"`
+    if test ! -z "$PYTHON_PREFIX"; then
+      PYTHON_INCLUDES="-I$PYTHON_PREFIX/include/python$PYTHON_VERSION"
+      PYTHON_LIBS="-lpython$PYTHON_VERSION"
+      ENABLE_PYTHON_INTERFACE=yes
+      AC_SUBST(PYTHON_PREFIX)
+      AC_SUBST(PYTHON_INCLUDES)
+      AC_SUBST(PYTHON_LIBS)
+      AC_MSG_RESULT(found)
+    else
+      AC_MSG_RESULT(none found -- disabling Python interface)
+      HAVE_PYTHON=0
+			use_python=no
+    fi
+  fi
+fi
+AM_CONDITIONAL(USE_PYTHON, test x$use_python = xyes)
+
+AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile])
 AC_OUTPUT
+
+AC_MSG_RESULT([igraph successfully configured.])
+AC_MSG_RESULT([  Python interface       -- $use_python])

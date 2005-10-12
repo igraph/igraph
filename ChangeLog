@@ -1,3 +1,8 @@
+2005-10-12  Tamas Nepusz <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/igraphmodule.c : added
+	* debian/ : added
+
 2005-10-10  Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 	* src/cocitation.c (igraph_cocitation_real) : memory leak removed

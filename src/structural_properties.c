@@ -689,7 +689,8 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
 
   dqueue_destroy(&q);
   vector_destroy(&tmp);
-
+  free(already_added);
+   
   return 0;
 }
 
@@ -828,6 +829,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   Free(distance);
   Free(nrgeo);
   Free(tmpscore);
+  
   dqueue_destroy(&q);
   igraph_stack_destroy(&stack);
   vector_destroy(&tmp);

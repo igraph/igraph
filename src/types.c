@@ -295,7 +295,7 @@ int vector_reserve   (vector_t* v, long int size) {
 	assert(v != NULL);
 	
 	if (size <= vector_size(v)) { return 0; }
-	
+
 	v->stor_begin=Realloc(v->stor_begin, size, real_t);
 	v->stor_end=v->stor_begin + size;
 	v->end=v->stor_begin+actual_size;
