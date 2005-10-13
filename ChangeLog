@@ -1,3 +1,8 @@
+2005-10-13  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_subcomponent) : free changed
+	to Free
+
 2005-10-12  Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/igraphmodule.c : added

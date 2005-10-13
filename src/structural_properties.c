@@ -689,7 +689,7 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
 
   dqueue_destroy(&q);
   vector_destroy(&tmp);
-  free(already_added);
+  Free(already_added);
    
   return 0;
 }
