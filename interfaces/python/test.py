@@ -340,6 +340,14 @@ start("Testing layout of vertices randomly")
 print g.layout_random()
 skip()
 
+start("Testing layout of vertices according to the Kamada-Kawai layout")
+print g.layout_kamada_kawai()
+skip()
+
+start("Testing layout of vertices according to the Fruchterman-Reingold layout")
+print g.layout_fruchterman_reingold()
+skip()
+
 results()
 test_leaks([g, g2, degs, neis, comps])
 

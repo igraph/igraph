@@ -919,22 +919,24 @@ static PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self,
 					     PyObject *args,
 					     PyObject *kwds) 
 {
-   PyObject *dir=NULL, *vcount_if_unconnected=NULL;
-   integer_t i;
+  PyObject *dir=NULL, *vcount_if_unconnected=NULL;
+  integer_t i;
+  int r;
    
-   static char *kwlist[] = 
-     {
-	"directed", "unconn", NULL
-     }
-   ;
+  static char *kwlist[] = {
+    "directed", "unconn", NULL
+  };
 
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!O!", kwlist,
-				    &PyBool_Type, &dir,
-				    &PyBool_Type, &vcount_if_unconnected))
-     return NULL;
-   
-   if (igraph_diameter(&self->g, &i, (bool_t)(dir == Py_True),
-		       (bool_t)(vcount_if_unconnected == Py_True))) 
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!O!", kwlist,
+				   &PyBool_Type, &dir,
+				   &PyBool_Type, &vcount_if_unconnected))
+    return NULL;
+  
+  Py_BEGIN_ALLOW_THREADS
+  r=igraph_diameter(&self->g, &i, (bool_t)(dir == Py_True),
+		    (bool_t)(vcount_if_unconnected == Py_True));
+  Py_END_ALLOW_THREADS
+  if (r) 
      {
 	igraphmodule_handle_igraph_error();
 	return NULL;
@@ -2120,6 +2122,84 @@ static PyObject* igraphmodule_Graph_layout_random(igraphmodule_GraphObject *self
 }
 
 /** \ingroup python_interface
+ * \brief Places the vertices on a plane according to the Kamada-Kawai algorithm.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_kamada_kawai
+ */
+static PyObject* igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *self,
+							PyObject *args,
+							PyObject *kwds) 
+{
+  static char *kwlist[] = {"n", "sigma", "initemp", "coolexp", "kkconst", NULL};
+  matrix_t m;
+  long niter=1000;
+  double sigma, initemp, coolexp, kkconst;
+  PyObject *result;
+   
+  sigma=igraph_vcount(&self->g);
+  kkconst=sigma*sigma; sigma=sigma/4.0;
+  initemp=10.0; coolexp=0.99;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+				   &niter, &sigma, &initemp, &coolexp, &kkconst))
+    return NULL;
+  
+  if (matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  if (igraph_layout_kamada_kawai(&self->g, &m, niter, sigma, initemp, coolexp, kkconst)) {
+    matrix_destroy(&m);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+   
+  matrix_destroy(&m);
+   
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface
+ * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_kamada_kawai
+ */
+static PyObject* igraphmodule_Graph_layout_fruchterman_reingold(igraphmodule_GraphObject *self,
+								PyObject *args,
+								PyObject *kwds) 
+{
+  static char *kwlist[] = {"n", "maxdelta", "area", "coolexp", "repulserad", NULL};
+  matrix_t m;
+  long niter=500;
+  double maxdelta, area, coolexp, repulserad;
+  PyObject *result;
+   
+  maxdelta=igraph_vcount(&self->g);
+  area=maxdelta*maxdelta; coolexp=1.5;
+  repulserad=area*maxdelta;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+				   &niter, &maxdelta, &area, &coolexp, &repulserad))
+    return NULL;
+  
+  if (matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  if (igraph_layout_fruchterman_reingold(&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0)) {
+    matrix_destroy(&m);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+   
+  matrix_destroy(&m);
+   
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface
  * \brief Returns the adjacency matrix of a graph.
  * \return the adjacency matrix as a Python list of lists
  * \sa igraph_get_adjacency
@@ -2186,6 +2266,17 @@ static PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface
+ * \brief Returns the encapsulated igraph graph as a PyCObject
+ * \return a new PyCObject
+ */
+static PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self,
+						 PyObject *args,
+						 PyObject *kwds) 
+{
+  return PyCObject_FromVoidPtr((void*)&self->g, NULL);
+}
+
+/** \ingroup python_interface
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
 static PyTypeObject igraphmodule_GraphType =
@@ -2220,247 +2311,247 @@ static PyTypeObject igraphmodule_GraphType =
  */
 static PyMethodDef igraphmodule_Graph_methods[] = 
 {
-   ////////////////////////////
-   // BASIC IGRAPH INTERFACE //
-   ////////////////////////////
-   
-   // interface to igraph_vcount
-     {"vcount", (PyCFunction)igraphmodule_Graph_vcount,
-	  METH_NOARGS,
-	  "Returns the number of vertices in the graph"
-     },
-   // interface to igraph_ecount
-     {"ecount", (PyCFunction)igraphmodule_Graph_ecount,
-	  METH_NOARGS,
-	  "Returns the number of edges in the graph"
-     },
-   // interface to igraph_is_directed
-     {"is_directed", (PyCFunction)igraphmodule_Graph_is_directed,
-	  METH_NOARGS,
-	  "Checks whether the graph is directed"
-     },
-   // interface to igraph_add_vertices
-     {"add_vertices", (PyCFunction)igraphmodule_Graph_add_vertices,
-	  METH_VARARGS,
-	  "Adds vertices to the graph. The only parameter is the number of "
-	  "vertices to be added"
-     },
-   // interface to igraph_delete_vertices
-     {"delete_vertices", (PyCFunction)igraphmodule_Graph_delete_vertices,
-	  METH_VARARGS,
-	  "Deletes vertices and all its edges from the graph. The only "
-	  "parameter is a list of the vertices to be added. It is allowed "
-	  "to provide a single integer instead of a list consisting of only "
-	  "one integer."
-     },
-   // interface to igraph_add_edges
-     {"add_edges", (PyCFunction)igraphmodule_Graph_add_edges,
-	  METH_VARARGS,
-	  "Adds edges to the graph. The only parameter is a list of "
-	  "edges to be added. Every edge is represented with a tuple, "
-	  "containing the vertex IDs of the two endpoints. Vertices are "
-	  "enumerated from zero. It is allowed to provide a single pair "
-	  "instead of a list consisting of only one pair."
-     },
-   // interface to igraph_delete_edges
-     {"delete_edges", (PyCFunction)igraphmodule_Graph_delete_edges,
-	  METH_VARARGS,
-	  "Removes edges from the graph. The only parameter is a list of "
-	  "edges to be removed. Every edge is represented with a tuple, "
-	  "containing the vertex IDs of the two endpoints. Vertices are "
-	  "enumerated from zero. It is allowed to provide a single pair "
-	  "instead of a list consisting of only one pair. Nonexistent "
-	  "edges will be silently ignored. All vertices will be kept, even "
-	  "if they lose all their edges."
-     },
-   // interface to igraph_degree
-     {"degree", (PyCFunction)igraphmodule_Graph_degree,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Returns some vertex degrees from the graph.\n"
-	  "This method accepts a single vertex ID or a list of vertex IDs as a "
-	  "parameter, and returns the degree of the given vertices (in the form of "
-	  "a single integer or a list, depending on the input parameter). A "
-	  "second and a third argument may be passed as well, the second one "
-	  "meaning the type of degree to be returned (OUT for out-degrees, "
-	  "IN for in-degrees or ALL for the sum of them) and the third one "
-	  "meaning whether self-loops should be counted. The default for them is "
-	  "ALL and False. The type of degree is ignored for undirected graphs."
-     },
-   // interface to igraph_neighbors
-     {"neighbors", (PyCFunction)igraphmodule_Graph_neighbors,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Returns adjacent vertices to a given vertex.\n"
-	  "This method accepts a single vertex ID as an argument, "
-	  "and returns the adjacent vertices of that vertex. An optional "
-	  "second argument allows the user to limit the result to only "
-	  "predecessors (IN), only successors (OUT) or both of them (ALL). "
-	  "The default behaviour is the latter one. "
-	  "This argument is ignored for undirected graphs."
-     },
-
-   //////////////////////
-   // GRAPH GENERATORS //
-   //////////////////////
-   
-   // interface to igraph_barabasi_game
-     {"Barabasi", (PyCFunction)igraphmodule_Graph_Barabasi,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a graph based on the Barabási-Albert model.\n"
-	  "The first two arguments are mandatory: the first one is the "
-	  "number of vertices, the second one is either the number of "
-	  "outgoing edges generated for each vertex or a list containing the "
-	  "number of outgoing edges for each vertex explicitly. The third "
-	  "argument is True if the out-degree of a given vertex should also "
-	  "increase its citation probability (as well as its in-degree), but "
-	  "it defaults to False. The fourth argument is True if the generated "
-	  "graph should be directed (default: False).\n\n"
-	  "Keywords for the arguments: n, m, outpref, directed"
-     },
-
-   // interface to igraph_erdos_renyi_game
-     {"Erdos_Renyi", (PyCFunction)igraphmodule_Graph_Erdos_Renyi,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a graph based on the Erdõs-Rényi model.\n"
-	  "There are a total of five possible arguments, two of them are "
-	  "mutually exclusive. The first argument (keyword: n) is the number "
-	  "of vertices. The second and the third (keywords: p and m) define "
-	  "the density of the graph: if p is missing, there will be m edges; "
-	  "if m is missing, every edge will be present with a probability of "
-	  "p. These two arguments influence the same graph property (the "
-	  "number of edges) in two different ways, so either p or m must be "
-	  "present (but not both of them). The remaining two arguments are "
-	  "optional. The fourth argument (keyword: directed) is True if the "
-	  "generated graph should be directed (default: False), the fifth "
-	  "(keyword: loops) is True if self-loops are allowed (default: False)."
-     },
-
-   // interface to igraph_full_game
-     {"Full", (PyCFunction)igraphmodule_Graph_Full,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a full graph (directed or undirected, with or without loops).\n"
-	  "The only mandatory argument (keyword: n) is the number "
-	  "of vertices. The remaining two arguments are optional. "
-	  "The second argument (keyword: directed) is True if the "
-	  "generated graph should be directed (default: False), the third "
-	  "(keyword: loops) is True if self-loops are allowed (default: False)."
-     },
-   
-   // interface to igraph_growing_random_game
-     {"Growing_Random", (PyCFunction)igraphmodule_Graph_Growing_Random,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a growing random graph.\n\n"
-	  "Keyword arguments:\n"
-	  "n -- The number of vertices in the graph\n"
-	  "m -- The number of edges to add in each step (after adding a new vertex)\n"
-	  "directed -- whether the graph should be directed.\n"
-	  "            Optional, defaults to False.\n"
-	  "citation -- whether the new edges should originate from the most\n"
-	  "            recently added vertex.\n"
-	  "            Optional, defaults to False."
-     },
-
-   // interface to igraph_star
-     {"Star", (PyCFunction)igraphmodule_Graph_Star,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a star graph.\n\n"
-	  "Keyword arguments:\n"
-	  "n -- The number of vertices in the graph\n"
-	  "mode -- Gives the type of the star graph to create. Should be\n"
-	  "        one of the constants STAR_OUT, STAR_IN and STAR_UNDIRECTED.\n"
-	  "        Optional, defaults to STAR_UNDIRECTED.\n"
-	  "center -- Vertex ID for the central vertex in the star.\n"
-	  "          Optional, defaults to zero.\n"
-     },
-   
-   // interface to igraph_lattice
-     {"Lattice", (PyCFunction)igraphmodule_unimplemented,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a lattice. This function is yet unimplemented.\n\n"
-	  "Throws a NotImplementedError."
-     },
-   
-   // interface to igraph_ring
-     {"Ring", (PyCFunction)igraphmodule_Graph_Ring,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a ring graph.\n\n"
-	  "Keyword arguments:\n"
-	  "n -- The number of vertices in the ring\n"
-	  "directed -- whether to create a directed ring.\n"
-	  "            Optional, defaults to False.\n"
-	  "mutual -- whether to create mutual edges in a directed ring.\n"
-	  "          Optional, defaults to False.\n"
-	  "          Ignored for undirected graphs.\n"
-	  "circular -- whether to create a closed ring.\n"
-	  "            Optional, defaults to True."
-     },
-
-   // interface to igraph_tree
-     {"Tree", (PyCFunction)igraphmodule_Graph_Tree,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a tree in which almost all vertices have the same number of children.\n\n"
-	  "Keyword arguments:\n"
-	  "n -- The number of vertices in the graph\n"
-	  "children -- The number of children of a vertex in the graph\n"
-	  "type -- determines whether the tree should be directed, and if\n"
-	  "        this is the case, also its orientation. Must be one of\n"
-	  "        TREE_IN, TREE_OUT and TREE_UNDIRECTED.\n"
-	  "        Optional, defaults to TREE_UNDIRECTED\n"
-     },
-   
-   // interface to igraph_adjacency
-     {"Adjacency", (PyCFunction)igraphmodule_unimplemented,
-	  METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-	  "Generates a graph from an adjacency matrix. This function is yet unimplemented.\n\n"
-	  "Throws a NotImplementedError."
-     },
-
-   /////////////////////////////////////
-   // STRUCTURAL PROPERTIES OF GRAPHS //
-   /////////////////////////////////////
-   
-   // interface to igraph_are_connected
-     {"are_connected", (PyCFunction)igraphmodule_Graph_are_connected,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Decides whether two given vertices are directly connected.\n\n"
-	  "Keyword arguments:\n"
-	  "v1 -- the first vertex\n"
-	  "v2 -- the second vertex\n"
-	  "Returns true if there exists an edge from v1 to v2."
-     },
-
-   // interface to igraph_average_path_length
-     {"average_path_length", (PyCFunction)igraphmodule_Graph_average_path_length,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Calculates the average path length in a graph.\n\n"
-	  "Keyword arguments:\n"
-	  "directed -- whether to consider directed paths.\n"
-	  "            Ignored for undirected graphs. Optional, defaults to True.\n"
-	  "unconn -- what to do when the graph is unconnected. If True, the\n"
-	  "          average of the geodesic lengths in the components is\n"
-	  "          calculated. Otherwise for all unconnected vertex pairs,\n"
-	  "          a path length equal to the number of vertices is used.\n"
-     },
-
-   // interface to igraph_betweenness
-     {"betweenness", (PyCFunction)igraphmodule_Graph_betweenness,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Calculates the betweenness of nodes in a graph.\n\n"
-	  "Keyword arguments:\n"
-	  "vertices -- the vertices for which the betweennesses must be returned.\n"
-	  "            Optional, defaults to all of the vertices in the graph.\n"
-	  "directed -- whether to consider directed paths.\n"
-	  "            Ignored for undirected graphs. Optional, defaults to True.\n"
-     },
-   
-   // interface to igraph_bibcoupling
-     {"bibcoupling", (PyCFunction)igraphmodule_Graph_bibcoupling,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Calculates bibliographic coupling values for given vertices in a graph.\n\n"
-	  "Keyword arguments:\n"
-	  "vertices -- the vertices to be analysed.\n"
-	  "Returns bibliographic coupling values for all given vertices in a matrix."
-     },
-   
+  ////////////////////////////
+  // BASIC IGRAPH INTERFACE //
+  ////////////////////////////
+  
+  // interface to igraph_vcount
+  {"vcount", (PyCFunction)igraphmodule_Graph_vcount,
+      METH_NOARGS,
+      "Returns the number of vertices in the graph"
+  },
+  // interface to igraph_ecount
+  {"ecount", (PyCFunction)igraphmodule_Graph_ecount,
+      METH_NOARGS,
+      "Returns the number of edges in the graph"
+  },
+  // interface to igraph_is_directed
+  {"is_directed", (PyCFunction)igraphmodule_Graph_is_directed,
+      METH_NOARGS,
+      "Checks whether the graph is directed"
+  },
+  // interface to igraph_add_vertices
+  {"add_vertices", (PyCFunction)igraphmodule_Graph_add_vertices,
+      METH_VARARGS,
+      "Adds vertices to the graph. The only parameter is the number of "
+      "vertices to be added"
+  },
+  // interface to igraph_delete_vertices
+  {"delete_vertices", (PyCFunction)igraphmodule_Graph_delete_vertices,
+      METH_VARARGS,
+      "Deletes vertices and all its edges from the graph. The only "
+      "parameter is a list of the vertices to be added. It is allowed "
+      "to provide a single integer instead of a list consisting of only "
+      "one integer."
+  },
+  // interface to igraph_add_edges
+  {"add_edges", (PyCFunction)igraphmodule_Graph_add_edges,
+      METH_VARARGS,
+      "Adds edges to the graph. The only parameter is a list of "
+      "edges to be added. Every edge is represented with a tuple, "
+      "containing the vertex IDs of the two endpoints. Vertices are "
+      "enumerated from zero. It is allowed to provide a single pair "
+      "instead of a list consisting of only one pair."
+  },
+  // interface to igraph_delete_edges
+  {"delete_edges", (PyCFunction)igraphmodule_Graph_delete_edges,
+      METH_VARARGS,
+      "Removes edges from the graph. The only parameter is a list of "
+      "edges to be removed. Every edge is represented with a tuple, "
+      "containing the vertex IDs of the two endpoints. Vertices are "
+      "enumerated from zero. It is allowed to provide a single pair "
+      "instead of a list consisting of only one pair. Nonexistent "
+      "edges will be silently ignored. All vertices will be kept, even "
+      "if they lose all their edges."
+  },
+  // interface to igraph_degree
+  {"degree", (PyCFunction)igraphmodule_Graph_degree,
+      METH_VARARGS | METH_KEYWORDS,
+      "Returns some vertex degrees from the graph.\n"
+      "This method accepts a single vertex ID or a list of vertex IDs as a "
+      "parameter, and returns the degree of the given vertices (in the form of "
+      "a single integer or a list, depending on the input parameter). A "
+      "second and a third argument may be passed as well, the second one "
+      "meaning the type of degree to be returned (OUT for out-degrees, "
+      "IN for in-degrees or ALL for the sum of them) and the third one "
+      "meaning whether self-loops should be counted. The default for them is "
+      "ALL and False. The type of degree is ignored for undirected graphs."
+  },
+  // interface to igraph_neighbors
+  {"neighbors", (PyCFunction)igraphmodule_Graph_neighbors,
+      METH_VARARGS | METH_KEYWORDS,
+      "Returns adjacent vertices to a given vertex.\n"
+      "This method accepts a single vertex ID as an argument, "
+      "and returns the adjacent vertices of that vertex. An optional "
+      "second argument allows the user to limit the result to only "
+      "predecessors (IN), only successors (OUT) or both of them (ALL). "
+      "The default behaviour is the latter one. "
+      "This argument is ignored for undirected graphs."
+  },
+  
+  //////////////////////
+  // GRAPH GENERATORS //
+  //////////////////////
+  
+  // interface to igraph_barabasi_game
+  {"Barabasi", (PyCFunction)igraphmodule_Graph_Barabasi,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a graph based on the Barabási-Albert model.\n"
+      "The first two arguments are mandatory: the first one is the "
+      "number of vertices, the second one is either the number of "
+      "outgoing edges generated for each vertex or a list containing the "
+      "number of outgoing edges for each vertex explicitly. The third "
+      "argument is True if the out-degree of a given vertex should also "
+      "increase its citation probability (as well as its in-degree), but "
+      "it defaults to False. The fourth argument is True if the generated "
+      "graph should be directed (default: False).\n\n"
+      "Keywords for the arguments: n, m, outpref, directed"
+  },
+  
+  // interface to igraph_erdos_renyi_game
+  {"Erdos_Renyi", (PyCFunction)igraphmodule_Graph_Erdos_Renyi,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a graph based on the Erdõs-Rényi model.\n"
+      "There are a total of five possible arguments, two of them are "
+      "mutually exclusive. The first argument (keyword: n) is the number "
+      "of vertices. The second and the third (keywords: p and m) define "
+      "the density of the graph: if p is missing, there will be m edges; "
+      "if m is missing, every edge will be present with a probability of "
+      "p. These two arguments influence the same graph property (the "
+      "number of edges) in two different ways, so either p or m must be "
+      "present (but not both of them). The remaining two arguments are "
+      "optional. The fourth argument (keyword: directed) is True if the "
+      "generated graph should be directed (default: False), the fifth "
+      "(keyword: loops) is True if self-loops are allowed (default: False)."
+  },
+  
+  // interface to igraph_full_game
+  {"Full", (PyCFunction)igraphmodule_Graph_Full,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a full graph (directed or undirected, with or without loops).\n"
+      "The only mandatory argument (keyword: n) is the number "
+      "of vertices. The remaining two arguments are optional. "
+      "The second argument (keyword: directed) is True if the "
+      "generated graph should be directed (default: False), the third "
+      "(keyword: loops) is True if self-loops are allowed (default: False)."
+  },
+  
+  // interface to igraph_growing_random_game
+  {"Growing_Random", (PyCFunction)igraphmodule_Graph_Growing_Random,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a growing random graph.\n\n"
+      "Keyword arguments:\n"
+      "n -- The number of vertices in the graph\n"
+      "m -- The number of edges to add in each step (after adding a new vertex)\n"
+      "directed -- whether the graph should be directed.\n"
+      "            Optional, defaults to False.\n"
+      "citation -- whether the new edges should originate from the most\n"
+      "            recently added vertex.\n"
+      "            Optional, defaults to False."
+  },
+  
+  // interface to igraph_star
+  {"Star", (PyCFunction)igraphmodule_Graph_Star,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a star graph.\n\n"
+      "Keyword arguments:\n"
+      "n -- The number of vertices in the graph\n"
+      "mode -- Gives the type of the star graph to create. Should be\n"
+      "        one of the constants STAR_OUT, STAR_IN and STAR_UNDIRECTED.\n"
+      "        Optional, defaults to STAR_UNDIRECTED.\n"
+      "center -- Vertex ID for the central vertex in the star.\n"
+      "          Optional, defaults to zero.\n"
+  },
+  
+  // interface to igraph_lattice
+  {"Lattice", (PyCFunction)igraphmodule_unimplemented,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a lattice. This function is yet unimplemented.\n\n"
+      "Throws a NotImplementedError."
+  },
+  
+  // interface to igraph_ring
+  {"Ring", (PyCFunction)igraphmodule_Graph_Ring,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a ring graph.\n\n"
+      "Keyword arguments:\n"
+      "n -- The number of vertices in the ring\n"
+      "directed -- whether to create a directed ring.\n"
+      "            Optional, defaults to False.\n"
+      "mutual -- whether to create mutual edges in a directed ring.\n"
+      "          Optional, defaults to False.\n"
+      "          Ignored for undirected graphs.\n"
+      "circular -- whether to create a closed ring.\n"
+      "            Optional, defaults to True."
+  },
+  
+  // interface to igraph_tree
+  {"Tree", (PyCFunction)igraphmodule_Graph_Tree,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a tree in which almost all vertices have the same number of children.\n\n"
+      "Keyword arguments:\n"
+      "n -- The number of vertices in the graph\n"
+      "children -- The number of children of a vertex in the graph\n"
+      "type -- determines whether the tree should be directed, and if\n"
+      "        this is the case, also its orientation. Must be one of\n"
+      "        TREE_IN, TREE_OUT and TREE_UNDIRECTED.\n"
+      "        Optional, defaults to TREE_UNDIRECTED\n"
+  },
+  
+  // interface to igraph_adjacency
+  {"Adjacency", (PyCFunction)igraphmodule_unimplemented,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a graph from an adjacency matrix. This function is yet unimplemented.\n\n"
+      "Throws a NotImplementedError."
+  },
+  
+  /////////////////////////////////////
+  // STRUCTURAL PROPERTIES OF GRAPHS //
+  /////////////////////////////////////
+  
+  // interface to igraph_are_connected
+  {"are_connected", (PyCFunction)igraphmodule_Graph_are_connected,
+      METH_VARARGS | METH_KEYWORDS,
+      "Decides whether two given vertices are directly connected.\n\n"
+      "Keyword arguments:\n"
+      "v1 -- the first vertex\n"
+      "v2 -- the second vertex\n"
+      "Returns true if there exists an edge from v1 to v2."
+  },
+  
+  // interface to igraph_average_path_length
+  {"average_path_length", (PyCFunction)igraphmodule_Graph_average_path_length,
+      METH_VARARGS | METH_KEYWORDS,
+      "Calculates the average path length in a graph.\n\n"
+      "Keyword arguments:\n"
+      "directed -- whether to consider directed paths.\n"
+      "            Ignored for undirected graphs. Optional, defaults to True.\n"
+      "unconn -- what to do when the graph is unconnected. If True, the\n"
+      "          average of the geodesic lengths in the components is\n"
+      "          calculated. Otherwise for all unconnected vertex pairs,\n"
+      "          a path length equal to the number of vertices is used.\n"
+  },
+  
+  // interface to igraph_betweenness
+  {"betweenness", (PyCFunction)igraphmodule_Graph_betweenness,
+      METH_VARARGS | METH_KEYWORDS,
+      "Calculates the betweenness of nodes in a graph.\n\n"
+      "Keyword arguments:\n"
+      "vertices -- the vertices for which the betweennesses must be returned.\n"
+      "            Optional, defaults to all of the vertices in the graph.\n"
+      "directed -- whether to consider directed paths.\n"
+      "            Ignored for undirected graphs. Optional, defaults to True.\n"
+  },
+  
+  // interface to igraph_bibcoupling
+  {"bibcoupling", (PyCFunction)igraphmodule_Graph_bibcoupling,
+      METH_VARARGS | METH_KEYWORDS,
+      "Calculates bibliographic coupling values for given vertices in a graph.\n\n"
+      "Keyword arguments:\n"
+      "vertices -- the vertices to be analysed.\n"
+      "Returns bibliographic coupling values for all given vertices in a matrix."
+  },
+  
    // interface to igraph_closeness
      {"closeness", (PyCFunction)igraphmodule_Graph_closeness,
 	  METH_VARARGS | METH_KEYWORDS,
@@ -2613,19 +2704,57 @@ static PyMethodDef igraphmodule_Graph_methods[] =
    // LAYOUT FUNCTIONS //
    //////////////////////
    
-   // interface to igraph_layout_circle
-     {"layout_circle", (PyCFunction)igraphmodule_Graph_layout_circle,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Places the vertices of the graph uniformly on a circle.\n\n"
-	  "Returns the calculated coordinate pairs in a vector."
-     },
-   
-   // interface to igraph_layout_random
-     {"layout_random", (PyCFunction)igraphmodule_Graph_layout_random,
-	  METH_VARARGS | METH_KEYWORDS,
-	  "Places the vertices of the graph randomly.\n\n"
-	  "Returns the \"calculated\" coordinate pairs in a vector."
-     },
+  // interface to igraph_layout_circle
+  {"layout_circle", (PyCFunction)igraphmodule_Graph_layout_circle,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices of the graph uniformly on a circle.\n\n"
+      "Returns the calculated coordinate pairs in a vector."
+  },
+
+  // interface to igraph_layout_kamada_kawai
+  {"layout_kamada_kawai", (PyCFunction)igraphmodule_Graph_layout_kamada_kawai,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices on a plane according the Kamada-Kawai algorithm.\n\n"
+      "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
+      "An Algorithm for Drawing General Undirected Graphs.\n"
+      "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
+      "Keyword arguments:\n"
+      "n       -- the number of iterations to perform. Optional, defaults to 1000.\n"
+      "sigma   -- the standard base deviation of the position change proposals.\n"
+      "           Optional, defaults to the number of vertices * 0.25\n"
+      "initemp -- initial temperature of the simulated annealing.\n"
+      "           Optional, defaults to 10.\n"
+      "coolexp -- cooling exponent of the simulated annealing.\n"
+      "           Optional, defaults to 0.99\n"
+      "kkconst -- the Kamada-Kawai vertex attraction constant. Optional,\n"
+      "           defaults to the square of the number of vertices.\n"
+  },
+  
+  // interface to igraph_layout_fruchterman_reingold
+  {"layout_fruchterman_reingold", (PyCFunction)igraphmodule_Graph_layout_fruchterman_reingold,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices on a plane according the Fruchterman-Reingold algorithm.\n\n"
+      "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
+      "Graph Drawing by Force-directed Placement.\n"
+      "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
+      "Keyword arguments:\n"
+      "n          -- the number of iterations to perform. Optional, defaults to 500.\n"
+      "maxdelta   -- the maximum distance to move a vertex in an iteration\n"
+      "              Optional, defaults to the number of vertices\n"
+      "area       -- the area parameter of the algorithm. Optional, defaults\n"
+      "              to the square of the number of vertices\n"
+      "coolexp    -- the cooling exponent of the simulated annealing.\n"
+      "              Optional, defaults to 0.99\n"
+      "repulserad -- Determines the radius at which vertex-vertex repulsion\n"
+      "              cancels out attraction of adjacent vertices.\n"
+  },
+  
+  // interface to igraph_layout_random
+  {"layout_random", (PyCFunction)igraphmodule_Graph_layout_random,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices of the graph randomly.\n\n"
+      "Returns the \"calculated\" coordinate pairs in a vector."
+  },
    
    //////////////////////////////////////////////////////
    // CONVERT A GRAPH TO EDGE LIST OR ADJACENCY MATRIX //
@@ -2649,7 +2778,20 @@ static PyMethodDef igraphmodule_Graph_methods[] =
 	  "Returns the edge list of a graph."
      },
    
-     {NULL}
+  ////////////////////////////////////
+  // INTERNAL/DEVELOPMENT FUNCTIONS //
+  ////////////////////////////////////
+  {"__graph_as_cobject__", (PyCFunction)igraphmodule_Graph___graph_as_cobject__,
+      METH_NOARGS,
+      "Returns the igraph graph encapsulated by the Python object as "
+      "a PyCObject (which is barely a regular C pointer). This function "
+      "should not be used directly by igraph users, it is useful only "
+      "in the case when the underlying igraph object must be passed to "
+      "another C code through Python"
+  },
+  
+  {NULL}
+
 }
 ;
 
