@@ -11,6 +11,11 @@ export(add.graph.attribute, remove.graph.attribute,
        add.vertex.attribute, remove.vertex.attribute,
        get.vertex.attribute, set.vertex.attribute, v.a, "v.a<-")
 
+# iterators
+
+export(ii.create, ii.next, ii.prev, ii.end, ii.get.vertex.nei,
+       ii.reset, ii.get.vertex, ii.get.from, ii.get.to, ii.get.edge)
+
 # basic functions, printing
 
 export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed)

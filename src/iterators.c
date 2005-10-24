@@ -38,15 +38,6 @@
  * \ingroup iterators
  */
   
-/* Vertex iterators */
-#define IGRAPH_ITERATOR_VID           1
-#define IGRAPH_ITERATOR_VNEIS         2
-
-/* Edge iterators */
-#define IGRAPH_ITERATOR_EID        1001
-#define IGRAPH_ITERATOR_ENEIS      1002
-#define IGRAPH_ITERATOR_EFROMORDER 1003
-
 /* Constructors */
 
 /**
@@ -181,13 +172,6 @@ int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it) {
   return 0;
 }
 
-typedef struct igraph_iterator_eneis_data_t {
-  integer_t vid;
-  integer_t mode;
-  integer_t oidx;
-  integer_t iidx;
-} igraph_iterator_eneis_data_t;
-
 /**
  * \defgroup iterators_eneis Adjacent edges of a vertex.
  * \ingroup iterators_edge
@@ -225,7 +209,7 @@ typedef struct igraph_iterator_eneis_data_t {
 int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
 			  integer_t vid, igraph_neimode_t mode) {  
 
-  igraph_iterator_eneis_data_t *data;
+  real_t *data;
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -241,25 +225,23 @@ int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it,
   it->getedge=igraph_get_edge_eneis;
   it->getvertexnei=igraph_get_vertex_nei_eneis;
 
-  it->data=Calloc(1, igraph_iterator_eneis_data_t);
+  it->data=Calloc(4, real_t);
   data=it->data;
-  data->vid=vid;
-  data->mode=mode;
+  data[0]=vid;
+  data[1]=mode;
   if (mode & IGRAPH_OUT) {
-    data->oidx=VECTOR(graph->os)[(long int)vid];
+    data[2]=VECTOR(graph->os)[(long int)vid];
   } else {
-    data->oidx=igraph_ecount(graph);
+    data[2]=igraph_ecount(graph);
   }
   if (mode & IGRAPH_IN) {
-    data->iidx=VECTOR(graph->is)[(long int)vid];
+    data[3]=VECTOR(graph->is)[(long int)vid];
   } else {
-    data->iidx=igraph_ecount(graph);
+    data[3]=igraph_ecount(graph);
   }
   
   return 0;
 }
-
-typedef igraph_iterator_eneis_data_t igraph_iterator_vneis_data_t;
 
 /**
  * \defgroup iterators_vneis Adjacent vertices of a vertex
@@ -295,7 +277,7 @@ typedef igraph_iterator_eneis_data_t igraph_iterator_vneis_data_t;
 
 int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it, 
 			  integer_t vid, igraph_neimode_t mode) {
-  igraph_iterator_vneis_data_t *data;
+  real_t *data;
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -310,19 +292,19 @@ int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it,
   it->getedge=0;
   it->getvertexnei=0;
 
-  it->data=Calloc(1, igraph_iterator_vneis_data_t);
+  it->data=Calloc(4, real_t);
   data=it->data;
-  data->vid=vid;
-  data->mode=mode;
+  data[0]=vid;
+  data[1]=mode;
   if (mode & IGRAPH_OUT) {
-    data->oidx=VECTOR(graph->os)[(long int)vid];
+    data[2]=VECTOR(graph->os)[(long int)vid];
   } else {
-    data->oidx=igraph_ecount(graph);
+    data[2]=igraph_ecount(graph);
   }
   if (mode & IGRAPH_IN) {
-    data->iidx=VECTOR(graph->is)[(long int)vid];
+    data[3]=VECTOR(graph->is)[(long int)vid];
   } else {
-    data->iidx=igraph_ecount(graph);
+    data[3]=igraph_ecount(graph);
   }
   
   return 0;  
@@ -613,43 +595,43 @@ integer_t igraph_get_edge_efromorder(igraph_t *graph, igraph_iterator_t *it) {
 }
 
 int igraph_next_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_vneis_data_t *data=it->data;
-  data->oidx++;
-  if (data->oidx > VECTOR(graph->os)[ (long int)data->vid+1 ]) {
-    data->iidx ++;
+  real_t *data=it->data;
+  data[2] ++;
+  if (data[2] > VECTOR(graph->os)[ (long int)data[0]+1 ]) {
+    data[3] ++;
   }
   return 0;
 }
 
 int igraph_end_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_vneis_data_t *data=it->data;
-  return (data->oidx >= VECTOR(graph->os)[ (long int) data->vid+1 ] &&
-	  data->iidx >= VECTOR(graph->is)[ (long int) data->vid+1 ]);  
+  real_t *data=it->data;
+  return (data[2] >= VECTOR(graph->os)[ (long int) data[0]+1 ] &&
+	  data[3] >= VECTOR(graph->is)[ (long int) data[0]+1 ]);  
 }
 
 int igraph_reset_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_vneis_data_t *data=it->data;
-  if ((int)data->mode & IGRAPH_OUT) {
-    data->oidx=VECTOR(graph->os)[(long int)data->vid];
+  real_t *data=it->data;
+  if ((int)data[1] & IGRAPH_OUT) {
+    data[2]=VECTOR(graph->os)[(long int)data[0]];
   } else {
-    data->oidx=igraph_ecount(graph);
+    data[2]=igraph_ecount(graph);
   }
-  if ((int)data->mode & IGRAPH_IN) {
-    data->iidx=VECTOR(graph->is)[(long int)data->vid];
+  if ((int)data[1] & IGRAPH_IN) {
+    data[3]=VECTOR(graph->is)[(long int)data[0]];
   } else {
-    data->iidx=igraph_ecount(graph);
+    data[3]=igraph_ecount(graph);
   }
 
   return 0;
 }
 
 integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_vneis_data_t* data=it->data;
-  if (data->oidx < VECTOR(graph->os)[ (long int)data->vid+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data->oidx];
+  real_t* data=it->data;
+  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)data[2]];
     return VECTOR(graph->to)[idx];
   } else {
-    long int idx=VECTOR(graph->ii)[(long int)data->iidx];
+    long int idx=VECTOR(graph->ii)[(long int)data[3]];
     return VECTOR(graph->from)[idx];
   }  
 }
@@ -657,21 +639,21 @@ integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it) {
 int igraph_iterator_vneis_set(igraph_t *graph, igraph_iterator_t *it, 
 			      integer_t vid, igraph_neimode_t mode) {
 
-  igraph_iterator_vneis_data_t *data=it->data;
+  real_t *data=it->data;
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
-  data->vid=vid;
-  data->mode=mode;
+  data[0]=vid;
+  data[1]=mode;
   if (mode & IGRAPH_OUT) {
-    data->oidx=VECTOR(graph->os)[(long int)vid];
+    data[2]=VECTOR(graph->os)[(long int)vid];
   } else {
-    data->oidx=igraph_ecount(graph);
+    data[2]=igraph_ecount(graph);
   }
   if (mode & IGRAPH_IN) {
-    data->iidx=VECTOR(graph->is)[(long int)vid];
+    data[3]=VECTOR(graph->is)[(long int)vid];
   } else {
-    data->iidx=igraph_ecount(graph);
+    data[3]=igraph_ecount(graph);
   }  
   
   return 0;
@@ -696,97 +678,97 @@ int igraph_iterator_vneis_set(igraph_t *graph, igraph_iterator_t *it,
 
 int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it, 
 			      integer_t vid, igraph_neimode_t mode) {
-  igraph_iterator_eneis_data_t *data=it->data;
+  real_t *data=it->data;
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
-  data->vid=vid;
-  data->mode=mode;
+  data[0]=vid;
+  data[1]=mode;
   if (mode & IGRAPH_OUT) {
-    data->oidx=VECTOR(graph->os)[(long int)vid];
+    data[2]=VECTOR(graph->os)[(long int)vid];
   } else {
-    data->oidx=igraph_ecount(graph);
+    data[2]=igraph_ecount(graph);
   }
   if (mode & IGRAPH_IN) {
-    data->iidx=VECTOR(graph->is)[(long int)vid];
+    data[3]=VECTOR(graph->is)[(long int)vid];
   } else {
-    data->iidx=igraph_ecount(graph);
+    data[3]=igraph_ecount(graph);
   }
   
   return 0;
 }
 
 int igraph_reset_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_eneis_data_t *data=it->data;
-  if ((int)data->mode & IGRAPH_OUT) {
-    data->oidx=VECTOR(graph->os)[(long int)data->vid];
+  real_t *data=it->data;
+  if ((int)data[1] & IGRAPH_OUT) {
+    data[2]=VECTOR(graph->os)[(long int)data[0]];
   } else {
-    data->oidx=igraph_ecount(graph);
+    data[2]=igraph_ecount(graph);
   }
-  if ((int)data->mode & IGRAPH_IN) {
-    data->iidx=VECTOR(graph->is)[(long int)data->vid];
+  if ((int)data[1] & IGRAPH_IN) {
+    data[3]=VECTOR(graph->is)[(long int)data[0]];
   } else {
-    data->iidx=igraph_ecount(graph);
+    data[3]=igraph_ecount(graph);
   }
   
   return 0;
 }
 
 int igraph_next_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_eneis_data_t* data=it->data;
-  data->oidx ++; 
-  if (data->oidx > VECTOR(graph->os)[ (long int)data->vid+1 ]) {
-    data->iidx ++;
+  real_t* data=it->data;
+  data[2] ++; 
+  if (data[2] > VECTOR(graph->os)[ (long int)data[0]+1 ]) {
+    data[3] ++;
   }     
   return 0;
 }
 
 bool_t igraph_end_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_eneis_data_t* data=it->data;
-  return (data->oidx >= VECTOR(graph->os)[ (long int) data->vid+1 ] &&
-	  data->iidx >= VECTOR(graph->is)[ (long int) data->vid+1 ]);
+  real_t* data=it->data;
+  return (data[2] >= VECTOR(graph->os)[ (long int) data[0]+1 ] &&
+	  data[3] >= VECTOR(graph->is)[ (long int) data[0]+1 ]);
 }
 
 integer_t igraph_get_vertex_from_eneis(igraph_t *graph, 
 				       igraph_iterator_t *it) {
-  igraph_iterator_eneis_data_t* data=it->data;
-  if (data->oidx < VECTOR(graph->os)[ (long int)data->vid+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data->oidx];
+  real_t* data=it->data;
+  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)data[2]];
     return VECTOR(graph->from)[idx];
   } else {
-    long int idx=VECTOR(graph->ii)[(long int)data->iidx];
+    long int idx=VECTOR(graph->ii)[(long int)data[3]];
     return VECTOR(graph->from)[idx];
   }  
 }
 
 integer_t igraph_get_vertex_to_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_eneis_data_t* data=it->data;
-  if (data->oidx < VECTOR(graph->os)[ (long int)data->vid+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data->oidx];
+  real_t* data=it->data;
+  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)data[2]];
     return VECTOR(graph->to)[idx];
   } else {
-    long int idx=VECTOR(graph->ii)[(long int)data->iidx];
+    long int idx=VECTOR(graph->ii)[(long int)data[3]];
     return VECTOR(graph->to)[idx];
   }  
 }
 
 integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_eneis_data_t* data=it->data;
-  if (data->oidx < VECTOR(graph->os)[ (long int)data->vid+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data->oidx];
+  real_t* data=it->data;
+  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)data[2]];
     return VECTOR(graph->to)[idx];
   } else {
-    long int idx=VECTOR(graph->ii)[(long int)data->iidx];
+    long int idx=VECTOR(graph->ii)[(long int)data[3]];
     return VECTOR(graph->from)[idx];
   }  
 }  
 
 integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  igraph_iterator_eneis_data_t* data=it->data;
-  if (data->oidx < VECTOR(graph->os)[ (long int)data->vid+1 ]) {
-    return VECTOR(graph->oi)[(long int)data->oidx];
+  real_t* data=it->data;
+  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
+    return VECTOR(graph->oi)[(long int)data[2]];
   } else {
-    return VECTOR(graph->ii)[(long int)data->iidx];
+    return VECTOR(graph->ii)[(long int)data[3]];
   }
 }
 

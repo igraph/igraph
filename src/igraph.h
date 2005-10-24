@@ -274,6 +274,19 @@ typedef struct igraph_s {
 } igraph_t;
 
 /* -------------------------------------------------- */
+/* Iterators                                          */
+/* -------------------------------------------------- */
+
+/* Vertex iterators */
+#define IGRAPH_ITERATOR_VID           1
+#define IGRAPH_ITERATOR_VNEIS         2
+
+/* Edge iterators */
+#define IGRAPH_ITERATOR_EID        1001
+#define IGRAPH_ITERATOR_ENEIS      1002
+#define IGRAPH_ITERATOR_EFROMORDER 1003
+
+/* -------------------------------------------------- */
 /* Constants                                          */
 /* -------------------------------------------------- */
 

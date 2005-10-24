@@ -11,3 +11,4 @@ o multicompartmental layout functions
 o error handling
 o function for merge networks
 o add data sets to the R package
+o get.edgelist (R) rewrite
