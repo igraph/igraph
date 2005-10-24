@@ -55,6 +55,9 @@ int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
   vector_init(&graph->os, 1);  VECTOR(graph->os)[0]=0;
   vector_init(&graph->is, 1);  VECTOR(graph->is)[0]=0;
 
+  igraph_attribute_list_init(&graph->gal, 1);
+  igraph_attribute_list_init(&graph->val, 0);
+
   /* add the vertices */
   igraph_add_vertices(graph, n);
   
@@ -82,6 +85,10 @@ int igraph_destroy(igraph_t *graph) {
   vector_destroy(&graph->ii);
   vector_destroy(&graph->os);
   vector_destroy(&graph->is);
+  
+  igraph_attribute_list_destroy(&graph->gal);
+  igraph_attribute_list_destroy(&graph->val);
+
   return 0;
 }
 
@@ -193,6 +200,9 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
   }
   
   graph->n += nv;
+
+  igraph_attribute_list_increase_length(&graph->val, nv);
+
   return 0;
 }
 
@@ -347,7 +357,7 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
   /* Create index for renaming vertices */
   
   index=Calloc(no_of_nodes, long int);
-  j=0;
+  j=1;
   for (i=0; i<no_of_nodes; i++) {
     if (VECTOR(graph->os)[i]>=0) {
       index[i]=j++;
@@ -359,11 +369,14 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
   vector_init(&newto  , no_of_edges-edges_to_delete);
   for (i=0; idx2<no_of_edges-edges_to_delete; i++) {
     if (VECTOR(graph->from)[i] >= 0) {
-      VECTOR(newfrom)[idx2]=index[ (long int) VECTOR(graph->from)[i] ];
-      VECTOR(newto  )[idx2]=index[ (long int) VECTOR(graph->to  )[i] ];
+      VECTOR(newfrom)[idx2]=index[ (long int) VECTOR(graph->from)[i] ]-1;
+      VECTOR(newto  )[idx2]=index[ (long int) VECTOR(graph->to  )[i] ]-1;
       idx2++;
     }
   }
+  
+  igraph_attribute_list_remove_elements(&graph->val, index, really_delete);
+
   Free(index);
   vector_destroy(&graph->from);
   vector_destroy(&graph->to  );  
@@ -614,17 +627,17 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
  * Testing purposes, indexed edgelist type                *
  *********************************************************/
 
-#include <stdio.h>
+/* #include <stdio.h> */
 
-int print_vector(vector_t *v) {
-  long int i;
-  for (i=0; i<vector_size(v); i++) {
-    printf("%f ", VECTOR(*v)[i]);
-  }
-  printf("\n");
+/* int print_vector(vector_t *v) { */
+/*   long int i; */
+/*   for (i=0; i<vector_size(v); i++) { */
+/*     printf("%f ", VECTOR(*v)[i]); */
+/*   } */
+/*   printf("\n"); */
   
-  return 0;
-}
+/*   return 0; */
+/* } */
 
 /* int print_igraph(igraph_t *graph) { */
 /*   printf("Nodes: %li\n", (long int)graph->n); */

@@ -1086,3 +1086,97 @@ int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops) {
 
   return 0;
 }
+
+int igraph_transitivity_undirected(igraph_t *graph, vector_t *res) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  real_t triples=0, triangles=0;
+  long int node;
+  long int *neis;
+  long int deg;
+
+  igraph_iterator_t nit, nit2;
+  
+  vector_resize(res, 1);
+  neis=Calloc(no_of_nodes, long int);
+
+  if (no_of_nodes != 0) {    
+    igraph_iterator_vneis(graph, &nit, 0, IGRAPH_ALL);
+    igraph_iterator_vneis(graph, &nit2, 0, IGRAPH_ALL);
+  }
+  for (node=0; node<no_of_nodes; node++) {
+    igraph_iterator_vneis_set(graph, &nit, node, IGRAPH_ALL);
+    deg=0;
+    /* Mark the neighbors of 'node' */
+    while (!igraph_end(graph, &nit)) {
+      neis[ (long int)igraph_get_vertex(graph, &nit) ] = node+1;
+      igraph_next(graph, &nit);
+      deg++;
+    }
+    triples += deg*(deg-1);
+    
+    /* Count the triangles and triples */
+    igraph_iterator_vneis_set(graph, &nit, node, IGRAPH_ALL);
+    while (!igraph_end(graph, &nit)) {
+      long int v=igraph_get_vertex(graph, &nit);
+      igraph_iterator_vneis_set(graph, &nit2, v, IGRAPH_ALL);
+      while (!igraph_end(graph, &nit2)) {
+	long int v2=igraph_get_vertex(graph, &nit2);
+	if (neis[v2] == node+1) {
+	  triangles += 1.0;
+	}
+	igraph_next(graph, &nit2);
+      }
+      igraph_next(graph, &nit);
+    }
+  }
+
+  Free(neis);
+  if (no_of_nodes != 0) {
+    igraph_iterator_destroy(graph, &nit);
+    igraph_iterator_destroy(graph, &nit2);
+  }
+
+  VECTOR(*res)[0] = triangles/triples;
+
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \brief Calculates the transitivity (clustering coefficient) of a graph
+ * 
+ * The transitivity measures the probability that two neighbors of a
+ * vertex are connected. See the <code>type</code> parameter for
+ * different definitions (more to be expected soon).
+ * @param graph The graph object.
+ * @param res Pointer to an initialized vector, this will be resized
+ *        to contain the result.
+ * @param type It gives the type of the transitivity to
+ *        calculate. Possible values:
+ *        - <b>IGRAPH_TRANSITIVITY_UNDIRECTED</b>: the most common
+ *          definition, the ratio of the triangles and connected
+ *          triples in the graph, the result is a single real number
+ *          or NaN (0/0) if there are no connected triples in the
+ *          graph.  Directed graphs are considered as
+ *          undirected ones. 
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|*d^2)</code> for
+ * IGRAPH_TRANSITIVITY_UNDIRECTED. <code>|V|</code> is the number of
+ * vertices in the graph, <code>d</code> is the highest node degree.
+ */
+
+int igraph_transitivity(igraph_t *graph, vector_t *res, 
+			igraph_transitivity_type_t type) {
+  
+  int retval;
+  
+  if (type == IGRAPH_TRANSITIVITY_UNDIRECTED) {
+    retval=igraph_transitivity_undirected(graph, res);
+  } else {
+    retval=igraph_error("unknown transitivity type");
+  }
+  
+  return retval;
+}

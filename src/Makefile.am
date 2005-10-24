@@ -5,6 +5,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     structure_generators.c conversion.c \
 			     measure_dynamics.c type_indexededgelist.c \
 			     error.c other.c types.c foreign.c random.c \
+			     attributes.c \
 			     memory.h random.h
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm

@@ -4,6 +4,13 @@
 export(graph.empty, add.edges, add.vertices, delete.edges,
        delete.vertices, vcount, ecount, neighbors)
 
+# Attributes
+
+export(add.graph.attribute, remove.graph.attribute,
+       get.graph.attribute, set.graph.attribute, g.a, "g.a<-",
+       add.vertex.attribute, remove.vertex.attribute,
+       get.vertex.attribute, set.vertex.attribute, v.a, "v.a<-")
+
 # basic functions, printing
 
 export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed)
@@ -46,7 +53,7 @@ export(layout.random, layout.circle, layout.fruchterman.reingold,
 export(subgraph, simplify, degree, degree.distribution, diameter,
        closeness, subcomponent, betweenness, bibcoupling, cocitation,
        shortest.paths, minimum.spanning.tree, edge.betweenness,
-       get.shortest.paths, average.path.length)
+       get.shortest.paths, average.path.length, transitivity)
 
 # plotting
 

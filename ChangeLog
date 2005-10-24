@@ -1,8 +1,70 @@
+2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/types.c (igraph_stack_reserve) : added
+	
+	* src/types.c (vector_remove_section, vector_move_interval)
+	(matrix_add_cols, matrix_remove_col, matrix_permdelete_rows) : added
+
+	* src/types.c (vector_ptr_init, vector_ptr_destroy)
+	(vector_ptr_reserve, vector_ptr_empty, vector_ptr_size)
+	(vector_ptr_clear, vector_ptr_push_back, vector_ptr_e)
+	(vector_ptr_set, vector_ptr_null, vector_ptr_find)
+	(vector_ptr_change, vector_ptr_resize, vector_ptr_as_vector)
+	(vector_ptr_init_copy, vector_ptr_copy_to, vector_ptr_copy)
+	(vector_ptr_remove) : added
+
+	* src/types.c (igraph_i_strarray_findnpos)
+	(igraph_attribute_list_init, igraph_attribute_list_destroy)
+	(igraph_attribute_list_add, igraph_attributes_list_remove)
+	(igraph_attribute_list_get, igraph_attribute_list_gets)
+	(igraph_attribute_list_set, igraph_attribute_list_sets)
+	(igraph_attribute_list_size, igraph_attribute_list_remove_elements)
+	(igraph_attribute_list_list, igraph_strarray_init)
+	(igraph_strarray_destroy) : added
+
+	* src/attributes.c (igraph_add_graph_attribute)
+	(igraph_remove_graph_attribute, igraph_get_graph_attribute)
+	(igraph_set_graph_attribute, igraph_list_graph_attributes)
+	(igraph_add_vertex_attribute, igraph_remove_vertex_attribute)
+	(igraph_get_vertex_attribute, igraph_set_vertex_attribute)
+	(igraph_get_vertex_attributes, igraph_set_vertex_attributes)
+	(igraph_list_vertex_attributes) : attribute handling added
+	* src/type_indexededgelist.c (igraph_empty, igraph_destroy)
+	(igraph_add_vertices, igraph_delete_vertices) : 
+	attribute handling added
+	* src/rinterface.c (R_strarray_to_SEXP, R_attributes_to_SEXP)
+	(R_SEXP_to_matrix_copy, R_SEXP_to_attributes)
+	(R_SEXP_to_attributes_copy) : added for attributes handling
+	* src/rinterface.c (R_igraph_to_SEXP, R_SEXP_to_igraph)
+	(R_SEXP_to_igraph_copy) : updated for copying the attributes
+	* src/rinterface.c (R_igraph_add_graph_attribute)
+	(R_igraph_remove_graph_attribute, R_igraph_get_graph_attribute)
+	(R_igraph_set_graph_attribute, R_igraph_add_vertex_attribute)
+	(R_igraph_remove_vertex_attribute, R_igraph_get_vertex_attribute)
+	(R_igraph_set_vertex_attribute, R_igraph_get_vertex_attributes)
+	(R_igraph_set_vertex_attributes, R_igraph_list_graph_attributes)
+	(R_igraph_list_vertex_attributes) : added interface to attribute
+	handling
+	* igraph/R/attributes.R (add.graph.attribute)
+	(remove.graph.attribute, get.graph.attribute)
+	(set.graph.attribute, g.a, g.a<-, add.vertex.attribute)
+	(remove.vertex.attribute, get.vertex.attribute)
+	(set.vertex.attribute) : R interface to attribute handling
+	
 2005-10-21  Tamas Nepusz <ntamas@rmki.kfki.hu>
         * configure.in, src/Makefile.am : slight changes to allow the
 	  library to compile as a DLL under Cygwin/Win32
 	* interfaces/python/igraphmodule.c : added FR and KK layout interface
 	
+2005-10-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_iterator_vneis_set) : added
+
+	* src/structural_properties.c (igraph_transitivity)
+	(igraph_transitivity_undirected) : added
+	* igraph/R/structural_properties.R (transitivity) : interface
+	* src/rinterface.c (R_igraph_transitivity) : interface
+
 2005-10-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_subcomponent) : free changed

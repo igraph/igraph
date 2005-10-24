@@ -145,3 +145,12 @@ edge.betweenness <- function(graph, e=0:(ecount(graph)-1), directed=TRUE) {
   .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
         PACKAGE="igraph")[ e+1 ]  
 }
+
+transitivity <- function(graph, type="undirected") {
+  if (is.character(type)) {
+    type <- switch(type, "undirected"=0)
+  }
+
+  .Call("R_igraph_transitivity", graph, as.numeric(type),
+        PACKAGE="igraph")
+}

@@ -39,7 +39,7 @@ layout.spring(graph, \dots, params)
     \item{coolexp}{Numeric, the cooling exponent for the simulated
       annealing (3).}
     \item{maxdelta}{Maximum change (\code{vcount(graph)}).}
-    \item{area}{Area parameter (\code(vcount(graph)^2).}
+    \item{area}{Area parameter (\code{vcount(graph)^2}).}
     \item{repulserad}{Cancellation radius (\code{area}*vcount(graph)).}
   }
   This function was ported from the SNA package.

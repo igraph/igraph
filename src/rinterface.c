@@ -41,13 +41,85 @@ SEXP R_matrix_to_SEXP(matrix_t *m) {
   return result;
 }
 
+SEXP R_strarray_to_SEXP(igraph_strarray_t *sa) {
+  
+  SEXP result;
+  Rbyte *ptr;
+  
+  PROTECT(result=allocVector(RAWSXP, sa->sa_end-sa->sa_begin));
+  memcpy(RAW(result), sa->sa_begin, sizeof(char)*(sa->sa_end-sa->sa_begin));
+  for (ptr = RAW(result); ptr < RAW(result)+(sa->sa_end-sa->sa_begin);
+       ptr++) {
+    if (*ptr == '\0') {
+      *ptr = '\n';
+    }
+  }  
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_attributes_to_SEXP(igraph_attribute_list_t *al) {
+
+  SEXP result;
+
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, allocVector(RAWSXP, al->sa_end-al->sa_begin));
+  memcpy(RAW(VECTOR_ELT(result, 0)), al->sa_begin, 
+	 sizeof(char)*(al->sa_end-al->sa_begin));
+  SET_VECTOR_ELT(result, 1, R_matrix_to_SEXP(&al->numattrs));
+
+  UNPROTECT(1);
+  return result;
+}
+
+int R_SEXP_to_matrix(SEXP pakl, matrix_t *akl) {
+  akl->data=vector_as_vector(REAL(pakl), GET_LENGTH(pakl));
+  akl->nrow=INTEGER(GET_DIM(pakl))[0];
+  akl->ncol=INTEGER(GET_DIM(pakl))[1];
+
+  return 0;
+}
+
+int R_SEXP_to_matrix_copy(SEXP pakl, matrix_t *akl) {
+  vector_init_copy(&akl->data, REAL(pakl), GET_LENGTH(pakl));
+  akl->nrow=INTEGER(GET_DIM(pakl))[0];
+  akl->ncol=INTEGER(GET_DIM(pakl))[1];
+
+  return 0;
+}
+ 
+int R_SEXP_to_attributes(SEXP attr, igraph_attribute_list_t *al) {
+  
+  al->len=INTEGER(GET_DIM(VECTOR_ELT(attr, 1)))[0];
+  al->nstr=INTEGER(GET_DIM(VECTOR_ELT(attr, 1)))[1];
+  al->sa_begin=RAW(VECTOR_ELT(attr, 0));
+  al->sa_end=al->sa_begin+GET_LENGTH(VECTOR_ELT(attr, 0));
+  R_SEXP_to_matrix(VECTOR_ELT(attr,1), &al->numattrs);
+  
+  return 0;
+}
+
+int R_SEXP_to_attributes_copy(SEXP attr, igraph_attribute_list_t *al) {
+
+  al->len=INTEGER(GET_DIM(VECTOR_ELT(attr, 1)))[0];
+  al->nstr=INTEGER(GET_DIM(VECTOR_ELT(attr, 1)))[1];
+  al->sa_begin=Calloc(GET_LENGTH(VECTOR_ELT(attr, 0)), char);
+  al->sa_end=al->sa_begin+GET_LENGTH(VECTOR_ELT(attr, 0));
+  memcpy(al->sa_begin, RAW(VECTOR_ELT(attr, 0)), 
+	 sizeof(char)*GET_LENGTH(VECTOR_ELT(attr, 0)));
+  R_SEXP_to_matrix_copy(VECTOR_ELT(attr,1), &al->numattrs);
+  
+  return 0;
+}
+
 SEXP R_igraph_to_SEXP(igraph_t *graph) {
   
   SEXP result;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   
-  PROTECT(result=NEW_LIST(8));
+  PROTECT(result=NEW_LIST(10));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
   SET_VECTOR_ELT(result, 1, NEW_LOGICAL(1));
   SET_VECTOR_ELT(result, 2, NEW_NUMERIC(no_of_edges));
@@ -56,6 +128,9 @@ SEXP R_igraph_to_SEXP(igraph_t *graph) {
   SET_VECTOR_ELT(result, 5, NEW_NUMERIC(no_of_edges));
   SET_VECTOR_ELT(result, 6, NEW_NUMERIC(no_of_nodes+1));
   SET_VECTOR_ELT(result, 7, NEW_NUMERIC(no_of_nodes+1));
+
+  SET_VECTOR_ELT(result, 8, R_attributes_to_SEXP(&graph->gal));
+  SET_VECTOR_ELT(result, 9, R_attributes_to_SEXP(&graph->val));
   
   REAL(VECTOR_ELT(result, 0))[0]=no_of_nodes;
   LOGICAL(VECTOR_ELT(result, 1))[0]=graph->directed;
@@ -78,14 +153,6 @@ SEXP R_igraph_to_SEXP(igraph_t *graph) {
   return result;
 }
 
-int R_SEXP_to_matrix(SEXP pakl, matrix_t *akl) {
-  akl->data=vector_as_vector(REAL(pakl), GET_LENGTH(pakl));
-  akl->nrow=INTEGER(GET_DIM(pakl))[0];
-  akl->ncol=INTEGER(GET_DIM(pakl))[1];
-
-  return 0;
-}
- 
 int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
   
   res->n=REAL(VECTOR_ELT(graph, 0))[0];
@@ -102,6 +169,10 @@ int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
 			   GET_LENGTH(VECTOR_ELT(graph, 6)));
   res->is=vector_as_vector(REAL(VECTOR_ELT(graph, 7)), 
 			   GET_LENGTH(VECTOR_ELT(graph, 7)));
+  
+  R_SEXP_to_attributes(VECTOR_ELT(graph, 8), &res->gal);
+  R_SEXP_to_attributes(VECTOR_ELT(graph, 9), &res->val);
+  
   return 0;
 }
 
@@ -121,6 +192,10 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
 		   GET_LENGTH(VECTOR_ELT(graph, 6)));
   vector_init_copy(&res->is, REAL(VECTOR_ELT(graph, 7)),
 		   GET_LENGTH(VECTOR_ELT(graph, 7)));
+
+  R_SEXP_to_attributes_copy(VECTOR_ELT(graph, 8), &res->gal);
+  R_SEXP_to_attributes_copy(VECTOR_ELT(graph, 9), &res->val);
+  
   return 0;
 }
 
@@ -1026,3 +1101,216 @@ SEXP R_igraph_degree_sequence_game(SEXP pout_seq, SEXP pin_seq,
   return result;
 }
   
+SEXP R_igraph_transitivity(SEXP graph, SEXP ptype) {
+  
+  igraph_t g;
+  vector_t res;
+  integer_t type=REAL(ptype)[0];
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  vector_init(&res, 0);
+  igraph_transitivity(&g, &res, type);
+  
+  PROTECT(result=NEW_NUMERIC(vector_size(&res)));
+  vector_copy_to(&res, REAL(result));
+  vector_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}
+  
+SEXP R_igraph_add_graph_attribute(SEXP graph, SEXP pname) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_add_graph_attribute(&g, name);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_remove_graph_attribute(SEXP graph, SEXP pname) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_remove_graph_attribute(&g, name);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_graph_attribute(SEXP graph, SEXP pname) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  real_t value;
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  igraph_get_graph_attribute(&g, name, &value);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=value;
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_set_graph_attribute(SEXP graph, SEXP pname, SEXP pvalue) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  real_t value=REAL(pvalue)[0];
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_set_graph_attribute(&g, name, value);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_add_vertex_attribute(SEXP graph, SEXP pname) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_add_vertex_attribute(&g, name);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_remove_vertex_attribute(SEXP graph, SEXP pname) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_remove_vertex_attribute(&g, name);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_vertex_attribute(SEXP graph, SEXP pname, SEXP pv) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  long int v=REAL(pv)[0];
+  real_t value;
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  igraph_get_vertex_attribute(&g, name, v, &value);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=value;
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_set_vertex_attribute(SEXP graph, SEXP pname, SEXP pv, 
+				   SEXP pvalue) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  long int v=REAL(pv)[0];
+  real_t value=REAL(pvalue)[0];
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_set_vertex_attribute(&g, name, v, value);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_vertex_attributes(SEXP graph, SEXP pname, SEXP pv) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  vector_t v=vector_as_vector(REAL(pv), GET_LENGTH(pv));
+  vector_t value;
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  vector_init(&value, 0);
+  igraph_get_vertex_attributes(&g, name, &v, &value);
+  PROTECT(result=NEW_NUMERIC(vector_size(&value)));
+  vector_copy_to(&value, REAL(result));
+  vector_destroy(&value);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_set_vertex_attributes(SEXP graph, SEXP pname, SEXP pv, 
+				    SEXP pvalue) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  vector_t v=vector_as_vector(REAL(pv), GET_LENGTH(pv));
+  vector_t value=vector_as_vector(REAL(pvalue), GET_LENGTH(pvalue));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_set_vertex_attributes(&g, name, &v, &value);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_list_graph_attributes(SEXP graph) {
+  igraph_t g;
+  igraph_strarray_t res;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_strarray_init(&res);
+  igraph_list_graph_attributes(&g, &res);
+  PROTECT(result=R_strarray_to_SEXP(&res));
+  igraph_strarray_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;  
+}
+
+SEXP R_igraph_list_vertex_attributes(SEXP graph) {
+  igraph_t g;
+  igraph_strarray_t res;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_strarray_init(&res);
+  igraph_list_vertex_attributes(&g, &res);
+  PROTECT(result=R_strarray_to_SEXP(&res));
+  igraph_strarray_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;  
+
+}

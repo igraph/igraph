@@ -654,6 +654,29 @@ integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it) {
   }  
 }
 
+int igraph_iterator_vneis_set(igraph_t *graph, igraph_iterator_t *it, 
+			      integer_t vid, igraph_neimode_t mode) {
+
+  igraph_iterator_vneis_data_t *data=it->data;
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
+  data->vid=vid;
+  data->mode=mode;
+  if (mode & IGRAPH_OUT) {
+    data->oidx=VECTOR(graph->os)[(long int)vid];
+  } else {
+    data->oidx=igraph_ecount(graph);
+  }
+  if (mode & IGRAPH_IN) {
+    data->iidx=VECTOR(graph->is)[(long int)vid];
+  } else {
+    data->iidx=igraph_ecount(graph);
+  }  
+  
+  return 0;
+}
+
 /* Iterates over the edges to and/or from a vertex */
 
 /**

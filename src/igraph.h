@@ -269,6 +269,8 @@ typedef struct igraph_s {
   vector_t ii;
   vector_t os;
   vector_t is;
+  igraph_attribute_list_t gal;
+  igraph_attribute_list_t val;
 } igraph_t;
 
 /* -------------------------------------------------- */
@@ -299,6 +301,8 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER=0,
 	       IGRAPH_GET_ADJACENCY_BOTH } igraph_get_adjacency_t;
 
 typedef enum { IGRAPH_DEGSEQ_SIMPLE=0 } igraph_degseq_t;
+
+typedef enum { IGRAPH_TRANSITIVITY_UNDIRECTED=0 } igraph_transitivity_type_t;
 
 /* -------------------------------------------------- */
 /* Interface                                          */
@@ -377,6 +381,8 @@ int igraph_next_vneis(igraph_t *graph, igraph_iterator_t *it);
 int igraph_end_vneis(igraph_t *graph, igraph_iterator_t *it);
 integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it);
 int igraph_reset_vneis(igraph_t *graph, igraph_iterator_t *it);
+int igraph_iterator_vneis_set(igraph_t *graph, igraph_iterator_t *it, 
+			      integer_t vid, igraph_neimode_t mode);
 
 /* Specifics, simple edge iterator */
 int igraph_next_eid(igraph_t *graph, igraph_iterator_t *it);
@@ -411,7 +417,29 @@ int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it,
 integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it);
 int igraph_reset_eneis(igraph_t *graph, igraph_iterator_t *it);
 
-/* TODO: attributes */
+/* -------------------------------------------------- */
+/* Attributes                                         */
+/* -------------------------------------------------- */
+
+int igraph_add_graph_attribute(igraph_t *graph, const char *name);
+int igraph_remove_graph_attribute(igraph_t *graph, const char *name);
+int igraph_get_graph_attribute(igraph_t *graph, const char *name, 
+			       real_t *value);
+int igraph_set_graph_attribute(igraph_t *graph, const char *name, 
+			       real_t value);
+int igraph_list_graph_attributes(igraph_t *graph, igraph_strarray_t *l);
+
+int igraph_add_vertex_attribute(igraph_t *graph, const char *name);
+int igraph_remove_vertex_attribute(igraph_t *graph, const char *name);
+int igraph_get_vertex_attribute(igraph_t *graph, const char *name, 
+				long int v, real_t *value);
+int igraph_set_vertex_attribute(igraph_t *graph, const char *name, 
+				long int v, real_t value);
+int igraph_get_vertex_attributes(igraph_t *graph, const char *name, 
+				 vector_t *v, vector_t *value);
+int igraph_set_vertex_attributes(igraph_t *graph, const char *name, 
+				 vector_t *v, vector_t *value);
+int igraph_list_vertex_attributes(igraph_t *graph, igraph_strarray_t *l);
 
 /* -------------------------------------------------- */
 /* Error handling                                     */
@@ -486,6 +514,8 @@ int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids);
 int igraph_average_path_length(igraph_t *graph, real_t *res,
 			       bool_t directed, bool_t unconn);
 int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops);
+int igraph_transitivity(igraph_t *graph, vector_t *res, 
+			igraph_transitivity_type_t type);
 
 /* TODO: degree.distribution (?) */
 

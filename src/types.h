@@ -128,6 +128,38 @@ int vector_copy(vector_t *to, vector_t *from);
 real_t vector_sum(vector_t *v);
 real_t vector_prod(vector_t *v);
 int vector_init_seq(vector_t *v, real_t from, real_t to);
+int vector_remove_section(vector_t *v, long int from, long int to);
+int vector_move_interval(vector_t *v, long int begin, long int end, 
+			 long int to);
+
+/* -------------------------------------------------- */
+/* Flexible vector, storing pointers                  */
+/* -------------------------------------------------- */
+
+typedef struct s_vector_ptr {
+  void** stor_begin;
+  void** stor_end;
+  void** end;
+} vector_ptr_t;
+
+int vector_ptr_init      (vector_ptr_t* v, long int size);
+int vector_ptr_init_copy (vector_ptr_t* v, void** data, long int length);
+int vector_ptr_destroy   (vector_ptr_t* v);
+int vector_ptr_reserve   (vector_ptr_t* v, long int size);
+int vector_ptr_empty     (vector_ptr_t* v);
+long int vector_ptr_size      (vector_ptr_t* v);
+int vector_ptr_clear     (vector_ptr_t* v);
+int vector_ptr_null      (vector_ptr_t* v);
+int vector_ptr_push_back (vector_ptr_t* v, void* e);
+void* vector_ptr_e         (vector_ptr_t* v, long int pos);
+int vector_ptr_set       (vector_ptr_t* v, long int pos, void* value);
+long int vector_ptr_find(vector_ptr_t* v, void* elem);
+int vector_ptr_change(vector_ptr_t* v, long int pos1, long int pos2);
+int vector_ptr_resize(vector_ptr_t* v, long int newsize);
+vector_ptr_t vector_ptr_as_vector(void* *start, long int length);
+int vector_ptr_copy_to(vector_ptr_t *v, void** to);
+int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from);
+int vector_ptr_remove(vector_ptr_t *v, long int pos);
 
 /* -------------------------------------------------- */
 /* Matrix, very similar to vector                     */
@@ -168,6 +200,11 @@ long int matrix_nrow(matrix_t *m);
 long int matrix_ncol(matrix_t *m);
 int matrix_copy_to(matrix_t *m, real_t *to);
 int matrix_null(matrix_t *m);
+int matrix_add_cols(matrix_t *m, long int n);
+int matrix_add_rows(matrix_t *m, long int n);
+int matrix_remove_col(matrix_t *m, long int col);
+int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove);
+
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */
@@ -327,5 +364,47 @@ int d_indheap_i_build(d_indheap_t* h, long int head);
 int d_indheap_i_shift_up(d_indheap_t* h, long int elem);
 int d_indheap_i_sink(d_indheap_t* h, long int head);
 int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
+
+/* -------------------------------------------------- */
+/* Attribute list, a hash set basically               */
+/* -------------------------------------------------- */
+
+typedef struct s_igraph_strarray {
+  long int nstr;
+  char *sa_begin;
+  char *sa_end;
+} igraph_strarray_t;
+
+int igraph_strarray_init(igraph_strarray_t *sa);
+int igraph_strarray_destroy(igraph_strarray_t *sa);
+
+typedef struct s_igraph_attribute_list {
+  long int len;
+  long int nstr;
+  char* sa_begin;
+  char* sa_end;
+  matrix_t numattrs;
+} igraph_attribute_list_t;
+
+int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len);
+int igraph_attribute_list_destroy(igraph_attribute_list_t *al);
+int igraph_attribute_list_add(igraph_attribute_list_t *al, const char *name);
+int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
+				 const char *name);
+int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
+			      long int idx, real_t *value);
+int igraph_attribute_list_gets(igraph_attribute_list_t *al, const char *name,
+			       vector_t *idx, vector_t *value);
+int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
+			      long int idx, real_t value);
+int igraph_attribute_list_sets(igraph_attribute_list_t *al, const char *name,
+			       vector_t *idx, vector_t *value);
+long int igraph_attribute_list_nattrs(igraph_attribute_list_t *al);
+int igraph_attribute_list_increase_length(igraph_attribute_list_t *al, 
+					  long int n);
+int igraph_attribute_list_remove_elements(igraph_attribute_list_t *al,
+					  long int *index, long int nremove);
+int igraph_attribute_list_list(igraph_attribute_list_t *al, 
+			       igraph_strarray_t *l);
 
 #endif

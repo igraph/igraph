@@ -1,5 +1,8 @@
 o write tutorial
-o add graph, vertex & edge attributes
+o add attributes for edges
+o add string attributes
+o print attributes in print.igraph (R only)
+o vertex and edge iterators in R
 o add methods for reading & saving a file together with its attributes
 o add conversion methods for different file formats
 o comunity detection algorithms
