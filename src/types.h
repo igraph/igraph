@@ -136,6 +136,10 @@ int vector_move_interval(vector_t *v, long int begin, long int end,
 /* Flexible vector, storing pointers                  */
 /* -------------------------------------------------- */
 
+/** \defgroup vectorptr Vector, storing pointers efficiently
+ * \ingroup internal
+ * 
+ */
 typedef struct s_vector_ptr {
   void** stor_begin;
   void** stor_end;
@@ -204,7 +208,8 @@ int matrix_add_cols(matrix_t *m, long int n);
 int matrix_add_rows(matrix_t *m, long int n);
 int matrix_remove_col(matrix_t *m, long int col);
 int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove);
-
+int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove);
+int matrix_copy(matrix_t *to, matrix_t *from);
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */
@@ -369,6 +374,11 @@ int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
 /* Attribute list, a hash set basically               */
 /* -------------------------------------------------- */
 
+/**
+ * \defgroup stringarray Array of strings
+ * \ingroup internal
+ */
+
 typedef struct s_igraph_strarray {
   long int nstr;
   char *sa_begin;
@@ -377,6 +387,11 @@ typedef struct s_igraph_strarray {
 
 int igraph_strarray_init(igraph_strarray_t *sa);
 int igraph_strarray_destroy(igraph_strarray_t *sa);
+
+/**
+ * \defgroup attributelist List of attributes
+ * \ingroup internal
+ */
 
 typedef struct s_igraph_attribute_list {
   long int len;
@@ -404,7 +419,11 @@ int igraph_attribute_list_increase_length(igraph_attribute_list_t *al,
 					  long int n);
 int igraph_attribute_list_remove_elements(igraph_attribute_list_t *al,
 					  long int *index, long int nremove);
+int igraph_attribute_list_remove_elements_neg(igraph_attribute_list_t *al,
+					      vector_t *neg, long int nremove);
 int igraph_attribute_list_list(igraph_attribute_list_t *al, 
 			       igraph_strarray_t *l);
+int igraph_attribute_list_copy(igraph_attribute_list_t *to,
+			       igraph_attribute_list_t *from);
 
 #endif

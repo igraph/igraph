@@ -1,8 +1,7 @@
 o write tutorial
-o add attributes for edges
+o add some iterators: in-, pre-, post-order, depth-first, breadth-first
+  search, etc.
 o add string attributes
-o print attributes in print.igraph (R only)
-o vertex and edge iterators in R
 o add methods for reading & saving a file together with its attributes
 o add conversion methods for different file formats
 o comunity detection algorithms
@@ -11,4 +10,3 @@ o multicompartmental layout functions
 o error handling
 o function for merge networks
 o add data sets to the R package
-o get.edgelist (R) rewrite

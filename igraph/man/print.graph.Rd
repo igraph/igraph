@@ -5,11 +5,15 @@
 \description{These functions attempt to print a graph to the terminal in
   a human readable form.}
 \usage{
-\method{print}{igraph}(x, \dots)
+\method{print}{igraph}(x, graph.attributes=FALSE,
+  vertex.attributes=FALSE, edge.attributes=FALSE, \dots)
 \method{summary}{igraph}(object, \dots)
 }
 \arguments{
   \item{x}{The graph to print.}
+  \item{graph.attributes}{Logical constant, whether to print graph attributes.}
+  \item{vertex.attributes}{Logical constant, whether to print vertex attributes.}
+  \item{edge.attributes}{Logical constant, whether to print edge attributes.}
   \item{object}{The graph of which the summary will be printed.}
   \item{\dots}{Ignored.}
 }

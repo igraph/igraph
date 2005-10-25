@@ -72,7 +72,7 @@ ii.get.from <- function(graph, iterator) {
 }
 
 ii.get.to <- function(graph, iterator) {
-  .Call("R_igraph_iterator_get_to", graph, iterator, PACKAGE="igraph")
+  .Call("R_igraph_iterator_to", graph, iterator, PACKAGE="igraph")
 }
 
 ii.get.edge <- function(graph, iterator) {

@@ -92,3 +92,47 @@ set.vertex.attribute <- function(graph, attrname, v=1:vcount(graph)-1, value) {
 
 v.a <- get.vertex.attribute
 "v.a<-" <- set.vertex.attribute
+
+add.edge.attribute <- function(graph, attrname) {
+  .Call("R_igraph_add_edge_attribute", graph, as.character(attrname),
+        PACKAGE="igraph")
+}
+
+remove.edge.attribute <- function(graph, attrname) {
+  .Call("R_igraph_remove_edge_attribute", graph, as.character(attrname),
+        PACKAGE="igraph")
+}
+
+get.edge.attribute <- function(graph, attrname=NULL,
+                                 e=1:ecount(graph)-1) {
+  if (is.null(attrname)) {
+    res <- .Call("R_igraph_list_edge_attributes", graph,
+                 PACKAGE="igraph")
+    strsplit(rawToChar(res), "\n")[[1]]
+  } else {
+    if (length(e)==1) {    
+      .Call("R_igraph_get_edge_attribute", graph,
+            as.character(attrname), as.numeric(e),
+            PACKAGE="igraph")
+    } else {
+      .Call("R_igraph_get_edge_attributes", graph,
+            as.character(attrname), as.numeric(e),
+            PACKAGE="igraph")
+    }
+  }
+}
+
+set.edge.attribute <- function(graph, attrname, e=1:ecount(graph)-1, value) {
+  if (length(e)==1) {  
+    .Call("R_igraph_set_edge_attribute", graph, as.character(attrname),
+          as.numeric(e), as.numeric(value),
+          PACKAGE="igraph")
+  } else {
+    .Call("R_igraph_set_edge_attributes", graph, as.character(attrname),
+          as.numeric(e), as.numeric(value),
+          PACKAGE="igraph")
+  }    
+}
+
+e.a <- get.edge.attribute
+"e.a<-" <- set.edge.attribute

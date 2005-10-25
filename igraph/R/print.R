@@ -23,8 +23,9 @@
 # Convert graphs to human readable forms
 ###################################################################
 
-## TODO: faster with get.edgelist
-print.igraph <- function(x, ...) {
+print.igraph <- function(x, graph.attributes=FALSE,
+                         vertex.attributes=FALSE, edge.attributes=FALSE,
+                         ...) {
   
   ec <- ecount(x)
   vc <- vcount(x)
@@ -34,20 +35,47 @@ print.igraph <- function(x, ...) {
   cat("Edges:", ec, "\n")
   cat("Directed:", is.directed(x), "\n")
 
+  # Graph attributes
+  if (graph.attributes) {
+    cat("Graph attributes:\n")
+    list <- g.a(x)
+    sapply(list, function(n) { cat("  ", n, "=", g.a(x, n), "\n") })
+  }
+
+  # Vertex attributes
+  if (vertex.attributes) {
+    cat("Vertex attributes:\n")
+    list <- v.a(x)
+    if (vc != 0) {
+      for (i in 0:(vc-1)) {
+        cat("  ", i, "  ")
+        sapply(list, function(n) { cat(n, "=", v.a(x, n, i), "\t")})
+        cat("\n")
+      }
+    }
+  }
+
+  if (edge.attributes) {
+    list <- e.a(x)
+  }
+  
   arrow <- ifelse(is.directed(x), "->", "--")
   if (ec != 0) {
-    cat("\nEdges:\n")
-    idx <- 1
-    for (i in 0:(vc-1)) {
-      neis <- neighbors(x, i, "out")
-      if (!is.directed(x)) {
-        no.loops <- sum(neis==i)
-        neis <- c(neis[ neis > i ], rep(i, no.loops/2))
+    if (!edge.attributes) {
+      cat("\nEdges:\n")
+    } else {
+      cat("\nEdges and their attributes:\n")
+    }
+    it <- ii.create(x, "eid")
+    while (!ii.end(x, it)) {
+      cat(sep="", "[", ii.get.edge(x, it), "] ",
+          ii.get.from(x, it), " ", arrow, " ", ii.get.to(x, it))
+      if (edge.attributes) {
+        sapply(list, function(n)
+               { cat("  ", n, "=", e.a(x, n, ii.get.edge(x,it)), "\t")})
       }
-      for (j in neis) {
-        cat(sep="", "[", idx, "] ", i, " ", arrow, " ", j, "\n")
-        idx <- idx + 1
-      }
+      cat("\n")
+      it <- ii.next(x, it)
     }
   }
   

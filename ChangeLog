@@ -1,5 +1,39 @@
 2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/types.c (matrix_delete_rows_neg, matrix_copy)
+	(igraph_attribute_list_remove_elements_neg)
+	(igraph_attribute_list_copy) : new 
+	* src/attributes.c (igraph_add_edge_attribute)
+	(igraph_remove_edge_attribute, igraph_get_edge_attribute)
+	(igraph_set_edge_attribute, igraph_get_edge_attributes)
+	(igraph_set_edge_attributes, igraph_list_edge_attributes) : new
+	* src/type_indexededgelist.c (igraph_empty, igraph_destroy)
+	(igraph_copy, igraph_add_edges, igraph_delete_edges) 
+	(igraph_delete_vertices) : (mostly edge) attribute handling added
+	* igraph/src/rinterface.c (R_igraph_to_SEXP, R_SEXP_to_igraph)
+	(R_SEXP_to_igraph_copy) : handle edge attributes
+	* igraph/src/rinterface.c (R_igraph_add_edge_attribute)
+	(R_igraph_remove_edge_attribute, R_igraph_get_edge_attribute)
+	(R_igraph_set_edge_attribute, igraph_get_edge_attributes)
+	(R_igraph_set_edge_attributes, igraph_list_edge_attributes) : interface
+	* igraph/R/attributes.R (add.edge.attribute, remove.edge.attribute)
+	(get.edge.attribute, set.edge.attribute, e.a, "e.a<-") : interface
+	* igraph/R/print.R (print.graph) : print edge attributes
+	
+2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* igraph/R/iterators.R (ii.get.to) : bug corrected
+
+	* igraph/R/print.R (print.igraph) : uses iterators, prints attributes
+
+2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+ 	* src/iterators.c (igraph_iterator_eneis)
+ 	(igraph_iterator_eneis_set, igraph_reset_eneis)
+ 	(igraph_next_eneis, igraph_end_eneis, igraph_get_vertex_from_eneis)
+
+2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+ 
 	* src/types.c (igraph_stack_reserve) : added
 	
 	* src/types.c (vector_remove_section, vector_move_interval)

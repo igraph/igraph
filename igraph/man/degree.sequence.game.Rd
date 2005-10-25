@@ -4,7 +4,7 @@
 \description{It is often to create a graph with given vertex
   degrees. This is exactly what \code{degree.sequence.game} does.}
 \usage{
-degree.sequence.game(out.deg, in.deg = NULL, method = "simple", \dots) 
+degree.sequence.game(out.deg, in.deg = numeric(0), method = "simple", \dots) 
 }
 \arguments{
   \item{out.deg}{Numeric vector, the sequence of degrees (for undirected

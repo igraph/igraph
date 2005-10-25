@@ -18,7 +18,8 @@ minimum.spanning.tree(graph, weights=NULL, algorithm="unweighted", \dots)
   }
   \item{algorithm}{The algorithm to use for
     calculation. \code{unweighted} can be used for unwieghted graphs,
-    and \code{prim} runs Prim's algorithm for weighted graphs.
+    and \code{prim} runs Prim's algorithm for weighted graphs.}
+  \item{\dots}{Additional arguments, unused.}
 }
 \details{
   If the graph is unconnected a minimum spanning forest is returned.

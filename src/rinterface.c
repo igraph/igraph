@@ -119,7 +119,7 @@ SEXP R_igraph_to_SEXP(igraph_t *graph) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   
-  PROTECT(result=NEW_LIST(10));
+  PROTECT(result=NEW_LIST(11));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
   SET_VECTOR_ELT(result, 1, NEW_LOGICAL(1));
   SET_VECTOR_ELT(result, 2, NEW_NUMERIC(no_of_edges));
@@ -131,6 +131,7 @@ SEXP R_igraph_to_SEXP(igraph_t *graph) {
 
   SET_VECTOR_ELT(result, 8, R_attributes_to_SEXP(&graph->gal));
   SET_VECTOR_ELT(result, 9, R_attributes_to_SEXP(&graph->val));
+  SET_VECTOR_ELT(result,10, R_attributes_to_SEXP(&graph->eal));
   
   REAL(VECTOR_ELT(result, 0))[0]=no_of_nodes;
   LOGICAL(VECTOR_ELT(result, 1))[0]=graph->directed;
@@ -172,6 +173,7 @@ int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
   
   R_SEXP_to_attributes(VECTOR_ELT(graph, 8), &res->gal);
   R_SEXP_to_attributes(VECTOR_ELT(graph, 9), &res->val);
+  R_SEXP_to_attributes(VECTOR_ELT(graph,10), &res->eal);
   
   return 0;
 }
@@ -195,6 +197,7 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
 
   R_SEXP_to_attributes_copy(VECTOR_ELT(graph, 8), &res->gal);
   R_SEXP_to_attributes_copy(VECTOR_ELT(graph, 9), &res->val);
+  R_SEXP_to_attributes_copy(VECTOR_ELT(graph,10), &res->eal);
   
   return 0;
 }
@@ -1712,4 +1715,122 @@ SEXP R_igraph_iterator_edge(SEXP graph, SEXP pit) {
   
   UNPROTECT(1);
   return result;
+}
+
+SEXP R_igraph_add_edge_attribute(SEXP graph, SEXP pname) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_add_edge_attribute(&g, name);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_remove_edge_attribute(SEXP graph, SEXP pname) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_remove_edge_attribute(&g, name);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_edge_attribute(SEXP graph, SEXP pname, SEXP pv) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  long int v=REAL(pv)[0];
+  real_t value;
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  igraph_get_edge_attribute(&g, name, v, &value);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=value;
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_set_edge_attribute(SEXP graph, SEXP pname, SEXP pv, 
+				 SEXP pvalue) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  long int v=REAL(pv)[0];
+  real_t value=REAL(pvalue)[0];
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_set_edge_attribute(&g, name, v, value);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_edge_attributes(SEXP graph, SEXP pname, SEXP pv) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  vector_t v=vector_as_vector(REAL(pv), GET_LENGTH(pv));
+  vector_t value;
+  SEXP result;
+
+  R_SEXP_to_igraph(graph, &g);
+  vector_init(&value, 0);
+  igraph_get_edge_attributes(&g, name, &v, &value);
+  PROTECT(result=NEW_NUMERIC(vector_size(&value)));
+  vector_copy_to(&value, REAL(result));
+  vector_destroy(&value);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_set_edge_attributes(SEXP graph, SEXP pname, SEXP pv, 
+				  SEXP pvalue) {
+  
+  igraph_t g;
+  const char *name=CHAR(STRING_ELT(pname, 0));
+  vector_t v=vector_as_vector(REAL(pv), GET_LENGTH(pv));
+  vector_t value=vector_as_vector(REAL(pvalue), GET_LENGTH(pvalue));
+  SEXP result;
+
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_set_edge_attributes(&g, name, &v, &value);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_list_edge_attributes(SEXP graph) {
+  igraph_t g;
+  igraph_strarray_t res;
+  SEXP result;
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_strarray_init(&res);
+  igraph_list_edge_attributes(&g, &res);
+  PROTECT(result=R_strarray_to_SEXP(&res));
+  igraph_strarray_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;  
+
 }

@@ -101,6 +101,43 @@ __BEGIN_DECLS
  */
 
 /**
+ * \defgroup attributes Graph, vertex and edge attributes
+ * \brief Attributes are numberic or textual labels assigned to 
+ * graphs, vertices or edges.
+ * 
+ * Attributes are associated values of graph, vertices or edges. A
+ * graph attribute can contain the date of its creations, vertex
+ * attributes describe the color to be used for the vertices when the
+ * graph is plotted, edge attributes can simply be the weights of the
+ * edges in a weighted graph.
+ * 
+ * The name space for graph, vertex and edge attributes are different,
+ * thus the ``color'' vertex attribute has nothing to do with the
+ * ``color'' edge attribute.
+ *
+ * In order to use an attribute, first it has to be added by the
+ * igraph_add_graph_attribute(), igraph_add_vertex_attribute() or
+ * igraph_add_edge_attribute() function. The value(s) of the added
+ * attribute is/are undefined.
+ * 
+ * The value of the attribute can be set after it was added, and also
+ * it can be requested, see the documentation of the specific
+ * functions.
+ * 
+ * The attribute can be removed id it is not needed any more.
+ * 
+ * The attributes are handled properly if vertices and/or edges are
+ * added or removed to or from a graph, the attributes are also copied
+ * if the graph is copied by igraph_copy().
+ * 
+ * Note that right now only numeric attributes are implemented, string
+ * attributes will be added soon.
+ * 
+ * Attribute handling does not change the time complexity of any
+ * functions in the igraph library.
+ */
+
+/**
  * \defgroup layout Layout functions for graph drawing
  * \brief These functions place the vertices of a graph in 2D and 3D,
  * trying to please the eye as much as possible.
@@ -271,6 +308,7 @@ typedef struct igraph_s {
   vector_t is;
   igraph_attribute_list_t gal;
   igraph_attribute_list_t val;
+  igraph_attribute_list_t eal;
 } igraph_t;
 
 /* -------------------------------------------------- */
@@ -453,6 +491,18 @@ int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
 int igraph_set_vertex_attributes(igraph_t *graph, const char *name, 
 				 vector_t *v, vector_t *value);
 int igraph_list_vertex_attributes(igraph_t *graph, igraph_strarray_t *l);
+
+int igraph_add_edge_attribute(igraph_t *graph, const char *name);
+int igraph_remove_edge_attribute(igraph_t *graph, const char *name);
+int igraph_get_edge_attribute(igraph_t *graph, const char *name, 
+			      long int e, real_t *value);
+int igraph_set_edge_attribute(igraph_t *graph, const char *name, 
+			      long int e, real_t value);
+int igraph_get_edge_attributes(igraph_t *graph, const char *name, 
+			       vector_t *e, vector_t *value);
+int igraph_set_edge_attributes(igraph_t *graph, const char *name, 
+			       vector_t *e, vector_t *value);
+int igraph_list_edge_attributes(igraph_t *graph, igraph_strarray_t *l);
 
 /* -------------------------------------------------- */
 /* Error handling                                     */

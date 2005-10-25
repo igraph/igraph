@@ -775,12 +775,20 @@ int vector_init_seq(vector_t *v, real_t from, real_t to) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_remove_section(vector_t *v, long int from, long int to) {
   memmove(v->stor_begin+from, v->stor_begin+to,
 	  sizeof(real_t)*(v->end-v->stor_begin-to));
   v->end -= (to-from);
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int vector_move_interval(vector_t *v, long int begin, long int end, 
 			 long int to) {
@@ -936,10 +944,18 @@ int matrix_null(matrix_t *m) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int matrix_add_cols(matrix_t *m, long int n) {
   matrix_resize(m, m->nrow, m->ncol+n);
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int matrix_add_rows(matrix_t *m, long int n) {
   long int i;
@@ -952,11 +968,19 @@ int matrix_add_rows(matrix_t *m, long int n) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int matrix_remove_col(matrix_t *m, long int col) {
   vector_remove_section(&m->data, (m->nrow)*col, (m->nrow)*(col+1));
   m->ncol--;
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove) {
   long int i, j;
@@ -969,6 +993,37 @@ int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove) {
   }
   matrix_resize(m, m->nrow-nremove, m->ncol);
 
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove) {
+  long int i, j, idx=0;
+  for (i=0; i<m->ncol; i++) {
+    for (j=0; j<m->nrow; j++) {
+      if (VECTOR(*neg)[j] >= 0) {
+	MATRIX(*m, idx++, i) = MATRIX(*m, j, i);
+      } 
+    }
+    idx=0;
+  }
+  matrix_resize(m, m->nrow-nremove, m->ncol);
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int matrix_copy(matrix_t *to, matrix_t *from) {
+  vector_copy(&to->data, &from->data);
+  to->nrow = from->nrow;
+  to->ncol = from->ncol;
+  
   return 0;
 }
 
@@ -2102,6 +2157,10 @@ int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_init      (vector_ptr_t* v, int long size) {	
         long int alloc_size= size > 0 ? size : 1;
 	assert(v != NULL);
@@ -2113,6 +2172,10 @@ int vector_ptr_init      (vector_ptr_t* v, int long size) {
 	return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_destroy   (vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
@@ -2122,6 +2185,10 @@ int vector_ptr_destroy   (vector_ptr_t* v) {
 	
 	return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int vector_ptr_reserve   (vector_ptr_t* v, long int size) {
 	long int actual_size=vector_ptr_size(v);
@@ -2136,6 +2203,10 @@ int vector_ptr_reserve   (vector_ptr_t* v, long int size) {
 	return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_empty     (vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
@@ -2143,11 +2214,19 @@ int vector_ptr_empty     (vector_ptr_t* v) {
 	return v->stor_begin == v->end;
 }
 
+/**
+ * \ingroup internal
+ */
+
 long int vector_ptr_size      (vector_ptr_t* v) {
 	assert(v != NULL);
 	
 	return v->end - v->stor_begin;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int vector_ptr_clear     (vector_ptr_t* v) {
 	assert(v != NULL);
@@ -2156,6 +2235,10 @@ int vector_ptr_clear     (vector_ptr_t* v) {
 	
 	return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int vector_ptr_push_back (vector_ptr_t* v, void* e) {
 	assert(v != NULL);
@@ -2173,11 +2256,19 @@ int vector_ptr_push_back (vector_ptr_t* v, void* e) {
 	return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 void* vector_ptr_e         (vector_ptr_t* v, long int pos) {
 	assert(v != NULL);
 	
 	return * (v->stor_begin + pos);
 }
+
+/**
+ * \ingroup internal
+ */
 
 int vector_ptr_set       (vector_ptr_t* v, long int pos, void* value) {
 	assert(v != NULL);
@@ -2186,12 +2277,20 @@ int vector_ptr_set       (vector_ptr_t* v, long int pos, void* value) {
 	return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_null      (vector_ptr_t* v) {
 	if (vector_ptr_size(v)>0) {
 		memset(v->stor_begin, 0, sizeof(void*)*vector_ptr_size(v));
 	}
 	return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 long int vector_ptr_find(vector_ptr_t* v, void* elem) {
   long int i, s;
@@ -2205,6 +2304,10 @@ long int vector_ptr_find(vector_ptr_t* v, void* elem) {
   return -1;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_change(vector_ptr_t* v, long int pos1, long int pos2) {
   void* tmp;
   assert(v!=NULL);
@@ -2214,11 +2317,19 @@ int vector_ptr_change(vector_ptr_t* v, long int pos1, long int pos2) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_resize(vector_ptr_t* v, long int newsize) {
   vector_ptr_reserve(v, newsize);
   v->end = v->stor_begin+newsize;
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 vector_ptr_t vector_ptr_as_vector(void** data, long int length) {
   vector_ptr_t v;
@@ -2227,6 +2338,10 @@ vector_ptr_t vector_ptr_as_vector(void** data, long int length) {
   
   return v;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int vector_ptr_init_copy(vector_ptr_t *v, void* *data, long int length) {
   v->stor_begin=Calloc(length, void*);
@@ -2237,12 +2352,20 @@ int vector_ptr_init_copy(vector_ptr_t *v, void* *data, long int length) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_copy_to(vector_ptr_t *v, void** to) {
   if (v->end != v->stor_begin) {
     memcpy(to, v->stor_begin, sizeof(void*) * (v->end - v->stor_begin));
   }
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from) {
   to->stor_begin=Calloc(vector_ptr_size(from), void*);
@@ -2253,6 +2376,10 @@ int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int vector_ptr_remove(vector_ptr_t *v, long int pos) {
 
   memcpy(v->stor_begin+pos, v->stor_begin+pos+1,
@@ -2261,6 +2388,10 @@ int vector_ptr_remove(vector_ptr_t *v, long int pos) {
   
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_i_strarray_findnpos(char *begin, char *end, const char *str,
 			       long int *npos, long int *pos) {
@@ -2299,6 +2430,10 @@ int igraph_i_strarray_findnpos(char *begin, char *end, const char *str,
   return ppos;  
 }
 
+/**
+ * \ingroup internal
+ */
+
 int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len) {
   al->len=len;
   al->nstr=0;
@@ -2309,12 +2444,20 @@ int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len) {
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int igraph_attribute_list_destroy(igraph_attribute_list_t *al) {  
   Free(al->sa_begin);
   matrix_destroy(&al->numattrs);
   
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_attribute_list_add(igraph_attribute_list_t *al, const char *name) {
   long int len=strlen(name);
@@ -2330,6 +2473,10 @@ int igraph_attribute_list_add(igraph_attribute_list_t *al, const char *name) {
   
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
 				 const char *name) {
@@ -2357,6 +2504,10 @@ int igraph_attribute_list_remove(igraph_attribute_list_t *al,
   return retval;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
 			      long int idx, real_t *value) {
   
@@ -2381,6 +2532,10 @@ int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
   *value  = MATRIX(al->numattrs, idx, ppos);
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_attribute_list_gets(igraph_attribute_list_t *al, const char *name,
 			       vector_t *idx, vector_t *value) {
@@ -2410,6 +2565,10 @@ int igraph_attribute_list_gets(igraph_attribute_list_t *al, const char *name,
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
 			      long int idx, real_t value) {
   const char *ptr=al->sa_begin;
@@ -2433,6 +2592,10 @@ int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
   MATRIX(al->numattrs, idx, ppos)=value;  
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_attribute_list_sets(igraph_attribute_list_t *al, const char *name,
 			       vector_t *idx, vector_t *value) {
@@ -2465,9 +2628,17 @@ int igraph_attribute_list_sets(igraph_attribute_list_t *al, const char *name,
 }
 
 
+/**
+ * \ingroup internal
+ */
+
 long int igraph_attribute_list_size(igraph_attribute_list_t *al) {
   return al->nstr;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_attribute_list_increase_length(igraph_attribute_list_t *al, 
 					  long int n) {
@@ -2477,6 +2648,10 @@ int igraph_attribute_list_increase_length(igraph_attribute_list_t *al,
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
 int igraph_attribute_list_remove_elements(igraph_attribute_list_t *al,
 					  long int *index, long int nremove) {
   
@@ -2485,6 +2660,23 @@ int igraph_attribute_list_remove_elements(igraph_attribute_list_t *al,
   
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_attribute_list_remove_elements_neg(igraph_attribute_list_t *al,
+					      vector_t *neg, 
+					      long int nremove) {
+  al->len -= nremove;
+  matrix_delete_rows_neg(&al->numattrs, neg, nremove);
+  
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_attribute_list_list(igraph_attribute_list_t *al,
 			       igraph_strarray_t *l) {
@@ -2497,6 +2689,27 @@ int igraph_attribute_list_list(igraph_attribute_list_t *al,
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
+int igraph_attribute_list_copy(igraph_attribute_list_t *to,
+			       igraph_attribute_list_t *from) {
+  to->len = from->len;
+  to->nstr = from->nstr;
+  to->sa_begin = Calloc(from->sa_end - from->sa_begin, char);
+  to->sa_end = to->sa_begin+(from->sa_end - from->sa_begin);
+  memcpy(to->sa_begin, from->sa_begin,
+	 sizeof(char) * (from->sa_end-from->sa_begin));
+  matrix_copy(&to->numattrs, &from->numattrs);
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
 int igraph_strarray_init(igraph_strarray_t *sa) {
   sa->nstr=0;
   sa->sa_begin=Calloc(0, char);
@@ -2504,6 +2717,10 @@ int igraph_strarray_init(igraph_strarray_t *sa) {
   
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
 
 int igraph_strarray_destroy(igraph_strarray_t *sa) {
   Free(sa->sa_begin);
