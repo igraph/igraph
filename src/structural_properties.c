@@ -797,13 +797,15 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
       igraph_neighbors(graph, &tmp, actnode, modein);
       for (j=0; j<vector_size(&tmp); j++) {
 	long int neighbor=VECTOR(tmp)[j];
-	if (distance[neighbor]==distance[actnode]-1) { friends++; }
+	if (distance[neighbor]==distance[actnode]-1 && 
+	    nrgeo[neighbor] != 0) { friends++; }
       }
 
       /* set the temporary score of the friends */
       for (j=0; j<vector_size(&tmp); j++) {
 	long int neighbor=VECTOR(tmp)[j];
-	if (distance[neighbor]==distance[actnode]-1) {
+	if (distance[neighbor]==distance[actnode]-1 &&
+	    nrgeo[neighbor] != 0) {
 	  tmpscore[neighbor] += (tmpscore[actnode]+1)/friends;
 	}
       }
@@ -941,7 +943,8 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
       igraph_iterator_eneis_set(graph, &it, actnode, modein);
       while ( !igraph_end(graph,  &it)) {
 	long int neighbor=igraph_get_vertex_nei(graph, &it);
-	if (distance[neighbor]==distance[actnode]-1) { friends++; }
+	if (distance[neighbor]==distance[actnode]-1 && 
+	    nrgeo[neighbor] != 0) { friends++; }
 	igraph_next(graph, &it);
       }
 
@@ -950,7 +953,8 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
       while ( !igraph_end(graph,  &it)) {
 	long int neighbor=igraph_get_vertex_nei(graph, &it);
 	long int edgeno=igraph_get_edge(graph, &it);
-	if (distance[neighbor]==distance[actnode]-1) {
+	if (distance[neighbor]==distance[actnode]-1 &&
+	    nrgeo[neighbor] != 0) {
 	  tmpscore[neighbor] += (tmpscore[actnode]+1)/friends;
 	  VECTOR(*result)[edgeno] += (tmpscore[actnode]+1)/friends;
 	}

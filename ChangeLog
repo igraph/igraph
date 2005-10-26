@@ -1,3 +1,8 @@
+2005-10-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_betweenness)
+	(igraph_edge_betweenness) : bug corrected
+
 2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/types.c (matrix_delete_rows_neg, matrix_copy)
