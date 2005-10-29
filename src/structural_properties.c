@@ -773,40 +773,33 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
 	if (nrgeo[neighbor] != 0) {
 	  /* we've already seen this node, another shortest path? */
 	  if (distance[neighbor]==distance[actnode]+1) {
-	    nrgeo[neighbor]++;
+	    nrgeo[neighbor]+=nrgeo[actnode];
 	  }
 	} else {
 	  /* we haven't seen this node yet */
-	  nrgeo[neighbor]++;
+	  nrgeo[neighbor]+=nrgeo[actnode];
 	  distance[neighbor]=distance[actnode]+1;
 	  dqueue_push(&q, neighbor);
 	  igraph_stack_push(&stack, neighbor);
 	}
       }
     } /* while !dqueue_empty */
-    
+
     /* Ok, we've the distance of each node and also the number of
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
     while (!igraph_stack_empty(&stack)) {
       long int actnode=igraph_stack_pop(&stack);
-      long int friends=0;
       if (distance[actnode]<=1) { continue; } /* skip source node */
       
-      /* search for the neighbors on the geodesics */
-      igraph_neighbors(graph, &tmp, actnode, modein);
-      for (j=0; j<vector_size(&tmp); j++) {
-	long int neighbor=VECTOR(tmp)[j];
-	if (distance[neighbor]==distance[actnode]-1 && 
-	    nrgeo[neighbor] != 0) { friends++; }
-      }
-
       /* set the temporary score of the friends */
+      igraph_neighbors(graph, &tmp, actnode, modein);
       for (j=0; j<vector_size(&tmp); j++) {
 	long int neighbor=VECTOR(tmp)[j];
 	if (distance[neighbor]==distance[actnode]-1 &&
 	    nrgeo[neighbor] != 0) {
-	  tmpscore[neighbor] += (tmpscore[actnode]+1)/friends;
+	  tmpscore[neighbor] += 
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
 	}
       }
     }
@@ -918,11 +911,11 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
 	if (nrgeo[neighbor] != 0) {
 	  /* we've already seen this node, another shortest path? */
 	  if (distance[neighbor]==distance[actnode]+1) {
-	    nrgeo[neighbor]++;
+	    nrgeo[neighbor]+=nrgeo[actnode];
 	  }
 	} else {
 	  /* we haven't seen this node yet */
-	  nrgeo[neighbor]++;
+	  nrgeo[neighbor]+=nrgeo[actnode];
 	  distance[neighbor]=distance[actnode]+1;
 	  dqueue_push(&q, neighbor);
 	  igraph_stack_push(&stack, neighbor);
@@ -936,18 +929,8 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
        with the farthest nodes. */
     while (!igraph_stack_empty(&stack)) {
       long int actnode=igraph_stack_pop(&stack);
-      long int friends=0;
       if (distance[actnode]<1) { continue; } /* skip source node */
       
-      /* search for the neighbors on the geodesics */
-      igraph_iterator_eneis_set(graph, &it, actnode, modein);
-      while ( !igraph_end(graph,  &it)) {
-	long int neighbor=igraph_get_vertex_nei(graph, &it);
-	if (distance[neighbor]==distance[actnode]-1 && 
-	    nrgeo[neighbor] != 0) { friends++; }
-	igraph_next(graph, &it);
-      }
-
       /* set the temporary score of the friends */
       igraph_iterator_eneis_set(graph, &it, actnode, modein);
       while ( !igraph_end(graph,  &it)) {
@@ -955,8 +938,10 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
 	long int edgeno=igraph_get_edge(graph, &it);
 	if (distance[neighbor]==distance[actnode]-1 &&
 	    nrgeo[neighbor] != 0) {
-	  tmpscore[neighbor] += (tmpscore[actnode]+1)/friends;
-	  VECTOR(*result)[edgeno] += (tmpscore[actnode]+1)/friends;
+	  tmpscore[neighbor] += 
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
+	  VECTOR(*result)[edgeno] += 
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
 	}
 	igraph_next(graph, &it);	
       }
