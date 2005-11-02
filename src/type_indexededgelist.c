@@ -169,7 +169,7 @@ int igraph_add_edges(igraph_t *graph, vector_t *edges) {
     vector_push_back(&graph->to,   VECTOR(*edges)[i++]);
   }
 
-  igraph_attribute_list_increase_length(&graph->eal, edges_to_add);
+  igraph_attribute_list_add_elem(&graph->eal, edges_to_add);
   
   /* oi & ii */
   vector_order(&graph->from, &graph->oi, graph->n);
@@ -209,7 +209,7 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
   
   graph->n += nv;
 
-  igraph_attribute_list_increase_length(&graph->val, nv);
+  igraph_attribute_list_add_elem(&graph->val, nv);
 
   return 0;
 }
@@ -287,8 +287,8 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
   /* OK, all edges to delete are marked with negative numbers */
   
   /* Edge attributes */
-  igraph_attribute_list_remove_elements_neg(&graph->eal, 
-					    &graph->from, really_delete);
+  igraph_attribute_list_remove_elem_neg(&graph->eal, 
+					&graph->from, really_delete);
   
   vector_init(&newfrom, no_of_edges-really_delete);
   vector_init(&newto  , no_of_edges-really_delete);
@@ -389,9 +389,9 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
     }
   }
   
-  igraph_attribute_list_remove_elements(&graph->val, index, really_delete);
-  igraph_attribute_list_remove_elements_neg(&graph->eal, 
-					    &graph->from, edges_to_delete);
+  igraph_attribute_list_remove_elem_idx(&graph->val, index, really_delete);
+  igraph_attribute_list_remove_elem_neg(&graph->eal, 
+					&graph->from, edges_to_delete);
 
   Free(index);
   vector_destroy(&graph->from);

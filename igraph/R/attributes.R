@@ -19,9 +19,12 @@
 #
 ###################################################################
 
-add.graph.attribute <- function(graph, attrname) {
+add.graph.attribute <- function(graph, attrname, type="numeric") {
+  if (is.character(type)) {
+    type <- switch(type, "numeric"=0, "character"=1, "string"=1)
+  }
   .Call("R_igraph_add_graph_attribute", graph, as.character(attrname),
-        PACKAGE="igraph")
+        as.numeric(type), PACKAGE="igraph")
 }
 
 remove.graph.attribute <- function(graph, attrname) {
@@ -31,9 +34,8 @@ remove.graph.attribute <- function(graph, attrname) {
 
 get.graph.attribute <- function(graph, attrname=NULL) {
   if (is.null(attrname)) {
-    res <- .Call("R_igraph_list_graph_attributes", graph,
-                 PACKAGE="igraph")
-    strsplit(rawToChar(res), "\n")[[1]]
+    .Call("R_igraph_list_graph_attributes", graph,
+          PACKAGE="igraph")
   } else {
     .Call("R_igraph_get_graph_attribute", graph, as.character(attrname),
           PACKAGE="igraph")
@@ -42,16 +44,18 @@ get.graph.attribute <- function(graph, attrname=NULL) {
 
 set.graph.attribute <- function(graph, attrname, value) {
   .Call("R_igraph_set_graph_attribute", graph, as.character(attrname),
-        as.numeric(value),
-        PACKAGE="igraph")
+        value, PACKAGE="igraph")
 }
 
 g.a <- get.graph.attribute
 "g.a<-" <- set.graph.attribute
 
-add.vertex.attribute <- function(graph, attrname) {
+add.vertex.attribute <- function(graph, attrname, type="numeric") {
+  if (is.character(type)) {
+    type <- switch(type, "numeric"=0, "character"=1, "string"=1)
+  }
   .Call("R_igraph_add_vertex_attribute", graph, as.character(attrname),
-        PACKAGE="igraph")
+        as.numeric(type), PACKAGE="igraph")
 }
 
 remove.vertex.attribute <- function(graph, attrname) {
@@ -62,9 +66,8 @@ remove.vertex.attribute <- function(graph, attrname) {
 get.vertex.attribute <- function(graph, attrname=NULL,
                                  v=1:vcount(graph)-1) {
   if (is.null(attrname)) {
-    res <- .Call("R_igraph_list_vertex_attributes", graph,
-                 PACKAGE="igraph")
-    strsplit(rawToChar(res), "\n")[[1]]
+    .Call("R_igraph_list_vertex_attributes", graph,
+          PACKAGE="igraph")
   } else {
     if (length(v)==1) {    
       .Call("R_igraph_get_vertex_attribute", graph,
@@ -81,11 +84,11 @@ get.vertex.attribute <- function(graph, attrname=NULL,
 set.vertex.attribute <- function(graph, attrname, v=1:vcount(graph)-1, value) {
   if (length(v)==1) {  
     .Call("R_igraph_set_vertex_attribute", graph, as.character(attrname),
-          as.numeric(v), as.numeric(value),
+          as.numeric(v), value,
           PACKAGE="igraph")
   } else {
     .Call("R_igraph_set_vertex_attributes", graph, as.character(attrname),
-          as.numeric(v), as.numeric(value),
+          as.numeric(v), value,
           PACKAGE="igraph")
   }    
 }
@@ -93,9 +96,12 @@ set.vertex.attribute <- function(graph, attrname, v=1:vcount(graph)-1, value) {
 v.a <- get.vertex.attribute
 "v.a<-" <- set.vertex.attribute
 
-add.edge.attribute <- function(graph, attrname) {
+add.edge.attribute <- function(graph, attrname, type="numeric") {
+  if (is.character(type)) {
+    type <- switch(type, "numeric"=0, "character"=1, "string"=1)
+  }
   .Call("R_igraph_add_edge_attribute", graph, as.character(attrname),
-        PACKAGE="igraph")
+        as.numeric(type), PACKAGE="igraph")
 }
 
 remove.edge.attribute <- function(graph, attrname) {
@@ -106,9 +112,8 @@ remove.edge.attribute <- function(graph, attrname) {
 get.edge.attribute <- function(graph, attrname=NULL,
                                  e=1:ecount(graph)-1) {
   if (is.null(attrname)) {
-    res <- .Call("R_igraph_list_edge_attributes", graph,
-                 PACKAGE="igraph")
-    strsplit(rawToChar(res), "\n")[[1]]
+    .Call("R_igraph_list_edge_attributes", graph,
+          PACKAGE="igraph")
   } else {
     if (length(e)==1) {    
       .Call("R_igraph_get_edge_attribute", graph,
@@ -125,11 +130,11 @@ get.edge.attribute <- function(graph, attrname=NULL,
 set.edge.attribute <- function(graph, attrname, e=1:ecount(graph)-1, value) {
   if (length(e)==1) {  
     .Call("R_igraph_set_edge_attribute", graph, as.character(attrname),
-          as.numeric(e), as.numeric(value),
+          as.numeric(e), value,
           PACKAGE="igraph")
   } else {
     .Call("R_igraph_set_edge_attributes", graph, as.character(attrname),
-          as.numeric(e), as.numeric(value),
+          as.numeric(e), value,
           PACKAGE="igraph")
   }    
 }

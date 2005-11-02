@@ -115,5 +115,25 @@ e.a(g, "weight") <- sample(1:100, 20, replace=TRUE)
 e.a(g, "weight")
 
 print.igraph(g, g=TRUE, v=TRUE, e=TRUE)
+
+g2 <- graph.star(10)
+g2 <- add.graph.attribute(g2, "date", "character")
+g.a(g2, "date")
+g.a(g2, "date") <- "2005/10/25"
+g.a(g2, "date")
+remove.graph.attribute(g2, "date") ## g2 is unchanged
+g.a(g2)
+g.a(g2, "date")
+
+g2 <- add.vertex.attribute(g2, "id", "character")
+abc <- strsplit("abcdefghujklmnpqrstuvwxyz", "")[[1]]
+v.a(g2, "id") <- abc
+v.a(g2, "id")
+
+g2 <- add.edge.attribute(g2, "random", "character")
+e.a(g2, "random") <- sample(1:100, 20, replace=TRUE)
+e.a(g2, "random")
+
+print.igraph(g2, g=TRUE, v=TRUE, e=TRUE)
 }
 \keyword{graphs}

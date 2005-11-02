@@ -409,6 +409,14 @@ real_t vector_e         (vector_t* v, long int pos) {
  * \ingroup internal
  */
 
+real_t*vector_e_ptr  (vector_t* v, long int pos) {
+  return v->stor_begin+pos;
+}
+
+/**
+ * \ingroup internal
+ */
+
 int vector_set       (vector_t* v, long int pos, real_t value) {
 	assert(v != NULL);
 	
@@ -790,6 +798,14 @@ int vector_remove_section(vector_t *v, long int from, long int to) {
  * \ingroup internal
  */
 
+int vector_remove(vector_t *v, long int elem) {
+  return vector_remove_section(v, elem, elem+1);
+}
+
+/**
+ * \ingroup internal
+ */
+
 int vector_move_interval(vector_t *v, long int begin, long int end, 
 			 long int to) {
   memcpy(v->stor_begin+to, v->stor_begin+begin, 
@@ -798,6 +814,33 @@ int vector_move_interval(vector_t *v, long int begin, long int end,
   return 0;
 }
 
+/**
+ * \ingroup internal
+ */
+
+int vector_permdelete(vector_t *v, long int *index, long int nremove) {
+  long int i;
+  for (i=0; i<vector_size(v); i++) {
+    VECTOR(*v)[ index[i]-1 ] = VECTOR(*v)[i];
+  }
+  vector_resize(v, vector_size(v)-nremove);
+  
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove) {
+  long int i, idx=0;
+  for (i=0; i<vector_size(v); i++) {
+    VECTOR(*v)[idx++] = VECTOR(*v)[i];
+  }
+  vector_resize(v, vector_size(v)-nremove);
+  
+  return 0;
+}
 
 /**
  * \ingroup matrix
@@ -2186,6 +2229,20 @@ int vector_ptr_destroy   (vector_ptr_t* v) {
 	return 0;
 }
 
+int vector_ptr_free_all   (vector_ptr_t* v) {
+  void **ptr;
+  for (ptr=v->stor_begin; ptr<v->end; ptr++) {
+    Free(*ptr);
+  }
+  return 0;
+}
+
+int vector_ptr_destroy_all   (vector_ptr_t* v) {
+  vector_ptr_free_all(v);
+  vector_ptr_destroy(v);
+  return 0;
+}
+
 /**
  * \ingroup internal
  */
@@ -2242,7 +2299,7 @@ int vector_ptr_clear     (vector_ptr_t* v) {
 
 int vector_ptr_push_back (vector_ptr_t* v, void* e) {
 	assert(v != NULL);
-	
+
 	/* full, allocate more storage */
 	if (v->stor_end == v->end) {
 		long int new_size = vector_ptr_size(v) * 2;
@@ -2393,53 +2450,9 @@ int vector_ptr_remove(vector_ptr_t *v, long int pos) {
  * \ingroup internal
  */
 
-int igraph_i_strarray_findnpos(char *begin, char *end, const char *str,
-			       long int *npos, long int *pos) {
-
-  const char *ptr=begin;
-  const char *strptr=str;
-  long int ppos=0, cpos=0, spos=-1;
-  bool_t l=0;
-  
-  while (!l && ptr < end) { 
-    strptr=str;
-    spos++;
-    ppos=cpos;
-    while (*ptr == *strptr && *ptr != '\0') {
-      ptr++; strptr++; cpos++;
-    }
-    l=(*ptr=='\0' && *strptr=='\0');
-    while (!l && *ptr != '\0') {
-      ptr++; cpos++;
-    }
-    ptr++; cpos++;
-  }
-
-  if (!l) {
-    ppos=-1;
-    spos=-1;
-  }
-
-  if (npos != NULL) {
-    *npos = ppos;
-  }
-  if (pos != NULL) {
-    *pos = spos;
-  }
-  
-  return ppos;  
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len) {
-  al->len=len;
-  al->nstr=0;
-  al->sa_begin=Calloc(0, char);
-  al->sa_end=al->sa_begin;
-  matrix_init(&al->numattrs, len, 0);
+int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
+  sv->data=Calloc(len, char*);
+  sv->len=len;
 
   return 0;
 }
@@ -2448,120 +2461,66 @@ int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len) {
  * \ingroup internal
  */
 
-int igraph_attribute_list_destroy(igraph_attribute_list_t *al) {  
-  Free(al->sa_begin);
-  matrix_destroy(&al->numattrs);
-  
-  return 0;
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_attribute_list_add(igraph_attribute_list_t *al, const char *name) {
-  long int len=strlen(name);
-  long int oldsize=al->sa_end - al->sa_begin;
-  long int newsize=oldsize+len+1;
-  
-  al->sa_begin = Realloc(al->sa_begin, newsize, char);
-  al->sa_end=al->sa_begin+newsize;
-  strcpy(al->sa_begin+oldsize, name); /* copies the '\0' as well */
-  al->nstr++;
-  
-  matrix_add_cols(&al->numattrs, 1);
-  
-  return 0;
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
-				 const char *name) {
-  int retval=0;
-  long int npos, spos;
-  
-  igraph_i_strarray_findnpos(al->sa_begin, al->sa_end, name, &npos, &spos);
-  
-  if (npos == -1) {
-    /* No such attribute */
-    retval=-1;
-  } else {
-    long int endpos=npos;
-    while (*(al->sa_begin+endpos) != '\0') {
-      endpos++;
-    }
-    memcpy(al->sa_begin+npos, al->sa_begin+endpos+1, 
-	   sizeof(char)*(al->sa_end-al->sa_begin-endpos));
-    al->sa_end -= (endpos-npos+1);
-    al->nstr--;
-  }
-
-  matrix_remove_col(&al->numattrs, spos);
-
-  return retval;
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
-			      long int idx, real_t *value) {
-  
-  const char *ptr=al->sa_begin;
-  const char *strptr=name;
-  long int ppos=-1;
-  bool_t l=0;
-  
-  while (!l && ptr < al->sa_end) { 
-    strptr=name;
-    ppos++;
-    while (*ptr == *strptr && *ptr != '\0') {
-      ptr++; strptr++;
-    }
-    l=(*ptr=='\0' && *strptr=='\0');
-    while (!l && *ptr != '\0') {
-      ptr++;
-    }
-    ptr++;
-  }
-  
-  *value  = MATRIX(al->numattrs, idx, ppos);
-  return 0;
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_attribute_list_gets(igraph_attribute_list_t *al, const char *name,
-			       vector_t *idx, vector_t *value) {
-  const char *ptr=al->sa_begin;
-  const char *strptr=name;
-  long int ppos=-1;
-  bool_t l=0;
+int igraph_strvector_destroy(igraph_strvector_t *sv) {
   long int i;
+  for (i=0; i<sv->len; i++) {
+    if (sv->data[i] != 0) {
+      Free(sv->data[i]);
+    }
+  }
+  Free(sv->data);
   
-  while (!l && ptr < al->sa_end) { 
-    strptr=name;
-    ppos++;
-    while (*ptr == *strptr && *ptr != '\0') {
-      ptr++; strptr++;
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strvector_get(igraph_strvector_t *sv, long int idx, char **value) {
+  if (sv->data[idx] == 0) {
+    sv->data[idx] = Calloc(1, char);
+  }
+  *value = sv->data[idx];
+  
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strvector_set(igraph_strvector_t *sv, long int idx, 
+			 const char *value) {
+  if (sv->data[idx] == 0) {
+    sv->data[idx] = Calloc(strlen(value)+1, char);
+  } else {
+    sv->data[idx] = Realloc(sv->data[idx], strlen(value)+1, char);
+  }
+  strcpy(sv->data[idx], value);
+  
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
+				    long int to) {
+  long int i;
+  for (i=from; i<to; i++) {
+    if (v->data[i] != 0) {
+      Free(v->data[i]);
     }
-    l=(*ptr=='\0' && *strptr=='\0');
-    while (!l && *ptr != '\0') {
-      ptr++;
-    }
-    ptr++;
+  }
+  for (i=0; i<v->len-to; i++) {
+    v->data[from+i]=v->data[to+i];
   }
 
-  vector_resize(value, vector_size(idx));
-  for (i=0; i<vector_size(idx); i++) {
-    VECTOR(*value)[i] = MATRIX(al->numattrs, (long int) VECTOR(*idx)[i], ppos);
-  }
+  v->data=Realloc(v->data, v->len-(to-from), char*);
+  v->len -= (to-from);
+
   return 0;
 }
 
@@ -2569,94 +2528,43 @@ int igraph_attribute_list_gets(igraph_attribute_list_t *al, const char *name,
  * \ingroup internal
  */
 
-int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
-			      long int idx, real_t value) {
-  const char *ptr=al->sa_begin;
-  const char *strptr=name;
-  long int ppos=-1;
-  bool_t l=0;
-  
-  while (!l && ptr < al->sa_end) { 
-    strptr=name;
-    ppos++;
-    while (*ptr == *strptr && *ptr != '\0') {
-      ptr++; strptr++;
-    }
-    l=(*ptr=='\0' && *strptr=='\0');
-    while (!l && *ptr != '\0') {
-      ptr++;
-    }
-    ptr++;
-  }
-  
-  MATRIX(al->numattrs, idx, ppos)=value;  
-  return 0;
+int igraph_strvector_remove(igraph_strvector_t *v, long int elem) {
+  return igraph_strvector_remove_section(v, elem, elem+1);
 }
 
 /**
  * \ingroup internal
  */
 
-int igraph_attribute_list_sets(igraph_attribute_list_t *al, const char *name,
-			       vector_t *idx, vector_t *value) {
-  const char *ptr=al->sa_begin;
-  const char *strptr=name;
-  long int ppos=-1;
-  bool_t l=0;
-  long int i, j=0, vs;
-  
-  while (!l && ptr < al->sa_end) { 
-    strptr=name;
-    ppos++;
-    while (*ptr == *strptr && *ptr != '\0') {
-      ptr++; strptr++;
+int igraph_strvector_move_interval(igraph_strvector_t *v, long int begin, 
+				   long int end, long int to) {
+  long int i;
+  for (i=to; i<to+end-begin; i++) {
+    if (v->data[i] != 0) {
+      Free(v->data[i]);
     }
-    l=(*ptr=='\0' && *strptr=='\0');
-    while (!l && *ptr != '\0') {
-      ptr++;
-    }
-    ptr++;
+  }
+  for (i=0; i<end-begin; i++) {
+    v->data[to+i]=v->data[begin+i];
   }
   
-  vs=vector_size(value);
-  for (i=0; i<vector_size(idx); i++) {
-    MATRIX(al->numattrs, (long int)VECTOR(*idx)[i], ppos) = VECTOR(*value)[j];
-    j++; 
-    if (j>=vs) { j=0; }
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from) {
+  long int i;
+  char *str;
+  to->data=Calloc(from->len, char*);
+  to->len=from->len;
+  
+  for (i=0; i<from->len; i++) {
+    igraph_strvector_get(from, i, &str);
+    igraph_strvector_set(to, i, str);
   }
-  return 0;
-}
-
-
-/**
- * \ingroup internal
- */
-
-long int igraph_attribute_list_size(igraph_attribute_list_t *al) {
-  return al->nstr;
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_attribute_list_increase_length(igraph_attribute_list_t *al, 
-					  long int n) {
-  al->len += n;
-  matrix_add_rows(&al->numattrs, n);
-
-  return 0;
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_attribute_list_remove_elements(igraph_attribute_list_t *al,
-					  long int *index, long int nremove) {
-  
-  al->len -= nremove;
-  matrix_permdelete_rows(&al->numattrs, index, nremove);
   
   return 0;
 }
@@ -2665,11 +2573,21 @@ int igraph_attribute_list_remove_elements(igraph_attribute_list_t *al,
  * \ingroup internal
  */
 
-int igraph_attribute_list_remove_elements_neg(igraph_attribute_list_t *al,
-					      vector_t *neg, 
-					      long int nremove) {
-  al->len -= nremove;
-  matrix_delete_rows_neg(&al->numattrs, neg, nremove);
+int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
+  long int toadd=newsize-v->len;
+  
+  if (newsize < v->len) { 
+    long int i;
+    for (i=v->len; i<newsize; i++) {
+      Free(v->data[i]);
+    }
+  }
+  
+  v->data = Realloc(v->data, newsize, char*);
+  if (newsize > v->len) {
+    memset(v->data+v->len, 0, toadd*sizeof(char*));
+  }
+  v->len = newsize;
   
   return 0;
 }
@@ -2678,13 +2596,60 @@ int igraph_attribute_list_remove_elements_neg(igraph_attribute_list_t *al,
  * \ingroup internal
  */
 
-int igraph_attribute_list_list(igraph_attribute_list_t *al,
-			       igraph_strarray_t *l) {
-  long int s=al->sa_end - al->sa_begin;
-  l->nstr = al->nstr;
-  l->sa_begin = Realloc(l->sa_begin, s, char);
-  l->sa_end = l->sa_begin + s;
-  memcpy(l->sa_begin, al->sa_begin, sizeof(char)*s);
+long int igraph_strvector_size(igraph_strvector_t *sv) {
+  return sv->len;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+  long int s=igraph_strvector_size(v);
+  igraph_strvector_resize(v, s+1);
+  igraph_strvector_set(v, s, value);
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
+				long int nremove) {
+  long int i;
+  for (i=0; i<igraph_strvector_size(v); i++) {
+    v->data[ index[i]-1 ] = v->data[i];
+  }
+  igraph_strvector_resize(v, igraph_strvector_size(v)-nremove);
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strvector_remove_negidx(igraph_strvector_t *v, vector_t *neg, 
+				   long int nremove) {
+  long int i, idx=0;
+  for (i=0; i<igraph_strvector_size(v); i++) {
+    v->data[idx++] = v->data[i];
+  }
+  igraph_strvector_resize(v, igraph_strvector_size(v)-nremove);
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_init(igraph_strmatrix_t *sm, 
+			  long int nrow, long int ncol) {
+  sm->nrow=nrow;
+  sm->ncol=ncol;
+  igraph_strvector_init(&sm->data, nrow*ncol);
   
   return 0;
 }
@@ -2693,27 +2658,8 @@ int igraph_attribute_list_list(igraph_attribute_list_t *al,
  * \ingroup internal
  */
 
-int igraph_attribute_list_copy(igraph_attribute_list_t *to,
-			       igraph_attribute_list_t *from) {
-  to->len = from->len;
-  to->nstr = from->nstr;
-  to->sa_begin = Calloc(from->sa_end - from->sa_begin, char);
-  to->sa_end = to->sa_begin+(from->sa_end - from->sa_begin);
-  memcpy(to->sa_begin, from->sa_begin,
-	 sizeof(char) * (from->sa_end-from->sa_begin));
-  matrix_copy(&to->numattrs, &from->numattrs);
-
-  return 0;
-}
-
-/**
- * \ingroup internal
- */
-
-int igraph_strarray_init(igraph_strarray_t *sa) {
-  sa->nstr=0;
-  sa->sa_begin=Calloc(0, char);
-  sa->sa_end=sa->sa_begin;
+int igraph_strmatrix_destroy(igraph_strmatrix_t *sm) {
+  igraph_strvector_destroy(&sm->data);
   
   return 0;
 }
@@ -2722,11 +2668,142 @@ int igraph_strarray_init(igraph_strarray_t *sa) {
  * \ingroup internal
  */
 
-int igraph_strarray_destroy(igraph_strarray_t *sa) {
-  Free(sa->sa_begin);
+int igraph_strmatrix_get(igraph_strmatrix_t *sm, long int row, long int col,
+			  char **value) {
+  igraph_strvector_get(&sm->data, col*(sm->nrow)+row, value);
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_set(igraph_strmatrix_t *sm, long int row, long int col,
+			 const char *value) {
+  igraph_strvector_set(&sm->data, col*(sm->nrow)+row, value);
   
   return 0;
 }
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_add_cols(igraph_strmatrix_t *sm, long int n) {
+  igraph_strmatrix_resize(sm, sm->nrow, sm->ncol+n);
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_remove_col(igraph_strmatrix_t *m, long int col) {
+  igraph_strvector_remove_section(&m->data, (m->nrow)*col, (m->nrow)*(col+1));
+  m->ncol--;
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_add_rows(igraph_strmatrix_t *m, long int n) {
+  long int i;
+  igraph_strvector_resize(&m->data, (m->ncol)*(m->nrow+n));
+  for (i=m->ncol-1; i>=0; i--) {
+    igraph_strvector_move_interval(&m->data, (m->nrow)*i, (m->nrow)*(i+1),
+				   (m->nrow+n)*i);
+  }
+  m->nrow += n;
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_permdelete_rows(igraph_strmatrix_t *m, long int *index, 
+				     long int nremove) {
+  long int i, j;
+  char *str;
+  for (i=0; i<m->ncol; i++) {
+    for (j=0; j<m->nrow; j++) {
+      if (index[j] != 0) {
+	igraph_strmatrix_get(m, j, i, &str);
+	igraph_strmatrix_set(m, index[j]-1, i, str);
+      }
+    }
+  }
+  igraph_strmatrix_resize(m, m->nrow-nremove, m->ncol);
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_delete_rows_neg(igraph_strmatrix_t *m, 
+				     vector_t *neg, long int nremove) {
+  long int i, j, idx=0;
+  char *str;
+  for (i=0; i<m->ncol; i++) {
+    for (j=0; j<m->nrow; j++) {
+      if (VECTOR(*neg)[j] >= 0) {
+	igraph_strmatrix_get(m, j, i, &str);
+	igraph_strmatrix_set(m, idx++, i, str);
+      } 
+    }
+    idx=0;
+  }
+  igraph_strmatrix_resize(m, m->nrow-nremove, m->ncol);
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_copy(igraph_strmatrix_t *to, igraph_strmatrix_t *from) {
+  igraph_strvector_copy(&to->data, &from->data);
+  to->nrow = from->nrow;
+  to->ncol = from->ncol;
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_strmatrix_resize(igraph_strmatrix_t *sm, 
+			    long int nrow, long int ncol) {
+  igraph_strvector_resize(&sm->data, nrow*ncol);
+  sm->nrow=nrow;
+  sm->ncol=ncol;
+
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+long int igraph_strmatrix_nrow(igraph_strmatrix_t *sm) {
+  return sm->nrow;
+}
+
+/**
+ * \ingroup internal
+ */
+
+long int igraph_strmatrix_ncol(igraph_strmatrix_t *sm) {
+  return sm->ncol;
+}
+
+
 
 /**********************************************************
  * Testing purposes, vector                               *

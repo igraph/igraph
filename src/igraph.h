@@ -36,6 +36,7 @@
 __BEGIN_DECLS
 
 #include "types.h"
+#include "attributes.h"
 
 /** \defgroup types Basic data types.
  * \brief Important data types for vectors, matrices and graphs.
@@ -130,9 +131,12 @@ __BEGIN_DECLS
  * added or removed to or from a graph, the attributes are also copied
  * if the graph is copied by igraph_copy().
  * 
- * Note that right now only numeric attributes are implemented, string
- * attributes will be added soon.
- * 
+ * There are two types of attributes, numeric
+ * (<b>IGRAPH_ATTRIBUTE_NUM</b>) and  string
+ * (<b>IGRAPH_ATTRIBUTE_STR</b>). These types cannot be mixed for an
+ * attribute, ie. if the "id" vertex attribute is a string attribute
+ * then it is a string attribute for all vertices.
+ *
  * Attribute handling does not change the time complexity of any
  * functions in the igraph library.
  */
@@ -472,37 +476,52 @@ int igraph_reset_eneis(igraph_t *graph, igraph_iterator_t *it);
 /* Attributes                                         */
 /* -------------------------------------------------- */
 
-int igraph_add_graph_attribute(igraph_t *graph, const char *name);
+int igraph_add_graph_attribute(igraph_t *graph, const char *name,
+			       igraph_attribute_type_t type);
 int igraph_remove_graph_attribute(igraph_t *graph, const char *name);
 int igraph_get_graph_attribute(igraph_t *graph, const char *name, 
-			       real_t *value);
+			       void **value,
+			       igraph_attribute_type_t *type);
 int igraph_set_graph_attribute(igraph_t *graph, const char *name, 
-			       real_t value);
-int igraph_list_graph_attributes(igraph_t *graph, igraph_strarray_t *l);
+			       void *value);
+int igraph_list_graph_attributes(igraph_t *graph, igraph_strvector_t *l,
+				 vector_t *types);
+int igraph_get_graph_attribute_type(igraph_t *graph, const char *name, 
+				    igraph_attribute_type_t *type);
 
-int igraph_add_vertex_attribute(igraph_t *graph, const char *name);
+int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
+				igraph_attribute_type_t type);
 int igraph_remove_vertex_attribute(igraph_t *graph, const char *name);
 int igraph_get_vertex_attribute(igraph_t *graph, const char *name, 
-				long int v, real_t *value);
+				long int v, void **value,
+				igraph_attribute_type_t *type);
 int igraph_set_vertex_attribute(igraph_t *graph, const char *name, 
-				long int v, real_t value);
+				long int v, void *value);
 int igraph_get_vertex_attributes(igraph_t *graph, const char *name, 
-				 vector_t *v, vector_t *value);
+				 vector_t *v, void **value);
 int igraph_set_vertex_attributes(igraph_t *graph, const char *name, 
-				 vector_t *v, vector_t *value);
-int igraph_list_vertex_attributes(igraph_t *graph, igraph_strarray_t *l);
+				 vector_t *v, void *value);
+int igraph_list_vertex_attributes(igraph_t *graph, igraph_strvector_t *l,
+				  vector_t *types);
+int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name, 
+				     igraph_attribute_type_t *type);
 
-int igraph_add_edge_attribute(igraph_t *graph, const char *name);
+int igraph_add_edge_attribute(igraph_t *graph, const char *name, 
+			      igraph_attribute_type_t type);
 int igraph_remove_edge_attribute(igraph_t *graph, const char *name);
 int igraph_get_edge_attribute(igraph_t *graph, const char *name, 
-			      long int e, real_t *value);
+			      long int e, void **value,
+			      igraph_attribute_type_t *type);
 int igraph_set_edge_attribute(igraph_t *graph, const char *name, 
-			      long int e, real_t value);
+			      long int e, void *value);
 int igraph_get_edge_attributes(igraph_t *graph, const char *name, 
-			       vector_t *e, vector_t *value);
+			       vector_t *e, void **value);
 int igraph_set_edge_attributes(igraph_t *graph, const char *name, 
-			       vector_t *e, vector_t *value);
-int igraph_list_edge_attributes(igraph_t *graph, igraph_strarray_t *l);
+			       vector_t *e, void *value);
+int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
+				vector_t *types);
+int igraph_get_edge_attribute_type(igraph_t *graph, const char *name, 
+				   igraph_attribute_type_t *type);
 
 /* -------------------------------------------------- */
 /* Error handling                                     */

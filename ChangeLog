@@ -1,8 +1,134 @@
+2005-10-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* igraph/src/rinterface.c (R_igraph_set_vertex_attributes)
+	(R_igraph_set_edge_attributes) : there is no type argument any more
+
+2005-10-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/types.c (vector_e_ptr, vector_remove, vector_permdelete)
+	(vector_remove_negidx, vector_ptr_free_all, vector_ptr_destroy_all)
+	: new
+	* src/types.c (igraph_attribute_list_init)
+	(igraph_attribute_list_destroy, igraph_attribute_list_add)
+	(igraph_attribute_list_addstr, igraph_attribute_list_remove)
+	(igraph_attribute_list_get, igraph_attribute_list_getstr)
+	(igraph_attribute_list_getany, igraph_attribute_list_gets)
+	(igraph_attribute_list_set, igraph_attribute_list_setstr)
+	(igraph_attribute_list_setany, igraph_attribute_list_sets)
+	(igraph_attribute_list_size, igraph_attribute_list_encrease_length)
+	(igraph_attribute_list_remove_elements)
+	(igraph_attribute_list_remove_elements_neg)
+	(igraph_attribute_list_list, igraph_attribute_list_copy)
+	(igraph_attribute_list_getsany, igraph_attribute_list_setsany)
+	(igraph_attribute_list_gettype) : deleted
+	* src/types.c (igraph_i_strarray_findnpos, igraph_strarray_init)
+	(igraph_strarray_destroy) : deleted
+	* src/types.c (igraph_strvector_remove, igraph_strvector_add)
+	(igraph_strvector_permdelete, igraph_strvector_remove_negidx) : new
+	(igraph_strvector_resize) : free deleted entries, memory leak corrected
+	* src/attributes.c (igraph_i_attribute_list_get_pos)
+	(igraph_i_attribute_list_free, igraph_attribute_list_init)
+	(igraph_attribute_list_destroy, igraph_attribute_list_add)
+	(igraph_attribute_list_remove, igraph_attribute_list_get)
+	(igraph_attribute_list_set, igraph_attribute_list_get_many)
+	(igraph_attribute_list_set_many, igraph_attribute_list_get_all)
+	(igraph_attribute_list_size, igraph_attribute_list_add_elem)
+	(igraph_attribute_list_names, igraph_attribute_list_copy)
+	(igraph_attribute_list_get_type, igraph_attribute_list_remove_elem_idx)
+	(igraph_attribute_list_remove_elem_neg) : new
+	* src/attributes.c (igraph_add_graph_attribute)
+	(igraph_get_graph_attribute, igraph_set_graph_attribute)
+	(igraph_list_graph_attributes, igraph_add_vertex_attribute)
+	(igraph_get_vertex_attribute, igraph_set_vertex_attribute)
+	(igraph_get_vertex_attributes, igraph_set_vertex_attributes)
+	(igraph_list_vertex_attributes,  igraph_add_edge_attribute)
+	(igraph_get_edge_attribute, igraph_set_edge_attribute)
+	(igraph_get_edge_attributes, igraph_set_edge_attributes)
+	(igraph_list_edge_attributes) : updated for new attribute handling
+	(igraph_get_graph_attribute_type, igraph_get_vertex_attribute_type)
+	(igraph_get_edge_attribute_type) : new
+	* src/type_indexededgelist.c (igraph_add_edges, igraph_add_vertices)
+	(igraph_delete_edges, igraph_delete_vertices) : updates for new
+	attribute handling
+	* igraph/src/rinterface.c (R_igraph_strvector_to_SEXP)
+	(R_igraph_SEXP_to_strvector, R_igraph_SEXP_to_strvector_copy)
+	(R_attributes_to_SEXP, R_SEXP_to_attributes, R_SEXP_to_attributes_copy)
+	: updated to new strvector and attribute structure
+	(R_igraph_strmatrix_to_SEXP, R_SEXP_to_igraph_strmatrix)
+	(R_SEXP_to_igraph_strmatrix_copy, R_strarray_to_SEXP) : deleted
+	(R_igraph_add_graph_attribute, R_igraph_get_graph_attribute)
+	(R_igraph_set_graph_attribute, R_igraph_list_graph_attributes)
+	(R_igraph_add_vertex_attribute, R_igraph_get_vertex_attribute)
+	(R_igraph_set_vertex_attribute, R_igraph_list_vertex_attributes)
+	(R_igraph_get_vertex_attributes, R_igraph_set_vertex_attributes)
+	(R_igraph_add_edge_attribute, R_igraph_get_edge_attribute)
+	(R_igraph_set_edge_attribute, R_igraph_list_edge_attributes)
+	(R_igraph_get_edge_attributes, R_igraph_set_edge_attributes) :
+	updated to new attribute structure
+	* igraph/R/attributes.R (get.graph.attribute, get.vertex.attribute)
+	(get.edge.attribute) : updated to strvector type
+	
 2005-10-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_betweenness)
 	(igraph_edge_betweenness) : another bug corrected
 
+2005-10-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/types.c (igraph_attribute_list_init)
+	(igraph_attribute_list_destroy, igraph_attribute_list_add)
+	(igraph_attribute_list_addstr, igraph_attribute_list_remove)
+	(igraph_attribute_list_get, igraph_attribute_list_getstr)
+	(igraph_attribute_list_getany, igraph_attribute_list_gets)
+	(igraph_attribute_list_set, igraph_attribute_list_setstr)
+	(igraph_attribute_list_setany, igraph_attribute_list_sets)
+	(igraph_attribute_list_size, igraph_attribute_list_increase_length)
+	(igraph_attribute_list_remove_elements)
+	(igraph_attribute_list_remove_elements_neg)
+	(igraph_attribute_list_list, igraph_attribute_list_copy)
+	(igraph_attribute_list_getsany, igraph_attribute_list_setsany)
+	(igraph_attribute_list_gettype) : string attributes added
+	* src/types.c (igraph_strvector_init)
+	(igraph_strvector_destroy, igraph_strvector_get)
+	(igraph_strvector_set, igraph_strvector_remove_section)
+	(igraph_strvector_move_interval, igraph_strvector_copy)
+	(igraph_strvector_resize, igraph_strvector_size)
+	(igraph_strmatrix_init, igraph_strmatrix_destroy)
+	(igraph_strmatrix_get, igraph_strmatrix_set)
+	(igraph_strmatrix_add_cols, igraph_strmatrix_remove_col)
+	(igraph_strmatrix_add_rows, igraph_strmatrix_permdelete_rows)
+	(igraph_strmatrix_delete_rows_neg, igraph_strmatrix_copy)
+	(igraph_strmatrix_resize, igraph_strmatrix_nrow)
+	(igraph_strmatrix_ncol) : new
+	* src/attributes.c (igraph_add_graph_attribute)
+	(igraph_get_graph_attribute, igraph_set_graph_attribute)
+	(igraph_list_graph_attributes, igraph_add_vertex_attribute)
+	(igraph_get_vertex_attribute, igraph_set_vertex_attribute)
+	(igraph_get_vertex_attributes, igraph_set_vertex_attributes)
+	(igraph_list_vertex_attributes, igraph_add_edge_attribute)
+	(igraph_get_edge_attribute, igraph_set_edge_attribute)
+	(igraph_get_edge_attributes, igraph_set_edge_attributes)
+	(igraph_list_edge_attributes, igraph_get_graph_attribute_type)
+	(igraph_get_vertex_attribute_type, igraph_get_edge_attribute_type) :
+	string attributes added, some new
+	* igraph/src/rinterface.c (R_igraph_strvector_to_SEXP)
+	(R_igraph_SEXP_to_strvector, R_igraph_SEXP_to_strvector1)
+	(R_igraph_SEXP_to_strvector_copy, R_igraph_strmatrix_to_SEXP)
+	(R_attributes_to_SEXP, R_SEXP_to_igraph_strmatrix)
+	(R_SEXP_to_igraph_strmatrix_copy, R_SEXP_to_attributes)
+	(R_SEXP_to_attributes_copy, R_igraph_add_graph_attribute)
+	(R_igraph_get_graph_attribute, R_igraph_set_graph_attribute)
+	(R_igraph_add_vertex_attribute, R_igraph_get_vertex_attribute)
+	(R_igraph_set_vertex_attribute, R_igraph_get_vertex_attributes)
+	(R_igraph_set_vertex_attributes, R_igraph_list_graph_attributes)
+	(R_igraph_list_vertex_attributes, R_igraph_add_edge_attribute)
+	(R_igraph_get_edge_attribute, R_igraph_set_edge_attribute)
+	(R_igraph_get_edge_attributes, R_igraph_set_edge_attributes)
+	(R_igraph_list_edge_attributes) : R interface
+	* igraph/R/attributes.R (add.graph.attribute)
+	(set.graph.attribute, add.vertex.attribute, set.vertex.attribute)
+	(add.edge.attribute, set.edge.attribute) : R interface
+	
 2005-10-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_betweenness)
@@ -59,7 +185,7 @@
 
 	* src/types.c (igraph_i_strarray_findnpos)
 	(igraph_attribute_list_init, igraph_attribute_list_destroy)
-	(igraph_attribute_list_add, igraph_attributes_list_remove)
+	(igraph_attribute_list_add, igraph_attribute_list_remove)
 	(igraph_attribute_list_get, igraph_attribute_list_gets)
 	(igraph_attribute_list_set, igraph_attribute_list_sets)
 	(igraph_attribute_list_size, igraph_attribute_list_remove_elements)

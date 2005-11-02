@@ -111,6 +111,7 @@ int vector_clear     (vector_t* v);
 int vector_null      (vector_t* v);
 int vector_push_back (vector_t* v, real_t e);
 real_t vector_e         (vector_t* v, long int pos);
+real_t*vector_e_ptr  (vector_t* v, long int pos);
 int vector_set       (vector_t* v, long int pos, real_t value);
 int vector_add       (vector_t* v, long int pos, real_t value);
 int vector_replace_first(vector_t* v, real_t old, real_t newe);
@@ -131,6 +132,9 @@ int vector_init_seq(vector_t *v, real_t from, real_t to);
 int vector_remove_section(vector_t *v, long int from, long int to);
 int vector_move_interval(vector_t *v, long int begin, long int end, 
 			 long int to);
+int vector_remove(vector_t *v, long int elem);
+int vector_permdelete(vector_t *v, long int *index, long int nremove);
+int vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
@@ -149,6 +153,8 @@ typedef struct s_vector_ptr {
 int vector_ptr_init      (vector_ptr_t* v, long int size);
 int vector_ptr_init_copy (vector_ptr_t* v, void** data, long int length);
 int vector_ptr_destroy   (vector_ptr_t* v);
+int vector_ptr_free_all   (vector_ptr_t* v);
+int vector_ptr_destroy_all   (vector_ptr_t* v);
 int vector_ptr_reserve   (vector_ptr_t* v, long int size);
 int vector_ptr_empty     (vector_ptr_t* v);
 long int vector_ptr_size      (vector_ptr_t* v);
@@ -379,51 +385,70 @@ int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
  * \ingroup internal
  */
 
-typedef struct s_igraph_strarray {
-  long int nstr;
-  char *sa_begin;
-  char *sa_end;
-} igraph_strarray_t;
+/* typedef struct s_igraph_strarray { */
+/*   long int nstr; */
+/*   char *sa_begin; */
+/*   char *sa_end; */
+/* } igraph_strarray_t; */
 
-int igraph_strarray_init(igraph_strarray_t *sa);
-int igraph_strarray_destroy(igraph_strarray_t *sa);
+/* int igraph_strarray_init(igraph_strarray_t *sa); */
+/* int igraph_strarray_destroy(igraph_strarray_t *sa); */
 
 /**
- * \defgroup attributelist List of attributes
  * \ingroup internal
  */
 
-typedef struct s_igraph_attribute_list {
-  long int len;
-  long int nstr;
-  char* sa_begin;
-  char* sa_end;
-  matrix_t numattrs;
-} igraph_attribute_list_t;
+typedef struct s_igraph_strvector {
+  char **data;
+  long int len;  
+} igraph_strvector_t;
 
-int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len);
-int igraph_attribute_list_destroy(igraph_attribute_list_t *al);
-int igraph_attribute_list_add(igraph_attribute_list_t *al, const char *name);
-int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
-				 const char *name);
-int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
-			      long int idx, real_t *value);
-int igraph_attribute_list_gets(igraph_attribute_list_t *al, const char *name,
-			       vector_t *idx, vector_t *value);
-int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
-			      long int idx, real_t value);
-int igraph_attribute_list_sets(igraph_attribute_list_t *al, const char *name,
-			       vector_t *idx, vector_t *value);
-long int igraph_attribute_list_nattrs(igraph_attribute_list_t *al);
-int igraph_attribute_list_increase_length(igraph_attribute_list_t *al, 
-					  long int n);
-int igraph_attribute_list_remove_elements(igraph_attribute_list_t *al,
-					  long int *index, long int nremove);
-int igraph_attribute_list_remove_elements_neg(igraph_attribute_list_t *al,
-					      vector_t *neg, long int nremove);
-int igraph_attribute_list_list(igraph_attribute_list_t *al, 
-			       igraph_strarray_t *l);
-int igraph_attribute_list_copy(igraph_attribute_list_t *to,
-			       igraph_attribute_list_t *from);
+int igraph_strvector_init(igraph_strvector_t *sv, long int len);
+int igraph_strvector_destroy(igraph_strvector_t *sv);
+long int igraph_strvector_size(igraph_strvector_t *sv);
+int igraph_strvector_get(igraph_strvector_t *sv, long int idx, char **value);
+int igraph_strvector_set(igraph_strvector_t *sv, long int idx, 
+			 const char *value);
+int igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
+				    long int to);
+int igraph_strvector_remove(igraph_strvector_t *v, long int elem);
+int igraph_strvector_move_interval(igraph_strvector_t *v, long int begin, 
+				   long int end, long int to);
+int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from);
+int igraph_strvector_resize(igraph_strvector_t* v, long int newsize);
+int igraph_strvector_add(igraph_strvector_t *v, const char *value);
+int igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
+				long int nremove);
+int igraph_strvector_remove_negidx(igraph_strvector_t *v, vector_t *neg, 
+				   long int nremove);
+  
+/**
+ * \ingroup internal
+ */
+
+typedef struct s_igraph_strmatrix {
+  igraph_strvector_t data;
+  long int nrow, ncol;
+} igraph_strmatrix_t;
+
+int igraph_strmatrix_init(igraph_strmatrix_t *sm, 
+			  long int nrow, long int ncol);
+int igraph_strmatrix_destroy(igraph_strmatrix_t *sm);
+int igraph_strmatrix_get(igraph_strmatrix_t *sm, long int row, long int col,
+			  char **value);
+int igraph_strmatrix_set(igraph_strmatrix_t *sm, long int row, long int col,
+			 const char *value);
+int igraph_strmatrix_add_cols(igraph_strmatrix_t *sm, long int n);
+int igraph_strmatrix_remove_col(igraph_strmatrix_t *sm, long int col);
+int igraph_strmatrix_add_rows(igraph_strmatrix_t *m, long int n);
+int igraph_strmatrix_permdelete_rows(igraph_strmatrix_t *m, long int *index, 
+				     long int nremove);
+int igraph_strmatrix_delete_rows_neg(igraph_strmatrix_t *m, 
+				     vector_t *neg, long int nremove);
+int igraph_strmatrix_copy(igraph_strmatrix_t *to, igraph_strmatrix_t *from);
+int igraph_strmatrix_resize(igraph_strmatrix_t *sm, 
+			    long int nrow, long int ncol);
+long int igraph_strmatrix_nrow(igraph_strmatrix_t *sm);
+long int igraph_strmatrix_ncol(igraph_strmatrix_t *sm);
 
 #endif
