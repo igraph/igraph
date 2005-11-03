@@ -1,3 +1,28 @@
+2005-11-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/types.c (igraph_i_trie_init_node, igraph_trie_init)
+	(igraph_i_trie_destroy_node, igraph_trie_destroy)
+	(igraph_i_strdiff, igraph_trie_get_node, igraph_trie_get)
+	(igraph_trie_get2, igraph_trie_idx) : new, Patricia trie data type
+	* src/foreign-ncol-lexer.l : parser for the ncol file type
+	* src/foreign-ncol-parser.y : parser for the ncol file type
+	* src/foreign.c (igraph_read_graph_ncol, igraph_write_graph_ncol) :
+	new file format added
+	* igraph/src/rinterface.c (R_igraph_read_graph_ncol)
+	(R_igraph_write_graph_ncol) : interface
+	* igraph/R/foreign.R (read.graph.ncol, write.graph.ncol) : interface
+	* igraph/R/foreign.R (read.graph, write.graph, read.graph.edgelist)
+	(write.graph.edgelist, write.graph.lgl) : don't pass "format" argument
+	
+2005-11-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_read_graph_edgelist)
+	(igraph_write_graph_edgelist) : new
+	* igraph/src/rinterface.c (R_igraph_read_graph_edgelist)
+	(R_igraph_write_graph_edgelist) : R interface
+	* igraph/R/foreign.R (read.graph.edgelist, write.graph.edgelist) :
+	  R interface
+
 2005-10-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* igraph/src/rinterface.c (R_igraph_set_vertex_attributes)

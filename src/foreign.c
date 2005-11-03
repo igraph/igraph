@@ -22,16 +22,286 @@
 
 #include "igraph.h"
 
-int igraph_read_graph(const char *filename, integer_t format) {
+#include <ctype.h>		/* isspace */
+
+/**
+ * \ingroup loadsave
+ * \brief Reads an edge list from a file and creates a graph
+ * 
+ * This format is simply a series of even number integers separated by
+ * whitespace. The one edge (ie. two integers) per line format is thus
+ * not required (but recommended for readability). Edges of directed
+ * graphs are assumed to be in from, to order.
+ * @param graph Pointer to an uninitialized graph object.
+ * @param instream Pointer to a stream, it should be readable.
+ * @param n The number of vertices in the graph. If smaller than the
+ *        largest integer in the file it will be ignored. It is thus
+ *        safe to supply zero here.
+ * @param directed Logical, if true the graph is directed, if false it
+ *        will be undirected.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * plus the number of edges. It is assumed that reading an integer
+ * requires <code>O(1)</code> time.
+ */
+
+int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream, 
+			       integer_t n, bool_t directed) {
+
+  vector_t edges;
+  vector_init(&edges, 0);
+  vector_reserve(&edges, 100);
+  long int from, to;
+  int c;
+
+  /* skip all whitespace */
+  do {
+    c = getc (instream);
+  } while (isspace (c));
+  ungetc (c, instream);
+  
+  while (!feof(instream)) {
+    int read;
+    read=fscanf(instream, "%li", &from);
+    if (read != 1) { igraph_error("Parse error in file\n"); }
+    read=fscanf(instream, "%li", &to);
+    if (read != 1) { igraph_error("Parse error in file\n"); }
+    vector_push_back(&edges, from);
+    vector_push_back(&edges, to);
+    
+    /* skip all whitespace */
+    do {
+      c = getc (instream);
+    } while (isspace (c));
+    ungetc (c, instream);    
+  }
+  
+  igraph_create(graph, &edges, n, directed);
+  vector_destroy(&edges);
+  return 0;
+}
+
+extern int igraph_ncol_yyparse();
+extern FILE *igraph_ncol_yyin;
+vector_t *igraph_ncol_vector=0;
+vector_t *igraph_ncol_weights=0;
+igraph_trie_t *igraph_ncol_trie=0;
+
+/**
+ * \ingroup loadsave
+ * \brief Reads a \a .ncol file used by LGL, also useful for creating
+ * graphs from "named" (and optionally weighted) edge lists.
+ * 
+ * This format is used by the Large Graph Layout program
+ * (http://bioinformatics.icmb.utexas.edu/lgl/), and it is simply a
+ * symbolic weighted edge list. It is a simple text file with one edge
+ * per line. An edge is defined by two symbolic vertex names separated
+ * by whitespace. (The symbolic vertex names themselves cannot contain 
+ * whitespace. They might follow by an optional number, this will be
+ * the weight of the edge; the number can be negative and can be in
+ * scientific notation. If there is no weight specified to an edge it
+ * is assumed to be zero.
+ *
+ * The resulting graph is always undirected.
+ * LGL cannot deal with files which contain multiple or loop edges, 
+ * this is however not checked here, as \a igraph is happy with
+ * these.
+ * @param graph Pointer to an uninitialized graph object.
+ * @param instream Pointer to a stream, it should be readable.
+ * @param names Logical value, if TRUE the symbolic names of the
+ *        vertices will be added to the graph as a vertex attribute
+ *        called "name".
+ * @param weights Logical value, if TRUE the weights of the
+ *        edges is added to the graph as an edge attribute called
+ *        "weight".
+ * @return Error code.
+ *
+ * Time complexity: <code>O(|V|+|E|)</code> if we neglect the time
+ * required by the parsing. As usual <code>|V|</code> is the number of
+ * vertices, while <code>|E|</code> is the number of edges.
+ */
+
+int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, 
+			  bool_t names, bool_t weights) {
+  
+  vector_t edges, ws;
+  igraph_trie_t trie;
+
+  igraph_ncol_vector=&edges;
+  vector_init(&edges, 0);
+  igraph_ncol_weights=&ws;
+  vector_init(&ws, 0);
+  igraph_ncol_trie=&trie;
+  igraph_trie_init(&trie, names);
+  igraph_ncol_yyin=instream;
+  igraph_ncol_yyparse();
+
+  igraph_create(graph, &edges, 0, 0);
+  vector_destroy(&edges);
+  
+  if (weights) {
+    /* TODO: we cannot really assume that the edge ids are the same
+       as the order they were added. TODO: add edges together with
+       attributes */
+    long int i;
+    igraph_add_edge_attribute(graph, "weight", IGRAPH_ATTRIBUTE_NUM);
+    for (i=0; i<igraph_ecount(graph); i++) {
+      igraph_set_edge_attribute(graph, "weight", i, &VECTOR(ws)[i]);
+    }
+  }
+  vector_destroy(&ws);
+  
+  if (names) {
+    long int i;
+    igraph_add_vertex_attribute(graph, "name", IGRAPH_ATTRIBUTE_STR);
+    for (i=0; i<igraph_vcount(graph); i++) {
+      char *str;
+      igraph_trie_idx(&trie, i, &str);
+      igraph_set_vertex_attribute(graph, "name", i, str);
+    }
+  }
+  igraph_trie_destroy(&trie);
+
+  return 0;
+}
+
+int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   /* TODO */
   return 0;
 }
 
-int igraph_write_graph(igraph_t *graph, const char *filename, 
-		       integer_t format) {
+/**
+ * \ingroup loadsave
+ * \brief Writes the edge list of a graph to a file
+ * 
+ * One edge is written per line, separated by a single space.
+ * For directed graphs edges are written in from, to order.
+ * @param graph The graph object to write.
+ * @param outstream Pointer to a stream, it should be writable.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|E|)</code>, the number of edges in the
+ * graph. It is assumed that writing an integer to the file requires
+ * <code>O(1)</code> time.
+ */
+
+int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream) {
+
+  igraph_iterator_t it;
+  
+  igraph_iterator_efromorder(graph, &it);
+  while (!igraph_end(graph, &it)) {
+    fprintf(outstream, "%li %li\n", 
+	    (long int) igraph_get_vertex_from(graph, &it),
+	    (long int) igraph_get_vertex_to(graph, &it));
+    igraph_next(graph, &it);
+  }
+  
+  return 0;
+}
+
+/** 
+ * \ingroup loadsave
+ * \brief Writes the graph to a file in \a .ncol format
+ * 
+ * \a .ncol is a format used by LGL, see igraph_read_graph_ncol() for 
+ * details. 
+ * 
+ * Note that having multiple or loop edges in an \a .ncol file breaks
+ * the  LGL software but \a igraph does not check for this condition.
+ * @param graph The graph to write.
+ * @param outstream The stream object to write to, it should be
+ *        writable.
+ * @param names The name of the vertex attribute, if symbolic names
+ *        are written to the file. If not supply 0 here.
+ * @param weights The name of the edge attribute, if they are also
+ *        written to the file. If you don't want weights supply 0
+ *        here.
+ * @return Error code.
+ * 
+ * Time complexity: <code>O(|E|)</code>, the number of edges. All file
+ * operations are expected to have time complexity <code>O(1)</code>.
+ */
+
+int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream, 
+			    const char *names, const char *weights) {
+  igraph_iterator_t it;
+  
+  igraph_iterator_efromorder(graph, &it);
+  if (names==0 && weights ==0) {
+    /* No names, no weights */
+    while (!igraph_end(graph, &it)) {
+      fprintf(outstream, "%li %li\n",
+	      (long int) igraph_get_vertex_from(graph, &it),
+	      (long int) igraph_get_vertex_to(graph, &it));
+      igraph_next(graph, &it);
+    }
+  } else if (weights==0) {
+    /* No weights, but use names */
+    while (!igraph_end(graph, &it)) {
+      igraph_attribute_type_t type;
+      long int from=igraph_get_vertex_from(graph, &it);
+      long int to  =igraph_get_vertex_to  (graph, &it);
+      void *ptr1, *ptr2;
+      igraph_get_vertex_attribute(graph, names, from, &ptr1, &type);
+      igraph_get_vertex_attribute(graph, names, to,   &ptr2, &type);
+      if (type==IGRAPH_ATTRIBUTE_NUM) {
+	fprintf(outstream, "%f %f\n", *(real_t*)ptr1, *(real_t*)ptr2);
+      } else if (type==IGRAPH_ATTRIBUTE_STR) {
+	fprintf(outstream, "%s %s\n", (char*)ptr1, (char*)ptr2);
+      }
+      igraph_next(graph, &it);
+    }
+  } else if (names==0) {
+    /* No names but weights */
+    while (!igraph_end(graph, &it)) {
+      igraph_attribute_type_t type;
+      long int from=igraph_get_vertex_from(graph, &it);
+      long int to  =igraph_get_vertex_to  (graph, &it);
+      long int edge=igraph_get_edge(graph, &it);
+      void *ptr;
+      igraph_get_edge_attribute(graph, weights, edge, &ptr, &type);
+      if (type==IGRAPH_ATTRIBUTE_NUM) {
+	fprintf(outstream, "%li %li %f\n", from, to, *(real_t*)ptr);
+      } else if (type==IGRAPH_ATTRIBUTE_STR) {
+	fprintf(outstream, "%li %li %s\n", from, to, (char*)ptr);
+      }
+      igraph_next(graph, &it);
+    }
+  } else {
+    /* Both names and weights */
+    while (!igraph_end(graph, &it)) {
+      igraph_attribute_type_t vtype, etype;
+      long int from=igraph_get_vertex_from(graph, &it);
+      long int to  =igraph_get_vertex_to  (graph, &it);
+      long int edge=igraph_get_edge(graph, &it);
+      void *ptr, *ptr1, *ptr2;
+      igraph_get_vertex_attribute(graph, names, from, &ptr1, &vtype);
+      igraph_get_vertex_attribute(graph, names, to,   &ptr2, &vtype);
+      igraph_get_edge_attribute(graph, weights, edge, &ptr, &etype);
+      if (vtype==IGRAPH_ATTRIBUTE_NUM) {
+	fprintf(outstream, "%f %f ", *(real_t*)ptr1, *(real_t*)ptr2);
+      } else if (vtype==IGRAPH_ATTRIBUTE_STR) {
+	fprintf(outstream, "%s %s ", (char*)ptr1, (char*)ptr2);
+      }
+      if (etype==IGRAPH_ATTRIBUTE_NUM) {
+	fprintf(outstream, "%f\n", *(real_t*)ptr);
+      } else if (etype==IGRAPH_ATTRIBUTE_STR) {
+	fprintf(outstream, "%s\n", (char*)ptr);
+      }
+      igraph_next(graph, &it);
+    }
+  }
+
+  return 0;
+}
+
+int igraph_write_graph_pajek(igraph_t *graph, FILE *outstream) {
   /* TODO */
   return 0;
 }
+
 
 /* /\* Skip space in the string *\/ */
 /* char *REST_i_skip_space(char *p) { */

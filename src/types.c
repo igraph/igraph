@@ -2803,6 +2803,232 @@ long int igraph_strmatrix_ncol(igraph_strmatrix_t *sm) {
   return sm->ncol;
 }
 
+/**
+ * \ingroup internal
+ */
+
+int igraph_i_trie_init_node(igraph_trie_node_t *t) { 
+  igraph_strvector_init(&t->strs, 0);
+  vector_ptr_init(&t->children, 0);
+  vector_init(&t->values, 0);
+  return 0;
+}  
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_trie_init(igraph_trie_t *t, bool_t storekeys) {
+  igraph_i_trie_init_node( (igraph_trie_node_t *)t );
+  t->maxvalue=-1;
+  t->storekeys=storekeys;
+  if (storekeys) {
+    igraph_strvector_init(&t->keys, 0);
+  }
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_i_trie_destroy_node(igraph_trie_node_t *t, bool_t sfree) {
+  long int i;
+  igraph_strvector_destroy(&t->strs);
+  for (i=0; i<vector_ptr_size(&t->children); i++) {
+    igraph_trie_node_t *child=VECTOR(t->children)[i];
+    if (child != 0) {
+      igraph_i_trie_destroy_node(child, 1);
+    }
+  }
+  vector_ptr_destroy(&t->children);
+  vector_destroy(&t->values);
+  if (sfree) { Free(t); }
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_trie_destroy(igraph_trie_t *t) {
+  if (t->storekeys) {
+    igraph_strvector_destroy(&t->keys);
+  }
+  return igraph_i_trie_destroy_node( (igraph_trie_node_t*) t, 0);
+}
+
+
+/**
+ * \ingroup internal
+ */
+
+long int igraph_i_strdiff(const char *str, const char *key) {
+
+  long int diff=0;
+  while (key[diff] != '\0' && str[diff] != '\0' && str[diff]==key[diff]) {
+    diff++;
+  }
+  return diff;
+}
+
+/**
+ * \ingroup internal
+ */
+
+long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key, 
+			      real_t newvalue) {
+  char *str;
+  long int i;
+
+  for (i=0; i<igraph_strvector_size(&t->strs); i++) {
+    long int diff;
+    igraph_strvector_get(&t->strs, i, &str);
+    diff=igraph_i_strdiff(str, key);
+    
+    if (diff == 0) {
+
+      /* ------------------------------------ */
+      /* No match, next */
+
+    } else if (str[diff]=='\0' && key[diff]=='\0') {
+
+      /* ------------------------------------ */
+      /* They are exactly the same */
+      if (VECTOR(t->values)[i] != -1) {
+	return VECTOR(t->values)[i];
+      } else {
+	VECTOR(t->values)[i]=newvalue;
+	return newvalue;
+      }
+
+    } else if (str[diff]=='\0') {
+
+      /* ------------------------------------ */
+      /* str is prefix of key, follow its link if there is one */
+      igraph_trie_node_t *node=VECTOR(t->children)[i];
+      if (node != 0) {
+	return igraph_trie_get_node(node, key+diff, newvalue);
+      } else {
+	igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
+	igraph_strvector_init(&node->strs, 1);
+	vector_ptr_init(&node->children, 1);
+	vector_init(&node->values, 1);
+	igraph_strvector_set(&node->strs, 0, key+diff);
+	VECTOR(node->children)[0]=0;
+	VECTOR(node->values)[0]=newvalue;
+
+	VECTOR(t->children)[i]=node;
+
+	return newvalue;
+      }
+
+    } else if (key[diff]=='\0') {
+
+      /* ------------------------------------ */
+      /* key is prefix of str, the node has to be cut */
+      char *str2;
+      
+      igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
+      igraph_strvector_init(&node->strs, 1);
+      vector_ptr_init(&node->children, 1);
+      vector_init(&node->values, 1);
+      igraph_strvector_set(&node->strs, 0, str+diff);
+      VECTOR(node->children)[0]=VECTOR(t->children)[i];
+      VECTOR(node->values)[0]=VECTOR(t->values)[i];
+
+      str2=strdup(str);
+      str2[diff]='\0';
+      igraph_strvector_set(&t->strs, i, str2);
+      free(str2);
+
+      VECTOR(t->values)[i]=newvalue;
+      VECTOR(t->children)[i]=node;
+      
+      return newvalue;
+
+    } else {
+
+      /* ------------------------------------ */
+      /* the first diff characters match */
+      char *str2;
+
+      igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
+      igraph_strvector_init(&node->strs, 2);
+      vector_ptr_init(&node->children, 2);
+      vector_init(&node->values, 2);
+      igraph_strvector_set(&node->strs, 0, str+diff);
+      igraph_strvector_set(&node->strs, 1, key+diff);
+      VECTOR(node->children)[0]=VECTOR(t->children)[i];
+      VECTOR(node->children)[1]=0;
+      VECTOR(node->values)[0]=VECTOR(t->values)[i];
+      VECTOR(node->values)[1]=newvalue;
+
+      str2=strdup(str);
+      str2[diff]='\0';
+      igraph_strvector_set(&t->strs, i, str2);
+      free(str2);
+
+      VECTOR(t->values)[i]=-1;
+      VECTOR(t->children)[i]=node;
+      
+      return newvalue;
+    }
+  }
+
+  /* ------------------------------------ */
+  /* Nothing matches */
+
+  igraph_strvector_add(&t->strs, key);
+  vector_ptr_push_back(&t->children, 0);
+  vector_push_back(&t->values, newvalue);
+  return newvalue;
+}
+
+/**
+ * \ingroup internal
+ */
+
+long int igraph_trie_get(igraph_trie_t *t, const char *key) {
+  long int retval = igraph_trie_get_node( (igraph_trie_node_t*) t, 
+					  key, t->maxvalue+1);
+  if (retval > t->maxvalue) {
+    t->maxvalue=retval;
+    if (t->storekeys) {
+      igraph_strvector_add(&t->keys, key);
+    }
+  }
+
+  return retval;
+}
+
+/**
+ * \ingroup internal
+ */
+
+long int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length) {
+  long int retval;
+  char *tmp=Calloc(length+1, char);
+  
+  strncpy(tmp, key, length);
+  tmp[length]='\0';
+  retval=igraph_trie_get(t, tmp);
+  Free(tmp);
+  return retval;
+}
+
+/**
+ * \ingroup internal
+ */
+
+int igraph_trie_idx(igraph_trie_t *t, long int idx, char **str) {
+  if (t->storekeys) {
+    return igraph_strvector_get(&t->keys, idx, str);
+  } else {
+    /* Error */
+    return -1;
+  }
+}
 
 
 /**********************************************************
@@ -2936,5 +3162,46 @@ long int igraph_strmatrix_ncol(igraph_strmatrix_t *sm) {
 /*   printf("------------------- DESTROY --------------------\n"); */
 /*   igraph_attribute_list_destroy(&al); */
 
+/*   return 0; */
+/* } */
+
+/**********************************************************
+ * Testing purposes, trie                                 *
+ *********************************************************/
+
+/* #include <stdio.h> */
+
+/* int main() { */
+  
+/*   igraph_trie_t trie; */
+
+/*   /\* init *\/ */
+/*   printf("----init------------------------\n"); */
+/*   igraph_trie_init(&trie); */
+
+/*   /\* add and get values *\/ */
+/*   printf("----add and get-----------------\n"); */
+/*   printf("hello: %li\n", igraph_trie_get(&trie, "hello")); */
+/*   printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp")); */
+/*   printf("alma:  %li\n", igraph_trie_get(&trie, "alma")); */
+/*   printf("also:  %li\n", igraph_trie_get(&trie, "also")); */
+
+/*   printf("hello: %li\n", igraph_trie_get(&trie, "hello")); */
+/*   printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp")); */
+/*   printf("alma:  %li\n", igraph_trie_get(&trie, "alma")); */
+/*   printf("also:  %li\n", igraph_trie_get(&trie, "also")); */
+
+/*   printf("a:     %li\n", igraph_trie_get(&trie, "a")); */
+/*   printf("axon:  %li\n", igraph_trie_get(&trie, "axon"));   */
+
+/*   printf("hello: %li\n", igraph_trie_get(&trie, "hello")); */
+/*   printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp")); */
+/*   printf("alma:  %li\n", igraph_trie_get(&trie, "alma")); */
+/*   printf("also:  %li\n", igraph_trie_get(&trie, "also")); */
+ 
+/*   /\* destroy *\/ */
+/*   printf("----destroy---------------------\n"); */
+/*   igraph_trie_destroy(&trie); */
+  
 /*   return 0; */
 /* } */

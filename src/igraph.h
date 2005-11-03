@@ -35,8 +35,12 @@
 
 __BEGIN_DECLS
 
+#define _GNU_SOURCE
+
 #include "types.h"
 #include "attributes.h"
+
+#include <stdio.h> 		/* FILE */
 
 /** \defgroup types Basic data types.
  * \brief Important data types for vectors, matrices and graphs.
@@ -145,6 +149,16 @@ __BEGIN_DECLS
  * \defgroup layout Layout functions for graph drawing
  * \brief These functions place the vertices of a graph in 2D and 3D,
  * trying to please the eye as much as possible.
+ */
+
+/**
+ * \defgroup loadsave Reading and writing graphs from and to files
+ * \brief These functions can write a graph to a file, or read a graph
+ * from a file.
+ * 
+ * Note that as \a igraph uses the traditional C streams it is
+ * possible to read/write files from/to memory, at least on GNU
+ * operating systems supporting "non-standard" streams.
  */
 
 /**
@@ -358,6 +372,10 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER=0,
 typedef enum { IGRAPH_DEGSEQ_SIMPLE=0 } igraph_degseq_t;
 
 typedef enum { IGRAPH_TRANSITIVITY_UNDIRECTED=0 } igraph_transitivity_type_t;
+
+typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
+	       IGRAPH_FILEFORMAT_NCOL,
+	       IGRAPH_FILEFORMAT_PAJEK } igraph_fileformat_type_t;
 
 /* -------------------------------------------------- */
 /* Interface                                          */
@@ -664,9 +682,16 @@ int igraph_get_edgelist(igraph_t *graph, vector_t *res, bool_t bycol);
 /* Read and write foreign formats                     */
 /* -------------------------------------------------- */
 
-int igraph_read_graph(const char *filename, integer_t format);
-int igraph_write_graph(igraph_t *graph, const char *filename, 
-		       integer_t format);
+int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream, 
+			       integer_t n, bool_t directed);
+int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, bool_t names, 
+			  bool_t weights);
+int igraph_read_graph_pajek(igraph_t *graph, FILE *instream);
+
+int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream);
+int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
+			    const char *names, const char *weights);
+int igraph_write_graph_pajek(igraph_t *graph, FILE *outstream);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */

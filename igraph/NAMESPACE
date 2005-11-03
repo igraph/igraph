@@ -48,7 +48,8 @@ export(power.law.fit, running.mean, igraph.sample)
 # foreign formats
 
 export(read.graph, write.graph, read.graph.edgelist,
-       write.graph.edgelist, write.graph.lgl)
+       write.graph.edgelist, write.graph.lgl, read.graph.ncol,
+       write.graph.ncol)
 
 # layouts
 

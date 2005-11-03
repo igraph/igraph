@@ -23,6 +23,8 @@
 #ifndef REST_TYPES_H
 #define REST_TYPES_H
 
+#define _GNU_SOURCE
+
 typedef double integer_t;
 typedef double real_t;
 typedef int    bool_t;
@@ -450,5 +452,30 @@ int igraph_strmatrix_resize(igraph_strmatrix_t *sm,
 			    long int nrow, long int ncol);
 long int igraph_strmatrix_nrow(igraph_strmatrix_t *sm);
 long int igraph_strmatrix_ncol(igraph_strmatrix_t *sm);
+
+/**
+ * \ingroup internal
+ */
+
+typedef struct s_igraph_trie_node {
+  igraph_strvector_t strs;
+  vector_ptr_t children;
+  vector_t values;
+} igraph_trie_node_t;
+
+typedef struct s_igraph_trie {
+  igraph_strvector_t strs;
+  vector_ptr_t children;
+  vector_t values;
+  long int maxvalue;
+  bool_t storekeys;
+  igraph_strvector_t keys;
+} igraph_trie_t;
+
+int igraph_trie_init(igraph_trie_t *t, bool_t storekeys);
+int igraph_trie_destroy(igraph_trie_t *t);
+long int igraph_trie_get(igraph_trie_t *t, const char *key);
+long int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length);
+int igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
 
 #endif

@@ -23,101 +23,40 @@
 # Reading foreign file formats
 ###################################################################
 
-read.graph <- function(file, format="edgelist", ...) {
-
-  res <- switch(format,
-#                "pajek"=read.graph.pajek(file, format, ...),
-                "edgelist"=read.graph.edgelist(file, format, ...),
-                stop(paste("Unknown file format:",format))
-                )
-  res
-}
-
-write.graph <- function(graph, file, format="edgelist", ...) {
-  
-  res <- switch(format,
-#                "pajek"=write.graph.pajek(graph, file, format, ...),
-                "edgelist"=write.graph.edgelist(graph, file, format, ...),
-                "lgl"=write.graph.lgl(graph, file, format, ...),
-                stop(paste("Unknown file format:",format))
-                )
-  res
-}
-
-################################################################
-# Pajek format
-# see http://vlado.fmf.uni-lj.si/pub/networks/pajek/
-################################################################
-
-read.graph.pajek <- function(filename, format="pajek", attributes=TRUE, ...) {
-
-##   lines <- readLines(filename)
-##   res <- .Call("REST_import_pajek", igraph.c.interface, lines, list(...), attributes)
-
-  res
-}
-
-################################################################
-# Plain edge list format, not sorted
-################################################################
-
-read.graph.edgelist <- function(filename, format="edgelist", ...) {
-
-  res <- graph.empty(...)
-
+read.graph.toraw <- function(filename) {
   if (is.character(filename)) {
     filename <- file(filename)
   }
   if (!isOpen(filename)) {
     open(filename)
   }
-  
-  edges <- scan(filename, nmax=20000)
-  while(length(edges)>0) {
-    m <- max(edges)+1
-    v <- vcount(res)
-    if (m>v) {
-      res <- add.vertices(res, m-v)
-    }
-    res <- add.edges(res, edges)
-    edges <- scan(filename, nmax=20000)
-  }
 
-  res
+  tmpbufsize <- 20000
+  buffer <- tmpbuffer <- readChar(filename, tmpbufsize)
+  while (nchar(tmpbuffer) == tmpbufsize) {
+    tmpbuffer <- readChar(filename, tmpbufsize)
+    buffer <- paste(sep="", buffer, tmpbuffer)
+  }
+  close(filename)
+  rm(tmpbuffer)
+  
+  charToRaw(buffer)  
 }
 
-################################################################
-# Write an edgelist format, sorted
-################################################################
+write.graph.fromraw <- function(buffer, file) {
 
-write.graph.edgelist <- function(graph, file, format="edgelist",
-                                 ...) {
-
+  closeit <- FALSE
   if (is.character(file)) {
-    file <- file(file, open="w+")
+    file <- file(file, open="w+b")
+    closeit <- TRUE
   }
   
-  closeit <- FALSE
   if (!isOpen(file)) {
     file <- open(file)
     closeit <- TRUE
   }
-  
-  vc <- vcount(graph)
-  for (i in 0:(vc-1)) {
-    neis <- neighbors(graph, i, "out")
-    if (!is.directed(graph)) {
-      no.loops <- sum(neis==i)
-      neis <- c(neis[neis > i], rep(i, no.loops/2))
-    }
-    neis <- sort(neis)
-    for (n in neis) {
-      cat(i,    file=file)
-      cat(" ",  file=file)
-      cat(n,    file=file)
-      cat("\n", file=file)
-    }
-  }
+
+  writeBin(buffer, file)
 
   if (closeit) {
     close(file)
@@ -126,11 +65,80 @@ write.graph.edgelist <- function(graph, file, format="edgelist",
   invisible(NULL)
 }
 
+read.graph <- function(file, format="edgelist", ...) {
+
+  res <- switch(format,
+#                "pajek"=read.graph.pajek(file, ...),
+                "ncol"=read.graph.ncol(file, ...),
+                "edgelist"=read.graph.edgelist(file, ...),
+                stop(paste("Unknown file format:",format))
+                )
+  res
+}
+
+write.graph <- function(graph, file, format="edgelist", ...) {
+  
+  res <- switch(format,
+#                "pajek"=write.graph.pajek(graph, file, ...),
+                "edgelist"=write.graph.edgelist(graph, file, ...),
+                "ncol"=write.graph.ncol(graph, file, ...),
+                stop(paste("Unknown file format:",format))
+                )
+  invisible(res)
+}
+
 ################################################################
-# Write an LGL format, quite simple
+# Plain edge list format, not sorted
 ################################################################
 
-write.graph.lgl <- function(graph, file, format="lgl", ...) {
+read.graph.edgelist <- function(filename, n=0,
+                                directed=TRUE, ...) {
+
+  buffer <- read.graph.toraw(filename)
+  .Call("R_igraph_read_graph_edgelist", buffer,
+        as.numeric(n), as.logical(directed),
+        PACKAGE="igraph")
+}
+
+write.graph.edgelist <- function(graph, file, 
+                                 ...) {
+
+  buffer <- .Call("R_igraph_write_graph_edgelist", graph,
+                  PACKAGE="igraph")
+  write.graph.fromraw(buffer, file)
+
+  invisible(NULL)
+}
+
+################################################################
+# NCOL and LGL formats, quite simple
+################################################################
+
+read.graph.ncol <- function(filename, names=TRUE,
+                           weights=TRUE, ...) {
+
+  buffer <- read.graph.toraw(filename)
+  .Call("R_igraph_read_graph_ncol", buffer,
+        as.logical(names), as.logical(weights),
+        PACKAGE="igraph")
+}
+
+write.graph.ncol <- function(graph, file, 
+                             names="name", weights="weight", ...) {
+  names <- as.character(names)
+  weights <- as.character(weights)
+  if (length(names)==0 || ! names %in% v.a(graph)) { names <- NULL }
+  if (length(weights)==0 || ! weights %in% e.a(graph)) { weights <- NULL }
+  
+  buffer <- .Call("R_igraph_write_graph_ncol", graph,
+                  names, weights,
+                  PACKAGE="igraph")
+  write.graph.fromraw(buffer, file)
+  
+  invisible(NULL)
+}  
+
+write.graph.lgl <- function(graph, file, ...) {
   
   if (is.character(file)) {
     file <- file(file, open="w+")

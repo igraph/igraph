@@ -1,6 +1,6 @@
 o write tutorial
 o add some iterators: in-, pre-, post-order, depth-first, breadth-first
-  search, etc.
+  search, iterators based on attributes etc.
 o add methods for reading & saving a file together with its attributes
 o add conversion methods for different file formats
 o comunity detection algorithms
@@ -10,3 +10,4 @@ o error handling
 o function for merge networks
 o add data sets to the R package
 o add automatic tests
+o iterators as edge and vertex sets

@@ -2,6 +2,7 @@
 \alias{write.graph}
 \alias{write.graph.edgelist}
 \alias{write.graph.lgl}
+\alias{write.graph.ncol}
 \title{Writing the graph to a file in some format}
 \description{\code{write.graph} is a general function for exporting
   graphs to foreign file formats, however not many formats are
@@ -24,7 +25,21 @@ write.graph(graph, file, format="edgelist", \dots)
 
   The \code{lgl} format is also a simple text file, this is the
   format expected by the 'Large Graph Layout' layout generator software.
-}
+
+  The \code{ncol} format is also used by LGL, it is a text file, see
+  \link{read.graph.ncol} for details.
+  Additional arguments:
+  \itemize{
+    \item{names}{If you want to write symbolic vertex names instead of
+      vertex ids, supply the name of the vertex attribute containing the
+      symbolic names here. By default the \sQuote{name} attribute is
+      used if there is one. Supply \code{NULL} if you want to numeric use
+      vertex ids.} 
+    \item{weights}{If you want to write edge weights to the file, supply
+      the name of the edge attribute here. Give \code{NULL} here if you
+      want to omit the weights.}
+  }
+} 
 \value{A NULL, invisibly.}
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

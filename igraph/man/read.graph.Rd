@@ -28,6 +28,31 @@ read.graph(file, format = "edgelist", \dots)
       
       There are no additional arguments for this format.
     }
+    \item{ncol}{
+      This format is used by the Large Graph Layout program
+      (http://bioinformatics.icmb.utexas.edu/lgl), and it is
+      simply a symbolic weighted edge list. It is a simple text file
+      with one edge per line. An edge is defined by two symbolic vertex
+      names separated by whitespace. (The symbolic vertex names
+      themselves cannot contain whitespace. They might follow by an
+      optional number, this will be the weight of the edge; the number
+      can be negative and can be in scientific notation. If there is no
+      weight specified to an edge it is assumed to be zero. 
+
+      The resulting graph is always undirected. LGL cannot deal with
+      files which contain multiple or loop edges, this is however not
+      checked here, as \a igraph is happy with these.
+
+      Additional arguments:
+      \itemize{
+	\item{names}{Logical constant, whether to add the symbolic names
+	  as vertex attributes to the graph. If TRUE the name of the
+	  vertex attribute will be \sQuote{name}.}
+	\item{weights}{Logical constant, whether to add the weights of
+	  the edges as edge attribute \sQuote{weight}.
+	}
+      }
+    }
   }
   
   Other additional arguments will be used as graph attributes.
