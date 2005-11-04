@@ -196,6 +196,59 @@
 
 2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/types.c (matrix_delete_rows_neg, matrix_copy)
+	(igraph_attribute_list_remove_elements_neg)
+	(igraph_attribute_list_copy) : new 
+	* src/attributes.c (igraph_add_edge_attribute)
+	(igraph_remove_edge_attribute, igraph_get_edge_attribute)
+	(igraph_set_edge_attribute, igraph_get_edge_attributes)
+	(igraph_set_edge_attributes, igraph_list_edge_attributes) : new
+	* src/type_indexededgelist.c (igraph_empty, igraph_destroy)
+	(igraph_copy, igraph_add_edges, igraph_delete_edges) 
+	(igraph_delete_vertices) : (mostly edge) attribute handling added
+	* igraph/src/rinterface.c (R_igraph_to_SEXP, R_SEXP_to_igraph)
+	(R_SEXP_to_igraph_copy) : handle edge attributes
+	* igraph/src/rinterface.c (R_igraph_add_edge_attribute)
+	(R_igraph_remove_edge_attribute, R_igraph_get_edge_attribute)
+	(R_igraph_set_edge_attribute, igraph_get_edge_attributes)
+	(R_igraph_set_edge_attributes, igraph_list_edge_attributes) : interface
+	* igraph/R/attributes.R (add.edge.attribute, remove.edge.attribute)
+	(get.edge.attribute, set.edge.attribute, e.a, "e.a<-") : interface
+	* igraph/R/print.R (print.graph) : print edge attributes
+	
+2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* igraph/R/iterators.R (ii.get.to) : bug corrected
+
+	* igraph/R/print.R (print.igraph) : uses iterators, prints attributes
+
+2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_iterator_eneis)
+	(igraph_iterator_eneis_set, igraph_reset_eneis)
+	(igraph_next_eneis, igraph_end_eneis, igraph_get_vertex_from_eneis)
+	(igraph_get_vertex_to_eneis, igraph_get_vertex_nei_eneis)
+	(igraph_get_edge_eneis, igraph_iterator_vneis)
+	(igraph_next_vneis, igraph_end_vneis, igraph_reset_vneis)
+	(igraph_get_vertex_vneis, igraph_iterator_vneis_set) :
+	eneis and vneis rewritten to use real_t array for data
+
+	* igraph/src/rinterface.c (R_igraph_iterator_to_SEXP)
+	(R_SEXP_to_igraph_iterator, R_SEXP_to_igraph_iterator_copy)
+	(R_igraph_empty, R_igraph_iteraror_vid, R_igraph_iterator_eid)
+	(R_igraph_iterator_efromorder, R_igraph_iterator_eneis)
+	(R_igraph_iterator_vneis, R_igraph_iterator_next)
+	(R_igraph_iterator_prev, R_igraph_iterator_reset)
+	(R_igraph_iterator_end, R_igraph_iterator_end)
+	(R_igraph_iterator_get_vertex_nei, R_igraph_iterator_get_vertex)
+	(R_igraph_iterator_from, R_igraph_iterator_to)
+	(R_igraph_iteartor_edge) : R interface to iterators
+	* igraph/R/iterators.R (ii.create, ii.next, ii.prev, ii.end)
+	(ii.get.vertex.nei, ii.reset, ii.get.vertex, ii.get.from)
+	(ii.get.to, ii.get.edge) : R interface to iterators
+
+2005-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/types.c (igraph_stack_reserve) : added
 	
 	* src/types.c (vector_remove_section, vector_move_interval)
