@@ -35,7 +35,9 @@
 
 __BEGIN_DECLS
 
-#define _GNU_SOURCE
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
 
 #include "types.h"
 #include "attributes.h"
@@ -686,12 +688,15 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
 			       integer_t n, bool_t directed);
 int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, bool_t names, 
 			  bool_t weights);
-int igraph_read_graph_pajek(igraph_t *graph, FILE *instream);
+int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
+			  bool_t names, bool_t weights);
 
 int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream);
 int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
 			    const char *names, const char *weights);
-int igraph_write_graph_pajek(igraph_t *graph, FILE *outstream);
+int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
+			   const char *names, const char *weights,
+			   bool_t isolates);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */

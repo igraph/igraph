@@ -7,7 +7,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     error.c other.c types.c foreign.c random.c \
 			     attributes.c \
 			     memory.h random.h \
-			     foreign-ncol-parser.y foreign-ncol-lexer.l
+			     foreign-ncol-parser.y foreign-ncol-lexer.l \
+			     foreign-lgl-parser.y foreign-lgl-lexer.l
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm
 

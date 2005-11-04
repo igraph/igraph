@@ -3030,6 +3030,13 @@ int igraph_trie_idx(igraph_trie_t *t, long int idx, char **str) {
   }
 }
 
+/**
+ * \ingroup internal
+ */
+
+long int igraph_trie_size(igraph_trie_t *t) {
+  return t->maxvalue+1;
+}
 
 /**********************************************************
  * Testing purposes, vector                               *

@@ -2092,3 +2092,55 @@ SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP pnames, SEXP pweights) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_read_graph_lgl(SEXP pvfile, SEXP pnames, SEXP pweights) {
+  igraph_t g;
+  void *vfile=RAW(pvfile);
+  long int vfilesize=GET_LENGTH(pvfile);
+  bool_t names=LOGICAL(pnames)[0];
+  bool_t weights=LOGICAL(pweights)[0];
+  FILE *file;
+  SEXP result;
+  
+  file=fmemopen(vfile, vfilesize, "r");
+  igraph_read_graph_lgl(&g, file, names, weights);
+  fclose(file);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  UNPROTECT(1);
+  return result;  
+}
+
+SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP pnames, SEXP pweights, 
+			      SEXP pisolates) {
+  igraph_t g;
+  FILE *stream;
+  char *bp;
+  size_t size;
+  const char *names, *weights;
+  bool_t isolates=LOGICAL(pisolates)[0];
+  SEXP result;
+
+  if (isNull(pnames)) {
+    names=0; 
+  } else {
+    names=CHAR(STRING_ELT(pnames, 0));
+  } 
+  if (isNull(pweights)) {
+    weights=0; 
+  } else {
+    weights=CHAR(STRING_ELT(pweights, 0));
+  }   
+
+  R_SEXP_to_igraph(graph, &g);
+  stream=open_memstream(&bp, &size);
+  igraph_write_graph_lgl(&g, stream, names, weights, isolates);
+  fclose(stream);
+  PROTECT(result=allocVector(RAWSXP, size));
+  memcpy(RAW(result), bp, sizeof(char)*size);
+  free(bp);
+  
+  UNPROTECT(1);
+  return result;
+}

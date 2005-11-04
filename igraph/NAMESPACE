@@ -49,7 +49,7 @@ export(power.law.fit, running.mean, igraph.sample)
 
 export(read.graph, write.graph, read.graph.edgelist,
        write.graph.edgelist, write.graph.lgl, read.graph.ncol,
-       write.graph.ncol)
+       write.graph.ncol, read.graph.lgl)
 
 # layouts
 

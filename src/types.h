@@ -23,7 +23,9 @@
 #ifndef REST_TYPES_H
 #define REST_TYPES_H
 
-#define _GNU_SOURCE
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
 
 typedef double integer_t;
 typedef double real_t;
@@ -477,5 +479,6 @@ int igraph_trie_destroy(igraph_trie_t *t);
 long int igraph_trie_get(igraph_trie_t *t, const char *key);
 long int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length);
 int igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
+long int igraph_trie_size(igraph_trie_t *t);
 
 #endif

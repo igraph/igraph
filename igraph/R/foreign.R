@@ -71,6 +71,7 @@ read.graph <- function(file, format="edgelist", ...) {
 #                "pajek"=read.graph.pajek(file, ...),
                 "ncol"=read.graph.ncol(file, ...),
                 "edgelist"=read.graph.edgelist(file, ...),
+                "lgl"=read.graph.lgl(file, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -138,36 +139,27 @@ write.graph.ncol <- function(graph, file,
   invisible(NULL)
 }  
 
-write.graph.lgl <- function(graph, file, ...) {
-  
-  if (is.character(file)) {
-    file <- file(file, open="w+")
-  }
-  
-  closeit <- FALSE
-  if (!isOpen(file)) {
-    file <- open(file)
-    closeit <- TRUE
-  }
+read.graph.lgl <- function(filename, names=TRUE,
+                           weights=TRUE, ...) {
 
-  vc <- vcount(graph)
-  for (i in 0:(vc-1)) {
-    neis <- neighbors(graph, i, "out")
-    if (!is.directed(graph)) {
-      neis <- neis [ neis < i ]
-    }
-    if (length(neis) > 0) {
-      neis <- sort(neis)
-      cat("# ", file=file)
-      cat(i+1,    file=file)
-      cat("\n", file=file)
-      for (n in neis) {
-        cat(n+1,    file=file)
-        cat("\n", file=file)
-      }
-    }
-  }
-
-  invisible(NULL)
+  buffer <- read.graph.toraw(filename)
+  .Call("R_igraph_read_graph_lgl", buffer,
+        as.logical(names), as.logical(weights),
+        PACKAGE="igraph")
 }
-      
+
+write.graph.lgl <- function(graph, file, 
+                            names="name", weights="weight",
+                            isolates=FALSE, ...) {
+  names <- as.character(names)
+  weights <- as.character(weights)
+  if (length(names)==0 || ! names %in% v.a(graph)) { names <- NULL }
+  if (length(weights)==0 || ! weights %in% e.a(graph)) { weights <- NULL }
+  
+  buffer <- .Call("R_igraph_write_graph_lgl", graph,
+                  names, weights, as.logical(isolates),
+                  PACKAGE="igraph")
+  write.graph.fromraw(buffer, file)
+  
+  invisible(NULL)
+}  
