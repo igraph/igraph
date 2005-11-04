@@ -28,11 +28,6 @@
 typedef enum { IGRAPH_ATTRIBUTE_NUM=0, 
 	       IGRAPH_ATTRIBUTE_STR } igraph_attribute_type_t;
 
-typedef struct s_igraph_attribute {
-  igraph_attribute_type_t type;
-  void *data;
-} igraph_attribute_t;
-
 typedef struct s_igraph_attribute_list {
   long int len;
   igraph_strvector_t names;

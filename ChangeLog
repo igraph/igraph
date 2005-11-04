@@ -1,5 +1,9 @@
 2005-11-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/attributes.c (igraph_attribute_list_copy) : bug corrected
+
+2005-11-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/types.c (igraph_trie_size) : new
 	* src/foreign.c (igraph_read_graph_lgl, igraph_write_graph_lgl) : new
 	* src/foreign.c (igraph_write_graph_ncol) : memory leak corrected

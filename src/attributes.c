@@ -335,16 +335,19 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
   to->len=from->len;
   igraph_strvector_copy(&to->names, &from->names);
   vector_copy(&to->types, &from->types);
+  vector_ptr_copy(&to->data, &from->data);
 
   for (i=0; i<vector_size(&from->types); i++) {
     if (VECTOR(from->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
       vector_t *data=VECTOR(from->data)[i];
       vector_t *ndata=Calloc(1, vector_t);
       vector_copy(ndata, data);
+      VECTOR(to->data)[i]=ndata;
     } else if (VECTOR(from->types)[i] == IGRAPH_ATTRIBUTE_STR) {
       igraph_strvector_t *data=VECTOR(from->data)[i];
       igraph_strvector_t *ndata=Calloc(1, igraph_strvector_t);
       igraph_strvector_copy(ndata, data);
+      VECTOR(to->data)[i]=ndata;
     }
   }
   
