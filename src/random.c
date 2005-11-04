@@ -175,6 +175,22 @@ int igraph_random_sample(vector_t *res, integer_t l, integer_t h,
 
 #else
 
+#ifdef __MINGW32__
+/** MinGW does not have an expm1 function at the time of writing (Nov 1 2005),
+so let's provide a replacement */
+static double expm1 (double x)
+{
+   if (-M_LN2 < x && x < M_LN2)
+     {
+     x *= M_LOG2E;
+     __asm__("f2xm1\n\t" : "=t" (x) : "0" (x));
+     return x;
+     }
+   else
+     return expl(x) - 1.0L;
+}
+#endif
+
 /*
  *  Mathlib : A C Library of Special Functions
  *  Copyright (C) 1998 Ross Ihaka

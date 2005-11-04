@@ -439,8 +439,9 @@ static PyObject* igraphmodule_unimplemented(PyObject* self, PyObject* args, PyOb
  */
 typedef struct 
 {
-   PyObject_HEAD
-     igraph_t g; // The graph object
+  PyObject_HEAD
+  igraph_t g;             // The graph object
+  PyObject* destructor;   // Python object to be called upon destruction
 } igraphmodule_GraphObject;
 
 /**
@@ -449,8 +450,14 @@ typedef struct
  */
 static void igraphmodule_Graph_dealloc(igraphmodule_GraphObject* self) 
 {
-   igraph_destroy(&self->g);
-   self->ob_type->tp_free((PyObject*)self);
+  PyObject* r;
+  
+  igraph_destroy(&self->g);
+  if (PyCallable_Check(self->destructor)) {
+    r=PyObject_CallObject(self->destructor, NULL);
+    if (r) Py_DECREF(r);
+  }
+  self->ob_type->tp_free((PyObject*)self);
 }
 
 /**
@@ -2266,6 +2273,254 @@ static PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface
+ * \brief Reads an edge list from a file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_edgelist
+ */
+static PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type,
+						  PyObject *args,
+						  PyObject *kwds)
+{
+  igraphmodule_GraphObject *self;
+  char* fname=NULL;
+  FILE* f;
+  PyObject *directed=Py_True;
+  
+  static char *kwlist[] =
+  {
+    "f", "directed", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O", kwlist,
+				   &fname, &directed))
+     return NULL;
+      
+   self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+   if (self != NULL) 
+     {
+       f=fopen(fname, "r");
+       if (!f) {
+	 PyErr_SetString(PyExc_IOError, strerror(errno));
+	 return NULL;
+       }
+       if (igraph_read_graph_edgelist(&self->g, f, 0, PyObject_IsTrue(directed)))
+       {
+	 igraphmodule_handle_igraph_error();
+	 fclose(f);
+	 return NULL;
+       }
+       fclose(f);
+     }
+   
+   return (PyObject*)self;
+}
+
+/** \ingroup python_interface
+ * \brief Reads an edge list from an NCOL file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_ncol
+ */
+static PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type,
+					      PyObject *args,
+					      PyObject *kwds)
+{
+  igraphmodule_GraphObject *self;
+  char* fname=NULL;
+  FILE* f;
+  PyObject *names=Py_True, *weights=Py_True;
+  
+  static char *kwlist[] =
+  {
+    "f", "names", "weights", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OO", kwlist,
+				   &fname, &names, &weights))
+     return NULL;
+      
+   self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+   if (self != NULL) 
+     {
+       f=fopen(fname, "r");
+       if (!f) {
+	 PyErr_SetString(PyExc_IOError, strerror(errno));
+	 return NULL;
+       }
+       if (igraph_read_graph_ncol(&self->g, f, PyObject_IsTrue(names), PyObject_IsTrue(weights)))
+       {
+	 igraphmodule_handle_igraph_error();
+	 fclose(f);
+	 return NULL;
+       }
+       fclose(f);
+     }
+   
+   return (PyObject*)self;
+}
+
+/** \ingroup python_interface
+ * \brief Reads an edge list from an LGL file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_lgl
+ */
+static PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type,
+					     PyObject *args,
+					     PyObject *kwds)
+{
+  igraphmodule_GraphObject *self;
+  char* fname=NULL;
+  FILE* f;
+  PyObject *names=Py_True, *weights=Py_True;
+  
+  static char *kwlist[] =
+  {
+    "f", "names", "weights", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OO", kwlist,
+				   &fname, &names, &weights))
+     return NULL;
+      
+   self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+   if (self != NULL) 
+     {
+       f=fopen(fname, "r");
+       if (!f) {
+	 PyErr_SetString(PyExc_IOError, strerror(errno));
+	 return NULL;
+       }
+       if (igraph_read_graph_lgl(&self->g, f, PyObject_IsTrue(names), PyObject_IsTrue(weights)))
+       {
+	 igraphmodule_handle_igraph_error();
+	 fclose(f);
+	 return NULL;
+       }
+       fclose(f);
+     }
+   
+   return (PyObject*)self;
+}
+
+/** \ingroup python_interface
+ * \brief Writes the edge list to a file
+ * \return none
+ * \sa igraph_write_graph_edgelist
+ */
+static PyObject* igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject *self,
+						   PyObject *args,
+						   PyObject *kwds)
+{
+  char* fname=NULL;
+  FILE* f;
+  
+  static char *kwlist[] =
+  {
+    "f", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+     return NULL;
+      
+  f=fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_write_graph_edgelist(&self->g, f))
+  {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  fclose(f);
+  
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface
+ * \brief Writes the edge list to a file in .ncol format
+ * \return none
+ * \sa igraph_write_graph_ncol
+ */
+static PyObject* igraphmodule_Graph_write_ncol(igraphmodule_GraphObject *self,
+					       PyObject *args,
+					       PyObject *kwds)
+{
+  char* fname=NULL;
+  char* names="name";
+  char* weights="weight";
+  FILE* f;
+  
+  static char *kwlist[] =
+  {
+    "f", "names", "weights", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|zz", kwlist,
+				   &fname, &names, &weights))
+     return NULL;
+
+  f=fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_write_graph_ncol(&self->g, f, names, weights))
+  {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  fclose(f);
+  
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface
+ * \brief Writes the edge list to a file in .lgl format
+ * \return none
+ * \sa igraph_write_graph_lgl
+ */
+static PyObject* igraphmodule_Graph_write_lgl(igraphmodule_GraphObject *self,
+					      PyObject *args,
+					      PyObject *kwds)
+{
+  char* fname=NULL;
+  char* names="name";
+  char* weights="weight";
+  PyObject* isolates=Py_True;
+  FILE* f;
+  
+  static char *kwlist[] =
+  {
+    "f", "names", "weights", "isolates", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|zzO", kwlist,
+				   &fname, &names, &weights, &isolates))
+     return NULL;
+
+  f=fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_write_graph_lgl(&self->g, f, names, weights,
+			     PyObject_IsTrue(isolates)))
+  {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  fclose(f);
+  
+  Py_RETURN_NONE;
+}
+
+/** \defgroup python_interface_internal Internal functions
+ * \ingroup python_interface */
+
+/** \ingroup python_interface_internal
  * \brief Returns the encapsulated igraph graph as a PyCObject
  * \return a new PyCObject
  */
@@ -2273,7 +2528,43 @@ static PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObjec
 						 PyObject *args,
 						 PyObject *kwds) 
 {
+  /*
+  static char *kwlist[] = {"ref", NULL};
+  PyObject *incref=Py_True;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &incref)) return NULL;
+  if (PyObject_IsTrue(incref)) Py_INCREF(self);
+  */
+  
   return PyCObject_FromVoidPtr((void*)&self->g, NULL);
+}
+
+/** \ingroup python_interface_internal
+ * \brief Registers a destructor to be called when the object is destroyed
+ * \return the previous destructor (if any)
+ * Unimplemented.
+ */
+static PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self,
+							    PyObject *args,
+							    PyObject *kwds) 
+{
+  static char *kwlist[] = {"destructor", NULL};
+  PyObject *destructor = NULL, *result;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &destructor)) return NULL;
+  
+  if (!PyCallable_Check(destructor)) {
+    PyErr_SetString(PyExc_TypeError, "The destructor must be callable!");
+    return NULL;
+  }
+  
+  result=self->destructor;
+  self->destructor=destructor;
+  Py_INCREF(self->destructor);
+
+  if (!result) Py_RETURN_NONE;
+  
+  return result;
 }
 
 /** \ingroup python_interface
@@ -2777,19 +3068,133 @@ static PyMethodDef igraphmodule_Graph_methods[] =
 	  METH_NOARGS,
 	  "Returns the edge list of a graph."
      },
-   
+
+  ///////////////////////////////
+  // LOADING AND SAVING GRAPHS //
+  ///////////////////////////////
+  
+  // interface to igraph_read_graph_edgelist
+  {"Read_Edgelist", (PyCFunction)igraphmodule_Graph_Read_Edgelist,
+      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+      "Reads an edge list from a file and creates a graph based on it.\n"
+      "Please note that the vertex indices are zero-based.\n\n"
+      "Keyword arguments:\n"
+      "f        -- the name of the file\n"
+      "directed -- whether the generated graph should be directed.\n"
+      "            Optional, defaults to True.\n\n"
+  },
+  // interface to igraph_read_graph_ncol
+  {"Read_Ncol", (PyCFunction)igraphmodule_Graph_Read_Ncol,
+      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+      "Reads an .ncol file used by LGL, also useful for creating graphs\n"
+      "from \"named\" (and optionally weighted) edge lists.\n\n"
+      "This format is used by the Large Graph Layout program. See the\n"
+      "documentation of LGL regarding the exact format description:\n"
+      "http://bioinformatics.icmb.utexas.edu/bgl\n\n"
+      "LGL originally cannot deal with graphs containing multiple or loop\n"
+      "edges, but this condition is not checked here, as igraph is happy\n"
+      "with these.\n\n"
+      "Keyword arguments:\n"
+      "f       -- the name of the file\n"
+      "names   -- logical value. If True, the vertex names are added as a\n"
+      "           vertex attribute called 'name'. Optional, defaults to\n"
+      "           True.\n"
+      "weights -- logical value. If True, the edge weights are added as an\n"
+      "           edge attribute called 'weight'. Optional, defaults to\n"
+      "           True.\n"
+  },
+  // interface to igraph_read_graph_lgl
+  {"Read_Lgl", (PyCFunction)igraphmodule_Graph_Read_Lgl,
+      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+      "Reads an .lgl file used by LGL, also useful for creating graphs\n"
+      "from \"named\" (and optionally weighted) edge lists.\n\n"
+      "This format is used by the Large Graph Layout program. See the\n"
+      "documentation of LGL regarding the exact format description:\n"
+      "http://bioinformatics.icmb.utexas.edu/bgl\n\n"
+      "LGL originally cannot deal with graphs containing multiple or loop\n"
+      "edges, but this condition is not checked here, as igraph is happy\n"
+      "with these.\n\n"
+      "Keyword arguments:\n"
+      "f       -- the name of the file\n"
+      "names   -- logical value. If True, the vertex names are added as a\n"
+      "           vertex attribute called 'name'. Optional, defaults to\n"
+      "           True.\n"
+      "weights -- logical value. If True, the edge weights are added as an\n"
+      "           edge attribute called 'weight'. Optional, defaults to\n"
+      "           True.\n"
+  },
+  // interface to igraph_write_graph_edgelist
+  {"write_edgelist", (PyCFunction)igraphmodule_Graph_write_edgelist,
+      METH_VARARGS | METH_KEYWORDS,
+      "Writes the edge list of a graph to a file. Directed edges are\n"
+      "written in (from, to) order.\n\n"
+      "Keyword arguments:\n"
+      "f -- the name of the file to be written\n"
+  },
+  // interface to igraph_write_graph_ncol
+  {"write_ncol", (PyCFunction)igraphmodule_Graph_write_ncol,
+      METH_VARARGS | METH_KEYWORDS,
+      "Writes the edge list of a graph to a file in .ncol format.\n"
+      "Note that multiple edges and/or loops break the LGL software,\n"
+      "but igraph does not check for this condition. Unless you know\n"
+      "that the graph does not have multiple edges and/or loops, it\n"
+      "is wise to call simplify() before saving.\n\n"
+      "Keyword arguments:\n"
+      "f       -- the name of the file to be written\n"
+      "names   -- the name of the vertex attribute containing the name\n"
+      "           of the vertices. Optional, defaults to 'name'. If you\n"
+      "           don't want to store vertex names, supply None here.\n"
+      "weights -- the name of the edge attribute containing the weight\n"
+      "           of the vertices. Optional, defaults to 'weight'. If you\n"
+      "           don't want to store weights, supply None here.\n\n"
+      "PLEASE NOTE THAT IT IS VITAL TO SUPPLY CORRECT 'names' AND 'weights'\n"
+      "PARAMETERS, otherwise the underlying igraph library will segfault\n"
+      "when it tries to reach nonexistent attributes. This issue will be\n"
+      "corrected soon.\n"
+  },
+  // interface to igraph_write_graph_lgl
+  {"write_lgl", (PyCFunction)igraphmodule_Graph_write_lgl,
+      METH_VARARGS | METH_KEYWORDS,
+      "Writes the edge list of a graph to a file in .lgl format.\n"
+      "Note that multiple edges and/or loops break the LGL software,\n"
+      "but igraph does not check for this condition. Unless you know\n"
+      "that the graph does not have multiple edges and/or loops, it\n"
+      "is wise to call simplify() before saving.\n\n"
+      "Keyword arguments:\n"
+      "f        -- the name of the file to be written\n"
+      "names    -- the name of the vertex attribute containing the name\n"
+      "            of the vertices. Optional, defaults to 'name'. If you\n"
+      "            don't want to store vertex names, supply None here.\n"
+      "weights  -- the name of the edge attribute containing the weight\n"
+      "            of the vertices. Optional, defaults to 'weight'. If you\n"
+      "            don't want to store weights, supply None here.\n"
+      "isolates -- whether to include isolated vertices in the output.\n"
+      "            Optional, defaults to True.\n\n"
+      "PLEASE NOTE THAT IT IS VITAL TO SUPPLY CORRECT 'names' AND 'weights'\n"
+      "PARAMETERS, otherwise the underlying igraph library will segfault\n"
+      "when it tries to reach nonexistent attributes. This issue will be\n"
+      "corrected soon.\n"
+  },
+  
   ////////////////////////////////////
   // INTERNAL/DEVELOPMENT FUNCTIONS //
   ////////////////////////////////////
   {"__graph_as_cobject__", (PyCFunction)igraphmodule_Graph___graph_as_cobject__,
-      METH_NOARGS,
-      "Returns the igraph graph encapsulated by the Python object as "
-      "a PyCObject (which is barely a regular C pointer). This function "
-      "should not be used directly by igraph users, it is useful only "
-      "in the case when the underlying igraph object must be passed to "
-      "another C code through Python"
+      METH_VARARGS | METH_KEYWORDS,
+      "Returns the igraph graph encapsulated by the Python object as\n"
+      "a PyCObject (which is barely a regular C pointer). This function\n"
+      "should not be used directly by igraph users, it is useful only\n"
+      "in the case when the underlying igraph object must be passed to\n"
+      "another C code through Python.\n\n"
+      /*"Keyword arguments:\n"
+      "ref -- increases the reference count of the graph when True.\n"
+      "       Optional, defaults to False.\n"*/
   },
-  
+  {"__register_destructor__", (PyCFunction)igraphmodule_Graph___register_destructor__,
+      METH_VARARGS | METH_KEYWORDS,
+      "Registers a destructor to be called when the object is freed by "
+      "Python. This function should not be used directly by igraph users."
+  },
   {NULL}
 
 }

@@ -1,8 +1,11 @@
 import sys;
 import gc;
-sys.path.append('interfaces/python/.libs');
-import igraph;
+import tempfile;
+import os;
 from time import clock;
+
+sys.path.insert(0, 'interfaces/python/.libs');
+import igraph;
 
 longtests=False;
 
@@ -346,6 +349,118 @@ skip()
 
 start("Testing layout of vertices according to the Fruchterman-Reingold layout")
 print g.layout_fruchterman_reingold()
+skip()
+
+start("Trying to load edge list from nonexistent file")
+try:
+    g=igraph.Graph.Read_Edgelist("nonexistent")
+except IOError, e:
+    ok()
+    print "Expected exception arrived: ", e
+else:
+    fail()
+
+start("Trying to load edge list from existing file")
+(fd,fname)=tempfile.mkstemp()
+f=os.fdopen(fd, "w")
+f.write("1 2\n")
+f.write("2 3\n")
+f.write("3 4\n")
+f.write("1 3\n")
+f.close()
+g=igraph.Graph.Read_Edgelist(fname, directed=False)
+test(g.vcount() == 5 and g.ecount() == 4)
+os.unlink(fname)
+
+start("Trying to save graph edge list")
+(fd,fname)=tempfile.mkstemp()
+os.close(fd)
+g.write_edgelist(fname)
+os.unlink(fname)
+skip()
+
+start("Trying to load nonexistent NCOL file")
+try:
+    g=igraph.Graph.Read_Ncol("nonexistent")
+except IOError, e:
+    ok()
+    print "Expected exception arrived: ", e
+else:
+    fail()
+
+start("Trying to load graph from existing NCOL file")
+(fd,fname)=tempfile.mkstemp()
+f=os.fdopen(fd, "w")
+f.write("a b 2.0\n")
+f.write("b c\n")
+f.write("c d 3.0\n")
+f.write("a c\n")
+f.close()
+g=igraph.Graph.Read_Ncol(fname)
+test(g.vcount() == 4 and g.ecount() == 4)
+os.unlink(fname)
+
+start("Trying to save graph edge list as NCOL file")
+(fd,fname)=tempfile.mkstemp()
+os.close(fd)
+g.write_ncol(fname)
+os.unlink(fname)
+skip()
+
+start("Trying to save graph edge list as NCOL file without weights and names")
+(fd,fname)=tempfile.mkstemp()
+os.close(fd)
+g.write_ncol(fname, None, None)
+os.unlink(fname)
+skip()
+
+"""
+g=igraph.Graph.Full(5)
+start("Trying to save graph not having name/weight attributes as NCOL file")
+(fd,fname)=tempfile.mkstemp()
+os.close(fd)
+g.write_ncol(fname)
+os.unlink(fname)
+skip()
+"""
+
+start("Trying to load nonexistent LGL file")
+try:
+    g=igraph.Graph.Read_Lgl("nonexistent")
+except IOError, e:
+    ok()
+    print "Expected exception arrived: ", e
+else:
+    fail()
+
+start("Trying to load graph from existing LGL file")
+(fd,fname)=tempfile.mkstemp()
+f=os.fdopen(fd, "w")
+f.write("# a\n")
+f.write("b 2.0\n")
+f.write("c\n")
+f.write("# b\n")
+f.write("c\n")
+f.write("# c\n")
+f.write("d 3.0\n")
+f.write("# e\n")
+f.close()
+g=igraph.Graph.Read_Lgl(fname)
+test(g.vcount() == 5 and g.ecount() == 4)
+os.unlink(fname)
+
+start("Trying to save graph edge list as NCOL file")
+(fd,fname)=tempfile.mkstemp()
+os.close(fd)
+g.write_lgl(fname)
+os.unlink(fname)
+skip()
+
+start("Trying to save graph edge list as NCOL file without weights and names and isolated vertices")
+(fd,fname)=tempfile.mkstemp()
+os.close(fd)
+g.write_lgl(fname, None, None, False)
+os.unlink(fname)
 skip()
 
 results()

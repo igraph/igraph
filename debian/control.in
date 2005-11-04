@@ -9,7 +9,7 @@ Package: libigraph
 Architecture: any
 Section: libs
 Priority: optional
-Depends: ${shlibs:Depends}
+Depends: libc6 (>= 2.3.2)
 Description: A library for creating and manipulating graphs.
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the

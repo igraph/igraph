@@ -12,6 +12,10 @@ deb:
 	debian/prepare
 	fakeroot debian/rules binary
 
+debcvs:
+	debian/prepare cvs
+	fakeroot debian/rules binary
+	
 test: all
 	for i in interfaces/*; do \
 		if [ -d $$i ]; then \

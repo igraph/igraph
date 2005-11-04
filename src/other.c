@@ -21,6 +21,7 @@
 */
 
 #include "igraph.h"
+#include "types.h"
 
 /**
  * \ingroup nongraph

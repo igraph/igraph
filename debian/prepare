@@ -2,6 +2,10 @@
 
 VER=`sed -n -e 's/^#define VERSION "\(.*\)"/\1/p' config.h`
 
+if [ x$1 == xcvs ]; then
+  VER="${VER}-cvs"`date +%Y%m%d`
+fi
+
 for i in changelog.in control.in; do
   sed "s/@VERSION@/$VER/g" debian/$i > debian/`basename $i .in`
 done
