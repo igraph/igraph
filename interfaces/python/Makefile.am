@@ -3,7 +3,7 @@ lib_LTLIBRARIES         = igraph.la
 igraph_la_SOURCES       = igraphmodule.c
 igraph_la_CFLAGS        = $(PYTHON_INCLUDES) -I$(top_srcdir)/include
 igraph_la_LDFLAGS       = -module -no-undefined
-igraph_la_LIBADD        = -lm $(PYTHON_LIBS) -ligraph
+igraph_la_LIBADD        = -lm $(PYTHON_LIBS)
 
 ## need to move the generated Python libraries to their proper place.
 ## unfortunately Automake does not have any native support to define

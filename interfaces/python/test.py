@@ -127,7 +127,13 @@ except TypeError, e:
     print "Expected exception arrived: ", e
 else:
     fail();
-    
+
+start("Creating a new graph, extending it to 45 vertices and adding an edge");
+g=igraph.Graph();
+g.add_vertices(44);
+g.add_edges([(0, 1)]);
+test(g.vcount() == 45 and g.ecount() == 1);
+
 start("Recreating a graph with 5 nodes and a couple of edges");
 g=igraph.Graph(n=5);
 g.add_edges([(0, 1), (1, 2), (2, 3), (3, 4), (4, 0), (4, 1), (0, 3), (2, 2)]);
@@ -212,6 +218,10 @@ test(g.vcount() == 10 and g.ecount() == 9 and neis == [0,1,2,3,4,6,7,8,9])
 start("Generating directed closed ring graph with 10 nodes and mutual edges")
 g=igraph.Graph.Ring(10, directed=True, mutual=True)
 test(g.vcount() == 10 and g.ecount() == 20)
+
+start("Generating an undirected graph with a given degree sequence")
+g=igraph.Graph.Degree_Sequence([3, 2, 2, 1])
+test(g.vcount() == 4 and g.degree(loops=True) == [3, 2, 2, 1])
 
 start("Generating a ternary directed tree with 40 nodes")
 g=igraph.Graph.Tree(40, 3, type=igraph.TREE_OUT)

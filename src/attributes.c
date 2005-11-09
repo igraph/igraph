@@ -356,15 +356,16 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
 
 /**
  * \ingroup internal
- * \brief Returns the type of an attribute in an attribute list
+ * \brief Returns 0 if the given attribute exists and returns
+ * its type in the third argument. Returns an error code otherwise.
  */
 
 int igraph_attribute_list_get_type(igraph_attribute_list_t *al, 
 				   const char *name,
 				   igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-  *type=VECTOR(al->types)[pos];
-    
+  if (pos<0) return 1;
+  if (type) *type=VECTOR(al->types)[pos];
   return 0;
 }
 

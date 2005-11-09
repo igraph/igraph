@@ -1,3 +1,18 @@
+2005-11-10  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+	* interfaces/python/igraphmodule.c
+	  (igraphmodule_Graph_Degree_Sequence): added
+	* interfaces/python/igraphmodule.c
+	  (igraphmodule_PyList_to_vector_t): bugfixes
+	* Makefile.am: debcvs is now a .PHONY target
+	* interfaces/python/Makefile.am: now compiles
+	  even if libigraph.so is not in the library path
+	* interfaces/python/test.py: added test case for
+	  Graph.Degree_Sequence
+	* debian/rules: added attributes.h to libigraph-dev
+	* src/attributes.c
+	  (igraph_attribute_list_get_type): returns 1
+	  if the requested attribute is nonexistent
+	  
 2005-11-04  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/random.c : added temporary expm1 implementation for

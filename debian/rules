@@ -74,6 +74,7 @@ binary-arch: build install
 	dh_movefiles -plibigraph-dev    \
 	    usr/include/igraph/igraph.h \
 			usr/include/igraph/types.h  \
+			usr/include/igraph/attributes.h  \
 			usr/lib/libigraph.a         \
 			usr/lib/libigraph.la        \
 			usr/lib/pkgconfig/igraph.pc

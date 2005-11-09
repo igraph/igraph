@@ -116,8 +116,8 @@ static int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t n
 	     if (PyTuple_Check(list) && PyTuple_Size(list)==2)
 	       {
 		  i1=i2=NULL;
-		  i1=PyTuple_GetItem(list, 1);
-		  if (i1) i2=PyTuple_GetItem(list, 2);
+		  i1=PyTuple_GetItem(list, 0);
+		  if (i1) i2=PyTuple_GetItem(list, 1);
 		  if (i1 && i2) 
 		    {
 		       if (PyInt_Check(i1) && PyInt_Check(i2)) 
@@ -215,7 +215,7 @@ static int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t n
 				 return 1;
 			      }
 			    
-			 }
+			 } else ok=0;
 		    }
 		  else 
 		    {
@@ -231,16 +231,26 @@ static int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t n
 	     
 		  if (!ok)
 		    {
-		       // item is not a non-negative integer, so throw an exception
-		       if (need_non_negative)
-			 PyErr_SetString(PyExc_TypeError, "List elements must be non-negative integers");
-		       else
-			 PyErr_SetString(PyExc_TypeError, "List elements must be integers");
-		       vector_destroy(v);
-		       return 1;
+		      if (pairs) {
+			// item is not a non-negative integer pair, so throw an exception
+			if (need_non_negative)
+			  PyErr_SetString(PyExc_TypeError, "List elements must be non-negative integer pairs");
+			else
+			  PyErr_SetString(PyExc_TypeError, "List elements must be integer pairs");
+			vector_destroy(v);
+			return 1;
+		      } else {
+			// item is not a non-negative integer, so throw an exception
+			if (need_non_negative)
+			  PyErr_SetString(PyExc_TypeError, "List elements must be non-negative integers");
+			else
+			  PyErr_SetString(PyExc_TypeError, "List elements must be integers");
+			vector_destroy(v);
+			return 1;
+		      }
 		    }
 		  
-		  // add idx into index vector
+		 // add idx into index vector
 		  VECTOR(*v)[k]=(real_t)idx;
 		  k++;
 		  if (pairs) 
@@ -1346,6 +1356,66 @@ static PyObject* igraphmodule_Graph_Tree(PyTypeObject *type,
      }
    
    return (PyObject*)self;
+}
+
+/** \ingroup python_interface
+ * \brief Generates a random graph with a given degree sequence
+ * This is intended to be a class method in Python, so the first argument
+ * is the type object and not the Python igraph object (because we have
+ * to allocate that in this method).
+ * 
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_degree_sequence_game
+ */
+static PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type,
+						    PyObject *args,
+						    PyObject *kwds) 
+{
+   igraphmodule_GraphObject *self;
+   vector_t outseq, inseq;
+   PyObject *outdeg=NULL, *indeg=NULL;
+   
+   static char *kwlist[] = 
+     {
+	"out", "in", NULL
+     }
+   ;
+
+   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!", kwlist,
+				    &PyList_Type, &outdeg,
+				    &PyList_Type, &indeg))
+     return NULL;
+   
+  if (igraphmodule_PyList_to_vector_t(outdeg, &outseq, 1, 0)) {
+    // something bad happened during conversion
+    return NULL;
+  }
+  if (indeg) {
+    if (igraphmodule_PyList_to_vector_t(indeg, &inseq, 1, 0)) {
+      // something bad happened during conversion
+      vector_destroy(&outseq);
+      return NULL;
+    }
+  } else {
+    vector_init(&inseq, 0);
+  }
+  
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+  if (self != NULL) 
+  {
+    if (igraph_degree_sequence_game(&self->g, &outseq, &inseq,
+				    IGRAPH_DEGSEQ_SIMPLE)) {
+      igraphmodule_handle_igraph_error();
+      vector_destroy(&outseq);
+      vector_destroy(&inseq);
+      return NULL;
+    }
+  }
+   
+  vector_destroy(&outseq);
+  vector_destroy(&inseq);
+  
+  return (PyObject*)self;
 }
 
 /** \ingroup python_interface
@@ -2568,6 +2638,17 @@ static PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphOb
 }
 
 /** \ingroup python_interface
+ * This structure is the collection of functions necessary to implement
+ * the graph as a mapping (e.g. to allow the retrieval and setting of
+ * igraph attributes in Python as if it were of a Python mapping type
+ */
+static PyMappingMethods igraphmodule_Graph_as_mapping = {
+    (inquiry)NULL,           // returns the number of graph attributes
+    (binaryfunc)NULL,        // returns an attribute by name
+    (objobjargproc)NULL      // sets an attribute by name
+};
+
+/** \ingroup python_interface
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
 static PyTypeObject igraphmodule_GraphType =
@@ -2585,7 +2666,7 @@ static PyTypeObject igraphmodule_GraphType =
      0,                                        // tp_repr
      0,                                        // tp_as_number
      0,                                        // tp_as_sequence
-     0,                                        // tp_as_mapping
+     &igraphmodule_Graph_as_mapping,           // tp_as_mapping
      0,                                        // tp_hash
      0,                                        // tp_call
      (reprfunc)igraphmodule_Graph_str,         // tp_str
@@ -2794,6 +2875,19 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
       "Generates a graph from an adjacency matrix. This function is yet unimplemented.\n\n"
       "Throws a NotImplementedError."
+  },
+  
+  // interface to igraph_degree_sequence_game
+  {"Degree_Sequence", (PyCFunction)igraphmodule_Graph_Degree_Sequence,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a graph with a given degree sequence.\n\n"
+      "Keyword arguments:\n"
+      "out -- the out-degree sequence for a directed graph. If the\n"
+      "       in-degree sequence is omitted, the generated graph\n"
+      "       will be undirected, so this will be the in-degree\n"
+      "       sequence as well\n"
+      "in  -- the in-degree sequence for a directed graph. Optional,\n"
+      "       if omitted, the generated graph will be undirected.\n"
   },
   
   /////////////////////////////////////
