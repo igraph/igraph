@@ -1,3 +1,7 @@
+2005-11-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structure_generators.c (igraph_star) : check bugs corrected
+
 2005-11-10  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 	* interfaces/python/igraphmodule.c
 	  (igraphmodule_Graph_Degree_Sequence): added

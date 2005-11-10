@@ -274,10 +274,11 @@ int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode,
   if (n<0) { 
     IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }
-  if (center<n || center >n-1) {
+  if (center<0 || center >n-1) {
     IGRAPH_ERROR("Invalid center vertex", IGRAPH_EINVAL);
   }
-  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+  if (mode != IGRAPH_STAR_OUT && mode != IGRAPH_STAR_IN && 
+      mode != IGRAPH_STAR_UNDIRECTED) {
     IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
   }
 
