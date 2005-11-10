@@ -6,3 +6,5 @@ EXTRA_DIST =					\
 	changelog.in				\
 	copyright \
 	prepare
+
+MAINTAINERCLEANFILES = Makefile.in

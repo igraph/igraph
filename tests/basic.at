@@ -1,0 +1,96 @@
+# Check the basic (interface) functions and implicitly also compilation
+
+# Test suite for the IGraph library.
+# Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
+# MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+AT_BANNER([[Basic (interface) functions.]])
+
+AT_SETUP([Compilation plus basic interface: ])
+
+AT_DATA([basic.c], 
+[[
+#include <igraph.h>
+int main() {
+  igraph_t g, g2;
+  vector_t v;
+
+  /* empty graph */
+  igraph_empty(&g, 0, 0);
+  igraph_destroy(&g);
+
+  /* copy */
+  igraph_empty(&g, 0, 0);
+  igraph_copy(&g2, &g);
+  igraph_ecount(&g2);
+  igraph_destroy(&g);
+  igraph_destroy(&g2);
+
+  /* add edges, ecount */
+  igraph_empty(&g, 10, 1);
+  vector_init(&v, 4);
+  VECTOR(v)[0]=0; VECTOR(v)[1]=1;
+  VECTOR(v)[2]=2; VECTOR(v)[3]=3;
+  igraph_add_edges(&g, &v);
+  vector_destroy(&v);
+  if (igraph_ecount(&g) != 2) {
+    printf("igraph_add_edges or igraph_ecount failed\n");
+    return 1;
+  }
+  igraph_destroy(&g);
+
+  /* add vertices, vcount */
+  igraph_empty(&g, 10, 1);
+  igraph_add_vertices(&g, 10);
+  if (igraph_vcount(&g) != 20) {
+    printf("igraph_add_vertices or igraph_vcount failed\n");
+    return 2;
+  }
+  igraph_destroy(&g);
+
+  /* delete edges */
+  igraph_empty(&g, 10, 1);
+  vector_init(&v, 6);
+  VECTOR(v)[0]=0; VECTOR(v)[1]=1;
+  VECTOR(v)[2]=2; VECTOR(v)[3]=3;
+  VECTOR(v)[2]=0; VECTOR(v)[3]=1;
+  igraph_add_edges(&g, &v);
+  vector_destroy(&v);
+  vector_init(&v, 4);
+  VECTOR(v)[0]=0; VECTOR(v)[1]=1;
+  VECTOR(v)[2]=0; VECTOR(v)[3]=1;
+  igraph_delete_edges(&g, &v);
+  vector_destroy(&v);
+  if (igraph_ecount(&g) != 1) {
+    printf("igraph_delete_edges failed\n");
+    return 3;
+  }
+  igraph_destroy(&g);
+
+  /* TODO: delete vertices */
+  /* TODO: neighbors */
+  /* TODO: is directed */
+  /* TODO: degree */
+
+  return 0;
+}
+]])
+
+AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph basic.c -o basic])
+AT_CHECK([LD_LIBRARY_PATH=$top_srcdir/src/.libs ./basic])
+
+AT_CLEANUP

@@ -1,0 +1,129 @@
+# Check the utility types (vector_t, etc.)
+
+# Test suite for the IGraph library.
+# Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
+# MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+AT_BANNER([[Utility types (vector_t, etc.)]])
+
+AT_SETUP([Utility types, vector_t: ])
+
+AT_DATA([vector.c],
+[[
+
+#include <stdio.h>
+#include <igraph.h>
+
+int print_vector(vector_t *v) {
+  long int i;
+  for (i=0; i<vector_size(v); i++) {
+    printf("%f ", VECTOR(*v)[i]);
+  }
+  printf("\n");
+  
+  return 0;
+}
+
+int main() {
+  
+  vector_t v, order;
+  long int i;
+  vector_init(&v, 10);
+  vector_null(&v);
+
+  /* indexing */
+  for (i=0; i<vector_size(&v); i++) {
+    VECTOR(v)[i]=i+1;
+  }
+  
+  /* resize */
+  vector_resize(&v, 12);
+  VECTOR(v)[10]=100;
+  VECTOR(v)[11]=1;
+  
+  /* order */
+  vector_init(&order,0);
+  vector_order(&v, &order, 100);
+
+  return 0;
+}
+]])
+
+AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph vector.c -o vector])
+AT_CHECK([LD_LIBRARY_PATH=$top_srcdir/src/.libs ./vector])
+
+AT_CLEANUP
+
+AT_SETUP([Utility types, igraph_trie_t: ])
+
+AT_DATA([trie.c], 
+[[
+#include <stdio.h>
+#include <igraph.h>
+
+int main() {
+  
+  igraph_trie_t trie;
+
+  /* init */
+  igraph_trie_init(&trie, 0);
+
+  /* add and get values */
+  printf("hello: %li\n", igraph_trie_get(&trie, "hello"));
+  printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp"));
+  printf("alma:  %li\n", igraph_trie_get(&trie, "alma"));
+  printf("also:  %li\n", igraph_trie_get(&trie, "also"));
+
+  printf("hello: %li\n", igraph_trie_get(&trie, "hello"));
+  printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp"));
+  printf("alma:  %li\n", igraph_trie_get(&trie, "alma"));
+  printf("also:  %li\n", igraph_trie_get(&trie, "also"));
+
+  printf("a:     %li\n", igraph_trie_get(&trie, "a"));
+  printf("axon:  %li\n", igraph_trie_get(&trie, "axon"));
+
+  printf("hello: %li\n", igraph_trie_get(&trie, "hello"));
+  printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp"));
+  printf("alma:  %li\n", igraph_trie_get(&trie, "alma"));
+  printf("also:  %li\n", igraph_trie_get(&trie, "also"));
+ 
+  /* destroy */
+  igraph_trie_destroy(&trie);
+  
+  return 0;
+}
+]])
+
+AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph trie.c -o trie])
+AT_CHECK([LD_LIBRARY_PATH=$top_srcdir/src/.libs ./trie], [0], 
+[[hello: 0
+hepp:  1
+alma:  2
+also:  3
+hello: 0
+hepp:  1
+alma:  2
+also:  3
+a:     4
+axon:  5
+hello: 0
+hepp:  1
+alma:  2
+also:  3
+]])
+
+AT_CLEANUP

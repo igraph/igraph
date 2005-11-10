@@ -3,15 +3,57 @@ AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE(igraph, 0.1)
 AM_CONFIG_HEADER(config.h)
 
+# Test suite
+AC_CONFIG_TESTDIR(tests)
+AC_CONFIG_FILES([tests/Makefile tests/atlocal])
+
 AC_PROG_CC
 AM_PROG_LEX
 AC_PROG_YACC
 
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
+AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h time.h unistd.h])
+
+AC_DEFUN(IGRAPH_WARNING,
+[AC_MSG_CHECKING(whether compiler accepts $1)
+AC_SUBST(WARNING_CFLAGS)
+ac_save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $1"
+AC_TRY_COMPILE(,
+[int x;],
+WARNING_CFLAGS="$WARNING_CFLAGS $1"
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+CFLAGS="$ac_save_CFLAGS"])
+
+AC_ARG_ENABLE(gcc-warnings,
+[  --enable-gcc-warnings   turn on lots of GCC warnings (not recommended)],
+[case "${enableval}" in
+   yes|no) ;;
+   *)      AC_MSG_ERROR([bad value ${enableval} for gcc-warnings option]) ;;
+ esac],
+              [enableval=no])
+if test "${enableval}" = yes; then
+  IGRAPH_WARNING(-Werror)
+  AC_SUBST([WERROR_CFLAGS], [$WARNING_CFLAGS])
+  WARNING_CFLAGS=
+  IGRAPH_WARNING(-Wall)
+  IGRAPH_WARNING(-W)
+  IGRAPH_WARNING(-Wbad-function-cast)
+  IGRAPH_WARNING(-Wcast-align)
+  IGRAPH_WARNING(-Wcast-qual)
+  IGRAPH_WARNING(-Wformat)
+  IGRAPH_WARNING(-Wmissing-declarations)
+  IGRAPH_WARNING(-Wmissing-prototypes)
+  IGRAPH_WARNING(-Wnested-externs)
+  IGRAPH_WARNING(-Wshadow)
+  IGRAPH_WARNING(-Wstrict-prototypes)
+  IGRAPH_WARNING(-Wwrite-strings)
+fi
 
 use_python=yes
 AC_ARG_ENABLE(python,

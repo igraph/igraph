@@ -12,3 +12,5 @@ install-exec-hook:
 	mkdir --parents $(DESTDIR)$(prefix)/lib/python$(PYTHON_VERSION)/site-packages
 	mv `readlink -f $(DESTDIR)$(libdir)/igraph.so` $(DESTDIR)$(prefix)/lib/python$(PYTHON_VERSION)/site-packages/igraph.so
 	rm $(DESTDIR)$(libdir)/igraph.so.* $(DESTDIR)$(libdir)/igraph.a $(DESTDIR)$(libdir)/igraph.la
+
+MAINTAINERCLEANFILES = Makefile.in

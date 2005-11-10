@@ -14,3 +14,5 @@ libigraph_la_LIBADD        = -lm
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = igraph.h types.h attributes.h error.h
+
+MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
