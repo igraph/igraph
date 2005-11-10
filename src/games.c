@@ -328,20 +328,23 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
 
   if (directed && 
       vector_size(out_seq) != vector_size(in_seq)) { 
-    igraph_error("Length of `out_seq' and  `in_seq' should match or directed graphs");
+    IGRAPH_ERROR("Length of `out_seq' and  `in_seq' differ for directed graph",
+		 IGRAPH_EINVAL);
   }
   
   outsum=vector_sum(out_seq);
   insum=vector_sum(in_seq);
-
+  
   if (!directed && outsum % 2 != 0) {
-    igraph_error("Total degree should be even for undirected graphs");
+    IGRAPH_ERROR("Total degree not even for undirected graph",
+		 IGRAPH_EINVAL);
   }
   
   if (directed && outsum != insum) {
-    igraph_error("The total in-degree should match the total out-degree for directed graphs");
+    IGRAPH_ERROR("Total in-degree and out-degree differfor directed graph",
+		 IGRAPH_EINVAL);
   }
-
+  
   no_of_nodes=vector_size(out_seq);
   if (directed) {
     no_of_edges=outsum;
@@ -440,7 +443,7 @@ int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
   if (method==IGRAPH_DEGSEQ_SIMPLE) {
     retval=igraph_degree_sequence_game_simple(graph, out_deg, in_deg);
   } else {
-    retval=igraph_error("Invalid method");
+    IGRAPH_ERROR("Invalid method", IGRAPH_EINVAL);
   }
 
   return retval;

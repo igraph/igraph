@@ -41,6 +41,7 @@ __BEGIN_DECLS
 
 #include "types.h"
 #include "attributes.h"
+#include "error.h"
 
 #include <stdio.h> 		/* FILE */
 
@@ -542,12 +543,6 @@ int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
 				vector_t *types);
 int igraph_get_edge_attribute_type(igraph_t *graph, const char *name, 
 				   igraph_attribute_type_t *type);
-
-/* -------------------------------------------------- */
-/* Error handling                                     */
-/* -------------------------------------------------- */
-
-int igraph_error(const char *msg);
 
 /* -------------------------------------------------- */
 /* Constructors, deterministic                        */

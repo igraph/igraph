@@ -139,6 +139,8 @@ int vector_move_interval(vector_t *v, long int begin, long int end,
 int vector_remove(vector_t *v, long int elem);
 int vector_permdelete(vector_t *v, long int *index, long int nremove);
 int vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove);
+bool_t vector_isininterval(vector_t *v, real_t low, real_t high);
+bool_t vector_any_smaller(vector_t *v, real_t limit);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */

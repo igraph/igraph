@@ -1164,7 +1164,7 @@ int igraph_transitivity(igraph_t *graph, vector_t *res,
   if (type == IGRAPH_TRANSITIVITY_UNDIRECTED) {
     retval=igraph_transitivity_undirected(graph, res);
   } else {
-    retval=igraph_error("unknown transitivity type");
+    IGRAPH_ERROR("unknown transitivity type", IGRAPH_EINVAL);
   }
   
   return retval;

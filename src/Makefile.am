@@ -13,4 +13,4 @@ libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm
 
 includedir = $(prefix)/include/igraph
-include_HEADERS = igraph.h types.h attributes.h
+include_HEADERS = igraph.h types.h attributes.h error.h

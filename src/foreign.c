@@ -64,9 +64,9 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
   while (!feof(instream)) {
     int read;
     read=fscanf(instream, "%li", &from);
-    if (read != 1) { igraph_error("Parse error in file\n"); }
+    if (read != 1) { IGRAPH_ERROR("Parse error in file", IGRAPH_PARSEERROR); }
     read=fscanf(instream, "%li", &to);
-    if (read != 1) { igraph_error("Parse error in file\n"); }
+    if (read != 1) { IGRAPH_ERROR("Parse error in file", IGRAPH_PARSEERROR); }
     vector_push_back(&edges, from);
     vector_push_back(&edges, to);
     

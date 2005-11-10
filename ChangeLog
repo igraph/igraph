@@ -13,6 +13,36 @@
 	  (igraph_attribute_list_get_type): returns 1
 	  if the requested attribute is nonexistent
 	  
+2005-11-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/error.c (igraph_error, igraph_error_handler_abort)
+	(igraph_error_handler_ignore) : fprintf bug corrected
+	
+	* src/type_indexededgelist.c (igraph_empty,igraph_add_edges)
+	(igraph_add_vertices,igraph_delete_vertices,igraph_neighbors)
+	(igraph_degree) : error handling added
+	* src/structure_generators.c (igraph_create,igraph_star,igraph_lattice)
+	(igraph_ring,igraph_tree,igraph_full) : error handling added
+	* src/types.c (vector_isininterval,vector_any_smaller) : new
+	* igraph/src/rinterface.c (R_igraph_myhandler,R_igraph_before)
+	(R_igraph_after) : install own error handler
+	* igraph/src/rinterface.c (all functions) : install own error handler
+
+2005-11-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/error.c (igraph_error, igraph_strerror)
+	(igraph_error_handler_abort, igraph_error_handler_ignore)
+	(igraph_set_error_handler) : new error handling
+	* src/type_indexededgelist.c (igraph_add_edges, igraph_delete_edges) :
+	new error handling
+	* src/foreign.c (igraph_read_graph_edgelist) : new error handling
+	* src/games.c (igraph_degree_sequence_game)
+	(igraph_degree_sequence_game_simple) : new error handling
+	* src/other.c (igraph_running_mean) : new error handling
+	* src/structural_properties.c (igraph_transitivity) : new error 
+	handling
+	* src/structure_generators.c (igraph_adjacency) : new error handling
+
 2005-11-04  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/random.c : added temporary expm1 implementation for

@@ -45,10 +45,17 @@
  */
 int igraph_create(igraph_t *graph, vector_t *edges, integer_t n, 
 		  bool_t directed) {
+  real_t max=vector_max(edges)+1;
+
+  if (vector_size(edges) % 2 != 0) {
+    IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVAL);
+  }
+  if (!vector_isininterval(edges, 0, max-1)) {
+    IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVAL);
+  }
 
   igraph_empty(graph, n, directed);
   if (vector_size(edges)>0) {
-    real_t max=vector_max(edges)+1;
     integer_t vc=igraph_vcount(graph);
     if (vc < max) {
       igraph_add_vertices(graph, max-vc);
@@ -197,7 +204,7 @@ int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
 
   /* Some checks */
   if (matrix_nrow(adjmatrix) != matrix_ncol(adjmatrix)) {
-    igraph_error("Non-square matrix");
+    IGRAPH_ERROR("Non-square matrix", IGRAPH_EINVAL);
   }
 
   vector_init(&edges, 0);
@@ -263,6 +270,16 @@ int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode,
 
   vector_t edges;
   long int i;
+
+  if (n<0) { 
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (center<n || center >n-1) {
+    IGRAPH_ERROR("Invalid center vertex", IGRAPH_EINVAL);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+  }
 
   vector_init(&edges, (n-1)*2);
   if (mode == IGRAPH_STAR_OUT) {
@@ -394,6 +411,10 @@ int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei,
   long int i, j;
   int carry, pos;
 
+  if (vector_any_smaller(dimvector, 0)) {
+    IGRAPH_ERROR("Invalid dimension vector", IGRAPH_EINVAL);
+  }
+
   /* init coords & weights */
 
   coords=Calloc(dims, long int);
@@ -484,6 +505,10 @@ int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
 		bool_t circular) {
   
   vector_t v;
+
+  if (n<0) {
+    IGRAPH_ERROR("negative number of vertices", IGRAPH_EINVAL);
+  }
   
   vector_init(&v, 1);
   VECTOR(v)[0]=n;
@@ -526,6 +551,14 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
   long int i, j;
   long int idx=0;
   long int to=1;
+
+  if (n<0 || children<=0) {
+    IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
+  }
+  if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN !=
+      type != IGRAPH_TREE_UNDIRECTED) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVAL);
+  }
   
   vector_init(&edges, 2*(n-1));
   
@@ -581,7 +614,11 @@ int igraph_full(igraph_t *graph, integer_t n, bool_t directed, bool_t loops) {
   
   vector_t edges;
   long int i, j;
-  
+
+  if (n<0) {
+    IGRAPH_ERROR("invalid number of vertices", IGRAPH_EINVAL);
+  }
+
   vector_init(&edges, 0);
   if (directed && loops) {
     vector_reserve(&edges, n*n);

@@ -23,6 +23,7 @@
 #include "types.h"
 #include "memory.h"
 #include "random.h"
+#include "error.h"
 
 #include <assert.h>
 #include <string.h> 		/* memcpy & co. */
@@ -839,6 +840,30 @@ int vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove) {
   }
   vector_resize(v, vector_size(v)-nremove);
   
+  return 0;
+}
+
+/**
+ * \ingroup internal
+ */
+
+bool_t vector_isininterval(vector_t *v, real_t low, real_t high) {
+  real_t *ptr;
+  for (ptr=v->stor_begin; ptr<v->end; ptr++) {
+    if (*ptr < 0 || *ptr >high) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+bool_t vector_any_smaller(vector_t *v, real_t limit) {
+  real_t *ptr;
+  for (ptr=v->stor_begin; ptr<v->end; ptr++) {
+    if (*ptr < limit) {
+      return 1;
+    }
+  }
   return 0;
 }
 

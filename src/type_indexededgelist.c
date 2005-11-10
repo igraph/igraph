@@ -46,6 +46,10 @@ int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index,
  */
 int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
 
+  if (n<0) {
+    IGRAPH_ERROR("n should be positive", IGRAPH_EINVAL);
+  }
+
   graph->n=0;
   graph->directed=directed;
   vector_init(&graph->from, 0);
@@ -155,10 +159,12 @@ int igraph_add_edges(igraph_t *graph, vector_t *edges) {
   long int no_of_edges=vector_size(&graph->from);
   long int edges_to_add=vector_size(edges)/2;
   long int i=0;
-  real_t max=vector_max(edges);
 
-  if (max > graph->n-1) {
-    igraph_error("invalid vertex id\n");
+  if (!vector_isininterval(edges, 0, igraph_vcount(graph)-1)) {
+    IGRAPH_ERROR("invalid vertex id in edges vector", IGRAPH_EINVAL);
+  }
+  if (vector_size(edges) % 2 != 0) {
+    IGRAPH_ERROR("invalid length of edges vector", IGRAPH_EINVAL);
   }
 
   /* from & to */
@@ -199,6 +205,10 @@ int igraph_add_edges(igraph_t *graph, vector_t *edges) {
 int igraph_add_vertices(igraph_t *graph, integer_t nv) {
   long int ec=igraph_ecount(graph);
   long int i;
+
+  if (nv < 0) {
+    IGRAPH_ERROR("invalid number of vertices", IGRAPH_EINVAL);
+  }
   
   vector_resize(&graph->os, graph->n+nv+1);
   vector_resize(&graph->is, graph->n+nv+1);
@@ -279,9 +289,13 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
 	really_delete++;
       }
     }
+    /* TODO: This is commented out because there is no chance to repair 
+       the graph anyway. The function should be rewritten...
+       Now nonexistent edges are silently ignored.
+    */
 /*     if (d==-1) { */
-/*       igraph_error("No such edge to delete"); */
-/*     }        */
+/*       IGRAPH_ERROR("No such edge to delete", IGRAPH_EINVAL); */
+/*     } */
   }
 
   /* OK, all edges to delete are marked with negative numbers */
@@ -344,6 +358,10 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
   long int *index;
   vector_t newfrom, newto;
   long int idx2=0;
+
+  if (!vector_isininterval(vertices, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVAL);
+  }
 
   for (i=0; i<vertices_to_delete; i++) {
     long int vid=VECTOR(*vertices)[i];
@@ -468,9 +486,16 @@ int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode,
 
   long int node=pnode;
 
+  if (node<0 || node>igraph_vcount(graph)-1) {
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVAL);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+  }
+
   no_of_edges=vector_size(&graph->from);
   if (! graph->directed) {
-    mode=3;
+    mode=IGRAPH_ALL;
   }
 
   /* Calculate needed space first & allocate it*/
@@ -589,6 +614,13 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
 
   long int nodes_to_calc;
   long int i, j;
+
+  if (!vector_isininterval(vids, 0, igraph_vcount(graph)-1)) {
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVAL);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+  }
   
   nodes_to_calc=vector_size(vids);
   if (!igraph_is_directed(graph)) {
