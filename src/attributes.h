@@ -64,6 +64,8 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
 int igraph_attribute_list_get_type(igraph_attribute_list_t *al, 
 				   const char *name,
 				   igraph_attribute_type_t *type);
+bool_t igraph_attribute_list_has(igraph_attribute_list_t *graph, 
+				 const char *name);
 
 int igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al, 
 				      long int *index, long int nremove);

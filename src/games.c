@@ -35,15 +35,17 @@
  * @param m The number of outgoing edges generated for each
  *        vertex. (Only if <code>outseq</code> is not given.)
  * @param outseq Gives the (out-)degrees of the vertices. If this is
- *        constant, this can be an empty (but initialized!) vector,
- *        in this case <code>m</code> contains the constant
- *        out-degree. 
+ *        constant, this can be a NULL pointer or an empty (but
+ *        initialized!) vector, in this case <code>m</code> contains
+ *        the constant out-degree. 
  * @param outpref Boolean, if true not only the in- but also the out-degree
  *        of a vertex increases its citation probability. Ie. the
  *        citation probability is determined by the total degree of
  *        the vertices.
  * @param directed Boolean, whether to generate a directed graph.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b> invalid <code>n</code>,
+ *           <code>m</code> or <code>outseq</code> parameter.
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
  * plus the number of edges.
@@ -63,7 +65,17 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
 
   long int i,j;
 
-  if (vector_size(outseq) == 0) {
+  if (n<0) {
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (outseq != 0 && vector_size(outseq) != 0 && vector_size(outseq) != n) {
+    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+  }
+  if ( (outseq == 0 || vector_size(outseq) == 0) && m<0) {
+    IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+  }
+
+  if (outseq==0 || vector_size(outseq) == 0) {
     no_of_neighbors=m;
     bag=Calloc(no_of_nodes * no_of_neighbors + no_of_nodes +
 	       outpref * no_of_nodes * no_of_neighbors,
@@ -91,7 +103,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
   
   for (i=1; i<no_of_nodes; i++) {
     /* draw edges */
-    if (vector_size(outseq)!=0) { no_of_neighbors=VECTOR(*outseq)[i]; }
+    if (outseq != 0 && vector_size(outseq)!=0) { no_of_neighbors=VECTOR(*outseq)[i]; }
     for (j=0; j<no_of_neighbors; j++) {
       long int to=bag[RNG_INTEGER(0, bagp-1)];
       VECTOR(edges)[resp++] = i;
@@ -127,6 +139,13 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
   vector_t edges;
   vector_t s;
   int retval=0;
+
+  if (n<0) {
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (p<0.0 || p>1.0) {
+    IGRAPH_ERROR("Invalid probability given", IGRAPH_EINVAL);
+  }
   
   if (p==0.0 || no_of_nodes<=1) {
     retval=igraph_empty(graph, n, directed);
@@ -208,6 +227,13 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
   vector_t edges;
   vector_t s;
   int retval=0;
+
+  if (n<0) {
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (m<0) {
+    IGRAPH_ERROR("Invalid number of edges", IGRAPH_EINVAL);
+  }  
   
   if (m==0.0 || no_of_nodes<=1) {
     retval=igraph_empty(graph, n, directed);
@@ -224,7 +250,11 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
     else 
       { maxedges = n * (n-1)/2; }
 
-    if (maxedges <= no_of_edges) {
+    if (no_of_edges > maxedges) {
+      IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
+    }
+    
+    if (maxedges == no_of_edges) {
       retval=igraph_full(graph, n, directed, loops);
     } else {
     
@@ -292,7 +322,10 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
  *        parameter for <code>G(n,m)</code> graphs.
  * @param directed Logical, whether to generate a directed graph.
  * @param loops Logical, whether to generate loops (self) edges.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid <code>type</code>,
+ *           <code>n</code>, <code>p</code> or <code>m</code>
+ *           parameter. 
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
  * plus the number of edges in the graph.
@@ -309,7 +342,7 @@ int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
   } else if (type == IGRAPH_ERDOS_RENYI_GNM) {
     retval=igraph_erdos_renyi_game_gnm(graph, n, p_or_m, directed, loops);
   } else {
-    retval=-1;
+    IGRAPH_ERROR("Invalid type", IGRAPH_EINVAL);
   }
   
   return retval;
@@ -319,13 +352,19 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
 				       vector_t *in_seq) {
 
   long int outsum=0, insum=0;
-  bool_t directed=(vector_size(in_seq)!=0);
+  bool_t directed=(in_seq != 0 && vector_size(in_seq)!=0);
   long int no_of_nodes, no_of_edges;
   long int *bag1=0, *bag2=0;
   long int bagp1=0, bagp2=0;
   vector_t edges;
   long int i,j;
 
+  if (vector_any_smaller(out_seq, 0)) {
+    IGRAPH_ERROR("Negative out degree", IGRAPH_EINVAL);
+  }
+  if (directed && vector_any_smaller(in_seq, 0)) {
+    IGRAPH_ERROR("Negative in degree", IGRAPH_EINVAL);
+  }
   if (directed && 
       vector_size(out_seq) != vector_size(in_seq)) { 
     IGRAPH_ERROR("Length of `out_seq' and  `in_seq' differ for directed graph",
@@ -417,7 +456,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
  *        <code>in_seq</code> is of length zero), or the out-degree
  *        sequence of a directed graph (if <code>in_deq</code> is not
  *        of length zero.
- * @param in_deg It is either a zero-length vector (if an undirected
+ * @param in_deg It is either a zero-length vector or NULL (if an undirected
  *        graph is generated), or the in-degree sequence.
  * @param method The method to generate the graph. Possible values: 
  *        <b>IGRAPH_DEGSEQ_SIMPLE</b>, for undirected graphs this
@@ -427,7 +466,13 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
  *        generate both loop (self) edges and multiple edges.
  *        For directed graphs, the algorithm is basically the same,
  *        but two separate bags are used for the in- and out-degrees. 
- * @return Error code.
+ * @return Error code: 
+ *         - <b>IGRAPH_EINVAL</b>: invalid method parameter, or
+ *           invalid in- and/or out-degree vectors. The degree vectors
+ *           should be non-negative, <code>out_deg</code> should sum
+ *           up to an even integer for undirected graphs; the length
+ *           and sum of <code>out_deg</code> and <code>in_deg</code>
+ *           should match for directed graphs.
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
  * plus the number of edges.
@@ -464,7 +509,9 @@ int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
  * @param directed Boolean, whether to generate a directed graph.
  * @param citation Boolean, if <code>TRUE</code> the edges always
  *        originate from the most recently added vertex.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid <code>n</code> or
+ *           <code>m</code> parameter.
  *
  * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
  * plus the number of edges.
@@ -481,6 +528,13 @@ int igraph_growing_random_game(igraph_t *graph, integer_t n,
   long int resp=0;
 
   long int i,j;
+
+  if (n<0) {
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (m<0) {
+    IGRAPH_ERROR("Invalid number of edges per step (m)", IGRAPH_EINVAL);
+  }
 
   no_of_edges=(no_of_nodes-1) * no_of_neighbors;
     

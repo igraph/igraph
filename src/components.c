@@ -45,7 +45,8 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
  *        weakly or strongly connected components. Possible values: 
  *        <b>IGRAPH_WEAK</B>, <b>IGRAPH_STRONG</b>. This argument is
  *        igrored for undirected graphs.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid mode argument.
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
  * <code>|E|</code> are the number of vertices and edges in the graph.
@@ -59,6 +60,8 @@ int igraph_clusters(igraph_t *graph, vector_t *membership, vector_t *csize,
     return igraph_clusters_weak(graph, membership, csize);
   } else if (mode==IGRAPH_STRONG) {
     return igraph_clusters_strong(graph, membership, csize);
+  } else {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVAL);
   }
   
   return 1;
@@ -227,7 +230,8 @@ int igraph_is_connected_weak(igraph_t *graph, bool_t *res);
  *        weak or strong connectedness. Possible values: 
  *        <b>IGRAPH_WEAK</B>, <b>IGRAPH_STRONG</b>. This argument is
  *        igrored for undirected graphs.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid mode argument.
  *
  * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
  * plus the number of edges in the graph.
@@ -249,6 +253,8 @@ int igraph_is_connected(igraph_t *graph, bool_t *res,
     vector_destroy(&membership);
     vector_destroy(&csize);
     return retval;
+  } else {
+    IGRAPH_ERROR("invalid mode argument", IGRAPH_EINVAL);
   }
   return 0;
 }

@@ -39,7 +39,8 @@ int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index,
  * @param n The number of vertices in the graph, a non-negative
  *          integer number is expected.
  * @param directed Whether the graph is directed or not.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
  * 
  * Time complexity: <code>O(|V|)</code> for a graph with
  * <code>|V|</code> vertices (and no edges).
@@ -147,7 +148,9 @@ int igraph_copy(igraph_t *to, igraph_t *from) {
  * want to add new vertices, call igraph_add_vertices() first.
  * @param graph The graph to which the edges will be added.
  * @param edges The edges themselves.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVEVECTOR</b>: invalid (odd) edges vector length.
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id in edges vector.
  *
  * This function invalidates all iterators.
  *
@@ -160,11 +163,11 @@ int igraph_add_edges(igraph_t *graph, vector_t *edges) {
   long int edges_to_add=vector_size(edges)/2;
   long int i=0;
 
-  if (!vector_isininterval(edges, 0, igraph_vcount(graph)-1)) {
-    IGRAPH_ERROR("invalid vertex id in edges vector", IGRAPH_EINVAL);
-  }
   if (vector_size(edges) % 2 != 0) {
-    IGRAPH_ERROR("invalid length of edges vector", IGRAPH_EINVAL);
+    IGRAPH_ERROR("invalid length of edges vector", IGRAPH_EINVEVECTOR);
+  }
+  if (!vector_isininterval(edges, 0, igraph_vcount(graph)-1)) {
+    IGRAPH_ERROR("invalid vertex id in edges vector", IGRAPH_EINVVID);
   }
 
   /* from & to */
@@ -197,7 +200,8 @@ int igraph_add_edges(igraph_t *graph, vector_t *edges) {
  * @param graph The graph object to extend.
  * @param nv Non-negative integer giving the number of 
  *           vertices to add.
- * @return Error code.
+ * @return Error code: 
+ *         - <b>IGRAPH_EINVAL</b>: invalid number of new vertices.
  *
  * Time complexity: <code>O(|V|)</code> where <code>|V|</code> is
  * the number of vertices in the \em new, extended graph.
@@ -239,7 +243,9 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
  * This function invalidates all iterators.
  * @param graph The graph to work on.
  * @param edges The edges to remove.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id in edges vector.
+ *         - <b>IGRAPH_EINVAL</b>: no such edge to delete.
  *
  * Time complexity: <code>O(|V|+|E|)</code> where <code>|V|</code>
  * and <code>|E|</code> are the number of vertices and edges in the
@@ -252,9 +258,17 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
   long int edges_to_delete=vector_size(edges)/2;
   long int really_delete=0;
   long int i;
-  vector_t newfrom, newto;
+  vector_t newfrom, newto;  
   long int idx=0;
+  vector_t backup;
 
+  if (!vector_isininterval(edges, 0, igraph_vcount(graph)-1)) {
+    IGRAPH_ERROR("invalid vertex id in edges vector", IGRAPH_EINVVID);
+  }
+
+  /* backup copy */
+  vector_copy(&backup, &graph->from);
+  
   /* result */
 
   for (i=0; i<edges_to_delete; i++) {
@@ -289,15 +303,15 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
 	really_delete++;
       }
     }
-    /* TODO: This is commented out because there is no chance to repair 
-       the graph anyway. The function should be rewritten...
-       Now nonexistent edges are silently ignored.
-    */
-/*     if (d==-1) { */
-/*       IGRAPH_ERROR("No such edge to delete", IGRAPH_EINVAL); */
-/*     } */
+    if (d==-1) {
+      /* repair the graph */
+      vector_destroy(&graph->from);
+      graph->from=backup;
+      IGRAPH_ERROR("No such edge to delete", IGRAPH_EINVAL);
+    }
   }
 
+  vector_destroy(&backup);
   /* OK, all edges to delete are marked with negative numbers */
   
   /* Edge attributes */
@@ -341,7 +355,8 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
  * @param vertices The ids of the vertices to remove in a 
  *                 vector. The vector may contain the same id more
  *                 than once.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
  *
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
  * <code>|E|</code> are the number of vertices and edges in the
@@ -360,7 +375,7 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
   long int idx2=0;
 
   if (!vector_isininterval(vertices, 0, no_of_nodes-1)) {
-    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVAL);
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
   }
 
   for (i=0; i<vertices_to_delete; i++) {
@@ -472,7 +487,9 @@ integer_t igraph_ecount(igraph_t *graph) {
  *          vertex is reachable are searched.
  *        - <b>IGRAPH_ALL</b>, both kind of vertices are searched.
  *        This parameter is ignored for undirected graphs.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
+ *         - <b>IGRAPH_EINVMODE</b>: invalid mode argument.
  * 
  * Time complexity: <code>O(d)</code>, <code>d</code> is the number
  * of adjacent vertices to the queried vertex.
@@ -487,10 +504,10 @@ int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode,
   long int node=pnode;
 
   if (node<0 || node>igraph_vcount(graph)-1) {
-    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVAL);
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
-    IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+    IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
   }
 
   no_of_edges=vector_size(&graph->from);
@@ -602,6 +619,9 @@ bool_t igraph_is_directed(igraph_t *graph) {
  *        This parameter is ignored for undirected graphs. 
  * @param loops Boolean, gives whether the self-loops should be
  *        counted.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
+ *         - <b>IGRAPH_EINVMODE</b>: invalid mode argument.
  *
  * Time complexity: <code>O(v)</code> if <code>loops</code> is
  * <code>TRUE</code>, and <code>O(v*d)</code>
@@ -616,10 +636,10 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
   long int i, j;
 
   if (!vector_isininterval(vids, 0, igraph_vcount(graph)-1)) {
-    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVAL);
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
-    IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+    IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
   }
   
   nodes_to_calc=vector_size(vids);

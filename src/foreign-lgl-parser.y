@@ -8,6 +8,7 @@ extern int igraph_lgl_yyleng;
 int igraph_lgl_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
+#include "error.h"
 extern vector_t *igraph_lgl_vector;
 extern vector_t *igraph_lgl_weights;
 extern igraph_trie_t *igraph_lgl_trie;
@@ -67,8 +68,7 @@ weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yytext,
 
 int igraph_lgl_yyerror (char *s)
 {
-  fprintf (stderr, "%s: line %d\n", s, mylineno);
-  return 1;
+  IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
 }
 
 real_t igraph_lgl_get_number(const char *str, long int length) {

@@ -1,3 +1,63 @@
+2005-11-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_degree_sequence_game_simple) :
+	in_seq may be null pointer
+	* src/games.c (igraph_barabasi_game) : error handling + outseq may
+	be null pointer
+	* src/games.c (igraph_erdos_renyi_game_gnp)
+	(igraph_erdos_renyi_game_gnm, igraph_erdos_renyi_game) :
+	error handling added
+	* src/type_indexededgelist.c (igraph_add_edges)
+	(igraph_delete_edges, igraph_delete_vertices)
+	(igraph_neighbors, igraph_degree) : error handling added
+	* src/foreign.c (igraph_write_graph_edgelist)
+	(igraph_write_graph_ncol, igraph_write_graph_lgl) : error handling
+	* src/foreign-lgl-parser.y (igraph_lgl_yyerror) : error handling
+	* src/iterators.c (igraph_iterator_vid, igraph_iterator_eid)
+	(igraph_iterator_efromorder, igraph_iterator_eneis)
+	(igraph_iterator_vneis, igraph_prev) : error handling
+	* src/basic_query.c (igraph_are_connected) : error handling added
+	* src/components.c (igraph_clusters, igraph_is_connected) : error
+	handling added
+	* src/conversion.c (igraph_get_adjacency) : error handling added
+	* src/error.c (igraph_i_error_strings) : new errors defined
+	* src/structural_properties.c (igraph_diameter)
+	(igraph_average_path_length)
+	(igraph_minimum_spanning_tree_unweighted)
+	(igraph_minimum_spanning_tree_prim, igraph_closeness)
+	(igraph_shortest_paths, igraph_get_shortest_paths)
+	(igraph_subcomponent, igraph_betweenness, igraph_edge_betweenness)
+	(igraph_subgraph, igraph_transitivity_undirected) : error handling
+	* src/structure_generators.c (igraph_create, igraph_adjacency)
+	(igraph_star, igraph_tree) : error handling added
+	* src/cocitation.c (igraph_cocitation_real) : error handling added
+	* src/foreign-ncol-parser.y (igraph_ncol_yyerror) : error handling
+	* src/attributes.c (igraph_attribute_list_add)
+	(igraph_attribute_list_remove, igraph_attribute_list_get)
+	(igraph_attribute_list_set, igraph_attribute_list_get_many)
+	(igraph_attribute_list_set_many, igraph_attribute_list_get_all)
+	(igraph_attribute_list_get_type, igraph_remove_graph_attribute)
+	(igraph_get_graph_attribute, igraph_set_graph_attribute)
+	(igraph_list_graph_attributes, igraph_add_vertex_attribute)
+	(igraph_remove_vertex_attribute, igraph_get_vertex_attribute)
+	(igraph_set_vertex_attribute, igraph_get_vertex_attributes)
+	(igraph_set_vertex_attributes, igraph_list_vertex_attributes)
+	(igraph_add_edge_attribute, igraph_remove_edge_attribute)
+	(igraph_get_edge_attribute, igraph_set_edge_attribute)
+	(igraph_get_edge_attributes, igraph_set_edge_attributes)
+	(igraph_list_edge_attributes, igraph_get_graph_attribute_type)
+	(igraph_get_vertex_attribute_type, igraph_get_edge_attribute_type)
+	: error handling added
+	
+2005-11-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/attributes.c (igraph_i_attribute_list_get_pos) : bug corrected
+
+2005-11-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/attributes.c (igraph_has_graph_attribute)
+	(igraph_has_vertex_attribute, igraph_has_edge_attribute) : added
+
 2005-11-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_star) : check bugs corrected

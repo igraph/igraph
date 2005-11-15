@@ -33,7 +33,13 @@ enum {
   IGRAPH_FAILURE    = 1,
   IGRAPH_ENOMEM     = 2,
   IGRAPH_PARSEERROR = 3,
-  IGRAPH_EINVAL     = 4
+  IGRAPH_EINVAL     = 4,
+  IGRAPH_EXISTS     = 5,
+  IGRAPH_EINVEVECTOR= 6,
+  IGRAPH_EINVVID    = 7,
+  IGRAPH_NONSQUARE  = 8,
+  IGRAPH_EINVMODE   = 9,
+  IGRAPH_EFILE      = 10
 };
 
 #define IGRAPH_ERROR(reason, igraph_errno) \

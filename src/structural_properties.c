@@ -39,7 +39,8 @@
  *        returned. (The ratio behind the latter is that this is
  *        always longer than the longest possible diameter in a
  *        graph.) 
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary data.
  *
  * Time complexity: <code>O(|V||E|)</code>, the number of vertices
  * times the number of edges.
@@ -60,6 +61,9 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
   *res=0;  
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
   already_added=Calloc(no_of_nodes, long int);
+  if (already_added==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   dqueue_init(&q, 100);
   vector_init(&neis, 0);
   
@@ -114,7 +118,8 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
  *        used for the length of non-existing geodesics. (The ratio
  *        behind this is that this is always longer than the longest
  *        possible geodesic in a graph.) 
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for data structures
  *
  * Time complexity: <code>O(|V||E|)</code>, the number of vertices
  * times the number of edges.
@@ -135,6 +140,9 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
   *res=0;  
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
   already_added=Calloc(no_of_nodes, long int);
+  if (already_added==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   dqueue_init(&q, 100);
   vector_init(&neis, 0);
   
@@ -196,7 +204,8 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
  *        <em>not</em> initialize this object before passing it to
  *        this function, but be sure to call igraph_destroy() on it if
  *        you don't need it any more.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary data.
  *
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
  * number of vertices, <code>|E|</code> the number of edges in the
@@ -216,6 +225,9 @@ int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
   long int i, j;
 
   already_added=Calloc(no_of_nodes, char);
+  if (already_added==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   vector_init(&tmp, 0);
 
   dqueue_init(&q, 100);
@@ -278,7 +290,10 @@ int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
  *        you don't need it any more.
  * @param weights A vector containing the weights of the the edges.
  *        in the same order as the simple edge iterator visits them.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
+ *         - <b>IGRAPH_EINVAL</b>, length of weight vector does not
+ *           match number of edges.
  *
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
  * number of vertices, <code>|E|</code> the number of edges in the
@@ -301,7 +316,14 @@ int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
 
   long int i;
 
+  if (vector_size(weights) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL);
+  }
+
   already_added=Calloc(no_of_nodes, char);
+  if (already_added == 0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   
   d_indheap_init(&heap, 0);
   vector_init(&edges, 0);
@@ -387,7 +409,11 @@ int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
  *          calculated. 
  *        - <b>IGRAPH_ALL</b>, the directed graph is considered as an
  *          undirected one for the computation.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>: not enough memory for temporary
+ *           data.
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id passed.
+ *         - <b>IGRAPH_EINVMODE</v>: invalid mode argument.
  *
  * Time complexity: <code>O(n|E|)</code>, <code>n</code> is the number
  * of vertices for which the calculation is done and |E| is the number
@@ -409,10 +435,20 @@ int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids,
   long int nodes_to_calc=vector_size(vids);
   vector_t tmp;
 
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+  if (!vector_isininterval(vids, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVVID);
+  }
+  already_counted=Calloc(no_of_nodes, long int);
+  if (already_counted==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+
   vector_resize(res, nodes_to_calc);
   vector_null(res);
   
-  already_counted=Calloc(no_of_nodes, long int);
   vector_init(&tmp, 0);
   dqueue_init(&q, 100);
 
@@ -470,7 +506,11 @@ int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids,
  *          calculated. 
  *        - <b>IGRAPH_ALL</b>, the directed graph is considered as an
  *          undirected one for the computation.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary
+ *           data.
+ *         - <b>IGRAPH_EINVVID</b>, invalid vertex id passed.
+ *         - <b>IGRAPH_EINVMODE</b>, invalid mode argument.
  * 
  * Time complexity: <code>O(n(|V|+|E|))</code>, <code>n</code> is the
  * number of vertices to calculate, <code>|V|</code> and
@@ -491,7 +531,16 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
   long int i, j;
   vector_t tmp;
 
+  if (!vector_isininterval(from, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVVID);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
   already_counted=Calloc(no_of_nodes, long int);
+  if (already_counted=0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   vector_init(&tmp, 0);
   matrix_resize(res, no_of_from, no_of_nodes);
   matrix_null(res);
@@ -560,7 +609,12 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
  *          calculated. 
  *        - <b>IGRAPH_ALL</b>, the directed graph is considered as an
  *          undirected one for the computation.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary
+ *           data.
+ *         - <b>IGRAPH_EINVVID</b>, <code>from</code> is invalid vertex
+ *           id.
+ *         - <b>IGRAPH_EINVMODE</b>, invalid mode argument.
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
  * number of vertices, <code>|E|</code> the number of edges in the
@@ -581,8 +635,18 @@ int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
 
   long int j;
   vector_t tmp;
-  
+
+  if (from<0 || from>=no_of_nodes) {
+    IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVVID);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+
   father=Calloc(no_of_nodes, long int);
+  if (father==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   vector_init(&tmp, 0);
   dqueue_init(&q, 100);
 
@@ -647,7 +711,11 @@ int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
  *        - <b>IGRAPH_ALL</b>, the graph is considered as an
  *          undirected graph. Note that this is <em>not</em> the same
  *          as the union of the previous two.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b> not enough memory for temporary data.
+ *         - <b>IGRAPH_EINVVID</b> <code>vertex</code> is an invalid
+ *           vertex id
+ *         - <b>IGRAPH_EINVMODE</b> invalid mode argument passed.
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, <code><|V|</code> and
  * <code>|E|</code> are the number of vertices and edges in the graph.
@@ -664,9 +732,19 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
   char *already_added;
   long int i;
   vector_t tmp;
-  
-  vector_init(&tmp, 0);
+
+  if (vertex<0 || vertex>=no_of_nodes) {
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("invalid mode argument", IGRAPH_EINVMODE);
+  }
+
   already_added=Calloc(no_of_nodes, char);
+  if (already_added==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  vector_init(&tmp, 0);
   dqueue_init(&q, 100);
   
   dqueue_push(&q, vertex);
@@ -709,7 +787,10 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
  *        will be calculated.
  * @param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary data.
+ *         - <b>IGRAPH_EINVVID</b>, invalid vertex id passed in
+ *           <code>vids</code>. 
  *
  * Time complexity: <code>O(|V||E|)</code>, <code>|V|</code> and
  * <code>|E|</code> are the number of vertices and edges in the graph.
@@ -735,14 +816,30 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
   vector_t tmp;
   integer_t modein, modeout;
 
+  if (!vector_isininterval(vids, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
+  }
+
   if (directed) 
     { modeout=IGRAPH_OUT; modein=IGRAPH_IN; } 
   else 
     { modeout=modein=IGRAPH_ALL; }
 
   distance=Calloc(no_of_nodes, long int);
+  if (distance==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   nrgeo=Calloc(no_of_nodes, long int);
+  if (nrgeo==0) {
+    Free(distance);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   tmpscore=Calloc(no_of_nodes, double);
+  if (tmpscore==0) {
+    Free(distance);
+    Free(nrgeo);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
 
   vector_init(&tmp, 0);
   vector_resize(res, vector_size(vids));
@@ -845,7 +942,8 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids,
  *        betweenness scores for the edges.
  * @param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary data.
  *
  * Time complexity: <code>O(|V||E|)</code>, <code>|V|</code> and
  * <code>|E|</code> are the number of vertices and edges in the graph.
@@ -879,8 +977,20 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
   }
   
   distance=Calloc(no_of_nodes, long int);
+  if (distance==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   nrgeo=Calloc(no_of_nodes, long int);
+  if (nrgeo==0) {
+    Free(distance);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   tmpscore=Calloc(no_of_nodes, double);
+  if (tmpscore==0) {
+    Free(distance);
+    Free(nrgeo);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
 
   vector_resize(result, no_of_edges);
   vector_null(result);
@@ -981,7 +1091,10 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
  *        function, and call igraph_destroy() on it if you don't need
  *        it any more.
  * @param vids Vector with the vertex ids to put in the subgraph.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary data.
+ *         - <b>IGRAPH_EINVVID</b>, invalid vertex id in
+ *           <code>vids</code>. 
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
  * <code>|E|</code> are the number of vertices and edges in the
@@ -998,9 +1111,16 @@ int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids) {
   char *remain;
   long int i;
 
+  if (!vector_isininterval(vids, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
+  }
+
+  remain=Calloc(no_of_nodes, char);
+  if (remain==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   vector_init(&delete, 0);
   vector_reserve(&delete, no_of_nodes-vector_size(vids));
-  remain=Calloc(no_of_nodes, char);
   
   for (i=0; i<vector_size(vids); i++) {
     remain[ (long int) VECTOR(*vids)[i] ] = 1;
@@ -1086,8 +1206,11 @@ int igraph_transitivity_undirected(igraph_t *graph, vector_t *res) {
 
   igraph_iterator_t nit, nit2;
   
-  vector_resize(res, 1);
   neis=Calloc(no_of_nodes, long int);
+  if (neis==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  vector_resize(res, 1);
 
   if (no_of_nodes != 0) {    
     igraph_iterator_vneis(graph, &nit, 0, IGRAPH_ALL);
@@ -1149,7 +1272,9 @@ int igraph_transitivity_undirected(igraph_t *graph, vector_t *res) {
  *          or NaN (0/0) if there are no connected triples in the
  *          graph.  Directed graphs are considered as
  *          undirected ones. 
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: unknown transitivity type.
+ *         - <b>IGRAPH_ENOMEM</b>: not enough memory for temporary data.
  * 
  * Time complexity: <code>O(|V|*d^2)</code> for
  * IGRAPH_TRANSITIVITY_UNDIRECTED. <code>|V|</code> is the number of

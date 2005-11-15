@@ -8,6 +8,7 @@ extern int igraph_ncol_yyleng;
 int igraph_ncol_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
+#include "error.h"
 extern vector_t *igraph_ncol_vector;
 extern vector_t *igraph_ncol_weights;
 extern igraph_trie_t *igraph_ncol_trie;
@@ -58,8 +59,7 @@ weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yytext,
 
 int igraph_ncol_yyerror (char *s)
 {
-  fprintf (stderr, "%s: line %d\n", s, mylineno);
-  return 1;
+  IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
 }
 
 real_t igraph_ncol_get_number(const char *str, long int length) {

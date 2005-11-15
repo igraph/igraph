@@ -509,6 +509,8 @@ int igraph_list_graph_attributes(igraph_t *graph, igraph_strvector_t *l,
 				 vector_t *types);
 int igraph_get_graph_attribute_type(igraph_t *graph, const char *name, 
 				    igraph_attribute_type_t *type);
+bool_t igraph_has_graph_attribute(igraph_t *graph, const char *name);
+				  
 
 int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
 				igraph_attribute_type_t type);
@@ -526,6 +528,7 @@ int igraph_list_vertex_attributes(igraph_t *graph, igraph_strvector_t *l,
 				  vector_t *types);
 int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name, 
 				     igraph_attribute_type_t *type);
+bool_t igraph_has_vertex_attribute(igraph_t *graph, const char *name);
 
 int igraph_add_edge_attribute(igraph_t *graph, const char *name, 
 			      igraph_attribute_type_t type);
@@ -543,6 +546,7 @@ int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
 				vector_t *types);
 int igraph_get_edge_attribute_type(igraph_t *graph, const char *name, 
 				   igraph_attribute_type_t *type);
+bool_t igraph_has_edge_attribute(igraph_t *graph, const char *name);
 
 /* -------------------------------------------------- */
 /* Constructors, deterministic                        */

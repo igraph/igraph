@@ -44,7 +44,8 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids,
  *        columns is the number of vertices in the graph.
  * @param vids The vertex ids of the vertices for which the
  *        calculation will be done.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
  * 
  * Time complexity: <code>O(|V|d^2</code>, |V| is the number of
  * vertices in the graph, <code>d</code> is the (maximum) degree of
@@ -75,7 +76,8 @@ int igraph_cocitation(igraph_t *graph, matrix_t *res, vector_t *vids) {
  *        columns is the number of vertices in the graph.
  * @param vids The vertex ids of the vertices for which the
  *        calculation will be done.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
  * 
  * Time complexity: <code>O(|V|d^2</code>, |V| is the number of
  * vertices in the graph, <code>d</code> is the (maximum) degree of
@@ -96,6 +98,10 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids,
   bool_t *calc;
   matrix_t tmpres;
   vector_t neis;
+
+  if (!vector_isininterval(vids, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVVID);
+  }
   
   calc=Calloc(no_of_nodes, bool_t);
   for (i=0; i<vector_size(vids); i++) {

@@ -37,7 +37,7 @@ long int igraph_i_attribute_list_get_pos(igraph_attribute_list_t *al,
   bool_t l=0;
   char *str;
   
-  while(!l && pos < n) {
+  while(!l && pos < n-1) {
     igraph_strvector_get(&al->names, pos+1, &str);
     l=!strcmp(name, str);
     pos++;
@@ -104,6 +104,16 @@ int igraph_attribute_list_destroy(igraph_attribute_list_t *al) {
 
 int igraph_attribute_list_add(igraph_attribute_list_t *al,
 			      const char *name, igraph_attribute_type_t type){
+  long int pos;
+  /* Checks */
+  if (strlen(name)==0) {
+    IGRAPH_ERROR("empty attribute name", IGRAPH_EINVAL);
+  }
+  pos=igraph_i_attribute_list_get_pos(al, name);
+  if (pos >= 0) {
+    IGRAPH_ERROR("attribute already exists", IGRAPH_EXISTS);
+  }
+
   igraph_strvector_add(&al->names, name);
   vector_push_back(&al->types, type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
@@ -126,6 +136,11 @@ int igraph_attribute_list_add(igraph_attribute_list_t *al,
 int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
 				 const char *name) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
+
+  if (pos < 0) {
+    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+  }
+
   igraph_i_attribute_list_free(al, pos);
   vector_ptr_remove(&al->data, pos);
   vector_remove(&al->types, pos);
@@ -142,6 +157,11 @@ int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
 			      long int idx, void **value, 
 			      igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
+
+  if (pos < 0) {
+    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+  }
+
   igraph_attribute_type_t atype=VECTOR(al->types)[pos];
   if (type != 0) {
     *type = atype;
@@ -164,7 +184,13 @@ int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
 int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
 			      long int idx, void *value) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-  igraph_attribute_type_t atype=VECTOR(al->types)[pos];
+  igraph_attribute_type_t atype;
+
+  if (pos < 0) {
+    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+  }
+
+  atype==VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_set(data, idx, *(real_t*)(value));
@@ -184,9 +210,14 @@ int igraph_attribute_list_get_many(igraph_attribute_list_t *al,
 				   const char *name,
 				   vector_t *idx, void **value) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-  igraph_attribute_type_t atype=VECTOR(al->types)[pos];
+  igraph_attribute_type_t atype;
   long int i;
 
+  if (pos < 0) {
+    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+  }
+
+  atype==VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=*value;
@@ -216,9 +247,14 @@ int igraph_attribute_list_set_many(igraph_attribute_list_t *al,
 				   const char *name,
 				   vector_t *idx, void *value) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-  igraph_attribute_type_t atype=VECTOR(al->types)[pos];
+  igraph_attribute_type_t atype;
   long int i;
 
+  if (pos < 0) {
+    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+  }
+
+  atype==VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=value;
@@ -253,12 +289,17 @@ int igraph_attribute_list_get_all(igraph_attribute_list_t *al,
 				  const char *name, void **value, 
 				  igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-  igraph_attribute_type_t atype=VECTOR(al->types)[pos];
+  igraph_attribute_type_t atype;
+
+  if (pos < 0) {
+    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+  }
   
   if (type != 0) {
     *type=atype;
   }
   
+  atype==VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=*value;
@@ -364,7 +405,11 @@ int igraph_attribute_list_get_type(igraph_attribute_list_t *al,
 				   const char *name,
 				   igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-  if (pos<0) return 1;
+
+  if (pos < 0) {
+    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+  }
+
   if (type) *type=VECTOR(al->types)[pos];
   return 0;
 }
@@ -417,6 +462,17 @@ int igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
   return 0;
 }
 
+/**
+ * \ingroup internal
+ * \brief Checks whether the list contains the named attribute
+ */
+
+bool_t igraph_attribute_list_has(igraph_attribute_list_t *al, 
+				 const char *name) {
+  long int pos=igraph_i_attribute_list_get_pos(al, name);
+  return (pos != -1);
+}
+
 /* ------------------------------------------------------------------------- */
 
 /**
@@ -430,7 +486,9 @@ int igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
  * @param type Numeric constant giving the type of the attribute,
  *        either <b>IGRAPH_ATTRIBUTE_NUM</b> (numeric) or
  *        <b>IGRAPH_ATTRIBUTE_STR</b> (string).
- * @return Error code.
+ * @return Error code:
+ *         - <B>IGRAPH_EINVAL</B>: invalid (empty) attribute name
+ *         - <B>IGRAPH_EXISTS</B>: the attribute already exists
  *
  * Time complexity: <code>O(1)</code>. (Assuming the number of graph
  * attributes of <code>graph</code> is <code>O(1)</code>.)
@@ -447,15 +505,15 @@ int igraph_add_graph_attribute(igraph_t *graph, const char *name,
  *
  * @param graph A graph object.
  * @param name The name of the attribute to remove.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code>. (Assuming the number of graph
  * attributes of <code>graph</code> is <code>O(1)</code>.)
  */
 
 int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
-  igraph_attribute_list_remove(&graph->gal, name);
-  return 0;
+  return igraph_attribute_list_remove(&graph->gal, name);
 }
 
 /**
@@ -470,7 +528,8 @@ int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
  *        to string attributes.
  * @param type Pointer to the attribute type, it will be stored here
  *        if not <code>NULL</code>.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code>. (Assuming the number of graph
  * attributes of <code>graph</code> is <code>O(1)</code>.)
@@ -478,8 +537,7 @@ int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
 
 int igraph_get_graph_attribute(igraph_t *graph, const char *name,
 			       void **value, igraph_attribute_type_t *type) {
-  igraph_attribute_list_get(&graph->gal, name, 0, value, type);
-  return 0;
+  return igraph_attribute_list_get(&graph->gal, name, 0, value, type);
 }
 
 /**
@@ -490,7 +548,8 @@ int igraph_get_graph_attribute(igraph_t *graph, const char *name,
  * @param name The name of the attribute to set.
  * @param value Pointer to the new value of the attribute, either a
  *        <code>real_t</code> or a <code>const char</code> pointer.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code>. (Assuming the number of graph
  * attributes of <code>graph</code> is <code>O(1)</code>.)
@@ -498,8 +557,7 @@ int igraph_get_graph_attribute(igraph_t *graph, const char *name,
 
 int igraph_set_graph_attribute(igraph_t *graph, const char *name,
 			       void *value) {
-  igraph_attribute_list_set(&graph->gal, name, 0, value);
-  return 0;
+  return igraph_attribute_list_set(&graph->gal, name, 0, value);
 }
 
 /**
@@ -522,8 +580,7 @@ int igraph_set_graph_attribute(igraph_t *graph, const char *name,
 
 int igraph_list_graph_attributes(igraph_t *graph, igraph_strvector_t *names,
 				 vector_t *types) {
-  igraph_attribute_list_names(&graph->gal, names, types);
-  return 0;
+  return igraph_attribute_list_names(&graph->gal, names, types);
 }
 
 /**
@@ -535,7 +592,9 @@ int igraph_list_graph_attributes(igraph_t *graph, igraph_strvector_t *names,
  * @param type Numeric constant giving the type of the attribute,
  *        either <b>IGRAPH_ATTRIBUTE_NUM</b> (numeric) or
  *        <b>IGRAPH_ATTRIBUTE_STR</b> (string).
- * @return Error code.
+ * @return Error code:
+ *         - <B>IGRAPH_EINVAL</B>: invalid (empty) attribute name
+ *         - <B>IGRAPH_EXISTS</B>: the attribute already exists
  *
  * Time complexity: <code>O(|V|)</code>, the number of vertices in the
  * graph.
@@ -543,8 +602,7 @@ int igraph_list_graph_attributes(igraph_t *graph, igraph_strvector_t *names,
 
 int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
 				igraph_attribute_type_t type) {
-  igraph_attribute_list_add(&graph->val, name, type);
-  return 0;
+  return igraph_attribute_list_add(&graph->val, name, type);
 }
 
 /**
@@ -553,7 +611,8 @@ int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
  *
  * @param graph A graph object.
  * @param name The name of the attribute to remove.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(|V|)</code>, assuming that the graph has
  * <code>O(1)</code> vertex attributes. <code>|V|</code> is the number
@@ -561,8 +620,7 @@ int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
  */
 
 int igraph_remove_vertex_attribute(igraph_t *graph, const char *name) {
-  igraph_attribute_list_remove(&graph->val, name);
-  return 0;
+  return igraph_attribute_list_remove(&graph->val, name);
 }
 
 /**
@@ -578,7 +636,8 @@ int igraph_remove_vertex_attribute(igraph_t *graph, const char *name) {
  *        to string attributes.
  * @param type If not <code>NULL</code> the type of the attribute will
  *        be stored here.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code>, assuming that the graph has
  * <code>O(1)</code> vertex attributes installed.
@@ -587,8 +646,7 @@ int igraph_remove_vertex_attribute(igraph_t *graph, const char *name) {
 int igraph_get_vertex_attribute(igraph_t *graph, const char *name,
 				long int v, void **value,
 				igraph_attribute_type_t *type) {
-  igraph_attribute_list_get(&graph->val, name, v, value, type);
-  return 0;
+  return igraph_attribute_list_get(&graph->val, name, v, value, type);
 }
 
 /**
@@ -599,7 +657,8 @@ int igraph_get_vertex_attribute(igraph_t *graph, const char *name,
  * @param name Name of the vertex attribute.
  * @param v The id of the vertex of which the attribute is set.
  * @param value The new value of the attribute.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code>, assuming that the graph has
  * <code>O(1)</code> vertex attributes installed.
@@ -607,8 +666,7 @@ int igraph_get_vertex_attribute(igraph_t *graph, const char *name,
 
 int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
 				long int v, void* value) {
-  igraph_attribute_list_set(&graph->val, name, v, value);
-  return 0;
+  return igraph_attribute_list_set(&graph->val, name, v, value);
 }
 
 /**
@@ -623,7 +681,8 @@ int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
  *        address of either a <code>vector_t</code> or a
  *        <code>igraph_strvector_t</code> depending on the type of the
  *        attribute.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(|v|)</code>, the number of queried
  * vertices, assuming the graph has <code>O(1)</code> vertex
@@ -632,8 +691,7 @@ int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
 
 int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
 				 vector_t *v, void **value) {
-  igraph_attribute_list_get_many(&graph->val, name, v, value);
-  return 0;
+  return igraph_attribute_list_get_many(&graph->val, name, v, value);
 }
 
 /**
@@ -653,7 +711,8 @@ int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
  *        length 1 here. This parameter is either a pointer to a
  *        <code>vector_t</code> or an <code>igraph_strvector_t</code>, 
  *        depending on the type of the attribute.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(|v|)</code>, the number of affected
  * vertices, assuming the graph has <code>O(1)</code> vertex
@@ -662,8 +721,7 @@ int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
 
 int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
 				 vector_t *v, void *value) {
-  igraph_attribute_list_set_many(&graph->val, name, v, value);
-  return 0;
+  return igraph_attribute_list_set_many(&graph->val, name, v, value);
 }
 
 /**
@@ -685,8 +743,7 @@ int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
 
 int igraph_list_vertex_attributes(igraph_t *graph, igraph_strvector_t *l,
 				  vector_t *types) {
-  igraph_attribute_list_names(&graph->val, l, types);
-  return 0;
+  return igraph_attribute_list_names(&graph->val, l, types);
 }
 
 /**
@@ -698,7 +755,9 @@ int igraph_list_vertex_attributes(igraph_t *graph, igraph_strvector_t *l,
  * @param type Numeric constant giving the type of the attribute,
  *        either <b>IGRAPH_ATTRIBUTE_NUM</b> (numeric) or
  *        <b>IGRAPH_ATTRIBUTE_STR</b> (string).
- * @return Error code.
+ * @return Error code:
+ *         - <B>IGRAPH_EINVAL</B>: invalid (empty) attribute name
+ *         - <B>IGRAPH_EXISTS</B>: the attribute already exists
  *
  * Time complexity: <code>O(|E|)</code>, the number of edges in the
  * graph.
@@ -706,8 +765,7 @@ int igraph_list_vertex_attributes(igraph_t *graph, igraph_strvector_t *l,
 
 int igraph_add_edge_attribute(igraph_t *graph, const char *name,
 			      igraph_attribute_type_t type) {
-  igraph_attribute_list_add(&graph->eal, name, type);
-  return 0;
+  return igraph_attribute_list_add(&graph->eal, name, type);
 }
 
 /**
@@ -716,7 +774,8 @@ int igraph_add_edge_attribute(igraph_t *graph, const char *name,
  *
  * @param graph A graph object.
  * @param name The name of the attribute to remove.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(|E|)</code>, assuming that the graph has
  * <code>O(1)</code> edge attributes. <code>|E|</code> is the number
@@ -724,8 +783,7 @@ int igraph_add_edge_attribute(igraph_t *graph, const char *name,
  */
 
 int igraph_remove_edge_attribute(igraph_t *graph, const char *name) {
-  igraph_attribute_list_remove(&graph->eal, name);
-  return 0;
+  return igraph_attribute_list_remove(&graph->eal, name);
 }
 
 /**
@@ -742,7 +800,8 @@ int igraph_remove_edge_attribute(igraph_t *graph, const char *name) {
  *        for string attributes. 
  * @param type If not <code>NULL</code> then the type of the attribute
  *        will be stored here.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code>, assuming that the graph has
  * <code>O(1)</code> edge attributes installed.
@@ -751,8 +810,7 @@ int igraph_remove_edge_attribute(igraph_t *graph, const char *name) {
 int igraph_get_edge_attribute(igraph_t *graph, const char *name,
 			      long int e, void **value,
 			      igraph_attribute_type_t *type) {
-  igraph_attribute_list_get(&graph->eal, name, e, value, type);
-  return 0;
+  return igraph_attribute_list_get(&graph->eal, name, e, value, type);
 }
 
 /**
@@ -764,7 +822,8 @@ int igraph_get_edge_attribute(igraph_t *graph, const char *name,
  * @param e The id of the edge of which the attribute is set.
  * @param value The new value of the attribute. Pointer to a
  *        <code>real_t</code> or a <code>const char</code>.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code>, assuming that the graph has
  * <code>O(1)</code> edge attributes installed.
@@ -772,8 +831,7 @@ int igraph_get_edge_attribute(igraph_t *graph, const char *name,
 
 int igraph_set_edge_attribute(igraph_t *graph, const char *name,
 			      long int e, void *value) {
-  igraph_attribute_list_set(&graph->eal, name, e, value);
-  return 0;
+  return igraph_attribute_list_set(&graph->eal, name, e, value);
 }
 
 /**
@@ -788,7 +846,8 @@ int igraph_set_edge_attribute(igraph_t *graph, const char *name,
  *        address of either a <code>vector_t</code> or a
  *        <code>igraph_strvector_t</code> depending on the type of the
  *        attribute.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(|e|)</code>, the number of queried
  * edges, assuming the graph has <code>O(1)</code> edge
@@ -797,8 +856,7 @@ int igraph_set_edge_attribute(igraph_t *graph, const char *name,
 
 int igraph_get_edge_attributes(igraph_t *graph, const char *name,
 			       vector_t *e, void **value) {
-  igraph_attribute_list_get_many(&graph->eal, name, e, value);
-  return 0;
+  return igraph_attribute_list_get_many(&graph->eal, name, e, value);
 }
 
 /**
@@ -818,7 +876,8 @@ int igraph_get_edge_attributes(igraph_t *graph, const char *name,
  *        length 1 here. This parameter is either a pointer to a
  *        <code>vector_t</code> or an <code>igraph_strvector_t</code>, 
  *        depending on the type of the attribute.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(|v|)</code>, the number of affected
  * edges, assuming the graph has <code>O(1)</code> edge
@@ -827,8 +886,7 @@ int igraph_get_edge_attributes(igraph_t *graph, const char *name,
 
 int igraph_set_edge_attributes(igraph_t *graph, const char *name,
 			       vector_t *e, void *value) {
-  igraph_attribute_list_set_many(&graph->eal, name, e, value);
-  return 0;
+  return igraph_attribute_list_set_many(&graph->eal, name, e, value);
 }
 
 /**
@@ -850,8 +908,7 @@ int igraph_set_edge_attributes(igraph_t *graph, const char *name,
 
 int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
 				vector_t *types) {
-  igraph_attribute_list_names(&graph->eal, l, types);
-  return 0;
+  return igraph_attribute_list_names(&graph->eal, l, types);
 }
 
 /**
@@ -861,7 +918,8 @@ int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
  * @param graph The graph object.
  * @param name The name of the attribute.
  * @param type Pointer to the attribute type.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code> assuming there are
  * <code>O(1)</code> graph attributes.
@@ -869,8 +927,7 @@ int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
 
 int igraph_get_graph_attribute_type(igraph_t *graph, const char *name,
 				    igraph_attribute_type_t *type) {
-  igraph_attribute_list_get_type(&graph->gal, name, type);
-  return 0;
+  return igraph_attribute_list_get_type(&graph->gal, name, type);
 }
 
 /**
@@ -880,7 +937,8 @@ int igraph_get_graph_attribute_type(igraph_t *graph, const char *name,
  * @param graph The graph object.
  * @param name The name of the attribute.
  * @param type Pointer to the attribute type.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code> assuming there are
  * <code>O(1)</code> vertex attributes.
@@ -888,8 +946,7 @@ int igraph_get_graph_attribute_type(igraph_t *graph, const char *name,
 
 int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name,
 				     igraph_attribute_type_t *type) {
-  igraph_attribute_list_get_type(&graph->val, name, type);
-  return 0;
+  return igraph_attribute_list_get_type(&graph->val, name, type);
 }
 
 /**
@@ -899,7 +956,8 @@ int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name,
  * @param graph The graph object.
  * @param name The name of the attribute.
  * @param type Pointer to the attribute type.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
  *
  * Time complexity: <code>O(1)</code> assuming there are
  * <code>O(1)</code> edge attributes.
@@ -907,6 +965,56 @@ int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name,
 
 int igraph_get_edge_attribute_type(igraph_t *graph, const char *name,
 				   igraph_attribute_type_t *type) {
-  igraph_attribute_list_get_type(&graph->eal, name, type);
-  return 0;
+  return igraph_attribute_list_get_type(&graph->eal, name, type);
+}
+
+/**
+ * \ingroup attributes
+ * \brief Checks whether a graph has the named graph attribute.
+ * 
+ * @param graph The graph object.
+ * @param name The name of the (potential) attribute.
+ * @return Non-zero (TRUE) value if the attribute is installed, zero
+ *         (FALSE) otherwise.
+ * 
+ * Time complexity: <code>O(1)</code> assuming there are
+ * <code>O(1)</code> edge attributes.
+ */
+
+bool_t igraph_has_graph_attribute(igraph_t *graph, const char *name) {
+  return igraph_attribute_list_has(&graph->gal, name); 
+}
+
+/**
+ * \ingroup attributes
+ * \brief Checks whether a graph has the named vertex attribute.
+ * 
+ * @param graph The graph object.
+ * @param name The name of the (potential) attribute.
+ * @return Non-zero (TRUE) value if the attribute is installed, zero
+ *         (FALSE) otherwise.
+ * 
+ * Time complexity: <code>O(1)</code> assuming there are
+ * <code>O(1)</code> edge attributes.
+ */
+
+bool_t igraph_has_vertex_attribute(igraph_t *graph, const char *name) {
+  return igraph_attribute_list_has(&graph->val, name); 
+}
+
+/**
+ * \ingroup attributes
+ * \brief Checks whether a graph has the named edge attribute.
+ * 
+ * @param graph The graph object.
+ * @param name The name of the (potential) attribute.
+ * @return Non-zero (TRUE) value if the attribute is installed, zero
+ *         (FALSE) otherwise.
+ * 
+ * Time complexity: <code>O(1)</code> assuming there are
+ * <code>O(1)</code> edge attributes.
+ */
+
+bool_t igraph_has_edge_attribute(igraph_t *graph, const char *name) {
+  return igraph_attribute_list_has(&graph->eal, name); 
 }

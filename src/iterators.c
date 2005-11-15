@@ -65,7 +65,8 @@
  * not needed any more to free the allocated memory.
  * @param graph A graph object.
  * @param it Pointer to an uninitialized iterator object.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
  * 
  * Time complexity: <code>O(1)</code>.
  */
@@ -73,6 +74,9 @@
 int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it) {  
   it->type=IGRAPH_ITERATOR_VID;
   it->data=Calloc(1, real_t);
+  if (it->data == 0) {
+    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+  }
   ((real_t*)it->data)[0]=0;
   it->next=igraph_next_vid;
   it->prev=igraph_prev_vid;
@@ -107,7 +111,8 @@ int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it) {
  * is not needed any more.
  * @param graph Pointer to a graph.
  * @param it Pointer to an uninitialized iterator object.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
  * 
  * Time complexity: <code>O(1)</code>.
  */
@@ -115,6 +120,9 @@ int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it) {
 int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it) {  
   it->type=IGRAPH_ITERATOR_EID;
   it->data=Calloc(1, real_t);
+  if (it->data == 0) {
+    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+  }
   ((real_t*)it->data)[0]=0;
   it->next=igraph_next_eid;
   it->prev=igraph_prev_eid;
@@ -151,7 +159,8 @@ int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it) {
  * visited in arbitrary order.
  * @param graph Pointer to graph object.
  * @param it Pointer to an uninitialized iterator object.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
  * 
  * Time complexity: <code>O(1)</code>.
  */
@@ -159,6 +168,9 @@ int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it) {
 int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it) {
   it->type=IGRAPH_ITERATOR_EFROMORDER;
   it->data=Calloc(1, real_t);
+  if (it->data == 0) {
+    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+  }
   ((real_t*)it->data)[0]=0;
   it->next=igraph_next_efromorder;
   it->prev=igraph_prev_efromorder;
@@ -201,7 +213,8 @@ int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it) {
  *        outgoing edges, <b>IGRAPH_IN</b> visits incoming edges,
  *        <b>IGRAPH_ALL</b> visits all adajcent edges. This argument
  *        is ignored for undirected graphs.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
  * 
  * Time complexity: <code>O(1)</code>.
  */
@@ -226,6 +239,9 @@ int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it,
   it->getvertexnei=igraph_get_vertex_nei_eneis;
 
   it->data=Calloc(4, real_t);
+  if (it->data == 0) {
+    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+  }
   data=it->data;
   data[0]=vid;
   data[1]=mode;
@@ -270,7 +286,8 @@ int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it,
  *        vectices at outgoing edges, <b>IGRAPH_IN</b> checks incoming
  *        edges, <b>IGRAPH_ALL</b> visits all adajcent vertices. This
  *         argument is ignored for undirected graphs.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
  * 
  * Time complexity: <code>O(1)</code>.
  */
@@ -293,6 +310,9 @@ int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it,
   it->getvertexnei=0;
 
   it->data=Calloc(4, real_t);
+  if (it->data == 0) {
+    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+  }
   data=it->data;
   data[0]=vid;
   data[1]=mode;
@@ -376,8 +396,7 @@ int igraph_next(igraph_t *graph, igraph_iterator_t *it) {
  */
 
 int igraph_prev(igraph_t *graph, igraph_iterator_t *it) {
-  it->prev(graph, it);
-  return 0;
+  return it->prev(graph, it);
 }
 
 /** 

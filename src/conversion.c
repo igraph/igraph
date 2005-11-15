@@ -41,7 +41,8 @@
  *          triangle of the matrix is used.
  *        - <b>IGRAPH_GET_ADJACENCY_BOTH</b>, the whole matrix is
  *          used, a symmetric matrix is returned.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid type argument.
  *
  * Time complexity: <code>O(|V||V|)</code>, <code>|V|</code> is the
  * number of vertices in the graph.
@@ -100,7 +101,7 @@ int igraph_get_adjacency(igraph_t *graph, matrix_t *res,
       igraph_next(graph, &edgeit);
     }
   } else {
-    retval=1;
+    IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
   }
 
   igraph_iterator_destroy(graph, &edgeit);

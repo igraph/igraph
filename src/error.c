@@ -27,11 +27,18 @@
 
 static igraph_error_handler_t *igraph_i_error_handler=0;
 
-static char *igraph_i_error_strings[]={ "No error", 
-					"Failed",
-					"Out of memory",
-					"Parse error",
-					"Invalid value"};
+static char *igraph_i_error_strings[]={ "No error",            /* 0 */
+					"Failed",              /* 1 */
+					"Out of memory",       /* 2 */
+					"Parse error",         /* 3 */
+					"Invalid value",       /* 4 */
+					"Already exists",      /* 5 */
+					"Invalid edge vector", /* 6 */
+					"Invalid vertex id",   /* 7 */
+					"Non-square matrix",   /* 8 */
+					"Invalid mode",        /* 9 */
+					"File operation error" /* 10 */
+};
 
 const char* igraph_strerror(const int igraph_errno) {
   return igraph_i_error_strings[igraph_errno];

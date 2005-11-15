@@ -37,7 +37,10 @@
  * @param directed Boolean, whether to create a directed graph or
  *        not. If yes, then the first edge points from the first
  *        vertex id in <code>edges</code> to the second, etc.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVEVECTOR</b>: invalid edges vector (odd
+ *           number of vertices.
+ *         - <b>IGRAPH_EINVVID</b>: invalid (negative) vertex id.
  *
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
  * number of vertices, <code>|E|</code> the number of edges in the
@@ -48,10 +51,10 @@ int igraph_create(igraph_t *graph, vector_t *edges, integer_t n,
   real_t max=vector_max(edges)+1;
 
   if (vector_size(edges) % 2 != 0) {
-    IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
   }
   if (!vector_isininterval(edges, 0, max-1)) {
-    IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
   }
 
   igraph_empty(graph, n, directed);
@@ -189,7 +192,8 @@ int igraph_i_adjacency_min(matrix_t *adjmatrix, vector_t *edges) {
  *        - <b>IGRAPH_ADJ_LOWER</b>, undirected graph will be created,
  *          only the lower left triangle (including the diagonal) is 
  *          used for creating the edges.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_NONSQUARE</B>: non-square matrix.
  * 
  * Time complexity: <code>O(|V||V|+|E|)</code>, <code>|V|</code> and
  * <code>|E|</code> are number of vertices and edges in the graph.
@@ -204,7 +208,7 @@ int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
 
   /* Some checks */
   if (matrix_nrow(adjmatrix) != matrix_ncol(adjmatrix)) {
-    IGRAPH_ERROR("Non-square matrix", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
   }
 
   vector_init(&edges, 0);
@@ -256,7 +260,10 @@ int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
  *          created. 
  * @param center Id of the vertex which will be the center of the
  *          graph. 
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVVID</b>: invalid number of vertices.
+ *         - <b>IGRAPH_EINVAL</b>: invalid center vertex.
+ *         - <b>IGRAPH_EINVMODE</b>: invalid mode argument.
  *
  * Time complexity: <code>O(|V|)</code>, the number of vertices in the
  * graph.
@@ -272,14 +279,14 @@ int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode,
   long int i;
 
   if (n<0) { 
-    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVVID);
   }
   if (center<0 || center >n-1) {
     IGRAPH_ERROR("Invalid center vertex", IGRAPH_EINVAL);
   }
   if (mode != IGRAPH_STAR_OUT && mode != IGRAPH_STAR_IN && 
       mode != IGRAPH_STAR_UNDIRECTED) {
-    IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+    IGRAPH_ERROR("invalid mode", IGRAPH_EINVMODE);
   }
 
   vector_init(&edges, (n-1)*2);
@@ -396,7 +403,9 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
  *        to create all connections as mutual.
  * @param circular Boolean, defines whether the generated lattice is
  *        periodic.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid (negative) dimension
+ *           vector. 
  *
  * Time complexity: <code>O(|V|+|E|)</code> (as far as i remember),
  * <code>|V|</code> and <code>|E|</code> are the number of vertices
@@ -494,7 +503,8 @@ int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei,
  *        ring. It is ignored for undirected graphs.
  * @param circular Logical, if false, the ring will be open (this is
  *        not a real <em>ring</em> actually).
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
  * 
  * Time complexity: <code>O(|V|)</code>, the number of vertices in the
  * graph.
@@ -536,7 +546,9 @@ int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
  *        - <b>IGRAPH_TREE_IN</b>, directed tree, the edges point from
  *          the children to their parents.
  *        - <b>IGRAPH_TREE_UNDIRECTED</b>, undirected tree.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
+ *         - <b>IGRAPH_INVMODE</b>: invalid mode argument.
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
  * plus the number of edges in the graph.
@@ -558,7 +570,7 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
   }
   if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN !=
       type != IGRAPH_TREE_UNDIRECTED) {
-    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
   
   vector_init(&edges, 2*(n-1));
@@ -600,7 +612,8 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
  * @param n Integer, the number of vertices in the graph.
  * @param directed Logical, whether to create a directed graph.
  * @param loops Logical, whether to include self-edges (loops).
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
  * 
  * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
  * number of vertices, <code>|E|</code> the number of edges in the

@@ -31,7 +31,9 @@
  * @param v1 The first vertex.
  * @param v2 The second vertex.
  * @return Boolean, <code>TRUE</code> if there is an edge from
- *         <code>v1</code> to <code>v2</code>.
+ *         <code>v1</code> to <code>v2</code>. Returns FALSE if there
+ *         is no such edge or at least one of the vertex ids is
+ *         invalid (ie. too big or negative).
  * 
  * The function is of course symmetric for undirected graphs.
  *
@@ -42,6 +44,12 @@ bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
 
   igraph_iterator_t it;
   bool_t res=0;
+  long int nov=igraph_vcount(graph);
+
+  if (v1 < 0 || v2 < 0 || v1 > nov-1 || v2 > nov-1) {
+    return 0;
+/*     IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVVID); */
+  }
 
   igraph_iterator_vneis(graph, &it, v1, IGRAPH_OUT);
   
