@@ -1,3 +1,31 @@
+2005-11-16  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+	* Makefile.am: made sure that the Debian packages are built
+	  from a clean source tree
+	* configure.in: restored MinGW compatibility
+	* src/Makefile.am: corrected some minor glitches
+	* interfaces/python/igraphmodule.c: sorted into standalone
+	  C files
+	* interfaces/python/common.c, interfaces/python/common.h,
+	  interfaces/python/convert.c, interfaces/python/convert.h,
+	  interfaces/python/error.c, interfaces/python/error.h,
+	  interfaces/python/graphobject.c,
+	  interfaces/python/graphobject.h,
+	  interfaces/python/vertexobject.c,
+	  interfaces/python/vertexobject.h,
+	  interfaces/python/vertexseqobject.c,
+	  interfaces/python/vertexseqobject.h: added. Graphs and
+	  vertices now support attribute assignment and iteration.
+	  Debug messages about every igraph-related PyObject
+	  allocation are printed on stderr if we turned on
+	  debug mode (this helps to track down leaking PyObject
+	  references)
+	* interfaces/python/Makefile.am: added new source files,
+	  found a way to install the built library to the proper
+	  directory. Some cleanup code still remains in the
+	  post-install hook
+	* interfaces/python/test.sh, interfaces/python/test.py:
+	  added new test cases
+	  
 2005-11-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_degree_sequence_game_simple) :

@@ -14,11 +14,11 @@ MAINTAINERCLEANFILES = Makefile.in
 doc:
 	doxygen Doxyfile
 
-deb: all
+deb: clean
 	debian/prepare
 	fakeroot debian/rules binary
 
-debcvs: all
+debcvs: clean
 	debian/prepare cvs
 	fakeroot debian/rules binary
 	

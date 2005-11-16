@@ -11,3 +11,6 @@ o function for merge networks
 o add data sets to the R package
 o add automatic tests
 o iterators as edge and vertex sets
+
+o PageRank calculation
+o Hamilton and Euler circles/paths

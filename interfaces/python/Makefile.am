@@ -1,16 +1,19 @@
-lib_LTLIBRARIES         = igraph.la
+pysitepkg_LTLIBRARIES = igraph.la
 
-igraph_la_SOURCES       = igraphmodule.c
+igraph_la_SOURCES       = igraphmodule.c error.c error.h convert.c convert.h \
+                          vertexobject.c vertexobject.h \
+                          vertexseqobject.c vertexseqobject.h \
+			  graphobject.c graphobject.h \
+			  common.c common.h
 igraph_la_CFLAGS        = $(PYTHON_INCLUDES) -I$(top_srcdir)/include
-igraph_la_LDFLAGS       = -module -no-undefined
-igraph_la_LIBADD        = -lm $(PYTHON_LIBS)
+igraph_la_LDFLAGS       = -module -no-undefined -L../../src
+igraph_la_LIBADD        = -lm $(PYTHON_LIBS) -ligraph
 
-## need to move the generated Python libraries to their proper place.
-## unfortunately Automake does not have any native support to define
-## destination directories for libraries
-install-exec-hook:
-	mkdir --parents $(DESTDIR)$(prefix)/lib/python$(PYTHON_VERSION)/site-packages
-	mv `readlink -f $(DESTDIR)$(libdir)/igraph.so` $(DESTDIR)$(prefix)/lib/python$(PYTHON_VERSION)/site-packages/igraph.so
-	rm $(DESTDIR)$(libdir)/igraph.so.* $(DESTDIR)$(libdir)/igraph.a $(DESTDIR)$(libdir)/igraph.la
+## We don't need libtool's versioning information in the Python
+## library, so remove them
+install-data-hook:
+	rm -f $(pysitepkgdir)/igraph.so $(pysitepkgdir)/igraph.so.0 $(pysitepkgdir)/igraph.so.0.0
+	rm -f $(pysitepkgdir)/igraph.a $(pysitepkgdir)/igraph.la
+	mv $(pysitepkgdir)/igraph.so.0.0.0 $(pysitepkgdir)/igraph.so
 
 MAINTAINERCLEANFILES = Makefile.in

@@ -12,6 +12,7 @@ AM_PROG_LEX
 AC_PROG_YACC
 
 AC_LIBTOOL_WIN32_DLL
+AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
@@ -81,6 +82,7 @@ if test $use_python = yes; then
   if test $HAVE_PYTHON -gt 0; then
     PYTHON_PREFIX=`python -c "import sys; print sys.prefix.replace('\\\\\\\\','/')"`
     if test ! -z "$PYTHON_PREFIX"; then
+      pysitepkgdir="\${prefix}/lib/python$PYTHON_VERSION/site-packages"
       PYTHON_CFLAGS="-I$PYTHON_PREFIX/include/python$PYTHON_VERSION -I$PYTHON_PREFIX/include"
       PYTHON_CPPFLAGS="${PYTHON_CFLAGS}"
       PYTHON_CXXFLAGS="${PYTHON_CFLAGS}"
@@ -88,6 +90,7 @@ if test $use_python = yes; then
       AC_SUBST(PYTHON_CFLAGS)
       AC_SUBST(PYTHON_CPPFLAGS)
       AC_SUBST(PYTHON_CXXFLAGS)
+      AC_SUBST(pysitepkgdir)
       
       PYTHON_LIBS="none"
       AC_CHECK_LIB([python$PYTHON_VERSION], [Py_Main], [
@@ -106,9 +109,7 @@ if test $use_python = yes; then
       CFLAGS=${PYTHON_CFLAGS}
       CPPFLAGS=${PYTHON_CPPFLAGS}
       AC_CHECK_HEADER([Python.h],[
-        PYTHON_LIBS="none"
         AC_SUBST([pythondir], [$PYTHON_PREFIX"/lib/python"$PYTHON_VERSION/site-packages])
-        PYTHON_LIBS="-lpython$PYTHON_VERSION"
         ENABLE_PYTHON_INTERFACE=yes
         AC_SUBST(PYTHON_PREFIX)
         AC_SUBST(PYTHON_INCLUDES)
@@ -124,13 +125,14 @@ if test $use_python = yes; then
       use_python=no
     fi
   fi
+  
 fi
 AM_CONDITIONAL(USE_PYTHON, test x$use_python = xyes)
 
 if test "$debug" == "yes"; then
-  CFLAGS="${CFLAGS} -ggdb"
-  CPPFLAGS="${CFLAGS} -ggdb"
-  CXXFLAGS="${CFLAGS} -ggdb"
+  CFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
+  CPPFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
+  CXXFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
 fi
 
 AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile])

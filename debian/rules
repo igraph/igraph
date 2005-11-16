@@ -75,6 +75,7 @@ binary-arch: build install
 	    usr/include/igraph/igraph.h \
 			usr/include/igraph/types.h  \
 			usr/include/igraph/attributes.h  \
+			usr/include/igraph/error.h  \
 			usr/lib/libigraph.a         \
 			usr/lib/libigraph.la        \
 			usr/lib/pkgconfig/igraph.pc

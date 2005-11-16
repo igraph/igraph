@@ -9,7 +9,7 @@ if [ x$1 == x-d -a -x /usr/bin/valgrind ]; then
 else
   PRE=""
 fi
-LD_PRELOAD=src/.libs/libigraph.so $PRE python $1 interfaces/python/test.py
+LD_LIBRARY_PATH=src/.libs python $1 interfaces/python/test.py
 if [ x$FNAME != x ]; then rm -f $FNAME; fi
 
 exit 0
