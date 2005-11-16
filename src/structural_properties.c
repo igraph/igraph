@@ -538,7 +538,7 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
     IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
   already_counted=Calloc(no_of_nodes, long int);
-  if (already_counted=0) {
+  if (already_counted==0) {
     IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
   }
   vector_init(&tmp, 0);

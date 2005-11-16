@@ -49,8 +49,9 @@ edge :   edgeid edgeid NEWLINE        {
        }
 ;
 
-edgeid : ALNUM  { $$=igraph_trie_get2(igraph_ncol_trie, 
-				      igraph_ncol_yytext, igraph_ncol_yyleng); };
+edgeid : ALNUM  { igraph_trie_get2(igraph_ncol_trie, 
+				   igraph_ncol_yytext, 
+				   igraph_ncol_yyleng, &$$); };
 
 weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yytext, 
 					   igraph_ncol_yyleng); } ;

@@ -78,28 +78,29 @@ AT_DATA([trie.c],
 int main() {
   
   igraph_trie_t trie;
+  long int id;
 
   /* init */
   igraph_trie_init(&trie, 0);
 
   /* add and get values */
-  printf("hello: %li\n", igraph_trie_get(&trie, "hello"));
-  printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp"));
-  printf("alma:  %li\n", igraph_trie_get(&trie, "alma"));
-  printf("also:  %li\n", igraph_trie_get(&trie, "also"));
+  igraph_trie_get(&trie, "hello", &id);  printf("hello: %li\n", id);
+  igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
+  igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
+  igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
 
-  printf("hello: %li\n", igraph_trie_get(&trie, "hello"));
-  printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp"));
-  printf("alma:  %li\n", igraph_trie_get(&trie, "alma"));
-  printf("also:  %li\n", igraph_trie_get(&trie, "also"));
+  igraph_trie_get(&trie, "hello", &id);  printf("hello: %li\n", id);
+  igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
+  igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
+  igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
 
-  printf("a:     %li\n", igraph_trie_get(&trie, "a"));
-  printf("axon:  %li\n", igraph_trie_get(&trie, "axon"));
+  igraph_trie_get(&trie, "a", &id);      printf("a:     %li\n", id);
+  igraph_trie_get(&trie, "axon", &id);   printf("axon:  %li\n", id);
 
-  printf("hello: %li\n", igraph_trie_get(&trie, "hello"));
-  printf("hepp:  %li\n", igraph_trie_get(&trie, "hepp"));
-  printf("alma:  %li\n", igraph_trie_get(&trie, "alma"));
-  printf("also:  %li\n", igraph_trie_get(&trie, "also"));
+  igraph_trie_get(&trie, "hello", &id);  printf("hello: %li\n", id);
+  igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
+  igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
+  igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
  
   /* destroy */
   igraph_trie_destroy(&trie);

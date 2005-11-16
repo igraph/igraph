@@ -478,8 +478,9 @@ typedef struct s_igraph_trie {
 
 int igraph_trie_init(igraph_trie_t *t, bool_t storekeys);
 int igraph_trie_destroy(igraph_trie_t *t);
-long int igraph_trie_get(igraph_trie_t *t, const char *key);
-long int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length);
+int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id);
+int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length, 
+		     long int *id);
 int igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
 long int igraph_trie_size(igraph_trie_t *t);
 

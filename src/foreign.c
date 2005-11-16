@@ -353,7 +353,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
       long int from=igraph_get_vertex_from(graph, &it);
       long int to  =igraph_get_vertex_to  (graph, &it);
       void *ptr1, *ptr2;
-      int ret;
+      int ret=0;
       igraph_get_vertex_attribute(graph, names, from, &ptr1, &type);
       igraph_get_vertex_attribute(graph, names, to,   &ptr2, &type);
       if (type==IGRAPH_ATTRIBUTE_NUM) {
@@ -375,7 +375,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
       long int to  =igraph_get_vertex_to  (graph, &it);
       long int edge=igraph_get_edge(graph, &it);
       void *ptr;
-      int ret;
+      int ret=0;
       igraph_get_edge_attribute(graph, weights, edge, &ptr, &type);
       if (type==IGRAPH_ATTRIBUTE_NUM) {
 	ret=fprintf(outstream, "%li %li %f\n", from, to, *(real_t*)ptr);
@@ -396,7 +396,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
       long int to  =igraph_get_vertex_to  (graph, &it);
       long int edge=igraph_get_edge(graph, &it);
       void *ptr, *ptr1, *ptr2;
-      int ret;
+      int ret=0;
       igraph_get_vertex_attribute(graph, names, from, &ptr1, &vtype);
       igraph_get_vertex_attribute(graph, names, to,   &ptr2, &vtype);
       igraph_get_edge_attribute(graph, weights, edge, &ptr, &etype);
@@ -593,7 +593,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
     long int i;
     igraph_attribute_type_t type;
     void *ptr;
-    int ret;
+    int ret=0;
     
     igraph_iterator_vneis(graph, &it, 0, IGRAPH_ALL);
     for (i=0; i<nov; i++) {

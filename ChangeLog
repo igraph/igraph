@@ -1,3 +1,31 @@
+2005-11-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/attributes.c (igraph_attribute_list_set)
+	(igraph_attribute_list_set_many, igraph_attribute_list_set_many)
+	(igraph_attribute_list_get_all) : attribute type bug corrected
+	
+	* src/types.c (igraph_trie_get_node, igraph_trie_get)
+	(igraph_trie_get2) : update for error handling
+	* src/foreign-lgl-parser.y : trie calls updated
+	* src/foreign-ncol-parser.y : trie calls updated
+
+	* src/structural_properties.c (igraph_shortest_paths) :
+	bug corrected
+
+	* src/foreign.c (igraph_write_graph_ncol, igraph_write_graph_lgl) :
+	cosmetics, initialize ret
+
+	* src/types.c (dqueue_init, dqueue_push, vector_init)
+	(vector_reserve, vector_order, vector_init_copy, vector_copy)
+	(igraph_stack_init, igraph_stack_reserve, igraph_stack_push)
+	(multiset_init, multiset_reserve, multiset_reserve, heap_init)
+	(heap_init_array, heap_reserve, indheap_init, indheap_init_array)
+	(indheap_reserve, d_indheap_init, d_indheap_reserve)
+	(vector_ptr_init, vector_ptr_reserve, vector_ptr_init_copy)
+	(vector_ptr_copy, igraph_strvector_init, igraph_strvector_get)
+	(igraph_strvector_get, igraph_strvector_remove_section)
+	(igraph_strvector_copy, igraph_strvector_resize) : IGRAPH_ENOMEM added
+	
 2005-11-16  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 	* Makefile.am: made sure that the Debian packages are built
 	  from a clean source tree

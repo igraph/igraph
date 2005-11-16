@@ -190,7 +190,7 @@ int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
     IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
   }
 
-  atype==VECTOR(al->types)[pos];
+  atype=VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_set(data, idx, *(real_t*)(value));
@@ -217,7 +217,7 @@ int igraph_attribute_list_get_many(igraph_attribute_list_t *al,
     IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
   }
 
-  atype==VECTOR(al->types)[pos];
+  atype=VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=*value;
@@ -254,7 +254,7 @@ int igraph_attribute_list_set_many(igraph_attribute_list_t *al,
     IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
   }
 
-  atype==VECTOR(al->types)[pos];
+  atype=VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=value;
@@ -289,7 +289,7 @@ int igraph_attribute_list_get_all(igraph_attribute_list_t *al,
 				  const char *name, void **value, 
 				  igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-  igraph_attribute_type_t atype;
+  igraph_attribute_type_t atype=IGRAPH_ATTRIBUTE_NUM;
 
   if (pos < 0) {
     IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
@@ -299,7 +299,7 @@ int igraph_attribute_list_get_all(igraph_attribute_list_t *al,
     *type=atype;
   }
   
-  atype==VECTOR(al->types)[pos];
+  atype=VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=*value;

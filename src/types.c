@@ -37,6 +37,9 @@
 int dqueue_init (dqueue_t* q, long int size) {
 	if (size <= 0 ) { size=1; }
 	q->stor_begin=Calloc(size, real_t);
+	if (q->stor_begin==0) {
+	  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+	}
 	q->stor_end=q->stor_begin + size;
 	q->begin=q->stor_begin;
 	q->end=NULL;
@@ -186,6 +189,9 @@ int dqueue_push (dqueue_t* q, real_t elem) {
 		real_t *bigger=NULL, *old=q->stor_begin;
 
 		bigger=Calloc( 2*(q->stor_end - q->stor_begin)+1, real_t );
+		if (bigger==0) {
+		  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+		}
 
 		if (q->stor_end - q->begin) {
 			memcpy(bigger, q->begin, 
@@ -227,7 +233,8 @@ int dqueue_push (dqueue_t* q, real_t elem) {
  * responsible for this.
  * @param v Pointer to a not yet initialized vector object.
  * @param size The size of the vector.
- * @return error code.
+ * @return error code:
+ *         - <b>IGRAPH_ENOMEM</b> if there is not enough memory.
  * 
  * Time complexity: operating system dependent.
  */
@@ -237,6 +244,9 @@ int vector_init      (vector_t* v, int long size) {
 	assert(v != NULL);
 	if (size < 0) { size=0; }
 	v->stor_begin=Calloc(alloc_size, real_t);
+	if (v->stor_begin==0) {
+	  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+	}
 	v->stor_end=v->stor_begin + alloc_size;
 	v->end=v->stor_begin+size;
 
@@ -284,7 +294,8 @@ int vector_destroy   (vector_t* v) {
  * elements to your vector before it will be copied.
  * @param v The vector object.
  * @param size The new <em>allocated</em> size of the vector.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRPAH_ENOMEM</b> if there is not enough memory.
  *
  * Time complexity: operating system dependent, should be around
  * <code>O(n)</code>, <code>n</code> is the new allocated size of the
@@ -293,11 +304,16 @@ int vector_destroy   (vector_t* v) {
 
 int vector_reserve   (vector_t* v, long int size) {
 	long int actual_size=vector_size(v);
+	real_t *tmp;
 	assert(v != NULL);
 	
 	if (size <= vector_size(v)) { return 0; }
 
-	v->stor_begin=Realloc(v->stor_begin, size, real_t);
+	tmp=Realloc(v->stor_begin, size, real_t);
+	if (tmp==0) {
+	  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+	}
+	v->stor_begin=tmp;
 	v->stor_end=v->stor_begin + size;
 	v->end=v->stor_begin+actual_size;
 	
@@ -532,10 +548,19 @@ int vector_change(vector_t* v, long int pos1, long int pos2) {
 
 int vector_order(vector_t* v, vector_t* res, integer_t nodes) {
   long int edges=vector_size(v);
-  long int *ptr=Calloc(nodes+1, long int);
-  long int *rad=Calloc(edges, long int);
+  long int *ptr;
+  long int *rad;
   long int i, j;
-  memset(ptr, 0, sizeof(long int)*nodes+1);
+
+  ptr=Calloc(nodes+1, long int);
+  if (ptr==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  rad=Calloc(edges, long int);
+  if (rad==0) {
+    Free(ptr);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }  
   vector_resize(res, edges);
   
   for (i=0; i<edges; i++) {
@@ -660,7 +685,8 @@ vector_t vector_as_vector(real_t* data, long int length) {
  * @param v Pointer to an uninitialized vector object.
  * @param data A regular C array.
  * @param length The length of the C array.
- * @return Error code.
+ * @return Error code: 
+ *         - <b>IGRAPH_ENOMEM</b> if there is not enough memory.
  * 
  * Time complexity: operating system specific, usually
  * <code>O(length)</code>.
@@ -668,6 +694,9 @@ vector_t vector_as_vector(real_t* data, long int length) {
 
 int vector_init_copy(vector_t *v, real_t *data, long int length) {
   v->stor_begin=Calloc(length, real_t);
+  if (v->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   v->stor_end=v->stor_begin+length;
   v->end=v->stor_end;
   memcpy(v->stor_begin, data, length*sizeof(real_t));
@@ -703,7 +732,8 @@ int vector_copy_to(vector_t *v, real_t* to) {
  * the new one.
  * @param to Pointer to a not yet initialized vector object.
  * @param from The original vector object to copy.
- * @return Error code.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b> if there is not enough memory.
  * 
  * Time complexity: operating system dependent, usually
  * <code>O(n)</code>, <code>n</code> is the size of the vector.
@@ -711,6 +741,9 @@ int vector_copy_to(vector_t *v, real_t* to) {
 
 int vector_copy(vector_t *to, vector_t *from) {
   to->stor_begin=Calloc(vector_size(from), real_t);
+  if (to->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   to->stor_end=to->stor_begin+vector_size(from);
   to->end=to->stor_end;
   memcpy(to->stor_begin, from->stor_begin, vector_size(from)*sizeof(real_t));
@@ -1106,6 +1139,9 @@ int igraph_stack_init       (igraph_stack_t* s, long int size) {
 	assert (s != NULL);
 	if (size < 0) { size=0; }
 	s->stor_begin=Calloc(alloc_size, real_t);
+	if (s->stor_begin==0) {
+	  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+	}
 	s->stor_end=s->stor_begin + alloc_size;
 	s->end=s->stor_begin;
 	
@@ -1133,11 +1169,16 @@ int igraph_stack_destroy    (igraph_stack_t* s) {
 
 int igraph_stack_reserve    (igraph_stack_t* s, long int size) {
   long int actual_size=igraph_stack_size(s);
+  real_t *tmp;
   assert(s != NULL);
   
   if (size <= igraph_stack_size(s)) { return 0; }
   
-  s->stor_begin=Realloc(s->stor_begin, size, real_t);
+  tmp=Realloc(s->stor_begin, size, real_t);
+  if (tmp==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  s->stor_begin=tmp; 
   s->stor_end=s->stor_begin + size;
   s->end=s->stor_begin+actual_size;
   
@@ -1197,6 +1238,9 @@ int igraph_stack_push       (igraph_stack_t* s, real_t elem) {
 		
 		bigger = Calloc(2*igraph_stack_size(s)+1, real_t);
 		
+		if (bigger==0) {
+		  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+		}
 		memcpy(bigger, s->stor_begin, 
 		       igraph_stack_size(s)*sizeof(real_t));
 
@@ -1241,6 +1285,9 @@ int multiset_init    (multiset_t* m, long int size) {
   size= size > 0 ? size : 1;
   assert(m != NULL);
   m->stor_begin=Calloc(size, real_t);
+  if (m->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   m->stor_end=m->stor_begin + size;
   m->end=m->stor_begin;
   
@@ -1269,6 +1316,7 @@ int multiset_destroy (multiset_t* m) {
 
 int multiset_reserve (multiset_t* m, long int size) {
   long int actual_size;
+  real_t *tmp;
   
   assert(m != NULL);
   assert(m->stor_begin != NULL);
@@ -1276,7 +1324,11 @@ int multiset_reserve (multiset_t* m, long int size) {
   actual_size=multiset_size(m);
   if (size < actual_size) { return 0; }
   
-  m->stor_begin=Realloc(m->stor_begin, size, real_t);
+  tmp=Realloc(m->stor_begin, size, real_t);
+  if (tmp==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  m->stor_begin=tmp; 
   m->stor_end=m->stor_begin + size;
   m->end=m->stor_begin+actual_size;
   
@@ -1528,6 +1580,9 @@ real_t multiset_choose_random_different(multiset_t* m, real_t elem) {
 int heap_init           (heap_t* h, long int alloc_size) {
   if (alloc_size <= 0 ) { alloc_size=1; }
   h->stor_begin=Calloc(alloc_size, real_t);
+  if (h->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   h->stor_end=h->stor_begin + alloc_size;
   h->end=h->stor_begin;
   h->destroy=1;
@@ -1543,6 +1598,9 @@ int heap_init           (heap_t* h, long int alloc_size) {
 
 int heap_init_array     (heap_t *h, real_t* data, long int len) {
   h->stor_begin=Calloc(len, real_t);
+  if (h->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   h->stor_end=h->stor_begin+len;
   h->end=h->stor_end;
   h->destroy=1;
@@ -1649,11 +1707,16 @@ long int heap_size      (heap_t* h) {
 
 int heap_reserve        (heap_t* h, long int size) {
   long int actual_size=heap_size(h);
+  real_t *tmp;
   assert(h != NULL);
   
   if (size <= actual_size) { return 0; }
   
-  h->stor_begin=Realloc(h->stor_begin, size, real_t);
+  tmp=Realloc(h->stor_begin, size, real_t);
+  if (tmp==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  h->stor_begin=tmp;
   h->stor_end=h->stor_begin + size;
   h->end=h->stor_begin+actual_size;
   
@@ -1751,10 +1814,17 @@ int heap_i_switch(real_t* arr, long int e1, long int e2) {
 int indheap_init           (indheap_t* h, long int alloc_size) {
  if (alloc_size <= 0 ) { alloc_size=1; }
   h->stor_begin=Calloc(alloc_size, real_t);
+  if (h->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  h->index_begin=Calloc(alloc_size, long int);
+  if (h->index_begin==0) {
+    Free(h->stor_begin);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   h->stor_end=h->stor_begin + alloc_size;
   h->end=h->stor_begin;
   h->destroy=1;
-  h->index_begin=Calloc(alloc_size, long int);
   
   return 0;  
 }
@@ -1768,10 +1838,17 @@ int indheap_init_array     (indheap_t *h, real_t* data, long int len) {
   long int i;
 
   h->stor_begin=Calloc(len, real_t);
+  if (h->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  h->index_begin=Calloc(len, long int);
+  if (h->index_begin==0) {
+    Free(h->stor_begin);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   h->stor_end=h->stor_begin+len;
   h->end=h->stor_end;
   h->destroy=1;
-  h->index_begin=Calloc(len, long int);
 
   memcpy(h->stor_begin, data, len*sizeof(real_t));
   for (i=0; i<len; i++) {
@@ -1880,14 +1957,24 @@ long int indheap_size      (indheap_t* h) {
 
 int indheap_reserve        (indheap_t* h, long int size) {
   long int actual_size=indheap_size(h);
+  real_t *tmp1;
+  long int *tmp2;
   assert(h != NULL);
   
   if (size <= actual_size) { return 0; }
   
-  h->stor_begin=Realloc(h->stor_begin, size, real_t);
+  tmp1=Realloc(h->stor_begin, size, real_t);
+  if (tmp1==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  h->stor_begin=tmp1;
+  tmp2=Realloc(h->index_begin, size, long int);
+  if (tmp2==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  h->index_begin=tmp2;
   h->stor_end=h->stor_begin + size;
   h->end=h->stor_begin+actual_size;
-  h->index_begin=Realloc(h->index_begin, size, long int);
   
   return 0;
 }
@@ -2000,11 +2087,23 @@ int indheap_i_switch(indheap_t* h, long int e1, long int e2) {
 int d_indheap_init           (d_indheap_t* h, long int alloc_size) {
  if (alloc_size <= 0 ) { alloc_size=1; }
   h->stor_begin=Calloc(alloc_size, real_t);
+  if (h->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   h->stor_end=h->stor_begin + alloc_size;
   h->end=h->stor_begin;
   h->destroy=1;
   h->index_begin=Calloc(alloc_size, long int);
+  if (h->index_begin==0) {
+    Free(h->stor_begin);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   h->index2_begin=Calloc(alloc_size, long int);
+  if (h->index2_begin==0) {
+    Free(h->stor_begin);
+    Free(h->index_begin);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   
   return 0;  
 }
@@ -2109,16 +2208,41 @@ long int d_indheap_size      (d_indheap_t* h) {
 
 int d_indheap_reserve        (d_indheap_t* h, long int size) {
   long int actual_size=d_indheap_size(h);
+  real_t *tmp1;
+  long int *tmp2, *tmp3;
   assert(h != NULL);
   
   if (size <= actual_size) { return 0; }
-  
-  h->stor_begin=Realloc(h->stor_begin, size, real_t);
+
+  tmp1=Calloc(size, real_t);
+  if (tmp1==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  tmp2=Calloc(size, long int);
+  if (tmp2==0) {
+    Free(tmp1);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  tmp3=Calloc(size, long int);
+  if (tmp3==0) {
+    Free(tmp1);
+    Free(tmp2);
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+
+  memcpy(tmp1, h->stor_begin, actual_size*sizeof(real_t));
+  memcpy(tmp2, h->index_begin, actual_size*sizeof(long int));
+  memcpy(tmp3, h->index2_begin, actual_size*sizeof(long int));
+  Free(h->stor_begin);
+  Free(h->index_begin);
+  Free(h->index2_begin);
+
+  h->stor_begin=tmp1;
   h->stor_end=h->stor_begin + size;
   h->end=h->stor_begin+actual_size;
-  h->index_begin=Realloc(h->index_begin, size, long int);
-  h->index2_begin=Realloc(h->index2_begin, size, long int);
-  
+  h->index_begin=tmp2; 
+  h->index2_begin=tmp3;
+
   return 0;
 }
 
@@ -2234,6 +2358,9 @@ int vector_ptr_init      (vector_ptr_t* v, int long size) {
 	assert(v != NULL);
 	if (size < 0) { size=0; }
 	v->stor_begin=Calloc(alloc_size, void*);
+	if (v->stor_begin==0) {
+	  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+	}
 	v->stor_end=v->stor_begin + alloc_size;
 	v->end=v->stor_begin+size;
 
@@ -2274,11 +2401,16 @@ int vector_ptr_destroy_all   (vector_ptr_t* v) {
 
 int vector_ptr_reserve   (vector_ptr_t* v, long int size) {
 	long int actual_size=vector_ptr_size(v);
+	void **tmp;
 	assert(v != NULL);
 	
 	if (size <= vector_ptr_size(v)) { return 0; }
 
-	v->stor_begin=Realloc(v->stor_begin, size, void*);
+	tmp=Realloc(v->stor_begin, size, void*);
+	if (tmp==0) {
+	  IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+	}
+	v->stor_begin=tmp;
 	v->stor_end=v->stor_begin + size;
 	v->end=v->stor_begin+actual_size;
 	
@@ -2427,6 +2559,9 @@ vector_ptr_t vector_ptr_as_vector(void** data, long int length) {
 
 int vector_ptr_init_copy(vector_ptr_t *v, void* *data, long int length) {
   v->stor_begin=Calloc(length, void*);
+  if (v->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   v->stor_end=v->stor_begin+length;
   v->end=v->stor_end;
   memcpy(v->stor_begin, data, length*sizeof(void*));
@@ -2451,6 +2586,9 @@ int vector_ptr_copy_to(vector_ptr_t *v, void** to) {
 
 int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from) {
   to->stor_begin=Calloc(vector_ptr_size(from), void*);
+  if (to->stor_begin==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   to->stor_end=to->stor_begin+vector_ptr_size(from);
   to->end=to->stor_end;
   memcpy(to->stor_begin, from->stor_begin, vector_ptr_size(from)*sizeof(void*));
@@ -2477,6 +2615,9 @@ int vector_ptr_remove(vector_ptr_t *v, long int pos) {
 
 int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
   sv->data=Calloc(len, char*);
+  if (sv->data==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   sv->len=len;
 
   return 0;
@@ -2505,6 +2646,9 @@ int igraph_strvector_destroy(igraph_strvector_t *sv) {
 int igraph_strvector_get(igraph_strvector_t *sv, long int idx, char **value) {
   if (sv->data[idx] == 0) {
     sv->data[idx] = Calloc(1, char);
+    if (sv->data[idx]==0) {
+      IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+    }
   }
   *value = sv->data[idx];
   
@@ -2519,8 +2663,15 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
 			 const char *value) {
   if (sv->data[idx] == 0) {
     sv->data[idx] = Calloc(strlen(value)+1, char);
+    if (sv->data[idx]==0) {
+      IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+    }
   } else {
-    sv->data[idx] = Realloc(sv->data[idx], strlen(value)+1, char);
+    char *tmp=Realloc(sv->data[idx], strlen(value)+1, char);
+    if (tmp==0) { 
+      IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+    }
+    sv->data[idx]=tmp;
   }
   strcpy(sv->data[idx], value);
   
@@ -2534,6 +2685,13 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
 int igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
 				    long int to) {
   long int i;
+  char **tmp;
+  
+  tmp=Calloc(v->len-(to-from), char*);
+  if (tmp==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+
   for (i=from; i<to; i++) {
     if (v->data[i] != 0) {
       Free(v->data[i]);
@@ -2543,7 +2701,9 @@ int igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
     v->data[from+i]=v->data[to+i];
   }
 
-  v->data=Realloc(v->data, v->len-(to-from), char*);
+  memcpy(tmp, v->data, v->len*sizeof(char*));
+  Free(v->data);
+  v->data=tmp;
   v->len -= (to-from);
 
   return 0;
@@ -2584,6 +2744,9 @@ int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from) {
   long int i;
   char *str;
   to->data=Calloc(from->len, char*);
+  if (to->data==0) { 
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
   to->len=from->len;
   
   for (i=0; i<from->len; i++) {
@@ -2600,6 +2763,7 @@ int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from) {
 
 int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
   long int toadd=newsize-v->len;
+  char **tmp;
   
   if (newsize < v->len) { 
     long int i;
@@ -2608,7 +2772,11 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
     }
   }
   
-  v->data = Realloc(v->data, newsize, char*);
+  tmp=Realloc(v->data, newsize, char*);
+  if (tmp==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  v->data = tmp;
   if (newsize > v->len) {
     memset(v->data+v->len, 0, toadd*sizeof(char*));
   }
@@ -2901,8 +3069,8 @@ long int igraph_i_strdiff(const char *str, const char *key) {
  * \ingroup internal
  */
 
-long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key, 
-			      real_t newvalue) {
+int igraph_trie_get_node(igraph_trie_node_t *t, const char *key, 
+			 real_t newvalue, long int *id) {
   char *str;
   long int i;
 
@@ -2921,10 +3089,12 @@ long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       /* ------------------------------------ */
       /* They are exactly the same */
       if (VECTOR(t->values)[i] != -1) {
-	return VECTOR(t->values)[i];
+	*id=VECTOR(t->values)[i];
+	return 0;
       } else {
 	VECTOR(t->values)[i]=newvalue;
-	return newvalue;
+	*id=newvalue;
+	return 0;
       }
 
     } else if (str[diff]=='\0') {
@@ -2933,7 +3103,7 @@ long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       /* str is prefix of key, follow its link if there is one */
       igraph_trie_node_t *node=VECTOR(t->children)[i];
       if (node != 0) {
-	return igraph_trie_get_node(node, key+diff, newvalue);
+	return igraph_trie_get_node(node, key+diff, newvalue, id);
       } else {
 	igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
 	igraph_strvector_init(&node->strs, 1);
@@ -2945,7 +3115,8 @@ long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
 	VECTOR(t->children)[i]=node;
 
-	return newvalue;
+	*id=newvalue;
+	return 0;
       }
 
     } else if (key[diff]=='\0') {
@@ -2970,7 +3141,8 @@ long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       VECTOR(t->values)[i]=newvalue;
       VECTOR(t->children)[i]=node;
       
-      return newvalue;
+      *id=newvalue;
+      return 0;
 
     } else {
 
@@ -2997,7 +3169,8 @@ long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       VECTOR(t->values)[i]=-1;
       VECTOR(t->children)[i]=node;
       
-      return newvalue;
+      *id=newvalue;
+      return 0;
     }
   }
 
@@ -3007,18 +3180,19 @@ long int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
   igraph_strvector_add(&t->strs, key);
   vector_ptr_push_back(&t->children, 0);
   vector_push_back(&t->values, newvalue);
-  return newvalue;
+  *id=newvalue;
+  return 0;
 }
 
 /**
  * \ingroup internal
  */
 
-long int igraph_trie_get(igraph_trie_t *t, const char *key) {
-  long int retval = igraph_trie_get_node( (igraph_trie_node_t*) t, 
-					  key, t->maxvalue+1);
-  if (retval > t->maxvalue) {
-    t->maxvalue=retval;
+int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id) {
+  int retval = igraph_trie_get_node( (igraph_trie_node_t*) t, 
+				     key, t->maxvalue+1, id);
+  if (*id > t->maxvalue) {
+    t->maxvalue=*id;
     if (t->storekeys) {
       igraph_strvector_add(&t->keys, key);
     }
@@ -3031,13 +3205,14 @@ long int igraph_trie_get(igraph_trie_t *t, const char *key) {
  * \ingroup internal
  */
 
-long int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length) {
-  long int retval;
+int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
+		     long int *id) {
+  int retval;
   char *tmp=Calloc(length+1, char);
   
   strncpy(tmp, key, length);
   tmp[length]='\0';
-  retval=igraph_trie_get(t, tmp);
+  retval=igraph_trie_get(t, tmp, id);
   Free(tmp);
   return retval;
 }
