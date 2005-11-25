@@ -1,3 +1,7 @@
+2005-11-25  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/structure_generators.c (igraph_tree) : typo corrected
+	
 2005-11-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/attributes.c (igraph_attribute_list_set)

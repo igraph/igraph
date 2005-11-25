@@ -568,7 +568,7 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
   if (n<0 || children<=0) {
     IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
   }
-  if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN !=
+  if (type != IGRAPH_TREE_OUT && type != IGRAPH_TREE_IN &&
       type != IGRAPH_TREE_UNDIRECTED) {
     IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
