@@ -1,3 +1,23 @@
+2005-12-01  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/types.c (vector_ptr_remove)
+	  (igraph_strvector_remove_section) : corrected invalid
+	  memory reads/writes reported by Valgrind
+	* src/attributes.c (igraph_i_attribute_list_get_pos) :
+	  corrected invalid result returned when the attribute
+	  was the last in the list
+	* interfaces/python/vertexobject.c,
+	  interfaces/python/vertexseq.c,
+	  interfaces/python/graphobject.c : adapted attribute
+	  getters to the new behaviour of igraph (returning
+	  IGRAPH_EINVAL instead of -1 as the attribute type)
+	* interfaces/python/edgeobject.c,
+	  interfaces/python/edgeobject.h,
+	  interfaces/python/edgeseqobject.c
+	  interfaces/python/edgeseqobject.h : added
+	* interfaces/python/test.sh, interfaces/python/test.py :
+	  added new test cases for the edge attributes
+	  
 2005-11-25  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_tree) : typo corrected

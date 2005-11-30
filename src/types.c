@@ -2601,9 +2601,9 @@ int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from) {
  */
 
 int vector_ptr_remove(vector_ptr_t *v, long int pos) {
-
-  memcpy(v->stor_begin+pos, v->stor_begin+pos+1,
-	 sizeof(void*)*(vector_ptr_size(v)-pos));
+  if (pos+1<vector_ptr_size(v))
+    memcpy(v->stor_begin+pos, v->stor_begin+pos+1,
+	   sizeof(void*)*(vector_ptr_size(v)-pos));
   v->end--;
   
   return 0;
@@ -2686,7 +2686,7 @@ int igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
 				    long int to) {
   long int i;
   char **tmp;
-  
+
   tmp=Calloc(v->len-(to-from), char*);
   if (tmp==0) {
     IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
@@ -2700,8 +2700,8 @@ int igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
   for (i=0; i<v->len-to; i++) {
     v->data[from+i]=v->data[to+i];
   }
-
-  memcpy(tmp, v->data, v->len*sizeof(char*));
+  
+  memcpy(tmp, v->data, (v->len-(to-from))*sizeof(char*));
   Free(v->data);
   v->data=tmp;
   v->len -= (to-from);

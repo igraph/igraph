@@ -1,6 +1,7 @@
 #!/bin/bash
 if [ x$1 == x-d -a -x /usr/bin/valgrind ]; then
   # Checking memory leaks with Valgrind
+  echo "Valgrind memory leak debugging enabled"
   FNAME=/tmp/igraph_${RANDOM}.supp
   cat /usr/lib/valgrind/python.supp >$FNAME
   cat $0|awk 'BEGIN { ok=0 } /[S]UPPRESSIONS/ { first=1 } { if (first) { ok=1; first=0; } else if (ok) { print; } }' >>$FNAME
@@ -9,7 +10,7 @@ if [ x$1 == x-d -a -x /usr/bin/valgrind ]; then
 else
   PRE=""
 fi
-LD_LIBRARY_PATH=src/.libs python $1 interfaces/python/test.py
+LD_LIBRARY_PATH=src/.libs $PRE python $1 interfaces/python/test.py
 if [ x$FNAME != x ]; then rm -f $FNAME; fi
 
 exit 0

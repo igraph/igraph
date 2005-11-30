@@ -36,14 +36,14 @@ long int igraph_i_attribute_list_get_pos(igraph_attribute_list_t *al,
   long int n=igraph_strvector_size(&al->names);
   bool_t l=0;
   char *str;
-  
+
   while(!l && pos < n-1) {
     igraph_strvector_get(&al->names, pos+1, &str);
     l=!strcmp(name, str);
     pos++;
   }
   
-  if (pos==n) {
+  if (!l) {
     pos = -1;
   }
 

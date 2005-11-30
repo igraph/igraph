@@ -16,9 +16,8 @@
  */
 void igraphmodule_Graph_init_internal(igraphmodule_GraphObject *self) {
   if (!self) return;
-  /*self->vseq = Py_None;
-  Py_INCREF(Py_None);*/
   self->vseq = NULL;
+  self->eseq = NULL;
   self->destructor = NULL;
   self->weakreflist = NULL;
 }
@@ -73,6 +72,10 @@ int igraphmodule_Graph_clear(igraphmodule_GraphObject *self) {
   self->vseq=NULL;
   Py_XDECREF(tmp);
 
+  tmp=self->eseq;
+  self->eseq=NULL;
+  Py_XDECREF(tmp);
+
   tmp=self->destructor;
   self->destructor=NULL;
   Py_XDECREF(tmp);
@@ -98,7 +101,7 @@ int igraphmodule_Graph_traverse(igraphmodule_GraphObject *self,
     if (vret != 0) return vret;
   }
   
-  // Funny things happen when we traverse the contained VertexSeq
+  // Funny things happen when we traverse the contained VertexSeq or EdgeSeq
   // object (it results in obviously fake memory leaks)
   /*if (self->vseq) {
     vret=visit(self->vseq, arg);
@@ -2255,18 +2258,24 @@ int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self) {
  * \brief Returns the corresponding value to a given attribute in the graph
  */
 PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self,
-						  PyObject* s) {
+					   PyObject* s) {
   igraph_attribute_type_t t=-1;
+  int result;
   void* value=NULL;
   
   if (!PyString_Check(s)) {
     PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
     return NULL;
   }
-  if (igraph_get_graph_attribute(&self->g, PyString_AsString(s),
-				 &value, &t)) {
+  result=igraph_get_graph_attribute(&self->g, PyString_AsString(s),
+				    &value, &t);
+  if (result == IGRAPH_EINVAL) {
+    PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
+    return NULL;
+  } else if (result) {
     return igraphmodule_handle_igraph_error();
   }
+  
   if (!value) {
     PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
     return NULL;
@@ -2291,6 +2300,7 @@ int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k
   void* value=NULL;
   char* key;
   real_t value0;
+  int result;
   
   if (!PyString_Check(k)) {
     PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
@@ -2302,8 +2312,12 @@ int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k
   }
   
   key=PyString_AsString(k);
-  if (igraph_get_graph_attribute_type(&self->g, key, &t2)) {
-     igraphmodule_handle_igraph_error(); return -1;
+  result=igraph_get_graph_attribute_type(&self->g, key, &t2);
+  if (result == IGRAPH_EINVAL) {
+    t2=-1;         // to indicate that there's no such attribute yet
+    PyErr_Clear(); // to indicate that we handled the situation
+  } else if (result) {
+    igraphmodule_handle_igraph_error(); return -1;
   }
   
   if (v==NULL) {
@@ -2382,6 +2396,9 @@ PyObject* igraphmodule_Graph_attributes(igraphmodule_GraphObject* self, PyObject
   return result;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Returns the attribute list of the graph's vertices
+ */
 PyObject* igraphmodule_Graph_vertex_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds) {
   vector_t t;
   igraph_strvector_t ns;
@@ -2392,7 +2409,34 @@ PyObject* igraphmodule_Graph_vertex_attributes(igraphmodule_GraphObject* self, P
     vector_destroy(&t);
     return 0;
   }
-  if (igraph_list_graph_attributes(&self->g, &ns, &t)) {
+  if (igraph_list_vertex_attributes(&self->g, &ns, &t)) {
+    vector_destroy(&t);
+    igraph_strvector_destroy(&ns);
+    return 0;
+  }
+  
+  result=igraphmodule_strvector_t_to_PyList(&ns);
+  
+  vector_destroy(&t);
+  igraph_strvector_destroy(&ns);
+  
+  return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the attribute list of the graph's edges
+ */
+PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds) {
+  vector_t t;
+  igraph_strvector_t ns;
+  PyObject *result;
+  
+  if (vector_init(&t, 0)) return 0;
+  if (igraph_strvector_init(&ns, 0)) {
+    vector_destroy(&t);
+    return 0;
+  }
+  if (igraph_list_edge_attributes(&self->g, &ns, &t)) {
     vector_destroy(&t);
     igraph_strvector_destroy(&ns);
     return 0;
@@ -2416,6 +2460,18 @@ PyObject* igraphmodule_Graph_get_vertices(igraphmodule_GraphObject* self, void* 
   }
   Py_INCREF(self->vseq);
   return self->vseq;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the edge sequence of the graph
+ */
+PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* closure) {
+  PyObject* o;
+  if (self->eseq==NULL) {
+    self->eseq=igraphmodule_EdgeSeq_New(self);
+  }
+  Py_INCREF(self->eseq);
+  return self->eseq;
 }
 
 /** \defgroup python_interface_internal Internal functions

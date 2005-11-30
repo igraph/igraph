@@ -20,6 +20,8 @@ typedef struct
   PyObject* destructor;
   // Python object representing the sequence of vertices
   PyObject* vseq;
+  // Python object representing the sequence of edges
+  PyObject* eseq;
   // Python object of the weak reference list
   PyObject* weakreflist;
 } igraphmodule_GraphObject;
@@ -90,8 +92,10 @@ PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self, PyObj
 int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k, PyObject* v);
 PyObject* igraphmodule_Graph_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_Graph_vertex_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
 PyObject* igraphmodule_Graph_get_vertices(igraphmodule_GraphObject* self, void* closure);
+PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* closure);
 
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -106,6 +110,9 @@ PyTypeObject igraphmodule_GraphType;
 static PyGetSetDef igraphmodule_Graph_getseters[] = {
   {"vs", (getter)igraphmodule_Graph_get_vertices, NULL,
       "The sequence of vertices in the graph.", NULL
+  },
+  {"es", (getter)igraphmodule_Graph_get_edges, NULL,
+      "The sequence of edges in the graph.", NULL
   },
   {NULL}
 };
@@ -735,6 +742,10 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   {"vertex_attributes", (PyCFunction)igraphmodule_Graph_vertex_attributes,
       METH_NOARGS,
       "Returns the attribute list of the graph's vertices\n"
+  },
+  {"edge_attributes", (PyCFunction)igraphmodule_Graph_edge_attributes,
+      METH_NOARGS,
+      "Returns the attribute list of the graph's edges\n"
   },
   
   ////////////////////////////////////

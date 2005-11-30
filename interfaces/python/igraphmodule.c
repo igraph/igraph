@@ -6,6 +6,8 @@
 #include "graphobject.h"
 #include "vertexseqobject.h"
 #include "vertexobject.h"
+#include "edgeseqobject.h"
+#include "edgeobject.h"
 
 /**
  * \defgroup python_interface Python module implementation
@@ -105,6 +107,16 @@ initigraph(void)
   igraphmodule_VertexType.tp_clear = (inquiry)igraphmodule_Vertex_clear;
 
   if (PyType_Ready(&igraphmodule_VertexType) < 0) return;
+  
+  igraphmodule_EdgeSeqType.tp_traverse = (traverseproc)igraphmodule_EdgeSeq_traverse;
+  igraphmodule_EdgeSeqType.tp_clear = (inquiry)igraphmodule_EdgeSeq_clear;
+
+  if (PyType_Ready(&igraphmodule_EdgeSeqType) < 0) return;
+  
+  igraphmodule_EdgeType.tp_traverse = (traverseproc)igraphmodule_Edge_traverse;
+  igraphmodule_EdgeType.tp_clear = (inquiry)igraphmodule_Edge_clear;
+
+  if (PyType_Ready(&igraphmodule_EdgeType) < 0) return;
   
   igraphmodule_GraphType.tp_new = igraphmodule_Graph_new;
   igraphmodule_GraphType.tp_init = (initproc)igraphmodule_Graph_init;

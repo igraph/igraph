@@ -3,6 +3,8 @@ pysitepkg_LTLIBRARIES = igraph.la
 igraph_la_SOURCES       = igraphmodule.c error.c error.h convert.c convert.h \
                           vertexobject.c vertexobject.h \
                           vertexseqobject.c vertexseqobject.h \
+                          edgeobject.c edgeobject.h \
+			  edgeseqobject.c edgeseqobject.h \
 			  graphobject.c graphobject.h \
 			  common.c common.h
 igraph_la_CFLAGS        = $(PYTHON_INCLUDES) -I$(top_srcdir)/include

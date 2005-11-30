@@ -42,6 +42,8 @@ def get_all_objects(gcl = None):
 									  
 ######################## Testing framework routines ########################
 def section(msg):
+    global lastsection;
+    lastsection=msg;
     sys.stdout.write("\n"+msg+"\n");
     sys.stdout.write("="*len(msg)+"\n\n");
     
@@ -57,8 +59,8 @@ def ok():
     print "ok.";
 
 def fail():
-    global failed, lasttest;
-    failed.append(lasttest);
+    global failed, lastsection, lasttest;
+    failed.append((lastsection, lasttest));
     print "FAILED.";
 
 def skip():
@@ -80,8 +82,9 @@ def results():
 	print "SOME TESTS FAILED!"
 	print "Check the implementation of the Python module."
 	print "Failed test cases are:"
-	for f in failed:
+	for (s, f) in failed:
 	    print " *", f
+	    print "   in section:", s
     else:
 	print "Everything went OK."
 
@@ -599,11 +602,51 @@ else:
     fail()
 del v
 
-section("Graph and vertex attributes")
+section("Edge sequence of a graph")
 
 g=igraph.Graph.Full(5)
 
-l=[g, g.vs[0]]
+start("Testing whether it's possible to reference the edge sequence")
+test(g.es)
+
+start("Testing whether it's possible to reference an edge in the edge sequence")
+test(g.es[0] != None)
+
+start("Testing whether it's possible to get the sequence length")
+test(len(g.es) == 10)
+
+start("Iterating through the sequence")
+for ed in g.es:
+    str(ed)
+ok()
+
+start("Weak reference testing: exporting the edge sequence to a variable and destroying the graph")
+es=g.es
+del g
+try:
+    es[0]
+except TypeError, e:
+    print "Expected exception arrived:", e
+    ok()
+else:
+    fail()
+del es
+
+start("Weak reference testing: referencing an edge of the destroyed graph")
+try:
+    print ed
+except TypeError, e:
+    print "Expected exception arrived:", e
+    ok()
+else:
+    fail()
+del ed
+
+section("Graph, vertex and edge attributes")
+
+g=igraph.Graph.Full(5)
+
+l=[g, g.vs[0], g.es[0]]
 for i in l:
     start("Trying to get a nonexistent attribute")
     try:
@@ -637,7 +680,7 @@ for i in l:
     l=i.attributes()
     l.sort()
     test(l == ["date", "name", "size"])
-    
+
     start("Overwriting a numeric attribute with a string")
     try:
 	i["size"]="6000 bytes"
