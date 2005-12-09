@@ -96,25 +96,32 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids,
   long int no_of_nodes=igraph_vcount(graph);
   long int from, i, j;
   bool_t *calc;
-  matrix_t tmpres;
-  vector_t neis;
+  matrix_t tmpres=MATRIX_NULL;
+  vector_t neis=VECTOR_NULL;
+  int ret1, ret2;
 
   if (!vector_isininterval(vids, 0, no_of_nodes-1)) {
-    IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVVID);
+    IGRAPH_FERROR("", IGRAPH_EINVVID);
   }
   
   calc=Calloc(no_of_nodes, bool_t);
+  if (calc==0) {
+    IGRAPH_FERROR("cannot calculate cocitation/bibcoupling", IGRAPH_ENOMEM);
+  }  
+  IGRAPH_FINALLY(free, calc); 	/* TODO: hack */
+
   for (i=0; i<vector_size(vids); i++) {
     calc[ (long int) VECTOR(*vids)[i] ] = 1;
   }
   
-  matrix_init(&tmpres, no_of_nodes, no_of_nodes);
-  vector_init(&neis, 0);
+  MATRIX_INIT_FINALLY(&tmpres, no_of_nodes, no_of_nodes);
+  VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(matrix_resize(res, vector_size(vids), no_of_nodes));
 
   /* The result */
   
   for (from=0; from<no_of_nodes; from++) {
-    igraph_neighbors(graph, &neis, from, mode);
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
     for (i=0; i < vector_size(&neis)-1; i++) {
       if (calc[ (long int)VECTOR(neis)[i] ]) {
 	for (j=i+1; j<vector_size(&neis); j++) {
@@ -128,7 +135,6 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids,
   }
 
   /* Copy result */
-  matrix_resize(res, vector_size(vids), no_of_nodes);
   for (i=0; i<vector_size(vids); i++) {
     for (j=0; j<no_of_nodes; j++) {
       MATRIX(*res, i, j) = MATRIX(tmpres, (long int) VECTOR(*vids)[i], j);
@@ -139,6 +145,7 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, vector_t *vids,
   matrix_destroy(&tmpres);
   vector_destroy(&neis);
   Free(calc);
+  IGRAPH_FINALLY_CLEAN(3);
   
   return 0;
 }

@@ -48,10 +48,10 @@ bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
 
   if (v1 < 0 || v2 < 0 || v1 > nov-1 || v2 > nov-1) {
     return 0;
-/*     IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVVID); */
+/*     IGRAPH_FERROR("are connected", IGRAPH_EINVVID); */
   }
 
-  igraph_iterator_vneis(graph, &it, v1, IGRAPH_OUT);
+  IGRAPH_CHECK(igraph_iterator_vneis(graph, &it, v1, IGRAPH_OUT));
   
   while (!res && !igraph_end(graph, &it)) {
     res= (igraph_get_vertex(graph, &it) == v2);

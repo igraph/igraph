@@ -6,7 +6,7 @@ o add conversion methods for different file formats
 o comunity detection algorithms
 o add 3d layout functions
 o multicompartmental layout functions
-o error handling
+o error handling for iterators
 o function for merge networks
 o add data sets to the R package
 o add automatic tests

@@ -57,9 +57,10 @@ int igraph_get_adjacency(igraph_t *graph, matrix_t *res,
   int retval=0;
   long int from, to;
   
-  matrix_resize(res, no_of_nodes, no_of_nodes);
+  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, no_of_nodes));
   matrix_null(res);
-  igraph_iterator_eid(graph, &edgeit);
+  IGRAPH_CHECK(igraph_iterator_eid(graph, &edgeit));
+  /* TODO: finalize iterator */
   
   if (directed) {
     while (!igraph_end(graph, &edgeit)) {
@@ -101,7 +102,7 @@ int igraph_get_adjacency(igraph_t *graph, matrix_t *res,
       igraph_next(graph, &edgeit);
     }
   } else {
-    IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
+    IGRAPH_FERROR("Invalid type argument", IGRAPH_EINVAL);
   }
 
   igraph_iterator_destroy(graph, &edgeit);
@@ -132,8 +133,9 @@ int igraph_get_edgelist(igraph_t *graph, vector_t *res, bool_t bycol) {
   long int no_of_edges=igraph_ecount(graph);
   long int vptr=0;
   
-  vector_resize(res, no_of_edges*2);
-  igraph_iterator_eid(graph, &edgeit);
+  IGRAPH_CHECK(vector_resize(res, no_of_edges*2));
+  IGRAPH_CHECK(igraph_iterator_eid(graph, &edgeit));
+  /* TODO: iterator finalize */
   
   if (bycol) {
     while (!igraph_end(graph, &edgeit)) {

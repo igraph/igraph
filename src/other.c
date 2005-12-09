@@ -48,12 +48,12 @@ int igraph_running_mean(vector_t *data, vector_t *res, integer_t binwidth) {
 
   /* Check */
   if (vector_size(data) < binwidth) {
-    IGRAPH_ERROR("Vector too short for this binwidth", IGRAPH_EINVAL); 
+    IGRAPH_FERROR("Vector too short for this binwidth", IGRAPH_EINVAL); 
   }
 
   /* Memory for result */
 
-  vector_resize(res, (long int)(vector_size(data)-binwidth+1));
+  IGRAPH_CHECK(vector_resize(res, (long int)(vector_size(data)-binwidth+1)));
   
   /* Initial bin */
   for (i=0; i<binwidth; i++) {

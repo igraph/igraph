@@ -36,7 +36,7 @@ typedef struct s_igraph_attribute_list {
 } igraph_attribute_list_t;
 
 int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len);
-int igraph_attribute_list_destroy(igraph_attribute_list_t *al);
+void igraph_attribute_list_destroy(igraph_attribute_list_t *al);
 int igraph_attribute_list_add(igraph_attribute_list_t *al,
 			      const char *name, igraph_attribute_type_t type);
 int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
@@ -67,9 +67,9 @@ int igraph_attribute_list_get_type(igraph_attribute_list_t *al,
 bool_t igraph_attribute_list_has(igraph_attribute_list_t *graph, 
 				 const char *name);
 
-int igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al, 
-				      long int *index, long int nremove);
-int igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
-					  vector_t *neg, long int nremove);
+void igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al, 
+					   long int *index, long int nremove);
+void igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
+					   vector_t *neg, long int nremove);
 
 #endif

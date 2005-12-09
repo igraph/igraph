@@ -22,6 +22,54 @@
 
 	* src/structure_generators.c (igraph_tree) : typo corrected
 	
+2005-11-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_strvector.c (igraph_strvector_remove_section) :
+	remove misterious Realloc
+
+	* src/type_indexededgelist.c (igraph_add_edges, igraph_add_vertices)
+	(igraph_delete_edges, igraph_delete_vertices) : proper error handling
+
+	* src/error.c (IGRAPH_FINALLY_CLEAN) : bug corrected
+
+	* src/attributes.c (igraph_i_attribute_list_get_pos) : bug corrected
+
+	* src/attribute.c (igraph_attribute_list_copy) : typo corrected
+	
+2005-11-24  Gabor Csardi  <csardi@szaffi>
+
+	* src/igraph_strvector.c (igraph_strvector_resize) : proper error
+	handling	
+	* src/igraph_trie.c (igraph_trie_get) : proper error handling
+	* src/attributes.c (igraph_attribute_list_set_many)
+	(igraph_attribute_list_add_elem, igraph_attribute_list_copy) :
+	proper error handling added
+	(igraph_attribute_list_remove_elem_idx) 
+	(igraph_attribute_list_remove_elem_neg) : changed to void
+	* src/type_indexededgelist.c (igraph_i_create_start) : error
+	handling added
+
+2005-11-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/*.c Error handling, possibly all functions changed
+
+2005-11-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/dqueue.c (dqueue_init) : assert bug removed
+	* src/igraph_strvector.c (igraph_strvector_init) : more error handling
+	* src/igraph_strvector.c (igraph_strvector_get) : bug corrected
+	* src/igraph_strvector.c (igraph_strvector_copy) : remove an assert
+	* src/igraph_strvector_resize (igraph_strvector_resize) : bug corrected
+	* src/vector.c (vector_copy_to) : change to void
+	* src/vector_ptr.c (vector_ptr_size, vector_ptr_copy) : 
+	remove assert bug
+	* src/vector_ptr.c (vector_ptr_null) : change to void
+	
+
+2005-11-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/*.c Error handling, possibly all functions changed.
+
 2005-11-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/attributes.c (igraph_attribute_list_set)

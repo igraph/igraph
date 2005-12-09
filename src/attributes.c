@@ -36,7 +36,7 @@ long int igraph_i_attribute_list_get_pos(igraph_attribute_list_t *al,
   long int n=igraph_strvector_size(&al->names);
   bool_t l=0;
   char *str;
-
+  
   while(!l && pos < n-1) {
     igraph_strvector_get(&al->names, pos+1, &str);
     l=!strcmp(name, str);
@@ -54,7 +54,7 @@ long int igraph_i_attribute_list_get_pos(igraph_attribute_list_t *al,
  * \ingroup internal
  */
 
-int igraph_i_attribute_list_free(igraph_attribute_list_t *al, long int i) {
+void igraph_i_attribute_list_free(igraph_attribute_list_t *al, long int i) {
   if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
     vector_t *numv=VECTOR(al->data)[i];
     vector_destroy(numv);
@@ -62,8 +62,6 @@ int igraph_i_attribute_list_free(igraph_attribute_list_t *al, long int i) {
     igraph_strvector_t *strv=VECTOR(al->data)[i];
     igraph_strvector_destroy(strv);
   }
-  
-  return 0;
 }
 
 /**
@@ -73,9 +71,10 @@ int igraph_i_attribute_list_free(igraph_attribute_list_t *al, long int i) {
 
 int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len) {
   al->len=len;
-  igraph_strvector_init(&al->names, 0);
-  vector_init(&al->types, 0);
-  vector_ptr_init(&al->data, 0);
+  IGRAPH_STRVECTOR_INIT_FINALLY(&al->names, 0);
+  VECTOR_INIT_FINALLY(&al->types, 0);
+  VECTOR_PTR_INIT_FINALLY(&al->data, 0);
+  IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }
 
@@ -84,7 +83,7 @@ int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len) {
  * \brief Frees the memory allocated for an attribute list
  */
 
-int igraph_attribute_list_destroy(igraph_attribute_list_t *al) {
+void igraph_attribute_list_destroy(igraph_attribute_list_t *al) {
   long int i;
 
   for (i=0; i<vector_size(&al->types); i++) {
@@ -94,7 +93,6 @@ int igraph_attribute_list_destroy(igraph_attribute_list_t *al) {
   igraph_strvector_destroy(&al->names);
   vector_destroy(&al->types);
   vector_ptr_destroy_all(&al->data);
-  return 0;
 }
 
 /**
@@ -105,26 +103,42 @@ int igraph_attribute_list_destroy(igraph_attribute_list_t *al) {
 int igraph_attribute_list_add(igraph_attribute_list_t *al,
 			      const char *name, igraph_attribute_type_t type){
   long int pos;
+  void *data=NULL;
+
   /* Checks */
   if (strlen(name)==0) {
-    IGRAPH_ERROR("empty attribute name", IGRAPH_EINVAL);
+    IGRAPH_FERROR("invalid attribute name", IGRAPH_EINVAL);
   }
   pos=igraph_i_attribute_list_get_pos(al, name);
   if (pos >= 0) {
-    IGRAPH_ERROR("attribute already exists", IGRAPH_EXISTS);
+    IGRAPH_FERROR("attribute already exists", IGRAPH_EXISTS);
   }
 
-  igraph_strvector_add(&al->names, name);
-  vector_push_back(&al->types, type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
-    vector_t *newnumv=Calloc(1, vector_t);
-    vector_init(newnumv, al->len);
-    vector_ptr_push_back(&al->data, newnumv);
-  } else if (type==IGRAPH_ATTRIBUTE_STR) {
-    igraph_strvector_t *newstrv=Calloc(1, igraph_strvector_t);
-    igraph_strvector_init(newstrv, al->len);
-    vector_ptr_push_back(&al->data, newstrv);
+    data=(void*) Calloc(1, vector_t);
+    if (data != 0) { 
+      VECTOR_INIT_FINALLY((vector_t*)data, al->len); 
+    } else {
+      IGRAPH_FERROR("cannot add attribute", IGRAPH_ENOMEM);
+    }
+  } else /* if (type==IGRAPH_ATTRIBUTE_STR) */ {
+    data=(void*)Calloc(1, igraph_strvector_t);
+    if (data != 0) { 
+      IGRAPH_STRVECTOR_INIT_FINALLY((igraph_strvector_t*)data, al->len);
+    } else {
+      IGRAPH_FERROR("cannot add attribute", IGRAPH_ENOMEM);
+    }
   }
+
+  IGRAPH_CHECK(vector_ptr_reserve(&al->data, vector_ptr_size(&al->data)+1));
+  IGRAPH_CHECK(vector_reserve(&al->types, vector_size(&al->types)+1));
+  IGRAPH_CHECK(igraph_strvector_add(&al->names, name));
+    
+  vector_ptr_push_back(&al->data, data);
+  vector_push_back(&al->types, type);
+  /* Space is allocated already, no need to check errors... */
+
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
@@ -138,7 +152,7 @@ int igraph_attribute_list_remove(igraph_attribute_list_t *al,
   long int pos=igraph_i_attribute_list_get_pos(al, name);
 
   if (pos < 0) {
-    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+    IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
 
   igraph_i_attribute_list_free(al, pos);
@@ -157,12 +171,13 @@ int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
 			      long int idx, void **value, 
 			      igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
+  igraph_attribute_type_t atype;
 
   if (pos < 0) {
-    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+    IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
 
-  igraph_attribute_type_t atype=VECTOR(al->types)[pos];
+  atype=VECTOR(al->types)[pos];
   if (type != 0) {
     *type = atype;
   }
@@ -187,7 +202,7 @@ int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
   igraph_attribute_type_t atype;
 
   if (pos < 0) {
-    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+    IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
 
   atype=VECTOR(al->types)[pos];
@@ -196,7 +211,7 @@ int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
     vector_set(data, idx, *(real_t*)(value));
   } else if (atype==IGRAPH_ATTRIBUTE_STR) {
     igraph_strvector_t *data=VECTOR(al->data)[pos];
-    igraph_strvector_set(data, idx, (char*)value);
+    IGRAPH_CHECK(igraph_strvector_set(data, idx, (char*)value));
   }
   return 0;
 }
@@ -214,25 +229,25 @@ int igraph_attribute_list_get_many(igraph_attribute_list_t *al,
   long int i;
 
   if (pos < 0) {
-    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+    IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
 
   atype=VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=*value;
-    vector_resize(nvalue, vector_size(idx));
+    IGRAPH_CHECK(vector_resize(nvalue, vector_size(idx)));
     for (i=0; i<vector_size(idx); i++) {
       VECTOR(*nvalue)[i] = VECTOR(*data)[ (long int)VECTOR(*idx)[i] ];
     }
   } else if (atype==IGRAPH_ATTRIBUTE_STR) {
     igraph_strvector_t *data=VECTOR(al->data)[pos];
     igraph_strvector_t *svalue=*value;
-    igraph_strvector_resize(svalue, vector_size(idx));
+    IGRAPH_CHECK(igraph_strvector_resize(svalue, vector_size(idx)));
     for (i=0; i<vector_size(idx); i++) {
       char *str;
       igraph_strvector_get(data, VECTOR(*idx)[i], &str);
-      igraph_strvector_set(svalue, i, str);
+      IGRAPH_CHECK(igraph_strvector_set(svalue, i, str));
     }    
   }
   return 0;
@@ -251,7 +266,7 @@ int igraph_attribute_list_set_many(igraph_attribute_list_t *al,
   long int i;
 
   if (pos < 0) {
-    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+    IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
 
   atype=VECTOR(al->types)[pos];
@@ -265,16 +280,22 @@ int igraph_attribute_list_set_many(igraph_attribute_list_t *al,
       if (j>=idxlen) { j=0; }
     }
   } else if (atype==IGRAPH_ATTRIBUTE_STR) {
+    igraph_strvector_t bak;
     igraph_strvector_t *data=VECTOR(al->data)[pos];
     igraph_strvector_t *svalue=value;
     long int idxlen=igraph_strvector_size(svalue);
     long int j=0;
+    IGRAPH_CHECK(igraph_strvector_copy(&bak, data));
+    IGRAPH_FINALLY(igraph_strvector_destroy, &bak);
     for (i=0; i<vector_size(idx); i++) {
       char *str;
       igraph_strvector_get(svalue, j++, &str);
-      igraph_strvector_set(data, VECTOR(*idx)[i], str); 
+      IGRAPH_CHECK(igraph_strvector_set(&bak, VECTOR(*idx)[i], str));
       if (j>=idxlen) { j=0; }
     }
+    IGRAPH_FINALLY_CLEAN(1);
+    igraph_strvector_destroy(data);
+    *data=bak;
   }
 
   return 0;
@@ -290,9 +311,10 @@ int igraph_attribute_list_get_all(igraph_attribute_list_t *al,
 				  igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
   igraph_attribute_type_t atype=IGRAPH_ATTRIBUTE_NUM;
+  int ret1;
 
   if (pos < 0) {
-    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+    IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
   
   if (type != 0) {
@@ -303,13 +325,15 @@ int igraph_attribute_list_get_all(igraph_attribute_list_t *al,
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
     vector_t *nvalue=*value;
-    vector_destroy(nvalue);
-    vector_copy(nvalue, data);
+    vector_t tmp=*nvalue;
+    IGRAPH_CHECK(vector_copy(nvalue, data));
+    vector_destroy(&tmp);
   } else if (atype==IGRAPH_ATTRIBUTE_STR) {
     igraph_strvector_t *data=VECTOR(al->data)[pos];
     igraph_strvector_t *svalue=*value;
-    igraph_strvector_destroy(svalue);
-    igraph_strvector_copy(svalue, data);
+    igraph_strvector_t tmp=*svalue;
+    IGRAPH_CHECK(igraph_strvector_copy(svalue, data));
+    igraph_strvector_destroy(&tmp);
   }
 
   return 0;
@@ -331,18 +355,42 @@ long int igraph_attribute_list_size(igraph_attribute_list_t *al) {
 
 int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne) {
   long int i;
-  al->len += ne;
+  int ret;
+  bool_t error=0;
+  igraph_error_handler_t *oldhandler;
   
+  oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
   for (i=0; i<vector_size(&al->types); i++) {
     if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
       vector_t *data=VECTOR(al->data)[i];
-      vector_resize(data, al->len);
+      ret=vector_resize(data, al->len+ne);
+      if (ret != 0) {
+	error=1; break;
+      }
     } else if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_STR) {
       igraph_strvector_t *data=VECTOR(al->data)[i];
-      igraph_strvector_resize(data, al->len);
+      ret=igraph_strvector_resize(data, al->len+ne);
+      if (ret != 0) {
+	error=1; break;
+      }
     }
   }
-  
+  al->len += ne;
+
+  if (error) {
+    al->len -= ne;
+    for (i=0; i<vector_size(&al->types); i++) {
+      if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
+	vector_t *data=VECTOR(al->data)[i];
+	vector_resize(data, al->len);
+      } else if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_STR) {
+	igraph_strvector_t *data;
+	igraph_strvector_resize(data, al->len);
+      }
+    }
+  }
+
+  igraph_set_error_handler(oldhandler);
   return 0;
 }
 
@@ -353,13 +401,17 @@ int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne) {
 
 int igraph_attribute_list_names(igraph_attribute_list_t *al,
 				igraph_strvector_t *names, vector_t *types) {
+  int ret1;
+
   if (names != 0) {
-    igraph_strvector_destroy(names);
-    igraph_strvector_copy(names, &al->names);
+    igraph_strvector_t tmp=*names;
+    IGRAPH_CHECK(igraph_strvector_copy(names, &al->names));
+    igraph_strvector_destroy(&tmp);
   }
   if (types != 0) {
-    vector_destroy(types);
-    vector_copy(types, &al->types);
+    vector_t tmp=*types;
+    IGRAPH_CHECK(vector_copy(types, &al->types));
+    vector_destroy(&tmp);
   }
   
   return 0;
@@ -373,25 +425,68 @@ int igraph_attribute_list_names(igraph_attribute_list_t *al,
 int igraph_attribute_list_copy(igraph_attribute_list_t *to,
 			       igraph_attribute_list_t *from) {
   long int i;
-  to->len=from->len;
-  igraph_strvector_copy(&to->names, &from->names);
-  vector_copy(&to->types, &from->types);
-  vector_ptr_copy(&to->data, &from->data);
+  igraph_error_handler_t *oldhandler;
+  bool_t error=0;
 
+  to->len=from->len;
+  IGRAPH_CHECK(igraph_strvector_copy(&to->names, &from->names));
+  IGRAPH_FINALLY(&to->names, igraph_strvector_destroy);  
+  IGRAPH_CHECK(vector_copy(&to->types, &from->types));
+  IGRAPH_FINALLY(&to->types, vector_destroy);
+  IGRAPH_CHECK(vector_ptr_copy(&to->data, &from->data));
+  vector_ptr_null(&to->data);
+
+  igraph_set_error_handler(igraph_error_handler_ignore);
   for (i=0; i<vector_size(&from->types); i++) {
+    int ret;
     if (VECTOR(from->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
       vector_t *data=VECTOR(from->data)[i];
       vector_t *ndata=Calloc(1, vector_t);
-      vector_copy(ndata, data);
+      if (ndata==0) {
+	error=1; break;
+      }
+      ret=vector_copy(ndata, data);
+      if (ret != 0) {
+	error=1; break;
+      }
       VECTOR(to->data)[i]=ndata;
     } else if (VECTOR(from->types)[i] == IGRAPH_ATTRIBUTE_STR) {
       igraph_strvector_t *data=VECTOR(from->data)[i];
       igraph_strvector_t *ndata=Calloc(1, igraph_strvector_t);
-      igraph_strvector_copy(ndata, data);
+      if (ndata==0) {
+	error=1; break;
+      }
+      ret=igraph_strvector_copy(ndata, data);
+      if (ret != 0) {
+	error=1; break;
+      }
       VECTOR(to->data)[i]=ndata;
     }
   }
   
+  if (error != 0) {
+    /* names & types are deleted already */
+    for (i=0; i<vector_size(&from->types); i++) {
+      if (VECTOR(from->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
+	vector_t *data=VECTOR(to->data)[i];
+	if (data != 0) {
+	  vector_destroy(data);
+	  Free(data);
+	}
+      } else if (VECTOR(from->types)[i] == IGRAPH_ATTRIBUTE_STR) {
+	igraph_strvector_t *data=VECTOR(to->data)[i];
+	if (data != 0) {
+	  igraph_strvector_destroy(data);
+	  Free(data);
+	}
+      }
+    }
+    vector_ptr_destroy(&to->data);
+  }
+  
+  igraph_set_error_handler(oldhandler);
+
+  if (!error) { IGRAPH_FINALLY_CLEAN(2); }
   return 0;
 }
 
@@ -407,7 +502,7 @@ int igraph_attribute_list_get_type(igraph_attribute_list_t *al,
   long int pos=igraph_i_attribute_list_get_pos(al, name);
 
   if (pos < 0) {
-    IGRAPH_ERROR("no such attribute", IGRAPH_EINVAL);
+    IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
 
   if (type) *type=VECTOR(al->types)[pos];
@@ -420,7 +515,7 @@ int igraph_attribute_list_get_type(igraph_attribute_list_t *al,
  * (in a weird way)
  */
 
-int igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al, 
+void igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al, 
 					  long int *index, long int nremove) {
   long int i;
   al->len -= nremove;
@@ -434,8 +529,6 @@ int igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al,
       igraph_strvector_permdelete(data, index, nremove);
     }
   }
-  
-  return 0;
 }
 
 /**
@@ -444,7 +537,7 @@ int igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al,
  * (in another weird way)
  */
 
-int igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
+void igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
 					  vector_t *neg, long int nremove) {
   long int i;
   al->len -= nremove;
@@ -458,8 +551,6 @@ int igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
       igraph_strvector_remove_negidx(data, neg, nremove);
     }
   }
-    
-  return 0;
 }
 
 /**

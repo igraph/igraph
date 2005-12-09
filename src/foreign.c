@@ -51,11 +51,12 @@
 int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream, 
 			       integer_t n, bool_t directed) {
 
-  vector_t edges;
-  vector_init(&edges, 0);
-  vector_reserve(&edges, 100);
+  vector_t edges=VECTOR_NULL;
   long int from, to;
   int c;
+  
+  VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(vector_reserve(&edges, 100));
 
   /* skip all whitespace */
   do {
@@ -66,11 +67,15 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
   while (!feof(instream)) {
     int read;
     read=fscanf(instream, "%li", &from);
-    if (read != 1) { IGRAPH_ERROR("Parse error in file", IGRAPH_PARSEERROR); }
+    if (read != 1) { 
+      IGRAPH_FERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 
+    }
     read=fscanf(instream, "%li", &to);
-    if (read != 1) { IGRAPH_ERROR("Parse error in file", IGRAPH_PARSEERROR); }
-    vector_push_back(&edges, from);
-    vector_push_back(&edges, to);
+    if (read != 1) { 
+      IGRAPH_FERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 
+    }
+    IGRAPH_CHECK(vector_push_back(&edges, from));
+    IGRAPH_CHECK(vector_push_back(&edges, to));
     
     /* skip all whitespace */
     do {
@@ -79,8 +84,9 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     ungetc (c, instream);    
   }
   
-  igraph_create(graph, &edges, n, directed);
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
   vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
@@ -132,42 +138,50 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 			  bool_t names, bool_t weights) {
   
   vector_t edges, ws;
-  igraph_trie_t trie;
+  igraph_trie_t trie=IGRAPH_TRIE_NULL;
+
+  IGRAPH_TRIE_INIT_FINALLY(&trie, names);
+  VECTOR_INIT_FINALLY(&ws, 0);
+  VECTOR_INIT_FINALLY(&edges, 0);
 
   igraph_ncol_vector=&edges;
-  vector_init(&edges, 0);
   igraph_ncol_weights=&ws;
-  vector_init(&ws, 0);
   igraph_ncol_trie=&trie;
-  igraph_trie_init(&trie, names);
   igraph_ncol_yyin=instream;
+
   igraph_ncol_yyparse();
 
-  igraph_create(graph, &edges, 0, 0);
+  IGRAPH_CHECK(igraph_create(graph, &edges, 0, 0));
   vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
   
   if (weights) {
     /* TODO: we cannot really assume that the edge ids are the same
        as the order they were added. TODO: add edges together with
        attributes */
     long int i;
-    igraph_add_edge_attribute(graph, "weight", IGRAPH_ATTRIBUTE_NUM);
+    IGRAPH_CHECK(igraph_add_edge_attribute(graph, "weight", 
+					   IGRAPH_ATTRIBUTE_NUM));
     for (i=0; i<igraph_ecount(graph); i++) {
-      igraph_set_edge_attribute(graph, "weight", i, &VECTOR(ws)[i]);
+      IGRAPH_CHECK(igraph_set_edge_attribute(graph, "weight", i, 
+					     &VECTOR(ws)[i])); 
     }
   }
   vector_destroy(&ws);
+  IGRAPH_FINALLY_CLEAN(1);
   
   if (names) {
     long int i;
-    igraph_add_vertex_attribute(graph, "name", IGRAPH_ATTRIBUTE_STR);
+    IGRAPH_CHECK(igraph_add_vertex_attribute(graph, "name", 
+					     IGRAPH_ATTRIBUTE_STR));
     for (i=0; i<igraph_vcount(graph); i++) {
       char *str;
       igraph_trie_idx(&trie, i, &str);
-      igraph_set_vertex_attribute(graph, "name", i, str);
+      IGRAPH_CHECK(igraph_set_vertex_attribute(graph, "name", i, str));
     }
   }
   igraph_trie_destroy(&trie);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }
@@ -223,43 +237,51 @@ igraph_trie_t *igraph_lgl_trie=0;
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 			  bool_t names, bool_t weights) {
 
-  vector_t edges, ws;
-  igraph_trie_t trie;
+  vector_t edges=VECTOR_NULL, ws=VECTOR_NULL;
+  igraph_trie_t trie=IGRAPH_TRIE_NULL;
+  
+  IGRAPH_TRIE_INIT_FINALLY(&trie, names);
+  VECTOR_INIT_FINALLY(&ws, 0);
+  VECTOR_INIT_FINALLY(&edges, 0);
   
   igraph_lgl_vector=&edges;
-  vector_init(&edges, 0);
   igraph_lgl_weights=&ws;
-  vector_init(&ws, 0);
   igraph_lgl_trie=&trie;
-  igraph_trie_init(&trie, names);
   igraph_lgl_yyin=instream;
+
   igraph_lgl_yyparse();
   
-  igraph_create(graph, &edges, igraph_trie_size(&trie), 0);
+  IGRAPH_CHECK(igraph_create(graph, &edges, igraph_trie_size(&trie), 0));
   vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
   
   if (weights) {
     /* TODO: we cannot really assume that the edge ids are the same
        as the order they were added. TODO: add edges together with
        attributes */
     long int i;
-    igraph_add_edge_attribute(graph, "weight", IGRAPH_ATTRIBUTE_NUM);
+    IGRAPH_CHECK(igraph_add_edge_attribute(graph, "weight", 
+					   IGRAPH_ATTRIBUTE_NUM));
     for (i=0; i<igraph_ecount(graph); i++) {
-      igraph_set_edge_attribute(graph, "weight", i, &VECTOR(ws)[i]);
+      IGRAPH_CHECK(igraph_set_edge_attribute(graph, "weight", i, 
+					     &VECTOR(ws)[i]));
     }
   }
   vector_destroy(&ws);
+  IGRAPH_FINALLY_CLEAN(1);
   
   if (names) {
     long int i;
-    igraph_add_vertex_attribute(graph, "name", IGRAPH_ATTRIBUTE_STR);
+    IGRAPH_CHECK(igraph_add_vertex_attribute(graph, "name", 
+					     IGRAPH_ATTRIBUTE_STR));
     for (i=0; i<igraph_vcount(graph); i++) {
       char *str;
       igraph_trie_idx(&trie, i, &str);
-      igraph_set_vertex_attribute(graph, "name", i, str);
+      IGRAPH_CHECK(igraph_set_vertex_attribute(graph, "name", i, str));
     }
   }
   igraph_trie_destroy(&trie);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }
@@ -285,14 +307,15 @@ int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream) {
 
   igraph_iterator_t it;
   
-  igraph_iterator_efromorder(graph, &it);
+  IGRAPH_CHECK(igraph_iterator_efromorder(graph, &it));
+  /* TODO: finalize iterator */
   while (!igraph_end(graph, &it)) {
     int ret=fprintf(outstream, "%li %li\n", 
 		    (long int) igraph_get_vertex_from(graph, &it),
 		    (long int) igraph_get_vertex_to(graph, &it));
     if (ret < 0) {
       igraph_iterator_destroy(graph, &it);
-      IGRAPH_ERROR("Write error", IGRAPH_EFILE);
+      IGRAPH_FERROR("Write error", IGRAPH_EFILE);
     }
     igraph_next(graph, &it);
   }
@@ -331,9 +354,10 @@ int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream) {
 
 int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream, 
 			    const char *names, const char *weights) {
-  igraph_iterator_t it;
+  igraph_iterator_t it=IGRAPH_ITERATOR_NULL;
   
-  igraph_iterator_efromorder(graph, &it);
+  IGRAPH_CHECK(igraph_iterator_efromorder(graph, &it));
+  /* TODO: finalize iterator */
   if (names==0 && weights ==0) {
     /* No names, no weights */
     while (!igraph_end(graph, &it)) {
@@ -342,7 +366,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
 		      (long int) igraph_get_vertex_to(graph, &it));
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -363,7 +387,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -384,7 +408,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -407,7 +431,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       if (etype==IGRAPH_ATTRIBUTE_NUM) {
 	ret=fprintf(outstream, "%f\n", *(real_t*)ptr);
@@ -416,7 +440,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -464,7 +488,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
   igraph_iterator_t it;
   long int actvertex=-1;
   
-  igraph_iterator_efromorder(graph, &it);
+  IGRAPH_CHECK(igraph_iterator_efromorder(graph, &it));
   if (names==0 && weights==0) {
     /* No names, no weights */
     while (!igraph_end(graph, &it)) {
@@ -479,7 +503,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -509,7 +533,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -539,7 +563,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -571,7 +595,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       if (etype==IGRAPH_ATTRIBUTE_NUM) {
 	ret=fprintf(outstream, "%f\n", *(real_t*)ptr);
@@ -580,7 +604,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_next(graph, &it);
     }
@@ -595,7 +619,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
     void *ptr;
     int ret=0;
     
-    igraph_iterator_vneis(graph, &it, 0, IGRAPH_ALL);
+    IGRAPH_CHECK(igraph_iterator_vneis(graph, &it, 0, IGRAPH_ALL));
     for (i=0; i<nov; i++) {
       igraph_iterator_vneis_set(graph, &it, i, IGRAPH_ALL);
       if (igraph_end(graph, &it)) {
@@ -612,7 +636,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
       }
       if (ret<0) {
 	igraph_iterator_destroy(graph, &it);
-	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
       }
     }
     igraph_iterator_destroy(graph, &it);

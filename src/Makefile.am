@@ -11,11 +11,14 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
 			     measure_dynamics.c type_indexededgelist.c \
-			     error.c other.c types.c foreign.c random.c \
+			     error.c other.c foreign.c random.c \
 			     attributes.c \
 			     memory.h random.h \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \
-			     foreign-lgl-parser.y foreign-lgl-lexer.l
+			     foreign-lgl-parser.y foreign-lgl-lexer.l \
+			     dqueue.c heap.c igraph_stack.c \
+			     igraph_strvector.c igraph_trie.c matrix.c \
+			     vector.c vector_ptr.c
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm
 

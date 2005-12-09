@@ -28,16 +28,6 @@ AT_DATA([vector.c],
 #include <stdio.h>
 #include <igraph.h>
 
-int print_vector(vector_t *v) {
-  long int i;
-  for (i=0; i<vector_size(v); i++) {
-    printf("%f ", VECTOR(*v)[i]);
-  }
-  printf("\n");
-  
-  return 0;
-}
-
 int main() {
   
   vector_t v, order;
@@ -59,6 +49,7 @@ int main() {
   vector_init(&order,0);
   vector_order(&v, &order, 100);
 
+  vector_destroy(&v);
   return 0;
 }
 ]])

@@ -40,7 +40,7 @@ delete.vertices(graph, v)
 \examples{
 g <- graph.ring(10)
 add.edges(g, c(1,5,2,6) )
-delete.edges(g, c(1,10, 1,2) )
+delete.edges(g, c(0,9, 1,2) )
 delete.vertices(g, c(1,6,7) )
 }
 \keyword{graphs}

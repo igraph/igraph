@@ -21,6 +21,7 @@
 */
 
 #include "random.h"
+#include "error.h"
 
 #include <math.h>
 double trunc(double);
@@ -53,13 +54,13 @@ int igraph_random_sample_alga(vector_t *res, integer_t l, integer_t h,
       quot=(quot*top)/Nreal;
     }
     l+=S;
-    vector_push_back(res, l);
+    vector_push_back(res, l);	/* allocated */
     Nreal=-1.0+Nreal; n=-1+n; S=1;
   }
   
   S=trunc(round(Nreal)*RNG_UNIF01())+1;
   l+=S;
-  vector_push_back(res, l);
+  vector_push_back(res, l);	/* allocated */
   
   return 0;
 }
@@ -102,12 +103,15 @@ int igraph_random_sample(vector_t *res, integer_t l, integer_t h,
   real_t negalphainv=-13;
   real_t threshold=-negalphainv*n;
   real_t S;
+  
+  int ret1;
+
+  vector_clear(res);
+  IGRAPH_CHECK(vector_reserve(res, length));  
 
   RNG_BEGIN();
   
   Vprime=exp(log(RNG_UNIF01())*ninv);
-  vector_clear(res);
-  vector_reserve(res, length);  
 
   while (n>1 && threshold < N) {
     real_t X, U;
@@ -150,7 +154,7 @@ int igraph_random_sample(vector_t *res, integer_t l, integer_t h,
     }
     
     l+=S;
-    vector_push_back(res, l);
+    vector_push_back(res, l);	/* allocated */
     N=-S+(-1+N);   Nreal=negSreal+(-1.0+Nreal);
     n=-1+n;   nreal=-1.0+nreal; ninv=nmin1inv;
     qu1=-S+qu1; qu1real=negSreal+qu1real;
@@ -163,7 +167,7 @@ int igraph_random_sample(vector_t *res, integer_t l, integer_t h,
     retval=0;
     S=trunc(N*Vprime);
     l+=S;
-    vector_push_back(res, l);
+    vector_push_back(res, l);	/* allocated */
   }
 
   RNG_END();

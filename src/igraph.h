@@ -45,6 +45,52 @@ __BEGIN_DECLS
 
 #include <stdio.h> 		/* FILE */
 
+/**
+ * \defgroup errorhandling Error handling
+ * \brief How igraph handles errors.
+ * 
+ * This very first section describes the \a igraph error handling.
+ * The error handling is based on the code of the GNU GSL. 
+ * The following base principles are used:
+ * -# All functions which may run into an error return an
+ *   <code>int</code>, the code of the error.
+ * -# A function which notices an error should call the error handler
+ *   and (if the error handler returns) return to its caller with the
+ *   error code. Functions performing their jobs successfully return
+ *   with IGRAPH_SUCCESS.
+ * -# The error handler is called by using the igraph_error() function.
+ *   There is also an IGRAPH_ERROR macro for convenience, it is
+ *   recommended to use this. This macro calles the error handler and
+ *   returns with the error code.
+ * -# Functions returning anything else than IGRAPH_SUCCESS always
+ *   leave their parameters <i>>semantically</i> unchanged.
+ * -# The \a igraph error codes and their explanation:
+ *   - <b>IGRAPH_SUCCESS</b>: the function performed its task
+ *     successfully. It can be assumed that this error code is the
+ *     same as integer zero.
+ *   - <b>IGRAPH_FAILURE</b>: some unknown error happened. 
+ *   - <b>IGRAPH_ENOMEM</b>: a memory allocation operation failed.
+ *   - <b>IGRAPH_PARSEERROR</b>: a syntactic error was found in a file
+ *     while parsing.
+ *   - <b>IGRAPH_EINVAL</b>: invalid value of a parameter.
+ *   - <b>IGRAPH_EXISTS</b>: the specified attribute already exists so
+ *     it cannot be added.
+ *   - <b>IGRAPH_EINVEVECTOR</b>: invalid edge vector, it either
+ *     contains a too high or negative value.
+ *   - <b>IGRAPH_EINVVID</b>: invalid vertex id. It is either too big
+ *     or negative.
+ *   - <b>IGRAPH_NONSQUARE</b>: non-square matrix was passed when a
+ *     square matrix was expected.
+ *   - <b>IGRAPH_EINVMODE</b>: invalid <code>mode</code> parameter.
+ *   - <b>IGRAPH_EFILE</b>: a file operation (like opening a file)
+ *     failed. 
+ * -# It is possible to define an error handler function which will be 
+ *   called after an error is noticed. This is possible with the
+ *   igraph_set_error_handler() function, see this for details. The
+ *   default error handler prints an error message and aborts the
+ *   program. 
+ */
+
 /** \defgroup types Basic data types.
  * \brief Important data types for vectors, matrices and graphs.
  */ 
@@ -418,6 +464,8 @@ typedef struct igraph_iterator_t {
   integer_t (*getvertexnei)(igraph_t *graph, struct igraph_iterator_t *it);
   integer_t (*getedge)(igraph_t *graph, struct igraph_iterator_t *it);
 } igraph_iterator_t;
+
+#define IGRAPH_ITERATOR_NULL { 0,0,0,0,0,0,0,0,0,0,0 }
 
 /* The constructors & destructor */
 int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it);

@@ -42,16 +42,28 @@ enum {
   IGRAPH_EFILE      = 10
 };
 
+/**
+ */
+
 #define IGRAPH_ERROR(reason, igraph_errno) \
        do { \
        igraph_error (reason, __FILE__, __LINE__, igraph_errno) ; \
        return igraph_errno ; \
        } while (0)
 
+/**
+ */
+
 int igraph_error(const char *reason, const char *file, int line,
 		 int igraph_errno);
 
+/**
+ */
+
 const char* igraph_strerror(const int igraph_errno);
+
+/**
+ */
 
 typedef void igraph_error_handler_t (const char * reason, const char * file,
 				     int line, int igraph_errno);
@@ -59,7 +71,46 @@ typedef void igraph_error_handler_t (const char * reason, const char * file,
 igraph_error_handler_t igraph_error_handler_abort;
 igraph_error_handler_t igraph_error_handler_ignore;
 
+/**
+ */
+
 igraph_error_handler_t *
 igraph_set_error_handler(igraph_error_handler_t new_handler);
+
+#define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
+#define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
+#define IGRAPH_ERROR_SELECT_4(a,b,c,d)   ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_3(b,c,d))
+#define IGRAPH_ERROR_SELECT_5(a,b,c,d,e) ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_4(b,c,d,e))
+
+/* Now comes the more conveninent error handling macro arsenal.
+ * Ideas taken from exception.{h,c} by Laurent Deniau see
+ * http://cern.ch/Laurent.Deniau/html/oopc/exception.html for more 
+ * information. We don't use the exception handling code though.  */
+
+struct igraph_i_protectedPtr {
+  int all;
+  void *ptr;
+  void (*func)(void*);
+};
+
+typedef void igraph_finally_func_t (void*);
+
+void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
+void IGRAPH_FINALLY_CLEAN(int); 
+void IGRAPH_FINALLY_FREE();
+
+#define IGRAPH_FINALLY(func, ptr) \
+  IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
+
+#define IGRAPH_FERROR(reason, errno) do { \
+  IGRAPH_FINALLY_FREE(); \
+  IGRAPH_ERROR(reason, errno); \
+  } while (0)
+
+#define IGRAPH_CHECK(a) do { \
+                 int igraph_i_ret=(a); \
+                 if (igraph_i_ret != 0) { \
+                    IGRAPH_FERROR("", igraph_i_ret); \
+                 } } while(0)
 
 #endif

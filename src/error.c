@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 static igraph_error_handler_t *igraph_i_error_handler=0;
 
@@ -76,4 +77,34 @@ igraph_set_error_handler (igraph_error_handler_t * new_handler)
   igraph_error_handler_t * previous_handler = igraph_i_error_handler;
   igraph_i_error_handler = new_handler;
   return previous_handler;
+}
+
+struct igraph_i_protectedPtr igraph_i_finally_stack[100];
+
+/*
+ * Adds another element to the free list
+ */
+
+void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
+  int no=igraph_i_finally_stack[0].all;
+  assert (no<100);
+  igraph_i_finally_stack[no].ptr=ptr;
+  igraph_i_finally_stack[no].func=func;
+  igraph_i_finally_stack[0].all ++;
+}
+
+void IGRAPH_FINALLY_CLEAN(int minus) { 
+  igraph_i_finally_stack[0].all -= minus;
+  if (igraph_i_finally_stack[0].all < 0) {
+    fprintf(stderr, "corrupt finally stack\n");
+    igraph_i_finally_stack[0].all = 0;
+  }
+}
+
+void IGRAPH_FINALLY_FREE() {
+  int p;
+  for (p=igraph_i_finally_stack[0].all-1; p>=0; p++) {
+    igraph_i_finally_stack[p].func(igraph_i_finally_stack[p].ptr);
+  }
+  igraph_i_finally_stack[0].all=0;
 }

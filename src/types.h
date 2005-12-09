@@ -27,6 +27,8 @@
 # define _GNU_SOURCE
 #endif
 
+#include "error.h"
+
 typedef double integer_t;
 typedef double real_t;
 typedef int    bool_t;
@@ -47,11 +49,16 @@ typedef struct s_dqueue {
   real_t *stor_end;
 } dqueue_t;
 
+#define DQUEUE_NULL { 0,0,0,0 }
+#define DQUEUE_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(dqueue_init(v, size)); \
+  IGRAPH_FINALLY(dqueue_destroy, v); } while (0)
+
 int dqueue_init    (dqueue_t* q, long int size);
-int dqueue_destroy (dqueue_t* q);
-int dqueue_empty   (dqueue_t* q);
-int dqueue_clear   (dqueue_t* q);
-int dqueue_full    (dqueue_t* q);
+void dqueue_destroy (dqueue_t* q);
+bool_t dqueue_empty   (dqueue_t* q);
+void dqueue_clear   (dqueue_t* q);
+bool_t dqueue_full    (dqueue_t* q);
 long int dqueue_size    (dqueue_t* q);
 real_t dqueue_pop     (dqueue_t* q);
 real_t dqueue_pop_back(dqueue_t* q);
@@ -87,6 +94,11 @@ typedef struct s_vector {
   real_t* end;
 } vector_t;
 
+#define VECTOR_NULL { 0,0,0 }
+#define VECTOR_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(vector_init(v, size)); \
+  IGRAPH_FINALLY(vector_destroy, v); } while (0)
+
 /**
  * \ingroup vector
  * \brief Accessing an element of a vector
@@ -107,38 +119,35 @@ typedef struct s_vector {
 #define VECTOR(v) ((v).stor_begin) /* DIRTY */
 int vector_init      (vector_t* v, long int size);
 int vector_init_copy (vector_t* v, real_t* data, long int length);
-int vector_destroy   (vector_t* v);
+void vector_destroy   (vector_t* v);
 int vector_reserve   (vector_t* v, long int size);
-int vector_empty     (vector_t* v);
+bool_t vector_empty     (vector_t* v);
 long int vector_size      (vector_t* v);
-int vector_clear     (vector_t* v);
-int vector_null      (vector_t* v);
+void vector_clear     (vector_t* v);
+void vector_null      (vector_t* v);
 int vector_push_back (vector_t* v, real_t e);
 real_t vector_e         (vector_t* v, long int pos);
 real_t*vector_e_ptr  (vector_t* v, long int pos);
-int vector_set       (vector_t* v, long int pos, real_t value);
-int vector_add       (vector_t* v, long int pos, real_t value);
-int vector_replace_first(vector_t* v, real_t old, real_t newe);
+void vector_set       (vector_t* v, long int pos, real_t value);
+void vector_add       (vector_t* v, long int pos, real_t value);
 real_t vector_tail(vector_t *v);
 real_t vector_pop_back(vector_t* v);
-long int vector_find(vector_t* v, real_t elem);
-int vector_change(vector_t* v, long int pos1, long int pos2);
 int vector_order(vector_t* v, vector_t* res, integer_t maxval);
-int vector_sort(vector_t *v);
+void vector_sort(vector_t *v);
 int vector_resize(vector_t* v, long int newsize);
 real_t vector_max(vector_t* v);
 vector_t vector_as_vector(real_t *start, long int length);
-int vector_copy_to(vector_t *v, real_t* to);
+void vector_copy_to(vector_t *v, real_t* to);
 int vector_copy(vector_t *to, vector_t *from);
 real_t vector_sum(vector_t *v);
 real_t vector_prod(vector_t *v);
 int vector_init_seq(vector_t *v, real_t from, real_t to);
-int vector_remove_section(vector_t *v, long int from, long int to);
+void vector_remove_section(vector_t *v, long int from, long int to);
 int vector_move_interval(vector_t *v, long int begin, long int end, 
 			 long int to);
-int vector_remove(vector_t *v, long int elem);
-int vector_permdelete(vector_t *v, long int *index, long int nremove);
-int vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove);
+void vector_remove(vector_t *v, long int elem);
+void vector_permdelete(vector_t *v, long int *index, long int nremove);
+void vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove);
 bool_t vector_isininterval(vector_t *v, real_t low, real_t high);
 bool_t vector_any_smaller(vector_t *v, real_t limit);
 
@@ -156,26 +165,29 @@ typedef struct s_vector_ptr {
   void** end;
 } vector_ptr_t;
 
+#define VECTOR_PTR_NULL { 0,0,0 }
+#define VECTOR_PTR_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(vector_ptr_init(v, size)); \
+  IGRAPH_FINALLY(vector_ptr_destroy, v); } while (0)
+
 int vector_ptr_init      (vector_ptr_t* v, long int size);
 int vector_ptr_init_copy (vector_ptr_t* v, void** data, long int length);
-int vector_ptr_destroy   (vector_ptr_t* v);
-int vector_ptr_free_all   (vector_ptr_t* v);
-int vector_ptr_destroy_all   (vector_ptr_t* v);
+void vector_ptr_destroy   (vector_ptr_t* v);
+void vector_ptr_free_all   (vector_ptr_t* v);
+void vector_ptr_destroy_all   (vector_ptr_t* v);
 int vector_ptr_reserve   (vector_ptr_t* v, long int size);
-int vector_ptr_empty     (vector_ptr_t* v);
+bool_t vector_ptr_empty     (vector_ptr_t* v);
 long int vector_ptr_size      (vector_ptr_t* v);
-int vector_ptr_clear     (vector_ptr_t* v);
-int vector_ptr_null      (vector_ptr_t* v);
+void vector_ptr_clear     (vector_ptr_t* v);
+void vector_ptr_null      (vector_ptr_t* v);
 int vector_ptr_push_back (vector_ptr_t* v, void* e);
 void* vector_ptr_e         (vector_ptr_t* v, long int pos);
-int vector_ptr_set       (vector_ptr_t* v, long int pos, void* value);
-long int vector_ptr_find(vector_ptr_t* v, void* elem);
-int vector_ptr_change(vector_ptr_t* v, long int pos1, long int pos2);
+void vector_ptr_set       (vector_ptr_t* v, long int pos, void* value);
 int vector_ptr_resize(vector_ptr_t* v, long int newsize);
 vector_ptr_t vector_ptr_as_vector(void* *start, long int length);
-int vector_ptr_copy_to(vector_ptr_t *v, void** to);
+void vector_ptr_copy_to(vector_ptr_t *v, void** to);
 int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from);
-int vector_ptr_remove(vector_ptr_t *v, long int pos);
+void vector_ptr_remove(vector_ptr_t *v, long int pos);
 
 /* -------------------------------------------------- */
 /* Matrix, very similar to vector                     */
@@ -195,6 +207,11 @@ typedef struct s_matrix {
   long int nrow, ncol;
 } matrix_t;
 
+#define MATRIX_NULL { VECTOR_NULL, 0, 0 }
+#define MATRIX_INIT_FINALLY(m, nr, nc) \
+  do { IGRAPH_CHECK(matrix_init(m, nr, nc)); \
+  IGRAPH_FINALLY(matrix_destroy, m); } while (0)
+
 /**
  * \ingroup matrix
  * \brief Accessing an element of a matrix.
@@ -209,7 +226,7 @@ typedef struct s_matrix {
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 int matrix_init(matrix_t *m, long int nrow, long int ncol);
-int matrix_destroy(matrix_t *m);
+void matrix_destroy(matrix_t *m);
 int matrix_resize(matrix_t *m, long int nrow, long int ncol);
 long int matrix_size(matrix_t *m);
 long int matrix_nrow(matrix_t *m);
@@ -238,46 +255,16 @@ typedef struct s_stack {
   real_t* end;
 } igraph_stack_t;
 
+#define IGRAPH_STACK_NULL { 0,0,0 }
+
 int igraph_stack_init       (igraph_stack_t* s, long int size);
-int igraph_stack_destroy    (igraph_stack_t* s);
+void igraph_stack_destroy    (igraph_stack_t* s);
 int igraph_stack_reserve    (igraph_stack_t* s, long int size);
-int igraph_stack_empty      (igraph_stack_t* s);
+bool_t igraph_stack_empty      (igraph_stack_t* s);
 long int igraph_stack_size       (igraph_stack_t* s);
-int igraph_stack_clear      (igraph_stack_t* s);
+void igraph_stack_clear      (igraph_stack_t* s);
 int igraph_stack_push       (igraph_stack_t* s, real_t elem);
 real_t igraph_stack_pop        (igraph_stack_t* s);
-
-/* -------------------------------------------------- */
-/* Multi set                                          */
-/* -------------------------------------------------- */
-
-/**
- * \defgroup multiset Multiset data type.
- * \ingroup internal
- */
-
-typedef struct s_multiset {
-  real_t* stor_begin;
-  real_t* stor_end;
-  real_t*end;
-} multiset_t;
-
-int multiset_init    (multiset_t* m, long int size);
-int multiset_destroy (multiset_t* m);
-int multiset_reserve (multiset_t* m, long int size);
-int multiset_add     (multiset_t* m, real_t elem);
-int multiset_clear   (multiset_t* m);
-real_t multiset_choose  (multiset_t* m);
-real_t multiset_choose_random(multiset_t* m);
-real_t multiset_choose_remove (multiset_t* m);
-real_t multiset_choose_remove_random(multiset_t* m);
-long int multiset_size(multiset_t* m);
-int multiset_remove (multiset_t* m, real_t elem);
-int multiset_remove_all (multiset_t* m, real_t elem);
-real_t* multiset_get_vector(multiset_t * m);
-long int multiset_count(multiset_t* m, real_t elem);
-long int multiset_count_different(multiset_t* m, real_t elem);
-real_t multiset_choose_random_different(multiset_t* m, real_t elem);
 
 /* -------------------------------------------------- */
 /* Heap                                               */
@@ -295,20 +282,22 @@ typedef struct s_heap {
   int destroy;
 } heap_t;
 
+#define HEAP_NULL { 0,0,0 }
+
 int heap_init           (heap_t* h, long int size);
 int heap_init_array     (heap_t *t, real_t* data, long int len);
-int heap_destroy        (heap_t* h);
-int heap_empty          (heap_t* h);
+void heap_destroy        (heap_t* h);
+bool_t heap_empty          (heap_t* h);
 int heap_push           (heap_t* h, real_t elem);
 real_t heap_max       (heap_t* h);
 real_t heap_delete_max(heap_t* h);
 long int heap_size      (heap_t* h);
 int heap_reserve        (heap_t* h, long int size);
 
-int heap_i_build(real_t* arr, long int size, long int head);
-int heap_i_shift_up(real_t* arr, long int size, long int elem);
-int heap_i_sink(real_t* arr, long int size, long int head);
-int heap_i_switch(real_t* arr, long int e1, long int e2);
+void heap_i_build(real_t* arr, long int size, long int head);
+void heap_i_shift_up(real_t* arr, long int size, long int elem);
+void heap_i_sink(real_t* arr, long int size, long int head);
+void heap_i_switch(real_t* arr, long int e1, long int e2);
 
 /* -------------------------------------------------- */
 /* Indexed heap                                       */
@@ -327,10 +316,12 @@ typedef struct s_indheap {
   long int* index_begin;
 } indheap_t;
 
+#define INDHEAP_NULL { 0,0,0,0,0 }
+
 int indheap_init           (indheap_t* h, long int size);
 int indheap_init_array     (indheap_t *t, real_t* data, long int len);
-int indheap_destroy        (indheap_t* h);
-int indheap_empty          (indheap_t* h);
+void indheap_destroy        (indheap_t* h);
+bool_t indheap_empty          (indheap_t* h);
 int indheap_push           (indheap_t* h, real_t elem);
 real_t indheap_max       (indheap_t* h);
 real_t indheap_delete_max(indheap_t* h);
@@ -338,10 +329,10 @@ long int indheap_size      (indheap_t* h);
 int indheap_reserve        (indheap_t* h, long int size);
 long int indheap_max_index(indheap_t *h);
 
-int indheap_i_build(indheap_t* h, long int head);
-int indheap_i_shift_up(indheap_t* h, long int elem);
-int indheap_i_sink(indheap_t* h, long int head);
-int indheap_i_switch(indheap_t* h, long int e1, long int e2);
+void indheap_i_build(indheap_t* h, long int head);
+void indheap_i_shift_up(indheap_t* h, long int elem);
+void indheap_i_sink(indheap_t* h, long int head);
+void indheap_i_switch(indheap_t* h, long int e1, long int e2);
 
 /* -------------------------------------------------- */
 /* Doubly indexed heap                                */
@@ -366,98 +357,61 @@ typedef struct s_indheap_d {
   long int* index2_begin;
 } d_indheap_t;
 
+
+#define D_INDHEAP_NULL { 0,0,0,0,0,0 }
+
 int d_indheap_init           (d_indheap_t* h, long int size);
-int d_indheap_destroy        (d_indheap_t* h);
-int d_indheap_empty          (d_indheap_t* h);
+void d_indheap_destroy        (d_indheap_t* h);
+bool_t d_indheap_empty          (d_indheap_t* h);
 int d_indheap_push           (d_indheap_t* h, real_t elem, 
 			      long int idx, long int idx2);
 real_t d_indheap_max       (d_indheap_t* h);
 real_t d_indheap_delete_max(d_indheap_t* h);
 long int d_indheap_size      (d_indheap_t* h);
 int d_indheap_reserve        (d_indheap_t* h, long int size);
-int d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2);
+void d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2);
 
-int d_indheap_i_build(d_indheap_t* h, long int head);
-int d_indheap_i_shift_up(d_indheap_t* h, long int elem);
-int d_indheap_i_sink(d_indheap_t* h, long int head);
-int d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
-
-/* -------------------------------------------------- */
-/* Attribute list, a hash set basically               */
-/* -------------------------------------------------- */
+void d_indheap_i_build(d_indheap_t* h, long int head);
+void d_indheap_i_shift_up(d_indheap_t* h, long int elem);
+void d_indheap_i_sink(d_indheap_t* h, long int head);
+void d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
 
 /**
- * \defgroup stringarray Array of strings
- * \ingroup internal
- */
-
-/* typedef struct s_igraph_strarray { */
-/*   long int nstr; */
-/*   char *sa_begin; */
-/*   char *sa_end; */
-/* } igraph_strarray_t; */
-
-/* int igraph_strarray_init(igraph_strarray_t *sa); */
-/* int igraph_strarray_destroy(igraph_strarray_t *sa); */
-
-/**
+ * \defgroup strvector Vector of strings
  * \ingroup internal
  */
 
 typedef struct s_igraph_strvector {
   char **data;
-  long int len;  
+  long int len;
 } igraph_strvector_t;
 
+#define IGRAPH_STRVECTOR_NULL { 0,0 }
+#define IGRAPH_STRVECTOR_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_strvector_init(v, size)); \
+  IGRAPH_FINALLY( (igraph_finally_func_t*) igraph_strvector_destroy, v); } while (0)
+
 int igraph_strvector_init(igraph_strvector_t *sv, long int len);
-int igraph_strvector_destroy(igraph_strvector_t *sv);
+void igraph_strvector_destroy(igraph_strvector_t *sv);
 long int igraph_strvector_size(igraph_strvector_t *sv);
-int igraph_strvector_get(igraph_strvector_t *sv, long int idx, char **value);
+void igraph_strvector_get(igraph_strvector_t *sv, long int idx, char **value);
 int igraph_strvector_set(igraph_strvector_t *sv, long int idx, 
 			 const char *value);
-int igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
-				    long int to);
-int igraph_strvector_remove(igraph_strvector_t *v, long int elem);
-int igraph_strvector_move_interval(igraph_strvector_t *v, long int begin, 
+void igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
+				     long int to);
+void igraph_strvector_remove(igraph_strvector_t *v, long int elem);
+void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin, 
 				   long int end, long int to);
 int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from);
 int igraph_strvector_resize(igraph_strvector_t* v, long int newsize);
 int igraph_strvector_add(igraph_strvector_t *v, const char *value);
-int igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
-				long int nremove);
-int igraph_strvector_remove_negidx(igraph_strvector_t *v, vector_t *neg, 
-				   long int nremove);
+void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
+				 long int nremove);
+void igraph_strvector_remove_negidx(igraph_strvector_t *v, vector_t *neg, 
+				    long int nremove);
   
 /**
- * \ingroup internal
- */
-
-typedef struct s_igraph_strmatrix {
-  igraph_strvector_t data;
-  long int nrow, ncol;
-} igraph_strmatrix_t;
-
-int igraph_strmatrix_init(igraph_strmatrix_t *sm, 
-			  long int nrow, long int ncol);
-int igraph_strmatrix_destroy(igraph_strmatrix_t *sm);
-int igraph_strmatrix_get(igraph_strmatrix_t *sm, long int row, long int col,
-			  char **value);
-int igraph_strmatrix_set(igraph_strmatrix_t *sm, long int row, long int col,
-			 const char *value);
-int igraph_strmatrix_add_cols(igraph_strmatrix_t *sm, long int n);
-int igraph_strmatrix_remove_col(igraph_strmatrix_t *sm, long int col);
-int igraph_strmatrix_add_rows(igraph_strmatrix_t *m, long int n);
-int igraph_strmatrix_permdelete_rows(igraph_strmatrix_t *m, long int *index, 
-				     long int nremove);
-int igraph_strmatrix_delete_rows_neg(igraph_strmatrix_t *m, 
-				     vector_t *neg, long int nremove);
-int igraph_strmatrix_copy(igraph_strmatrix_t *to, igraph_strmatrix_t *from);
-int igraph_strmatrix_resize(igraph_strmatrix_t *sm, 
-			    long int nrow, long int ncol);
-long int igraph_strmatrix_nrow(igraph_strmatrix_t *sm);
-long int igraph_strmatrix_ncol(igraph_strmatrix_t *sm);
-
-/**
+ * \defgroup igraphtrie Trie data type
  * \ingroup internal
  */
 
@@ -476,12 +430,18 @@ typedef struct s_igraph_trie {
   igraph_strvector_t keys;
 } igraph_trie_t;
 
+#define IGRAPH_TRIE_NULL { IGRAPH_STRVECTOR_NULL, VECTOR_PTR_NULL, \
+                           VECTOR_NULL, 0, 0, IGRAPH_STRVECTOR_NULL }
+#define IGRAPH_TRIE_INIT_FINALLY(tr, sk) \
+  do { IGRAPH_CHECK(igraph_trie_init(tr, sk)); \
+  IGRAPH_FINALLY(igraph_trie_destroy, tr); } while (0)
+
 int igraph_trie_init(igraph_trie_t *t, bool_t storekeys);
-int igraph_trie_destroy(igraph_trie_t *t);
+void igraph_trie_destroy(igraph_trie_t *t);
 int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id);
 int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length, 
 		     long int *id);
-int igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
+void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
 long int igraph_trie_size(igraph_trie_t *t);
 
 #endif

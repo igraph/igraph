@@ -41,7 +41,7 @@ int igraph_layout_random(igraph_t *graph, matrix_t *res) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
 
-  matrix_resize(res, no_of_nodes, 2);
+  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, 2));
 
   RNG_BEGIN();
 
@@ -73,7 +73,7 @@ int igraph_layout_circle(igraph_t *graph, matrix_t *res) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
 
-  matrix_resize(res, no_of_nodes, 2);  
+  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, 2));  
 
   for (i=0; i<no_of_nodes; i++) {
     real_t phi=2*M_PI/no_of_nodes*i;
@@ -123,14 +123,14 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
   long int i,j,k;
 
   long int no_of_nodes=igraph_vcount(graph);
-  matrix_t dxdy;
+  matrix_t dxdy=MATRIX_NULL;
   igraph_iterator_t edgeit;
   
-  matrix_resize(res, no_of_nodes, 2);
+  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
-    igraph_layout_random(graph, res);
+    IGRAPH_CHECK(igraph_layout_random(graph, res));
   }
-  matrix_init(&dxdy, no_of_nodes, 2);
+  MATRIX_INIT_FINALLY(&dxdy, no_of_nodes, 2);
   
   frk=sqrt(area/no_of_nodes);
 
@@ -157,7 +157,7 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
       }
     }
     /* Calculate the attractive "force" */
-    igraph_iterator_eid(graph, &edgeit);
+    IGRAPH_CHECK(igraph_iterator_eid(graph, &edgeit));
     while (!igraph_end(graph, &edgeit)) {
       j=igraph_get_vertex_from(graph, &edgeit);
       k=igraph_get_vertex_to(graph, &edgeit);
@@ -190,6 +190,7 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
   }
   
   matrix_destroy(&dxdy);
+  IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
 }
@@ -236,11 +237,13 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 
   RNG_BEGIN();
 
-  matrix_resize(res, n, 2);
-  matrix_init(&elen, n, n);
-  vector_init_seq(&vids, 0, n-1);
-  igraph_shortest_paths(graph, &elen, &vids, 3);
+  IGRAPH_CHECK(matrix_resize(res, n, 2));
+  MATRIX_INIT_FINALLY(&elen, n, n);
+  IGRAPH_CHECK(vector_init_seq(&vids, 0, n-1));
+  IGRAPH_FINALLY(vector_destroy, &vids);
+  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, &vids, 3));
   vector_destroy(&vids);
+  IGRAPH_FINALLY_CLEAN(1);
   for (i=0; i<n; i++) {
     MATRIX(elen, i, i) = sqrt(n);
     MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
@@ -281,6 +284,7 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 
   RNG_END();
   matrix_destroy(&elen);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }

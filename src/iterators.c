@@ -75,7 +75,7 @@ int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it) {
   it->type=IGRAPH_ITERATOR_VID;
   it->data=Calloc(1, real_t);
   if (it->data == 0) {
-    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
   }
   ((real_t*)it->data)[0]=0;
   it->next=igraph_next_vid;
@@ -121,7 +121,7 @@ int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it) {
   it->type=IGRAPH_ITERATOR_EID;
   it->data=Calloc(1, real_t);
   if (it->data == 0) {
-    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
   }
   ((real_t*)it->data)[0]=0;
   it->next=igraph_next_eid;
@@ -169,7 +169,7 @@ int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it) {
   it->type=IGRAPH_ITERATOR_EFROMORDER;
   it->data=Calloc(1, real_t);
   if (it->data == 0) {
-    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
   }
   ((real_t*)it->data)[0]=0;
   it->next=igraph_next_efromorder;
@@ -240,7 +240,7 @@ int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it,
 
   it->data=Calloc(4, real_t);
   if (it->data == 0) {
-    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
   }
   data=it->data;
   data[0]=vid;
@@ -311,7 +311,7 @@ int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it,
 
   it->data=Calloc(4, real_t);
   if (it->data == 0) {
-    IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
   }
   data=it->data;
   data[0]=vid;
@@ -348,19 +348,19 @@ int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it,
 int igraph_iterator_destroy(igraph_t *graph, igraph_iterator_t *it) {
   switch ((long int) it->type) {
   case IGRAPH_ITERATOR_VID:
-    Free(it->data);
+    if (it->data != 0) { Free(it->data); }
     break;
   case IGRAPH_ITERATOR_VNEIS:
-    Free(it->data);
+    if (it->data != 0) { Free(it->data); }
     break;
   case IGRAPH_ITERATOR_EID:
-    free(it->data); 
+    if (it->data != 0) { Free(it->data); }
     break;
   case IGRAPH_ITERATOR_ENEIS:
-    Free(it->data);
+    if (it->data != 0) { Free(it->data); }
     break;
   case IGRAPH_ITERATOR_EFROMORDER:
-    Free(it->data);
+    if (it->data != 0) { Free(it->data); }
     break;
   }
   return 0;
@@ -790,48 +790,3 @@ integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it) {
     return VECTOR(graph->ii)[(long int)data[3]];
   }
 }
-
-/**********************************************************
- * Testing purposes, indexed edgelist type                *
- *********************************************************/
-
-/* int main() { */
-  
-/*   igraph_t g; */
-/*   vector_t edges; */
-/*   igraph_iterator_t it; */
-
-/*   vector_init(&edges, 10); */
-/*   VECTOR(edges)[0]=0;  VECTOR(edges)[1]=1; */
-/*   VECTOR(edges)[2]=0;  VECTOR(edges)[3]=2; */
-/*   VECTOR(edges)[4]=3;  VECTOR(edges)[5]=0; */
-/*   VECTOR(edges)[6]=0;  VECTOR(edges)[7]=4; */
-/*   VECTOR(edges)[8]=3;  VECTOR(edges)[9]=4; */
-/*   igraph_create(&g, &edges, 0, 1); */
-  
-/*   print_igraph(&g); */
-
-/*   igraph_iterator_eneis(&g, &it, 3, 3); */
-/*   while (! igraph_end(&g, &it)) { */
-/*     printf("%f: %f -> %f\n", igraph_get_edge(&g, &it),  */
-/* 	   igraph_get_vertex_from(&g, &it), */
-/* 	   igraph_get_vertex_to(&g, &it)); */
-/*     igraph_next(&g, &it); */
-/*   } */
-
-/*   printf("----------------------\n"); */
-/*   igraph_iterator_eneis_set(&g, &it, 0, 3); */
-/*   while (! igraph_end(&g, &it)) { */
-/*     printf("%f: %f -> %f\n", igraph_get_edge(&g, &it),  */
-/* 	   igraph_get_vertex_from(&g, &it), */
-/* 	   igraph_get_vertex_to(&g, &it)); */
-/*     igraph_next(&g, &it); */
-/*   }   */
-  
-/*   igraph_iterator_destroy(&g, &it); */
-/*   igraph_destroy(&g); */
-/*   vector_destroy(&edges); */
-  
-/*   return 0; */
-/* } */
-	   
