@@ -129,7 +129,6 @@ int vector_push_back (vector_t* v, real_t e);
 real_t vector_e         (vector_t* v, long int pos);
 real_t*vector_e_ptr  (vector_t* v, long int pos);
 void vector_set       (vector_t* v, long int pos, real_t value);
-void vector_add       (vector_t* v, long int pos, real_t value);
 real_t vector_tail(vector_t *v);
 real_t vector_pop_back(vector_t* v);
 int vector_order(vector_t* v, vector_t* res, integer_t maxval);
@@ -150,6 +149,7 @@ void vector_permdelete(vector_t *v, long int *index, long int nremove);
 void vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove);
 bool_t vector_isininterval(vector_t *v, real_t low, real_t high);
 bool_t vector_any_smaller(vector_t *v, real_t limit);
+bool_t vector_is_equal(vector_t *lhs, vector_t *rhs);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */

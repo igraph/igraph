@@ -1,0 +1,77 @@
+# Check the utility types (vector_t, etc.)
+
+# Test suite for the IGraph library.
+# Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
+# MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+AT_BANNER([[Structure generators]])
+
+AT_SETUP([Simple graph creation (igraph_create): ])
+AT_KEYWORDS([igraph_create])
+AT_COMPILE_CHECK([simple/igraph_create.c])
+AT_CLEANUP
+
+AT_SETUP([Barabasi-Albert model (igraph_barabasi_game):])
+AT_KEYWORDS([barabasi barabasi-albert igraph_barabasi_game])
+AT_COMPILE_CHECK([simple/igraph_barabasi_game.c])
+AT_CLEANUP
+
+AT_SETUP([Erdos-Renyi model (igraph_erdos_renyi_game):])
+AT_KEYWORDS([erdos renyi erdos-renyi igraph_erdos_renyi_game])
+AT_COMPILE_CHECK([simple/igraph_erdos_renyi_game.c])
+AT_CLEANUP
+
+AT_SETUP([Degree sequence(igraph_degree_sequence_game):])
+AT_KEYWORDS([degree sequence igraph_degree_sequence_game])
+AT_COMPILE_CHECK([simple/igraph_degree_sequence_game.c])
+AT_CLEANUP
+
+AT_SETUP([Growing random (igraph_growing_random_game):])
+AT_KEYWORDS([growing random game igraph_growing_random_game])
+AT_COMPILE_CHECK([simple/igraph_growing_random_game.c])
+AT_CLEANUP
+
+AT_SETUP([From adjacency matrix (igraph_adjacency):])
+AT_KEYWORDS([adjacency matrix igraph_adjacency])
+AT_COMPILE_CHECK([simple/igraph_adjacency.c])
+AT_CLEANUP
+
+AT_SETUP([Star graph (igraph_star):])
+AT_KEYWORDS([star igraph_star])
+AT_COMPILE_CHECK([simple/igraph_star.c])
+AT_CLEANUP
+
+AT_SETUP([Lattice graph (igraph_lattice):])
+AT_KEYWORDS([lattice igraph_lattice])
+AT_COMPILE_CHECK([simple/igraph_lattice.c])
+AT_CLEANUP
+
+AT_SETUP([Ring graph (igraph_ring):])
+AT_KEYWORDS([ring igraph_ring])
+AT_COMPILE_CHECK([simple/igraph_ring.c])
+AT_CLEANUP
+
+AT_SETUP([Tree graph (igraph_tree):])
+AT_KEYWORDS([tree igraph_tree])
+AT_COMPILE_CHECK([simple/igraph_tree.c])
+AT_CLEANUP
+
+AT_SETUP([Full graph (igraph_full):])
+AT_KEYWORDS([full igraph_full])
+AT_COMPILE_CHECK([simple/igraph_full.c])
+AT_CLEANUP
+

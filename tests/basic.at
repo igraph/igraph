@@ -18,79 +18,52 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+# Macros
+
 AT_BANNER([[Basic (interface) functions.]])
 
-AT_SETUP([Compilation plus basic interface: ])
+AT_SETUP([Creating an empty graph (igraph_empty): ])
+AT_KEYWORDS([igraph_empty])
+AT_COMPILE_CHECK([simple/igraph_empty.c])
+AT_CLEANUP
 
-AT_DATA([basic.c], 
-[[
-#include <igraph.h>
-int main() {
-  igraph_t g, g2;
-  vector_t v;
+AT_SETUP([Copying a graph (igraph_copy): ])
+AT_KEYWORDS([igraph_copy igraph_create])
+AT_COMPILE_CHECK([simple/igraph_copy.c])
+AT_CLEANUP
 
-  /* empty graph */
-  igraph_empty(&g, 0, 0);
-  igraph_destroy(&g);
+AT_SETUP([Adding edges to a graph (igraph_add_edges): ])
+AT_KEYWORDS([igraph_add_edges])
+AT_COMPILE_CHECK([simple/igraph_add_edges.c], 
+	[simple/igraph_add_edges.out])
+AT_CLEANUP
 
-  /* copy */
-  igraph_empty(&g, 0, 0);
-  igraph_copy(&g2, &g);
-  igraph_ecount(&g2);
-  igraph_destroy(&g);
-  igraph_destroy(&g2);
+AT_SETUP([Adding vertices (igraph_add_vertices): ])
+AT_KEYWORDS([igraph_add_vertices])
+AT_COMPILE_CHECK([simple/igraph_add_vertices.c])
+AT_CLEANUP
 
-  /* add edges, ecount */
-  igraph_empty(&g, 10, 1);
-  vector_init(&v, 4);
-  VECTOR(v)[0]=0; VECTOR(v)[1]=1;
-  VECTOR(v)[2]=2; VECTOR(v)[3]=3;
-  igraph_add_edges(&g, &v);
-  vector_destroy(&v);
-  if (igraph_ecount(&g) != 2) {
-    printf("igraph_add_edges or igraph_ecount failed\n");
-    return 1;
-  }
-  igraph_destroy(&g);
+AT_SETUP([Deleting edges (igraph_delete_edges): ])
+AT_KEYWORDS([igraph_delete_vertices])
+AT_COMPILE_CHECK([simple/igraph_delete_edges.c])
+AT_CLEANUP
 
-  /* add vertices, vcount */
-  igraph_empty(&g, 10, 1);
-  igraph_add_vertices(&g, 10);
-  if (igraph_vcount(&g) != 20) {
-    printf("igraph_add_vertices or igraph_vcount failed\n");
-    return 2;
-  }
-  igraph_destroy(&g);
+AT_SETUP([Deleting vertices (igraph_delete_vertices): ])
+AT_KEYWORDS([igraph_delete_vertices])
+AT_COMPILE_CHECK([simple/igraph_delete_vertices.c])
+AT_CLEANUP
 
-  /* delete edges */
-  igraph_empty(&g, 10, 1);
-  vector_init(&v, 6);
-  VECTOR(v)[0]=0; VECTOR(v)[1]=1;
-  VECTOR(v)[2]=2; VECTOR(v)[3]=3;
-  VECTOR(v)[2]=0; VECTOR(v)[3]=1;
-  igraph_add_edges(&g, &v);
-  vector_destroy(&v);
-  vector_init(&v, 4);
-  VECTOR(v)[0]=0; VECTOR(v)[1]=1;
-  VECTOR(v)[2]=0; VECTOR(v)[3]=1;
-  igraph_delete_edges(&g, &v);
-  vector_destroy(&v);
-  if (igraph_ecount(&g) != 1) {
-    printf("igraph_delete_edges failed\n");
-    return 3;
-  }
-  igraph_destroy(&g);
+AT_SETUP([Neighbors (igraph_neighbors): ])
+AT_KEYWORDS([igraph_neighbors])
+AT_COMPILE_CHECK([simple/igraph_neighbors.c], [simple/igraph_neighbors.out])
+AT_CLEANUP
 
-  /* TODO: delete vertices */
-  /* TODO: neighbors */
-  /* TODO: is directed */
-  /* TODO: degree */
+AT_SETUP([Is the graph directed? (igraph_is_directed): ])
+AT_KEYWORDS([igraph_is_directed])
+AT_COMPILE_CHECK([simple/igraph_is_directed.c])
+AT_CLEANUP
 
-  return 0;
-}
-]])
-
-AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph basic.c -o basic])
-AT_CHECK([LD_LIBRARY_PATH=$top_srcdir/src/.libs ./basic])
-
+AT_SETUP([Degree of the vertices (igraph_degree): ])
+AT_KEYWORDS([igraph_degree])
+AT_COMPILE_CHECK([simple/igraph_degree.c], [simple/igraph_degree.out])
 AT_CLEANUP

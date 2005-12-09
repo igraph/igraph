@@ -1,3 +1,7 @@
+2005-12-02  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph.h (igraph_i_directed_t, igraph_i_loops_t) : added	
+
 2005-12-01  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/types.c (vector_ptr_remove)
@@ -18,6 +22,29 @@
 	* interfaces/python/test.sh, interfaces/python/test.py :
 	  added new test cases for the edge attributes
 	  
+2005-11-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/vector.c (vector_add) : unused, deleted
+
+	* src/vector.c (vector_isininterval) : bug fixed
+
+	* src/error.c (igraph_error_handler_ignore) : do not print anything
+
+	* src/type_indexededgelist.c (igraph_delete_edges) : check that 
+	edges is even
+
+	* examples/simple/igraph_add_edges.c : added
+	* examples/simple/igraph_add_vertices.c : added
+	* examples/simple/igraph_copy.c : added
+	* examples/simple/igraph_degree.c : added
+	* examples/simple/igraph_degree.out : added
+	* examples/simple/igraph_delete_edges.c : added
+	* examples/simple/igraph_delete_vertices.c : added
+	* examples/simple/igraph_empty.c : added
+	* examples/simple/igraph_is_directed.c : added
+	* examples/simple/igraph_neighbors.c : added
+	* examples/simple/vector.c : added
+
 2005-11-25  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_tree) : typo corrected

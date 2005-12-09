@@ -251,17 +251,6 @@ void vector_set       (vector_t* v, long int pos, real_t value) {
 
 /**
  * \ingroup vector
- * \brief Add a value to an element of a vector.
- */
-
-void vector_add       (vector_t* v, long int pos, real_t value) {
-	assert(v != NULL);
-	assert(v->stor_begin != NULL);	
-	*(v->stor_begin + pos) += value;
-}
-
-/**
- * \ingroup vector
  * \brief Sets each element in the vector to zero.
  * 
  * @param v The vector object.
@@ -686,7 +675,7 @@ bool_t vector_isininterval(vector_t *v, real_t low, real_t high) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   for (ptr=v->stor_begin; ptr<v->end; ptr++) {
-    if (*ptr < 0 || *ptr >high) {
+    if (*ptr < low || *ptr >high) {
       return 0;
     }
   }
@@ -708,4 +697,29 @@ bool_t vector_any_smaller(vector_t *v, real_t limit) {
     }
   }
   return 0;
+}
+
+/**
+ * \ingroup vecgtor
+ * \brief Decides whether two vectors contain exactly the same elements.
+ */
+
+bool_t vector_is_equal(vector_t *lhs, vector_t *rhs) {
+  long int i, s;
+  assert(lhs != 0);
+  assert(rhs != 0);
+  assert(lhs->stor_begin != 0);
+  assert(rhs->stor_begin != 0);
+  
+  s=vector_size(lhs);
+  if (s != vector_size(rhs)) {
+    return 0;
+  } else {
+    for (i=0; i<s; i++) {
+      if (VECTOR(*lhs)[i] != VECTOR(*rhs)[i]) {
+	return 0;
+      }
+    }
+    return 1;
+  }
 }

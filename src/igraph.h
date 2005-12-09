@@ -397,6 +397,10 @@ typedef struct igraph_s {
 /* Constants                                          */
 /* -------------------------------------------------- */
 
+typedef enum { IGRAPH_UNDIRECTED=0, IGRAPH_DIRECTED=1 } igraph_i_directed_t;
+
+typedef enum { IGRAPH_NO_LOOPS=0, IGRAPH_LOOPS=1 } igraph_i_loops_t;
+
 typedef enum { IGRAPH_OUT=1, IGRAPH_IN=2, IGRAPH_ALL=3,
 	       IGRAPH_TOTAL=3 } igraph_neimode_t;
 

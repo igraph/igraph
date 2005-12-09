@@ -316,6 +316,7 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
  * @param graph The graph to work on.
  * @param edges The edges to remove.
  * @return Error code:
+ *         - <b>IGRAPH_EINVEVECTOR</b>: invalid (odd) length of edges vector.
  *         - <b>IGRAPH_EINVVID</b>: invalid vertex id in edges vector.
  *         - <b>IGRAPH_EINVAL</b>: no such edge to delete.
  *
@@ -337,6 +338,9 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
   int ret1, ret2;
   igraph_error_handler_t *oldhandler;
 
+  if (vector_size(edges) % 2 != 0) {
+    IGRAPH_FERROR("invalid (odd) length of edges vector", IGRAPH_EINVEVECTOR);
+  }
   if (!vector_isininterval(edges, 0, igraph_vcount(graph)-1)) {
     IGRAPH_FERROR("invalid vertex id in edges vector", IGRAPH_EINVVID);
   }

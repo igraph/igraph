@@ -20,102 +20,53 @@
 
 AT_BANNER([[Utility types (vector_t, etc.)]])
 
-AT_SETUP([Utility types, vector_t: ])
-
-AT_DATA([vector.c],
-[[
-
-#include <stdio.h>
-#include <igraph.h>
-
-int main() {
-  
-  vector_t v, order;
-  long int i;
-  vector_init(&v, 10);
-  vector_null(&v);
-
-  /* indexing */
-  for (i=0; i<vector_size(&v); i++) {
-    VECTOR(v)[i]=i+1;
-  }
-  
-  /* resize */
-  vector_resize(&v, 12);
-  VECTOR(v)[10]=100;
-  VECTOR(v)[11]=1;
-  
-  /* order */
-  vector_init(&order,0);
-  vector_order(&v, &order, 100);
-
-  vector_destroy(&v);
-  return 0;
-}
-]])
-
-AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph vector.c -o vector])
-AT_CHECK([LD_LIBRARY_PATH=$top_srcdir/src/.libs ./vector])
-
+AT_SETUP([Vector (vector_t): ])
+AT_KEYWORDS([vector vector_t])
+AT_COMPILE_CHECK([simple/vector.c], [simple/vector.out])
 AT_CLEANUP
 
-AT_SETUP([Utility types, igraph_trie_t: ])
-
-AT_DATA([trie.c], 
-[[
-#include <stdio.h>
-#include <igraph.h>
-
-int main() {
-  
-  igraph_trie_t trie;
-  long int id;
-
-  /* init */
-  igraph_trie_init(&trie, 0);
-
-  /* add and get values */
-  igraph_trie_get(&trie, "hello", &id);  printf("hello: %li\n", id);
-  igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
-  igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
-  igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
-
-  igraph_trie_get(&trie, "hello", &id);  printf("hello: %li\n", id);
-  igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
-  igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
-  igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
-
-  igraph_trie_get(&trie, "a", &id);      printf("a:     %li\n", id);
-  igraph_trie_get(&trie, "axon", &id);   printf("axon:  %li\n", id);
-
-  igraph_trie_get(&trie, "hello", &id);  printf("hello: %li\n", id);
-  igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
-  igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
-  igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
- 
-  /* destroy */
-  igraph_trie_destroy(&trie);
-  
-  return 0;
-}
-]])
-
-AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph trie.c -o trie])
-AT_CHECK([LD_LIBRARY_PATH=$top_srcdir/src/.libs ./trie], [0], 
-[[hello: 0
-hepp:  1
-alma:  2
-also:  3
-hello: 0
-hepp:  1
-alma:  2
-also:  3
-a:     4
-axon:  5
-hello: 0
-hepp:  1
-alma:  2
-also:  3
-]])
-
+AT_SETUP([Matrix (matrix_t): ])
+AT_KEYWORDS([matrix matrix_t])
+AT_COMPILE_CHECK([simple/matrix.c], [simple/matrix.out])
 AT_CLEANUP
+
+AT_SETUP([Double ended queue (dqueue_t): ])
+AT_KEYWORDS([dqueue double queue dqueue_t])
+AT_COMPILE_CHECK([simple/dqueue.c])
+AT_CLEANUP
+
+AT_SETUP([Vector of pointers (vector_ptr_t): ])
+AT_KEYWORDS([vector pointers vector_ptr_t])
+AT_COMPILE_CHECK([simple/vector_ptr.c])
+AT_CLEANUP
+
+AT_SETUP([Stack (stack_t): ])
+AT_KEYWORDS([stack stack_t])
+AT_COMPILE_CHECK([simple/stack.c])
+AT_CLEANUP
+
+AT_SETUP([Heap (heap_t): ])
+AT_KEYWORDS([heap heap_t])
+AT_COMPILE_CHECK([simple/heap.c])
+AT_CLEANUP
+
+AT_SETUP([Indexed heap (indheap_t): ])
+AT_KEYWORDS([indexed heap indheap_t])
+AT_COMPILE_CHECK([simple/indheap.c])
+AT_CLEANUP
+
+AT_SETUP([Doubly indexed heap (d_indheap_t): ])
+AT_KEYWORDS([doubly indexed heap d_indheap_t])
+AT_COMPILE_CHECK([simple/d_indheap.c], [simple/d_indheap.out])
+AT_CLEANUP
+
+AT_SETUP([String vector (igraph_strvector_t): ])
+AT_KEYWORDS([string vector igraph_strvector_t])
+AT_COMPILE_CHECK([simple/igraph_strvector.c], [simple/igraph_strvector.out])
+AT_CLEANUP
+
+AT_SETUP([Trie (igraph_trie_t): ])
+AT_KEYWORDS([trie igraph_trie_t])
+AT_COMPILE_CHECK([simple/igraph_trie.c], [simple/igraph_trie.out])
+AT_CLEANUP
+

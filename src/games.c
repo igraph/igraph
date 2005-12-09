@@ -33,11 +33,13 @@
  * @param graph An uninitialized graph object.
  * @param n The number of vertices in the graph.
  * @param m The number of outgoing edges generated for each
- *        vertex. (Only if <code>outseq</code> is not given.)
+ *        vertex. (Only if <code>outseq</code> is <code>NULL</code>.)
  * @param outseq Gives the (out-)degrees of the vertices. If this is
  *        constant, this can be a NULL pointer or an empty (but
  *        initialized!) vector, in this case <code>m</code> contains
- *        the constant out-degree. 
+ *        the constant out-degree. The very first vertex has by definition 
+ *        no outgoing edges, so the first number in this vector is 
+ *        ignored.
  * @param outpref Boolean, if true not only the in- but also the out-degree
  *        of a vertex increases its citation probability. Ie. the
  *        citation probability is determined by the total degree of

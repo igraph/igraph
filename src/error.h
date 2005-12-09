@@ -70,6 +70,7 @@ typedef void igraph_error_handler_t (const char * reason, const char * file,
 
 igraph_error_handler_t igraph_error_handler_abort;
 igraph_error_handler_t igraph_error_handler_ignore;
+igraph_error_handler_t igraph_error_handler_printignore;
 
 /**
  */
