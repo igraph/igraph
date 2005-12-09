@@ -7,7 +7,7 @@
   edge. 
 }
 \usage{
-betweenness(graph, v = 0:(vcount(graph)-1), directed = TRUE)
+betweenness(graph, v=igraph.vs.all(graph), directed = TRUE)
 edge.betweenness(graph, e=0:(ecount(graph)-1), directed = TRUE)
 }
 \arguments{

@@ -124,8 +124,7 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
 void igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
 				    long int to) {
   long int i;
-  int ret;
-  char **tmp;
+/*   char **tmp; */
   
   assert(v != 0);
   assert(v->data != 0);

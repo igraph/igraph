@@ -1,3 +1,103 @@
+2005-12-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/python/graphobject.c
+	(igraphmodule_Graph_delete_vertices, igraphmodule_Graph_degree)
+	(igraphmodule_Graph_betweenness, igraphmodule_Graph_bibcoupling)
+	(igraphmodule_Graph_closeness, igraphmodule_Graph_cocitation)
+	(igraphmodule_Graph_shortest_paths, igraphmodule_Graph_subgraph) :
+	updated for new vertex set/edge set interface	
+
+2005-12-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c
+	(igraph_minimum_spanning_tree_unweighted) : FINALLY bug corrected
+
+	* src/memory.c (igraph_free) : added 
+
+	* src/iterators.c : completely rewritten, all functions
+
+	* src/type_indexededgelist.c (igraph_delete_vertices)
+	(igraph_degree) : updated for new vertex set interface
+	* src/foreign.c (igraph_write_graph_edgelist)
+	(igraph_write_graph_ncol, igraph_write_graph_lgl) : updated for
+	new vertex set interface
+	* src/layout.c (igraph_layout_fruchterman_reingold) : updated for
+	new edge set interface
+	* src/basic_query.c (igraph_are_connected) : updated for new
+	vertex set interface
+	* src/cocitation.c (igraph_cocitation_real, igraph_cocitation)
+	(igraph_bibcoupling) : updated for new vertex/edge sets
+	* src/structural_properties.c (igraph_minimum_spanning_tree_prim)
+	(igraph_closeness, igraph_shortest_paths, igraph_betweenness)
+	(igraph_edge_betweenness, igraph_subgraph)
+	(igraph_transitivity_undirected) : updated for vertex/edge sets
+	* src/conversion.c (igraph_get_adjacency, igraph_get_edgelist) :
+	updated for new vertex/edge sets
+	* src/attributes.c (igraph_get_vertex_attributes)
+	(igraph_set_vertex_attributes) : updated for vertex/edge sets
+
+	* examples/simple/igraph_barabasi_game.c : updated for igraph_vs_t
+	* examples/simple/igraph_degree.c : updated for igraph_vs_t
+	* examples/simple/igraph_delete_vertices.c : updated for igraph_vs_t
+
+	* igraph/src/rinterface.c : updated for new vertex/edge sets
+	
+	* igraph/R/iterators.R : interface rewritten
+
+	* igraph/R/attributes.R : updated to new vertex set interface
+	* igraph/R/interface.R : updated to new vertex set interface
+	* igraph/R/print.R : updated to new vertex set interface
+	* igraph/R/structural.properties.R : updated to new vertex set 
+	interface
+	* igraph/R/cocitation.R : updated to new vertex set interface
+
+2005-12-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/error.c (IGRAPH_FINALLY_FREE) : serious error handling bug 
+	corrected
+
+	* src/error.h (IGRAPH_EUNFOLDINF) : added
+
+	* src/attributes.c (igraph_attribute_list_get_all) 
+	(igraph_attribute_list_names) : bugs corrected
+
+	* src/igraph.h (igraph_vit_t, igraph_eit_t) : introduced
+	(igraph_iterator_t) : deleted
+	* src/iterators.c (igraph_vit_t, igraph_eit_t) : introduced
+
+	* src/type_indexededgelist.c (igraph_delete_vertices)
+	(igraph_degree) : updated for igraph_vit_t
+	* src/foreign.c (igraph_write_graph_edgelist,igraph_write_graph_ncol)
+	(igraph_write_graph_lgl) : updated for igraph_vit_t, igraph_eit_t
+	* src/layout.c (igraph_layout_fruchterman_reingold)
+	(igraph_layout_kamada_kawai) : updated for igraph_vit_t
+	* src/basic_query.c (igraph_are_connected) : updated for igraph_vit_t
+	* src/conversion.c (igraph_get_adjacency,igraph_get_edgelist) :
+	updated for igraph_eit_t
+	* src/rinterface.c (R_igraph_iterator_to_SEXP)
+	(R_SEXP_to_igraph_iterator, R_SEXP_to_igraph_iterator_copy)
+	(R_igraph_iterator_vid, R_igraph_iterator_eid)
+	(R_igraph_iterator_efromorder, R_igraph_iterator_eneis)
+	(R_igraph_iterator_vneis, R_igraph_iterator_next)
+	(R_igraph_iterator_prev, R_igraph_iterator_reset)
+	(R_igraph_iterator_end, R_igraph_iterator_get_vertex_nei)
+	(R_igraph_iterator_get_vertex, R_igraph_iterator_from)
+	(R_igraph_iterator_to, R_igraph_iterator_edge)
+	(R_igraph_iterator_randomwalk, R_igraph_iterator_randomwalk1) :
+	removed, to be reimplemented
+	* src/structural_properties.c (R_igraph_minimum_spanning_tree_prim)
+	(igraph_closeness, igraph_shortest_paths, igraph_betweenness)
+	(igraph_subgraph, igraph_transitivity_undirected) : updated for
+	igraph_vit_t, igraph_eit_t
+	* src/cocitation.c (igraph_cocitation,igraph_bibcoupling)
+	(igraph_cocitation_real) : updated for igraph_vit_t
+	* src/attributes.c (igraph_get_vertex_attributes)
+	(igraph_set_vertex_attributes) : updated for igraph_vit_t
+
+	* examples/simple/igraph_barabasi_game.c : updated
+	* examples/simple/igraph_degree.c : updated
+	* examples/simple/igraph_delete_vertices.c :updated
+	
 2005-12-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph.h (igraph_i_directed_t, igraph_i_loops_t) : added	

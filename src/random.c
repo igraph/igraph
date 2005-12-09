@@ -104,8 +104,6 @@ int igraph_random_sample(vector_t *res, integer_t l, integer_t h,
   real_t threshold=-negalphainv*n;
   real_t S;
   
-  int ret1;
-
   vector_clear(res);
   IGRAPH_CHECK(vector_reserve(res, length));  
 

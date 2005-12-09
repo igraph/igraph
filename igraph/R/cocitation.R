@@ -19,13 +19,13 @@
 #
 ###################################################################
 
-cocitation <- function(graph, v=0:(vcount(graph)-1)) {
+cocitation <- function(graph, v=igraph.vs.all(graph)) {
 
-  .Call("R_igraph_cocitation", graph, as.numeric(v),
+  .Call("R_igraph_cocitation", graph, as.igraph.vs(graph, v),
         PACKAGE="igraph")
 }
 
-bibcoupling <- function(graph, v=0:(vcount(graph)-1)) {
-  .Call("R_igraph_bibcoupling", graph, as.numeric(v),
+bibcoupling <- function(graph, v=igraph.vs.all(graph)) {
+  .Call("R_igraph_bibcoupling", graph, as.igraph.vs(graph, v),
         PACKAGE="igraph")
 }

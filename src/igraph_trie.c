@@ -313,7 +313,6 @@ int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id) {
 
 int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
 		     long int *id) {
-  int retval;
   char *tmp=Calloc(length+1, char);
 
   if (tmp==0) {

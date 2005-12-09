@@ -8,7 +8,7 @@
   network. \code{get.shortest.paths} calculates one shortest path (the
   path itself, and not just its length) from or to the given vertex.}
 \usage{
-shortest.paths(graph, v = 0:(vcount(graph)-1), mode = "all")
+shortest.paths(graph, v=igraph.vs.all(graph), mode = "all")
 get.shortest.paths(graph, from, mode = "all")
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
 }

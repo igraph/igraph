@@ -332,7 +332,7 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
   long int really_delete=0;
   long int i;
   vector_t newfrom=VECTOR_NULL, newto=VECTOR_NULL;  
-  vector_t newoi=VECTOR_NULL, newii=VECTOR_NULL;
+  vector_t newoi=VECTOR_NULL;
   long int idx=0;
   vector_t backup=VECTOR_NULL;
   int ret1, ret2;
@@ -484,29 +484,35 @@ int igraph_delete_edges(igraph_t *graph, vector_t *edges) {
  * <code>|E|</code> are the number of vertices and edges in the
  * original graph.
  */
-int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
+int igraph_delete_vertices(igraph_t *graph, igraph_vs_t vertices) {
 
   long int no_of_edges=igraph_ecount(graph);
   long int no_of_nodes=igraph_vcount(graph);
-  long int vertices_to_delete=vector_size(vertices);
+  long int vertices_to_delete;
   long int really_delete=0;
   long int edges_to_delete=0;
   long int *index;
   long int i, j;
   long int idx2=0;
   igraph_t result;
+  igraph_vs_t myvertices;
 
-  if (!vector_isininterval(vertices, 0, no_of_nodes-1)) {
-    IGRAPH_FERROR("invalid vertex id", IGRAPH_EINVVID);
-  }
-  
   IGRAPH_CHECK(igraph_copy(&result, graph));
   IGRAPH_FINALLY(igraph_destroy, &result);
 
+  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vertices, &myvertices));
+  IGRAPH_FINALLY(igraph_vs_destroy, &myvertices);
+
+  vertices_to_delete=vector_size(myvertices.v);
+
+  if (!vector_isininterval(myvertices.v, 0, no_of_nodes-1)) {
+    IGRAPH_FERROR("invalid vertex id", IGRAPH_EINVVID);
+  }
+  
   /* we use result.oi and result.os to mark vertices and edges to delete */
   vector_pop_back(&result.os);	/* adjust length a bit */
   for (i=0; i<vertices_to_delete; i++) {
-    long int vid=VECTOR(*vertices)[i];
+    long int vid=VECTOR(*myvertices.v)[i];
     if (VECTOR(graph->os)[vid] >= 0) {
       really_delete++;      
       for (j=VECTOR(graph->os)[vid]; j<VECTOR(graph->os)[vid+1]; j++) {
@@ -570,8 +576,9 @@ int igraph_delete_vertices(igraph_t *graph, vector_t *vertices) {
 				     &result.ii, result.n));
   
   igraph_destroy(graph);
+  igraph_vs_destroy(&myvertices);
   *graph=result;
-  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }
@@ -635,7 +642,6 @@ int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode,
   long int i;
 
   long int node=pnode;
-  int ret1;
 
   if (node<0 || node>igraph_vcount(graph)-1) {
     IGRAPH_FERROR("cannot get neighbors", IGRAPH_EINVVID);
@@ -764,20 +770,24 @@ bool_t igraph_is_directed(igraph_t *graph) {
  * degree will be calculated, and <code>d</code> is their (average)
  * degree. 
  */
-int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
+int igraph_degree(igraph_t *graph, vector_t *res, igraph_vs_t vids, 
 		  igraph_neimode_t mode, bool_t loops) {
 
   long int nodes_to_calc;
   long int i, j;
+  igraph_vs_t myvids;
 
-  if (!vector_isininterval(vids, 0, igraph_vcount(graph)-1)) {
+  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
+  IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
+
+  if (!vector_isininterval(myvids.v, 0, igraph_vcount(graph)-1)) {
     IGRAPH_FERROR("cannot count degree", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
     IGRAPH_FERROR("degree calculation failed", IGRAPH_EINVMODE);
   }
   
-  nodes_to_calc=vector_size(vids);
+  nodes_to_calc=vector_size(myvids.v);
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -788,20 +798,20 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
   if (loops) {
     if (mode & IGRAPH_OUT) {
       for (i=0; i<nodes_to_calc; i++) {
-	long int vid=VECTOR(*vids)[i];
+	long int vid=VECTOR(*myvids.v)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
       }
     }
     if (mode & IGRAPH_IN) {
       for (i=0; i<nodes_to_calc; i++) {
-	long int vid=VECTOR(*vids)[i];
+	long int vid=VECTOR(*myvids.v)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
       }
     }
   } else { /* no loops */
     if (mode & IGRAPH_OUT) {
       for (i=0; i<nodes_to_calc; i++) {
-	long int vid=VECTOR(*vids)[i];
+	long int vid=VECTOR(*myvids.v)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
 	for (j=VECTOR(graph->os)[vid]; j<VECTOR(graph->os)[vid+1]; j++) {
 	  if (VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[j] ]==vid) {
@@ -812,7 +822,7 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
     }
     if (mode & IGRAPH_IN) {
       for (i=0; i<nodes_to_calc; i++) {
-	long int vid=VECTOR(*vids)[i];
+	long int vid=VECTOR(*myvids.v)[i];
 	VECTOR(*res)[i] += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
 	for (j=VECTOR(graph->is)[vid]; j<VECTOR(graph->is)[vid+1]; j++) {
 	  if (VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[j] ]==vid) {
@@ -822,6 +832,9 @@ int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids,
       }
     }
   }  /* loops */
+
+  igraph_vs_destroy(&myvids);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }

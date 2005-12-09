@@ -33,10 +33,10 @@ g.a(graph, attrname=NULL)
 g.a(graph, attrname) <- value
 graph <- add.vertex.attribute(graph, attrname)
 graph <- remove.vertex.attribute(graph, attrname)
-get.vertex.attribute(graph, attrname=NULL, v=1:vcount(graph)-1)
-set.vertex.attribute(graph, attrname, v=1:vcount(graph)-1, value)
-v.a(graph, attrname=NULL, v=1:vcount(graph)-1)
-v.a(graph, attrname, v=1:vcount(graph)-1) <- value
+get.vertex.attribute(graph, attrname=NULL, v=igraph.vs.all(graph))
+set.vertex.attribute(graph, attrname, v=igraph.vs.all(graph), value)
+v.a(graph, attrname=NULL, v=igraph.vs.all(graph))
+v.a(graph, attrname, v=igraph.vs.all(graph)) <- value
 graph <- add.edge.attribute(graph, attrname)
 graph <- remove.edge.attribute(graph, attrname)
 get.edge.attribute(graph, attrname=NULL, e=1:ecount(graph)-1)

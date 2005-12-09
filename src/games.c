@@ -67,8 +67,6 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
 
   long int i,j;
 
-  int ret1;
-
   if (n<0) {
     IGRAPH_FERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }

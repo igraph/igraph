@@ -378,7 +378,6 @@ bool_t indheap_empty          (indheap_t* h) {
  */
 
 int indheap_push           (indheap_t* h, real_t elem) {
-  int ret;
   assert(h != 0);
   assert(h->stor_begin != 0);
 	

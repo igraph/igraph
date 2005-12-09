@@ -42,7 +42,7 @@
  */
 bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
 
-  igraph_iterator_t it;
+  igraph_vs_t it;
   bool_t res=0;
   long int nov=igraph_vcount(graph);
 
@@ -51,14 +51,12 @@ bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
 /*     IGRAPH_FERROR("are connected", IGRAPH_EINVVID); */
   }
 
-  IGRAPH_CHECK(igraph_iterator_vneis(graph, &it, v1, IGRAPH_OUT));
+  it=igraph_vs_adj(graph, v1, IGRAPH_OUT);
   
-  while (!res && !igraph_end(graph, &it)) {
-    res= (igraph_get_vertex(graph, &it) == v2);
-    igraph_next(graph, &it);
+  while (!res && !igraph_vs_end(graph, &it)) {
+    res= (igraph_vs_get(graph, &it) == v2);
+    igraph_vs_next(graph, &it);
   }
-  
-  igraph_iterator_destroy(graph, &it);  
   
   return res;
 }

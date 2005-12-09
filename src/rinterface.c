@@ -31,7 +31,8 @@
 SEXP R_matrix_to_SEXP(matrix_t *m);
 SEXP R_igraph_strvector_to_SEXP(igraph_strvector_t *m);
 SEXP R_attributes_to_SEXP(igraph_attribute_list_t *al);
-SEXP R_igraph_iterator_to_SEXP(igraph_t *g, igraph_iterator_t *it);
+SEXP R_igraph_vs_to_SEXP(igraph_t *g, igraph_vs_t *vs);
+SEXP R_igraph_es_to_SEXP(igraph_t *g, igraph_es_t *vs);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
@@ -42,8 +43,8 @@ int R_SEXP_to_attributes(SEXP attr, igraph_attribute_list_t *al);
 int R_SEXP_to_attributes_copy(SEXP attr, igraph_attribute_list_t *al);
 int R_SEXP_to_igraph(SEXP graph, igraph_t *res);
 int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res);
-int R_SEXP_to_igraph_iterator(SEXP rit, igraph_iterator_t *it);
-int R_SEXP_to_igraph_iterator_copy(SEXP rit, igraph_iterator_t *it);
+int R_SEXP_to_igraph_vs(SEXP rit, igraph_vs_t *it);
+int R_SEXP_to_igraph_es(SEXP rit, igraph_es_t *it);
 
 /******************************************************
  * things to do before and after                      *
@@ -128,36 +129,55 @@ SEXP R_attributes_to_SEXP(igraph_attribute_list_t *al) {
   return result;
 }
 
-SEXP R_igraph_iterator_to_SEXP(igraph_t *g, igraph_iterator_t *it) {
-  
+SEXP R_igraph_vs_to_SEXP(igraph_t *g, igraph_vs_t *it) {
+
   SEXP result;
-  long int datalen=1;
+  long int datalen=IGRAPH_I_STDATA_SIZE;
   
-  PROTECT(result=NEW_LIST(2));
+  if (it->type == IGRAPH_ITERATOR_VS_VECTOR) { /* vector is special */
+    PROTECT(result=NEW_LIST(3));
+  } else {
+    PROTECT(result=NEW_LIST(2));
+  }
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
   REAL(VECTOR_ELT(result, 0))[0] = it->type;
-  switch ((long int)it->type) {
-  case IGRAPH_ITERATOR_VID:
-  case IGRAPH_ITERATOR_EID:
-  case IGRAPH_ITERATOR_EFROMORDER:
-    datalen=1;
-    break;
-  case IGRAPH_ITERATOR_ENEIS: 
-  case IGRAPH_ITERATOR_VNEIS:
-  case IGRAPH_ITERATOR_RANDOMWALK:
-    datalen=4;
-    break;
-  case IGRAPH_ITERATOR_RANDOMWALK1:
-    datalen=5;
-    break;
-  default:
-    break;
-  }
   SET_VECTOR_ELT(result, 1, NEW_NUMERIC(datalen));
-  memcpy(REAL(VECTOR_ELT(result, 1)), (real_t *)it->data, 
+  memcpy(REAL(VECTOR_ELT(result, 1)), (real_t *)it->stdata,
 	 datalen * sizeof (real_t));
 
-  SET_CLASS(result, ScalarString(CREATE_STRING_VECTOR("igraph.iterator")));  
+  if (it->type == IGRAPH_ITERATOR_VS_VECTOR) {
+    SET_VECTOR_ELT(result, 2, NEW_NUMERIC(vector_size(it->v)));
+    vector_copy_to(it->v, REAL(VECTOR_ELT(result, 2)));
+  }
+
+  SET_CLASS(result, ScalarString(CREATE_STRING_VECTOR("igraph.vs")));
+
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_es_to_SEXP(igraph_t *g, igraph_es_t *it) {
+
+  SEXP result;
+  long int datalen=IGRAPH_I_STDATA_SIZE;
+
+  if (it->type == IGRAPH_ITERATOR_ES_VECTOR) { /* vector is special */
+    PROTECT(result=NEW_LIST(3));
+  } else {
+    PROTECT(result=NEW_LIST(2));
+  }
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
+  REAL(VECTOR_ELT(result, 0))[0] = it->type;
+  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(datalen));
+  memcpy(REAL(VECTOR_ELT(result, 1)), (real_t *)it->stdata,
+	 datalen * sizeof (real_t));
+
+  if (it->type == IGRAPH_ITERATOR_ES_VECTOR) {
+    SET_VECTOR_ELT(result, 2, NEW_NUMERIC(vector_size(it->v)));
+    vector_copy_to(it->v, REAL(VECTOR_ELT(result, 2)));
+  }
+
+  SET_CLASS(result, ScalarString(CREATE_STRING_VECTOR("igraph.es")));
 
   UNPROTECT(1);
   return result;
@@ -341,190 +361,45 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
   return 0;
 }
 
-int R_SEXP_to_igraph_iterator(SEXP rit, igraph_iterator_t *it) {
+int R_SEXP_to_igraph_vs(SEXP rit, igraph_vs_t *it) {
   
   it->type=REAL(VECTOR_ELT(rit, 0))[0];
-  it->data=REAL(VECTOR_ELT(rit, 1));
-  switch ( (long int) it->type ) {
-  case IGRAPH_ITERATOR_VID:
-    it->next=igraph_next_vid;
-    it->prev=igraph_prev_vid;
-    it->end=igraph_end_vid;
-    it->reset=igraph_reset_vid;
-    it->getvertex=igraph_get_vertex_vid;
-    it->getvertexfrom=it->getvertexto=it->getedge=0;
-    it->getvertexnei=0;    
-    break;
-  case IGRAPH_ITERATOR_EID:
-    it->next=igraph_next_eid;
-    it->prev=igraph_prev_eid;
-    it->end=igraph_end_eid;
-    it->reset=igraph_reset_eid;
-    it->getvertex=0;
-    it->getvertexfrom=igraph_get_vertex_from_eid;
-    it->getvertexto=igraph_get_vertex_to_eid;
-    it->getedge=igraph_get_edge_eid;
-    it->getvertexnei=0;
-    break;
-  case IGRAPH_ITERATOR_EFROMORDER:
-    it->next=igraph_next_efromorder;
-    it->prev=igraph_prev_efromorder;
-    it->end=igraph_end_efromorder;
-    it->reset=igraph_reset_efromorder;
-    it->getvertex=0;
-    it->getvertexfrom=igraph_get_vertex_from_efromorder;
-    it->getvertexto=igraph_get_vertex_to_efromorder;
-    it->getedge=igraph_get_edge_efromorder;
-    it->getvertexnei=0;
-    break;
-  case IGRAPH_ITERATOR_ENEIS:
-    it->next=igraph_next_eneis;
-    it->prev=0;
-    it->end=igraph_end_eneis;
-    it->reset=igraph_reset_eneis;
-    it->getvertex=0;
-    it->getvertexfrom=igraph_get_vertex_from_eneis;
-    it->getvertexto=igraph_get_vertex_to_eneis;
-    it->getedge=igraph_get_edge_eneis;
-    it->getvertexnei=igraph_get_vertex_nei_eneis;
-    break;
-  case IGRAPH_ITERATOR_VNEIS:
-    it->type=IGRAPH_ITERATOR_VNEIS;
-    it->next=igraph_next_vneis;
-    it->prev=0;
-    it->end=igraph_end_vneis;
-    it->reset=igraph_reset_vneis;
-    it->getvertex=igraph_get_vertex_vneis;
-    it->getvertexfrom=0;
-    it->getvertexto=0;
-    it->getedge=0;
-    it->getvertexnei=0;
-    break;
-  case IGRAPH_ITERATOR_RANDOMWALK:
-    it->type=IGRAPH_ITERATOR_RANDOMWALK;
-    it->next=igraph_next_randomwalk;
-    it->prev=0;
-    it->end=igraph_end_randomwalk;
-    it->reset=igraph_reset_randomwalk;
-    it->getvertex=igraph_get_vertex_randomwalk;
-    it->getvertexfrom=0;
-    it->getvertexto=0;
-    it->getedge=0;
-    it->getvertexnei=0;
-    break;    
-  case IGRAPH_ITERATOR_RANDOMWALK1:
-    it->type=IGRAPH_ITERATOR_RANDOMWALK1;
-    it->next=igraph_next_randomwalk1;
-    it->prev=0;
-    it->end=igraph_end_randomwalk1;
-    it->reset=igraph_reset_randomwalk1;
-    it->getvertex=igraph_get_vertex_randomwalk1;
-    it->getvertexfrom=0;
-    it->getvertexto=0;
-    it->getedge=0;
-    it->getvertexnei=0;
-    break;    
+  memcpy(it->stdata, REAL(VECTOR_ELT(rit, 1)), 
+	 sizeof(real_t) * IGRAPH_I_STDATA_SIZE);
+
+  it->pdata=0;
+  it->table=igraph_i_vstable[ (int) it->type ];
+  it->v=0;
+  it->vdestroy=0;
+  it->view=0;
+
+  if (it->type == IGRAPH_ITERATOR_VS_VECTOR) {
+    it->v=(vector_t*) R_alloc(1, sizeof(vector_t));
+    *it->v=vector_as_vector(REAL(VECTOR_ELT(rit, 2)), 
+			    LENGTH(VECTOR_ELT(rit,2)));
   }
-  
+
   return 0;
 }
 
-int R_SEXP_to_igraph_iterator_copy(SEXP rit, igraph_iterator_t *it) {
+int R_SEXP_to_igraph_es(SEXP rit, igraph_es_t *it) {
   
-  long int datalen=1;
   it->type=REAL(VECTOR_ELT(rit, 0))[0];
-  switch ( (long int) it->type ) {
-  case IGRAPH_ITERATOR_VID:
-    datalen=1;
-    it->next=igraph_next_vid;
-    it->prev=igraph_prev_vid;
-    it->end=igraph_end_vid;
-    it->reset=igraph_reset_vid;
-    it->getvertex=igraph_get_vertex_vid;
-    it->getvertexfrom=it->getvertexto=it->getedge=0;
-    it->getvertexnei=0;    
-    break;
-  case IGRAPH_ITERATOR_EID:
-    datalen=1;
-    it->next=igraph_next_eid;
-    it->prev=igraph_prev_eid;
-    it->end=igraph_end_eid;
-    it->reset=igraph_reset_eid;
-    it->getvertex=0;
-    it->getvertexfrom=igraph_get_vertex_from_eid;
-    it->getvertexto=igraph_get_vertex_to_eid;
-    it->getedge=igraph_get_edge_eid;
-    it->getvertexnei=0;
-    break;
-  case IGRAPH_ITERATOR_EFROMORDER:
-    datalen=1;
-    it->next=igraph_next_efromorder;
-    it->prev=igraph_prev_efromorder;
-    it->end=igraph_end_efromorder;
-    it->reset=igraph_reset_efromorder;
-    it->getvertex=0;
-    it->getvertexfrom=igraph_get_vertex_from_efromorder;
-    it->getvertexto=igraph_get_vertex_to_efromorder;
-    it->getedge=igraph_get_edge_efromorder;
-    it->getvertexnei=0;
-    break;
-  case IGRAPH_ITERATOR_ENEIS:
-    datalen=4;
-    it->next=igraph_next_eneis;
-    it->prev=0;
-    it->end=igraph_end_eneis;
-    it->reset=igraph_reset_eneis;
-    it->getvertex=0;
-    it->getvertexfrom=igraph_get_vertex_from_eneis;
-    it->getvertexto=igraph_get_vertex_to_eneis;
-    it->getedge=igraph_get_edge_eneis;
-    it->getvertexnei=igraph_get_vertex_nei_eneis;
-    break;
-  case IGRAPH_ITERATOR_VNEIS:
-    datalen=4;
-    it->type=IGRAPH_ITERATOR_VNEIS;
-    it->next=igraph_next_vneis;
-    it->prev=0;
-    it->end=igraph_end_vneis;
-    it->reset=igraph_reset_vneis;
-    it->getvertex=igraph_get_vertex_vneis;
-    it->getvertexfrom=0;
-    it->getvertexto=0;
-    it->getedge=0;
-    it->getvertexnei=0;
-    break;
-  case IGRAPH_ITERATOR_RANDOMWALK:
-    datalen=4;
-    it->type=IGRAPH_ITERATOR_RANDOMWALK;
-    it->next=igraph_next_randomwalk;
-    it->prev=0;
-    it->end=igraph_end_randomwalk;
-    it->reset=igraph_reset_randomwalk;
-    it->getvertex=igraph_get_vertex_randomwalk;
-    it->getvertexfrom=0;
-    it->getvertexto=0;
-    it->getedge=0;
-    it->getvertexnei=0;
-    break;
-  case IGRAPH_ITERATOR_RANDOMWALK1:
-    datalen=5;
-    it->type=IGRAPH_ITERATOR_RANDOMWALK1;
-    it->next=igraph_next_randomwalk1;
-    it->prev=0;
-    it->end=igraph_end_randomwalk1;
-    it->reset=igraph_reset_randomwalk1;
-    it->getvertex=igraph_get_vertex_randomwalk1;
-    it->getvertexfrom=0;
-    it->getvertexto=0;
-    it->getedge=0;
-    it->getvertexnei=0;
-    break;
-  default: 
-    break;
+  memcpy(it->stdata, REAL(VECTOR_ELT(rit, 1)), 
+	 sizeof(real_t) * IGRAPH_I_STDATA_SIZE);
+
+  it->pdata=0;
+  it->table=igraph_i_estable[ (int) it->type ];
+  it->v=0;
+  it->vdestroy=0;
+  it->view=0;
+
+  if (it->type == IGRAPH_ITERATOR_ES_VECTOR) {
+    it->v=(vector_t*) R_alloc(1, sizeof(vector_t));
+    *it->v=vector_as_vector(REAL(VECTOR_ELT(rit, 2)), 
+			    LENGTH(VECTOR_ELT(rit,2)));
   }
-  it->data=Calloc(datalen, real_t);
-  memcpy(it->data, REAL(VECTOR_ELT(rit, 1)), datalen * sizeof(real_t));
-  
+
   return 0;
 }
 
@@ -670,15 +545,15 @@ SEXP R_igraph_delete_edges(SEXP graph, SEXP edges) {
 
 SEXP R_igraph_delete_vertices(SEXP graph, SEXP vertices) {
   
-  vector_t v;
+  igraph_vs_t vs;
   igraph_t g;
   SEXP result;
   
   R_igraph_before();
   
-  v=vector_as_vector(REAL(vertices), GET_LENGTH(vertices));
+  R_SEXP_to_igraph_vs(vertices, &vs);
   R_SEXP_to_igraph_copy(graph, &g);
-  igraph_delete_vertices(&g, &v);
+  igraph_delete_vertices(&g, vs);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
@@ -729,7 +604,7 @@ SEXP R_igraph_create(SEXP edges, SEXP pn, SEXP pdirected) {
 SEXP R_igraph_degree(SEXP graph, SEXP vids, SEXP pmode, SEXP ploops) {
   
   igraph_t g;
-  vector_t v;
+  igraph_vs_t vs;
   vector_t res;
   integer_t mode=REAL(pmode)[0];
   bool_t loops=LOGICAL(ploops)[0];
@@ -737,10 +612,10 @@ SEXP R_igraph_degree(SEXP graph, SEXP vids, SEXP pmode, SEXP ploops) {
 
   R_igraph_before();
   
-  v=vector_as_vector(REAL(vids), GET_LENGTH(vids));
+  R_SEXP_to_igraph_vs(vids, &vs);
   R_SEXP_to_igraph(graph, &g);
-  vector_init(&res, vector_size(&v));
-  igraph_degree(&g, &res, &v, mode, loops);
+  vector_init(&res, 0);
+  igraph_degree(&g, &res, vs, mode, loops);
   
   PROTECT(result=NEW_NUMERIC(vector_size(&res)));
   vector_copy_to(&res, REAL(result));
@@ -832,16 +707,17 @@ SEXP R_igraph_diameter(SEXP graph, SEXP pdirected, SEXP punconnected) {
 SEXP R_igraph_closeness(SEXP graph, SEXP pvids, SEXP pmode) {
   
   igraph_t g;
-  vector_t vids=vector_as_vector(REAL(pvids), GET_LENGTH(pvids));
+  igraph_vs_t vs;
   integer_t mode=REAL(pmode)[0];
   vector_t res;
   SEXP result;
   
   R_igraph_before();
-  
+
+  R_SEXP_to_igraph_vs(pvids, &vs);
   R_SEXP_to_igraph(graph, &g);
   vector_init(&res, 0);
-  igraph_closeness(&g, &res, &vids, mode);
+  igraph_closeness(&g, &res, vs, mode);
   
   PROTECT(result=NEW_NUMERIC(vector_size(&res)));
   vector_copy_to(&res, REAL(result));
@@ -880,16 +756,17 @@ SEXP R_igraph_subcomponent(SEXP graph, SEXP pvertex, SEXP pmode) {
 SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected) {
   
   igraph_t g;
-  vector_t vids=vector_as_vector(REAL(pvids), GET_LENGTH(pvids));
+  igraph_vs_t vs;
   bool_t directed=LOGICAL(pdirected)[0];
   vector_t res;
   SEXP result;
   
   R_igraph_before();
-  
+
+  R_SEXP_to_igraph_vs(pvids, &vs);
   R_SEXP_to_igraph(graph, &g);
   vector_init(&res, 0);
-  igraph_betweenness(&g, &res, &vids, directed);
+  igraph_betweenness(&g, &res, vs, directed);
   
   PROTECT(result=NEW_NUMERIC(vector_size(&res)));
   vector_copy_to(&res, REAL(result));
@@ -926,15 +803,16 @@ SEXP R_igraph_running_mean(SEXP pdata, SEXP pbinwidth) {
 SEXP R_igraph_cocitation(SEXP graph, SEXP pvids) {
 
   igraph_t g;
-  vector_t vids=vector_as_vector(REAL(pvids), GET_LENGTH(pvids));
+  igraph_vs_t vs;
   matrix_t m;
   SEXP result;
   
   R_igraph_before();
-  
+
+  R_SEXP_to_igraph_vs(pvids, &vs);
   R_SEXP_to_igraph(graph, &g);
   matrix_init(&m, 0, 0);
-  igraph_cocitation(&g, &m, &vids);
+  igraph_cocitation(&g, &m, vs);
   
   PROTECT(result=R_matrix_to_SEXP(&m));
   matrix_destroy(&m);
@@ -948,15 +826,16 @@ SEXP R_igraph_cocitation(SEXP graph, SEXP pvids) {
 SEXP R_igraph_bibcoupling(SEXP graph, SEXP pvids) {
 
   igraph_t g;
-  vector_t vids=vector_as_vector(REAL(pvids), GET_LENGTH(pvids));
+  igraph_vs_t vs;
   matrix_t m;
   SEXP result;
   
   R_igraph_before();
-  
+
+  R_SEXP_to_igraph_vs(pvids, &vs);
   R_SEXP_to_igraph(graph, &g);
   matrix_init(&m, 0, 0);
-  igraph_bibcoupling(&g, &m, &vids);
+  igraph_bibcoupling(&g, &m, vs);
   
   PROTECT(result=R_matrix_to_SEXP(&m));
   matrix_destroy(&m);
@@ -992,16 +871,17 @@ SEXP R_igraph_growing_random_game(SEXP pn, SEXP pm, SEXP pdirected,
 SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode) {
   
   igraph_t g;
-  vector_t vids=vector_as_vector(REAL(pvids), GET_LENGTH(pvids));
+  igraph_vs_t vs;
   integer_t mode=REAL(pmode)[0];
   matrix_t res;
   SEXP result;
   
   R_igraph_before();
   
+  R_SEXP_to_igraph_vs(pvids, &vs);
   R_SEXP_to_igraph(graph, &g);
   matrix_init(&res, 0, 0);
-  igraph_shortest_paths(&g, &res, &vids, mode);
+  igraph_shortest_paths(&g, &res, vs, mode);
   PROTECT(result=R_matrix_to_SEXP(&res));
   matrix_destroy(&res);
   
@@ -1400,13 +1280,14 @@ SEXP R_igraph_subgraph(SEXP graph, SEXP pvids) {
   
   igraph_t g;
   igraph_t sub;
-  vector_t vids=vector_as_vector(REAL(pvids), GET_LENGTH(pvids));
+  igraph_vs_t vs;
   SEXP result;
   
   R_igraph_before();
   
+  R_SEXP_to_igraph_vs(pvids, &vs);
   R_SEXP_to_igraph(graph, &g);
-  igraph_subgraph(&g, &sub, &vids);
+  igraph_subgraph(&g, &sub, vs);
   PROTECT(result=R_igraph_to_SEXP(&sub));
   igraph_destroy(&sub);
   
@@ -1845,20 +1726,21 @@ SEXP R_igraph_get_vertex_attributes(SEXP graph, SEXP pname, SEXP pv) {
   
   igraph_t g;
   const char *name=CHAR(STRING_ELT(pname, 0));
-  vector_t v=vector_as_vector(REAL(pv), GET_LENGTH(pv));
+  igraph_vs_t vs;
   igraph_attribute_type_t type;
   SEXP result;
 
   R_igraph_before();
-  
+
+  R_SEXP_to_igraph_vs(pv, &vs);
   R_SEXP_to_igraph(graph, &g);
-  
+
   igraph_get_vertex_attribute_type(&g, name, &type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
     vector_t value;
     void *valueptr=&value;
     vector_init(&value, 0);
-    igraph_get_vertex_attributes(&g, name, &v, &valueptr);
+    igraph_get_vertex_attributes(&g, name, vs, &valueptr);
     PROTECT(result=NEW_NUMERIC(vector_size(&value)));
     vector_copy_to(&value, REAL(result));
     vector_destroy(&value);
@@ -1866,7 +1748,7 @@ SEXP R_igraph_get_vertex_attributes(SEXP graph, SEXP pname, SEXP pv) {
     igraph_strvector_t value;
     void *valueptr=&value;
     igraph_strvector_init(&value, 0);
-    igraph_get_vertex_attributes(&g, name, &v, &valueptr);
+    igraph_get_vertex_attributes(&g, name, vs, &valueptr);
     PROTECT(result=R_igraph_strvector_to_SEXP(&value));
     igraph_strvector_destroy(&value);
   }
@@ -1881,24 +1763,25 @@ SEXP R_igraph_set_vertex_attributes(SEXP graph, SEXP pname, SEXP pv,
 				    SEXP pvalue) {
   
   igraph_t g;
+  igraph_vs_t vs;
   const char *name=CHAR(STRING_ELT(pname, 0));
-  vector_t v=vector_as_vector(REAL(pv), GET_LENGTH(pv));
   igraph_attribute_type_t type;
   SEXP result;
 
   R_igraph_before();
   
+  R_SEXP_to_igraph_vs(pv, &vs);
   R_SEXP_to_igraph_copy(graph, &g);
   igraph_get_vertex_attribute_type(&g, name, &type);
   if (type==IGRAPH_ATTRIBUTE_NUM) { 
     vector_t value;
     value=vector_as_vector(REAL(AS_NUMERIC(pvalue)), 
 			   GET_LENGTH(AS_NUMERIC(pvalue)));
-    igraph_set_vertex_attributes(&g, name, &v, &value);
+    igraph_set_vertex_attributes(&g, name, vs, &value);
   } else {
     igraph_strvector_t value;
     R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(pvalue), &value);
-    igraph_set_vertex_attributes(&g, name, &v, &value);
+    igraph_set_vertex_attributes(&g, name, vs, &value);
   }
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
@@ -1948,18 +1831,18 @@ SEXP R_igraph_list_vertex_attributes(SEXP graph) {
 
 }
 
-SEXP R_igraph_iterator_vid(SEXP graph) {
+SEXP R_igraph_vs_all(SEXP graph) {
   
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_vs_t it;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_iterator_vid(&g, &it);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  it=igraph_vs_all(&g);
+  PROTECT(result=R_igraph_vs_to_SEXP(&g, &it));
+  igraph_vs_destroy(&it);
 
   R_igraph_after();
   
@@ -1967,18 +1850,18 @@ SEXP R_igraph_iterator_vid(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_iterator_eid(SEXP graph) {
+SEXP R_igraph_es_all(SEXP graph) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_iterator_eid(&g, &it);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  it=igraph_es_all(&g);
+  PROTECT(result=R_igraph_es_to_SEXP(&g, &it));
+  igraph_es_destroy(&it);
 
   R_igraph_after();
   
@@ -1986,18 +1869,18 @@ SEXP R_igraph_iterator_eid(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_iterator_efromorder(SEXP graph) {
+SEXP R_igraph_es_fromorder(SEXP graph) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_iterator_efromorder(&g, &it);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  it=igraph_es_fromorder(&g);
+  PROTECT(result=R_igraph_es_to_SEXP(&g, &it));
+  igraph_es_destroy(&it);
 
   R_igraph_after();
   
@@ -2005,10 +1888,10 @@ SEXP R_igraph_iterator_efromorder(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_iterator_eneis(SEXP graph, SEXP pvid, SEXP pmode) {
+SEXP R_igraph_es_adj(SEXP graph, SEXP pvid, SEXP pmode) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
   integer_t vid=REAL(pvid)[0];
   integer_t mode=REAL(pmode)[0];
   SEXP result;
@@ -2016,9 +1899,9 @@ SEXP R_igraph_iterator_eneis(SEXP graph, SEXP pvid, SEXP pmode) {
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_iterator_eneis(&g, &it, vid, mode);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  it=igraph_es_adj(&g, vid, mode);
+  PROTECT(result=R_igraph_es_to_SEXP(&g, &it));
+  igraph_es_destroy(&it);
 
   R_igraph_after();
   
@@ -2026,10 +1909,10 @@ SEXP R_igraph_iterator_eneis(SEXP graph, SEXP pvid, SEXP pmode) {
   return result;
 }
 
-SEXP R_igraph_iterator_vneis(SEXP graph, SEXP pvid, SEXP pmode) {
+SEXP R_igraph_vs_adj(SEXP graph, SEXP pvid, SEXP pmode) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_vs_t it;
   integer_t vid=REAL(pvid)[0];
   integer_t mode=REAL(pmode)[0];
   SEXP result;
@@ -2037,9 +1920,9 @@ SEXP R_igraph_iterator_vneis(SEXP graph, SEXP pvid, SEXP pmode) {
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_iterator_vneis(&g, &it, vid, mode);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  it=igraph_vs_adj(&g, vid, mode);
+  PROTECT(result=R_igraph_vs_to_SEXP(&g, &it));
+  igraph_vs_destroy(&it);
 
   R_igraph_after();
   
@@ -2047,19 +1930,61 @@ SEXP R_igraph_iterator_vneis(SEXP graph, SEXP pvid, SEXP pmode) {
   return result;
 }
 
-SEXP R_igraph_iterator_next(SEXP graph, SEXP pit) {
+SEXP R_igraph_vs_vector(SEXP graph, SEXP vec) {
+  
+  igraph_t g;
+  igraph_vs_t it;
+  vector_t v;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  v=vector_as_vector(REAL(vec), LENGTH(vec));
+  it=igraph_vs_vector(&g, &v);
+  PROTECT(result=R_igraph_vs_to_SEXP(&g, &it));
+  igraph_vs_destroy(&it);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_es_vector(SEXP graph, SEXP vec) {
+  
+  igraph_t g;
+  igraph_es_t it;
+  vector_t v;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  v=vector_as_vector(REAL(vec), LENGTH(vec));
+  it=igraph_es_vector(&g, &v);
+  PROTECT(result=R_igraph_es_to_SEXP(&g, &it));
+  igraph_es_destroy(&it);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vs_next(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_vs_t it;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator_copy(pit, &it);
-  igraph_next(&g, &it);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  R_SEXP_to_igraph_vs(pit, &it);
+  igraph_vs_next(&g, &it);
+  PROTECT(result=R_igraph_vs_to_SEXP(&g, &it));
+  igraph_vs_destroy(&it);
   
   R_igraph_after();
   
@@ -2067,19 +1992,19 @@ SEXP R_igraph_iterator_next(SEXP graph, SEXP pit) {
   return result;
 }
 
-SEXP R_igraph_iterator_prev(SEXP graph, SEXP pit) {
+SEXP R_igraph_es_next(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator_copy(pit, &it);
-  igraph_prev(&g, &it);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  R_SEXP_to_igraph_es(pit, &it);
+  igraph_es_next(&g, &it);
+  PROTECT(result=R_igraph_es_to_SEXP(&g, &it));
+  igraph_es_destroy(&it);
   
   R_igraph_after();
   
@@ -2087,19 +2012,19 @@ SEXP R_igraph_iterator_prev(SEXP graph, SEXP pit) {
   return result;
 }
 
-SEXP R_igraph_iterator_reset(SEXP graph, SEXP pit) {
+SEXP R_igraph_vs_reset(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_vs_t it;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator_copy(pit, &it);
-  igraph_reset(&g, &it);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+  R_SEXP_to_igraph_vs(pit, &it);
+  igraph_vs_reset(&g, &it);
+  PROTECT(result=R_igraph_vs_to_SEXP(&g, &it));
+  igraph_vs_destroy(&it);
   
   R_igraph_after();
   
@@ -2107,18 +2032,38 @@ SEXP R_igraph_iterator_reset(SEXP graph, SEXP pit) {
   return result;
 }
 
-SEXP R_igraph_iterator_end(SEXP graph, SEXP pit) {
+SEXP R_igraph_es_reset(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_es(pit, &it);
+  igraph_es_reset(&g, &it);
+  PROTECT(result=R_igraph_es_to_SEXP(&g, &it));
+  igraph_es_destroy(&it);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vs_end(SEXP graph, SEXP pit) {
+
+  igraph_t g;
+  igraph_vs_t it;
   bool_t res;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator(pit, &it);
-  res=igraph_end(&g, &it);
+  R_SEXP_to_igraph_vs(pit, &it);
+  res=igraph_vs_end(&g, &it);
   PROTECT(result=NEW_LOGICAL(1));
   LOGICAL(result)[0]=res;
   
@@ -2128,18 +2073,39 @@ SEXP R_igraph_iterator_end(SEXP graph, SEXP pit) {
   return result;
 }
 
-SEXP R_igraph_iterator_get_vertex_nei(SEXP graph, SEXP pit) {
+SEXP R_igraph_es_end(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
+  bool_t res;
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_es(pit, &it);
+  res=igraph_es_end(&g, &it);
+  PROTECT(result=NEW_LOGICAL(1));
+  LOGICAL(result)[0]=res;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vs_get(SEXP graph, SEXP pit) {
+
+  igraph_t g;
+  igraph_vs_t it;
   integer_t res;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator(pit, &it);
-  res=igraph_get_vertex_nei(&g, &it);
+  R_SEXP_to_igraph_vs(pit, &it);
+  res=igraph_vs_get(&g, &it);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   
@@ -2149,18 +2115,18 @@ SEXP R_igraph_iterator_get_vertex_nei(SEXP graph, SEXP pit) {
   return result;
 }
 
-SEXP R_igraph_iterator_get_vertex(SEXP graph, SEXP pit) {
+SEXP R_igraph_es_get(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
   integer_t res;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator(pit, &it);
-  res=igraph_get_vertex(&g, &it);
+  R_SEXP_to_igraph_es(pit, &it);
+  res=igraph_es_get(&g, &it);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   
@@ -2170,18 +2136,18 @@ SEXP R_igraph_iterator_get_vertex(SEXP graph, SEXP pit) {
   return result;
 }
 
-SEXP R_igraph_iterator_from(SEXP graph, SEXP pit) {
+SEXP R_igraph_es_from(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
   integer_t res;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator(pit, &it);
-  res=igraph_get_vertex_from(&g, &it);
+  R_SEXP_to_igraph_es(pit, &it);
+  res=igraph_es_from(&g, &it);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   
@@ -2191,39 +2157,18 @@ SEXP R_igraph_iterator_from(SEXP graph, SEXP pit) {
   return result;
 }
 
-SEXP R_igraph_iterator_to(SEXP graph, SEXP pit) {
+SEXP R_igraph_es_to(SEXP graph, SEXP pit) {
 
   igraph_t g;
-  igraph_iterator_t it;
+  igraph_es_t it;
   integer_t res;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator(pit, &it);
-  res=igraph_get_vertex_to(&g, &it);
-  PROTECT(result=NEW_NUMERIC(1));
-  REAL(result)[0]=res;
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
-SEXP R_igraph_iterator_edge(SEXP graph, SEXP pit) {
-
-  igraph_t g;
-  igraph_iterator_t it;
-  integer_t res;
-  SEXP result;
-
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_iterator(pit, &it);
-  res=igraph_get_edge(&g, &it);
+  R_SEXP_to_igraph_es(pit, &it);
+  res=igraph_es_to(&g, &it);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   
@@ -2579,45 +2524,45 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP pnames, SEXP pweights,
   return result;
 }
 
-SEXP R_igraph_iterator_randomwalk(SEXP graph, SEXP pvid, SEXP pmode) {
+/* SEXP R_igraph_iterator_randomwalk(SEXP graph, SEXP pvid, SEXP pmode) { */
   
-  igraph_t g;
-  igraph_iterator_t it;
-  integer_t vid=REAL(pvid)[0];
-  integer_t mode=REAL(pmode)[0];
-  SEXP result; 
+/*   igraph_t g; */
+/*   igraph_iterator_t it; */
+/*   integer_t vid=REAL(pvid)[0]; */
+/*   integer_t mode=REAL(pmode)[0]; */
+/*   SEXP result;  */
   
-  R_igraph_before();
+/*   R_igraph_before(); */
   
-  R_SEXP_to_igraph(graph, &g);
-  igraph_iterator_randomwalk(&g, &it, vid, mode);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+/*   R_SEXP_to_igraph(graph, &g); */
+/*   igraph_iterator_randomwalk(&g, &it, vid, mode); */
+/*   PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it)); */
+/*   igraph_iterator_destroy(&g, &it); */
   
-  R_igraph_after();
+/*   R_igraph_after(); */
   
-  UNPROTECT(1);
-  return result;
-}
+/*   UNPROTECT(1); */
+/*   return result; */
+/* } */
   
-SEXP R_igraph_iterator_randomwalk1(SEXP graph, SEXP pvid, SEXP pmode) {
+/* SEXP R_igraph_iterator_randomwalk1(SEXP graph, SEXP pvid, SEXP pmode) { */
   
-  igraph_t g;
-  igraph_iterator_t it;
-  integer_t vid=REAL(pvid)[0];
-  integer_t mode=REAL(pmode)[0];
-  SEXP result; 
+/*   igraph_t g; */
+/*   igraph_iterator_t it; */
+/*   integer_t vid=REAL(pvid)[0]; */
+/*   integer_t mode=REAL(pmode)[0]; */
+/*   SEXP result;  */
   
-  R_igraph_before();
+/*   R_igraph_before(); */
   
-  R_SEXP_to_igraph(graph, &g);
-  igraph_iterator_randomwalk1(&g, &it, vid, mode);
-  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
-  igraph_iterator_destroy(&g, &it);
+/*   R_SEXP_to_igraph(graph, &g); */
+/*   igraph_iterator_randomwalk1(&g, &it, vid, mode); */
+/*   PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it)); */
+/*   igraph_iterator_destroy(&g, &it); */
   
-  R_igraph_after();
+/*   R_igraph_after(); */
   
-  UNPROTECT(1);
-  return result;
-}
+/*   UNPROTECT(1); */
+/*   return result; */
+/* } */
   

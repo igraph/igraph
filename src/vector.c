@@ -310,7 +310,6 @@ int vector_order(vector_t* v, vector_t* res, integer_t nodes) {
   vector_t ptr;
   vector_t rad;
   long int i, j;
-  int ret1;
 
   assert(v!=NULL);
   assert(v->stor_begin != NULL);

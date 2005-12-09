@@ -66,16 +66,16 @@ print.igraph <- function(x, graph.attributes=FALSE,
     } else {
       cat("\nEdges and their attributes:\n")
     }
-    it <- ii.create(x, "eid")
-    while (!ii.end(x, it)) {
-      cat(sep="", "[", ii.get.edge(x, it), "] ",
-          ii.get.from(x, it), " ", arrow, " ", ii.get.to(x, it))
+    it <- igraph.es.all(x)
+    while (!igraph.es.end(x, it)) {
+      cat(sep="", "[", igraph.es.get(x, it), "] ",
+          igraph.es.from(x, it), " ", arrow, " ", igraph.es.to(x, it))
       if (edge.attributes) {
         sapply(list, function(n)
-               { cat("  ", n, "=", e.a(x, n, ii.get.edge(x,it)), "\t")})
+               { cat("  ", n, "=", e.a(x, n, igraph.es.get(x,it)), "\t")})
       }
       cat("\n")
-      it <- ii.next(x, it)
+      it <- igraph.es.next(x, it)
     }
   }
   

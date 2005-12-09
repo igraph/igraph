@@ -20,15 +20,9 @@
 
 */
 
-#ifndef REST_MEMORY_H
-#define REST_MEMORY_H
+#include "memory.h"
 
-#include <stdlib.h>
-
-#define Calloc(n,t)    (t*) calloc( (size_t)(n), sizeof(t) )
-#define Realloc(p,n,t) (t*) realloc((void*)(p), (size_t)((n)*sizeof(t)))
-#define Free(p)        (free( (void *)(p) ), (p) = NULL)
-
-int igraph_free(void *p);
-
-#endif
+int igraph_free(void *p) {
+  Free(p);
+  return 0;
+}

@@ -35,13 +35,13 @@ average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
         PACKAGE="igraph")
 }
 
-degree <- function(graph, v=0:(vcount(graph)-1),
+degree <- function(graph, v=igraph.vs.all(graph),
                    mode="total", loops=TRUE){
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
   
-  .Call("R_igraph_degree", graph, as.numeric(v), as.numeric(mode),
+  .Call("R_igraph_degree", graph, as.igraph.vs(graph, v), as.numeric(mode),
         as.logical(loops), PACKAGE="igraph")
 }
   
@@ -58,21 +58,22 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
   res
 }
 
-closeness <- function(graph, v=0:(vcount(graph)-1), mode="all") {
+closeness <- function(graph, v=igraph.vs.all(graph), mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
   
-  .Call("R_igraph_closeness", graph, as.numeric(v), as.numeric(mode),
+  .Call("R_igraph_closeness", graph, as.igraph.vs(graph, v), as.numeric(mode),
         PACKAGE="igraph")
 }
 
-shortest.paths <- function(graph, v=0:(vcount(graph)-1), mode="all") {
+shortest.paths <- function(graph, v=igraph.vs.all(graph), mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
 
-  .Call("R_igraph_shortest_paths", graph, as.double(v), as.numeric(mode),
+  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(graph, v),
+        as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -96,7 +97,7 @@ subcomponent <- function(graph, v, mode="all") {
 }
 
 subgraph <- function(graph, v) {
-  .Call("R_igraph_subgraph", graph, as.numeric(v),
+  .Call("R_igraph_subgraph", graph, as.igraph.vs(graph, v),
         PACKAGE="igraph")
 }
 
@@ -133,9 +134,9 @@ simplify <- function(graph, remove.multiple=TRUE,
 ##   res
 }
 
-betweenness <- function(graph, v=0:(vcount(graph)-1), directed=TRUE) {
+betweenness <- function(graph, v=igraph.vs.all(graph), directed=TRUE) {
   
-  .Call("R_igraph_betweenness", graph, as.numeric(v),
+  .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v),
         as.logical(directed),
         PACKAGE="igraph")
 }

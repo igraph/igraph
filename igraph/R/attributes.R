@@ -64,31 +64,32 @@ remove.vertex.attribute <- function(graph, attrname) {
 }
 
 get.vertex.attribute <- function(graph, attrname=NULL,
-                                 v=1:vcount(graph)-1) {
+                                 v=igraph.vs.all(graph)) {
   if (is.null(attrname)) {
     .Call("R_igraph_list_vertex_attributes", graph,
           PACKAGE="igraph")
   } else {
-    if (length(v)==1) {    
+    if (is.numeric(v) && length(v)==1) {    
       .Call("R_igraph_get_vertex_attribute", graph,
             as.character(attrname), as.numeric(v),
             PACKAGE="igraph")
     } else {
       .Call("R_igraph_get_vertex_attributes", graph,
-            as.character(attrname), as.numeric(v),
+            as.character(attrname), as.igraph.vs(graph, v),
             PACKAGE="igraph")
     }
   }
 }
 
-set.vertex.attribute <- function(graph, attrname, v=1:vcount(graph)-1, value) {
-  if (length(v)==1) {  
+set.vertex.attribute <- function(graph, attrname,
+                                 v=igraph.vs.all(graph), value) {
+  if (is.numeric(v) && length(v)==1) {  
     .Call("R_igraph_set_vertex_attribute", graph, as.character(attrname),
           as.numeric(v), value,
           PACKAGE="igraph")
   } else {
     .Call("R_igraph_set_vertex_attributes", graph, as.character(attrname),
-          as.numeric(v), value,
+          as.igraph.vs(graph, v), value,
           PACKAGE="igraph")
   }    
 }

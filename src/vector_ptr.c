@@ -214,7 +214,6 @@ void vector_ptr_null      (vector_ptr_t* v) {
  */
 
 int vector_ptr_resize(vector_ptr_t* v, long int newsize) {
-  int ret;
   IGRAPH_CHECK(vector_ptr_reserve(v, newsize));
   v->end = v->stor_begin+newsize;
   return 0;

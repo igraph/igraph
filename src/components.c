@@ -79,8 +79,6 @@ int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
   long int i;
   vector_t neis=VECTOR_NULL;
 
-  int ret1, ret2;
-  
   already_added=Calloc(no_of_nodes,char);
   if (already_added==0) {
     IGRAPH_FERROR("", IGRAPH_ENOMEM);
@@ -144,8 +142,6 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
 
   vector_t out=VECTOR_NULL;
   vector_t tmp=VECTOR_NULL;
-
-  int ret1, ret2, ret3;
 
   /* The result */
 
@@ -277,8 +273,6 @@ int igraph_is_connected_weak(igraph_t *graph, bool_t *res) {
   dqueue_t q=DQUEUE_NULL;
   
   long int i, j;
-
-  int ret1, ret2;
 
   already_added=Calloc(no_of_nodes, char);
   if (already_added==0) {

@@ -19,76 +19,93 @@
 #
 ###################################################################
 
-ii.create <- function(graph, type, vid=NULL, mode=NULL) {
-  if (type=="vid") {
-    .Call("R_igraph_iterator_vid", graph, PACKAGE="igraph")
-  } else if (type=="eid") {
-    .Call("R_igraph_iterator_eid", graph, PACKAGE="igraph")
-  } else if (type=="efromorder") {
-    .Call("R_igraph_iterator_efromorder", graph, PACKAGE="igraph")
-  } else if (type=="eneis") {
-    if (is.character(mode)) {
-      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-    }
-    .Call("R_igraph_iterator_eneis", graph, as.numeric(vid),
-          as.numeric(mode),
-          PACKAGE="igraph")
-  } else if (type=="vneis") {
-    if (is.character(mode)) {
-      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-    }
-    .Call("R_igraph_iterator_vneis", graph, as.numeric(vid),
-          as.numeric(mode),
-          PACKAGE="igraph")
-  } else if (type=="randomwalk") {
-    if (is.character(mode)) {
-      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-    }
-    .Call("R_igraph_iterator_randomwalk", graph, as.numeric(vid),
-          as.numeric(mode),
-          PACKAGE="igraph")
-  } else if (type=="randomwalk1") {
-    if (is.character(mode)) {
-      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-    }
-    .Call("R_igraph_iterator_randomwalk1", graph, as.numeric(vid),
-          as.numeric(mode),
-          PACKAGE="igraph")
+igraph.vs.all <- function(graph) {
+  .Call("R_igraph_vs_all", graph, PACKAGE="igraph")
+}
+
+igraph.es.all <- function(graph) {
+  .Call("R_igraph_es_all", graph, PACKAGE="igraph")
+}
+
+igraph.es.fromorder <- function(graph) {
+  .Call("R_igraph_es_fromorder", graph, PACKAGE="igraph")
+}
+
+igraph.es.adj <- function(graph, vid, mode="all") {
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
+  .Call("R_igraph_es_adj", graph, as.numeric(vid), as.numeric(mode),
+        PACKAGE="igraph")
 }
 
-ii.next <- function(graph, iterator) {
-  .Call("R_igraph_iterator_next", graph, iterator, PACKAGE="igraph")
+igraph.vs.adj <- function(graph, vid, mode="all") {
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+  }
+  .Call("R_igraph_vs_adj", graph, as.numeric(vid), as.numeric(mode),
+        PACKAGE="igraph")
 }
 
-ii.prev <- function(graph, iterator) {
-  .Call("R_igraph_iterator_prev", graph, iterator, PACKAGE="igraph")
+igraph.vs.vector <- function(graph, v) {
+  .Call("R_igraph_vs_vector", graph, as.numeric(v),
+        PACKAGE="igraph")
 }
 
-ii.end <- function(graph, iterator) {
-  .Call("R_igraph_iterator_end", graph, iterator, PACKAGE="igraph")
+igraph.es.vector <- function(graph, v) {
+  .Call("R_igraph_es_vector", graph, as.numeric(v),
+        PACKAGE="igraph")
 }
 
-ii.get.vertex.nei <- function(graph, iterator) {
-  .Call("R_igraph_iterator_get_vertex_nei", graph, iterator, PACKAGE="igraph")
+igraph.vs.next <- function(graph, iterator) {
+  .Call("R_igraph_vs_next", graph, iterator, PACKAGE="igraph")
 }
 
-ii.reset <- function(graph, iterator) {
-  .Call("R_igraph_iterator_reset", graph, iterator, PACKAGE="igraph")
+igraph.vs.end <- function(graph, iterator) {
+  .Call("R_igraph_vs_end", graph, iterator, PACKAGE="igraph")
 }
 
-ii.get.vertex <- function(graph, iterator) {
-  .Call("R_igraph_iterator_get_vertex", graph, iterator, PACKAGE="igraph")
+igraph.vs.get <- function(graph, iterator) {
+  .Call("R_igraph_vs_get", graph, iterator, PACKAGE="igraph")
 }
 
-ii.get.from <- function(graph, iterator) {
-  .Call("R_igraph_iterator_from", graph, iterator, PACKAGE="igraph")
+igraph.vs.reset <- function(graph, iterator) {
+  .Call("R_igraph_vs_reset", graph, iterator, PACKAGE="igraph")
 }
 
-ii.get.to <- function(graph, iterator) {
-  .Call("R_igraph_iterator_to", graph, iterator, PACKAGE="igraph")
+igraph.es.next <- function(graph, iterator) {
+  .Call("R_igraph_es_next", graph, iterator, PACKAGE="igraph")
 }
 
-ii.get.edge <- function(graph, iterator) {
-  .Call("R_igraph_iterator_edge", graph, iterator, PACKAGE="igraph")
+igraph.es.end <- function(graph, iterator) {
+  .Call("R_igraph_es_end", graph, iterator, PACKAGE="igraph")
+}
+
+igraph.es.get <- function(graph, iterator) {
+  .Call("R_igraph_es_get", graph, iterator, PACKAGE="igraph")
+}
+
+igraph.es.reset <- function(graph, iterator) {
+  .Call("R_igraph_es_reset", graph, iterator, PACKAGE="igraph")
+}
+
+igraph.es.from <- function(graph, iterator) {
+  .Call("R_igraph_es_from", graph, iterator, PACKAGE="igraph")
+}
+
+igraph.es.to <- function(graph, iterator) {
+  .Call("R_igraph_es_to", graph, iterator, PACKAGE="igraph")
+}
+
+#####
+# internal helper functions
+
+as.igraph.vs <- function(g, it) {
+  if (class(it) == "igraph.vs") {
+    it
+  } else if (is.numeric(it)) {
+    igraph.vs.vector(g, it)
+  } else {
+    stop("Cannot interpret vertex set")
+  }
 }

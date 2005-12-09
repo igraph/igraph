@@ -15,8 +15,13 @@ export(add.graph.attribute, remove.graph.attribute,
 
 # iterators
 
-export(ii.create, ii.next, ii.prev, ii.end, ii.get.vertex.nei,
-       ii.reset, ii.get.vertex, ii.get.from, ii.get.to, ii.get.edge)
+export(igraph.vs.all, igraph.vs.adj, igraph.vs.vector,
+       igraph.es.all, igraph.es.fromorder, igraph.es.adj,
+       igraph.es.vector,
+       igraph.vs.next, igraph.vs.end, igraph.vs.reset, igraph.vs.get,
+       igraph.es.next, igraph.es.end, igraph.es.reset, igraph.es.get,
+       igraph.es.from, igraph.es.to)
+       
 
 # basic functions, printing
 

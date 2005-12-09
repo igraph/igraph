@@ -38,7 +38,8 @@ static char *igraph_i_error_strings[]={ "No error",            /* 0 */
 					"Invalid vertex id",   /* 7 */
 					"Non-square matrix",   /* 8 */
 					"Invalid mode",        /* 9 */
-					"File operation error" /* 10 */
+					"File operation error",/* 10 */
+					"Unfold infinite iterator", /* 11 */
 };
 
 const char* igraph_strerror(const int igraph_errno) {
@@ -109,7 +110,7 @@ void IGRAPH_FINALLY_CLEAN(int minus) {
 
 void IGRAPH_FINALLY_FREE() {
   int p;
-  for (p=igraph_i_finally_stack[0].all-1; p>=0; p++) {
+  for (p=igraph_i_finally_stack[0].all-1; p>=0; p--) {
     igraph_i_finally_stack[p].func(igraph_i_finally_stack[p].ptr);
   }
   igraph_i_finally_stack[0].all=0;

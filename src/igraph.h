@@ -118,42 +118,6 @@ __BEGIN_DECLS
  * of a graph, like its diameter, the degree of the nodes, etc.
  */
 
-/** 
- * \defgroup iterators Vertex and edge iterators
- * \brief Iterators provide a method to walk through some edges or
- * vertices of the graph.
- * 
- * An iterator is a method for walking through the edges or the
- * vertices of a graph, or often just on a subset of them. Iterators
- * might ordered which means that the vertices or edges are visited in
- * a specific order. Iterator are meant to be very powerful, usually
- * all iterator operations have time complexity <code>O(1)</code>,
- * ie. they work in constant time. (But see also the specifics and
- * exceptions at the documentation of the different iterators.)
- *
- * There are three classes of iterators:
- * - <b>vertex iterators</b> walk through vertices,
- * - <b>edge iterators</b> walk through edges,
- * - <b>general iterators</b> can walk through graphs in general by
- *   visiting both edges and vertices. (There is no general iterator
- *   implemented yet.)
- * 
- * These three classes are usually handled together with an
- * abstraction, ie. all three types of operators use the igraph_end()
- * function to check whether it has had reach the very last element to
- * visit.
- *
- * There are two kinds of function handling iterators: <b>specific</b>
- * iterator functions work only on a given type of iterator, these
- * have the name of the iterator in their names; <b>generic</b>
- * iterator functions work on all types of iterators (which implement
- * the generic function in question).
- *
- * An iterator is always created by a specific function, this also
- * fixes the type of the iterator, After this usually only generic
- * functions are called on it for stepping and quering the iterator.
- */
-
 /**
  * \defgroup attributes Graph, vertex and edge attributes
  * \brief Attributes are numberic or textual labels assigned to 
@@ -383,15 +347,21 @@ typedef struct igraph_s {
 /* -------------------------------------------------- */
 
 /* Vertex iterators */
-#define IGRAPH_ITERATOR_VID           1
-#define IGRAPH_ITERATOR_VNEIS         2
-#define IGRAPH_ITERATOR_RANDOMWALK    3
-#define IGRAPH_ITERATOR_RANDOMWALK1   4
+#define IGRAPH_ITERATOR_VS_ALL          0
+#define IGRAPH_ITERATOR_VS_NONE         1
+#define IGRAPH_ITERATOR_VS_ADJ          2
+#define IGRAPH_ITERATOR_VS_VECTOR       3
+#define IGRAPH_ITERATOR_VS_1            4
+#define IGRAPH_ITERATOR_VS_SEQ          5
+#define IGRAPH_ITERATOR_VS_RW           6
+#define IGRAPH_ITERATOR_VS_RW1          7
 
-/* Edge iterators */
-#define IGRAPH_ITERATOR_EID        1001
-#define IGRAPH_ITERATOR_ENEIS      1002
-#define IGRAPH_ITERATOR_EFROMORDER 1003
+#define IGRAPH_ITERATOR_ES_ALL          0
+#define IGRAPH_ITERATOR_ES_FROMORDER    1
+#define IGRAPH_ITERATOR_ES_ADJ          2
+#define IGRAPH_ITERATOR_ES_NONE         3
+#define IGRAPH_ITERATOR_ES_1            4
+#define IGRAPH_ITERATOR_ES_VECTOR       5
 
 /* -------------------------------------------------- */
 /* Constants                                          */
@@ -433,139 +403,187 @@ typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
 	       IGRAPH_FILEFORMAT_PAJEK } igraph_fileformat_type_t;
 
 /* -------------------------------------------------- */
+/* Vertex sequences                                   */
+/* -------------------------------------------------- */
+
+#define IGRAPH_I_STDATA_SIZE 10
+
+struct igraph_vs_t;
+
+typedef struct igraph_i_vstable_t {
+  void (*next)(igraph_t *graph, struct igraph_vs_t *vs);
+  bool_t (*end)(igraph_t *graph, struct igraph_vs_t *vs);
+  void (*reset)(igraph_t *graph, struct igraph_vs_t *vs);
+  integer_t(*get)(igraph_t *graph, struct igraph_vs_t *vs);
+  int (*unfold)(igraph_t *graph, struct igraph_vs_t *vs);
+  void (*destroy)(struct igraph_vs_t *vs);
+} igraph_i_vstable_t;
+
+typedef struct igraph_vs_t {
+  int type;
+  real_t stdata[IGRAPH_I_STDATA_SIZE]; /* working storage */
+  void *pdata;			   /* other storage   */
+  igraph_i_vstable_t *table;	   /* the table of functions */
+  vector_t *v;                     /* vector representation (if any) */
+  bool_t vdestroy;                 /* whether the vector should be freed */
+  bool_t view;
+} igraph_vs_t;
+
+extern igraph_i_vstable_t *igraph_i_vstable[8];
+
+/* -------------------------------------------------- */
+/* Edge sequences                                   */
+/* -------------------------------------------------- */
+
+struct igraph_es_t;
+
+typedef struct igraph_i_estable_t {
+  void (*next)(igraph_t *graph, struct igraph_es_t *es);
+  bool_t (*end)(igraph_t *graph, struct igraph_es_t *es);
+  void (*reset)(igraph_t *graph, struct igraph_es_t *es);
+  integer_t(*get)(igraph_t *graph, struct igraph_es_t *es);
+  integer_t (*from)(igraph_t *graph, struct igraph_es_t *es);
+  integer_t (*to)(igraph_t *graph, struct igraph_es_t *es);
+  int (*unfold)(igraph_t *graph, struct igraph_es_t *es);
+  void (*destroy)(struct igraph_es_t *es);
+} igraph_i_estable_t;
+
+typedef struct igraph_es_t {
+  int type;
+  real_t stdata[IGRAPH_I_STDATA_SIZE]; /* working storage */
+  void *pdata;			   /* other storage   */
+  igraph_i_estable_t *table;	   /* the table of functions */
+  vector_t *v;                     /* vector representation (if any) */
+  bool_t vdestroy;                 /* whether the vector should be freed */
+  bool_t view;
+} igraph_es_t;
+
+extern igraph_i_estable_t *igraph_i_estable[6];
+
+/* -------------------------------------------------- */
 /* Interface                                          */
 /* -------------------------------------------------- */
+
+struct igraph_eit_t;
 
 int igraph_empty(igraph_t *graph, integer_t n, bool_t directed);
 int igraph_destroy(igraph_t *graph);
 int igraph_copy(igraph_t *to, igraph_t *from);
 int igraph_add_edges(igraph_t *graph, vector_t *edges);
 int igraph_add_vertices(igraph_t *graph, integer_t nv);
-int igraph_delete_edges(igraph_t *graph, vector_t *edges);
-int igraph_delete_vertices(igraph_t *graph, vector_t *vertices);
+int igraph_delete_edges(igraph_t *graph, vector_t *edges); /* eee */
+int igraph_delete_vertices(igraph_t *graph, igraph_vs_t vertices);
 integer_t igraph_vcount(igraph_t *graph);
 integer_t igraph_ecount(igraph_t *graph);
 int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t vid, 
 		     igraph_neimode_t mode); 
 bool_t igraph_is_directed(igraph_t *graph);
-int igraph_degree(igraph_t *graph, vector_t *res, vector_t *vids, 
+int igraph_degree(igraph_t *graph, vector_t *res, igraph_vs_t vids, 
 		  igraph_neimode_t mode, bool_t loops);
 
 /* -------------------------------------------------- */
-/* Iterators                                          */
+/* Vertex sequences, contd.                           */
 /* -------------------------------------------------- */
 
-struct igraph_iterator_t;
+/* Iterator view, for shorthands */
+int igraph_vs_create_view_as_vector(igraph_t *graph, igraph_vs_t *vs,
+				    igraph_vs_t *newvs);
+  
+/* Generics */
+void igraph_vs_next(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy(igraph_vs_t *vs);
 
-typedef struct igraph_iterator_t {
-  integer_t type;
-  void *data;
-  int (*next)(igraph_t *graph, struct igraph_iterator_t *it);
-  int (*prev)(igraph_t *graph, struct igraph_iterator_t *it);
-  bool_t (*end)(igraph_t *graph, struct igraph_iterator_t *it);
-  int (*reset)(igraph_t *graph, struct igraph_iterator_t *it);
-  integer_t (*getvertex)(igraph_t *graph, struct igraph_iterator_t *it);
-  integer_t (*getvertexfrom)(igraph_t *graph, struct igraph_iterator_t *it);
-  integer_t (*getvertexto)(igraph_t *graph, struct igraph_iterator_t *it);
-  integer_t (*getvertexnei)(igraph_t *graph, struct igraph_iterator_t *it);
-  integer_t (*getedge)(igraph_t *graph, struct igraph_iterator_t *it);
-} igraph_iterator_t;
+/* Simple vertex iterator, all vertices */
+igraph_vs_t igraph_vs_all(igraph_t *graph);
 
-#define IGRAPH_ITERATOR_NULL { 0,0,0,0,0,0,0,0,0,0,0 }
-
-/* The constructors & destructor */
-int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it);
-int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it, 
+/* Adjacent vertices of a vertex */
+igraph_vs_t igraph_vs_adj(igraph_t *graph,
 			  integer_t vid, igraph_neimode_t mode);
-int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it);
-int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it);
-int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
-			  integer_t vid, igraph_neimode_t mode);
-int igraph_iterator_randomwalk(igraph_t *graph, igraph_iterator_t *it,
-			       integer_t vid, igraph_neimode_t mode);
-int igraph_iterator_randomwalk1(igraph_t *graph, igraph_iterator_t *it,
-				integer_t vid, igraph_neimode_t mode);
+void igraph_vs_adj_set(igraph_t *graph, igraph_vs_t *vs,
+		       integer_t vid, igraph_neimode_t mode);
 
-int igraph_iterator_destroy(igraph_t *graph, igraph_iterator_t *it);
-
-/* Generics, common functions */
-int igraph_next(igraph_t *graph, igraph_iterator_t *it);
-int igraph_prev(igraph_t *graph, igraph_iterator_t *it);
-bool_t igraph_end(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_nei(igraph_t *graph, igraph_iterator_t *it);
-int igraph_reset(igraph_t *graph, igraph_iterator_t *it);
-
-/* Generics, vertices */
-integer_t igraph_get_vertex(igraph_t *graph, igraph_iterator_t *it);
-
-/* Generics, edges */
-integer_t igraph_get_vertex_from(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_to(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_edge(igraph_t *graph, igraph_iterator_t *it);
-
-/* Specifics, simple vertex iterator */
-int igraph_next_vid(igraph_t *graph, igraph_iterator_t *it);
-int igraph_prev_vid(igraph_t *graph, igraph_iterator_t *it);
-bool_t igraph_end_vid(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_vid(igraph_t *graph, igraph_iterator_t *it);
-int igraph_reset_vid(igraph_t *graph, igraph_iterator_t *it);
-
-/* Iterates over the neighbors of a vertex */
-int igraph_next_vneis(igraph_t *graph, igraph_iterator_t *it);
-int igraph_end_vneis(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it);
-int igraph_reset_vneis(igraph_t *graph, igraph_iterator_t *it);
-int igraph_iterator_vneis_set(igraph_t *graph, igraph_iterator_t *it, 
-			      integer_t vid, igraph_neimode_t mode);
-
-/* Specifics, simple edge iterator */
-int igraph_next_eid(igraph_t *graph, igraph_iterator_t *it);
-int igraph_prev_eid(igraph_t *graph, igraph_iterator_t *it);
-bool_t igraph_end_eid(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_from_eid(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_to_eid(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_edge_eid(igraph_t *graph, igraph_iterator_t *it); 
-int igraph_reset_eid(igraph_t *graph, igraph_iterator_t *it);
-
-/* Specifics, edge iterator according to the 'from' order */
-int igraph_next_efromorder(igraph_t *graph, igraph_iterator_t *it);
-int igraph_prev_efromorder(igraph_t *graph, igraph_iterator_t *it);
-bool_t igraph_end_efromorder(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_from_efromorder(igraph_t *graph, 
-					    igraph_iterator_t *it);
-integer_t igraph_get_vertex_to_efromorder(igraph_t *graph, 
-					  igraph_iterator_t *it);
-integer_t igraph_get_edge_efromorder(igraph_t *graph, igraph_iterator_t *it);
-int igraph_reset_efromorder(igraph_t *graph, igraph_iterator_t *it);
-
-
-/* Iterates over the edges to and/or from a vertex */
-int igraph_next_eneis(igraph_t *graph, igraph_iterator_t *it);
-int igraph_prev_eneis(igraph_t *graph, igraph_iterator_t *it);
-bool_t igraph_end_eneis(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_from_eneis(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_to_eneis(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it); 
-int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it, 
-			      integer_t vid, igraph_neimode_t mode);
-integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it);
-int igraph_reset_eneis(igraph_t *graph, igraph_iterator_t *it);
-
-/* Random walker without memory */
-int igraph_next_randomwalk(igraph_t *graph, igraph_iterator_t *it);
-bool_t igraph_end_randomwalk(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_randomwalk(igraph_t *graph, 
-				       igraph_iterator_t *it);
-int igraph_reset_randomwalk(igraph_t *graph, igraph_iterator_t *it);
-long int igraph_iterator_randomwalk_length(igraph_t *graph, 
-					   igraph_iterator_t *it);
+/* Random walker */
+igraph_vs_t igraph_vs_rw(igraph_t *graph,
+			 integer_t vid, igraph_neimode_t mode);
+long int igraph_vs_rw_length(igraph_t *graph, igraph_vs_t *vs);
 
 /* Random walker with one unit memory */
-int igraph_next_randomwalk1(igraph_t *graph, igraph_iterator_t *it);
-bool_t igraph_end_randomwalk1(igraph_t *graph, igraph_iterator_t *it);
-integer_t igraph_get_vertex_randomwalk1(igraph_t *graph, 
-				       igraph_iterator_t *it);
-int igraph_reset_randomwalk1(igraph_t *graph, igraph_iterator_t *it);
+igraph_vs_t igraph_vs_rw1(igraph_t *graph,
+			  integer_t vid, igraph_neimode_t mode);
+long int igraph_vs_rw1_length(igraph_t *graph, igraph_vs_t *vs);
+
+/* Empty iterator */
+igraph_vs_t igraph_vs_none(igraph_t *graph);
+
+/* Single vertex iterator */
+igraph_vs_t igraph_vs_1(igraph_t *igraph, integer_t vid);
+
+/* A sequence of vertices */
+igraph_vs_t igraph_vs_seq(igraph_t *igraph, integer_t from, 
+			  integer_t to);
+
+/* Iterates over a vector */
+igraph_vs_t igraph_vs_vector(igraph_t *igraph, vector_t *vids);
+
+/* Shorthands, a bit dirty */
+#define IGRAPH_VS_ALL             (igraph_vs_all(0))
+#define IGRAPH_VS_NONE            (igraph_vs_none(0))
+#define IGRAPH_VS_1(id)           (igraph_vs_1(0, (id)))
+#define IGRAPH_VS_VECTOR(vector)  (igraph_vs_vector(0,(vector)))
+
+/* -------------------------------------------------- */
+/* Edge sequences contd.                              */
+/* -------------------------------------------------- */
+
+/* Iterator view, for shorthands */
+int igraph_es_create_view_as_vector(igraph_t *graph, igraph_es_t *es,
+				    igraph_es_t *newes);
+
+/* Generics */
+void igraph_es_next(igraph_t *graph, igraph_es_t *es);
+bool_t igraph_es_end(igraph_t *graph, igraph_es_t *es);
+void igraph_es_reset(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_get(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_from(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_to(igraph_t *graph, igraph_es_t *es);
+int igraph_es_unfold(igraph_t *graph, igraph_es_t *es);
+void igraph_es_destroy(igraph_es_t *es);
+
+/* Simple edge iterator */
+igraph_es_t igraph_es_all(igraph_t *graph);
+
+/* Empty edge iterator */
+igraph_es_t igraph_es_none(igraph_t *graph);
+
+/* Single edge edge iterator */
+igraph_es_t igraph_es_1(igraph_t *graph, integer_t id);
+
+/* Iterators between vertex sets */
+igraph_es_t igraph_es_fromto(igraph_t *igraph, igraph_vs_t from,
+			     igraph_vs_t to, igraph_neimode_t mode);
+
+/* Sorted edge iterator */
+igraph_es_t igraph_es_fromorder(igraph_t *graph);
+
+/* Adjacent edges of a vertex */
+igraph_es_t igraph_es_adj(igraph_t *graph,
+			  integer_t vid, igraph_neimode_t mode);
+void igraph_es_adj_set(igraph_t *graph, igraph_es_t *es,
+			integer_t vid, igraph_neimode_t mode);
+integer_t igraph_es_adj_vertex(igraph_t *graph, igraph_es_t *es);
+
+/* View of a vector */
+igraph_es_t igraph_es_vector(igraph_t *graph, vector_t *eids);
+
+/* Shorthands, a bit dirty */
+#define IGRAPH_ES_ALL             (igraph_es_all(0))
+#define IGRAPH_ES_NONE            (igraph_es_none(0))
+#define IGRAPH_ES_1(id)           (igraph_es_1(0, (id)))
+#define IGRAPH_ES_VECTOR(vector)  (igraph_es_vector(0,(vector)))
 
 /* -------------------------------------------------- */
 /* Attributes                                         */
@@ -595,9 +613,9 @@ int igraph_get_vertex_attribute(igraph_t *graph, const char *name,
 int igraph_set_vertex_attribute(igraph_t *graph, const char *name, 
 				long int v, void *value);
 int igraph_get_vertex_attributes(igraph_t *graph, const char *name, 
-				 vector_t *v, void **value);
+				 igraph_vs_t v, void **value);
 int igraph_set_vertex_attributes(igraph_t *graph, const char *name, 
-				 vector_t *v, void *value);
+				 igraph_vs_t v, void *value);
 int igraph_list_vertex_attributes(igraph_t *graph, igraph_strvector_t *l,
 				  vector_t *types);
 int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name, 
@@ -613,9 +631,9 @@ int igraph_get_edge_attribute(igraph_t *graph, const char *name,
 int igraph_set_edge_attribute(igraph_t *graph, const char *name, 
 			      long int e, void *value);
 int igraph_get_edge_attributes(igraph_t *graph, const char *name, 
-			       vector_t *e, void **value);
+			       vector_t *e, void **value); /* eee */
 int igraph_set_edge_attributes(igraph_t *graph, const char *name, 
-			       vector_t *e, void *value);
+			       vector_t *e, void *value); /* eee */
 int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
 				vector_t *types);
 int igraph_get_edge_attribute_type(igraph_t *graph, const char *name, 
@@ -673,24 +691,24 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
 int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst);
 int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
 				      vector_t *weights);
-int igraph_closeness(igraph_t *graph, vector_t *res, vector_t *vids, 
+int igraph_closeness(igraph_t *graph, vector_t *res, igraph_vs_t vids, 
 		     igraph_neimode_t mode);
 int igraph_shortest_paths(igraph_t *graph, matrix_t *res, 
-			  vector_t *from, igraph_neimode_t mode);
+			  igraph_vs_t from, igraph_neimode_t mode);
 int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
 			      integer_t from, igraph_neimode_t mode);
 int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vid, 
-			igraph_neimode_t mode);
-int igraph_betweenness (igraph_t *graph, vector_t *res, vector_t *vids, 
+			igraph_neimode_t mode);	
+int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids, 
 			bool_t directed);
 int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 
-			     bool_t directed);
-int igraph_subgraph(igraph_t *graph, igraph_t *res, vector_t *vids);
+			     bool_t directed); /* eee + add */
+int igraph_subgraph(igraph_t *graph, igraph_t *res, igraph_vs_t vids);
 int igraph_average_path_length(igraph_t *graph, real_t *res,
 			       bool_t directed, bool_t unconn);
 int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops);
 int igraph_transitivity(igraph_t *graph, vector_t *res, 
-			igraph_transitivity_type_t type);
+			igraph_transitivity_type_t type); /* vvv + add */
 
 /* TODO: degree.distribution (?) */
 
@@ -732,8 +750,8 @@ int igraph_layout_springs(igraph_t *graph, matrix_t *res,
 /* Cocitation                                         */
 /* -------------------------------------------------- */
 
-int igraph_cocitation(igraph_t *graph, matrix_t *res, vector_t *vids);
-int igraph_bibcoupling(igraph_t *graph, matrix_t *res, vector_t *vids);
+int igraph_cocitation(igraph_t *graph, matrix_t *res, igraph_vs_t vids);
+int igraph_bibcoupling(igraph_t *graph, matrix_t *res, igraph_vs_t vids);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */

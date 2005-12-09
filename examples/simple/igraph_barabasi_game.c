@@ -4,7 +4,7 @@
 int main() {
   
   igraph_t g;
-  vector_t v, v2, v3;
+  vector_t v, v2;
   int i, ret;
   
   igraph_barabasi_game(&g, 10, 2, 0, 0, 1);
@@ -40,8 +40,7 @@ int main() {
     return 5;
   }
   vector_init(&v2, 0);
-  vector_init_seq(&v3, 0, igraph_vcount(&g)-1);
-  igraph_degree(&g, &v2, &v3, IGRAPH_OUT, 1);
+  igraph_degree(&g, &v2, IGRAPH_VS_ALL, IGRAPH_OUT, 1);
   for (i=0; i<igraph_vcount(&g); i++) {
     if (VECTOR(v)[i] != VECTOR(v2)[i]) {
       return 6;
@@ -49,7 +48,6 @@ int main() {
   }
   vector_destroy(&v);
   vector_destroy(&v2);
-  vector_destroy(&v3);
   igraph_destroy(&g);
   
   /* outpref, we cannot really test this quantitatively,

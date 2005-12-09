@@ -39,7 +39,8 @@ enum {
   IGRAPH_EINVVID    = 7,
   IGRAPH_NONSQUARE  = 8,
   IGRAPH_EINVMODE   = 9,
-  IGRAPH_EFILE      = 10
+  IGRAPH_EFILE      = 10,
+  IGRAPH_EUNFOLDINF = 11
 };
 
 /**

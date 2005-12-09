@@ -124,7 +124,7 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
 
   long int no_of_nodes=igraph_vcount(graph);
   matrix_t dxdy=MATRIX_NULL;
-  igraph_iterator_t edgeit;
+  igraph_es_t edgeit;
   
   IGRAPH_CHECK(matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
@@ -157,10 +157,10 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
       }
     }
     /* Calculate the attractive "force" */
-    IGRAPH_CHECK(igraph_iterator_eid(graph, &edgeit));
-    while (!igraph_end(graph, &edgeit)) {
-      j=igraph_get_vertex_from(graph, &edgeit);
-      k=igraph_get_vertex_to(graph, &edgeit);
+    edgeit=igraph_es_all(graph);
+    while (!igraph_es_end(graph, &edgeit)) {
+      j=igraph_es_from(graph, &edgeit);
+      k=igraph_es_to(graph, &edgeit);
       xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
       yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
       ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
@@ -171,9 +171,9 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
       MATRIX(dxdy, k, 0)+=xd*af;
       MATRIX(dxdy, j, 1)-=yd*af;
       MATRIX(dxdy, k, 1)+=yd*af;
-      igraph_next(graph, &edgeit);
+      igraph_es_next(graph, &edgeit);
     }
-    igraph_iterator_destroy(graph, &edgeit);
+    igraph_es_destroy(&edgeit);
     
     /* Dampen motion, if needed, and move the points */   
     for(j=0;j<no_of_nodes;j++){
@@ -228,7 +228,6 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
   real_t dpot, odis, ndis, osqd, nsqd;
   long int n,i,j,k;
   matrix_t elen;
-  vector_t vids;
 
   /* Define various things */
   n=igraph_vcount(graph);
@@ -239,11 +238,7 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 
   IGRAPH_CHECK(matrix_resize(res, n, 2));
   MATRIX_INIT_FINALLY(&elen, n, n);
-  IGRAPH_CHECK(vector_init_seq(&vids, 0, n-1));
-  IGRAPH_FINALLY(vector_destroy, &vids);
-  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, &vids, 3));
-  vector_destroy(&vids);
-  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, IGRAPH_VS_ALL, 3));
   for (i=0; i<n; i++) {
     MATRIX(elen, i, i) = sqrt(n);
     MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);

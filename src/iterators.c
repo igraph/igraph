@@ -24,958 +24,296 @@
 #include "memory.h"
 #include "random.h"
 
-/**
- * \defgroup iterators_generic Generic iterator functions
- * \ingroup iterators
- */
+#include <string.h>
 
-/**
- * \defgroup iterators_vertex Vertex iterators
- * \ingroup iterators
- */
+/* -------------------------------------------------- */
+/* Vertex iterator generics                           */
+/* -------------------------------------------------- */
 
-/**
- * \defgroup iterators_edge Edge iterators
- * \ingroup iterators
- */
-  
-/* Constructors */
-
-/**
- * \defgroup iterators_vid Simple vertex iterator
- * \ingroup iterators_vertex
- * \brief Iterates through the vertices of a graph in arbitrary
- * order.
- * 
- * Implemented generic operations: igraph_next(), igraph_prev(), 
- * igraph_end(), igraph_reset(), igraph_getvertex().
- * 
- * Specific operation: igraph_iterator_vid().
- * 
- * The time complexity of all generic operations is
- * <code>O(1)</code>. 
- */
-
-/** 
- * \ingroup iterators_vid
- * \brief Initialization function for the simple vertex iterator.
- * 
- * This is the initialization function of the simple vertex iterator
- * which visits the vertices of a graph in arbitrary order. The
- * iterator <em>must</em> be destroyed by igraph_iterator_destroy() if
- * not needed any more to free the allocated memory.
- * @param graph A graph object.
- * @param it Pointer to an uninitialized iterator object.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
- * 
- * Time complexity: <code>O(1)</code>.
- */
-
-int igraph_iterator_vid(igraph_t *graph, igraph_iterator_t *it) {  
-  it->type=IGRAPH_ITERATOR_VID;
-  it->data=Calloc(1, real_t);
-  if (it->data == 0) {
-    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
-  }
-  ((real_t*)it->data)[0]=0;
-  it->next=igraph_next_vid;
-  it->prev=igraph_prev_vid;
-  it->end=igraph_end_vid;
-  it->reset=igraph_reset_vid;
-  it->getvertex=igraph_get_vertex_vid;
-  it->getvertexfrom=it->getvertexto=it->getedge=0;
-  it->getvertexnei=0;
-  return 0;
+void igraph_vs_next(igraph_t *graph, igraph_vs_t *vs) {
+  vs->table->next(graph, (struct igraph_vs_t*)vs);
 }
 
-/**
- * \defgroup iterators_eid Simple edge iterator.
- * \ingroup iterators_edge
- * \brief Iterates through the edges of a graph in arbitrary order.
- * 
- * Implemented generic operations: igraph_next(), igraph_prev(),
- * igraph_end(), igraph_reset(), igraph_get_vertex_from(),
- * igraph_get_vertex_to(), igraph_get_edge().
- * 
- * Specific operation: igraph_iterator_eid().
- *
- * Time complexity of all generic operations is <code>O(1)</code>.
- */
-
-/**
- * \ingroup iterators_eid
- * \brief Initializes a simple edge iterator.
- * 
- * This iterator walks through the edges of a graph in arbitrary
- * order. Don't forget to call igraph_iterator_destroy() on it if it
- * is not needed any more.
- * @param graph Pointer to a graph.
- * @param it Pointer to an uninitialized iterator object.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
- * 
- * Time complexity: <code>O(1)</code>.
- */
-
-int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it) {  
-  it->type=IGRAPH_ITERATOR_EID;
-  it->data=Calloc(1, real_t);
-  if (it->data == 0) {
-    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
-  }
-  ((real_t*)it->data)[0]=0;
-  it->next=igraph_next_eid;
-  it->prev=igraph_prev_eid;
-  it->end=igraph_end_eid;
-  it->reset=igraph_reset_eid;
-  it->getvertex=0;
-  it->getvertexfrom=igraph_get_vertex_from_eid;
-  it->getvertexto=igraph_get_vertex_to_eid;
-  it->getedge=igraph_get_edge_eid;
-  it->getvertexnei=0;
-  return 0;
+bool_t igraph_vs_end(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->table->end(graph, (struct igraph_vs_t*)vs);
 }
 
-/**
- * \defgroup iterators_efromorder Ordered edge iterator for directed graphs
- * \ingroup iterators_edge
- * \brief Visits the edges in the order of their starting point.
- *
- * Implemented operations: igraph_next(), igraph_prev(), igraph_end(), 
- * igraph_reset(), igraph_get_vertex_from(), igraph_get_vertex_to(),
- * igraph_get_edge().
- * 
- * Specific operation: igraph_iterator_efromorder().
- * 
- * Time complexity of all generic operations: <code>O(1)</code>.
- */
-
-/**
- * \ingroup iterators_efromorder
- * \brief Initializes a starting point ordered edge iterator.
- *
- * The order of the edges is determined by the id of the starting
- * vertex of the directed edges. Edges starting at the same vertex are
- * visited in arbitrary order.
- * @param graph Pointer to graph object.
- * @param it Pointer to an uninitialized iterator object.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
- * 
- * Time complexity: <code>O(1)</code>.
- */
-
-int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it) {
-  it->type=IGRAPH_ITERATOR_EFROMORDER;
-  it->data=Calloc(1, real_t);
-  if (it->data == 0) {
-    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
-  }
-  ((real_t*)it->data)[0]=0;
-  it->next=igraph_next_efromorder;
-  it->prev=igraph_prev_efromorder;
-  it->end=igraph_end_efromorder;
-  it->reset=igraph_reset_efromorder;
-  it->getvertex=0;
-  it->getvertexfrom=igraph_get_vertex_from_efromorder;
-  it->getvertexto=igraph_get_vertex_to_efromorder;
-  it->getedge=igraph_get_edge_efromorder;
-  it->getvertexnei=0;
-  return 0;
+void igraph_vs_reset(igraph_t *graph, igraph_vs_t *vs) {
+  vs->table->reset(graph, (struct igraph_vs_t*)vs);
 }
 
-/**
- * \defgroup iterators_eneis Adjacent edges of a vertex.
- * \ingroup iterators_edge
- * \brief Iterates through the adjacenct edges of a vertex.
- * 
- * Implemented generic operations: igraph_next(), igraph_end(),
- * igraph_reset(), igraph_get_vertex_from(), igraph_get_vertex_to(),
- * igraph_get_edge(), igraph_get_vertex_nei().
- * 
- * Specific operations: igraph_iterator_eneis(),
- * igraph_iterator_eneis_set(). 
- * 
- * Time complexity of all implemented generic operation is
- * <code>O(1)</code>. 
- */
+integer_t igraph_vs_get(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->table->get(graph, (struct igraph_vs_t*)vs);
+}
 
-/**
- * \ingroup iterators_eneis
- * \brief Initializes an adjacent edge iterator.
- * 
- * The edges are visited in arbitrary order.
- * @param graph A graph object.
- * @param it Pointer to an uninitialized iterator object.
- * @param vid The id of the vertex of which the adjacent edges will be
- *        visited.
- * @param mode Defined which edges to visit: <b>IGRAPH_OUT</b> visits
- *        outgoing edges, <b>IGRAPH_IN</b> visits incoming edges,
- *        <b>IGRAPH_ALL</b> visits all adajcent edges. This argument
- *        is ignored for undirected graphs.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
- * 
- * Time complexity: <code>O(1)</code>.
- */
+int igraph_vs_unfold(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->table->unfold(graph, (struct igraph_vs_t*)vs);
+}
 
-int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
-			  integer_t vid, igraph_neimode_t mode) {  
+void igraph_vs_destroy(igraph_vs_t *vs) {
+  vs->table->destroy((struct igraph_vs_t*)vs);
+}
 
-  real_t *data;
-  if (!igraph_is_directed(graph)) {
-    mode=IGRAPH_ALL;
-  }
-  
-  it->type=IGRAPH_ITERATOR_ENEIS;
-  it->next=igraph_next_eneis;
-  it->prev=0;
-  it->end=igraph_end_eneis;
-  it->reset=igraph_reset_eneis;
-  it->getvertex=0;
-  it->getvertexfrom=igraph_get_vertex_from_eneis;
-  it->getvertexto=igraph_get_vertex_to_eneis;
-  it->getedge=igraph_get_edge_eneis;
-  it->getvertexnei=igraph_get_vertex_nei_eneis;
-
-  it->data=Calloc(4, real_t);
-  if (it->data == 0) {
-    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
-  }
-  data=it->data;
-  data[0]=vid;
-  data[1]=mode;
-  if (mode & IGRAPH_OUT) {
-    data[2]=VECTOR(graph->os)[(long int)vid];
+int igraph_vs_create_view_as_vector(igraph_t *graph, igraph_vs_t *vs,
+				    igraph_vs_t *newvs) {
+  newvs->type = vs->type;
+  memcpy(newvs->stdata, vs->stdata, sizeof(real_t)*IGRAPH_I_STDATA_SIZE);
+  newvs->pdata = vs->pdata;
+  newvs->table = vs->table;
+  newvs->v = vs->v;
+  newvs->view=1;
+  if (vs->v==0) {
+    IGRAPH_CHECK(igraph_vs_unfold(graph, newvs));
+    newvs->vdestroy=1;
   } else {
-    data[2]=igraph_ecount(graph);
+    newvs->v=vs->v;
+    newvs->vdestroy=0;
   }
-  if (mode & IGRAPH_IN) {
-    data[3]=VECTOR(graph->is)[(long int)vid];
-  } else {
-    data[3]=igraph_ecount(graph);
-  }
-  
   return 0;
 }
 
-/**
- * \defgroup iterators_vneis Adjacent vertices of a vertex
- * \ingroup iterators_vertex
- * \brief Iterates through the adjacenct vertices of a vertex.
- * 
- * Implemented generic operations: igraph_next(), igraph_end(),
- * igraph_reset(), igraph_get_vertex().
- * 
- * Specific operation: igraph_iterator_vneis(),
- * igraph_iterator_vneis_set(). 
- * 
- * Time complexity of all implemented generic operations is
- * <code>O(1)</code>.
- */
+/* -------------------------------------------------- */
+/* Simple vertex iterator                             */
+/* -------------------------------------------------- */
 
-/**
- * \ingroup iterators_vneis
- * \brief Initializes an adjacent vertex iterator.
- *
- * The adjacenct vertices are visited in arbitrary order.
- * @param graph Pointer to a graph object.
- * @param it Pointer to an uninitialized iterator object.
- * @param vid The id of the vertex of which the adjacenct vertices
- *        will be visited.
- * @param mode Defined which vertices to visit: <b>IGRAPH_OUT</b> visits
- *        vectices at outgoing edges, <b>IGRAPH_IN</b> checks incoming
- *        edges, <b>IGRAPH_ALL</b> visits all adajcent vertices. This
- *         argument is ignored for undirected graphs.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>, not enough memory.
- * 
- * Time complexity: <code>O(1)</code>.
- */
+void igraph_vs_next_all(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_all(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_all(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_all(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_all(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_all(igraph_vs_t *vs);
 
-int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it, 
+igraph_i_vstable_t igraph_i_vs_all_table = {
+  igraph_vs_next_all, igraph_vs_end_all, igraph_vs_reset_all,
+  igraph_vs_get_all, igraph_vs_unfold_all, igraph_vs_destroy_all
+};
+
+igraph_vs_t igraph_vs_all(igraph_t *graph) {
+  igraph_vs_t vs;
+  vs.type=IGRAPH_ITERATOR_VS_ALL;
+  vs.stdata[0]=0;
+  vs.table=&igraph_i_vs_all_table;
+  vs.v=0;
+  vs.vdestroy=0;
+  vs.view=0;
+  return vs;
+}
+
+void igraph_vs_next_all(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0] ++;
+}
+
+bool_t igraph_vs_end_all(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0] >= igraph_vcount(graph);
+}
+
+void igraph_vs_reset_all(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0]=0;
+}
+
+integer_t igraph_vs_get_all(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0];
+}
+
+int igraph_vs_unfold_all(igraph_t *graph, igraph_vs_t *vs) {
+  long int n;
+  if (vs->v==0) {		/* otherwise already unfolded */
+    n=igraph_vcount(graph);
+    vs->v=Calloc(1, vector_t);
+    if (vs->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vs->v); /* free it if cannot allocate vector */
+    IGRAPH_CHECK(vector_init_seq(vs->v, 0, n-1));
+    IGRAPH_FINALLY_CLEAN(1);
+    vs->vdestroy=1;
+  }
+  return 0;
+}
+
+void igraph_vs_destroy_all(igraph_vs_t *pvs) {
+  igraph_vs_t *vs=(igraph_vs_t*)pvs;
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Adjacent vertices of a vertex                      */
+/* -------------------------------------------------- */
+
+void igraph_vs_next_adj(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_adj(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_adj(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_adj(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_adj(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_adj(igraph_vs_t *vs);
+
+igraph_i_vstable_t igraph_i_vs_adj_table = {
+  igraph_vs_next_adj, igraph_vs_end_adj, igraph_vs_reset_adj,
+  igraph_vs_get_adj, igraph_vs_unfold_adj, igraph_vs_destroy_adj
+};
+
+igraph_vs_t igraph_vs_adj(igraph_t *graph,
 			  integer_t vid, igraph_neimode_t mode) {
-  real_t *data;
+  igraph_vs_t vs;
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
-  it->type=IGRAPH_ITERATOR_VNEIS;
-  it->next=igraph_next_vneis;
-  it->prev=0;
-  it->end=igraph_end_vneis;
-  it->reset=igraph_reset_vneis;
-  it->getvertex=igraph_get_vertex_vneis;
-  it->getvertexfrom=0;
-  it->getvertexto=0;
-  it->getedge=0;
-  it->getvertexnei=0;
-
-  it->data=Calloc(4, real_t);
-  if (it->data == 0) {
-    IGRAPH_FERROR("cannot create iterator", IGRAPH_ENOMEM);
-  }
-  data=it->data;
-  data[0]=vid;
-  data[1]=mode;
+  vs.type=IGRAPH_ITERATOR_VS_ADJ;
+  vs.table=&igraph_i_vs_adj_table;
+  vs.v=0;
+  vs.vdestroy=0;
+  vs.view=0;
+  
+  vs.stdata[0]=vid;
+  vs.stdata[1]=mode;
   if (mode & IGRAPH_OUT) {
-    data[2]=VECTOR(graph->os)[(long int)vid];
+    vs.stdata[2]=VECTOR(graph->os)[(long int)vid];
   } else {
-    data[2]=igraph_ecount(graph);
+    vs.stdata[2]=igraph_ecount(graph);
   }
   if (mode & IGRAPH_IN) {
-    data[3]=VECTOR(graph->is)[(long int)vid];
+    vs.stdata[3]=VECTOR(graph->is)[(long int)vid];
   } else {
-    data[3]=igraph_ecount(graph);
+    vs.stdata[3]=igraph_ecount(graph);
   }
   
-  return 0;  
+  return vs;
 }
 
-/**
- * \defgroup iterators_randomwalk Random walker iterator.
- * \ingroup iterators_vertex
- * \brief Performs a random walk from a given staring vertex.
- * 
- * Implemented generic operations: igraph_next(), igraph_end(),
- * igraph_reset(), igraph_get_vertex().
- * 
- * Specific operation: igraph_iterator_randomwalk(),
- * igraph_iterator_randomwalk_length().
- * 
- * Time complexity of igraph_next() is <code>O(d)</code>, the other
- * generic operations are <code>O(1)</code>. <code>d</code> is the
- * number of neighboring vertices at the current vertex.
- * 
- * \sa iterators_randomwalk1
- */
-
-/**
- * \ingroup iterators_randomwalk
- * \brief Creates a random walker iterator.
- * 
- * Initializes a random walker iterator. The random walker starts at
- * the given vertex and steps to a neighboring vertex if igraph_next()
- * is called. The random walker cannot leave the starting component of
- * the graph. igraph_end() returns TRUE only if there is no possible
- * legal steps to take.
- * @param graph The graph to walk on.
- * @param it Pointer to an uninitialized iterator.
- * @param vid The id of the vertex to start from.
- * @param mode Constant giving the type of the edges to use while
- *        walking. Possible values: <b>IGRAPH_OUT</b> follows the
- *        direction of the edges, <b>IGRAPH_IN</b> follows the
- *        opposite of the direction of the edges, <b>IGRAPH_ALL</b>
- *        ignores the direction of the edges. This argument is ignored
- *        for undirected graphs.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
- * 
- * Time complexity: <code>O(1)</code>.
- */
-
-int igraph_iterator_randomwalk(igraph_t *graph, igraph_iterator_t *it,
-			       integer_t vid, igraph_neimode_t mode) {
-  real_t *data;
-  
-  if (!igraph_is_directed(graph)) {
-    mode=IGRAPH_ALL;
+void igraph_vs_next_adj(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[2] ++;
+  if (vs->stdata[2] > VECTOR(graph->os)[ (long int)vs->stdata[0]+1 ]) {
+    vs->stdata[3] ++;
   }
-  it->type=IGRAPH_ITERATOR_RANDOMWALK;
-  it->next=igraph_next_randomwalk;
-  it->prev=0;
-  it->end=igraph_end_randomwalk;
-  it->reset=igraph_reset_randomwalk;
-  it->getvertex=igraph_get_vertex_randomwalk;
-  it->getvertexfrom=0;
-  it->getvertexto=0;
-  it->getedge=0;
-  it->getvertexnei=0;
-  
-  it->data=Calloc(4, real_t);
-  if (it->data==0) {
-    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
-  }
-  data=it->data;
-  data[0]=vid;			/* actual vertex */
-  data[1]=vid;			/* start vertex  */
-  data[2]=mode;			/* mode */
-  data[3]=0;			/* number of steps so far */
-
-  return 0;
 }
 
-/**
- * \defgroup iterators_randomwalk1 Random walker with one step memory.
- * \ingroup iterators_vertex
- * \brief Perform a random walk from a given vertex, trying not to
- * step backwards.
- * 
- * Implemented generic operations: igraph_next(), igraph_end(),
- * igraph_reset(), igraph_get_vertex().
- * 
- * Specific operations: igraph_iterator_randomwalk1(),
- * igraph_iterator_randomwalk_length().
- * 
- * Time complexity of igraph_next() is <code>O(d)</code>, the other
- * generic operations are <code>O(1)</code>. <code>d</code> is the
- * number of neighboring vertices at the current vertex.
- * 
- * \sa iterators_randomwalk
- */
-
-/**
- * \ingroup iterators_randomwalk1
- * \brief Creates a random walker with memory.
- *
- * This is the initializer of a ``smart'' random walker, which does
- * not step backwards whenever this is possible. If the only way is
- * backwards then it steps backwards.
- * @param graph The graph to walk on.
- * @param it Pointer to an uninitialized iterator.
- * @param vid The id of the vertex to start from.
- * @param mode Constant giving the type of the edges to use while
- *        walking. Possible values: <b>IGRAPH_OUT</b> follows the
- *        direction of the edges, <b>IGRAPH_IN</b> follows the
- *        opposite of the direction of the edges, <b>IGRAPH_ALL</b>
- *        ignores the direction of the edges. This argument is ignored
- *        for undirected graphs.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
- * 
- * Time complexity: <code>O(1)</code>.
- */
-
-int igraph_iterator_randomwalk1(igraph_t *graph, igraph_iterator_t *it,
-			       integer_t vid, igraph_neimode_t mode) {
-  real_t *data;
-  
-  if (!igraph_is_directed(graph)) {
-    mode=IGRAPH_ALL;
-  }
-  it->type=IGRAPH_ITERATOR_RANDOMWALK1;
-  it->next=igraph_next_randomwalk1;
-  it->prev=0;
-  it->end=igraph_end_randomwalk1;
-  it->reset=igraph_reset_randomwalk1;
-  it->getvertex=igraph_get_vertex_randomwalk1;
-  it->getvertexfrom=0;
-  it->getvertexto=0;
-  it->getedge=0;
-  it->getvertexnei=0;
-  
-  it->data=Calloc(5, real_t);
-  if (it->data==0) {
-    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
-  }
-  data=it->data;
-  data[0]=vid;			/* actual vertex */
-  data[1]=vid;			/* start vertex  */
-  data[2]=mode;			/* mode */
-  data[3]=0;			/* number of steps so far */
-  data[4]=-1;                   /* the previous vertex */
-
-  return 0;
+bool_t igraph_vs_end_adj(igraph_t *graph, igraph_vs_t *vs) {
+  return (vs->stdata[2] >= VECTOR(graph->os)[ (long int) vs->stdata[0]+1 ] &&
+	  vs->stdata[3] >= VECTOR(graph->is)[ (long int) vs->stdata[0]+1 ]);
 }
 
-/**
- * \ingroup iterators_generic
- * \brief Uninitialize an iterator and free the memory allocated for
- * it.
- *
- * All iterators must be properly destroyed by calling this function
- * on them if they are not needed any more. An iterator must be always
- * destroyed before its corresponding graph is destroyed.
- * @param graph The associated graph to the iterator.
- * @param it The iterator to destroy.
- * @return Error code.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-int igraph_iterator_destroy(igraph_t *graph, igraph_iterator_t *it) {
-  switch ((long int) it->type) {
-  case IGRAPH_ITERATOR_VID:
-    if (it->data != 0) { Free(it->data); }
-    break;
-  case IGRAPH_ITERATOR_VNEIS:
-    if (it->data != 0) { Free(it->data); }
-    break;
-  case IGRAPH_ITERATOR_EID:
-    if (it->data != 0) { Free(it->data); }
-    break;
-  case IGRAPH_ITERATOR_ENEIS:
-    if (it->data != 0) { Free(it->data); }
-    break;
-  case IGRAPH_ITERATOR_EFROMORDER:
-    if (it->data != 0) { Free(it->data); }
-    break;
-  }
-  return 0;
-}
-
-/** 
- * \ingroup iterators_generic
- * \brief Steps an iterator.
- *
- * This function is implemented by all vertex and edge iterators.
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return Error code.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-int igraph_next(igraph_t *graph, igraph_iterator_t *it) {
-  it->next(graph, it);
-  return 0;
-}
-
-/** 
- * \ingroup iterators_generic
- * \brief Steps an iterator backward.
- *
- * This function is not always implemented for the iterators.
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return Error code.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-int igraph_prev(igraph_t *graph, igraph_iterator_t *it) {
-  return it->prev(graph, it);
-}
-
-/** 
- * \ingroup iterators_generic
- * \brief Checks whether the iterator has already finished.
- *
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return Logical value, false if there are still more elements to
- * visit.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-bool_t igraph_end(igraph_t *graph, igraph_iterator_t *it) {
-  return it->end(graph, it);
-}
-
-/** 
- * \ingroup iterators_generic
- * \brief Gives the vertex at the end of the current edge.
- *
- * The exact semantics of this function depends on the type of the
- * iterator, but usually it returns the id of the ``other'' vertex of 
- * the current edge. For example if iterating through the adjacent
- * edges of a vertex, this function gives the other end point of the
- * current edge.
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return Error code.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-integer_t igraph_get_vertex_nei(igraph_t *graph, igraph_iterator_t *it) {
-  return it->getvertexnei(graph, it);
-}
-
-/** 
- * \ingroup iterators_generic
- * \brief Resets the iterator.
- *
- * The effect of this function is the same as destroying the iterator
- * and recreating it with the same parameters, but use it only if the
- * graph hasn't changed since the previous initialization.
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return Error code.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-int igraph_reset(igraph_t *graph, igraph_iterator_t *it) {
-  return it->reset(graph, it);
-}
-
-/* Vertices */
-
-/** 
- * \ingroup iterators_generic
- * \brief Return the current vertex (mostly for vertex iterators).
- *
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return Error code.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-integer_t igraph_get_vertex(igraph_t *graph, igraph_iterator_t *it) {
-  return it->getvertex(graph, it);
-}
-
-/* Edges */
-
-/** 
- * \ingroup iterators_generic
- * \brief Returns the first end point of the current edge (for edge
- * iterators). 
- *
- * For directed graphs this is always the <em>starting</em> end of the
- * edge. 
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return The id of the vertex.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-integer_t igraph_get_vertex_from(igraph_t *graph, igraph_iterator_t *it) {
-  return it->getvertexfrom(graph, it);
-}
-
-/** 
- * \ingroup iterators_generic
- * \brief The second end point of the current edge (for edge
- * iterators). 
- *
- * For directed graphs this is always the <em>end</em> of the edge. 
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return The id of the vertex.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-integer_t igraph_get_vertex_to(igraph_t *graph, igraph_iterator_t *it) {
-  return it->getvertexto(graph, it);
-}
-
-/** 
- * \ingroup iterators_generic
- * \brief Returns the id of the current edge (edge iterators).
- *
- * @param graph The associated graph of the iterator.
- * @param it The iterator object.
- * @return The id of the vertex.
- * 
- * Time complexity: iterator type dependent, ususally <code>O(1)</code>.
- */
-
-integer_t igraph_get_edge(igraph_t *graph, igraph_iterator_t *it) {
-  return it->getedge(graph, it);
-}
-
-/* Specifics, simple vertex iterator */
-int igraph_next_vid(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)(it->data))[0] += 1;
-  return 0;
-}
-
-int igraph_prev_vid(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0] -= 1;
-  return 0;
-}
-
-bool_t igraph_end_vid(igraph_t *graph, igraph_iterator_t *it) {
-  return ((real_t*)it->data)[0] >= igraph_vcount(graph);
-}
-
-integer_t igraph_get_vertex_vid(igraph_t *graph, igraph_iterator_t *it) {
-  return ((real_t*)it->data)[0];
-}
-
-int igraph_reset_vid(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0] = 0;
-  return 0;
-}
-
-/* Specifics, simple edge iterator */
-int igraph_next_eid(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0] += 1;
-  return 0;
-}
-
-int igraph_prev_eid(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0] -= 1;
-  return 0;
-}
-
-bool_t igraph_end_eid(igraph_t *graph, igraph_iterator_t *it) {
-  return ((real_t*)it->data)[0] >= igraph_ecount(graph);
-}
-
-int igraph_reset_eid(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0]=0;
-  return 0;
-}
-
-integer_t igraph_get_vertex_from_eid(igraph_t *graph, igraph_iterator_t *it) {
-  return VECTOR(graph->from)[ (long int) ((real_t*)it->data)[0] ];
-}
-
-integer_t igraph_get_vertex_to_eid(igraph_t *graph, igraph_iterator_t *it) {
-  return VECTOR(graph->to)[ (long int) ((real_t*)it->data)[0] ];
-}
-
-integer_t igraph_get_edge_eid(igraph_t *graph, igraph_iterator_t *it) {
-  return ((real_t*)it->data)[0];
-}
-
-int igraph_next_efromorder(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0] += 1;
-  return 0;
-}
-
-int igraph_prev_efromorder(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0] -= 1;  
-  return 0;
-}
-
-bool_t igraph_end_efromorder(igraph_t *graph, igraph_iterator_t *it) {
-  return ((real_t*)it->data)[0] >= igraph_ecount(graph);
-}
-
-int igraph_reset_efromorder(igraph_t *graph, igraph_iterator_t *it) {
-  ((real_t*)it->data)[0] = 0;
-  return 0;
-}
-
-integer_t igraph_get_vertex_from_efromorder(igraph_t *graph, 
-					    igraph_iterator_t *it) {
-  long int idx=VECTOR(graph->oi)[ (long int) ((real_t*)it->data)[0] ];
-  return VECTOR(graph->from)[ idx ];
-}
-
-integer_t igraph_get_vertex_to_efromorder(igraph_t *graph, 
-					  igraph_iterator_t *it) {
-  long int idx=VECTOR(graph->oi)[ (long int) ((real_t*)it->data)[0] ];
-  return VECTOR(graph->to)[ idx ];
-}
-
-integer_t igraph_get_edge_efromorder(igraph_t *graph, igraph_iterator_t *it) {
-  return VECTOR(graph->oi)[ (long int) ((real_t*)it->data)[0] ];
-}
-
-int igraph_next_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  data[2] ++;
-  if (data[2] > VECTOR(graph->os)[ (long int)data[0]+1 ]) {
-    data[3] ++;
-  }
-  return 0;
-}
-
-int igraph_end_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  return (data[2] >= VECTOR(graph->os)[ (long int) data[0]+1 ] &&
-	  data[3] >= VECTOR(graph->is)[ (long int) data[0]+1 ]);  
-}
-
-int igraph_reset_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  if ((int)data[1] & IGRAPH_OUT) {
-    data[2]=VECTOR(graph->os)[(long int)data[0]];
+void igraph_vs_reset_adj(igraph_t *graph, igraph_vs_t *vs) {
+  if ((int)vs->stdata[1] & IGRAPH_OUT) {
+    vs->stdata[2]=VECTOR(graph->os)[(long int)vs->stdata[0]];
   } else {
-    data[2]=igraph_ecount(graph);
+    vs->stdata[2]=igraph_ecount(graph);
   }
-  if ((int)data[1] & IGRAPH_IN) {
-    data[3]=VECTOR(graph->is)[(long int)data[0]];
+  if ((int)vs->stdata[1] & IGRAPH_IN) {
+    vs->stdata[3]=VECTOR(graph->is)[(long int)vs->stdata[0]];
   } else {
-    data[3]=igraph_ecount(graph);
+    vs->stdata[3]=igraph_ecount(graph);
   }
-
-  return 0;
 }
 
-integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t* data=it->data;
-  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data[2]];
+integer_t igraph_vs_get_adj(igraph_t *graph, igraph_vs_t *vs) {
+  if (vs->stdata[2] < VECTOR(graph->os)[ (long int)vs->stdata[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)vs->stdata[2]];
     return VECTOR(graph->to)[idx];
   } else {
-    long int idx=VECTOR(graph->ii)[(long int)data[3]];
+    long int idx=VECTOR(graph->ii)[(long int)vs->stdata[3]];
     return VECTOR(graph->from)[idx];
-  }  
+  }
 }
 
-/**
- * \ingroup iterators_vneis
- * \brief Reinitialize the iterator for another vertex and/or mode.
- * 
- * This is equivalent to destroying ad inializing again the operator,
- * but there is no need to free and allocate memory, so it is slightly
- * faster and cannot signal memory allocation errors.
- * @param graph The graph to work on.
- * @param it The already initialized iterator.
- * @param vid The vertex of which the neighbors will be visited.
- * @param mode Specifies the type of neighbors to visit. See
- *        igraph_iterators_vneis() for possible values.
- * @return Error code: none right now.
- * 
- * Time complexity: <code>O(1)</code>.
- */
+int igraph_vs_unfold_adj(igraph_t *graph, igraph_vs_t *vs) {
+  if (vs->v==0) {
+    vs->v=Calloc(1, vector_t);
+    if (vs->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vs->v); /* free it if cannot allocate vector */
+    IGRAPH_CHECK(vector_init(vs->v, 0));
+    IGRAPH_CHECK(igraph_neighbors(graph, vs->v, vs->stdata[0], vs->stdata[1]));
+    IGRAPH_FINALLY_CLEAN(1);
+    vs->vdestroy=1;
+  }
+  return 0;
+}
 
-int igraph_iterator_vneis_set(igraph_t *graph, igraph_iterator_t *it, 
-			      integer_t vid, igraph_neimode_t mode) {
-
-  real_t *data=it->data;
+void igraph_vs_adj_set(igraph_t *graph, igraph_vs_t *vs,
+			integer_t vid, igraph_neimode_t mode) {
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
-  data[0]=vid;
-  data[1]=mode;
+  vs->stdata[0]=vid;
+  vs->stdata[1]=mode;
   if (mode & IGRAPH_OUT) {
-    data[2]=VECTOR(graph->os)[(long int)vid];
+    vs->stdata[2]=VECTOR(graph->os)[(long int)vid];
   } else {
-    data[2]=igraph_ecount(graph);
+    vs->stdata[2]=igraph_ecount(graph);
   }
   if (mode & IGRAPH_IN) {
-    data[3]=VECTOR(graph->is)[(long int)vid];
+    vs->stdata[3]=VECTOR(graph->is)[(long int)vid];
   } else {
-    data[3]=igraph_ecount(graph);
-  }  
-  
-  return 0;
-}
-
-/* Iterates over the edges to and/or from a vertex */
-
-/**
- * \ingroup iterators_eneis
- * \brief Resets the iterator but to a different vertex.
- * 
- * This function is similar to igraph_reset(), it reinitializes the
- * iterator but to a different vertex.
- * @param graph Pointer to the associated graph object.
- * @param it Pointer to the iterator object. 
- * @param vid Id of the vertex of which the adjacenct edges will be
- *        visited.
- * @param mode Type of the adjacenct edges to visit. Possible values:
- *        <b>IGRAPH_OUT</b>, <b>IGRAPH_IN</b>, <b>IGRAPH_ALL</b>.
- * @return Error code.
- */
-
-int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it, 
-			      integer_t vid, igraph_neimode_t mode) {
-  real_t *data=it->data;
-  if (!igraph_is_directed(graph)) {
-    mode=IGRAPH_ALL;
+    vs->stdata[3]=igraph_ecount(graph);
   }
-  data[0]=vid;
-  data[1]=mode;
-  if (mode & IGRAPH_OUT) {
-    data[2]=VECTOR(graph->os)[(long int)vid];
-  } else {
-    data[2]=igraph_ecount(graph);
+}
+
+void igraph_vs_destroy_adj(igraph_vs_t *vs) {
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
   }
-  if (mode & IGRAPH_IN) {
-    data[3]=VECTOR(graph->is)[(long int)vid];
-  } else {
-    data[3]=igraph_ecount(graph);
-  }
-  
-  return 0;
-}
-
-int igraph_reset_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  if ((int)data[1] & IGRAPH_OUT) {
-    data[2]=VECTOR(graph->os)[(long int)data[0]];
-  } else {
-    data[2]=igraph_ecount(graph);
-  }
-  if ((int)data[1] & IGRAPH_IN) {
-    data[3]=VECTOR(graph->is)[(long int)data[0]];
-  } else {
-    data[3]=igraph_ecount(graph);
-  }
-  
-  return 0;
-}
-
-int igraph_next_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t* data=it->data;
-  data[2] ++; 
-  if (data[2] > VECTOR(graph->os)[ (long int)data[0]+1 ]) {
-    data[3] ++;
-  }     
-  return 0;
-}
-
-bool_t igraph_end_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t* data=it->data;
-  return (data[2] >= VECTOR(graph->os)[ (long int) data[0]+1 ] &&
-	  data[3] >= VECTOR(graph->is)[ (long int) data[0]+1 ]);
-}
-
-integer_t igraph_get_vertex_from_eneis(igraph_t *graph, 
-				       igraph_iterator_t *it) {
-  real_t* data=it->data;
-  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data[2]];
-    return VECTOR(graph->from)[idx];
-  } else {
-    long int idx=VECTOR(graph->ii)[(long int)data[3]];
-    return VECTOR(graph->from)[idx];
-  }  
-}
-
-integer_t igraph_get_vertex_to_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t* data=it->data;
-  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data[2]];
-    return VECTOR(graph->to)[idx];
-  } else {
-    long int idx=VECTOR(graph->ii)[(long int)data[3]];
-    return VECTOR(graph->to)[idx];
-  }  
-}
-
-integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t* data=it->data;
-  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
-    long int idx=VECTOR(graph->oi)[(long int)data[2]];
-    return VECTOR(graph->to)[idx];
-  } else {
-    long int idx=VECTOR(graph->ii)[(long int)data[3]];
-    return VECTOR(graph->from)[idx];
-  }  
 }  
 
-integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it) {
-  real_t* data=it->data;
-  if (data[2] < VECTOR(graph->os)[ (long int)data[0]+1 ]) {
-    return VECTOR(graph->oi)[(long int)data[2]];
-  } else {
-    return VECTOR(graph->ii)[(long int)data[3]];
+/* -------------------------------------------------- */
+/* Random walker                                      */
+/* -------------------------------------------------- */
+
+void igraph_vs_next_rw(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_rw(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_rw(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_rw(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_rw(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_rw(igraph_vs_t *vs);
+
+igraph_i_vstable_t igraph_i_vs_rw_table = {
+  igraph_vs_next_rw, igraph_vs_end_rw, igraph_vs_reset_rw,
+  igraph_vs_get_rw, igraph_vs_unfold_rw, igraph_vs_destroy_rw
+};
+
+igraph_vs_t igraph_vs_rw(igraph_t *graph,
+			 integer_t vid, igraph_neimode_t mode) {
+  igraph_vs_t vs;
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
   }
+  vs.type=IGRAPH_ITERATOR_VS_RW;
+  
+  vs.stdata[0]=vid;		/* actual vertex */
+  vs.stdata[1]=vid;		/* start vertex  */
+  vs.stdata[2]=mode;		/* mode */
+  vs.stdata[3]=0;		/* number of steps so far */
+
+  vs.table=&igraph_i_vs_rw_table;
+  vs.v=0;
+  vs.vdestroy=0;
+  vs.view=0;
+  return vs;
 }
 
-int igraph_next_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  long int vid=data[0], nvid;
-  igraph_neimode_t mode=data[2];
+void igraph_vs_next_rw(igraph_t *graph, igraph_vs_t *vs) {
+  long int vid=vs->stdata[0], nvid;
+  igraph_neimode_t mode=vs->stdata[2];
   long int indegree=0, outdegree=0;
   
   if (mode & IGRAPH_OUT) {
     outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
-  } 
+  }
   if (mode & IGRAPH_IN) {
     indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
   }
 
   if (indegree+outdegree==0) {
     /* TODO: Nowhere to step, isolate vertex. What should we do? */
-    return 0;
+    return;
   }
   
   RNG_BEGIN();
-  nvid=RNG_INTEGER(0, outdegree+indegree-1);  
+  nvid=RNG_INTEGER(0, outdegree+indegree-1);
   RNG_END();
 
   if (nvid < outdegree) {
@@ -986,21 +324,19 @@ int igraph_next_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
     nvid=VECTOR(graph->from)[ (long int) VECTOR(graph->ii)[i] ];
   }
   
-  data[0]=nvid;
-  data[3] += 1.0;
-
-  return 0;
+  vs->stdata[0]=nvid;
+  vs->stdata[3] += 1.0;
 }
 
-bool_t igraph_end_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  long int vid=data[0];
-  igraph_neimode_t mode=data[2];
+bool_t igraph_vs_end_rw(igraph_t *graph, igraph_vs_t *vs) {
+  long int vid=vs->stdata[0];
+  igraph_neimode_t mode=vs->stdata[2];
   long int indegree=0, outdegree=0;
   
   if (mode & IGRAPH_OUT) {
     outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->is)[vid]);
-  } 
+  }
+
   if (mode & IGRAPH_IN) {
     indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
   }
@@ -1008,52 +344,85 @@ bool_t igraph_end_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
   return indegree+outdegree == 0;
 }
 
-integer_t igraph_get_vertex_randomwalk(igraph_t *graph, 
-				       igraph_iterator_t *it) {
-  real_t *data=it->data;
-  return data[0];
+void igraph_vs_reset_rw(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0]=vs->stdata[1];
+  vs->stdata[3]=0;
 }
 
-int igraph_reset_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  data[0]=data[1];
-  data[3]=0;
-  return 0;
+integer_t igraph_vs_get_rw(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0];
 }
 
-/**
- * \ingroup iterators_randomwalk
- * \brief Reports the length of a random walk.
- * 
- * @param graph The graph to work on.
- * @param it The random walker iterator.
- * @return The length of the random walk.
- * 
- * Time complexity: <code>O(1)</code>.
- */
-
-long int igraph_iterator_randomwalk_length(igraph_t *graph, 
-					   igraph_iterator_t *it) {
-  real_t *data=it->data;
-  return data[3];
+int igraph_vs_unfold_rw(igraph_t *graph, igraph_vs_t *vs) {
+  IGRAPH_FERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
+  return 0;			/* return unneccesary */
 }
 
-int igraph_next_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  long int vid=data[0], nvid;
-  igraph_neimode_t mode=data[2];
+long int igraph_vs_rw_length(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[3];
+}
+
+void igraph_vs_destroy_rw(igraph_vs_t *pvs) {
+  igraph_vs_t *vs=(igraph_vs_t*)pvs;
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Random walker with one unit memory                 */
+/* -------------------------------------------------- */
+
+void igraph_vs_next_rw1(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_rw1(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_rw1(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_rw1(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_rw1(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_rw1(igraph_vs_t *vs);
+
+igraph_i_vstable_t igraph_i_vs_rw1_table = {
+  igraph_vs_next_rw1, igraph_vs_end_rw1, igraph_vs_reset_rw1,
+  igraph_vs_get_rw1, igraph_vs_unfold_rw1, igraph_vs_destroy_rw1
+};
+
+igraph_vs_t igraph_vs_rw1(igraph_t *graph,
+			    integer_t vid, igraph_neimode_t mode) {
+  igraph_vs_t vs;
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
+  vs.type=IGRAPH_ITERATOR_VS_RW1;
+  
+  vs.stdata[0]=vid;			/* actual vertex */
+  vs.stdata[1]=vid;			/* start vertex  */
+  vs.stdata[2]=mode;			/* mode */
+  vs.stdata[3]=0;			/* number of steps so far */
+  vs.stdata[4]=-1;		        /* the previous vertex */
+
+  vs.table=&igraph_i_vs_rw1_table;
+  vs.v=0;
+  vs.vdestroy=0;
+  vs.view=0;
+  return vs;
+}
+
+void igraph_vs_next_rw1(igraph_t *graph, igraph_vs_t *vs) {
+
+  long int vid=vs->stdata[0], nvid;
+  igraph_neimode_t mode=vs->stdata[2];
   long int indegree=0, outdegree=0;
 
   if (mode & IGRAPH_OUT) {
     outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
-  } 
+  }
   if (mode & IGRAPH_IN) {
     indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
   }
 
   if (indegree+outdegree==0) {
     /* TODO: Nowhere to step, isolate vertex. What should we do? */
-    return 0;
+    return;
   }
   
   if (indegree+outdegree==1) {
@@ -1071,11 +440,11 @@ int igraph_next_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
   } else {
     /* There are other options */
     RNG_BEGIN();
-    if (data[4] >=0) {
+    if (vs->stdata[4] >=0) {
       nvid=RNG_INTEGER(0, outdegree+indegree-2);
     } else {
       nvid=RNG_INTEGER(0, outdegree+indegree-1);
-    }      
+    }
     RNG_END();
 
     if (nvid < outdegree) {
@@ -1087,9 +456,7 @@ int igraph_next_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
     }
     
     /* In case we wanted to step back */
-    /* TODO: it is still possible to step back but on a *different* edge, 
-       this applies only to graphs with multiple edges of course */
-    if (nvid==data[4]) {
+    if (nvid==vs->stdata[4]) {
       nvid=outdegree+indegree-1;
 
       if (nvid < outdegree) {
@@ -1102,22 +469,19 @@ int igraph_next_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
     }
   }
 
-  data[4]=data[0];
-  data[0]=nvid;
-  data[3]+=1.0;
-
-  return 0;
+  vs->stdata[4]=vs->stdata[0];
+  vs->stdata[0]=nvid;
+  vs->stdata[3]+=1.0;
 }
 
-bool_t igraph_end_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  long int vid=data[0];
-  igraph_neimode_t mode=data[2];
+bool_t igraph_vs_end_rw1(igraph_t *graph, igraph_vs_t *vs) {
+  long int vid=vs->stdata[0];
+  igraph_neimode_t mode=vs->stdata[2];
   long int indegree=0, outdegree=0;
   
   if (mode & IGRAPH_OUT) {
     outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->is)[vid]);
-  } 
+  }
   if (mode & IGRAPH_IN) {
     indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
   }
@@ -1125,17 +489,961 @@ bool_t igraph_end_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
   return indegree+outdegree == 0;
 }
 
-integer_t igraph_get_vertex_randomwalk1(igraph_t *graph, 
-				       igraph_iterator_t *it) {
-  real_t *data=it->data;
-  return data[0];
+integer_t igraph_vs_get_rw1(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0];
 }
 
-int igraph_reset_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
-  real_t *data=it->data;
-  data[0]=data[1];
-  data[3]=0;
-  data[5]=-1;
+void igraph_vs_reset_rw1(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0]=vs->stdata[1];
+  vs->stdata[3]=0;
+  vs->stdata[5]=-1;
+}
+
+int igraph_vs_unfold_rw1(igraph_t *graph, igraph_vs_t *vs) {
+  IGRAPH_FERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
   return 0;
 }
 
+long int igraph_vs_rw1_length(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[3];
+}
+
+void igraph_vs_destroy_rw1(igraph_vs_t *pvs) {
+  igraph_vs_t *vs=(igraph_vs_t*)pvs;
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
+  }  
+}
+
+/* -------------------------------------------------- */
+/* Empty vertex set                                   */
+/* -------------------------------------------------- */
+
+void igraph_vs_next_none(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_none(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_none(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_none(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_none(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_none(igraph_vs_t *vs);
+
+igraph_i_vstable_t igraph_i_vs_none_table = {
+  igraph_vs_next_none, igraph_vs_end_none, igraph_vs_reset_none,
+  igraph_vs_get_none, igraph_vs_unfold_none, igraph_vs_destroy_none
+};
+
+igraph_vs_t igraph_vs_none(igraph_t *graph) {
+  igraph_vs_t vs;
+  vs.type=IGRAPH_ITERATOR_VS_NONE;
+  vs.table=&igraph_i_vs_none_table;
+  vs.v=0;
+  vs.vdestroy=0;
+  vs.view=0;
+  return vs;
+}
+
+void igraph_vs_next_none(igraph_t *graph, igraph_vs_t *vs) {
+  /* nothing to do */
+}
+
+bool_t igraph_vs_end_none(igraph_t *graph, igraph_vs_t *vs) {
+  return 1;
+}
+
+void igraph_vs_reset_none(igraph_t *graph, igraph_vs_t *vs) {
+  /* nothing to do */
+}
+
+integer_t igraph_vs_get_none(igraph_t *graph, igraph_vs_t *vs) {
+  /* ooops this is an error, no way to signal it though... */
+  return -1;
+}
+
+int igraph_vs_unfold_none(igraph_t *graph, igraph_vs_t *vs) {
+  if (vs->v==0) {		/* otherwise already unfolded */
+    vs->v=Calloc(1, vector_t);
+    if (vs->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vs->v); /* free it if cannot allocate vector */
+    IGRAPH_CHECK(vector_init(vs->v, 0));
+    IGRAPH_FINALLY_CLEAN(1);
+    vs->vdestroy=1;
+  } 
+  return 0;
+}
+
+void igraph_vs_destroy_none(igraph_vs_t *vs) {
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* vertex set with single vertex                      */
+/* -------------------------------------------------- */
+
+void igraph_vs_next_1(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_1(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_1(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_1(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_1(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_1(igraph_vs_t *vs);
+
+igraph_i_vstable_t igraph_i_vs_1_table = {
+  igraph_vs_next_1, igraph_vs_end_1, igraph_vs_reset_1,
+  igraph_vs_get_1, igraph_vs_unfold_1, igraph_vs_destroy_1
+};
+
+
+igraph_vs_t igraph_vs_1(igraph_t *igraph, integer_t vid) {
+  igraph_vs_t vs;
+  vs.type=IGRAPH_ITERATOR_VS_1;
+  vs.stdata[0]=vid;
+  vs.stdata[1]=0;		/* write 1 here if end */
+  vs.table=&igraph_i_vs_1_table;
+  vs.v=0;
+  vs.vdestroy=0;
+  vs.view=0;
+  return vs;
+}
+
+void igraph_vs_next_1(igraph_t *graph, igraph_vs_t *vs) {
+  /* signal end */
+  vs->stdata[1]=1;
+}
+
+bool_t igraph_vs_end_1(igraph_t *graph, igraph_vs_t *vs) {
+  return (vs->stdata[1]==1);
+}
+
+void igraph_vs_reset_1(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[1]=0;
+}
+
+integer_t igraph_vs_get_1(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0];
+}
+
+int igraph_vs_unfold_1(igraph_t *graph, igraph_vs_t *vs) {
+  if (vs->v==0) {
+    vs->v=Calloc(1, vector_t);
+    if (vs->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vs->v);
+    IGRAPH_CHECK(vector_init(vs->v, 1));
+    VECTOR(*vs->v)[0]=vs->stdata[0];
+    IGRAPH_FINALLY_CLEAN(1);
+    vs->vdestroy=1;
+  }
+  return 0;
+}
+
+void igraph_vs_destroy_1(igraph_vs_t *pvs) {
+  igraph_vs_t *vs=(igraph_vs_t*)pvs;
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Vertex set with sequence of vertices               */
+/* -------------------------------------------------- */
+
+void igraph_vs_next_seq(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_seq(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_seq(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_seq(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_seq(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_seq(igraph_vs_t *vs);
+
+igraph_i_vstable_t igraph_i_vs_seq_table = {
+  igraph_vs_next_seq, igraph_vs_end_seq, igraph_vs_reset_seq,
+  igraph_vs_get_seq, igraph_vs_unfold_seq, igraph_vs_destroy_seq
+};
+
+igraph_vs_t igraph_vs_seq(igraph_t *igraph, integer_t from,
+			   integer_t to) {
+  igraph_vs_t vs;
+  vs.type=IGRAPH_ITERATOR_VS_SEQ;
+  vs.stdata[0]=from;
+  vs.stdata[1]=from;
+  vs.stdata[2]=to;
+  vs.table=&igraph_i_vs_seq_table;
+  vs.v=0;
+  vs.vdestroy=0;
+  vs.view=0;
+  return vs;
+}
+
+void igraph_vs_next_seq(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0] ++;
+}
+
+bool_t igraph_vs_end_seq(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0] > vs->stdata[2];
+}
+
+void igraph_vs_reset_seq(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0]=vs->stdata[1];
+}
+
+integer_t igraph_vs_get_seq(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0];
+}
+
+int igraph_vs_unfold_seq(igraph_t *graph, igraph_vs_t *vs) {
+  if (vs->v==0) {
+    vs->v=Calloc(1, vector_t);
+    if (vs->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, vs->v);
+    IGRAPH_CHECK(vector_init_seq(vs->v, vs->stdata[1], vs->stdata[2]));
+    IGRAPH_FINALLY_CLEAN(1);
+    vs->vdestroy=1;
+  }
+  return 0;
+}
+
+void igraph_vs_destroy_seq(igraph_vs_t *pvs) {
+  igraph_vs_t *vs=(igraph_vs_t*)pvs;
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Vertex ids in a vector, this is a view             */
+/* -------------------------------------------------- */
+
+void igraph_vs_next_vector(igraph_t *graph, igraph_vs_t *vs);
+bool_t igraph_vs_end_vector(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_reset_vector(igraph_t *graph, igraph_vs_t *vs);
+integer_t igraph_vs_get_vector(igraph_t *graph, igraph_vs_t *vs);
+int igraph_vs_unfold_vector(igraph_t *graph, igraph_vs_t *vs);
+void igraph_vs_destroy_vector(igraph_vs_t *vs);
+
+igraph_i_vstable_t igraph_i_vs_vector_table = {
+  igraph_vs_next_vector, igraph_vs_end_vector, igraph_vs_reset_vector,
+  igraph_vs_get_vector, igraph_vs_unfold_vector, igraph_vs_destroy_vector
+};
+
+igraph_vs_t igraph_vs_vector(igraph_t *igraph, vector_t *vids) {
+  igraph_vs_t vs;
+  vs.type=IGRAPH_ITERATOR_VS_VECTOR;
+  vs.stdata[0]=0;
+  vs.table=&igraph_i_vs_vector_table;
+  vs.v=vids;
+  vs.vdestroy=0;
+  vs.view=0;
+  return vs;
+}
+
+void igraph_vs_next_vector(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0] ++;
+}
+
+bool_t igraph_vs_end_vector(igraph_t *graph, igraph_vs_t *vs) {
+  return vs->stdata[0] >= vector_size(vs->v);
+}
+
+void igraph_vs_reset_vector(igraph_t *graph, igraph_vs_t *vs) {
+  vs->stdata[0]=0;
+}
+
+integer_t igraph_vs_get_vector(igraph_t *graph, igraph_vs_t *vs) {
+  return VECTOR(*vs->v)[ (long int) (vs->stdata[0]) ];
+}
+
+int igraph_vs_unfold_vector(igraph_t *graph, igraph_vs_t *vs) {
+  /* nothing to do */
+  return 0;
+}
+
+void igraph_vs_destroy_vector(igraph_vs_t *pvs) {
+  igraph_vs_t *vs=(igraph_vs_t*)pvs;
+  if (vs->vdestroy) {
+    vector_destroy(vs->v);
+    Free(vs->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Edge iterator generics                             */
+/* -------------------------------------------------- */
+
+void igraph_es_next(igraph_t *graph, igraph_es_t *es) {
+  es->table->next(graph, es);
+}
+
+bool_t igraph_es_end(igraph_t *graph, igraph_es_t *es) {
+  return es->table->end(graph, es);
+}
+
+void igraph_es_reset(igraph_t *graph, igraph_es_t *es) {
+  return es->table->reset(graph, es);
+}
+
+integer_t igraph_es_from(igraph_t *graph, igraph_es_t *es) {
+  return es->table->from(graph, es);
+}
+
+integer_t igraph_es_to(igraph_t *graph, igraph_es_t *es) {
+  return es->table->to(graph, es);
+}
+
+integer_t igraph_es_get(igraph_t *graph, igraph_es_t *es) {
+  return es->table->get(graph, es);
+}
+
+int igraph_es_unfold(igraph_t *graph, igraph_es_t *es) {
+  return es->table->unfold(graph, es);
+}
+
+void igraph_es_destroy(igraph_es_t *es) {
+  es->table->destroy(es);
+}
+
+/* -------------------------------------------------- */
+/* Simple edge iterator                               */
+/* -------------------------------------------------- */
+
+void igraph_es_next_all(igraph_t *graph, igraph_es_t *es);
+bool_t igraph_es_end_all(igraph_t *graph, igraph_es_t *es);
+void igraph_es_reset_all(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_get_all(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_from_all(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_to_all(igraph_t *graph, igraph_es_t *es);
+int igraph_es_unfold_all(igraph_t *graph, igraph_es_t *es);
+void igraph_es_destroy_all(igraph_es_t *es);
+
+igraph_i_estable_t igraph_i_es_all_table = {
+  igraph_es_next_all, igraph_es_end_all, igraph_es_reset_all,
+  igraph_es_get_all, igraph_es_from_all, igraph_es_to_all,
+  igraph_es_unfold_all, igraph_es_destroy_all
+};
+
+igraph_es_t igraph_es_all(igraph_t *graph) {
+  igraph_es_t es;
+  es.type=IGRAPH_ITERATOR_ES_ALL;
+  es.stdata[0]=0;
+  es.table=&igraph_i_es_all_table;
+  es.v=0;
+  es.vdestroy=0;
+  es.view=0;
+  return es;
+}
+
+void igraph_es_next_all(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[0] ++;
+}
+
+bool_t igraph_es_end_all(igraph_t *graph, igraph_es_t *es) {
+  return es->stdata[0] >= igraph_ecount(graph);
+}
+
+void igraph_es_reset_all(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[0]=0;
+}
+
+integer_t igraph_es_get_all(igraph_t *graph, igraph_es_t *es) {
+  return es->stdata[0];
+}
+
+integer_t igraph_es_from_all(igraph_t *graph, igraph_es_t *es) {
+  return VECTOR(graph->from)[ (long int) es->stdata[0] ];
+}
+
+integer_t igraph_es_to_all(igraph_t *graph, igraph_es_t *es) {
+  return VECTOR(graph->to)[ (long int) es->stdata[0] ];
+}
+
+int igraph_es_unfold_all(igraph_t *graph, igraph_es_t *es) {
+  long int n;
+  if (es->v==0) {		/* otherwise already unfolded */
+    n=igraph_ecount(graph);
+    es->v=Calloc(1, vector_t);
+    if (es->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, es->v); /* free it if cannot allocate vector */
+    IGRAPH_CHECK(vector_init_seq(es->v, 0, n-1));
+    IGRAPH_FINALLY_CLEAN(1);
+    es->vdestroy=1;
+  }
+  return 0;
+}
+
+void igraph_es_destroy_all(igraph_es_t *pvs) {
+  igraph_es_t *es=(igraph_es_t*)pvs;
+  if (es->vdestroy) {
+    vector_destroy(es->v);
+    Free(es->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Ordered edge iterator                              */
+/* -------------------------------------------------- */
+
+void igraph_es_next_fromorder(igraph_t *graph, igraph_es_t *es);
+bool_t igraph_es_end_fromorder(igraph_t *graph, igraph_es_t *es);
+void igraph_es_reset_fromorder(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_get_fromorder(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_from_fromorder(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_to_fromorder(igraph_t *graph, igraph_es_t *es);
+int igraph_es_unfold_fromorder(igraph_t *graph, igraph_es_t *es);
+void igraph_es_destroy_fromorder(igraph_es_t *es);
+
+igraph_i_estable_t igraph_i_es_fromorder_table = {
+  igraph_es_next_fromorder, igraph_es_end_fromorder, igraph_es_reset_fromorder,
+  igraph_es_get_fromorder, igraph_es_from_fromorder, igraph_es_to_fromorder,
+  igraph_es_unfold_fromorder, igraph_es_destroy_fromorder
+};
+  
+igraph_es_t igraph_es_fromorder(igraph_t *graph) {
+  igraph_es_t es;
+  es.type=IGRAPH_ITERATOR_ES_FROMORDER;
+  es.stdata[0]=0;
+  es.table=&igraph_i_es_fromorder_table;
+  es.v=0;
+  es.vdestroy=0;
+  es.view=0;
+  return es;
+}
+
+void igraph_es_next_fromorder(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[0] ++;
+}
+
+bool_t igraph_es_end_fromorder(igraph_t *graph, igraph_es_t *es) {
+  return es->stdata[0] >= igraph_ecount(graph);
+}
+
+void igraph_es_reset_fromorder(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[0]=0;
+}
+
+integer_t igraph_es_get_fromorder(igraph_t *graph, igraph_es_t *es) {
+  return VECTOR(graph->oi)[ (long int) es->stdata[0] ];
+}
+
+integer_t igraph_es_from_fromorder(igraph_t *graph, igraph_es_t *es) {
+  long int idx=VECTOR(graph->oi)[ (long int) es->stdata[0] ];
+  return VECTOR(graph->from)[ idx ];
+}
+
+integer_t igraph_es_to_fromorder(igraph_t *graph, igraph_es_t *es) {
+  long int idx=VECTOR(graph->oi)[ (long int) es->stdata[0] ];
+  return VECTOR(graph->to)[ idx ];
+}
+
+int igraph_es_unfold_fromorder(igraph_t *graph, igraph_es_t *es) {
+  if (es->v==0) {
+    long int i=0, n=igraph_ecount(graph);  
+    es->v=Calloc(1, vector_t);
+    if (es->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, es->v);
+    IGRAPH_CHECK(vector_init(es->v, n));
+    for (i=0; i<n; i++) {
+      VECTOR(*es->v)[i]=VECTOR(graph->oi)[i];
+    }
+    IGRAPH_FINALLY_CLEAN(1);
+    es->vdestroy=1;
+  }
+  return 0;
+}
+
+void igraph_es_destroy_fromorder(igraph_es_t *pvs) {
+  igraph_es_t *es=(igraph_es_t*)pvs;
+  if (es->vdestroy) {
+    vector_destroy(es->v);
+    Free(es->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Adjacent edges of a vertex                         */
+/* -------------------------------------------------- */
+
+void igraph_es_next_adj(igraph_t *graph, igraph_es_t *es);
+bool_t igraph_es_end_adj(igraph_t *graph, igraph_es_t *es);
+void igraph_es_reset_adj(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_get_adj(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_from_adj(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_to_adj(igraph_t *graph, igraph_es_t *es);
+int igraph_es_unfold_adj(igraph_t *graph, igraph_es_t *es);
+void igraph_es_destroy_adj(igraph_es_t *es);
+
+igraph_i_estable_t igraph_i_es_adj_table = {
+  igraph_es_next_adj, igraph_es_end_adj, igraph_es_reset_adj,
+  igraph_es_get_adj, igraph_es_from_adj, igraph_es_to_adj,
+  igraph_es_unfold_adj, igraph_es_destroy_adj
+};
+  
+igraph_es_t igraph_es_adj(igraph_t *graph,
+			    integer_t vid, igraph_neimode_t mode) {
+  igraph_es_t es;
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
+  
+  es.type=IGRAPH_ITERATOR_ES_ADJ;
+
+  es.stdata[0]=vid;
+  es.stdata[1]=mode;
+  if (mode & IGRAPH_OUT) {
+    es.stdata[2]=VECTOR(graph->os)[(long int)vid];
+  } else {
+    es.stdata[2]=igraph_ecount(graph);
+  }
+  if (mode & IGRAPH_IN) {
+    es.stdata[3]=VECTOR(graph->is)[(long int)vid];
+  } else {
+    es.stdata[3]=igraph_ecount(graph);
+  }
+
+  es.table=&igraph_i_es_adj_table;
+  es.v=0;
+  es.vdestroy=0;
+  es.view=0;
+  return es;
+}
+
+void igraph_es_next_adj(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[2] ++;
+  if (es->stdata[2] > VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
+    es->stdata[3] ++;
+  }
+}
+
+bool_t igraph_es_end_adj(igraph_t *graph, igraph_es_t *es) {
+  return (es->stdata[2] >= VECTOR(graph->os)[ (long int) es->stdata[0]+1 ] &&
+	  es->stdata[3] >= VECTOR(graph->is)[ (long int) es->stdata[0]+1 ]);
+}
+
+void igraph_es_reset_adj(igraph_t *graph, igraph_es_t *es) {
+  if ((int)es->stdata[1] & IGRAPH_OUT) {
+    es->stdata[2]=VECTOR(graph->os)[(long int)es->stdata[0]];
+  } else {
+    es->stdata[2]=igraph_ecount(graph);
+  }
+  if ((int)es->stdata[1] & IGRAPH_IN) {
+    es->stdata[3]=VECTOR(graph->is)[(long int)es->stdata[0]];
+  } else {
+    es->stdata[3]=igraph_ecount(graph);
+  }
+}
+
+integer_t igraph_es_get_adj(igraph_t *graph, igraph_es_t *es) {
+  if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
+    return VECTOR(graph->oi)[(long int)es->stdata[2]];
+  } else {
+    return VECTOR(graph->ii)[(long int)es->stdata[3]];
+  }
+}
+
+integer_t igraph_es_from_adj(igraph_t *graph, igraph_es_t *es) {
+  if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)es->stdata[2]];
+    return VECTOR(graph->from)[idx];
+  } else {
+    long int idx=VECTOR(graph->ii)[(long int)es->stdata[3]];
+    return VECTOR(graph->from)[idx];
+  }
+}
+
+integer_t igraph_es_to_adj(igraph_t *graph, igraph_es_t *es) {
+  if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)es->stdata[2]];
+    return VECTOR(graph->to)[idx];
+  } else {
+    long int idx=VECTOR(graph->ii)[(long int)es->stdata[3]];
+    return VECTOR(graph->to)[idx];
+  }
+}
+
+int igraph_es_unfold_adj(igraph_t *graph, igraph_es_t *es) {
+  if (es->v==0) {
+    long int length=0, idx=0;
+    long int no_of_edges;
+    long int i;
+    
+    long int node=es->stdata[0];
+    int mode=es->stdata[1];
+    
+    no_of_edges=igraph_ecount(graph);
+
+    /* Calculate needed space first & allocate it*/
+    
+    if (mode & IGRAPH_OUT) {
+      length += (VECTOR(graph->os)[node+1] - VECTOR(graph->os)[node]);
+    }
+    if (mode & IGRAPH_IN) {
+      length += (VECTOR(graph->is)[node+1] - VECTOR(graph->is)[node]);
+    }
+  
+    es->v=Calloc(1, vector_t);
+    if (es->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, es->v);
+    IGRAPH_CHECK(vector_init(es->v, length));
+    IGRAPH_FINALLY_CLEAN(1);
+    es->vdestroy=1;
+  
+    if (mode & IGRAPH_OUT) {
+      for (i=VECTOR(graph->os)[node]; i<VECTOR(graph->os)[node+1]; i++) {
+	VECTOR(*es->v)[idx++] = VECTOR(graph->oi)[i];
+      }
+    }
+    if (mode & IGRAPH_IN) {
+      for (i=VECTOR(graph->is)[node]; i<VECTOR(graph->is)[node+1]; i++) {
+	VECTOR(*es->v)[idx++] = VECTOR(graph->ii)[i];
+      }
+    }
+  }
+
+  return 0;
+}
+
+void igraph_es_destroy_adj(igraph_es_t *pvs) {
+  igraph_es_t *es=(igraph_es_t*)pvs;
+  if (es->vdestroy) {
+    vector_destroy(es->v);
+    Free(es->v);
+  }
+}
+
+void igraph_es_adj_set(igraph_t *graph, igraph_es_t *es,
+			integer_t vid, igraph_neimode_t mode) {
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
+  es->stdata[0]=vid;
+  es->stdata[1]=mode;
+  if (mode & IGRAPH_OUT) {
+    es->stdata[2]=VECTOR(graph->os)[(long int)vid];
+  } else {
+    es->stdata[2]=igraph_ecount(graph);
+  }
+  if (mode & IGRAPH_IN) {
+    es->stdata[3]=VECTOR(graph->is)[(long int)vid];
+  } else {
+    es->stdata[3]=igraph_ecount(graph);
+  }
+}
+
+integer_t igraph_es_adj_vertex(igraph_t *graph, igraph_es_t *es) {
+  if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
+    long int idx=VECTOR(graph->oi)[(long int)es->stdata[2]];
+    return VECTOR(graph->to)[idx];
+  } else {
+    long int idx=VECTOR(graph->ii)[(long int)es->stdata[3]];
+    return VECTOR(graph->from)[idx];
+  }
+}
+
+/* -------------------------------------------------- */
+/* Empty edge iterator                                */
+/* -------------------------------------------------- */
+
+void igraph_es_next_none(igraph_t *graph, igraph_es_t *es);
+bool_t igraph_es_end_none(igraph_t *graph, igraph_es_t *es);
+void igraph_es_reset_none(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_get_none(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_from_none(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_to_none(igraph_t *graph, igraph_es_t *es);
+int igraph_es_unfold_none(igraph_t *graph, igraph_es_t *es);
+void igraph_es_destroy_none(igraph_es_t *es);
+
+igraph_i_estable_t igraph_i_es_none_table = {
+  igraph_es_next_none, igraph_es_end_none, igraph_es_reset_none,
+  igraph_es_get_none, igraph_es_from_none, igraph_es_to_none,
+  igraph_es_unfold_none, igraph_es_destroy_none
+};
+
+igraph_es_t igraph_es_none(igraph_t *graph) {
+  igraph_es_t es;
+  es.type=IGRAPH_ITERATOR_ES_NONE;
+  
+  es.table=&igraph_i_es_none_table;
+  es.v=0;
+  es.vdestroy=0;
+  es.view=0;
+  return es;
+}
+
+void igraph_es_next_none(igraph_t *graph, igraph_es_t *es) {
+  /* nothing to do */
+}
+
+bool_t igraph_es_end_none(igraph_t *graph, igraph_es_t *es) {
+  return 1;
+}
+
+void igraph_es_reset_none(igraph_t *graph, igraph_es_t *es) {
+  /* nothing to do */
+}
+
+integer_t igraph_es_get_none(igraph_t *graph, igraph_es_t *es) {
+  /* ooops this is an error, no way to signal it though... */
+  return -1;
+}
+
+integer_t igraph_es_from_none(igraph_t *graph, igraph_es_t *es) {
+  /* error */
+  return 0;
+}
+
+integer_t igraph_es_to_none(igraph_t *graph, igraph_es_t *es) {
+  /* error */
+  return 0;
+}
+
+int igraph_es_unfold_none(igraph_t *graph, igraph_es_t *es) {
+  if (es->v==0) {
+    es->v=Calloc(1, vector_t);
+    if (es->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, es->v);
+    IGRAPH_CHECK(vector_init(es->v, 0));
+    IGRAPH_FINALLY_CLEAN(1);
+    es->vdestroy=1;
+  }
+  return 0;
+}
+
+void igraph_es_destroy_none(igraph_es_t *pvs) {
+  igraph_es_t *es=(igraph_es_t*)pvs;
+  if (es->vdestroy) {
+    vector_destroy(es->v);
+    Free(es->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* edge iterator, single edge                         */
+/* -------------------------------------------------- */
+
+void igraph_es_next_1(igraph_t *graph, igraph_es_t *es);
+bool_t igraph_es_end_1(igraph_t *graph, igraph_es_t *es);
+void igraph_es_reset_1(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_get_1(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_from_1(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_to_1(igraph_t *graph, igraph_es_t *es);
+int igraph_es_unfold_1(igraph_t *graph, igraph_es_t *es);
+void igraph_es_destroy_1(igraph_es_t *es);
+
+igraph_i_estable_t igraph_i_es_1_table = {
+  igraph_es_next_1, igraph_es_end_1, igraph_es_reset_1,
+  igraph_es_get_1, igraph_es_from_1, igraph_es_to_1,
+  igraph_es_unfold_1, igraph_es_destroy_1
+};
+
+igraph_es_t igraph_es_1(igraph_t *igraph, integer_t eid) {
+  igraph_es_t es;
+  es.type=IGRAPH_ITERATOR_ES_1;
+  es.stdata[0]=eid;
+  es.stdata[1]=0;		/* write 1 here if end */
+  es.table=&igraph_i_es_1_table;
+  es.v=0;
+  es.vdestroy=0;
+  es.view=0;
+  return es;
+}
+
+void igraph_es_next_1(igraph_t *graph, igraph_es_t *es) {
+  /* signal end */
+  es->stdata[1]=1;
+}
+
+bool_t igraph_es_end_1(igraph_t *graph, igraph_es_t *es) {
+  return (es->stdata[1]==1);
+}
+
+void igraph_es_reset_1(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[1]=0;
+}
+
+integer_t igraph_es_get_1(igraph_t *graph, igraph_es_t *es) {
+  return es->stdata[0];
+}
+
+integer_t igraph_es_from_1(igraph_t *graph, igraph_es_t *es) {
+  /* error */
+  return 0;
+}
+
+integer_t igraph_es_to_1(igraph_t *graph, igraph_es_t *es) {
+  /* error */
+  return 0;
+}
+
+int igraph_es_unfold_1(igraph_t *graph, igraph_es_t *es) {
+  if (es->v==0) {
+    es->v=Calloc(1, vector_t);
+    if (es->v==0) {
+      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, es->v);
+    IGRAPH_CHECK(vector_init(es->v, 1));
+    VECTOR(*es->v)[0]=es->stdata[0];
+    IGRAPH_FINALLY_CLEAN(1);
+    es->vdestroy=1;
+  }
+  return 0;
+}
+
+void igraph_es_destroy_1(igraph_es_t *pvs) {
+  igraph_es_t *es=(igraph_es_t*)pvs;
+  if (es->vdestroy) {
+    vector_destroy(es->v);
+    Free(es->v);
+  }
+}
+
+/* -------------------------------------------------- */
+/* Edge ids in a vector, this is a view               */
+/* -------------------------------------------------- */
+
+void igraph_es_next_vector(igraph_t *graph, igraph_es_t *es);
+bool_t igraph_es_end_vector(igraph_t *graph, igraph_es_t *es);
+void igraph_es_reset_vector(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_get_vector(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_from_vector(igraph_t *graph, igraph_es_t *es);
+integer_t igraph_es_to_vector(igraph_t *graph, igraph_es_t *es);
+int igraph_es_unfold_vector(igraph_t *graph, igraph_es_t *es);
+void igraph_es_destroy_vector(igraph_es_t *es);
+
+igraph_i_estable_t igraph_i_es_vector_table = {
+  igraph_es_next_vector, igraph_es_end_vector, igraph_es_reset_vector,
+  igraph_es_get_vector, igraph_es_from_vector, igraph_es_to_vector,
+  igraph_es_unfold_vector, igraph_es_destroy_vector
+};
+
+igraph_es_t igraph_es_vector(igraph_t *igraph, vector_t *eids) {
+  igraph_es_t es;
+  es.type=IGRAPH_ITERATOR_ES_VECTOR;
+  es.stdata[0]=0;
+  es.table=&igraph_i_es_vector_table;
+  es.v=eids;
+  es.vdestroy=0;
+  es.view=0;
+  return es;
+}
+
+void igraph_es_next_vector(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[0] ++;
+}
+
+bool_t igraph_es_end_vector(igraph_t *graph, igraph_es_t *es) {
+  return es->stdata[0] >= vector_size(es->v);
+}
+
+void igraph_es_reset_vector(igraph_t *graph, igraph_es_t *es) {
+  es->stdata[0]=0;
+}
+
+integer_t igraph_es_get_vector(igraph_t *graph, igraph_es_t *es) {
+  return VECTOR(*es->v)[ (long int) (es->stdata[0]) ];
+}
+
+integer_t igraph_es_from_vector(igraph_t *graph, igraph_es_t *es) {
+  long int id=VECTOR(*es->v)[ (long int) (es->stdata[0]) ];
+  return VECTOR(graph->from) [id];
+}
+
+integer_t igraph_es_to_vector(igraph_t *graph, igraph_es_t *es) {
+  long int id=VECTOR(*es->v)[ (long int) (es->stdata[0]) ];
+  return VECTOR(graph->to) [id];
+}
+
+int igraph_es_unfold_vector(igraph_t *graph, igraph_es_t *es) {
+  /* nothing to do */
+  return 0;
+}
+
+void igraph_es_destroy_vector(igraph_es_t *pes) {
+  igraph_es_t *es=(igraph_es_t*)pes;
+  if (es->vdestroy) {
+    vector_destroy(es->v);
+    Free(es->v);
+  }
+}
+
+/* /\* -------------------------------------------------- *\/ */
+/* /\* edge iterator, all edges between two vertex sets   *\/ */
+/* /\* -------------------------------------------------- *\/   */
+
+/* void igraph_es_next_fromto(igraph_t *graph, igraph_es_t *es); */
+/* bool_t igraph_es_end_fromto(igraph_t *graph, igraph_es_t *es); */
+/* void igraph_es_reset_fromto(igraph_t *graph, igraph_es_t *es); */
+/* integer_t igraph_es_get_fromto(igraph_t *graph, igraph_es_t *es); */
+/* int igraph_es_unfold_fromto(igraph_t *graph, igraph_es_t *es,  */
+/* 			   vector_t *vids); */
+
+/* igraph_es_t igraph_es_fromto(igraph_t *igraph, igraph_vs_t from, */
+/* 			       igraph_vs_t to, igraph_neimode_t mode) { */
+/*   igraph_es_t es; */
+/*   es.type=IGRAPH_ITERATOR_FROMTO; */
+/*   /\* todo: stdata *\/ */
+/*   es.next=igraph_es_next_fromto; */
+/*   es.end=igraph_es_end_fromto; */
+/*   es.reset=igraph_es_reset_fromto; */
+/*   es.get=igraph_es_get_fromto; */
+/*   es.unfold=igraph_es_unfold_fromto; */
+/*   return es;   */
+/* } */
+
+/* void igraph_es_next_fromto(igraph_t *graph, igraph_es_t *es) { */
+/*   /\* TODO *\/ */
+/* } */
+
+/* bool_t igraph_es_end_fromto(igraph_t *graph, igraph_es_t *es) { */
+/*   /\* TODO *\/ */
+/*   return 1; */
+/* } */
+
+
+/* void igraph_es_reset_fromto(igraph_t *graph, igraph_es_t *es) { */
+/*   /\* TODO *\/ */
+/* } */
+
+
+/* integer_t igraph_es_get_fromto(igraph_t *graph, igraph_es_t *es) { */
+/*   /\* TODO *\/ */
+/*   return 0; */
+/* } */
+
+
+/* int igraph_es_unfold_fromto(igraph_t *graph, igraph_es_t *es,  */
+/* 			   vector_t *vids) { */
+/*   /\* TODO *\/ */
+/*   return 0; */
+/* } */
+
+
+/* -------------------------------------------------- */
+/* FUNCTION TABLES                                    */
+/* -------------------------------------------------- */
+
+igraph_i_vstable_t *igraph_i_vstable[8] = {
+  &igraph_i_vs_all_table,    &igraph_i_vs_none_table, &igraph_i_vs_adj_table,
+  &igraph_i_vs_vector_table, &igraph_i_vs_1_table,    &igraph_i_vs_seq_table,
+  &igraph_i_vs_rw_table,     &igraph_i_vs_rw1_table
+};
+
+igraph_i_estable_t *igraph_i_estable[6] = {
+  &igraph_i_es_all_table,  &igraph_i_es_fromorder_table, 
+  &igraph_i_es_adj_table,  &igraph_i_es_none_table, 
+  &igraph_i_es_1_table,    &igraph_i_es_vector_table
+};

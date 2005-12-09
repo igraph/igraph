@@ -311,7 +311,6 @@ int igraph_attribute_list_get_all(igraph_attribute_list_t *al,
 				  igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
   igraph_attribute_type_t atype=IGRAPH_ATTRIBUTE_NUM;
-  int ret1;
 
   if (pos < 0) {
     IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
@@ -384,7 +383,7 @@ int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne) {
 	vector_t *data=VECTOR(al->data)[i];
 	vector_resize(data, al->len);
       } else if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_STR) {
-	igraph_strvector_t *data;
+	igraph_strvector_t *data=VECTOR(al->data)[i];
 	igraph_strvector_resize(data, al->len);
       }
     }
@@ -401,8 +400,6 @@ int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne) {
 
 int igraph_attribute_list_names(igraph_attribute_list_t *al,
 				igraph_strvector_t *names, vector_t *types) {
-  int ret1;
-
   if (names != 0) {
     igraph_strvector_t tmp=*names;
     IGRAPH_CHECK(igraph_strvector_copy(names, &al->names));
@@ -436,7 +433,7 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
   IGRAPH_CHECK(vector_ptr_copy(&to->data, &from->data));
   vector_ptr_null(&to->data);
 
-  igraph_set_error_handler(igraph_error_handler_ignore);
+  oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
   for (i=0; i<vector_size(&from->types); i++) {
     int ret;
     if (VECTOR(from->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
@@ -781,8 +778,15 @@ int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
  */
 
 int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
-				 vector_t *v, void **value) {
-  return igraph_attribute_list_get_many(&graph->val, name, v, value);
+				 igraph_vs_t v, void **value) {
+  int ret;
+  igraph_vs_t myv;
+  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &v, &myv));
+  IGRAPH_FINALLY(igraph_vs_destroy, &myv);
+  ret=igraph_attribute_list_get_many(&graph->val, name, myv.v, value);
+  igraph_vs_destroy(&myv);
+  IGRAPH_FINALLY_CLEAN(1);
+  return ret;
 }
 
 /**
@@ -811,8 +815,15 @@ int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
  */
 
 int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
-				 vector_t *v, void *value) {
-  return igraph_attribute_list_set_many(&graph->val, name, v, value);
+				 igraph_vs_t v, void *value) {
+  int ret;
+  igraph_vs_t myv;
+  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &v, &myv));
+  IGRAPH_FINALLY(igraph_vs_destroy, &myv);
+  ret=igraph_attribute_list_set_many(&graph->val, name, myv.v, value);
+  igraph_vs_destroy(&myv);
+  IGRAPH_FINALLY_CLEAN(1);
+  return ret;
 }
 
 /**
