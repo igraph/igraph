@@ -40,6 +40,20 @@ ii.create <- function(graph, type, vid=NULL, mode=NULL) {
     .Call("R_igraph_iterator_vneis", graph, as.numeric(vid),
           as.numeric(mode),
           PACKAGE="igraph")
+  } else if (type=="randomwalk") {
+    if (is.character(mode)) {
+      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+    }
+    .Call("R_igraph_iterator_randomwalk", graph, as.numeric(vid),
+          as.numeric(mode),
+          PACKAGE="igraph")
+  } else if (type=="randomwalk1") {
+    if (is.character(mode)) {
+      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+    }
+    .Call("R_igraph_iterator_randomwalk1", graph, as.numeric(vid),
+          as.numeric(mode),
+          PACKAGE="igraph")
   }
 }
 

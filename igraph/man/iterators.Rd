@@ -30,10 +30,12 @@ ii.get.vertex.nei(graph, iterator)
     object does not store its graph, or a reference to it, so this
     argument has to be given for every function documented here. }
   \item{type}{The type of the iterator, see details below.}
-  \item{vid}{The vertex id for the \sQuote{eneis} and \sQuote{vneis}
-    iterator types, see details below.}
-  \item{mode}{The mode for the \sQuote{eneis} and \sQuote{vneis}
-    iterator types, see details below.}
+  \item{vid}{The vertex id for the \sQuote{eneis}, \sQuote{vneis},
+    \sQuote{randomwalk} and \sQuote{randomwalk1} iterator types, see
+    details below.} 
+  \item{mode}{The mode for the \sQuote{eneis}, \sQuote{vneis},
+    \sQuote{randomwalk} and \sQuote{randomwalk1} iterator types, see
+    details below.} 
   \item{iterator}{The iterator object.}
 }
 \details{
@@ -67,8 +69,17 @@ ii.get.vertex.nei(graph, iterator)
       \code{mode} argument specifies the neighbors to step through, see
       the same argument of the \code{\link{neighbors}} function for
       details.}
+    \item{\sQuote{randomwalk},}{random walker, it starts at the specified
+      vertex. This iterator might never end, \code{ii.end} return TRUE
+      only if there is nowhere to step to. The possible steps can be
+      constrained by the \code{mode} argument for directed graphs.}
+    \item{\sQuote{randomwalk1},}{random walker with one unit
+      memory. This is very similar to the previous iterator, the only
+      difference is that it remembers its previous step and avoids to
+      step back whenever possible. (If there is no other way it steps
+      back.)}
   }
-
+  
   Edge iterators:
   \itemize{
     \item{\sQuote{eid},}{simple edge iterator, steps through the edges

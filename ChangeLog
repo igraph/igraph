@@ -24,6 +24,20 @@
 	
 2005-11-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/iterators.c (igraph_iterator_randomwalk)
+	(igraph_iterator_randomwalk1, igraph_next_randomwalk)
+	(igraph_end_randomwalk, igraph_get_vertex_randomwalk)
+	(igraph_reset_randomwalk, igraph_iterator_randomwalk_length)
+	(igraph_reset_randomwalk1, igraph_end_randomwalk1)
+	(igraph_get_vertex_randomwalk1, igraph_reset_randomwalk1) : added
+	* igraph/src/rinterface.c (R_igraph_iterator_to_SEXP)
+	(R_SEXP_to_igraph_iterator, R_SEXP_to_igraph_iterator_copy)
+	(R_igraph_iterator_randomwalk, R_igraph_iterator_randomwalk1) :
+	R interface added
+	* igraph/R/iterators.R (ii.create) : added random walkers interface
+
+2005-11-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/igraph_strvector.c (igraph_strvector_remove_section) :
 	remove misterious Realloc
 
@@ -36,7 +50,7 @@
 
 	* src/attribute.c (igraph_attribute_list_copy) : typo corrected
 	
-2005-11-24  Gabor Csardi  <csardi@szaffi>
+2005-11-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph_strvector.c (igraph_strvector_resize) : proper error
 	handling	

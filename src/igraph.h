@@ -385,6 +385,8 @@ typedef struct igraph_s {
 /* Vertex iterators */
 #define IGRAPH_ITERATOR_VID           1
 #define IGRAPH_ITERATOR_VNEIS         2
+#define IGRAPH_ITERATOR_RANDOMWALK    3
+#define IGRAPH_ITERATOR_RANDOMWALK1   4
 
 /* Edge iterators */
 #define IGRAPH_ITERATOR_EID        1001
@@ -475,6 +477,10 @@ int igraph_iterator_eid(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_efromorder(igraph_t *graph, igraph_iterator_t *it);
 int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it, 
 			  integer_t vid, igraph_neimode_t mode);
+int igraph_iterator_randomwalk(igraph_t *graph, igraph_iterator_t *it,
+			       integer_t vid, igraph_neimode_t mode);
+int igraph_iterator_randomwalk1(igraph_t *graph, igraph_iterator_t *it,
+				integer_t vid, igraph_neimode_t mode);
 
 int igraph_iterator_destroy(igraph_t *graph, igraph_iterator_t *it);
 
@@ -540,6 +546,22 @@ int igraph_iterator_eneis_set(igraph_t *graph, igraph_iterator_t *it,
 			      integer_t vid, igraph_neimode_t mode);
 integer_t igraph_get_vertex_nei_eneis(igraph_t *graph, igraph_iterator_t *it);
 int igraph_reset_eneis(igraph_t *graph, igraph_iterator_t *it);
+
+/* Random walker without memory */
+int igraph_next_randomwalk(igraph_t *graph, igraph_iterator_t *it);
+bool_t igraph_end_randomwalk(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_randomwalk(igraph_t *graph, 
+				       igraph_iterator_t *it);
+int igraph_reset_randomwalk(igraph_t *graph, igraph_iterator_t *it);
+long int igraph_iterator_randomwalk_length(igraph_t *graph, 
+					   igraph_iterator_t *it);
+
+/* Random walker with one unit memory */
+int igraph_next_randomwalk1(igraph_t *graph, igraph_iterator_t *it);
+bool_t igraph_end_randomwalk1(igraph_t *graph, igraph_iterator_t *it);
+integer_t igraph_get_vertex_randomwalk1(igraph_t *graph, 
+				       igraph_iterator_t *it);
+int igraph_reset_randomwalk1(igraph_t *graph, igraph_iterator_t *it);
 
 /* -------------------------------------------------- */
 /* Attributes                                         */

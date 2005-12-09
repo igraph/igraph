@@ -144,7 +144,11 @@ SEXP R_igraph_iterator_to_SEXP(igraph_t *g, igraph_iterator_t *it) {
     break;
   case IGRAPH_ITERATOR_ENEIS: 
   case IGRAPH_ITERATOR_VNEIS:
+  case IGRAPH_ITERATOR_RANDOMWALK:
     datalen=4;
+    break;
+  case IGRAPH_ITERATOR_RANDOMWALK1:
+    datalen=5;
     break;
   default:
     break;
@@ -396,6 +400,30 @@ int R_SEXP_to_igraph_iterator(SEXP rit, igraph_iterator_t *it) {
     it->getedge=0;
     it->getvertexnei=0;
     break;
+  case IGRAPH_ITERATOR_RANDOMWALK:
+    it->type=IGRAPH_ITERATOR_RANDOMWALK;
+    it->next=igraph_next_randomwalk;
+    it->prev=0;
+    it->end=igraph_end_randomwalk;
+    it->reset=igraph_reset_randomwalk;
+    it->getvertex=igraph_get_vertex_randomwalk;
+    it->getvertexfrom=0;
+    it->getvertexto=0;
+    it->getedge=0;
+    it->getvertexnei=0;
+    break;    
+  case IGRAPH_ITERATOR_RANDOMWALK1:
+    it->type=IGRAPH_ITERATOR_RANDOMWALK1;
+    it->next=igraph_next_randomwalk1;
+    it->prev=0;
+    it->end=igraph_end_randomwalk1;
+    it->reset=igraph_reset_randomwalk1;
+    it->getvertex=igraph_get_vertex_randomwalk1;
+    it->getvertexfrom=0;
+    it->getvertexto=0;
+    it->getedge=0;
+    it->getvertexnei=0;
+    break;    
   }
   
   return 0;
@@ -403,8 +431,8 @@ int R_SEXP_to_igraph_iterator(SEXP rit, igraph_iterator_t *it) {
 
 int R_SEXP_to_igraph_iterator_copy(SEXP rit, igraph_iterator_t *it) {
   
-  it->type=REAL(VECTOR_ELT(rit, 0))[0];
   long int datalen=1;
+  it->type=REAL(VECTOR_ELT(rit, 0))[0];
   switch ( (long int) it->type ) {
   case IGRAPH_ITERATOR_VID:
     datalen=1;
@@ -460,6 +488,32 @@ int R_SEXP_to_igraph_iterator_copy(SEXP rit, igraph_iterator_t *it) {
     it->end=igraph_end_vneis;
     it->reset=igraph_reset_vneis;
     it->getvertex=igraph_get_vertex_vneis;
+    it->getvertexfrom=0;
+    it->getvertexto=0;
+    it->getedge=0;
+    it->getvertexnei=0;
+    break;
+  case IGRAPH_ITERATOR_RANDOMWALK:
+    datalen=4;
+    it->type=IGRAPH_ITERATOR_RANDOMWALK;
+    it->next=igraph_next_randomwalk;
+    it->prev=0;
+    it->end=igraph_end_randomwalk;
+    it->reset=igraph_reset_randomwalk;
+    it->getvertex=igraph_get_vertex_randomwalk;
+    it->getvertexfrom=0;
+    it->getvertexto=0;
+    it->getedge=0;
+    it->getvertexnei=0;
+    break;
+  case IGRAPH_ITERATOR_RANDOMWALK1:
+    datalen=5;
+    it->type=IGRAPH_ITERATOR_RANDOMWALK1;
+    it->next=igraph_next_randomwalk1;
+    it->prev=0;
+    it->end=igraph_end_randomwalk1;
+    it->reset=igraph_reset_randomwalk1;
+    it->getvertex=igraph_get_vertex_randomwalk1;
     it->getvertexfrom=0;
     it->getvertexto=0;
     it->getedge=0;
@@ -2524,3 +2578,46 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP pnames, SEXP pweights,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_iterator_randomwalk(SEXP graph, SEXP pvid, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_iterator_t it;
+  integer_t vid=REAL(pvid)[0];
+  integer_t mode=REAL(pmode)[0];
+  SEXP result; 
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_iterator_randomwalk(&g, &it, vid, mode);
+  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
+  igraph_iterator_destroy(&g, &it);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+  
+SEXP R_igraph_iterator_randomwalk1(SEXP graph, SEXP pvid, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_iterator_t it;
+  integer_t vid=REAL(pvid)[0];
+  integer_t mode=REAL(pmode)[0];
+  SEXP result; 
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_iterator_randomwalk1(&g, &it, vid, mode);
+  PROTECT(result=R_igraph_iterator_to_SEXP(&g, &it));
+  igraph_iterator_destroy(&g, &it);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+  

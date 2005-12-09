@@ -22,6 +22,7 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include "random.h"
 
 /**
  * \defgroup iterators_generic Generic iterator functions
@@ -267,7 +268,8 @@ int igraph_iterator_eneis(igraph_t *graph, igraph_iterator_t *it,
  * Implemented generic operations: igraph_next(), igraph_end(),
  * igraph_reset(), igraph_get_vertex().
  * 
- * Specific operation: igraph_iterator_vneis().
+ * Specific operation: igraph_iterator_vneis(),
+ * igraph_iterator_vneis_set(). 
  * 
  * Time complexity of all implemented generic operations is
  * <code>O(1)</code>.
@@ -328,6 +330,152 @@ int igraph_iterator_vneis(igraph_t *graph, igraph_iterator_t *it,
   }
   
   return 0;  
+}
+
+/**
+ * \defgroup iterators_randomwalk Random walker iterator.
+ * \ingroup iterators_vertex
+ * \brief Performs a random walk from a given staring vertex.
+ * 
+ * Implemented generic operations: igraph_next(), igraph_end(),
+ * igraph_reset(), igraph_get_vertex().
+ * 
+ * Specific operation: igraph_iterator_randomwalk(),
+ * igraph_iterator_randomwalk_length().
+ * 
+ * Time complexity of igraph_next() is <code>O(d)</code>, the other
+ * generic operations are <code>O(1)</code>. <code>d</code> is the
+ * number of neighboring vertices at the current vertex.
+ * 
+ * \sa iterators_randomwalk1
+ */
+
+/**
+ * \ingroup iterators_randomwalk
+ * \brief Creates a random walker iterator.
+ * 
+ * Initializes a random walker iterator. The random walker starts at
+ * the given vertex and steps to a neighboring vertex if igraph_next()
+ * is called. The random walker cannot leave the starting component of
+ * the graph. igraph_end() returns TRUE only if there is no possible
+ * legal steps to take.
+ * @param graph The graph to walk on.
+ * @param it Pointer to an uninitialized iterator.
+ * @param vid The id of the vertex to start from.
+ * @param mode Constant giving the type of the edges to use while
+ *        walking. Possible values: <b>IGRAPH_OUT</b> follows the
+ *        direction of the edges, <b>IGRAPH_IN</b> follows the
+ *        opposite of the direction of the edges, <b>IGRAPH_ALL</b>
+ *        ignores the direction of the edges. This argument is ignored
+ *        for undirected graphs.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
+
+int igraph_iterator_randomwalk(igraph_t *graph, igraph_iterator_t *it,
+			       integer_t vid, igraph_neimode_t mode) {
+  real_t *data;
+  
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
+  it->type=IGRAPH_ITERATOR_RANDOMWALK;
+  it->next=igraph_next_randomwalk;
+  it->prev=0;
+  it->end=igraph_end_randomwalk;
+  it->reset=igraph_reset_randomwalk;
+  it->getvertex=igraph_get_vertex_randomwalk;
+  it->getvertexfrom=0;
+  it->getvertexto=0;
+  it->getedge=0;
+  it->getvertexnei=0;
+  
+  it->data=Calloc(4, real_t);
+  if (it->data==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  data=it->data;
+  data[0]=vid;			/* actual vertex */
+  data[1]=vid;			/* start vertex  */
+  data[2]=mode;			/* mode */
+  data[3]=0;			/* number of steps so far */
+
+  return 0;
+}
+
+/**
+ * \defgroup iterators_randomwalk1 Random walker with one step memory.
+ * \ingroup iterators_vertex
+ * \brief Perform a random walk from a given vertex, trying not to
+ * step backwards.
+ * 
+ * Implemented generic operations: igraph_next(), igraph_end(),
+ * igraph_reset(), igraph_get_vertex().
+ * 
+ * Specific operations: igraph_iterator_randomwalk1(),
+ * igraph_iterator_randomwalk_length().
+ * 
+ * Time complexity of igraph_next() is <code>O(d)</code>, the other
+ * generic operations are <code>O(1)</code>. <code>d</code> is the
+ * number of neighboring vertices at the current vertex.
+ * 
+ * \sa iterators_randomwalk
+ */
+
+/**
+ * \ingroup iterators_randomwalk1
+ * \brief Creates a random walker with memory.
+ *
+ * This is the initializer of a ``smart'' random walker, which does
+ * not step backwards whenever this is possible. If the only way is
+ * backwards then it steps backwards.
+ * @param graph The graph to walk on.
+ * @param it Pointer to an uninitialized iterator.
+ * @param vid The id of the vertex to start from.
+ * @param mode Constant giving the type of the edges to use while
+ *        walking. Possible values: <b>IGRAPH_OUT</b> follows the
+ *        direction of the edges, <b>IGRAPH_IN</b> follows the
+ *        opposite of the direction of the edges, <b>IGRAPH_ALL</b>
+ *        ignores the direction of the edges. This argument is ignored
+ *        for undirected graphs.
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
+
+int igraph_iterator_randomwalk1(igraph_t *graph, igraph_iterator_t *it,
+			       integer_t vid, igraph_neimode_t mode) {
+  real_t *data;
+  
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
+  it->type=IGRAPH_ITERATOR_RANDOMWALK1;
+  it->next=igraph_next_randomwalk1;
+  it->prev=0;
+  it->end=igraph_end_randomwalk1;
+  it->reset=igraph_reset_randomwalk1;
+  it->getvertex=igraph_get_vertex_randomwalk1;
+  it->getvertexfrom=0;
+  it->getvertexto=0;
+  it->getedge=0;
+  it->getvertexnei=0;
+  
+  it->data=Calloc(5, real_t);
+  if (it->data==0) {
+    IGRAPH_ERROR("out of memory", IGRAPH_ENOMEM);
+  }
+  data=it->data;
+  data[0]=vid;			/* actual vertex */
+  data[1]=vid;			/* start vertex  */
+  data[2]=mode;			/* mode */
+  data[3]=0;			/* number of steps so far */
+  data[4]=-1;                   /* the previous vertex */
+
+  return 0;
 }
 
 /**
@@ -655,6 +803,23 @@ integer_t igraph_get_vertex_vneis(igraph_t *graph, igraph_iterator_t *it) {
   }  
 }
 
+/**
+ * \ingroup iterators_vneis
+ * \brief Reinitialize the iterator for another vertex and/or mode.
+ * 
+ * This is equivalent to destroying ad inializing again the operator,
+ * but there is no need to free and allocate memory, so it is slightly
+ * faster and cannot signal memory allocation errors.
+ * @param graph The graph to work on.
+ * @param it The already initialized iterator.
+ * @param vid The vertex of which the neighbors will be visited.
+ * @param mode Specifies the type of neighbors to visit. See
+ *        igraph_iterators_vneis() for possible values.
+ * @return Error code: none right now.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
+
 int igraph_iterator_vneis_set(igraph_t *graph, igraph_iterator_t *it, 
 			      integer_t vid, igraph_neimode_t mode) {
 
@@ -790,3 +955,187 @@ integer_t igraph_get_edge_eneis(igraph_t *graph, igraph_iterator_t *it) {
     return VECTOR(graph->ii)[(long int)data[3]];
   }
 }
+
+int igraph_next_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
+  real_t *data=it->data;
+  long int vid=data[0], nvid;
+  igraph_neimode_t mode=data[2];
+  long int indegree=0, outdegree=0;
+  
+  if (mode & IGRAPH_OUT) {
+    outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
+  } 
+  if (mode & IGRAPH_IN) {
+    indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
+  }
+
+  if (indegree+outdegree==0) {
+    /* TODO: Nowhere to step, isolate vertex. What should we do? */
+    return 0;
+  }
+  
+  RNG_BEGIN();
+  nvid=RNG_INTEGER(0, outdegree+indegree-1);  
+  RNG_END();
+
+  if (nvid < outdegree) {
+    long int i=VECTOR(graph->os)[vid]+nvid;
+    nvid=VECTOR(graph->to)[ (long int) VECTOR(graph->oi)[i] ];
+  } else {
+    long int i=VECTOR(graph->is)[vid]+nvid-outdegree;
+    nvid=VECTOR(graph->from)[ (long int) VECTOR(graph->ii)[i] ];
+  }
+  
+  data[0]=nvid;
+  data[3] += 1.0;
+
+  return 0;
+}
+
+bool_t igraph_end_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
+  real_t *data=it->data;
+  long int vid=data[0];
+  igraph_neimode_t mode=data[2];
+  long int indegree=0, outdegree=0;
+  
+  if (mode & IGRAPH_OUT) {
+    outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->is)[vid]);
+  } 
+  if (mode & IGRAPH_IN) {
+    indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
+  }
+
+  return indegree+outdegree == 0;
+}
+
+integer_t igraph_get_vertex_randomwalk(igraph_t *graph, 
+				       igraph_iterator_t *it) {
+  real_t *data=it->data;
+  return data[0];
+}
+
+int igraph_reset_randomwalk(igraph_t *graph, igraph_iterator_t *it) {
+  real_t *data=it->data;
+  data[0]=data[1];
+  data[3]=0;
+  return 0;
+}
+
+/**
+ * \ingroup iterators_randomwalk
+ * \brief Reports the length of a random walk.
+ * 
+ * @param graph The graph to work on.
+ * @param it The random walker iterator.
+ * @return The length of the random walk.
+ * 
+ * Time complexity: <code>O(1)</code>.
+ */
+
+long int igraph_iterator_randomwalk_length(igraph_t *graph, 
+					   igraph_iterator_t *it) {
+  real_t *data=it->data;
+  return data[3];
+}
+
+int igraph_next_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
+  real_t *data=it->data;
+  long int vid=data[0], nvid;
+  igraph_neimode_t mode=data[2];
+  long int indegree=0, outdegree=0;
+
+  if (mode & IGRAPH_OUT) {
+    outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
+  } 
+  if (mode & IGRAPH_IN) {
+    indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
+  }
+
+  if (indegree+outdegree==0) {
+    /* TODO: Nowhere to step, isolate vertex. What should we do? */
+    return 0;
+  }
+  
+  if (indegree+outdegree==1) {
+    /* There only one way, we may go back as well */
+    nvid=0;
+    
+    if (nvid < outdegree) {
+      long int i=VECTOR(graph->os)[vid]+nvid;
+      nvid=VECTOR(graph->to)[ (long int) VECTOR(graph->oi)[i] ];
+    } else {
+      long int i=VECTOR(graph->is)[vid]+nvid-outdegree;
+      nvid=VECTOR(graph->from)[ (long int) VECTOR(graph->ii)[i] ];
+    }
+    
+  } else {
+    /* There are other options */
+    RNG_BEGIN();
+    if (data[4] >=0) {
+      nvid=RNG_INTEGER(0, outdegree+indegree-2);
+    } else {
+      nvid=RNG_INTEGER(0, outdegree+indegree-1);
+    }      
+    RNG_END();
+
+    if (nvid < outdegree) {
+      long int i=VECTOR(graph->os)[vid]+nvid;
+      nvid=VECTOR(graph->to)[ (long int) VECTOR(graph->oi)[i] ];
+    } else {
+      long int i=VECTOR(graph->is)[vid]+nvid-outdegree;
+      nvid=VECTOR(graph->from)[ (long int) VECTOR(graph->ii)[i] ];
+    }
+    
+    /* In case we wanted to step back */
+    /* TODO: it is still possible to step back but on a *different* edge, 
+       this applies only to graphs with multiple edges of course */
+    if (nvid==data[4]) {
+      nvid=outdegree+indegree-1;
+
+      if (nvid < outdegree) {
+	long int i=VECTOR(graph->os)[vid]+nvid;
+	nvid=VECTOR(graph->to)[ (long int) VECTOR(graph->oi)[i] ];
+      } else {
+	long int i=VECTOR(graph->is)[vid]+nvid-outdegree;
+	nvid=VECTOR(graph->from)[ (long int) VECTOR(graph->ii)[i] ];
+      }
+    }
+  }
+
+  data[4]=data[0];
+  data[0]=nvid;
+  data[3]+=1.0;
+
+  return 0;
+}
+
+bool_t igraph_end_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
+  real_t *data=it->data;
+  long int vid=data[0];
+  igraph_neimode_t mode=data[2];
+  long int indegree=0, outdegree=0;
+  
+  if (mode & IGRAPH_OUT) {
+    outdegree += (VECTOR(graph->os)[vid+1]-VECTOR(graph->is)[vid]);
+  } 
+  if (mode & IGRAPH_IN) {
+    indegree += (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
+  }
+
+  return indegree+outdegree == 0;
+}
+
+integer_t igraph_get_vertex_randomwalk1(igraph_t *graph, 
+				       igraph_iterator_t *it) {
+  real_t *data=it->data;
+  return data[0];
+}
+
+int igraph_reset_randomwalk1(igraph_t *graph, igraph_iterator_t *it) {
+  real_t *data=it->data;
+  data[0]=data[1];
+  data[3]=0;
+  data[5]=-1;
+  return 0;
+}
+
