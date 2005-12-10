@@ -150,12 +150,15 @@ int igraph_attribute_list_add(igraph_attribute_list_t *al,
 int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
 				 const char *name) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
-
+  void* ptr;
+  
   if (pos < 0) {
     IGRAPH_FERROR("no such attribute", IGRAPH_EINVAL);
   }
 
   igraph_i_attribute_list_free(al, pos);
+  ptr=vector_ptr_e(&al->data, pos);
+  Free(ptr);
   vector_ptr_remove(&al->data, pos);
   vector_remove(&al->types, pos);
   igraph_strvector_remove(&al->names, pos);

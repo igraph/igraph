@@ -1,3 +1,15 @@
+2005-12-10  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/attributes.c (igraph_attribute_list_remove) :
+	removed memory leak
+	
+	* src/igraph_indexededgelist.c (igraph_delete_vertices) :
+	frees index before exiting
+	
+	* src/igraph_strvector.c (igraph_strvector_resize) :
+	swapped upper and lower bounds in the for loop. The
+        loop was never executed before.
+	
 2005-12-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c

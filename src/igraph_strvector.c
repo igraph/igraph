@@ -227,7 +227,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
   assert(v->data != 0);
   if (newsize < v->len) { 
     long int i;
-    for (i=v->len; i<newsize; i++) {
+    for (i=newsize; i<v->len; i++) {
       Free(v->data[i]);
     }
     /* try to give back some space */

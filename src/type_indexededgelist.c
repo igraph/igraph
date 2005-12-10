@@ -577,6 +577,8 @@ int igraph_delete_vertices(igraph_t *graph, igraph_vs_t vertices) {
   
   igraph_destroy(graph);
   igraph_vs_destroy(&myvertices);
+  Free(index);
+  
   *graph=result;
   IGRAPH_FINALLY_CLEAN(2);
 
