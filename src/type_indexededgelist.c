@@ -708,19 +708,24 @@ int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index,
   
   /* create the index */
 
-  idx=-1;
-  for (i=0; i<=EDGE(0); i++) {
-    idx++; VECTOR(*res)[idx]=0;
-  }
-  for (i=1; i<no_of_edges; i++) {
-    long int n=EDGE(i) - EDGE((long int)VECTOR(*res)[idx]);
-    for (j=0; j<n; j++) {
-      idx++; VECTOR(*res)[idx]=i;
+  if (vector_size(el)==0) {
+    /* empty graph */
+    vector_null(res);
+  } else {
+    idx=-1;
+    for (i=0; i<=EDGE(0); i++) {
+      idx++; VECTOR(*res)[idx]=0;
     }
-  }
-  j=EDGE((long int)VECTOR(*res)[idx]);
-  for (i=0; i<no_of_nodes-j; i++) {
-    idx++; VECTOR(*res)[idx]=no_of_edges;
+    for (i=1; i<no_of_edges; i++) {
+      long int n=EDGE(i) - EDGE((long int)VECTOR(*res)[idx]);
+      for (j=0; j<n; j++) {
+	idx++; VECTOR(*res)[idx]=i;
+      }
+    }
+    j=EDGE((long int)VECTOR(*res)[idx]);
+    for (i=0; i<no_of_nodes-j; i++) {
+      idx++; VECTOR(*res)[idx]=no_of_edges;
+    }
   }
 
   /* clean */

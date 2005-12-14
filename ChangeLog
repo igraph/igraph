@@ -1,3 +1,10 @@
+2005-12-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexededgelist.c (igraph_i_create_start) :
+	zero edges edge bug removed
+	* src/examples/simple/igraph_delete_vertices.c : test for this 
+	edge case
+
 2005-12-10  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/attributes.c (igraph_attribute_list_remove) :

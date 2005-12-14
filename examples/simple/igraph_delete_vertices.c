@@ -7,6 +7,21 @@ int main() {
   vector_t v;
   int ret;
 
+  /* without edges */
+  igraph_empty(&g, 5, IGRAPH_DIRECTED);
+  igraph_add_vertices(&g, 2);
+  igraph_add_vertices(&g, 3);
+  igraph_add_vertices(&g, 1);
+  igraph_add_vertices(&g, 4);
+  if (igraph_vcount(&g) != 15)  {
+    return 1;
+  }
+  igraph_delete_vertices(&g, IGRAPH_VS_1(2));
+  if (igraph_vcount(&g) != 14)  {
+    return 1;
+  }
+  igraph_destroy(&g);
+   
   vector_init(&v, 8);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=1; VECTOR(v)[3]=2;
