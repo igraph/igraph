@@ -1,3 +1,22 @@
+2005-12-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/adjlist.c (igraph_i_adjlist_t, igraph_i_adjlist_init)
+	(igraph_i_adjlist_destroy) : added
+	* src/structural_properties.c (igraph_diameter)
+	(igraph_average_path_length) : some speedup with igraph_i_adjlist_t
+	* examples/simple/igraph_diameter.c : added
+	* examples/simple/igraph_average_path_length.c : added
+
+2005-12-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexededgelist.c (igraph_neighbors) : some speedup
+
+2005-12-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_vs_adj,igraph_vs_next_adj)
+	(igraph_vs_end_adj,igraph_vs_get_adj,igraph_vs_adj_set) : storing end
+	of the interval, some speedup
+
 2005-12-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/type_indexededgelist.c (igraph_i_create_start) :

@@ -50,13 +50,14 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
 		    bool_t directed, bool_t unconn) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  long int i, j;
+  long int i, j, n;
   long int *already_added;
   long int nodes_reached;
 
   dqueue_t q=DQUEUE_NULL;
-  vector_t neis=VECTOR_NULL;
+  vector_t *neis;
   integer_t dirmode;
+  igraph_i_adjlist_t allneis;
   
   *res=0;  
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
@@ -64,9 +65,11 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
   if (already_added==0) {
     IGRAPH_FERROR("diameter failed", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+  IGRAPH_FINALLY(igraph_free, already_added);
   DQUEUE_INIT_FINALLY(&q, 100);
-  VECTOR_INIT_FINALLY(&neis, 0);
+  
+  igraph_i_adjlist_init(graph, &allneis, dirmode);
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
   
   for (i=0; i<no_of_nodes; i++) {
     nodes_reached=1;
@@ -79,9 +82,10 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
       long int actdist=dqueue_pop(&q);
       if (actdist>*res) { *res=actdist; }
       
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, dirmode));
-      for (j=0; j<vector_size(&neis); j++) {
-	long int neighbor=VECTOR(neis)[j];
+      neis=igraph_i_adjlist_get(&allneis, actnode);
+      n=vector_size(neis);
+      for (j=0; j<n; j++) {
+	long int neighbor=VECTOR(*neis)[j];
 	if (already_added[neighbor] == i+1) { continue; }
 	already_added[neighbor]=i+1;
 	nodes_reached++;
@@ -100,7 +104,7 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
   /* clean */
   Free(already_added);
   dqueue_destroy(&q);
-  vector_destroy(&neis);
+  igraph_i_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
@@ -130,14 +134,15 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
 int igraph_average_path_length(igraph_t *graph, real_t *res,
 			       bool_t directed, bool_t unconn) {
   long int no_of_nodes=igraph_vcount(graph);
-  long int i, j;
+  long int i, j, n;
   long int *already_added;
   long int nodes_reached=0;
   real_t normfact=0.0;
 
   dqueue_t q=DQUEUE_NULL;
-  vector_t neis=VECTOR_NULL;
+  vector_t *neis;
   integer_t dirmode;
+  igraph_i_adjlist_t allneis;
 
   *res=0;  
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
@@ -147,7 +152,9 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
   DQUEUE_INIT_FINALLY(&q, 100);
-  VECTOR_INIT_FINALLY(&neis, 0);
+
+  igraph_i_adjlist_init(graph, &allneis, dirmode);
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
 
   for (i=0; i<no_of_nodes; i++) {
     nodes_reached=0;
@@ -159,9 +166,10 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
       long int actnode=dqueue_pop(&q);
       long int actdist=dqueue_pop(&q);
     
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, dirmode));
-      for (j=0; j<vector_size(&neis); j++) {
-	long int neighbor=VECTOR(neis)[j];
+      neis=igraph_i_adjlist_get(&allneis, actnode);
+      n=vector_size(neis);
+      for (j=0; j<n; j++) {
+	long int neighbor=VECTOR(*neis)[j];
 	if (already_added[neighbor] == i+1) { continue; }
 	already_added[neighbor]=i+1;
 	nodes_reached++;
@@ -184,7 +192,7 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
   /* clean */
   Free(already_added);
   dqueue_destroy(&q);
-  vector_destroy(&neis);
+  igraph_i_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(3);
 
   return 0;

@@ -17,7 +17,8 @@ EXTRA_DIST += package.m4
 
 TESTSUITE_AT = \
 	testsuite.at \
-	types.at basic.at
+	types.at basic.at structure_generators.at \
+	structural_properties.at
 TESTSUITE = $(srcdir)/testsuite
 
 AUTOTEST = $(AUTOM4TE) --language=autotest

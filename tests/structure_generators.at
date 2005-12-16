@@ -1,4 +1,4 @@
-# Check the utility types (vector_t, etc.)
+# Check graph generators
 
 # Test suite for the IGraph library.
 # Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>

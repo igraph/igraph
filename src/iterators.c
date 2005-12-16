@@ -179,20 +179,22 @@ igraph_vs_t igraph_vs_adj(igraph_t *graph,
   } else {
     vs.stdata[3]=igraph_ecount(graph);
   }
+  vs.stdata[4]=VECTOR(graph->os)[ (long int) vs.stdata[0]+1 ];
+  vs.stdata[5]=VECTOR(graph->is)[ (long int) vs.stdata[0]+1 ];
   
   return vs;
 }
 
 void igraph_vs_next_adj(igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[2] ++;
-  if (vs->stdata[2] > VECTOR(graph->os)[ (long int)vs->stdata[0]+1 ]) {
+  if (vs->stdata[2] > vs->stdata[4]) {
     vs->stdata[3] ++;
   }
 }
 
 bool_t igraph_vs_end_adj(igraph_t *graph, igraph_vs_t *vs) {
-  return (vs->stdata[2] >= VECTOR(graph->os)[ (long int) vs->stdata[0]+1 ] &&
-	  vs->stdata[3] >= VECTOR(graph->is)[ (long int) vs->stdata[0]+1 ]);
+  return (vs->stdata[2] >= vs->stdata[4] &&
+	  vs->stdata[3] >= vs->stdata[5]);
 }
 
 void igraph_vs_reset_adj(igraph_t *graph, igraph_vs_t *vs) {
@@ -209,7 +211,7 @@ void igraph_vs_reset_adj(igraph_t *graph, igraph_vs_t *vs) {
 }
 
 integer_t igraph_vs_get_adj(igraph_t *graph, igraph_vs_t *vs) {
-  if (vs->stdata[2] < VECTOR(graph->os)[ (long int)vs->stdata[0]+1 ]) {
+  if (vs->stdata[2] < vs->stdata[4]) {
     long int idx=VECTOR(graph->oi)[(long int)vs->stdata[2]];
     return VECTOR(graph->to)[idx];
   } else {
@@ -250,6 +252,8 @@ void igraph_vs_adj_set(igraph_t *graph, igraph_vs_t *vs,
   } else {
     vs->stdata[3]=igraph_ecount(graph);
   }
+  vs->stdata[4]=VECTOR(graph->os)[ (long int) vs->stdata[0]+1 ];
+  vs->stdata[5]=VECTOR(graph->is)[ (long int) vs->stdata[0]+1 ];
 }
 
 void igraph_vs_destroy_adj(igraph_vs_t *vs) {

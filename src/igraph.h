@@ -814,6 +814,21 @@ int igraph_running_mean(vector_t *data, vector_t *res, integer_t binwidth);
 int igraph_random_sample(vector_t *res, integer_t l, integer_t h, 
 			 integer_t length);
 
+/* -------------------------------------------------- */
+/* For internal use only, should move to other header */
+/* -------------------------------------------------- */
+
+typedef struct igraph_i_adjlist_t { 
+  integer_t length;
+  vector_t *adjs;
+} igraph_i_adjlist_t;
+
+int igraph_i_adjlist_init(igraph_t *graph, igraph_i_adjlist_t *al, 
+			  igraph_neimode_t mode);
+void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al);
+/* vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, integer_t no); */
+#define igraph_i_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])
+
 __END_DECLS
   
 #endif

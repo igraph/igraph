@@ -641,7 +641,7 @@ int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode,
 
   long int length=0, idx=0;   
   long int no_of_edges;
-  long int i;
+  long int i, j;
 
   long int node=pnode;
 
@@ -670,13 +670,15 @@ int igraph_neighbors(igraph_t *graph, vector_t *neis, integer_t pnode,
   IGRAPH_CHECK(vector_resize(neis, length));
   
   if (mode & IGRAPH_OUT) {
-    for (i=VECTOR(graph->os)[node]; i<VECTOR(graph->os)[node+1]; i++) {
+    j=VECTOR(graph->os)[node+1];
+    for (i=VECTOR(graph->os)[node]; i<j; i++) {
       VECTOR(*neis)[idx++] = 
 	VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
     }
   }
   if (mode & IGRAPH_IN) {
-    for (i=VECTOR(graph->is)[node]; i<VECTOR(graph->is)[node+1]; i++) {
+    j=VECTOR(graph->is)[node+1];
+    for (i=VECTOR(graph->is)[node]; i<j; i++) {
       VECTOR(*neis)[idx++] =
 	VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
     }
