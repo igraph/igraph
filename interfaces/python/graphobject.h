@@ -66,6 +66,7 @@ PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self, PyObject *
 PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_simplify(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -491,6 +492,27 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "mode -- whether we should calculate strong or weak connectivity.\n"
       "        Ignored for undirected graphs. Optional, defaults to\n"
       "        STRONG."
+  },
+  
+  // interface to igraph_pagerank
+  {"pagerank", (PyCFunction)igraphmodule_Graph_pagerank,
+      METH_VARARGS | METH_KEYWORDS,
+      "Calculates the Google PageRank values of a graph.\n\n"
+      "Keyword arguments:\n"
+      "vertices -- the indices of the vertices being queried. Optional,"
+      "            defaults to all of the vertices.\n"
+      "directed -- whether to consider directed paths.\n"
+      "            Ignored for undirected graphs. Optional, defaults to True.\n"
+      "niter    -- the maximum number of iterations to be performed.\n"
+      "            Optional, defaults to 1000.\n"
+      "eps      -- the iteration stops if all of the PageRank values change\n"
+      "            less than eps between two iterations. Optional, defaults\n"
+      "            to 0.001\n"
+      "damping  -- the damping factor. Optional, defaults to 0.85.\n"
+      "            1-damping is the PageRank value for nodes with no\n"
+      "            incoming links.\n"
+      "Returns a list with the Google PageRank values of the specified\n"
+      "vertices."
   },
   
   // interface to igraph_shortest_paths

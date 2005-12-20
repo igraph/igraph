@@ -703,6 +703,9 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
 			bool_t directed);
 int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 
 			     bool_t directed); /* eee + add */
+int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
+		    bool_t directed, integer_t niter, real_t eps,
+		    real_t damping);
 int igraph_subgraph(igraph_t *graph, igraph_t *res, igraph_vs_t vids);
 int igraph_average_path_length(igraph_t *graph, real_t *res,
 			       bool_t directed, bool_t unconn);

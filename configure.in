@@ -32,7 +32,8 @@ AC_MSG_RESULT(no))
 CFLAGS="$ac_save_CFLAGS"])
 
 AC_ARG_ENABLE(gcc-warnings,
-[  --enable-gcc-warnings   turn on lots of GCC warnings (not recommended)],
+              AC_HELP_STRING([--enable-gcc-warnings],
+	                     [turn on lots of GCC warnings (not recommended)]),
 [case "${enableval}" in
    yes|no) ;;
    *)      AC_MSG_ERROR([bad value ${enableval} for gcc-warnings option]) ;;
@@ -55,6 +56,11 @@ if test "${enableval}" = yes; then
   IGRAPH_WARNING(-Wstrict-prototypes)
   IGRAPH_WARNING(-Wwrite-strings)
 fi
+
+use_gprof=no
+AC_ARG_ENABLE(profiling,
+              AC_HELP_STRING([--enable-profiling], [Enable gprof profiling]),
+              [use_gprof=$enableval], [use_gprof=no])
 
 use_python=yes
 AC_ARG_ENABLE(python,
@@ -135,9 +141,16 @@ if test "$debug" == "yes"; then
   CXXFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
 fi
 
+if test "$use_gprof" == "yes"; then
+  CFLAGS="${CFLAGS} -pg"
+  CPPFLAGS="${CFLAGS} -pg"
+  CXXFLAGS="${CFLAGS} -pg"
+fi
+
 AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
 AC_MSG_RESULT([  Python interface       -- $use_python])
 AC_MSG_RESULT([  Debug build            -- $debug])
+AC_MSG_RESULT([  Profiling              -- $use_gprof])

@@ -1,5 +1,5 @@
 #include "edgeseqobject.h"
-// #include "edgeobject.h"
+#include "edgeobject.h"
 #include "common.h"
 
 /**

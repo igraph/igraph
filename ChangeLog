@@ -1,3 +1,25 @@
+2005-12-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* configure.in : added switch for profiling
+	
+	* src/igraph.h : added igraph_pagerank header
+	* src/error.h : corrected URL
+	* src/structural_properties.c (igraph_pagerank) : added
+	
+	* examples/simple/igraph_pagerank.c : added
+	* examples/simple/igraph_pagerank.out : added
+	
+	* tests/structural_properties.at : added test case
+	for igraph_pagerank
+	
+	* interfaces/python/edgeseqobject.c : corrected a warning
+	* interfaces/python/test.py : added test case for
+	Graph.pagerank
+	* interfaces/python/graphobject.c
+	(igraphmodule_Graph_pagerank) : added
+	* interfaces/python/graphobject.h :
+	added igraphmodule_Graph_pagerank header
+
 2005-12-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/adjlist.c (igraph_i_adjlist_t, igraph_i_adjlist_init)

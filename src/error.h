@@ -86,7 +86,7 @@ igraph_set_error_handler(igraph_error_handler_t new_handler);
 
 /* Now comes the more conveninent error handling macro arsenal.
  * Ideas taken from exception.{h,c} by Laurent Deniau see
- * http://cern.ch/Laurent.Deniau/html/oopc/exception.html for more 
+ * http://cern.ch/Laurent.Deniau/html/oopc/oopc.html#Exceptions for more 
  * information. We don't use the exception handling code though.  */
 
 struct igraph_i_protectedPtr {

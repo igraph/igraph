@@ -29,3 +29,8 @@ AT_SETUP([Average geodesic length (igraph_average_path_length): ])
 AT_KEYWORDS([igraph_average_path_length])
 AT_COMPILE_CHECK([simple/igraph_average_path_length.c])
 AT_CLEANUP
+
+AT_SETUP([Google PageRank (igraph_pagerank): ])
+AT_KEYWORDS([igraph_pagerank])
+AT_COMPILE_CHECK([simple/igraph_pagerank.c], [simple/igraph_pagerank.out])
+AT_CLEANUP

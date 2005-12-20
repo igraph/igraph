@@ -239,7 +239,7 @@ int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
   VECTOR_INIT_FINALLY(&edges, 0);
   already_added=Calloc(no_of_nodes, char);
   if (already_added==0) {
-    IGRAPH_FERROR("unweighted snanning tree failed", IGRAPH_ENOMEM);
+    IGRAPH_FERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
   VECTOR_INIT_FINALLY(&tmp, 0);
@@ -1128,6 +1128,161 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
       VECTOR(*result)[j] /= 2.0;
     }
   }
+  
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \brief Calculates the Google PageRank for the specified vertices.
+ * 
+ * This function calculates the Google PageRank value for the specified
+ * vertices. Note that the PageRank of a given vertex depends on all
+ * other vertices, so even if you want to calculate the PageRank for
+ * only some of the vertices, all of them must be calculated, so requesting
+ * the PageRank for only some of the vertices does not result in any
+ * performance increase at all. Since the calculation is an iterative
+ * process, the algorithm is stopped after a given count of iterations
+ * or if the PageRank value differences between iterations are less than
+ * a predefined value.
+ * 
+ * For the explanation of the PageRank algorithm, see the following
+ * webpage: http://www-db.stanford.edu/~backrub/google.html or the
+ * following reference:
+ * 
+ * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
+ * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
+ * Brisbane, Australia, April 1998.
+ * 
+ * @param graph The graph object.
+ * @param res The result vector containing the PageRank values for the
+ * given nodes.
+ * @param vids Vector with the vertex ids
+ * @param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * @param niter The maximum number of iterations to perform
+ * @param eps The algorithm will consider the calculation as complete
+ *        if the difference of PageRank values between iterations change
+ *        less than this value for every node
+ * @param damping The damping factor ("d" in the original paper)
+ * @return Error code:
+ *         - <b>IGRAPH_ENOMEM</b>, not enough memory for temporary data.
+ *         - <b>IGRAPH_EINVVID</b>, invalid vertex id in
+ *           <code>vids</code>. 
+ */
+
+int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
+		    bool_t directed, integer_t niter, real_t eps,
+		    real_t damping) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i, j, n, nodes_to_calc;
+  real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
+  vector_t *neis, outdegree;
+  integer_t dirmode;
+  igraph_i_adjlist_t allneis;
+  real_t maxdiff=eps;
+  igraph_vs_t myvids;
+
+  if (niter<=0) IGRAPH_FERROR("Invalid iteration count", IGRAPH_EINVAL);
+  if (eps<=0) IGRAPH_FERROR("Invalid epsilon value", IGRAPH_EINVAL);
+  if (damping<=0 || damping>=1) IGRAPH_FERROR("Invalid damping factor", IGRAPH_EINVAL);
+
+  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
+  IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
+  nodes_to_calc=vector_size(myvids.v);  
+
+  IGRAPH_CHECK(vector_resize(res, nodes_to_calc));
+  vector_null(res);
+  
+  VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
+    
+  prvec=Calloc(no_of_nodes, real_t);
+  if (prvec==0) {
+    IGRAPH_FERROR("pagerank failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, prvec);
+  
+  prvec_new=Calloc(no_of_nodes, real_t);
+  if (prvec_new==0) {
+    IGRAPH_FERROR("pagerank failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, prvec_new);
+  
+  prvec_scaled=Calloc(no_of_nodes, real_t);
+  if (prvec_scaled==0) {
+    IGRAPH_FERROR("pagerank failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, prvec_scaled);
+  
+  if (directed) { dirmode=IGRAPH_IN; } else { dirmode=IGRAPH_ALL; }  
+  igraph_i_adjlist_init(graph, &allneis, dirmode);
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+
+  /* Calculate outdegrees for every node */
+  igraph_degree(graph, &outdegree, IGRAPH_VS_ALL,
+		directed?IGRAPH_OUT:IGRAPH_ALL, 0);
+  /* Initialize PageRank values */
+  for (i=0; i<no_of_nodes; i++) {
+    prvec[i]=1-damping;
+    /* The next line is necessary to avoid division by zero in the
+     * calculation of prvec_scaled. This won't cause any problem,
+     * since if a node doesn't have any outgoing links, its
+     * prvec_scaled value won't be used anywhere */
+    if (VECTOR(outdegree)[i]==0) VECTOR(outdegree)[i]=1;
+  }
+  
+  /* We will always calculate the new PageRank values into prvec_new
+   * based on the existing values from prvec. To avoid unnecessary
+   * copying from prvec_new to prvec at the end of every iteration,
+   * the pointers are swapped after every iteration */
+  while (niter>0 && maxdiff >= eps) {
+    niter--;
+    maxdiff=0;
+
+    /* Calculate the quotient of the actual PageRank value and the
+     * outdegree for every node */
+    for (i=0; i<no_of_nodes; i++) {
+      prvec_scaled[i]=prvec[i]/VECTOR(outdegree)[i];
+    }
+    
+    /* Calculate new PageRank values based on the old ones */
+    for (i=0; i<no_of_nodes; i++) {
+      prvec_new[i]=0;
+      neis=igraph_i_adjlist_get(&allneis, i);
+      n=vector_size(neis);
+      for (j=0; j<n; j++) {
+	long int neighbor=VECTOR(*neis)[j];
+	prvec_new[i]+=prvec_scaled[neighbor];
+      }
+      prvec_new[i]*=damping;
+      prvec_new[i]+=(1-damping);
+
+      if (prvec_new[i]-prvec[i]>maxdiff) 
+	maxdiff=prvec_new[i]-prvec[i];
+      else if (prvec[i]-prvec_new[i]>maxdiff)
+	maxdiff=prvec[i]-prvec_new[i];
+    }
+    
+    /* Swap the vectors */
+    prvec_aux=prvec_new;
+    prvec_new=prvec;
+    prvec=prvec_aux;
+  }
+  
+  /* Copy results from prvec to res */
+  for (i=0; i<nodes_to_calc; i++) {
+    long int vid=VECTOR(*myvids.v)[i];
+    VECTOR(*res)[i]=prvec[vid];
+  }
+  
+  igraph_i_adjlist_destroy(&allneis);
+  igraph_vs_destroy(&myvids);
+  vector_destroy(&outdegree);
+  Free(prvec);
+  Free(prvec_new);  
+  Free(prvec_scaled);
+  
+  IGRAPH_FINALLY_CLEAN(6);
   
   return 0;
 }

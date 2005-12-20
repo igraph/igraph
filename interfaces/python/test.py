@@ -430,6 +430,14 @@ test(g.cocitation()==[[0,1,0,0], [1,0,0,0], [0,0,0,0], [0,0,0,0]])
 start("Calculating outgoing shortest paths")
 test(g.shortest_paths(mode=igraph.OUT)==[[0,1,4,4], [4,0,4,4], [1,1,0,4], [1,2,4,0]])
 
+g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (0,2), (3,2)], directed=True)
+start("Calculating Google PageRank values in a graph")
+l=g.pagerank()
+expected=[1.48, 0.78, 1.57, 0.15]
+diff=map(lambda x: abs(round(l[x], 2)-expected[x]), range(len(l)))
+print diff
+test(sum(diff)<0.001)
+
 section("Layout algorithms")
 
 start("Testing layout of vertices in a circle")

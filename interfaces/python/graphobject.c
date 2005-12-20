@@ -1,5 +1,6 @@
 #include "graphobject.h"
 #include "vertexseqobject.h"
+#include "edgeseqobject.h"
 #include "convert.h"
 #include "error.h"
 
@@ -1208,6 +1209,64 @@ PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObjec
    vector_destroy(&vids);
    
    return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the Google PageRank value of some nodes in the graph.
+ * \return the PageRank values
+ * \sa igraph_pagerank
+ */
+PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds)
+{
+  char *kwlist[] = {"vertices", "directed", "niter", "eps", "damping", NULL};
+  PyObject *directed=Py_True;
+  PyObject *vobj=NULL, *list=NULL;
+  long int niter=1000; /// @todo maybe it should be selected adaptively based on the number of vertices?
+  double eps=0.001, damping=0.85;
+  vector_t vids;
+  vector_t res;
+  int return_single=0;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOldd", kwlist,
+				   &vobj, &directed, &niter, &eps, &damping))
+    return NULL;
+
+  if (vobj == NULL) {
+    // no vertex list was supplied
+    if (igraph_vcount(&self->g)>0)  {
+      if (vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1)) 
+	return igraphmodule_handle_igraph_error();
+    } else {
+      if (vector_init(&vids, 0)) return igraphmodule_handle_igraph_error();
+    }
+  } else {
+    if (PyInt_Check(vobj)) return_single=1;
+      
+    Py_INCREF(vobj);
+    // vertex list was specified, convert to vector_t
+    if (igraphmodule_PyList_to_vector_t(vobj, &vids, 1, 0)) {
+      Py_DECREF(vobj);
+      return NULL;
+    }
+    Py_DECREF(vobj);
+  }
+   
+  if (vector_init(&res, vector_size(&vids))) return igraphmodule_handle_igraph_error();
+   
+  if (igraph_pagerank(&self->g, &res, IGRAPH_VS_VECTOR(&vids),
+		      PyObject_IsTrue(directed), niter, eps, damping)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  if (!return_single)
+    list=igraphmodule_vector_t_to_float_PyList(&res);
+  else
+    list=PyFloat_FromDouble(VECTOR(res)[0]);
+   
+  vector_destroy(&res);
+  vector_destroy(&vids);
+   
+  return list;
 }
 
 /** \ingroup python_interface_graph
