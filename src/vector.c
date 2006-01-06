@@ -49,6 +49,12 @@
  * Time complexity: operating system dependent.
  */
 
+/**
+ * vector_init:
+ * @v: Pointer to an uninitialized vector object.
+ * @size: The size of the vector.
+ */
+
 int vector_init      (vector_t* v, int long size) {	
         long int alloc_size= size > 0 ? size : 1;
 	if (size < 0) { size=0; }

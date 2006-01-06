@@ -147,7 +147,10 @@ if test "$use_gprof" == "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile])
+# DOCS
+GTK_DOC_CHECK(1.4)
+
+AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile doc/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])

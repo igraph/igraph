@@ -1,4 +1,4 @@
-SUBDIRS=src interfaces debian tests
+SUBDIRS=src interfaces debian tests doc
 
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
@@ -9,9 +9,9 @@ MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make doc will always call doxygen rule
 ## and deb will generate Debian packages
-.PHONY: doc deb debcvs
+.PHONY: dox deb debcvs
 
-doc:
+dox:
 	doxygen Doxyfile
 
 deb: clean
@@ -29,5 +29,4 @@ test: all
 	 	fi; \
 	done
 
-CLEANFILES=doc/*
-
+CLEANFILES=

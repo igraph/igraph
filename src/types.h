@@ -88,7 +88,13 @@ int dqueue_push    (dqueue_t* q, real_t elem);
  * implementation does not free a single bit of memory.
  */
 
+/**
+ * vector_t:
+ * 
+ * Flecible arrays
+ */
 typedef struct s_vector {
+   /*< private >*/
   real_t* stor_begin;
   real_t* stor_end;
   real_t* end;

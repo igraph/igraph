@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY igraph "<literal>igraph</literal>">
+<!ENTITY tut_simple SYSTEM "../examples/doc/tut_simple.c">
+]>
+
+<chapter id="igraph-tutorial">
+<title>Tutorial</title>
+
+<section><title>Lesson 1. Compiling programs using igraph.</title>
+
+<para>
+The following short example program demonstrates the basic usage of 
+the &igraph; library.
+<programlisting>
+<![CDATA[#include <igraph.h>
+
+int main(void) {
+  real_t diameter;
+  igraph_t graph;
+  igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 1000, 5.0/1000,
+                          IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+  igraph_diameter(&graph, &diameter, IGRAPH_UNDIRECTED, 1);
+  printf("Diameter of a random graph with average degree 5: %f\n", 
+	 (double) diameter);
+  igraph_destroy(&graph);
+  return 0;
+}]]>
+</programlisting>
+</para>
+
+<para>
+The short example illustrates a couple of points. Firstly, programs
+using the &igraph; library should include the
+<filename>igraph.h</filename> header 
+file. Secondly, &igraph; uses the <type>real_t</type> type for real number
+instead of using <type>double</type>. Third, &igraph; graph objects are
+represented by the 
+<type><link linkend="igraph-t">igraph_t</link></type> data
+type. Fourth, graphs are created by some functions,
+<function><link linkend="igraph-erdos-renyi-game">igraph_erdos_renyi_game()</link></function>
+in this example, and they are destroyed by 
+<function><link linkend="igraph-destroy">igraph_destroy()</link></function>
+if they are not needed any more. 
+</para>
+
+<para>
+For compiling this program you need a C compiler, if this is called 
+<command>gcc</command> and the previous code is saved in file
+<filename>igraph_test.c</filename>, you will need a command like this:
+<programlisting>
+gcc -I/usr/local/igraph -L/usr/local/lib -ligraph igraph_test.c -o igraph_test
+</programlisting>
+</para>
+
+<para>
+The exact form depends on where &igraph; was installed on your
+system. The directory after the <option>-I</option> switch is the one
+containing the <filename>igraph.h</filename> file, while the one
+following <option>-L</option> should contain the 
+library file itself, usually a file called
+<filename>libigraph.so</filename>, <filename>libigraph.a</filename> or
+<filename>igraph.dll</filename>. 
+It your system has the <command>pkg-config</command>. utility you are
+likely to get the neccessary compile options by issuing
+<programlisting>
+pkg-config --libs --cflags igraph
+</programlisting>
+</para>
+
+<para>
+The executable can be run by simply typing its name like this:
+<programlisting>
+./igraph_test
+</programlisting>
+on most systems. If you use dynamic linking and the &igraph;
+libraries are not at a standard place, you may need to set the
+<envar>LD_LIBRARY_PATH</envar> variable, the syntax depends on the
+shell use are using. In <command>bash</command> it goes like this:
+<programlisting>
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libs/igraph
+./igraph_test
+</programlisting>
+Here we assumed that the &igraph; library is installed in 
+<filename>/home/user/libs/igraph</filename>. 
+</para>
+
+</section>
+<section><title>Lesson 2. Creating your first graphs.</title>
+
+<para>
+The functions generating graph objects are called graph
+generators. Stochastic (=randomized) graph generators are called
+``games''.
+</para>
+
+<para>
+&igraph; can handle directed and undirected graphs. Most graph
+generators are able to create both types of graphs and most other
+functions are usually also capable of handling
+both. Eg. <function><link linkend="igraph-shortest-path">igraph_shortest_path()</link></function>
+which (surprisingly) calculates
+shortest paths from a vertex to another vertices can calculate
+directed or undirected paths
+</para>
+
+<para>
+&igraph; has sophisticated ways for creating graphs. The simplest
+graphs are deterministic regular structures like star graphs
+(<function><link linkend="igraph-star">igraph_star()</link></function>), 
+ring graphs (<function><link linkend="igraph-ring">igraph_ring()</link></function>), lattices  
+(<function><link linkend="igraph-lattice">igraph_lattice()</link></function>) or trees
+(<function><link linkend="igraph-tree">igraph_tree()</link></function>).  
+</para>
+
+<para>
+The following example creates an undirected regular circular lattice,
+adds some random edges to it and calculates the average length of
+shortest paths between all pairs of vertices in the graph before and
+after adding the random edges. (The message is that some random edges
+can reduce path lengths a lot.)
+<programlisting>
+<![CDATA[#include <igraph.h>
+#include <igraph.h>
+
+int main(void) {
+  real_t avg_path;
+  igraph_t graph;
+  vector_t dimvector;
+  vector_t edges;
+  int i;
+  
+  vector_init(&dimvector, 2);
+  VECTOR(dimvector)[0]=30;
+  VECTOR(dimvector)[1]=30;
+  igraph_lattice(&graph, &dimvector, 0, IGRAPH_UNDIRECTED, 0, 1);
+
+  srand(100);
+  vector_init(&edges, 20);
+  for (i=0; i<vector_size(&edges); i++) {
+    VECTOR(edges)[i] = rand() % (int)igraph_vcount(&graph);
+  }
+
+  igraph_average_path_length(&graph, &avg_path, IGRAPH_UNDIRECTED, 1);
+  printf("Average path length (lattice):            %f\n", (double) avg_path);
+
+  igraph_add_edges(&graph, &edges);
+  igraph_average_path_length(&graph, &avg_path, IGRAPH_UNDIRECTED, 1);
+  printf("Average path length (randomized lattice): %f\n", (double) avg_path);
+  
+  vector_destroy(&dimvector);
+  vector_destroy(&edges);
+  igraph_destroy(&graph);
+
+  return 0;
+}]]>
+</programlisting>
+</para>
+
+<para>
+This example illustrates some new points. &igraph; uses 
+<type><link linkend="vector-t">vector_t</link></type>
+instead of plain C arrays. <type>vector_t</type> is superior to
+regular array in almost every sense. Vectors are created by the
+<function><link linkend="vector-init">vector_init()</link></function>
+function and like graphs they should be destroyed if not 
+needed any more by calling 
+<function><link linkend="vector-destroy">vector_destroy()</link></function>
+on them. A vector can be indexed by the 
+<function><link linkend="vector">VECTOR()</link></function> function
+(right now it is a macro). Vectors 
+can be resized, eg. most &igraph; functions returning the result in a
+vector resize it to the size of the result.
+</para>
+
+<para>
+<function><link linkend="igraph-lattice">igraph_lattice()</link></function>
+takes a vector argument specifying the dimensions of 
+the lattice, in this example we generate a 30x30 two dimensional
+lattice. See the documentation of
+<function><link linkend="igraph-lattice">igraph_lattice()</link></function> in
+the reference manual for the other arguments.
+</para>
+
+<para>
+The vertices in a graph are identified by an integer number between
+0 and N-1, N is the number of vertices in the graph (this can be
+obtained by 
+<function><link linkend="igraph-vcount">igraph_vcount()</link></function>, 
+as in the example). 
+</para>
+
+<para>
+The <function><link
+linkend="igraph-add-edges">igraph_add_edges()</link></function>
+function simply takes a graph and a vector of 
+vertex ids defining the new edges. The first edge is between the first
+two vertex ids in the vector, the second edge is between the second
+two, etc. This way we add ten random edges to the lattice.
+</para>
+
+<para>
+Note that in the example it is possible to add loop edges, edges
+pointing to the same vertex and multiple edges, more than one edge
+between the same pair of vertices. 
+<type><link linkend="igraph-t">igraph_t</link></type> can of course
+represent loop 
+multiple edges, although some routines expect simple graphs,
+ie. graphs without loop and multiple edges, because for example some
+structural properties are ill-defined for non-simple graphs. Loop
+edges can be removed by calling 
+<function><link linkend="igraph-simplify">igraph_simplify()</link></function>.
+</para>
+
+</section>
+<section><title>Lesson 3. Calculating various properties of graphs.</title>
+<para>
+In our next example we will calculate various centrality measures in a
+friendship graph. The friendship graph is from the famous Zachary karate
+club study. (Web search on 'Zachary karate' if you want to know more about
+this.) Centrality measures quantify how central is the position of
+individual vertices in the graph.
+<programlisting>
+<![CDATA[#include <igraph.h>
+#include <igraph.h>
+
+int main(void) {
+  igraph_t graph;
+  vector_t v;
+  vector_t result;
+  real_t edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
+                     0,10, 0,11, 0,12, 0,13, 0,17, 0,19, 0,21, 0,31,
+                     1, 2, 1, 3, 1, 7, 1,13, 1,17, 1,19, 1,21, 1,30,
+                     2, 3, 2, 7, 2,27, 2,28, 2,32, 2, 9, 2, 8, 2,13,
+                     3, 7, 3,12, 3,13, 4, 6, 4,10, 5, 6, 5,10, 5,16,
+                     6,16, 8,32, 8,32, 8,33, 9,33,13,33,14,32,14,33,
+                    15,32,15,33,18,32,18,33,19,33,20,32,20,33,
+                    22,32,22,33,23,25,23,27,23,32,23,33,23,29,
+                    24,25,24,27,24,31,25,31,26,29,26,33,27,33,
+                    28,31,28,33,29,32,29,33,30,32,30,33,31,32,31,33,
+                    32,33 };
+  
+  v=vector_as_vector(edges, sizeof(edges)/sizeof(double));
+  igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
+  
+  vector_init(&result, 0);
+
+  igraph_degree(&graph, &result, IGRAPH_VS_ALL, IGRAPH_ALL, IGRAPH_LOOPS);
+  printf("Maximum degree is      %10i, vertex %2i.\n", 
+	 (int)vector_max(&result), (int)vector_which_max(&result));
+  
+  igraph_closeness(&graph, &result, IGRAPH_VS_ALL, IGRAPH_ALL);
+  printf("Maximum closeness is   %10f, vertex %2i.\n", 
+	 (double)vector_max(&result), (int)vector_which_max(&result));
+  
+  igraph_betweenness(&graph, &result, IGRAPH_VS_ALL, IGRAPH_UNDIRECTED);
+  printf("Maximum betweenness is %10f, vertex %2i.\n", 
+	 (double)vector_max(&result), (int)vector_which_max(&result));  
+  
+  vector_destroy(&result);
+  igraph_destroy(&graph);
+
+  return 0;
+}]]>
+</programlisting>
+</para>
+
+<para>
+This example reflects some new features. First of all, it shows a
+way to define a graph simply as defining a C array with its edges.
+Function <function><link
+linkend="vector-as-vector">vector_as_vector()</link></function>
+creates a <emphasis>view</emphasis> of a C 
+array. It does not copy any data, this also means that you should not
+call <function><link linkend="vector-destroy">vector_destroy()</link></function>
+on a vector created this way. This vector is then used to create the
+undirected graph.
+</para>
+
+<para>
+Then the degree, closeness and betweenness centrality of the vertices
+is calculated and the highest values are printed. Note that the vector
+(<varname>result</varname>) which returns the result from these
+functions has to initialized first, and also that the functions resize
+it to be able to hold the result.
+</para>
+
+<para>
+The <constant>IGRAPH_VS_ALL</constant> argument tells the functions to
+calculate the property for every vertex in the graph, it is shorthand
+for a <emphasis>vertex set</emphasis> (<type>igraph_vs_t</type>), one
+of the central concepts in &igraph;.  
+</para>
+</section>
+
+</chapter>

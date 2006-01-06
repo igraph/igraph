@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY igraph "<literal>igraph</literal>">
+]>
+
+<chapter id="igraph-installation">
+<title>Installation</title>
+
+<para>
+First download the latest version of &igraph; and
+uncompress it to a temporary directory:
+<programlisting>
+$ wget http://geza.kzoo.edu/~csardi/igraph_latest.tar.gz
+$ tar xzf igraph_latest.tar.gz 
+$ cd igraph-latest 
+</programlisting>
+</para>
+
+<para>
+Installing the &igraph; R package is very simple, the &igraph;
+directory in the tarball contains a complete R package. Eg. in Linux
+you can install it like
+<programlisting>
+$ R CMD INSTALL -l ~/.R/library igraph
+</programlisting>
+</para>
+
+<para>
+Alternatively you can download the R package version of &igraph; only.
+</para>
+
+<para>
+Also, consult your R documentation.
+</para>
+
+<para>
+To install the complete R library typing
+<programlisting>
+$ ./configure
+$ make
+$ make install
+</programlisting>
+(the latter as root) should work on most systems. You can try
+<programlisting>
+$ ./configure --help \endverbatim
+</programlisting>
+to see installations options, and reading the <code>INSTALL</code> 
+file. 
+</para>
+
+</chapter>
