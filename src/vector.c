@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <string.h> 		/* memcpy & co. */
 #include <stdlib.h>
+#include <stdarg.h>		/* va_start & co */
 
 /**
  * \ingroup vector
@@ -66,6 +67,98 @@ int vector_init      (vector_t* v, int long size) {
 	v->end=v->stor_begin+size;
 
 	return 0;
+}
+
+/**
+ */ 
+
+const vector_t *vector_view (const vector_t *v, const real_t *data, 
+			     long int length) {
+  vector_t *v2=(vector_t*) v;
+  v2->stor_begin=(real_t*)data;
+  v2->stor_end=(real_t*)data+length;
+  v2->end=v2->stor_end;
+  return v;
+}
+
+int vector_init_real(vector_t *v, int no, ...) {
+  int i=0;
+  va_list ap;
+  IGRAPH_CHECK(vector_init(v, no));
+
+  va_start(ap, no);
+  for (i=0; i<no; i++) {
+    VECTOR(*v)[i]=(real_t) va_arg(ap, double);
+  }
+  va_end(ap);
+  
+  return 0;
+}
+
+int vector_init_real_end(vector_t *v, real_t endmark, ...) {
+  int i=0, n=0;
+  va_list ap;
+
+  va_start(ap, endmark);
+  while (1) {
+    real_t num = va_arg(ap, double);
+    if (num == endmark) {
+      break;
+    }
+    n++;
+  }
+  va_end(ap);
+
+  VECTOR_INIT_FINALLY(v, n);
+  
+  va_start(ap, endmark);
+  for (i=0; i<n; i++) {
+    VECTOR(*v)[i]=(real_t) va_arg(ap, double);
+  }
+  va_end(ap);
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+int vector_init_int(vector_t *v, int no, ...) {
+  int i=0;
+  va_list ap;
+  IGRAPH_CHECK(vector_init(v, no));
+
+  va_start(ap, no);
+  for (i=0; i<no; i++) {
+    VECTOR(*v)[i]=(real_t) va_arg(ap, int);
+  }
+  va_end(ap);
+  
+  return 0;
+}
+
+int vector_init_int_end(vector_t *v, int endmark, ...) {
+  int i=0, n=0;
+  va_list ap;
+
+  va_start(ap, endmark);
+  while (1) {
+    int num = va_arg(ap, int);
+    if (num == endmark) {
+      break;
+    }
+    n++;
+  }
+  va_end(ap);
+
+  VECTOR_INIT_FINALLY(v, n);
+  
+  va_start(ap, endmark);
+  for (i=0; i<n; i++) {
+    VECTOR(*v)[i]=(real_t) va_arg(ap, int);
+  }
+  va_end(ap);
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
 }
 
 /**
@@ -143,7 +236,7 @@ int vector_reserve   (vector_t* v, long int size) {
  * Time complexity: <code>O(1)</code>.
  */
 
-bool_t vector_empty     (vector_t* v) {
+bool_t vector_empty     (const vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return v->stor_begin == v->end;
@@ -159,7 +252,7 @@ bool_t vector_empty     (vector_t* v) {
  * Time complexity: <code>O(1)</code>. 
  */
 
-long int vector_size      (vector_t* v) {
+long int vector_size      (const vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return v->end - v->stor_begin;
@@ -227,7 +320,7 @@ int vector_push_back (vector_t* v, real_t e) {
  * \brief Access an element of a vector.
  */
 
-real_t vector_e         (vector_t* v, long int pos) {
+real_t vector_e         (const vector_t* v, long int pos) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return * (v->stor_begin + pos);
@@ -238,7 +331,7 @@ real_t vector_e         (vector_t* v, long int pos) {
  * \brief Get the address of an element of a vector
  */
 
-real_t*vector_e_ptr  (vector_t* v, long int pos) {
+real_t*vector_e_ptr  (const vector_t* v, long int pos) {
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   return v->stor_begin+pos;
@@ -283,7 +376,7 @@ void vector_null      (vector_t* v) {
  * Time complexity: <code>O(1)</code>.
  */
 
-real_t vector_tail(vector_t *v) {
+real_t vector_tail(const vector_t *v) {
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   return *((v->end)-1);
@@ -311,7 +404,7 @@ real_t vector_pop_back(vector_t* v) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int vector_order(vector_t* v, vector_t* res, integer_t nodes) {
+int vector_order(const vector_t* v, vector_t* res, integer_t nodes) {
   long int edges=vector_size(v);
   vector_t ptr;
   vector_t rad;
@@ -422,7 +515,7 @@ int vector_resize(vector_t* v, long int newsize) {
  * the vector. 
  */
 
-real_t vector_max(vector_t* v) {
+real_t vector_max(const vector_t* v) {
   real_t max;
   real_t *ptr;
   assert(v != NULL);
@@ -436,20 +529,6 @@ real_t vector_max(vector_t* v) {
     ptr++;
   }
   return max;
-}
-
-/**
- * \ingroup vector
- * \brief Handle a regular C array as a vector, don't ever call 
- * vector_destroy() on this!
- */
-
-vector_t vector_as_vector(real_t* data, long int length) {
-  vector_t v;
-  v.stor_begin=data;
-  v.stor_end=v.end=data+length;
-  
-  return v;
 }
 
 /**
@@ -490,7 +569,7 @@ int vector_init_copy(vector_t *v, real_t *data, long int length) {
  * the vector.
  */
 
-void vector_copy_to(vector_t *v, real_t* to) {
+void vector_copy_to(const vector_t *v, real_t* to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   if (v->end != v->stor_begin) {
@@ -513,7 +592,7 @@ void vector_copy_to(vector_t *v, real_t* to) {
  * <code>O(n)</code>, <code>n</code> is the size of the vector.
  */
 
-int vector_copy(vector_t *to, vector_t *from) {
+int vector_copy(vector_t *to, const vector_t *from) {
   assert(from != NULL);
   assert(from->stor_begin != NULL);
   to->stor_begin=Calloc(vector_size(from), real_t);
@@ -539,7 +618,7 @@ int vector_copy(vector_t *to, vector_t *from) {
  * Time complexity: <code>O(n)</code>, the size of the vector.
  */
 
-real_t vector_sum(vector_t *v) {
+real_t vector_sum(const vector_t *v) {
   real_t res=0;
   real_t *p;
   assert(v != NULL);
@@ -561,7 +640,7 @@ real_t vector_sum(vector_t *v) {
  * Time complexity: <code>O(n)</code>, the size of the vector.
  */
 
-real_t vector_prod(vector_t *v) {
+real_t vector_prod(const vector_t *v) {
   real_t res=1;
   real_t *p;
   assert(v != NULL);
@@ -660,7 +739,7 @@ void vector_permdelete(vector_t *v, long int *index, long int nremove) {
  * \brief Remove elements of a vector (for internal use).
  */
 
-void vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove) {
+void vector_remove_negidx(vector_t *v, const vector_t *neg, long int nremove) {
   long int i, idx=0;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
@@ -675,7 +754,7 @@ void vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove) {
  * \brief Checks if all elements of a vector are in the given interval.
  */
 
-bool_t vector_isininterval(vector_t *v, real_t low, real_t high) {
+bool_t vector_isininterval(const vector_t *v, real_t low, real_t high) {
   real_t *ptr;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
@@ -692,7 +771,7 @@ bool_t vector_isininterval(vector_t *v, real_t low, real_t high) {
  * \brief Checks if all elements of a vector are smaller than a limit.
  */
 
-bool_t vector_any_smaller(vector_t *v, real_t limit) {
+bool_t vector_any_smaller(const vector_t *v, real_t limit) {
   real_t *ptr;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
@@ -705,11 +784,12 @@ bool_t vector_any_smaller(vector_t *v, real_t limit) {
 }
 
 /**
- * \ingroup vecgtor
- * \brief Decides whether two vectors contain exactly the same elements.
+ * \ingroup vector
+ * \brief Decides whether two vectors contain exactly the same elements
+ * (in the same order).
  */
 
-bool_t vector_is_equal(vector_t *lhs, vector_t *rhs) {
+bool_t vector_is_equal(const vector_t *lhs, const vector_t *rhs) {
   long int i, s;
   assert(lhs != 0);
   assert(rhs != 0);
@@ -727,4 +807,31 @@ bool_t vector_is_equal(vector_t *lhs, vector_t *rhs) {
     }
     return 1;
   }
+}
+
+/**
+ * \ingroup vector
+ * \brief Finds an element by binary searching a sorted vector
+ */
+
+bool_t vector_binsearch(const vector_t *v, real_t what, long int *pos) {
+  long int left=0;
+  long int right=vector_size(v)-1;
+
+  while (left < right) {
+    long int middle=(left+right)/2;
+    if (VECTOR(*v)[middle] > what) {
+      right=middle-1;
+    } else if (VECTOR(*v)[middle] < what) {
+      left=middle+1;
+    } else {
+      left=middle;
+      break;
+    }
+  }
+  
+  if (pos != 0 && VECTOR(*v)[left]==what) {
+    *pos=left;
+  }
+  return VECTOR(*v)[left]==what;
 }

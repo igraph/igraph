@@ -303,11 +303,11 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
  * <code>O(1)</code> time.
  */
 
-int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream) {
+int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
 
   igraph_es_t it;
   
-  it=igraph_es_fromorder(graph);
+  IGRAPH_CHECK(igraph_es_fromorder(graph, &it));
   IGRAPH_FINALLY(igraph_es_destroy, &it);
 
   while (!igraph_es_end(graph, &it)) {
@@ -352,11 +352,11 @@ int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream) {
  * \sa igraph_read_graph_ncol(), igraph_write_graph_lgl()
  */
 
-int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream, 
+int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream, 
 			    const char *names, const char *weights) {
   igraph_es_t it;
   
-  it=igraph_es_fromorder(graph);
+  IGRAPH_CHECK(igraph_es_fromorder(graph, &it));
   IGRAPH_FINALLY(igraph_es_destroy, &it);
   if (names==0 && weights ==0) {
     /* No names, no weights */
@@ -477,13 +477,13 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
  * \sa igraph_read_graph_ncol(), igraph_write_graph_lgl()
  */
 
-int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
+int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 			   const char *names, const char *weights,
 			   bool_t isolates) {
   igraph_es_t it;
   long int actvertex=-1;
   
-  it=igraph_es_fromorder(graph);
+  IGRAPH_CHECK(igraph_es_fromorder(graph, &it));
   IGRAPH_FINALLY(igraph_es_destroy, &it);
   if (names==0 && weights==0) {
     /* No names, no weights */
@@ -610,7 +610,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
     igraph_vs_t it;
 
     /* TODO: eliminate iterators from here, dirty... */
-    it=igraph_vs_adj(graph, 0, IGRAPH_ALL);
+    IGRAPH_CHECK(igraph_vs_adj(graph, &it, 0, IGRAPH_ALL));
     for (i=0; i<nov; i++) {
       igraph_vs_adj_set(graph, &it, i, IGRAPH_ALL);
       if (igraph_vs_end(graph, &it)) {

@@ -16,7 +16,7 @@ int main() {
   if (igraph_vcount(&g) != 15)  {
     return 1;
   }
-  igraph_delete_vertices(&g, IGRAPH_VS_1(2));
+  igraph_delete_vertices(&g, IGRAPH_VS_1(&g, 2));
   if (igraph_vcount(&g) != 14)  {
     return 1;
   }
@@ -31,7 +31,7 @@ int main() {
   vector_destroy(&v);
 
   /* resize vector */
-  igraph_delete_vertices(&g, IGRAPH_VS_1(2));
+  igraph_delete_vertices(&g, IGRAPH_VS_1(&g, 2));
   if (igraph_vcount(&g) != 3) {
     return 1;
   }
@@ -41,7 +41,7 @@ int main() {
 
   /* error test */
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_delete_vertices(&g, IGRAPH_VS_1(3));
+  ret=igraph_delete_vertices(&g, IGRAPH_VS_1(&g, 3));
   if (ret != IGRAPH_EINVVID) {
     return 3;
   }

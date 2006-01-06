@@ -30,7 +30,7 @@
  * \ingroup internal
  */
 
-long int igraph_i_attribute_list_get_pos(igraph_attribute_list_t *al, 
+long int igraph_i_attribute_list_get_pos(const igraph_attribute_list_t *al, 
 					 const char *name) {
   long int pos=-1;
   long int n=igraph_strvector_size(&al->names);
@@ -170,7 +170,8 @@ int igraph_attribute_list_remove(igraph_attribute_list_t *al,
  * \brief Returns an attribute for a single element 
  */
 
-int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name, 
+int igraph_attribute_list_get(const igraph_attribute_list_t *al, 
+			      const char *name, 
 			      long int idx, void **value, 
 			      igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
@@ -200,7 +201,7 @@ int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name,
  */
 
 int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
-			      long int idx, void *value) {
+			      long int idx, const void *value) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
   igraph_attribute_type_t atype;
 
@@ -224,9 +225,9 @@ int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
  * \brief Returns an attribute for many elements
  */
 
-int igraph_attribute_list_get_many(igraph_attribute_list_t *al, 
+int igraph_attribute_list_get_many(const igraph_attribute_list_t *al, 
 				   const char *name,
-				   vector_t *idx, void **value) {
+				   const vector_t *idx, void **value) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
   igraph_attribute_type_t atype;
   long int i;
@@ -263,7 +264,7 @@ int igraph_attribute_list_get_many(igraph_attribute_list_t *al,
 
 int igraph_attribute_list_set_many(igraph_attribute_list_t *al, 
 				   const char *name,
-				   vector_t *idx, void *value) {
+				   const vector_t *idx, const void *value) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
   igraph_attribute_type_t atype;
   long int i;
@@ -275,7 +276,7 @@ int igraph_attribute_list_set_many(igraph_attribute_list_t *al,
   atype=VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     vector_t *data=VECTOR(al->data)[pos];
-    vector_t *nvalue=value;
+    const vector_t *nvalue=value;
     long int idxlen=vector_size(nvalue);
     long int j=0;
     for (i=0; i<vector_size(idx); i++) {
@@ -285,7 +286,7 @@ int igraph_attribute_list_set_many(igraph_attribute_list_t *al,
   } else if (atype==IGRAPH_ATTRIBUTE_STR) {
     igraph_strvector_t bak;
     igraph_strvector_t *data=VECTOR(al->data)[pos];
-    igraph_strvector_t *svalue=value;
+    const igraph_strvector_t *svalue=value;
     long int idxlen=igraph_strvector_size(svalue);
     long int j=0;
     IGRAPH_CHECK(igraph_strvector_copy(&bak, data));
@@ -309,7 +310,7 @@ int igraph_attribute_list_set_many(igraph_attribute_list_t *al,
  * \brief Returns an attribute for all elements (untested!)
  */
 
-int igraph_attribute_list_get_all(igraph_attribute_list_t *al, 
+int igraph_attribute_list_get_all(const igraph_attribute_list_t *al, 
 				  const char *name, void **value, 
 				  igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
@@ -346,7 +347,7 @@ int igraph_attribute_list_get_all(igraph_attribute_list_t *al,
  * \brief Returns the number of attributes in an attribute list
  */
 
-long int igraph_attribute_list_size(igraph_attribute_list_t *al) {
+long int igraph_attribute_list_size(const igraph_attribute_list_t *al) {
   return vector_size(&al->types);
 }
 
@@ -401,7 +402,7 @@ int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne) {
  * \brief Returns names of the attributes in an attribute list
  */
 
-int igraph_attribute_list_names(igraph_attribute_list_t *al,
+int igraph_attribute_list_names(const igraph_attribute_list_t *al,
 				igraph_strvector_t *names, vector_t *types) {
   if (names != 0) {
     igraph_strvector_t tmp=*names;
@@ -423,7 +424,7 @@ int igraph_attribute_list_names(igraph_attribute_list_t *al,
  */
 
 int igraph_attribute_list_copy(igraph_attribute_list_t *to,
-			       igraph_attribute_list_t *from) {
+			       const igraph_attribute_list_t *from) {
   long int i;
   igraph_error_handler_t *oldhandler;
   bool_t error=0;
@@ -496,7 +497,7 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
  * its type in the third argument. Returns an error code otherwise.
  */
 
-int igraph_attribute_list_get_type(igraph_attribute_list_t *al, 
+int igraph_attribute_list_get_type(const igraph_attribute_list_t *al, 
 				   const char *name,
 				   igraph_attribute_type_t *type) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
@@ -538,7 +539,8 @@ void igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al,
  */
 
 void igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
-					  vector_t *neg, long int nremove) {
+					   const vector_t *neg, 
+					   long int nremove) {
   long int i;
   al->len -= nremove;
   
@@ -558,7 +560,7 @@ void igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
  * \brief Checks whether the list contains the named attribute
  */
 
-bool_t igraph_attribute_list_has(igraph_attribute_list_t *al, 
+bool_t igraph_attribute_list_has(const igraph_attribute_list_t *al, 
 				 const char *name) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
   return (pos != -1);
@@ -626,7 +628,7 @@ int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
  * attributes of <code>graph</code> is <code>O(1)</code>.)
  */
 
-int igraph_get_graph_attribute(igraph_t *graph, const char *name,
+int igraph_get_graph_attribute(const igraph_t *graph, const char *name,
 			       void **value, igraph_attribute_type_t *type) {
   return igraph_attribute_list_get(&graph->gal, name, 0, value, type);
 }
@@ -647,7 +649,7 @@ int igraph_get_graph_attribute(igraph_t *graph, const char *name,
  */
 
 int igraph_set_graph_attribute(igraph_t *graph, const char *name,
-			       void *value) {
+			       const void *value) {
   return igraph_attribute_list_set(&graph->gal, name, 0, value);
 }
 
@@ -669,7 +671,8 @@ int igraph_set_graph_attribute(igraph_t *graph, const char *name,
  * attributes of <code>graph</code> is <code>O(1)</code>.)
  */
 
-int igraph_list_graph_attributes(igraph_t *graph, igraph_strvector_t *names,
+int igraph_list_graph_attributes(const igraph_t *graph, 
+				 igraph_strvector_t *names,
 				 vector_t *types) {
   return igraph_attribute_list_names(&graph->gal, names, types);
 }
@@ -734,7 +737,7 @@ int igraph_remove_vertex_attribute(igraph_t *graph, const char *name) {
  * <code>O(1)</code> vertex attributes installed.
  */
 
-int igraph_get_vertex_attribute(igraph_t *graph, const char *name,
+int igraph_get_vertex_attribute(const igraph_t *graph, const char *name,
 				long int v, void **value,
 				igraph_attribute_type_t *type) {
   return igraph_attribute_list_get(&graph->val, name, v, value, type);
@@ -756,7 +759,7 @@ int igraph_get_vertex_attribute(igraph_t *graph, const char *name,
  */
 
 int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
-				long int v, void* value) {
+				long int v, const void* value) {
   return igraph_attribute_list_set(&graph->val, name, v, value);
 }
 
@@ -780,15 +783,18 @@ int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
  * attributes.
  */
 
-int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
-				 igraph_vs_t v, void **value) {
+int igraph_get_vertex_attributes(const igraph_t *graph, const char *name,
+				 const igraph_vs_t *v, void **value) {
   int ret;
   igraph_vs_t myv;
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &v, &myv));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, v, &myv));
   IGRAPH_FINALLY(igraph_vs_destroy, &myv);
-  ret=igraph_attribute_list_get_many(&graph->val, name, myv.v, value);
+  ret=igraph_attribute_list_get_many(&graph->val, name, 
+				     igraph_vs_vector_getvector(graph, &myv), 
+				     value);
   igraph_vs_destroy(&myv);
   IGRAPH_FINALLY_CLEAN(1);
+  if (v->shorthand) { igraph_vs_destroy((igraph_vs_t*)v); }
   return ret;
 }
 
@@ -818,14 +824,17 @@ int igraph_get_vertex_attributes(igraph_t *graph, const char *name,
  */
 
 int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
-				 igraph_vs_t v, void *value) {
+				 const igraph_vs_t *v, const void *value) {
   int ret;
   igraph_vs_t myv;
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &v, &myv));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, v, &myv));
   IGRAPH_FINALLY(igraph_vs_destroy, &myv);
-  ret=igraph_attribute_list_set_many(&graph->val, name, myv.v, value);
+  ret=igraph_attribute_list_set_many(&graph->val, name, 
+				     igraph_vs_vector_getvector(graph, &myv), 
+				     value);
   igraph_vs_destroy(&myv);
   IGRAPH_FINALLY_CLEAN(1);
+  if (v->shorthand) { igraph_vs_destroy((igraph_vs_t*)v); }
   return ret;
 }
 
@@ -846,7 +855,7 @@ int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
  * attributes of <code>graph</code> is <code>O(1)</code>.)
  */
 
-int igraph_list_vertex_attributes(igraph_t *graph, igraph_strvector_t *l,
+int igraph_list_vertex_attributes(const igraph_t *graph, igraph_strvector_t *l,
 				  vector_t *types) {
   return igraph_attribute_list_names(&graph->val, l, types);
 }
@@ -912,7 +921,7 @@ int igraph_remove_edge_attribute(igraph_t *graph, const char *name) {
  * <code>O(1)</code> edge attributes installed.
  */
 
-int igraph_get_edge_attribute(igraph_t *graph, const char *name,
+int igraph_get_edge_attribute(const igraph_t *graph, const char *name,
 			      long int e, void **value,
 			      igraph_attribute_type_t *type) {
   return igraph_attribute_list_get(&graph->eal, name, e, value, type);
@@ -935,7 +944,7 @@ int igraph_get_edge_attribute(igraph_t *graph, const char *name,
  */
 
 int igraph_set_edge_attribute(igraph_t *graph, const char *name,
-			      long int e, void *value) {
+			      long int e, const void *value) {
   return igraph_attribute_list_set(&graph->eal, name, e, value);
 }
 
@@ -959,8 +968,8 @@ int igraph_set_edge_attribute(igraph_t *graph, const char *name,
  * attributes.
  */
 
-int igraph_get_edge_attributes(igraph_t *graph, const char *name,
-			       vector_t *e, void **value) {
+int igraph_get_edge_attributes(const igraph_t *graph, const char *name,
+			       const vector_t *e, void **value) {
   return igraph_attribute_list_get_many(&graph->eal, name, e, value);
 }
 
@@ -990,7 +999,7 @@ int igraph_get_edge_attributes(igraph_t *graph, const char *name,
  */
 
 int igraph_set_edge_attributes(igraph_t *graph, const char *name,
-			       vector_t *e, void *value) {
+			       const vector_t *e, const void *value) {
   return igraph_attribute_list_set_many(&graph->eal, name, e, value);
 }
 
@@ -1011,7 +1020,7 @@ int igraph_set_edge_attributes(igraph_t *graph, const char *name,
  * attributes of <code>graph</code> is <code>O(1)</code>.)
  */
 
-int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
+int igraph_list_edge_attributes(const igraph_t *graph, igraph_strvector_t *l,
 				vector_t *types) {
   return igraph_attribute_list_names(&graph->eal, l, types);
 }
@@ -1030,7 +1039,7 @@ int igraph_list_edge_attributes(igraph_t *graph, igraph_strvector_t *l,
  * <code>O(1)</code> graph attributes.
  */
 
-int igraph_get_graph_attribute_type(igraph_t *graph, const char *name,
+int igraph_get_graph_attribute_type(const igraph_t *graph, const char *name,
 				    igraph_attribute_type_t *type) {
   return igraph_attribute_list_get_type(&graph->gal, name, type);
 }
@@ -1049,7 +1058,7 @@ int igraph_get_graph_attribute_type(igraph_t *graph, const char *name,
  * <code>O(1)</code> vertex attributes.
  */
 
-int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name,
+int igraph_get_vertex_attribute_type(const igraph_t *graph, const char *name,
 				     igraph_attribute_type_t *type) {
   return igraph_attribute_list_get_type(&graph->val, name, type);
 }
@@ -1068,7 +1077,7 @@ int igraph_get_vertex_attribute_type(igraph_t *graph, const char *name,
  * <code>O(1)</code> edge attributes.
  */
 
-int igraph_get_edge_attribute_type(igraph_t *graph, const char *name,
+int igraph_get_edge_attribute_type(const igraph_t *graph, const char *name,
 				   igraph_attribute_type_t *type) {
   return igraph_attribute_list_get_type(&graph->eal, name, type);
 }
@@ -1086,7 +1095,7 @@ int igraph_get_edge_attribute_type(igraph_t *graph, const char *name,
  * <code>O(1)</code> edge attributes.
  */
 
-bool_t igraph_has_graph_attribute(igraph_t *graph, const char *name) {
+bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name) {
   return igraph_attribute_list_has(&graph->gal, name); 
 }
 
@@ -1103,7 +1112,7 @@ bool_t igraph_has_graph_attribute(igraph_t *graph, const char *name) {
  * <code>O(1)</code> edge attributes.
  */
 
-bool_t igraph_has_vertex_attribute(igraph_t *graph, const char *name) {
+bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name) {
   return igraph_attribute_list_has(&graph->val, name); 
 }
 
@@ -1120,6 +1129,6 @@ bool_t igraph_has_vertex_attribute(igraph_t *graph, const char *name) {
  * <code>O(1)</code> edge attributes.
  */
 
-bool_t igraph_has_edge_attribute(igraph_t *graph, const char *name) {
+bool_t igraph_has_edge_attribute(const igraph_t *graph, const char *name) {
   return igraph_attribute_list_has(&graph->eal, name); 
 }

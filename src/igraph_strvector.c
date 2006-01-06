@@ -79,7 +79,8 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
  * \brief Returns an element of a string vector.
  */
 
-void igraph_strvector_get(igraph_strvector_t *sv, long int idx, char **value) {
+void igraph_strvector_get(const igraph_strvector_t *sv, long int idx, 
+			  char **value) {
   assert(sv != 0);
   assert(sv->data != 0);
   assert(sv->data[idx] != 0);
@@ -187,7 +188,8 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
  * \todo why does the assert fail
  */
 
-int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from) {
+int igraph_strvector_copy(igraph_strvector_t *to, 
+			  const igraph_strvector_t *from) {
   long int i;
   char *str;
   assert(from != 0);
@@ -277,7 +279,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
  * \todo repair assert
  */
 
-long int igraph_strvector_size(igraph_strvector_t *sv) {
+long int igraph_strvector_size(const igraph_strvector_t *sv) {
   assert(sv != 0);
   assert(sv->data != 0);
   return sv->len;
@@ -340,7 +342,7 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index,
  * \brief Removes elements from a string vector (for internal use)
  */
 
-void igraph_strvector_remove_negidx(igraph_strvector_t *v, vector_t *neg, 
+void igraph_strvector_remove_negidx(igraph_strvector_t *v, const vector_t *neg,
 				   long int nremove) {
   long int i, idx=0;
   char **tmp;

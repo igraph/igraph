@@ -25,9 +25,9 @@
 
 #include <math.h>
 
-int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl,
+int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
 				  matrix_t *sd,
-				  vector_t *st, integer_t pagebins,
+				  const vector_t *st, integer_t pagebins,
 				  integer_t pmaxind, bool_t lsd) {
 
   long int agebins=pagebins;
@@ -140,8 +140,8 @@ int igraph_measure_dynamics_idage(igraph_t *graph, matrix_t *akl,
   return 0;
 }
 
-int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
-				     matrix_t *akl) {
+int igraph_measure_dynamics_idage_st(const igraph_t *graph, vector_t *res,
+				     const matrix_t *akl) {
 
   long int agebins=matrix_ncol(akl);
   long int no_of_nodes=igraph_vcount(graph);
@@ -192,9 +192,9 @@ int igraph_measure_dynamics_idage_st(igraph_t *graph, vector_t *res,
   return 0;
 }
 
-int igraph_measure_dynamics_idage_debug(igraph_t *graph, matrix_t *akl,
+int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
 					matrix_t *sd,
-					vector_t *st, integer_t pagebins,
+					const vector_t *st, integer_t pagebins,
 					integer_t pmaxind, bool_t lsd,
 					vector_t *estimates, 
 					integer_t est_ind, integer_t est_age) {

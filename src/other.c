@@ -41,7 +41,8 @@
  * the data vector.
  */
 
-int igraph_running_mean(vector_t *data, vector_t *res, integer_t binwidth) {
+int igraph_running_mean(const vector_t *data, vector_t *res, 
+			integer_t binwidth) {
 
   double sum=0;
   long int i;

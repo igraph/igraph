@@ -40,7 +40,8 @@
  * Time complexity: <code>O(d)</code>, <code>d</code> is the
  * out-degree of <code>v1</code>.
  */
-bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
+bool_t igraph_are_connected(const igraph_t *graph, 
+			    integer_t v1, integer_t v2) {
 
   igraph_vs_t it;
   bool_t res=0;
@@ -51,7 +52,7 @@ bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
 /*     IGRAPH_ERROR("are connected", IGRAPH_EINVVID); */
   }
 
-  it=igraph_vs_adj(graph, v1, IGRAPH_OUT);
+  IGRAPH_CHECK(igraph_vs_adj(graph, &it, v1, IGRAPH_OUT));
   
   while (!res && !igraph_vs_end(graph, &it)) {
     res= (igraph_vs_get(graph, &it) == v2);

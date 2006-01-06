@@ -1,3 +1,16 @@
+
+These are needed for the first release:
+------------------------------------
+
+o complete R iterators interface
+o prefix each exported name with igraph_
+o write user's manual
+o write R documentation
+o realese script :)
+
+Others:
+------
+
 o write tutorial
 o add some iterators: in-, pre-, post-order, depth-first, breadth-first
   search, iterators based on attributes etc.
@@ -6,11 +19,8 @@ o add conversion methods for different file formats
 o comunity detection algorithms
 o add 3d layout functions
 o multicompartmental layout functions
-o error handling for iterators
 o function for merge networks
 o add data sets to the R package
 o add automatic tests
-o iterators as edge and vertex sets
 
-o PageRank calculation
 o Hamilton and Euler circles/paths

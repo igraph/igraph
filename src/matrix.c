@@ -105,7 +105,7 @@ int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
  * Time complexity: <code>O(1)</code>.
  */
 
-long int matrix_size(matrix_t *m) {
+long int matrix_size(const matrix_t *m) {
   return (m->nrow) * (m->ncol);
 }
 
@@ -119,7 +119,7 @@ long int matrix_size(matrix_t *m) {
  * Time complexity: <code>O(1)</code>.
  */
 
-long int matrix_nrow(matrix_t *m) {
+long int matrix_nrow(const matrix_t *m) {
   return m->nrow;
 }
 
@@ -133,7 +133,7 @@ long int matrix_nrow(matrix_t *m) {
  * Time complexity: <code>O(1)</code>.
  */
 
-long int matrix_ncol(matrix_t *m) {
+long int matrix_ncol(const matrix_t *m) {
   return m->ncol;
 }
 
@@ -153,7 +153,7 @@ long int matrix_ncol(matrix_t *m) {
  * elements in the matrix.
  */
 
-int matrix_copy_to(matrix_t *m, real_t *to) {
+int matrix_copy_to(const matrix_t *m, real_t *to) {
   vector_copy_to(&m->data, to);
   return 0;
 }
@@ -255,7 +255,7 @@ int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove) {
  * \brief Copies a matrix.
  */
 
-int matrix_copy(matrix_t *to, matrix_t *from) {
+int matrix_copy(matrix_t *to, const matrix_t *from) {
   to->nrow = from->nrow;
   to->ncol = from->ncol;
   return vector_copy(&to->data, &from->data);

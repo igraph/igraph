@@ -23,7 +23,7 @@
 #include "igraph.h"
 #include "memory.h"
 
-int igraph_i_adjlist_init(igraph_t *graph, igraph_i_adjlist_t *al, 
+int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al, 
 			  igraph_neimode_t mode) {
   long int i;
 

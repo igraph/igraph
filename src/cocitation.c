@@ -23,7 +23,8 @@
 #include "igraph.h"
 #include "memory.h"
 
-int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids, 
+int igraph_cocitation_real(const igraph_t *graph, matrix_t *res, 
+			   const igraph_vs_t *vids, 
 			   igraph_neimode_t mode);
 
 /**
@@ -54,7 +55,8 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids,
  * \sa igraph_bibcoupling()
  */
 
-int igraph_cocitation(igraph_t *graph, matrix_t *res, igraph_vs_t vids) {
+int igraph_cocitation(const igraph_t *graph, matrix_t *res, 
+		      const igraph_vs_t *vids) {
   return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT);
 }
 
@@ -86,11 +88,13 @@ int igraph_cocitation(igraph_t *graph, matrix_t *res, igraph_vs_t vids) {
  * \sa igraph_cocitation()
  */
 
-int igraph_bibcoupling(igraph_t *graph, matrix_t *res, igraph_vs_t vids) {
+int igraph_bibcoupling(const igraph_t *graph, matrix_t *res, 
+		       const igraph_vs_t *vids) {
   return igraph_cocitation_real(graph, res, vids, IGRAPH_IN);
 }
 
-int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids,
+int igraph_cocitation_real(const igraph_t *graph, matrix_t *res, 
+			   const igraph_vs_t *vids,
 			   igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -99,11 +103,13 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids,
   matrix_t tmpres=MATRIX_NULL;
   vector_t neis=VECTOR_NULL;
   igraph_vs_t myvids;
+  const vector_t *myvidsv;
   
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
+  myvidsv=igraph_vs_vector_getvector(graph, &myvids);
 
-  if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
+  if (!vector_isininterval(myvidsv, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("", IGRAPH_EINVVID);
   }
   
@@ -113,13 +119,13 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids,
   }  
   IGRAPH_FINALLY(free, calc); 	/* TODO: hack */
 
-  for (i=0; i<vector_size(myvids.v); i++) {
-    calc[ (long int) VECTOR(*myvids.v)[i] ] = 1;
+  for (i=0; i<vector_size(myvidsv); i++) {
+    calc[ (long int) VECTOR(*myvidsv)[i] ] = 1;
   }
   
   MATRIX_INIT_FINALLY(&tmpres, no_of_nodes, no_of_nodes);
   VECTOR_INIT_FINALLY(&neis, 0);
-  IGRAPH_CHECK(matrix_resize(res, vector_size(myvids.v), no_of_nodes));
+  IGRAPH_CHECK(matrix_resize(res, vector_size(myvidsv), no_of_nodes));
 
   /* The result */
   
@@ -138,9 +144,9 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids,
   }
 
   /* Copy result */
-  for (i=0; i<vector_size(myvids.v); i++) {
+  for (i=0; i<vector_size(myvidsv); i++) {
     for (j=0; j<no_of_nodes; j++) {
-      MATRIX(*res, i, j) = MATRIX(tmpres, (long int) VECTOR(*myvids.v)[i], j);
+      MATRIX(*res, i, j) = MATRIX(tmpres, (long int) VECTOR(*myvidsv)[i], j);
     }
   }  
   
@@ -150,6 +156,7 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids,
   Free(calc);
   igraph_vs_destroy(&myvids);
   IGRAPH_FINALLY_CLEAN(4);
-  
+
+  if (vids->shorthand) { igraph_vs_destroy((igraph_vs_t*)vids); }  
   return 0;
 }

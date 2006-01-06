@@ -31,5 +31,6 @@ void igraphmodule_igraph_error_hook(const char *reason, const char *file,
   char buf[4096];
   sprintf(buf, "Error at %s:%i: %s, %s", file, line, reason,
 	  igraph_strerror(igraph_errno));
+  IGRAPH_FINALLY_FREE();
   PyErr_SetString(igraphmodule_InternalError, buf);
 }

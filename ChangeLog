@@ -1,3 +1,194 @@
+2006-01-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_es_seq) : added
+	(igraph_i_vstable, igraph_i_estable) : added
+
+	* interfaces/R/src/rinterface.c (R_igraph_vs_to_SEXP)
+	(R_igraph_es_to_SEXP, R_SEXP_to_igraph_vs, R_SEXP_to_igraph_es_copy) :
+	rewritten
+	(R_igraph_delete_vertices, R_igraph_degree, R_igraph_closeness)
+	(R_igraph_betweenness, R_igraph_cocitation, R_igraph_bibcoupling)
+	(R_igraph_shortest_paths, R_igraph_subgraph)
+	(R_igraph_get_vertex_attributes, R_igraph_set_vertex_attributes)
+	(R_igraph_vs_next, R_igraph_es_next, R_igraph_vs_reset)
+	(R_igraph_es_reset, R_igraph_vs_end, R_igraph_es_end)
+	(R_igraph_vs_get, R_igraph_es_get, R_igraph_es_from, R_igraph_es_to) :
+	vertex and edge seq handling updated
+	* interfaces/R/igraph/R/iterators.R (all) : rewritten
+
+	* src/iterators.c (igraph_vs_vectorview_it) : memory leak cured
+	* src/type_indexededgelist.c (igraph_degree) : memory leak cured
+
+	* interfaces/python/error.c (igraphmodule_igraph_error_hook) :
+	memory leak(s) cured, IGRAPH_FINALLY_FREE() added
+
+	* interfaces/R/src/rinterface.c (R_igraph_myhandler) : 
+	memory leak(s) cured, IGRAPH_FINALLY_FREE() added
+
+	* interfaces/R/src/rinterface.c (R_SEXP_to_attributes) :
+	vector_ptr_as_vector changed to vector_ptr_view
+	
+2006-01-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_es_to_SEXP)
+	(R_SEXP_to_igraph_vs, R_SEXP_to_igraph_es) : updated
+	(R_igraph_vs_next, R_igraph_vs_reset, R_igraph_es_next)
+	(R_igraph_es_reset) : bug corrected (double destroy)
+
+	* src/iterators.c (igraph_es_vector_getvector) : added
+
+2005-12-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph.h (igraph_es_t) : redesigned
+	* src/iterators.c (igraph_vs_unfold) : unfold to vector passed as an
+	argument
+	(IGRAPH_ES_ALL, IGRAPH_ES_1, IGRAPH_ES_VECTOR, IGRAPH_ES) : added
+	(igraph_es_vectorview, igraph_es_vector, igraph_es_vectorview_it)
+	(igraph_es_vector_small, igraph_es_end_vectorview)
+	(igraph_es_get_vectorview, igraph_es_from_vectorview)
+	(igraph_es_to_vectorview, igraph_es_destroy_vectorview) : rewritten
+	(igraph_es_fromto) : rewritten
+	(igraph_es_next_formto, igraph_es_end_fromto, igraph_es_reset_fromto)
+	(igraph_es_get_fromto, igraph_es_from_fromto, igraph_es_to_fromto)
+	(igraph_es_unfold_fromto, igraph_es_destroy_fromto) : removed
+
+	* src/iterators.c : all constructors set shorthand to zero
+
+2005-12-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_vs_vector_small, IGRAPH_VS) : added
+	* examples/simple/igraph_vs_vector.c : updated
+
+	* src/vector.c (igraph_init_real_end, igraph_init_int_end) :
+	rewritten to allocate exactly the needed space
+
+2005-12-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/vector.c (vector_init_real, vector_init_int)
+	(vector_init_real_end, vector_init_int_end) : added
+	* examples/simple/vector.c : updated
+
+2005-12-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+	
+	* src/igraph.h (igraph_vs_t) : redesigned
+	* src/iterators.c (igraph_i_vs_all, igraph_i_vs_none, igraph_i_vs_1)
+	(igraph_i_vs_vector, igraph_vs_create_view_as_vector) : removed
+	(IGRAPH_VS_ALL, IGRAPH_VS_NONE, IGRAPH_VS_1, IGRAPH_VS_VECTOR) : added
+	(igraph_vs_unfold) : unfold to vector passed as an argument
+	(igraph_vs_destroy_all, igraph_vs_destroy_adj, igraph_vs_destroy_rw)
+	(igraph_vs_destroy_rw1, igraph_vs_destroy_none,  igraph_vs_destroy_1)
+	(igraph_vs_destroy_seq) : free if shorthand
+	(igraph_vs_vectorview, igraph_vs_vector, igraph_vs_vectorview_it)
+	(igraph_vs_end_vectorview, igraph_vs_end_vectorview)
+	(igraph_vs_unfold_vectorview, igraph_vs_destroy_vectorview) 
+	(igraph_vs_vector_getvector) : redesigned, added
+	* src/layout.c : updated
+	* src/structural_properties.c : updated
+	* src/type_indexededgelist.c : updated
+	* igraph/src/rinterface.c : updated
+	* src/cocitation.c : updated
+	* src/attributes.c : updated
+	* interfaces/python/graphobject.c : updated
+	* examples/simple/igraph_es_fromto.c : updated
+	* examples/simple/igraph_barabasi_game.c : updated
+	* examples/simple/igraph_degree.c : updated
+	* examples/simple/igraph_delete_vertices.c : updated
+	* examples/simple/igraph_pagerank.c : updated
+	
+	* src/igraph.h (igraph_es_t) : view removed
+	* src/iterators.c (igraph_i_es_all, igraph_i_es_none, igraph_i_es_1)
+	(igraph_i_es_vector) : removed
+
+	* src/iterators.c (igraph_es_fromto) : rewritten, it works
+
+	* src/vector.c (vector_view) : rewritten
+	* src/vector_ptr.c (vector_ptr_view) : rewritten
+	
+	* examples/simple/vector_ptr.c : bug corrected
+	
+2005-12-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_vs_all, igraph_vs_adj, igraph_vs_rw)
+	(igraph_vs_rw1, igraph_vs_none, igraph_vs_1, igraph_vs_seq)
+	(igraph_vs_vector, igraph_es_all, igraph_es_none, igraph_es_1)
+	(igraph_es_fromorder, igraph_es_adj, igraph_es_vector) : return error 
+	code
+	
+	* src/iterators.c (igraph_i_vs_all, igraph_i_vs_none)
+	(igraph_i_vs_1, igraph_i_vs_vector, igraph_i_es_all, igraph_i_es_none)
+	(igraph_i_es_1, igraph_i_es_vector) : added
+
+	* src/iterators.c (igraph_vs_vector, igraph_es_vector) : added
+	* src/iterators.c (igraph_vs_vectorview, igraph_es_vectorview) :
+	renamed from *_vector
+
+	* src/iterators.c (igraph_es_fromto) : added
+
+	* src/vector.c (vector_as_vector) : removed
+	* src/vector.c (vector_view) : added
+	* src/vector_ptr.c (vector_ptr_as_vector) : removed
+	* src/vector_ptr.c (vector_ptr_view) : added
+
+	* src/vector.c (vector_binsearch) : added
+	
+	* src/adjlist.c (igraph_i_adjlist_init) : const added
+	* src/attributes.c (igraph_i_attribute_list_get_pos)
+	(igraph_attribute_list_get, igraph_attribute_list_set)
+	(igraph_attribute_list_get_many, igraph_attribute_list_set_many)
+	(igraph_attribute_list_get_all, igraph_attribute_list_all)
+	(igraph_attribute_list_names, igraph_attribute_list_copy)
+	(igraph_attribute_list_get_type, igraph_attribute_list_remove_elem_neg)
+	(igraph_attribute_list_has, igraph_get_graph_attribute)
+	(igraph_set_graph_attribute, igraph_list_graph_attributes)
+	(igraph_get_vertex_attribute, igraph_set_vertex_attribute)
+	(igraph_get_vertex_attributes, igraph_set_vertex_attributes)
+	(igraph_list_vertex_attributes, igraph_get_edge_attribute)
+	(igraph_set_edge_attribute, igraph_get_edge_attributes)
+	(igraph_set_edge_attributes, igraph_list_edge_attributes)
+	(igraph_get_graph_attribute_type, igraph_get_vertex_attribute_type)
+	(igraph_get_edge_attribute_type, igraph_has_graph_attribute)
+	(igraph_has_vertex_attribute, igraph_has_edge_attribute) : const added
+	* src/basic_query.c (igraph_are_connected): const added
+	* src/cocitation.c (igraph_cocitation_real, igraph_cocitation)
+	(igraph_bibcoupling) : const added
+	* src/components.c (igraph_clusters_weak, igraph_clusters_strong)
+	(igraph_clusters, igraph_is_connected_weak, igraph_is_connected) :
+	const added
+	* src/conversion.c (igraph_get_adjacency, igraph_get_edgelist) :
+	const added
+	* src/foreign.c (igraph_write_graph_edgelist, igraph_write_graph_ncol)
+	(igraph_write_graph_lgl) : const added
+	* src/games.c (igraph_barabasi_game, igraph_degree_sequence_game)
+	(igraph_degree_sequence_game_simple) : const added
+	* src/iterators.c (almost all functions) : const added	
+	* src/igraph_strvector.c (igraph_strvector_get, igraph_strvector_copy)
+	(igraph_strvecto_size, igraph_strvector_remove_negidx) : const added
+	* src/layout.c (igraph_layout_random, igraph_layout_circle)
+	(igraph_layout_fruchterman_reingold, igraph_layout_kamada_kawai)
+	(igraph_layout_springs) : const added
+	* src/matrix.c (matrix_size, matrix_nrow, matrix_ncol, matrix_copy_to)
+	(matrix_copy) : const added
+	* src/measure_dynamics.c (igraph_measure_dynamics_idage)
+	(igraph_measure_dynamics_isage_st, igraph_measure_dynamics_idage_debug)
+	: const added
+	* src/other.c (igraph_running_mean) : const added
+	* src/structure_generators.c (igraph_create, igraph_lattice) :
+	const added
+	* src/type_indexededgelist.c (igraph_copy, igraph_add_edges)
+	(igraph_delete_edges, igraph_delete_vertices, igraph_vcount)
+	(igraph_ecount, igraph_neighbors, igraph_is_directed, igraph_degree) :
+	const added
+	* src/vector.c (vector_empty, vector_size, vector_e, vector_e_ptr)
+	(vector_tail, vector_order, vector_max, vector_copy_to, vector_copy)
+	(vector_sum, vector_prod, vector_remove_negidx, vector_isininterval)
+	(vector_any_smaller, vector_is_equal) : const added
+	* src/vector_ptr.c (vector_ptr_empty, vector_ptr_size)
+	(vector_ptr_e, vector_ptr_copy_to, vector_ptr_copy) : const added
+	
+	* igraph/src/rinterface.c (R_SEXP_to_vector, R_SEXP_to_vector_copy)
+	(vector_ptr_as_vector) : added
+	
+	
 2005-12-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* configure.in : added switch for profiling

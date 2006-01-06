@@ -23,10 +23,10 @@
 #include "igraph.h"
 #include "memory.h"
 
-int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
+int igraph_clusters_weak(const igraph_t *graph, vector_t *membership,
 			 vector_t *csize);
 
-int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
+int igraph_clusters_strong(const igraph_t *graph, vector_t *membership,
 			   vector_t *csize);
 
 /**
@@ -54,8 +54,8 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
 
 #include <string.h>
 
-int igraph_clusters(igraph_t *graph, vector_t *membership, vector_t *csize, 
-		    igraph_connectedness_t mode) {
+int igraph_clusters(const igraph_t *graph, vector_t *membership, 
+		    vector_t *csize, igraph_connectedness_t mode) {
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
     return igraph_clusters_weak(graph, membership, csize);
   } else if (mode==IGRAPH_STRONG) {
@@ -67,7 +67,7 @@ int igraph_clusters(igraph_t *graph, vector_t *membership, vector_t *csize,
   return 1;
 }
 
-int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
+int igraph_clusters_weak(const igraph_t *graph, vector_t *membership,
 			 vector_t *csize) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -128,7 +128,7 @@ int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
   return 0;
 }
 
-int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
+int igraph_clusters_strong(const igraph_t *graph, vector_t *membership,
 			   vector_t *csize) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -222,7 +222,7 @@ int igraph_clusters_strong(igraph_t *graph, vector_t *membership,
   return 0;
 }
 
-int igraph_is_connected_weak(igraph_t *graph, bool_t *res);
+int igraph_is_connected_weak(const igraph_t *graph, bool_t *res);
 
 /**
  * \ingroup structural
@@ -243,7 +243,7 @@ int igraph_is_connected_weak(igraph_t *graph, bool_t *res);
  */
 
 
-int igraph_is_connected(igraph_t *graph, bool_t *res, 
+int igraph_is_connected(const igraph_t *graph, bool_t *res, 
 			igraph_connectedness_t mode) {
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
     return igraph_is_connected_weak(graph, res);
@@ -265,7 +265,7 @@ int igraph_is_connected(igraph_t *graph, bool_t *res,
   return 0;
 }
 
-int igraph_is_connected_weak(igraph_t *graph, bool_t *res) {
+int igraph_is_connected_weak(const igraph_t *graph, bool_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   char *already_added;

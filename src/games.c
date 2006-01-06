@@ -54,7 +54,8 @@
  */
 
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
-			 vector_t *outseq, bool_t outpref, bool_t directed) {
+			 const vector_t *outseq, bool_t outpref, 
+			 bool_t directed) {
 
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
@@ -357,8 +358,9 @@ int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
   return retval;
 }
 
-int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
-				       vector_t *in_seq) {
+int igraph_degree_sequence_game_simple(igraph_t *graph, 
+				       const vector_t *out_seq, 
+				       const vector_t *in_seq) {
 
   long int outsum=0, insum=0;
   bool_t directed=(in_seq != 0 && vector_size(in_seq)!=0);
@@ -501,8 +503,9 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
  * \sa barabasi_game(), erdos_renyi_game()
  */
 
-int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
-				vector_t *in_deg, igraph_degseq_t method) {
+int igraph_degree_sequence_game(igraph_t *graph, const vector_t *out_deg,
+				const vector_t *in_deg, 
+				igraph_degseq_t method) {
 
   int retval;
 

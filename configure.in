@@ -147,13 +147,25 @@ if test "$use_gprof" == "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
+rpackage=no
+AC_ARG_ENABLE(rpackage,
+              AC_HELP_STRING([--enable-rpackage], 
+	      [Create a GNU R source package]),
+              [rpackage=$enableval], [rpackage=no])
+
+if test "$rpackage" == "yes"; then
+  RPACKAGE=1
+fi
+AM_CONDITIONAL(RPACKAGE, test x$rpackage = xyes)
+
 # DOCS
 GTK_DOC_CHECK(1.4)
 
-AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile doc/Makefile interfaces/R/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
 AC_MSG_RESULT([  Python interface       -- $use_python])
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
+AC_MSG_RESULT([  Create R package       -- $rpackage])

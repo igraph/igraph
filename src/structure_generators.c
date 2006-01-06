@@ -46,7 +46,7 @@
  * number of vertices, <code>|E|</code> the number of edges in the
  * graph.
  */
-int igraph_create(igraph_t *graph, vector_t *edges, integer_t n, 
+int igraph_create(igraph_t *graph, const vector_t *edges, integer_t n, 
 		  bool_t directed) {
   real_t max=vector_max(edges)+1;
 
@@ -417,7 +417,7 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
  * <code>|V|</code> and <code>|E|</code> are the number of vertices
  * and edges in the generated graph.
  */
-int igraph_lattice(igraph_t *graph, vector_t *dimvector, integer_t nei, 
+int igraph_lattice(igraph_t *graph, const vector_t *dimvector, integer_t nei, 
 		   bool_t directed, bool_t mutual, bool_t circular) {
 
   long int dims=vector_size(dimvector);

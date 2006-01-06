@@ -41,35 +41,37 @@ int igraph_attribute_list_add(igraph_attribute_list_t *al,
 			      const char *name, igraph_attribute_type_t type);
 int igraph_attribute_list_remove(igraph_attribute_list_t *al, 
 				 const char *name);
-int igraph_attribute_list_get(igraph_attribute_list_t *al, const char *name, 
-			  long int idx, void **value, 
-			  igraph_attribute_type_t *type);
+int igraph_attribute_list_get(const igraph_attribute_list_t *al, 
+			      const char *name, 
+			      long int idx, void **value, 
+			      igraph_attribute_type_t *type);
 int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
-			  long int idx, void *value);
-int igraph_attribute_list_get_many(igraph_attribute_list_t *al, 
+			      long int idx, const void *value);
+int igraph_attribute_list_get_many(const igraph_attribute_list_t *al, 
 				   const char *name,
-				   vector_t *idx, void **value);
+				   const vector_t *idx, void **value);
 int igraph_attribute_list_set_many(igraph_attribute_list_t *al, 
 				   const char *name,
-				   vector_t *idx, void *value);
-int igraph_attribute_list_get_all(igraph_attribute_list_t *al, 
+				   const vector_t *idx, const void *value);
+int igraph_attribute_list_get_all(const igraph_attribute_list_t *al, 
 				  const char *name,
 				  void **value, igraph_attribute_type_t *type);
-long int igraph_attribute_list_size(igraph_attribute_list_t *al);
+long int igraph_attribute_list_size(const igraph_attribute_list_t *al);
 int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne);
-int igraph_attribute_list_names(igraph_attribute_list_t *al,
+int igraph_attribute_list_names(const igraph_attribute_list_t *al,
 				igraph_strvector_t *names, vector_t *types);
 int igraph_attribute_list_copy(igraph_attribute_list_t *to,
-			       igraph_attribute_list_t *from);
-int igraph_attribute_list_get_type(igraph_attribute_list_t *al, 
+			       const igraph_attribute_list_t *from);
+int igraph_attribute_list_get_type(const igraph_attribute_list_t *al, 
 				   const char *name,
 				   igraph_attribute_type_t *type);
-bool_t igraph_attribute_list_has(igraph_attribute_list_t *graph, 
+bool_t igraph_attribute_list_has(const igraph_attribute_list_t *graph, 
 				 const char *name);
 
 void igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al, 
 					   long int *index, long int nremove);
 void igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
-					   vector_t *neg, long int nremove);
+					   const vector_t *neg, 
+					   long int nremove);
 
 #endif

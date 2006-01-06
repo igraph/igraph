@@ -46,7 +46,7 @@
  * times the number of edges.
  */
 
-int igraph_diameter(igraph_t *graph, integer_t *res, 
+int igraph_diameter(const igraph_t *graph, integer_t *res, 
 		    bool_t directed, bool_t unconn) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -131,7 +131,7 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
  * times the number of edges.
  */
 
-int igraph_average_path_length(igraph_t *graph, real_t *res,
+int igraph_average_path_length(const igraph_t *graph, real_t *res,
 			       bool_t directed, bool_t unconn) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n;
@@ -226,7 +226,8 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
  * \sa igraph_minimum_spanning_tree_prim() for weighted graphs.
  */
 
-int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
+int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph, 
+					    igraph_t *mst) {
 
   long int no_of_nodes=igraph_vcount(graph);
   char *already_added;
@@ -316,8 +317,8 @@ int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
  * \sa igraph_minimum_spanning_tree_unweighted() for unweighted graphs.
  */
 
-int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
-				      vector_t *weights) {
+int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
+				      const vector_t *weights) {
 
   long int no_of_nodes=igraph_vcount(graph);
   char *already_added;
@@ -343,7 +344,7 @@ int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
   IGRAPH_CHECK(d_indheap_init(&heap, 0));
   IGRAPH_FINALLY(d_indheap_destroy, &heap);
   IGRAPH_CHECK(vector_reserve(&edges, (no_of_nodes-1)*2));
-  it=igraph_es_adj(graph, 0, mode);
+  IGRAPH_CHECK(igraph_es_adj(graph, &it, 0, mode));
   IGRAPH_FINALLY(igraph_es_destroy, &it);
 
   for (i=0; i<no_of_nodes; i++) {
@@ -442,7 +443,8 @@ int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
  * \sa Other centrality types: igraph_degree(), igraph_betweenness().
  */
 
-int igraph_closeness(igraph_t *graph, vector_t *res, igraph_vs_t vids, 
+int igraph_closeness(const igraph_t *graph, vector_t *res, 
+		     const igraph_vs_t *vids, 
 		     igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -455,17 +457,19 @@ int igraph_closeness(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   long int nodes_to_calc;
   vector_t tmp;
   igraph_vs_t myvids;
+  const vector_t *myvidsv;
 
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
+  myvidsv=igraph_vs_vector_getvector(graph, &myvids);
 
-  nodes_to_calc=vector_size(myvids.v);
+  nodes_to_calc=vector_size(myvidsv);
   
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
     IGRAPH_ERROR("calculating closeness", IGRAPH_EINVMODE);
   }
-  if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
+  if (!vector_isininterval(myvidsv, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("calculating closeness", IGRAPH_EINVVID);
   }
 
@@ -477,10 +481,10 @@ int igraph_closeness(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   vector_null(res);
   
   for (i=0; i<nodes_to_calc; i++) {
-    IGRAPH_CHECK(dqueue_push(&q, VECTOR(*myvids.v)[i]));
+    IGRAPH_CHECK(dqueue_push(&q, VECTOR(*myvidsv)[i]));
     IGRAPH_CHECK(dqueue_push(&q, 0));
     nodes_reached=1;
-    VECTOR(already_counted)[(long int)VECTOR(*myvids.v)[i]]=i+1;
+    VECTOR(already_counted)[(long int)VECTOR(*myvidsv)[i]]=i+1;
     
     while (!dqueue_empty(&q)) {
       long int act=dqueue_pop(&q);
@@ -508,6 +512,7 @@ int igraph_closeness(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   igraph_vs_destroy(&myvids);
   IGRAPH_FINALLY_CLEAN(4);
   
+  if (vids->shorthand) { igraph_vs_destroy((igraph_vs_t*)vids); }
   return 0;
 }
 
@@ -545,8 +550,8 @@ int igraph_closeness(igraph_t *graph, vector_t *res, igraph_vs_t vids,
  * \sa igraph_get_shortest_paths() to get the paths themselves.
  */
 
-int igraph_shortest_paths(igraph_t *graph, matrix_t *res, 
-			  igraph_vs_t from, igraph_neimode_t mode) {
+int igraph_shortest_paths(const igraph_t *graph, matrix_t *res, 
+			  const igraph_vs_t *from, igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_from;
@@ -557,13 +562,15 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
   long int i, j;
   vector_t tmp=VECTOR_NULL;
   igraph_vs_t myfrom;
+  const vector_t *myfromv;
 
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &from, &myfrom));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, from, &myfrom));
   IGRAPH_FINALLY(igraph_vs_destroy, &myfrom);
+  myfromv=igraph_vs_vector_getvector(graph, &myfrom);
 
-  no_of_from=vector_size(myfrom.v);
+  no_of_from=vector_size(myfromv);
 
-  if (!vector_isininterval(myfrom.v, 0, no_of_nodes-1)) {
+  if (!vector_isininterval(myfromv, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("shortest paths failed", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
@@ -583,9 +590,9 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
 
   for (i=0; i<no_of_from; i++) {
     long int reached=1;
-    IGRAPH_CHECK(dqueue_push(&q, VECTOR(*myfrom.v)[i]));
+    IGRAPH_CHECK(dqueue_push(&q, VECTOR(*myfromv)[i]));
     IGRAPH_CHECK(dqueue_push(&q, 0));
-    already_counted[ (long int) VECTOR(*myfrom.v)[i] ] = i+1;
+    already_counted[ (long int) VECTOR(*myfromv)[i] ] = i+1;
     
     while (!dqueue_empty(&q)) {
       long int act=dqueue_pop(&q);
@@ -605,7 +612,7 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
     /* Plus the unreachable nodes */
     j=0;
     while (reached < no_of_nodes) {
-      if (MATRIX(*res, i, j) == 0 && j != VECTOR(*myfrom.v)[i]) {
+      if (MATRIX(*res, i, j) == 0 && j != VECTOR(*myfromv)[i]) {
 	MATRIX(*res, i, j)=no_of_nodes;
 	reached++;
       }
@@ -620,6 +627,7 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
   igraph_vs_destroy(&myfrom);
   IGRAPH_FINALLY_CLEAN(4);
 
+  if (from->shorthand) { igraph_vs_destroy((igraph_vs_t*)from); }
   return 0;
 }
 
@@ -661,7 +669,7 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
  */
  
 
-int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
+int igraph_get_shortest_paths(const igraph_t *graph, vector_t *res,
 			      integer_t from, igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -763,7 +771,7 @@ int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
  * a given set of vertices and the edges between them.
  */
 
-int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex, 
+int igraph_subcomponent(const igraph_t *graph, vector_t *res, real_t vertex, 
 			igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -845,7 +853,8 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
  *     of the edges in a graph.
  */
 
-int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids, 
+int igraph_betweenness (const igraph_t *graph, vector_t *res, 
+			const igraph_vs_t *vids, 
 			bool_t directed) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -859,11 +868,13 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
   vector_t tmp=VECTOR_NULL;
   integer_t modein, modeout;
   igraph_vs_t myvids;
+  const vector_t *myvidsv;
 
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
+  myvidsv=igraph_vs_vector_getvector(graph, &myvids);
 
-  if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
+  if (!vector_isininterval(myvidsv, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("betweenness failed", IGRAPH_EINVVID);
   }
 
@@ -893,7 +904,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
   igraph_stack_init(&stack, no_of_nodes);
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
     
-  IGRAPH_CHECK(vector_resize(res, vector_size(myvids.v)));
+  IGRAPH_CHECK(vector_resize(res, vector_size(myvidsv)));
   vector_null(res);
 
   /* here we go */
@@ -950,8 +961,8 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
     }
     
     /* Ok, we've the scores for this source */
-    for (j=0; j<vector_size(myvids.v); j++) {
-      long int node=VECTOR(*myvids.v)[j];
+    for (j=0; j<vector_size(myvidsv); j++) {
+      long int node=VECTOR(*myvidsv)[j];
       VECTOR(*res)[node] += tmpscore[node];
       tmpscore[node] = 0.0; /* in case a node is in vids multiple times */
     }
@@ -976,6 +987,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
   igraph_vs_destroy(&myvids);
   IGRAPH_FINALLY_CLEAN(7);
 
+  if (vids->shorthand) { igraph_vs_destroy((igraph_vs_t*)vids); }
   return 0;
 }
 
@@ -1003,7 +1015,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
  *     of the edges in a graph.
  */
 
-int igraph_edge_betweenness (igraph_t *graph, vector_t *result, 
+int igraph_edge_betweenness (const igraph_t *graph, vector_t *result, 
 			     bool_t directed) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -1046,7 +1058,7 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
   IGRAPH_CHECK(igraph_stack_init(&stack, no_of_nodes));
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
 
-  it=igraph_es_adj(graph, 0, modeout);
+  IGRAPH_CHECK(igraph_es_adj(graph, &it, 0, modeout));
   IGRAPH_FINALLY(igraph_es_destroy, &it);
   IGRAPH_CHECK(vector_resize(result, no_of_edges));
 
@@ -1171,9 +1183,9 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
  *           <code>vids</code>. 
  */
 
-int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
-		    bool_t directed, integer_t niter, real_t eps,
-		    real_t damping) {
+int igraph_pagerank(const igraph_t *graph, vector_t *res, 
+		    const igraph_vs_t *vids, bool_t directed, integer_t niter, 
+		    real_t eps, real_t damping) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n, nodes_to_calc;
   real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
@@ -1181,15 +1193,16 @@ int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   integer_t dirmode;
   igraph_i_adjlist_t allneis;
   real_t maxdiff=eps;
-  igraph_vs_t myvids;
+  const vector_t * myvids;
 
   if (niter<=0) IGRAPH_ERROR("Invalid iteration count", IGRAPH_EINVAL);
   if (eps<=0) IGRAPH_ERROR("Invalid epsilon value", IGRAPH_EINVAL);
   if (damping<=0 || damping>=1) IGRAPH_ERROR("Invalid damping factor", IGRAPH_EINVAL);
 
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, &vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
-  nodes_to_calc=vector_size(myvids.v);  
+  myvidsv=igraph_vs_vector_getvector(graph, &myvids);
+  nodes_to_calc=vector_size(myvidsv);    
 
   IGRAPH_CHECK(vector_resize(res, nodes_to_calc));
   vector_null(res);
@@ -1219,7 +1232,7 @@ int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
 
   /* Calculate outdegrees for every node */
-  igraph_degree(graph, &outdegree, IGRAPH_VS_ALL,
+  igraph_degree(graph, &outdegree, IGRAPH_VS_ALL(graph),
 		directed?IGRAPH_OUT:IGRAPH_ALL, 0);
   /* Initialize PageRank values */
   for (i=0; i<no_of_nodes; i++) {
@@ -1271,7 +1284,7 @@ int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   
   /* Copy results from prvec to res */
   for (i=0; i<nodes_to_calc; i++) {
-    long int vid=VECTOR(*myvids.v)[i];
+    long int vid=VECTOR(*myvidsv)[i];
     VECTOR(*res)[i]=prvec[vid];
   }
   
@@ -1284,6 +1297,7 @@ int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   
   IGRAPH_FINALLY_CLEAN(6);
   
+  if (vids->shorthand) { igraph_vs_destroy((igraph_vs_t*)vids); }
   return 0;
 }
 
@@ -1314,19 +1328,21 @@ int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
  * vertices from a graph, the opposite of this function.
  */
 
-int igraph_subgraph(igraph_t *graph, igraph_t *res, igraph_vs_t vids) {
+int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
+		    const igraph_vs_t* vids) {
   
   long int no_of_nodes=igraph_vcount(graph);
   vector_t delete=VECTOR_NULL;
   char *remain;
   long int i;
   igraph_vs_t myvids;
-
+  const vector_t *myvidsv;
   
-  IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
+  myvidsv=igraph_vs_vector_getvector(graph, &myvids);
 
-  if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
+  if (!vector_isininterval(myvidsv, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("subgraph failed", IGRAPH_EINVVID);
   }
 
@@ -1336,10 +1352,10 @@ int igraph_subgraph(igraph_t *graph, igraph_t *res, igraph_vs_t vids) {
     IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, remain);	/* TODO: hack */
-  IGRAPH_CHECK(vector_reserve(&delete, no_of_nodes-vector_size(myvids.v)));
+  IGRAPH_CHECK(vector_reserve(&delete, no_of_nodes-vector_size(myvidsv)));
   
-  for (i=0; i<vector_size(myvids.v); i++) {
-    remain[ (long int) VECTOR(*myvids.v)[i] ] = 1;
+  for (i=0; i<vector_size(myvidsv); i++) {
+    remain[ (long int) VECTOR(*myvidsv)[i] ] = 1;
   }
 
   for (i=0; i<no_of_nodes; i++) {
@@ -1352,11 +1368,12 @@ int igraph_subgraph(igraph_t *graph, igraph_t *res, igraph_vs_t vids) {
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_CHECK(igraph_copy(res, graph));
   IGRAPH_FINALLY(igraph_destroy, res);
-  IGRAPH_CHECK(igraph_delete_vertices(res, IGRAPH_VS_VECTOR(&delete)));
+  IGRAPH_CHECK(igraph_delete_vertices(res, IGRAPH_VS_VECTOR(res,&delete)));
   
   vector_destroy(&delete);
   igraph_vs_destroy(&myvids);
   IGRAPH_FINALLY_CLEAN(3);
+  if (vids->shorthand) { igraph_vs_destroy((igraph_vs_t*)vids); }
   return 0;
 }
 
@@ -1418,7 +1435,7 @@ int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops) {
   return 0;
 }
 
-int igraph_transitivity_undirected(igraph_t *graph, vector_t *res) {
+int igraph_transitivity_undirected(const igraph_t *graph, vector_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   real_t triples=0, triangles=0;
@@ -1436,8 +1453,8 @@ int igraph_transitivity_undirected(igraph_t *graph, vector_t *res) {
   IGRAPH_CHECK(vector_resize(res, 1));
 
   if (no_of_nodes != 0) {    
-    nit=igraph_vs_adj(graph, 0, IGRAPH_ALL);
-    nit2=igraph_vs_adj(graph, 0, IGRAPH_ALL);
+    IGRAPH_CHECK(igraph_vs_adj(graph, &nit, 0, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_vs_adj(graph, &nit2, 0, IGRAPH_ALL));
   }
   for (node=0; node<no_of_nodes; node++) {
     igraph_vs_adj_set(graph, &nit, node, IGRAPH_ALL);
@@ -1501,7 +1518,7 @@ int igraph_transitivity_undirected(igraph_t *graph, vector_t *res) {
  * vertices in the graph, <code>d</code> is the highest node degree.
  */
 
-int igraph_transitivity(igraph_t *graph, vector_t *res, 
+int igraph_transitivity(const igraph_t *graph, vector_t *res, 
 			igraph_transitivity_type_t type) {
   
   int retval;

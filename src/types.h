@@ -125,37 +125,43 @@ typedef struct s_vector {
 #define VECTOR(v) ((v).stor_begin) /* DIRTY */
 int vector_init      (vector_t* v, long int size);
 int vector_init_copy (vector_t* v, real_t* data, long int length);
+int vector_init_seq(vector_t *v, real_t from, real_t to);
+int vector_init_real(vector_t *v, int no, ...);
+int vector_init_int(vector_t *v, int no, ...);
+int vector_init_real_end(vector_t *v, real_t endmark, ...);
+int vector_init_int_end(vector_t *v, int endmark, ...);
+const vector_t *vector_view (const vector_t *v, const real_t *data, 
+			     long int length);
 void vector_destroy   (vector_t* v);
 int vector_reserve   (vector_t* v, long int size);
-bool_t vector_empty     (vector_t* v);
-long int vector_size      (vector_t* v);
+bool_t vector_empty     (const vector_t* v);
+long int vector_size      (const vector_t* v);
 void vector_clear     (vector_t* v);
 void vector_null      (vector_t* v);
 int vector_push_back (vector_t* v, real_t e);
-real_t vector_e         (vector_t* v, long int pos);
-real_t*vector_e_ptr  (vector_t* v, long int pos);
+real_t vector_e         (const vector_t* v, long int pos);
+real_t*vector_e_ptr  (const vector_t* v, long int pos);
 void vector_set       (vector_t* v, long int pos, real_t value);
-real_t vector_tail(vector_t *v);
+real_t vector_tail(const vector_t *v);
 real_t vector_pop_back(vector_t* v);
-int vector_order(vector_t* v, vector_t* res, integer_t maxval);
+int vector_order(const vector_t* v, vector_t* res, integer_t maxval);
 void vector_sort(vector_t *v);
 int vector_resize(vector_t* v, long int newsize);
-real_t vector_max(vector_t* v);
-vector_t vector_as_vector(real_t *start, long int length);
-void vector_copy_to(vector_t *v, real_t* to);
-int vector_copy(vector_t *to, vector_t *from);
-real_t vector_sum(vector_t *v);
-real_t vector_prod(vector_t *v);
-int vector_init_seq(vector_t *v, real_t from, real_t to);
+real_t vector_max(const vector_t* v);
+void vector_copy_to(const vector_t *v, real_t* to);
+int vector_copy(vector_t *to, const vector_t *from);
+real_t vector_sum(const vector_t *v);
+real_t vector_prod(const vector_t *v);
 void vector_remove_section(vector_t *v, long int from, long int to);
 int vector_move_interval(vector_t *v, long int begin, long int end, 
 			 long int to);
 void vector_remove(vector_t *v, long int elem);
 void vector_permdelete(vector_t *v, long int *index, long int nremove);
-void vector_remove_negidx(vector_t *v, vector_t *neg, long int nremove);
-bool_t vector_isininterval(vector_t *v, real_t low, real_t high);
-bool_t vector_any_smaller(vector_t *v, real_t limit);
-bool_t vector_is_equal(vector_t *lhs, vector_t *rhs);
+void vector_remove_negidx(vector_t *v, const vector_t *neg, long int nremove);
+bool_t vector_isininterval(const vector_t *v, real_t low, real_t high);
+bool_t vector_any_smaller(const vector_t *v, real_t limit);
+bool_t vector_is_equal(const vector_t *lhs, const vector_t *rhs);
+bool_t vector_binsearch(const vector_t *v, real_t what, long int *pos);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
@@ -178,21 +184,22 @@ typedef struct s_vector_ptr {
 
 int vector_ptr_init      (vector_ptr_t* v, long int size);
 int vector_ptr_init_copy (vector_ptr_t* v, void** data, long int length);
+const vector_ptr_t *vector_ptr_view (const vector_ptr_t *v, 
+				     void *const *data, long int length);
 void vector_ptr_destroy   (vector_ptr_t* v);
 void vector_ptr_free_all   (vector_ptr_t* v);
 void vector_ptr_destroy_all   (vector_ptr_t* v);
 int vector_ptr_reserve   (vector_ptr_t* v, long int size);
-bool_t vector_ptr_empty     (vector_ptr_t* v);
-long int vector_ptr_size      (vector_ptr_t* v);
+bool_t vector_ptr_empty     (const vector_ptr_t* v);
+long int vector_ptr_size      (const vector_ptr_t* v);
 void vector_ptr_clear     (vector_ptr_t* v);
 void vector_ptr_null      (vector_ptr_t* v);
 int vector_ptr_push_back (vector_ptr_t* v, void* e);
-void* vector_ptr_e         (vector_ptr_t* v, long int pos);
+void* vector_ptr_e         (const vector_ptr_t* v, long int pos);
 void vector_ptr_set       (vector_ptr_t* v, long int pos, void* value);
 int vector_ptr_resize(vector_ptr_t* v, long int newsize);
-vector_ptr_t vector_ptr_as_vector(void* *start, long int length);
-void vector_ptr_copy_to(vector_ptr_t *v, void** to);
-int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from);
+void vector_ptr_copy_to(const vector_ptr_t *v, void** to);
+int vector_ptr_copy(vector_ptr_t *to, const vector_ptr_t *from);
 void vector_ptr_remove(vector_ptr_t *v, long int pos);
 
 /* -------------------------------------------------- */
@@ -234,17 +241,17 @@ typedef struct s_matrix {
 int matrix_init(matrix_t *m, long int nrow, long int ncol);
 void matrix_destroy(matrix_t *m);
 int matrix_resize(matrix_t *m, long int nrow, long int ncol);
-long int matrix_size(matrix_t *m);
-long int matrix_nrow(matrix_t *m);
-long int matrix_ncol(matrix_t *m);
-int matrix_copy_to(matrix_t *m, real_t *to);
+long int matrix_size(const matrix_t *m);
+long int matrix_nrow(const matrix_t *m);
+long int matrix_ncol(const matrix_t *m);
+int matrix_copy_to(const matrix_t *m, real_t *to);
 int matrix_null(matrix_t *m);
 int matrix_add_cols(matrix_t *m, long int n);
 int matrix_add_rows(matrix_t *m, long int n);
 int matrix_remove_col(matrix_t *m, long int col);
 int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove);
 int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove);
-int matrix_copy(matrix_t *to, matrix_t *from);
+int matrix_copy(matrix_t *to, const matrix_t *from);
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */
@@ -399,8 +406,9 @@ typedef struct s_igraph_strvector {
 
 int igraph_strvector_init(igraph_strvector_t *sv, long int len);
 void igraph_strvector_destroy(igraph_strvector_t *sv);
-long int igraph_strvector_size(igraph_strvector_t *sv);
-void igraph_strvector_get(igraph_strvector_t *sv, long int idx, char **value);
+long int igraph_strvector_size(const igraph_strvector_t *sv);
+void igraph_strvector_get(const igraph_strvector_t *sv, 
+			  long int idx, char **value);
 int igraph_strvector_set(igraph_strvector_t *sv, long int idx, 
 			 const char *value);
 void igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
@@ -408,12 +416,13 @@ void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
 void igraph_strvector_remove(igraph_strvector_t *v, long int elem);
 void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin, 
 				   long int end, long int to);
-int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from);
+int igraph_strvector_copy(igraph_strvector_t *to, 
+			  const igraph_strvector_t *from);
 int igraph_strvector_resize(igraph_strvector_t* v, long int newsize);
 int igraph_strvector_add(igraph_strvector_t *v, const char *value);
 void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
 				 long int nremove);
-void igraph_strvector_remove_negidx(igraph_strvector_t *v, vector_t *neg, 
+void igraph_strvector_remove_negidx(igraph_strvector_t *v, const vector_t *neg,
 				    long int nremove);
   
 /**

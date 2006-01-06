@@ -21,7 +21,23 @@ export(igraph.vs.all, igraph.vs.adj, igraph.vs.vector,
        igraph.vs.next, igraph.vs.end, igraph.vs.reset, igraph.vs.get,
        igraph.es.next, igraph.es.end, igraph.es.reset, igraph.es.get,
        igraph.es.from, igraph.es.to)
-       
+
+S3method(igraph.vs.get, igraphvsseq)
+S3method(igraph.vs.get, igraphvsvector)
+S3method(igraph.es.get, igraphesseq)
+S3method(igraph.es.get, igraphesvector)
+S3method(igraph.es.from, igraphesseq)
+S3method(igraph.es.from, igraphesvector)
+S3method(igraph.es.to, igraphesseq)
+S3method(igraph.es.to, igraphesvector)
+
+export ("$.igraphvsseq", "$.igraphvsvector",
+        "$.igraphesseq", "$.igraphesvector")
+
+S3method("$", "igraphvsseq")
+S3method("$", "igraphvsvector")
+S3method("$", "igraphesseq")
+S3method("$", "igraphesvector")
 
 # basic functions, printing
 

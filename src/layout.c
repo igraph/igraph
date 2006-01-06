@@ -36,7 +36,7 @@
  * Time complexity: <code>O(|V|)</code>, the number of vertices.
  */
 
-int igraph_layout_random(igraph_t *graph, matrix_t *res) {
+int igraph_layout_random(const igraph_t *graph, matrix_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
@@ -68,7 +68,7 @@ int igraph_layout_random(igraph_t *graph, matrix_t *res) {
  * Time complexity: <code>O(|V|)</code>, the number of vertices.
  */
 
-int igraph_layout_circle(igraph_t *graph, matrix_t *res) {
+int igraph_layout_circle(const igraph_t *graph, matrix_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
@@ -114,7 +114,7 @@ int igraph_layout_circle(igraph_t *graph, matrix_t *res) {
  * <code>|V|</code> is the number of vertices in the graph.
  */
 
-int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
+int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
 				       integer_t niter, real_t maxdelta,
 				       real_t area, real_t coolexp, 
 				       real_t repulserad, bool_t use_seed) {
@@ -157,7 +157,7 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
       }
     }
     /* Calculate the attractive "force" */
-    edgeit=igraph_es_all(graph);
+    IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
     while (!igraph_es_end(graph, &edgeit)) {
       j=igraph_es_from(graph, &edgeit);
       k=igraph_es_to(graph, &edgeit);
@@ -219,7 +219,7 @@ int igraph_layout_fruchterman_reingold(igraph_t *graph, matrix_t *res,
  * <code>|V|</code> is the number of vertices in the graph.
  */
 
-int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
+int igraph_layout_kamada_kawai(const igraph_t *graph, matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,
 			       real_t kkconst) {
@@ -238,7 +238,7 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
 
   IGRAPH_CHECK(matrix_resize(res, n, 2));
   MATRIX_INIT_FINALLY(&elen, n, n);
-  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, IGRAPH_VS_ALL, 3));
+  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, IGRAPH_VS_ALL(graph), 3));
   for (i=0; i<n; i++) {
     MATRIX(elen, i, i) = sqrt(n);
     MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
@@ -284,7 +284,7 @@ int igraph_layout_kamada_kawai(igraph_t *graph, matrix_t *res,
   return 0;
 }
 
-int igraph_layout_springs(igraph_t *graph, matrix_t *res,
+int igraph_layout_springs(const igraph_t *graph, matrix_t *res,
 			  real_t mass, real_t equil, real_t k,
 			  real_t repeqdis, real_t kfr, bool_t repulse) {
   /* TODO */

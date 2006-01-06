@@ -40,7 +40,7 @@ int main() {
     return 5;
   }
   vector_init(&v2, 0);
-  igraph_degree(&g, &v2, IGRAPH_VS_ALL, IGRAPH_OUT, 1);
+  igraph_degree(&g, &v2, IGRAPH_VS_ALL(&g), IGRAPH_OUT, 1);
   for (i=0; i<igraph_vcount(&g); i++) {
     if (VECTOR(v)[i] != VECTOR(v2)[i]) {
       return 6;

@@ -307,7 +307,7 @@ PyObject* igraphmodule_Graph_delete_vertices(igraphmodule_GraphObject *self,
      }
    
    // do the hard work :)
-   if (igraph_delete_vertices(&self->g, IGRAPH_VS_VECTOR(&v))) 
+   if (igraph_delete_vertices(&self->g, IGRAPH_VS_VECTOR(&self->g, &v))) 
      {
 	igraphmodule_handle_igraph_error();
 	Py_DECREF(list);
@@ -469,7 +469,7 @@ PyObject* igraphmodule_Graph_degree(igraphmodule_GraphObject *self,
      }
 
    vector_init(&result, 0);
-   if (igraph_degree(&self->g, &result, IGRAPH_VS_VECTOR(&vids),
+   if (igraph_degree(&self->g, &result, IGRAPH_VS_VECTOR(&self->g, &vids),
 		     (igraph_neimode_t)dtype, (bool_t)(loops == Py_True))) 
      {
        Py_DECREF(list);
@@ -1195,7 +1195,7 @@ PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObjec
    
    if (vector_init(&res, vector_size(&vids))) return igraphmodule_handle_igraph_error();
    
-   if (igraph_betweenness(&self->g, &res, IGRAPH_VS_VECTOR(&vids), PyObject_IsTrue(directed)))
+   if (igraph_betweenness(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids), PyObject_IsTrue(directed)))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1253,7 +1253,7 @@ PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *
    
   if (vector_init(&res, vector_size(&vids))) return igraphmodule_handle_igraph_error();
    
-  if (igraph_pagerank(&self->g, &res, IGRAPH_VS_VECTOR(&vids),
+  if (igraph_pagerank(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids),
 		      PyObject_IsTrue(directed), niter, eps, damping)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
@@ -1317,7 +1317,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self,
    if (matrix_init(&res, vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
-   if (igraph_bibcoupling(&self->g, &res, IGRAPH_VS_VECTOR(&vids)))
+   if (igraph_bibcoupling(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids)))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1386,7 +1386,7 @@ PyObject* igraphmodule_Graph_closeness(igraphmodule_GraphObject *self,
    
    if (vector_init(&res, vector_size(&vids))) return igraphmodule_handle_igraph_error();
    
-   if (igraph_closeness(&self->g, &res, IGRAPH_VS_VECTOR(&vids), mode))
+   if (igraph_closeness(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids), mode))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1490,7 +1490,7 @@ PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self,
    if (matrix_init(&res, vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
-   if (igraph_cocitation(&self->g, &res, IGRAPH_VS_VECTOR(&vids)))
+   if (igraph_cocitation(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids)))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1672,7 +1672,7 @@ PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self,
    if (matrix_init(&res, vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
-   if (igraph_shortest_paths(&self->g, &res, IGRAPH_VS_VECTOR(&vids), mode))
+   if (igraph_shortest_paths(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids), mode))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1830,7 +1830,7 @@ PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self,
   if (igraphmodule_PyList_to_vector_t(list, &vertices, 1, 0))
     return NULL;
   
-  if (igraph_subgraph(&self->g, &sg, IGRAPH_VS_VECTOR(&vertices))) {
+  if (igraph_subgraph(&self->g, &sg, IGRAPH_VS_VECTOR(&self->g, &vertices))) {
     igraphmodule_handle_igraph_error();
     vector_destroy(&vertices);
     return NULL;

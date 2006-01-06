@@ -1,5 +1,6 @@
 
 #include <igraph.h>
+#include <stdlib.h>
 
 void print_vector(vector_t *v, FILE *f) {
   long int i;
@@ -105,18 +106,19 @@ int main() {
   print_vector(&v, stdout);
   vector_destroy(&v);
 
-  /* vector_as_vector, vector_max, vector_init_copy */
-  ptr=(real_t*) malloc(10* sizeof(real_t));
-  v=vector_as_vector(ptr, 10);
+  /* vector_max, vector_init_copy */
+  vector_init(&v, 10);
   for (i=0; i<vector_size(&v); i++) {
     VECTOR(v)[i]=100-i;    
   }
   for (i=0; i<10; i++) {
-    fprintf(stdout, " %li", (long int)ptr[i]);
+    fprintf(stdout, " %li", (long int)VECTOR(v)[i]);
   }
   fprintf(stdout, "\n");
   fprintf(stdout, " %li\n", (long int)vector_max(&v));
 
+  vector_destroy(&v);
+  ptr=(real_t*) malloc(10* sizeof(real_t));
   vector_init_copy(&v, ptr, 10);
   free(ptr);
   print_vector(&v, stdout);
@@ -179,6 +181,61 @@ int main() {
   if (!vector_any_smaller(&v, 2)) {
     return 8;
   }
+  vector_destroy(&v);
+
+  /* vector_is_equal */
+
+  /* vector_binsearch */
+  vector_init_seq(&v, 0, 9);
+  for (i=0; i<vector_size(&v); i++) {
+    if (!vector_binsearch(&v, 0, 0)) {
+      return 9;
+    }
+  }
+  if (vector_binsearch(&v, 10, 0)) {
+    return 10;
+  }
+  if (vector_binsearch(&v, -1, 0)) {
+    return 11;
+  }
+  for (i=0; i<vector_size(&v); i++) {
+    VECTOR(v)[i]= 2*i;
+  }
+  for (i=0; i<vector_size(&v); i++) {
+    long int pos;
+    if (!vector_binsearch(&v, VECTOR(v)[i], &pos)) {
+      fprintf(stderr, "cannot find %i\n", (int)VECTOR(v)[i]);
+      return 12;
+    }
+    if (pos != i) {
+      return 13;
+    }
+    if (vector_binsearch(&v, VECTOR(v)[i]+1, &pos)) {
+      return 14;
+    }
+  }
+  vector_destroy(&v);
+
+  /* vector_init_real */
+  vector_init_real(&v, 10, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0);
+  print_vector(&v, stdout);
+  vector_destroy(&v);
+
+  /* vector_init_int */
+  vector_init_int(&v, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+  print_vector(&v, stdout);
+  vector_destroy(&v);
+
+  /* vector_init_real */
+  vector_init_real_end(&v, -1, 1.0, 2.0, 3.0, 4.0, 5.0, 
+		       6.0, 7.0, 8.0, 9.0, 10.0, -1.0);
+  print_vector(&v, stdout);
+  vector_destroy(&v);
+
+  /* vector_init_int */
+  vector_init_int_end(&v, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1);
+  print_vector(&v, stdout);
+  vector_destroy(&v);
 
   /* vector_permdelete */
   /* vector_remove_negidx */

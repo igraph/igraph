@@ -52,6 +52,18 @@ int vector_ptr_init      (vector_ptr_t* v, int long size) {
 }
 
 /**
+ */ 
+
+const vector_ptr_t *vector_ptr_view (const vector_ptr_t *v, void *const *data, 
+				     long int length) {
+  vector_ptr_t *v2=(vector_ptr_t*) v;
+  v2->stor_begin=(void **)data;
+  v2->stor_end=(void**)data+length;
+  v2->end=v2->stor_end;
+  return v;
+}
+
+/**
  * \ingroup vectorptr
  * \brief Destroys a pointer vector.
  */
@@ -122,7 +134,7 @@ int vector_ptr_reserve   (vector_ptr_t* v, long int size) {
  * \brief Decides whether the pointer vector is empty.
  */
 
-bool_t vector_ptr_empty     (vector_ptr_t* v) {
+bool_t vector_ptr_empty     (const vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 	return v->stor_begin == v->end;
@@ -134,7 +146,7 @@ bool_t vector_ptr_empty     (vector_ptr_t* v) {
  * \todo why does the assert fail???
  */
 
-long int vector_ptr_size      (vector_ptr_t* v) {
+long int vector_ptr_size      (const vector_ptr_t* v) {
 	assert(v != NULL);
 /* 	assert(v->stor_begin != NULL);		 */
 	return v->end - v->stor_begin;
@@ -178,7 +190,7 @@ int vector_ptr_push_back (vector_ptr_t* v, void* e) {
  * \brief Access an element of a pointer vector.
  */
 
-void* vector_ptr_e         (vector_ptr_t* v, long int pos) {
+void* vector_ptr_e         (const vector_ptr_t* v, long int pos) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 	return * (v->stor_begin + pos);
@@ -221,20 +233,6 @@ int vector_ptr_resize(vector_ptr_t* v, long int newsize) {
 
 /**
  * \ingroup vectorptr
- * \brief Handle a C array as a pointer vector temporarily. Don't ever 
- * call vector_ptr_destroy() on these vectors.
- */
-
-vector_ptr_t vector_ptr_as_vector(void** data, long int length) {
-  vector_ptr_t v;
-  v.stor_begin=data;
-  v.stor_end=v.end=data+length;
-  
-  return v;
-}
-
-/**
- * \ingroup vectorptr
  * \brief Initializes a pointer vector from an array (constructor).
  *
  * @return Error code:
@@ -258,7 +256,7 @@ int vector_ptr_init_copy(vector_ptr_t *v, void* *data, long int length) {
  * \brief Copy the contents of a pointer vector to a regular C array.
  */
 
-void vector_ptr_copy_to(vector_ptr_t *v, void** to) {
+void vector_ptr_copy_to(const vector_ptr_t *v, void** to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);		
   if (v->end != v->stor_begin) {
@@ -275,7 +273,7 @@ void vector_ptr_copy_to(vector_ptr_t *v, void** to) {
  * \todo why does the assert fail???
  */
 
-int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from) {
+int vector_ptr_copy(vector_ptr_t *to, const vector_ptr_t *from) {
   assert(from != NULL);
 /*   assert(from->stor_begin != NULL); */
   to->stor_begin=Calloc(vector_ptr_size(from), void*);

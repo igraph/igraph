@@ -1,9 +1,11 @@
 
 #include <igraph.h>
+#include <stdlib.h>
 
 int main() {
   
   vector_ptr_t v1, v2;
+  const vector_ptr_t v3;
   int i;
   void ** ptr;
   int d1=1, d2=2, d3=3, d4=4, d5=5;
@@ -152,12 +154,12 @@ int main() {
     return 16;
   }
 
-  /* vector_ptr_as_vector */
-  ptr=(void*) malloc(5 * sizeof(void*));
-  v1=vector_ptr_as_vector(ptr, 5);
+  /* vector_ptr_view */
+  ptr=(void**) malloc(5 * sizeof(void*));
+  vector_ptr_view(&v3, ptr, 5);
   ptr[0]=&d1; ptr[1]=&d2; ptr[2]=&d3; ptr[3]=&d4; ptr[4]=&d5;
-  for (i=0; i<vector_ptr_size(&v1); i++) {
-    if ( *((int*)VECTOR(v1)[i]) != i+1) {
+  for (i=0; i<vector_ptr_size(&v3); i++) {
+    if ( *((int*)VECTOR(v3)[i]) != i+1) {
       return 17;
     }
   }
