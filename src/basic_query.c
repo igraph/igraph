@@ -48,7 +48,7 @@ bool_t igraph_are_connected(igraph_t *graph, integer_t v1, integer_t v2) {
 
   if (v1 < 0 || v2 < 0 || v1 > nov-1 || v2 > nov-1) {
     return 0;
-/*     IGRAPH_FERROR("are connected", IGRAPH_EINVVID); */
+/*     IGRAPH_ERROR("are connected", IGRAPH_EINVVID); */
   }
 
   it=igraph_vs_adj(graph, v1, IGRAPH_OUT);

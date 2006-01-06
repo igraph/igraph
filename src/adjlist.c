@@ -28,7 +28,7 @@ int igraph_i_adjlist_init(igraph_t *graph, igraph_i_adjlist_t *al,
   long int i;
 
   if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
-    IGRAPH_FERROR("Cannot create adjlist view", IGRAPH_EINVMODE);
+    IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_EINVMODE);
   }
 
   if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
@@ -36,7 +36,7 @@ int igraph_i_adjlist_init(igraph_t *graph, igraph_i_adjlist_t *al,
   al->length=igraph_vcount(graph);
   al->adjs=Calloc(al->length, vector_t);
   if (al->adjs == 0) {
-    IGRAPH_FERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, al->adjs);
 

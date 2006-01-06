@@ -45,7 +45,7 @@ int heap_init           (heap_t* h, long int alloc_size) {
   if (alloc_size <= 0 ) { alloc_size=1; }
   h->stor_begin=Calloc(alloc_size, real_t);
   if (h->stor_begin==0) {
-    IGRAPH_FERROR("heap init failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("heap init failed", IGRAPH_ENOMEM);
   }
   h->stor_end=h->stor_begin + alloc_size;
   h->end=h->stor_begin;
@@ -66,7 +66,7 @@ int heap_init           (heap_t* h, long int alloc_size) {
 int heap_init_array     (heap_t *h, real_t* data, long int len) {
   h->stor_begin=Calloc(len, real_t);
   if (h->stor_begin==0) {
-    IGRAPH_FERROR("heap init from array failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
   }
   h->stor_end=h->stor_begin+len;
   h->end=h->stor_end;
@@ -191,7 +191,7 @@ int heap_reserve        (heap_t* h, long int size) {
   
   tmp=Realloc(h->stor_begin, size, real_t);
   if (tmp==0) {
-    IGRAPH_FERROR("heap reserve failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("heap reserve failed", IGRAPH_ENOMEM);
   }
   h->stor_begin=tmp;
   h->stor_end=h->stor_begin + size;
@@ -290,13 +290,13 @@ int indheap_init           (indheap_t* h, long int alloc_size) {
  h->stor_begin=Calloc(alloc_size, real_t);
  if (h->stor_begin==0) {
    h->index_begin=0;
-   IGRAPH_FERROR("indheap init failed", IGRAPH_ENOMEM);
+   IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
  }
  h->index_begin=Calloc(alloc_size, long int);
  if (h->index_begin==0) {
    Free(h->stor_begin);
    h->stor_begin=0;
-   IGRAPH_FERROR("indheap init failed", IGRAPH_ENOMEM);
+   IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
  }
  
  h->stor_end=h->stor_begin + alloc_size;
@@ -320,13 +320,13 @@ int indheap_init_array     (indheap_t *h, real_t* data, long int len) {
   h->stor_begin=Calloc(len, real_t);
   if (h->stor_begin==0) {
     h->index_begin=0;
-    IGRAPH_FERROR("indheap init from array failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
   }
   h->index_begin=Calloc(len, long int);
   if (h->index_begin==0) {
     Free(h->stor_begin);
     h->stor_begin=0;
-    IGRAPH_FERROR("indheap init from array failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
   }
   h->stor_end=h->stor_begin+len;
   h->end=h->stor_end;
@@ -460,12 +460,12 @@ int indheap_reserve        (indheap_t* h, long int size) {
 
   tmp1=Calloc(size, real_t);  
   if (tmp1==0) {
-    IGRAPH_FERROR("indheap reserve failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmp1); 	/* TODO: hack */
   tmp2=Calloc(size, long int);
   if (tmp2==0) {
-    IGRAPH_FERROR("indheap reserve failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmp2);
   memcpy(tmp1, h->stor_begin, actual_size*sizeof(real_t));
@@ -592,7 +592,7 @@ int d_indheap_init           (d_indheap_t* h, long int alloc_size) {
   if (h->stor_begin==0) {
     h->index_begin=0;
     h->index2_begin=0;
-    IGRAPH_FERROR("d_indheap init failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
   }
   h->stor_end=h->stor_begin + alloc_size;
   h->end=h->stor_begin;
@@ -602,7 +602,7 @@ int d_indheap_init           (d_indheap_t* h, long int alloc_size) {
     Free(h->stor_begin);
     h->stor_begin=0;
     h->index2_begin=0;
-    IGRAPH_FERROR("d_indheap init failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
   }
   h->index2_begin=Calloc(alloc_size, long int);
   if (h->index2_begin==0) {
@@ -610,7 +610,7 @@ int d_indheap_init           (d_indheap_t* h, long int alloc_size) {
     Free(h->index_begin);
     h->stor_begin=0;
     h->index_begin=0;
-    IGRAPH_FERROR("d_indheap init failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("d_indheap init failed", IGRAPH_ENOMEM);
   }
   
   return 0;  
@@ -740,17 +740,17 @@ int d_indheap_reserve        (d_indheap_t* h, long int size) {
 
   tmp1=Calloc(size, real_t);
   if (tmp1==0) {
-    IGRAPH_FERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmp1);	/* TODO: hack */
   tmp2=Calloc(size, long int);
   if (tmp2==0) {
-    IGRAPH_FERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmp2);	/* TODO: hack */
   tmp3=Calloc(size, long int);
   if (tmp3==0) {
-    IGRAPH_FERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmp3); 	/* TODO: hack */
 

@@ -54,7 +54,7 @@ int vector_init      (vector_t* v, int long size) {
 	if (size < 0) { size=0; }
 	v->stor_begin=Calloc(alloc_size, real_t);
 	if (v->stor_begin==0) {
-	  IGRAPH_FERROR("cannot init vector", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("cannot init vector", IGRAPH_ENOMEM);
 	}
 	v->stor_end=v->stor_begin + alloc_size;
 	v->end=v->stor_begin+size;
@@ -117,7 +117,7 @@ int vector_reserve   (vector_t* v, long int size) {
 
 	tmp=Realloc(v->stor_begin, size, real_t);
 	if (tmp==0) {
-	  IGRAPH_FERROR("cannot reserve space for vector", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("cannot reserve space for vector", IGRAPH_ENOMEM);
 	}
 	v->stor_begin=tmp;
 	v->stor_end=v->stor_begin + size;
@@ -463,7 +463,7 @@ vector_t vector_as_vector(real_t* data, long int length) {
 int vector_init_copy(vector_t *v, real_t *data, long int length) {
   v->stor_begin=Calloc(length, real_t);
   if (v->stor_begin==0) {
-    IGRAPH_FERROR("cannot init vector from array", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);
   }
   v->stor_end=v->stor_begin+length;
   v->end=v->stor_end;
@@ -512,7 +512,7 @@ int vector_copy(vector_t *to, vector_t *from) {
   assert(from->stor_begin != NULL);
   to->stor_begin=Calloc(vector_size(from), real_t);
   if (to->stor_begin==0) {
-    IGRAPH_FERROR("canot copy vector", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("canot copy vector", IGRAPH_ENOMEM);
   }
   to->stor_end=to->stor_begin+vector_size(from);
   to->end=to->stor_end;

@@ -68,13 +68,13 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
   long int i,j;
 
   if (n<0) {
-    IGRAPH_FERROR("Invalid number of vertices", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }
   if (outseq != 0 && vector_size(outseq) != 0 && vector_size(outseq) != n) {
-    IGRAPH_FERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
   }
   if ( (outseq == 0 || vector_size(outseq) == 0) && m<0) {
-    IGRAPH_FERROR("Invalid out degree", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
   }
 
   if (outseq==0 || vector_size(outseq) == 0) {
@@ -93,7 +93,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
   }
   
   if (bag==0) {
-    IGRAPH_FERROR("barabasi_game failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, bag); 	/* TODO: hack */
   VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
@@ -148,10 +148,10 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
   int retval=0;
 
   if (n<0) {
-    IGRAPH_FERROR("Invalid number of vertices", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }
   if (p<0.0 || p>1.0) {
-    IGRAPH_FERROR("Invalid probability given", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid probability given", IGRAPH_EINVAL);
   }
   
   if (p==0.0 || no_of_nodes<=1) {
@@ -238,10 +238,10 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
   int retval=0;
 
   if (n<0) {
-    IGRAPH_FERROR("Invalid number of vertices", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }
   if (m<0) {
-    IGRAPH_FERROR("Invalid number of edges", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid number of edges", IGRAPH_EINVAL);
   }
   
   if (m==0.0 || no_of_nodes<=1) {
@@ -260,7 +260,7 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
       { maxedges = n * (n-1)/2; }
     
     if (no_of_edges > maxedges) {
-      IGRAPH_FERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
+      IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
     }
     
     if (maxedges == no_of_edges) {
@@ -351,7 +351,7 @@ int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
   } else if (type == IGRAPH_ERDOS_RENYI_GNM) {
     retval=igraph_erdos_renyi_game_gnm(graph, n, p_or_m, directed, loops);
   } else {
-    IGRAPH_FERROR("Invalid type", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid type", IGRAPH_EINVAL);
   }
   
   return retval;
@@ -369,14 +369,14 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
   long int i,j;
 
   if (vector_any_smaller(out_seq, 0)) {
-    IGRAPH_FERROR("Negative out degree", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Negative out degree", IGRAPH_EINVAL);
   }
   if (directed && vector_any_smaller(in_seq, 0)) {
-    IGRAPH_FERROR("Negative in degree", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Negative in degree", IGRAPH_EINVAL);
   }
   if (directed && 
       vector_size(out_seq) != vector_size(in_seq)) { 
-    IGRAPH_FERROR("Length of `out_seq' and `in_seq' differ for directed graph",
+    IGRAPH_ERROR("Length of `out_seq' and `in_seq' differ for directed graph",
 		 IGRAPH_EINVAL);
   }
   
@@ -384,11 +384,11 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
   insum=vector_sum(in_seq);
   
   if (!directed && outsum % 2 != 0) {
-    IGRAPH_FERROR("Total degree not even for undirected graph", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Total degree not even for undirected graph", IGRAPH_EINVAL);
   }
   
   if (directed && outsum != insum) {
-    IGRAPH_FERROR("Total in-degree and out-degree differ for directed graph",
+    IGRAPH_ERROR("Total in-degree and out-degree differ for directed graph",
 		  IGRAPH_EINVAL);
   }
 
@@ -401,7 +401,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
 
   bag1=Calloc(outsum, long int);
   if (bag1==0) {
-    IGRAPH_FERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, bag1); 	/* TODO: hack */
     
@@ -413,7 +413,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph, vector_t *out_seq,
   if (directed) {
     bag2=Calloc(insum, long int);
     if (bag2==0) {
-      IGRAPH_FERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(free, bag2);
     for (i=0; i<no_of_nodes; i++) {
@@ -509,7 +509,7 @@ int igraph_degree_sequence_game(igraph_t *graph, vector_t *out_deg,
   if (method==IGRAPH_DEGSEQ_SIMPLE) {
     retval=igraph_degree_sequence_game_simple(graph, out_deg, in_deg);
   } else {
-    IGRAPH_FERROR("Invalid degree sequence game method", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid degree sequence game method", IGRAPH_EINVAL);
   }
 
   return retval;
@@ -551,10 +551,10 @@ int igraph_growing_random_game(igraph_t *graph, integer_t n,
   long int i,j;
 
   if (n<0) {
-    IGRAPH_FERROR("Invalid number of vertices", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }
   if (m<0) {
-    IGRAPH_FERROR("Invalid number of edges per step (m)", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid number of edges per step (m)", IGRAPH_EINVAL);
   }
 
   no_of_edges=(no_of_nodes-1) * no_of_neighbors;

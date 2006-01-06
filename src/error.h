@@ -104,15 +104,10 @@ void IGRAPH_FINALLY_FREE();
 #define IGRAPH_FINALLY(func, ptr) \
   IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
 
-#define IGRAPH_FERROR(reason, errno) do { \
-  IGRAPH_FINALLY_FREE(); \
-  IGRAPH_ERROR(reason, errno); \
-  } while (0)
-
 #define IGRAPH_CHECK(a) do { \
                  int igraph_i_ret=(a); \
                  if (igraph_i_ret != 0) { \
-                    IGRAPH_FERROR("", igraph_i_ret); \
+                    IGRAPH_ERROR("", igraph_i_ret); \
                  } } while(0)
 
 #endif

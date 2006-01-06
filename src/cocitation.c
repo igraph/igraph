@@ -104,12 +104,12 @@ int igraph_cocitation_real(igraph_t *graph, matrix_t *res, igraph_vs_t vids,
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
 
   if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
-    IGRAPH_FERROR("", IGRAPH_EINVVID);
+    IGRAPH_ERROR("", IGRAPH_EINVVID);
   }
   
   calc=Calloc(no_of_nodes, bool_t);
   if (calc==0) {
-    IGRAPH_FERROR("cannot calculate cocitation/bibcoupling", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot calculate cocitation/bibcoupling", IGRAPH_ENOMEM);
   }  
   IGRAPH_FINALLY(free, calc); 	/* TODO: hack */
 

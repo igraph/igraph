@@ -63,7 +63,7 @@ int igraph_diameter(igraph_t *graph, integer_t *res,
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
   already_added=Calloc(no_of_nodes, long int);
   if (already_added==0) {
-    IGRAPH_FERROR("diameter failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, already_added);
   DQUEUE_INIT_FINALLY(&q, 100);
@@ -148,7 +148,7 @@ int igraph_average_path_length(igraph_t *graph, real_t *res,
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
   already_added=Calloc(no_of_nodes, long int);
   if (already_added==0) {
-    IGRAPH_FERROR("average path length failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("average path length failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
   DQUEUE_INIT_FINALLY(&q, 100);
@@ -239,7 +239,7 @@ int igraph_minimum_spanning_tree_unweighted(igraph_t *graph, igraph_t *mst) {
   VECTOR_INIT_FINALLY(&edges, 0);
   already_added=Calloc(no_of_nodes, char);
   if (already_added==0) {
-    IGRAPH_FERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
   VECTOR_INIT_FINALLY(&tmp, 0);
@@ -331,13 +331,13 @@ int igraph_minimum_spanning_tree_prim(igraph_t *graph, igraph_t *mst,
   long int i;
 
   if (vector_size(weights) != igraph_ecount(graph)) {
-    IGRAPH_FERROR("Invalid weights length", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL);
   }
 
   VECTOR_INIT_FINALLY(&edges, 0);
   already_added=Calloc(no_of_nodes, char);
   if (already_added == 0) {
-    IGRAPH_FERROR("prim spanning tree failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
   IGRAPH_CHECK(d_indheap_init(&heap, 0));
@@ -463,10 +463,10 @@ int igraph_closeness(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
-    IGRAPH_FERROR("calculating closeness", IGRAPH_EINVMODE);
+    IGRAPH_ERROR("calculating closeness", IGRAPH_EINVMODE);
   }
   if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
-    IGRAPH_FERROR("calculating closeness", IGRAPH_EINVVID);
+    IGRAPH_ERROR("calculating closeness", IGRAPH_EINVVID);
   }
 
   VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
@@ -564,15 +564,15 @@ int igraph_shortest_paths(igraph_t *graph, matrix_t *res,
   no_of_from=vector_size(myfrom.v);
 
   if (!vector_isininterval(myfrom.v, 0, no_of_nodes-1)) {
-    IGRAPH_FERROR("shortest paths failed", IGRAPH_EINVVID);
+    IGRAPH_ERROR("shortest paths failed", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
-    IGRAPH_FERROR("Invalid mode argument", IGRAPH_EINVMODE);
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
   already_counted=Calloc(no_of_nodes, long int);
   if (already_counted==0) {
-    IGRAPH_FERROR("shortest paths failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_counted);
   VECTOR_INIT_FINALLY(&tmp, 0);
@@ -673,16 +673,16 @@ int igraph_get_shortest_paths(igraph_t *graph, vector_t *res,
   vector_t tmp=VECTOR_NULL;
 
   if (from<0 || from>=no_of_nodes) {
-    IGRAPH_FERROR("cannot get shortest paths", IGRAPH_EINVVID);
+    IGRAPH_ERROR("cannot get shortest paths", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
-    IGRAPH_FERROR("Invalid mode argument", IGRAPH_EINVMODE);
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
 
   father=Calloc(no_of_nodes, long int);
   if (father==0) {
-    IGRAPH_FERROR("cannot get shortest paths", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot get shortest paths", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, father);	/* TODO: hack */
   VECTOR_INIT_FINALLY(&tmp, 0);
@@ -773,16 +773,16 @@ int igraph_subcomponent(igraph_t *graph, vector_t *res, real_t vertex,
   vector_t tmp=VECTOR_NULL;
 
   if (vertex<0 || vertex>=no_of_nodes) {
-    IGRAPH_FERROR("subcomponent failed", IGRAPH_EINVVID);
+    IGRAPH_ERROR("subcomponent failed", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
-    IGRAPH_FERROR("invalid mode argument", IGRAPH_EINVMODE);
+    IGRAPH_ERROR("invalid mode argument", IGRAPH_EINVMODE);
   }
 
   already_added=Calloc(no_of_nodes, char);
   if (already_added==0) {
-    IGRAPH_FERROR("subcomponent failed",IGRAPH_ENOMEM);
+    IGRAPH_ERROR("subcomponent failed",IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
 
@@ -864,7 +864,7 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
 
   if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
-    IGRAPH_FERROR("betweenness failed", IGRAPH_EINVVID);
+    IGRAPH_ERROR("betweenness failed", IGRAPH_EINVVID);
   }
 
   if (directed) 
@@ -874,17 +874,17 @@ int igraph_betweenness (igraph_t *graph, vector_t *res, igraph_vs_t vids,
 
   distance=Calloc(no_of_nodes, long int);
   if (distance==0) {
-    IGRAPH_FERROR("betweenness failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, distance); /* TODO: hack */
   nrgeo=Calloc(no_of_nodes, long int);
   if (nrgeo==0) {
-    IGRAPH_FERROR("betweenness failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, nrgeo);	/* TODO: hack */
   tmpscore=Calloc(no_of_nodes, double);
   if (tmpscore==0) {
-    IGRAPH_FERROR("betweenness failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmpscore); /* TODO: hack */
 
@@ -1028,17 +1028,17 @@ int igraph_edge_betweenness (igraph_t *graph, vector_t *result,
   
   distance=Calloc(no_of_nodes, long int);
   if (distance==0) {
-    IGRAPH_FERROR("edge betweenness failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, distance); /* TODO: hack */
   nrgeo=Calloc(no_of_nodes, long int);
   if (nrgeo==0) {
-    IGRAPH_FERROR("edge betweenness failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, nrgeo);	/* TODO: hack */
   tmpscore=Calloc(no_of_nodes, double);
   if (tmpscore==0) {
-    IGRAPH_FERROR("edge betweenness failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmpscore); /* TODO: hack */
 
@@ -1183,9 +1183,9 @@ int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
   real_t maxdiff=eps;
   igraph_vs_t myvids;
 
-  if (niter<=0) IGRAPH_FERROR("Invalid iteration count", IGRAPH_EINVAL);
-  if (eps<=0) IGRAPH_FERROR("Invalid epsilon value", IGRAPH_EINVAL);
-  if (damping<=0 || damping>=1) IGRAPH_FERROR("Invalid damping factor", IGRAPH_EINVAL);
+  if (niter<=0) IGRAPH_ERROR("Invalid iteration count", IGRAPH_EINVAL);
+  if (eps<=0) IGRAPH_ERROR("Invalid epsilon value", IGRAPH_EINVAL);
+  if (damping<=0 || damping>=1) IGRAPH_ERROR("Invalid damping factor", IGRAPH_EINVAL);
 
   IGRAPH_CHECK(igraph_vs_create_view_as_vector(graph, &vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
@@ -1198,19 +1198,19 @@ int igraph_pagerank(igraph_t *graph, vector_t *res, igraph_vs_t vids,
     
   prvec=Calloc(no_of_nodes, real_t);
   if (prvec==0) {
-    IGRAPH_FERROR("pagerank failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("pagerank failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, prvec);
   
   prvec_new=Calloc(no_of_nodes, real_t);
   if (prvec_new==0) {
-    IGRAPH_FERROR("pagerank failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("pagerank failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, prvec_new);
   
   prvec_scaled=Calloc(no_of_nodes, real_t);
   if (prvec_scaled==0) {
-    IGRAPH_FERROR("pagerank failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("pagerank failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, prvec_scaled);
   
@@ -1327,13 +1327,13 @@ int igraph_subgraph(igraph_t *graph, igraph_t *res, igraph_vs_t vids) {
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
 
   if (!vector_isininterval(myvids.v, 0, no_of_nodes-1)) {
-    IGRAPH_FERROR("subgraph failed", IGRAPH_EINVVID);
+    IGRAPH_ERROR("subgraph failed", IGRAPH_EINVVID);
   }
 
   VECTOR_INIT_FINALLY(&delete, 0);
   remain=Calloc(no_of_nodes, char);
   if (remain==0) {
-    IGRAPH_FERROR("subgraph failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, remain);	/* TODO: hack */
   IGRAPH_CHECK(vector_reserve(&delete, no_of_nodes-vector_size(myvids.v)));
@@ -1430,7 +1430,7 @@ int igraph_transitivity_undirected(igraph_t *graph, vector_t *res) {
   
   neis=Calloc(no_of_nodes, long int);
   if (neis==0) {
-    IGRAPH_FERROR("undirected transitivity failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, neis);	/* TODO: hack */
   IGRAPH_CHECK(vector_resize(res, 1));
@@ -1509,7 +1509,7 @@ int igraph_transitivity(igraph_t *graph, vector_t *res,
   if (type == IGRAPH_TRANSITIVITY_UNDIRECTED) {
     retval=igraph_transitivity_undirected(graph, res);
   } else {
-    IGRAPH_FERROR("unknown transitivity type", IGRAPH_EINVAL);
+    IGRAPH_ERROR("unknown transitivity type", IGRAPH_EINVAL);
   }
   
   return retval;

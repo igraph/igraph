@@ -61,7 +61,7 @@ int igraph_clusters(igraph_t *graph, vector_t *membership, vector_t *csize,
   } else if (mode==IGRAPH_STRONG) {
     return igraph_clusters_strong(graph, membership, csize);
   } else {
-    IGRAPH_FERROR("", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
   }
   
   return 1;
@@ -81,7 +81,7 @@ int igraph_clusters_weak(igraph_t *graph, vector_t *membership,
 
   already_added=Calloc(no_of_nodes,char);
   if (already_added==0) {
-    IGRAPH_FERROR("", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
 
@@ -260,7 +260,7 @@ int igraph_is_connected(igraph_t *graph, bool_t *res,
     IGRAPH_FINALLY_CLEAN(2);
     return retval;
   } else {
-    IGRAPH_FERROR("mode argument", IGRAPH_EINVAL);
+    IGRAPH_ERROR("mode argument", IGRAPH_EINVAL);
   }
   return 0;
 }
@@ -276,7 +276,7 @@ int igraph_is_connected_weak(igraph_t *graph, bool_t *res) {
 
   already_added=Calloc(no_of_nodes, char);
   if (already_added==0) {
-    IGRAPH_FERROR("is connected (weak) failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("is connected (weak) failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
 

@@ -42,7 +42,7 @@ int dqueue_init (dqueue_t* q, long int size) {
 	if (size <= 0 ) { size=1; }
 	q->stor_begin=Calloc(size, real_t);
 	if (q->stor_begin==0) {
-	  IGRAPH_FERROR("dqueue init failed", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("dqueue init failed", IGRAPH_ENOMEM);
 	}
 	q->stor_end=q->stor_begin + size;
 	q->begin=q->stor_begin;
@@ -211,7 +211,7 @@ int dqueue_push (dqueue_t* q, real_t elem) {
 
 		bigger=Calloc( 2*(q->stor_end - q->stor_begin)+1, real_t );
 		if (bigger==0) {
-		  IGRAPH_FERROR("dqueue push failed", IGRAPH_ENOMEM);
+		  IGRAPH_ERROR("dqueue push failed", IGRAPH_ENOMEM);
 		}
 
 		if (q->stor_end - q->begin) {

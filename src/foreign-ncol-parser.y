@@ -60,7 +60,7 @@ weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yytext,
 
 int igraph_ncol_yyerror (char *s)
 {
-  IGRAPH_FERROR("Parse error", IGRAPH_PARSEERROR);
+  IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
 }
 
 real_t igraph_ncol_get_number(const char *str, long int length) {

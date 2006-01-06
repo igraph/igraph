@@ -41,13 +41,13 @@ int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
   long int i;
   sv->data=Calloc(len, char*);
   if (sv->data==0) {
-    IGRAPH_FERROR("strvector init failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
   }
   for (i=0; i<len; i++) {
     sv->data[i]=Calloc(1, char);
     if (sv->data[i]==0) {
       igraph_strvector_destroy(sv);
-      IGRAPH_FERROR("strvector init failed", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
     }
     sv->data[i][0]='\0';
   }
@@ -101,12 +101,12 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
   if (sv->data[idx] == 0) {
     sv->data[idx] = Calloc(strlen(value)+1, char);
     if (sv->data[idx]==0) {
-      IGRAPH_FERROR("strvector set failed", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
     }
   } else {
     char *tmp=Realloc(sv->data[idx], strlen(value)+1, char);
     if (tmp==0) { 
-      IGRAPH_FERROR("strvector set failed", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
     }
     sv->data[idx]=tmp;
   }
@@ -194,7 +194,7 @@ int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from) {
 /*   assert(from->data != 0); */
   to->data=Calloc(from->len, char*);
   if (to->data==0) { 
-    IGRAPH_FERROR("Cannot copy string vector", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("Cannot copy string vector", IGRAPH_ENOMEM);
   }
   to->len=from->len;
   
@@ -204,7 +204,7 @@ int igraph_strvector_copy(igraph_strvector_t *to, igraph_strvector_t *from) {
     ret=igraph_strvector_set(to, i, str);
     if (ret != 0) {
       igraph_strvector_destroy(to);
-      IGRAPH_FERROR("cannot copy string vector", ret);
+      IGRAPH_ERROR("cannot copy string vector", ret);
     }
   }
   
@@ -239,7 +239,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
     bool_t error=0;
     tmp=Realloc(v->data, newsize, char*);
     if (tmp==0) {
-      IGRAPH_FERROR("cannot resize string vector", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM);
     }
     v->data = tmp;
     
@@ -263,7 +263,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
       if (tmp != 0) {
 	v->data=tmp;
       }
-      IGRAPH_FERROR("canot resize string vector", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("canot resize string vector", IGRAPH_ENOMEM);
     }
   }
   v->len = newsize;
@@ -295,12 +295,12 @@ int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
   assert(v->data != 0);
   tmp=Realloc(v->data, s+1, char*);
   if (tmp == 0) {
-    IGRAPH_FERROR("cannot add string to string vector", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
   }
   v->data=tmp;
   v->data[s]=Calloc(strlen(value)+1, char);
   if (v->data[s]==0) {
-    IGRAPH_FERROR("cannot add string to string vector", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot add string to string vector", IGRAPH_ENOMEM);
   }
   strcpy(v->data[s], value);
   v->len += 1;

@@ -48,7 +48,7 @@ int igraph_running_mean(vector_t *data, vector_t *res, integer_t binwidth) {
 
   /* Check */
   if (vector_size(data) < binwidth) {
-    IGRAPH_FERROR("Vector too short for this binwidth", IGRAPH_EINVAL); 
+    IGRAPH_ERROR("Vector too short for this binwidth", IGRAPH_EINVAL); 
   }
 
   /* Memory for result */

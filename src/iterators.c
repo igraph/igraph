@@ -121,7 +121,7 @@ int igraph_vs_unfold_all(igraph_t *graph, igraph_vs_t *vs) {
     n=igraph_vcount(graph);
     vs->v=Calloc(1, vector_t);
     if (vs->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vs->v); /* free it if cannot allocate vector */
     IGRAPH_CHECK(vector_init_seq(vs->v, 0, n-1));
@@ -224,7 +224,7 @@ int igraph_vs_unfold_adj(igraph_t *graph, igraph_vs_t *vs) {
   if (vs->v==0) {
     vs->v=Calloc(1, vector_t);
     if (vs->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vs->v); /* free it if cannot allocate vector */
     IGRAPH_CHECK(vector_init(vs->v, 0));
@@ -358,7 +358,7 @@ integer_t igraph_vs_get_rw(igraph_t *graph, igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_rw(igraph_t *graph, igraph_vs_t *vs) {
-  IGRAPH_FERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
+  IGRAPH_ERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
   return 0;			/* return unneccesary */
 }
 
@@ -504,7 +504,7 @@ void igraph_vs_reset_rw1(igraph_t *graph, igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_rw1(igraph_t *graph, igraph_vs_t *vs) {
-  IGRAPH_FERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
+  IGRAPH_ERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
   return 0;
 }
 
@@ -567,7 +567,7 @@ int igraph_vs_unfold_none(igraph_t *graph, igraph_vs_t *vs) {
   if (vs->v==0) {		/* otherwise already unfolded */
     vs->v=Calloc(1, vector_t);
     if (vs->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vs->v); /* free it if cannot allocate vector */
     IGRAPH_CHECK(vector_init(vs->v, 0));
@@ -634,7 +634,7 @@ int igraph_vs_unfold_1(igraph_t *graph, igraph_vs_t *vs) {
   if (vs->v==0) {
     vs->v=Calloc(1, vector_t);
     if (vs->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vs->v);
     IGRAPH_CHECK(vector_init(vs->v, 1));
@@ -703,7 +703,7 @@ int igraph_vs_unfold_seq(igraph_t *graph, igraph_vs_t *vs) {
   if (vs->v==0) {
     vs->v=Calloc(1, vector_t);
     if (vs->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, vs->v);
     IGRAPH_CHECK(vector_init_seq(vs->v, vs->stdata[1], vs->stdata[2]));
@@ -873,7 +873,7 @@ int igraph_es_unfold_all(igraph_t *graph, igraph_es_t *es) {
     n=igraph_ecount(graph);
     es->v=Calloc(1, vector_t);
     if (es->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, es->v); /* free it if cannot allocate vector */
     IGRAPH_CHECK(vector_init_seq(es->v, 0, n-1));
@@ -952,7 +952,7 @@ int igraph_es_unfold_fromorder(igraph_t *graph, igraph_es_t *es) {
     long int i=0, n=igraph_ecount(graph);  
     es->v=Calloc(1, vector_t);
     if (es->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, es->v);
     IGRAPH_CHECK(vector_init(es->v, n));
@@ -1096,7 +1096,7 @@ int igraph_es_unfold_adj(igraph_t *graph, igraph_es_t *es) {
   
     es->v=Calloc(1, vector_t);
     if (es->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, es->v);
     IGRAPH_CHECK(vector_init(es->v, length));
@@ -1216,7 +1216,7 @@ int igraph_es_unfold_none(igraph_t *graph, igraph_es_t *es) {
   if (es->v==0) {
     es->v=Calloc(1, vector_t);
     if (es->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, es->v);
     IGRAPH_CHECK(vector_init(es->v, 0));
@@ -1296,7 +1296,7 @@ int igraph_es_unfold_1(igraph_t *graph, igraph_es_t *es) {
   if (es->v==0) {
     es->v=Calloc(1, vector_t);
     if (es->v==0) {
-      IGRAPH_FERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot unfold iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, es->v);
     IGRAPH_CHECK(vector_init(es->v, 1));

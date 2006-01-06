@@ -68,11 +68,11 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     int read;
     read=fscanf(instream, "%li", &from);
     if (read != 1) { 
-      IGRAPH_FERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 
+      IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 
     }
     read=fscanf(instream, "%li", &to);
     if (read != 1) { 
-      IGRAPH_FERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 
+      IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 
     }
     IGRAPH_CHECK(vector_push_back(&edges, from));
     IGRAPH_CHECK(vector_push_back(&edges, to));
@@ -315,7 +315,7 @@ int igraph_write_graph_edgelist(igraph_t *graph, FILE *outstream) {
 		    (long int) igraph_es_from(graph, &it),
 		    (long int) igraph_es_to(graph, &it));
     if (ret < 0) {
-      IGRAPH_FERROR("Write error", IGRAPH_EFILE);
+      IGRAPH_ERROR("Write error", IGRAPH_EFILE);
     }
     igraph_es_next(graph, &it);
   }
@@ -365,7 +365,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
 		      (long int) igraph_es_from(graph, &it),
 		      (long int) igraph_es_to(graph, &it));
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -385,7 +385,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
 	ret=fprintf(outstream, "%s %s\n", (char*)ptr1, (char*)ptr2);
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -405,7 +405,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
 	ret=fprintf(outstream, "%li %li %s\n", from, to, (char*)ptr);
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -427,7 +427,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
 	ret=fprintf(outstream, "%s %s ", (char*)ptr1, (char*)ptr2);
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       if (etype==IGRAPH_ATTRIBUTE_NUM) {
 	ret=fprintf(outstream, "%f\n", *(real_t*)ptr);
@@ -435,7 +435,7 @@ int igraph_write_graph_ncol(igraph_t *graph, FILE *outstream,
 	ret=fprintf(outstream, "%s\n", (char*)ptr);
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -498,7 +498,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
 	ret=fprintf(outstream, "# %li\n%li\n", from, to);
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -527,7 +527,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
 	}
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -556,7 +556,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
 	}
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -587,7 +587,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
 	}
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       if (etype==IGRAPH_ATTRIBUTE_NUM) {
 	ret=fprintf(outstream, "%f\n", *(real_t*)ptr);
@@ -595,7 +595,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
 	ret=fprintf(outstream, "%s\n", (char*)ptr);
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
       igraph_es_next(graph, &it);
     }
@@ -626,7 +626,7 @@ int igraph_write_graph_lgl(igraph_t *graph, FILE *outstream,
 	}
       }
       if (ret<0) {
-	IGRAPH_FERROR("Write failed", IGRAPH_EFILE);
+	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
     }
   }  

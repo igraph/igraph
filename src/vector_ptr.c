@@ -43,7 +43,7 @@ int vector_ptr_init      (vector_ptr_t* v, int long size) {
 	if (size < 0) { size=0; }
 	v->stor_begin=Calloc(alloc_size, void*);
 	if (v->stor_begin==0) {
-	  IGRAPH_FERROR("vector ptr init failed", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("vector ptr init failed", IGRAPH_ENOMEM);
 	}
 	v->stor_end=v->stor_begin + alloc_size;
 	v->end=v->stor_begin+size;
@@ -108,7 +108,7 @@ int vector_ptr_reserve   (vector_ptr_t* v, long int size) {
 
 	tmp=Realloc(v->stor_begin, size, void*);
 	if (tmp==0) {
-	  IGRAPH_FERROR("vector ptr reserve failed", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("vector ptr reserve failed", IGRAPH_ENOMEM);
 	}
 	v->stor_begin=tmp;
 	v->stor_end=v->stor_begin + size;
@@ -244,7 +244,7 @@ vector_ptr_t vector_ptr_as_vector(void** data, long int length) {
 int vector_ptr_init_copy(vector_ptr_t *v, void* *data, long int length) {
   v->stor_begin=Calloc(length, void*);
   if (v->stor_begin==0) {
-    IGRAPH_FERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
   }
   v->stor_end=v->stor_begin+length;
   v->end=v->stor_end;
@@ -280,7 +280,7 @@ int vector_ptr_copy(vector_ptr_t *to, vector_ptr_t *from) {
 /*   assert(from->stor_begin != NULL); */
   to->stor_begin=Calloc(vector_ptr_size(from), void*);
   if (to->stor_begin==0) {
-    IGRAPH_FERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
   }
   to->stor_end=to->stor_begin+vector_ptr_size(from);
   to->end=to->stor_end;

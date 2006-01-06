@@ -102,7 +102,7 @@ int igraph_get_adjacency(igraph_t *graph, matrix_t *res,
       igraph_es_next(graph, &edgeit);
     }
   } else {
-    IGRAPH_FERROR("Invalid type argument", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
   }
 
   igraph_es_destroy(&edgeit);

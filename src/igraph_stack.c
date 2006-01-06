@@ -43,7 +43,7 @@ int igraph_stack_init       (igraph_stack_t* s, long int size) {
 	if (size < 0) { size=0; }
 	s->stor_begin=Calloc(alloc_size, real_t);
 	if (s->stor_begin==0) {
-	  IGRAPH_FERROR("stack init failed", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("stack init failed", IGRAPH_ENOMEM);
 	}
 	s->stor_end=s->stor_begin + alloc_size;
 	s->end=s->stor_begin;
@@ -82,7 +82,7 @@ int igraph_stack_reserve    (igraph_stack_t* s, long int size) {
   
   tmp=Realloc(s->stor_begin, size, real_t);
   if (tmp==0) {
-    IGRAPH_FERROR("stack reserve failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("stack reserve failed", IGRAPH_ENOMEM);
   }
   s->stor_begin=tmp; 
   s->stor_end=s->stor_begin + size;
@@ -143,7 +143,7 @@ int igraph_stack_push       (igraph_stack_t* s, real_t elem) {
 		
 		bigger = Calloc(2*igraph_stack_size(s)+1, real_t);
 		if (bigger==0) {
-		  IGRAPH_FERROR("stack push failed", IGRAPH_ENOMEM);
+		  IGRAPH_ERROR("stack push failed", IGRAPH_ENOMEM);
 		}
 		memcpy(bigger, s->stor_begin, 
 		       igraph_stack_size(s)*sizeof(real_t));

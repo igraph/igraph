@@ -69,7 +69,7 @@ weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yytext,
 
 int igraph_lgl_yyerror (char *s)
 {
-  IGRAPH_FERROR("Parse error", IGRAPH_PARSEERROR);
+  IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
 }
 
 real_t igraph_lgl_get_number(const char *str, long int length) {

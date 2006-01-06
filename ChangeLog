@@ -20,6 +20,40 @@
 	* interfaces/python/graphobject.h :
 	added igraphmodule_Graph_pagerank header
 
+2005-12-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/error.c (igraph_error) : calls igraph_error_handler_abort if
+	there is no error handler installed.
+
+2005-12-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/error.h (IGRAPH_FERROR) : removed
+	* src/error.c (igraph_error_handler_ignore)
+	(igraph_error_handler_printignore) : IGRAPH_FINALLY_FREE() call added
+
+	* src/dqueue.c
+	* src/heap.c
+	* src/igraph_strvector.c
+	* src/igraph_trie.c
+	* src/vector.c
+	* src/vector_ptr.c
+	* src/igraph_stack.c
+	* src/type_indexededgelist.c
+	* src/adjlist.c
+	* src/foreign.c
+	* src/foreign-lgl-parser.y
+	* src/iterators.c
+	* src/games.c
+	* src/basic_query.c
+	* src/components.c
+	* src/conversion.c
+	* src/other.c
+	* src/structural_properties.c
+	* src/structure_generators.c
+	* src/cocitation.c
+	* src/foreign-ncol-parser.y
+	* src/attributes.c : IGRAPH_ERROR instead of IGRAPH_FERROR
+
 2005-12-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/adjlist.c (igraph_i_adjlist_t, igraph_i_adjlist_init)
