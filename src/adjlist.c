@@ -42,7 +42,7 @@ int igraph_i_adjlist_init(igraph_t *graph, igraph_i_adjlist_t *al,
 
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, al);  
   for (i=0; i<al->length; i++) {
-    vector_init(&al->adjs[i], 0);
+    IGRAPH_CHECK(vector_init(&al->adjs[i], 0));
     IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
   }
   

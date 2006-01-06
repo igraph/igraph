@@ -22,6 +22,10 @@
 
 2005-12-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/adjlist.c (igraph_i_adlist_init) : error check added
+
+2005-12-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/error.c (igraph_error) : calls igraph_error_handler_abort if
 	there is no error handler installed.
 
