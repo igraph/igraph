@@ -1264,13 +1264,14 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
   integer_t dirmode;
   igraph_i_adjlist_t allneis;
   real_t maxdiff=eps;
-  const igraph_vector_t * myvids;
+  igraph_vs_t myvids;
+  const igraph_vector_t * myvidsv;
 
   if (niter<=0) IGRAPH_ERROR("Invalid iteration count", IGRAPH_EINVAL);
   if (eps<=0) IGRAPH_ERROR("Invalid epsilon value", IGRAPH_EINVAL);
   if (damping<=0 || damping>=1) IGRAPH_ERROR("Invalid damping factor", IGRAPH_EINVAL);
 
-  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, &vids, &myvids));
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
   myvidsv=igraph_vs_vector_getvector(graph, &myvids);
   nodes_to_calc=igraph_vector_size(myvidsv);    

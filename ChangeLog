@@ -1,3 +1,8 @@
+2006-01-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_pagerank) : merge confusion
+	repaired
+
 2006-01-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/dqueue.c (dqueue_t, igraph_dqueue_t) :
