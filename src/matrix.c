@@ -48,7 +48,7 @@
  * \param ncol The number of columns in the matrix.
  * \return Error code.
  *
- * Time complexity: ususally O(n), 
+ * Time complexity: usually O(n), 
  * n is the
  * number of elements in the matrix.
  */
@@ -204,7 +204,7 @@ int igraph_matrix_null(igraph_matrix_t *m) {
  *   not enough memory to perform the operation.
  *
  * Time complexity: linear with the number of elements of the new,
- * resized, matrix.
+ * resized matrix.
  */
 
 int igraph_matrix_add_cols(igraph_matrix_t *m, long int n) {

@@ -54,7 +54,7 @@
  *        the vertices.
  * \param directed Boolean, whether to generate a directed graph.
  * \return Error code:
- *         \c IGRAPH_EINVAL invalid \p n,
+ *         \c IGRAPH_EINVAL: invalid \p n,
  *         \p m or \p outseq parameter.
  * 
  * Time complexity: O(|V|+|E|), the
@@ -552,9 +552,9 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  * \param graph Uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of edges to add in a time step (ie. after
- *        adding a vertex.
+ *        adding a vertex).
  * \param directed Boolean, whether to generate a directed graph.
- * \param citation Boolean, if \c TRUE the edges always
+ * \param citation Boolean, if \c TRUE, the edges always
  *        originate from the most recently added vertex.
  * \return Error code:
  *          \c IGRAPH_EINVAL: invalid

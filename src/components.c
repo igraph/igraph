@@ -47,7 +47,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
  *        weakly or strongly connected components. Possible values: 
  *        \c IGRAPH_WEAK,
  *        \c IGRAPH_STRONG. This argument is 
- *        igrored for undirected graphs.
+ *        ignored for undirected graphs.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid mode argument.
  * 

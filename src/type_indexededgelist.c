@@ -330,9 +330,7 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
  *
  * The edges to remove are given in a vector, the first two numbers
  * define the first edge, etc. The vector should contain even number
- * of elements. If an edge to remove is not included in the graph,
- * that edge will be ignored. (Perhaps not the best approach, this
- * will likely change, as soon as there will be error handling.
+ * of elements.
  * This function cannot remove vertices, they will be kept, even if
  * they lose all their edges.
  *

@@ -27,12 +27,12 @@
 /**
  * \section about_layouts
  * 
- * <para>Layout generator functions (or at least most of them) try place the
+ * <para>Layout generator functions (or at least most of them) try to place the
  * vertices and edges of a graph on a 2D plane or in 3D space in a way
  * which visually pleases the human eye.</para>
  *
  * <para>They take a graph object and a number of parameters as arguments
- * and return a \type igraph_matrix_t, in which each row gives the
+ * and return an \type igraph_matrix_t, in which each row gives the
  * coordinates of a vertex.</para>
  */
 

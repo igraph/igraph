@@ -26,7 +26,7 @@
 /**
  * \ingroup nongraph
  * \function igraph_running_mean
- * \brief Calculates the running mean of a vector
+ * \brief Calculates the running mean of a vector.
  * 
  * The running mean is defined by the mean of the
  * previous \p binwidth values.

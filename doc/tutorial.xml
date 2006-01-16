@@ -83,7 +83,15 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libs/igraph
 ./igraph_test
 </programlisting>
 Here we assumed that the <command>igraph</command> library is installed in 
-<filename>/home/user/libs/igraph</filename>. 
+<filename>/home/user/libs/igraph</filename>. Alternatively, you can use
+the <envar>LD_PRELOAD</envar> variable to preload the
+<command>igraph</command> library before invoking your program:
+<programlisting>
+LD_PRELOAD=/home/user/libs/igraph/libigraph.so ./igraph_test
+</programlisting>
+Please note that <envar>LD_PRELOAD</envar> and
+<envar>LD_LIBRARY_PATH</envar> are usually available only on
+Un*x-like systems.
 </para>
 
 </section>
@@ -102,7 +110,7 @@ functions are usually also capable of handling
 both. Eg. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
 which (surprisingly) calculates
 shortest paths from a vertex to another vertices can calculate
-directed or undirected paths
+directed or undirected paths.
 </para>
 
 <para>
@@ -282,7 +290,7 @@ undirected graph.
 Then the degree, closeness and betweenness centrality of the vertices
 is calculated and the highest values are printed. Note that the vector
 (<varname>result</varname>) which returns the result from these
-functions has to initialized first, and also that the functions resize
+functions has to be initialized first, and also that the functions resize
 it to be able to hold the result.
 </para>
 

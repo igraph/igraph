@@ -89,7 +89,7 @@ typedef struct s_vector {
 /**
  * \ingroup vector
  * \define VECTOR
- * \brief Accessing an element of a vector
+ * \brief Accessing an element of a vector.
  * 
  * Usage: 
  * \verbatim VECTOR(v)[0] \endverbatim 
@@ -193,9 +193,9 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
 /** 
  * \section about_igraph_matrix_t_objects About \type igraph_matrix_t objects
  * 
- * <para>This type is just an interface to vector.</para>
+ * <para>This type is just an interface to \type igraph_vector_t.</para>
  *
- * <para>The \type igraph_matrix_t type ususally stores n
+ * <para>The \type igraph_matrix_t type usually stores n
  * elements in O(n) space, but not always, see the documentation of
  * the vector type.</para>
  */

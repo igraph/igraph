@@ -25,7 +25,7 @@
 
 /* This file contains the igraph error handling.
  * Most bits are taken literally from the GSL library (with the GSL_
- * prefix renamed to IGRAPH_), as i couldn't find a better way to do
+ * prefix renamed to IGRAPH_), as I couldn't find a better way to do
  * them. */
 
 /**
@@ -33,11 +33,11 @@
  *
  * <para>
  * If \a igraph runs into an error - an invalid argument was supplied
- * to a function, or we've runned out of memory - the control is
+ * to a function, or we've ran out of memory - the control is
  * transferred to the \emb error handler \eme function.
  * </para><para>
  * The default error handler is \ref igraph_error_handler_abort which
- * prints and error message and aborts the program.
+ * prints an error message and aborts the program.
  * </para>
  * <para>
  * The \ref igraph_set_error_handler() function can be used to set a new
@@ -59,7 +59,7 @@
  * happens. By semantically we mean that the implementation of an
  * object supplied as an argument might change, but its
  * \quote meaning \endquote in most cases does not. The rare occasions
- * when this rule does is violated are documented in this manual.
+ * when this rule is violated are documented in this manual.
  * </para>
  */
 
@@ -89,7 +89,7 @@
  * </para>
  * <para> 
  * If you want to write an error handler, your error handler should
- * call \ref IGRAPH_FINALLY_FREE() to deallocate all temporarily memory to
+ * call \ref IGRAPH_FINALLY_FREE() to deallocate all temporary memory to
  * prevent memory leaks.
  * </para>
  */
@@ -101,8 +101,8 @@
  * If an error happens, the functions in the library call the
  * \ref IGRAPH_ERROR macro with a textual description of the error and an
  * \a igraph error code. This macro calls (through the \ref
- * igraph_error() function) the installed error handler. Other useful
- * macro is \ref IGRAPH_CHECK(), this check the return value of its
+ * igraph_error() function) the installed error handler. Another useful
+ * macro is \ref IGRAPH_CHECK(), this checks the return value of its
  * argument which is normally a function call, and calls \ref
  * IGRAPH_ERROR if it is not \c IGRAPH_SUCCESS. 
  * </para>
@@ -113,9 +113,9 @@
  *
  * <para>
  * If a function runs into an error (and the program is not aborted)
- * the error handler should deallocate all temporarily memory. This is
- * done by storing the address and destroy function of all temporary
- * object in a stack. The \ref IGRAPH_FINALLY function declares an object as
+ * the error handler should deallocate all temporary memory. This is
+ * done by storing the address and the destroy function of all temporary
+ * objects in a stack. The \ref IGRAPH_FINALLY function declares an object as
  * temporary by placing its address in the stack. If a function returns
  * with success it calls \ref IGRAPH_FINALLY_CLEAN() with the
  * number of objects to remove from the stack. If an error happens
@@ -132,9 +132,9 @@
  *
  * <para>
  * There are some simple rules to keep in order to have functions
- * behaving well in errorenous situations. First, check the arguments
+ * behaving well in erroneous situations. First, check the arguments
  * of the functions and call \ref IGRAPH_ERROR if they are invalid. Second,
- * call \ref IGRAPH_FINALLY on each dinamically allocated object and call
+ * call \ref IGRAPH_FINALLY on each dynamically allocated object and call
  * \ref IGRAPH_FINALLY_CLEAN() with the proper argument. Third, use
  * IGRAPH_CHECK on all function calls which can generate errors.
  * </para>
@@ -157,7 +157,7 @@
  *
  * <para>
  * It is likely that the \a igraph error handling
- * method is \em not thread-safe, mainly beacuse of
+ * method is \em not thread-safe, mainly because of
  * the static global stack which is used to store the address of the
  * temporarily allocated objects. This issue might be addressed in a
  * later version of \a igraph.
@@ -261,7 +261,7 @@ typedef enum {
 /**
  * \define IGRAPH_ERROR
  * 
- * This macro is called if an error is noticed. It calles
+ * This macro is called if an error is noticed. It calls
  * \ref igraph_error() with the proper parameters and if that returns 
  * the macro returns the "calling" function as well, with the error
  * code. If for some (suspicious) reason you want to call the error

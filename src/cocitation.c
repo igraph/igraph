@@ -30,13 +30,11 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 /**
  * \ingroup structural
  * \function igraph_cocitation
- * \brief Cocitation coupling
+ * \brief Cocitation coupling.
  * 
  * Two vertices are cocited if there is another vertex citing both of
- * them. \ref igraph_cocitation() siply counts how many types two vertices are
- * cocited. The bibliographic coupling of two vertices is the number
- * of other vertices they both cite, \ref igraph_bibcoupling() calculates
- * this.
+ * them. \ref igraph_cocitation() simply counts how many types two vertices are
+ * cocited.
  * The cocitation score for each given vertex and all other vertices
  * in the graph will be calculated.
  * \param graph The graph object to analyze.
@@ -65,11 +63,9 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
 /**
  * \ingroup structural
  * \function igraph_bibcoupling
- * \brief Bibliographic coupling
+ * \brief Bibliographic coupling.
  * 
- * Two vertices are cocited if there is another vertex citing both of
- * them. \ref igraph_cocitation() siply counts how many types two vertices are
- * cocited. The bibliographic coupling of two vertices is the number
+ * The bibliographic coupling of two vertices is the number
  * of other vertices they both cite, \ref igraph_bibcoupling() calculates
  * this.
  * The bibliographic coupling  score for each given vertex and all

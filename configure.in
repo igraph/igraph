@@ -163,7 +163,7 @@ AC_ARG_ENABLE(docs,
               [docs=$enableval], [docs=no])
 
 if test "$docs" == "yes"; then
-  if test HAVE_PYTHON -gt 0; then
+  if test $HAVE_PYTHON -gt 0; then
     DOCS=1
   else
     AC_MSG_RESULT(Python not found, disabling docs)

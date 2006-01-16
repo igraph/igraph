@@ -572,7 +572,7 @@ bool_t igraph_attribute_list_has(const igraph_attribute_list_t *al,
  * \section about_attributes
  * 
  * <para>Attributes are associated values of graph, vertices or edges. A
- * graph attribute can contain the date of its creations, vertex
+ * graph attribute can contain the date of its creation, vertex
  * attributes describe the color to be used for the vertices when the
  * graph is plotted, edge attributes can simply be the weights of the
  * edges in a weighted graph.</para>
@@ -615,7 +615,7 @@ bool_t igraph_attribute_list_has(const igraph_attribute_list_t *al,
  * Attributes have to be added by calling this function before setting
  * or getting them.
  * \param graph A graph object.
- * \param name The name of the attribute to install.
+ * \param name The name of the attribute to add.
  * \param type Numeric constant giving the type of the attribute,
  *        either \c IGRAPH_ATTRIBUTE_NUM (numeric) or
  *        \c IGRAPH_ATTRIBUTE_STR (string).
@@ -628,9 +628,7 @@ bool_t igraph_attribute_list_has(const igraph_attribute_list_t *al,
  *        \endclist
  *
  * Time complexity: O(1). (Assuming
- * the number of graph attributes of
- * graph is
- * O(1).) 
+ * the number of graph attributes of the graph is O(1).) 
  */
 
 int igraph_add_graph_attribute(igraph_t *graph, const char *name,
@@ -649,9 +647,7 @@ int igraph_add_graph_attribute(igraph_t *graph, const char *name,
  *         \c IGRAPH_EINVAL: the attribute does not exist.
  *
  * Time complexity: O(1). (Assuming
- * the number of graph attributes of
- * graph is
- * O(1).) 
+ * the number of graph attributes of the graph is O(1).) 
  */
 
 int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
@@ -675,9 +671,7 @@ int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
  *         \c IGRAPH_EINVAL: the attribute does not exist.
  *
  * Time complexity: O(1). (Assuming
- * the number of graph attributes of
- * graph is
- * O(1).) 
+ * the number of graph attributes of the graph is O(1).)
  */
 
 int igraph_get_graph_attribute(const igraph_t *graph, const char *name,
@@ -698,9 +692,7 @@ int igraph_get_graph_attribute(const igraph_t *graph, const char *name,
  *         \c IGRAPH_EINVAL: the attribute does not exist.
  *
  * Time complexity: O(1). (Assuming
- * the number of graph attributes of
- * graph is
- * O(1).) 
+ * the number of graph attributes of the graph is O(1).)
  */
 
 int igraph_set_graph_attribute(igraph_t *graph, const char *name,
@@ -711,7 +703,7 @@ int igraph_set_graph_attribute(igraph_t *graph, const char *name,
 /**
  * \ingroup attributes
  * \function igraph_list_graph_attributes
- * \brief Queries the list of installed graph attributes.
+ * \brief Queries the list of added graph attributes.
  *
  * \param graph A graph object.
  * \param names This string vector will contain the names of the
@@ -724,9 +716,7 @@ int igraph_set_graph_attribute(igraph_t *graph, const char *name,
  * \return Error code.
  *
  * Time complexity: O(1). (Assuming
- * the number of graph attributes of
- * graph is
- * O(1).) 
+ * the number of graph attributes of the graph is O(1).)
  */
 
 int igraph_list_graph_attributes(const igraph_t *graph, 
@@ -741,7 +731,7 @@ int igraph_list_graph_attributes(const igraph_t *graph,
  * \brief Adds a vertex attribute.
  *
  * \param graph The graph object.
- * \param name The name of the attribute to install.
+ * \param name The name of the attribute to add.
  * \param type Numeric constant giving the type of the attribute,
  *        either \c IGRAPH_ATTRIBUTE_NUM (numeric) or
  *        \c IGRAPH_ATTRIBUTE_STR (string).
@@ -801,7 +791,7 @@ int igraph_remove_vertex_attribute(igraph_t *graph, const char *name) {
  *
  * Time complexity: O(1), assuming
  * that the graph has  O(1) vertex
- * attributes installed. 
+ * attributes added.
  */
 
 int igraph_get_vertex_attribute(const igraph_t *graph, const char *name,
@@ -824,7 +814,7 @@ int igraph_get_vertex_attribute(const igraph_t *graph, const char *name,
  *
  * Time complexity: O(1), assuming
  * that the graph has O(1) vertex
- * attributes installed. 
+ * attributes added. 
  */
 
 int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
@@ -912,7 +902,7 @@ int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
 /**
  * \ingroup attributes
  * \function igraph_list_vertex_attributes
- * \brief Queries the list of installed vertex attributes.
+ * \brief Queries the list of added vertex attributes.
  *
  * \param graph A graph object.
  * \param l This string array will contain the names of the
@@ -940,7 +930,7 @@ int igraph_list_vertex_attributes(const igraph_t *graph, igraph_strvector_t *l,
  * \brief Adds an edge attribute.
  *
  * \param graph The graph object.
- * \param name The name of the attribute to install.
+ * \param name The name of the attribute to add.
  * \param type Numeric constant giving the type of the attribute,
  *        either \c IGRAPH_ATTRIBUTE_NUM (numeric) or
  *        \c IGRAPH_ATTRIBUTE_STR (string).
@@ -1001,7 +991,7 @@ int igraph_remove_edge_attribute(igraph_t *graph, const char *name) {
  *
  * Time complexity: O(1), assuming
  * that the graph has  O(1) edge
- * attributes installed. 
+ * attributes addeed.
  */
 
 int igraph_get_edge_attribute(const igraph_t *graph, const char *name,
@@ -1025,7 +1015,7 @@ int igraph_get_edge_attribute(const igraph_t *graph, const char *name,
  *
  * Time complexity: O(1), assuming
  * that the graph has O(1) edge
- * attributes installed. 
+ * attributes added. 
  */
 
 int igraph_set_edge_attribute(igraph_t *graph, const char *name,
@@ -1093,7 +1083,7 @@ int igraph_set_edge_attributes(igraph_t *graph, const char *name,
 /**
  * \ingroup attributes
  * \function igraph_list_edge_attributes
- * \brief Queries the list of installed edge attributes.
+ * \brief Queries the list of added edge attributes.
  *
  * \param graph A graph object.
  * \param l This string array will contain the names of the
@@ -1182,7 +1172,7 @@ int igraph_get_edge_attribute_type(const igraph_t *graph, const char *name,
  * 
  * \param graph The graph object.
  * \param name The name of the (potential) attribute.
- * \return Non-zero (TRUE) value if the attribute is installed, zero
+ * \return Non-zero (TRUE) value if the attribute is added, zero
  *         (FALSE) otherwise.
  * 
  * Time complexity: O(1) assuming there are
@@ -1200,7 +1190,7 @@ bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name) {
  * 
  * \param graph The graph object.
  * \param name The name of the (potential) attribute.
- * \return Non-zero (TRUE) value if the attribute is installed, zero
+ * \return Non-zero (TRUE) value if the attribute is added, zero
  *         (FALSE) otherwise.
  * 
  * Time complexity: O(1) assuming there are
@@ -1218,7 +1208,7 @@ bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name) {
  * 
  * \param graph The graph object.
  * \param name The name of the (potential) attribute.
- * \return Non-zero (TRUE) value if the attribute is installed, zero
+ * \return Non-zero (TRUE) value if the attribute is added, zero
  *         (FALSE) otherwise.
  * 
  * Time complexity: O(1) assuming there are

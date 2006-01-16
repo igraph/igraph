@@ -28,8 +28,8 @@
  * \function igraph_get_adjacency
  * \brief Returns the adjacency matrix of a graph
  * 
- * The result is an incidence matrix, it contains numbers higher
- * than one, if there are multiple edges in the graph.
+ * The result is an incidence matrix, it contains numbers greater
+ * than one if there are multiple edges in the graph.
  * \param graph Pointer to the graph to convert
  * \param res Pointer to an initialized matrix object, it will be
  *        resized if needed.
@@ -122,7 +122,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph Pointer to the graph object
  * \param res Pointer to an initialized vector object, it will be
  *        resized.
- * \param bycol Logical, if true the edges will be returned
+ * \param bycol Logical, if true, the edges will be returned
  *        columnwise, eg. the first edge is
  *        <code>res[0]->res[|E|]</code>, the second is
  *        <code>res[1]->res[|E|+1]</code>, etc.

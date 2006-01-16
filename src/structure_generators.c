@@ -281,13 +281,13 @@ int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
 /**
  * \ingroup generators
  * \function igraph_star
- * \brief Created a \em star graph, every vertex connect to the center
- * only.
+ * \brief Creates a \em star graph, every vertex connects only to
+ * the center.
  *
  * \param graph Pointer to an uninitialized graph object, this will
  *        be the result.
  * \param n Integer constant, the number of vertices in the graph.
- * \param mode Contant, gives the type of the star graph to
+ * \param mode Constant, gives the type of the star graph to
  *        create. Possible values:
  *        \clist
  *        \cli IGRAPH_STAR_OUT
@@ -436,12 +436,11 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
 /**
  * \ingroup generators 
  * \function igraph_lattice
- * \brief Creating all kinds of lattices.
+ * \brief Creates most kind of lattices.
  *
- * This function can create most kind of regular lattices.
  * \param graph An uninitialized graph object.
  * \param dimvector Vector giving the sizes of the lattice in each of
- *        its dimensions. IE. the dimension of the lattice will be the
+ *        its dimensions. Ie. the dimension of the lattice will be the
  *        same as the length of this vector.
  * \param nei Integer value giving the distance (number of steps)
  *        within which two vertices will be connected. Not implemented
@@ -596,7 +595,7 @@ int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
 /**
  * \ingroup generators
  * \function igraph_tree
- * \brief Creates a tree in which almost all vertices has the same
+ * \brief Creates a tree in which almost all vertices have the same
  * number of children.
  *
  * \param graph Pointer to an uninitialized graph object.

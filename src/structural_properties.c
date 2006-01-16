@@ -44,7 +44,7 @@
  * \param unconn What to do if the graph is not connected. If
  *        \c TRUE the longest geodesic within a component
  *        will be returned, otherwise the number of vertices is
- *        returned. (The ratio behind the latter is that this is
+ *        returned. (The rationale behind the latter is that this is
  *        always longer than the longest possible diameter in a
  *        graph.) 
  * \return Error code:
@@ -132,7 +132,7 @@ int igraph_diameter(const igraph_t *graph, integer_t *res,
  *        \c TRUE the average of thr geodesics
  *        within the components 
  *        will be returned, otherwise the number of vertices is
- *        used for the length of non-existing geodesics. (The ratio
+ *        used for the length of non-existing geodesics. (The rationale
  *        behind this is that this is always longer than the longest
  *        possible geodesic in a graph.) 
  * \return Error code:
@@ -424,9 +424,9 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 /**
  * \ingroup structural
  * \function igraph_closeness
- * \brief Cloness centrality calculations for some vertices.
+ * \brief Closeness centrality calculations for some vertices.
  *
- * The closeness centerality of a vertex measures how easily other
+ * The closeness centrality of a vertex measures how easily other
  * vertices can be reached from it (or the other way: how easily it
  * can be reached from the other vertices). It is defined as the
  * number of the number of vertices minus one divided by the sum of the
@@ -437,11 +437,11 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
  * geodesic. This is always longer than the longest possible geodesic.
  * 
  * \param graph The graph object.
- * \param res The result of the computatuion, a vector containing the
+ * \param res The result of the computation, a vector containing the
  *        closeness centrality scores for the given vertices.
  * \param vids Vector giving the vertices for which the closeness
  *        centrality scores will be computed.
- * \param mode The type of shortest paths to be use for the
+ * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values: 
  *        \clist
  *        \cli IGRAPH_OUT 
@@ -889,11 +889,11 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, real_t vert
  * \brief Betweenness centrality of some vertices.
  * 
  * The betweenness centrality of a vertex is the number of geodesics
- * going through it. If there are more than one geodesics between two
+ * going through it. If there are more than one geodesic between two
  * vertices, the value of these geodesics are weighted by one over the 
  * number of geodesics.
  * \param graph The graph object.
- * \param res The result of the computation, vector containing the
+ * \param res The result of the computation, a vector containing the
  *        betweenness scores for the specified vertices.
  * \param vids The vertices of which the betweenness centrality scores
  *        will be calculated.
@@ -1217,24 +1217,31 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  * \function igraph_pagerank
  * \brief Calculates the Google PageRank for the specified vertices.
  * 
- * This function calculates the Google PageRank value for the specified
- * vertices. Note that the PageRank of a given vertex depends on all
- * other vertices, so even if you want to calculate the PageRank for
- * only some of the vertices, all of them must be calculated, so requesting
+ * Please note that the PageRank of a given vertex depends on the PageRank
+ * of all other vertices, so even if you want to calculate the PageRank for
+ * only some of the vertices, all of them must be calculated. Requesting
  * the PageRank for only some of the vertices does not result in any
- * performance increase at all. Since the calculation is an iterative
+ * performance increase at all.
+ * 
+ * <para>
+ * Since the calculation is an iterative
  * process, the algorithm is stopped after a given count of iterations
  * or if the PageRank value differences between iterations are less than
  * a predefined value.
+ * </para>
  * 
+ * <para>
  * For the explanation of the PageRank algorithm, see the following
  * webpage:
- * http://www-db.stanford.edu/~backrub/google.html or the 
+ * http://www-db.stanford.edu/~backrub/google.html, or the
  * following reference:
+ * </para>
  * 
+ * <para>
  * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
  * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
  * Brisbane, Australia, April 1998.
+ * </para>
  * 
  * \param graph The graph object.
  * \param res The result vector containing the PageRank values for the
@@ -1458,7 +1465,7 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
  * \brief Removes loop and/or multiple edges from the graph.
  * 
  * \param graph The graph object.
- * \param multiple Logical, if true multiple edges will be removed. 
+ * \param multiple Logical, if true, multiple edges will be removed. 
  * \param loops Logical, if true, loops (self edges) will be removed.
  * \return Error code:
  *    \c IGRAPH_ENOMEM if we are out of memory.
@@ -1573,7 +1580,7 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
 /**
  * \ingroup structural
  * \function igraph_transitivity
- * \brief Calculates the transitivity (clustering coefficient) of a graph
+ * \brief Calculates the transitivity (clustering coefficient) of a graph.
  * 
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. See the \p type parameter for

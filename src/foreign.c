@@ -38,7 +38,7 @@
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_edgelist
- * \brief Reads an edge list from a file and creates a graph
+ * \brief Reads an edge list from a file and creates a graph.
  * 
  * This format is simply a series of even number integers separated by
  * whitespace. The one edge (ie. two integers) per line format is thus
@@ -314,7 +314,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_edgelist
- * \brief Writes the edge list of a graph to a file
+ * \brief Writes the edge list of a graph to a file.
  * 
  * One edge is written per line, separated by a single space.
  * For directed graphs edges are written in from, to order.
@@ -367,9 +367,9 @@ int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
  * \param outstream The stream object to write to, it should be
  *        writable.
  * \param names The name of the vertex attribute, if symbolic names
- *        are written to the file. If not supply 0 here.
+ *        are written to the file. If not, supply 0 here.
  * \param weights The name of the edge attribute, if they are also
- *        written to the file. If you don't want weights supply 0
+ *        written to the file. If you don't want weights, supply 0
  *        here.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error writing the
@@ -495,14 +495,14 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
  * \param weights The name of the edge attribute, if they are also
  *        written to the file. If you don't want weights supply 0
  *        here.
- * \param isolates Logical, if TRUE isolate vertices are also written
+ * \param isolates Logical, if TRUE isolated vertices are also written
  *        to the file. If FALSE they will be omitted.
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error
  *         writing the file. 
  *
  * Time complexity: O(|E|), the
- * number of edges if isolates is
+ * number of edges if \p isolates is
  * FALSE, O(|V|+|E|) otherwise. All
  * file operations are expected to have time complexity 
  * O(1). 
