@@ -42,7 +42,7 @@
  * We will discuss all vertex sequence constructors later.</para>
  * 
  * <para>Vertex sequences are usually used as iterators, but there is a
- * method unfold finite vertex sequences into a <type>vector_t</type>
+ * method unfold finite vertex sequences into a <type>igraph_vector_t</type>
  * object. (Infinite sequences cannot be unfolded of course.) 
  * This manual sometimes calles vertex (or edge) sequences as
  * iterators, these two names are used as synonims. </para>
@@ -200,7 +200,7 @@ integer_t igraph_vs_get(const igraph_t *graph, const igraph_vs_t *vs) {
  * iterators, like random walkers.
  * \param graph The underlying graph object.
  * \param vs The vertex sequence object.
- * \param v An initialized <type>vector_t</type> object. These will be
+ * \param v An initialized <type>igraph_vector_t</type> object. These will be
  *   resized to hold the vertices.
  * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
  *   not enough memory to resize <parameter>v</parameter>.
@@ -211,7 +211,7 @@ integer_t igraph_vs_get(const igraph_t *graph, const igraph_vs_t *vs) {
  */
 
 int igraph_vs_unfold(const igraph_t *graph, const igraph_vs_t *vs, 
-		     vector_t *v) {
+		     igraph_vector_t *v) {
   return vs->table->unfold(graph, (const struct igraph_vs_t*)vs, v);
 }
 
@@ -239,7 +239,7 @@ bool_t igraph_vs_end_all(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_all(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_all(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_all(const igraph_t *graph, const igraph_vs_t *vs, 
-			 vector_t *v);
+			 igraph_vector_t *v);
 void igraph_vs_destroy_all(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_all_table = {
@@ -307,12 +307,12 @@ integer_t igraph_vs_get_all(const igraph_t *graph, const igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_all(const igraph_t *graph, const igraph_vs_t *vs, 
-			 vector_t *v) {
+			 igraph_vector_t *v) {
   long int n;
-  vector_t v2;
+  igraph_vector_t v2;
   n=igraph_vcount(graph);
-  IGRAPH_CHECK(vector_init_seq(&v2, 0, n-1));
-  vector_destroy(v);
+  IGRAPH_CHECK(igraph_vector_init_seq(&v2, 0, n-1));
+  igraph_vector_destroy(v);
   *v=v2;
   return 0;
 }
@@ -333,7 +333,7 @@ bool_t igraph_vs_end_adj(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_adj(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_adj(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_adj(const igraph_t *graph, const igraph_vs_t *vs, 
-			 vector_t *v);
+			 igraph_vector_t *v);
 void igraph_vs_destroy_adj(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_adj_table = {
@@ -425,7 +425,7 @@ integer_t igraph_vs_get_adj(const igraph_t *graph, const igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_adj(const igraph_t *graph, const igraph_vs_t *vs,
-			 vector_t *v) {
+			 igraph_vector_t *v) {
   IGRAPH_CHECK(igraph_neighbors(graph, v, vs->stdata[0], vs->stdata[1]));
   return 0;
 }
@@ -477,7 +477,7 @@ bool_t igraph_vs_end_rw(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_rw(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_rw(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_rw(const igraph_t *graph, const igraph_vs_t *vs, 
-			vector_t *v);
+			igraph_vector_t *v);
 void igraph_vs_destroy_rw(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_rw_table = {
@@ -584,7 +584,7 @@ integer_t igraph_vs_get_rw(const igraph_t *graph, const igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_rw(const igraph_t *graph, const igraph_vs_t *vs,
-			vector_t *v) {
+			igraph_vector_t *v) {
   IGRAPH_ERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
   return 0;			/* return unneccesary */
 }
@@ -609,7 +609,7 @@ bool_t igraph_vs_end_rw1(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_rw1(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_rw1(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_rw1(const igraph_t *graph, const igraph_vs_t *vs, 
-			 vector_t *v);
+			 igraph_vector_t *v);
 void igraph_vs_destroy_rw1(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_rw1_table = {
@@ -753,7 +753,7 @@ void igraph_vs_reset_rw1(const igraph_t *graph, igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_rw1(const igraph_t *graph, const igraph_vs_t *vs,
-			 vector_t *v) {
+			 igraph_vector_t *v) {
   IGRAPH_ERROR("attempt to unfold random walker", IGRAPH_EUNFOLDINF);
   return 0;
 }
@@ -777,7 +777,7 @@ bool_t igraph_vs_end_none(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_none(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_none(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_none(const igraph_t *graph, const igraph_vs_t *vs,
-			  vector_t *v);
+			  igraph_vector_t *v);
 void igraph_vs_destroy_none(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_none_table = {
@@ -822,8 +822,8 @@ integer_t igraph_vs_get_none(const igraph_t *graph, const igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_none(const igraph_t *graph, const igraph_vs_t *vs,
-			  vector_t *v) {
-  vector_clear(v);
+			  igraph_vector_t *v) {
+  igraph_vector_clear(v);
   return 0;
 }
 
@@ -842,7 +842,7 @@ bool_t igraph_vs_end_1(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_1(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_1(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_1(const igraph_t *graph, const igraph_vs_t *vs, 
-		       vector_t *v);
+		       igraph_vector_t *v);
 void igraph_vs_destroy_1(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_1_table = {
@@ -914,8 +914,8 @@ integer_t igraph_vs_get_1(const igraph_t *graph, const igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_1(const igraph_t *graph, const igraph_vs_t *vs,
-		       vector_t *v) {
-  IGRAPH_CHECK(vector_resize(v, 1));
+		       igraph_vector_t *v) {
+  IGRAPH_CHECK(igraph_vector_resize(v, 1));
   VECTOR(*v)[0]=vs->stdata[0];
   return 0;
 }
@@ -936,7 +936,7 @@ bool_t igraph_vs_end_seq(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_seq(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_seq(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_seq(const igraph_t *graph, const igraph_vs_t *vs,
-			 vector_t *v);
+			 igraph_vector_t *v);
 void igraph_vs_destroy_seq(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_seq_table = {
@@ -986,10 +986,10 @@ integer_t igraph_vs_get_seq(const igraph_t *graph, const igraph_vs_t *vs) {
 }
 
 int igraph_vs_unfold_seq(const igraph_t *graph, const igraph_vs_t *vs,
-			 vector_t *v) {
-  vector_t v2;
-  IGRAPH_CHECK(vector_init_seq(&v2, vs->stdata[1], vs->stdata[2]));
-  vector_destroy(v);
+			 igraph_vector_t *v) {
+  igraph_vector_t v2;
+  IGRAPH_CHECK(igraph_vector_init_seq(&v2, vs->stdata[1], vs->stdata[2]));
+  igraph_vector_destroy(v);
   *v=v2;
   return 0;
 }
@@ -1012,7 +1012,7 @@ void igraph_vs_reset_vectorview(const igraph_t *graph, igraph_vs_t *vs);
 integer_t igraph_vs_get_vectorview(const igraph_t *graph, 
 				   const igraph_vs_t *vs);
 int igraph_vs_unfold_vectorview(const igraph_t *graph, const igraph_vs_t *vs,
-				vector_t *v);
+				igraph_vector_t *v);
 void igraph_vs_destroy_vectorview(igraph_vs_t *vs);
 
 igraph_i_vstable_t igraph_i_vs_vectorview_table = {
@@ -1022,17 +1022,17 @@ igraph_i_vstable_t igraph_i_vs_vectorview_table = {
 };
 
 typedef struct igraph_i_vs_vectorview_pdata_t {
-  const vector_t v;
+  const igraph_vector_t v;
   bool_t destroy;
 } igraph_i_vs_vectorview_pdata_t;
 
 /**
  * \function igraph_vs_vectorview
  * 
- * This iterator type allows to handle a <type>vector_t</type> object
+ * This iterator type allows to handle a <type>igraph_vector_t</type> object
  * as a vertex sequence. Note that this function does \em not make a
  * copy of the original vector, so be sure that you don't destroy the
- * underlying <type>vector_t</type> object before destroying the
+ * underlying <type>igraph_vector_t</type> object before destroying the
  * vertex set. 
  *
  * The \ref igraph_vs_vector_getvector() specific function can be
@@ -1040,7 +1040,7 @@ typedef struct igraph_i_vs_vectorview_pdata_t {
  * 
  * \param igraph The underlying graph object.
  * \param vs The vertex sequence object.
- * \param vids The underlying <type>vector_t</type> object.
+ * \param vids The underlying <type>igraph_vector_t</type> object.
  * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
  *   not enough memory.
  * 
@@ -1051,9 +1051,9 @@ typedef struct igraph_i_vs_vectorview_pdata_t {
  */
 
 int igraph_vs_vectorview(const igraph_t *igraph, igraph_vs_t *vs, 
-			 const vector_t *vids) {
+			 const igraph_vector_t *vids) {
   igraph_i_vs_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
 
   vs->type=IGRAPH_ITERATOR_VS_VECTOR;
   vs->stdata[0]=0;
@@ -1065,11 +1065,11 @@ int igraph_vs_vectorview(const igraph_t *igraph, igraph_vs_t *vs,
     IGRAPH_ERROR("Cannot create vector iterator", IGRAPH_ENOMEM);
   }
   data=(igraph_i_vs_vectorview_pdata_t*)vs->pdata;
-  fakev=(vector_t*) &data->v;
+  fakev=(igraph_vector_t*) &data->v;
   *fakev = *vids;
   data->destroy=0;
 
-  vs->stdata[1]=vector_size(&data->v);
+  vs->stdata[1]=igraph_vector_size(&data->v);
 
   return 0;
 }
@@ -1078,7 +1078,7 @@ int igraph_vs_vectorview(const igraph_t *igraph, igraph_vs_t *vs,
  * \function igraph_vs_vector
  * 
  * This function creates a vertex sequence object from a
- * <type>vector_t</type> containing vertex ids. Unlike \ref
+ * <type>igraph_vector_t</type> containing vertex ids. Unlike \ref
  * igraph_vs_vectorview() this function makes a copy of the original
  * vector, which can be safely destroyed.
  * 
@@ -1100,9 +1100,9 @@ int igraph_vs_vectorview(const igraph_t *igraph, igraph_vs_t *vs,
  */
 
 int igraph_vs_vector(const igraph_t *igraph, igraph_vs_t *vs,
-		     const vector_t *vids) {
+		     const igraph_vector_t *vids) {
   igraph_i_vs_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
 
   vs->type=IGRAPH_ITERATOR_VS_VECTOR;
   vs->stdata[0]=0;
@@ -1115,11 +1115,11 @@ int igraph_vs_vector(const igraph_t *igraph, igraph_vs_t *vs,
   }
   IGRAPH_FINALLY(igraph_free, vs->pdata);
   data=(igraph_i_vs_vectorview_pdata_t*)vs->pdata;
-  fakev=(vector_t*)&data->v;
-  IGRAPH_CHECK(vector_copy(fakev, vids));
+  fakev=(igraph_vector_t*)&data->v;
+  IGRAPH_CHECK(igraph_vector_copy(fakev, vids));
   data->destroy=1;
 
-  vs->stdata[1]=vector_size(&data->v);
+  vs->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
@@ -1157,7 +1157,7 @@ int igraph_vs_vector(const igraph_t *igraph, igraph_vs_t *vs,
 int igraph_vs_vectorview_it(const igraph_t *graph, const igraph_vs_t *vs,
 			    igraph_vs_t *newvs) {
   igraph_i_vs_vectorview_pdata_t *data, *vsdata;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
 
   newvs->type=IGRAPH_ITERATOR_VS_VECTOR;
   newvs->stdata[0]=0;
@@ -1170,9 +1170,9 @@ int igraph_vs_vectorview_it(const igraph_t *graph, const igraph_vs_t *vs,
   }
   IGRAPH_FINALLY(igraph_free, newvs->pdata);
   data=(igraph_i_vs_vectorview_pdata_t*)newvs->pdata;
-  fakev=(vector_t*)&data->v;
+  fakev=(igraph_vector_t*)&data->v;
   if (vs->type != IGRAPH_ITERATOR_VS_VECTOR) {
-    VECTOR_INIT_FINALLY((vector_t*) &data->v, 0);
+    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*) &data->v, 0);
     IGRAPH_CHECK(igraph_vs_unfold(graph, vs, fakev));
     data->destroy=1;
     IGRAPH_FINALLY_CLEAN(1);
@@ -1183,7 +1183,7 @@ int igraph_vs_vectorview_it(const igraph_t *graph, const igraph_vs_t *vs,
     data->destroy=0;
   }
 
-  newvs->stdata[1]=vector_size(&data->v);
+  newvs->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
@@ -1212,7 +1212,7 @@ int igraph_vs_vectorview_it(const igraph_t *graph, const igraph_vs_t *vs,
 int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
   va_list ap;
   igraph_i_vs_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
   long int i, n=0;
   vs->type=IGRAPH_ITERATOR_VS_VECTOR;
   vs->stdata[0]=0;
@@ -1225,7 +1225,7 @@ int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
   }
   IGRAPH_FINALLY(igraph_free, vs->pdata);
   data=(igraph_i_vs_vectorview_pdata_t*)vs->pdata;
-  fakev=(vector_t*)&data->v;
+  fakev=(igraph_vector_t*)&data->v;
   data->destroy=1;
 
   va_start(ap, vs);
@@ -1238,7 +1238,7 @@ int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
   }
   va_end(ap);
 
-  VECTOR_INIT_FINALLY(fakev, n);
+  IGRAPH_VECTOR_INIT_FINALLY(fakev, n);
   
   va_start(ap, vs);
   for (i=0; i<n; i++) {
@@ -1246,7 +1246,7 @@ int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
   }
   va_end(ap);  
   
-  vs->stdata[1]=vector_size(&data->v);
+  vs->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
@@ -1255,9 +1255,9 @@ int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
 /**
  * \function IGRAPH_VS_VECTOR
  * 
- * Vertex sequence shorthand for a <type>vector_t</type> object. 
+ * Vertex sequence shorthand for a <type>igraph_vector_t</type> object. 
  * \param graph The underlying graph object.
- * \param vids An initialized <type>vector_t</type> object containing
+ * \param vids An initialized <type>igraph_vector_t</type> object containing
  * vertex ids.
  * \return Vertex sequence shorthand.
  * 
@@ -1265,7 +1265,7 @@ int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
  */
 
 const igraph_vs_t *IGRAPH_VS_VECTOR(const igraph_t *graph, 
-				    const vector_t *vids) {
+				    const igraph_vector_t *vids) {
   igraph_vs_t *vs=Calloc(1, igraph_vs_t);
   if (vs==0) {
     igraph_error("Cannot create iterator shorthand", __FILE__, __LINE__,
@@ -1293,7 +1293,7 @@ const igraph_vs_t *IGRAPH_VS(const igraph_t *graph, ...) {
   igraph_vs_t *vs=Calloc(1, igraph_vs_t);
   va_list ap;
   igraph_i_vs_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
   long int i, n=0;
   int ret;
   if (vs==0) {
@@ -1315,7 +1315,7 @@ const igraph_vs_t *IGRAPH_VS(const igraph_t *graph, ...) {
   }
   IGRAPH_FINALLY(igraph_free, vs->pdata);
   data=(igraph_i_vs_vectorview_pdata_t*)vs->pdata;
-  fakev=(vector_t*)&data->v;
+  fakev=(igraph_vector_t*)&data->v;
   data->destroy=1;
 
   va_start(ap, graph);
@@ -1328,13 +1328,13 @@ const igraph_vs_t *IGRAPH_VS(const igraph_t *graph, ...) {
   }
   va_end(ap);
 
-  ret=vector_init(fakev, n);
+  ret=igraph_vector_init(fakev, n);
   if (ret != 0) {
     igraph_error("Cannot create vector for iterator shorthand", __FILE__, 
 		 __LINE__, ret);
     return 0;
   }
-  IGRAPH_FINALLY(vector_destroy, fakev);
+  IGRAPH_FINALLY(igraph_vector_destroy, fakev);
   
   va_start(ap, graph);
   for (i=0; i<n; i++) {
@@ -1342,7 +1342,7 @@ const igraph_vs_t *IGRAPH_VS(const igraph_t *graph, ...) {
   }
   va_end(ap);  
   
-  vs->stdata[1]=vector_size(&data->v);
+  vs->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(2);
   vs->shorthand=1;
@@ -1369,12 +1369,12 @@ integer_t igraph_vs_get_vectorview(const igraph_t *graph,
 }
 
 int igraph_vs_unfold_vectorview(const igraph_t *graph, const igraph_vs_t *vs,
-				vector_t *v) {
-  vector_t v2;
+				igraph_vector_t *v) {
+  igraph_vector_t v2;
   igraph_i_vs_vectorview_pdata_t *data=
     (igraph_i_vs_vectorview_pdata_t*)vs->pdata;
-  IGRAPH_CHECK(vector_copy(&v2, &data->v));
-  vector_destroy(v);
+  IGRAPH_CHECK(igraph_vector_copy(&v2, &data->v));
+  igraph_vector_destroy(v);
   *v=v2;
   return 0;
 }
@@ -1384,7 +1384,7 @@ void igraph_vs_destroy_vectorview(igraph_vs_t *pvs) {
   igraph_i_vs_vectorview_pdata_t *data=
     (igraph_i_vs_vectorview_pdata_t*)vs->pdata;
   if (data->destroy) {
-    vector_destroy((vector_t*)&data->v);
+    igraph_vector_destroy((igraph_vector_t*)&data->v);
   }
   Free(data);
   
@@ -1401,20 +1401,20 @@ void igraph_vs_destroy_vectorview(igraph_vs_t *pvs) {
  * igraph_vs_vector(), \ref igraph_vs_vectorview(), \ref
  * igraph_vs_vectorview_it() or \ref igraph_vs_vector_small()).
  * It gives access to the vertex ids in the sequence as a
- * <type>vector_t</type> type.
+ * <type>igraph_vector_t</type> type.
  * 
  * The result is undefined if you call it with a different iterator
  * type. 
  * 
  * \param graph The underlying graph object.
  * \param vs The vertex sequence. 
- * \return Pointer to a <type>vector_t</type> object. This object should
+ * \return Pointer to a <type>igraph_vector_t</type> object. This object should
  *   be considered as constant, don't change its elements or size.
  * 
  * Time complexity: O(1).
  */
 
-const vector_t *igraph_vs_vector_getvector(const igraph_t *graph, 
+const igraph_vector_t *igraph_vs_vector_getvector(const igraph_t *graph, 
 					   const igraph_vs_t *vs) {
   igraph_i_vs_vectorview_pdata_t *data=
     (igraph_i_vs_vectorview_pdata_t*)vs->pdata;
@@ -1549,7 +1549,7 @@ integer_t igraph_es_get(const igraph_t *graph, const igraph_es_t *es) {
  * vector. 
  * \param graph The underlying graph object.
  * \param vs The edge sequence object.
- * \param v An initialized <type>vector_t</type> object. These will be
+ * \param v An initialized <type>igraph_vector_t</type> object. These will be
  *   resized to hold the edges.
  * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
  *   not enough memory to resize <parameter>v</parameter>.
@@ -1560,7 +1560,7 @@ integer_t igraph_es_get(const igraph_t *graph, const igraph_es_t *es) {
  */
 
 int igraph_es_unfold(const igraph_t *graph, const igraph_es_t *es,
-		     vector_t *v) {
+		     igraph_vector_t *v) {
   return es->table->unfold(graph, es, v);
 }
 
@@ -1590,7 +1590,7 @@ integer_t igraph_es_get_all(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_from_all(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_to_all(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_all(const igraph_t *graph, const igraph_es_t *es,
-			 vector_t *v);
+			 igraph_vector_t *v);
 void igraph_es_destroy_all(igraph_es_t *es);
 
 igraph_i_estable_t igraph_i_es_all_table = {
@@ -1669,12 +1669,12 @@ integer_t igraph_es_to_all(const igraph_t *graph, const igraph_es_t *es) {
 }
 
 int igraph_es_unfold_all(const igraph_t *graph, const igraph_es_t *es, 
-			 vector_t *v) {
+			 igraph_vector_t *v) {
   long int n;
-  vector_t v2;
+  igraph_vector_t v2;
   n=igraph_ecount(graph);
-  IGRAPH_CHECK(vector_init_seq(&v2, 0, n-1));
-  vector_destroy(v);
+  IGRAPH_CHECK(igraph_vector_init_seq(&v2, 0, n-1));
+  igraph_vector_destroy(v);
   *v=v2;
   return 0;
 }
@@ -1699,7 +1699,7 @@ integer_t igraph_es_from_fromorder(const igraph_t *graph,
 				   const igraph_es_t *es);
 integer_t igraph_es_to_fromorder(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_fromorder(const igraph_t *graph, const igraph_es_t *es,
-			       vector_t *v);
+			       igraph_vector_t *v);
 void igraph_es_destroy_fromorder(igraph_es_t *es);
 
 igraph_i_estable_t igraph_i_es_fromorder_table = {
@@ -1764,9 +1764,9 @@ integer_t igraph_es_to_fromorder(const igraph_t *graph,
 }
 
 int igraph_es_unfold_fromorder(const igraph_t *graph, const igraph_es_t *es,
-			       vector_t *v) {
+			       igraph_vector_t *v) {
   long int i=0, n=igraph_ecount(graph);  
-  IGRAPH_CHECK(vector_resize(v, n));
+  IGRAPH_CHECK(igraph_vector_resize(v, n));
   for (i=0; i<n; i++) {
     VECTOR(*v)[i]=VECTOR(graph->oi)[i];
   }
@@ -1791,7 +1791,7 @@ integer_t igraph_es_get_adj(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_from_adj(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_to_adj(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_adj(const igraph_t *graph, const igraph_es_t *es,
-			 vector_t *v);
+			 igraph_vector_t *v);
 void igraph_es_destroy_adj(igraph_es_t *es);
 
 igraph_i_estable_t igraph_i_es_adj_table = {
@@ -1898,7 +1898,7 @@ integer_t igraph_es_to_adj(const igraph_t *graph, const igraph_es_t *es) {
 }
 
 int igraph_es_unfold_adj(const igraph_t *graph, const igraph_es_t *es,
-			 vector_t *v) {
+			 igraph_vector_t *v) {
   long int length=0, idx=0;
   long int no_of_edges;
   long int i;
@@ -1917,7 +1917,7 @@ int igraph_es_unfold_adj(const igraph_t *graph, const igraph_es_t *es,
     length += (VECTOR(graph->is)[node+1] - VECTOR(graph->is)[node]);
   }
   
-  IGRAPH_CHECK(vector_resize(v, length));
+  IGRAPH_CHECK(igraph_vector_resize(v, length));
   
   if (mode & IGRAPH_OUT) {
     for (i=VECTOR(graph->os)[node]; i<VECTOR(graph->os)[node+1]; i++) {
@@ -2004,7 +2004,7 @@ integer_t igraph_es_get_none(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_from_none(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_to_none(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_none(const igraph_t *graph, const igraph_es_t *es, 
-			  vector_t *v);
+			  igraph_vector_t *v);
 void igraph_es_destroy_none(igraph_es_t *es);
 
 igraph_i_estable_t igraph_i_es_none_table = {
@@ -2061,8 +2061,8 @@ integer_t igraph_es_to_none(const igraph_t *graph, const igraph_es_t *es) {
 }
 
 int igraph_es_unfold_none(const igraph_t *graph, const igraph_es_t *es,
-			  vector_t *v) {
-  vector_clear(v);
+			  igraph_vector_t *v) {
+  igraph_vector_clear(v);
   return 0;
 }
 
@@ -2084,7 +2084,7 @@ integer_t igraph_es_get_1(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_from_1(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_to_1(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_1(const igraph_t *graph, const igraph_es_t *es, 
-		       vector_t *v);
+		       igraph_vector_t *v);
 void igraph_es_destroy_1(igraph_es_t *es);
 
 igraph_i_estable_t igraph_i_es_1_table = {
@@ -2164,8 +2164,8 @@ integer_t igraph_es_to_1(const igraph_t *graph, const igraph_es_t *es) {
 }
 
 int igraph_es_unfold_1(const igraph_t *graph, const igraph_es_t *es,
-		       vector_t *v) {
-  IGRAPH_CHECK(vector_resize(v, 1));
+		       igraph_vector_t *v) {
+  IGRAPH_CHECK(igraph_vector_resize(v, 1));
   VECTOR(*v)[0]=es->stdata[0];
   return 0;
 }
@@ -2188,7 +2188,7 @@ integer_t igraph_es_get_seq(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_from_seq(const igraph_t *graph, const igraph_es_t *es);
 integer_t igraph_es_to_seq(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_seq(const igraph_t *graph, const igraph_es_t *es,
-			 vector_t *v);
+			 igraph_vector_t *v);
 void igraph_es_destroy_seq(igraph_es_t *es);
 
 igraph_i_estable_t igraph_i_es_seq_table = {
@@ -2247,10 +2247,10 @@ integer_t igraph_es_to_seq(const igraph_t *graph, const igraph_es_t *es) {
 }
 
 int igraph_es_unfold_seq(const igraph_t *graph, const igraph_es_t *es,
-			 vector_t *v) {
-  vector_t v2;
-  IGRAPH_CHECK(vector_init_seq(&v2, es->stdata[1], es->stdata[2]));
-  vector_destroy(v);
+			 igraph_vector_t *v) {
+  igraph_vector_t v2;
+  IGRAPH_CHECK(igraph_vector_init_seq(&v2, es->stdata[1], es->stdata[2]));
+  igraph_vector_destroy(v);
   *v=v2;
   return 0;
 }
@@ -2276,7 +2276,7 @@ integer_t igraph_es_from_vectorview(const igraph_t *graph,
 integer_t igraph_es_to_vectorview(const igraph_t *graph, 
 				  const igraph_es_t *es);
 int igraph_es_unfold_vectorview(const igraph_t *graph, const igraph_es_t *es,
-				vector_t *v);
+				igraph_vector_t *v);
 void igraph_es_destroy_vectorview(igraph_es_t *es);
 
 igraph_i_estable_t igraph_i_es_vectorview_table = {
@@ -2291,10 +2291,10 @@ typedef igraph_i_vs_vectorview_pdata_t igraph_i_es_vectorview_pdata_t;
 /**
  * \function igraph_es_vectorview
  * 
- * This iterator type allows to handle a <type>vector_t</type> object
+ * This iterator type allows to handle a <type>igraph_vector_t</type> object
  * as an edge sequence. Note that this function does \em not make a
  * copy of the original vector, so be sure that you don't destroy the
- * underlying <type>vector_t</type> object before destroying the
+ * underlying <type>igraph_vector_t</type> object before destroying the
  * edge set. 
  *
  * The \ref igraph_es_vector_getvector() specific function can be
@@ -2302,7 +2302,7 @@ typedef igraph_i_vs_vectorview_pdata_t igraph_i_es_vectorview_pdata_t;
  * 
  * \param igraph The underlying graph object.
  * \param es The edge sequence object.
- * \param vids The underlying <type>vector_t</type> object.
+ * \param vids The underlying <type>igraph_vector_t</type> object.
  * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
  *   not enough memory.
  * 
@@ -2313,9 +2313,9 @@ typedef igraph_i_vs_vectorview_pdata_t igraph_i_es_vectorview_pdata_t;
  */
 
 int igraph_es_vectorview(const igraph_t *igraph, igraph_es_t *es, 
-			 const vector_t *eids) {
+			 const igraph_vector_t *eids) {
   igraph_i_es_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
 
   es->type=IGRAPH_ITERATOR_ES_VECTOR;
   es->stdata[0]=0;
@@ -2327,11 +2327,11 @@ int igraph_es_vectorview(const igraph_t *igraph, igraph_es_t *es,
     IGRAPH_ERROR("Cannot create vector iterator", IGRAPH_ENOMEM);
   }
   data=(igraph_i_es_vectorview_pdata_t*)es->pdata;
-  fakev=(vector_t*) &data->v;
+  fakev=(igraph_vector_t*) &data->v;
   *fakev = *eids;
   data->destroy=0;
 
-  es->stdata[1]=vector_size(&data->v);
+  es->stdata[1]=igraph_vector_size(&data->v);
 
   return 0;
 }
@@ -2340,7 +2340,7 @@ int igraph_es_vectorview(const igraph_t *igraph, igraph_es_t *es,
  * \function igraph_es_vector
  * 
  * This function creates a edge sequence object from a
- * <type>vector_t</type> containing edge ids. Unlike \ref
+ * <type>igraph_vector_t</type> containing edge ids. Unlike \ref
  * igraph_es_vectorview() this function makes a copy of the original
  * vector, which can be safely destroyed.
  * 
@@ -2362,9 +2362,9 @@ int igraph_es_vectorview(const igraph_t *igraph, igraph_es_t *es,
  */
 
 int igraph_es_vector(const igraph_t *igraph, igraph_es_t *es,
-		     const vector_t *eids) {
+		     const igraph_vector_t *eids) {
   igraph_i_es_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
 
   es->type=IGRAPH_ITERATOR_ES_VECTOR;
   es->stdata[0]=0;
@@ -2377,11 +2377,11 @@ int igraph_es_vector(const igraph_t *igraph, igraph_es_t *es,
   }
   IGRAPH_FINALLY(igraph_free, es->pdata);
   data=(igraph_i_es_vectorview_pdata_t*)es->pdata;
-  fakev=(vector_t*)&data->v;
-  IGRAPH_CHECK(vector_copy(fakev, eids));
+  fakev=(igraph_vector_t*)&data->v;
+  IGRAPH_CHECK(igraph_vector_copy(fakev, eids));
   data->destroy=1;
 
-  es->stdata[1]=vector_size(&data->v);
+  es->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
@@ -2419,7 +2419,7 @@ int igraph_es_vector(const igraph_t *igraph, igraph_es_t *es,
 int igraph_es_vectorview_it(const igraph_t *graph, const igraph_es_t *es,
 			    igraph_es_t *newes) {
   igraph_i_es_vectorview_pdata_t *data, *esdata;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
 
   newes->type=IGRAPH_ITERATOR_ES_VECTOR;
   newes->stdata[0]=0;
@@ -2432,10 +2432,10 @@ int igraph_es_vectorview_it(const igraph_t *graph, const igraph_es_t *es,
   }
   IGRAPH_FINALLY(igraph_free, newes->pdata);
   data=(igraph_i_es_vectorview_pdata_t*)newes->pdata;
-  VECTOR_INIT_FINALLY((vector_t*) &data->v, 0);
-  fakev=(vector_t*)&data->v;
+  IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*) &data->v, 0);
+  fakev=(igraph_vector_t*)&data->v;
   if (es->type != IGRAPH_ITERATOR_ES_VECTOR) {
-    vector_init(fakev, 0);
+    igraph_vector_init(fakev, 0);
     IGRAPH_CHECK(igraph_es_unfold(graph, es, fakev));
     data->destroy=1;
   } else {
@@ -2445,7 +2445,7 @@ int igraph_es_vectorview_it(const igraph_t *graph, const igraph_es_t *es,
     data->destroy=0;
   }
 
-  newes->stdata[1]=vector_size(&data->v);
+  newes->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
@@ -2474,7 +2474,7 @@ int igraph_es_vectorview_it(const igraph_t *graph, const igraph_es_t *es,
 int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
   va_list ap;
   igraph_i_es_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
   long int i, n=0;
   es->type=IGRAPH_ITERATOR_ES_VECTOR;
   es->stdata[0]=0;
@@ -2487,7 +2487,7 @@ int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
   }
   IGRAPH_FINALLY(igraph_free, es->pdata);
   data=(igraph_i_es_vectorview_pdata_t*)es->pdata;
-  fakev=(vector_t*)&data->v;
+  fakev=(igraph_vector_t*)&data->v;
   data->destroy=1;
 
   va_start(ap, es);
@@ -2500,7 +2500,7 @@ int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
   }
   va_end(ap);
 
-  VECTOR_INIT_FINALLY(fakev, n);
+  IGRAPH_VECTOR_INIT_FINALLY(fakev, n);
   
   va_start(ap, es);
   for (i=0; i<n; i++) {
@@ -2508,7 +2508,7 @@ int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
   }
   va_end(ap);  
   
-  es->stdata[1]=vector_size(&data->v);
+  es->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
@@ -2517,9 +2517,9 @@ int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
 /** 
  * \function IGRAPH_ES_VECTOR
  * 
- * Edge sequence shorthand for a <type>vector_t</type> object. 
+ * Edge sequence shorthand for a <type>igraph_vector_t</type> object. 
  * \param graph The underlying graph object.
- * \param eids The <type>vector_t</type> object containing the edge
+ * \param eids The <type>igraph_vector_t</type> object containing the edge
  * ids. 
  * \return Edge sequence shorthand.
  *
@@ -2527,7 +2527,7 @@ int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
  */
 
 const igraph_es_t *IGRAPH_ES_VECTOR(const igraph_t *graph, 
-				    const vector_t *eids) {
+				    const igraph_vector_t *eids) {
   igraph_es_t *es=Calloc(1, igraph_es_t);
   if (es==0) {
     igraph_error("Cannot create iterator shorthand", __FILE__, __LINE__,
@@ -2556,7 +2556,7 @@ const igraph_es_t *IGRAPH_ES(const igraph_t *graph, ...) {
   igraph_es_t *es=Calloc(1, igraph_es_t);
   va_list ap;
   igraph_i_es_vectorview_pdata_t *data;
-  vector_t *fakev;
+  igraph_vector_t *fakev;
   long int i, n=0;
   int ret;
   if (es==0) {
@@ -2578,7 +2578,7 @@ const igraph_es_t *IGRAPH_ES(const igraph_t *graph, ...) {
   }
   IGRAPH_FINALLY(igraph_free, es->pdata);
   data=(igraph_i_es_vectorview_pdata_t*)es->pdata;
-  fakev=(vector_t*)&data->v;
+  fakev=(igraph_vector_t*)&data->v;
   data->destroy=1;
 
   va_start(ap, graph);
@@ -2591,13 +2591,13 @@ const igraph_es_t *IGRAPH_ES(const igraph_t *graph, ...) {
   }
   va_end(ap);
 
-  ret=vector_init(fakev, n);
+  ret=igraph_vector_init(fakev, n);
   if (ret != 0) {
     igraph_error("Cannot create vector for iterator shorthand", __FILE__, 
 		 __LINE__, ret);
     return 0;
   }
-  IGRAPH_FINALLY(vector_destroy, fakev);
+  IGRAPH_FINALLY(igraph_vector_destroy, fakev);
   
   va_start(ap, graph);
   for (i=0; i<n; i++) {
@@ -2605,7 +2605,7 @@ const igraph_es_t *IGRAPH_ES(const igraph_t *graph, ...) {
   }
   va_end(ap);  
   
-  es->stdata[1]=vector_size(&data->v);
+  es->stdata[1]=igraph_vector_size(&data->v);
   
   IGRAPH_FINALLY_CLEAN(2);
   es->shorthand=1;
@@ -2648,12 +2648,12 @@ integer_t igraph_es_to_vectorview(const igraph_t *graph,
 }
 
 int igraph_es_unfold_vectorview(const igraph_t *graph, const igraph_es_t *es,
-				vector_t *v) {
-  vector_t v2;
+				igraph_vector_t *v) {
+  igraph_vector_t v2;
   igraph_i_es_vectorview_pdata_t *data=
     (igraph_i_es_vectorview_pdata_t*)es->pdata;
-  IGRAPH_CHECK(vector_copy(&v2, &data->v));
-  vector_destroy(v);
+  IGRAPH_CHECK(igraph_vector_copy(&v2, &data->v));
+  igraph_vector_destroy(v);
   *v=v2;
   return 0;
 }
@@ -2663,7 +2663,7 @@ void igraph_es_destroy_vectorview(igraph_es_t *pes) {
   igraph_i_es_vectorview_pdata_t *data=
     (igraph_i_es_vectorview_pdata_t*)es->pdata;
   if (data->destroy) {
-    vector_destroy((vector_t*)&data->v);
+    igraph_vector_destroy((igraph_vector_t*)&data->v);
   }
   Free(data);
   
@@ -2680,20 +2680,20 @@ void igraph_es_destroy_vectorview(igraph_es_t *pes) {
  * igraph_es_vector(), \ref igraph_es_vectorview(), \ref
  * igraph_es_vectorview_it() or \ref igraph_es_vector_small()).
  * It gives access to the edge ids in the sequence as a
- * <type>vector_t</type> type.
+ * <type>igraph_vector_t</type> type.
  * 
  * The result is undefined if you call it with a different iterator
  * type. 
  * 
  * \param graph The underlying graph object.
  * \param es The edge sequence. 
- * \return Pointer to a <type>vector_t</type> object. This object should
+ * \return Pointer to a <type>igraph_vector_t</type> object. This object should
  *   be considered as constant, don't change its elements or size.
  * 
  * Time complexity: O(1).
  */
 
-const vector_t *igraph_es_vector_getvector(const igraph_t *graph, 
+const igraph_vector_t *igraph_es_vector_getvector(const igraph_t *graph, 
 					   const igraph_es_t *es) {
   igraph_i_es_vectorview_pdata_t *data=
     (igraph_i_es_vectorview_pdata_t*)es->pdata;
@@ -2737,8 +2737,8 @@ int igraph_es_fromto(const igraph_t *graph, igraph_es_t *es,
   long int i, j, lfrom;
   igraph_es_t edgeit;
   igraph_neimode_t mode;
-  const vector_t *fromvect;
-  vector_t tovect;
+  const igraph_vector_t *fromvect;
+  igraph_vector_t tovect;
   
   igraph_i_es_vectorview_pdata_t *data;
 
@@ -2754,8 +2754,8 @@ int igraph_es_fromto(const igraph_t *graph, igraph_es_t *es,
   IGRAPH_FINALLY(igraph_vs_destroy, &myto);  
 
   fromvect=igraph_vs_vector_getvector(graph, &myfrom);
-  IGRAPH_CHECK(vector_copy(&tovect, igraph_vs_vector_getvector(graph, &myto)));
-  IGRAPH_FINALLY(vector_destroy, &tovect);
+  IGRAPH_CHECK(igraph_vector_copy(&tovect, igraph_vs_vector_getvector(graph, &myto)));
+  IGRAPH_FINALLY(igraph_vector_destroy, &tovect);
 
   es->type=IGRAPH_ITERATOR_ES_VECTOR;
   es->shorthand=0;
@@ -2767,21 +2767,21 @@ int igraph_es_fromto(const igraph_t *graph, igraph_es_t *es,
   }
   IGRAPH_FINALLY(igraph_free, es->pdata);
   data=(igraph_i_es_vectorview_pdata_t*)es->pdata;
-  VECTOR_INIT_FINALLY((vector_t*) &data->v, 0);
+  IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*) &data->v, 0);
   data->destroy=1;
 
-  lfrom=vector_size(fromvect);
-  if (lfrom != 0 && vector_size(&tovect) != 0) {
+  lfrom=igraph_vector_size(fromvect);
+  if (lfrom != 0 && igraph_vector_size(&tovect) != 0) {
     IGRAPH_CHECK(igraph_es_adj(graph, &edgeit, 0, mode));
     IGRAPH_FINALLY(igraph_es_destroy, &edgeit);
-    vector_sort(&tovect);
+    igraph_vector_sort(&tovect);
     for (i=0; i<lfrom; i++) {
       long int vfrom=VECTOR(*fromvect)[i];
       igraph_es_adj_set(graph, &edgeit, vfrom, mode);
       while (!igraph_es_end(graph, &edgeit)) {
 	long int vto=igraph_es_adj_vertex(graph, &edgeit);
-	if (vector_binsearch(&tovect, vto, 0)) {
-	  vector_push_back((vector_t*)&data->v, igraph_es_get(graph, &edgeit));
+	if (igraph_vector_binsearch(&tovect, vto, 0)) {
+	  igraph_vector_push_back((igraph_vector_t*)&data->v, igraph_es_get(graph, &edgeit));
 	}
 	igraph_es_next(graph, &edgeit);
       }
@@ -2789,12 +2789,12 @@ int igraph_es_fromto(const igraph_t *graph, igraph_es_t *es,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  es->stdata[1]=vector_size(&data->v);
+  es->stdata[1]=igraph_vector_size(&data->v);
 
   /* Clean */
   igraph_vs_destroy(&myfrom);
   igraph_vs_destroy(&myto);
-  vector_destroy(&tovect);
+  igraph_vector_destroy(&tovect);
   IGRAPH_FINALLY_CLEAN(5);
 
   if (from->shorthand) { igraph_vs_destroy((igraph_vs_t*) from); }

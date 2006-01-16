@@ -1,9 +1,9 @@
 
 #include <igraph.h>
 
-void print_vector(vector_t *v, FILE *f) {
+void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;
-  for (i=0; i<vector_size(v); i++) {
+  for (i=0; i<igraph_vector_size(v); i++) {
     fprintf(f, " %4.2f", VECTOR(*v)[i]);
   }
   fprintf(f, "\n");
@@ -12,11 +12,11 @@ void print_vector(vector_t *v, FILE *f) {
 int main() {
 
   igraph_t g;
-  vector_t v, res;
+  igraph_vector_t v, res;
   int ret;
 
   /* Test graphs taken from http://www.iprcom.com/papers/pagerank/ */
-  vector_init(&v, 10);
+  igraph_vector_init(&v, 10);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=1; VECTOR(v)[3]=2;
   VECTOR(v)[4]=2; VECTOR(v)[5]=0;
@@ -24,13 +24,13 @@ int main() {
   VECTOR(v)[8]=0; VECTOR(v)[9]=2;
   igraph_create(&g, &v, 0, 1);
 
-  vector_init(&res, 0);
+  igraph_vector_init(&res, 0);
   igraph_pagerank(&g, &res, IGRAPH_VS_ALL(&g), 1, 1000, 0.001, 0.85);
   print_vector(&res, stdout);
-  vector_destroy(&res);
-  vector_destroy(&v);
+  igraph_vector_destroy(&res);
+  igraph_vector_destroy(&v);
   
-  vector_init(&v, 28);
+  igraph_vector_init(&v, 28);
   VECTOR(v)[ 0]=0; VECTOR(v)[ 1]=1;
   VECTOR(v)[ 2]=0; VECTOR(v)[ 3]=2;
   VECTOR(v)[ 4]=0; VECTOR(v)[ 5]=3;
@@ -47,11 +47,11 @@ int main() {
   VECTOR(v)[26]=7; VECTOR(v)[27]=0;
   igraph_create(&g, &v, 0, 1);
 
-  vector_init(&res, 0);
+  igraph_vector_init(&res, 0);
   igraph_pagerank(&g, &res, IGRAPH_VS_ALL(&g), 1, 1000, 0.001, 0.85);
   print_vector(&res, stdout);
-  vector_destroy(&res);
-  vector_destroy(&v);
+  igraph_vector_destroy(&res);
+  igraph_vector_destroy(&v);
   
   /* Errors */
   igraph_set_error_handler(igraph_error_handler_ignore);

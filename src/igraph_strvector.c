@@ -342,7 +342,7 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index,
  * \brief Removes elements from a string vector (for internal use)
  */
 
-void igraph_strvector_remove_negidx(igraph_strvector_t *v, const vector_t *neg,
+void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t *neg,
 				   long int nremove) {
   long int i, idx=0;
   char **tmp;

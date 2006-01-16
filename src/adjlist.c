@@ -34,7 +34,7 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
   if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
 
   al->length=igraph_vcount(graph);
-  al->adjs=Calloc(al->length, vector_t);
+  al->adjs=Calloc(al->length, igraph_vector_t);
   if (al->adjs == 0) {
     IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
   }
@@ -42,7 +42,7 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
 
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, al);  
   for (i=0; i<al->length; i++) {
-    IGRAPH_CHECK(vector_init(&al->adjs[i], 0));
+    IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], 0));
     IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
   }
   
@@ -53,13 +53,13 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
 void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
-    /* This works if some vector_t's are 0, because vector_destroy can
+    /* This works if some igraph_vector_t's are 0, because igraph_vector_destroy can
        handle this. */
-    vector_destroy(&al->adjs[i]);
+    igraph_vector_destroy(&al->adjs[i]);
   }
   Free(al->adjs);
 }
 
-/* vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, integer_t no) { */
+/* igraph_vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, integer_t no) { */
 /*   return &al->adjs[(long int)no]; */
 /* } */

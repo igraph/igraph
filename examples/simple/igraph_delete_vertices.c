@@ -4,7 +4,7 @@
 int main() {
 
   igraph_t g;
-  vector_t v;
+  igraph_vector_t v;
   int ret;
 
   /* without edges */
@@ -22,13 +22,13 @@ int main() {
   }
   igraph_destroy(&g);
    
-  vector_init(&v, 8);
+  igraph_vector_init(&v, 8);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=1; VECTOR(v)[3]=2;
   VECTOR(v)[4]=2; VECTOR(v)[5]=3;
   VECTOR(v)[6]=2; VECTOR(v)[7]=2;
   igraph_create(&g, &v, 0, 0);
-  vector_destroy(&v);
+  igraph_vector_destroy(&v);
 
   /* resize vector */
   igraph_delete_vertices(&g, IGRAPH_VS_1(&g, 2));

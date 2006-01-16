@@ -4,10 +4,10 @@
 int main() {
 
   igraph_t g;
-  vector_t v;
+  igraph_vector_t v;
   int ret;
 
-  vector_init(&v, 8);
+  igraph_vector_init(&v, 8);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=1; VECTOR(v)[3]=2;
   VECTOR(v)[4]=2; VECTOR(v)[5]=3;
@@ -15,7 +15,7 @@ int main() {
   igraph_create(&g, &v, 0, 0);
   
   /* resize vector */
-  vector_resize(&v, 2);
+  igraph_vector_resize(&v, 2);
   VECTOR(v)[0]=3; VECTOR(v)[1]=2;
   igraph_delete_edges(&g, &v);
   if (igraph_ecount(&g) != 3) {
@@ -44,7 +44,7 @@ int main() {
   }
   
   /* error test, invalid vertex id */
-  vector_resize(&v, 3);
+  igraph_vector_resize(&v, 3);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=2;
   ret=igraph_delete_edges(&g, &v);
@@ -55,7 +55,7 @@ int main() {
     return 7;
   }  
 
-  vector_destroy(&v);
+  igraph_vector_destroy(&v);
   igraph_destroy(&g);
   
   return 0;

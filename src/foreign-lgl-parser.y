@@ -9,8 +9,8 @@ int igraph_lgl_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
 #include "error.h"
-extern vector_t *igraph_lgl_vector;
-extern vector_t *igraph_lgl_weights;
+extern igraph_vector_t *igraph_lgl_vector;
+extern igraph_vector_t *igraph_lgl_weights;
 extern igraph_trie_t *igraph_lgl_trie;
 real_t igraph_lgl_get_number(const char *str, long int len);
 long int igraph_lgl_actvertex;
@@ -46,14 +46,14 @@ vertexdef : HASH edgeid NEWLINE       { igraph_lgl_actvertex=$2; } ;
 edges :   /* empty */ | edge edges ;
 
 edge :   edgeid NEWLINE             { 
-             vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
-	     vector_push_back(igraph_lgl_vector, $1);
-	     vector_push_back(igraph_lgl_weights, 0);
+             igraph_vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
+	     igraph_vector_push_back(igraph_lgl_vector, $1);
+	     igraph_vector_push_back(igraph_lgl_weights, 0);
            }
        | edgeid weight NEWLINE      { 
-             vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
-	     vector_push_back(igraph_lgl_vector, $1);
-	     vector_push_back(igraph_lgl_weights, $2);
+             igraph_vector_push_back(igraph_lgl_vector, igraph_lgl_actvertex);
+	     igraph_vector_push_back(igraph_lgl_vector, $1);
+	     igraph_vector_push_back(igraph_lgl_weights, $2);
            } 
 ;
 

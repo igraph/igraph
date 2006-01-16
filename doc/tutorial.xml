@@ -126,18 +126,18 @@ can reduce path lengths a lot.)
 int main(void) {
   real_t avg_path;
   igraph_t graph;
-  vector_t dimvector;
-  vector_t edges;
+  igraph_vector_t dimvector;
+  igraph_vector_t edges;
   int i;
   
-  vector_init(&dimvector, 2);
+  igraph_vector_init(&dimvector, 2);
   VECTOR(dimvector)[0]=30;
   VECTOR(dimvector)[1]=30;
   igraph_lattice(&graph, &dimvector, 0, IGRAPH_UNDIRECTED, 0, 1);
 
   srand(100);
-  vector_init(&edges, 20);
-  for (i=0; i<vector_size(&edges); i++) {
+  igraph_vector_init(&edges, 20);
+  for (i=0; i<igraph_vector_size(&edges); i++) {
     VECTOR(edges)[i] = rand() % (int)igraph_vcount(&graph);
   }
 
@@ -148,8 +148,8 @@ int main(void) {
   igraph_average_path_length(&graph, &avg_path, IGRAPH_UNDIRECTED, 1);
   printf("Average path length (randomized lattice): %f\n", (double) avg_path);
   
-  vector_destroy(&dimvector);
-  vector_destroy(&edges);
+  igraph_vector_destroy(&dimvector);
+  igraph_vector_destroy(&edges);
   igraph_destroy(&graph);
 
   return 0;
@@ -159,13 +159,13 @@ int main(void) {
 
 <para>
 This example illustrates some new points. &igraph; uses 
-<link linkend="vector_t"><type>vector_t</type></link>
-instead of plain C arrays. <type>vector_t</type> is superior to
+<link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>
+instead of plain C arrays. <type>igraph_vector_t</type> is superior to
 regular array in almost every sense. Vectors are created by the
-<link linkend="vector_init"><function>vector_init()</function></link>
+<link linkend="igraph_vector_init"><function>igraph_vector_init()</function></link>
 function and like graphs they should be destroyed if not 
 needed any more by calling 
-<link linkend="vector_destroy"><function>vector_destroy()</function></link>
+<link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
 on them. A vector can be indexed by the 
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). Vectors 
@@ -225,8 +225,8 @@ individual vertices in the graph.
 
 int main(void) {
   igraph_t graph;
-  vector_t v;
-  vector_t result;
+  igraph_vector_t v;
+  igraph_vector_t result;
   real_t edges[] = { 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8,
                      0,10, 0,11, 0,12, 0,13, 0,17, 0,19, 0,21, 0,31,
                      1, 2, 1, 3, 1, 7, 1,13, 1,17, 1,19, 1,21, 1,30,
@@ -239,26 +239,26 @@ int main(void) {
                     28,31,28,33,29,32,29,33,30,32,30,33,31,32,31,33,
                     32,33 };
   
-  vector_view(&v, edges, sizeof(edges)/sizeof(double));
+  igraph_vector_view(&v, edges, sizeof(edges)/sizeof(double));
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
-  vector_init(&result, 0);
+  igraph_vector_init(&result, 0);
 
   igraph_degree(&graph, &result, IGRAPH_VS_ALL(&graph), IGRAPH_ALL, 
 		IGRAPH_LOOPS);
   printf("Maximum degree is      %10i, vertex %2i.\n", 
-	 (int)vector_max(&result), (int)vector_which_max(&result));
+	 (int)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
   
   igraph_closeness(&graph, &result, IGRAPH_VS_ALL(&graph), IGRAPH_ALL);
   printf("Maximum closeness is   %10f, vertex %2i.\n", 
-	 (double)vector_max(&result), (int)vector_which_max(&result));
+	 (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
   
   igraph_betweenness(&graph, &result, IGRAPH_VS_ALL(&graph), 
 		     IGRAPH_UNDIRECTED);
   printf("Maximum betweenness is %10f, vertex %2i.\n", 
-	 (double)vector_max(&result), (int)vector_which_max(&result));  
+	 (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));  
   
-  vector_destroy(&result);
+  igraph_vector_destroy(&result);
   igraph_destroy(&graph);
 
   return 0;
@@ -270,10 +270,10 @@ int main(void) {
 This example reflects some new features. First of all, it shows a
 way to define a graph simply as defining a C array with its edges.
 Function <link
-linkend="vector_view"><function>vector_view()</function></link>
+linkend="igraph_vector_view"><function>igraph_vector_view()</function></link>
 creates a <emphasis>view</emphasis> of a C 
 array. It does not copy any data, this also means that you should not
-call <link linkend="vector_destroy"><function>vector_destroy()</function></link>
+call <link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
 on a vector created this way. This vector is then used to create the
 undirected graph.
 </para>

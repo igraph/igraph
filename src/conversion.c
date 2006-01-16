@@ -132,13 +132,13 @@ int igraph_get_adjacency(const igraph_t *graph, matrix_t *res,
  * number of edges in the graph.
  */
 
-int igraph_get_edgelist(const igraph_t *graph, vector_t *res, bool_t bycol) {
+int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, bool_t bycol) {
 
   igraph_es_t edgeit;
   long int no_of_edges=igraph_ecount(graph);
   long int vptr=0;
   
-  IGRAPH_CHECK(vector_resize(res, no_of_edges*2));
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges*2));
   IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
   IGRAPH_FINALLY(igraph_es_destroy, &edgeit);
   

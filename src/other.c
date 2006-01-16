@@ -43,20 +43,20 @@
  * the data vector.
  */
 
-int igraph_running_mean(const vector_t *data, vector_t *res, 
+int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res, 
 			integer_t binwidth) {
 
   double sum=0;
   long int i;
 
   /* Check */
-  if (vector_size(data) < binwidth) {
+  if (igraph_vector_size(data) < binwidth) {
     IGRAPH_ERROR("Vector too short for this binwidth", IGRAPH_EINVAL); 
   }
 
   /* Memory for result */
 
-  IGRAPH_CHECK(vector_resize(res, (long int)(vector_size(data)-binwidth+1)));
+  IGRAPH_CHECK(igraph_vector_resize(res, (long int)(igraph_vector_size(data)-binwidth+1)));
   
   /* Initial bin */
   for (i=0; i<binwidth; i++) {
@@ -65,7 +65,7 @@ int igraph_running_mean(const vector_t *data, vector_t *res,
   
   VECTOR(*res)[0]=sum/binwidth;
   
-  for (i=1; i<vector_size(data)-binwidth+1; i++) {
+  for (i=1; i<igraph_vector_size(data)-binwidth+1; i++) {
     sum -= VECTOR(*data)[i-1];
     sum += VECTOR(*data)[ (long int)(i+binwidth-1)];
     VECTOR(*res)[i] = sum/binwidth;

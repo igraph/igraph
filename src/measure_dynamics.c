@@ -27,7 +27,7 @@
 
 int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
 				  matrix_t *sd,
-				  const vector_t *st, integer_t pagebins,
+				  const igraph_vector_t *st, integer_t pagebins,
 				  integer_t pmaxind, bool_t lsd) {
 
   long int agebins=pagebins;
@@ -37,7 +37,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
   
   int *indegree;
   matrix_t ntkl, ch, normfact, notnull;
-  vector_t neis;
+  igraph_vector_t neis;
   
   long int node;
   long int i, j, k;
@@ -45,7 +45,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
 
   binwidth = no_of_nodes/agebins+1;
 
-  vector_init(&neis, 0);
+  igraph_vector_init(&neis, 0);
   indegree=Calloc(no_of_nodes, int);
   matrix_resize(akl, maxind+1, agebins);
   matrix_null(akl);
@@ -63,7 +63,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
     /* inspect the edges */
    
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
-    for (i=0; i<vector_size(&neis); i++) {
+    for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=indegree[to];
       long int yidx=(node-to)/binwidth;
@@ -135,12 +135,12 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
   matrix_destroy(&ch);
   matrix_destroy(&normfact);
   matrix_destroy(&notnull);
-  vector_destroy(&neis);
+  igraph_vector_destroy(&neis);
 
   return 0;
 }
 
-int igraph_measure_dynamics_idage_st(const igraph_t *graph, vector_t *res,
+int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res,
 				     const matrix_t *akl) {
 
   long int agebins=matrix_ncol(akl);
@@ -148,18 +148,18 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, vector_t *res,
   long int binwidth;
   
   int *indegree;
-  vector_t neis;
+  igraph_vector_t neis;
   
   long int node;
   long int i, k;
 
-  vector_init(&neis, 0);
+  igraph_vector_init(&neis, 0);
   
   indegree=Calloc(no_of_nodes, int);
   binwidth=no_of_nodes/agebins+1;
   
-  vector_resize(res, no_of_nodes);
-  vector_null(res);
+  igraph_vector_resize(res, no_of_nodes);
+  igraph_vector_null(res);
   VECTOR(*res)[0]=MATRIX(*akl, 0, 0);
 
   for (node=1; node<no_of_nodes; node++) {
@@ -174,7 +174,7 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, vector_t *res,
     
     /* inspect the outgoing edges */
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
-    for (i=0; i<vector_size(&neis); i++) {
+    for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=indegree[to];
       long int yidx=(node-to)/binwidth;
@@ -186,7 +186,7 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, vector_t *res,
     }
   }
   
-  vector_destroy(&neis);
+  igraph_vector_destroy(&neis);
   Free(indegree);
   
   return 0;
@@ -194,9 +194,9 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, vector_t *res,
 
 int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
 					matrix_t *sd,
-					const vector_t *st, integer_t pagebins,
+					const igraph_vector_t *st, integer_t pagebins,
 					integer_t pmaxind, bool_t lsd,
-					vector_t *estimates, 
+					igraph_vector_t *estimates, 
 					integer_t est_ind, integer_t est_age) {
   
   long int agebins=pagebins;
@@ -206,7 +206,7 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
   
   int *indegree;
   matrix_t ntkl, ch, normfact, notnull;
-  vector_t neis;
+  igraph_vector_t neis;
   
   long int node;
   long int i, j, k;
@@ -214,7 +214,7 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
 
   binwidth = no_of_nodes/agebins+1;
 
-  vector_init(&neis, 0);
+  igraph_vector_init(&neis, 0);
   indegree=Calloc(no_of_nodes, int);
   matrix_resize(akl, maxind+1, agebins);
   matrix_null(akl);
@@ -223,7 +223,7 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
     matrix_null(sd);
   }
 
-  vector_clear(estimates);
+  igraph_vector_clear(estimates);
 
   matrix_init(&ntkl, maxind+1, agebins+1);
   matrix_init(&ch, maxind+1, agebins+1);
@@ -235,7 +235,7 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
     /* inspect the edges */
    
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
-    for (i=0; i<vector_size(&neis); i++) {
+    for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=indegree[to];
       long int yidx=(node-to)/binwidth;
@@ -249,7 +249,7 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
       }
 
       if (xidx==est_ind && yidx==est_age) {
-	vector_push_back(estimates, xk);
+	igraph_vector_push_back(estimates, xk);
       }
 
       indegree[to] ++;
@@ -306,18 +306,18 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
     }
   }
 
-  for (i=0; i<vector_size(estimates); i++) {
+  for (i=0; i<igraph_vector_size(estimates); i++) {
     VECTOR(*estimates)[i] /= MATRIX(normfact, (long int)est_ind, 
 				    (long int)est_age);
   }
-/*   vector_push_back(estimates, MATRIX(normfact, est_ind, est_age)); */
+/*   igraph_vector_push_back(estimates, MATRIX(normfact, est_ind, est_age)); */
   
   Free(indegree);
   matrix_destroy(&ntkl);
   matrix_destroy(&ch);
   matrix_destroy(&normfact);
   matrix_destroy(&notnull);
-  vector_destroy(&neis);
+  igraph_vector_destroy(&neis);
 
   return 0;
 }

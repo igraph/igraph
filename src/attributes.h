@@ -31,7 +31,7 @@ typedef enum { IGRAPH_ATTRIBUTE_NUM=0,
 typedef struct s_igraph_attribute_list {
   long int len;
   igraph_strvector_t names;
-  vector_t types;
+  igraph_vector_t types;
   vector_ptr_t data;
 } igraph_attribute_list_t;
 
@@ -49,17 +49,17 @@ int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
 			      long int idx, const void *value);
 int igraph_attribute_list_get_many(const igraph_attribute_list_t *al, 
 				   const char *name,
-				   const vector_t *idx, void **value);
+				   const igraph_vector_t *idx, void **value);
 int igraph_attribute_list_set_many(igraph_attribute_list_t *al, 
 				   const char *name,
-				   const vector_t *idx, const void *value);
+				   const igraph_vector_t *idx, const void *value);
 int igraph_attribute_list_get_all(const igraph_attribute_list_t *al, 
 				  const char *name,
 				  void **value, igraph_attribute_type_t *type);
 long int igraph_attribute_list_size(const igraph_attribute_list_t *al);
 int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne);
 int igraph_attribute_list_names(const igraph_attribute_list_t *al,
-				igraph_strvector_t *names, vector_t *types);
+				igraph_strvector_t *names, igraph_vector_t *types);
 int igraph_attribute_list_copy(igraph_attribute_list_t *to,
 			       const igraph_attribute_list_t *from);
 int igraph_attribute_list_get_type(const igraph_attribute_list_t *al, 
@@ -71,7 +71,7 @@ bool_t igraph_attribute_list_has(const igraph_attribute_list_t *graph,
 void igraph_attribute_list_remove_elem_idx(igraph_attribute_list_t *al, 
 					   long int *index, long int nremove);
 void igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
-					   const vector_t *neg, 
+					   const igraph_vector_t *neg, 
 					   long int nremove);
 
 #endif

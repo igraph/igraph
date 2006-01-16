@@ -1,9 +1,9 @@
 
 #include <igraph.h>
 
-void print_vector(vector_t *v, FILE *f) {
+void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;
-  for (i=0; i<vector_size(v); i++) {
+  for (i=0; i<igraph_vector_size(v); i++) {
     fprintf(f, " %li", (long int) VECTOR(*v)[i]);
   }
   fprintf(f, "\n");
@@ -12,11 +12,11 @@ void print_vector(vector_t *v, FILE *f) {
 int main() {
 
   igraph_t g;
-  vector_t v, seq;
+  igraph_vector_t v, seq;
   int ret;
 
   /* Create graph */
-  vector_init(&v, 8);
+  igraph_vector_init(&v, 8);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=1; VECTOR(v)[3]=2;
   VECTOR(v)[4]=2; VECTOR(v)[5]=3;
@@ -43,7 +43,7 @@ int main() {
   
   igraph_destroy(&g);
   
-  vector_resize(&v, 8);
+  igraph_vector_resize(&v, 8);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=1; VECTOR(v)[3]=2;
   VECTOR(v)[4]=2; VECTOR(v)[5]=3;
@@ -70,7 +70,7 @@ int main() {
 
   /* Degree of the same vertex multiple times */
   
-  vector_init(&seq, 3);
+  igraph_vector_init(&seq, 3);
   VECTOR(seq)[0]=2; VECTOR(seq)[1]=0; VECTOR(seq)[2]=2;
   igraph_degree(&g, &v, IGRAPH_VS_VECTOR(&g, &seq), IGRAPH_ALL, IGRAPH_LOOPS);
   print_vector(&v, stdout);
@@ -89,8 +89,8 @@ int main() {
   }  
 
   igraph_destroy(&g);
-  vector_destroy(&v);
-  vector_destroy(&seq);
+  igraph_vector_destroy(&v);
+  igraph_vector_destroy(&seq);
 
   return 0;
 }

@@ -4,7 +4,7 @@
 int main() {
   
   igraph_t g;
-  vector_t v, v2;
+  igraph_vector_t v, v2;
   int i, ret;
   
   igraph_barabasi_game(&g, 10, 2, 0, 0, 1);
@@ -18,7 +18,7 @@ int main() {
     return 3;
   }
 
-  vector_init(&v, 0);
+  igraph_vector_init(&v, 0);
   igraph_get_edgelist(&g, &v, 0);
   for (i=0; i<igraph_ecount(&g); i++) {
     if (VECTOR(v)[2*i] <= VECTOR(v)[2*i+1]) {
@@ -28,7 +28,7 @@ int main() {
   igraph_destroy(&g);
   
   /* out degree sequence */
-  vector_resize(&v, 10);
+  igraph_vector_resize(&v, 10);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=3; VECTOR(v)[3]=3;
   VECTOR(v)[4]=4; VECTOR(v)[5]=5;
@@ -36,24 +36,24 @@ int main() {
   VECTOR(v)[8]=8; VECTOR(v)[9]=9;
   
   igraph_barabasi_game(&g, 10, 0, &v, 0, 1);
-  if (igraph_ecount(&g) != vector_sum(&v)) {
+  if (igraph_ecount(&g) != igraph_vector_sum(&v)) {
     return 5;
   }
-  vector_init(&v2, 0);
+  igraph_vector_init(&v2, 0);
   igraph_degree(&g, &v2, IGRAPH_VS_ALL(&g), IGRAPH_OUT, 1);
   for (i=0; i<igraph_vcount(&g); i++) {
     if (VECTOR(v)[i] != VECTOR(v2)[i]) {
       return 6;
     }
   }
-  vector_destroy(&v);
-  vector_destroy(&v2);
+  igraph_vector_destroy(&v);
+  igraph_vector_destroy(&v2);
   igraph_destroy(&g);
   
   /* outpref, we cannot really test this quantitatively,
      would need to set random seed */
   igraph_barabasi_game(&g, 10, 2, 0, 1, 0);
-  vector_init(&v, 0);
+  igraph_vector_init(&v, 0);
   igraph_get_edgelist(&g, &v, 0);
   for (i=0; i<igraph_ecount(&g); i++) {
     if (VECTOR(v)[2*i] <= VECTOR(v)[2*i+1]) {
@@ -75,12 +75,12 @@ int main() {
   if (ret != IGRAPH_EINVAL) {
     return 10;
   }
-  vector_init(&v, 9);
+  igraph_vector_init(&v, 9);
   ret=igraph_barabasi_game(&g, 10, 0, &v, 0, 0);
   if (ret != IGRAPH_EINVAL) {
     return 11;
   }
-  vector_destroy(&v);
+  igraph_vector_destroy(&v);
   
   return 0;
 }

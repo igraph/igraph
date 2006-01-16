@@ -113,7 +113,7 @@ PyObject* igraphmodule_VertexSeq_sq_item(igraphmodule_VertexSeqObject* self,
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_VertexSeq_attributes(igraphmodule_VertexSeqObject* self) {
-  vector_t t;
+  igraph_vector_t t;
   vector_ptr_t ns;
   long result;
   igraphmodule_GraphObject *o;

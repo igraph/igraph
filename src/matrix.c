@@ -55,7 +55,7 @@
 
 int matrix_init(matrix_t *m, long int nrow, long int ncol) {
   int ret1;
-  ret1=vector_init(&m->data, nrow*ncol);
+  ret1=igraph_vector_init(&m->data, nrow*ncol);
   m->nrow=nrow;
   m->ncol=ncol;
   return ret1;
@@ -75,7 +75,7 @@ int matrix_init(matrix_t *m, long int nrow, long int ncol) {
  */ 
 
 void matrix_destroy(matrix_t *m) {
-  vector_destroy(&m->data);
+  igraph_vector_destroy(&m->data);
 }
 
 /**
@@ -104,7 +104,7 @@ void matrix_destroy(matrix_t *m) {
  */
 
 int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
-  vector_resize(&m->data, nrow*ncol);
+  igraph_vector_resize(&m->data, nrow*ncol);
   m->nrow=nrow;
   m->ncol=ncol;
   return 0;
@@ -173,7 +173,7 @@ long int matrix_ncol(const matrix_t *m) {
  */
 
 int matrix_copy_to(const matrix_t *m, real_t *to) {
-  vector_copy_to(&m->data, to);
+  igraph_vector_copy_to(&m->data, to);
   return 0;
 }
 
@@ -190,7 +190,7 @@ int matrix_copy_to(const matrix_t *m, real_t *to) {
  */
 
 int matrix_null(matrix_t *m) {
-  vector_null(&m->data);
+  igraph_vector_null(&m->data);
   return 0;
 }
 
@@ -227,9 +227,9 @@ int matrix_add_cols(matrix_t *m, long int n) {
 
 int matrix_add_rows(matrix_t *m, long int n) {
   long int i;
-  vector_resize(&m->data, (m->ncol)*(m->nrow+n));
+  igraph_vector_resize(&m->data, (m->ncol)*(m->nrow+n));
   for (i=m->ncol-1; i>=0; i--) {
-    vector_move_interval(&m->data, (m->nrow)*i, (m->nrow)*(i+1),
+    igraph_vector_move_interval(&m->data, (m->nrow)*i, (m->nrow)*(i+1),
 			 (m->nrow+n)*i);
   }
   m->nrow += n;
@@ -250,7 +250,7 @@ int matrix_add_rows(matrix_t *m, long int n) {
  */
 
 int matrix_remove_col(matrix_t *m, long int col) {
-  vector_remove_section(&m->data, (m->nrow)*col, (m->nrow)*(col+1));
+  igraph_vector_remove_section(&m->data, (m->nrow)*col, (m->nrow)*(col+1));
   m->ncol--;
   return 0;
 }
@@ -287,7 +287,7 @@ int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove) {
  * matrix. 
  */
 
-int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove) {
+int matrix_delete_rows_neg(matrix_t *m, igraph_vector_t *neg, long int nremove) {
   long int i, j, idx=0;
   for (i=0; i<m->ncol; i++) {
     for (j=0; j<m->nrow; j++) {
@@ -320,6 +320,6 @@ int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove) {
 int matrix_copy(matrix_t *to, const matrix_t *from) {
   to->nrow = from->nrow;
   to->ncol = from->ncol;
-  return vector_copy(&to->data, &from->data);
+  return igraph_vector_copy(&to->data, &from->data);
 }
 

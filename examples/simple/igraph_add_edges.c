@@ -1,9 +1,9 @@
 
 #include <igraph.h>
 
-void print_vector(vector_t *v, FILE *f) {
+void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;
-  for (i=0; i<vector_size(v); i++) {
+  for (i=0; i<igraph_vector_size(v); i++) {
     fprintf(f, " %li", (long int) VECTOR(*v)[i]);
   }
   fprintf(f, "\n");
@@ -12,11 +12,11 @@ void print_vector(vector_t *v, FILE *f) {
 int main() {
 
   igraph_t g;
-  vector_t v;
+  igraph_vector_t v;
   int ret;
 
   /* Create graph */
-  vector_init(&v, 8);
+  igraph_vector_init(&v, 8);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=1; VECTOR(v)[3]=2;
   VECTOR(v)[4]=2; VECTOR(v)[5]=3;
@@ -24,19 +24,19 @@ int main() {
   igraph_create(&g, &v, 0, 1);
 
   /* Add edges */
-  vector_resize(&v, 4);
+  igraph_vector_resize(&v, 4);
   VECTOR(v)[0]=2; VECTOR(v)[1]=1;
   VECTOR(v)[2]=3; VECTOR(v)[3]=3;
   igraph_add_edges(&g, &v);
   
   /* Check result */
   igraph_get_edgelist(&g, &v, 0);
-  vector_sort(&v);
+  igraph_vector_sort(&v);
   print_vector(&v, stdout);
 
   /* Error, vector length */
   igraph_set_error_handler(igraph_error_handler_ignore);
-  vector_resize(&v, 3);
+  igraph_vector_resize(&v, 3);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=2;
   ret=igraph_add_edges(&g, &v);
@@ -46,11 +46,11 @@ int main() {
   
   /* Check result */
   igraph_get_edgelist(&g, &v, 0);
-  vector_sort(&v);
+  igraph_vector_sort(&v);
   print_vector(&v, stdout);
 
   /* Error, vector ids */
-  vector_resize(&v, 4);
+  igraph_vector_resize(&v, 4);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=2; VECTOR(v)[3]=4;
   ret=igraph_add_edges(&g, &v);
@@ -60,10 +60,10 @@ int main() {
 
   /* Check result */
   igraph_get_edgelist(&g, &v, 0);
-  vector_sort(&v);
+  igraph_vector_sort(&v);
   print_vector(&v, stdout);
 
-  vector_destroy(&v);
+  igraph_vector_destroy(&v);
   igraph_destroy(&g);
 
   return 0;

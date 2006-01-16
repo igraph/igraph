@@ -5,17 +5,17 @@
 
 /**
  * \ingroup python_interface_conversion
- * \brief Converts a Python integer list to an igraph \c vector_t
- * The incoming \c vector_t should be uninitialized. Raises suitable
+ * \brief Converts a Python integer list to an igraph \c igraph_vector_t
+ * The incoming \c igraph_vector_t should be uninitialized. Raises suitable
  * Python exceptions when needed.
  * 
  * \param list the Python list to be converted
- * \param v the \c vector_t containing the result
+ * \param v the \c igraph_vector_t containing the result
  * \param need_non_negative if true, checks whether all elements are non-negative
  * \param pairs if true, assumes that every list element is a pair of integers
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non_negative, bool_t pairs)
+int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, bool_t need_non_negative, bool_t pairs)
 {
    PyObject *item, *i1, *i2;
    int i, j, k, ok;
@@ -60,7 +60,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 	     
 	     if (ok) 
 	       {
-		  vector_init(v, 2);
+		  igraph_vector_init(v, 2);
 		  VECTOR(*v)[0]=(real_t)idx;
 		  VECTOR(*v)[1]=(real_t)idx2;
 	       }
@@ -77,7 +77,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 	  {
 	     // a single integer was given instead of a list
 	     // Let's assume that the user meant a list consisting of this single item
-	     vector_init(v, 1);
+	     igraph_vector_init(v, 1);
 	     VECTOR(*v)[0]=(real_t)PyInt_AsLong(list);
 	  }
 	else 
@@ -93,9 +93,9 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 	// Non-integer or negative elements raise an exception
 	j=PyList_Size(list);
 	if (pairs)
-	  vector_init(v, 2*j);
+	  igraph_vector_init(v, 2*j);
 	else
-	  vector_init(v, j);
+	  igraph_vector_init(v, j);
 	for (i=0, k=0; i<j; i++)
 	  {
 	     item=PyList_GetItem(list, i);
@@ -127,7 +127,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 				 // this should not happen, but we return anyway.
 				 // an IndexError exception was set by PyTuple_GetItem
 				 // at this point
-				 vector_destroy(v);
+				 igraph_vector_destroy(v);
 				 return 1;
 			      }
 			    
@@ -153,7 +153,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 			  PyErr_SetString(PyExc_TypeError, "List elements must be non-negative integer pairs");
 			else
 			  PyErr_SetString(PyExc_TypeError, "List elements must be integer pairs");
-			vector_destroy(v);
+			igraph_vector_destroy(v);
 			return 1;
 		      } else {
 			// item is not a non-negative integer, so throw an exception
@@ -161,7 +161,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 			  PyErr_SetString(PyExc_TypeError, "List elements must be non-negative integers");
 			else
 			  PyErr_SetString(PyExc_TypeError, "List elements must be integers");
-			vector_destroy(v);
+			igraph_vector_destroy(v);
 			return 1;
 		      }
 		    }
@@ -181,7 +181,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 		  // this should not happen, but we return anyway.
 		  // an IndexError exception was set by PyList_GetItem
 		  // at this point
-		  vector_destroy(v);
+		  igraph_vector_destroy(v);
 		  return 1;
 	       }
 	  }
@@ -192,16 +192,16 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, vector_t *v, bool_t need_non
 
 /**
  * \ingroup python_interface_conversion
- * \brief Converts an igraph \c vector_t to a Python integer list
+ * \brief Converts an igraph \c igraph_vector_t to a Python integer list
  * 
- * \param v the \c vector_t containing the vector to be converted
+ * \param v the \c igraph_vector_t containing the vector to be converted
  * \return the Python integer list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_to_PyList(vector_t *v) {
+PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v) {
    PyObject* list;
    int n, i;
    
-   n=vector_size(v);
+   n=igraph_vector_size(v);
    if (n<0) return igraphmodule_handle_igraph_error();
 
    // create a new Python list
@@ -222,16 +222,16 @@ PyObject* igraphmodule_vector_t_to_PyList(vector_t *v) {
 
 /**
  * \ingroup python_interface_conversion
- * \brief Converts an igraph \c vector_t to a Python list of integer pairs
+ * \brief Converts an igraph \c igraph_vector_t to a Python list of integer pairs
  * 
- * \param v the \c vector_t containing the vector to be converted
+ * \param v the \c igraph_vector_t containing the vector to be converted
  * \return the Python integer pair list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_to_PyList_pairs(vector_t *v) {
+PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v) {
    PyObject *list, *pair;
    int n, i, j;
    
-   n=vector_size(v);
+   n=igraph_vector_size(v);
    if (n<0) return igraphmodule_handle_igraph_error();
    if (n%2) return igraphmodule_handle_igraph_error();
    
@@ -257,20 +257,20 @@ PyObject* igraphmodule_vector_t_to_PyList_pairs(vector_t *v) {
 
 /**
  * \ingroup python_interface_conversion
- * \brief Converts an igraph \c vector_t to a Python float list
+ * \brief Converts an igraph \c igraph_vector_t to a Python float list
  * 
- * \param v the \c vector_t containing the vector to be converted
+ * \param v the \c igraph_vector_t containing the vector to be converted
  * \return the Python float list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_to_float_PyList(vector_t *v) {
+PyObject* igraphmodule_vector_t_to_float_PyList(igraph_vector_t *v) {
    PyObject* list;
    int n, i;
    
-   n=vector_size(v);
+   n=igraph_vector_size(v);
    if (n<0) return igraphmodule_handle_igraph_error();
 
    // create a new Python list
-   list=PyList_New(vector_size(v));
+   list=PyList_New(igraph_vector_size(v));
    // populate the list with data
    for (i=0; i<n; i++) 
      {

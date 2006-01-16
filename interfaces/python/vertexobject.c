@@ -94,21 +94,21 @@ PyObject* igraphmodule_Vertex_str(igraphmodule_VertexObject *self)
  * \brief Returns the number of vertex attributes
  */
 int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
-  vector_t t;
+  igraph_vector_t t;
   long result;
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return 0;
   
-  if (vector_init(&t, 0)) return 0;
+  if (igraph_vector_init(&t, 0)) return 0;
   if (igraph_list_vertex_attributes(&o->g, NULL, &t)) {
-    vector_destroy(&t);
+    igraph_vector_destroy(&t);
     return 0;
   }
   
-  result=vector_size(&t);
-  vector_destroy(&t);
+  result=igraph_vector_size(&t);
+  igraph_vector_destroy(&t);
   return result;
 }
 
@@ -116,7 +116,7 @@ int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
-  vector_t t;
+  igraph_vector_t t;
   vector_ptr_t ns;
   long result;
   igraphmodule_GraphObject *o;

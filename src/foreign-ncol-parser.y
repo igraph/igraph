@@ -9,8 +9,8 @@ int igraph_ncol_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
 #include "error.h"
-extern vector_t *igraph_ncol_vector;
-extern vector_t *igraph_ncol_weights;
+extern igraph_vector_t *igraph_ncol_vector;
+extern igraph_vector_t *igraph_ncol_weights;
 extern igraph_trie_t *igraph_ncol_trie;
 real_t igraph_ncol_get_number(const char *str, long int len);
 %}
@@ -38,14 +38,14 @@ input :    /* empty */
 ;
 
 edge :   edgeid edgeid NEWLINE        { 
-           vector_push_back(igraph_ncol_vector, $1);
-           vector_push_back(igraph_ncol_vector, $2);
-	   vector_push_back(igraph_ncol_weights, 0);
+           igraph_vector_push_back(igraph_ncol_vector, $1);
+           igraph_vector_push_back(igraph_ncol_vector, $2);
+	   igraph_vector_push_back(igraph_ncol_weights, 0);
        }
        | edgeid edgeid weight NEWLINE { 
-           vector_push_back(igraph_ncol_vector, $1);
-           vector_push_back(igraph_ncol_vector, $2);
-	   vector_push_back(igraph_ncol_weights, $3);
+           igraph_vector_push_back(igraph_ncol_vector, $1);
+           igraph_vector_push_back(igraph_ncol_vector, $2);
+	   igraph_vector_push_back(igraph_ncol_weights, $3);
        }
 ;
 

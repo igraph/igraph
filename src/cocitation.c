@@ -105,15 +105,15 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
   long int from, i, j;
   bool_t *calc;
   matrix_t tmpres=MATRIX_NULL;
-  vector_t neis=VECTOR_NULL;
+  igraph_vector_t neis=IGRAPH_VECTOR_NULL;
   igraph_vs_t myvids;
-  const vector_t *myvidsv;
+  const igraph_vector_t *myvidsv;
   
   IGRAPH_CHECK(igraph_vs_vectorview_it(graph, vids, &myvids));
   IGRAPH_FINALLY(igraph_vs_destroy, &myvids);
   myvidsv=igraph_vs_vector_getvector(graph, &myvids);
 
-  if (!vector_isininterval(myvidsv, 0, no_of_nodes-1)) {
+  if (!igraph_vector_isininterval(myvidsv, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("", IGRAPH_EINVVID);
   }
   
@@ -123,21 +123,21 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
   }  
   IGRAPH_FINALLY(free, calc); 	/* TODO: hack */
 
-  for (i=0; i<vector_size(myvidsv); i++) {
+  for (i=0; i<igraph_vector_size(myvidsv); i++) {
     calc[ (long int) VECTOR(*myvidsv)[i] ] = 1;
   }
   
   MATRIX_INIT_FINALLY(&tmpres, no_of_nodes, no_of_nodes);
-  VECTOR_INIT_FINALLY(&neis, 0);
-  IGRAPH_CHECK(matrix_resize(res, vector_size(myvidsv), no_of_nodes));
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(matrix_resize(res, igraph_vector_size(myvidsv), no_of_nodes));
 
   /* The result */
   
   for (from=0; from<no_of_nodes; from++) {
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
-    for (i=0; i < vector_size(&neis)-1; i++) {
+    for (i=0; i < igraph_vector_size(&neis)-1; i++) {
       if (calc[ (long int)VECTOR(neis)[i] ]) {
-	for (j=i+1; j<vector_size(&neis); j++) {
+	for (j=i+1; j<igraph_vector_size(&neis); j++) {
 	  MATRIX(tmpres, (long int)VECTOR(neis)[i], 
 		 (long int)VECTOR(neis)[j]) += 1;
 	  MATRIX(tmpres, (long int)VECTOR(neis)[j], 
@@ -148,7 +148,7 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
   }
 
   /* Copy result */
-  for (i=0; i<vector_size(myvidsv); i++) {
+  for (i=0; i<igraph_vector_size(myvidsv); i++) {
     for (j=0; j<no_of_nodes; j++) {
       MATRIX(*res, i, j) = MATRIX(tmpres, (long int) VECTOR(*myvidsv)[i], j);
     }
@@ -156,7 +156,7 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
   
   /* Clean up */
   matrix_destroy(&tmpres);
-  vector_destroy(&neis);
+  igraph_vector_destroy(&neis);
   Free(calc);
   igraph_vs_destroy(&myvids);
   IGRAPH_FINALLY_CLEAN(4);

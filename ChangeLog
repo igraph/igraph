@@ -1,5 +1,10 @@
 2006-01-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/vector.c (vector_t, igraph_vector_t) :
+	vector_t removed to igraph_vector_t. All functions renamed.
+
+2006-01-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/vector.c (vector_which_max) : added
 
 2006-01-06  Gabor Csardi  <csardi@rmki.kfki.hu>

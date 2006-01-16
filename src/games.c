@@ -63,7 +63,7 @@
  */
 
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
-			 const vector_t *outseq, bool_t outpref, 
+			 const igraph_vector_t *outseq, bool_t outpref, 
 			 bool_t directed) {
 
   long int no_of_nodes=n;
@@ -71,7 +71,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
   long int *bag;
   long int bagp;
   long int no_of_edges;
-  vector_t edges=VECTOR_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   
   long int resp=0;
 
@@ -80,14 +80,14 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
   if (n<0) {
     IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }
-  if (outseq != 0 && vector_size(outseq) != 0 && vector_size(outseq) != n) {
+  if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != n) {
     IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
   }
-  if ( (outseq == 0 || vector_size(outseq) == 0) && m<0) {
+  if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
     IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
   }
 
-  if (outseq==0 || vector_size(outseq) == 0) {
+  if (outseq==0 || igraph_vector_size(outseq) == 0) {
     no_of_neighbors=m;
     bag=Calloc(no_of_nodes * no_of_neighbors + no_of_nodes +
 	       outpref * no_of_nodes * no_of_neighbors,
@@ -95,7 +95,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
     no_of_edges=(no_of_nodes-1)*no_of_neighbors;
   } else {
     no_of_edges=0;
-    for (i=1; i<vector_size(outseq); i++) {
+    for (i=1; i<igraph_vector_size(outseq); i++) {
       no_of_edges+=VECTOR(*outseq)[i];
     }
     bag=Calloc(no_of_nodes + no_of_edges + outpref * no_of_edges,
@@ -106,7 +106,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
     IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, bag); 	/* TODO: hack */
-  VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
 
   /* The first node */
 
@@ -119,7 +119,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
   
   for (i=1; i<no_of_nodes; i++) {
     /* draw edges */
-    if (outseq != 0 && vector_size(outseq)!=0) { no_of_neighbors=VECTOR(*outseq)[i]; }
+    if (outseq != 0 && igraph_vector_size(outseq)!=0) { no_of_neighbors=VECTOR(*outseq)[i]; }
     for (j=0; j<no_of_neighbors; j++) {
       long int to=bag[RNG_INTEGER(0, bagp-1)];
       VECTOR(edges)[resp++] = i;
@@ -139,7 +139,7 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
 
   Free(bag);
   IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
-  vector_destroy(&edges);
+  igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
@@ -153,8 +153,8 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
 				bool_t directed, bool_t loops) {
 
   long int no_of_nodes=n;
-  vector_t edges=VECTOR_NULL;
-  vector_t s=VECTOR_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
+  igraph_vector_t s=IGRAPH_VECTOR_NULL;
   int retval=0;
 
   if (n<0) {
@@ -181,57 +181,57 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
     else 
       { maxedges = n * (n-1)/2; }
     
-    VECTOR_INIT_FINALLY(&s, 0);
-    IGRAPH_CHECK(vector_reserve(&s, maxedges*p*1.1));
+    IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
+    IGRAPH_CHECK(igraph_vector_reserve(&s, maxedges*p*1.1));
 
     RNG_BEGIN();
 
-    IGRAPH_CHECK(vector_push_back(&s, RNG_GEOM(p)+1));
-    while (vector_tail(&s) < maxedges) {
-      IGRAPH_CHECK(vector_push_back(&s, vector_tail(&s)+RNG_GEOM(p)+1));
+    IGRAPH_CHECK(igraph_vector_push_back(&s, RNG_GEOM(p)+1));
+    while (igraph_vector_tail(&s) < maxedges) {
+      IGRAPH_CHECK(igraph_vector_push_back(&s, igraph_vector_tail(&s)+RNG_GEOM(p)+1));
     }
-    if (vector_tail(&s) > maxedges+1) {
-      vector_pop_back(&s);
+    if (igraph_vector_tail(&s) > maxedges+1) {
+      igraph_vector_pop_back(&s);
     }
 
     RNG_END();
 
-    VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(vector_reserve(&edges, vector_size(&s)*2));
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, igraph_vector_size(&s)*2));
 
     if (directed && loops) {
-      for (i=0; i<vector_size(&s); i++) {
-	vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))/no_of_nodes);
-	vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))%no_of_nodes);
+      for (i=0; i<igraph_vector_size(&s); i++) {
+	igraph_vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))/no_of_nodes);
+	igraph_vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))%no_of_nodes);
       }
     } else if (directed && !loops) {
-      for (i=0; i<vector_size(&s); i++) {
+      for (i=0; i<igraph_vector_size(&s); i++) {
 	long int from=((long int)(VECTOR(s)[i]-1))/(no_of_nodes-1);
 	long int to=((long int)VECTOR(s)[i])%(no_of_nodes-1);
 	if (from==to) {
 	  to=no_of_nodes-1;
 	}
-	vector_push_back(&edges, from);
-	vector_push_back(&edges, to);
+	igraph_vector_push_back(&edges, from);
+	igraph_vector_push_back(&edges, to);
       }
     } else if (!directed && loops) {
-      for (i=0; i<vector_size(&s); i++) {
+      for (i=0; i<igraph_vector_size(&s); i++) {
 	real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
-	vector_push_back(&edges, from-1);
-	vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
+	igraph_vector_push_back(&edges, from-1);
+	igraph_vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
       }
     } else {
-      for (i=0; i<vector_size(&s); i++) {
+      for (i=0; i<igraph_vector_size(&s); i++) {
 	real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
-	vector_push_back(&edges, from-1);
-	vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
+	igraph_vector_push_back(&edges, from-1);
+	igraph_vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
       }
     }      
 
-    vector_destroy(&s);
+    igraph_vector_destroy(&s);
     IGRAPH_FINALLY_CLEAN(1);
     IGRAPH_CHECK(retval=igraph_create(graph, &edges, n, directed));
-    vector_destroy(&edges);
+    igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -243,8 +243,8 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
 
   long int no_of_nodes=n;
   long int no_of_edges=m;
-  vector_t edges=VECTOR_NULL;
-  vector_t s=VECTOR_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
+  igraph_vector_t s=IGRAPH_VECTOR_NULL;
   int retval=0;
 
   if (n<0) {
@@ -277,44 +277,44 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
       retval=igraph_full(graph, n, directed, loops);
     } else {
     
-      VECTOR_INIT_FINALLY(&s, 0);
+      IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
       IGRAPH_CHECK(igraph_random_sample(&s, 1, maxedges, no_of_edges));
       
-      VECTOR_INIT_FINALLY(&edges, 0);
-      IGRAPH_CHECK(vector_reserve(&edges, vector_size(&s)*2));
+      IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+      IGRAPH_CHECK(igraph_vector_reserve(&edges, igraph_vector_size(&s)*2));
       
       if (directed && loops) {
-	for (i=0; i<vector_size(&s); i++) {
-	  vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))/no_of_nodes);
-	  vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))%no_of_nodes);
+	for (i=0; i<igraph_vector_size(&s); i++) {
+	  igraph_vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))/no_of_nodes);
+	  igraph_vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))%no_of_nodes);
 	}
       } else if (directed && !loops) {
-	for (i=0; i<vector_size(&s); i++) {
+	for (i=0; i<igraph_vector_size(&s); i++) {
 	  long int from=((long int)(VECTOR(s)[i]-1))/(no_of_nodes-1);
 	  long int to=((long int)VECTOR(s)[i])%(no_of_nodes-1);
 	  if (from==to) {
 	    to=no_of_nodes-1;
 	  }
-	  vector_push_back(&edges, from);
-	  vector_push_back(&edges, to);
+	  igraph_vector_push_back(&edges, from);
+	  igraph_vector_push_back(&edges, to);
 	}
       } else if (!directed && loops) {
-	for (i=0; i<vector_size(&s); i++) {
+	for (i=0; i<igraph_vector_size(&s); i++) {
 	  real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
-	  vector_push_back(&edges, from-1);
-	  vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
+	  igraph_vector_push_back(&edges, from-1);
+	  igraph_vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
 	}
       } else {
-	for (i=0; i<vector_size(&s); i++) {
+	for (i=0; i<igraph_vector_size(&s); i++) {
 	  real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
-	  vector_push_back(&edges, from-1);
-	  vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
+	  igraph_vector_push_back(&edges, from-1);
+	  igraph_vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
 	}
       }  
 
-      vector_destroy(&s);
+      igraph_vector_destroy(&s);
       retval=igraph_create(graph, &edges, n, directed);
-      vector_destroy(&edges);
+      igraph_vector_destroy(&edges);
       IGRAPH_FINALLY_CLEAN(2);
     }
   }
@@ -377,31 +377,31 @@ int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
 }
 
 int igraph_degree_sequence_game_simple(igraph_t *graph, 
-				       const vector_t *out_seq, 
-				       const vector_t *in_seq) {
+				       const igraph_vector_t *out_seq, 
+				       const igraph_vector_t *in_seq) {
 
   long int outsum=0, insum=0;
-  bool_t directed=(in_seq != 0 && vector_size(in_seq)!=0);
+  bool_t directed=(in_seq != 0 && igraph_vector_size(in_seq)!=0);
   long int no_of_nodes, no_of_edges;
   long int *bag1=0, *bag2=0;
   long int bagp1=0, bagp2=0;
-  vector_t edges=VECTOR_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   long int i,j;
 
-  if (vector_any_smaller(out_seq, 0)) {
+  if (igraph_vector_any_smaller(out_seq, 0)) {
     IGRAPH_ERROR("Negative out degree", IGRAPH_EINVAL);
   }
-  if (directed && vector_any_smaller(in_seq, 0)) {
+  if (directed && igraph_vector_any_smaller(in_seq, 0)) {
     IGRAPH_ERROR("Negative in degree", IGRAPH_EINVAL);
   }
   if (directed && 
-      vector_size(out_seq) != vector_size(in_seq)) { 
+      igraph_vector_size(out_seq) != igraph_vector_size(in_seq)) { 
     IGRAPH_ERROR("Length of `out_seq' and `in_seq' differ for directed graph",
 		 IGRAPH_EINVAL);
   }
   
-  outsum=vector_sum(out_seq);
-  insum=vector_sum(in_seq);
+  outsum=igraph_vector_sum(out_seq);
+  insum=igraph_vector_sum(in_seq);
   
   if (!directed && outsum % 2 != 0) {
     IGRAPH_ERROR("Total degree not even for undirected graph", IGRAPH_EINVAL);
@@ -412,7 +412,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
 		  IGRAPH_EINVAL);
   }
 
-  no_of_nodes=vector_size(out_seq);
+  no_of_nodes=igraph_vector_size(out_seq);
   if (directed) {
     no_of_edges=outsum;
   } else {
@@ -443,8 +443,8 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     }
   }
 
-  VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_CHECK(vector_reserve(&edges, no_of_edges));
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges));
 
   RNG_BEGIN();
 
@@ -452,8 +452,8 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     for (i=0; i<no_of_edges; i++) {
       long int from=RNG_INTEGER(0, bagp1-1);
       long int to=RNG_INTEGER(0, bagp2-1);
-      vector_push_back(&edges, bag1[from]); /* safe, already reserved */
-      vector_push_back(&edges, bag2[to]);   /* detto */
+      igraph_vector_push_back(&edges, bag1[from]); /* safe, already reserved */
+      igraph_vector_push_back(&edges, bag2[to]);   /* detto */
       bag1[from]=bag1[bagp1-1];
       bag2[to]=bag2[bagp2-1];
       bagp1--; bagp2--;
@@ -462,11 +462,11 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     for (i=0; i<no_of_edges; i++) {
       long int from=RNG_INTEGER(0, bagp1-1);
       long int to;
-      vector_push_back(&edges, bag1[from]); /* safe, already reserved */
+      igraph_vector_push_back(&edges, bag1[from]); /* safe, already reserved */
       bag1[from]=bag1[bagp1-1];
       bagp1--;
       to=RNG_INTEGER(0, bagp1-1);
-      vector_push_back(&edges, bag1[to]);   /* detto */
+      igraph_vector_push_back(&edges, bag1[to]);   /* detto */
       bag1[to]=bag1[bagp1-1];
       bagp1--;
     }
@@ -482,7 +482,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
   }
 
   IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
-  vector_destroy(&edges);
+  igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
@@ -526,8 +526,8 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
  * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game()
  */
 
-int igraph_degree_sequence_game(igraph_t *graph, const vector_t *out_deg,
-				const vector_t *in_deg, 
+int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
+				const igraph_vector_t *in_deg, 
 				igraph_degseq_t method) {
 
   int retval;
@@ -572,7 +572,7 @@ int igraph_growing_random_game(igraph_t *graph, integer_t n,
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
   long int no_of_edges;
-  vector_t edges=VECTOR_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   
   long int resp=0;
 
@@ -587,7 +587,7 @@ int igraph_growing_random_game(igraph_t *graph, integer_t n,
 
   no_of_edges=(no_of_nodes-1) * no_of_neighbors;
 
-  VECTOR_INIT_FINALLY(&edges, no_of_edges*2);  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);  
 
   RNG_BEGIN();
 
@@ -609,7 +609,7 @@ int igraph_growing_random_game(igraph_t *graph, integer_t n,
   RNG_END();
 
   IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-  vector_destroy(&edges);
+  igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
 
   return 0;

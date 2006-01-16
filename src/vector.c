@@ -32,64 +32,64 @@
 
 /**
  * \ingroup vector
- * \section about_vector_t_objects About <type>vector_t</type> objects
+ * \section about_igraph_vector_t_objects About <type>igraph_vector_t</type> objects
  * 
- * <para>The <type>vector_t</type> data type is a simple and efficient
+ * <para>The <type>igraph_vector_t</type> data type is a simple and efficient
  * interface to arrays containing real numbers. It is something
  * similar as (but much simpler than) the <type>vector</type> template
  * in the C++ standard library.</para>
  *
  * <para>Vectors are used extensively in <command>igraph</command>, all
  * functions which expects or returns a list of numbers use
- * vector_t to achive this.</para>
+ * igraph_vector_t to achive this.</para>
  *
- * <para>The <type>vector_t</type> type ususally uses
+ * <para>The <type>igraph_vector_t</type> type ususally uses
  * O(n) space
  * to store n elements. Sometimes it
  * uses more, this is because vectors can shrink, but even if they
  * shrink, the current implementation does not free a single bit of
  * memory.</para>
  * 
- * <para>The position of the elements in a <type>vector_t</type>
+ * <para>The position of the elements in a <type>igraph_vector_t</type>
  * object is numbered from zero, as this is the usual C
  * standard.</para> 
  */
 
 /**
  * \ingroup vector
- * \section vector_constructors_and_destructors Constructors and
+ * \section igraph_vector_constructors_and_destructors Constructors and
  * Destructors
  * 
- * <para><type>vector_t</type> objects have to be initialized before using
+ * <para><type>igraph_vector_t</type> objects have to be initialized before using
  * them, this is analogous to calling a constructor on them. There are a
- * number of <type>vector_t</type> constructors, for your
- * convenience. \ref vector_init() is the basic constructor, it
+ * number of <type>igraph_vector_t</type> constructors, for your
+ * convenience. \ref igraph_vector_init() is the basic constructor, it
  * creates a vector of the given length, filled with zeros.
- * \ref vector_init_real(), \ref vector_init_real_end(), \ref
- * vector_init_int() and \ref vector_init_int_end() are convenience
+ * \ref igraph_vector_init_real(), \ref igraph_vector_init_real_end(), \ref
+ * igraph_vector_init_int() and \ref igraph_vector_init_int_end() are convenience
  * constructors, these create a vector with the elements given as
- * their parameters. \ref vector_copy() creates a new identical copy
+ * their parameters. \ref igraph_vector_copy() creates a new identical copy
  * of an already existing and initialized vector. \ref
- * vector_init_copy() creates a vector by copying a regular C array. 
- * \ref vector_init_seq() creates a vector containing a regular
+ * igraph_vector_init_copy() creates a vector by copying a regular C array. 
+ * \ref igraph_vector_init_seq() creates a vector containing a regular
  * sequence with increment one.</para>
  * 
- * <para>\ref vector_view() is a special constructor, it allows you to
+ * <para>\ref igraph_vector_view() is a special constructor, it allows you to
  * handle a regular C array as a <type>vector</type> without copying
  * its elements.
  * </para> 
  *
- * <para>If a <type>vector_t</type> object is not needed any more, it
+ * <para>If a <type>igraph_vector_t</type> object is not needed any more, it
  * should be destroyed to free its allocated memory by calling the
- * <type>vector_t</type> destructor, \ref vector_destroy().</para>
+ * <type>igraph_vector_t</type> destructor, \ref igraph_vector_destroy().</para>
  * 
- * <para> Note that vectors created by \ref vector_view() are special,
- * you mustn't call \ref vector_destroy() on these.</para>
+ * <para> Note that vectors created by \ref igraph_vector_view() are special,
+ * you mustn't call \ref igraph_vector_destroy() on these.</para>
  */
 
 /**
  * \ingroup vector
- * \function vector_init
+ * \function igraph_vector_init
  * \brief Initializes a vector object (constructor).
  * 
  * Every vector needs to be initialized before it can be used, and
@@ -98,7 +98,7 @@
  * 
  * Every vector object initialized by this function should be
  * destroyed (ie. the memory allocated for it should be freed) when it
- * is not needed any more, the \ref vector_destroy() function is
+ * is not needed any more, the \ref igraph_vector_destroy() function is
  * responsible for this.
  * \param v Pointer to a not yet initialized vector object.
  * \param size The size of the vector.
@@ -111,7 +111,7 @@
  * n is the number of elements. 
  */
 
-int vector_init      (vector_t* v, int long size) {	
+int igraph_vector_init      (igraph_vector_t* v, int long size) {	
         long int alloc_size= size > 0 ? size : 1;
 	if (size < 0) { size=0; }
 	v->stor_begin=Calloc(alloc_size, real_t);
@@ -126,14 +126,14 @@ int vector_init      (vector_t* v, int long size) {
 
 /**
  * \ingroup vector
- * \function vector_view
- * \brief Handle a regular C array as a <type>vector_t</type>.
+ * \function igraph_vector_view
+ * \brief Handle a regular C array as a <type>igraph_vector_t</type>.
  * 
- * This is a special <type>vector_t</type> constructor. It allows to
- * handle a regular C array as a <type>vector_t</type> temporarily.
+ * This is a special <type>igraph_vector_t</type> constructor. It allows to
+ * handle a regular C array as a <type>igraph_vector_t</type> temporarily.
  * Be sure that you \em don't ever call the destructor (\ref
- * vector_destroy()) on objects created by this constructor.
- * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * igraph_vector_destroy()) on objects created by this constructor.
+ * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
  * \param data Pointer, the C array.
  * \param length The length of the C array.
  * \return Pointer to the vector object, the same as the 
@@ -142,9 +142,9 @@ int vector_init      (vector_t* v, int long size) {
  * Time complexity: O(1)
  */ 
 
-const vector_t *vector_view (const vector_t *v, const real_t *data, 
+const igraph_vector_t *igraph_vector_view (const igraph_vector_t *v, const real_t *data, 
 			     long int length) {
-  vector_t *v2=(vector_t*) v;
+  igraph_vector_t *v2=(igraph_vector_t*) v;
   v2->stor_begin=(real_t*)data;
   v2->stor_end=(real_t*)data+length;
   v2->end=v2->stor_end;
@@ -153,30 +153,30 @@ const vector_t *vector_view (const vector_t *v, const real_t *data,
 
 /**
  * \ingroup vector
- * \function vector_init_real
- * \brief Create a <type>vector_t</type> from the parameters.
+ * \function igraph_vector_init_real
+ * \brief Create a <type>igraph_vector_t</type> from the parameters.
  * 
  * Because of how C and the C library handles variable length argument
  * lists, it is required that you supply real constants to this
  * function. This means that
  * <informalexample><programlisting>
- * vector_t v;
- * vector_init_real(&amp;v, 5, 1,2,3,4,5);
+ * igraph_vector_t v;
+ * igraph_vector_init_real(&amp;v, 5, 1,2,3,4,5);
  * </programlisting></informalexample>
  * is an error at running time and the results are undefined. This is
  * the proper way:
  * <informalexample><programlisting>
- * vector_t v;
- * vector_init_real(&amp;v, 5, 1.0,2.0,3.0,4.0,5.0);
+ * igraph_vector_t v;
+ * igraph_vector_init_real(&amp;v, 5, 1.0,2.0,3.0,4.0,5.0);
  * </programlisting></informalexample>
- * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
  * \param no Positive integer, the number of <type>real_t</type>
  *    parameters to follow.
  * \param ... The elements of the vector.
  * \return Error code, this can be <constant>IGRAPH_ENOMEM</constant>
  *     if there isn't enough memory to allocate the vector.
  *
- * \sa \ref vector_init_real_end(), \ref vector_init_int() for similar
+ * \sa \ref igraph_vector_init_real_end(), \ref igraph_vector_init_int() for similar
  * functions.
  *
  * Time complexity: depends on the time required to allocate memory,
@@ -184,10 +184,10 @@ const vector_t *vector_view (const vector_t *v, const real_t *data,
  * elements in the vector.
  */
 
-int vector_init_real(vector_t *v, int no, ...) {
+int igraph_vector_init_real(igraph_vector_t *v, int no, ...) {
   int i=0;
   va_list ap;
-  IGRAPH_CHECK(vector_init(v, no));
+  IGRAPH_CHECK(igraph_vector_init(v, no));
 
   va_start(ap, no);
   for (i=0; i<no; i++) {
@@ -200,21 +200,21 @@ int vector_init_real(vector_t *v, int no, ...) {
 
 /**
  * \ingroup vector
- * \function vector_init_real_end
- * \brief Create a <type>vector_t</type> from the parameters.
+ * \function igraph_vector_init_real_end
+ * \brief Create a <type>igraph_vector_t</type> from the parameters.
  * 
- * This constructor is similar to \ref vector_init_real(), the only
+ * This constructor is similar to \ref igraph_vector_init_real(), the only
  * difference is that instead of giving the number of elements in the
  * vector, a special marker element follows the last real vector
  * element.
- * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
  * \param endmark This element will signal the end of the vector. It
  *    will \em not be part of the vector.
  * \param ... The elements of the vector.
  * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
  *    isn't enough memory.
  * 
- * \sa \ref vector_init_real() and \ref vector_init_int_end() for
+ * \sa \ref igraph_vector_init_real() and \ref igraph_vector_init_int_end() for
  * similar functions.
  * 
  * Time complexity: at least O(n) for 
@@ -222,7 +222,7 @@ int vector_init_real(vector_t *v, int no, ...) {
  * complexity of the memory allocation.
  */
 
-int vector_init_real_end(vector_t *v, real_t endmark, ...) {
+int igraph_vector_init_real_end(igraph_vector_t *v, real_t endmark, ...) {
   int i=0, n=0;
   va_list ap;
 
@@ -236,7 +236,7 @@ int vector_init_real_end(vector_t *v, real_t endmark, ...) {
   }
   va_end(ap);
 
-  VECTOR_INIT_FINALLY(v, n);
+  IGRAPH_VECTOR_INIT_FINALLY(v, n);
   
   va_start(ap, endmark);
   for (i=0; i<n; i++) {
@@ -250,19 +250,19 @@ int vector_init_real_end(vector_t *v, real_t endmark, ...) {
 
 /**
  * \ingroup vector
- * \function vector_init_int
- * \brief Create a <type>vector_t</type> containing the parameters.
+ * \function igraph_vector_init_int
+ * \brief Create a <type>igraph_vector_t</type> containing the parameters.
  * 
- * This function is similar to \ref vector_init_real(), but it expects 
+ * This function is similar to \ref igraph_vector_init_real(), but it expects 
  * <type>int</type> parameters. It is important that all parameters
  * should be of this type, otherwise the result of the function call
  * is undefined.
- * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
  * \param no The number of <type>int</type> parameters to follow.
  * \param ... The elements of the vector.
  * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
  *    not enough memory.
- * \sa \ref vector_init_real() and vector_init_int_end(), these are
+ * \sa \ref igraph_vector_init_real() and igraph_vector_init_int_end(), these are
  *    similar functions.
  *
  * Time complexity: at least O(n) for 
@@ -270,10 +270,10 @@ int vector_init_real_end(vector_t *v, real_t endmark, ...) {
  * complexity of the memory allocation.
  */
 
-int vector_init_int(vector_t *v, int no, ...) {
+int igraph_vector_init_int(igraph_vector_t *v, int no, ...) {
   int i=0;
   va_list ap;
-  IGRAPH_CHECK(vector_init(v, no));
+  IGRAPH_CHECK(igraph_vector_init(v, no));
 
   va_start(ap, no);
   for (i=0; i<no; i++) {
@@ -286,21 +286,21 @@ int vector_init_int(vector_t *v, int no, ...) {
 
 /**
  * \ingroup vector
- * \function vector_init_int_end
- * \brief Create a <type>vector_t</type> from the parameters.
+ * \function igraph_vector_init_int_end
+ * \brief Create a <type>igraph_vector_t</type> from the parameters.
  * 
- * This constructor is similar to \ref vector_init_int(), the only
+ * This constructor is similar to \ref igraph_vector_init_int(), the only
  * difference is that instead of giving the number of elements in the
  * vector, a special marker element follows the last real vector
  * element.
- * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
  * \param endmark This element will signal the end of the vector. It
  *    will \em not be part of the vector.
  * \param ... The elements of the vector.
  * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
  *    isn't enough memory.
  * 
- * \sa \ref vector_init_int() and \ref vector_init_real_end() for
+ * \sa \ref igraph_vector_init_int() and \ref igraph_vector_init_real_end() for
  * similar functions.
  *
  * Time complexity: at least O(n) for 
@@ -308,7 +308,7 @@ int vector_init_int(vector_t *v, int no, ...) {
  * complexity of the memory allocation.
  */
 
-int vector_init_int_end(vector_t *v, int endmark, ...) {
+int igraph_vector_init_int_end(igraph_vector_t *v, int endmark, ...) {
   int i=0, n=0;
   va_list ap;
 
@@ -322,7 +322,7 @@ int vector_init_int_end(vector_t *v, int endmark, ...) {
   }
   va_end(ap);
 
-  VECTOR_INIT_FINALLY(v, n);
+  IGRAPH_VECTOR_INIT_FINALLY(v, n);
   
   va_start(ap, endmark);
   for (i=0; i<n; i++) {
@@ -336,12 +336,12 @@ int vector_init_int_end(vector_t *v, int endmark, ...) {
 
 /**
  * \ingroup vector
- * \function vector_destroy
+ * \function igraph_vector_destroy
  * \brief Destroys a vector object.
  *
- * All vectors initialized by \ref vector_init() should be properly
+ * All vectors initialized by \ref igraph_vector_init() should be properly
  * destroyed by this function. A destroyed vector needs to be
- * reinitialized by \ref vector_init(), \ref vector_init_copy() or
+ * reinitialized by \ref igraph_vector_init(), \ref igraph_vector_init_copy() or
  * another constructor.
  * \param v Pointer to the (previously initialized) vector object to
  *        destroy. 
@@ -349,7 +349,7 @@ int vector_init_int_end(vector_t *v, int endmark, ...) {
  * Time complexity: operating system dependent.
  */
 
-void vector_destroy   (vector_t* v) {
+void igraph_vector_destroy   (igraph_vector_t* v) {
   assert(v != 0);
   if (v->stor_begin != 0) {
     Free(v->stor_begin);
@@ -359,7 +359,7 @@ void vector_destroy   (vector_t* v) {
 
 /**
  * \ingroup vector
- * \function vector_reserve
+ * \function igraph_vector_reserve
  * \brief Reserves memory for a vector.
  * 
  * <command>igraph</command> vectors are flexible, they can grow and
@@ -383,12 +383,12 @@ void vector_destroy   (vector_t* v) {
  * is the new allocated size of the vector.
  */
 
-int vector_reserve   (vector_t* v, long int size) {
-	long int actual_size=vector_size(v);
+int igraph_vector_reserve   (igraph_vector_t* v, long int size) {
+	long int actual_size=igraph_vector_size(v);
 	real_t *tmp;
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
-	if (size <= vector_size(v)) { return 0; }
+	if (size <= igraph_vector_size(v)) { return 0; }
 
 	tmp=Realloc(v->stor_begin, size, real_t);
 	if (tmp==0) {
@@ -403,7 +403,7 @@ int vector_reserve   (vector_t* v, long int size) {
 
 /**
  * \ingroup vector
- * \function vector_empty
+ * \function igraph_vector_empty
  * \brief Decides whether the size of the vector is zero.
  *
  * \param v The vector object.
@@ -413,7 +413,7 @@ int vector_reserve   (vector_t* v, long int size) {
  * Time complexity: O(1).
  */
 
-bool_t vector_empty     (const vector_t* v) {
+bool_t igraph_vector_empty     (const igraph_vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return v->stor_begin == v->end;
@@ -421,7 +421,7 @@ bool_t vector_empty     (const vector_t* v) {
 
 /**
  * \ingroup vector
- * \function vector_size
+ * \function igraph_vector_size
  * \brief Gives the size (=length) of the vector.
  * 
  * \param v The vector object
@@ -430,7 +430,7 @@ bool_t vector_empty     (const vector_t* v) {
  * Time complexity: O(1). 
  */
 
-long int vector_size      (const vector_t* v) {
+long int igraph_vector_size      (const igraph_vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return v->end - v->stor_begin;
@@ -438,18 +438,18 @@ long int vector_size      (const vector_t* v) {
 
 /**
  * \ingroup vector
- * \function vector_clear
+ * \function igraph_vector_clear
  * \brief Removes all elements from a vector.
  * 
  * This function simply sets the size of the vector to zero, it does
  * not free any allocated memory. For that you have to call
- * vector_destroy().
+ * igraph_vector_destroy().
  * \param v The vector object.
  * 
  * Time complexity: O(1).
  */
 
-void vector_clear     (vector_t* v) {
+void igraph_vector_clear     (igraph_vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	v->end = v->stor_begin;
@@ -457,7 +457,7 @@ void vector_clear     (vector_t* v) {
 
 /**
  * \ingroup vector
- * \function vector_push_back
+ * \function igraph_vector_push_back
  * \brief Appends one element to a vector.
  * 
  * This function resizes the vector to be one element longer and
@@ -472,22 +472,22 @@ void vector_clear     (vector_t* v) {
  * subsequent calls to this function has time complexity
  * O(n), even if there 
  * hadn't been any space reserved for the new elements by
- * \ref vector_reserve(). This is implemented by a trick similar to the C++
+ * \ref igraph_vector_reserve(). This is implemented by a trick similar to the C++
  * <type>vector</type> class: each time more memory is allocated for a
  * vector, the size of the additionally allocated memory is the same
  * as the vector's current length. (We assume here that the time
  * complexity of memory allocation is at most linear.)
  */
 
-int vector_push_back (vector_t* v, real_t e) {
+int igraph_vector_push_back (igraph_vector_t* v, real_t e) {
   	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	
 	/* full, allocate more storage */
 	if (v->stor_end == v->end) {
-		long int new_size = vector_size(v) * 2;
+		long int new_size = igraph_vector_size(v) * 2;
 		if (new_size == 0) { new_size = 1; }
-		IGRAPH_CHECK(vector_reserve(v, new_size));
+		IGRAPH_CHECK(igraph_vector_reserve(v, new_size));
 	}
 	
 	*(v->end) = e;
@@ -498,35 +498,35 @@ int vector_push_back (vector_t* v, real_t e) {
 
 /**
  * \ingroup vector
- * \section vector_accessing_elements Accessing elements of a
- * <type>vector_t</type>.
+ * \section igraph_vector_accessing_elements Accessing elements of a
+ * <type>igraph_vector_t</type>.
  * 
  * <para>The simplest way to access an element of a vector is to use the
  * \ref VECTOR macro. This macro can be used both for query and set
- * <type>vector_t</type> elements. If you need a function, \ref
- * vector_e() queries and \ref vector_set() sets an element of a
- * vector. \ref vector_e_ptr() returns the address of an element.</para>
+ * <type>igraph_vector_t</type> elements. If you need a function, \ref
+ * igraph_vector_e() queries and \ref igraph_vector_set() sets an element of a
+ * vector. \ref igraph_vector_e_ptr() returns the address of an element.</para>
  * 
- * <para>\ref vector_tail() returns the last element of a non-empty
- * vector. There is no <function>vector_tail()</function> function
+ * <para>\ref igraph_vector_tail() returns the last element of a non-empty
+ * vector. There is no <function>igraph_vector_tail()</function> function
  * however, as it is easy to write <literal>VECTOR(v)[0]</literal>
  * instead.</para>
  */
 
 /**
  * \ingroup vector
- * \function vector_e
+ * \function igraph_vector_e
  * \brief Access an element of a vector.
- * \param v The <type>vector_t</type> object.
+ * \param v The <type>igraph_vector_t</type> object.
  * \param pos The position of the element, the position of the first
  *    element is zero.
  * \return The desired element.
- * \sa \ref vector_e_ptr() and the \ref VECTOR macro.
+ * \sa \ref igraph_vector_e_ptr() and the \ref VECTOR macro.
  * 
  * Time complexity: O(1).
  */
 
-real_t vector_e         (const vector_t* v, long int pos) {
+real_t igraph_vector_e         (const igraph_vector_t* v, long int pos) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return * (v->stor_begin + pos);
@@ -534,18 +534,18 @@ real_t vector_e         (const vector_t* v, long int pos) {
 
 /**
  * \ingroup vector
- * \function vector_e_ptr
+ * \function igraph_vector_e_ptr
  * \brief Get the address of an element of a vector
- * \param v The <type>vector_t</type> object.
+ * \param v The <type>igraph_vector_t</type> object.
  * \param pos The position of the element, the position of the first
  *   element is zero.
  * \return Pointer to the desired element.
- * \sa \ref vector_e() and the \ref VECTOR macro.
+ * \sa \ref igraph_vector_e() and the \ref VECTOR macro.
  * 
  * Time complexity: O(1).
  */
 
-real_t*vector_e_ptr  (const vector_t* v, long int pos) {
+real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos) {
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   return v->stor_begin+pos;
@@ -553,15 +553,15 @@ real_t*vector_e_ptr  (const vector_t* v, long int pos) {
 
 /**
  * \ingroup vector
- * \function vector_set
+ * \function igraph_vector_set
  * \brief Assignment to an element of a vector.
- * \param v The <type>vector_t</type> element.
+ * \param v The <type>igraph_vector_t</type> element.
  * \param pos Position of the element to set.
  * \param value New value of the element.
- * \sa \ref vector_e().
+ * \sa \ref igraph_vector_e().
  */
 
-void vector_set       (vector_t* v, long int pos, real_t value) {
+void igraph_vector_set       (igraph_vector_t* v, long int pos, real_t value) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 	*(v->stor_begin + pos) = value;
@@ -569,10 +569,10 @@ void vector_set       (vector_t* v, long int pos, real_t value) {
 
 /**
  * \ingroup vector
- * \function vector_null
+ * \function igraph_vector_null
  * \brief Sets each element in the vector to zero.
  * 
- * Note that \ref vector_init() sets the elements to zero as well, so
+ * Note that \ref igraph_vector_init() sets the elements to zero as well, so
  * it maked no sense to call this function on a just initialized
  * vector. 
  * \param v The vector object.
@@ -581,17 +581,17 @@ void vector_set       (vector_t* v, long int pos, real_t value) {
  * the vector. 
  */
 
-void vector_null      (vector_t* v) {
+void igraph_vector_null      (igraph_vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
-	if (vector_size(v)>0) {
-		memset(v->stor_begin, 0, sizeof(real_t)*vector_size(v));
+	if (igraph_vector_size(v)>0) {
+		memset(v->stor_begin, 0, sizeof(real_t)*igraph_vector_size(v));
 	}
 }
 
 /**
  * \ingroup vector
- * \function vector_tail
+ * \function igraph_vector_tail
  * \brief Returns the last element in a vector.
  *
  * It is an error to call this function on an empty vector, the result
@@ -602,7 +602,7 @@ void vector_null      (vector_t* v) {
  * Time complexity: O(1).
  */
 
-real_t vector_tail(const vector_t *v) {
+real_t igraph_vector_tail(const igraph_vector_t *v) {
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   return *((v->end)-1);
@@ -610,7 +610,7 @@ real_t vector_tail(const vector_t *v) {
 
 /**
  * \ingroup vector
- * \function vector_pop_back
+ * \function igraph_vector_pop_back
  * \brief Removes and returns the last element of a vector.
  *
  * It is an error to call this function with an empty vector.
@@ -620,25 +620,25 @@ real_t vector_tail(const vector_t *v) {
  * Time complexity: O(1).
  */
 
-real_t vector_pop_back(vector_t* v) {
+real_t igraph_vector_pop_back(igraph_vector_t* v) {
   real_t tmp;
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   assert(v->end != v->stor_begin);
-  tmp=vector_e(v, vector_size(v)-1);
+  tmp=igraph_vector_e(v, igraph_vector_size(v)-1);
   v->end -= 1;
   return tmp;
 }
 
 /**
  * \ingroup vector
- * \function vector_order
+ * \function igraph_vector_order
  * \brief Calculate the order of the elements in a vector.
  *
  * The smallest element will have order zero, the second smallest
  * order one, etc. 
- * \param v The original <type>vector_t</type> object.
- * \param res An initialized <type>vector_t</type> object, it will be
+ * \param v The original <type>igraph_vector_t</type> object.
+ * \param res An initialized <type>igraph_vector_t</type> object, it will be
  *    resized to match the size of <parameter>v</parameter>. The
  *    result of the computation will be stored here.
  * \param nodes Hint, the largest element in <parameter>v</parameter>.
@@ -648,18 +648,18 @@ real_t vector_pop_back(vector_t* v) {
  * Time complexity: O()
  */
 
-int vector_order(const vector_t* v, vector_t* res, integer_t nodes) {
-  long int edges=vector_size(v);
-  vector_t ptr;
-  vector_t rad;
+int igraph_vector_order(const igraph_vector_t* v, igraph_vector_t* res, integer_t nodes) {
+  long int edges=igraph_vector_size(v);
+  igraph_vector_t ptr;
+  igraph_vector_t rad;
   long int i, j;
 
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
 
-  VECTOR_INIT_FINALLY(&ptr, nodes+1);
-  VECTOR_INIT_FINALLY(&rad, edges);
-  IGRAPH_CHECK(vector_resize(res, edges));
+  IGRAPH_VECTOR_INIT_FINALLY(&ptr, nodes+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
+  IGRAPH_CHECK(igraph_vector_resize(res, edges));
   
   for (i=0; i<edges; i++) {
     long int radix=v->stor_begin[i];
@@ -681,8 +681,8 @@ int vector_order(const vector_t* v, vector_t* res, integer_t nodes) {
     }
   }
   
-  vector_destroy(&ptr);
-  vector_destroy(&rad);
+  igraph_vector_destroy(&ptr);
+  igraph_vector_destroy(&rad);
   IGRAPH_FINALLY_CLEAN(2);
   
   return 0;
@@ -690,12 +690,12 @@ int vector_order(const vector_t* v, vector_t* res, integer_t nodes) {
 
 /**
  * \ingroup vector
- * \function vector_sort_cmp
+ * \function igraph_vector_sort_cmp
  * \brief Internal comparision function of vector elements, used by 
- * vector_sort().
+ * igraph_vector_sort().
  */
 
-int vector_sort_cmp(const void *a, const void *b) {
+int igraph_vector_sort_cmp(const void *a, const void *b) {
   const real_t *da = (const real_t *) a;
   const real_t *db = (const real_t *) b;
 
@@ -704,7 +704,7 @@ int vector_sort_cmp(const void *a, const void *b) {
 
 /**
  * \ingroup vector
- * \function vector_sort
+ * \function igraph_vector_sort
  * \brief Sorts the elements of the vector into ascending order.
  * 
  * This function uses the built-in sort function of the C library.
@@ -716,15 +716,15 @@ int vector_sort_cmp(const void *a, const void *b) {
  * elements.
  */
 
-void vector_sort(vector_t *v) {
+void igraph_vector_sort(igraph_vector_t *v) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  qsort(v->stor_begin, vector_size(v), sizeof(real_t), vector_sort_cmp);
+  qsort(v->stor_begin, igraph_vector_size(v), sizeof(real_t), igraph_vector_sort_cmp);
 }
 
 /**
  * \ingroup vector
- * \function vector_resize
+ * \function igraph_vector_resize
  * \brief Resize the vector.
  *
  * Note that this function does not free any memory, just sets the
@@ -738,7 +738,7 @@ void vector_sort(vector_t *v) {
  *         <constant>IGRAPH_ENOMEM</constant> if there is not enough
  *         memory. Note that this function \em never returns an error
  *         if the vector is made smaller.
- * \sa \ref vector_reserve() for allocating memory for future
+ * \sa \ref igraph_vector_reserve() for allocating memory for future
  * extensions of a vector.
  * 
  * Time complexity: O(1) if the new
@@ -748,17 +748,17 @@ void vector_sort(vector_t *v) {
  * n is the new size of the vector. 
  */
 
-int vector_resize(vector_t* v, long int newsize) {
+int igraph_vector_resize(igraph_vector_t* v, long int newsize) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  IGRAPH_CHECK(vector_reserve(v, newsize));
+  IGRAPH_CHECK(igraph_vector_reserve(v, newsize));
   v->end = v->stor_begin+newsize;
   return 0;
 }
 
 /**
  * \ingroup vector
- * \function vector_max
+ * \function igraph_vector_max
  * \brief Gives the maximum element of the vector.
  *
  * If the size of the vector is zero, an arbitrary number is
@@ -770,7 +770,7 @@ int vector_resize(vector_t* v, long int newsize) {
  * n is the size of the vector. 
  */
 
-real_t vector_max(const vector_t* v) {
+real_t igraph_vector_max(const igraph_vector_t* v) {
   real_t max;
   real_t *ptr;
   assert(v != NULL);
@@ -788,7 +788,7 @@ real_t vector_max(const vector_t* v) {
 
 /**
  * \ingroup vector
- * \function vector_which_max
+ * \function igraph_vector_which_max
  * \brief Gives the position of the maximum element of the vector.
  *
  * If the size of the vector is zero, -1 is 
@@ -800,9 +800,9 @@ real_t vector_max(const vector_t* v) {
  * n is the size of the vector. 
  */
 
-long int vector_which_max(const vector_t* v) {
+long int igraph_vector_which_max(const igraph_vector_t* v) {
   long int which=-1;
-  if (!vector_empty(v)) {
+  if (!igraph_vector_empty(v)) {
     real_t max;
     real_t *ptr;
     long int pos;
@@ -823,7 +823,7 @@ long int vector_which_max(const vector_t* v) {
 
 /**
  * \ingroup vector
- * \function vector_init_copy
+ * \function igraph_vector_init_copy
  * \brief Initializes a vector from an ordinary C array (constructor).
  * 
  * \param v Pointer to an uninitialized vector object.
@@ -836,7 +836,7 @@ long int vector_which_max(const vector_t* v) {
  * O(length).
  */
 
-int vector_init_copy(vector_t *v, real_t *data, long int length) {
+int igraph_vector_init_copy(igraph_vector_t *v, real_t *data, long int length) {
   v->stor_begin=Calloc(length, real_t);
   if (v->stor_begin==0) {
     IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);
@@ -850,7 +850,7 @@ int vector_init_copy(vector_t *v, real_t *data, long int length) {
 
 /**
  * \ingroup vector
- * \function vector_copy_to
+ * \function igraph_vector_copy_to
  * \brief Copies the contents of a vector to a C array.
  * 
  * The C array should have sufficient length.
@@ -861,7 +861,7 @@ int vector_init_copy(vector_t *v, real_t *data, long int length) {
  * n is the size of the vector.
  */
 
-void vector_copy_to(const vector_t *v, real_t* to) {
+void igraph_vector_copy_to(const igraph_vector_t *v, real_t* to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   if (v->end != v->stor_begin) {
@@ -871,7 +871,7 @@ void vector_copy_to(const vector_t *v, real_t* to) {
 
 /**
  * \ingroup vector
- * \function vector_copy
+ * \function igraph_vector_copy
  * \brief Initializes a vector from another vector object (constructor).
  * 
  * The contents of the existing vector object will be copied to
@@ -886,23 +886,23 @@ void vector_copy_to(const vector_t *v, real_t* to) {
  * n is the size of the vector. 
  */
 
-int vector_copy(vector_t *to, const vector_t *from) {
+int igraph_vector_copy(igraph_vector_t *to, const igraph_vector_t *from) {
   assert(from != NULL);
   assert(from->stor_begin != NULL);
-  to->stor_begin=Calloc(vector_size(from), real_t);
+  to->stor_begin=Calloc(igraph_vector_size(from), real_t);
   if (to->stor_begin==0) {
     IGRAPH_ERROR("canot copy vector", IGRAPH_ENOMEM);
   }
-  to->stor_end=to->stor_begin+vector_size(from);
+  to->stor_end=to->stor_begin+igraph_vector_size(from);
   to->end=to->stor_end;
-  memcpy(to->stor_begin, from->stor_begin, vector_size(from)*sizeof(real_t));
+  memcpy(to->stor_begin, from->stor_begin, igraph_vector_size(from)*sizeof(real_t));
   
   return 0;
 }
 
 /**
  * \ingroup vector
- * \function vector_sum
+ * \function igraph_vector_sum
  * \brief Calculates the sum of the elements in the vector.
  *
  * For the empty vector 0.0 is returned.
@@ -914,7 +914,7 @@ int vector_copy(vector_t *to, const vector_t *from) {
  * the vector. 
  */
 
-real_t vector_sum(const vector_t *v) {
+real_t igraph_vector_sum(const igraph_vector_t *v) {
   real_t res=0;
   real_t *p;
   assert(v != NULL);
@@ -927,7 +927,7 @@ real_t vector_sum(const vector_t *v) {
 
 /**
  * \ingroup vector
- * \function vector_prod
+ * \function igraph_vector_prod
  * \brief Calculates the product of the elements in the vector.
  * 
  * For the empty vector one (1) is returned.
@@ -938,7 +938,7 @@ real_t vector_sum(const vector_t *v) {
  * the vector. 
  */
 
-real_t vector_prod(const vector_t *v) {
+real_t igraph_vector_prod(const igraph_vector_t *v) {
   real_t res=1;
   real_t *p;
   assert(v != NULL);
@@ -951,7 +951,7 @@ real_t vector_prod(const vector_t *v) {
 
 /**
  * \ingroup vector
- * \function vector_init_seq
+ * \function igraph_vector_init_seq
  * \brief Initializes a vector with a sequence.
  * 
  * The vector will contain the numbers <parameter>from</parameter>,
@@ -966,9 +966,9 @@ real_t vector_prod(const vector_t *v) {
  * of elements in the vector. 
  */
 
-int vector_init_seq(vector_t *v, real_t from, real_t to) {
+int igraph_vector_init_seq(igraph_vector_t *v, real_t from, real_t to) {
   real_t *p;
-  IGRAPH_CHECK(vector_init(v, to-from+1));
+  IGRAPH_CHECK(igraph_vector_init(v, to-from+1));
 
   for (p=v->stor_begin; p<v->end; p++) {
     *p = from++;
@@ -979,7 +979,7 @@ int vector_init_seq(vector_t *v, real_t from, real_t to) {
 
 /**
  * \ingroup vector
- * \function vector_remove_section
+ * \function igraph_vector_remove_section
  * \brief Deletes a section from a vector.
  * 
  * Note that this function does not do range checking. The result is
@@ -993,7 +993,7 @@ int vector_init_seq(vector_t *v, real_t from, real_t to) {
  * vector. 
  */
 
-void vector_remove_section(vector_t *v, long int from, long int to) {
+void igraph_vector_remove_section(igraph_vector_t *v, long int from, long int to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   memmove(v->stor_begin+from, v->stor_begin+to,
@@ -1003,7 +1003,7 @@ void vector_remove_section(vector_t *v, long int from, long int to) {
 
 /**
  * \ingroup vector
- * \function vector_remove
+ * \function igraph_vector_remove
  * \brief Removes a single element from a vector.
  *
  * Note that this function does not do range checking.
@@ -1015,15 +1015,15 @@ void vector_remove_section(vector_t *v, long int from, long int to) {
  * vector. 
  */
 
-void vector_remove(vector_t *v, long int elem) {
+void igraph_vector_remove(igraph_vector_t *v, long int elem) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  vector_remove_section(v, elem, elem+1);
+  igraph_vector_remove_section(v, elem, elem+1);
 }
 
 /**
  * \ingroup vector
- * \function vector_move_interval
+ * \function igraph_vector_move_interval
  * \brief Copies a section of a vector.
  *
  * The result of this function is undefined if the source and target
@@ -1038,7 +1038,7 @@ void vector_remove(vector_t *v, long int elem) {
  * Time complexity: O(end-begin).
  */
 
-int vector_move_interval(vector_t *v, long int begin, long int end, 
+int igraph_vector_move_interval(igraph_vector_t *v, long int begin, long int end, 
 			 long int to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
@@ -1050,15 +1050,15 @@ int vector_move_interval(vector_t *v, long int begin, long int end,
 
 /**
  * \ingroup vector
- * \function vector_permdelete
+ * \function igraph_vector_permdelete
  * \brief Remove elements of a vector (for internal use).
  */
 
-void vector_permdelete(vector_t *v, long int *index, long int nremove) {
+void igraph_vector_permdelete(igraph_vector_t *v, long int *index, long int nremove) {
   long int i;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  for (i=0; i<vector_size(v); i++) {
+  for (i=0; i<igraph_vector_size(v); i++) {
     if (index[i] != 0) {
       VECTOR(*v)[ index[i]-1 ] = VECTOR(*v)[i];
     }
@@ -1068,15 +1068,15 @@ void vector_permdelete(vector_t *v, long int *index, long int nremove) {
 
 /**
  * \ingroup vector
- * \function vector_remove_negidx
+ * \function igraph_vector_remove_negidx
  * \brief Remove elements of a vector (for internal use).
  */
 
-void vector_remove_negidx(vector_t *v, const vector_t *neg, long int nremove) {
+void igraph_vector_remove_negidx(igraph_vector_t *v, const igraph_vector_t *neg, long int nremove) {
   long int i, idx=0;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  for (i=0; i<vector_size(v); i++) {
+  for (i=0; i<igraph_vector_size(v); i++) {
     VECTOR(*v)[idx++] = VECTOR(*v)[i];
   }
   v->end -= nremove;
@@ -1084,7 +1084,7 @@ void vector_remove_negidx(vector_t *v, const vector_t *neg, long int nremove) {
 
 /**
  * \ingroup vector
- * \function vector_isininterval
+ * \function igraph_vector_isininterval
  * \brief Checks if all elements of a vector are in the given
  * interval.
  * 
@@ -1098,7 +1098,7 @@ void vector_remove_negidx(vector_t *v, const vector_t *neg, long int nremove) {
  * of elements in the vector.
  */
 
-bool_t vector_isininterval(const vector_t *v, real_t low, real_t high) {
+bool_t igraph_vector_isininterval(const igraph_vector_t *v, real_t low, real_t high) {
   real_t *ptr;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
@@ -1112,10 +1112,10 @@ bool_t vector_isininterval(const vector_t *v, real_t low, real_t high) {
 
 /**
  * \ingroup vector
- * \function vector_any_smaller
+ * \function igraph_vector_any_smaller
  * \brief Checks if any element of a vector is smaller than a limit.
  * 
- * \param v The <type>vector_t</type> object.
+ * \param v The <type>igraph_vector_t</type> object.
  * \param limit The limit.
  * \return True (positive integer) if the vector contains at least one
  *   smaller element than <parameter>limit</parameter>, false (zero)
@@ -1125,7 +1125,7 @@ bool_t vector_isininterval(const vector_t *v, real_t low, real_t high) {
  * of elements in the vector.
  */
 
-bool_t vector_any_smaller(const vector_t *v, real_t limit) {
+bool_t igraph_vector_any_smaller(const igraph_vector_t *v, real_t limit) {
   real_t *ptr;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
@@ -1139,7 +1139,7 @@ bool_t vector_any_smaller(const vector_t *v, real_t limit) {
 
 /**
  * \ingroup vector
- * \function vector_is_equal
+ * \function igraph_vector_is_equal
  * \brief Decides whether two vectors contain exactly the same elements
  * (in the same order).
  * 
@@ -1152,15 +1152,15 @@ bool_t vector_any_smaller(const vector_t *v, real_t limit) {
  * of the vectors.
  */
 
-bool_t vector_is_equal(const vector_t *lhs, const vector_t *rhs) {
+bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t *rhs) {
   long int i, s;
   assert(lhs != 0);
   assert(rhs != 0);
   assert(lhs->stor_begin != 0);
   assert(rhs->stor_begin != 0);
   
-  s=vector_size(lhs);
-  if (s != vector_size(rhs)) {
+  s=igraph_vector_size(lhs);
+  if (s != igraph_vector_size(rhs)) {
     return 0;
   } else {
     for (i=0; i<s; i++) {
@@ -1174,14 +1174,14 @@ bool_t vector_is_equal(const vector_t *lhs, const vector_t *rhs) {
 
 /**
  * \ingroup vector
- * \function vector_binsearch
+ * \function igraph_vector_binsearch
  * \brief Finds an element by binary searching a sorted vector
  * 
  * Binary search to find an element in a vector. It is assumed that
  * the vector is sorted. If the specified element
  * (<parameter>what</parameter>) is not in the vector, then the
  * position of where it should be inserted is returned.
- * \param v The <type>vector_t</type> object.
+ * \param v The <type>igraph_vector_t</type> object.
  * \param what The element to search for.
  * \param pos Pointer to a <type>long int</type>. This is set to the
  *   position of an instance of <parameter>what</parameter> in the
@@ -1197,9 +1197,9 @@ bool_t vector_is_equal(const vector_t *lhs, const vector_t *rhs) {
  * <parameter>v</parameter>.
  */
 
-bool_t vector_binsearch(const vector_t *v, real_t what, long int *pos) {
+bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *pos) {
   long int left=0;
-  long int right=vector_size(v)-1;
+  long int right=igraph_vector_size(v)-1;
 
   while (left < right) {
     long int middle=(left+right)/2;

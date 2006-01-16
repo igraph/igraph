@@ -65,12 +65,12 @@
 int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream, 
 			       integer_t n, bool_t directed) {
 
-  vector_t edges=VECTOR_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   long int from, to;
   int c;
   
-  VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_CHECK(vector_reserve(&edges, 100));
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, 100));
 
   /* skip all whitespace */
   do {
@@ -88,8 +88,8 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     if (read != 1) { 
       IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 
     }
-    IGRAPH_CHECK(vector_push_back(&edges, from));
-    IGRAPH_CHECK(vector_push_back(&edges, to));
+    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
     
     /* skip all whitespace */
     do {
@@ -99,15 +99,15 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
   }
   
   IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
-  vector_destroy(&edges);
+  igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
 extern int igraph_ncol_yyparse();
 extern FILE *igraph_ncol_yyin;
-vector_t *igraph_ncol_vector=0;
-vector_t *igraph_ncol_weights=0;
+igraph_vector_t *igraph_ncol_vector=0;
+igraph_vector_t *igraph_ncol_weights=0;
 igraph_trie_t *igraph_ncol_trie=0;
 
 /**
@@ -156,12 +156,12 @@ igraph_trie_t *igraph_ncol_trie=0;
 int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, 
 			  bool_t names, bool_t weights) {
   
-  vector_t edges, ws;
+  igraph_vector_t edges, ws;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
 
   IGRAPH_TRIE_INIT_FINALLY(&trie, names);
-  VECTOR_INIT_FINALLY(&ws, 0);
-  VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
   igraph_ncol_vector=&edges;
   igraph_ncol_weights=&ws;
@@ -171,7 +171,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_ncol_yyparse();
 
   IGRAPH_CHECK(igraph_create(graph, &edges, 0, 0));
-  vector_destroy(&edges);
+  igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
   if (weights) {
@@ -186,7 +186,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 					     &VECTOR(ws)[i])); 
     }
   }
-  vector_destroy(&ws);
+  igraph_vector_destroy(&ws);
   IGRAPH_FINALLY_CLEAN(1);
   
   if (names) {
@@ -207,8 +207,8 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
 extern int igraph_lgl_yyparse();
 extern FILE *igraph_lgl_yyin;
-vector_t *igraph_lgl_vector=0;
-vector_t *igraph_lgl_weights=0;
+igraph_vector_t *igraph_lgl_vector=0;
+igraph_vector_t *igraph_lgl_weights=0;
 igraph_trie_t *igraph_lgl_trie=0;
 
 /**
@@ -264,12 +264,12 @@ igraph_trie_t *igraph_lgl_trie=0;
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 			  bool_t names, bool_t weights) {
 
-  vector_t edges=VECTOR_NULL, ws=VECTOR_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL, ws=IGRAPH_VECTOR_NULL;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
   
   IGRAPH_TRIE_INIT_FINALLY(&trie, names);
-  VECTOR_INIT_FINALLY(&ws, 0);
-  VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   
   igraph_lgl_vector=&edges;
   igraph_lgl_weights=&ws;
@@ -279,7 +279,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_lgl_yyparse();
   
   IGRAPH_CHECK(igraph_create(graph, &edges, igraph_trie_size(&trie), 0));
-  vector_destroy(&edges);
+  igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
   if (weights) {
@@ -294,7 +294,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 					     &VECTOR(ws)[i]));
     }
   }
-  vector_destroy(&ws);
+  igraph_vector_destroy(&ws);
   IGRAPH_FINALLY_CLEAN(1);
   
   if (names) {
