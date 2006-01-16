@@ -8,7 +8,7 @@
 <title>Installation</title>
 
 <para>
-First download the latest version of &igraph; and
+First download the latest version of <command>igraph</command> and
 uncompress it to a temporary directory:
 <programlisting>
 $ wget http://geza.kzoo.edu/~csardi/igraph_latest.tar.gz
@@ -18,7 +18,7 @@ $ cd igraph-latest
 </para>
 
 <para>
-Installing the &igraph; R package is very simple, the &igraph;
+Installing the <command>igraph</command> R package is very simple, the <command>igraph</command>
 directory in the tarball contains a complete R package. Eg. in Linux
 you can install it like
 <programlisting>
@@ -27,7 +27,7 @@ $ R CMD INSTALL -l ~/.R/library igraph
 </para>
 
 <para>
-Alternatively you can download the R package version of &igraph; only.
+Alternatively you can download the R package version of <command>igraph</command> only.
 </para>
 
 <para>
@@ -45,7 +45,7 @@ $ make install
 <programlisting>
 $ ./configure --help
 </programlisting>
-to see installations options, and reading the <code>INSTALL</code> 
+to see installations options, and reading the <filename>INSTALL</filename> 
 file. 
 </para>
 

@@ -38,7 +38,7 @@ typedef int    bool_t;
 /* -------------------------------------------------- */
 
 /**
- * \defgroup dqueue Double ended queue data type.
+ * Double ended queue data type.
  * \ingroup internal
  */
 
@@ -70,7 +70,8 @@ int igraph_dqueue_push    (igraph_dqueue_t* q, real_t elem);
 /* Flexible vector                                    */
 /* -------------------------------------------------- */
 
-/** \defgroup vector Vector, dealing with arrays efficiently.
+/** 
+ * Vector, dealing with arrays efficiently.
  * \ingroup types
  */
 
@@ -149,7 +150,8 @@ bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *
 /* Flexible vector, storing pointers                  */
 /* -------------------------------------------------- */
 
-/** \defgroup vectorptr Vector, storing pointers efficiently
+/** 
+ * Vector, storing pointers efficiently
  * \ingroup internal
  * 
  */
@@ -189,11 +191,11 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
 /* -------------------------------------------------- */
 
 /** 
- * \section about_igraph_matrix_t_objects About <type>igraph_matrix_t</type> objects
+ * \section about_igraph_matrix_t_objects About \type igraph_matrix_t objects
  * 
  * <para>This type is just an interface to vector.</para>
  *
- * <para>The <type>igraph_matrix_t</type> type ususally stores n
+ * <para>The \type igraph_matrix_t type ususally stores n
  * elements in O(n) space, but not always, see the documentation of
  * the vector type.</para>
  */
@@ -218,7 +220,7 @@ typedef struct s_matrix {
  * \param i The index of the row, starting with zero.
  * \param j The index of the column, starting with zero.
  *
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 int igraph_matrix_init(igraph_matrix_t *m, long int nrow, long int ncol);
@@ -241,7 +243,7 @@ int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from);
 /* -------------------------------------------------- */
 
 /**
- * \defgroup stack Stack data type.
+ * Stack data type.
  * \ingroup internal
  */
 
@@ -267,7 +269,7 @@ real_t igraph_stack_pop        (igraph_stack_t* s);
 /* -------------------------------------------------- */
 
 /**
- * \defgroup heap Heap data type.
+ * Heap data type.
  * \ingroup internal
  */
 
@@ -300,7 +302,7 @@ void igraph_heap_i_switch(real_t* arr, long int e1, long int e2);
 /* -------------------------------------------------- */
 
 /**
- * \defgroup indheap Indexed heap data type.
+ * Indexed heap data type.
  * \ingroup internal
  */
 
@@ -340,7 +342,7 @@ void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2);
 */
 
 /**
- * \defgroup doubleindheap Doubly indexed heap data type.
+ * Doubly indexed heap data type.
  * \ingroup internal
  */
 
@@ -373,7 +375,7 @@ void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head);
 void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2);
 
 /**
- * \defgroup strvector Vector of strings
+ * Vector of strings
  * \ingroup internal
  */
 
@@ -409,7 +411,7 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
 				    long int nremove);
   
 /**
- * \defgroup igraphtrie Trie data type
+ * Trie data type
  * \ingroup internal
  */
 

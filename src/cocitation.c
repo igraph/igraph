@@ -42,12 +42,12 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in <parameter>vids</parameter>, the number of
+ *        number of vertex ids in \p vids, the number of
  *        columns is the number of vertices in the graph.
  * \param vids The vertex ids of the vertices for which the
  *        calculation will be done.
  * \return Error code:
- *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex id.
  * 
  * Time complexity: O(|V|d^2), |V| is
  * the number of vertices in the graph,
@@ -77,12 +77,12 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  * \param graph The graph object to analyze.
  * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in <parameter>vids</parameter>, the number of
+ *        number of vertex ids in \p vids, the number of
  *        columns is the number of vertices in the graph.
  * \param vids The vertex ids of the vertices for which the
  *        calculation will be done.
  * \return Error code:
- *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex id.
  * 
  * Time complexity: O(|V|d^2),
  * |V| is the number of vertices in

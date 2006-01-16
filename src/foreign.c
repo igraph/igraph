@@ -30,9 +30,9 @@
  * <para>These functions can write a graph to a file, or read a graph
  * from a file.</para>
  * 
- * <para>Note that as &igraph; uses the traditional C streams it is
+ * <para>Note that as \a igraph uses the traditional C streams it is
  * possible to read/write files from/to memory, at least on GNU
- * operating systems supporting <quote>non-standard</quote> streams.</para>
+ * operating systems supporting \quote non-standard\endquote streams.</para>
  */
 
 /**
@@ -52,7 +52,7 @@
  * \param directed Logical, if true the graph is directed, if false it
  *        will be undirected.
  * \return Error code:
- *         <constant>IGRAPH_PARSEERROR</constant>: if there is a
+ *         \c IGRAPH_PARSEERROR: if there is a
  *         problem reading the file, or the file is syntactically
  *         incorrect. 
  * 
@@ -113,12 +113,12 @@ igraph_trie_t *igraph_ncol_trie=0;
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_ncol
- * \brief Reads a <literal>.ncol</literal> file used by LGL, also
- * useful for creating graphs from <quote>named</quote> (and
+ * \brief Reads a <code>.ncol</code> file used by LGL, also
+ * useful for creating graphs from \quote named\endquote (and
  * optionally weighted) edge lists. 
  * 
  * This format is used by the Large Graph Layout program
- * (<ulink url="http://bioinformatics.icmb.utexas.edu/lgl/">http://bioinformatics.icmb.utexas.edu/lgl/</ulink>), and it is simply a
+ * (http://bioinformatics.icmb.utexas.edu/lgl/), and it is simply a
  * symbolic weighted edge list. It is a simple text file with one edge
  * per line. An edge is defined by two symbolic vertex names separated
  * by whitespace. (The symbolic vertex names themselves cannot contain 
@@ -129,18 +129,18 @@ igraph_trie_t *igraph_ncol_trie=0;
  *
  * The resulting graph is always undirected.
  * LGL cannot deal with files which contain multiple or loop edges, 
- * this is however not checked here, as &igraph; is happy with
+ * this is however not checked here, as \a igraph is happy with
  * these.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
- *        called <quote>name</quote>.
+ *        called \quote name\endquote.
  * \param weights Logical value, if TRUE the weights of the
  *        edges is added to the graph as an edge attribute called
- *        <quote>weight</quote>.
+ *        \quote weight\endquote.
  * \return Error code:
- *         <constant>IGRAPH_PARSEERROR</constant>: if there is a
+ *         \c IGRAPH_PARSEERROR: if there is a
  *          problem reading 
  *         the file, or the file is syntactically incorrect.
  *
@@ -214,41 +214,39 @@ igraph_trie_t *igraph_lgl_trie=0;
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_lgl
- * \brief Reads a graph from an <literal>.lgl</literal> file
+ * \brief Reads a graph from an <code>.lgl</code> file
  * 
- * The <literal>.lgl</literal> format is used by the Large Graph
+ * The <code>.lgl</code> format is used by the Large Graph
  * Layout visualization software
- * (<ulink url="http://bioinformatics.icmb.utexas.edu/lgl/">http://bioinformatics.icmb.utexas.edu/lgl/</ulink>), it can 
+ * (http://bioinformatics.icmb.utexas.edu/lgl/), it can 
  * describe undirected optionally weighted graphs. From the LGL
  * manual: 
  * 
- * <blockquote><para>The second format is the LGL file format
- * (<literal>.lgl</literal> file 
+ * \blockquote <para>The second format is the LGL file format
+ * (<code>.lgl</code> file 
  * suffix). This is yet another graph file format that tries to be as
  * stingy as possible with space, yet keeping the edge file in a human
  * readable (not binary) format. The format itself is like the
  * following:
- * <programlisting>
- * # vertex1name
- * vertex2name [optionalWeight]
- * vertex3name [optionalWeight]
- * </programlisting>
+ * \verbatim # vertex1name
+vertex2name [optionalWeight]
+vertex3name [optionalWeight] \endverbatim
  * Here, the first vertex of an edge is preceded with a pound sign
  * '#'.  Then each vertex that shares an edge with that vertex is
- * listed one per line on subsequent lines.</para></blockquote>
+ * listed one per line on subsequent lines.</para> \endblockquote
  * 
  * LGL cannot handle loop and multiple edges or directed graphs, but
- * in &igraph; it is not an error to have multiple and loop edges.
+ * in \a igraph it is not an error to have multiple and loop edges.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
- *        called <quote>name</quote>.
+ *        called \quote name\endquote.
  * \param weights Logical value, if TRUE the weights of the
  *        edges is added to the graph as an edge attribute called
- *        <quote>weight</quote>.
+ *        \quote weight\endquote.
  * \return Error code:
- *         <constant>IGRAPH_PARSEERROR</constant>: if there is a
+ *         \c IGRAPH_PARSEERROR: if there is a
  *         problem reading the file, or the file is syntactically
  *         incorrect. 
  *
@@ -323,7 +321,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
  * \param graph The graph object to write.
  * \param outstream Pointer to a stream, it should be writable.
  * \return Error code:
- *         <constant>IGRAPH_EFILE</constant> if there is an error writing the
+ *         \c IGRAPH_EFILE if there is an error writing the
  *         file. 
  * 
  * Time complexity: O(|E|), the
@@ -357,14 +355,14 @@ int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
 /** 
  * \ingroup loadsave
  * \function igraph_write_graph_ncol
- * \brief Writes the graph to a file in <literal>.ncol</literal> format
+ * \brief Writes the graph to a file in <code>.ncol</code> format
  * 
- * <literal>.ncol</literal> is a format used by LGL, see \ref
+ * <code>.ncol</code> is a format used by LGL, see \ref
  * igraph_read_graph_ncol() for details. 
  * 
  * Note that having multiple or loop edges in an
- * <literal>.ncol</literal> file breaks the  LGL software but 
- * &igraph; does not check for this condition. 
+ * <code>.ncol</code> file breaks the  LGL software but 
+ * \a igraph does not check for this condition. 
  * \param graph The graph to write.
  * \param outstream The stream object to write to, it should be
  *        writable.
@@ -374,7 +372,7 @@ int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
  *        written to the file. If you don't want weights supply 0
  *        here.
  * \return Error code:
- *         <constant>IGRAPH_EFILE</constant> if there is an error writing the
+ *         \c IGRAPH_EFILE if there is an error writing the
  *         file. 
  * 
  * Time complexity: O(|E|), the
@@ -481,13 +479,13 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_lgl
- * \brief Writes the graph to a file in <literal>.lgl</literal> format
+ * \brief Writes the graph to a file in <code>.lgl</code> format
  *
- * <literal>.lgl</literal> is a format used by LGL, see \ref
+ * <code>.lgl</code> is a format used by LGL, see \ref
  * igraph_read_graph_lgl() for details.
  *
  * Note that having multiple or loop edges in an
- * <literal>.lgl</literal> file breaks the  LGL software but &igraph;
+ * <code>.lgl</code> file breaks the  LGL software but \a igraph
  * does not check for this condition. 
  * \param graph The graph to write. 
  * \param outstream The stream object to write to, it should be
@@ -500,7 +498,7 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
  * \param isolates Logical, if TRUE isolate vertices are also written
  *        to the file. If FALSE they will be omitted.
  * \return Error code:
- *         <constant>IGRAPH_EFILE</constant> if there is an error
+ *         \c IGRAPH_EFILE if there is an error
  *         writing the file. 
  *
  * Time complexity: O(|E|), the

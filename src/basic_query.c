@@ -31,10 +31,10 @@
  * \param graph The graph object.
  * \param v1 The first vertex.
  * \param v2 The second vertex.
- * \return Boolean, <constant>TRUE</constant> if there is an edge from
- *         <parameter>v1</parameter> to
- *         <parameter>v2</parameter>. Returns
- *         <constant>FALSE</constant> if there   
+ * \return Boolean, \c TRUE if there is an edge from
+ *         \p v1 to
+ *         \p v2. Returns
+ *         \c FALSE if there   
  *         is no such edge or at least one of the vertex ids is
  *         invalid (ie. too big or negative).
  * 
@@ -42,7 +42,7 @@
  *
  * Time complexity: O(d),
  * d is the
- * out-degree of <parameter>v1</parameter>.
+ * out-degree of \p v1.
  */
 bool_t igraph_are_connected(const igraph_t *graph, 
 			    integer_t v1, integer_t v2) {

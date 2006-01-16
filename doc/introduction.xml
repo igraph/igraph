@@ -11,12 +11,12 @@
 This is another library for creating and manipulating graphs. There
 is simply no other graph library out there which can be handle
 graphs of the size the author is confronted with
-efficiently. Whenever possible &igraph; tries to be also user
+efficiently. Whenever possible <command>igraph</command> tries to be also user
 friendly and portable.
 </para>
 
 <para>
-&igraph; started as an additional package to the GNU R
+<command>igraph</command> started as an additional package to the GNU R
 statistical environment, and still some functions which are hard to
 implement in C are available only in R (like interactive
 graphics). Most functions are however now written in C and they can
@@ -34,17 +34,17 @@ using here at KFKI.
 </para>
 
 <para>
-&igraph; also features a Python interface, and other interfaces
+<command>igraph</command> also features a Python interface, and other interfaces
 can be added without too much pain.
 </para>
 
 <section><title>Features</title>
 
 <itemizedlist>
-<listitem><para>&igraph; contains functions for generating regular and
+<listitem><para><command>igraph</command> contains functions for generating regular and
   random graphs according to known algorithms and models in the
   network theory literature. </para></listitem>
-<listitem><para>&igraph; provides routines for manipulating graphs,
+<listitem><para><command>igraph</command> provides routines for manipulating graphs,
   adding and removing edges and vertices. </para></listitem>
 <listitem><para>a set of structural property calculation functions like
   degree, betweenness, etc. are also included. </para></listitem>
@@ -53,16 +53,16 @@ can be added without too much pain.
   soon.</para></listitem> 
 <listitem><para>a set of conversion functions are also included and will be
   extended shortly.</para></listitem>
-<listitem><para>&igraph; iterators provide a simple and efficient way
+<listitem><para><command>igraph</command> iterators provide a simple and efficient way
   of walking through graphs.</para></listitem>
-<listitem><para>&igraph; is well documented both for users and
+<listitem><para><command>igraph</command> is well documented both for users and
   developers.</para></listitem> 
-<listitem><para>&igraph; is open source and distributed under GNU
+<listitem><para><command>igraph</command> is open source and distributed under GNU
   GPL.</para></listitem> 
 </itemizedlist>
 </section>
 
-<section><title>&igraph; is free software</title>
+<section><title><command>igraph</command> is free software</title>
 <para>
     IGraph library
 </para><para>

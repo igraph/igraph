@@ -32,9 +32,9 @@
  * \section errorhandlers Error handlers
  *
  * <para>
- * If &igraph; runs into an error - an invalid argument was supplied
+ * If \a igraph runs into an error - an invalid argument was supplied
  * to a function, or we've runned out of memory - the control is
- * transferred to the <emphasis>error handler</emphasis> function.
+ * transferred to the \emb error handler \eme function.
  * </para><para>
  * The default error handler is \ref igraph_error_handler_abort which
  * prints and error message and aborts the program.
@@ -51,14 +51,14 @@
  * later) and return with the error code. The latter also prints an
  * error message. If you use these error handlers you need to take
  * care about possible errors yourself by checking the return value of
- * every &igraph; function.
+ * every \a igraph function.
  * </para><para>
  * Independently of the error handler installed, all functions in the
  * library do their best to leave their arguments
- * <emphasis>semantically</emphasis> unchanged if an error
+ * \em semantically unchanged if an error
  * happens. By semantically we mean that the implementation of an
  * object supplied as an argument might change, but its
- * <quote>meaning</quote> in most cases does not. The rare occasions
+ * \quote meaning \endquote in most cases does not. The rare occasions
  * when this rule does is violated are documented in this manual.
  * </para>
  */
@@ -66,10 +66,10 @@
 /**
  * \section errorcodes Error codes
  * 
- * <para>Every &igraph; function which can fail return a
+ * <para>Every \a igraph function which can fail return a
  * single integer error code. Some functions are very simple and
  * cannot run into any error, these may return other types, or
- * <type>void</type> as well. The error codes are defined by the
+ * \type void as well. The error codes are defined by the
  * \ref igraph_i_error_type_t enumeration.
  * </para>
  */
@@ -81,7 +81,7 @@
  * You can write and install error handlers simply by defining a
  * function of type \ref igraph_error_handler_t and calling
  * \ref igraph_set_error_handler(). This feature is useful for interface
- * writers, as the &igraph; will have the chance to
+ * writers, as the \a igraph will have the chance to
  * signal errors the appropriate way, eg. the R interface defines an
  * error handler which calls the <function>error()</function>
  * function, as required by R, while the Python interface has an error
@@ -100,11 +100,11 @@
  * <para>
  * If an error happens, the functions in the library call the
  * \ref IGRAPH_ERROR macro with a textual description of the error and an
- * &igraph; error code. This macro calls (through the \ref
+ * \a igraph error code. This macro calls (through the \ref
  * igraph_error() function) the installed error handler. Other useful
  * macro is \ref IGRAPH_CHECK(), this check the return value of its
  * argument which is normally a function call, and calls \ref
- * IGRAPH_ERROR if it is not <constant>IGRAPH_SUCCESS</constant>. 
+ * IGRAPH_ERROR if it is not \c IGRAPH_SUCCESS. 
  * </para>
  */
 
@@ -127,7 +127,7 @@
  */
 
 /**
- * \section writing_functions_error_handling Writing &igraph; functions with
+ * \section writing_functions_error_handling Writing \a igraph functions with
  * proper error handling
  *
  * <para>
@@ -143,7 +143,7 @@
  * small. If you want to allocate several objects, write a destroy
  * function which can deallocate all of these. See the
  * <filename>adjlist.c</filename> file in the
- * &igraph; source for an example.
+ * \a igraph source for an example.
  * </para>
  * <para> 
  * For some functions these mechanisms are simply not flexible
@@ -156,11 +156,11 @@
  * \section error_handling_threads Error handling and threads
  *
  * <para>
- * It is likely that the &igraph; error handling
- * method is <emphasis>not</emphasis> thread-safe, mainly beacuse of
+ * It is likely that the \a igraph error handling
+ * method is \em not thread-safe, mainly beacuse of
  * the static global stack which is used to store the address of the
  * temporarily allocated objects. This issue might be addressed in a
- * later version of &igraph;.
+ * later version of \a igraph.
  * </para>
  */
 
@@ -172,7 +172,7 @@
  * \param file The source file in which the error is noticed.
  * \param line The number of the line in the source file which triggered
  *   the error
- * \param igraph_errno The &igraph; error code.
+ * \param igraph_errno The \a igraph error code.
  */
 
 typedef void igraph_error_handler_t (const char * reason, const char * file,
@@ -213,7 +213,7 @@ extern igraph_error_handler_t igraph_error_handler_printignore;
  * \ref igraph_error_handler_abort). 
  * \param new_handler The error handler function to install.
  * \return the old error handler function. This should be saved and
- *   restored if <parameter>new_handler</parameter> is not needed any
+ *   restored if \p new_handler is not needed any
  *   more.
  */
 
@@ -269,11 +269,11 @@ typedef enum {
  * \ref igraph_error() directly.
  * \param reason Textual description of the error. This should be
  *   something more explaning than the text associated with the error
- *   code. Eg. if the error code is <constant>IGRAPH_EINVAL</constant>,
+ *   code. Eg. if the error code is \c IGRAPH_EINVAL,
  *   its asssociated text (see  \ref igraph_strerror()) is "Invalid
  *   value" and this string should explain which parameter was invalid
  *   and maybe why. 
- * \param igraph_errno The &igraph; error code.
+ * \param igraph_errno The \a igraph error code.
  */
 
 #define IGRAPH_ERROR(reason, igraph_errno) \
@@ -293,6 +293,7 @@ typedef enum {
  * \param file The source file in which the error was noticed.
  * \param line The number of line in the source file which triggered the
  *   error.
+ * \param igraph_errno The \a igraph error code.
  * \return the error code (if it returns)
  */
 
@@ -303,9 +304,9 @@ int igraph_error(const char *reason, const char *file, int line,
  * \function igraph_strerror
  * 
  * This is a simple utility function, it gives a short general textual
- * description for an &igraph; error code.
+ * description for an \a igraph error code.
  * 
- * \param igraph_errno The &igraph; error code.
+ * \param igraph_errno The \a igraph error code.
  * \return pointer to the textual description of the error code.
  */
 
@@ -348,7 +349,7 @@ void IGRAPH_FINALLY_CLEAN(int num);
  *
  * Calls the destroy function for all objects in the stack of
  * temporarily allocated objects. This is usually called only from an
- * error handler. It is <emphasis>not</emphasis> appropriate to use it
+ * error handler. It is \em not appropriate to use it
  * instead of destroying each unneeded object of a function, as it
  * destroys the temporary objects of the caller function (and so on)
  * as well.
@@ -377,13 +378,9 @@ void IGRAPH_FINALLY_FREE();
  * \param a An expression, usually a function call.
  * 
  * Executes the expression and checks its value. If this is not
- * <constant>IGRAPH_SUCCESS</constant>, it calls \ref IGRAPH_ERROR with
+ * \c IGRAPH_SUCCESS, it calls \ref IGRAPH_ERROR with
  * the value as the error code. Here is an example usage:
- * <informalexample>
- * <programlisting>
- * IGRAPH_CHECK(vector_push_back(&amp;v, 100));
- * </programlisting>
- * </informalexample>
+ * \verbatim IGRAPH_CHECK(vector_push_back(&amp;v, 100)); \endverbatim
  */
 
 #define IGRAPH_CHECK(a) do { \

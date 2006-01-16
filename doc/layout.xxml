@@ -7,7 +7,7 @@
 <chapter id="igraph-Layout">
 <title>Generating Layouts for Graph Drawing</title>
 
-<section><title></title>
+<section><title>2D Layouts</title>
 <!-- doxrox-include about_layouts -->
 <!-- doxrox-include igraph_layout_random -->
 <!-- doxrox-include igraph_layout_circle -->

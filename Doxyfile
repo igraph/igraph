@@ -4,7 +4,7 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = igraph
-PROJECT_NUMBER         = 0.1
+PROJECT_NUMBER         = 0.3
 OUTPUT_DIRECTORY       = dox
 CREATE_SUBDIRS         = NO
 OUTPUT_LANGUAGE        = English
@@ -25,7 +25,19 @@ INHERIT_DOCS           = YES
 DISTRIBUTE_GROUP_DOC   = NO
 SEPARATE_MEMBER_PAGES  = NO
 TAB_SIZE               = 8
-ALIASES                = 
+ALIASES                = "function=\anchor"
+ALIASES               += "type=\c "
+ALIASES               += "define=\anchor"
+ALIASES               += "quote=<em>"
+ALIASES               += "endquote=</em>"
+ALIASES               += "emb=<em>"
+ALIASES               += "eme=</em>"
+ALIASES               += "clist=<ul>"
+ALIASES               += "cli=<li>\c "
+ALIASES               += "endclist=</ul>"
+ALIASES               += "enumval= - \c "
+ALIASES               += "blockquote=<i>"
+ALIASES               += "endblockquote=</i>"
 OPTIMIZE_OUTPUT_FOR_C  = YES
 OPTIMIZE_OUTPUT_JAVA   = NO
 SUBGROUPING            = YES
@@ -49,10 +61,10 @@ INLINE_INFO            = YES
 SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = NO
 SORT_BY_SCOPE_NAME     = NO
-GENERATE_TODOLIST      = YES
-GENERATE_TESTLIST      = YES
-GENERATE_BUGLIST       = YES
-GENERATE_DEPRECATEDLIST= YES
+GENERATE_TODOLIST      = NO
+GENERATE_TESTLIST      = NO
+GENERATE_BUGLIST       = NO
+GENERATE_DEPRECATEDLIST= NO
 ENABLED_SECTIONS       = 
 MAX_INITIALIZER_LINES  = 30
 SHOW_USED_FILES        = NO
@@ -103,7 +115,7 @@ VERBATIM_HEADERS       = YES
 #---------------------------------------------------------------------------
 # configuration options related to the alphabetical class index
 #---------------------------------------------------------------------------
-ALPHABETICAL_INDEX     = NO
+ALPHABETICAL_INDEX     = YES
 COLS_IN_ALPHA_INDEX    = 5
 IGNORE_PREFIX          = 
 #---------------------------------------------------------------------------
@@ -122,9 +134,9 @@ HHC_LOCATION           =
 GENERATE_CHI           = NO
 BINARY_TOC             = NO
 TOC_EXPAND             = YES
-DISABLE_INDEX          = YES
+DISABLE_INDEX          = NO
 ENUM_VALUES_PER_LINE   = 4
-GENERATE_TREEVIEW      = YES
+GENERATE_TREEVIEW      = NO
 TREEVIEW_WIDTH         = 270
 #---------------------------------------------------------------------------
 # configuration options related to the LaTeX output

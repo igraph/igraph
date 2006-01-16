@@ -2,12 +2,11 @@
 These are needed for the first release:
 ------------------------------------
 
-o prefix each exported name with igraph_
 o write R documentation
 o implement GNU libc only functions for non-GNU libc systems, like cygwin:
   - open_memstream, fmemopen
 o R interface: don't copy attributes unneccessarily
-o pdf, info, man documentation, docs targets in autoconf
+o creating html (& info docs) & copy them to the package
 o write realese script :)
 
 Others:
@@ -25,7 +24,7 @@ o function for merge networks
 o add data sets to the R package
 o add automatic tests
 o make docs look better: index, section tocs
-o make docs doxygen compatible
 o make better and faster doxrox engine
+o create man pages
 
 o Hamilton and Euler circles/paths

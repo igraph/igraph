@@ -1,4 +1,9 @@
-SUBDIRS=src interfaces debian tests doc
+
+if DOCS
+   MAYBE_DOCS = doc
+endif
+
+SUBDIRS=src interfaces debian tests $(MAYBE_DOCS)
 
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
@@ -21,7 +26,7 @@ deb: clean
 debcvs: clean
 	debian/prepare cvs
 	fakeroot debian/rules binary
-	
+
 test: all
 	for i in interfaces/*; do \
 		if [ -d $$i ]; then \

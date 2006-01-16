@@ -32,7 +32,7 @@
  * which visually pleases the human eye.</para>
  *
  * <para>They take a graph object and a number of parameters as arguments
- * and return a <type>igraph_matrix_t</type>, in which each row gives the
+ * and return a \type igraph_matrix_t, in which each row gives the
  * coordinates of a vertex.</para>
  */
 
@@ -124,7 +124,7 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
  *        vertex-vertex repulsion cancels out attraction of
  *        adjacent vertices.
  * \param use_seed Logical, if true the supplied values in the
- *        <parameter>res</parameter> argument are used as an initial layout, if
+ *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
  * \return Error code.
  * 

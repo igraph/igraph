@@ -31,7 +31,7 @@
  * \section about_iterators
  * 
  * <para>Vertex and edge sequences are probably the most central concepts of
- * &igraph;, They provide a method to step over a sequence of vertices
+ * \a igraph, They provide a method to step over a sequence of vertices
  * or edges. There are different types of vertex sequences (and this is
  * also true for edges sequences, like everything else in this section),
  * and they are all handled through a common abstract interface. </para>
@@ -42,12 +42,12 @@
  * We will discuss all vertex sequence constructors later.</para>
  * 
  * <para>Vertex sequences are usually used as iterators, but there is a
- * method unfold finite vertex sequences into a <type>igraph_vector_t</type>
+ * method unfold finite vertex sequences into a \type igraph_vector_t
  * object. (Infinite sequences cannot be unfolded of course.) 
  * This manual sometimes calles vertex (or edge) sequences as
  * iterators, these two names are used as synonims. </para>
  * 
- * <para>After creation the vertex sequence is set to <quote>point</quote>
+ * <para>After creation the vertex sequence is set to \quote point\endquote
  * to the first vertex (if there are any in the sequence), the actual
  * vertex id can be queried by \ref igraph_vs_get(). \ref
  * igraph_vs_next() moves on to the next vertex in the sequence. \ref
@@ -56,7 +56,7 @@
  * sequence is not needed any more, this deallocates the memory area
  * used by the iterator.</para>
  * 
- * <para>Every vertex sequence is related to an <type>igraph_t</type>
+ * <para>Every vertex sequence is related to an \type igraph_t
  * object, this is called the \em underlying graph. If the structure
  * of the underlying graph changes or it is destroyed by calling \ref
  * igraph_destroy() on it, the vertex sequence is said to be
@@ -72,7 +72,7 @@
 /**
  * \section about_iterator_shorthands
  * 
- * <para>There are a number of functions in the &igraph; library which take
+ * <para>There are a number of functions in the \a igraph library which take
  * vertex or edge sequences as parameters. For example the simple \ref
  * igraph_degree() function calculates the degree of the vertices
  * given as a vertex sequence parameter. Imagine that you want to
@@ -90,11 +90,9 @@
  * notation. Iterator shorthands can be used in the parameter list of
  * the function you want to call, they provide a compact
  * notation. Here is a little example for calculating the closeness
- * centraility for every vertex in graph <literal>g</literal> by
+ * centraility for every vertex in graph <code>g</code> by
  * calling \ref igraph_closeness():
- * <informalexample><programlisting>
- * ret = igraph_closeness(g, res, IGRAPH_VS_ALL(g), IGRAPH_ALL);
- * </programlisting></informalexample></para>
+ * \verbatim ret = igraph_closeness(g, res, IGRAPH_VS_ALL(g), IGRAPH_ALL); \endverbatim </para>
  * 
  * <para>Please use shorthands only in the parameter list of a function, 
  * otherwise your program might contain memory leaks. (This is because
@@ -177,12 +175,12 @@ void igraph_vs_reset(const igraph_t *graph, igraph_vs_t *vs) {
  * \function igraph_vs_get
  * 
  * This function returns the id of the current vertex an iterator. (Or
- * in other words the vertex the iterator <quote>points</quote> to.
+ * in other words the vertex the iterator \quote points\endquote to.
  * You should call \ref igraph_vs_end() on the iterator beforehand to
  * be sure that the iterator really points to a vertex.
  * \param graph The underlying graph object.
  * \param vs The vertex sequence object.
- * \return Id of the <quote>current</quote> vertex.
+ * \return Id of the \quote current\endquote vertex.
  * 
  * Time complexity: usually O(1) 
  * but see also the specific types.
@@ -200,10 +198,10 @@ integer_t igraph_vs_get(const igraph_t *graph, const igraph_vs_t *vs) {
  * iterators, like random walkers.
  * \param graph The underlying graph object.
  * \param vs The vertex sequence object.
- * \param v An initialized <type>igraph_vector_t</type> object. These will be
+ * \param v An initialized \type igraph_vector_t object. These will be
  *   resized to hold the vertices.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
- *   not enough memory to resize <parameter>v</parameter>.
+ * \return Error code, \c IGRAPH_ENOMEM if there is
+ *   not enough memory to resize \p v.
  * 
  * Time complexity: depends on the type of the iterator, but usually
  * it is at most O(n), the number of
@@ -350,11 +348,11 @@ igraph_i_vstable_t igraph_i_vs_adj_table = {
  * \param vs Pointer to an uninitialized vertex sequence object.
  * \param vid The vertex id of the vertex of which the neighboring
  *   vertices will be searched.
- * \param mode <constant>IGRAPH_OUT</constant> for vertices at the
- *   end of an edge originating from <parameter>vid</parameter>,
- *   <constant>IGRAPH_IN</constant> for vertices from which an edge
- *   points to <parameter>vid</parameter>. 
- *   <constant>IGRAPH_ALL</constant> for the union of the previous
+ * \param mode \c IGRAPH_OUT for vertices at the
+ *   end of an edge originating from \p vid,
+ *   \c IGRAPH_IN for vertices from which an edge
+ *   points to \p vid. 
+ *   \c IGRAPH_ALL for the union of the previous
  *   two. This parameter is ignored for undirected graphs.
  * \return Error code, the current implementation always returns with
  *   success.
@@ -436,7 +434,7 @@ int igraph_vs_unfold_adj(const igraph_t *graph, const igraph_vs_t *vs,
  * Reinitializes an iterator created by \ref igraph_vs_adj() for a
  * different vertex. This function is equivialent to destroying the
  * iterator and initializing it with a different
- * <parameter>vid</parameter> argument but it is more efficient.
+ * \p vid argument but it is more efficient.
  * 
  * The arguments are the same as for the \ref igraph_vs_adj()
  * function. 
@@ -498,9 +496,9 @@ igraph_i_vstable_t igraph_i_vs_rw_table = {
  * \param vs Pointer to an uninitialized vertex sequence object.
  * \param vid The id of the starting vertex.
  * \param mode Gives how to step along directed
- *   edges. <constant>IGRAPH_OUT</constant> moves along the direction
- *   of the edges, <constant>IGRAPH_IN</constant> the opposite
- *   way. <constant>IGRAPH_ALL</constant> ignored the direction of the
+ *   edges. \c IGRAPH_OUT moves along the direction
+ *   of the edges, \c IGRAPH_IN the opposite
+ *   way. \c IGRAPH_ALL ignored the direction of the
  *   edges. This argument is ignored for undirected graphs.
  * \return Error code, the current implementation always returns with
  *   success. 
@@ -632,9 +630,9 @@ igraph_i_vstable_t igraph_i_vs_rw1_table = {
  * \param vs Pointer to an uninitialized vertex sequence object.
  * \param vid The id of the starting vertex.
  * \param mode Gives how to step along directed
- *   edges. <constant>IGRAPH_OUT</constant> moves along the direction
- *   of the edges, <constant>IGRAPH_IN</constant> the opposite
- *   way. <constant>IGRAPH_ALL</constant> ignored the direction of the
+ *   edges. \c IGRAPH_OUT moves along the direction
+ *   of the edges, \c IGRAPH_IN the opposite
+ *   way. \c IGRAPH_ALL ignored the direction of the
  *   edges. This argument is ignored for undirected graphs.
  * \return Error code, the current implementation always returns with
  *   success. 
@@ -1029,10 +1027,10 @@ typedef struct igraph_i_vs_vectorview_pdata_t {
 /**
  * \function igraph_vs_vectorview
  * 
- * This iterator type allows to handle a <type>igraph_vector_t</type> object
+ * This iterator type allows to handle a \type igraph_vector_t object
  * as a vertex sequence. Note that this function does \em not make a
  * copy of the original vector, so be sure that you don't destroy the
- * underlying <type>igraph_vector_t</type> object before destroying the
+ * underlying \type igraph_vector_t object before destroying the
  * vertex set. 
  *
  * The \ref igraph_vs_vector_getvector() specific function can be
@@ -1040,8 +1038,8 @@ typedef struct igraph_i_vs_vectorview_pdata_t {
  * 
  * \param igraph The underlying graph object.
  * \param vs The vertex sequence object.
- * \param vids The underlying <type>igraph_vector_t</type> object.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ * \param vids The underlying \type igraph_vector_t object.
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *   not enough memory.
  * 
  * \sa \ref igraph_vs_vector() is a similar iterator but uses a
@@ -1078,7 +1076,7 @@ int igraph_vs_vectorview(const igraph_t *igraph, igraph_vs_t *vs,
  * \function igraph_vs_vector
  * 
  * This function creates a vertex sequence object from a
- * <type>igraph_vector_t</type> containing vertex ids. Unlike \ref
+ * \type igraph_vector_t containing vertex ids. Unlike \ref
  * igraph_vs_vectorview() this function makes a copy of the original
  * vector, which can be safely destroyed.
  * 
@@ -1088,7 +1086,7 @@ int igraph_vs_vectorview(const igraph_t *igraph, igraph_vs_t *vs,
  * \param igraph The underlying graph.
  * \param vs The vertex sequence object.
  * \param vids The original vector.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if we don't
+ * \return Error code, \c IGRAPH_ENOMEM if we don't
  * have enough memory.
  *
  * Time complexity: O(n),
@@ -1140,11 +1138,11 @@ int igraph_vs_vector(const igraph_t *igraph, igraph_vs_t *vs,
  * Note that the new iterator is a \em view of the original iterator,
  * don't destroy the original iterator before destroying the newly
  * created view.
- * \param igraph The underlying graph object.
+ * \param graph The underlying graph object.
  * \param vs The original iterator. 
  * \param newvs Pointer to an uninitialized vertex sequence, this 
- *   will be initialized as a view of <parameter>vs</parameter>.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ *   will be initialized as a view of \p vs.
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *   not enough memory.
  * 
  * Time complexity: this is the function of the type of the original
@@ -1200,7 +1198,7 @@ int igraph_vs_vectorview_it(const igraph_t *graph, const igraph_vs_t *vs,
  * \param vs The vertex sequence object.
  * \param ... The ids of the vertices are given by additional
  *   parameters closed by a -1 parameter.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *   not enough memory to create the vertex sequence.
  * 
  * \sa \ref igraph_vs_vectorview() and \ref igraph_vs_vector().
@@ -1255,9 +1253,9 @@ int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
 /**
  * \function IGRAPH_VS_VECTOR
  * 
- * Vertex sequence shorthand for a <type>igraph_vector_t</type> object. 
+ * Vertex sequence shorthand for a \type igraph_vector_t object. 
  * \param graph The underlying graph object.
- * \param vids An initialized <type>igraph_vector_t</type> object containing
+ * \param vids An initialized \type igraph_vector_t object containing
  * vertex ids.
  * \return Vertex sequence shorthand.
  * 
@@ -1401,14 +1399,14 @@ void igraph_vs_destroy_vectorview(igraph_vs_t *pvs) {
  * igraph_vs_vector(), \ref igraph_vs_vectorview(), \ref
  * igraph_vs_vectorview_it() or \ref igraph_vs_vector_small()).
  * It gives access to the vertex ids in the sequence as a
- * <type>igraph_vector_t</type> type.
+ * \type igraph_vector_t type.
  * 
  * The result is undefined if you call it with a different iterator
  * type. 
  * 
  * \param graph The underlying graph object.
  * \param vs The vertex sequence. 
- * \return Pointer to a <type>igraph_vector_t</type> object. This object should
+ * \return Pointer to a \type igraph_vector_t object. This object should
  *   be considered as constant, don't change its elements or size.
  * 
  * Time complexity: O(1).
@@ -1527,12 +1525,12 @@ integer_t igraph_es_to(const igraph_t *graph, const igraph_es_t *es) {
  * \function igraph_es_get
  * 
  * This function returns the id of the current edge an iterator. (Or
- * in other words the edge the iterator <quote>points</quote> to.
+ * in other words the edge the iterator \quote points\endquote to.
  * You should call \ref igraph_es_end() on the iterator beforehand to
  * be sure that the iterator really points to an edge.
  * \param graph The underlying graph object.
- * \param vs The vertex sequence object.
- * \return Id of the <quote>current</quote> edge.
+ * \param es The vertex sequence object.
+ * \return Id of the \quote current\endquote edge.
  * 
  * Time complexity: usually O(1) 
  * but see also the specific types.
@@ -1548,11 +1546,11 @@ integer_t igraph_es_get(const igraph_t *graph, const igraph_es_t *es) {
  * Steps over an edge sequence and stores the visited edges in a
  * vector. 
  * \param graph The underlying graph object.
- * \param vs The edge sequence object.
- * \param v An initialized <type>igraph_vector_t</type> object. These will be
+ * \param es The edge sequence object.
+ * \param v An initialized \type igraph_vector_t object. These will be
  *   resized to hold the edges.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
- *   not enough memory to resize <parameter>v</parameter>.
+ * \return Error code, \c IGRAPH_ENOMEM if there is
+ *   not enough memory to resize \p v.
  * 
  * Time complexity: depends on the type of the iterator, but usually
  * it is at most O(n), the number of
@@ -1569,7 +1567,7 @@ int igraph_es_unfold(const igraph_t *graph, const igraph_es_t *es,
  *
  * Destroys an edge sequence, ie. frees all memory allocated for it. 
  * The iterator has to be reinitialized before using it again.
- * \param vs The edge sequence object to destroy.
+ * \param es The edge sequence object to destroy.
  * 
  * Time complexity: usually O(1) 
  * but see also the specific types.
@@ -1605,7 +1603,7 @@ igraph_i_estable_t igraph_i_es_all_table = {
  * Edge sequence containing all edges in arbitrary 
  * order. This iterator doesn't have any special functions.
  * \param graph The underlying graph object.
- * \param vs Pointer to an uninitialized edge set object.
+ * \param es Pointer to an uninitialized edge set object.
  * \return Error code, the current implementation always returns with
  *   success. 
  * 
@@ -1717,7 +1715,7 @@ igraph_i_estable_t igraph_i_es_fromorder_table = {
  * order, etc. For undirected graph the edges are visited in arbitrary
  * order. 
  * \param graph The underlying graph object.
- * \param vs Pointer to an uninitialized edge set object.
+ * \param es Pointer to an uninitialized edge set object.
  * \return Error code, the current implementation always returns with
  *   success. 
  * 
@@ -1809,9 +1807,9 @@ igraph_i_estable_t igraph_i_es_adj_table = {
  * \param es The edge sequence object. 
  * \param vid The vertex of which the adjacent edges will be visited. 
  * \param mode Constant, specifies the type of adjacenct edges to
- *   visit. <constant>IGRAPH_OUT</constant> visits only outgoing,
- *   <constant>IGRAPH_IN</constant> only incoming edges,
- *   <constant>IGRAPH_ALL</constant> visits all adjacent edges.
+ *   visit. \c IGRAPH_OUT visits only outgoing,
+ *   \c IGRAPH_IN only incoming edges,
+ *   \c IGRAPH_ALL visits all adjacent edges.
  * \return Error code, the current implementation always returns with
  *   success. 
  * 
@@ -1945,8 +1943,8 @@ void igraph_es_destroy_adj(igraph_es_t *pvs) {
  * 
  * Reinitialize an iterator created by \ref igraph_es_adj() for a
  * different vertex. This is the same as destroying the iterator and
- * initializing it with a different <parameter>vid</parameter> and/or
- * <parameter>mode</parameter> argument.
+ * initializing it with a different \p vid and/or
+ * \p mode argument.
  * 
  * The arguments are the same as for the \ref igraph_es_adj()
  * function. 
@@ -1977,8 +1975,8 @@ void igraph_es_adj_set(const igraph_t *graph, igraph_es_t *es,
  * Special function for \ref igraph_es_adj() iterators. Provides the
  * id of the vertex at the \em other end of the edge. Ie. if the
  * iterator visits the adjacent edges of vertex
- * <parameter>vid</parameter> then this function always returns the id
- * of the other vertex, not <parameter>vid</parameter>.
+ * \p vid then this function always returns the id
+ * of the other vertex, not \p vid.
  * 
  * Time complexity: O(1).
  */
@@ -2202,7 +2200,7 @@ igraph_i_estable_t igraph_i_es_seq_table = {
  * 
  * Creates a regular sequence of edges. 
  * \param igraph The underlying graph object. 
- * \param vs Pointer to an uninitialized edge sequence object.
+ * \param es Pointer to an uninitialized edge sequence object.
  * \param from The lower limit of the inverval (inclusive).
  * \param to The upper limit of the interval (inclusive).
  * \return Error code, the current implementation always returns with
@@ -2291,10 +2289,10 @@ typedef igraph_i_vs_vectorview_pdata_t igraph_i_es_vectorview_pdata_t;
 /**
  * \function igraph_es_vectorview
  * 
- * This iterator type allows to handle a <type>igraph_vector_t</type> object
+ * This iterator type allows to handle a \type igraph_vector_t object
  * as an edge sequence. Note that this function does \em not make a
  * copy of the original vector, so be sure that you don't destroy the
- * underlying <type>igraph_vector_t</type> object before destroying the
+ * underlying \type igraph_vector_t object before destroying the
  * edge set. 
  *
  * The \ref igraph_es_vector_getvector() specific function can be
@@ -2302,8 +2300,8 @@ typedef igraph_i_vs_vectorview_pdata_t igraph_i_es_vectorview_pdata_t;
  * 
  * \param igraph The underlying graph object.
  * \param es The edge sequence object.
- * \param vids The underlying <type>igraph_vector_t</type> object.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ * \param eids The underlying \type igraph_vector_t object.
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *   not enough memory.
  * 
  * \sa \ref igraph_es_vector() is a similar iterator but uses a
@@ -2340,7 +2338,7 @@ int igraph_es_vectorview(const igraph_t *igraph, igraph_es_t *es,
  * \function igraph_es_vector
  * 
  * This function creates a edge sequence object from a
- * <type>igraph_vector_t</type> containing edge ids. Unlike \ref
+ * \type igraph_vector_t containing edge ids. Unlike \ref
  * igraph_es_vectorview() this function makes a copy of the original
  * vector, which can be safely destroyed.
  * 
@@ -2349,8 +2347,8 @@ int igraph_es_vectorview(const igraph_t *igraph, igraph_es_t *es,
  * 
  * \param igraph The underlying graph.
  * \param es The edge sequence object.
- * \param vids The original vector.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if we don't
+ * \param eids The original vector.
+ * \return Error code, \c IGRAPH_ENOMEM if we don't
  * have enough memory.
  *
  * Time complexity: O(n),
@@ -2402,11 +2400,11 @@ int igraph_es_vector(const igraph_t *igraph, igraph_es_t *es,
  * Note that the new iterator is a \em view of the original iterator,
  * don't destroy the original iterator before destroying the newly
  * created view.
- * \param igraph The underlying graph object.
+ * \param graph The underlying graph object.
  * \param es The original iterator. 
  * \param newes Pointer to an uninitialized edge sequence, this 
- *   will be initialized as a view of <parameter>es</parameter>.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ *   will be initialized as a view of \p es.
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *   not enough memory.
  * 
  * Time complexity: this is the function of the type of the original
@@ -2462,7 +2460,7 @@ int igraph_es_vectorview_it(const igraph_t *graph, const igraph_es_t *es,
  * \param es The edge sequence object.
  * \param ... The ids of the edges are given by additional
  *   parameters closed by a -1 parameter.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *   not enough memory to create the edge sequence.
  * 
  * \sa \ref igraph_es_vectorview() and \ref igraph_es_vector().
@@ -2517,9 +2515,9 @@ int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
 /** 
  * \function IGRAPH_ES_VECTOR
  * 
- * Edge sequence shorthand for a <type>igraph_vector_t</type> object. 
+ * Edge sequence shorthand for a \type igraph_vector_t object. 
  * \param graph The underlying graph object.
- * \param eids The <type>igraph_vector_t</type> object containing the edge
+ * \param eids The \type igraph_vector_t object containing the edge
  * ids. 
  * \return Edge sequence shorthand.
  *
@@ -2680,14 +2678,14 @@ void igraph_es_destroy_vectorview(igraph_es_t *pes) {
  * igraph_es_vector(), \ref igraph_es_vectorview(), \ref
  * igraph_es_vectorview_it() or \ref igraph_es_vector_small()).
  * It gives access to the edge ids in the sequence as a
- * <type>igraph_vector_t</type> type.
+ * \type igraph_vector_t type.
  * 
  * The result is undefined if you call it with a different iterator
  * type. 
  * 
  * \param graph The underlying graph object.
  * \param es The edge sequence. 
- * \return Pointer to a <type>igraph_vector_t</type> object. This object should
+ * \return Pointer to a \type igraph_vector_t object. This object should
  *   be considered as constant, don't change its elements or size.
  * 
  * Time complexity: O(1).
@@ -2714,19 +2712,19 @@ const igraph_vector_t *igraph_es_vector_getvector(const igraph_t *graph,
  * \param es The uninitialized edge sequence objects.
  * \param from The first vertex sequence.
  * \param to The second vertex sequence. 
- * \param directed Logical, if true and <parameter>graph</parameter>
- *   is directed only edges \em from <parameter>from</parameter> \em to
- *   <parameter>to</parameter> will be included. If false or
- *   <parameter>graph</parameter> is undirected all edges between
- *   <parameter>from</parameter> and <parameter>to</parameter> will be
+ * \param directed Logical, if true and \p graph
+ *   is directed only edges \em from \p from \em to
+ *   \p to will be included. If false or
+ *   \p graph is undirected all edges between
+ *   \p from and \p to will be
  *   included. 
  *
  * Time complexity: O(dn),
  * n is the number of vertices in
- * <parameter>from</parameter> and d
+ * \p from and d
  * is the average (out- or total- depending on
- * <parameter>directed</parameter>) degree of the vertices in
- * <parameter>from</parameter>.
+ * \p directed) degree of the vertices in
+ * \p from.
  */
 
 int igraph_es_fromto(const igraph_t *graph, igraph_es_t *es, 

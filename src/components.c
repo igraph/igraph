@@ -45,11 +45,11 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
  *        The vector has to be preinitialized and will be resized.
  * \param mode For directed graph this specifies whether to calculate
  *        weakly or strongly connected components. Possible values: 
- *        <constant>IGRAPH_WEAK</constant>,
- *        <constant>IGRAPH_STRONG</constant>. This argument is 
+ *        \c IGRAPH_WEAK,
+ *        \c IGRAPH_STRONG. This argument is 
  *        igrored for undirected graphs.
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: invalid mode argument.
+ *         \c IGRAPH_EINVAL: invalid mode argument.
  * 
  * Time complexity: O(|V|+|E|),
  * |V| and 
@@ -237,11 +237,11 @@ int igraph_is_connected_weak(const igraph_t *graph, bool_t *res);
  *        here. 
  * \param mode For directed graph this specifies whether to calculate
  *        weak or strong connectedness. Possible values: 
- *        <constant>IGRAPH_WEAK</constant>,
- *        <constant>IGRAPH_STRONG</constant>. This argument is 
+ *        \c IGRAPH_WEAK,
+ *        \c IGRAPH_STRONG. This argument is 
  *        igrored for undirected graphs.
  * \return Error code:
- *        <constant>IGRAPH_EINVAL</constant>: invalid mode argument.
+ *        \c IGRAPH_EINVAL: invalid mode argument.
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices 

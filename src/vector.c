@@ -32,25 +32,25 @@
 
 /**
  * \ingroup vector
- * \section about_igraph_vector_t_objects About <type>igraph_vector_t</type> objects
+ * \section about_igraph_vector_t_objects About \type igraph_vector_t objects
  * 
- * <para>The <type>igraph_vector_t</type> data type is a simple and efficient
+ * <para>The \type igraph_vector_t data type is a simple and efficient
  * interface to arrays containing real numbers. It is something
- * similar as (but much simpler than) the <type>vector</type> template
+ * similar as (but much simpler than) the \type vector template
  * in the C++ standard library.</para>
  *
- * <para>Vectors are used extensively in <command>igraph</command>, all
+ * <para>Vectors are used extensively in \a igraph, all
  * functions which expects or returns a list of numbers use
  * igraph_vector_t to achive this.</para>
  *
- * <para>The <type>igraph_vector_t</type> type ususally uses
+ * <para>The \type igraph_vector_t type ususally uses
  * O(n) space
  * to store n elements. Sometimes it
  * uses more, this is because vectors can shrink, but even if they
  * shrink, the current implementation does not free a single bit of
  * memory.</para>
  * 
- * <para>The position of the elements in a <type>igraph_vector_t</type>
+ * <para>The position of the elements in a \type igraph_vector_t
  * object is numbered from zero, as this is the usual C
  * standard.</para> 
  */
@@ -60,9 +60,9 @@
  * \section igraph_vector_constructors_and_destructors Constructors and
  * Destructors
  * 
- * <para><type>igraph_vector_t</type> objects have to be initialized before using
+ * <para>\type igraph_vector_t objects have to be initialized before using
  * them, this is analogous to calling a constructor on them. There are a
- * number of <type>igraph_vector_t</type> constructors, for your
+ * number of \type igraph_vector_t constructors, for your
  * convenience. \ref igraph_vector_init() is the basic constructor, it
  * creates a vector of the given length, filled with zeros.
  * \ref igraph_vector_init_real(), \ref igraph_vector_init_real_end(), \ref
@@ -75,13 +75,13 @@
  * sequence with increment one.</para>
  * 
  * <para>\ref igraph_vector_view() is a special constructor, it allows you to
- * handle a regular C array as a <type>vector</type> without copying
+ * handle a regular C array as a \type vector without copying
  * its elements.
  * </para> 
  *
- * <para>If a <type>igraph_vector_t</type> object is not needed any more, it
+ * <para>If a \type igraph_vector_t object is not needed any more, it
  * should be destroyed to free its allocated memory by calling the
- * <type>igraph_vector_t</type> destructor, \ref igraph_vector_destroy().</para>
+ * \type igraph_vector_t destructor, \ref igraph_vector_destroy().</para>
  * 
  * <para> Note that vectors created by \ref igraph_vector_view() are special,
  * you mustn't call \ref igraph_vector_destroy() on these.</para>
@@ -103,10 +103,10 @@
  * \param v Pointer to a not yet initialized vector object.
  * \param size The size of the vector.
  * \return error code:
- *       <constant>IGRAPH_ENOMEM</constant> if there is not enough memory.
+ *       \c IGRAPH_ENOMEM if there is not enough memory.
  * 
  * Time complexity: operating system dependent, the amount of 
- * <quote>time</quote> required to allocate
+ * \quote time \endquote required to allocate
  * O(n) elements,
  * n is the number of elements. 
  */
@@ -127,17 +127,17 @@ int igraph_vector_init      (igraph_vector_t* v, int long size) {
 /**
  * \ingroup vector
  * \function igraph_vector_view
- * \brief Handle a regular C array as a <type>igraph_vector_t</type>.
+ * \brief Handle a regular C array as a \type igraph_vector_t.
  * 
- * This is a special <type>igraph_vector_t</type> constructor. It allows to
- * handle a regular C array as a <type>igraph_vector_t</type> temporarily.
+ * This is a special \type igraph_vector_t constructor. It allows to
+ * handle a regular C array as a \type igraph_vector_t temporarily.
  * Be sure that you \em don't ever call the destructor (\ref
  * igraph_vector_destroy()) on objects created by this constructor.
- * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
+ * \param v Pointer to an uninitialized \type igraph_vector_t object.
  * \param data Pointer, the C array.
  * \param length The length of the C array.
  * \return Pointer to the vector object, the same as the 
- *     <parameter>v</parameter> parameter, for convenience.
+ *     \p v parameter, for convenience.
  * 
  * Time complexity: O(1)
  */ 
@@ -154,26 +154,22 @@ const igraph_vector_t *igraph_vector_view (const igraph_vector_t *v, const real_
 /**
  * \ingroup vector
  * \function igraph_vector_init_real
- * \brief Create a <type>igraph_vector_t</type> from the parameters.
+ * \brief Create a \type igraph_vector_t from the parameters.
  * 
  * Because of how C and the C library handles variable length argument
  * lists, it is required that you supply real constants to this
  * function. This means that
- * <informalexample><programlisting>
- * igraph_vector_t v;
- * igraph_vector_init_real(&amp;v, 5, 1,2,3,4,5);
- * </programlisting></informalexample>
+ * \verbatim igraph_vector_t v;
+ * igraph_vector_init_real(&amp;v, 5, 1,2,3,4,5); \endverbatim
  * is an error at running time and the results are undefined. This is
  * the proper way:
- * <informalexample><programlisting>
- * igraph_vector_t v;
- * igraph_vector_init_real(&amp;v, 5, 1.0,2.0,3.0,4.0,5.0);
- * </programlisting></informalexample>
- * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
- * \param no Positive integer, the number of <type>real_t</type>
+ * \verbatim igraph_vector_t v;
+ * igraph_vector_init_real(&amp;v, 5, 1.0,2.0,3.0,4.0,5.0); \endverbatim
+ * \param v Pointer to an uninitialized \type igraph_vector_t object.
+ * \param no Positive integer, the number of \type real_t
  *    parameters to follow.
  * \param ... The elements of the vector.
- * \return Error code, this can be <constant>IGRAPH_ENOMEM</constant>
+ * \return Error code, this can be \c IGRAPH_ENOMEM
  *     if there isn't enough memory to allocate the vector.
  *
  * \sa \ref igraph_vector_init_real_end(), \ref igraph_vector_init_int() for similar
@@ -201,17 +197,17 @@ int igraph_vector_init_real(igraph_vector_t *v, int no, ...) {
 /**
  * \ingroup vector
  * \function igraph_vector_init_real_end
- * \brief Create a <type>igraph_vector_t</type> from the parameters.
+ * \brief Create a \type igraph_vector_t from the parameters.
  * 
  * This constructor is similar to \ref igraph_vector_init_real(), the only
  * difference is that instead of giving the number of elements in the
  * vector, a special marker element follows the last real vector
  * element.
- * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
+ * \param v Pointer to an uninitialized \type igraph_vector_t object.
  * \param endmark This element will signal the end of the vector. It
  *    will \em not be part of the vector.
  * \param ... The elements of the vector.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ * \return Error code, \c IGRAPH_ENOMEM if there
  *    isn't enough memory.
  * 
  * \sa \ref igraph_vector_init_real() and \ref igraph_vector_init_int_end() for
@@ -251,16 +247,16 @@ int igraph_vector_init_real_end(igraph_vector_t *v, real_t endmark, ...) {
 /**
  * \ingroup vector
  * \function igraph_vector_init_int
- * \brief Create a <type>igraph_vector_t</type> containing the parameters.
+ * \brief Create a \type igraph_vector_t containing the parameters.
  * 
  * This function is similar to \ref igraph_vector_init_real(), but it expects 
- * <type>int</type> parameters. It is important that all parameters
+ * \type int parameters. It is important that all parameters
  * should be of this type, otherwise the result of the function call
  * is undefined.
- * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
- * \param no The number of <type>int</type> parameters to follow.
+ * \param v Pointer to an uninitialized \type igraph_vector_t object.
+ * \param no The number of \type int parameters to follow.
  * \param ... The elements of the vector.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *    not enough memory.
  * \sa \ref igraph_vector_init_real() and igraph_vector_init_int_end(), these are
  *    similar functions.
@@ -287,17 +283,17 @@ int igraph_vector_init_int(igraph_vector_t *v, int no, ...) {
 /**
  * \ingroup vector
  * \function igraph_vector_init_int_end
- * \brief Create a <type>igraph_vector_t</type> from the parameters.
+ * \brief Create a \type igraph_vector_t from the parameters.
  * 
  * This constructor is similar to \ref igraph_vector_init_int(), the only
  * difference is that instead of giving the number of elements in the
  * vector, a special marker element follows the last real vector
  * element.
- * \param v Pointer to an uninitialized <type>igraph_vector_t</type> object.
+ * \param v Pointer to an uninitialized \type igraph_vector_t object.
  * \param endmark This element will signal the end of the vector. It
  *    will \em not be part of the vector.
  * \param ... The elements of the vector.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ * \return Error code, \c IGRAPH_ENOMEM if there
  *    isn't enough memory.
  * 
  * \sa \ref igraph_vector_init_int() and \ref igraph_vector_init_real_end() for
@@ -362,21 +358,21 @@ void igraph_vector_destroy   (igraph_vector_t* v) {
  * \function igraph_vector_reserve
  * \brief Reserves memory for a vector.
  * 
- * <command>igraph</command> vectors are flexible, they can grow and
+ * \a igraph vectors are flexible, they can grow and
  * shrink. Growing 
  * however occasionally needs the data in the vector to be copyed.
  * In order to avoid you can call this function to reserve space for
  * future growth of the vector. 
  * 
- * Note that this function does <emphasis>not</emphasis> change the size of the
+ * Note that this function does \em not change the size of the
  * vector, let us see a small example to clarify things: if you
  * reserve space for 100 elements and the size of your
  * vector was (and still is) 60, then you can surely add additional 40
  * elements to your vector before it will be copied.
  * \param v The vector object.
- * \param size The new <emphasis>allocated</emphasis> size of the vector.
+ * \param size The new \em allocated size of the vector.
  * \return Error code:
- *         <constant>IGRPAH_ENOMEM</constant> if there is not enough memory.
+ *         \c IGRPAH_ENOMEM if there is not enough memory.
  *
  * Time complexity: operating system dependent, should be around
  * O(n), n 
@@ -461,11 +457,11 @@ void igraph_vector_clear     (igraph_vector_t* v) {
  * \brief Appends one element to a vector.
  * 
  * This function resizes the vector to be one element longer and
- * sets the very last element in the vector to <parameter>e</parameter>.
+ * sets the very last element in the vector to \p e.
  * \param v The vector object.
  * \param e The element to append to the vector.
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>: not enough memory.
+ *         \c IGRAPH_ENOMEM: not enough memory.
  * 
  * Time complexity: operating system dependent. What is important that
  * a sequence of n
@@ -473,7 +469,7 @@ void igraph_vector_clear     (igraph_vector_t* v) {
  * O(n), even if there 
  * hadn't been any space reserved for the new elements by
  * \ref igraph_vector_reserve(). This is implemented by a trick similar to the C++
- * <type>vector</type> class: each time more memory is allocated for a
+ * \type vector class: each time more memory is allocated for a
  * vector, the size of the additionally allocated memory is the same
  * as the vector's current length. (We assume here that the time
  * complexity of memory allocation is at most linear.)
@@ -499,17 +495,17 @@ int igraph_vector_push_back (igraph_vector_t* v, real_t e) {
 /**
  * \ingroup vector
  * \section igraph_vector_accessing_elements Accessing elements of a
- * <type>igraph_vector_t</type>.
+ * \type igraph_vector_t.
  * 
  * <para>The simplest way to access an element of a vector is to use the
  * \ref VECTOR macro. This macro can be used both for query and set
- * <type>igraph_vector_t</type> elements. If you need a function, \ref
+ * \type igraph_vector_t elements. If you need a function, \ref
  * igraph_vector_e() queries and \ref igraph_vector_set() sets an element of a
  * vector. \ref igraph_vector_e_ptr() returns the address of an element.</para>
  * 
  * <para>\ref igraph_vector_tail() returns the last element of a non-empty
  * vector. There is no <function>igraph_vector_tail()</function> function
- * however, as it is easy to write <literal>VECTOR(v)[0]</literal>
+ * however, as it is easy to write <code>VECTOR(v)[0]</code>
  * instead.</para>
  */
 
@@ -517,7 +513,7 @@ int igraph_vector_push_back (igraph_vector_t* v, real_t e) {
  * \ingroup vector
  * \function igraph_vector_e
  * \brief Access an element of a vector.
- * \param v The <type>igraph_vector_t</type> object.
+ * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the position of the first
  *    element is zero.
  * \return The desired element.
@@ -536,7 +532,7 @@ real_t igraph_vector_e         (const igraph_vector_t* v, long int pos) {
  * \ingroup vector
  * \function igraph_vector_e_ptr
  * \brief Get the address of an element of a vector
- * \param v The <type>igraph_vector_t</type> object.
+ * \param v The \type igraph_vector_t object.
  * \param pos The position of the element, the position of the first
  *   element is zero.
  * \return Pointer to the desired element.
@@ -555,7 +551,7 @@ real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos) {
  * \ingroup vector
  * \function igraph_vector_set
  * \brief Assignment to an element of a vector.
- * \param v The <type>igraph_vector_t</type> element.
+ * \param v The \type igraph_vector_t element.
  * \param pos Position of the element to set.
  * \param value New value of the element.
  * \sa \ref igraph_vector_e().
@@ -637,13 +633,13 @@ real_t igraph_vector_pop_back(igraph_vector_t* v) {
  *
  * The smallest element will have order zero, the second smallest
  * order one, etc. 
- * \param v The original <type>igraph_vector_t</type> object.
- * \param res An initialized <type>igraph_vector_t</type> object, it will be
- *    resized to match the size of <parameter>v</parameter>. The
+ * \param v The original \type igraph_vector_t object.
+ * \param res An initialized \type igraph_vector_t object, it will be
+ *    resized to match the size of \p v. The
  *    result of the computation will be stored here.
- * \param nodes Hint, the largest element in <parameter>v</parameter>.
+ * \param nodes Hint, the largest element in \p v.
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>: out of memory
+ *         \c IGRAPH_ENOMEM: out of memory
  * 
  * Time complexity: O()
  */
@@ -735,7 +731,7 @@ void igraph_vector_sort(igraph_vector_t *v) {
  * \param v The vector object
  * \param newsize The new size of the vector.
  * \return Error code, 
- *         <constant>IGRAPH_ENOMEM</constant> if there is not enough
+ *         \c IGRAPH_ENOMEM if there is not enough
  *         memory. Note that this function \em never returns an error
  *         if the vector is made smaller.
  * \sa \ref igraph_vector_reserve() for allocating memory for future
@@ -830,7 +826,7 @@ long int igraph_vector_which_max(const igraph_vector_t* v) {
  * \param data A regular C array.
  * \param length The length of the C array.
  * \return Error code: 
- *         <constant>IGRAPH_ENOMEM</constant> if there is not enough memory.
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
  * 
  * Time complexity: operating system specific, usually
  * O(length).
@@ -879,7 +875,7 @@ void igraph_vector_copy_to(const igraph_vector_t *v, real_t* to) {
  * \param to Pointer to a not yet initialized vector object.
  * \param from The original vector object to copy.
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant> if there is not enough memory.
+ *         \c IGRAPH_ENOMEM if there is not enough memory.
  * 
  * Time complexity: operating system dependent, usually
  * O(n),
@@ -954,13 +950,13 @@ real_t igraph_vector_prod(const igraph_vector_t *v) {
  * \function igraph_vector_init_seq
  * \brief Initializes a vector with a sequence.
  * 
- * The vector will contain the numbers <parameter>from</parameter>,
- * <parameter>from</parameter>+1, ..., <parameter>to</parameter>.
+ * The vector will contain the numbers \p from,
+ * \p from+1, ..., \p to.
  * \param v Pointer to an uninitialized vector object.
  * \param from The lower limit in the sequence (inclusive).
  * \param to The upper limit in the sequence (inclusive).
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>: out of memory.
+ *         \c IGRAPH_ENOMEM: out of memory.
  *
  * Time complexity: O(n), the number
  * of elements in the vector. 
@@ -1115,10 +1111,10 @@ bool_t igraph_vector_isininterval(const igraph_vector_t *v, real_t low, real_t h
  * \function igraph_vector_any_smaller
  * \brief Checks if any element of a vector is smaller than a limit.
  * 
- * \param v The <type>igraph_vector_t</type> object.
+ * \param v The \type igraph_vector_t object.
  * \param limit The limit.
  * \return True (positive integer) if the vector contains at least one
- *   smaller element than <parameter>limit</parameter>, false (zero)
+ *   smaller element than \p limit, false (zero)
  *   otherwise. 
  * 
  * Time complexity: O(n), the number
@@ -1179,22 +1175,22 @@ bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t 
  * 
  * Binary search to find an element in a vector. It is assumed that
  * the vector is sorted. If the specified element
- * (<parameter>what</parameter>) is not in the vector, then the
+ * (\p what) is not in the vector, then the
  * position of where it should be inserted is returned.
- * \param v The <type>igraph_vector_t</type> object.
+ * \param v The \type igraph_vector_t object.
  * \param what The element to search for.
- * \param pos Pointer to a <type>long int</type>. This is set to the
- *   position of an instance of <parameter>what</parameter> in the
- *   vector if it is present. If <parameter>v</parameter> does not
- *   contain <parameter>what</parameter> then
- *   <parameter>pos</parameter> is set to the position to which it
+ * \param pos Pointer to a \type long int. This is set to the
+ *   position of an instance of \p what in the
+ *   vector if it is present. If \p v does not
+ *   contain \p what then
+ *   \p pos is set to the position to which it
  *   should be inserted (to keep the the vector sorted of course).
- * \return Positive integer (true) if <parameter>what</parameter> is
+ * \return Positive integer (true) if \p what is
  *   found in the vector, zero (false) otherwise.
  * 
  * Time complexity: O(log(n)),
  * n is the number of elements in
- * <parameter>v</parameter>.
+ * \p v.
  */
 
 bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *pos) {

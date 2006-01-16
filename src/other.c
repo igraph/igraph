@@ -29,7 +29,7 @@
  * \brief Calculates the running mean of a vector
  * 
  * The running mean is defined by the mean of the
- * previous <parameter>binwidth</parameter> values.
+ * previous \p binwidth values.
  * \param data The vector containing the data.
  * \param res The vector containing the result. This should be
  *        initialized before calling this function and will be

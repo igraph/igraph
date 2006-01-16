@@ -43,16 +43,16 @@
  * \param edges The edges to add, the first two elements are the first
  *        edge, etc.
  * \param n The number of vertices in the graph, if smaller or equal
- *        to the highest vertex id in the <code>edges</code> vector it
+ *        to the highest vertex id in the \p edges vector it
  *        will be increased automatically. So it is safe to give 0
  *        here.
  * \param directed Boolean, whether to create a directed graph or
  *        not. If yes, then the first edge points from the first
- *        vertex id in <code>edges</code> to the second, etc.
+ *        vertex id in \p edges to the second, etc.
  * \return Error code:
- *         <constant>IGRAPH_EINVEVECTOR</constant>: invalid edges
+ *         \c IGRAPH_EINVEVECTOR: invalid edges
  *         vector (odd number of vertices).
- *         <constant>IGRAPH_EINVVID</constant>: invalid (negative)
+ *         \c IGRAPH_EINVVID: invalid (negative)
  *         vertex id. 
  *
  * Time complexity: O(|V|+|E|),
@@ -184,19 +184,19 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
  * 
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The adjacency matrix. How it is interpreted
- *        depends on the <code>mode</code> argument.
+ *        depends on the \p mode argument.
  * \param mode Constant to specify how the given matrix is interpreted
  *        as an adjacency matrix. Possible values
  *        (A(i,j) 
  *        is the element in row i and column
  *        j in the adjacency matrix
- *        (<code>adjmatrix</code>): 
+ *        (\p adjmatrix): 
  *        \clist
  *        \cli IGRAPH_ADJ_DIRECTED
  *          the graph will be directed and
  *          an element gives the number of edges between two vertex.
  *        \cli IGRAPH_ADJ_UNDIRECTED
- *          this is the same as <constant>IGRAPH_ADJ_MAX</constant>,
+ *          this is the same as \c IGRAPH_ADJ_MAX,
  *          for convenience. 
  *        \cli IGRAPH_ADJ_MAX
  *          undirected graph will be created
@@ -226,7 +226,7 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
  *          used for creating the edges.
  *       \endclist
  * \return Error code,
- *         <constant>IGRAPH_NONSQUARE</constant>: non-square matrix.
+ *         \c IGRAPH_NONSQUARE: non-square matrix.
  * 
  * Time complexity: O(|V||V|+|E|),
  * |V| and 
@@ -455,7 +455,7 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
  * \param circular Boolean, defines whether the generated lattice is
  *        periodic.
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: invalid (negative)
+ *         \c IGRAPH_EINVAL: invalid (negative)
  *         dimension vector. 
  *
  * Time complexity: O(|V|+|E|) (as
@@ -566,7 +566,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, integer_t 
  * \param circular Logical, if false, the ring will be open (this is
  *        not a real \em ring actually).
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
  * 
  * Time complexity: O(|V|), the
  * number of vertices in the graph.
@@ -616,8 +616,8 @@ int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
  *          undirected tree.
  *        \endclist
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
- *         <constant>IGRAPH_INVMODE</constant>: invalid mode argument.
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
+ *         \c IGRAPH_INVMODE: invalid mode argument.
  * 
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges in the graph.
@@ -684,7 +684,7 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
  * \param directed Logical, whether to create a directed graph.
  * \param loops Logical, whether to include self-edges (loops).
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
  * 
  * Time complexity: O(|V|+|E|),
  * |V| is the number of vertices,

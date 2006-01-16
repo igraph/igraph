@@ -4,12 +4,25 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
 	      foreign.xml nongraph.xml
 
-all: doctemplate docfix
+DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
+	 tutorial.xml
+
+all: doctemplate
+
+html: html/stamp
+
+info: igraph-docs.info
+
+dvi: igraph-docs.dvi
+
+pdf: igraph-docs.pdf
+
+ps: igraph-docs.ps
 
 doctemplate: $(DOCINCLUDES)
 
-docfix: fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
-	tutorial.xml
+igraph-docs.xml: $(DOCINCLUDES)
+	touch igraph-docs.xml
 
 vector.xml: vector.xxml ../src/types.h ../src/vector.c
 	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/types.h ../src/vector.c
@@ -50,4 +63,29 @@ nongraph.xml: nongraph.xxml ../src/other.c ../src/random.c
 	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/other.c ../src/random.c
 
 
-CLEANFILES=html/*.html $(DOCINCLUDES)
+html/stamp: igraph-docs.xml $(DOCFIX)
+	xmlto -x gtk-doc.xsl -o html xhtml igraph-docs.xml \
+	&& touch html/stamp
+
+igraph-docs.info: igraph-docs.xml $(DOCFIX)
+	db2x_xsltproc --xinclude -s texi igraph-docs.xml -o igraph-docs.txml \
+	&& db2x_texixml igraph-docs.txml \
+	&& makeinfo igraph-docs.texi
+
+igraph-docs.dvi: igraph-docs.xml $(DOCFIX)
+	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
+	&& docbook2dvi igraph-docs2.xml \
+	&& mv igraph-docs2.dvi igraph-docs.dvi
+
+igraph-docs.ps: igraph-docs.xml $(DOCFIX)
+	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
+	&& docbook2ps igraph-docs2.xml \
+	&& mv igraph-docs2.ps igraph-docs.ps
+
+igraph-docs.pdf: igraph-docs.xml $(DOCFIX)
+	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
+	&& docbook2pdf igraph-docs2.xml \
+	&& mv igraph-docs2.pdf igraph-docs.pdf
+
+CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
+	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml 

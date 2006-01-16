@@ -31,7 +31,7 @@ WITH --------------------------------------------------------------------------
 </para>
 </section>
 
-REPLACE ----- <paramdef> for functions ----------------------------------------
+REPLACE ----- <paramdef> for functions (not used currently) -------------------
 
 <paramdef>(?P<params>[^<]*)</paramdef>\n
 
@@ -124,7 +124,7 @@ REPLACE ----- variables -------------------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section><title><anchor id="\g<name>" role="struct"/>\g<name></title>
+<section id="\g<name>"><title>\g<name></title>
 <indexterm><primary>\g<name></primary></indexterm>
 <para>
 <programlisting>
@@ -147,7 +147,7 @@ REPLACE ----- \define ---------------------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section><title><anchor id="\g<name>" role="define"/>\g<name></title>
+<section id="\g<name>"><title>\g<name></title>
 <indexterm><primary>\g<name></primary></indexterm>
 <para>
 <programlisting>
@@ -209,7 +209,7 @@ REPLACE ----- an enumeration typedef ------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section><title><anchor id="\g<name>" role="typedef"/>\g<name></title>
+<section id="\g<name>"><title>\g<name></title>
 <indexterm><primary>\g<name></primary></indexterm>
 <para>
 <programlisting>
@@ -274,7 +274,7 @@ REPLACE ----- \typedef function -----------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section><title><anchor id="\g<name>" role="typedef"/>\g<name></title>
+<section id="\g<name>"><title>\g<name></title>
 <indexterm><primary>\g<name></primary></indexterm>
 <para><programlisting>
 \g<src>
@@ -346,6 +346,22 @@ WITH
 
 <emphasis>\g<text></emphasis>
 
+REPLACE ----- \emb command ----------------------------------------------------
+
+\\emb\b
+
+WITH
+
+<emphasis>
+
+REPLACE ----- \eme command ----------------------------------------------------
+
+\\eme\b
+
+WITH
+
+</emphasis>
+
 REPLACE ----- \verbatim -------------------------------------------------------
 
 \\verbatim\b
@@ -390,4 +406,85 @@ REPLACE ----- \endclist -------------------------------------------------------
 WITH
 
 </variablelist>
+
+REPLACE ----- doxygen \c command is for <constant> ----------------------------
+
+\\c\s+(?P<word>\w+)\b
+
+WITH
+
+<constant>\g<word></constant>
+
+REPLACE ----- doxygen \p command is for <parameter> ---------------------------
+
+\\p\s+(?P<word>\w+)\b
+
+WITH
+
+<parameter>\g<word></parameter>
+
+REPLACE ----- doxygen \type command is for <type> -----------------------------
+
+\\type\s+(?P<word>\w+)\b
+
+WITH
+
+<type>\g<word></type>
+
+REPLACE ----- doxygen \a command is for <command> -----------------------------
+
+\\a\s+(?P<word>\w+)\b
+
+WITH
+
+<command>\g<word></command>
+
+REPLACE ----- doxygen \quote command is for <quote> ---------------------------
+
+\\quote\s+
+
+WITH
+
+<quote>
+
+REPLACE ----- doxygen \endquote command is for </quote> -----------------------
+
+\s*\\endquote\b
+
+WITH
+
+</quote>
+
+REPLACE ----- replace <code> with <literal> -----------------------------------
+
+<(?P<c>/?)code>
+
+WITH --------------------------------------------------------------------------
+
+<\g<c>literal> 
+
+REPLACE ----- add http:// links -----------------------------------------------
+
+(?P<link>http:\/\/.*?)
+(?=(\s)|\))
+
+WITH --------------------------------------------------------------------------
+
+<ulink url="\g<link>">\g<link></ulink>
+
+REPLACE ----- blockquote ------------------------------------------------------
+
+\\blockquote
+
+WITH --------------------------------------------------------------------------
+
+<blockquote>
+
+REPLACE ----- blockquote ------------------------------------------------------
+
+\\endblockquote
+
+WITH --------------------------------------------------------------------------
+
+</blockquote>
 

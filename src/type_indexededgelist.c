@@ -32,7 +32,7 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
 /**
  * \section about_basic_interface
  *
- * <para>This is the very minimal API in &igraph;. All the other
+ * <para>This is the very minimal API in \a igraph. All the other
  * functions use this minimal set for creating and manipulating the
  * graphs.</para>
  * 
@@ -53,7 +53,7 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  *          integer number is expected.
  * \param directed Whether the graph is directed or not.
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
  * 
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
@@ -177,7 +177,7 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  * 
  * The edges are given in a vector, the
  * first two elements define the first edge (the order is
- * <literal>from</literal>, <literal>to</literal> for directed
+ * <code>from</code>, <code>to</code> for directed
  * graphs). The vector 
  * should contain even number of integer numbers between zero and the
  * number of vertices in the graph minus one (inclusive). If you also
@@ -185,8 +185,8 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  * \param graph The graph to which the edges will be added.
  * \param edges The edges themselves.
  * \return Error code:
- *    <constant>IGRAPH_EINVEVECTOR</constant>: invalid (odd)
- *    edges vector length, <constant>IGRAPH_EINVVID</constant>:
+ *    \c IGRAPH_EINVEVECTOR: invalid (odd)
+ *    edges vector length, \c IGRAPH_EINVVID:
  *    invalid vertex id in edges vector. 
  *
  * This function invalidates all iterators.
@@ -281,7 +281,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges) {
  * \param nv Non-negative integer giving the number of 
  *           vertices to add.
  * \return Error code: 
- *         <constant>IGRAPH_EINVAL</constant>: invalid number of new
+ *         \c IGRAPH_EINVAL: invalid number of new
  *         vertices. 
  *
  * Time complexity: O(|V|) where
@@ -340,9 +340,9 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
  * \param graph The graph to work on.
  * \param edges The edges to remove.
  * \return Error code:
- *   <constant>IGRAPH_EINVEVECTOR</constant>: invalid (odd) length of
- *   edges vector, <constant>IGRAPH_EINVVID</constant>: invalid vertex
- *   id in edges vector, <constant>IGRAPH_EINVAL</constant>: no such
+ *   \c IGRAPH_EINVEVECTOR: invalid (odd) length of
+ *   edges vector, \c IGRAPH_EINVVID: invalid vertex
+ *   id in edges vector, \c IGRAPH_EINVAL: no such
  *   edge to delete. 
  *
  * Time complexity: O(|V|+|E|) where
@@ -505,7 +505,7 @@ int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges) {
  *                 vector. The vector may contain the same id more
  *                 than once.
  * \return Error code:
- *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
+ *         \c IGRAPH_EINVVID: invalid vertex id.
  *
  * Time complexity: O(|V|+|E|),
  * |V| and 
@@ -656,17 +656,17 @@ integer_t igraph_ecount(const igraph_t *graph) {
  *        searched. 
  * \param mode Defines the way adjacent vertices are searched for
  *        directed graphs. It can have the following values:
- *        <constant>IGRAPH_OUT</constant>, vertices reachable by an
+ *        \c IGRAPH_OUT, vertices reachable by an
  *        edge from the specified vertex are searched,
- *        <constant>IGRAPH_IN</constant>, vertices from which the
+ *        \c IGRAPH_IN, vertices from which the
  *        specified vertex is reachable are searched.
- *        <constant>IGRAPH_ALL</constant>, both kind of vertices are
+ *        \c IGRAPH_ALL, both kind of vertices are
  *        searched. 
  *        This parameter is ignored for undirected graphs.
  * \return Error code:
- *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
- *         <constant>IGRAPH_EINVMODE</constant>: invalid mode argument.
- *         <constant>IGRAPH_ENOMEM</constant>: not enough memory.
+ *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
+ *         \c IGRAPH_ENOMEM: not enough memory.
  * 
  * Time complexity: O(d),
  * d is the number
@@ -778,8 +778,8 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * \brief Is this a directed graph?
  *
  * \param graph The graph.
- * \return Logical value, <literal>TRUE</literal> if the graph is directed,
- * <literal>FALSE</literal> otherwise.
+ * \return Logical value, <code>TRUE</code> if the graph is directed,
+ * <code>FALSE</code> otherwise.
  *
  * Time complexity: O(1)
  */
@@ -801,16 +801,16 @@ bool_t igraph_is_directed(const igraph_t *graph) {
  * \param vids Vector, giving the vertex ids of which the degree will
  *        be calculated.
  * \param mode Defines the type of the degree.
- *        <constant>IGRAPH_OUT</constant>, out-degree,
- *        <constant>IGRAPH_IN</constant>, in-degree,
- *        <constant>IGRAPH_ALL</constant>, total degree (sum of the
+ *        \c IGRAPH_OUT, out-degree,
+ *        \c IGRAPH_IN, in-degree,
+ *        \c IGRAPH_ALL, total degree (sum of the
  *        in- and out-degree). 
  *        This parameter is ignored for undirected graphs. 
  * \param loops Boolean, gives whether the self-loops should be
  *        counted.
  * \return Error code:
- *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
- *         <constant>IGRAPH_EINVMODE</constant>: invalid mode argument.
+ *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
  *
  * Time complexity: O(v) if
  * loops is 

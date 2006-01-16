@@ -200,7 +200,7 @@ int igraph_matrix_null(igraph_matrix_t *m) {
  * \brief Adds columns to a matrix.
  * \param m The matrix object.
  * \param n The number of columns to add.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ * \return Error code, \c IGRAPH_ENOMEM if there is
  *   not enough memory to perform the operation.
  *
  * Time complexity: linear with the number of elements of the new,
@@ -218,7 +218,7 @@ int igraph_matrix_add_cols(igraph_matrix_t *m, long int n) {
  * \brief Adds rows to a matrix.
  * \param m The matrix object.
  * \param n The number of rows to add.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ * \return Error code, \c IGRAPH_ENOMEM if there
  *   isn't enough memory for the operation.
  * 
  * Time complexity: linear with the number of elements of the new,
@@ -310,7 +310,7 @@ int igraph_matrix_delete_rows_neg(igraph_matrix_t *m, igraph_vector_t *neg, long
  * Creates a matrix object by copying another one.
  * \param to Pointer to an uninitialized matrix object.
  * \param from The initialized matrix object to copy.
- * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ * \return Error code, \c IGRAPH_ENOMEM if there
  *   isn't enough memory to allocate the new matrix.
  * 
  * Time complexity: O(n), the number

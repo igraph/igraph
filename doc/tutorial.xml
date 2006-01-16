@@ -12,7 +12,7 @@
 
 <para>
 The following short example program demonstrates the basic usage of 
-the &igraph; library.
+the <command>igraph</command> library.
 <programlisting>
 <![CDATA[#include <igraph.h>
 
@@ -32,10 +32,10 @@ int main(void) {
 
 <para>
 The short example illustrates a couple of points. Firstly, programs
-using the &igraph; library should include the
+using the <command>igraph</command> library should include the
 <filename>igraph.h</filename> header 
-file. Secondly, &igraph; uses the <type>real_t</type> type for real number
-instead of using <type>double</type>. Third, &igraph; graph objects are
+file. Secondly, <command>igraph</command> uses the <type>real_t</type> type for real number
+instead of using <type>double</type>. Third, <command>igraph</command> graph objects are
 represented by the 
 <type>igraph_t</type> data
 type. Fourth, graphs are created by some functions,
@@ -55,7 +55,7 @@ gcc -I/usr/local/igraph -L/usr/local/lib -ligraph igraph_test.c -o igraph_test
 </para>
 
 <para>
-The exact form depends on where &igraph; was installed on your
+The exact form depends on where <command>igraph</command> was installed on your
 system. The directory after the <option>-I</option> switch is the one
 containing the <filename>igraph.h</filename> file, while the one
 following <option>-L</option> should contain the 
@@ -74,7 +74,7 @@ The executable can be run by simply typing its name like this:
 <programlisting>
 ./igraph_test
 </programlisting>
-on most systems. If you use dynamic linking and the &igraph;
+on most systems. If you use dynamic linking and the <command>igraph</command>
 libraries are not at a standard place, you may need to set the
 <envar>LD_LIBRARY_PATH</envar> variable, the syntax depends on the
 shell use are using. In <command>bash</command> it goes like this:
@@ -82,7 +82,7 @@ shell use are using. In <command>bash</command> it goes like this:
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libs/igraph
 ./igraph_test
 </programlisting>
-Here we assumed that the &igraph; library is installed in 
+Here we assumed that the <command>igraph</command> library is installed in 
 <filename>/home/user/libs/igraph</filename>. 
 </para>
 
@@ -96,7 +96,7 @@ generators. Stochastic (=randomized) graph generators are called
 </para>
 
 <para>
-&igraph; can handle directed and undirected graphs. Most graph
+<command>igraph</command> can handle directed and undirected graphs. Most graph
 generators are able to create both types of graphs and most other
 functions are usually also capable of handling
 both. Eg. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
@@ -106,7 +106,7 @@ directed or undirected paths
 </para>
 
 <para>
-&igraph; has sophisticated ways for creating graphs. The simplest
+<command>igraph</command> has sophisticated ways for creating graphs. The simplest
 graphs are deterministic regular structures like star graphs
 (<link linkend="igraph_star"><function>igraph_star()</function></link>), 
 ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices  
@@ -158,7 +158,7 @@ int main(void) {
 </para>
 
 <para>
-This example illustrates some new points. &igraph; uses 
+This example illustrates some new points. <command>igraph</command> uses 
 <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>
 instead of plain C arrays. <type>igraph_vector_t</type> is superior to
 regular array in almost every sense. Vectors are created by the
@@ -169,7 +169,7 @@ needed any more by calling
 on them. A vector can be indexed by the 
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). Vectors 
-can be resized, eg. most &igraph; functions returning the result in a
+can be resized, eg. most <command>igraph</command> functions returning the result in a
 vector resize it to the size of the result.
 </para>
 
@@ -290,7 +290,7 @@ it to be able to hold the result.
 The <constant>IGRAPH_VS_ALL</constant> argument tells the functions to
 calculate the property for every vertex in the graph, it is shorthand
 for a <emphasis>vertex set</emphasis> (<type>igraph_vs_t</type>), one
-of the central concepts in &igraph;.  
+of the central concepts in <command>igraph</command>.  
 </para>
 </section>
 

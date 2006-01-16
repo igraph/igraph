@@ -45,7 +45,7 @@
  *          the whole matrix is used, a symmetric matrix is returned.
  *        \endclist
  * \return Error code:
- *        <constant>IGRAPH_EINVAL</constant> invalid type argument.
+ *        \c IGRAPH_EINVAL invalid type argument.
  *
  * Time complexity: O(|V||V|),
  * |V| is the 
@@ -124,8 +124,8 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
  *        resized.
  * \param bycol Logical, if true the edges will be returned
  *        columnwise, eg. the first edge is
- *        <literal>res[0]->res[|E|]</literal>, the second is
- *        <literal>res[1]->res[|E|+1]</literal>, etc.
+ *        <code>res[0]->res[|E|]</code>, the second is
+ *        <code>res[1]->res[|E|+1]</code>, etc.
  * \return Error code.
  * 
  * Time complexity: O(|E|), the

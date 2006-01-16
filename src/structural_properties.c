@@ -42,13 +42,13 @@
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        <constant>TRUE</constant> the longest geodesic within a component
+ *        \c TRUE the longest geodesic within a component
  *        will be returned, otherwise the number of vertices is
  *        returned. (The ratio behind the latter is that this is
  *        always longer than the longest possible diameter in a
  *        graph.) 
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+ *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.  
  *
  * Time complexity: O(|V||E|), the
@@ -129,14 +129,14 @@ int igraph_diameter(const igraph_t *graph, integer_t *res,
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        <constant>TRUE</constant> the average of thr geodesics
+ *        \c TRUE the average of thr geodesics
  *        within the components 
  *        will be returned, otherwise the number of vertices is
  *        used for the length of non-existing geodesics. (The ratio
  *        behind this is that this is always longer than the longest
  *        possible geodesic in a graph.) 
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+ *         \c IGRAPH_ENOMEM, not enough memory for
  *         data structures 
  *
  * Time complexity: O(|V||E|), the
@@ -230,7 +230,7 @@ int igraph_average_path_length(const igraph_t *graph, real_t *res,
  *        this function, but be sure to call \ref igraph_destroy() on it if
  *        you don't need it any more.
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+ *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
  *
  * Time complexity: O(|V|+|E|),
@@ -301,8 +301,8 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  *
  * This function uses Prim's method for carrying out the computation,
  * see Prim, R.C.: Shortest connection networks and some
- * generalizations, <emphasis>Bell System Technical
- * Journal</emphasis>, Vol. 36, 
+ * generalizations, Bell System Technical
+ * Journal, Vol. 36, 
  * 1957, 1389--1401.
  * 
  * If the graph has more than one minimum spanning tree, the current
@@ -323,8 +323,8 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * \param weights A vector containing the weights of the the edges.
  *        in the same order as the simple edge iterator visits them.
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>, not enough memory.
- *         <constant>IGRAPH_EINVAL</constant>, length of weight vector does not
+ *         \c IGRAPH_ENOMEM, not enough memory.
+ *         \c IGRAPH_EINVAL, length of weight vector does not
  *           match number of edges.
  *
  * Time complexity: O(|V|+|E|),
@@ -551,7 +551,7 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
  *
  * \param graph The graph object.
  * \param res The result of the calculation, a matrix. It has the same
- *        number of rows as the length of the <constant>from</constant>
+ *        number of rows as the length of the \c from
  *        argument, and its number of columns is the number of
  *        vertices in the graph. One row of the matrix shows the
  *        distances from/to a given vertex to all the others in the
@@ -701,7 +701,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  *        \cli IGRAPH_ENOMEM 
  *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           <parameter>from</parameter> is invalid vertex id.
+ *           \p from is invalid vertex id.
  *        \cli IGRAPH_EINVMODE 
  *           invalid mode argument.
  *        \endclist
@@ -803,10 +803,10 @@ int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_t *res,
  *        \clist
  *        \cli IGRAPH_OUT 
  *          the set of vertices reachable \em from the
- *          <parameter>vertex</parameter>, 
+ *          \p vertex, 
  *        \cli IGRAPH_IN
  *          the set of vertices from which the
- *          <parameter>vertex</parameter> is reachable.
+ *          \p vertex is reachable.
  *        \cli IGRAPH_ALL 
  *          the graph is considered as an
  *          undirected graph. Note that this is \em not the same
@@ -817,7 +817,7 @@ int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_t *res,
  *        \cli IGRAPH_ENOMEM 
  *          not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID 
- *           <parameter>vertex</parameter> is an invalid vertex id
+ *           \p vertex is an invalid vertex id
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument passed.
  *        \endclist
@@ -900,10 +900,10 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, real_t vert
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \return Error code:
- *        <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+ *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data. 
- *        <constant>IGRAPH_EINVVID</constant>, invalid vertex id passed in
- *        <parameter>vids</parameter>. 
+ *        \c IGRAPH_EINVVID, invalid vertex id passed in
+ *        \p vids. 
  *
  * Time complexity: O(|V||E|),
  * |V| and 
@@ -1070,7 +1070,7 @@ int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res,
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \return Error code:
- *        <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+ *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data. 
  *
  * Time complexity: O(|V||E|),
@@ -1229,8 +1229,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  * 
  * For the explanation of the PageRank algorithm, see the following
  * webpage:
- * <ulink url="http://www-db.stanford.edu/~backrub/google.html">
- * http://www-db.stanford.edu/~backrub/google.html</ulink> or the 
+ * http://www-db.stanford.edu/~backrub/google.html or the 
  * following reference:
  * 
  * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
@@ -1249,10 +1248,10 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  *        less than this value for every node
  * \param damping The damping factor ("d" in the original paper)
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+ *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
- *         <constant>IGRAPH_EINVVID</constant>, invalid vertex id in
- *         <parameter>vids</parameter>. 
+ *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \p vids. 
  */
 
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res, 
@@ -1389,10 +1388,10 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
  *        it any more.
  * \param vids Vector with the vertex ids to put in the subgraph.
  * \return Error code:
- *         <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+ *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
- *         <constant>IGRAPH_EINVVID</constant>, invalid vertex id in
- *         <parameter>vids</parameter>. 
+ *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \p vids. 
  * 
  * Time complexity: O(|V|+|E|),
  * |V| and
@@ -1461,7 +1460,7 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
  * \param multiple Logical, if true multiple edges will be removed. 
  * \param loops Logical, if true, loops (self edges) will be removed.
  * \return Error code:
- *    <constant>IGRAPH_ENOMEM</constant> if we are out of memory.
+ *    \c IGRAPH_ENOMEM if we are out of memory.
  *
  * Time complexity: O(|V|+|E|) for
  * removing the loops,
@@ -1576,7 +1575,7 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
  * \brief Calculates the transitivity (clustering coefficient) of a graph
  * 
  * The transitivity measures the probability that two neighbors of a
- * vertex are connected. See the <parameter>type</parameter> parameter for
+ * vertex are connected. See the \p type parameter for
  * different definitions (more to be expected soon).
  * \param graph The graph object.
  * \param res Pointer to an initialized vector, this will be resized
@@ -1593,8 +1592,8 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
  *          undirected ones. 
  *        \endclist
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: unknown transitivity type.
- *         <constant>IGRAPH_ENOMEM</constant>: not enough memory for
+ *         \c IGRAPH_EINVAL: unknown transitivity type.
+ *         \c IGRAPH_ENOMEM: not enough memory for
  *         temporary data. 
  * 
  * Time complexity: O(|V|*d^2) for

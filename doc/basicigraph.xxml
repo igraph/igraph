@@ -5,22 +5,29 @@
 ]>
 
 <chapter id="igraph-Basic">
-<title>The Basic &igraph; Interface</title>
+<title>The Basic <command>igraph</command> Interface</title>
 
-<section><title></title>
 <!-- doxrox-include about_basic_interface -->
+
+<section><title>Graph Constructors and Destructors</title>
 <!-- doxrox-include igraph_empty -->
 <!-- doxrox-include igraph_copy -->
 <!-- doxrox-include igraph_destroy -->
-<!-- doxrox-include igraph_add_edges -->
-<!-- doxrox-include igraph_add_vertices -->
-<!-- doxrox-include igraph_delete_edges -->
-<!-- doxrox-include igraph_delete_vertices -->
+</section>
+
+<section><title>Basic Query Operations</title>
 <!-- doxrox-include igraph_vcount -->
 <!-- doxrox-include igraph_ecount -->
 <!-- doxrox-include igraph_neighbors -->
 <!-- doxrox-include igraph_is_directed -->
 <!-- doxrox-include igraph_degree -->
+</section>
+
+<section><title>Adding and Deleting Vertices</title>
+<!-- doxrox-include igraph_add_edges -->
+<!-- doxrox-include igraph_add_vertices -->
+<!-- doxrox-include igraph_delete_edges -->
+<!-- doxrox-include igraph_delete_vertices -->
 </section>
 
 </chapter>

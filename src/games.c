@@ -41,11 +41,10 @@
  * \param graph An uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of outgoing edges generated for each 
- *        vertex. (Only if <parameter>outseq</parameter> is
- *        <constant>NULL</constant>.) 
+ *        vertex. (Only if \p outseq is \c NULL.) 
  * \param outseq Gives the (out-)degrees of the vertices. If this is
  *        constant, this can be a NULL pointer or an empty (but
- *        initialized!) vector, in this case <parameter>m</parameter> contains
+ *        initialized!) vector, in this case \p m contains
  *        the constant out-degree. The very first vertex has by definition 
  *        no outgoing edges, so the first number in this vector is 
  *        ignored.
@@ -55,8 +54,8 @@
  *        the vertices.
  * \param directed Boolean, whether to generate a directed graph.
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant> invalid <parameter>n</parameter>,
- *         <parameter>m</parameter> or <parameter>outseq</parameter> parameter.
+ *         \c IGRAPH_EINVAL invalid \p n,
+ *         \p m or \p outseq parameter.
  * 
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
@@ -348,11 +347,11 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
  * \param directed Logical, whether to generate a directed graph.
  * \param loops Logical, whether to generate loops (self) edges.
  * \return Error code:
- *         <constant>IGRAPH_EINVAL</constant>: invalid
- *         <parameter>type</parameter>, <parameter>n</parameter>,
- *         <parameter>p</parameter> or <parameter>m</parameter>
+ *         \c IGRAPH_EINVAL: invalid
+ *         \p type, \p n,
+ *         \p p or \p m
  *          parameter.
- *         <constant>IGRAPH_ENOMEM</constant>: there is not enought
+ *         \c IGRAPH_ENOMEM: there is not enought
  *         memory for the operation.
  * 
  * Time complexity: O(|V|+|E|), the
@@ -495,14 +494,14 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
  * 
  * \param graph Pointer to an uninitialized graph object.
  * \param out_deg The degree sequence for an undirected graph (if
- *        <parameter>in_seq</parameter> is of length zero), or the out-degree
- *        sequence of a directed graph (if <parameter>in_deq</parameter> is not
+ *        \p in_seq is of length zero), or the out-degree
+ *        sequence of a directed graph (if \p in_deq is not
  *        of length zero.
  * \param in_deg It is either a zero-length vector or
- *        <constant>NULL</constant> (if an undirected 
+ *        \c NULL (if an undirected 
  *        graph is generated), or the in-degree sequence.
  * \param method The method to generate the graph. Possible values: 
- *        <constant>IGRAPH_DEGSEQ_SIMPLE</constant>, for undirected graphs this
+ *        \c IGRAPH_DEGSEQ_SIMPLE, for undirected graphs this
  *        method puts all vertex ids in a bag, the multiplicity of a
  *        vertex in the bag is the same as its degree. Then it 
  *        draws pairs from the bag, until it is empty. This method can 
@@ -510,14 +509,14 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
  *        For directed graphs, the algorithm is basically the same,
  *        but two separate bags are used for the in- and out-degrees. 
  * \return Error code: 
- *          <constant>IGRAPH_ENOMEM</constant>: there is not enough
+ *          \c IGRAPH_ENOMEM: there is not enough
  *           memory to perform the operation.
- *          <constant>IGRAPH_EINVAL</constant>: invalid method parameter, or
+ *          \c IGRAPH_EINVAL: invalid method parameter, or
  *           invalid in- and/or out-degree vectors. The degree vectors
- *           should be non-negative, <parameter>out_deg</parameter> should sum
+ *           should be non-negative, \p out_deg should sum
  *           up to an even integer for undirected graphs; the length
- *           and sum of <parameter>out_deg</parameter> and
- *           <parameter>in_deg</parameter> 
+ *           and sum of \p out_deg and
+ *           \p in_deg 
  *           should match for directed graphs.
  * 
  * Time complexity: O(|V|+|E|), the
@@ -555,11 +554,11 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  * \param m The number of edges to add in a time step (ie. after
  *        adding a vertex.
  * \param directed Boolean, whether to generate a directed graph.
- * \param citation Boolean, if <constant>TRUE</constant> the edges always
+ * \param citation Boolean, if \c TRUE the edges always
  *        originate from the most recently added vertex.
  * \return Error code:
- *          <constant>IGRAPH_EINVAL</constant>: invalid
- *          <parameter>n</parameter> or <parameter>m</parameter>
+ *          \c IGRAPH_EINVAL: invalid
+ *          \p n or \p m
  *          parameter. 
  *
  * Time complexity: O(|V|+|E|), the
