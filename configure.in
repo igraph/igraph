@@ -158,9 +158,6 @@ if test "$rpackage" == "yes"; then
 fi
 AM_CONDITIONAL(RPACKAGE, test x$rpackage = xyes)
 
-# DOCS
-GTK_DOC_CHECK(1.4)
-
 AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile doc/Makefile interfaces/R/Makefile])
 AC_OUTPUT
 

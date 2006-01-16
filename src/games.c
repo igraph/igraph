@@ -27,30 +27,39 @@
 #include <math.h>
 
 /**
+ * \section about_games
+ * 
+ * <para>Games are randomized graph generators. Randomization means that
+ * they generate a different graph every time you call them. </para>
+ */
+
+/**
  * \ingroup generators
- * \brief Generates a graph based on the Barabási-Albert model.
+ * \function igraph_barabasi_game
+ * \brief Generates a graph based on the Barab&aacute;si-Albert model.
  *
- * @param graph An uninitialized graph object.
- * @param n The number of vertices in the graph.
- * @param m The number of outgoing edges generated for each
- *        vertex. (Only if <code>outseq</code> is <code>NULL</code>.)
- * @param outseq Gives the (out-)degrees of the vertices. If this is
+ * \param graph An uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param m The number of outgoing edges generated for each 
+ *        vertex. (Only if <parameter>outseq</parameter> is
+ *        <constant>NULL</constant>.) 
+ * \param outseq Gives the (out-)degrees of the vertices. If this is
  *        constant, this can be a NULL pointer or an empty (but
- *        initialized!) vector, in this case <code>m</code> contains
+ *        initialized!) vector, in this case <parameter>m</parameter> contains
  *        the constant out-degree. The very first vertex has by definition 
  *        no outgoing edges, so the first number in this vector is 
  *        ignored.
- * @param outpref Boolean, if true not only the in- but also the out-degree
+ * \param outpref Boolean, if true not only the in- but also the out-degree
  *        of a vertex increases its citation probability. Ie. the
  *        citation probability is determined by the total degree of
  *        the vertices.
- * @param directed Boolean, whether to generate a directed graph.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b> invalid <code>n</code>,
- *           <code>m</code> or <code>outseq</code> parameter.
+ * \param directed Boolean, whether to generate a directed graph.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant> invalid <parameter>n</parameter>,
+ *         <parameter>m</parameter> or <parameter>outseq</parameter> parameter.
  * 
- * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
- * plus the number of edges.
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges.
  */
 
 int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
@@ -315,32 +324,41 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
 
 /**
  * \ingroup generators
+ * \function igraph_erdos_renyi_game
  * \brief Generates a random (Erdos-Renyi) graph.
  * 
- * @param graph Pointer to an uninitialized graph object.
- * @param type The type of the random graph, possible values:
- *        - <b>IGRAPH_ERDOS_RENYI_GNM</b>, <code>G(n,m)</code> graph, 
- *          <code>m</code> edges are
- *          selected uniformly randomly in a graph with <code>n</code>
- *          vertices.
- *        - <b>IGRAPH_ERDOS_RENYI_GNP</b>, <code>G(n,p)</code> graph,
+ * \param graph Pointer to an uninitialized graph object.
+ * \param type The type of the random graph, possible values:
+ *        \clist
+ *        \cli IGRAPH_ERDOS_RENYI_GNM
+ *          G(n,m) graph,  
+ *          m edges are
+ *          selected uniformly randomly in a graph with
+ *          n vertices.
+ *        \cli IGRAPH_ERDOS_RENYI_GNP
+ *          G(n,p) graph,
  *          every possible edge is included in the graph with
- *          probability <code>p</code>.
- * @param n The number of vertices in the graph.
- * @param p_or_m This is the <code>p</code> parameter for
- *        <code>G(n,p)</code> graphs and the <code>m</code>
- *        parameter for <code>G(n,m)</code> graphs.
- * @param directed Logical, whether to generate a directed graph.
- * @param loops Logical, whether to generate loops (self) edges.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid <code>type</code>,
- *           <code>n</code>, <code>p</code> or <code>m</code>
- *           parameter. 
+ *          probability p.
+ *        \endclist
+ * \param n The number of vertices in the graph.
+ * \param p_or_m This is the p parameter for
+ *        G(n,p) graphs and the
+ *        m 
+ *        parameter for G(n,m) graphs.
+ * \param directed Logical, whether to generate a directed graph.
+ * \param loops Logical, whether to generate loops (self) edges.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: invalid
+ *         <parameter>type</parameter>, <parameter>n</parameter>,
+ *         <parameter>p</parameter> or <parameter>m</parameter>
+ *          parameter.
+ *         <constant>IGRAPH_ENOMEM</constant>: there is not enought
+ *         memory for the operation.
  * 
- * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
- * plus the number of edges in the graph.
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
  * 
- * \sa barabasi_game(), growing_random_game()
+ * \sa \ref igraph_barabasi_game(), \ref igraph_growing_random_game()
  */
 
 int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
@@ -472,35 +490,40 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
 
 /**
  * \ingroup generators
+ * \function igraph_degree_sequence_game
  * \brief Generates a random graph with a given degree sequence 
  * 
- * @param graph Pointer to an uninitialized graph object.
- * @param out_deg The degree sequence for an undirected graph (if
- *        <code>in_seq</code> is of length zero), or the out-degree
- *        sequence of a directed graph (if <code>in_deq</code> is not
+ * \param graph Pointer to an uninitialized graph object.
+ * \param out_deg The degree sequence for an undirected graph (if
+ *        <parameter>in_seq</parameter> is of length zero), or the out-degree
+ *        sequence of a directed graph (if <parameter>in_deq</parameter> is not
  *        of length zero.
- * @param in_deg It is either a zero-length vector or NULL (if an undirected
+ * \param in_deg It is either a zero-length vector or
+ *        <constant>NULL</constant> (if an undirected 
  *        graph is generated), or the in-degree sequence.
- * @param method The method to generate the graph. Possible values: 
- *        <b>IGRAPH_DEGSEQ_SIMPLE</b>, for undirected graphs this
+ * \param method The method to generate the graph. Possible values: 
+ *        <constant>IGRAPH_DEGSEQ_SIMPLE</constant>, for undirected graphs this
  *        method puts all vertex ids in a bag, the multiplicity of a
  *        vertex in the bag is the same as its degree. Then it 
  *        draws pairs from the bag, until it is empty. This method can 
  *        generate both loop (self) edges and multiple edges.
  *        For directed graphs, the algorithm is basically the same,
  *        but two separate bags are used for the in- and out-degrees. 
- * @return Error code: 
- *         - <b>IGRAPH_EINVAL</b>: invalid method parameter, or
+ * \return Error code: 
+ *          <constant>IGRAPH_ENOMEM</constant>: there is not enough
+ *           memory to perform the operation.
+ *          <constant>IGRAPH_EINVAL</constant>: invalid method parameter, or
  *           invalid in- and/or out-degree vectors. The degree vectors
- *           should be non-negative, <code>out_deg</code> should sum
+ *           should be non-negative, <parameter>out_deg</parameter> should sum
  *           up to an even integer for undirected graphs; the length
- *           and sum of <code>out_deg</code> and <code>in_deg</code>
+ *           and sum of <parameter>out_deg</parameter> and
+ *           <parameter>in_deg</parameter> 
  *           should match for directed graphs.
  * 
- * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
- * plus the number of edges.
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges.
  * 
- * \sa barabasi_game(), erdos_renyi_game()
+ * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game()
  */
 
 int igraph_degree_sequence_game(igraph_t *graph, const vector_t *out_deg,
@@ -520,25 +543,27 @@ int igraph_degree_sequence_game(igraph_t *graph, const vector_t *out_deg,
 
 /**
  * \ingroup generators
+ * \function igraph_growing_random_game
  * \brief Generates a growing random graph.
  *
  * This function simulates a growing random graph. In each discrete
  * time step a new vertex is added and a number of new edges are also
  * added. These graphs are known to be different from standard (not
  * growing) random graphs.
- * @param graph Uninitialized graph object.
- * @param n The number of vertices in the graph.
- * @param m The number of edges to add in a time step (ie. after
+ * \param graph Uninitialized graph object.
+ * \param n The number of vertices in the graph.
+ * \param m The number of edges to add in a time step (ie. after
  *        adding a vertex.
- * @param directed Boolean, whether to generate a directed graph.
- * @param citation Boolean, if <code>TRUE</code> the edges always
+ * \param directed Boolean, whether to generate a directed graph.
+ * \param citation Boolean, if <constant>TRUE</constant> the edges always
  *        originate from the most recently added vertex.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid <code>n</code> or
- *           <code>m</code> parameter.
+ * \return Error code:
+ *          <constant>IGRAPH_EINVAL</constant>: invalid
+ *          <parameter>n</parameter> or <parameter>m</parameter>
+ *          parameter. 
  *
- * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
- * plus the number of edges.
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges.
  */
 int igraph_growing_random_game(igraph_t *graph, integer_t n, 
 			       integer_t m, bool_t directed,

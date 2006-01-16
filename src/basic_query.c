@@ -25,20 +25,24 @@
 
 /**
  * \ingroup structural
+ * \function igraph_are_connected
  * \brief Decides whether two vertices are connected 
  *
- * @param graph The graph object.
- * @param v1 The first vertex.
- * @param v2 The second vertex.
- * @return Boolean, <code>TRUE</code> if there is an edge from
- *         <code>v1</code> to <code>v2</code>. Returns FALSE if there
+ * \param graph The graph object.
+ * \param v1 The first vertex.
+ * \param v2 The second vertex.
+ * \return Boolean, <constant>TRUE</constant> if there is an edge from
+ *         <parameter>v1</parameter> to
+ *         <parameter>v2</parameter>. Returns
+ *         <constant>FALSE</constant> if there   
  *         is no such edge or at least one of the vertex ids is
  *         invalid (ie. too big or negative).
  * 
  * The function is of course symmetric for undirected graphs.
  *
- * Time complexity: <code>O(d)</code>, <code>d</code> is the
- * out-degree of <code>v1</code>.
+ * Time complexity: O(d),
+ * d is the
+ * out-degree of <parameter>v1</parameter>.
  */
 bool_t igraph_are_connected(const igraph_t *graph, 
 			    integer_t v1, integer_t v2) {

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<chapter id="igraph-Structural">
+<title>Structural Properties of Graphs</title>
+
+<!-- doxrox-include about_structural -->
+
+<section><title>Basic Properties</title>
+<!-- doxrox-include igraph_are_connected -->
+</section>
+
+<section><title>Shortest Path Related Functions</title>
+<!-- doxrox-include igraph_shortest_paths -->
+<!-- doxrox-include igraph_get_shortest_paths -->
+<!-- doxrox-include igraph_average_path_length -->
+<!-- doxrox-include igraph_diameter -->
+</section>
+
+<section><title>Graph Components</title>
+<!-- doxrox-include igraph_subcomponent -->
+<!-- doxrox-include igraph_subgraph -->
+<!-- doxrox-include igraph_clusters -->
+<!-- doxrox-include igraph_is_connected -->
+</section>
+
+<section><title>Centrality Measures</title>
+<!-- doxrox-include igraph_closeness -->
+<!-- doxrox-include igraph_betweenness -->
+<!-- doxrox-include igraph_edge_betweenness -->
+<!-- doxrox-include igraph_pagerank -->
+</section>
+
+<section><title>Spanning Tree</title>
+<!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
+<!-- doxrox-include igraph_minimum_spanning_tree_prim -->
+</section>
+
+<section><title>Other Operations</title>
+<!-- doxrox-include igraph_simplify -->
+<!-- doxrox-include igraph_transitivity -->	
+<!-- doxrox-include igraph_bibcoupling -->
+<!-- doxrox-include igraph_cocitation -->
+<!-- doxrox-include igraph_get_adjacency -->	
+<!-- doxrox-include igraph_get_edgelist -->	
+</section>
+
+</chapter>

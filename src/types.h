@@ -72,29 +72,9 @@ int dqueue_push    (dqueue_t* q, real_t elem);
 
 /** \defgroup vector Vector, dealing with arrays efficiently.
  * \ingroup types
- * 
- * The <code>vector_t</code> data type is a simple and efficient
- * interface to arrays containing real numbers. It is something
- * similar as (but much simpler than) the <code>vector</code> template
- * in the C++ standard library.
- *
- * Vectors are used extensively in \a igraph, all functions which
- * expects or returns a list of numbers use <code>vector_t</code> to
- * achive this.
- * 
- * The <code>vector_t</code> type susally uses <code>O(n)</code> space
- * to store <code>n</code> elements. Sometimes it uses more, this is
- * because vectors can shrink, but even if they shrink, the current
- * implementation does not free a single bit of memory.
  */
 
-/**
- * vector_t:
- * 
- * Flecible arrays
- */
 typedef struct s_vector {
-   /*< private >*/
   real_t* stor_begin;
   real_t* stor_end;
   real_t* end;
@@ -107,6 +87,7 @@ typedef struct s_vector {
 
 /**
  * \ingroup vector
+ * \define VECTOR
  * \brief Accessing an element of a vector
  * 
  * Usage: 
@@ -118,9 +99,9 @@ typedef struct s_vector {
  * Note that there are no range checks right now.
  * This functionality might be redefined later as a real function
  * instead of a <code>#define</code>. 
- * @param v The vector object.
+ * \param v The vector object.
  * 
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 #define VECTOR(v) ((v).stor_begin) /* DIRTY */
 int vector_init      (vector_t* v, long int size);
@@ -148,6 +129,7 @@ int vector_order(const vector_t* v, vector_t* res, integer_t maxval);
 void vector_sort(vector_t *v);
 int vector_resize(vector_t* v, long int newsize);
 real_t vector_max(const vector_t* v);
+long int vector_which_max(const vector_t* v);
 void vector_copy_to(const vector_t *v, real_t* to);
 int vector_copy(vector_t *to, const vector_t *from);
 real_t vector_sum(const vector_t *v);
@@ -206,14 +188,14 @@ void vector_ptr_remove(vector_ptr_t *v, long int pos);
 /* Matrix, very similar to vector                     */
 /* -------------------------------------------------- */
 
-/** \defgroup matrix Matrix type, for storing real matrices efficienly. 
- * \ingroup types
+/** 
+ * \section about_matrix_t_objects About <type>matrix_t</type> objects
  * 
- * This type is just an interface to vector.
+ * <para>This type is just an interface to vector.</para>
  *
- * The <code>matrix_t</code> type ususally stores <code>n</code>
- * elements in <code>O(n)</code> space, but not always, see the
- * documentation of the vector type.
+ * <para>The <type>matrix_t</type> type ususally stores n
+ * elements in O(n) space, but not always, see the documentation of
+ * the vector type.</para>
  */
 typedef struct s_matrix {
   vector_t data;
@@ -227,13 +209,14 @@ typedef struct s_matrix {
 
 /**
  * \ingroup matrix
+ * \define MATRIX
  * \brief Accessing an element of a matrix.
  *
  * Note that there are no range checks right now. 
  * This functionality might be redefines as a proper function later. 
- * @param m The matrix object.
- * @param i The index of the row, starting with zero.
- * @param j The index of the column, starting with zero.
+ * \param m The matrix object.
+ * \param i The index of the row, starting with zero.
+ * \param j The index of the column, starting with zero.
  *
  * Time complexity: <code>O(1)</code>.
  */

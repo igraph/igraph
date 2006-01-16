@@ -29,30 +29,32 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
 
 /**
  * \ingroup structural
+ * \function igraph_cocitation
  * \brief Cocitation coupling
  * 
  * Two vertices are cocited if there is another vertex citing both of
- * them. igraph_cocitation() siply counts how many types two vertices are
+ * them. \ref igraph_cocitation() siply counts how many types two vertices are
  * cocited. The bibliographic coupling of two vertices is the number
- * of other vertices they both cite, igraph_bibcoupling() calculates
+ * of other vertices they both cite, \ref igraph_bibcoupling() calculates
  * this.
  * The cocitation score for each given vertex and all other vertices
  * in the graph will be calculated.
- * @param graph The graph object to analyze.
- * @param res Pointer to a matrix, the result of the calculation will
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in <code>vids</code>, the number of
+ *        number of vertex ids in <parameter>vids</parameter>, the number of
  *        columns is the number of vertices in the graph.
- * @param vids The vertex ids of the vertices for which the
+ * \param vids The vertex ids of the vertices for which the
  *        calculation will be done.
- * @return Error code:
- *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
  * 
- * Time complexity: <code>O(|V|d^2</code>, |V| is the number of
- * vertices in the graph, <code>d</code> is the (maximum) degree of
+ * Time complexity: O(|V|d^2), |V| is
+ * the number of vertices in the graph,
+ * d is the (maximum) degree of 
  * the vertices in the graph.
  *
- * \sa igraph_bibcoupling()
+ * \sa \ref igraph_bibcoupling()
  */
 
 int igraph_cocitation(const igraph_t *graph, matrix_t *res, 
@@ -62,30 +64,32 @@ int igraph_cocitation(const igraph_t *graph, matrix_t *res,
 
 /**
  * \ingroup structural
+ * \function igraph_bibcoupling
  * \brief Bibliographic coupling
  * 
  * Two vertices are cocited if there is another vertex citing both of
- * them. igraph_cocitation() siply counts how many types two vertices are
+ * them. \ref igraph_cocitation() siply counts how many types two vertices are
  * cocited. The bibliographic coupling of two vertices is the number
- * of other vertices they both cite, igraph_bibcoupling() calculates
+ * of other vertices they both cite, \ref igraph_bibcoupling() calculates
  * this.
  * The bibliographic coupling  score for each given vertex and all
  * other vertices in the graph will be calculated.
- * @param graph The graph object to analyze.
- * @param res Pointer to a matrix, the result of the calculation will
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a matrix, the result of the calculation will
  *        be stored here. The number of its rows is the same as the
- *        number of vertex ids in <code>vids</code>, the number of
+ *        number of vertex ids in <parameter>vids</parameter>, the number of
  *        columns is the number of vertices in the graph.
- * @param vids The vertex ids of the vertices for which the
+ * \param vids The vertex ids of the vertices for which the
  *        calculation will be done.
- * @return Error code:
- *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
  * 
- * Time complexity: <code>O(|V|d^2</code>, |V| is the number of
- * vertices in the graph, <code>d</code> is the (maximum) degree of
- * the vertices in the graph.
+ * Time complexity: O(|V|d^2),
+ * |V| is the number of vertices in
+ * the graph, d is the (maximum)
+ * degree of the vertices in the graph.
  *
- * \sa igraph_cocitation()
+ * \sa \ref igraph_cocitation()
  */
 
 int igraph_bibcoupling(const igraph_t *graph, matrix_t *res, 

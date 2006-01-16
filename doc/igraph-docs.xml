@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY igraph "<literal>igraph</literal>">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
 ]>
 
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
-    <title>Igraph Reference Manual</title>
+    <title><command>Igraph</command> Reference Manual</title>
     <authorgroup>
       <author><firstname>Gábor</firstname><surname>Csárdi</surname>
       <affiliation><orgname>RIPNP of the HAS</orgname></affiliation>
@@ -14,13 +14,13 @@
     </authorgroup>
 
     <legalnotice><para>
-      Copyright (C)  2005  Gábor Csárdi.
+      Copyright (C)  2005, 2006  Gábor Csárdi.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
       with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
-      Texts.  A copy of the license is included in the section entitled ``GNU
-      Free Documentation License''.
+      Texts.  A copy of the license is included in the section entitled 
+      <quote>GNU Free Documentation License</quote>.
     </para></legalnotice>
   </bookinfo>
 
@@ -30,15 +30,34 @@
 
   <xi:include href="tutorial.xml"/>
 
-  <xi:include href="xml/errorhandling.xml"/>
+  <xi:include href="error.xml"/>
 
   <chapter>
     <title>Basic Types</title>
-    <xi:include href="xml/vector.xml"/>
+    <xi:include href="vector.xml"/>
+    <xi:include href="matrix.xml"/>
   </chapter>
+
+  <xi:include href="basicigraph.xml"/>
+
+  <xi:include href="generators.xml"/>
+
+  <xi:include href="iterators.xml"/>  
+
+  <xi:include href="structural.xml"/>
+  
+  <xi:include href="attributes.xml"/>  
+
+  <xi:include href="layout.xml"/>  
+
+  <xi:include href="foreign.xml"/>  
+
+  <xi:include href="nongraph.xml"/>  
 
   <xi:include href="fdl.xml"/>
 
   <xi:include href="gpl.xml"/>
+  
+  <index/>
 
 </book>

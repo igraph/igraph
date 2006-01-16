@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY igraph "<literal>igraph</literal>">
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
 ]>
 
 <chapter id="igraph-introduction">
@@ -38,7 +38,7 @@ using here at KFKI.
 can be added without too much pain.
 </para>
 
-<section><title>Features</title></section>
+<section><title>Features</title>
 
 <itemizedlist>
 <listitem><para>&igraph; contains functions for generating regular and
@@ -60,6 +60,7 @@ can be added without too much pain.
 <listitem><para>&igraph; is open source and distributed under GNU
   GPL.</para></listitem> 
 </itemizedlist>
+</section>
 
 <section><title>&igraph; is free software</title>
 <para>

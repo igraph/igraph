@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<section id="igraph-Matrices">
+<title>Matrices</title>
+
+<section>
+<!-- doxrox-include about_matrix_t_objects -->
+</section>
+
+<section>
+<!-- doxrox-include matrix_constructor_and_destructor -->
+<!-- doxrox-include matrix_init -->
+<!-- doxrox-include matrix_copy -->
+<!-- doxrox-include matrix_destroy -->
+</section>
+
+<section>
+<!-- doxrox-include matrix_accessing_elements -->
+<!-- doxrox-include MATRIX -->
+</section>
+
+<section>
+<title>Matrix query operations</title>
+<!-- doxrox-include matrix_size -->
+<!-- doxrox-include matrix_nrow -->
+<!-- doxrox-include matrix_ncol -->
+</section>
+
+<section>
+<title>Matrix operations</title>
+<!-- doxrox-include matrix_add_rows -->
+<!-- doxrox-include matrix_add_cols -->
+<!-- doxrox-include matrix_resize -->
+<!-- doxrox-include matrix_remove_col -->
+</section>
+
+<section>
+<title>Functions for internal use only</title>
+<!-- doxrox-include matrix_permdelete_rows -->
+<!-- doxrox-include matrix_delete_rows_neg -->
+</section>
+
+</section>

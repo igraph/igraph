@@ -27,7 +27,7 @@
 double trunc(double);
 double round(double);
 
-/**
+/*
  * \ingroup internal
  * 
  * This function appends the rest of the needed random number to the 
@@ -67,25 +67,26 @@ int igraph_random_sample_alga(vector_t *res, integer_t l, integer_t h,
 
 /**
  * \ingroup nongraph
+ * \function igraph_random_sample
  * \brief Generates an increasing random sequence of integers.
  * 
  * This function generates an incresing sequence of random integer
  * numbers from a given interval. The algorithm is taken literally
  * from Jeffrey Scott Vitter: 'An Efficient Algorithm for Sequential
- * Random Sampling', <em>ACM Transactions on Mathematical Software</em>, 13/1,
+ * Random Sampling', ACM Transactions on Mathematical Software, 13/1,
  * 58--67. This method can be used for generating numbers from a
- * <em>very</em> large interval, it is primilarly created for randomly
+ * \em very large interval, it is primilarly created for randomly
  * selecting some edges from the sometimes huge set of possible edges
  * in a large graph.
- * @param res Pointer to an initialized vector, this will hold the
+ * \param res Pointer to an initialized vector, this will hold the
  *        result. It will be resized to the proper size.
- * @param l The lower limit of the generation interval (inclusive).
- * @param h The upper limit of the generation interval (inclusive).
- * @param length The number of random integers to generate.
- * @return Error code.
+ * \param l The lower limit of the generation interval (inclusive).
+ * \param h The upper limit of the generation interval (inclusive).
+ * \param length The number of random integers to generate.
+ * \return Error code.
  *
  * Time complexity: according to the referenced paper, the expected
- * running time is <code>O(length)</code>.
+ * running time is O(length).
  */
 
 int igraph_random_sample(vector_t *res, integer_t l, integer_t h, 

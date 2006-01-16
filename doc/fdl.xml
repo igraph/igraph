@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
 <chapter id="igraph-fdl">
   <chapterinfo>
-    <title>The GNU Free Documentation License</title>
     <edition>Version 1.2, November 2002</edition>
     <copyright><year>2000</year><year>2001</year><year>2002</year>      
     <holder>Free Software Foundation, Inc.
@@ -16,6 +15,8 @@
     </para>
     </legalnotice>
   </chapterinfo>
+
+<title>The GNU Free Documentation License</title>
 
 <section><title>0. PREAMBLE</title>
 <para>
@@ -204,14 +205,14 @@
           in the History section of the Document).  You may use the
           same title as a previous version if the original publisher of
           that version gives permission.
-     </para></listitem><listitem>
+     </para></listitem><listitem><para>
           List on the Title Page, as authors, one or more persons or
           entities responsible for authorship of the modifications in
           the Modified Version, together with at least five of the
           principal authors of the Document (all of its principal
           authors, if it has fewer than five), unless they release you
           from this requirement.
-     </listitem><listitem><para>
+     </para></listitem><listitem><para>
           State on the Title page the name of the publisher of the
           Modified Version, as the publisher.
      </para></listitem><listitem><para>

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<chapter id="igraph-Error">
+<title>Error Handling</title>
+
+<section>
+<!-- doxrox-include errorhandlers -->
+<!-- doxrox-include igraph_error_handler_t -->
+<!-- doxrox-include igraph_error_handler_abort -->
+<!-- doxrox-include igraph_error_handler_ignore -->
+<!-- doxrox-include igraph_error_handler_printignore -->
+</section>
+
+<section>
+<!-- doxrox-include errorcodes -->
+<!-- doxrox-include igraph_i_error_type_t -->
+<!-- doxrox-include igraph_strerror -->
+</section>
+
+<section>
+<!-- doxrox-include writing_error_handlers -->
+<!-- doxrox-include igraph_set_error_handler -->
+</section>
+
+<section>
+<!-- doxrox-include error_handling_internals -->
+<!-- doxrox-include IGRAPH_ERROR -->
+<!-- doxrox-include igraph_error -->
+<!-- doxrox-include IGRAPH_CHECK -->
+</section>
+
+<section>
+<!-- doxrox-include deallocating_memory -->
+<!-- doxrox-include IGRAPH_FINALLY -->
+<!-- doxrox-include IGRAPH_FINALLY_CLEAN -->
+<!-- doxrox-include IGRAPH_FINALLY_FREE -->
+</section>
+
+<section>
+<!-- doxrox-include writing_functions_error_handling -->
+</section>
+
+<section>
+<!-- doxrox-include error_handling_threads -->
+</section>
+
+</chapter>

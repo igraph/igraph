@@ -569,22 +569,68 @@ bool_t igraph_attribute_list_has(const igraph_attribute_list_t *al,
 /* ------------------------------------------------------------------------- */
 
 /**
+ * \section about_attributes
+ * 
+ * <para>Attributes are associated values of graph, vertices or edges. A
+ * graph attribute can contain the date of its creations, vertex
+ * attributes describe the color to be used for the vertices when the
+ * graph is plotted, edge attributes can simply be the weights of the
+ * edges in a weighted graph.</para>
+ * 
+ * <para>The name space for graph, vertex and edge attributes are different,
+ * thus the <quote>color</quote> vertex attribute has nothing to do with the
+ * <quote>color</quote> edge attribute.</para>
+ *
+ * <para>In order to use an attribute, first it has to be added by the
+ * \ref igraph_add_graph_attribute(), \ref igraph_add_vertex_attribute() or
+ * \ref igraph_add_edge_attribute() function. The value(s) of the added
+ * attribute is/are undefined.</para>
+ * 
+ * <para>The value of the attribute can be set after it was added, and also
+ * it can be requested, see the documentation of the specific
+ * functions.</para>
+ * 
+ * <para>The attribute can be removed if it is not needed any more.</para>
+ * 
+ * <para>The attributes are handled properly if vertices and/or edges are
+ * added or removed to or from a graph, the attributes are also copied
+ * if the graph is copied by \ref igraph_copy().</para>
+ * 
+ * <para>There are two types of attributes, numeric
+ * (<constant>IGRAPH_ATTRIBUTE_NUM</constant>) and  string
+ * (<constant>IGRAPH_ATTRIBUTE_STR</constant>). These types cannot be
+ * mixed for an 
+ * attribute, ie. if the <quote>id</quote> vertex attribute is a
+ * string attribute then it is a string attribute for all vertices.</para>
+ *
+ * <para>Attribute handling does not change the time complexity of any
+ * functions in the igraph library.</para>
+ */
+
+/**
  * \ingroup attributes
+ * \function igraph_add_graph_attribute
  * \brief Adds a graph attribute.
  *
  * Attributes have to be added by calling this function before setting
  * or getting them.
- * @param graph A graph object.
- * @param name The name of the attribute to install.
- * @param type Numeric constant giving the type of the attribute,
- *        either <b>IGRAPH_ATTRIBUTE_NUM</b> (numeric) or
- *        <b>IGRAPH_ATTRIBUTE_STR</b> (string).
- * @return Error code:
- *         - <B>IGRAPH_EINVAL</B>: invalid (empty) attribute name
- *         - <B>IGRAPH_EXISTS</B>: the attribute already exists
+ * \param graph A graph object.
+ * \param name The name of the attribute to install.
+ * \param type Numeric constant giving the type of the attribute,
+ *        either <constant>IGRAPH_ATTRIBUTE_NUM</constant> (numeric) or
+ *        <constant>IGRAPH_ATTRIBUTE_STR</constant> (string).
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_EINVAL
+ *           invalid (empty) attribute name
+ *        \cli IGRAPH_EXISTS
+ *           the attribute already exists
+ *        \endclist
  *
- * Time complexity: <code>O(1)</code>. (Assuming the number of graph
- * attributes of <code>graph</code> is <code>O(1)</code>.)
+ * Time complexity: O(1). (Assuming
+ * the number of graph attributes of
+ * graph is
+ * O(1).) 
  */
 
 int igraph_add_graph_attribute(igraph_t *graph, const char *name,
@@ -594,15 +640,18 @@ int igraph_add_graph_attribute(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_remove_graph_attribute
  * \brief Removes a graph attribute.
  *
- * @param graph A graph object.
- * @param name The name of the attribute to remove.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph A graph object.
+ * \param name The name of the attribute to remove.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code>. (Assuming the number of graph
- * attributes of <code>graph</code> is <code>O(1)</code>.)
+ * Time complexity: O(1). (Assuming
+ * the number of graph attributes of
+ * graph is
+ * O(1).) 
  */
 
 int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
@@ -611,21 +660,24 @@ int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
 
 /**
  * \ingroup attributes
+ * \function igraph_get_graph_attribute
  * \brief Queries the value of a graph attribute.
  *
- * @param graph A graph object.
- * @param name The name of the attribute to query.
- * @param value Pointer to a typeless pointer. The address of the
- *        result will be stored here, a <code>real_t</code> pointer
- *        for numeric attributes or a <code>const char</code> pointer
+ * \param graph A graph object.
+ * \param name The name of the attribute to query.
+ * \param value Pointer to a typeless pointer. The address of the
+ *        result will be stored here, a <type>real_t</type> pointer
+ *        for numeric attributes or a <type>const char</type> pointer
  *        to string attributes.
- * @param type Pointer to the attribute type, it will be stored here
- *        if not <code>NULL</code>.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param type Pointer to the attribute type, it will be stored here
+ *        if not <constant>NULL</constant>.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code>. (Assuming the number of graph
- * attributes of <code>graph</code> is <code>O(1)</code>.)
+ * Time complexity: O(1). (Assuming
+ * the number of graph attributes of
+ * graph is
+ * O(1).) 
  */
 
 int igraph_get_graph_attribute(const igraph_t *graph, const char *name,
@@ -635,17 +687,20 @@ int igraph_get_graph_attribute(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_set_graph_attribute
  * \brief Sets the value of a graph attribute.
  *
- * @param graph A graph object.
- * @param name The name of the attribute to set.
- * @param value Pointer to the new value of the attribute, either a
- *        <code>real_t</code> or a <code>const char</code> pointer.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph A graph object.
+ * \param name The name of the attribute to set.
+ * \param value Pointer to the new value of the attribute, either a
+ *        <type>real_t</type> or a <type>const char</type> pointer.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code>. (Assuming the number of graph
- * attributes of <code>graph</code> is <code>O(1)</code>.)
+ * Time complexity: O(1). (Assuming
+ * the number of graph attributes of
+ * graph is
+ * O(1).) 
  */
 
 int igraph_set_graph_attribute(igraph_t *graph, const char *name,
@@ -655,20 +710,23 @@ int igraph_set_graph_attribute(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_list_graph_attributes
  * \brief Queries the list of installed graph attributes.
  *
- * @param graph A graph object.
- * @param names This string vector will contain the names of the
+ * \param graph A graph object.
+ * \param names This string vector will contain the names of the
  *        attributes. It should be initialized and will be resized.
- *        This parameter can be <code>NULL</code>, which means that it
+ *        This parameter can be <constant>NULL</constant>, which means that it
  *        is ignored.
- * @param types Pointer to a vector, this will be set to the types of
- *        the attributes if the pointer is not <code>NULL</code>. The
+ * \param types Pointer to a vector, this will be set to the types of
+ *        the attributes if the pointer is not <constant>NULL</constant>. The
  *        vector will be resized if neccessary.
- * @return Error code.
+ * \return Error code.
  *
- * Time complexity: <code>O(1)</code>. (Assuming the number of graph
- * attributes of <code>graph</code> is <code>O(1)</code>.)
+ * Time complexity: O(1). (Assuming
+ * the number of graph attributes of
+ * graph is
+ * O(1).) 
  */
 
 int igraph_list_graph_attributes(const igraph_t *graph, 
@@ -679,19 +737,24 @@ int igraph_list_graph_attributes(const igraph_t *graph,
 
 /**
  * \ingroup attributes
+ * \function igraph_add_vertex_attribute
  * \brief Adds a vertex attribute.
  *
- * @param graph The graph object.
- * @param name The name of the attribute to install.
- * @param type Numeric constant giving the type of the attribute,
- *        either <b>IGRAPH_ATTRIBUTE_NUM</b> (numeric) or
- *        <b>IGRAPH_ATTRIBUTE_STR</b> (string).
- * @return Error code:
- *         - <B>IGRAPH_EINVAL</B>: invalid (empty) attribute name
- *         - <B>IGRAPH_EXISTS</B>: the attribute already exists
+ * \param graph The graph object.
+ * \param name The name of the attribute to install.
+ * \param type Numeric constant giving the type of the attribute,
+ *        either <constant>IGRAPH_ATTRIBUTE_NUM</constant> (numeric) or
+ *        <constant>IGRAPH_ATTRIBUTE_STR</constant> (string).
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_EINVAL 
+ *          invalid (empty) attribute name
+ *        \cli IGRAPH_EXISTS
+ *          the attribute already exists
+ *        \endclist
  *
- * Time complexity: <code>O(|V|)</code>, the number of vertices in the
- * graph.
+ * Time complexity: O(|V|), the
+ * number of vertices in the graph.
  */
 
 int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
@@ -701,15 +764,17 @@ int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_remove_vertex_attribute
  * \brief Removes a vertex attribute.
  *
- * @param graph A graph object.
- * @param name The name of the attribute to remove.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph A graph object.
+ * \param name The name of the attribute to remove.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(|V|)</code>, assuming that the graph has
- * <code>O(1)</code> vertex attributes. <code>|V|</code> is the number
+ * Time complexity: O(|V|), assuming
+ * that the graph has O(1) vertex
+ * attributes. |V| is the number 
  * of vertices.
  */
 
@@ -719,22 +784,24 @@ int igraph_remove_vertex_attribute(igraph_t *graph, const char *name) {
 
 /**
  * \ingroup attributes
+ * \function igraph_get_vertex_attribute
  * \brief Queries the value of a vertex attribute for a single vertex
  *
- * @param graph The graph object.
- * @param name The name of the vertex attribute.
- * @param v The id of the vertex of which the attribute is requested.
- * @param value Pointer to a typeless pointer. The address of the
- *        result will be stored here, a <code>real_t</code> pointer
- *        for numeric attributes or a <code>const char</code> pointer
+ * \param graph The graph object.
+ * \param name The name of the vertex attribute.
+ * \param v The id of the vertex of which the attribute is requested.
+ * \param value Pointer to a typeless pointer. The address of the
+ *        result will be stored here, a <type>real_t</type> pointer
+ *        for numeric attributes or a <type>const char</type> pointer
  *        to string attributes.
- * @param type If not <code>NULL</code> the type of the attribute will
+ * \param type If not <constant>NULL</constant> the type of the attribute will
  *        be stored here.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code>, assuming that the graph has
- * <code>O(1)</code> vertex attributes installed.
+ * Time complexity: O(1), assuming
+ * that the graph has  O(1) vertex
+ * attributes installed. 
  */
 
 int igraph_get_vertex_attribute(const igraph_t *graph, const char *name,
@@ -745,17 +812,19 @@ int igraph_get_vertex_attribute(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_set_vertex_attribute
  * \brief Set the value of a vertex attribute for a single vertex.
  *
- * @param graph The graph object.
- * @param name Name of the vertex attribute.
- * @param v The id of the vertex of which the attribute is set.
- * @param value The new value of the attribute.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph The graph object.
+ * \param name Name of the vertex attribute.
+ * \param v The id of the vertex of which the attribute is set.
+ * \param value The new value of the attribute.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code>, assuming that the graph has
- * <code>O(1)</code> vertex attributes installed.
+ * Time complexity: O(1), assuming
+ * that the graph has O(1) vertex
+ * attributes installed. 
  */
 
 int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
@@ -765,22 +834,23 @@ int igraph_set_vertex_attribute(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_get_vertex_attributes
  * \brief Query the value of a vertex attribute for many vertices.
  *
- * @param graph The graph object.
- * @param name The name of the attribute to get.
- * @param v Vector with the vertex ids of the vertices of which the
+ * \param graph The graph object.
+ * \param name The name of the attribute to get.
+ * \param v Vector with the vertex ids of the vertices of which the
  *        attribute will be returned.
- * @param value Pointer to a typeless pointer, which contains the
- *        address of either a <code>vector_t</code> or a
- *        <code>igraph_strvector_t</code> depending on the type of the
+ * \param value Pointer to a typeless pointer, which contains the
+ *        address of either a <type>vector_t</type> or a
+ *        <type>igraph_strvector_t</type> depending on the type of the
  *        attribute.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(|v|)</code>, the number of queried
- * vertices, assuming the graph has <code>O(1)</code> vertex
- * attributes.
+ * Time complexity: O(|v|), the
+ * number of queried vertices, assuming the graph has
+ * O(1) vertex attributes.
  */
 
 int igraph_get_vertex_attributes(const igraph_t *graph, const char *name,
@@ -800,27 +870,28 @@ int igraph_get_vertex_attributes(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_set_vertex_attributes
  * \brief Set the value of a vertex attribute for many vertices.
  *
- * @param graph The graph object.
- * @param name The name of the attribute to set.
- * @param v Vector with the vertex ids of the vertices of which the
+ * \param graph The graph object.
+ * \param name The name of the attribute to set.
+ * \param v Vector with the vertex ids of the vertices of which the
  *        attribute will be set.
- * @param value The new value(s) of the attribute. This may be of
- *        different length than <code>v</code>, if it is shorter it
+ * \param value The new value(s) of the attribute. This may be of
+ *        different length than <parameter>v</parameter>, if it is shorter it
  *        will be recycled (ie. after the last element the first one
  *        is used again), if it is longer the unneeded values are
  *        ignored. Thus it is easy to set an attribute to a single
  *        constant value for many vertices, just give a vector of
  *        length 1 here. This parameter is either a pointer to a
- *        <code>vector_t</code> or an <code>igraph_strvector_t</code>, 
+ *        <type>vector_t</type> or an <type>igraph_strvector_t</type>, 
  *        depending on the type of the attribute.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(|v|)</code>, the number of affected
- * vertices, assuming the graph has <code>O(1)</code> vertex
- * attributes.
+ * Time complexity: O(|v|), the
+ * number of affected vertices, assuming the graph has
+ * O(1) vertex attributes.
  */
 
 int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
@@ -840,19 +911,22 @@ int igraph_set_vertex_attributes(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_list_vertex_attributes
  * \brief Queries the list of installed vertex attributes.
  *
- * @param graph A graph object.
- * @param l This string array will contain the names of the
+ * \param graph A graph object.
+ * \param l This string array will contain the names of the
  *        attributes. It should be initialized and will be resized.
- *        If <code>NULL</code> then this parameter is ignored.
- * @param types Pointer to a vector, this will be set to the types of
- *        the attributes if the pointer is not <code>NULL</code>. The
+ *        If <constant>NULL</constant> then this parameter is ignored.
+ * \param types Pointer to a vector, this will be set to the types of
+ *        the attributes if the pointer is not <constant>NULL</constant>. The
  *        vector will be resized if neccessary.
- * @return Error code.
+ * \return Error code.
  *
- * Time complexity: <code>O(1)</code>. (Assuming the number of vertex
- * attributes of <code>graph</code> is <code>O(1)</code>.)
+ * Time complexity: O(1). (Assuming
+ * the number of vertex attributes of
+ * graph is
+ * O(1).) 
  */
 
 int igraph_list_vertex_attributes(const igraph_t *graph, igraph_strvector_t *l,
@@ -862,19 +936,24 @@ int igraph_list_vertex_attributes(const igraph_t *graph, igraph_strvector_t *l,
 
 /**
  * \ingroup attributes
+ * \function igraph_add_edge_attribute
  * \brief Adds an edge attribute.
  *
- * @param graph The graph object.
- * @param name The name of the attribute to install.
- * @param type Numeric constant giving the type of the attribute,
- *        either <b>IGRAPH_ATTRIBUTE_NUM</b> (numeric) or
- *        <b>IGRAPH_ATTRIBUTE_STR</b> (string).
- * @return Error code:
- *         - <B>IGRAPH_EINVAL</B>: invalid (empty) attribute name
- *         - <B>IGRAPH_EXISTS</B>: the attribute already exists
+ * \param graph The graph object.
+ * \param name The name of the attribute to install.
+ * \param type Numeric constant giving the type of the attribute,
+ *        either <constant>IGRAPH_ATTRIBUTE_NUM</constant> (numeric) or
+ *        <constant>IGRAPH_ATTRIBUTE_STR</constant> (string).
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_EINVAL
+ *          invalid (empty) attribute name
+ *        \cli IGRAPH_EXISTS 
+ *          the attribute already exists
+ *        \endclist
  *
- * Time complexity: <code>O(|E|)</code>, the number of edges in the
- * graph.
+ * Time complexity: O(|E|), the
+ * number of edges in the graph.
  */
 
 int igraph_add_edge_attribute(igraph_t *graph, const char *name,
@@ -884,15 +963,17 @@ int igraph_add_edge_attribute(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_remove_edge_attribute
  * \brief Removes an edge attribute.
  *
- * @param graph A graph object.
- * @param name The name of the attribute to remove.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph A graph object.
+ * \param name The name of the attribute to remove.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(|E|)</code>, assuming that the graph has
- * <code>O(1)</code> edge attributes. <code>|E|</code> is the number
+ * Time complexity: O(|E|), assuming
+ * that the graph has O(1) edge
+ * attributes. |E| is the number 
  * of edges.
  */
 
@@ -902,23 +983,25 @@ int igraph_remove_edge_attribute(igraph_t *graph, const char *name) {
 
 /**
  * \ingroup attributes
+ * \function igraph_get_edge_attribute
  * \brief Queries the value of an edge attribute for a single edge
  *
  * It is easy to get the id of an edge by using an edge iterator.
- * @param graph The graph object.
- * @param name The name of the edge attribute.
- * @param e The id of the edge of which the attribute is requested.
- * @param value Pointer to a typeless pointer. The address of the
- *        result will be placed here, a <code>real_t</code> pointer
- *        for numeric attributes and a <code>const char</code> pointer
+ * \param graph The graph object.
+ * \param name The name of the edge attribute.
+ * \param e The id of the edge of which the attribute is requested.
+ * \param value Pointer to a typeless pointer. The address of the
+ *        result will be placed here, a <type>real_t</type> pointer
+ *        for numeric attributes and a <type>const char</type> pointer
  *        for string attributes. 
- * @param type If not <code>NULL</code> then the type of the attribute
+ * \param type If not <constant>NULL</constant> then the type of the attribute
  *        will be stored here.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code>, assuming that the graph has
- * <code>O(1)</code> edge attributes installed.
+ * Time complexity: O(1), assuming
+ * that the graph has  O(1) edge
+ * attributes installed. 
  */
 
 int igraph_get_edge_attribute(const igraph_t *graph, const char *name,
@@ -929,18 +1012,20 @@ int igraph_get_edge_attribute(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_set_edge_attribute
  * \brief Set the value of an edge attribute for a single edge.
  *
- * @param graph The graph object.
- * @param name Name of the edge attribute.
- * @param e The id of the edge of which the attribute is set.
- * @param value The new value of the attribute. Pointer to a
- *        <code>real_t</code> or a <code>const char</code>.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph The graph object.
+ * \param name Name of the edge attribute.
+ * \param e The id of the edge of which the attribute is set.
+ * \param value The new value of the attribute. Pointer to a
+ *        <type>real_t</type> or a <type>const char</type>.
+ * \return Error code:
+ *        <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code>, assuming that the graph has
- * <code>O(1)</code> edge attributes installed.
+ * Time complexity: O(1), assuming
+ * that the graph has O(1) edge
+ * attributes installed. 
  */
 
 int igraph_set_edge_attribute(igraph_t *graph, const char *name,
@@ -950,22 +1035,23 @@ int igraph_set_edge_attribute(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_get_edge_attributes
  * \brief Query the value of an edge attribute for many edges.
  *
- * @param graph The graph object.
- * @param name The name of the attribute to get.
- * @param e Vector with the edge ids of the edges of which the
+ * \param graph The graph object.
+ * \param name The name of the attribute to get.
+ * \param e Vector with the edge ids of the edges of which the
  *        attribute will be returned.
- * @param value Pointer to a typeless pointer, which contains the
- *        address of either a <code>vector_t</code> or a
- *        <code>igraph_strvector_t</code> depending on the type of the
+ * \param value Pointer to a typeless pointer, which contains the
+ *        address of either a <type>vector_t</type> or a
+ *        <type>igraph_strvector_t</type> depending on the type of the
  *        attribute.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(|e|)</code>, the number of queried
- * edges, assuming the graph has <code>O(1)</code> edge
- * attributes.
+ * Time complexity: O(|e|), the
+ * number of queried edges, assuming the graph has
+ * O(1) edge attributes.
  */
 
 int igraph_get_edge_attributes(const igraph_t *graph, const char *name,
@@ -975,27 +1061,28 @@ int igraph_get_edge_attributes(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_set_edge_attributes
  * \brief Set the value of an edge attribute for many edges.
  *
- * @param graph The graph object.
- * @param name The name of the attribute to set.
- * @param e Vector with the edge ids of the edges of which the
+ * \param graph The graph object.
+ * \param name The name of the attribute to set.
+ * \param e Vector with the edge ids of the edges of which the
  *        attribute will be set.
- * @param value The new value(s) of the attribute. This may be of
- *        different length than <code>v</code>, if it is shorter it
+ * \param value The new value(s) of the attribute. This may be of
+ *        different length than <parameter>v</parameter>, if it is shorter it
  *        will be recycled (ie. after the last element the first one
  *        is used again), if it is longer the unneeded values are
  *        ignored. Thus it is easy to set an attribute to a single
  *        constant value for many vertices, just give a vector of
  *        length 1 here. This parameter is either a pointer to a
- *        <code>vector_t</code> or an <code>igraph_strvector_t</code>, 
+ *        <type>vector_t</type> or an <type>igraph_strvector_t</type>, 
  *        depending on the type of the attribute.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \return Error code:
+ *        <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(|v|)</code>, the number of affected
- * edges, assuming the graph has <code>O(1)</code> edge
- * attributes.
+ * Time complexity: O(|v|), the
+ * number of affected edges, assuming the graph has
+ * O(1) edge attributes.
  */
 
 int igraph_set_edge_attributes(igraph_t *graph, const char *name,
@@ -1005,19 +1092,22 @@ int igraph_set_edge_attributes(igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_list_edge_attributes
  * \brief Queries the list of installed edge attributes.
  *
- * @param graph A graph object.
- * @param l This string array will contain the names of the
- *        attributes (if not <code>NULL</code>). It should be
+ * \param graph A graph object.
+ * \param l This string array will contain the names of the
+ *        attributes (if not <constant>NULL</constant>). It should be
  *        initialized and will be resized.
- * @param types Pointer to a vector, this will be set to the types of
- *        the attributes if the pointer is not <code>NULL</code>. The
+ * \param types Pointer to a vector, this will be set to the types of
+ *        the attributes if the pointer is not <constant>NULL</constant>. The
  *        vector will be resized if neccessary.
- * @return Error code.
+ * \return Error code.
  *
- * Time complexity: <code>O(1)</code>. (Assuming the number of edge
- * attributes of <code>graph</code> is <code>O(1)</code>.)
+ * Time complexity: O(1). (Assuming
+ * the number of edge attributes of
+ * graph is
+ * O(1).) 
  */
 
 int igraph_list_edge_attributes(const igraph_t *graph, igraph_strvector_t *l,
@@ -1027,16 +1117,17 @@ int igraph_list_edge_attributes(const igraph_t *graph, igraph_strvector_t *l,
 
 /**
  * \ingroup attributes
+ * \function igraph_get_graph_attribute_type
  * \brief Queries the type of a graph attribute.
  * 
- * @param graph The graph object.
- * @param name The name of the attribute.
- * @param type Pointer to the attribute type.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph The graph object.
+ * \param name The name of the attribute.
+ * \param type Pointer to the attribute type.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code> assuming there are
- * <code>O(1)</code> graph attributes.
+ * Time complexity: O(1) assuming there are
+ * O(1) graph attributes.
  */
 
 int igraph_get_graph_attribute_type(const igraph_t *graph, const char *name,
@@ -1046,16 +1137,17 @@ int igraph_get_graph_attribute_type(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_get_vertex_attribute_type
  * \brief Queries the type of a vertex attribute.
  * 
- * @param graph The graph object.
- * @param name The name of the attribute.
- * @param type Pointer to the attribute type.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph The graph object.
+ * \param name The name of the attribute.
+ * \param type Pointer to the attribute type.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code> assuming there are
- * <code>O(1)</code> vertex attributes.
+ * Time complexity: O(1) assuming there are
+ * O(1) vertex attributes.
  */
 
 int igraph_get_vertex_attribute_type(const igraph_t *graph, const char *name,
@@ -1065,16 +1157,17 @@ int igraph_get_vertex_attribute_type(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_get_edge_attribute_type
  * \brief Queries the type of an edge attribute.
  * 
- * @param graph The graph object.
- * @param name The name of the attribute.
- * @param type Pointer to the attribute type.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: the attribute does not exist.
+ * \param graph The graph object.
+ * \param name The name of the attribute.
+ * \param type Pointer to the attribute type.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: the attribute does not exist.
  *
- * Time complexity: <code>O(1)</code> assuming there are
- * <code>O(1)</code> edge attributes.
+ * Time complexity: O(1) assuming there are
+ * O(1) edge attributes.
  */
 
 int igraph_get_edge_attribute_type(const igraph_t *graph, const char *name,
@@ -1084,15 +1177,16 @@ int igraph_get_edge_attribute_type(const igraph_t *graph, const char *name,
 
 /**
  * \ingroup attributes
+ * \function igraph_has_graph_attribute
  * \brief Checks whether a graph has the named graph attribute.
  * 
- * @param graph The graph object.
- * @param name The name of the (potential) attribute.
- * @return Non-zero (TRUE) value if the attribute is installed, zero
+ * \param graph The graph object.
+ * \param name The name of the (potential) attribute.
+ * \return Non-zero (TRUE) value if the attribute is installed, zero
  *         (FALSE) otherwise.
  * 
- * Time complexity: <code>O(1)</code> assuming there are
- * <code>O(1)</code> edge attributes.
+ * Time complexity: O(1) assuming there are
+ * O(1) edge attributes.
  */
 
 bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name) {
@@ -1101,15 +1195,16 @@ bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name) {
 
 /**
  * \ingroup attributes
+ * \function igraph_has_vertex_attribute
  * \brief Checks whether a graph has the named vertex attribute.
  * 
- * @param graph The graph object.
- * @param name The name of the (potential) attribute.
- * @return Non-zero (TRUE) value if the attribute is installed, zero
+ * \param graph The graph object.
+ * \param name The name of the (potential) attribute.
+ * \return Non-zero (TRUE) value if the attribute is installed, zero
  *         (FALSE) otherwise.
  * 
- * Time complexity: <code>O(1)</code> assuming there are
- * <code>O(1)</code> edge attributes.
+ * Time complexity: O(1) assuming there are
+ * O(1) edge attributes.
  */
 
 bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name) {
@@ -1118,15 +1213,16 @@ bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name) {
 
 /**
  * \ingroup attributes
+ * \function igraph_has_edge_attribute
  * \brief Checks whether a graph has the named edge attribute.
  * 
- * @param graph The graph object.
- * @param name The name of the (potential) attribute.
- * @return Non-zero (TRUE) value if the attribute is installed, zero
+ * \param graph The graph object.
+ * \param name The name of the (potential) attribute.
+ * \return Non-zero (TRUE) value if the attribute is installed, zero
  *         (FALSE) otherwise.
  * 
- * Time complexity: <code>O(1)</code> assuming there are
- * <code>O(1)</code> edge attributes.
+ * Time complexity: O(1) assuming there are
+ * O(1) edge attributes.
  */
 
 bool_t igraph_has_edge_attribute(const igraph_t *graph, const char *name) {

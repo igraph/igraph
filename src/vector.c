@@ -32,28 +32,83 @@
 
 /**
  * \ingroup vector
- * \brief Initializes a vector object (constructor).
+ * \section about_vector_t_objects About <type>vector_t</type> objects
  * 
- * Every vector needs to be initialized before it can be used, and
- * there are a number initialization functions, the others are
- * vector_init_copy(), vector_init_seq() and vector_copy().
+ * <para>The <type>vector_t</type> data type is a simple and efficient
+ * interface to arrays containing real numbers. It is something
+ * similar as (but much simpler than) the <type>vector</type> template
+ * in the C++ standard library.</para>
+ *
+ * <para>Vectors are used extensively in <command>igraph</command>, all
+ * functions which expects or returns a list of numbers use
+ * vector_t to achive this.</para>
+ *
+ * <para>The <type>vector_t</type> type ususally uses
+ * O(n) space
+ * to store n elements. Sometimes it
+ * uses more, this is because vectors can shrink, but even if they
+ * shrink, the current implementation does not free a single bit of
+ * memory.</para>
  * 
- * Every vector object initialized by this function should be
- * destroyed (ie. the memory allocated for it should be freed) when it
- * is not needed any more, the vector_destroy() function is
- * responsible for this.
- * @param v Pointer to a not yet initialized vector object.
- * @param size The size of the vector.
- * @return error code:
- *         - <b>IGRAPH_ENOMEM</b> if there is not enough memory.
- * 
- * Time complexity: operating system dependent.
+ * <para>The position of the elements in a <type>vector_t</type>
+ * object is numbered from zero, as this is the usual C
+ * standard.</para> 
  */
 
 /**
- * vector_init:
- * @v: Pointer to an uninitialized vector object.
- * @size: The size of the vector.
+ * \ingroup vector
+ * \section vector_constructors_and_destructors Constructors and
+ * Destructors
+ * 
+ * <para><type>vector_t</type> objects have to be initialized before using
+ * them, this is analogous to calling a constructor on them. There are a
+ * number of <type>vector_t</type> constructors, for your
+ * convenience. \ref vector_init() is the basic constructor, it
+ * creates a vector of the given length, filled with zeros.
+ * \ref vector_init_real(), \ref vector_init_real_end(), \ref
+ * vector_init_int() and \ref vector_init_int_end() are convenience
+ * constructors, these create a vector with the elements given as
+ * their parameters. \ref vector_copy() creates a new identical copy
+ * of an already existing and initialized vector. \ref
+ * vector_init_copy() creates a vector by copying a regular C array. 
+ * \ref vector_init_seq() creates a vector containing a regular
+ * sequence with increment one.</para>
+ * 
+ * <para>\ref vector_view() is a special constructor, it allows you to
+ * handle a regular C array as a <type>vector</type> without copying
+ * its elements.
+ * </para> 
+ *
+ * <para>If a <type>vector_t</type> object is not needed any more, it
+ * should be destroyed to free its allocated memory by calling the
+ * <type>vector_t</type> destructor, \ref vector_destroy().</para>
+ * 
+ * <para> Note that vectors created by \ref vector_view() are special,
+ * you mustn't call \ref vector_destroy() on these.</para>
+ */
+
+/**
+ * \ingroup vector
+ * \function vector_init
+ * \brief Initializes a vector object (constructor).
+ * 
+ * Every vector needs to be initialized before it can be used, and
+ * there are a number initialization functions or otherwise called
+ * constructors. 
+ * 
+ * Every vector object initialized by this function should be
+ * destroyed (ie. the memory allocated for it should be freed) when it
+ * is not needed any more, the \ref vector_destroy() function is
+ * responsible for this.
+ * \param v Pointer to a not yet initialized vector object.
+ * \param size The size of the vector.
+ * \return error code:
+ *       <constant>IGRAPH_ENOMEM</constant> if there is not enough memory.
+ * 
+ * Time complexity: operating system dependent, the amount of 
+ * <quote>time</quote> required to allocate
+ * O(n) elements,
+ * n is the number of elements. 
  */
 
 int vector_init      (vector_t* v, int long size) {	
@@ -70,6 +125,21 @@ int vector_init      (vector_t* v, int long size) {
 }
 
 /**
+ * \ingroup vector
+ * \function vector_view
+ * \brief Handle a regular C array as a <type>vector_t</type>.
+ * 
+ * This is a special <type>vector_t</type> constructor. It allows to
+ * handle a regular C array as a <type>vector_t</type> temporarily.
+ * Be sure that you \em don't ever call the destructor (\ref
+ * vector_destroy()) on objects created by this constructor.
+ * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param data Pointer, the C array.
+ * \param length The length of the C array.
+ * \return Pointer to the vector object, the same as the 
+ *     <parameter>v</parameter> parameter, for convenience.
+ * 
+ * Time complexity: O(1)
  */ 
 
 const vector_t *vector_view (const vector_t *v, const real_t *data, 
@@ -80,6 +150,39 @@ const vector_t *vector_view (const vector_t *v, const real_t *data,
   v2->end=v2->stor_end;
   return v;
 }
+
+/**
+ * \ingroup vector
+ * \function vector_init_real
+ * \brief Create a <type>vector_t</type> from the parameters.
+ * 
+ * Because of how C and the C library handles variable length argument
+ * lists, it is required that you supply real constants to this
+ * function. This means that
+ * <informalexample><programlisting>
+ * vector_t v;
+ * vector_init_real(&amp;v, 5, 1,2,3,4,5);
+ * </programlisting></informalexample>
+ * is an error at running time and the results are undefined. This is
+ * the proper way:
+ * <informalexample><programlisting>
+ * vector_t v;
+ * vector_init_real(&amp;v, 5, 1.0,2.0,3.0,4.0,5.0);
+ * </programlisting></informalexample>
+ * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param no Positive integer, the number of <type>real_t</type>
+ *    parameters to follow.
+ * \param ... The elements of the vector.
+ * \return Error code, this can be <constant>IGRAPH_ENOMEM</constant>
+ *     if there isn't enough memory to allocate the vector.
+ *
+ * \sa \ref vector_init_real_end(), \ref vector_init_int() for similar
+ * functions.
+ *
+ * Time complexity: depends on the time required to allocate memory,
+ * but at least O(n), the number of
+ * elements in the vector.
+ */
 
 int vector_init_real(vector_t *v, int no, ...) {
   int i=0;
@@ -94,6 +197,30 @@ int vector_init_real(vector_t *v, int no, ...) {
   
   return 0;
 }
+
+/**
+ * \ingroup vector
+ * \function vector_init_real_end
+ * \brief Create a <type>vector_t</type> from the parameters.
+ * 
+ * This constructor is similar to \ref vector_init_real(), the only
+ * difference is that instead of giving the number of elements in the
+ * vector, a special marker element follows the last real vector
+ * element.
+ * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param endmark This element will signal the end of the vector. It
+ *    will \em not be part of the vector.
+ * \param ... The elements of the vector.
+ * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ *    isn't enough memory.
+ * 
+ * \sa \ref vector_init_real() and \ref vector_init_int_end() for
+ * similar functions.
+ * 
+ * Time complexity: at least O(n) for 
+ * n elements plus the time
+ * complexity of the memory allocation.
+ */
 
 int vector_init_real_end(vector_t *v, real_t endmark, ...) {
   int i=0, n=0;
@@ -121,6 +248,28 @@ int vector_init_real_end(vector_t *v, real_t endmark, ...) {
   return 0;
 }
 
+/**
+ * \ingroup vector
+ * \function vector_init_int
+ * \brief Create a <type>vector_t</type> containing the parameters.
+ * 
+ * This function is similar to \ref vector_init_real(), but it expects 
+ * <type>int</type> parameters. It is important that all parameters
+ * should be of this type, otherwise the result of the function call
+ * is undefined.
+ * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param no The number of <type>int</type> parameters to follow.
+ * \param ... The elements of the vector.
+ * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ *    not enough memory.
+ * \sa \ref vector_init_real() and vector_init_int_end(), these are
+ *    similar functions.
+ *
+ * Time complexity: at least O(n) for 
+ * n elements plus the time
+ * complexity of the memory allocation.
+ */
+
 int vector_init_int(vector_t *v, int no, ...) {
   int i=0;
   va_list ap;
@@ -134,6 +283,30 @@ int vector_init_int(vector_t *v, int no, ...) {
   
   return 0;
 }
+
+/**
+ * \ingroup vector
+ * \function vector_init_int_end
+ * \brief Create a <type>vector_t</type> from the parameters.
+ * 
+ * This constructor is similar to \ref vector_init_int(), the only
+ * difference is that instead of giving the number of elements in the
+ * vector, a special marker element follows the last real vector
+ * element.
+ * \param v Pointer to an uninitialized <type>vector_t</type> object.
+ * \param endmark This element will signal the end of the vector. It
+ *    will \em not be part of the vector.
+ * \param ... The elements of the vector.
+ * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ *    isn't enough memory.
+ * 
+ * \sa \ref vector_init_int() and \ref vector_init_real_end() for
+ * similar functions.
+ *
+ * Time complexity: at least O(n) for 
+ * n elements plus the time
+ * complexity of the memory allocation.
+ */
 
 int vector_init_int_end(vector_t *v, int endmark, ...) {
   int i=0, n=0;
@@ -163,15 +336,16 @@ int vector_init_int_end(vector_t *v, int endmark, ...) {
 
 /**
  * \ingroup vector
- * \brief Destroys a vector object
+ * \function vector_destroy
+ * \brief Destroys a vector object.
  *
- * All vectors initialized by vector_init() should be properly
+ * All vectors initialized by \ref vector_init() should be properly
  * destroyed by this function. A destroyed vector needs to be
- * reinitialized by vector_init(), vector_init_copy() or
- * vector_as_vector() before using it again.
- * @param v Pointer to the (previously initialized) vector object to
+ * reinitialized by \ref vector_init(), \ref vector_init_copy() or
+ * another constructor.
+ * \param v Pointer to the (previously initialized) vector object to
  *        destroy. 
- * 
+ *
  * Time complexity: operating system dependent.
  */
 
@@ -185,26 +359,28 @@ void vector_destroy   (vector_t* v) {
 
 /**
  * \ingroup vector
- * \brief Reserves memory for a vector
+ * \function vector_reserve
+ * \brief Reserves memory for a vector.
  * 
- * \a igraph vectors are flexible, they can grow and shrink. Growing
+ * <command>igraph</command> vectors are flexible, they can grow and
+ * shrink. Growing 
  * however occasionally needs the data in the vector to be copyed.
  * In order to avoid you can call this function to reserve space for
  * future growth of the vector. 
  * 
- * Note that this function does <em>not</em> change the size of the
+ * Note that this function does <emphasis>not</emphasis> change the size of the
  * vector, let us see a small example to clarify things: if you
  * reserve space for 100 elements and the size of your
  * vector was (and still is) 60, then you can surely add additional 40
  * elements to your vector before it will be copied.
- * @param v The vector object.
- * @param size The new <em>allocated</em> size of the vector.
- * @return Error code:
- *         - <b>IGRPAH_ENOMEM</b> if there is not enough memory.
+ * \param v The vector object.
+ * \param size The new <emphasis>allocated</emphasis> size of the vector.
+ * \return Error code:
+ *         <constant>IGRPAH_ENOMEM</constant> if there is not enough memory.
  *
  * Time complexity: operating system dependent, should be around
- * <code>O(n)</code>, <code>n</code> is the new allocated size of the
- * vector.
+ * O(n), n 
+ * is the new allocated size of the vector.
  */
 
 int vector_reserve   (vector_t* v, long int size) {
@@ -227,13 +403,14 @@ int vector_reserve   (vector_t* v, long int size) {
 
 /**
  * \ingroup vector
+ * \function vector_empty
  * \brief Decides whether the size of the vector is zero.
  *
- * @param v The vector object.
- * @return Non-zero number if the size of the vector is not zero and
+ * \param v The vector object.
+ * \return Non-zero number if the size of the vector is not zero and
  *         zero otherwise.
  * 
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 
 bool_t vector_empty     (const vector_t* v) {
@@ -244,12 +421,13 @@ bool_t vector_empty     (const vector_t* v) {
 
 /**
  * \ingroup vector
+ * \function vector_size
  * \brief Gives the size (=length) of the vector.
  * 
- * @param v The vector object
- * @return The size of the vector.
+ * \param v The vector object
+ * \return The size of the vector.
  *
- * Time complexity: <code>O(1)</code>. 
+ * Time complexity: O(1). 
  */
 
 long int vector_size      (const vector_t* v) {
@@ -260,14 +438,15 @@ long int vector_size      (const vector_t* v) {
 
 /**
  * \ingroup vector
+ * \function vector_clear
  * \brief Removes all elements from a vector.
  * 
  * This function simply sets the size of the vector to zero, it does
  * not free any allocated memory. For that you have to call
  * vector_destroy().
- * @param v The vector object.
+ * \param v The vector object.
  * 
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 
 void vector_clear     (vector_t* v) {
@@ -278,24 +457,26 @@ void vector_clear     (vector_t* v) {
 
 /**
  * \ingroup vector
+ * \function vector_push_back
  * \brief Appends one element to a vector.
  * 
  * This function resizes the vector to be one element longer and
- * sets the very last element in the vector to <code>e</code>.
- * @param v The vector object.
- * @param e The element to append to the vector.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
+ * sets the very last element in the vector to <parameter>e</parameter>.
+ * \param v The vector object.
+ * \param e The element to append to the vector.
+ * \return Error code:
+ *         <constant>IGRAPH_ENOMEM</constant>: not enough memory.
  * 
  * Time complexity: operating system dependent. What is important that
- * it can be assumed that <code>n</code> subsequent calls to this
- * function has time complexity <code>O(n)</code>, even if there
+ * a sequence of n
+ * subsequent calls to this function has time complexity
+ * O(n), even if there 
  * hadn't been any space reserved for the new elements by
- * vector_reserve(). This is 
- * implemented by a trick similar to the C++ <code>vector</code>
- * class: each time more memory is allocated for a vector, the size of
- * the additionally allocated memory is the same as the vector's
- * current length.
+ * \ref vector_reserve(). This is implemented by a trick similar to the C++
+ * <type>vector</type> class: each time more memory is allocated for a
+ * vector, the size of the additionally allocated memory is the same
+ * as the vector's current length. (We assume here that the time
+ * complexity of memory allocation is at most linear.)
  */
 
 int vector_push_back (vector_t* v, real_t e) {
@@ -317,7 +498,32 @@ int vector_push_back (vector_t* v, real_t e) {
 
 /**
  * \ingroup vector
+ * \section vector_accessing_elements Accessing elements of a
+ * <type>vector_t</type>.
+ * 
+ * <para>The simplest way to access an element of a vector is to use the
+ * \ref VECTOR macro. This macro can be used both for query and set
+ * <type>vector_t</type> elements. If you need a function, \ref
+ * vector_e() queries and \ref vector_set() sets an element of a
+ * vector. \ref vector_e_ptr() returns the address of an element.</para>
+ * 
+ * <para>\ref vector_tail() returns the last element of a non-empty
+ * vector. There is no <function>vector_tail()</function> function
+ * however, as it is easy to write <literal>VECTOR(v)[0]</literal>
+ * instead.</para>
+ */
+
+/**
+ * \ingroup vector
+ * \function vector_e
  * \brief Access an element of a vector.
+ * \param v The <type>vector_t</type> object.
+ * \param pos The position of the element, the position of the first
+ *    element is zero.
+ * \return The desired element.
+ * \sa \ref vector_e_ptr() and the \ref VECTOR macro.
+ * 
+ * Time complexity: O(1).
  */
 
 real_t vector_e         (const vector_t* v, long int pos) {
@@ -328,7 +534,15 @@ real_t vector_e         (const vector_t* v, long int pos) {
 
 /**
  * \ingroup vector
+ * \function vector_e_ptr
  * \brief Get the address of an element of a vector
+ * \param v The <type>vector_t</type> object.
+ * \param pos The position of the element, the position of the first
+ *   element is zero.
+ * \return Pointer to the desired element.
+ * \sa \ref vector_e() and the \ref VECTOR macro.
+ * 
+ * Time complexity: O(1).
  */
 
 real_t*vector_e_ptr  (const vector_t* v, long int pos) {
@@ -339,7 +553,12 @@ real_t*vector_e_ptr  (const vector_t* v, long int pos) {
 
 /**
  * \ingroup vector
+ * \function vector_set
  * \brief Assignment to an element of a vector.
+ * \param v The <type>vector_t</type> element.
+ * \param pos Position of the element to set.
+ * \param value New value of the element.
+ * \sa \ref vector_e().
  */
 
 void vector_set       (vector_t* v, long int pos, real_t value) {
@@ -350,11 +569,16 @@ void vector_set       (vector_t* v, long int pos, real_t value) {
 
 /**
  * \ingroup vector
+ * \function vector_null
  * \brief Sets each element in the vector to zero.
  * 
- * @param v The vector object.
+ * Note that \ref vector_init() sets the elements to zero as well, so
+ * it maked no sense to call this function on a just initialized
+ * vector. 
+ * \param v The vector object.
  *
- * Time complexity: <code>O(n)</code>, the size of the vector.
+ * Time complexity: O(n), the size of
+ * the vector. 
  */
 
 void vector_null      (vector_t* v) {
@@ -367,13 +591,15 @@ void vector_null      (vector_t* v) {
 
 /**
  * \ingroup vector
+ * \function vector_tail
  * \brief Returns the last element in a vector.
  *
- * It is an error to call this function on an empty vector.
- * @param v The vector object.
- * @return The last element.
+ * It is an error to call this function on an empty vector, the result
+ * is undefined.
+ * \param v The vector object.
+ * \return The last element.
  * 
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 
 real_t vector_tail(const vector_t *v) {
@@ -384,7 +610,14 @@ real_t vector_tail(const vector_t *v) {
 
 /**
  * \ingroup vector
+ * \function vector_pop_back
  * \brief Removes and returns the last element of a vector.
+ *
+ * It is an error to call this function with an empty vector.
+ * \param v The vector object.
+ * \return The removed last element.
+ * 
+ * Time complexity: O(1).
  */
 
 real_t vector_pop_back(vector_t* v) {
@@ -399,9 +632,20 @@ real_t vector_pop_back(vector_t* v) {
 
 /**
  * \ingroup vector
+ * \function vector_order
+ * \brief Calculate the order of the elements in a vector.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * The smallest element will have order zero, the second smallest
+ * order one, etc. 
+ * \param v The original <type>vector_t</type> object.
+ * \param res An initialized <type>vector_t</type> object, it will be
+ *    resized to match the size of <parameter>v</parameter>. The
+ *    result of the computation will be stored here.
+ * \param nodes Hint, the largest element in <parameter>v</parameter>.
+ * \return Error code:
+ *         <constant>IGRAPH_ENOMEM</constant>: out of memory
+ * 
+ * Time complexity: O()
  */
 
 int vector_order(const vector_t* v, vector_t* res, integer_t nodes) {
@@ -446,6 +690,7 @@ int vector_order(const vector_t* v, vector_t* res, integer_t nodes) {
 
 /**
  * \ingroup vector
+ * \function vector_sort_cmp
  * \brief Internal comparision function of vector elements, used by 
  * vector_sort().
  */
@@ -459,12 +704,15 @@ int vector_sort_cmp(const void *a, const void *b) {
 
 /**
  * \ingroup vector
+ * \function vector_sort
  * \brief Sorts the elements of the vector into ascending order.
  * 
  * This function uses the built-in sort function of the C library.
- * @param v Pointer to an initialized vector object.
+ * \param v Pointer to an initialized vector object.
  *
- * Time complexity: should be <code>O(nlogn)</code> for <code>n</code>
+ * Time complexity: should be
+ * O(nlogn) for
+ * n 
  * elements.
  */
 
@@ -476,22 +724,28 @@ void vector_sort(vector_t *v) {
 
 /**
  * \ingroup vector
+ * \function vector_resize
  * \brief Resize the vector.
  *
  * Note that this function does not free any memory, just sets the
  * size of the vector to the given one. It can on the other hand 
  * allocate more memory if the new size is larger than the previous
  * one. In this case the newly appeared elements in the vectors are
- * <em>not</em> set to zero, they are uninitialized.
- * @param v The vector object
- * @param newsize The new size of the vector.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
+ * \em set to zero, they are uninitialized.
+ * \param v The vector object
+ * \param newsize The new size of the vector.
+ * \return Error code, 
+ *         <constant>IGRAPH_ENOMEM</constant> if there is not enough
+ *         memory. Note that this function \em never returns an error
+ *         if the vector is made smaller.
+ * \sa \ref vector_reserve() for allocating memory for future
+ * extensions of a vector.
  * 
- * Time complexity: <code>O(1)</code> if the new size is smaller,
- * operating system dependent if it is larger. In the latter case it
- * is usually around <code>O(n)</code>, <code>n</code> is the new size
- * of the vector.
+ * Time complexity: O(1) if the new
+ * size is smaller, operating system dependent if it is larger. In the
+ * latter case it is usually around
+ * O(n),
+ * n is the new size of the vector. 
  */
 
 int vector_resize(vector_t* v, long int newsize) {
@@ -504,15 +758,16 @@ int vector_resize(vector_t* v, long int newsize) {
 
 /**
  * \ingroup vector
+ * \function vector_max
  * \brief Gives the maximum element of the vector.
  *
  * If the size of the vector is zero, an arbitrary number is
  * returned.
- * @param v The vector object.
- * @return The maximum element.
+ * \param v The vector object.
+ * \return The maximum element.
  *
- * Time complexity: <code>O(n)</code>, <code>n</code> is the size of
- * the vector. 
+ * Time complexity: O(n),
+ * n is the size of the vector. 
  */
 
 real_t vector_max(const vector_t* v) {
@@ -533,16 +788,52 @@ real_t vector_max(const vector_t* v) {
 
 /**
  * \ingroup vector
+ * \function vector_which_max
+ * \brief Gives the position of the maximum element of the vector.
+ *
+ * If the size of the vector is zero, -1 is 
+ * returned.
+ * \param v The vector object.
+ * \return The position of the first maximum element.
+ *
+ * Time complexity: O(n),
+ * n is the size of the vector. 
+ */
+
+long int vector_which_max(const vector_t* v) {
+  long int which=-1;
+  if (!vector_empty(v)) {
+    real_t max;
+    real_t *ptr;
+    long int pos;
+    assert(v != NULL);
+    assert(v->stor_begin != NULL);
+    max=*(v->stor_begin); which=0;
+    ptr=v->stor_begin+1; pos=1;
+    while (ptr < v->end) {
+      if ((*ptr) > max) {
+	max=*ptr;
+	which=pos;
+      }
+      ptr++; pos++;
+    }
+  }
+  return which;
+}
+
+/**
+ * \ingroup vector
+ * \function vector_init_copy
  * \brief Initializes a vector from an ordinary C array (constructor).
  * 
- * @param v Pointer to an uninitialized vector object.
- * @param data A regular C array.
- * @param length The length of the C array.
- * @return Error code: 
- *         - <b>IGRAPH_ENOMEM</b> if there is not enough memory.
+ * \param v Pointer to an uninitialized vector object.
+ * \param data A regular C array.
+ * \param length The length of the C array.
+ * \return Error code: 
+ *         <constant>IGRAPH_ENOMEM</constant> if there is not enough memory.
  * 
  * Time complexity: operating system specific, usually
- * <code>O(length)</code>.
+ * O(length).
  */
 
 int vector_init_copy(vector_t *v, real_t *data, long int length) {
@@ -559,14 +850,15 @@ int vector_init_copy(vector_t *v, real_t *data, long int length) {
 
 /**
  * \ingroup vector
+ * \function vector_copy_to
  * \brief Copies the contents of a vector to a C array.
  * 
  * The C array should have sufficient length.
- * @param v The vector object.
- * @param to The C array.
+ * \param v The vector object.
+ * \param to The C array.
  * 
- * Time complexity: <code>O(n)</code>, <code>n</code> is the size of
- * the vector.
+ * Time complexity: O(n),
+ * n is the size of the vector.
  */
 
 void vector_copy_to(const vector_t *v, real_t* to) {
@@ -579,17 +871,19 @@ void vector_copy_to(const vector_t *v, real_t* to) {
 
 /**
  * \ingroup vector
+ * \function vector_copy
  * \brief Initializes a vector from another vector object (constructor).
  * 
  * The contents of the existing vector object will be copied to
  * the new one.
- * @param to Pointer to a not yet initialized vector object.
- * @param from The original vector object to copy.
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b> if there is not enough memory.
+ * \param to Pointer to a not yet initialized vector object.
+ * \param from The original vector object to copy.
+ * \return Error code:
+ *         <constant>IGRAPH_ENOMEM</constant> if there is not enough memory.
  * 
  * Time complexity: operating system dependent, usually
- * <code>O(n)</code>, <code>n</code> is the size of the vector.
+ * O(n),
+ * n is the size of the vector. 
  */
 
 int vector_copy(vector_t *to, const vector_t *from) {
@@ -608,14 +902,16 @@ int vector_copy(vector_t *to, const vector_t *from) {
 
 /**
  * \ingroup vector
+ * \function vector_sum
  * \brief Calculates the sum of the elements in the vector.
  *
  * For the empty vector 0.0 is returned.
- * @param v The vector object.
- * @return The sum of the elements.
+ * \param v The vector object.
+ * \return The sum of the elements.
  * 
  * 
- * Time complexity: <code>O(n)</code>, the size of the vector.
+ * Time complexity: O(n), the size of
+ * the vector. 
  */
 
 real_t vector_sum(const vector_t *v) {
@@ -631,13 +927,15 @@ real_t vector_sum(const vector_t *v) {
 
 /**
  * \ingroup vector
+ * \function vector_prod
  * \brief Calculates the product of the elements in the vector.
  * 
  * For the empty vector one (1) is returned.
- * @param v The vector object.
- * @return The product of the elements.
+ * \param v The vector object.
+ * \return The product of the elements.
  * 
- * Time complexity: <code>O(n)</code>, the size of the vector.
+ * Time complexity: O(n), the size of
+ * the vector. 
  */
 
 real_t vector_prod(const vector_t *v) {
@@ -653,18 +951,19 @@ real_t vector_prod(const vector_t *v) {
 
 /**
  * \ingroup vector
+ * \function vector_init_seq
  * \brief Initializes a vector with a sequence.
  * 
- * The vector will contain the numbers <code>from</code>,
- * <code>from+1</code>, ..., <code>to</code>.
- * @param v Pointer to an uninitialized vector object.
- * @param from The lower limit in the sequence (inclusive).
- * @param to The upper limit in the sequence (inclusive).
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory.
+ * The vector will contain the numbers <parameter>from</parameter>,
+ * <parameter>from</parameter>+1, ..., <parameter>to</parameter>.
+ * \param v Pointer to an uninitialized vector object.
+ * \param from The lower limit in the sequence (inclusive).
+ * \param to The upper limit in the sequence (inclusive).
+ * \return Error code:
+ *         <constant>IGRAPH_ENOMEM</constant>: out of memory.
  *
- * Time complexity: <code>O(n)</code>, the number of elements in the
- * vector. 
+ * Time complexity: O(n), the number
+ * of elements in the vector. 
  */
 
 int vector_init_seq(vector_t *v, real_t from, real_t to) {
@@ -680,7 +979,18 @@ int vector_init_seq(vector_t *v, real_t from, real_t to) {
 
 /**
  * \ingroup vector
+ * \function vector_remove_section
  * \brief Deletes a section from a vector.
+ * 
+ * Note that this function does not do range checking. The result is
+ * undefined if you supply invalid limits.
+ * \param v The vector object.
+ * \param from The position of the first element to remove.
+ * \param to The position of the first element \em not to remove.
+ *
+ * Time complexity: O(n-from),
+ * n is the number of elements in the
+ * vector. 
  */
 
 void vector_remove_section(vector_t *v, long int from, long int to) {
@@ -693,7 +1003,16 @@ void vector_remove_section(vector_t *v, long int from, long int to) {
 
 /**
  * \ingroup vector
+ * \function vector_remove
  * \brief Removes a single element from a vector.
+ *
+ * Note that this function does not do range checking.
+ * \param v The vector object.
+ * \param elem The position of the element to remove.
+ * 
+ * Time complexity: O(n-elem),
+ * n is the number of elements in the
+ * vector. 
  */
 
 void vector_remove(vector_t *v, long int elem) {
@@ -704,7 +1023,19 @@ void vector_remove(vector_t *v, long int elem) {
 
 /**
  * \ingroup vector
+ * \function vector_move_interval
  * \brief Copies a section of a vector.
+ *
+ * The result of this function is undefined if the source and target
+ * intervals overlap.
+ * \param v The vector object.
+ * \param begin The position of the first element to move.
+ * \param end The position of the first element \em not to move.
+ * \param to The target position.
+ * \return Error code, the current implementation always returns with
+ *    success. 
+ *
+ * Time complexity: O(end-begin).
  */
 
 int vector_move_interval(vector_t *v, long int begin, long int end, 
@@ -719,6 +1050,7 @@ int vector_move_interval(vector_t *v, long int begin, long int end,
 
 /**
  * \ingroup vector
+ * \function vector_permdelete
  * \brief Remove elements of a vector (for internal use).
  */
 
@@ -736,6 +1068,7 @@ void vector_permdelete(vector_t *v, long int *index, long int nremove) {
 
 /**
  * \ingroup vector
+ * \function vector_remove_negidx
  * \brief Remove elements of a vector (for internal use).
  */
 
@@ -751,7 +1084,18 @@ void vector_remove_negidx(vector_t *v, const vector_t *neg, long int nremove) {
 
 /**
  * \ingroup vector
- * \brief Checks if all elements of a vector are in the given interval.
+ * \function vector_isininterval
+ * \brief Checks if all elements of a vector are in the given
+ * interval.
+ * 
+ * \param v The vector object.
+ * \param low The lower limit of the interval (inclusive).
+ * \param high The higher limit of the interval (inclusive).
+ * \return True (positive integer) if all vector elements are in the
+ *   interval, false (zero) otherwise.
+ *
+ * Time complexity: O(n), the number
+ * of elements in the vector.
  */
 
 bool_t vector_isininterval(const vector_t *v, real_t low, real_t high) {
@@ -768,7 +1112,17 @@ bool_t vector_isininterval(const vector_t *v, real_t low, real_t high) {
 
 /**
  * \ingroup vector
- * \brief Checks if all elements of a vector are smaller than a limit.
+ * \function vector_any_smaller
+ * \brief Checks if any element of a vector is smaller than a limit.
+ * 
+ * \param v The <type>vector_t</type> object.
+ * \param limit The limit.
+ * \return True (positive integer) if the vector contains at least one
+ *   smaller element than <parameter>limit</parameter>, false (zero)
+ *   otherwise. 
+ * 
+ * Time complexity: O(n), the number
+ * of elements in the vector.
  */
 
 bool_t vector_any_smaller(const vector_t *v, real_t limit) {
@@ -785,8 +1139,17 @@ bool_t vector_any_smaller(const vector_t *v, real_t limit) {
 
 /**
  * \ingroup vector
+ * \function vector_is_equal
  * \brief Decides whether two vectors contain exactly the same elements
  * (in the same order).
+ * 
+ * \param lhs The first vector.
+ * \param rhs The second vector.
+ * \return Positive integer if the two vectors are equal element by
+ * element or zero if they are not.
+ * 
+ * Time complexity: O(n), the length
+ * of the vectors.
  */
 
 bool_t vector_is_equal(const vector_t *lhs, const vector_t *rhs) {
@@ -811,7 +1174,27 @@ bool_t vector_is_equal(const vector_t *lhs, const vector_t *rhs) {
 
 /**
  * \ingroup vector
+ * \function vector_binsearch
  * \brief Finds an element by binary searching a sorted vector
+ * 
+ * Binary search to find an element in a vector. It is assumed that
+ * the vector is sorted. If the specified element
+ * (<parameter>what</parameter>) is not in the vector, then the
+ * position of where it should be inserted is returned.
+ * \param v The <type>vector_t</type> object.
+ * \param what The element to search for.
+ * \param pos Pointer to a <type>long int</type>. This is set to the
+ *   position of an instance of <parameter>what</parameter> in the
+ *   vector if it is present. If <parameter>v</parameter> does not
+ *   contain <parameter>what</parameter> then
+ *   <parameter>pos</parameter> is set to the position to which it
+ *   should be inserted (to keep the the vector sorted of course).
+ * \return Positive integer (true) if <parameter>what</parameter> is
+ *   found in the vector, zero (false) otherwise.
+ * 
+ * Time complexity: O(log(n)),
+ * n is the number of elements in
+ * <parameter>v</parameter>.
  */
 
 bool_t vector_binsearch(const vector_t *v, real_t what, long int *pos) {

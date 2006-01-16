@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
 <chapter id="igraph-gpl">
   <chapterinfo>
-    <title>GNU GENERAL PUBLIC LICENSE</title>
     <edition>Version 2, June 1991</edition>
     <copyright><year>1989</year><year>1991</year>
     <holder> Free Software Foundation, Inc.
@@ -16,6 +15,7 @@
     </para></legalnotice>
   </chapterinfo>
 
+<title>GNU GENERAL PUBLIC LICENSE</title>
 <section><title>Preamble</title>
 
 <para>

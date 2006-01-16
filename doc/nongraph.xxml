@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<chapter id="igraph-Nongraph">
+<title>Not Graph Related Functions </title>
+
+<section><title></title>
+<!-- doxrox-include igraph_running_mean -->
+<!-- doxrox-include igraph_random_sample -->
+</section>
+
+</chapter>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY igraph "<literal>igraph</literal>">
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
 <!ENTITY tut_simple SYSTEM "../examples/doc/tut_simple.c">
 ]>
 
@@ -37,11 +37,11 @@ using the &igraph; library should include the
 file. Secondly, &igraph; uses the <type>real_t</type> type for real number
 instead of using <type>double</type>. Third, &igraph; graph objects are
 represented by the 
-<type><link linkend="igraph-t">igraph_t</link></type> data
+<type>igraph_t</type> data
 type. Fourth, graphs are created by some functions,
-<function><link linkend="igraph-erdos-renyi-game">igraph_erdos_renyi_game()</link></function>
+<link linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
 in this example, and they are destroyed by 
-<function><link linkend="igraph-destroy">igraph_destroy()</link></function>
+<link linkend="igraph_destroy"><function>igraph_destroy()</function></link>
 if they are not needed any more. 
 </para>
 
@@ -62,7 +62,7 @@ following <option>-L</option> should contain the
 library file itself, usually a file called
 <filename>libigraph.so</filename>, <filename>libigraph.a</filename> or
 <filename>igraph.dll</filename>. 
-It your system has the <command>pkg-config</command>. utility you are
+It your system has the <command>pkg-config</command> utility you are
 likely to get the neccessary compile options by issuing
 <programlisting>
 pkg-config --libs --cflags igraph
@@ -92,14 +92,14 @@ Here we assumed that the &igraph; library is installed in
 <para>
 The functions generating graph objects are called graph
 generators. Stochastic (=randomized) graph generators are called
-``games''.
+<quote>games</quote>.
 </para>
 
 <para>
 &igraph; can handle directed and undirected graphs. Most graph
 generators are able to create both types of graphs and most other
 functions are usually also capable of handling
-both. Eg. <function><link linkend="igraph-shortest-path">igraph_shortest_path()</link></function>
+both. Eg. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
 which (surprisingly) calculates
 shortest paths from a vertex to another vertices can calculate
 directed or undirected paths
@@ -108,10 +108,10 @@ directed or undirected paths
 <para>
 &igraph; has sophisticated ways for creating graphs. The simplest
 graphs are deterministic regular structures like star graphs
-(<function><link linkend="igraph-star">igraph_star()</link></function>), 
-ring graphs (<function><link linkend="igraph-ring">igraph_ring()</link></function>), lattices  
-(<function><link linkend="igraph-lattice">igraph_lattice()</link></function>) or trees
-(<function><link linkend="igraph-tree">igraph_tree()</link></function>).  
+(<link linkend="igraph_star"><function>igraph_star()</function></link>), 
+ring graphs (<link linkend="igraph_ring"><function>igraph_ring()</function></link>), lattices  
+(<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>) or trees
+(<link linkend="igraph_tree"><function>igraph_tree()</function></link>).  
 </para>
 
 <para>
@@ -122,7 +122,6 @@ after adding the random edges. (The message is that some random edges
 can reduce path lengths a lot.)
 <programlisting>
 <![CDATA[#include <igraph.h>
-#include <igraph.h>
 
 int main(void) {
   real_t avg_path;
@@ -160,26 +159,26 @@ int main(void) {
 
 <para>
 This example illustrates some new points. &igraph; uses 
-<type><link linkend="vector-t">vector_t</link></type>
+<link linkend="vector_t"><type>vector_t</type></link>
 instead of plain C arrays. <type>vector_t</type> is superior to
 regular array in almost every sense. Vectors are created by the
-<function><link linkend="vector-init">vector_init()</link></function>
+<link linkend="vector_init"><function>vector_init()</function></link>
 function and like graphs they should be destroyed if not 
 needed any more by calling 
-<function><link linkend="vector-destroy">vector_destroy()</link></function>
+<link linkend="vector_destroy"><function>vector_destroy()</function></link>
 on them. A vector can be indexed by the 
-<function><link linkend="vector">VECTOR()</link></function> function
+<link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). Vectors 
 can be resized, eg. most &igraph; functions returning the result in a
 vector resize it to the size of the result.
 </para>
 
 <para>
-<function><link linkend="igraph-lattice">igraph_lattice()</link></function>
+<link linkend="igraph_lattice"><function>igraph_lattice()</function></link>
 takes a vector argument specifying the dimensions of 
 the lattice, in this example we generate a 30x30 two dimensional
 lattice. See the documentation of
-<function><link linkend="igraph-lattice">igraph_lattice()</link></function> in
+<link linkend="igraph_lattice"><function>igraph_lattice()</function></link> in
 the reference manual for the other arguments.
 </para>
 
@@ -187,13 +186,13 @@ the reference manual for the other arguments.
 The vertices in a graph are identified by an integer number between
 0 and N-1, N is the number of vertices in the graph (this can be
 obtained by 
-<function><link linkend="igraph-vcount">igraph_vcount()</link></function>, 
+<link linkend="igraph_vcount"><function>igraph_vcount()</function></link>, 
 as in the example). 
 </para>
 
 <para>
-The <function><link
-linkend="igraph-add-edges">igraph_add_edges()</link></function>
+The <link
+linkend="igraph_add_edges"><function>igraph_add_edges()</function></link>
 function simply takes a graph and a vector of 
 vertex ids defining the new edges. The first edge is between the first
 two vertex ids in the vector, the second edge is between the second
@@ -204,13 +203,13 @@ two, etc. This way we add ten random edges to the lattice.
 Note that in the example it is possible to add loop edges, edges
 pointing to the same vertex and multiple edges, more than one edge
 between the same pair of vertices. 
-<type><link linkend="igraph-t">igraph_t</link></type> can of course
+<type>igraph_t</type> can of course
 represent loop 
 multiple edges, although some routines expect simple graphs,
 ie. graphs without loop and multiple edges, because for example some
 structural properties are ill-defined for non-simple graphs. Loop
 edges can be removed by calling 
-<function><link linkend="igraph-simplify">igraph_simplify()</link></function>.
+<link linkend="igraph_simplify"><function>igraph_simplify()</function></link>.
 </para>
 
 </section>
@@ -223,7 +222,6 @@ this.) Centrality measures quantify how central is the position of
 individual vertices in the graph.
 <programlisting>
 <![CDATA[#include <igraph.h>
-#include <igraph.h>
 
 int main(void) {
   igraph_t graph;
@@ -241,20 +239,22 @@ int main(void) {
                     28,31,28,33,29,32,29,33,30,32,30,33,31,32,31,33,
                     32,33 };
   
-  v=vector_as_vector(edges, sizeof(edges)/sizeof(double));
+  vector_view(&v, edges, sizeof(edges)/sizeof(double));
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
   
   vector_init(&result, 0);
 
-  igraph_degree(&graph, &result, IGRAPH_VS_ALL, IGRAPH_ALL, IGRAPH_LOOPS);
+  igraph_degree(&graph, &result, IGRAPH_VS_ALL(&graph), IGRAPH_ALL, 
+		IGRAPH_LOOPS);
   printf("Maximum degree is      %10i, vertex %2i.\n", 
 	 (int)vector_max(&result), (int)vector_which_max(&result));
   
-  igraph_closeness(&graph, &result, IGRAPH_VS_ALL, IGRAPH_ALL);
+  igraph_closeness(&graph, &result, IGRAPH_VS_ALL(&graph), IGRAPH_ALL);
   printf("Maximum closeness is   %10f, vertex %2i.\n", 
 	 (double)vector_max(&result), (int)vector_which_max(&result));
   
-  igraph_betweenness(&graph, &result, IGRAPH_VS_ALL, IGRAPH_UNDIRECTED);
+  igraph_betweenness(&graph, &result, IGRAPH_VS_ALL(&graph), 
+		     IGRAPH_UNDIRECTED);
   printf("Maximum betweenness is %10f, vertex %2i.\n", 
 	 (double)vector_max(&result), (int)vector_which_max(&result));  
   
@@ -269,11 +269,11 @@ int main(void) {
 <para>
 This example reflects some new features. First of all, it shows a
 way to define a graph simply as defining a C array with its edges.
-Function <function><link
-linkend="vector-as-vector">vector_as_vector()</link></function>
+Function <link
+linkend="vector_view"><function>vector_view()</function></link>
 creates a <emphasis>view</emphasis> of a C 
 array. It does not copy any data, this also means that you should not
-call <function><link linkend="vector-destroy">vector_destroy()</link></function>
+call <link linkend="vector_destroy"><function>vector_destroy()</function></link>
 on a vector created this way. This vector is then used to create the
 undirected graph.
 </para>

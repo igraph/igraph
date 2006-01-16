@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<chapter id="igraph-Attributes">
+<title>Graph, Vertex and Edge Attributes</title>
+
+<!-- doxrox-include about_attributes -->
+
+<section><title>Graph attributes</title>
+<!-- doxrox-include igraph_add_graph_attribute -->
+<!-- doxrox-include igraph_remove_graph_attribute -->
+<!-- doxrox-include igraph_has_graph_attribute -->
+<!-- doxrox-include igraph_get_graph_attribute_type -->
+<!-- doxrox-include igraph_get_graph_attribute -->
+<!-- doxrox-include igraph_set_graph_attribute -->
+<!-- doxrox-include igraph_list_graph_attributes -->
+</section>
+
+<section><title>Vertex attributes</title>
+<!-- doxrox-include igraph_add_vertex_attribute -->
+<!-- doxrox-include igraph_remove_vertex_attribute -->
+<!-- doxrox-include igraph_has_vertex_attribute -->
+<!-- doxrox-include igraph_get_vertex_attribute_type -->
+<!-- doxrox-include igraph_get_vertex_attribute -->
+<!-- doxrox-include igraph_get_vertex_attributes -->
+<!-- doxrox-include igraph_set_vertex_attribute -->
+<!-- doxrox-include igraph_set_vertex_attributes -->
+<!-- doxrox-include igraph_list_vertex_attributes -->
+</section>
+
+<section><title>Edge attributes</title>
+<!-- doxrox-include igraph_add_edge_attribute -->
+<!-- doxrox-include igraph_remove_edge_attribute -->
+<!-- doxrox-include igraph_has_edge_attribute -->
+<!-- doxrox-include igraph_get_edge_attribute_type -->
+<!-- doxrox-include igraph_get_edge_attribute -->
+<!-- doxrox-include igraph_get_edge_attributes -->
+<!-- doxrox-include igraph_set_edge_attribute -->
+<!-- doxrox-include igraph_set_edge_attributes -->
+<!-- doxrox-include igraph_list_edge_attributes -->
+</section>
+
+</chapter>

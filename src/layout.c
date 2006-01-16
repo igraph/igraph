@@ -25,15 +25,30 @@
 #include <math.h>
 
 /**
+ * \section about_layouts
+ * 
+ * <para>Layout generator functions (or at least most of them) try place the
+ * vertices and edges of a graph on a 2D plane or in 3D space in a way
+ * which visually pleases the human eye.</para>
+ *
+ * <para>They take a graph object and a number of parameters as arguments
+ * and return a <type>matrix_t</type>, in which each row gives the
+ * coordinates of a vertex.</para>
+ */
+
+/**
  * \ingroup layout
+ * \function igraph_layout_random
  * \brief Places the vertices uniform randomly on a plane.
  * 
- * @param graph Pointer to an initialized graph object.
- * @param res Pointer to an initialized graph object. This will
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized graph object. This will
  *        contain the result and will be resized in needed.
- * @return Error code.
+ * \return Error code. The current implementation always returns with
+ * success. 
  * 
- * Time complexity: <code>O(|V|)</code>, the number of vertices.
+ * Time complexity: O(|V|), the
+ * number of vertices. 
  */
 
 int igraph_layout_random(const igraph_t *graph, matrix_t *res) {
@@ -57,15 +72,17 @@ int igraph_layout_random(const igraph_t *graph, matrix_t *res) {
 
 /**
  * \ingroup layout
+ * \function igraph_layout_circle
  * \brief Places the vertices uniformly on a circle, in the order of
  * vertex ids.
  * 
- * @param graph Pointer to an initialized graph object.
- * @param res Pointer to an initialized graph object. This will
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized graph object. This will
  *        contain the result and will be resized in needed.
- * @return Error code.
+ * \return Error code.
  * 
- * Time complexity: <code>O(|V|)</code>, the number of vertices.
+ * Time complexity: O(|V|), the
+ * number of vertices. 
  */
 
 int igraph_layout_circle(const igraph_t *graph, matrix_t *res) {
@@ -86,32 +103,34 @@ int igraph_layout_circle(const igraph_t *graph, matrix_t *res) {
 
 /**
  * \ingroup layout
+ * \function igraph_layout_fruchterman_reingold
  * \brief Places the vertices on a plane according to the
  * Fruchterman-Reingold algorithm.
  *
  * This is a force-directed layout, see Fruchterman, T.M.J. and
  * Reingold, E.M.: Graph Drawing by Force-directed Placement.
- * <em>Software -- Practice and Experience</em>, 21/11, 1129--1164,
+ * Software -- Practice and Experience, 21/11, 1129--1164,
  * 1991. 
  * This function was ported from the SNA R package.
- * @param graph Pointer to an initialized graph object.
- * @param res Pointer to an initialized matrix object. This will
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized in needed.
- * @param niter The number of iterations to do.
- * @param maxdelta The maximum distance to move a vertex in an
+ * \param niter The number of iterations to do.
+ * \param maxdelta The maximum distance to move a vertex in an
  *        iteration.
- * @param area The area parameter of the algorithm.
- * @param coolexp The cooling exponent of the simulated annealing.
- * @param repulserad Determines the radius at which
+ * \param area The area parameter of the algorithm.
+ * \param coolexp The cooling exponent of the simulated annealing.
+ * \param repulserad Determines the radius at which
  *        vertex-vertex repulsion cancels out attraction of
  *        adjacent vertices.
- * @param use_seed Logical, if true the supplied values in the
- *        <code>res</code> argument are used as an initial layout, if
+ * \param use_seed Logical, if true the supplied values in the
+ *        <parameter>res</parameter> argument are used as an initial layout, if
  *        false a random initial layout is used.
- * @return Error code.
+ * \return Error code.
  * 
- * Time complexity: <code>O(|V|^2)</code> in each iteration,
- * <code>|V|</code> is the number of vertices in the graph.
+ * Time complexity: O(|V|^2) in each
+ * iteration, |V| is the number of
+ * vertices in the graph. 
  */
 
 int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
@@ -197,26 +216,28 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
 
 /**
  * \ingroup layout
+ * \function igraph_layout_kamada_kawai
  * \brief Places the vertices on a plane according the Kamada-Kawai
  * algorithm. 
  *
  * This is a force directed layout, see  Kamada, T. and Kawai, S.: An
- * Algorithm for Drawing General Undirected Graphs. <em>Information
- * Processing Letters</em>, 31/1, 7--15, 1989.
+ * Algorithm for Drawing General Undirected Graphs. Information
+ * Processing Letters, 31/1, 7--15, 1989.
  * This function was ported from the SNA R package.
- * @param graph A graph object.
- * @param res Pointer to an initialized matrix object. This will
+ * \param graph A graph object.
+ * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized if needed.
- * @param niter The number of iterations to perform.
- * @param sigma Sets the base standard deviation of position
+ * \param niter The number of iterations to perform.
+ * \param sigma Sets the base standard deviation of position
  *        change proposals. 
- * @param initemp Sets the initial temperature for the annealing.
- * @param coolexp The cooling exponent of the annealing.
- * @param kkconst The Kamada-Kawai vertex attraction constant.
- * @return Error code.
+ * \param initemp Sets the initial temperature for the annealing.
+ * \param coolexp The cooling exponent of the annealing.
+ * \param kkconst The Kamada-Kawai vertex attraction constant.
+ * \return Error code.
  * 
- * Time complexity: <code>O(|V|^2)</code> for each iteration,
- * <code>|V|</code> is the number of vertices in the graph.
+ * Time complexity: O(|V|^2) for each
+ * iteration, |V| is the number of
+ * vertices in the graph. 
  */
 
 int igraph_layout_kamada_kawai(const igraph_t *graph, matrix_t *res,

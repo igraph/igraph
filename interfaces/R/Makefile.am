@@ -38,3 +38,5 @@ igraph_0.1.tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
 	cp $(RTOPHEADERS) igraph/src
 	cp $(RSRCSOURCES) igraph/src
 	R CMD build igraph
+
+CLEANFILES = igraph/src/*

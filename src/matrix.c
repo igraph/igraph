@@ -30,21 +30,29 @@
 #include <stdlib.h>
 
 /**
+ * \section matrix_constructor_and_destructor Matrix constructors and
+ * destructors
+ */
+
+/**
  * \ingroup matrix
+ * \function matrix_init
  * \brief Initializes a matrix.
  * 
  * Every matrix needs to be initialized before using it, this is done
  * by calling this function. A matrix has to be destroyed if it is not
- * needed any more, see matrix_destroy().
- * @param m Pointer to a not yet initialized matrix object to be
+ * needed any more, see \ref matrix_destroy().
+ * \param m Pointer to a not yet initialized matrix object to be
  *        initialized. 
- * @param nrow The number of rows in the matrix.
- * @param ncol The number of columns in the matrix.
- * @return Error code.
+ * \param nrow The number of rows in the matrix.
+ * \param ncol The number of columns in the matrix.
+ * \return Error code.
  *
- * Time complexity: ususally <code>O(n)</code>, <code>n</code> is the
+ * Time complexity: ususally O(n), 
+ * n is the
  * number of elements in the matrix.
  */
+
 int matrix_init(matrix_t *m, long int nrow, long int ncol) {
   int ret1;
   ret1=vector_init(&m->data, nrow*ncol);
@@ -55,14 +63,14 @@ int matrix_init(matrix_t *m, long int nrow, long int ncol) {
 
 /** 
  * \ingroup matrix
+ * \function matrix_destroy
  * \brief Destroys a matrix object.
  * 
  * This function frees all the memory allocated for a matrix
  * object. The destroyed object needs to be reinitialized before using
  * it again.
- * @param m The matrix to destroy.
- * @return Error code.
- *
+ * \param m The matrix to destroy.
+ * 
  * Time complexity: operating system dependent.
  */ 
 
@@ -71,20 +79,27 @@ void matrix_destroy(matrix_t *m) {
 }
 
 /**
+ * \section matrix_accessing_elements Accessing elements of a matrix
+ */
+
+/**
  * \ingroup matrix
+ * \function matrix_resize
  * \brief Resizes a matrix.
  *
  * This function resizes a matrix by adding more elements to it.
  * The matrix contains arbitrary data after resizing it.
  * Ie. after calling this function you cannot expect that element
- * <code>(i,j)</code> in the matrix remains the same as before. 
- * @param m Pointer to an already initialized matrix object.
- * @param nrow The number of rows in the resized matrix.
- * @param ncol The number of columns in the resized matrix.
- * @return Error code.
+ * (i,j) in the matrix remains the
+ * same as before.  
+ * \param m Pointer to an already initialized matrix object.
+ * \param nrow The number of rows in the resized matrix.
+ * \param ncol The number of columns in the resized matrix.
+ * \return Error code.
  * 
- * Time complexity: <code>O(1)</code> if the matrix gets smaller,
- * usually <code>O(n)</code> if it gets larger, <code>n</code> is the
+ * Time complexity: O(1) if the
+ * matrix gets smaller, usually O(n)
+ * if it gets larger, n is the 
  * number of elements in the resized matrix.
  */
 
@@ -97,12 +112,13 @@ int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
 
 /**
  * \ingroup matrix
+ * \function matrix_size
  * \brief The number of elements in a matrix.
  * 
- * @param m Pointer to an initialized matrix object.
- * @return The size of the matrix.
+ * \param m Pointer to an initialized matrix object.
+ * \return The size of the matrix.
  *
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 
 long int matrix_size(const matrix_t *m) {
@@ -111,12 +127,13 @@ long int matrix_size(const matrix_t *m) {
 
 /**
  * \ingroup matrix
+ * \function matrix_nrow
  * \brief The number of rows in a matrix.
  * 
- * @param m Pointer to an initialized matrix object.
- * @return The number of rows in the matrix.
+ * \param m Pointer to an initialized matrix object.
+ * \return The number of rows in the matrix.
  * 
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 
 long int matrix_nrow(const matrix_t *m) {
@@ -125,12 +142,13 @@ long int matrix_nrow(const matrix_t *m) {
 
 /**
  * \ingroup matrix
+ * \function matrix_ncol
  * \brief The number of columns in a matrix.
  * 
- * @param m Pointer to an initialized matrix object.
- * @return The number of columns in the matrix.
+ * \param m Pointer to an initialized matrix object.
+ * \return The number of columns in the matrix.
  * 
- * Time complexity: <code>O(1)</code>.
+ * Time complexity: O(1).
  */
 
 long int matrix_ncol(const matrix_t *m) {
@@ -145,11 +163,12 @@ long int matrix_ncol(const matrix_t *m) {
  * programs and languages use.
  * The C array should be of sufficient size, there are (of course) not
  * range checks done.
- * @param m Pointer to an initialized matrix object.
- * @param to Pointer to a C array, the place to copy the data to.
- * @return Error code.
+ * \param m Pointer to an initialized matrix object.
+ * \param to Pointer to a C array, the place to copy the data to.
+ * \return Error code.
  *
- * Time complexity: <code>O(n)</code>, <code>n</code> is the number of 
+ * Time complexity: O(n),
+ * n is the number of 
  * elements in the matrix.
  */
 
@@ -162,11 +181,12 @@ int matrix_copy_to(const matrix_t *m, real_t *to) {
  * \ingroup matrix
  * \brief Sets all element in a matrix to zero.
  * 
- * @param m Pointer to an initialized matrix object.
- * @return Error code.
+ * \param m Pointer to an initialized matrix object.
+ * \return Error code, always returns with success.
  * 
- * Time complexity: <code>O(n)</code>, <code>n</code> is the number of 
- * elements in the matrix.
+ * Time complexity: O(n),
+ * n is the number of  elements in
+ * the matrix. 
  */
 
 int matrix_null(matrix_t *m) {
@@ -176,7 +196,15 @@ int matrix_null(matrix_t *m) {
 
 /**
  * \ingroup matrix
+ * \function matrix_add_cols
  * \brief Adds columns to a matrix.
+ * \param m The matrix object.
+ * \param n The number of columns to add.
+ * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there is
+ *   not enough memory to perform the operation.
+ *
+ * Time complexity: linear with the number of elements of the new,
+ * resized, matrix.
  */
 
 int matrix_add_cols(matrix_t *m, long int n) {
@@ -186,7 +214,15 @@ int matrix_add_cols(matrix_t *m, long int n) {
 
 /**
  * \ingroup matrix
+ * \function matrix_add_rows
  * \brief Adds rows to a matrix.
+ * \param m The matrix object.
+ * \param n The number of rows to add.
+ * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ *   isn't enough memory for the operation.
+ * 
+ * Time complexity: linear with the number of elements of the new,
+ * resized, matrix.
  */
 
 int matrix_add_rows(matrix_t *m, long int n) {
@@ -202,7 +238,15 @@ int matrix_add_rows(matrix_t *m, long int n) {
 
 /**
  * \ingroup matrix
+ * \function matrix_remove_col
  * \brief Removes a column from a matrix.
+ * 
+ * \param m The matrix object.
+ * \param col The column to remove.
+ * \return Error code, always returns with success. 
+ * 
+ * Time complexity: linear with the number of elements of the new,
+ * resized matrix.
  */
 
 int matrix_remove_col(matrix_t *m, long int col) {
@@ -213,7 +257,11 @@ int matrix_remove_col(matrix_t *m, long int col) {
 
 /**
  * \ingroup matrix
+ * \function matrix_permdelete_rows
  * \brief Removes columns from a matrix (for internal use).
+ * 
+ * Time complexity: linear with the number of elements of the original
+ * matrix. 
  */
 
 int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove) {
@@ -232,7 +280,11 @@ int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove) {
 
 /**
  * \ingroup matrix
+ * \function matrix_delete_rows_neg
  * \brief Removes columns from a matrix (for internal use).
+ * 
+ * Time complexity: linear with the number of elements of the original
+ * matrix. 
  */
 
 int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove) {
@@ -252,7 +304,17 @@ int matrix_delete_rows_neg(matrix_t *m, vector_t *neg, long int nremove) {
 
 /**
  * \ingroup matrix
+ * \function matrix_copy
  * \brief Copies a matrix.
+ *
+ * Creates a matrix object by copying another one.
+ * \param to Pointer to an uninitialized matrix object.
+ * \param from The initialized matrix object to copy.
+ * \return Error code, <constant>IGRAPH_ENOMEM</constant> if there
+ *   isn't enough memory to allocate the new matrix.
+ * 
+ * Time complexity: O(n), the number
+ * of elements in the matrix.
  */
 
 int matrix_copy(matrix_t *to, const matrix_t *from) {

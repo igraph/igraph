@@ -23,28 +23,42 @@
 #include "igraph.h"
 #include "memory.h"
 
+/** 
+ * \section about_generators
+ *
+ * <para>Graph generators create graphs.</para>
+ * 
+ * <para>Almost all functions which create graph objects are documented
+ * here. The exceptions are \ref igraph_subgraph() and alike, these 
+ * create graphs based on another graph.</para>
+ */
+
+
 /**
  * \ingroup generators
+ * \function igraph_create
  * \brief Creates a graph with the specified edges.
  * 
- * @param graph An uninitialized graph object.
- * @param edges The edges to add, the first two elements are the first
+ * \param graph An uninitialized graph object.
+ * \param edges The edges to add, the first two elements are the first
  *        edge, etc.
- * @param n The number of vertices in the graph, if smaller or equal
+ * \param n The number of vertices in the graph, if smaller or equal
  *        to the highest vertex id in the <code>edges</code> vector it
  *        will be increased automatically. So it is safe to give 0
  *        here.
- * @param directed Boolean, whether to create a directed graph or
+ * \param directed Boolean, whether to create a directed graph or
  *        not. If yes, then the first edge points from the first
  *        vertex id in <code>edges</code> to the second, etc.
- * @return Error code:
- *         - <b>IGRAPH_EINVEVECTOR</b>: invalid edges vector (odd
- *           number of vertices.
- *         - <b>IGRAPH_EINVVID</b>: invalid (negative) vertex id.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVEVECTOR</constant>: invalid edges
+ *         vector (odd number of vertices).
+ *         <constant>IGRAPH_EINVVID</constant>: invalid (negative)
+ *         vertex id. 
  *
- * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
- * number of vertices, <code>|E|</code> the number of edges in the
- * graph.
+ * Time complexity: O(|V|+|E|),
+ * |V| is the number of vertices,
+ * |E| the number of edges in the
+ * graph. 
  */
 int igraph_create(igraph_t *graph, const vector_t *edges, integer_t n, 
 		  bool_t directed) {
@@ -165,40 +179,59 @@ int igraph_i_adjacency_min(matrix_t *adjmatrix, vector_t *edges) {
 
 /**
  * \ingroup generators
+ * \function igraph_adjacency
  * \brief Creates a graph object from an adjacency matrix.
  * 
- * @param graph Pointer to an uninitialized graph object.
- * @param adjmatrix The adjacency matrix. How it is interpreted
+ * \param graph Pointer to an uninitialized graph object.
+ * \param adjmatrix The adjacency matrix. How it is interpreted
  *        depends on the <code>mode</code> argument.
- * @param mode Constant to specify how the given matrix is interpreted
- *        as an adjacency matrix. Possible values (<code>A(i,j)</code>
- *        is the element in row <code>i</code> and column
- *        <code>j</code> in the adjacency matrix
+ * \param mode Constant to specify how the given matrix is interpreted
+ *        as an adjacency matrix. Possible values
+ *        (A(i,j) 
+ *        is the element in row i and column
+ *        j in the adjacency matrix
  *        (<code>adjmatrix</code>): 
- *        - <b>IGRAPH_ADJ_DIRECTED</b>, the graph will be directed and
+ *        \clist
+ *        \cli IGRAPH_ADJ_DIRECTED
+ *          the graph will be directed and
  *          an element gives the number of edges between two vertex.
- *        - <b>IGRAPH_ADJ_UNDIRECTED</b>, this is the same as
- *          <b>IGRAPH_ADJ_MAX</b>, for convenience.
- *        - <b>IGRAPH_ADJ_MAX</b>, undirected graph will be created
- *          and the number of edges between vertex <code>i</code> and
- *          <code>j</code> is <code>max(A(i,j), A(j,i))</code>.
- *        - <b>IGRAPH_ADJ_MIN</b>, undirected graph will be created
- *          with <code>min(A(i,j), A(j,i))</code> edges between vertex
- *          <code>i</code> and <code>j</code>.
- *        - <b>IGRAPH_ADJ_PLUS</b>, undirected graph will be created 
- *          with <code>A(i,j)+A(j,i)</code> edges between vertex
- *          <code>i</code> and <code>j</code>. 
- *        - <b>IGRAPH_ADJ_UPPER</b>, undirected graph will be created,
+ *        \cli IGRAPH_ADJ_UNDIRECTED
+ *          this is the same as <constant>IGRAPH_ADJ_MAX</constant>,
+ *          for convenience. 
+ *        \cli IGRAPH_ADJ_MAX
+ *          undirected graph will be created
+ *          and the number of edges between vertex
+ *          i and 
+ *          j is
+ *          max(A(i,j), A(j,i)). 
+ *        \cli IGRAPH_ADJ_MIN
+ *          undirected graph will be created
+ *          with min(A(i,j), A(j,i))
+ *          edges between vertex 
+ *          i and
+ *          j. 
+ *        \cli IGRAPH_ADJ_PLUS 
+ *          undirected graph will be created 
+ *          with A(i,j)+A(j,i) edges
+ *          between vertex 
+ *          i and
+ *          j.  
+ *        \cli IGRAPH_ADJ_UPPER 
+ *          undirected graph will be created,
  *          only the upper right triangle (including the diagonal) is
  *          used for the number of edges.
- *        - <b>IGRAPH_ADJ_LOWER</b>, undirected graph will be created,
+ *        \cli IGRAPH_ADJ_LOWER 
+ *          undirected graph will be created,
  *          only the lower left triangle (including the diagonal) is 
  *          used for creating the edges.
- * @return Error code:
- *         - <b>IGRAPH_NONSQUARE</B>: non-square matrix.
+ *       \endclist
+ * \return Error code,
+ *         <constant>IGRAPH_NONSQUARE</constant>: non-square matrix.
  * 
- * Time complexity: <code>O(|V||V|+|E|)</code>, <code>|V|</code> and
- * <code>|E|</code> are number of vertices and edges in the graph.
+ * Time complexity: O(|V||V|+|E|),
+ * |V| and 
+ * |E| are number of vertices and
+ * edges in the graph. 
  */
 
 int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
@@ -247,32 +280,43 @@ int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
 
 /**
  * \ingroup generators
- * \brief Created a \a star graph, every vertex connect to the center
+ * \function igraph_star
+ * \brief Created a \em star graph, every vertex connect to the center
  * only.
  *
- * @param graph Pointer to an uninitialized graph object, this will
+ * \param graph Pointer to an uninitialized graph object, this will
  *        be the result.
- * @param n Integer constant, the number of vertices in the graph.
- * @param mode Contant, gives the type of the star graph to
+ * \param n Integer constant, the number of vertices in the graph.
+ * \param mode Contant, gives the type of the star graph to
  *        create. Possible values:
- *        - <b>IGRAPH_STAR_OUT</b>, directed star graph, edges point
- *          <em>from</em> the center to the other vertices.
- *        - <b>IGRAPH_STAR_IN</b>, directed star graph, edges point
- *          <em>to</em> the center from the other vertices.
- *        - <b>IGRAPH_STAR_UNDIRECTED</b>, an undirected star graph is
+ *        \clist
+ *        \cli IGRAPH_STAR_OUT
+ *          directed star graph, edges point
+ *          \em from the center to the other vertices.
+ *        \cli IGRAPH_STAR_IN
+ *          directed star graph, edges point
+ *          \em to the center from the other vertices.
+ *        \cli IGRAPH_STAR_UNDIRECTED 
+ *          an undirected star graph is
  *          created. 
- * @param center Id of the vertex which will be the center of the
+ *        \endclist
+ * \param center Id of the vertex which will be the center of the
  *          graph. 
- * @return Error code:
- *         - <b>IGRAPH_EINVVID</b>: invalid number of vertices.
- *         - <b>IGRAPH_EINVAL</b>: invalid center vertex.
- *         - <b>IGRAPH_EINVMODE</b>: invalid mode argument.
+ * \return Error code:
+ *         \clist
+ *         \cli IGRAPH_EINVVID 
+ *           invalid number of vertices.
+ *         \cli IGRAPH_EINVAL 
+ *           invalid center vertex.
+ *         \cli IGRAPH_EINVMODE 
+ *           invalid mode argument.
+ *         \endclist
+ * 
+ * Time complexity: O(|V|), the
+ * number of vertices in the graph.
  *
- * Time complexity: <code>O(|V|)</code>, the number of vertices in the
- * graph.
- *
- * \sa igraph_lattice(), igraph_ring(), igraph_tree() for creating
- * other regular structures.
+ * \sa \ref igraph_lattice(), \ref igraph_ring(), \ref igraph_tree()
+ * for creating other regular structures.
  */
 
 int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode, 
@@ -391,30 +435,32 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
 
 /**
  * \ingroup generators 
+ * \function igraph_lattice
  * \brief Creating all kinds of lattices.
  *
  * This function can create most kind of regular lattices.
- * @param graph An uninitialized graph object.
- * @param dimvector Vector giving the sizes of the lattice in each of
+ * \param graph An uninitialized graph object.
+ * \param dimvector Vector giving the sizes of the lattice in each of
  *        its dimensions. IE. the dimension of the lattice will be the
  *        same as the length of this vector.
- * @param nei Integer value giving the distance (number of steps)
+ * \param nei Integer value giving the distance (number of steps)
  *        within which two vertices will be connected. Not implemented
  *        yet. 
- * @param directed Boolean, whether to create a directed graph. The
+ * \param directed Boolean, whether to create a directed graph. The
  *        direction of the edges is determined by the generation
  *        algorithm and is unlikely to suit you, so this isn't a very
  *        useful option.
- * @param mutual Boolean, if the graph is directed this gives whether
+ * \param mutual Boolean, if the graph is directed this gives whether
  *        to create all connections as mutual.
- * @param circular Boolean, defines whether the generated lattice is
+ * \param circular Boolean, defines whether the generated lattice is
  *        periodic.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid (negative) dimension
- *           vector. 
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: invalid (negative)
+ *         dimension vector. 
  *
- * Time complexity: <code>O(|V|+|E|)</code> (as far as i remember),
- * <code>|V|</code> and <code>|E|</code> are the number of vertices
+ * Time complexity: O(|V|+|E|) (as
+ * far as i remember), |V| and
+ * |E| are the number of vertices 
  * and edges in the generated graph.
  */
 int igraph_lattice(igraph_t *graph, const vector_t *dimvector, integer_t nei, 
@@ -509,22 +555,23 @@ int igraph_lattice(igraph_t *graph, const vector_t *dimvector, integer_t nei,
 
 /**
  * \ingroup generators
- * \brief Creates a \a ring graph, a one dimensional lattice.
+ * \function igraph_ring
+ * \brief Creates a \em ring graph, a one dimensional lattice.
  * 
- * @param graph Pointer to an uninitialized graph object.
- * @param n The number of vertices in the ring.
- * @param directed Logical, whether to create a directed ring.
- * @param mutual Logical, whether to create mutual edges in a directed
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the ring.
+ * \param directed Logical, whether to create a directed ring.
+ * \param mutual Logical, whether to create mutual edges in a directed
  *        ring. It is ignored for undirected graphs.
- * @param circular Logical, if false, the ring will be open (this is
- *        not a real <em>ring</em> actually).
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
+ * \param circular Logical, if false, the ring will be open (this is
+ *        not a real \em ring actually).
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
  * 
- * Time complexity: <code>O(|V|)</code>, the number of vertices in the
- * graph.
+ * Time complexity: O(|V|), the
+ * number of vertices in the graph.
  *
- * \sa igraph_lattice() for generating more general lattices.
+ * \sa \ref igraph_lattice() for generating more general lattices.
  */
 
 int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
@@ -548,28 +595,34 @@ int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
 
 /**
  * \ingroup generators
+ * \function igraph_tree
  * \brief Creates a tree in which almost all vertices has the same
  * number of children.
  *
- * @param graph Pointer to an uninitialized graph object.
- * @param n Integer, the number of vertices in the graph.
- * @param children Integer, the number of children of a vertex in the
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n Integer, the number of vertices in the graph.
+ * \param children Integer, the number of children of a vertex in the
  *        tree. 
- * @param type Constant, gives whether to create a directed tree, and
+ * \param type Constant, gives whether to create a directed tree, and
  *        if this is the case, also its orientation. Possible values:
- *        - <b>IGRAPH_TREE_OUT</b>, directed tree, the edges point
+ *        \clist
+ *        \cli IGRAPH_TREE_OUT 
+ *          directed tree, the edges point
  *          from the parents to their children,
- *        - <b>IGRAPH_TREE_IN</b>, directed tree, the edges point from
+ *        \cli IGRAPH_TREE_IN 
+ *          directed tree, the edges point from
  *          the children to their parents.
- *        - <b>IGRAPH_TREE_UNDIRECTED</b>, undirected tree.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
- *         - <b>IGRAPH_INVMODE</b>: invalid mode argument.
+ *        \cli IGRAPH_TREE_UNDIRECTED
+ *          undirected tree.
+ *        \endclist
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
+ *         <constant>IGRAPH_INVMODE</constant>: invalid mode argument.
  * 
- * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
- * plus the number of edges in the graph.
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
  * 
- * \sa igraph_lattice(), igraph_star() for creating other regular
+ * \sa \ref igraph_lattice(), \ref igraph_star() for creating other regular
  * structures. 
  */
 
@@ -619,26 +672,29 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
 
 /**
  * \ingroup generators
+ * \function igraph_full
  * \brief Creates a full graph (directed or undirected, with or
  * without loops). 
  * 
  * In a full graph every possible edge is present, every vertex is
  * connected to every other vertex. 
  * 
- * @param graph Pointer to an uninitialized graph object.
- * @param n Integer, the number of vertices in the graph.
- * @param directed Logical, whether to create a directed graph.
- * @param loops Logical, whether to include self-edges (loops).
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n Integer, the number of vertices in the graph.
+ * \param directed Logical, whether to create a directed graph.
+ * \param loops Logical, whether to include self-edges (loops).
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
  * 
- * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> is the
- * number of vertices, <code>|E|</code> the number of edges in the
- * graph. Of course this is the same as <code>O(|E|)=O(|V||V|)</code>
+ * Time complexity: O(|V|+|E|),
+ * |V| is the number of vertices,
+ * |E| the number of edges in the
+ * graph. Of course this is the same as
+ * O(|E|)=O(|V||V|) 
  * here. 
  * 
- * \sa igraph.lattice(), igraph.star(), igraph.tree() for creating
- * other regular structures.
+ * \sa \ref igraph_lattice(), \ref igraph_star(), \ref igraph_tree()
+ * for creating other regular structures.
  */
 
 int igraph_full(igraph_t *graph, integer_t n, bool_t directed, bool_t loops) {

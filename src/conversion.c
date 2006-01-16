@@ -25,26 +25,30 @@
 
 /**
  * \ingroup conversion
+ * \function igraph_get_adjacency
  * \brief Returns the adjacency matrix of a graph
  * 
  * The result is an incidence matrix, it contains numbers higher
  * than one, if there are multiple edges in the graph.
- * @param graph Pointer to the graph to convert
- * @param res Pointer to an initialized matrix object, it will be
+ * \param graph Pointer to the graph to convert
+ * \param res Pointer to an initialized matrix object, it will be
  *        resized if needed.
- * @param type Constant giving the type of the adjacency matrix to
+ * \param type Constant giving the type of the adjacency matrix to
  *        create for undirected graphs. It is ignored for directed
  *        graphs. Possible values:
- *        - <b>IGRAPH_GET_ADJACENCY_UPPER</b>, the upper right
- *          triangle of the matrix is used.
- *        - <b>IGRAPH_GET_ADJACENCY_LOWER</b>, the lower left 
- *          triangle of the matrix is used.
- *        - <b>IGRAPH_GET_ADJACENCY_BOTH</b>, the whole matrix is
- *          used, a symmetric matrix is returned.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid type argument.
+ *        \clist
+ *        \cli IGRAPH_GET_ADJACENCY_UPPER 
+ *          the upper right triangle of the matrix is used.
+ *        \cli IGRAPH_GET_ADJACENCY_LOWER 
+ *          the lower left triangle of the matrix is used.
+ *        \cli IGRAPH_GET_ADJACENCY_BOTH 
+ *          the whole matrix is used, a symmetric matrix is returned.
+ *        \endclist
+ * \return Error code:
+ *        <constant>IGRAPH_EINVAL</constant> invalid type argument.
  *
- * Time complexity: <code>O(|V||V|)</code>, <code>|V|</code> is the
+ * Time complexity: O(|V||V|),
+ * |V| is the 
  * number of vertices in the graph.
  */
 
@@ -112,19 +116,20 @@ int igraph_get_adjacency(const igraph_t *graph, matrix_t *res,
 
 /**
  * \ingroup conversion
+ * \function igraph_get_edgelist
  * \brief Returns the list of edges in a graph
  * 
- * @param graph Pointer to the graph object
- * @param res Pointer to an initialized vector object, it will be
+ * \param graph Pointer to the graph object
+ * \param res Pointer to an initialized vector object, it will be
  *        resized.
- * @param bycol Logical, if true the edges will be returned
+ * \param bycol Logical, if true the edges will be returned
  *        columnwise, eg. the first edge is
- *        <code>res[0]->res[|E|]</code>, the second is
- *        <code>res[1]->res[|E|+1]</code>, etc.
- * @return Error code.
+ *        <literal>res[0]->res[|E|]</literal>, the second is
+ *        <literal>res[1]->res[|E|+1]</literal>, etc.
+ * \return Error code.
  * 
- * Time complexity: <code>O(|E|)</code>, the number of edges in the
- * graph.
+ * Time complexity: O(|E|), the
+ * number of edges in the graph.
  */
 
 int igraph_get_edgelist(const igraph_t *graph, vector_t *res, bool_t bycol) {

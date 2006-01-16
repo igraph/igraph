@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY igraph "<literal>igraph</literal>">
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
 ]>
 
 <chapter id="igraph-installation">
@@ -43,7 +43,7 @@ $ make install
 </programlisting>
 (the latter as root) should work on most systems. You can try
 <programlisting>
-$ ./configure --help \endverbatim
+$ ./configure --help
 </programlisting>
 to see installations options, and reading the <code>INSTALL</code> 
 file. 

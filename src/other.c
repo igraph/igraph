@@ -25,19 +25,21 @@
 
 /**
  * \ingroup nongraph
+ * \function igraph_running_mean
  * \brief Calculates the running mean of a vector
  * 
  * The running mean is defined by the mean of the
- * previous <code>binwidth</code> values.
- * @param data The vector containing the data.
- * @param res The vector containing the result. This should be
+ * previous <parameter>binwidth</parameter> values.
+ * \param data The vector containing the data.
+ * \param res The vector containing the result. This should be
  *        initialized before calling this function and will be
  *        resized. 
- * @param binwidth Integer giving the width of the bin for the running
+ * \param binwidth Integer giving the width of the bin for the running
  *        mean calculation.
- * @return Error code.
+ * \return Error code.
  * 
- * Time complexity: <code>O(n)</code>, <code>n</code> is the length of
+ * Time complexity: O(n),
+ * n is the length of
  * the data vector.
  */
 

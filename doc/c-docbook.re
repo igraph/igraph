@@ -1,0 +1,393 @@
+REPLACE ----- remove the " * " prefix first -----------------*- mode:python -*-
+^[ ]\*[ ]
+WITH --------------------------------------------------------------------------
+REPLACE ----- remove the " *" lines -------------------------------------------
+^[ ]\*\s*\n
+WITH --------------------------------------------------------------------------
+\n
+REPLACE ----- function object, extract its signature --------------------------
+
+(?P<before>\A.*?)                # head of the comment
+\\function\s+(?P<name>\w+)       # \function keyword
+(?P<after>.*?)\*\/               # tail of the comment
+\s*
+(?P<def>.*?\))                   # function head
+(?=(\s*;)|(\s*\{))               # prototype ends with ; function head with {
+.*\Z                             # and the remainder
+
+WITH --------------------------------------------------------------------------
+
+<section id="\g<name>">
+<title>\g<name></title>
+<indexterm><primary>\g<name></primary></indexterm>
+<para>
+<informalexample><programlisting>
+\g<def>;
+</programlisting></informalexample>
+</para>
+<para>
+\g<before>
+\g<after>
+</para>
+</section>
+
+REPLACE ----- <paramdef> for functions ----------------------------------------
+
+<paramdef>(?P<params>[^<]*)</paramdef>\n
+
+RUN ---------------------------------------------------------------------------
+
+if matched != None:
+    dr_params=string.split(matched.group("params"), ',')
+    dr_out=""
+    for dr_i in dr_params:
+        dr_i=string.strip(dr_i)
+        if dr_i=="...":
+            dr_out=dr_out+"<varargs/>"
+        else:
+            dr_words=re.match(r"([\w\*\&\s]+)(\b\w+)$", dr_i).groups()
+            dr_out=dr_out+"<paramdef>"+dr_words[0]+"<parameter>"+dr_words[1]+ \
+                    "</parameter></paramdef>\n"
+    actch=actch[0:matched.start()]+dr_out+actch[matched.end():]
+
+REPLACE ----- function parameter descriptions, head ---------------------------
+
+(?P<before>\A.*?)               # head of the comment
+\\param\b                       # first \param commant
+
+WITH --------------------------------------------------------------------------
+
+\g<before></para>
+<formalpara><title>Arguments:</title><para>
+<variablelist role="params">
+\param
+
+REPLACE ----- function parameter descriptions, tail ---------------------------
+
+# the end of the params is either an empty line after the last \param
+# command or a \return or \sa statement (others might be added later)
+# or the end of the comment
+
+\\param\b                         # the last \param command
+(?P<paramtext>.*?)                # the text of the \param command
+(?P<endmark>                      # this marks the end of the \param text
+ (\\return\b)|(\\sa\b)|           # it is either a \return or \sa or
+ (\n\s*?\n)|                      # (at least) one empty line or
+ (\*\/))                          # the end of the comment
+(?P<after>.*?\Z)                  # remaining part
+
+WITH
+
+\param\g<paramtext></variablelist></para></formalpara><para>
+\g<endmark>\g<after>
+
+REPLACE ----- function parameter descriptions ---------------------------------
+
+\\param\b\s*                      # \param command
+(?P<paramname>(\w+)|(...))\s+     # name of the parameter
+(?P<paramtext>.*?)                # text of the \param command
+(?=(\\param)|(</variablelist>)|
+ (\n\s*\n))
+
+
+WITH --------------------------------------------------------------------------
+
+  <varlistentry><term><parameter>\g<paramname></parameter>:</term>
+  <listitem><para>
+  \g<paramtext></para></listitem></varlistentry>  
+
+REPLACE ----- \return command -------------------------------------------------
+
+# a return statement ends with an empty line or the end of the comment
+\\return\b\s*                     # \return command
+(?P<text>.*?)                     # the text
+(?=(\n\s*?\n)|                    # empty line or 
+ (\*\/)|                          # the end of the comment or
+ (\\sa\b))                        # \sa command
+
+WITH ----------------------------------------------------------------------TODO
+
+</para><formalpara><title>Returns:</title><para><variablelist>
+  <varlistentry><term><parameter></parameter></term>
+  <listitem><para>
+  \g<text>
+  </para></listitem></varlistentry>
+</variablelist></para></formalpara><para>
+
+REPLACE ----- variables -------------------------------------------------------
+
+(?P<before>\A.*?)                 # head of the comment
+\\var\s+(?P<name>\w+)             # \var keyword + argument
+(?P<after>.*?)\*\/                # tail of the comment
+\s*(?P<def>[^;]*;)                # the definition of the variable
+.*\Z                              # and the remainder
+
+WITH --------------------------------------------------------------------------
+
+<section><title><anchor id="\g<name>" role="struct"/>\g<name></title>
+<indexterm><primary>\g<name></primary></indexterm>
+<para>
+<programlisting>
+\g<def>
+</programlisting>
+</para><para>
+\g<before>\g<after>
+</para>
+</section>
+
+REPLACE ----- \define ---------------------------------------------------------
+
+(?P<before>\A.*?)                 # head of the comment
+\\define\s+(?P<name>\w+)          # \define command
+(?P<after>.*?)\*\/                # tail of the comment
+\s*                               # whitespace
+(?P<def>.*?)                      # macro definition
+[^\\]\n                           # end of the macro definition
+.*\Z                              # drop the remainder
+
+WITH --------------------------------------------------------------------------
+
+<section><title><anchor id="\g<name>" role="define"/>\g<name></title>
+<indexterm><primary>\g<name></primary></indexterm>
+<para>
+<programlisting>
+\g<def>
+</programlisting>
+</para><para>
+\g<before>\g<after>
+</para>
+</section>
+
+REPLACE ----- \section without title ------------------------------------------
+
+(?P<before>\A.*?)                 # head of the comment
+\\section\s+(?P<name>\w+)\s*$     # \section + argument
+(?P<after>.*?)\*\/                # tail of the comment
+.*\Z                              # and the remainder, this is dropped
+
+WITH
+
+\g<before>
+\g<after>
+
+REPLACE ----- \section with title ---------------------------------------------
+
+(?P<before>\A.*?)                 # head of the comment
+\\section\s+(?P<name>\w+)         # \section + argument
+(?P<title>.*?)                    # section title
+\n\s*?\n                          # empty line
+(?P<after>.*?)\*\/                # tail of the comment
+.*\Z                              # and the remainder, this is dropped
+
+WITH
+
+<title>\g<title></title>
+\g<before>
+\g<after>
+
+REPLACE ----- \section with title ---------------------------------------------
+
+(?P<before>\A.*?)                 # head of the comment
+\\section\s+(?P<name>\w+)         # \section + argument
+(?P<title>.*?)\s*\*\/             # section title
+.*\Z                              # and the remainder, this is dropped
+
+WITH
+
+<title>\g<title></title>
+\g<before>
+
+REPLACE ----- an enumeration typedef ------------------------------------------
+
+(?P<before>\A.*?)                 # head of the comment
+\\typedef\s+(?P<name>\w+)         # \typedef command
+(?P<after>.*?)                    # tail of the comment
+ \*\/\s*                          # closing the comment
+(?P<def>typedef\s*enum\s*\{       # typedef enum
+ .*\}\s*\w+\s*;)                  # rest of the definition
+.*\Z
+
+WITH --------------------------------------------------------------------------
+
+<section><title><anchor id="\g<name>" role="typedef"/>\g<name></title>
+<indexterm><primary>\g<name></primary></indexterm>
+<para>
+<programlisting>
+\g<def>
+</programlisting>
+</para>
+<para>
+\g<before>\g<after>
+</para>
+</section>
+
+REPLACE ----- enumeration value descriptions, head ----------------------------
+
+(?P<before>\A.*?)               # head of the comment
+\\enumval\b                     # first \param commant
+
+WITH --------------------------------------------------------------------------
+
+\g<before></para>
+<formalpara><title>Values:</title><para>
+<variablelist role="params">
+\enumval
+
+REPLACE ----- enumeration value descriptions, tail ----------------------------
+
+\\enumval\b                       # the last \enumval command
+(?P<paramtext>.*?)                # the text of the \enumval command
+(?P<endmark>                      # this marks the end of the \enumval text
+ (\\return\b)|(\\sa\b)|           # it is either a \return or \sa or
+ (\n\s*?\n)|                      # (at least) one empty line or
+ (\*\/))                          # the end of the comment
+(?P<after>.*?\Z)                  # remaining part
+
+WITH
+
+\enumval\g<paramtext></variablelist></para></formalpara><para>
+\g<endmark>\g<after>
+
+REPLACE ----- enumeration value descriptions ----------------------------------
+
+\\enumval\b\s*                    # \enumval command
+(?P<paramname>(\w+)|(...))\s+     # name of the parameter
+(?P<paramtext>.*?)                # text of the \enumval command
+(?=(\\enumval)|(</variablelist>)|
+ (\n\s*\n))
+
+WITH --------------------------------------------------------------------------
+
+  <varlistentry><term><constant>\g<paramname></constant>:</term>
+  <listitem><para>
+  \g<paramtext></para></listitem></varlistentry>  
+
+REPLACE ----- \typedef function -----------------------------------------------
+
+(?P<before>.*?)                   # comment head
+\\typedef\s+(?P<name>\w+)         # \typedef command
+(?P<after>.*?)                    # comment tail
+\*\/                              # end of comment block
+\s*
+(?P<src>typedef\s+[^\(]+\(        # the typedef definition
+ .*?\);)                          # parameters
+
+WITH --------------------------------------------------------------------------
+
+<section><title><anchor id="\g<name>" role="typedef"/>\g<name></title>
+<indexterm><primary>\g<name></primary></indexterm>
+<para><programlisting>
+\g<src>
+</programlisting></para>
+<para>
+\g<before>\g<after>
+</para>
+</section>
+
+REPLACE ----- ignore doxygen \ingroup command ---------------------------------
+
+\\ingroup\s+\w+
+
+WITH --------------------------------------------------------------------------
+
+REPLACE ----- ignore doxygen \defgroup command --------------------------------
+
+\\defgroup\s+\w+
+
+WITH --------------------------------------------------------------------------
+
+REPLACE ----- add the contents of \brief to the description -------------------
+
+\\brief\b
+
+WITH --------------------------------------------------------------------------
+
+REPLACE ----- \varname command ------------------------------------------------
+
+\\varname\b\s*
+(?P<var>\w+\b)
+
+WITH
+
+<varname>\g<var></varname>
+
+REPLACE ----- references, \ref command ----------------------------------------
+
+\\ref\b\s*
+(?P<what>\w+)(?P<paren>([\(][\)])?)
+
+WITH --------------------------------------------------------------------------
+
+<link linkend="\g<what>"><function>\g<what>\g<paren></function></link>
+
+REPLACE ----- \sa command -----------------------------------------------------
+
+\\sa\b
+\s*
+(?P<text>.*?)
+(?=(\n\s*?\n)|(\*\/))
+
+WITH ----------------------------------------------------------------------TODO
+
+</para><formalpara><title>See also:</title><para><variablelist>
+  <varlistentry><term><parameter></parameter></term>
+  <listitem><para>
+  \g<text>
+  </para></listitem></varlistentry>
+</variablelist></para></formalpara><para>
+
+REPLACE ----- \em command -----------------------------------------------------
+
+\\em\b
+\s*
+(?P<text>[^\s]+)
+
+WITH
+
+<emphasis>\g<text></emphasis>
+
+REPLACE ----- \verbatim -------------------------------------------------------
+
+\\verbatim\b
+
+WITH
+
+<informalexample><programlisting>
+
+REPLACE ----- \endverbatim ----------------------------------------------------
+
+\\endverbatim\b
+
+WITH
+
+</programlisting></informalexample>
+
+REPLACE ----- \clist ----------------------------------------------------------
+
+\\clist\b
+
+WITH
+
+<variablelist>
+
+REPLACE ----- \cli ------------------------------------------------------------
+
+\\cli\s+(?P<term>.*?)$
+(?P<text>.*?)
+(?=(\\cli)|(\\endclist))
+
+WITH --------------------------------------------------------------------------
+
+<varlistentry><term><constant>\g<term></constant></term>
+<listitem><para>
+\g<text>
+</para></listitem></varlistentry>
+
+REPLACE ----- \endclist -------------------------------------------------------
+
+\\endclist\b
+
+WITH
+
+</variablelist>
+

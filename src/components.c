@@ -22,6 +22,7 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include <string.h>
 
 int igraph_clusters_weak(const igraph_t *graph, vector_t *membership,
 			 vector_t *csize);
@@ -31,28 +32,30 @@ int igraph_clusters_strong(const igraph_t *graph, vector_t *membership,
 
 /**
  * \ingroup structural
+ * \function igraph_clusters
  * \brief Calculates the (weakly or strongly) connected components in
  * a graph. 
  *
- * @param graph The graph object to analyze.
- * @param membership First half of the result will be stored here. For
+ * \param graph The graph object to analyze.
+ * \param membership First half of the result will be stored here. For
  *        every vertex the id of its component is given. The vector
  *        has to be preinitialized and will be resized.
- * @param csize The second half of the result. For every component it
+ * \param csize The second half of the result. For every component it
  *        gives its size, the order is defined by the component ids.
  *        The vector has to be preinitialized and will be resized.
- * @param mode For directed graph this specifies whether to calculate
+ * \param mode For directed graph this specifies whether to calculate
  *        weakly or strongly connected components. Possible values: 
- *        <b>IGRAPH_WEAK</B>, <b>IGRAPH_STRONG</b>. This argument is
+ *        <constant>IGRAPH_WEAK</constant>,
+ *        <constant>IGRAPH_STRONG</constant>. This argument is 
  *        igrored for undirected graphs.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid mode argument.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: invalid mode argument.
  * 
- * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
- * <code>|E|</code> are the number of vertices and edges in the graph.
+ * Time complexity: O(|V|+|E|),
+ * |V| and 
+ * |E| are the number of vertices and
+ * edges in the graph. 
  */
-
-#include <string.h>
 
 int igraph_clusters(const igraph_t *graph, vector_t *membership, 
 		    vector_t *csize, igraph_connectedness_t mode) {
@@ -226,19 +229,22 @@ int igraph_is_connected_weak(const igraph_t *graph, bool_t *res);
 
 /**
  * \ingroup structural
+ * \function igraph_is_connected
  * \brief Decides whether the graph is (weakly or strongly) connected.
  * 
- * @param graph The graph object to analyze.
- * @param res Pointer to a logical variable, the result will be stored
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a logical variable, the result will be stored
  *        here. 
- * @param mode For directed graph this specifies whether to calculate
+ * \param mode For directed graph this specifies whether to calculate
  *        weak or strong connectedness. Possible values: 
- *        <b>IGRAPH_WEAK</B>, <b>IGRAPH_STRONG</b>. This argument is
+ *        <constant>IGRAPH_WEAK</constant>,
+ *        <constant>IGRAPH_STRONG</constant>. This argument is 
  *        igrored for undirected graphs.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid mode argument.
+ * \return Error code:
+ *        <constant>IGRAPH_EINVAL</constant>: invalid mode argument.
  *
- * Time complexity: <code>O(|V|+|E|)</code>, the number of vertices
+ * Time complexity: O(|V|+|E|), the
+ * number of vertices 
  * plus the number of edges in the graph.
  */
 

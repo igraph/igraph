@@ -29,21 +29,34 @@
 int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index, 
 			  integer_t nodes);
 
+/**
+ * \section about_basic_interface
+ *
+ * <para>This is the very minimal API in &igraph;. All the other
+ * functions use this minimal set for creating and manipulating the
+ * graphs.</para>
+ * 
+ * <para>This is a very important principle since it makes possible to
+ * implement other data representations by implementing only this
+ * minimal set.</para>
+ */
+
 /** 
  * \ingroup interface
+ * \function igraph_empty
  * \brief Creates an empty graph with some vertices and no edges.
  *
  * The most basic constructor, all the other constructors should call
  * this to create a minimal graph object.
- * @param graph Pointer to a not-yet initialized graph object.
- * @param n The number of vertices in the graph, a non-negative
+ * \param graph Pointer to a not-yet initialized graph object.
+ * \param n The number of vertices in the graph, a non-negative
  *          integer number is expected.
- * @param directed Whether the graph is directed or not.
- * @return Error code:
- *         - <b>IGRAPH_EINVAL</b>: invalid number of vertices.
+ * \param directed Whether the graph is directed or not.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVAL</constant>: invalid number of vertices.
  * 
- * Time complexity: <code>O(|V|)</code> for a graph with
- * <code>|V|</code> vertices (and no edges).
+ * Time complexity: O(|V|) for a graph with
+ * |V| vertices (and no edges).
  */
 int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
 
@@ -80,6 +93,7 @@ int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
 
 /**
  * \ingroup interface
+ * \function igraph_destroy
  * \brief Frees the memory allocated for a graph object. 
  * 
  * This function should be called for every graph object exactly once.
@@ -87,8 +101,8 @@ int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
  * This function invalidates all iterators (of course), but the
  * iterators of are graph should be destroyed before the graph itself
  * anyway. 
- * @param graph Pointer to the graph to free.
- * @return Error code.
+ * \param graph Pointer to the graph to free.
+ * \return Error code.
  * 
  * Time complexity: operating system specific.
  */
@@ -109,22 +123,24 @@ int igraph_destroy(igraph_t *graph) {
 
 /**
  * \ingroup interface
+ * \function igraph_copy
  * \brief Creates an exact (deep) copy of a graph.
  * 
  * This function deeply copies a graph object to create an exact
  * replica of it. The new replica should be destroyed by calling
- * igraph_destroy() on it when not needed any more.
+ * \ref igraph_destroy() on it when not needed any more.
  * 
  * You can also create a shallow copy of a graph by simply using the
- * standard assignment operator, but be careful and do <em>not</em>
+ * standard assignment operator, but be careful and do \em not
  * destroy a shallow replica. To avoid this mistake creating shallow
  * copies is not recommended.
- * @param to Pointer to an uninitialized graph object.
- * @param from Pointer to the graph object to copy.
- * @return Error code.
+ * \param to Pointer to an uninitialized graph object.
+ * \param from Pointer to the graph object to copy.
+ * \return Error code.
  *
- * Time complexity:  <code>O(|V|+|E|)</code> for a graph with
- * <code>|V|</code> vertices and <code>|E|</code> edges.
+ * Time complexity:  O(|V|+|E|) for a
+ * graph with |V| vertices and
+ * |E| edges.
  */
 
 int igraph_copy(igraph_t *to, const igraph_t *from) {
@@ -156,24 +172,28 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
 
 /**
  * \ingroup interface
+ * \function igraph_add_edges
  * \brief Adds edges to a graph object. 
  * 
  * The edges are given in a vector, the
  * first two elements define the first edge (the order is
- * <code>from</code>, <code>to</code> for directed graphs). The vector
+ * <literal>from</literal>, <literal>to</literal> for directed
+ * graphs). The vector 
  * should contain even number of integer numbers between zero and the
  * number of vertices in the graph minus one (inclusive). If you also
  * want to add new vertices, call igraph_add_vertices() first.
- * @param graph The graph to which the edges will be added.
- * @param edges The edges themselves.
- * @return Error code:
- *         - <b>IGRAPH_EINVEVECTOR</b>: invalid (odd) edges vector length.
- *         - <b>IGRAPH_EINVVID</b>: invalid vertex id in edges vector.
+ * \param graph The graph to which the edges will be added.
+ * \param edges The edges themselves.
+ * \return Error code:
+ *    <constant>IGRAPH_EINVEVECTOR</constant>: invalid (odd)
+ *    edges vector length, <constant>IGRAPH_EINVVID</constant>:
+ *    invalid vertex id in edges vector. 
  *
  * This function invalidates all iterators.
  *
- * Time complexity: <code>O(|V|+|E|)</code> where <code>|V|</code>
- * is the number of vertices and <code>|E|</code> is the number of
+ * Time complexity: O(|V|+|E|) where
+ * |V| is the number of vertices and
+ * |E| is the number of
  * edges in the \em new, extended graph.
  */
 int igraph_add_edges(igraph_t *graph, const vector_t *edges) {
@@ -252,17 +272,20 @@ int igraph_add_edges(igraph_t *graph, const vector_t *edges) {
 
 /**
  * \ingroup interface
+ * \function igraph_add_vertices
  * \brief Adds vertices to a graph. 
  *
  * This function invalidates all iterators.
  *
- * @param graph The graph object to extend.
- * @param nv Non-negative integer giving the number of 
+ * \param graph The graph object to extend.
+ * \param nv Non-negative integer giving the number of 
  *           vertices to add.
- * @return Error code: 
- *         - <b>IGRAPH_EINVAL</b>: invalid number of new vertices.
+ * \return Error code: 
+ *         <constant>IGRAPH_EINVAL</constant>: invalid number of new
+ *         vertices. 
  *
- * Time complexity: <code>O(|V|)</code> where <code>|V|</code> is
+ * Time complexity: O(|V|) where
+ * |V| is 
  * the number of vertices in the \em new, extended graph.
  */
 int igraph_add_vertices(igraph_t *graph, integer_t nv) {
@@ -302,6 +325,7 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
 
 /**
  * \ingroup interface
+ * \function igraph_delete_edges
  * \brief Removes edges from a graph.
  *
  * The edges to remove are given in a vector, the first two numbers
@@ -313,16 +337,18 @@ int igraph_add_vertices(igraph_t *graph, integer_t nv) {
  * they lose all their edges.
  *
  * This function invalidates all iterators.
- * @param graph The graph to work on.
- * @param edges The edges to remove.
- * @return Error code:
- *         - <b>IGRAPH_EINVEVECTOR</b>: invalid (odd) length of edges vector.
- *         - <b>IGRAPH_EINVVID</b>: invalid vertex id in edges vector.
- *         - <b>IGRAPH_EINVAL</b>: no such edge to delete.
+ * \param graph The graph to work on.
+ * \param edges The edges to remove.
+ * \return Error code:
+ *   <constant>IGRAPH_EINVEVECTOR</constant>: invalid (odd) length of
+ *   edges vector, <constant>IGRAPH_EINVVID</constant>: invalid vertex
+ *   id in edges vector, <constant>IGRAPH_EINVAL</constant>: no such
+ *   edge to delete. 
  *
- * Time complexity: <code>O(|V|+|E|)</code> where <code>|V|</code>
- * and <code>|E|</code> are the number of vertices and edges in the
- * \em original graph, respectively.
+ * Time complexity: O(|V|+|E|) where
+ * |V| 
+ * and |E| are the number of vertices
+ * and edges in the \em original graph, respectively.
  */
 int igraph_delete_edges(igraph_t *graph, const vector_t *edges) {
 
@@ -466,6 +492,7 @@ int igraph_delete_edges(igraph_t *graph, const vector_t *edges) {
 
 /**
  * \ingroup interface
+ * \function igraph_delete_vertices
  * \brief Removes vertices (with all their edges) from the graph.
  *
  * This function changes the ids of the vertices (except in some very
@@ -473,16 +500,17 @@ int igraph_delete_edges(igraph_t *graph, const vector_t *edges) {
  *
  * This function invalidates all iterators.
  * 
- * @param graph The graph to work on.
- * @param vertices The ids of the vertices to remove in a 
+ * \param graph The graph to work on.
+ * \param vertices The ids of the vertices to remove in a 
  *                 vector. The vector may contain the same id more
  *                 than once.
- * @return Error code:
- *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
  *
- * Time complexity: <code>O(|V|+|E|)</code>, <code>|V|</code> and
- * <code>|E|</code> are the number of vertices and edges in the
- * original graph.
+ * Time complexity: O(|V|+|E|),
+ * |V| and 
+ * |E| are the number of vertices and
+ * edges in the original graph.
  */
 int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices) {
 
@@ -590,12 +618,13 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices) {
 
 /**
  * \ingroup interface
+ * \function igraph_vcount
  * \brief The number of vertices in a graph
  * 
- * @param graph The graph.
- * @return Number of vertices.
+ * \param graph The graph.
+ * \return Number of vertices.
  *
- * Time complexity: <code>O(1)</code>
+ * Time complexity: O(1)
  */
 integer_t igraph_vcount(const igraph_t *graph) {
   return graph->n;
@@ -603,12 +632,13 @@ integer_t igraph_vcount(const igraph_t *graph) {
 
 /**
  * \ingroup interface
+ * \function igraph_ecount
  * \brief The number of edges in a graph
  * 
- * @param graph The graph.
- * @return Number of edges.
+ * \param graph The graph.
+ * \return Number of edges.
  *
- * Time complexity: <code>O(1)</code>
+ * Time complexity: O(1)
  */
 integer_t igraph_ecount(const igraph_t *graph) {
   return vector_size(&graph->from);
@@ -616,27 +646,30 @@ integer_t igraph_ecount(const igraph_t *graph) {
 
 /**
  * \ingroup interface
+ * \function igraph_neighbors
  * \brief Adjacent vertices to a vertex.
  *
- * @param graph The graph to work on.
- * @param neis This vector will contain the result. The vector should
+ * \param graph The graph to work on.
+ * \param neis This vector will contain the result. The vector should
  *        be initialized before and will be resized.
- * @param pnode The id of the node of which the adjacent vertices are
+ * \param pnode The id of the node of which the adjacent vertices are
  *        searched. 
- * @param mode Defines the way adjacent vertices are searched for
+ * \param mode Defines the way adjacent vertices are searched for
  *        directed graphs. It can have the following values:
- *        - <b>IGRAPH_OUT</b>, vertices reachable by an edge from the specified
- *          vertex are searched,
- *        - <b>IGRAPH_IN</b>, vertices from which the specified 
- *          vertex is reachable are searched.
- *        - <b>IGRAPH_ALL</b>, both kind of vertices are searched.
+ *        <constant>IGRAPH_OUT</constant>, vertices reachable by an
+ *        edge from the specified vertex are searched,
+ *        <constant>IGRAPH_IN</constant>, vertices from which the
+ *        specified vertex is reachable are searched.
+ *        <constant>IGRAPH_ALL</constant>, both kind of vertices are
+ *        searched. 
  *        This parameter is ignored for undirected graphs.
- * @return Error code:
- *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
- *         - <b>IGRAPH_EINVMODE</b>: invalid mode argument.
- *         - <b>IGRAPH_ENOMEM</b>: not enough memory.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
+ *         <constant>IGRAPH_EINVMODE</constant>: invalid mode argument.
+ *         <constant>IGRAPH_ENOMEM</constant>: not enough memory.
  * 
- * Time complexity: <code>O(d)</code>, <code>d</code> is the number
+ * Time complexity: O(d),
+ * d is the number
  * of adjacent vertices to the queried vertex.
  */
 int igraph_neighbors(const igraph_t *graph, vector_t *neis, integer_t pnode, 
@@ -741,13 +774,14 @@ int igraph_i_create_start(vector_t *res, vector_t *el, vector_t *index,
 
 /**
  * \ingroup interface
+ * \function igraph_is_directed
  * \brief Is this a directed graph?
  *
- * @param graph The graph.
- * @return Logical value, <code>TRUE</code> if the graph is directed,
- * <code>FALSE</code> otherwise.
+ * \param graph The graph.
+ * \return Logical value, <literal>TRUE</literal> if the graph is directed,
+ * <literal>FALSE</literal> otherwise.
  *
- * Time complexity: <code>O(1)</code>
+ * Time complexity: O(1)
  */
 
 bool_t igraph_is_directed(const igraph_t *graph) {
@@ -756,31 +790,35 @@ bool_t igraph_is_directed(const igraph_t *graph) {
 
 /**
  * \ingroup interface
+ * \function igraph_degree
  * \brief The degree of some vertices in a graph.
  *
  * This function calculates the in-, out- or total degree of the
  * specified vertices. 
- * @param graph The graph.
- * @param res Vector, this will contain the result. It should be
+ * \param graph The graph.
+ * \param res Vector, this will contain the result. It should be
  *        initialized and will be resized to be the appropriate size.
- * @param vids Vector, giving the vertex ids of which the degree will
+ * \param vids Vector, giving the vertex ids of which the degree will
  *        be calculated.
- * @param mode Defines the type of the degree.
- *        - <b>IGRAPH_OUT</b>, out-degree,
- *        - <b>IGRAPH_IN</b>, in-degree,
- *        - <b>IGRAPH_ALL</b>, total degree (sum of the in- and out-degree).
+ * \param mode Defines the type of the degree.
+ *        <constant>IGRAPH_OUT</constant>, out-degree,
+ *        <constant>IGRAPH_IN</constant>, in-degree,
+ *        <constant>IGRAPH_ALL</constant>, total degree (sum of the
+ *        in- and out-degree). 
  *        This parameter is ignored for undirected graphs. 
- * @param loops Boolean, gives whether the self-loops should be
+ * \param loops Boolean, gives whether the self-loops should be
  *        counted.
- * @return Error code:
- *         - <b>IGRAPH_EINVVID</b>: invalid vertex id.
- *         - <b>IGRAPH_EINVMODE</b>: invalid mode argument.
+ * \return Error code:
+ *         <constant>IGRAPH_EINVVID</constant>: invalid vertex id.
+ *         <constant>IGRAPH_EINVMODE</constant>: invalid mode argument.
  *
- * Time complexity: <code>O(v)</code> if <code>loops</code> is
- * <code>TRUE</code>, and <code>O(v*d)</code>
- * otherwise. <code>v</code> is the number vertices for which the
- * degree will be calculated, and <code>d</code> is their (average)
- * degree. 
+ * Time complexity: O(v) if
+ * loops is 
+ * TRUE, and
+ * O(v*d)
+ * otherwise. v is the number
+ * vertices for which the degree will be calculated, and
+ * d is their (average) degree. 
  */
 int igraph_degree(const igraph_t *graph, vector_t *res, 
 		  const igraph_vs_t *vids, 

@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<section id="igraph-Vectors">
+<title>Vectors</title>
+
+<section id="vector_t">
+<!-- doxrox-include about_vector_t_objects -->
+</section>
+
+<section>
+<!-- doxrox-include vector_constructors_and_destructors -->
+<!-- doxrox-include vector_init -->
+<!-- doxrox-include vector_init_seq -->
+<!-- doxrox-include vector_init_copy -->
+<!-- doxrox-include vector_view -->
+<!-- doxrox-include vector_init_real -->
+<!-- doxrox-include vector_init_real_end -->
+<!-- doxrox-include vector_init_int -->
+<!-- doxrox-include vector_init_int_end -->
+<!-- doxrox-include vector_copy -->
+<!-- doxrox-include vector_destroy -->
+</section>
+
+<section>
+<!-- doxrox-include vector_accessing_elements -->
+<!-- doxrox-include VECTOR -->
+<!-- doxrox-include vector_e -->
+<!-- doxrox-include vector_e_ptr -->
+<!-- doxrox-include vector_set -->
+<!-- doxrox-include vector_tail -->
+</section>
+
+<section><title>Query properties of vectors</title>
+<!-- doxrox-include vector_empty -->
+<!-- doxrox-include vector_size -->
+<!-- doxrox-include vector_max -->
+<!-- doxrox-include vector_which_max -->
+<!-- doxrox-include vector_sum -->
+<!-- doxrox-include vector_prod -->
+<!-- doxrox-include vector_is_equal -->
+<!-- doxrox-include vector_binsearch -->
+<!-- doxrox-include vector_isininterval -->
+<!-- doxrox-include vector_any_smaller -->
+</section>
+
+<section><title>Vector operations</title>
+<!-- doxrox-include vector_clear -->
+<!-- doxrox-include vector_null -->
+<!-- doxrox-include vector_push_back -->
+<!-- doxrox-include vector_pop_back -->
+<!-- doxrox-include vector_sort -->
+<!-- doxrox-include vector_remove_section -->
+<!-- doxrox-include vector_remove -->
+<!-- doxrox-include vector_copy_to -->
+</section>
+
+<section><title>Memory management of <type>vector_t</type> objects</title>
+<!-- doxrox-include vector_reserve -->
+<!-- doxrox-include vector_resize -->
+</section>
+
+<section><title>Fuctions for internal use only</title>
+<!-- doxrox-include vector_order  -->
+<!-- doxrox-include vector_sort_cmp  -->
+<!-- doxrox-include vector_move_interval -->
+<!-- doxrox-include vector_permdelete -->
+<!-- doxrox-include vector_remove_negidx -->
+</section>
+
+</section>
