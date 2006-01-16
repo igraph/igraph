@@ -16,7 +16,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, bool_t n
 PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v);
 PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v);
 PyObject* igraphmodule_vector_t_to_float_PyList(igraph_vector_t *v);
-PyObject* igraphmodule_matrix_t_to_PyList(matrix_t *m,
+PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
 						 igraphmodule_conv_t type);
 PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v);
 #endif

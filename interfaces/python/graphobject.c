@@ -1281,7 +1281,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self,
    char *kwlist[] = {"vertices", NULL};
    PyObject *vobj=NULL, *list=NULL;
    igraph_vector_t vids;
-   matrix_t res;
+   igraph_matrix_t res;
    int return_single=0;
    
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
@@ -1314,7 +1314,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self,
      }
 
    
-   if (matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
+   if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
    if (igraph_bibcoupling(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids)))
@@ -1325,7 +1325,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self,
    /// \todo Return a single list instead of a matrix if only one vertex was given
    list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
    
-   matrix_destroy(&res);
+   igraph_matrix_destroy(&res);
    igraph_vector_destroy(&vids);
    
    return list;
@@ -1454,7 +1454,7 @@ PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self,
    char *kwlist[] = {"vertices", NULL};
    PyObject *vobj=NULL, *list=NULL;
    igraph_vector_t vids;
-   matrix_t res;
+   igraph_matrix_t res;
    int return_single=0;
    
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
@@ -1487,7 +1487,7 @@ PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self,
      }
 
    
-   if (matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
+   if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
    if (igraph_cocitation(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids)))
@@ -1498,7 +1498,7 @@ PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self,
    /// \todo Return a single list instead of a matrix if only one vertex was given
    list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
    
-   matrix_destroy(&res);
+   igraph_matrix_destroy(&res);
    igraph_vector_destroy(&vids);
    
    return list;
@@ -1629,7 +1629,7 @@ PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self,
    char *kwlist[] = {"vertices", "mode", NULL};
    PyObject *vobj=NULL, *list=NULL;
    igraph_vector_t vids;
-   matrix_t res;
+   igraph_matrix_t res;
    igraph_neimode_t mode=IGRAPH_ALL;
    int return_single=0;
    
@@ -1669,7 +1669,7 @@ PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self,
      }
 
    
-   if (matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
+   if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
    if (igraph_shortest_paths(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids), mode))
@@ -1680,7 +1680,7 @@ PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self,
    /// \todo Return a single list instead of a matrix if only one vertex was given
    list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
    
-   matrix_destroy(&res);
+   igraph_matrix_destroy(&res);
    igraph_vector_destroy(&vids);
    
    return list;
@@ -1855,23 +1855,23 @@ PyObject* igraphmodule_Graph_layout_circle(igraphmodule_GraphObject *self,
 						  PyObject *args,
 						  PyObject *kwds) 
 {
-   matrix_t m;
+   igraph_matrix_t m;
    PyObject *result;
    
-   if (matrix_init(&m, 1, 1)) 
+   if (igraph_matrix_init(&m, 1, 1)) 
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
    
    if (igraph_layout_circle(&self->g, &m))
      {
-	matrix_destroy(&m);
+	igraph_matrix_destroy(&m);
 	igraphmodule_handle_igraph_error(); return NULL;
      }
    
    result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
    
-   matrix_destroy(&m);
+   igraph_matrix_destroy(&m);
    
    return (PyObject*)result;
 }
@@ -1885,23 +1885,23 @@ PyObject* igraphmodule_Graph_layout_random(igraphmodule_GraphObject *self,
 						  PyObject *args,
 						  PyObject *kwds) 
 {
-   matrix_t m;
+   igraph_matrix_t m;
    PyObject *result;
    
-   if (matrix_init(&m, 1, 1)) 
+   if (igraph_matrix_init(&m, 1, 1)) 
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
    
    if (igraph_layout_random(&self->g, &m))
      {
-	matrix_destroy(&m);
+	igraph_matrix_destroy(&m);
 	igraphmodule_handle_igraph_error(); return NULL;
      }
    
    result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
    
-   matrix_destroy(&m);
+   igraph_matrix_destroy(&m);
    
    return (PyObject*)result;
 }
@@ -1916,7 +1916,7 @@ PyObject* igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *self,
 							PyObject *kwds) 
 {
   char *kwlist[] = {"n", "sigma", "initemp", "coolexp", "kkconst", NULL};
-  matrix_t m;
+  igraph_matrix_t m;
   long niter=1000;
   double sigma, initemp, coolexp, kkconst;
   PyObject *result;
@@ -1929,18 +1929,18 @@ PyObject* igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *self,
 				   &niter, &sigma, &initemp, &coolexp, &kkconst))
     return NULL;
   
-  if (matrix_init(&m, 1, 1)) {
+  if (igraph_matrix_init(&m, 1, 1)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
    
   if (igraph_layout_kamada_kawai(&self->g, &m, niter, sigma, initemp, coolexp, kkconst)) {
-    matrix_destroy(&m);
+    igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error(); return NULL;
   }
    
   result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
    
-  matrix_destroy(&m);
+  igraph_matrix_destroy(&m);
    
   return (PyObject*)result;
 }
@@ -1955,7 +1955,7 @@ PyObject* igraphmodule_Graph_layout_fruchterman_reingold(igraphmodule_GraphObjec
 								PyObject *kwds) 
 {
   char *kwlist[] = {"n", "maxdelta", "area", "coolexp", "repulserad", NULL};
-  matrix_t m;
+  igraph_matrix_t m;
   long niter=500;
   double maxdelta, area, coolexp, repulserad;
   PyObject *result;
@@ -1968,18 +1968,18 @@ PyObject* igraphmodule_Graph_layout_fruchterman_reingold(igraphmodule_GraphObjec
 				   &niter, &maxdelta, &area, &coolexp, &repulserad))
     return NULL;
   
-  if (matrix_init(&m, 1, 1)) {
+  if (igraph_matrix_init(&m, 1, 1)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
    
   if (igraph_layout_fruchterman_reingold(&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0)) {
-    matrix_destroy(&m);
+    igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error(); return NULL;
   }
    
   result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
    
-  matrix_destroy(&m);
+  igraph_matrix_destroy(&m);
    
   return (PyObject*)result;
 }
@@ -1995,7 +1995,7 @@ PyObject* igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject *self,
 {
    char *kwlist[] = {"type", NULL};
    igraph_get_adjacency_t t=IGRAPH_GET_ADJACENCY_BOTH;
-   matrix_t m;
+   igraph_matrix_t m;
    PyObject *result;
    
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|i", kwlist, &t)) return NULL;
@@ -2007,7 +2007,7 @@ PyObject* igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject *self,
 	return NULL;
      }
    
-   if (matrix_init(&m, igraph_vcount(&self->g), igraph_vcount(&self->g))) 
+   if (igraph_matrix_init(&m, igraph_vcount(&self->g), igraph_vcount(&self->g))) 
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -2015,12 +2015,12 @@ PyObject* igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject *self,
    if (igraph_get_adjacency(&self->g, &m, t)) 
      {
 	igraphmodule_handle_igraph_error();
-	matrix_destroy(&m);
+	igraph_matrix_destroy(&m);
 	return NULL;
      }
    
    result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_INT);
-   matrix_destroy(&m);
+   igraph_matrix_destroy(&m);
    return result;
 }
 

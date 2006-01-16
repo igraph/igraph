@@ -85,9 +85,9 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges, integer_t n,
   return 0;
 }
 
-int igraph_i_adjacency_directed(matrix_t *adjmatrix, igraph_vector_t *edges) {
+int igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
-  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int no_of_nodes=igraph_matrix_nrow(adjmatrix);
   long int i, j, k;
   
   for (i=0; i<no_of_nodes; i++) {
@@ -103,9 +103,9 @@ int igraph_i_adjacency_directed(matrix_t *adjmatrix, igraph_vector_t *edges) {
   return 0;
 }
 
-int igraph_i_adjacency_max(matrix_t *adjmatrix, igraph_vector_t *edges) {
+int igraph_i_adjacency_max(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
-  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int no_of_nodes=igraph_matrix_nrow(adjmatrix);
   long int i, j, k;
   
   for (i=0; i<no_of_nodes; i++) {
@@ -123,9 +123,9 @@ int igraph_i_adjacency_max(matrix_t *adjmatrix, igraph_vector_t *edges) {
   return 0;
 }
 
-int igraph_i_adjacency_upper(matrix_t *adjmatrix, igraph_vector_t *edges) {
+int igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
-  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int no_of_nodes=igraph_matrix_nrow(adjmatrix);
   long int i, j, k;
   
   for (i=0; i<no_of_nodes; i++) {
@@ -140,9 +140,9 @@ int igraph_i_adjacency_upper(matrix_t *adjmatrix, igraph_vector_t *edges) {
   return 0;
 }
 
-int igraph_i_adjacency_lower(matrix_t *adjmatrix, igraph_vector_t *edges) {
+int igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
 
-  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int no_of_nodes=igraph_matrix_nrow(adjmatrix);
   long int i, j, k;
   
   for (i=0; i<no_of_nodes; i++) {
@@ -157,9 +157,9 @@ int igraph_i_adjacency_lower(matrix_t *adjmatrix, igraph_vector_t *edges) {
   return 0;
 }
 
-int igraph_i_adjacency_min(matrix_t *adjmatrix, igraph_vector_t *edges) {
+int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
-  long int no_of_nodes=matrix_nrow(adjmatrix);
+  long int no_of_nodes=igraph_matrix_nrow(adjmatrix);
   long int i, j, k;
   
   for (i=0; i<no_of_nodes; i++) {
@@ -234,21 +234,21 @@ int igraph_i_adjacency_min(matrix_t *adjmatrix, igraph_vector_t *edges) {
  * edges in the graph. 
  */
 
-int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
+int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
 		     igraph_adjacency_t mode) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   long int no_of_nodes;
 
   /* Some checks */
-  if (matrix_nrow(adjmatrix) != matrix_ncol(adjmatrix)) {
+  if (igraph_matrix_nrow(adjmatrix) != igraph_matrix_ncol(adjmatrix)) {
     IGRAPH_ERROR("Non-square matrix", IGRAPH_NONSQUARE);
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   
   /* Collect the edges */
-  no_of_nodes=matrix_nrow(adjmatrix);
+  no_of_nodes=igraph_matrix_nrow(adjmatrix);
   switch (mode) {
   case IGRAPH_ADJ_DIRECTED:
     IGRAPH_CHECK(igraph_i_adjacency_directed(adjmatrix, &edges));

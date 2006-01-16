@@ -25,8 +25,8 @@
 
 #include <math.h>
 
-int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
-				  matrix_t *sd,
+int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_matrix_t *akl,
+				  igraph_matrix_t *sd,
 				  const igraph_vector_t *st, integer_t pagebins,
 				  integer_t pmaxind, bool_t lsd) {
 
@@ -36,7 +36,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
   long int binwidth;
   
   int *indegree;
-  matrix_t ntkl, ch, normfact, notnull;
+  igraph_matrix_t ntkl, ch, normfact, notnull;
   igraph_vector_t neis;
   
   long int node;
@@ -47,16 +47,16 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
 
   igraph_vector_init(&neis, 0);
   indegree=Calloc(no_of_nodes, int);
-  matrix_resize(akl, maxind+1, agebins);
-  matrix_null(akl);
+  igraph_matrix_resize(akl, maxind+1, agebins);
+  igraph_matrix_null(akl);
   if (lsd) {
-    matrix_resize(sd, maxind+1, agebins);
-    matrix_null(sd);
+    igraph_matrix_resize(sd, maxind+1, agebins);
+    igraph_matrix_null(sd);
   }
-  matrix_init(&ntkl, maxind+1, agebins+1);
-  matrix_init(&ch, maxind+1, agebins+1);
-  matrix_init(&normfact, maxind+1, agebins);
-  matrix_init(&notnull, maxind+1, agebins);
+  igraph_matrix_init(&ntkl, maxind+1, agebins+1);
+  igraph_matrix_init(&ch, maxind+1, agebins+1);
+  igraph_matrix_init(&normfact, maxind+1, agebins);
+  igraph_matrix_init(&notnull, maxind+1, agebins);
 
   for (node=0; node<no_of_nodes; node++) {
     
@@ -131,19 +131,19 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl,
   }
   
   Free(indegree);
-  matrix_destroy(&ntkl);
-  matrix_destroy(&ch);
-  matrix_destroy(&normfact);
-  matrix_destroy(&notnull);
+  igraph_matrix_destroy(&ntkl);
+  igraph_matrix_destroy(&ch);
+  igraph_matrix_destroy(&normfact);
+  igraph_matrix_destroy(&notnull);
   igraph_vector_destroy(&neis);
 
   return 0;
 }
 
 int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res,
-				     const matrix_t *akl) {
+				     const igraph_matrix_t *akl) {
 
-  long int agebins=matrix_ncol(akl);
+  long int agebins=igraph_matrix_ncol(akl);
   long int no_of_nodes=igraph_vcount(graph);
   long int binwidth;
   
@@ -192,8 +192,8 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res
   return 0;
 }
 
-int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
-					matrix_t *sd,
+int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *akl,
+					igraph_matrix_t *sd,
 					const igraph_vector_t *st, integer_t pagebins,
 					integer_t pmaxind, bool_t lsd,
 					igraph_vector_t *estimates, 
@@ -205,7 +205,7 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
   long int binwidth;
   
   int *indegree;
-  matrix_t ntkl, ch, normfact, notnull;
+  igraph_matrix_t ntkl, ch, normfact, notnull;
   igraph_vector_t neis;
   
   long int node;
@@ -216,19 +216,19 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
 
   igraph_vector_init(&neis, 0);
   indegree=Calloc(no_of_nodes, int);
-  matrix_resize(akl, maxind+1, agebins);
-  matrix_null(akl);
+  igraph_matrix_resize(akl, maxind+1, agebins);
+  igraph_matrix_null(akl);
   if (lsd) {
-    matrix_resize(sd, maxind+1, agebins);
-    matrix_null(sd);
+    igraph_matrix_resize(sd, maxind+1, agebins);
+    igraph_matrix_null(sd);
   }
 
   igraph_vector_clear(estimates);
 
-  matrix_init(&ntkl, maxind+1, agebins+1);
-  matrix_init(&ch, maxind+1, agebins+1);
-  matrix_init(&normfact, maxind+1, agebins);
-  matrix_init(&notnull, maxind+1, agebins);
+  igraph_matrix_init(&ntkl, maxind+1, agebins+1);
+  igraph_matrix_init(&ch, maxind+1, agebins+1);
+  igraph_matrix_init(&normfact, maxind+1, agebins);
+  igraph_matrix_init(&notnull, maxind+1, agebins);
 
   for (node=0; node<no_of_nodes; node++) {
     
@@ -313,10 +313,10 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
 /*   igraph_vector_push_back(estimates, MATRIX(normfact, est_ind, est_age)); */
   
   Free(indegree);
-  matrix_destroy(&ntkl);
-  matrix_destroy(&ch);
-  matrix_destroy(&normfact);
-  matrix_destroy(&notnull);
+  igraph_matrix_destroy(&ntkl);
+  igraph_matrix_destroy(&ch);
+  igraph_matrix_destroy(&normfact);
+  igraph_matrix_destroy(&notnull);
   igraph_vector_destroy(&neis);
 
   return 0;

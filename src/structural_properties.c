@@ -589,7 +589,7 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
  * \sa \ref igraph_get_shortest_paths() to get the paths themselves.
  */
 
-int igraph_shortest_paths(const igraph_t *graph, matrix_t *res, 
+int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
 			  const igraph_vs_t *from, igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -624,8 +624,8 @@ int igraph_shortest_paths(const igraph_t *graph, matrix_t *res,
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   DQUEUE_INIT_FINALLY(&q, 100);
 
-  IGRAPH_CHECK(matrix_resize(res, no_of_from, no_of_nodes));
-  matrix_null(res);
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_nodes));
+  igraph_matrix_null(res);
 
   for (i=0; i<no_of_from; i++) {
     long int reached=1;

@@ -287,20 +287,20 @@ PyObject* igraphmodule_vector_t_to_float_PyList(igraph_vector_t *v) {
 
 /**
  * \ingroup python_interface_conversion
- * \brief Converts an igraph \c matrix_t to a Python list of lists
+ * \brief Converts an igraph \c igraph_matrix_t to a Python list of lists
  * 
- * \param m the \c matrix_t containing the matrix to be converted
+ * \param m the \c igraph_matrix_t containing the matrix to be converted
  * \param type the type of conversion. If equals to IGRAPHMODULE_TYPE_INT,
  *        returns an integer matrix, else returns a float matrix.
  * \return the Python list of lists as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_matrix_t_to_PyList(matrix_t *m,
+PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
 						 igraphmodule_conv_t type) {
    PyObject *list, *row, *item;
    int nr, nc, i, j;
    
    
-   nr=matrix_nrow(m); nc=matrix_ncol(m);
+   nr=igraph_matrix_nrow(m); nc=igraph_matrix_ncol(m);
    if (nr<0 || nc<0) return igraphmodule_handle_igraph_error();
 
    // create a new Python list

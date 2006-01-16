@@ -406,7 +406,7 @@ bool_t igraph_has_edge_attribute(const igraph_t *graph, const char *name);
 
 int igraph_create(igraph_t *graph, const igraph_vector_t *edges, integer_t n, 
 		  bool_t directed);
-int igraph_adjacency(igraph_t *graph, matrix_t *adjmatrix,
+int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
 		     igraph_adjacency_t mode);
 int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode, 
 		integer_t center);
@@ -456,7 +456,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 				      const igraph_vector_t *weights);
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res, 
 		     const igraph_vs_t *vids, igraph_neimode_t mode);
-int igraph_shortest_paths(const igraph_t *graph, matrix_t *res, 
+int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
 			  const igraph_vs_t *from, igraph_neimode_t mode);
 int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_t *res,
 			      integer_t from, igraph_neimode_t mode);
@@ -493,17 +493,17 @@ int igraph_is_connected(const igraph_t *graph, bool_t *res,
 /* Layouts                                            */
 /* -------------------------------------------------- */
 
-int igraph_layout_random(const igraph_t *graph, matrix_t *res);
-int igraph_layout_circle(const igraph_t *graph, matrix_t *res);
-int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
+int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res);
+int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res);
+int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
 				       integer_t niter, real_t maxdelta,
 				       real_t area, real_t coolexp, 
 				       real_t repulserad, bool_t use_seed);
-int igraph_layout_kamada_kawai(const igraph_t *graph, matrix_t *res,
+int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,
 			       real_t kkconst);
-int igraph_layout_springs(const igraph_t *graph, matrix_t *res,
+int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 			  real_t mass, real_t equil, real_t k,
 			  real_t repeqdis, real_t kfr, bool_t repulse);
 
@@ -517,9 +517,9 @@ int igraph_layout_springs(const igraph_t *graph, matrix_t *res,
 /* Cocitation                                         */
 /* -------------------------------------------------- */
 
-int igraph_cocitation(const igraph_t *graph, matrix_t *res, 
+int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res, 
 		      const igraph_vs_t *vids);
-int igraph_bibcoupling(const igraph_t *graph, matrix_t *res, 
+int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res, 
 		       const igraph_vs_t *vids);
 
 /* -------------------------------------------------- */
@@ -536,7 +536,7 @@ int igraph_bibcoupling(const igraph_t *graph, matrix_t *res,
 /* Conversion                                         */
 /* -------------------------------------------------- */
 
-int igraph_get_adjacency(const igraph_t *graph, matrix_t *res,
+int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 			 igraph_get_adjacency_t type);
 int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, bool_t bycol);
 
@@ -562,14 +562,14 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 
-int igraph_measure_dynamics_idage(const igraph_t *graph, matrix_t *akl, 
-				  matrix_t *sd,
+int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_matrix_t *akl, 
+				  igraph_matrix_t *sd,
 				  const igraph_vector_t *st, integer_t agebins,
 				  integer_t maxind, bool_t lsd);
 int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res,
-				     const matrix_t *akl);
-int igraph_measure_dynamics_idage_debug(const igraph_t *graph, matrix_t *akl,
-					matrix_t *sd,
+				     const igraph_matrix_t *akl);
+int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *akl,
+					igraph_matrix_t *sd,
 					const igraph_vector_t *st, integer_t pagebins,
 					integer_t pmaxind, bool_t lsd,
 					igraph_vector_t *estimates, 

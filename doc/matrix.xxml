@@ -8,40 +8,40 @@
 <title>Matrices</title>
 
 <section>
-<!-- doxrox-include about_matrix_t_objects -->
+<!-- doxrox-include about_igraph_matrix_t_objects -->
 </section>
 
 <section>
-<!-- doxrox-include matrix_constructor_and_destructor -->
-<!-- doxrox-include matrix_init -->
-<!-- doxrox-include matrix_copy -->
-<!-- doxrox-include matrix_destroy -->
+<!-- doxrox-include igraph_matrix_constructor_and_destructor -->
+<!-- doxrox-include igraph_matrix_init -->
+<!-- doxrox-include igraph_matrix_copy -->
+<!-- doxrox-include igraph_matrix_destroy -->
 </section>
 
 <section>
-<!-- doxrox-include matrix_accessing_elements -->
+<!-- doxrox-include igraph_matrix_accessing_elements -->
 <!-- doxrox-include MATRIX -->
 </section>
 
 <section>
 <title>Matrix query operations</title>
-<!-- doxrox-include matrix_size -->
-<!-- doxrox-include matrix_nrow -->
-<!-- doxrox-include matrix_ncol -->
+<!-- doxrox-include igraph_matrix_size -->
+<!-- doxrox-include igraph_matrix_nrow -->
+<!-- doxrox-include igraph_matrix_ncol -->
 </section>
 
 <section>
 <title>Matrix operations</title>
-<!-- doxrox-include matrix_add_rows -->
-<!-- doxrox-include matrix_add_cols -->
-<!-- doxrox-include matrix_resize -->
-<!-- doxrox-include matrix_remove_col -->
+<!-- doxrox-include igraph_matrix_add_rows -->
+<!-- doxrox-include igraph_matrix_add_cols -->
+<!-- doxrox-include igraph_matrix_resize -->
+<!-- doxrox-include igraph_matrix_remove_col -->
 </section>
 
 <section>
 <title>Functions for internal use only</title>
-<!-- doxrox-include matrix_permdelete_rows -->
-<!-- doxrox-include matrix_delete_rows_neg -->
+<!-- doxrox-include igraph_matrix_permdelete_rows -->
+<!-- doxrox-include igraph_matrix_delete_rows_neg -->
 </section>
 
 </section>

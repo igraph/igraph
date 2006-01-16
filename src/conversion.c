@@ -52,7 +52,7 @@
  * number of vertices in the graph.
  */
 
-int igraph_get_adjacency(const igraph_t *graph, matrix_t *res,
+int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 			 igraph_get_adjacency_t type) {
   
   igraph_es_t edgeit;
@@ -61,8 +61,8 @@ int igraph_get_adjacency(const igraph_t *graph, matrix_t *res,
   int retval=0;
   long int from, to;
   
-  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, no_of_nodes));
-  matrix_null(res);
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
+  igraph_matrix_null(res);
   IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
   IGRAPH_FINALLY(igraph_es_destroy, &edgeit);
   

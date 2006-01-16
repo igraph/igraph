@@ -23,7 +23,7 @@
 #include "igraph.h"
 #include "memory.h"
 
-int igraph_cocitation_real(const igraph_t *graph, matrix_t *res, 
+int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res, 
 			   const igraph_vs_t *vids, 
 			   igraph_neimode_t mode);
 
@@ -57,7 +57,7 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
  * \sa \ref igraph_bibcoupling()
  */
 
-int igraph_cocitation(const igraph_t *graph, matrix_t *res, 
+int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res, 
 		      const igraph_vs_t *vids) {
   return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT);
 }
@@ -92,19 +92,19 @@ int igraph_cocitation(const igraph_t *graph, matrix_t *res,
  * \sa \ref igraph_cocitation()
  */
 
-int igraph_bibcoupling(const igraph_t *graph, matrix_t *res, 
+int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res, 
 		       const igraph_vs_t *vids) {
   return igraph_cocitation_real(graph, res, vids, IGRAPH_IN);
 }
 
-int igraph_cocitation_real(const igraph_t *graph, matrix_t *res, 
+int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res, 
 			   const igraph_vs_t *vids,
 			   igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int from, i, j;
   bool_t *calc;
-  matrix_t tmpres=MATRIX_NULL;
+  igraph_matrix_t tmpres=IGRAPH_MATRIX_NULL;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
   igraph_vs_t myvids;
   const igraph_vector_t *myvidsv;
@@ -127,9 +127,9 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
     calc[ (long int) VECTOR(*myvidsv)[i] ] = 1;
   }
   
-  MATRIX_INIT_FINALLY(&tmpres, no_of_nodes, no_of_nodes);
+  IGRAPH_MATRIX_INIT_FINALLY(&tmpres, no_of_nodes, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  IGRAPH_CHECK(matrix_resize(res, igraph_vector_size(myvidsv), no_of_nodes));
+  IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vector_size(myvidsv), no_of_nodes));
 
   /* The result */
   
@@ -155,7 +155,7 @@ int igraph_cocitation_real(const igraph_t *graph, matrix_t *res,
   }  
   
   /* Clean up */
-  matrix_destroy(&tmpres);
+  igraph_matrix_destroy(&tmpres);
   igraph_vector_destroy(&neis);
   Free(calc);
   igraph_vs_destroy(&myvids);

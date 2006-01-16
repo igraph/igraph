@@ -189,23 +189,23 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
 /* -------------------------------------------------- */
 
 /** 
- * \section about_matrix_t_objects About <type>matrix_t</type> objects
+ * \section about_igraph_matrix_t_objects About <type>igraph_matrix_t</type> objects
  * 
  * <para>This type is just an interface to vector.</para>
  *
- * <para>The <type>matrix_t</type> type ususally stores n
+ * <para>The <type>igraph_matrix_t</type> type ususally stores n
  * elements in O(n) space, but not always, see the documentation of
  * the vector type.</para>
  */
 typedef struct s_matrix {
   igraph_vector_t data;
   long int nrow, ncol;
-} matrix_t;
+} igraph_matrix_t;
 
-#define MATRIX_NULL { IGRAPH_VECTOR_NULL, 0, 0 }
-#define MATRIX_INIT_FINALLY(m, nr, nc) \
-  do { IGRAPH_CHECK(matrix_init(m, nr, nc)); \
-  IGRAPH_FINALLY(matrix_destroy, m); } while (0)
+#define IGRAPH_MATRIX_NULL { IGRAPH_VECTOR_NULL, 0, 0 }
+#define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
+  do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \
+  IGRAPH_FINALLY(igraph_matrix_destroy, m); } while (0)
 
 /**
  * \ingroup matrix
@@ -221,20 +221,20 @@ typedef struct s_matrix {
  * Time complexity: <code>O(1)</code>.
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
-int matrix_init(matrix_t *m, long int nrow, long int ncol);
-void matrix_destroy(matrix_t *m);
-int matrix_resize(matrix_t *m, long int nrow, long int ncol);
-long int matrix_size(const matrix_t *m);
-long int matrix_nrow(const matrix_t *m);
-long int matrix_ncol(const matrix_t *m);
-int matrix_copy_to(const matrix_t *m, real_t *to);
-int matrix_null(matrix_t *m);
-int matrix_add_cols(matrix_t *m, long int n);
-int matrix_add_rows(matrix_t *m, long int n);
-int matrix_remove_col(matrix_t *m, long int col);
-int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove);
-int matrix_delete_rows_neg(matrix_t *m, igraph_vector_t *neg, long int nremove);
-int matrix_copy(matrix_t *to, const matrix_t *from);
+int igraph_matrix_init(igraph_matrix_t *m, long int nrow, long int ncol);
+void igraph_matrix_destroy(igraph_matrix_t *m);
+int igraph_matrix_resize(igraph_matrix_t *m, long int nrow, long int ncol);
+long int igraph_matrix_size(const igraph_matrix_t *m);
+long int igraph_matrix_nrow(const igraph_matrix_t *m);
+long int igraph_matrix_ncol(const igraph_matrix_t *m);
+int igraph_matrix_copy_to(const igraph_matrix_t *m, real_t *to);
+int igraph_matrix_null(igraph_matrix_t *m);
+int igraph_matrix_add_cols(igraph_matrix_t *m, long int n);
+int igraph_matrix_add_rows(igraph_matrix_t *m, long int n);
+int igraph_matrix_remove_col(igraph_matrix_t *m, long int col);
+int igraph_matrix_permdelete_rows(igraph_matrix_t *m, long int *index, long int nremove);
+int igraph_matrix_delete_rows_neg(igraph_matrix_t *m, igraph_vector_t *neg, long int nremove);
+int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from);
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */

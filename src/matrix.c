@@ -30,18 +30,18 @@
 #include <stdlib.h>
 
 /**
- * \section matrix_constructor_and_destructor Matrix constructors and
+ * \section igraph_matrix_constructor_and_destructor Matrix constructors and
  * destructors
  */
 
 /**
  * \ingroup matrix
- * \function matrix_init
+ * \function igraph_matrix_init
  * \brief Initializes a matrix.
  * 
  * Every matrix needs to be initialized before using it, this is done
  * by calling this function. A matrix has to be destroyed if it is not
- * needed any more, see \ref matrix_destroy().
+ * needed any more, see \ref igraph_matrix_destroy().
  * \param m Pointer to a not yet initialized matrix object to be
  *        initialized. 
  * \param nrow The number of rows in the matrix.
@@ -53,7 +53,7 @@
  * number of elements in the matrix.
  */
 
-int matrix_init(matrix_t *m, long int nrow, long int ncol) {
+int igraph_matrix_init(igraph_matrix_t *m, long int nrow, long int ncol) {
   int ret1;
   ret1=igraph_vector_init(&m->data, nrow*ncol);
   m->nrow=nrow;
@@ -63,7 +63,7 @@ int matrix_init(matrix_t *m, long int nrow, long int ncol) {
 
 /** 
  * \ingroup matrix
- * \function matrix_destroy
+ * \function igraph_matrix_destroy
  * \brief Destroys a matrix object.
  * 
  * This function frees all the memory allocated for a matrix
@@ -74,17 +74,17 @@ int matrix_init(matrix_t *m, long int nrow, long int ncol) {
  * Time complexity: operating system dependent.
  */ 
 
-void matrix_destroy(matrix_t *m) {
+void igraph_matrix_destroy(igraph_matrix_t *m) {
   igraph_vector_destroy(&m->data);
 }
 
 /**
- * \section matrix_accessing_elements Accessing elements of a matrix
+ * \section igraph_matrix_accessing_elements Accessing elements of a matrix
  */
 
 /**
  * \ingroup matrix
- * \function matrix_resize
+ * \function igraph_matrix_resize
  * \brief Resizes a matrix.
  *
  * This function resizes a matrix by adding more elements to it.
@@ -103,7 +103,7 @@ void matrix_destroy(matrix_t *m) {
  * number of elements in the resized matrix.
  */
 
-int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
+int igraph_matrix_resize(igraph_matrix_t *m, long int nrow, long int ncol) {
   igraph_vector_resize(&m->data, nrow*ncol);
   m->nrow=nrow;
   m->ncol=ncol;
@@ -112,7 +112,7 @@ int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
 
 /**
  * \ingroup matrix
- * \function matrix_size
+ * \function igraph_matrix_size
  * \brief The number of elements in a matrix.
  * 
  * \param m Pointer to an initialized matrix object.
@@ -121,13 +121,13 @@ int matrix_resize(matrix_t *m, long int nrow, long int ncol) {
  * Time complexity: O(1).
  */
 
-long int matrix_size(const matrix_t *m) {
+long int igraph_matrix_size(const igraph_matrix_t *m) {
   return (m->nrow) * (m->ncol);
 }
 
 /**
  * \ingroup matrix
- * \function matrix_nrow
+ * \function igraph_matrix_nrow
  * \brief The number of rows in a matrix.
  * 
  * \param m Pointer to an initialized matrix object.
@@ -136,13 +136,13 @@ long int matrix_size(const matrix_t *m) {
  * Time complexity: O(1).
  */
 
-long int matrix_nrow(const matrix_t *m) {
+long int igraph_matrix_nrow(const igraph_matrix_t *m) {
   return m->nrow;
 }
 
 /**
  * \ingroup matrix
- * \function matrix_ncol
+ * \function igraph_matrix_ncol
  * \brief The number of columns in a matrix.
  * 
  * \param m Pointer to an initialized matrix object.
@@ -151,7 +151,7 @@ long int matrix_nrow(const matrix_t *m) {
  * Time complexity: O(1).
  */
 
-long int matrix_ncol(const matrix_t *m) {
+long int igraph_matrix_ncol(const igraph_matrix_t *m) {
   return m->ncol;
 }
 
@@ -172,7 +172,7 @@ long int matrix_ncol(const matrix_t *m) {
  * elements in the matrix.
  */
 
-int matrix_copy_to(const matrix_t *m, real_t *to) {
+int igraph_matrix_copy_to(const igraph_matrix_t *m, real_t *to) {
   igraph_vector_copy_to(&m->data, to);
   return 0;
 }
@@ -189,14 +189,14 @@ int matrix_copy_to(const matrix_t *m, real_t *to) {
  * the matrix. 
  */
 
-int matrix_null(matrix_t *m) {
+int igraph_matrix_null(igraph_matrix_t *m) {
   igraph_vector_null(&m->data);
   return 0;
 }
 
 /**
  * \ingroup matrix
- * \function matrix_add_cols
+ * \function igraph_matrix_add_cols
  * \brief Adds columns to a matrix.
  * \param m The matrix object.
  * \param n The number of columns to add.
@@ -207,14 +207,14 @@ int matrix_null(matrix_t *m) {
  * resized, matrix.
  */
 
-int matrix_add_cols(matrix_t *m, long int n) {
-  matrix_resize(m, m->nrow, m->ncol+n);
+int igraph_matrix_add_cols(igraph_matrix_t *m, long int n) {
+  igraph_matrix_resize(m, m->nrow, m->ncol+n);
   return 0;
 }
 
 /**
  * \ingroup matrix
- * \function matrix_add_rows
+ * \function igraph_matrix_add_rows
  * \brief Adds rows to a matrix.
  * \param m The matrix object.
  * \param n The number of rows to add.
@@ -225,7 +225,7 @@ int matrix_add_cols(matrix_t *m, long int n) {
  * resized, matrix.
  */
 
-int matrix_add_rows(matrix_t *m, long int n) {
+int igraph_matrix_add_rows(igraph_matrix_t *m, long int n) {
   long int i;
   igraph_vector_resize(&m->data, (m->ncol)*(m->nrow+n));
   for (i=m->ncol-1; i>=0; i--) {
@@ -238,7 +238,7 @@ int matrix_add_rows(matrix_t *m, long int n) {
 
 /**
  * \ingroup matrix
- * \function matrix_remove_col
+ * \function igraph_matrix_remove_col
  * \brief Removes a column from a matrix.
  * 
  * \param m The matrix object.
@@ -249,7 +249,7 @@ int matrix_add_rows(matrix_t *m, long int n) {
  * resized matrix.
  */
 
-int matrix_remove_col(matrix_t *m, long int col) {
+int igraph_matrix_remove_col(igraph_matrix_t *m, long int col) {
   igraph_vector_remove_section(&m->data, (m->nrow)*col, (m->nrow)*(col+1));
   m->ncol--;
   return 0;
@@ -257,14 +257,14 @@ int matrix_remove_col(matrix_t *m, long int col) {
 
 /**
  * \ingroup matrix
- * \function matrix_permdelete_rows
+ * \function igraph_matrix_permdelete_rows
  * \brief Removes columns from a matrix (for internal use).
  * 
  * Time complexity: linear with the number of elements of the original
  * matrix. 
  */
 
-int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove) {
+int igraph_matrix_permdelete_rows(igraph_matrix_t *m, long int *index, long int nremove) {
   long int i, j;
   for (i=0; i<m->ncol; i++) {
     for (j=0; j<m->nrow; j++) {
@@ -273,21 +273,21 @@ int matrix_permdelete_rows(matrix_t *m, long int *index, long int nremove) {
       }
     }
   }
-  matrix_resize(m, m->nrow-nremove, m->ncol);
+  igraph_matrix_resize(m, m->nrow-nremove, m->ncol);
 
   return 0;
 }
 
 /**
  * \ingroup matrix
- * \function matrix_delete_rows_neg
+ * \function igraph_matrix_delete_rows_neg
  * \brief Removes columns from a matrix (for internal use).
  * 
  * Time complexity: linear with the number of elements of the original
  * matrix. 
  */
 
-int matrix_delete_rows_neg(matrix_t *m, igraph_vector_t *neg, long int nremove) {
+int igraph_matrix_delete_rows_neg(igraph_matrix_t *m, igraph_vector_t *neg, long int nremove) {
   long int i, j, idx=0;
   for (i=0; i<m->ncol; i++) {
     for (j=0; j<m->nrow; j++) {
@@ -297,14 +297,14 @@ int matrix_delete_rows_neg(matrix_t *m, igraph_vector_t *neg, long int nremove) 
     }
     idx=0;
   }
-  matrix_resize(m, m->nrow-nremove, m->ncol);
+  igraph_matrix_resize(m, m->nrow-nremove, m->ncol);
 
   return 0;
 }
 
 /**
  * \ingroup matrix
- * \function matrix_copy
+ * \function igraph_matrix_copy
  * \brief Copies a matrix.
  *
  * Creates a matrix object by copying another one.
@@ -317,7 +317,7 @@ int matrix_delete_rows_neg(matrix_t *m, igraph_vector_t *neg, long int nremove) 
  * of elements in the matrix.
  */
 
-int matrix_copy(matrix_t *to, const matrix_t *from) {
+int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from) {
   to->nrow = from->nrow;
   to->ncol = from->ncol;
   return igraph_vector_copy(&to->data, &from->data);

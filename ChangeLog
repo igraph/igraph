@@ -1,5 +1,10 @@
 2006-01-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/matrix.c (matrix_t, igraph_matrix_t) :
+	matrix_t renamed to igraph_matrix_t. All functions renamed
+
+2006-01-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/vector_ptr.c (vector_ptr_t, igraph_vector_ptr_t) :
 	vector_ptr_t renamed to igraph_vector_ptr_t. All functions renamed.
 

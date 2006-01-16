@@ -32,7 +32,7 @@
  * which visually pleases the human eye.</para>
  *
  * <para>They take a graph object and a number of parameters as arguments
- * and return a <type>matrix_t</type>, in which each row gives the
+ * and return a <type>igraph_matrix_t</type>, in which each row gives the
  * coordinates of a vertex.</para>
  */
 
@@ -51,12 +51,12 @@
  * number of vertices. 
  */
 
-int igraph_layout_random(const igraph_t *graph, matrix_t *res) {
+int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
 
-  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, 2));
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
 
   RNG_BEGIN();
 
@@ -85,12 +85,12 @@ int igraph_layout_random(const igraph_t *graph, matrix_t *res) {
  * number of vertices. 
  */
 
-int igraph_layout_circle(const igraph_t *graph, matrix_t *res) {
+int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
 
-  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, 2));  
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));  
 
   for (i=0; i<no_of_nodes; i++) {
     real_t phi=2*M_PI/no_of_nodes*i;
@@ -133,7 +133,7 @@ int igraph_layout_circle(const igraph_t *graph, matrix_t *res) {
  * vertices in the graph. 
  */
 
-int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
+int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
 				       integer_t niter, real_t maxdelta,
 				       real_t area, real_t coolexp, 
 				       real_t repulserad, bool_t use_seed) {
@@ -142,14 +142,14 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
   long int i,j,k;
 
   long int no_of_nodes=igraph_vcount(graph);
-  matrix_t dxdy=MATRIX_NULL;
+  igraph_matrix_t dxdy=IGRAPH_MATRIX_NULL;
   igraph_es_t edgeit;
   
-  IGRAPH_CHECK(matrix_resize(res, no_of_nodes, 2));
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
     IGRAPH_CHECK(igraph_layout_random(graph, res));
   }
-  MATRIX_INIT_FINALLY(&dxdy, no_of_nodes, 2);
+  IGRAPH_MATRIX_INIT_FINALLY(&dxdy, no_of_nodes, 2);
   
   frk=sqrt(area/no_of_nodes);
 
@@ -157,7 +157,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
     /* Set the temperature (maximum move/iteration) */
     t=maxdelta*pow(i/(double)niter,coolexp);
     /* Clear the deltas */
-    matrix_null(&dxdy);
+    igraph_matrix_null(&dxdy);
     /* Increment deltas for each undirected pair */
     for(j=0;j<no_of_nodes;j++) {
       for(k=j+1;k<no_of_nodes;k++){
@@ -208,7 +208,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
     }
   }
   
-  matrix_destroy(&dxdy);
+  igraph_matrix_destroy(&dxdy);
   IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
@@ -240,7 +240,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, matrix_t *res,
  * vertices in the graph. 
  */
 
-int igraph_layout_kamada_kawai(const igraph_t *graph, matrix_t *res,
+int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,
 			       real_t kkconst) {
@@ -248,7 +248,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, matrix_t *res,
   real_t temp, candx, candy;
   real_t dpot, odis, ndis, osqd, nsqd;
   long int n,i,j,k;
-  matrix_t elen;
+  igraph_matrix_t elen;
 
   /* Define various things */
   n=igraph_vcount(graph);
@@ -257,8 +257,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, matrix_t *res,
 
   RNG_BEGIN();
 
-  IGRAPH_CHECK(matrix_resize(res, n, 2));
-  MATRIX_INIT_FINALLY(&elen, n, n);
+  IGRAPH_CHECK(igraph_matrix_resize(res, n, 2));
+  IGRAPH_MATRIX_INIT_FINALLY(&elen, n, n);
   IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, IGRAPH_VS_ALL(graph), 3));
   for (i=0; i<n; i++) {
     MATRIX(elen, i, i) = sqrt(n);
@@ -299,13 +299,13 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, matrix_t *res,
   }
 
   RNG_END();
-  matrix_destroy(&elen);
+  igraph_matrix_destroy(&elen);
   IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }
 
-int igraph_layout_springs(const igraph_t *graph, matrix_t *res,
+int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 			  real_t mass, real_t equil, real_t k,
 			  real_t repeqdis, real_t kfr, bool_t repulse) {
   /* TODO */
