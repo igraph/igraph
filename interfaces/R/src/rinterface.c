@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
-SEXP R_matrix_to_SEXP(matrix_t *m);
+SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
 SEXP R_igraph_strvector_to_SEXP(igraph_strvector_t *m);
 SEXP R_attributes_to_SEXP(igraph_attribute_list_t *al);
 SEXP R_igraph_vs_to_SEXP(igraph_t *g, igraph_vs_t *vs);
@@ -40,8 +40,8 @@ int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
 int R_SEXP_to_vector(SEXP sv, igraph_vector_t *v);
 int R_SEXP_to_vector_copy(SEXP sv, igraph_vector_t *v);
-int R_SEXP_to_matrix(SEXP pakl, matrix_t *akl);
-int R_SEXP_to_matrix_copy(SEXP pakl, matrix_t *akl);
+int R_SEXP_to_matrix(SEXP pakl, igraph_matrix_t *akl);
+int R_SEXP_to_igraph_matrix_copy(SEXP pakl, igraph_matrix_t *akl);
 int R_SEXP_to_attributes(SEXP attr, igraph_attribute_list_t *al);
 int R_SEXP_to_attributes_copy(SEXP attr, igraph_attribute_list_t *al);
 int R_SEXP_to_igraph(SEXP graph, igraph_t *res);
@@ -75,15 +75,15 @@ R_INLINE void R_igraph_after() {
  * functions to convert igraph objects to SEXP
  *****************************************************/
 
-SEXP R_matrix_to_SEXP(matrix_t *m) {
+SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m) {
 
   SEXP result, dim; 
   
-  PROTECT(result=NEW_NUMERIC(matrix_size(m)));
-  matrix_copy_to(m, REAL(result));
+  PROTECT(result=NEW_NUMERIC(igraph_matrix_size(m)));
+  igraph_matrix_copy_to(m, REAL(result));
   PROTECT(dim=NEW_INTEGER(2));
-  INTEGER(dim)[0]=matrix_nrow(m);
-  INTEGER(dim)[1]=matrix_ncol(m);
+  INTEGER(dim)[0]=igraph_matrix_nrow(m);
+  INTEGER(dim)[1]=igraph_matrix_ncol(m);
   SET_DIM(result, dim);
 
   UNPROTECT(2);
@@ -271,7 +271,7 @@ int R_SEXP_to_vector_copy(SEXP sv, igraph_vector_t *v) {
   return igraph_vector_init_copy(v, REAL(sv), GET_LENGTH(sv));  
 }
 
-int R_SEXP_to_matrix(SEXP pakl, matrix_t *akl) {
+int R_SEXP_to_matrix(SEXP pakl, igraph_matrix_t *akl) {
   R_SEXP_to_vector(pakl, &akl->data);
   akl->nrow=INTEGER(GET_DIM(pakl))[0];
   akl->ncol=INTEGER(GET_DIM(pakl))[1];
@@ -279,7 +279,7 @@ int R_SEXP_to_matrix(SEXP pakl, matrix_t *akl) {
   return 0;
 }
 
-int R_SEXP_to_matrix_copy(SEXP pakl, matrix_t *akl) {
+int R_SEXP_to_igraph_matrix_copy(SEXP pakl, igraph_matrix_t *akl) {
   igraph_vector_init_copy(&akl->data, REAL(pakl), GET_LENGTH(pakl));
   akl->nrow=INTEGER(GET_DIM(pakl))[0];
   akl->ncol=INTEGER(GET_DIM(pakl))[1];
@@ -826,18 +826,18 @@ SEXP R_igraph_cocitation(SEXP graph, SEXP pvids) {
 
   igraph_t g;
   igraph_vs_t vs;
-  matrix_t m;
+  igraph_matrix_t m;
   SEXP result;
   
   R_igraph_before();
 
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
-  matrix_init(&m, 0, 0);
+  igraph_matrix_init(&m, 0, 0);
   igraph_cocitation(&g, &m, &vs);
   
-  PROTECT(result=R_matrix_to_SEXP(&m));
-  matrix_destroy(&m);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&m));
+  igraph_matrix_destroy(&m);
   igraph_vs_destroy(&vs);
 
   R_igraph_after();
@@ -850,18 +850,18 @@ SEXP R_igraph_bibcoupling(SEXP graph, SEXP pvids) {
 
   igraph_t g;
   igraph_vs_t vs;
-  matrix_t m;
+  igraph_matrix_t m;
   SEXP result;
   
   R_igraph_before();
 
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
-  matrix_init(&m, 0, 0);
+  igraph_matrix_init(&m, 0, 0);
   igraph_bibcoupling(&g, &m, &vs);
   
-  PROTECT(result=R_matrix_to_SEXP(&m));
-  matrix_destroy(&m);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&m));
+  igraph_matrix_destroy(&m);
   igraph_vs_destroy(&vs);
   
   R_igraph_after();
@@ -897,17 +897,17 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode) {
   igraph_t g;
   igraph_vs_t vs;
   integer_t mode=REAL(pmode)[0];
-  matrix_t res;
+  igraph_matrix_t res;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
-  matrix_init(&res, 0, 0);
+  igraph_matrix_init(&res, 0, 0);
   igraph_shortest_paths(&g, &res, &vs, mode);
-  PROTECT(result=R_matrix_to_SEXP(&res));
-  matrix_destroy(&res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
   igraph_vs_destroy(&vs);
   
   R_igraph_after();
@@ -975,17 +975,17 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   real_t coolexp=REAL(pcoolexp)[0];
   real_t kkconst=REAL(pkkconst)[0];
   real_t sigma=REAL(psigma)[0];
-  matrix_t res;
+  igraph_matrix_t res;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  matrix_init(&res, 0, 0);
+  igraph_matrix_init(&res, 0, 0);
   igraph_layout_kamada_kawai(&g, &res, niter, sigma, 
 			     initemp, coolexp, kkconst);
-  PROTECT(result=R_matrix_to_SEXP(&res));
-  matrix_destroy(&res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
   
   R_igraph_after();
   
@@ -1060,7 +1060,7 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pst, SEXP pagebins,
 				     SEXP pmaxind, SEXP plsd) {
   
   igraph_t g;
-  matrix_t akl, sd;
+  igraph_matrix_t akl, sd;
   igraph_vector_t st;
   integer_t agebins=REAL(pagebins)[0];
   integer_t maxind=REAL(pmaxind)[0];
@@ -1072,15 +1072,15 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pst, SEXP pagebins,
   R_SEXP_to_vector(pst, &st);
 
   R_SEXP_to_igraph(graph, &g);
-  matrix_init(&akl, 0, 0);
-  matrix_init(&sd, 0, 0);
+  igraph_matrix_init(&akl, 0, 0);
+  igraph_matrix_init(&sd, 0, 0);
   igraph_measure_dynamics_idage(&g, &akl, &sd, &st, agebins, maxind, lsd);
   
   PROTECT(result=NEW_LIST(2));
-  SET_VECTOR_ELT(result, 0, R_matrix_to_SEXP(&akl));
-  matrix_destroy(&akl);
-  SET_VECTOR_ELT(result, 1, R_matrix_to_SEXP(&sd));
-  matrix_destroy(&sd);
+  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akl));
+  igraph_matrix_destroy(&akl);
+  SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
+  igraph_matrix_destroy(&sd);
 
   R_igraph_after();
   
@@ -1093,7 +1093,7 @@ SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst,
 					   SEXP plsd, SEXP pest_ind, 
 					   SEXP pest_age) {
   igraph_t g;
-  matrix_t akl, sd;
+  igraph_matrix_t akl, sd;
   igraph_vector_t st;
   integer_t agebins=REAL(pagebins)[0];
   integer_t maxind=REAL(pmaxind)[0];
@@ -1108,17 +1108,17 @@ SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst,
   R_SEXP_to_vector(pst, &st);
   
   R_SEXP_to_igraph(graph, &g);
-  matrix_init(&akl, 0, 0);
-  matrix_init(&sd, 0, 0);
+  igraph_matrix_init(&akl, 0, 0);
+  igraph_matrix_init(&sd, 0, 0);
   igraph_vector_init(&estimates, 0);
   igraph_measure_dynamics_idage_debug(&g, &akl, &sd, &st, agebins, maxind, lsd,
 				      &estimates, est_ind, est_age);
   
   PROTECT(result=NEW_LIST(3));
-  SET_VECTOR_ELT(result, 0, R_matrix_to_SEXP(&akl));
-  matrix_destroy(&akl);
-  SET_VECTOR_ELT(result, 1, R_matrix_to_SEXP(&sd));
-  matrix_destroy(&sd);
+  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akl));
+  igraph_matrix_destroy(&akl);
+  SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
+  igraph_matrix_destroy(&sd);
   SET_VECTOR_ELT(result, 2, NEW_NUMERIC(igraph_vector_size(&estimates)));
   igraph_vector_copy_to(&estimates, REAL(VECTOR_ELT(result, 2)));
   igraph_vector_destroy(&estimates);
@@ -1132,7 +1132,7 @@ SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst,
 SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
   
   igraph_t g;
-  matrix_t akl;
+  igraph_matrix_t akl;
   igraph_vector_t res;
   SEXP result;
 
@@ -1209,7 +1209,7 @@ SEXP R_igraph_are_connected(SEXP graph, SEXP pv1, SEXP pv2) {
 SEXP R_igraph_graph_adjacency(SEXP adjmatrix, SEXP pmode) {
   
   igraph_t g;
-  matrix_t adjm;
+  igraph_matrix_t adjm;
   integer_t mode=REAL(pmode)[0];
   SEXP result;
   
@@ -1335,16 +1335,16 @@ SEXP R_igraph_subgraph(SEXP graph, SEXP pvids) {
 SEXP R_igraph_layout_random(SEXP graph) {
   
   igraph_t g;
-  matrix_t res;
+  igraph_matrix_t res;
   SEXP result=R_NilValue;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  matrix_init(&res, 0, 0);
+  igraph_matrix_init(&res, 0, 0);
   igraph_layout_random(&g, &res);
-  PROTECT(result=R_matrix_to_SEXP(&res));
-  matrix_destroy(&res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
   
   R_igraph_after();
   
@@ -1355,16 +1355,16 @@ SEXP R_igraph_layout_random(SEXP graph) {
 SEXP R_igraph_layout_circle(SEXP graph) {
   
   igraph_t g;
-  matrix_t res;
+  igraph_matrix_t res;
   SEXP result=R_NilValue;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  matrix_init(&res, 0, 0);
+  igraph_matrix_init(&res, 0, 0);
   igraph_layout_circle(&g, &res);
-  PROTECT(result=R_matrix_to_SEXP(&res));
-  matrix_destroy(&res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
   
   R_igraph_after();
   
@@ -1462,17 +1462,17 @@ SEXP R_igraph_get_edgelist(SEXP graph, SEXP pbycol) {
 SEXP R_igraph_get_adjacency(SEXP graph, SEXP ptype) {
   
   igraph_t g;
-  matrix_t res;
+  igraph_matrix_t res;
   integer_t type=REAL(ptype)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  matrix_init(&res, 0, 0);
+  igraph_matrix_init(&res, 0, 0);
   igraph_get_adjacency(&g, &res, type);
-  PROTECT(result=R_matrix_to_SEXP(&res));
-  matrix_destroy(&res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
   
   R_igraph_after();
   
@@ -1509,17 +1509,17 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   real_t area=REAL(parea)[0];
   real_t coolexp=REAL(pcoolexp)[0];
   real_t repulserad=REAL(prepulserad)[0];
-  matrix_t res;
+  igraph_matrix_t res;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  matrix_init(&res, 0, 0);
+  igraph_matrix_init(&res, 0, 0);
   igraph_layout_fruchterman_reingold(&g, &res, niter, maxdelta, area, 
 				     coolexp, repulserad, 0);
-  PROTECT(result=R_matrix_to_SEXP(&res));
-  matrix_destroy(&res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
   
   R_igraph_after();
   

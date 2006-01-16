@@ -77,7 +77,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
   char *already_added;
   long int first_node, act_cluster_size=0, no_of_clusters=1;
   
-  dqueue_t q=DQUEUE_NULL;
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   
   long int i;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
@@ -88,7 +88,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
 
-  DQUEUE_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes/10);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes/10);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
   /* Memory for result, csize is dynamically allocated */
@@ -103,15 +103,15 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
     already_added[first_node]=1;
     act_cluster_size=1;
     VECTOR(*membership)[first_node]=no_of_clusters-1;
-    IGRAPH_CHECK(dqueue_push(&q, first_node));
+    IGRAPH_CHECK(igraph_dqueue_push(&q, first_node));
     
-    while ( !dqueue_empty(&q) ) {
-      long int act_node=dqueue_pop(&q);
+    while ( !igraph_dqueue_empty(&q) ) {
+      long int act_node=igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_neighbors(graph, &neis, act_node, IGRAPH_ALL));
       for (i=0; i<igraph_vector_size(&neis); i++) {
 	long int neighbor=VECTOR(neis)[i];
 	if (already_added[neighbor]==1) { continue; }
-	IGRAPH_CHECK(dqueue_push(&q, neighbor));
+	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	already_added[neighbor]=1;
 	act_cluster_size++;
 	VECTOR(*membership)[neighbor]=no_of_clusters-1;
@@ -124,7 +124,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
   /* Cleaning up */
   
   Free(already_added);
-  dqueue_destroy(&q);
+  igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(3);
   
@@ -138,7 +138,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
   igraph_vector_t next_nei=IGRAPH_VECTOR_NULL;
   
   long int i;
-  dqueue_t q=DQUEUE_NULL;
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   
   long int no_of_clusters=1;
   long int act_cluster_size;
@@ -150,7 +150,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 
   IGRAPH_VECTOR_INIT_FINALLY(&next_nei, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&out, 0);
-  DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
 
   IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
@@ -163,9 +163,9 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
     IGRAPH_CHECK(igraph_neighbors(graph, &tmp, i, IGRAPH_OUT));
     if (VECTOR(next_nei)[i] > igraph_vector_size(&tmp)) { continue; }
     
-    IGRAPH_CHECK(dqueue_push(&q, i));
-    while (!dqueue_empty(&q)) {
-      long int act_node=dqueue_back(&q);
+    IGRAPH_CHECK(igraph_dqueue_push(&q, i));
+    while (!igraph_dqueue_empty(&q)) {
+      long int act_node=igraph_dqueue_back(&q);
       IGRAPH_CHECK(igraph_neighbors(graph, &tmp, act_node, IGRAPH_OUT));
       if (VECTOR(next_nei)[act_node]==0) {
 	/* this is the first time we've met this vertex */
@@ -174,13 +174,13 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 	/* we've already met this vertex but it has more children */
 	long int neighbor=VECTOR(tmp)[(long int)VECTOR(next_nei)[act_node]-1];
 	if (VECTOR(next_nei)[neighbor] == 0) {
-	  IGRAPH_CHECK(dqueue_push(&q, neighbor));
+	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	}
 	VECTOR(next_nei)[act_node]++;
       } else {
 	/* we've met this vertex and it has no more children */
 	IGRAPH_CHECK(igraph_vector_push_back(&out, act_node));
-	dqueue_pop_back(&q);
+	igraph_dqueue_pop_back(&q);
       }
     } /* while q */
   }  /* for */
@@ -196,15 +196,15 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
     VECTOR(next_nei)[grandfather]=1;
     act_cluster_size=1;
     VECTOR(*membership)[grandfather]=no_of_clusters-1;
-    IGRAPH_CHECK(dqueue_push(&q, grandfather));
+    IGRAPH_CHECK(igraph_dqueue_push(&q, grandfather));
     
-    while (!dqueue_empty(&q)) {
-      long int act_node=dqueue_pop_back(&q);
+    while (!igraph_dqueue_empty(&q)) {
+      long int act_node=igraph_dqueue_pop_back(&q);
       IGRAPH_CHECK(igraph_neighbors(graph, &tmp, act_node, IGRAPH_IN));
       for (i=0; i<igraph_vector_size(&tmp); i++) {
 	long int neighbor=VECTOR(tmp)[i];
 	if (VECTOR(next_nei)[neighbor] != 0) { continue; }
-	IGRAPH_CHECK(dqueue_push(&q, neighbor));
+	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	VECTOR(next_nei)[neighbor]=1;
 	act_cluster_size++;
 	VECTOR(*membership)[neighbor]=no_of_clusters-1;
@@ -218,7 +218,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 
   igraph_vector_destroy(&out);
   igraph_vector_destroy(&tmp);
-  dqueue_destroy(&q);
+  igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&next_nei);
   IGRAPH_FINALLY_CLEAN(4);
 
@@ -276,7 +276,7 @@ int igraph_is_connected_weak(const igraph_t *graph, bool_t *res) {
   long int no_of_nodes=igraph_vcount(graph);
   char *already_added;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
-  dqueue_t q=DQUEUE_NULL;
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   
   long int i, j;
 
@@ -286,21 +286,21 @@ int igraph_is_connected_weak(const igraph_t *graph, bool_t *res) {
   }
   IGRAPH_FINALLY(free, already_added); /* TODO: hack */
 
-  DQUEUE_INIT_FINALLY(&q, 10);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 10);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   
   /* Try to find at least two clusters */
   already_added[0]=1;
-  IGRAPH_CHECK(dqueue_push(&q, 0));
+  IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
   
   j=1;
-  while ( !dqueue_empty(&q)) {
-    long int actnode=dqueue_pop(&q);
+  while ( !igraph_dqueue_empty(&q)) {
+    long int actnode=igraph_dqueue_pop(&q);
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
     for (i=0; i <igraph_vector_size(&neis); i++) {
       long int neighbor=VECTOR(neis)[i];
       if (already_added[neighbor] != 0) { continue; }
-      IGRAPH_CHECK(dqueue_push(&q, neighbor));
+      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
       j++;
       already_added[neighbor]++;
     }
@@ -310,7 +310,7 @@ int igraph_is_connected_weak(const igraph_t *graph, bool_t *res) {
   *res = (j == no_of_nodes);
 
   Free(already_added);
-  dqueue_destroy(&q);
+  igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(3);
 

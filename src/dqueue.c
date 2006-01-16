@@ -37,7 +37,7 @@
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int dqueue_init (dqueue_t* q, long int size) {
+int igraph_dqueue_init (igraph_dqueue_t* q, long int size) {
         assert(q != 0);
 	if (size <= 0 ) { size=1; }
 	q->stor_begin=Calloc(size, real_t);
@@ -56,7 +56,7 @@ int dqueue_init (dqueue_t* q, long int size) {
  * \brief Destroys a double ended queue.
  */
 
-void dqueue_destroy (dqueue_t* q) {
+void igraph_dqueue_destroy (igraph_dqueue_t* q) {
   assert(q != 0);
   if (q->stor_begin != 0) {
     Free(q->stor_begin);
@@ -69,7 +69,7 @@ void dqueue_destroy (dqueue_t* q) {
  * \brief Decides whether the queue is empty.
  */
 
-bool_t dqueue_empty (dqueue_t* q) {
+bool_t igraph_dqueue_empty (igraph_dqueue_t* q) {
   assert(q != 0);
   assert(q->stor_begin != 0);
   return q->end == NULL;
@@ -80,7 +80,7 @@ bool_t dqueue_empty (dqueue_t* q) {
  * \brief Removes all elements from the queue.
  */
 
-void dqueue_clear   (dqueue_t* q) {
+void igraph_dqueue_clear   (igraph_dqueue_t* q) {
   assert(q != 0);
   assert(q->stor_begin != 0);
   q->begin=q->stor_begin;
@@ -91,11 +91,11 @@ void dqueue_clear   (dqueue_t* q) {
  * \ingroup dqueue
  * \brief Checks whether the queue is full.
  *
- * If a queue is full the next dqueue_push() operation will allocate
+ * If a queue is full the next igraph_dqueue_push() operation will allocate
  * more memory.
  */
 
-bool_t dqueue_full (dqueue_t* q) {
+bool_t igraph_dqueue_full (igraph_dqueue_t* q) {
   assert(q != 0);
   assert(q->stor_begin != 0);
   return q->begin == q->end;
@@ -106,7 +106,7 @@ bool_t dqueue_full (dqueue_t* q) {
  * \brief Returns the number of elements in the queue.
  */
 
-long int dqueue_size (dqueue_t* q) {
+long int igraph_dqueue_size (igraph_dqueue_t* q) {
         assert(q != 0);
         assert(q->stor_begin != 0);
 	if (q->end==NULL) {
@@ -123,7 +123,7 @@ long int dqueue_size (dqueue_t* q) {
  * \brief Returns the element at the head of the queue.
  */
 
-real_t dqueue_head (dqueue_t* q) {
+real_t igraph_dqueue_head (igraph_dqueue_t* q) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
 	return *(q->begin);
@@ -134,7 +134,7 @@ real_t dqueue_head (dqueue_t* q) {
  * \brief Returns the element at the tail of the queue.
  */
 
-real_t dqueue_back (dqueue_t* q) {
+real_t igraph_dqueue_back (igraph_dqueue_t* q) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
 	return *(q->end-1);
@@ -145,7 +145,7 @@ real_t dqueue_back (dqueue_t* q) {
  * \brief Returns and removes the element at the head of the queue.
  */
 
-real_t dqueue_pop (dqueue_t* q) {
+real_t igraph_dqueue_pop (igraph_dqueue_t* q) {
 	real_t tmp=*(q->begin);
         assert(q != 0);
 	assert(q->stor_begin != 0);
@@ -165,7 +165,7 @@ real_t dqueue_pop (dqueue_t* q) {
  * \brief Returns and removes the element at the tail of the queue.
  */
 
-real_t dqueue_pop_back (dqueue_t* q) {
+real_t igraph_dqueue_pop_back (igraph_dqueue_t* q) {
 	real_t tmp;
         assert(q != 0);
 	assert(q->stor_begin != 0);
@@ -191,7 +191,7 @@ real_t dqueue_pop_back (dqueue_t* q) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int dqueue_push (dqueue_t* q, real_t elem) {
+int igraph_dqueue_push (igraph_dqueue_t* q, real_t elem) {
         assert(q != 0);
 	assert(q->stor_begin != 0);
 	if (q->begin != q->end) {

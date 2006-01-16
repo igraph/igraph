@@ -375,7 +375,7 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
   
 /*   long int no_of_nodes; */
 /*   long int radius; */
-/*   dqueue_t q; */
+/*   igraph_dqueue_t q; */
 /*   long int *already_visited; */
 /*   igraph_vector_t add; */
 /*   long int i,j; */
@@ -388,18 +388,18 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
 /*   already_visited=(long int*) R_alloc(no_of_nodes, sizeof(long int)); */
 /*   memset(already_visited, 0, no_of_nodes*sizeof(long int)); */
 
-/*   dqueue_init(&q, 100); */
+/*   igraph_dqueue_init(&q, 100); */
 /*   igraph_vector_init(&add, 0); */
 /*   igraph_vector_reserve(&add, radius*no_of_nodes); */
   
 /*   for (i=1; i<=no_of_nodes; i++) { */
-/*     dqueue_push(&q, i); */
-/*     dqueue_push(&q, 0); */
+/*     igraph_dqueue_push(&q, i); */
+/*     igraph_dqueue_push(&q, 0); */
 /*     already_visited[i-1]=i; */
     
-/*     while (!dqueue_empty(&q)) { */
-/*       long int actnode=dqueue_pop(&q); */
-/*       long int actdist=dqueue_pop(&q); */
+/*     while (!igraph_dqueue_empty(&q)) { */
+/*       long int actnode=igraph_dqueue_pop(&q); */
+/*       long int actdist=igraph_dqueue_pop(&q); */
 /*       if (actdist >= 2 && (actnode > i || mutual)) { */
 /* 	igraph_vector_push_back(&add, i); */
 /* 	igraph_vector_push_back(&add, actnode); */
@@ -410,15 +410,15 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
 /* 	  long int neighbor=REAL(VECTOR_ELT(neis, actnode-1))[j]; */
 /* 	  if (already_visited[neighbor-1] == i) { continue; } */
 /* 	  already_visited[neighbor-1] = i; */
-/* 	  dqueue_push(&q, neighbor); */
-/* 	  dqueue_push(&q, actdist+1); */
+/* 	  igraph_dqueue_push(&q, neighbor); */
+/* 	  igraph_dqueue_push(&q, actdist+1); */
 /* 	} */
 /*       } */
-/*     } /\* while !dqueue_empty(q) *\/ */
+/*     } /\* while !igraph_dqueue_empty(q) *\/ */
 /*     R_CheckUserInterrupt(); */
 /*   } /\* for i<=no_of_nodes *\/ */
 
-/*   dqueue_destroy(&q); */
+/*   igraph_dqueue_destroy(&q); */
   
 /*   /\* Copy vector to result *\/ */
 /*   j=igraph_vector_size(&add); */

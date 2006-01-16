@@ -47,24 +47,24 @@ typedef struct s_dqueue {
   real_t *end;
   real_t *stor_begin;
   real_t *stor_end;
-} dqueue_t;
+} igraph_dqueue_t;
 
-#define DQUEUE_NULL { 0,0,0,0 }
-#define DQUEUE_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(dqueue_init(v, size)); \
-  IGRAPH_FINALLY(dqueue_destroy, v); } while (0)
+#define IGRAPH_DQUEUE_NULL { 0,0,0,0 }
+#define IGRAPH_DQUEUE_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_dqueue_init(v, size)); \
+  IGRAPH_FINALLY(igraph_dqueue_destroy, v); } while (0)
 
-int dqueue_init    (dqueue_t* q, long int size);
-void dqueue_destroy (dqueue_t* q);
-bool_t dqueue_empty   (dqueue_t* q);
-void dqueue_clear   (dqueue_t* q);
-bool_t dqueue_full    (dqueue_t* q);
-long int dqueue_size    (dqueue_t* q);
-real_t dqueue_pop     (dqueue_t* q);
-real_t dqueue_pop_back(dqueue_t* q);
-real_t dqueue_head    (dqueue_t* q);
-real_t dqueue_back    (dqueue_t* q);
-int dqueue_push    (dqueue_t* q, real_t elem);
+int igraph_dqueue_init    (igraph_dqueue_t* q, long int size);
+void igraph_dqueue_destroy (igraph_dqueue_t* q);
+bool_t igraph_dqueue_empty   (igraph_dqueue_t* q);
+void igraph_dqueue_clear   (igraph_dqueue_t* q);
+bool_t igraph_dqueue_full    (igraph_dqueue_t* q);
+long int igraph_dqueue_size    (igraph_dqueue_t* q);
+real_t igraph_dqueue_pop     (igraph_dqueue_t* q);
+real_t igraph_dqueue_pop_back(igraph_dqueue_t* q);
+real_t igraph_dqueue_head    (igraph_dqueue_t* q);
+real_t igraph_dqueue_back    (igraph_dqueue_t* q);
+int igraph_dqueue_push    (igraph_dqueue_t* q, real_t elem);
 
 /* -------------------------------------------------- */
 /* Flexible vector                                    */
@@ -276,24 +276,24 @@ typedef struct s_heap {
   real_t* stor_end;
   real_t* end;
   int destroy;
-} heap_t;
+} igraph_heap_t;
 
-#define HEAP_NULL { 0,0,0 }
+#define IGRAPH_HEAP_NULL { 0,0,0 }
 
-int heap_init           (heap_t* h, long int size);
-int heap_init_array     (heap_t *t, real_t* data, long int len);
-void heap_destroy        (heap_t* h);
-bool_t heap_empty          (heap_t* h);
-int heap_push           (heap_t* h, real_t elem);
-real_t heap_max       (heap_t* h);
-real_t heap_delete_max(heap_t* h);
-long int heap_size      (heap_t* h);
-int heap_reserve        (heap_t* h, long int size);
+int igraph_heap_init           (igraph_heap_t* h, long int size);
+int igraph_heap_init_array     (igraph_heap_t *t, real_t* data, long int len);
+void igraph_heap_destroy        (igraph_heap_t* h);
+bool_t igraph_heap_empty          (igraph_heap_t* h);
+int igraph_heap_push           (igraph_heap_t* h, real_t elem);
+real_t igraph_heap_max       (igraph_heap_t* h);
+real_t igraph_heap_delete_max(igraph_heap_t* h);
+long int igraph_heap_size      (igraph_heap_t* h);
+int igraph_heap_reserve        (igraph_heap_t* h, long int size);
 
-void heap_i_build(real_t* arr, long int size, long int head);
-void heap_i_shift_up(real_t* arr, long int size, long int elem);
-void heap_i_sink(real_t* arr, long int size, long int head);
-void heap_i_switch(real_t* arr, long int e1, long int e2);
+void igraph_heap_i_build(real_t* arr, long int size, long int head);
+void igraph_heap_i_shift_up(real_t* arr, long int size, long int elem);
+void igraph_heap_i_sink(real_t* arr, long int size, long int head);
+void igraph_heap_i_switch(real_t* arr, long int e1, long int e2);
 
 /* -------------------------------------------------- */
 /* Indexed heap                                       */
@@ -310,25 +310,25 @@ typedef struct s_indheap {
   real_t* end;
   int destroy;
   long int* index_begin;
-} indheap_t;
+} igraph_indheap_t;
 
-#define INDHEAP_NULL { 0,0,0,0,0 }
+#define IGRAPH_INDHEAP_NULL { 0,0,0,0,0 }
 
-int indheap_init           (indheap_t* h, long int size);
-int indheap_init_array     (indheap_t *t, real_t* data, long int len);
-void indheap_destroy        (indheap_t* h);
-bool_t indheap_empty          (indheap_t* h);
-int indheap_push           (indheap_t* h, real_t elem);
-real_t indheap_max       (indheap_t* h);
-real_t indheap_delete_max(indheap_t* h);
-long int indheap_size      (indheap_t* h);
-int indheap_reserve        (indheap_t* h, long int size);
-long int indheap_max_index(indheap_t *h);
+int igraph_indheap_init           (igraph_indheap_t* h, long int size);
+int igraph_indheap_init_array     (igraph_indheap_t *t, real_t* data, long int len);
+void igraph_indheap_destroy        (igraph_indheap_t* h);
+bool_t igraph_indheap_empty          (igraph_indheap_t* h);
+int igraph_indheap_push           (igraph_indheap_t* h, real_t elem);
+real_t igraph_indheap_max       (igraph_indheap_t* h);
+real_t igraph_indheap_delete_max(igraph_indheap_t* h);
+long int igraph_indheap_size      (igraph_indheap_t* h);
+int igraph_indheap_reserve        (igraph_indheap_t* h, long int size);
+long int igraph_indheap_max_index(igraph_indheap_t *h);
 
-void indheap_i_build(indheap_t* h, long int head);
-void indheap_i_shift_up(indheap_t* h, long int elem);
-void indheap_i_sink(indheap_t* h, long int head);
-void indheap_i_switch(indheap_t* h, long int e1, long int e2);
+void igraph_indheap_i_build(igraph_indheap_t* h, long int head);
+void igraph_indheap_i_shift_up(igraph_indheap_t* h, long int elem);
+void igraph_indheap_i_sink(igraph_indheap_t* h, long int head);
+void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2);
 
 /* -------------------------------------------------- */
 /* Doubly indexed heap                                */
@@ -351,26 +351,26 @@ typedef struct s_indheap_d {
   int destroy;
   long int* index_begin;
   long int* index2_begin;
-} d_indheap_t;
+} igraph_d_indheap_t;
 
 
-#define D_INDHEAP_NULL { 0,0,0,0,0,0 }
+#define IGRAPH_D_INDHEAP_NULL { 0,0,0,0,0,0 }
 
-int d_indheap_init           (d_indheap_t* h, long int size);
-void d_indheap_destroy        (d_indheap_t* h);
-bool_t d_indheap_empty          (d_indheap_t* h);
-int d_indheap_push           (d_indheap_t* h, real_t elem, 
+int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int size);
+void igraph_d_indheap_destroy        (igraph_d_indheap_t* h);
+bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h);
+int igraph_d_indheap_push           (igraph_d_indheap_t* h, real_t elem, 
 			      long int idx, long int idx2);
-real_t d_indheap_max       (d_indheap_t* h);
-real_t d_indheap_delete_max(d_indheap_t* h);
-long int d_indheap_size      (d_indheap_t* h);
-int d_indheap_reserve        (d_indheap_t* h, long int size);
-void d_indheap_max_index(d_indheap_t *h, long int *idx, long int *idx2);
+real_t igraph_d_indheap_max       (igraph_d_indheap_t* h);
+real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h);
+long int igraph_d_indheap_size      (igraph_d_indheap_t* h);
+int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size);
+void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *idx2);
 
-void d_indheap_i_build(d_indheap_t* h, long int head);
-void d_indheap_i_shift_up(d_indheap_t* h, long int elem);
-void d_indheap_i_sink(d_indheap_t* h, long int head);
-void d_indheap_i_switch(d_indheap_t* h, long int e1, long int e2);
+void igraph_d_indheap_i_build(igraph_d_indheap_t* h, long int head);
+void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, long int elem);
+void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head);
+void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2);
 
 /**
  * \defgroup strvector Vector of strings
