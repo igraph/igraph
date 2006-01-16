@@ -32,7 +32,7 @@ typedef struct s_igraph_attribute_list {
   long int len;
   igraph_strvector_t names;
   igraph_vector_t types;
-  vector_ptr_t data;
+  igraph_vector_ptr_t data;
 } igraph_attribute_list_t;
 
 int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len);

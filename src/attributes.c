@@ -73,7 +73,7 @@ int igraph_attribute_list_init(igraph_attribute_list_t *al, long int len) {
   al->len=len;
   IGRAPH_STRVECTOR_INIT_FINALLY(&al->names, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&al->types, 0);
-  VECTOR_PTR_INIT_FINALLY(&al->data, 0);
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&al->data, 0);
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }
@@ -92,7 +92,7 @@ void igraph_attribute_list_destroy(igraph_attribute_list_t *al) {
 
   igraph_strvector_destroy(&al->names);
   igraph_vector_destroy(&al->types);
-  vector_ptr_destroy_all(&al->data);
+  igraph_vector_ptr_destroy_all(&al->data);
 }
 
 /**
@@ -130,11 +130,11 @@ int igraph_attribute_list_add(igraph_attribute_list_t *al,
     }
   }
 
-  IGRAPH_CHECK(vector_ptr_reserve(&al->data, vector_ptr_size(&al->data)+1));
+  IGRAPH_CHECK(igraph_vector_ptr_reserve(&al->data, igraph_vector_ptr_size(&al->data)+1));
   IGRAPH_CHECK(igraph_vector_reserve(&al->types, igraph_vector_size(&al->types)+1));
   IGRAPH_CHECK(igraph_strvector_add(&al->names, name));
     
-  vector_ptr_push_back(&al->data, data);
+  igraph_vector_ptr_push_back(&al->data, data);
   igraph_vector_push_back(&al->types, type);
   /* Space is allocated already, no need to check errors... */
 
@@ -157,9 +157,9 @@ int igraph_attribute_list_remove(igraph_attribute_list_t *al,
   }
 
   igraph_i_attribute_list_free(al, pos);
-  ptr=vector_ptr_e(&al->data, pos);
+  ptr=igraph_vector_ptr_e(&al->data, pos);
   Free(ptr);
-  vector_ptr_remove(&al->data, pos);
+  igraph_vector_ptr_remove(&al->data, pos);
   igraph_vector_remove(&al->types, pos);
   igraph_strvector_remove(&al->names, pos);
   return 0;
@@ -434,8 +434,8 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
   IGRAPH_FINALLY(&to->names, igraph_strvector_destroy);  
   IGRAPH_CHECK(igraph_vector_copy(&to->types, &from->types));
   IGRAPH_FINALLY(&to->types, igraph_vector_destroy);
-  IGRAPH_CHECK(vector_ptr_copy(&to->data, &from->data));
-  vector_ptr_null(&to->data);
+  IGRAPH_CHECK(igraph_vector_ptr_copy(&to->data, &from->data));
+  igraph_vector_ptr_null(&to->data);
 
   oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
   for (i=0; i<igraph_vector_size(&from->types); i++) {
@@ -482,7 +482,7 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
 	}
       }
     }
-    vector_ptr_destroy(&to->data);
+    igraph_vector_ptr_destroy(&to->data);
   }
   
   igraph_set_error_handler(oldhandler);

@@ -293,7 +293,7 @@ int R_SEXP_to_attributes(SEXP attr, igraph_attribute_list_t *al) {
   al->len=REAL(VECTOR_ELT(attr, 0))[0];
   R_igraph_SEXP_to_strvector(VECTOR_ELT(attr, 1), &al->names);
   R_SEXP_to_vector(VECTOR_ELT(attr, 2), &al->types);
-  vector_ptr_view(&al->data, (void*) R_alloc(nattr, sizeof(void*)),
+  igraph_vector_ptr_view(&al->data, (void*) R_alloc(nattr, sizeof(void*)),
 		  nattr);
   for (i=0; i<nattr; i++) {
     if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_NUM) {
@@ -318,7 +318,7 @@ int R_SEXP_to_attributes_copy(SEXP attr, igraph_attribute_list_t *al) {
   R_igraph_SEXP_to_strvector_copy(VECTOR_ELT(attr, 1), &al->names);
   igraph_vector_init_copy(&al->types, REAL(VECTOR_ELT(attr, 2)), 
 		   GET_LENGTH(VECTOR_ELT(attr, 2)));
-  vector_ptr_init(&al->data, nattr);  
+  igraph_vector_ptr_init(&al->data, nattr);  
 
   for (i=0; i<nattr; i++) {
     if (VECTOR(al->types)[i] == IGRAPH_ATTRIBUTE_NUM) {      

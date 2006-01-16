@@ -114,7 +114,7 @@ PyObject* igraphmodule_EdgeSeq_sq_item(igraphmodule_EdgeSeqObject* self,
  */
 PyObject* igraphmodule_EdgeSeq_attributes(igraphmodule_EdgeSeqObject* self) {
   igraph_vector_t t;
-  vector_ptr_t ns;
+  igraph_vector_ptr_t ns;
   long result;
   igraphmodule_GraphObject *o;
   

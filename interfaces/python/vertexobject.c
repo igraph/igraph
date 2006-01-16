@@ -117,7 +117,7 @@ int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
  */
 PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
   igraph_vector_t t;
-  vector_ptr_t ns;
+  igraph_vector_ptr_t ns;
   long result;
   igraphmodule_GraphObject *o;
   

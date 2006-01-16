@@ -157,32 +157,32 @@ typedef struct s_vector_ptr {
   void** stor_begin;
   void** stor_end;
   void** end;
-} vector_ptr_t;
+} igraph_vector_ptr_t;
 
-#define VECTOR_PTR_NULL { 0,0,0 }
-#define VECTOR_PTR_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(vector_ptr_init(v, size)); \
-  IGRAPH_FINALLY(vector_ptr_destroy, v); } while (0)
+#define IGRAPH_VECTOR_PTR_NULL { 0,0,0 }
+#define IGRAPH_VECTOR_PTR_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_ptr_init(v, size)); \
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, v); } while (0)
 
-int vector_ptr_init      (vector_ptr_t* v, long int size);
-int vector_ptr_init_copy (vector_ptr_t* v, void** data, long int length);
-const vector_ptr_t *vector_ptr_view (const vector_ptr_t *v, 
+int igraph_vector_ptr_init      (igraph_vector_ptr_t* v, long int size);
+int igraph_vector_ptr_init_copy (igraph_vector_ptr_t* v, void** data, long int length);
+const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v, 
 				     void *const *data, long int length);
-void vector_ptr_destroy   (vector_ptr_t* v);
-void vector_ptr_free_all   (vector_ptr_t* v);
-void vector_ptr_destroy_all   (vector_ptr_t* v);
-int vector_ptr_reserve   (vector_ptr_t* v, long int size);
-bool_t vector_ptr_empty     (const vector_ptr_t* v);
-long int vector_ptr_size      (const vector_ptr_t* v);
-void vector_ptr_clear     (vector_ptr_t* v);
-void vector_ptr_null      (vector_ptr_t* v);
-int vector_ptr_push_back (vector_ptr_t* v, void* e);
-void* vector_ptr_e         (const vector_ptr_t* v, long int pos);
-void vector_ptr_set       (vector_ptr_t* v, long int pos, void* value);
-int vector_ptr_resize(vector_ptr_t* v, long int newsize);
-void vector_ptr_copy_to(const vector_ptr_t *v, void** to);
-int vector_ptr_copy(vector_ptr_t *to, const vector_ptr_t *from);
-void vector_ptr_remove(vector_ptr_t *v, long int pos);
+void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v);
+void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v);
+void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v);
+int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size);
+bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v);
+long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v);
+void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v);
+void igraph_vector_ptr_null      (igraph_vector_ptr_t* v);
+int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e);
+void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos);
+void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* value);
+int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize);
+void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
+int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
+void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
 
 /* -------------------------------------------------- */
 /* Matrix, very similar to vector                     */
@@ -415,20 +415,20 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
 
 typedef struct s_igraph_trie_node {
   igraph_strvector_t strs;
-  vector_ptr_t children;
+  igraph_vector_ptr_t children;
   igraph_vector_t values;
 } igraph_trie_node_t;
 
 typedef struct s_igraph_trie {
   igraph_strvector_t strs;
-  vector_ptr_t children;
+  igraph_vector_ptr_t children;
   igraph_vector_t values;
   long int maxvalue;
   bool_t storekeys;
   igraph_strvector_t keys;
 } igraph_trie_t;
 
-#define IGRAPH_TRIE_NULL { IGRAPH_STRVECTOR_NULL, VECTOR_PTR_NULL, \
+#define IGRAPH_TRIE_NULL { IGRAPH_STRVECTOR_NULL, IGRAPH_VECTOR_PTR_NULL, \
                            IGRAPH_VECTOR_NULL, 0, 0, IGRAPH_STRVECTOR_NULL }
 #define IGRAPH_TRIE_INIT_FINALLY(tr, sk) \
   do { IGRAPH_CHECK(igraph_trie_init(tr, sk)); \

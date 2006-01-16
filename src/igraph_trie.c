@@ -33,12 +33,12 @@
  * \ingroup igraphtrie
  * \brief Creates a trie node (not to be called directly)
  * \return Error code: errors by igraph_strvector_init(),
- *         vector_ptr_init() and igraph_vector_init() might be returned.
+ *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
 int igraph_i_trie_init_node(igraph_trie_node_t *t) { 
   IGRAPH_STRVECTOR_INIT_FINALLY(&t->strs, 0);
-  VECTOR_PTR_INIT_FINALLY(&t->children, 0);
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&t->values, 0);
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
@@ -50,7 +50,7 @@ void igraph_i_trie_destroy_node(igraph_trie_node_t *t, bool_t sfree);
  * \ingroup igraphtrie
  * \brief Creates a trie.
  * \return Error code: errors by igraph_strvector_init(),
- *         vector_ptr_init() and igraph_vector_init() might be returned.
+ *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
 int igraph_trie_init(igraph_trie_t *t, bool_t storekeys) {
@@ -74,13 +74,13 @@ int igraph_trie_init(igraph_trie_t *t, bool_t storekeys) {
 void igraph_i_trie_destroy_node(igraph_trie_node_t *t, bool_t sfree) {
   long int i;
   igraph_strvector_destroy(&t->strs);
-  for (i=0; i<vector_ptr_size(&t->children); i++) {
+  for (i=0; i<igraph_vector_ptr_size(&t->children); i++) {
     igraph_trie_node_t *child=VECTOR(t->children)[i];
     if (child != 0) {
       igraph_i_trie_destroy_node(child, 1);
     }
   }
-  vector_ptr_destroy(&t->children);
+  igraph_vector_ptr_destroy(&t->children);
   igraph_vector_destroy(&t->values);
   if (sfree) { Free(t); }
 }
@@ -161,7 +161,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 	  IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
 	}
 	IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
-	VECTOR_PTR_INIT_FINALLY(&node->children, 1);
+	IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
 	IGRAPH_VECTOR_INIT_FINALLY(&node->values, 1);
 	IGRAPH_CHECK(igraph_strvector_set(&node->strs, 0, key+diff));
 	VECTOR(node->children)[0]=0;
@@ -185,7 +185,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 	IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
       }
       IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 1);
-      VECTOR_PTR_INIT_FINALLY(&node->children, 1);
+      IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 1);
       IGRAPH_VECTOR_INIT_FINALLY(&node->values, 1);
       IGRAPH_CHECK(igraph_strvector_set(&node->strs, 0, str+diff));
       
@@ -219,7 +219,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 	IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
       }
       IGRAPH_STRVECTOR_INIT_FINALLY(&node->strs, 2);
-      VECTOR_PTR_INIT_FINALLY(&node->children, 2);
+      IGRAPH_VECTOR_PTR_INIT_FINALLY(&node->children, 2);
       IGRAPH_VECTOR_INIT_FINALLY(&node->values, 2);
       IGRAPH_CHECK(igraph_strvector_set(&node->strs, 0, str+diff));
       IGRAPH_CHECK(igraph_strvector_set(&node->strs, 1, key+diff));
@@ -249,12 +249,12 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
   /* ------------------------------------ */
   /* Nothing matches */
 
-  IGRAPH_CHECK(vector_ptr_reserve(&t->children, 
-				  vector_ptr_size(&t->children)+1));
+  IGRAPH_CHECK(igraph_vector_ptr_reserve(&t->children, 
+				  igraph_vector_ptr_size(&t->children)+1));
   IGRAPH_CHECK(igraph_vector_reserve(&t->values, igraph_vector_size(&t->values)+1));
   IGRAPH_CHECK(igraph_strvector_add(&t->strs, key));
 
-  vector_ptr_push_back(&t->children, 0); /* allocated */
+  igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
   igraph_vector_push_back(&t->values, newvalue); /* allocated */
   *id=newvalue;
   return 0;

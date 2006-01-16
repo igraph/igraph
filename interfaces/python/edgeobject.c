@@ -117,7 +117,7 @@ int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
  */
 PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
   igraph_vector_t t;
-  vector_ptr_t ns;
+  igraph_vector_ptr_t ns;
   long result;
   igraphmodule_GraphObject *o;
   

@@ -37,7 +37,7 @@
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int vector_ptr_init      (vector_ptr_t* v, int long size) {	
+int igraph_vector_ptr_init      (igraph_vector_ptr_t* v, int long size) {	
         long int alloc_size= size > 0 ? size : 1;
 	assert(v != NULL);
 	if (size < 0) { size=0; }
@@ -54,9 +54,9 @@ int vector_ptr_init      (vector_ptr_t* v, int long size) {
 /**
  */ 
 
-const vector_ptr_t *vector_ptr_view (const vector_ptr_t *v, void *const *data, 
+const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v, void *const *data, 
 				     long int length) {
-  vector_ptr_t *v2=(vector_ptr_t*) v;
+  igraph_vector_ptr_t *v2=(igraph_vector_ptr_t*) v;
   v2->stor_begin=(void **)data;
   v2->stor_end=(void**)data+length;
   v2->end=v2->stor_end;
@@ -68,7 +68,7 @@ const vector_ptr_t *vector_ptr_view (const vector_ptr_t *v, void *const *data,
  * \brief Destroys a pointer vector.
  */
 
-void vector_ptr_destroy   (vector_ptr_t* v) {
+void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v) {
   assert(v != 0);
   if (v->stor_begin != 0) {
     Free(v->stor_begin);
@@ -81,7 +81,7 @@ void vector_ptr_destroy   (vector_ptr_t* v) {
  * \brief Calls free() on all elements of a pointer vector.
  */
 
-void vector_ptr_free_all   (vector_ptr_t* v) {
+void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v) {
   void **ptr;
   assert(v != 0);
   assert(v->stor_begin != 0);
@@ -95,11 +95,11 @@ void vector_ptr_free_all   (vector_ptr_t* v) {
  * \brief Calls free() on all elements and destroys the pointer vector.
  */
 
-void vector_ptr_destroy_all   (vector_ptr_t* v) { 
+void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v) { 
   assert(v != 0);
   assert(v->stor_begin != 0);
-  vector_ptr_free_all(v);
-  vector_ptr_destroy(v);
+  igraph_vector_ptr_free_all(v);
+  igraph_vector_ptr_destroy(v);
 }
 
 /**
@@ -110,13 +110,13 @@ void vector_ptr_destroy_all   (vector_ptr_t* v) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int vector_ptr_reserve   (vector_ptr_t* v, long int size) {
-	long int actual_size=vector_ptr_size(v);
+int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size) {
+	long int actual_size=igraph_vector_ptr_size(v);
 	void **tmp;
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	
-	if (size <= vector_ptr_size(v)) { return 0; }
+	if (size <= igraph_vector_ptr_size(v)) { return 0; }
 
 	tmp=Realloc(v->stor_begin, size, void*);
 	if (tmp==0) {
@@ -134,7 +134,7 @@ int vector_ptr_reserve   (vector_ptr_t* v, long int size) {
  * \brief Decides whether the pointer vector is empty.
  */
 
-bool_t vector_ptr_empty     (const vector_ptr_t* v) {
+bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 	return v->stor_begin == v->end;
@@ -146,7 +146,7 @@ bool_t vector_ptr_empty     (const vector_ptr_t* v) {
  * \todo why does the assert fail???
  */
 
-long int vector_ptr_size      (const vector_ptr_t* v) {
+long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v) {
 	assert(v != NULL);
 /* 	assert(v->stor_begin != NULL);		 */
 	return v->end - v->stor_begin;
@@ -157,7 +157,7 @@ long int vector_ptr_size      (const vector_ptr_t* v) {
  * \brief Removes all elements in a pointer vector.
  */
 
-void vector_ptr_clear     (vector_ptr_t* v) {
+void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);		
 	v->end = v->stor_begin;	
@@ -168,15 +168,15 @@ void vector_ptr_clear     (vector_ptr_t* v) {
  * \brief Appends an elements to the back of a pointer vector.
  */
 
-int vector_ptr_push_back (vector_ptr_t* v, void* e) {
+int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 
 	/* full, allocate more storage */
 	if (v->stor_end == v->end) {
-		long int new_size = vector_ptr_size(v) * 2;
+		long int new_size = igraph_vector_ptr_size(v) * 2;
 		if (new_size == 0) { new_size = 1; }
-		IGRAPH_CHECK(vector_ptr_reserve(v, new_size));
+		IGRAPH_CHECK(igraph_vector_ptr_reserve(v, new_size));
 	}
 	
 	*(v->end) = e;
@@ -190,7 +190,7 @@ int vector_ptr_push_back (vector_ptr_t* v, void* e) {
  * \brief Access an element of a pointer vector.
  */
 
-void* vector_ptr_e         (const vector_ptr_t* v, long int pos) {
+void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 	return * (v->stor_begin + pos);
@@ -201,7 +201,7 @@ void* vector_ptr_e         (const vector_ptr_t* v, long int pos) {
  * \brief Assign to an element of a pointer vector.
  */
 
-void vector_ptr_set       (vector_ptr_t* v, long int pos, void* value) {
+void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* value) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);		
 	*(v->stor_begin + pos) = value;
@@ -212,11 +212,11 @@ void vector_ptr_set       (vector_ptr_t* v, long int pos, void* value) {
  * \brief Set all elements of a pointer vector to the NULL pointer.
  */
 
-void vector_ptr_null      (vector_ptr_t* v) {
+void igraph_vector_ptr_null      (igraph_vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);		
-	if (vector_ptr_size(v)>0) {
-		memset(v->stor_begin, 0, sizeof(void*)*vector_ptr_size(v));
+	if (igraph_vector_ptr_size(v)>0) {
+		memset(v->stor_begin, 0, sizeof(void*)*igraph_vector_ptr_size(v));
 	}
 }
 
@@ -225,8 +225,8 @@ void vector_ptr_null      (vector_ptr_t* v) {
  * \brief Resizes a pointer vector.
  */
 
-int vector_ptr_resize(vector_ptr_t* v, long int newsize) {
-  IGRAPH_CHECK(vector_ptr_reserve(v, newsize));
+int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
+  IGRAPH_CHECK(igraph_vector_ptr_reserve(v, newsize));
   v->end = v->stor_begin+newsize;
   return 0;
 }
@@ -239,7 +239,7 @@ int vector_ptr_resize(vector_ptr_t* v, long int newsize) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int vector_ptr_init_copy(vector_ptr_t *v, void* *data, long int length) {
+int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void* *data, long int length) {
   v->stor_begin=Calloc(length, void*);
   if (v->stor_begin==0) {
     IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
@@ -256,7 +256,7 @@ int vector_ptr_init_copy(vector_ptr_t *v, void* *data, long int length) {
  * \brief Copy the contents of a pointer vector to a regular C array.
  */
 
-void vector_ptr_copy_to(const vector_ptr_t *v, void** to) {
+void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);		
   if (v->end != v->stor_begin) {
@@ -273,16 +273,16 @@ void vector_ptr_copy_to(const vector_ptr_t *v, void** to) {
  * \todo why does the assert fail???
  */
 
-int vector_ptr_copy(vector_ptr_t *to, const vector_ptr_t *from) {
+int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
   assert(from != NULL);
 /*   assert(from->stor_begin != NULL); */
-  to->stor_begin=Calloc(vector_ptr_size(from), void*);
+  to->stor_begin=Calloc(igraph_vector_ptr_size(from), void*);
   if (to->stor_begin==0) {
     IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
   }
-  to->stor_end=to->stor_begin+vector_ptr_size(from);
+  to->stor_end=to->stor_begin+igraph_vector_ptr_size(from);
   to->end=to->stor_end;
-  memcpy(to->stor_begin, from->stor_begin, vector_ptr_size(from)*sizeof(void*));
+  memcpy(to->stor_begin, from->stor_begin, igraph_vector_ptr_size(from)*sizeof(void*));
   
   return 0;
 }
@@ -292,12 +292,12 @@ int vector_ptr_copy(vector_ptr_t *to, const vector_ptr_t *from) {
  * \brief Remove an element from a pointer vector.
  */
 
-void vector_ptr_remove(vector_ptr_t *v, long int pos) {
+void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  if (pos+1<vector_ptr_size(v)) { /* TOOD: why is this needed */
+  if (pos+1<igraph_vector_ptr_size(v)) { /* TOOD: why is this needed */
     memcpy(v->stor_begin+pos, v->stor_begin+pos+1,
-	   sizeof(void*)*(vector_ptr_size(v)-pos));
+	   sizeof(void*)*(igraph_vector_ptr_size(v)-pos));
   }
   v->end--;
 }
