@@ -1,0 +1,3 @@
+
+igraph.i.have.fmemopen <- @HAVE_FMEMOPEN@
+igraph.i.have.open.memstream <- @HAVE_OPEN_MEMSTREAM@

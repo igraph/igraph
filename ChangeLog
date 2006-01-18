@@ -1,3 +1,18 @@
+2006-01-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_read_graph_edgelist)
+	(R_igraph_read_graph_lgl, R_igraph_read_graph_ncol)
+	(R_igraph_write_graph_edgelist, R_igraph_write_graph_lgl)
+	(R_igraph_write_graph_ncol) : make these work on systems without
+	fmemopen and open_memstream
+	* interfaces/R/igraph/R/foreign.R (read.graph, read.graph.edgelist)
+	(read.graph.lgl, read.graph.ncol, write.graph, write.graph.ncol)
+	(write.graph.lgl, write.graph.edgelist) : make this work on systems 
+	without fmemopen and open_memstream (eg. mswin)
+	* interfaces/R/igraph/R/configwin.R (igraph.i.have.fmemopen)
+	(igraph.i.have.open.memstream) : added for windows compatibility,
+	configure is not run on windows
+
 2006-01-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_pagerank) : merge confusion

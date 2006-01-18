@@ -23,6 +23,8 @@
 #include "igraph.h"
 #include "error.h"
 
+#include "config.h"
+
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>
@@ -2409,8 +2411,6 @@ SEXP R_igraph_list_edge_attributes(SEXP graph) {
 
 SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   igraph_t g;
-  void *vfile=RAW(pvfile);
-  long int vfilesize=GET_LENGTH(pvfile);
   integer_t n=REAL(pn)[0];
   bool_t directed=LOGICAL(pdirected)[0];
   FILE *file;
@@ -2418,7 +2418,13 @@ SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   
   R_igraph_before();
   
-  file=fmemopen(vfile, vfilesize, "r");
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
+#else 
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "r");
+#endif
+  if (file==0) { igraph_error("Cannot read edgelist", __FILE__, __LINE__,
+			      IGRAPH_EFILE); }
   igraph_read_graph_edgelist(&g, file, n, directed);
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
@@ -2430,7 +2436,7 @@ SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   return result;  
 }
 
-SEXP R_igraph_write_graph_edgelist(SEXP graph) {
+SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   igraph_t g;
   FILE *stream;
   char *bp;
@@ -2440,12 +2446,22 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph) {
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
+#if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
+#else
+  stream=fopen(CHAR(STRING_ELT(file, 0)), "w");
+#endif
+  if (stream==0) { igraph_error("Cannot write edgelist", __FILE__, __LINE__,
+				IGRAPH_EFILE); }
   igraph_write_graph_edgelist(&g, stream);
   fclose(stream);
+#if HAVE_OPEN_MEMSTREAM == 1
   PROTECT(result=allocVector(RAWSXP, size));
   memcpy(RAW(result), bp, sizeof(char)*size);
   free(bp);
+#else 
+  PROTECT(result=NEW_NUMERIC(0));
+#endif
   
   R_igraph_after();
   
@@ -2455,8 +2471,6 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph) {
 
 SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP pnames, SEXP pweights) {
   igraph_t g;
-  void *vfile=RAW(pvfile);
-  long int vfilesize=GET_LENGTH(pvfile);
   bool_t names=LOGICAL(pnames)[0];
   bool_t weights=LOGICAL(pweights)[0];
   FILE *file;
@@ -2464,7 +2478,13 @@ SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP pnames, SEXP pweights) {
   
   R_igraph_before();
   
-  file=fmemopen(vfile, vfilesize, "r");
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
+#else 
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "r");
+#endif
+  if (file==0) { igraph_error("Cannot read edgelist", __FILE__, __LINE__,
+			      IGRAPH_EFILE); }
   igraph_read_graph_ncol(&g, file, names, weights);
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
@@ -2476,7 +2496,8 @@ SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP pnames, SEXP pweights) {
   return result;  
 }
 
-SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP pnames, SEXP pweights) {
+SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP file, SEXP pnames, 
+			       SEXP pweights) {
   igraph_t g;
   FILE *stream;
   char *bp;
@@ -2498,12 +2519,22 @@ SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP pnames, SEXP pweights) {
   }   
 
   R_SEXP_to_igraph(graph, &g);
+#if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
+#else 
+  stream=fopen(CHAR(STRING_ELT(file,0)), "w");
+#endif
+  if (stream==0) { igraph_error("Cannot write .ncol file", __FILE__, __LINE__,
+				IGRAPH_EFILE); }
   igraph_write_graph_ncol(&g, stream, names, weights);
   fclose(stream);
+#if HAVE_OPEN_MEMSTREAM == 1
   PROTECT(result=allocVector(RAWSXP, size));
   memcpy(RAW(result), bp, sizeof(char)*size);
   free(bp);
+#else
+  PROTECT(result=NEW_NUMERIC(0));
+#endif
   
   R_igraph_after();
   
@@ -2513,8 +2544,6 @@ SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP pnames, SEXP pweights) {
 
 SEXP R_igraph_read_graph_lgl(SEXP pvfile, SEXP pnames, SEXP pweights) {
   igraph_t g;
-  void *vfile=RAW(pvfile);
-  long int vfilesize=GET_LENGTH(pvfile);
   bool_t names=LOGICAL(pnames)[0];
   bool_t weights=LOGICAL(pweights)[0];
   FILE *file;
@@ -2522,7 +2551,13 @@ SEXP R_igraph_read_graph_lgl(SEXP pvfile, SEXP pnames, SEXP pweights) {
   
   R_igraph_before();
   
-  file=fmemopen(vfile, vfilesize, "r");
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
+#else 
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "r");
+#endif
+  if (file==0) { igraph_error("Cannot read edgelist", __FILE__, __LINE__,
+			      IGRAPH_EFILE); }
   igraph_read_graph_lgl(&g, file, names, weights);
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
@@ -2534,8 +2569,8 @@ SEXP R_igraph_read_graph_lgl(SEXP pvfile, SEXP pnames, SEXP pweights) {
   return result;  
 }
 
-SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP pnames, SEXP pweights, 
-			      SEXP pisolates) {
+SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames, 
+			      SEXP pweights, SEXP pisolates) {
   igraph_t g;
   FILE *stream;
   char *bp;
@@ -2558,12 +2593,20 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP pnames, SEXP pweights,
   }   
 
   R_SEXP_to_igraph(graph, &g);
+#if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
+#else
+  stream=fopen(CHAR(STRING_ELT(file, 0)), "w");
+#endif
   igraph_write_graph_lgl(&g, stream, names, weights, isolates);
   fclose(stream);
+#if HAVE_OPEN_MEMSTREAM == 1
   PROTECT(result=allocVector(RAWSXP, size));
   memcpy(RAW(result), bp, sizeof(char)*size);
   free(bp);
+#else
+  PROTECT(result=NEW_NUMERIC(0));
+#endif
   
   R_igraph_after();
   

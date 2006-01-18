@@ -3,10 +3,8 @@ These are needed for the first release:
 ------------------------------------
 
 o write R documentation
-o implement GNU libc only functions for non-GNU libc systems, like cygwin:
-  - open_memstream, fmemopen
 o R interface: don't copy attributes unneccessarily
-o creating html (& info docs) & copy them to the package
+o copy html & info docs to the package
 o write realese script :)
 
 Others:

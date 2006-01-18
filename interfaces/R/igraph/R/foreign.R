@@ -67,6 +67,16 @@ write.graph.fromraw <- function(buffer, file) {
 
 read.graph <- function(file, format="edgelist", ...) {
 
+  if (igraph.i.have.fmemopen) {
+    file <- read.graph.toraw(file)
+  } else {
+    if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
+      buffer <- read.graph.toraw(file)
+      file <- tempfile()
+      write.graph.fromraw(buffer, file)
+    }
+  }
+  
   res <- switch(format,
 #                "pajek"=read.graph.pajek(file, ...),
                 "ncol"=read.graph.ncol(file, ...),
@@ -78,6 +88,16 @@ read.graph <- function(file, format="edgelist", ...) {
 }
 
 write.graph <- function(graph, file, format="edgelist", ...) {
+
+  if (!igraph.i.have.open.memstream) {
+    if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
+      tmpfile <- TRUE
+      origfile <- file
+      file <- tempfile()
+    } else {
+      tmpfile <- FALSE
+    }
+  }
   
   res <- switch(format,
 #                "pajek"=write.graph.pajek(graph, file, ...),
@@ -85,6 +105,16 @@ write.graph <- function(graph, file, format="edgelist", ...) {
                 "ncol"=write.graph.ncol(graph, file, ...),
                 stop(paste("Unknown file format:",format))
                 )
+
+  if (igraph.i.have.open.memstream) {
+    write.graph.fromraw(res, file)
+  } else {
+    if (tmpfile) {
+      buffer <- read.graph.toraw(file)
+      write.graph.fromraw(buffer, origfile)
+    }
+  }
+  
   invisible(res)
 }
 
@@ -92,34 +122,29 @@ write.graph <- function(graph, file, format="edgelist", ...) {
 # Plain edge list format, not sorted
 ################################################################
 
-read.graph.edgelist <- function(filename, n=0,
+read.graph.edgelist <- function(file, n=0,
                                 directed=TRUE, ...) {
 
-  buffer <- read.graph.toraw(filename)
-  .Call("R_igraph_read_graph_edgelist", buffer,
+  .Call("R_igraph_read_graph_edgelist", file,
         as.numeric(n), as.logical(directed),
         PACKAGE="igraph")
 }
 
 write.graph.edgelist <- function(graph, file, 
                                  ...) {
-
-  buffer <- .Call("R_igraph_write_graph_edgelist", graph,
-                  PACKAGE="igraph")
-  write.graph.fromraw(buffer, file)
-
-  invisible(NULL)
+  
+  .Call("R_igraph_write_graph_edgelist", graph, file,
+        PACKAGE="igraph")
 }
 
 ################################################################
 # NCOL and LGL formats, quite simple
 ################################################################
 
-read.graph.ncol <- function(filename, names=TRUE,
+read.graph.ncol <- function(file, names=TRUE,
                            weights=TRUE, ...) {
 
-  buffer <- read.graph.toraw(filename)
-  .Call("R_igraph_read_graph_ncol", buffer,
+  .Call("R_igraph_read_graph_ncol", file,
         as.logical(names), as.logical(weights),
         PACKAGE="igraph")
 }
@@ -131,19 +156,15 @@ write.graph.ncol <- function(graph, file,
   if (length(names)==0 || ! names %in% v.a(graph)) { names <- NULL }
   if (length(weights)==0 || ! weights %in% e.a(graph)) { weights <- NULL }
   
-  buffer <- .Call("R_igraph_write_graph_ncol", graph,
-                  names, weights,
-                  PACKAGE="igraph")
-  write.graph.fromraw(buffer, file)
-  
-  invisible(NULL)
+  .Call("R_igraph_write_graph_ncol", graph, file,
+        names, weights,
+        PACKAGE="igraph")
 }  
 
-read.graph.lgl <- function(filename, names=TRUE,
+read.graph.lgl <- function(file, names=TRUE,
                            weights=TRUE, ...) {
 
-  buffer <- read.graph.toraw(filename)
-  .Call("R_igraph_read_graph_lgl", buffer,
+  .Call("R_igraph_read_graph_lgl", file,
         as.logical(names), as.logical(weights),
         PACKAGE="igraph")
 }
@@ -156,10 +177,7 @@ write.graph.lgl <- function(graph, file,
   if (length(names)==0 || ! names %in% v.a(graph)) { names <- NULL }
   if (length(weights)==0 || ! weights %in% e.a(graph)) { weights <- NULL }
   
-  buffer <- .Call("R_igraph_write_graph_lgl", graph,
-                  names, weights, as.logical(isolates),
-                  PACKAGE="igraph")
-  write.graph.fromraw(buffer, file)
-  
-  invisible(NULL)
+  .Call("R_igraph_write_graph_lgl", graph,
+        names, weights, as.logical(isolates),
+        PACKAGE="igraph")
 }  

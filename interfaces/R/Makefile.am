@@ -31,7 +31,8 @@ RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 	$(top_srcdir)/include/igraph.h \
 	$(top_srcdir)/include/types.h
 
-RSRCSOURCES = src/rinterface.c src/Makevars
+RSRCSOURCES = src/rinterface.c src/Makevars src/Makevars.win \
+	src/config.h.in src/config.h
 
 igraph_0.1.tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
 	cp $(RSCNAMES_ORIGPLACE) igraph/src/
@@ -40,3 +41,4 @@ igraph_0.1.tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
 	R CMD build igraph
 
 CLEANFILES = igraph/src/*
+
