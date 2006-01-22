@@ -19,12 +19,12 @@
 #
 ###################################################################
 
-evcent <- function(graph, v=1:vcount(graph)) {
+evcent <- function(graph, v=igraph.vs.all(graph)) {
 
   ad <- get.adjacency(graph)
 
   res <- abs(eigen(ad)$vectors[,1])
-  res <- res[v]
+  res <- res[as.vector(v)+1]
 
   res
 }

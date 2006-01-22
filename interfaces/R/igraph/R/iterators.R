@@ -130,6 +130,18 @@ igraph.vs.reset <- function(graph, iterator) {
   iterator[[1]][1] <- iterator[[1]][2]
 }
 
+as.vector.igraphvsseq <- function(x, mode="any") {
+  if (x[[1]][2] <= x[[1]][3]) {
+    (x[[1]][2]):(x[[1]][3])
+  } else {
+    numeric()
+  }
+}
+
+as.vector.igraphvsvector <- function(x, mode="any") {
+  x[[2]]
+}
+
 igraph.es.next <- function(graph, iterator) {
   iterator[[1]][1] <- iterator[[1]][1] + 1
   iterator
@@ -174,6 +186,18 @@ igraph.es.to.igraphesseq <- function(graph, iterator) {
 
 igraph.es.to.igraphesvector <- function(graph, iterator) {
   graph[[4]] [ iterator[[2]] [ iterator[[1]][1] ]+1 ]
+}
+
+as.vector.igraphesseq <- function(x, mode="any") {
+  if (x[[1]][2] <= x[[1]][3]) {
+    (x[[1]][2]):(x[[1]][3])
+  } else {
+    numeric()
+  }
+}
+
+as.vector.igraphesvector <- function(x, mode="any") {
+  x[[2]]
 }
 
 ###################################################################

@@ -1,3 +1,9 @@
+2006-01-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R 
+	(edge.betweenness) : use edge sequences
+	* interfaces/R/igraph/R/iterators.R (as.vector) : added
+	
 2006-01-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_read_graph_edgelist)

@@ -141,10 +141,10 @@ betweenness <- function(graph, v=igraph.vs.all(graph), directed=TRUE) {
         PACKAGE="igraph")
 }
 
-edge.betweenness <- function(graph, e=0:(ecount(graph)-1), directed=TRUE) {
+edge.betweenness <- function(graph, e=igraph.es.all(graph), directed=TRUE) {
 
   .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
-        PACKAGE="igraph")[ e+1 ]  
+        PACKAGE="igraph")[ as.vector(e)+1 ]  
 }
 
 transitivity <- function(graph, type="undirected") {
