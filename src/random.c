@@ -24,8 +24,6 @@
 #include "error.h"
 
 #include <math.h>
-double trunc(double);
-double round(double);
 
 /*
  * \ingroup internal
@@ -58,7 +56,7 @@ int igraph_random_sample_alga(igraph_vector_t *res, integer_t l, integer_t h,
     Nreal=-1.0+Nreal; n=-1+n; S=1;
   }
   
-  S=trunc(round(Nreal)*RNG_UNIF01())+1;
+  S=floor(rint(Nreal)*RNG_UNIF01())+1;
   l+=S;
   igraph_vector_push_back(res, l);	/* allocated */
   
@@ -120,7 +118,7 @@ int igraph_random_sample(igraph_vector_t *res, integer_t l, integer_t h,
     while (1) {
       while(1) {
 	X=Nreal*(-Vprime+1.0);
-	S=trunc(X);
+	S=floor(X);
 	if (S <qu1) { break; }
 	Vprime = exp(log(RNG_UNIF01())*ninv);
       }
@@ -164,7 +162,7 @@ int igraph_random_sample(igraph_vector_t *res, integer_t l, integer_t h,
     retval=igraph_random_sample_alga(res, l, h, n);
   } else {
     retval=0;
-    S=trunc(N*Vprime);
+    S=floor(N*Vprime);
     l+=S;
     igraph_vector_push_back(res, l);	/* allocated */
   }

@@ -1,5 +1,10 @@
 2006-01-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/random.c (igraph_random_sample_alga, igraph_random_sample) :
+	use floor instead of trunc, rint instead of round, sunos 5.8
+
+2006-01-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* interfaces/R/igraph/R/structural.properties.R 
 	(edge.betweenness) : use edge sequences
 	* interfaces/R/igraph/R/iterators.R (as.vector) : added
