@@ -287,7 +287,7 @@ as.igraph.es <- function(g, it) {
   if (class(it) %in% c("igraphesseq", "igraphesvector")) {
     it
   } else if (is.numeric(it)) {
-    igraph.vs.vector(g, it)
+    igraph.es.vector(g, it)
   } else {
     stop("Cannot interpret as edge set")
   }

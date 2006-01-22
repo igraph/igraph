@@ -1,3 +1,24 @@
+2006-01-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* R/attributes.R (get.vertex.attribute) : bug corrected
+
+	* R/attributes.R (get.edge.attribute, set.edge.attribute) :
+	updated to use edge sequences
+	* src/rinterface.c (R_igraph_get_edge_attributes)
+	(R_igraph_set_edge_attributes) : updated
+
+	* R/iterators.R (as.igraph.es) : bug.corrected
+
+	* src/rinterface.c (R_SEXP_to_igraph_attr) : added
+	(R_igraph_subgraph, R_igraph_get_graph_attribute)
+	(R_igraph_get_vertex_attribute, R_igraph_get_vertex_attributes)
+	(R_igraph_list_graph_attributes, R_igraph_list_vertex_attributes)
+	(R_igraph_get_edge_attribute, R_igraph_get_edge_attributes)
+	(R_igraph_list_edge_attributes, R_igraph_write_graph_ncol)
+	(R_igraph_write_graph_lgl) : updated to use R_SEXP_to_igraph_attr
+
+	* src/rinterface.c (R_SEXP_to_igraph_es_copy) : typo corrected
+	
 2006-01-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* R/structure.generators.R (igraph.lattice) : make length + dim form

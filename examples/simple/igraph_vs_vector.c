@@ -12,7 +12,7 @@ void igraph_vector_print(const igraph_vector_t *v) {
 int main() {
 
   igraph_t g, g2;
-  const igraph_vector_t v;
+  const igraph_vector_t v=IGRAPH_VECTOR_NULL;
   real_t edges[] = { 0,1, 1,2, 2,2, 2,3, 2,4, 3,4 };
   igraph_vector_t v2, v3;
   long int i;

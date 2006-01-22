@@ -1030,7 +1030,7 @@ int igraph_set_edge_attribute(igraph_t *graph, const char *name,
  *
  * \param graph The graph object.
  * \param name The name of the attribute to get.
- * \param e Vector with the edge ids of the edges of which the
+ * \param e Edge sequence with the edge ids of the edges of which the
  *        attribute will be returned.
  * \param value Pointer to a typeless pointer, which contains the
  *        address of either a \type igraph_vector_t or a
@@ -1045,8 +1045,18 @@ int igraph_set_edge_attribute(igraph_t *graph, const char *name,
  */
 
 int igraph_get_edge_attributes(const igraph_t *graph, const char *name,
-			       const igraph_vector_t *e, void **value) {
-  return igraph_attribute_list_get_many(&graph->eal, name, e, value);
+			       const igraph_es_t *e, void **value) {
+  int ret;
+  igraph_es_t mye;
+  IGRAPH_CHECK(igraph_es_vectorview_it(graph, e, &mye));
+  IGRAPH_FINALLY(igraph_es_destroy, &mye);
+  ret=igraph_attribute_list_get_many(&graph->eal, name, 
+				     igraph_es_vector_getvector(graph, &mye),
+				     value);
+  igraph_es_destroy(&mye);
+  IGRAPH_FINALLY_CLEAN(1);
+  if (e->shorthand) { igraph_es_destroy((igraph_es_t*)e); }
+  return ret;
 }
 
 /**
@@ -1056,7 +1066,7 @@ int igraph_get_edge_attributes(const igraph_t *graph, const char *name,
  *
  * \param graph The graph object.
  * \param name The name of the attribute to set.
- * \param e Vector with the edge ids of the edges of which the
+ * \param e Edge sequence with the edge ids of the edges of which the
  *        attribute will be set.
  * \param value The new value(s) of the attribute. This may be of
  *        different length than \p v, if it is shorter it
@@ -1076,8 +1086,18 @@ int igraph_get_edge_attributes(const igraph_t *graph, const char *name,
  */
 
 int igraph_set_edge_attributes(igraph_t *graph, const char *name,
-			       const igraph_vector_t *e, const void *value) {
-  return igraph_attribute_list_set_many(&graph->eal, name, e, value);
+			       const igraph_es_t *e, const void *value) {
+  int ret;
+  igraph_es_t mye;
+  IGRAPH_CHECK(igraph_es_vectorview_it(graph, e, &mye));
+  IGRAPH_FINALLY(igraph_es_destroy, &mye);
+  ret=igraph_attribute_list_set_many(&graph->eal, name, 
+				     igraph_es_vector_getvector(graph, &mye),
+				     value);
+  igraph_es_destroy(&mye);
+  IGRAPH_FINALLY_CLEAN(1);
+  if (e->shorthand) { igraph_es_destroy((igraph_es_t*)e); }
+  return ret;
 }
 
 /**

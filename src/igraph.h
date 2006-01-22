@@ -1,4 +1,3 @@
-
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
@@ -220,7 +219,7 @@ int igraph_destroy(igraph_t *graph);
 int igraph_copy(igraph_t *to, const igraph_t *from);
 int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges);
 int igraph_add_vertices(igraph_t *graph, integer_t nv);
-int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges); /* eee */
+int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges); /*eee*/
 int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices);
 integer_t igraph_vcount(const igraph_t *graph);
 integer_t igraph_ecount(const igraph_t *graph);
@@ -391,9 +390,9 @@ int igraph_get_edge_attribute(const igraph_t *graph, const char *name,
 int igraph_set_edge_attribute(igraph_t *graph, const char *name, 
 			      long int e, const void *value);
 int igraph_get_edge_attributes(const igraph_t *graph, const char *name, 
-			       const igraph_vector_t *e, void **value); /* eee */
+			       const igraph_es_t *e, void **value);
 int igraph_set_edge_attributes(igraph_t *graph, const char *name, 
-			       const igraph_vector_t *e, const void *value); /* eee */
+			       const igraph_es_t *e, const void *value); 
 int igraph_list_edge_attributes(const igraph_t *graph, igraph_strvector_t *l,
 				igraph_vector_t *types);
 int igraph_get_edge_attribute_type(const igraph_t *graph, const char *name, 

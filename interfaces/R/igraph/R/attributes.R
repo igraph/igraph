@@ -69,15 +69,9 @@ get.vertex.attribute <- function(graph, attrname=NULL,
     .Call("R_igraph_list_vertex_attributes", graph,
           PACKAGE="igraph")
   } else {
-    if (is.numeric(v) && length(v)==1) {    
-      .Call("R_igraph_get_vertex_attribute", graph,
-            as.character(attrname), as.numeric(v),
-            PACKAGE="igraph")
-    } else {
-      .Call("R_igraph_get_vertex_attributes", graph,
-            as.character(attrname), as.igraph.vs(graph, v),
-            PACKAGE="igraph")
-    }
+    .Call("R_igraph_get_vertex_attributes", graph,
+          as.character(attrname), as.igraph.vs(graph, v),
+          PACKAGE="igraph")
   }
 }
 
@@ -117,14 +111,14 @@ get.edge.attribute <- function(graph, attrname=NULL,
           PACKAGE="igraph")
   } else {
     .Call("R_igraph_get_edge_attributes", graph,
-          as.character(attrname), e,
+          as.character(attrname), as.igraph.es(graph, e),
           PACKAGE="igraph")
   }
 }
 
 set.edge.attribute <- function(graph, attrname, e=igraph.es.all(graph),value) {
   .Call("R_igraph_set_edge_attributes", graph, as.character(attrname),
-        e, value,
+        as.igraph.es(graph, e), value,
         PACKAGE="igraph")
 }
 

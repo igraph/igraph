@@ -36,7 +36,7 @@ int main() {
   
   /* Errors */
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_neighbors(&g, &v, 2, 0);
+  ret=igraph_neighbors(&g, &v, 2, (igraph_neimode_t)0); /* conv for c++ */
   if (ret != IGRAPH_EINVMODE) {
     return 1;
   }

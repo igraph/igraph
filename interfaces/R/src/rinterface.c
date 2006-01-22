@@ -48,6 +48,7 @@ int R_SEXP_to_attributes(SEXP attr, igraph_attribute_list_t *al);
 int R_SEXP_to_attributes_copy(SEXP attr, igraph_attribute_list_t *al);
 int R_SEXP_to_igraph(SEXP graph, igraph_t *res);
 int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res);
+int R_SEXP_to_igraph_attr(SEXP graph, igraph_t *res);
 int R_SEXP_to_igraph_vs_copy(SEXP rit, igraph_t *graph, igraph_vs_t *it);
 int R_SEXP_to_igraph_es_copy(SEXP rit, igraph_t *graph, igraph_es_t *it);
 
@@ -349,10 +350,6 @@ int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
   R_SEXP_to_vector(VECTOR_ELT(graph, 6), &res->os);
   R_SEXP_to_vector(VECTOR_ELT(graph, 7), &res->is);
   
-  R_SEXP_to_attributes(VECTOR_ELT(graph, 8), &res->gal);
-  R_SEXP_to_attributes(VECTOR_ELT(graph, 9), &res->val);
-  R_SEXP_to_attributes(VECTOR_ELT(graph,10), &res->eal);
-  
   return 0;
 }
 
@@ -376,6 +373,17 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
   R_SEXP_to_attributes_copy(VECTOR_ELT(graph, 8), &res->gal);
   R_SEXP_to_attributes_copy(VECTOR_ELT(graph, 9), &res->val);
   R_SEXP_to_attributes_copy(VECTOR_ELT(graph,10), &res->eal);
+  
+  return 0;
+}
+
+int R_SEXP_to_igraph_attr(SEXP graph, igraph_t *res) {
+
+  R_SEXP_to_igraph(graph, res);
+  
+  R_SEXP_to_attributes(VECTOR_ELT(graph, 8), &res->gal);
+  R_SEXP_to_attributes(VECTOR_ELT(graph, 9), &res->val);
+  R_SEXP_to_attributes(VECTOR_ELT(graph,10), &res->eal);
   
   return 0;
 }
@@ -417,7 +425,7 @@ int R_SEXP_to_igraph_es_copy(SEXP rit, igraph_t *graph, igraph_es_t *it) {
 			 igraph_vector_view(tmpv, REAL(VECTOR_ELT(rit,1)), 
 				     GET_LENGTH(VECTOR_ELT(rit,1))));
   } else {
-    error("unknown vertex set type");
+    error("unknown edge set type");
   }    
   return 0;
 }
@@ -1321,7 +1329,7 @@ SEXP R_igraph_subgraph(SEXP graph, SEXP pvids) {
   
   R_igraph_before();
   
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
   igraph_subgraph(&g, &sub, &vs);
   PROTECT(result=R_igraph_to_SEXP(&sub));
@@ -1623,7 +1631,7 @@ SEXP R_igraph_get_graph_attribute(SEXP graph, SEXP pname) {
 
   R_igraph_before();
   
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   igraph_get_graph_attribute(&g, name, &value, &type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
     PROTECT(result=NEW_NUMERIC(1));
@@ -1716,7 +1724,7 @@ SEXP R_igraph_get_vertex_attribute(SEXP graph, SEXP pname, SEXP pv) {
 
   R_igraph_before();
   
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   igraph_get_vertex_attribute(&g, name, v, &value, &type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
     PROTECT(result=NEW_NUMERIC(1));
@@ -1771,7 +1779,7 @@ SEXP R_igraph_get_vertex_attributes(SEXP graph, SEXP pname, SEXP pv) {
 
   R_igraph_before();
 
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   R_SEXP_to_igraph_vs_copy(pv, &g, &vs);
 
   igraph_get_vertex_attribute_type(&g, name, &type);
@@ -1839,7 +1847,7 @@ SEXP R_igraph_list_graph_attributes(SEXP graph) {
   
   R_igraph_before();
   
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   igraph_strvector_init(&res, 0);
   igraph_list_graph_attributes(&g, &res, 0);
   PROTECT(result=R_igraph_strvector_to_SEXP(&res));
@@ -1858,7 +1866,7 @@ SEXP R_igraph_list_vertex_attributes(SEXP graph) {
   
   R_igraph_before();
   
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   igraph_strvector_init(&res, 0);
   igraph_list_vertex_attributes(&g, &res, 0);
   PROTECT(result=R_igraph_strvector_to_SEXP(&res));
@@ -2274,7 +2282,7 @@ SEXP R_igraph_get_edge_attribute(SEXP graph, SEXP pname, SEXP pv) {
 
   R_igraph_before();
   
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   igraph_get_edge_attribute(&g, name, v, &value, &type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
     PROTECT(result=NEW_NUMERIC(1));
@@ -2323,21 +2331,21 @@ SEXP R_igraph_get_edge_attributes(SEXP graph, SEXP pname, SEXP pv) {
   
   igraph_t g;
   const char *name=CHAR(STRING_ELT(pname, 0));
-  igraph_vector_t v;
+  igraph_es_t es;
   igraph_attribute_type_t type;
   SEXP result;
 
   R_igraph_before();
 
-  R_SEXP_to_vector(pv, &v);
+  R_SEXP_to_igraph_attr(graph, &g);
+  R_SEXP_to_igraph_es_copy(pv, &g, &es);
 
-  R_SEXP_to_igraph(graph, &g);
   igraph_get_edge_attribute_type(&g, name, &type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
     igraph_vector_t value;
     void *valueptr=&value;
     igraph_vector_init(&value, 0);
-    igraph_get_edge_attributes(&g, name, &v, &valueptr);
+    igraph_get_edge_attributes(&g, name, &es, &valueptr);
     PROTECT(result=NEW_NUMERIC(igraph_vector_size(&value)));
     igraph_vector_copy_to(&value, REAL(result));
     igraph_vector_destroy(&value);
@@ -2345,11 +2353,12 @@ SEXP R_igraph_get_edge_attributes(SEXP graph, SEXP pname, SEXP pv) {
     igraph_strvector_t value;
     void *valueptr=&value;
     igraph_strvector_init(&value, 0);
-    igraph_get_edge_attributes(&g, name, &v, &valueptr);
+    igraph_get_edge_attributes(&g, name, &es, &valueptr);
     PROTECT(result=R_igraph_strvector_to_SEXP(&value));
     igraph_strvector_destroy(&value);
   }    
-  
+  igraph_es_destroy(&es);
+
   R_igraph_after();
   
   UNPROTECT(1);
@@ -2361,27 +2370,28 @@ SEXP R_igraph_set_edge_attributes(SEXP graph, SEXP pname, SEXP pv,
   
   igraph_t g;
   const char *name=CHAR(STRING_ELT(pname, 0));
-  igraph_vector_t v;
+  igraph_es_t es;
   igraph_attribute_type_t type;
   SEXP result;
 
   R_igraph_before();
 
-  R_SEXP_to_vector(pv, &v); 
-
   R_SEXP_to_igraph_copy(graph, &g);
+  R_SEXP_to_igraph_es_copy(pv, &g, &es);
+
   igraph_get_edge_attribute_type(&g, name, &type);
   if (type==IGRAPH_ATTRIBUTE_NUM) {
     igraph_vector_t value;
     R_SEXP_to_vector(AS_NUMERIC(pvalue), &value);
-    igraph_set_edge_attributes(&g, name, &v, &value);
+    igraph_set_edge_attributes(&g, name, &es, &value);
   } else {
     igraph_strvector_t value;
     R_igraph_SEXP_to_strvector(AS_CHARACTER(pvalue), &value);
-    igraph_set_edge_attributes(&g, name, &v, &value);
+    igraph_set_edge_attributes(&g, name, &es, &value);
   }    
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
+  igraph_es_destroy(&es);
   
   R_igraph_after();
   
@@ -2396,7 +2406,7 @@ SEXP R_igraph_list_edge_attributes(SEXP graph) {
   
   R_igraph_before();
   
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
   igraph_strvector_init(&res, 0);
   igraph_list_edge_attributes(&g, &res, 0);
   PROTECT(result=R_igraph_strvector_to_SEXP(&res));
@@ -2518,7 +2528,7 @@ SEXP R_igraph_write_graph_ncol(SEXP graph, SEXP file, SEXP pnames,
     weights=CHAR(STRING_ELT(pweights, 0));
   }   
 
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
 #if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
 #else 
@@ -2592,7 +2602,7 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames,
     weights=CHAR(STRING_ELT(pweights, 0));
   }   
 
-  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_attr(graph, &g);
 #if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
 #else

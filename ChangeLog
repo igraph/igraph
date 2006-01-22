@@ -1,3 +1,17 @@
+2006-01-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* examples/simple/igraph_es_adj.c : updated to be c++ compatible
+	* examples/simple/igraph_es_fromto.c : updated to be c++ compatible
+	* examples/simple/igraph_vs_vector.c : updated to c++ compatible
+	* examples/simple/igraph_degree.c : updated to c++ compatible
+	* examples/simple/igraph_neighbors.c : updated to c++ compatible
+	* examples/simple/vector_ptr.c : updated to c++ compatible
+
+2006-01-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/attributes.c (igraph_get_edge_attributes)
+	(igraph_set_edge_attributes) : updated to use edge sequences
+
 2006-01-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/random.c (igraph_random_sample_alga, igraph_random_sample) :

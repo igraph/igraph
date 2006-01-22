@@ -77,7 +77,8 @@ int main() {
 
   /* Errors */
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_degree(&g, &v, IGRAPH_VS_VECTOR(&g, &seq), 0, IGRAPH_LOOPS);
+  ret=igraph_degree(&g, &v, IGRAPH_VS_VECTOR(&g, &seq), (igraph_neimode_t)0, 
+		    IGRAPH_LOOPS);
   if (ret != IGRAPH_EINVMODE) {
     return 1;
   }
