@@ -45,13 +45,19 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
     string.}
   \item{\dots}{Additional arguments, passed to \code{\link{plot}}.}
 }
-\details{The additional arguments specified are passed to the
-  \code{plot} function.}
-\value{Returns no value. (?)}
+\details{
+  One convenient way to plot graphs is to plot with \code{\link{tkplot}}
+  first, handtune the placement of the vertices, query the coordinates
+  by the \code{\link{tkplot.getcoords}} function and use them with
+  \code{plot} to plot the graph to any R device.
+  
+  The additional arguments specified are passed to the \code{plot}
+  function.} 
+\value{Returns \code{NULL}, invisibly.}
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{layout}} for different layouts,
-  \code{\link{tkplot}} for the better description of the parameters or
+  \code{\link{tkplot}} for the better description of the parameters and
   an interactive version.}
 \examples{
 g <- graph.ring(10)

@@ -21,7 +21,8 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
   \code{out} then the shortest paths \emph{from} the vertex, if
   \code{in} then \emph{to} it will be considered. If \code{all}, the
   default, then the corresponding undirected graph will be used,
-  ie. also not directed paths are searched.}
+  ie. not directed paths are searched. This argument is ignored for
+  undirected graphs.}
   \item{from}{Numeric constant, the vertex from or to the shortest paths
     will be calculated. Note that right now this is not a vector of
     vertex ids, but only a single vertex.}
@@ -48,21 +49,22 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
 }
 \value{
   For \code{shortest.paths} a numeric matrix with \code{vcount(graph)}
-  rows and length(v) columns. The shortest path length from a vertex to
+  columns and \code{length(v)} rows. The shortest path length from a vertex to
   itself is always zero.
 
   For \code{get.shortest.paths} a list of length
   \code{vcount(graph)}. List element \code{i} contains the vertex ids on
   the path from vertex \code{from} to vertex \code{i} (or the other way
   for directed graphs depending on the \code{mode} argument). The vector
-  also contains the \code{from} and \code{i} vertices. If the
-  \code{from} is the same as \code{i} then it is only included once.
-  If there is no path between  two vertices then a numeric vector of
-  length zero is returned as the list element.
+  also contains \code{from} and \code{i} as the first and last
+  elements. If \code{from} is the same as \code{i} then it is only
+  included once. If there is no path between two vertices then a
+  numeric vector of length zero is returned as the list element.
 
   For \code{average.path.length} a single number is returned.
 }
-% \references{}
+\references{ West, D.B. (1996). \emph{Introduction to Graph Theory.} Upper
+  Saddle River, N.J.: Prentice Hall. }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 %\seealso{}
 \examples{

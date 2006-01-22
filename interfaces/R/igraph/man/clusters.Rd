@@ -16,11 +16,11 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
     strongly connected components to search. It is ignored for
     undirected graphs.}
   \item{cumulative}{Logical, if TRUE the cumulative distirubution
-    (realtive frequency) is calculated.}
+    (relative frequency) is calculated.}
   \item{mul.size}{Logical. If TRUE the relative frequencies will be
     multiplied by the cluster sizes.}
   \item{\dots}{Additional attributes to pass to \code{cluster}, right
-    noe only \code{mode} makes sense.}
+    now only \code{mode} makes sense.}
 }
 \details{
   \code{is.connected} decides whether the graph is weakly or strongly

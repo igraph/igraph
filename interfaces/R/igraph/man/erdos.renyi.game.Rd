@@ -3,9 +3,7 @@
 \alias{random.graph.game}
 \title{Generate random graphs according to the Erdos-Renyi model}
 \description{This model is very simple, every possible edge is created
-  with the same constant probability. This is only one version of the ER
-  model, the other -- adding the specified number of edges randomly to
-  ampty graph -- is not implemented yet.}
+  with the same constant probability. }
 \usage{
 erdos.renyi.game(n, p.or.m, type="gnp",
                  directed = FALSE, loops = FALSE, \dots)
@@ -23,11 +21,19 @@ erdos.renyi.game(n, p.or.m, type="gnp",
   \item{\dots}{Additional arguments, ignored.}
 }
 \details{
+  In G(n,p) graphs, the graph has \sQuote{n} vertices and for each edge
+  the probability that it is present in the graph is \sQuote{p}.
+
+  In G(n,m) graphs, the graph has \sQuote{n} vertices and \sQuote{m}
+  edges, and the \sQuote{m} edges are chosen uniformly randomly from the
+  set of all possible edges. This set includes loop edges as well if the
+  \code{loops} parameter is TRUE.
+  
   \code{random.graph.game} is an alias to this function.
 }
 \value{A graph object.}
-\references{ Erdos, P. and Renyi, A., On random graphs, Publicationes
-  Mathematicae 6, 290--297 (1959).
+\references{ Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
+  Mathematicae} 6, 290--297 (1959).
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{barabasi.game}}}

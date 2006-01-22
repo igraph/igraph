@@ -13,9 +13,9 @@ bibcoupling(graph, v=igraph.vs.all(graph))
 }
 \arguments{
   \item{graph}{The graph object to analyze}
-  \item{v}{Numeric vector, the vertex ids for which the cocitation or
-    bibliographic coupling values we want to calculate. The default is
-    all vertices.} 
+  \item{v}{Vertex sequence or numeric vector, the vertex ids for which
+    the cocitation or bibliographic coupling values we want to
+    calculate. The default is all vertices.} 
 }
 \details{
   \code{cocitation} calculates the cocitation counts for the vertices in the
@@ -31,7 +31,7 @@ bibcoupling(graph, v=igraph.vs.all(graph))
 \value{
   A numeric matrix with \code{length(v)} lines and \code{vcount(graph)}
   columns. Element \code{(i,j)} contains the cocitation or bibliographic
-  coupling for vertices \code{i} and \code{j}.
+  coupling for vertices \code{v[i]} and \code{j}.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

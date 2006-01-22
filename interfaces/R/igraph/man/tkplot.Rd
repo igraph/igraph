@@ -137,26 +137,44 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
 
   In the color dialog a color name like 'orange' or RGB notation can
   also be used.
+
+  The \code{tkplot} command creates a new Tk window with the graphical
+  representation of \code{graph}. The command returns an integer number,
+  the tkplot id. The other commands utilize this id to be able to
+  query or manipulate the plot.
+
+  \code{tkplot.close} closes the Tk plot with id \code{tkp.id}.
+
+  \code{tkplot.off} closes all Tk plots.
+
+  \code{tkplot.fit.to.screen} fits the plot to the given rectange
+  (\code{width} and \code{height}), if some of these are \code{NULL}
+  the actual phisical width od height of the plot window is used.
+
+  \code{tkplot.reshape} applies a new layout to the plot, its optional
+  parameters will be collected to a list analogous to \code{layout.par}.
+
+  \code{tkplot.export.postscript} creates a dialog window for saving the
+  plot in postscript format.
+
+  \code{tkplot.getcoords} returns the coordinates of the vertices in a
+  matrix. Each row corresponds to one vertex.
+
+  \code{tkplot.center} shifts the figure to the center of its plot window.
+
+  \code{tkplot.rotate} rotates the figure, its parameter can be given
+  either in degrees or in radians.
 }
 \value{
   \code{tkplot} returns an integer, the id of the plot, this can be used
   to manipulate it from the command line.
 
-  \code{tkplot.close} does not return a value (?).
-
-  \code{tkplot.off} returns TRUE.
-
-  \code{tkplot.fit.to.screen} returns TRUE.
-
-  \code{tkplot.reshape} does not return a value (?).
-
-  \code{tkplot.export.postscript} does not return a value (?).
-
   \code{tkplot.getcoords} returns a matrix with the coordinates.
 
-  \code{tkplot.center} returns TRUE.
-
-  \code{tkplot.rotate} returns TRUE.
+  \code{tkplot.close}, \code{tkplot.off}, \code{tkplot.fit.to.screen},
+  \code{tkplot.reshape}, \code{tkplot.export.postscript},
+  \code{tkplot.center} and \code{tkplot.rotate} return \code{NULL}
+  invisibly. 
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

@@ -19,8 +19,8 @@
 \alias{e.a}
 \alias{e.a<-}
 \title{Graph, vertex and edge attributes}
-\description{Attributes associated values belonging to a whole graph,
-  its vertices or edges. These can represent some property, like data
+\description{Attributes are associated values belonging to a graph,
+  vertices or edges. These can represent some property, like data
   about how the graph was constructed, the color of the vertices when
   the graph is plotted, or simply the weights of the edges in a weighted
   graph.}
@@ -59,7 +59,11 @@ e.a(graph, attrname, e=1:ecount(graph)-1) <- value
   \item{e}{Numeric vector, the ids of the edges. It is not recycled,
     even if \code{value} is longer.}
 }
-\details{Each attribute has a name, this is simply a character
+\details{
+  An attribute value is either a numeric constant or a character
+  string. 
+  
+  Each attribute has a name, this is simply a character
   string. The names of the graph, vertex and edge attributes use
   different name spaces, so the \sQuote{color} vertex attribute has
   nothing to do with the \sQuote{color} edge attribute.
@@ -73,10 +77,10 @@ e.a(graph, attrname, e=1:ecount(graph)-1) <- value
   You can also use the shorter \code{g.a}, \code{v.a}, \code{e.a} forms,
   see the examples below, they are shorthands for the
   \code{get.*.attribute} and \code{set.*.attribute} functions, the
-  latter is in effect if they are used on the left hand side of an
+  latter is in effect if it is used on the left hand side of an
   assignment, see examples below.
 
-  An unneeded attribute can be removed by the \code{remove.*.*}
+  An unneeded attribute can be removed by the \code{remove.*.attribute}
   functions.
 
   You can list the attributes of a graph by giving \code{attrname=NULL}
@@ -90,10 +94,10 @@ e.a(graph, attrname, e=1:ecount(graph)-1) <- value
   \code{set.*.attribute} functions all return a new graph object with the
   requested modifications.
 
-  The \code{get.*.attribute} functions return numeric vectors, the
-  values of the attributes if the \code{attrname} argument is not
-  \code{NULL} and a character vector, the name of the attributes if it
-  is \code{NULL}.
+  The \code{get.*.attribute} functions return numeric or character
+  vectors, the values of the attributes if the \code{attrname} argument
+  is not \code{NULL} and a character vector, the name of the attributes
+  if it is \code{NULL}.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

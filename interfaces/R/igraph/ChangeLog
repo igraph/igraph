@@ -1,0 +1,20 @@
+2006-01-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* R/structure.generators.R (igraph.lattice) : make length + dim form
+	work
+
+2006-01-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* R/iterators.R (igraph.vs.reset, igraph.es.reset) : repaired
+
+	* R/iterators.R (as.vector.igraphvsvector, as.vector.igraphesvector) :
+	minus one bug corrected
+	
+	* R/attributes.R (get.edge.attribute, set.edge.attribute) :
+	updated to use edge sequences
+
+	* R/plot.R (plot.igraph) : return NULL invisibly
+
+	* R/tkplot.R (tkplot.close, tkplot.off, tkplot.fit.to.screen)
+	(tkplot.center, tkplot.reshape, tkplot.export.postscript)
+	(tkplot.rotate) : return NULL invisibly

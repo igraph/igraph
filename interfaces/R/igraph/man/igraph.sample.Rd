@@ -15,14 +15,15 @@ igraph.sample(low, high, length)
   \code{high-low} is big. It is much faster (but of course less general)
   than the builtin \code{sample} function of R.}
 \value{
-  A numeric vector containing integers, the sample.
+  An increasing numeric vector containing integers, the sample.
 }
-\references{Jeffrey Scott Vitter: 'An Efficient Algorithm for Sequential
-  Random Sampling', ACM Transactions on Mathematical Software, 13/1,
+\references{Jeffrey Scott Vitter: An Efficient Algorithm for Sequential
+  Random Sampling, \emph{ACM Transactions on Mathematical Software}, 13/1,
   58--67.}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \examples{
 rs <- igraph.sample(1, 100000000, 10)
+rs
 }
 \keyword{datagen}
     

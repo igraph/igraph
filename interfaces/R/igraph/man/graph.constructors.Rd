@@ -16,28 +16,19 @@ graph.lattice(dimvector = NULL, length = NULL, dim = NULL, nei = 1,
               directed = FALSE, mutual = FALSE, circular = FALSE, \dots)
 }
 \usage{
-graph.empty(\dots, type = igraph.par("default.type"))
-graph(edges, \dots)
-graph.adjacency(adjmatrix, directed = TRUE, \dots)
-graph.star(n, mode = "in", center = 1, directed = TRUE, \dots)
+graph.empty(n=0, directed=TRUE)
+graph(edges, n=max(edges)+1, directed=TRUE)
+graph.adjacency(adjmatrix, mode="directed")
+graph.star(n, mode = "in", center = 0)
 graph.lattice(dimvector, nei = 1, directed = FALSE, mutual = FALSE, 
-              circular = FALSE, \dots)
+              circular = FALSE)
 graph.lattice(length, dim, nei = 1, directed = FALSE, mutual = FALSE,
-              circular = FALSE, \dots)
-graph.ring(n, circular = TRUE, directed = FALSE, mutual = FALSE, \dots)
-graph.tree(n, children = 2, \dots)
+              circular = FALSE)
+graph.ring(n, directed = FALSE, mutual = FALSE, circular=TRUE)
+graph.tree(n, children = 2, mode="out")
 graph.full(n, directed = FALSE, loops = FALSE)
 }
 \arguments{
-  \item{type}{The storage type of the graph, this defines how its data
-    will be stored in the memory or on the disk. Currently the following
-    storage types are defined:
-    \enumerate{
-      \item{\code{adjacencylist}}{the neighbor of each
-	node is stored in a list, this type is immutable, graph
-	modifying operations create a new graph}
-    }
-  }
   \item{edges}{Numeric vector defining the edges, the first edge points
     from the first element to the second, the second edge from the third
   to the fourth, etc.}
@@ -47,28 +38,63 @@ graph.full(n, directed = FALSE, loops = FALSE)
     for \code{graph.lattice} and \code{graph.ring} it is FALSE. For
     \code{graph.star} the \code{mode} argument should be used for
     creating an undirected graph.}
-  \item{n}{The number of vertices in the graph.}
-  \item{mode}{For \code{graph.star} it defined the direction of the
+  \item{n}{The number of vertices in the graph.
+
+    For \code{graph} this parameter is ignored if there is a bigger
+    vertex id in \code{edges}. This means that for this function it is
+    safe to supply zero here if the vertex with the largest id is not an
+    isolate.} 
+  \item{mode}{
+    For \code{graph.adjacency} the possible values of this argument are
+    \itemize{
+      \item{\code{directed}}{the graph will be directed and a matrix
+	element gives the number of edges between two vertex.}
+      \item{\code{undirected}}{this is the same as \code{max}, for
+	convenience.} 
+      \item{\code{max}}{ undirected graph will be created and the number
+	of edges between vertex \code{i} and \code{j} is
+	\code{max(A(i,j), A(j,i))}.} 
+      \item{\code{upper}}{undirected graph will be created, only the
+	upper right triangle (including the diagonal) is used for the
+	number of edges.}
+      \item{\code{lower}}{undirected graph will be created, only the
+	lower left triangle (including the diagonal) is used for
+	creating the edges.}
+      \item{\code{min}}{undirected graph will be created with
+	\code{min(A(i,j), A(j,i))} edges between vertex \code{i} and
+	\code{j}.}
+      \item{\code{plus}}{ undirected graph will be created with
+	\code{A(i,j)+A(j,i)} edges between vertex \code{i} and
+	\code{j}.}  
+    }
+
+    For \code{graph.star} it defines the direction of the
     edges, \code{in}: the edges point \emph{to} the center, \code{out}:
     the edges point \emph{from} the center, \code{undirected}: the edges
-    are undirected.}
+    are undirected.
+
+    For \code{igraph.tree} this parameter defines the direction of the
+    edges. \code{out} indicates that the edges point from the parent to
+    the children, \code{in} indicates that they point from the children
+    to their parents, while \code{undirected} creates an undirected
+    graph. 
+  }
   \item{center}{For \code{graph.star} the center vertex of the graph, by
     default the first vertex.}
   \item{dimvector}{A vector giving the size of the lattice in each
     dimension, for \code{graph.lattice}.}
   \item{nei}{The distance within which (inclusive) the neighbors on the
-    lattice will be connected.}
+    lattice will be connected. This parameter is not used right now.}
   \item{mutual}{Logical, if TRUE directed lattices we be mutually
     connected.} 
-  \item{circular}{Logical, if TRUE the lattice will be circular.}
+  \item{circular}{Logical, if TRUE the lattice or ring will be circular.}
   \item{length}{Integer constant, for regular lattices, the size of the
     lattice in each dimension.}
   \item{dim}{Integer constant, the dimension of the lattice.}
   \item{children}{Integer constant, the number of children of a vertex
-    for \code{graph.tree}.}
+    (except for leafs) for \code{graph.tree}.}
   \item{loops}{If TRUE also loops edges (self edges) are added.}
   \item{graph}{An object.}
-  \item{\dots}{Additional arguments, ignored right now.}
 }
 \details{All these functions create graphs in a deterministic way.
 

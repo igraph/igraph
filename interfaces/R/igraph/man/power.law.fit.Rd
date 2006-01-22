@@ -26,12 +26,12 @@ power.law.fit(x, xmin = NULL, start = 2, \dots)
 }
 \value{A numeric constant giving the power-law exponent.}
 \references{Power laws, Pareto distributions and Zipf's law,
-  M. E. J. Newman, Contemporary Physics, in press.}
+  M. E. J. Newman, \emph{Contemporary Physics}, in press.}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link[stats4]{mle}}}
 \examples{
 # This should approximately yield the correct exponent 3
-g <- barabasi.game(1000)
+g <- barabasi.game(1000)    # increase this number to have a better estimation
 d <- degree(g, mode="in")
 power.law.fit(d+1, 20)
 }

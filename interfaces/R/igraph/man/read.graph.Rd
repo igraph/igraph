@@ -1,13 +1,9 @@
 \name{read.graph}
 \alias{read.graph}
-\alias{read.graph.edgelist}
-\alias{read.graph.ncol}
-\alias{read.graph.lgl}
 \title{Reading foreign file formats}
 \description{The \code{read.graph} function is able to read graphs in
   various representations from a file, or from a http
-  connection. Currently the Pajek and edgelist forms are supported, the
-  default is being the first.}
+  connection. Currently some simple formats are supported.}
 \usage{
 read.graph(file, format = "edgelist", \dots)
 }
@@ -15,7 +11,8 @@ read.graph(file, format = "edgelist", \dots)
   \item{file}{The connection to read from. This can be a local file, or
     a \code{http} or \code{ftp} URI.}
   \item{format}{Character constant giving the file format. Right now
-    \dQuote{edgelist}, \dQuote{ncol} and \dQuote{lgl} are supported. }
+    \code{edgelist}, \code{ncol} and \code{lgl} are supported, the
+    default is \code{edgelist}. }
   \item{\dots}{Additional arguments, see below.}
 }
 \details{
@@ -36,7 +33,7 @@ read.graph(file, format = "edgelist", \dots)
       simply a symbolic weighted edge list. It is a simple text file
       with one edge per line. An edge is defined by two symbolic vertex
       names separated by whitespace. (The symbolic vertex names
-      themselves cannot contain whitespace. They might follow by an
+      themselves cannot contain whitespace. They might followed by an
       optional number, this will be the weight of the edge; the number
       can be negative and can be in scientific notation. If there is no
       weight specified to an edge it is assumed to be zero. 

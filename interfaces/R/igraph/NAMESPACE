@@ -31,6 +31,11 @@ S3method(igraph.es.from, igraphesvector)
 S3method(igraph.es.to, igraphesseq)
 S3method(igraph.es.to, igraphesvector)
 
+S3method(as.vector, igraphvsseq)
+S3method(as.vector, igraphvsvector)
+S3method(as.vector, igraphesseq)
+S3method(as.vector, igraphesvector)
+
 export ("$.igraphvsseq", "$.igraphvsvector",
         "$.igraphesseq", "$.igraphesvector")
 
@@ -84,7 +89,9 @@ export(subgraph, simplify, degree, degree.distribution, diameter,
 
 # plotting
 
-export(plot.igraph, tkplot)
+export(plot.igraph, tkplot, tkplot.close, tkplot.off, tkplot.fit.to.screen,
+       tkplot.reshape, tkplot.export.postscript, tkplot.getcoords,
+       tkplot.center, tkplot.rotate)
 
 # components
 

@@ -453,12 +453,13 @@ tkplot.close <- function(tkp.id, window.close=TRUE) {
   }
   cmd <- paste(sep="", "tkp.", tkp.id)
   rm(list=cmd, envir=.tkplot.env)
+  invisible(NULL)
 }
 
 tkplot.off <- function() {
   eapply(.tkplot.env, function(tkp) { tkdestroy(tkp$top) })
   rm(list=ls(.tkplot.env), envir=.tkplot.env)
-  TRUE
+  invisible(NULL)
 }
 
 tkplot.fit.to.screen <- function(tkp.id, width=NULL, height=NULL) {
@@ -482,7 +483,7 @@ tkplot.fit.to.screen <- function(tkp.id, width=NULL, height=NULL) {
   .tkplot.set(tkp.id, "coords", coords)
   # Update
   .tkplot.update.vertices(tkp.id)
-  invisible(TRUE)
+  invisible(NULL)
 }
 
 tkplot.center <- function(tkp.id) {
@@ -504,7 +505,7 @@ tkplot.center <- function(tkp.id) {
   .tkplot.set(tkp.id, "coords", coords)
   # Update
   .tkplot.update.vertices(tkp.id)
-  invisible(TRUE)
+  invisible(NULL)
 }
   
 tkplot.reshape <- function(tkp.id, newlayout, ...) {
@@ -512,6 +513,7 @@ tkplot.reshape <- function(tkp.id, newlayout, ...) {
   .tkplot.set(tkp.id, "coords", newlayout(tkp$graph, ...))
   tkplot.fit.to.screen(tkp.id)
   .tkplot.update.vertices(tkp.id)
+  invisible(NULL)
 }
 
 tkplot.export.postscript <- function(tkp.id) {
@@ -522,6 +524,7 @@ tkplot.export.postscript <- function(tkp.id) {
                             defaultextension="eps",
                             title="Export graph to PostScript file")
   tkpostscript(tkp$canvas, file=filename)
+  invisible(NULL)
 }
 
 tkplot.getcoords <- function(tkp.id, norm=FALSE) {
@@ -557,7 +560,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   
   .tkplot.set(tkp.id, "coords", coords)
   tkplot.center(tkp.id)
-  invisible(TRUE)
+  invisible(NULL)
 }
 
 ###################################################################

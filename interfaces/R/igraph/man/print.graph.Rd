@@ -18,10 +18,10 @@
   \item{\dots}{Ignored.}
 }
 \details{
-  \code{summary.igraph} prints the number of vertices, edges, whether the
-  graph is directed and its storage type.
-  \code{print.igraph} prints the same information as \code{summary.graph}
-  and also the edges.
+  \code{summary.igraph} prints the number of vertices, edges and whether the
+  graph is directed.
+  \code{print.igraph} prints the same information, aand also lists
+  the edges, and optionally graph, vertex and/or edge attributes.
 }
 \value{Both functions return the graph invisibly.}
 % \references{}

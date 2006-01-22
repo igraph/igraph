@@ -94,4 +94,5 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
     (vertex.size+6*8*log10(nchar(labels)+1))/200
   text(x, y, labels=labels, col=label.color)
   rm(x, y)
+  invisible(NULL)
 }

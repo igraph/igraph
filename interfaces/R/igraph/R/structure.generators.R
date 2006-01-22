@@ -107,6 +107,11 @@ graph.lattice <- function(dimvector=NULL,length=NULL, dim=NULL, nei=1,
 ##   }
   
 ##   res
+
+  if (is.null(dimvector)) {
+    dimvector <- rep(length, dim)
+  }
+  
   .Call("R_igraph_lattice", as.numeric(dimvector), as.numeric(nei),
         as.logical(directed), as.logical(mutual),
         as.logical(circular),

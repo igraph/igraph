@@ -19,8 +19,7 @@ growing.random.game(n, m=1, directed=TRUE, citation=FALSE)
   added to the graph and \code{m} new edges are created. If
   \code{citation} is \code{FALSE} these edges are connecting two
   uniformly randomly chosen vertices, otherwise the edges are connecting 
-  new vertex to uniformly randomly chosen old vertices. For directed
-  graphs, the edges are always originating from the new vertex.
+  new vertex to uniformly randomly chosen old vertices.
 }
 \value{
   A new graph object.

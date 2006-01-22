@@ -1,7 +1,7 @@
 \name{minimum.spanning.tree}
 \alias{minimum.spanning.tree}
 \title{Minimum spanning tree}
-\description{A subgraph of a connected graph is a minimum spanning tree
+\description{A subgraph of a connected graph is a \emph{minimum spanning tree}
   if it is tree, and the sum of its edge weights are the minimal among
   all tree subgraphs of the graph. A minimum spanning forest of a graph
   is the graph consisting of the minimum spanning trees of its
@@ -26,10 +26,10 @@ minimum.spanning.tree(graph, weights=NULL, algorithm="unweighted", \dots)
 }
 \value{
   A graph object with the minimum spanning forest. (To check that it is
-  a tree check that the number of its edges is \code{vcount(graph)-1}.
+  a tree check that the number of its edges is \code{vcount(graph)-1}.)
 }
-\references{ Prim, R.C. 1957. ``Shortest connection networks and some
-  generalizations'' Bell System Technical Journal, 37 1389--1401.}
+\references{ Prim, R.C. 1957. Shortest connection networks and some
+  generalizations \emph{Bell System Technical Journal}, 37 1389--1401.}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{clusters}}}
 \examples{

@@ -12,8 +12,8 @@ diameter(graph, directed = TRUE, unconnected = TRUE)
     be considered. This is ignored for undirected graphs.}
   \item{unconnected}{Logical, what to do if the graph is unconnected. If
     FALSE, the function will return the largest possible diameter which
-    is the number of vertices. If TRUE, the diameter within connected
-    clusters will be considered only.}
+    is the number of vertices. If TRUE, the diameters of the connected
+    components will be calculated and the largest one will be returned.}
 }
 \details{The diameter is calculated by using a breadth-first search like
   method.}

@@ -44,8 +44,8 @@ layout.spring(graph, \dots, params)
   }
   This function was ported from the SNA package.
 
-  \code{layout.kamada.kawai} is other force based algorithm. This was
-  ported from the SNA package. Parameters and default values:
+  \code{layout.kamada.kawai} is another force based algorithm. 
+  Parameters and default values:
   \itemize{
     \item{niter}{Number of iterations to perform (1000).}
     \item{sigma}{Sets the base standard deviation of position change
@@ -55,32 +55,36 @@ layout.spring(graph, \dots, params)
     \item{kkconst}{Sets the Kamada-Kawai vertex attraction
       constant (vcount(graph)**2).}
   }
+  This function performs very well for connected graphs, but it gives
+  poor results for unconnected ones.
+  This function was ported from the SNA package.
 
-  \code{layout.spring} is a spring embedder algorithm. This function was
-  ported from the SNA package. Parameters and default values:
+  \code{layout.spring} is a spring embedder algorithm.
+  Parameters and default values:
   \itemize{
-    \item{mass}{The vertex mass (in ``quasi-kilograms''). (Defaults to 0.1.)}
+    \item{mass}{The vertex mass (in \sQuote{quasi-kilograms}). (Defaults to 0.1.)}
     \item{equil}{The equilibrium spring extension (in
-      ``quasi-meters''). (Defaults to 1.)}
-    \item{k}{The spring coefficient (in ``quasi-Newtons per
-      quasi-meter''). (Defaults to 0.001.)}
+      \sQuote{quasi-meters}). (Defaults to 1.)}
+    \item{k}{The spring coefficient (in \sQuote{quasi-Newtons per
+      quasi-meter}). (Defaults to 0.001.)}
     \item{repeqdis}{The point at which repulsion (if employed) balances
-      out the spring extension force (in ``quasi-meters''). (Defaults to
+      out the spring extension force (in \sQuote{quasi-meters}). (Defaults to
       0.1.)}
     \item{kfr}{The base coefficient of kinetic friction (in
-      ``quasi-Newton quasi-kilograms''). (Defaults to 0.01.)}
+      \sQuote{quasi-Newton quasi-kilograms}). (Defaults to 0.01.)}
     \item{repulse}{Should repulsion be used? (Defaults to FALSE.)}
-  }    
+  }
+  This function was ported from the SNA package. 
 }
 \value{All these functions return a numeric matrix with at least two
   columns and the same number of lines as the number of vertices.}
 \references{
-  Fruchterman, T.M.J. and Reingold, E.M. (1991). ``Graph Drawing by
-  Force-directed Placement.'' Software - Practice and Experience,
+  Fruchterman, T.M.J. and Reingold, E.M. (1991). Graph Drawing by
+  Force-directed Placement. \emph{Software - Practice and Experience},
   21(11):1129-1164. 
 
-  Kamada, T. and Kawai, S. (1989). ``An Algorithm for Drawing General
-  Undirected Graphs.'' Information Processing Letters, 31(1):7-15. 
+  Kamada, T. and Kawai, S. (1989). An Algorithm for Drawing General
+  Undirected Graphs. \emph{Information Processing Letters}, 31(1):7-15. 
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{plot.igraph}}, \code{\link{tkplot}}}

@@ -6,7 +6,7 @@
   eigenvector centralities of positions \code{v} within it
 }
 \usage{
-evcent(graph, v=c(1:vcount(graph))
+evcent(graph, v=igraph.vs.all(graph))
 }
 \arguments{
   \item{graph}{Graph to be analyzed.}
@@ -32,11 +32,11 @@ matrix via the \eqn{SLS^-1}{$S \Lambda S^{-1}$} decomposition).)
 \value{
   A vector containing the centrality scores.
 }
-\references{ Bonacich, P.  (1987).  ``Power and Centrality: A Family of
-Measures.'' \emph{American Journal of Sociology}, 92, 1170-1182. 
+\references{ Bonacich, P.  (1987).  Power and Centrality: A Family of
+Measures. \emph{American Journal of Sociology}, 92, 1170-1182. 
 
-Katz, L.  (1953).  ``A New Status Index Derived from Sociometric
-Analysis.''  \emph{Psychometrika}, 18, 39-43. 
+Katz, L.  (1953).  A New Status Index Derived from Sociometric
+Analysis.  \emph{Psychometrika}, 18, 39-43. 
  }
 \author{ Gabor Csardi \email{csardi@rmki.kfki.hu} and Carter T. Butts
 \email{buttsc@uci.edu} for the manual page} 

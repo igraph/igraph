@@ -111,33 +111,21 @@ remove.edge.attribute <- function(graph, attrname) {
 }
 
 get.edge.attribute <- function(graph, attrname=NULL,
-                                 e=1:ecount(graph)-1) {
+                                 e=igraph.es.all(graph)) {
   if (is.null(attrname)) {
     .Call("R_igraph_list_edge_attributes", graph,
           PACKAGE="igraph")
   } else {
-    if (length(e)==1) {    
-      .Call("R_igraph_get_edge_attribute", graph,
-            as.character(attrname), as.numeric(e),
-            PACKAGE="igraph")
-    } else {
-      .Call("R_igraph_get_edge_attributes", graph,
-            as.character(attrname), as.numeric(e),
-            PACKAGE="igraph")
-    }
+    .Call("R_igraph_get_edge_attributes", graph,
+          as.character(attrname), e,
+          PACKAGE="igraph")
   }
 }
 
-set.edge.attribute <- function(graph, attrname, e=1:ecount(graph)-1, value) {
-  if (length(e)==1) {  
-    .Call("R_igraph_set_edge_attribute", graph, as.character(attrname),
-          as.numeric(e), value,
-          PACKAGE="igraph")
-  } else {
-    .Call("R_igraph_set_edge_attributes", graph, as.character(attrname),
-          as.numeric(e), value,
-          PACKAGE="igraph")
-  }    
+set.edge.attribute <- function(graph, attrname, e=igraph.es.all(graph),value) {
+  .Call("R_igraph_set_edge_attributes", graph, as.character(attrname),
+        e, value,
+        PACKAGE="igraph")
 }
 
 e.a <- get.edge.attribute

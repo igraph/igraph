@@ -2,9 +2,9 @@
 These are needed for the first release:
 ------------------------------------
 
-o write R documentation
 o R interface: don't copy attributes unneccessarily
 o copy html & info docs to the package
+o graph.lattice bug in R if length and dim are given
 o write realese script :)
 
 Others:

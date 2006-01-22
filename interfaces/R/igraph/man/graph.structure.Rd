@@ -22,16 +22,17 @@ delete.vertices(graph, v)
   \code{add.edges} adds the specified edges to the graph. The ids of the
   vertices are preserved.
 
-  \code{add.vertices} adds the specified number of isolated vertices to
+  \code{add.vertices} adds the specified number of isolate vertices to
   the graph. The ids of the old vertices are preserved.
 
   \code{delete.edges} removes the specified edges from the graph. If a
-  specified edge is not present, the function gives an error message.
+  specified edge is not present, the function gives an error message,
+  and the original graph remains unchanged.
   The ids of the vertices are preserved.
 
   \code{delete.vertices} removes the specified vertices from the graph
   together with their adjacent edges. The ids of the vertices are
-  \emph{not} present.
+  \emph{not} preserved.
 }
 \value{The new graph.}
 % \references{}

@@ -28,7 +28,7 @@ degree.distribution(graph, cumulative = FALSE, \dots)
 
   For \code{degree.distribution} a numeric vector of the same length as
   the maximum degree plus one. The first element is the relative
-  frequency of vertices with degree zero, the second with degree one,
+  frequency zero degree vertices, the second vertices with degree one, 
   etc. 
 }
 % \references{}

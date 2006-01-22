@@ -10,7 +10,7 @@ subcomponent(graph, v, mode = "all")
 \arguments{
   \item{graph}{The graph to analyze.}
   \item{v}{The vertex to start the search from.}
-  \item{mode}{Character string, either \dQuote{in}, dQuote{out} or
+  \item{mode}{Character string, either \dQuote{in}, \dQuote{out} or
     \dQuote{all}. If \dQuote{in} all vertices from which \code{v} is
     reachable are listed. If \dQuote{out} all vertices reachable from
     \code{v} are returned. If \dQuote{all} returns the union of
