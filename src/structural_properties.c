@@ -1222,7 +1222,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  * only some of the vertices, all of them must be calculated. Requesting
  * the PageRank for only some of the vertices does not result in any
  * performance increase at all.
- * 
+ * </para>
  * <para>
  * Since the calculation is an iterative
  * process, the algorithm is stopped after a given count of iterations
@@ -1242,7 +1242,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
  * Brisbane, Australia, April 1998.
  * </para>
- * 
+ * <para>
  * \param graph The graph object.
  * \param res The result vector containing the PageRank values for the
  * given nodes.
