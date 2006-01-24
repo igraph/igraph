@@ -83,6 +83,17 @@ scp interfaces/R/igraph_${version}.zip ${repohost}:${repodir}/download ||
 exit 1
 
 #################################################
+# Upload R documentation
+
+cp interfaces/R/igraph_${version}.tar.gz /tmp
+cd /tmp
+tar xzf igraph_${version}.tar.gz
+R CMD check igraph
+scp -rC igraph.Rcheck/igraph/html/* ${repohost}:${repodir}/doc/R/
+dvipdf igraph.Rcheck/igraph-manual.dvi
+scp igraph-manual.pdf ${repohost}:${repodir}/doc/R/igraph.pdf
+
+#################################################
 # mirror the tla repo to geza
 
 # tla archive-mirror csardi@rmki.kfki.hu--2004-public
