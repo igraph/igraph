@@ -8,29 +8,29 @@ version="`head -1 configure.in | cut -f2 -d, | tr -d ' '`"
 nextversion=`echo $version+0.1 | bc | sed s/^\./0\./` 
 
 # Make everything 
-# ./configure --enable-python --enable-docs --enable-rpackage &&
-# make &&
-# make html && make pdf && make info || exit 1
+./configure --enable-python --enable-docs --enable-rpackage &&
+make &&
+make html && make pdf && make info || exit 1
 
 #################################################
 # start jed to write the NEWS section
-# jed NEWS
+jed NEWS
 
 #################################################
 # make a tar.gz source distribution and upload it to the 
 #       igraph homepage (geza)
-# make dist || exit 1
-# scp igraph-${version}.tar.gz ${repohost}:${repodir}/download || exit 1
+make dist || exit 1
+scp igraph-${version}.tar.gz ${repohost}:${repodir}/download || exit 1
 
 #################################################
 # make documentation and upload it to the igraph homepage
-# scp -rC doc/html ${repohost}:${repodir}/doc/ && 
-# cd doc && mv html igraph-docs-${version} &&
-# tar czf igraph-docs-${version}.tar.gz igraph-docs-${version} && 
-# mv igraph-docs-${version} html && cd - && 
-# scp doc/igraph-docs-${version}.tar.gz ${repohost}:${repodir}/doc/ && 
-# scp -C doc/igraph-docs.info doc/igraph-docs.pdf ${repohost}:${repodir}/doc/ ||
-# exit 1
+scp -rC doc/html ${repohost}:${repodir}/doc/ && 
+cd doc && mv html igraph-docs-${version} &&
+tar czf igraph-docs-${version}.tar.gz igraph-docs-${version} && 
+mv igraph-docs-${version} html && cd - && 
+scp doc/igraph-docs-${version}.tar.gz ${repohost}:${repodir}/doc/ && 
+scp -C doc/igraph-docs.info doc/igraph-docs.pdf ${repohost}:${repodir}/doc/ ||
+exit 1
 
 #################################################
 # update the igraph homepage (html) itself
@@ -65,23 +65,22 @@ html=reg.sub("\g<head>"+news, html)
 print html
 ' || exit 1
 
-
 # replace the things to be replaced
-# sed 's/@VERSION@/'$version'/g' doc/igraph2.html >doc/igraph3.html && 
-# scp doc/igraph3.html ${repohost}:${repodir}/igraph.html && 
-# scp doc/*.png doc/*.jpg ${repohost}:${repodir}/ || exit 1
+sed 's/@VERSION@/'$version'/g' doc/igraph2.html >doc/igraph3.html && 
+scp doc/igraph3.html ${repohost}:${repodir}/igraph.html && 
+scp doc/*.png doc/*.jpg ${repohost}:${repodir}/ || exit 1
 
 #################################################
-# make debian packages and upload them to the igraph homepage
-# make deb &&
-# scp ../*igraph*.deb ${repohost}:${repodir}/debian
+make debian packages and upload them to the igraph homepage
+make deb &&
+scp ../*igraph*.deb ${repohost}:${repodir}/debian
 
 #################################################
 # make an R source package and upload that too
 
-# scp interfaces/R/igraph_${version}.tar.gz ${repohost}:${repodir}/download &&
-# scp interfaces/R/igraph_${version}.zip ${repohost}:${repodir}/download ||
-# exit 1
+scp interfaces/R/igraph_${version}.tar.gz ${repohost}:${repodir}/download &&
+scp interfaces/R/igraph_${version}.zip ${repohost}:${repodir}/download ||
+exit 1
 
 #################################################
 # mirror the tla repo to geza
