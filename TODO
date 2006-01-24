@@ -1,17 +1,4 @@
 
-These are needed for the first release:
-------------------------------------
-
-o edge set based on the edge end points
-o use edge set in igraph_delete_edges
-o copy html & info docs to the package (make dist)
-o copy tests + examples to the package (make dist)
-o copy R interface to the package (make dist)
-o write realese script :)
-
-Others:
-------
-
 o make possible building in separate directory (make check, r package,
   make dist do not work)
 o write tutorial

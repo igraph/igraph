@@ -1,4 +1,4 @@
-AC_INIT(igraph, 0.1, csardi@rmki.kfki.hu)
+AC_INIT(igraph, @VERSION@, csardi@rmki.kfki.hu)
 AC_CONFIG_SRCDIR(src/rinterface.c)
 
 AC_PROG_CC

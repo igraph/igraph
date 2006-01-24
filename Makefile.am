@@ -8,7 +8,9 @@ SUBDIRS=src interfaces debian tests $(MAYBE_DOCS)
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
 
-EXTRA_DIST = igraph.pc include/*
+EXTRA_DIST = igraph.pc include/* \
+	doc/html doc/igraph-docs.info doc/igraph-docs.pdf \
+	examples tests interfaces
 
 MAINTAINERCLEANFILES = Makefile.in
 
