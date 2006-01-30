@@ -1,7 +1,7 @@
 #! /bin/bash
 
-repohost=geza.kzoo.edu
-repodir=public_html/igraph
+repohost=cneurocvs.rmki.kfki.hu
+repodir=/var/www/igraph
 
 # Get current version
 version="`head -1 configure.in | cut -f2 -d, | tr -d ' '`"
@@ -18,7 +18,7 @@ jed NEWS
 
 #################################################
 # make a tar.gz source distribution and upload it to the 
-#       igraph homepage (geza)
+#       igraph homepage
 make dist || exit 1
 scp igraph-${version}.tar.gz ${repohost}:${repodir}/download || exit 1
 
@@ -94,7 +94,7 @@ dvipdf igraph.Rcheck/igraph-manual.dvi
 scp igraph-manual.pdf ${repohost}:${repodir}/doc/R/igraph.pdf
 
 #################################################
-# mirror the tla repo to geza
+# mirror the tla repo
 
 # tla archive-mirror csardi@rmki.kfki.hu--2004-public
 
