@@ -1,5 +1,12 @@
 2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/atlas.c (igraph_atlas) : added
+	* src/atlas-edges.h (igraph_i_atlas_edges)
+	(igraph_i_atlas_edges_pos) : added
+	* examples/simple/igraph_atlas.c : added
+
+2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/igraph_grid.c (igraph_2dgrid_init) : deltax, deltay
 	arguments are real numbers
 	(igraph_2dgrid_which) : try to prevent limit cases

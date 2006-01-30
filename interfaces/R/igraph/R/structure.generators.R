@@ -137,3 +137,13 @@ graph.tree <- function(n, children=2, mode="out") {
         as.numeric(mode),
         PACKAGE="igraph")
 }
+
+###################################################################
+# The graph atlas
+###################################################################
+
+graph.atlas <- function(n) {
+
+  .Call("R_igraph_atlas", as.numeric(n),
+        PACKAGE="igraph")
+}

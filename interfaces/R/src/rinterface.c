@@ -2726,3 +2726,21 @@ SEXP R_igraph_decompose(SEXP graph, SEXP pmode, SEXP pmaxcompno,
   UNPROTECT(1);
   return result;  
 }
+
+SEXP R_igraph_atlas(SEXP pno) {
+  
+  int no=REAL(pno)[0];
+  igraph_t g;
+  SEXP result;
+  
+  R_igraph_before();
+
+  igraph_atlas(&g, no);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

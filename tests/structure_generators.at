@@ -75,3 +75,7 @@ AT_KEYWORDS([full igraph_full])
 AT_COMPILE_CHECK([simple/igraph_full.c])
 AT_CLEANUP
 
+AT_SETUP([Graph atlas (igraph_atlas):])
+AT_KEYWORDS([atlas igraph_atlas])
+AT_COMPILE_CHECK([simple/igraph_atlas.c], [simple/igraph_atlas.out])
+AT_CLEANUP

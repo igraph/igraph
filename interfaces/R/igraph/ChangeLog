@@ -1,5 +1,10 @@
 2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/structure.generators.R (graph.atlas) : added
+	* interfaces/R/src/rinterface.c (R_igraph_atlas) : added	
+	
+2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* interfaces/R/igraph/R/layout.R (layout.lgl) : updated
 	* interfaces/R/src/rinterface.c (R_igraph_layout_lgl) : updated
 
