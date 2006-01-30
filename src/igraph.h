@@ -229,6 +229,10 @@ bool_t igraph_is_directed(const igraph_t *graph);
 int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
 		  const igraph_vs_t *vids, igraph_neimode_t mode, 
 		  bool_t loops);
+int igraph_edge(const igraph_t *graph, integer_t eid, 
+		integer_t *from, integer_t *to);		
+int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, integer_t vid,
+		    igraph_neimode_t mode);
 
 /* -------------------------------------------------- */
 /* Vertex sequences, contd.                           */
@@ -486,6 +490,10 @@ int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
 		    igraph_vector_t *csize, igraph_connectedness_t mode);
 int igraph_is_connected(const igraph_t *graph, bool_t *res, 
 			igraph_connectedness_t mode);
+int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
+		     igraph_connectedness_t mode, 
+		     long int maxcompno, long int minelements);
+
 /* TODO: cluster.distribution (?) */
 
 /* -------------------------------------------------- */
@@ -505,6 +513,19 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 			  real_t mass, real_t equil, real_t k,
 			  real_t repeqdis, real_t kfr, bool_t repulse);
+int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
+		      integer_t maxiter, real_t maxdelta, 
+		      real_t area, real_t coolexp,
+		      real_t repulserad, real_t cellsize);
+
+
+/* -------------------------------------------------- */
+/* Visitor-like functions                             */
+/* -------------------------------------------------- */
+
+int igraph_bfs(igraph_t *graph, integer_t vid, igraph_neimode_t mode,
+	       igraph_vector_t *vids, igraph_vector_t *layers,
+	       igraph_vector_t *parents);
 
 /* -------------------------------------------------- */
 /* Centrality                                         */

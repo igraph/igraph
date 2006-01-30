@@ -12,7 +12,8 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	error.c other.c foreign.c random.c \
 	attributes.c dqueue.c heap.c igraph_stack.c \
 	igraph_strvector.c igraph_trie.c matrix.c \
-	vector.c vector_ptr.c memory.c adjlist.c
+	vector.c vector_ptr.c memory.c adjlist.c visitors.c \
+	igraph_grid.c
 
 RSNAMES_H = memory.h random.h
 

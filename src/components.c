@@ -23,6 +23,7 @@
 #include "igraph.h"
 #include "memory.h"
 #include <string.h>
+#include <limits.h>
 
 int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
 			 igraph_vector_t *csize);
@@ -314,5 +315,125 @@ int igraph_is_connected_weak(const igraph_t *graph, bool_t *res) {
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(3);
 
+  return 0;
+}
+
+void igraph_i_decompose_free(igraph_vector_ptr_t *complist) {
+  long int i;
+  for (i=0; i<igraph_vector_ptr_size(complist); i++) {
+    if (VECTOR(*complist)[i] != 0) {
+      igraph_destroy(VECTOR(*complist)[i]);
+      igraph_free(VECTOR(*complist)[i]);
+    }
+  }
+}
+
+/**
+ * \function igraph_decompose
+ * 
+ * Create separate graph for each component of a graph. Note that the
+ * vertex ids in the new graphs will be different than in the original 
+ * graph. (Except if there is only one component in the original graph.)
+ * 
+ * \param graph The original graph.
+ * \param components This pointer vector will contain pointers to the
+ *   subcomponent graphs. It should be initialized before calling this
+ *   function and will be resized to hold the graphs. Don't forget to 
+ *   call \ref igraph_destroy() and igraph_free() on the elements of
+ *   this pointer vector to free unneeded memory.
+ * \param mode Either \c IGRAPH_WEAK or \c IGRAPH_STRONG for weakly
+ *    and strongly connected components respectively. Right now only
+ *    the former is implemented.
+ * \param maxcompno The maximum number of components to return. The
+ *    first \p maxcompno components will be returned (which hold at
+ *    least \p minelements vertices, see the next parameter), the
+ *    others will be ignored. Supply -1 here if you don't want to limit
+ *    the number of components.
+ * \param minelements The minimum number of vertices a component
+ *    should contain in order to place it in the \p components
+ *    vector. Eg. supply 2 here to ignore isolate vertices.
+ * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
+ *   to perform the operation.
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges. 
+ */
+
+int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
+		     igraph_connectedness_t mode,
+		     long int maxcompno, long int minelements) {
+
+  long int actstart;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int resco=0;		/* number of graphs created so far */ 
+  char *already_added;
+  igraph_dqueue_t q;
+  igraph_vector_t verts;
+  igraph_vector_t neis;
+  long int i;
+  igraph_t *newg;
+
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_WEAK;
+  }
+
+  if (mode != IGRAPH_WEAK) {
+    IGRAPH_ERROR("only 'IGRAPH_WEAK' is implemented", IGRAPH_EINVAL);
+  }
+
+  if (maxcompno<0) {
+    maxcompno=LONG_MAX;
+  }
+
+  already_added=Calloc(no_of_nodes, char);
+  if (already_added==0) {
+    IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, already_added);
+
+  IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
+  IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  igraph_vector_ptr_clear(components);
+  IGRAPH_FINALLY(igraph_i_decompose_free, components);
+  
+  for(actstart=0; resco<maxcompno && actstart < no_of_nodes; actstart++) {
+    
+    if (already_added[actstart]) { continue; }
+    
+    igraph_vector_clear(&verts);
+    already_added[actstart]=1;
+    IGRAPH_CHECK(igraph_vector_push_back(&verts, actstart));
+    IGRAPH_CHECK(igraph_dqueue_push(&q, actstart));
+    
+    while (!igraph_dqueue_empty(&q) ) {
+      long int actvert=igraph_dqueue_pop(&q);
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvert, IGRAPH_ALL));
+      for (i=0; i<igraph_vector_size(&neis); i++) {
+	long int neighbor=VECTOR(neis)[i];
+	if (already_added[neighbor]==1) { continue; }
+	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	IGRAPH_CHECK(igraph_vector_push_back(&verts, neighbor));
+	already_added[neighbor]=1;
+      }
+    }
+    
+    /* ok, we have a component */
+    if (igraph_vector_size(&verts)<minelements) { continue; }
+
+    newg=Calloc(1, igraph_t);
+    if (newg==0) {
+      IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
+    }
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
+    IGRAPH_FINALLY(igraph_destroy, newg);
+    IGRAPH_CHECK(igraph_subgraph(graph, newg, 
+				 IGRAPH_VS_VECTOR(graph, &verts)));
+    IGRAPH_FINALLY_CLEAN(1);
+    resco++;
+    
+  } /* for actstart++ */
+
+  IGRAPH_FINALLY_CLEAN(4);
   return 0;
 }

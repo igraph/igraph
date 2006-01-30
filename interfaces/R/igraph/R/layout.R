@@ -74,6 +74,27 @@ layout.kamada.kawai<-function(graph, ..., params=list()) {
         PACKAGE="igraph")
 }
 
+layout.lgl <- function(graph, ..., params=list()) {
+
+  if (length(params)==0) {
+    params <- list(...)
+  }
+
+  vc <- vcount(graph)
+  if (is.null(params$niter))     { params$maxiter    <- 500  }
+  if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
+  if (is.null(params$area))      { params$area       <- vc^2 }
+  if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
+  if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
+  if (is.null(params$cellsize))  { params$cellsize   <- sqrt(params$area)/100 }
+  
+  .Call("R_igraph_layout_lgl", graph, as.double(params$maxiter),
+        as.double(params$maxdelta), as.double(params$area),
+        as.double(params$coolexp), as.double(params$repulserad),
+        as.double(params$cellsize),
+        PACKAGE="igraph")
+}
+
 # FROM SNA 0.5
 
 symmetrize.mat <- function(mats,rule="weak"){

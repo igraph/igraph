@@ -323,3 +323,22 @@ int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from) {
   return igraph_vector_copy(&to->data, &from->data);
 }
 
+/**
+ * \function igraph_matrix_max
+ * 
+ * TODO
+ */
+
+real_t igraph_matrix_max(const igraph_matrix_t *m) {
+  return igraph_vector_max(&m->data);
+}
+
+/**
+ * \function igraph_matrix_multiple
+ * 
+ * TODO
+ */
+
+void igraph_matrix_multiply(igraph_matrix_t *m, real_t by) {
+  igraph_vector_multiply(&m->data, by);
+}

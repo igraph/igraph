@@ -1214,3 +1214,10 @@ bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *
   }
   return VECTOR(*v)[left]==what;
 }
+
+void igraph_vector_multiply(igraph_vector_t *v, real_t by) {
+  long int i;
+  for (i=0; i<igraph_vector_size(v); i++) {
+    VECTOR(*v)[i] *= by;
+  }
+}

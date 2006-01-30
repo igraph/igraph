@@ -897,3 +897,61 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
   }
   return 0;
 }
+
+int igraph_edge(const igraph_t *graph, integer_t eid, 
+		integer_t *from, integer_t *to) {
+  
+  *from = VECTOR(graph->from)[(long int)eid];
+  *to   = VECTOR(graph->to  )[(long int)eid];
+
+  return 0;
+}
+
+int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, 
+		    integer_t pnode, igraph_neimode_t mode) {
+  
+  long int length=0, idx=0;   
+  long int no_of_edges;
+  long int i, j;
+
+  long int node=pnode;
+
+  if (node<0 || node>igraph_vcount(graph)-1) {
+    IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVVID);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
+  }
+
+  no_of_edges=igraph_vector_size(&graph->from);
+  if (! graph->directed) {
+    mode=IGRAPH_ALL;
+  }
+
+  /* Calculate needed space first & allocate it*/
+
+  if (mode & IGRAPH_OUT) {
+    length += (VECTOR(graph->os)[node+1] - VECTOR(graph->os)[node]);
+  }
+  if (mode & IGRAPH_IN) {
+    length += (VECTOR(graph->is)[node+1] - VECTOR(graph->is)[node]);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(eids, length));
+  
+  if (mode & IGRAPH_OUT) {
+    j=VECTOR(graph->os)[node+1];
+    for (i=VECTOR(graph->os)[node]; i<j; i++) {
+      VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i];
+    }
+  }
+  if (mode & IGRAPH_IN) {
+    j=VECTOR(graph->is)[node+1];
+    for (i=VECTOR(graph->is)[node]; i<j; i++) {
+      VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i];
+    }
+  }
+
+  return 0;
+}

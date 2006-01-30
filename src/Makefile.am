@@ -18,7 +18,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
 			     dqueue.c heap.c igraph_stack.c \
 			     igraph_strvector.c igraph_trie.c matrix.c \
-			     vector.c vector_ptr.c memory.c adjlist.c
+			     vector.c vector_ptr.c memory.c adjlist.c \
+			     visitors.c igraph_grid.c
 libigraph_la_CFLAGS        = -O2
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm

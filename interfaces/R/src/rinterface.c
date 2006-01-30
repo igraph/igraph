@@ -1002,7 +1002,36 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
+			 SEXP parea, SEXP pcoolexp, SEXP prepulserad,
+			 SEXP pcellsize) {
   
+  igraph_t g;
+  igraph_matrix_t res;
+  real_t maxiter=REAL(pmaxiter)[0];
+  real_t maxdelta=REAL(pmaxdelta)[0];
+  real_t area=REAL(parea)[0];
+  real_t coolexp=REAL(pcoolexp)[0];
+  real_t repulserad=REAL(prepulserad)[0];
+  real_t cellsize=REAL(pcellsize)[0];
+  SEXP result;
+
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&res, 0, 0);
+  igraph_layout_lgl(&g, &res, maxiter, maxdelta, area, coolexp, repulserad,
+		    cellsize);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}  
+
 SEXP R_igraph_minimum_spanning_tree_unweighted(SEXP graph) {
   
   igraph_t g;
@@ -2666,3 +2695,34 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames,
 /*   return result; */
 /* } */
   
+SEXP R_igraph_decompose(SEXP graph, SEXP pmode, SEXP pmaxcompno, 
+			SEXP pminelements) {
+
+  igraph_t g;
+  integer_t mode=REAL(pmode)[0];
+  integer_t maxcompno=REAL(pmaxcompno)[0];
+  integer_t minelements=REAL(pminelements)[0];
+  igraph_vector_ptr_t comps;
+  SEXP result;
+  long int i;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph_attr(graph, &g);
+  igraph_vector_ptr_init(&comps, 0);
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &comps);
+  igraph_decompose(&g, &comps, mode, maxcompno, minelements);
+  PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&comps)));
+  for (i=0; i<igraph_vector_ptr_size(&comps); i++) {
+    SET_VECTOR_ELT(result, i, R_igraph_to_SEXP(VECTOR(comps)[i]));
+    igraph_destroy(VECTOR(comps)[i]);
+    igraph_free(VECTOR(comps)[i]);
+  }
+  igraph_vector_ptr_destroy(&comps);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;  
+}

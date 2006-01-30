@@ -1,3 +1,15 @@
+2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/layout.R (layout.lgl) : updated
+	* interfaces/R/src/rinterface.c (R_igraph_layout_lgl) : updated
+
+2006-01-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/components.R (decompose.graph) : added
+	* interfaces/R/igraph/R/layout.R (layout.lgl) : added
+	* interfaces/R/src/rinterface.c (R_igraph_decompose)
+	(R_igraph_layout_lgl) : added
+
 2006-01-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* R/attributes.R (get.vertex.attribute) : bug corrected

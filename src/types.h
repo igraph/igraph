@@ -145,6 +145,7 @@ bool_t igraph_vector_isininterval(const igraph_vector_t *v, real_t low, real_t h
 bool_t igraph_vector_any_smaller(const igraph_vector_t *v, real_t limit);
 bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t *rhs);
 bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *pos);
+void igraph_vector_multiply(igraph_vector_t *v, real_t by);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
@@ -237,6 +238,8 @@ int igraph_matrix_remove_col(igraph_matrix_t *m, long int col);
 int igraph_matrix_permdelete_rows(igraph_matrix_t *m, long int *index, long int nremove);
 int igraph_matrix_delete_rows_neg(igraph_matrix_t *m, igraph_vector_t *neg, long int nremove);
 int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from);
+real_t igraph_matrix_max(const igraph_matrix_t *m);
+void igraph_matrix_multiply(igraph_matrix_t *m, real_t by);
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */
@@ -444,4 +447,37 @@ int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
 void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
 long int igraph_trie_size(igraph_trie_t *t);
 
+/**
+ * 2d grid containing points
+ */
+
+typedef struct igraph_2dgrid_t {
+  igraph_matrix_t *coords;
+  real_t minx, maxx, deltax;
+  real_t miny, maxy, deltay;
+  long int stepsx, stepsy;
+  igraph_matrix_t startidx;
+  igraph_vector_t next;
+  igraph_vector_t prev;
+  real_t massx, massy;		/* The sum of the coordinates */
+  long int vertices;		/* Number of active vertices  */
+} igraph_2dgrid_t;
+
+int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords, 
+		       real_t minx, real_t maxx, real_t deltax,
+		       real_t miny, real_t maxy, real_t deltay);
+void igraph_2dgrid_destroy(igraph_2dgrid_t *grid);
+void igraph_2dgrid_add(igraph_2dgrid_t *grid, long int elem, 
+		       real_t xc, real_t yc);
+void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem, 
+			real_t xc, real_t yc);
+void igraph_2dgrid_getcenter(const igraph_2dgrid_t *grid, 
+			     real_t *massx, real_t *massy);
+bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, long int elem);
+real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid, 
+			  long int e1, long int e2);
+int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids, 
+			    integer_t vid, real_t r);
+
 #endif
+

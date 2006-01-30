@@ -25,6 +25,7 @@
 <!-- doxrox-include igraph_subgraph -->
 <!-- doxrox-include igraph_clusters -->
 <!-- doxrox-include igraph_is_connected -->
+<!-- doxrox-include igraph_decompose -->
 </section>
 
 <section><title>Centrality Measures</title>

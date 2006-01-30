@@ -78,7 +78,7 @@ export(read.graph, write.graph)
 # layouts
 
 export(layout.random, layout.circle, layout.fruchterman.reingold,
-       layout.spring, layout.kamada.kawai)
+       layout.spring, layout.kamada.kawai, layout.lgl)
 
 # structural properties
 
@@ -95,7 +95,7 @@ export(plot.igraph, tkplot, tkplot.close, tkplot.off, tkplot.fit.to.screen,
 
 # components
 
-export(clusters, cluster.distribution, is.connected)
+export(clusters, cluster.distribution, is.connected, decompose.graph)
 
 # centrality
 

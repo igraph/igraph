@@ -15,5 +15,6 @@ o add automatic tests
 o make docs look better: index, section tocs
 o make better and faster doxrox engine
 o create man pages
+o implement IGRAPH_STRONG in igraph_decompose
 
 o Hamilton and Euler circles/paths

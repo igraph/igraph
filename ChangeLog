@@ -1,3 +1,34 @@
+2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_grid.c (igraph_2dgrid_init) : deltax, deltay
+	arguments are real numbers
+	(igraph_2dgrid_which) : try to prevent limit cases
+	* src/layout.c (igraph_layout_lgl) : updated to use
+	Fruchterman-Reingold style forces instead of springs
+	* examples/simple/igraph_layout_lgl.c : updated
+
+2006-01-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/vector.c (igraph_vector_multiply) : added
+	* src/matrix.c (igraph_matrix_max, igraph_matrix_multiply) : added
+
+	* src/type_indexededgelist.c (igraph_edge, igraph_adjacent) : added
+	
+	* src/igraph_grid.c (igraph_2dgrid_which, igraph_2dgrid_init)
+	(igraph_2dgrid_add, igraph_2dgrid_move, igraph_2dgrid_getcenter)
+	(igraph_2dgrid_in, igraph_2dgrid_dist, igraph_i_2dgrid_addvertices)
+	(igraph_2dgrid_neighbors) : added 
+
+	* src/visitors.c (igraph_bfs) : added
+	* examples/simple/igraph_bfs.c : added
+
+	* src/components.c (igraph_decompose) : added
+
+	* src/layout.c (igraph_layout_lgl) : added
+	
+	* examples/simple/igraph_decompose.c : added
+	* examples/simple/igraph_layout_lgl.c : added
+
 2006-01-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* examples/simple/igraph_es_adj.c : updated to be c++ compatible

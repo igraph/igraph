@@ -57,3 +57,14 @@ is.connected <- function(graph, mode="weak") {
         PACKAGE="igraph")
 }
 
+decompose.graph <- function(graph, mode="weak", max.comps=NA,
+                      min.vertices=0) {
+  if (is.character(mode)) {
+    mode <- switch(mode, "weak"=1, "strong"=2)
+  }
+  if (is.na(max.comps)) {
+    max.comps=-1
+  }
+  .Call("R_igraph_decompose", graph, as.numeric(mode),
+                      as.numeric(max.comps), as.numeric(min.vertices))
+}
