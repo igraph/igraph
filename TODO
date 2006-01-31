@@ -1,4 +1,5 @@
 
+o better random number generator handling (init with seed, etc...)
 o make possible building in separate directory (make check, r package,
   make dist do not work)
 o write tutorial
@@ -6,7 +7,7 @@ o add some iterators: in-, pre-, post-order, depth-first, breadth-first
   search, iterators based on attributes etc.
 o add methods for reading & saving a file together with its attributes
 o add conversion methods for different file formats
-o comunity detection algorithms
+o community detection algorithms
 o add 3d layout functions
 o multicompartmental layout functions
 o function for merge networks

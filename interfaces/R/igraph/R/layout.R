@@ -81,17 +81,19 @@ layout.lgl <- function(graph, ..., params=list()) {
   }
 
   vc <- vcount(graph)
-  if (is.null(params$niter))     { params$maxiter    <- 500  }
+  if (is.null(params$maxiter))   { params$maxiter    <- 150  }
   if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
   if (is.null(params$area))      { params$area       <- vc^2 }
   if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
   if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
-  if (is.null(params$cellsize))  { params$cellsize   <- sqrt(params$area)/100 }
+  if (is.null(params$cellsize))  { params$cellsize   <-
+                                     (sqrt(sqrt(params$area))) }
+  if (is.null(params$root))      { params$root       <- -1   }
   
   .Call("R_igraph_layout_lgl", graph, as.double(params$maxiter),
         as.double(params$maxdelta), as.double(params$area),
         as.double(params$coolexp), as.double(params$repulserad),
-        as.double(params$cellsize),
+        as.double(params$cellsize), as.double(params$root),
         PACKAGE="igraph")
 }
 

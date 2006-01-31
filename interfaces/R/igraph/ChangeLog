@@ -1,3 +1,16 @@
+2006-01-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/layout.R (layout.lgl) : added root,
+	corrected maxiter
+	* interfaces/R/src/rinterface.c (R_igraph_layout_lgl) : added root
+
+2006-01-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/layout.R (layout.lgl) : change defaults
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : add xlim & ylim 
+	parameters
+
 2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.atlas) : added

@@ -1,3 +1,25 @@
+2006-01-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_grid.c (igraph_2dgrid_reset, igraph_2dgrid_next)
+	(igraph_2dgrid_next_nei) : simple grid iterator, added
+	* src/layout.c (igraph_layout_lgl) : added root parameter,
+	first layer placed equidistantly, corrected maxiter bug,
+	speedup by using the grid iterator
+
+	* examples/simple/igraph_layout_lgl.c : updated
+
+2006-01-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_grid.c (igraph_2dgrid_which, igraph_2dgrid_move)
+	(igraph_2dgrid_dist, igraph_2dgrid_addvertices) : trivial small
+	speedups, inlining
+	(igraph_2dgrid_dist2) : squared distance
+	* src/layout.c (igraph_layout_lgl) : small improvement on the
+	placing of the spheres
+	
+	* src/layout.c (igraph_layout_fruchterman_reingold) : correct
+	division by zero error
+
 2006-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/atlas.c (igraph_atlas) : added

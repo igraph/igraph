@@ -517,8 +517,7 @@ int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 		      integer_t maxiter, real_t maxdelta, 
 		      real_t area, real_t coolexp,
-		      real_t repulserad, real_t cellsize);
-
+		      real_t repulserad, real_t cellsize, integer_t root);
 
 /* -------------------------------------------------- */
 /* Visitor-like functions                             */

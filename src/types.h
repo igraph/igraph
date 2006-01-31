@@ -479,5 +479,17 @@ real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid,
 int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids, 
 			    integer_t vid, real_t r);
 
+typedef struct igraph_2dgrid_iterator_t {
+  long int vid, x, y;
+  long int nei;
+  long int nx[4], ny[4], ncells;
+} igraph_2dgrid_iterator_t;
+
+void igraph_2dgrid_reset(igraph_2dgrid_t *grid, igraph_2dgrid_iterator_t *it);
+integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid, 
+			      igraph_2dgrid_iterator_t *it);
+integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
+				 igraph_2dgrid_iterator_t *it);
+
 #endif
 

@@ -27,6 +27,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        edge.labels=NA, 
                        # SPECIFIC: #####################################
                        axes=FALSE, xlab="", ylab="",
+                       xlim=c(-1,1), ylim=c(-1,1),
                        ...) {
 
   graph <- x
@@ -42,7 +43,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   edge.labels <- i.get.edge.labels(graph, edge.labels)
 
   # create the plot
-  plot(0, 0, type="n", xlab=xlab, ylab=ylab, asp=1, xlim=c(-1,1), ylim=c(-1,1),
+  plot(0, 0, type="n", xlab=xlab, ylab=ylab, asp=1, xlim=xlim, ylim=ylim,
        axes=axes, ...)
 
   # norm layout to (-1, 1)

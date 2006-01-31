@@ -1005,16 +1005,17 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
 
 SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
 			 SEXP parea, SEXP pcoolexp, SEXP prepulserad,
-			 SEXP pcellsize) {
+			 SEXP pcellsize, SEXP proot) {
   
   igraph_t g;
   igraph_matrix_t res;
-  real_t maxiter=REAL(pmaxiter)[0];
+  integer_t maxiter=REAL(pmaxiter)[0];
   real_t maxdelta=REAL(pmaxdelta)[0];
   real_t area=REAL(parea)[0];
   real_t coolexp=REAL(pcoolexp)[0];
   real_t repulserad=REAL(prepulserad)[0];
   real_t cellsize=REAL(pcellsize)[0];
+  integer_t root=REAL(proot)[0];
   SEXP result;
 
   R_igraph_before();
@@ -1022,7 +1023,7 @@ SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_lgl(&g, &res, maxiter, maxdelta, area, coolexp, repulserad,
-		    cellsize);
+		    cellsize, root);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
 

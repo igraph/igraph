@@ -25,7 +25,7 @@
 
 /* internal function */
 
-int igraph_2dgrid_which(igraph_2dgrid_t *grid, real_t xc, real_t yc,
+inline int igraph_2dgrid_which(igraph_2dgrid_t *grid, real_t xc, real_t yc,
 			long int *x, long int *y) {
 
   if (xc <= grid->minx) { 
@@ -42,10 +42,6 @@ int igraph_2dgrid_which(igraph_2dgrid_t *grid, real_t xc, real_t yc,
     *y=grid->stepsy-1;
   } else {
     *y=floor((yc-(grid->miny))/(grid->deltay));
-  }
-
-  if (*x < 0 || *y < 0 || *x >= grid->stepsx || *y >= grid->stepsy) {
-    printf("HOHOHO x: %li y: %li xc: %f yc: %f minx: %f maxx: %f miny: %f maxy: %f deltax: %f deltay: %f\n", x, y, xc, yc, grid->minx, grid->maxx, grid->miny, grid->maxy, grid->deltax, grid->deltay); 
   }
 
   return 0;
@@ -125,27 +121,29 @@ void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem,
   xc=oldxc+xc; yc=oldyc+yc;
 
   igraph_2dgrid_which(grid, oldxc, oldyc, &oldx, &oldy);
-  /* remove from this cell */
-  if (VECTOR(grid->prev)[elem] != 0) {
-    VECTOR(grid->next) [ (long int) VECTOR(grid->prev)[elem]-1 ] =
-      VECTOR(grid->next)[elem];
-  } else {
-    MATRIX(grid->startidx, oldx, oldy)=VECTOR(grid->next)[elem];
-  }
-  if (VECTOR(grid->next)[elem] != 0) {
-    VECTOR(grid->prev)[ (long int) VECTOR(grid->next)[elem]-1 ] =
-      VECTOR(grid->prev)[elem];
-  }
-
   igraph_2dgrid_which(grid, xc, yc, &newx, &newy);
-  /* add to this cell */
-  first=MATRIX(grid->startidx, newx, newy);
-  VECTOR(grid->prev)[elem]=0;
-  VECTOR(grid->next)[elem]=first;
-  if (first != 0) {
-    VECTOR(grid->prev)[first-1]=elem+1;
+  if (oldx != newx || oldy != newy) {
+    /* remove from this cell */
+    if (VECTOR(grid->prev)[elem] != 0) {
+      VECTOR(grid->next) [ (long int) VECTOR(grid->prev)[elem]-1 ] =
+	VECTOR(grid->next)[elem];
+    } else {
+      MATRIX(grid->startidx, oldx, oldy)=VECTOR(grid->next)[elem];
+    }
+    if (VECTOR(grid->next)[elem] != 0) {
+      VECTOR(grid->prev)[ (long int) VECTOR(grid->next)[elem]-1 ] =
+	VECTOR(grid->prev)[elem];
+    }
+    
+    /* add to this cell */
+    first=MATRIX(grid->startidx, newx, newy);
+    VECTOR(grid->prev)[elem]=0;
+    VECTOR(grid->next)[elem]=first;
+    if (first != 0) {
+      VECTOR(grid->prev)[first-1]=elem+1;
+    }
+    MATRIX(grid->startidx, newx, newy)=elem+1;
   }
-  MATRIX(grid->startidx, newx, newy)=elem+1;
   
   grid->massx += -oldxc+xc;
   grid->massy += -oldyc+yc;
@@ -165,27 +163,35 @@ bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, long int elem) {
   return VECTOR(grid->next)[elem] != -1;
 }
 
-real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid, 
+inline real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid, 
 			  long int e1, long int e2) {
-  real_t x1=MATRIX(*grid->coords, e1, 0);
-  real_t x2=MATRIX(*grid->coords, e2, 0);
-  real_t y1=MATRIX(*grid->coords, e1, 1);
-  real_t y2=MATRIX(*grid->coords, e2, 1);
+  real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
+  real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
   
-  return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+  return sqrt(x*x + y*y);
+}
+
+inline real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid, 
+			  long int e1, long int e2) {
+  real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
+  real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
+  
+  return x*x + y*y;
 }
 
 int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
 				integer_t vid, real_t r, 
 				long int x, long int y) {
   long int act;
+  real_t *v=VECTOR(grid->next);
 
+  r=r*r;
   act=MATRIX(grid->startidx, x, y);
   while (act != 0) {
-    if (igraph_2dgrid_dist(grid, vid, act-1) < r) {
+    if (igraph_2dgrid_dist2(grid, vid, act-1) < r) {
       IGRAPH_CHECK(igraph_vector_push_back(eids, act-1));
     }
-    act=VECTOR(grid->next)[act-1];
+    act=v[act-1];
   }
   return 0;
 }
@@ -195,13 +201,13 @@ int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
   real_t xc=MATRIX(*grid->coords, (long int)vid, 0);
   real_t yc=MATRIX(*grid->coords, (long int)vid, 1);
   long int x, y;
-  
   igraph_vector_clear(eids);
   
   igraph_2dgrid_which(grid, xc, yc, &x, &y);
 
   /* this cell */
   igraph_i_2dgrid_addvertices(grid, eids, vid, r, x, y);
+  
   /* left */
   if (x!=0) {
     igraph_i_2dgrid_addvertices(grid, eids, vid, r, x-1, y);
@@ -236,4 +242,76 @@ int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
   }
   
   return 0;
+}
+
+void igraph_2dgrid_reset(igraph_2dgrid_t *grid, igraph_2dgrid_iterator_t *it) {
+  /* Search for the first cell containing a vertex */
+  it->x=0; it->y=0; it->vid=MATRIX(grid->startidx, 0, 0);
+  while ( it->vid==0 && (it->x < grid->stepsx-1 || it->y<grid->stepsy-1)) {
+    it->x += 1;
+    if (it->x == grid->stepsx) {
+      it->x=0; it->y += 1;
+    }
+    it->vid=MATRIX(grid->startidx, it->x, it->y);
+  }
+}
+
+integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid, 
+			      igraph_2dgrid_iterator_t *it) {
+  long int ret=it->vid;
+
+  if (ret==0) { return 0; }
+
+  /* First neighbor */
+  it->ncells=-1;
+  if (it->x != grid->stepsx-1) {
+    it->ncells += 1;
+    it->nx[it->ncells]=it->x+1;
+    it->ny[it->ncells]=it->y;
+  }
+  if (it->y != grid->stepsy-1) {
+    it->ncells += 1;
+    it->nx[it->ncells]=it->x;
+    it->ny[it->ncells]=it->y+1;
+  }
+  if (it->ncells==1) {
+    it->ncells += 1;
+    it->nx[it->ncells]=it->x+1;
+    it->ny[it->ncells]=it->y+1;
+  }
+  it->ncells+=1;
+  it->nx[it->ncells]=it->x;
+  it->ny[it->ncells]=it->y;
+  
+  it->nei=VECTOR(grid->next) [ ret-1 ];
+  while (it->ncells > 0 && it->nei==0 ) {
+    it->ncells -= 1;
+    it->nei=MATRIX(grid->startidx, it->nx[it->ncells], it->ny[it->ncells]);
+  }
+
+  /* Next vertex */
+  it->vid=VECTOR(grid->next)[ it->vid-1 ];
+  while ( (it->x < grid->stepsx-1 || it->y<grid->stepsy-1) &&
+	  it->vid == 0) {
+    it->x += 1;
+    if (it->x == grid->stepsx) {
+      it->x=0; it->y += 1;
+    }
+    it->vid=MATRIX(grid->startidx, it->x, it->y);
+  }
+
+  return ret;
+}
+
+inline integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
+				 igraph_2dgrid_iterator_t *it) {
+  long int ret=it->nei;
+
+  it->nei=VECTOR(grid->next) [ ret-1 ];
+  while (it->ncells > 0 && it->nei==0 ) {
+    it->ncells -= 1;
+    it->nei=MATRIX(grid->startidx, it->nx[it->ncells], it->ny[it->ncells]);
+  }
+ 
+  return ret;  
 }
