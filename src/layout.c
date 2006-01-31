@@ -530,29 +530,6 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 	}
       }
       
-/*       pairs=0; */
-/*       for (j=0; j<VECTOR(layers)[actlayer+1]; j++) { */
-/* 	long int vid=VECTOR(vids)[j]; */
-/* 	long int k; */
-/* 	real_t xd, yd, dist, force; */
-/* 	IGRAPH_CHECK(igraph_2dgrid_neighbors(&grid, &eids, vid, cellsize)); */
-/* 	pairs+=igraph_vector_size(&eids); */
-/* 	for (k=0; k<igraph_vector_size(&eids); k++) { */
-/* 	  long int nei=VECTOR(eids)[k]; */
-/* 	  if (nei < vid) { */
-/* 	    xd=MATRIX(*res, (long int)vid, 0)-MATRIX(*res, (long int)nei, 0); */
-/* 	    yd=MATRIX(*res, (long int)vid, 1)-MATRIX(*res, (long int)nei, 1); */
-/* 	    dist=sqrt(xd*xd+yd*yd); */
-/* 	    if (dist == 0) { dist=epsilon; } */
-/* 	    xd/=dist; yd/=dist; */
-/* 	    force=frk*frk*(1.0/dist-dist*dist/repulserad); */
-/* 	    VECTOR(forcex)[(long int)vid] += xd*force; */
-/* 	    VECTOR(forcex)[(long int)nei] -= xd*force; */
-/* 	    VECTOR(forcey)[(long int)vid] += yd*force; */
-/* 	    VECTOR(forcey)[(long int)nei] -= yd*force; */
-/* 	  } */
-/* 	} */
-/*       } */
 /*       printf("verties: %li iterations: %li\n",  */
 /* 	     (long int) VECTOR(layers)[actlayer+1], pairs); */
       
@@ -589,3 +566,107 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
 }
 		      
+int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
+					    igraph_matrix_t *res,
+					    integer_t niter, real_t maxdelta, 
+					    real_t area, real_t coolexp,
+					    real_t repulserad, 
+					    real_t cellsize,
+					    bool_t use_seed) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_2dgrid_t grid;  
+  igraph_vector_t forcex;
+  igraph_vector_t forcey;
+  long int i, it=0;
+  igraph_2dgrid_iterator_t vidit;  
+
+  real_t frk=sqrt(area/no_of_nodes);
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
+  IGRAPH_VECTOR_INIT_FINALLY(&forcex, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&forcey, no_of_nodes);
+  
+  /* initial layout */
+  if (!use_seed) {
+    IGRAPH_CHECK(igraph_layout_random(graph, res));
+    igraph_matrix_multiply(res, sqrt(area/M_PI));
+  }
+  
+  /* make grid */
+  IGRAPH_CHECK(igraph_2dgrid_init(&grid, res, 
+				  -sqrt(area/M_PI),sqrt(area/M_PI), cellsize,
+				  -sqrt(area/M_PI),sqrt(area/M_PI), cellsize));
+  IGRAPH_FINALLY(igraph_2dgrid_destroy, &grid);
+  
+  /* place vertices on grid */
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_2dgrid_add2(&grid, i);
+  }
+
+  while (it<niter) {
+    long int j;
+    real_t t=maxdelta*pow((niter-it)/(double)niter, coolexp);
+    long int vid, nei;
+
+    igraph_vector_null(&forcex);
+    igraph_vector_null(&forcey);
+    
+    /* attraction */
+    for (j=0; j<no_of_edges; j++) {
+      integer_t from, to;
+      real_t xd, yd, dist, force;
+      igraph_edge(graph, j, &from, &to);
+      xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
+      yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
+      dist=sqrt(xd*xd+yd*yd);
+      if (dist != 0) { xd/=dist; yd/=dist; }
+      force=dist*dist/frk;
+      VECTOR(forcex)[(long int)from] -= xd*force;
+      VECTOR(forcex)[(long int)to]   += xd*force;
+      VECTOR(forcey)[(long int)from] -= yd*force;
+      VECTOR(forcey)[(long int)to]   += yd*force;
+    }
+
+    /* repulsion */
+    igraph_2dgrid_reset(&grid, &vidit);
+    while ( (vid=igraph_2dgrid_next(&grid, &vidit)-1) != -1) {
+      while ( (nei=igraph_2dgrid_next_nei(&grid, &vidit)-1) != -1) {
+	real_t xd=MATRIX(*res, (long int)vid, 0)-
+	  MATRIX(*res, (long int)nei, 0);
+	real_t yd=MATRIX(*res, (long int)vid, 1)-
+	  MATRIX(*res, (long int)nei, 1);
+	real_t dist=sqrt(xd*xd+yd*yd);
+	real_t force;
+	if (dist < cellsize) {
+	  if (dist==0) { dist=1e-6; };
+	  xd/=dist; yd/=dist;
+	  force=frk*frk*(1.0/dist-dist*dist/repulserad);
+	  VECTOR(forcex)[(long int)vid] += xd*force;
+	  VECTOR(forcex)[(long int)nei] -= xd*force;
+	  VECTOR(forcey)[(long int)vid] += yd*force;
+	  VECTOR(forcey)[(long int)nei] -= yd*force;	    
+	}
+      }
+    }
+
+    /* update */
+    for (j=0; j<no_of_nodes; j++) {
+      long int vid=j;
+      real_t fx=VECTOR(forcex)[vid];
+      real_t fy=VECTOR(forcey)[vid];
+      real_t ded=sqrt(fx*fx+fy*fy);
+      if (ded > t) {
+	ded=t/ded;
+	fx*=ded; fy *=ded;
+      }
+      igraph_2dgrid_move(&grid, vid, fx, fy);
+    }
+    it++;
+    
+  } /* it<niter */
+
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}

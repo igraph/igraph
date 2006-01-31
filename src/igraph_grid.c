@@ -110,6 +110,29 @@ void igraph_2dgrid_add(igraph_2dgrid_t *grid, long int elem,
   grid->vertices += 1;
 }
 
+void igraph_2dgrid_add2(igraph_2dgrid_t *grid, long int elem) {
+  long int x, y;
+  long int first;
+  real_t xc, yc;
+
+  xc=MATRIX(*grid->coords, elem, 0);
+  yc=MATRIX(*grid->coords, elem, 1);
+
+  /* add to cell */
+  igraph_2dgrid_which(grid, xc, yc, &x, &y);
+  first=MATRIX(grid->startidx, x, y);
+  VECTOR(grid->prev)[elem]=0;
+  VECTOR(grid->next)[elem]=first;
+  if (first != 0) {
+    VECTOR(grid->prev)[first-1]=elem+1;
+  }
+  MATRIX(grid->startidx, x, y)=elem+1;
+
+  grid->massx += xc;
+  grid->massy += yc;
+  grid->vertices += 1;
+}
+
 void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem, 
 			real_t xc, real_t yc) {
   long int oldx, oldy;

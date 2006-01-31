@@ -78,7 +78,8 @@ export(read.graph, write.graph)
 # layouts
 
 export(layout.random, layout.circle, layout.fruchterman.reingold,
-       layout.spring, layout.kamada.kawai, layout.lgl)
+       layout.spring, layout.kamada.kawai, layout.lgl,
+       layout.fruchterman.reingold.grid)
 
 # structural properties
 

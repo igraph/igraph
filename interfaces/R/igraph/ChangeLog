@@ -1,5 +1,12 @@
 2006-01-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/layout.R (layout.fruchterman.reingold.grid) :
+	added
+	* interfaces/R/src/rinterface.c	
+	(R_igraph_layout_fruchterman_reingold_grid) : added
+
+2006-01-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* interfaces/R/igraph/R/layout.R (layout.lgl) : added root,
 	corrected maxiter
 	* interfaces/R/src/rinterface.c (R_igraph_layout_lgl) : added root

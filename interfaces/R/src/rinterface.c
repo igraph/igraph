@@ -1033,6 +1033,43 @@ SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
   return result;
 }  
 
+SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph, SEXP mat,
+					       SEXP pniter,
+					       SEXP pmaxdelta, SEXP parea,
+					       SEXP pcoolexp, SEXP prepulserad,
+					       SEXP pcellsize, SEXP puseseed) {
+
+  igraph_t g;
+  igraph_matrix_t res;
+  integer_t niter=REAL(pniter)[0];
+  real_t maxdelta=REAL(pmaxdelta)[0];
+  real_t area=REAL(parea)[0];
+  real_t coolexp=REAL(pcoolexp)[0];
+  real_t repulserad=REAL(prepulserad)[0];
+  real_t cellsize=REAL(pcellsize)[0];
+  bool_t use_seed=LOGICAL(puseseed)[0];
+  SEXP result;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  if (use_seed) {
+    R_SEXP_to_igraph_matrix_copy(mat, &res);
+  } else {
+    igraph_matrix_init(&res, 0, 0);
+  }
+  igraph_layout_grid_fruchterman_reingold(&g, &res, niter, maxdelta, area,
+					  coolexp, repulserad, cellsize, 
+					  use_seed);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_minimum_spanning_tree_unweighted(SEXP graph) {
   
   igraph_t g;

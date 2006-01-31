@@ -53,6 +53,31 @@ layout.fruchterman.reingold <- function(graph, ..., params=list()) {
         PACKAGE="igraph")
 }
 
+layout.fruchterman.reingold.grid <- function(graph, ...,
+                                             params=list()) {
+  if (length(params)==0) {
+    params <- list(...)
+  }
+
+  vc <- vcount(graph)
+  if (is.null(params$niter))     { params$niter      <- 500  }
+  if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
+  if (is.null(params$area))      { params$area       <- vc^2 }
+  if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
+  if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
+  if (is.null(params$cellsize))  { params$cellsize   <-
+                                     (sqrt(sqrt(params$area))) }
+  
+  .Call("R_igraph_layout_fruchterman_reingold_grid", graph,
+        as.numeric(params$seed),
+        as.double(params$niter), as.double(params$maxdelta),
+        as.double(params$area), as.double(params$coolexp),
+        as.double(params$repulserad), as.double(params$cellsize),
+        as.logical(!is.null(params$seed)),
+        PACKAGE="igraph")
+}
+  
+
 # FROM SNA 0.5
 
 layout.kamada.kawai<-function(graph, ..., params=list()) {

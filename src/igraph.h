@@ -507,6 +507,12 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 				       integer_t niter, real_t maxdelta,
 				       real_t area, real_t coolexp, 
 				       real_t repulserad, bool_t use_seed);
+int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
+					    igraph_matrix_t *res,
+					    integer_t niter, real_t maxdelta, 
+					    real_t area, real_t coolexp,
+					    real_t repulserad, 
+					    real_t cellsize, bool_t use_seed);
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       integer_t niter, real_t sigma, 
 			       real_t initemp, real_t coolexp,

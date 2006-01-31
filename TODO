@@ -1,4 +1,5 @@
 
+o make CTRL+C work in R
 o better random number generator handling (init with seed, etc...)
 o make possible building in separate directory (make check, r package,
   make dist do not work)

@@ -469,6 +469,7 @@ int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
 void igraph_2dgrid_destroy(igraph_2dgrid_t *grid);
 void igraph_2dgrid_add(igraph_2dgrid_t *grid, long int elem, 
 		       real_t xc, real_t yc);
+void igraph_2dgrid_add2(igraph_2dgrid_t *grid, long int elem);
 void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem, 
 			real_t xc, real_t yc);
 void igraph_2dgrid_getcenter(const igraph_2dgrid_t *grid, 
