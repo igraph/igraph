@@ -525,6 +525,19 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 		      real_t area, real_t coolexp,
 		      real_t repulserad, real_t cellsize, integer_t root);
 
+int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
+int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);
+int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
+					  igraph_matrix_t *res,
+					  integer_t niter, real_t maxdelta,
+					  real_t volume, real_t coolexp,
+					  real_t repulserad,
+					  bool_t use_seed);
+int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+				  integer_t niter, real_t sigma, 
+				  real_t initemp, real_t coolexp, 
+				  real_t kkconst);
+
 /* -------------------------------------------------- */
 /* Visitor-like functions                             */
 /* -------------------------------------------------- */

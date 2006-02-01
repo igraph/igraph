@@ -1,3 +1,9 @@
+2006-02-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/layout.c (igraph_layout_random_3d, igraph_layout_sphere)
+	(igraph_layout_fruchterman_reingold_3d)
+	(igraph_layout_kamada_kawai_3d) : added
+
 2006-01-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph_grid.c (igraph_2dgrid_add2) : added

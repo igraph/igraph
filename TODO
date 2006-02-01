@@ -9,7 +9,6 @@ o add some iterators: in-, pre-, post-order, depth-first, breadth-first
 o add methods for reading & saving a file together with its attributes
 o add conversion methods for different file formats
 o community detection algorithms
-o add 3d layout functions
 o multicompartmental layout functions
 o function for merge networks
 o add data sets to the R package

@@ -70,6 +70,26 @@ int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
   return 0;
 }
 
+int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
+  
+  RNG_BEGIN();
+  
+  for (i=0; i<no_of_nodes; i++) {
+    MATRIX(*res, i, 0)=RNG_UNIF(-1, 1);
+    MATRIX(*res, i, 1)=RNG_UNIF(-1, 1);
+    MATRIX(*res, i, 2)=RNG_UNIF(-1, 1);
+  }
+  
+  RNG_END();
+  
+  return 0;
+}
+
 /**
  * \ingroup layout
  * \function igraph_layout_circle
@@ -96,6 +116,47 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
     real_t phi=2*M_PI/no_of_nodes*i;
     MATRIX(*res, i, 0)=cos(phi);
     MATRIX(*res, i, 1)=sin(phi);
+  }
+  
+  return 0;
+}
+
+/*
+ * "Distributing many points on a sphere" by E.B. Saff and A.B.J. Kuijlaars,
+ * Mathematical Intelligencer 19.1 (1997) 5--11. 
+ *
+ */
+
+int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  real_t h;
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
+
+  if (no_of_nodes != 0) {
+    MATRIX(*res, 0, 0)=M_PI;
+    MATRIX(*res, 0, 1)=0;
+  }
+  for (i=1; i<no_of_nodes-1; i++) {
+    h = -1 + 2*i/(double)(no_of_nodes-1);
+    MATRIX(*res, i, 0) = acos(h);
+    MATRIX(*res, i, 1) = fmod((MATRIX(*res, i-1, 1) +
+			       3.6/sqrt(no_of_nodes*(1-h*h))), 2*M_PI);
+  }
+  if (no_of_nodes >=2) {
+    MATRIX(*res, no_of_nodes-1, 0)=0;
+    MATRIX(*res, no_of_nodes-1, 1)=0;
+  }
+
+  for (i=0; i<no_of_nodes; i++) {
+    real_t x=cos(MATRIX(*res, i, 1))*sin(MATRIX(*res, i, 0));
+    real_t y=sin(MATRIX(*res, i, 1))*sin(MATRIX(*res, i, 0));
+    real_t z=cos(MATRIX(*res, i, 0));
+    MATRIX(*res, i, 0)=x;
+    MATRIX(*res, i, 1)=y;
+    MATRIX(*res, i, 2)=z;
   }
   
   return 0;
@@ -216,6 +277,108 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
   return 0;
 }
 
+int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
+					  igraph_matrix_t *res,
+					  integer_t niter, real_t maxdelta,
+					  real_t volume, real_t coolexp,
+					  real_t repulserad,
+					  bool_t use_seed) {
+  
+  real_t frk, t, ded, xd, yd, zd;
+  igraph_matrix_t dxdydz;
+  real_t rf, af;
+  long int i, j, k;
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_es_t edgeit;
+  
+  IGRAPH_CHECK(igraph_matrix_init(&dxdydz, no_of_nodes, 3));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &dxdydz);
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
+  if (!use_seed) {
+    IGRAPH_CHECK(igraph_layout_random_3d(graph, res));
+  }
+
+  frk=pow(volume/(double)no_of_nodes,1.0/3.0); /*Define the F-R constant*/
+
+  /*Run the annealing loop*/
+  for(i=niter;i>=0;i--){
+    /*Set the temperature (maximum move/iteration)*/
+    t=maxdelta*pow(i/(double)niter,coolexp);
+    /*Clear the deltas*/
+    igraph_matrix_null(&dxdydz);
+    /*Increment deltas for each undirected pair*/
+    for(j=0;j<no_of_nodes;j++) {
+      for(k=j+1;k<no_of_nodes;k++){
+        /*Obtain difference vector*/
+        xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
+        yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
+        zd=MATRIX(*res, j, 2)-MATRIX(*res, k, 2);
+        ded=sqrt(xd*xd+yd*yd+zd*zd);  /*Get dyadic euclidean distance*/
+        if (ded != 0) {
+	  xd/=ded;                      /*Rescale differences to length 1*/
+	  yd/=ded;
+	  zd/=ded;
+	}
+        /*Calculate repulsive "force"*/
+        rf=frk*frk*(1.0/ded-ded*ded/repulserad);
+        MATRIX(dxdydz, j, 0)+=xd*rf;     /*Add to the position change vector*/
+        MATRIX(dxdydz, k, 0)-=xd*rf;
+        MATRIX(dxdydz, j, 1)+=yd*rf;
+        MATRIX(dxdydz, k, 1)-=yd*rf;
+        MATRIX(dxdydz, j, 2)+=zd*rf;
+        MATRIX(dxdydz, k, 2)-=zd*rf;
+      }
+    }
+
+    /*Calculate the attractive "force"*/
+    IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
+    while (!igraph_es_end(graph, &edgeit)) {
+      j=igraph_es_from(graph, &edgeit);
+      k=igraph_es_to(graph, &edgeit);
+      xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
+      yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
+      zd=MATRIX(*res, j, 2)-MATRIX(*res, k, 2);
+      ded=sqrt(xd*xd+yd*yd+zd*zd);  /*Get dyadic euclidean distance*/
+      if (ded != 0) {
+	xd/=ded;                      /*Rescale differences to length 1*/
+	yd/=ded;
+	zd/=ded;
+      }
+      af=ded*ded/frk;
+      MATRIX(dxdydz, j, 0)-=xd*af;   /*Add to the position change vector*/
+      MATRIX(dxdydz, k, 0)+=xd*af;
+      MATRIX(dxdydz, j, 1)-=yd*af;
+      MATRIX(dxdydz, k, 1)+=yd*af;
+      MATRIX(dxdydz, j, 2)-=zd*af;
+      MATRIX(dxdydz, k, 2)+=zd*af;
+      igraph_es_next(graph, &edgeit);
+    }
+    igraph_es_destroy(&edgeit);
+
+    /*Dampen motion, if needed, and move the points*/
+    for(j=0;j<no_of_nodes;j++){
+      ded=sqrt(MATRIX(dxdydz, j, 0)*MATRIX(dxdydz, j, 0)+
+	       MATRIX(dxdydz, j, 1)*MATRIX(dxdydz, j, 1)+
+	       MATRIX(dxdydz, j, 2)*MATRIX(dxdydz, j, 2));
+      if(ded>t){                 /*Dampen to t*/
+        ded=t/ded;
+        MATRIX(dxdydz, j, 0)*=ded;
+        MATRIX(dxdydz, j, 1)*=ded;
+        MATRIX(dxdydz, j, 2)*=ded;
+      }
+      MATRIX(*res, j, 0)+=MATRIX(dxdydz, j, 0);          /*Update positions*/
+      MATRIX(*res, j, 1)+=MATRIX(dxdydz, j, 1);
+      MATRIX(*res, j, 2)+=MATRIX(dxdydz, j, 2);
+    }
+  }
+  
+  igraph_matrix_destroy(&dxdydz);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 /**
  * \ingroup layout
  * \function igraph_layout_kamada_kawai
@@ -294,6 +457,66 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
       if(log(RNG_UNIF(0.0,1.0))<dpot/temp){
         MATRIX(*res, j, 0)=candx;
         MATRIX(*res, j, 1)=candy;
+      }
+    }
+    /*Cool the system*/
+    temp*=coolexp;
+  }
+
+  RNG_END();
+  igraph_matrix_destroy(&elen);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+				  integer_t niter, real_t sigma, 
+				  real_t initemp, real_t coolexp, 
+				  real_t kkconst) {
+  real_t temp, candx, candy, candz;
+  real_t dpot, odis, ndis, osqd, nsqd;
+  long int i,j,k;
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_matrix_t elen;
+  
+  RNG_BEGIN();
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
+  IGRAPH_MATRIX_INIT_FINALLY(&elen,  no_of_nodes, no_of_nodes);
+  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, IGRAPH_VS_ALL(graph), 
+				     IGRAPH_ALL));
+  
+  temp=initemp;
+  for(i=0;i<niter;i++){
+    /*Update each vertex*/
+    for(j=0;j<no_of_nodes;j++){
+      /*Draw the candidate via a gaussian perturbation*/
+      candx=RNG_NORMAL(MATRIX(*res, j, 0) ,sigma*temp/initemp);
+      candy=RNG_NORMAL(MATRIX(*res, j, 1) ,sigma*temp/initemp);
+      candz=RNG_NORMAL(MATRIX(*res, j, 2) ,sigma*temp/initemp);
+      /*Calculate the potential difference for the new position*/
+      dpot=0.0;
+      for(k=0;k<no_of_nodes;k++) /*Potential differences for pairwise effects*/
+        if(j!=k){
+          odis=sqrt((MATRIX(*res, j, 0)-MATRIX(*res, k, 0))*
+		    (MATRIX(*res, j, 0)-MATRIX(*res, k, 0))+
+		    (MATRIX(*res, j, 1)-MATRIX(*res, k, 1))*
+		    (MATRIX(*res, j, 1)-MATRIX(*res, k, 1))+
+		    (MATRIX(*res, j, 2)-MATRIX(*res, k, 2))*
+		    (MATRIX(*res, j, 2)-MATRIX(*res, k, 2)));
+          ndis=sqrt((candx-MATRIX(*res, k, 0))*(candx-MATRIX(*res, k, 0))+
+		    (candy-MATRIX(*res, k, 1))*(candy-MATRIX(*res, k, 1))+
+		    (candz-MATRIX(*res, k, 2))*(candz-MATRIX(*res, k, 2)));
+          osqd=(odis-MATRIX(elen, j, k))*(odis-MATRIX(elen, j, k));
+          nsqd=(ndis-MATRIX(elen, j, k))*(ndis-MATRIX(elen, j, k));
+          dpot+=kkconst*(osqd-nsqd)/(MATRIX(elen, j, k)*MATRIX(elen, j, k));
+        }
+      /*Make a keep/reject decision*/
+      if(log(RNG_UNIF(0.0,1.0))<dpot/temp){
+        MATRIX(*res, j, 0)=candx;
+        MATRIX(*res, j, 1)=candy;
+        MATRIX(*res, j, 2)=candz;
       }
     }
     /*Cool the system*/

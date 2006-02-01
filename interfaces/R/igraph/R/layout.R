@@ -23,9 +23,16 @@
 # Layouts
 ###################################################################
 
-layout.random <- function(graph, params) {
-  .Call("R_igraph_layout_random", graph,
-        PACKAGE="igraph")
+layout.random <- function(graph, params, dim=2) {
+  if (dim==2) {
+    .Call("R_igraph_layout_random", graph,
+          PACKAGE="igraph")
+  } else if (dim==3) {
+    .Call("R_igraph_layout_random_3d", graph,
+          PACKAGE="igraph")
+  } else {
+    stop("Invalid `dim' value");
+  }
 }
 
 layout.circle <- function(graph, params) {
@@ -33,20 +40,33 @@ layout.circle <- function(graph, params) {
         PACKAGE="igraph")
 }
 
-layout.fruchterman.reingold <- function(graph, ..., params=list()) {
+layout.sphere <- function(graph, params) {
+  .Call("R_igraph_layout_sphere", graph,
+        PACKAGE="igraph")
+}
+
+layout.fruchterman.reingold <- function(graph, ..., dim=2, params=list()) {
 
   if (length(params)==0) {
     params <- list(...)
   }
 
+  if (dim==2) {
+    fn <- "R_igraph_layout_fruchterman_reingold"
+  } else if (dim==3 ){
+    fn <- "R_igraph_layout_fruchterman_reingold_3d"
+  } else {
+    stop("Invalid `grid' argument");
+  }
+  
   vc <- vcount(graph)
   if (is.null(params$niter))     { params$niter      <- 500  }
   if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
   if (is.null(params$area))      { params$area       <- vc^2 }
   if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
   if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
-  
-  .Call("R_igraph_layout_fruchterman_reingold", graph,
+
+  .Call(fn, graph,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad),
@@ -80,19 +100,27 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
 
 # FROM SNA 0.5
 
-layout.kamada.kawai<-function(graph, ..., params=list()) {
+layout.kamada.kawai<-function(graph, ..., dim=2, params=list()) {
 
   if (length(params)==0) {
     params <- list(...)
   }
 
+  if (dim==2) {
+    fn <- "R_igraph_layout_kamada_kawai"
+  } else if (dim==3) {
+    fn <- "R_igraph_layout_kamada_kawai_3d"
+  } else {
+    stop("Invalid `dim' parameter")
+  }
+  
   vc <- vcount(graph)
   if (is.null(params$niter))      { params$niter   <- 1000 }
   if (is.null(params$sigma))      { params$sigma   <- vc/4 }
   if (is.null(params$initemp))    { params$initemp <- 10   }
   if (is.null(params$coolexp))    { params$coolexp <- 0.99 }
   if (is.null(params$kkconst))    { params$kkconst <- vc^2 }
-  .Call("R_igraph_layout_kamada_kawai", graph,
+  .Call(fn, graph,
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
         as.double(params$sigma),
@@ -245,7 +273,7 @@ layout.spring<-function(graph, ..., params=list()) {
 }
 
 i.layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
-                          zmin=NULL, zmax=NUL) {
+                          zmin=NULL, zmax=NULL) {
 
   if (!is.null(xmin) && !is.null(xmax)) {
     layout[,1] <- .layout.norm.col(layout[,1], xmin, xmax)

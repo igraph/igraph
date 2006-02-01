@@ -79,7 +79,8 @@ export(read.graph, write.graph)
 
 export(layout.random, layout.circle, layout.fruchterman.reingold,
        layout.spring, layout.kamada.kawai, layout.lgl,
-       layout.fruchterman.reingold.grid)
+       layout.fruchterman.reingold.grid, layout.sphere)
+
 
 # structural properties
 
@@ -92,7 +93,9 @@ export(subgraph, simplify, degree, degree.distribution, diameter,
 
 export(plot.igraph, tkplot, tkplot.close, tkplot.off, tkplot.fit.to.screen,
        tkplot.reshape, tkplot.export.postscript, tkplot.getcoords,
-       tkplot.center, tkplot.rotate)
+       tkplot.center, tkplot.rotate, rglplot.igraph, rglplot)
+
+S3method(rglplot, igraph)
 
 # components
 

@@ -1003,6 +1003,34 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   return result;
 }
 
+SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
+				     SEXP pcoolexp, SEXP pkkconst, 
+				     SEXP psigma) {
+  igraph_t g;
+  integer_t niter=REAL(pniter)[0];
+  real_t initemp=REAL(pinitemp)[0];
+  real_t coolexp=REAL(pcoolexp)[0];
+  real_t kkconst=REAL(pkkconst)[0];
+  real_t sigma=REAL(psigma)[0];
+  igraph_matrix_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&res, 0, 0);
+  igraph_layout_kamada_kawai_3d(&g, &res, niter, sigma, 
+				initemp, coolexp, kkconst);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+
 SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
 			 SEXP parea, SEXP pcoolexp, SEXP prepulserad,
 			 SEXP pcellsize, SEXP proot) {
@@ -1594,6 +1622,33 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_fruchterman_reingold(&g, &res, niter, maxdelta, area, 
+				     coolexp, repulserad, 0);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter, 
+					     SEXP pmaxdelta, SEXP parea,
+					     SEXP pcoolexp, SEXP prepulserad) {
+  igraph_t g;
+  integer_t niter=REAL(pniter)[0];
+  real_t maxdelta=REAL(pmaxdelta)[0];
+  real_t area=REAL(parea)[0];
+  real_t coolexp=REAL(pcoolexp)[0];
+  real_t repulserad=REAL(prepulserad)[0];
+  igraph_matrix_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&res, 0, 0);
+  igraph_layout_fruchterman_reingold_3d(&g, &res, niter, maxdelta, area, 
 				     coolexp, repulserad, 0);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
@@ -2777,6 +2832,46 @@ SEXP R_igraph_atlas(SEXP pno) {
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_layout_random_3d(SEXP graph) {
+  
+  igraph_t g;
+  igraph_matrix_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&res, 0, 0);
+  igraph_layout_random_3d(&g, &res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);  
+  
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_layout_sphere(SEXP graph) {
+
+  igraph_t g;
+  igraph_matrix_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&res, 0, 0);
+  igraph_layout_sphere(&g, &res);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+  
   R_igraph_after();
   
   UNPROTECT(1);
