@@ -1,3 +1,18 @@
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_isoclass_34)
+	(R_igraph_isomorphic_34) : updated
+	
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : correct bug for
+	empty graphs
+
+	* interfaces/R/igraph/R/topology.R (graph.isoclass)
+	(graph.isomorphic) : added
+	* interfaces/R/src/rinterface.c (R_igraph_isoclass_34)
+	(R_igraph_isomorphic_34) : added
+
 2006-02-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (rglplot.igraph) : omit labels if NA

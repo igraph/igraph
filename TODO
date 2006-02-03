@@ -1,4 +1,6 @@
 
+o topological equaivalence of graphs
+o motif search (RAND-ESU algorithm)
 o make CTRL+C work in R
 o better random number generator handling (init with seed, etc...)
 o make possible building in separate directory (make check, r package,

@@ -2877,3 +2877,42 @@ SEXP R_igraph_layout_sphere(SEXP graph) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_isoclass_34(SEXP graph) {
+  
+  igraph_t g;
+  int class;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_isoclass(&g, &class);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=class;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_isomorphic_34(SEXP graph1, SEXP graph2) {
+  
+  igraph_t g1, g2;
+  bool_t res;
+  SEXP result;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph1, &g1);
+  R_SEXP_to_igraph(graph2, &g2);
+  igraph_isomorphic(&g1, &g2, &res);
+  PROTECT(result=NEW_LOGICAL(1));
+  LOGICAL(result)[0]=(res>0);
+    
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

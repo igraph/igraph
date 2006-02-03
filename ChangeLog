@@ -1,3 +1,14 @@
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_isoclass_3, igraph_isomorphic_3)
+	(igraph_isoclass_4, igraph_isomorphic_4) : removed
+	(igraph_isoclass, igraph_isomorphic) : added
+	
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_isoclass_3, igraph_isomorphic_3)
+	(igraph_isoclass_4, igraph_isomorphic_4) : added
+
 2006-02-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/layout.c (igraph_layout_random_3d, igraph_layout_sphere)

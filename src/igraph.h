@@ -598,6 +598,14 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 			   bool_t isolates);
 
 /* -------------------------------------------------- */
+/* Graph isomorphisms                                 */
+/* -------------------------------------------------- */
+
+int igraph_isoclass(const igraph_t *graph, int *class);
+int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
+		      bool_t *iso);
+
+/* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 

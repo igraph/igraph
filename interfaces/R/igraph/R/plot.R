@@ -72,11 +72,13 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   y0 <- y0 + vsize.from*sin(phi)
   
   arrow.code <- ifelse(is.directed(graph), 2, 0)
-  arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.code,
-         col=edge.color, lwd=edge.width)
-  x <- (x0+x1)/2
-  y <- (y0+y1)/2
-  text(x, y, labels=edge.labels, col=label.color)
+  if (length(x0) != 0) {
+    arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.code,
+           col=edge.color, lwd=edge.width)
+    x <- (x0+x1)/2
+    y <- (y0+y1)/2
+    text(x, y, labels=edge.labels, col=label.color)
+  }
   # add the edge labels 
 
   rm(x0, y0, x1, y1)
