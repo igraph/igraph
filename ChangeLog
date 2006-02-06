@@ -1,5 +1,9 @@
 2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/vector.c (igraph_vector_binsearch) : bug corrected
+
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/games.c (igraph_growing_traits_game) :
 	renamed to igraph_callaway_traits_game
 	(igraph_establishment_game) : added
