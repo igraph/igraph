@@ -50,7 +50,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   igraph_vector_t deg;
 
   IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
-  igraph_degree(graph, &deg, IGRAPH_VS_ALL(graph), IGRAPH_OUT, 0);
+  igraph_degree(graph, &deg, IGRAPH_VS_ALL(graph), IGRAPH_OUT, 1);
   
   if (size != 3 && size != 4) {
     IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
@@ -137,7 +137,8 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 	  long int last;
 
 	  if (cp!=0 && RNG_UNIF01() < cp) { continue; }
-
+	  motifs+=1;
+	  
 	  last=VECTOR(adjverts)[2*i];
 	  IGRAPH_CHECK(igraph_vector_push_back(&vids, last));
 	  subg[last]=size;
@@ -149,7 +150,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 	    s2=VECTOR(deg)[from];
 	    for (j=0; j<s2; j++) {
 	      long int nei=VECTOR(*neis)[j];
-	      if (subg[nei]) {
+	      if (subg[nei] && k != subg[nei]-1) {
 		idx=mul*k+(subg[nei]-1);
 		code |= arr_idx[idx];
 	      }
@@ -160,7 +161,6 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 	  subg[last]=0;
 	  VECTOR(*hist)[arr_code[code]] += 1;
 	}
-	motifs += s;	
       }
 
       /* can we step down? */
