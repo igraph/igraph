@@ -442,6 +442,17 @@ int igraph_growing_random_game(igraph_t *graph, integer_t n,
 int igraph_aging_prefatt_game(igraph_t *graph, integer_t n, integer_t m,
 			      integer_t aging_type, real_t aging_exp);
 
+int igraph_callaway_traits_game (igraph_t *graph, integer_t nodes, 
+				 integer_t types, integer_t edges_per_step, 
+				 igraph_vector_t *type_dist,
+				 igraph_matrix_t *pref_matrix,
+				 bool_t directed);
+int igraph_establishment_game(igraph_t *graph, integer_t nodes,
+			      integer_t types, integer_t k,
+			      igraph_vector_t *type_dist,
+			      igraph_matrix_t *pref_matrix,
+			      bool_t directed);
+
 /* -------------------------------------------------- */
 /* Basic query functions                              */
 /* -------------------------------------------------- */

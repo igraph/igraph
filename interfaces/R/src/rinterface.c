@@ -2917,7 +2917,7 @@ SEXP R_igraph_isomorphic_34(SEXP graph1, SEXP graph2) {
   return result;
 }
 
-SEXP R_igraph_growing_traits_game(SEXP pnodes, SEXP ptypes, 
+SEXP R_igraph_callaway_traits_game(SEXP pnodes, SEXP ptypes, 
 				  SEXP pepers, SEXP ptype_dist,
 				  SEXP pmatrix, SEXP pdirected) {
 
@@ -2934,8 +2934,8 @@ SEXP R_igraph_growing_traits_game(SEXP pnodes, SEXP ptypes,
   
   R_SEXP_to_vector(ptype_dist, &type_dist);
   R_SEXP_to_matrix(pmatrix, &matrix);
-  igraph_growing_traits_game(&g, nodes, types, epers, &type_dist,
-			     &matrix, directed);
+  igraph_callaway_traits_game(&g, nodes, types, epers, &type_dist,
+			      &matrix, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
@@ -2944,3 +2944,31 @@ SEXP R_igraph_growing_traits_game(SEXP pnodes, SEXP ptypes,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_establishment_game(SEXP pnodes, SEXP ptypes, SEXP pk,
+				 SEXP ptype_dist, SEXP pmatrix,
+				 SEXP pdirected) {
+  igraph_t g;
+  integer_t nodes=REAL(pnodes)[0];
+  integer_t types=REAL(ptypes)[0];
+  integer_t k=REAL(pk)[0];
+  igraph_vector_t type_dist;
+  igraph_matrix_t matrix;
+  bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_vector(ptype_dist, &type_dist);
+  R_SEXP_to_matrix(pmatrix, &matrix);
+  igraph_establishment_game(&g, nodes, types, k, &type_dist, &matrix,
+			    directed);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+			    
