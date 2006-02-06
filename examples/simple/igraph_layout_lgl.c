@@ -8,7 +8,7 @@ int main() {
   igraph_matrix_t coords;
   real_t vc;
   
-  igraph_tree(&g, 1000, 3, IGRAPH_TREE_UNDIRECTED);
+  igraph_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
 /*   igraph_barabasi_game(&g, 1000, 1, 0, 0, IGRAPH_UNDIRECTED); */
   igraph_matrix_init(&coords, 0, 0);
   vc=igraph_vcount(&g);

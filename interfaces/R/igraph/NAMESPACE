@@ -110,6 +110,6 @@ export(evcent)
 
 export(measure.dynamics.idage)
 
-# isomorphism
+# isomorphism, motifs
 
-export(graph.isoclass, graph.isomorphic)
+export(graph.isoclass, graph.isomorphic, graph.motifs)

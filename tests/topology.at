@@ -1,4 +1,4 @@
-# Process this file with autom4te to create testsuite. -*- Autotest -*-
+# Check graph topology related functions
 
 # Test suite for the IGraph library.
 # Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -18,20 +18,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-AT_INIT([igraph])
+AT_BANNER([[Graph topology]])
 
-m4_define([AT_COMPILE_CHECK], [
-AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph $top_srcdir/examples/$1 -o itest])
-AT_CHECK([m4_if([[$2]],[[]],[[>expout]],[[cp $top_srcdir/examples/'$2' expout]])])
-AT_CHECK([LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$top_srcdir/src/.libs ./itest], [], [expout])])
-
-m4_include([types.at])
-m4_include([basic.at])
-m4_include([iterators.at])
-m4_include([structure_generators.at])
-m4_include([structural_properties.at])
-m4_include([components.at])
-m4_include([layout.at])
-m4_include([visitors.at])
-m4_include([topology.at])
-m4_include([motifs.at])
+AT_SETUP([The isomorphism class of a subgraph (igraph_isolass_subgraph)])
+AT_KEYWORDS([isomorph isomorphism class motif])
+AT_COMPILE_CHECK([simple/topology.c], [simple/topology.out])
+AT_CLEANUP

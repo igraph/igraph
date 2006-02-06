@@ -146,6 +146,8 @@ bool_t igraph_vector_any_smaller(const igraph_vector_t *v, real_t limit);
 bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t *rhs);
 bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *pos);
 void igraph_vector_multiply(igraph_vector_t *v, real_t by);
+bool_t igraph_vector_search(igraph_vector_t *v, long int from, real_t what, 
+			    long int *pos);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
@@ -266,6 +268,7 @@ long int igraph_stack_size       (igraph_stack_t* s);
 void igraph_stack_clear      (igraph_stack_t* s);
 int igraph_stack_push       (igraph_stack_t* s, real_t elem);
 real_t igraph_stack_pop        (igraph_stack_t* s);
+real_t igraph_stack_top        (const igraph_stack_t* s);
 
 /* -------------------------------------------------- */
 /* Heap                                               */

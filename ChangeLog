@@ -1,3 +1,30 @@
+2006-02-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/motifs.c (igraph_motifs_randesu) : added randomized cuts
+	* examples/simple/igraph_motifs_randesu.c : updated
+
+2006-02-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/vector.c (igraph_vector_search) : added
+
+	* src/motifs.c (igraph_motifs_randesu) : isomorphism classes added
+	* src/topology.c (igraph_isoclass_subgraph) : added
+
+	* examples/simple/topology.c : added
+	* examples/simple/igraph_layout_lgl.c : smaller graph, faster
+	* examples/simple/igraph_motifs_randesu.c : updated
+
+2006-02-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/motifs.c (igraph_motifs_randesu) : bug corrected
+
+2006-02-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_stack.c (igraph_stack_top) : added
+
+	* src/motifs.c (igraph_motifs_randesu) : added
+	* examples/simple/igraph_motifs_randesu.c : added
+
 2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/vector.c (igraph_vector_binsearch) : bug corrected

@@ -179,3 +179,18 @@ real_t igraph_stack_pop        (igraph_stack_t* s) {
 	
 	return *(s->end);
 }
+
+/**
+ * \ingroup stack
+ * \brief Returns an element from the top of a stack.
+ */
+
+real_t igraph_stack_top        (const igraph_stack_t* s) {
+
+	assert (s != NULL);
+	assert (s->stor_begin != NULL);
+	assert (s->end != NULL);
+	assert (s->end != s->stor_begin);
+
+	return *(s->end-1);
+}

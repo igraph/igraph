@@ -2972,3 +2972,25 @@ SEXP R_igraph_establishment_game(SEXP pnodes, SEXP ptypes, SEXP pk,
   return result;
 }
 			    
+SEXP R_igraph_motifs_randesu(SEXP graph, SEXP psize, SEXP pcutprob) {
+  igraph_t g;
+  integer_t size=REAL(psize)[0];
+  igraph_vector_t cutprob;
+  igraph_vector_t res;
+  SEXP result;
+
+  R_igraph_before();
+
+  R_SEXP_to_vector(pcutprob, &cutprob);
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&res, 0);
+  igraph_motifs_randesu(&g, &res, size, &cutprob);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

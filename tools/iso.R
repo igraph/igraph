@@ -64,6 +64,29 @@ for (num in 0:(length(res)-1)) {
   if (res[num+1]==-1) {
     res[num+1] <- num
     canon <- c(canon, num)
+res <- rep(-1, ng)
+canon <- numeric()
+
+for (num in 0:(length(res)-1)) {
+
+  print(num)
+  el <- to.edgelist(num)
+  
+  for (p in perms) {
+    el2 <- matrix(p[el+1]-1, nc=2)
+    num2 <- to.number(el2)
+    w <- which(num2 == canon)
+    if (length(w) != 0) {
+      res[num+1] <- canon[w]
+      break
+    }
+  }
+  if (res[num+1]==-1) {
+    res[num+1] <- num
+    canon <- c(canon, num)
+  }
+}
+
   }
 }
 
@@ -71,10 +94,6 @@ for (num in 0:(length(res)-1)) {
 
 R
 library(igraph)
-
-coo <- matrix( c( 0,1, 1,.5, 0,0 ), nc=2, byrow=TRUE)
-layout( matrix(1:64, nr=8, nc=8, byrow=TRUE) )
-layout.show(64)
 
 n <- 3
 ng <- 2 ^ (n*(n-1))
@@ -101,12 +120,16 @@ to.edgelist <- function(num, nodes=n) {
   get.edgelist(g)
 }
 
+coo <- matrix( c( 0,1, 1,.5, 0,0 ), nc=2, byrow=TRUE)
+layout( matrix(1:64, nr=8, nc=8, byrow=TRUE) )
+layout.show(64)
+
 for (i in 0:63) {
   
   g <- graph( t(to.edgelist(i)), n=3 )
   par(mar=c(0,0,0,0), mai=c(1,1,1,1)/5)
   class <- graph.isoclass(g)
-  col=if (class==i) "red" else "lightblue"
+  col=if (FALSE) "red" else "lightblue"
   plot(g, layout=coo, vertex.size=20, vertex.color=col, labels=NA)
   text(-.9,0,substitute(i %<=>% j, list(i=i, j=class)),
        adj=c(0,.5), cex=2)

@@ -19,7 +19,7 @@ TESTSUITE_AT = \
 	testsuite.at \
 	types.at basic.at structure_generators.at \
 	structural_properties.at iterators.at components.at \
-	visitors.at layout.at
+	visitors.at layout.at motifs.at topology.at
 TESTSUITE = $(srcdir)/testsuite
 
 AUTOTEST = $(AUTOM4TE) --language=autotest

@@ -1225,3 +1225,20 @@ void igraph_vector_multiply(igraph_vector_t *v, real_t by) {
     VECTOR(*v)[i] *= by;
   }
 }
+
+bool_t igraph_vector_search(igraph_vector_t *v, long int from, real_t what, 
+			    long int *pos) {
+  long int i, n=igraph_vector_size(v);  
+  for (i=from; i<n; i++) {
+    if (VECTOR(*v)[i]==what) break;
+  }
+  
+  if (i<n) {
+    if (pos != 0) {
+      *pos=i;
+    }
+    return 1;
+  } else {
+    return 0;
+  }
+}

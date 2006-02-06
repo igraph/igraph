@@ -615,6 +615,15 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 int igraph_isoclass(const igraph_t *graph, int *class);
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 		      bool_t *iso);
+int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
+			     int *class);
+
+/* -------------------------------------------------- */
+/* Graph motifs                                       */
+/* -------------------------------------------------- */
+
+int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
+			  int size, igraph_vector_t *cut_prob);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */
@@ -657,6 +666,19 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al);
 /* igraph_vector_t *igraph_i_adjlist_get(const igraph_i_adjlist_t *al,  */
 /* 			       integer_t no); */
 #define igraph_i_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])
+
+extern unsigned int igraph_i_isoclass_3[];
+extern unsigned int igraph_i_isoclass_4[];
+extern unsigned int igraph_i_isoclass_3u[];
+extern unsigned int igraph_i_isoclass_4u[];
+extern unsigned int igraph_i_isoclass2_3[];
+extern unsigned int igraph_i_isoclass2_4[];
+extern unsigned int igraph_i_isoclass2_3u[];
+extern unsigned int igraph_i_isoclass2_4u[];
+extern unsigned int igraph_i_isoclass_3_idx[];
+extern unsigned int igraph_i_isoclass_4_idx[];
+extern unsigned int igraph_i_isoclass_3u_idx[];
+extern unsigned int igraph_i_isoclass_4u_idx[];
 
 __END_DECLS
   
