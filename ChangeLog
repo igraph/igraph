@@ -1,5 +1,9 @@
 2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/random.c (igraph_random_sample) : correct upper limit bug
+
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/vector.c (igraph_vector_binsearch) : modified to find "possible"
 	place of element even if it's not in the vector
 	* src/games.c (igraph_growing_traits_game) : added

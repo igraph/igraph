@@ -1,5 +1,9 @@
 2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/other.R (igraph.sample) : correct bug
+
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* interfaces/R/igraph/R/games.R (callaway.traits.game) : added
 	* interfaces/R/src/rinterface.c (R_igraph_growing_traits_game) : added
 
