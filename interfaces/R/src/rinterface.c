@@ -2916,3 +2916,31 @@ SEXP R_igraph_isomorphic_34(SEXP graph1, SEXP graph2) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_growing_traits_game(SEXP pnodes, SEXP ptypes, 
+				  SEXP pepers, SEXP ptype_dist,
+				  SEXP pmatrix, SEXP pdirected) {
+
+  igraph_t g;
+  integer_t nodes=REAL(pnodes)[0];
+  integer_t types=REAL(ptypes)[0];
+  integer_t epers=REAL(pepers)[0];
+  igraph_vector_t type_dist;
+  igraph_matrix_t matrix;
+  bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result; 
+
+  R_igraph_before();
+  
+  R_SEXP_to_vector(ptype_dist, &type_dist);
+  R_SEXP_to_matrix(pmatrix, &matrix);
+  igraph_growing_traits_game(&g, nodes, types, epers, &type_dist,
+			     &matrix, directed);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

@@ -151,3 +151,14 @@ aging.prefatt.game <- function(n, m=1, aging.type="exponential",
 
   graph(edges-1, n=n, ...)
 }
+
+callaway.traits.game <- function(nodes, types, edge.per.step=1,
+                                type.dist=rep(1, types),
+                                pref.matrix=matrix(1, types, types),
+                                directed=FALSE) {
+
+  .Call("R_igraph_growing_traits_game", as.double(nodes),
+        as.double(types), as.double(edge.per.step),
+        as.double(type.dist), matrix(as.double(pref.matrix), types, types),
+        as.logical(directed))
+}

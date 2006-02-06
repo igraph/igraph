@@ -619,3 +619,51 @@ int igraph_aging_prefatt_game(igraph_t *graph, integer_t n, integer_t m,
   /* TODO */
   return 0;
 }
+
+int igraph_growing_traits_game (igraph_t *graph, integer_t nodes, 
+				integer_t types, integer_t edges_per_step, 
+				igraph_vector_t *type_dist,
+				igraph_matrix_t *pref_matrix,
+				bool_t directed) {
+  long int i, j;
+  igraph_vector_t edges;
+  igraph_vector_t cumdist;
+  real_t maxcum;
+
+  /* TODO: parameter checks */
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
+  
+  VECTOR(cumdist)[0]=0;
+  for (i=0; i<types; i++) {
+    VECTOR(cumdist)[i+1] = VECTOR(cumdist)[i]+VECTOR(*type_dist)[i];
+  }
+  maxcum=igraph_vector_tail(&cumdist);
+
+  RNG_BEGIN();
+
+  for (i=1; i<nodes; i++) {
+    for (j=0; j<edges_per_step; j++) {
+      long int node1=RNG_INTEGER(0, i);
+      long int node2=RNG_INTEGER(0, i);
+      real_t uni1=RNG_UNIF(0, maxcum), uni2=RNG_UNIF(0, maxcum);
+      long int type1, type2;
+      igraph_vector_binsearch(&cumdist, uni1, &type1);
+      igraph_vector_binsearch(&cumdist, uni2, &type2);
+/*    printf("unif: %f, %f, types: %li, %li\n", uni1, uni2, type1, type2); */
+      if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
+	igraph_vector_push_back(&edges, node1);
+	igraph_vector_push_back(&edges, node2);
+      }
+    }
+  }
+
+  RNG_END();
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+

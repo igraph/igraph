@@ -1197,19 +1197,19 @@ bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *
   long int left=0;
   long int right=igraph_vector_size(v)-1;
 
-  while (left < right) {
+  while (left < right-1) {
     long int middle=(left+right)/2;
     if (VECTOR(*v)[middle] > what) {
-      right=middle-1;
+      right=middle;
     } else if (VECTOR(*v)[middle] < what) {
-      left=middle+1;
+      left=middle;
     } else {
       left=middle;
       break;
     }
   }
   
-  if (pos != 0 && VECTOR(*v)[left]==what) {
+  if (pos != 0) {
     *pos=left;
   }
   return VECTOR(*v)[left]==what;
