@@ -311,6 +311,33 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   return 0;
 }
 
+extern int igraph_pajek_yyparse();
+extern FILE *igraph_pajek_yyin;
+igraph_vector_t *igraph_pajek_vector=0;
+igraph_stack_t *igraph_pajek_coords=0;
+bool_t igraph_pajek_directed;
+long int igraph_pajek_vcount=0;
+long int igraph_pajek_actfrom, igraph_pajek_actto;
+int igraph_pajek_mode=0;	/* 0 - general, 1 - vertex, 2 - edge */
+
+int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
+  igraph_vector_t edges;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
+  igraph_pajek_vector=&edges;
+  igraph_pajek_yyin=instream;
+  
+  igraph_pajek_yyparse();
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, igraph_pajek_vcount, 
+			     igraph_pajek_directed));
+  igraph_vector_destroy(&edges);
+
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_edgelist

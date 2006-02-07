@@ -17,9 +17,9 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 
 RSNAMES_H = memory.h random.h atlas-edges.h
 
-RSNAMES_Y = foreign-ncol-parser.y foreign-lgl-parser.y 
+RSNAMES_Y = foreign-ncol-parser.y foreign-lgl-parser.y foreign-pajek-parser.y
 
-RSNAMES_L = foreign-ncol-lexer.l foreign-lgl-lexer.l
+RSNAMES_L = foreign-ncol-lexer.l foreign-lgl-lexer.l foreign-pajek-lexer.l
 
 RSCNAMES = $(RSNAMES_C) $(RSNAMES_H) \
 	$(RSNAMES_Y:.y=.c) $(RSNAMES_Y:.y=.h) \

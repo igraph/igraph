@@ -600,6 +600,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, bool_t names,
 			  bool_t weights);
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 			  bool_t names, bool_t weights);
+int igraph_read_graph_pajek(igraph_t *graph, FILE *instream);
 
 int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream);
 int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,

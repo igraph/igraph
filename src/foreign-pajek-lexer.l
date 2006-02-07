@@ -1,0 +1,72 @@
+%{
+#include "foreign-pajek-parser.h"
+long int igraph_pajek_mylineno=0;
+extern int igraph_pajek_mode;
+%}
+
+%option noyywrap
+%option prefix="igraph_pajek_yy"
+%option outfile="lex.yy.c"
+
+digit [0-9]
+word [^ \t\r\n]
+
+%%
+
+[ \t]*          { }
+^%[^\n]*\n      { }
+^\*[Nn][Ee][Tt][Ww][Oo][Rr][Kk]         { return NETWORKLINE; }
+^\*[Vv][Ee][Rr][Tt][Ii][Cc][Ee][Ss]     { return VERTICESLINE; }
+^\*[Aa][Rr][Cc][Ss]                     { return ARCSLINE; }
+^\*[Ee][Dd][Gg][Ee][Ss]                 { return EDGESLINE; }
+^\*[Aa][Rr][Cc][Ss][Ll][Ii][Ss][Tt]     { return ARCSLISTLINE; }
+^\*[Ee][Dd][Gg][Ee][Ss][Ll][Ii][Ss][Tt] { return EDGESLISTLINE; }
+^\*[Mm][Aa][Tt][Rr][Ii][Xx]             { return MATRIXLINE; }
+\n|\n\r|\r\n      { igraph_pajek_mylineno++; igraph_pajek_mode=0; return NEWLINE; }
+\"[^\"]*\"        { return QSTR; }
+\([^\)]*\)        { return PSTR; }
+\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { 
+                    return NUM; }
+
+[Xx]_[Ff][Aa][Cc][Tt]/[ \t\n\r]  { if (igraph_pajek_mode==1) { return VP_X_FACT; } else { return ALNUM; } }
+[Yy]_[Ff][Aa][Cc][Tt]/[ \t\n\r]  { if (igraph_pajek_mode==1) { return VP_Y_FACT; } else { return ALNUM; } }
+[Ii][Cc]/[ \t\n\r]               { if (igraph_pajek_mode==1) { return VP_IC; } else { return ALNUM; } }
+[Bb][Cc]/[ \t\n\r]               { if (igraph_pajek_mode==1) { return VP_BC; } else { return ALNUM; } }
+[Bb][Ww]/[ \t\n\r]               { if (igraph_pajek_mode==1) { return VP_BW; } else { return ALNUM; } }
+[Pp][Hh][Ii]/[ \t\n\r]           { if (igraph_pajek_mode==1) { return VP_PHI; } else { return ALNUM; } }
+[Rr]/[ \t\n\r]                   { if (igraph_pajek_mode==1) { return VP_R; } else { return ALNUM; } }
+[Qq]/[ \t\n\r]                   { if (igraph_pajek_mode==1) { return VP_Q; } else { return ALNUM; } }
+[Ff][Oo][Nn][Tt]/[ \t\n\r]       { if (igraph_pajek_mode==1) { return VP_FONT; } else { return ALNUM; } }
+[Uu][Rr][Ll]/[ \t\n\r]           { if (igraph_pajek_mode==1) { return VP_URL; } else { return ALNUM; } }
+
+[Cc]/[ \t\n\r]       { if (igraph_pajek_mode==2) { return EP_C; } else { return ALNUM; } }
+[Pp]/[ \t\n\r]       { if (igraph_pajek_mode==2) { return EP_P; } else { return ALNUM; } }
+[Ss]/[ \t\n\r]       { if (igraph_pajek_mode==2) { return EP_S; } else { return ALNUM; } }
+[Aa]/[ \t\n\r]       { if (igraph_pajek_mode==2) { return EP_A; } else { return ALNUM; } }
+[Ww]/[ \t\n\r]       { if (igraph_pajek_mode==2) { return EP_W; } else { return ALNUM; } }
+[Hh]1/[ \t\n\r]      { if (igraph_pajek_mode==2) { return EP_H1; } else { return ALNUM; } }
+[Hh]2/[ \t\n\r]      { if (igraph_pajek_mode==2) { return EP_H2; } else { return ALNUM; } }
+[Aa]1/[ \t\n\r]      { if (igraph_pajek_mode==2) { return EP_A1; } else { return ALNUM; } }
+[Aa]2/[ \t\n\r]      { if (igraph_pajek_mode==2) { return EP_A2; } else { return ALNUM; } }
+[Kk]1/[ \t\n\r]      { if (igraph_pajek_mode==2) { return EP_K1; } else { return ALNUM; } }
+[Kk]2/[ \t\n\r]      { if (igraph_pajek_mode==2) { return EP_K2; } else { return ALNUM; } }
+[Aa][Pp]/[ \t\n\r]   { if (igraph_pajek_mode==2) { return EP_AP; } else { return ALNUM; } }
+[Ll]/[ \t\n\r]       { if (igraph_pajek_mode==2) { return EP_L; } else { return ALNUM; } }
+[Ll][Pp]/[ \t\n\r]   { if (igraph_pajek_mode==2) { return EP_LP; } else { return ALNUM; } }
+
+[Ll][Pp][Hh][Ii]/[ \t\n\r] { if (igraph_pajek_mode==1) { return VP_LPHI; } else
+                             if (igraph_pajek_mode==2) { return EP_LPHI; } else { return ALNUM; } }
+[Ll][Cc]/[ \t\n\r]         { if (igraph_pajek_mode==1) { return VP_LC; } else
+                             if (igraph_pajek_mode==2) { return EP_LC; } else { return ALNUM; } }
+[Ll][Rr]/[ \t\n\r]         { if (igraph_pajek_mode==1) { return VP_LR; } else
+                             if (igraph_pajek_mode==2) { return EP_LR; } else { return ALNUM; } }
+[Ll][Aa]/[ \t\n\r]         { if (igraph_pajek_mode==1) { return VP_LA; } else
+                             if (igraph_pajek_mode==2) { return EP_LA; } else { return ALNUM; } }
+[Ss][Ii][Zz][Ee]/[ \t\n\r] { if (igraph_pajek_mode==1) { return VP_SIZE; } else 
+                             if (igraph_pajek_mode==2) { return EP_SIZE; } else { return ALNUM; } }
+[Ff][Oo][Ss]/[ \t\n\r]     { if (igraph_pajek_mode==1) { return VP_FOS; } else 
+                             if (igraph_pajek_mode==2) { return EP_FOS; } else { return ALNUM; } }
+                             
+{word}+           { return ALNUM; }
+
+%%

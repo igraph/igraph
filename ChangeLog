@@ -1,3 +1,15 @@
+2006-02-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign-pajek-parser.y : better vertex and edge parameter 
+	handling, support for adjacency matrices
+
+2006-02-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_read_graph_pajek) :added
+	* src/foreign-pajek-lexer.l : added
+	* src/foreign-pajek-parser.y : added
+	* examples/simple/foreign.c : added
+
 2006-02-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/motifs.c (igraph_motifs_randesu) : motif count correct even

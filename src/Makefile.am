@@ -16,11 +16,12 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     memory.h random.h \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
+			     foreign-pajek-parser.y foreign-pajek-lexer.l \
 			     dqueue.c heap.c igraph_stack.c \
 			     igraph_strvector.c igraph_trie.c matrix.c \
 			     vector.c vector_ptr.c memory.c adjlist.c \
 			     visitors.c igraph_grid.c atlas.c topology.c \
-			     motifs.c
+			     motifs.c 
 libigraph_la_CFLAGS        = -O2
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm
