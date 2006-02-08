@@ -25,6 +25,9 @@
 
 /**
  * \function igraph_bfs
+ * \ingroup internal
+ * 
+ * Added in version 0.2.
  * 
  * TODO
  */

@@ -18,7 +18,9 @@
 <section><title>Basic Query Operations</title>
 <!-- doxrox-include igraph_vcount -->
 <!-- doxrox-include igraph_ecount -->
+<!-- doxrox-include igraph_edge -->
 <!-- doxrox-include igraph_neighbors -->
+<!-- doxrox-include igraph_adjacent -->
 <!-- doxrox-include igraph_is_directed -->
 <!-- doxrox-include igraph_degree -->
 </section>

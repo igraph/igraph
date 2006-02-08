@@ -407,6 +407,33 @@ WITH
 
 </variablelist>
 
+REPLACE ----- \olist ----------------------------------------------------------
+
+\\olist\b
+
+WITH
+
+<orderedlist>
+
+REPLACE ----- \oli ------------------------------------------------------------
+
+\\oli\s+(?P<text>.*?)
+(?=(\\oli)|(\\endolist))
+
+WITH
+
+<listitem><para>
+\g<text>
+</para></listitem>
+
+REPLACE ----- \endolist -------------------------------------------------------
+
+\\endolist\b
+
+WITH
+
+</orderedlist>
+
 REPLACE ----- doxygen \c command is for <constant> ----------------------------
 
 \\c\s+(?P<word>\w+)\b

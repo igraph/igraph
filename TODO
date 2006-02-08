@@ -1,8 +1,10 @@
 
+o R interface for some functions: page rank, etc.
+o get non-structural info from Pajek files
 o functions for handling motifs (get motif with a code, get the code of a
   motif, etc.), estimate # of motifs
 o topological equaivalence of graphs
-o motif search (RAND-ESU algorithm), improve: get # motifs
+o motif search (RAND-ESU algorithm), improve: get # motifs, etc.
 o make CTRL+C work in R
 o better random number generator handling (init with seed, etc...)
 o make possible building in separate directory (make check, r package,

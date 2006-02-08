@@ -326,7 +326,14 @@ int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from) {
 /**
  * \function igraph_matrix_max
  * 
- * TODO
+ * Returns the maximal element of a matrix.
+ * \param m The matrix object.
+ * \return The maximum element. For empty matrix the returned value is
+ * undefined. 
+ * 
+ * Added in version 0.2.</para><para>
+ *
+ * Time complexity: O(n), the number of elements in the matrix.
  */
 
 real_t igraph_matrix_max(const igraph_matrix_t *m) {
@@ -334,9 +341,15 @@ real_t igraph_matrix_max(const igraph_matrix_t *m) {
 }
 
 /**
- * \function igraph_matrix_multiple
+ * \function igraph_matrix_multiply
  * 
- * TODO
+ * Multiplies each element of the matrix by a constant.
+ * \param m The matrix.
+ * \param by The constant.
+ *
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(n), the number of elements in the matrix.
  */
 
 void igraph_matrix_multiply(igraph_matrix_t *m, real_t by) {

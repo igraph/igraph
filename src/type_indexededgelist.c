@@ -898,6 +898,24 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_edge
+ * \brief Gives the head and tail vertices of an edge.
+ * 
+ * \param graph The graph object.
+ * \param eid The edge id. 
+ * \param from Pointer to an \type integer_t. The tail of the edge
+ * will be placed here. 
+ * \param to Pointer to an \type integer_t. The head of the edge 
+ * will be placed here.
+ * \return Error code. The current implementation always returns with
+ * success. 
+ * 
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_edge(const igraph_t *graph, integer_t eid, 
 		integer_t *from, integer_t *to) {
   
@@ -906,6 +924,26 @@ int igraph_edge(const igraph_t *graph, integer_t eid,
 
   return 0;
 }
+
+/**
+ * \function igraph_adjacent
+ * \brief Gives the adjacent edges of a vertex.
+ * 
+ * \param graph The graph object.
+ * \param eids An initialized \type vector_t object. It will be resized
+ * to hold the result.
+ * \param pnode A vertex id.
+ * \param mode Specifies what kind of edges to include for directed
+ * graphs. \c IGRAPH_OUT means only outgoing edges, \c IGRAPH_IN only
+ * incoming edges, \c IGRAPH_ALL both. This parameter is ignored for
+ * undirected graphs.
+ * \return Error code. \c IGRAPH_EINVVID: invalid \p pnode argument, 
+ *   \c IGRAPH_EINVMODE: invalid \p mode argument.
+ * 
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(d), the number of adjacent edges to \p pnode.
+ */
 
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, 
 		    integer_t pnode, igraph_neimode_t mode) {

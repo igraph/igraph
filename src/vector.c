@@ -1219,6 +1219,19 @@ bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *
   return VECTOR(*v)[left]==what;
 }
 
+/**
+ * \function igraph_vector_multiply
+ * \brief Multiply all elements of a vector by a constant
+ * 
+ * \param v The vector.
+ * \param by The constant.
+ * \return Error code. The current implementation always returns with success.
+ * 
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(n), the number of elements in a vector.
+ */
+
 void igraph_vector_multiply(igraph_vector_t *v, real_t by) {
   long int i;
   for (i=0; i<igraph_vector_size(v); i++) {

@@ -36,9 +36,10 @@ matrix.xml: matrix.xxml ../src/types.h ../src/matrix.c
 basicigraph.xml: basicigraph.xxml ../src/type_indexededgelist.c
 	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/type_indexededgelist.c
 
-generators.xml: generators.xxml ../src/structure_generators.c ../src/games.c
+generators.xml: generators.xxml ../src/structure_generators.c ../src/games.c \
+		../src/atlas.c
 	./doxrox.py -t $< -e c-docbook.re -o $@ \
-	../src/structure_generators.c ../src/games.c
+	../src/structure_generators.c ../src/games.c ../src/atlas.c
 
 structural.xml: structural.xxml ../src/structural_properties.c \
 		../src/conversion.c ../src/basic_query.c \

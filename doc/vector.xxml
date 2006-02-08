@@ -52,6 +52,7 @@
 <!-- doxrox-include igraph_vector_null -->
 <!-- doxrox-include igraph_vector_push_back -->
 <!-- doxrox-include igraph_vector_pop_back -->
+<!-- doxrox-include igraph_vector_multiply -->
 <!-- doxrox-include igraph_vector_sort -->
 <!-- doxrox-include igraph_vector_remove_section -->
 <!-- doxrox-include igraph_vector_remove -->

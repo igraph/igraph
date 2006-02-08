@@ -70,6 +70,21 @@ int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res) {
   return 0;
 }
 
+/**
+ * \function igraph_layout_random_3d
+ * \brief Random layout in 3D
+ * 
+ * \param graph The graph to place.
+ * \param res Pointer to an initialized matrix object. It will be
+ * resized to hold the result.
+ * \return Error code. The current implementation always returns with
+ * success. 
+ *
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(|V|), the number of vertices.
+ */
+
 int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -121,10 +136,24 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
   return 0;
 }
 
-/*
- * "Distributing many points on a sphere" by E.B. Saff and A.B.J. Kuijlaars,
- * Mathematical Intelligencer 19.1 (1997) 5--11. 
+/**
+ * \function igraph_layout_sphere
+ * \brief Places vertices (more or less) uniformly on a sphere.
+ * 
+ * The algorithm was described in the following paper:
+ * Distributing many points on a sphere by E.B. Saff and
+ * A.B.J. Kuijlaars, \emb Mathematical Intelligencer \eme 19.1 (1997)
+ * 5--11.  
+ * 
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object, the will be
+ * stored here. It will be resized.
+ * \return Error code. The current implementation always returns with
+ * success. 
+ * 
+ * Added in version 0.2.</para><para>
  *
+ * Time complexity: O(|V|), the number of vertices in the graph.
  */
 
 int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
@@ -276,6 +305,37 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
   
   return 0;
 }
+
+/**
+ * \function igraph_layout_fruchterman_reingold_3d
+ * \brief This is the 3D version of the force based
+ * Fruchterman-Reingold layout (see \ref
+ * igraph_layout_fruchterman_reingold for the 2D version
+ *
+ * This function was ported from the SNA R package.
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized in needed.
+ * \param niter The number of iterations to do.
+ * \param maxdelta The maximum distance to move a vertex in an
+ *        iteration.
+ * \param volume The volume parameter of the algorithm.
+ * \param coolexp The cooling exponent of the simulated annealing.
+ * \param repulserad Determines the radius at which
+ *        vertex-vertex repulsion cancels out attraction of
+ *        adjacent vertices.
+ * \param use_seed Logical, if true the supplied values in the
+ *        \p res argument are used as an initial layout, if
+ *        false a random initial layout is used.
+ * \return Error code.
+ *
+ * Added in version 0.2.</para><para>
+ *
+ * Time complexity: O(|V|^2) in each
+ * iteration, |V| is the number of
+ * vertices in the graph. 
+ * 
+ */
 
 int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
 					  igraph_matrix_t *res,
@@ -470,6 +530,30 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_layout_kamada_kawai_3d
+ * \brief 3D version of the force based Kamada-Kawai layout, the pair
+ * of the \ref igraph_layout_kamada_kawai 2D layout generator
+ * 
+ * This function was ported from the SNA R package.
+ * \param graph A graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized if needed.
+ * \param niter The number of iterations to perform.
+ * \param sigma Sets the base standard deviation of position
+ *        change proposals. 
+ * \param initemp Sets the initial temperature for the annealing.
+ * \param coolexp The cooling exponent of the annealing.
+ * \param kkconst The Kamada-Kawai vertex attraction constant.
+ * \return Error code.
+ * 
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(|V|^2) for each
+ * iteration, |V| is the number of
+ * vertices in the graph. 
+ */
+
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  integer_t niter, real_t sigma, 
 				  real_t initemp, real_t coolexp, 
@@ -547,8 +631,42 @@ void igraph_i_norm2d(real_t *x, real_t *y) {
 
 /**
  * \function igraph_layout_lgl
+ * \brief Force based layout algorithm for large graphs.
  * 
- * TODO
+ * This is a layout generator similar to the Large Graph Layout
+ * algorithm and program
+ * (http://bioinformatics.icmb.utexas.edu/lgl/). But unlike LGL, this
+ * version uses a Fruchterman-Reingold style simulated annealing
+ * algorithm for placing the vertices. The speedup is achived by
+ * placing the vertices on a grid and calculating the repulsion only
+ * for vertices which are closer to each other than a limit. 
+ * 
+ * \param graph The (initialized) graph object to place.
+ * \param res Pointer to an initialized matrix object to hold the
+ *   result. It will be resized if needed.
+ * \param maxit The maximum number of cooling iterations to perform
+ *   for each layout step.
+ * \param maxdelta The maximum length of the move allowed for a vertex
+ *   in a single iteration. 
+ * \param area This parameter gives the area of the square on which
+ *   the vertices will be placed.
+ * \param coolexp The cooling exponent. 
+ * \param repulserad Determines the radius at which vertex-vertex 
+ *   repulsion cancels out attraction of adjacenct vertices.
+ * \param cellsize The size of the grid cells, one side of the
+ *   square. 
+ * \param proot The root vertex, this is placed first, its neighbors
+ *   in the first iteration, second neighbors in the second, etc. If
+ *   negative then a random vertex is chosen.
+ * \return Error code.
+ * 
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: ideally O(dia*maxit*(|V|+|E|)), |V| is the number
+ * of vertices, 
+ * dia is the diameter of the graph, worst case complexity is still 
+ * O(dia*maxit*(|V|^2+|E|)), this is the case when all vertices happen to be
+ * in the same grid cell. 
  */
 
 int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
@@ -788,7 +906,37 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
   return 0;
 
 }
-		      
+
+/**
+ * \function igraph_layout_grid_fruchterman_reingold
+ * \brief Force based layout generator for large graphs.
+ * 
+ * This algorithm is the same as the Fruchterman-Reingold layout
+ * generator, but it partitions the 2d space to a grid and and vertex
+ * repulsion is calculated only for vertices nearby.
+ *
+ * \param graph The graph object. 
+ * \param res The result, the coordinates in a matrix. The parameter
+ *   should point to an initialized matrix object and will be resized.
+ * \param niter Number of iterations to perform.
+ * \param maxdelta Maximum distance to move a vertex in an iteration.
+ * \param area The area of the square on which the vertices will be
+ *   placed.
+ * \param coolexp The cooling exponent.
+ * \param repulserad Determines the radius at which vertex-vertex 
+ *   repulsion cancels out attraction of adjacenct vertices.
+ * \param cellsize The size of the grid cells.
+ * \param use_seed Logical, if true, the coordinates passed in \p res
+ *   (should have the appropriate size) will be used for the first
+ *   iteration.
+ * \return Error code.
+ *
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: ideally (constant number of vertices in each cell) 
+ * O(niter*(|V|+|E|)), in the worst case O(niter*(|V|^2+|E|)).
+ */
+
 int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
 					    igraph_matrix_t *res,
 					    integer_t niter, real_t maxdelta, 

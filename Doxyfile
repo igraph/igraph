@@ -35,6 +35,9 @@ ALIASES               += "eme=</em>"
 ALIASES               += "clist=<ul>"
 ALIASES               += "cli=<li>\c "
 ALIASES               += "endclist=</ul>"
+ALIASES               += "olist=<ol>"
+ALIASES               += "oli=<li>"
+ALIASES               += "endolist=</ol>"
 ALIASES               += "enumval= - \c "
 ALIASES               += "blockquote=<i>"
 ALIASES               += "endblockquote=</i>"
@@ -93,7 +96,9 @@ EXCLUDE                = src/foreign-lgl-lexer.c \
                          src/foreign-ncol-lexer.c \
                          src/foreign-ncol-parser.c \
                          src/foreign-ncol-parser.h \
-                         src/foreign-lgl-lexer.c
+                         src/foreign-pajek-lexer.c \
+                         src/foreign-pajek-parser.c \
+                         src/foreign-pajek-parser.h 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXAMPLE_PATH           = 

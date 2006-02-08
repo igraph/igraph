@@ -354,6 +354,8 @@ void igraph_i_decompose_free(igraph_vector_ptr_t *complist) {
  *    vector. Eg. supply 2 here to ignore isolate vertices.
  * \return Error code, \c IGRAPH_ENOMEM if there is not enough memory
  *   to perform the operation.
+ *
+ * Added in version 0.2.</para><para>
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges. 

@@ -28,10 +28,12 @@
 <!-- doxrox-include igraph_matrix_size -->
 <!-- doxrox-include igraph_matrix_nrow -->
 <!-- doxrox-include igraph_matrix_ncol -->
+<!-- doxrox-include igraph_matrix_max -->
 </section>
 
 <section>
 <title>Matrix operations</title>
+<!-- doxrox-include igraph_matrix_multiply -->
 <!-- doxrox-include igraph_matrix_add_rows -->
 <!-- doxrox-include igraph_matrix_add_cols -->
 <!-- doxrox-include igraph_matrix_resize -->

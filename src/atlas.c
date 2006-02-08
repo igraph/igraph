@@ -23,6 +23,35 @@
 #include "igraph.h"
 #include "atlas-edges.h"
 
+/**
+ * \function igraph_atlas
+ * \brief Create a small graph from the \quote Graph Atlas \endquote.
+ * 
+ * The number of the graph is given as a parameter. 
+ * The graphs are listed: \olist
+ *      \oli in increasing order of number of nodes;
+ *      \oli for a fixed number of nodes, in increasing order of the 
+ *           number of edges;
+ *      \oli for fixed numbers of nodes and edges, in increasing 
+ *           order of the degree sequence, for example 111223 &lt; 112222; 
+ *      \oli for fixed degree sequence, in increasing number of 
+ *           automorphisms.
+ *      \endolist
+ *
+ * The data was converted from the networkx software package, 
+ * see http://networkx.lanl.gov.
+ * 
+ * See \emb An Atlas of Graphs \eme by Ronald C. Read and Robin J. Wilson, 
+ * Oxford University Press, 1998.
+ * 
+ * \param graph Pointer to an uninitialized graph object. 
+ * \param number The number of the graph to generate.
+ * 
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number of 
+ * edges.
+ */
 int igraph_atlas(igraph_t *graph, int number) {
   
   long int pos, n, e;

@@ -620,6 +620,37 @@ int igraph_aging_prefatt_game(igraph_t *graph, integer_t n, integer_t m,
   return 0;
 }
 
+/**
+ * \function igraph_callaway_traits_game
+ * 
+ * This function simulates a growing network with vertex types.
+ * The different types of vertices prefer to connect other types of
+ * vertices with a given probability.</para><para>
+ * 
+ * The simulation goes like this: in each discrete time step a new
+ * vertex is added to the graph. The type of this vertex is generated
+ * based on \p type_dist. Then two vertices are selected uniformly
+ * randomly from the graph. The probability that they will be
+ * connected depends on the types of these vertices and is taken from
+ * \p pref_matrix. Then another two vertices are selected and this is
+ * repeated \p edges_per_step times in each time step.
+ * \param graph Pointer to an uninitialized graph.
+ * \param nodes The number of nodes in the graph.
+ * \param types Number of node types.
+ * \param edges_per_step The number of edges to be add per time step.
+ * \param type_dist Vector giving the distribution of the vertex
+ * types.
+ * \param pref_matrix Matrix giving the connection probabilities for
+ * the vertex types.
+ * \param directed Logical, whether to generate a directed graph.
+ * \return Error code. 
+ * 
+ * Added in version 0.2.</para><para>
+ * 
+ * Time complexity: O(|V|e*log(|V|)), |V| is the number of vertices, e
+ * is \p edges_per_step.
+ */
+
 int igraph_callaway_traits_game (igraph_t *graph, integer_t nodes, 
 				integer_t types, integer_t edges_per_step, 
 				igraph_vector_t *type_dist,
@@ -668,6 +699,32 @@ int igraph_callaway_traits_game (igraph_t *graph, integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_establishment_game
+ * \brief Generates a graph with a simple growing model with vertex
+ * types 
+ * 
+ * The simulation goes like this: a single vertex is added at each
+ * time step. This new vertex tries to connect to \p k vertices in the
+ * graph. The probability that such a connection is realized depends
+ * on the types of the vertices involved. 
+ * 
+ * \param graph Pointer to an uninitialized graph.
+ * \param nodes The number of vertices in the graph.
+ * \param types The number of vertex types.
+ * \param k The number of connections tried in each time step.
+ * \param type_dist Vector giving the distribution of vertex types.
+ * \param pref_matrix Matrix giving the connection probabilities for
+ * different vertex types.
+ * \param directed Logical, whether to generate a directed graph.
+ * \return Error code.
+ *
+ * Added in version 0.2.</para><para>
+ *
+ * Time complexity: O(|V|*k*log(|V|)), |V| is the number of vertices
+ * and k is the \p k parameter.
+ */
 
 int igraph_establishment_game(igraph_t *graph, integer_t nodes,
 			      integer_t types, integer_t k,
