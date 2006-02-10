@@ -1,3 +1,10 @@
+2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R
+	(get.all.shortest.paths) : added
+	* interfaces/R/src/rinterface.c (R_igraph_get_all_shortest_paths) :
+	added
+
 2006-02-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c	(R_igraph_motifs_randesu) : added

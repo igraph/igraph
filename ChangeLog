@@ -1,3 +1,7 @@
+2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_get_all_shortest_paths) : added
+
 2006-02-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-pajek-parser.y : better vertex and edge parameter 

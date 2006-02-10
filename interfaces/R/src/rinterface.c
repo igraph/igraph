@@ -2994,3 +2994,33 @@ SEXP R_igraph_motifs_randesu(SEXP graph, SEXP psize, SEXP pcutprob) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom, 
+				     SEXP pmode) {
+  
+  igraph_t g;
+  integer_t from=REAL(pfrom)[0];
+  integer_t mode=REAL(pmode)[0];
+  igraph_vector_ptr_t res;
+  SEXP result;
+  long int i;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_ptr_init(&res, 0);
+  igraph_get_all_shortest_paths(&g, &res, 0, from, mode);
+  PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&res)));
+  for (i=0; i<igraph_vector_ptr_size(&res); i++) {
+    long int len=igraph_vector_size(VECTOR(res)[i]);
+    SET_VECTOR_ELT(result, i, NEW_NUMERIC(len));
+    igraph_vector_copy_to(VECTOR(res)[i], REAL(VECTOR_ELT(result, i)));
+    igraph_vector_destroy(VECTOR(res)[i]);
+  }
+  igraph_vector_ptr_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

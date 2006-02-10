@@ -788,6 +788,173 @@ int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
+void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
+  long int i;
+  for (i=0; i<igraph_vector_ptr_size(v); i++) {
+    if (VECTOR(*v)[i] != 0) {
+      igraph_vector_destroy(VECTOR(*v)[i]);
+      Free(VECTOR(*v)[i]);
+    }
+  }
+  igraph_vector_ptr_destroy(v);
+}
+
+/**
+ * \function igraph_get_all_shortest_paths
+ * \brief Finds all shortest paths (geodesics) from a vertex to all
+ * other vertices 
+ * 
+ * \param graph The graph object.
+ * \param res Pointer to an initialized pointer vector, the result
+ *   will be stored here in igraph_vector_t objects. Each vector
+ *   object contains the vertices along a shortest path from \p from
+ *   to another vertex. The vectors are ordered according to their
+ *   target vertex: first the shortest paths to vertex 0, then to
+ *   vertex 1, etc. No data is included for unreachable vertices.
+ * \param nrgeo Pointer to an initialized igraph_vector_t object or
+ *   NULL. If not NULL the number of shortest paths from \p from are
+ * is stored here for every vertex in the graph.
+ * \param from The id of the vertex from/to which the geodesics are
+ *        calculated. 
+ * \param mode The type of shortest paths to be use for the
+ *        calculation in directed graphs. Possible values: 
+ *        \clist
+ *        \cli IGRAPH_OUT 
+ *          the lengths of the outgoing paths are calculated. 
+ *        \cli IGRAPH_IN 
+ *          the lengths of the incoming paths are calculated. 
+ *        \cli IGRAPH_ALL 
+ *          the directed graph is considered as an
+ *          undirected one for the computation.
+ *        \endclist
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM 
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           \p from is invalid vertex id.
+ *        \cli IGRAPH_EINVMODE 
+ *           invalid mode argument.
+ *        \endclist
+ *
+ * Added in version 0.2.</para><para>
+ *
+ * Time complexity: O(|V|+|E|) for most graphs, O(|V|^2) in the worst
+ * case. 
+ */
+
+int igraph_get_all_shortest_paths(const igraph_t *graph,
+				  igraph_vector_ptr_t *res, 
+				  igraph_vector_t *nrgeo,
+				  integer_t from, igraph_neimode_t mode) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int *geodist;
+  igraph_vector_ptr_t paths;
+  igraph_dqueue_t q;
+  igraph_vector_t *vptr;
+  igraph_vector_t neis;
+  igraph_vector_t ptrlist;
+  igraph_vector_t ptrhead;
+  long int n, j, i;
+
+  if (from<0 || from>=no_of_nodes) {
+    IGRAPH_ERROR("cannot get shortest paths", IGRAPH_EINVVID);
+  }
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+
+  IGRAPH_CHECK(igraph_vector_ptr_init(&paths, 0));
+  IGRAPH_FINALLY(igraph_i_gasp_paths_destroy, &paths);
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&ptrlist, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&ptrhead, no_of_nodes);
+  IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
+  geodist=Calloc(no_of_nodes, long int);
+  if (geodist==0) {
+    IGRAPH_ERROR("Cannot calculate shortest paths", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, geodist);
+
+
+  if (nrgeo) { 
+    IGRAPH_CHECK(igraph_vector_resize(nrgeo, no_of_nodes));
+    igraph_vector_null(nrgeo);
+  }
+  
+  /* from -> from */
+  vptr=Calloc(1, igraph_vector_t); /* TODO: dirty */
+  IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
+  IGRAPH_CHECK(igraph_vector_init(vptr, 1));
+  VECTOR(*vptr)[0]=from;
+  geodist[(long int)from]=1;
+  VECTOR(ptrhead)[(long int)from]=1;
+  IGRAPH_CHECK(igraph_vector_push_back(&ptrlist, 0));
+  if (nrgeo) { VECTOR(*nrgeo)[(long int)from]=1; }
+
+  /* Init queue */
+  IGRAPH_CHECK(igraph_dqueue_push(&q, from));
+  IGRAPH_CHECK(igraph_dqueue_push(&q, 0.0));
+  while (!igraph_dqueue_empty(&q)) {
+    long int actnode=igraph_dqueue_pop(&q);
+    long int actdist=igraph_dqueue_pop(&q);
+    
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, mode));
+    n=igraph_vector_size(&neis);
+    for (j=0; j<n; j++) {
+      long int neighbor=VECTOR(neis)[j];
+      long int fatherptr=VECTOR(ptrhead)[actnode];
+      if (geodist[neighbor] != 0 && 
+	  geodist[neighbor]-1 < actdist+1) { continue; }
+      if (nrgeo) { VECTOR(*nrgeo)[neighbor] += VECTOR(*nrgeo)[actnode]; }
+      geodist[neighbor]=actdist+2;
+      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+      IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+
+      /* copy all existing paths to the parent */
+      while (fatherptr != 0) {
+	long int tmp;
+	vptr=Calloc(1, igraph_vector_t);
+	IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
+	IGRAPH_CHECK(igraph_vector_copy(vptr, VECTOR(paths)[fatherptr-1]));
+	IGRAPH_CHECK(igraph_vector_reserve(vptr, actdist+2));
+	igraph_vector_push_back(vptr, neighbor);
+
+	IGRAPH_CHECK(igraph_vector_push_back(&ptrlist, 
+					     VECTOR(ptrhead)[neighbor]));
+	VECTOR(ptrhead)[neighbor]=igraph_vector_size(&ptrlist);
+	
+	fatherptr=VECTOR(ptrlist)[fatherptr-1];
+      }
+    }
+  }
+
+  Free(geodist);
+  igraph_dqueue_destroy(&q);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  /* Copy to the result */  
+  IGRAPH_CHECK(igraph_vector_ptr_resize(res, igraph_vector_ptr_size(&paths)));
+  j=0;
+  for (i=0; i<no_of_nodes; i++) {
+    long int fatherptr=VECTOR(ptrhead)[i];
+    while (fatherptr != 0) {
+      VECTOR(*res)[j++]=VECTOR(paths)[fatherptr-1];
+      fatherptr=VECTOR(ptrlist)[fatherptr-1];
+    }
+  }
+
+  igraph_vector_destroy(&ptrlist);
+  igraph_vector_destroy(&ptrhead);
+  igraph_vector_ptr_destroy(&paths);
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}
+				  
+
 /** 
  * \ingroup structural
  * \function igraph_subcomponent
