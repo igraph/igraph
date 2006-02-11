@@ -1,3 +1,15 @@
+2006-02-11  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/visitors.c (igraph_bfs) : fixed memory leaks
+	* src/layout.c (igraph_lgl) : fixed memory leaks
+	* src/components.c (igraph_decompose) : fixed memory leaks
+	* Makefile.am : don't try to call test.sh in interfaces/R
+	* interfaces/python/test.py : added new test cases
+	* interfaces/python/graphobject.c,
+	  interfaces/python/graphobject.h : added wrappers for 3D layouts,
+	  igraph_decompose, igraph_write_pajek, igraph_layout_lgl,
+	  igraph_layout_grid_fruchterman_reingold
+	  
 2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_get_all_shortest_paths) : added

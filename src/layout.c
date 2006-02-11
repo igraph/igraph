@@ -347,7 +347,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
   real_t frk, t, ded, xd, yd, zd;
   igraph_matrix_t dxdydz;
   real_t rf, af;
-  long int i, j, k;
+  long int i, j;
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_es_t edgeit;
@@ -742,7 +742,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
   for (actlayer=1; actlayer<no_of_layers; actlayer++) {
 
     real_t c=1;
-    long int i, j;
+    long int i, j, k;
     real_t massx, massy;
     real_t px, py;
     real_t sx, sy;
@@ -1038,6 +1038,9 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     
   } /* it<niter */
 
+  igraph_vector_destroy(&forcex);
+  igraph_vector_destroy(&forcey);
+  igraph_2dgrid_destroy(&grid);
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }

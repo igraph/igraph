@@ -436,6 +436,11 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
     
   } /* for actstart++ */
 
+  igraph_dqueue_destroy(&q);
+  igraph_free(already_added);
+  igraph_vector_destroy(&verts);
+  igraph_vector_destroy(&neis);
+  
   IGRAPH_FINALLY_CLEAN(4);
   return 0;
 }

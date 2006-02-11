@@ -657,6 +657,34 @@ PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a graph from the Graph Atlas
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_atlas
+ */
+PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type,
+				   PyObject *args) {
+  long n, children;
+  igraph_tree_mode_t mode=IGRAPH_TREE_UNDIRECTED;
+  igraphmodule_GraphObject *self;
+  
+  if (!PyArg_ParseTuple(args, "l", &n)) return NULL;
+  
+  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						    type);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_atlas(&self->g, (integer_t)n)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+   
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a graph based on the Barabási-Albert model
  * This is intended to be a class method in Python, so the first argument
  * is the type object and not the Python igraph object (because we have
@@ -1443,6 +1471,61 @@ PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Decomposes a graph into components.
+ * \return a list of graph objects, each containing a copy of a component in the original graph.
+ * \sa igraph_components
+ */
+PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self,
+				       PyObject *args,
+				       PyObject *kwds) {
+  char *kwlist[] = {"mode", "maxcompno", "minelements", NULL};
+  igraph_connectedness_t mode=IGRAPH_STRONG;
+  PyObject *list;
+  igraphmodule_GraphObject *o;
+  long maxcompno=-1, minelements=-1, n, i;
+  igraph_vector_ptr_t components;
+  igraph_t *g;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lll", kwlist, &mode,
+				   &maxcompno, &minelements))
+    return NULL;
+
+  if (mode != IGRAPH_STRONG && mode != IGRAPH_WEAK) {
+    PyErr_SetString(PyExc_ValueError, "mode must be either STRONG or WEAK");
+    return NULL;
+  }
+  
+  igraph_vector_ptr_init(&components, 3);
+  if (igraph_decompose(&self->g, &components, mode, maxcompno, minelements)) {
+    igraph_vector_ptr_destroy(&components);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+   
+  // We have to create a separate Python igraph object for every graph returned
+  n=igraph_vector_ptr_size(&components);
+  list=PyList_New(n);
+  for (i=0; i<n; i++) {
+    g=(igraph_t*)VECTOR(components)[i];
+    o = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						   &igraphmodule_GraphType);
+    RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(o);
+    o->g=*g;
+    PyList_SET_ITEM(list, i, (PyObject*)o);
+    // reference has been transferred by PyList_SET_ITEM, no need to Py_DECREF
+    //
+    // we mustn't call igraph_destroy here, because it would free the vertices
+    // and the edges as well, but we need them in o->g. So just call free
+    igraph_free(g);
+  }
+  
+  igraph_vector_ptr_destroy(&components);
+  
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the cocitation scores of some nodes in a graph.
  * \return the cocitation scores in a matrix
  * \sa igraph_cocitation
@@ -1877,13 +1960,43 @@ PyObject* igraphmodule_Graph_layout_circle(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph uniformly on a sphere in 3D.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_sphere
+ */
+PyObject* igraphmodule_Graph_layout_sphere(igraphmodule_GraphObject *self,
+					   PyObject *args,
+					   PyObject *kwds) 
+{
+   igraph_matrix_t m;
+   PyObject *result;
+   
+   if (igraph_matrix_init(&m, 1, 1)) 
+     {
+	igraphmodule_handle_igraph_error(); return NULL;
+     }
+   
+   if (igraph_layout_sphere(&self->g, &m))
+     {
+	igraph_matrix_destroy(&m);
+	igraphmodule_handle_igraph_error(); return NULL;
+     }
+   
+   result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+   
+   igraph_matrix_destroy(&m);
+   
+   return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices of a graph randomly.
  * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_circle
+ * \sa igraph_layout_random
  */
 PyObject* igraphmodule_Graph_layout_random(igraphmodule_GraphObject *self,
-						  PyObject *args,
-						  PyObject *kwds) 
+					   PyObject *args,
+					   PyObject *kwds) 
 {
    igraph_matrix_t m;
    PyObject *result;
@@ -1899,10 +2012,36 @@ PyObject* igraphmodule_Graph_layout_random(igraphmodule_GraphObject *self,
 	igraphmodule_handle_igraph_error(); return NULL;
      }
    
-   result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-   
+   result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
    igraph_matrix_destroy(&m);
+   return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph randomly in 3D.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_random_3d
+ */
+PyObject* igraphmodule_Graph_layout_random_3d(igraphmodule_GraphObject *self,
+					      PyObject *args,
+					      PyObject *kwds) 
+{
+   igraph_matrix_t m;
+   PyObject *result;
    
+   if (igraph_matrix_init(&m, 1, 1)) 
+     {
+	igraphmodule_handle_igraph_error(); return NULL;
+     }
+   
+   if (igraph_layout_random_3d(&self->g, &m))
+     {
+	igraph_matrix_destroy(&m);
+	igraphmodule_handle_igraph_error(); return NULL;
+     }
+   
+   result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
+   igraph_matrix_destroy(&m);
    return (PyObject*)result;
 }
 
@@ -1915,7 +2054,7 @@ PyObject* igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *self,
 							PyObject *args,
 							PyObject *kwds) 
 {
-  char *kwlist[] = {"n", "sigma", "initemp", "coolexp", "kkconst", NULL};
+  char *kwlist[] = {"maxiter", "sigma", "initemp", "coolexp", "kkconst", NULL};
   igraph_matrix_t m;
   long niter=1000;
   double sigma, initemp, coolexp, kkconst;
@@ -1938,23 +2077,57 @@ PyObject* igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *self,
     igraphmodule_handle_igraph_error(); return NULL;
   }
    
-  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
   igraph_matrix_destroy(&m);
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Places the vertices on a plane according to the Kamada-Kawai algorithm in 3D.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_kamada_kawai_3d
+ */
+PyObject* igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *self,
+						    PyObject *args,
+						    PyObject *kwds) 
+{
+  char *kwlist[] = {"maxiter", "sigma", "initemp", "coolexp", "kkconst", NULL};
+  igraph_matrix_t m;
+  long niter=1000;
+  double sigma, initemp, coolexp, kkconst;
+  PyObject *result;
    
+  sigma=igraph_vcount(&self->g);
+  kkconst=sigma*sigma; sigma=sigma/4.0;
+  initemp=10.0; coolexp=0.99;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+				   &niter, &sigma, &initemp, &coolexp, &kkconst))
+    return NULL;
+  
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  if (igraph_layout_kamada_kawai_3d(&self->g, &m, niter, sigma, initemp, coolexp, kkconst)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
+  igraph_matrix_destroy(&m);
   return (PyObject*)result;
 }
 
 /** \ingroup python_interface_graph
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_kamada_kawai
+ * \sa igraph_layout_fruchterman_reingold
  */
 PyObject* igraphmodule_Graph_layout_fruchterman_reingold(igraphmodule_GraphObject *self,
-								PyObject *args,
-								PyObject *kwds) 
-{
-  char *kwlist[] = {"n", "maxdelta", "area", "coolexp", "repulserad", NULL};
+							 PyObject *args,
+							 PyObject *kwds) {
+  char *kwlist[] = {"maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL};
   igraph_matrix_t m;
   long niter=500;
   double maxdelta, area, coolexp, repulserad;
@@ -1977,10 +2150,122 @@ PyObject* igraphmodule_Graph_layout_fruchterman_reingold(igraphmodule_GraphObjec
     igraphmodule_handle_igraph_error(); return NULL;
   }
    
-  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
   igraph_matrix_destroy(&m);
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm in 3D.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_fruchterman_reingold_3d
+ */
+PyObject* igraphmodule_Graph_layout_fruchterman_reingold_3d(igraphmodule_GraphObject *self,
+							    PyObject *args,
+							    PyObject *kwds) {
+  char *kwlist[] = {"maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL};
+  igraph_matrix_t m;
+  long niter=500;
+  double maxdelta, area, coolexp, repulserad;
+  PyObject *result;
    
+  maxdelta=igraph_vcount(&self->g);
+  area=maxdelta*maxdelta; coolexp=1.5;
+  repulserad=area*maxdelta;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+				   &niter, &maxdelta, &area, &coolexp, &repulserad))
+    return NULL;
+  
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  if (igraph_layout_fruchterman_reingold_3d(&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
+  igraph_matrix_destroy(&m);
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Places the vertices on a plane according to the Fruchterman-Reingold grid layout algorithm.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_grid_fruchterman_reingold
+ */
+PyObject* igraphmodule_Graph_layout_grid_fruchterman_reingold(igraphmodule_GraphObject *self,
+							      PyObject *args,
+							      PyObject *kwds) {
+  char *kwlist[] = {"maxiter", "maxdelta", "area", "coolexp", "repulserad", "cellsize", NULL};
+  igraph_matrix_t m;
+  long niter=500;
+  double maxdelta, area, coolexp, repulserad, cellsize;
+  PyObject *result;
+   
+  maxdelta=igraph_vcount(&self->g);
+  area=maxdelta*maxdelta; coolexp=1.5;
+  repulserad=area*maxdelta;
+  cellsize=1.0; // TODO: reasonable default
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddd", kwlist,
+				   &niter, &maxdelta, &area, &coolexp,
+				   &repulserad, &cellsize))
+    return NULL;
+  
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  if (igraph_layout_grid_fruchterman_reingold(&self->g, &m, niter, maxdelta, area, coolexp, repulserad, cellsize, 0)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
+  igraph_matrix_destroy(&m);
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph according to the Large Graph Layout
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_circle
+ */
+PyObject* igraphmodule_Graph_layout_lgl(igraphmodule_GraphObject *self,
+					PyObject *args,
+					PyObject *kwds) 
+{
+  char *kwlist[] = {"maxiter", "maxdelta", "area", "coolexp", "repulserad", "cellsize", "proot", NULL};
+  igraph_matrix_t m;
+  PyObject *result;
+  long maxiter=500, proot=-1;
+  double maxdelta, area, coolexp, repulserad, cellsize;
+   
+  maxdelta=igraph_vcount(&self->g);
+  area=maxdelta*maxdelta; coolexp=1.5;
+  repulserad=area*maxdelta;
+  cellsize=1.0; // TODO: reasonable default should be set
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddddl", kwlist,
+				   &maxiter, &maxdelta, &area, &coolexp,
+				   &repulserad, &cellsize, &proot))
+    return NULL;
+  
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  if (igraph_layout_lgl(&self->g, &m, maxiter, maxdelta,
+			area, coolexp, repulserad, cellsize, proot)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
+  igraph_matrix_destroy(&m);
   return (PyObject*)result;
 }
 
@@ -2176,7 +2461,49 @@ PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type, PyObject *args, PyObje
   }
   fclose(f);
   
-   return (PyObject*)self;
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Reads an edge list from a Pajek file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_pajek
+ */
+PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+  igraphmodule_GraphObject *self;
+  char* fname=NULL;
+  FILE* f;
+  PyObject *names=Py_True, *weights=Py_True;
+  igraph_t g;
+  
+  char *kwlist[] =
+  {
+    "f", NULL
+  };
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+    return NULL;
+  
+  f=fopen(fname, "r");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_read_graph_pajek(&g, f)) {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						    type);
+  if (self != NULL) {
+    RC_ALLOC("Graph", self);
+    self->g=g;
+  }
+  fclose(f);
+  
+  return (PyObject*)self;
 }
 
 /** \ingroup python_interface_graph

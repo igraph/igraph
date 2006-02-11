@@ -31,7 +31,7 @@ debcvs: clean
 
 test: all
 	for i in interfaces/*; do \
-		if [ -d $$i ]; then \
+		if [ -x $$i/test.sh ]; then \
 		  $$i/test.sh; \
 	 	fi; \
 	done

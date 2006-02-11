@@ -42,7 +42,7 @@ int igraph_bfs(igraph_t *graph, integer_t vid, igraph_neimode_t mode,
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
   char *added;
-  long int lastlayer;
+  long int lastlayer=-1;
   
   if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
 

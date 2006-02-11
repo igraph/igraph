@@ -242,7 +242,10 @@ test(g.diameter(True, True) == 2)
 
 section("Graph generators")
 
-"""
+start("Generating a graph from the Graph Atlas")
+g=igraph.Graph.Atlas(4)
+ok()
+
 start("Generating a graph using the Barabasi-Albert model, n=1000, m=10")
 g=igraph.Graph.Barabasi(1000, 10)
 ok()
@@ -262,7 +265,6 @@ test(g.vcount() == 1000 and g.ecount() == 500)
 start("Generating a graph using the Erdos-Renyi model, n=1000, p=0.1")
 g=igraph.Graph.Erdos_Renyi(n=1000, p=0.1)
 skip() # test(g.vcount() == 1000)
-"""
 
 start("Trying ill-formed arguments for the Erdos-Renyi model (missing n and p)")
 try:
@@ -408,13 +410,11 @@ start("Testing igraph_subgraph");
 g2=g.subgraph(g.subcomponent(2, mode=igraph.IN))
 test(g2.vcount() == 3 and g2.ecount() == 3)
 
-"""
 start("Testing igraph_get_edgelist");
 test(g2.get_edgelist()==[(0,1), (1,2), (2,0)]);
 
 start("Retrieving adjacency matrix");
 test(g2.get_adjacency()==[[0,1,0], [0,0,1], [1,0,0]]);
-"""
 
 start("Retrieving adjacency matrix, only upper half, undirected graph");
 g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (3,0)])
@@ -435,25 +435,42 @@ start("Calculating Google PageRank values in a graph")
 l=g.pagerank()
 expected=[1.48, 0.78, 1.57, 0.15]
 diff=map(lambda x: abs(round(l[x], 2)-expected[x]), range(len(l)))
-print diff
+print l
 test(sum(diff)<0.001)
+
+g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (3,4), (4,5), (5,3), (6,4)])
+start("Decomposing a graph into components")
+l=g.decompose()
+test(len(l) == 2 and l[0].vcount() == 3 and l[0].ecount() == 3 and l[1].vcount() == 4 and l[1].ecount() == 4)
 
 section("Layout algorithms")
 
-start("Testing layout of vertices in a circle")
-print g.layout_circle()
+start("Testing layout of vertices in a circle or sphere")
+g.layout_circle()
+g.layout_sphere()
 skip()
 
-start("Testing layout of vertices randomly")
-print g.layout_random()
+start("Testing layout of vertices randomly either in 2D or 3D")
+g.layout_random()
+g.layout_random_3d()
 skip()
 
 start("Testing layout of vertices according to the Kamada-Kawai layout")
-print g.layout_kamada_kawai()
+g.layout_kamada_kawai()
+g.layout_kamada_kawai_3d()
 skip()
 
 start("Testing layout of vertices according to the Fruchterman-Reingold layout")
-print g.layout_fruchterman_reingold()
+g.layout_fruchterman_reingold()
+g.layout_fruchterman_reingold_3d()
+skip()
+
+start("Testing layout of vertices according to the Fruchterman-Reingold grid layout")
+g.layout_grid_fruchterman_reingold()
+skip()
+
+start("Testing layout of vertices according to the Large Graph Layout")
+g.layout_lgl()
 skip()
 
 section("Import and export functions")

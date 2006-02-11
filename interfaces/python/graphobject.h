@@ -46,6 +46,7 @@ PyObject* igraphmodule_Graph_neighbors(igraphmodule_GraphObject *self, PyObject 
 PyObject* igraphmodule_Graph_successors(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_predecessors(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
+PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type, PyObject *args);
 PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Erdos_Renyi(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Full(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -64,6 +65,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self, PyObjec
 PyObject* igraphmodule_Graph_closeness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -74,9 +76,15 @@ PyObject* igraphmodule_Graph_subcomponent(igraphmodule_GraphObject *self, PyObje
 PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_layout_circle(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_layout_sphere(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_random(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_layout_random_3d(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_fruchterman_reingold(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_layout_fruchterman_reingold_3d(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_layout_grid_fruchterman_reingold(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_layout_lgl(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -84,6 +92,7 @@ PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self, PyObje
 PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_ncol(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_lgl(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -218,16 +227,30 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Returns the successors of a given vertex.\n"
       "Equivalent to calling the neighbors method with type=OUT."
   },
-  {"successors", (PyCFunction)igraphmodule_Graph_predecessors,
+  {"predecessors", (PyCFunction)igraphmodule_Graph_predecessors,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the successors of a given vertex.\n"
-      "Equivalent to calling the neighbors method with type=OUT."
+      "Returns the predecessors of a given vertex.\n"
+      "Equivalent to calling the neighbors method with type=IN."
   },
   
   //////////////////////
   // GRAPH GENERATORS //
   //////////////////////
   
+  // interface to igraph_atlas
+  {"Atlas", (PyCFunction)igraphmodule_Graph_Atlas,
+      METH_CLASS | METH_KEYWORDS,
+      "Generates a graph from the Graph Atlas.\n"
+      "The only argument denotes the index of the graph to be generated.\n"
+      "Indices start from zero, graphs are listed:\n"
+      "1. in increasing order of number of nodes;\n"
+      "2. for a fixed number of nodes, in increasing order of the\n"
+      "   number of edges;\n"
+      "3. for fixed numbers of nodes and edges, in increasing order\n"
+      "   of the degree sequence, for example 111223 < 112222;\n"
+      "4. for fixed degree sequence, in increasing number of automorphisms.\n"
+  },
+	
   // interface to igraph_barabasi_game
   {"Barabasi", (PyCFunction)igraphmodule_Graph_Barabasi,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -436,6 +459,20 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Alias for 'clusters'.\n\n"
       "See the documentation of 'clusters' for details."
   },
+  {"decompose", (PyCFunction)igraphmodule_Graph_decompose,
+      METH_VARARGS | METH_KEYWORDS,
+      "Decomposes the graph into subgraphs.\n\n"
+      "Keyword arguments:\n"
+      "mode -- must be either STRONG or WEAK, depending on the clusters\n"
+      "        being sought. Optional, defaults to STRONG.\n"
+      "maxcompno -- maximum number of components to return. Optional,\n"
+      "             defaults to all possible components.\n"
+      "minelements -- minimum number of vertices in a component. Optional,\n"
+      "               defaults to 1. By setting this to 2, isolated vertices\n"
+      "               are not returned as separate components.\n"
+      "A list of the subgraphs is returned. Every returned subgraph is a\n"
+      "copy of the original.\n"
+  },
   
   // interface to igraph_cocitation
   {"cocitation", (PyCFunction)igraphmodule_Graph_cocitation,
@@ -580,15 +617,22 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Returns the calculated coordinate pairs in a vector."
   },
   
+  // interface to igraph_layout_sphere
+  {"layout_sphere", (PyCFunction)igraphmodule_Graph_layout_sphere,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices of the graph uniformly on a sphere.\n\n"
+      "Returns the calculated coordinate pairs in a vector."
+  },
+  
   // interface to igraph_layout_kamada_kawai
   {"layout_kamada_kawai", (PyCFunction)igraphmodule_Graph_layout_kamada_kawai,
       METH_VARARGS | METH_KEYWORDS,
-      "Places the vertices on a plane according the Kamada-Kawai algorithm.\n\n"
+      "Places the vertices on a plane according to the Kamada-Kawai algorithm.\n\n"
       "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
       "An Algorithm for Drawing General Undirected Graphs.\n"
       "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
       "Keyword arguments:\n"
-      "n       -- the number of iterations to perform. Optional, defaults to 1000.\n"
+      "maxiter -- the number of iterations to perform. Optional, defaults to 1000.\n"
       "sigma   -- the standard base deviation of the position change proposals.\n"
       "           Optional, defaults to the number of vertices * 0.25\n"
       "initemp -- initial temperature of the simulated annealing.\n"
@@ -599,30 +643,101 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "           defaults to the square of the number of vertices.\n"
   },
   
+  // interface to igraph_layout_kamada_kawai_3d
+  {"layout_kamada_kawai_3d", (PyCFunction)igraphmodule_Graph_layout_kamada_kawai_3d,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices in the 3D space according to the Kamada-Kawai algorithm.\n\n"
+      "For argument list, see Graph.layout_kamada_kawai"
+  },
+  
   // interface to igraph_layout_fruchterman_reingold
   {"layout_fruchterman_reingold", (PyCFunction)igraphmodule_Graph_layout_fruchterman_reingold,
       METH_VARARGS | METH_KEYWORDS,
-      "Places the vertices on a plane according the Fruchterman-Reingold algorithm.\n\n"
+      "Places the vertices on a 2D plane according to the Fruchterman-Reingold algorithm.\n\n"
       "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
       "Graph Drawing by Force-directed Placement.\n"
       "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
       "Keyword arguments:\n"
-      "n          -- the number of iterations to perform. Optional, defaults to 500.\n"
+      "maxiter    -- the number of iterations to perform. Optional, defaults to 500.\n"
       "maxdelta   -- the maximum distance to move a vertex in an iteration\n"
       "              Optional, defaults to the number of vertices\n"
-      "area       -- the area parameter of the algorithm. Optional, defaults\n"
-      "              to the square of the number of vertices\n"
+      "area       -- the area of the square on which the vertices\n"
+      "              will be placed. Optional, defaults to the square of\n"
+      "              maxdelta.\n"
       "coolexp    -- the cooling exponent of the simulated annealing.\n"
       "              Optional, defaults to 0.99\n"
       "repulserad -- Determines the radius at which vertex-vertex repulsion\n"
-      "              cancels out attraction of adjacent vertices.\n"
+      "              cancels out attraction of adjacent vertices. Optional,\n"
+      "              defaults to maxiter * maxdelta\n"
+  },
+  
+  // interface to igraph_layout_fruchterman_reingold_3d
+  {"layout_fruchterman_reingold_3d", (PyCFunction)igraphmodule_Graph_layout_fruchterman_reingold_3d,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices in the 3D space according to the Fruchterman-Reingold grid algorithm.\n\n"
+      "For argument list, see Graph.layout_fruchterman_reingold"
+  },
+  
+  // interface to igraph_layout_grid_fruchterman_reingold
+  {"layout_grid_fruchterman_reingold", (PyCFunction)igraphmodule_Graph_layout_grid_fruchterman_reingold,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices on a 2D plane according to the Fruchterman-Reingold grid algorithm.\n\n"
+      "This is a modified version of a force directed layout, see\n"
+      "Fruchterman, T. M. J. and Reingold, E. M.:\n"
+      "Graph Drawing by Force-directed Placement.\n"
+      "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n"
+      "The algorithm partitions the 2D space to a grid and vertex\n"
+      "repulsion is then calculated only for vertices nearby.\n\n"
+      "Keyword arguments:\n"
+      "maxiter    -- the number of iterations to perform. Optional, defaults to 500.\n"
+      "maxdelta   -- the maximum distance to move a vertex in an iteration\n"
+      "              Optional, defaults to the number of vertices\n"
+      "area       -- the area of the square on which the vertices\n"
+      "              will be placed. Optional, defaults to the square of\n"
+      "              maxdelta.\n"
+      "coolexp    -- the cooling exponent of the simulated annealing.\n"
+      "              Optional, defaults to 0.99\n"
+      "repulserad -- Determines the radius at which vertex-vertex repulsion\n"
+      "              cancels out attraction of adjacent vertices. Optional,\n"
+      "              defaults to maxiter * maxdelta\n"
+      "cellsize   -- the size of the grid cells.\n"
+  },
+  
+  // interface to igraph_layout_lgl
+  {"layout_lgl", (PyCFunction)igraphmodule_Graph_layout_lgl,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices on a 2D plane according to the Large Graph Layout.\n\n"
+      "Keyword arguments:\n"
+      "maxiter    -- the number of iterations to perform. Optional, defaults to 500.\n"
+      "maxdelta   -- the maximum distance to move a vertex in an iteration\n"
+      "              Optional, defaults to the number of vertices\n"
+      "area       -- the area of the square on which the vertices\n"
+      "              will be placed. Optional, defaults to the square of\n"
+      "              maxdelta.\n"
+      "coolexp    -- the cooling exponent of the simulated annealing.\n"
+      "              Optional, defaults to 0.99\n"
+      "repulserad -- Determines the radius at which vertex-vertex repulsion\n"
+      "              cancels out attraction of adjacent vertices. Optional,\n"
+      "              defaults to maxiter * maxdelta\n"
+      "cellsize   -- The size of the grid cells, one side of the square.\n"
+      "              Optional.\n"
+      "proot      -- The root vertex, this is placed first, its neighbors\n"
+      "              in the first iteration, second neighbors in the second,\n"
+      "              etc. Optional, defaults to a random vertex.\n"
   },
   
   // interface to igraph_layout_random
   {"layout_random", (PyCFunction)igraphmodule_Graph_layout_random,
       METH_VARARGS | METH_KEYWORDS,
-      "Places the vertices of the graph randomly.\n\n"
+      "Places the vertices of the graph randomly in a 2D space.\n\n"
       "Returns the \"calculated\" coordinate pairs in a vector."
+  },
+   
+  // interface to igraph_layout_random_3d
+  {"layout_random_3d", (PyCFunction)igraphmodule_Graph_layout_random_3d,
+      METH_VARARGS | METH_KEYWORDS,
+      "Places the vertices of the graph randomly in a 3D space.\n\n"
+      "Returns the \"calculated\" coordinate triplets in a vector."
   },
    
   //////////////////////////////////////////////////////
@@ -700,6 +815,13 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "weights -- logical value. If True, the edge weights are added as an\n"
       "           edge attribute called 'weight'. Optional, defaults to\n"
       "           True.\n"
+  },
+  // interface to igraph_read_graph_pajek
+  {"Read_Pajek", (PyCFunction)igraphmodule_Graph_Read_Pajek,
+      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+      "Reads a Pajek format file and creates a graph based on it.\n"
+      "Keyword arguments:\n"
+      "f        -- the name of the file\n"
   },
   // interface to igraph_write_graph_edgelist
   {"write_edgelist", (PyCFunction)igraphmodule_Graph_write_edgelist,
