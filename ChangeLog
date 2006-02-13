@@ -1,3 +1,10 @@
+2006-02-13  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+
+	* src/igraph_grid.c (igraph_2dgrid_next_nei) : bug hunted
+	* src/visitors.c (igraph_bfs) : bug for unconnected graphs hunted
+	* src/layout.c (igraph_layout_fruchterman_reingold_3d) : corrected
+	* src/random.h (RNG_UNIF) : small bug corrected
+
 2006-02-12  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
 
 	* src/motifs.c (igraph_motifs_randesu_estimate) : added

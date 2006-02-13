@@ -88,7 +88,7 @@ int igraph_bfs(igraph_t *graph, integer_t vid, igraph_neimode_t mode,
       }
     } /* for i in neis */
   } /* while ! dqueue_empty */
-  IGRAPH_CHECK(igraph_vector_push_back(layers, no_of_nodes));
+  IGRAPH_CHECK(igraph_vector_push_back(layers, vidspos));
   
   igraph_vector_destroy(&neis);
   igraph_dqueue_destroy(&q);

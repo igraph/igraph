@@ -54,7 +54,7 @@ double igraph_rgeom(double);
 #define RNG_END()  
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 #define RNG_NORMAL(m, s)  (igraph_norm_rand()*(s)+(m))
-#define RNG_UNIF(l, h)    (rand()/((double)RAND_MAX+1)*(double)((h)-(l))+l)
+#define RNG_UNIF(l, h)    (rand()/((double)RAND_MAX+1)*(double)((h)-(l))+(l))
 #define RNG_UNIF01()      (RNG_UNIF(0,1))
 #define RNG_GEOM(p)       (igraph_rgeom(p))
 

@@ -330,7 +330,9 @@ inline integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
 				 igraph_2dgrid_iterator_t *it) {
   long int ret=it->nei;
 
-  it->nei=VECTOR(grid->next) [ ret-1 ];
+  if (it->nei != 0) {
+    it->nei=VECTOR(grid->next) [ ret-1 ];
+  }
   while (it->ncells > 0 && it->nei==0 ) {
     it->ncells -= 1;
     it->nei=MATRIX(grid->startidx, it->nx[it->ncells], it->ny[it->ncells]);

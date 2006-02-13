@@ -347,7 +347,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
   real_t frk, t, ded, xd, yd, zd;
   igraph_matrix_t dxdydz;
   real_t rf, af;
-  long int i, j;
+  long int i, j, k;
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_es_t edgeit;
