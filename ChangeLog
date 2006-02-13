@@ -12,6 +12,12 @@
 	  
 2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
 
+	* src/igraph.h (igraph_progress_handler_t) : added
+	* src/progress.c (igraph_progress, igraph_progress_handler_stderr)
+	(igraph_set_progress_handler) : added
+
+2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+
 	* src/structural_properties.c (igraph_get_all_shortest_paths) : added
 
 2006-02-07  Gabor Csardi  <csardi@rmki.kfki.hu>

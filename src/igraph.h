@@ -631,6 +631,18 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 			  int size, igraph_vector_t *cut_prob);
 
 /* -------------------------------------------------- */
+/* Progress handlers                                  */
+/* -------------------------------------------------- */
+
+typedef int igraph_progress_handler_t(const char *message, real_t percent,
+				      void *data);
+
+extern igraph_progress_handler_t igraph_progress_handler_stderr;
+
+igraph_progress_handler_t *
+igraph_set_progress_handler(igraph_progress_handler_t new_handler);
+
+/* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 
