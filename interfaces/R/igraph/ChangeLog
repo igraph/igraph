@@ -1,3 +1,10 @@
+2006-02-12  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/topology.R (graph.isocreate) : added
+	* interfaces/R/igraph/R/motifs.R (graph.motifs.est) : added
+	* interfaces/R/src/rinterface.c (R_igraph_motifs_randesu_estimate)
+	(R_igraph_isoclass_create) : added
+
 2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R

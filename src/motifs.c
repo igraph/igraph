@@ -236,3 +236,155 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   IGRAPH_FINALLY_CLEAN(7);
   return 0;
 }
+
+int igraph_motifs_randesu_estimate(const igraph_t *graph, integer_t *est,
+				   int size, igraph_vector_t *cut_prob, 
+				   integer_t sample_size, 
+				   igraph_vector_t *parsample) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t neis;
+    
+  igraph_vector_t vids;		/* this is G */
+  igraph_vector_t adjverts;	/* this is V_E */
+  igraph_stack_t stack;		/* this is S */
+  long int *added;
+  igraph_vector_t sample;
+  long int sam;
+  long int i;
+
+  added=Calloc(no_of_nodes, long int);
+  if (added==0) {
+    IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, added);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&vids, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&adjverts, 0);
+  IGRAPH_CHECK(igraph_stack_init(&stack, 0));
+  IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  if (igraph_vector_size(parsample)==0) {
+    IGRAPH_VECTOR_INIT_FINALLY(&sample, 0);  
+    IGRAPH_CHECK(igraph_random_sample(&sample, 0, no_of_nodes-1, sample_size));
+  } else {
+    sample=*parsample;
+    sample_size=igraph_vector_size(&sample);
+  }
+
+  *est=0;
+
+  for (sam=0; sam<sample_size; sam++) {
+    long int father=VECTOR(sample)[sam];
+    long int level, s;
+
+    /* init G */
+    igraph_vector_clear(&vids); level=0;
+    IGRAPH_CHECK(igraph_vector_push_back(&vids, father));
+    added[father] += 1; level += 1;
+    
+    /* init V_E */
+    igraph_vector_clear(&adjverts);
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, father, IGRAPH_ALL));
+    s=igraph_vector_size(&neis);
+    for (i=0; i<s; i++) {
+      long int nei=VECTOR(neis)[i];
+      if (!added[nei]) {
+	IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
+	IGRAPH_CHECK(igraph_vector_push_back(&adjverts, father));
+      }
+      added[nei] += 1;
+    }
+    
+    /* init S */
+    igraph_stack_clear(&stack);
+
+    while (level != 1 || !igraph_vector_empty(&adjverts)) {
+      real_t cp=VECTOR(*cut_prob)[level];
+      
+      if (level==size-1) {
+	s=igraph_vector_size(&adjverts)/2;
+	for (i=0; i<s; i++) {
+	  if (cp!=0 && RNG_UNIF01() < cp) { continue; }
+	  (*est) += 1;
+	}
+      }
+
+      if (level < size-1 && 
+	  !igraph_vector_empty(&adjverts) && 
+	  (cp==0 || RNG_UNIF01() > cp)) {
+	/* yes, step down */
+	long int neifather=igraph_vector_pop_back(&adjverts);
+	long int nei=igraph_vector_pop_back(&adjverts);
+	IGRAPH_CHECK(igraph_vector_push_back(&vids, nei));
+	added[nei] += 1; level += 1;
+
+	IGRAPH_CHECK(igraph_stack_push(&stack, neifather));
+	IGRAPH_CHECK(igraph_stack_push(&stack, nei));
+	IGRAPH_CHECK(igraph_stack_push(&stack, level));
+
+	IGRAPH_CHECK(igraph_neighbors(graph, &neis, nei, IGRAPH_ALL));
+	s=igraph_vector_size(&neis);
+	for (i=0; i<s; i++) {
+	  long int nei2=VECTOR(neis)[i];
+	  if (!added[nei2]) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei2));
+	    IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
+	  }
+	  added[nei2] += 1;
+	}
+      } else {
+	/* no, step back */
+	long int nei, neifather;
+	while (!igraph_stack_empty(&stack) &&
+	       level==igraph_stack_top(&stack)-1) {
+	  igraph_stack_pop(&stack);
+	  nei=igraph_stack_pop(&stack);
+	  neifather=igraph_stack_pop(&stack);
+	  igraph_vector_push_back(&adjverts, nei);
+	  igraph_vector_push_back(&adjverts, neifather);
+	}
+
+	nei=igraph_vector_pop_back(&vids);
+	added[nei] -= 1; level -= 1;
+	IGRAPH_CHECK(igraph_neighbors(graph, &neis, nei, IGRAPH_ALL));
+	s=igraph_vector_size(&neis);
+	for (i=0; i<s; i++) {
+	  added[ (long int) VECTOR(neis)[i] ] -= 1;
+	}
+	while (!igraph_vector_empty(&adjverts) && 
+	       igraph_vector_tail(&adjverts)==nei) {
+	  igraph_vector_pop_back(&adjverts);
+	  igraph_vector_pop_back(&adjverts);
+	}
+      }
+      
+    } /* while */
+
+    /* clear the added vector */
+    added[father] -= 1;
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, father, IGRAPH_ALL));
+    s=igraph_vector_size(&neis);
+    for (i=0; i<s; i++) {
+      added[ (long int) VECTOR(neis)[i] ] -= 1;
+    }
+
+  } /* for father */
+
+  (*est) *= ((double)no_of_nodes/sample_size);
+  (*est) /= size;
+
+  if (igraph_vector_size(parsample)==0) {
+    igraph_vector_destroy(&sample);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  Free(added);
+  igraph_vector_destroy(&vids);
+  igraph_vector_destroy(&adjverts);
+  igraph_stack_destroy(&stack);
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(5);
+  return 0;
+}

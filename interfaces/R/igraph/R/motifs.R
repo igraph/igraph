@@ -31,3 +31,18 @@ graph.motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
         as.numeric(cut.prob),
         PACKAGE="igraph")
 }
+
+graph.motifs.est <- function(graph, size=3, cut.prob=rep(0, size),
+                             sample.size=vcount(graph)/10, sample=NULL) {
+
+  cut.prob <- as.numeric(cut.prob)
+  if (length(cut.prob) != size) {
+    cut.prob <- c(cut.prob[-length(cut.prob)],
+                  rep(cut.prob[-length(cut.prob)], length(cut.prob)-1))
+  }
+  
+  .Call("R_igraph_motifs_randesu_estimate", graph, as.numeric(size),
+        as.numeric(cut.prob), as.numeric(sample.size), as.numeric(sample),
+        PACKAGE="igraph")
+}
+  

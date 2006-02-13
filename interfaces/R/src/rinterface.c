@@ -2995,6 +2995,32 @@ SEXP R_igraph_motifs_randesu(SEXP graph, SEXP psize, SEXP pcutprob) {
   return result;
 }
 
+SEXP R_igraph_motifs_randesu_estimate(SEXP graph, SEXP psize, SEXP pcutprob,
+				      SEXP psamplesize, SEXP psample) {
+  igraph_t g;
+  integer_t size=REAL(psize)[0];
+  igraph_vector_t cutprob;
+  integer_t samplesize=REAL(psamplesize)[0];
+  igraph_vector_t sample;
+  integer_t res;
+  SEXP result;
+  
+  R_igraph_before();
+
+  R_SEXP_to_vector(pcutprob, &cutprob);
+  R_SEXP_to_vector(psample, &sample);
+  R_SEXP_to_igraph(graph, &g);
+  igraph_motifs_randesu_estimate(&g, &res, size, &cutprob, samplesize,
+				 &sample);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom, 
 				     SEXP pmode) {
   
@@ -3019,6 +3045,26 @@ SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom,
   }
   igraph_vector_ptr_destroy(&res);
   
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_isoclass_create(SEXP psize, SEXP pnumber, SEXP pdirected) {
+
+  igraph_t g;
+  integer_t size=REAL(psize)[0];
+  integer_t number=REAL(pnumber)[0];
+  bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result;
+  
+  R_igraph_before();
+
+  igraph_isoclass_create(&g, size, number, directed);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+
   R_igraph_after();
   
   UNPROTECT(1);

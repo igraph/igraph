@@ -30,3 +30,10 @@ graph.isomorphic <- function(graph1, graph2) {
   .Call("R_igraph_isomorphic_34", graph1, graph2,
         PACKAGE="igraph")
 }
+
+graph.isocreate <- function(size, number, directed=TRUE) {
+
+  .Call("R_igraph_isoclass_create", as.numeric(size),
+        as.numeric(number), as.logical(directed),
+        PACKAGE="igraph")
+}

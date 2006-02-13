@@ -590,6 +590,36 @@ unsigned int igraph_i_isoclass2_4[] = {
  75,195,167,212,167,212,205,216, 91,198,198,216,198,216,216,217
 };
 
+unsigned int igraph_i_isographs_3[] =  { 0, 1, 3, 5, 6, 7, 10, 11, 15, 21, 
+					 23, 25, 27, 30, 31, 63 };
+unsigned int igraph_i_isographs_3u[] = { 0, 1, 3, 7 };
+unsigned int igraph_i_isographs_4[] = {
+   0,    1,    3,    7,    9,   10,   11,   14,   15,   18,   19,   20,   21, 
+  22,   23,   27,   29,   30,   31,   54,   55,   63,   73,   75,   76,   77, 
+  79,   81,   83,   84,   85,   86,   87,   90,   91,   92,   93,   94,   95, 
+  98,   99,  100,  101,  102,  103,  106,  107,  108,  109,  110,  111,  115, 
+ 116,  117,  118,  119,  122,  123,  124,  125,  126,  127,  219,  220,  221, 
+ 223,  228,  229,  230,  231,  237,  238,  239,  246,  247,  255,  292,  293, 
+ 295,  301,  302,  303,  310,  311,  319,  365,  367,  373,  375,  382,  383, 
+ 511,  585,  587,  591,  593,  594,  595,  596,  597,  598,  599,  601,  602, 
+ 603,  604,  605,  606,  607,  625,  626,  627,  630,  631,  633,  634,  635, 
+ 638,  639,  659,  660,  661,  663,  666,  667,  669,  670,  671,  674,  675, 
+ 678,  679,  683,  686,  687,  694,  695,  703,  729,  731,  732,  733,  735, 
+ 737,  739,  741,  742,  743,  745,  746,  747,  748,  749,  750,  751,  753, 
+ 755,  756,  757,  758,  759,  761,  762,  763,  764,  765,  766,  767,  819, 
+ 822,  823,  826,  827,  830,  831,  875,  876,  877,  879,  883,  885,  886, 
+ 887,  891,  892,  893,  894,  895,  947,  949,  951,  955,  957,  958,  959, 
+1019, 1020, 1021, 1023, 1755, 1757, 1758, 1759, 1782, 1783, 1791, 1883, 1887, 
+1907, 1911, 1917, 1918, 1919, 2029, 2031, 2039, 2047, 4095};
+unsigned int igraph_i_isographs_4u[] = { 0, 1, 3, 7, 11, 12, 13, 
+					15, 30, 31, 63};
+
+unsigned int igraph_i_classedges_3[] = { 1,2, 0,2, 2,1, 0,1, 2,0, 1,0 };
+unsigned int igraph_i_classedges_3u[] = { 1,2, 0,2, 0,1 };
+unsigned int igraph_i_classedges_4[] = { 2,3, 1,3, 0,3, 3,2, 1,2, 0,2,
+					 3,1, 2,1, 0,1, 3,0, 2,0, 1,0 };
+unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
+
 int igraph_isoclass(const igraph_t *graph, int *class) {
   long int e;
   long int no_of_nodes=igraph_vcount(graph);
@@ -608,7 +638,7 @@ int igraph_isoclass(const igraph_t *graph, int *class) {
       arr_idx=igraph_i_isoclass_4_idx;
       arr_code=igraph_i_isoclass2_4;
       mul=4;
-    }      
+    }
   } else {
     if (no_of_nodes==3) {
       arr_idx=igraph_i_isoclass_3u_idx;
@@ -618,7 +648,7 @@ int igraph_isoclass(const igraph_t *graph, int *class) {
       arr_idx=igraph_i_isoclass_4u_idx;
       arr_code=igraph_i_isoclass2_4u;
       mul=4;
-    }      
+    }
   }
   for (e=0; e<no_of_edges; e++) {
     igraph_edge(graph, e, &from, &to);
@@ -690,6 +720,55 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
   
   *class=arr_code[code];
   igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+int igraph_isoclass_create(igraph_t *graph, integer_t size,
+			   integer_t number, bool_t directed) {
+  igraph_vector_t edges;
+  unsigned int *classedges;
+  long int power;
+  long int code;
+  long int pos;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
+  if (directed) {
+    if (size==3) {
+      classedges=igraph_i_classedges_3;
+      code=igraph_i_isographs_3[ (long int) number];
+      power=32;
+    } else {
+      classedges=igraph_i_classedges_4;
+      code=igraph_i_isographs_4[ (long int) number];
+      power=2048;
+    }
+  } else {
+    if (size==3) {
+      classedges=igraph_i_classedges_3u;
+      code=igraph_i_isographs_3u[ (long int) number];
+      power=4;
+    } else {
+      classedges=igraph_i_classedges_4u;
+      code=igraph_i_isographs_4u[ (long int) number];
+      power=32;
+    }
+  }
+
+  pos=0;
+  while (code > 0) {
+    if (code >= power) {
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2*pos]));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, classedges[2*pos+1]));
+      code -= power;
+    }
+    power /= 2;
+    pos++;
+  }
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }

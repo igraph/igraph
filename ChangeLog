@@ -1,3 +1,8 @@
+2006-02-12  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+
+	* src/motifs.c (igraph_motifs_randesu_estimate) : added
+	* src/topology.c (igraph_isoclass_create) : added
+
 2006-02-11  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/visitors.c (igraph_bfs) : fixed memory leaks

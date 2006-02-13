@@ -622,6 +622,8 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 		      bool_t *iso);
 int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
 			     int *class);
+int igraph_isoclass_create(igraph_t *graph, integer_t size,
+			   integer_t number, bool_t directed);
 
 /* -------------------------------------------------- */
 /* Graph motifs                                       */
@@ -629,6 +631,11 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
 
 int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
 			  int size, igraph_vector_t *cut_prob);
+
+int igraph_motifs_randesu_estimate(const igraph_t *graph, integer_t *est,
+				   int size, igraph_vector_t *cut_prob, 
+				   integer_t sample_size, 
+				   igraph_vector_t *sample);
 
 /* -------------------------------------------------- */
 /* Progress handlers                                  */
