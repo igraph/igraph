@@ -68,6 +68,7 @@ PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self, PyObject
 PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -93,6 +94,7 @@ PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type, PyObject *args, P
 PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_ncol(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_lgl(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -521,6 +523,21 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "are returned in reversed order!"
   },
   
+  // interface to igraph_get_all_shortest_paths
+  {"get_all_shortest_paths", (PyCFunction)igraphmodule_Graph_get_all_shortest_paths,
+      METH_VARARGS | METH_KEYWORDS,
+      "Calculates all of the shortest paths from/to a given node in a graph.\n\n"
+      "Keyword arguments:\n"
+      "v    -- the source/destination for the calculated paths\n"
+      "mode -- the directionality of the paths. IN means to calculate\n"
+      "        incoming paths, OUT means to calculate outgoing paths,\n"
+      "        ALL means to calculate both ones. Ignored for undirected\n"
+      "        graphs. Optional, defaults to ALL\n"
+      "Returns all of the shortest path from the given node to every other\n"
+      "reachable node in the graph in a list. Note that in case of mode=IN,\n"
+      "the nodes in a path are returned in reversed order!"
+  },
+  
   // interface to igraph_is_connected
   {"is_connected", (PyCFunction)igraphmodule_Graph_is_connected,
       METH_VARARGS | METH_KEYWORDS,
@@ -821,7 +838,28 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,
       "Reads a Pajek format file and creates a graph based on it.\n"
       "Keyword arguments:\n"
+      "f -- the name of the file\n"
+  },
+  // interface to igraph_read_graph_pajek
+  {"Read_GraphML", (PyCFunction)igraphmodule_Graph_Read_GraphML,
+      METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+      "Reads a GraphML format file and creates a graph based on it.\n"
+      "Keyword arguments:\n"
       "f        -- the name of the file\n"
+      "directed -- whether the graph should be directed. Please note that\n"
+      "            if you ask for a directed graph, but the GraphML file\n"
+      "            contains an undirected graph (with some optional directed\n"
+      "            edges), then the undirected edges will be added in both\n"
+      "            directions and the resulting Graph object will be a\n"
+      "            directed graph. However, if you ask for an undirected\n"
+      "            graph and the GraphML file contains a directed one,\n"
+      "            all of the edges will be undirected (so your request\n"
+      "            takes precedence over what the file states). Optional,\n"
+      "            defaults to true\n"
+      "index    -- if the GraphML file contains multiple graphs, specifies\n"
+      "            the one which should be loaded. Graph indices start from\n"
+      "            zero, so if you want to load the first graph, specify 0\n"
+      "            here. Optional, defaults to zero.\n"
   },
   // interface to igraph_write_graph_edgelist
   {"write_edgelist", (PyCFunction)igraphmodule_Graph_write_edgelist,

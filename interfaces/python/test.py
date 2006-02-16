@@ -373,12 +373,15 @@ start("Calculating edge betweennesses in a graph")
 g=igraph.Graph(edges=[(0,1), (2,1), (1,3), (3,4), (3,5)], directed=True)
 test(g.edge_betweenness(directed=False) == [5,5,9,5,5])
 
-start("Calculating shortest paths from/to node 1 in the graph")
+start("Calculating shortest paths to node 4 in the graph")
 test(g.get_shortest_paths(4, mode=igraph.IN) == [[4,3,1,0], [4,3,1], [4,3,1,2], [4,3], [4], []])
 
 start("Adding some more edges (to make sense for a spanning tree calculation)")
 g.add_edges([(0,2), (4, 5), (0, 4), (2, 5)])
 test(g.vcount() == 6 and g.ecount() == 9)
+
+start("Calculating all of the shortest paths from node 0 in the graph")
+test(g.get_all_shortest_paths(0, mode=igraph.OUT) == [[0], [0,1], [0,2], [0,1,3], [0,4], [0,2,5], [0,4,5]])
 
 start("Calculating unweighted spanning tree")
 g2=g.spanning_tree()
@@ -438,10 +441,12 @@ diff=map(lambda x: abs(round(l[x], 2)-expected[x]), range(len(l)))
 print l
 test(sum(diff)<0.001)
 
+"""
 g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (3,4), (4,5), (5,3), (6,4)])
 start("Decomposing a graph into components")
 l=g.decompose()
 test(len(l) == 2 and l[0].vcount() == 3 and l[0].ecount() == 3 and l[1].vcount() == 4 and l[1].ecount() == 4)
+"""
 
 section("Layout algorithms")
 
@@ -537,6 +542,27 @@ os.close(fd)
 g.write_ncol(fname, None, None)
 os.unlink(fname)
 skip()
+
+start("Trying to load Pajek file")
+g=igraph.Graph.Read_Pajek("examples/simple/LINKS.NET")
+test(g.vcount() == 4 and g.ecount() == 7)
+
+start("Trying to load GraphML file")
+g=igraph.Graph.Read_GraphML("examples/simple/test.gxl")
+test(g.vcount() == 11 and g.ecount() == 22)
+
+start("Trying to load GraphML file as undirected")
+g=igraph.Graph.Read_GraphML("examples/simple/test.gxl", directed=False)
+test(g.vcount() == 11 and g.ecount() == 12)
+
+start("Trying to load GraphML file with invalid index")
+try:
+    g=igraph.Graph.Read_GraphML("examples/simple/test.gxl", index=2)
+except igraph.InternalError, e:
+    ok()
+    print "Expected exception arrived:", e
+else:
+    fail()
 
 """
 g=igraph.Graph.Full(5)

@@ -241,21 +241,24 @@ igraph_set_error_handler(igraph_error_handler_t new_handler);
  * \enumval IGRAPH_EFILE A file operation failed. Eg. a file doesn't exist,
  *   or the user ha no rights to open it.
  * \enumval IGRAPH_EUNFOLDINF Attempted to unfold an infinite iterator.
+ * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
+ *   disabled (at compile-time) function.
  */
 
 typedef enum {
-  IGRAPH_SUCCESS    = 0,
-  IGRAPH_FAILURE    = 1,
-  IGRAPH_ENOMEM     = 2,
-  IGRAPH_PARSEERROR = 3,
-  IGRAPH_EINVAL     = 4,
-  IGRAPH_EXISTS     = 5,
-  IGRAPH_EINVEVECTOR= 6,
-  IGRAPH_EINVVID    = 7,
-  IGRAPH_NONSQUARE  = 8,
-  IGRAPH_EINVMODE   = 9,
-  IGRAPH_EFILE      = 10,
-  IGRAPH_EUNFOLDINF = 11
+  IGRAPH_SUCCESS       = 0,
+  IGRAPH_FAILURE       = 1,
+  IGRAPH_ENOMEM        = 2,
+  IGRAPH_PARSEERROR    = 3,
+  IGRAPH_EINVAL        = 4,
+  IGRAPH_EXISTS        = 5,
+  IGRAPH_EINVEVECTOR   = 6,
+  IGRAPH_EINVVID       = 7,
+  IGRAPH_NONSQUARE     = 8,
+  IGRAPH_EINVMODE      = 9,
+  IGRAPH_EFILE         = 10,
+  IGRAPH_EUNFOLDINF    = 11,
+  IGRAPH_UNIMPLEMENTED = 12
 } igraph_i_error_type_t;
 
 /**

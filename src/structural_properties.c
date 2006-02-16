@@ -949,8 +949,9 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
 
   igraph_vector_destroy(&ptrlist);
   igraph_vector_destroy(&ptrhead);
+  igraph_vector_destroy(&neis);
   igraph_vector_ptr_destroy(&paths);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);
   return 0;
 }
 				  

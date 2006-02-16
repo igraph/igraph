@@ -1,3 +1,20 @@
+2006-02-15  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* examples/simple/graphml.c, examples/simple/graphml.out,
+	  examples/simple/test.gxl : added
+	* src/foreign.c (igraph_read_graph_graphml) : added
+	* src/igraph.h : header extended
+	* src/error.h, src/error.c : IGRAPH_UNIMPLEMENTED error code added
+	* configure.in : added tests for libxml2
+	* src/Makefile.am : updated to link with libxml2 if necessary
+	* src/structural_properties.c : get_all_shortest_paths bug
+	  and memory leak fixed
+	* interfaces/python/graphobject.c : added interface for
+	  get_all_shortest_paths and igraph_read_graph_graphml
+	* interfaces/python/test.py : added test case for
+          get_all_shortest_paths, igraph_read_graph_pajek and
+	  igraph_read_graph_graphml
+
 2006-02-13  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
 
 	* src/igraph_grid.c (igraph_2dgrid_next_nei) : bug hunted

@@ -1639,17 +1639,6 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self,
 				    &from0, &mode))
      return NULL;
 
-   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) 
-     {
-	PyErr_SetString(PyExc_ValueError, "mode must be either IN, OUT or ALL");
-	return NULL;
-     }
-   
-   if (from0<0 || from0>=igraph_vcount(&self->g)) 
-     {
-	PyErr_SetString(PyExc_ValueError, "vertex ID must be non-negative and less than the number of edges");
-	return NULL;
-     }
    from=(integer_t)from0;
    
    res=(igraph_vector_t*)calloc(no_of_nodes, sizeof(igraph_vector_t));
@@ -1698,6 +1687,70 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self,
    for (j=0; j<no_of_nodes; j++) igraph_vector_destroy(&res[j]);
    free(res);
    return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates all of the shortest paths from/to a given node in the graph
+ * \return a list containing shortest paths from/to the given node
+ * \sa igraph_get_shortest_paths
+ */
+PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *self,
+						       PyObject *args,
+						       PyObject *kwds) 
+{
+  char *kwlist[] = {"v", "mode", NULL};
+  igraph_vector_ptr_t res;
+  igraph_neimode_t mode=IGRAPH_ALL;
+  long from0, i, j, k;
+  integer_t from;
+  PyObject *list, *item;
+  long int no_of_nodes=igraph_vcount(&self->g);
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|l", kwlist,
+				   &from0, &mode))
+    return NULL;
+  
+  from=(integer_t)from0;
+  
+  if (igraph_vector_ptr_init(&res, 1)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  if (igraph_get_all_shortest_paths(&self->g, &res, NULL, from, mode)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_ptr_destroy(&res);
+    return NULL;
+  }
+  
+  j=igraph_vector_ptr_size(&res);
+  list=PyList_New(j);
+  if (!list) {
+    for (i=0; i<j; i++) igraph_vector_destroy(igraph_vector_ptr_e(&res, i));
+    igraph_vector_ptr_destroy_all(&res);
+    return NULL;
+  }
+   
+  for (i=0; i<j; i++) {
+    item=igraphmodule_vector_t_to_PyList((igraph_vector_t*)igraph_vector_ptr_e(&res, i));
+    if (!item) {
+      Py_DECREF(list);
+      for (k=0; k<j; k++) igraph_vector_destroy(igraph_vector_ptr_e(&res, k));
+      igraph_vector_ptr_destroy_all(&res);
+      return NULL;
+    }
+    if (PyList_SetItem(list, i, item)) {
+      Py_DECREF(list);
+      Py_DECREF(item);
+      for (k=0; k<j; k++) igraph_vector_destroy(igraph_vector_ptr_e(&res, k));
+      igraph_vector_ptr_destroy_all(&res);
+      return NULL;
+    }
+  }
+  
+  for (i=0; i<j; i++) igraph_vector_destroy(igraph_vector_ptr_e(&res, i));
+  igraph_vector_ptr_destroy_all(&res);
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -2503,6 +2556,47 @@ PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyOb
   }
   fclose(f);
   
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Reads a GraphML file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_graphml
+ */
+PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type,
+					  PyObject *args, PyObject *kwds) {
+  igraphmodule_GraphObject *self;
+  char* fname=NULL;
+  FILE* f;
+  PyObject *directed=Py_True;
+  long int index=0;
+  igraph_t g;
+  
+  char *kwlist[] = {"f", "directed", "index", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|Oi", kwlist,
+				   &fname, &directed, &index))
+     return NULL;
+
+  f=fopen(fname, "r");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_read_graph_graphml(&g, f, PyObject_IsTrue(directed), index)) {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						    type);
+  if (self != NULL) {
+    RC_ALLOC("Graph", self);
+    self->g=g;
+  }
+  fclose(f);
+   
   return (PyObject*)self;
 }
 

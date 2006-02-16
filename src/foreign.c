@@ -21,8 +21,14 @@
 */
 
 #include "igraph.h"
+#include <config.h>
 
 #include <ctype.h>		/* isspace */
+
+#ifdef HAVE_LIBXML
+#include <libxml/encoding.h>
+#include <libxml/parser.h>
+#endif
 
 /**
  * \section about_loadsave 
@@ -30,7 +36,7 @@
  * <para>These functions can write a graph to a file, or read a graph
  * from a file.</para>
  * 
- * <para>Note that as \a igraph uses the traditional C streams it is
+ * <para>Note that as \a igraph uses the traditional C streams, it is
  * possible to read/write files from/to memory, at least on GNU
  * operating systems supporting \quote non-standard\endquote streams.</para>
  */
@@ -336,6 +342,293 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
+}
+
+#ifdef HAVE_LIBXML
+int igraph_i_libxml2_read_callback(void *instream, char* buffer, int len) {
+  int res;  
+  res=fread(buffer, 1, len, (FILE*)instream);
+  if (res) return res;
+  if (feof((FILE*)instream)) return 0;
+  return -1;
+}
+
+int igraph_i_libxml2_close_callback(void *instream) { return 0; }
+
+struct igraph_i_graphml_parser_state {
+  enum { START, INSIDE_GRAPHML, INSIDE_GRAPH, INSIDE_NODE, INSIDE_EDGE,
+      FINISH, UNKNOWN, ERROR } st;
+  igraph_t *g;
+  igraph_trie_t node_trie;
+  igraph_vector_t edgelist;
+  unsigned int prev_state;
+  unsigned int unknown_depth;
+  int index;
+  bool_t successful, edges_directed, directed_default;
+};
+
+void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
+  struct igraph_i_graphml_parser_state *state=
+    (struct igraph_i_graphml_parser_state*)state0;
+  state->successful=0;
+  state->st=ERROR;
+  /* TODO: use the message */
+}
+
+xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
+						     const xmlChar* name) {
+  return xmlGetPredefinedEntity(name);
+}
+
+void igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {
+  if (state->st != UNKNOWN) {
+    state->prev_state=state->st;
+    state->st=UNKNOWN;
+    state->unknown_depth=1;
+  } else state->unknown_depth++;
+}
+
+void igraph_i_graphml_sax_handler_start_document(void *state0) {
+  struct igraph_i_graphml_parser_state *state=
+    (struct igraph_i_graphml_parser_state*)state0;
+  
+  state->st=START;
+  state->successful=1;
+  state->edges_directed=0;
+  igraph_vector_init(&state->edgelist, 0);
+  igraph_trie_init(&state->node_trie, 1);
+}
+
+void igraph_i_graphml_sax_handler_end_document(void *state0) {
+  struct igraph_i_graphml_parser_state *state=
+    (struct igraph_i_graphml_parser_state*)state0;
+
+  if (state->index<0) {
+    igraph_empty(state->g, igraph_trie_size(&state->node_trie),
+		 state->directed_default);
+    igraph_add_edges(state->g, &state->edgelist);
+  }
+  
+  igraph_trie_destroy(&state->node_trie);
+  igraph_vector_destroy(&state->edgelist);
+}
+
+void igraph_i_graphml_sax_handler_start_element(void *state0,
+						const xmlChar* name,
+						const xmlChar** attrs) {
+  struct igraph_i_graphml_parser_state *state=
+    (struct igraph_i_graphml_parser_state*)state0;
+  xmlChar** it;
+  long int id1, id2;
+  unsigned short int directed;
+  
+  switch (state->st) {
+  case START:
+    /* If we are in the START state and received a graphml tag,
+     * change to INSIDE_GRAPHML state. Otherwise, change to UNKNOWN. */
+    if (!strcmp(name, "graphml"))
+      state->st=INSIDE_GRAPHML;
+    else
+      igraph_i_graphml_handle_unknown_start_tag(state);
+    break;
+    
+  case INSIDE_GRAPHML:
+    /* If we are in the INSIDE_GRAPHML state and received a graph tag,
+     * change to INSIDE_GRAPH state if the state->index counter reached
+     * zero (this is to handle multiple graphs in the same file).
+     * Otherwise, change to UNKNOWN. */
+    if (!strcmp(name, "graph")) {
+      if (state->index==0) {
+	state->st=INSIDE_GRAPH;
+	for (it=(xmlChar**)attrs; *it; it+=2) {
+	  if (!strcmp(*it, "edgedefault")) {
+	    if (!strcmp(*(it+1), "directed")) state->edges_directed=1;
+	    else if (!strcmp(*(it+1), "undirected")) state->edges_directed=0;
+	  }
+	}
+      }
+      state->index--;
+    } else
+      igraph_i_graphml_handle_unknown_start_tag(state);
+    break;
+      
+  case INSIDE_GRAPH:
+    /* If we are in the INSIDE_GRAPH state, check for node and edge tags */
+    if (!strcmp(name, "edge")) {
+      id1=-1; id2=-1; directed=state->edges_directed;
+      for (it=(xmlChar**)attrs; *it; it+=2) {
+	if (!strcmp(*it, "source")) {
+	  /* TODO: convert from xmlChar to char instead of just typecasting */
+	  igraph_trie_get(&state->node_trie, (char*)*(it+1), &id1);
+	}
+	if (!strcmp(*it, "target")) {
+	  igraph_trie_get(&state->node_trie, (char*)*(it+1), &id2);
+	}
+	if (!strcmp(*it, "directed")) {
+	  if (!strcmp((char*)*(it+1), "true")) directed=1; else directed=0;
+	}
+      }
+      if (id1>=0 && id2>=0) {
+	igraph_vector_push_back(&state->edgelist, id1);
+	igraph_vector_push_back(&state->edgelist, id2);
+	if (!directed && state->directed_default) {
+	  igraph_vector_push_back(&state->edgelist, id2);
+	  igraph_vector_push_back(&state->edgelist, id1);
+	}
+      } else {
+	igraph_i_graphml_sax_handler_error(state, "Edge with missing source or target encountered");
+	return;
+      }
+      state->st=INSIDE_EDGE;
+    } else if (!strcmp(name, "node")) {
+      for (it=(xmlChar**)attrs; *it; it+=2) {
+	if (!strcmp(*it, "id")) {
+	  it++;
+	  igraph_trie_get(&state->node_trie, (char*)*it, &id1);
+	  break;
+	}
+      }
+      state->st=INSIDE_NODE;
+    } else
+      igraph_i_graphml_handle_unknown_start_tag(state);
+    break;
+    
+  case INSIDE_NODE:
+    /* We don't expect any tags inside node */
+    igraph_i_graphml_handle_unknown_start_tag(state);
+    break;
+    
+  case INSIDE_EDGE:
+    /* We don't expect any tags inside node */
+    igraph_i_graphml_handle_unknown_start_tag(state);
+    break;
+    
+  default:
+    break;
+  }
+}
+
+void igraph_i_graphml_sax_handler_end_element(void *state0,
+						const xmlChar* name) {
+  struct igraph_i_graphml_parser_state *state=
+    (struct igraph_i_graphml_parser_state*)state0;
+  
+  switch (state->st) {
+  case INSIDE_GRAPHML:
+    state->st=FINISH;
+    break;
+    
+  case INSIDE_GRAPH:
+    state->st=INSIDE_GRAPHML;
+    break;
+    
+  case INSIDE_NODE:
+    state->st=INSIDE_GRAPH;
+    break;
+    
+  case INSIDE_EDGE:
+    state->st=INSIDE_GRAPH;
+    break;
+    
+  case UNKNOWN:
+    state->unknown_depth--;
+    if (!state->unknown_depth) state->st=state->prev_state;
+    break;
+    
+  default:
+    break;
+  }
+}
+
+static xmlSAXHandler igraph_i_graphml_sax_handler={
+  NULL, NULL, NULL, NULL, NULL,
+    igraph_i_graphml_sax_handler_get_entity,
+    NULL, NULL, NULL, NULL, NULL, NULL,
+    igraph_i_graphml_sax_handler_start_document,
+    igraph_i_graphml_sax_handler_end_document,
+    igraph_i_graphml_sax_handler_start_element,
+    igraph_i_graphml_sax_handler_end_element,
+    NULL,
+    //chars,
+    NULL,
+    NULL, NULL, NULL,
+    igraph_i_graphml_sax_handler_error,
+    igraph_i_graphml_sax_handler_error,
+    igraph_i_graphml_sax_handler_error,
+};
+
+#endif
+
+/**
+ * \ingroup loadsave
+ * \function igraph_read_graph_graphml
+ * \brief Reads a graph from a GraphML file.
+ * 
+ * GraphML is an XML-based file format for representing various types of
+ * graphs. Currently only the most basic import functionality is implemented
+ * in igraph: it can read GraphML files without nested graphs and hyperedges.
+ * Attributes of the graph are not loaded yet.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param instream A stream, it should be readable.
+ * \param directed Whether the imported graph should be directed. Please
+ *              note that if you ask for a directed graph, but the
+ *              GraphML file to be read contains an undirected graph,
+ *              the resulting \c igraph_t graph will be undirected as
+ *              well, but it will appear as directed. If you ask for an
+ *              undirected graph, the result will be undirected even if
+ *              the original GraphML file contained a directed graph.
+ * \param index If the GraphML file contains more than one graph, the one
+ *              specified by this index will be loaded. Indices start from
+ *              zero, so supply zero here if your GraphML file contains only
+ *              a single graph.
+ * 
+ * \return Error code:
+ *         \c IGRAPH_PARSEERROR: if there is a
+ *         problem reading the file, or the file is syntactically
+ *         incorrect.
+ *         \c IGRAPH_UNIMPLEMENTED: the GraphML functionality was disabled
+ *         at compile-time
+ */
+int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
+			      bool_t directed, int index) {
+#ifdef HAVE_LIBXML
+  xmlParserCtxtPtr ctxt;
+  struct igraph_i_graphml_parser_state state;
+  int res;
+  char buffer[4096];
+
+  if (index<0)
+    IGRAPH_ERROR("Graph index must be non-negative", IGRAPH_EINVAL);
+  
+  // Create a progressive parser context
+  state.g=graph;
+  state.index=index<0?0:index;
+  state.directed_default=directed;
+  ctxt=xmlCreateIOParserCtxt(&igraph_i_graphml_sax_handler, &state,
+			     igraph_i_libxml2_read_callback,
+			     igraph_i_libxml2_close_callback,
+			     instream, XML_CHAR_ENCODING_NONE);
+  if (ctxt==NULL)
+    IGRAPH_ERROR("Can't create progressive parser context", IGRAPH_PARSEERROR);
+
+  // Parse the file
+  while ((res=fread(buffer, 1, 4096, instream))>0) {
+    xmlParseChunk(ctxt, buffer, res, 0);
+    if (!state.successful) break;
+  }
+  xmlParseChunk(ctxt, buffer, res, 1);
+  
+  // Free the context
+  xmlFreeParserCtxt(ctxt);
+  if (!state.successful)
+    IGRAPH_ERROR("Malformed GraphML file", IGRAPH_PARSEERROR);
+  if (state.index>=0)
+    IGRAPH_ERROR("Graph index was too large", IGRAPH_EINVAL);
+  
+  return 0;
+#else
+  IGRAPH_ERROR("GraphML support is disabled", IGRAPH_UNIMPLEMENTED);
+#endif
 }
 
 /**

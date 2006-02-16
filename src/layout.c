@@ -742,7 +742,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
   for (actlayer=1; actlayer<no_of_layers; actlayer++) {
 
     real_t c=1;
-    long int i, j, k;
+    long int i, j;
     real_t massx, massy;
     real_t px, py;
     real_t sx, sy;
