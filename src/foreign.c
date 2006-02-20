@@ -863,7 +863,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
       long int to=igraph_es_to(graph, &it);      
       void *ptr1, *ptr2;
       int ret;
-      igraph_get_vertex_attribute(graph, names, to, &ptr2, &type);
+      IGRAPH_CHECK(igraph_get_vertex_attribute(graph, names, to, &ptr2, &type));
       if (from==actvertex) {
 	if (type==IGRAPH_ATTRIBUTE_NUM) {
 	  ret=fprintf(outstream, "%f\n", *(real_t*)ptr2);
@@ -872,7 +872,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 	}
       } else {
 	actvertex=from;
-	igraph_get_vertex_attribute(graph, names, from, &ptr1, &type);
+	IGRAPH_CHECK(igraph_get_vertex_attribute(graph, names, from, &ptr1, &type));
 	if (type==IGRAPH_ATTRIBUTE_NUM) {
 	  ret=fprintf(outstream, "# %f\n%f\n", *(real_t*)ptr1, *(real_t*)ptr2);
 	} else {
@@ -893,7 +893,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
       long int edge=igraph_es_get(graph, &it);
       void *ptr;
       int ret;
-      igraph_get_edge_attribute(graph, weights, edge, &ptr, &type);
+      IGRAPH_CHECK(igraph_get_edge_attribute(graph, weights, edge, &ptr, &type));
       if (from==actvertex) {
 	if (type==IGRAPH_ATTRIBUTE_NUM) {
 	  ret=fprintf(outstream, "%li %f\n", to, *(real_t*)ptr);
@@ -922,8 +922,8 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
       long int edge=igraph_es_get(graph, &it);
       void *ptr1, *ptr2, *ptr;
       int ret;
-      igraph_get_vertex_attribute(graph, names, to, &ptr2, &vtype);
-      igraph_get_edge_attribute(graph, weights, edge, &ptr, &etype);
+      IGRAPH_CHECK(igraph_get_vertex_attribute(graph, names, to, &ptr2, &vtype));
+      IGRAPH_CHECK(igraph_get_edge_attribute(graph, weights, edge, &ptr, &etype));
       if (from==actvertex) {
 	if (vtype==IGRAPH_ATTRIBUTE_NUM) {
 	  ret=fprintf(outstream, "%f ", *(real_t*)ptr2);
@@ -932,7 +932,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 	} 
       } else {
 	actvertex=from;
-	igraph_get_vertex_attribute(graph, names, from, &ptr1, &vtype);
+	IGRAPH_CHECK(igraph_get_vertex_attribute(graph, names, from, &ptr1, &vtype));
 	if (vtype==IGRAPH_ATTRIBUTE_NUM) {
 	  ret=fprintf(outstream, "# %f\n%f ", *(real_t*)ptr1, *(real_t*)ptr2);
 	} else {
@@ -970,7 +970,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 	if (names==0) {
 	  ret=fprintf(outstream, "# %li\n", i);
 	} else {
-	  igraph_get_vertex_attribute(graph, names, i, &ptr, &type);
+	  IGRAPH_CHECK(igraph_get_vertex_attribute(graph, names, i, &ptr, &type));
 	  if (type==IGRAPH_ATTRIBUTE_NUM) {
 	    ret=fprintf(outstream, "# %f\n", *(real_t*)ptr);
 	  } else {
