@@ -32,7 +32,7 @@ running.mean <- function(v, binwidth) {
 }
 
 igraph.sample <- function(low, high, length) {
-  if (length>high-low) {
+  if (length>high-low+1) {
     stop("length too big for this interval")
   }
   

@@ -1,3 +1,7 @@
+2006-02-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/random.c (igraph_random_sample) : correct upper limit bug
+
 2006-01-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* examples/simple/igraph_es_adj.c : updated to be c++ compatible

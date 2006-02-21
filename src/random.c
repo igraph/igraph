@@ -89,7 +89,7 @@ int igraph_random_sample_alga(igraph_vector_t *res, integer_t l, integer_t h,
 
 int igraph_random_sample(igraph_vector_t *res, integer_t l, integer_t h, 
 			 integer_t length) {
-  real_t N=h-l+2;
+  real_t N=h-l+1;
   real_t n=length;
   int retval;
 
