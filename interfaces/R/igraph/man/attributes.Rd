@@ -39,10 +39,10 @@ v.a(graph, attrname=NULL, v=igraph.vs.all(graph))
 v.a(graph, attrname, v=igraph.vs.all(graph)) <- value
 graph <- add.edge.attribute(graph, attrname)
 graph <- remove.edge.attribute(graph, attrname)
-get.edge.attribute(graph, attrname=NULL, e=1:ecount(graph)-1)
-set.edge.attribute(graph, attrname, e=1:ecount(graph)-1, value)
-e.a(graph, attrname=NULL, e=1:ecount(graph)-1)
-e.a(graph, attrname, e=1:ecount(graph)-1) <- value
+get.edge.attribute(graph, attrname=NULL, e=igraph.es.all(graph))
+set.edge.attribute(graph, attrname, e=igraph.es.all(graph), value)
+e.a(graph, attrname=NULL, e=igraph.es.all(graph))
+e.a(graph, attrname, e=igraph.es.all(graph)) <- value
 }
 \arguments{
   \item{graph}{The graph object to work on. Note that the original graph

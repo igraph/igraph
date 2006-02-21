@@ -24,9 +24,20 @@
 \alias{as.vector.igraphvsvector}
 \alias{as.vector.igraphesseq}
 \alias{as.vector.igraphesvector}
+\alias{as.vector}
 \title{Vertex and edge sequences}
 \description{Vertex and edge sequences are the central concept of
   igraph.}
+\synopsis{
+\method{"$"}{igraphvsseq}(it, cmd)
+\method{"$"}{igraphvsvector}(it, cmd)
+\method{"$"}{igraphesseq}(it, cmd)
+\method{"$"}{igraphesvector}(it, cmd)
+\method{as.vector}{igraphvsseq}(x, mode="any")
+\method{as.vector}{igraphvsvector}(x, mode="any")
+\method{as.vector}{igraphesseq}(x, mode="any")
+\method{as.vector}{igraphesvector}(x, mode="any")
+}
 \usage{
 igraph.vs.all(graph)
 igraph.vs.vector(graph, iterator)
@@ -48,15 +59,15 @@ igraph.es.adj(graph, vid, mode="all")
 
 igraph.es.end(graph, iterator)
 igraph.es.get(graph, iterator)
-igraph.es.from(graph, iteraror)
+igraph.es.from(graph, iterator)
 igraph.es.to(graph, iterator)
 igraph.es.next(graph, iterator)
 igraph.es.reset(graph, iterator)
 
 es$end
 es$e
-es$from(graph)
-es$to(graph)
+es$from
+es$to
 
 as.vector(iterator)
 }
@@ -67,7 +78,20 @@ as.vector(iterator)
     will be selected.}
   \item{mode}{Defines the type of adjacent vertices/edges to
     select. \code{out} is for outgoing edges, \code{in} for incoming
-    ones, while \code{all} is both both of them.}  
+    ones, while \code{all} is both both of them.}
+  \item{vs}{A vertex sequence.}
+  \item{es}{An edge sequence.}
+  \item{end}{Not a real parameter, \code{vs$end} is TRUE if the
+    \code{vs} sequence has no more vertices/edges to visit. See example
+    below.} 
+  \item{step}{Not a real parameter, \code{vs$step} is a shorthand for
+    \code{igraph.vs.next(graph,vs)} and \code{igraph.es.next(graph,es)}.}
+  \item{v}{Shorthand for \code{igraph.vs.get}.}
+  \item{e}{Shorthand for \code{igraph.es.get}.}
+  \item{from}{\code{es$from(graph)} is a shorthand for
+    \code{igraph.es.from(graph, es)}.}
+  \item{to}{\code{es$to(graph)} is a shorthand for
+    \code{igraph.es.to(graph, es)}.}
 }
 \details{
   \code{igraph.vs.all} creates a vertex sequence with all vertices of a
