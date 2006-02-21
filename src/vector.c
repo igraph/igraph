@@ -1208,6 +1208,10 @@ bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *
       break;
     }
   }
+
+  if (VECTOR(*v)[left] != what && VECTOR(*v)[right]==what) {
+    left=right;
+  }
   
   if (pos != 0 && VECTOR(*v)[left]==what) {
     *pos=left;
