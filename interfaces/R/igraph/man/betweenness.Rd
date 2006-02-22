@@ -19,14 +19,14 @@ edge.betweenness(graph, e=igraph.es.all(graph), directed = TRUE)
   \item{directed}{Logical, whether directed paths should be considered
     while determining the shortest paths.}
 }
-\details{The vertex betweenness of vertex \eqn{$v$}{\code{v}} is defined
+\details{The vertex betweenness of vertex \eqn{v}{\code{v}} is defined
   by
 
-  \deqn{$$\sum_{i\ne j, i\ne v, j\ne v} g_{ivj}/g_{ij}$$}{sum( g_ivj / g_ij, i!=j,i!=v,j!=v)}
+  \deqn{\sum_{i\ne j, i\ne v, j\ne v} g_{ivj}/g_{ij}}{sum( g_ivj / g_ij, i!=j,i!=v,j!=v)}
   
-  The edge betweenness of edge \eqn{$e$}{\code{e}} is defined by
+  The edge betweenness of edge \eqn{e}{\code{e}} is defined by
 
-  \deqn{$$\sum_{i\ne j} g{iej}/g_{ij}$$}{sum( g_iej / g_ij, i!=j)}.
+  \deqn{\sum_{i\ne j} g{iej}/g_{ij}}{sum( g_iej / g_ij, i!=j)}.
 }
 \value{A numeric vector with the betweenness score for each vertex in
   \code{v} for \code{betweenness}.
