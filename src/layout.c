@@ -24,6 +24,11 @@
 #include "random.h"
 #include <math.h>
 
+int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, real_t *x, real_t *y,
+			      real_t *r);
+int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, real_t *x, real_t *y,
+			      real_t *z, real_t *r);
+
 /**
  * \section about_layouts
  * 
@@ -1044,3 +1049,204 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }
+
+int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid, 
+			      long int actg, real_t *x, real_t *y, real_t r,
+			      real_t cx, real_t cy, real_t startr, 
+			      real_t killr);
+
+int igraph_layout_merge_dla(igraph_vector_ptr_t *coords, 
+			    igraph_matrix_t *res) {
+  long int graphs=igraph_vector_ptr_size(coords);
+  igraph_vector_t sizes;
+  igraph_vector_t x, y, r;
+  long int allnodes=0;
+  long int i, j;
+  long int actg;
+  igraph_i_layout_mergegrid_t grid;
+  long int jpos=0;
+  real_t minx, maxx, miny, maxy;
+  real_t area=0;
+  real_t maxr=0;
+  long int respos;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&sizes, graphs);
+  IGRAPH_VECTOR_INIT_FINALLY(&x, graphs);
+  IGRAPH_VECTOR_INIT_FINALLY(&y, graphs);
+  IGRAPH_VECTOR_INIT_FINALLY(&r, graphs);
+  
+  for (i=0; i<igraph_vector_ptr_size(coords); i++) {
+    long int size=igraph_matrix_nrow(VECTOR(*coords)[i]);
+    allnodes += size;
+    VECTOR(sizes)[i]=size;
+    igraph_i_layout_sphere_2d(VECTOR(*coords)[i], 
+			      igraph_vector_e_ptr(&x, i),
+			      igraph_vector_e_ptr(&y, i),
+			      igraph_vector_e_ptr(&r, i));
+/*     VECTOR(r)[i] *= 1.05;	/\* safety factor *\/ */
+    area+=VECTOR(r)[i] * VECTOR(r)[i];
+    if (VECTOR(r)[i] > maxr) {
+      maxr=VECTOR(r)[i];
+    }
+  }
+  igraph_vector_order2(&sizes);	/* largest first */
+
+  /* 0. create grid */
+  minx=miny=-sqrt(5*area);
+  maxx=maxy=sqrt(5*area);
+  igraph_i_layout_mergegrid_init(&grid, minx, maxx, 200,
+				 miny, maxy, 200);
+  IGRAPH_FINALLY(igraph_i_layout_mergegrid_destroy, &grid);
+  
+  /* 1. place the largest  */
+  actg=VECTOR(sizes)[jpos++];
+  igraph_i_layout_merge_place_sphere(&grid, 0, 0, VECTOR(r)[actg], actg);
+  
+  while (jpos<graphs) {
+    actg=VECTOR(sizes)[jpos++];
+    /* 2. random walk, TODO: tune parameters */
+    igraph_i_layout_merge_dla(&grid, actg, 
+			      igraph_vector_e_ptr(&x, actg),
+			      igraph_vector_e_ptr(&y, actg), 
+			      VECTOR(r)[actg], 0, 0,
+			      maxx-maxr, maxx-maxr+5);
+    
+    /* 3. place sphere */
+    igraph_i_layout_merge_place_sphere(&grid, VECTOR(x)[actg], VECTOR(y)[actg],
+				       VECTOR(r)[actg], actg);
+  }
+
+  /* Create the result */
+  IGRAPH_CHECK(igraph_matrix_resize(res, allnodes, 2));
+  respos=0;
+  for (i=0; i<graphs; i++) {
+    long int size=igraph_matrix_nrow(VECTOR(*coords)[i]);
+    real_t xx=VECTOR(x)[i];
+    real_t yy=VECTOR(y)[i];
+    igraph_matrix_t *mat=VECTOR(*coords)[i];
+    for (j=0; j<size; j++) {
+      MATRIX(*res, respos, 0)=MATRIX(*mat, j, 0)+xx;
+      MATRIX(*res, respos, 1)=MATRIX(*mat, j, 1)+yy;
+      ++respos;
+    }
+  }
+    
+  igraph_i_layout_mergegrid_destroy(&grid);
+  igraph_vector_destroy(&sizes);
+  igraph_vector_destroy(&x);
+  igraph_vector_destroy(&y);
+  igraph_vector_destroy(&r);
+  IGRAPH_FINALLY_CLEAN(5);
+  return 0;
+}
+
+int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, real_t *x, real_t *y,
+			      real_t *r) {
+  long int nodes=igraph_matrix_nrow(coords);
+  long int i;
+  real_t xmin, xmax, ymin, ymax;
+  
+  xmin=xmax=MATRIX(*coords,0,0);
+  ymin=ymax=MATRIX(*coords,0,1);
+  for (i=1; i<nodes; i++) {
+
+    if (MATRIX(*coords,i,0) < xmin) {
+      xmin=MATRIX(*coords,i,0);
+    } else if (MATRIX(*coords,i,0)>xmax) {
+      xmax=MATRIX(*coords,i,0);
+    }
+
+    if (MATRIX(*coords,i,1) < ymin) {
+      ymin=MATRIX(*coords,i,1);
+    } else if (MATRIX(*coords,i,1)>ymax) {
+      ymax=MATRIX(*coords,i,1);
+    }
+    
+  }
+
+  *x=(xmin+xmax)/2;
+  *y=(ymin+ymax)/2;
+  *r=sqrt( (xmax-xmin)*(xmax-xmin)+(ymax-ymin)*(ymax-ymin) ) / 2;
+
+  return 0;
+}
+
+int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, real_t *x, real_t *y,
+			      real_t *z, real_t *r) {
+  long int nodes=igraph_matrix_nrow(coords);
+  long int i;
+  real_t xmin, xmax, ymin, ymax, zmin, zmax;
+  
+  xmin=xmax=MATRIX(*coords,0,0);
+  ymin=ymax=MATRIX(*coords,0,1);
+  zmin=zmax=MATRIX(*coords,0,2);
+  for (i=1; i<nodes; i++) {
+    
+    if (MATRIX(*coords,i,0) < xmin) {
+      xmin=MATRIX(*coords,i,0);
+    } else if (MATRIX(*coords,i,0)>xmax) {
+      xmax=MATRIX(*coords,i,0);
+    }
+
+    if (MATRIX(*coords,i,1) < ymin) {
+      ymin=MATRIX(*coords,i,1);
+    } else if (MATRIX(*coords,i,1)>ymax) {
+      ymax=MATRIX(*coords,i,1);
+    }
+    
+    if (MATRIX(*coords,i,2) < zmin) {
+      zmin=MATRIX(*coords,i,2);
+    } else if (MATRIX(*coords,i,2)>zmax) {
+      zmax=MATRIX(*coords,i,2);
+    }
+
+  }
+  
+  *x=(xmin+xmax)/2;
+  *y=(ymin+ymax)/2;
+  *z=(zmin+zmax)/2;
+  *r=sqrt( (xmax-xmin)*(xmax-xmin)+(ymax-ymin)*(ymax-ymin)+
+	   (zmax-zmin)*(zmax-zmin) ) / 2;
+  
+  return 0;
+}
+
+#define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
+
+int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid, 
+			      long int actg, real_t *x, real_t *y, real_t r,
+			      real_t cx, real_t cy, real_t startr, 
+			      real_t killr) {
+  long int sp=-1;
+  real_t angle, len;
+  long int steps=0;
+
+  while (sp < 0) {
+    /* start particle */
+    do {
+      steps++;
+      angle=RNG_UNIF(0,2*M_PI);
+      len=RNG_UNIF(.5*startr, startr);
+      *x=cx+len*cos(angle);
+      *y=cy+len*sin(angle);
+      sp=igraph_i_layout_mergegrid_get_sphere(grid, *x, *y, r);
+    } while (sp >= 0);
+
+    while (sp < 0 && DIST(*x,*y)<killr) {
+      real_t nx, ny;
+      steps++;
+      angle=RNG_UNIF(0,2*M_PI);
+      len=RNG_UNIF(0, startr/100);
+      nx= *x + len * cos(angle);
+      ny= *y + len * sin(angle);      
+      sp=igraph_i_layout_mergegrid_get_sphere(grid, nx, ny, r);
+      if (sp < 0) {
+	*x = nx; *y = ny;
+      }
+    }
+  }
+
+/*   fprintf(stderr, "%li ", steps); */
+  return 0;
+}
+

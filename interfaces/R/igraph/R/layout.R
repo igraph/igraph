@@ -56,7 +56,7 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2, params=list()) {
   } else if (dim==3 ){
     fn <- "R_igraph_layout_fruchterman_reingold_3d"
   } else {
-    stop("Invalid `grid' argument");
+    stop("Invalid `dim' argument");
   }
   
   vc <- vcount(graph)
@@ -148,6 +148,20 @@ layout.lgl <- function(graph, ..., params=list()) {
         as.double(params$coolexp), as.double(params$repulserad),
         as.double(params$cellsize), as.double(params$root),
         PACKAGE="igraph")
+}
+
+layout.merge <- function(..., method="dla") {
+
+  layouts <- as.list(c(...))
+
+  if (method == "dla") {
+    res <- .Call("R_igraph_layout_merge_dla",
+                 layouts,
+                 PACKAGE="igraph")
+  } else {
+    stop("Invalid `method'.")
+  }
+  res
 }
 
 # FROM SNA 0.5

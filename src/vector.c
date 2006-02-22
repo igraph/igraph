@@ -684,6 +684,25 @@ int igraph_vector_order(const igraph_vector_t* v, igraph_vector_t* res, integer_
   return 0;
 }
 
+int igraph_vector_order2(igraph_vector_t *v) {
+
+  igraph_indheap_t heap;
+
+  igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v));
+  IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
+
+  igraph_vector_clear(v);
+  while (!igraph_indheap_empty(&heap)) {
+    IGRAPH_CHECK(igraph_vector_push_back(v, 
+					 igraph_indheap_max_index(&heap)-1));
+    igraph_indheap_delete_max(&heap);
+  }
+  
+  igraph_indheap_destroy(&heap);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 /**
  * \ingroup vector
  * \function igraph_vector_sort_cmp

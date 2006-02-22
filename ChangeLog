@@ -1,4 +1,20 @@
-2006-02-20  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/layout.c (igraph_layout_merge_dla, igraph_i_layout_sphere_2d)
+	(igraph_i_layout_sphere_3d, igraph_i_layout_merge_dla) : added
+	* examples/simple/igraph_i_layout_sphere.c : added
+	* examples/simple/igraph_layout_merge.c : added
+
+	* src/vector.c (igraph_vector_order2) : added
+	* examples/simple/vector.c: updated
+
+	* src/igraph_grid.c (igraph_i_layout_mergegrid_which)
+	(igraph_i_layout_mergegrid_init, igraph_i_layout_mergegrid_destroy)
+	(igraph_i_layout_mergegrid_place_sphere)
+	(igraph_i_layout_mergegrid_get, igraph_i_layout_mergegrid_get_sphere)
+	: added
+		
+2006-02-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_write_graph_lgl) : error handling bug 
 	hunted
@@ -20,14 +36,14 @@
           get_all_shortest_paths, igraph_read_graph_pajek and
 	  igraph_read_graph_graphml
 
-2006-02-13  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph_grid.c (igraph_2dgrid_next_nei) : bug hunted
 	* src/visitors.c (igraph_bfs) : bug for unconnected graphs hunted
 	* src/layout.c (igraph_layout_fruchterman_reingold_3d) : corrected
 	* src/random.h (RNG_UNIF) : small bug corrected
 
-2006-02-12  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/motifs.c (igraph_motifs_randesu_estimate) : added
 	* src/topology.c (igraph_isoclass_create) : added
@@ -44,13 +60,13 @@
 	  igraph_decompose, igraph_write_pajek, igraph_layout_lgl,
 	  igraph_layout_grid_fruchterman_reingold
 	  
-2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph.h (igraph_progress_handler_t) : added
 	* src/progress.c (igraph_progress, igraph_progress_handler_stderr)
 	(igraph_set_progress_handler) : added
 
-2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_get_all_shortest_paths) : added
 

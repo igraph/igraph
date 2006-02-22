@@ -127,6 +127,7 @@ void igraph_vector_set       (igraph_vector_t* v, long int pos, real_t value);
 real_t igraph_vector_tail(const igraph_vector_t *v);
 real_t igraph_vector_pop_back(igraph_vector_t* v);
 int igraph_vector_order(const igraph_vector_t* v, igraph_vector_t* res, integer_t maxval);
+int igraph_vector_order2(igraph_vector_t *v);
 void igraph_vector_sort(igraph_vector_t *v);
 int igraph_vector_resize(igraph_vector_t* v, long int newsize);
 real_t igraph_vector_max(const igraph_vector_t* v);
@@ -495,5 +496,28 @@ integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
 integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
 				 igraph_2dgrid_iterator_t *it);
 
+/* Another type of grid, each cell is owned by exactly one graph */
+
+typedef struct igraph_i_layout_mergegrid_t {
+  long int *data;
+  long int stepsx, stepsy;
+  real_t minx, maxx, deltax;
+  real_t miny, maxy, deltay;
+} igraph_i_layout_mergegrid_t;
+
+int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+				   real_t minx, real_t maxx, long int stepsx,
+				   real_t miny, real_t maxy, long int stepsy);
+void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid);
+
+int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+				       real_t x, real_t y, real_t r,
+				       long int id);
+
+long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
+				       real_t x, real_t y);
+
+long int igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
+					      real_t x, real_t y, real_t r);
 #endif
 

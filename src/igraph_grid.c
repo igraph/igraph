@@ -21,7 +21,9 @@
 */
 
 #include "igraph.h"
-#include "math.h"
+#include "memory.h"
+
+#include <math.h>
 
 /* internal function */
 
@@ -340,3 +342,197 @@ inline integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
  
   return ret;  
 }
+
+/*-----------------------------------------------------------------------*/
+
+inline int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
+					   real_t xc, real_t yc,
+					   long int *x, long int *y) {
+  if (xc <= grid->minx) { 
+    *x=0; 
+  } else if (xc >= grid->maxx) {
+    *x=grid->stepsx-1;
+  } else {
+    *x=floor((xc-(grid->minx))/(grid->deltax));
+  }
+
+  if (yc <= grid->miny) {
+    *y=0;
+  } else if (yc >= grid->maxy) {
+    *y=grid->stepsy-1;
+  } else {
+    *y=floor((yc-(grid->miny))/(grid->deltay));
+  }
+
+  return 0;
+}  
+
+int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+				   real_t minx, real_t maxx, long int stepsx,
+				   real_t miny, real_t maxy, long int stepsy) {
+  grid->minx=minx;
+  grid->maxx=maxx;
+  grid->stepsx=stepsx;
+  grid->deltax=(maxx-minx)/stepsx;
+  grid->miny=miny;
+  grid->maxy=maxy;
+  grid->stepsy=stepsy;
+  grid->deltay=(maxy-miny)/stepsy;
+  
+  grid->data=Calloc(stepsx*stepsy, long int);
+  if (grid->data==0) {
+    IGRAPH_ERROR("Cannot create grid", IGRAPH_ENOMEM);
+  }
+  return 0;
+}
+
+void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
+  Free(grid->data);
+}
+
+#define MAT(i,j) (grid->data[(grid->stepsy)*(j)+(i)])
+#define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
+
+int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+				       real_t x, real_t y, real_t r, 
+				       long int id) {
+  long int cx, cy;
+  long int i, j;
+
+  igraph_i_layout_mergegrid_which(grid, x, y, &cx, &cy);
+  
+  MAT(cx, cy)=id+1;
+
+#define DIST(i,j) (DIST2(grid->minx+(cx+(i))*grid->deltax, \
+			 grid->miny+(cy+(j))*grid->deltay))
+  
+  for (i=0; cx+i<grid->stepsx && DIST(i,0)<r; i++) {
+    for (j=0; cy+j<grid->stepsy && DIST(i,j)<r; j++) {
+      MAT(cx+i,cy+j)=id+1;
+    }
+  }
+
+#undef DIST
+#define DIST(i,j) (DIST2(grid->minx+(cx+(i))*grid->deltax, \
+                         grid->miny+(cy-(j)+1)*grid->deltay))
+
+  for (i=0; cx+i<grid->stepsx && DIST(i,0)<r; i++) {
+    for (j=1; cy-j>0 && DIST(i,j)<r; j++) {
+      MAT(cx+i,cy-j)=id+1;
+    }
+  }
+
+#undef DIST
+#define DIST(i,j) (DIST2(grid->minx+(cx-(i)+1)*grid->deltax, \
+			 grid->miny+(cy+(j))*grid->deltay))
+
+  for (i=1; cx-i>0 && DIST(i,0)<r; i++) {
+    for (j=0; cy+j<grid->stepsy && DIST(i,j)<r; j++) {
+      MAT(cx-i,cy+j)=id+1;
+    }
+  }
+
+#undef DIST
+#define DIST(i,j) (DIST2(grid->minx+(cx-(i)+1)*grid->deltax, \
+			 grid->miny+(cy-(j)+1)*grid->deltay))
+
+  for (i=1; cx-i>0 && DIST(i,0)<r; i++) {
+    for (j=1; cy-j>0 && DIST(i,j)<r; j++) {
+      MAT(cx-i,cy-j)=id+1;
+    }
+  }  
+
+#undef DIST
+#undef DIST2
+
+  return 0;
+}
+
+long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
+				       real_t x, real_t y) {
+  long int cx, cy;
+  long int res;
+
+  if (x <= grid->minx || x >= grid->maxx ||
+      y <= grid->miny || y >= grid->maxy) {
+    res=-1;
+  } else {
+    igraph_i_layout_mergegrid_which(grid, x, y, &cx, &cy);
+    res=MAT(cx, cy)-1;
+  }
+
+  return res;
+}
+
+#define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
+
+long int igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *grid,
+					      real_t x, real_t y, real_t r) {
+  long int cx, cy;
+  long int i,j;
+  long int ret;
+  
+  if (x-r <= grid->minx || x+r >= grid->maxx ||
+      y-r <= grid->miny || y+r >= grid->maxy) {
+    ret=-1;
+  } else {
+    igraph_i_layout_mergegrid_which(grid, x, y, &cx, &cy);
+    
+    ret=MAT(cx, cy)-1;
+  
+#define DIST(i,j) (DIST2(grid->minx+(cx+(i))*grid->deltax, \
+			 grid->miny+(cy+(j))*grid->deltay))
+  
+    for (i=0; ret<0 && cx+i<grid->stepsx && DIST(i,0)<r; i++) {
+      for (j=0; ret<0 && cy+j<grid->stepsy && DIST(i,j)<r; j++) {
+	ret=MAT(cx+i,cy+j)-1;
+      }
+    }
+    
+#undef DIST
+#define DIST(i,j) (DIST2(grid->minx+(cx+(i))*grid->deltax, \
+                         grid->miny+(cy-(j)+1)*grid->deltay))
+    
+    for (i=0; ret<0 && cx+i<grid->stepsx && DIST(i,0)<r; i++) {
+      for (j=1; ret<0 && cy-j>0 && DIST(i,j)<r; j++) {
+	ret=MAT(cx+i,cy-j)-1;
+      }
+    }
+    
+#undef DIST
+#define DIST(i,j) (DIST2(grid->minx+(cx-(i)+1)*grid->deltax, \
+			 grid->miny+(cy+(j))*grid->deltay))
+    
+    for (i=1; ret<0 && cx-i>0 && DIST(i,0)<r; i++) {
+      for (j=0; ret<0 && cy+j<grid->stepsy && DIST(i,j)<r; j++) {
+	ret=MAT(cx-i,cy+j)-1;
+      }
+    }
+    
+#undef DIST
+#define DIST(i,j) (DIST2(grid->minx+(cx-(i)+1)*grid->deltax, \
+			 grid->miny+(cy-(j)+1)*grid->deltay))
+    
+    for (i=1; ret<0 && cx+i>0 && DIST(i,0)<r; i++) {
+      for (j=1; ret<0 && cy+i>0 && DIST(i,j)<r; j++) {
+	ret=MAT(cx-i,cy-j)-1;
+      }
+    }  
+    
+#undef DIST
+    
+  }
+  
+  return ret;
+}
+  
+/* int print_grid(igraph_i_layout_mergegrid_t *grid) { */
+/*   long int i,j; */
+  
+/*   for (i=0; i<grid->stepsx; i++) { */
+/*     for (j=0; j<grid->stepsy; j++) { */
+/*       printf("%li ", MAT(i,j)-1); */
+/*     } */
+/*     printf("\n"); */
+/*   } */
+/* } */

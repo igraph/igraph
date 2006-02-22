@@ -3070,3 +3070,32 @@ SEXP R_igraph_isoclass_create(SEXP psize, SEXP pnumber, SEXP pdirected) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_layout_merge_dla(SEXP layouts) {
+  
+  igraph_vector_ptr_t ptrvec;
+  igraph_matrix_t *mats;
+  igraph_matrix_t res;
+  long int i;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  igraph_vector_ptr_init(&ptrvec, GET_LENGTH(layouts));
+  mats=(igraph_matrix_t*)R_alloc(GET_LENGTH(layouts),
+				 sizeof(igraph_matrix_t));
+  for (i=0; i<GET_LENGTH(layouts); i++) {
+    R_SEXP_to_matrix(VECTOR_ELT(layouts, i), &mats[i]);
+    VECTOR(ptrvec)[i]=&mats[i];
+  }
+  igraph_matrix_init(&res, 0, 0);
+  igraph_layout_merge_dla(&ptrvec, &res);
+  igraph_vector_ptr_destroy(&ptrvec);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

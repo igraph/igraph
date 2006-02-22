@@ -240,6 +240,12 @@ int main() {
   /* igraph_vector_permdelete */
   /* igraph_vector_remove_negidx */
 
+  /* order2 */
+  igraph_vector_init_int_end(&v, -1, 10,9,8,7,6,7,8,9,10, -1);
+  igraph_vector_order2(&v);
+  print_vector(&v, stdout);
+  igraph_vector_destroy(&v);
+
   return 0;
 }
   
