@@ -145,6 +145,11 @@ igraph_trie_t *igraph_ncol_trie=0;
  * \param weights Logical value, if TRUE the weights of the
  *        edges is added to the graph as an edge attribute called
  *        \quote weight\endquote.
+ * \param directed Whether to create a directed graph. As this format
+ *        was originally used only for undirected graphs there is no
+ *        information in the file about the directedness of the graph.
+ *        Set this parameter to \c IGRAPH_DIRECTED or \c
+ *        IGRAPH_UNDIRECTED to create a directed or undirected graph.
  * \return Error code:
  *         \c IGRAPH_PARSEERROR: if there is a
  *          problem reading 
@@ -160,7 +165,7 @@ igraph_trie_t *igraph_ncol_trie=0;
  */
 
 int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, 
-			  bool_t names, bool_t weights) {
+			  bool_t names, bool_t weights, bool_t directed) {
   
   igraph_vector_t edges, ws;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
@@ -176,7 +181,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
   igraph_ncol_yyparse();
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, 0));
+  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   

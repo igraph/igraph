@@ -2601,10 +2601,12 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   return result;
 }
 
-SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP pnames, SEXP pweights) {
+SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP pnames, SEXP pweights,
+			      SEXP pdirected) {
   igraph_t g;
   bool_t names=LOGICAL(pnames)[0];
   bool_t weights=LOGICAL(pweights)[0];
+  bool_t directed=LOGICAL(pdirected)[0];
   FILE *file;
   SEXP result;
   
@@ -2617,7 +2619,7 @@ SEXP R_igraph_read_graph_ncol(SEXP pvfile, SEXP pnames, SEXP pweights) {
 #endif
   if (file==0) { igraph_error("Cannot read edgelist", __FILE__, __LINE__,
 			      IGRAPH_EFILE); }
-  igraph_read_graph_ncol(&g, file, names, weights);
+  igraph_read_graph_ncol(&g, file, names, weights, directed);
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);

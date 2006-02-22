@@ -1,16 +1,21 @@
-2006-02-22  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (read.graph.ncol) : updated
+	* interfaces/R/src/rinterface.c (R_igraph_read_graph_ncol) : updated
+
+2006-02-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/layout.R (layout.merge) : added
 	* interfaces/R/src/rinterface.c (R_igraph_layout_merge_dla) : added
 
-2006-02-12  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/topology.R (graph.isocreate) : added
 	* interfaces/R/igraph/R/motifs.R (graph.motifs.est) : added
 	* interfaces/R/src/rinterface.c (R_igraph_motifs_randesu_estimate)
 	(R_igraph_isoclass_create) : added
 
-2006-02-10  Gabor Csardi  <csardi@szaffi.rmki.kfki.hu>
+2006-02-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R
 	(get.all.shortest.paths) : added

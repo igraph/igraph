@@ -2441,16 +2441,16 @@ PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObj
   igraphmodule_GraphObject *self;
   char* fname=NULL;
   FILE* f;
-  PyObject *names=Py_True, *weights=Py_True;
+  PyObject *names=Py_True, *weights=Py_True, *directed=Py_True;
   igraph_t g;
   
   char *kwlist[] =
   {
-    "f", "names", "weights", NULL
+    "f", "names", "weights", "directed", NULL
   };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OO", kwlist,
-				   &fname, &names, &weights))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OOO", kwlist,
+				   &fname, &names, &weights, &directed))
      return NULL;
       
   f=fopen(fname, "r");
@@ -2458,7 +2458,7 @@ PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObj
     PyErr_SetString(PyExc_IOError, strerror(errno));
     return NULL;
   }
-  if (igraph_read_graph_ncol(&g, f, PyObject_IsTrue(names), PyObject_IsTrue(weights))) {
+  if (igraph_read_graph_ncol(&g, f, PyObject_IsTrue(names), PyObject_IsTrue(weights), PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
