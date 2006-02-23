@@ -1,3 +1,7 @@
+2006-02-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/operators.c (igraph_union, igraph_union_many) : added
+
 2006-02-23  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.h,
