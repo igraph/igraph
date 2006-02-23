@@ -94,21 +94,25 @@ struct igraph_i_protectedPtr igraph_i_finally_stack[100];
 void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr) {
   int no=igraph_i_finally_stack[0].all;
   assert (no<100);
+  assert (no>=0);
   igraph_i_finally_stack[no].ptr=ptr;
   igraph_i_finally_stack[no].func=func;
   igraph_i_finally_stack[0].all ++;
+  /* printf("--> Finally stack contains now %d elements\n", igraph_i_finally_stack[0].all); */
 }
 
 void IGRAPH_FINALLY_CLEAN(int minus) { 
   igraph_i_finally_stack[0].all -= minus;
   if (igraph_i_finally_stack[0].all < 0) {
-    fprintf(stderr, "corrupt finally stack\n");
+    fprintf(stderr, "corrupt finally stack, popping %d elements when only %d left\n", minus, igraph_i_finally_stack[0].all+minus);
     igraph_i_finally_stack[0].all = 0;
   }
+  /* printf("<-- Finally stack contains now %d elements\n", igraph_i_finally_stack[0].all); */
 }
 
 void IGRAPH_FINALLY_FREE() {
   int p;
+  /* printf("[X] Finally stack will be cleaned (contained %d elements)\n", igraph_i_finally_stack[0].all); */
   for (p=igraph_i_finally_stack[0].all-1; p>=0; p--) {
     igraph_i_finally_stack[p].func(igraph_i_finally_stack[p].ptr);
   }

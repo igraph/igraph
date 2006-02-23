@@ -241,12 +241,60 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
 
 /**
  * \ingroup python_interface_edge
+ * Returns the source node index of an edge
+ */
+PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closure) {
+  PyObject *o;
+  integer_t from, to;
+  
+  o=igraphmodule_resolve_graph_weakref(self->gref);
+  if (!o) return NULL;
+  
+  if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  return PyInt_FromLong(from);
+}
+
+/**
+ * \ingroup python_interface_edge
+ * Returns the target node index of an edge
+ */
+PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure) {
+  PyObject *o;
+  integer_t from, to;
+  
+  o=igraphmodule_resolve_graph_weakref(self->gref);
+  if (!o) return NULL;
+  
+  if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  return PyInt_FromLong(to);
+}
+
+/**
+ * \ingroup python_interface_edge
  * Method table for the \c igraph.Edge object
  */
 PyMethodDef igraphmodule_Edge_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_Edge_attributes,
       METH_NOARGS,
       "Returns the attribute list of the graph's edges\n"
+  },
+  {NULL}
+};
+
+/**
+ * \ingroup python_interface_edge
+ * Getter/setter table for the \c igraph.Edge object
+ */
+PyGetSetDef igraphmodule_Edge_getseters[] = {
+  {"source", igraphmodule_Edge_get_from, NULL,
+      "Source node index of this edge", NULL
+  },
+  {"target", igraphmodule_Edge_get_to, NULL,
+      "Target node index of this edge", NULL
   },
   {NULL}
 };
@@ -300,5 +348,7 @@ PyTypeObject igraphmodule_EdgeType =
   0,                                          // tp_iter
   0,                                          // tp_iternext
   igraphmodule_Edge_methods,                  // tp_methods
+  0,                                          // tp_members
+  igraphmodule_Edge_getseters,                // tp_getset
 };
 

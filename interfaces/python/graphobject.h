@@ -70,6 +70,7 @@ PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, Py
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_rewire(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_simplify(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -568,6 +569,21 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Returns a list with the Google PageRank values of the specified\n"
       "vertices."
   },
+
+  // interface to igraph_rewire
+  {"rewire", (PyCFunction)igraphmodule_Graph_rewire,
+      METH_VARARGS | METH_KEYWORDS,
+      "Randomly rewires the graph while preserving the degree distribution.\n\n"
+      "Please note that the rewiring is done \"in-place\", so the original\n"
+      "graph will be modified. If you want to preserve the original graph,\n"
+      "use the copy method before.\n\n"
+      "Keyword arguments:\n"
+      "n        -- the number of rewiring trials. Optional,\n"
+      "            defaults to 1000.\n"
+      "mode     -- the rewiring algorithm to use. Optional,\n"
+      "            defaults to REWIRING_SIMPLE.\n"
+      "Returns the modified graph.\n"
+  },
   
   // interface to igraph_shortest_paths
   {"shortest_paths", (PyCFunction)igraphmodule_Graph_shortest_paths,
@@ -583,7 +599,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_simplify
   {"simplify", (PyCFunction)igraphmodule_Graph_simplify,
       METH_VARARGS | METH_KEYWORDS,
-      "Simplifies a graph by removing selp-loops and/or multiple edges."
+      "Simplifies a graph by removing self-loops and/or multiple edges.\n"
       "Keywords arguments:\n"
       "multiple -- whether to remove multiple edges. Optional, defaults\n"
       "            to True.\n"
@@ -840,7 +856,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Keyword arguments:\n"
       "f -- the name of the file\n"
   },
-  // interface to igraph_read_graph_pajek
+  // interface to igraph_read_graph_graphml
   {"Read_GraphML", (PyCFunction)igraphmodule_Graph_Read_GraphML,
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,
       "Reads a GraphML format file and creates a graph based on it.\n"

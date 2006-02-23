@@ -5,7 +5,7 @@ int main(int argc, char **argv) {
   igraph_t g;
   igraph_error_handler_t* oldhandler;
   int result;
-  FILE *ifile;
+  FILE *ifile, *ofile;
 
   /* GraphML */
   ifile=fopen("test.gxl", "r");
@@ -22,6 +22,18 @@ int main(int argc, char **argv) {
   igraph_set_error_handler(oldhandler);
     
   fclose(ifile);
+
+  /* Write it back */
+  ofile=fopen("test2.gxl", "w");
+  /* If we can't create the test file, just skip the test */
+  if (ofile) {
+    if (result=igraph_write_graph_graphml(&g, ofile)) {
+      return 1;
+    }
+    fclose(ofile);
+    unlink("test2.gxl");
+  }
+  
   printf("The directed graph:\n");
   printf("Vertices: %li\n", (long int) igraph_vcount(&g));
   printf("Edges: %li\n", (long int) igraph_ecount(&g));
@@ -41,6 +53,6 @@ int main(int argc, char **argv) {
   printf("Directed: %i\n", (int) igraph_is_directed(&g));
   igraph_write_graph_edgelist(&g, stdout);
   igraph_destroy(&g);
-
+  
   return 0;
 }

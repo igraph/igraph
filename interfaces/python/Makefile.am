@@ -11,6 +11,8 @@ igraph_la_CFLAGS        = $(PYTHON_INCLUDES) -I$(top_srcdir)/include
 igraph_la_LDFLAGS       = -module -no-undefined -L../../src
 igraph_la_LIBADD        = -lm $(PYTHON_LIBS) -ligraph
 
+EXTRA_DIST = test.py test.sh
+
 ## We don't need libtool's versioning information in the Python
 ## library, so remove them
 install-data-hook:

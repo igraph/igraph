@@ -156,6 +156,8 @@ typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
 	       IGRAPH_FILEFORMAT_NCOL,
 	       IGRAPH_FILEFORMAT_PAJEK } igraph_fileformat_type_t;
 
+typedef enum { IGRAPH_REWIRING_SIMPLE=0 } igraph_rewiring_t;
+
 /* -------------------------------------------------- */
 /* Vertex sequences                                   */
 /* -------------------------------------------------- */
@@ -488,6 +490,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res, 
 		    const igraph_vs_t *vids, bool_t directed, integer_t niter, 
 		    real_t eps, real_t damping);
+int igraph_rewire(igraph_t *graph, integer_t n, igraph_rewiring_t mode);
 int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
 		    const igraph_vs_t *vids);
 int igraph_average_path_length(const igraph_t *graph, real_t *res,
@@ -617,16 +620,17 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
 int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 			   const char *names, const char *weights,
 			   bool_t isolates);
+int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */
 /* -------------------------------------------------- */
 
-int igraph_isoclass(const igraph_t *graph, int *class);
+int igraph_isoclass(const igraph_t *graph, int *isoclass);
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 		      bool_t *iso);
 int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
-			     int *class);
+			     int *isoclass);
 int igraph_isoclass_create(igraph_t *graph, integer_t size,
 			   integer_t number, bool_t directed);
 

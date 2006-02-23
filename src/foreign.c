@@ -24,6 +24,7 @@
 #include <config.h>
 
 #include <ctype.h>		/* isspace */
+#include "memory.h"
 
 #ifdef HAVE_LIBXML
 #include <libxml/encoding.h>
@@ -360,12 +361,26 @@ int igraph_i_libxml2_read_callback(void *instream, char* buffer, int len) {
 
 int igraph_i_libxml2_close_callback(void *instream) { return 0; }
 
+struct igraph_i_graphml_key_data {
+  enum { I_GRAPHML_GRAPH, I_GRAPHML_NODE, I_GRAPHML_EDGE,
+      I_GRAPHML_UNKNOWN_TARGET } what_for;
+  enum { I_GRAPHML_BOOLEAN, I_GRAPHML_INTEGER, I_GRAPHML_LONG,
+      I_GRAPHML_FLOAT, I_GRAPHML_DOUBLE, I_GRAPHML_STRING,
+      I_GRAPHML_UNKNOWN_TYPE } type;
+  char* name;
+  char* default_value;
+  long id;
+};
+
 struct igraph_i_graphml_parser_state {
   enum { START, INSIDE_GRAPHML, INSIDE_GRAPH, INSIDE_NODE, INSIDE_EDGE,
-      FINISH, UNKNOWN, ERROR } st;
+      INSIDE_KEY, INSIDE_DEFAULT, INSIDE_DATA, FINISH, UNKNOWN, ERROR } st;
   igraph_t *g;
   igraph_trie_t node_trie;
+  igraph_trie_t key_trie;
   igraph_vector_t edgelist;
+  igraph_vector_ptr_t key_list;
+  struct igraph_i_graphml_key_data *current_key;
   unsigned int prev_state;
   unsigned int unknown_depth;
   int index;
@@ -400,21 +415,35 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
   state->st=START;
   state->successful=1;
   state->edges_directed=0;
+  state->current_key=NULL;
   igraph_vector_init(&state->edgelist, 0);
+  igraph_vector_ptr_init(&state->key_list, 0);
   igraph_trie_init(&state->node_trie, 1);
+  igraph_trie_init(&state->key_trie, 1);
 }
 
 void igraph_i_graphml_sax_handler_end_document(void *state0) {
   struct igraph_i_graphml_parser_state *state=
     (struct igraph_i_graphml_parser_state*)state0;
+  struct igraph_i_graphml_key_data *kd;
+  long i, l;
 
   if (state->index<0) {
     igraph_empty(state->g, igraph_trie_size(&state->node_trie),
 		 state->directed_default);
     igraph_add_edges(state->g, &state->edgelist);
   }
+
+  l=igraph_vector_ptr_size(&state->key_list);
+  for (i=0; i<l; i++) {
+    kd=(struct igraph_i_graphml_key_data*)VECTOR(state->key_list)[i];
+    if (kd->name) Free(kd->name);
+    if (kd->default_value) Free(kd->default_value);
+  }
   
   igraph_trie_destroy(&state->node_trie);
+  igraph_trie_destroy(&state->key_trie);
+  igraph_vector_ptr_destroy_all(&state->key_list);
   igraph_vector_destroy(&state->edgelist);
 }
 
@@ -426,7 +455,7 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
   xmlChar** it;
   long int id1, id2;
   unsigned short int directed;
-  
+
   switch (state->st) {
   case START:
     /* If we are in the START state and received a graphml tag,
@@ -453,10 +482,54 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
 	}
       }
       state->index--;
+    } else if (!strcmp(name, "key")) {
+      if (!state->current_key)
+	state->current_key=Calloc(1, struct igraph_i_graphml_key_data);
+      state->current_key->name=NULL;
+      state->current_key->id=-1;
+      state->current_key->default_value=NULL;
+      state->current_key->what_for=I_GRAPHML_UNKNOWN_TARGET;
+      state->current_key->type=I_GRAPHML_UNKNOWN_TYPE;
+      for (it=(xmlChar**)attrs; *it; it+=2) {
+	if (!strcmp(*it, "id")) {
+	  igraph_trie_get(&state->key_trie, (char*)*(it+1), &state->current_key->id);
+	} else if (!strcmp(*it, "attr.name")) {
+	  state->current_key->name=strdup(*(it+1));
+	} else if (!strcmp(*it, "attr.type")) {
+	  if (!strcmp(*(it+1), "boolean")) state->current_key->type=I_GRAPHML_BOOLEAN;
+	  else if (!strcmp(*(it+1), "string")) state->current_key->type=I_GRAPHML_STRING;
+	  else if (!strcmp(*(it+1), "float")) state->current_key->type=I_GRAPHML_FLOAT;
+	  else if (!strcmp(*(it+1), "double")) state->current_key->type=I_GRAPHML_DOUBLE;
+	  else if (!strcmp(*(it+1), "int")) state->current_key->type=I_GRAPHML_INTEGER;
+	  else if (!strcmp(*(it+1), "long")) state->current_key->type=I_GRAPHML_LONG;
+	  else {
+	    // some warning here?
+	  }
+	} else if (!strcmp(*it, "for")) {
+	  if (!strcmp(*(it+1), "graph")) state->current_key->what_for=I_GRAPHML_GRAPH;
+	  else if (!strcmp(*(it+1), "node")) state->current_key->what_for=I_GRAPHML_NODE;
+	  else if (!strcmp(*(it+1), "edge")) state->current_key->what_for=I_GRAPHML_EDGE;
+	  else {
+	    // some warning here?
+	  }
+	}
+      }
+      state->st=INSIDE_KEY;
     } else
       igraph_i_graphml_handle_unknown_start_tag(state);
     break;
-      
+
+  case INSIDE_KEY:
+    /* If we are in the INSIDE_KEY state, check for default tag */
+    if (!strcmp(name, "default")) state->st=INSIDE_DEFAULT;
+    else igraph_i_graphml_handle_unknown_start_tag(state);
+    break;
+
+  case INSIDE_DEFAULT:
+    /* If we are in the INSIDE_DEFAULT state, every further tag will be unknown */
+    igraph_i_graphml_handle_unknown_start_tag(state);
+    break;
+    
   case INSIDE_GRAPH:
     /* If we are in the INSIDE_GRAPH state, check for node and edge tags */
     if (!strcmp(name, "edge")) {
@@ -494,6 +567,9 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
 	}
       }
       state->st=INSIDE_NODE;
+    } else if (!strcmp(name, "data")) {
+      state->prev_state=state->st;
+      state->st=INSIDE_DATA;
     } else
       igraph_i_graphml_handle_unknown_start_tag(state);
     break;
@@ -504,7 +580,7 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
     break;
     
   case INSIDE_EDGE:
-    /* We don't expect any tags inside node */
+    /* We don't expect any tags inside edge */
     igraph_i_graphml_handle_unknown_start_tag(state);
     break;
     
@@ -527,12 +603,36 @@ void igraph_i_graphml_sax_handler_end_element(void *state0,
     state->st=INSIDE_GRAPHML;
     break;
     
+  case INSIDE_KEY:
+    if (!state->current_key->name ||
+	(state->current_key->what_for == I_GRAPHML_UNKNOWN_TARGET) ||
+	(state->current_key->type == I_GRAPHML_UNKNOWN_TYPE)) {
+      /* some warning here? */
+    } else {
+      /* printf("Encountered new key: %s\n", state->current_key->name);
+      printf("Target: %d\n", state->current_key->what_for);
+      printf("Type: %d\n", state->current_key->type);
+      printf("Default value: %s\n", state->current_key->default_value); */
+      igraph_vector_ptr_push_back(&state->key_list, state->current_key);
+      state->current_key=NULL;
+    }
+    state->st=INSIDE_GRAPHML;
+    break;
+
+  case INSIDE_DEFAULT:
+    state->st=INSIDE_KEY;
+    break;
+    
   case INSIDE_NODE:
     state->st=INSIDE_GRAPH;
     break;
     
   case INSIDE_EDGE:
     state->st=INSIDE_GRAPH;
+    break;
+
+  case INSIDE_DATA:
+    state->st=state->prev_state;
     break;
     
   case UNKNOWN:
@@ -541,6 +641,34 @@ void igraph_i_graphml_sax_handler_end_element(void *state0,
     break;
     
   default:
+    break;
+  }
+}
+
+void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len) {
+  struct igraph_i_graphml_parser_state *state=
+    (struct igraph_i_graphml_parser_state*)state0;
+  
+  switch (state->st) {
+  case INSIDE_KEY:
+  case INSIDE_DEFAULT:
+    if (state->current_key->default_value) {
+      // continuation of character data, so append to the previous
+      state->current_key->default_value=realloc(state->current_key->default_value,
+						strlen(state->current_key->default_value)+len+1);
+      if (state->current_key->default_value)
+	strncat(state->current_key->default_value, (const char*)ch, (size_t)len);
+      // TODO: this is not really efficient, since it reallocs every time
+      // Maybe it's time to implement a string type in igraph?
+    } else 
+      state->current_key->default_value=strndup((const char*)ch, (size_t)len);
+    break;
+    
+  case INSIDE_DATA:
+    break;
+    
+  default:
+    // just ignore it
     break;
   }
 }
@@ -554,8 +682,7 @@ static xmlSAXHandler igraph_i_graphml_sax_handler={
     igraph_i_graphml_sax_handler_start_element,
     igraph_i_graphml_sax_handler_end_element,
     NULL,
-    //chars,
-    NULL,
+    igraph_i_graphml_sax_handler_chars,
     NULL, NULL, NULL,
     igraph_i_graphml_sax_handler_error,
     igraph_i_graphml_sax_handler_error,
@@ -994,3 +1121,72 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
   return 0;
 }
 
+/**
+ * \ingroup loadsave
+ * \function igraph_write_graph_graphml
+ * \brief Writes the graph to a file in GraphML format
+ *
+ * GraphML is an XML-based file format for representing various types of
+ * graphs. See the GraphML Primer (<ulink>http://graphml.graphdrawing.org/primer/graphml-primer.html</ulink>)
+ * for detailed format description.
+ * 
+ * No attributes are written at present.
+ *
+ * \param graph The graph to write. 
+ * \param outstream The stream object to write to, it should be
+ *        writable.
+ * \return Error code:
+ *         \c IGRAPH_EFILE if there is an error
+ *         writing the file. 
+ *
+ * Time complexity: O(|V|+|E|) otherwise. All
+ * file operations are expected to have time complexity 
+ * O(1). 
+ */
+int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
+  int ret;
+  integer_t l, vc;
+  igraph_es_t it;
+  
+  ret=fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  ret=fprintf(outstream, "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  ret=fprintf(outstream, "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  ret=fprintf(outstream, "         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  ret=fprintf(outstream, "         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  ret=fprintf(outstream, "<!-- Created by igraph -->\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  ret=fprintf(outstream, "  <graph id=\"G\" edgedefault=\"%s\">\n", (igraph_is_directed(graph)?"directed":"undirected"));
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  
+  /* Let's dump the nodes first */
+  vc=igraph_vcount(graph);
+  for (l=0; l<vc; l++) {
+    ret=fprintf(outstream, "    <node id=\"n%ld\" />\n", (long)l);
+    if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  }
+  
+  /* Now the edges */
+  IGRAPH_CHECK(igraph_es_all(graph, &it));
+  IGRAPH_FINALLY(igraph_es_destroy, &it);
+  while (!igraph_es_end(graph, &it)) {
+    long int from=igraph_es_from(graph, &it);
+    long int to=igraph_es_to(graph, &it);
+    ret=fprintf(outstream, "    <edge source=\"n%ld\" target=\"n%ld\" />\n", from, to);
+    if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+    igraph_es_next(graph, &it);
+  }
+  igraph_es_destroy(&it);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  ret=fprintf(outstream, "  </graph>\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  fprintf(outstream, "</graphml>\n");
+  if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+  
+  return 0;
+}

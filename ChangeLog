@@ -1,3 +1,22 @@
+2006-02-23  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/graphobject.h,
+	interfaces/python/graphobject.c : added interface for igraph_rewire
+	and igraph_write_graphml
+	* examples/simple/igraph_rewire.c,
+	examples/simple/igraph_rewire.out : added test case for igraph_rewire
+	* src/foreign.c : added igraph_write_graphml, extended
+	igraph_read_graphml to parse attribute data (but don't store it)
+	* Makefile.am : separated documentation targets
+	* src/error.c : added some debug statements
+	* src/structural_properties.c : added igraph_rewire
+	* examples/simple/test.gxl : replaced with a graph containing
+	attributes
+	* examples/simple/graphml.c : now tests igraph_write_graphml
+	* examples/simple/graphml.out : adjusted to test.gxl output
+	* src/topology.c : replaced class argument name to make it compile
+	with g++ as well
+
 2006-02-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_ncol) : added directed argument

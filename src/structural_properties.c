@@ -22,6 +22,7 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include "random.h"
 
 #include <string.h>
 
@@ -1545,6 +1546,111 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
   IGRAPH_FINALLY_CLEAN(6);
   
   if (vids->shorthand) { igraph_vs_destroy((igraph_vs_t*)vids); }
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_rewire
+ * \brief Randomly rewires a graph while preserves the degree distribution.
+ * 
+ * This function generates a new graph based on the original one by randomly
+ * rewiring edges while preserving the original graph's degree distribution.
+ * Please note that the rewiring is done "in place", so no new graph will
+ * be generated. If you would like to keep the original graph intact, use
+ * \ref igraph_copy() before.
+ * 
+ * \param graph The graph object to be rewired.
+ * \param n Number of rewiring trials to perform.
+ * \param mode The rewiring algorithm to be used. It can be one of the following:
+ *         \c IGRAPH_REWIRING_SIMPLE: simple rewiring algorithm which
+ *         chooses two arbitrary edges in each step (namely (a,b) and (c,d))
+ *         and substitutes them with (a,d) and (c,b) if they don't exist.
+ *         Time complexity: TODO.
+ * \return Error code:
+ *         \c IGRAPH_EINVMODE, invalid rewiring mode.
+ *         \c IGRAPH_EINVAL, graph unsuitable for rewiring (e.g. it has
+ *         less than 4 nodes in case of \c IGRAPH_REWIRING_SIMPLE)
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data.
+ */
+
+int igraph_rewire(igraph_t *graph, integer_t n, igraph_rewiring_t mode) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i, a, b, c, d;
+  igraph_i_adjlist_t allneis;
+  igraph_vector_t *neis[2], edgevec;
+  
+  if (mode == IGRAPH_REWIRING_SIMPLE && no_of_nodes<4)
+    IGRAPH_ERROR("graph unsuitable for rewiring", IGRAPH_EINVAL);
+  
+  RNG_BEGIN();
+  
+  igraph_i_adjlist_init(graph, &allneis, IGRAPH_OUT);
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  igraph_vector_init(&edgevec, 4);
+  IGRAPH_FINALLY(igraph_vector_destroy, &edgevec);
+  
+  while (n>0) {
+    switch (mode) {
+    case IGRAPH_REWIRING_SIMPLE:
+      a=RNG_INTEGER(0, no_of_nodes-1);
+      do { c=RNG_INTEGER(0, no_of_nodes-1); } while (c==a);
+      
+      /* We don't want the algorithm to get stuck in an infinite loop when
+       * it can't choose two edges satisfying the conditions. Instead of
+       * this, we choose two arbitrary edges and if they have endpoints
+       * in common, we just decrease the number of trials left and continue
+       * (so unsuccessful rewirings still count as a trial)
+       */
+      neis[0]=igraph_i_adjlist_get(&allneis, a);
+      i=igraph_vector_size(neis[0]);
+      if (i==0) b=c;
+      else b=VECTOR(*neis[0])[RNG_INTEGER(0, i-1)];
+      
+      neis[1]=igraph_i_adjlist_get(&allneis, c);
+      i=igraph_vector_size(neis[1]);
+      if (i==0) d=a;
+      else d=VECTOR(*neis[1])[RNG_INTEGER(0, i-1)];
+      
+      /* Okay, we have two edges. Can they be rewired?
+       * neis[0] mustn't contain d and neis[1] mustn't contain b
+       */
+      if (!igraph_vector_search(neis[0], 0, d, NULL) &&
+	  !igraph_vector_search(neis[1], 0, b, NULL) &&
+	  b!=c && a!=d && a!=b && c!=d) {
+	/* TODO: maybe it would be more efficient to implement an
+	 * igraph_replace_edges function?
+	 */
+	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=b;
+	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=d;
+	/*printf("Deleting: %d -> %d, %d -> %d\n", a, b, c, d);*/
+	igraph_delete_edges(graph, &edgevec);
+	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=d;
+	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=b;
+	/*printf("Adding: %d -> %d, %d -> %d\n", a, d, c, b);*/
+	igraph_add_edges(graph, &edgevec);
+	/* We have to adjust the adjacency list view as well.
+	   It's a luck that we have the pointers in neis[0] and neis[1] */
+	for (i=igraph_vector_size(neis[0])-1; i>=0; i--)
+	  if (VECTOR(*neis[0])[i]==b) { VECTOR(*neis[0])[i]=d; break; }
+	for (i=igraph_vector_size(neis[1])-1; i>=0; i--)
+	  if (VECTOR(*neis[1])[i]==d) { VECTOR(*neis[1])[i]=b; break; }
+      }
+      break;
+    default:
+      RNG_END();
+      IGRAPH_ERROR("unknown rewiring mode", IGRAPH_EINVMODE);
+    }
+    n--;
+  }
+  
+  igraph_i_adjlist_destroy(&allneis);
+  igraph_vector_destroy(&edgevec);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  RNG_END();
+  
   return 0;
 }
 

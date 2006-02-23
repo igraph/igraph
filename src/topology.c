@@ -620,7 +620,7 @@ unsigned int igraph_i_classedges_4[] = { 2,3, 1,3, 0,3, 3,2, 1,2, 0,2,
 					 3,1, 2,1, 0,1, 3,0, 2,0, 1,0 };
 unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
 
-int igraph_isoclass(const igraph_t *graph, int *class) {
+int igraph_isoclass(const igraph_t *graph, int *isoclass) {
   long int e;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -656,7 +656,7 @@ int igraph_isoclass(const igraph_t *graph, int *class) {
     code |= arr_idx[idx];
   }
   
-  *class=arr_code[code];
+  *isoclass=arr_code[code];
   return 0;
 }
 
@@ -670,7 +670,7 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 }
 
 int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
-			     int *class) {
+			     int *isoclass) {
   int nodes=igraph_vector_size(vids);
   bool_t directed=igraph_is_directed(graph);
   igraph_vector_t neis;
@@ -718,7 +718,7 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
     }
   }
   
-  *class=arr_code[code];
+  *isoclass=arr_code[code];
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;

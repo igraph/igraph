@@ -1947,6 +1947,34 @@ PyObject* igraphmodule_Graph_subcomponent(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Rewires a graph while preserving degree distribution
+ * \return the rewired graph
+ * \sa igraph_rewire
+ */
+PyObject* igraphmodule_Graph_rewire(igraphmodule_GraphObject *self,
+				    PyObject *args,
+				    PyObject *kwds) {
+  char *kwlist[] = {"n", "mode", NULL};
+  long n=1000;
+  igraph_rewiring_t mode = IGRAPH_REWIRING_SIMPLE;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ll", kwlist,
+				   &n, &mode)) return NULL;
+  
+   if (mode!=IGRAPH_REWIRING_SIMPLE) {
+     PyErr_SetString(PyExc_ValueError, "mode must be REWIRING_SIMPLE");
+     return NULL;
+   }
+   
+  if (igraph_rewire(&self->g, n, mode)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  Py_INCREF(self);
+  return self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Returns a subgraph of the graph based on the given vertices
  * \return the subgraph as a new igraph object
  * \sa igraph_subgraph

@@ -34,3 +34,8 @@ AT_SETUP([Google PageRank (igraph_pagerank): ])
 AT_KEYWORDS([igraph_pagerank])
 AT_COMPILE_CHECK([simple/igraph_pagerank.c], [simple/igraph_pagerank.out])
 AT_CLEANUP
+
+AT_SETUP([Random rewiring (igraph_rewire): ])
+AT_KEYWORDS([igraph_rewire])
+AT_COMPILE_CHECK([simple/igraph_rewire.c], [simple/igraph_rewire.out])
+AT_CLEANUP

@@ -4,13 +4,13 @@ if DOCS
 endif
 
 SUBDIRS=src interfaces debian tests $(MAYBE_DOCS)
+DOC_FILES = doc/html doc/igraph-docs.info doc/igraph-docs.pdf
 
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
 
-EXTRA_DIST = igraph.pc include/* \
-	doc/html doc/igraph-docs.info doc/igraph-docs.pdf \
-	examples tests interfaces
+EXTRA_DIST = igraph.pc include/* $(DOC_FILES) \
+	examples tests
 
 MAINTAINERCLEANFILES = Makefile.in
 
