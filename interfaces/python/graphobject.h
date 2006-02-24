@@ -99,6 +99,7 @@ PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type, PyObject *args, Py
 PyObject* igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_ncol(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_lgl(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_write_graphml(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self);
 PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self, PyObject* s);
@@ -900,11 +901,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "           don't want to store vertex names, supply None here.\n"
       "weights -- the name of the edge attribute containing the weight\n"
       "           of the vertices. Optional, defaults to 'weight'. If you\n"
-      "           don't want to store weights, supply None here.\n\n"
-      "PLEASE NOTE THAT IT IS VITAL TO SUPPLY CORRECT 'names' AND 'weights'\n"
-      "PARAMETERS, otherwise the underlying igraph library will segfault\n"
-      "when it tries to reach nonexistent attributes. This issue will be\n"
-      "corrected soon.\n"
+      "           don't want to store weights, supply None here.\n"
   },
   // interface to igraph_write_graph_lgl
   {"write_lgl", (PyCFunction)igraphmodule_Graph_write_lgl,
@@ -923,11 +920,14 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "            of the vertices. Optional, defaults to 'weight'. If you\n"
       "            don't want to store weights, supply None here.\n"
       "isolates -- whether to include isolated vertices in the output.\n"
-      "            Optional, defaults to True.\n\n"
-      "PLEASE NOTE THAT IT IS VITAL TO SUPPLY CORRECT 'names' AND 'weights'\n"
-      "PARAMETERS, otherwise the underlying igraph library will segfault\n"
-      "when it tries to reach nonexistent attributes. This issue will be\n"
-      "corrected soon.\n"
+      "            Optional, defaults to True.\n"
+  },
+  // interface to igraph_write_graph_edgelist
+  {"write_graphml", (PyCFunction)igraphmodule_Graph_write_graphml,
+      METH_VARARGS | METH_KEYWORDS,
+      "Writes the graph to a GraphML file.\n\n"
+      "Keyword arguments:\n"
+      "f -- the name of the file to be written\n"
   },
 
   ////////////////////////

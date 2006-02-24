@@ -1,3 +1,19 @@
+2006-02-24  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/common.h : compatibility changes to make it
+	compile with Python 2.3
+	* interfaces/python/graphobject.h : slight documentation corrections
+	* interfaces/python/graphobject.c : added igraphmodule_Graph_write_graphml
+	* interfaces/python/igraphmodule.c : added function for replacing
+	progress handler
+	* src/progress.c : now the default progress handler is empty
+	* src/layout.c : reports progress of KK and FR layout
+	* src/other.c : added function to calculate convex hull
+	* tests/testsuite.at, tests/other.at : added test case for
+	convex hulls
+	* examples/simple/igraph_convex_hull.c,
+	examples/simple/igraph_convex_hull.out : added
+	
 2006-02-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/operators.c (igraph_union, igraph_union_many) : added

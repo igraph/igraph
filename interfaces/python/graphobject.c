@@ -2745,6 +2745,42 @@ PyObject* igraphmodule_Graph_write_lgl(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Writes the graph to a GraphML file
+ * \return none
+ * \sa igraph_write_graph_graphml
+ */
+PyObject* igraphmodule_Graph_write_graphml(igraphmodule_GraphObject *self,
+					   PyObject *args,
+					   PyObject *kwds)
+{
+  char* fname=NULL;
+  FILE* f;
+  
+  char *kwlist[] =
+  {
+    "f", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+     return NULL;
+      
+  f=fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_write_graph_graphml(&self->g, f))
+  {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  fclose(f);
+  
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface_graph
  * \brief Returns the number of graph attributes
  */
 int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self) {

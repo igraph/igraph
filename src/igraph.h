@@ -154,7 +154,9 @@ typedef enum { IGRAPH_TRANSITIVITY_UNDIRECTED=0 } igraph_transitivity_type_t;
 
 typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
 	       IGRAPH_FILEFORMAT_NCOL,
-	       IGRAPH_FILEFORMAT_PAJEK } igraph_fileformat_type_t;
+	       IGRAPH_FILEFORMAT_PAJEK,
+               IGRAPH_FILEFORMAT_LGL,
+               IGRAPH_FILEFORMAT_GRAPHML } igraph_fileformat_type_t;
 
 typedef enum { IGRAPH_REWIRING_SIMPLE=0 } igraph_rewiring_t;
 
@@ -690,6 +692,8 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
 			integer_t binwidth);
 int igraph_random_sample(igraph_vector_t *res, integer_t l, integer_t h, 
 			 integer_t length);
+int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *res,
+		       bool_t coords);
 
 /* -------------------------------------------------- */
 /* For internal use only, should move to other header */

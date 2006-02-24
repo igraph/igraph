@@ -1568,11 +1568,15 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
  *         and substitutes them with (a,d) and (c,b) if they don't exist.
  *         Time complexity: TODO.
  * \return Error code:
- *         \c IGRAPH_EINVMODE, invalid rewiring mode.
- *         \c IGRAPH_EINVAL, graph unsuitable for rewiring (e.g. it has
- *         less than 4 nodes in case of \c IGRAPH_REWIRING_SIMPLE)
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
+ *         \clist
+ *           \cli IGRAPH_EINVMODE
+ *                Invalid rewiring mode.
+ *           \cli IGRAPH_EINVAL
+ *                Graph unsuitable for rewiring (e.g. it has
+ *                less than 4 nodes in case of \c IGRAPH_REWIRING_SIMPLE)
+ *           \cli IGRAPH_ENOMEM
+ *                Not enough memory for temporary data.
+ *         \endclist
  */
 
 int igraph_rewire(igraph_t *graph, integer_t n, igraph_rewiring_t mode) {

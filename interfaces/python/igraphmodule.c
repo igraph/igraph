@@ -81,12 +81,43 @@ help(igraph.Graph)
  *    references.
  */
 
+static PyObject* igraphmodule_progress_handler=NULL;
+
+int igraphmodule_igraph_progress_hook(const char* message, real_t percent,
+				       void* data) {
+  /* Look up _progress_handler in module namespace */
+  if (igraphmodule_progress_handler) {
+    PyObject *result;
+    if (PyCallable_Check(igraphmodule_progress_handler)) {
+      result=PyObject_CallFunction(igraphmodule_progress_handler,
+				   "sd", message, (double)percent);
+      Py_DECREF(result);
+    }
+  }
+  
+  return 0;
+}
+
+PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
+  PyObject* o;
+  if (!PyArg_ParseTuple(args, "O", &o)) return NULL;
+  if (!PyCallable_Check(o)) {
+    PyErr_SetString(PyExc_TypeError, "Progress handler must be callable.");
+    return NULL;
+  }
+  igraphmodule_progress_handler=o;
+  Py_RETURN_NONE;
+}
+
 /** \ingroup python_interface
  * \brief Method table for the igraph Python module
  */
 static PyMethodDef igraphmodule_methods[] = 
 {
-   {NULL, NULL, 0, NULL}
+  {"set_progress_handler", igraphmodule_set_progress_handler, METH_VARARGS,
+      "Sets the handler to be called when igraph is performing a long operation."
+  },
+  {NULL, NULL, 0, NULL}
 };
 
 #ifndef PyMODINIT_FUNC
@@ -158,6 +189,7 @@ initigraph(void)
   PyModule_AddIntConstant(m, "GET_ADJACENCY_BOTH", IGRAPH_GET_ADJACENCY_BOTH);
   PyModule_AddIntConstant(m, "REWIRING_SIMPLE", IGRAPH_REWIRING_SIMPLE);
   
-  /// initialize error handler
+  /* initialize error and progress handler */
   igraph_set_error_handler(igraphmodule_igraph_error_hook);
+  igraph_set_progress_handler(igraphmodule_igraph_progress_hook);
 }

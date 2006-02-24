@@ -249,6 +249,11 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
   frk=sqrt(area/no_of_nodes);
 
   for(i=niter;i>0;i--) {
+    /* Report progress in approx. every 100th step */
+    if (i%100 == 0)
+      igraph_progress("Fruchterman-Reingold layout: ",
+		      100.0-100.0*i/niter, NULL);
+    
     /* Set the temperature (maximum move/iteration) */
     t=maxdelta*pow(i/(double)niter,coolexp);
     /* Clear the deltas */
@@ -499,6 +504,10 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   /*Perform the annealing loop*/
   temp=initemp;
   for(i=0;i<niter;i++){
+    /* Report progress in approx. every 100th step */
+    if (i%100 == 0)
+      igraph_progress("Kamada-Kawai layout: ",
+		      100.0*i/niter, NULL);
     /*Update each vertex*/
     for(j=0;j<n;j++){
       /*Draw the candidate via a gaussian perturbation*/

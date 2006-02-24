@@ -504,7 +504,7 @@ int igraph_vector_push_back (igraph_vector_t* v, real_t e) {
  * vector. \ref igraph_vector_e_ptr() returns the address of an element.</para>
  * 
  * <para>\ref igraph_vector_tail() returns the last element of a non-empty
- * vector. There is no <function>igraph_vector_tail()</function> function
+ * vector. There is no <function>igraph_vector_head()</function> function
  * however, as it is easy to write <code>VECTOR(v)[0]</code>
  * instead.</para>
  */

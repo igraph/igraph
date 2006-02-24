@@ -1,4 +1,4 @@
-# Process this file with autom4te to create testsuite. -*- Autotest -*-
+# Check functions for other miscellaneous functions
 
 # Test suite for the IGraph library.
 # Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -18,23 +18,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-AT_INIT([igraph])
+AT_BANNER([[Miscellaneous functions]])
 
-m4_define([AT_COMPILE_CHECK], [
-AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph $top_srcdir/examples/$1 -o itest])
-AT_CHECK([m4_if([[$2]],[[]],[[>expout]],[[cp $top_srcdir/examples/'$2' expout]])])
-AT_CHECK([m4_if([[$3]],[[]],[[]],[[cp $top_srcdir/examples/'$3' .]])])
-AT_CHECK([LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$top_srcdir/src/.libs ./itest], [], [expout])])
+AT_SETUP([Convex hull calculation (igraph_convex_hull):])
+AT_KEYWORDS([igraph_convex_hull other])
+AT_COMPILE_CHECK([simple/igraph_convex_hull.c], [simple/igraph_convex_hull.out])
+AT_CLEANUP
 
-m4_include([types.at])
-m4_include([basic.at])
-m4_include([iterators.at])
-m4_include([structure_generators.at])
-m4_include([structural_properties.at])
-m4_include([components.at])
-m4_include([layout.at])
-m4_include([visitors.at])
-m4_include([topology.at])
-m4_include([motifs.at])
-m4_include([foreign.at])
-m4_include([other.at])
+AT_SETUP([GraphML (igraph_read_graph_graphml):])
+AT_KEYWORDS([igraph_read_graph_graphml foreign graphml])
+AT_COMPILE_CHECK([simple/graphml.c], [simple/graphml.out], [simple/test.gxl])
+AT_CLEANUP
+
+AT_SETUP([Writing LGL (igraph_write_graph_lgl):])
+AT_KEYWORDS([igraph_write_graph_lgl foreign LGL])
+AT_COMPILE_CHECK([simple/igraph_write_graph_lgl.c])
+AT_CLEANUP
