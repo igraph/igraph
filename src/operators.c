@@ -49,8 +49,8 @@ int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right) {
   }
   for (i=0; i<no_of_edges_right; i++) {
     igraph_edge(right, i, &from, &to);
-    igraph_vector_push_back(&edges, from+no_of_edges_left);
-    igraph_vector_push_back(&edges, to+no_of_edges_right);
+    igraph_vector_push_back(&edges, from+no_of_nodes_left);
+    igraph_vector_push_back(&edges, to+no_of_nodes_left);
   }
   
   IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes_left+no_of_nodes_right, 

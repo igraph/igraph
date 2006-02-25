@@ -756,6 +756,41 @@ for i in l:
 del i
 del l
 
+section("Graph operators")
+
+start("Union of graphs")
+g=igraph.Graph.Tree(10, 3) | igraph.Graph(edges=[(0, 1), (2, 1)])
+l=g.get_edgelist()
+l.sort()
+test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
+
+start("Union of graph and number (should fail)")
+try:
+    g=g | 2
+except TypeError:
+    ok()
+else:
+    fail()
+
+start("In-place union")
+g = igraph.Graph.Tree(10, 3)
+g |= igraph.Graph(edges=[(0, 1), (2, 1)])
+l=g.get_edgelist()
+l.sort()
+test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
+
+start("Multiple union")
+g = igraph.Graph.Tree(10, 3).union([igraph.Graph.Tree(8, 2), igraph.Graph.Full(5)])
+ok()
+
+section("Miscellaneous functions")
+
+vs = [[3, 2], [5, 1], [4, 4], [6, 4], [4, 3], [2, 5], [1, 3], [2, 4], [6, 3], [9, 2]];
+start("Convex hull test #1")
+test(igraph.convex_hull(vs) == [1, 6, 5, 3, 9])
+start("Convex hull test #2")
+test(igraph.convex_hull(vs, True) == [(5, 1), (1, 3), (2, 5), (6, 4), (9, 2)])
+
 results()
 
 print "\nTesting for possible leaks..."

@@ -1,3 +1,10 @@
+2006-02-25  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+        * interfaces/python/graphobject.c : added igraphmodule_Graph_union
+	* src/operators.c : corrected igraph_union bug
+	* interfaces/python/igraphobject.c : added igraphmodule_convex_hull
+	* interfaces/python/test.py : added new test cases
+
 2006-02-24  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/common.h : compatibility changes to make it

@@ -1971,7 +1971,7 @@ PyObject* igraphmodule_Graph_rewire(igraphmodule_GraphObject *self,
   }
   
   Py_INCREF(self);
-  return self;
+  return (PyObject*)self;
 }
 
 /** \ingroup python_interface_graph
@@ -3018,6 +3018,63 @@ PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* clo
   return self->eseq;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Creates the union of two graphs (operator version)
+ */
+PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other) {
+  PyObject *t, *it;
+  igraphmodule_GraphObject *o, *result;
+  igraph_t g;
+  
+  /* Did we receive an iterable? */
+  it=PyObject_GetIter(other);
+  if (it) {
+    /* Get all elements, store the graphs in an igraph_vector_ptr */
+    igraph_vector_ptr_t gs;
+    if (igraph_vector_ptr_init(&gs, 0)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    
+    while (t=PyIter_Next(it)) {
+      if (!PyObject_TypeCheck(t, &igraphmodule_GraphType)) {
+	PyErr_SetString(PyExc_TypeError, "iterable argument must contain graphs");
+	igraph_vector_ptr_destroy(&gs);
+	return NULL;
+      }
+      igraph_vector_ptr_push_back(&gs, &((igraphmodule_GraphObject*)t)->g);
+    }
+
+    /* Create union */
+    if (igraph_union_many(&g, &gs)) {
+      igraph_vector_ptr_destroy(&gs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    
+    igraph_vector_ptr_destroy(&gs);
+  } else {
+    PyErr_Clear();
+    if (!PyObject_TypeCheck(other, &igraphmodule_GraphType)) {
+      Py_INCREF(Py_NotImplemented);
+      return Py_NotImplemented;
+    }
+    o=(igraphmodule_GraphObject*)other;
+  
+    if (igraph_union(&g, &self->g, &o->g)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
 /** \defgroup python_interface_internal Internal functions
  * \ingroup python_interface */
 
@@ -3083,6 +3140,46 @@ PyMappingMethods igraphmodule_Graph_as_mapping = {
   (objobjargproc)igraphmodule_Graph_set_attribute
 };
 
+/** \ingroup python_interface
+ * \brief Collection of methods to allow numeric operators to be used on the graph
+ */
+PyNumberMethods igraphmodule_Graph_as_number = {
+  0,	/*nb_add*/
+    0,	/*nb_subtract*/
+    0,	/*nb_multiply*/
+    0,	/*nb_divide*/
+    0,	/*nb_remainder*/
+    0,	/*nb_divmod*/
+    0,	/*nb_power*/
+    0,	/*nb_negative*/
+    0,	/*nb_positive*/
+    0,	/*nb_absolute*/
+    0,	/*nb_nonzero*/
+    0,	/*nb_invert*/
+    0,	/*nb_lshift*/
+    0,	/*nb_rshift*/
+    0,	/*nb_and*/
+    0,	/*nb_xor*/
+    (binaryfunc)igraphmodule_Graph_union,	/*nb_or*/
+    0,	/*nb_coerce*/
+    0,	/*nb_int*/
+    0,	/*nb_long*/
+    0,	/*nb_float*/
+    0,	/*nb_oct*/
+    0, 	/*nb_hex*/
+    0,	/*nb_inplace_add*/
+    0,	/*nb_inplace_subtract*/
+    0,	/*nb_inplace_multiply*/
+    0,	/*nb_inplace_divide*/
+    0,	/*nb_inplace_remainder*/
+    0,	/*nb_inplace_power*/
+    0,	/*nb_inplace_lshift*/
+    0,	/*nb_inplace_rshift*/
+    0,	/*nb_inplace_and*/
+    0,	/*nb_inplace_xor*/
+    0,	/*nb_inplace_or*/
+};
+
 /** \ingroup python_interface_graph
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
@@ -3098,7 +3195,7 @@ PyTypeObject igraphmodule_GraphType = {
   0,                                        // tp_setattr
   0,                                        // tp_compare
   0,                                        // tp_repr
-  0,                                        // tp_as_number
+  &igraphmodule_Graph_as_number,            // tp_as_mapping
   0,                                        // tp_as_sequence
   &igraphmodule_Graph_as_mapping,           // tp_as_mapping
   0,                                        // tp_hash

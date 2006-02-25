@@ -111,6 +111,8 @@ PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self, PyO
 PyObject* igraphmodule_Graph_get_vertices(igraphmodule_GraphObject* self, void* closure);
 PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* closure);
 
+PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other);
+
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
@@ -944,6 +946,13 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   {"edge_attributes", (PyCFunction)igraphmodule_Graph_edge_attributes,
       METH_NOARGS,
       "Returns the attribute list of the graph's edges\n"
+  },
+
+  ///////////////
+  // OPERATORS //
+  ///////////////
+  {"union", (PyCFunction)igraphmodule_Graph_union,
+      METH_O, "Creates the union of two (or more) graphs"
   },
   
   ////////////////////////////////////

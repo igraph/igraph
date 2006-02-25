@@ -98,6 +98,7 @@ int igraphmodule_igraph_progress_hook(const char* message, real_t percent,
   return 0;
 }
 
+
 PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
   PyObject* o;
   if (!PyArg_ParseTuple(args, "O", &o)) return NULL;
@@ -109,11 +110,105 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
   Py_RETURN_NONE;
 }
 
+
+PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwds) {
+  const char* kwlist[] = {"vs", "coords", NULL};
+  PyObject *vs, *o, *o1, *o2, *coords = Py_False;
+  igraph_matrix_t mtrx;
+  igraph_vector_t result;
+  long no_of_nodes, i;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O", kwlist, &PyList_Type, &vs, &coords))
+    return NULL;
+  
+  no_of_nodes=PyList_Size(vs);
+  if (igraph_matrix_init(&mtrx, no_of_nodes, 2)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  for (i=0; i<no_of_nodes; i++) {
+    o=PyList_GetItem(vs, i);
+    if (PyList_Check(o)) {
+      if (PyList_Size(o) >= 2) {
+	o1=PyList_GetItem(o, 0);
+	o2=PyList_GetItem(o, 1);
+	if (PyList_Size(o) > 2)
+	  PyErr_Warn(PyExc_Warning, "vertex with more than 2 coordinates found, considering only the first 2");
+      } else {
+	PyErr_SetString(PyExc_TypeError, "vertex with less than 2 coordinates found");
+	igraph_matrix_destroy(&mtrx);
+	return NULL;
+      }
+    } else if (PyTuple_Check(o)) {
+      if (PyTuple_Size(o) >= 2) {
+	o1=PyTuple_GetItem(o, 0);
+	o2=PyTuple_GetItem(o, 1);
+	if (PyTuple_Size(o) > 2)
+	  PyErr_Warn(PyExc_Warning, "vertex with more than 2 coordinates found, considering only the first 2");
+      } else {
+	PyErr_SetString(PyExc_TypeError, "vertex with less than 2 coordinates found");
+	igraph_matrix_destroy(&mtrx);
+	return NULL;
+      }
+    }
+    
+    if (!PyNumber_Check(o1) || !PyNumber_Check(o2)) {
+      PyErr_SetString(PyExc_TypeError, "vertex coordinates must be numeric");
+      igraph_matrix_destroy(&mtrx);
+      return NULL;
+    }
+    /* o, o1 and o2 were borrowed, but now o1 and o2 are actual references! */
+    o1=PyNumber_Float(o1); o2=PyNumber_Float(o2);
+    if (!o1 || !o2) {
+      PyErr_SetString(PyExc_TypeError, "vertex coordinate conversion to float failed");
+      Py_XDECREF(o1);
+      Py_XDECREF(o2);
+      igraph_matrix_destroy(&mtrx);
+      return NULL;
+    }
+    MATRIX(mtrx, i, 0)=(real_t)PyFloat_AsDouble(o1);
+    MATRIX(mtrx, i, 1)=(real_t)PyFloat_AsDouble(o2);
+    Py_DECREF(o1);
+    Py_DECREF(o2);
+  }
+
+  if (igraph_vector_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&mtrx);
+    return NULL;
+  }
+  
+  if (igraph_convex_hull(&mtrx, &result, PyObject_IsTrue(coords))) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&mtrx);
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+  
+  if (PyObject_IsTrue(coords))
+    o=igraphmodule_vector_t_to_PyList_pairs(&result);
+  else
+    o=igraphmodule_vector_t_to_PyList(&result);
+  
+  igraph_matrix_destroy(&mtrx);
+  igraph_vector_destroy(&result);
+
+  return o;
+}
+
 /** \ingroup python_interface
  * \brief Method table for the igraph Python module
  */
 static PyMethodDef igraphmodule_methods[] = 
 {
+  {"convex_hull", igraphmodule_convex_hull, METH_VARARGS,
+      "Calculates the convex hull of a given point set\n\n"
+      "Keyword arguments:\n"
+      "vs     -- the point set as a list of lists\n"
+      "coords -- if True, the function returns the coordinates of the\n"
+      "          corners of the convex hull polygon, otherwise returns\n"
+      "          the corner indices. Optional, defaults to False."
+  },
   {"set_progress_handler", igraphmodule_set_progress_handler, METH_VARARGS,
       "Sets the handler to be called when igraph is performing a long operation."
   },
