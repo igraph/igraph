@@ -3046,7 +3046,7 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
     }
 
     /* Create union */
-    if (igraph_union_many(&g, &gs)) {
+    if (igraph_disjoint_union_many(&g, &gs)) {
       igraph_vector_ptr_destroy(&gs);
       igraphmodule_handle_igraph_error();
       return NULL;
@@ -3061,7 +3061,7 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
     }
     o=(igraphmodule_GraphObject*)other;
   
-    if (igraph_union(&g, &self->g, &o->g)) {
+    if (igraph_disjoint_union(&g, &self->g, &o->g)) {
       igraphmodule_handle_igraph_error();
       return NULL;
     }

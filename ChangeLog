@@ -1,3 +1,9 @@
+2006-02-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/operators.c (igraph_disjoint_union) : bug corrected
+	* interfaces/python/graphobject.c (igraphmodule_Graph_union) :
+	updated to refer to disjoint union
+
 2006-02-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/operators.c (igraph_union, igraph_union_many) : added
