@@ -1,5 +1,14 @@
 2006-02-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/operators.c (igraph_union, igraph_union_many) : added
+	(igraph_intersect) : make error check first
+	(igraph_intersect) : removed memory leak
+	(igraph_intersect_many) : # vertices is inherited from biggest graph
+	* examples/simple/igraph_union.c : added
+	* examples/simple/igraph_intersection.c : updated
+
+2006-02-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/operators.c (igraph_union, igraph_disjoint_union) :
 	igraph_union renamed to igraph_disjoint_union
 	(igraph_union_many, igraph_disjoint_union_many) : 

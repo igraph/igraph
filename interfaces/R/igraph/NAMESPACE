@@ -118,4 +118,5 @@ export(graph.isoclass, graph.isomorphic, graph.motifs,
 
 # operators
 
-export(graph.union, "%du%", graph.intersection, "%s%")
+export(graph.disjoint.union, "%du%", graph.intersection, "%s%",
+       graph.union, "%u%")

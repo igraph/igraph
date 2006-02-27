@@ -1,5 +1,14 @@
 2006-02-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/operators.R 
+	(igraph.union, igraph.disjoint.union) : first renamed to second 
+	(igraph.union, "%u%") : added
+	* interfaces/R/src/rinterface.c	
+	(R_igraph_union, R_igraph_disjoint_union) : first renamed to second
+	(R_igraph_union) : added
+	
+2006-02-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* interfaces/R/igraph/R/operators.R (graph.intersection, "%s%") : added
 	("%u%", "%du%") : "%u%" renamed to "%du%"
 	* interfaces/R/src/rinterface.c (R_igraph_intersection) : added

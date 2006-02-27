@@ -19,7 +19,7 @@
 #
 ###################################################################
 
-graph.union <- function(...) {
+graph.disjoint.union <- function(...) {
 
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
     if (is.igraph(l)) list(l) else l
@@ -30,6 +30,20 @@ graph.union <- function(...) {
 }
 
 "%du%" <- function(x,y) {
+  graph.disjoint.union(x,y)
+}
+
+graph.union <- function(...) {
+
+  graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
+    if (is.igraph(l)) list(l) else l
+  } ))
+  
+  .Call("R_igraph_union", graphs,
+        PACKAGE="igraph")
+}
+
+"%u%" <- function(x,y) {
   graph.union(x,y)
 }
 

@@ -56,7 +56,7 @@ int main() {
   VECTOR(glist)[1]=&g2;
   VECTOR(glist)[2]=&g3;
   igraph_intersection_many(&isec, &glist);
-  if (igraph_ecount(&isec) != 0 || igraph_vcount(&isec) != 4) {
+  if (igraph_ecount(&isec) != 0 || igraph_vcount(&isec) != 10) {
     return 2;
   }
   igraph_destroy(&g1);

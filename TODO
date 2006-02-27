@@ -1,10 +1,23 @@
 
-o R interface for some functions: page rank, etc.
-o get non-structural info from Pajek files
-o get (exact) number of motifs
-o topological equaivalence of graphs
+Needed for 0.2:
+
+o uniform graph operators (union, intersection, etc...)
+o rewrite attributes
+o merging layouts properly, multicompartmental layout functions
 o make CTRL+C work in R
 o better random number generator handling (init with seed, etc...)
+o rewrite iterators
+o R interface to all (sensible) functions
+o proper documentation (docbook & R) for all (sensible) functions
+o get (exact) number of motifs
+o get non-structural info from Pajek files
+o write Pajek file
+o read and write non-structural info from/to GraphML files
+o better looking graphs in 3D in the R interface
+
+Other bits:
+
+o topological equaivalence of graphs (hard)
 o make possible building in separate directory (make check, r package,
   make dist do not work)
 o write tutorial
@@ -13,10 +26,8 @@ o add some iterators: in-, pre-, post-order, depth-first, breadth-first
 o add methods for reading & saving a file together with its attributes
 o add conversion methods for different file formats
 o community detection algorithms
-o multicompartmental layout functions
-o function for merge networks
 o add data sets to the R package
-o add automatic tests
+o add automatic tests, add valgrind option to tests (?)
 o make docs look better: index, section tocs
 o make better and faster doxrox engine
 o create man pages

@@ -666,6 +666,8 @@ igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
 int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right);
 int igraph_disjoint_union_many(igraph_t *res, igraph_vector_ptr_t *graphs);
+int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right);
+int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs);
 int igraph_intersection(igraph_t *res, igraph_t *left, igraph_t *right);
 int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs);
 
