@@ -22,8 +22,9 @@
 
 #include "igraph.h"
 #include "error.h"
+#include "memory.h"
 
-int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right) {
+int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right) {
 
   long int no_of_nodes_left=igraph_vcount(left);
   long int no_of_nodes_right=igraph_vcount(right);
@@ -60,7 +61,7 @@ int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right) {
   return 0;
 }
 
-int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
+int igraph_disjoint_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
   bool_t directed=1;
   igraph_vector_t edges;
@@ -101,5 +102,203 @@ int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   IGRAPH_CHECK(igraph_create(res, &edges, shift, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+int igraph_intersection(igraph_t *res, igraph_t *left, igraph_t *right) {
+  
+  long int no_of_nodes_left=igraph_vcount(left);
+  long int no_of_nodes_right=igraph_vcount(right);
+  long int no_of_nodes;
+  long int smaller_nodes;
+  bool_t directed=igraph_is_directed(left);
+  igraph_vector_t edges;
+  igraph_vector_t nei1, nei2;
+  long int i,j1,j2,n1,n2;
+  integer_t v1, v2;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&nei1, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&nei2, 0);
+
+  no_of_nodes= no_of_nodes_left > no_of_nodes_right ? 
+    no_of_nodes_left : no_of_nodes_right;
+  smaller_nodes= no_of_nodes_left < no_of_nodes_right ? 
+    no_of_nodes_left : no_of_nodes_right;
+
+  if (directed != igraph_is_directed(right)) {
+    IGRAPH_ERROR("Cannot intersect directed and undirected graph",
+		 IGRAPH_EINVAL);
+  }
+
+  for (i=0; i<smaller_nodes; i++) {
+    IGRAPH_CHECK(igraph_neighbors(left, &nei1, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(right, &nei2, i, IGRAPH_OUT));
+    igraph_vector_sort(&nei1);
+    igraph_vector_sort(&nei2);
+    if (!directed) {
+      igraph_vector_filter_smaller(&nei1, i);
+      igraph_vector_filter_smaller(&nei2, i);
+    }
+    n1=igraph_vector_size(&nei1);
+    n2=igraph_vector_size(&nei2);
+    j1=j2=0;
+    while (j1<n1 && j2<n2) {
+      v1=VECTOR(nei1)[j1]; v2=VECTOR(nei2)[j2];
+      if (v1 < v2) {
+	j1++;
+      } else if (v1 > v2) {
+	j2++; 
+      } else {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+	j1++; 
+	j2++;
+      }
+    }
+  }
+
+  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&nei1);
+  igraph_vector_destroy(&nei2);
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}
+
+void igraph_i_intersection_many_free(igraph_vector_ptr_t *v) {
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) { 
+    if (VECTOR(*v)[i] != 0) {
+      igraph_vector_destroy(VECTOR(*v)[i]);
+    }
+  }
+  igraph_vector_ptr_destroy(v);
+}
+
+int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
+
+  long int no_of_graphs=igraph_vector_ptr_size(graphs);
+  long int no_of_nodes=0;
+  bool_t directed=1;
+  igraph_vector_t edges;
+  igraph_vector_ptr_t neivects;
+  igraph_vector_t neiptr;
+  long int i, j;
+  
+  /* Check directedness */
+  if (no_of_graphs != 0) {
+    directed=igraph_is_directed(VECTOR(*graphs)[0]);
+    no_of_nodes=igraph_vcount(VECTOR(*graphs)[0]);
+  }
+  for (i=1; i<no_of_graphs; i++) {
+    if (directed != igraph_is_directed(VECTOR(*graphs)[i])) {
+      IGRAPH_ERROR("Cannot intersect directed and undirected graphs",
+		   IGRAPH_EINVAL);
+    }
+  }
+
+  /* Calculate number of nodes */
+  for (i=0; i<no_of_graphs; i++) {
+    long int n=igraph_vcount(VECTOR(*graphs)[i]);
+    if (n < no_of_nodes) {
+      no_of_nodes=n;
+    }
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&neiptr, no_of_graphs);
+
+  /* Init neighbor vectors */
+  if (no_of_graphs != 0) {
+    IGRAPH_CHECK(igraph_vector_ptr_init(&neivects, no_of_graphs));
+    IGRAPH_FINALLY(igraph_i_intersection_many_free, &neivects);
+  }
+  for (i=0; i<no_of_graphs; i++) {
+    VECTOR(neivects)[i]=Calloc(1, igraph_vector_t);
+    if (VECTOR(neivects)[i]==0) { 
+      IGRAPH_ERROR("Cannot intersect graphs", IGRAPH_ENOMEM);
+    }
+    IGRAPH_CHECK(igraph_vector_init(VECTOR(neivects)[i], 0));
+  }
+
+  /* Main part */
+  for (i=0; i<no_of_nodes; i++) {
+    bool_t l;
+    
+    /* get neighbors */
+    for (j=0; j<no_of_graphs; j++) {
+      IGRAPH_CHECK(igraph_neighbors(VECTOR(*graphs)[j], VECTOR(neivects)[j], i,
+				    IGRAPH_OUT));
+      igraph_vector_sort(VECTOR(neivects)[j]);
+      if (!directed) {
+	igraph_vector_filter_smaller(VECTOR(neivects)[j], i);
+      }
+    }
+    igraph_vector_null(&neiptr);
+
+    /* check if there are more edges */
+    l=1; j=0;
+    while (l && j<no_of_graphs) {
+      l = VECTOR(neiptr)[j] < igraph_vector_size(VECTOR(neivects)[j]);
+      j++;
+    }
+
+    while (l) {
+      
+      /* get largest head element and decide whether all head elements
+	 are the same */
+      bool_t k=1;
+      long int head=VECTOR(*(igraph_vector_t*)VECTOR(neivects)[0])
+	[(long int)VECTOR(neiptr)[0]];
+      long int maxhead=head;
+      for (j=1; j<no_of_graphs; j++) {
+	long int h=VECTOR(*(igraph_vector_t*)VECTOR(neivects)[j])
+	  [(long int)VECTOR(neiptr)[j]];
+	k= (k && head==h);
+	if (h > maxhead) {
+	  maxhead=h;
+	}
+      }
+      
+      /* add edge if common, remove head elements */
+      if (k) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, head));
+	for (j=0; j<no_of_graphs; j++) {
+	  VECTOR(neiptr)[j] += 1;
+	}
+      } else {
+	for (j=0; j<no_of_graphs; j++) {
+	  while (VECTOR(neiptr)[j] < igraph_vector_size(VECTOR(neivects)[j]) &&
+		 VECTOR(*(igraph_vector_t*)VECTOR(neivects)[j])
+		 [ (long int) VECTOR(neiptr)[j]] < maxhead){
+	    VECTOR(neiptr)[j] += 1;
+	  }
+	}
+      }
+
+      /* update l, check if there are more edges */
+      l=1; j=0;
+      while (l && j<no_of_graphs) {
+	l = VECTOR(neiptr)[j] < igraph_vector_size(VECTOR(neivects)[j]);
+	j++;
+      }
+      
+    }
+  }
+      
+  if (no_of_graphs != 0) {
+    for (i=0; i<no_of_graphs; i++) {
+      igraph_vector_destroy(VECTOR(neivects)[i]);
+    }
+    igraph_vector_ptr_destroy(&neivects);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&neiptr);
+  IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }

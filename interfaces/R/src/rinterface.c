@@ -3119,7 +3119,7 @@ SEXP R_igraph_union(SEXP pgraphs) {
     R_SEXP_to_igraph(VECTOR_ELT(pgraphs, i), &graphs[i]);
     VECTOR(ptrvec)[i]=&graphs[i];
   }
-  igraph_union_many(&res, &ptrvec);
+  igraph_disjoint_union_many(&res, &ptrvec);
   igraph_vector_ptr_destroy(&ptrvec);
   PROTECT(result=R_igraph_to_SEXP(&res));
   igraph_destroy(&res);
@@ -3129,3 +3129,32 @@ SEXP R_igraph_union(SEXP pgraphs) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_intersection(SEXP pgraphs) {
+  
+  igraph_vector_ptr_t ptrvec;
+  igraph_t *graphs;
+  igraph_t res;
+  long int i;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  igraph_vector_ptr_init(&ptrvec, GET_LENGTH(pgraphs));
+  graphs=(igraph_t *)R_alloc(GET_LENGTH(pgraphs),
+			     sizeof(igraph_t));
+  for (i=0; i<GET_LENGTH(pgraphs); i++) {
+    R_SEXP_to_igraph(VECTOR_ELT(pgraphs, i), &graphs[i]);
+    VECTOR(ptrvec)[i]=&graphs[i];
+  }
+  igraph_intersection_many(&res, &ptrvec);
+  igraph_vector_ptr_destroy(&ptrvec);
+  PROTECT(result=R_igraph_to_SEXP(&res));
+  igraph_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+

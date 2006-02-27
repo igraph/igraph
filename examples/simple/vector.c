@@ -246,6 +246,20 @@ int main() {
   print_vector(&v, stdout);
   igraph_vector_destroy(&v);
 
+  /* filter_smaller, quite special.... */
+  igraph_vector_init_int_end(&v, -1, 0,1,2,3,4,4,4,4,5,6,7,8, -1);
+  igraph_vector_filter_smaller(&v, 4);
+  print_vector(&v, stdout);
+  igraph_vector_destroy(&v);
+  igraph_vector_init_int_end(&v, -1, 1,2,3,4,4,4,4,5,6,7,8, -1);
+  igraph_vector_filter_smaller(&v, 0);
+  print_vector(&v, stdout);
+  igraph_vector_destroy(&v);
+  igraph_vector_init_int_end(&v, -1, 0,0,1,2,3,4,4,4,4,5,6,7,8, -1);
+  igraph_vector_filter_smaller(&v, 0);
+  print_vector(&v, stdout);
+  igraph_vector_destroy(&v);
+
   return 0;
 }
   

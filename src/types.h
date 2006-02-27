@@ -149,6 +149,7 @@ bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *
 void igraph_vector_multiply(igraph_vector_t *v, real_t by);
 bool_t igraph_vector_search(igraph_vector_t *v, long int from, real_t what, 
 			    long int *pos);
+int igraph_vector_filter_smaller(igraph_vector_t *v, real_t elem);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */

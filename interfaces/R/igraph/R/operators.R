@@ -29,6 +29,20 @@ graph.union <- function(...) {
         PACKAGE="igraph")
 }
 
-"%u%" <- function(x,y) {
+"%du%" <- function(x,y) {
   graph.union(x,y)
+}
+
+graph.intersection <- function(...) {
+
+  graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
+    if (is.igraph(l)) list(l) else l
+  } ))
+  
+  .Call("R_igraph_intersection", graphs,
+        PACKAGE="igraph")
+}
+
+"%s%" <- function(x,y) {
+  graph.intersection(x,y)
 }

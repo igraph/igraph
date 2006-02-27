@@ -1,3 +1,18 @@
+2006-02-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/operators.c (igraph_union, igraph_disjoint_union) :
+	igraph_union renamed to igraph_disjoint_union
+	(igraph_union_many, igraph_disjoint_union_many) : 
+	igraph_union_many renamed to igraph_disjoint_union_many
+	(igraph_intersection, igraph_intersection_many) : added
+	* examples/simple/igraph_disjoint_union.c : added
+	* examples/simple/igraph_intersection.c : added
+
+	* src/vector.c (igraph_vector_filter_smaller) : added
+	* examples/simple/vector.c : updated
+	
+	* examples/simple/igraph_motifs_randesu.c : bug corrected
+
 2006-02-25  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
         * interfaces/python/graphobject.c : added igraphmodule_Graph_union

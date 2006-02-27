@@ -16,7 +16,7 @@ int main() {
   igraph_vector_t hist;
   igraph_vector_t cp;
 
-  igraph_vector_init_real(&cp, 8, 0.0, 0.0, 0.0, 0.0);
+  igraph_vector_init_real(&cp, 8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
   igraph_ring(&g, 1000, IGRAPH_DIRECTED, 0, 1);
   igraph_vector_init(&hist, 0);

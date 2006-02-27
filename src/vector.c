@@ -1274,3 +1274,19 @@ bool_t igraph_vector_search(igraph_vector_t *v, long int from, real_t what,
     return 0;
   }
 }
+
+int igraph_vector_filter_smaller(igraph_vector_t *v, real_t elem) {
+  long int i=0, n=igraph_vector_size(v);
+  long int s;
+  while (i<n && VECTOR(*v)[i]<elem) {
+    i++;
+  }
+  s=i;
+  
+  while (s<n && VECTOR(*v)[s]==elem) {
+    s++;
+  }
+  
+  igraph_vector_remove_section(v, 0, i+(s-i)/2);
+  return 0;
+}
