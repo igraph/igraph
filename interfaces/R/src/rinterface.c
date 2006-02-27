@@ -3186,3 +3186,23 @@ SEXP R_igraph_intersection(SEXP pgraphs) {
   return result;
 }
 
+SEXP R_igraph_difference(SEXP pleft, SEXP pright) {
+  
+  igraph_t left, right;
+  igraph_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(pleft, &left);
+  R_SEXP_to_igraph(pright, &right);
+  igraph_difference(&res, &left, &right);
+  PROTECT(result=R_igraph_to_SEXP(&res));
+  igraph_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+

@@ -1,5 +1,10 @@
 2006-02-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/operators.c (igraph_difference) : added
+	* examples/simple/igraph_difference.c : added
+
+2006-02-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/operators.c (igraph_disjoint_union) : bug corrected
 	* interfaces/python/graphobject.c (igraphmodule_Graph_union) :
 	updated to refer to disjoint union

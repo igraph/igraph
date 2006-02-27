@@ -501,3 +501,81 @@ int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub) {
+  long int no_of_nodes_orig=igraph_vcount(orig);
+  long int no_of_nodes_sub =igraph_vcount(sub);
+  long int no_of_nodes=no_of_nodes_orig;
+  long int smaller_nodes;
+  bool_t directed=igraph_is_directed(orig);
+  igraph_vector_t edges;
+  igraph_vector_t nei1, nei2;
+  long int i;
+  integer_t v1, v2;
+
+  if (directed != igraph_is_directed(sub)) {
+    IGRAPH_ERROR("Cannot subtract directed and undirected graphs",
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&nei1, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&nei2, 0);
+  
+  smaller_nodes=no_of_nodes_orig > no_of_nodes_sub ?
+    no_of_nodes_sub : no_of_nodes_orig;
+  
+  for (i=0; i<smaller_nodes; i++) {
+    IGRAPH_CHECK(igraph_neighbors(orig, &nei1, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(sub, &nei2, i, IGRAPH_OUT));
+    igraph_vector_sort(&nei1);
+    igraph_vector_sort(&nei2);
+    if (!directed) {
+      igraph_vector_filter_smaller(&nei1, i);
+      igraph_vector_filter_smaller(&nei2, i);
+    }
+    while (!igraph_vector_empty(&nei1) && !igraph_vector_empty(&nei2)) {
+      v1=igraph_vector_tail(&nei1);
+      v2=igraph_vector_tail(&nei2);
+      
+      if (v1>v2) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+	igraph_vector_pop_back(&nei1);
+      } else if (v2>v1) {
+	igraph_vector_pop_back(&nei2);
+      } else {
+	igraph_vector_pop_back(&nei1);
+	igraph_vector_pop_back(&nei2);
+      }
+    }
+
+    /* Copy remaining edges */
+    while (!igraph_vector_empty(&nei1)) {
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, 
+					   igraph_vector_pop_back(&nei1)));
+    }
+  }
+
+  /* copy remaining edges, use the previous value of 'i' */
+  for (; i<no_of_nodes_orig; i++) {
+    IGRAPH_CHECK(igraph_neighbors(orig, &nei1, i, IGRAPH_OUT));
+    igraph_vector_sort(&nei1);
+    if (!directed) {
+      igraph_vector_filter_smaller(&nei1, i);
+    }
+    while (!igraph_vector_empty(&nei1)) {
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, 
+					   igraph_vector_pop_back(&nei1)));
+    }
+  }
+
+  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&nei1);
+  igraph_vector_destroy(&nei2);
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}

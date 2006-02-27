@@ -60,3 +60,17 @@ graph.intersection <- function(...) {
 "%s%" <- function(x,y) {
   graph.intersection(x,y)
 }
+
+graph.difference <- function(big, small) {
+
+  if (!is.igraph(big) || !is.igraph(small)) {
+    stop("argument is not a graph")
+  }
+  
+  .Call("R_igraph_difference", big, small,
+        PACKAGE="igraph")
+}
+    
+"%m%" <- function(x,y) {
+  graph.difference(x,y)
+}
