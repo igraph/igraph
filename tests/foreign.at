@@ -20,13 +20,13 @@
 
 AT_BANNER([[Foreign formats]])
 
-AT_SETUP([Pajek (igraph_read_graph_pajek):])
+AT_SETUP([Reading Pajek (igraph_read_graph_pajek):])
 AT_KEYWORDS([igraph_read_graph_pajek foreign pajek])
 AT_COMPILE_CHECK([simple/foreign.c], [simple/foreign.out], [simple/LINKS.NET])
 AT_CLEANUP
 
-AT_SETUP([GraphML (igraph_read_graph_graphml):])
-AT_KEYWORDS([igraph_read_graph_graphml foreign graphml])
+AT_SETUP([GraphML (igraph_{read,write}_graph_graphml):])
+AT_KEYWORDS([igraph_read_graph_graphml igraph_write_graph_graphml foreign graphml])
 AT_COMPILE_CHECK([simple/graphml.c], [simple/graphml.out], [simple/test.gxl])
 AT_CLEANUP
 
