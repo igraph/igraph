@@ -25,7 +25,7 @@ graph.disjoint.union <- function(...) {
     if (is.igraph(l)) list(l) else l
   } ))
   
-  .Call("R_igraph_union", graphs,
+  .Call("R_igraph_disjoint_union", graphs,
         PACKAGE="igraph")
 }
 

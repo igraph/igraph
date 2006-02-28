@@ -1,5 +1,8 @@
 2006-02-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/operators.r (graph.disjoint.union) :
+	bug corrected, calls R_igraph_disjoint_union
+
 	* interfaces/R/igraph/R/operators.R (graph.compose, "%c%") : added
 	* interfaces/R/src/rinterface.c (R_igraph_compose) : added
 
