@@ -1,5 +1,10 @@
 2006-02-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/operators.R (graph.complementer) : added
+	* interfaces/R/src/rinterface.c (R_igraph_complementer) : added
+
+2006-02-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* interfaces/R/igraph/R/operators.R (graph.difference, "%m%") : added
 	* interfaces/R/src/rinterface.c (R_igraph_difference) : added
 

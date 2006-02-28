@@ -579,3 +579,54 @@ int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub) {
   IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }
+
+int igraph_complementer(igraph_t *res, igraph_t *graph, bool_t loops) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t edges;
+  igraph_vector_t neis;
+  long int i, j, k;
+  long int zero=0, *limit;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  if (igraph_is_directed(graph)) {
+    limit=&zero;
+  } else {
+    limit=&i;
+  }
+  
+  for (i=0; i<no_of_nodes; i++) {
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+    igraph_vector_sort(&neis);
+    if (loops) {
+      for (j=no_of_nodes-1; j>=*limit; j--) {
+	if (igraph_vector_empty(&neis) || j>igraph_vector_tail(&neis)) {
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+	} else {
+	  igraph_vector_pop_back(&neis);
+	}
+      }
+    } else {
+      for (j=no_of_nodes-1; j>=*limit; j--) {
+	if (igraph_vector_empty(&neis) || j>igraph_vector_tail(&neis)) {
+	  if (i!=j) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+	  }
+	} else {
+	  igraph_vector_pop_back(&neis);
+	}
+      }
+    }      
+  }
+  
+  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, 
+			     igraph_is_directed(graph)));
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}

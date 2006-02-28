@@ -3206,3 +3206,22 @@ SEXP R_igraph_difference(SEXP pleft, SEXP pright) {
   return result;
 }
 
+SEXP R_igraph_complementer(SEXP pgraph, SEXP ploops) {
+  
+  igraph_t g;
+  igraph_t res;
+  bool_t loops=LOGICAL(ploops)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(pgraph, &g);
+  igraph_complementer(&res, &g, loops);
+  PROTECT(result=R_igraph_to_SEXP(&res));
+  igraph_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

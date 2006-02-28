@@ -74,3 +74,10 @@ graph.difference <- function(big, small) {
 "%m%" <- function(x,y) {
   graph.difference(x,y)
 }
+
+graph.complementer <- function(graph, loops=FALSE) {
+
+  .Call("R_igraph_complementer", graph, as.logical(loops),
+        PACKAGE="igraph")
+}
+

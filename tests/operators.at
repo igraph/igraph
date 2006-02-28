@@ -44,3 +44,9 @@ AT_KEYWORDS([igraph_difference, difference])
 AT_COMPILE_CHECK([simple/igraph_difference.c], 
 	[simple/igraph_difference.out])
 AT_CLEANUP
+
+AT_SETUP([Complementer (igraph_complementer):])
+AT_KEYWORDS([igraph_complementer, complementer])
+AT_COMPILE_CHECK([simple/igraph_complementer.c], 
+	[simple/igraph_complementer.out])
+AT_CLEANUP
