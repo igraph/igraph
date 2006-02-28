@@ -1,5 +1,5 @@
 Package: igraph
-Version: @VERSION@
+Version: @PACKAGE_VERSION@
 Date: Januar 25, 2005
 Title:  IGraph class
 Author: Gabor Csardi <csardi@rmki.kfki.hu>

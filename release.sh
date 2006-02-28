@@ -1,7 +1,7 @@
 #! /bin/bash
 
 repohost=cneurocvs.rmki.kfki.hu
-repodir=/var/www/igraph
+repodir=/var/www/igraph.bak
 
 # Get current version
 version="`head -1 configure.in | cut -f2 -d, | tr -d ' '`"

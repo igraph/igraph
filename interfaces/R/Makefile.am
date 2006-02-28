@@ -1,5 +1,5 @@
 
-all: igraph_$(VERSION).tar.gz
+all: igraph_$(PACKAGE_VERSION).tar.gz
 
 RRFILES = $(wildcard igraph/R/*.R) \
 	  $(wildcard igraph/man/*.Rd) \
@@ -34,7 +34,7 @@ RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 RSRCSOURCES = src/rinterface.c src/Makevars src/Makevars.win \
 	src/config.h.in src/config.h
 
-igraph_$(VERSION).tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
+igraph_$(PACKAGE_VERSION).tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
 	cp $(RSCNAMES_ORIGPLACE) igraph/src/
 	cp $(RTOPHEADERS) igraph/src
 	cp $(RSRCSOURCES) igraph/src
