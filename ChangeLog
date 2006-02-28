@@ -1,5 +1,7 @@
 2006-02-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/layout.c (igraph_layout_merge_dla) : updated
+
 	* src/operators.c (igraph_compose) : added
 	* examples/simple/igraph_compose.c : added
 
