@@ -50,3 +50,9 @@ AT_KEYWORDS([igraph_complementer, complementer])
 AT_COMPILE_CHECK([simple/igraph_complementer.c], 
 	[simple/igraph_complementer.out])
 AT_CLEANUP
+
+AT_SETUP([Composition (igraph_compose):])
+AT_KEYWORDS([igraph_composition, composition, compose])
+AT_COMPILE_CHECK([simple/igraph_compose.c], 
+	[simple/igraph_compose.out])
+AT_CLEANUP

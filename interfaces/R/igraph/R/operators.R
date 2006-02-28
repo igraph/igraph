@@ -81,3 +81,12 @@ graph.complementer <- function(graph, loops=FALSE) {
         PACKAGE="igraph")
 }
 
+graph.compose <- function(g1, g2) {
+
+  .Call("R_igraph_compose", g1, g2,
+        PACKAGE="igraph")
+}
+
+"%c%" <- function(x,y) {
+  graph.compose(x,y)
+}

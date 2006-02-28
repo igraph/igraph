@@ -630,3 +630,51 @@ int igraph_complementer(igraph_t *res, igraph_t *graph, bool_t loops) {
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
+
+int igraph_compose(igraph_t *res, igraph_t *g1, igraph_t *g2) {
+  
+  long int no_of_nodes_left=igraph_vcount(g1);
+  long int no_of_nodes_right=igraph_vcount(g2);
+  long int no_of_nodes;
+  bool_t directed=igraph_is_directed(g1);
+  igraph_vector_t edges;
+  igraph_vector_t neis1, neis2;
+  long int i;
+
+  if (directed != igraph_is_directed(g2)) {
+    IGRAPH_ERROR("Cannot compose directed and undirected graph",
+		 IGRAPH_EINVAL);
+  }
+
+  no_of_nodes= no_of_nodes_left > no_of_nodes_right ? 
+    no_of_nodes_left : no_of_nodes_right;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis1, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis2, 0);
+  
+  for (i=0; i<no_of_nodes_left; i++) {
+    IGRAPH_CHECK(igraph_neighbors(g1, &neis1, i, IGRAPH_OUT));
+    while (!igraph_vector_empty(&neis1)) {
+      long int con=igraph_vector_pop_back(&neis1);
+      if (con<no_of_nodes_right) {
+	IGRAPH_CHECK(igraph_neighbors(g2, &neis2, con, IGRAPH_OUT));
+      }
+      while (!igraph_vector_empty(&neis2)) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges,
+					     igraph_vector_pop_back(&neis2)));
+      }
+    }
+  }
+
+  igraph_vector_destroy(&neis1);
+  igraph_vector_destroy(&neis2);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
