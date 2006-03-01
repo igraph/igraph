@@ -558,7 +558,8 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  real_t initemp, real_t coolexp, 
 				  real_t kkconst);
 
-int igraph_layout_merge_dla(igraph_vector_ptr_t *coords, 
+int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
+			    igraph_vector_ptr_t *coords, 
 			    igraph_matrix_t *res);
 
 /* -------------------------------------------------- */

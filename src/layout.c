@@ -1064,7 +1064,8 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 			      real_t cx, real_t cy, real_t startr, 
 			      real_t killr);
 
-int igraph_layout_merge_dla(igraph_vector_ptr_t *coords, 
+int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
+			    igraph_vector_ptr_t *coords, 
 			    igraph_matrix_t *res) {
   long int graphs=igraph_vector_ptr_size(coords);
   igraph_vector_t sizes;

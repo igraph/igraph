@@ -150,12 +150,11 @@ layout.lgl <- function(graph, ..., params=list()) {
         PACKAGE="igraph")
 }
 
-layout.merge <- function(..., method="dla") {
-
-  layouts <- as.list(c(...))
+layout.merge <- function(graphs, layouts, method="dla") {
 
   if (method == "dla") {
     res <- .Call("R_igraph_layout_merge_dla",
+                 graphs,
                  layouts,
                  PACKAGE="igraph")
   } else {

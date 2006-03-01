@@ -1,5 +1,9 @@
 2006-02-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/layout.R (layout.merge) : add graph list 
+	parameter
+	* interfaces/R/src/rinterface.c (R_igraph_layout_merge_dla) : updated
+
 	* interfaces/R/igraph/R/operators.r (graph.disjoint.union) :
 	bug corrected, calls R_igraph_disjoint_union
 
