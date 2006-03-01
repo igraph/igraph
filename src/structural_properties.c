@@ -911,9 +911,11 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
       if (geodist[neighbor] != 0 && 
 	  geodist[neighbor]-1 < actdist+1) { continue; }
       if (nrgeo) { VECTOR(*nrgeo)[neighbor] += VECTOR(*nrgeo)[actnode]; }
+      if (geodist[neighbor] == 0) {
+	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+      }
       geodist[neighbor]=actdist+2;
-      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-      IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
 
       /* copy all existing paths to the parent */
       while (fatherptr != 0) {
