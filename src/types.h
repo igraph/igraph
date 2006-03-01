@@ -150,6 +150,7 @@ void igraph_vector_multiply(igraph_vector_t *v, real_t by);
 bool_t igraph_vector_search(igraph_vector_t *v, long int from, real_t what, 
 			    long int *pos);
 int igraph_vector_filter_smaller(igraph_vector_t *v, real_t elem);
+int igraph_vector_append(igraph_vector_t *to, const igraph_vector_t *from);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
@@ -244,6 +245,8 @@ int igraph_matrix_delete_rows_neg(igraph_matrix_t *m, igraph_vector_t *neg, long
 int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from);
 real_t igraph_matrix_max(const igraph_matrix_t *m);
 void igraph_matrix_multiply(igraph_matrix_t *m, real_t by);
+int igraph_matrix_select_rows(const igraph_matrix_t *m, igraph_matrix_t *res, 
+			      const igraph_vector_t *rows);
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */

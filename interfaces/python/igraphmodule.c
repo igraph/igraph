@@ -112,10 +112,11 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
 
 
 PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwds) {
-  const char* kwlist[] = {"vs", "coords", NULL};
+  char* kwlist[] = {"vs", "coords", NULL};
   PyObject *vs, *o, *o1, *o2, *coords = Py_False;
   igraph_matrix_t mtrx;
   igraph_vector_t result;
+  igraph_matrix_t resmat;
   long no_of_nodes, i;
   
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O", kwlist, &PyList_Type, &vs, &coords))
@@ -172,26 +173,37 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
     Py_DECREF(o2);
   }
 
-  if (igraph_vector_init(&result, 0)) {
-    igraphmodule_handle_igraph_error();
-    igraph_matrix_destroy(&mtrx);
-    return NULL;
-  }
-  
-  if (igraph_convex_hull(&mtrx, &result, PyObject_IsTrue(coords))) {
-    igraphmodule_handle_igraph_error();
-    igraph_matrix_destroy(&mtrx);
-    igraph_vector_destroy(&result);
-    return NULL;
-  }
-  
-  if (PyObject_IsTrue(coords))
-    o=igraphmodule_vector_t_to_PyList_pairs(&result);
-  else
+  if (!PyObject_IsTrue(coords)) {
+    if (igraph_vector_init(&result, 0)) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&mtrx);
+      return NULL;
+    }
+    if (igraph_convex_hull(&mtrx, &result, 0)) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&mtrx);
+      igraph_vector_destroy(&result);
+      return NULL;
+    }    
     o=igraphmodule_vector_t_to_PyList(&result);
+    igraph_vector_destroy(&result);
+  } else {
+    if (igraph_matrix_init(&resmat, 0, 0)) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&mtrx);
+      return NULL;
+    }
+    if (igraph_convex_hull(&mtrx, 0, &resmat)) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&mtrx);
+      igraph_matrix_destroy(&resmat);
+      return NULL;
+    }        
+    o=igraphmodule_matrix_t_to_PyList(&resmat, IGRAPHMODULE_TYPE_FLOAT);
+    igraph_matrix_destroy(&resmat);
+  }
   
   igraph_matrix_destroy(&mtrx);
-  igraph_vector_destroy(&result);
 
   return o;
 }

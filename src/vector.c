@@ -1290,3 +1290,16 @@ int igraph_vector_filter_smaller(igraph_vector_t *v, real_t elem) {
   igraph_vector_remove_section(v, 0, i+(s-i)/2);
   return 0;
 }
+
+int igraph_vector_append(igraph_vector_t *to, const igraph_vector_t *from) {
+  long int tosize, fromsize;
+  
+  tosize=igraph_vector_size(to);
+  fromsize=igraph_vector_size(from);
+  IGRAPH_CHECK(igraph_vector_resize(to, tosize+fromsize));
+  memcpy(to->stor_begin+tosize, from->stor_begin, 
+	 sizeof(real_t)*fromsize);
+  to->end=to->stor_begin+tosize+fromsize;
+  
+  return 0;
+}

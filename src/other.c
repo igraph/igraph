@@ -104,8 +104,8 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
  * 
  * Time complexity: O(n log(n)) where n is the number of vertices
  */
-int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *res,
-		       bool_t coords) {
+int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+		       igraph_matrix_t *rescoords) {
   integer_t no_of_nodes;
   long int i, pivot_idx=0, last_idx, before_last_idx, next_idx, j, k;
   real_t* angles;
@@ -118,10 +118,16 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *res,
     IGRAPH_ERROR("matrix must have 2 columns", IGRAPH_EINVAL);
   }
   if (no_of_nodes == 0) {
-    IGRAPH_CHECK(igraph_vector_resize(res, 0));
+    if (resverts != 0) {
+      IGRAPH_CHECK(igraph_vector_resize(resverts, 0));
+    } 
+    if (rescoords != 0) {
+      IGRAPH_CHECK(igraph_matrix_resize(rescoords, 0, 2));
+    }
+    /**************************** this is an exit here *********/
     return 0;
   }
-  
+    
   angles=Calloc(no_of_nodes, real_t);
   if (!angles) IGRAPH_ERROR("not enough memory for angle array", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(free, angles);
@@ -212,17 +218,12 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *res,
   }
   
   /* Create result vector */
-  j=igraph_vector_size(&stack);
-  if (!coords) {
-    /* TODO: This is a silly way of copying a vector :( */
-    IGRAPH_CHECK(igraph_vector_resize(res, j));
-    for (i=0; i<j; i++) VECTOR(*res)[i]=VECTOR(stack)[i];
-  } else {
-    IGRAPH_CHECK(igraph_vector_resize(res, j*2));
-    for (i=0, k=0; i<j; i++, k+=2) {
-      VECTOR(*res)[k]=MATRIX(*data, (long)VECTOR(stack)[i], 0);
-      VECTOR(*res)[k+1]=MATRIX(*data, (long)VECTOR(stack)[i], 1);
-    }
+  if (resverts != 0) {
+    igraph_vector_clear(resverts);
+    IGRAPH_CHECK(igraph_vector_append(resverts, &stack));
+  } 
+  if (rescoords != 0) {
+    igraph_matrix_select_rows(data, rescoords, &stack);
   }
   
   /* Free everything */

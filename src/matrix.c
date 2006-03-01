@@ -355,3 +355,18 @@ real_t igraph_matrix_max(const igraph_matrix_t *m) {
 void igraph_matrix_multiply(igraph_matrix_t *m, real_t by) {
   igraph_vector_multiply(&m->data, by);
 }
+
+int igraph_matrix_select_rows(const igraph_matrix_t *m, igraph_matrix_t *res, 
+			      const igraph_vector_t *rows) {
+  long int norows=igraph_vector_size(rows);
+  long int i, j, ncols=igraph_matrix_ncol(m);
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, norows, ncols));
+  for (i=0; i<norows; i++) {
+    for (j=0; j<ncols; j++) {
+      MATRIX(*res, i, j) = MATRIX(*m, (long int)VECTOR(*rows)[i], j);
+    }
+  }
+  
+  return 0;
+}

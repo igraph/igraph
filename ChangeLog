@@ -1,5 +1,13 @@
 2006-03-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/matrix.c (igraph_matrix_select_rows) : added
+	* src/vector.c (igraph_vector_append) : added
+	* src/other.c (igraph_convex_hull) : changed parameters
+	* examples/simple/igraph_convex_hull.c : updated
+	* interfaces/python/igraphmodule.c (igraphmodule_convex_hull): updated
+	for new igraph_convex_hull syntax, returns a matrix if coords is true
+	* interfaces/python/test.py : updated
+
 	* src/structural_properties.c (igraph_get_all_shortest_paths) :
 	bug hunted
 

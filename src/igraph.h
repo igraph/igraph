@@ -700,8 +700,8 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
 			integer_t binwidth);
 int igraph_random_sample(igraph_vector_t *res, integer_t l, integer_t h, 
 			 integer_t length);
-int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *res,
-		       bool_t coords);
+int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+		       igraph_matrix_t *rescoords);
 
 /* -------------------------------------------------- */
 /* For internal use only, should move to other header */

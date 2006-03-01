@@ -789,7 +789,8 @@ vs = [[3, 2], [5, 1], [4, 4], [6, 4], [4, 3], [2, 5], [1, 3], [2, 4], [6, 3], [9
 start("Convex hull test #1")
 test(igraph.convex_hull(vs) == [1, 6, 5, 3, 9])
 start("Convex hull test #2")
-test(igraph.convex_hull(vs, True) == [(5, 1), (1, 3), (2, 5), (6, 4), (9, 2)])
+print(igraph.convex_hull(vs, True))
+test(igraph.convex_hull(vs, True) == [[5, 1], [1, 3], [2, 5], [6, 4], [9, 2]])
 
 results()
 

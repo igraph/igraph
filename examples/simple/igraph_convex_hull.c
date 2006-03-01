@@ -7,7 +7,7 @@ int main() {
     {2, 5}, {1, 3}, {2, 4}, {6, 3}, {9, 2}
    };
     
-  igraph_matrix_t coords;
+  igraph_matrix_t coords, resmat;
   igraph_vector_t result;
   long i;
   
@@ -24,15 +24,15 @@ int main() {
   printf("\n");
   
   /* Testing with coordinate output mode */
-  igraph_vector_init(&result, 1);
-  if (igraph_convex_hull(&coords, &result, 1))
+  igraph_matrix_init(&resmat, 0, 0);
+  if (igraph_convex_hull(&coords, 0, &resmat))
     return 1;
 
-  for (i=0; i<igraph_vector_size(&result); i++)
-    printf("%ld ", (long)VECTOR(result)[i]);
+  for (i=0; i<igraph_matrix_nrow(&resmat); i++)
+    printf("%ld %ld ", (long)MATRIX(resmat, i, 0), (long)MATRIX(resmat, i, 1));
   printf("\n");
   
-  igraph_vector_destroy(&result);
+  igraph_matrix_destroy(&resmat);
   igraph_matrix_destroy(&coords);
   
   return 0;
