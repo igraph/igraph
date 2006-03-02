@@ -45,7 +45,8 @@ layout.sphere <- function(graph, params) {
         PACKAGE="igraph")
 }
 
-layout.fruchterman.reingold <- function(graph, ..., dim=2, params=list()) {
+layout.fruchterman.reingold <- function(graph, ..., dim=2,
+                                        verbose=FALSE, params=list()) {
 
   if (length(params)==0) {
     params <- list(...)
@@ -69,12 +70,12 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2, params=list()) {
   .Call(fn, graph,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
-        as.double(params$repulserad),
+        as.double(params$repulserad), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 layout.fruchterman.reingold.grid <- function(graph, ...,
-                                             params=list()) {
+                                             verbose=FALSE, params=list()) {
   if (length(params)==0) {
     params <- list(...)
   }
@@ -94,13 +95,15 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), as.double(params$cellsize),
         as.logical(!is.null(params$seed)),
+        as.logical(verbose),
         PACKAGE="igraph")
 }
   
 
 # FROM SNA 0.5
 
-layout.kamada.kawai<-function(graph, ..., dim=2, params=list()) {
+layout.kamada.kawai<-function(graph, ..., dim=2, verbose=FALSE,
+                              params=list()) {
 
   if (length(params)==0) {
     params <- list(...)
@@ -123,7 +126,7 @@ layout.kamada.kawai<-function(graph, ..., dim=2, params=list()) {
   .Call(fn, graph,
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
-        as.double(params$sigma),
+        as.double(params$sigma), as.logical(verbose),
         PACKAGE="igraph")
 }
 
@@ -150,12 +153,12 @@ layout.lgl <- function(graph, ..., params=list()) {
         PACKAGE="igraph")
 }
 
-layout.merge <- function(graphs, layouts, method="dla") {
+layout.merge <- function(graphs, layouts, method="dla", verbose=FALSE) {
 
   if (method == "dla") {
     res <- .Call("R_igraph_layout_merge_dla",
                  graphs,
-                 layouts,
+                 layouts, as.logical(verbose),
                  PACKAGE="igraph")
   } else {
     stop("Invalid `method'.")

@@ -1,3 +1,14 @@
+2006-03-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/layout.R (layout.fruchterman.reingold)
+	(layout.fruchterman.reingold.grid, layout.kamada.kawai,layout.merge) :
+	verbose option (progress bar) added
+	* interfaces/R/src/rinterface.c (R_igraph_progress_handler) : added
+	(R_igraph_layout_kamada_kawai, R_igraph_layout_kamada_kawai_3d)
+	(R_igraph_layout_fruchterman_reingold)
+	(R_igraph_layout_fruchterman_reingold_3d, R_igraph_layout_merge_dla) :
+	updated for verbose option
+
 2006-02-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/layout.R (layout.merge) : add graph list 

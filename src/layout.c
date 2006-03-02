@@ -250,7 +250,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 
   for(i=niter;i>0;i--) {
     /* Report progress in approx. every 100th step */
-    if (i%100 == 0)
+    if (i%10 == 0)
       igraph_progress("Fruchterman-Reingold layout: ",
 		      100.0-100.0*i/niter, NULL);
     
@@ -309,6 +309,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       MATRIX(*res, j, 1)+=MATRIX(dxdy, j, 1);
     }
   }
+
+  igraph_progress("Fruchterman-Reingold layout: ", 100.0, NULL);
   
   igraph_matrix_destroy(&dxdy);
   IGRAPH_FINALLY_CLEAN(1);
@@ -374,6 +376,10 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 
   /*Run the annealing loop*/
   for(i=niter;i>=0;i--){
+    if (i%10 == 0)
+      igraph_progress("3D Fruchterman-Reingold layout: ",
+		      100.0-100.0*i/niter, NULL);
+
     /*Set the temperature (maximum move/iteration)*/
     t=maxdelta*pow(i/(double)niter,coolexp);
     /*Clear the deltas*/
@@ -443,6 +449,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
       MATRIX(*res, j, 2)+=MATRIX(dxdydz, j, 2);
     }
   }
+
+  igraph_progress("3D Fruchterman-Reingold layout: ", 100.0, NULL);
   
   igraph_matrix_destroy(&dxdydz);
   IGRAPH_FINALLY_CLEAN(1);
@@ -505,7 +513,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   temp=initemp;
   for(i=0;i<niter;i++){
     /* Report progress in approx. every 100th step */
-    if (i%100 == 0)
+    if (i%10 == 0)
       igraph_progress("Kamada-Kawai layout: ",
 		      100.0*i/niter, NULL);
     /*Update each vertex*/
@@ -536,6 +544,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     /*Cool the system*/
     temp*=coolexp;
   }
+
+  igraph_progress("Kamada-Kawai layout: ", 100.0, NULL);
 
   RNG_END();
   igraph_matrix_destroy(&elen);
@@ -587,6 +597,10 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
   
   temp=initemp;
   for(i=0;i<niter;i++){
+    if (i%10 == 0)
+      igraph_progress("3D Kamada-Kawai layout: ",
+		      100.0*i/niter, NULL);
+
     /*Update each vertex*/
     for(j=0;j<no_of_nodes;j++){
       /*Draw the candidate via a gaussian perturbation*/
@@ -620,6 +634,8 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
     /*Cool the system*/
     temp*=coolexp;
   }
+
+  igraph_progress("3D Kamada-Kawai layout: ", 100.0, NULL);
 
   RNG_END();
   igraph_matrix_destroy(&elen);
@@ -995,6 +1011,12 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     real_t t=maxdelta*pow((niter-it)/(double)niter, coolexp);
     long int vid, nei;
 
+    /* Report progress */
+    if (it%10 == 0) {
+      igraph_progress("Grid based Fruchterman-Reingold layout: ", 
+		      (100.0*it)/niter, NULL);
+    }
+
     igraph_vector_null(&forcex);
     igraph_vector_null(&forcey);
     
@@ -1051,6 +1073,9 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     it++;
     
   } /* it<niter */
+  
+  igraph_progress("Grid based Fruchterman-Reingold layout: ", 
+		  100.0, NULL);
 
   igraph_vector_destroy(&forcex);
   igraph_vector_destroy(&forcey);
@@ -1121,8 +1146,11 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   actg=VECTOR(sizes)[jpos++];
   igraph_i_layout_merge_place_sphere(&grid, 0, 0, VECTOR(r)[actg], actg);
   
+  igraph_progress("Merging layouts via DLA", 0.0, NULL);
   while (jpos<graphs) {
 /*     fprintf(stderr, "comp: %li", jpos); */
+    igraph_progress("Merging layouts via DLA", (100.0*jpos)/graphs, NULL);
+    
     actg=VECTOR(sizes)[jpos++];
     /* 2. random walk, TODO: tune parameters */
     igraph_i_layout_merge_dla(&grid, actg, 
@@ -1135,6 +1163,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     igraph_i_layout_merge_place_sphere(&grid, VECTOR(x)[actg], VECTOR(y)[actg],
 				       VECTOR(r)[actg], actg);
   }
+  igraph_progress("Merging layouts via DLA", 100.0, NULL);
 
   /* Create the result */
   IGRAPH_CHECK(igraph_matrix_resize(res, allnodes, 2));

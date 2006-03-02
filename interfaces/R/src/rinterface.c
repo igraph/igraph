@@ -74,6 +74,20 @@ R_INLINE void R_igraph_after() {
   igraph_set_error_handler(R_igraph_oldhandler);
 }
 
+int R_igraph_progress_handler(const char *message, real_t percent,
+			      void* data) {
+  static real_t last=0;
+  if (percent == 0) {
+    last=0;
+  } 
+  while (last < percent) {
+    fputc('#', stderr);
+    last+=2;
+  }
+  return 0;
+}
+
+
 /******************************************************
  * functions to convert igraph objects to SEXP
  *****************************************************/
@@ -977,7 +991,8 @@ SEXP R_igraph_barabasi_game(SEXP pn, SEXP pm, SEXP poutseq,
 }
   
 SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp, 
-				  SEXP pcoolexp, SEXP pkkconst, SEXP psigma) {
+				  SEXP pcoolexp, SEXP pkkconst, SEXP psigma, 
+				  SEXP pverbose) {
   
   igraph_t g;
   integer_t niter=REAL(pniter)[0];
@@ -986,9 +1001,15 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   real_t kkconst=REAL(pkkconst)[0];
   real_t sigma=REAL(psigma)[0];
   igraph_matrix_t res;
+  bool_t verbose=LOGICAL(pverbose)[0];
+  igraph_progress_handler_t *oldprogress;
   SEXP result;
   
   R_igraph_before();
+  if (verbose) {
+    fprintf(stderr, "KK layout: ");
+    oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+  }
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
@@ -997,6 +1018,10 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
+  if (verbose) {
+    igraph_set_progress_handler(oldprogress);
+    fputc('\n', stderr);
+  }
   R_igraph_after();
   
   UNPROTECT(1);
@@ -1005,7 +1030,7 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
 
 SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
 				     SEXP pcoolexp, SEXP pkkconst, 
-				     SEXP psigma) {
+				     SEXP psigma, SEXP pverbose) {
   igraph_t g;
   integer_t niter=REAL(pniter)[0];
   real_t initemp=REAL(pinitemp)[0];
@@ -1013,9 +1038,15 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   real_t kkconst=REAL(pkkconst)[0];
   real_t sigma=REAL(psigma)[0];
   igraph_matrix_t res;
+  bool_t verbose=LOGICAL(pverbose)[0];
+  igraph_progress_handler_t *oldprogress;
   SEXP result;
   
   R_igraph_before();
+  if (verbose) {
+    fprintf(stderr, "3D KK layout: ");
+    oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+  }
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
@@ -1024,6 +1055,10 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
+  if (verbose) {
+    igraph_set_progress_handler(oldprogress);
+    fputc('\n', stderr);
+  }
   R_igraph_after();
   
   UNPROTECT(1);
@@ -1065,7 +1100,8 @@ SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph, SEXP mat,
 					       SEXP pniter,
 					       SEXP pmaxdelta, SEXP parea,
 					       SEXP pcoolexp, SEXP prepulserad,
-					       SEXP pcellsize, SEXP puseseed) {
+					       SEXP pcellsize, SEXP puseseed,
+					       SEXP pverbose) {
 
   igraph_t g;
   igraph_matrix_t res;
@@ -1076,9 +1112,15 @@ SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph, SEXP mat,
   real_t repulserad=REAL(prepulserad)[0];
   real_t cellsize=REAL(pcellsize)[0];
   bool_t use_seed=LOGICAL(puseseed)[0];
+  bool_t verbose=LOGICAL(pverbose)[0];
+  igraph_progress_handler_t *oldprogress;
   SEXP result;
   
   R_igraph_before();
+  if (verbose) {
+    fprintf(stderr, "Grid-FR layout: ");
+    oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+  }
 
   R_SEXP_to_igraph(graph, &g);
   if (use_seed) {
@@ -1092,6 +1134,10 @@ SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph, SEXP mat,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
+  if (verbose) {
+    igraph_set_progress_handler(oldprogress);
+    fputc('\n', stderr);
+  }
   R_igraph_after();
   
   UNPROTECT(1);
@@ -1607,7 +1653,8 @@ SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
 
 SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter, 
 					  SEXP pmaxdelta, SEXP parea,
-					  SEXP pcoolexp, SEXP prepulserad) {
+					  SEXP pcoolexp, SEXP prepulserad, 
+					  SEXP pverbose) {
   igraph_t g;
   integer_t niter=REAL(pniter)[0];
   real_t maxdelta=REAL(pmaxdelta)[0];
@@ -1615,9 +1662,15 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   real_t coolexp=REAL(pcoolexp)[0];
   real_t repulserad=REAL(prepulserad)[0];
   igraph_matrix_t res;
+  bool_t verbose=LOGICAL(pverbose)[0];
+  igraph_progress_handler_t *oldprogress;
   SEXP result;
   
   R_igraph_before();
+  if (verbose) {
+    fprintf(stderr, "FR layout: ");
+    oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+  }
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
@@ -1626,6 +1679,10 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
+  if (verbose) {
+    igraph_set_progress_handler(oldprogress);
+    fputc('\n', stderr);
+  }
   R_igraph_after();
   
   UNPROTECT(1);
@@ -1634,7 +1691,8 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
 
 SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter, 
 					     SEXP pmaxdelta, SEXP parea,
-					     SEXP pcoolexp, SEXP prepulserad) {
+					     SEXP pcoolexp, SEXP prepulserad,
+					     SEXP pverbose) {
   igraph_t g;
   integer_t niter=REAL(pniter)[0];
   real_t maxdelta=REAL(pmaxdelta)[0];
@@ -1642,9 +1700,15 @@ SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter,
   real_t coolexp=REAL(pcoolexp)[0];
   real_t repulserad=REAL(prepulserad)[0];
   igraph_matrix_t res;
+  bool_t verbose=LOGICAL(pverbose)[0];
+  igraph_progress_handler_t *oldprogress;
   SEXP result;
   
   R_igraph_before();
+  if (verbose) {
+    fprintf(stderr, "3D FR layout: ");
+    oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+  }
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
@@ -1653,6 +1717,10 @@ SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter,
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
+  if (verbose) {
+    igraph_set_progress_handler(oldprogress);
+    fputc('\n', stderr);
+  }
   R_igraph_after();
   
   UNPROTECT(1);
@@ -3073,7 +3141,7 @@ SEXP R_igraph_isoclass_create(SEXP psize, SEXP pnumber, SEXP pdirected) {
   return result;
 }
 
-SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts) {
+SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts, SEXP pverbose) {
 
   igraph_vector_ptr_t graphvec;
   igraph_vector_ptr_t ptrvec;
@@ -3081,9 +3149,15 @@ SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts) {
   igraph_matrix_t *mats;
   igraph_matrix_t res;
   long int i;
+  bool_t verbose=LOGICAL(pverbose)[0];
+  igraph_progress_handler_t *oldprogress;
   SEXP result;
   
   R_igraph_before();
+  if (verbose) {
+    fprintf(stderr, "Merge layouts: ");
+    oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+  }
   
   igraph_vector_ptr_init(&graphvec, GET_LENGTH(graphs));
   igraph_vector_ptr_init(&ptrvec, GET_LENGTH(layouts));
@@ -3105,6 +3179,10 @@ SEXP R_igraph_layout_merge_dla(SEXP graphs, SEXP layouts) {
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
+  if (verbose) {
+    igraph_set_progress_handler(oldprogress);
+    fputc('\n', stderr);
+  }
   R_igraph_after();
   
   UNPROTECT(1);
