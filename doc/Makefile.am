@@ -71,7 +71,7 @@ html/stamp: igraph-docs.xml $(DOCFIX)
 igraph-docs.info: igraph-docs.xml $(DOCFIX)
 	db2x_xsltproc --xinclude -s texi igraph-docs.xml -o igraph-docs.txml \
 	&& db2x_texixml igraph-docs.txml \
-	&& makeinfo igraph-docs.texi
+	&& makeinfo --no-split igraph-docs.texi
 
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX)
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \

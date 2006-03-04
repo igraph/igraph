@@ -6,7 +6,7 @@
     <edition>Version 2, June 1991</edition>
     <copyright><year>1989</year><year>1991</year>
     <holder> Free Software Foundation, Inc.
-     59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+       51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
     </holder>
     </copyright>
     <legalnotice><para>
@@ -405,7 +405,7 @@ when it starts in an interactive mode:
 </para>
 
 <para><literallayout>
-    Gnomovision version 69, Copyright (C) year  name of author
+    Gnomovision version 69, Copyright (C) year name of author
     Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
