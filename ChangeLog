@@ -1,5 +1,8 @@
 2006-03-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/python/graphobject.c (igraphmodule_Graph_Read_Ncol) :
+	dummy update for predef argument
+	
 	* src/foreign.c (igraph_read_graph_ncol) : added predef argument
 
 2006-03-01  Gabor Csardi  <csardi@rmki.kfki.hu>

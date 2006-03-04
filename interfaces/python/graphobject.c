@@ -2509,7 +2509,7 @@ PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObj
     PyErr_SetString(PyExc_IOError, strerror(errno));
     return NULL;
   }
-  if (igraph_read_graph_ncol(&g, f, PyObject_IsTrue(names), PyObject_IsTrue(weights), PyObject_IsTrue(directed))) {
+  if (igraph_read_graph_ncol(&g, f, 0, PyObject_IsTrue(names), PyObject_IsTrue(weights), PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
