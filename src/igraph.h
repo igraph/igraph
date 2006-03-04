@@ -610,7 +610,8 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, bool_t byco
 
 int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream, 
 			       integer_t n, bool_t directed);
-int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, bool_t names, 
+int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
+			   igraph_strvector_t *predefnames, bool_t names, 
 			  bool_t weights, bool_t directed);
 int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 			  bool_t names, bool_t weights);

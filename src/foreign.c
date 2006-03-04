@@ -141,6 +141,12 @@ igraph_trie_t *igraph_ncol_trie=0;
  * these.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
+ * \param predefnames Pointer to the symbolic names of the vertices in
+ *        the file. If \c NULL is given here then vertex ids will be
+ *        assigned to vertex names in the order of their appearence in
+ *        the \c .ncol file. If it is not \c NULL and some unknown
+ *        vertex names are found in the \c .ncol file then new vertex
+ *        ids will be assigned to them. 
  * \param names Logical value, if TRUE the symbolic names of the
  *        vertices will be added to the graph as a vertex attribute
  *        called \quote name\endquote.
@@ -167,15 +173,26 @@ igraph_trie_t *igraph_ncol_trie=0;
  */
 
 int igraph_read_graph_ncol(igraph_t *graph, FILE *instream, 
-			  bool_t names, bool_t weights, bool_t directed) {
+			   igraph_strvector_t *predefnames,
+			   bool_t names, bool_t weights, bool_t directed) {
   
   igraph_vector_t edges, ws;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
-
+  
   IGRAPH_TRIE_INIT_FINALLY(&trie, names);
   IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
+  /* Add the predefined names, if any */
+  if (predefnames != 0) {
+    long int i; long int id;
+    char *key;
+    for (i=0; i<igraph_strvector_size(predefnames); i++) {
+      igraph_strvector_get(predefnames, i, &key);
+      igraph_trie_get(&trie, key, &id);
+    }
+  }
+  
   igraph_ncol_vector=&edges;
   igraph_ncol_weights=&ws;
   igraph_ncol_trie=&trie;

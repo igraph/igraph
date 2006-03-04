@@ -142,10 +142,10 @@ write.graph.edgelist <- function(graph, file,
 # NCOL and LGL formats, quite simple
 ################################################################
 
-read.graph.ncol <- function(file, names=TRUE,
+read.graph.ncol <- function(file, predef=character(0), names=TRUE,
                            weights=TRUE, directed=FALSE, ...) {
 
-  .Call("R_igraph_read_graph_ncol", file,
+  .Call("R_igraph_read_graph_ncol", file, as.character(predef),
         as.logical(names), as.logical(weights), as.logical(directed),
         PACKAGE="igraph")
 }

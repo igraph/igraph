@@ -1,3 +1,10 @@
+2006-03-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (read.graph.ncol) : added predef
+	argument
+	* interfaces/R/src/rinterface.c (R_igraph_read_graph_ncol) : 
+	added predef argument
+
 2006-03-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/layout.R (layout.fruchterman.reingold)
