@@ -1,3 +1,10 @@
+2006-03-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/error.h (igraph_warning_handler_t, IGRAPH_WARNING) : added
+	* src/error.c (igraph_i_warning_handler, igraph_warning_handler_print)
+	(igraph_warning, igraph_set_warning_handler) : added
+	* src/foreign.c (igraph_read_graph_ncol) : added two warnings
+
 2006-03-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_Read_Ncol) :

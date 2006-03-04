@@ -393,4 +393,20 @@ void IGRAPH_FINALLY_FREE();
                     IGRAPH_ERROR("", igraph_i_ret); \
                  } } while(0)
 
+
+typedef igraph_error_handler_t igraph_warning_handler_t;
+
+igraph_warning_handler_t*
+igraph_set_warning_handler(igraph_warning_handler_t new_handler);
+
+extern igraph_warning_handler_t igraph_warning_handler_print;
+
+int igraph_warning(const char *reason, const char *file, int line,
+		   int igraph_errno);
+
+#define IGRAPH_WARNING(reason) \
+       do { \
+         igraph_warning(reason, __FILE__, __LINE__, -1); \
+       } while (0)
+
 #endif

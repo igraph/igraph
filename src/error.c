@@ -119,3 +119,29 @@ void IGRAPH_FINALLY_FREE() {
   }
   igraph_i_finally_stack[0].all=0;
 }
+
+static igraph_warning_handler_t *igraph_i_warning_handler=0;
+
+void igraph_warning_handler_print (const char *reason, const char *file,
+				   int line, int igraph_errno) {
+  fprintf(stderr, "Warning: %s in file %s, line %i\n", reason, file, line);
+}
+
+int igraph_warning(const char *reason, const char *file, int line,
+		   int igraph_errno) {
+
+  if (igraph_i_warning_handler) {
+    igraph_i_warning_handler(reason, file, line, igraph_errno);
+  }  else {
+    igraph_warning_handler_print(reason, file, line, igraph_errno);
+  }
+  return igraph_errno;
+}
+
+igraph_warning_handler_t *
+igraph_set_warning_handler (igraph_warning_handler_t * new_handler)
+{
+  igraph_warning_handler_t * previous_handler = igraph_i_warning_handler;
+  igraph_i_warning_handler = new_handler;
+  return previous_handler;
+}

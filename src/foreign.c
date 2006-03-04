@@ -178,6 +178,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   
   igraph_vector_t edges, ws;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
+  long int no_predefined=0;
   
   IGRAPH_TRIE_INIT_FINALLY(&trie, names);
   IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
@@ -185,11 +186,16 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
   /* Add the predefined names, if any */
   if (predefnames != 0) {
-    long int i; long int id;
+    long int i, id, n;
     char *key;
-    for (i=0; i<igraph_strvector_size(predefnames); i++) {
+    n=no_predefined=igraph_strvector_size(predefnames);
+    for (i=0; i<n; i++) {
       igraph_strvector_get(predefnames, i, &key);
       igraph_trie_get(&trie, key, &id);
+      if (id != i) {
+	IGRAPH_WARNING("reading NCOL file, duplicate entry in predefnames");
+	no_predefined--;
+      }
     }
   }
   
@@ -200,7 +206,12 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
   igraph_ncol_yyparse();
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  if (predefnames != 0 && 
+      igraph_trie_size(&trie) != no_predefined) {
+    IGRAPH_WARNING("unknown vertex/vertices found, predefnames extended");    
+  }
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));  
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
