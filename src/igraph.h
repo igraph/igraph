@@ -682,17 +682,21 @@ int igraph_compose(igraph_t *res, igraph_t *g1, igraph_t *g2);
 /* -------------------------------------------------- */
 
 int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_matrix_t *akl, 
-				  igraph_matrix_t *sd,
+				  igraph_matrix_t *sd, igraph_matrix_t *confint, 
+				  igraph_matrix_t *no,
 				  const igraph_vector_t *st, integer_t agebins,
-				  integer_t maxind, bool_t lsd);
+				  integer_t maxind, real_t significance,
+				  bool_t lno);
 int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res,
 				     const igraph_matrix_t *akl);
 int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *akl,
-					igraph_matrix_t *sd,
+					igraph_matrix_t *sd, igraph_matrix_t *confint, 
+					igraph_matrix_t *no,
 					const igraph_vector_t *st, integer_t pagebins,
-					integer_t pmaxind, bool_t lsd,
+					integer_t pmaxind, real_t significance,
 					igraph_vector_t *estimates, 
-					integer_t est_ind, integer_t est_age);
+					integer_t est_ind, integer_t est_age,
+					bool_t lno);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */

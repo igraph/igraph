@@ -22,36 +22,47 @@
 
 
 measure.dynamics.idage <- function(graph, agebins=300,
-                                   iterations=5, sd=FALSE,
-                                   estind=NULL, estage=NULL) {
+                                   iterations=5, significance=0,
+                                   estind=NULL, estage=NULL, number=FALSE) {
 
   maxind <- max(degree(graph, mode="in"))
 
   st <- rep(1, vcount(graph))
+  sd <- (significance != 0)
 
   for (i in seq(along=numeric(iterations))) {
 
     # Standard deviation only at the last iteration
     if (sd && i==iterations) {
-      sd.real <- TRUE
+      sd.real <- significance
     } else {
-      sd.real <- FALSE
+      sd.real <- 0.0
     }
 
+    # Number of estimates also
+    if (number && i==iterations) {
+      number.real <- number
+    } else {
+      number.real <- FALSE
+    }
+
+    if (i != 1) {
+      mes[[1]] <- mes[[1]]/mes[[1]][1,1]
+    }    
+    
     if (i==iterations && !is.null(estind) && !is.null(estage)) {
       mes <- .Call("R_igraph_measure_dynamics_idage_debug", graph,
                    as.numeric(st), as.numeric(agebins),
-                   as.numeric(maxind), sd.real, as.numeric(estind),
-                   as.numeric(estage),
+                   as.numeric(maxind), as.numeric(sd.real), as.numeric(estind),
+                   as.numeric(estage), as.logical(number.real),
                    PACKAGE="igraph")
     } else {
       mes <- .Call("R_igraph_measure_dynamics_idage", graph,
                    as.numeric(st), as.numeric(agebins),
-                   as.numeric(maxind), sd.real,
+                   as.numeric(maxind), as.numeric(sd.real),
+                   as.logical(number.real),
                    PACKAGE="igraph")
     }
-
-    mes[[1]] <- mes[[1]]/mes[[1]][1,1]    
 
     mes[[1]][!is.finite(mes[[1]])] <- 0
     st <- .Call("R_igraph_measure_dynamics_idage_st", graph,
@@ -59,19 +70,24 @@ measure.dynamics.idage <- function(graph, agebins=300,
                 PACKAGE="igraph")
   }
 
-  if (sd.real) {
+  print(mes[[1]][1,1])
+  
+  if (sd.real != 0) {
     mes[[2]] <- mes[[2]]/mes[[1]][1,1]
+    mes[[3]] <- mes[[3]]/mes[[1]][1,1]
   }
   if (!is.null(estind) && !is.null(estage)) {
-    mes[[3]] <- mes[[3]]/mes[[1]][1,1]
-    mes[[3]] <- mes[[3]][-length(mes[[3]])]
+    mes[[4]] <- mes[[4]]/mes[[1]][1,1]
+##    mes[[4]] <- mes[[4]][-length(mes[[4]])]
   }
   mes[[1]] <- mes[[1]]/mes[[1]][1,1]
 
   if (!is.null(estind) && !is.null(estage)) {
-    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], est=mes[[3]])
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]],
+                error=mes[[3]], no=mes[[4]], est=mes[[5]])
   } else {
-    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], est=NULL)
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]],
+                error=mes[[3]], no=mes[[4]], est=NULL)
   }
   
   res

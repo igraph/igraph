@@ -1,3 +1,12 @@
+2006-03-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/games.R (ba.game) : bug corrected
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.idage) :
+	error estimation added
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_idage)
+	(R_igraph_measure_dynamics_idage_debug) : error estimation added
+
 2006-03-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/foreign.R (read.graph.ncol) : added predef

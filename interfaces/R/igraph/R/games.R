@@ -52,7 +52,7 @@ ba.game <- function(n, m=NULL, out.dist=NULL, out.seq=NULL,
   n <- as.numeric(n)
   if (!is.null(m)) { m <- as.numeric(m) }
   if (!is.null(out.dist)) { out.dist <- as.numeric(out.dist) }
-  if (!is.null(out.dist)) { out.seq <- as.numeric(out.seq) }
+  if (!is.null(out.seq)) { out.seq <- as.numeric(out.seq) }
   out.pref <- as.logical(out.pref)
 
   if (!is.null(out.dist)) {

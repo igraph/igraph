@@ -1,3 +1,9 @@
+2006-03-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/measure_dynamics.c (igraph_measure_dynamics_idage)
+	(igraph_measure_dynamics_idage_debug, igraph_i_tuppercrit): error 
+	estimation added
+
 2006-03-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/error.h (igraph_warning_handler_t, IGRAPH_WARNING) : added

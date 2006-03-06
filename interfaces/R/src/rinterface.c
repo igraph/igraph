@@ -1209,14 +1209,15 @@ SEXP R_igraph_edge_betweenness(SEXP graph, SEXP pdirected) {
 }
 
 SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pst, SEXP pagebins,
-				     SEXP pmaxind, SEXP plsd) {
-  
+				     SEXP pmaxind, SEXP psign, SEXP pno) {
+
   igraph_t g;
-  igraph_matrix_t akl, sd;
+  igraph_matrix_t akl, sd, confint, no;
   igraph_vector_t st;
   integer_t agebins=REAL(pagebins)[0];
   integer_t maxind=REAL(pmaxind)[0];
-  bool_t lsd=LOGICAL(plsd)[0];
+  real_t sign=REAL(psign)[0];
+  bool_t lno=LOGICAL(pno)[0];
   SEXP result;
   
   R_igraph_before();
@@ -1226,13 +1227,20 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pst, SEXP pagebins,
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&akl, 0, 0);
   igraph_matrix_init(&sd, 0, 0);
-  igraph_measure_dynamics_idage(&g, &akl, &sd, &st, agebins, maxind, lsd);
-  
-  PROTECT(result=NEW_LIST(2));
+  igraph_matrix_init(&confint, 0, 0);
+  igraph_matrix_init(&no, 0, 0);
+  igraph_measure_dynamics_idage(&g, &akl, &sd, &confint, &no, &st,
+				agebins, maxind, sign, lno);
+    
+  PROTECT(result=NEW_LIST(4));  
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akl));
   igraph_matrix_destroy(&akl);
   SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
   igraph_matrix_destroy(&sd);
+  SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&confint));
+  igraph_matrix_destroy(&confint);
+  SET_VECTOR_ELT(result, 3, R_igraph_matrix_to_SEXP(&no));
+  igraph_matrix_destroy(&no);
 
   R_igraph_after();
   
@@ -1242,14 +1250,15 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pst, SEXP pagebins,
 
 SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst, 
 					   SEXP pagebins, SEXP pmaxind, 
-					   SEXP plsd, SEXP pest_ind, 
-					   SEXP pest_age) {
+					   SEXP psign, SEXP pest_ind, 
+					   SEXP pest_age, SEXP pno) {
   igraph_t g;
-  igraph_matrix_t akl, sd;
+  igraph_matrix_t akl, sd, confint, no;
   igraph_vector_t st;
   integer_t agebins=REAL(pagebins)[0];
   integer_t maxind=REAL(pmaxind)[0];
-  bool_t lsd=LOGICAL(plsd)[0];
+  real_t sign=REAL(psign)[0];
+  bool_t lno=LOGICAL(pno)[0];
   integer_t est_ind=REAL(pest_ind)[0];
   integer_t est_age=REAL(pest_age)[0];
   igraph_vector_t estimates;
@@ -1262,17 +1271,25 @@ SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst,
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&akl, 0, 0);
   igraph_matrix_init(&sd, 0, 0);
+  igraph_matrix_init(&confint, 0, 0);
+  igraph_matrix_init(&no, 0, 0);
   igraph_vector_init(&estimates, 0);
-  igraph_measure_dynamics_idage_debug(&g, &akl, &sd, &st, agebins, maxind, lsd,
-				      &estimates, est_ind, est_age);
-  
-  PROTECT(result=NEW_LIST(3));
+  igraph_measure_dynamics_idage_debug(&g, &akl, &sd, &no, &confint, 
+				      &st, agebins, 
+				      maxind, sign, &estimates, est_ind, 
+				      est_age, lno);
+    
+  PROTECT(result=NEW_LIST(5));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akl));
   igraph_matrix_destroy(&akl);
   SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
   igraph_matrix_destroy(&sd);
-  SET_VECTOR_ELT(result, 2, NEW_NUMERIC(igraph_vector_size(&estimates)));
-  igraph_vector_copy_to(&estimates, REAL(VECTOR_ELT(result, 2)));
+  SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&confint));
+  igraph_matrix_destroy(&confint);
+  SET_VECTOR_ELT(result, 3, R_igraph_matrix_to_SEXP(&no));
+  igraph_matrix_destroy(&no);
+  SET_VECTOR_ELT(result, 4, NEW_NUMERIC(igraph_vector_size(&estimates)));
+  igraph_vector_copy_to(&estimates, REAL(VECTOR_ELT(result, 4)));
   igraph_vector_destroy(&estimates);
 
   R_igraph_after();
