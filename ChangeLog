@@ -1,3 +1,12 @@
+2006-03-08  Csardi Gabor  <csardi@rmki.kfki.hu>
+
+	* src/foreign-lgl-lexer.l 
+	* src/foreign-lgl-parser.y (mylineno, igraph_lgl_mylineno) :
+	renamed to resolve name clash, eliminates a compilation bug on OSX
+	* src/foreign-ncol-lexer.l
+	* src/foreign-ncol-parser.y (mylineno, igraph_ncol_mylineno) :
+	renamed to resolve name clash, eliminates a compilation bug on OSX
+
 2006-02-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_write_graph_lgl) : error handling bug 

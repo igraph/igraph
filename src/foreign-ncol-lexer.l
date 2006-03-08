@@ -1,6 +1,6 @@
 %{
 #include "foreign-ncol-parser.h"
-long int mylineno;
+long int igraph_ncol_mylineno;
 %}
 
 %option noyywrap
@@ -15,7 +15,7 @@ alnum [^ \t\n]
 [ \t]*               { }
 
  /* ---------------------------------------------------newline------*/
-\n                   { mylineno++; return NEWLINE; }
+\n                   { igraph_ncol_mylineno++; return NEWLINE; }
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }

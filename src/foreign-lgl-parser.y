@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 extern int igraph_lgl_yylex();
-extern int mylineno;
+extern int igraph_lgl_mylineno;
 extern char *igraph_lgl_yytext;
 extern int igraph_lgl_yyleng;
 int igraph_lgl_yyerror(char *s);

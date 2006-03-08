@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 extern int igraph_ncol_yylex();
-extern int mylineno;
+extern int igraph_ncol_mylineno;
 extern char *igraph_ncol_yytext;
 extern int igraph_ncol_yyleng;
 int igraph_ncol_yyerror(char *s);

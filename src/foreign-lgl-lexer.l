@@ -1,6 +1,6 @@
 %{
 #include "foreign-lgl-parser.h"
-long int mylineno;
+long int igraph_lgl_mylineno;
 %}
 
 %option noyywrap
@@ -18,7 +18,7 @@ alnum [^ \t\n#]
 [ \t]*               { }
 
  /* ---------------------------------------------------newline------*/
-\n                   { mylineno++; return NEWLINE; }
+\n                   { igraph_lgl_mylineno++; return NEWLINE; }
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }
