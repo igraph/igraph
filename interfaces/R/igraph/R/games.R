@@ -100,57 +100,47 @@ growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
         as.logical(directed), as.logical(citation),
         PACKAGE="igraph")
 }
-  
-aging.prefatt.game <- function(n, m=1, aging.type="exponential",
-                               params=list(), ...) {
 
-  if (! aging.type %in% c("exponential", "powerlaw")) {
-    stop("Invalid aging type.")
+aging.prefatt.game <- function(graph, n, out.deg=rep(1,n),
+                               age.bin=1, pa.exp=1, ac=1,
+                               age.exp=1) {
+
+  vc <- vcount(graph)
+  ec <- ecount(graph)
+
+  if (vc==0) {
+    stop("Cannot start with empty graph")
   }
-  
-  probs <- rep(1, times=n)
-  ind <- rep(0, times=n)
-  born <- 1:n
-  edges <- numeric( (n-1)*m )
+
+  born <- as.integer((1:(vc+n)-1) / age.bin)+1
+  time <- tail(born, 1)+1
+  ind <- c(degree(graph, mode="in"), rep(0, n))
+  prob <- (time-born)^-age.exp * (ind+ac)^pa.exp
+  edges <- numeric(sum(out.deg)*2)
   edgep <- 1
 
-  if (aging.type=="exponential") {
-    aging.exp <- params[["aging.exp"]]
-    if (is.null(aging.exp)) { aging.exp <- 1 }
-  } else if (aging.type=="powerlaw") {
-    aging.exp <- params[["aging.exp"]]
-    if (is.null(aging.exp)) { aging.exp <- 1 }
+  for (nn in (vc+1):(vc+n)) {
+
+    sam <- sample(nn-1, out.deg[nn-vc], prob=prob[1:(nn-1)])
+
+    ## aging
+    if ( (nn-vc) %% age.bin==0) {
+      time <- time + 1
+      prob[1:(nn-1)] <- prob[1:(nn-1)] *
+        ((time-born[1:(nn-1)]+1)/(time-born[1:(nn-1)]))^-age.exp
+    }
+
+    ## increase degree
+    for (s in sam) {
+      prob[s] <- prob[s] * ((ind[s]+ac+1)/(ind[s]+ac))^pa.exp
+      edges[edgep] <- nn ; edgep <- edgep + 1
+      edges[edgep] <- s ; edgep <- edgep + 1
+    }
   }
   
-  for (step in 2:n) {
-
-    # choose neighbors
-    newneis <- sample(1:(step-1), m, replace=TRUE,
-                      prob=probs[1:(step-1)])
-    
-    # aging in probs
-    if (aging.type=="exponential") {
-      probs[1:(step-1)] <- probs[1:(step-1)] * exp(-aging.exp)
-    } else if (aging.type=="powerlaw") {
-      probs[1:(step-1)] <- probs[1:(step-1)] *
-        ((step:2)/((step-1):1))^-aging.exp
-    }
-      
-    # add the edges, recalculate probs
-    for (nei in newneis) {
-      if (aging.type=="exponential") {
-        probs[nei] <- probs[nei] * ((ind[nei]+1)+1)/(ind[nei]+1)
-      } else if (aging.type=="powerlaw") {
-        probs[nei] <- probs[nei] * ((ind[nei]+1)+1)/(ind[nei]+1)
-      }
-      ind[nei] <- ind[nei]+1
-      edges[edgep] <- step; edgep <- edgep + 1
-      edges[edgep] <- nei ; edgep <- edgep + 1
-    }
-    
-  }
-
-  graph(edges-1, n=n, ...)
+  res <- add.vertices(graph, n)
+  res <- add.edges(res, edges-1)
+  res
 }
 
 callaway.traits.game <- function(nodes, types, edge.per.step=1,

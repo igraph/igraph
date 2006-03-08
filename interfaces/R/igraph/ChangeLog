@@ -1,3 +1,8 @@
+2006-03-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/games.R (aging.prefatt.game) : rewritten,
+	does not work yet
+
 2006-03-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/games.R (ba.game) : bug corrected
