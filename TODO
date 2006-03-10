@@ -17,6 +17,11 @@ o better looking graphs in 3D in the R interface
 
 Other bits:
 
+o diameter returns the actual diameter
+o 'to' argument for get.shortest.paths
+o farthest points
+o eccentricity
+
 o topological equaivalence of graphs (hard)
 o make possible building in separate directory (make check, r package,
   make dist do not work)
