@@ -90,6 +90,9 @@ int igraph_diameter(const igraph_t *graph, integer_t *pres,
     IGRAPH_CHECK(igraph_dqueue_push(&q, i));
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
     already_added[i]=i+1;
+
+    igraph_progress("Diameter: ", 100.0*i/no_of_nodes, NULL);
+    IGRAPH_ALLOW_INTERRUPTION();
     
     while (!igraph_dqueue_empty(&q)) {
       long int actnode=igraph_dqueue_pop(&q);
@@ -121,6 +124,8 @@ int igraph_diameter(const igraph_t *graph, integer_t *pres,
     }
   } /* for i<no_of_nodes */
 
+  igraph_progress("Diameter: ", 100.0, NULL);
+  
   /* return the requested info */
   if (pres != 0) {
     *pres=res;
@@ -1495,6 +1500,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
   
   return 0;
 }
+
 
 /**
  * \ingroup structural

@@ -22,6 +22,7 @@
 */
 
 #include <Python.h>
+#include <pythonrun.h>
 #include "igraph.h"
 #include "common.h"
 #include "error.h"
@@ -106,9 +107,15 @@ help(igraph.Graph)
 
 static PyObject* igraphmodule_progress_handler=NULL;
 
+static int igraphmodule_igraph_interrupt_hook(void* data) {
+  if (PyErr_CheckSignals()) {
+    return IGRAPH_FAILURE;
+  }
+  return IGRAPH_SUCCESS;
+}
+
 int igraphmodule_igraph_progress_hook(const char* message, real_t percent,
 				       void* data) {
-  /* Look up _progress_handler in module namespace */
   if (igraphmodule_progress_handler) {
     PyObject *result;
     if (PyCallable_Check(igraphmodule_progress_handler)) {
@@ -236,7 +243,7 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
  */
 static PyMethodDef igraphmodule_methods[] = 
 {
-  {"convex_hull", igraphmodule_convex_hull, METH_VARARGS,
+  {"convex_hull", (PyCFunction)igraphmodule_convex_hull, METH_VARARGS,
       "Calculates the convex hull of a given point set\n\n"
       "Keyword arguments:\n"
       "vs     -- the point set as a list of lists\n"
@@ -319,7 +326,8 @@ initigraph(void)
   PyModule_AddIntConstant(m, "GET_ADJACENCY_BOTH", IGRAPH_GET_ADJACENCY_BOTH);
   PyModule_AddIntConstant(m, "REWIRING_SIMPLE", IGRAPH_REWIRING_SIMPLE);
   
-  /* initialize error and progress handler */
+  /* initialize error, progress and interruption handler */
   igraph_set_error_handler(igraphmodule_igraph_error_hook);
   igraph_set_progress_handler(igraphmodule_igraph_progress_hook);
+  igraph_set_interruption_handler(igraphmodule_igraph_interrupt_hook);
 }

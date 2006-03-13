@@ -43,6 +43,7 @@ __BEGIN_DECLS
 #include "types.h"
 #include "attributes.h"
 #include "error.h"
+#include "interrupt.h"
 
 #include <stdio.h> 		/* FILE */
 

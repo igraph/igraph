@@ -259,7 +259,8 @@ typedef enum {
   IGRAPH_EINVMODE      = 9,
   IGRAPH_EFILE         = 10,
   IGRAPH_EUNFOLDINF    = 11,
-  IGRAPH_UNIMPLEMENTED = 12
+  IGRAPH_UNIMPLEMENTED = 12,
+  IGRAPH_INTERRUPTED   = 13,
 } igraph_i_error_type_t;
 
 /**
@@ -290,7 +291,7 @@ typedef enum {
  * \function igraph_error
  *
  * This is the function which is called (usually via the
- * \ref IGRAPH_ERROR macro if an error is noticed. See the discussion of
+ * \ref IGRAPH_ERROR macro) if an error is noticed. See the discussion of
  * this macro as well.
  *
  * \param reason Textual description of the error.

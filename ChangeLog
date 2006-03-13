@@ -1,3 +1,13 @@
+2006-03-13  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/interrupt.h, src/interrupt.c : functions for interruption
+	handling added
+	* src/structural_properties.c (igraph_diameter) : progress
+	handler and interruption handling added
+	* src/igraph.h : now includes interrupt.h
+	* src/Makefile.am : updated to include the new files
+	* src/error.c : added new error code IGRAPH_INTERRUPTED
+	
 2006-03-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_lattice) : nonmutual and directed

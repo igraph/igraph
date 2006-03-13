@@ -1,6 +1,8 @@
 
 Needed for 0.2:
 
+o for almost all functions: add progress handlers and allow
+  them to be interrupted using IGRAPH_ALLOW_INTERRUPTION()
 o uniform graph operators (union, intersection, etc...)
 o rewrite attributes
 o merging layouts properly, multicompartmental layout functions

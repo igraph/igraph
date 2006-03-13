@@ -41,7 +41,8 @@ static char *igraph_i_error_strings[]={ "No error",            /* 0 */
 					"Invalid mode",        /* 9 */
 					"File operation error",/* 10 */
 					"Unfold infinite iterator", /* 11 */
-                                        "Unimplemented function call",
+                                        "Unimplemented function call", /* 12 */
+                                        "Interrupted",         /* 13 */
 };
 
 const char* igraph_strerror(const int igraph_errno) {

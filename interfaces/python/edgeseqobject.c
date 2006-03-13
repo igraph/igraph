@@ -132,7 +132,7 @@ PyObject* igraphmodule_EdgeSeq_sq_item(igraphmodule_EdgeSeqObject* self,
   return igraphmodule_Edge_New(self->gref, i);
 }
 
-/** \ingroup python_interface_edge
+/** \ingroup python_interface_edgeseq
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_EdgeSeq_attributes(igraphmodule_EdgeSeqObject* self) {
@@ -147,6 +147,85 @@ PyObject* igraphmodule_EdgeSeq_attributes(igraphmodule_EdgeSeqObject* self) {
   return igraphmodule_Graph_edge_attributes(o, NULL, NULL);
 }
 
+/** \ingroup python_interface_edgeseq
+ * \brief Returns the list of values for a given attribute
+ */
+PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* self, PyObject* o) {
+  igraphmodule_GraphObject *gr;
+  igraph_attribute_type_t t;
+  void* vec;
+  igraph_vector_t rv;
+  igraph_strvector_t rsv;
+  long i, j;
+  PyObject* result;
+  
+  if (!PyString_Check(o)) {
+    PyErr_SetString(PyExc_TypeError, "attribute name must be string");
+    return NULL;
+  }
+  
+  gr=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
+  if (!gr) return NULL;
+  j=igraph_ecount(&gr->g);
+
+  /* Get the attribute type */
+  if (igraph_get_edge_attribute_type(&gr->g, PyString_AsString(o), &t)) {
+    igraphmodule_handle_igraph_error(); return NULL; 
+  }
+  
+  if (t == IGRAPH_ATTRIBUTE_NUM) {
+    if (igraph_vector_init(&rv, j)) {
+      igraphmodule_handle_igraph_error(); return NULL;
+    }
+    vec=(void*)&rv;
+    if (igraph_get_edge_attributes(&gr->g, PyString_AsString(o), IGRAPH_ES_ALL(&gr->g), &vec)) {
+      igraph_vector_destroy(&rv);
+      igraphmodule_handle_igraph_error(); return NULL;
+    }
+
+    /* Allocate the list */
+    result=PyList_New(j);
+    if (!result) {
+      igraph_vector_destroy(&rv);
+      return NULL;
+    }
+
+    for (i=0; i<j; i++)
+      PyList_SetItem(result, i, PyFloat_FromDouble((double)VECTOR(rv)[i]));
+    
+    igraph_vector_destroy(&rv);
+  } else if (t == IGRAPH_ATTRIBUTE_STR) {
+    if (igraph_strvector_init(&rsv, j)) {
+      igraphmodule_handle_igraph_error(); return NULL;
+    }
+    vec=(void*)&rsv;
+    if (igraph_get_edge_attributes(&gr->g, PyString_AsString(o), IGRAPH_ES_ALL(&gr->g), &vec)) {
+      igraph_strvector_destroy(&rsv);
+      igraphmodule_handle_igraph_error(); return NULL;
+    }
+
+    /* Allocate the list */
+    result=PyList_New(j);
+    if (!result) {
+      igraph_strvector_destroy(&rsv);
+      return NULL;
+    }
+
+    for (i=0; i<j; i++) {
+      char* s;
+      igraph_strvector_get(&rsv, i, &s);
+      PyList_SetItem(result, i, PyString_FromString(s));
+    }
+    
+    igraph_strvector_destroy(&rsv);
+  } else {
+    PyErr_SetString(PyExc_TypeError, "unknown attribute type");
+    return NULL;
+  }
+  
+  return result;
+}
+
 /**
  * \ingroup python_interface_edgeseq
  * Method table for the \c igraph.EdgeSeq object
@@ -155,6 +234,10 @@ PyMethodDef igraphmodule_EdgeSeq_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_EdgeSeq_attributes,
       METH_NOARGS,
       "Returns the attribute list of the graph's edges\n"
+  },
+  {"get_attribute_values", (PyCFunction)igraphmodule_EdgeSeq_get_attribute_values,
+      METH_O,
+      "Returns the value list of a given edge attribute\n"
   },
   {NULL}
 };

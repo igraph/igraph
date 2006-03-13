@@ -666,10 +666,8 @@ PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self,
 				   &PyBool_Type, &vcount_if_unconnected))
     return NULL;
   
-  Py_BEGIN_ALLOW_THREADS
   r=igraph_diameter(&self->g, &i, 0, 0, 0, (bool_t)(dir == Py_True),
 		    (bool_t)(vcount_if_unconnected == Py_True));
-  Py_END_ALLOW_THREADS
   if (r) 
      {
 	igraphmodule_handle_igraph_error();
@@ -3077,11 +3075,15 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
       if (!PyObject_TypeCheck(t, &igraphmodule_GraphType)) {
 	PyErr_SetString(PyExc_TypeError, "iterable argument must contain graphs");
 	igraph_vector_ptr_destroy(&gs);
+	Py_DECREF(t);
+	Py_DECREF(it);
 	return NULL;
       }
       igraph_vector_ptr_push_back(&gs, &((igraphmodule_GraphObject*)t)->g);
+      Py_DECREF(t);
     }
-
+    Py_DECREF(it);
+    
     /* Create union */
     if (igraph_disjoint_union_many(&g, &gs)) {
       igraph_vector_ptr_destroy(&gs);
