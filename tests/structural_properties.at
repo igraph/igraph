@@ -40,3 +40,9 @@ AT_SETUP([Random rewiring (igraph_rewire): ])
 AT_KEYWORDS([igraph_rewire])
 AT_COMPILE_CHECK([simple/igraph_rewire.c], [simple/igraph_rewire.out])
 AT_CLEANUP
+
+AT_SETUP([Get the shortest paths (igraph_get_shortest_paths): ])
+AT_KEYWORDS([igraph_get_shortest_paths shortest paths geodesic])
+AT_COMPILE_CHECK([simple/igraph_get_shortest_paths.c], 
+		 [simple/igraph_get_shortest_paths.out])
+AT_CLEANUP

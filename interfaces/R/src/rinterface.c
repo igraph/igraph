@@ -1323,33 +1323,47 @@ SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
   return result;
 }
 
-SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pmode) {
+SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto, 
+				 SEXP pmode) {
 
   igraph_t g;
   integer_t from=REAL(pfrom)[0];
+  igraph_vs_t to;
   integer_t mode=REAL(pmode)[0];
   igraph_vector_t *vects;
-  long int no_of_nodes, i;
+  long int i;
+  igraph_vector_ptr_t ptrvec;
   SEXP result;
   
-  R_igraph_before();
+  igraph_vs_t myto;
+  const igraph_vector_t *mytov;
+  long int no;
   
+  R_igraph_before();  
+
   R_SEXP_to_igraph(graph, &g);
-  no_of_nodes=igraph_vcount(&g);
-  vects=Calloc(no_of_nodes, igraph_vector_t);
-  for (i=0; i<no_of_nodes; i++) {
+  R_SEXP_to_igraph_vs_copy(pto, &g, &to);
+
+  igraph_vs_vectorview_it(&g, &to, &myto);
+  mytov=igraph_vs_vector_getvector(&g, &myto);
+  no=igraph_vector_size(mytov);
+  igraph_vs_destroy(&myto);
+
+  igraph_vector_ptr_init(&ptrvec, no);
+  vects=(igraph_vector_t*) R_alloc(GET_LENGTH(pto), sizeof(igraph_vector_t));
+  for (i=0; i<no; i++) {
     igraph_vector_init(&vects[i], 0);
+    VECTOR(ptrvec)[i]=&vects[i];
   }
-  igraph_get_shortest_paths(&g, vects, from, mode);
-  PROTECT(result=NEW_LIST(no_of_nodes));
-  for (i=0; i<no_of_nodes; i++) {
+  igraph_get_shortest_paths(&g, &ptrvec, from, &to, mode);
+  PROTECT(result=NEW_LIST(no));
+  for (i=0; i<no; i++) {
     SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(&vects[i])));
     igraph_vector_copy_to(&vects[i], REAL(VECTOR_ELT(result, i)));
     igraph_vector_destroy(&vects[i]);
   }
+  igraph_vector_ptr_destroy(&ptrvec);
   
-  Free(vects);
-
   R_igraph_after();
   
   UNPROTECT(1);

@@ -478,8 +478,9 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
 		     const igraph_vs_t *vids, igraph_neimode_t mode);
 int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
 			  const igraph_vs_t *from, igraph_neimode_t mode);
-int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_t *res,
-			      integer_t from, igraph_neimode_t mode);
+int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
+			      integer_t from, const igraph_vs_t *to, 
+			      igraph_neimode_t mode);
 int igraph_get_all_shortest_paths(const igraph_t *graph,
 				  igraph_vector_ptr_t *res, 
 				  igraph_vector_t *nrgeo,
