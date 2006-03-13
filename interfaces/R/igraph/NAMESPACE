@@ -89,7 +89,7 @@ export(subgraph, simplify, degree, degree.distribution, diameter,
        closeness, subcomponent, betweenness, bibcoupling, cocitation,
        shortest.paths, minimum.spanning.tree, edge.betweenness,
        get.shortest.paths, average.path.length, transitivity,
-       get.all.shortest.paths)
+       get.all.shortest.paths, get.diameter, farthest.points)
 
 # plotting
 

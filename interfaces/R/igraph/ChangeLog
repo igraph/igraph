@@ -1,4 +1,11 @@
-2006-03-12  Gabor Csardi  <csardi@cool100.rmki.kfki.hu>
+2006-03-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R (get.diameter) : added
+	(farthest.points) : added
+	(get.all.shortest.paths) : to argument added
+	* interfaces/R/src/rinterface.c (R_igraph_diameter) : updated
+	(R_igraph_get_diameter) : added
+	(R_igraph_farthest_points) : added
 
 	* interfaces/R/igraph/R/structural.properties.R (get.shortest.paths) :
 	to argument added

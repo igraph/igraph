@@ -30,6 +30,18 @@ diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
         PACKAGE="igraph")
 }
 
+get.diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
+  .Call("R_igraph_get_diameter", graph, as.logical(directed),
+        as.logical(unconnected),
+        PACKAGE="igraph")
+}
+
+farthest.points <- function(graph, directed=TRUE, unconnected=TRUE) {
+  .Call("R_igraph_farthest_points", graph, as.logical(directed),
+        as.logical(unconnected),
+        PACKAGE="igraph")
+}       
+
 average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
   .Call("R_igraph_average_path_length", graph, as.logical(directed),
         as.logical(unconnected),
@@ -89,14 +101,20 @@ get.shortest.paths <- function(graph, from, to=igraph.vs.all(graph),
         PACKAGE="igraph")
 }
 
-get.all.shortest.paths <- function(graph, from, mode="all") {
+get.all.shortest.paths <- function(graph, from,
+                                   to=NULL,
+                                   mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
 
-  .Call("R_igraph_get_all_shortest_paths", graph,
-        as.numeric(from), as.numeric(mode),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_get_all_shortest_paths", graph,
+               as.numeric(from), as.numeric(mode),
+               PACKAGE="igraph")
+  if (!is.null(to)) {
+    res <- res[ sapply(res, function(x) tail(x,1) %in% to) ]
+  }
+  res
 }
 
 subcomponent <- function(graph, v, mode="all") {

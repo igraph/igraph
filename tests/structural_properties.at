@@ -23,7 +23,7 @@ AT_BANNER([[Structural properties]])
 
 AT_SETUP([Diameter of a graph (igraph_diameter):])
 AT_KEYWORDS([igraph_diameter])
-AT_COMPILE_CHECK([simple/igraph_diameter.c])
+AT_COMPILE_CHECK([simple/igraph_diameter.c], [simple/igraph_diameter.out])
 AT_CLEANUP
 
 AT_SETUP([Average geodesic length (igraph_average_path_length): ])

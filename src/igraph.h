@@ -469,6 +469,8 @@ bool_t igraph_are_connected(const igraph_t *graph, integer_t v1, integer_t v2);
 /* -------------------------------------------------- */
 
 int igraph_diameter(const igraph_t *graph, integer_t *res, 
+		    integer_t *from, integer_t *to,
+		    igraph_vector_t *path,
 		    bool_t directed, bool_t unconn);
 int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph, 
 					    igraph_t *mst);

@@ -737,10 +737,62 @@ SEXP R_igraph_diameter(SEXP graph, SEXP pdirected, SEXP punconnected) {
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_diameter(&g, &res, directed, unconnected);
+  igraph_diameter(&g, &res, 0, 0, 0, directed, unconnected);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_diameter(SEXP graph, SEXP pdirected, SEXP punconnected) {
+  
+  igraph_t g;
+  bool_t directed=LOGICAL(pdirected)[0];
+  bool_t unconnected=LOGICAL(punconnected)[0];
+  igraph_vector_t res;
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&res, 0);
+  igraph_diameter(&g, 0, 0, 0, &res, directed, unconnected);
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_farthest_points(SEXP graph, SEXP pdirected, SEXP punconnected) {
+  
+  igraph_t g;
+  bool_t directed=LOGICAL(pdirected)[0];
+  bool_t unconnected=LOGICAL(punconnected)[0];
+  integer_t from, to, len;
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_diameter(&g, &len, &from, &to, 0, directed, unconnected);
+  
+  PROTECT(result=NEW_NUMERIC(3));
+  if (from < 0) {
+    REAL(result)[0]=REAL(result)[1]=REAL(result)[2]=NA_REAL;
+  } else {
+    REAL(result)[0]=from;
+    REAL(result)[1]=to;
+    REAL(result)[2]=len;
+  }
   
   R_igraph_after();
   

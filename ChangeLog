@@ -1,4 +1,8 @@
-2006-03-12  Gabor Csardi  <csardi@cool100.rmki.kfki.hu>
+2006-03-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_diameter) : from, to, path
+	arguments added
+	* examples/simple/igraph_diameter.c : updated
 
 	* src/structural_properties.c (igraph_get_shortest_paths) : 
 	to argument added

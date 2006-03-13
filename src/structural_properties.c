@@ -57,20 +57,23 @@
  * number of vertices times the number of edges.
  */
 
-int igraph_diameter(const igraph_t *graph, integer_t *res, 
+int igraph_diameter(const igraph_t *graph, integer_t *pres, 
+		    integer_t *pfrom, integer_t *pto, 
+		    igraph_vector_t *path,
 		    bool_t directed, bool_t unconn) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n;
   long int *already_added;
   long int nodes_reached;
+  long int from=0, to=0;
+  long int res=0;
 
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t *neis;
   integer_t dirmode;
   igraph_i_adjlist_t allneis;
   
-  *res=0;  
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
   already_added=Calloc(no_of_nodes, long int);
   if (already_added==0) {
@@ -91,7 +94,11 @@ int igraph_diameter(const igraph_t *graph, integer_t *res,
     while (!igraph_dqueue_empty(&q)) {
       long int actnode=igraph_dqueue_pop(&q);
       long int actdist=igraph_dqueue_pop(&q);
-      if (actdist>*res) { *res=actdist; }
+      if (actdist>res) { 
+	res=actdist; 
+	from=i;
+	to=actnode;
+      }
       
       neis=igraph_i_adjlist_get(&allneis, actnode);
       n=igraph_vector_size(neis);
@@ -107,10 +114,37 @@ int igraph_diameter(const igraph_t *graph, integer_t *res,
     
     /* not connected, return largest possible */
     if (nodes_reached != no_of_nodes && !unconn) {
-      *res=no_of_nodes;
+      res=no_of_nodes;
+      from=-1;
+      to=-1;
       break;
     }
   } /* for i<no_of_nodes */
+
+  /* return the requested info */
+  if (pres != 0) {
+    *pres=res;
+  }
+  if (pfrom != 0) {
+    *pfrom=from;
+  }
+  if (pto != 0) {
+    *pto=to;
+  }
+  if (path != 0) {
+    if (res==no_of_nodes) {
+      igraph_vector_clear(path);
+    } else {
+      igraph_vector_ptr_t tmpptr;
+      igraph_vector_ptr_init(&tmpptr, 1);
+      IGRAPH_FINALLY(igraph_vector_ptr_destroy, &tmpptr);
+      VECTOR(tmpptr)[0]=path;
+      IGRAPH_CHECK(igraph_get_shortest_paths(graph, &tmpptr, from, 
+					     IGRAPH_VS_1(graph, to), dirmode));
+      igraph_vector_ptr_destroy(&tmpptr);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
   
   /* clean */
   Free(already_added);
@@ -726,6 +760,8 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
 			      integer_t from, const igraph_vs_t *to, 
 			      igraph_neimode_t mode) {
+
+  /* TODO: use adjlist_t if to is long (longer than 1?) */
 
   long int no_of_nodes=igraph_vcount(graph);
   long int *father;
