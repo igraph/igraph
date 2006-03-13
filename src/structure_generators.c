@@ -496,7 +496,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, integer_t 
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_nodes*dims +
-			      directed * no_of_nodes*dims));
+				     mutual*directed * no_of_nodes*dims));
 
   for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<dims; j++) {
@@ -512,7 +512,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, integer_t 
 	  igraph_vector_push_back(&edges, new_nei-1); /* reserved */
 	}
       } /* if circular || coords[j] */
-      if (directed && (circular || coords[j] != 0)) {
+      if (mutual && directed && (circular || coords[j] != 0)) {
 	long int new_nei;
 	if (coords[j]!=0) {
 	  new_nei=i-weights[j]+1;
