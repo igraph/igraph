@@ -1,5 +1,10 @@
 2006-03-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/python/graphobject.c (igraphmodule_Graph_diameter) :
+	updated
+	(igraphmodule_Graph_get_shortest_paths) : updated
+	(igraphmodule_Graph_get_all_shortest_paths) : updated
+	
 	* src/structural_properties.c (igraph_get_all_shortest_paths) :
 	to argument added
 

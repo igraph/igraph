@@ -667,7 +667,7 @@ PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self,
     return NULL;
   
   Py_BEGIN_ALLOW_THREADS
-  r=igraph_diameter(&self->g, &i, (bool_t)(dir == Py_True),
+  r=igraph_diameter(&self->g, &i, 0, 0, 0, (bool_t)(dir == Py_True),
 		    (bool_t)(vcount_if_unconnected == Py_True));
   Py_END_ALLOW_THREADS
   if (r) 
@@ -1657,6 +1657,7 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self,
    integer_t from;
    PyObject *list, *item;
    long int no_of_nodes=igraph_vcount(&self->g);
+   igraph_vector_ptr_t ptrvec;
    
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|l", kwlist,
 				    &from0, &mode))
@@ -1670,10 +1671,21 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self,
 	PyErr_SetString(PyExc_MemoryError, "");
 	return NULL;
      }
+
+   if (igraph_vector_ptr_init(&ptrvec, no_of_nodes)) 
+     {
+       PyErr_SetString(PyExc_MemoryError, "");
+       return NULL;
+     }  
    
-   for (i=0; i<no_of_nodes; i++) igraph_vector_init(&res[i], 5);
+   for (i=0; i<no_of_nodes; i++)
+     {
+       VECTOR(ptrvec)[i]=&res[i];
+       igraph_vector_init(&res[i], 5);
+     }
    
-   if (igraph_get_shortest_paths(&self->g, res, from, mode))
+   if (igraph_get_shortest_paths(&self->g, &ptrvec, from, 
+				 IGRAPH_VS_ALL(&self->g), mode))
      {
 	igraphmodule_handle_igraph_error();
 	for (j=0; j<no_of_nodes; j++) igraph_vector_destroy(&res[j]);
@@ -1709,6 +1721,7 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self,
    
    for (j=0; j<no_of_nodes; j++) igraph_vector_destroy(&res[j]);
    free(res);
+   igraph_vector_ptr_destroy(&ptrvec);
    return list;
 }
 
@@ -1740,7 +1753,8 @@ PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *se
     return NULL;
   }
   
-  if (igraph_get_all_shortest_paths(&self->g, &res, NULL, from, mode)) {
+  if (igraph_get_all_shortest_paths(&self->g, &res, NULL, from, 
+				    IGRAPH_VS_ALL(&self->g), mode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_ptr_destroy(&res);
     return NULL;
