@@ -17,8 +17,6 @@ o better looking graphs in 3D in the R interface
 
 Other bits:
 
-o diameter returns the actual diameter
-o farthest points
 o eccentricity
 
 o topological equaivalence of graphs (hard)

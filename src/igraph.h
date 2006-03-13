@@ -486,7 +486,8 @@ int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
 int igraph_get_all_shortest_paths(const igraph_t *graph,
 				  igraph_vector_ptr_t *res, 
 				  igraph_vector_t *nrgeo,
-				  integer_t from, igraph_neimode_t mode);
+				  integer_t from, const igraph_vs_t *to, 
+				  igraph_neimode_t mode);
 int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, real_t vid, 
 			igraph_neimode_t mode);	
 int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res, 

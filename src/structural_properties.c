@@ -926,7 +926,8 @@ void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
 int igraph_get_all_shortest_paths(const igraph_t *graph,
 				  igraph_vector_ptr_t *res, 
 				  igraph_vector_t *nrgeo,
-				  integer_t from, igraph_neimode_t mode) {
+				  integer_t from, const igraph_vs_t *to,
+				  igraph_neimode_t mode) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int *geodist;
@@ -938,6 +939,9 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
   igraph_vector_t ptrhead;
   long int n, j, i;
 
+  igraph_vs_t myto;
+  const igraph_vector_t *mytov;
+
   if (from<0 || from>=no_of_nodes) {
     IGRAPH_ERROR("cannot get shortest paths", IGRAPH_EINVVID);
   }
@@ -946,19 +950,22 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
 
+  IGRAPH_CHECK(igraph_vs_vectorview_it(graph, to, &myto));
+  IGRAPH_FINALLY(igraph_vs_destroy, &myto);
+  mytov=igraph_vs_vector_getvector(graph, &myto);
+
   IGRAPH_CHECK(igraph_vector_ptr_init(&paths, 0));
   IGRAPH_FINALLY(igraph_i_gasp_paths_destroy, &paths);
-  IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&ptrlist, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&ptrhead, no_of_nodes);
-  IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
   geodist=Calloc(no_of_nodes, long int);
   if (geodist==0) {
     IGRAPH_ERROR("Cannot calculate shortest paths", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, geodist);
-
+  IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
 
   if (nrgeo) { 
     IGRAPH_CHECK(igraph_vector_resize(nrgeo, no_of_nodes));
@@ -1014,26 +1021,53 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
     }
   }
 
-  Free(geodist);
   igraph_dqueue_destroy(&q);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(1);
 
-  /* Copy to the result */  
-  IGRAPH_CHECK(igraph_vector_ptr_resize(res, igraph_vector_ptr_size(&paths)));
-  j=0;
+  /* Copy to the result */
+  memset(geodist, 0, sizeof(long int)*no_of_nodes);
+  for (i=0; i<igraph_vector_size(mytov); i++) {
+    geodist[ (long int) VECTOR(*mytov)[i] ] = 1;
+  }
+  
+  n=0;
   for (i=0; i<no_of_nodes; i++) {
     long int fatherptr=VECTOR(ptrhead)[i];
-    while (fatherptr != 0) {
-      VECTOR(*res)[j++]=VECTOR(paths)[fatherptr-1];
-      fatherptr=VECTOR(ptrlist)[fatherptr-1];
+    if (geodist[i] > 0) {
+      while (fatherptr != 0) {
+	n++;
+	fatherptr=VECTOR(ptrlist)[fatherptr-1];
+      }
     }
   }
 
+  IGRAPH_CHECK(igraph_vector_ptr_resize(res, n));
+  j=0;
+  for (i=0; i<no_of_nodes; i++) {
+    long int fatherptr=VECTOR(ptrhead)[i];
+    if (geodist[i] > 0) {
+      while (fatherptr != 0) {
+	VECTOR(*res)[j++]=VECTOR(paths)[fatherptr-1];
+	fatherptr=VECTOR(ptrlist)[fatherptr-1];
+      }
+    } else {
+      while (fatherptr != 0) {
+	igraph_vector_destroy(VECTOR(paths)[fatherptr-1]);
+	Free(VECTOR(paths)[fatherptr-1]);
+	fatherptr=VECTOR(ptrlist)[fatherptr-1];
+      }
+    }
+  }
+
+  Free(geodist);
   igraph_vector_destroy(&ptrlist);
   igraph_vector_destroy(&ptrhead);
   igraph_vector_destroy(&neis);
   igraph_vector_ptr_destroy(&paths);
-  IGRAPH_FINALLY_CLEAN(4);
+  igraph_vs_destroy(&myto);
+  IGRAPH_FINALLY_CLEAN(6);
+
+  if (to->shorthand) { igraph_vs_destroy((igraph_vs_t*)to); }
   return 0;
 }
 				  

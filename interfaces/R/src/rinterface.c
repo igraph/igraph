@@ -3181,11 +3181,12 @@ SEXP R_igraph_motifs_randesu_estimate(SEXP graph, SEXP psize, SEXP pcutprob,
   return result;
 }
 
-SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom, 
+SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
 				     SEXP pmode) {
   
   igraph_t g;
   integer_t from=REAL(pfrom)[0];
+  igraph_vs_t to;
   integer_t mode=REAL(pmode)[0];
   igraph_vector_ptr_t res;
   SEXP result;
@@ -3194,8 +3195,9 @@ SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom,
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_vs_copy(pto, &g, &to);
   igraph_vector_ptr_init(&res, 0);
-  igraph_get_all_shortest_paths(&g, &res, 0, from, mode);
+  igraph_get_all_shortest_paths(&g, &res, 0, from, &to, mode);
   PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&res)));
   for (i=0; i<igraph_vector_ptr_size(&res); i++) {
     long int len=igraph_vector_size(VECTOR(res)[i]);
@@ -3204,6 +3206,7 @@ SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom,
     igraph_vector_destroy(VECTOR(res)[i]);
   }
   igraph_vector_ptr_destroy(&res);
+  igraph_vs_destroy(&to);
   
   R_igraph_after();
   
