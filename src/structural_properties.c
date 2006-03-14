@@ -40,7 +40,15 @@
  * \brief Calculates the diameter of a graph (longest geodesic).
  *
  * \param graph The graph object.
- * \param res Pointer to an integer, this will contain the result.
+ * \param pres Pointer to an integer, if not \c NULL then it will contain 
+ *        the diameter (the actual distance).
+ * \param pfrom Pointer to an integer, if not \c NULL it will be set to the 
+ *        source vertex of the diameter path.
+ * \param pto Pointer to an integer, if not \c NULL it will be set to the 
+ *        target vertex of the diameter path.
+ * \param path Pointer to an initialized vector. If not \c NULL the actual 
+ *        longest geodesic path will be stored here. The vector will be 
+ *        resized as needed.
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
