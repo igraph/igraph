@@ -34,10 +34,14 @@ RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 	$(top_srcdir)/include/types.h \
 	$(top_srcdir)/include/interrupt.h
 
-RSRCSOURCES = src/rinterface.c src/Makevars src/Makevars.win \
-	src/config.h.in src/config.h
+RSRCSOURCES = $(top_srcdir)/interfaces/R/src/rinterface.c \
+	$(top_srcdir)/interfaces/R/src/Makevars \
+	$(top_srcdir)/interfaces/R/src/Makevars.win \
+	$(top_srcdir)/interfaces/R/src/config.h.in  \
+	$(top_srcdir)/interfaces/R/src/config.h
 
 igraph_$(VERSION).tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
+	cp -r $(top_srcdir)/interfaces/R/igraph .
 	cp $(RSCNAMES_ORIGPLACE) igraph/src/
 	cp $(RTOPHEADERS) igraph/src
 	cp $(RSRCSOURCES) igraph/src
