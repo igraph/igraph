@@ -1,11 +1,17 @@
 ## Process this file with automake to produce Makefile.in
 
+DOXROX=$(top_srcdir)/doc/doxrox.py
+REGEX=$(top_srcdir)/doc/c-docbook.re
+SRCDIR=$(top_srcdir)/src
+
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
 	      foreign.xml nongraph.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml
+
+DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/%,$(DOCFIX))
 
 all: doctemplate
 
@@ -24,66 +30,71 @@ doctemplate: $(DOCINCLUDES)
 igraph-docs.xml: $(DOCINCLUDES)
 	touch igraph-docs.xml
 
-vector.xml: vector.xxml ../src/types.h ../src/vector.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/types.h ../src/vector.c
+vector.xml: vector.xxml $(SRCDIR)/types.h $(SRCDIR)/vector.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/vector.c
 
-error.xml: error.xxml ../src/error.h
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/error.h
+error.xml: error.xxml $(SRCDIR)/error.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/error.h
 
-matrix.xml: matrix.xxml ../src/types.h ../src/matrix.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/types.h ../src/matrix.c
+matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.c
 
-basicigraph.xml: basicigraph.xxml ../src/type_indexededgelist.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/type_indexededgelist.c
+basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c
 
-generators.xml: generators.xxml ../src/structure_generators.c ../src/games.c \
-		../src/atlas.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ \
-	../src/structure_generators.c ../src/games.c ../src/atlas.c
+generators.xml: generators.xxml $(SRCDIR)/structure_generators.c $(SRCDIR)/games.c \
+		$(SRCDIR)/atlas.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ \
+	$(SRCDIR)/structure_generators.c $(SRCDIR)/games.c $(SRCDIR)/atlas.c
 
-structural.xml: structural.xxml ../src/structural_properties.c \
-		../src/conversion.c ../src/basic_query.c \
-		../src/cocitation.c ../src/components.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ \
-	../src/structural_properties.c ../src/conversion.c \
-	../src/basic_query.c ../src/cocitation.c ../src/components.c
+structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
+		$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c \
+		$(SRCDIR)/cocitation.c $(SRCDIR)/components.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ \
+	$(SRCDIR)/structural_properties.c $(SRCDIR)/conversion.c \
+	$(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c $(SRCDIR)/components.c
 
-iterators.xml: iterators.xxml ../src/iterators.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/iterators.c
+iterators.xml: iterators.xxml $(SRCDIR)/iterators.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c
 
-attributes.xml: attributes.xxml ../src/attributes.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/attributes.c
+attributes.xml: attributes.xxml $(SRCDIR)/attributes.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c
 
-layout.xml: layout.xxml ../src/layout.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/layout.c
+layout.xml: layout.xxml $(SRCDIR)/layout.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c
 
-foreign.xml: foreign.xxml ../src/foreign.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/foreign.c
+foreign.xml: foreign.xxml $(SRCDIR)/foreign.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c
 
-nongraph.xml: nongraph.xxml ../src/other.c ../src/random.c
-	./doxrox.py -t $< -e c-docbook.re -o $@ ../src/other.c ../src/random.c
+nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/other.c $(SRCDIR)/random.c
 
 
-html/stamp: igraph-docs.xml $(DOCFIX)
-	xmlto -x gtk-doc.xsl -o html xhtml igraph-docs.xml \
+html/stamp: igraph-docs.xml $(DOCFIX2)
+	cp $(DOCFIX2) . && \
+	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
 	&& touch html/stamp
 
-igraph-docs.info: igraph-docs.xml $(DOCFIX)
+igraph-docs.info: igraph-docs.xml $(DOCFIX2)
+	cp $(DOCFIX2) . && \
 	db2x_xsltproc --xinclude -s texi igraph-docs.xml -o igraph-docs.txml \
 	&& db2x_texixml igraph-docs.txml \
 	&& makeinfo --no-split igraph-docs.texi
 
-igraph-docs.dvi: igraph-docs.xml $(DOCFIX)
+igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
+	cp $(DOCFIX2) . && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
 	&& docbook2dvi igraph-docs2.xml \
 	&& mv igraph-docs2.dvi igraph-docs.dvi
 
-igraph-docs.ps: igraph-docs.xml $(DOCFIX)
+igraph-docs.ps: igraph-docs.xml $(DOCFIX2)
+	cp $(DOCFIX2) . && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
 	&& docbook2ps igraph-docs2.xml \
 	&& mv igraph-docs2.ps igraph-docs.ps
 
-igraph-docs.pdf: igraph-docs.xml $(DOCFIX)
+igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
+	cp $(DOCFIX2) . && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
 	&& docbook2pdf igraph-docs2.xml \
 	&& mv igraph-docs2.pdf igraph-docs.pdf

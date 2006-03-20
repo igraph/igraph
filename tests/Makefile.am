@@ -1,5 +1,5 @@
 
-EXTRA_DIST = $(TESTSUITE_AT) testsuite
+EXTRA_DIST = $(TESTSUITE_AT) $(top_builddir)/tests/testsuite
 
 MAINTAINERCLEANFILES = Makefile.in $(TESTSUITE) package.m4 atconfig
 
@@ -20,17 +20,19 @@ TESTSUITE_AT = \
 	types.at basic.at structure_generators.at \
 	structural_properties.at iterators.at components.at \
 	visitors.at layout.at motifs.at topology.at foreign.at operators.at
-TESTSUITE = $(srcdir)/testsuite
+
+TESTSUITE = testsuite
 
 AUTOTEST = $(AUTOM4TE) --language=autotest
-$(srcdir)/$(TESTSUITE): package.m4 $(TESTSUITE_AT)
-	$(AUTOTEST) -I $(srcdir) testsuite.at -o $@.tmp
+$(TESTSUITE): $(srcdir)/package.m4 $(TESTSUITE_AT)
+	$(AUTOTEST) -I $(top_srcdir)/tests $(top_srcdir)/tests/testsuite.at -o $@.tmp
 	mv $@.tmp $@
 
 clean-local: $(TESTSUITE)
 	$(SHELL) $(TESTSUITE) --clean
 
 check-local: atconfig atlocal $(TESTSUITE)
+	if [ ! -f $(TESTSUITE) ]; then cp $(top_srcdir)/tests/testsuite .; fi
 	$(SHELL) $(TESTSUITE)
 
 # Run the test suite on the *installed* tree.

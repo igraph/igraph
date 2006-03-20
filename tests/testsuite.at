@@ -22,10 +22,10 @@
 AT_INIT([igraph])
 
 m4_define([AT_COMPILE_CHECK], [
-AT_CHECK([$CC -I$top_srcdir/include -L$top_srcdir/src/.libs -ligraph $top_srcdir/examples/$1 -o itest])
+AT_CHECK([$CC -I$top_srcdir/include -L$top_builddir/src/.libs -ligraph $top_srcdir/examples/$1 -o itest])
 AT_CHECK([m4_if([[$2]],[[]],[[>expout]],[[cp $top_srcdir/examples/'$2' expout]])])
 AT_CHECK([m4_if([[$3]],[[]],[[]],[[cp $top_srcdir/examples/'$3' .]])])
-AT_CHECK([LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$top_srcdir/src/.libs ./itest], [], [expout])])
+AT_CHECK([LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$top_builddir/src/.libs ./itest], [], [expout])])
 
 m4_include([types.at])
 m4_include([basic.at])
