@@ -40,7 +40,7 @@ int main() {
 
   igraph_vector_init_real(&cp, 8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-  igraph_ring(&g, 1000, IGRAPH_DIRECTED, 0, 1);
+  igraph_ring(&g, 1000, IGRAPH_DIRECTED, 1, 1);
   igraph_vector_init(&hist, 0);
   igraph_motifs_randesu(&g, &hist, 3, &cp);
   print_vector(&hist);
