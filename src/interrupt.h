@@ -132,4 +132,7 @@ typedef int igraph_interruption_handler_t (void* data);
 
 int igraph_allow_interruption(void* data);
 
+igraph_interruption_handler_t *
+igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
+
 #endif

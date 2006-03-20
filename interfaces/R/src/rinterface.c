@@ -67,12 +67,26 @@ void R_igraph_myhandler (const char *reason, const char *file,
 	igraph_strerror(igraph_errno));
 }
 
+igraph_interruption_handler_t *R_igraph_oldinterrupt;
+
+int R_igraph_interrupt_handler(void *data) {
+  R_CheckUserInterrupt();
+  /* TODO!!! : rewrite this to free memory:
+     check the R code for what exactly R_CheckUserInterrupt() does and 
+     do the same except returning to R
+  */
+  return 0;
+}
+
 R_INLINE void R_igraph_before() {
   R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
+  R_igraph_oldinterrupt=
+    igraph_set_interruption_handler(R_igraph_interrupt_handler);
 }
 
 R_INLINE void R_igraph_after() {
   igraph_set_error_handler(R_igraph_oldhandler);
+  igraph_set_interruption_handler(R_igraph_oldinterrupt);
 }
 
 int R_igraph_progress_handler(const char *message, real_t percent,

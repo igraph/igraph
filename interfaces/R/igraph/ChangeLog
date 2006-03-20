@@ -1,3 +1,9 @@
+2006-03-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_oldinterrupt)
+	(R_igraph_interrupt_handler) : added
+	(R_igraph_before, R_igraph_after) : added interruption handling
+
 2006-03-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R 

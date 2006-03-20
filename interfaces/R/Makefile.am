@@ -14,7 +14,7 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	igraph_strvector.c igraph_trie.c matrix.c \
 	vector.c vector_ptr.c memory.c adjlist.c visitors.c \
 	igraph_grid.c atlas.c topology.c motifs.c progress.c \
-	operators.c
+	operators.c interrupt.c
 
 RSNAMES_H = memory.h random.h atlas-edges.h
 
@@ -31,7 +31,8 @@ RSCNAMES_ORIGPLACE = $(patsubst %,$(top_srcdir)/src/%,$(RSCNAMES))
 RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 	$(top_srcdir)/include/error.h \
 	$(top_srcdir)/include/igraph.h \
-	$(top_srcdir)/include/types.h
+	$(top_srcdir)/include/types.h \
+	$(top_srcdir)/include/interrupt.h
 
 RSRCSOURCES = src/rinterface.c src/Makevars src/Makevars.win \
 	src/config.h.in src/config.h
