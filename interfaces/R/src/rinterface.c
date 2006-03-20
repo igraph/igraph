@@ -3169,6 +3169,27 @@ SEXP R_igraph_motifs_randesu(SEXP graph, SEXP psize, SEXP pcutprob) {
   return result;
 }
 
+SEXP R_igraph_motifs_randesu_no(SEXP graph, SEXP psize, SEXP pcutprob) {
+  igraph_t g;
+  integer_t size=REAL(psize)[0];
+  igraph_vector_t cutprob;
+  integer_t res;
+  SEXP result;
+
+  R_igraph_before();
+
+  R_SEXP_to_vector(pcutprob, &cutprob);
+  R_SEXP_to_igraph(graph, &g);
+  igraph_motifs_randesu_no(&g, &res, size, &cutprob);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_motifs_randesu_estimate(SEXP graph, SEXP psize, SEXP pcutprob,
 				      SEXP psamplesize, SEXP psample) {
   igraph_t g;

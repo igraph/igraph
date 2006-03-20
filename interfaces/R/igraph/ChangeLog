@@ -1,5 +1,8 @@
 2006-03-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/motifs.R (graph.motifs.no) : added
+	* interfaces/R/src/rinterface.c (R_igraph_motifs_randesu_no) : added
+
 	* interfaces/R/src/rinterface.c (R_igraph_oldinterrupt)
 	(R_igraph_interrupt_handler) : added
 	(R_igraph_before, R_igraph_after) : added interruption handling

@@ -114,7 +114,7 @@ export(measure.dynamics.idage)
 # isomorphism, motifs
 
 export(graph.isoclass, graph.isomorphic, graph.motifs,
-       graph.motifs.est, graph.isocreate)
+       graph.motifs.est, graph.isocreate, graph.motifs.no)
 
 # operators
 

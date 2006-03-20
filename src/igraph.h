@@ -655,6 +655,8 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, integer_t *est,
 				   int size, igraph_vector_t *cut_prob, 
 				   integer_t sample_size, 
 				   igraph_vector_t *sample);
+int igraph_motifs_randesu_no(const igraph_t *graph, integer_t *no,
+			     int size, igraph_vector_t *cut_prob);
 
 /* -------------------------------------------------- */
 /* Progress handlers                                  */
