@@ -1,9 +1,6 @@
 
-if DOCS
-   MAYBE_DOCS = doc
-endif
 
-SUBDIRS=src interfaces debian tests $(MAYBE_DOCS)
+SUBDIRS=src interfaces debian tests
 DOC_FILES = $(top_builddir)/doc/html \
 	$(top_builddir)/doc/igraph-docs.info \
 	$(top_builddir)/doc/igraph-docs.pdf
