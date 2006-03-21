@@ -69,12 +69,19 @@ void R_igraph_myhandler (const char *reason, const char *file,
 
 igraph_interruption_handler_t *R_igraph_oldinterrupt;
 
+extern int R_interrupts_pending;
+
 int R_igraph_interrupt_handler(void *data) {
+#if  ( defined(HAVE_AQUA) || defined(Win32) )
+  /* TODO!!!: proper interrupt handling for these systems, 
+     right now memory is not deallocated!!! */
   R_CheckUserInterrupt();
-  /* TODO!!! : rewrite this to free memory:
-     check the R code for what exactly R_CheckUserInterrupt() does and 
-     do the same except returning to R
-  */
+#else
+  if (R_interrupts_pending) {
+    IGRAPH_FINALLY_FREE();
+    R_CheckUserInterrupt();
+  }
+#endif
   return 0;
 }
 
