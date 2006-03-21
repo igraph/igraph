@@ -1,3 +1,10 @@
+2006-03-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* debian/rules : added interrupt.h to Debian package
+	* src/other.c (igraph_convex_hull) : updated documentation
+	* configure.in, interfaces/python/Makefile.am : made them
+	compatible with Fedora Core 3 (and possibly other platforms :))
+
 2006-03-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/motifs.c (igraph_motifs_randesu_no) : added

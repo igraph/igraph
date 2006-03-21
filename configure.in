@@ -76,64 +76,63 @@ graphml_support=yes
 AC_ARG_ENABLE(graphml,
               AC_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),
               [graphml_support=$enableval], [graphml_support=yes])
-	      
-AC_MSG_CHECKING(for Python >= 2.3)
-AM_PYTHON_CHECK_VERSION(python, 2.3, [
-  HAVE_PYTHON=1
-  PYTHON_VERSION=`python -c "import sys; print sys.version[[:3]]"`
-  AC_SUBST(PYTHON_VERSION)
-  AC_MSG_RESULT([found, ${PYTHON_VERSION}])
-], [
-  AC_MSG_RESULT(not found -- disabling Python interface)
-  HAVE_PYTHON=0
-  use_python=no
-])
 
-if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
-  PYTHON_PREFIX=`python -c "import sys; print sys.prefix.replace('\\\\\\\\','/')"`
-  if test ! -z "$PYTHON_PREFIX"; then
-    pysitepkgdir="\${prefix}/lib/python$PYTHON_VERSION/site-packages"
-    PYTHON_CFLAGS="-I$PYTHON_PREFIX/include/python$PYTHON_VERSION -I$PYTHON_PREFIX/include"
-    PYTHON_CPPFLAGS="${PYTHON_CFLAGS}"
-    PYTHON_CXXFLAGS="${PYTHON_CFLAGS}"
-    AC_SUBST(PYTHON_PREFIX)
-    AC_SUBST(PYTHON_CFLAGS)
-    AC_SUBST(PYTHON_CPPFLAGS)
-    AC_SUBST(PYTHON_CXXFLAGS)
-    AC_SUBST(pysitepkgdir)
-      
-    PYTHON_LIBS="none"
-    AC_CHECK_LIB([python$PYTHON_VERSION], [Py_Main], [
-      PYTHON_LIBS="-lpython$PYTHON_VERSION"
-    ],[],[-L${PYTHON_PREFIX}/lib -L${PYTHON_PREFIX}/libs])
-    if test $PYTHON_LIBS == none; then
-      PYTHON_LIBS="python`echo $PYTHON_VERSION|sed -e 's/[[^0-9]]//g'`"
-      AC_CHECK_LIB(${PYTHON_LIBS}, [Py_Main], [
-        PYTHON_LIBS="-l${PYTHON_LIBS}"
-      ],[PYTHON_LIBS="none"],[-L${PYTHON_PREFIX}/lib -L${PYTHON_PREFIX}/libs])
-    fi
-    if test $PYTHON_LIBS == none; then
-      AC_MSG_ERROR([Python library not found!])
-    fi
-
-    CFLAGS=${PYTHON_CFLAGS}
-    CPPFLAGS=${PYTHON_CPPFLAGS}
-    AC_CHECK_HEADER([Python.h],[
-      AC_SUBST([pythondir], [$PYTHON_PREFIX"/lib/python"$PYTHON_VERSION/site-packages])
-      ENABLE_PYTHON_INTERFACE=yes
-      AC_SUBST(PYTHON_PREFIX)
-      AC_SUBST(PYTHON_INCLUDES)
-      AC_SUBST(PYTHON_LIBS)
-    ],[
-      AC_MSG_RESULT(none found -- disabling Python interface)
-      HAVE_PYTHON=0
-      use_python=no
-    ])
-  else
-    AC_MSG_RESULT(none found -- disabling Python interface)
+if test $use_python == yes; then
+  AM_PATH_PYTHON(2.3, [
+    HAVE_PYTHON=1
+  ], [
     HAVE_PYTHON=0
     use_python=no
-  fi
+  ])
+fi
+
+if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
+  PYTHON_CFLAGS="-I"`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_inc()"`
+  PYTHON_CPPFLAGS="${PYTHON_CFLAGS}"
+  PYTHON_CXXFLAGS="${PYTHON_CFLAGS}"
+  AC_SUBST(PYTHON_CFLAGS)
+  AC_SUBST(PYTHON_CPPFLAGS)
+  AC_SUBST(PYTHON_CXXFLAGS)
+
+  # These code snippets are taken from the Apache mod_python's configure.in
+  # this is where the Python libraries will get installed
+  AC_SUBST(PY_STD_LIB)
+  AC_MSG_CHECKING(checking where python libraries are installed)
+  PY_STD_LIB=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(plat_specific=1, standard_lib=1)'`
+  AC_MSG_RESULT($PY_STD_LIB)
+  
+  PyLIBP=${PY_STD_LIB}
+  PyLIBPL=${PyLIBP}/config
+  PyPYTHONLIBS=${PyLIBPL}/libpython${PYTHON_VERSION}.a
+  PyLIBS=`grep "^LIB[[SMC]]=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
+  PyMODLIBS=`grep "^LOCALMODLIBS=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
+
+  AC_CHECK_LIB([python${PYTHON_VERSION}], Py_NewInterpreter,
+    [PyPYTHONLIBS="-lpython${PYTHON_VERSION}"],
+    [if test -f ${PyLIBPL}/libpython${PYTHON_VERSION}.a; then
+      PyPYTHONLIBS=${PyLIBPL}/libpython${PYTHON_VERSION}.a
+    else
+      AC_ERROR([cannot link to Python])
+    fi
+    ], [ ${PyLIBS} ${PyMODLIBS} ])
+    
+  PYTHON_LIBS="${PyPYTHONLIBS} ${PyLIBS} ${PyMODLIBS}"
+
+  CFLAGS=${PYTHON_CFLAGS}
+  CPPFLAGS=${PYTHON_CPPFLAGS}
+  AC_CHECK_HEADER([Python.h],[
+    ENABLE_PYTHON_INTERFACE=yes
+    AC_SUBST(PYTHON_PREFIX)
+    AC_SUBST(PYTHON_INCLUDES)
+    AC_SUBST(PYTHON_LIBS)
+  ],[
+    HAVE_PYTHON=0
+    use_python=no
+  ])
+else
+  AC_MSG_RESULT(none found -- disabling Python interface)
+  HAVE_PYTHON=0
+  use_python=no
 fi
   
 AM_CONDITIONAL(USE_PYTHON, test x$use_python = xyes)

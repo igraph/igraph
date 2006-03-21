@@ -93,13 +93,13 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
  * 
  * \param data vector containing the coordinates. The length of the
  *        vector must be even, since it contains X-Y coordinate pairs.
- * \param res the vector containing the result. According to the selected
- *        mode, this will be either the vector of vertex indices used as
- *        the corners of the convex hull, or the vector of the coordinates
- *        of the convex hull corners. The vector must be initialized and
- *        will be resized as needed.
- * \param coords If true, the actual coordinates of the selected corners
- *        will be returned, but only the indices otherwise.
+ * \param resverts the vector containing the result, e.g. the vector of
+ *        vertex indices used as the corners of the convex hull. Supply
+ *        \c NULL here if you are only interested in the coordinates of
+ *        the convex hull corners.
+ * \param rescoords the matrix containing the coordinates of the selected
+ *        corner vertices. Supply \c NULL here if you are only interested in
+ *        the vertex indices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM: not enough memory
  * 
