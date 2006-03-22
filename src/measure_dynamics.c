@@ -26,6 +26,171 @@
 
 #include <math.h>
 
+int igraph_measure_dynamics_id(const igraph_t *graph, integer_t start_vertex,
+			       igraph_matrix_t *ak, igraph_matrix_t *sd,
+			       igraph_matrix_t *confint, igraph_matrix_t *no,
+			       const igraph_vector_t *st, integer_t pmaxind,
+			       real_t significance, bool_t lno) {
+  
+  long int maxind=pmaxind;
+  long int no_of_nodes=igraph_vcount(graph);
+
+  int *indegree;
+  igraph_matrix_t normfact;
+  igraph_vector_t ntk, ch, notnull;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i, j, k;
+  long int edges=0;
+  
+  bool_t lsd=(significance != 0);
+  int signidx=0;
+
+  igraph_vector_init(&neis, 0);
+  indegree=Calloc(no_of_nodes, int);
+  igraph_matrix_resize(ak, maxind+1, 1);
+  igraph_matrix_null(ak);
+  if (lsd) {
+    igraph_matrix_resize(sd, maxind+1, 1);
+    igraph_matrix_resize(confint, maxind+1, 1);
+    igraph_matrix_null(ak);
+    /* TODO: significance calculation */
+  }
+  igraph_vector_init(&ntk, maxind+1);
+  igraph_vector_init(&ch, maxind+1);
+  igraph_matrix_init(&normfact, maxind+1, 1);
+  igraph_vector_init(&notnull, maxind+1);
+
+  VECTOR(ntk)[0] += (start_vertex-node);
+  for (node=0; node<start_vertex; node++) {
+    
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      
+      indegree[to] ++;
+      VECTOR(ntk)[xidx] --;
+      VECTOR(ntk)[xidx+1] ++;
+    }
+  }
+  
+  if (start_vertex != 0) {
+    for (i=0; i<maxind+1; i++) {
+      VECTOR(ch)[i]=start_vertex;
+    }
+  }
+  
+  for (node=start_vertex; node<no_of_nodes; node++) {
+    
+    /* inspect the edges */
+    
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      
+      double xk=VECTOR(*st)[node]/VECTOR(ntk)[xidx];
+      double oldm=MATRIX(*ak, xidx, 0);
+      VECTOR(notnull)[xidx] += 1;
+      MATRIX(*ak, xidx, 0) += (xk-oldm)/VECTOR(notnull)[xidx];
+      if (lsd) {
+	MATRIX(*confint, xidx, 0) += (xk-oldm)*(xk-MATRIX(*ak, xidx, 0));
+      }
+      
+      indegree[to]++;
+      VECTOR(ntk)[xidx] --;
+      if (MATRIX(normfact, xidx, 0)==0) {
+	MATRIX(normfact, xidx, 0) += (edges-VECTOR(ch)[xidx]+1);
+	VECTOR(ch)[xidx]=edges;
+      }
+      VECTOR(ntk)[xidx+1]++;
+      if (VECTOR(ntk)[xidx+1]==1) {
+	VECTOR(ch)[xidx+1]=edges;
+      }
+      edges++;
+    }
+  }      
+
+  /* Ok, measurement done, update change */
+  for (i=0; i<maxind+1; i++) {
+    real_t oldmean;
+    if (VECTOR(ntk)[i] != 0) {
+      MATRIX(normfact, i, 0) += (edges-VECTOR(ch)[i]+1);
+    }
+    oldmean=MATRIX(*ak, i, 0);
+    MATRIX(*ak, i, 0) *= VECTOR(notnull)[i] / MATRIX(normfact, i, 0);
+    if (lsd) {
+      /* TODO: confidence interval estimation */
+      MATRIX(*confint, i, 0) +=
+	oldmean * oldmean * VECTOR(notnull)[i] *
+	(1-VECTOR(notnull)[i]/MATRIX(normfact, i, 0));
+      if (MATRIX(normfact, i, 0) > 0) {
+	MATRIX(*confint, i, 0) =
+	  sqrt(MATRIX(*confint, i, 0)/(MATRIX(normfact, i, 0)-1));
+	MATRIX(*sd, i, 0) = MATRIX(*confint,i,0);
+      }
+    }
+  }
+  
+  if (!lno) {
+    igraph_matrix_destroy(&normfact);
+  } else {
+    igraph_matrix_destroy(no);
+    *no=normfact;
+  }
+  
+  Free(indegree);
+  igraph_vector_destroy(&ntk);
+  igraph_vector_destroy(&ch);
+  igraph_vector_destroy(&notnull);
+  igraph_vector_destroy(&neis);
+  
+  return 0;
+}
+
+int igraph_measure_dynamics_id_st(const igraph_t *graph, 
+				  igraph_vector_t *res, 
+				  const igraph_matrix_t *ak) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  int *indegree;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i, k;
+  
+  igraph_vector_init(&neis, 0);
+  
+  indegree=Calloc(no_of_nodes, int);
+  
+  igraph_vector_resize(res, no_of_nodes);
+  igraph_vector_null(res);
+  VECTOR(*res)[0]=MATRIX(*ak, 0, 0);
+  
+  for (node=1; node<no_of_nodes; node++) {
+    
+    /* new node */
+    VECTOR(*res)[node] = VECTOR(*res)[node-1] + MATRIX(*ak, 0, 0);
+    
+    /* outgoing edges */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      
+      indegree[to]++;
+      
+      VECTOR(*res)[node] += -MATRIX(*ak, xidx, 0)+MATRIX(*ak, xidx+1, 0);
+    }
+  }
+  
+  igraph_vector_destroy(&neis);
+  Free(indegree);
+
+  return 0;
+}
 
 /* alpha = 
     0.1,  0.05,   0.025,  0.01,   0.005,  0.001 */
@@ -134,7 +299,8 @@ const real_t igraph_i_tuppercrit[][6] = {
   { 1.282,  1.645,  1.960,  2.326,  2.576,  3.090 }  /* dof: infinity */
 };
 
-int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_matrix_t *akl, 
+int igraph_measure_dynamics_idage(const igraph_t *graph, integer_t start_vertex,
+				  igraph_matrix_t *akl, 
 				  igraph_matrix_t *sd, igraph_matrix_t *confint, 
 				  igraph_matrix_t *no,
 				  const igraph_vector_t *st, integer_t pagebins,
@@ -185,8 +351,32 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_matrix_t *akl,
   igraph_matrix_init(&ch, maxind+1, agebins+1);
   igraph_matrix_init(&normfact, maxind+1, agebins);
   igraph_matrix_init(&notnull, maxind+1, agebins);
+  
+  for (node=0; node<start_vertex; node++) {
 
-  for (node=0; node<no_of_nodes; node++) {
+    MATRIX(ntkl, 0, (long int)(start_vertex-node)/binwidth) ++;
+
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      long int yidx=(start_vertex-to)/binwidth;
+      
+      indegree[to] ++;
+      MATRIX(ntkl, xidx, yidx)--;
+      MATRIX(ntkl, xidx+1, yidx)++;
+    }
+  }
+
+  if (start_vertex != 0) {
+    for (i=0; i<maxind+1; i++) {
+      for (j=0; j<agebins; j++) {
+	MATRIX(ch, i, j) = start_vertex;
+      }
+    }
+  }
+
+  for (node=start_vertex; node<no_of_nodes; node++) {
     
     /* inspect the edges */
    
@@ -279,7 +469,6 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_matrix_t *akl,
   Free(indegree);
   igraph_matrix_destroy(&ntkl);
   igraph_matrix_destroy(&ch);
-  igraph_matrix_destroy(&normfact);
   igraph_matrix_destroy(&notnull);
   igraph_vector_destroy(&neis);
 
@@ -498,7 +687,6 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *
   Free(indegree);
   igraph_matrix_destroy(&ntkl);
   igraph_matrix_destroy(&ch);
-  igraph_matrix_destroy(&normfact);
   igraph_matrix_destroy(&notnull);
   igraph_vector_destroy(&neis);
 

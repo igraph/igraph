@@ -1,4 +1,10 @@
-2006-03-20  Gabor Csardi  <csardi@cool100.rmki.kfki.hu>
+2006-03-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id) :
+	added
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id) : added
+
+2006-03-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_interrupt_handler) :
 	free memory before returning after interruption for unix systems

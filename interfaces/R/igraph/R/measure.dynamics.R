@@ -20,8 +20,71 @@
 #
 ###################################################################
 
+measure.dynamics.id <- function(graph, start.vertex=0,
+                                iterations=5, significance=0,
+                                estind=NULL, estage=NULL, number=FALSE) {
 
-measure.dynamics.idage <- function(graph, agebins=300,
+  maxind <- max(degree(graph, mode="in"))
+
+  st <- rep(1, vcount(graph))
+  sd <- (significance != 0)
+
+  if (sd) {
+    warning("Error calculation not implemented yet")
+  }
+
+  for (i in seq(along=numeric(iterations))) {
+
+    # Standard deviation only at the last iteration
+    if (sd && i==iterations) {
+      sd.real <- significance
+    } else {
+      sd.real <- 0.0
+    }
+
+    # Number of estimates also
+    if (number && i==iterations) {
+      number.real <- number
+    } else {
+      number.real <- FALSE
+    }
+
+    if (i != 1) {
+      mes[[1]] <- mes[[1]]/mes[[1]][1]
+    }    
+    
+    mes <- .Call("R_igraph_measure_dynamics_id", graph,
+                 as.numeric(start.vertex),
+                 as.numeric(st),
+                 as.numeric(maxind), as.numeric(sd.real),
+                 as.logical(number.real),
+                 PACKAGE="igraph")
+
+    mes[[1]][!is.finite(mes[[1]])] <- 0
+    st <- .Call("R_igraph_measure_dynamics_id_st", graph,
+                mes[[1]], 
+                PACKAGE="igraph")
+  }
+
+  print(mes[[1]][1])
+  
+  if (sd.real != 0) {
+    mes[[2]] <- mes[[2]]/mes[[1]][1]
+    mes[[3]] <- mes[[3]]/mes[[1]][1]
+  }
+  if (!is.null(estind) && !is.null(estage)) {
+    mes[[4]] <- mes[[4]]/mes[[1]][1]
+##    mes[[4]] <- mes[[4]][-length(mes[[4]])]
+  }
+  mes[[1]] <- mes[[1]]/mes[[1]][1]
+
+  res <- list(akl=mes[[1]], st=st, sd=mes[[2]],
+              error=mes[[3]], no=mes[[4]], est=NULL)
+  
+  res
+}
+
+measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
                                    iterations=5, significance=0,
                                    estind=NULL, estage=NULL, number=FALSE) {
 
@@ -58,6 +121,7 @@ measure.dynamics.idage <- function(graph, agebins=300,
                    PACKAGE="igraph")
     } else {
       mes <- .Call("R_igraph_measure_dynamics_idage", graph,
+                   as.numeric(start.vertex),
                    as.numeric(st), as.numeric(agebins),
                    as.numeric(maxind), as.numeric(sd.real),
                    as.logical(number.real),

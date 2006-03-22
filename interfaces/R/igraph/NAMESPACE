@@ -109,7 +109,7 @@ export(evcent)
 
 # dynamics measurement
 
-export(measure.dynamics.idage)
+export(measure.dynamics.id, measure.dynamics.idage)
 
 # isomorphism, motifs
 
