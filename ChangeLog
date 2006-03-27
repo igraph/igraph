@@ -1,3 +1,10 @@
+2006-03-28  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/foreign.c : removed strndup for compatibility with Mac OS X
+	
+	* src/foreign-lgl-lexer.l, src/foreign-ncol-lexer.l : made
+	mylineno static to avoid linking problems on Mac OS X
+
 2006-03-27  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_complementer,

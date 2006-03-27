@@ -689,8 +689,10 @@ void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len
 	strncat(state->current_key->default_value, (const char*)ch, (size_t)len);
       // TODO: this is not really efficient, since it reallocs every time
       // Maybe it's time to implement a string type in igraph?
-    } else 
-      state->current_key->default_value=strndup((const char*)ch, (size_t)len);
+    } else {
+      state->current_key->default_value=malloc(sizeof(char*)*(len+1));
+      memcpy(state->current_key->default_value, ch, len);
+    }
     break;
     
   case INSIDE_DATA:
