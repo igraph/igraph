@@ -88,6 +88,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self, PyObjec
 PyObject* igraphmodule_Graph_closeness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_copy(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -134,6 +135,12 @@ PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self, PyO
 PyObject* igraphmodule_Graph_get_vertices(igraphmodule_GraphObject* self, void* closure);
 PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* closure);
 
+PyObject* igraphmodule_Graph_complementer(igraphmodule_GraphObject* self, PyObject* args);
+PyObject* igraphmodule_Graph_complementer_op(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_compose(igraphmodule_GraphObject* self, PyObject* other);
+PyObject* igraphmodule_Graph_difference(igraphmodule_GraphObject* self, PyObject* other);
+PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyObject* other);
+PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObject* other);
 PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other);
 
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -487,6 +494,10 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       METH_VARARGS | METH_KEYWORDS,
       "Alias for 'clusters'.\n\n"
       "See the documentation of 'clusters' for details."
+  },
+  {"copy", (PyCFunction)igraphmodule_Graph_copy,
+      METH_NOARGS,
+      "Creates an exact deep copy of the graph."
   },
   {"decompose", (PyCFunction)igraphmodule_Graph_decompose,
       METH_VARARGS | METH_KEYWORDS,
@@ -974,6 +985,25 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   ///////////////
   // OPERATORS //
   ///////////////
+  {"complementer", (PyCFunction)igraphmodule_Graph_complementer,
+      METH_VARARGS,
+      "Returns the complementer of the graph\n\n"
+      "If the first argument is True, the complementer will include\n"
+      "loop edges. If it is omitted or False, no loop edges will be\n"
+      "present in the complementer."
+  },
+  {"compose", (PyCFunction)igraphmodule_Graph_compose,
+      METH_O, "Returns the composition of two graphs"
+  },
+  {"difference", (PyCFunction)igraphmodule_Graph_difference,
+      METH_O, "Subtracts the second graph from the first"
+  },
+  {"disjoint_union", (PyCFunction)igraphmodule_Graph_disjoint_union,
+      METH_O, "Creates the disjoint union of two (or more) graphs"
+  },
+  {"intersection", (PyCFunction)igraphmodule_Graph_intersection,
+      METH_O, "Creates the intersection of two (or more) graphs"
+  },
   {"union", (PyCFunction)igraphmodule_Graph_union,
       METH_O, "Creates the union of two (or more) graphs"
   },

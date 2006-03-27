@@ -42,4 +42,5 @@ PyObject* igraphmodule_vector_t_to_float_PyList(igraph_vector_t *v);
 PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
 						 igraphmodule_conv_t type);
 PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v);
+int igraphmodule_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v);
 #endif

@@ -1491,6 +1491,27 @@ PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self,
    return list;
 }
 
+/** \ingroup python_interface_copy
+ * \brief Creates an exact deep copy of the graph
+ * \return the copy of the graph
+ */
+PyObject* igraphmodule_Graph_copy(igraphmodule_GraphObject *self) {
+  igraphmodule_GraphObject *result;
+  igraph_t g;
+  
+  if (igraph_copy(&g, &self->g)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
 /** \ingroup python_interface_graph
  * \brief Decomposes a graph into components.
  * \return a list of graph objects, each containing a copy of a component in the original graph.
@@ -3054,9 +3075,9 @@ PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* clo
 }
 
 /** \ingroup python_interface_graph
- * \brief Creates the union of two graphs (operator version)
+ * \brief Creates the disjoint union of two graphs (operator version)
  */
-PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other) {
+PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyObject* other) {
   PyObject *t, *it;
   igraphmodule_GraphObject *o, *result;
   igraph_t g;
@@ -3066,25 +3087,13 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
   if (it) {
     /* Get all elements, store the graphs in an igraph_vector_ptr */
     igraph_vector_ptr_t gs;
-    if (igraph_vector_ptr_init(&gs, 0)) {
-      igraphmodule_handle_igraph_error();
+    if (igraphmodule_PyIter_to_vector_ptr_t(it, &gs)) {
+      Py_DECREF(it);
       return NULL;
-    }
-    
-    while (t=PyIter_Next(it)) {
-      if (!PyObject_TypeCheck(t, &igraphmodule_GraphType)) {
-	PyErr_SetString(PyExc_TypeError, "iterable argument must contain graphs");
-	igraph_vector_ptr_destroy(&gs);
-	Py_DECREF(t);
-	Py_DECREF(it);
-	return NULL;
-      }
-      igraph_vector_ptr_push_back(&gs, &((igraphmodule_GraphObject*)t)->g);
-      Py_DECREF(t);
     }
     Py_DECREF(it);
     
-    /* Create union */
+    /* Create disjoint union */
     if (igraph_disjoint_union_many(&g, &gs)) {
       igraph_vector_ptr_destroy(&gs);
       igraphmodule_handle_igraph_error();
@@ -3104,6 +3113,200 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
       igraphmodule_handle_igraph_error();
       return NULL;
     }
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Creates the union of two graphs (operator version)
+ */
+PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other) {
+  PyObject *t, *it;
+  igraphmodule_GraphObject *o, *result;
+  igraph_t g;
+  
+  /* Did we receive an iterable? */
+  it=PyObject_GetIter(other);
+  if (it) {
+    /* Get all elements, store the graphs in an igraph_vector_ptr */
+    igraph_vector_ptr_t gs;
+    if (igraphmodule_PyIter_to_vector_ptr_t(it, &gs)) {
+      Py_DECREF(it);
+      return NULL;
+    }
+    Py_DECREF(it);
+    
+    /* Create union */
+    if (igraph_union_many(&g, &gs)) {
+      igraph_vector_ptr_destroy(&gs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    
+    igraph_vector_ptr_destroy(&gs);
+  } else {
+    PyErr_Clear();
+    if (!PyObject_TypeCheck(other, &igraphmodule_GraphType)) {
+      Py_INCREF(Py_NotImplemented);
+      return Py_NotImplemented;
+    }
+    o=(igraphmodule_GraphObject*)other;
+  
+    if (igraph_union(&g, &self->g, &o->g)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Creates the intersection of two graphs (operator version)
+ */
+PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObject* other) {
+  PyObject *it;
+  igraphmodule_GraphObject *o, *result;
+  igraph_t g;
+  
+  /* Did we receive an iterable? */
+  it=PyObject_GetIter(other);
+  if (it) {
+    /* Get all elements, store the graphs in an igraph_vector_ptr */
+    igraph_vector_ptr_t gs;
+    if (igraphmodule_PyIter_to_vector_ptr_t(it, &gs)) {
+      Py_DECREF(it);
+      return NULL;
+    }
+    Py_DECREF(it);
+    
+    /* Create union */
+    if (igraph_intersection_many(&g, &gs)) {
+      igraph_vector_ptr_destroy(&gs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    
+    igraph_vector_ptr_destroy(&gs);
+  } else {
+    PyErr_Clear();
+    if (!PyObject_TypeCheck(other, &igraphmodule_GraphType)) {
+      Py_INCREF(Py_NotImplemented);
+      return Py_NotImplemented;
+    }
+    o=(igraphmodule_GraphObject*)other;
+  
+    if (igraph_intersection(&g, &self->g, &o->g)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Creates the difference of two graphs (operator version)
+ */
+PyObject* igraphmodule_Graph_difference(igraphmodule_GraphObject* self, PyObject* other) {
+  PyObject *it;
+  igraphmodule_GraphObject *o, *result;
+  igraph_t g;
+  
+  if (!PyObject_TypeCheck(other, &igraphmodule_GraphType)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+  o=(igraphmodule_GraphObject*)other;
+  
+  if (igraph_difference(&g, &self->g, &o->g)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Creates the complementer of a graph
+ */
+PyObject* igraphmodule_Graph_complementer(igraphmodule_GraphObject* self, PyObject* args) {
+  igraphmodule_GraphObject *result;
+  PyObject *o = Py_True;
+  igraph_t g;
+  
+  if (!PyArg_ParseTuple(args, "|O", &o)) return NULL;
+  if (igraph_complementer(&g, &self->g, PyObject_IsTrue(o))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Creates the complementer of a graph (operator version)
+ */
+PyObject* igraphmodule_Graph_complementer_op(igraphmodule_GraphObject* self) {
+  igraphmodule_GraphObject *result;
+  igraph_t g;
+  
+  if (igraph_complementer(&g, &self->g, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						      self->ob_type);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g=g;
+  
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Creates the composition of two graphs
+ */
+PyObject* igraphmodule_Graph_compose(igraphmodule_GraphObject* self, PyObject* other) {
+  PyObject *it;
+  igraphmodule_GraphObject *o, *result;
+  igraph_t g;
+  
+  if (!PyObject_TypeCheck(other, &igraphmodule_GraphType)) {
+    Py_INCREF(Py_NotImplemented);
+    return Py_NotImplemented;
+  }
+  o=(igraphmodule_GraphObject*)other;
+  
+  if (igraph_compose(&g, &self->g, &o->g)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
   }
   
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
@@ -3183,8 +3386,8 @@ PyMappingMethods igraphmodule_Graph_as_mapping = {
  * \brief Collection of methods to allow numeric operators to be used on the graph
  */
 PyNumberMethods igraphmodule_Graph_as_number = {
-  0,	/*nb_add*/
-    0,	/*nb_subtract*/
+    (binaryfunc)igraphmodule_Graph_disjoint_union, /* nb_add */
+    (binaryfunc)igraphmodule_Graph_difference,	/*nb_subtract*/
     0,	/*nb_multiply*/
     0,	/*nb_divide*/
     0,	/*nb_remainder*/
@@ -3194,12 +3397,12 @@ PyNumberMethods igraphmodule_Graph_as_number = {
     0,	/*nb_positive*/
     0,	/*nb_absolute*/
     0,	/*nb_nonzero*/
-    0,	/*nb_invert*/
+    (unaryfunc)igraphmodule_Graph_complementer_op,	/*nb_invert*/
     0,	/*nb_lshift*/
     0,	/*nb_rshift*/
-    0,	/*nb_and*/
+    (binaryfunc)igraphmodule_Graph_intersection, /*nb_and*/
     0,	/*nb_xor*/
-    (binaryfunc)igraphmodule_Graph_union,	/*nb_or*/
+    (binaryfunc)igraphmodule_Graph_union,	 /*nb_or*/
     0,	/*nb_coerce*/
     0,	/*nb_int*/
     0,	/*nb_long*/

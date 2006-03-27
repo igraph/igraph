@@ -1,3 +1,13 @@
+2006-03-27  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/graphobject.c (igraphmodule_Graph_complementer,
+	igraphmodule_Graph_disjoint_union, igraphmodule_Graph_union,
+	igraphmodule_Graph_intersection, igraphmodule_Graph_difference,
+	igraphmodule_Graph_compose, igraphmodule_Graph_copy) : added
+	
+	* bootstrap.sh : can use glibtoolize instead of libtoolize
+	(necessary on Mac OS X)
+
 2006-03-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_id)

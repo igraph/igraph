@@ -758,11 +758,36 @@ del l
 
 section("Graph operators")
 
+start("Disjoint union of graphs")
+g=igraph.Graph.Tree(10, 3) + igraph.Graph(edges=[(0, 1), (2, 1)])
+l=g.get_edgelist()
+l.sort()
+test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
+
+start("Disjoint union of graph and number (should fail)")
+try:
+    g=g + 2
+except TypeError:
+    ok()
+else:
+    fail()
+
+start("In-place disjoint union")
+g = igraph.Graph.Tree(10, 3)
+g += igraph.Graph(edges=[(0, 1), (2, 1)])
+l=g.get_edgelist()
+l.sort()
+test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
+
+start("Multiple disjoint union")
+g = igraph.Graph.Tree(10, 3).disjoint_union([igraph.Graph.Tree(8, 2), igraph.Graph.Full(5)])
+skip()
+
 start("Union of graphs")
 g=igraph.Graph.Tree(10, 3) | igraph.Graph(edges=[(0, 1), (2, 1)])
 l=g.get_edgelist()
 l.sort()
-test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
+test(l == [(0, 1), (0, 2), (0, 3), (1, 2), (1, 4), (1, 5), (1, 6), (2, 7), (2, 8), (2, 9)])
 
 start("Union of graph and number (should fail)")
 try:
@@ -772,16 +797,36 @@ except TypeError:
 else:
     fail()
 
-start("In-place union")
-g = igraph.Graph.Tree(10, 3)
-g |= igraph.Graph(edges=[(0, 1), (2, 1)])
-l=g.get_edgelist()
-l.sort()
-test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
-
 start("Multiple union")
 g = igraph.Graph.Tree(10, 3).union([igraph.Graph.Tree(8, 2), igraph.Graph.Full(5)])
-ok()
+skip()
+
+start("Intersection of graphs")
+g=igraph.Graph.Tree(10, 3) & igraph.Graph(edges=[(0, 1), (2, 1), (5, 6), (4, 1)])
+l=g.get_edgelist()
+l.sort()
+test(l == [(0, 1), (1, 4)])
+
+start("Difference of graphs")
+g=igraph.Graph.Tree(10, 3) - igraph.Graph(edges=[(0, 1), (2, 1), (5, 6), (4, 1)])
+l=g.get_edgelist()
+l.sort()
+test(l == [(0, 2), (0, 3), (1, 5), (1, 6), (2, 7), (2, 8), (2, 9)])
+
+start("Complementer of graph")
+l=(~igraph.Graph.Tree(3, 2, igraph.TREE_OUT)).get_edgelist()
+l.sort()
+test(l == [(1, 0), (1, 2), (2, 0), (2, 1)])
+
+start("Complementer of graph with loop edges")
+l=igraph.Graph.Tree(3, 2, igraph.TREE_OUT).complementer(True).get_edgelist()
+l.sort()
+test(l == [(0, 0), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)])
+
+start("Composition of two graphs")
+l=igraph.Graph(4, [(0, 1), (1, 2)]).compose(igraph.Graph(4, [(2, 3), (2, 1)])).get_edgelist()
+l.sort()
+test(l == [(0, 2), (1, 1), (1, 3), (2, 2)])
 
 section("Miscellaneous functions")
 
