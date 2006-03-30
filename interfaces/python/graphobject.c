@@ -21,6 +21,7 @@
 
 */
 
+#include "common.h"
 #include "graphobject.h"
 #include "vertexseqobject.h"
 #include "edgeseqobject.h"
@@ -269,10 +270,11 @@ PyObject* igraphmodule_Graph_ecount(igraphmodule_GraphObject *self)
  */
 PyObject* igraphmodule_Graph_is_directed(igraphmodule_GraphObject *self) 
 {
-   if (igraph_is_directed(&self->g))
-     Py_RETURN_TRUE;
-   else
-     Py_RETURN_FALSE;
+   if (igraph_is_directed(&self->g)) {
+     Py_INCREF(Py_True); return Py_True;
+   } else {
+     Py_INCREF(Py_False); return Py_False;
+   }
 }
 
 /** \ingroup python_interface_graph
@@ -1146,7 +1148,11 @@ PyObject* igraphmodule_Graph_is_connected(igraphmodule_GraphObject *self,
 	igraphmodule_handle_igraph_error();
 	return NULL;
      }
-   if (res) Py_RETURN_TRUE; else Py_RETURN_FALSE;
+   if (res) {
+     Py_INCREF(Py_True); return Py_True;
+   } else {
+     Py_INCREF(Py_False); return Py_False;
+   }
 }
 
 /** \ingroup python_interface_graph
@@ -1166,7 +1172,11 @@ PyObject* igraphmodule_Graph_are_connected(igraphmodule_GraphObject *self,
      return NULL;
 
    res=igraph_are_connected(&self->g, (integer_t)v1, (integer_t)v2);
-   if (res) Py_RETURN_TRUE; else Py_RETURN_FALSE;
+   if (res) {
+     Py_INCREF(Py_True); return Py_True;
+   } else {
+     Py_INCREF(Py_False); return Py_False;
+   }
 }
 
 /** \ingroup python_interface_graph
@@ -3425,7 +3435,7 @@ PyNumberMethods igraphmodule_Graph_as_number = {
 /** \ingroup python_interface_graph
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
-PyTypeObject igraphmodule_GraphType = {
+static PyTypeObject igraphmodule_GraphType = {
   PyObject_HEAD_INIT(NULL)                  // 
   0,                                        // ob_size
   "igraph.Graph",                           // tp_name

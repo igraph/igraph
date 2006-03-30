@@ -51,6 +51,6 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self);
 					   PyObject* s);
 int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject* k, PyObject* v);*/
 
-PyTypeObject igraphmodule_VertexType;
+static PyTypeObject igraphmodule_VertexType;
 
 #endif

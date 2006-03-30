@@ -146,7 +146,7 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
-PyTypeObject igraphmodule_GraphType;
+static PyTypeObject igraphmodule_GraphType;
 
 /** \ingroup python_interface
  * \brief Member list of the \c igraph.Graph object type

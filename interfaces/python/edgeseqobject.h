@@ -45,6 +45,6 @@ void igraphmodule_EdgeSeq_dealloc(igraphmodule_EdgeSeqObject* self);
 
 int igraphmodule_EdgeSeq_sq_length(igraphmodule_EdgeSeqObject *self);
 
-PyTypeObject igraphmodule_EdgeSeqType;
+static PyTypeObject igraphmodule_EdgeSeqType;
 
 #endif

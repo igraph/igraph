@@ -265,7 +265,7 @@ static PySequenceMethods igraphmodule_EdgeSeq_as_sequence = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * an edge sequence of a graph
  */
-PyTypeObject igraphmodule_EdgeSeqType =
+static PyTypeObject igraphmodule_EdgeSeqType =
 {
   PyObject_HEAD_INIT(NULL)                  //
   0,                                        // ob_size

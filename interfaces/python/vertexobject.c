@@ -292,7 +292,7 @@ PyMappingMethods igraphmodule_Vertex_as_mapping = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * a vertex of a graph
  */
-PyTypeObject igraphmodule_VertexType =
+static PyTypeObject igraphmodule_VertexType =
 {
   PyObject_HEAD_INIT(NULL)                    //
   0,                                          // ob_size

@@ -31,6 +31,18 @@ AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 CFLAGS="$ac_save_CFLAGS"])
 
+AC_DEFUN(IGRAPH_CC_SWITCH,
+[AC_MSG_CHECKING(whether compiler supports $1)
+ac_save_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $1"
+AC_TRY_COMPILE(,
+[int x;],
+AC_MSG_RESULT(yes)
+$2,
+AC_MSG_RESULT(no)
+$3)
+CFLAGS="$ac_save_CFLAGS"])
+
 AC_ARG_ENABLE(gcc-warnings,
               AC_HELP_STRING([--enable-gcc-warnings],
 	                     [turn on lots of GCC warnings (not recommended)]),
@@ -77,6 +89,7 @@ AC_ARG_ENABLE(graphml,
               AC_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),
               [graphml_support=$enableval], [graphml_support=yes])
 
+HAVE_PYTHON=1
 if test $use_python == yes; then
   AM_PATH_PYTHON(2.3, [
     HAVE_PYTHON=1
@@ -90,9 +103,11 @@ if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
   PYTHON_CFLAGS="-I"`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_inc()"`
   PYTHON_CPPFLAGS="${PYTHON_CFLAGS}"
   PYTHON_CXXFLAGS="${PYTHON_CFLAGS}"
+  PYTHON_LDFLAGS="-module -no-undefined"
   AC_SUBST(PYTHON_CFLAGS)
   AC_SUBST(PYTHON_CPPFLAGS)
   AC_SUBST(PYTHON_CXXFLAGS)
+  AC_SUBST(PYTHON_LDFLAGS)
 
   # These code snippets are taken from the Apache mod_python's configure.in
   # this is where the Python libraries will get installed
@@ -107,12 +122,20 @@ if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
   PyLIBS=`grep "^LIB[[SMC]]=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
   PyMODLIBS=`grep "^LOCALMODLIBS=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
 
+  # OS X does not have any libpython*.a, we have to use -undefined instead
+  echo $target
+
   AC_CHECK_LIB([python${PYTHON_VERSION}], Py_NewInterpreter,
     [PyPYTHONLIBS="-lpython${PYTHON_VERSION}"],
     [if test -f ${PyLIBPL}/libpython${PYTHON_VERSION}.a; then
       PyPYTHONLIBS=${PyLIBPL}/libpython${PYTHON_VERSION}.a
     else
-      AC_ERROR([cannot link to Python])
+      # Mac OS X doesn't have libpython*.a but supports dynamic lookup
+      IGRAPH_CC_SWITCH([-undefined dynamic_lookup], [
+        PyPYTHONLIBS=""
+        PYTHON_LDFLAGS="-undefined dynamic_lookup -module"
+      ], [AC_ERROR([cannot link to Python and no dynamic lookup available])]
+      )
     fi
     ], [ ${PyLIBS} ${PyMODLIBS} ])
     
@@ -125,6 +148,15 @@ if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
     AC_SUBST(PYTHON_PREFIX)
     AC_SUBST(PYTHON_INCLUDES)
     AC_SUBST(PYTHON_LIBS)
+
+    AC_MSG_CHECKING([whether integer_t conflicts (usually on OS X)])
+    AC_TRY_COMPILE(,
+    [#include <Python.h>
+    typedef double integer_t;],
+    [AC_MSG_RESULT(no)],
+    [AC_MSG_RESULT(yes)
+     AC_DEFINE(INTEGER_T_CONFLICTS, 1, [1 if integer_t conflicts (usually on OS X)])
+    ])
   ],[
     HAVE_PYTHON=0
     use_python=no

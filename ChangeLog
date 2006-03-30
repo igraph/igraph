@@ -1,3 +1,15 @@
+2006-03-29  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* configure.in : compatibility improvements (OS X)
+
+	* interfaces/python/*object.[ch], interfaces/python/error.h :
+        some variables changed to static (compilation issues in OS X)
+
+        * interfaces/python/graphobject.c : included common.h to make it
+	compile with Python 2.3
+
+	* tests/Makefile.am : added other.at
+
 2006-03-28  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/foreign.c : removed strndup for compatibility with Mac OS X

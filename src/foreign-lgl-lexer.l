@@ -45,7 +45,7 @@
 */
 
 #include "foreign-lgl-parser.h"
-static long int mylineno;
+long int mylineno;
 %}
 
 %option noyywrap

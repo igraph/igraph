@@ -182,7 +182,7 @@ static PySequenceMethods igraphmodule_VertexSeq_as_sequence = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * a vertex sequence of a graph
  */
-PyTypeObject igraphmodule_VertexSeqType =
+static PyTypeObject igraphmodule_VertexSeqType =
 {
   PyObject_HEAD_INIT(NULL)                    //
   0,                                          // ob_size

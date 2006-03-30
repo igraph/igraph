@@ -340,7 +340,7 @@ PyMappingMethods igraphmodule_Edge_as_mapping = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * an edge of a graph
  */
-PyTypeObject igraphmodule_EdgeType =
+static PyTypeObject igraphmodule_EdgeType =
 {
   PyObject_HEAD_INIT(NULL)                    //
   0,                                          // ob_size
