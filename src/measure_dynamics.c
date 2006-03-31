@@ -62,7 +62,6 @@ int igraph_measure_dynamics_id(const igraph_t *graph, integer_t start_vertex,
   igraph_matrix_init(&normfact, maxind+1, 1);
   igraph_vector_init(&notnull, maxind+1);
 
-  VECTOR(ntk)[0] += (start_vertex-node);
   for (node=0; node<start_vertex; node++) {
     
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
@@ -74,6 +73,8 @@ int igraph_measure_dynamics_id(const igraph_t *graph, integer_t start_vertex,
       VECTOR(ntk)[xidx] --;
       VECTOR(ntk)[xidx+1] ++;
     }
+    
+    VECTOR(ntk)[0]++;
   }
   
   if (start_vertex != 0) {
@@ -111,6 +112,8 @@ int igraph_measure_dynamics_id(const igraph_t *graph, integer_t start_vertex,
       }
       edges++;
     }
+    
+    VECTOR(ntk)[0]++;
   }      
 
   /* Ok, measurement done, update change */

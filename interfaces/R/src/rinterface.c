@@ -26,6 +26,7 @@
 
 #include "config.h"
 
+#define USE_RINTERNALS
 #include <R.h>
 #include <Rdefines.h>
 #include <Rinternals.h>

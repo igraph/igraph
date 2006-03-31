@@ -22,11 +22,13 @@ RSNAMES_Y = foreign-ncol-parser.y foreign-lgl-parser.y foreign-pajek-parser.y
 
 RSNAMES_L = foreign-ncol-lexer.l foreign-lgl-lexer.l foreign-pajek-lexer.l
 
-RSCNAMES = $(RSNAMES_C) $(RSNAMES_H) \
-	$(RSNAMES_Y:.y=.c) $(RSNAMES_Y:.y=.h) \
+RSCNAMES = $(RSNAMES_C) $(RSNAMES_H)
+
+RSCNAMES2 = $(RSNAMES_Y:.y=.c) $(RSNAMES_Y:.y=.h) \
 	$(RSNAMES_L:.l=.c)
 
-RSCNAMES_ORIGPLACE = $(patsubst %,$(top_srcdir)/src/%,$(RSCNAMES))
+RSCNAMES_ORIGPLACE = $(patsubst %,$(top_srcdir)/src/%,$(RSCNAMES)) \
+	$(patsubst %,$(top_builddir)/src/%,$(RSCNAMES2))
 
 RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 	$(top_srcdir)/include/error.h \
@@ -41,7 +43,7 @@ RSRCSOURCES = $(top_srcdir)/interfaces/R/src/rinterface.c \
 	$(top_srcdir)/interfaces/R/src/config.h
 
 igraph_$(VERSION).tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
-	cp -r $(top_srcdir)/interfaces/R/igraph .
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_srcdir)/interfaces/R/igraph .; fi
 	cp $(RSCNAMES_ORIGPLACE) igraph/src/
 	cp $(RTOPHEADERS) igraph/src
 	cp $(RSRCSOURCES) igraph/src

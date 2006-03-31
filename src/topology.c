@@ -676,13 +676,13 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
   bool_t directed=igraph_is_directed(graph);
   igraph_vector_t neis;
   
-  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-    
   unsigned char mul, idx;
   unsigned int *arr_idx, *arr_code;
   int code=0;
   
   long int i, j, s;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   
   if (directed) {
     if (nodes==3) {
