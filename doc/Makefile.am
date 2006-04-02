@@ -71,30 +71,30 @@ nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c
 
 
 html/stamp: igraph-docs.xml $(DOCFIX2)
-	cp $(DOCFIX2) . && \
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
 	&& touch html/stamp
 
 igraph-docs.info: igraph-docs.xml $(DOCFIX2)
-	cp $(DOCFIX2) . && \
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	db2x_xsltproc --xinclude -s texi igraph-docs.xml -o igraph-docs.txml \
 	&& db2x_texixml igraph-docs.txml \
 	&& makeinfo --no-split igraph-docs.texi
 
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
-	cp $(DOCFIX2) . && \
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
 	&& docbook2dvi igraph-docs2.xml \
 	&& mv igraph-docs2.dvi igraph-docs.dvi
 
 igraph-docs.ps: igraph-docs.xml $(DOCFIX2)
-	cp $(DOCFIX2) . && \
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
 	&& docbook2ps igraph-docs2.xml \
 	&& mv igraph-docs2.ps igraph-docs.ps
 
 igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
-	cp $(DOCFIX2) . && \
+	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
 	&& docbook2pdf igraph-docs2.xml \
 	&& mv igraph-docs2.pdf igraph-docs.pdf

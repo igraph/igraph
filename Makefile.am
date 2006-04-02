@@ -3,13 +3,15 @@
 SUBDIRS=src interfaces debian tests
 DOC_FILES = $(top_builddir)/doc/html \
 	$(top_builddir)/doc/igraph-docs.info \
-	$(top_builddir)/doc/igraph-docs.pdf
+	$(top_builddir)/doc/igraph-docs.pdf \
+	$(top_srcdir)/doc/Makefile.in
 
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
 
 EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) \
-	examples 
+	examples $(top_srcdir)/interfaces/R/Makefile.in \
+	$(top_srcdir)/interfaces/R/DESCRIPTION.in
 
 MAINTAINERCLEANFILES = Makefile.in
 
