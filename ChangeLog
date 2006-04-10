@@ -1,3 +1,13 @@
+2006-04-10  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/igraph_strvector.c (igraph_strvector_move_interval) :
+	corrected serious bug, deep copy needed.
+
+	* src/igraph_strvector.c (igraph_strvector_resize) : corrected bug
+	when resizing to empty vector
+	* examples/simple/igraph_strvector.c : updated to check resizing 
+	to empty vector
+
 2006-03-31  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_id) : bugs corrected

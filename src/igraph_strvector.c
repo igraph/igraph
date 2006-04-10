@@ -176,7 +176,11 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
     }
   }
   for (i=0; i<end-begin; i++) {
-    v->data[to+i]=v->data[begin+i];
+    if (v->data[begin+i] != 0) {
+      long int len=strlen(v->data[begin+i])+1;
+      v->data[to+i]=Calloc(len, char);
+      memcpy(v->data[to+i], v->data[begin+i], sizeof(char)*len);
+    }
   }
 }
 
@@ -228,13 +232,16 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
   
   assert(v != 0);
   assert(v->data != 0);
+/*   printf("resize %li to %li\n", v->len, newsize); */
   if (newsize < v->len) { 
-    long int i;
+    long int i, reallocsize=newsize;
     for (i=newsize; i<v->len; i++) {
       Free(v->data[i]);
     }
     /* try to give back some space */
-    tmp=Realloc(v->data, newsize, char*);
+    if (reallocsize==0) { reallocsize=1; }
+    tmp=Realloc(v->data, reallocsize, char*);
+/*     printf("resize %li to %li, %p\n", v->len, newsize, tmp); */
     if (tmp != 0) {
       v->data=tmp;
     }
