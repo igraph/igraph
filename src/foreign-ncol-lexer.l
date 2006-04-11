@@ -45,7 +45,7 @@
 */
 
 #include "foreign-ncol-parser.h"
-long int mylineno;
+static long int mylineno;
 %}
 
 %option noyywrap
