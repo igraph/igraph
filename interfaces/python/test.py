@@ -487,6 +487,10 @@ start("Testing layout of vertices according to the Large Graph Layout")
 g.layout_lgl()
 skip()
 
+start("Testing layout of vertices according to the Reingold-Tilford tree layout")
+g.layout_reingold_tilford(0)
+skip()
+
 section("Import and export functions")
 
 start("Trying to load edge list from nonexistent file")

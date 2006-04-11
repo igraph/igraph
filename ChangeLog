@@ -1,3 +1,20 @@
+2006-04-11  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/layout.c (igraph_layout_reingold_tilford) : added
+	* src/igraph.h (igraph_layout_reingold_tilford) : added
+	* tests/layout.at : added test case for Reingold-Tilford layout
+	* interfaces/python/test.py : added test case for
+	Reingold-Tilford layout
+	
+	* configure.in : even better OS X compatibility :)	
+	* interfaces/python/*.[ch] : declared type objects as extern
+	where needed (so ld won't complain under OS X)
+	* interfaces/python/test.sh, tests/testsuite.at :
+	added DYLD_LIBRARY_PATH
+
+	* src/foreign-lgl-lexer.l, src/foreign-ncol-lexer.l :
+	made line counter static
+
 2006-04-10  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/igraph_strvector.c (igraph_strvector_move_interval) :

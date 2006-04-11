@@ -2420,6 +2420,39 @@ PyObject* igraphmodule_Graph_layout_lgl(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph according to the Reingold-Tilford
+ * tree layout algorithm
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_reingold_tilford
+ */
+PyObject* igraphmodule_Graph_layout_reingold_tilford(igraphmodule_GraphObject *self,
+					PyObject *args,
+					PyObject *kwds) 
+{
+  char *kwlist[] = {"root", NULL};
+  igraph_matrix_t m;
+  long int root=0;
+  PyObject *result;
+   
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist,
+				   &root))
+    return NULL;
+  
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  if (igraph_layout_reingold_tilford(&self->g, &m, root)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+   
+  result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);   
+  igraph_matrix_destroy(&m);
+  return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Returns the adjacency matrix of a graph.
  * \return the adjacency matrix as a Python list of lists
  * \sa igraph_get_adjacency

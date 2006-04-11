@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "random.h"
+#include "memory.h"
 #include <math.h>
 
 int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, real_t *x, real_t *y,
@@ -1082,6 +1083,246 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
   igraph_vector_destroy(&forcey);
   igraph_2dgrid_destroy(&grid);
   IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}
+
+/* Internal structure for Reingold-Tilford layout */
+struct igraph_i_reingold_tilford_vertex {
+  int parent;        /* Parent node index */
+  int level;         /* Level of the node */
+  real_t offset;     /* X offset from parent node */
+  int left_contour;  /* Next left node of the contour
+		      of the subtree rooted at this node */
+  int right_contour; /* Next right node of the contour
+		      of the subtree rooted at this node */
+};
+
+int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
+                                               long int node, long int vcount);
+int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
+                                                 igraph_matrix_t *res, long int node,
+												 long int vcount, real_t xpos);
+
+/**
+ * \function igraph_layout_reingold_tilford
+ * \brief Reingold-Tilford layout for tree graphs
+ * 
+ * Arranges the nodes in a tree where the given node is used as the root.
+ * The tree is directed downwards and the parents are centered above its
+ * children. For the exact algorithm, see:
+ * 
+ * Reingold, E and Tilford, J: Tidier drawing of trees.
+ * IEEE Trans. Softw. Eng., SE-7(2):223--228, 1981
+ *
+ * If the given graph is not a tree, a breadth-first search is executed
+ * first to obtain a possible spanning tree.
+ * 
+ * \param graph The graph object. 
+ * \param res The result, the coordinates in a matrix. The parameter
+ *   should point to an initialized matrix object and will be resized.
+ * \param root The index of the root vertex.
+ * \return Error code.
+ *
+ * Added in version 0.2.
+ * 
+ * TODO: decompose and merge for not fully connected graphs
+ * TODO: possible speedup could be achieved if we use a table for storing
+ * the children of each node in the tree. (Now the implementation uses a
+ * single array containing the parent of each node and a node's children
+ * are determined by looking for other nodes that have this node as parent)
+ */
+int igraph_layout_reingold_tilford(const igraph_t *graph, 
+				   igraph_matrix_t *res, long int root) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int i, n, j, it=0;
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  igraph_i_adjlist_t allneis;
+  igraph_vector_t *neis;
+  struct igraph_i_reingold_tilford_vertex *vdata;
+  
+  if (root<0 || root>=no_of_nodes) {
+    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  
+  vdata=Calloc(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
+  if (vdata==0) {
+    IGRAPH_ERROR("igraph_layout_reingold_tilford failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, vdata);
+
+  for (i=0; i<no_of_nodes; i++) {
+    vdata[i].parent=-1;
+    vdata[i].level=-1;
+    vdata[i].offset=0.0;
+    vdata[i].left_contour=-1;
+    vdata[i].right_contour=-1;
+  }
+  vdata[root].parent=root;
+  vdata[root].level=0;
+  MATRIX(*res, root, 1) = 0;
+  
+  /* Step 1: assign Y coordinates based on BFS and setup parents vector */
+  IGRAPH_CHECK(igraph_dqueue_push(&q, root));
+  IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+  while (!igraph_dqueue_empty(&q)) {
+    long int actnode=igraph_dqueue_pop(&q);
+    long int actdist=igraph_dqueue_pop(&q);
+    neis=igraph_i_adjlist_get(&allneis, actnode);
+    n=igraph_vector_size(neis);
+    for (j=0; j<n; j++) {
+      long int neighbor=VECTOR(*neis)[j];
+      if (vdata[neighbor].parent >= 0) { continue; }
+      MATRIX(*res, neighbor, 1)=actdist+1;
+      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+      IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+      vdata[neighbor].parent = actnode;
+      vdata[neighbor].level = actdist+1;
+    }
+  }
+  
+  /* Step 2: postorder tree traversal, determines the appropriate X
+   * offsets for every node */
+  igraph_i_layout_reingold_tilford_postorder(vdata, root, no_of_nodes);
+  
+  /* Step 3: calculate real coordinates based on X offsets */
+  igraph_i_layout_reingold_tilford_calc_coords(vdata, res, root, no_of_nodes, vdata[root].offset);
+  
+  igraph_dqueue_destroy(&q);
+  igraph_i_adjlist_destroy(&allneis);
+  igraph_free(vdata);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  igraph_progress("Reingold-Tilford tree layout", 100.0, NULL);
+  
+  return 0;
+}
+
+int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
+                                                 igraph_matrix_t *res, long int node,
+												 long int vcount, real_t xpos) {
+  long int i, n;
+  real_t avg=0.0;
+  MATRIX(*res, node, 0) = xpos;
+  for (i=0, n=0; i<vcount; i++) {
+    if (i == node) continue;
+    if (vdata[i].parent == node) {
+      igraph_i_layout_reingold_tilford_calc_coords(vdata, res, i, vcount,
+						   xpos+vdata[i].offset);
+    }
+  }
+}
+
+int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
+                                               long int node, long int vcount) {
+  long int i, j, childcount, leftroot, leftrootidx;
+  real_t avg;
+  
+  /* printf("Starting visiting node %d\n", node); */
+  
+  /* Check whether this node is a leaf node */
+  childcount=0;
+  for (i=0; i<vcount; i++) {
+    if (i == node) continue;
+    if (vdata[i].parent == node) {
+      /* Node i is a child, so visit it recursively */
+      childcount++;
+      igraph_i_layout_reingold_tilford_postorder(vdata, i, vcount);
+    }
+  }
+  
+  if (childcount == 0) return 0;
+  
+  /* Here we can assume that all of the subtrees have been placed and their
+   * left and right contours are calculated. Let's place them next to each
+   * other as close as we can.
+   * We will take each subtree in an arbitrary order. The root of the
+   * first one will be placed at offset 0, the next ones will be placed
+   * as close to each other as possible. leftroot stores the root of the
+   * rightmost subtree of the already placed subtrees - its right contour
+   * will be checked against the left contour of the next subtree */
+  leftroot=leftrootidx=-1;
+  avg=0.0;
+  /* printf("Visited node %d and arranged its subtrees\n", node); */
+  for (i=0, j=0; i<vcount; i++) {
+    if (i == node) continue;
+    if (vdata[i].parent == node) {
+      /* printf("  Placing child %d on level %d\n", i, vdata[i].level); */
+      if (leftroot >= 0) {
+	/* Now we will follow the right contour of leftroot and the
+	 * left contour of the subtree rooted at i */
+	long lnode, rnode;
+	real_t loffset, roffset, minsep, rootsep;
+	lnode = leftroot; rnode = i;
+	minsep = 1;
+	rootsep = vdata[leftroot].offset + minsep;
+	loffset = 0; roffset = minsep;
+	/* printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n",
+	 lnode, rnode, loffset, roffset, rootsep);*/
+	while ((lnode >= 0) && (rnode >= 0)) {
+	  /* Step to the next level on the left contour */
+	  if (vdata[lnode].right_contour >= 0) {
+	    lnode = vdata[lnode].right_contour;
+	    loffset += vdata[lnode].offset;
+	  } else {
+	    lnode = vdata[lnode].left_contour;
+	    if (lnode >= 0) loffset += vdata[lnode].offset;
+	  }
+	  /* Step to the next level on the right contour */
+	  if (vdata[rnode].left_contour >= 0) {
+	    rnode = vdata[rnode].left_contour;
+	    roffset += vdata[rnode].offset;
+	  } else if (vdata[rnode].right_contour >= 0) {
+	    rnode = vdata[rnode].right_contour;
+	    roffset += vdata[rnode].offset;
+	  } else {
+	    /* Right subtree ended. If the left subtree is deeper, the
+	     * left contour will continue on the left subtree. We can
+	     * use only lnode here, since it has already been advanced
+	     * to the next level in the previous if statement */
+	    vdata[rnode].left_contour = lnode;
+	    vdata[rnode].right_contour = lnode;
+	    rnode = -1;
+	    /* printf("      Right subtree ended, continuing its contours to %d\n", vdata[rnode].left_contour); */
+	  }
+	  /* printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n", 
+	   lnode, rnode, loffset, roffset, rootsep);*/
+	  
+	  /* Push subtrees away if necessary */
+	  if ((lnode >= 0) && (rnode >= 0) && (roffset - loffset < minsep)) {
+	    /* printf("    Pushing right subtree away by %lf\n", minsep-roffset+loffset); */
+	    rootsep += minsep-roffset+loffset;
+	    roffset = loffset+minsep;
+	  }
+	}
+	/* printf("  Offset of subtree with root node %d will be %lf\n", i, rootsep); */
+	vdata[i].offset = rootsep;
+	vdata[node].right_contour=i;
+	avg = (avg*j)/(j+1) + rootsep/(j+1);
+	leftrootidx=j;
+	leftroot=i;
+      } else {
+	leftrootidx=j;
+	leftroot=i;
+	vdata[node].left_contour=i;
+	avg = vdata[i].offset;
+      }
+      j++;
+    }
+  }
+  /* printf("Shifting node to be centered above children. Shift amount: %lf\n", avg); */
+  vdata[node].offset += avg;
+  for (i=0, j=0; i<vcount; i++) {
+    if (i == node) continue;
+    if (vdata[i].parent == node) vdata[i].offset -= avg;
+  }
+  
   return 0;
 }
 

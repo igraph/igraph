@@ -550,6 +550,8 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 		      integer_t maxiter, real_t maxdelta, 
 		      real_t area, real_t coolexp,
 		      real_t repulserad, real_t cellsize, integer_t root);
+int igraph_layout_reingold_tilford(const igraph_t *graph, igraph_matrix_t *res,
+              long int root);
 
 int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);

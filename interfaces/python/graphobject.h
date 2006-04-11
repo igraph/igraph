@@ -797,6 +797,17 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "              etc. Optional, defaults to a random vertex.\n"
   },
   
+  // interface to igraph_layout_reingold_tilford
+  {"layout_reingold_tilford", (PyCFunction)igraphmodule_Graph_layout_reingold_tilford,
+      METH_VARARGS | METH_KEYWORDS,
+	  "Places the vertices on a 2D plane according to the Reingold-Tilford\n"
+	  "layout algorithm. See the following reference for details:\n\n"
+	  "EM Reingold, JS Tilford: Tidier Drawings of Trees.\n"
+	  "IEEE Transactions on Software Engineering 7:22, 223-228, 1981.\n\n"
+	  "Keyword arguments:\n"
+	  "root -- the root of the tree.\n"
+  },
+  
   // interface to igraph_layout_random
   {"layout_random", (PyCFunction)igraphmodule_Graph_layout_random,
       METH_VARARGS | METH_KEYWORDS,

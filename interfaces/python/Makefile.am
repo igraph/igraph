@@ -8,7 +8,7 @@ igraph_la_SOURCES       = igraphmodule.c error.c error.h convert.c convert.h \
 			  graphobject.c graphobject.h \
 			  common.c common.h
 igraph_la_CFLAGS        = $(PYTHON_INCLUDES) -I$(top_srcdir)/include
-igraph_la_LDFLAGS       = $(PYTHON_LDFLAGS) -L../../src
+igraph_la_LDFLAGS       = -module $(PYTHON_LDFLAGS) -L../../src
 igraph_la_LIBADD        = -lm $(PYTHON_LIBS) -ligraph
 
 EXTRA_DIST = test.py test.sh

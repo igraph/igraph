@@ -26,6 +26,11 @@ AT_KEYWORDS([igraph_layout_lgl LGL])
 AT_COMPILE_CHECK([simple/igraph_layout_lgl.c])
 AT_CLEANUP
 
+AT_SETUP([Reingold-Tilford tree layout (igraph_layout_reingold_tilford])
+AT_KEYWORDS([reingold tilford tree layout igraph_layout_reingold_tilford])
+AT_COMPILE_CHECK([simple/igraph_layout_reingold_tilford.c])
+AT_CLEANUP
+
 AT_SETUP([Covering circle and sphere (igraph_i_layout_sphere_{2,3}d):])
 AT_KEYWORDS([covering circle sphere layout])
 AT_COMPILE_CHECK([simple/igraph_i_layout_sphere.c])
