@@ -30,6 +30,8 @@
  * \defgroup python_interface_edgeseq Edge sequence object
  */
 
+PyTypeObject igraphmodule_EdgeSeqType;
+
 /**
  * \ingroup python_interface_edgeseq
  * \brief Allocate a new edge sequence object for a given graph
@@ -136,9 +138,6 @@ PyObject* igraphmodule_EdgeSeq_sq_item(igraphmodule_EdgeSeqObject* self,
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_EdgeSeq_attributes(igraphmodule_EdgeSeqObject* self) {
-  igraph_vector_t t;
-  igraph_vector_ptr_t ns;
-  long result;
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
@@ -265,7 +264,7 @@ static PySequenceMethods igraphmodule_EdgeSeq_as_sequence = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * an edge sequence of a graph
  */
-static PyTypeObject igraphmodule_EdgeSeqType =
+PyTypeObject igraphmodule_EdgeSeqType =
 {
   PyObject_HEAD_INIT(NULL)                  //
   0,                                        // ob_size

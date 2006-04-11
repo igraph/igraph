@@ -43,7 +43,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, bool_t n
 {
    PyObject *item, *i1, *i2;
    int i, j, k, ok;
-   long idx, idx2;
+   long idx, idx2=0;
 
    if (!PyList_Check(list)) 
      {
@@ -408,7 +408,7 @@ int igraphmodule_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v) {
     return 1;
   }
     
-  while (t=PyIter_Next(it)) {
+  while ((t=PyIter_Next(it))) {
     if (!PyObject_TypeCheck(t, &igraphmodule_GraphType)) {
       PyErr_SetString(PyExc_TypeError, "iterable argument must contain graphs");
       igraph_vector_ptr_destroy(v);

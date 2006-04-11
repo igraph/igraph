@@ -28,6 +28,8 @@
 #include "convert.h"
 #include "error.h"
 
+PyTypeObject igraphmodule_GraphType;
+
 /** \defgroup python_interface_graph Graph object
  * \ingroup python_interface */
 
@@ -116,7 +118,7 @@ int igraphmodule_Graph_clear(igraphmodule_GraphObject *self) {
  * other \c PyObject pointers and they might point back to itself.
  */
 int igraphmodule_Graph_traverse(igraphmodule_GraphObject *self,
-				       visitproc visit, void *arg) {
+				visitproc visit, void *arg) {
   int vret;
 
   RC_TRAVERSE("Graph", self);
@@ -152,7 +154,9 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject* self)
   
   if (PyCallable_Check(self->destructor)) {
     r=PyObject_CallObject(self->destructor, NULL);
-    if (r) Py_DECREF(r);
+    if (r) {
+      Py_DECREF(r);
+    }
   }
   
   igraphmodule_Graph_clear(self);
@@ -497,16 +501,18 @@ PyObject* igraphmodule_Graph_degree(igraphmodule_GraphObject *self,
    if (igraph_degree(&self->g, &result, IGRAPH_VS_VECTOR(&self->g, &vids),
 		     (igraph_neimode_t)dtype, (bool_t)(loops == Py_True))) 
      {
+       igraphmodule_handle_igraph_error();
        Py_DECREF(list);
        Py_DECREF(loops);
        igraph_vector_destroy(&vids);
        igraph_vector_destroy(&result);
-       igraphmodule_handle_igraph_error();
        return NULL;
      }
    
    Py_DECREF(loops);
-   if (list) Py_DECREF(list);
+   if (list) {
+     Py_DECREF(list);
+   }
    
    if (input_was_list) 
      list=igraphmodule_vector_t_to_PyList(&result);
@@ -686,8 +692,7 @@ PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self,
  */
 PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type,
 				   PyObject *args) {
-  long n, children;
-  igraph_tree_mode_t mode=IGRAPH_TREE_UNDIRECTED;
+  long n;
   igraphmodule_GraphObject *self;
   
   if (!PyArg_ParseTuple(args, "l", &n)) return NULL;
@@ -721,7 +726,7 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
 					     PyObject *kwds) 
 {
   igraphmodule_GraphObject *self;
-  long n, m;
+  long n, m=0;
   igraph_vector_t outseq;
   PyObject *m_obj, *outpref=NULL, *directed=NULL;
   
@@ -988,7 +993,7 @@ PyObject* igraphmodule_Graph_Ring(PyTypeObject *type,
 					 PyObject *args,
 					 PyObject *kwds) 
 {
-  long n, m;
+  long n;
   PyObject *directed=Py_False, *mutual=Py_False, *circular=Py_True;
   igraphmodule_GraphObject *self;
   
@@ -1189,7 +1194,6 @@ PyObject* igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *self,
 							PyObject *kwds) 
 {
    char *kwlist[] = {"directed", "unconn", NULL};
-   long v1, v2;
    PyObject *directed=Py_True, *unconn=Py_True;
    real_t res;
    
@@ -1769,7 +1773,6 @@ PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *se
   long from0, i, j, k;
   integer_t from;
   PyObject *list, *item;
-  long int no_of_nodes=igraph_vcount(&self->g);
   
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|l", kwlist,
 				   &from0, &mode))
@@ -1979,7 +1982,7 @@ PyObject* igraphmodule_Graph_subcomponent(igraphmodule_GraphObject *self,
    igraph_neimode_t mode=IGRAPH_ALL;
    long from0;
    real_t from;
-   PyObject *multiple=Py_True, *loops=Py_True, *list=NULL;
+   PyObject *list=NULL;
    
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|l", kwlist,
 				    &from0, &mode))
@@ -2379,7 +2382,7 @@ PyObject* igraphmodule_Graph_layout_grid_fruchterman_reingold(igraphmodule_Graph
 /** \ingroup python_interface_graph
  * \brief Places the vertices of a graph according to the Large Graph Layout
  * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_circle
+ * \sa igraph_layout_lgl
  */
 PyObject* igraphmodule_Graph_layout_lgl(igraphmodule_GraphObject *self,
 					PyObject *args,
@@ -2621,7 +2624,6 @@ PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyOb
   igraphmodule_GraphObject *self;
   char* fname=NULL;
   FILE* f;
-  PyObject *names=Py_True, *weights=Py_True;
   igraph_t g;
   
   char *kwlist[] =
@@ -3064,7 +3066,6 @@ PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self, PyO
  * \brief Returns the vertex sequence of the graph
  */
 PyObject* igraphmodule_Graph_get_vertices(igraphmodule_GraphObject* self, void* closure) {
-  PyObject* o;
   if (self->vseq==NULL) {
     self->vseq=igraphmodule_VertexSeq_New(self);
   }
@@ -3076,7 +3077,6 @@ PyObject* igraphmodule_Graph_get_vertices(igraphmodule_GraphObject* self, void* 
  * \brief Returns the edge sequence of the graph
  */
 PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* closure) {
-  PyObject* o;
   if (self->eseq==NULL) {
     self->eseq=igraphmodule_EdgeSeq_New(self);
   }
@@ -3088,7 +3088,7 @@ PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* clo
  * \brief Creates the disjoint union of two graphs (operator version)
  */
 PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyObject* other) {
-  PyObject *t, *it;
+  PyObject *it;
   igraphmodule_GraphObject *o, *result;
   igraph_t g;
   
@@ -3137,7 +3137,7 @@ PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyOb
  * \brief Creates the union of two graphs (operator version)
  */
 PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other) {
-  PyObject *t, *it;
+  PyObject *it;
   igraphmodule_GraphObject *o, *result;
   igraph_t g;
   
@@ -3235,7 +3235,6 @@ PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObje
  * \brief Creates the difference of two graphs (operator version)
  */
 PyObject* igraphmodule_Graph_difference(igraphmodule_GraphObject* self, PyObject* other) {
-  PyObject *it;
   igraphmodule_GraphObject *o, *result;
   igraph_t g;
   
@@ -3304,7 +3303,6 @@ PyObject* igraphmodule_Graph_complementer_op(igraphmodule_GraphObject* self) {
  * \brief Creates the composition of two graphs
  */
 PyObject* igraphmodule_Graph_compose(igraphmodule_GraphObject* self, PyObject* other) {
-  PyObject *it;
   igraphmodule_GraphObject *o, *result;
   igraph_t g;
   
@@ -3435,7 +3433,7 @@ PyNumberMethods igraphmodule_Graph_as_number = {
 /** \ingroup python_interface_graph
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
-static PyTypeObject igraphmodule_GraphType = {
+PyTypeObject igraphmodule_GraphType = {
   PyObject_HEAD_INIT(NULL)                  // 
   0,                                        // ob_size
   "igraph.Graph",                           // tp_name

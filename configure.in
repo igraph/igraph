@@ -93,6 +93,10 @@ HAVE_PYTHON=1
 if test $use_python == yes; then
   AM_PATH_PYTHON(2.3, [
     HAVE_PYTHON=1
+    # MinGW returns Python path with backslashes, replace them with
+    # forward slashes
+    PYTHON_INCLUDES=`echo $PYTHON_INCLUDES | tr '\\\\' '/'`
+    pyexecdir=`echo $pyexecdir | tr '\\\\' '/'`
   ], [
     HAVE_PYTHON=0
     use_python=no
@@ -100,10 +104,10 @@ if test $use_python == yes; then
 fi
 
 if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
-  PYTHON_CFLAGS="-I"`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_inc()"`
+  PYTHON_CFLAGS="-I"`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_inc()" | tr '\\\\' '/'`
   PYTHON_CPPFLAGS="${PYTHON_CFLAGS}"
   PYTHON_CXXFLAGS="${PYTHON_CFLAGS}"
-  PYTHON_LDFLAGS="-module -no-undefined"
+  PYTHON_LDFLAGS="-no-undefined"
   AC_SUBST(PYTHON_CFLAGS)
   AC_SUBST(PYTHON_CPPFLAGS)
   AC_SUBST(PYTHON_CXXFLAGS)
@@ -112,19 +116,33 @@ if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
   # These code snippets are taken from the Apache mod_python's configure.in
   # this is where the Python libraries will get installed
   AC_SUBST(PY_STD_LIB)
-  AC_MSG_CHECKING(checking where python libraries are installed)
-  PY_STD_LIB=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(plat_specific=1, standard_lib=1)'`
+  AC_MSG_CHECKING(where Python libraries are installed)
+  PY_STD_LIB=`$PYTHON -c 'import distutils.sysconfig; print distutils.sysconfig.get_python_lib(plat_specific=1, standard_lib=1)' | tr '\\\\' '/'`
   AC_MSG_RESULT($PY_STD_LIB)
   
   PyLIBP=${PY_STD_LIB}
-  PyLIBPL=${PyLIBP}/config
+  
+  # Some platforms have the Python libraries in a separate config subdir
+  # but others not. Choose the config directory only if it exists
+  if test -d ${PyLIBP}/config; then
+    PyLIBPL=${PyLIBP}/config
+  else
+    PyLIBPL=${PyLIBP}
+  fi
+  
+  # The standard Windows installation of Python does not have a dot in
+  # the version number when used in the library filename
   PyPYTHONLIBS=${PyLIBPL}/libpython${PYTHON_VERSION}.a
-  PyLIBS=`grep "^LIB[[SMC]]=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
-  PyMODLIBS=`grep "^LOCALMODLIBS=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
+  if test ! -f $PyPYTHONLIBS; then
+    PYTHON_VERSION=`echo $PYTHON_VERSION | tr -d '.'`
+    PyPYTHONLIBS=${PyLIBPL}/libpython${PYTHON_VERSION}.a
+  fi
 
-  # OS X does not have any libpython*.a, we have to use -undefined instead
-  echo $target
-
+  if test -f ${PyLIBPL}/Makefile; then  
+    PyLIBS=`grep "^LIB[[SMC]]=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
+    PyMODLIBS=`grep "^LOCALMODLIBS=" ${PyLIBPL}/Makefile | cut -f2 -d= | tr '\011\012\015' '   '`
+  fi
+  
   AC_CHECK_LIB([python${PYTHON_VERSION}], Py_NewInterpreter,
     [PyPYTHONLIBS="-lpython${PYTHON_VERSION}"],
     [if test -f ${PyLIBPL}/libpython${PYTHON_VERSION}.a; then
@@ -150,9 +168,10 @@ if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
     AC_SUBST(PYTHON_LIBS)
 
     AC_MSG_CHECKING([whether integer_t conflicts (usually on OS X)])
-    AC_TRY_COMPILE(,
+    AC_TRY_COMPILE(
     [#include <Python.h>
     typedef double integer_t;],
+    [],
     [AC_MSG_RESULT(no)],
     [AC_MSG_RESULT(yes)
      AC_DEFINE(INTEGER_T_CONFLICTS, 1, [1 if integer_t conflicts (usually on OS X)])
@@ -212,7 +231,7 @@ if test "$use_gprof" == "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile doc/Makefile interfaces/R/Makefile interfaces/R/igraph/configure.in interfaces/R/DESCRIPTION])
+AC_CONFIG_FILES([Makefile src/Makefile interfaces/Makefile interfaces/python/Makefile igraph.pc debian/Makefile doc/Makefile interfaces/R/igraph/configure.in])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])

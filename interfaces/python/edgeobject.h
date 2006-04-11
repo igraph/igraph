@@ -51,6 +51,6 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self);
 					   PyObject* s);
 int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, PyObject* v);*/
 
-static PyTypeObject igraphmodule_EdgeType;
+extern PyTypeObject igraphmodule_EdgeType;
 
 #endif

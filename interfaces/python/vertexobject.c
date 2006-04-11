@@ -30,6 +30,8 @@
  * \defgroup python_interface_vertex Vertex object
  */
 
+PyTypeObject igraphmodule_VertexType;
+
 /**
  * \ingroup python_interface_vertex
  * \brief Allocates a new Python vertex object
@@ -292,7 +294,7 @@ PyMappingMethods igraphmodule_Vertex_as_mapping = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * a vertex of a graph
  */
-static PyTypeObject igraphmodule_VertexType =
+PyTypeObject igraphmodule_VertexType =
 {
   PyObject_HEAD_INIT(NULL)                    //
   0,                                          // ob_size

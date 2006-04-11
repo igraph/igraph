@@ -23,6 +23,11 @@
 
 #include "error.h"
 
+/** \ingroup python_interface_errors
+ * \brief Exception type to be returned when an internal \c igraph error occurs.
+ */
+PyObject* igraphmodule_InternalError;
+
 /**
  * \ingroup python_interface_errors
  * \brief Generic error handler for internal \c igraph errors.
@@ -42,7 +47,7 @@ PyObject* igraphmodule_handle_igraph_error()
     PyErr_SetString(igraphmodule_InternalError,
 		    "Internal igraph error. Please contact the author!");
   }
-   return NULL;
+  return NULL;
 }
 
 /**

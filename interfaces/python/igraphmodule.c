@@ -143,7 +143,7 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
 
 PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwds) {
   char* kwlist[] = {"vs", "coords", NULL};
-  PyObject *vs, *o, *o1, *o2, *coords = Py_False;
+  PyObject *vs, *o, *o1=0, *o2=0, *coords = Py_False;
   igraph_matrix_t mtrx;
   igraph_vector_t result;
   igraph_matrix_t resmat;
@@ -260,6 +260,8 @@ static PyMethodDef igraphmodule_methods[] =
 #ifndef PyMODINIT_FUNC
 #define PyMODINIT_FUNC void
 #endif
+
+extern PyObject* igraphmodule_InternalError;
 
 PyMODINIT_FUNC
 initigraph(void)

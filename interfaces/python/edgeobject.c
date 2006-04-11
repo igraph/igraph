@@ -30,6 +30,8 @@
  * \defgroup python_interface_edge Edge object
  */
 
+PyTypeObject igraphmodule_EdgeType;
+
 /**
  * \ingroup python_interface_edge
  * \brief Allocates a new Python edge object
@@ -139,9 +141,6 @@ int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
-  igraph_vector_t t;
-  igraph_vector_ptr_t ns;
-  long result;
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
@@ -313,10 +312,10 @@ PyMethodDef igraphmodule_Edge_methods[] = {
  * Getter/setter table for the \c igraph.Edge object
  */
 PyGetSetDef igraphmodule_Edge_getseters[] = {
-  {"source", igraphmodule_Edge_get_from, NULL,
+  {"source", (getter)igraphmodule_Edge_get_from, NULL,
       "Source node index of this edge", NULL
   },
-  {"target", igraphmodule_Edge_get_to, NULL,
+  {"target", (getter)igraphmodule_Edge_get_to, NULL,
       "Target node index of this edge", NULL
   },
   {NULL}
@@ -340,7 +339,7 @@ PyMappingMethods igraphmodule_Edge_as_mapping = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * an edge of a graph
  */
-static PyTypeObject igraphmodule_EdgeType =
+PyTypeObject igraphmodule_EdgeType =
 {
   PyObject_HEAD_INIT(NULL)                    //
   0,                                          // ob_size

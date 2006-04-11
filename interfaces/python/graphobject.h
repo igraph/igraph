@@ -30,6 +30,8 @@
 #include "structmember.h"
 #include "common.h"
 
+extern PyTypeObject igraphmodule_GraphType;
+
 /**
  * \ingroup python_interface
  * \brief A structure containing all the fields required to access an igraph from Python
@@ -111,6 +113,7 @@ PyObject* igraphmodule_Graph_layout_fruchterman_reingold(igraphmodule_GraphObjec
 PyObject* igraphmodule_Graph_layout_fruchterman_reingold_3d(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_grid_fruchterman_reingold(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_lgl(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_layout_reingold_tilford(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -145,8 +148,6 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
 
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
-
-static PyTypeObject igraphmodule_GraphType;
 
 /** \ingroup python_interface
  * \brief Member list of the \c igraph.Graph object type

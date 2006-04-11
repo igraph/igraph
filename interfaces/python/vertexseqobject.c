@@ -30,6 +30,8 @@
  * \defgroup python_interface_vertexseq Vertex sequence object
  */
 
+PyTypeObject igraphmodule_VertexSeqType;
+
 /**
  * \ingroup python_interface_vertexseq
  * \brief Allocate a new vertex sequence object for a given graph
@@ -182,7 +184,7 @@ static PySequenceMethods igraphmodule_VertexSeq_as_sequence = {
  * Python type object referencing the methods Python calls when it performs various operations on
  * a vertex sequence of a graph
  */
-static PyTypeObject igraphmodule_VertexSeqType =
+PyTypeObject igraphmodule_VertexSeqType =
 {
   PyObject_HEAD_INIT(NULL)                    //
   0,                                          // ob_size

@@ -45,6 +45,6 @@ void igraphmodule_VertexSeq_dealloc(igraphmodule_VertexSeqObject* self);
 
 int igraphmodule_VertexSeq_sq_length(igraphmodule_VertexSeqObject *self);
 
-static PyTypeObject igraphmodule_VertexSeqType;
+extern PyTypeObject igraphmodule_VertexSeqType;
 
 #endif
