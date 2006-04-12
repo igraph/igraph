@@ -36,7 +36,7 @@ int main() {
   igraph_t ring, g;
   igraph_vector_ptr_t complist;
   long int i;
-  real_t edges[]= { 0,1,1,2,2,0,
+  igraph_real_t edges[]= { 0,1,1,2,2,0,
 		    3,4,4,5,5,6,
 		    8,9,9,10 };
   igraph_vector_t v;
@@ -63,7 +63,7 @@ int main() {
   
   /* a toy graph, three components maximum, with at least 2 vertices each */
   igraph_create(&g, 
-		igraph_vector_view(&v, edges, sizeof(edges)/sizeof(real_t)), 
+		igraph_vector_view(&v, edges, sizeof(edges)/sizeof(igraph_real_t)), 
 		0, IGRAPH_DIRECTED);
   igraph_decompose(&g, &complist, IGRAPH_WEAK, 3, 2);
   for (i=0; i<igraph_vector_ptr_size(&complist); i++) {
@@ -83,7 +83,7 @@ int main() {
     igraph_es_t es;
     igraph_es_all(comp, &es);
     while (!igraph_es_end(comp, &es)) {
-      real_t *from, *to; 
+      igraph_real_t *from, *to; 
       igraph_get_vertex_attribute(comp, "id", igraph_es_from(comp, &es),
 				  (void**) &from, 0);
       igraph_get_vertex_attribute(comp, "id", igraph_es_to(comp, &es),

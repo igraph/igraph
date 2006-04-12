@@ -65,10 +65,10 @@
  * number of vertices times the number of edges.
  */
 
-int igraph_diameter(const igraph_t *graph, integer_t *pres, 
-		    integer_t *pfrom, integer_t *pto, 
+int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres, 
+		    igraph_integer_t *pfrom, igraph_integer_t *pto, 
 		    igraph_vector_t *path,
-		    bool_t directed, bool_t unconn) {
+		    igraph_bool_t directed, igraph_bool_t unconn) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n;
@@ -79,7 +79,7 @@ int igraph_diameter(const igraph_t *graph, integer_t *pres,
 
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t *neis;
-  integer_t dirmode;
+  igraph_integer_t dirmode;
   igraph_i_adjlist_t allneis;
   
   if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
@@ -192,17 +192,17 @@ int igraph_diameter(const igraph_t *graph, integer_t *pres,
  * number of vertices times the number of edges.
  */
 
-int igraph_average_path_length(const igraph_t *graph, real_t *res,
-			       bool_t directed, bool_t unconn) {
+int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
+			       igraph_bool_t directed, igraph_bool_t unconn) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n;
   long int *already_added;
   long int nodes_reached=0;
-  real_t normfact=0.0;
+  igraph_real_t normfact=0.0;
 
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t *neis;
-  integer_t dirmode;
+  igraph_integer_t dirmode;
   igraph_i_adjlist_t allneis;
 
   *res=0;  
@@ -392,7 +392,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 
   igraph_d_indheap_t heap=IGRAPH_D_INDHEAP_NULL;
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
-  integer_t mode=3;
+  igraph_integer_t mode=3;
   
   igraph_es_t it;
 
@@ -771,7 +771,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  
 
 int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
-			      integer_t from, const igraph_vs_t *to, 
+			      igraph_integer_t from, const igraph_vs_t *to, 
 			      igraph_neimode_t mode) {
 
   /* TODO: use adjlist_t if to is long (longer than 1?) */
@@ -939,7 +939,7 @@ void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
 int igraph_get_all_shortest_paths(const igraph_t *graph,
 				  igraph_vector_ptr_t *res, 
 				  igraph_vector_t *nrgeo,
-				  integer_t from, const igraph_vs_t *to,
+				  igraph_integer_t from, const igraph_vs_t *to,
 				  igraph_neimode_t mode) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -1128,7 +1128,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
  * a given set of vertices and the edges between them.
  */
 
-int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, real_t vertex, 
+int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vertex, 
 			igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -1216,7 +1216,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, real_t vert
 
 int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res, 
 			const igraph_vs_t *vids, 
-			bool_t directed) {
+			igraph_bool_t directed) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
@@ -1227,7 +1227,7 @@ int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res,
   long int source;
   long int j;
   igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
-  integer_t modein, modeout;
+  igraph_integer_t modein, modeout;
   igraph_vs_t myvids;
   const igraph_vector_t *myvidsv;
 
@@ -1381,7 +1381,7 @@ int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res,
  */
 
 int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result, 
-			     bool_t directed) {
+			     igraph_bool_t directed) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -1394,7 +1394,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
   long int j;
 
   igraph_es_t it;
-  integer_t modein, modeout;
+  igraph_integer_t modein, modeout;
 
   if (directed) {
     modeout=IGRAPH_OUT;
@@ -1560,15 +1560,15 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  */
 
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res, 
-		    const igraph_vs_t *vids, bool_t directed, integer_t niter, 
-		    real_t eps, real_t damping) {
+		    const igraph_vs_t *vids, igraph_bool_t directed, igraph_integer_t niter, 
+		    igraph_real_t eps, igraph_real_t damping) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n, nodes_to_calc;
-  real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
+  igraph_real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
   igraph_vector_t *neis, outdegree;
-  integer_t dirmode;
+  igraph_integer_t dirmode;
   igraph_i_adjlist_t allneis;
-  real_t maxdiff=eps;
+  igraph_real_t maxdiff=eps;
   igraph_vs_t myvids;
   const igraph_vector_t * myvidsv;
 
@@ -1586,19 +1586,19 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
   
   IGRAPH_VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
     
-  prvec=Calloc(no_of_nodes, real_t);
+  prvec=Calloc(no_of_nodes, igraph_real_t);
   if (prvec==0) {
     IGRAPH_ERROR("pagerank failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, prvec);
   
-  prvec_new=Calloc(no_of_nodes, real_t);
+  prvec_new=Calloc(no_of_nodes, igraph_real_t);
   if (prvec_new==0) {
     IGRAPH_ERROR("pagerank failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, prvec_new);
   
-  prvec_scaled=Calloc(no_of_nodes, real_t);
+  prvec_scaled=Calloc(no_of_nodes, igraph_real_t);
   if (prvec_scaled==0) {
     IGRAPH_ERROR("pagerank failed", IGRAPH_ENOMEM);
   }
@@ -1708,7 +1708,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
  *         \endclist
  */
 
-int igraph_rewire(igraph_t *graph, integer_t n, igraph_rewiring_t mode) {
+int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, a, b, c, d;
   igraph_i_adjlist_t allneis;
@@ -1886,7 +1886,7 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
  * highest out-degree in the graph.
  */
 
-int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops) {
+int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
@@ -1931,7 +1931,7 @@ int igraph_simplify(igraph_t *graph, bool_t multiple, bool_t loops) {
 int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  real_t triples=0, triangles=0;
+  igraph_real_t triples=0, triangles=0;
   long int node;
   long int *neis;
   long int deg;

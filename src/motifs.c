@@ -129,7 +129,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
     igraph_stack_clear(&stack);
 
     while (level != 1 || !igraph_vector_empty(&adjverts)) {
-      real_t cp=VECTOR(*cut_prob)[level];
+      igraph_real_t cp=VECTOR(*cut_prob)[level];
       
       if (level==size-1) {
 	s=igraph_vector_size(&adjverts)/2;
@@ -238,9 +238,9 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   return 0;
 }
 
-int igraph_motifs_randesu_estimate(const igraph_t *graph, integer_t *est,
+int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 				   int size, igraph_vector_t *cut_prob, 
-				   integer_t sample_size, 
+				   igraph_integer_t sample_size, 
 				   igraph_vector_t *parsample) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -302,7 +302,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, integer_t *est,
     igraph_stack_clear(&stack);
 
     while (level != 1 || !igraph_vector_empty(&adjverts)) {
-      real_t cp=VECTOR(*cut_prob)[level];
+      igraph_real_t cp=VECTOR(*cut_prob)[level];
       
       if (level==size-1) {
 	s=igraph_vector_size(&adjverts)/2;
@@ -390,7 +390,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, integer_t *est,
   return 0;
 }
 
-int igraph_motifs_randesu_no(const igraph_t *graph, integer_t *no,
+int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 			     int size, igraph_vector_t *cut_prob) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -442,7 +442,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, integer_t *no,
     igraph_stack_clear(&stack);
 
     while (level != 1 || !igraph_vector_empty(&adjverts)) {
-      real_t cp=VECTOR(*cut_prob)[level];
+      igraph_real_t cp=VECTOR(*cut_prob)[level];
       
       if (level==size-1) {
 	s=igraph_vector_size(&adjverts)/2;

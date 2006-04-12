@@ -44,7 +44,7 @@
 
 int igraph_heap_init           (igraph_heap_t* h, long int alloc_size) {
   if (alloc_size <= 0 ) { alloc_size=1; }
-  h->stor_begin=Calloc(alloc_size, real_t);
+  h->stor_begin=Calloc(alloc_size, igraph_real_t);
   if (h->stor_begin==0) {
     IGRAPH_ERROR("heap init failed", IGRAPH_ENOMEM);
   }
@@ -64,8 +64,8 @@ int igraph_heap_init           (igraph_heap_t* h, long int alloc_size) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_heap_init_array     (igraph_heap_t *h, real_t* data, long int len) {
-  h->stor_begin=Calloc(len, real_t);
+int igraph_heap_init_array     (igraph_heap_t *h, igraph_real_t* data, long int len) {
+  h->stor_begin=Calloc(len, igraph_real_t);
   if (h->stor_begin==0) {
     IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
   }
@@ -73,7 +73,7 @@ int igraph_heap_init_array     (igraph_heap_t *h, real_t* data, long int len) {
   h->end=h->stor_end;
   h->destroy=1;
 
-  memcpy(h->stor_begin, data, len*sizeof(real_t));
+  memcpy(h->stor_begin, data, len*sizeof(igraph_real_t));
 
   igraph_heap_i_build (h->stor_begin, h->end-h->stor_begin, 0);
   
@@ -99,7 +99,7 @@ void igraph_heap_destroy        (igraph_heap_t* h) {
  * \brief Decides whether a heap object is empty.
  */
 
-bool_t igraph_heap_empty          (igraph_heap_t* h) {
+igraph_bool_t igraph_heap_empty          (igraph_heap_t* h) {
   assert(h != NULL);
   assert(h->stor_begin != NULL);
   return h->stor_begin == h->end;
@@ -110,7 +110,7 @@ bool_t igraph_heap_empty          (igraph_heap_t* h) {
  * \brief Adds an element to a heap object.
  */
 
-int igraph_heap_push           (igraph_heap_t* h, real_t elem) {
+int igraph_heap_push           (igraph_heap_t* h, igraph_real_t elem) {
   int ret;
   assert(h != NULL);
   assert(h->stor_begin != NULL);
@@ -136,7 +136,7 @@ int igraph_heap_push           (igraph_heap_t* h, real_t elem) {
  * \brief Returns the largest element in a heap.
  */
 
-real_t igraph_heap_max       (igraph_heap_t* h) {
+igraph_real_t igraph_heap_max       (igraph_heap_t* h) {
   assert(h != NULL);
   assert(h->stor_begin != NULL);
   assert(h->stor_begin != h->end);
@@ -149,8 +149,8 @@ real_t igraph_heap_max       (igraph_heap_t* h) {
  * \brief Returns and removes the largest element in a heap.
  */
 
-real_t igraph_heap_delete_max(igraph_heap_t* h) {
-  real_t tmp;
+igraph_real_t igraph_heap_delete_max(igraph_heap_t* h) {
+  igraph_real_t tmp;
 
   assert(h != NULL);
   assert(h->stor_begin != NULL);
@@ -184,13 +184,13 @@ long int igraph_heap_size      (igraph_heap_t* h) {
 
 int igraph_heap_reserve        (igraph_heap_t* h, long int size) {
   long int actual_size=igraph_heap_size(h);
-  real_t *tmp;
+  igraph_real_t *tmp;
   assert(h != NULL);
   assert(h->stor_begin != NULL);
   
   if (size <= actual_size) { return 0; }
   
-  tmp=Realloc(h->stor_begin, size, real_t);
+  tmp=Realloc(h->stor_begin, size, igraph_real_t);
   if (tmp==0) {
     IGRAPH_ERROR("heap reserve failed", IGRAPH_ENOMEM);
   }
@@ -206,7 +206,7 @@ int igraph_heap_reserve        (igraph_heap_t* h, long int size) {
  * \brief Build a heap, this should not be called directly.
  */
 
-void igraph_heap_i_build(real_t* arr, long int size, long int head) {
+void igraph_heap_i_build(igraph_real_t* arr, long int size, long int head) {
 
   if (RIGHTCHILD(head) < size) { 
     /* both subtrees */
@@ -228,7 +228,7 @@ void igraph_heap_i_build(real_t* arr, long int size, long int head) {
  * called directly.
  */
 
-void igraph_heap_i_shift_up(real_t* arr, long int size, long int elem) {
+void igraph_heap_i_shift_up(igraph_real_t* arr, long int size, long int elem) {
   
   if (elem==0 || arr[elem] < arr[PARENT(elem)]) { 
     /* at the top */
@@ -244,7 +244,7 @@ void igraph_heap_i_shift_up(real_t* arr, long int size, long int elem) {
  * called directly.
  */
 
-void igraph_heap_i_sink(real_t* arr, long int size, long int head) {
+void igraph_heap_i_sink(igraph_real_t* arr, long int size, long int head) {
 
   if (LEFTCHILD(head) >= size) { 
     /* no subtrees */
@@ -270,9 +270,9 @@ void igraph_heap_i_sink(real_t* arr, long int size, long int head) {
  * called directly.
  */
 
-void igraph_heap_i_switch(real_t* arr, long int e1, long int e2) {
+void igraph_heap_i_switch(igraph_real_t* arr, long int e1, long int e2) {
   if (e1!=e2) {
-    real_t tmp=arr[e1];
+    igraph_real_t tmp=arr[e1];
     arr[e1]=arr[e2];
     arr[e2]=tmp;
   }
@@ -288,7 +288,7 @@ void igraph_heap_i_switch(real_t* arr, long int e1, long int e2) {
 
 int igraph_indheap_init           (igraph_indheap_t* h, long int alloc_size) {
  if (alloc_size <= 0 ) { alloc_size=1; }
- h->stor_begin=Calloc(alloc_size, real_t);
+ h->stor_begin=Calloc(alloc_size, igraph_real_t);
  if (h->stor_begin==0) {
    h->index_begin=0;
    IGRAPH_ERROR("indheap init failed", IGRAPH_ENOMEM);
@@ -315,10 +315,10 @@ int igraph_indheap_init           (igraph_indheap_t* h, long int alloc_size) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_indheap_init_array     (igraph_indheap_t *h, real_t* data, long int len) {
+int igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, long int len) {
   long int i;
 
-  h->stor_begin=Calloc(len, real_t);
+  h->stor_begin=Calloc(len, igraph_real_t);
   if (h->stor_begin==0) {
     h->index_begin=0;
     IGRAPH_ERROR("indheap init from array failed", IGRAPH_ENOMEM);
@@ -333,7 +333,7 @@ int igraph_indheap_init_array     (igraph_indheap_t *h, real_t* data, long int l
   h->end=h->stor_end;
   h->destroy=1;
 
-  memcpy(h->stor_begin, data, len*sizeof(real_t));
+  memcpy(h->stor_begin, data, len*sizeof(igraph_real_t));
   for (i=0; i<len; i++) {
     h->index_begin[i]=i+1;
   }
@@ -367,7 +367,7 @@ void igraph_indheap_destroy        (igraph_indheap_t* h) {
  * \brief Checks whether a heap is empty.
  */
 
-bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
+igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
   assert(h != 0);
   assert(h->stor_begin != 0);
   return h->stor_begin == h->end;
@@ -378,7 +378,7 @@ bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
  * \brief Adds an element to an indexed heap.
  */
 
-int igraph_indheap_push           (igraph_indheap_t* h, real_t elem) {
+int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
   assert(h != 0);
   assert(h->stor_begin != 0);
 	
@@ -404,7 +404,7 @@ int igraph_indheap_push           (igraph_indheap_t* h, real_t elem) {
  * \brief Returns the largest element in an indexed heap.
  */
 
-real_t igraph_indheap_max       (igraph_indheap_t* h) {
+igraph_real_t igraph_indheap_max       (igraph_indheap_t* h) {
   assert(h != NULL);
   assert(h->stor_begin != NULL);
   assert(h->stor_begin != h->end);
@@ -417,8 +417,8 @@ real_t igraph_indheap_max       (igraph_indheap_t* h) {
  * \brief Removes the largest element from an indexed heap.
  */
 
-real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
-  real_t tmp;
+igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
+  igraph_real_t tmp;
 
   assert(h != NULL);
   assert(h->stor_begin != NULL);
@@ -452,14 +452,14 @@ long int igraph_indheap_size      (igraph_indheap_t* h) {
 
 int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
   long int actual_size=igraph_indheap_size(h);
-  real_t *tmp1;
+  igraph_real_t *tmp1;
   long int *tmp2;
   assert(h != 0);
   assert(h->stor_begin != 0);
   
   if (size <= actual_size) { return 0; }
 
-  tmp1=Calloc(size, real_t);  
+  tmp1=Calloc(size, igraph_real_t);  
   if (tmp1==0) {
     IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
   }
@@ -469,7 +469,7 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
     IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, tmp2);
-  memcpy(tmp1, h->stor_begin, actual_size*sizeof(real_t));
+  memcpy(tmp1, h->stor_begin, actual_size*sizeof(igraph_real_t));
   memcpy(tmp2, h->index_begin, actual_size*sizeof(long int));
   Free(h->stor_begin);
   Free(h->index_begin);
@@ -568,7 +568,7 @@ void igraph_indheap_i_sink(igraph_indheap_t* h, long int head) {
 
 void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2) {
   if (e1!=e2) {
-    real_t tmp=h->stor_begin[e1];
+    igraph_real_t tmp=h->stor_begin[e1];
     h->stor_begin[e1]=h->stor_begin[e2];
     h->stor_begin[e2]=tmp;
     
@@ -589,7 +589,7 @@ void igraph_indheap_i_switch(igraph_indheap_t* h, long int e1, long int e2) {
 
 int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size) {
  if (alloc_size <= 0 ) { alloc_size=1; }
-  h->stor_begin=Calloc(alloc_size, real_t);
+  h->stor_begin=Calloc(alloc_size, igraph_real_t);
   if (h->stor_begin==0) {
     h->index_begin=0;
     h->index2_begin=0;
@@ -645,7 +645,7 @@ void igraph_d_indheap_destroy        (igraph_d_indheap_t* h) {
  * \brief Decides whether a heap is empty.
  */
 
-bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
+igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
   assert(h != 0);
   assert(h->stor_begin != 0);
   return h->stor_begin == h->end;
@@ -656,7 +656,7 @@ bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
  * \brief Adds an element to the heap.
  */
 
-int igraph_d_indheap_push           (igraph_d_indheap_t* h, real_t elem, 
+int igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem, 
 			      long int idx, long int idx2) {
   assert(h != 0);
   assert(h->stor_begin != 0);
@@ -684,7 +684,7 @@ int igraph_d_indheap_push           (igraph_d_indheap_t* h, real_t elem,
  * \brief Returns the largest element in the heap.
  */
 
-real_t igraph_d_indheap_max       (igraph_d_indheap_t* h) {
+igraph_real_t igraph_d_indheap_max       (igraph_d_indheap_t* h) {
   assert(h != NULL);
   assert(h->stor_begin != NULL);
   assert(h->stor_begin != h->end);
@@ -697,8 +697,8 @@ real_t igraph_d_indheap_max       (igraph_d_indheap_t* h) {
  * \brief Removes the largest element from the heap.
  */
 
-real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
-  real_t tmp;
+igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
+  igraph_real_t tmp;
 
   assert(h != NULL);
   assert(h->stor_begin != NULL);
@@ -732,14 +732,14 @@ long int igraph_d_indheap_size      (igraph_d_indheap_t* h) {
 
 int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
   long int actual_size=igraph_d_indheap_size(h);
-  real_t *tmp1;
+  igraph_real_t *tmp1;
   long int *tmp2, *tmp3;
   assert(h != 0);
   assert(h->stor_begin != 0);
   
   if (size <= actual_size) { return 0; }
 
-  tmp1=Calloc(size, real_t);
+  tmp1=Calloc(size, igraph_real_t);
   if (tmp1==0) {
     IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
   }
@@ -755,7 +755,7 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
   }
   IGRAPH_FINALLY(free, tmp3); 	/* TODO: hack */
 
-  memcpy(tmp1, h->stor_begin, actual_size*sizeof(real_t));
+  memcpy(tmp1, h->stor_begin, actual_size*sizeof(igraph_real_t));
   memcpy(tmp2, h->index_begin, actual_size*sizeof(long int));
   memcpy(tmp3, h->index2_begin, actual_size*sizeof(long int));
   Free(h->stor_begin);
@@ -855,7 +855,7 @@ void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head) {
 void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2) {
   if (e1!=e2) {
     long int tmpi;
-    real_t tmp=h->stor_begin[e1];
+    igraph_real_t tmp=h->stor_begin[e1];
     h->stor_begin[e1]=h->stor_begin[e2];
     h->stor_begin[e2]=tmp;
     

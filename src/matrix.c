@@ -173,7 +173,7 @@ long int igraph_matrix_ncol(const igraph_matrix_t *m) {
  * elements in the matrix.
  */
 
-int igraph_matrix_copy_to(const igraph_matrix_t *m, real_t *to) {
+int igraph_matrix_copy_to(const igraph_matrix_t *m, igraph_real_t *to) {
   igraph_vector_copy_to(&m->data, to);
   return 0;
 }
@@ -337,7 +337,7 @@ int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from) {
  * Time complexity: O(n), the number of elements in the matrix.
  */
 
-real_t igraph_matrix_max(const igraph_matrix_t *m) {
+igraph_real_t igraph_matrix_max(const igraph_matrix_t *m) {
   return igraph_vector_max(&m->data);
 }
 
@@ -353,7 +353,7 @@ real_t igraph_matrix_max(const igraph_matrix_t *m) {
  * Time complexity: O(n), the number of elements in the matrix.
  */
 
-void igraph_matrix_multiply(igraph_matrix_t *m, real_t by) {
+void igraph_matrix_multiply(igraph_matrix_t *m, igraph_real_t by) {
   igraph_vector_multiply(&m->data, by);
 }
 

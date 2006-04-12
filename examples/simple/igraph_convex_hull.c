@@ -24,7 +24,7 @@
 #include <igraph.h>
 
 int main() {
-  real_t coords_array[][2] =
+  igraph_real_t coords_array[][2] =
    {{3, 2}, {5, 1}, {4, 4}, {6, 4}, {4, 3},
     {2, 5}, {1, 3}, {2, 4}, {6, 3}, {9, 2}
    };

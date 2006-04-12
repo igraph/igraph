@@ -26,7 +26,7 @@
 int main() {
   
   igraph_t g;
-  integer_t result;
+  igraph_integer_t result;
   
   igraph_barabasi_game(&g, 30, 30, 0, 0, IGRAPH_DIRECTED);
   igraph_average_path_length(&g, &result, IGRAPH_UNDIRECTED, 1);

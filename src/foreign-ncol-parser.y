@@ -57,7 +57,7 @@ int igraph_ncol_yyerror(char *s);
 extern igraph_vector_t *igraph_ncol_vector;
 extern igraph_vector_t *igraph_ncol_weights;
 extern igraph_trie_t *igraph_ncol_trie;
-real_t igraph_ncol_get_number(const char *str, long int len);
+igraph_real_t igraph_ncol_get_number(const char *str, long int len);
 %}
 
 %output="y.tab.c"
@@ -108,8 +108,8 @@ int igraph_ncol_yyerror (char *s)
   IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
 }
 
-real_t igraph_ncol_get_number(const char *str, long int length) {
-  real_t num;
+igraph_real_t igraph_ncol_get_number(const char *str, long int length) {
+  igraph_real_t num;
   char *tmp=Calloc(length+1, char);
   
   strncpy(tmp, str, length);

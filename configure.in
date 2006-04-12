@@ -166,16 +166,6 @@ if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
     AC_SUBST(PYTHON_PREFIX)
     AC_SUBST(PYTHON_INCLUDES)
     AC_SUBST(PYTHON_LIBS)
-
-    AC_MSG_CHECKING([whether integer_t conflicts (usually on OS X)])
-    AC_TRY_COMPILE(
-    [#include <Python.h>
-    typedef double integer_t;],
-    [],
-    [AC_MSG_RESULT(no)],
-    [AC_MSG_RESULT(yes)
-     AC_DEFINE(INTEGER_T_CONFLICTS, 1, [1 if integer_t conflicts (usually on OS X)])
-    ])
   ],[
     HAVE_PYTHON=0
     use_python=no

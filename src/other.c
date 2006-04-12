@@ -47,7 +47,7 @@
  */
 
 int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res, 
-			integer_t binwidth) {
+			igraph_integer_t binwidth) {
 
   double sum=0;
   long int i;
@@ -107,12 +107,12 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
  */
 int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 		       igraph_matrix_t *rescoords) {
-  integer_t no_of_nodes;
+  igraph_integer_t no_of_nodes;
   long int i, pivot_idx=0, last_idx, before_last_idx, next_idx, j, k;
-  real_t* angles;
+  igraph_real_t* angles;
   igraph_vector_t stack;
   igraph_indheap_t order;
-  real_t px, py, cp;
+  igraph_real_t px, py, cp;
   
   no_of_nodes=igraph_matrix_nrow(data);
   if (igraph_matrix_ncol(data) != 2) {
@@ -129,7 +129,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
     return 0;
   }
     
-  angles=Calloc(no_of_nodes, real_t);
+  angles=Calloc(no_of_nodes, igraph_real_t);
   if (!angles) IGRAPH_ERROR("not enough memory for angle array", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(free, angles);
   

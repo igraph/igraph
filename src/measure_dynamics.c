@@ -26,11 +26,11 @@
 
 #include <math.h>
 
-int igraph_measure_dynamics_id(const igraph_t *graph, integer_t start_vertex,
+int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_vertex,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,
 			       igraph_matrix_t *confint, igraph_matrix_t *no,
-			       const igraph_vector_t *st, integer_t pmaxind,
-			       real_t significance, bool_t lno) {
+			       const igraph_vector_t *st, igraph_integer_t pmaxind,
+			       igraph_real_t significance, igraph_bool_t lno) {
   
   long int maxind=pmaxind;
   long int no_of_nodes=igraph_vcount(graph);
@@ -44,7 +44,7 @@ int igraph_measure_dynamics_id(const igraph_t *graph, integer_t start_vertex,
   long int i, j, k;
   long int edges=0;
   
-  bool_t lsd=(significance != 0);
+  igraph_bool_t lsd=(significance != 0);
   int signidx=0;
 
   igraph_vector_init(&neis, 0);
@@ -118,7 +118,7 @@ int igraph_measure_dynamics_id(const igraph_t *graph, integer_t start_vertex,
 
   /* Ok, measurement done, update change */
   for (i=0; i<maxind+1; i++) {
-    real_t oldmean;
+    igraph_real_t oldmean;
     if (VECTOR(ntk)[i] != 0) {
       MATRIX(normfact, i, 0) += (edges-VECTOR(ch)[i]+1);
     }
@@ -198,7 +198,7 @@ int igraph_measure_dynamics_id_st(const igraph_t *graph,
 /* alpha = 
     0.1,  0.05,   0.025,  0.01,   0.005,  0.001 */
 const int igraph_i_tuppercrit_length=100;
-const real_t igraph_i_tuppercrit[][6] = {
+const igraph_real_t igraph_i_tuppercrit[][6] = {
   { 3.078,  6.314, 12.706, 31.821, 63.657,318.313 }, /* dof: 1 */
   { 1.886,  2.920,  4.303,  6.965,  9.925, 22.327 },
   { 1.638,  2.353,  3.182,  4.541,  5.841, 10.215 },
@@ -302,13 +302,13 @@ const real_t igraph_i_tuppercrit[][6] = {
   { 1.282,  1.645,  1.960,  2.326,  2.576,  3.090 }  /* dof: infinity */
 };
 
-int igraph_measure_dynamics_idage(const igraph_t *graph, integer_t start_vertex,
+int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_integer_t start_vertex,
 				  igraph_matrix_t *akl, 
 				  igraph_matrix_t *sd, igraph_matrix_t *confint, 
 				  igraph_matrix_t *no,
-				  const igraph_vector_t *st, integer_t pagebins,
-				  integer_t pmaxind, real_t significance,
-				  bool_t lno) {
+				  const igraph_vector_t *st, igraph_integer_t pagebins,
+				  igraph_integer_t pmaxind, igraph_real_t significance,
+				  igraph_bool_t lno) {
 
   long int agebins=pagebins;
   long int maxind=pmaxind;
@@ -323,7 +323,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, integer_t start_vertex,
   long int i, j, k;
   long int edges=0;
 
-  bool_t lsd=(significance != 0);
+  igraph_bool_t lsd=(significance != 0);
   int signidx=0;
 
   binwidth = no_of_nodes/agebins+1;
@@ -432,9 +432,9 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, integer_t start_vertex,
 
   /* Ok, measurement done, update change */
   for (i=0; i<maxind+1; i++) {
-    real_t tuppercrit;
+    igraph_real_t tuppercrit;
     for (j=0; j<agebins; j++) {
-      real_t oldmean;
+      igraph_real_t oldmean;
       if (MATRIX(ntkl, i, j) != 0) {
 	MATRIX(normfact, i, j) += (edges-MATRIX(ch, i, j)+1);
       }
@@ -533,11 +533,11 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res
 int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *akl,
 					igraph_matrix_t *sd, igraph_matrix_t *confint, 
 					igraph_matrix_t *no,
-					const igraph_vector_t *st, integer_t pagebins,
-					integer_t pmaxind, real_t significance,
+					const igraph_vector_t *st, igraph_integer_t pagebins,
+					igraph_integer_t pmaxind, igraph_real_t significance,
 					igraph_vector_t *estimates, 
-					integer_t est_ind, integer_t est_age,
-					bool_t lno) {
+					igraph_integer_t est_ind, igraph_integer_t est_age,
+					igraph_bool_t lno) {
   
   long int agebins=pagebins;
   long int maxind=pmaxind;
@@ -552,7 +552,7 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *
   long int i, j, k;
   long int edges=0;
 
-  bool_t lsd=(significance != 0);
+  igraph_bool_t lsd=(significance != 0);
   int signidx=0;
 
   binwidth = no_of_nodes/agebins+1;
@@ -643,9 +643,9 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *
 
   /* Ok, measurement done, update change */
   for (i=0; i<maxind+1; i++) {
-    real_t tuppercrit;
+    igraph_real_t tuppercrit;
     for (j=0; j<agebins; j++) {
-      real_t oldmean;
+      igraph_real_t oldmean;
       if (MATRIX(ntkl, i, j) != 0) {
 	MATRIX(normfact, i, j) += (edges-MATRIX(ch, i, j)+1);
       }

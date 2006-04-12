@@ -100,7 +100,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 
   long int no_of_nodes=igraph_vcount(graph);
   long int from, i, j;
-  bool_t *calc;
+  igraph_bool_t *calc;
   igraph_matrix_t tmpres=IGRAPH_MATRIX_NULL;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
   igraph_vs_t myvids;
@@ -114,7 +114,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_ERROR("", IGRAPH_EINVVID);
   }
   
-  calc=Calloc(no_of_nodes, bool_t);
+  calc=Calloc(no_of_nodes, igraph_bool_t);
   if (calc==0) {
     IGRAPH_ERROR("cannot calculate cocitation/bibcoupling", IGRAPH_ENOMEM);
   }  

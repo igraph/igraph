@@ -1,3 +1,8 @@
+2006-04-12  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* almost everywhere : added igraph_ prefix to integer_t,
+	real_t and bool_t
+	
 2006-04-11  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/layout.c (igraph_layout_reingold_tilford) : added

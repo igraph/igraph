@@ -28,7 +28,7 @@
 /* Internal functions */
 
 int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vector_t *index, 
-			  integer_t nodes);
+			  igraph_integer_t nodes);
 
 /**
  * \section about_basic_interface
@@ -59,7 +59,7 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * Time complexity: O(|V|) for a graph with
  * |V| vertices (and no edges).
  */
-int igraph_empty(igraph_t *graph, integer_t n, bool_t directed) {
+int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
 
   if (n<0) {
     IGRAPH_ERROR("cannot create empty graph with negative number of vertices",
@@ -289,7 +289,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges) {
  * |V| is 
  * the number of vertices in the \em new, extended graph.
  */
-int igraph_add_vertices(igraph_t *graph, integer_t nv) {
+int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv) {
   long int ec=igraph_ecount(graph);
   long int i;
   igraph_error_handler_t *oldhandler;
@@ -625,7 +625,7 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices) {
  *
  * Time complexity: O(1)
  */
-integer_t igraph_vcount(const igraph_t *graph) {
+igraph_integer_t igraph_vcount(const igraph_t *graph) {
   return graph->n;
 }
 
@@ -639,7 +639,7 @@ integer_t igraph_vcount(const igraph_t *graph) {
  *
  * Time complexity: O(1)
  */
-integer_t igraph_ecount(const igraph_t *graph) {
+igraph_integer_t igraph_ecount(const igraph_t *graph) {
   return igraph_vector_size(&graph->from);
 }
 
@@ -671,7 +671,7 @@ integer_t igraph_ecount(const igraph_t *graph) {
  * d is the number
  * of adjacent vertices to the queried vertex.
  */
-int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, integer_t pnode, 
+int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t pnode, 
 		     igraph_neimode_t mode) {
 
   long int length=0, idx=0;   
@@ -728,7 +728,7 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, integer_t pno
  */
 
 int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vector_t *index, 
-			  integer_t nodes) {
+			  igraph_integer_t nodes) {
   
 # define EDGE(i) (VECTOR(*el)[ (long int) VECTOR(*index)[(i)] ])
   
@@ -783,7 +783,7 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * Time complexity: O(1)
  */
 
-bool_t igraph_is_directed(const igraph_t *graph) {
+igraph_bool_t igraph_is_directed(const igraph_t *graph) {
   return graph->directed;
 }
 
@@ -821,7 +821,7 @@ bool_t igraph_is_directed(const igraph_t *graph) {
  */
 int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
 		  const igraph_vs_t *vids, 
-		  igraph_neimode_t mode, bool_t loops) {
+		  igraph_neimode_t mode, igraph_bool_t loops) {
 
   long int nodes_to_calc;
   long int i, j;
@@ -905,9 +905,9 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
  * 
  * \param graph The graph object.
  * \param eid The edge id. 
- * \param from Pointer to an \type integer_t. The tail of the edge
+ * \param from Pointer to an \type igraph_integer_t. The tail of the edge
  * will be placed here. 
- * \param to Pointer to an \type integer_t. The head of the edge 
+ * \param to Pointer to an \type igraph_integer_t. The head of the edge 
  * will be placed here.
  * \return Error code. The current implementation always returns with
  * success. 
@@ -917,8 +917,8 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
  * Time complexity: O(1).
  */
 
-int igraph_edge(const igraph_t *graph, integer_t eid, 
-		integer_t *from, integer_t *to) {
+int igraph_edge(const igraph_t *graph, igraph_integer_t eid, 
+		igraph_integer_t *from, igraph_integer_t *to) {
   
   *from = VECTOR(graph->from)[(long int)eid];
   *to   = VECTOR(graph->to  )[(long int)eid];
@@ -947,7 +947,7 @@ int igraph_edge(const igraph_t *graph, integer_t eid,
  */
 
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, 
-		    integer_t pnode, igraph_neimode_t mode) {
+		    igraph_integer_t pnode, igraph_neimode_t mode) {
   
   long int length=0, idx=0;   
   long int no_of_edges;

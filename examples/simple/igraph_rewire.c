@@ -26,7 +26,7 @@
 int main() {
   
   igraph_t g;
-  integer_t result;
+  igraph_integer_t result;
   igraph_vector_t edges, res;
   igraph_vs_t vids;
   long i, n;

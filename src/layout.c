@@ -26,10 +26,10 @@
 #include "memory.h"
 #include <math.h>
 
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, real_t *x, real_t *y,
-			      real_t *r);
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, real_t *x, real_t *y,
-			      real_t *z, real_t *r);
+int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+			      igraph_real_t *r);
+int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+			      igraph_real_t *z, igraph_real_t *r);
 
 /**
  * \section about_layouts
@@ -135,7 +135,7 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));  
 
   for (i=0; i<no_of_nodes; i++) {
-    real_t phi=2*M_PI/no_of_nodes*i;
+    igraph_real_t phi=2*M_PI/no_of_nodes*i;
     MATRIX(*res, i, 0)=cos(phi);
     MATRIX(*res, i, 1)=sin(phi);
   }
@@ -167,7 +167,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
-  real_t h;
+  igraph_real_t h;
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
 
@@ -187,9 +187,9 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
   }
 
   for (i=0; i<no_of_nodes; i++) {
-    real_t x=cos(MATRIX(*res, i, 1))*sin(MATRIX(*res, i, 0));
-    real_t y=sin(MATRIX(*res, i, 1))*sin(MATRIX(*res, i, 0));
-    real_t z=cos(MATRIX(*res, i, 0));
+    igraph_real_t x=cos(MATRIX(*res, i, 1))*sin(MATRIX(*res, i, 0));
+    igraph_real_t y=sin(MATRIX(*res, i, 1))*sin(MATRIX(*res, i, 0));
+    igraph_real_t z=cos(MATRIX(*res, i, 0));
     MATRIX(*res, i, 0)=x;
     MATRIX(*res, i, 1)=y;
     MATRIX(*res, i, 2)=z;
@@ -231,11 +231,11 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
  */
 
 int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
-				       integer_t niter, real_t maxdelta,
-				       real_t area, real_t coolexp, 
-				       real_t repulserad, bool_t use_seed) {
-  real_t frk,t,ded,xd,yd;
-  real_t rf,af;
+				       igraph_integer_t niter, igraph_real_t maxdelta,
+				       igraph_real_t area, igraph_real_t coolexp, 
+				       igraph_real_t repulserad, igraph_bool_t use_seed) {
+  igraph_real_t frk,t,ded,xd,yd;
+  igraph_real_t rf,af;
   long int i,j,k;
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -353,14 +353,14 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 
 int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
 					  igraph_matrix_t *res,
-					  integer_t niter, real_t maxdelta,
-					  real_t volume, real_t coolexp,
-					  real_t repulserad,
-					  bool_t use_seed) {
+					  igraph_integer_t niter, igraph_real_t maxdelta,
+					  igraph_real_t volume, igraph_real_t coolexp,
+					  igraph_real_t repulserad,
+					  igraph_bool_t use_seed) {
   
-  real_t frk, t, ded, xd, yd, zd;
+  igraph_real_t frk, t, ded, xd, yd, zd;
   igraph_matrix_t dxdydz;
-  real_t rf, af;
+  igraph_real_t rf, af;
   long int i, j, k;
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -486,12 +486,12 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
  */
 
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
-			       integer_t niter, real_t sigma, 
-			       real_t initemp, real_t coolexp,
-			       real_t kkconst) {
+			       igraph_integer_t niter, igraph_real_t sigma, 
+			       igraph_real_t initemp, igraph_real_t coolexp,
+			       igraph_real_t kkconst) {
 
-  real_t temp, candx, candy;
-  real_t dpot, odis, ndis, osqd, nsqd;
+  igraph_real_t temp, candx, candy;
+  igraph_real_t dpot, odis, ndis, osqd, nsqd;
   long int n,i,j,k;
   igraph_matrix_t elen;
 
@@ -581,11 +581,11 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
-				  integer_t niter, real_t sigma, 
-				  real_t initemp, real_t coolexp, 
-				  real_t kkconst) {
-  real_t temp, candx, candy, candz;
-  real_t dpot, odis, ndis, osqd, nsqd;
+				  igraph_integer_t niter, igraph_real_t sigma, 
+				  igraph_real_t initemp, igraph_real_t coolexp, 
+				  igraph_real_t kkconst) {
+  igraph_real_t temp, candx, candy, candz;
+  igraph_real_t dpot, odis, ndis, osqd, nsqd;
   long int i,j,k;
   long int no_of_nodes=igraph_vcount(graph);
   igraph_matrix_t elen;
@@ -647,14 +647,14 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 }
 
 int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
-			  real_t mass, real_t equil, real_t k,
-			  real_t repeqdis, real_t kfr, bool_t repulse) {
+			  igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
+			  igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse) {
   /* TODO */
   return 0;
 }
 
-void igraph_i_norm2d(real_t *x, real_t *y) {
-  real_t len=sqrt((*x)*(*x) + (*y)*(*y));
+void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
+  igraph_real_t len=sqrt((*x)*(*x) + (*y)*(*y));
   if (len != 0) {
     *x /= len;
     *y /= len;
@@ -702,10 +702,10 @@ void igraph_i_norm2d(real_t *x, real_t *y) {
  */
 
 int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
-		      integer_t maxit, real_t maxdelta, 
-		      real_t area, real_t coolexp,
-		      real_t repulserad, real_t cellsize, 
-		      integer_t proot) {
+		      igraph_integer_t maxit, igraph_real_t maxdelta, 
+		      igraph_real_t area, igraph_real_t coolexp,
+		      igraph_real_t repulserad, igraph_real_t cellsize, 
+		      igraph_integer_t proot) {
   
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -722,8 +722,8 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
   igraph_vector_t forcex;
   igraph_vector_t forcey;
 
-  real_t frk=sqrt(area/no_of_nodes);
-  real_t H_n=0;
+  igraph_real_t frk=sqrt(area/no_of_nodes);
+  igraph_real_t H_n=0;
 
   IGRAPH_CHECK(igraph_minimum_spanning_tree_unweighted(graph, &mst));
   IGRAPH_FINALLY(igraph_destroy, &mst);
@@ -773,17 +773,17 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
   for (actlayer=1; actlayer<no_of_layers; actlayer++) {
 
-    real_t c=1;
+    igraph_real_t c=1;
     long int i, j;
-    real_t massx, massy;
-    real_t px, py;
-    real_t sx, sy;
+    igraph_real_t massx, massy;
+    igraph_real_t px, py;
+    igraph_real_t sx, sy;
 
     long int it=0;
-    real_t epsilon=10e-6;
-    real_t maxchange=epsilon+1;
+    igraph_real_t epsilon=10e-6;
+    igraph_real_t maxchange=epsilon+1;
     long int pairs;
-    real_t sconst=sqrt(area/M_PI) / H_n; 
+    igraph_real_t sconst=sqrt(area/M_PI) / H_n; 
     igraph_2dgrid_iterator_t vidit;
 
 /*     printf("Layer %li:\n", actlayer); */
@@ -810,9 +810,9 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       /* The neighbors of 'vid' */
       while (j < VECTOR(layers)[actlayer+1] && 
 	     VECTOR(parents)[(long int)VECTOR(vids)[j]]==vid) {
-	real_t rx, ry;
+	igraph_real_t rx, ry;
 	if (actlayer==1) {
-	  real_t phi=2*M_PI/(VECTOR(layers)[2]-1)*(j-1);
+	  igraph_real_t phi=2*M_PI/(VECTOR(layers)[2]-1)*(j-1);
 	  rx=cos(phi);
 	  ry=sin(phi);
 	} else {
@@ -839,7 +839,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       IGRAPH_CHECK(igraph_adjacent(graph, &eids, vid, IGRAPH_ALL));
       for (k=0;k<igraph_vector_size(&eids);k++) {
 	long int eid=VECTOR(eids)[k];
-	integer_t from, to;
+	igraph_integer_t from, to;
 	igraph_edge(graph, eid, &from, &to);
 	if (from != vid && igraph_2dgrid_in(&grid, from) ||
 	    to   != vid && igraph_2dgrid_in(&grid, to)) {
@@ -855,7 +855,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     maxchange=epsilon+1;
     while (it < maxit && maxchange > epsilon) {
       long int j;
-      real_t t=maxdelta*pow((maxit-it)/(double)maxit, coolexp);
+      igraph_real_t t=maxdelta*pow((maxit-it)/(double)maxit, coolexp);
       long int vid, nei;
 
       /* init */
@@ -865,8 +865,8 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       
       /* attractive "forces" along the edges */
       for (j=0; j<igraph_vector_size(&edges); j++) {
-	integer_t from, to;
-	real_t xd, yd, dist, force;
+	igraph_integer_t from, to;
+	igraph_real_t xd, yd, dist, force;
 	igraph_edge(graph, VECTOR(edges)[j], &from, &to);
 	xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
 	yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
@@ -884,12 +884,12 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       igraph_2dgrid_reset(&grid, &vidit);
       while ( (vid=igraph_2dgrid_next(&grid, &vidit)-1) != -1) {
 	while ( (nei=igraph_2dgrid_next_nei(&grid, &vidit)-1) != -1) {
-	  real_t xd=MATRIX(*res, (long int)vid, 0)-
+	  igraph_real_t xd=MATRIX(*res, (long int)vid, 0)-
 	    MATRIX(*res, (long int)nei, 0);
-	  real_t yd=MATRIX(*res, (long int)vid, 1)-
+	  igraph_real_t yd=MATRIX(*res, (long int)vid, 1)-
 	    MATRIX(*res, (long int)nei, 1);
-	  real_t dist=sqrt(xd*xd+yd*yd);
-	  real_t force;
+	  igraph_real_t dist=sqrt(xd*xd+yd*yd);
+	  igraph_real_t force;
 	  if (dist < cellsize) {
 	    pairs++;
 	    if (dist==0) { dist=epsilon; };
@@ -909,9 +909,9 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       /* apply the changes */
       for (j=0; j<VECTOR(layers)[actlayer+1]; j++) {
 	long int vid=VECTOR(vids)[j];
-	real_t fx=VECTOR(forcex)[vid];
-	real_t fy=VECTOR(forcey)[vid];
-	real_t ded=sqrt(fx*fx+fy*fy);
+	igraph_real_t fx=VECTOR(forcex)[vid];
+	igraph_real_t fy=VECTOR(forcey)[vid];
+	igraph_real_t ded=sqrt(fx*fx+fy*fy);
 	if (ded > t) {
 	  ded=t/ded;
 	  fx*=ded; fy *=ded;
@@ -971,11 +971,11 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
 int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
 					    igraph_matrix_t *res,
-					    integer_t niter, real_t maxdelta, 
-					    real_t area, real_t coolexp,
-					    real_t repulserad, 
-					    real_t cellsize,
-					    bool_t use_seed) {
+					    igraph_integer_t niter, igraph_real_t maxdelta, 
+					    igraph_real_t area, igraph_real_t coolexp,
+					    igraph_real_t repulserad, 
+					    igraph_real_t cellsize,
+					    igraph_bool_t use_seed) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -985,7 +985,7 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
   long int i, it=0;
   igraph_2dgrid_iterator_t vidit;  
 
-  real_t frk=sqrt(area/no_of_nodes);
+  igraph_real_t frk=sqrt(area/no_of_nodes);
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   IGRAPH_VECTOR_INIT_FINALLY(&forcex, no_of_nodes);
@@ -1010,7 +1010,7 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
 
   while (it<niter) {
     long int j;
-    real_t t=maxdelta*pow((niter-it)/(double)niter, coolexp);
+    igraph_real_t t=maxdelta*pow((niter-it)/(double)niter, coolexp);
     long int vid, nei;
 
     /* Report progress */
@@ -1024,8 +1024,8 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     
     /* attraction */
     for (j=0; j<no_of_edges; j++) {
-      integer_t from, to;
-      real_t xd, yd, dist, force;
+      igraph_integer_t from, to;
+      igraph_real_t xd, yd, dist, force;
       igraph_edge(graph, j, &from, &to);
       xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
       yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
@@ -1042,12 +1042,12 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     igraph_2dgrid_reset(&grid, &vidit);
     while ( (vid=igraph_2dgrid_next(&grid, &vidit)-1) != -1) {
       while ( (nei=igraph_2dgrid_next_nei(&grid, &vidit)-1) != -1) {
-	real_t xd=MATRIX(*res, (long int)vid, 0)-
+	igraph_real_t xd=MATRIX(*res, (long int)vid, 0)-
 	  MATRIX(*res, (long int)nei, 0);
-	real_t yd=MATRIX(*res, (long int)vid, 1)-
+	igraph_real_t yd=MATRIX(*res, (long int)vid, 1)-
 	  MATRIX(*res, (long int)nei, 1);
-	real_t dist=sqrt(xd*xd+yd*yd);
-	real_t force;
+	igraph_real_t dist=sqrt(xd*xd+yd*yd);
+	igraph_real_t force;
 	if (dist < cellsize) {
 	  if (dist==0) { dist=1e-6; };
 	  xd/=dist; yd/=dist;
@@ -1063,9 +1063,9 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     /* update */
     for (j=0; j<no_of_nodes; j++) {
       long int vid=j;
-      real_t fx=VECTOR(forcex)[vid];
-      real_t fy=VECTOR(forcey)[vid];
-      real_t ded=sqrt(fx*fx+fy*fy);
+      igraph_real_t fx=VECTOR(forcex)[vid];
+      igraph_real_t fy=VECTOR(forcey)[vid];
+      igraph_real_t ded=sqrt(fx*fx+fy*fy);
       if (ded > t) {
 	ded=t/ded;
 	fx*=ded; fy *=ded;
@@ -1090,7 +1090,7 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
 struct igraph_i_reingold_tilford_vertex {
   int parent;        /* Parent node index */
   int level;         /* Level of the node */
-  real_t offset;     /* X offset from parent node */
+  igraph_real_t offset;     /* X offset from parent node */
   int left_contour;  /* Next left node of the contour
 		      of the subtree rooted at this node */
   int right_contour; /* Next right node of the contour
@@ -1101,7 +1101,7 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
                                                long int node, long int vcount);
 int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
                                                  igraph_matrix_t *res, long int node,
-												 long int vcount, real_t xpos);
+												 long int vcount, igraph_real_t xpos);
 
 /**
  * \function igraph_layout_reingold_tilford
@@ -1206,9 +1206,9 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
 int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
                                                  igraph_matrix_t *res, long int node,
-												 long int vcount, real_t xpos) {
+												 long int vcount, igraph_real_t xpos) {
   long int i, n;
-  real_t avg=0.0;
+  igraph_real_t avg=0.0;
   MATRIX(*res, node, 0) = xpos;
   for (i=0, n=0; i<vcount; i++) {
     if (i == node) continue;
@@ -1222,7 +1222,7 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
 int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
                                                long int node, long int vcount) {
   long int i, j, childcount, leftroot, leftrootidx;
-  real_t avg;
+  igraph_real_t avg;
   
   /* printf("Starting visiting node %d\n", node); */
   
@@ -1258,7 +1258,7 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
 	/* Now we will follow the right contour of leftroot and the
 	 * left contour of the subtree rooted at i */
 	long lnode, rnode;
-	real_t loffset, roffset, minsep, rootsep;
+	igraph_real_t loffset, roffset, minsep, rootsep;
 	lnode = leftroot; rnode = i;
 	minsep = 1;
 	rootsep = vdata[leftroot].offset + minsep;
@@ -1327,9 +1327,9 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
 }
 
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid, 
-			      long int actg, real_t *x, real_t *y, real_t r,
-			      real_t cx, real_t cy, real_t startr, 
-			      real_t killr);
+			      long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+			      igraph_real_t cx, igraph_real_t cy, igraph_real_t startr, 
+			      igraph_real_t killr);
 
 int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
 			    igraph_vector_ptr_t *coords, 
@@ -1343,9 +1343,9 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   long int actg;
   igraph_i_layout_mergegrid_t grid;
   long int jpos=0;
-  real_t minx, maxx, miny, maxy;
-  real_t area=0;
-  real_t maxr=0;
+  igraph_real_t minx, maxx, miny, maxy;
+  igraph_real_t area=0;
+  igraph_real_t maxr=0;
   long int respos;
   
   IGRAPH_VECTOR_INIT_FINALLY(&sizes, graphs);
@@ -1412,9 +1412,9 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   respos=0;
   for (i=0; i<graphs; i++) {
     long int size=igraph_matrix_nrow(VECTOR(*coords)[i]);
-    real_t xx=VECTOR(x)[i];
-    real_t yy=VECTOR(y)[i];
-    real_t rr=VECTOR(r)[i]/VECTOR(nr)[i];
+    igraph_real_t xx=VECTOR(x)[i];
+    igraph_real_t yy=VECTOR(y)[i];
+    igraph_real_t rr=VECTOR(r)[i]/VECTOR(nr)[i];
     igraph_matrix_t *mat=VECTOR(*coords)[i];
     if (VECTOR(nr)[i]==0) { rr=1; }
     for (j=0; j<size; j++) {
@@ -1438,11 +1438,11 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   return 0;
 }
 
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, real_t *x, real_t *y,
-			      real_t *r) {
+int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+			      igraph_real_t *r) {
   long int nodes=igraph_matrix_nrow(coords);
   long int i;
-  real_t xmin, xmax, ymin, ymax;
+  igraph_real_t xmin, xmax, ymin, ymax;
   
   xmin=xmax=MATRIX(*coords,0,0);
   ymin=ymax=MATRIX(*coords,0,1);
@@ -1469,11 +1469,11 @@ int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, real_t *x, real_t *y,
   return 0;
 }
 
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, real_t *x, real_t *y,
-			      real_t *z, real_t *r) {
+int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+			      igraph_real_t *z, igraph_real_t *r) {
   long int nodes=igraph_matrix_nrow(coords);
   long int i;
-  real_t xmin, xmax, ymin, ymax, zmin, zmax;
+  igraph_real_t xmin, xmax, ymin, ymax, zmin, zmax;
   
   xmin=xmax=MATRIX(*coords,0,0);
   ymin=ymax=MATRIX(*coords,0,1);
@@ -1512,11 +1512,11 @@ int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, real_t *x, real_t *y,
 #define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
 
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid, 
-			      long int actg, real_t *x, real_t *y, real_t r,
-			      real_t cx, real_t cy, real_t startr, 
-			      real_t killr) {
+			      long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+			      igraph_real_t cx, igraph_real_t cy, igraph_real_t startr, 
+			      igraph_real_t killr) {
   long int sp=-1;
-  real_t angle, len;
+  igraph_real_t angle, len;
   long int steps=0;
 
   while (sp < 0) {
@@ -1531,7 +1531,7 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
     } while (sp >= 0);
 
     while (sp < 0 && DIST(*x,*y)<killr) {
-      real_t nx, ny;
+      igraph_real_t nx, ny;
       steps++;
       angle=RNG_UNIF(0,2*M_PI);
       len=RNG_UNIF(0, startr/100);

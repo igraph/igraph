@@ -26,15 +26,15 @@
 #include <stdlib.h>
 #include <math.h>
 
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, real_t *x, real_t *y,
-			      real_t *r);
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, real_t *x, real_t *y,
-			      real_t *z, real_t *r);
+int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+			      igraph_real_t *r);
+int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+			      igraph_real_t *z, igraph_real_t *r);
 
 int main () {
   long int i; 
   igraph_matrix_t m;
-  real_t x, y, z, r;
+  igraph_real_t x, y, z, r;
 
   srand(time(0));
 
@@ -47,7 +47,7 @@ int main () {
   igraph_i_layout_sphere_2d(&m, &x, &y, &r);
   
   for (i=0; i<igraph_matrix_nrow(&m); i++) {
-    real_t dist=sqrt((MATRIX(m,i,0)-x)*(MATRIX(m,i,0)-x) + 
+    igraph_real_t dist=sqrt((MATRIX(m,i,0)-x)*(MATRIX(m,i,0)-x) + 
 		     (MATRIX(m,i,1)-y)*(MATRIX(m,i,1)-y));
     if (dist > r) {
       printf("x: %f y: %f r: %f\n", x, y, r);
@@ -68,7 +68,7 @@ int main () {
   igraph_i_layout_sphere_3d(&m, &x, &y, &z, &r);
   
   for (i=0; i<igraph_matrix_nrow(&m); i++) {
-    real_t dist=sqrt((MATRIX(m,i,0)-x)*(MATRIX(m,i,0)-x) + 
+    igraph_real_t dist=sqrt((MATRIX(m,i,0)-x)*(MATRIX(m,i,0)-x) + 
 		     (MATRIX(m,i,1)-y)*(MATRIX(m,i,1)-y) +
 		     (MATRIX(m,i,2)-z)*(MATRIX(m,i,2)-z));
     if (dist > r) {

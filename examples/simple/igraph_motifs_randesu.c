@@ -25,7 +25,7 @@
 
 void print_vector(igraph_vector_t *v) {
   long int i;
-  real_t sum=igraph_vector_sum(v);
+  igraph_real_t sum=igraph_vector_sum(v);
   for (i=0; i<igraph_vector_size(v); i++) {
     printf("%2.2f ", VECTOR(*v)[i]/sum);
   }

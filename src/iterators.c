@@ -147,7 +147,7 @@ void igraph_vs_next(const igraph_t *graph, igraph_vs_t *vs) {
  * but see also the specific types.
  */
 
-bool_t igraph_vs_end(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->table->end(graph, (struct igraph_vs_t*)vs);
 }
 
@@ -187,7 +187,7 @@ void igraph_vs_reset(const igraph_t *graph, igraph_vs_t *vs) {
  * but see also the specific types.
  */
 
-integer_t igraph_vs_get(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->table->get(graph, (struct igraph_vs_t*)vs);
 }
 
@@ -234,9 +234,9 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_all(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_all(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_all(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_all(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_all(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_integer_t igraph_vs_get_all(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_all(const igraph_t *graph, const igraph_vs_t *vs, 
 			 igraph_vector_t *v);
 void igraph_vs_destroy_all(igraph_vs_t *vs);
@@ -293,7 +293,7 @@ void igraph_vs_next_all(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[0] ++;
 }
 
-bool_t igraph_vs_end_all(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_all(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0] >= igraph_vcount(graph);
 }
 
@@ -301,7 +301,7 @@ void igraph_vs_reset_all(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[0]=0;
 }
 
-integer_t igraph_vs_get_all(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get_all(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0];
 }
 
@@ -328,9 +328,9 @@ void igraph_vs_destroy_all(igraph_vs_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_adj(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_adj(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_adj(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_adj(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_adj(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_integer_t igraph_vs_get_adj(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_adj(const igraph_t *graph, const igraph_vs_t *vs, 
 			 igraph_vector_t *v);
 void igraph_vs_destroy_adj(igraph_vs_t *vs);
@@ -362,7 +362,7 @@ igraph_i_vstable_t igraph_i_vs_adj_table = {
  */
 
 int igraph_vs_adj(const igraph_t *graph, igraph_vs_t *vs,
-		   integer_t vid, igraph_neimode_t mode) {
+		   igraph_integer_t vid, igraph_neimode_t mode) {
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -395,7 +395,7 @@ void igraph_vs_next_adj(const igraph_t *graph, igraph_vs_t *vs) {
   }
 }
 
-bool_t igraph_vs_end_adj(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_adj(const igraph_t *graph, const igraph_vs_t *vs) {
   return (vs->stdata[2] >= vs->stdata[4] &&
 	  vs->stdata[3] >= vs->stdata[5]);
 }
@@ -413,7 +413,7 @@ void igraph_vs_reset_adj(const igraph_t *graph, igraph_vs_t *vs) {
   }
 }
 
-integer_t igraph_vs_get_adj(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get_adj(const igraph_t *graph, const igraph_vs_t *vs) {
   if (vs->stdata[2] < vs->stdata[4]) {
     long int idx=VECTOR(graph->oi)[(long int)vs->stdata[2]];
     return VECTOR(graph->to)[idx];
@@ -444,7 +444,7 @@ int igraph_vs_unfold_adj(const igraph_t *graph, const igraph_vs_t *vs,
  */
 
 void igraph_vs_adj_set(const igraph_t *graph, igraph_vs_t *vs,
-			integer_t vid, igraph_neimode_t mode) {
+			igraph_integer_t vid, igraph_neimode_t mode) {
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -472,9 +472,9 @@ void igraph_vs_destroy_adj(igraph_vs_t *vs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_rw(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_rw(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_rw(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_rw(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_rw(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_integer_t igraph_vs_get_rw(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_rw(const igraph_t *graph, const igraph_vs_t *vs, 
 			igraph_vector_t *v);
 void igraph_vs_destroy_rw(igraph_vs_t *vs);
@@ -508,7 +508,7 @@ igraph_i_vstable_t igraph_i_vs_rw_table = {
  */
 
 int igraph_vs_rw(const igraph_t *graph, igraph_vs_t *vs,
-		 integer_t vid, igraph_neimode_t mode) {
+		 igraph_integer_t vid, igraph_neimode_t mode) {
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -557,7 +557,7 @@ void igraph_vs_next_rw(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[3] += 1.0;
 }
 
-bool_t igraph_vs_end_rw(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_rw(const igraph_t *graph, const igraph_vs_t *vs) {
   long int vid=vs->stdata[0];
   igraph_neimode_t mode=vs->stdata[2];
   long int indegree=0, outdegree=0;
@@ -578,7 +578,7 @@ void igraph_vs_reset_rw(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[3]=0;
 }
 
-integer_t igraph_vs_get_rw(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get_rw(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0];
 }
 
@@ -604,9 +604,9 @@ void igraph_vs_destroy_rw(igraph_vs_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_rw1(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_rw1(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_rw1(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_rw1(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_rw1(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_integer_t igraph_vs_get_rw1(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_rw1(const igraph_t *graph, const igraph_vs_t *vs, 
 			 igraph_vector_t *v);
 void igraph_vs_destroy_rw1(igraph_vs_t *vs);
@@ -642,7 +642,7 @@ igraph_i_vstable_t igraph_i_vs_rw1_table = {
  */
 
 int igraph_vs_rw1(const igraph_t *graph, igraph_vs_t *vs,
-		  integer_t vid, igraph_neimode_t mode) {
+		  igraph_integer_t vid, igraph_neimode_t mode) {
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -726,7 +726,7 @@ void igraph_vs_next_rw1(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[3]+=1.0;
 }
 
-bool_t igraph_vs_end_rw1(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_rw1(const igraph_t *graph, const igraph_vs_t *vs) {
   long int vid=vs->stdata[0];
   igraph_neimode_t mode=vs->stdata[2];
   long int indegree=0, outdegree=0;
@@ -741,7 +741,7 @@ bool_t igraph_vs_end_rw1(const igraph_t *graph, const igraph_vs_t *vs) {
   return indegree+outdegree == 0;
 }
 
-integer_t igraph_vs_get_rw1(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get_rw1(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0];
 }
 
@@ -772,9 +772,9 @@ void igraph_vs_destroy_rw1(igraph_vs_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_none(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_none(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_none(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_none(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_none(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_integer_t igraph_vs_get_none(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_none(const igraph_t *graph, const igraph_vs_t *vs,
 			  igraph_vector_t *v);
 void igraph_vs_destroy_none(igraph_vs_t *vs);
@@ -807,7 +807,7 @@ void igraph_vs_next_none(const igraph_t *graph, igraph_vs_t *vs) {
   /* nothing to do */
 }
 
-bool_t igraph_vs_end_none(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_none(const igraph_t *graph, const igraph_vs_t *vs) {
   return 1;
 }
 
@@ -815,7 +815,7 @@ void igraph_vs_reset_none(const igraph_t *graph, igraph_vs_t *vs) {
   /* nothing to do */
 }
 
-integer_t igraph_vs_get_none(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get_none(const igraph_t *graph, const igraph_vs_t *vs) {
   /* ooops this is an error, no way to signal it though... */
   return -1;
 }
@@ -837,9 +837,9 @@ void igraph_vs_destroy_none(igraph_vs_t *vs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_1(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_1(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_1(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_1(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_1(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_integer_t igraph_vs_get_1(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_1(const igraph_t *graph, const igraph_vs_t *vs, 
 		       igraph_vector_t *v);
 void igraph_vs_destroy_1(igraph_vs_t *vs);
@@ -862,7 +862,7 @@ igraph_i_vstable_t igraph_i_vs_1_table = {
  * Time complexity: O(1).
  */
 
-int igraph_vs_1(const igraph_t *igraph, igraph_vs_t *vs, integer_t vid) {
+int igraph_vs_1(const igraph_t *igraph, igraph_vs_t *vs, igraph_integer_t vid) {
   vs->type=IGRAPH_ITERATOR_VS_1;
   vs->stdata[0]=vid;
   vs->stdata[1]=0;		/* write 1 here if end */
@@ -883,7 +883,7 @@ int igraph_vs_1(const igraph_t *igraph, igraph_vs_t *vs, integer_t vid) {
  * Time complexity: O(1).
  */
 
-const igraph_vs_t *IGRAPH_VS_1(const igraph_t *graph, integer_t vid) {
+const igraph_vs_t *IGRAPH_VS_1(const igraph_t *graph, igraph_integer_t vid) {
   igraph_vs_t *vs=Calloc(1, igraph_vs_t);
   if (vs==0) {
     igraph_error("Cannot create iterator shorthand", __FILE__, __LINE__,
@@ -900,7 +900,7 @@ void igraph_vs_next_1(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[1]=1;
 }
 
-bool_t igraph_vs_end_1(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_1(const igraph_t *graph, const igraph_vs_t *vs) {
   return (vs->stdata[1]==1);
 }
 
@@ -908,7 +908,7 @@ void igraph_vs_reset_1(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[1]=0;
 }
 
-integer_t igraph_vs_get_1(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get_1(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0];
 }
 
@@ -931,9 +931,9 @@ void igraph_vs_destroy_1(igraph_vs_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_seq(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_seq(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_seq(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_seq(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_seq(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_integer_t igraph_vs_get_seq(const igraph_t *graph, const igraph_vs_t *vs);
 int igraph_vs_unfold_seq(const igraph_t *graph, const igraph_vs_t *vs,
 			 igraph_vector_t *v);
 void igraph_vs_destroy_seq(igraph_vs_t *vs);
@@ -957,8 +957,8 @@ igraph_i_vstable_t igraph_i_vs_seq_table = {
  * Time complexity: O(1).
  */
 
-int igraph_vs_seq(const igraph_t *igraph, igraph_vs_t *vs, integer_t from,
-		  integer_t to) {
+int igraph_vs_seq(const igraph_t *igraph, igraph_vs_t *vs, igraph_integer_t from,
+		  igraph_integer_t to) {
   vs->type=IGRAPH_ITERATOR_VS_SEQ;
   vs->stdata[0]=from;
   vs->stdata[1]=from;
@@ -972,7 +972,7 @@ void igraph_vs_next_seq(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[0] ++;
 }
 
-bool_t igraph_vs_end_seq(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_seq(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0] > vs->stdata[2];
 }
 
@@ -980,7 +980,7 @@ void igraph_vs_reset_seq(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[0]=vs->stdata[1];
 }
 
-integer_t igraph_vs_get_seq(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_integer_t igraph_vs_get_seq(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0];
 }
 
@@ -1006,9 +1006,9 @@ void igraph_vs_destroy_seq(igraph_vs_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_vs_next_vectorview(const igraph_t *graph, igraph_vs_t *vs);
-bool_t igraph_vs_end_vectorview(const igraph_t *graph, const igraph_vs_t *vs);
+igraph_bool_t igraph_vs_end_vectorview(const igraph_t *graph, const igraph_vs_t *vs);
 void igraph_vs_reset_vectorview(const igraph_t *graph, igraph_vs_t *vs);
-integer_t igraph_vs_get_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_vs_get_vectorview(const igraph_t *graph, 
 				   const igraph_vs_t *vs);
 int igraph_vs_unfold_vectorview(const igraph_t *graph, const igraph_vs_t *vs,
 				igraph_vector_t *v);
@@ -1022,7 +1022,7 @@ igraph_i_vstable_t igraph_i_vs_vectorview_table = {
 
 typedef struct igraph_i_vs_vectorview_pdata_t {
   const igraph_vector_t v;
-  bool_t destroy;
+  igraph_bool_t destroy;
 } igraph_i_vs_vectorview_pdata_t;
 
 /**
@@ -1241,7 +1241,7 @@ int igraph_vs_vector_small(const igraph_t *igraph, igraph_vs_t *vs, ...) {
   
   va_start(ap, vs);
   for (i=0; i<n; i++) {
-    VECTOR(*fakev)[i]=(real_t) va_arg(ap, int);
+    VECTOR(*fakev)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);  
   
@@ -1337,7 +1337,7 @@ const igraph_vs_t *IGRAPH_VS(const igraph_t *graph, ...) {
   
   va_start(ap, graph);
   for (i=0; i<n; i++) {
-    VECTOR(*fakev)[i]=(real_t) va_arg(ap, int);
+    VECTOR(*fakev)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);  
   
@@ -1352,7 +1352,7 @@ void igraph_vs_next_vectorview(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[0] ++;
 }
 
-bool_t igraph_vs_end_vectorview(const igraph_t *graph, const igraph_vs_t *vs) {
+igraph_bool_t igraph_vs_end_vectorview(const igraph_t *graph, const igraph_vs_t *vs) {
   return vs->stdata[0] >= vs->stdata[1];
 }
 
@@ -1360,7 +1360,7 @@ void igraph_vs_reset_vectorview(const igraph_t *graph, igraph_vs_t *vs) {
   vs->stdata[0]=0;
 }
 
-integer_t igraph_vs_get_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_vs_get_vectorview(const igraph_t *graph, 
 				   const igraph_vs_t *vs) {
   igraph_i_vs_vectorview_pdata_t *data=
     (igraph_i_vs_vectorview_pdata_t*)vs->pdata;
@@ -1457,7 +1457,7 @@ void igraph_es_next(const igraph_t *graph, igraph_es_t *es) {
  * see also the specific iterator types.
  */
 
-bool_t igraph_es_end(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end(const igraph_t *graph, const igraph_es_t *es) {
   return es->table->end(graph, es);
 }
 
@@ -1496,7 +1496,7 @@ void igraph_es_reset(const igraph_t *graph, igraph_es_t *es) {
  * \sa \ref igraph_es_to().
  */
 
-integer_t igraph_es_from(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_from(const igraph_t *graph, const igraph_es_t *es) {
   return es->table->from(graph, es);
 }
 
@@ -1518,7 +1518,7 @@ integer_t igraph_es_from(const igraph_t *graph, const igraph_es_t *es) {
  * \sa \ref igraph_es_from().
  */
 
-integer_t igraph_es_to(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_to(const igraph_t *graph, const igraph_es_t *es) {
   return es->table->to(graph, es);
 }
 
@@ -1537,7 +1537,7 @@ integer_t igraph_es_to(const igraph_t *graph, const igraph_es_t *es) {
  * but see also the specific types.
  */
 
-integer_t igraph_es_get(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_get(const igraph_t *graph, const igraph_es_t *es) {
   return es->table->get(graph, es);
 }
 
@@ -1583,11 +1583,11 @@ void igraph_es_destroy(igraph_es_t *es) {
 /* -------------------------------------------------- */
 
 void igraph_es_next_all(const igraph_t *graph, igraph_es_t *es);
-bool_t igraph_es_end_all(const igraph_t *graph, const igraph_es_t *es);
+igraph_bool_t igraph_es_end_all(const igraph_t *graph, const igraph_es_t *es);
 void igraph_es_reset_all(const igraph_t *graph, igraph_es_t *es);
-integer_t igraph_es_get_all(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_from_all(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_to_all(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_get_all(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_from_all(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_to_all(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_all(const igraph_t *graph, const igraph_es_t *es,
 			 igraph_vector_t *v);
 void igraph_es_destroy_all(igraph_es_t *es);
@@ -1647,7 +1647,7 @@ void igraph_es_next_all(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0] ++;
 }
 
-bool_t igraph_es_end_all(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end_all(const igraph_t *graph, const igraph_es_t *es) {
   return es->stdata[0] >= igraph_ecount(graph);
 }
 
@@ -1655,15 +1655,15 @@ void igraph_es_reset_all(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0]=0;
 }
 
-integer_t igraph_es_get_all(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_get_all(const igraph_t *graph, const igraph_es_t *es) {
   return es->stdata[0];
 }
 
-integer_t igraph_es_from_all(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_from_all(const igraph_t *graph, const igraph_es_t *es) {
   return VECTOR(graph->from)[ (long int) es->stdata[0] ];
 }
 
-integer_t igraph_es_to_all(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_to_all(const igraph_t *graph, const igraph_es_t *es) {
   return VECTOR(graph->to)[ (long int) es->stdata[0] ];
 }
 
@@ -1690,13 +1690,13 @@ void igraph_es_destroy_all(igraph_es_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_es_next_fromorder(const igraph_t *graph, igraph_es_t *es);
-bool_t igraph_es_end_fromorder(const igraph_t *graph, const igraph_es_t *es);
+igraph_bool_t igraph_es_end_fromorder(const igraph_t *graph, const igraph_es_t *es);
 void igraph_es_reset_fromorder(const igraph_t *graph, igraph_es_t *es);
-integer_t igraph_es_get_fromorder(const igraph_t *graph, 
+igraph_integer_t igraph_es_get_fromorder(const igraph_t *graph, 
 				  const igraph_es_t *es);
-integer_t igraph_es_from_fromorder(const igraph_t *graph, 
+igraph_integer_t igraph_es_from_fromorder(const igraph_t *graph, 
 				   const igraph_es_t *es);
-integer_t igraph_es_to_fromorder(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_to_fromorder(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_fromorder(const igraph_t *graph, const igraph_es_t *es,
 			       igraph_vector_t *v);
 void igraph_es_destroy_fromorder(igraph_es_t *es);
@@ -1737,7 +1737,7 @@ void igraph_es_next_fromorder(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0] ++;
 }
 
-bool_t igraph_es_end_fromorder(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end_fromorder(const igraph_t *graph, const igraph_es_t *es) {
   return es->stdata[0] >= igraph_ecount(graph);
 }
 
@@ -1745,18 +1745,18 @@ void igraph_es_reset_fromorder(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0]=0;
 }
 
-integer_t igraph_es_get_fromorder(const igraph_t *graph, 
+igraph_integer_t igraph_es_get_fromorder(const igraph_t *graph, 
 				  const igraph_es_t *es) {
   return VECTOR(graph->oi)[ (long int) es->stdata[0] ];
 }
 
-integer_t igraph_es_from_fromorder(const igraph_t *graph, 
+igraph_integer_t igraph_es_from_fromorder(const igraph_t *graph, 
 				   const igraph_es_t *es) {
   long int idx=VECTOR(graph->oi)[ (long int) es->stdata[0] ];
   return VECTOR(graph->from)[ idx ];
 }
 
-integer_t igraph_es_to_fromorder(const igraph_t *graph, 
+igraph_integer_t igraph_es_to_fromorder(const igraph_t *graph, 
 				 const igraph_es_t *es) {
   long int idx=VECTOR(graph->oi)[ (long int) es->stdata[0] ];
   return VECTOR(graph->to)[ idx ];
@@ -1784,11 +1784,11 @@ void igraph_es_destroy_fromorder(igraph_es_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_es_next_adj(const igraph_t *graph, igraph_es_t *es);
-bool_t igraph_es_end_adj(const igraph_t *graph, const igraph_es_t *es);
+igraph_bool_t igraph_es_end_adj(const igraph_t *graph, const igraph_es_t *es);
 void igraph_es_reset_adj(const igraph_t *graph, igraph_es_t *es);
-integer_t igraph_es_get_adj(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_from_adj(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_to_adj(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_get_adj(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_from_adj(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_to_adj(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_adj(const igraph_t *graph, const igraph_es_t *es,
 			 igraph_vector_t *v);
 void igraph_es_destroy_adj(igraph_es_t *es);
@@ -1818,7 +1818,7 @@ igraph_i_estable_t igraph_i_es_adj_table = {
  */
 
 int igraph_es_adj(const igraph_t *graph, igraph_es_t *es,
-		  integer_t vid, igraph_neimode_t mode) {
+		  igraph_integer_t vid, igraph_neimode_t mode) {
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -1850,7 +1850,7 @@ void igraph_es_next_adj(const igraph_t *graph, igraph_es_t *es) {
   }
 }
 
-bool_t igraph_es_end_adj(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end_adj(const igraph_t *graph, const igraph_es_t *es) {
   return (es->stdata[2] >= VECTOR(graph->os)[ (long int) es->stdata[0]+1 ] &&
 	  es->stdata[3] >= VECTOR(graph->is)[ (long int) es->stdata[0]+1 ]);
 }
@@ -1868,7 +1868,7 @@ void igraph_es_reset_adj(const igraph_t *graph, igraph_es_t *es) {
   }
 }
 
-integer_t igraph_es_get_adj(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_get_adj(const igraph_t *graph, const igraph_es_t *es) {
   if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
     return VECTOR(graph->oi)[(long int)es->stdata[2]];
   } else {
@@ -1876,7 +1876,7 @@ integer_t igraph_es_get_adj(const igraph_t *graph, const igraph_es_t *es) {
   }
 }
 
-integer_t igraph_es_from_adj(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_from_adj(const igraph_t *graph, const igraph_es_t *es) {
   if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
     long int idx=VECTOR(graph->oi)[(long int)es->stdata[2]];
     return VECTOR(graph->from)[idx];
@@ -1886,7 +1886,7 @@ integer_t igraph_es_from_adj(const igraph_t *graph, const igraph_es_t *es) {
   }
 }
 
-integer_t igraph_es_to_adj(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_to_adj(const igraph_t *graph, const igraph_es_t *es) {
   if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
     long int idx=VECTOR(graph->oi)[(long int)es->stdata[2]];
     return VECTOR(graph->to)[idx];
@@ -1952,7 +1952,7 @@ void igraph_es_destroy_adj(igraph_es_t *pvs) {
  */
 
 void igraph_es_adj_set(const igraph_t *graph, igraph_es_t *es,
-		       integer_t vid, igraph_neimode_t mode) {
+		       igraph_integer_t vid, igraph_neimode_t mode) {
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
@@ -1982,7 +1982,7 @@ void igraph_es_adj_set(const igraph_t *graph, igraph_es_t *es,
  * Time complexity: O(1).
  */
 
-integer_t igraph_es_adj_vertex(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_adj_vertex(const igraph_t *graph, const igraph_es_t *es) {
   if (es->stdata[2] < VECTOR(graph->os)[ (long int)es->stdata[0]+1 ]) {
     long int idx=VECTOR(graph->oi)[(long int)es->stdata[2]];
     return VECTOR(graph->to)[idx];
@@ -1997,11 +1997,11 @@ integer_t igraph_es_adj_vertex(const igraph_t *graph, const igraph_es_t *es) {
 /* -------------------------------------------------- */
 
 void igraph_es_next_none(const igraph_t *graph, igraph_es_t *es);
-bool_t igraph_es_end_none(const igraph_t *graph, const igraph_es_t *es);
+igraph_bool_t igraph_es_end_none(const igraph_t *graph, const igraph_es_t *es);
 void igraph_es_reset_none(const igraph_t *graph, igraph_es_t *es);
-integer_t igraph_es_get_none(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_from_none(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_to_none(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_get_none(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_from_none(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_to_none(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_none(const igraph_t *graph, const igraph_es_t *es, 
 			  igraph_vector_t *v);
 void igraph_es_destroy_none(igraph_es_t *es);
@@ -2036,7 +2036,7 @@ void igraph_es_next_none(const igraph_t *graph, igraph_es_t *es) {
   /* nothing to do */
 }
 
-bool_t igraph_es_end_none(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end_none(const igraph_t *graph, const igraph_es_t *es) {
   return 1;
 }
 
@@ -2044,17 +2044,17 @@ void igraph_es_reset_none(const igraph_t *graph, igraph_es_t *es) {
   /* nothing to do */
 }
 
-integer_t igraph_es_get_none(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_get_none(const igraph_t *graph, const igraph_es_t *es) {
   /* ooops this is an error, no way to signal it though... */
   return -1;
 }
 
-integer_t igraph_es_from_none(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_from_none(const igraph_t *graph, const igraph_es_t *es) {
   /* error */
   return 0;
 }
 
-integer_t igraph_es_to_none(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_to_none(const igraph_t *graph, const igraph_es_t *es) {
   /* error */
   return 0;
 }
@@ -2077,11 +2077,11 @@ void igraph_es_destroy_none(igraph_es_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_es_next_1(const igraph_t *graph, igraph_es_t *es);
-bool_t igraph_es_end_1(const igraph_t *graph, const igraph_es_t *es);
+igraph_bool_t igraph_es_end_1(const igraph_t *graph, const igraph_es_t *es);
 void igraph_es_reset_1(const igraph_t *graph, igraph_es_t *es);
-integer_t igraph_es_get_1(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_from_1(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_to_1(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_get_1(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_from_1(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_to_1(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_1(const igraph_t *graph, const igraph_es_t *es, 
 		       igraph_vector_t *v);
 void igraph_es_destroy_1(igraph_es_t *es);
@@ -2105,7 +2105,7 @@ igraph_i_estable_t igraph_i_es_1_table = {
  * success. 
  */
 
-int igraph_es_1(const igraph_t *igraph, igraph_es_t *es, integer_t eid) {
+int igraph_es_1(const igraph_t *igraph, igraph_es_t *es, igraph_integer_t eid) {
   es->type=IGRAPH_ITERATOR_ES_1;
   es->stdata[0]=eid;
   es->stdata[1]=0;		/* write 1 here if end */
@@ -2125,7 +2125,7 @@ int igraph_es_1(const igraph_t *igraph, igraph_es_t *es, integer_t eid) {
  * Time complexity: O(1).
  */
 
-const igraph_es_t *IGRAPH_ES_1(const igraph_t *graph, integer_t eid) {
+const igraph_es_t *IGRAPH_ES_1(const igraph_t *graph, igraph_integer_t eid) {
   igraph_es_t *es=Calloc(1, igraph_es_t);
   if (es==0) {
     igraph_error("Cannot create iterator shorthand", __FILE__, __LINE__,
@@ -2142,7 +2142,7 @@ void igraph_es_next_1(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[1]=1;
 }
 
-bool_t igraph_es_end_1(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end_1(const igraph_t *graph, const igraph_es_t *es) {
   return (es->stdata[1]==1);
 }
 
@@ -2150,15 +2150,15 @@ void igraph_es_reset_1(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[1]=0;
 }
 
-integer_t igraph_es_get_1(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_get_1(const igraph_t *graph, const igraph_es_t *es) {
   return es->stdata[0];
 }
 
-integer_t igraph_es_from_1(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_from_1(const igraph_t *graph, const igraph_es_t *es) {
   return VECTOR(graph->from)[ (long int) es->stdata[0] ];
 }
 
-integer_t igraph_es_to_1(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_to_1(const igraph_t *graph, const igraph_es_t *es) {
   return VECTOR(graph->to)[ (long int) es->stdata[0] ];
 }
 
@@ -2181,11 +2181,11 @@ void igraph_es_destroy_1(igraph_es_t *pvs) {
 /* -------------------------------------------------- */
 
 void igraph_es_next_seq(const igraph_t *graph, igraph_es_t *es);
-bool_t igraph_es_end_seq(const igraph_t *graph, const igraph_es_t *es);
+igraph_bool_t igraph_es_end_seq(const igraph_t *graph, const igraph_es_t *es);
 void igraph_es_reset_seq(const igraph_t *graph, igraph_es_t *es);
-integer_t igraph_es_get_seq(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_from_seq(const igraph_t *graph, const igraph_es_t *es);
-integer_t igraph_es_to_seq(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_get_seq(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_from_seq(const igraph_t *graph, const igraph_es_t *es);
+igraph_integer_t igraph_es_to_seq(const igraph_t *graph, const igraph_es_t *es);
 int igraph_es_unfold_seq(const igraph_t *graph, const igraph_es_t *es,
 			 igraph_vector_t *v);
 void igraph_es_destroy_seq(igraph_es_t *es);
@@ -2210,8 +2210,8 @@ igraph_i_estable_t igraph_i_es_seq_table = {
  * Time complexity: O(1).
  */
 
-int igraph_es_seq(const igraph_t *igraph, igraph_es_t *es, integer_t from,
-		  integer_t to) {
+int igraph_es_seq(const igraph_t *igraph, igraph_es_t *es, igraph_integer_t from,
+		  igraph_integer_t to) {
   es->type=IGRAPH_ITERATOR_ES_SEQ;
   es->stdata[0]=from;
   es->stdata[1]=from;
@@ -2225,7 +2225,7 @@ void igraph_es_next_seq(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0] ++;
 }
 
-bool_t igraph_es_end_seq(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end_seq(const igraph_t *graph, const igraph_es_t *es) {
   return es->stdata[0] > es->stdata[2];
 }
 
@@ -2233,15 +2233,15 @@ void igraph_es_reset_seq(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0]=es->stdata[1];
 }
 
-integer_t igraph_es_get_seq(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_get_seq(const igraph_t *graph, const igraph_es_t *es) {
   return es->stdata[0];
 }
 
-integer_t igraph_es_from_seq(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_from_seq(const igraph_t *graph, const igraph_es_t *es) {
   return VECTOR(graph->from)[ (long int) es->stdata[0] ];
 }
 
-integer_t igraph_es_to_seq(const igraph_t *graph, const igraph_es_t *es) {
+igraph_integer_t igraph_es_to_seq(const igraph_t *graph, const igraph_es_t *es) {
   return VECTOR(graph->to)[ (long int) es->stdata[0] ];
 }
 
@@ -2266,13 +2266,13 @@ void igraph_es_destroy_seq(igraph_es_t *pes) {
 /* -------------------------------------------------- */
 
 void igraph_es_next_vectorview(const igraph_t *graph, igraph_es_t *es);
-bool_t igraph_es_end_vectorview(const igraph_t *graph, const igraph_es_t *es);
+igraph_bool_t igraph_es_end_vectorview(const igraph_t *graph, const igraph_es_t *es);
 void igraph_es_reset_vectorview(const igraph_t *graph, igraph_es_t *es);
-integer_t igraph_es_get_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_es_get_vectorview(const igraph_t *graph, 
 				   const igraph_es_t *es);
-integer_t igraph_es_from_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_es_from_vectorview(const igraph_t *graph, 
 				    const igraph_es_t *es);
-integer_t igraph_es_to_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_es_to_vectorview(const igraph_t *graph, 
 				  const igraph_es_t *es);
 int igraph_es_unfold_vectorview(const igraph_t *graph, const igraph_es_t *es,
 				igraph_vector_t *v);
@@ -2503,7 +2503,7 @@ int igraph_es_vector_small(const igraph_t *igraph, igraph_es_t *es, ...) {
   
   va_start(ap, es);
   for (i=0; i<n; i++) {
-    VECTOR(*fakev)[i]=(real_t) va_arg(ap, int);
+    VECTOR(*fakev)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);  
   
@@ -2600,7 +2600,7 @@ const igraph_es_t *IGRAPH_ES(const igraph_t *graph, ...) {
   
   va_start(ap, graph);
   for (i=0; i<n; i++) {
-    VECTOR(*fakev)[i]=(real_t) va_arg(ap, int);
+    VECTOR(*fakev)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);  
   
@@ -2615,7 +2615,7 @@ void igraph_es_next_vectorview(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0] ++;
 }
 
-bool_t igraph_es_end_vectorview(const igraph_t *graph, const igraph_es_t *es) {
+igraph_bool_t igraph_es_end_vectorview(const igraph_t *graph, const igraph_es_t *es) {
   return es->stdata[0] >= es->stdata[1];
 }
 
@@ -2623,14 +2623,14 @@ void igraph_es_reset_vectorview(const igraph_t *graph, igraph_es_t *es) {
   es->stdata[0]=0;
 }
 
-integer_t igraph_es_get_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_es_get_vectorview(const igraph_t *graph, 
 				   const igraph_es_t *es) {
   igraph_i_es_vectorview_pdata_t *data=
     (igraph_i_es_vectorview_pdata_t*)es->pdata;
   return VECTOR(data->v)[ (long int) (es->stdata[0]) ]; 
 }
 
-integer_t igraph_es_from_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_es_from_vectorview(const igraph_t *graph, 
 				    const igraph_es_t *es) {
   igraph_i_es_vectorview_pdata_t *data=
     (igraph_i_es_vectorview_pdata_t*)es->pdata;
@@ -2638,7 +2638,7 @@ integer_t igraph_es_from_vectorview(const igraph_t *graph,
   return VECTOR(graph->from) [id];
 }
 
-integer_t igraph_es_to_vectorview(const igraph_t *graph, 
+igraph_integer_t igraph_es_to_vectorview(const igraph_t *graph, 
 				  const igraph_es_t *es) {
   igraph_i_es_vectorview_pdata_t *data=
     (igraph_i_es_vectorview_pdata_t*)es->pdata;
@@ -2730,7 +2730,7 @@ const igraph_vector_t *igraph_es_vector_getvector(const igraph_t *graph,
 
 int igraph_es_fromto(const igraph_t *graph, igraph_es_t *es, 
 		     const igraph_vs_t *from, const igraph_vs_t *to, 
-		     bool_t directed) {
+		     igraph_bool_t directed) {
 
   igraph_vs_t myfrom, myto;  
   long int i, j, lfrom;

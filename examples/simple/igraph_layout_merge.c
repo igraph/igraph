@@ -25,9 +25,9 @@
 #include <stdlib.h>
 
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid, 
-			      long int actg, real_t *x, real_t *y, real_t r,
-			      real_t cx, real_t cy, real_t startr, 
-			      real_t killr);
+			      long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
+			      igraph_real_t cx, igraph_real_t cy, igraph_real_t startr, 
+			      igraph_real_t killr);
 
 int main() {
   

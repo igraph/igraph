@@ -28,7 +28,7 @@ int main() {
 
   igraph_t g;
   igraph_matrix_t coords;
-  real_t vc;
+  igraph_real_t vc;
   
   igraph_tree(&g, 100, 3, IGRAPH_TREE_UNDIRECTED);
 /*   igraph_barabasi_game(&g, 1000, 1, 0, 0, IGRAPH_UNDIRECTED); */

@@ -39,7 +39,7 @@
  * \param pairs if true, assumes that every list element is a pair of integers
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, bool_t need_non_negative, bool_t pairs)
+int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs)
 {
    PyObject *item, *i1, *i2;
    int i, j, k, ok;
@@ -85,8 +85,8 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, bool_t n
 	     if (ok) 
 	       {
 		  igraph_vector_init(v, 2);
-		  VECTOR(*v)[0]=(real_t)idx;
-		  VECTOR(*v)[1]=(real_t)idx2;
+		  VECTOR(*v)[0]=(igraph_real_t)idx;
+		  VECTOR(*v)[1]=(igraph_real_t)idx2;
 	       }
 	     else
 	       {
@@ -102,7 +102,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, bool_t n
 	     // a single integer was given instead of a list
 	     // Let's assume that the user meant a list consisting of this single item
 	     igraph_vector_init(v, 1);
-	     VECTOR(*v)[0]=(real_t)PyInt_AsLong(list);
+	     VECTOR(*v)[0]=(igraph_real_t)PyInt_AsLong(list);
 	  }
 	else 
 	  {
@@ -191,12 +191,12 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, bool_t n
 		    }
 		  
 		 // add idx into index vector
-		  VECTOR(*v)[k]=(real_t)idx;
+		  VECTOR(*v)[k]=(igraph_real_t)idx;
 		  k++;
 		  if (pairs) 
 		    {
 		       // if we are working on pairs, add idx and idx2 as well
-		       VECTOR(*v)[k]=(real_t)idx2;
+		       VECTOR(*v)[k]=(igraph_real_t)idx2;
 		       k++;
 		    }
 	       }

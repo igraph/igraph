@@ -227,7 +227,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
   return 0;
 }
 
-int igraph_is_connected_weak(const igraph_t *graph, bool_t *res);
+int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
 
 /**
  * \ingroup structural
@@ -251,7 +251,7 @@ int igraph_is_connected_weak(const igraph_t *graph, bool_t *res);
  */
 
 
-int igraph_is_connected(const igraph_t *graph, bool_t *res, 
+int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res, 
 			igraph_connectedness_t mode) {
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
     return igraph_is_connected_weak(graph, res);
@@ -273,7 +273,7 @@ int igraph_is_connected(const igraph_t *graph, bool_t *res,
   return 0;
 }
 
-int igraph_is_connected_weak(const igraph_t *graph, bool_t *res) {
+int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   char *already_added;

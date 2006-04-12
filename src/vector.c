@@ -115,7 +115,7 @@
 int igraph_vector_init      (igraph_vector_t* v, int long size) {	
         long int alloc_size= size > 0 ? size : 1;
 	if (size < 0) { size=0; }
-	v->stor_begin=Calloc(alloc_size, real_t);
+	v->stor_begin=Calloc(alloc_size, igraph_real_t);
 	if (v->stor_begin==0) {
 	  IGRAPH_ERROR("cannot init vector", IGRAPH_ENOMEM);
 	}
@@ -143,11 +143,11 @@ int igraph_vector_init      (igraph_vector_t* v, int long size) {
  * Time complexity: O(1)
  */ 
 
-const igraph_vector_t *igraph_vector_view (const igraph_vector_t *v, const real_t *data, 
+const igraph_vector_t *igraph_vector_view (const igraph_vector_t *v, const igraph_real_t *data, 
 			     long int length) {
   igraph_vector_t *v2=(igraph_vector_t*) v;
-  v2->stor_begin=(real_t*)data;
-  v2->stor_end=(real_t*)data+length;
+  v2->stor_begin=(igraph_real_t*)data;
+  v2->stor_end=(igraph_real_t*)data+length;
   v2->end=v2->stor_end;
   return v;
 }
@@ -167,7 +167,7 @@ const igraph_vector_t *igraph_vector_view (const igraph_vector_t *v, const real_
  * \verbatim igraph_vector_t v;
  * igraph_vector_init_real(&amp;v, 5, 1.0,2.0,3.0,4.0,5.0); \endverbatim
  * \param v Pointer to an uninitialized \type igraph_vector_t object.
- * \param no Positive integer, the number of \type real_t
+ * \param no Positive integer, the number of \type igraph_real_t
  *    parameters to follow.
  * \param ... The elements of the vector.
  * \return Error code, this can be \c IGRAPH_ENOMEM
@@ -188,7 +188,7 @@ int igraph_vector_init_real(igraph_vector_t *v, int no, ...) {
 
   va_start(ap, no);
   for (i=0; i<no; i++) {
-    VECTOR(*v)[i]=(real_t) va_arg(ap, double);
+    VECTOR(*v)[i]=(igraph_real_t) va_arg(ap, double);
   }
   va_end(ap);
   
@@ -219,13 +219,13 @@ int igraph_vector_init_real(igraph_vector_t *v, int no, ...) {
  * complexity of the memory allocation.
  */
 
-int igraph_vector_init_real_end(igraph_vector_t *v, real_t endmark, ...) {
+int igraph_vector_init_real_end(igraph_vector_t *v, igraph_real_t endmark, ...) {
   int i=0, n=0;
   va_list ap;
 
   va_start(ap, endmark);
   while (1) {
-    real_t num = va_arg(ap, double);
+    igraph_real_t num = va_arg(ap, double);
     if (num == endmark) {
       break;
     }
@@ -237,7 +237,7 @@ int igraph_vector_init_real_end(igraph_vector_t *v, real_t endmark, ...) {
   
   va_start(ap, endmark);
   for (i=0; i<n; i++) {
-    VECTOR(*v)[i]=(real_t) va_arg(ap, double);
+    VECTOR(*v)[i]=(igraph_real_t) va_arg(ap, double);
   }
   va_end(ap);
   
@@ -274,7 +274,7 @@ int igraph_vector_init_int(igraph_vector_t *v, int no, ...) {
 
   va_start(ap, no);
   for (i=0; i<no; i++) {
-    VECTOR(*v)[i]=(real_t) va_arg(ap, int);
+    VECTOR(*v)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);
   
@@ -323,7 +323,7 @@ int igraph_vector_init_int_end(igraph_vector_t *v, int endmark, ...) {
   
   va_start(ap, endmark);
   for (i=0; i<n; i++) {
-    VECTOR(*v)[i]=(real_t) va_arg(ap, int);
+    VECTOR(*v)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);
   
@@ -382,12 +382,12 @@ void igraph_vector_destroy   (igraph_vector_t* v) {
 
 int igraph_vector_reserve   (igraph_vector_t* v, long int size) {
 	long int actual_size=igraph_vector_size(v);
-	real_t *tmp;
+	igraph_real_t *tmp;
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	if (size <= igraph_vector_size(v)) { return 0; }
 
-	tmp=Realloc(v->stor_begin, size, real_t);
+	tmp=Realloc(v->stor_begin, size, igraph_real_t);
 	if (tmp==0) {
 	  IGRAPH_ERROR("cannot reserve space for vector", IGRAPH_ENOMEM);
 	}
@@ -410,7 +410,7 @@ int igraph_vector_reserve   (igraph_vector_t* v, long int size) {
  * Time complexity: O(1).
  */
 
-bool_t igraph_vector_empty     (const igraph_vector_t* v) {
+igraph_bool_t igraph_vector_empty     (const igraph_vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return v->stor_begin == v->end;
@@ -476,7 +476,7 @@ void igraph_vector_clear     (igraph_vector_t* v) {
  * complexity of memory allocation is at most linear.)
  */
 
-int igraph_vector_push_back (igraph_vector_t* v, real_t e) {
+int igraph_vector_push_back (igraph_vector_t* v, igraph_real_t e) {
   	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	
@@ -523,7 +523,7 @@ int igraph_vector_push_back (igraph_vector_t* v, real_t e) {
  * Time complexity: O(1).
  */
 
-real_t igraph_vector_e         (const igraph_vector_t* v, long int pos) {
+igraph_real_t igraph_vector_e         (const igraph_vector_t* v, long int pos) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	return * (v->stor_begin + pos);
@@ -542,7 +542,7 @@ real_t igraph_vector_e         (const igraph_vector_t* v, long int pos) {
  * Time complexity: O(1).
  */
 
-real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos) {
+igraph_real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos) {
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   return v->stor_begin+pos;
@@ -558,7 +558,7 @@ real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos) {
  * \sa \ref igraph_vector_e().
  */
 
-void igraph_vector_set       (igraph_vector_t* v, long int pos, real_t value) {
+void igraph_vector_set       (igraph_vector_t* v, long int pos, igraph_real_t value) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 	*(v->stor_begin + pos) = value;
@@ -582,7 +582,7 @@ void igraph_vector_null      (igraph_vector_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	if (igraph_vector_size(v)>0) {
-		memset(v->stor_begin, 0, sizeof(real_t)*igraph_vector_size(v));
+		memset(v->stor_begin, 0, sizeof(igraph_real_t)*igraph_vector_size(v));
 	}
 }
 
@@ -599,7 +599,7 @@ void igraph_vector_null      (igraph_vector_t* v) {
  * Time complexity: O(1).
  */
 
-real_t igraph_vector_tail(const igraph_vector_t *v) {
+igraph_real_t igraph_vector_tail(const igraph_vector_t *v) {
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   return *((v->end)-1);
@@ -617,8 +617,8 @@ real_t igraph_vector_tail(const igraph_vector_t *v) {
  * Time complexity: O(1).
  */
 
-real_t igraph_vector_pop_back(igraph_vector_t* v) {
-  real_t tmp;
+igraph_real_t igraph_vector_pop_back(igraph_vector_t* v) {
+  igraph_real_t tmp;
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   assert(v->end != v->stor_begin);
@@ -645,7 +645,7 @@ real_t igraph_vector_pop_back(igraph_vector_t* v) {
  * Time complexity: O()
  */
 
-int igraph_vector_order(const igraph_vector_t* v, igraph_vector_t* res, integer_t nodes) {
+int igraph_vector_order(const igraph_vector_t* v, igraph_vector_t* res, igraph_integer_t nodes) {
   long int edges=igraph_vector_size(v);
   igraph_vector_t ptr;
   igraph_vector_t rad;
@@ -712,8 +712,8 @@ int igraph_vector_order2(igraph_vector_t *v) {
  */
 
 int igraph_vector_sort_cmp(const void *a, const void *b) {
-  const real_t *da = (const real_t *) a;
-  const real_t *db = (const real_t *) b;
+  const igraph_real_t *da = (const igraph_real_t *) a;
+  const igraph_real_t *db = (const igraph_real_t *) b;
 
   return (*da > *db) - (*da < *db);
 }
@@ -735,7 +735,7 @@ int igraph_vector_sort_cmp(const void *a, const void *b) {
 void igraph_vector_sort(igraph_vector_t *v) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  qsort(v->stor_begin, igraph_vector_size(v), sizeof(real_t), igraph_vector_sort_cmp);
+  qsort(v->stor_begin, igraph_vector_size(v), sizeof(igraph_real_t), igraph_vector_sort_cmp);
 }
 
 /**
@@ -786,9 +786,9 @@ int igraph_vector_resize(igraph_vector_t* v, long int newsize) {
  * n is the size of the vector. 
  */
 
-real_t igraph_vector_max(const igraph_vector_t* v) {
-  real_t max;
-  real_t *ptr;
+igraph_real_t igraph_vector_max(const igraph_vector_t* v) {
+  igraph_real_t max;
+  igraph_real_t *ptr;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   max=*(v->stor_begin);
@@ -819,8 +819,8 @@ real_t igraph_vector_max(const igraph_vector_t* v) {
 long int igraph_vector_which_max(const igraph_vector_t* v) {
   long int which=-1;
   if (!igraph_vector_empty(v)) {
-    real_t max;
-    real_t *ptr;
+    igraph_real_t max;
+    igraph_real_t *ptr;
     long int pos;
     assert(v != NULL);
     assert(v->stor_begin != NULL);
@@ -852,14 +852,14 @@ long int igraph_vector_which_max(const igraph_vector_t* v) {
  * O(\p length).
  */
 
-int igraph_vector_init_copy(igraph_vector_t *v, real_t *data, long int length) {
-  v->stor_begin=Calloc(length, real_t);
+int igraph_vector_init_copy(igraph_vector_t *v, igraph_real_t *data, long int length) {
+  v->stor_begin=Calloc(length, igraph_real_t);
   if (v->stor_begin==0) {
     IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);
   }
   v->stor_end=v->stor_begin+length;
   v->end=v->stor_end;
-  memcpy(v->stor_begin, data, length*sizeof(real_t));
+  memcpy(v->stor_begin, data, length*sizeof(igraph_real_t));
   
   return 0;
 }
@@ -877,11 +877,11 @@ int igraph_vector_init_copy(igraph_vector_t *v, real_t *data, long int length) {
  * n is the size of the vector.
  */
 
-void igraph_vector_copy_to(const igraph_vector_t *v, real_t* to) {
+void igraph_vector_copy_to(const igraph_vector_t *v, igraph_real_t* to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   if (v->end != v->stor_begin) {
-    memcpy(to, v->stor_begin, sizeof(real_t) * (v->end - v->stor_begin));
+    memcpy(to, v->stor_begin, sizeof(igraph_real_t) * (v->end - v->stor_begin));
   }
 }
 
@@ -905,13 +905,13 @@ void igraph_vector_copy_to(const igraph_vector_t *v, real_t* to) {
 int igraph_vector_copy(igraph_vector_t *to, const igraph_vector_t *from) {
   assert(from != NULL);
   assert(from->stor_begin != NULL);
-  to->stor_begin=Calloc(igraph_vector_size(from), real_t);
+  to->stor_begin=Calloc(igraph_vector_size(from), igraph_real_t);
   if (to->stor_begin==0) {
     IGRAPH_ERROR("canot copy vector", IGRAPH_ENOMEM);
   }
   to->stor_end=to->stor_begin+igraph_vector_size(from);
   to->end=to->stor_end;
-  memcpy(to->stor_begin, from->stor_begin, igraph_vector_size(from)*sizeof(real_t));
+  memcpy(to->stor_begin, from->stor_begin, igraph_vector_size(from)*sizeof(igraph_real_t));
   
   return 0;
 }
@@ -930,9 +930,9 @@ int igraph_vector_copy(igraph_vector_t *to, const igraph_vector_t *from) {
  * the vector. 
  */
 
-real_t igraph_vector_sum(const igraph_vector_t *v) {
-  real_t res=0;
-  real_t *p;
+igraph_real_t igraph_vector_sum(const igraph_vector_t *v) {
+  igraph_real_t res=0;
+  igraph_real_t *p;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   for (p=v->stor_begin; p<v->end; p++) {
@@ -954,9 +954,9 @@ real_t igraph_vector_sum(const igraph_vector_t *v) {
  * the vector. 
  */
 
-real_t igraph_vector_prod(const igraph_vector_t *v) {
-  real_t res=1;
-  real_t *p;
+igraph_real_t igraph_vector_prod(const igraph_vector_t *v) {
+  igraph_real_t res=1;
+  igraph_real_t *p;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   for (p=v->stor_begin; p<v->end; p++) {
@@ -982,8 +982,8 @@ real_t igraph_vector_prod(const igraph_vector_t *v) {
  * of elements in the vector. 
  */
 
-int igraph_vector_init_seq(igraph_vector_t *v, real_t from, real_t to) {
-  real_t *p;
+int igraph_vector_init_seq(igraph_vector_t *v, igraph_real_t from, igraph_real_t to) {
+  igraph_real_t *p;
   IGRAPH_CHECK(igraph_vector_init(v, to-from+1));
 
   for (p=v->stor_begin; p<v->end; p++) {
@@ -1013,7 +1013,7 @@ void igraph_vector_remove_section(igraph_vector_t *v, long int from, long int to
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   memmove(v->stor_begin+from, v->stor_begin+to,
-	  sizeof(real_t)*(v->end-v->stor_begin-to));
+	  sizeof(igraph_real_t)*(v->end-v->stor_begin-to));
   v->end -= (to-from);
 }
 
@@ -1059,7 +1059,7 @@ int igraph_vector_move_interval(igraph_vector_t *v, long int begin, long int end
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   memcpy(v->stor_begin+to, v->stor_begin+begin, 
-	 sizeof(real_t)*(end-begin));
+	 sizeof(igraph_real_t)*(end-begin));
 
   return 0;
 }
@@ -1114,8 +1114,8 @@ void igraph_vector_remove_negidx(igraph_vector_t *v, const igraph_vector_t *neg,
  * of elements in the vector.
  */
 
-bool_t igraph_vector_isininterval(const igraph_vector_t *v, real_t low, real_t high) {
-  real_t *ptr;
+igraph_bool_t igraph_vector_isininterval(const igraph_vector_t *v, igraph_real_t low, igraph_real_t high) {
+  igraph_real_t *ptr;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   for (ptr=v->stor_begin; ptr<v->end; ptr++) {
@@ -1141,8 +1141,8 @@ bool_t igraph_vector_isininterval(const igraph_vector_t *v, real_t low, real_t h
  * of elements in the vector.
  */
 
-bool_t igraph_vector_any_smaller(const igraph_vector_t *v, real_t limit) {
-  real_t *ptr;
+igraph_bool_t igraph_vector_any_smaller(const igraph_vector_t *v, igraph_real_t limit) {
+  igraph_real_t *ptr;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   for (ptr=v->stor_begin; ptr<v->end; ptr++) {
@@ -1168,7 +1168,7 @@ bool_t igraph_vector_any_smaller(const igraph_vector_t *v, real_t limit) {
  * of the vectors.
  */
 
-bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t *rhs) {
+igraph_bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t *rhs) {
   long int i, s;
   assert(lhs != 0);
   assert(rhs != 0);
@@ -1213,7 +1213,7 @@ bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t 
  * \p v.
  */
 
-bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *pos) {
+igraph_bool_t igraph_vector_binsearch(const igraph_vector_t *v, igraph_real_t what, long int *pos) {
   long int left=0;
   long int right=igraph_vector_size(v)-1;
 
@@ -1252,14 +1252,14 @@ bool_t igraph_vector_binsearch(const igraph_vector_t *v, real_t what, long int *
  * Time complexity: O(n), the number of elements in a vector.
  */
 
-void igraph_vector_multiply(igraph_vector_t *v, real_t by) {
+void igraph_vector_multiply(igraph_vector_t *v, igraph_real_t by) {
   long int i;
   for (i=0; i<igraph_vector_size(v); i++) {
     VECTOR(*v)[i] *= by;
   }
 }
 
-bool_t igraph_vector_search(igraph_vector_t *v, long int from, real_t what, 
+igraph_bool_t igraph_vector_search(igraph_vector_t *v, long int from, igraph_real_t what, 
 			    long int *pos) {
   long int i, n=igraph_vector_size(v);  
   for (i=from; i<n; i++) {
@@ -1276,7 +1276,7 @@ bool_t igraph_vector_search(igraph_vector_t *v, long int from, real_t what,
   }
 }
 
-int igraph_vector_filter_smaller(igraph_vector_t *v, real_t elem) {
+int igraph_vector_filter_smaller(igraph_vector_t *v, igraph_real_t elem) {
   long int i=0, n=igraph_vector_size(v);
   long int s;
   while (i<n && VECTOR(*v)[i]<elem) {
@@ -1299,7 +1299,7 @@ int igraph_vector_append(igraph_vector_t *to, const igraph_vector_t *from) {
   fromsize=igraph_vector_size(from);
   IGRAPH_CHECK(igraph_vector_resize(to, tosize+fromsize));
   memcpy(to->stor_begin+tosize, from->stor_begin, 
-	 sizeof(real_t)*fromsize);
+	 sizeof(igraph_real_t)*fromsize);
   to->end=to->stor_begin+tosize+fromsize;
   
   return 0;

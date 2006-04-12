@@ -62,9 +62,9 @@
  * number of vertices plus the number of edges.
  */
 
-int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m, 
-			 const igraph_vector_t *outseq, bool_t outpref, 
-			 bool_t directed) {
+int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m, 
+			 const igraph_vector_t *outseq, igraph_bool_t outpref, 
+			 igraph_bool_t directed) {
 
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
@@ -149,8 +149,8 @@ int igraph_barabasi_game(igraph_t *graph, integer_t n, integer_t m,
  * \ingroup internal
  */
 
-int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
-				bool_t directed, bool_t loops) {
+int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real_t p,
+				igraph_bool_t directed, igraph_bool_t loops) {
 
   long int no_of_nodes=n;
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
@@ -216,13 +216,13 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
       }
     } else if (!directed && loops) {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
+	igraph_real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
 	igraph_vector_push_back(&edges, from-1);
 	igraph_vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
       }
     } else {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
+	igraph_real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
 	igraph_vector_push_back(&edges, from-1);
 	igraph_vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
       }
@@ -238,8 +238,8 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, integer_t n, real_t p,
   return retval;
 }
 
-int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
-				bool_t directed, bool_t loops) {
+int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real_t m,
+				igraph_bool_t directed, igraph_bool_t loops) {
 
   long int no_of_nodes=n;
   long int no_of_edges=m;
@@ -300,13 +300,13 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
 	}
       } else if (!directed && loops) {
 	for (i=0; i<igraph_vector_size(&s); i++) {
-	  real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
+	  igraph_real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
 	  igraph_vector_push_back(&edges, from-1);
 	  igraph_vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
 	}
       } else {
 	for (i=0; i<igraph_vector_size(&s); i++) {
-	  real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
+	  igraph_real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
 	  igraph_vector_push_back(&edges, from-1);
 	  igraph_vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
 	}
@@ -362,8 +362,8 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, integer_t n, real_t m,
  */
 
 int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
-			    integer_t n, real_t p_or_m,
-			    bool_t directed, bool_t loops) {
+			    igraph_integer_t n, igraph_real_t p_or_m,
+			    igraph_bool_t directed, igraph_bool_t loops) {
   int retval=0;
   if (type == IGRAPH_ERDOS_RENYI_GNP) {
     retval=igraph_erdos_renyi_game_gnp(graph, n, p_or_m, directed, loops);
@@ -381,7 +381,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
 				       const igraph_vector_t *in_seq) {
 
   long int outsum=0, insum=0;
-  bool_t directed=(in_seq != 0 && igraph_vector_size(in_seq)!=0);
+  igraph_bool_t directed=(in_seq != 0 && igraph_vector_size(in_seq)!=0);
   long int no_of_nodes, no_of_edges;
   long int *bag1=0, *bag2=0;
   long int bagp1=0, bagp2=0;
@@ -565,9 +565,9 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
  */
-int igraph_growing_random_game(igraph_t *graph, integer_t n, 
-			       integer_t m, bool_t directed,
-			       bool_t citation) {
+int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n, 
+			       igraph_integer_t m, igraph_bool_t directed,
+			       igraph_bool_t citation) {
 
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
@@ -615,8 +615,8 @@ int igraph_growing_random_game(igraph_t *graph, integer_t n,
   return 0;
 }
 
-int igraph_aging_prefatt_game(igraph_t *graph, integer_t n, integer_t m,
-			      integer_t aging_type, real_t aging_exp) {
+int igraph_aging_prefatt_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
+			      igraph_integer_t aging_type, igraph_real_t aging_exp) {
   /* TODO */
   return 0;
 }
@@ -652,15 +652,15 @@ int igraph_aging_prefatt_game(igraph_t *graph, integer_t n, integer_t m,
  * is \p edges_per_step.
  */
 
-int igraph_callaway_traits_game (igraph_t *graph, integer_t nodes, 
-				integer_t types, integer_t edges_per_step, 
+int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes, 
+				igraph_integer_t types, igraph_integer_t edges_per_step, 
 				igraph_vector_t *type_dist,
 				igraph_matrix_t *pref_matrix,
-				bool_t directed) {
+				igraph_bool_t directed) {
   long int i, j;
   igraph_vector_t edges;
   igraph_vector_t cumdist;
-  real_t maxcum;
+  igraph_real_t maxcum;
 
   /* TODO: parameter checks */
 
@@ -679,7 +679,7 @@ int igraph_callaway_traits_game (igraph_t *graph, integer_t nodes,
     for (j=0; j<edges_per_step; j++) {
       long int node1=RNG_INTEGER(0, i);
       long int node2=RNG_INTEGER(0, i);
-      real_t uni1=RNG_UNIF(0, maxcum), uni2=RNG_UNIF(0, maxcum);
+      igraph_real_t uni1=RNG_UNIF(0, maxcum), uni2=RNG_UNIF(0, maxcum);
       long int type1, type2;
       igraph_vector_binsearch(&cumdist, uni1, &type1);
       igraph_vector_binsearch(&cumdist, uni2, &type2);
@@ -727,17 +727,17 @@ int igraph_callaway_traits_game (igraph_t *graph, integer_t nodes,
  * and k is the \p k parameter.
  */
 
-int igraph_establishment_game(igraph_t *graph, integer_t nodes,
-			      integer_t types, integer_t k,
+int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
+			      igraph_integer_t types, igraph_integer_t k,
 			      igraph_vector_t *type_dist,
 			      igraph_matrix_t *pref_matrix,
-			      bool_t directed) {
+			      igraph_bool_t directed) {
   
   long int i, j;
   igraph_vector_t edges;
   igraph_vector_t cumdist;
   igraph_vector_t potneis;
-  real_t maxcum;
+  igraph_real_t maxcum;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
@@ -755,7 +755,7 @@ int igraph_establishment_game(igraph_t *graph, integer_t nodes,
     igraph_random_sample(&potneis, 0, i-1, k);
     for (j=0; j<k; j++) {
       long int type1, type2;
-      real_t uni1=RNG_UNIF(0, maxcum), uni2=RNG_UNIF(0, maxcum);
+      igraph_real_t uni1=RNG_UNIF(0, maxcum), uni2=RNG_UNIF(0, maxcum);
       igraph_vector_binsearch(&cumdist, uni1, &type1);
       igraph_vector_binsearch(&cumdist, uni2, &type2);
       if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {

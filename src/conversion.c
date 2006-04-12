@@ -58,7 +58,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
   
   igraph_es_t edgeit;
   long int no_of_nodes=igraph_vcount(graph);
-  bool_t directed=igraph_is_directed(graph);
+  igraph_bool_t directed=igraph_is_directed(graph);
   int retval=0;
   long int from, to;
   
@@ -133,7 +133,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
  * number of edges in the graph.
  */
 
-int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, bool_t bycol) {
+int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol) {
 
   igraph_es_t edgeit;
   long int no_of_edges=igraph_ecount(graph);

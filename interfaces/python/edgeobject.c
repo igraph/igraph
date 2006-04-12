@@ -179,7 +179,7 @@ PyObject* igraphmodule_Edge_get_attribute(igraphmodule_EdgeObject* self,
   }
   
   if (t==IGRAPH_ATTRIBUTE_NUM)
-    return PyFloat_FromDouble((double)(*(real_t*)value));
+    return PyFloat_FromDouble((double)(*(igraph_real_t*)value));
   if (t==IGRAPH_ATTRIBUTE_STR)
     return PyString_FromString((char*)value);
   return igraphmodule_handle_igraph_error();
@@ -196,7 +196,7 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
   igraph_attribute_type_t t=-1, t2=-1;
   void* value=NULL;
   char* key;
-  real_t value0;
+  igraph_real_t value0;
   igraphmodule_GraphObject *o;
   int result;
   
@@ -233,11 +233,11 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
   } else {
     t=IGRAPH_ATTRIBUTE_NUM;
     if (PyInt_Check(v))
-      value0=(real_t)(PyInt_AsLong(v));
+      value0=(igraph_real_t)(PyInt_AsLong(v));
     else if (PyLong_Check(v))
-      value0=(real_t)(PyLong_AsLong(v));
+      value0=(igraph_real_t)(PyLong_AsLong(v));
     else if (PyFloat_Check(v))
-      value0=(real_t)(PyFloat_AsDouble(v));
+      value0=(igraph_real_t)(PyFloat_AsDouble(v));
     if (PyErr_Occurred()) return -1;
     value=(void*)&value0;
   }
@@ -267,7 +267,7 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
  */
 PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closure) {
   PyObject *o;
-  integer_t from, to;
+  igraph_integer_t from, to;
   
   o=igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
@@ -284,7 +284,7 @@ PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closur
  */
 PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure) {
   PyObject *o;
-  integer_t from, to;
+  igraph_integer_t from, to;
   
   o=igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;

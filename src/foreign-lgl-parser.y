@@ -56,7 +56,7 @@ int igraph_lgl_yyerror(char *s);
 extern igraph_vector_t *igraph_lgl_vector;
 extern igraph_vector_t *igraph_lgl_weights;
 extern igraph_trie_t *igraph_lgl_trie;
-real_t igraph_lgl_get_number(const char *str, long int len);
+igraph_real_t igraph_lgl_get_number(const char *str, long int len);
 long int igraph_lgl_actvertex;
 %}
 
@@ -116,8 +116,8 @@ int igraph_lgl_yyerror (char *s)
   IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
 }
 
-real_t igraph_lgl_get_number(const char *str, long int length) {
-  real_t num;
+igraph_real_t igraph_lgl_get_number(const char *str, long int length) {
+  igraph_real_t num;
   char *tmp=Calloc(length+1, char);
   
   strncpy(tmp, str, length);

@@ -114,7 +114,7 @@ static int igraphmodule_igraph_interrupt_hook(void* data) {
   return IGRAPH_SUCCESS;
 }
 
-int igraphmodule_igraph_progress_hook(const char* message, real_t percent,
+int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent,
 				       void* data) {
   if (igraphmodule_progress_handler) {
     PyObject *result;
@@ -197,8 +197,8 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
       igraph_matrix_destroy(&mtrx);
       return NULL;
     }
-    MATRIX(mtrx, i, 0)=(real_t)PyFloat_AsDouble(o1);
-    MATRIX(mtrx, i, 1)=(real_t)PyFloat_AsDouble(o2);
+    MATRIX(mtrx, i, 0)=(igraph_real_t)PyFloat_AsDouble(o1);
+    MATRIX(mtrx, i, 1)=(igraph_real_t)PyFloat_AsDouble(o2);
     Py_DECREF(o1);
     Py_DECREF(o2);
   }

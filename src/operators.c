@@ -32,8 +32,8 @@ int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right) {
   long int no_of_edges_left=igraph_ecount(left);
   long int no_of_edges_right=igraph_ecount(right);
   igraph_vector_t edges;
-  bool_t directed_left=igraph_is_directed(left);
-  integer_t from, to;
+  igraph_bool_t directed_left=igraph_is_directed(left);
+  igraph_integer_t from, to;
   long int i;
   
   if (directed_left != igraph_is_directed(right)) {
@@ -64,13 +64,13 @@ int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right) {
 
 int igraph_disjoint_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
-  bool_t directed=1;
+  igraph_bool_t directed=1;
   igraph_vector_t edges;
   long int no_of_edges=0;
   long int shift=0;
   igraph_t *graph;
   long int i, j;
-  integer_t from, to;
+  igraph_integer_t from, to;
   
   if (no_of_graphs != 0) {
     graph=VECTOR(*graphs)[0];
@@ -112,11 +112,11 @@ int igraph_intersection(igraph_t *res, igraph_t *left, igraph_t *right) {
   long int no_of_nodes_right=igraph_vcount(right);
   long int no_of_nodes;
   long int smaller_nodes;
-  bool_t directed=igraph_is_directed(left);
+  igraph_bool_t directed=igraph_is_directed(left);
   igraph_vector_t edges;
   igraph_vector_t nei1, nei2;
   long int i,j1,j2,n1,n2;
-  integer_t v1, v2;
+  igraph_integer_t v1, v2;
 
   if (directed != igraph_is_directed(right)) {
     IGRAPH_ERROR("Cannot intersect directed and undirected graph",
@@ -183,7 +183,7 @@ int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
   long int no_of_nodes=0;
   long int smallest_nodes=0;
-  bool_t directed=1;
+  igraph_bool_t directed=1;
   igraph_vector_t edges;
   igraph_vector_ptr_t neivects;
   igraph_vector_t neiptr;
@@ -229,7 +229,7 @@ int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
 
   /* Main part */
   for (i=0; i<smallest_nodes; i++) {
-    bool_t l;
+    igraph_bool_t l;
     
     /* get neighbors */
     for (j=0; j<no_of_graphs; j++) {
@@ -253,7 +253,7 @@ int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
       
       /* get largest head element and decide whether all head elements
 	 are the same */
-      bool_t k=1;
+      igraph_bool_t k=1;
       long int head=VECTOR(*(igraph_vector_t*)VECTOR(neivects)[0])
 	[(long int)VECTOR(neiptr)[0]];
       long int maxhead=head;
@@ -314,7 +314,7 @@ int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right) {
   long int no_of_nodes_left=igraph_vcount(left);
   long int no_of_nodes_right=igraph_vcount(right);
   long int no_of_nodes;
-  bool_t directed=igraph_is_directed(left);
+  igraph_bool_t directed=igraph_is_directed(left);
   igraph_vector_t edges;
   igraph_vector_t nei1, nei2;
   long int i;
@@ -391,7 +391,7 @@ int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
   long int no_of_nodes=0;
-  bool_t directed=1;
+  igraph_bool_t directed=1;
   igraph_vector_t edges;
   igraph_vector_ptr_t neivects;
   long int i, j;
@@ -433,7 +433,7 @@ int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   
   /* Main part */
   for (i=0; i<no_of_nodes; i++) {
-    bool_t l;
+    igraph_bool_t l;
     long int bigtail;
     
     /* get neighbors */
@@ -508,11 +508,11 @@ int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub) {
   long int no_of_nodes_sub =igraph_vcount(sub);
   long int no_of_nodes=no_of_nodes_orig;
   long int smaller_nodes;
-  bool_t directed=igraph_is_directed(orig);
+  igraph_bool_t directed=igraph_is_directed(orig);
   igraph_vector_t edges;
   igraph_vector_t nei1, nei2;
   long int i;
-  integer_t v1, v2;
+  igraph_integer_t v1, v2;
 
   if (directed != igraph_is_directed(sub)) {
     IGRAPH_ERROR("Cannot subtract directed and undirected graphs",
@@ -581,7 +581,7 @@ int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub) {
   return 0;
 }
 
-int igraph_complementer(igraph_t *res, igraph_t *graph, bool_t loops) {
+int igraph_complementer(igraph_t *res, igraph_t *graph, igraph_bool_t loops) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t edges;
@@ -637,7 +637,7 @@ int igraph_compose(igraph_t *res, igraph_t *g1, igraph_t *g2) {
   long int no_of_nodes_left=igraph_vcount(g1);
   long int no_of_nodes_right=igraph_vcount(g2);
   long int no_of_nodes;
-  bool_t directed=igraph_is_directed(g1);
+  igraph_bool_t directed=igraph_is_directed(g1);
   igraph_vector_t edges;
   igraph_vector_t neis1, neis2;
   long int i;

@@ -35,12 +35,12 @@ int main() {
   
   igraph_t g;
   const igraph_vector_t v=IGRAPH_VECTOR_NULL;
-  real_t edges1[] = { 0,1, 1,2, 2,2, 2,3, 2,4, 3,4 };
+  igraph_real_t edges1[] = { 0,1, 1,2, 2,2, 2,3, 2,4, 3,4 };
   igraph_vector_t from, to;  
   igraph_es_t it;
   long int i;
 
-  igraph_vector_view(&v, edges1, sizeof(edges1)/sizeof(real_t));
+  igraph_vector_view(&v, edges1, sizeof(edges1)/sizeof(igraph_real_t));
 
   /******************************************/
   /* Directed graph                         */

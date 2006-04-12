@@ -28,7 +28,7 @@
 
 /* internal function */
 
-inline int igraph_2dgrid_which(igraph_2dgrid_t *grid, real_t xc, real_t yc,
+inline int igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
 			long int *x, long int *y) {
 
   if (xc <= grid->minx) { 
@@ -51,8 +51,8 @@ inline int igraph_2dgrid_which(igraph_2dgrid_t *grid, real_t xc, real_t yc,
 }
 
 int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords, 
-		       real_t minx, real_t maxx, real_t deltax,
-		       real_t miny, real_t maxy, real_t deltay) {
+		       igraph_real_t minx, igraph_real_t maxx, igraph_real_t deltax,
+		       igraph_real_t miny, igraph_real_t maxy, igraph_real_t deltay) {
   long int i;
   
   grid->coords=coords;
@@ -91,7 +91,7 @@ void igraph_2dgrid_destroy(igraph_2dgrid_t *grid) {
 }
 
 void igraph_2dgrid_add(igraph_2dgrid_t *grid, long int elem,
-		       real_t xc, real_t yc) {
+		       igraph_real_t xc, igraph_real_t yc) {
   long int x, y;
   long int first;
 
@@ -116,7 +116,7 @@ void igraph_2dgrid_add(igraph_2dgrid_t *grid, long int elem,
 void igraph_2dgrid_add2(igraph_2dgrid_t *grid, long int elem) {
   long int x, y;
   long int first;
-  real_t xc, yc;
+  igraph_real_t xc, yc;
 
   xc=MATRIX(*grid->coords, elem, 0);
   yc=MATRIX(*grid->coords, elem, 1);
@@ -137,11 +137,11 @@ void igraph_2dgrid_add2(igraph_2dgrid_t *grid, long int elem) {
 }
 
 void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem, 
-			real_t xc, real_t yc) {
+			igraph_real_t xc, igraph_real_t yc) {
   long int oldx, oldy;
   long int newx, newy;
-  real_t oldxc=MATRIX(*grid->coords, elem, 0);
-  real_t oldyc=MATRIX(*grid->coords, elem, 1);
+  igraph_real_t oldxc=MATRIX(*grid->coords, elem, 0);
+  igraph_real_t oldyc=MATRIX(*grid->coords, elem, 1);
   long int first;
 
   xc=oldxc+xc; yc=oldyc+yc;
@@ -180,36 +180,36 @@ void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem,
 }
 
 void igraph_2dgrid_getcenter(const igraph_2dgrid_t *grid, 
-			     real_t *massx, real_t *massy) {
+			     igraph_real_t *massx, igraph_real_t *massy) {
   *massx = (grid->massx)/(grid->vertices);
   *massy = (grid->massy)/(grid->vertices);
 }
 
-bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, long int elem) {
+igraph_bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, long int elem) {
   return VECTOR(grid->next)[elem] != -1;
 }
 
-inline real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid, 
+inline igraph_real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid, 
 			  long int e1, long int e2) {
-  real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
-  real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
+  igraph_real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
+  igraph_real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
   
   return sqrt(x*x + y*y);
 }
 
-inline real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid, 
+inline igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid, 
 			  long int e1, long int e2) {
-  real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
-  real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
+  igraph_real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
+  igraph_real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
   
   return x*x + y*y;
 }
 
 int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
-				integer_t vid, real_t r, 
+				igraph_integer_t vid, igraph_real_t r, 
 				long int x, long int y) {
   long int act;
-  real_t *v=VECTOR(grid->next);
+  igraph_real_t *v=VECTOR(grid->next);
 
   r=r*r;
   act=MATRIX(grid->startidx, x, y);
@@ -223,9 +223,9 @@ int igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
 }
 
 int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids, 
-			    integer_t vid, real_t r) {
-  real_t xc=MATRIX(*grid->coords, (long int)vid, 0);
-  real_t yc=MATRIX(*grid->coords, (long int)vid, 1);
+			    igraph_integer_t vid, igraph_real_t r) {
+  igraph_real_t xc=MATRIX(*grid->coords, (long int)vid, 0);
+  igraph_real_t yc=MATRIX(*grid->coords, (long int)vid, 1);
   long int x, y;
   igraph_vector_clear(eids);
   
@@ -282,7 +282,7 @@ void igraph_2dgrid_reset(igraph_2dgrid_t *grid, igraph_2dgrid_iterator_t *it) {
   }
 }
 
-integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid, 
+igraph_integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid, 
 			      igraph_2dgrid_iterator_t *it) {
   long int ret=it->vid;
 
@@ -329,7 +329,7 @@ integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
   return ret;
 }
 
-inline integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
+inline igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
 				 igraph_2dgrid_iterator_t *it) {
   long int ret=it->nei;
 
@@ -347,7 +347,7 @@ inline integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
 /*-----------------------------------------------------------------------*/
 
 inline int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
-					   real_t xc, real_t yc,
+					   igraph_real_t xc, igraph_real_t yc,
 					   long int *x, long int *y) {
   if (xc <= grid->minx) { 
     *x=0; 
@@ -369,8 +369,8 @@ inline int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
 }  
 
 int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
-				   real_t minx, real_t maxx, long int stepsx,
-				   real_t miny, real_t maxy, long int stepsy) {
+				   igraph_real_t minx, igraph_real_t maxx, long int stepsx,
+				   igraph_real_t miny, igraph_real_t maxy, long int stepsy) {
   grid->minx=minx;
   grid->maxx=maxx;
   grid->stepsx=stepsx;
@@ -395,7 +395,7 @@ void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
 
 int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
-				       real_t x, real_t y, real_t r, 
+				       igraph_real_t x, igraph_real_t y, igraph_real_t r, 
 				       long int id) {
   long int cx, cy;
   long int i, j;
@@ -450,7 +450,7 @@ int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
 }
 
 long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
-				       real_t x, real_t y) {
+				       igraph_real_t x, igraph_real_t y) {
   long int cx, cy;
   long int res;
 
@@ -468,7 +468,7 @@ long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
 
 long int igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *grid,
-					      real_t x, real_t y, real_t r) {
+					      igraph_real_t x, igraph_real_t y, igraph_real_t r) {
   long int cx, cy;
   long int i,j;
   long int ret;

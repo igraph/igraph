@@ -57,11 +57,11 @@ int igraph_pajek_yyerror(char *s);
 #include <math.h>
 extern igraph_vector_t *igraph_pajek_vector;
 extern igraph_stack_t *igraph_pajek_coords;
-extern bool_t igraph_pajek_directed;
+extern igraph_bool_t igraph_pajek_directed;
 extern long int igraph_pajek_vcount;
 extern int igraph_pajek_mode;
 extern long int igraph_pajek_actfrom, igraph_pajek_actto;
-real_t igraph_pajek_get_number(const char *str, long int len);
+igraph_real_t igraph_pajek_get_number(const char *str, long int len);
 %}
 
 %output="y.tab.c"
@@ -342,8 +342,8 @@ int igraph_pajek_yyerror(char *s)
   IGRAPH_ERROR("Cannot read pajek file", IGRAPH_PARSEERROR);
 }
 
-real_t igraph_pajek_get_number(const char *str, long int length) {
-  real_t num;
+igraph_real_t igraph_pajek_get_number(const char *str, long int length) {
+  igraph_real_t num;
   char *tmp=Calloc(length+1, char);
   
   strncpy(tmp, str, length);

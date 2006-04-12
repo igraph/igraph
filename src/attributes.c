@@ -35,7 +35,7 @@ long int igraph_i_attribute_list_get_pos(const igraph_attribute_list_t *al,
 					 const char *name) {
   long int pos=-1;
   long int n=igraph_strvector_size(&al->names);
-  bool_t l=0;
+  igraph_bool_t l=0;
   char *str;
   
   while(!l && pos < n-1) {
@@ -213,7 +213,7 @@ int igraph_attribute_list_set(igraph_attribute_list_t *al, const char *name,
   atype=VECTOR(al->types)[pos];
   if (atype==IGRAPH_ATTRIBUTE_NUM) {
     igraph_vector_t *data=VECTOR(al->data)[pos];
-    igraph_vector_set(data, idx, *(real_t*)(value));
+    igraph_vector_set(data, idx, *(igraph_real_t*)(value));
   } else if (atype==IGRAPH_ATTRIBUTE_STR) {
     igraph_strvector_t *data=VECTOR(al->data)[pos];
     IGRAPH_CHECK(igraph_strvector_set(data, idx, (char*)value));
@@ -360,7 +360,7 @@ long int igraph_attribute_list_size(const igraph_attribute_list_t *al) {
 int igraph_attribute_list_add_elem(igraph_attribute_list_t *al, long int ne) {
   long int i;
   int ret;
-  bool_t error=0;
+  igraph_bool_t error=0;
   igraph_error_handler_t *oldhandler;
   
   oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
@@ -428,7 +428,7 @@ int igraph_attribute_list_copy(igraph_attribute_list_t *to,
 			       const igraph_attribute_list_t *from) {
   long int i;
   igraph_error_handler_t *oldhandler;
-  bool_t error=0;
+  igraph_bool_t error=0;
 
   to->len=from->len;
   IGRAPH_CHECK(igraph_strvector_copy(&to->names, &from->names));
@@ -561,7 +561,7 @@ void igraph_attribute_list_remove_elem_neg(igraph_attribute_list_t *al,
  * \brief Checks whether the list contains the named attribute
  */
 
-bool_t igraph_attribute_list_has(const igraph_attribute_list_t *al, 
+igraph_bool_t igraph_attribute_list_has(const igraph_attribute_list_t *al, 
 				 const char *name) {
   long int pos=igraph_i_attribute_list_get_pos(al, name);
   return (pos != -1);
@@ -663,7 +663,7 @@ int igraph_remove_graph_attribute(igraph_t *graph, const char *name) {
  * \param graph A graph object.
  * \param name The name of the attribute to query.
  * \param value Pointer to a typeless pointer. The address of the
- *        result will be stored here, a \type real_t pointer
+ *        result will be stored here, a \type igraph_real_t pointer
  *        for numeric attributes or a \type const char pointer
  *        to string attributes.
  * \param type Pointer to the attribute type, it will be stored here
@@ -688,7 +688,7 @@ int igraph_get_graph_attribute(const igraph_t *graph, const char *name,
  * \param graph A graph object.
  * \param name The name of the attribute to set.
  * \param value Pointer to the new value of the attribute, either a
- *        \type real_t or a \type const char pointer.
+ *        \type igraph_real_t or a \type const char pointer.
  * \return Error code:
  *         \c IGRAPH_EINVAL: the attribute does not exist.
  *
@@ -782,7 +782,7 @@ int igraph_remove_vertex_attribute(igraph_t *graph, const char *name) {
  * \param name The name of the vertex attribute.
  * \param v The id of the vertex of which the attribute is requested.
  * \param value Pointer to a typeless pointer. The address of the
- *        result will be stored here, a \type real_t pointer
+ *        result will be stored here, a \type igraph_real_t pointer
  *        for numeric attributes or a \type const char pointer
  *        to string attributes.
  * \param type If not \c NULL the type of the attribute will
@@ -982,7 +982,7 @@ int igraph_remove_edge_attribute(igraph_t *graph, const char *name) {
  * \param name The name of the edge attribute.
  * \param e The id of the edge of which the attribute is requested.
  * \param value Pointer to a typeless pointer. The address of the
- *        result will be placed here, a \type real_t pointer
+ *        result will be placed here, a \type igraph_real_t pointer
  *        for numeric attributes and a \type const char pointer
  *        for string attributes. 
  * \param type If not \c NULL then the type of the attribute
@@ -1010,7 +1010,7 @@ int igraph_get_edge_attribute(const igraph_t *graph, const char *name,
  * \param name Name of the edge attribute.
  * \param e The id of the edge of which the attribute is set.
  * \param value The new value of the attribute. Pointer to a
- *        \type real_t or a \type const char.
+ *        \type igraph_real_t or a \type const char.
  * \return Error code:
  *        \c IGRAPH_EINVAL: the attribute does not exist.
  *
@@ -1200,7 +1200,7 @@ int igraph_get_edge_attribute_type(const igraph_t *graph, const char *name,
  * O(1) edge attributes.
  */
 
-bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name) {
+igraph_bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name) {
   return igraph_attribute_list_has(&graph->gal, name); 
 }
 
@@ -1218,7 +1218,7 @@ bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name) {
  * O(1) edge attributes.
  */
 
-bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name) {
+igraph_bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name) {
   return igraph_attribute_list_has(&graph->val, name); 
 }
 
@@ -1236,6 +1236,6 @@ bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name) {
  * O(1) edge attributes.
  */
 
-bool_t igraph_has_edge_attribute(const igraph_t *graph, const char *name) {
+igraph_bool_t igraph_has_edge_attribute(const igraph_t *graph, const char *name) {
   return igraph_attribute_list_has(&graph->eal, name); 
 }

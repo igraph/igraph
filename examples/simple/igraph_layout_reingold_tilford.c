@@ -29,7 +29,6 @@ int main() {
   igraph_t g;
   FILE *f;
   igraph_matrix_t coords;
-  real_t vc;
   long int i, n;
 
   f=fopen("igraph_layout_reingold_tilford.in", "r");

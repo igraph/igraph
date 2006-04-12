@@ -21,7 +21,7 @@
 
 */
 
-real_t igraph_i_atlas_edges[]={
+igraph_real_t igraph_i_atlas_edges[]={
 	0,0,
 	1,0,
 	2,0,

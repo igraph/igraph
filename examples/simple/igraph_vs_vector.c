@@ -35,12 +35,12 @@ int main() {
 
   igraph_t g, g2;
   const igraph_vector_t v=IGRAPH_VECTOR_NULL;
-  real_t edges[] = { 0,1, 1,2, 2,2, 2,3, 2,4, 3,4 };
+  igraph_real_t edges[] = { 0,1, 1,2, 2,2, 2,3, 2,4, 3,4 };
   igraph_vector_t v2, v3;
   long int i;
   igraph_vs_t vs;
 
-  igraph_vector_view(&v, edges, sizeof(edges)/sizeof(real_t));
+  igraph_vector_view(&v, edges, sizeof(edges)/sizeof(igraph_real_t));
   igraph_create(&g, &v, 0, IGRAPH_DIRECTED);
 
   /* Create iterator based on a vector (view) */

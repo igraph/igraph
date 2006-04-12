@@ -246,7 +246,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
       v->data=tmp;
     }
   } else if (newsize > v->len) {
-    bool_t error=0;
+    igraph_bool_t error=0;
     tmp=Realloc(v->data, newsize, char*);
     if (tmp==0) {
       IGRAPH_ERROR("cannot resize string vector", IGRAPH_ENOMEM);

@@ -45,11 +45,11 @@
  * d is the
  * out-degree of \p v1.
  */
-bool_t igraph_are_connected(const igraph_t *graph, 
-			    integer_t v1, integer_t v2) {
+igraph_bool_t igraph_are_connected(const igraph_t *graph, 
+			    igraph_integer_t v1, igraph_integer_t v2) {
 
   igraph_vs_t it;
-  bool_t res=0;
+  igraph_bool_t res=0;
   long int nov=igraph_vcount(graph);
 
   if (v1 < 0 || v2 < 0 || v1 > nov-1 || v2 > nov-1) {

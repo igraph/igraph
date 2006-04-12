@@ -36,7 +36,7 @@ int main() {
   
   igraph_vector_t v, v2;
   int i;
-  real_t *ptr;
+  igraph_real_t *ptr;
 
   /* simple init */
   igraph_vector_init(&v, 0);
@@ -140,14 +140,14 @@ int main() {
   fprintf(stdout, " %li\n", (long int)igraph_vector_max(&v));
 
   igraph_vector_destroy(&v);
-  ptr=(real_t*) malloc(10* sizeof(real_t));
+  ptr=(igraph_real_t*) malloc(10* sizeof(igraph_real_t));
   igraph_vector_init_copy(&v, ptr, 10);
   free(ptr);
   print_vector(&v, stdout);
   igraph_vector_destroy(&v);
   
   /* igraph_vector_copy_to */
-  ptr=(real_t*) malloc(10* sizeof(real_t));
+  ptr=(igraph_real_t*) malloc(10* sizeof(igraph_real_t));
   igraph_vector_init_seq(&v, 11, 20);
   igraph_vector_copy_to(&v, ptr);
   for (i=0; i<10; i++) {

@@ -45,7 +45,7 @@ int igraph_i_trie_init_node(igraph_trie_node_t *t) {
   return 0;
 }  
 
-void igraph_i_trie_destroy_node(igraph_trie_node_t *t, bool_t sfree);
+void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree);
 
 /**
  * \ingroup igraphtrie
@@ -54,7 +54,7 @@ void igraph_i_trie_destroy_node(igraph_trie_node_t *t, bool_t sfree);
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
-int igraph_trie_init(igraph_trie_t *t, bool_t storekeys) {
+int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
   t->maxvalue=-1;
   t->storekeys=storekeys;
   IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *)t ));
@@ -72,7 +72,7 @@ int igraph_trie_init(igraph_trie_t *t, bool_t storekeys) {
  * \brief Destroys a node of a trie (not to be called directly).
  */
 
-void igraph_i_trie_destroy_node(igraph_trie_node_t *t, bool_t sfree) {
+void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree) {
   long int i;
   igraph_strvector_destroy(&t->strs);
   for (i=0; i<igraph_vector_ptr_size(&t->children); i++) {
@@ -122,7 +122,7 @@ long int igraph_i_strdiff(const char *str, const char *key) {
  */
 
 int igraph_trie_get_node(igraph_trie_node_t *t, const char *key, 
-			 real_t newvalue, long int *id) {
+			 igraph_real_t newvalue, long int *id) {
   char *str;
   long int i;
 

@@ -61,6 +61,6 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
   Free(al->adjs);
 }
 
-/* igraph_vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, integer_t no) { */
+/* igraph_vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, igraph_integer_t no) { */
 /*   return &al->adjs[(long int)no]; */
 /* } */

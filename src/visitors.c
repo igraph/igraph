@@ -33,7 +33,7 @@
  * TODO
  */
 
-int igraph_bfs(igraph_t *graph, integer_t vid, igraph_neimode_t mode,
+int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 	       igraph_vector_t *vids, igraph_vector_t *layers,
 	       igraph_vector_t *parents) {   
 

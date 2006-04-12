@@ -61,9 +61,9 @@
  * |E| the number of edges in the
  * graph. 
  */
-int igraph_create(igraph_t *graph, const igraph_vector_t *edges, integer_t n, 
-		  bool_t directed) {
-  real_t max=igraph_vector_max(edges)+1;
+int igraph_create(igraph_t *graph, const igraph_vector_t *edges, igraph_integer_t n, 
+		  igraph_bool_t directed) {
+  igraph_real_t max=igraph_vector_max(edges)+1;
 
   if (igraph_vector_size(edges) % 2 != 0) {
     IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
@@ -75,7 +75,7 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges, integer_t n,
   IGRAPH_CHECK(igraph_empty(graph, n, directed));
   IGRAPH_FINALLY(igraph_destroy, graph);
   if (igraph_vector_size(edges)>0) {
-    integer_t vc=igraph_vcount(graph);
+    igraph_integer_t vc=igraph_vcount(graph);
     if (vc < max) {
       IGRAPH_CHECK(igraph_add_vertices(graph, max-vc));
     }
@@ -320,8 +320,8 @@ int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
  * for creating other regular structures.
  */
 
-int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode, 
-		integer_t center) {
+int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode, 
+		igraph_integer_t center) {
 
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   long int i;
@@ -367,8 +367,8 @@ int igraph_star(igraph_t *graph, integer_t n, igraph_star_mode_t mode,
   return 0;
 }
 
-int igraph_connect_neighborhood(igraph_t *graph, integer_t nei, 
-				bool_t mutual) {
+int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t nei, 
+				igraph_bool_t mutual) {
   /* TODO */
 /* SEXP REST_connect_neighborhood(SEXP neis, SEXP pradius, SEXP pmutual) { */
 
@@ -463,8 +463,8 @@ int igraph_connect_neighborhood(igraph_t *graph, integer_t nei,
  * |E| are the number of vertices 
  * and edges in the generated graph.
  */
-int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, integer_t nei, 
-		   bool_t directed, bool_t mutual, bool_t circular) {
+int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_integer_t nei, 
+		   igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t circular) {
 
   long int dims=igraph_vector_size(dimvector);
   long int no_of_nodes=igraph_vector_prod(dimvector);
@@ -574,8 +574,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, integer_t 
  * \sa \ref igraph_lattice() for generating more general lattices.
  */
 
-int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
-		bool_t circular) {
+int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t mutual,
+		igraph_bool_t circular) {
   
   igraph_vector_t v=IGRAPH_VECTOR_NULL;
 
@@ -626,7 +626,7 @@ int igraph_ring(igraph_t *graph, integer_t n, bool_t directed, bool_t mutual,
  * structures. 
  */
 
-int igraph_tree(igraph_t *graph, integer_t n, integer_t children, 
+int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children, 
 		igraph_tree_mode_t type) {
   
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
@@ -697,7 +697,7 @@ int igraph_tree(igraph_t *graph, integer_t n, integer_t children,
  * for creating other regular structures.
  */
 
-int igraph_full(igraph_t *graph, integer_t n, bool_t directed, bool_t loops) {
+int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops) {
   
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   long int i, j;

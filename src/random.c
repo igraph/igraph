@@ -33,15 +33,15 @@
  * result vector.
  */
 
-int igraph_random_sample_alga(igraph_vector_t *res, integer_t l, integer_t h, 
-			      integer_t length) {
-  real_t N=h-l+1;
-  real_t n=length;
+int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
+			      igraph_integer_t length) {
+  igraph_real_t N=h-l+1;
+  igraph_real_t n=length;
   
-  real_t top=N-n;
-  real_t Nreal=N;
-  real_t S=0;
-  real_t V, quot;
+  igraph_real_t top=N-n;
+  igraph_real_t Nreal=N;
+  igraph_real_t S=0;
+  igraph_real_t V, quot;
 
   while (n>=2) {
     V=RNG_UNIF01();
@@ -88,21 +88,21 @@ int igraph_random_sample_alga(igraph_vector_t *res, integer_t l, integer_t h,
  * running time is O(length).
  */
 
-int igraph_random_sample(igraph_vector_t *res, integer_t l, integer_t h, 
-			 integer_t length) {
-  real_t N=h-l+1;
-  real_t n=length;
+int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h, 
+			 igraph_integer_t length) {
+  igraph_real_t N=h-l+1;
+  igraph_real_t n=length;
   int retval;
 
-  real_t nreal=length;
-  real_t ninv=1.0/nreal;
-  real_t Nreal=N;
-  real_t Vprime;
-  real_t qu1=-n+1+N;
-  real_t qu1real=-nreal+1.0+Nreal;
-  real_t negalphainv=-13;
-  real_t threshold=-negalphainv*n;
-  real_t S;
+  igraph_real_t nreal=length;
+  igraph_real_t ninv=1.0/nreal;
+  igraph_real_t Nreal=N;
+  igraph_real_t Vprime;
+  igraph_real_t qu1=-n+1+N;
+  igraph_real_t qu1real=-nreal+1.0+Nreal;
+  igraph_real_t negalphainv=-13;
+  igraph_real_t threshold=-negalphainv*n;
+  igraph_real_t S;
   
   igraph_vector_clear(res);
   IGRAPH_CHECK(igraph_vector_reserve(res, length));  
@@ -112,10 +112,10 @@ int igraph_random_sample(igraph_vector_t *res, integer_t l, integer_t h,
   Vprime=exp(log(RNG_UNIF01())*ninv);
 
   while (n>1 && threshold < N) {
-    real_t X, U;
-    real_t limit, t;
-    real_t negSreal, y1, y2, top, bottom;
-    real_t nmin1inv=1.0/(-1.0+nreal);
+    igraph_real_t X, U;
+    igraph_real_t limit, t;
+    igraph_real_t negSreal, y1, y2, top, bottom;
+    igraph_real_t nmin1inv=1.0/(-1.0+nreal);
     while (1) {
       while(1) {
 	X=Nreal*(-Vprime+1.0);

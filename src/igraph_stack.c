@@ -42,7 +42,7 @@ int igraph_stack_init       (igraph_stack_t* s, long int size) {
         long int alloc_size= size > 0 ? size : 1;
 	assert (s != NULL);
 	if (size < 0) { size=0; }
-	s->stor_begin=Calloc(alloc_size, real_t);
+	s->stor_begin=Calloc(alloc_size, igraph_real_t);
 	if (s->stor_begin==0) {
 	  IGRAPH_ERROR("stack init failed", IGRAPH_ENOMEM);
 	}
@@ -75,13 +75,13 @@ void igraph_stack_destroy    (igraph_stack_t* s) {
 
 int igraph_stack_reserve    (igraph_stack_t* s, long int size) {
   long int actual_size=igraph_stack_size(s);
-  real_t *tmp;
+  igraph_real_t *tmp;
   assert(s != NULL);
   assert(s->stor_begin != NULL);
   
   if (size <= igraph_stack_size(s)) { return 0; }
   
-  tmp=Realloc(s->stor_begin, size, real_t);
+  tmp=Realloc(s->stor_begin, size, igraph_real_t);
   if (tmp==0) {
     IGRAPH_ERROR("stack reserve failed", IGRAPH_ENOMEM);
   }
@@ -97,7 +97,7 @@ int igraph_stack_reserve    (igraph_stack_t* s, long int size) {
  * \brief Decides whether a stack object is empty.
  */
 
-bool_t igraph_stack_empty      (igraph_stack_t* s) {
+igraph_bool_t igraph_stack_empty      (igraph_stack_t* s) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	assert (s->end != NULL);
@@ -134,20 +134,20 @@ void igraph_stack_clear      (igraph_stack_t* s) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-int igraph_stack_push       (igraph_stack_t* s, real_t elem) {
+int igraph_stack_push       (igraph_stack_t* s, igraph_real_t elem) {
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
 	if (s->end == s->stor_end) {
 		/* full, allocate more storage */
 		
-	        real_t *bigger=NULL, *old=s->stor_begin;
+	        igraph_real_t *bigger=NULL, *old=s->stor_begin;
 		
-		bigger = Calloc(2*igraph_stack_size(s)+1, real_t);
+		bigger = Calloc(2*igraph_stack_size(s)+1, igraph_real_t);
 		if (bigger==0) {
 		  IGRAPH_ERROR("stack push failed", IGRAPH_ENOMEM);
 		}
 		memcpy(bigger, s->stor_begin, 
-		       igraph_stack_size(s)*sizeof(real_t));
+		       igraph_stack_size(s)*sizeof(igraph_real_t));
 
 		s->end        = bigger + (s->stor_end - s->stor_begin);
 		s->stor_end   = bigger + 2*(s->stor_end - s->stor_begin)+1;
@@ -169,7 +169,7 @@ int igraph_stack_push       (igraph_stack_t* s, real_t elem) {
  * \brief Removes and returns an element from the top of a stack.
  */
 
-real_t igraph_stack_pop        (igraph_stack_t* s) {
+igraph_real_t igraph_stack_pop        (igraph_stack_t* s) {
 
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);
@@ -186,7 +186,7 @@ real_t igraph_stack_pop        (igraph_stack_t* s) {
  * \brief Returns an element from the top of a stack.
  */
 
-real_t igraph_stack_top        (const igraph_stack_t* s) {
+igraph_real_t igraph_stack_top        (const igraph_stack_t* s) {
 
 	assert (s != NULL);
 	assert (s->stor_begin != NULL);

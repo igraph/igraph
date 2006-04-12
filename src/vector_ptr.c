@@ -135,7 +135,7 @@ int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size) {
  * \brief Decides whether the pointer vector is empty.
  */
 
-bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v) {
+igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);	
 	return v->stor_begin == v->end;

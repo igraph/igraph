@@ -625,7 +625,7 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
   long int e;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  integer_t from, to;
+  igraph_integer_t from, to;
   unsigned char idx, mul;
   unsigned int *arr_idx, *arr_code;
   int code=0;
@@ -662,7 +662,7 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
 }
 
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
-		      bool_t *iso) {
+		      igraph_bool_t *iso) {
   int class1, class2;
   IGRAPH_CHECK(igraph_isoclass(graph1, &class1));
   IGRAPH_CHECK(igraph_isoclass(graph2, &class2));
@@ -673,7 +673,7 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
 			     int *isoclass) {
   int nodes=igraph_vector_size(vids);
-  bool_t directed=igraph_is_directed(graph);
+  igraph_bool_t directed=igraph_is_directed(graph);
   igraph_vector_t neis;
   
   unsigned char mul, idx;
@@ -725,8 +725,8 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
   return 0;
 }
 
-int igraph_isoclass_create(igraph_t *graph, integer_t size,
-			   integer_t number, bool_t directed) {
+int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
+			   igraph_integer_t number, igraph_bool_t directed) {
   igraph_vector_t edges;
   unsigned int *classedges;
   long int power;
