@@ -80,7 +80,7 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
 
   /* init attributes */
   graph->attr=0;
-  IGRAPH_I_ATTRIBUTE_INIT(graph);
+  IGRAPH_CHECK(igraph_i_attribute_init(graph));
 
   /* add the vertices */
   IGRAPH_CHECK(igraph_add_vertices(graph, n));
@@ -289,6 +289,10 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv) {
     IGRAPH_ERROR("cannot add negative number of vertices", IGRAPH_EINVAL);
   }
 
+  if (graph->attr) {
+    IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv));
+  }
+
   IGRAPH_CHECK(igraph_vector_reserve(&graph->os, graph->n+nv+1));
   IGRAPH_CHECK(igraph_vector_reserve(&graph->is, graph->n+nv+1));
   
@@ -299,7 +303,7 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv) {
     VECTOR(graph->is)[i]=ec;
   }
   
-  graph->n += nv;
+  graph->n += nv;   
   
   return 0;
 }
@@ -453,25 +457,7 @@ int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges) {
 
   /* attributes */
   if (graph->attr) {
-    /* create index vector */
-    igraph_vector_t idxv;
-    ret1=igraph_vector_init(&idxv, really_delete);
-    if (ret1 == 0) {
-      long int i, j=0;
-      for (i=0; i<igraph_vector_size(&graph->from); i++) {
-	VECTOR(idxv)[j++]=i;
-      }
-      igraph_i_attribute_delete_edges(graph, &idxv);
-      igraph_vector_destroy(&idxv);
-    } else { 
-      igraph_vector_destroy(&newfrom);
-      igraph_vector_destroy(&newto);
-      igraph_vector_destroy(&graph->from);
-      graph->from=backup;
-      igraph_vector_destroy(&newoi);
-      igraph_set_error_handler(oldhandler);
-      IGRAPH_ERROR("cannot delete edges", ret1);
-    }
+    igraph_i_attribute_delete_edges(graph, &graph->from);
   }
 
   igraph_set_error_handler(oldhandler);
@@ -585,6 +571,12 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices) {
   }
 
   result.n -= really_delete;
+
+  /* Attributes */
+  result.attr=graph->attr;
+  if (graph->attr) {
+    IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(&result, &result.oi, &result.os);
+  }
     
   /* update indices */
   IGRAPH_CHECK(igraph_vector_order(&result.from, &result.oi, result.n));
@@ -594,13 +586,6 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices) {
 				     &result.oi, result.n));
   IGRAPH_CHECK(igraph_i_create_start(&result.is, &result.to, 
 				     &result.ii, result.n));
-
-  /* Attributes */
-  result.attr=graph->attr;
-  if (graph->attr) {
-    graph->attr=0;		/* don't want to destroy attributes */
-    IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(&result, &index);
-  }
 
   igraph_destroy(graph);
   igraph_vs_destroy(&myvertices);

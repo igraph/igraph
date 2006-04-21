@@ -1,3 +1,10 @@
+2006-04-21  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/attributes.c (igraph_i_attribute_delete_vertices) : use two
+	index vectors, one for vertex, one for edge indexes
+	* src/type_indexededgelist.c (igraph_empty, igraph_add_vertices)
+	(igraph_delete_edges, igraph_delete_vertices)
+
 2006-04-20  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/attributes.c (igraph_i_attribute_init)

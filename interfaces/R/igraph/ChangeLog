@@ -1,3 +1,15 @@
+2006-04-21  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/attributes.R (get.graph.attribute)
+	(set.graph.attribute, get.vertex.attribute, set.vertex.attribute)
+	(get.edge.attribute, set.edge.attribute) : updated
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_init)
+	(R_igraph_attribute_destroy, R_igraph_attribute_copy)
+	(R_igraph_attribute_add_vertices, R_igraph_attribute_delete_vertices)
+	(R_igraph_attribute_add_edges, R_igraph_attribute_delete_edges) :
+	written properly (?)
+	(R_SEXP_to_igraph, R_SEXP_to_igraph_copy, R_igraph_to_SEXP) : updated
+
 2006-04-20  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/attributes.R (add.graph.attribute)

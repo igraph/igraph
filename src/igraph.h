@@ -711,7 +711,8 @@ typedef struct igraph_attribute_table_t {
   void (*destroy)(igraph_t *graph);
   int (*copy)(igraph_t *to, const igraph_t *from);
   int (*add_vertices)(igraph_t *graph, long int nv);
-  void (*delete_vertices)(igraph_t *graph, const igraph_vector_t *idx);
+  void (*delete_vertices)(igraph_t *graph, const igraph_vector_t *eidx,
+			  const igraph_vector_t *vidx);
   int (*add_edges)(igraph_t *graph, long int ne);
   void (*delete_edges)(igraph_t *graph, const igraph_vector_t *idx);
 } igraph_attribute_table_t;
@@ -721,19 +722,10 @@ extern igraph_attribute_table_t *igraph_i_attribute_table;
 igraph_attribute_table_t *
 igraph_i_set_attribute_table(igraph_attribute_table_t * table);
 
-#define IGRAPH_I_ATTRIBUTE_INIT(graph) \
-        do {igraph_i_attribute_init(graph);} while(0)
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
-#define IGRAPH_I_ATTRIBUTE_ADD_VERTICES(graph, n) \
-        do {if ((graph)->attr) igraph_i_attribute_add_vertices((graph),(n));} while(0)
-#define IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(graph, idx) \
-        do {if ((graph)->attr) igraph_i_attribute_delete_vertices((graph),(idx));} while(0)
-#define IGRAPH_I_ATTRIBUTE_ADD_EDGES(graph, n) \
-        do {if ((graph)->attr) igraph_i_attribute_add_edges((graph),(n));} while(0)
-#define IGRAPH_I_ATTRIBUTE_DELETE_EDGES(graph, idx) \
-        do {if ((graph)->attr) igraph_i_attribute_delete_edges((graph),(idx));} while(0)
-
+#define IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(graph, eidx, vidx) \
+        do {if ((graph)->attr) igraph_i_attribute_delete_vertices((graph),(eidx),(vidx));} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from) do { \
         int igraph_i_ret=0; \
         if (from->attr) { \
@@ -749,7 +741,8 @@ void igraph_i_attribute_destroy(igraph_t *graph);
 int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from);
 int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv);
 void igraph_i_attribute_delete_vertices(igraph_t *graph, 
-					const igraph_vector_t *idx);
+					const igraph_vector_t *eidx,
+					const igraph_vector_t *vidx);
 int igraph_i_attribute_add_edges(igraph_t *graph, long int ne);
 void igraph_i_attribute_delete_edges(igraph_t *graph, 
 				     const igraph_vector_t *idx);
