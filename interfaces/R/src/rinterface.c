@@ -144,16 +144,17 @@ void R_igraph_attribute_delete_vertices(igraph_t *graph,
   for (i=0; i<valno; i++) {
     SEXP oldva=VECTOR_ELT(val, i), newva;
     long int origlen=GET_LENGTH(oldva);
-    long int newlen=0, j, k=0;
+    long int newlen=0, j;
     for (j=0; j<igraph_vector_size(vidx); j++) {
-      if (VECTOR(*vidx)[j] >= 0) {
+      if (VECTOR(*vidx)[j] > 0) {
 	newlen++;
       }
     }    
     PROTECT(newva=NEW_LIST(newlen));
     for (j=0; j<origlen; j++) {
-      if (VECTOR(*vidx)[j]>=0) {
-	SET_VECTOR_ELT(newva, k++, VECTOR_ELT(oldva, j));
+      if (VECTOR(*vidx)[j]>0) {
+	SET_VECTOR_ELT(newva, (long int)VECTOR(*vidx)[j]-1, 
+		       VECTOR_ELT(oldva, j));
       }
     }
     SET_VECTOR_ELT(val, i, newva);
@@ -166,17 +167,18 @@ void R_igraph_attribute_delete_vertices(igraph_t *graph,
   for (i=0; i<ealno; i++) {
     SEXP oldea=VECTOR_ELT(eal, i), newea;
     long int origlen=GET_LENGTH(oldea);
-    long int newlen=0, j, k=0;
+    long int newlen=0, j;
     /* calculate new length */
     for (j=0; j<igraph_vector_size(eidx); j++) {
-      if (VECTOR(*eidx)[j] >= 0) {
+      if (VECTOR(*eidx)[j] > 0) {
 	newlen++;
       }
     }    
     PROTECT(newea=NEW_LIST(newlen));
     for (j=0; j<origlen; j++) {
-      if (VECTOR(*eidx)[j]>=0) {
-	SET_VECTOR_ELT(newea, k++, VECTOR_ELT(oldea, j));
+      if (VECTOR(*eidx)[j]>0) {
+	SET_VECTOR_ELT(newea, (long int)VECTOR(*eidx)[j]-1, 
+		       VECTOR_ELT(oldea, j));
       }
     }
     SET_VECTOR_ELT(eal, i, newea);
@@ -243,7 +245,7 @@ void R_igraph_attribute_delete_edges(igraph_t *graph,
   for (i=0; i<ealno; i++) {
     SEXP oldea=VECTOR_ELT(eal, i), newea;
     long int origlen=GET_LENGTH(oldea);
-    long int newlen=0, j, k=0;
+    long int newlen=0, j;
     /* calculate new length */
     for (j=0; j<igraph_vector_size(idx); j++) {
       if (VECTOR(*idx)[j] > 0) {
@@ -253,7 +255,8 @@ void R_igraph_attribute_delete_edges(igraph_t *graph,
     PROTECT(newea=NEW_LIST(newlen));
     for (j=0; j<origlen; j++) {
       if (VECTOR(*idx)[j]>0) {
-	SET_VECTOR_ELT(newea, k++, VECTOR_ELT(oldea, j));
+	SET_VECTOR_ELT(newea, (long int)VECTOR(*idx)[j]-1, 
+		       VECTOR_ELT(oldea, j));
       }
     }
     SET_VECTOR_ELT(eal, i, newea);

@@ -5,6 +5,10 @@
 	* src/type_indexededgelist.c (igraph_empty, igraph_add_vertices)
 	(igraph_delete_edges, igraph_delete_vertices)
 
+	* src/type_indexededgelist.c (igraph_delete_vertices)
+	(igraph_delete_edges) : igraph_i_attribute_delete_edges and 
+	igraph_i_attribute_delete_vertices semantics changed
+	
 2006-04-20  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/attributes.c (igraph_i_attribute_init)
