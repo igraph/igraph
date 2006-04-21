@@ -1,6 +1,7 @@
 
 Needed for 0.2:
 
+o add references to SNA, paper by Carter
 o for almost all functions: add progress handlers and allow
   them to be interrupted using IGRAPH_ALLOW_INTERRUPTION()
 o uniform graph operators (union, intersection, etc...)
@@ -15,6 +16,9 @@ o get non-structural info from Pajek files
 o write Pajek file
 o read and write non-structural info from/to GraphML files
 o better looking graphs in 3D in the R interface
+o rewite add_edges, add_vertices, delete_edges, delete_vertices,
+  they're a mess
+o edge seq argument to delete_edges
 
 Other bits:
 

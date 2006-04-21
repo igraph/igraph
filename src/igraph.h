@@ -92,9 +92,7 @@ typedef struct igraph_s {
   igraph_vector_t ii;
   igraph_vector_t os;
   igraph_vector_t is;
-  igraph_attribute_list_t gal;
-  igraph_attribute_list_t val;
-  igraph_attribute_list_t eal;
+  void *attr;
 } igraph_t;
 
 /* -------------------------------------------------- */
@@ -354,60 +352,6 @@ const igraph_es_t *IGRAPH_ES_VECTOR(const igraph_t *graph,
 const igraph_es_t *IGRAPH_ES(const igraph_t *graph, ...);
 const igraph_vector_t *igraph_es_vector_getvector(const igraph_t *graph, 
 					   const igraph_es_t *vs);
-
-/* -------------------------------------------------- */
-/* Attributes                                         */
-/* -------------------------------------------------- */
-
-int igraph_add_graph_attribute(igraph_t *graph, const char *name,
-			       igraph_attribute_type_t type);
-int igraph_remove_graph_attribute(igraph_t *graph, const char *name);
-int igraph_get_graph_attribute(const igraph_t *graph, const char *name, 
-			       void **value,
-			       igraph_attribute_type_t *type);
-int igraph_set_graph_attribute(igraph_t *graph, const char *name, 
-			       const void *value);
-int igraph_list_graph_attributes(const igraph_t *graph, igraph_strvector_t *l,
-				 igraph_vector_t *types);
-int igraph_get_graph_attribute_type(const igraph_t *graph, const char *name, 
-				    igraph_attribute_type_t *type);
-igraph_bool_t igraph_has_graph_attribute(const igraph_t *graph, const char *name);
-
-int igraph_add_vertex_attribute(igraph_t *graph, const char *name,
-				igraph_attribute_type_t type);
-int igraph_remove_vertex_attribute(igraph_t *graph, const char *name);
-int igraph_get_vertex_attribute(const igraph_t *graph, const char *name, 
-				long int v, void **value,
-				igraph_attribute_type_t *type);
-int igraph_set_vertex_attribute(igraph_t *graph, const char *name, 
-				long int v, const void *value);
-int igraph_get_vertex_attributes(const igraph_t *graph, const char *name, 
-				 const igraph_vs_t *v, void **value);
-int igraph_set_vertex_attributes(igraph_t *graph, const char *name, 
-				 const igraph_vs_t *v, const void *value);
-int igraph_list_vertex_attributes(const igraph_t *graph, igraph_strvector_t *l,
-				  igraph_vector_t *types);
-int igraph_get_vertex_attribute_type(const igraph_t *graph, const char *name, 
-				     igraph_attribute_type_t *type);
-igraph_bool_t igraph_has_vertex_attribute(const igraph_t *graph, const char *name);
-
-int igraph_add_edge_attribute(igraph_t *graph, const char *name, 
-			      igraph_attribute_type_t type);
-int igraph_remove_edge_attribute(igraph_t *graph, const char *name);
-int igraph_get_edge_attribute(const igraph_t *graph, const char *name, 
-			      long int e, void **value,
-			      igraph_attribute_type_t *type);
-int igraph_set_edge_attribute(igraph_t *graph, const char *name, 
-			      long int e, const void *value);
-int igraph_get_edge_attributes(const igraph_t *graph, const char *name, 
-			       const igraph_es_t *e, void **value);
-int igraph_set_edge_attributes(igraph_t *graph, const char *name, 
-			       const igraph_es_t *e, const void *value); 
-int igraph_list_edge_attributes(const igraph_t *graph, igraph_strvector_t *l,
-				igraph_vector_t *types);
-int igraph_get_edge_attribute_type(const igraph_t *graph, const char *name, 
-				   igraph_attribute_type_t *type);
-igraph_bool_t igraph_has_edge_attribute(const igraph_t *graph, const char *name);
 
 /* -------------------------------------------------- */
 /* Constructors, deterministic                        */
@@ -757,6 +701,58 @@ extern unsigned int igraph_i_isoclass_3_idx[];
 extern unsigned int igraph_i_isoclass_4_idx[];
 extern unsigned int igraph_i_isoclass_3u_idx[];
 extern unsigned int igraph_i_isoclass_4u_idx[];
+
+/* -------------------------------------------------- */
+/* Attributes, this is internal                       */
+/* -------------------------------------------------- */
+
+typedef struct igraph_attribute_table_t {
+  int (*init)(igraph_t *graph);
+  void (*destroy)(igraph_t *graph);
+  int (*copy)(igraph_t *to, const igraph_t *from);
+  int (*add_vertices)(igraph_t *graph, long int nv);
+  void (*delete_vertices)(igraph_t *graph, const igraph_vector_t *idx);
+  int (*add_edges)(igraph_t *graph, long int ne);
+  void (*delete_edges)(igraph_t *graph, const igraph_vector_t *idx);
+} igraph_attribute_table_t;
+
+extern igraph_attribute_table_t *igraph_i_attribute_table;
+
+igraph_attribute_table_t *
+igraph_i_set_attribute_table(igraph_attribute_table_t * table);
+
+#define IGRAPH_I_ATTRIBUTE_INIT(graph) \
+        do {igraph_i_attribute_init(graph);} while(0)
+#define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
+        do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
+#define IGRAPH_I_ATTRIBUTE_ADD_VERTICES(graph, n) \
+        do {if ((graph)->attr) igraph_i_attribute_add_vertices((graph),(n));} while(0)
+#define IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(graph, idx) \
+        do {if ((graph)->attr) igraph_i_attribute_delete_vertices((graph),(idx));} while(0)
+#define IGRAPH_I_ATTRIBUTE_ADD_EDGES(graph, n) \
+        do {if ((graph)->attr) igraph_i_attribute_add_edges((graph),(n));} while(0)
+#define IGRAPH_I_ATTRIBUTE_DELETE_EDGES(graph, idx) \
+        do {if ((graph)->attr) igraph_i_attribute_delete_edges((graph),(idx));} while(0)
+
+#define IGRAPH_I_ATTRIBUTE_COPY(to,from) do { \
+        int igraph_i_ret=0; \
+        if (from->attr) { \
+          IGRAPH_CHECK(igraph_i_ret=igraph_i_attribute_copy(to, from)); \
+        } \
+        if (igraph_i_ret != 0) { \
+          IGRAPH_ERROR("", igraph_i_ret); \
+        } \
+   } while(0)        
+
+int igraph_i_attribute_init(igraph_t *graph);
+void igraph_i_attribute_destroy(igraph_t *graph);
+int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from);
+int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv);
+void igraph_i_attribute_delete_vertices(igraph_t *graph, 
+					const igraph_vector_t *idx);
+int igraph_i_attribute_add_edges(igraph_t *graph, long int ne);
+void igraph_i_attribute_delete_edges(igraph_t *graph, 
+				     const igraph_vector_t *idx);
 
 __END_DECLS
   

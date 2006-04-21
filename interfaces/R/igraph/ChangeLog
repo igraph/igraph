@@ -1,3 +1,35 @@
+2006-04-20  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/attributes.R (add.graph.attribute)
+	(remove.graph.attribute, get.graph.attribute, set.graph.attribute)
+	(add.vertex.attribute, remove.vertex.attribute)
+	(get.vertex.attribute, set.vertex.attribute)
+	(add.edge.attribute, remove.edge.attribute)
+	(get.edge.attribute, set.edge.attribute) : rewritten
+	(g.a, v.a, e.a, g.a<-, v.a<-, e.a<-) : temporarily removed
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_init)
+	(R_igraph_attribute_destroy, R_igraph_attribute_copy)
+	(R_igraph_attribute_add_vertices, R_igraph_attribute_add_edges)
+	(R_igraph_attribute_delete_edges, R_igraph_attribute_table)
+	(R_igraph_attribute_oldtable) : added
+	(R_igraph_before, R_igraph_after) : updated
+	(R_igraph_attributes_to_SEXP, R_SEXP_to_attributes) 
+	(R_SEXP_to_attributes_copy) : removed
+	(R_igraph_to_SEXP, R_SEXP_to_igraph) : updated
+	(R_igraph_subgraph, R_igraph_write_graph_ncol)
+	(R_igraph_write_graph_lgl, R_igraph_decompose) : updated
+	(R_igraph_add_graph_attribute, R_igraph_remove_graph_attribute)
+	(R_igraph_get_graph_attribute, R_igraph_set_graph_attribute)
+	(R_igraph_add_vertex_attribute, R_igraph_remove_vertex_attribute)
+	(R_igraph_get_vertex_attribute, R_igraph_set_vertex_attribute)
+	(R_igraph_add_edge_attribute, R_igraph_remove_edge_attribute)
+	(R_igraph_get_edge_attribute, R_igraph_set_edge_attribute)
+	(R_igraph_list_graph_attributes, R_igraph_list_vertex_attributes)
+	(R_igraph_list_edge_attributes, R_igraph_list_edge_attributes)
+	(R_igraph_get_vertex_attributes, R_igraph_get_edge_attributes)
+	(R_igraph_set_vertex_attributes, R_igraph_set_edge_attributes) :
+	removed
+	
 2006-03-31  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/src/rinterface.c (USE_RINTERNALS) : define this,

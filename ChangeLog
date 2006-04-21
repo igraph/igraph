@@ -1,3 +1,23 @@
+2006-04-20  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/attributes.c (igraph_i_attribute_init)
+	(igraph_i_attribute_destroy, igraph_i_attribute_copy)
+	(igraph_i_attribute_add_vertices, igraph_i_attribute_delete_vertices)
+	(igraph_i_attribute_add_edges, igraph_i_attribute_delete_edges)
+	(igraph_i_attribute_table, igraph_i_set_attribute_table) : added,
+	all the original functions deleted
+	* src/type_indexededgelist.c (igraph_empty, igraph_destroy)
+	(igraph_copy, igraph_add_edges, igraph_add_vertices)
+	(igraph_delete_edges, igraph_delete_vertices) : updated for new
+	attribute handling
+	* src/foreign.c (igraph_read_graph_ncol, igraph_read_graph_lgl)
+	(igraph_write_graph_ncol, igraph_write_graph_lgl) : attribute 
+	support temporarily removed
+	* examples/simple/igraph_write_graph_lgl.c : removed
+	attribute-dependent error handling test
+	* examples/simple/igraph_decompose.c : removed attribute-dependent
+	test case
+	
 2006-04-12  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* almost everywhere : added igraph_ prefix to integer_t,

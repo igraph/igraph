@@ -6,12 +6,9 @@ export(graph.empty, add.edges, add.vertices, delete.edges,
 
 # Attributes
 
-export(add.graph.attribute, remove.graph.attribute,
-       get.graph.attribute, set.graph.attribute, g.a, "g.a<-",
-       add.vertex.attribute, remove.vertex.attribute,
-       get.vertex.attribute, set.vertex.attribute, v.a, "v.a<-",
-       add.edge.attribute, remove.edge.attribute,
-       get.edge.attribute, set.edge.attribute, e.a, "e.a<-")
+export(get.graph.attribute, set.graph.attribute, g, 
+       get.vertex.attribute, set.vertex.attribute, v,
+       get.edge.attribute, set.edge.attribute, e)
 
 # iterators
 
