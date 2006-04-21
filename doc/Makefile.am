@@ -57,8 +57,9 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c
 
-attributes.xml: attributes.xxml $(SRCDIR)/attributes.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c
+attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(SRCDIR)/attributes.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c \
+	$(SRCDIR)/attributes.h
 
 layout.xml: layout.xxml $(SRCDIR)/layout.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c

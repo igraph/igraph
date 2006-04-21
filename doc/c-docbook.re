@@ -262,6 +262,71 @@ WITH --------------------------------------------------------------------------
   <listitem><para>
   \g<paramtext></para></listitem></varlistentry>  
 
+REPLACE ----- \struct ---------------------------------------------------------
+
+(?P<before>\A.*?)                 # head of the comment
+\\struct\s+(?P<name>[\w_]+)       # \struct command
+(?P<after>.*?)                    # tail of the command
+\*\/\s*                           # closing the comment
+(?P<def>typedef \s*struct\s*\w+\s*\{
+ .*\}\s*\w+\s*;)
+.*\Z
+
+WITH --------------------------------------------------------------------------
+
+<section id="\g<name>"><title>\g<name></title>
+<indexterm><primary>\g<name></primary></indexterm>
+<para>
+<programlisting>
+\g<def>
+</programlisting>
+</para>
+<para>
+\g<before>\g<after>
+</para>
+</section>
+
+REPLACE ----- structure member descriptions, head -----------------------------
+
+(?P<before>\A.*?)               # head of the comment
+\\member\b                      # first \member commant
+
+WITH --------------------------------------------------------------------------
+
+\g<before></para>
+<formalpara><title>Values:</title><para>
+<variablelist role="params">
+\member
+
+REPLACE ----- structure member descriptions, tail -----------------------------
+
+\\member\b                        # the last \member command
+(?P<paramtext>.*?)                # the text of the \member command
+(?P<endmark>                      # this marks the end of the \member text
+ (\\return\b)|(\\sa\b)|           # it is either a \return or \sa or
+ (\n\s*?\n)|                      # (at least) one empty line or
+ (\*\/))                          # the end of the comment
+(?P<after>.*?\Z)                  # remaining part
+
+WITH
+
+\member\g<paramtext></variablelist></para></formalpara><para>
+\g<endmark>\g<after>
+
+REPLACE ----- structure member descriptions -----------------------------------
+
+\\member\b\s*                    # \enumval command
+(?P<paramname>(\w+)|(...))\s+     # name of the parameter
+(?P<paramtext>.*?)                # text of the \enumval command
+(?=(\\member)|(</variablelist>)|
+ (\n\s*\n))
+
+WITH --------------------------------------------------------------------------
+
+  <varlistentry><term><constant>\g<paramname></constant>:</term>
+  <listitem><para>
+  \g<paramtext></para></listitem></varlistentry>  
+
 REPLACE ----- \typedef function -----------------------------------------------
 
 (?P<before>.*?)                   # comment head

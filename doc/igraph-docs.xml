@@ -11,12 +11,26 @@
     <title><command>Igraph</command> Reference Manual</title>
     <authorgroup>
       <author><firstname>Gábor</firstname><surname>Csárdi</surname>
-      <affiliation><orgname>RIPNP of the HAS</orgname></affiliation>
+      <affiliation><orgname>Department of Biophysics, Research
+      Institute for Nuclear and Particle Physics of the Hungarian
+      Academy of Sciences</orgname>
+      <address>29-33 Konkoly-Thege Miklós road, Budapest H-1121, Hungary</address>
+      </affiliation>
+      <affiliation><orgname>Center for Complex Systems Studies,
+      Kalamazoo College</orgname>
+      <address>1200 Academy st, Kalamazoo, 49006, MI, USA</address></affiliation>
+      </author>
+      <author><firstname>Tamás</firstname><surname>Nepusz</surname>
+      <affiliation><orgname>Department of Biophysics, Research
+      Institute for Nuclear and Particle Physics of the Hungarian
+      Academy of Sciences</orgname>
+      <address>29-33 Konkoly-Thege Miklós road, Budapest H-1121, Hungary</address>
+      </affiliation>
       </author>
     </authorgroup>
 
     <legalnotice><para>
-      Copyright (C)  2005, 2006  Gábor Csárdi.
+      Copyright (C)  2005, 2006  Gábor Csárdi and Tamás Nepusz.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
