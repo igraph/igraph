@@ -1,3 +1,8 @@
+2006-04-23  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/type_indexededgelist.c (igraph_delete_vertices)
+	(igraph_delete_edges) : attribute handling interface corrected
+
 2006-04-21  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/attributes.c (igraph_i_attribute_delete_vertices) : use two

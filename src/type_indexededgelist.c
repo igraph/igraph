@@ -461,6 +461,8 @@ int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges) {
     for (i=0; i<igraph_vector_size(&graph->from); i++) {
       if (VECTOR(graph->from)[i] > 0) {
 	VECTOR(graph->from)[i]=j++;
+      } else {
+	VECTOR(graph->from)[i]=0;
       }
     }
     igraph_i_attribute_delete_edges(graph, &graph->from);
@@ -583,8 +585,10 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices) {
   if (graph->attr) {
     long int i, j=1;
     for (i=0; i<igraph_vector_size(&result.oi); i++) {
-      if (VECTOR(result.oi)[i] > 0) {
+      if (VECTOR(result.oi)[i] >= 0) {
 	VECTOR(result.oi)[i]=j++;
+      } else {
+	VECTOR(result.oi)[i]=0;
       }
     }
     IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(&result, &result.oi, &index);
