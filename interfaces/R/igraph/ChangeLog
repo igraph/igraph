@@ -1,3 +1,10 @@
+2006-04-23  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_add_vertices)
+	(R_igraph_attribute_add_edges, R_igraph_attribute_delete_vertices)
+	(R_igraph_attribute_delete_edges) : handle vectors in addition 
+	to lists
+
 2006-04-21  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/attributes.R (get.graph.attribute)
