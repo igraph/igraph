@@ -227,8 +227,8 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 /* 					     &VECTOR(ws)[i]));  */
 /*     } */
 /*   } */
-/*   igraph_vector_destroy(&ws); */
-/*   IGRAPH_FINALLY_CLEAN(1); */
+  igraph_vector_destroy(&ws); 
+  IGRAPH_FINALLY_CLEAN(1); 
   
 /*   if (names) { */
 /*     long int i; */
@@ -333,8 +333,8 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 /* 					     &VECTOR(ws)[i])); */
 /*     } */
 /*   } */
-/*   igraph_vector_destroy(&ws); */
-/*   IGRAPH_FINALLY_CLEAN(1); */
+  igraph_vector_destroy(&ws);
+  IGRAPH_FINALLY_CLEAN(1);
   
 /*   if (names) { */
 /*     long int i; */
@@ -448,7 +448,7 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
   igraph_vector_init(&state->edgelist, 0);
   igraph_vector_ptr_init(&state->key_list, 0);
   igraph_trie_init(&state->node_trie, 1);
-  igraph_trie_init(&state->key_trie, 1);
+  /*igraph_trie_init(&state->key_trie, 1);*/
 }
 
 void igraph_i_graphml_sax_handler_end_document(void *state0) {
@@ -471,7 +471,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
   }
   
   igraph_trie_destroy(&state->node_trie);
-  igraph_trie_destroy(&state->key_trie);
+  /*igraph_trie_destroy(&state->key_trie);*/
   igraph_vector_ptr_destroy_all(&state->key_list);
   igraph_vector_destroy(&state->edgelist);
 }
@@ -521,7 +521,7 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
       state->current_key->type=I_GRAPHML_UNKNOWN_TYPE;
       for (it=(xmlChar**)attrs; *it; it+=2) {
 	if (!strcmp(*it, "id")) {
-	  igraph_trie_get(&state->key_trie, (char*)*(it+1), &state->current_key->id);
+	  /*igraph_trie_get(&state->key_trie, (char*)*(it+1), &state->current_key->id);*/
 	} else if (!strcmp(*it, "attr.name")) {
 	  state->current_key->name=strdup(*(it+1));
 	} else if (!strcmp(*it, "attr.type")) {
