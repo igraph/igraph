@@ -80,6 +80,9 @@ int R_igraph_attribute_copy(igraph_t *to, const igraph_t *from) {
   SEXP fromattr=from->attr;
   to->attr=from->attr;
   REAL(VECTOR_ELT(fromattr, 0))[1] += 1; /* refcount only */
+  if (REAL(VECTOR_ELT(fromattr, 0))[1] == 1) {
+    PROTECT(to->attr);
+  }
   return 0;
 }
 

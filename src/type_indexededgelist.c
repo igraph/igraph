@@ -581,8 +581,7 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t *vertices) {
   result.n -= really_delete;
 
   /* Attributes */
-  result.attr=graph->attr;
-  if (graph->attr) {
+  if (result.attr) {
     long int i, j=1;
     for (i=0; i<igraph_vector_size(&result.oi); i++) {
       if (VECTOR(result.oi)[i] >= 0) {
