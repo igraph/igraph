@@ -57,3 +57,9 @@ AT_SETUP([Transitivity (igraph_transitivity): ])
 AT_KEYWORDS([igraph_transitivity transitivity igraph_transitivity_undirected])
 AT_COMPILE_CHECK([simple/igraph_transitivity.c])
 AT_CLEANUP
+
+AT_SETUP([Minimum spanning tree (igraph_minimum_spanning_tree_*): ])
+AT_KEYWORDS([igraph_minimum_spanning_tree_prim Prim minimum spanning tree])
+AT_COMPILE_CHECK([simple/igraph_minimum_spanning_tree.c],
+	         [simple/igraph_minimum_spanning_tree.out])
+AT_CLEANUP

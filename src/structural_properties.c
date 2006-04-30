@@ -384,91 +384,94 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * \sa \ref igraph_minimum_spanning_tree_unweighted() for unweighted graphs.
  */
 
-/* int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst, */
-/* 				      const igraph_vector_t *weights) { */
+int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
+				      const igraph_vector_t *weights) {
 
-/*   long int no_of_nodes=igraph_vcount(graph); */
-/*   char *already_added; */
+  long int no_of_nodes=igraph_vcount(graph);
+  char *already_added;
 
-/*   igraph_d_indheap_t heap=IGRAPH_D_INDHEAP_NULL; */
-/*   igraph_vector_t edges=IGRAPH_VECTOR_NULL; */
-/*   igraph_integer_t mode=3; */
+  igraph_d_indheap_t heap=IGRAPH_D_INDHEAP_NULL;
+  igraph_vector_t edges=IGRAPH_VECTOR_NULL;
+  igraph_integer_t mode=IGRAPH_ALL;
   
-/*   igraph_es_t it; */
+  igraph_vector_t adj;
 
-/*   long int i; */
+  long int i, j;
 
-/*   if (igraph_vector_size(weights) != igraph_ecount(graph)) { */
-/*     IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL); */
-/*   } */
+  if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL);
+  }
 
-/*   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0); */
-/*   already_added=Calloc(no_of_nodes, char); */
-/*   if (already_added == 0) { */
-/*     IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM); */
-/*   } */
-/*   IGRAPH_FINALLY(free, already_added); /\* TODO: hack *\/ */
-/*   IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0)); */
-/*   IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap); */
-/*   IGRAPH_CHECK(igraph_vector_reserve(&edges, (no_of_nodes-1)*2)); */
-/*   IGRAPH_CHECK(igraph_es_adj(&it, 0, mode)); */
-/*   IGRAPH_FINALLY(igraph_es_destroy, &it); */
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  already_added=Calloc(no_of_nodes, char);
+  if (already_added == 0) {
+    IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+  IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
+  IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, (no_of_nodes-1)*2));
+  IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
 
-/*   for (i=0; i<no_of_nodes; i++) { */
-/*     if (already_added[i]>0) { continue; } */
+  for (i=0; i<no_of_nodes; i++) {
+    if (already_added[i]>0) { continue; }
 
-/*     already_added[i]=1; */
-/*     /\* add all edges of the first vertex *\/ */
-/*     igraph_es_adj_set(graph, &it, i, mode); */
-/*     while( !igraph_es_end(graph, &it)) { */
-/*       long int neighbor=igraph_es_adj_vertex(graph, &it); */
-/*       long int edgeno=igraph_es_get(graph, &it); */
-/*       if (already_added[neighbor] == 0) { */
-/* 	IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,  */
-/* 				    neighbor)); */
-/*       } */
-/*       igraph_es_next(graph, &it); */
-/*     } */
+    already_added[i]=1;
+    /* add all edges of the first vertex */
+    igraph_adjacent(graph, &adj, i, mode);
+    for (j=0; j<igraph_vector_size(&adj); j++) {
+      long int edgeno=VECTOR(adj)[j];
+      igraph_integer_t edgefrom, edgeto;
+      long int neighbor;
+      igraph_edge(graph, edgeno, &edgefrom, &edgeto);
+      neighbor= edgefrom != i ? edgefrom : edgeto;
+      if (already_added[neighbor] == 0) {
+	IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
+				    neighbor));
+      }
+    }
 
-/*     while(! igraph_d_indheap_empty(&heap)) { */
-/*       /\* Get minimal edge *\/ */
-/*       long int from, to; */
-/*       igraph_d_indheap_max_index(&heap, &from, &to); */
+    while(! igraph_d_indheap_empty(&heap)) {
+      /* Get minimal edge */
+      long int from, to;
+      igraph_d_indheap_max_index(&heap, &from, &to);
 
-/*       /\* Erase it *\/ */
-/*       igraph_d_indheap_delete_max(&heap); */
+      /* Erase it */
+      igraph_d_indheap_delete_max(&heap);
       
-/*       /\* Does it point to a visited node? *\/ */
-/*       if (already_added[to]==0) { */
-/* 	already_added[to]=1; */
-/* 	IGRAPH_CHECK(igraph_vector_push_back(&edges, from)); */
-/* 	IGRAPH_CHECK(igraph_vector_push_back(&edges, to)); */
-/* 	/\* add all outgoing edges *\/ */
-/* 	igraph_es_adj_set(graph, &it, to, mode); */
-/* 	while ( !igraph_es_end(graph, &it)) { */
-/* 	  long int neighbor=igraph_es_adj_vertex(graph, &it); */
-/* 	  long int edgeno=igraph_es_get(graph, &it); */
-/* 	  if (already_added[neighbor] == 0) { */
-/* 	    IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,  */
-/* 					neighbor)); */
-/* 	  } */
-/* 	  igraph_es_next(graph, &it); */
-/* 	} /\* for *\/ */
-/*       } /\* if !already_added *\/ */
-/*     } /\* while in the same component *\/ */
-/*   } /\* for all nodes *\/ */
+      /* Does it point to a visited node? */
+      if (already_added[to]==0) {
+	already_added[to]=1;
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	/* add all outgoing edges */
+	igraph_adjacent(graph, &adj, to, mode);
+	for (j=0; j<igraph_vector_size(&adj); j++) {
+	  long int edgeno=VECTOR(adj)[j];
+	  igraph_integer_t edgefrom, edgeto;
+	  long int neighbor;
+	  igraph_edge(graph, edgeno, &edgefrom, &edgeto);
+	  neighbor= edgefrom != to ? edgefrom : edgeto;
+	  if (already_added[neighbor] == 0) {
+	    IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
+					neighbor));
+	  }
+	} /* for */
+      } /* if !already_added */
+    } /* while in the same component */
+  } /* for all nodes */
 
-/*   igraph_d_indheap_destroy(&heap); */
-/*   Free(already_added); */
-/*   IGRAPH_FINALLY_CLEAN(2); */
+  igraph_d_indheap_destroy(&heap);
+  Free(already_added);
+  IGRAPH_FINALLY_CLEAN(2);
 
-/*   IGRAPH_CHECK(igraph_create(mst, &edges, 0, igraph_is_directed(graph))); */
-/*   igraph_vector_destroy(&edges); */
-/*   igraph_es_destroy(&it); */
-/*   IGRAPH_FINALLY_CLEAN(2); */
+  IGRAPH_CHECK(igraph_create(mst, &edges, 0, igraph_is_directed(graph)));
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&adj);
+  IGRAPH_FINALLY_CLEAN(2);
   
-/*   return 0; */
-/* } */
+  return 0;
+}
 
 /**
  * \ingroup structural
