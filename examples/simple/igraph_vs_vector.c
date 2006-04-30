@@ -33,11 +33,12 @@ void igraph_vector_print(const igraph_vector_t *v) {
 
 int main() {
 
-  igraph_t g, g2;
+  igraph_t g;
   const igraph_vector_t v=IGRAPH_VECTOR_NULL;
   igraph_real_t edges[] = { 0,1, 1,2, 2,2, 2,3, 2,4, 3,4 };
   igraph_vector_t v2, v3;
   long int i;
+  igraph_vit_t vit;
   igraph_vs_t vs;
 
   igraph_vector_view(&v, edges, sizeof(edges)/sizeof(igraph_real_t));
@@ -49,44 +50,37 @@ int main() {
   VECTOR(v2)[2]=4;   VECTOR(v2)[3]=0;
   VECTOR(v2)[4]=2;   VECTOR(v2)[5]=4;
 
-  igraph_vs_vectorview(&g, &vs, &v2);
+  igraph_vit_create(&g, igraph_vss_vector(&v2), &vit);
   i=0;
-  while (!igraph_vs_end(&g, &vs)) {
-    if (igraph_vs_get(&g, &vs) != VECTOR(v2)[i]) {
+  while (!IGRAPH_VIT_END(vit)) {
+    if (IGRAPH_VIT_GET(vit) != VECTOR(v2)[i]) {
       return 1;
     }
-    igraph_vs_next(&g, &vs); 
+    IGRAPH_VIT_NEXT(vit);
     i++;
   }
   if (i != igraph_vector_size(&v2)) {
     return 2;
   }
 
-  igraph_vs_destroy(&vs);
+  igraph_vit_destroy(&vit);
   igraph_vector_destroy(&v2);
 
   /* Create small vector iterator */
 
-  igraph_vs_vector_small(&g, &vs, 0, 2, 4, 0, 2, 4, 2, -1);
-  igraph_vector_print(igraph_vs_vector_getvector(&g, &vs));
-
-  igraph_vs_destroy(&vs);
-
-  /* Using a shorthand */  
-
-  igraph_subgraph(&g, &g2, IGRAPH_VS(&g, 0,1,2,3,4,-1));
-  igraph_vector_init(&v2, 0); igraph_get_edgelist(&g, &v2, 0); igraph_vector_sort(&v2);
-  igraph_vector_init(&v3, 0); igraph_get_edgelist(&g, &v3, 0); igraph_vector_sort(&v3);
-  if (!igraph_vector_is_equal(&v2, &v3)) {
-    return 3;
+  igraph_vs_vector_small(&vs, 0, 2, 4, 0, 2, 4, 2, -1);
+  igraph_vit_create(&g, vs, &vit);
+  for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+    printf("%li ", (long int) IGRAPH_VIT_GET(vit));
   }
-  igraph_vector_destroy(&v2);
-  igraph_vector_destroy(&v3);
+  printf("\n");
+  
+  igraph_vit_destroy(&vit);
+  igraph_vs_destroy(&vs);
 
   /* Clean up */
 
   igraph_destroy(&g);
-  igraph_destroy(&g2);
 
   return 0;
 }

@@ -25,9 +25,9 @@ int main() {
     VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
     igraph_vector_init(VECTOR(vecs)[i], 0);
   }
-  igraph_vs_vector_small(&g, &vs, 1, 3, 5, 2, 1,  -1);
+  igraph_vs_vector_small(&vs, 1, 3, 5, 2, 1,  -1);
   
-  igraph_get_shortest_paths(&g, &vecs, 0, &vs, IGRAPH_OUT);
+  igraph_get_shortest_paths(&g, &vecs, 0, vs, IGRAPH_OUT);
   
   for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
     print_vector(VECTOR(vecs)[i]);

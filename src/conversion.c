@@ -56,61 +56,66 @@
 int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 			 igraph_get_adjacency_t type) {
   
-  igraph_es_t edgeit;
+  igraph_eit_t edgeit;
   long int no_of_nodes=igraph_vcount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
   int retval=0;
   long int from, to;
+  igraph_integer_t ffrom, fto;
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
   igraph_matrix_null(res);
-  IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
-  IGRAPH_FINALLY(igraph_es_destroy, &edgeit);
+  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
   
   if (directed) {
-    while (!igraph_es_end(graph, &edgeit)) {
-      from=igraph_es_from(graph, &edgeit);
-      to=igraph_es_to(graph, &edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
       MATRIX(*res, from, to) += 1;
-      igraph_es_next(graph, &edgeit);
+      IGRAPH_EIT_NEXT(edgeit);
     }
   } else if (type==IGRAPH_GET_ADJACENCY_UPPER) {
-    while (!igraph_es_end(graph, &edgeit)) {  
-      from=igraph_es_from(graph, &edgeit);
-      to=igraph_es_to(graph, &edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {  
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
       if (to < from) {
 	MATRIX(*res, to, from) += 1;
       } else {
 	MATRIX(*res, from, to) += 1;    
       }
-      igraph_es_next(graph, &edgeit);
+      IGRAPH_EIT_NEXT(edgeit);
     }
   } else if (type==IGRAPH_GET_ADJACENCY_LOWER) {
-    while (!igraph_es_end(graph, &edgeit)) {
-      from=igraph_es_from(graph, &edgeit);
-      to=igraph_es_to(graph, &edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
       if (to < from) {
 	MATRIX(*res, from, to) += 1;
       } else {
 	MATRIX(*res, to, from) += 1;
       }
-      igraph_es_next(graph, &edgeit);
+      IGRAPH_EIT_NEXT(edgeit);
     }
   } else if (type==IGRAPH_GET_ADJACENCY_BOTH) {
-    while (!igraph_es_end(graph, &edgeit)) {
-      from=igraph_es_from(graph, &edgeit);
-      to=igraph_es_to(graph, &edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
       MATRIX(*res, from, to) += 1;
       if (from != to) {
 	MATRIX(*res, to, from) += 1;
       }
-      igraph_es_next(graph, &edgeit);
+      IGRAPH_EIT_NEXT(edgeit);
     }
   } else {
     IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
   }
 
-  igraph_es_destroy(&edgeit);
+  igraph_eit_destroy(&edgeit);
   IGRAPH_FINALLY_CLEAN(1);
   return retval;
 }
@@ -135,30 +140,33 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 
 int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol) {
 
-  igraph_es_t edgeit;
+  igraph_eit_t edgeit;
   long int no_of_edges=igraph_ecount(graph);
   long int vptr=0;
+  igraph_integer_t from, to;
   
   IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges*2));
-  IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
-  IGRAPH_FINALLY(igraph_es_destroy, &edgeit);
+  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
   
   if (bycol) {
-    while (!igraph_es_end(graph, &edgeit)) {
-      VECTOR(*res)[vptr]=igraph_es_from(graph, &edgeit);
-      VECTOR(*res)[vptr+no_of_edges]=igraph_es_to(graph, &edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+      VECTOR(*res)[vptr]=from;
+      VECTOR(*res)[vptr+no_of_edges]=to;
       vptr++;
-      igraph_es_next(graph, &edgeit);
+      IGRAPH_EIT_NEXT(edgeit);
     }
   } else {
-    while (!igraph_es_end(graph, &edgeit)) {
-      VECTOR(*res)[vptr++]=igraph_es_from(graph, &edgeit);
-      VECTOR(*res)[vptr++]=igraph_es_to(graph, &edgeit);
-      igraph_es_next(graph, &edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+      VECTOR(*res)[vptr++]=from;
+      VECTOR(*res)[vptr++]=to;
+      IGRAPH_EIT_NEXT(edgeit);
     }
   }
   
-  igraph_es_destroy(&edgeit);
+  igraph_eit_destroy(&edgeit);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }

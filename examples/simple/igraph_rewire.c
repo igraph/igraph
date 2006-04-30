@@ -36,12 +36,12 @@ int main() {
   
   n=igraph_vcount(&g);
   igraph_vector_init(&res, 0);
-  igraph_degree(&g, &res, IGRAPH_VS_ALL(&g), IGRAPH_IN, 0);
+  igraph_degree(&g, &res, igraph_vss_all(), IGRAPH_IN, 0);
   for (i=0; i<n; i++)
     printf("%ld ", (long)igraph_vector_e(&res, i));
   printf("\n");
   
-  igraph_degree(&g, &res, IGRAPH_VS_ALL(&g), IGRAPH_OUT, 0);
+  igraph_degree(&g, &res, igraph_vss_all(), IGRAPH_OUT, 0);
   for (i=0; i<n; i++)
     printf("%ld ", (long)igraph_vector_e(&res, i));
   printf("\n");

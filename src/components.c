@@ -431,7 +431,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
     IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
     IGRAPH_FINALLY(igraph_destroy, newg);
     IGRAPH_CHECK(igraph_subgraph(graph, newg, 
-				 IGRAPH_VS_VECTOR(graph, &verts)));
+				 igraph_vss_vector(&verts)));
     IGRAPH_FINALLY_CLEAN(1);
     resco++;
     

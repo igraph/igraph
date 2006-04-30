@@ -1,7 +1,11 @@
 
 Needed for 0.2:
 
-o improve iterators: serialize/unserialize
+o igraph_edge_betweenness
+o igraph_transitivity_undirected
+o igraph_minimum_spanning_tree_prim
+o attribute handling for iterators
+o improve attributes: serialize/unserialize
 o igraph_i_attribute_add_edges should supply the ids of the new edges, or
   the edges themselves.....
 o add references to SNA, paper by Carter

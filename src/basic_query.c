@@ -48,7 +48,8 @@
 igraph_bool_t igraph_are_connected(const igraph_t *graph, 
 			    igraph_integer_t v1, igraph_integer_t v2) {
 
-  igraph_vs_t it;
+  igraph_vs_t vs;
+  igraph_vit_t it;
   igraph_bool_t res=0;
   long int nov=igraph_vcount(graph);
 
@@ -57,11 +58,13 @@ igraph_bool_t igraph_are_connected(const igraph_t *graph,
 /*     IGRAPH_ERROR("are connected", IGRAPH_EINVVID); */
   }
 
-  IGRAPH_CHECK(igraph_vs_adj(graph, &it, v1, IGRAPH_OUT));
+  IGRAPH_CHECK(igraph_vs_adj(&vs, v1, IGRAPH_OUT));
+  IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
   
-  while (!res && !igraph_vs_end(graph, &it)) {
-    res= (igraph_vs_get(graph, &it) == v2);
-    igraph_vs_next(graph, &it);
+  IGRAPH_VIT_RESET(it);
+  while (!res && !IGRAPH_VIT_END(it)) {
+    res= (IGRAPH_VIT_GET(it) == v2);
+    IGRAPH_VIT_NEXT(it);
   }
   
   return res;

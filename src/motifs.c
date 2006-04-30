@@ -51,7 +51,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   igraph_vector_t deg;
 
   IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
-  igraph_degree(graph, &deg, IGRAPH_VS_ALL(graph), IGRAPH_OUT, 1);
+  igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_OUT, 1);
   
   if (size != 3 && size != 4) {
     IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",

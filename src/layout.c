@@ -240,13 +240,17 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_matrix_t dxdy=IGRAPH_MATRIX_NULL;
-  igraph_es_t edgeit;
+  igraph_eit_t edgeit;
+  igraph_integer_t from, to;
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
     IGRAPH_CHECK(igraph_layout_random(graph, res));
   }
   IGRAPH_MATRIX_INIT_FINALLY(&dxdy, no_of_nodes, 2);
+
+  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
   
   frk=sqrt(area/no_of_nodes);
 
@@ -278,10 +282,11 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       }
     }
     /* Calculate the attractive "force" */
-    IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
-    while (!igraph_es_end(graph, &edgeit)) {
-      j=igraph_es_from(graph, &edgeit);
-      k=igraph_es_to(graph, &edgeit);
+    IGRAPH_EIT_RESET(edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+      j=from; 
+      k=to;
       xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
       yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
       ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
@@ -294,9 +299,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       MATRIX(dxdy, k, 0)+=xd*af;
       MATRIX(dxdy, j, 1)-=yd*af;
       MATRIX(dxdy, k, 1)+=yd*af;
-      igraph_es_next(graph, &edgeit);
+      IGRAPH_EIT_NEXT(edgeit);
     }
-    igraph_es_destroy(&edgeit);
     
     /* Dampen motion, if needed, and move the points */   
     for(j=0;j<no_of_nodes;j++){
@@ -314,8 +318,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 
   igraph_progress("Fruchterman-Reingold layout: ", 100.0, NULL);
   
+  igraph_eit_destroy(&edgeit);
   igraph_matrix_destroy(&dxdy);
-  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY_CLEAN(2);
   
   return 0;
 }
@@ -364,7 +369,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
   long int i, j, k;
   
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_es_t edgeit;
+  igraph_eit_t edgeit;
+  igraph_integer_t from, to;
   
   IGRAPH_CHECK(igraph_matrix_init(&dxdydz, no_of_nodes, 3));
   IGRAPH_FINALLY(igraph_matrix_destroy, &dxdydz);
@@ -373,6 +379,9 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
   if (!use_seed) {
     IGRAPH_CHECK(igraph_layout_random_3d(graph, res));
   }
+
+  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
 
   frk=pow(volume/(double)no_of_nodes,1.0/3.0); /*Define the F-R constant*/
 
@@ -411,10 +420,11 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     }
 
     /*Calculate the attractive "force"*/
-    IGRAPH_CHECK(igraph_es_all(graph, &edgeit));
-    while (!igraph_es_end(graph, &edgeit)) {
-      j=igraph_es_from(graph, &edgeit);
-      k=igraph_es_to(graph, &edgeit);
+    IGRAPH_EIT_RESET(edgeit);
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+      j=from;
+      k=to;
       xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
       yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
       zd=MATRIX(*res, j, 2)-MATRIX(*res, k, 2);
@@ -431,9 +441,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
       MATRIX(dxdydz, k, 1)+=yd*af;
       MATRIX(dxdydz, j, 2)-=zd*af;
       MATRIX(dxdydz, k, 2)+=zd*af;
-      igraph_es_next(graph, &edgeit);
+      IGRAPH_EIT_NEXT(edgeit);
     }
-    igraph_es_destroy(&edgeit);
 
     /*Dampen motion, if needed, and move the points*/
     for(j=0;j<no_of_nodes;j++){
@@ -455,7 +464,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
   igraph_progress("3D Fruchterman-Reingold layout: ", 100.0, NULL);
   
   igraph_matrix_destroy(&dxdydz);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_eit_destroy(&edgeit);
+  IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
 
@@ -504,7 +514,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 
   IGRAPH_CHECK(igraph_matrix_resize(res, n, 2));
   IGRAPH_MATRIX_INIT_FINALLY(&elen, n, n);
-  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, IGRAPH_VS_ALL(graph), 3));
+  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(), 
+				     IGRAPH_ALL));
   for (i=0; i<n; i++) {
     MATRIX(elen, i, i) = sqrt(n);
     MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
@@ -594,7 +605,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
   IGRAPH_MATRIX_INIT_FINALLY(&elen,  no_of_nodes, no_of_nodes);
-  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, IGRAPH_VS_ALL(graph), 
+  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(), 
 				     IGRAPH_ALL));
   
   temp=initemp;

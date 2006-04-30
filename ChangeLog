@@ -3,6 +3,42 @@
 	* src/type_indexededgelist.c (igraph_delete_vertices) : attribute
 	handling bug corrected
 
+2006-04-27  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/iterators.c : completely rewritten
+
+	* src/type_indexededgelist.c (igraph_delete_vertices)
+	(igraph_degree) : updated
+	* src/motifs.c (igraph_motifs_randesu) : updated
+	* src/foreign.c (igraph_write_graph_edgelist, igraph_write_graph_ncol)
+	(igraph_write_graph_lgl, igraph_write_graph_graphml) : updated
+	* src/layout.c (igraph_layout_fruchterman_reingold)
+	(igraph_layout_fruchterman_reingold_3d) : updated
+	* src/basic_query.c (igraph_are_connected) : updated
+	* src/components.c (igraph_decompose) : updated
+	* src/conversion.c (igraph_get_adjacency, igraph_get_edgelist) :
+	updated
+	* src/structural_properties.c (igraph_diameter, igraph_closeness)
+	(igraph_shortest_paths, igraph_get_shortest_paths)
+	(igraph_get_all_shortest_paths, igraph_betweenness)
+	(igraph_pagerank, igraph_subgraph) : updated
+	* src/structural_properties.c (igraph_minimum_spanning_tree_prim) 
+	(igraph_edge_betweenness, igraph_transitivity_undirected) : 
+	temporarily removed
+	* src/cocitation.c (igraph_cocitation_real, igraph_cocitation)
+	(igraph_bibcoupling) : updated
+
+	* examples/simple/igraph_rewire.c : updated
+	* examples/simple/igraph_pagerank.c : updated
+	* examples/simple/igraph_barabasi_game.c : updated
+	* examples/simple/igraph_vs_vector.c : updated
+	* examples/simple/igraph_get_shortest_paths.c : updated
+	* examples/simple/igraph_degree.c : updated
+	* examples/simple/igraph_delete_vertices.c : updated
+
+	* src/type_indexededgelist.c (igraph_edge) : canonical order for 
+	undirected graphs
+	
 2006-04-23  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/type_indexededgelist.c (igraph_delete_vertices)

@@ -62,7 +62,7 @@ int main() {
     return 5;
   }
   igraph_vector_init(&v2, 0);
-  igraph_degree(&g, &v2, IGRAPH_VS_ALL(&g), IGRAPH_OUT, 1);
+  igraph_degree(&g, &v2, igraph_vss_all(), IGRAPH_OUT, 1);
   for (i=0; i<igraph_vcount(&g); i++) {
     if (VECTOR(v)[i] != VECTOR(v2)[i]) {
       return 6;
@@ -74,7 +74,7 @@ int main() {
   
   /* outpref, we cannot really test this quantitatively,
      would need to set random seed */
-  igraph_barabasi_game(&g, 10, 2, 0, 1, 0);
+  igraph_barabasi_game(&g, 10, 2, 0, 1, 1);
   igraph_vector_init(&v, 0);
   igraph_get_edgelist(&g, &v, 0);
   for (i=0; i<igraph_ecount(&g); i++) {
@@ -82,7 +82,7 @@ int main() {
       return 7;
     }
   }
-  if (igraph_is_directed(&g)) {
+  if (!igraph_is_directed(&g)) {
     return 8;
   }
   igraph_destroy(&g);
