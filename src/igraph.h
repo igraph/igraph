@@ -244,6 +244,7 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order);
 
 int igraph_es_adj(igraph_es_t *es, 
 		  igraph_integer_t vid, igraph_neimode_t mode);
+igraph_es_t igraph_ess_adj(igraph_integer_t vid, igraph_neimode_t mode);
 
 int igraph_es_none(igraph_es_t *es);
 igraph_es_t igraph_ess_none();
@@ -647,6 +648,17 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al);
 /* igraph_vector_t *igraph_i_adjlist_get(const igraph_i_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
 #define igraph_i_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])
+
+typedef struct igraph_i_adjedgelist_t {
+  igraph_integer_t length;
+  igraph_vector_t *adjs;
+} igraph_i_adjedgelist_t;
+
+int igraph_i_adjedgelist_init(const igraph_t *graph, 
+			      igraph_i_adjedgelist_t *eal, 
+			      igraph_neimode_t mode);
+void igraph_i_adjedgelist_destroy(igraph_i_adjedgelist_t *ael);
+#define igraph_i_adjedgelist_get(ael, no) (&(ael).adjs[(long int)(no)])
 
 extern unsigned int igraph_i_isoclass_3[];
 extern unsigned int igraph_i_isoclass_4[];

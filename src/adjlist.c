@@ -64,3 +64,41 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
 /* igraph_vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, igraph_integer_t no) { */
 /*   return &al->adjs[(long int)no]; */
 /* } */
+
+int igraph_i_adjedgelist_init(const igraph_t *graph, 
+			      igraph_i_adjedgelist_t *ael, 
+			      igraph_neimode_t mode) {
+  long int i;
+
+  if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Cannot create adjedgelist view", IGRAPH_EINVMODE);
+  }
+
+  if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
+
+  ael->length=igraph_vcount(graph);
+  ael->adjs=Calloc(ael->length, igraph_vector_t);
+  if (ael->adjs == 0) {
+    IGRAPH_ERROR("Cannot create adjedgelist view", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, ael->adjs);
+
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, ael);  
+  for (i=0; i<ael->length; i++) {
+    IGRAPH_CHECK(igraph_vector_init(&ael->adjs[i], 0));
+    IGRAPH_CHECK(igraph_adjacent(graph, &ael->adjs[i], i, mode));
+  }
+  
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
+void igraph_i_adjedgelist_destroy(igraph_i_adjedgelist_t *ael) {
+  long int i;
+  for (i=0; i<ael->length; i++) {
+    /* This works if some igraph_vector_t's are 0, because igraph_vector_destroy can
+       handle this. */
+    igraph_vector_destroy(&ael->adjs[i]);
+  }
+  Free(ael->adjs);
+}

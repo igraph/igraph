@@ -3,6 +3,14 @@
 	* src/type_indexededgelist.c (igraph_delete_vertices) : attribute
 	handling bug corrected
 
+	* src/adjlist.c (igraph_i_adjedgelist_init)
+	(igraph_i_adjedgelist_destroy) : added
+
+	* src/structural_properties.c (igraph_edge_betweenness) : added
+	* examples/simple/igraph_edge_betweenness.c : added, empty
+
+	* src/iterators.c (igraph_ess_adj) : added
+	
 2006-04-27  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/iterators.c : completely rewritten

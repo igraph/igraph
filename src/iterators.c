@@ -243,6 +243,14 @@ int igraph_es_adj(igraph_es_t *es,
   return 0;
 }
 
+igraph_es_t igraph_ess_adj(igraph_integer_t vid, igraph_neimode_t mode) {
+  igraph_es_t es;
+  es.type=IGRAPH_ES_ADJ;
+  es.data.adj.vid=vid;
+  es.data.adj.mode=mode;
+  return es;
+} 
+
 int igraph_es_none(igraph_es_t *es) {
   es->type=IGRAPH_ES_NONE;
   return 0;

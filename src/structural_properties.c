@@ -1361,134 +1361,159 @@ int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res,
  *     of the edges in a graph.
  */
 
-/* int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,  */
-/* 			     igraph_bool_t directed) { */
+int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
+			     igraph_bool_t directed) {
   
-/*   long int no_of_nodes=igraph_vcount(graph); */
-/*   long int no_of_edges=igraph_ecount(graph); */
-/*   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL; */
-/*   long int *distance; */
-/*   long int *nrgeo; */
-/*   double *tmpscore; */
-/*   igraph_stack_t stack=IGRAPH_STACK_NULL; */
-/*   long int source; */
-/*   long int j; */
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  long int *distance;
+  long int *nrgeo;
+  double *tmpscore;
+  igraph_stack_t stack=IGRAPH_STACK_NULL;
+  long int source;
+  long int j;
 
-/*   igraph_es_t it; */
-/*   igraph_integer_t modein, modeout; */
+  igraph_i_adjedgelist_t elist_out, elist_in;
+  igraph_i_adjedgelist_t *elist_out_p, *elist_in_p;
+  igraph_vector_t *neip;
+  long int neino;
+  long int i;
+  igraph_integer_t modein, modeout;
 
-/*   if (directed) { */
-/*     modeout=IGRAPH_OUT; */
-/*     modein=IGRAPH_IN; */
-/*   } else { */
-/*     modeout=modein=IGRAPH_ALL; */
-/*   } */
+  if (directed) {
+    modeout=IGRAPH_OUT;
+    modein=IGRAPH_IN;
+    IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &elist_out, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &elist_in, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &elist_in);
+    elist_out_p=&elist_out;
+    elist_in_p=&elist_in;
+  } else {
+    modeout=modein=IGRAPH_ALL;
+    IGRAPH_CHECK(igraph_i_adjedgelist_init(graph,&elist_out, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &elist_out);
+    elist_out_p=elist_in_p=&elist_out;
+  }
   
-/*   distance=Calloc(no_of_nodes, long int); */
-/*   if (distance==0) { */
-/*     IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM); */
-/*   } */
-/*   IGRAPH_FINALLY(free, distance); /\* TODO: hack *\/ */
-/*   nrgeo=Calloc(no_of_nodes, long int); */
-/*   if (nrgeo==0) { */
-/*     IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM); */
-/*   } */
-/*   IGRAPH_FINALLY(free, nrgeo);	/\* TODO: hack *\/ */
-/*   tmpscore=Calloc(no_of_nodes, double); */
-/*   if (tmpscore==0) { */
-/*     IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM); */
-/*   } */
-/*   IGRAPH_FINALLY(free, tmpscore); /\* TODO: hack *\/ */
+  distance=Calloc(no_of_nodes, long int);
+  if (distance==0) {
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, distance); /* TODO: hack */
+  nrgeo=Calloc(no_of_nodes, long int);
+  if (nrgeo==0) {
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, nrgeo);	/* TODO: hack */
+  tmpscore=Calloc(no_of_nodes, double);
+  if (tmpscore==0) {
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, tmpscore); /* TODO: hack */
 
-/*   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100); */
-/*   IGRAPH_CHECK(igraph_stack_init(&stack, no_of_nodes)); */
-/*   IGRAPH_FINALLY(igraph_stack_destroy, &stack); */
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_CHECK(igraph_stack_init(&stack, no_of_nodes));
+  IGRAPH_FINALLY(igraph_stack_destroy, &stack);
 
-/*   IGRAPH_CHECK(igraph_es_adj(&it, 0, modeout)); */
-/*   IGRAPH_FINALLY(igraph_es_destroy, &it); */
-/*   IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges)); */
+  IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
 
-/*   igraph_vector_null(result); */
+  igraph_vector_null(result);
 
-/*   /\* here we go *\/ */
+  /* here we go */
   
-/*   for (source=0; source<no_of_nodes; source++) { */
+  for (source=0; source<no_of_nodes; source++) {
 
-/*     memset(distance, 0, no_of_nodes*sizeof(long int)); */
-/*     memset(nrgeo, 0, no_of_nodes*sizeof(long int)); */
-/*     memset(tmpscore, 0, no_of_nodes*sizeof(double)); */
-/*     igraph_stack_clear(&stack); /\* it should be empty anyway... *\/ */
+    memset(distance, 0, no_of_nodes*sizeof(long int));
+    memset(nrgeo, 0, no_of_nodes*sizeof(long int));
+    memset(tmpscore, 0, no_of_nodes*sizeof(double));
+    igraph_stack_clear(&stack); /* it should be empty anyway... */
     
-/*     IGRAPH_CHECK(igraph_dqueue_push(&q, source)); */
+    IGRAPH_CHECK(igraph_dqueue_push(&q, source));
       
-/*     nrgeo[source]=1; */
-/*     distance[source]=0; */
+    nrgeo[source]=1;
+    distance[source]=0;
     
-/*     while (!igraph_dqueue_empty(&q)) { */
-/*       long int actnode=igraph_dqueue_pop(&q); */
+    while (!igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
     
-/*       igraph_es_adj_set(graph, &it, actnode, modeout); */
-/*       while ( !igraph_es_end(graph, &it)) { */
-/* 	long int neighbor=igraph_es_adj_vertex(graph, &it); */
-/* 	if (nrgeo[neighbor] != 0) { */
-/* 	  /\* we've already seen this node, another shortest path? *\/ */
-/* 	  if (distance[neighbor]==distance[actnode]+1) { */
-/* 	    nrgeo[neighbor]+=nrgeo[actnode]; */
-/* 	  } */
-/* 	} else { */
-/* 	  /\* we haven't seen this node yet *\/ */
-/* 	  nrgeo[neighbor]+=nrgeo[actnode]; */
-/* 	  distance[neighbor]=distance[actnode]+1; */
-/* 	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor)); */
-/* 	  IGRAPH_CHECK(igraph_stack_push(&stack, neighbor)); */
-/* 	} */
-/* 	igraph_es_next(graph, &it); */
-/*       } */
-/*     } /\* while !igraph_dqueue_empty *\/ */
+      neip=igraph_i_adjedgelist_get(*elist_out_p, actnode);
+      neino=igraph_vector_size(neip);
+      for (i=0; i<neino; i++) {
+	igraph_integer_t edge=VECTOR(*neip)[i], from, to;
+	long int neighbor;
+	igraph_edge(graph, edge, &from, &to);
+	neighbor = actnode!=from ? from : to;
+	if (nrgeo[neighbor] != 0) {
+	  /* we've already seen this node, another shortest path? */
+	  if (distance[neighbor]==distance[actnode]+1) {
+	    nrgeo[neighbor]+=nrgeo[actnode];
+	  }
+	} else {
+	  /* we haven't seen this node yet */
+	  nrgeo[neighbor]+=nrgeo[actnode];
+	  distance[neighbor]=distance[actnode]+1;
+	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	  IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
+	}
+      }
+    } /* while !igraph_dqueue_empty */
     
-/*     /\* Ok, we've the distance of each node and also the number of */
-/*        shortest paths to them. Now we do an inverse search, starting */
-/*        with the farthest nodes. *\/ */
-/*     while (!igraph_stack_empty(&stack)) { */
-/*       long int actnode=igraph_stack_pop(&stack); */
-/*       if (distance[actnode]<1) { continue; } /\* skip source node *\/ */
+    /* Ok, we've the distance of each node and also the number of
+       shortest paths to them. Now we do an inverse search, starting
+       with the farthest nodes. */
+    while (!igraph_stack_empty(&stack)) {
+      long int actnode=igraph_stack_pop(&stack);
+      if (distance[actnode]<1) { continue; } /* skip source node */
       
-/*       /\* set the temporary score of the friends *\/ */
-/*       igraph_es_adj_set(graph, &it, actnode, modein); */
-/*       while ( !igraph_es_end(graph,  &it)) { */
-/* 	long int neighbor=igraph_es_adj_vertex(graph, &it); */
-/* 	long int edgeno=igraph_es_get(graph, &it); */
-/* 	if (distance[neighbor]==distance[actnode]-1 && */
-/* 	    nrgeo[neighbor] != 0) { */
-/* 	  tmpscore[neighbor] +=  */
-/* 	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode]; */
-/* 	  VECTOR(*result)[edgeno] +=  */
-/* 	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode]; */
-/* 	} */
-/* 	igraph_es_next(graph, &it);	 */
-/*       } */
-/*     } */
-/*     /\* Ok, we've the scores for this source *\/ */
-/*   } /\* for source <= no_of_nodes *\/ */
+      /* set the temporary score of the friends */
+      neip=igraph_i_adjedgelist_get(*elist_in_p, actnode);
+      neino=igraph_vector_size(neip);
+      for (i=0; i<neino; i++) {
+	igraph_integer_t from, to;
+	long int neighbor;
+	long int edgeno=VECTOR(*neip)[i];
+	igraph_edge(graph, edgeno, &from, &to);
+	neighbor= actnode != from ? from : to;
+	if (distance[neighbor]==distance[actnode]-1 &&
+	    nrgeo[neighbor] != 0) {
+	  tmpscore[neighbor] +=
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
+	  VECTOR(*result)[edgeno] +=
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
+	}
+      }
+    }
+    /* Ok, we've the scores for this source */
+  } /* for source <= no_of_nodes */
   
-/*   /\* clean and return *\/ */
-/*   Free(distance); */
-/*   Free(nrgeo); */
-/*   Free(tmpscore); */
-/*   igraph_dqueue_destroy(&q); */
-/*   igraph_stack_destroy(&stack); */
-/*   igraph_es_destroy(&it); */
-/*   IGRAPH_FINALLY_CLEAN(6); */
+  /* clean and return */
+  Free(distance);
+  Free(nrgeo);
+  Free(tmpscore);
+  igraph_dqueue_destroy(&q);
+  igraph_stack_destroy(&stack);
+  IGRAPH_FINALLY_CLEAN(5);
 
-/*   /\* divide by 2 for undirected graph *\/ */
-/*   if (!directed || !igraph_is_directed(graph)) { */
-/*     for (j=0; j<igraph_vector_size(result); j++) { */
-/*       VECTOR(*result)[j] /= 2.0; */
-/*     } */
-/*   } */
+  if (directed) {
+    igraph_i_adjedgelist_destroy(&elist_out);
+    igraph_i_adjedgelist_destroy(&elist_in);
+    IGRAPH_FINALLY_CLEAN(2);
+  } else {
+    igraph_i_adjedgelist_destroy(&elist_out);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  /* divide by 2 for undirected graph */
+  if (!directed || !igraph_is_directed(graph)) {
+    for (j=0; j<igraph_vector_size(result); j++) {
+      VECTOR(*result)[j] /= 2.0;
+    }
+  }
   
-/*   return 0; */
-/* } */
+  return 0;
+}
 
 
 /**
