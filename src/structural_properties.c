@@ -1438,7 +1438,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
     while (!igraph_dqueue_empty(&q)) {
       long int actnode=igraph_dqueue_pop(&q);
     
-      neip=igraph_i_adjedgelist_get(*elist_out_p, actnode);
+      neip=igraph_i_adjedgelist_get(elist_out_p, actnode);
       neino=igraph_vector_size(neip);
       for (i=0; i<neino; i++) {
 	igraph_integer_t edge=VECTOR(*neip)[i], from, to;
@@ -1468,7 +1468,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
       if (distance[actnode]<1) { continue; } /* skip source node */
       
       /* set the temporary score of the friends */
-      neip=igraph_i_adjedgelist_get(*elist_in_p, actnode);
+      neip=igraph_i_adjedgelist_get(elist_in_p, actnode);
       neino=igraph_vector_size(neip);
       for (i=0; i<neino; i++) {
 	igraph_integer_t from, to;
@@ -1928,56 +1928,54 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
 
 int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) {
 
-/*   long int no_of_nodes=igraph_vcount(graph); */
-/*   igraph_real_t triples=0, triangles=0; */
-/*   long int node; */
-/*   long int *neis; */
-/*   long int deg; */
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_real_t triples=0, triangles=0;
+  long int node;
+  long int *neis;
+  long int deg;
 
-/*   igraph_vs_t nit, nit2; */
+  igraph_i_adjlist_t allneis;
+  igraph_vector_t *neis1, *neis2;
+  long int i, j, neilen1, neilen2;
   
-/*   neis=Calloc(no_of_nodes, long int); */
-/*   if (neis==0) { */
-/*     IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM); */
-/*   } */
-/*   IGRAPH_FINALLY(free, neis);	/\* TODO: hack *\/ */
-/*   IGRAPH_CHECK(igraph_vector_resize(res, 1)); */
+  neis=Calloc(no_of_nodes, long int);
+  if (neis==0) {
+    IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, neis);	/* TODO: hack */
+  IGRAPH_CHECK(igraph_vector_resize(res, 1));
 
-/*   if (no_of_nodes != 0) {     */
-/*     IGRAPH_CHECK(igraph_vs_adj(&nit, 0, IGRAPH_ALL)); */
-/*     IGRAPH_CHECK(igraph_vs_adj(&nit2, 0, IGRAPH_ALL)); */
-/*   } */
-/*   for (node=0; node<no_of_nodes; node++) { */
-/*     igraph_vs_adj_set(graph, &nit, node, IGRAPH_ALL); */
-/*     deg=0; */
-/*     /\* Mark the neighbors of 'node' *\/ */
-/*     while (!igraph_vs_end(graph, &nit)) { */
-/*       neis[ (long int)igraph_vs_get(graph, &nit) ] = node+1; */
-/*       igraph_vs_next(graph, &nit); */
-/*       deg++; */
-/*     } */
-/*     triples += deg*(deg-1); */
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  for (node=0; node<no_of_nodes; node++) {
+    neis1=igraph_i_adjlist_get(&allneis, node);
+    neilen1=igraph_vector_size(neis1);
+    deg=0;
+    /* Mark the neighbors of 'node' */
+    for (i=0; i<neilen1; i++) {
+      neis[ (long int)VECTOR(*neis1)[i] ] = node+1;
+      deg++;
+    }
+    triples += deg*(deg-1);
     
-/*     /\* Count the triangles and triples *\/ */
-/*     igraph_vs_adj_set(graph, &nit, node, IGRAPH_ALL); */
-/*     while (!igraph_vs_end(graph, &nit)) { */
-/*       long int v=igraph_vs_get(graph, &nit); */
-/*       igraph_vs_adj_set(graph, &nit2, v, IGRAPH_ALL); */
-/*       while (!igraph_vs_end(graph, &nit2)) { */
-/* 	long int v2=igraph_vs_get(graph, &nit2); */
-/* 	if (neis[v2] == node+1) { */
-/* 	  triangles += 1.0; */
-/* 	} */
-/* 	igraph_vs_next(graph, &nit2); */
-/*       } */
-/*       igraph_vs_next(graph, &nit); */
-/*     } */
-/*   } */
+    /* Count the triangles and triples */
+    for (i=0; i<neilen1; i++) {
+      long int v=VECTOR(*neis1)[i];
+      neis2=igraph_i_adjlist_get(&allneis, v);
+      neilen2=igraph_vector_size(neis2);
+      for (j=0; j<neilen2; j++) {
+	long int v2=VECTOR(*neis2)[j];
+	if (neis[v2] == node+1) {
+	  triangles += 1.0;
+	}
+      }
+    }
+  }
 
-/*   Free(neis); */
-/*   IGRAPH_FINALLY_CLEAN(1); */
+  Free(neis);
+  IGRAPH_FINALLY_CLEAN(1);
 
-/*   VECTOR(*res)[0] = triangles/triples; */
+  VECTOR(*res)[0] = triangles/triples;
 
   return 0;
 }

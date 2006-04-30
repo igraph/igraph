@@ -13,6 +13,13 @@
 
 	* src/structure_generators.c (igraph_small) : added
 	* examples/simple/igraph_small.c : added
+
+	* src/structural_properties.c (igraph_transitivity_undirected) :
+	readded
+	* examples/simple/igraph_transitivity.c : added
+
+	* src/igraph.h (igraph_i_adjedgelist_get) : pointer argument
+	* src/structural_properties.c (igraph_edge_betweenness) : updated
 	
 2006-04-27  Gabor Csardi  <csardi@kzoo.edu>
 

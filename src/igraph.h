@@ -660,7 +660,7 @@ int igraph_i_adjedgelist_init(const igraph_t *graph,
 			      igraph_i_adjedgelist_t *eal, 
 			      igraph_neimode_t mode);
 void igraph_i_adjedgelist_destroy(igraph_i_adjedgelist_t *ael);
-#define igraph_i_adjedgelist_get(ael, no) (&(ael).adjs[(long int)(no)])
+#define igraph_i_adjedgelist_get(ael, no) (&(ael)->adjs[(long int)(no)])
 
 extern unsigned int igraph_i_isoclass_3[];
 extern unsigned int igraph_i_isoclass_4[];

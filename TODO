@@ -1,8 +1,6 @@
 
 Needed for 0.2:
 
-o igraph_edge_betweenness
-o igraph_transitivity_undirected
 o igraph_minimum_spanning_tree_prim
 o attribute handling for iterators
 o improve attributes: serialize/unserialize
