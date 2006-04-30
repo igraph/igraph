@@ -319,6 +319,8 @@ int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer
 
 int igraph_create(igraph_t *graph, const igraph_vector_t *edges, igraph_integer_t n, 
 		  igraph_bool_t directed);
+int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, 
+		 ...);
 int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
 		     igraph_adjacency_t mode);
 int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode, 

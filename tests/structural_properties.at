@@ -49,5 +49,6 @@ AT_CLEANUP
 
 AT_SETUP([Edge betweenness])
 AT_KEYWORDS([igraph_edge_betweenness betwenness])
-AT_COMPILE_CHECK([simple/igraph_edge_betweenness.c])
+AT_COMPILE_CHECK([simple/igraph_edge_betweenness.c], 
+	         [simple/igraph_edge_betweenness.out])
 AT_CLEANUP

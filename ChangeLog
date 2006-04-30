@@ -10,6 +10,9 @@
 	* examples/simple/igraph_edge_betweenness.c : added, empty
 
 	* src/iterators.c (igraph_ess_adj) : added
+
+	* src/structure_generators.c (igraph_small) : added
+	* examples/simple/igraph_small.c : added
 	
 2006-04-27  Gabor Csardi  <csardi@kzoo.edu>
 

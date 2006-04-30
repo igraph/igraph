@@ -24,6 +24,8 @@
 #include "igraph.h"
 #include "memory.h"
 
+#include <stdarg.h>
+
 /** 
  * \section about_generators
  *
@@ -750,5 +752,28 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
+  return 0;
+}
+
+int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, 
+		 ...) {
+  igraph_vector_t edges;
+  va_list ap;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  
+  va_start(ap, directed);
+  while (1) {
+    int num = va_arg(ap, int);
+    if (num == -1) {
+      break;
+    }
+    igraph_vector_push_back(&edges, num);
+  }
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+  
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }

@@ -80,3 +80,8 @@ AT_SETUP([Graph atlas (igraph_atlas):])
 AT_KEYWORDS([atlas igraph_atlas])
 AT_COMPILE_CHECK([simple/igraph_atlas.c], [simple/igraph_atlas.out])
 AT_CLEANUP
+
+AT_SETUP([Small graph (igraph_small):])
+AT_KEYWORDS([graph constructor small igraph_small])
+AT_COMPILE_CHECK([simple/igraph_small.c], [simple/igraph_small.out])
+AT_CLEANUP
