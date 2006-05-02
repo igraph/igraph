@@ -459,7 +459,7 @@ int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges) {
   if (graph->attr) {
     long int i, j=1;
     for (i=0; i<igraph_vector_size(&graph->from); i++) {
-      if (VECTOR(graph->from)[i] > 0) {
+      if (VECTOR(graph->from)[i] >= 0) {
 	VECTOR(graph->from)[i]=j++;
       } else {
 	VECTOR(graph->from)[i]=0;
