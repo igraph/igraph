@@ -1658,13 +1658,15 @@ SEXP R_igraph_are_connected(SEXP graph, SEXP pv1, SEXP pv2) {
   igraph_t g;
   igraph_integer_t v1=REAL(pv1)[0];
   igraph_integer_t v2=REAL(pv2)[0];
+  igraph_bool_t res;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   PROTECT(result=NEW_LOGICAL(1));
-  LOGICAL(result)[0]=igraph_are_connected(&g, v1, v2);
+  igraph_are_connected(&g, v1, v2, &res);
+  LOGICAL(result)[0]=res;
   
   R_igraph_after();
   

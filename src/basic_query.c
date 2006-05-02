@@ -32,12 +32,9 @@
  * \param graph The graph object.
  * \param v1 The first vertex.
  * \param v2 The second vertex.
- * \return Boolean, \c TRUE if there is an edge from
- *         \p v1 to
- *         \p v2. Returns
- *         \c FALSE if there   
- *         is no such edge or at least one of the vertex ids is
- *         invalid (ie. too big or negative).
+ * \param res Boolean, \c TRUE if there is an edge from
+ *         \p v1 to \p v2, \c FALSE otherwise.
+ * \return Error code.
  * 
  * The function is of course symmetric for undirected graphs.
  *
@@ -45,27 +42,26 @@
  * d is the
  * out-degree of \p v1.
  */
-igraph_bool_t igraph_are_connected(const igraph_t *graph, 
-			    igraph_integer_t v1, igraph_integer_t v2) {
-
+int igraph_are_connected(const igraph_t *graph, 
+			 igraph_integer_t v1, igraph_integer_t v2,
+			 igraph_bool_t *res) {
   igraph_vs_t vs;
   igraph_vit_t it;
-  igraph_bool_t res=0;
   long int nov=igraph_vcount(graph);
 
   if (v1 < 0 || v2 < 0 || v1 > nov-1 || v2 > nov-1) {
-    return 0;
-/*     IGRAPH_ERROR("are connected", IGRAPH_EINVVID); */
+    IGRAPH_ERROR("are connected", IGRAPH_EINVVID);
   }
 
   IGRAPH_CHECK(igraph_vs_adj(&vs, v1, IGRAPH_OUT));
   IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
-  
+
+  *res=0;
   IGRAPH_VIT_RESET(it);
-  while (!res && !IGRAPH_VIT_END(it)) {
-    res= (IGRAPH_VIT_GET(it) == v2);
+  while (!*res && !IGRAPH_VIT_END(it)) {
+    *res= (IGRAPH_VIT_GET(it) == v2);
     IGRAPH_VIT_NEXT(it);
   }
   
-  return res;
+  return IGRAPH_SUCCESS;
 }

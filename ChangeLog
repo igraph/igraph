@@ -1,3 +1,11 @@
+2006-05-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/igraph.h, src/basic_query.c (igraph_are_connected) :
+	modified to return int instead of igraph_bool_t (the actual result
+	is now a formal parameter)
+	* interfaces/python/graphobject.c, interfaces/R/src/rinterface.c :
+	adapted to new interface of igraph_are_connected
+	
 2006-04-29  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/structural_properties.c (igraph_minimum_spanning_tree_prim) :

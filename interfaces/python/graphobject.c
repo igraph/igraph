@@ -28,6 +28,10 @@
 #include "convert.h"
 #include "error.h"
 
+#define ATTRHASH_IDX_GRAPH 0
+#define ATTRHASH_IDX_VERTEX 1
+#define ATTRHASH_IDX_EDGE 2
+
 PyTypeObject igraphmodule_GraphType;
 
 /** \defgroup python_interface_graph Graph object
@@ -42,11 +46,14 @@ PyTypeObject igraphmodule_GraphType;
  * \c tp_alloc
  */
 void igraphmodule_Graph_init_internal(igraphmodule_GraphObject *self) {
+  int i;
+  
   if (!self) return;
   self->vseq = NULL;
   self->eseq = NULL;
   self->destructor = NULL;
   self->weakreflist = NULL;
+  self->g.attr = NULL;
 }
 
 /**
@@ -78,9 +85,10 @@ PyObject* igraphmodule_Graph_new(PyTypeObject *type, PyObject *args,
 						    type);
   RC_ALLOC("Graph", self);
   
-  if (self != NULL) {
+  /* don't need it, the constructor will do it */
+  /*if (self != NULL) {
     igraph_empty(&self->g, 1, 0);
-  }
+  }*/
   igraphmodule_Graph_init_internal(self);
   
   return (PyObject*)self;
@@ -92,7 +100,8 @@ PyObject* igraphmodule_Graph_new(PyTypeObject *type, PyObject *args,
  */
 int igraphmodule_Graph_clear(igraphmodule_GraphObject *self) {
   PyObject *tmp;
-
+  int i;
+  
   PyObject_GC_UnTrack(self);
   
   tmp=self->vseq;
@@ -106,7 +115,14 @@ int igraphmodule_Graph_clear(igraphmodule_GraphObject *self) {
   tmp=self->destructor;
   self->destructor=NULL;
   Py_XDECREF(tmp);
-  
+
+  /*
+  for (i=0; i<3; i++) {
+    tmp=self->attrs[i];
+    self->attrs[i]=NULL;
+    Py_XDECREF(tmp);
+  }
+  */
   return 0;
 }
 
@@ -119,12 +135,17 @@ int igraphmodule_Graph_clear(igraphmodule_GraphObject *self) {
  */
 int igraphmodule_Graph_traverse(igraphmodule_GraphObject *self,
 				visitproc visit, void *arg) {
-  int vret;
+  int vret, i;
 
   RC_TRAVERSE("Graph", self);
   
   if (self->destructor) {
     vret=visit(self->destructor, arg);
+    if (vret != 0) return vret;
+  }
+  
+  for (i=0; i<3; i++) {
+    vret=visit(((PyObject**)(self->g.attr))[i], arg);
     if (vret != 0) return vret;
   }
   
@@ -158,7 +179,7 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject* self)
       Py_DECREF(r);
     }
   }
-  
+
   igraphmodule_Graph_clear(self);
 
   RC_DEALLOC("Graph", self);
@@ -195,12 +216,6 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject *self,
 				   &PyBool_Type, &dir))
     return -1;
 
-  if (n<0) {
-    // Throw an exception
-    PyErr_SetString(PyExc_AssertionError, "Number of vertices must be greater than zero.");
-    return -1;
-  }
-   
   if (edges && PyList_Check(edges)) {
     // Caller specified an edge list, so we use igraph_create
     // We have to convert the Python list to a igraph_vector_t
@@ -209,14 +224,18 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject *self,
       return -1;
     }
 	
-    igraph_destroy(&self->g);
-    igraph_create(&self->g, &edges_vector, (igraph_integer_t)n, (dir==Py_True));
+    if (igraph_create(&self->g, &edges_vector, (igraph_integer_t)n, (dir==Py_True))) {
+      igraphmodule_handle_igraph_error();
+      return -1;
+    }
     
     igraph_vector_destroy(&edges_vector);
   } else {
     // No edge list was specified, let's use igraph_empty
-    igraph_destroy(&self->g);
-    igraph_empty(&self->g, n, (dir==Py_True));
+    if (igraph_empty(&self->g, n, (dir==Py_True))) {
+      igraphmodule_handle_igraph_error();
+      return -1;
+    }
   }
    
   PyObject_GC_Track(self);
@@ -325,28 +344,21 @@ PyObject* igraphmodule_Graph_delete_vertices(igraphmodule_GraphObject *self,
    igraph_vector_t v;
    
    if (!PyArg_ParseTuple(args, "O", &list)) return NULL;
-   Py_INCREF(list);
-   
    if (igraphmodule_PyList_to_vector_t(list, &v, 1, 0))
      {
-	// something bad happened during conversion, release the
-	// list reference and return immediately
-	Py_DECREF(list);
+	// something bad happened during conversion
 	return NULL;
      }
    
    // do the hard work :)
-   if (igraph_delete_vertices(&self->g, IGRAPH_VS_VECTOR(&self->g, &v))) 
+   if (igraph_delete_vertices(&self->g, igraph_vss_vector(&v)))
      {
 	igraphmodule_handle_igraph_error();
-	Py_DECREF(list);
 	igraph_vector_destroy(&v);
 	return NULL;
      }
 
    igraph_vector_destroy(&v);
-   
-   Py_DECREF(list);
    
    Py_INCREF(self);
    
@@ -498,7 +510,7 @@ PyObject* igraphmodule_Graph_degree(igraphmodule_GraphObject *self,
      }
 
    igraph_vector_init(&result, 0);
-   if (igraph_degree(&self->g, &result, IGRAPH_VS_VECTOR(&self->g, &vids),
+   if (igraph_degree(&self->g, &result, igraph_vss_vector(&vids),
 		     (igraph_neimode_t)dtype, (igraph_bool_t)(loops == Py_True))) 
      {
        igraphmodule_handle_igraph_error();
@@ -1176,7 +1188,9 @@ PyObject* igraphmodule_Graph_are_connected(igraphmodule_GraphObject *self,
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &v1, &v2))
      return NULL;
 
-   res=igraph_are_connected(&self->g, (igraph_integer_t)v1, (igraph_integer_t)v2);
+   if (igraph_are_connected(&self->g, (igraph_integer_t)v1, (igraph_integer_t)v2, &res))
+     return NULL;
+       
    if (res) {
      Py_INCREF(Py_True); return Py_True;
    } else {
@@ -1207,7 +1221,7 @@ PyObject* igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *self,
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
-   
+     
    return PyFloat_FromDouble(res);
 }
 
@@ -1224,11 +1238,12 @@ PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObjec
    igraph_vector_t vids;
    igraph_vector_t res;
    int return_single=0;
-   
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-				    &vobj, &directed))
-     return NULL;
 
+   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+				    &vobj, &directed)) {
+     return NULL;
+   }
+  
    if (vobj == NULL) 
      {
 	// no vertex list was supplied
@@ -1258,7 +1273,7 @@ PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObjec
    
    if (igraph_vector_init(&res, igraph_vector_size(&vids))) return igraphmodule_handle_igraph_error();
    
-   if (igraph_betweenness(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids), PyObject_IsTrue(directed)))
+   if (igraph_betweenness(&self->g, &res, igraph_vss_vector(&vids), PyObject_IsTrue(directed)))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1316,7 +1331,7 @@ PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *
    
   if (igraph_vector_init(&res, igraph_vector_size(&vids))) return igraphmodule_handle_igraph_error();
    
-  if (igraph_pagerank(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids),
+  if (igraph_pagerank(&self->g, &res, igraph_vss_vector(&vids),
 		      PyObject_IsTrue(directed), niter, eps, damping)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
@@ -1380,7 +1395,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self,
    if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
-   if (igraph_bibcoupling(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids)))
+   if (igraph_bibcoupling(&self->g, &res, igraph_vss_vector(&vids)))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1449,7 +1464,7 @@ PyObject* igraphmodule_Graph_closeness(igraphmodule_GraphObject *self,
    
    if (igraph_vector_init(&res, igraph_vector_size(&vids))) return igraphmodule_handle_igraph_error();
    
-   if (igraph_closeness(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids), mode))
+   if (igraph_closeness(&self->g, &res, igraph_vss_vector(&vids), mode))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1521,7 +1536,6 @@ PyObject* igraphmodule_Graph_copy(igraphmodule_GraphObject *self) {
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
   
   return (PyObject*)result;
 }
@@ -1629,7 +1643,7 @@ PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self,
    if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
-   if (igraph_cocitation(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids)))
+   if (igraph_cocitation(&self->g, &res, igraph_vss_vector(&vids)))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -1718,7 +1732,7 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self,
      }
    
    if (igraph_get_shortest_paths(&self->g, &ptrvec, from, 
-				 IGRAPH_VS_ALL(&self->g), mode))
+				 igraph_vss_all(), mode))
      {
 	igraphmodule_handle_igraph_error();
 	for (j=0; j<no_of_nodes; j++) igraph_vector_destroy(&res[j]);
@@ -1786,7 +1800,7 @@ PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *se
   }
   
   if (igraph_get_all_shortest_paths(&self->g, &res, NULL, from, 
-				    IGRAPH_VS_ALL(&self->g), mode)) {
+				    igraph_vss_all(&self->g), mode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_ptr_destroy(&res);
     return NULL;
@@ -1877,7 +1891,7 @@ PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self,
    if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
      return igraphmodule_handle_igraph_error();
    
-   if (igraph_shortest_paths(&self->g, &res, IGRAPH_VS_VECTOR(&self->g, &vids), mode))
+   if (igraph_shortest_paths(&self->g, &res, igraph_vss_vector(&vids), mode))
      {
 	igraphmodule_handle_igraph_error(); return NULL;
      }
@@ -2063,7 +2077,7 @@ PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self,
   if (igraphmodule_PyList_to_vector_t(list, &vertices, 1, 0))
     return NULL;
   
-  if (igraph_subgraph(&self->g, &sg, IGRAPH_VS_VECTOR(&self->g, &vertices))) {
+  if (igraph_subgraph(&self->g, &sg, igraph_vss_vector(&vertices))) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&vertices);
     return NULL;
@@ -2554,6 +2568,7 @@ PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type,
 						    type);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(self);
     self->g=g;
   }
   fclose(f);
@@ -2597,6 +2612,7 @@ PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObj
 						    type);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(self);
     self->g=g;
   }
   fclose(f);
@@ -2640,6 +2656,7 @@ PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type, PyObject *args, PyObje
 						    type);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(self);
     self->g=g;
   }
   fclose(f);
@@ -2681,6 +2698,7 @@ PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyOb
 						    type);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(self);
     self->g=g;
   }
   fclose(f);
@@ -2722,6 +2740,7 @@ PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type,
 						    type);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(self);
     self->g=g;
   }
   fclose(f);
@@ -2885,18 +2904,7 @@ PyObject* igraphmodule_Graph_write_graphml(igraphmodule_GraphObject *self,
  * \brief Returns the number of graph attributes
  */
 int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self) {
-  igraph_vector_t t;
-  long result;
-  
-  if (igraph_vector_init(&t, 0)) return 0;
-  if (igraph_list_graph_attributes(&self->g, NULL, &t)) {
-    igraph_vector_destroy(&t);
-    return 0;
-  }
-  
-  result=igraph_vector_size(&t);
-  igraph_vector_destroy(&t);
-  return result;
+  return PyDict_Size(((PyObject**)self->g.attr)[ATTRHASH_IDX_GRAPH]);
 }
 
 /** \ingroup python_interface_graph
@@ -2904,33 +2912,18 @@ int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self) {
  */
 PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self,
 					   PyObject* s) {
-  igraph_attribute_type_t t=-1;
-  int result;
-  void* value=NULL;
+  PyObject* result;
   
-  if (!PyString_Check(s)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
-    return NULL;
+  result=PyDict_GetItem(((PyObject**)self->g.attr)[ATTRHASH_IDX_GRAPH], s);
+  if (result) {
+    Py_INCREF(result);
+    return result;
   }
-  result=igraph_get_graph_attribute(&self->g, PyString_AsString(s),
-				    &value, &t);
-  if (result == IGRAPH_EINVAL) {
+  
+  /* result is NULL, check whether there was an error */
+  if (!PyErr_Occurred())
     PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
-    return NULL;
-  } else if (result) {
-    return igraphmodule_handle_igraph_error();
-  }
-  
-  if (!value) {
-    PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
-    return NULL;
-  }
-  
-  if (t==IGRAPH_ATTRIBUTE_NUM)
-    return PyFloat_FromDouble((double)(*(igraph_real_t*)value));
-  if (t==IGRAPH_ATTRIBUTE_STR)
-    return PyString_FromString((char*)value);
-  return igraphmodule_handle_igraph_error();
+  return NULL;
 }
 
 /** \ingroup python_interface_graph
@@ -2941,75 +2934,12 @@ PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self,
  * \return 0 if everything's ok, -1 in case of error
  */
 int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k, PyObject* v) {
-  igraph_attribute_type_t t=-1, t2=-1;
-  void* value=NULL;
-  char* key;
-  igraph_real_t value0;
-  int result;
-  
-  if (!PyString_Check(k)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
+  if (v == NULL)
+    return PyDict_DelItem(((PyObject**)self->g.attr)[ATTRHASH_IDX_GRAPH], k);
+  Py_INCREF(v);
+  if (PyDict_SetItem(((PyObject**)self->g.attr)[ATTRHASH_IDX_GRAPH], k, v) == -1) {
+    Py_DECREF(v);
     return -1;
-  }
-  if (v!=NULL && !PyString_Check(v) && !PyInt_Check(v) && !PyLong_Check(v) && !PyFloat_Check(v)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute value must be either numeric or string");
-    return -1;
-  }
-  
-  key=PyString_AsString(k);
-  result=igraph_get_graph_attribute_type(&self->g, key, &t2);
-  if (result == IGRAPH_EINVAL) {
-    t2=-1;         // to indicate that there's no such attribute yet
-    PyErr_Clear(); // to indicate that we handled the situation
-  } else if (result) {
-    igraphmodule_handle_igraph_error(); return -1;
-  }
-  
-  if (v==NULL) {
-    // we are deleting attribute
-    if (igraph_remove_graph_attribute(&self->g, key)) {
-      igraphmodule_handle_igraph_error(); return -1;
-    }
-    return 0;
-  } else if (PyString_Check(v)) {
-    t=IGRAPH_ATTRIBUTE_STR;
-    value=(void*)PyString_AsString(v);
-  } else {
-    t=IGRAPH_ATTRIBUTE_NUM;
-    if (PyInt_Check(v))
-      value0=(igraph_real_t)(PyInt_AsLong(v));
-    else if (PyLong_Check(v))
-      value0=(igraph_real_t)(PyLong_AsLong(v));
-    else if (PyFloat_Check(v))
-      value0=(igraph_real_t)(PyFloat_AsDouble(v));
-    if (PyErr_Occurred()) return -1;
-    value=(void*)&value0;
-  }
-
-  if ((long)t2 == -1) {
-    // Attribute does not exist yet, so we add it
-    if (igraph_add_graph_attribute(&self->g, key, t)) {
-      igraphmodule_handle_igraph_error(); return -1;
-    }
-    t2=t;
-  } else {
-    if (t2!=t) {
-      /* In a graph, only one value can be assigned to an attribute name,
-       * so it is perfectly safe to delete the attribute and add it again
-       * if the type of the attribute changes. Note that this is not the
-       * same for vertices or edges, since removing an attribute from a
-       * vertex removes it from all of the vertices */
-      if (igraph_remove_graph_attribute(&self->g, key) ||
-	  igraph_add_graph_attribute(&self->g, key, t)) {
-	igraphmodule_handle_igraph_error(); return -1;
-      }
-      t2=t;
-      //PyErr_SetString(PyExc_TypeError, "Graph attribute type does not match the type of the given value");
-      //return -1;
-    }
-  }
-  if (igraph_set_graph_attribute(&self->g, key, value)) {
-    igraphmodule_handle_igraph_error(); return -1;
   }
   return 0;
 }
@@ -3017,82 +2947,22 @@ int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k
 /** \ingroup python_interface_graph
  * \brief Returns the attribute list of the graph
  */
-PyObject* igraphmodule_Graph_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds) {
-  igraph_vector_t t;
-  igraph_strvector_t ns;
-  PyObject *result;
-  
-  if (igraph_vector_init(&t, 0)) return NULL;
-  if (igraph_strvector_init(&ns, 0)) {
-    igraph_vector_destroy(&t);
-    return NULL;
-  }
-  if (igraph_list_graph_attributes(&self->g, &ns, &t)) {
-    igraph_vector_destroy(&t);
-    igraph_strvector_destroy(&ns);
-    return NULL;
-  }
-  
-  result=igraphmodule_strvector_t_to_PyList(&ns);
-  
-  igraph_vector_destroy(&t);
-  igraph_strvector_destroy(&ns);
-  
-  return result;
+PyObject* igraphmodule_Graph_attributes(igraphmodule_GraphObject* self) {
+  return PyDict_Keys(((PyObject**)self->g.attr)[ATTRHASH_IDX_GRAPH]);
 }
 
 /** \ingroup python_interface_graph
  * \brief Returns the attribute list of the graph's vertices
  */
-PyObject* igraphmodule_Graph_vertex_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds) {
-  igraph_vector_t t;
-  igraph_strvector_t ns;
-  PyObject *result;
-  
-  if (igraph_vector_init(&t, 0)) return 0;
-  if (igraph_strvector_init(&ns, 0)) {
-    igraph_vector_destroy(&t);
-    return 0;
-  }
-  if (igraph_list_vertex_attributes(&self->g, &ns, &t)) {
-    igraph_vector_destroy(&t);
-    igraph_strvector_destroy(&ns);
-    return 0;
-  }
-  
-  result=igraphmodule_strvector_t_to_PyList(&ns);
-  
-  igraph_vector_destroy(&t);
-  igraph_strvector_destroy(&ns);
-  
-  return result;
+PyObject* igraphmodule_Graph_vertex_attributes(igraphmodule_GraphObject* self) {
+  return PyDict_Keys(((PyObject**)self->g.attr)[ATTRHASH_IDX_VERTEX]);
 }
 
 /** \ingroup python_interface_graph
  * \brief Returns the attribute list of the graph's edges
  */
-PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds) {
-  igraph_vector_t t;
-  igraph_strvector_t ns;
-  PyObject *result;
-  
-  if (igraph_vector_init(&t, 0)) return 0;
-  if (igraph_strvector_init(&ns, 0)) {
-    igraph_vector_destroy(&t);
-    return 0;
-  }
-  if (igraph_list_edge_attributes(&self->g, &ns, &t)) {
-    igraph_vector_destroy(&t);
-    igraph_strvector_destroy(&ns);
-    return 0;
-  }
-  
-  result=igraphmodule_strvector_t_to_PyList(&ns);
-  
-  igraph_vector_destroy(&t);
-  igraph_strvector_destroy(&ns);
-  
-  return result;
+PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self) {
+  return PyDict_Keys(((PyObject**)self->g.attr)[ATTRHASH_IDX_EDGE]);
 }
 
 /** \ingroup python_interface_graph
@@ -3161,7 +3031,13 @@ PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyOb
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
+  if (result != NULL) {
+    /* this is correct as long as attributes are not copied by the
+     * operator. if they are copied, the initialization should not empty
+     * the attribute hashes */
+    igraphmodule_Graph_init_internal(result);
+    result->g=g;
+  }
   
   return (PyObject*)result;
 }
@@ -3210,7 +3086,13 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
+  if (result != NULL) {
+    /* this is correct as long as attributes are not copied by the
+     * operator. if they are copied, the initialization should not empty
+     * the attribute hashes */
+    igraphmodule_Graph_init_internal(result);
+    result->g=g;
+  }
   
   return (PyObject*)result;
 }
@@ -3259,7 +3141,13 @@ PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObje
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
+  if (result != NULL) {
+    /* this is correct as long as attributes are not copied by the
+     * operator. if they are copied, the initialization should not empty
+     * the attribute hashes */
+    igraphmodule_Graph_init_internal(result);
+    result->g=g;
+  }
   
   return (PyObject*)result;
 }
@@ -3285,7 +3173,13 @@ PyObject* igraphmodule_Graph_difference(igraphmodule_GraphObject* self, PyObject
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
+  if (result != NULL) {
+    /* this is correct as long as attributes are not copied by the
+     * operator. if they are copied, the initialization should not empty
+     * the attribute hashes */
+    igraphmodule_Graph_init_internal(result);
+    result->g=g;
+  }
   
   return (PyObject*)result;
 }
@@ -3307,7 +3201,13 @@ PyObject* igraphmodule_Graph_complementer(igraphmodule_GraphObject* self, PyObje
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
+  if (result != NULL) {
+    /* this is correct as long as attributes are not copied by the
+     * operator. if they are copied, the initialization should not empty
+     * the attribute hashes */
+    igraphmodule_Graph_init_internal(result);
+    result->g=g;
+  }
   
   return (PyObject*)result;
 }
@@ -3327,7 +3227,13 @@ PyObject* igraphmodule_Graph_complementer_op(igraphmodule_GraphObject* self) {
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
+  if (result != NULL) {
+    /* this is correct as long as attributes are not copied by the
+     * operator. if they are copied, the initialization should not empty
+     * the attribute hashes */
+    igraphmodule_Graph_init_internal(result);
+    result->g=g;
+  }
   
   return (PyObject*)result;
 }
@@ -3353,7 +3259,13 @@ PyObject* igraphmodule_Graph_compose(igraphmodule_GraphObject* self, PyObject* o
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
   RC_ALLOC("Graph", result);
-  if (result != NULL) result->g=g;
+  if (result != NULL) {
+    /* this is correct as long as attributes are not copied by the
+     * operator. if they are copied, the initialization should not empty
+     * the attribute hashes */
+    igraphmodule_Graph_init_internal(result);
+    result->g=g;
+  }
   
   return (PyObject*)result;
 }

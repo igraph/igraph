@@ -369,7 +369,7 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
 /* Basic query functions                              */
 /* -------------------------------------------------- */
 
-igraph_bool_t igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2);
+int igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
 
 /* -------------------------------------------------- */
 /* Structural properties                              */
