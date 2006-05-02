@@ -1,5 +1,9 @@
 2006-05-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
+	* src/iterators.c (igraph_vit_create) : bug corrected
+	
+2006-05-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
 	* src/igraph.h, src/basic_query.c (igraph_are_connected) :
 	modified to return int instead of igraph_bool_t (the actual result
 	is now a formal parameter)

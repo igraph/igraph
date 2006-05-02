@@ -150,7 +150,7 @@ int igraph_vit_create(const igraph_t *graph,
     vit->pos=0;
     vit->start=0;
     vit->vec=Calloc(1, igraph_vector_t);
-    if (vit->vec != 0) {
+    if (vit->vec == 0) {
       IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) vit->vec);
