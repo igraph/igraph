@@ -19,6 +19,8 @@
 	(igraph_vs_destroy, igraph_vit_create, igraph_es_destroy) 
 	(igraph_eit_create) : updated
 
+	* src/iterators.c (igraph_es_seq) : argument bug corrected
+
 2006-04-29  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/structural_properties.c (igraph_minimum_spanning_tree_prim) :

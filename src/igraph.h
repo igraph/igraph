@@ -272,7 +272,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v);
 int igraph_es_fromto(igraph_es_t *es,
 		     igraph_vs_t from, igraph_vs_t to);
 
-int igraph_es_seq(igraph_vs_t *es, igraph_integer_t from, igraph_integer_t to);
+int igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
 igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
 void igraph_es_destroy(igraph_es_t *es);

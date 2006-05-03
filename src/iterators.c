@@ -317,7 +317,7 @@ int igraph_es_fromto(igraph_es_t *es,
   /* TODO */
 }
 
-int igraph_es_seq(igraph_vs_t *es, 
+int igraph_es_seq(igraph_es_t *es, 
 		  igraph_integer_t from, igraph_integer_t to) {
   es->type=IGRAPH_ES_SEQ;
   es->data.seq.from=from;
