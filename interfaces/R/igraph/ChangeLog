@@ -1,3 +1,15 @@
+2006-04-30  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/iterators.R (igraph.es.fromorder)
+	(igraph.es.adj, igraph.vs.adj) : removed
+	* interfaces/R/src/rinterface.c (R_igraph_vs_to_SEXP)
+	(R_igraph_es_to_SEXP, R_igraph_vs_all, R_igraph_es_all)
+	(R_igraph_es_fromorder, R_igraph_es_adj, R_igraph_vs_adj)
+	(R_igraph_vs_vector, R_igraph_es_vector, R_igraph_vs_next)
+	(R_igraph_es_next, R_igraph_vs_reset, R_igraph_es_reset)
+	(R_igraph_vs_end, R_igraph_es_end, R_igraph_vs_get, R_igraph_es_get)
+	(R_igraph_es_from, R_igraph_es_to) : removed
+
 2006-04-28  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_attribute_copy) :

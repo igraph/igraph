@@ -68,26 +68,6 @@ igraph.es.all <- function(graph) {
   it
 }
 
-igraph.es.fromorder <- function(graph) {
-  .Call("R_igraph_es_fromorder", graph, PACKAGE="igraph")
-}
-
-igraph.es.adj <- function(graph, vid, mode="all") {
-  if (is.character(mode)) {
-    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-  }
-  .Call("R_igraph_es_adj", graph, as.numeric(vid), as.numeric(mode),
-        PACKAGE="igraph")
-}
-
-igraph.vs.adj <- function(graph, vid, mode="all") {
-  if (is.character(mode)) {
-    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-  }
-  .Call("R_igraph_vs_adj", graph, as.numeric(vid), as.numeric(mode),
-        PACKAGE="igraph")
-}
-
 igraph.vs.vector <- function(graph, v) {
   it <- list( c(1,1,length(v),), as.numeric(v) )
   class(it) <- "igraphvsvector"

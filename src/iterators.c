@@ -117,6 +117,22 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
   return 0;  
 }
 
+int igraph_vs_seq(igraph_vs_t *vs, 
+		  igraph_integer_t from, igraph_integer_t to) {
+  vs->type=IGRAPH_VS_SEQ;
+  vs->data.seq.from=from;
+  vs->data.seq.to=to;
+  return 0;
+}
+
+igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
+  igraph_vs_t vs;
+  vs.type=IGRAPH_VS_SEQ;
+  vs.data.seq.from=from;
+  vs.data.seq.to=to;
+  return vs;
+}
+
 void igraph_vs_destroy(igraph_vs_t *vs) {
   switch (vs->type) {
   case IGRAPH_VS_ALL:
@@ -124,6 +140,7 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
   case IGRAPH_VS_NONE:
   case IGRAPH_VS_1:
   case IGRAPH_VS_VECTORPTR:
+  case IGRAPH_VS_SEQ:
     break;
   case IGRAPH_VS_VECTOR:
     igraph_vector_destroy((igraph_vector_t*)vs->data.vecptr);
@@ -185,6 +202,12 @@ int igraph_vit_create(const igraph_t *graph,
     if (!igraph_vector_isininterval(vit->vec, 0, igraph_vcount(graph)-1)) {
       IGRAPH_ERROR("Cannot create iterator, invalid vertex id",IGRAPH_EINVVID);
     }
+    break;
+  case IGRAPH_VS_SEQ:
+    vit->type=IGRAPH_VIT_SEQ;
+    vit->pos=vs.data.seq.from;
+    vit->start=vs.data.seq.from;
+    vit->end=vs.data.seq.to;
     break;
   default:
     IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);
@@ -294,6 +317,22 @@ int igraph_es_fromto(igraph_es_t *es,
   /* TODO */
 }
 
+int igraph_es_seq(igraph_vs_t *es, 
+		  igraph_integer_t from, igraph_integer_t to) {
+  es->type=IGRAPH_ES_SEQ;
+  es->data.seq.from=from;
+  es->data.seq.to=to;
+  return 0;
+}
+
+igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
+  igraph_es_t es;
+  es.type=IGRAPH_ES_SEQ;
+  es.data.seq.from=from;
+  es.data.seq.to=to;
+  return es;
+}
+
 void igraph_es_destroy(igraph_es_t *es) {
   switch (es->type) { 
   case IGRAPH_ES_ALL:
@@ -303,6 +342,7 @@ void igraph_es_destroy(igraph_es_t *es) {
   case IGRAPH_ES_NONE:
   case IGRAPH_ES_1:
   case IGRAPH_ES_VECTORPTR:
+  case IGRAPH_ES_SEQ:
     break;
   default:
     break;
@@ -425,6 +465,12 @@ int igraph_eit_create(const igraph_t *graph,
     if (!igraph_vector_isininterval(eit->vec, 0, igraph_ecount(graph)-1)) {
       IGRAPH_ERROR("Cannot create iterator, invalid edge id",IGRAPH_EINVVID);
     }
+    break;
+  case IGRAPH_ES_SEQ:
+    eit->type=IGRAPH_EIT_SEQ;
+    eit->pos=es.data.seq.from;
+    eit->start=es.data.seq.from;
+    eit->end=es.data.seq.to;
     break;
   default:
     IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);

@@ -151,16 +151,21 @@ typedef enum { IGRAPH_EDGEORDER_ID=0,
 #define IGRAPH_VS_1         3
 #define IGRAPH_VS_VECTORPTR 4
 #define IGRAPH_VS_VECTOR    5
+#define IGRAPH_VS_SEQ       6
 
 typedef struct igraph_vs_t {
   int type;
   union {
-    igraph_integer_t vid;    
-    const igraph_vector_t *vecptr;
+    igraph_integer_t vid;    	        /* single vertex  */
+    const igraph_vector_t *vecptr;      /* vector of vertices  */
     struct {
       igraph_integer_t vid;
       igraph_neimode_t mode;
-    } adj;
+    } adj;			        /* adjacent vertices  */
+    struct {                           
+      igraph_integer_t from;
+      igraph_integer_t to;
+    } seq;                              /* sequence of vertices from:to */
   } data;
 } igraph_vs_t;
     
@@ -182,6 +187,9 @@ int igraph_vs_vector(igraph_vs_t *vs,
 igraph_vs_t igraph_vss_vector(const igraph_vector_t *v);
 
 int igraph_vs_vector_small(igraph_vs_t *vs, ...);			   
+
+int igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to);
+igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
 
 void igraph_vs_destroy(igraph_vs_t *vs);
 
@@ -224,6 +232,7 @@ void igraph_vit_destroy(const igraph_vit_t *vit);
 #define IGRAPH_ES_NONE      4
 #define IGRAPH_ES_1         5
 #define IGRAPH_ES_VECTORPTR 6
+#define IGRAPH_ES_SEQ       7
 
 typedef struct igraph_es_t {
   int type;
@@ -235,6 +244,10 @@ typedef struct igraph_es_t {
       igraph_integer_t vid;
       igraph_neimode_t mode;
     } adj;
+    struct {
+      igraph_integer_t from;
+      igraph_integer_t to;
+    } seq;
   } data;
 } igraph_es_t;
 
@@ -258,6 +271,9 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v);
 
 int igraph_es_fromto(igraph_es_t *es,
 		     igraph_vs_t from, igraph_vs_t to);
+
+int igraph_es_seq(igraph_vs_t *es, igraph_integer_t from, igraph_integer_t to);
+igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
 void igraph_es_destroy(igraph_es_t *es);
 
