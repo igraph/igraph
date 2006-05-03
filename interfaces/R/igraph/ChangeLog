@@ -10,6 +10,19 @@
 	(R_igraph_vs_end, R_igraph_es_end, R_igraph_vs_get, R_igraph_es_get)
 	(R_igraph_es_from, R_igraph_es_to) : removed
 
+	* interfaces/R/igraph/R/iterators.R (V, E, print.igraphesseq)
+	(print.igraphesseq, print.igraphvsvector, print.igraphesvector)
+	(length.igraphvsseq, length.igraphesseq, length.igraphvsvector)
+	(length.igraphesvector) : added
+	* interfaces/R/igraph/R/structural.properties.R 
+	(get.all.shortest.paths) : updated 
+	* interfaces/R/src/rinterface.c (R_SEXP_to_igraph_vs_copy)
+	(R_SEXP_to_igraph_es_copy) : rewritten
+	(R_igraph_delete_vertices, R_igraph_closeness, R_igraph_betweenness)
+	(R_igraph_cocitation, R_igraph_shortest_paths)
+	(R_igraph_get_shortest_paths, R_igraph_subgraph)
+	(R_igraph_get_all_shortest_paths) : updated
+
 2006-04-28  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_attribute_copy) :

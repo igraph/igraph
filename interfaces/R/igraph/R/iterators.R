@@ -56,6 +56,14 @@
 # Constructors
 ###################################################################
 
+V <- function(graph) {
+  igraph.vs.all(graph)
+}
+
+E <- function(graph) {
+  igraph.es.all(graph)
+}
+
 igraph.vs.all <- function(graph) {
   it <- list( c(0,0,vcount(graph)-1,) )
   class(it) <- "igraphvsseq"
@@ -78,6 +86,46 @@ igraph.es.vector <- function(graph, v) {
   it <- list( c(1,1,length(v),), as.numeric(v) )
   class(it) <- "igraphesvector"
   it
+}
+
+###################################################################
+# Pretty printing
+###################################################################
+
+print.igraphvsseq <- function(vs) {
+  print((vs[[1]][2]):(vs[[1]][3]))
+}
+
+print.igraphesseq <- function(es) {
+  print((es[[1]][2]):(es[[1]][3]))
+}
+
+print.igraphvsvector <- function(vs) {
+  print(vs[[2]])
+}
+
+print.igraphesvector <- function(es) {
+  print(es[[2]])
+}
+
+###################################################################
+# Length
+###################################################################
+
+length.igraphvsseq <- function(vs) {
+  vs[[1]][3]-vs[[1]][2]+1
+}
+
+length.igraphesseq <- function(es) {
+  es[[1]][3]-es[[1]][2]+1
+}
+
+length.igraphvsvector <- function(vs) {
+  length(vs[[2]])
+}
+
+length.igraphesvector <- function(es) {
+  length(es[[2]])
 }
 
 ###################################################################

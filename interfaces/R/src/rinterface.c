@@ -509,18 +509,18 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
 
 int R_SEXP_to_igraph_vs_copy(SEXP rit, igraph_t *graph, igraph_vs_t *it) {
 
-  if (!strcmp(CHAR(STRING_ELT(GET_CLASS(rit),0)), "igraphvsseq")) {
-    long int from=REAL(VECTOR_ELT(rit, 0))[1];
-    long int to=REAL(VECTOR_ELT(rit, 0))[2];    
-    igraph_vs_seq(graph, it, from, to);
-  } else if (!strcmp(CHAR(STRING_ELT(GET_CLASS(rit),0)), "igraphvsvector")) {
-    igraph_vector_t *tmpv=(igraph_vector_t*)R_alloc(1, sizeof(igraph_vector_t));
-    igraph_vs_vectorview(graph, it, 
-			 igraph_vector_view(tmpv, REAL(VECTOR_ELT(rit,1)), 
-				     GET_LENGTH(VECTOR_ELT(rit,1))));
+  if (!strcmp(CHAR(STRING_ELT(GET_CLASS(rit),0)), "igraphvsseq")) { 
+    
+    long int from=REAL(VECTOR_ELT(rit, 0))[1]; 
+    long int to=REAL(VECTOR_ELT(rit, 0))[2];
+    igraph_vs_seq(it, from, to); 
+  } else if (!strcmp(CHAR(STRING_ELT(GET_CLASS(rit),0)), "igraphvsvector")) { 
+    igraph_vector_t *tmpv=(igraph_vector_t*)R_alloc(1,sizeof(igraph_vector_t));
+    igraph_vs_vector(it, igraph_vector_view(tmpv, REAL(VECTOR_ELT(rit,1)), 
+					    GET_LENGTH(VECTOR_ELT(rit,1))));
   } else {
-    error("unknown vertex set type");
-  }
+    error("unknown vertex set type"); 
+  } 
   return 0;
 }
 
@@ -529,19 +529,18 @@ int R_SEXP_to_igraph_vs_copy(SEXP rit, igraph_t *graph, igraph_vs_t *it) {
  */
 
 int R_SEXP_to_igraph_es_copy(SEXP rit, igraph_t *graph, igraph_es_t *it) {
-  
+
   if (!strcmp(CHAR(STRING_ELT(GET_CLASS(rit),0)), "igraphesseq")) {
     long int from=REAL(VECTOR_ELT(rit, 0))[1];
-    long int to=REAL(VECTOR_ELT(rit, 0))[2];    
-    igraph_es_seq(graph, it, from, to);
+    long int to=REAL(VECTOR_ELT(rit, 0))[2];
+    igraph_es_seq(it, from, to);
   } else if (!strcmp(CHAR(STRING_ELT(GET_CLASS(rit),0)), "igraphesvector")) {
-    igraph_vector_t *tmpv=(igraph_vector_t*)R_alloc(1, sizeof(igraph_vector_t));
-    igraph_es_vectorview(graph, it, 
-			 igraph_vector_view(tmpv, REAL(VECTOR_ELT(rit,1)), 
-				     GET_LENGTH(VECTOR_ELT(rit,1))));
+    igraph_vector_t *tmpv=(igraph_vector_t*)R_alloc(1,sizeof(igraph_vector_t));
+    igraph_es_vector(it, igraph_vector_view(tmpv, REAL(VECTOR_ELT(rit,1)),
+					    GET_LENGTH(VECTOR_ELT(rit,1))));
   } else {
     error("unknown edge set type");
-  }    
+  }
   return 0;
 }
 
@@ -695,7 +694,7 @@ SEXP R_igraph_delete_vertices(SEXP graph, SEXP vertices) {
   
   R_SEXP_to_igraph_copy(graph, &g);
   R_SEXP_to_igraph_vs_copy(vertices, &g, &vs);
-  igraph_delete_vertices(&g, &vs);
+  igraph_delete_vertices(&g, vs);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   igraph_vs_destroy(&vs);
@@ -758,7 +757,7 @@ SEXP R_igraph_degree(SEXP graph, SEXP vids, SEXP pmode, SEXP ploops) {
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(vids, &g, &vs);
   igraph_vector_init(&res, 0);
-  igraph_degree(&g, &res, &vs, mode, loops);
+  igraph_degree(&g, &res, vs, mode, loops);
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
@@ -913,7 +912,7 @@ SEXP R_igraph_closeness(SEXP graph, SEXP pvids, SEXP pmode) {
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
   igraph_vector_init(&res, 0);
-  igraph_closeness(&g, &res, &vs, mode);
+  igraph_closeness(&g, &res, vs, mode);
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
@@ -963,7 +962,7 @@ SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected) {
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
   igraph_vector_init(&res, 0);
-  igraph_betweenness(&g, &res, &vs, directed);
+  igraph_betweenness(&g, &res, vs, directed);
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
@@ -1011,7 +1010,7 @@ SEXP R_igraph_cocitation(SEXP graph, SEXP pvids) {
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
   igraph_matrix_init(&m, 0, 0);
-  igraph_cocitation(&g, &m, &vs);
+  igraph_cocitation(&g, &m, vs);
   
   PROTECT(result=R_igraph_matrix_to_SEXP(&m));
   igraph_matrix_destroy(&m);
@@ -1035,7 +1034,7 @@ SEXP R_igraph_bibcoupling(SEXP graph, SEXP pvids) {
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
   igraph_matrix_init(&m, 0, 0);
-  igraph_bibcoupling(&g, &m, &vs);
+  igraph_bibcoupling(&g, &m, vs);
   
   PROTECT(result=R_igraph_matrix_to_SEXP(&m));
   igraph_matrix_destroy(&m);
@@ -1082,7 +1081,7 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode) {
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
   igraph_matrix_init(&res, 0, 0);
-  igraph_shortest_paths(&g, &res, &vs, mode);
+  igraph_shortest_paths(&g, &res, vs, mode);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   igraph_vs_destroy(&vs);
@@ -1541,7 +1540,7 @@ SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
 }
 
 SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto, 
-				 SEXP pmode) {
+				 SEXP pmode, SEXP pno) {
 
   igraph_t g;
   igraph_integer_t from=REAL(pfrom)[0];
@@ -1552,19 +1551,12 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
   igraph_vector_ptr_t ptrvec;
   SEXP result;
   
-  igraph_vs_t myto;
-  const igraph_vector_t *mytov;
-  long int no;
+  long int no=REAL(pno)[0];
   
   R_igraph_before();  
 
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pto, &g, &to);
-
-  igraph_vs_vectorview_it(&g, &to, &myto);
-  mytov=igraph_vs_vector_getvector(&g, &myto);
-  no=igraph_vector_size(mytov);
-  igraph_vs_destroy(&myto);
 
   igraph_vector_ptr_init(&ptrvec, no);
   vects=(igraph_vector_t*) R_alloc(GET_LENGTH(pto), sizeof(igraph_vector_t));
@@ -1572,7 +1564,7 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
     igraph_vector_init(&vects[i], 0);
     VECTOR(ptrvec)[i]=&vects[i];
   }
-  igraph_get_shortest_paths(&g, &ptrvec, from, &to, mode);
+  igraph_get_shortest_paths(&g, &ptrvec, from, to, mode);
   PROTECT(result=NEW_LIST(no));
   for (i=0; i<no; i++) {
     SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(&vects[i])));
@@ -1723,7 +1715,7 @@ SEXP R_igraph_subgraph(SEXP graph, SEXP pvids) {
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pvids, &g, &vs);
-  igraph_subgraph(&g, &sub, &vs);
+  igraph_subgraph(&g, &sub, vs);
   PROTECT(result=R_igraph_to_SEXP(&sub));
   igraph_destroy(&sub);
   igraph_vs_destroy(&vs);
@@ -2506,7 +2498,7 @@ SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs_copy(pto, &g, &to);
   igraph_vector_ptr_init(&res, 0);
-  igraph_get_all_shortest_paths(&g, &res, 0, from, &to, mode);
+  igraph_get_all_shortest_paths(&g, &res, 0, from, to, mode);
   PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&res)));
   for (i=0; i<igraph_vector_ptr_size(&res); i++) {
     long int len=igraph_vector_size(VECTOR(res)[i]);

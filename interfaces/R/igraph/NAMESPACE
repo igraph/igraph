@@ -12,9 +12,9 @@ export(get.graph.attribute, set.graph.attribute, g,
 
 # iterators
 
-export(igraph.vs.all, igraph.vs.adj, igraph.vs.vector,
-       igraph.es.all, igraph.es.fromorder, igraph.es.adj,
-       igraph.es.vector,
+export(igraph.vs.all, igraph.vs.vector,
+       igraph.es.all, igraph.es.vector,
+       V, E,
        igraph.vs.next, igraph.vs.end, igraph.vs.reset, igraph.vs.get,
        igraph.es.next, igraph.es.end, igraph.es.reset, igraph.es.get,
        igraph.es.from, igraph.es.to)
@@ -32,6 +32,16 @@ S3method(as.vector, igraphvsseq)
 S3method(as.vector, igraphvsvector)
 S3method(as.vector, igraphesseq)
 S3method(as.vector, igraphesvector)
+
+S3method(print, igraphvsseq)
+S3method(print, igraphesseq)
+S3method(print, igraphvsvector)
+S3method(print, igraphesvector)
+
+S3method(length, igraphvsseq)
+S3method(length, igraphesseq)
+S3method(length, igraphvsvector)
+S3method(length, igraphesvector)
 
 export ("$.igraphvsseq", "$.igraphvsvector",
         "$.igraphesseq", "$.igraphesvector")

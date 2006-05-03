@@ -96,8 +96,9 @@ get.shortest.paths <- function(graph, from, to=igraph.vs.all(graph),
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
 
+  to <- as.igraph.vs(graph, to)
   .Call("R_igraph_get_shortest_paths", graph,
-        as.numeric(from), as.igraph.vs(graph, to), as.numeric(mode),
+        as.numeric(from), to, as.numeric(mode), length(to),
         PACKAGE="igraph")
 }
 
