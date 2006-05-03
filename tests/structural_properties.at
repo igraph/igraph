@@ -63,3 +63,8 @@ AT_KEYWORDS([igraph_minimum_spanning_tree_prim Prim minimum spanning tree])
 AT_COMPILE_CHECK([simple/igraph_minimum_spanning_tree.c],
 	         [simple/igraph_minimum_spanning_tree.out])
 AT_CLEANUP
+
+AT_SETUP([Cocitation and bibcoupling (igraph_cocitation,igraph_bibcoupling):])
+AT_KEYWORDS([cocitation bibliographic coupling])
+AT_COMPILE_CHECK([simple/igraph_cocitation.c], [simple/igraph_cocitation.out])
+AT_CLEANUP

@@ -139,7 +139,9 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
   }
 
   /* Copy result */
-  for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+  for (IGRAPH_VIT_RESET(vit), i=0; 
+       !IGRAPH_VIT_END(vit); 
+       IGRAPH_VIT_NEXT(vit), i++) {
     for (j=0; j<no_of_nodes; j++) {
       MATRIX(*res, i, j) = MATRIX(tmpres, (long int) IGRAPH_VIT_GET(vit), j);
     }
