@@ -55,13 +55,17 @@ int igraph_are_connected(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_vs_adj(&vs, v1, IGRAPH_OUT));
   IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
-
+  IGRAPH_FINALLY(igraph_vit_destroy, &it);
+  
   *res=0;
   IGRAPH_VIT_RESET(it);
   while (!*res && !IGRAPH_VIT_END(it)) {
     *res= (IGRAPH_VIT_GET(it) == v2);
     IGRAPH_VIT_NEXT(it);
   }
+  
+  igraph_vit_destroy(&it);
+  IGRAPH_FINALLY_CLEAN(1);
   
   return IGRAPH_SUCCESS;
 }

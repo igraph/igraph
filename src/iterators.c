@@ -482,8 +482,8 @@ int igraph_eit_create(const igraph_t *graph,
 void igraph_eit_destroy(const igraph_eit_t *eit) {
   switch (eit->type) {
   case IGRAPH_EIT_SEQ:
-  case IGRAPH_EIT_VECTORPTR:
     break;
+  case IGRAPH_EIT_VECTORPTR:
   case IGRAPH_EIT_VECTOR:
     igraph_vector_destroy((igraph_vector_t*)eit->vec);
     igraph_free((igraph_vector_t*)eit->vec);
