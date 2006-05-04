@@ -3,6 +3,11 @@
 	* src/iterators.c (igraph_eit_destroy) : fixed memory leak
 	* src/basic_query.c (igraph_are_connected) : fixed memory leak
 
+2006-05-03  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/measure_dynamics.c (igraph_measure_dynamics_id) : two bugs
+	corrected
+
 2006-05-02  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/cocitation.c (igraph_cocitation_real) : bug corrected

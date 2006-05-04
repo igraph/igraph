@@ -102,7 +102,7 @@ int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_ver
       
       indegree[to]++;
       VECTOR(ntk)[xidx] --;
-      if (MATRIX(normfact, xidx, 0)==0) {
+      if (VECTOR(ntk)[xidx]==0) {
 	MATRIX(normfact, xidx, 0) += (edges-VECTOR(ch)[xidx]+1);
 	VECTOR(ch)[xidx]=edges;
       }
@@ -114,6 +114,9 @@ int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_ver
     }
     
     VECTOR(ntk)[0]++;
+    if (VECTOR(ntk)[0]==1) {
+      VECTOR(ch)[0]=edges;
+    }
   }      
 
   /* Ok, measurement done, update change */
