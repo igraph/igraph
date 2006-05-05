@@ -25,6 +25,9 @@
 	* examples/simple/igraph_add_vertices.c : updated
 	* examples/simple/igraph_delete_vertices.c : updated
 
+	* src/iterators.c (igraph_eit_destroy) : do not destroy vector for
+	VECTORPTR iterator type
+
 2006-05-04  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/iterators.c (igraph_eit_destroy) : fixed memory leak
