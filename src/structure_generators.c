@@ -79,9 +79,9 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges, igraph_integer_
   if (igraph_vector_size(edges)>0) {
     igraph_integer_t vc=igraph_vcount(graph);
     if (vc < max) {
-      IGRAPH_CHECK(igraph_add_vertices(graph, max-vc));
+      IGRAPH_CHECK(igraph_add_vertices(graph, max-vc, 0));
     }
-    IGRAPH_CHECK(igraph_add_edges(graph, edges));
+    IGRAPH_CHECK(igraph_add_edges(graph, edges, 0));
   }
 
   IGRAPH_FINALLY_CLEAN(1);

@@ -31,10 +31,10 @@ int main() {
 
   /* without edges */
   igraph_empty(&g, 5, IGRAPH_DIRECTED);
-  igraph_add_vertices(&g, 2);
-  igraph_add_vertices(&g, 3);
-  igraph_add_vertices(&g, 1);
-  igraph_add_vertices(&g, 4);
+  igraph_add_vertices(&g, 2, 0);
+  igraph_add_vertices(&g, 3, 0);
+  igraph_add_vertices(&g, 1, 0);
+  igraph_add_vertices(&g, 4, 0);
   if (igraph_vcount(&g) != 15)  {
     return 1;
   }

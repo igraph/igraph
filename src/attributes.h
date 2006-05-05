@@ -30,6 +30,22 @@
 /* Attributes                                         */
 /* -------------------------------------------------- */
 
+typedef enum { IGRAPH_ATTRIBUTE_DEFAULT=0,
+	       IGRAPH_ATTRIBUTE_NUMERIC=1, 
+	       IGRAPH_ATTRIBUTE_STRING=2,
+	       IGRAPH_ATTRIBUTE_R_OBJECT=3, 
+	       IGRAPH_ATTRIBUTE_PY_OBJECT=4 } igraph_attribute_type_t;
+
+typedef struct igraph_i_attribute_record_t {
+  const char *name;
+  igraph_attribute_type_t type;
+  void *value;
+} igraph_i_attribute_record_t;
+
+typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
+	       IGRAPH_ATTRIBUTE_VERTEX,
+	       IGRAPH_ATTRIBUTE_EDGE } igraph_attribute_elemtype_t;
+
 /**
  * \struct igraph_attribute_table_t
  * 
@@ -45,7 +61,8 @@
  *    igraph_copy, after the structure of the graph has been already
  *    copied. It is expected to return an error code.
  * \member add_vertices Called when vertices are added to a
- *    graph. The number of vertices to add is supplied as an
+ *    graph, before adding the vertices themselves.
+ *    The number of vertices to add is supplied as an
  *    argument. Expected to return an error code. 
  * \member delete_vertices Called when vertices are deleted from the
  *    graph. Two additional parameters are supplied, the first is a
@@ -67,11 +84,37 @@ typedef struct igraph_attribute_table_t {
   int (*init)(igraph_t *graph);
   void (*destroy)(igraph_t *graph);
   int (*copy)(igraph_t *to, const igraph_t *from);
-  int (*add_vertices)(igraph_t *graph, long int nv);
+  int (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
   void (*delete_vertices)(igraph_t *graph, const igraph_vector_t *eidx,
 			  const igraph_vector_t *vidx);
-  int (*add_edges)(igraph_t *graph, long int ne);
+  int (*add_edges)(igraph_t *graph, const igraph_vector_t *edges, 
+		   igraph_vector_ptr_t *attr);
   void (*delete_edges)(igraph_t *graph, const igraph_vector_t *idx);
+
+  int (*get_info)(const igraph_t *graph,
+		  igraph_strvector_t *gnames, igraph_vector_t *gtypes,
+		  igraph_strvector_t *vnames, igraph_vector_t *vtypes,
+		  igraph_strvector_t *enames, igraph_vector_t *etypes);
+
+  igraph_bool_t (*has_attr)(const igraph_t *graph, igraph_attribute_elemtype_t type,
+			    const char *name);
+
+  int (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
+				igraph_vector_t *value);
+  int (*get_string_graph_attr)(const igraph_t *graph, const char *name,
+			       igraph_strvector_t *value);
+  int (*get_numeric_vertex_attr)(const igraph_t *graph, const char *name,
+				 igraph_vs_t vs,
+				 igraph_vector_t *value);
+  int (*get_string_vertex_attr)(const igraph_t *graph, const char *name,
+				igraph_vs_t vs,
+				igraph_strvector_t *value);
+  int (*get_numeric_edge_attr)(const igraph_t *graph, const char *name,
+			       igraph_es_t es,
+			       igraph_vector_t *value);
+  int (*get_string_edge_attr)(const igraph_t *graph, const char *name,
+			      igraph_es_t es,
+			      igraph_strvector_t *value);
 } igraph_attribute_table_t;
 
 extern igraph_attribute_table_t *igraph_i_attribute_table;
@@ -96,12 +139,47 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table);
 int igraph_i_attribute_init(igraph_t *graph);
 void igraph_i_attribute_destroy(igraph_t *graph);
 int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from);
-int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv);
+int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr);
 void igraph_i_attribute_delete_vertices(igraph_t *graph, 
 					const igraph_vector_t *eidx,
 					const igraph_vector_t *vidx);
-int igraph_i_attribute_add_edges(igraph_t *graph, long int ne);
+int igraph_i_attribute_add_edges(igraph_t *graph, 
+				 const igraph_vector_t *edges, void *attr);
 void igraph_i_attribute_delete_edges(igraph_t *graph, 
 				     const igraph_vector_t *idx);
+
+int igraph_i_attribute_get_info(const igraph_t *graph,
+				igraph_strvector_t *gnames, 
+				igraph_vector_t *gtypes,
+				igraph_strvector_t *vnames,
+				igraph_vector_t *vtypes,
+				igraph_strvector_t *enames,
+				igraph_vector_t *etypes);
+igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph, 
+					  igraph_attribute_elemtype_t type,
+					  const char *name);
+
+int igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
+					      const char *name,
+					      igraph_vector_t *value);
+int igraph_i_attribute_get_numeric_vertex_attr(const igraph_t *graph, 
+					       const char *name,
+					       igraph_vs_t vs,
+					       igraph_vector_t *value);
+int igraph_i_attribute_get_numeric_edge_attr(const igraph_t *graph,
+					     const char *name,
+					     igraph_es_t es,
+					     igraph_vector_t *value);
+int igraph_i_attribute_get_string_graph_attr(const igraph_t *graph,
+					     const char *name,
+					     igraph_strvector_t *value);
+int igraph_i_attribute_get_string_vertex_attr(const igraph_t *graph, 
+					      const char *name,
+					      igraph_vs_t vs,
+					      igraph_strvector_t *value);
+int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
+					    const char *name,
+					    igraph_es_t es,
+					    igraph_strvector_t *value);
 
 #endif

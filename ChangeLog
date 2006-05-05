@@ -1,3 +1,30 @@
+2006-05-05  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/igraph_trie.c (igraph_trie_getkeys) : added
+
+	* src/attributes.h (igraph_attribute_type_t)
+	(igraph_i_attribute_record_t, igraph_attribute_elemtype_t) : added
+	* src/attributes.c (igraph_i_attribute_add_vertices)
+	(igraph_i_attribute_add_edges) : added attr argument
+	(igraph_i_attribute_get_info, igraph_i_attribute_has_attr)
+	(igraph_i_attribute_get_numeric_graph_attr)
+	(igraph_i_attribute_get_string_graph_attr)
+	(igraph_i_attribute_get_numeric_vertex_attr)
+	(igraph_i_attribute_get_string_vertex_attr)
+	(igraph_i_attribute_get_numeric_edge_attr)
+	(igraph_i_attribute_get_string_edge_attr) : added	
+	* src/type_indexededgelist.c (igraph_add_vertices)
+	(igraph_add_edges) : added attr argument
+	(igrap_empty) : udated igraph_add_vertices call
+	* src/foreign.c (igraph_read_graph_ncol) : attributes readded
+	* src/structural_properties.c (igraph_rewire) : updated 
+	igraph_add_edges call
+	* src/structure_generators.c (igraph_create) : updated 
+	igraph_add_vertices and igraph_add_edges calls
+	* examples/simple/igraph_add_edges.c : updated
+	* examples/simple/igraph_add_vertices.c : updated
+	* examples/simple/igraph_delete_vertices.c : updated
+
 2006-05-04  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/iterators.c (igraph_eit_destroy) : fixed memory leak

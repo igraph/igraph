@@ -179,10 +179,17 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_vector_t edges, ws;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
   long int no_predefined=0;
-  
+  igraph_vector_ptr_t name, weight;
+  igraph_vector_ptr_t *pname=0, *pweight=0;
+  igraph_i_attribute_record_t namerec, weightrec;
+  const char *namestr="name", *weightstr="weight";
+
+  IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
   IGRAPH_TRIE_INIT_FINALLY(&trie, names);
   IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
   /* Add the predefined names, if any */
   if (predefnames != 0) {
@@ -211,37 +218,39 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     IGRAPH_WARNING("unknown vertex/vertices found, predefnames extended");    
   }
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));  
-  igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(1);
-  
-/*   if (weights) { */
-/*     /\* TODO: we cannot really assume that the edge ids are the same */
-/*        as the order they were added. TODO: add edges together with */
-/*        attributes *\/ */
-/*     long int i; */
-/*     IGRAPH_CHECK(igraph_add_edge_attribute(graph, "weight",  */
-/* 					   IGRAPH_ATTRIBUTE_NUM)); */
-/*     for (i=0; i<igraph_ecount(graph); i++) { */
-/*       IGRAPH_CHECK(igraph_set_edge_attribute(graph, "weight", i,  */
-/* 					     &VECTOR(ws)[i]));  */
-/*     } */
-/*   } */
+  if (names) {
+    igraph_strvector_t *namevec;
+    IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1)); 
+    pname=&name;
+    igraph_trie_getkeys(&trie, &namevec); /* dirty */
+    namerec.name=namestr;
+    namerec.type=IGRAPH_ATTRIBUTE_STRING;
+    namerec.value=namevec;
+    VECTOR(name)[0]=&namerec;
+  }
+
+  if (weights) {
+    IGRAPH_CHECK(igraph_vector_ptr_init(&weight, 1)); 
+    pweight=&weight;
+    weightrec.name=weightstr;
+    weightrec.type=IGRAPH_ATTRIBUTE_NUMERIC;
+    weightrec.value=&ws;
+    VECTOR(weight)[0]=&weightrec;
+  }
+
+  IGRAPH_CHECK(igraph_add_vertices(graph, igraph_vector_max(&edges)+1, pname));
+  IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
+
+  if (pname) {
+    igraph_vector_ptr_destroy(pname);
+  }
+  if (pweight) {
+    igraph_vector_ptr_destroy(pweight);
+  }
   igraph_vector_destroy(&ws); 
-  IGRAPH_FINALLY_CLEAN(1); 
-  
-/*   if (names) { */
-/*     long int i; */
-/*     IGRAPH_CHECK(igraph_add_vertex_attribute(graph, "name",  */
-/* 					     IGRAPH_ATTRIBUTE_STR)); */
-/*     for (i=0; i<igraph_vcount(graph); i++) { */
-/*       char *str; */
-/*       igraph_trie_idx(&trie, i, &str); */
-/*       IGRAPH_CHECK(igraph_set_vertex_attribute(graph, "name", i, str)); */
-/*     } */
-/*   } */
   igraph_trie_destroy(&trie);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(4);
 
   return 0;
 }
@@ -460,7 +469,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
   if (state->index<0) {
     igraph_empty(state->g, igraph_trie_size(&state->node_trie),
 		 state->directed_default);
-    igraph_add_edges(state->g, &state->edgelist);
+    igraph_add_edges(state->g, &state->edgelist, 0);
   }
 
   l=igraph_vector_ptr_size(&state->key_list);

@@ -83,7 +83,7 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
   IGRAPH_CHECK(igraph_i_attribute_init(graph));
 
   /* add the vertices */
-  IGRAPH_CHECK(igraph_add_vertices(graph, n));
+  IGRAPH_CHECK(igraph_add_vertices(graph, n, 0));
   
   IGRAPH_FINALLY_CLEAN(6);
   return 0;
@@ -188,7 +188,8 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  * |E| is the number of
  * edges in the \em new, extended graph.
  */
-int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges) {
+int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
+		     void *attr) {
   long int no_of_edges=igraph_vector_size(&graph->from);
   long int edges_to_add=igraph_vector_size(edges)/2;
   long int i=0;
@@ -237,7 +238,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges) {
 
   /* Attributes */
   if (graph->attr) { 
-    ret1=igraph_i_attribute_add_edges(graph, edges_to_add);
+    ret1=igraph_i_attribute_add_edges(graph, edges, attr);
     if (ret1 != 0) {
       igraph_vector_resize(&graph->from, no_of_edges);
       igraph_vector_resize(&graph->to, no_of_edges);
@@ -280,7 +281,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges) {
  * |V| is 
  * the number of vertices in the \em new, extended graph.
  */
-int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv) {
+int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
   long int ec=igraph_ecount(graph);
   long int i;
   int ret;
@@ -290,7 +291,7 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv) {
   }
 
   if (graph->attr) {
-    IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv));
+    IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
   }
 
   IGRAPH_CHECK(igraph_vector_reserve(&graph->os, graph->n+nv+1));

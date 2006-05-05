@@ -1,3 +1,16 @@
+2006-05-05  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_getListElement) : added
+
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_add_vertices)
+	(R_igraph_attribute_add_edges) : handle attr argument
+	(R_igraph_attribute_get_info, R_igraph_attribute_has_attr)
+	(R_igraph_get_numeric_graph_attr, R_igraph_get_string_graph_attr)
+	(R_igraph_get_numeric_vertex_attr, R_igraph_get_string_vertex_attr)
+	(R_igraph_get_numeric_edge_attr, R_igraph_get_string_edge_attr) : added
+	(R_igraph_attribute_table) : updated
+	(R_igraph_add_vertices, R_igraph_add_edges) : updated
+
 2006-04-30  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/iterators.R (igraph.es.fromorder)

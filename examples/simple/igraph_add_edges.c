@@ -49,7 +49,7 @@ int main() {
   igraph_vector_resize(&v, 4);
   VECTOR(v)[0]=2; VECTOR(v)[1]=1;
   VECTOR(v)[2]=3; VECTOR(v)[3]=3;
-  igraph_add_edges(&g, &v);
+  igraph_add_edges(&g, &v, 0);
   
   /* Check result */
   igraph_get_edgelist(&g, &v, 0);
@@ -61,7 +61,7 @@ int main() {
   igraph_vector_resize(&v, 3);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=2;
-  ret=igraph_add_edges(&g, &v);
+  ret=igraph_add_edges(&g, &v, 0);
   if (ret != IGRAPH_EINVEVECTOR) {
     return 1;
   }
@@ -75,7 +75,7 @@ int main() {
   igraph_vector_resize(&v, 4);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
   VECTOR(v)[2]=2; VECTOR(v)[3]=4;
-  ret=igraph_add_edges(&g, &v);
+  ret=igraph_add_edges(&g, &v, 0);
   if (ret != IGRAPH_EINVVID) {
     return 2;
   }  

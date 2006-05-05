@@ -454,6 +454,7 @@ int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id);
 int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length, 
 		     long int *id);
 void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
+int igraph_trie_getkeys(igraph_trie_t *t, igraph_strvector_t **strv);
 long int igraph_trie_size(igraph_trie_t *t);
 
 /**

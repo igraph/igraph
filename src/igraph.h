@@ -312,8 +312,10 @@ void igraph_eit_destroy(const igraph_eit_t *eit);
 int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
 int igraph_destroy(igraph_t *graph);
 int igraph_copy(igraph_t *to, const igraph_t *from);
-int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges);
-int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv);
+int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges, 
+		     void *attr);
+int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, 
+			void *attr);
 int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges); /*eee*/
 int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
 igraph_integer_t igraph_vcount(const igraph_t *graph);

@@ -1770,7 +1770,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
 	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=d;
 	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=b;
 	/*printf("Adding: %d -> %d, %d -> %d\n", a, d, c, b);*/
-	igraph_add_edges(graph, &edgevec);
+	igraph_add_edges(graph, &edgevec, 0);
 	/* We have to adjust the adjacency list view as well.
 	   It's a luck that we have the pointers in neis[0] and neis[1] */
 	for (i=igraph_vector_size(neis[0])-1; i>=0; i--)

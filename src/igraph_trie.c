@@ -346,3 +346,10 @@ void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str) {
 long int igraph_trie_size(igraph_trie_t *t) {
   return t->maxvalue+1;
 }
+
+/* Hmmm, very dirty.... */
+
+int igraph_trie_getkeys(igraph_trie_t *t, igraph_strvector_t **strv) {
+  *strv=&t->keys;
+  return 0;
+}

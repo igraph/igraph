@@ -48,6 +48,22 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res);
 int R_SEXP_to_igraph_vs_copy(SEXP rit, igraph_t *graph, igraph_vs_t *it);
 int R_SEXP_to_igraph_es_copy(SEXP rit, igraph_t *graph, igraph_es_t *it);
 
+/* get the list element named str, or return NULL */
+/* from the R Manual */
+
+SEXP R_igraph_getListElement(SEXP list, const char *str)
+{
+  SEXP elmt = R_NilValue, names = getAttrib(list, R_NamesSymbol);
+  int i;
+  
+  for (i = 0; i < length(list); i++)
+    if(strcmp(CHAR(STRING_ELT(names, i)), str) == 0) {
+      elmt = VECTOR_ELT(list, i);
+      break;
+    }
+  return elmt;
+}
+
 /******************************************************
  * Attributes                                         *
  *****************************************************/
@@ -84,10 +100,12 @@ int R_igraph_attribute_copy(igraph_t *to, const igraph_t *from) {
   return 0;
 }
 
-int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv) {
+int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv, 
+				    igraph_vector_ptr_t *nattr) {
   SEXP attr=graph->attr;
-  SEXP val, rep;
-  long int valno, i, origlen;
+  SEXP val, rep=0, names, newnames;
+  igraph_vector_t news;
+  long int valno, i, origlen, nattrno, newattrs;
   if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
     SEXP newattr;
     PROTECT(newattr=duplicate(attr));
@@ -99,23 +117,112 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv) {
     REAL(VECTOR_ELT(newattr, 0))[1] = 1;
     attr=graph->attr=newattr;
   }
-  
+
   val=VECTOR_ELT(attr, 2);
   valno=GET_LENGTH(val);  
-  if (valno > 0) {
-    origlen=GET_LENGTH(VECTOR_ELT(val, 0));
-    PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL), 
-			   ScalarInteger(nv))));
+  names=GET_NAMES(val);
+  if (nattr==NULL) { 
+    nattrno=0;
+  } else {
+    nattrno=igraph_vector_ptr_size(nattr); 
   }
+  origlen=igraph_vcount(graph);
+
+  /* First add the new attributes, if any */
+  newattrs=0;
+  IGRAPH_VECTOR_INIT_FINALLY(&news, 0);
+  for (i=0; i<nattrno; i++) {
+    igraph_i_attribute_record_t *nattr_entry=VECTOR(*nattr)[i];
+    const char *nname=nattr_entry->name;
+    long int j; 
+    igraph_bool_t l=0;
+    for (j=0; !l && j<valno; j++) {
+      l=!strcmp(nname, CHAR(STRING_ELT(names, j)));
+    }
+    if (!l) {
+      newattrs++;
+      IGRAPH_CHECK(igraph_vector_push_back(&news, i));
+    }
+  }
+  if (newattrs != 0) {
+    SEXP app, newval;
+    PROTECT(app=NEW_LIST(newattrs));
+    PROTECT(newnames=NEW_CHARACTER(newattrs));
+    PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL), 
+			   ScalarInteger(origlen))));
+    for (i=0; i<newattrs; i++) {
+      igraph_i_attribute_record_t *tmp=
+	VECTOR(*nattr)[(long int)VECTOR(news)[i]];
+      SET_VECTOR_ELT(app, i, rep);
+      SET_STRING_ELT(newnames, i, CREATE_STRING_VECTOR(tmp->name));
+    }
+    UNPROTECT(1); 		/* rep */
+    PROTECT(newval=EVAL(lang3(install("c"), val, app)));
+    PROTECT(newnames=EVAL(lang3(install("c"), names, newnames)));
+    SET_NAMES(newval, newnames);
+    SET_VECTOR_ELT(attr, 2, newval);
+    val=VECTOR_ELT(attr, 2);    
+    valno=GET_LENGTH(val);  
+    names=GET_NAMES(val);
+    UNPROTECT(4);
+    rep=0;
+  }
+  igraph_vector_destroy(&news);
+  IGRAPH_FINALLY_CLEAN(1);	/* news */
+
+  /* Now append the new values */
   for (i=0; i<valno; i++) {
     SEXP oldva=VECTOR_ELT(val, i), newva;
-    PROTECT(newva=EVAL(lang3(install("c"), oldva, rep)));
-    SET_VECTOR_ELT(val, i, newva);
-    UNPROTECT(1);
+    const char *sexpname=CHAR(STRING_ELT(names,i));
+    igraph_bool_t l=0;
+    long int j;
+    for (j=0; !l && j<nattrno; j++) {
+      igraph_i_attribute_record_t *tmp=VECTOR(*nattr)[j];
+      l=!strcmp(sexpname, tmp->name);
+    }
+    if (l) {
+      /* This attribute is present in nattr */
+      SEXP app;
+      igraph_i_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
+      switch (tmprec->type) {
+      case IGRAPH_ATTRIBUTE_NUMERIC:
+	if (nv != igraph_vector_size(tmprec->value)) {
+	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
+	}
+	PROTECT(app=NEW_NUMERIC(nv));
+	igraph_vector_copy_to(tmprec->value, REAL(app));
+	break;
+      case IGRAPH_ATTRIBUTE_STRING:
+	if (nv != igraph_strvector_size(tmprec->value)) {
+	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
+	}
+	PROTECT(app=R_igraph_strvector_to_SEXP(tmprec->value));
+	break;
+      case IGRAPH_ATTRIBUTE_R_OBJECT:
+	/* TODO */
+	IGRAPH_ERROR("R_objects not implemented yet", IGRAPH_UNIMPLEMENTED);
+	break;
+      default:
+	warning("Ignoring unknown attribute type");
+	break;
+      }
+      PROTECT(newva=EVAL(lang3(install("c"), oldva, app)));
+      SET_VECTOR_ELT(val, i, newva);
+      UNPROTECT(2);		/* app & newva */
+    } else {
+      /* No such attribute, append NA's */
+      if (rep==0) {
+	PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL), 
+			       ScalarInteger(nv))));
+      }
+      PROTECT(newva=EVAL(lang3(install("c"), oldva, rep)));
+      SET_VECTOR_ELT(val, i, newva);
+      UNPROTECT(1); 		/* newva */
+    }
   }
-  if (valno > 0) {
+  if (rep != 0) {
     UNPROTECT(1);
-  }
+  } 
   
   return 0;
 }
@@ -187,10 +294,14 @@ void R_igraph_attribute_delete_vertices(igraph_t *graph,
 }
 
 
-int R_igraph_attribute_add_edges(igraph_t *graph, long int ne) {
+int R_igraph_attribute_add_edges(igraph_t *graph, 
+				 const igraph_vector_t *edges,
+				 igraph_vector_ptr_t *nattr) {
   SEXP attr=graph->attr;
-  SEXP eal, rep;
-  long int ealno, i, origlen;
+  SEXP eal, rep=0, names, newnames;
+  igraph_vector_t news;
+  long int ealno, i, origlen, nattrno, newattrs;  
+  long int ne=igraph_vector_size(edges)/2;
   if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
     SEXP newattr;
     PROTECT(newattr=duplicate(attr));
@@ -205,21 +316,110 @@ int R_igraph_attribute_add_edges(igraph_t *graph, long int ne) {
 
   eal=VECTOR_ELT(attr, 3);
   ealno=GET_LENGTH(eal);
-  if (ealno > 0) {
-    origlen=GET_LENGTH(VECTOR_ELT(eal, 0));
-    PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL), 
-			   ScalarReal(ne))));
+  names=GET_NAMES(eal);
+  if (nattr==NULL) {
+    nattrno=0; 
+  } else {
+    nattrno=igraph_vector_ptr_size(nattr);
   }
+  origlen=igraph_ecount(graph)-ne;
+
+  /* First add the new attributes, if any */
+  newattrs=0;
+  IGRAPH_VECTOR_INIT_FINALLY(&news, 0);
+  for (i=0; i<nattrno; i++) {
+    igraph_i_attribute_record_t *nattr_entry=VECTOR(*nattr)[i];
+    const char *nname=nattr_entry->name;
+    long int j;
+    igraph_bool_t l=0;
+    for (j=0; !l && j<ealno; j++) {
+      l=!strcmp(nname, CHAR(STRING_ELT(names, j)));
+    }
+    if (!l) {
+      newattrs++;
+      IGRAPH_CHECK(igraph_vector_push_back(&news, i));
+    }
+  }
+  if (newattrs != 0) {
+    SEXP app, neweal;
+    PROTECT(app=NEW_LIST(newattrs));
+    PROTECT(newnames=NEW_CHARACTER(newattrs));
+    PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL),
+			   ScalarInteger(origlen))));
+    for (i=0; i<newattrs; i++) {
+      igraph_i_attribute_record_t *tmp=
+	VECTOR(*nattr)[ (long int) VECTOR(news)[i]];
+      SET_VECTOR_ELT(app, i, rep);
+      SET_STRING_ELT(newnames, i, CREATE_STRING_VECTOR(tmp->name));
+    }
+    UNPROTECT(1);		/* rep */
+    PROTECT(neweal=EVAL(lang3(install("c"), eal, app)));
+    PROTECT(newnames=EVAL(lang3(install("c"), names, newnames)));
+    SET_NAMES(neweal, newnames);
+    SET_VECTOR_ELT(attr, 3, neweal);
+    eal=VECTOR_ELT(attr, 3);
+    ealno=GET_LENGTH(eal);
+    names=GET_NAMES(eal);
+    UNPROTECT(4);
+    rep=0;
+  }
+  igraph_vector_destroy(&news);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Now append the new values */
   for (i=0; i<ealno; i++) {
     SEXP oldea=VECTOR_ELT(eal, i), newea;
-    PROTECT(newea=EVAL(lang3(install("c"), oldea, rep)));
-    SET_VECTOR_ELT(eal, i, newea);
+    const char *sexpname=CHAR(STRING_ELT(names, i));
+    igraph_bool_t l=0;
+    long int j;
+    for (j=0; !l && j<nattrno; j++) {
+      igraph_i_attribute_record_t *tmp=VECTOR(*nattr)[j];
+      l=!strcmp(sexpname, tmp->name);
+    }
+    if (l) {
+      /* This attribute is present in nattr */
+      SEXP app;
+      igraph_i_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
+      switch (tmprec->type) {
+      case IGRAPH_ATTRIBUTE_NUMERIC:
+	if (ne != igraph_vector_size(tmprec->value)) {
+	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
+	}
+	PROTECT(app=NEW_NUMERIC(ne));
+	igraph_vector_copy_to(tmprec->value, REAL(app));
+	break;
+      case IGRAPH_ATTRIBUTE_STRING:
+	if (ne != igraph_vector_ptr_size(tmprec->value)) {
+	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
+	}
+	PROTECT(app=R_igraph_strvector_to_SEXP(tmprec->value));
+	break;
+      case IGRAPH_ATTRIBUTE_R_OBJECT:
+	/* TODO */
+	IGRAPH_ERROR("R objects not implemented yet", IGRAPH_UNIMPLEMENTED);
+	break;
+      default:
+	warning("Ignoring unknown attribute type");
+	break;
+      }
+      PROTECT(newea=EVAL(lang3(install("c"), oldea, app)));
+      SET_VECTOR_ELT(eal, i, newea);
+      UNPROTECT(2);		/* app & newea */
+    } else {
+      /* No such attribute, append NA's */
+      if (rep==0) {
+	PROTECT(rep=EVAL(lang3(install("rep"), ScalarLogical(NA_LOGICAL),
+			       ScalarInteger(ne))));
+      }
+      PROTECT(newea=EVAL(lang3(install("c"), oldea, rep)));
+      SET_VECTOR_ELT(eal, i, newea);
+      UNPROTECT(1);		/* newea */
+    }
+  }
+  if (rep != 0) {
     UNPROTECT(1);
   }
-  if (ealno > 0) {
-    UNPROTECT(1);
-  }
-  
+
   return 0;
 }
 
@@ -264,11 +464,191 @@ void R_igraph_attribute_delete_edges(igraph_t *graph,
   }
 }
 
+int R_igraph_attribute_get_info(const igraph_t *graph,
+				igraph_strvector_t *gnames,
+				igraph_vector_t *gtypes,
+				igraph_strvector_t *vnames,
+				igraph_vector_t *vtypes,
+				igraph_strvector_t *enames,
+				igraph_vector_t *etypes) {
+  igraph_strvector_t *names[3] = { gnames, vnames, enames };
+  igraph_vector_t *types[3] = { gtypes, vtypes, etypes };
+  long int i, j;
+
+  SEXP attr=graph->attr;
+
+  for (i=0; i<3; i++) {
+    igraph_strvector_t *n=names[i];
+    igraph_vector_t *t=types[i];
+    SEXP al=VECTOR_ELT(attr, i+1);
+    
+    if (n) {			/* return names */
+      SEXP names=GET_NAMES(al);
+      R_igraph_SEXP_to_strvector_copy(names, n);
+    }
+
+    if (t) {			/* return types */
+      for (j=0; j<GET_LENGTH(al); j++) {
+	SEXP a=VECTOR_ELT(al, j);
+	if (IS_NUMERIC(a)) {
+	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_NUMERIC;
+	} else if (IS_CHARACTER(a)) {
+	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_STRING;
+	} else {
+	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_R_OBJECT;
+	}
+      }
+    }
+  }
+
+  return 0;
+}
+
+igraph_bool_t R_igraph_attribute_has_attr(const igraph_t *graph,
+					  igraph_attribute_elemtype_t type,
+					  const char *name) {
+  long int attrnum;
+  SEXP res;
+  
+  switch (type) {
+  case IGRAPH_ATTRIBUTE_GRAPH:
+    attrnum=1;
+    break;
+  case IGRAPH_ATTRIBUTE_VERTEX:
+    attrnum=2;
+    break;
+  case IGRAPH_ATTRIBUTE_EDGE:
+    attrnum=3;
+    break;
+  default:
+    IGRAPH_ERROR("Unkwown attribute element type", IGRAPH_EINVAL);
+    break;
+  }
+  
+  res=R_igraph_getListElement(VECTOR_ELT(graph->attr, attrnum), name);
+  return res != NULL;
+}
+
+int R_igraph_attribute_get_numeric_graph_attr(const igraph_t *graph,
+					      const char *name, 
+					      igraph_vector_t *value) {
+  SEXP gal=VECTOR_ELT(graph->attr, 1);
+  SEXP ga=R_igraph_getListElement(gal, name);
+  
+  if (ga == NULL) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(value, 1));
+  VECTOR(*value)[0]=REAL(ga)[0];
+
+  return 0;
+}
+
+int R_igraph_attribute_get_string_graph_attr(const igraph_t *graph,
+					     const char *name,
+					     igraph_strvector_t *value) {
+  /* TODO: serialization */
+  SEXP gal=VECTOR_ELT(graph->attr, 1);
+  SEXP ga=R_igraph_getListElement(gal, name);
+  
+  if (ga == NULL) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_strvector_resize(value, 1));
+  IGRAPH_CHECK(igraph_strvector_set(value, 0, CHAR(STRING_ELT(ga, 0))));
+  
+  return 0;
+}
+
+int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph, 
+					       const char *name,
+					       igraph_vs_t vs,
+					       igraph_vector_t *value) {
+  /* TODO: handle vs, serialization */
+  SEXP val=VECTOR_ELT(graph->attr, 1);
+  SEXP va=R_igraph_getListElement(val, name);
+  igraph_vector_t newvalue;
+  
+  if (va == NULL) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  
+  R_SEXP_to_vector_copy(va, &newvalue);
+  igraph_vector_destroy(value);
+  *value=newvalue;
+
+  return 0;
+}
+
+int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph, 
+					      const char *name,
+					      igraph_vs_t vs,
+					      igraph_strvector_t *value) {
+  /* TODO: handle vs, serialization */
+  SEXP val=VECTOR_ELT(graph->attr, 1);
+  SEXP va=R_igraph_getListElement(val, name);
+  igraph_vector_t newvalue;
+  
+  if (va == NULL) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  
+  R_igraph_SEXP_to_strvector_copy(va, value);
+  
+  return 0;
+}
+
+int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
+					     const char *name,
+					     igraph_es_t es,
+					     igraph_vector_t *value) {
+  /* TODO: handle es, serialization */
+  SEXP eal=VECTOR_ELT(graph->attr, 1);
+  SEXP ea=R_igraph_getListElement(eal, name);
+  igraph_vector_t newvalue;
+  
+  if (ea == NULL) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  
+  R_SEXP_to_vector_copy(ea, &newvalue);
+  igraph_vector_destroy(value);
+  *value=newvalue;
+
+  return 0;
+}
+
+int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
+					    const char *name,
+					    igraph_es_t es,
+					    igraph_strvector_t *value) {
+  /* TODO: handle es, serialization */
+  SEXP eal=VECTOR_ELT(graph->attr, 1);
+  SEXP ea=R_igraph_getListElement(eal, name);
+  igraph_vector_t newvalue;
+  
+  if (ea == NULL) {
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  }
+  
+  R_igraph_SEXP_to_strvector_copy(ea, value);
+  
+  return 0;
+}
+
 igraph_attribute_table_t R_igraph_attribute_table={
   &R_igraph_attribute_init, &R_igraph_attribute_destroy,
   &R_igraph_attribute_copy, &R_igraph_attribute_add_vertices,
   &R_igraph_attribute_delete_vertices, &R_igraph_attribute_add_edges,
-  &R_igraph_attribute_delete_edges
+  &R_igraph_attribute_delete_edges, &R_igraph_attribute_get_info,
+  &R_igraph_attribute_has_attr, &R_igraph_attribute_get_numeric_graph_attr,
+  &R_igraph_attribute_get_string_graph_attr,
+  &R_igraph_attribute_get_numeric_vertex_attr,
+  &R_igraph_attribute_get_string_vertex_attr,
+  &R_igraph_attribute_get_numeric_edge_attr,
+  &R_igraph_attribute_get_string_edge_attr
 };
 
 igraph_attribute_table_t *R_igraph_attribute_oldtable;
@@ -575,7 +955,7 @@ SEXP R_igraph_add_edges(SEXP graph, SEXP edges) {
   
   R_SEXP_to_vector(edges, &v);
   R_SEXP_to_igraph_copy(graph, &g);
-  igraph_add_edges(&g, &v);
+  igraph_add_edges(&g, &v, 0);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 
@@ -595,7 +975,7 @@ SEXP R_igraph_add_vertices(SEXP graph, SEXP pnv) {
   
   nv=REAL(pnv)[0];
   R_SEXP_to_igraph_copy(graph, &g);
-  igraph_add_vertices(&g, nv);
+  igraph_add_vertices(&g, nv, 0);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 

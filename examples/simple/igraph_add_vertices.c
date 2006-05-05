@@ -39,20 +39,20 @@ int main() {
   igraph_vector_destroy(&v1);
 
   /* Add more vertices */
-  igraph_add_vertices(&g1, 10);
+  igraph_add_vertices(&g1, 10, 0);
   if (igraph_vcount(&g1) != 14) {
     return 1;
   }
 
   /* Add more vertices */
-  igraph_add_vertices(&g1, 0);
+  igraph_add_vertices(&g1, 0, 0);
   if (igraph_vcount(&g1) != 14) {
     return 2;
   }
   
   /* Error */
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_add_vertices(&g1, -1);
+  ret=igraph_add_vertices(&g1, -1, 0);
   if (ret != IGRAPH_EINVAL) {
     return 3;
   }
