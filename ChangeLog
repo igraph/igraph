@@ -1,3 +1,8 @@
+2006-05-06  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_i_eit_create_allfromto) :
+	iterator must be of VECTOR type instead of VECTORPTR
+
 2006-05-05  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/igraph_trie.c (igraph_trie_getkeys) : added
@@ -32,6 +37,7 @@
 
 	* src/iterators.c (igraph_eit_destroy) : fixed memory leak
 	* src/basic_query.c (igraph_are_connected) : fixed memory leak
+	* interfaces/python/* : added working (?) attribute handling
 
 2006-05-03  Gabor Csardi  <csardi@kzoo.edu>
 

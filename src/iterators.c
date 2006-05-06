@@ -401,7 +401,7 @@ int igraph_i_eit_create_allfromto(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(2);
   }
 
-  eit->type=IGRAPH_EIT_VECTORPTR;
+  eit->type=IGRAPH_EIT_VECTOR;
   eit->pos=0;
   eit->start=0;
   eit->vec=vec;
