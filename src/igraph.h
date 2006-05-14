@@ -641,6 +641,22 @@ int igraph_measure_dynamics_id_st(const igraph_t *graph,
 				  igraph_vector_t *res, 
 				  const igraph_matrix_t *ak);
 
+int igraph_measure_dynamics_d_d(const igraph_t *graph,
+				const igraph_vector_t *ntime,
+				const igraph_vector_t *etime,
+				igraph_integer_t events,
+				igraph_matrix_t *akk,
+				igraph_matrix_t *sd,
+				const igraph_vector_t *st,
+				igraph_integer_t pmadeg);
+
+int igraph_measure_dynamics_d_d_st(const igraph_t *graph,
+				   const igraph_vector_t *ntime,
+				   const igraph_vector_t *etime,
+				   const igraph_matrix_t *akk,
+				   igraph_integer_t events,
+				   igraph_integer_t maxtotaldeg,
+				   igraph_vector_t *st);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */

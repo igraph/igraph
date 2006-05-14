@@ -698,3 +698,309 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *
 
   return 0;
 }
+
+int igraph_measure_dynamics_d_d(const igraph_t *graph,        /* input  */
+				const igraph_vector_t *ntime, /* input  */
+				const igraph_vector_t *etime, /* input  */
+				igraph_integer_t events,    
+				igraph_matrix_t *akk,	      /* output */
+				igraph_matrix_t *sd,          /* output */
+				const igraph_vector_t *st,    /* input  */
+				igraph_integer_t pmaxdeg) {
+  
+  long int maxdeg=pmaxdeg;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  
+  igraph_vector_t degree;	/* the actual degrees of the nodes */
+  igraph_vector_t ntk;		/* the actual number of k-nodes */
+  igraph_matrix_t normfact;	/* number of experiments */
+  igraph_vector_t ch;		/* the time of the last switch */
+  igraph_matrix_t notnull;	/* the number of non-zero experiments */
+  
+  igraph_vector_t ntimeidx;	/* lookup vector for nodes */
+  igraph_vector_t etimeidx;     /* lookup vector for edges */
+
+  long int timestep=0;
+  long int nptr=0;
+  long int eptr=0;
+  long int eptr_save, i, j;
+
+  /* Init everything */
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&ntk, maxdeg+1);
+  IGRAPH_MATRIX_INIT_FINALLY(&normfact, maxdeg+1, maxdeg+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&ch, maxdeg+1);
+  IGRAPH_MATRIX_INIT_FINALLY(&notnull, maxdeg+1, maxdeg+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&ntimeidx, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&etimeidx, 0);
+  
+  /* Resize and init the output */
+  IGRAPH_CHECK(igraph_matrix_resize(akk, maxdeg+1, maxdeg+1));
+  igraph_matrix_null(akk);
+  if (sd) {
+    IGRAPH_CHECK(igraph_matrix_resize(sd, maxdeg+1, maxdeg+1));
+    igraph_matrix_null(sd);
+  }
+  
+  /* Create lookup vectors for nodes and edges */
+  IGRAPH_CHECK(igraph_vector_order(ntime, &ntimeidx, events));
+  IGRAPH_CHECK(igraph_vector_order(etime, &etimeidx, events));
+  
+  for (timestep=0; timestep<events; timestep++) {    
+
+    /* add the new nodes, if any */
+    while (nptr < no_of_nodes && 
+	   VECTOR(*ntime)[ (long int) VECTOR(ntimeidx)[nptr] ] == timestep) {
+      VECTOR(ntk)[0] ++;
+      if (VECTOR(ntk)[0]==1) {
+	VECTOR(ch)[0]=eptr;
+      }
+      nptr++;
+    }
+
+    /* measure akk and sd for the new edges, if any */
+    eptr_save=eptr;
+    while (eptr < no_of_edges && 
+	   VECTOR(*etime)[ (long int) VECTOR(etimeidx)[eptr] ] == timestep) {
+      long int edge=VECTOR(etimeidx)[eptr];
+      long int xidx, yidx;
+      igraph_integer_t from, to;
+      double xk, oldakk;
+      
+      igraph_edge(graph, edge, &from, &to);
+      xidx=VECTOR(degree)[ (long int)from ];
+      yidx=VECTOR(degree)[ (long int)to ];      
+      if (xidx < yidx) { long int t=xidx; xidx=yidx; yidx=t; }
+
+      xk=VECTOR(*st)[timestep]/VECTOR(ntk)[xidx]/VECTOR(ntk)[yidx];
+      oldakk=MATRIX(*akk, xidx, yidx);
+      MATRIX(*akk, xidx, yidx) += (xk-oldakk)/(MATRIX(notnull, xidx, yidx)+1);
+      if (sd) {
+	MATRIX(*sd, xidx, yidx) += (xk-oldakk)*(xk-MATRIX(*akk, xidx, yidx));
+      }
+      eptr++;
+    }
+
+    /* add the new edges to the network */
+    eptr=eptr_save;
+    while (eptr < no_of_edges && 
+	   VECTOR(*etime)[ (long int) VECTOR(etimeidx)[eptr] ] == timestep) {
+      long int edge=VECTOR(etimeidx)[eptr];
+      long int xidx, yidx;
+      igraph_integer_t from, to;
+      
+      igraph_edge(graph, edge, &from, &to);
+      xidx=VECTOR(degree)[(long int)from];
+      yidx=VECTOR(degree)[(long int)to];
+      if (xidx < yidx) { long int t=xidx; xidx=yidx; yidx=t; }
+
+      MATRIX(notnull, xidx, yidx) += 1;
+            
+      VECTOR(degree)[(long int)from] ++;
+      VECTOR(degree)[(long int)to] ++;
+      VECTOR(ntk)[xidx] --;
+      VECTOR(ntk)[yidx] --;
+      VECTOR(ntk)[xidx+1] ++;
+      VECTOR(ntk)[yidx+1] ++;
+      if (VECTOR(ntk)[xidx] == 0 || VECTOR(ntk)[yidx] == 0) {
+	MATRIX(normfact, xidx, yidx) += 
+	  (eptr-(VECTOR(ch)[xidx] > VECTOR(ch)[yidx] ? VECTOR(ch)[xidx] : 
+		 VECTOR(ch)[yidx])+1);
+      }
+      if (VECTOR(ntk)[xidx]==0) {
+	VECTOR(ch)[xidx]=eptr;
+      }
+      if (VECTOR(ntk)[yidx]==0) {
+	VECTOR(ch)[yidx]=eptr;
+      }
+      if (VECTOR(ntk)[xidx+1]==1) {
+	VECTOR(ch)[xidx+1]=eptr;
+      }
+      if (VECTOR(ntk)[yidx+1]==1) {
+	VECTOR(ch)[yidx+1]=eptr;
+      }
+      eptr++;
+
+
+      if (VECTOR(ntk)[xidx]<0) {
+	fprintf(stderr, "oops\n");
+      }
+      if (VECTOR(ntk)[yidx]<0) {
+	fprintf(stderr, "oops2\n");
+      }
+
+    }
+  }
+  
+  /* Ok, update normfact */
+  for (i=0; i<maxdeg+1; i++) {
+    if (VECTOR(ntk)[i] != 0) {
+      for (j=0; j<=i; j++) {
+	if (VECTOR(ntk)[j] != 0) {
+	  MATRIX(normfact, i, j) += 
+	    (eptr-(VECTOR(ch)[i] > VECTOR(ch)[j] ? VECTOR(ch)[i] : 
+		   VECTOR(ch)[j])+1);
+	}
+      }
+    }
+  }
+  
+  /* Update akk, sd */
+  for (i=0; i<maxdeg+1; i++) {
+    igraph_real_t oldakk;
+    for (j=0; j<=i; j++) {
+      oldakk=MATRIX(*akk, i, j);
+      MATRIX(*akk, i, j) *= MATRIX(notnull, i, j) / MATRIX(normfact, i, j);
+      if (sd) {
+	MATRIX(*sd, i, j) += oldakk * oldakk * MATRIX(notnull, i, j) *
+	  (1-MATRIX(notnull, i, j)/MATRIX(normfact, i, j));
+	if (MATRIX(normfact, i, j) > 0) {
+	  MATRIX(*sd, i, j) = sqrt(MATRIX(*sd, i, j)/MATRIX(normfact, i, j));
+	}
+      }
+    }
+  }
+
+  /* Symmetrize akk, sd */
+  for (i=0; i<maxdeg+1; i++) {
+    for (j=0; j<i; j++) {
+      MATRIX(*akk, j, i)=MATRIX(*akk, i, j);
+      if (sd) {
+	MATRIX(*sd, j, i)=MATRIX(*sd, i, j);
+      }
+    }
+  }
+
+  igraph_vector_destroy(&etimeidx);
+  igraph_vector_destroy(&ntimeidx);
+  igraph_matrix_destroy(&notnull);
+  igraph_vector_destroy(&ch);
+  igraph_matrix_destroy(&normfact);
+  igraph_vector_destroy(&ntk);
+  igraph_vector_destroy(&degree);
+
+  IGRAPH_FINALLY_CLEAN(7);
+  return 0;
+}
+				  
+int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
+				   const igraph_vector_t *ntime, /* input */
+				   const igraph_vector_t *etime, /* input */
+				   const igraph_matrix_t *akk,   /* input */
+				   igraph_integer_t events,
+				   igraph_integer_t maxtotaldeg,
+				   igraph_vector_t *st) {        /* output */
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int timestep=0;
+  long int nptr=0;
+  long int eptr=0;
+  long int maxdeg=0;
+
+  igraph_vector_t degree;
+  igraph_vector_t ntk;		/* number of nodes of different types */
+  igraph_vector_t ntimeidx;	/* lookup vector for nodes */
+  igraph_vector_t etimeidx;	/* lookup vector for edges */
+
+  long int i;
+
+  /* Init everything */
+  IGRAPH_VECTOR_INIT_FINALLY(&ntk, maxtotaldeg+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&ntimeidx, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&etimeidx, 0);
+  
+  /* Resize result */
+  IGRAPH_CHECK(igraph_vector_resize(st, events+1));
+  VECTOR(*st)[0]=0;
+  
+  /* Create lookup vectors */
+  IGRAPH_CHECK(igraph_vector_order(ntime, &ntimeidx, events));
+  IGRAPH_CHECK(igraph_vector_order(etime, &etimeidx, events));
+
+  for (timestep=0; timestep<events; timestep++) {
+    
+    /* add the new nodes, if any */
+    while (nptr < no_of_nodes &&
+	   VECTOR(*ntime)[ (long int) VECTOR(ntimeidx)[nptr] ] == timestep) {
+      igraph_real_t akk_inc;
+      akk_inc=0;
+      for (i=0; i<=maxdeg; i++) {
+	akk_inc += VECTOR(ntk)[i] * MATRIX(*akk, i, 0);
+      }
+      VECTOR(ntk)[0]++;
+
+      VECTOR(*st)[timestep] += akk_inc;
+      nptr++;
+    }
+
+    VECTOR(*st)[timestep+1]=VECTOR(*st)[timestep];    
+    
+    /* add the new edges if any */
+    while (eptr < no_of_edges &&
+	   VECTOR(*etime)[ (long int) VECTOR(etimeidx)[eptr] ] == timestep) {
+      igraph_real_t akk_inc;
+      long int edge=VECTOR(etimeidx)[eptr];
+      igraph_integer_t from, to;
+      long int xidx, yidx;
+      igraph_real_t tmp;
+      igraph_edge(graph, edge, &from, &to);
+      xidx=VECTOR(degree)[ (long int)from];
+      yidx=VECTOR(degree)[ (long int)to];
+
+      VECTOR(degree)[(long int)from]++;
+      VECTOR(degree)[(long int)to]++;
+
+      akk_inc=0;
+
+      /* an xidx node disappears */
+      for (i=0; i<=maxdeg; i++) {
+	akk_inc -= VECTOR(ntk)[i] * MATRIX(*akk, i, xidx);
+      }
+      akk_inc += MATRIX(*akk, xidx, xidx); /* self loops */
+      VECTOR(ntk)[xidx]--;
+
+      /* a yidx node disappears */
+      for (i=0; i<=maxdeg; i++) {
+	akk_inc -= VECTOR(ntk)[i] * MATRIX(*akk, i, yidx);
+      }
+      akk_inc += MATRIX(*akk, yidx, yidx); /* self loops */
+      VECTOR(ntk)[yidx]--;
+
+      tmp=akk_inc;
+
+      /* an xidx+1 node appears  */
+      for (i=0; i<=maxdeg; i++) {
+	akk_inc += VECTOR(ntk)[i] * MATRIX(*akk, i, xidx+1);
+      }
+      VECTOR(ntk)[xidx+1]++;
+      if (xidx+1 > maxdeg) {
+	maxdeg=xidx+1;
+      }
+
+      /* a yidx+1 node appears */
+      for (i=0; i<=maxdeg; i++) {
+	akk_inc += VECTOR(ntk)[i] * MATRIX(*akk, i, yidx+1);
+      }
+      VECTOR(ntk)[yidx+1]++;
+      if (yidx+1 > maxdeg) {
+	maxdeg=yidx+1;
+      }
+      
+      VECTOR(*st)[timestep+1] += akk_inc;
+      eptr++;
+    }    
+  }
+
+  igraph_vector_pop_back(st);
+  
+  igraph_vector_destroy(&etimeidx);
+  igraph_vector_destroy(&ntimeidx);
+  igraph_vector_destroy(&degree);
+  igraph_vector_destroy(&ntk);
+  IGRAPH_FINALLY_CLEAN(4);
+  
+  return 0;
+}

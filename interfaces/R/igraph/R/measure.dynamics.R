@@ -157,3 +157,43 @@ measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
   res
 }
 
+## TODO: vtime and etime as attributes
+
+measure.dynamics.d.d <- function(graph, vtime, etime,
+                                 iterations=5, sd=TRUE) {
+
+  maxdeg <- max(degree(graph, mode="all"))
+  events <- max(vtime, etime)+1
+
+  st <- rep(1, events)
+
+  for (i in seq(along=numeric(iterations))) {
+
+    # standard deviation only in the last iteration
+    sd.real <- sd && i==iterations
+    
+    mes <- .Call("R_igraph_measure_dynamics_d_d", graph,
+                 as.numeric(vtime), as.numeric(etime),
+                 as.numeric(events), as.numeric(st),
+                 as.numeric(maxdeg), as.logical(sd.real),
+                 PACKAGE="igraph")
+
+    mes[[1]][!is.finite(mes[[1]])] <- 0 ## Hmmmm
+    
+    mes[[1]] <- mes[[1]]/mes[[1]][1]
+    if (sd.real) {
+      mes[[2]] <- mes[[2]]/mes[[1]][1]
+    }
+
+    st <- .Call("R_igraph_measure_dynamics_d_d_st", graph,
+                as.numeric(vtime), as.numeric(etime),
+                mes[[1]], as.numeric(events), as.numeric(maxdeg),
+                PACKAGE="igraph")
+  }
+
+  res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+
+  res
+}
+                 
+                 
