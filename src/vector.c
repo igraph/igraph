@@ -1304,3 +1304,10 @@ int igraph_vector_append(igraph_vector_t *to, const igraph_vector_t *from) {
   
   return 0;
 }
+
+int igraph_vector_get_interval(const igraph_vector_t *v, igraph_vector_t *res,
+			       long int from, long int to) {
+  IGRAPH_CHECK(igraph_vector_resize(res, to-from));
+  memcpy(res->stor_begin, v->stor_begin+from, (to-from)*sizeof(igraph_real_t));
+  return 0;
+}

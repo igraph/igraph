@@ -1,3 +1,10 @@
+2006-05-12  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.d.d) :
+	added 'no' argument, norm by the 0-0 degree appeal
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id) :
+	updated, added 'no' argument
+
 2006-05-06  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.d.d) :

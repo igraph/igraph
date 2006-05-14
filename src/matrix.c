@@ -371,3 +371,12 @@ int igraph_matrix_select_rows(const igraph_matrix_t *m, igraph_matrix_t *res,
   
   return 0;
 }
+
+int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
+			  long int index) {
+  long int nrow=igraph_matrix_nrow(m);
+
+  IGRAPH_CHECK(igraph_vector_get_interval(&m->data, res, 
+					  nrow*index, nrow*(index+1)));
+  return 0;
+}

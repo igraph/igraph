@@ -1,3 +1,12 @@
+2006-05-12  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/vector.c (igraph_vector_get_interval) : added
+
+	* src/matrix.c (igraph_matrix_get_col) : added
+	
+	* src/measure_dynamics.c (igraph_measure_dynamics_d_d) :
+	completely rewritten, works fine now
+
 2006-05-06  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_d_d)

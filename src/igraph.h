@@ -647,6 +647,7 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
 				igraph_integer_t events,
 				igraph_matrix_t *akk,
 				igraph_matrix_t *sd,
+				igraph_matrix_t *no,
 				const igraph_vector_t *st,
 				igraph_integer_t pmadeg);
 

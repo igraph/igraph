@@ -1921,11 +1921,11 @@ SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
 
 SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
 				   SEXP pevents, SEXP pst, SEXP pmaxdeg, 
-				   SEXP psd) {
+				   SEXP psd, SEXP pno) {
   igraph_t g;
   igraph_vector_t ntime, etime;
   igraph_integer_t events=REAL(pevents)[0];
-  igraph_matrix_t akk, sd, *ppsd=0;
+  igraph_matrix_t akk, sd, *ppsd=0, no, *ppno=0;
   igraph_vector_t st;
   igraph_integer_t maxdeg=REAL(pmaxdeg)[0];
   SEXP result;
@@ -1940,10 +1940,14 @@ SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
     igraph_matrix_init(&sd, 0, 0);
     ppsd=&sd;
   }
+  if (LOGICAL(pno)[0]) {
+    igraph_matrix_init(&no, 0, 0);
+    ppno=&no;
+  }
   R_SEXP_to_vector(pst, &st);
   igraph_measure_dynamics_d_d(&g, &ntime, &etime, events, &akk, 
-			      ppsd, &st, maxdeg);
-  PROTECT(result=NEW_LIST(2));
+			      ppsd, ppno, &st, maxdeg);
+  PROTECT(result=NEW_LIST(3));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akk));
   igraph_matrix_destroy(&akk);
   if (LOGICAL(psd)[0]) {
@@ -1951,6 +1955,12 @@ SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
     igraph_matrix_destroy(&sd);
   } else {
     SET_VECTOR_ELT(result, 1, R_NilValue);
+  }
+  if (LOGICAL(pno)[0]) {
+    SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&no));
+    igraph_matrix_destroy(&no);
+  } else {
+    SET_VECTOR_ELT(result, 2, R_NilValue);
   }
   
   R_igraph_after();
