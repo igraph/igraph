@@ -1,3 +1,8 @@
+2006-05-14  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/foreign.c (igraph_write_graph_lgl, igraph_write_graph_edgelist) :
+	moved declaration to beginning of the block, works with older gcc
+	
 2006-05-12  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/vector.c (igraph_vector_get_interval) : added

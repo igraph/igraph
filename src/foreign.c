@@ -830,10 +830,11 @@ int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
 
   while (!IGRAPH_EIT_END(it)) {
     igraph_integer_t from, to;
+    int ret;
     igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-    int ret=fprintf(outstream, "%li %li\n", 
-		    (long int) from,
-		    (long int) to);
+    ret=fprintf(outstream, "%li %li\n", 
+		(long int) from,
+		(long int) to);
     if (ret < 0) {
       IGRAPH_ERROR("Write error", IGRAPH_EFILE);
     }
@@ -1020,8 +1021,8 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     /* No names, no weights */
     while (!IGRAPH_EIT_END(it)) {
       igraph_integer_t from, to;
-      igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
       int ret;
+      igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
       if (from==actvertex) {
 	ret=fprintf(outstream, "%li\n", (long int)to);
       } else {
