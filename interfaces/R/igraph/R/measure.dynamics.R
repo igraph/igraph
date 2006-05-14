@@ -169,6 +169,8 @@ measure.dynamics.d.d <- function(graph, vtime, etime,
 
   for (i in seq(along=numeric(iterations))) {
 
+    print(i)
+    
     # standard deviation only in the last iteration
     sd.real <- sd && i==iterations
     
@@ -180,9 +182,9 @@ measure.dynamics.d.d <- function(graph, vtime, etime,
 
     mes[[1]][!is.finite(mes[[1]])] <- 0 ## Hmmmm
     
-    mes[[1]] <- mes[[1]]/mes[[1]][1]
+    mes[[1]] <- mes[[1]]/mes[[1]][2]
     if (sd.real) {
-      mes[[2]] <- mes[[2]]/mes[[1]][1]
+      mes[[2]] <- mes[[2]]/mes[[1]][2]
     }
 
     st <- .Call("R_igraph_measure_dynamics_d_d_st", graph,
