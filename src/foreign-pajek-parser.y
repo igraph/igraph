@@ -150,7 +150,7 @@ vertexline: NEWLINE |
             vertex NEWLINE |
             vertex vertexid vertexcoords shape params NEWLINE;
 
-vertex: longint { igraph_pajek_mode=1; } 
+vertex: longint { igraph_pajek_mode=1; };
 
 vertexid: word ;
 
@@ -167,7 +167,7 @@ vertexcoords: /* empty */
     igraph_stack_push(igraph_pajek_coords, $2);
     igraph_stack_push(igraph_pajek_coords, $3);
   }
-}
+};
 
 shape: /* empty */ | word;
 
@@ -195,7 +195,7 @@ vpword: vpword2 { igraph_pajek_mode=3; };
 
 vpword2: VP_FONT | VP_URL | VP_IC | VP_BC | VP_LC;
 
-vpwordpar: word { igraph_pajek_mode=1; }
+vpwordpar: word { igraph_pajek_mode=1; };
 
 edgeblock: /* empty */ | edgeblock arcs | edgeblock edges | edgeblock arcslist | edgeblock edgeslist | edgeblock adjmatrix;
 
@@ -213,7 +213,7 @@ arcfrom: longint { igraph_pajek_mode=2; };
 
 arcto: longint;
 
-edges: EDGESLINE NEWLINE edgesdefs { igraph_pajek_directed=0; }
+edges: EDGESLINE NEWLINE edgesdefs { igraph_pajek_directed=0; };
 
 edgesdefs: /* empty */ | edgesdefs edgesline;
 
@@ -223,7 +223,7 @@ edgesline: NEWLINE |
   igraph_vector_push_back(igraph_pajek_vector, $2-1); }
 ;
 
-edgefrom: longint { igraph_pajek_mode=2; }
+edgefrom: longint { igraph_pajek_mode=2; };
 
 edgeto: longint;
 
@@ -291,7 +291,7 @@ edgelistto: longint {
 
 adjmatrix: matrixline NEWLINE adjmatrixlines;
 
-matrixline: MATRIXLINE { igraph_pajek_actfrom=0; igraph_pajek_actto=0; }
+matrixline: MATRIXLINE { igraph_pajek_actfrom=0; igraph_pajek_actto=0; };
 
 adjmatrixlines: /* empty */ | adjmatrixlines adjmatrixline;
 
