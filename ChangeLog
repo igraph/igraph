@@ -2,6 +2,9 @@
 
 	* src/foreign.c (igraph_write_graph_lgl, igraph_write_graph_edgelist) :
 	moved declaration to beginning of the block, works with older gcc
+
+	* src/foreign-pajek-parser.y : added some semicolons to be compatible
+	with older bison versions
 	
 2006-05-12  Gabor Csardi  <csardi@kzoo.edu>
 
