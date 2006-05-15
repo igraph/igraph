@@ -21,303 +21,108 @@
 ###################################################################
 
 ###################################################################
-# Implementation issues.
-# There are two types of iterators (this is only true for the R
-# interface of course). The first type is a sequence of type
-# seq(from, to, by=1). The second type is a simple vector (ie. vector
-# of double constants, numeric()).
-#
-# Both types are represented as a list. The first element of the list
-# is always a numeric(3) vector with the following elements:
-#   it[[1]][1]  - the actual position of the iterator
-#   it[[1]][2]  - the reset (first) position of the iterator
-#   it[[1]][3]  - the last position of the iterator
-# This common iterator-type independent structure makes it possible to
-# implement the most common operations (get, end, next) very
-# efficiently, it is not even required to check the type of the
-# iterator. See the implementation below.
-#
-# Sequences are quite simple, (from, to) = it[[1]][2:3].
-#
-# Vectors are simple as well, they have the whole vector in it[[2]],
-# it[[1]][2] is always 1 and it[[1]][3] is the length of the vector.
-#
-# This is (yet) the only part of the R interface which has some
-# built-in knowledge about the structure of the igraph_t object
-# (not counting the conversion code in rinterface.c of course).
-# It is not good to have such code. But i decided to have because
-# (1) it is simple and brief, can be modified easily in case of need
-# and (2) otherwise it would be painfully slow. Beacuse of (2) i had
-# two choices basically, either leave out iterators from the R
-# interface completely or do it in an igraph_t implementation-specific
-# way. I considered the latter to be a better choice.
-
-###################################################################
 # Constructors
 ###################################################################
 
 V <- function(graph) {
-  igraph.vs.all(graph)
+  vc <- vcount(graph)
+  if (vc == 0) {
+    res <- numeric()
+  } else {
+    res <- 0:(vc-1)
+  }
+  class(res) <- "igraph.vs"
+  ne <- new.env()
+  assign("graph", graph, envir=ne)
+  attr(res, "env") <- ne
+  res
 }
 
 E <- function(graph) {
-  igraph.es.all(graph)
-}
-
-igraph.vs.all <- function(graph) {
-  it <- list( c(0,0,vcount(graph)-1,) )
-  class(it) <- "igraphvsseq"
-  it
-}
-
-igraph.es.all <- function(graph) {
-  it <- list( c(0,0,ecount(graph)-1,) )
-  class(it) <- "igraphesseq"
-  it
-}
-
-igraph.vs.vector <- function(graph, v) {
-  it <- list( c(1,1,length(v),), as.numeric(v) )
-  class(it) <- "igraphvsvector"
-  it
-}
-
-igraph.es.vector <- function(graph, v) {
-  it <- list( c(1,1,length(v),), as.numeric(v) )
-  class(it) <- "igraphesvector"
-  it
-}
-
-###################################################################
-# Pretty printing
-###################################################################
-
-print.igraphvsseq <- function(vs) {
-  print((vs[[1]][2]):(vs[[1]][3]))
-}
-
-print.igraphesseq <- function(es) {
-  print((es[[1]][2]):(es[[1]][3]))
-}
-
-print.igraphvsvector <- function(vs) {
-  print(vs[[2]])
-}
-
-print.igraphesvector <- function(es) {
-  print(es[[2]])
-}
-
-###################################################################
-# Length
-###################################################################
-
-length.igraphvsseq <- function(vs) {
-  vs[[1]][3]-vs[[1]][2]+1
-}
-
-length.igraphesseq <- function(es) {
-  es[[1]][3]-es[[1]][2]+1
-}
-
-length.igraphvsvector <- function(vs) {
-  length(vs[[2]])
-}
-
-length.igraphesvector <- function(es) {
-  length(es[[2]])
-}
-
-###################################################################
-# Generic operations
-###################################################################
-
-igraph.vs.next <- function(graph, iterator) {
-  iterator[[1]][1] <- iterator[[1]][1] + 1
-  iterator
-}
-
-igraph.vs.end <- function(graph, iterator) {
-  iterator[[1]][1] > iterator[[1]][3]
-}
-
-# This might be replaced later if it turns out to be too slow
-# The same applies to igraph.es.get, igraph.es.from & igraph.es.to
-
-igraph.vs.get <- function(graph, iterator)
-  UseMethod("igraph.vs.get", iterator)
-
-igraph.vs.get.igraphvsseq <- function(graph, iterator) {
-  iterator[[1]][1]
-}
-
-igraph.vs.get.igraphvsvector <- function(graph, iterator) {
-  iterator[[2]] [ iterator[[1]][1] ]
-}
-
-igraph.vs.reset <- function(graph, iterator) {
-  iterator[[1]][1] <- iterator[[1]][2]
-  iterator
-}
-
-as.vector.igraphvsseq <- function(x, mode="any") {
-  if (x[[1]][2] <= x[[1]][3]) {
-    (x[[1]][2]):(x[[1]][3])
+  ec <- ecount(graph)
+  if (ec == 0) {
+    res <- numeric()
   } else {
-    numeric()
+    res <- 0:(ec-1)
   }
+  class(res) <- "igraph.es"
+  ne <- new.env()
+  assign("graph", graph, envir=ne)
+  attr(res, "env") <- ne
+  res
 }
 
-as.vector.igraphvsvector <- function(x, mode="any") {
-  x[[2]]-1
+# TODO: indexing based on attributes
+"[.igraph.vs" <- function(x, i) {
+  res <- i[ i %in% x ]
+  attributes(res) <- attributes(x)
+  res
 }
 
-igraph.es.next <- function(graph, iterator) {
-  iterator[[1]][1] <- iterator[[1]][1] + 1
-  iterator
-}
+# TODO: indexing based on attributes
+"[.igraph.es" <- function(x, i) {
+  res <- i[ i %in% x ]
+  attributes(res) <- attributes(x)
+  res
+} 
 
-igraph.es.end <- function(graph, iterator) {
-  iterator[[1]][1] > iterator[[1]][3]
-}
-
-igraph.es.get <- function(graph, iterator) 
-  UseMethod("igraph.es.get", iterator)
-
-igraph.es.get.igraphesseq <- function(graph, iterator) {
-  iterator[[1]][1]
-}
-
-igraph.es.get.igraphesvector <- function(graph, iterator) {
-  iterator[[2]] [ iterator[[1]][1] ]
-}
-
-igraph.es.reset <- function(graph, iterator) {
-  iterator[[1]][1] <- iterator[[1]][2]
-  iterator
-}
-
-igraph.es.from <- function(graph, iterator)
-  UseMethod("igraph.es.from", iterator)
-
-igraph.es.from.igraphesseq <- function(graph, iterator) {
-  graph[[3]] [ iterator[[1]][1]+1 ]
-}
-
-igraph.es.from.igraphesvector <- function(graph, iterator) {
-  graph[[3]] [ iterator[[2]] [ iterator[[1]][1] ]+1 ]
-}
-
-igraph.es.to <- function(graph, iterator)
-  UseMethod("igraph.es.to", iterator)
-
-igraph.es.to.igraphesseq <- function(graph, iterator) {
-  graph[[4]] [ iterator[[1]][1]+1 ]
-}
-
-igraph.es.to.igraphesvector <- function(graph, iterator) {
-  graph[[4]] [ iterator[[2]] [ iterator[[1]][1] ]+1 ]
-}
-
-as.vector.igraphesseq <- function(x, mode="any") {
-  if (x[[1]][2] <= x[[1]][3]) {
-    (x[[1]][2]):(x[[1]][3])
-  } else {
-    numeric()
+"[<-.igraph.vs" <- function(x, i, value) {
+  if (! "name"  %in% names(attributes(value)) ||
+      ! "value" %in% names(attributes(value))) {
+    stop("invalid indexing")
   }
+  value
 }
 
-as.vector.igraphesvector <- function(x, mode="any") {
-  x[[2]]-1
-}
-
-###################################################################
-# Iterator shorthands, the should make iterators much more
-# comfortable. Look at something like this:
-#
-# i <- igraph.es.adj(graph, from=c(1,2,3), to=igraph_vs_all(graph))
-# while (! i$end) {
-#   print(paste(i$e, ":", i$from(g), "->", i$to(g)))
-#   i <- i$step
-# }
-# 
-# Isn't it nice?
-
-"$.igraphvsseq" <- function(it, cmd) {
-  if (cmd=="end") {
-    igraph.vs.end(NULL, it)
-  } else if (cmd=="v") {
-    igraph.vs.get.igraphvsseq(NULL, it)
-  } else if (cmd=="step") {
-    igraph.vs.next(NULL, it)
-  } else {
-    NULL
+"[<-.igraph.es" <- function(x, i, value) {
+  if (! "name"  %in% names(attributes(value)) ||
+      ! "value" %in% names(attributes(value))) {
+    stop("invalid indexing")
   }
+  value
+}  
+
+"$.igraph.vs" <- function(x, name) {
+  get.vertex.attribute(get("graph", attr(x, "env")), name, x)
 }
 
-"$.igraphvsvector" <- function(it, cmd) {
-  if (cmd=="end") {
-    igraph.vs.end(NULL, it)
-  } else if (cmd=="v") {
-    igraph.vs.get.igraphvsvector(NULL, it)
-  } else if (cmd=="step") {
-    igraph.vs.next(NULL, it)
-  } else {
-    NULL
+"$.igraph.es" <- function(x, name) {
+  get.edge.attribute(get("graph", attr(x, "env")), name, x)
+}
+
+"$<-.igraph.vs" <- function(x, name, value) {
+  attr(x, "name") <- name
+  attr(x, "value") <- value
+  x
+}
+
+"$<-.igraph.es" <- function(x, name, value) {
+  attr(x, "name") <- name
+  attr(x, "value") <- value
+  x
+}
+
+"V<-" <- function(x, value) {
+  if (! "name"  %in% names(attributes(value)) ||
+      ! "value" %in% names(attributes(value))) {
+    stop("invalid indexing")
   }
+  set.vertex.attribute(x, attr(value, "name"), index=value,
+                       value=attr(value, "value"))
 }
 
-"$.igraphesseq" <- function(it, cmd) {
-  if (cmd=="end") {
-    igraph.es.end(NULL, it)
-  } else if (cmd=="e") {
-    igraph.es.get.igraphesseq(NULL, it)
-  } else if (cmd=="from") {
-    function(g) { igraph.es.from.igraphesseq(g, it) }
-  } else if (cmd=="to") {
-    function(g) { igraph.es.to.igraphesseq(g, it) }
-  } else if (cmd=="step") {
-    igraph.es.next(NULL, it)
-  } else {
-    NULL
+"E<-" <- function(x, value) {
+  if (! "name"  %in% names(attributes(value)) ||
+      ! "value" %in% names(attributes(value))) {
+    stop("invalid indexing")
   }
+  set.edge.attribute(x, attr(value, "name"), index=value,
+                     value=attr(value, "value"))
 }
 
-"$.igraphesvector" <- function(it, cmd) {
-  if (cmd=="end") {
-    igraph.es.end(NULL, it)
-  } else if (cmd=="e") {
-    igraph.es.get.igraphesvector(NULL, it)
-  } else if (cmd=="from") {
-    function(g) { igraph.es.from.igraphesvector(g, it) }
-  } else if (cmd=="to") {
-    function(g) { igraph.es.to.igraphesvector(g, it) }
-  } else if (cmd=="step") {
-    igraph.es.next(NULL, it)
-  } else {
-    NULL
-  }
-}
+# these are internal
 
-#####
-# internal helper functions
+as.igraph.vs <- as.numeric
+as.igraph.es <- as.numeric
 
-as.igraph.vs <- function(g, it) {
-  if (class(it) %in% c("igraphvsseq", "igraphvsvector")) {
-    it
-  } else if (is.numeric(it)) {
-    igraph.vs.vector(g, it)
-  } else {
-    stop("Cannot interpret as vertex set")
-  }
-}
 
-as.igraph.es <- function(g, it) {
-  if (class(it) %in% c("igraphesseq", "igraphesvector")) {
-    it
-  } else if (is.numeric(it)) {
-    igraph.es.vector(g, it)
-  } else {
-    stop("Cannot interpret as edge set")
-  }
-}

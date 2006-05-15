@@ -45,7 +45,7 @@ delete.edges <- function(graph, edges) {
 }
 
 delete.vertices <- function(graph, v) {
-  .Call("R_igraph_delete_vertices", graph, as.igraph.vs(graph, v),
+  .Call("R_igraph_delete_vertices", graph, as.igraph.vs(v),
         PACKAGE="igraph")
 }
 

@@ -48,13 +48,13 @@ average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
         PACKAGE="igraph")
 }
 
-degree <- function(graph, v=igraph.vs.all(graph),
+degree <- function(graph, v=V(graph),
                    mode="total", loops=TRUE){
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
   
-  .Call("R_igraph_degree", graph, as.igraph.vs(graph, v), as.numeric(mode),
+  .Call("R_igraph_degree", graph, as.igraph.vs(v), as.numeric(mode),
         as.logical(loops), PACKAGE="igraph")
 }
   
@@ -71,46 +71,46 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
   res
 }
 
-closeness <- function(graph, v=igraph.vs.all(graph), mode="all") {
+closeness <- function(graph, v=V(graph), mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
   
-  .Call("R_igraph_closeness", graph, as.igraph.vs(graph, v), as.numeric(mode),
+  .Call("R_igraph_closeness", graph, as.igraph.vs(v), as.numeric(mode),
         PACKAGE="igraph")
 }
 
-shortest.paths <- function(graph, v=igraph.vs.all(graph), mode="all") {
+shortest.paths <- function(graph, v=V(graph), mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
 
-  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(graph, v),
+  .Call("R_igraph_shortest_paths", graph, as.igraph.vs(v),
         as.numeric(mode),
         PACKAGE="igraph")
 }
 
-get.shortest.paths <- function(graph, from, to=igraph.vs.all(graph),
+get.shortest.paths <- function(graph, from, to=V(graph),
                                mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
 
-  to <- as.igraph.vs(graph, to)
+  to <- as.igraph.vs(to)
   .Call("R_igraph_get_shortest_paths", graph,
         as.numeric(from), to, as.numeric(mode), length(to),
         PACKAGE="igraph")
 }
 
 get.all.shortest.paths <- function(graph, from,
-                                   to=igraph.vs.all(graph),
+                                   to=V(graph),
                                    mode="all") {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
 
   .Call("R_igraph_get_all_shortest_paths", graph,
-        as.numeric(from), as.igraph.vs(graph, to), as.numeric(mode),
+        as.numeric(from), as.igraph.vs(to), as.numeric(mode),
         PACKAGE="igraph")
 }
 
@@ -119,12 +119,12 @@ subcomponent <- function(graph, v, mode="all") {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
 
-  .Call("R_igraph_subcomponent", graph, as.numeric(v), as.numeric(mode),
+  .Call("R_igraph_subcomponent", graph, as.igraph.vs(v), as.numeric(mode),
         PACKAGE="igraph")
 }
 
 subgraph <- function(graph, v) {
-  .Call("R_igraph_subgraph", graph, as.igraph.vs(graph, v),
+  .Call("R_igraph_subgraph", graph, as.igraph.vs(v),
         PACKAGE="igraph")
 }
 
@@ -161,17 +161,17 @@ simplify <- function(graph, remove.multiple=TRUE,
 ##   res
 }
 
-betweenness <- function(graph, v=igraph.vs.all(graph), directed=TRUE) {
+betweenness <- function(graph, v=V(graph), directed=TRUE) {
   
-  .Call("R_igraph_betweenness", graph, as.igraph.vs(graph, v),
+  .Call("R_igraph_betweenness", graph, as.igraph.vs(v),
         as.logical(directed),
         PACKAGE="igraph")
 }
 
-edge.betweenness <- function(graph, e=igraph.es.all(graph), directed=TRUE) {
+edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
 
   .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
-        PACKAGE="igraph")[ as.vector(e)+1 ]  
+        PACKAGE="igraph")[ as.numeric(e)+1 ]  
 }
 
 transitivity <- function(graph, type="undirected") {

@@ -39,25 +39,27 @@ print.igraph <- function(x, graph.attributes=FALSE,
   # Graph attributes
   if (graph.attributes) {
     cat("Graph attributes:\n")
-    list <- g.a(x)
-    sapply(list, function(n) { cat("  ", n, "=", g.a(x, n), "\n") })
+    list <- list.graph.attributes(x)
+    sapply(list, function(n) {
+      cat("  ", n, "=", get.graph.attribute(x, n), "\n") })
   }
 
   # Vertex attributes
   if (vertex.attributes) {
     cat("Vertex attributes:\n")
-    list <- v.a(x)
+    list <- list.vertex.attributes(x)
     if (vc != 0) {
       for (i in 0:(vc-1)) {
         cat("  ", i, "  ")
-        sapply(list, function(n) { cat(n, "=", v.a(x, n, i), "\t")})
+        sapply(list, function(n) {
+          cat(n, "=", get.vertex.attribute(x, n, i), "\t")})
         cat("\n")
       }
     }
   }
 
   if (edge.attributes) {
-    list <- e.a(x)
+    list <- list.edge.attributes(x)
   }
   
   arrow <- ifelse(is.directed(x), "->", "--")
@@ -67,17 +69,17 @@ print.igraph <- function(x, graph.attributes=FALSE,
     } else {
       cat("\nEdges and their attributes:\n")
     }
-    it <- igraph.es.all(x)
-    while (!igraph.es.end(x, it)) {
-      cat(sep="", "[", igraph.es.get(x, it), "] ",
-          igraph.es.from(x, it), " ", arrow, " ", igraph.es.to(x, it))
+    i <- 0
+    el <- get.edgelist(x)
+    apply(el, 1, function(v) {
+      cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
       if (edge.attributes) {
-        sapply(list, function(n)
-               { cat("  ", n, "=", e.a(x, n, igraph.es.get(x,it)), "\t")})
+        sapply(list, function(n) {
+          cat("  ", n, "=", get.edge.attribute(x, n, i), "\t")})
       }
       cat("\n")
-      it <- igraph.es.next(x, it)
-    }
+      i <<- i+1
+    })
   }
   
   invisible(x)

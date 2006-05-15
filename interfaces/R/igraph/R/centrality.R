@@ -20,7 +20,7 @@
 #
 ###################################################################
 
-evcent <- function(graph, v=igraph.vs.all(graph)) {
+evcent <- function(graph, v=V(graph)) {
 
   ad <- get.adjacency(graph)
 

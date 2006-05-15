@@ -6,51 +6,28 @@ export(graph.empty, add.edges, add.vertices, delete.edges,
 
 # Attributes
 
-export(get.graph.attribute, set.graph.attribute, g, 
-       get.vertex.attribute, set.vertex.attribute, v,
-       get.edge.attribute, set.edge.attribute, e)
+export(get.graph.attribute, set.graph.attribute,
+       get.vertex.attribute, set.vertex.attribute,
+       get.edge.attribute, set.edge.attribute,
+       list.graph.attributes, list.vertex.attributes,
+       list.edge.attributes, remove.graph.attribute,
+       remove.vertex.attribute, remove.edge.attribute)
 
 # iterators
 
-export(igraph.vs.all, igraph.vs.vector,
-       igraph.es.all, igraph.es.vector,
-       V, E,
-       igraph.vs.next, igraph.vs.end, igraph.vs.reset, igraph.vs.get,
-       igraph.es.next, igraph.es.end, igraph.es.reset, igraph.es.get,
-       igraph.es.from, igraph.es.to)
+export(V, E, "$.igraph.vs", "$.igraph.es",
+       "[.igraph.vs", "[.igraph.es", "[<-.igraph.vs", "[<-.igraph.es",
+       "$<-.igraph.vs", "$<-.igraph.es", "V<-", "E<-")
 
-S3method(igraph.vs.get, igraphvsseq)
-S3method(igraph.vs.get, igraphvsvector)
-S3method(igraph.es.get, igraphesseq)
-S3method(igraph.es.get, igraphesvector)
-S3method(igraph.es.from, igraphesseq)
-S3method(igraph.es.from, igraphesvector)
-S3method(igraph.es.to, igraphesseq)
-S3method(igraph.es.to, igraphesvector)
-
-S3method(as.vector, igraphvsseq)
-S3method(as.vector, igraphvsvector)
-S3method(as.vector, igraphesseq)
-S3method(as.vector, igraphesvector)
-
-S3method(print, igraphvsseq)
-S3method(print, igraphesseq)
-S3method(print, igraphvsvector)
-S3method(print, igraphesvector)
-
-S3method(length, igraphvsseq)
-S3method(length, igraphesseq)
-S3method(length, igraphvsvector)
-S3method(length, igraphesvector)
-
-export ("$.igraphvsseq", "$.igraphvsvector",
-        "$.igraphesseq", "$.igraphesvector")
-
-S3method("$", "igraphvsseq")
-S3method("$", "igraphvsvector")
-S3method("$", "igraphesseq")
-S3method("$", "igraphesvector")
-
+S3method("$", igraph.vs)
+S3method("[", igraph.vs)
+S3method("[<-", igraph.vs)
+S3method("$<-", igraph.vs)
+S3method("$", igraph.es)
+S3method("[", igraph.es)
+S3method("[<-", igraph.es)
+S3method("$<-", igraph.es)
+  
 # basic functions, printing
 
 export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed)

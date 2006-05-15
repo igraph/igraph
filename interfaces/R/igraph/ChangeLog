@@ -1,3 +1,50 @@
+2006-05-15  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/attributes.R (get.graph.attribute)
+	(set.graph.attribute, get.vertex.attribute, set.vertex.attribute)
+	(get.edge.attribute, set.edge.attribute) : updated to new 
+	attribute handling
+	(list.graph.attributes, list.vertex.attributes, list.edge.attributes)
+	(remove.graph.attributes, remove.vertex.atattributes)
+	(remove.edge.attributes) : added, new attribute handling
+	(g,e,v) : removed
+	* interfaces/R/igraph/R/iterators.R (V, E) : updated, new iterators
+	(igraph.vs.all, igraph.es.all, igraph.vs.vector, igraph.vs.vector)
+	(print.igraphvsseq, print.igraphesseq, print.igraphvsvector)
+	(print.igraphesvector, length.igraphvsseq, length.igraphesseq)
+	(length.igraphvsvector, length.igraphesvector, igraph.vs.next)
+	(igraph.vs.end, igraph.vs.get, igraph.vs.get.igraphvsseq)
+	(igraph.vs.get.igraphvsvector, igraph.vs.reset, as.vector.igraphvssseq)
+	(as.vector.igraphvsvector, igraph.es.next, igraph.es.end)
+	(igraph.es.get, igraph.es.get.igraphesseq)
+	(igraph.es.get.igraphesvector, igraph.es.reset, igraph.es.from)
+	(igraph.es.from.igraphesseq, igraph.es.from.igraphesvector)
+	(igraph.es.to, igraph.es.to.igraphesseq)
+	(igraph.es.to.igraphesvector, as.vector.igraphesseq)
+	(as.vector.igraphesvector, $.igraphvsseq, $.igraphvsvector)
+	($.igraphesseq, $.igraphesvector) : removed
+	([.igraph.vs, [.igraph.es, [<-.igraph.vs, [<-.igraph.es)
+	($.igraph.vs, $.igraph.es, $<-.igraph.vs, $<-.igraph.es)
+	(V<-, E<-) : added
+	(as.igraph.vs, as.igraph.es) : updated
+	* interfaces/R/src/rinterface.c (R_SEXP_to_igraph_vs_copy)
+	(R_SEXP_to_igraph_es_copy) : removed
+	(R_SEXP_to_igraph_vs, R_SEXP_to_igraph_es) : added
+	(R_igraph_delete_vertices, R_igraph_degree, R_igraph_closeness)
+	(R_igraph_betweenness, R_igraph_cocitation, R_igraph_bibcoupling)
+	(R_igraph_shortest_paths, R_igraph_get_shortest_paths)
+	(R_igraph_subgraph, R_igraph_get_all_shortest_paths) : updated
+
+	* interfaces/R/igraph/R/interface.R (delete.vertices) : updated
+	* interfaces/R/igraph/R/print.R (print.igraph) : updated
+	* interfaces/R/igraph/R/structural.properties.R (degree)
+	(closeness, shortest.paths, get.shortest.paths)
+	(get.all.shortest.paths, subcomponent, subgraph, betweenness)
+	(edge.betweenness) : updated
+	* interfaces/R/igraph/R/cocitation.R (cocitation, bibcoupling) : 
+	updated
+	* interfaces/R/igraph/R/centrality.R (evcent) : updated
+
 2006-05-12  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.d.d) :
