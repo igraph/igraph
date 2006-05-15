@@ -131,9 +131,9 @@ PyObject* igraphmodule_Graph_write_graphml(igraphmodule_GraphObject *self, PyObj
 int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self);
 PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self, PyObject* s);
 int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k, PyObject* v);
-PyObject* igraphmodule_Graph_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
-PyObject* igraphmodule_Graph_vertex_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
-PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_attributes(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_vertex_attributes(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject* self);
 
 PyObject* igraphmodule_Graph_get_vertices(igraphmodule_GraphObject* self, void* closure);
 PyObject* igraphmodule_Graph_get_edges(igraphmodule_GraphObject* self, void* closure);

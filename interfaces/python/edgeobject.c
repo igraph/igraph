@@ -48,7 +48,7 @@ PyObject* igraphmodule_Edge_New(PyObject *gref, long idx) {
   igraphmodule_EdgeObject* self;
   self=PyObject_GC_New(igraphmodule_EdgeObject, &igraphmodule_EdgeType);
   if (self) {
-    RC_ALLOC("Edge", self);
+    /* RC_ALLOC("Edge", self); */
     Py_INCREF(gref);
     self->gref=gref;
     self->idx=idx;
@@ -93,7 +93,7 @@ int igraphmodule_Edge_clear(igraphmodule_EdgeObject *self) {
 void igraphmodule_Edge_dealloc(igraphmodule_EdgeObject* self) {
   igraphmodule_Edge_clear(self);
 
-  RC_DEALLOC("Edge", self);
+  /* RC_DEALLOC("Edge", self); */
 
   PyObject_GC_Del((PyObject*)self);
 }
@@ -119,22 +119,12 @@ PyObject* igraphmodule_Edge_str(igraphmodule_EdgeObject *self)
  * \brief Returns the number of edge attributes
  */
 int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
-  igraph_vector_t t;
-  long result;
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return 0;
-  
-  if (igraph_vector_init(&t, 0)) return 0;
-  if (igraph_list_edge_attributes(&o->g, NULL, &t)) {
-    igraph_vector_destroy(&t);
-    return 0;
-  }
-  
-  result=igraph_vector_size(&t);
-  igraph_vector_destroy(&t);
-  return result;
+  if (!((PyObject**)o->g.attr)[1]) return 0;
+  return PyDict_Size(((PyObject**)o->g.attr)[1]);
 }
 
 /** \ingroup python_interface_edge
@@ -146,7 +136,7 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
 
-  return igraphmodule_Graph_edge_attributes(o, NULL, NULL);
+  return igraphmodule_Graph_edge_attributes(o);
 }
 
 /** \ingroup python_interface_edge
@@ -156,33 +146,28 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
  */
 PyObject* igraphmodule_Edge_get_attribute(igraphmodule_EdgeObject* self,
 					  PyObject* s) {
-  igraph_attribute_type_t t=-1;
-  void* value=NULL;
   igraphmodule_GraphObject *o;
-  int result;
+  PyObject* result;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
   
-  if (!PyString_Check(s)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
-    return NULL;
+  result=PyDict_GetItem(((PyObject**)o->g.attr)[2], s);
+  if (result) {
+    /* result is a list, so get the element with index self->idx */
+    if (!PyList_Check(result)) {
+      PyErr_SetString(igraphmodule_InternalError, "Edge attribute dict member is not a list");
+      return NULL;
+    }
+    result=PyList_GetItem(result, self->idx);
+    Py_INCREF(result);
+    return result;
   }
   
-  result=igraph_get_edge_attribute(&o->g, PyString_AsString(s),
-				     self->idx, &value, &t);
-  if (result == IGRAPH_EINVAL) {
+  /* result is NULL, check whether there was an error */
+  if (!PyErr_Occurred())
     PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
-    return NULL;
-  } else if (result) {
-    return igraphmodule_handle_igraph_error();
-  }
-  
-  if (t==IGRAPH_ATTRIBUTE_NUM)
-    return PyFloat_FromDouble((double)(*(igraph_real_t*)value));
-  if (t==IGRAPH_ATTRIBUTE_STR)
-    return PyString_FromString((char*)value);
-  return igraphmodule_handle_igraph_error();
+  return NULL;
 }
 
 /** \ingroup python_interface_edge
@@ -193,72 +178,64 @@ PyObject* igraphmodule_Edge_get_attribute(igraphmodule_EdgeObject* self,
  * \return 0 if everything's ok, -1 in case of error
  */
 int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, PyObject* v) {
-  igraph_attribute_type_t t=-1, t2=-1;
-  void* value=NULL;
-  char* key;
-  igraph_real_t value0;
   igraphmodule_GraphObject *o;
-  int result;
+  PyObject* result;
+  int r;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return -1;
-  
-  if (!PyString_Check(k)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
-    return -1;
-  }
-  if (v!=NULL && !PyString_Check(v) && !PyInt_Check(v) && !PyLong_Check(v) && !PyFloat_Check(v)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute value must be either numeric or string");
-    return -1;
-  }
-  
-  key=PyString_AsString(k);
-  result=igraph_get_edge_attribute_type(&o->g, key, &t2);
-  if (result == IGRAPH_EINVAL) {
-    t2=-1;         // to indicate that there's no such attribute yet
-    PyErr_Clear(); // to indicate that we handled the situation
-  } else if (result) {
-    igraphmodule_handle_igraph_error(); return -1;
-  }
-  
-  if (v==NULL) {
-    // we are deleting attribute
-    if (igraph_remove_edge_attribute(&o->g, key)) {
-      igraphmodule_handle_igraph_error(); return -1;
-    }
-    return 0;
-  } else if (PyString_Check(v)) {
-    t=IGRAPH_ATTRIBUTE_STR;
-    value=(void*)PyString_AsString(v);
-  } else {
-    t=IGRAPH_ATTRIBUTE_NUM;
-    if (PyInt_Check(v))
-      value0=(igraph_real_t)(PyInt_AsLong(v));
-    else if (PyLong_Check(v))
-      value0=(igraph_real_t)(PyLong_AsLong(v));
-    else if (PyFloat_Check(v))
-      value0=(igraph_real_t)(PyFloat_AsDouble(v));
-    if (PyErr_Occurred()) return -1;
-    value=(void*)&value0;
-  }
 
-  if ((long)t2 == -1) {
-    // Attribute does not exist yet, so we add it
-    if (igraph_add_edge_attribute(&o->g, key, t)) {
-      igraphmodule_handle_igraph_error(); return -1;
-    }
-    t2=t;
-  } else {
-    if (t2!=t) {
-      /* The type of the existing attribute differs from the new one */
-      PyErr_SetString(PyExc_TypeError, "Edge attribute type does not match the type of the given value");
+  if (v==NULL)
+    // we are deleting attribute
+    return PyDict_DelItem(((PyObject**)o->g.attr)[2], k);
+  
+  result=PyDict_GetItem(((PyObject**)o->g.attr)[2], k);
+  if (result) {
+    /* result is a list, so set the element with index self->idx */
+    if (!PyList_Check(result)) {
+      PyErr_SetString(igraphmodule_InternalError, "Vertex attribute dict member is not a list");
       return -1;
     }
+    /* we actually don't own a reference here to v, so we must increase
+     * its reference count, because PyList_SetItem will "steal" a reference!
+     * It took me 1.5 hours between London and Manchester to figure it out */
+    Py_INCREF(v);
+    r=PyList_SetItem(result, self->idx, v);
+    if (r == -1) Py_DECREF(v);
+    return r;
   }
-  if (igraph_set_edge_attribute(&o->g, key, self->idx, value)) {
-    igraphmodule_handle_igraph_error(); return -1;
+  
+  /* result is NULL, check whether there was an error */
+  if (!PyErr_Occurred()) {
+    /* no, there wasn't, so we must simply add the attribute */
+    int n=(int)igraph_ecount(&o->g), i;
+    result=PyList_New(n);
+    for (i=0; i<n; i++) {
+      if (i != self->idx) {
+	Py_INCREF(Py_None);
+	if (PyList_SetItem(result, i, Py_None) == -1) {
+	  Py_DECREF(Py_None);
+	  Py_DECREF(result);
+	  return -1;
+	}
+      } else {
+	/* Same game with the reference count here */
+	Py_INCREF(v);
+	if (PyList_SetItem(result, i, v) == -1) {
+	  Py_DECREF(v);
+	  Py_DECREF(result);
+	  return -1;
+	}
+      }
+    }
+    if (PyDict_SetItem(((PyObject**)o->g.attr)[2], k, result) == -1) {
+      Py_DECREF(result); /* TODO: is it needed here? maybe not! */
+      return -1;
+    }
+    return 0;
   }
-  return 0;
+  
+  return -1;
 }
 
 /**
@@ -275,7 +252,7 @@ PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closur
   if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
-  return PyInt_FromLong(from);
+  return PyInt_FromLong((long)from);
 }
 
 /**
@@ -292,7 +269,24 @@ PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure)
   if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
-  return PyInt_FromLong(to);
+  return PyInt_FromLong((long)to);
+}
+
+/**
+ * \ingroup python_interface_edge
+ * Returns the target node index of an edge
+ */
+PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closure) {
+  PyObject *o;
+  igraph_integer_t from, to;
+  
+  o=igraphmodule_resolve_graph_weakref(self->gref);
+  if (!o) return NULL;
+  
+  if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  return Py_BuildValue("(ii)", (long)from, (long)to);
 }
 
 /**
@@ -317,6 +311,9 @@ PyGetSetDef igraphmodule_Edge_getseters[] = {
   },
   {"target", (getter)igraphmodule_Edge_get_to, NULL,
       "Target node index of this edge", NULL
+  },
+  {"tuple", (getter)igraphmodule_Edge_get_tuple, NULL,
+      "Source and target node index of this edge as a tuple", NULL
   },
   {NULL}
 };

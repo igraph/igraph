@@ -119,37 +119,24 @@ PyObject* igraphmodule_Vertex_str(igraphmodule_VertexObject *self)
  * \brief Returns the number of vertex attributes
  */
 int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
-  igraph_vector_t t;
-  long result;
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return 0;
-  
-  if (igraph_vector_init(&t, 0)) return 0;
-  if (igraph_list_vertex_attributes(&o->g, NULL, &t)) {
-    igraph_vector_destroy(&t);
-    return 0;
-  }
-  
-  result=igraph_vector_size(&t);
-  igraph_vector_destroy(&t);
-  return result;
+  if (!((PyObject**)o->g.attr)[1]) return 0;
+  return PyDict_Size(((PyObject**)o->g.attr)[1]);
 }
 
 /** \ingroup python_interface_vertex
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
-  igraph_vector_t t;
-  igraph_vector_ptr_t ns;
-  long result;
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
 
-  return igraphmodule_Graph_vertex_attributes(o, NULL, NULL);
+  return igraphmodule_Graph_vertex_attributes(o);
 }
 
 /** \ingroup python_interface_vertex
@@ -159,33 +146,28 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
  */
 PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
 					   PyObject* s) {
-  igraph_attribute_type_t t=-1;
-  void* value=NULL;
   igraphmodule_GraphObject *o;
-  int result;
+  PyObject* result;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
   
-  if (!PyString_Check(s)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
-    return NULL;
+  result=PyDict_GetItem(((PyObject**)o->g.attr)[1], s);
+  if (result) {
+    /* result is a list, so get the element with index self->idx */
+    if (!PyList_Check(result)) {
+      PyErr_SetString(igraphmodule_InternalError, "Vertex attribute dict member is not a list");
+      return NULL;
+    }
+    result=PyList_GetItem(result, self->idx);
+    Py_INCREF(result);
+    return result;
   }
   
-  result=igraph_get_vertex_attribute(&o->g, PyString_AsString(s),
-				     self->idx, &value, &t);
-  if (result == IGRAPH_EINVAL) {
+  /* result is NULL, check whether there was an error */
+  if (!PyErr_Occurred())
     PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
-    return NULL;
-  } else if (result) {
-    return igraphmodule_handle_igraph_error();
-  }
-  
-  if (t==IGRAPH_ATTRIBUTE_NUM)
-    return PyFloat_FromDouble((double)(*(igraph_real_t*)value));
-  if (t==IGRAPH_ATTRIBUTE_STR)
-    return PyString_FromString((char*)value);
-  return igraphmodule_handle_igraph_error();
+  return NULL;
 }
 
 /** \ingroup python_interface_vertex
@@ -196,72 +178,72 @@ PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
  * \return 0 if everything's ok, -1 in case of error
  */
 int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject* k, PyObject* v) {
-  igraph_attribute_type_t t=-1, t2=-1;
-  void* value=NULL;
-  char* key;
-  igraph_real_t value0;
   igraphmodule_GraphObject *o;
-  int result;
+  PyObject* result;
+  int r;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return -1;
-  
-  if (!PyString_Check(k)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute name must be string");
-    return -1;
-  }
-  if (v!=NULL && !PyString_Check(v) && !PyInt_Check(v) && !PyLong_Check(v) && !PyFloat_Check(v)) {
-    PyErr_SetString(PyExc_TypeError, "Attribute value must be either numeric or string");
-    return -1;
-  }
-  
-  key=PyString_AsString(k);
-  result=igraph_get_vertex_attribute_type(&o->g, key, &t2);
-  if (result == IGRAPH_EINVAL) {
-    t2=-1;         // to indicate that there's no such attribute yet
-    PyErr_Clear(); // to indicate that we handled the situation
-  } else if (result) {
-    igraphmodule_handle_igraph_error(); return -1;
-  }
-  
-  if (v==NULL) {
-    // we are deleting attribute
-    if (igraph_remove_vertex_attribute(&o->g, key)) {
-      igraphmodule_handle_igraph_error(); return -1;
-    }
-    return 0;
-  } else if (PyString_Check(v)) {
-    t=IGRAPH_ATTRIBUTE_STR;
-    value=(void*)PyString_AsString(v);
-  } else {
-    t=IGRAPH_ATTRIBUTE_NUM;
-    if (PyInt_Check(v))
-      value0=(igraph_real_t)(PyInt_AsLong(v));
-    else if (PyLong_Check(v))
-      value0=(igraph_real_t)(PyLong_AsLong(v));
-    else if (PyFloat_Check(v))
-      value0=(igraph_real_t)(PyFloat_AsDouble(v));
-    if (PyErr_Occurred()) return -1;
-    value=(void*)&value0;
-  }
 
-  if ((long)t2 == -1) {
-    // Attribute does not exist yet, so we add it
-    if (igraph_add_vertex_attribute(&o->g, key, t)) {
-      igraphmodule_handle_igraph_error(); return -1;
-    }
-    t2=t;
-  } else {
-    if (t2!=t) {
-      /* The type of the existing attribute differs from the new one */
-      PyErr_SetString(PyExc_TypeError, "Vertex attribute type does not match the type of the given value");
+  if (v==NULL)
+    // we are deleting attribute
+    return PyDict_DelItem(((PyObject**)o->g.attr)[1], k);
+  
+  result=PyDict_GetItem(((PyObject**)o->g.attr)[1], k);
+  if (result) {
+    /* result is a list, so set the element with index self->idx */
+    if (!PyList_Check(result)) {
+      PyErr_SetString(igraphmodule_InternalError, "Vertex attribute dict member is not a list");
       return -1;
     }
+    /* we actually don't own a reference here to v, so we must increase
+     * its reference count, because PyList_SetItem will "steal" a reference!
+     * It took me 1.5 hours between London and Manchester to figure it out */
+    Py_INCREF(v);
+    r=PyList_SetItem(result, self->idx, v);
+    if (r == -1) Py_DECREF(v);
+    return r;
   }
-  if (igraph_set_vertex_attribute(&o->g, key, self->idx, value)) {
-    igraphmodule_handle_igraph_error(); return -1;
+  
+  /* result is NULL, check whether there was an error */
+  if (!PyErr_Occurred()) {
+    /* no, there wasn't, so we must simply add the attribute */
+    int n=(int)igraph_vcount(&o->g), i;
+    result=PyList_New(n);
+    for (i=0; i<n; i++) {
+      if (i != self->idx) {
+	Py_INCREF(Py_None);
+	if (PyList_SetItem(result, i, Py_None) == -1) {
+	  Py_DECREF(Py_None);
+	  Py_DECREF(result);
+	  return -1;
+	}
+      } else {
+	/* Same game with the reference count here */
+	Py_INCREF(v);
+	if (PyList_SetItem(result, i, v) == -1) {
+	  Py_DECREF(v);
+	  Py_DECREF(result);
+	  return -1;
+	}
+      }
+    }
+    if (PyDict_SetItem(((PyObject**)o->g.attr)[1], k, result) == -1) {
+      Py_DECREF(result);
+      return -1;
+    }
+    return 0;
   }
-  return 0;
+  
+  return -1;
+}
+
+/**
+ * \ingroup python_interface_vertex
+ * Returns the vertex index
+ */
+PyObject* igraphmodule_Vertex_get_index(igraphmodule_VertexObject* self, void* closure) {
+  return PyInt_FromLong((long)self->idx);
 }
 
 /**
@@ -288,6 +270,17 @@ PyMappingMethods igraphmodule_Vertex_as_mapping = {
   (binaryfunc)igraphmodule_Vertex_get_attribute,
   // sets an attribute by name
   (objobjargproc)igraphmodule_Vertex_set_attribute
+};
+
+/**
+ * \ingroup python_interface_vertex
+ * Getter/setter table for the \c igraph.Vertex object
+ */
+PyGetSetDef igraphmodule_Vertex_getseters[] = {
+  {"index", (getter)igraphmodule_Vertex_get_index, NULL,
+      "Index of the vertex", NULL
+  },
+  {NULL}
 };
 
 /** \ingroup python_interface_vertex
@@ -325,5 +318,7 @@ PyTypeObject igraphmodule_VertexType =
   0,                                          // tp_iter
   0,                                          // tp_iternext
   igraphmodule_Vertex_methods,                // tp_methods
+  0,                                          // tp_members
+  igraphmodule_Vertex_getseters,              // tp_getset
 };
 

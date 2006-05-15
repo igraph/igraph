@@ -9,7 +9,9 @@ from time import clock;
 sys.path.insert(0, 'interfaces/python/.libs');
 import igraph;
 
-longtests=False;
+longtests=False
+
+idx=1;
 
 # Recursively expand slist's objects
 # into olist, using seen to track
@@ -48,10 +50,11 @@ def section(msg):
     sys.stdout.write("="*len(msg)+"\n\n");
     
 def start(msg):
-    global lasttest;
+    global lasttest, idx;
     lasttest=msg;
-    sys.stdout.write(msg+"... ");
+    sys.stdout.write("#"+str(idx)+": "+msg+"... ");
     sys.stdout.flush();
+    idx+=1;
     
 def ok():
     global passed;
@@ -154,7 +157,7 @@ test(g.vcount() == 4 and g.ecount() == 4);
 start("Creating igraph.Graph object with -2 vertices (should throw exception)")
 try:
     g=igraph.Graph(-2);
-except AssertionError, e:
+except igraph.InternalError, e:
     ok();
     print "Expected exception arrived: ", e
 else:
@@ -425,9 +428,11 @@ test(g.get_adjacency(igraph.GET_ADJACENCY_UPPER)==[[0,1,1,1], [0,0,1,0], [0,0,0,
 
 start("Calculating bibliographic coupling")
 g=igraph.Graph(edges=[(0,1), (2,1), (2,0), (3,0)], directed=True)
+print g.bibcoupling()
 test(g.bibcoupling()==[[0,0,1,0], [0,0,0,0], [1,0,0,1], [0,0,1,0]])
 
 start("Calculating cocitation scores")
+print g.cocitation()
 test(g.cocitation()==[[0,1,0,0], [1,0,0,0], [0,0,0,0], [0,0,0,0]])
 
 start("Calculating outgoing shortest paths")
@@ -450,12 +455,10 @@ test(ddist == ddist2)
 del ddist
 del ddist2
 
-"""
 g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (3,4), (4,5), (5,3), (6,4)])
 start("Decomposing a graph into components")
 l=g.decompose()
 test(len(l) == 2 and l[0].vcount() == 3 and l[0].ecount() == 3 and l[1].vcount() == 4 and l[1].ecount() == 4)
-"""
 
 section("Layout algorithms")
 
@@ -469,23 +472,27 @@ g.layout_random()
 g.layout_random_3d()
 skip()
 
-start("Testing layout of vertices according to the Kamada-Kawai layout")
-g.layout_kamada_kawai()
-g.layout_kamada_kawai_3d()
-skip()
+if longtests:
+    start("Testing layout of vertices according to the Kamada-Kawai layout")
+    g.layout_kamada_kawai()
+    g.layout_kamada_kawai_3d()
+    skip()
 
-start("Testing layout of vertices according to the Fruchterman-Reingold layout")
-g.layout_fruchterman_reingold()
-g.layout_fruchterman_reingold_3d()
-skip()
+if longtests:
+    start("Testing layout of vertices according to the Fruchterman-Reingold layout")
+    g.layout_fruchterman_reingold()
+    g.layout_fruchterman_reingold_3d()
+    skip()
 
-start("Testing layout of vertices according to the Fruchterman-Reingold grid layout")
-g.layout_grid_fruchterman_reingold()
-skip()
+if longtests:
+    start("Testing layout of vertices according to the Fruchterman-Reingold grid layout")
+    g.layout_grid_fruchterman_reingold()
+    skip()
 
-start("Testing layout of vertices according to the Large Graph Layout")
-g.layout_lgl()
-skip()
+if longtests:
+    start("Testing layout of vertices according to the Large Graph Layout")
+    g.layout_lgl()
+    skip()
 
 start("Testing layout of vertices according to the Reingold-Tilford tree layout")
 g.layout_reingold_tilford(0)
@@ -579,7 +586,6 @@ except igraph.InternalError, e:
 else:
     fail()
 
-"""
 g=igraph.Graph.Full(5)
 start("Trying to save graph not having name/weight attributes as NCOL file")
 (fd,fname)=tempfile.mkstemp()
@@ -587,7 +593,6 @@ os.close(fd)
 g.write_ncol(fname)
 os.unlink(fname)
 skip()
-"""
 
 start("Trying to load nonexistent LGL file")
 try:
@@ -711,12 +716,17 @@ else:
     fail()
 del ed
 
-section("Graph, vertex and edge attributes")
-
 g=igraph.Graph.Full(5)
+g["test"]="aaa"
+g.vs[2]["test"]="aaa"
+g.es[3]["test"]="aaa"
+g.add_vertices(2)
+g.add_edges([(4,5), (5,6)])
 
-l=[g, g.vs[0], g.es[0]]
-for i in l:
+l={"Full graph": g, "1st vertex": g.vs[0], "2nd edge": g.es[1], "7th vertex (added later)": g.vs[6], "Last edge (added later)": g.es[len(g.es)-1]}
+
+for name, i in l.iteritems():
+    section("Attribute testing -- %s" % name)
     start("Trying to get a nonexistent attribute")
     try:
 	print i['aaa']
@@ -733,7 +743,7 @@ for i in l:
 
     start("Overwriting a string attribute")
     s="11:48 11.11.2005"
-    i["date"]=s
+    i["date"]="11:48 11.11.2005"
     s=""
     test(i["date"] == "11:48 11.11.2005")
 
@@ -748,17 +758,23 @@ for i in l:
     start("Getting list of attributes")
     l=i.attributes()
     l.sort()
-    test(l == ["date", "name", "size"])
+    test(l == ["date", "name", "size", "test"])
 
     start("Overwriting a numeric attribute with a string")
-    try:
-	i["size"]="6000 bytes"
-    except TypeError, e:
-	del i["size"]
-	i["size"]="6000 bytes"
+    i["size"]="6000 bytes"
     test(i["size"] == "6000 bytes")
 del i
 del l
+
+start("Deleting three edges and see if attributes shift with edge indices")
+g.es[len(g.es)-1]["name"]="Deletion test"
+g.delete_edges([(0,1), (0,2), (2,3)])
+test(g.ecount() == 9 and g.es[g.ecount()-1]["name"] == "Deletion test")
+
+start("Deleting a vertex and see if attributes shift with vertex indices")
+g.vs[len(g.vs)-1]["name"]="Deletion test"
+g.delete_vertices([0])
+test(g.vcount() == 6 and g.vs[g.vcount()-1]["name"] == "Deletion test")
 
 section("Graph operators")
 
@@ -766,7 +782,7 @@ start("Disjoint union of graphs")
 g=igraph.Graph.Tree(10, 3) + igraph.Graph(edges=[(0, 1), (2, 1)])
 l=g.get_edgelist()
 l.sort()
-test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
+test(l == [(0, 1), (0, 2), (0, 3), (1, 4), (1, 5), (1, 6), (2, 7), (2, 8), (2, 9), (10, 11), (11, 12)])
 
 start("Disjoint union of graph and number (should fail)")
 try:
@@ -781,7 +797,7 @@ g = igraph.Graph.Tree(10, 3)
 g += igraph.Graph(edges=[(0, 1), (2, 1)])
 l=g.get_edgelist()
 l.sort()
-test(l == [(1, 0), (2, 0), (3, 0), (4, 1), (5, 1), (6, 1), (7, 2), (8, 2), (9, 2), (10, 11), (12, 11)])
+test(l == [(0, 1), (0, 2), (0, 3), (1, 4), (1, 5), (1, 6), (2, 7), (2, 8), (2, 9), (10, 11), (11, 12)])
 
 start("Multiple disjoint union")
 g = igraph.Graph.Tree(10, 3).disjoint_union([igraph.Graph.Tree(8, 2), igraph.Graph.Full(5)])
@@ -840,6 +856,16 @@ test(igraph.convex_hull(vs) == [1, 6, 5, 3, 9])
 start("Convex hull test #2")
 print(igraph.convex_hull(vs, True))
 test(igraph.convex_hull(vs, True) == [[5, 1], [1, 3], [2, 5], [6, 4], [9, 2]])
+
+section("Inheritance")
+
+class MyGraph(igraph.Graph):
+    def my_method(self):
+	return True
+    
+start("Testing inheritance from igraph.Graph")
+g=MyGraph(5)
+test(g.my_method)
 
 results()
 

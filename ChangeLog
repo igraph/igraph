@@ -1,3 +1,16 @@
+2006-05-15  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_subgraph) : small bugfix.
+	  Fixes a NULL pointer reference in the Python interface.
+	* interfaces/python/edgeobject.[ch],
+	  interfaces/python/edgeseqobject.c,
+	  interfaces/python/graphobject.[ch],
+	  interfaces/python/igraphmodule.c,
+	  interfaces/python/test.py,
+	  interfaces/python/vertexobject.c,
+	  interfaces/python/vertexseqobject.c : new attribute interface,
+	  partial implementation
+
 2006-05-14  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/foreign.c (igraph_write_graph_lgl, igraph_write_graph_edgelist) :

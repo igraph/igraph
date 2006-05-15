@@ -45,11 +45,7 @@ void igraphmodule_Edge_dealloc(igraphmodule_EdgeObject* self);
 
 PyObject* igraphmodule_Edge_New(PyObject *gref, long idx);
 PyObject* igraphmodule_Edge_str(igraphmodule_EdgeObject *self);
-//int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self);
 PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self);
-/*PyObject* igraphmodule_Edge_get_attribute(igraphmodule_EdgeObject* self,
-					   PyObject* s);
-int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, PyObject* v);*/
 
 extern PyTypeObject igraphmodule_EdgeType;
 

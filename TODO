@@ -46,3 +46,9 @@ o create man pages
 o implement IGRAPH_STRONG in igraph_decompose
 o top-down and radial layout algorithm for tree graphs
 o Hamilton and Euler circles/paths
+o method to turn the edges to the opposite direction in a graph
+o Python inteface: some useful iterators:
+  o iterator over all components
+  o iterator over all circles
+o selective copy: copy only selected edges with attributes
+o method for vertex and edge to return all attrs as a hash

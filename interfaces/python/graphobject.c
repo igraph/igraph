@@ -90,6 +90,7 @@ PyObject* igraphmodule_Graph_new(PyTypeObject *type, PyObject *args,
     igraph_empty(&self->g, 1, 0);
   }*/
   igraphmodule_Graph_init_internal(self);
+  PyObject_GC_Track(self);
   
   return (PyObject*)self;
 }
@@ -144,9 +145,11 @@ int igraphmodule_Graph_traverse(igraphmodule_GraphObject *self,
     if (vret != 0) return vret;
   }
   
-  for (i=0; i<3; i++) {
-    vret=visit(((PyObject**)(self->g.attr))[i], arg);
-    if (vret != 0) return vret;
+  if (self->g.attr) {
+    for (i=0; i<3; i++) {
+      vret=visit(((PyObject**)(self->g.attr))[i], arg);
+      if (vret != 0) return vret;
+    }
   }
   
   // Funny things happen when we traverse the contained VertexSeq or EdgeSeq
@@ -207,7 +210,7 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject* self)
 int igraphmodule_Graph_init(igraphmodule_GraphObject *self,
 			    PyObject *args, PyObject *kwds) {
   char *kwlist[] = {"n", "edges", "directed", NULL};
-  int n=1;
+  int n=1, i;
   PyObject *edges=NULL, *dir=Py_False;
   igraph_vector_t edges_vector;
    
@@ -223,7 +226,12 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject *self,
       igraphmodule_handle_igraph_error();
       return -1;
     }
-	
+
+    /*printf("Edge list:");
+    for (i=0; i<n; i++)
+      printf(" %d", (int)(VECTOR(edges_vector)[i]));
+    printf("\n");*/
+    
     if (igraph_create(&self->g, &edges_vector, (igraph_integer_t)n, (dir==Py_True))) {
       igraphmodule_handle_igraph_error();
       return -1;
@@ -238,7 +246,6 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject *self,
     }
   }
    
-  PyObject_GC_Track(self);
   return 0;
 }
 
@@ -318,7 +325,7 @@ PyObject* igraphmodule_Graph_add_vertices(igraphmodule_GraphObject *self,
 	PyErr_SetString(PyExc_AssertionError, "Number of vertices to be added can't be negative.");
 	return NULL;
      }
-   if (igraph_add_vertices(&self->g, (igraph_integer_t)n)) {
+   if (igraph_add_vertices(&self->g, (igraph_integer_t)n, 0)) {
       igraphmodule_handle_igraph_error();
       return NULL;
    }
@@ -392,7 +399,7 @@ PyObject* igraphmodule_Graph_add_edges(igraphmodule_GraphObject *self,
      }
    
    // do the hard work :)
-   if (igraph_add_edges(&self->g, &v)) 
+   if (igraph_add_edges(&self->g, &v, 0)) 
      {
 	igraphmodule_handle_igraph_error();
 	Py_DECREF(list);
@@ -1535,6 +1542,8 @@ PyObject* igraphmodule_Graph_copy(igraphmodule_GraphObject *self) {
   
   result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
 						      self->ob_type);
+  igraphmodule_Graph_init_internal(result);
+  result->g=g;
   RC_ALLOC("Graph", result);
   
   return (PyObject*)result;
@@ -3379,31 +3388,44 @@ PyNumberMethods igraphmodule_Graph_as_number = {
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
 PyTypeObject igraphmodule_GraphType = {
-  PyObject_HEAD_INIT(NULL)                  // 
-  0,                                        // ob_size
-  "igraph.Graph",                           // tp_name
-  sizeof(igraphmodule_GraphObject),         // tp_basicsize
-  0,                                        // tp_itemsize
-  (destructor)igraphmodule_Graph_dealloc,   // tp_dealloc
-  0,                                        // tp_print
-  0,                                        // tp_getattr
-  0,                                        // tp_setattr
-  0,                                        // tp_compare
-  0,                                        // tp_repr
-  &igraphmodule_Graph_as_number,            // tp_as_mapping
-  0,                                        // tp_as_sequence
-  &igraphmodule_Graph_as_mapping,           // tp_as_mapping
-  0,                                        // tp_hash
-  0,                                        // tp_call
-  (reprfunc)igraphmodule_Graph_str,         // tp_str
-  0,                                        // tp_getattro
-  0,                                        // tp_setattro
-  0,                                        // tp_as_buffer
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE |
-    Py_TPFLAGS_HAVE_GC | Py_TPFLAGS_HAVE_WEAKREFS, // tp_flags
-  "igraph graph object",                    // tp_doc
-  (traverseproc)igraphmodule_Graph_traverse,// tp_traverse
-  (inquiry)igraphmodule_Graph_clear,        // tp_clear
-  0,                                        // tp_richcompare
-  offsetof(igraphmodule_GraphObject, weakreflist), // tp_weaklistoffset
+  PyObject_HEAD_INIT(&PyType_Type)
+  0,                                        /* ob_size */
+  "igraph.Graph",                           /* tp_name */
+  sizeof(igraphmodule_GraphObject),         /* tp_basicsize */
+  0,                                        /* tp_itemsize */
+  (destructor)igraphmodule_Graph_dealloc,   /* tp_dealloc */
+  0,                                        /* tp_print */
+  0,                                        /* tp_getattr */
+  0,                                        /* tp_setattr */
+  0,                                        /* tp_compare */
+  0,                                        /* tp_repr */
+  &igraphmodule_Graph_as_number,            /* tp_as_number */
+  0,                                        /* tp_as_sequence */
+  &igraphmodule_Graph_as_mapping,           /* tp_as_mapping */
+  0,                                        /* tp_hash */
+  0,                                        /* tp_call */
+  (reprfunc)igraphmodule_Graph_str,         /* tp_str */
+  PyObject_GenericGetAttr,                  /* tp_getattro */
+  PyObject_GenericSetAttr,                  /* tp_setattro */
+  0,                                        /* tp_as_buffer */
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, /* tp_flags */
+  "igraph graph object",                    /* tp_doc */
+  (traverseproc)igraphmodule_Graph_traverse,/* tp_traverse */
+  (inquiry)igraphmodule_Graph_clear,        /* tp_clear */
+  0,                                        /* tp_richcompare */
+  offsetof(igraphmodule_GraphObject, weakreflist), /* tp_weaklistoffset */
+  0,                                        /* tp_iter */
+  0,                                        /* tp_iternext */
+  0,                                        /* tp_methods */
+  0,                                        /* tp_members */
+  0,                                        /* tp_getset */
+  &PyBaseObject_Type,                       /* tp_base */
+  0,                                        /* tp_dict */
+  0,                                        /* tp_descr_get */
+  0,                                        /* tp_descr_set */
+  0,                                        /* tp_dictoffset */
+  0,                                        /* tp_init */
+  0,                                        /* tp_alloc */
+  0,                                        /* tp_new */
+  0,                                        /* tp_free */
 };

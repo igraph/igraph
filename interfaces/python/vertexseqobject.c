@@ -146,7 +146,28 @@ PyObject* igraphmodule_VertexSeq_attributes(igraphmodule_VertexSeqObject* self) 
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
 
-  return igraphmodule_Graph_vertex_attributes(o, NULL, NULL);
+  return igraphmodule_Graph_vertex_attributes(o);
+}
+
+/** \ingroup python_interface_vertexseq
+ * \brief Returns the list of values for a given attribute
+ */
+PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObject* self, PyObject* o) {
+  igraphmodule_GraphObject *gr;
+  PyObject* result;
+  
+  gr=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
+  if (!gr) return NULL;
+  
+  result=PyDict_GetItem(((PyObject**)gr->g.attr)[1], o);
+  if (result) {
+    Py_INCREF(result);
+    return result;
+  }
+  
+  if (!PyErr_Occurred())
+    PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
+  return NULL;
 }
 
 /**
@@ -157,6 +178,10 @@ PyMethodDef igraphmodule_VertexSeq_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_VertexSeq_attributes,
       METH_NOARGS,
       "Returns the attribute list of the graph's vertices\n"
+  },
+  {"get_attribute_values", (PyCFunction)igraphmodule_VertexSeq_get_attribute_values,
+      METH_O,
+      "Returns the value list of a given vertex attribute\n"
   },
   {NULL}
 };

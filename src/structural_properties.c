@@ -1857,6 +1857,9 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
 
   Free(remain);
   IGRAPH_FINALLY_CLEAN(1);
+  
+  /* must set res->attr to 0 before calling igraph_copy */
+  res->attr=0;
   IGRAPH_CHECK(igraph_copy(res, graph));
   IGRAPH_FINALLY(igraph_destroy, res);
   IGRAPH_CHECK(igraph_delete_vertices(res, igraph_vss_vector(&delete)));

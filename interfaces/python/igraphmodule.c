@@ -24,6 +24,7 @@
 #include <Python.h>
 #include <pythonrun.h>
 #include "igraph.h"
+#include "attributes.h"
 #include "common.h"
 #include "error.h"
 #include "convert.h"
@@ -238,6 +239,257 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
   return o;
 }
 
+
+/* Attribute handlers for the Python interface */
+
+/* Initialization */ 
+static int igraphmodule_i_attribute_init(igraph_t *graph) {
+  PyObject** attrs;
+  int i;
+  
+  attrs=(PyObject**)calloc(3, sizeof(PyObject*));
+  /* printf("Created attribute table at %p\n", attrs); */
+  if (!attrs)
+    IGRAPH_ERROR("not enough memory to allocate attribute hashes", IGRAPH_ENOMEM);
+  
+  for (i=0; i<3; i++) {
+    attrs[i] = PyDict_New();
+  }
+  graph->attr=(void*)attrs;
+  
+  return IGRAPH_SUCCESS;
+}
+
+/* Destruction */
+static void igraphmodule_i_attribute_destroy(igraph_t *graph) {
+  PyObject** attrs;
+  int i;
+ 
+  /* printf("Destroying attribute table\n"); */
+  if (graph->attr) {
+    attrs=(PyObject**)graph->attr;
+    for (i=0; i<3; i++) {
+      Py_DECREF(attrs[i]);
+    }
+    free(attrs);
+  }
+}
+
+/* Copying */
+static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from) {
+  PyObject **fromattrs, **toattrs, *key, *value, *newval, *o;
+  int i, j, pos;
+ 
+  /* printf("Copying attribute table\n"); */
+  if (from->attr) {
+    fromattrs=(PyObject**)from->attr;
+    /* what to do with the original value of toattrs? */
+    toattrs=to->attr=(PyObject**)calloc(3, sizeof(PyObject*));
+    for (i=0; i<3; i++) {
+      if (!PyDict_Check(fromattrs[i])) {
+	toattrs[i]=fromattrs[i];
+	Py_XINCREF(o);
+	continue;
+      }
+      
+      toattrs[i]=PyDict_New();
+      
+      pos=0;
+      while (PyDict_Next(fromattrs[i], &pos, &key, &value)) {
+	/* value is only borrowed, so copy it */
+	if (i>0) {
+	  newval=PyList_New(PyList_GET_SIZE(value));
+	  for (j=0; j<PyList_GET_SIZE(value); j++) {
+	    o=PyList_GetItem(value, j);
+	    Py_INCREF(o);
+	    PyList_SetItem(newval, j, o);
+	  }
+	} else {
+	  newval=value;
+	  Py_INCREF(newval);
+	}
+	PyDict_SetItem(toattrs[i], key, newval);
+      }
+    }
+  }
+  return IGRAPH_SUCCESS;
+}
+
+/* Adding vertices */
+static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr) {
+  /* Extend the end of every value in the vertex hash with nv pieces of None */
+  PyObject *key, *value, *dict, *l, *r;
+  int pos=0;
+  long int i;
+  
+  if (!graph->attr) return IGRAPH_SUCCESS;
+  if (nv<=0) return IGRAPH_SUCCESS;
+  
+  dict=((PyObject**)graph->attr)[1];
+  if (!PyDict_Check(dict)) 
+    IGRAPH_ERROR("vertex attribute hash type mismatch", IGRAPH_EINVAL);
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    /* Create an object with nv pieces of None */
+    if (!PyList_Check(value))
+      IGRAPH_ERROR("vertex attribute hash member is not a list", IGRAPH_EINVAL);
+
+    for (i=0; i<nv; i++) {
+      Py_INCREF(Py_None); /* is it correct here? */
+      if (PyList_Append(value, Py_None) == -1) {
+	Py_DECREF(Py_None);
+	IGRAPH_ERROR("can't extend a vertex attribute hash member", IGRAPH_FAILURE);
+      }
+    }
+  }
+  
+  return IGRAPH_SUCCESS;
+}
+
+static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_vector_t *idx);
+
+/* Deleting vertices */
+static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
+						     const igraph_vector_t *eidx,
+						     const igraph_vector_t *vidx) {
+  long int n, i, ndeleted=0;
+  PyObject *key, *value, *dict, *o;
+  int pos=0;
+  
+  /* Reindexing vertices */
+  dict=((PyObject**)graph->attr)[1];
+  if (!PyDict_Check(dict)) return;
+
+  n=igraph_vector_size(vidx);
+  for (i=0; i<n; i++) {
+    /*printf("%ld:%f ", i, VECTOR(*idx)[i]);*/
+    if (!VECTOR(*vidx)[i]) {
+      ndeleted++;
+      continue;
+    }
+
+    pos=0;
+    /* TODO: maybe it would be more efficient to get the values from the
+     * hash in advance? */
+    while (PyDict_Next(dict, &pos, &key, &value)) {
+      /* Move the element from index i to VECTOR(*idx)[i]-1 */
+      o=PyList_GetItem(value, i);
+      if (!o) {
+	/* IndexError is already set, clear it and return */
+	PyErr_Clear();
+	return;
+      }
+      Py_INCREF(o);
+      PyList_SetItem(value, VECTOR(*vidx)[i]-1, o);
+    }
+  }
+  /*printf("\n");*/
+  
+  /* Clear the remaining parts of the lists that aren't needed anymore */
+  pos=0;
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    n=PySequence_Size(value);
+    if (PySequence_DelSlice(value, n-ndeleted, n) == -1) return;
+    /*printf("key: "); PyObject_Print(key, stdout, Py_PRINT_RAW); printf("\n");
+    printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");*/
+  }
+  
+  igraphmodule_i_attribute_delete_edges(graph, eidx);
+
+  return;
+}
+
+/* Adding edges */
+static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vector_t *edges, igraph_vector_ptr_t *attr) {
+  /* Extend the end of every value in the edge hash with ne pieces of None */
+  PyObject *key, *value, *dict, *l, *r;
+  int pos=0;
+  long int i, ne;
+
+  ne=igraph_vector_size(edges);
+  if (!graph->attr) return IGRAPH_SUCCESS;
+  if (ne<=0) return IGRAPH_SUCCESS;
+  
+  dict=((PyObject**)graph->attr)[2];
+  if (!PyDict_Check(dict)) 
+    IGRAPH_ERROR("edge attribute hash type mismatch", IGRAPH_EINVAL);
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    if (!PyList_Check(value))
+      IGRAPH_ERROR("edge attribute hash member is not a list", IGRAPH_EINVAL);
+
+    for (i=0; i<ne; i++) {
+      Py_INCREF(Py_None); /* is it correct here? */
+      if (PyList_Append(value, Py_None) == -1) {
+	Py_DECREF(Py_None);
+	IGRAPH_ERROR("can't extend a vertex attribute hash member", IGRAPH_FAILURE);
+      }
+    }
+  }
+  
+  /*pos=0;
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    printf("key: "); PyObject_Print(key, stdout, Py_PRINT_RAW); printf("\n");
+    printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");
+  }*/
+  
+  return IGRAPH_SUCCESS;
+}
+
+/* Deleting edges */
+static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_vector_t *idx) {
+  long int n, i, ndeleted=0;
+  PyObject *key, *value, *dict, *o;
+  int pos=0;
+  
+  dict=((PyObject**)graph->attr)[2];
+  if (!PyDict_Check(dict)) return;
+
+  n=igraph_vector_size(idx);
+  for (i=0; i<n; i++) {
+    /*printf("%ld:%f ", i, VECTOR(*idx)[i]);*/
+    if (!VECTOR(*idx)[i]) {
+      ndeleted++;
+      continue;
+    }
+
+    pos=0;
+    /* TODO: maybe it would be more efficient to get the values from the
+     * hash in advance? */
+    while (PyDict_Next(dict, &pos, &key, &value)) {
+      /* Move the element from index i to VECTOR(*idx)[i]-1 */
+      o=PyList_GetItem(value, i);
+      if (!o) {
+	/* IndexError is already set, clear it and return */
+	PyErr_Clear();
+	return;
+      }
+      Py_INCREF(o);
+      PyList_SetItem(value, VECTOR(*idx)[i]-1, o);
+    }
+  }
+  /*printf("\n");*/
+  
+  /* Clear the remaining parts of the lists that aren't needed anymore */
+  pos=0;
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    n=PySequence_Size(value);
+    if (PySequence_DelSlice(value, n-ndeleted, n) == -1) return;
+    /*printf("key: "); PyObject_Print(key, stdout, Py_PRINT_RAW); printf("\n");
+    printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");*/
+  }
+  
+  return;
+}
+
+static igraph_attribute_table_t igraphmodule_i_attribute_table = {
+  igraphmodule_i_attribute_init,
+  igraphmodule_i_attribute_destroy,
+  igraphmodule_i_attribute_copy,
+  igraphmodule_i_attribute_add_vertices,
+  igraphmodule_i_attribute_delete_vertices,
+  igraphmodule_i_attribute_add_edges,
+  igraphmodule_i_attribute_delete_edges
+};
+
 /** \ingroup python_interface
  * \brief Method table for the igraph Python module
  */
@@ -332,4 +584,7 @@ initigraph(void)
   igraph_set_error_handler(igraphmodule_igraph_error_hook);
   igraph_set_progress_handler(igraphmodule_igraph_progress_hook);
   igraph_set_interruption_handler(igraphmodule_igraph_interrupt_hook);
+  
+  /* initialize attribute handlers */
+  igraph_i_set_attribute_table(&igraphmodule_i_attribute_table);
 }
