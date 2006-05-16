@@ -461,6 +461,20 @@ void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
 int igraph_trie_getkeys(igraph_trie_t *t, igraph_strvector_t **strv);
 long int igraph_trie_size(igraph_trie_t *t);
 
+typedef struct {
+  igraph_vector_t v;
+  long int size;
+  long int offset;
+} igraph_psumtree_t;
+int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
+void igraph_psumtree_destroy(igraph_psumtree_t *t);
+long int igraph_psumtree_size(const igraph_psumtree_t *t);
+int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+			   igraph_real_t elem);
+int igraph_psumtree_update(igraph_psumtree_t *t, long int idx, 
+			   igraph_real_t new_value);
+igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
+
 /**
  * 2d grid containing points
  */

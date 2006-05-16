@@ -1,3 +1,10 @@
+2006-05-16  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/games.R (ba.game) : added 'power' argument
+
+	* interfaces/R/src/rinterface.c (R_igraph_nonlinear_barabasi_game) :
+	added
+
 2006-05-15  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/attributes.R (get.graph.attribute)

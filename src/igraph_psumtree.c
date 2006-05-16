@@ -1,0 +1,86 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2006 Elliot Paquette <Elliot.Paquette05@kzoo.edu>
+   Kalamazoo College, 1200 Academy st, Kalamazoo, MI
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+#include "types.h"
+#include "error.h"
+
+#include <math.h>
+#include <stdio.h>
+
+int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
+  t->size=size;
+  t->offset=pow(2, ceil(log2(size)))-1;
+  IGRAPH_CHECK(igraph_vector_init((igraph_vector_t *)t, t->offset+t->size));
+  return 0;
+}
+
+void igraph_psumtree_destroy(igraph_psumtree_t *t) {
+  igraph_vector_destroy((igraph_vector_t *)t);
+}
+
+int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+			   igraph_real_t search) {
+  const igraph_vector_t *tree=&t->v;
+  long int i = 1;
+  long int size = igraph_vector_size(tree);
+  
+  while( 2*i+1 <= size) {
+    if( search <= VECTOR(*tree)[i*2-1] ) {
+      i <<= 1;	
+    } else {
+      search -= VECTOR(*tree)[i*2-1];
+      i <<= 1;
+      i += 1;
+    }
+  }
+  if (2*i <= size) {
+    i=2*i;
+  }
+
+  *idx = i-t->offset-1;
+  return IGRAPH_SUCCESS;
+}
+
+int igraph_psumtree_update(igraph_psumtree_t *t, long int idx, 
+			   igraph_real_t new_value) {
+  const igraph_vector_t *tree=&t->v;
+  long int treesize = igraph_vector_size(tree);
+  igraph_real_t difference;
+  
+  idx = idx + t->offset+1;
+  difference = new_value - VECTOR(*tree)[idx-1];
+  
+  while( idx >= 1 ) {
+    VECTOR(*tree)[idx-1] += difference;
+    idx >>= 1;
+  }
+  return IGRAPH_SUCCESS;	
+}
+
+long int igraph_psumtree_size(const igraph_psumtree_t *t) {
+  return t->size;
+}
+
+igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t) {
+  return VECTOR(t->v)[0];
+}

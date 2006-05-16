@@ -1,3 +1,12 @@
+2006-05-16  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/igraph_psumtree.c (igraph_psumtree_init, igraph_psumtree_destroy)
+	(igraph_psumtree_update, igraph_psumtree_size, igraph_psumtree_sum) :
+	added
+	* examples/simple/igraph_psumtree.c : added
+
+	* src/games.c (igraph_nonlinear_barabasi_game) : added
+	
 2006-05-15  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_subgraph) : small bugfix.

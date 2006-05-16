@@ -71,3 +71,7 @@ AT_KEYWORDS([trie igraph_trie_t])
 AT_COMPILE_CHECK([simple/igraph_trie.c], [simple/igraph_trie.out])
 AT_CLEANUP
 
+AT_SETUP([Partial Sum-Tree (igraph_psumtree_t): ])
+AT_KEYWORDS([partial sumtree igraph_psumtree_t])
+AT_COMPILE_CHECK([simple/igraph_psumtree.c])
+AT_CLEANUP

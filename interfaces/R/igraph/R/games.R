@@ -20,7 +20,7 @@
 #
 ###################################################################
 
-ba.game <- function(n, m=NULL, out.dist=NULL, out.seq=NULL,
+ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
                     out.pref=FALSE, directed=TRUE) {
 
   # Checks
@@ -44,7 +44,10 @@ ba.game <- function(n, m=NULL, out.dist=NULL, out.seq=NULL,
   if (!is.null(m) && m==0) {
     warning("`m' is zero, graph will be empty")
   }
-
+  if (power < 0) {
+    warning("`power' is negative")
+  }
+  
   if (is.null(m) && is.null(out.dist) && is.null(out.seq)) {
     m <- 1
   }
@@ -64,8 +67,14 @@ ba.game <- function(n, m=NULL, out.dist=NULL, out.seq=NULL,
     out.seq <- numeric()
   }
 
-  .Call("R_igraph_barabasi_game", n, m, out.seq, out.pref, directed,
-        PACKAGE="igraph")
+  if (power==1) {    
+    .Call("R_igraph_barabasi_game", n, m, out.seq, out.pref, directed,
+          PACKAGE="igraph")
+  } else {
+    .Call("R_igraph_nonlinear_barabasi_game", n, power, m, out.seq,
+          out.pref, directed,
+          PACKAGE="igraph")
+  }
 }
 
 barabasi.game <- ba.game
