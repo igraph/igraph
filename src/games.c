@@ -853,3 +853,107 @@ int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
 
   return 0;
 }
+
+int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
+			      igraph_real_t power,
+			      igraph_integer_t window,
+			      igraph_integer_t m,  
+			      const igraph_vector_t *outseq,
+			      igraph_bool_t outpref,
+			      igraph_bool_t directed) {
+  long int no_of_nodes=n;
+  long int no_of_neighbors=m;
+  long int no_of_edges;
+  igraph_vector_t edges;
+  long int i, j;
+  igraph_psumtree_t sumtree;
+  long int edgeptr=0;
+  igraph_vector_t degree;
+  long int time_window=window;
+  igraph_dqueue_t history;
+
+  if (n<0) {
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != n) {
+    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+  }
+  if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
+    IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+  }
+
+  if (outseq==0 || igraph_vector_size(outseq) == 0) {
+    no_of_neighbors=m;
+    no_of_edges=(no_of_nodes-1)*no_of_neighbors;
+  } else {
+    no_of_edges=0;
+    for (i=1; i<igraph_vector_size(outseq); i++) {
+      no_of_edges+=VECTOR(*outseq)[i];
+    }
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+  IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  IGRAPH_CHECK(igraph_dqueue_init(&history, 
+				  time_window*(no_of_neighbors+1)+10));
+  IGRAPH_FINALLY(&history, igraph_dqueue_destroy);
+  
+  RNG_BEGIN();
+  
+  /* first node */
+  igraph_psumtree_update(&sumtree, 0, 1);
+  igraph_dqueue_push(&history, -1);
+
+  /* and the rest */
+  for (i=1; i<no_of_nodes; i++) {
+    igraph_real_t sum;
+    long int to;
+    if (outseq != 0 && igraph_vector_size(outseq)!=0) {
+      no_of_neighbors=VECTOR(*outseq)[i];
+    }
+
+    if (i>=time_window) {
+      while ((j=igraph_dqueue_pop(&history)) != -1) {
+	VECTOR(degree)[j] -= 1;
+	igraph_psumtree_update(&sumtree, j, pow(VECTOR(degree)[j], power)+1);
+      }
+    }
+    
+    sum=igraph_psumtree_sum(&sumtree);
+    for (j=0; j<no_of_neighbors; j++) {
+      igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+      VECTOR(degree)[to]++;
+      VECTOR(edges)[edgeptr++] = i;
+      VECTOR(edges)[edgeptr++] = to;
+      igraph_dqueue_push(&history, to);
+    }
+    igraph_dqueue_push(&history, -1);
+
+    /* update probabilities */
+    for (j=0; j<no_of_neighbors; j++) {
+      long int n=VECTOR(edges)[edgeptr-2*j-1];
+      igraph_psumtree_update(&sumtree, n, pow(VECTOR(degree)[n], power)+1);
+    }
+    if (outpref) {
+      VECTOR(degree)[i] += no_of_neighbors;
+      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], power)+1);
+    } else {
+      igraph_psumtree_update(&sumtree, i, 1);
+    }
+  }
+  
+  RNG_END();
+
+  igraph_dqueue_destroy(&history);
+  igraph_psumtree_destroy(&sumtree);
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}

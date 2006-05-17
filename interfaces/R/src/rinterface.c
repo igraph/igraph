@@ -1530,6 +1530,34 @@ SEXP R_igraph_nonlinear_barabasi_game(SEXP pn, SEXP ppower, SEXP pm,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
+				 SEXP pm, SEXP poutseq, SEXP poutpref,
+				 SEXP pdirected) {
+  igraph_t g;
+  igraph_integer_t n=REAL(pn)[0];
+  igraph_real_t power=REAL(ppower)[0];
+  igraph_integer_t window=REAL(pwindow)[0];
+  igraph_integer_t m=REAL(pm)[0];
+  igraph_vector_t outseq;
+  igraph_bool_t outpref=LOGICAL(poutpref)[0];
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_vector(poutseq, &outseq);
+  
+  igraph_recent_degree_game(&g, n, power, window, m, &outseq, outpref, 
+			    directed);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
   
 SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp, 
 				  SEXP pcoolexp, SEXP pkkconst, SEXP psigma, 

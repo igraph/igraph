@@ -1,3 +1,7 @@
+2006-05-17  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/games.c (igraph_recent_degree_game) : added
+
 2006-05-16  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/igraph_psumtree.c (igraph_psumtree_init, igraph_psumtree_destroy)

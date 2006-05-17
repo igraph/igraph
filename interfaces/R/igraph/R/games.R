@@ -172,5 +172,58 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
         as.logical(directed))
 }
         
+recent.degree.game <- function(n, power=1, window,
+                               m=NULL, out.dist=NULL, out.seq=NULL,
+                               out.pref=FALSE, directed=TRUE) {
 
-                               
+  # Checks
+  if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
+    warning("if `out.seq' is given `m' and `out.dist' should be NULL")
+    m <- out.dist <- NULL
+  }
+  if (is.null(out.seq) && !is.null(out.dist) && !is.null(m)) {
+    warning("if `out.dist' is given `m' will be ignored")
+    m <- NULL
+  }
+  if (!is.null(out.seq) && length(out.seq) != n) {
+    stop("`out.seq' should be of length `n'")
+  }
+  if (!is.null(out.seq) && min(out.seq)<0) {
+    stop("negative elements in `out.seq'");
+  }
+  if (!is.null(m) && m<0) {
+    stop("`m' is negative")
+  }
+  if (window <= 0) {
+    stop("time window size `window' should be positive")
+  }
+  if (!is.null(m) && m==0) {
+    warning("`m' is zero, graph will be empty")
+  }
+  if (power < 0) {
+    warning("`power' is negative")
+  }
+  
+  if (is.null(m) && is.null(out.dist) && is.null(out.seq)) {
+    m <- 1
+  }  
+  
+  n <- as.numeric(n)
+  if (!is.null(m)) { m <- as.numeric(m) }
+  if (!is.null(out.dist)) { out.dist <- as.numeric(out.dist) }
+  if (!is.null(out.seq)) { out.seq <- as.numeric(out.seq) }
+  out.pref <- as.logical(out.pref)
+
+  if (!is.null(out.dist)) {
+    out.seq <- as.numeric(sample(0:(length(out.dist)-1), n,
+                                 replace=TRUE, prob=out.dist))
+  }
+
+  if (is.null(out.seq)) {
+    out.seq <- numeric()
+  }
+
+  .Call("R_igraph_recent_degree_game", n, power, window, m, out.seq,
+        out.pref, directed,
+        PACKAGE="igraph")
+}

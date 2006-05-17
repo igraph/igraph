@@ -1,3 +1,8 @@
+2006-05-17  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/games.R (recent.degree.game) : added
+	* interfaces/R/src/rinterface.c (R_igraph_recent_degree_game) : added
+
 2006-05-16  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/games.R (ba.game) : added 'power' argument
