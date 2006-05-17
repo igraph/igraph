@@ -1,7 +1,6 @@
 
 Needed for 0.2:
 
-o type check graph arguments in the R interface
 o document bison requirements
 o repair simplify
 o Laplacian of a graph, in R only

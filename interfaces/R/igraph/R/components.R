@@ -25,6 +25,9 @@
 ###################################################################
 
 clusters <- function(graph, mode="weak") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "weak"=1, "strong"=2)
   }
@@ -34,6 +37,9 @@ clusters <- function(graph, mode="weak") {
   
 cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
                                  ...) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   
   cs <- clusters(graph, ...)$csize;
   hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities;
@@ -51,6 +57,9 @@ cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
 }
 
 is.connected <- function(graph, mode="weak") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "weak"=1, "strong"=2)
   }
@@ -60,6 +69,9 @@ is.connected <- function(graph, mode="weak") {
 
 decompose.graph <- function(graph, mode="weak", max.comps=NA,
                       min.vertices=0) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "weak"=1, "strong"=2)
   }

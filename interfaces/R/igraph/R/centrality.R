@@ -21,6 +21,9 @@
 ###################################################################
 
 evcent <- function(graph, v=V(graph)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
 
   ad <- get.adjacency(graph)
 

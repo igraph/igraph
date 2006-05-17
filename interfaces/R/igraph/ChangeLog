@@ -5,6 +5,28 @@
 	* interfaces/R/src/rinterface.c (R_igraph_nonlinear_barabasi_game) :
 	added
 
+	* interfaces/R/igraph/R/measure.dynamics.R
+	* interfaces/R/igraph/R/motifs.R
+	* interfaces/R/igraph/R/attributes.R
+	* interfaces/R/igraph/R/iterators.R
+	* interfaces/R/igraph/R/minimum.spanning.tree.R
+	* interfaces/R/igraph/R/plot.R
+	* interfaces/R/igraph/R/community.R
+	* interfaces/R/igraph/R/operators.R
+	* interfaces/R/igraph/R/topology.R
+	* interfaces/R/igraph/R/foreign.R
+	* interfaces/R/igraph/R/layout.R
+	* interfaces/R/igraph/R/interface.R
+	* interfaces/R/igraph/R/print.R
+	* interfaces/R/igraph/R/structure.info.R
+	* interfaces/R/igraph/R/basic.R
+	* interfaces/R/igraph/R/components.R
+	* interfaces/R/igraph/R/conversion.R
+	* interfaces/R/igraph/R/structural.properties.R
+	* interfaces/R/igraph/R/tkplot.R
+	* interfaces/R/igraph/R/cocitation.R
+	* interfaces/R/igraph/R/centrality.R : is.igraph checks added
+
 2006-05-15  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/attributes.R (get.graph.attribute)

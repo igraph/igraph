@@ -90,6 +90,9 @@ read.graph <- function(file, format="edgelist", ...) {
 
 write.graph <- function(graph, file, format="edgelist", ...) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (!igraph.i.have.open.memstream) {
     if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
       tmpfile <- TRUE

@@ -25,6 +25,9 @@
 ###################################################################
 
 layout.random <- function(graph, params, dim=2) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (dim==2) {
     .Call("R_igraph_layout_random", graph,
           PACKAGE="igraph")
@@ -37,11 +40,17 @@ layout.random <- function(graph, params, dim=2) {
 }
 
 layout.circle <- function(graph, params) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_layout_circle", graph,
         PACKAGE="igraph")
 }
 
 layout.sphere <- function(graph, params) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_layout_sphere", graph,
         PACKAGE="igraph")
 }
@@ -49,6 +58,9 @@ layout.sphere <- function(graph, params) {
 layout.fruchterman.reingold <- function(graph, ..., dim=2,
                                         verbose=FALSE, params=list()) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (length(params)==0) {
     params <- list(...)
   }
@@ -77,6 +89,9 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
 
 layout.fruchterman.reingold.grid <- function(graph, ...,
                                              verbose=FALSE, params=list()) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (length(params)==0) {
     params <- list(...)
   }
@@ -106,6 +121,9 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
 layout.kamada.kawai<-function(graph, ..., dim=2, verbose=FALSE,
                               params=list()) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (length(params)==0) {
     params <- list(...)
   }
@@ -133,6 +151,9 @@ layout.kamada.kawai<-function(graph, ..., dim=2, verbose=FALSE,
 
 layout.lgl <- function(graph, ..., params=list()) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (length(params)==0) {
     params <- list(...)
   }
@@ -156,6 +177,9 @@ layout.lgl <- function(graph, ..., params=list()) {
 
 layout.merge <- function(graphs, layouts, method="dla", verbose=FALSE) {
 
+  if (!all(sapply(graph, is.graph))) {
+    stop("Not a graph object")
+  }
   if (method == "dla") {
     res <- .Call("R_igraph_layout_merge_dla",
                  graphs,
@@ -213,6 +237,9 @@ symmetrize.mat <- function(mats,rule="weak"){
 
 layout.spring<-function(graph, ..., params=list()) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (length(params)==0) {
     params <- list(...)
   }  

@@ -24,6 +24,9 @@ measure.dynamics.id <- function(graph, start.vertex=0,
                                 iterations=5, significance=0,
                                 estind=NULL, estage=NULL, number=FALSE) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   maxind <- max(degree(graph, mode="in"))
 
   st <- rep(1, vcount(graph))
@@ -88,6 +91,9 @@ measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
                                    iterations=5, significance=0,
                                    estind=NULL, estage=NULL, number=FALSE) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   maxind <- max(degree(graph, mode="in"))
 
   st <- rep(1, vcount(graph))
@@ -162,6 +168,9 @@ measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
 measure.dynamics.d.d <- function(graph, vtime, etime,
                                  iterations=5, sd=TRUE, no=FALSE) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   maxdeg <- max(degree(graph, mode="all"))
   events <- max(vtime, etime)+1
 

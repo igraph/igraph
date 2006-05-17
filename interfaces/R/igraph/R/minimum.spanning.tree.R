@@ -23,6 +23,9 @@
 minimum.spanning.tree <- function(graph, weights=NULL,
                                   algorithm="unweighted", ...) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (algorithm=="unweighted") {
     .Call("R_igraph_minimum_spanning_tree_unweighted", graph,
           PACKAGE="igraph")

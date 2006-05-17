@@ -28,6 +28,9 @@ print.igraph <- function(x, graph.attributes=FALSE,
                          vertex.attributes=FALSE, edge.attributes=FALSE,
                          ...) {
   
+  if (!is.igraph(x)) {
+    stop("Not a graph object")
+  }
   ec <- ecount(x)
   vc <- vcount(x)
   
@@ -87,6 +90,9 @@ print.igraph <- function(x, graph.attributes=FALSE,
 
 summary.igraph <- function(object, ...) {
 
+  if (!is.igraph(object)) {
+    stop("Not a graph object")
+  }
   cat("Vertices:", vcount(object), "\n")
   cat("Edges:", ecount(object), "\n")
   cat("Directed:", is.directed(object), "\n")

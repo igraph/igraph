@@ -22,6 +22,9 @@
 
 graph.motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   cut.prob <- as.numeric(cut.prob)
   if (length(cut.prob) != size) {
     cut.prob <- c(cut.prob[-length(cut.prob)],
@@ -35,6 +38,9 @@ graph.motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
 
 graph.motifs.no <- function(graph, size=3, cut.prob=rep(0, size)) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   cut.prob <- as.numeric(cut.prob)
   if (length(cut.prob) != size) {
     cut.prob <- c(cut.prob[-length(cut.prob)],
@@ -49,6 +55,9 @@ graph.motifs.no <- function(graph, size=3, cut.prob=rep(0, size)) {
 graph.motifs.est <- function(graph, size=3, cut.prob=rep(0, size),
                              sample.size=vcount(graph)/10, sample=NULL) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   cut.prob <- as.numeric(cut.prob)
   if (length(cut.prob) != size) {
     cut.prob <- c(cut.prob[-length(cut.prob)],

@@ -29,6 +29,9 @@ is.igraph <- function(graph) {
 
 is.directed <- function(graph) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_is_directed", graph,
         PACKAGE="igraph")
 }

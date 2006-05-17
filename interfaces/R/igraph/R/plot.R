@@ -32,6 +32,9 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        ...) {
 
   graph <- x
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   
   # Interpret parameters
   layout <- i.get.layout(graph, layout, layout.par)
@@ -124,6 +127,9 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
   require(rgl)
   
   graph <- x
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
 
   # Interpret parameters
   layout <- i.get.layout(graph, layout, layout.par)

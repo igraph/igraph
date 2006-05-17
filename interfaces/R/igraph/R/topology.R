@@ -22,12 +22,18 @@
 
 graph.isoclass <- function(graph) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_isoclass_34", graph,
         PACKAGE="igraph")
 }
 
 graph.isomorphic <- function(graph1, graph2) {
 
+  if (!is.igraph(graph1) || !is.igraph(graph2)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_isomorphic_34", graph1, graph2,
         PACKAGE="igraph")
 }

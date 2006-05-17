@@ -25,6 +25,9 @@
 ###################################################################
 
 V <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   vc <- vcount(graph)
   if (vc == 0) {
     res <- numeric()
@@ -39,6 +42,9 @@ V <- function(graph) {
 }
 
 E <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   ec <- ecount(graph)
   if (ec == 0) {
     res <- numeric()
@@ -103,6 +109,9 @@ E <- function(graph) {
 }
 
 "V<-" <- function(x, value) {
+  if (!is.igraph(x)) {
+    stop("Not a graph object")
+  }
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
@@ -112,6 +121,9 @@ E <- function(graph) {
 }
 
 "E<-" <- function(x, value) {
+  if (!is.igraph(x)) {
+    stop("Not a graph object")
+  }
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")

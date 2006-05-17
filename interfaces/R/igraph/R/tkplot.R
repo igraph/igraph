@@ -41,6 +41,10 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                    edge.color="darkgrey", edge.width=1,
                    edge.labels=NA, ...) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  
   # Libraries
   require(tcltk) || stop("tcl/tk library not available")
 

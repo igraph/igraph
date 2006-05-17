@@ -25,24 +25,36 @@
 ###################################################################
 
 diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_diameter", graph, as.logical(directed),
         as.logical(unconnected),
         PACKAGE="igraph")
 }
 
 get.diameter <- function(graph, directed=TRUE, unconnected=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_get_diameter", graph, as.logical(directed),
         as.logical(unconnected),
         PACKAGE="igraph")
 }
 
 farthest.nodes <- function(graph, directed=TRUE, unconnected=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_farthest_points", graph, as.logical(directed),
         as.logical(unconnected),
         PACKAGE="igraph")
 }       
 
 average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_average_path_length", graph, as.logical(directed),
         as.logical(unconnected),
         PACKAGE="igraph")
@@ -50,6 +62,9 @@ average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
 
 degree <- function(graph, v=V(graph),
                    mode="total", loops=TRUE){
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
@@ -60,6 +75,9 @@ degree <- function(graph, v=V(graph),
   
 degree.distribution <- function(graph, cumulative=FALSE, ...) {
   
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   cs <- degree(graph, ...)
   hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities
   if (!cumulative) {
@@ -72,6 +90,9 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
 }
 
 closeness <- function(graph, v=V(graph), mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
@@ -81,6 +102,9 @@ closeness <- function(graph, v=V(graph), mode="all") {
 }
 
 shortest.paths <- function(graph, v=V(graph), mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
@@ -92,6 +116,9 @@ shortest.paths <- function(graph, v=V(graph), mode="all") {
 
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
@@ -105,6 +132,9 @@ get.shortest.paths <- function(graph, from, to=V(graph),
 get.all.shortest.paths <- function(graph, from,
                                    to=V(graph),
                                    mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
@@ -115,6 +145,9 @@ get.all.shortest.paths <- function(graph, from,
 }
 
 subcomponent <- function(graph, v, mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3)
   }
@@ -124,12 +157,18 @@ subcomponent <- function(graph, v, mode="all") {
 }
 
 subgraph <- function(graph, v) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_subgraph", graph, as.igraph.vs(v),
         PACKAGE="igraph")
 }
 
 simplify <- function(graph, remove.multiple=TRUE,
                      remove.loops=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_simplify", graph, as.logical(remove.multiple),
         as.logical(remove.loops), PACKAGE="igraph")
 
@@ -163,6 +202,9 @@ simplify <- function(graph, remove.multiple=TRUE,
 
 betweenness <- function(graph, v=V(graph), directed=TRUE) {
   
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_betweenness", graph, as.igraph.vs(v),
         as.logical(directed),
         PACKAGE="igraph")
@@ -170,11 +212,17 @@ betweenness <- function(graph, v=V(graph), directed=TRUE) {
 
 edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
 
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
         PACKAGE="igraph")[ as.numeric(e)+1 ]  
 }
 
 transitivity <- function(graph, type="undirected") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(type)) {
     type <- switch(type, "undirected"=0)
   }

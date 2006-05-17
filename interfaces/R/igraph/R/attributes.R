@@ -35,15 +35,24 @@
 ##
 
 get.graph.attribute <- function(graph, name) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   graph[[9]][[2]][[as.character(name)]]
 }
 
 set.graph.attribute <- function(graph, name, value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   graph[[9]][[2]][[as.character(name)]] <- value
   graph
 }
 
 get.vertex.attribute <- function(graph, name, index=V(g)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   name <- as.character(name)
   if (is.list(graph[[9]][[3]][[name]]) && length(index)==1) {
     graph[[9]][[3]][[as.character(name)]][[index+1]]
@@ -53,6 +62,9 @@ get.vertex.attribute <- function(graph, name, index=V(g)) {
 }
 
 set.vertex.attribute <- function(graph, name, index=V(g), value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   name <- as.character(name)
   graph[[9]][[3]][[name]][index+1] <- value
   if (length(graph[[9]][[3]][[name]]) != vcount(graph)) {
@@ -63,6 +75,9 @@ set.vertex.attribute <- function(graph, name, index=V(g), value) {
 }
 
 get.edge.attribute <- function(graph, name, index=E(g)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   name <- as.character(name)
   if (is.list(graph[[9]][[4]][[name]]) && length(index)==1) {
     graph[[9]][[4]][[name]][[index+1]]
@@ -72,6 +87,9 @@ get.edge.attribute <- function(graph, name, index=E(g)) {
 }
 
 set.edge.attribute <- function(graph, name, index=E(g), value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   name <- as.character(name)
   graph[[9]][[4]][[name]][index+1] <- value
   if (length(graph[[9]][[4]][[name]]) != ecount(graph)) {
@@ -82,34 +100,52 @@ set.edge.attribute <- function(graph, name, index=E(g), value) {
 }
 
 list.graph.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   res <- names(graph[[9]][[2]])
   if (is.null(res)) { res <- character() }
   res
 }
 
 list.vertex.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   res <- names(graph[[9]][[3]])
   if (is.null(res)) { res <- character() }
   res
 }
 
 list.edge.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   res <- names(graph[[9]][[4]])
   if (is.null(res)) { res <- character() }
   res
 }
 
 remove.graph.attribute <- function(graph, name) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   graph[[9]][[2]][[as.character(name)]] <- NULL
   graph
 }
 
 remove.vertex.attribute <- function(graph, name) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   graph[[9]][[3]][[as.character(name)]] <- NULL
   graph
 }
 
 remove.edge.attribute <- function(graph, name) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   graph[[9]][[4]][[as.character(name)]] <- NULL
   graph
 }

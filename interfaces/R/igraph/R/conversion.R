@@ -21,6 +21,9 @@
 ###################################################################
 
 get.adjacency <- function(graph, type="both") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   if (is.character(type)) {
     type <- switch(type, "upper"=0, "lower"=1, "both"=2)
   }
@@ -30,6 +33,9 @@ get.adjacency <- function(graph, type="both") {
 }
 
 get.edgelist <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
   matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
                PACKAGE="igraph"), nc=2)
 }
