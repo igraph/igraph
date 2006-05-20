@@ -1,3 +1,13 @@
+2006-05-20  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/games.R (ba.game, recent.degree.game) :
+	latter merged into the former
+	
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id) :
+	time.window parameter added
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_idwindow)
+	(R_igraph_measure_dynamics_idwindow_st) : added
+
 2006-05-17  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/games.R (recent.degree.game) : added

@@ -659,6 +659,22 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,
 				   igraph_integer_t maxtotaldeg,
 				   igraph_vector_t *st);
 
+int igraph_measure_dynamics_idwindow(const igraph_t *graph, 
+				     igraph_integer_t start_vertex,
+				     igraph_matrix_t *ak, 
+				     igraph_matrix_t *sd,
+				     igraph_matrix_t *confint,
+				     igraph_matrix_t *no,
+				     const igraph_vector_t *st,
+				     igraph_integer_t pmaxind,
+				     igraph_real_t significance,
+				     igraph_integer_t time_window);
+
+int igraph_measure_dynamics_idwindow_st(const igraph_t *graph,
+					igraph_vector_t *res,
+					const igraph_matrix_t *ak,
+					igraph_integer_t time_window);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */

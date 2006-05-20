@@ -85,8 +85,7 @@ int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_ver
   
   for (node=start_vertex; node<no_of_nodes; node++) {
     
-    /* inspect the edges */
-    
+    /* estimate Ak */    
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
@@ -99,11 +98,17 @@ int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_ver
       if (lsd) {
 	MATRIX(*confint, xidx, 0) += (xk-oldm)*(xk-MATRIX(*ak, xidx, 0));
       }
+    }
+
+    /* Update ntk, ch, normfact */
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
       
       indegree[to]++;
       VECTOR(ntk)[xidx] --;
       if (VECTOR(ntk)[xidx]==0) {
-	MATRIX(normfact, xidx, 0) += (edges-VECTOR(ch)[xidx]+1);
+	MATRIX(normfact, xidx, 0) += (edges-VECTOR(ch)[xidx]);
 	VECTOR(ch)[xidx]=edges;
       }
       VECTOR(ntk)[xidx+1]++;
@@ -123,7 +128,7 @@ int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_ver
   for (i=0; i<maxind+1; i++) {
     igraph_real_t oldmean;
     if (VECTOR(ntk)[i] != 0) {
-      MATRIX(normfact, i, 0) += (edges-VECTOR(ch)[i]+1);
+      MATRIX(normfact, i, 0) += (edges-VECTOR(ch)[i]);
     }
     oldmean=MATRIX(*ak, i, 0);
     MATRIX(*ak, i, 0) *= VECTOR(notnull)[i] / MATRIX(normfact, i, 0);
@@ -197,6 +202,208 @@ int igraph_measure_dynamics_id_st(const igraph_t *graph,
 
   return 0;
 }
+
+int igraph_measure_dynamics_idwindow(const igraph_t *graph, 
+				     igraph_integer_t start_vertex,
+				     igraph_matrix_t *ak, 
+				     igraph_matrix_t *sd,
+				     igraph_matrix_t *confint,
+				     igraph_matrix_t *no,
+				     const igraph_vector_t *st,
+				     igraph_integer_t pmaxind,
+				     igraph_real_t significance,
+				     igraph_integer_t time_window) {
+  long int maxind=pmaxind;
+  long int no_of_nodes=igraph_vcount(graph);
+  
+  igraph_vector_t indegree;
+  igraph_matrix_t normfact;
+  igraph_dqueue_t history;
+  igraph_vector_t ntk, ch, notnull;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i, j;
+  long int edges=0;
+  
+  igraph_bool_t lsd=(significance != 0);
+  igraph_bool_t lno=(no != 0);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&ntk, maxind+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&ch, maxind+1);
+  IGRAPH_MATRIX_INIT_FINALLY(&normfact, maxind+1, 1);
+  IGRAPH_VECTOR_INIT_FINALLY(&notnull, maxind+1);
+  IGRAPH_DQUEUE_INIT_FINALLY(&history, time_window);
+  
+  igraph_matrix_resize(ak, maxind+1, 1);
+  igraph_matrix_null(ak);
+  if (lsd) {
+    igraph_matrix_resize(sd, maxind+1, 1);
+    igraph_matrix_resize(confint, maxind+1, 1);
+  } 
+  
+  for (node=0; node<no_of_nodes; node++) {
+
+    /* estimate Ak */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    if (node>=start_vertex) {
+      for (i=0; i<igraph_vector_size(&neis); i++) {
+	long int to=VECTOR(neis)[i];
+	long int xidx=VECTOR(indegree)[to];
+	
+	double xk=VECTOR(*st)[node]/VECTOR(ntk)[xidx];
+	double oldm=MATRIX(*ak, xidx, 0);
+	VECTOR(notnull)[xidx]+=1;
+	MATRIX(*ak, xidx, 0) += (xk-oldm)/VECTOR(notnull)[xidx];
+	if (lsd) {
+	  MATRIX(*confint, xidx, 0) += (xk-oldm)*(xk-MATRIX(*ak, xidx, 0));
+	}
+      }
+    }
+
+    /* Update ntk, ch, normfact */
+    edges += igraph_vector_size(&neis);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(indegree)[to];
+      
+      VECTOR(indegree)[to]++;
+      VECTOR(notnull)[xidx] += 1;
+      VECTOR(ntk)[xidx] --;
+      if (VECTOR(ntk)[xidx]==0) {
+	MATRIX(normfact, xidx, 0) += (edges-VECTOR(ch)[xidx]);
+	VECTOR(ch)[xidx]=edges;
+      }
+      VECTOR(ntk)[xidx+1]++;
+      if (VECTOR(ntk)[xidx+1]==1) {
+	VECTOR(ch)[xidx+1]=edges;
+      }
+      igraph_dqueue_push(&history, to);      
+    }
+    igraph_dqueue_push(&history, -1);
+    
+    /* time window */
+    if (node > time_window) {
+      while ( (j=igraph_dqueue_pop(&history)) != -1) {
+	long int xidx=VECTOR(indegree)[j];
+	VECTOR(indegree)[j] --; 
+	VECTOR(ntk)[xidx]--;
+	if (VECTOR(ntk)[xidx]==0) {
+	  MATRIX(normfact, xidx, 0) += (edges-VECTOR(ch)[xidx]);
+	  VECTOR(ch)[xidx]=edges;
+	}
+	VECTOR(ntk)[xidx-1]++;
+	if (VECTOR(ntk)[xidx-1]==1) {
+	  VECTOR(ch)[xidx-1]=edges;
+	}
+      }
+    }
+
+    /* isolate node */
+    VECTOR(ntk)[0]++;
+    if (VECTOR(ntk)[0]==1) {
+      VECTOR(ch)[0]=edges;
+    }        
+    
+  }      
+
+  /* Ok, measurement done, update change */
+  for (i=0; i<maxind+1; i++) {
+    igraph_real_t oldmean;
+    if (VECTOR(ntk)[i] != 0) {
+      MATRIX(normfact, i, 0) += (edges-VECTOR(ch)[i]);
+    }
+    oldmean=MATRIX(*ak, i, 0);
+    MATRIX(*ak, i, 0) *= VECTOR(notnull)[i] / MATRIX(normfact, i, 0);
+    if (lsd) {
+      /* TODO: confidence interval estimation */
+      MATRIX(*confint, i, 0) +=
+	oldmean * oldmean * VECTOR(notnull)[i] *
+	(1-VECTOR(notnull)[i]/MATRIX(normfact, i, 0));
+      if (MATRIX(normfact, i, 0) > 0) {
+	MATRIX(*confint, i, 0) =
+	  sqrt(MATRIX(*confint, i, 0)/(MATRIX(normfact, i, 0)-1));
+	MATRIX(*sd, i, 0) = MATRIX(*confint,i,0);
+      }
+    }
+  }
+  
+  igraph_dqueue_destroy(&history);
+  igraph_vector_destroy(&notnull);
+  if (!lno) {
+    igraph_matrix_destroy(&normfact);
+  } else {
+    igraph_matrix_destroy(no);
+    *no=normfact;
+  }
+  igraph_vector_destroy(&ch);
+  igraph_vector_destroy(&ntk);
+  igraph_vector_destroy(&indegree);
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(7);
+  
+  return 0;
+}	   
+
+int igraph_measure_dynamics_idwindow_st(const igraph_t *graph,
+					igraph_vector_t *res,
+					const igraph_matrix_t *ak,
+					igraph_integer_t time_window) {
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t indegree;
+  igraph_vector_t neis;
+  igraph_dqueue_t history;
+  
+  long int node;
+  long int i, k;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_DQUEUE_INIT_FINALLY(&history, time_window);
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  igraph_vector_null(res);
+  VECTOR(*res)[0]=MATRIX(*ak, 0, 0);
+  
+  for (node=1; node<no_of_nodes; node++) {
+    
+    /* new node */
+    VECTOR(*res)[node] = VECTOR(*res)[node-1] + MATRIX(*ak, 0, 0);
+	
+    if(node > time_window) {
+      while( (k = igraph_dqueue_pop(&history)) != -1) {
+	long int xidx=VECTOR(indegree)[k];
+	VECTOR(*res)[node] -= MATRIX(*ak, xidx, 0);
+	VECTOR(*res)[node] += MATRIX(*ak, xidx-1, 0);
+	VECTOR(indegree)[k]--;
+      }
+    }
+    
+    /* outgoing edges */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(indegree)[to];
+      
+      VECTOR(indegree)[to]++;
+      igraph_dqueue_push(&history, to);
+      
+      VECTOR(*res)[node] += -MATRIX(*ak, xidx, 0)+MATRIX(*ak, xidx+1, 0);
+    }
+    igraph_dqueue_push(&history, -1);
+  }
+  
+  igraph_vector_destroy(&neis);
+  igraph_dqueue_destroy(&history);
+  igraph_vector_destroy(&indegree);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+    
+  
 
 /* alpha = 
     0.1,  0.05,   0.025,  0.01,   0.005,  0.001 */

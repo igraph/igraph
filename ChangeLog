@@ -1,3 +1,10 @@
+2006-05-20  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/measure.dynamics.c (igraph_measure_dynamics_id) : cleaner
+	implementation
+	(igraph_measure_dynamics_idwindow, igraph_measure_dynamics_idwindow_st)
+	: added
+	
 2006-05-17  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/games.c (igraph_recent_degree_game) : added

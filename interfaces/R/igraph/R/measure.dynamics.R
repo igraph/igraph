@@ -22,11 +22,13 @@
 
 measure.dynamics.id <- function(graph, start.vertex=0,
                                 iterations=5, significance=0,
-                                estind=NULL, estage=NULL, number=FALSE) {
+                                estind=NULL, estage=NULL,
+                                number=FALSE, time.window=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+
   maxind <- max(degree(graph, mode="in"))
 
   st <- rep(1, vcount(graph))
@@ -55,18 +57,32 @@ measure.dynamics.id <- function(graph, start.vertex=0,
     if (i != 1) {
       mes[[1]] <- mes[[1]]/mes[[1]][1]
     }    
-    
-    mes <- .Call("R_igraph_measure_dynamics_id", graph,
-                 as.numeric(start.vertex),
-                 as.numeric(st),
-                 as.numeric(maxind), as.numeric(sd.real),
-                 as.logical(number.real),
-                 PACKAGE="igraph")
+
+    if (is.null(time.window)) {
+      mes <- .Call("R_igraph_measure_dynamics_id", graph,
+                   as.numeric(start.vertex),
+                   as.numeric(st),
+                   as.numeric(maxind), as.numeric(sd.real),
+                   as.logical(number.real),
+                   PACKAGE="igraph")
+    } else {
+      mes <- .Call("R_igraph_measure_dynamics_idwindow", graph,
+                   as.numeric(start.vertex), as.numeric(st),
+                   as.numeric(time.window), as.numeric(maxind),
+                   as.numeric(sd.real), as.logical(number.real),
+                   PACKAGE="igraph")
+    }
 
     mes[[1]][!is.finite(mes[[1]])] <- 0
-    st <- .Call("R_igraph_measure_dynamics_id_st", graph,
-                mes[[1]], 
-                PACKAGE="igraph")
+    if (is.null(time.window)) {
+      st <- .Call("R_igraph_measure_dynamics_id_st", graph,
+                  mes[[1]], 
+                  PACKAGE="igraph")
+    } else {
+      st <- .Call("R_igraph_measure_dynamics_idwindow_st", graph,
+                  mes[[1]], as.numeric(time.window),
+                  PACKAGE="igraph")
+    }
   }
 
   print(mes[[1]][1])

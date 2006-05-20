@@ -1839,6 +1839,69 @@ SEXP R_igraph_measure_dynamics_id_st(SEXP graph, SEXP pak) {
   return result;
 }
 
+SEXP R_igraph_measure_dynamics_idwindow(SEXP graph, SEXP pstartvertex,
+					SEXP pst, SEXP pwindow, SEXP pmaxind,
+					SEXP psign, SEXP pno) {
+  igraph_t g;
+  igraph_matrix_t ak, sd, confint, no;
+  igraph_vector_t st;
+  igraph_integer_t startvertex=REAL(pstartvertex)[0];
+  igraph_integer_t maxind=REAL(pmaxind)[0];
+  igraph_real_t sign=REAL(psign)[0];
+  igraph_bool_t lno=LOGICAL(pno)[0];
+  igraph_real_t window=REAL(pwindow)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_vector(pst, &st);
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&ak, 0, 0);
+  igraph_matrix_init(&sd, 0, 0);
+  igraph_matrix_init(&confint, 0, 0);
+  igraph_matrix_init(&no, 0, 0);
+  igraph_measure_dynamics_idwindow(&g, startvertex, &ak, &sd, &confint,
+				   &no, &st, maxind, sign, window);
+  PROTECT(result=NEW_LIST(4));
+  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&ak));
+  igraph_matrix_destroy(&ak);
+  SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
+  igraph_matrix_destroy(&sd);
+  SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&confint));
+  igraph_matrix_destroy(&confint);
+  SET_VECTOR_ELT(result, 3, R_igraph_matrix_to_SEXP(&no));
+  igraph_matrix_destroy(&no);
+
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_measure_dynamics_idwindow_st(SEXP graph, SEXP pak, 
+					   SEXP pwindow) {
+  igraph_t g;
+  igraph_matrix_t ak;
+  igraph_vector_t res;
+  igraph_integer_t window=REAL(pwindow)[0];
+  SEXP result;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_matrix(pak, &ak);
+  igraph_vector_init(&res, 0);
+  igraph_measure_dynamics_idwindow_st(&g, &res, &ak, window);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pstartvertex,
 				     SEXP pst, SEXP pagebins,
 				     SEXP pmaxind, SEXP psign, SEXP pno) {

@@ -41,7 +41,7 @@ export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice,
 
 export(erdos.renyi.game, random.graph.game, degree.sequence.game,
        aging.prefatt.game, growing.random.game, barabasi.game, ba.game,
-       callaway.traits.game, establishment.game, recent.degree.game)
+       callaway.traits.game, establishment.game)
 
 # community structure
 
