@@ -98,6 +98,8 @@ typedef struct igraph_attribute_table_t {
 
   igraph_bool_t (*has_attr)(const igraph_t *graph, igraph_attribute_elemtype_t type,
 			    const char *name);
+  int (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
+		 igraph_attribute_elemtype_t elemtype, const char *name);
 
   int (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
 				igraph_vector_t *value);
@@ -158,6 +160,10 @@ int igraph_i_attribute_get_info(const igraph_t *graph,
 igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph, 
 					  igraph_attribute_elemtype_t type,
 					  const char *name);
+int igraph_i_attribute_gettype(const igraph_t *graph,
+			       igraph_attribute_type_t *type,
+			       igraph_attribute_elemtype_t elemtype,
+			       const char *name);
 
 int igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
 					      const char *name,

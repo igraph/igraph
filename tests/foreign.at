@@ -31,7 +31,15 @@ AT_KEYWORDS([igraph_read_graph_graphml igraph_write_graph_graphml foreign graphm
 AT_COMPILE_CHECK([simple/graphml.c], [simple/graphml.out], [simple/test.gxl])
 AT_CLEANUP
 
+AT_SETUP([Reading an LGL file (igraph_read_graph_lgl):])
+AT_KEYWORDS([igraph_read_graph_lgl LGL foreign])
+AT_COMPILE_CHECK([simple/igraph_read_graph_lgl.c],
+		 [simple/igraph_read_graph_lgl.out],
+		 [{simple/igraph_read_graph_lgl-1.lgl,simple/igraph_read_graph_lgl-2.lgl}])
+AT_CLEANUP
+
 AT_SETUP([Writing LGL (igraph_write_graph_lgl):])
 AT_KEYWORDS([igraph_write_graph_lgl foreign LGL])
 AT_COMPILE_CHECK([simple/igraph_write_graph_lgl.c])
 AT_CLEANUP
+

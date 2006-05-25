@@ -526,7 +526,40 @@ igraph_bool_t R_igraph_attribute_has_attr(const igraph_t *graph,
   }
   
   res=R_igraph_getListElement(VECTOR_ELT(graph->attr, attrnum), name);
-  return res != NULL;
+  return res != R_NilValue;
+}
+
+int R_igraph_attribute_gettype(const igraph_t *graph,
+			       igraph_attribute_type_t *type,
+			       igraph_attribute_elemtype_t elemtype,
+			       const char *name) {
+  long int attrnum;
+  SEXP res;
+  
+  switch (elemtype) {
+  case IGRAPH_ATTRIBUTE_GRAPH:
+    attrnum=1;
+    break;
+  case IGRAPH_ATTRIBUTE_VERTEX:
+    attrnum=2;
+    break;
+  case IGRAPH_ATTRIBUTE_EDGE:
+    attrnum=3;
+    break;
+  default:
+    IGRAPH_ERROR("Unkwown attribute element type", IGRAPH_EINVAL);
+    break;
+  }
+  
+  res=R_igraph_getListElement(VECTOR_ELT(graph->attr, attrnum), name);
+  if (IS_NUMERIC(res) || IS_INTEGER(res)) {
+    *type=IGRAPH_ATTRIBUTE_NUMERIC;
+  } else if (IS_CHARACTER(res)) {
+    *type=IGRAPH_ATTRIBUTE_STRING;
+  } else {
+    *type=IGRAPH_ATTRIBUTE_R_OBJECT;
+  }
+  return 0;
 }
 
 int R_igraph_attribute_get_numeric_graph_attr(const igraph_t *graph,
@@ -535,7 +568,7 @@ int R_igraph_attribute_get_numeric_graph_attr(const igraph_t *graph,
   SEXP gal=VECTOR_ELT(graph->attr, 1);
   SEXP ga=R_igraph_getListElement(gal, name);
   
-  if (ga == NULL) {
+  if (ga == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
   
@@ -552,7 +585,7 @@ int R_igraph_attribute_get_string_graph_attr(const igraph_t *graph,
   SEXP gal=VECTOR_ELT(graph->attr, 1);
   SEXP ga=R_igraph_getListElement(gal, name);
   
-  if (ga == NULL) {
+  if (ga == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
   
@@ -567,15 +600,15 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
 					       igraph_vs_t vs,
 					       igraph_vector_t *value) {
   /* TODO: handle vs, serialization */
-  SEXP val=VECTOR_ELT(graph->attr, 1);
+  SEXP val=VECTOR_ELT(graph->attr, 2);
   SEXP va=R_igraph_getListElement(val, name);
   igraph_vector_t newvalue;
   
-  if (va == NULL) {
+  if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
   
-  R_SEXP_to_vector_copy(va, &newvalue);
+  R_SEXP_to_vector_copy(AS_NUMERIC(va), &newvalue);
   igraph_vector_destroy(value);
   *value=newvalue;
 
@@ -587,15 +620,16 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
 					      igraph_vs_t vs,
 					      igraph_strvector_t *value) {
   /* TODO: handle vs, serialization */
-  SEXP val=VECTOR_ELT(graph->attr, 1);
-  SEXP va=R_igraph_getListElement(val, name);
+  SEXP val, va;
   igraph_vector_t newvalue;
-  
-  if (va == NULL) {
+
+  val=VECTOR_ELT(graph->attr, 2);  
+  va=R_igraph_getListElement(val, name);
+  if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-  
-  R_igraph_SEXP_to_strvector_copy(va, value);
+
+  R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(va), value);
   
   return 0;
 }
@@ -605,15 +639,15 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
 					     igraph_es_t es,
 					     igraph_vector_t *value) {
   /* TODO: handle es, serialization */
-  SEXP eal=VECTOR_ELT(graph->attr, 1);
+  SEXP eal=VECTOR_ELT(graph->attr, 3);
   SEXP ea=R_igraph_getListElement(eal, name);
   igraph_vector_t newvalue;
   
-  if (ea == NULL) {
+  if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
   
-  R_SEXP_to_vector_copy(ea, &newvalue);
+  R_SEXP_to_vector_copy(AS_NUMERIC(ea), &newvalue);
   igraph_vector_destroy(value);
   *value=newvalue;
 
@@ -625,15 +659,15 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
 					    igraph_es_t es,
 					    igraph_strvector_t *value) {
   /* TODO: handle es, serialization */
-  SEXP eal=VECTOR_ELT(graph->attr, 1);
+  SEXP eal=VECTOR_ELT(graph->attr, 3);
   SEXP ea=R_igraph_getListElement(eal, name);
   igraph_vector_t newvalue;
   
-  if (ea == NULL) {
+  if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
   
-  R_igraph_SEXP_to_strvector_copy(ea, value);
+  R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(ea), value);
   
   return 0;
 }
@@ -643,7 +677,8 @@ igraph_attribute_table_t R_igraph_attribute_table={
   &R_igraph_attribute_copy, &R_igraph_attribute_add_vertices,
   &R_igraph_attribute_delete_vertices, &R_igraph_attribute_add_edges,
   &R_igraph_attribute_delete_edges, &R_igraph_attribute_get_info,
-  &R_igraph_attribute_has_attr, &R_igraph_attribute_get_numeric_graph_attr,
+  &R_igraph_attribute_has_attr, &R_igraph_attribute_gettype,
+  &R_igraph_attribute_get_numeric_graph_attr,
   &R_igraph_attribute_get_string_graph_attr,
   &R_igraph_attribute_get_numeric_vertex_attr,
   &R_igraph_attribute_get_string_vertex_attr,

@@ -1,3 +1,10 @@
+2006-05-25  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/foreign.c (igraph_write_graph_ncol) : attribute handling added
+	* src/attributes.c (igraph_i_attribute_has_attr) : bug corrected
+	(igraph_i_attribute_gettype) : added
+	* examples/simple/igraph_read_graph_lgl.c : added
+
 2006-05-20  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/measure.dynamics.c (igraph_measure_dynamics_id) : cleaner

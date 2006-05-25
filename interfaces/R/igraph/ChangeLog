@@ -1,3 +1,17 @@
+2006-05-25  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/foreign.R (write.graph.ncol, write.graph.lgl) :
+	updated to new vertex and edge sequences
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_has_attr)
+	(R_igraph_attribute_get_numeric_graph_attr)
+	(R_igraph_attribute_get_string_graph_attr)
+	(R_igraph_attribute_get_numeric_vertex_attr)
+	(R_igraph_attribute_get_string_vertex_attr)
+	(R_igraph_attribute_get_numeric_edge_attr)
+	(R_igraph_attribute_get_string_edge_attr) : NULL changed to R_NilValue,
+	convert attributes to NUMERIC or CHARACTER
+	(R_igraph_attributes_gettype) : added
+
 2006-05-20  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/games.R (ba.game, recent.degree.game) :

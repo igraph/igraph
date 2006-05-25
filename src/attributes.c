@@ -122,10 +122,22 @@ igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph,
 					  igraph_attribute_elemtype_t type,
 					  const char *name) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->has_attr(graph, type, name);
+    return igraph_i_attribute_table->has_attr(graph, type, name);
   } else {
     return 0;
   }
+}
+
+int igraph_i_attribute_gettype(const igraph_t *graph,
+			       igraph_attribute_type_t *type,
+			       igraph_attribute_elemtype_t elemtype,
+			       const char *name) {
+  if (igraph_i_attribute_table) {
+    return igraph_i_attribute_table->gettype(graph, type, elemtype, name);
+  } else {
+    return 0;
+  }
+  
 }
 
 int igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,

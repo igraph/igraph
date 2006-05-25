@@ -157,8 +157,8 @@ write.graph.ncol <- function(graph, file,
                              names="name", weights="weight", ...) {
   names <- as.character(names)
   weights <- as.character(weights)
-  if (length(names)==0 || ! names %in% v.a(graph)) { names <- NULL }
-  if (length(weights)==0 || ! weights %in% e.a(graph)) { weights <- NULL }
+  if (length(names)==0 || ! names %in% list.vertex.attributes(graph)) { names <- NULL }
+  if (length(weights)==0 || ! weights %in% list.edge.attributes(graph)) { weights <- NULL }
   
   .Call("R_igraph_write_graph_ncol", graph, file,
         names, weights,
@@ -178,8 +178,8 @@ write.graph.lgl <- function(graph, file,
                             isolates=FALSE, ...) {
   names <- as.character(names)
   weights <- as.character(weights)
-  if (length(names)==0 || ! names %in% v.a(graph)) { names <- NULL }
-  if (length(weights)==0 || ! weights %in% e.a(graph)) { weights <- NULL }
+  if (length(names)==0 || ! names %in% list.vertex.attributes(graph)) { names <- NULL }
+  if (length(weights)==0 || ! weights %in% list.edge.attributes(graph)) { weights <- NULL }
   
   .Call("R_igraph_write_graph_lgl", graph,
         names, weights, as.logical(isolates),

@@ -5,9 +5,6 @@ o document bison requirements
 o repair simplify
 o Laplacian of a graph, in R only
 o attribute handling for operators
-o improve attributes: serialize/unserialize
-o igraph_i_attribute_add_edges should supply the ids of the new edges, or
-  the edges themselves.....
 o add references to SNA, paper by Carter
 o for almost all functions: add progress handlers and allow
   them to be interrupted using IGRAPH_ALLOW_INTERRUPTION()
