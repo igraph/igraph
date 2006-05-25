@@ -270,7 +270,6 @@ int igraph_measure_dynamics_idwindow(const igraph_t *graph,
       long int xidx=VECTOR(indegree)[to];
       
       VECTOR(indegree)[to]++;
-      VECTOR(notnull)[xidx] += 1;
       VECTOR(ntk)[xidx] --;
       if (VECTOR(ntk)[xidx]==0) {
 	MATRIX(normfact, xidx, 0) += (edges-VECTOR(ch)[xidx]);

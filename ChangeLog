@@ -5,6 +5,9 @@
 	(igraph_i_attribute_gettype) : added
 	* examples/simple/igraph_read_graph_lgl.c : added
 
+	* src/measure_dynamics.c (igraph_measure_dynamics_idwindow) : small (?)
+	bug eliminated (thanks Elliot)
+	
 2006-05-20  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/measure.dynamics.c (igraph_measure_dynamics_id) : cleaner
