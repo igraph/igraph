@@ -58,19 +58,93 @@ E <- function(graph) {
   res
 }
 
-# TODO: indexing based on attributes
 "[.igraph.vs" <- function(x, i) {
-  res <- i[ i %in% x ]
-  attributes(res) <- attributes(x)
+  i <- substitute(i)
+  if (is.numeric(i) || is.integer(i)) {
+    # simple indexing by vertex ids
+    res <- i[ i %in% x ]
+    attributes(res) <- attributes(x)
+  } else if (is.logical(i)) {
+    # simple indexing by logical vector
+    res <- as.numeric(x) [ i ]
+    attributes(res) <- attributes(x)
+  } else {
+    # language expression, we also do attribute based indexing
+    graph <- get("graph", attr(V(g), "env"))
+    i <- eval(i, graph[[9]][[3]])
+    if (is.numeric(i) || is.integer(i)) {
+      i <- as.numeric(i)
+      res <- i[ i %in% x ]
+      attributes(res) <- attributes(x)
+    } else if (is.logical(i)) {
+      res <- as.numeric(x) [ i ]
+      attributes(res) <- attributes(x)
+    } else {
+      stop("invalid indexing of vertex seq")
+    }
+  }
+
   res
 }
 
-# TODO: indexing based on attributes
 "[.igraph.es" <- function(x, i) {
-  res <- i[ i %in% x ]
-  attributes(res) <- attributes(x)
+  i <- substitute(i)
+  if (is.numeric(i) || is.integer(i)) {
+    # simple indexing by vertex ids
+    res <- i[ i %in% x ]
+    attributes(res) <- attributes(x)    
+  } else if (is.logical(i)) {
+    # simple indexing by a logical vector
+    res <- as.numeric(x) [ i ]
+    attributes(res) <- attributes(x)
+  } else {
+    # language expression, we also do attribute based indexing
+    graph <- get("graph", attr(V(g), "env"))
+    i <- substitute(i)
+    i <- eval(i, c(graph[[9]][[4]], from=list(graph[[3]][ as.numeric(x)+1 ]),
+                   to=list(graph[[4]][as.numeric(x)+1]), graph=list(graph)))
+    if (is.numeric(i) || is.integer(i)) {
+      i <- as.numeric(i)
+      res <- i[ i %in% x ]
+      attributes(res) <- attributes(x)
+    } else if (is.logical(i)) {
+      res <- as.numeric(x) [ i ]
+      attributes(res) <- attributes(x)
+    } else {
+      stop("invalid indexing of edge seq")
+    }
+  }
+  
   res
 } 
+
+"%--%" <- function(f, t) {
+  from <- get("from", parent.frame())
+  to <- get("to", parent.frame())
+  (from %in% f & to %in% t) | (to %in% f & from %in% t)
+}
+
+"%->%" <- function(f, t) {
+  from <- get("from", parent.frame())
+  to <- get("to", parent.frame())
+  graph <- get("graph", parent.frame())
+  if (is.directed(graph)) {
+    from %in% f & to %in% t
+  } else {
+    (from %in% f & to %in% t) | (to %in% f & from %in% t)
+  }
+}
+
+"%<-%" <- function(t, f) {
+  from <- get("from", parent.frame())
+  to <- get("to", parent.frame())
+  graph <- get("graph", parent.frame())
+  if (is.directed(graph)) {
+    from %in% f & to %in% t
+  } else {
+    (from %in% f & to %in% t) | (to %in% f & from %in% t)
+  }
+}
 
 "[<-.igraph.vs" <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
