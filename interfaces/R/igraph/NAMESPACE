@@ -17,7 +17,8 @@ export(get.graph.attribute, set.graph.attribute,
 
 export(V, E, "$.igraph.vs", "$.igraph.es",
        "[.igraph.vs", "[.igraph.es", "[<-.igraph.vs", "[<-.igraph.es",
-       "$<-.igraph.vs", "$<-.igraph.es", "V<-", "E<-")
+       "$<-.igraph.vs", "$<-.igraph.es", "V<-", "E<-",
+       print.igraph.vs, print.igraph.es)
 
 S3method("$", igraph.vs)
 S3method("[", igraph.vs)
@@ -27,6 +28,8 @@ S3method("$", igraph.es)
 S3method("[", igraph.es)
 S3method("[<-", igraph.es)
 S3method("$<-", igraph.es)
+S3method(print, igraph.vs)
+S3method(print, igraph.es)
   
 # basic functions, printing
 

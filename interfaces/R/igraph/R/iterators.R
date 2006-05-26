@@ -132,6 +132,16 @@ E <- function(graph) {
                      value=attr(value, "value"))
 }
 
+print.igraph.vs <- function(x, ...) {
+  cat("Vertex sequence:\n")
+  print(as.numeric(x))
+}
+
+print.igraph.es <- function(x, ...) {
+  cat("Edge sequence:\n")
+  print(as.numeric(x))
+}
+
 # these are internal
 
 as.igraph.vs <- as.numeric

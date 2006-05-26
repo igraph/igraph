@@ -1,3 +1,7 @@
+2006-05-26  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R (print.igraph.vs, print.igraph.es) : added
+
 2006-05-25  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/foreign.R (write.graph.ncol, write.graph.lgl) :
