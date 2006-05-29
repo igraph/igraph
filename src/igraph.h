@@ -193,6 +193,8 @@ igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
 
 void igraph_vs_destroy(igraph_vs_t *vs);
 
+igraph_bool_t igraph_vs_is_all(igraph_vs_t *vs);
+
 /* -------------------------------------------------- */
 /* Vertex iterators                                   */
 /* -------------------------------------------------- */
@@ -276,6 +278,8 @@ int igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
 igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
 void igraph_es_destroy(igraph_es_t *es);
+
+igraph_bool_t igraph_es_is_all(igraph_es_t *es);
 
 /* -------------------------------------------------- */
 /* Edge Iterators                                     */

@@ -3,6 +3,12 @@
 	* interfaces/R/igraph/R/foreign.R (write.graph.lgl) : bug corrected
 	* interfaces/R/igraph/R/foreign.R (write.graph) : lgl format added
 
+	* interfaces/R/src/rinterface.c 
+	(R_igraph_attribute_get_numeric_vertex_attr)
+	(R_igraph_attribute_get_string_vertex_attr)
+	(R_igraph_attribute_get_numeric_edge_attr)
+	(R_igraph_attribute_get_string_edge_attr) : handle vertex/edge seq
+
 2006-05-27  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/structural.properties.R (graph.laplacian) :

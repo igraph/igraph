@@ -151,6 +151,10 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
   }
 }
 
+igraph_bool_t igraph_vs_is_all(igraph_vs_t *vs) {
+  return vs->type == IGRAPH_VS_ALL;
+}
+
 /***************************************************/
 
 int igraph_vit_create(const igraph_t *graph, 
@@ -347,6 +351,10 @@ void igraph_es_destroy(igraph_es_t *es) {
   default:
     break;
   }
+}
+
+igraph_bool_t igraph_es_is_all(igraph_es_t *es) {
+  return es->type == IGRAPH_ES_ALL;
 }
 
 /**************************************************/

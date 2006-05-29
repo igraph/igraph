@@ -599,7 +599,7 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
 					       const char *name,
 					       igraph_vs_t vs,
 					       igraph_vector_t *value) {
-  /* TODO: handle vs, serialization */
+  /* TODO: serialization */
   SEXP val=VECTOR_ELT(graph->attr, 2);
   SEXP va=R_igraph_getListElement(val, name);
   igraph_vector_t newvalue;
@@ -607,10 +607,26 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
   if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-  
-  R_SEXP_to_vector_copy(AS_NUMERIC(va), &newvalue);
-  igraph_vector_destroy(value);
-  *value=newvalue;
+
+  if (igraph_vs_is_all(&vs)) {
+    R_SEXP_to_vector_copy(AS_NUMERIC(va), &newvalue);
+    igraph_vector_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_vit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
+    IGRAPH_FINALLY(igraph_vit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_VIT_SIZE(it)));
+    while (!IGRAPH_VIT_END(it)) {
+      long int v=IGRAPH_VIT_GET(it);
+      VECTOR(*value)[i]=REAL(va)[v];
+      IGRAPH_VIT_NEXT(it);
+      i++;
+    }
+    igraph_vit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return 0;
 }
@@ -619,7 +635,7 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
 					      const char *name,
 					      igraph_vs_t vs,
 					      igraph_strvector_t *value) {
-  /* TODO: handle vs, serialization */
+  /* TODO: serialization */
   SEXP val, va;
   igraph_vector_t newvalue;
 
@@ -628,8 +644,25 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
   if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-
-  R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(va), value);
+  
+  if (igraph_vs_is_all(&vs)) {
+    R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(va), value);
+  } else {
+    igraph_vit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
+    IGRAPH_FINALLY(igraph_vit_destroy, &it);
+    IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
+    while (!IGRAPH_VIT_END(it)) {
+      long int v=IGRAPH_VIT_GET(it);
+      char *str=CHAR(STRING_ELT(AS_CHARACTER(va), v));
+      IGRAPH_CHECK(igraph_strvector_set(value, i, str));
+      IGRAPH_VIT_NEXT(it);
+      i++;
+    }
+    igraph_vit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
   
   return 0;
 }
@@ -638,7 +671,7 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
 					     const char *name,
 					     igraph_es_t es,
 					     igraph_vector_t *value) {
-  /* TODO: handle es, serialization */
+  /* TODO: serialization */
   SEXP eal=VECTOR_ELT(graph->attr, 3);
   SEXP ea=R_igraph_getListElement(eal, name);
   igraph_vector_t newvalue;
@@ -647,9 +680,25 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
   
-  R_SEXP_to_vector_copy(AS_NUMERIC(ea), &newvalue);
-  igraph_vector_destroy(value);
-  *value=newvalue;
+  if (igraph_es_is_all(&es)) {    
+    R_SEXP_to_vector_copy(AS_NUMERIC(ea), &newvalue);
+    igraph_vector_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_eit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
+    IGRAPH_FINALLY(igraph_eit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_EIT_SIZE(it)));
+    while (!IGRAPH_EIT_END(it)) {
+      long int e=IGRAPH_EIT_GET(it);
+      VECTOR(*value)[i]=REAL(ea)[e];
+      IGRAPH_EIT_NEXT(it);
+      i++;
+    }
+    igraph_eit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return 0;
 }
@@ -658,7 +707,7 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
 					    const char *name,
 					    igraph_es_t es,
 					    igraph_strvector_t *value) {
-  /* TODO: handle es, serialization */
+  /* TODO: serialization */
   SEXP eal=VECTOR_ELT(graph->attr, 3);
   SEXP ea=R_igraph_getListElement(eal, name);
   igraph_vector_t newvalue;
@@ -667,7 +716,24 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
   
-  R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(ea), value);
+  if (igraph_es_is_all(&es)) {
+    R_igraph_SEXP_to_strvector_copy(AS_CHARACTER(ea), value);
+  } else {
+    igraph_eit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
+    IGRAPH_FINALLY(igraph_eit_destroy, &it);
+    IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
+    while (!IGRAPH_EIT_END(it)) {
+      long int e=IGRAPH_EIT_GET(it);
+      char *str=CHAR(STRING_ELT(AS_CHARACTER(ea), e));
+      IGRAPH_CHECK(igraph_strvector_set(value, i, str));
+      IGRAPH_EIT_NEXT(it);
+      i++;
+    }
+    igraph_eit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
   
   return 0;
 }

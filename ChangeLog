@@ -4,6 +4,8 @@
 
 	* src/foreign.c (igraph_write_graph_ncol) : memory leaks removed
 
+	* src/iterators.c (igraph_vs_is_all, igraph_es_is_all) : added
+
 2006-05-25  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/foreign.c (igraph_write_graph_ncol) : attribute handling added
