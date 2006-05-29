@@ -105,6 +105,8 @@
 
 typedef int igraph_interruption_handler_t (void* data);
 
+extern igraph_interruption_handler_t *igraph_i_interruption_handler;
+
 /**
  * \define IGRAPH_ALLOW_INTERRUPTION
  * 
@@ -116,8 +118,8 @@ typedef int igraph_interruption_handler_t (void* data);
 
 #define IGRAPH_ALLOW_INTERRUPTION() \
        do { \
-       if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) return IGRAPH_INTERRUPTED; \
-       } while (0)
+       if (igraph_i_interruption_handler) { if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) return IGRAPH_INTERRUPTED; \
+       } } while (0)
 
 /**
  * \function igraph_allow_interruption

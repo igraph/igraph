@@ -101,6 +101,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
 
   for (first_node=0; first_node < no_of_nodes; ++first_node) {
     if (already_added[first_node]==1) continue;
+    IGRAPH_ALLOW_INTERRUPTION();
 
     already_added[first_node]=1;
     act_cluster_size=1;
@@ -162,6 +163,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
   igraph_vector_clear(csize);
   
   for (i=0; i<no_of_nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(graph, &tmp, i, IGRAPH_OUT));
     if (VECTOR(next_nei)[i] > igraph_vector_size(&tmp)) { continue; }
     
@@ -194,6 +196,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 							added vertices */
   while (!igraph_vector_empty(&out)) {
     long int grandfather=igraph_vector_pop_back(&out);
+    IGRAPH_ALLOW_INTERRUPTION();
     if (VECTOR(next_nei)[grandfather] != 0) { continue; }
     VECTOR(next_nei)[grandfather]=1;
     act_cluster_size=1;
@@ -298,6 +301,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
   j=1;
   while ( !igraph_dqueue_empty(&q)) {
     long int actnode=igraph_dqueue_pop(&q);
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
     for (i=0; i <igraph_vector_size(&neis); i++) {
       long int neighbor=VECTOR(neis)[i];
@@ -403,6 +407,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   for(actstart=0; resco<maxcompno && actstart < no_of_nodes; actstart++) {
     
     if (already_added[actstart]) { continue; }
+    IGRAPH_ALLOW_INTERRUPTION();
     
     igraph_vector_clear(&verts);
     already_added[actstart]=1;

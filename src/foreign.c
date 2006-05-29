@@ -88,6 +88,9 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
   
   while (!feof(instream)) {
     int read;
+
+    IGRAPH_ALLOW_INTERRUPTION();
+    
     read=fscanf(instream, "%li", &from);
     if (read != 1) { 
       IGRAPH_ERROR("parsing edgelist file failed", IGRAPH_PARSEERROR); 

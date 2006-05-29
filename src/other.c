@@ -69,6 +69,7 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
   VECTOR(*res)[0]=sum/binwidth;
   
   for (i=1; i<igraph_vector_size(data)-binwidth+1; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     sum -= VECTOR(*data)[i-1];
     sum += VECTOR(*data)[ (long int)(i+binwidth-1)];
     VECTOR(*res)[i] = sum/binwidth;

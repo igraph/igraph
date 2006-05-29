@@ -125,6 +125,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
   /* The result */
   
   for (from=0; from<no_of_nodes; from++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
     for (i=0; i < igraph_vector_size(&neis)-1; i++) {
       if (calc[ (long int)VECTOR(neis)[i] ]) {

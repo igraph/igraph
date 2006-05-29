@@ -114,7 +114,7 @@ void IGRAPH_FINALLY_CLEAN(int minus) {
 
 void IGRAPH_FINALLY_FREE() {
   int p;
-  /* printf("[X] Finally stack will be cleaned (contained %d elements)\n", igraph_i_finally_stack[0].all); */
+/*   printf("[X] Finally stack will be cleaned (contained %d elements)\n", igraph_i_finally_stack[0].all);  */
   for (p=igraph_i_finally_stack[0].all-1; p>=0; p--) {
     igraph_i_finally_stack[p].func(igraph_i_finally_stack[p].ptr);
   }

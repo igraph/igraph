@@ -133,6 +133,7 @@ int igraph_intersection(igraph_t *res, igraph_t *left, igraph_t *right) {
     no_of_nodes_left : no_of_nodes_right;
 
   for (i=0; i<smaller_nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(left, &nei1, i, IGRAPH_OUT));
     IGRAPH_CHECK(igraph_neighbors(right, &nei2, i, IGRAPH_OUT));
     igraph_vector_sort(&nei1);
@@ -231,6 +232,8 @@ int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   for (i=0; i<smallest_nodes; i++) {
     igraph_bool_t l;
     
+    IGRAPH_ALLOW_INTERRUPTION();
+
     /* get neighbors */
     for (j=0; j<no_of_graphs; j++) {
       IGRAPH_CHECK(igraph_neighbors(VECTOR(*graphs)[j], VECTOR(neivects)[j], i,
@@ -333,6 +336,7 @@ int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right) {
   
   for (i=0; i<no_of_nodes; i++) {
     long int n1=0, n2=0, p1=0, p2=0;
+    IGRAPH_ALLOW_INTERRUPTION();
     if (i<no_of_nodes_left) {
       IGRAPH_CHECK(igraph_neighbors(left, &nei1, i, IGRAPH_OUT));
       igraph_vector_sort(&nei1);
@@ -436,6 +440,8 @@ int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
     igraph_bool_t l;
     long int bigtail;
     
+    IGRAPH_ALLOW_INTERRUPTION();
+
     /* get neighbors */
     for (j=0; j<no_of_graphs; j++) {
       if (i<igraph_vcount(VECTOR(*graphs)[j])) {
@@ -527,6 +533,7 @@ int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub) {
     no_of_nodes_sub : no_of_nodes_orig;
   
   for (i=0; i<smaller_nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(orig, &nei1, i, IGRAPH_OUT));
     IGRAPH_CHECK(igraph_neighbors(sub, &nei2, i, IGRAPH_OUT));
     igraph_vector_sort(&nei1);
@@ -599,6 +606,7 @@ int igraph_complementer(igraph_t *res, igraph_t *graph, igraph_bool_t loops) {
   }
   
   for (i=0; i<no_of_nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
     igraph_vector_sort(&neis);
     if (loops) {
@@ -655,6 +663,7 @@ int igraph_compose(igraph_t *res, igraph_t *g1, igraph_t *g2) {
   IGRAPH_VECTOR_INIT_FINALLY(&neis2, 0);
   
   for (i=0; i<no_of_nodes_left; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(g1, &neis1, i, IGRAPH_OUT));
     while (!igraph_vector_empty(&neis1)) {
       long int con=igraph_vector_pop_back(&neis1);

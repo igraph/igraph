@@ -39,23 +39,21 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
   if (al->adjs == 0) {
     IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(igraph_free, al->adjs);
 
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, al);  
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, al);
   for (i=0; i<al->length; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], 0));
     IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
   }
-  
-  IGRAPH_FINALLY_CLEAN(2);
+
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
 void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
-    /* This works if some igraph_vector_t's are 0, because igraph_vector_destroy can
-       handle this. */
     igraph_vector_destroy(&al->adjs[i]);
   }
   Free(al->adjs);
@@ -81,15 +79,15 @@ int igraph_i_adjedgelist_init(const igraph_t *graph,
   if (ael->adjs == 0) {
     IGRAPH_ERROR("Cannot create adjedgelist view", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(igraph_free, ael->adjs);
 
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, ael);  
   for (i=0; i<ael->length; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_vector_init(&ael->adjs[i], 0));
     IGRAPH_CHECK(igraph_adjacent(graph, &ael->adjs[i], i, mode));
   }
   
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 

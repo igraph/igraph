@@ -180,6 +180,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
     MATRIX(*res, i, 0) = acos(h);
     MATRIX(*res, i, 1) = fmod((MATRIX(*res, i-1, 1) +
 			       3.6/sqrt(no_of_nodes*(1-h*h))), 2*M_PI);
+    IGRAPH_ALLOW_INTERRUPTION();
   }
   if (no_of_nodes >=2) {
     MATRIX(*res, no_of_nodes-1, 0)=0;
@@ -193,6 +194,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
     MATRIX(*res, i, 0)=x;
     MATRIX(*res, i, 1)=y;
     MATRIX(*res, i, 2)=z;
+    IGRAPH_ALLOW_INTERRUPTION();
   }
   
   return 0;
@@ -266,6 +268,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
     igraph_matrix_null(&dxdy);
     /* Increment deltas for each undirected pair */
     for(j=0;j<no_of_nodes;j++) {
+      IGRAPH_ALLOW_INTERRUPTION();
       for(k=j+1;k<no_of_nodes;k++){
         /* Obtain difference vector */
         xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
@@ -397,6 +400,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     igraph_matrix_null(&dxdydz);
     /*Increment deltas for each undirected pair*/
     for(j=0;j<no_of_nodes;j++) {
+      IGRAPH_ALLOW_INTERRUPTION();
       for(k=j+1;k<no_of_nodes;k++){
         /*Obtain difference vector*/
         xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
@@ -531,6 +535,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 		      100.0*i/niter, NULL);
     /*Update each vertex*/
     for(j=0;j<n;j++){
+      IGRAPH_ALLOW_INTERRUPTION();
       /*Draw the candidate via a gaussian perturbation*/
       candx=RNG_NORMAL(MATRIX(*res, j, 0),sigma*temp/initemp);
       candy=RNG_NORMAL(MATRIX(*res, j, 1),sigma*temp/initemp);
@@ -616,6 +621,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 
     /*Update each vertex*/
     for(j=0;j<no_of_nodes;j++){
+      IGRAPH_ALLOW_INTERRUPTION();
       /*Draw the candidate via a gaussian perturbation*/
       candx=RNG_NORMAL(MATRIX(*res, j, 0) ,sigma*temp/initemp);
       candy=RNG_NORMAL(MATRIX(*res, j, 1) ,sigma*temp/initemp);
@@ -810,6 +816,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
       long int vid=VECTOR(vids)[i];
       long int par=VECTOR(parents)[vid];
+      IGRAPH_ALLOW_INTERRUPTION();
       igraph_2dgrid_getcenter(&grid, &massx, &massy);
       igraph_i_norm2d(&massx, &massy);
       px=MATRIX(*res, vid, 0)-MATRIX(*res, par, 0);
@@ -847,6 +854,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     for (j=VECTOR(layers)[actlayer]; j<VECTOR(layers)[actlayer+1]; j++) {
       long int vid=VECTOR(vids)[j];
       long int k;
+      IGRAPH_ALLOW_INTERRUPTION();
       IGRAPH_CHECK(igraph_adjacent(graph, &eids, vid, IGRAPH_ALL));
       for (k=0;k<igraph_vector_size(&eids);k++) {
 	long int eid=VECTOR(eids)[k];
@@ -878,6 +886,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       for (j=0; j<igraph_vector_size(&edges); j++) {
 	igraph_integer_t from, to;
 	igraph_real_t xd, yd, dist, force;
+	IGRAPH_ALLOW_INTERRUPTION();
 	igraph_edge(graph, VECTOR(edges)[j], &from, &to);
 	xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
 	yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
@@ -1052,6 +1061,7 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
     /* repulsion */
     igraph_2dgrid_reset(&grid, &vidit);
     while ( (vid=igraph_2dgrid_next(&grid, &vidit)-1) != -1) {
+      IGRAPH_ALLOW_INTERRUPTION();
       while ( (nei=igraph_2dgrid_next_nei(&grid, &vidit)-1) != -1) {
 	igraph_real_t xd=MATRIX(*res, (long int)vid, 0)-
 	  MATRIX(*res, (long int)nei, 0);
@@ -1370,6 +1380,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   for (i=0; i<igraph_vector_ptr_size(coords); i++) {
     igraph_matrix_t *mat=VECTOR(*coords)[i];
     long int size=igraph_matrix_nrow(mat);
+    IGRAPH_ALLOW_INTERRUPTION();
     allnodes += size;
     VECTOR(sizes)[i]=size;
     VECTOR(r)[i]=pow(size, .75);
@@ -1401,6 +1412,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   
   igraph_progress("Merging layouts via DLA", 0.0, NULL);
   while (jpos<graphs) {
+    IGRAPH_ALLOW_INTERRUPTION();
 /*     fprintf(stderr, "comp: %li", jpos); */
     igraph_progress("Merging layouts via DLA", (100.0*jpos)/graphs, NULL);
     
@@ -1422,6 +1434,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   IGRAPH_CHECK(igraph_matrix_resize(res, allnodes, 2));
   respos=0;
   for (i=0; i<graphs; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     long int size=igraph_matrix_nrow(VECTOR(*coords)[i]);
     igraph_real_t xx=VECTOR(x)[i];
     igraph_real_t yy=VECTOR(y)[i];

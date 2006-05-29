@@ -501,6 +501,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
 				     mutual*directed * no_of_nodes*dims));
 
   for (i=0; i<no_of_nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
     for (j=0; j<dims; j++) {
       if (circular || coords[j] != VECTOR(*dimvector)[j]-1) {
 	long int new_nei;

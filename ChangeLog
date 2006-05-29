@@ -1,3 +1,45 @@
+2006-05-29  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/interrupt.h (IGRAPH_ALLOW_INTERRUPTION) : eliminate function
+	call if not neccessary
+	* src/interrupt.c (igraph_i_interruption_handler) : declaration 
+	moved to .h
+
+	* src/measure_dynamics.c (igraph_measure_dynamics_id)
+	(igraph_measure_dynamics_idwindow, igraph_measure_dynamics_idwindow_st)
+	(igraph_measure_dynamics_idage, igraph_measure_dynamics_idage_st)
+	(igraph_measure_dynamics_idage_debug, igraph_measure_dynamics_d_d)
+	(igraph_measure_dynamics_d_d)
+	* src/motifs.c (igraph_motifs_randesu, igraph_motifs_randesu_estimate)
+	(igraph_motifs_randesu_no)
+	* src/adjlist.c (igraph_i_adjlist_init, igraph_i_adjedgelist_init)
+	* src/operators.c (igraph_intersection, igraph_intersection_many)
+	(igraph_union, igraph_union_many, igraph_difference)
+	(igraph_complemented, igraph_compose)
+	* src/foreign.c (igraph_read_graph_edgelist)
+	* src/layout.c (igraph_layout_sphere) 
+	(igraph_layout_fruchterman_reingold)
+	(igraph_layout_fruchterman_reingold_3d)
+	(igraph_layout_kamada_kawai, igraph_layout_kamada_kawai_3d)
+	(igraph_layout_lgl, igraph_layout_grid_fruchterman_reingold)
+	(igraph_layout_merge_dla)
+	* src/components.c (igraph_clusters_weak, igraph_clusters_strong)
+	(igraph_is_connected_weak, igraph_decompose)
+	* src/other.c (igraph_running_mean)
+	* src/structural_properties.c (igraph_average_path_length)
+	(igraph_minimum_spanning_tree_unweighted) 
+	(igraph_minimum_spanning_tree_prim, igraph_closeness)
+	(igraph_shortest_paths, igraph_get_shortest_paths)
+	(igraph_get_all_shortest_paths, igraph_subcomponent)
+	(igraph_betweenness, igraph_edge_betweenness, igraph_pagerank)
+	(igraph_rewire, igraph_subgraph, igraph_simplify)
+	(igraph_transitivity_undirected)
+	* src/structure_generators.c (igraph_lattice)
+	* src/cocitation.c (igraph_cocitation_real) : interruption checks added
+
+	* src/adjlist.c (igraph_i_adjlist_init, igraph_i_adjedgelist_init) :
+	double free bug if error corrected	
+	
 2006-05-28  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/foreign.c (igraph_write_graph_lgl) : attribute handling added

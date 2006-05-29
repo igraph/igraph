@@ -84,6 +84,8 @@ int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_ver
   }
   
   for (node=start_vertex; node<no_of_nodes; node++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
     
     /* estimate Ak */    
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
@@ -246,6 +248,8 @@ int igraph_measure_dynamics_idwindow(const igraph_t *graph,
   
   for (node=0; node<no_of_nodes; node++) {
 
+    IGRAPH_ALLOW_INTERRUPTION();
+
     /* estimate Ak */
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
     if (node>=start_vertex) {
@@ -368,6 +372,8 @@ int igraph_measure_dynamics_idwindow_st(const igraph_t *graph,
   
   for (node=1; node<no_of_nodes; node++) {
     
+    IGRAPH_ALLOW_INTERRUPTION();
+
     /* new node */
     VECTOR(*res)[node] = VECTOR(*res)[node-1] + MATRIX(*ak, 0, 0);
 	
@@ -590,6 +596,8 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_integer_t start_
 
   for (node=start_vertex; node<no_of_nodes; node++) {
     
+    IGRAPH_ALLOW_INTERRUPTION();
+
     /* inspect the edges */
    
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
@@ -710,6 +718,8 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res
   VECTOR(*res)[0]=MATRIX(*akl, 0, 0);
 
   for (node=1; node<no_of_nodes; node++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
     
     /* new node, aging */
     VECTOR(*res)[node] = VECTOR(*res)[node-1] + MATRIX(*akl, 0, 0);
@@ -796,6 +806,8 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *
   igraph_matrix_init(&notnull, maxind+1, agebins);
 
   for (node=0; node<no_of_nodes; node++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
     
     /* inspect the edges */
    
@@ -979,6 +991,8 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_order(etime, &etimeidx, events));
 
   for (timestep=0; timestep<events; timestep++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
 
 /*     fprintf(stderr, "-----------time step %li\n", timestep); */
 
@@ -1192,6 +1206,8 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
   IGRAPH_CHECK(igraph_vector_order(etime, &etimeidx, events));
 
   for (timestep=0; timestep<events; timestep++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
     
     /* add the new nodes, if any */
     while (nptr < no_of_nodes &&

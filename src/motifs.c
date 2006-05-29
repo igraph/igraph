@@ -106,6 +106,8 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 
   for (father=0; father<no_of_nodes; father++) {
     long int level;
+
+    IGRAPH_ALLOW_INTERRUPTION();
     
     /* init G */
     igraph_vector_clear(&vids); level=0;
@@ -280,6 +282,8 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     long int father=VECTOR(sample)[sam];
     long int level, s;
 
+    IGRAPH_ALLOW_INTERRUPTION();
+
     /* init G */
     igraph_vector_clear(&vids); level=0;
     IGRAPH_CHECK(igraph_vector_push_back(&vids, father));
@@ -419,6 +423,8 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 
   for (father=0; father<no_of_nodes; father++) {
     long int level, s;
+
+    IGRAPH_ALLOW_INTERRUPTION();
 
     /* init G */
     igraph_vector_clear(&vids); level=0;
