@@ -24,8 +24,10 @@
 # Convert graphs to human readable forms
 ###################################################################
 
-print.igraph <- function(x, graph.attributes=FALSE,
-                         vertex.attributes=FALSE, edge.attributes=FALSE,
+print.igraph <- function(x,
+                         graph.attributes=igraph.par("print.graph.attributes"),
+                         vertex.attributes=igraph.par("print.vertex.attributes"),
+                         edge.attributes=igraph.par("print.edge.attributes"),
                          ...) {
   
   if (!is.igraph(x)) {

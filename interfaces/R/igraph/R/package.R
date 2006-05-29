@@ -22,6 +22,19 @@
 
 .onLoad <- function(dir, package) {
   library.dynam("igraph", package, dir, local=FALSE);
+
+  ########################
+  # Set default parameters
+  ########################
+
+  # printing attributes
+  igraph.par("print.graph.attributes", FALSE)
+  igraph.par("print.vertex.attributes", FALSE)
+  igraph.par("print.edge.attributes", FALSE)
+
+  # verbosity, progress bars mainly
+  igraph.par("verbose", FALSE)
+  
 }
 
 .Last.lib <- function(libpath) {

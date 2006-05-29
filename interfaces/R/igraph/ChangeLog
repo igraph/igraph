@@ -1,3 +1,14 @@
+2006-05-29  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/par.R (igraph.par) : slightly different
+	return values	
+	* interfaces/R/igraph/R/layout.R (layout.fruchterman.reingold)
+	(layout.fruchterman.reingold.grid, layout.kamada.kawai)
+	(layout.merge) : updated verbose argument
+	* interfaces/R/igraph/R/package.R (.onLoad) : added default parameters
+	* interfaces/R/igraph/R/print.R (print.igraph) : updated attribute
+	printing, it is based on parameters now
+
 2006-05-28  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/foreign.R (write.graph.lgl) : bug corrected

@@ -109,3 +109,7 @@ export(graph.isoclass, graph.isomorphic, graph.motifs,
 export(graph.disjoint.union, "%du%", graph.intersection, "%s%",
        graph.union, "%u%", graph.difference, "%m%",
        graph.complementer, graph.compose, "%c%")
+
+# parameters, config
+
+export(igraph.par)

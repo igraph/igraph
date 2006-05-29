@@ -26,9 +26,9 @@ igraph.par <- function(parid, parvalue=NULL) {
 
   if (is.null(parvalue)) {
     res <- igraph.pars[[parid]]
+    res
   } else {
     igraph.pars[[parid]] <- parvalue
-    res <- TRUE
+    invisible(parvalue)
   }
-  res
 }

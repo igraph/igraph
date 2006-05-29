@@ -56,7 +56,8 @@ layout.sphere <- function(graph, params) {
 }
 
 layout.fruchterman.reingold <- function(graph, ..., dim=2,
-                                        verbose=FALSE, params=list()) {
+                                        verbose=igraph.par("verbose"),
+                                        params=list()) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -88,7 +89,8 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
 }
 
 layout.fruchterman.reingold.grid <- function(graph, ...,
-                                             verbose=FALSE, params=list()) {
+                                             verbose=igraph.par("verbose"),
+                                             params=list()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -118,7 +120,7 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
 
 # FROM SNA 0.5
 
-layout.kamada.kawai<-function(graph, ..., dim=2, verbose=FALSE,
+layout.kamada.kawai<-function(graph, ..., dim=2, verbose=igraph.par("verbose"),
                               params=list()) {
 
   if (!is.igraph(graph)) {
@@ -175,7 +177,8 @@ layout.lgl <- function(graph, ..., params=list()) {
         PACKAGE="igraph")
 }
 
-layout.merge <- function(graphs, layouts, method="dla", verbose=FALSE) {
+layout.merge <- function(graphs, layouts, method="dla",
+                         verbose=igraph.par("verbose")) {
 
   if (!all(sapply(graph, is.graph))) {
     stop("Not a graph object")
