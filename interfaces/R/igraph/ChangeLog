@@ -1,3 +1,8 @@
+2006-05-28  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/foreign.R (write.graph.lgl) : bug corrected
+	* interfaces/R/igraph/R/foreign.R (write.graph) : lgl format added
+
 2006-05-27  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/structural.properties.R (graph.laplacian) :

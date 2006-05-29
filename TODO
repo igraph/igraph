@@ -11,7 +11,6 @@ o uniform graph operators (union, intersection, etc...)
 o merging layouts properly, multicompartmental layout functions
 o make CTRL+C work in R
 o better random number generator handling (init with seed, etc...)
-o rewrite iterators
 o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions
 o get non-structural info from Pajek files

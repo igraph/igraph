@@ -107,6 +107,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
 #                "pajek"=write.graph.pajek(graph, file, ...),
                 "edgelist"=write.graph.edgelist(graph, file, ...),
                 "ncol"=write.graph.ncol(graph, file, ...),
+                "lgl"=write.graph.lgl(graph, file, ...),
                 stop(paste("Unknown file format:",format))
                 )
 
@@ -181,7 +182,7 @@ write.graph.lgl <- function(graph, file,
   if (length(names)==0 || ! names %in% list.vertex.attributes(graph)) { names <- NULL }
   if (length(weights)==0 || ! weights %in% list.edge.attributes(graph)) { weights <- NULL }
   
-  .Call("R_igraph_write_graph_lgl", graph,
+  .Call("R_igraph_write_graph_lgl", graph, file,
         names, weights, as.logical(isolates),
         PACKAGE="igraph")
 }  
