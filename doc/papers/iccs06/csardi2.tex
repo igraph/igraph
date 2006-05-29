@@ -1,0 +1,192 @@
+\documentclass[twoside]{book}% Specify document type
+\usepackage{graphicx}           % Load macros for PostScript figures
+\usepackage{url}
+\input ICCSsty.tex              % Load style for Complex Systems '97
+
+%---------------------------------------------------------
+% Give data to appear in the title section
+
+ \shtitle{The igraph software package for complex network research}
+ \title{The igraph software package for complex network research}
+ \author{%
+   G\'abor Cs\'ardi\affil{Center for Complex Systems Studies,
+     Kalamazoo College, Kalamazoo, MI, USA \\
+     and \\
+     Department of Biophysics, KFKI Research Institute for Particle
+     and Nuclear Physics of the Hungarian Academy of Sciences,
+     Budapest, Hungary\\csardi@kzoo.edu} 
+   
+   Tam\'as Nepusz\affil{Department of Biophysics, KFKI Research
+     Institute for Particle and Nuclear Physics of the Hungarian
+     Academy of Sciences, Budapest, Hungary\\ntamas@rmki.kfki.hu}
+ }
+\date{May 10, 2006}
+\abstract{The igraph software package provides handy tools for
+  researchers in network science. It is an open source portable
+  library capable of handling huge graphs with millions of vertices
+  and edges and it is also suitable to grid computing. It contains
+  routines for creating, manipulating and visualizing networks,
+  calculating various structural properties, importing from and
+  exporting to various file formats and many more. Via its interfaces
+  to high-level languages like GNU R and Python it supports rapid
+  development and fast prototyping.
+}
+
+%---------------------------------------------------------
+% Here is the document
+
+\begin{document}           % Matched by \end{document}
+\maketitle                 % Typeset the title section
+                           
+\section{Introduction}
+
+This paper does not present results of scientific research, but
+introduces a software package which gives handy tools into the hands
+of researchers doing network science. The authors strongly believe
+that the tools scientists use are important because that they
+can increase productivity by several factors and thereby enhance
+scientific progress. 
+
+\subsection{Why another network analysis package?}
+
+The igraph library was developed because of the lack of network
+analysis software which (1)~can handle large graphs efficiently,
+(2)~is embeddable into a higher level program or programming language
+(like Python, Perl or GNU R) and (3) can be used both interactively
+and non-interactively.
+
+The capability of handling large graphs was important because the
+authors were confronted with graphs with millions of vertices and edges. 
+
+Embedding igraph into Python or GNU R creates a very productive
+research environment, well suitable for rapid development. All the
+expressing power of GNU R (or other higher level languange) is readily
+available in a convenient integrated environment for generating,
+manipualing and measuring graphs, and evaluating these measurements.
+
+Interactive means of software usage is nowadays considered as superior
+to non-interactive interfaces, which is very true for most
+cases. Dealing with large graphs can be different though, if it takes
+three month to calculate the diameter of a graph, nobody wants that to
+be interactive.
+
+\section{Features}
+
+In the addition to the three goal features in the previous section
+others showed up as a side-effect. Let us discuss all features here.
+
+\paragraph{Open source.} Igraph is open source, it is free for
+non-commercial or commercial use and distributed according to the GNU
+General Public License. Beeing open source means that in addition to
+the binary format of the program the user can
+always get the source code format enabling additions and corrections.
+This is a very important feature for the users. How many times did you
+find a piece of software which was perfect for your (or your
+company's) needs except for some small tidbits. With open source
+software you can add or correct these deficiencies or hire somebody to
+this for your, with closed source software this is impossible.
+
+\paragraph{Efficient implementation.} Igraph uses space and time
+efficient data structures and implements the current state-of-the-art
+algorithms. All igraph functions are carefully profiled to create the
+fastest implementation possible.
+
+\paragraph{Portability.} The library is written in ANSI~C it is thus
+portable to most platforms, it is tested on different Linux flavours,
+Mac OSX, MS Windows, and Sun OS. The R and Python interfaces are also
+portable to many architectures.
+
+\paragraph{Layered architecture.} The igraph library has a layered
+architecture, the three layers are connected through well defined
+interfaces. Each layer can be replaced with an alternate
+implementation without changing the other components. See the details
+in~\sect{arch}.
+
+\paragraph{Open, embeddable system.} The core igraph library is an
+open system, it can be embedded into higher level languages or
+programs, the current distribution contains interfaces to two high
+level languages: GNU R and Python.
+
+\paragraph{High level operations.} The higher level interfaces provide
+abstract, high level operations and data types. These support rapid
+program development, see~\sect{fast} for an example.
+
+\paragraph{Documentation.} The C library is very well documented, the
+documentation is available is various forms supporting both online
+browsing and printing. For each function its time requirements are
+documented.
+
+\paragraph{Drawbacks.} The library lacks functionality in some areas
+compared to other network analysis packages. One such area is graph
+visualization, another one is various social network analysis methods
+like blockmodeling, p$^{*}$ methods, etc. Note that this piece of
+software is heavily under development, so expect much more
+functionality in the near future. Igraph also does not have a
+graphical user interface.
+
+\section{Example applications}
+
+\subsection{Grid computing}
+
+\subsection{Fast prototyping}\sectlabel{fast}
+
+\section{The igraph architecture}\sectlabel{arch}
+
+\section{Current functionality}
+
+Please note that new functionality is added to the library almost each
+day, so check the igraph homepage at
+\url{http://cneurocvs.rmki.kfki.hu/igraph} if you cannot see here the
+algorithms or measures you're looking for. 
+
+\paragraph{Graph generation} Igraph can generate various regular and
+random graphs: $\bullet$ regular structures: star, ring and full
+graphs, circular and non-circular lattices with any number of
+dimensions, regular trees $\bullet$ graphs based on Barab\'asi's
+preferential attachment model \cite{barabasi99a}, also with nonlinear
+attachment exponent and various variation $\bullet$ Random
+(Erd\H{o}s-R\'enyi) graphs, both $G(n,p)$ and $G(n,m)$ types, directed
+and undirected ones $\bullet$ graphs having a given degree sequence,
+directed or undirected ones $\bullet$ growing random graphs, also for
+modeling citation networks $\bullet$ growing random graphs where the
+connection probability depends on some vertex properties $\bullet$
+graphs from the Graph Atlas $\bullet$ all non-isomorphic graphs of a
+given size.
+
+\paragraph{Centrality measures} The following centraility measures can
+be calculated: $\bullet$ degree $\bullet$ closeness $\bullet$
+vertex and edge betweenness $\bullet$ eigenvector centrality $\bullet$
+page rank.
+
+\paragraph{Path length based properties} One or all shortest paths
+between vertices can be calculated, and also based on this the
+diameter and the average path length of the graph.
+
+\paragraph{Graph components} Weakly and strongly connected components
+can be calculated, and also the minimum spanning forest of a graph.
+
+\paragraph{Graph motifs} Graph motifs of three or four components can
+be calculated, both undirected and directed motifs.
+
+\paragraph{Vertex and edge sets} Igraph provides a simple way to
+manipulate subsets of vertices and/or edges of a graph,
+see~\sect{fast} for an example. 
+
+\paragraph{Vertex and edge attributes} Numeric or non-numeric
+attributes can be assigned to the vertices and edges of a graph, and
+queried and set by using a simple notation, see~\sect{fast}. 
+
+\paragraph{File formats} Igraph can read and write various simple edge
+list files and also Pajek and GraphML files.
+
+\paragraph{Graph layouts} The following layout generators are part of
+igraph: $\bullet$ simple circle and sphere layouts, random layouts
+$\bullet$ Fruchterman-Reingold layout, 2D and 3D $\bullet$
+Kamada-Kawai layout, 2D and 3D $bullet$ spring embedder layout
+$\bullet$ LGL layout generator for large graphs $\bullet$ Grid-based
+Fruchterman-Reingold layout for large graphs $\bullet$
+Reingold-Tilford layout for trees.
+
+\bibliography{net}
+
+\end{document}
