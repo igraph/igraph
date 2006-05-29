@@ -3,7 +3,6 @@ Needed for 0.2:
 
 o document bison requirements
 o repair simplify
-o Laplacian of a graph, in R only
 o attribute handling for operators
 o add references to SNA, paper by Carter
 o for almost all functions: add progress handlers and allow
@@ -26,6 +25,9 @@ o edge seq argument to delete_edges
 Other bits:
 
 o eccentricity
+o bi-connected components (or k connected component), articulations points,
+  cliques, k-cores
+o connectedness, efficiency, hierarchy, lubness
 
 o topological equaivalence of graphs (hard)
 o make possible building in separate directory (make check, r package,
