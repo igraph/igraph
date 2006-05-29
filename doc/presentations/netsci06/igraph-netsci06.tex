@@ -1,0 +1,130 @@
+\documentclass[landscape,20pt]{foils}
+
+\usepackage{ae}
+\usepackage{hyperref}
+\usepackage{thumbpdf}
+\usepackage[margin=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{multicol}
+\usepackage[document]{ragged2e}
+\usepackage{pause}
+\usepackage{amstext}
+\usepackage{amsmath}
+
+\newcommand{\tit}[1]{{\centering\Large #1\par\vspace*{10pt}\hrule}}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\dd}{\mathrm{d}}
+
+\setlength{\columnsep}{0.5cm}
+\setlength{\columnseprule}{0.4pt}
+
+\newcommand{\pdflaunch}[1] {\pdfpageattr{/AA << /O << /S /Launch /F (#1) >>>>}}
+\newcommand{\pdflaunchlink}[2]{%
+      \pdfstartlink attr{/Border [0 0 0]} user{/Subtype /Link /A << %
+        /S /Launch /F (#1) >>}%
+      \pdfliteral{0 1 0 0 k}%  
+      {#2}\pdfliteral{0 0 0 1 k}\pdfendlink%
+      }
+
+%\renewcommand{\pause}{\relax}
+
+\renewcommand{\emph}[1]{\textcolor{red}{\bf #1}}
+
+\begin{document}
+
+\MyLogo{The \texttt{igraph} library -- NetSci 2006 conference}
+
+%%%%%%%%%%%%%%%%%%%%%% TITLEPAGE
+
+\mbox{}\vfill
+\begin{center}
+\LARGE
+The \texttt{igraph} network analysis library\\[10pt]
+\normalsize
+\url{http://cneurocvs.rmki.kfki.hu/igraph}
+\par
+\large
+G\'abor Cs\'ardi
+\par
+\normalsize 
+Center for Complex Systems Studies, Kalamazoo College,\\
+Department of Biophysics, KFKI Research Institute for Particle and
+Nuclear Physics, Budapest, Hungary
+\end{center}
+\vfill
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%% 
+
+\tit{Why another network analysis library/program?}
+
+I needed something
+\begin{itemize}
+\item for \emph{large} data sets. Millions of nodes and vertices.
+\item \emph{fast}.
+\item open, \emph{embeddable} into another program/higher level
+  language for productivity.
+\item non-interactive \emph{and} interactive.
+\end{itemize}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%% 
+
+\tit{Other features}
+
+(I don't really need them but it turned out that we have them.)
+\begin{itemize}
+\item Documentation. 
+\item Portability.
+\item Layered architecture.
+\item Open source.
+\end{itemize}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%% 
+
+\tit{What is \texttt{igraph}?}
+\vfill
+
+\begin{center}
+\includegraphics[width=.6\textwidth]{arch}
+\end{center}
+\vfill
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%% 
+
+\tit{Case study one: ``grid'' computation}
+
+\begin{center}
+\includegraphics[width=.6\textwidth]{grid1}
+\end{center}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%% 
+
+\tit{Case study one: ``grid'' computation}
+
+\begin{center}
+\includegraphics[width=.6\textwidth]{grid2}
+\end{center}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%% 
+
+\tit{Case study two: live demo}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%% 
+
+\tit{To get it}
+
+\vfill
+\begin{center}
+\Large
+\url{http://cneurocvs.rmki.kfki.hu/igraph}
+\end{center}
+\vfill
+
+\end{document}
