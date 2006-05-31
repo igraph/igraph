@@ -20,12 +20,15 @@ g <- graph(directed=FALSE,
            28,31,28,33,29,32,29,33,30,32,30,33,31,32,31,33,
            32,33))
 
+g <- read.graph("http://localhost/~csardi/karate.net", format="pajek")
+
 ######################### Implement Newman's algorithm
 
 community.newman <- function(g) {
   A <- get.adjacency(g)
   deg <- degree(g)
-  P <- outer(deg, deg, function(x,y) x*y / mean(deg) )
+  ec <- ecount(g)
+  P <- outer(deg, deg, function(x,y) x*y / 2 /ec )
   B <- A - P
   diag(B) <- 0
 
@@ -36,11 +39,9 @@ community.newman <- function(g) {
 
 mem <- community.newman(g)
 
-color <- rep("green", vcount(g))
-color[mem<0] <- "grey"
+V(g)$color <- ifelse(mem < 0, "grey", "green")
 
-pdf("p2.pdf")
-plot(g, layout=layout.kamada.kawai, vertex.color=color)
+plot(g, layout=layout.kamada.kawai, vertex.color="a:color")
 
 ######################## Vertex sizes
 
@@ -51,10 +52,12 @@ scale <- function(v, a, b) {
   v+a
 }
 
-vsize <- scale(abs(mem), 15, 25)
+V(g)$size <- scale(abs(mem), 15, 25)
+E(g)$color <- "grey"
+E(g)[ V(g)[color=="grey"] %--% V(g)[color=="green"] ]$color <- "red"
 
-pdf(file="p1.pdf")
-plot(g, layout=layout.kamada.kawai, vertex.color=color, vertex.size=vsize)
+tkplot(g, layout=layout.kamada.kawai, vertex.color="a:color",
+       vertex.size="a:size", edge.color="a:color")
 
 ####################### A large graph
 

@@ -1,7 +1,16 @@
 \documentclass[twoside]{book}% Specify document type
 \usepackage{graphicx}           % Load macros for PostScript figures
 \usepackage{url}
+\usepackage{psfrag}
+\usepackage{fancyvrb}
 \input ICCSsty.tex              % Load style for Complex Systems '97
+
+\newcommand{\figfigure}[2]{%
+  \begin{psfrags}
+  \input #2.eps_t
+  \includegraphics[width=#1]{#2.eps}
+  \end{psfrags}
+}
 
 %---------------------------------------------------------
 % Give data to appear in the title section
@@ -55,7 +64,7 @@ scientific progress.
 
 The igraph library was developed because of the lack of network
 analysis software which (1)~can handle large graphs efficiently,
-(2)~is embeddable into a higher level program or programming language
+(2)~can be embedded into a higher level program or programming language
 (like Python, Perl or GNU R) and (3) can be used both interactively
 and non-interactively.
 
@@ -63,7 +72,7 @@ The capability of handling large graphs was important because the
 authors were confronted with graphs with millions of vertices and edges. 
 
 Embedding igraph into Python or GNU R creates a very productive
-research environment, well suitable for rapid development. All the
+research environment, well suited for rapid development. All the
 expressing power of GNU R (or other higher level languange) is readily
 available in a convenient integrated environment for generating,
 manipulating and measuring graphs, and evaluating these measurements.
@@ -84,11 +93,10 @@ non-commercial or commercial use and distributed according to the GNU
 General Public License. Being open source means that in addition to
 the binary format of the program, the user can
 always get the source code format enabling additions and corrections.
-This is a very important feature for the users. How many times did you
-find a piece of software which was perfect for your (or your
-company's) needs, except for some small tidbits? With open source
-software, you can add or correct these deficiencies or hire somebody to
-do this for you. With closed source software this is impossible.
+This is a very important feature for the users. With open source
+software, you can add new functionality and correct deficiencies or
+hire somebody to do this for you. With closed source software this is
+impossible. 
 
 \paragraph{Efficient implementation.} Igraph uses space and time
 efficient data structures and implements the current state-of-the-art
@@ -96,7 +104,7 @@ algorithms. All igraph functions are carefully profiled to create the
 fastest implementation possible.
 
 \paragraph{Portability.} The library is written in ANSI~C, it is thus
-portable to most platforms. It is tested on different Linux flavours,
+portable to most platforms. It is tested on different Linux flavors,
 Mac OS X, MS Windows and Sun OS. The R and Python interfaces are also
 portable to many architectures.
 
@@ -112,34 +120,146 @@ programs. The current distribution contains interfaces to two high
 level languages: GNU R and Python.
 
 \paragraph{High level operations.} The higher level interfaces provide
-abstract, high level operations and data types. These support rapid
+abstract operations and data types. These support rapid
 program development, see~\sect{fast} for an example.
 
 \paragraph{Documentation.} The C library is very well documented, the
-documentation is available in various forms supporting both online
+documentation is available in various formats supporting both online
 browsing and printing. For each function its time requirements are
 documented.
 
 \paragraph{Drawbacks.} The library lacks functionality in some areas
 compared to other network analysis packages. One such area is graph
 visualization, another one is various social network analysis methods
-like blockmodeling, p$^{*}$ methods, etc. Note that this piece of
+like block-modeling, p$^{*}$ methods, etc. Note that this piece of
 software is heavily under development, so expect much more
 functionality in the near future. Igraph also does not have a
 graphical user interface, but a Python-based GUI is under development
-and will be available for download soon.
+and will be available for download soon and the R interface also
+provides a facility for visual manipulation of small graphs.
 
 \section{Example applications}
 
 \subsection{Grid computing}
 
-\subsection{Fast prototyping}\sectlabel{fast}
+In this section we give an example for using the igraph library
+for large scale computation. The task presented here is to calculate
+the diameter of the US patent citation network. In this network the
+nodes are US patents granted between 1963 and 2000 and two patents are
+connected if one cites the other. The largest component of the network
+contains more than 3~million nodes and 15~million edges. The
+(undirected) diameter of a network is the largest undirected shortest
+path connecting two vertices. 
+
+For calculating the diameter of a graph you need to calculate the
+length of the shortest path between all possible pairs of nodes, so
+this is computationally very expensive. We used the following approach
+with igraph. 
+
+First we wrote a simple program in C which downloads the data set from
+a web server and then starts calculating the shortest paths from a
+given source node to all other nodes in the network by using
+Dijkstra's algorithm \cite{dijkstra59} implemented in the igraph
+library. We will call this program the \emph{worker}. 
+
+The worker downloads the id of the source node from a second web
+server. This web server simply gives a different source node id every
+time one is requested by the workers. As soon as the worker has
+finished with the calculation of the shortest paths to all nodes it
+stores the result on a third web server and asks the second web-server
+for a new source node id, etc. The architecture of the system can be
+seen in 
+\fig{grid}. 
+
+\begin{figure}
+\centering
+\figfigure{0.75\textwidth}{grid2}
+\caption{The architecture of the system used for calculating the
+  diameter of a large graph. A worker node (1) downloads the network
+  data from the data web-server, then (2) it requests a source vertex
+  id from the task web-server, (3) calculates the shortest paths from
+  that source vertex and (4) stores the result on the task
+  web-server. Then a new source vertex id is requested, etc.}
+\figlabel{grid}
+\end{figure}
+
+This system is very robust in the sense that there is no single point
+of failure. The workers can be run in any grid-based environment from
+which they can access the WWW. They can be run on different platforms
+as well.
+
+\subsection{Fast prototyping, rapid development}\sectlabel{fast}
+
+\paragraph{Newman's community finding algorithm}
+The second example we present is very different from the first. Here
+we will use the GNU R interface to the igraph library to implement
+and apply Newman's spectral community finding algorithm
+\cite{newman06}.
+First we load the igraph package into R and download the Zachary
+Karate-club network data \cite{zachary77} from the web.
+\begin{Verbatim}[fontsize=\small,numbers=left]
+library(igraph)
+g <- read.graph("http://geza.kzoo.edu/~csardi/karate.net", format="pajek")
+\end{Verbatim}
+
+Now we implement the community finding algorithm.
+\begin{Verbatim}[fontsize=\small,numbers=left,firstnumber=last]
+community.newman <- function(g) {
+  deg <- degree(g)
+  ec <- ecount(g)
+  B <- get.adjacency(g) - outer(deg, deg, function(x,y) x*y/2/ec)
+  diag(B) <- 0
+  eigen(B)$vectors[,1]
+}
+\end{Verbatim}
+This algorithm creates a modularity matrix which is the difference of
+the adjacency matrix of the graph and the null-model matrix. The
+latter contains the probabilities that two nodes are connected in a
+random graph if the
+degrees of the nodes are given. Then the network is divided into two
+communities based on the eigenvector associated with the largest
+positive eigenvalue of the modularity matrix: all vertices having the
+same sign in this eigenvector belong to the same community.
+
+Now we are ready to apply this algorithm to the Karate-club data and 
+set the color of the vertices based on their communities.
+\begin{Verbatim}[fontsize=\small,numbers=left,firstnumber=last]
+mem <- community.newman(g)
+V(g)$color <- ifelse(mem < 0, "grey", "green")
+\end{Verbatim}
+           
+We also set the size of the vertices based on the first eigenvector,
+the farther this value is from zero the more the given vertex is in
+the \emph{core} of the community. We also set the color of the edges
+across the two communities to red.
+\begin{Verbatim}[fontsize=\small,numbers=left,firstnumber=last]
+scale <- function(v, a, b) {
+  v <- v-min(v) ; v <- v/max(v) ; v <- v * (b-a) ; v+a
+}
+V(g)$size <- scale(abs(mem), 15, 25)
+E(g)$color <- "grey"
+E(g)[ V(g)[color=="grey"] %--% V(g)[color=="green"] ]$color <- "red"
+plot(g, layout=layout.kamada.kawai, vertex.color="a:color",
+       vertex.size="a:size", edge.color="a:color")
+\end{Verbatim}
+See the resulting plot in \fig{karate}.
+
+\begin{figure}[t]
+\centering
+\figfigure{0.65\textwidth}{karate}
+\caption{The two communities identified correctly in the Zachary
+  karate-club network. The size of the vertices is proportional to
+  the absolute value of their coordinate in the first eigenvector and
+  expresses how strongly they belong to a community. All edges across the
+  two communities are painted red.}
+\figlabel{karate}
+\end{figure}
 
 \paragraph{PageRank algorithm in 19 lines} Using the Python interface
 of igraph, one can easily create a prototype of the original PageRank
 algorithm in only 19 lines of code (not counting empty lines):
 
-\begin{verbatim}
+\begin{Verbatim}[fontsize=\small,numbers=left]
 from igraph import *
 from copy import copy
 
@@ -163,14 +283,35 @@ def pagerank(g, damping=0.85, epsilon=0.001, iters=100):
         pageranks = copy(newprs)
 	
     return pageranks
-\end{verbatim}
+\end{Verbatim}
 
 \section{The igraph architecture}\sectlabel{arch}
 
+The igraph system has a layered architecture consisting three
+layers. The lowest layer contains the very basic operations only, and
+is implemented in C. It is only this layer which can manipulate the
+internal igraph data structures directly. This means that this layer
+can be easily replaced with and alternate graph representation if
+needed.
+
+The second layer contains almost all network analysis functions, this
+is also implemented in C. 
+
+The third layer contains the higher level interfaces, so far
+interfaces to GNU R and Python are implemented.
+
+\begin{figure}
+\centering
+\figfigure{0.6\textwidth}{arch}
+\caption{The architecture of the igraph system. See the text for a
+  description. }
+\figlabel{arch}
+\end{figure}
+
 \section{Current functionality}
 
-Please note that new functionality is added to the library almost every
-day, so check the igraph homepage at
+Please note that new functionality is added to the library every
+week, so check the igraph homepage at
 \url{http://cneurocvs.rmki.kfki.hu/igraph} if you cannot see here the
 algorithms or measures you're looking for. 
 
@@ -180,18 +321,19 @@ graphs, circular and non-circular lattices with any number of
 dimensions, regular trees $\bullet$ graphs based on Barab\'asi's
 preferential attachment model \cite{barabasi99a}, also with nonlinear
 attachment exponent and various variations $\bullet$ Random
-(Erd\H{o}s-R\'enyi) graphs, both $G(n,p)$ and $G(n,m)$ types, directed
-and undirected ones $\bullet$ graphs having a given degree sequence,
-directed or undirected ones $\bullet$ growing random graphs, also for
-modeling citation networks $\bullet$ growing random graphs where the
-connection probability depends on some vertex properties $\bullet$
-graphs from the Graph Atlas \cite{read98} $\bullet$ all
-non-isomorphic graphs of a given size.
+(Erd\H{o}s-R\'enyi) graphs, both $G(n,p)$ and $G(n,m)$ types
+\cite{erdos59}, directed and undirected ones $\bullet$ graphs having a
+given degree sequence, directed or undirected ones \cite{newman01}
+$\bullet$ growing random graphs, also for modeling citation networks
+\cite{callaway01} $\bullet$ growing random graphs where the connection
+probability depends on some vertex properties $\bullet$ graphs from
+the Graph Atlas \cite{read98} $\bullet$ all non-isomorphic graphs of a
+given size. 
 
-\paragraph{Centrality measures} The following centrality measures can
-be calculated: $\bullet$ degree $\bullet$ closeness $\bullet$
-vertex and edge betweenness $\bullet$ eigenvector centrality $\bullet$
-page rank \cite{page98}.
+\paragraph{Centrality measures} The following centrality measures
+\cite{freeman79} can be calculated: $\bullet$ degree $\bullet$
+closeness $\bullet$ vertex and edge betweenness $\bullet$ eigenvector
+centrality $\bullet$ page rank \cite{page98}.
 
 \paragraph{Path length based properties} One or all shortest paths
 between vertices can be calculated, and also based on this the
@@ -201,7 +343,7 @@ diameter and the average path length of the graph.
 can be calculated, and also the minimum spanning forest of a graph.
 
 \paragraph{Graph motifs} Graph motifs of three or four components can
-be calculated, both undirected and directed motifs.
+be calculated, both undirected and directed motifs \cite{wernicke06}. 
 
 \paragraph{Random rewiring} Existing graphs can be rewired randomly
 while preserving their degree distribution, allowing the user to
@@ -215,16 +357,16 @@ see~\sect{fast} for an example.
 attributes can be assigned to the vertices and edges of a graph, and
 queried and set by using a simple notation, see~\sect{fast}. 
 
-\paragraph{File formats} Igraph can read and write various simple edge
-list files and also Pajek and GraphML files.
+\paragraph{File formats} Igraph can read and write simple edge
+list files and also Pajek \cite{nooy05} and GraphML \cite{brandes01} files.
 
 \paragraph{Graph layouts} The following layout generators are part of
 igraph: $\bullet$ simple circle and sphere layouts, random layouts
-$\bullet$ Fruchterman-Reingold layout, 2D and 3D $\bullet$
-Kamada-Kawai layout, 2D and 3D $bullet$ spring embedder layout
-$\bullet$ LGL layout generator for large graphs $\bullet$ Grid-based
-Fruchterman-Reingold layout for large graphs $\bullet$
-Reingold-Tilford layout for trees.
+$\bullet$ Fruchterman-Reingold layout, 2D and 3D \cite{fruchterman91} $\bullet$
+Kamada-Kawai layout, 2D and 3D \cite{kamada89} $\bullet$ spring embedder layout
+$\bullet$ LGL layout generator for large graphs \cite{adai04}
+$\bullet$ Grid-based Fruchterman-Reingold layout for large graphs
+$\bullet$ Reingold-Tilford layout \cite{reingold81} for trees.
 
 \bibliography{net}
 
