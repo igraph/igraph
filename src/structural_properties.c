@@ -2017,7 +2017,8 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
   }
 
   Free(neis);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_i_adjlist_destroy(&allneis);
+  IGRAPH_FINALLY_CLEAN(2);
 
   VECTOR(*res)[0] = triangles/triples;
 
