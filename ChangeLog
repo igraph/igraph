@@ -1,3 +1,13 @@
+2006-05-31  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/graphobject.c (igraphmodule_Graph_transitivity,
+	igraphmodule_Graph_Lattice) : added
+	* interfaces/python/igraphmodule.c : added some attribute handling
+	functions
+	* interfaces/python/convert.c (igraphmodule_PyList_to_strvector_t) :
+	added
+	* interfaces/python/test.py : added test cases
+	
 2006-05-29  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/interrupt.h (IGRAPH_ALLOW_INTERRUPTION) : eliminate function

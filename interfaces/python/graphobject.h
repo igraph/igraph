@@ -76,6 +76,7 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type, PyObject *args, PyObje
 PyObject* igraphmodule_Graph_Erdos_Renyi(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Full(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Growing_Random(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Star(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Ring(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Tree(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -102,6 +103,7 @@ PyObject* igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject *self, PyObj
 PyObject* igraphmodule_Graph_simplify(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_subcomponent(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_transitivity(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_layout_circle(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_sphere(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -359,10 +361,20 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   },
   
   // interface to igraph_lattice
-  {"Lattice", (PyCFunction)igraphmodule_unimplemented,
+  {"Lattice", (PyCFunction)igraphmodule_Graph_Lattice,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Generates a lattice. This function is yet unimplemented.\n\n"
-      "Throws a NotImplementedError."
+      "Generates a regular lattice.\n\n"
+      "Keyword arguments:\n"
+      "dim      -- List with the dimensions of the lattice\n"
+      "nei      -- Value giving the distance (number of steps) within which\n"
+      "            two vertices will be connected. Not implemented yet. Optional,\n"
+      "            defaults to 1.\n"
+      "directed -- Whether to create a directed graph. Optional,\n"
+      "            defaults to False.\n"
+      "mutual   -- Whether to create all connections as mutual in case of a\n"
+      "            directed graph. Optional, defaults to True.\n"
+      "circular -- Whether the generated lattice is periodic. Optional,\n"
+      "            defaults to True.\n"
   },
   
   // interface to igraph_ring
@@ -675,6 +687,12 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Returns a subgraph based on the given vertices.\n\n"
       "Keyword arguments:\n"
       "vertices -- a list containing the vertex IDs which should be included in the result.\n"
+  },
+  
+  // interface to igraph_transitivity
+  {"transitivity", (PyCFunction)igraphmodule_Graph_transitivity,
+      METH_VARARGS | METH_KEYWORDS,
+      "Returns the transitivity (clustering coefficient) of the graph."
   },
   
   //////////////////////

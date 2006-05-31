@@ -81,8 +81,7 @@ PyObject* igraphmodule_Graph_new(PyTypeObject *type, PyObject *args,
 				 PyObject *kwds) {
   igraphmodule_GraphObject *self;
 
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   /* don't need it, the constructor will do it */
@@ -90,7 +89,6 @@ PyObject* igraphmodule_Graph_new(PyTypeObject *type, PyObject *args,
     igraph_empty(&self->g, 1, 0);
   }*/
   igraphmodule_Graph_init_internal(self);
-  PyObject_GC_Track(self);
   
   return (PyObject*)self;
 }
@@ -1000,6 +998,70 @@ PyObject* igraphmodule_Graph_Star(PyTypeObject *type,
     }
   }
    
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a regular lattice
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_lattice
+ */
+PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type,
+				     PyObject *args,
+				     PyObject *kwds) {
+  igraph_vector_t dimvector;
+  long nei=1, ndims, i;
+  igraph_bool_t directed;
+  igraph_bool_t mutual;
+  igraph_bool_t circular;
+  PyObject *o_directed=Py_False, *o_mutual=Py_True, *o_circular=Py_True;
+  PyObject *o_dimvector=Py_None, *o;
+  igraphmodule_GraphObject *self;
+  
+  char *kwlist[] = {"dim", "nei", "directed", "mutual", "circular", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|lOOO", kwlist,
+				   &PyList_Type, &o_dimvector,
+				   &nei, &o_directed, &o_mutual, &o_circular))
+    return NULL;
+
+  directed=PyObject_IsTrue(o_directed);
+  mutual=PyObject_IsTrue(o_mutual);
+  circular=PyObject_IsTrue(o_circular);
+
+  ndims=PyList_Size(o_dimvector);
+  igraph_vector_init(&dimvector, ndims);
+  for (i=0; i<ndims; i++) {
+    o=PyList_GetItem(o_dimvector, i);
+    if (o) {
+      if (PyInt_Check(o))
+	VECTOR(dimvector)[i] = (igraph_integer_t)PyInt_AsLong(o);
+      else {
+	PyErr_SetString(PyExc_TypeError, "Dimension list must contain integers");
+	igraph_vector_destroy(&dimvector);
+	return NULL;
+      }
+    } else {
+      igraph_vector_destroy(&dimvector);
+      return NULL;
+    }
+  }
+	
+  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						    type);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_lattice(&self->g, &dimvector, nei, directed, mutual, circular)) {
+      igraph_vector_destroy(&dimvector);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+   
+  igraph_vector_destroy(&dimvector);
+  
   return (PyObject*)self;
 }
 
@@ -2100,6 +2162,40 @@ PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self,
   igraph_vector_destroy(&vertices);
   
   return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the graph transitivity (a.k.a. clustering coefficient)
+ * \return the clustering coefficient
+ * \sa igraph_transitivity
+ */
+PyObject* igraphmodule_Graph_transitivity(igraphmodule_GraphObject *self,
+					  PyObject *args,
+					  PyObject *kwds) {
+  char *kwlist[] = {"type", NULL};
+  igraph_transitivity_type_t type = IGRAPH_TRANSITIVITY_UNDIRECTED;
+  igraph_vector_t result;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &type))
+    return NULL;
+
+  igraph_vector_init(&result, 1);
+  
+  if (igraph_transitivity(&self->g, &result, type)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  if (type == IGRAPH_TRANSITIVITY_UNDIRECTED) {
+    PyObject *r = Py_BuildValue("d", (double)(VECTOR(result)[0]));
+    igraph_vector_destroy(&result);
+    return r;
+  }
+  
+  igraph_vector_destroy(&result);
+  Py_INCREF(Py_None);
+  return Py_None;
 }
 
 /** \ingroup python_interface_graph
@@ -3388,7 +3484,7 @@ PyNumberMethods igraphmodule_Graph_as_number = {
  * Python type object referencing the methods Python calls when it performs various operations on an igraph (creating, printing and so on)
  */
 PyTypeObject igraphmodule_GraphType = {
-  PyObject_HEAD_INIT(&PyType_Type)
+  PyObject_HEAD_INIT(NULL)
   0,                                        /* ob_size */
   "igraph.Graph",                           /* tp_name */
   sizeof(igraphmodule_GraphObject),         /* tp_basicsize */
@@ -3424,8 +3520,8 @@ PyTypeObject igraphmodule_GraphType = {
   0,                                        /* tp_descr_get */
   0,                                        /* tp_descr_set */
   0,                                        /* tp_dictoffset */
-  0,                                        /* tp_init */
+  (initproc)igraphmodule_Graph_init,        /* tp_init */
   0,                                        /* tp_alloc */
-  0,                                        /* tp_new */
+  igraphmodule_Graph_new,                   /* tp_new */
   0,                                        /* tp_free */
 };

@@ -376,18 +376,60 @@ PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v) {
   
   // create a new Python list
   list=PyList_New(n);
-  // populate the list with data
+  /* populate the list with data */
   for (i=0; i<n; i++) {
     igraph_strvector_get(v, i, &ptr);
     if (PyList_SetItem(list, i, PyString_FromString(ptr))) {
-      // error occurred while populating the list, return immediately
+      /* error occurred while populating the list, return immediately */
       Py_DECREF(list);
       return NULL;
     }
   }
   
-   // return the list
+   /* return the list */
    return list;
+}
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python string list to an \c igraph_strvector_t
+ * 
+ * \param v the Python list as a \c PyObject*
+ * \param result an \c igraph_strvector_t containing the result
+ * The incoming \c igraph_strvector_t should be uninitialized. Raises suitable
+ * Python exceptions when needed.
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) {
+  int n, i;
+  char* ptr;
+  static const char* empty = "";
+  
+  if (!PyList_Check(v)) {
+    PyErr_SetString(PyExc_TypeError, "expected list");
+    return 1;
+  }
+  
+  n=PyList_Size(v);
+
+  /* initialize the string vector */
+  if (igraph_strvector_init(result, n)) return 1;
+  
+  /* populate the vector with data */
+  for (i=0; i<n; i++) {
+    PyObject *item = PyList_GetItem(v, i);
+    char* ptr;
+    if (PyString_Check(item))
+      ptr=PyString_AS_STRING(item);
+    else
+      ptr=empty;
+    if (igraph_strvector_set(result, i, ptr)) {
+      igraph_strvector_destroy(result);
+      return 1;
+    }
+  }
+
+  return 0;
 }
 
 /**

@@ -295,6 +295,19 @@ start("Generating growing random graph with 10 nodes and 2 new edges per step")
 g=igraph.Graph.Growing_Random(10, 2)
 test(g.vcount() == 10 and g.ecount() == 18)
 
+start("Generating a circular two-dimensional undirected lattice")
+g=igraph.Graph.Lattice([5, 4])
+test(g.vcount() == 20 and g.ecount() == 40)
+
+start("Generating a circular two-dimensional directed lattice")
+g=igraph.Graph.Lattice([5, 4], directed=True)
+test(g.vcount() == 20 and g.ecount() == 80)
+
+start("Generating a noncircular two-dimensional directed lattice without mutual edges")
+g=igraph.Graph.Lattice([5, 4], directed=True, mutual=False, circular=False)
+print g
+test(g.vcount() == 20 and g.ecount() == 31)
+
 start("Generating directed outgoing star graph with 10 nodes and a center of node 5")
 g=igraph.Graph.Star(10, igraph.STAR_OUT, 5)
 neis=g.neighbors(5)
@@ -454,6 +467,10 @@ ddist2=[(g.degree(i, type=igraph.OUT), g.degree(i, type=igraph.IN)) for i in ran
 test(ddist == ddist2)
 del ddist
 del ddist2
+
+g=igraph.Graph(edges=[(0,1), (0,2), (1,2), (0,3)])
+start("Calculating the transitivity of a graph")
+test(g.transitivity() == 0.6)
 
 g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (3,4), (4,5), (5,3), (6,4)])
 start("Decomposing a graph into components")

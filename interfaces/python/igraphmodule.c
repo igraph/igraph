@@ -480,6 +480,79 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
   return;
 }
 
+/* Getting attribute names and types */
+static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
+					     igraph_strvector_t *gnames,
+					     igraph_vector_t *gtypes,
+					     igraph_strvector_t *vnames,
+					     igraph_vector_t *vtypes,
+					     igraph_strvector_t *enames,
+					     igraph_vector_t *etypes) {
+  igraph_strvector_t *names[3] = { gnames, vnames, enames };
+  igraph_vector_t *types[3] = { gtypes, vtypes, etypes };
+  long int i, j, k;
+  
+  for (i=0; i<3; i++) {
+    igraph_strvector_t *n = names[i];
+    igraph_vector_t *t = types[i];
+    PyObject *dict = ((PyObject**)graph->attr)[i];
+    PyObject *keys;
+    keys=PyDict_Keys(dict);
+    if (!keys) IGRAPH_ERROR("Internal error in PyDict_Keys", IGRAPH_FAILURE);
+    
+    if (n) {
+      j=igraphmodule_PyList_to_strvector_t(keys, n);
+      if (j) return j;
+    }
+    if (t) {
+      k=PyList_Size(keys);
+      igraph_vector_init(t, k);
+      for (j=0; j<k; j++) VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_PY_OBJECT;
+    }
+    
+    Py_DECREF(keys);
+  }
+  
+  return 0;
+}
+
+/* Checks whether the graph has a graph/vertex/edge attribute with the given name */
+igraph_bool_t igraphmodule_i_attribute_has_attr(const igraph_t *graph,
+						igraph_attribute_elemtype_t type,
+						const char* name) {
+  long int attrnum;
+  PyObject *o, *dict;
+  switch (type) {
+  case IGRAPH_ATTRIBUTE_GRAPH: attrnum=0; break;
+  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=1; break;
+  case IGRAPH_ATTRIBUTE_EDGE: attrnum=2; break;
+  default: return 0; break;
+  }
+  dict = ((PyObject**)graph->attr)[attrnum];
+  o = PyDict_GetItemString(dict, name);
+  return o != 0;
+}
+
+/* Returns the type of a given attribute */
+int igraphmodule_i_attribute_get_type(const igraph_t *graph,
+				      igraph_attribute_type_t *type,
+				      igraph_attribute_elemtype_t elemtype,
+				      const char *name) {
+  long int attrnum;
+  PyObject *o, *dict;
+  switch (elemtype) {
+  case IGRAPH_ATTRIBUTE_GRAPH: attrnum=0; break;
+  case IGRAPH_ATTRIBUTE_VERTEX: attrnum=1; break;
+  case IGRAPH_ATTRIBUTE_EDGE: attrnum=2; break;
+  default: IGRAPH_ERROR("No such attribute type", IGRAPH_EINVAL); break;
+  }
+  dict = ((PyObject**)graph->attr)[attrnum];
+  o = PyDict_GetItemString(dict, name);
+  if (o != 0) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  *type = IGRAPH_ATTRIBUTE_PY_OBJECT;
+  return 0;
+}
+
 static igraph_attribute_table_t igraphmodule_i_attribute_table = {
   igraphmodule_i_attribute_init,
   igraphmodule_i_attribute_destroy,
@@ -487,7 +560,16 @@ static igraph_attribute_table_t igraphmodule_i_attribute_table = {
   igraphmodule_i_attribute_add_vertices,
   igraphmodule_i_attribute_delete_vertices,
   igraphmodule_i_attribute_add_edges,
-  igraphmodule_i_attribute_delete_edges
+  igraphmodule_i_attribute_delete_edges,
+  igraphmodule_i_attribute_get_info,
+  igraphmodule_i_attribute_has_attr,
+  igraphmodule_i_attribute_get_type,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
 };
 
 /** \ingroup python_interface
@@ -540,8 +622,6 @@ initigraph(void)
 
   if (PyType_Ready(&igraphmodule_EdgeType) < 0) return;
   
-  igraphmodule_GraphType.tp_new = igraphmodule_Graph_new;
-  igraphmodule_GraphType.tp_init = (initproc)igraphmodule_Graph_init;
   igraphmodule_GraphType.tp_methods = igraphmodule_Graph_methods;
   igraphmodule_GraphType.tp_getset = igraphmodule_Graph_getseters;
   
