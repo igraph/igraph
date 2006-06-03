@@ -159,6 +159,16 @@ int main() {
       return 10;
     }
   }
+
+  /* Test query */
+  for (i=0; i<igraph_psumtree_size(&tree); i++) {
+    if (i%2==0 && igraph_psumtree_get(&tree, i) != 2) {
+      return 11;
+    }
+    if (i%2!=0 && igraph_psumtree_get(&tree, i) != 1) {
+      return 12;
+    }
+  }
   
   /* Test zero probabilities */
   igraph_psumtree_update(&tree, 0, 0);

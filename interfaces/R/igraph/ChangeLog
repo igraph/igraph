@@ -1,3 +1,9 @@
+2006-06-03  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/games.R (aging.prefatt.game) : rewritten
+	to call new C function
+	* interfaces/R/src/rinterface.c (R_igraph_barabasi_aging_game) : added
+
 2006-05-29  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/par.R (igraph.par) : slightly different

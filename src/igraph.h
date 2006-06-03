@@ -373,9 +373,15 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
 				igraph_degseq_t method);
 int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n, 
 			       igraph_integer_t m, igraph_bool_t directed, igraph_bool_t citation);
-int igraph_aging_prefatt_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m,
-			      igraph_integer_t aging_type, igraph_real_t aging_exp);
-
+int igraph_barabasi_aging_game(igraph_t *graph, 
+			       igraph_integer_t nodes,
+			       igraph_integer_t m,
+			       const igraph_vector_t *outseq,
+			       igraph_bool_t outpref,
+			       igraph_real_t pa_exp,
+			       igraph_real_t aging_exp,
+			       igraph_integer_t aging_bin,
+			       igraph_bool_t directed);
 int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes, 
 				 igraph_integer_t types, igraph_integer_t edges_per_step, 
 				 igraph_vector_t *type_dist,

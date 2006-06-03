@@ -1,3 +1,10 @@
+2006-06-03  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/igraph_psumtree.c (igraph_psumtree_get) : added
+	* examples/simple/igraph_psumtree.c : igraph_psumtree_get test added
+
+	* src/games.c (igraph_barabasi_aging_game) : added
+
 2006-05-31  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_transitivity,

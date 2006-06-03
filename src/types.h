@@ -468,6 +468,7 @@ typedef struct {
 } igraph_psumtree_t;
 int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
 void igraph_psumtree_destroy(igraph_psumtree_t *t);
+igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx);
 long int igraph_psumtree_size(const igraph_psumtree_t *t);
 int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
 			   igraph_real_t elem);

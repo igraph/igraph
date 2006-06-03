@@ -3387,3 +3387,33 @@ SEXP R_igraph_compose(SEXP pleft, SEXP pright) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
+				  SEXP paging_bin, SEXP pm, SEXP pout_seq,
+				  SEXP pout_pref, SEXP pdirected) {
+  igraph_t g;
+  igraph_integer_t n=REAL(pn)[0];
+  igraph_real_t pa_exp=REAL(ppa_exp)[0];
+  igraph_real_t aging_exp=REAL(paging_exp)[0];
+  igraph_integer_t aging_bin=REAL(paging_bin)[0];
+  igraph_integer_t m=REAL(pm)[0];
+  igraph_vector_t out_seq;
+  igraph_bool_t out_pref=LOGICAL(pout_pref)[0];
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_vector(pout_seq, &out_seq);  
+  
+  igraph_barabasi_aging_game(&g, n, m, &out_seq, out_pref, pa_exp, aging_exp,
+			     aging_bin, directed);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+

@@ -117,47 +117,106 @@ growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
         PACKAGE="igraph")
 }
 
-aging.prefatt.game <- function(graph, n, out.deg=rep(1,n),
-                               age.bin=1, pa.exp=1, ac=1,
-                               age.exp=1) {
-
-  vc <- vcount(graph)
-  ec <- ecount(graph)
-
-  if (vc==0) {
-    stop("Cannot start with empty graph")
+aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
+                               out.dist=NULL, out.seq=NULL,
+                               out.pref=FALSE, directed=TRUE) {
+  # Checks
+  if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
+    warning("if `out.seq' is given `m' and `out.dist' should be NULL")
+    m <- out.dist <- NULL
+  }
+  if (is.null(out.seq) && !is.null(out.dist) && !is.null(m)) {
+    warning("if `out.dist' is given `m' will be ignored")
+    m <- NULL
+  }
+  if (!is.null(out.seq) && length(out.seq) != n) {
+    stop("`out.seq' should be of length `n'")
+  }
+  if (!is.null(out.seq) && min(out.seq)<0) {
+    stop("negative elements in `out.seq'");
+  }
+  if (!is.null(m) && m<0) {
+    stop("`m' is negative")
+  }
+  if (!is.null(m) && m==0) {
+    warning("`m' is zero, graph will be empty")
+  }
+  if (pa.exp < 0) {
+    warning("preferential attachment is negative")
+  }
+  if (aging.exp > 0) {
+    warning("aging exponent is positive")
   }
 
-  born <- as.integer((1:(vc+n)-1) / age.bin)+1
-  time <- tail(born, 1)+1
-  ind <- c(degree(graph, mode="in"), rep(0, n))
-  prob <- (time-born)^-age.exp * (ind+ac)^pa.exp
-  edges <- numeric(sum(out.deg)*2)
-  edgep <- 1
-
-  for (nn in (vc+1):(vc+n)) {
-
-    sam <- sample(nn-1, out.deg[nn-vc], prob=prob[1:(nn-1)])
-
-    ## aging
-    if ( (nn-vc) %% age.bin==0) {
-      time <- time + 1
-      prob[1:(nn-1)] <- prob[1:(nn-1)] *
-        ((time-born[1:(nn-1)]+1)/(time-born[1:(nn-1)]))^-age.exp
-    }
-
-    ## increase degree
-    for (s in sam) {
-      prob[s] <- prob[s] * ((ind[s]+ac+1)/(ind[s]+ac))^pa.exp
-      edges[edgep] <- nn ; edgep <- edgep + 1
-      edges[edgep] <- s ; edgep <- edgep + 1
-    }
+  if (is.null(m) && is.null(out.dist) && is.null(out.seq)) {
+    m <- 1
   }
   
-  res <- add.vertices(graph, n)
-  res <- add.edges(res, edges-1)
-  res
+  n <- as.numeric(n)
+  if (!is.null(m)) { m <- as.numeric(m) }
+  if (!is.null(out.dist)) { out.dist <- as.numeric(out.dist) }
+  if (!is.null(out.seq)) { out.seq <- as.numeric(out.seq) }
+  out.pref <- as.logical(out.pref)
+
+  if (!is.null(out.dist)) {
+    out.seq <- as.numeric(sample(0:(length(out.dist)-1), n,
+                                 replace=TRUE, prob=out.dist))
+  }
+
+  if (is.null(out.seq)) {
+    out.seq <- numeric()
+  }
+
+  .Call("R_igraph_barabasi_aging_game", as.numeric(n),
+        as.numeric(pa.exp), as.numeric(aging.exp),
+        as.numeric(aging.bin), m, out.seq,
+        out.pref, directed, 
+        PACKAGE="igraph")
 }
+
+aging.barabasi.game <- aging.ba.game <- aging.prefatt.game
+
+## aging.prefatt.game <- function(graph, n, out.deg=rep(1,n),
+##                                age.bin=1, pa.exp=1, ac=1,
+##                                age.exp=1) {
+
+##   vc <- vcount(graph)
+##   ec <- ecount(graph)
+
+##   if (vc==0) {
+##     stop("Cannot start with empty graph")
+##   }
+
+##   born <- as.integer((1:(vc+n)-1) / age.bin)+1
+##   time <- tail(born, 1)+1
+##   ind <- c(degree(graph, mode="in"), rep(0, n))
+##   prob <- (time-born)^-age.exp * (ind+ac)^pa.exp
+##   edges <- numeric(sum(out.deg)*2)
+##   edgep <- 1
+
+##   for (nn in (vc+1):(vc+n)) {
+
+##     sam <- sample(nn-1, out.deg[nn-vc], prob=prob[1:(nn-1)])
+
+##     ## aging
+##     if ( (nn-vc) %% age.bin==0) {
+##       time <- time + 1
+##       prob[1:(nn-1)] <- prob[1:(nn-1)] *
+##         ((time-born[1:(nn-1)]+1)/(time-born[1:(nn-1)]))^-age.exp
+##     }
+
+##     ## increase degree
+##     for (s in sam) {
+##       prob[s] <- prob[s] * ((ind[s]+ac+1)/(ind[s]+ac))^pa.exp
+##       edges[edgep] <- nn ; edgep <- edgep + 1
+##       edges[edgep] <- s ; edgep <- edgep + 1
+##     }
+##   }
+  
+##   res <- add.vertices(graph, n)
+##   res <- add.edges(res, edges-1)
+##   res
+## }
 
 callaway.traits.game <- function(nodes, types, edge.per.step=1,
                                 type.dist=rep(1, types),

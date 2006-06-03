@@ -38,6 +38,11 @@ void igraph_psumtree_destroy(igraph_psumtree_t *t) {
   igraph_vector_destroy((igraph_vector_t *)t);
 }
 
+igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx) {
+  const igraph_vector_t *tree=&t->v;
+  return VECTOR(*tree)[t->offset+idx];
+}
+
 int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
 			   igraph_real_t search) {
   const igraph_vector_t *tree=&t->v;
