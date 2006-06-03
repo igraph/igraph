@@ -4,6 +4,16 @@
 	to call new C function
 	* interfaces/R/src/rinterface.c (R_igraph_barabasi_aging_game) : added
 
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.idage) : 
+	added time.window argument
+	* interfaces/R/src/rinterface.c	(R_igraph_measure_dynamics_idage)
+	(R_igraph_measure_dynamics_idage_st) : added time_window argument
+
+	* interfaces/R/igraph/R/games.R (aging.prefatt.game) : added
+	time.window argument
+	* interfaces/R/src/rinterface.c
+	(R_igraph_recent_degree_aging_game) : added
+	
 2006-05-29  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/par.R (igraph.par) : slightly different

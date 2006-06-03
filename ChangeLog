@@ -5,6 +5,11 @@
 
 	* src/games.c (igraph_barabasi_aging_game) : added
 
+	* src/measure_dynamics.c (igraph_measure_dynamics_idwindowage) 
+	(igraph_measure_dynamics_idwindowage_st) : added
+
+	* src/games.c (igraph_recent_degree_aging_game) : added
+	
 2006-05-31  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_transitivity,

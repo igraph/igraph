@@ -105,7 +105,8 @@ measure.dynamics.id <- function(graph, start.vertex=0,
 
 measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
                                    iterations=5, significance=0,
-                                   estind=NULL, estage=NULL, number=FALSE) {
+                                   estind=NULL, estage=NULL,
+                                   number=FALSE, time.window=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -114,6 +115,10 @@ measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
 
   st <- rep(1, vcount(graph))
   sd <- (significance != 0)
+
+  if (!is.null(time.window)) {
+    time.window <- as.numeric(time.window)
+  }
 
   for (i in seq(along=numeric(iterations))) {
 
@@ -146,13 +151,13 @@ measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
                    as.numeric(start.vertex),
                    as.numeric(st), as.numeric(agebins),
                    as.numeric(maxind), as.numeric(sd.real),
-                   as.logical(number.real),
+                   as.logical(number.real), time.window,
                    PACKAGE="igraph")
     }
 
     mes[[1]][!is.finite(mes[[1]])] <- 0
     st <- .Call("R_igraph_measure_dynamics_idage_st", graph,
-                mes[[1]], 
+                mes[[1]], time.window,
                 PACKAGE="igraph")
   }
 

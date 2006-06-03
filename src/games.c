@@ -974,7 +974,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
   igraph_vector_t edges;
   long int i, j, k;
   igraph_psumtree_t sumtree;
-  long int edgeptr;
+  long int edgeptr=0;
   igraph_vector_t degree;
   
   if (no_of_nodes<0) {
@@ -1061,3 +1061,130 @@ int igraph_barabasi_aging_game(igraph_t *graph,
   
   return 0;
 }
+
+int igraph_recent_degree_aging_game(igraph_t *graph,
+				    igraph_integer_t nodes,
+				    igraph_integer_t m, 
+				    const igraph_vector_t *outseq,
+				    igraph_bool_t outpref,
+				    igraph_real_t pa_exp,
+				    igraph_real_t aging_exp,
+				    igraph_integer_t aging_bin,
+				    igraph_integer_t time_window,
+				    igraph_bool_t directed) {
+  
+  long int no_of_nodes=nodes;
+  long int no_of_neighbors=m;
+  long int binwidth=nodes/aging_bin+1;
+  long int no_of_edges;
+  igraph_vector_t edges;
+  long int i, j, k;
+  igraph_psumtree_t sumtree;
+  long int edgeptr=0;
+  igraph_vector_t degree;
+  igraph_dqueue_t history;
+  
+  if (no_of_nodes<0) {
+    IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+  }
+  if (outseq != 0 && igraph_vector_size(outseq) != 0 && igraph_vector_size(outseq) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid out degree sequence length", IGRAPH_EINVAL);
+  }
+  if ( (outseq == 0 || igraph_vector_size(outseq) == 0) && m<0) {
+    IGRAPH_ERROR("Invalid out degree", IGRAPH_EINVAL);
+  }
+  if (aging_bin <= 0) { 
+    IGRAPH_ERROR("Invalid aging bin", IGRAPH_EINVAL);
+  }
+
+  if (outseq==0 || igraph_vector_size(outseq) == 0) {
+    no_of_neighbors=m;
+    no_of_edges=(no_of_nodes-1)*no_of_neighbors;
+  } else {
+    no_of_edges=0;
+    for (i=1; i<igraph_vector_size(outseq); i++) {
+      no_of_edges+=VECTOR(*outseq)[i];
+    }
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+  IGRAPH_CHECK(igraph_psumtree_init(&sumtree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  IGRAPH_CHECK(igraph_dqueue_init(&history, 
+				  time_window*(no_of_neighbors+1)+10));
+  IGRAPH_FINALLY(&history, igraph_dqueue_destroy);
+  
+  RNG_BEGIN();
+  
+  /* first node */
+  igraph_psumtree_update(&sumtree, 0, 1);
+  igraph_dqueue_push(&history, -1);
+  
+  /* and the rest */
+  for (i=1; i<no_of_nodes; i++) {
+    igraph_real_t sum;
+    long int to;
+    if (outseq != 0 && igraph_vector_size(outseq)!=0) {
+      no_of_neighbors=VECTOR(*outseq)[i];
+    }
+
+    if (i>=time_window) {
+      while ((j=igraph_dqueue_pop(&history)) != -1) {
+	long int age=(i-j)/binwidth;
+	VECTOR(degree)[j] -= 1;
+	igraph_psumtree_update(&sumtree, j, (pow(VECTOR(degree)[j], pa_exp)+1)*
+			       pow(age+1, aging_exp));
+      }
+    }
+
+    sum=igraph_psumtree_sum(&sumtree);
+    for (j=0; j<no_of_neighbors; j++) {
+      igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+      VECTOR(degree)[to]++;
+      VECTOR(edges)[edgeptr++] = i;
+      VECTOR(edges)[edgeptr++] = to;
+      igraph_dqueue_push(&history, to);
+    }
+    igraph_dqueue_push(&history, -1);
+    
+    /* update probabilites */
+    for (j=0; j<no_of_neighbors; j++) {
+      long int n=VECTOR(edges)[edgeptr-2*j-1];
+      long int age=(i-n)/binwidth;
+      igraph_psumtree_update(&sumtree, n, 
+			     (pow(VECTOR(degree)[n], pa_exp)+1)*
+			     pow(age+1,aging_exp));
+    }
+    if (outpref) {
+      VECTOR(degree)[i] += no_of_neighbors;
+      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], pa_exp)+1);
+    } else { 
+      igraph_psumtree_update(&sumtree, i, 1);
+    }
+
+    /* aging */
+    for (k=1; i-binwidth*k+1 >= 1; k++) {
+      long int shnode=i-binwidth*k;
+      long int deg=VECTOR(degree)[shnode];
+      long int age=(i-shnode)/binwidth;
+      igraph_psumtree_update(&sumtree, shnode,
+			     (pow(deg, pa_exp)+1) * pow(age+2, aging_exp));
+    }
+  }
+  
+  RNG_END();
+  
+  igraph_dqueue_destroy(&history);
+  igraph_vector_destroy(&degree);
+  igraph_psumtree_destroy(&sumtree);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+				    
+				   

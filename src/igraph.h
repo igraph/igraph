@@ -363,6 +363,12 @@ int igraph_atlas(igraph_t *graph, int number);
 int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m, 
 			 const igraph_vector_t *outseq, igraph_bool_t outpref, 
 			 igraph_bool_t directed);
+int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
+				   igraph_real_t power,
+				   igraph_integer_t m,  
+				   const igraph_vector_t *outseq,
+				   igraph_bool_t outpref,
+				   igraph_bool_t directed);
 int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
 			    igraph_integer_t n, igraph_real_t p,
 			    igraph_bool_t directed, igraph_bool_t loops);
@@ -382,6 +388,23 @@ int igraph_barabasi_aging_game(igraph_t *graph,
 			       igraph_real_t aging_exp,
 			       igraph_integer_t aging_bin,
 			       igraph_bool_t directed);
+int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
+			      igraph_real_t power,
+			      igraph_integer_t window,
+			      igraph_integer_t m,  
+			      const igraph_vector_t *outseq,
+			      igraph_bool_t outpref,
+			      igraph_bool_t directed);
+int igraph_recent_degree_aging_game(igraph_t *graph,
+				    igraph_integer_t nodes,
+				    igraph_integer_t m, 
+				    const igraph_vector_t *outseq,
+				    igraph_bool_t outpref,
+				    igraph_real_t pa_exp,
+				    igraph_real_t aging_exp,
+				    igraph_integer_t aging_bin,
+				    igraph_integer_t window,
+				    igraph_bool_t directed);
 int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes, 
 				 igraph_integer_t types, igraph_integer_t edges_per_step, 
 				 igraph_vector_t *type_dist,
@@ -641,6 +664,22 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *
 					igraph_vector_t *estimates, 
 					igraph_integer_t est_ind, igraph_integer_t est_age,
 					igraph_bool_t lno);
+int igraph_measure_dynamics_idwindowage(const igraph_t *graph, 
+					igraph_integer_t start_vertex,
+					igraph_matrix_t *akl, 
+					igraph_matrix_t *sd, 
+					igraph_matrix_t *confint, 
+					igraph_matrix_t *no,
+					const igraph_vector_t *st, 
+					igraph_integer_t pagebins,
+					igraph_integer_t pmaxind, 
+					igraph_real_t significance,
+					igraph_bool_t lno, 
+					igraph_integer_t time_window);
+int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph, 
+					   igraph_vector_t *res,
+					   const igraph_matrix_t *akl,
+					   igraph_integer_t time_window);
 
 int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_vertex,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,

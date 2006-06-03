@@ -917,6 +917,288 @@ int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *
   return 0;
 }
 
+int igraph_measure_dynamics_idwindowage(const igraph_t *graph, 
+					igraph_integer_t start_vertex,
+					igraph_matrix_t *akl, 
+					igraph_matrix_t *sd, 
+					igraph_matrix_t *confint, 
+					igraph_matrix_t *no,
+					const igraph_vector_t *st, 
+					igraph_integer_t pagebins,
+					igraph_integer_t pmaxind, 
+					igraph_real_t significance,
+					igraph_bool_t lno, 
+					igraph_integer_t time_window) {
+
+  long int agebins=pagebins;
+  long int maxind=pmaxind;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth;
+  
+  int *indegree;
+  igraph_matrix_t ntkl, ch, normfact, notnull;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i, j, k;
+  long int edges=0;
+
+  igraph_bool_t lsd=(significance != 0);
+  int signidx=0;
+
+  igraph_dqueue_t history;
+
+  binwidth = no_of_nodes/agebins+1;
+
+  igraph_vector_init(&neis, 0);
+  indegree=Calloc(no_of_nodes, int);
+  igraph_matrix_resize(akl, maxind+1, agebins);
+  igraph_matrix_null(akl);
+  if (lsd) {
+    igraph_matrix_resize(sd, maxind+1, agebins);
+    igraph_matrix_resize(confint, maxind+1, agebins);
+    igraph_matrix_null(sd);
+    if (significance >= 0.998) {
+      signidx=5;
+    } else if (significance >= 0.99) {
+      signidx=4;
+    } else if (significance >= 0.98) {
+      signidx=3;
+    } else if (significance >= 0.95) {
+      signidx=2;
+    } else if (significance >= 0.9) {
+      signidx=1;
+    } else {
+      signidx=0;
+    }
+  }
+  igraph_matrix_init(&ntkl, maxind+1, agebins+1);
+  igraph_matrix_init(&ch, maxind+1, agebins+1);
+  igraph_matrix_init(&normfact, maxind+1, agebins);
+  igraph_matrix_init(&notnull, maxind+1, agebins);
+  igraph_dqueue_init(&history, time_window);
+  
+  for (node=0; node<start_vertex; node++) {
+
+    MATRIX(ntkl, 0, (long int)(start_vertex-node)/binwidth) ++;
+
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      long int yidx=(start_vertex-to)/binwidth;
+      
+      indegree[to] ++;
+      MATRIX(ntkl, xidx, yidx)--;
+      MATRIX(ntkl, xidx+1, yidx)++;
+    }
+  }
+
+  if (start_vertex != 0) {
+    for (i=0; i<maxind+1; i++) {
+      for (j=0; j<agebins; j++) {
+	MATRIX(ch, i, j) = start_vertex;
+      }
+    }
+  }
+
+  for (i=0; i<=start_vertex; i++) {
+    igraph_dqueue_push(&history, -1);
+  }
+
+  for (node=start_vertex; node<no_of_nodes; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    /* inspect the edges */
+   
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+      
+      double xk=VECTOR(*st)[node]/MATRIX(ntkl, xidx, yidx);
+      double oldm=MATRIX(*akl, xidx, yidx);
+      MATRIX(notnull, xidx, yidx) += 1;
+      MATRIX(*akl, xidx, yidx) += (xk-oldm)/MATRIX(notnull, xidx, yidx);
+      if (lsd) {
+	MATRIX(*confint, xidx, yidx) += (xk-oldm)*(xk-MATRIX(*akl, xidx, yidx));
+      }
+
+      indegree[to] ++;
+      MATRIX(ntkl, xidx, yidx)--;
+      if (MATRIX(ntkl,xidx, yidx)==0) {
+	MATRIX(normfact, xidx, yidx) += (edges-MATRIX(ch, xidx, yidx)+1);
+	MATRIX(ch, xidx, yidx)=edges;
+      }
+      MATRIX(ntkl, xidx+1, yidx)++;
+      if (MATRIX(ntkl, xidx+1, yidx)==1) {
+	MATRIX(ch, xidx+1, yidx)=edges;
+      }
+      edges++;
+      igraph_dqueue_push(&history, to);
+    }
+    igraph_dqueue_push(&history, -1);
+
+    /* new node, aging */
+    MATRIX(ntkl, 0, 0)++;
+    if (MATRIX(ntkl, 0, 0)==1) {
+      MATRIX(ch, 0, 0)=edges;
+    }
+    for (k=1; node-binwidth*k+1 >=1; k++) {
+      long int shnode=node-binwidth*k;
+      long int deg=indegree[shnode];
+      MATRIX(ntkl, deg, k-1)--;
+      if (MATRIX(ntkl, deg, k-1)==0) {
+	MATRIX(normfact, deg, k-1) += (edges-MATRIX(ch, deg, k-1)+1);
+	MATRIX(ch, deg, k-1)=edges;
+      }
+      MATRIX(ntkl, deg, k)++;
+      if (MATRIX(ntkl, deg, k)==1) {
+	MATRIX(ch, deg, k)=edges;
+      }
+    }
+    
+    /* time window */
+    if (node > time_window) {
+      while ( (j=igraph_dqueue_pop(&history)) != -1) {
+	long int xidx=indegree[j];
+	long int yidx=(node-j)/binwidth;
+	indegree[j]--;
+	MATRIX(ntkl, xidx, yidx)--;
+	if (MATRIX(ntkl, xidx, yidx)==0) {
+	  MATRIX(normfact, xidx, yidx) += (edges-MATRIX(ch, xidx, yidx)+1);
+	  MATRIX(ch, xidx, yidx)=edges;
+	}
+	MATRIX(ntkl, xidx-1, yidx)++;
+	if (MATRIX(ntkl, xidx-1, yidx)==1) {
+	  MATRIX(ch, xidx-1, yidx)=edges;
+	}
+      }
+    }
+  }
+
+  /* Ok, measurement done, update change */
+  for (i=0; i<maxind+1; i++) {
+    igraph_real_t tuppercrit;
+    for (j=0; j<agebins; j++) {
+      igraph_real_t oldmean;
+      if (MATRIX(ntkl, i, j) != 0) {
+	MATRIX(normfact, i, j) += (edges-MATRIX(ch, i, j)+1);
+      }
+      oldmean=MATRIX(*akl, i, j);
+      MATRIX(*akl, i, j) *= MATRIX(notnull, i, j) / MATRIX(normfact, i, j);
+      if (lsd) {
+	MATRIX(*confint, i, j) +=
+	  oldmean * oldmean * MATRIX(notnull, i, j) * 
+	  (1-MATRIX(notnull,i,j)/MATRIX(normfact,i,j));
+	if (MATRIX(normfact,i,j) > 0) {
+	  MATRIX(*confint, i, j) =
+	    sqrt(MATRIX(*confint, i, j)/(MATRIX(normfact,i,j)-1));
+	  if (MATRIX(normfact,i,j) > igraph_i_tuppercrit_length) {
+	    tuppercrit=
+	      igraph_i_tuppercrit[igraph_i_tuppercrit_length][signidx];
+	  } else {
+	    tuppercrit=igraph_i_tuppercrit
+	      [(long int)MATRIX(normfact,i,j)-1][signidx];
+	  }	  
+	  MATRIX(*sd, i, j) = MATRIX(*confint,i,j);
+	  MATRIX(*confint, i, j) =
+	    tuppercrit * MATRIX(*confint,i,j)/sqrt(MATRIX(normfact,i,j));
+	}
+      }
+    }
+  }
+  
+  if (!lno) {
+    igraph_matrix_destroy(&normfact);
+  } else {
+    igraph_matrix_destroy(no);
+    *no=normfact;
+  }
+
+  igraph_dqueue_destroy(&history);
+  Free(indegree);
+  igraph_matrix_destroy(&ntkl);
+  igraph_matrix_destroy(&ch);
+  igraph_matrix_destroy(&notnull);
+  igraph_vector_destroy(&neis);
+
+  return 0;
+}
+
+int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph, 
+					   igraph_vector_t *res,
+					   const igraph_matrix_t *akl,
+					   igraph_integer_t time_window) {
+
+  long int agebins=igraph_matrix_ncol(akl);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth;
+  
+  int *indegree;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i, k;
+
+  igraph_dqueue_t history;
+
+  igraph_vector_init(&neis, 0);
+  igraph_dqueue_init(&history, time_window);
+  
+  indegree=Calloc(no_of_nodes, int);
+  binwidth=no_of_nodes/agebins+1;
+  
+  igraph_vector_resize(res, no_of_nodes);
+  igraph_vector_null(res);
+  VECTOR(*res)[0]=MATRIX(*akl, 0, 0);
+
+  for (node=1; node<no_of_nodes; node++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* new node, aging */
+    VECTOR(*res)[node] = VECTOR(*res)[node-1] + MATRIX(*akl, 0, 0);
+    for (k=1; node-binwidth*k+1 >= 1; k++) {
+      long int shnode=node-binwidth*k;
+      long int deg=indegree[shnode];
+      VECTOR(*res)[node] += -MATRIX(*akl, deg, k-1)+MATRIX(*akl, deg, k);
+    }
+
+    if (node > time_window) {
+      while ( (k=igraph_dqueue_pop(&history)) != -1) {
+	long int xidx=indegree[k];
+	long int yidx=(node-k)/binwidth;
+	VECTOR(*res)[node] -= MATRIX(*akl, xidx, yidx);
+	VECTOR(*res)[node] += MATRIX(*akl, xidx-1, yidx);
+	indegree[k]--;
+      }
+    }
+    
+    /* inspect the outgoing edges */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+      
+      indegree[to] ++;
+      igraph_dqueue_push(&history, to);
+      
+      VECTOR(*res)[node] +=
+	-MATRIX(*akl, xidx, yidx) + MATRIX(*akl, xidx+1, yidx);
+    }
+    igraph_dqueue_push(&history, -1);
+  }
+  
+  igraph_vector_destroy(&neis);
+  Free(indegree);
+  
+  return 0;
+}
+
 #define NTKK(xidx, yidx) \
    ((xidx)==(yidx)) ? (VECTOR(ntk)[(xidx)]*(VECTOR(ntk)[(xidx)]-1)/2-MATRIX(ntkk,(xidx),(yidx))) : (VECTOR(ntk)[(xidx)]*VECTOR(ntk)[(yidx)]-MATRIX(ntkk,(xidx),(yidx)))
 

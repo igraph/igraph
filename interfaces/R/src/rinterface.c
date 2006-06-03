@@ -2005,7 +2005,8 @@ SEXP R_igraph_measure_dynamics_idwindow_st(SEXP graph, SEXP pak,
 
 SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pstartvertex,
 				     SEXP pst, SEXP pagebins,
-				     SEXP pmaxind, SEXP psign, SEXP pno) {
+				     SEXP pmaxind, SEXP psign, SEXP pno, 
+				     SEXP ptime_window) {
 
   igraph_t g;
   igraph_matrix_t akl, sd, confint, no;
@@ -2026,8 +2027,14 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pstartvertex,
   igraph_matrix_init(&sd, 0, 0);
   igraph_matrix_init(&confint, 0, 0);
   igraph_matrix_init(&no, 0, 0);
-  igraph_measure_dynamics_idage(&g, startvertex, &akl, &sd, &confint, &no, &st,
-				agebins, maxind, sign, lno);
+  if (ptime_window==R_NilValue) {
+    igraph_measure_dynamics_idage(&g, startvertex, &akl, &sd, &confint, 
+				  &no, &st, agebins, maxind, sign, lno);
+  } else {
+    igraph_measure_dynamics_idwindowage(&g, startvertex, &akl, &sd,
+					&confint, &no, &st, agebins, maxind,
+					sign, lno, REAL(ptime_window)[0]);
+  }
     
   PROTECT(result=NEW_LIST(4));  
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akl));
@@ -2095,7 +2102,8 @@ SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst,
   return result;
 }
   
-SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
+SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl, 
+					SEXP ptime_window) {
   
   igraph_t g;
   igraph_matrix_t akl;
@@ -2107,7 +2115,12 @@ SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl) {
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_matrix(pakl, &akl);
   igraph_vector_init(&res, 0);
-  igraph_measure_dynamics_idage_st(&g, &res, &akl);
+  if (ptime_window==R_NilValue) {    
+    igraph_measure_dynamics_idage_st(&g, &res, &akl);
+  } else {
+    igraph_measure_dynamics_idwindowage_st(&g, &res, &akl, 
+					   REAL(ptime_window)[0]);
+  }
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
@@ -3417,3 +3430,33 @@ SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   return result;
 }
 
+SEXP R_igraph_recent_degree_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
+				       SEXP paging_bin, SEXP pm, SEXP pout_seq,
+				       SEXP pout_pref, SEXP pdirected,
+				       SEXP ptime_window) {
+  igraph_t g;
+  igraph_integer_t n=REAL(pn)[0];
+  igraph_real_t pa_exp=REAL(ppa_exp)[0];
+  igraph_real_t aging_exp=REAL(paging_exp)[0];
+  igraph_integer_t aging_bin=REAL(paging_bin)[0];
+  igraph_integer_t m=REAL(pm)[0];
+  igraph_vector_t out_seq;
+  igraph_bool_t out_pref=LOGICAL(pout_pref)[0];
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  igraph_integer_t time_window=REAL(ptime_window)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_vector(pout_seq, &out_seq);  
+  
+  igraph_recent_degree_aging_game(&g, n, m, &out_seq, out_pref, pa_exp, 
+				  aging_exp, aging_bin, time_window, directed);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
