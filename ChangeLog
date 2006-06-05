@@ -6,6 +6,7 @@
 	igraphmodule_Graph_bfs) : added
 	* interfaces/python/graphobject.c (igraphmodule_Graph_Barabasi) :
 	added support for non-linear model
+	* interfaces/python/bfsiter.c : added (BFS iterator)
 
 2006-06-03  Gabor Csardi  <csardi@kzoo.edu>
 

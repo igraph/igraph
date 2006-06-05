@@ -155,6 +155,7 @@ PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObje
 PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other);
 
 PyObject* igraphmodule_Graph_bfs(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_bfsiter(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -907,7 +908,19 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Keyword arguments:\n"
       "vid  -- the root vertex ID\n"
       "mode -- either IN or OUT or ALL, ignored for undirected graphs.\n"
-      "        Optional, defaults to ALL.\n"
+      "        Optional, defaults to OUT.\n"
+  },
+  {"bfsiter", (PyCFunction)igraphmodule_Graph_bfsiter,
+      METH_VARARGS | METH_KEYWORDS,
+      "Constructs a breadth first search (BFS) iterator of the graph.\n\n"
+      "Keyword arguments:\n"
+      "vid      -- the root vertex ID\n"
+      "mode     -- either IN or OUT or ALL, ignored for undirected graphs.\n"
+      "            Optional, defaults to OUT.\n"
+      "advanced -- if False, the iterator returns the next vertex in BFS\n"
+      "            order in every step. If True, the iterator returns the\n"
+      "            distance of the vertex from the root and the parent\n"
+      "            of the vertex in the BFS tree as well."
   },
   
   //////////////////////////////////////////////////////

@@ -666,12 +666,22 @@ section("Visitors and iterators")
 
 g=igraph.Graph(edges=[(0,1), (0,2), (0,3), (1,4), (1,2), (1,5), (2,6), (6, 0)], directed=True)
 start("BFS on a directed graph without directionality")
-vids, parents, layers = g.bfs(0)
-
-skip()
+vids, layers, parents = g.bfs(0, igraph.ALL)
+test(vids == [0, 3, 2, 1, 6, 5, 4] and parents == [0, 0, 0, 0, 1, 1, 0])
 
 start("BFS on a directed graph with directionality")
-print g.bfs(0, igraph.OUT)
+vids, layers, parents = g.bfs(0)
+test(vids == [0, 3, 2, 1, 6, 5, 4] and parents == [0, 0, 0, 0, 1, 1, 2])
+
+start("BFS on a directed graph with directionality using iterator")
+l=[x.index for x in g.bfsiter(0)]
+test(l == [0, 3, 2, 1, 6, 5, 4])
+
+start("BFS on a directed graph without directionality using advanced iterator")
+l=[(x.index, dist) for x, dist, parent in g.bfsiter(0, igraph.ALL, advanced=True)]
+print l
+test(l == [(0, 0), (3, 1), (2, 1), (1, 1), (6, 1), (5, 2), (4, 2)])
+
 skip()
 
 section("Isomorphism")

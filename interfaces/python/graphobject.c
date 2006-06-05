@@ -25,6 +25,7 @@
 #include "graphobject.h"
 #include "vertexseqobject.h"
 #include "edgeseqobject.h"
+#include "bfsiter.h"
 #include "convert.h"
 #include "error.h"
 
@@ -3625,7 +3626,7 @@ PyObject* igraphmodule_Graph_bfs(igraphmodule_GraphObject* self, PyObject* args,
   char *kwlist[] = {"vid", "mode", NULL};
   long vid;
   PyObject *l1, *l2, *l3, *result;
-  igraph_neimode_t mode = IGRAPH_ALL;
+  igraph_neimode_t mode = IGRAPH_OUT;
   igraph_vector_t vids;
   igraph_vector_t layers;
   igraph_vector_t parents;
@@ -3651,21 +3652,27 @@ PyObject* igraphmodule_Graph_bfs(igraphmodule_GraphObject* self, PyObject* args,
     return NULL;
   }
   l1=igraphmodule_vector_t_to_PyList(&vids);
-  if (!l1) {
-    igraph_vector_destroy(&vids); igraph_vector_destroy(&layers);
-    igraph_vector_destroy(&parents); return NULL;
-  }
   l2=igraphmodule_vector_t_to_PyList(&layers);
-  if (!l2) {
-    igraph_vector_destroy(&vids); igraph_vector_destroy(&layers);
-    igraph_vector_destroy(&parents); return NULL;
-  }
   l3=igraphmodule_vector_t_to_PyList(&parents);
-  if (!l3) {
-    igraph_vector_destroy(&vids); igraph_vector_destroy(&layers);
-    igraph_vector_destroy(&parents); return NULL;
-  }
-  return Py_BuildValue("(OOO)", l1, l2, l3);
+  if (l1 && l2 && l3)
+    result=Py_BuildValue("(OOO)", l1, l2, l3);
+  else result=NULL;
+  igraph_vector_destroy(&vids); igraph_vector_destroy(&layers);
+  igraph_vector_destroy(&parents); return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Constructs a breadth first search (BFS) iterator of the graph
+ */
+PyObject* igraphmodule_Graph_bfsiter(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds) {
+  char *kwlist[] = {"vid", "mode", "advanced", NULL};
+  PyObject *root, *adv = Py_False;
+  igraph_neimode_t mode = IGRAPH_OUT;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|iO", kwlist, &root, &mode, &adv))
+    return NULL;
+  
+  return igraphmodule_BFSIter_new(self, root, mode, PyObject_IsTrue(adv));
 }
 
 /** \defgroup python_interface_internal Internal functions

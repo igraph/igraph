@@ -33,6 +33,7 @@
 #include "vertexobject.h"
 #include "edgeseqobject.h"
 #include "edgeobject.h"
+#include "bfsiter.h"
 
 /**
  * \defgroup python_interface Python module implementation
@@ -604,28 +605,25 @@ initigraph(void)
   
   igraphmodule_VertexSeqType.tp_traverse = (traverseproc)igraphmodule_VertexSeq_traverse;
   igraphmodule_VertexSeqType.tp_clear = (inquiry)igraphmodule_VertexSeq_clear;
-
   if (PyType_Ready(&igraphmodule_VertexSeqType) < 0) return;
   
   igraphmodule_VertexType.tp_traverse = (traverseproc)igraphmodule_Vertex_traverse;
   igraphmodule_VertexType.tp_clear = (inquiry)igraphmodule_Vertex_clear;
-
   if (PyType_Ready(&igraphmodule_VertexType) < 0) return;
   
   igraphmodule_EdgeSeqType.tp_traverse = (traverseproc)igraphmodule_EdgeSeq_traverse;
   igraphmodule_EdgeSeqType.tp_clear = (inquiry)igraphmodule_EdgeSeq_clear;
-
   if (PyType_Ready(&igraphmodule_EdgeSeqType) < 0) return;
   
   igraphmodule_EdgeType.tp_traverse = (traverseproc)igraphmodule_Edge_traverse;
   igraphmodule_EdgeType.tp_clear = (inquiry)igraphmodule_Edge_clear;
-
   if (PyType_Ready(&igraphmodule_EdgeType) < 0) return;
   
   igraphmodule_GraphType.tp_methods = igraphmodule_Graph_methods;
   igraphmodule_GraphType.tp_getset = igraphmodule_Graph_getseters;
-  
   if (PyType_Ready(&igraphmodule_GraphType) < 0) return;
+  
+  if (PyType_Ready(&igraphmodule_BFSIterType) < 0) return;
   
   igraphmodule_InternalError =
     PyErr_NewException("igraph.InternalError", NULL, NULL);
@@ -636,12 +634,9 @@ initigraph(void)
 		     "Python interface for the igraph library");
   
   Py_INCREF(&igraphmodule_GraphType);
-  // Maybe the next line is unnecessary?
-  // Py_INCREF(&igraphmodule_VertexSeqType);
   
   PyModule_AddObject(m, "Graph", (PyObject*)&igraphmodule_GraphType);
-  // Maybe the next line is unnecessary?
-  // PyModule_AddObject(m, "VertexSeq", (PyObject*)&igraphmodule_VertexSeqType);
+  PyModule_AddObject(m, "BFSIter", (PyObject*)&igraphmodule_BFSIterType);
   
   PyModule_AddObject(m, "InternalError", igraphmodule_InternalError);
   PyModule_AddIntConstant(m, "OUT", IGRAPH_OUT);
