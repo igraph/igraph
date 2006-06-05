@@ -47,6 +47,11 @@ int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
   
   if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
 
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+  
   /* temporary storage */
   added=Calloc(no_of_nodes, char);
   if (added==0) {

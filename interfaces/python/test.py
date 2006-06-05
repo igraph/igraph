@@ -245,6 +245,18 @@ test(g.diameter(True, True) == 2)
 
 section("Graph generators")
 
+start("Generating a directed graph from adjacency matrix")
+g=igraph.Graph.Adjacency([[0, 1, 1, 1], [1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
+test(g.vcount() == 4 and g.ecount() == 4)
+
+start("Generating an undirected graph from adjacency matrix with method ADJ_PLUS")
+g=igraph.Graph.Adjacency([[0, 1, 1, 1], [1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], igraph.ADJ_PLUS)
+test(g.vcount() == 4 and g.ecount() == 4)
+
+start("Generating an undirected graph from adjacency matrix with method ADJ_LOWER")
+g=igraph.Graph.Adjacency([[0, 1, 1, 1], [1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], igraph.ADJ_LOWER)
+test(g.vcount() == 4 and g.ecount() == 1)
+
 start("Generating a graph from the Graph Atlas")
 g=igraph.Graph.Atlas(4)
 ok()
@@ -649,6 +661,33 @@ os.close(fd)
 g.write_lgl(fname, None, None, False)
 os.unlink(fname)
 skip()
+
+section("Visitors and iterators")
+
+g=igraph.Graph(edges=[(0,1), (0,2), (0,3), (1,4), (1,2), (1,5), (2,6), (6, 0)], directed=True)
+start("BFS on a directed graph without directionality")
+vids, parents, layers = g.bfs(0)
+
+skip()
+
+start("BFS on a directed graph with directionality")
+print g.bfs(0, igraph.OUT)
+skip()
+
+section("Isomorphism")
+
+g=igraph.Graph(edges=[(0,1), (1,2)])
+start("Calculating isomorphy class for a 3-node graph")
+test(g.isoclass() == 2)
+
+g=igraph.Graph(edges=[(0,1), (1,2), (3,2), (0, 2)], directed=True)
+start("Calculating isomorphy class for a 4-node directed graph")
+test(g.isoclass() == 14)
+
+g2=igraph.Graph(edges=[(1,2), (2,3), (0,3), (1, 3)], directed=True)
+start("Checking isomorphy for two graphs")
+test(g.isomorphic(g2))
+del g
 
 section("Vertex sequence of a graph")
 

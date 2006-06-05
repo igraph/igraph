@@ -703,6 +703,48 @@ PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a graph from its adjacency matrix
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_adjacency
+ */
+PyObject* igraphmodule_Graph_Adjacency(PyTypeObject *type,
+				       PyObject *args,
+				       PyObject *kwds) {
+  igraphmodule_GraphObject *self;
+  igraph_matrix_t m;
+  PyObject *matrix;
+  igraph_adjacency_t mode = IGRAPH_ADJ_DIRECTED;
+  
+  char *kwlist[] = {"matrix", "mode", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|i", kwlist,
+				   &PyList_Type, &matrix, &mode))
+    return NULL;
+      
+  if (igraphmodule_PyList_to_matrix_t(matrix, &m)) {
+    PyErr_SetString(PyExc_TypeError, "Error while converting adjacency matrix");
+    return NULL;
+  }
+  
+  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						    type);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_adjacency(&self->g, &m, mode)) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&m);
+      return NULL;
+    }
+  }
+   
+  igraph_matrix_destroy(&m);
+  
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a graph from the Graph Atlas
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_atlas
@@ -730,7 +772,7 @@ PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type,
 }
 
 /** \ingroup python_interface_graph
- * \brief Generates a graph based on the Barabási-Albert model
+ * \brief Generates a graph based on the Barabasi-Albert model
  * This is intended to be a class method in Python, so the first argument
  * is the type object and not the Python igraph object (because we have
  * to allocate that in this method).
@@ -739,20 +781,19 @@ PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type,
  * \sa igraph_barabasi_game
  */
 PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
-					     PyObject *args,
-					     PyObject *kwds) 
+				      PyObject *args,
+				      PyObject *kwds) 
 {
   igraphmodule_GraphObject *self;
   long n, m=0;
+  float power=0.0;
   igraph_vector_t outseq;
-  PyObject *m_obj, *outpref=NULL, *directed=NULL;
+  PyObject *m_obj, *outpref=Py_False, *directed=Py_False;
   
-  char *kwlist[] = {"n", "m", "outpref", "directed", NULL};
+  char *kwlist[] = {"n", "m", "outpref", "directed", "power", NULL};
   
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO|O!O!", kwlist,
-				   &n, &m_obj,
-				   &PyBool_Type, &outpref,
-				   &PyBool_Type, &directed))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO|OOf", kwlist,
+				   &n, &m_obj, &outpref, &directed, &power))
     return NULL;
   
   if (n<0) {
@@ -777,12 +818,27 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
   
   if (self != NULL) {
     igraphmodule_Graph_init_internal(self);
-    if (igraph_barabasi_game(&self->g, (igraph_integer_t)n, (igraph_integer_t)m,
-			     &outseq, (outpref == Py_True),
-			     (directed == Py_True))) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&outseq);
-      return NULL;
+    if (power == 0.0) {
+      /* linear model */
+      if (igraph_barabasi_game(&self->g, (igraph_integer_t)n,
+			       (igraph_integer_t)m,
+			       &outseq, PyObject_IsTrue(outpref),
+			       PyObject_IsTrue(directed))) {
+	igraphmodule_handle_igraph_error();
+	igraph_vector_destroy(&outseq);
+	return NULL;
+      }
+    } else {
+      /* nonlinear model */
+      if (igraph_nonlinear_barabasi_game(&self->g, (igraph_integer_t)n,
+					 (igraph_real_t)power,
+					 (igraph_integer_t)m,
+					 &outseq, PyObject_IsTrue(outpref),
+					 PyObject_IsTrue(directed))) {
+	igraphmodule_handle_igraph_error();
+	igraph_vector_destroy(&outseq);
+	return NULL;
+      }
     }
   }
   
@@ -861,6 +917,74 @@ PyObject* igraphmodule_Graph_Erdos_Renyi(PyTypeObject *type,
     }
   }
    
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a graph based on a simple growing model with vertex types
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_establishment_game
+ */
+PyObject* igraphmodule_Graph_Establishment(PyTypeObject *type,
+					   PyObject *args,
+					   PyObject *kwds) 
+{
+  igraphmodule_GraphObject *self;
+  long n, types, k;
+  PyObject *type_dist, *pref_matrix;
+  PyObject *directed = Py_False;
+  igraph_matrix_t pm;
+  igraph_vector_t td;
+  
+  char *kwlist[] = {"n", "k", "type_dist", "pref_matrix", "directed", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "llO!O!|O", kwlist,
+				   &n, &k, &PyList_Type, &type_dist,
+				   &PyList_Type, &pref_matrix,
+				   &directed))
+    return NULL;
+      
+  if (n<=0 || k<=0) {
+    PyErr_SetString(PyExc_ValueError, "Number of vertices and the amount of connection trials per step must be positive.");
+    return NULL;
+  }
+  types = PyList_Size(type_dist);
+  
+  if (igraphmodule_PyList_to_matrix_t(pref_matrix, &pm)) {
+    PyErr_SetString(PyExc_TypeError, "Error while converting preference matrix");
+    return NULL;
+  }
+  if (igraph_matrix_nrow(&pm) != igraph_matrix_ncol(&pm) ||
+      igraph_matrix_nrow(&pm) != types) {
+    PyErr_SetString(PyExc_ValueError, "Preference matrix must have exactly the same rows and columns as the number of types");
+    igraph_matrix_destroy(&pm);
+    return NULL;
+  }
+  if (igraphmodule_PyList_to_vector_t(type_dist, &td, 1, 0)) {
+    PyErr_SetString(PyExc_ValueError, "Error while converting type distribution vector");
+    igraph_matrix_destroy(&pm);
+    return NULL;
+  }
+  
+  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						    type);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_establishment_game(&self->g, (igraph_integer_t)n,
+				  (igraph_integer_t)types,
+				  (igraph_integer_t)k, &td, &pm,
+				  PyObject_IsTrue(directed))) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&pm);
+      igraph_vector_destroy(&td);
+      return NULL;
+    }
+  }
+   
+  igraph_matrix_destroy(&pm);
+  igraph_vector_destroy(&td);
   return (PyObject*)self;
 }
 
@@ -1204,6 +1328,47 @@ PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type,
   igraph_vector_destroy(&outseq);
   igraph_vector_destroy(&inseq);
   
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a graph with a given isomorphy class
+ * This is intended to be a class method in Python, so the first argument
+ * is the type object and not the Python igraph object (because we have
+ * to allocate that in this method).
+ * 
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_isoclass_create
+ */
+PyObject* igraphmodule_Graph_Isoclass(PyTypeObject *type,
+				      PyObject *args, PyObject *kwds) {
+  long n, isoclass;
+  PyObject *directed=NULL;
+  igraphmodule_GraphObject *self;
+  
+  char *kwlist[] = {"n", "class", "directed", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|O", kwlist,
+				   &n, &isoclass, &directed))
+    return NULL;
+
+  if (n<3 || n>4) {
+    PyErr_SetString(PyExc_ValueError, "Only graphs with 3 or 4 vertices are supported");
+    return NULL;
+  }
+  
+  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
+						    type);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_isoclass_create(&self->g, n, isoclass, PyObject_IsTrue(directed))) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+    
   return (PyObject*)self;
 }
 
@@ -3006,6 +3171,84 @@ PyObject* igraphmodule_Graph_write_graphml(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the isomorphy class of a graph or its subgraph
+ * \sa igraph_isoclass, igraph_isoclass_subgraph
+ */
+PyObject* igraphmodule_Graph_isoclass(igraphmodule_GraphObject *self,
+				      PyObject* args,
+				      PyObject* kwds) {
+  int isoclass = 0, n;
+  PyObject* vids = 0;
+  char *kwlist[] = {"vertices", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist, &PyList_Type, &vids))
+     return NULL;
+  
+  if (vids) {
+    /* vertex list was passed, check its length */
+    n=PyList_Size(vids);
+  } else {
+    n=igraph_vcount(&self->g);
+  }
+  
+  if (n < 3 || n > 4) {
+    PyErr_SetString(PyExc_ValueError, "Graph or subgraph must have 3 or 4 vertices.");
+    return NULL;
+  }
+  
+  if (vids) {
+    igraph_vector_t vidsvec;
+    if (igraphmodule_PyList_to_vector_t(vids, &vidsvec, 1, 0)) {
+      PyErr_SetString(PyExc_ValueError, "Error while converting PyList to igraph_vector_t");
+      return NULL;
+    }
+    if (igraph_isoclass_subgraph(&self->g, &vidsvec, &isoclass)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    if (igraph_isoclass(&self->g, &isoclass)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+  
+  return PyInt_FromLong((long)isoclass);
+}
+
+/** \ingroup python_interface_graph
+ * \brief Determines whether the graph is isomorphic to another graph
+ * \sa igraph_isoclass
+ */
+PyObject* igraphmodule_Graph_isomorphic(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  igraph_bool_t result = 0;
+  PyObject *o;
+  igraphmodule_GraphObject *other;
+  char *kwlist[] = {"other", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!", kwlist, &igraphmodule_GraphType, &o))
+    return NULL;
+  other=(igraphmodule_GraphObject*)o;
+  
+  if (igraph_vcount(&self->g) < 3 || igraph_vcount(&self->g) > 4) {
+    PyErr_SetString(PyExc_ValueError, "Graph must have 3 or 4 vertices.");
+    return NULL;
+  }
+  if (igraph_vcount(&other->g) < 3 || igraph_vcount(&other->g) > 4) {
+    PyErr_SetString(PyExc_ValueError, "Graph must have 3 or 4 vertices.");
+    return NULL;
+  }
+  
+  if (igraph_isomorphic(&self->g, &other->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  if (result) Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+/** \ingroup python_interface_graph
  * \brief Returns the number of graph attributes
  */
 int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self) {
@@ -3373,6 +3616,56 @@ PyObject* igraphmodule_Graph_compose(igraphmodule_GraphObject* self, PyObject* o
   }
   
   return (PyObject*)result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Conducts a breadth first search (BFS) on the graph
+ */
+PyObject* igraphmodule_Graph_bfs(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds) {
+  char *kwlist[] = {"vid", "mode", NULL};
+  long vid;
+  PyObject *l1, *l2, *l3, *result;
+  igraph_neimode_t mode = IGRAPH_ALL;
+  igraph_vector_t vids;
+  igraph_vector_t layers;
+  igraph_vector_t parents;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "i|i", kwlist, &vid, &mode))
+    return NULL;
+  if (vid < 0 || vid>igraph_vcount(&self->g)) {
+    PyErr_SetString(PyExc_ValueError, "invalid vertex id");
+    return NULL;
+  }
+  
+  if (igraph_vector_init(&vids, igraph_vcount(&self->g))) {
+    PyErr_SetString(PyExc_MemoryError, "not enough memory");
+  }
+  if (igraph_vector_init(&layers, igraph_vcount(&self->g))) {
+    PyErr_SetString(PyExc_MemoryError, "not enough memory");
+  }
+  if (igraph_vector_init(&parents, igraph_vcount(&self->g))) {
+    PyErr_SetString(PyExc_MemoryError, "not enough memory");
+  }
+  if (igraph_bfs(&self->g, (igraph_integer_t)vid, mode, &vids, &layers, &parents)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  l1=igraphmodule_vector_t_to_PyList(&vids);
+  if (!l1) {
+    igraph_vector_destroy(&vids); igraph_vector_destroy(&layers);
+    igraph_vector_destroy(&parents); return NULL;
+  }
+  l2=igraphmodule_vector_t_to_PyList(&layers);
+  if (!l2) {
+    igraph_vector_destroy(&vids); igraph_vector_destroy(&layers);
+    igraph_vector_destroy(&parents); return NULL;
+  }
+  l3=igraphmodule_vector_t_to_PyList(&parents);
+  if (!l3) {
+    igraph_vector_destroy(&vids); igraph_vector_destroy(&layers);
+    igraph_vector_destroy(&parents); return NULL;
+  }
+  return Py_BuildValue("(OOO)", l1, l2, l3);
 }
 
 /** \defgroup python_interface_internal Internal functions

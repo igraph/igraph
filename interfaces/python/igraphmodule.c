@@ -659,6 +659,13 @@ initigraph(void)
   PyModule_AddIntConstant(m, "GET_ADJACENCY_LOWER", IGRAPH_GET_ADJACENCY_LOWER);
   PyModule_AddIntConstant(m, "GET_ADJACENCY_BOTH", IGRAPH_GET_ADJACENCY_BOTH);
   PyModule_AddIntConstant(m, "REWIRING_SIMPLE", IGRAPH_REWIRING_SIMPLE);
+  PyModule_AddIntConstant(m, "ADJ_DIRECTED", IGRAPH_ADJ_DIRECTED);
+  PyModule_AddIntConstant(m, "ADJ_UNDIRECTED", IGRAPH_ADJ_UNDIRECTED);
+  PyModule_AddIntConstant(m, "ADJ_MAX", IGRAPH_ADJ_MAX);
+  PyModule_AddIntConstant(m, "ADJ_MIN", IGRAPH_ADJ_MIN);
+  PyModule_AddIntConstant(m, "ADJ_PLUS", IGRAPH_ADJ_PLUS);
+  PyModule_AddIntConstant(m, "ADJ_UPPER", IGRAPH_ADJ_UPPER);
+  PyModule_AddIntConstant(m, "ADJ_LOWER", IGRAPH_ADJ_LOWER);
   
   /* initialize error, progress and interruption handler */
   igraph_set_error_handler(igraphmodule_igraph_error_hook);

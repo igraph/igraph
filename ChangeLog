@@ -1,3 +1,12 @@
+2006-06-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/graphobject.c (igraphmodule_Graph_Adjacency,
+	igraphmodule_Graph_Establishment, igraphmodule_Graph_Isoclass,
+	igraphmodule_Graph_isoclass, igraphmodule_Graph_isomorphic,
+	igraphmodule_Graph_bfs) : added
+	* interfaces/python/graphobject.c (igraphmodule_Graph_Barabasi) :
+	added support for non-linear model
+
 2006-06-03  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/igraph_psumtree.c (igraph_psumtree_get) : added

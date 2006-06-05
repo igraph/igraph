@@ -71,8 +71,10 @@ PyObject* igraphmodule_Graph_neighbors(igraphmodule_GraphObject *self, PyObject 
 PyObject* igraphmodule_Graph_successors(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_predecessors(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
+PyObject* igraphmodule_Graph_Adjacency(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type, PyObject *args);
 PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Establishment(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Erdos_Renyi(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Full(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Growing_Random(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -81,6 +83,7 @@ PyObject* igraphmodule_Graph_Star(PyTypeObject *type, PyObject *args, PyObject *
 PyObject* igraphmodule_Graph_Ring(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Tree(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Isoclass(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_is_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -130,6 +133,9 @@ PyObject* igraphmodule_Graph_write_ncol(igraphmodule_GraphObject *self, PyObject
 PyObject* igraphmodule_Graph_write_lgl(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_graphml(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
+PyObject* igraphmodule_Graph_isoclass(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_isomorphic(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+
 int igraphmodule_Graph_attribute_count(igraphmodule_GraphObject* self);
 PyObject* igraphmodule_Graph_get_attribute(igraphmodule_GraphObject* self, PyObject* s);
 int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject* self, PyObject* k, PyObject* v);
@@ -147,6 +153,8 @@ PyObject* igraphmodule_Graph_difference(igraphmodule_GraphObject* self, PyObject
 PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyObject* other);
 PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObject* other);
 PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* other);
+
+PyObject* igraphmodule_Graph_bfs(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -275,11 +283,33 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   //////////////////////
   // GRAPH GENERATORS //
   //////////////////////
+
+  // interface to igraph_adjacency
+  {"Adjacency", (PyCFunction)igraphmodule_Graph_Adjacency,
+      METH_CLASS | METH_VARARGS | METH_KEYWORDS,
+      "Generates a graph from its adjacency matrix.\n\n"
+      "Keyword arguments:\n"
+      "matrix -- the adjacency matrix\n"
+      "mode -- the mode to be used. Possible values are:\n"
+      "  ADJ_DIRECTED - the graph will be directed and a matrix\n"
+      "                 element gives the number of edges between\n"
+      "                 two vertex.\n"
+      "  ADJ_UNDIRECTED - alias to ADJ_MAX for convenience.\n"
+      "  ADJ_MAX  - undirected graph will be created and the number of\n"
+      "            edges between vertex i and j is max(A(i,j), A(j,i))\n"
+      "  ADJ_MIN  - like ADJ_MAX, but with min(A(i,j), A(j,i))\n"
+      "  ADJ_PLUS - like ADJ_MAX, but with A(i,j) + A(j,i)\n"
+      "  ADJ_UPPER - undirected graph with the upper right triangle of\n"
+      "              the matrix (including the diagonal)\n"
+      "  ADJ_LOWER - undirected graph with the lower left triangle of\n"
+      "              the matrix (including the diagonal)\n"
+      "  Optional, defaults to ADJ_DIRECTED.\n"
+  },
   
   // interface to igraph_atlas
   {"Atlas", (PyCFunction)igraphmodule_Graph_Atlas,
       METH_CLASS | METH_KEYWORDS,
-      "Generates a graph from the Graph Atlas.\n"
+      "Generates a graph from the Graph Atlas.\n\n"
       "The only argument denotes the index of the graph to be generated.\n"
       "Indices start from zero, graphs are listed:\n"
       "1. in increasing order of number of nodes;\n"
@@ -293,7 +323,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_barabasi_game
   {"Barabasi", (PyCFunction)igraphmodule_Graph_Barabasi,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Generates a graph based on the Barabási-Albert model.\n"
+      "Generates a graph based on the Barabási-Albert model.\n\n"
       "The first two arguments are mandatory: the first one is the "
       "number of vertices, the second one is either the number of "
       "outgoing edges generated for each vertex or a list containing the "
@@ -301,8 +331,28 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "argument is True if the out-degree of a given vertex should also "
       "increase its citation probability (as well as its in-degree), but "
       "it defaults to False. The fourth argument is True if the generated "
-      "graph should be directed (default: False).\n\n"
-      "Keywords for the arguments: n, m, outpref, directed"
+      "graph should be directed (default: False). The fifth argument is\n"
+      "the power constant of the nonlinear model, but it can be omitted,\n"
+      "and in this case the usual linear model will be used.\n\n"
+      "Keywords for the arguments: n, m, outpref, directed, power"
+  },
+
+  // interface to igraph_establishment_game
+  {"Establishment", (PyCFunction)igraphmodule_Graph_Establishment,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a graph based on a simple growing model with vertex types.\n"
+      "A single vertex is added at each time step. This new vertex tries to\n"
+      "connect to k vertices in the graph. The probability that such a\n"
+      "connection is realized depends on the types of the vertices involved.\n"
+      "\n"
+      "Keyword arguments:\n"
+      "n -- the number of vertices in the graph\n"
+      "k -- the number of connections tried in each step\n"
+      "type_dist -- list giving the distribution of vertex types\n"
+      "pref_matrix -- matrix (list of lists) giving the connection\n"
+      "               probabilities for different vertex types\n"
+      "directed -- whether to generate a directed graph. Optional, defaults\n"
+      "            to False."
   },
   
   // interface to igraph_erdos_renyi_game
@@ -405,13 +455,6 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "        Optional, defaults to TREE_UNDIRECTED\n"
   },
   
-  // interface to igraph_adjacency
-  {"Adjacency", (PyCFunction)igraphmodule_unimplemented,
-      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Generates a graph from an adjacency matrix. This function is yet unimplemented.\n\n"
-      "Throws a NotImplementedError."
-  },
-  
   // interface to igraph_degree_sequence_game
   {"Degree_Sequence", (PyCFunction)igraphmodule_Graph_Degree_Sequence,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -423,6 +466,17 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "       sequence as well\n"
       "in  -- the in-degree sequence for a directed graph. Optional,\n"
       "       if omitted, the generated graph will be undirected.\n"
+  },
+  
+  // interface to igraph_isoclass_create
+  {"Isoclass", (PyCFunction)igraphmodule_Graph_Isoclass,
+      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Generates a graph with a given isomorphy class.\n\n"
+      "Keyword arguments:\n"
+      "n        -- the number of vertices in the graph (3 or 4)\n"
+      "class    -- the isomorphy class\n"
+      "directed -- whether the graph should be directed. Optional,\n"
+      "            defaults to False.\n"
   },
   
   /////////////////////////////////////
@@ -839,7 +893,23 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Places the vertices of the graph randomly in a 3D space.\n\n"
       "Returns the \"calculated\" coordinate triplets in a vector."
   },
-   
+
+  ////////////////////////////
+  // VISITOR-LIKE FUNCTIONS //
+  ////////////////////////////
+  {"bfs", (PyCFunction)igraphmodule_Graph_bfs,
+      METH_VARARGS | METH_KEYWORDS,
+      "Conducts a breadth first search (BFS) on the graph.\n\n"
+      "Returns a tuple with the following items:\n"
+      "* The vertex IDs visited (in order)\n"
+      "* The start indices of the layers in the vertex list\n"
+      "* The parent of every vertex in the BFS\n"
+      "Keyword arguments:\n"
+      "vid  -- the root vertex ID\n"
+      "mode -- either IN or OUT or ALL, ignored for undirected graphs.\n"
+      "        Optional, defaults to ALL.\n"
+  },
+  
   //////////////////////////////////////////////////////
   // CONVERT A GRAPH TO EDGE LIST OR ADJACENCY MATRIX //
   //////////////////////////////////////////////////////
@@ -996,6 +1066,23 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "f -- the name of the file to be written\n"
   },
 
+  /////////////////
+  // ISOMORPHISM //
+  /////////////////
+  {"isoclass", (PyCFunction)igraphmodule_Graph_isoclass,
+      METH_VARARGS | METH_KEYWORDS,
+      "Returns the isomorphy class of the graph or its subgraph. The only\n"
+      "argument is optional and may contain a list of vertices if we want\n"
+      "to calculate the isomorphy class for only a subset of vertices.\n"
+      "Isomorphy class calculations are implemented only for graphs with\n"
+      "3 or 4 nodes.\n"
+  },
+  {"isomorphic", (PyCFunction)igraphmodule_Graph_isomorphic,
+      METH_VARARGS | METH_KEYWORDS,
+      "Checks whether the graph is isomorphic with another graph (given in\n"
+      "an argument)"
+  },
+  
   ////////////////////////
   // ATTRIBUTE HANDLING //
   ////////////////////////

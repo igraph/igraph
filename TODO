@@ -22,9 +22,9 @@ o better looking graphs in 3D in the R interface
 o rewite add_edges, add_vertices, delete_edges, delete_vertices,
   they're a mess
 o edge seq argument to delete_edges
-o Add Python interface to igraph_adjacency, igraph_aging_prefatt_game,
-  igraph_callaway_traits_game, igraph_establishment_game,
-
+o Add Python interface to igraph_callaway_traits_game,
+  igraph_barabasi_aging_game, igraph_recent_degree_aging_game
+  
 Other bits:
 
 o eccentricity

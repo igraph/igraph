@@ -361,6 +361,50 @@ PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python list of lists to an \c igraph_matrix_t
+ * 
+ * \param o the Python object representing the list of lists
+ * \param m the address of an uninitialized \c igraph_matrix_t
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyList_to_matrix_t(PyObject* o, igraph_matrix_t *m) {
+  int nr, nc, n, i, j;
+  PyObject *row, *item;
+  
+  /* calculate the matrix dimensions */
+  if (!PyList_Check(o)) return 1;
+  nr = PyList_Size(o);
+  nc = 0;
+  for (i=0; i<nr; i++) {
+    row=PyList_GetItem(o, i);
+    if (!PyList_Check(row)) return 1;
+    n=PyList_Size(row);
+    if (n>nc) nc=n;
+  }
+  
+  igraph_matrix_init(m, nr, nc);
+  for (i=0; i<nr; i++) {
+    row=PyList_GetItem(o, i);
+    n=PyList_Size(row);
+    for (j=0; j<n; j++) {
+      item=PyList_GetItem(row, j);
+      if (PyInt_Check(item)) {
+	MATRIX(*m, i, j) = (igraph_real_t)PyInt_AsLong(item);
+      } else if (PyLong_Check(item)) {
+	MATRIX(*m, i, j) = (igraph_real_t)PyLong_AsLong(item);
+      } else if (PyFloat_Check(item)) {
+	MATRIX(*m, i, j) = (igraph_real_t)PyFloat_AsDouble(item);
+      } else {
+	/* warning? */
+      }
+    }
+  }
+
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an \c igraph_strvector_t to a Python string list
  * 
  * \param v the \c igraph_strvector_t containing the vector to be converted
