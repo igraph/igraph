@@ -19,6 +19,9 @@
 	(igraph_measure_dynamics_idwindowage_st) : added
 
 	* src/games.c (igraph_recent_degree_aging_game) : added
+
+	* src/layout.c (igraph_layout_merge_dla) : change to make it 
+	gcc 2.95 compatible 
 	
 2006-05-31  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 

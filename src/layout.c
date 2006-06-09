@@ -1434,12 +1434,12 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
   IGRAPH_CHECK(igraph_matrix_resize(res, allnodes, 2));
   respos=0;
   for (i=0; i<graphs; i++) {
-    IGRAPH_ALLOW_INTERRUPTION();
     long int size=igraph_matrix_nrow(VECTOR(*coords)[i]);
     igraph_real_t xx=VECTOR(x)[i];
     igraph_real_t yy=VECTOR(y)[i];
     igraph_real_t rr=VECTOR(r)[i]/VECTOR(nr)[i];
     igraph_matrix_t *mat=VECTOR(*coords)[i];
+    IGRAPH_ALLOW_INTERRUPTION();
     if (VECTOR(nr)[i]==0) { rr=1; }
     for (j=0; j<size; j++) {
       MATRIX(*res, respos, 0)=rr*(MATRIX(*mat, j, 0)-VECTOR(nx)[i]);
