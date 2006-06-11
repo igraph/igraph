@@ -1,3 +1,11 @@
+2006-06-11  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/types.h (igraph_array3_t, ARRAY3) : added
+	* src/array.c (igraph_array3_init, igraph_array3_destroy)
+	(igraph_array3_size, igraph_array3_n, igraph_array3_resize)
+	(igraph_array3_null) : added
+	* examples/simple/igraph_array.c :added
+
 2006-06-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_Adjacency,

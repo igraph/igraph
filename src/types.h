@@ -254,6 +254,25 @@ int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
 			  long int index);
 
 /* -------------------------------------------------- */
+/* 3D array                                           */
+/* -------------------------------------------------- */
+
+typedef struct s_array3 {
+  igraph_vector_t data;
+  long int n1, n2, n3, n1n2;
+} igraph_array3_t;
+
+#define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
+int igraph_array3_init(igraph_array3_t *a, long int n1, long int n2, 
+		       long int n3);
+void igraph_array3_destroy(igraph_array3_t *a);
+long int igraph_array3_size(const igraph_array3_t *a);
+long int igraph_array3_n(const igraph_array3_t *a, long int idx);
+int igraph_array3_resize(igraph_array3_t *a, long int n1, long int n2, 
+			 long int n3);
+void igraph_array3_null(igraph_array3_t *a);
+
+/* -------------------------------------------------- */
 /* Plain stack                                        */
 /* -------------------------------------------------- */
 
