@@ -681,6 +681,26 @@ int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph,
 					   const igraph_matrix_t *akl,
 					   igraph_integer_t time_window);
 
+int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
+					    igraph_integer_t start_vertex,
+					    igraph_array3_t *adkl,
+					    igraph_array3_t *sd,
+					    igraph_array3_t *confint,
+					    igraph_array3_t *no,
+					    const igraph_vector_t *st,
+					    const igraph_vector_t *cats,
+					    igraph_integer_t pno_cats,
+					    igraph_integer_t pagebins,
+					    igraph_integer_t pmaxind,
+					    igraph_real_t significance,
+					    igraph_bool_t lno);
+
+int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
+					       igraph_vector_t *res,
+					       const igraph_array3_t *adkl,
+					       const igraph_vector_t *cats, 
+					       igraph_integer_t pno_cats);
+
 int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_vertex,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,
 			       igraph_matrix_t *confint, igraph_matrix_t *no,

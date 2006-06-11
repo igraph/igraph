@@ -1205,6 +1205,217 @@ int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph,
   return 0;
 }
 
+int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
+					    igraph_integer_t start_vertex,
+					    igraph_array3_t *adkl,
+					    igraph_array3_t *sd,
+					    igraph_array3_t *confint,
+					    igraph_array3_t *no,
+					    const igraph_vector_t *st,
+					    const igraph_vector_t *cats,
+					    igraph_integer_t pno_cats,
+					    igraph_integer_t pagebins,
+					    igraph_integer_t pmaxind,
+					    igraph_real_t significance,
+					    igraph_bool_t lno) {
+  
+  long int agebins=pagebins;
+  long int maxind=pmaxind;
+  long int no_cats=pno_cats;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth;
+  
+  int *indegree;
+  igraph_array3_t ntkl, ch, normfact, notnull;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i,j,k;
+  long int edges=0;
+  
+  igraph_bool_t lsd=(significance != 0);
+  
+  binwidth=no_of_nodes/agebins+1;
+  
+  igraph_vector_init(&neis, 0);
+  indegree=Calloc(no_of_nodes, int);
+  igraph_array3_resize(adkl, no_cats, maxind+1, agebins);
+  igraph_array3_null(adkl);
+  if (lsd) {
+    igraph_array3_resize(sd, no_cats, maxind+1, agebins);
+    igraph_array3_null(sd);
+  }
+  igraph_array3_init(&ntkl,     no_cats, maxind+1, agebins);
+  igraph_array3_init(&ch,       no_cats, maxind+1, agebins);
+  igraph_array3_init(&normfact, no_cats, maxind+1, agebins);
+  igraph_array3_init(&notnull,  no_cats, maxind+1, agebins);
+  
+  for (node=0; node < no_of_nodes; node++) {
+    long int cidx;
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* update A(d,k,l) */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int cidx=VECTOR(*cats)[to];
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+      
+      double xk=VECTOR(*st)[node] / ARRAY3(ntkl, cidx, xidx, yidx);
+      double oldm=ARRAY3(*adkl, cidx, xidx, yidx);
+      ARRAY3(notnull, cidx, xidx, yidx) += 1;
+      ARRAY3(*adkl, cidx, xidx, yidx) += 
+	(xk-oldm)/ARRAY3(notnull, cidx, xidx, yidx);
+      if (lsd) {
+	ARRAY3(*sd, cidx, xidx, yidx) += 
+	  (xk-oldm)*(xk-ARRAY3(*adkl, cidx, xidx, yidx));
+      }
+    }
+    
+    /* add the new edges */
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int cidx=VECTOR(*cats)[to];
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+      
+      indegree[to] ++;
+      ARRAY3(ntkl, cidx, xidx, yidx)--;
+      if (ARRAY3(ntkl, cidx, xidx, yidx)==0) {
+	ARRAY3(normfact, cidx, xidx, yidx) += 
+	  (edges-ARRAY3(ch, cidx, xidx, yidx)+1);
+	ARRAY3(ch, cidx, xidx, yidx)=edges;
+      }
+      ARRAY3(ntkl, cidx, xidx+1, yidx)++;
+      if (ARRAY3(ntkl, cidx, xidx+1, yidx)==1) {
+	ARRAY3(ch, cidx, xidx+1, yidx)=edges;
+      }
+      edges++;
+    }
+    
+    /* aging */
+    cidx=VECTOR(*cats)[node];
+    ARRAY3(ntkl, cidx, 0, 0)++;
+    if (ARRAY3(ntkl, cidx, 0, 0)==1) {
+      ARRAY3(ch, cidx, 0, 0)=edges;
+    }
+    for (k=1; node-binwidth*k+1 >= 1; k++) {
+      long int shnode=node-binwidth*k;
+      long int cat=VECTOR(*cats)[shnode];
+      long int deg=indegree[shnode];
+      ARRAY3(ntkl, cat, deg, k-1)--;
+      if (ARRAY3(ntkl, cat, deg, k-1)==0) {
+	ARRAY3(normfact, cat, deg, k-1)+=(edges-ARRAY3(ch, cat, deg, k-1)+1);
+	ARRAY3(ch, cat, deg, k-1)=edges;
+      }
+      ARRAY3(ntkl, cat, deg, k)++;
+      if (ARRAY3(ntkl, cat, deg, k)==1) {
+	ARRAY3(ch, cat, deg, k)=edges;
+      }
+    }
+  }
+  
+  /* measurement done, update change */
+  for (k=0; k<no_cats; k++) {
+    for (i=0; i<maxind+1; i++) {
+      for (j=0; j<agebins; j++) {
+	igraph_real_t oldmean;
+	if (ARRAY3(ntkl, k, i, j) !=0) {
+	  ARRAY3(normfact, k, i, j) += (edges-ARRAY3(ch, k, i, j)+1);
+	}
+	oldmean=ARRAY3(*adkl, k, i, j);
+	ARRAY3(*adkl, k, i, j) *=
+	  ARRAY3(notnull, k, i, j)/ARRAY3(normfact, k, i, j);
+	if (lsd) {
+	  ARRAY3(*sd, k, i, j) += oldmean * oldmean * ARRAY3(notnull, k, i, j)*
+	    (1-ARRAY3(notnull, k, i, j)/ARRAY(normfact, k, i, j));
+	  if (ARRAY3(normfact, k, i, j) > 0) {
+	    ARRAY3(*sd, k, i, j)=
+	      sqrt(ARRAY3(*sd, k, i, j)/(ARRAY3(normfact, k, i, j)-1));
+	  }
+	}
+      }
+    }
+  }
+  
+  if (!lno) {
+    igraph_array3_destroy(&normfact);
+  } else {
+    igraph_array3_destroy(no);
+    *no=normfact;
+  }
+  
+  Free(indegree);
+  igraph_array3_destroy(&ntkl);
+  igraph_array3_destroy(&ch);
+  igraph_array3_destroy(&notnull);
+  igraph_vector_destroy(&neis);
+
+  return 0;
+}
+
+int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
+					       igraph_vector_t *res,
+					       const igraph_array3_t *adkl,
+					       const igraph_vector_t *cats, 
+					       igraph_integer_t pno_cats) {
+  long int agebins=igraph_array3_n(adkl, 3);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_cats=pno_cats;
+  long int binwidth;
+  
+  int *indegree;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i, k;
+  
+  igraph_vector_init(&neis, 0);
+  indegree=Calloc(no_of_nodes, int);
+  binwidth=no_of_nodes/agebins+1;
+  
+  igraph_vector_resize(res, no_of_nodes);
+  igraph_vector_null(res);
+  VECTOR(*res)[0]=ARRAY3(*adkl, (long int)VECTOR(*cats)[0], 0, 0);
+  
+  for (node=1; node<no_of_nodes; node++) {
+    long int cidx;
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* new node, aging */
+    cidx=VECTOR(*cats)[node];
+    VECTOR(*res)[node] = VECTOR(*res)[node-1] + ARRAY3(*adkl, cidx, 0, 0);
+    for (k=1; node-binwidth+1 >= 1; k++) {
+      long int shnode=node-binwidth*k;
+      long int cat=VECTOR(*cats)[shnode];
+      long int deg=indegree[shnode];
+      VECTOR(*res)[node] += 
+	-ARRAY3(*adkl, cat, deg, k-1)+ARRAY3(*adkl, cat, deg, k);
+    }
+
+    /* inspect the outgoing edges */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int cidx=VECTOR(*cats)[to];      
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+      
+      indegree[to]++;
+      VECTOR(*res)[node] += 
+	-ARRAY3(*adkl, cidx, xidx, yidx) + ARRAY3(*adkl, cidx, xidx+1, yidx);
+    }
+  }
+
+  igraph_vector_destroy(&neis);
+  Free(indegree);
+  
+  return 0;
+}
+
 #define NTKK(xidx, yidx) \
    ((xidx)==(yidx)) ? (VECTOR(ntk)[(xidx)]*(VECTOR(ntk)[(xidx)]-1)/2-MATRIX(ntkk,(xidx),(yidx))) : (VECTOR(ntk)[(xidx)]*VECTOR(ntk)[(yidx)]-MATRIX(ntkk,(xidx),(yidx)))
 

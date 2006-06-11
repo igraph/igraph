@@ -9,6 +9,9 @@
 	* src/measure_dynamics.c (igraph_measure_dynamics_idage) : 
 	slight change, first update A(k,l) and then add the edges 
 
+	* src/measure_dynamics.c (igraph_measure_dynamics_citedcat_id_age)
+	(igraph_measure_dynamics_citedcat_id_age_st) : added
+
 2006-06-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_Adjacency,
