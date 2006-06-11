@@ -6,6 +6,9 @@
 	(igraph_array3_null) : added
 	* examples/simple/igraph_array.c :added
 
+	* src/measure_dynamics.c (igraph_measure_dynamics_idage) : 
+	slight change, first update A(k,l) and then add the edges 
+
 2006-06-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_Adjacency,

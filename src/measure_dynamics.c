@@ -598,8 +598,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_integer_t start_
     
     IGRAPH_ALLOW_INTERRUPTION();
 
-    /* inspect the edges */
-   
+    /* inspect the edges, update A(k,l) */
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
@@ -613,7 +612,14 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_integer_t start_
       if (lsd) {
 	MATRIX(*confint, xidx, yidx) += (xk-oldm)*(xk-MATRIX(*akl, xidx, yidx));
       }
+    }
 
+    /* add the new edges */
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=indegree[to];
+      long int yidx=(node-to)/binwidth;
+      
       indegree[to] ++;
       MATRIX(ntkl, xidx, yidx)--;
       if (MATRIX(ntkl,xidx, yidx)==0) {
@@ -625,7 +631,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_integer_t start_
 	MATRIX(ch, xidx+1, yidx)=edges;
       }
       edges++;
-    }
+    }      
 
     /* new node, aging */
     MATRIX(ntkl, 0, 0)++;
