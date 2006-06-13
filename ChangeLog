@@ -3,6 +3,9 @@
 	* src/measure_dynamics.c (igraph_measure_dynamics_citedcat_id_age) :
 	significance calculation added
 
+	* src/measure_dynamics.c (igraph_measure_dynamics_citingcat_id_age)
+	(igraph_mesaure_dynamics_citingcat_id_age_st) : added
+	
 2006-06-11  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/types.h (igraph_array3_t, ARRAY3) : added

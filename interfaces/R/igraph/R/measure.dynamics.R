@@ -244,6 +244,66 @@ measure.dynamics.citedcat.id.age <- function(graph, categories, agebins=300,
   res
 }  
 
+measure.dynamics.citingcat.id.age <- function(graph, categories, agebins=300,
+                                              iterations=5, significance=0,
+                                              number=FALSE, norm=c(1,1,1)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  maxind <- max(degree(graph, mode="in"))
+
+  st <- rep(1, vcount(graph))
+  sd <- (significance != 0)
+
+  for (i in seq(along=numeric(iterations))) {
+
+    # Standard deviation only at the last iteration
+    if (sd && i==iterations) {
+      sd.real <- significance
+    } else {
+      sd.real <- 0.0
+    }
+
+    # Number of estimates also
+    if (number && i==iterations) {
+      number.real <- number
+    } else {
+      number.real <- FALSE
+    }
+
+    if (i != 1) {
+      mes[[1]] <- mes[[1]]/mes[[1]][norm[1],norm[2],norm[3]]
+    }    
+
+    mes <- .Call("R_igraph_measure_dynamics_citingcat_id_age", graph,
+                 as.numeric(0),
+                 as.numeric(st), as.numeric(categories),
+                 as.numeric(max(categories))+1,
+                 as.numeric(agebins), as.numeric(maxind), as.numeric(sd.real),
+                 as.logical(number.real),
+                 PACKAGE="igraph")
+    
+    mes[[1]][!is.finite(mes[[1]])] <- 0
+    st <- .Call("R_igraph_measure_dynamics_citingcat_id_age_st", graph,
+                mes[[1]], as.numeric(categories), 
+                as.numeric(max(categories))+1,
+                PACKAGE="igraph")
+  }
+
+#  print(mes[[1]][1,1])
+  
+  if (sd.real != 0) {
+    mes[[2]] <- mes[[2]]/mes[[1]][norm[1],norm[2],norm[3]]
+    mes[[3]] <- mes[[3]]/mes[[1]][norm[1],norm[2],norm[3]]
+  }
+  mes[[1]] <- mes[[1]]/mes[[1]][norm[1],norm[2],norm[3]]
+
+  res <- list(akl=mes[[1]], st=st, sd=mes[[2]],
+              error=mes[[3]], no=mes[[4]], est=NULL)
+  
+  res
+}  
+
 ## TODO: vtime and etime as attributes
 
 measure.dynamics.d.d <- function(graph, vtime, etime,

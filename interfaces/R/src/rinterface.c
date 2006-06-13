@@ -2240,6 +2240,79 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age_st(SEXP graph, SEXP padkl,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_measure_dynamics_citingcat_id_age(SEXP graph, SEXP pstartvertex,
+						SEXP pst, SEXP pcats, 
+						SEXP pcatno, SEXP pagebins,
+						SEXP pmaxind, SEXP psign,
+						SEXP pno) {
+  igraph_t g;
+  igraph_array3_t adkl, sd, confint, no;
+  igraph_vector_t st;
+  igraph_integer_t startvertex=REAL(pstartvertex)[0];
+  igraph_integer_t agebins=REAL(pagebins)[0];
+  igraph_vector_t cats;
+  igraph_integer_t catno=REAL(pcatno)[0];
+  igraph_integer_t maxind=REAL(pmaxind)[0];
+  igraph_real_t sign=REAL(psign)[0];
+  igraph_bool_t lno=LOGICAL(pno)[0];
+  SEXP result;
+  
+  R_igraph_before();
+
+  R_SEXP_to_vector(pst, &st);
+  R_SEXP_to_vector(pcats, &cats);
+  R_SEXP_to_igraph(graph, &g);
+  
+  igraph_array3_init(&adkl, 0, 0, 0);
+  igraph_array3_init(&sd, 0, 0, 0);
+  igraph_array3_init(&confint, 0, 0, 0);
+  igraph_array3_init(&no, 0, 0, 0);
+  igraph_measure_dynamics_citingcat_id_age(&g, startvertex, &adkl, &sd, 
+					  &confint, &no, &st, &cats, catno,
+					  agebins, maxind, sign, lno);
+  PROTECT(result=NEW_LIST(4));
+  SET_VECTOR_ELT(result, 0, R_igraph_array3_to_SEXP(&adkl));
+  igraph_array3_destroy(&adkl);
+  SET_VECTOR_ELT(result, 1, R_igraph_array3_to_SEXP(&sd));
+  igraph_array3_destroy(&sd);
+  SET_VECTOR_ELT(result, 2, R_igraph_array3_to_SEXP(&confint));
+  igraph_array3_destroy(&confint);
+  SET_VECTOR_ELT(result, 3, R_igraph_array3_to_SEXP(&no));
+  igraph_array3_destroy(&no);
+  
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+} 
+
+SEXP R_igraph_measure_dynamics_citingcat_id_age_st(SEXP graph, SEXP padkl,
+						   SEXP pcats, SEXP pcatno) {
+  igraph_t g;
+  igraph_array3_t adkl;
+  igraph_vector_t cats;
+  igraph_integer_t catno=REAL(pcatno)[0];
+  igraph_vector_t res;
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_igraph_SEXP_to_array3(padkl, &adkl);
+  R_SEXP_to_vector(pcats, &cats);
+  igraph_vector_init(&res, 0);
+  igraph_measure_dynamics_citingcat_id_age_st(&g, &res, &adkl, &cats, catno);
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
   
 SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
 				   SEXP pevents, SEXP pst, SEXP pmaxdeg, 

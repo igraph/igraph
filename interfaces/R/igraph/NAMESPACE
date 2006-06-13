@@ -99,7 +99,7 @@ export(evcent)
 # dynamics measurement
 
 export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
-       measure.dynamics.citedcat.id.age)
+       measure.dynamics.citedcat.id.age, measure.dynamics.citingcat.id.age)
 
 # isomorphism, motifs
 
