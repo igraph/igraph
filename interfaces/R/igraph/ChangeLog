@@ -1,3 +1,14 @@
+2006-06-12  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_array3_to_SEXP)
+	(R_igraph_SEXP_to_array3, R_igraph_SEXP_to_array3_copy) : added
+
+	* interfaces/R/igraph/R/measure.dynamics.R
+	(measure.dynamics.citedcat.id.age) : added
+	* interfaces/R/src/rinterface.c 
+	(R_igraph_measure_dynamics_citedcat_id_age)
+	(R_igraph_measure_dynamics_citedcat_id_age_st) : added
+
 2006-06-03  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/games.R (aging.prefatt.game) : rewritten

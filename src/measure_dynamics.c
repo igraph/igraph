@@ -1234,7 +1234,8 @@ int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
   long int edges=0;
   
   igraph_bool_t lsd=(significance != 0);
-  
+  int signidx=0;
+
   binwidth=no_of_nodes/agebins+1;
   
   igraph_vector_init(&neis, 0);
@@ -1244,6 +1245,20 @@ int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
   if (lsd) {
     igraph_array3_resize(sd, no_cats, maxind+1, agebins);
     igraph_array3_null(sd);
+    igraph_array3_resize(confint, no_cats, maxind+1, agebins);
+    if (significance >= 0.998) {
+      signidx=5;
+    } else if (significance >= 0.99) {
+      signidx=4;
+    } else if (significance >= 0.98) {
+      signidx=3;
+    } else if (significance >= 0.95) {
+      signidx=2;
+    } else if (significance >= 0.9) {
+      signidx=1;
+    } else {
+      signidx=0;
+    }    
   }
   igraph_array3_init(&ntkl,     no_cats, maxind+1, agebins);
   igraph_array3_init(&ch,       no_cats, maxind+1, agebins);
@@ -1269,7 +1284,7 @@ int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
       ARRAY3(*adkl, cidx, xidx, yidx) += 
 	(xk-oldm)/ARRAY3(notnull, cidx, xidx, yidx);
       if (lsd) {
-	ARRAY3(*sd, cidx, xidx, yidx) += 
+	ARRAY3(*confint, cidx, xidx, yidx) += 
 	  (xk-oldm)*(xk-ARRAY3(*adkl, cidx, xidx, yidx));
       }
     }
@@ -1320,6 +1335,7 @@ int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
   /* measurement done, update change */
   for (k=0; k<no_cats; k++) {
     for (i=0; i<maxind+1; i++) {
+      igraph_real_t tuppercrit;
       for (j=0; j<agebins; j++) {
 	igraph_real_t oldmean;
 	if (ARRAY3(ntkl, k, i, j) !=0) {
@@ -1329,11 +1345,22 @@ int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
 	ARRAY3(*adkl, k, i, j) *=
 	  ARRAY3(notnull, k, i, j)/ARRAY3(normfact, k, i, j);
 	if (lsd) {
-	  ARRAY3(*sd, k, i, j) += oldmean * oldmean * ARRAY3(notnull, k, i, j)*
-	    (1-ARRAY3(notnull, k, i, j)/ARRAY(normfact, k, i, j));
+	  ARRAY3(*confint, k, i, j) += 
+	    oldmean * oldmean * ARRAY3(notnull, k, i, j)*
+	    (1-ARRAY3(notnull, k, i, j)/ARRAY3(normfact, k, i, j));
 	  if (ARRAY3(normfact, k, i, j) > 0) {
-	    ARRAY3(*sd, k, i, j)=
-	      sqrt(ARRAY3(*sd, k, i, j)/(ARRAY3(normfact, k, i, j)-1));
+	    ARRAY3(*confint, k, i, j)=
+	      sqrt(ARRAY3(*confint, k, i, j)/(ARRAY3(normfact, k, i, j)-1));
+	    if (ARRAY3(normfact, k, i, j) > igraph_i_tuppercrit_length) {
+	      tuppercrit=
+		igraph_i_tuppercrit[igraph_i_tuppercrit_length][signidx];
+	    } else {
+	      tuppercrit=igraph_i_tuppercrit
+		[(long int)ARRAY3(normfact, k, i, j)-1][signidx];
+	    }
+	    ARRAY3(*sd, k, i, j)=ARRAY3(*confint, k, i, k);
+	    ARRAY3(*confint, k, i, j) = 
+	      tuppercrit*ARRAY3(*confint,k,i,j)/sqrt(ARRAY3(normfact,k,i,j));
 	  }
 	}
       }
@@ -1371,7 +1398,7 @@ int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
   
   long int node;
   long int i, k;
-  
+
   igraph_vector_init(&neis, 0);
   indegree=Calloc(no_of_nodes, int);
   binwidth=no_of_nodes/agebins+1;
@@ -1388,7 +1415,7 @@ int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
     /* new node, aging */
     cidx=VECTOR(*cats)[node];
     VECTOR(*res)[node] = VECTOR(*res)[node-1] + ARRAY3(*adkl, cidx, 0, 0);
-    for (k=1; node-binwidth+1 >= 1; k++) {
+    for (k=1; node-binwidth*k+1 >= 1; k++) {
       long int shnode=node-binwidth*k;
       long int cat=VECTOR(*cats)[shnode];
       long int deg=indegree[shnode];

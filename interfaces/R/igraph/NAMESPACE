@@ -98,7 +98,8 @@ export(evcent)
 
 # dynamics measurement
 
-export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d)
+export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
+       measure.dynamics.citedcat.id.age)
 
 # isomorphism, motifs
 
