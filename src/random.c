@@ -26,6 +26,8 @@
 
 #include <math.h>
 
+int igraph_rng_inited = 0;
+
 /*
  * \ingroup internal
  * 

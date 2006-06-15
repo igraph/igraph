@@ -50,8 +50,9 @@ double  Rf_rgeom(double);
 
 double igraph_norm_rand(void);
 double igraph_rgeom(double);
+extern int igraph_rng_inited;
 
-#define RNG_BEGIN()       srand(time(0))
+#define RNG_BEGIN()       if (!igraph_rng_inited) { srand(time(0)); igraph_rng_inited=1; }
 #define RNG_END()  
 #define RNG_INTEGER(l, h) ((long int)((rand())/((double)RAND_MAX+1)*((h)-(l)+1)+(l)))
 #define RNG_NORMAL(m, s)  (igraph_norm_rand()*(s)+(m))

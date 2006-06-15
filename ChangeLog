@@ -1,3 +1,8 @@
+2006-06-14  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/random.c, src/random.h : avoids calling srand(time(0))
+	multiple times
+
 2006-06-12  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_citedcat_id_age) :
