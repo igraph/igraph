@@ -727,8 +727,7 @@ PyObject* igraphmodule_Graph_Adjacency(PyTypeObject *type,
     return NULL;
   }
   
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -757,8 +756,7 @@ PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type,
   
   if (!PyArg_ParseTuple(args, "l", &n)) return NULL;
   
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -813,8 +811,7 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
     }
   }
   
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -903,8 +900,7 @@ PyObject* igraphmodule_Graph_Erdos_Renyi(PyTypeObject *type,
     }	
   }
       
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -967,8 +963,7 @@ PyObject* igraphmodule_Graph_Establishment(PyTypeObject *type,
     return NULL;
   }
   
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1014,8 +1009,7 @@ PyObject* igraphmodule_Graph_Full(PyTypeObject *type,
     return NULL;
   }
    
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1060,8 +1054,7 @@ PyObject* igraphmodule_Graph_Growing_Random(PyTypeObject *type,
     return NULL;
   }
    
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1111,8 +1104,7 @@ PyObject* igraphmodule_Graph_Star(PyTypeObject *type,
     return NULL;
   }
   
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1172,8 +1164,7 @@ PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type,
     }
   }
 	
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1216,8 +1207,7 @@ PyObject* igraphmodule_Graph_Ring(PyTypeObject *type,
     return NULL;
   }
    
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1260,8 +1250,7 @@ PyObject* igraphmodule_Graph_Tree(PyTypeObject *type,
     return NULL;
   }
    
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1311,8 +1300,7 @@ PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type,
     igraph_vector_init(&inseq, 0);
   }
   
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1358,8 +1346,7 @@ PyObject* igraphmodule_Graph_Isoclass(PyTypeObject *type,
     return NULL;
   }
   
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
@@ -1768,8 +1755,7 @@ PyObject* igraphmodule_Graph_copy(igraphmodule_GraphObject *self) {
     return NULL;
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   igraphmodule_Graph_init_internal(result);
   result->g=g;
   RC_ALLOC("Graph", result);
@@ -1814,8 +1800,7 @@ PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self,
   list=PyList_New(n);
   for (i=0; i<n; i++) {
     g=(igraph_t*)VECTOR(components)[i];
-    o = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						   &igraphmodule_GraphType);
+    o = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
     RC_ALLOC("Graph", self);
     igraphmodule_Graph_init_internal(o);
     o->g=*g;
@@ -2181,8 +2166,7 @@ PyObject* igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject *self,
     return NULL;
   }
 
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   
   if (result != NULL) result->g=mst;
@@ -2320,8 +2304,7 @@ PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self,
     return NULL;
   }
 
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) result->g=sg;
   
@@ -2362,6 +2345,28 @@ PyObject* igraphmodule_Graph_transitivity(igraphmodule_GraphObject *self,
   igraph_vector_destroy(&result);
   Py_INCREF(Py_None);
   return Py_None;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the graph reciprocity
+ * \return the reciprocity
+ * \sa igraph_reciprocity
+ */
+PyObject* igraphmodule_Graph_reciprocity(igraphmodule_GraphObject *self,
+					 PyObject *args, PyObject *kwds) {
+  char *kwlist[] = {"ignore_loops", NULL};
+  igraph_real_t result;
+  PyObject *ignore_loops = Py_True;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &ignore_loops))
+    return NULL;
+
+  if (igraph_reciprocity(&self->g, &result, PyObject_IsTrue(ignore_loops))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("d", (double)result);
 }
 
 /** \ingroup python_interface_graph
@@ -2835,8 +2840,7 @@ PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
     igraphmodule_Graph_init_internal(self);
@@ -2879,8 +2883,7 @@ PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObj
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
     igraphmodule_Graph_init_internal(self);
@@ -2923,8 +2926,7 @@ PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type, PyObject *args, PyObje
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
     igraphmodule_Graph_init_internal(self);
@@ -2965,8 +2967,7 @@ PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyOb
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
     igraphmodule_Graph_init_internal(self);
@@ -3007,8 +3008,7 @@ PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type,
     fclose(f);
     return NULL;
   }
-  self = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						    type);
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   if (self != NULL) {
     RC_ALLOC("Graph", self);
     igraphmodule_Graph_init_internal(self);
@@ -3377,8 +3377,7 @@ PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyOb
     }
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) {
     /* this is correct as long as attributes are not copied by the
@@ -3432,8 +3431,7 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
     }
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) {
     /* this is correct as long as attributes are not copied by the
@@ -3487,8 +3485,7 @@ PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObje
     }
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) {
     /* this is correct as long as attributes are not copied by the
@@ -3519,8 +3516,7 @@ PyObject* igraphmodule_Graph_difference(igraphmodule_GraphObject* self, PyObject
     return NULL;
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) {
     /* this is correct as long as attributes are not copied by the
@@ -3547,8 +3543,7 @@ PyObject* igraphmodule_Graph_complementer(igraphmodule_GraphObject* self, PyObje
     return NULL;
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) {
     /* this is correct as long as attributes are not copied by the
@@ -3573,8 +3568,7 @@ PyObject* igraphmodule_Graph_complementer_op(igraphmodule_GraphObject* self) {
     return NULL;
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) {
     /* this is correct as long as attributes are not copied by the
@@ -3605,8 +3599,7 @@ PyObject* igraphmodule_Graph_compose(igraphmodule_GraphObject* self, PyObject* o
     return NULL;
   }
   
-  result = (igraphmodule_GraphObject*)PyObject_GC_New(igraphmodule_GraphObject,
-						      self->ob_type);
+  result = (igraphmodule_GraphObject*)self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
   if (result != NULL) {
     /* this is correct as long as attributes are not copied by the

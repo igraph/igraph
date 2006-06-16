@@ -463,6 +463,8 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops);
 int igraph_transitivity(const igraph_t *graph, igraph_vector_t *res, 
 			igraph_transitivity_type_t type); /* vvv + add */
+int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
+		       igraph_bool_t ignore_loops);
 
 /* TODO: degree.distribution (?) */
 

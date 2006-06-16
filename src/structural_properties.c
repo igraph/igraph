@@ -1716,7 +1716,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
 /**
  * \ingroup structural
  * \function igraph_rewire
- * \brief Randomly rewires a graph while preserves the degree distribution.
+ * \brief Randomly rewires a graph while preserving the degree distribution.
  * 
  * This function generates a new graph based on the original one by randomly
  * rewiring edges while preserving the original graph's degree distribution.
@@ -1758,7 +1758,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
   igraph_vector_init(&edgevec, 4);
   IGRAPH_FINALLY(igraph_vector_destroy, &edgevec);
-  
+
   while (n>0) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2071,4 +2071,79 @@ int igraph_transitivity(const igraph_t *graph, igraph_vector_t *res,
   }
   
   return retval;
+}
+
+
+/**
+ * \ingroup structural
+ * \function igraph_reciprocity
+ * \brief Calculates the reciprocity of a directed graph.
+ * 
+ * A vertex pair (A, B) is said to be reciprocal if there are edges
+ * between them in both directions. The reciprocity of a directed graph
+ * is the proportion of all possible (A, B) pairs which are reciprocal,
+ * provided there is at least one edge between A and B. The reciprocity
+ * of an empty graph is undefined (results in an error code). Undirected
+ * graphs always have a reciprocity of 1.0 unless they are empty.
+ * 
+ * \param graph The graph object.
+ * \param res Pointer to an \c igraph_real_t which will contain the result.
+ * \param ignore_loops Whether to ignore loop edges.
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: graph has no edges
+ *         \c IGRAPH_ENOMEM: not enough memory for
+ *         temporary data. 
+ * 
+ * Time complexity: TODO
+ */
+int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
+		       igraph_bool_t ignore_loops) {
+  igraph_i_adjlist_t allneis;
+  igraph_vector_t *neis1, *neis2;
+  long rec, ecount, node, i, n, no_of_nodes;
+  
+  if (igraph_ecount(graph) == 0) {
+    return IGRAPH_EINVAL;
+  }
+  
+  if (!igraph_is_directed(graph)) {
+    *res=1.0;
+    return 0;
+  }
+  
+  igraph_i_adjlist_init(graph, &allneis, IGRAPH_OUT);
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+
+  rec=ecount=0;
+  no_of_nodes=igraph_vcount(graph);
+  
+  for (node=0; node<no_of_nodes; node++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    neis1=igraph_i_adjlist_get(&allneis, node);
+    /* TODO: this is pretty dumb, I just needed a quick solution to
+     * calculate reciprocity for some graphs. Maybe we can speed it up
+     * somehow */
+    n=igraph_vector_size(neis1);
+    for (i=0; i<n; i++) {
+      if (ignore_loops) {
+	if (VECTOR(*neis1)[i]<=node) continue;
+      } else if (VECTOR(*neis1)[i]<node) continue;
+	
+      neis2=igraph_i_adjlist_get(&allneis, VECTOR(*neis1)[i]);
+      if (igraph_vector_search(neis2, 0, node, 0)) {
+	rec++;
+	/* printf("%d -> %d [%c]\n", (int)node, (int)VECTOR(*neis1)[i], '+'); */
+      } /* else {
+	printf("%d -> %d [%c]\n", (int)node, (int)VECTOR(*neis1)[i], '-');
+      } */
+      ecount++;
+    }
+  }
+  
+  *res=((float)rec)/ecount;
+  
+  igraph_i_adjlist_destroy(&allneis);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
 }

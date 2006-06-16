@@ -1,3 +1,10 @@
+2006-06-16  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_reciprocity) : added
+	* examples/simple/igraph_reciprocity.c : added
+	* interfaces/python/graphobject.c
+	(igraphmodule_Graphobject_reciprocity) : added
+
 2006-06-14  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/random.c, src/random.h : avoids calling srand(time(0))

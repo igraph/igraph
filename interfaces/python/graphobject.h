@@ -100,6 +100,7 @@ PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, Py
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_reciprocity(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_rewire(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -675,6 +676,12 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "vertices."
   },
 
+  // interface to igraph_reciprocity
+  {"reciprocity", (PyCFunction)igraphmodule_Graph_reciprocity,
+      METH_VARARGS | METH_KEYWORDS,
+      "Returns the reciprocity of the graph."
+  },
+  
   // interface to igraph_rewire
   {"rewire", (PyCFunction)igraphmodule_Graph_rewire,
       METH_VARARGS | METH_KEYWORDS,
