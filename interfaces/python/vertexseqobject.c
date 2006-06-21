@@ -177,11 +177,14 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
 PyMethodDef igraphmodule_VertexSeq_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_VertexSeq_attributes,
       METH_NOARGS,
-      "Returns the attribute list of the graph's vertices\n"
+      "attributes() -> list\n\n"
+      "Returns the attribute name list of the graph's vertices\n"
   },
   {"get_attribute_values", (PyCFunction)igraphmodule_VertexSeq_get_attribute_values,
       METH_O,
-      "Returns the value list of a given vertex attribute\n"
+      "get_attribute_values(attrname) -> list\n"
+      "Returns the value of a given vertex attribute for all edges\n"
+      "@param attrname: the name of the attribute\n"
   },
   {NULL}
 };
@@ -232,7 +235,16 @@ PyTypeObject igraphmodule_VertexSeqType =
   0,                                          // tp_setattro
   0,                                          // tp_as_buffer
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, // tp_flags
-  "igraph vertex sequence object",            // tp_doc
+  "Class representing the vertex set of a graph.\n\n"
+  "The individual vertices can be accessed by indexing the vertex sequence\n"
+  "object. It can be used as an iterable as well, or even in a list\n"
+  "comprehension:\n\n"
+  "  >>> g=igraph.Graph.Full(3)\n"
+  "  >>> for v in g.vs:\n"
+  "  ...   v[\"value\"] = v.index ** 2\n"
+  "  ...\n"
+  "  >>> [v[\"value\"] ** 0.5 for v in g.vs]\n"
+  "  [0.0, 1.0, 2.0]\n", // tp_doc
   0,                                          // tp_traverse
   0,                                          // tp_clear
   0,                                          // tp_richcompare

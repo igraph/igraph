@@ -579,15 +579,23 @@ static igraph_attribute_table_t igraphmodule_i_attribute_table = {
 static PyMethodDef igraphmodule_methods[] = 
 {
   {"convex_hull", (PyCFunction)igraphmodule_convex_hull, METH_VARARGS,
-      "Calculates the convex hull of a given point set\n\n"
-      "Keyword arguments:\n"
-      "vs     -- the point set as a list of lists\n"
-      "coords -- if True, the function returns the coordinates of the\n"
-      "          corners of the convex hull polygon, otherwise returns\n"
-      "          the corner indices. Optional, defaults to False."
+      "convex_hull(vs, coords=False) -> list\n\n"
+      "Calculates the convex hull of a given point set.\n\n"
+      "@param vs: the point set as a list of lists\n"
+      "@param coords: if C{True}, the function returns the\n"
+      "  coordinates of the corners of the convex hull polygon,\n"
+      "  otherwise returns the corner indices.\n"
+      "@return: either the hull's corner coordinates or the point\n"
+      "  indices corresponding to them, depending on the C{coords}\n"
+      "  parameter."
   },
   {"set_progress_handler", igraphmodule_set_progress_handler, METH_VARARGS,
-      "Sets the handler to be called when igraph is performing a long operation."
+      "set_progress_handler(handler)\n\n"
+      "Sets the handler to be called when igraph is performing a long operation.\n"
+      "@param handler: the progress handler function. It must accept two\n"
+      "  arguments, the first is the message informing the user about\n"
+      "  what igraph is doing right now, the second is the actual\n"
+      "  progress information (a percentage).\n"
   },
   {NULL, NULL, 0, NULL}
 };
@@ -637,8 +645,15 @@ initigraph(void)
   
   PyModule_AddObject(m, "Graph", (PyObject*)&igraphmodule_GraphType);
   PyModule_AddObject(m, "BFSIter", (PyObject*)&igraphmodule_BFSIterType);
+  /* These types are not necessary to be registered, but I want epydoc to
+   * see them so the proper documentation can be generated for them */
+  PyModule_AddObject(m, "Edge", (PyObject*)&igraphmodule_EdgeType);
+  PyModule_AddObject(m, "EdgeSeq", (PyObject*)&igraphmodule_EdgeSeqType);
+  PyModule_AddObject(m, "Vertex", (PyObject*)&igraphmodule_VertexType);
+  PyModule_AddObject(m, "VertexSeq", (PyObject*)&igraphmodule_VertexSeqType);
   
   PyModule_AddObject(m, "InternalError", igraphmodule_InternalError);
+  
   PyModule_AddIntConstant(m, "OUT", IGRAPH_OUT);
   PyModule_AddIntConstant(m, "IN", IGRAPH_IN);
   PyModule_AddIntConstant(m, "ALL", IGRAPH_ALL);

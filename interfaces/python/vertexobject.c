@@ -253,6 +253,7 @@ PyObject* igraphmodule_Vertex_get_index(igraphmodule_VertexObject* self, void* c
 PyMethodDef igraphmodule_Vertex_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_Vertex_attributes,
       METH_NOARGS,
+      "attributes() -> list\n\n"
       "Returns the attribute list of the graph's vertices\n"
   },
   {NULL}
@@ -310,7 +311,15 @@ PyTypeObject igraphmodule_VertexType =
   0,                                          // tp_setattro
   0,                                          // tp_as_buffer
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, // tp_flags
-  "igraph vertex object",                     // tp_doc
+  "Class representing a single vertex in a graph.\n\n"
+  "The vertex is referenced by its index, so if the underlying graph\n"
+  "changes, the semantics of the vertex object might change as well\n"
+  "(if the vertex indices are altered in the original graph).\n\n"
+  "The attributes of the vertex can be accessed by using the vertex\n"
+  "as a hash:\n\n"
+  "  >>> v[\"color\"] = \"red\"\n"
+  "  >>> print v[\"color\"]\n"
+  "  red\n", // tp_doc
   0,                                          // tp_traverse
   0,                                          // tp_clear
   0,                                          // tp_richcompare

@@ -201,85 +201,100 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_vcount
   {"vcount", (PyCFunction)igraphmodule_Graph_vcount,
       METH_NOARGS,
-      "Returns the number of vertices in the graph"
+      "vcount() -> int\n"
+      "Return the number of vertices in the graph."
   },
   // interface to igraph_ecount
   {"ecount", (PyCFunction)igraphmodule_Graph_ecount,
       METH_NOARGS,
-      "Returns the number of edges in the graph"
+      "ecount() -> int\n"
+      "Return the number of edges in the graph."
   },
   // interface to igraph_is_directed
   {"is_directed", (PyCFunction)igraphmodule_Graph_is_directed,
       METH_NOARGS,
-      "Checks whether the graph is directed"
+      "is_directed() -> bool\n"
+      "Checks whether the graph is directed."
   },
   // interface to igraph_add_vertices
   {"add_vertices", (PyCFunction)igraphmodule_Graph_add_vertices,
       METH_VARARGS,
-      "Adds vertices to the graph. The only parameter is the number of "
-      "vertices to be added"
+      "add_vertices(n) -> self\n\n"
+      "Adds vertices to the graph.\n\n"
+      "@param n: the number of vertices to be added\n"
+      "@return: the same graph object\n"
   },
   // interface to igraph_delete_vertices
   {"delete_vertices", (PyCFunction)igraphmodule_Graph_delete_vertices,
       METH_VARARGS,
-      "Deletes vertices and all its edges from the graph. The only "
-      "parameter is a list of the vertices to be added. It is allowed "
-      "to provide a single integer instead of a list consisting of only "
-      "one integer."
+      "delete_vertices(vs) -> self\n\n"
+      "Deletes vertices and all its edges from the graph.\n\n"
+      "@param vs: a single vertex ID or the list of vertex IDs\n"
+      "  to be deleted.\n"
+      "@return: the same graph object\n"
   },
   // interface to igraph_add_edges
   {"add_edges", (PyCFunction)igraphmodule_Graph_add_edges,
       METH_VARARGS,
-      "Adds edges to the graph. The only parameter is a list of "
-      "edges to be added. Every edge is represented with a tuple, "
-      "containing the vertex IDs of the two endpoints. Vertices are "
-      "enumerated from zero. It is allowed to provide a single pair "
-      "instead of a list consisting of only one pair."
+      "add_edges(es) -> self\n\n"
+      "Adds edges to the graph.\n\n"
+      "@param es: the list of edges to be added. Every edge is\n"
+      "  represented with a tuple, containing the vertex IDs of the\n"
+      "  two endpoints. Vertices are enumerated from zero. It is\n"
+      "  allowed to provide a single pair instead of a list consisting\n"
+      "  of only one pair.\n"
+      "@return: the same graph object\n"
   },
   // interface to igraph_delete_edges
   {"delete_edges", (PyCFunction)igraphmodule_Graph_delete_edges,
       METH_VARARGS,
-      "Removes edges from the graph. The only parameter is a list of "
-      "edges to be removed. Every edge is represented with a tuple, "
-      "containing the vertex IDs of the two endpoints. Vertices are "
-      "enumerated from zero. It is allowed to provide a single pair "
-      "instead of a list consisting of only one pair. Nonexistent "
-      "edges will be silently ignored. All vertices will be kept, even "
-      "if they lose all their edges."
+      "delete_edges(es) -> self\n\n"
+      "Removes edges from the graph.\n\n"
+      "@param es: the list of edges to be removed. Every edge is\n"
+      "  represented with a tuple, containing the vertex IDs of the\n"
+      "  two endpoints. Vertices are enumerated from zero. It is\n"
+      "  allowed to provide a single pair instead of a list consisting\n"
+      "  of only one pair. Nonexistent edges will be silently ignored.\n"
+      "  All vertices will be kept, even if they lose all their edges.\n"
+      "@return: the same graph object\n"
   },
   // interface to igraph_degree
   {"degree", (PyCFunction)igraphmodule_Graph_degree,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns some vertex degrees from the graph.\n"
-      "This method accepts a single vertex ID or a list of vertex IDs as a "
-      "parameter, and returns the degree of the given vertices (in the form of "
-      "a single integer or a list, depending on the input parameter). A "
-      "second and a third argument may be passed as well, the second one "
-      "meaning the type of degree to be returned (OUT for out-degrees, "
-      "IN for in-degrees or ALL for the sum of them) and the third one "
-      "meaning whether self-loops should be counted. The default for them is "
-      "ALL and False. The type of degree is ignored for undirected graphs."
+      "degree(vertices, type=ALL, loops=False) -> int or list\n\n"
+      "Returns some vertex degrees from the graph.\n\n"
+      "This method accepts a single vertex ID or a list of vertex IDs as a\n"
+      "parameter, and returns the degree of the given vertices (in the\n"
+      "form of a single integer or a list, depending on the input\n"
+      "parameter).\n"
+      "\n"
+      "@param vertices: a single vertex ID or a list of vertex IDs\n"
+      "@param type: the type of degree to be returned (L{OUT} for\n"
+      "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
+      "  them).\n"
+      "@param loops: whether self-loops should be counted.\n"
   },
   // interfaces to igraph_neighbors
   {"neighbors", (PyCFunction)igraphmodule_Graph_neighbors,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns adjacent vertices to a given vertex.\n"
-      "This method accepts a single vertex ID as an argument, "
-      "and returns the adjacent vertices of that vertex. An optional "
-      "second argument allows the user to limit the result to only "
-      "predecessors (IN), only successors (OUT) or both of them (ALL). "
-      "The default behaviour is the latter one. "
-      "This argument is ignored for undirected graphs."
+      "neighbors(vertex, type=ALL) -> list\n\n"
+      "Returns adjacent vertices to a given vertex.\n\n"
+      "@param vertex: a vertex ID\n"
+      "@param type: whether to return only predecessors (L{OUT}),\n"
+      "  successors (L{OUT}) or both (L{ALL}). Ignored for undirected\n"
+      "  graphs."
   },
   {"successors", (PyCFunction)igraphmodule_Graph_successors,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the successors of a given vertex.\n"
-      "Equivalent to calling the neighbors method with type=OUT."
+      "successors(vertex) -> list\n\n"
+      "Returns the successors of a given vertex.\n\n"
+      "Equivalent to calling the L{Graph.neighbors} method with type=L{OUT}."
   },
   {"predecessors", (PyCFunction)igraphmodule_Graph_predecessors,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the predecessors of a given vertex.\n"
-      "Equivalent to calling the neighbors method with type=IN."
+      "predecessors(vertex) -> list\n\n"
+      "Returns the predecessors of a given vertex.\n\n"
+      "Equivalent to calling the L{Graph.neighbors} method with type=L{IN}."
   },
   
   //////////////////////
@@ -289,196 +304,179 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_adjacency
   {"Adjacency", (PyCFunction)igraphmodule_Graph_Adjacency,
       METH_CLASS | METH_VARARGS | METH_KEYWORDS,
+      "Adjacency(matrix, mode=ADJ_DIRECTED) -> Graph\n\n"
       "Generates a graph from its adjacency matrix.\n\n"
-      "Keyword arguments:\n"
-      "matrix -- the adjacency matrix\n"
-      "mode -- the mode to be used. Possible values are:\n"
-      "  ADJ_DIRECTED - the graph will be directed and a matrix\n"
-      "                 element gives the number of edges between\n"
-      "                 two vertex.\n"
-      "  ADJ_UNDIRECTED - alias to ADJ_MAX for convenience.\n"
-      "  ADJ_MAX  - undirected graph will be created and the number of\n"
-      "            edges between vertex i and j is max(A(i,j), A(j,i))\n"
-      "  ADJ_MIN  - like ADJ_MAX, but with min(A(i,j), A(j,i))\n"
-      "  ADJ_PLUS - like ADJ_MAX, but with A(i,j) + A(j,i)\n"
-      "  ADJ_UPPER - undirected graph with the upper right triangle of\n"
-      "              the matrix (including the diagonal)\n"
-      "  ADJ_LOWER - undirected graph with the lower left triangle of\n"
-      "              the matrix (including the diagonal)\n"
-      "  Optional, defaults to ADJ_DIRECTED.\n"
+      "@param matrix: the adjacency matrix\n"
+      "@param mode: the mode to be used. Possible values are:\n"
+      "\n"
+      "  - C{ADJ_DIRECTED} - the graph will be directed and a matrix\n"
+      "    element gives the number of edges between two vertex.\n"
+      "  - C{ADJ_UNDIRECTED} - alias to C{ADJ_MAX} for convenience.\n"
+      "  - C{ADJ_MAX}   - undirected graph will be created and the number of\n"
+      "    edges between vertex M{i} and M{j} is M{max(A(i,j), A(j,i))}\n"
+      "  - C{ADJ_MIN}   - like C{ADJ_MAX}, but with M{min(A(i,j), A(j,i))}\n"
+      "  - C{ADJ_PLUS}  - like C{ADJ_MAX}, but with M{A(i,j) + A(j,i)}\n"
+      "  - C{ADJ_UPPER} - undirected graph with the upper right triangle of\n"
+      "    the matrix (including the diagonal)\n"
+      "  - C{ADJ_LOWER} - undirected graph with the lower left triangle of\n"
+      "    the matrix (including the diagonal)\n"
+      " Optional, defaults to ADJ_DIRECTED.\n"
   },
   
   // interface to igraph_atlas
   {"Atlas", (PyCFunction)igraphmodule_Graph_Atlas,
       METH_CLASS | METH_KEYWORDS,
+      "Atlas(idx) -> Graph\n\n"
       "Generates a graph from the Graph Atlas.\n\n"
-      "The only argument denotes the index of the graph to be generated.\n"
-      "Indices start from zero, graphs are listed:\n"
-      "1. in increasing order of number of nodes;\n"
-      "2. for a fixed number of nodes, in increasing order of the\n"
-      "   number of edges;\n"
-      "3. for fixed numbers of nodes and edges, in increasing order\n"
-      "   of the degree sequence, for example 111223 < 112222;\n"
-      "4. for fixed degree sequence, in increasing number of automorphisms.\n"
+      "@param idx: The index of the graph to be generated.\n"
+      "  Indices start from zero, graphs are listed:\n\n"
+      "    1. in increasing order of number of nodes;\n"
+      "    2. for a fixed number of nodes, in increasing order of the\n"
+      "       number of edges;\n"
+      "    3. for fixed numbers of nodes and edges, in increasing order\n"
+      "       of the degree sequence, for example 111223 < 112222;\n"
+      "    4. for fixed degree sequence, in increasing number of automorphisms.\n"
   },
 	
   // interface to igraph_barabasi_game
   {"Barabasi", (PyCFunction)igraphmodule_Graph_Barabasi,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Generates a graph based on the Barabási-Albert model.\n\n"
-      "The first two arguments are mandatory: the first one is the "
-      "number of vertices, the second one is either the number of "
-      "outgoing edges generated for each vertex or a list containing the "
-      "number of outgoing edges for each vertex explicitly. The third "
-      "argument is True if the out-degree of a given vertex should also "
-      "increase its citation probability (as well as its in-degree), but "
-      "it defaults to False. The fourth argument is True if the generated "
-      "graph should be directed (default: False). The fifth argument is\n"
-      "the power constant of the nonlinear model, but it can be omitted,\n"
-      "and in this case the usual linear model will be used.\n\n"
-      "Keywords for the arguments: n, m, outpref, directed, power"
+      "Barabasi(n, m, outpref=False, directed=False, power=1) -> Graph\n\n"
+      "Generates a graph based on the Barabasi-Albert model.\n\n"
+      "@param n: the number of vertices\n"
+      "@param m: either the number of outgoing edges generated for\n"
+      "  each vertex or a list containing the number of outgoing\n"
+      "  edges for each vertex explicitly.\n"
+      "@param outpref: C{True} if the out-degree of a given vertex\n"
+      "  should also increase its citation probability (as well as\n"
+      "  its in-degree), but it defaults to C{False}.\n"
+      "@param directed: C{True} if the generated graph should be\n"
+      "  directed (default: C{False}).\n"
+      "@param power: the power constant of the nonlinear model.\n"
+      "  It can be omitted, and in this case the usual linear model\n"
+      "  will be used.\n"
   },
 
   // interface to igraph_establishment_game
   {"Establishment", (PyCFunction)igraphmodule_Graph_Establishment,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Generates a graph based on a simple growing model with vertex types.\n"
+      "Establishment(n, k, type_dist, pref_matrix, directed=False) -> Graph\n\n"
+      "Generates a graph based on a simple growing model with vertex types.\n\n"
       "A single vertex is added at each time step. This new vertex tries to\n"
       "connect to k vertices in the graph. The probability that such a\n"
       "connection is realized depends on the types of the vertices involved.\n"
       "\n"
-      "Keyword arguments:\n"
-      "n -- the number of vertices in the graph\n"
-      "k -- the number of connections tried in each step\n"
-      "type_dist -- list giving the distribution of vertex types\n"
-      "pref_matrix -- matrix (list of lists) giving the connection\n"
-      "               probabilities for different vertex types\n"
-      "directed -- whether to generate a directed graph. Optional, defaults\n"
-      "            to False."
+      "@param n: the number of vertices in the graph\n"
+      "@param k: the number of connections tried in each step\n"
+      "@param type_dist: list giving the distribution of vertex types\n"
+      "@param pref_matrix: matrix (list of lists) giving the connection\n"
+      "  probabilities for different vertex types\n"
+      "@param directed: whether to generate a directed graph.\n"
   },
   
   // interface to igraph_erdos_renyi_game
   {"Erdos_Renyi", (PyCFunction)igraphmodule_Graph_Erdos_Renyi,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Generates a graph based on the Erdõs-Rényi model.\n"
-      "There are a total of five possible arguments, two of them are "
-      "mutually exclusive. The first argument (keyword: n) is the number "
-      "of vertices. The second and the third (keywords: p and m) define "
-      "the density of the graph: if p is missing, there will be m edges; "
-      "if m is missing, every edge will be present with a probability of "
-      "p. These two arguments influence the same graph property (the "
-      "number of edges) in two different ways, so either p or m must be "
-      "present (but not both of them). The remaining two arguments are "
-      "optional. The fourth argument (keyword: directed) is True if the "
-      "generated graph should be directed (default: False), the fifth "
-      "(keyword: loops) is True if self-loops are allowed (default: False)."
+      "Erdos_Renyi(n, p, m, directed=False, loops=False) -> Graph\n\n"
+      "Generates a graph based on the Erdos-Renyi model.\n\n"
+      "@param n: the number of vertices.\n"
+      "@param p: the probability of edges. If given, C{m} must be missing.\n"
+      "@param m: the number of edges. If given, C{p} must be missing.\n"
+      "@param directed: whether to generate a directed graph.\n"
+      "@param loops: whether self-loops are allowed.\n"
   },
   
   // interface to igraph_full_game
   {"Full", (PyCFunction)igraphmodule_Graph_Full,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Generates a full graph (directed or undirected, with or without loops).\n"
-      "The only mandatory argument (keyword: n) is the number "
-      "of vertices. The remaining two arguments are optional. "
-      "The second argument (keyword: directed) is True if the "
-      "generated graph should be directed (default: False), the third "
-      "(keyword: loops) is True if self-loops are allowed (default: False)."
+      "Full(n, directed=False, loops=False) -> Graph\n\n"
+      "Generates a full graph (directed or undirected, with or without loops).\n\n"
+      "@param n: the number of vertices.\n"
+      "@param directed: whether to generate a directed graph.\n"
+      "@param loops: whether self-loops are allowed.\n"
   },
   
   // interface to igraph_growing_random_game
   {"Growing_Random", (PyCFunction)igraphmodule_Graph_Growing_Random,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Growing_Random(n, m, directed=False, citation=False) -> Graph\n\n"
       "Generates a growing random graph.\n\n"
-      "Keyword arguments:\n"
-      "n -- The number of vertices in the graph\n"
-      "m -- The number of edges to add in each step (after adding a new vertex)\n"
-      "directed -- whether the graph should be directed.\n"
-      "            Optional, defaults to False.\n"
-      "citation -- whether the new edges should originate from the most\n"
-      "            recently added vertex.\n"
-      "            Optional, defaults to False."
+      "@param n: The number of vertices in the graph\n"
+      "@param m: The number of edges to add in each step (after adding a new vertex)\n"
+      "@param directed: whether the graph should be directed.\n"
+      "@param citation: whether the new edges should originate from the most\n"
+      "   recently added vertex.\n"
   },
   
   // interface to igraph_star
   {"Star", (PyCFunction)igraphmodule_Graph_Star,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Star(n, mode=STAR_UNDIRECTED, center=0) -> Graph\n\n"
       "Generates a star graph.\n\n"
-      "Keyword arguments:\n"
-      "n -- The number of vertices in the graph\n"
-      "mode -- Gives the type of the star graph to create. Should be\n"
-      "        one of the constants STAR_OUT, STAR_IN and STAR_UNDIRECTED.\n"
-      "        Optional, defaults to STAR_UNDIRECTED.\n"
-      "center -- Vertex ID for the central vertex in the star.\n"
-      "          Optional, defaults to zero.\n"
+      "@param n: the number of vertices in the graph\n"
+      "@param mode: Gives the type of the star graph to create. Should be\n"
+      "  one of the constants C{STAR_OUT}, C{STAR_IN} and C{STAR_UNDIRECTED}.\n"
+      "@param center: Vertex ID for the central vertex in the star.\n"
   },
   
   // interface to igraph_lattice
   {"Lattice", (PyCFunction)igraphmodule_Graph_Lattice,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Lattice(dim, nei=1, directed=False, mutual=True, circular=True) -> Graph\n\n"
       "Generates a regular lattice.\n\n"
-      "Keyword arguments:\n"
-      "dim      -- List with the dimensions of the lattice\n"
-      "nei      -- Value giving the distance (number of steps) within which\n"
-      "            two vertices will be connected. Not implemented yet. Optional,\n"
-      "            defaults to 1.\n"
-      "directed -- Whether to create a directed graph. Optional,\n"
-      "            defaults to False.\n"
-      "mutual   -- Whether to create all connections as mutual in case of a\n"
-      "            directed graph. Optional, defaults to True.\n"
-      "circular -- Whether the generated lattice is periodic. Optional,\n"
-      "            defaults to True.\n"
+      "@param dim: list with the dimensions of the lattice\n"
+      "@param nei: value giving the distance (number of steps) within which\n"
+      "   two vertices will be connected. Not implemented yet.\n"
+      "@param directed: whether to create a directed graph.\n"
+      "@param mutual: whether to create all connections as mutual\n"
+      "    in case of a directed graph.\n"
+      "@param circular: whether the generated lattice is periodic.\n"
   },
   
   // interface to igraph_ring
   {"Ring", (PyCFunction)igraphmodule_Graph_Ring,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Ring(n, directed=False, mutual=False, circular=True) -> Graph\n\n"
       "Generates a ring graph.\n\n"
-      "Keyword arguments:\n"
-      "n -- The number of vertices in the ring\n"
-      "directed -- whether to create a directed ring.\n"
-      "            Optional, defaults to False.\n"
-      "mutual -- whether to create mutual edges in a directed ring.\n"
-      "          Optional, defaults to False.\n"
-      "          Ignored for undirected graphs.\n"
-      "circular -- whether to create a closed ring.\n"
-      "            Optional, defaults to True."
+      "@param n: the number of vertices in the ring\n"
+      "@param directed: whether to create a directed ring.\n"
+      "@param mutual: whether to create mutual edges in a directed ring.\n"
+      "@param circular: whether to create a closed ring.\n"
   },
   
   // interface to igraph_tree
   {"Tree", (PyCFunction)igraphmodule_Graph_Tree,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Tree(n, children, type=TREE_UNDIRECTED) -> Graph\n\n"
       "Generates a tree in which almost all vertices have the same number of children.\n\n"
-      "Keyword arguments:\n"
-      "n -- The number of vertices in the graph\n"
-      "children -- The number of children of a vertex in the graph\n"
-      "type -- determines whether the tree should be directed, and if\n"
-      "        this is the case, also its orientation. Must be one of\n"
-      "        TREE_IN, TREE_OUT and TREE_UNDIRECTED.\n"
-      "        Optional, defaults to TREE_UNDIRECTED\n"
+      "@param n: the number of vertices in the graph\n"
+      "@param children: the number of children of a vertex in the graph\n"
+      "@param type: determines whether the tree should be directed, and if\n"
+      "  this is the case, also its orientation. Must be one of\n"
+      "  C{TREE_IN}, C{TREE_OUT} and C{TREE_UNDIRECTED}.\n"
   },
   
   // interface to igraph_degree_sequence_game
   {"Degree_Sequence", (PyCFunction)igraphmodule_Graph_Degree_Sequence,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Degree_Sequence(out, in=None) -> Graph\n\n"
       "Generates a graph with a given degree sequence.\n\n"
-      "Keyword arguments:\n"
-      "out -- the out-degree sequence for a directed graph. If the\n"
-      "       in-degree sequence is omitted, the generated graph\n"
-      "       will be undirected, so this will be the in-degree\n"
-      "       sequence as well\n"
-      "in  -- the in-degree sequence for a directed graph. Optional,\n"
-      "       if omitted, the generated graph will be undirected.\n"
+      "@param out: the out-degree sequence for a directed graph. If the\n"
+      "  in-degree sequence is omitted, the generated graph\n"
+      "  will be undirected, so this will be the in-degree\n"
+      "  sequence as well\n"
+      "@param in: the in-degree sequence for a directed graph.\n"
+      "   If omitted, the generated graph will be undirected.\n"
   },
   
   // interface to igraph_isoclass_create
   {"Isoclass", (PyCFunction)igraphmodule_Graph_Isoclass,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+      "Isoclass(n, class, directed=False) -> Graph\n\n"
       "Generates a graph with a given isomorphy class.\n\n"
-      "Keyword arguments:\n"
-      "n        -- the number of vertices in the graph (3 or 4)\n"
-      "class    -- the isomorphy class\n"
-      "directed -- whether the graph should be directed. Optional,\n"
-      "            defaults to False.\n"
+      "@param n: the number of vertices in the graph (3 or 4)\n"
+      "@param class: the isomorphy class\n"
+      "@param directed: whether the graph should be directed.\n"
   },
   
   /////////////////////////////////////
@@ -488,49 +486,55 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_are_connected
   {"are_connected", (PyCFunction)igraphmodule_Graph_are_connected,
       METH_VARARGS | METH_KEYWORDS,
+      "are_connected(v1, v2) -> bool\n\n"
       "Decides whether two given vertices are directly connected.\n\n"
-      "Keyword arguments:\n"
-      "v1 -- the first vertex\n"
-      "v2 -- the second vertex\n"
-      "Returns true if there exists an edge from v1 to v2."
+      "@param v1: the first vertex\n"
+      "@param v2: the second vertex\n"
+      "@return: C{True} if there exists an edge from v1 to v2, C{False}\n"
+      "  otherwise.\n"
   },
   
   // interface to igraph_average_path_length
   {"average_path_length", (PyCFunction)igraphmodule_Graph_average_path_length,
       METH_VARARGS | METH_KEYWORDS,
+      "average_path_length(directed=True, unconn=True) -> double\n\n"
       "Calculates the average path length in a graph.\n\n"
-      "Keyword arguments:\n"
-      "directed -- whether to consider directed paths.\n"
-      "            Ignored for undirected graphs. Optional, defaults to True.\n"
-      "unconn -- what to do when the graph is unconnected. If True, the\n"
-      "          average of the geodesic lengths in the components is\n"
-      "          calculated. Otherwise for all unconnected vertex pairs,\n"
-      "          a path length equal to the number of vertices is used.\n"
+      "@param directed: whether to consider directed paths in case of a\n"
+      "  directed graph. Ignored for undirected graphs.\n"
+      "@param unconn: what to do when the graph is unconnected. If C{True},\n"
+      "  the average of the geodesic lengths in the components is\n"
+      "  calculated. Otherwise for all unconnected vertex pairs,\n"
+      "  a path length equal to the number of vertices is used.\n"
+      "@return: the average path length in the graph\n"
   },
   
   // interface to igraph_betweenness
   {"betweenness", (PyCFunction)igraphmodule_Graph_betweenness,
       METH_VARARGS | METH_KEYWORDS,
+      "betweenness(vertices=None, directed=True) -> list\n\n"
       "Calculates the betweenness of nodes in a graph.\n\n"
       "Keyword arguments:\n"
-      "vertices -- the vertices for which the betweennesses must be returned.\n"
-      "            Optional, defaults to all of the vertices in the graph.\n"
-      "directed -- whether to consider directed paths.\n"
-      "            Ignored for undirected graphs. Optional, defaults to True.\n"
+      "@param vertices: the vertices for which the betweennesses must be returned.\n"
+      "  If C{None}, assumes all of the vertices in the graph.\n"
+      "@param directed: whether to consider directed paths.\n"
+      "@return: the betweenness of the given nodes in a list\n"
   },
   
   // interface to igraph_bibcoupling
   {"bibcoupling", (PyCFunction)igraphmodule_Graph_bibcoupling,
       METH_VARARGS | METH_KEYWORDS,
-      "Calculates bibliographic coupling values for given vertices in a graph.\n\n"
-      "Keyword arguments:\n"
-      "vertices -- the vertices to be analysed.\n"
-      "Returns bibliographic coupling values for all given vertices in a matrix."
+      "bibcoupling(vertices) -> matrix\n\n"
+      "Calculates bibliographic coupling values for given vertices\n"
+      "in a graph.\n\n"
+      "@param vertices: the vertices to be analysed.\n"
+      "@return: bibliographic coupling values for all given\n"
+      "  vertices in a matrix.\n"
   },
   
   // interface to igraph_closeness
   {"closeness", (PyCFunction)igraphmodule_Graph_closeness,
       METH_VARARGS | METH_KEYWORDS,
+      "closeness(vertices=None, mode=ALL) -> list\n\n"
       "Calculates the closeness centralities of given nodes in a graph.\n\n"
       "The closeness centerality of a vertex measures how easily other\n"
       "vertices can be reached from it (or the other way: how easily it\n"
@@ -541,220 +545,223 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "vertices, the number of vertices is used instead the length of\n"
       "the geodesic. This is always longer than the longest possible\n"
       "geodesic.\n\n"
-      "Keyword arguments:\n"
-      "vertices -- the vertices for which the betweennesses must be returned.\n"
-      "            Optional, defaults to all of the vertices in the graph.\n"
-      "mode -- must be one of IN, OUT and ALL. IN means that the length of\n"
-      "        incoming paths, OUT means that the length of the outgoing\n"
-      "        paths must be calculated. ALL means that both of them must\n"
-      "        be calculated. Optional, defaults to ALL.\n"
+      "@param vertices: the vertices for which the closenesses must\n"
+      "  be returned. If C{None}, uses all of the vertices in the graph.\n"
+      "@param mode: must be one of C{IN}, C{OUT} and C{ALL}. C{IN} means\n"
+      "  that the length of the incoming paths, C{OUT} means that the\n"
+      "  length of the outgoing paths must be calculated. C{ALL} means\n"
+      "  that both of them must be calculated.\n"
+      "@return: the calculated closenesses in a list\n"
   },   	    
   
   // interface to igraph_clusters
   {"clusters", (PyCFunction)igraphmodule_Graph_clusters,
       METH_VARARGS | METH_KEYWORDS,
+      "clusters(mode=STRONG) -> list\n\n"
       "Calculates the (strong or weak) clusters for a given graph.\n\n"
-      "Keyword arguments:\n"
-      "mode -- must be either STRONG or WEAK, depending on the clusters\n"
-      "        being sought. Optional, defaults to STRONG.\n"
-      "Returns the component index for every node in the graph."
+      "@param mode: must be either C{STRONG} or C{WEAK}, depending on\n"
+      "  the clusters being sought. Optional, defaults to C{STRONG}.\n"
+      "@return: the component index for every node in the graph.\n"
   },
   {"components", (PyCFunction)igraphmodule_Graph_clusters,
       METH_VARARGS | METH_KEYWORDS,
-      "Alias for 'clusters'.\n\n"
-      "See the documentation of 'clusters' for details."
+      "components(mode=STRONG) -> list\n\n"
+      "Alias for L{Graph.clusters}.\n\n"
+      "See the documentation of L{Graph.clusters} for details."
   },
   {"copy", (PyCFunction)igraphmodule_Graph_copy,
       METH_NOARGS,
+      "copy() -> graph\n\n"
       "Creates an exact deep copy of the graph."
   },
   {"decompose", (PyCFunction)igraphmodule_Graph_decompose,
       METH_VARARGS | METH_KEYWORDS,
+      "decompose(mode=STRONG, maxcompno=None, minelements=1) -> list\n\n"
       "Decomposes the graph into subgraphs.\n\n"
-      "Keyword arguments:\n"
-      "mode -- must be either STRONG or WEAK, depending on the clusters\n"
-      "        being sought. Optional, defaults to STRONG.\n"
-      "maxcompno -- maximum number of components to return. Optional,\n"
-      "             defaults to all possible components.\n"
-      "minelements -- minimum number of vertices in a component. Optional,\n"
-      "               defaults to 1. By setting this to 2, isolated vertices\n"
-      "               are not returned as separate components.\n"
-      "A list of the subgraphs is returned. Every returned subgraph is a\n"
-      "copy of the original.\n"
+      "@param mode: must be either STRONG or WEAK, depending on the\n"
+      "  clusters being sought.\n"
+      "@param maxcompno: maximum number of components to return.\n"
+      "  C{None} means all possible components.\n"
+      "@param minelements: minimum number of vertices in a component.\n"
+      "  By setting this to 2, isolated vertices are not returned\n"
+      "  as separate components.\n"
+      "@return: a list of the subgraphs. Every returned subgraph is a\n"
+      "  copy of the original.\n"
   },
   
   // interface to igraph_cocitation
   {"cocitation", (PyCFunction)igraphmodule_Graph_cocitation,
       METH_VARARGS | METH_KEYWORDS,
+      "cocitation(vertices) -> matrix\n\n"
       "Calculates cocitation scores for given vertices in a graph.\n\n"
-      "Keyword arguments:\n"
-      "vertices -- the vertices to be analysed.\n"
-      "Returns cocitation scores for all given vertices in a matrix."
+      "@param vertices: the vertices to be analysed.\n"
+      "@return: cocitation scores for all given vertices in a matrix."
   },
   
   // interface to igraph_diameter
   {"diameter", (PyCFunction)igraphmodule_Graph_diameter,
       METH_VARARGS | METH_KEYWORDS,
+      "diameter(directed=True, unconn=True) -> double\n\n"
       "Calculates the diameter of the graph.\n\n"
-      "Keyword arguments:\n"
-      "directed -- whether to consider directed paths.\n"
-      "            Ignored for undirected graphs. Optional, defaults to True.\n"
-      "unconn -- if True and the graph is undirected, the longest geodesic "
-      "          within a component will be returned. If False and the "
-      "          graph is undirected, the result is the number of vertices."
+      "@param directed: whether to consider directed paths.\n"
+      "@param unconn: if C{True} and the graph is undirected, the\n"
+      "  longest geodesic within a component will be returned. If\n"
+      "  C{False} and the graph is undirected, the result is the\n"
+      "  number of vertices."
   },
   
   // interface to igraph_edge_betweenness
   {"edge_betweenness", (PyCFunction)igraphmodule_Graph_edge_betweenness,
       METH_VARARGS | METH_KEYWORDS,
+      "edge_betweenness(directed=True) -> list\n\n"
       "Calculates the edge betweennesses in a graph.\n\n"
-      "Keyword arguments:\n"
-      "directed -- whether to consider directed paths.\n"
-      "            Ignored for undirected graphs. Optional, defaults to True.\n"
-      "Returns a list with the edge betweennesses of all the edges.\n"
+      "@param directed: whether to consider directed paths.\n"
+      "@return: a list with the edge betweennesses of all specified edges.\n"
   },
   
   // interface to igraph_get_shortest_paths
   {"get_shortest_paths", (PyCFunction)igraphmodule_Graph_get_shortest_paths,
       METH_VARARGS | METH_KEYWORDS,
+      "get_shortest_paths(v, mode=ALL) -> list\n\n"
       "Calculates the shortest paths from/to a given node in a graph.\n\n"
-      "Keyword arguments:\n"
-      "v    -- the source/destination for the calculated paths\n"
-      "mode -- the directionality of the paths. IN means to calculate\n"
-      "        incoming paths, OUT means to calculate outgoing paths,\n"
-      "        ALL means to calculate both ones. Ignored for undirected\n"
-      "        graphs. Optional, defaults to ALL\n"
-      "Returns at most one shortest path for every node in the graph in a\n"
+      "@param v: the source/destination for the calculated paths\n"
+      "@param mode: the directionality of the paths. C{IN} means to\n"
+      "  calculate incoming paths, C{OUT} means to calculate outgoing\n"
+      "  paths, C{ALL} means to calculate both ones.\n"
+      "@return: at most one shortest path for every node in the graph in a\n"
       "list. For unconnected graphs, some of the list elements will be\n"
-      "an empty list. Note that in case of mode=IN, the nodes in a path\n"
+      "empty lists. Note that in case of mode=C{IN}, the nodes in a path\n"
       "are returned in reversed order!"
   },
   
   // interface to igraph_get_all_shortest_paths
   {"get_all_shortest_paths", (PyCFunction)igraphmodule_Graph_get_all_shortest_paths,
       METH_VARARGS | METH_KEYWORDS,
+      "get_all_shortest_paths(v, mode=ALL) -> list\n\n"
       "Calculates all of the shortest paths from/to a given node in a graph.\n\n"
-      "Keyword arguments:\n"
-      "v    -- the source/destination for the calculated paths\n"
-      "mode -- the directionality of the paths. IN means to calculate\n"
-      "        incoming paths, OUT means to calculate outgoing paths,\n"
-      "        ALL means to calculate both ones. Ignored for undirected\n"
-      "        graphs. Optional, defaults to ALL\n"
-      "Returns all of the shortest path from the given node to every other\n"
-      "reachable node in the graph in a list. Note that in case of mode=IN,\n"
+      "@param v: the source/destination for the calculated paths\n"
+      "@param mode: the directionality of the paths. C{IN} means to calculate\n"
+      "  incoming paths, C{OUT} means to calculate outgoing paths,\n"
+      "  C{ALL} means to calculate both ones.\n"
+      "@return: all of the shortest path from the given node to every other\n"
+      "reachable node in the graph in a list. Note that in case of mode=C{IN},\n"
       "the nodes in a path are returned in reversed order!"
   },
   
   // interface to igraph_is_connected
   {"is_connected", (PyCFunction)igraphmodule_Graph_is_connected,
       METH_VARARGS | METH_KEYWORDS,
+      "is_connected(mode=STRONG) -> bool\n\n"
       "Decides whether a graph is connected.\n\n"
-      "Keyword arguments:\n"
-      "mode -- whether we should calculate strong or weak connectivity.\n"
-      "        Ignored for undirected graphs. Optional, defaults to\n"
-      "        STRONG."
+      "@param mode: whether we should calculate strong or weak connectivity.\n"
+      "@return: C{True} if the graph is connected, C{False} otherwise.\n"
   },
   
   // interface to igraph_pagerank
   {"pagerank", (PyCFunction)igraphmodule_Graph_pagerank,
       METH_VARARGS | METH_KEYWORDS,
+      "pagerank(vertices=None, directed=True, niter=1000, eps=0.001, damping=0.85) -> list\n\n"
       "Calculates the Google PageRank values of a graph.\n\n"
-      "Keyword arguments:\n"
-      "vertices -- the indices of the vertices being queried. Optional,"
-      "            defaults to all of the vertices.\n"
-      "directed -- whether to consider directed paths.\n"
-      "            Ignored for undirected graphs. Optional, defaults to True.\n"
-      "niter    -- the maximum number of iterations to be performed.\n"
-      "            Optional, defaults to 1000.\n"
-      "eps      -- the iteration stops if all of the PageRank values change\n"
-      "            less than eps between two iterations. Optional, defaults\n"
-      "            to 0.001\n"
-      "damping  -- the damping factor. Optional, defaults to 0.85.\n"
-      "            1-damping is the PageRank value for nodes with no\n"
-      "            incoming links.\n"
-      "Returns a list with the Google PageRank values of the specified\n"
-      "vertices."
+      "@param vertices: the indices of the vertices being queried.\n"
+      "  C{None} means all of the vertices.\n"
+      "@param directed: whether to consider directed paths.\n"
+      "@param niter: the maximum number of iterations to be performed.\n"
+      "@param eps: the iteration stops if all of the PageRank values change\n"
+      "  less than M{eps} between two iterations.\n"
+      "@param damping: the damping factor.\n"
+      "  M{1-damping} is the PageRank value for nodes with no\n"
+      "  incoming links.\n"
+      "@return: a list with the Google PageRank values of the specified\n"
+      "  vertices."
   },
 
   // interface to igraph_reciprocity
   {"reciprocity", (PyCFunction)igraphmodule_Graph_reciprocity,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the reciprocity of the graph."
+      "reciprocity() -> double\n\n"
+      "@return: the reciprocity of the graph."
   },
   
   // interface to igraph_rewire
   {"rewire", (PyCFunction)igraphmodule_Graph_rewire,
       METH_VARARGS | METH_KEYWORDS,
+      "rewire(n=1000, mode=REWIRING_SIMPLE) -> self\n\n"
       "Randomly rewires the graph while preserving the degree distribution.\n\n"
       "Please note that the rewiring is done \"in-place\", so the original\n"
       "graph will be modified. If you want to preserve the original graph,\n"
-      "use the copy method before.\n\n"
-      "Keyword arguments:\n"
-      "n        -- the number of rewiring trials. Optional,\n"
-      "            defaults to 1000.\n"
-      "mode     -- the rewiring algorithm to use. Optional,\n"
-      "            defaults to REWIRING_SIMPLE.\n"
-      "Returns the modified graph.\n"
+      "use the L{copy} method before.\n\n"
+      "@param n: the number of rewiring trials.\n"
+      "@param mode: the rewiring algorithm to use. As for now, only\n"
+      "  C{REWIRING_SIMPLE} is supported.\n"
+      "@return: the modified graph.\n"
   },
   
   // interface to igraph_shortest_paths
   {"shortest_paths", (PyCFunction)igraphmodule_Graph_shortest_paths,
       METH_VARARGS | METH_KEYWORDS,
+      "shortest_paths(vertices, mode) -> matrix\n\n"
       "Calculates shortest path lengths for given nodes in a graph.\n\n"
-      "Keyword arguments:\n"
-      "vertices -- a list containing the vertex IDs which should be included in the result.\n"
-      "mode -- the type of shortest paths to be used for the calculation in directed graphs.\n"
-      "        OUT -- outgoing paths, IN -- incoming paths, ALL -- the directed graph\n"
-      "        is considered as an undirected one."
+      "@param vertices: a list containing the vertex IDs which should be\n"
+      "  included in the result.\n"
+      "@param mode: the type of shortest paths to be used for the\n"
+      "  calculation in directed graphs. C{OUT} means only outgoing,\n"
+      "  C{IN} means only incoming paths. C{ALL} means to consider\n"
+      "  the directed graph as an undirected one.\n"
+      "@return: the shortest path lengths for given nodes in a matrix\n"
   },
   
   // interface to igraph_simplify
   {"simplify", (PyCFunction)igraphmodule_Graph_simplify,
       METH_VARARGS | METH_KEYWORDS,
-      "Simplifies a graph by removing self-loops and/or multiple edges.\n"
-      "Keywords arguments:\n"
-      "multiple -- whether to remove multiple edges. Optional, defaults\n"
-      "            to True.\n"
-      "loops -- whether to remove loops. Optional, defaults to True.\n"
+      "simplify(multiple=True, loops=True)\n\n"
+      "Simplifies a graph by removing self-loops and/or multiple edges.\n\n"
+      "@param multiple: whether to remove multiple edges.\n"
+      "@param loops: whether to remove loops.\n"
   },
   
   // interface to igraph_minimum_spanning_tree_unweighted and
   // igraph_minimum_spanning_tree_prim
   {"spanning_tree", (PyCFunction)igraphmodule_Graph_spanning_tree,
       METH_VARARGS | METH_KEYWORDS,
+      "spanning_tree(weights=None) -> graph\n\n"
       "Calculates a minimum spanning tree for a graph (weighted or unweighted)\n\n"
-      "Keyword arguments:\n"
-      "weights -- a vector containing weights for every edge in the graph.\n"
-      "           If omitted, every edge is assumed to have an equal weight.\n"
-      "Returns the spanning tree as an igraph.Graph object."
+      "@param weights: a vector containing weights for every edge in\n"
+      "  the graph. C{None} means that the graph is unweighted.\n"
+      "@return: the spanning tree as an igraph.Graph object."
   },
   
   // interface to igraph_subcomponent
   {"subcomponent", (PyCFunction)igraphmodule_Graph_subcomponent,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the indices of vertices which are in the same component as a given vertex.\n\n"
-      "Keyword arguments:\n"
-      "v -- the index of the vertex used as the source/destination\n"
-      "mode -- if equals to IN, returns the vertex IDs from where the\n"
-      "        given vertex can be reached. If equals to OUT, returns the\n"
-      "        vertex IDs which are reachable from the given vertex. If\n"
-      "        equals to ALL, returns all vertices within the same component\n"
-      "        as the given vertex, ignoring edge directions. Note that this\n"
-      "        not equals to calculating the union of the results of IN and OUT.\n"
+      "subcomponent(v, mode=ALL) -> list\n\n"
+      "Determines the indices of vertices which are in the same component as a given vertex.\n\n"
+      "@param v: the index of the vertex used as the source/destination\n"
+      "@param mode: if equals to C{IN}, returns the vertex IDs from\n"
+      "  where the given vertex can be reached. If equals to C{OUT},\n"
+      "  returns the vertex IDs which are reachable from the given\n"
+      "  vertex. If equals to C{ALL}, returns all vertices within the\n"
+      "  same component as the given vertex, ignoring edge directions.\n"
+      "  Note that this is not equal to calculating the union of the \n"
+      "  results of C{IN} and C{OUT}.\n"
+      "@return: the indices of vertices which are in the same component as a given vertex.\n"
   },
   
   // interface to igraph_subgraph
   {"subgraph", (PyCFunction)igraphmodule_Graph_subgraph,
       METH_VARARGS | METH_KEYWORDS,
+      "subgraph(vertices) -> graph\n\n"
       "Returns a subgraph based on the given vertices.\n\n"
-      "Keyword arguments:\n"
-      "vertices -- a list containing the vertex IDs which should be included in the result.\n"
+      "@param vertices: a list containing the vertex IDs which\n"
+      "  should be included in the result.\n"
+      "@return: a copy of the subgraph\n"
   },
   
   // interface to igraph_transitivity
   {"transitivity", (PyCFunction)igraphmodule_Graph_transitivity,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the transitivity (clustering coefficient) of the graph."
+      "transitivity() -> double\n\n"
+      "Calculates the transitivity (clustering coefficient) of the graph.\n\n"
+      "@return: the transitivity\n"
   },
   
   //////////////////////
@@ -764,142 +771,166 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_layout_circle
   {"layout_circle", (PyCFunction)igraphmodule_Graph_layout_circle,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_circle() -> list\n\n"
       "Places the vertices of the graph uniformly on a circle.\n\n"
-      "Returns the calculated coordinate pairs in a vector."
+      "@return: the calculated coordinate pairs in a list."
   },
   
   // interface to igraph_layout_sphere
   {"layout_sphere", (PyCFunction)igraphmodule_Graph_layout_sphere,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_sphere() -> list\n\n"
       "Places the vertices of the graph uniformly on a sphere.\n\n"
-      "Returns the calculated coordinate pairs in a vector."
+      "@return: the calculated coordinate triplets in a list."
   },
   
   // interface to igraph_layout_kamada_kawai
   {"layout_kamada_kawai", (PyCFunction)igraphmodule_Graph_layout_kamada_kawai,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None) -> list\n\n"
       "Places the vertices on a plane according to the Kamada-Kawai algorithm.\n\n"
       "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
       "An Algorithm for Drawing General Undirected Graphs.\n"
       "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
-      "Keyword arguments:\n"
-      "maxiter -- the number of iterations to perform. Optional, defaults to 1000.\n"
-      "sigma   -- the standard base deviation of the position change proposals.\n"
-      "           Optional, defaults to the number of vertices * 0.25\n"
-      "initemp -- initial temperature of the simulated annealing.\n"
-      "           Optional, defaults to 10.\n"
-      "coolexp -- cooling exponent of the simulated annealing.\n"
-      "           Optional, defaults to 0.99\n"
-      "kkconst -- the Kamada-Kawai vertex attraction constant. Optional,\n"
-      "           defaults to the square of the number of vertices.\n"
+      "@param maxiter: the number of iterations to perform.\n"
+      "@param sigma: the standard base deviation of the position\n"
+      "  change proposals. C{None} means the number of vertices * 0.25\n"
+      "@param initemp: initial temperature of the simulated annealing.\n"
+      "@param coolexp: cooling exponent of the simulated annealing.\n"
+      "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
+      "  C{None} means the square of the number of vertices.\n"
+      "@return: the calculated coordinate pairs in a list."
   },
   
   // interface to igraph_layout_kamada_kawai_3d
   {"layout_kamada_kawai_3d", (PyCFunction)igraphmodule_Graph_layout_kamada_kawai_3d,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_kamada_kawai_3d(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None) -> list\n\n"
       "Places the vertices in the 3D space according to the Kamada-Kawai algorithm.\n\n"
-      "For argument list, see Graph.layout_kamada_kawai"
+      "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
+      "An Algorithm for Drawing General Undirected Graphs.\n"
+      "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
+      "@param maxiter: the number of iterations to perform.\n"
+      "@param sigma: the standard base deviation of the position\n"
+      "  change proposals. C{None} means the number of vertices * 0.25\n"
+      "@param initemp: initial temperature of the simulated annealing.\n"
+      "@param coolexp: cooling exponent of the simulated annealing.\n"
+      "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
+      "  C{None} means the square of the number of vertices.\n"
+      "@return: the calculated coordinate triplets in a list."
   },
   
   // interface to igraph_layout_fruchterman_reingold
   {"layout_fruchterman_reingold", (PyCFunction)igraphmodule_Graph_layout_fruchterman_reingold,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_fruchterman_reingold(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta) -> list\n\n"
       "Places the vertices on a 2D plane according to the Fruchterman-Reingold algorithm.\n\n"
       "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
       "Graph Drawing by Force-directed Placement.\n"
       "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
-      "Keyword arguments:\n"
-      "maxiter    -- the number of iterations to perform. Optional, defaults to 500.\n"
-      "maxdelta   -- the maximum distance to move a vertex in an iteration\n"
-      "              Optional, defaults to the number of vertices\n"
-      "area       -- the area of the square on which the vertices\n"
-      "              will be placed. Optional, defaults to the square of\n"
-      "              maxdelta.\n"
-      "coolexp    -- the cooling exponent of the simulated annealing.\n"
-      "              Optional, defaults to 0.99\n"
-      "repulserad -- Determines the radius at which vertex-vertex repulsion\n"
-      "              cancels out attraction of adjacent vertices. Optional,\n"
-      "              defaults to maxiter * maxdelta\n"
+      "@param maxiter: the number of iterations to perform.\n"
+      "@param maxdelta: the maximum distance to move a vertex in\n"
+      "  an iteration. C{None} means the number of vertices.\n"
+      "@param area: the area of the square on which the vertices\n"
+      "  will be placed. C{None} means the square of M{maxdelta}.\n"
+      "@param coolexp: the cooling exponent of the simulated annealing.\n"
+      "@param repulserad: determines the radius at which vertex-vertex\n"
+      "  repulsion cancels out attraction of adjacent vertices.\n"
+      "  C{None} means M{maxiter*maxdelta}.\n"
+      "@return: the calculated coordinate pairs in a list."
   },
   
   // interface to igraph_layout_fruchterman_reingold_3d
   {"layout_fruchterman_reingold_3d", (PyCFunction)igraphmodule_Graph_layout_fruchterman_reingold_3d,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_fruchterman_reingold_3d(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta) -> list\n\n"
       "Places the vertices in the 3D space according to the Fruchterman-Reingold grid algorithm.\n\n"
-      "For argument list, see Graph.layout_fruchterman_reingold"
+      "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
+      "Graph Drawing by Force-directed Placement.\n"
+      "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
+      "@param maxiter: the number of iterations to perform.\n"
+      "@param maxdelta: the maximum distance to move a vertex in\n"
+      "  an iteration. C{None} means the number of vertices.\n"
+      "@param area: the area of the square on which the vertices\n"
+      "  will be placed. C{None} means the square of M{maxdelta}.\n"
+      "@param coolexp: the cooling exponent of the simulated annealing.\n"
+      "@param repulserad: determines the radius at which vertex-vertex\n"
+      "  repulsion cancels out attraction of adjacent vertices.\n"
+      "  C{None} means M{maxiter*maxdelta}.\n"
+      "@return: the calculated coordinate triplets in a list."
   },
   
   // interface to igraph_layout_grid_fruchterman_reingold
   {"layout_grid_fruchterman_reingold", (PyCFunction)igraphmodule_Graph_layout_grid_fruchterman_reingold,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_grid_fruchterman_reingold(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, cellsize=1.0) -> list\n\n"
       "Places the vertices on a 2D plane according to the Fruchterman-Reingold grid algorithm.\n\n"
       "This is a modified version of a force directed layout, see\n"
       "Fruchterman, T. M. J. and Reingold, E. M.:\n"
       "Graph Drawing by Force-directed Placement.\n"
-      "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n"
+      "Software -- Practice and Experience, 21/11, 1129--1164, 1991.\n"
       "The algorithm partitions the 2D space to a grid and vertex\n"
       "repulsion is then calculated only for vertices nearby.\n\n"
-      "Keyword arguments:\n"
-      "maxiter    -- the number of iterations to perform. Optional, defaults to 500.\n"
-      "maxdelta   -- the maximum distance to move a vertex in an iteration\n"
-      "              Optional, defaults to the number of vertices\n"
-      "area       -- the area of the square on which the vertices\n"
-      "              will be placed. Optional, defaults to the square of\n"
-      "              maxdelta.\n"
-      "coolexp    -- the cooling exponent of the simulated annealing.\n"
-      "              Optional, defaults to 0.99\n"
-      "repulserad -- Determines the radius at which vertex-vertex repulsion\n"
-      "              cancels out attraction of adjacent vertices. Optional,\n"
-      "              defaults to maxiter * maxdelta\n"
-      "cellsize   -- the size of the grid cells.\n"
+      "@param maxiter: the number of iterations to perform.\n"
+      "@param maxdelta: the maximum distance to move a vertex in\n"
+      "  an iteration. C{None} means the number of vertices.\n"
+      "@param area: the area of the square on which the vertices\n"
+      "  will be placed. C{None} means the square of M{maxdelta}.\n"
+      "@param coolexp: the cooling exponent of the simulated annealing.\n"
+      "@param repulserad: determines the radius at which vertex-vertex\n"
+      "  repulsion cancels out attraction of adjacent vertices.\n"
+      "  C{None} means M{maxiter*maxdelta}.\n"
+      "@param cellsize: the size of the grid cells.\n"
+      "@return: the calculated coordinate pairs in a list."
   },
   
   // interface to igraph_layout_lgl
   {"layout_lgl", (PyCFunction)igraphmodule_Graph_layout_lgl,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_lgl(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, cellsize=1.0, proot=None) -> list\n\n"
       "Places the vertices on a 2D plane according to the Large Graph Layout.\n\n"
-      "Keyword arguments:\n"
-      "maxiter    -- the number of iterations to perform. Optional, defaults to 500.\n"
-      "maxdelta   -- the maximum distance to move a vertex in an iteration\n"
-      "              Optional, defaults to the number of vertices\n"
-      "area       -- the area of the square on which the vertices\n"
-      "              will be placed. Optional, defaults to the square of\n"
-      "              maxdelta.\n"
-      "coolexp    -- the cooling exponent of the simulated annealing.\n"
-      "              Optional, defaults to 0.99\n"
-      "repulserad -- Determines the radius at which vertex-vertex repulsion\n"
-      "              cancels out attraction of adjacent vertices. Optional,\n"
-      "              defaults to maxiter * maxdelta\n"
-      "cellsize   -- The size of the grid cells, one side of the square.\n"
-      "              Optional.\n"
-      "proot      -- The root vertex, this is placed first, its neighbors\n"
-      "              in the first iteration, second neighbors in the second,\n"
-      "              etc. Optional, defaults to a random vertex.\n"
+      "@param maxiter: the number of iterations to perform.\n"
+      "@param maxdelta: the maximum distance to move a vertex in\n"
+      "  an iteration. C{None} means the number of vertices.\n"
+      "@param area: the area of the square on which the vertices\n"
+      "  will be placed. C{None} means the square of M{maxdelta}.\n"
+      "@param coolexp: the cooling exponent of the simulated annealing.\n"
+      "@param repulserad: determines the radius at which vertex-vertex\n"
+      "  repulsion cancels out attraction of adjacent vertices.\n"
+      "  C{None} means M{maxiter*maxdelta}.\n"
+      "@param cellsize: the size of the grid cells.\n"
+      "@param proot: the root vertex, this is placed first, its neighbors\n"
+      "  in the first iteration, second neighbors in the second,\n"
+      "  etc. C{None} means a random vertex.\n"
+      "@return: the calculated coordinate pairs in a list."
   },
   
   // interface to igraph_layout_reingold_tilford
   {"layout_reingold_tilford", (PyCFunction)igraphmodule_Graph_layout_reingold_tilford,
       METH_VARARGS | METH_KEYWORDS,
-	  "Places the vertices on a 2D plane according to the Reingold-Tilford\n"
-	  "layout algorithm. See the following reference for details:\n\n"
-	  "EM Reingold, JS Tilford: Tidier Drawings of Trees.\n"
-	  "IEEE Transactions on Software Engineering 7:22, 223-228, 1981.\n\n"
-	  "Keyword arguments:\n"
-	  "root -- the root of the tree.\n"
+      "layout_reingold_tilford(root) -> list\n"
+      "Places the vertices on a 2D plane according to the Reingold-Tilford\n"
+      "layout algorithm. See the following reference for details:\n"
+      "EM Reingold, JS Tilford: Tidier Drawings of Trees.\n"
+      "IEEE Transactions on Software Engineering 7:22, 223-228, 1981.\n\n"
+      "@param root: the root of the tree.\n"
+      "@return: the calculated coordinate pairs in a list."
   },
   
   // interface to igraph_layout_random
   {"layout_random", (PyCFunction)igraphmodule_Graph_layout_random,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_random() -> list\n"
       "Places the vertices of the graph randomly in a 2D space.\n\n"
-      "Returns the \"calculated\" coordinate pairs in a vector."
+      "@return: the \"calculated\" coordinate pairs in a list."
   },
    
   // interface to igraph_layout_random_3d
   {"layout_random_3d", (PyCFunction)igraphmodule_Graph_layout_random_3d,
       METH_VARARGS | METH_KEYWORDS,
+      "layout_random_3d() -> list\n"
       "Places the vertices of the graph randomly in a 3D space.\n\n"
-      "Returns the \"calculated\" coordinate triplets in a vector."
+      "@return: the \"calculated\" coordinate triplets in a list."
   },
 
   ////////////////////////////
@@ -907,48 +938,49 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   ////////////////////////////
   {"bfs", (PyCFunction)igraphmodule_Graph_bfs,
       METH_VARARGS | METH_KEYWORDS,
+      "bfs(vid, mode=OUT) -> tuple\n\n"
       "Conducts a breadth first search (BFS) on the graph.\n\n"
-      "Returns a tuple with the following items:\n"
-      "* The vertex IDs visited (in order)\n"
-      "* The start indices of the layers in the vertex list\n"
-      "* The parent of every vertex in the BFS\n"
-      "Keyword arguments:\n"
-      "vid  -- the root vertex ID\n"
-      "mode -- either IN or OUT or ALL, ignored for undirected graphs.\n"
-      "        Optional, defaults to OUT.\n"
+      "@param vid: the root vertex ID\n"
+      "@param mode: either C{IN} or C{OUT} or C{ALL}, ignored\n"
+      "  for undirected graphs.\n"
+      "@return: a tuple with the following items:\n"
+      "   - The vertex IDs visited (in order)\n"
+      "   - The start indices of the layers in the vertex list\n"
+      "   - The parent of every vertex in the BFS\n"
   },
   {"bfsiter", (PyCFunction)igraphmodule_Graph_bfsiter,
       METH_VARARGS | METH_KEYWORDS,
+      "bfsiter(vid, mode=OUT, advanced=False) -> BFSIter\n\n"
       "Constructs a breadth first search (BFS) iterator of the graph.\n\n"
-      "Keyword arguments:\n"
-      "vid      -- the root vertex ID\n"
-      "mode     -- either IN or OUT or ALL, ignored for undirected graphs.\n"
-      "            Optional, defaults to OUT.\n"
-      "advanced -- if False, the iterator returns the next vertex in BFS\n"
-      "            order in every step. If True, the iterator returns the\n"
-      "            distance of the vertex from the root and the parent\n"
-      "            of the vertex in the BFS tree as well."
+      "@param vid: the root vertex ID\n"
+      "@param mode: either C{IN} or C{OUT} or C{ALL}.\n"
+      "@param advanced: if C{False}, the iterator returns the next\n"
+      "  vertex in BFS order in every step. If C{True}, the iterator\n"
+      "  returns the distance of the vertex from the root and the\n"
+      "  parent of the vertex in the BFS tree as well.\n"
+      "@return: the BFS iterator as a L{BFSIter} object.\n"
   },
   
   //////////////////////////////////////////////////////
   // CONVERT A GRAPH TO EDGE LIST OR ADJACENCY MATRIX //
   //////////////////////////////////////////////////////
   
-  // interface to igraph_get_edgelist
+  // interface to igraph_get_adjacency
   {"get_adjacency", (PyCFunction)igraphmodule_Graph_get_adjacency,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the edge list of a graph.\n\n"
-      "Keyword arguments:\n"
-      "type -- either GET_ADJACENCY_LOWER (uses the lower triangle\n"
-      "        of the matrix) or GET_ADJACENCY_UPPER (uses the upper\n"
-      "        triangle) or GET_ADJACENCY_BOTH (uses both parts).\n"
-      "        Optional, defaults to GET_ADJACENCY_BOTH, ignored for\n"
-      "        directed graphs."
+      "get_adjacency(type=GET_ADJACENCY_BOTH) -> matrix\n\n"
+      "Returns the adjacency matrix of a graph.\n\n"
+      "@param type: either C{GET_ADJACENCY_LOWER} (uses the\n"
+      "  lower triangle of the matrix) or C{GET_ADJACENCY_UPPER}\n"
+      "  (uses the upper triangle) or C{GET_ADJACENCY_BOTH}\n"
+      "  (uses both parts). Ignored for directed graphs.\n"
+      "@return: the adjacency matrix.\n"
   },
   
   // interface to igraph_get_edgelist
   {"get_edgelist", (PyCFunction)igraphmodule_Graph_get_edgelist,
       METH_NOARGS,
+      "get_edgelist() -> list\n\n"
       "Returns the edge list of a graph."
   },
   
@@ -959,131 +991,126 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_read_graph_edgelist
   {"Read_Edgelist", (PyCFunction)igraphmodule_Graph_Read_Edgelist,
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-      "Reads an edge list from a file and creates a graph based on it.\n"
+      "Read_Edgelist(f, directed=True) -> Graph\n\n"
+      "Reads an edge list from a file and creates a graph based on it.\n\n"
       "Please note that the vertex indices are zero-based.\n\n"
-      "Keyword arguments:\n"
-      "f        -- the name of the file\n"
-      "directed -- whether the generated graph should be directed.\n"
-      "            Optional, defaults to True.\n\n"
+      "@param f: the name of the file\n"
+      "@param directed: whether the generated graph should be directed.\n"
   },
   // interface to igraph_read_graph_ncol
   {"Read_Ncol", (PyCFunction)igraphmodule_Graph_Read_Ncol,
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-      "Reads an .ncol file used by LGL, also useful for creating graphs\n"
-      "from \"named\" (and optionally weighted) edge lists.\n\n"
+      "Read_Ncol(f, names=True, weights=True) -> Graph\n\n"
+      "Reads an .ncol file used by LGL.\n\n"
+      "It is also useful for creating graphs from \"named\" (and\n"
+      "optionally weighted) edge lists.\n\n"
       "This format is used by the Large Graph Layout program. See the\n"
-      "documentation of LGL regarding the exact format description:\n"
-      "http://bioinformatics.icmb.utexas.edu/bgl\n\n"
+      "U{documentation of LGL <http://bioinformatics.icmb.utexas.edu/bgl/>}\n"
+      "regarding the exact format description.\n\n"
       "LGL originally cannot deal with graphs containing multiple or loop\n"
       "edges, but this condition is not checked here, as igraph is happy\n"
       "with these.\n\n"
-      "Keyword arguments:\n"
-      "f       -- the name of the file\n"
-      "names   -- logical value. If True, the vertex names are added as a\n"
-      "           vertex attribute called 'name'. Optional, defaults to\n"
-      "           True.\n"
-      "weights -- logical value. If True, the edge weights are added as an\n"
-      "           edge attribute called 'weight'. Optional, defaults to\n"
-      "           True.\n"
+      "@param f: the name of the file\n"
+      "@param names: If C{True}, the vertex names are added as a\n"
+      "  vertex attribute called 'name'.\n"
+      "@param weights: If True, the edge weights are added as an\n"
+      "  edge attribute called 'weight'.\n"
   },
   // interface to igraph_read_graph_lgl
   {"Read_Lgl", (PyCFunction)igraphmodule_Graph_Read_Lgl,
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-      "Reads an .lgl file used by LGL, also useful for creating graphs\n"
-      "from \"named\" (and optionally weighted) edge lists.\n\n"
+      "Read_Lgl(f, names=True, weights=True) -> Graph\n\n"
+      "Reads an .lgl file used by LGL.\n\n"
+      "It is also useful for creating graphs from \"named\" (and\n"
+      "optionally weighted) edge lists.\n\n"
       "This format is used by the Large Graph Layout program. See the\n"
-      "documentation of LGL regarding the exact format description:\n"
-      "http://bioinformatics.icmb.utexas.edu/bgl\n\n"
+      "U{documentation of LGL <http://bioinformatics.icmb.utexas.edu/bgl/>}\n"
+      "regarding the exact format description.\n\n"
       "LGL originally cannot deal with graphs containing multiple or loop\n"
       "edges, but this condition is not checked here, as igraph is happy\n"
       "with these.\n\n"
-      "Keyword arguments:\n"
-      "f       -- the name of the file\n"
-      "names   -- logical value. If True, the vertex names are added as a\n"
-      "           vertex attribute called 'name'. Optional, defaults to\n"
-      "           True.\n"
-      "weights -- logical value. If True, the edge weights are added as an\n"
-      "           edge attribute called 'weight'. Optional, defaults to\n"
-      "           True.\n"
+      "@param f: the name of the file\n"
+      "@param names: If C{True}, the vertex names are added as a\n"
+      "  vertex attribute called 'name'.\n"
+      "@param weights: If True, the edge weights are added as an\n"
+      "  edge attribute called 'weight'.\n"
   },
   // interface to igraph_read_graph_pajek
   {"Read_Pajek", (PyCFunction)igraphmodule_Graph_Read_Pajek,
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-      "Reads a Pajek format file and creates a graph based on it.\n"
-      "Keyword arguments:\n"
-      "f -- the name of the file\n"
+      "Read_Pajek(f) -> Graph\n\n"
+      "Reads a Pajek format file and creates a graph based on it.\n\n"
+      "@param f: the name of the file\n"
   },
   // interface to igraph_read_graph_graphml
   {"Read_GraphML", (PyCFunction)igraphmodule_Graph_Read_GraphML,
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-      "Reads a GraphML format file and creates a graph based on it.\n"
-      "Keyword arguments:\n"
-      "f        -- the name of the file\n"
-      "directed -- whether the graph should be directed. Please note that\n"
-      "            if you ask for a directed graph, but the GraphML file\n"
-      "            contains an undirected graph (with some optional directed\n"
-      "            edges), then the undirected edges will be added in both\n"
-      "            directions and the resulting Graph object will be a\n"
-      "            directed graph. However, if you ask for an undirected\n"
-      "            graph and the GraphML file contains a directed one,\n"
-      "            all of the edges will be undirected (so your request\n"
-      "            takes precedence over what the file states). Optional,\n"
-      "            defaults to true\n"
-      "index    -- if the GraphML file contains multiple graphs, specifies\n"
-      "            the one which should be loaded. Graph indices start from\n"
-      "            zero, so if you want to load the first graph, specify 0\n"
-      "            here. Optional, defaults to zero.\n"
+      "Read_GraphML(f, directed=True, index=0) -> Graph\n\n"
+      "Reads a GraphML format file and creates a graph based on it.\n\n"
+      "@param f: the name of the file\n"
+      "@param directed: whether the graph should be directed. Please\n"
+      "  note that if you ask for a directed graph, but the GraphML\n"
+      "  file contains an undirected graph (with some optional directed\n"
+      "  edges), then the undirected edges will be added in both\n"
+      "  directions and the resulting Graph object will be a\n"
+      "  directed graph. However, if you ask for an undirected\n"
+      "  graph and the GraphML file contains a directed one,\n"
+      "  all of the edges will be undirected (so your request\n"
+      "  takes precedence over what the file states).\n"
+      "@param index: if the GraphML file contains multiple graphs,\n"
+      "  specifies the one that should be loaded. Graph indices\n"
+      "  start from zero, so if you want to load the first graph,\n"
+      "  specify 0 here.\n"
   },
   // interface to igraph_write_graph_edgelist
   {"write_edgelist", (PyCFunction)igraphmodule_Graph_write_edgelist,
       METH_VARARGS | METH_KEYWORDS,
-      "Writes the edge list of a graph to a file. Directed edges are\n"
-      "written in (from, to) order.\n\n"
-      "Keyword arguments:\n"
-      "f -- the name of the file to be written\n"
+      "write_edgelist(f)\n\n"
+      "Writes the edge list of a graph to a file.\n\n"
+      "Directed edges are written in (from, to) order.\n\n"
+      "@param f: the name of the file to be written\n"
   },
   // interface to igraph_write_graph_ncol
   {"write_ncol", (PyCFunction)igraphmodule_Graph_write_ncol,
       METH_VARARGS | METH_KEYWORDS,
-      "Writes the edge list of a graph to a file in .ncol format.\n"
+      "write_ncol(f, names=\"name\", weights=\"weights\")\n\n"
+      "Writes the edge list of a graph to a file in .ncol format.\n\n"
       "Note that multiple edges and/or loops break the LGL software,\n"
       "but igraph does not check for this condition. Unless you know\n"
       "that the graph does not have multiple edges and/or loops, it\n"
-      "is wise to call simplify() before saving.\n\n"
-      "Keyword arguments:\n"
-      "f       -- the name of the file to be written\n"
-      "names   -- the name of the vertex attribute containing the name\n"
-      "           of the vertices. Optional, defaults to 'name'. If you\n"
-      "           don't want to store vertex names, supply None here.\n"
-      "weights -- the name of the edge attribute containing the weight\n"
-      "           of the vertices. Optional, defaults to 'weight'. If you\n"
-      "           don't want to store weights, supply None here.\n"
+      "is wise to call L{simplify()} before saving.\n\n"
+      "@param f: the name of the file to be written\n"
+      "@param names: the name of the vertex attribute containing the name\n"
+      "  of the vertices. If you don't want to store vertex names,\n"
+      "  supply C{None} here.\n"
+      "@param weights: the name of the edge attribute containing the weight\n"
+      "  of the vertices. If you don't want to store weights,\n"
+      "  supply C{None} here.\n"
   },
   // interface to igraph_write_graph_lgl
   {"write_lgl", (PyCFunction)igraphmodule_Graph_write_lgl,
       METH_VARARGS | METH_KEYWORDS,
-      "Writes the edge list of a graph to a file in .lgl format.\n"
+      "write_lgl(f, names=\"name\", weights=\"weights\", isolates=True)\n\n"
+      "Writes the edge list of a graph to a file in .lgl format.\n\n"
       "Note that multiple edges and/or loops break the LGL software,\n"
       "but igraph does not check for this condition. Unless you know\n"
       "that the graph does not have multiple edges and/or loops, it\n"
-      "is wise to call simplify() before saving.\n\n"
-      "Keyword arguments:\n"
-      "f        -- the name of the file to be written\n"
-      "names    -- the name of the vertex attribute containing the name\n"
-      "            of the vertices. Optional, defaults to 'name'. If you\n"
-      "            don't want to store vertex names, supply None here.\n"
-      "weights  -- the name of the edge attribute containing the weight\n"
-      "            of the vertices. Optional, defaults to 'weight'. If you\n"
-      "            don't want to store weights, supply None here.\n"
-      "isolates -- whether to include isolated vertices in the output.\n"
-      "            Optional, defaults to True.\n"
+      "is wise to call L{simplify()} before saving.\n\n"
+      "@param f: the name of the file to be written\n"
+      "@param names: the name of the vertex attribute containing the name\n"
+      "  of the vertices. If you don't want to store vertex names,\n"
+      "  supply C{None} here.\n"
+      "@param weights: the name of the edge attribute containing the weight\n"
+      "  of the vertices. If you don't want to store weights,\n"
+      "  supply C{None} here.\n"
+      "@param isolates: whether to include isolated vertices in the output.\n"
   },
   // interface to igraph_write_graph_edgelist
   {"write_graphml", (PyCFunction)igraphmodule_Graph_write_graphml,
       METH_VARARGS | METH_KEYWORDS,
+      "write_graphml(f)\n\n"
       "Writes the graph to a GraphML file.\n\n"
-      "Keyword arguments:\n"
-      "f -- the name of the file to be written\n"
+      "@param f: the name of the file to be written\n"
   },
 
   /////////////////
@@ -1091,16 +1118,22 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   /////////////////
   {"isoclass", (PyCFunction)igraphmodule_Graph_isoclass,
       METH_VARARGS | METH_KEYWORDS,
-      "Returns the isomorphy class of the graph or its subgraph. The only\n"
-      "argument is optional and may contain a list of vertices if we want\n"
-      "to calculate the isomorphy class for only a subset of vertices.\n"
+      "isoclass(vertices) -> int\n\n"
+      "Returns the isomorphy class of the graph or its subgraph.\n\n"
       "Isomorphy class calculations are implemented only for graphs with\n"
-      "3 or 4 nodes.\n"
+      "3 or 4 nodes.\n\n"
+      "@param vertices: a list of vertices if we want to calculate the\n"
+      "  isomorphy class for only a subset of vertices. C{None} means to\n"
+      "  use the full graph.\n"
+      "@return: the isomorphy class of the (sub)graph\n\n"
   },
   {"isomorphic", (PyCFunction)igraphmodule_Graph_isomorphic,
       METH_VARARGS | METH_KEYWORDS,
-      "Checks whether the graph is isomorphic with another graph (given in\n"
-      "an argument)"
+      "isomorphic(other) -> bool\n\n"
+      "Checks whether the graph is isomorphic with another graph.\n\n"
+      "Works only for graphs with 3 or 4 vertices.\n\n"
+      "@param other: the other graph with which we want to compare the graph.\n"
+      "@return: C{True} if the graphs are isomorphic, C{False} if not.\n"
   },
   
   ////////////////////////
@@ -1108,15 +1141,18 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   ////////////////////////
   {"attributes", (PyCFunction)igraphmodule_Graph_attributes,
       METH_NOARGS,
-      "Returns the attribute list of the graph\n"
+      "attributes() -> list\n\n"
+      "Returs the attribute name list of the graph\n"
   },
   {"vertex_attributes", (PyCFunction)igraphmodule_Graph_vertex_attributes,
       METH_NOARGS,
-      "Returns the attribute list of the graph's vertices\n"
+      "vertex_attributes() -> list\n\n"
+      "Returns the attribute name list of the graph's vertices\n"
   },
   {"edge_attributes", (PyCFunction)igraphmodule_Graph_edge_attributes,
       METH_NOARGS,
-      "Returns the attribute list of the graph's edges\n"
+      "edge_attributes() -> list\n\n"
+      "Returns the attribute name list of the graph's edges\n"
   },
 
   ///////////////
@@ -1124,25 +1160,36 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   ///////////////
   {"complementer", (PyCFunction)igraphmodule_Graph_complementer,
       METH_VARARGS,
+      "complementer(loops=False) -> graph\n\n"
       "Returns the complementer of the graph\n\n"
-      "If the first argument is True, the complementer will include\n"
-      "loop edges. If it is omitted or False, no loop edges will be\n"
-      "present in the complementer."
+      "@param loops: whether to include loop edges in the complementer.\n"
+      "@return: the complementer of the graph\n"
   },
   {"compose", (PyCFunction)igraphmodule_Graph_compose,
-      METH_O, "Returns the composition of two graphs"
+      METH_O, "compose(other) -> graph\n\nReturns the composition of two graphs."
   },
   {"difference", (PyCFunction)igraphmodule_Graph_difference,
-      METH_O, "Subtracts the second graph from the first"
+      METH_O, "difference(other) -> graph\n\nSubtracts the given graph from the original"
   },
   {"disjoint_union", (PyCFunction)igraphmodule_Graph_disjoint_union,
-      METH_O, "Creates the disjoint union of two (or more) graphs"
+      METH_O,
+      "disjoint_union(graphs) -> graph\n\n"
+      "Creates the disjoint union of two (or more) graphs.\n\n"
+      "@param graphs: the list of graphs to be united with the current one.\n"
   },
   {"intersection", (PyCFunction)igraphmodule_Graph_intersection,
-      METH_O, "Creates the intersection of two (or more) graphs"
+      METH_O,
+      "intersection(graphs) -> graph\n\n"
+      "Creates the intersection of two (or more) graphs.\n\n"
+      "@param graphs: the list of graphs to be intersected with\n"
+      "  the current one.\n"
   },
   {"union", (PyCFunction)igraphmodule_Graph_union,
-      METH_O, "Creates the union of two (or more) graphs"
+      METH_O,
+      "union(graphs) -> graph\n\n"
+      "Creates the union of two (or more) graphs.\n\n"
+      "@param graphs: the list of graphs to be intersected with\n"
+      "  the current one.\n"
   },
   
   ////////////////////////////////////
@@ -1150,18 +1197,18 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   ////////////////////////////////////
   {"__graph_as_cobject__", (PyCFunction)igraphmodule_Graph___graph_as_cobject__,
       METH_VARARGS | METH_KEYWORDS,
+      "__graph_as_cobject__() -> PyCObject\n\n"
       "Returns the igraph graph encapsulated by the Python object as\n"
-      "a PyCObject (which is barely a regular C pointer). This function\n"
+      "a PyCObject\n\n."
+      "A PyObject is barely a regular C pointer. This function\n"
       "should not be used directly by igraph users, it is useful only\n"
       "in the case when the underlying igraph object must be passed to\n"
       "another C code through Python.\n\n"
-      /*"Keyword arguments:\n"
-      "ref -- increases the reference count of the graph when True.\n"
-      "       Optional, defaults to False.\n"*/
   },
   {"__register_destructor__", (PyCFunction)igraphmodule_Graph___register_destructor__,
       METH_VARARGS | METH_KEYWORDS,
-      "Registers a destructor to be called when the object is freed by "
+      "__register_destructor__(destructor)\n\n"
+      "Registers a destructor to be called when the object is freed by\n"
       "Python. This function should not be used directly by igraph users."
   },
   {NULL}

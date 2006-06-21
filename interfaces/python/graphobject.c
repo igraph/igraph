@@ -3798,7 +3798,7 @@ PyTypeObject igraphmodule_GraphType = {
   PyObject_GenericSetAttr,                  /* tp_setattro */
   0,                                        /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, /* tp_flags */
-  "igraph graph object",                    /* tp_doc */
+  "Class representing a graph in the igraph library.",                    /* tp_doc */
   (traverseproc)igraphmodule_Graph_traverse,/* tp_traverse */
   (inquiry)igraphmodule_Graph_clear,        /* tp_clear */
   0,                                        /* tp_richcompare */

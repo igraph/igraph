@@ -296,6 +296,7 @@ PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closu
 PyMethodDef igraphmodule_Edge_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_Edge_attributes,
       METH_NOARGS,
+      "attributes() -> list\n\n"
       "Returns the attribute list of the graph's edges\n"
   },
   {NULL}
@@ -359,7 +360,15 @@ PyTypeObject igraphmodule_EdgeType =
   0,                                          // tp_setattro
   0,                                          // tp_as_buffer
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, // tp_flags
-  "igraph edge object",                       // tp_doc
+  "Class representing a single edge in a graph.\n\n"
+  "The edge is referenced by its index, so if the underlying graph\n"
+  "changes, the semantics of the edge object might change as well\n"
+  "(if the edge indices are altered in the original graph).\n\n"
+  "The attributes of the edge can be accessed by using the edge\n"
+  "as a hash:\n\n"
+  "  >>> e[\"weight\"] = 2\n"
+  "  >>> print e[\"weight\"]\n"
+  "  2\n", // tp_doc
   0,                                          // tp_traverse
   0,                                          // tp_clear
   0,                                          // tp_richcompare

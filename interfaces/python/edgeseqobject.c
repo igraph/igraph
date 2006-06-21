@@ -174,11 +174,14 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* 
 PyMethodDef igraphmodule_EdgeSeq_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_EdgeSeq_attributes,
       METH_NOARGS,
-      "Returns the attribute list of the graph's edges\n"
+      "attributes() -> list\n\n"
+      "Returns the attribute name list of the graph's edges\n"
   },
   {"get_attribute_values", (PyCFunction)igraphmodule_EdgeSeq_get_attribute_values,
       METH_O,
-      "Returns the value list of a given edge attribute\n"
+      "get_attribute_values(attrname) -> list\n\n"
+      "Returns the value of a given edge attribute for all edges.\n\n"
+      "@param attrname: the name of the attribute\n"
   },
   {NULL}
 };
@@ -229,7 +232,19 @@ PyTypeObject igraphmodule_EdgeSeqType =
   0,                                        // tp_setattro
   0,                                        // tp_as_buffer
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, // tp_flags
-  "igraph edge sequence object",            // tp_doc
+  "Class representing the edge set of a graph.\n\n"
+  "The individual edges can be accessed by indexing the edge sequence\n"
+  "object. It can be used as an iterable as well, or even in a list\n"
+  "comprehension:\n\n"
+  "  >>> g=igraph.Graph.Full(3)\n"
+  "  >>> for e in g.es:\n"
+  "  ...   print e.tuple\n"
+  "  ...\n"
+  "  (0, 1)\n"
+  "  (0, 2)\n"
+  "  (1, 2)\n"
+  "  >>> [max(e.tuple) for e in g.es]\n"
+  "  [1, 2, 2]\n", // tp_doc
   0,                                          // tp_traverse
   0,                                          // tp_clear
   0,                                          // tp_richcompare
