@@ -2100,11 +2100,10 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops) {
   igraph_i_adjlist_t allneis;
   igraph_vector_t *neis1, *neis2;
-  long rec, ecount, node, i, n, no_of_nodes;
+  long rec, nonrec, node, node2, i, j, n, m, no_of_nodes;
   
-  if (igraph_ecount(graph) == 0) {
-    return IGRAPH_EINVAL;
-  }
+  if (igraph_ecount(graph) == 0)
+    IGRAPH_ERROR("graph has no edges", IGRAPH_EINVAL);
   
   if (!igraph_is_directed(graph)) {
     *res=1.0;
@@ -2114,8 +2113,15 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
   igraph_i_adjlist_init(graph, &allneis, IGRAPH_OUT);
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
 
-  rec=ecount=0;
+  rec=nonrec=0;
   no_of_nodes=igraph_vcount(graph);
+  
+  /* First sort all the vectors in the adjacency list */
+  for (node=0; node<no_of_nodes; node++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    neis1=igraph_i_adjlist_get(&allneis, node);
+    igraph_vector_sort(neis1);
+  }
   
   for (node=0; node<no_of_nodes; node++) {
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2124,23 +2130,34 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
      * calculate reciprocity for some graphs. Maybe we can speed it up
      * somehow */
     n=igraph_vector_size(neis1);
-    for (i=0; i<n; i++) {
-      if (ignore_loops) {
-	if (VECTOR(*neis1)[i]<=node) continue;
-      } else if (VECTOR(*neis1)[i]<node) continue;
-	
+    i=0;
+    while (i<n) {
+      /* Okay, count how many identical elements do we have consecutively
+       * in the head of the vector. This means the number of edges going
+       * from the current node to one of its neighbours. All of them are
+       * potential nonreciprocal candidates. */
+      node2=VECTOR(*neis1)[i];
+      if (ignore_loops && node2==node) continue;
+      
+      nonrec++; i++;
+      while (i<n && VECTOR(*neis1)[i] == node2) { nonrec++; i++; }
+      /* Good, so we have ecount edges from node to node2.
+       * See how many do we have in the reverse direction.
+       * First we have to search for the first occurrence of node in the
+       * adjacency list of node2
+       */
       neis2=igraph_i_adjlist_get(&allneis, VECTOR(*neis1)[i]);
-      if (igraph_vector_search(neis2, 0, node, 0)) {
-	rec++;
-	/* printf("%d -> %d [%c]\n", (int)node, (int)VECTOR(*neis1)[i], '+'); */
-      } /* else {
-	printf("%d -> %d [%c]\n", (int)node, (int)VECTOR(*neis1)[i], '-');
-      } */
-      ecount++;
+      m=igraph_vector_size(neis2);
+      if (igraph_vector_search(neis2, 0, node, &j)) {
+	/* The first occurrence of node in the adj. list of node2 is at
+	 * index j */
+	nonrec--; j++; rec++;
+	while (j<m && VECTOR(*neis2)[j] == node) { nonrec--; j++; }
+      }
     }
   }
   
-  *res=((float)rec)/ecount;
+  *res=(float)rec/(rec+nonrec);
   
   igraph_i_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(1);

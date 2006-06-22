@@ -1,5 +1,10 @@
 2006-06-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_reciprocity) :
+	bug corrected
+
+2006-06-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
 	* interfaces/python/*.c : modified docstrings to be conform to
 	the epydoc formatting conventions. Now the whole Python API
 	documentation can be generated with epydoc.

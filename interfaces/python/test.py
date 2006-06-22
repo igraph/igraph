@@ -486,6 +486,7 @@ test(g.transitivity() == 0.6)
 
 g=igraph.Graph(edges=[(0,1), (0,2), (0,3), (1, 0), (2,3), (3,2)], directed=True)
 start("Calculating the reciprocity of a graph")
+print g.reciprocity()
 test(g.reciprocity() == 0.5)
 
 g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (3,4), (4,5), (5,3), (6,4)])
