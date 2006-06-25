@@ -775,6 +775,7 @@ int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
 				   igraph_integer_t m,  
 				   const igraph_vector_t *outseq,
 				   igraph_bool_t outpref,
+				   igraph_real_t zeroappeal,
 				   igraph_bool_t directed) {
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
@@ -813,7 +814,7 @@ int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
   RNG_BEGIN();
   
   /* first node */
-  igraph_psumtree_update(&sumtree, 0, 1);
+  igraph_psumtree_update(&sumtree, 0, zeroappeal);
 
   /* and the rest */
   for (i=1; i<no_of_nodes; i++) {
@@ -831,13 +832,15 @@ int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
     /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
       long int n=VECTOR(edges)[edgeptr-2*j-1];
-      igraph_psumtree_update(&sumtree, n, pow(VECTOR(degree)[n], power)+1);
+      igraph_psumtree_update(&sumtree, n, 
+			     pow(VECTOR(degree)[n], power)+zeroappeal);
     }
     if (outpref) {
       VECTOR(degree)[i] += no_of_neighbors;
-      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], power)+1);
+      igraph_psumtree_update(&sumtree, i, 
+			     pow(VECTOR(degree)[i], power)+zeroappeal);
     } else {
-      igraph_psumtree_update(&sumtree, i, 1);
+      igraph_psumtree_update(&sumtree, i, zeroappeal);
     }
   }
   
@@ -860,6 +863,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 			      igraph_integer_t m,  
 			      const igraph_vector_t *outseq,
 			      igraph_bool_t outpref,
+			      igraph_real_t zero_appeal,
 			      igraph_bool_t directed) {
   long int no_of_nodes=n;
   long int no_of_neighbors=m;
@@ -903,7 +907,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
   RNG_BEGIN();
   
   /* first node */
-  igraph_psumtree_update(&sumtree, 0, 1);
+  igraph_psumtree_update(&sumtree, 0, zero_appeal);
   igraph_dqueue_push(&history, -1);
 
   /* and the rest */
@@ -917,7 +921,8 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     if (i>=time_window) {
       while ((j=igraph_dqueue_pop(&history)) != -1) {
 	VECTOR(degree)[j] -= 1;
-	igraph_psumtree_update(&sumtree, j, pow(VECTOR(degree)[j], power)+1);
+	igraph_psumtree_update(&sumtree, j, 
+			       pow(VECTOR(degree)[j], power)+zero_appeal);
       }
     }
     
@@ -934,13 +939,15 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     /* update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
       long int n=VECTOR(edges)[edgeptr-2*j-1];
-      igraph_psumtree_update(&sumtree, n, pow(VECTOR(degree)[n], power)+1);
+      igraph_psumtree_update(&sumtree, n,
+			     pow(VECTOR(degree)[n], power)+zero_appeal);
     }
     if (outpref) {
       VECTOR(degree)[i] += no_of_neighbors;
-      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], power)+1);
+      igraph_psumtree_update(&sumtree, i, 
+			     pow(VECTOR(degree)[i], power)+zero_appeal);
     } else {
-      igraph_psumtree_update(&sumtree, i, 1);
+      igraph_psumtree_update(&sumtree, i, zero_appeal);
     }
   }
   
@@ -966,6 +973,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
 			       igraph_real_t pa_exp,
 			       igraph_real_t aging_exp,
 			       igraph_integer_t aging_bin,
+			       igraph_real_t zero_appeal,
 			       igraph_bool_t directed) {
   long int no_of_nodes=nodes;
   long int no_of_neighbors=m;
@@ -1008,7 +1016,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
   RNG_BEGIN();
   
   /* first node */
-  igraph_psumtree_update(&sumtree, 0, 1);
+  igraph_psumtree_update(&sumtree, 0, zero_appeal);
   
   /* and the rest */
   for (i=1; i<no_of_nodes; i++) {
@@ -1029,14 +1037,15 @@ int igraph_barabasi_aging_game(igraph_t *graph,
       long int n=VECTOR(edges)[edgeptr-2*j-1];
       long int age=(i-n)/binwidth;
       igraph_psumtree_update(&sumtree, n, 
-			     (pow(VECTOR(degree)[n], pa_exp)+1)*
+			     (pow(VECTOR(degree)[n], pa_exp)+zero_appeal)*
 			     pow(age+1,aging_exp));
     }
     if (outpref) {
       VECTOR(degree)[i] += no_of_neighbors;
-      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], pa_exp)+1);
+      igraph_psumtree_update(&sumtree, i, 
+			     pow(VECTOR(degree)[i], pa_exp)+zero_appeal);
     } else { 
-      igraph_psumtree_update(&sumtree, i, 1);
+      igraph_psumtree_update(&sumtree, i, zero_appeal);
     }
 
     /* aging */
@@ -1045,7 +1054,8 @@ int igraph_barabasi_aging_game(igraph_t *graph,
       long int deg=VECTOR(degree)[shnode];
       long int age=(i-shnode)/binwidth;
       igraph_psumtree_update(&sumtree, shnode,
-			     (pow(deg, pa_exp)+1) * pow(age+2, aging_exp));
+			     (pow(deg, pa_exp)+zero_appeal) * 
+			     pow(age+2, aging_exp));
     }
   }
   
@@ -1071,6 +1081,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 				    igraph_real_t aging_exp,
 				    igraph_integer_t aging_bin,
 				    igraph_integer_t time_window,
+				    igraph_real_t zero_appeal,
 				    igraph_bool_t directed) {
   
   long int no_of_nodes=nodes;
@@ -1118,7 +1129,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
   RNG_BEGIN();
   
   /* first node */
-  igraph_psumtree_update(&sumtree, 0, 1);
+  igraph_psumtree_update(&sumtree, 0, zero_appeal);
   igraph_dqueue_push(&history, -1);
   
   /* and the rest */
@@ -1133,7 +1144,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
       while ((j=igraph_dqueue_pop(&history)) != -1) {
 	long int age=(i-j)/binwidth;
 	VECTOR(degree)[j] -= 1;
-	igraph_psumtree_update(&sumtree, j, (pow(VECTOR(degree)[j], pa_exp)+1)*
+	igraph_psumtree_update(&sumtree, j, 
+			       (pow(VECTOR(degree)[j], pa_exp)+zero_appeal)*
 			       pow(age+1, aging_exp));
       }
     }
@@ -1153,14 +1165,15 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
       long int n=VECTOR(edges)[edgeptr-2*j-1];
       long int age=(i-n)/binwidth;
       igraph_psumtree_update(&sumtree, n, 
-			     (pow(VECTOR(degree)[n], pa_exp)+1)*
+			     (pow(VECTOR(degree)[n], pa_exp)+zero_appeal)*
 			     pow(age+1,aging_exp));
     }
     if (outpref) {
       VECTOR(degree)[i] += no_of_neighbors;
-      igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], pa_exp)+1);
+      igraph_psumtree_update(&sumtree, i,
+			     pow(VECTOR(degree)[i], pa_exp)+zero_appeal);
     } else { 
-      igraph_psumtree_update(&sumtree, i, 1);
+      igraph_psumtree_update(&sumtree, i, zero_appeal);
     }
 
     /* aging */
@@ -1169,7 +1182,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
       long int deg=VECTOR(degree)[shnode];
       long int age=(i-shnode)/binwidth;
       igraph_psumtree_update(&sumtree, shnode,
-			     (pow(deg, pa_exp)+1) * pow(age+2, aging_exp));
+			     (pow(deg, pa_exp)+zero_appeal) *
+			     pow(age+2, aging_exp));
     }
   }
   

@@ -9,6 +9,12 @@
 	the epydoc formatting conventions. Now the whole Python API
 	documentation can be generated with epydoc.
 
+2006-06-17  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/games.c (igraph_nonlinear_barabasi_game)
+	(igraph_barabasi_aging_game, igraph_recent_degree_aging_game)
+	(igraph_recent_degree_aging_game) : added zero_appeal argument
+
 2006-06-16  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_reciprocity) : added

@@ -1643,6 +1643,7 @@ SEXP R_igraph_barabasi_game(SEXP pn, SEXP pm, SEXP poutseq,
 
 SEXP R_igraph_nonlinear_barabasi_game(SEXP pn, SEXP ppower, SEXP pm,
 				      SEXP poutseq, SEXP poutpref, 
+				      SEXP pzeroappeal,
 				      SEXP pdirected) {
   igraph_t g;
   igraph_integer_t n=REAL(pn)[0];
@@ -1651,13 +1652,15 @@ SEXP R_igraph_nonlinear_barabasi_game(SEXP pn, SEXP ppower, SEXP pm,
   igraph_vector_t outseq;
   igraph_bool_t outpref=LOGICAL(poutpref)[0];
   igraph_bool_t directed=LOGICAL(pdirected)[0];
+  igraph_real_t zeroappeal=REAL(pzeroappeal)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_vector(poutseq, &outseq);
   
-  igraph_nonlinear_barabasi_game(&g, n, power, m, &outseq, outpref, directed);
+  igraph_nonlinear_barabasi_game(&g, n, power, m, &outseq, outpref, 
+				 zeroappeal, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
@@ -1669,6 +1672,7 @@ SEXP R_igraph_nonlinear_barabasi_game(SEXP pn, SEXP ppower, SEXP pm,
 
 SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
 				 SEXP pm, SEXP poutseq, SEXP poutpref,
+				 SEXP pzero_appeal,
 				 SEXP pdirected) {
   igraph_t g;
   igraph_integer_t n=REAL(pn)[0];
@@ -1678,6 +1682,7 @@ SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
   igraph_vector_t outseq;
   igraph_bool_t outpref=LOGICAL(poutpref)[0];
   igraph_bool_t directed=LOGICAL(pdirected)[0];
+  igraph_real_t zero_appeal=REAL(pzero_appeal)[0];
   SEXP result;
 
   R_igraph_before();
@@ -1685,7 +1690,7 @@ SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
   R_SEXP_to_vector(poutseq, &outseq);
   
   igraph_recent_degree_game(&g, n, power, window, m, &outseq, outpref, 
-			    directed);
+			    zero_appeal, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
@@ -3584,7 +3589,8 @@ SEXP R_igraph_compose(SEXP pleft, SEXP pright) {
 
 SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
 				  SEXP paging_bin, SEXP pm, SEXP pout_seq,
-				  SEXP pout_pref, SEXP pdirected) {
+				  SEXP pout_pref, SEXP pzero_appeal,
+				  SEXP pdirected) {
   igraph_t g;
   igraph_integer_t n=REAL(pn)[0];
   igraph_real_t pa_exp=REAL(ppa_exp)[0];
@@ -3594,6 +3600,7 @@ SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   igraph_vector_t out_seq;
   igraph_bool_t out_pref=LOGICAL(pout_pref)[0];
   igraph_bool_t directed=LOGICAL(pdirected)[0];
+  igraph_real_t zero_appeal=REAL(pzero_appeal)[0];
   SEXP result;
   
   R_igraph_before();
@@ -3601,7 +3608,7 @@ SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   R_SEXP_to_vector(pout_seq, &out_seq);  
   
   igraph_barabasi_aging_game(&g, n, m, &out_seq, out_pref, pa_exp, aging_exp,
-			     aging_bin, directed);
+			     aging_bin, zero_appeal, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   
@@ -3613,7 +3620,8 @@ SEXP R_igraph_barabasi_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
 
 SEXP R_igraph_recent_degree_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
 				       SEXP paging_bin, SEXP pm, SEXP pout_seq,
-				       SEXP pout_pref, SEXP pdirected,
+				       SEXP pout_pref, SEXP pzero_appeal, 
+				       SEXP pdirected,
 				       SEXP ptime_window) {
   igraph_t g;
   igraph_integer_t n=REAL(pn)[0];
@@ -3625,6 +3633,7 @@ SEXP R_igraph_recent_degree_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   igraph_bool_t out_pref=LOGICAL(pout_pref)[0];
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   igraph_integer_t time_window=REAL(ptime_window)[0];
+  igraph_real_t zero_appeal=REAL(pzero_appeal)[0];
   SEXP result;
   
   R_igraph_before();
@@ -3632,7 +3641,8 @@ SEXP R_igraph_recent_degree_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   R_SEXP_to_vector(pout_seq, &out_seq);  
   
   igraph_recent_degree_aging_game(&g, n, m, &out_seq, out_pref, pa_exp, 
-				  aging_exp, aging_bin, time_window, directed);
+				  aging_exp, aging_bin, time_window, 
+				  zero_appeal, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   

@@ -1,3 +1,11 @@
+2006-06-17  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/games.R (ba.game, aging.prefatt.game) : added
+	zero.appeal argument
+	* interfaces/R/src/rinterface.c (R_igraph_nonlinear_barabasi_game)
+	(R_igraph_recent_degree_game, R_igraph_barabasi_aging_game)
+	(R_igraph_recent_degree_aging_game) : added zero appeal argument
+
 2006-06-12  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_array3_to_SEXP)
