@@ -1,4 +1,4 @@
-2006-06-24  Gabor Csardi  <csardi@localdomain>
+2006-06-24  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/plot.common.R (i.get.vertex.frame.color) : 
 	added
@@ -8,6 +8,9 @@
 	argument added
 	(.tkplot.create.vertex) : vertex.frame.color handling added
 	(.tkplot.deselect.vertex) : vertex.frame.color handling added
+
+	* interfaces/R/igraph/R/iterators.R ([.igraph.vs, [.igraph.es) :
+	added parent environment to the evaluation list
 
 2006-06-17  Gabor Csardi  <csardi@kzoo.edu>
 

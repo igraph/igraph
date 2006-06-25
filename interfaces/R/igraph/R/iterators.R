@@ -71,7 +71,7 @@ E <- function(graph) {
   } else {
     # language expression, we also do attribute based indexing
     graph <- get("graph", attr(V(g), "env"))
-    i <- eval(i, graph[[9]][[3]])
+    i <- eval(i, c(graph[[9]][[3]], as.list(parent.frame())))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
       res <- i[ i %in% x ]
@@ -102,7 +102,8 @@ E <- function(graph) {
     graph <- get("graph", attr(V(g), "env"))
     i <- substitute(i)
     i <- eval(i, c(graph[[9]][[4]], from=list(graph[[3]][ as.numeric(x)+1 ]),
-                   to=list(graph[[4]][as.numeric(x)+1]), graph=list(graph)))
+                   to=list(graph[[4]][as.numeric(x)+1]), graph=list(graph),
+                   as.list(parent.frame())))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
       res <- i[ i %in% x ]
