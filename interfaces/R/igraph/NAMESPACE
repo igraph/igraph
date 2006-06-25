@@ -33,7 +33,8 @@ S3method(print, igraph.es)
   
 # basic functions, printing
 
-export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed)
+export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed,
+       get.edge)
 
 # structure generators
 

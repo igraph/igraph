@@ -70,7 +70,7 @@ E <- function(graph) {
     attributes(res) <- attributes(x)
   } else {
     # language expression, we also do attribute based indexing
-    graph <- get("graph", attr(V(g), "env"))
+    graph <- get("graph", attr(x, "env"))
     i <- eval(i, c(graph[[9]][[3]], as.list(parent.frame())))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
@@ -99,7 +99,7 @@ E <- function(graph) {
     attributes(res) <- attributes(x)
   } else {
     # language expression, we also do attribute based indexing
-    graph <- get("graph", attr(V(g), "env"))
+    graph <- get("graph", attr(x, "env"))
     i <- substitute(i)
     i <- eval(i, c(graph[[9]][[4]], from=list(graph[[3]][ as.numeric(x)+1 ]),
                    to=list(graph[[4]][as.numeric(x)+1]), graph=list(graph),
@@ -214,7 +214,16 @@ print.igraph.vs <- function(x, ...) {
 
 print.igraph.es <- function(x, ...) {
   cat("Edge sequence:\n")
-  print(as.numeric(x))
+  graph <- get("graph", attr(x, "env"))
+  if (is.directed(graph)) {
+    arrow <- " -> "
+  } else {
+    arrow <- " -- "
+  }
+  for (i in as.numeric(x)) {
+    edge <- get.edge(graph, i)
+    cat(sep="", "[", i, "] ", edge[1], arrow, edge[2], "\n")
+  }
 }
 
 # these are internal

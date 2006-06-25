@@ -3651,3 +3651,24 @@ SEXP R_igraph_recent_degree_aging_game(SEXP pn, SEXP ppa_exp, SEXP paging_exp,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_get_edge(SEXP graph, SEXP peid) {
+  
+  igraph_t g;
+  igraph_integer_t eid=REAL(peid)[0];
+  igraph_integer_t from, to;
+  SEXP result;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);  
+  igraph_edge(&g, eid, &from, &to);
+  PROTECT(result=NEW_NUMERIC(2));
+  REAL(result)[0]=from;
+  REAL(result)[1]=to;
+  
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+}

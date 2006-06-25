@@ -35,3 +35,22 @@ is.directed <- function(graph) {
   .Call("R_igraph_is_directed", graph,
         PACKAGE="igraph")
 }
+
+get.edge <- function(graph, id) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  id <- as.numeric(id)
+  ec <- ecount(graph)
+  
+  if (id < 0 || id >= ec) {
+    stop("No such edge")
+  }
+
+  .Call("R_igraph_get_edge", graph, as.numeric(id),
+        PACKAGE="igraph")
+}
+
+

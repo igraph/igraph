@@ -12,6 +12,15 @@
 	* interfaces/R/igraph/R/iterators.R ([.igraph.vs, [.igraph.es) :
 	added parent environment to the evaluation list
 
+	* interfaces/R/igraph/R/iterators.R ([.igraph.vs, [.igraph.es) :
+	"get" bug corrected
+
+	* interfaces/R/igraph/R/basic.R (get.edge) : added
+	* interfaces/R/src/rinterface.c (R_igraph_get_edge) : added
+
+	* interfaces/R/igraph/R/iterators.R (print.igraph.es) : prettier
+	printing of edge sequences
+	
 2006-06-17  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/games.R (ba.game, aging.prefatt.game) : added
