@@ -26,6 +26,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        vertex.color="SkyBlue2", vertex.size=15,
                        edge.color="darkgrey", edge.width=1,
                        edge.labels=NA, 
+                       vertex.frame.color="black",
                        # SPECIFIC: #####################################
                        axes=FALSE, xlab="", ylab="",
                        xlim=c(-1,1), ylim=c(-1,1),
@@ -39,6 +40,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   # Interpret parameters
   layout <- i.get.layout(graph, layout, layout.par)
   vertex.color <- i.get.vertex.color(graph, vertex.color)
+  vertex.frame.color <- i.get.vertex.frame.color(graph, vertex.frame.color)
   vertex.size <- (1/200) * i.get.vertex.size(graph, vertex.size)
   edge.color <- i.get.edge.color(graph, edge.color)
   edge.width <- i.get.edge.width(graph, edge.width)
@@ -89,7 +91,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   
   # add the vertices
   if (length(vertex.size)==1) { vertex.size <- rep(vertex.size, nrow(layout)) }
-  symbols(x=layout[,1], y=layout[,2], bg=vertex.color,
+  symbols(x=layout[,1], y=layout[,2], bg=vertex.color, fg=vertex.frame.color,
           circles=vertex.size, add=TRUE, inches=FALSE)
 
   # add the labels

@@ -39,7 +39,9 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                    label.font=NULL, label.degree=-pi/4, label.dist=0,
                    vertex.color="SkyBlue2", vertex.size=15,
                    edge.color="darkgrey", edge.width=1,
-                   edge.labels=NA, ...) {
+                   edge.labels=NA,
+                   vertex.frame.color="black",
+                   ...) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -53,6 +55,7 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
 
   # Vertex color
   vertex.color <- i.get.vertex.color(graph, vertex.color)
+  vertex.frame.color <- i.get.vertex.frame.color(graph, vertex.frame.color)
   
   # Vertex size
   vertex.size <- i.get.vertex.size(graph, vertex.size)
@@ -85,7 +88,8 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                  edge.color=edge.color, label.color=label.color,
                  labels.state=1, edge.width=edge.width, padding=30,
                  grid=0, label.font=label.font, label.degree=label.degree,
-                 label.dist=label.dist, edge.labels=edge.labels)
+                 label.dist=label.dist, edge.labels=edge.labels,
+                 vertex.frame.color=vertex.frame.color)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
@@ -331,7 +335,8 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   
   # We don't need these any more, they are stored in the environment
   rm(tkp, params, layout, vertex.color, edge.color, top, canvas,
-     main.menu, layout.menu, view.menu, export.menu, label.font, label.degree)
+     main.menu, layout.menu, view.menu, export.menu, label.font, label.degree,
+     vertex.frame.color)
   
   tkp.id
 }
@@ -644,9 +649,12 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   vertex.color <- ifelse(length(tkp$params$vertex.color)>1,
                          tkp$params$vertex.color[id+1],
                          tkp$params$vertex.color)
+  vertex.frame.color <- ifelse(length(tkp$params$vertex.frame.color)>1,
+                               tkp$params$vertex.frame.color[id+1],
+                               tkp$params$vertex.frame.color)
   item <- tkcreate(tkp$canvas, "oval", x-vertex.size, y-vertex.size,
                    x+vertex.size, y+vertex.size, width=1,
-                   outline="black",  fill=vertex.color)
+                   outline=vertex.frame.color,  fill=vertex.color)
   tkaddtag(tkp$canvas, "vertex", "withtag", item)
   tkaddtag(tkp$canvas, paste("v-", id, sep=""), "withtag", item)
   if (!is.na(label)) {
@@ -1055,7 +1063,13 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 .tkplot.deselect.vertex <- function(tkp.id, tkid) {
   canvas <- .tkplot.get(tkp.id, "canvas")
   tkdtag(canvas, tkid, "selected")
-  tkitemconfigure(canvas, tkid, "-outline", "black",
+  tkp <- .tkplot.get(tkp.id)
+  tags <- as.character(tkgettags(canvas, tkid))
+  id <- as.numeric(substring(tags[pmatch("v-", tags)], 3))
+  vertex.frame.color <- ifelse(length(tkp$params$vertex.frame.color)>1,
+                               tkp$params$vertex.frame.color[id+1],
+                               tkp$params$vertex.frame.color)  
+  tkitemconfigure(canvas, tkid, "-outline", vertex.frame.color,
                   "-width", 1)
 }
 

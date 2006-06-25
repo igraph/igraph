@@ -53,6 +53,24 @@ i.get.vertex.color <- function(graph, vertex.color) {
   vertex.color  
 }
 
+i.get.vertex.frame.color <- function(graph, vertex.frame.color) {
+
+  if (length(vertex.frame.color)==1 &&
+      substr(vertex.frame.color, 1, 2)=="a:") {
+    vertex.frame.color <-
+      unlist(get.vertex.attribute(graph,
+                                  substring(vertex.frame.color,3)))
+  }
+
+  if (is.numeric(vertex.frame.color)) {
+    vertex.frame.color <- vertex.frame.color %% length(palette())
+    vertex.frame.color[vertex.frame.color==0] <- length(palette())
+    vertex.frame.color <- palette()[vertex.frame.color]
+  }
+
+  vertex.frame.color  
+}
+
 i.get.vertex.size <- function(graph, vertex.size) {
 
   if (is.character(vertex.size) &&
