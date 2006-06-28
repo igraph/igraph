@@ -470,6 +470,9 @@ int igraph_transitivity(const igraph_t *graph, igraph_vector_t *res,
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops);
 
+int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
+		      igraph_vs_t vids);
+
 /* TODO: degree.distribution (?) */
 
 /* -------------------------------------------------- */

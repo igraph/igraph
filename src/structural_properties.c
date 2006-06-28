@@ -2164,3 +2164,70 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
   
   return 0;
 }
+
+int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
+		      igraph_vs_t vids) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t first, second;
+  igraph_vector_t first_vec;
+  igraph_vector_t invdeg;
+  
+  long int i,j,k;
+  igraph_vit_t vit;
+  long int nodes_to_calc;
+
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+  nodes_to_calc=IGRAPH_VIT_SIZE(vit);
+ 
+  IGRAPH_VECTOR_INIT_FINALLY(&first, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&second, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&first_vec, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&invdeg, no_of_nodes);
+ 
+  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
+  igraph_vector_null(res);
+  
+  IGRAPH_CHECK(igraph_degree(graph, &invdeg, igraph_vss_all(), IGRAPH_ALL, 
+			     IGRAPH_NO_LOOPS));
+  for (i=0; i<no_of_nodes; i++) {
+    if (VECTOR(invdeg)[i] != 0) {
+      VECTOR(invdeg)[i] = 1 / VECTOR(invdeg)[i];
+    } else {
+      VECTOR(invdeg)[i] = (0.0 / 0.0);
+    }
+  }
+  
+  /* Do it! */
+  for (i=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); 
+       i++, IGRAPH_VIT_NEXT(vit)) {
+    IGRAPH_CHECK(igraph_neighbors(graph, &first, 
+				  IGRAPH_VIT_GET(vit), IGRAPH_ALL));
+    for (j=0; j<igraph_vector_size(&first); j++) {
+      VECTOR(first_vec)[ (long int) VECTOR(first)[j] ] = i+1;
+    }
+    VECTOR(*res)[i] += VECTOR(invdeg)[(long int) IGRAPH_VIT_GET(vit)];
+    for (j=0; j<igraph_vector_size(&first); j++) {
+      IGRAPH_CHECK(igraph_neighbors(graph, &second,
+				    VECTOR(first)[j], IGRAPH_ALL));
+      for (k=0; k<igraph_vector_size(&second); k++) {
+	long int snei=VECTOR(second)[k];
+	if (VECTOR(first_vec)[snei] == i+1) {
+	  VECTOR(*res)[i] += VECTOR(invdeg)[(long int)IGRAPH_VIT_GET(vit)] * 
+	    VECTOR(invdeg)[(long int)VECTOR(first)[j]];
+	}
+      }
+    }
+  }
+
+  igraph_vector_destroy(&first);
+  igraph_vector_destroy(&second);
+  igraph_vector_destroy(&first_vec);
+  igraph_vector_destroy(&invdeg);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  return 0;
+}

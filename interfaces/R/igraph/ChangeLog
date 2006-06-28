@@ -1,3 +1,8 @@
+2006-06-28  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/structural.properties.R (constraint) : added
+	* interfaces/R/igraph/src/rinterface.c (R_igraph_constraint) : added
+
 2006-06-24  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/plot.common.R (i.get.vertex.frame.color) : 

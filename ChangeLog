@@ -1,3 +1,7 @@
+2006-06-28  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/structural_properties.c (igraph_constraint) : added
+
 2006-06-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_reciprocity) :
