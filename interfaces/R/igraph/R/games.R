@@ -126,7 +126,8 @@ growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
 aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
                                out.dist=NULL, out.seq=NULL,
                                out.pref=FALSE, directed=TRUE,
-                               zero.appeal=1,
+                               zero.deg.appeal=1, zero.age.appeal=1,
+                               deg.coef=1, age.coef=1,
                                time.window=NULL) {
   # Checks
   if (! is.null(out.seq) && (!is.null(m) || !is.null(out.dist))) {
@@ -158,7 +159,7 @@ aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
   if (aging.exp > 0) {
     warning("aging exponent is positive")
   }
-  if (zero.appeal <=0 ) {
+  if (zero.deg.appeal <=0 ) {
     warning("initial attractiveness is not positive")
   }
 
@@ -185,12 +186,13 @@ aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
     .Call("R_igraph_barabasi_aging_game", as.numeric(n),
           as.numeric(pa.exp), as.numeric(aging.exp),
           as.numeric(aging.bin), m, out.seq,
-          out.pref, as.numeric(zero.appeal), directed, 
+          out.pref, as.numeric(zero.deg.appeal), as.numeric(zero.age.appeal),
+          as.numeric(deg.coef), as.numeric(age.coef), directed, 
           PACKAGE="igraph")
   } else {
     .Call("R_igraph_recent_degree_aging_game", as.numeric(n),
           as.numeric(pa.exp), as.numeric(aging.exp),
-          as.numeric(aging.bin), m, out.seq, out.pref, as.numeric(zero.appeal),
+          as.numeric(aging.bin), m, out.seq, out.pref, as.numeric(zero.deg.appeal),
           directed,
           time.window,
           PACKAGE="igraph")

@@ -973,7 +973,10 @@ int igraph_barabasi_aging_game(igraph_t *graph,
 			       igraph_real_t pa_exp,
 			       igraph_real_t aging_exp,
 			       igraph_integer_t aging_bin,
-			       igraph_real_t zero_appeal,
+			       igraph_real_t zero_deg_appeal,
+			       igraph_real_t zero_age_appeal,
+			       igraph_real_t deg_coef,
+			       igraph_real_t age_coef,
 			       igraph_bool_t directed) {
   long int no_of_nodes=nodes;
   long int no_of_neighbors=m;
@@ -984,7 +987,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
   igraph_psumtree_t sumtree;
   long int edgeptr=0;
   igraph_vector_t degree;
-  
+
   if (no_of_nodes<0) {
     IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
   }
@@ -1016,7 +1019,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
   RNG_BEGIN();
   
   /* first node */
-  igraph_psumtree_update(&sumtree, 0, zero_appeal);
+  igraph_psumtree_update(&sumtree, 0, zero_deg_appeal*(1+zero_age_appeal));
   
   /* and the rest */
   for (i=1; i<no_of_nodes; i++) {
@@ -1037,15 +1040,17 @@ int igraph_barabasi_aging_game(igraph_t *graph,
       long int n=VECTOR(edges)[edgeptr-2*j-1];
       long int age=(i-n)/binwidth;
       igraph_psumtree_update(&sumtree, n, 
-			     (pow(VECTOR(degree)[n], pa_exp)+zero_appeal)*
-			     pow(age+1,aging_exp));
+			     (deg_coef*pow(VECTOR(degree)[n], pa_exp)
+			      +zero_deg_appeal)*
+			     (age_coef*pow(age+1,aging_exp)+zero_age_appeal));
     }
     if (outpref) {
       VECTOR(degree)[i] += no_of_neighbors;
-      igraph_psumtree_update(&sumtree, i, 
-			     pow(VECTOR(degree)[i], pa_exp)+zero_appeal);
+      igraph_psumtree_update(&sumtree, i, (zero_age_appeal+1)*
+			     (deg_coef*pow(VECTOR(degree)[i], pa_exp)
+			      +zero_deg_appeal));
     } else { 
-      igraph_psumtree_update(&sumtree, i, zero_appeal);
+      igraph_psumtree_update(&sumtree, i, (1+zero_age_appeal)*zero_deg_appeal);
     }
 
     /* aging */
@@ -1053,9 +1058,10 @@ int igraph_barabasi_aging_game(igraph_t *graph,
       long int shnode=i-binwidth*k;
       long int deg=VECTOR(degree)[shnode];
       long int age=(i-shnode)/binwidth;
+      igraph_real_t old=igraph_psumtree_get(&sumtree, shnode);
       igraph_psumtree_update(&sumtree, shnode,
-			     (pow(deg, pa_exp)+zero_appeal) * 
-			     pow(age+2, aging_exp));
+			     (deg_coef*pow(deg, pa_exp)+zero_deg_appeal) * 
+			     (age_coef*pow(age+2, aging_exp)+zero_age_appeal));
     }
   }
   

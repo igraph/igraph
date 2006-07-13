@@ -1,3 +1,10 @@
+2006-07-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/games.R (aging.prefatt.game) : zero.age.appeal
+	age.coef, deg.coef added
+	* interfaces/R/src/rinterface.c (R_igraph_barabasi_aging_game) : 
+	zero_age_appeal, deg_coef, age_coef added
+
 2006-06-28  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/structural.properties.R (constraint) : added
