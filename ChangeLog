@@ -1,3 +1,15 @@
+2006-07-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign-pajek-parser.y : a bit rewritten to handle attributes
+	* src/foreign.c (igraph_read_graph_pajek) : updated to handle 
+	attributes
+	* examples/simple/foreign.c : updated, attributes parameter added
+
+	* src/attributes.h (igraph_i_attribute_record_t) : value changed to
+	const pointer
+	* src/foreign.c (igraph_read_graph_ncol, igraph_read_graph_lgl) :
+	updated
+
 2006-07-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/types.h (igraph_hashtable_t) : added

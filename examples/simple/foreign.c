@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   if (ifile==0) {
     return 10;
   }
-  igraph_read_graph_pajek(&g, ifile);
+  igraph_read_graph_pajek(&g, ifile, 1);
   fclose(ifile);
   printf("The graph:\n");
   printf("Vertices: %li\n", (long int) igraph_vcount(&g));

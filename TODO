@@ -1,17 +1,15 @@
 
 Needed for 0.2:
 
+o range checks for vertex/edge sequences in R
 o check reading and writing (big) files from the R interface, possibly
   rewrite
 o document bison requirements
 o repair simplify
 o attribute handling for operators
 o add references to SNA, paper by Carter
-o for almost all functions: add progress handlers and allow
-  them to be interrupted using IGRAPH_ALLOW_INTERRUPTION()
 o uniform graph operators (union, intersection, etc...)
 o merging layouts properly, multicompartmental layout functions
-o make CTRL+C work in R
 o better random number generator handling (init with seed, etc...)
 o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions

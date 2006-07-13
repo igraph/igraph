@@ -222,7 +222,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   }
 
   if (names) {
-    igraph_strvector_t *namevec;
+    const igraph_strvector_t *namevec;
     IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1)); 
     pname=&name;
     igraph_trie_getkeys(&trie, &namevec); /* dirty */
@@ -337,7 +337,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   IGRAPH_FINALLY(igraph_destroy, graph);
 
   if (names) {
-    igraph_strvector_t *namevec;
+    const igraph_strvector_t *namevec;
     IGRAPH_CHECK(igraph_vector_ptr_init(&name, 1)); 
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &name);
     pname=&name;
@@ -380,27 +380,103 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 extern int igraph_pajek_yyparse();
 extern FILE *igraph_pajek_yyin;
 igraph_vector_t *igraph_pajek_vector=0;
-igraph_stack_t *igraph_pajek_coords=0;
 igraph_bool_t igraph_pajek_directed;
+igraph_bool_t igraph_i_pajek_attr;
 long int igraph_pajek_vcount=0;
 long int igraph_pajek_actfrom, igraph_pajek_actto;
 int igraph_pajek_mode=0;	/* 0 - general, 1 - vertex, 2 - edge */
+igraph_trie_t *igraph_i_pajek_vertex_attribute_names;
+igraph_vector_ptr_t *igraph_i_pajek_vertex_attributes;
+igraph_trie_t *igraph_i_pajek_edge_attribute_names;
+igraph_vector_ptr_t *igraph_i_pajek_edge_attributes;
+long int igraph_i_pajek_vertexid=0;
+long int igraph_i_pajek_actvertex=0;
+long int igraph_i_pajek_actedge=0;
 
-int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
+/* int vector_print(igraph_vector_t *v) { */
+/*   long int i, size=igraph_vector_size(v); */
+/*   for (i=0; i<size; i++) { */
+/*     printf("%f|", VECTOR(*v)[i]); */
+/*   } */
+/*   printf("\n"); */
+/*   return 0; */
+/* } */
+
+/* int strvector_print(igraph_strvector_t *sv) { */
+/*   long int i, size=igraph_strvector_size(sv); */
+/*   char *str; */
+/*   for (i=0; i<size; i++) { */
+/*     igraph_strvector_get(sv, i, &str); */
+/*     printf("%s|", str); */
+/*   } */
+/*   printf("\n"); */
+/*   return 0; */
+/* } */
+
+int igraph_read_graph_pajek(igraph_t *graph, FILE *instream, 
+			    igraph_bool_t attr) {
   igraph_vector_t edges;
+  igraph_trie_t vattrnames;
+  igraph_vector_ptr_t vattrs;
+  igraph_trie_t eattrnames;
+  igraph_vector_ptr_t eattrs;
+  igraph_hashtable_t vattrhash;
+  igraph_hashtable_t eattrhash;
+  long int i, j;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
+  IGRAPH_TRIE_INIT_FINALLY(&vattrnames, 1);
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&vattrs, 0);
+  IGRAPH_TRIE_INIT_FINALLY(&eattrnames, 1);
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&eattrs, 0);
+
   igraph_pajek_vector=&edges;
   igraph_pajek_yyin=instream;
+
+  igraph_pajek_mode=0;
+  igraph_pajek_vcount=0;
+  igraph_i_pajek_vertexid=0;
+  igraph_i_pajek_attr=attr;
+  igraph_i_pajek_vertex_attribute_names=&vattrnames;
+  igraph_i_pajek_vertex_attributes=&vattrs;
+  igraph_i_pajek_edge_attribute_names=&eattrnames;
+  igraph_i_pajek_edge_attributes=&eattrs;
+  igraph_i_pajek_actedge=0;
   
   igraph_pajek_yyparse();
-  
-  IGRAPH_CHECK(igraph_create(graph, &edges, igraph_pajek_vcount, 
-			     igraph_pajek_directed));
-  igraph_vector_destroy(&edges);
 
-  IGRAPH_FINALLY_CLEAN(1);
+  for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
+    igraph_i_attribute_record_t *rec=VECTOR(eattrs)[i];
+    if (rec->type==IGRAPH_ATTRIBUTE_NUMERIC) {
+      igraph_vector_t *vec=(igraph_vector_t*)rec->value;
+      long int origsize=igraph_vector_size(vec);
+      igraph_vector_resize(vec, igraph_i_pajek_actedge);
+      for (j=origsize; j<igraph_i_pajek_actedge; j++) {
+	VECTOR(*vec)[j] = 0.0/0.0;
+      }
+    } else if (rec->type==IGRAPH_ATTRIBUTE_STRING) {
+      igraph_strvector_t *strvec=(igraph_strvector_t*)rec->value;
+      long int origsize=igraph_strvector_size(strvec);
+      igraph_strvector_resize(strvec, igraph_i_pajek_actedge);
+      for (j=origsize; j<igraph_i_pajek_actedge; j++) {
+	igraph_strvector_set(strvec, j, "");
+      }
+    }
+  }
+
+  IGRAPH_CHECK(igraph_empty(graph, 0, igraph_pajek_directed));
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  IGRAPH_CHECK(igraph_add_vertices(graph, igraph_pajek_vcount, &vattrs));
+  IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
+
+  igraph_vector_destroy(&edges);  
+  igraph_vector_ptr_destroy(&eattrs);
+  igraph_trie_destroy(&eattrnames);
+  igraph_vector_ptr_destroy(&vattrs);
+  igraph_trie_destroy(&vattrnames);
+
+  IGRAPH_FINALLY_CLEAN(6);
   return 0;
 }
 

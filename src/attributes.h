@@ -39,7 +39,7 @@ typedef enum { IGRAPH_ATTRIBUTE_DEFAULT=0,
 typedef struct igraph_i_attribute_record_t {
   const char *name;
   igraph_attribute_type_t type;
-  void *value;
+  const void *value;
 } igraph_i_attribute_record_t;
 
 typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,

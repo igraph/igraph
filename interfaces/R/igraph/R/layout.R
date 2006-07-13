@@ -180,7 +180,7 @@ layout.lgl <- function(graph, ..., params=list()) {
 layout.merge <- function(graphs, layouts, method="dla",
                          verbose=igraph.par("verbose")) {
 
-  if (!all(sapply(graph, is.graph))) {
+  if (!all(sapply(graphs, is.igraph))) {
     stop("Not a graph object")
   }
   if (method == "dla") {

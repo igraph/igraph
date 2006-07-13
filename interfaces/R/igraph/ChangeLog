@@ -1,3 +1,21 @@
+2006-07-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (read.graph) : pajek format added
+	(read.graph.pajek) : added
+	* interfaces/R/src/rinterface.c (R_igraph_read_graph_pajek) : added
+
+	* interfaces/R/igraph/R/layout.R (layout.merge) : bug corrected
+
+	* interfaces/R/igraph/R/operators.R (graph.disjoint.union)
+	(graph.union, graph.intersection, graph.compose) : graph argument 
+	checking bugs corrected
+
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_add_edges) : 
+	string attribute type bug corrected
+
+	* interfaces/R/src/rinterface.c (R_igraph_strvector_to_SEXP) : 
+	argument type now const
+
 2006-07-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/games.R (aging.prefatt.game) : zero.age.appeal

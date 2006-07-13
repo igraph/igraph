@@ -25,7 +25,7 @@ graph.disjoint.union <- function(...) {
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
     if (is.igraph(l)) list(l) else l
   } ))
-  if (!all(sapply(l, is.graph))) {
+  if (!all(sapply(graphs, is.igraph))) {
     stop("Not a graph object")
   }
   
@@ -42,7 +42,7 @@ graph.union <- function(...) {
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
     if (is.igraph(l)) list(l) else l
   } ))
-  if (!all(sapply(l, is.graph))) {
+  if (!all(sapply(graphs, is.igraph))) {
     stop("Not a graph object")
   }
   
@@ -59,10 +59,10 @@ graph.intersection <- function(...) {
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
     if (is.igraph(l)) list(l) else l
   } ))
-  if (!all(sapply(l, is.graph))) {
+  if (!all(sapply(graphs, is.igraph))) {
     stop("Not a graph object")
   }
-  
+
   .Call("R_igraph_intersection", graphs,
         PACKAGE="igraph")
 }
@@ -96,7 +96,7 @@ graph.complementer <- function(graph, loops=FALSE) {
 
 graph.compose <- function(g1, g2) {
 
-  if (!is.igraph(g1) || !is.graph(g2)) {
+  if (!is.igraph(g1) || !is.igraph(g2)) {
     stop("Not a graph object")
   }
   .Call("R_igraph_compose", g1, g2,

@@ -34,7 +34,7 @@
 #include <stdio.h>
 
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
-SEXP R_igraph_strvector_to_SEXP(igraph_strvector_t *m);
+SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
@@ -389,7 +389,7 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
 	igraph_vector_copy_to(tmprec->value, REAL(app));
 	break;
       case IGRAPH_ATTRIBUTE_STRING:
-	if (ne != igraph_vector_ptr_size(tmprec->value)) {
+	if (ne != igraph_strvector_size(tmprec->value)) {
 	  IGRAPH_ERROR("Invalid attribute length", IGRAPH_EINVAL);
 	}
 	PROTECT(app=R_igraph_strvector_to_SEXP(tmprec->value));
@@ -847,7 +847,7 @@ SEXP R_igraph_array3_to_SEXP(igraph_array3_t *a) {
   return result;
 }
 
-SEXP R_igraph_strvector_to_SEXP(igraph_strvector_t *m) {
+SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m) {
   SEXP result;
   long int i;
   char *str;
@@ -3087,6 +3087,31 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_read_graph_pajek(SEXP pvfile) {
+  igraph_t g;
+  FILE *file;
+  SEXP result;
+  
+  R_igraph_before();
+  
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
+#else
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "r");
+#endif
+  if (file==0) { igraph_error("Cannot read Pajek file", __FILE__, __LINE__,
+			      IGRAPH_EFILE); }
+  igraph_read_graph_pajek(&g, file, 1);
+  fclose(file);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+} 
 
 SEXP R_igraph_decompose(SEXP graph, SEXP pmode, SEXP pmaxcompno, 
 			SEXP pminelements) {

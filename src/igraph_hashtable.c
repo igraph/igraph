@@ -43,8 +43,8 @@ void igraph_hashtable_destroy(igraph_hashtable_t *ht) {
 }
 
 /* Note: may leave the hashtable in an inconsistent state if a new
-   element is added, but this is not a big problem, since the
-   defaults, or the defaults plus the elements contain more element
+   element is added, but this is not a big problem, since while the
+   defaults, or the defaults plus the elements may contain more elements
    than the keys trie, but the data is always retrieved based on the trie
 */
 
@@ -87,7 +87,7 @@ int igraph_hashtable_addset2(igraph_hashtable_t *ht,
   IGRAPH_FINALLY(free, tmp);
   strncpy(tmp, elem, elemlen);
   tmp[elemlen]='\0';
-  
+
   if (newid==size) {
     IGRAPH_CHECK(igraph_strvector_resize(&ht->defaults, newid+1));
     IGRAPH_CHECK(igraph_strvector_resize(&ht->elements, newid+1));
