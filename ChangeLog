@@ -1,3 +1,11 @@
+2006-07-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/types.h (igraph_hashtable_t) : added
+	* src/igraph_hashtable.c (igraph_hashtable_init)
+	(igraph_hashtable_destroy, igraph_hashtable_addset)
+	(igraph_hashtable_get, igraph_hashtable_reset) : added
+	* examples/simple/igraph_hashtable.c : added
+
 2006-07-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_barabasi_aging_game) : zero_age_appeal, 

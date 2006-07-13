@@ -563,5 +563,23 @@ long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
 
 long int igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
 					      igraph_real_t x, igraph_real_t y, igraph_real_t r);
+
+/* string -> string hash table */
+
+typedef struct igraph_hashtable_t {
+  igraph_trie_t keys;
+  igraph_strvector_t elements;
+  igraph_strvector_t defaults;
+} igraph_hashtable_t;
+
+int igraph_hashtable_init(igraph_hashtable_t *ht);
+void igraph_hashtable_destroy(igraph_hashtable_t *ht);
+int igraph_hashtable_addset(igraph_hashtable_t *ht,
+			    const char *key, const char *def, 
+			    const char *elem);
+int igraph_hashtable_get(igraph_hashtable_t *ht,
+			 const char *key, char **elem);
+int igraph_hashtable_reset(igraph_hashtable_t *ht);
+
 #endif
 

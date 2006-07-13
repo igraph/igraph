@@ -80,3 +80,8 @@ AT_SETUP([Three dimensional array (igraph_array3_t): ])
 AT_KEYWORDS([array array3 three dimensional array])
 AT_COMPILE_CHECK([simple/igraph_array.c], [simple/igraph_array.out])
 AT_CLEANUP
+
+AT_SETUP([Hash table (string->string) (igraph_hashtable_t): ])
+AT_KEYWORDS([igraph_hashtable_t hash table])
+AT_COMPILE_CHECK([simple/igraph_hashtable.c], [simple/igraph_hashtable.out])
+AT_CLEANUP
