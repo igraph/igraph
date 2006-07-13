@@ -1,0 +1,182 @@
+\documentclass[landscape]{foils}
+
+\usepackage{ae}
+\usepackage{hyperref}
+\usepackage{thumbpdf}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage[left=0cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[display]{texpower}
+\usepackage{psfrag}
+\usepackage{ragged2e}
+\usepackage{amstext}
+\usepackage{xspace}
+\usepackage{fancyvrb}
+
+\newcommand{\figfigure}[2]{%
+  \begin{psfrags}%
+  \input #2.eps_t%
+  \includegraphics[width=#1]{#2.eps}%
+  \end{psfrags}%
+}
+
+\newcommand{\stitle}[1]{{\color{yellow}\centering\Large #1\par\vspace*{10pt}\hrule}}
+
+\setlength{\columnsep}{0.5cm}
+\setlength{\columnseprule}{0.4pt}
+
+\renewcommand{\emph}[1]{\textcolor{yellow}{\bf #1}}
+
+\newcommand{\igraph}{\texttt{\emph{igraph}}\xspace}
+
+\begin{document}
+
+\RaggedRight
+\color{white}
+\pagecolor{black}
+\fvset{fontsize=\small}
+\fvset{commandchars=\\\{\}}
+\definecolor{grey}{gray}{0.75}
+\fvset{frame=single, numbers=left, rulecolor=\color{grey}}
+
+\MyLogo{\color{grey}The \igraph library for complex network research -- NECSI ICCS 2006}
+
+\thispagestyle{empty}
+\vspace*{1cm}
+{\centering
+\hrule
+\Large
+\vspace*{1cm}
+{\bf The \igraph library for complex network research}
+\vspace*{1cm}
+\par
+\hrule
+\par
+\vspace*{2cm}
+\normalsize G\'abor Cs\'ardi\\
+\small \verb+csardi@rmki.kfki.hu+
+\par
+\vspace*{1cm}
+\normalsize Tam\'as Nepusz\\
+\small \verb+ntamas@rmki.kfki.hu+
+\par
+\vspace*{1.5cm}
+Center for Complex Systems Studies, Kalamazoo College, Kalamazoo, MI, and\\
+Department of Biophysics, 
+KFKI Research Institute for Nuclear and Particle Physics of the
+Hungarian Academy of Sciences\\
+}
+
+\newpage
+\stitle{Why???}\pause
+
+\begin{center}
+Because every existing software package lacked something.
+\end{center}\pause
+
+\vfill
+\stitle{Being open}
+
+\begin{center}
+The most important feature.
+\end{center}
+\vfill
+
+\newpage
+\stitle{Design goals}
+
+\begin{itemize}
+\item Handling \emph{large} data sets time- and
+  space-efficiently. Millions of vertices and/or edges. All basic
+  operations are linear in time and space. \pause
+\item Open: (1) open source (2) \emph{extendable} and (3) \emph{embeddable}. \pause
+\item \emph{Interactive} and \emph{non-interactive}. \pause
+\item Supporting \emph{rapid development}. \pause
+\end{itemize}
+
+\stitle{Additional Features (side effects)} 
+
+\begin{itemize}
+\item \emph{Portable} (both the C layer and the and Python
+  layers). \pause
+\item Well \emph{documented}. The time complexity of every operation is
+  defined. See homepage for documentation.
+\end{itemize}
+
+\newpage
+\stitle{The \igraph architecture}
+\begin{center}
+\color{black}
+\figfigure{.7\textwidth}{arch}
+\end{center}
+
+\newpage
+\stitle{Functionality}
+
+\begin{itemize}
+\item Handles directed and undirected graphs with possibly multiple
+  edges and self-loops. No hypergraphs. \pause
+\item Graph generation: various regular and random graphs. Efficient
+  algorithms for large random graphs. \pause
+\item Random graphs with a given degree sequence, rewiring of graphs.\pause
+\item Path length properties, centrality measures. Page-rank
+  algorithm. \pause
+\item Graph components, weakly or strongly connected, minimum spanning
+  tree. \pause
+\item Vertex and edge sets/sequences, high level interfaces support
+  graph, vertex and edge attributes. An attribute can be an arbitrary
+  object. Vertex and edge selection based on attributes. 
+\end{itemize}
+
+\newpage
+\stitle{Functionality (contd.)}
+\begin{itemize}
+\item File formats. Some simple file formats and also Pajek (import
+  only) and GraphML. (Basic support right now.) \pause
+\item Graph layouts, regular and force-based layouts in 2D and 3D. \pause
+\item High level interfaces support graph visualization in 2D. 
+  (interactive and non-interactive, many file formats to export: EPS,
+  PDF, SVG, JPG, PNG, FIG, etc.) or 3D
+  (with R). \pause
+\item Graph operators: graph intersection, union, composition. \pause
+\item Graph motifs: an implementation of the fast RAND-ESU algorithm.
+\end{itemize}
+
+\newpage
+\stitle{Demo 1: Nonlinear Preferential Attachment}
+\VerbatimInput{demo2.R}
+
+\newpage
+\stitle{Demo 2: Community Structure Detection Algorithm}
+\VerbatimInput{demo1.R}
+
+\newpage
+\stitle{Demo 3: Clusters in a Random Graph}
+\VerbatimInput{demo3.R}
+
+\newpage
+\stitle{Where to get it}
+
+\emph{Home page:}\\
+\url{http://cneurocvs.rmki.kfki.hu/igraph}
+\vfill
+
+\emph{Mailing lists:}\\
+\url{http://lists.nongnu.org/mailman/listinfo/igraph-help}\\
+\url{http://lists.nongnu.org/mailman/listinfo/igraph-announce}\\
+\url{http://www.r-project.org/mail.html}
+\vfill
+
+\emph{On SourceForge:}\\
+\url{http://www.sourceforge.net/projects/igraph}
+\vfill
+
+\emph{On Savannah:}\\
+\url{http://savannah.nongnu.org/projects/igraph}
+\vfill
+
+\emph{Source code:}\\
+\url{http://arch.sv.nongnu.org/archives/igraph}
+\vfill
+
+\end{document}
