@@ -22,6 +22,8 @@
 */
 
 #include "types.h"
+#include "memory.h"
+#include <string.h>
 
 int igraph_hashtable_init(igraph_hashtable_t *ht) {
   IGRAPH_CHECK(igraph_trie_init(&ht->keys, 1));
@@ -64,6 +66,40 @@ int igraph_hashtable_addset(igraph_hashtable_t *ht,
     IGRAPH_CHECK(igraph_strvector_set(&ht->elements, newid, elem));
   }
   
+  return 0;
+}
+
+/* Previous comment also applies here */
+
+int igraph_hashtable_addset2(igraph_hashtable_t *ht,
+			     const char *key, const char *def,
+			     const char *elem, int elemlen) {
+  long int size=igraph_trie_size(&ht->keys);
+  long int newid;
+  char *tmp;
+
+  IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
+
+  tmp=Calloc(elemlen+1, char);
+  if (tmp==0) {
+    IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, tmp);
+  strncpy(tmp, elem, elemlen);
+  tmp[elemlen]='\0';
+  
+  if (newid==size) {
+    IGRAPH_CHECK(igraph_strvector_resize(&ht->defaults, newid+1));
+    IGRAPH_CHECK(igraph_strvector_resize(&ht->elements, newid+1));
+    IGRAPH_CHECK(igraph_strvector_set(&ht->defaults, newid, def));
+    IGRAPH_CHECK(igraph_strvector_set(&ht->elements, newid, tmp));    
+  } else {
+    IGRAPH_CHECK(igraph_strvector_set(&ht->elements, newid, tmp));    
+  }
+
+  Free(tmp);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 

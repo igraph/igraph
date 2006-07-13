@@ -577,6 +577,9 @@ void igraph_hashtable_destroy(igraph_hashtable_t *ht);
 int igraph_hashtable_addset(igraph_hashtable_t *ht,
 			    const char *key, const char *def, 
 			    const char *elem);
+int igraph_hashtable_addset2(igraph_hashtable_t *ht,
+			     const char *key, const char *def,
+			     const char *elem, int elemlen);
 int igraph_hashtable_get(igraph_hashtable_t *ht,
 			 const char *key, char **elem);
 int igraph_hashtable_getkeys(igraph_hashtable_t *ht, 
