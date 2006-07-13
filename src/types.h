@@ -477,7 +477,7 @@ int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id);
 int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length, 
 		     long int *id);
 void igraph_trie_idx(igraph_trie_t *t, long int idx, char **str);
-int igraph_trie_getkeys(igraph_trie_t *t, igraph_strvector_t **strv);
+int igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv);
 long int igraph_trie_size(igraph_trie_t *t);
 
 typedef struct {
@@ -579,6 +579,8 @@ int igraph_hashtable_addset(igraph_hashtable_t *ht,
 			    const char *elem);
 int igraph_hashtable_get(igraph_hashtable_t *ht,
 			 const char *key, char **elem);
+int igraph_hashtable_getkeys(igraph_hashtable_t *ht, 
+			     const igraph_strvector_t **sv);
 int igraph_hashtable_reset(igraph_hashtable_t *ht);
 
 #endif

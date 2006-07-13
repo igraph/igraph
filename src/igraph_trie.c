@@ -349,7 +349,7 @@ long int igraph_trie_size(igraph_trie_t *t) {
 
 /* Hmmm, very dirty.... */
 
-int igraph_trie_getkeys(igraph_trie_t *t, igraph_strvector_t **strv) {
+int igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
   *strv=&t->keys;
   return 0;
 }

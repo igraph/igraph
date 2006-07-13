@@ -82,3 +82,8 @@ int igraph_hashtable_reset(igraph_hashtable_t *ht) {
   IGRAPH_CHECK(igraph_strvector_copy(&ht->elements, &ht->defaults));
   return 0;
 }
+
+int igraph_hashtable_getkeys(igraph_hashtable_t *ht, 
+			     const igraph_strvector_t **sv) {
+  return igraph_trie_getkeys(&ht->keys, sv);
+}

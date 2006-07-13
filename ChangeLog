@@ -6,6 +6,8 @@
 	(igraph_hashtable_get, igraph_hashtable_reset) : added
 	* examples/simple/igraph_hashtable.c : added
 
+	* src/igraph_hashtable.c (igraph_hashtable_getkeys) : added
+
 2006-07-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_barabasi_aging_game) : zero_age_appeal, 

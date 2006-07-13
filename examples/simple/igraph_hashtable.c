@@ -27,6 +27,8 @@ int main() {
 
   igraph_hashtable_t ht;
   char *str;
+  const igraph_strvector_t *keys;
+  long int i;
 
   /* init and destroy */
   igraph_hashtable_init(&ht);
@@ -80,8 +82,15 @@ int main() {
   igraph_hashtable_get(&ht, "shape", &str);
   printf("shape: %s\n", str);
   
-  igraph_hashtable_destroy(&ht);
+  igraph_hashtable_getkeys(&ht, &keys);
+  for (i=0; i<igraph_strvector_size(keys); i++) {
+    igraph_strvector_get(keys, i, &str);
+    printf("%s ", str);
+  }
+  printf("\n");
   
+  igraph_hashtable_destroy(&ht);
+
 
   return 0;
 }
