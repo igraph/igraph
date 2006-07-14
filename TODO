@@ -6,19 +6,12 @@ o check reading and writing (big) files from the R interface, possibly
   rewrite
 o document bison requirements
 o repair simplify
-o attribute handling for operators
 o add references to SNA, paper by Carter
-o uniform graph operators (union, intersection, etc...)
-o merging layouts properly, multicompartmental layout functions
-o better random number generator handling (init with seed, etc...)
 o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions
-o get non-structural info from Pajek files
+o check importing pajek files
 o write Pajek file
 o read and write non-structural info from/to GraphML files
-o better looking graphs in 3D in the R interface
-o rewite add_edges, add_vertices, delete_edges, delete_vertices,
-  they're a mess
 o edge seq argument to delete_edges
 o Add Python interface to igraph_callaway_traits_game,
   igraph_barabasi_aging_game, igraph_recent_degree_aging_game
@@ -26,6 +19,13 @@ o add attribute support to spanning tree functions
 
 Other bits:
 
+o rewite add_edges, add_vertices, delete_edges, delete_vertices,
+  they're a mess
+o better looking graphs in 3D in the R interface
+o better random number generator handling (init with seed, etc...)
+o uniform graph operators (union, intersection, etc...)
+o attribute handling for operators
+o merging layouts properly, multicompartmental layout functions
 o eccentricity
 o bi-connected components (or k connected component), articulations points,
   cliques, k-cores

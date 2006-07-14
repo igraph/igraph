@@ -5,92 +5,69 @@
 ]>
 
 <chapter id="igraph-Iterators">
-<title>Vertex and Edge Sequences and Iterators</title>
+<title>Vertex and Edge Selectors and Sequences, Iterators</title>
 
-<section><title>Vertex and Edge Sequences</title>
+<section>
 <!-- doxrox-include about_iterators -->
 </section>
 
-<section><title>Generic Vertex Sequence Operations</title>
-<!-- doxrox-include igraph_vs_next -->
-<!-- doxrox-include igraph_vs_end -->
-<!-- doxrox-include igraph_vs_get -->
-<!-- doxrox-include igraph_vs_reset -->
-<!-- doxrox-include igraph_vs_unfold -->
-<!-- doxrox-include igraph_vs_destroy -->
-</section>
-
-<section><title>Vertex Sequence Constructors</title>
-<section><title>Basic Vertex Iterators</title>
+<section><title>Vertex selector constructors</title>
+<!-- doxrox-include about_vertex_selectors -->
 <!-- doxrox-include igraph_vs_all -->
 <!-- doxrox-include igraph_vs_adj -->
-<!-- doxrox-include igraph_vs_adj_set -->
 <!-- doxrox-include igraph_vs_none -->
 <!-- doxrox-include igraph_vs_1 -->
+<!-- doxrox-include igraph_vs_vector -->
+<!-- doxrox-include igraph_vs_vector_small -->
 <!-- doxrox-include igraph_vs_seq -->
 </section>
-<section><title>Random Walkers</title>
-<!-- doxrox-include igraph_vs_rw -->
-<!-- doxrox-include igraph_vs_rw1 -->
-</section>
-<section><title>Vertex Sequences Based on Vectors</title>
-<!-- doxrox-include igraph_vs_vectorview -->
-<!-- doxrox-include igraph_vs_vector -->
-<!-- doxrox-include igraph_vs_vectorview_it -->
-<!-- doxrox-include igraph_vs_vector_small -->
-<!-- doxrox-include igraph_vs_vector_getvector -->
-</section>
+
+<section><title>Generic vertex selector operations</title>
+<!-- doxrox-include igraph_vs_destroy -->
+<!-- doxrox-include igraph_vs_is_all -->
 </section>
 
-<section><title>Generic Edge Sequence Operations</title>
-<!-- doxrox-include igraph_es_next -->
-<!-- doxrox-include igraph_es_end -->
-<!-- doxrox-include igraph_es_get -->
-<!-- doxrox-include igraph_es_from -->
-<!-- doxrox-include igraph_es_to -->
-<!-- doxrox-include igraph_es_reset -->
-<!-- doxrox-include igraph_es_unfold -->
-<!-- doxrox-include igraph_es_destroy -->
+<section><title>Immediate vertex selectors</title>
+<!-- doxrox-include igraph_vss_all -->
+<!-- doxrox-include igraph_vss_none -->
+<!-- doxrox-include igraph_vss_1 -->
+<!-- doxrox-include igraph_vss_vector -->
+<!-- doxrox-include igraph_vss_seq -->
 </section>
 
-<section><title>Edge Sequence Constructors</title>
-<section><title>Basic Edge Iterators</title>
+<section><title>Vertex iterators</title>
+<!-- doxrox-include igraph_vit_create -->
+<!-- doxrox-include igraph_vit_destroy -->
+</section>
+
+<section><title>Edge selector constructors</title>
 <!-- doxrox-include igraph_es_all -->
-<!-- doxrox-include igraph_es_fromorder -->
 <!-- doxrox-include igraph_es_adj -->
-<!-- doxrox-include igraph_es_adj_set -->
-<!-- doxrox-include igraph_es_adj_vertex -->
 <!-- doxrox-include igraph_es_none -->
 <!-- doxrox-include igraph_es_1 -->
+<!-- doxrox-include igraph_es_vector -->
+<!-- doxrox-include igraph_es_fromto -->
 <!-- doxrox-include igraph_es_seq -->
 </section>
-<section><title>Edge Sequences Based on Vectors</title>
-<!-- doxrox-include igraph_es_vectorview -->
-<!-- doxrox-include igraph_es_vector -->
-<!-- doxrox-include igraph_es_vectorview_it -->
-<!-- doxrox-include igraph_es_vector_small -->
-<!-- doxrox-include igraph_es_vector_getvector -->
-</section>
-<section><title>Other Edge Sequences</title>
-<!-- doxrox-include igraph_es_fromto -->
-</section>
+
+<section><title>Immediate edge selectors</title>
+<!-- doxrox-include igraph_ess_all -->
+<!-- doxrox-include igraph_ess_none -->
+<!-- doxrox-include igraph_ess_1 -->
+<!-- doxrox-include igraph_ess_vector -->
+<!-- doxrox-include igraph_ess_seq -->
 </section>
 
-<section><title>Vertex and Edge Sequence Shorthands</title>
-<!-- doxrox-include about_iterator_shorthands -->
-<section><title>Vertex Sequence Shorthands</title>
-<!-- doxrox-include IGRAPH_VS_ALL -->
-<!-- doxrox-include IGRAPH_VS_1 -->
-<!-- doxrox-include IGRAPH_VS_VECTOR -->
-<!-- doxrox-include IGRAPH_VS -->
+<section><title>Generic edge selector operations</title>
+<!-- doxrox-include igraph_es_destroy -->
+<!-- doxrox-include igraph_es_is_all -->
 </section>
-<section><title>Edge Sequence Shorthands</title>
-<!-- doxrox-include IGRAPH_ES_ALL -->
-<!-- doxrox-include IGRAPH_ES_1 -->
-<!-- doxrox-include IGRAPH_ES_VECTOR -->
-<!-- doxrox-include IGRAPH_ES -->
+
+<section><title>Edge iterators</title>
+<!-- doxrox-include igraph_eit_create -->
+<!-- doxrox-include igraph_eit_destroy -->
 </section>
-</section>
+
 
 <!-- <section><title>Examples</title>
 	</section> 

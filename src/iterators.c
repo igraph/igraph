@@ -28,16 +28,103 @@
 #include <string.h>
 #include <stdarg.h>
 
+/**
+ * \section about_iterators About selectors, iterators
+ *
+ * <para>Everything about vertices and vertex selectors also applies
+ * to edges and edge selectors unless explicitly noted otherwise.</para>
+ *
+ * <para>The vertex (and edge) selector notion was introduced in igraph 0.2,
+ * and it is a way to reference to sequence of vertices or edges
+ * independently of the graph.</para>
+ *
+ * <para>While this might sound quite mysterious, it is actually very
+ * simple. For example all vertex of graph can be selected by
+ * \ref igraph_vs_all(), and the graph indenpendence means that
+ * \ref igraph_vs_all() is not parametrized by a graph object. Ie. 
+ * \ref igraph_vs_all() is the \em concept of selecting all vertices
+ * of a graph.</para>
+ * 
+ * <para>This means that for determining the actual vertex id's implied
+ * by a vertex selector it needs to be instantiated with a graph
+ * object, the instantiation results a vertex iterator.</para>
+ * 
+ * <para>Some vertex selectors have \em immediate versions, these have
+ * prefix <code>igraph_vss</code> instead of <code>igraph_vs</code>, eg. 
+ * \ref igraph_vss_all() instead of \ref igraph_vs_all(). 
+ * These immediate versions are to be used in the parameter list of the igraph
+ * functions, like \ref igraph_degree(). These functions are not
+ * associated with any \type igraph_vs_t object, so they have no
+ * separate constructors and destructors (destroy functions).</para> 
+ */ 
+
+/**
+ * \section about_vertex_selectors
+ * 
+ * <para>Vertex selectors are created by vertex selector constructors,
+ * can be instantiated with \ref igraph_vit_create(), and are
+ * destroyed with \ref igraph_vs_destroy().</para>
+ */
+
+/**
+ * \function igraph_vs_all
+ * 
+ * \param vs Pointer to an uninitialized \type igraph_vs_t object.
+ * \return Error code.
+ * \sa \ref igraph_vss_all().
+ *
+ * This selector includes all vertices of a given graph in
+ * increasing vertex id order.
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_vs_all(igraph_vs_t *vs) {
   vs->type=IGRAPH_VS_ALL;
   return 0;
 }
+
+/**
+ * \function igraph_vss_all
+ *
+ * Immediate vertex selector for all vertices in a graph. It can
+ * be used conveniently when some vertex property (eg. betweenness,
+ * degree, etc.) should be calculated for all vertices.
+ *
+ * \return A vertex selector for all vertices in a graph.
+ * \sa \ref igraph_vs_all()
+ *
+ * Time complexity: O(1).
+ */
 
 igraph_vs_t igraph_vss_all() {
   igraph_vs_t allvs;
   allvs.type=IGRAPH_VS_ALL;
   return allvs;  
 }
+
+/**
+ * \function igraph_vs_adj
+ * 
+ * All neighboring vertices of a given vertex are selected by this
+ * selector. The \c mode argument controls the type of the neighboring 
+ * vertices to be selected.
+ * 
+ * \param vs Pointer to an uninitialized vertex selector object.
+ * \param vid Vertex id, the center of the neighborhood.
+ * \param mode Decides the type of the neighborhood for directed
+ *        graphs. Possible values:
+ *        \c IGRAPH_OUT,  all vertices to which there is a directed edge
+ *           from \c vid.
+ *        \c IGRAPH_IN, all vertices from which there is a directed
+ *           edge from \c vid.
+ *        \c IGRAPH_ALL, all vertices to which or from which there is
+ *           a directed edge from/to \c vid.
+ *        This parameter is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(1).
+ */
 
 int igraph_vs_adj(igraph_vs_t *vs, 
 		  igraph_integer_t vid, igraph_neimode_t mode) {
@@ -47,10 +134,33 @@ int igraph_vs_adj(igraph_vs_t *vs,
   return 0;
 }
 
+/** 
+ * \function igraph_vs_none
+ * 
+ * Creates an empty vertex selector. 
+ *
+ * \param vs Pointer to an uninitialized vertex selector object.
+ * \return Error code.
+ * \sa \ref igraph_vss_none.
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_vs_none(igraph_vs_t *vs) {
   vs->type=IGRAPH_VS_NONE;
   return 0;
 }
+
+/**
+ * \function igraph_vss_none
+ *
+ * The immediate version of the empty vertex selector.
+ * 
+ * \return An empty vertex selector.
+ * \sa \ref igraph_vs_none()
+ * 
+ * Time complexity: O(1).
+ */
 
 igraph_vs_t igraph_vss_none() {
   igraph_vs_t nonevs;
@@ -58,11 +168,36 @@ igraph_vs_t igraph_vss_none() {
   return nonevs;
 }
 
+/**
+ * \function igraph_vs_1
+ * 
+ * This vertex selector selects a single vertex.
+ *
+ * \param vs Pointer to an uninitialized vertex selector object.
+ * \param vid The vertex id to be selected.
+ * \return Error Code.
+ * \sa \ref igraph_vss_1()
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
   vs->type=IGRAPH_VS_1;
   vs->data.vid=vid;
   return 0;
 }
+
+/**
+ * \function igraph_vss_1
+ * 
+ * The immediate version of the single-vertex selector.
+ * 
+ * \param vid The vertex to be selected.
+ * \return A vertex selector containing a single vertex.
+ * \sa \ref igraph_vs_1()
+ *
+ * Time complexity: O(1).
+ */
 
 igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
   igraph_vs_t onevs;
@@ -71,6 +206,25 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
   return onevs;
 }
 
+/**
+ * \function igraph_vs_vector
+ * 
+ * This function makes it possible to handle a \type vector_t
+ * temporarily as a vertex selector. The vertex selector should be
+ * thought of like a \em view to the vector. If you make changes to
+ * the vector that also affects the vertex selector. Destroying the
+ * vertex selector does not destroy the vector. (Of course.) Do not
+ * destroy the vector before destroying the vertex selector, or you
+ * might get strange behavior.
+ * 
+ * \param vs Pointer to an uninitialized vertex selector.
+ * \param v Pointer to a \type igraph_vector_t object.
+ * \return Error code.
+ * \sa \ref igraph_vss_vector()
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_vs_vector(igraph_vs_t *vs,
 		     const igraph_vector_t *v) {
   vs->type=IGRAPH_VS_VECTORPTR;
@@ -78,12 +232,46 @@ int igraph_vs_vector(igraph_vs_t *vs,
   return 0;
 }
 
+/**
+ * \function igraph_vss_vector
+ * 
+ * This is the immediate version of \ref igraph_vs_vector. 
+ * 
+ * \param v Pointer to a \type igraph_vector_t object.
+ * \return A vertex selector object containing the vertices in the
+ *         vector. 
+ * \sa \ref igraph_vs_vector()
+ * 
+ * Time complexity: O(1).
+ */
+
 igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
   igraph_vs_t vecvs;
   vecvs.type=IGRAPH_VS_VECTORPTR;
   vecvs.data.vecptr=v;
   return vecvs;
 }
+
+/**
+ * \function igraph_vs_vector_small
+ *
+ * This function can be used to create a vertex selector with a couple
+ * of vertices. Do not forget to include a <code>-1</code> after the
+ * last vertex id, the behavior of the function is undefined if you
+ * don't use a <code>-1</code> properly.
+ * 
+ * Note that the vertex ids supplied will be parsed as
+ * <code>int</code>'s so you cannot supply arbitrarily large (too
+ * large for int) vertex ids here. 
+ * 
+ * \param vs Pointer to an uninitialized vertex selector object.
+ * \param ... Additional parameters, these will be the vertex ids to
+ *        be included in the vertex selector. Supply a <code>-1</code>
+ *        after the last vertex id.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of vertex ids supplied.
+ */
 
 int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
   va_list ap;
@@ -117,6 +305,24 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
   return 0;  
 }
 
+/**
+ * \function igraph_vs_seq
+ * 
+ * Creates a vertex selector containing all vertices with vertex id
+ * equal to or bigger than \c from and equal to or smaller than \c
+ * to.
+ * 
+ * \param vs Pointer to an uninitialized vertex selector object.
+ * \param from The first vertex id to be included in the vertex
+ *        selector. 
+ * \param to The last vertex id to be included in the vertex
+ *        selector. 
+ * \return Error code.
+ * \sa \ref igraph_vss_seq()
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_vs_seq(igraph_vs_t *vs, 
 		  igraph_integer_t from, igraph_integer_t to) {
   vs->type=IGRAPH_VS_SEQ;
@@ -125,6 +331,21 @@ int igraph_vs_seq(igraph_vs_t *vs,
   return 0;
 }
 
+/**
+ * \function igraph_vss_seq
+ * 
+ * The immediate version of \ref igraph_vs_seq().
+ * 
+ * \param from The first vertex id to be included in the vertex
+ *        selector. 
+ * \param to The last vertex id to be included in the vertex
+ *        selector. 
+ * \return Error code.
+ * \sa \ref igraph_vs_seq()
+ *
+ * Time complexity: O(1).
+ */
+
 igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
   igraph_vs_t vs;
   vs.type=IGRAPH_VS_SEQ;
@@ -132,6 +353,20 @@ igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
   vs.data.seq.to=to;
   return vs;
 }
+
+/**
+ * \function igraph_vs_destroy
+ * 
+ * This function should be called for all vertex selectors when they
+ * are not needed. The memory allocated for the vertex selector will
+ * be deallocated. Do not call this function on vertex selectors
+ * created with the immediate versions of the vertex selector
+ * constructors (starting with <code>igraph_vss</code>).
+ * 
+ * \param vs Pointer to a vertex selector object.
+ * 
+ * Time complecity: operating system dependent, usually O(1).
+ */
 
 void igraph_vs_destroy(igraph_vs_t *vs) {
   switch (vs->type) {
@@ -151,11 +386,57 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
   }
 }
 
+/**
+ * \function igraph_vs_is_all
+ * 
+ * This function checks whether the vertex selector object was created
+ * by \ref igraph_vs_all() of \ref igraph_vss_all(). Note that the
+ * vertex selector might contain all vertices in a given graph but if
+ * it wasn't created by the two constructors mentioned here the return
+ * value will be FALSE.
+ * 
+ * \param vs Pointer to a vertex selector object.
+ * \return TRUE (1) if the vertex selector contains all vertices and
+ *         FALSE (1) otherwise.
+ * 
+ * Time complexity: O(1).
+ */
+
 igraph_bool_t igraph_vs_is_all(igraph_vs_t *vs) {
   return vs->type == IGRAPH_VS_ALL;
 }
 
 /***************************************************/
+
+/**
+ * \function igraph_vit_create
+ * \brief Creates a vertex iterator from a vertex selector.
+ * 
+ * This function instantiates a vertex selector object with a given
+ * graph. This is the step when the actual vertex ids are created from
+ * the \em logical notion of the vertex selector based on the graph. 
+ * Eg. a vertex selector created with \ref igraph_vs_all() contains
+ * knowledge that \em all vertices are included in a (yet indefinite)
+ * graph. When instantiating it a vertex iterator object is created,
+ * this contains the actual vertex ids in the graph supplied as a
+ * parameter. 
+ * 
+ * The same vertex selector object can be used to instantiate any
+ * number vertex iterators.
+ *
+ * \param graph An \type igraph_t object, a graph. 
+ * \param vs A vertex selector object. 
+ * \param vit Pointer to an uninitialized vertex iterator object.
+ * \return Error code.
+ * \sa \ref igraph_vit_destroy().
+ * 
+ * Time complexity: it depends on the vertex selector type. O(1) for
+ * vertex selectors created with \ref igraph_vs_all(), \ref
+ * igraph_vs_none(), \ref igraph_vs_1, \ref igraph_vs_vector, \ref
+ * igraph_vs_seq(), \ref igraph_vs_vector(), \ref
+ * igraph_vs_vector_small(). O(d) for \ref igraph_vs_adj(), d is the
+ * number of vertex ids to be included in the iterator.
+ */
 
 int igraph_vit_create(const igraph_t *graph, 
 		      igraph_vs_t vs, igraph_vit_t *vit) {
@@ -220,6 +501,18 @@ int igraph_vit_create(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_vit_destroy
+ * \brief Destroys a vertex iterator.
+ * 
+ * Deallocates memory allocated for a vertex iterator. 
+ * 
+ * \param vit Pointer to an initialized vertex iterator object.
+ * \sa \ref igraph_vit_create()
+ * 
+ * Time complexity: operating system dependent, usually O(1).
+ */
+
 void igraph_vit_destroy(const igraph_vit_t *vit) {
   switch (vit->type) {
   case IGRAPH_VIT_SEQ:
@@ -236,6 +529,26 @@ void igraph_vit_destroy(const igraph_vit_t *vit) {
 }
 
 /*******************************************************/
+
+/**
+ * \function igraph_es_all
+ *
+ * \param es Pointer to an uninitialized edge selector object.
+ * \param order Constant giving the order in which the edges will be
+ *        included in the selector. Possible values:
+ *        \c IGRAPH_EDGEORDER_ID, edge id order.
+ *        \c IGRAPH_EDGEORDER_FROM, vertex id order, the id of the
+ *           \em source vertex counts for directed graphs. The order
+ *           of the adjacent edges of a given vertex is arbitrary.
+ *        \c IGRAPH_EDGEORDER_TO, vertex id order, the id of the \em
+ *           target vertex counts for directed graphs. The order
+ *           of the adjacent edges of a given vertex is arbitrary.
+ *        For undirected graph the latter two is the same. 
+ * \return Error code.
+ * \sa \ref igraph_ess_all()
+ * 
+ * Time complexity: O(1).
+ */
 
 int igraph_es_all(igraph_es_t *es, 
 		  igraph_edgeorder_type_t order) {
@@ -256,11 +569,41 @@ int igraph_es_all(igraph_es_t *es,
   return 0;
 }
 
+/**
+ * \function igraph_ess_all
+ * 
+ * The immediate version of the all-vertices selector.
+ * 
+ * \param order Constant giving the order of the edges in the edge
+ *        selector. See \ref igraph_es_all() for the possible values.
+ * \return The edge selector. 
+ * \sa \ref igraph_es_all()
+ * 
+ * Time complexity: O(1).
+ */
+
 igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
   igraph_es_t es;
   igraph_es_all(&es, order); /* cannot fail */
   return es;  
 }
+
+/**
+ * \function igraph_es_adj
+ * \brief Adjacent edges of a vertex.
+ * 
+ * \param es Pointer to an uninitialized edge selector object.
+ * \param vid Vertex id, of which the adjacent edges will be
+ *        selected.
+ * \param mode Constant giving the type of the adjacent edges to
+ *        select. This is ignored for undirected graphs. Possible values:
+ *        \c IGRAPH_OUT, outgoing edges
+ *        \c IGRAPH_IN, incoming edges
+ *        \c IGRAPH_ALL, all edges
+ * \return Error code.
+ * 
+ * Time complexity: O(1).
+ */
 
 int igraph_es_adj(igraph_es_t *es, 
 		  igraph_integer_t vid, igraph_neimode_t mode) {
@@ -270,18 +613,34 @@ int igraph_es_adj(igraph_es_t *es,
   return 0;
 }
 
-igraph_es_t igraph_ess_adj(igraph_integer_t vid, igraph_neimode_t mode) {
-  igraph_es_t es;
-  es.type=IGRAPH_ES_ADJ;
-  es.data.adj.vid=vid;
-  es.data.adj.mode=mode;
-  return es;
-} 
+/**
+ * \function igraph_es_none
+ * \brief Empty edge selector.
+ * 
+ * \param es Pointer to an uninitialized edge selector object to
+ * initialize.
+ * \return Error code.
+ * \sa \ref igraph_ess_none()
+ * 
+ * Time complexity: O(1).
+ */
 
 int igraph_es_none(igraph_es_t *es) {
   es->type=IGRAPH_ES_NONE;
   return 0;
 }
+
+/**
+ * \function igraph_ess_none
+ * \brief Immediate empty edge selector.
+ * 
+ * Immediate version of the empty edge selector.
+ * 
+ * \return Initialized empty edge selector.
+ * \sa \ref igraph_es_none()
+ * 
+ * Time complexity: O(1).
+ */
 
 igraph_es_t igraph_ess_none() {
   igraph_es_t es;
@@ -289,11 +648,34 @@ igraph_es_t igraph_ess_none() {
   return es;
 }
 
+/**
+ * \function igraph_es_1
+ * \brief Edge selector containing a single edge.
+ * 
+ * \param es Pointer to an uninitialized edge selector object.
+ * \param eid Edge id of the edge to select.
+ * \return Error code.
+ * \sa \ref igraph_ess_1()
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
   es->type=IGRAPH_ES_1;
   es->data.eid=eid;
   return 0;
 }
+
+/**
+ * \function igraph_ess_1
+ * \brief Immediate version of the single edge edge selector.
+ * 
+ * \param eid The id of the edge.
+ * \return The edge selector.
+ * \sa \ref igraph_es_1()
+ * 
+ * Time complexity: O(1).
+ */
 
 igraph_es_t igraph_ess_1(igraph_integer_t eid) {
   igraph_es_t es;
@@ -302,12 +684,44 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
   return es;
 }
 
+/**
+ * \function igraph_es_vector
+ * \brief Handle a vector as an edge selector.
+ * 
+ * Creates an edge selector which serves as a view to a vector
+ * containing edge ids. Do not destroy the vector before destroying
+ * the view. 
+ * 
+ * Many views can be created to the same vector.
+ * 
+ * \param es Pointer to an uninitialized edge selector.
+ * \param v Vector containing edge ids.
+ * \return Error code.
+ * \sa \ref igraph_ess_vector()
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_es_vector(igraph_es_t *es,
 		     const igraph_vector_t *v) {
   es->type=IGRAPH_ES_VECTORPTR;
   es->data.vecptr=v;
   return 0;
 }
+
+/**
+ * \function igraph_ess_vector
+ * \brief Immediate vector view edge selector.
+ * 
+ * This is the immediate version of the vector of edge ids edge
+ * selector. 
+ * 
+ * \param v The vector of edge ids.
+ * \return Edge selector, initialized.
+ * \sa \ref igraph_es_vector()
+ * 
+ * Time complexity: O(1).
+ */
 
 igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
   igraph_es_t es;
@@ -316,10 +730,42 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
   return es;
 }
 
+/**
+ * \function igraph_es_fromto
+ * \brief Edge selector, all edges between two vertex sets.
+ * 
+ * This function is not implemented yet.
+ * 
+ * \param es Pointer to an uninitialized edge selector.
+ * \param from Vertex selector, their outgoing edges will be
+ *        selected. 
+ * \param to Vertex selector, their incoming edges will be selected
+ *        from the previous selection.
+ * \return Error code.
+ * 
+ * Time complexity: O(1).
+ */
+
 int igraph_es_fromto(igraph_es_t *es,
 		     igraph_vs_t from, igraph_vs_t to) {
   /* TODO */
 }
+
+/**
+ * \function igraph_es_seq
+ * \brief Edge selector, a sequence of edge ids.
+ * 
+ * All edge ids between <code>from</code> and <code>to</code> will be
+ * included in the edge selection.
+ * 
+ * \param es Pointer to an uninitialized edge selector object.
+ * \param from The first edge id to be included.
+ * \param to The last edge id to be included.
+ * \return Error code.
+ * \sa \ref igraph_ess_seq()
+ * 
+ * Time complecity: O(1).
+ */
 
 int igraph_es_seq(igraph_es_t *es, 
 		  igraph_integer_t from, igraph_integer_t to) {
@@ -329,6 +775,18 @@ int igraph_es_seq(igraph_es_t *es,
   return 0;
 }
 
+/**
+ * \function igraph_ess_seq
+ * \brief Immediate version of the sequence edge selector.
+ * 
+ * \param from The first edge id to include.
+ * \param to The last edge id to include.
+ * \return The initialized edge selector.
+ * \sa \ref igraph_es_seq()
+ * 
+ * Time complexity: O(1).
+ */
+
 igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
   igraph_es_t es;
   es.type=IGRAPH_ES_SEQ;
@@ -336,6 +794,19 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
   es.data.seq.to=to;
   return es;
 }
+
+/**
+ * \function igraph_es_destroy
+ * \brief Destroys an edge selector object.
+ * 
+ * Call this function on an edge selector when it is not needed any
+ * more. Do \em not call this function on edge selectors created by
+ * immediate constructors, those don't need to be destroyed.
+ * 
+ * \param es Pointer to an edge selector object.
+ * 
+ * Time complexity: operating system dependent, usually O(1).
+ */
 
 void igraph_es_destroy(igraph_es_t *es) {
   switch (es->type) { 
@@ -352,6 +823,17 @@ void igraph_es_destroy(igraph_es_t *es) {
     break;
   }
 }
+
+/**
+ * \function igraph_es_is_all
+ * \brief Check whether an edge selector includes all edges.
+ * 
+ * \param es Pointer to an edge selector object.
+ * \return TRUE (1) if <code>es</code> was created with \ref
+ * igraph_es_all() or \ref igraph_ess_all(), and FALSE (0) otherwise.
+ * 
+ * Time complexity: O(1).
+ */
 
 igraph_bool_t igraph_es_is_all(igraph_es_t *es) {
   return es->type == IGRAPH_ES_ALL;
@@ -418,6 +900,29 @@ int igraph_i_eit_create_allfromto(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
+
+/**
+ * \function igraph_eit_create
+ * \brief Creates an edge iterator from an edge selector.
+ * 
+ * This function creates an edge iterator based on an edge selector
+ * and a graph. 
+ * 
+ * The same edge selector can be used to create many edge iterators,
+ * also for different graphs.
+ * 
+ * \param graph An \type igraph_t object for which the edge selector
+ *        will be instantiated.
+ * \param es The edge selector to instantiate.
+ * \param eit Pointer to an uninitialized edge iterator. 
+ * \return Error code.
+ * 
+ * Time complexity: depends on the type of the edge selector. For edge
+ * selectors created by \ref igraph_es_all(), \ref igraph_es_none(),
+ * \ref igraph_es_1(), igraph_es_vector(), igraph_es_seq() it is
+ * O(1). For \ref igraph_es_adj() it is O(d) where d is the number of
+ * adjacent edges of the vertex.
+ */
 
 int igraph_eit_create(const igraph_t *graph, 
 		      igraph_es_t es, igraph_eit_t *eit) {
@@ -486,6 +991,16 @@ int igraph_eit_create(const igraph_t *graph,
   }
   return 0;
 }
+
+/**
+ * \function igraph_eit_destroy
+ * \brief Destroys an edge iterator
+ * 
+ * \param eit Pointer to an edge iterator to destroy.
+ * \sa \ref igraph_eit_create()
+ * 
+ * Time complexity: operating system dependent, usually O(1).
+ */
 
 void igraph_eit_destroy(const igraph_eit_t *eit) {
   switch (eit->type) {

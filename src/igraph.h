@@ -259,7 +259,6 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order);
 
 int igraph_es_adj(igraph_es_t *es, 
 		  igraph_integer_t vid, igraph_neimode_t mode);
-igraph_es_t igraph_ess_adj(igraph_integer_t vid, igraph_neimode_t mode);
 
 int igraph_es_none(igraph_es_t *es);
 igraph_es_t igraph_ess_none();

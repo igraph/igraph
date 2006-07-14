@@ -13,12 +13,14 @@
 <!-- doxrox-include igraph_layout_circle -->
 <!-- doxrox-include igraph_layout_fruchterman_reingold -->
 <!-- doxrox-include igraph_layout_kamada_kawai -->
+<!-- doxrox-include igraph_layout_reingold_tilford -->
 <!-- doxrox-include igraph_layout_grid_fruchterman_reingold -->
 <!-- doxrox-include igraph_layout_lgl -->
 </section>
 
 <section><title>3D Layouts</title>
 <!-- doxrox-include igraph_layout_random_3d -->
+<!-- doxrox-include igraph_layout_sphere -->
 <!-- doxrox-include igraph_layout_fruchterman_reingold_3d -->
 <!-- doxrox-include igraph_layout_kamada_kawai_3d -->
 </section>

@@ -8,34 +8,20 @@
 <title>Installation</title>
 
 <para>
-First download the latest version of <command>igraph</command> and
-uncompress it to a temporary directory:
+First download the latest version of <command>igraph</command> from
+<ulink url="http://cneurocvs.rmki.kfki.hu/igraph"><command>igraph</command>
+homepage</ulink> or from 
+<ulink
+    url="http://sourceforge.net/project/showfiles.php?group_id=160289">SourceForge</ulink>, and uncompress it to a temporary directory:
 <programlisting>
-$ wget http://geza.kzoo.edu/~csardi/igraph_latest.tar.gz
-$ tar xzf igraph_latest.tar.gz 
-$ cd igraph-latest 
+$ wget http://cneurocvs.rmki.kfki.hu/igraph/download/igraph-0.2.tar.gz
+$ tar xzf igraph-0.2.tar.gz 
+$ cd igraph-0.2
 </programlisting>
 </para>
 
 <para>
-Installing the <command>igraph</command> R package is very simple, the <command>igraph</command>
-directory in the tarball contains a complete R package. Eg. in Linux
-you can install it like
-<programlisting>
-$ R CMD INSTALL -l ~/.R/library igraph
-</programlisting>
-</para>
-
-<para>
-Alternatively you can download the R package version of <command>igraph</command> only.
-</para>
-
-<para>
-Also, consult your R documentation.
-</para>
-
-<para>
-To install the complete R library typing
+To install the complete C library typing
 <programlisting>
 $ ./configure
 $ make
@@ -47,6 +33,23 @@ $ ./configure --help
 </programlisting>
 to see installations options, and reading the <filename>INSTALL</filename> 
 file. 
+</para>
+
+<para>
+Installing the <command>igraph</command> R package is very simple,
+you don't need to download anything by hand, just give the command 
+<programlisting>
+> install.packages("igraph", lib="~/.R/library")
+</programlisting>
+in R and select a mirror site close to you. The
+<parameter>lib</parameter> argument specifies the directory to 
+which the package will be installed. If not specified, this will be
+default system wide R package directory. You must have write rights to
+this directory.
+</para>
+
+<para>
+Also, consult your R documentation.
 </para>
 
 </chapter>
