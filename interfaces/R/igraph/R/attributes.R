@@ -49,7 +49,7 @@ set.graph.attribute <- function(graph, name, value) {
   graph
 }
 
-get.vertex.attribute <- function(graph, name, index=V(g)) {
+get.vertex.attribute <- function(graph, name, index=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -61,7 +61,7 @@ get.vertex.attribute <- function(graph, name, index=V(g)) {
   }
 }
 
-set.vertex.attribute <- function(graph, name, index=V(g), value) {
+set.vertex.attribute <- function(graph, name, index=V(graph), value) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -74,7 +74,7 @@ set.vertex.attribute <- function(graph, name, index=V(g), value) {
   graph
 }
 
-get.edge.attribute <- function(graph, name, index=E(g)) {
+get.edge.attribute <- function(graph, name, index=E(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -86,7 +86,7 @@ get.edge.attribute <- function(graph, name, index=E(g)) {
   }
 }
 
-set.edge.attribute <- function(graph, name, index=E(g), value) {
+set.edge.attribute <- function(graph, name, index=E(graph), value) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }

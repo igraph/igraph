@@ -1,3 +1,9 @@
+2006-07-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/attributes.R (get.vertex.attribute)
+	(set.vertex.attribute, get.edge.attribute, set.edge.attribute) :
+	bugs eliminated ('g' in the argument list instead of 'graph')
+
 2006-07-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/foreign.R (read.graph) : pajek format added
