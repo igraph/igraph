@@ -1,23 +1,17 @@
 \name{attributes}
 \alias{attributes}
-\alias{add.graph.attribute}
-\alias{remove.graph.attribute}
-\alias{get.graph.attribute}
 \alias{set.graph.attribute}
-\alias{g.a}
-\alias{g.a<-}
-\alias{add.vertex.attribute}
-\alias{remove.vertex.attribute}
-\alias{get.vertex.attribute}
+\alias{get.graph.attribute}
+\alias{remove.graph.attribute}
+\alias{list.graph.attributes}
 \alias{set.vertex.attribute}
-\alias{v.a}
-\alias{v.a<-}
-\alias{add.edge.attribute}
-\alias{remove.edge.attribute}
-\alias{get.edge.attribute}
+\alias{get.vertex.attribute}
+\alias{remove.vertex.attribute}
+\alias{list.vertex.attributes}
 \alias{set.edge.attribute}
-\alias{e.a}
-\alias{e.a<-}
+\alias{get.edge.attribute}
+\alias{remove.edge.attribute}
+\alias{list.edge.attributes}
 \title{Graph, vertex and edge attributes}
 \description{Attributes are associated values belonging to a graph,
   vertices or edges. These can represent some property, like data
@@ -25,119 +19,124 @@
   the graph is plotted, or simply the weights of the edges in a weighted
   graph.}
 \usage{
-graph <- add.graph.attribute(graph, attrname)
-graph <- remove.graph.attribute(graph, attrname)
 get.graph.attribute(graph, attrname=NULL)
-set.graph.attribute(graph, attrname, value)
-g.a(graph, attrname=NULL)
-g.a(graph, attrname) <- value
-graph <- add.vertex.attribute(graph, attrname)
+graph <- set.graph.attribute(graph, attrname, value)
+graph <- remove.graph.attribute(graph, attrname)
+get.vertex.attribute(graph, attrname=NULL, index=V(graph))
+graph <- set.vertex.attribute(graph, attrname, index=V(graph), value)
 graph <- remove.vertex.attribute(graph, attrname)
-get.vertex.attribute(graph, attrname=NULL, v=igraph.vs.all(graph))
-set.vertex.attribute(graph, attrname, v=igraph.vs.all(graph), value)
-v.a(graph, attrname=NULL, v=igraph.vs.all(graph))
-v.a(graph, attrname, v=igraph.vs.all(graph)) <- value
-graph <- add.edge.attribute(graph, attrname)
+get.edge.attribute(graph, attrname=NULL, index=E(graph))
+graph <- set.edge.attribute(graph, attrname, index=E(graph), value)
 graph <- remove.edge.attribute(graph, attrname)
-get.edge.attribute(graph, attrname=NULL, e=igraph.es.all(graph))
-set.edge.attribute(graph, attrname, e=igraph.es.all(graph), value)
-e.a(graph, attrname=NULL, e=igraph.es.all(graph))
-e.a(graph, attrname, e=igraph.es.all(graph)) <- value
 }
 \arguments{
   \item{graph}{The graph object to work on. Note that the original graph
-  is never modified, a new graph object is returned instead; if don't
+  is never modified, a new graph object is returned instead; if you don't
   assign it to a variable your modifications will be lost! See examples
   below.}
   \item{attrname}{Character constant, the name of the attribute. For
     query functions this can be \code{NULL}, in this case the list of
     the attributes will be returned.}
-  \item{v}{Numeric vector, the ids of the vertices. It is not recycled,
-    even if \code{value} is longer.}
+  \item{index}{Numeric vector, the ids of the vertices or edges.
+    It is not recycled, even if \code{value} is longer.}
   \item{value}{Numeric vector, the new value(s) of the attributes, it
     will be recycled if needed.}
-  \item{e}{Numeric vector, the ids of the edges. It is not recycled,
-    even if \code{value} is longer.}
 }
 \details{
-  An attribute value is either a numeric constant or a character
-  string. 
+  There are three types of attributes in igraph: graph, vertex and edge
+  attributes. Graph attributes are associated with graph, vertex
+  attributes with vertices and edge attributes with edges.
+
+  Examples for graph attributes are the date when the graph data was
+  collected or other types of memos like the type of the data, or
+  whether the graph is a simple graph, ie. one without loops and
+  multiple edges.
+
+  Examples of vertex attributes are vertex properties, like the
+  vertex coordinates for the visualization of the graph, or other
+  visualization parameters, or meta-data associated with the vertices,
+  like the gender and the age of the individuals in a friendship
+  network, the type of the neurons in a graph representing neural
+  circuitry or even some pre-computed structual properties, like the
+  betweenness centrality of the vertices.
+
+  Examples of edge attributes are data associated with edges: most
+  commonly edge weights, or visualization parameters.
+
+  In recent igraph versions, arbitrary R objects can be assigned as
+  graph, vertex or edge attributes.
   
-  Each attribute has a name, this is simply a character
-  string. The names of the graph, vertex and edge attributes use
-  different name spaces, so the \sQuote{color} vertex attribute has
-  nothing to do with the \sQuote{color} edge attribute.
+  Some igraph functions use the values or graph, vertex and edge
+  attributes if they are present but this is not done in the current
+  version very extensively. Expect more in the (near) future.
 
-  In order to use an attribute it has to be \sQuote{added} first by
-  using the \code{add.*.attribute} functions. The initial values of the
-  attributes are undefined. After an attribute is added, its value(s)
-  can be set by the \code{set.*.attribute} functions and queried by the
-  \code{get.*.attribute} functions.
+  Graph attributes can be created with the \code{set.graph.attribute}
+  function, and removed with \code{remove.graph.attribute}. Graph
+  attributes are queried with \code{get.graph.attribute} and the
+  assigned graph attributes are listed with
+  \code{list.graph.attributes}.
 
-  You can also use the shorter \code{g.a}, \code{v.a}, \code{e.a} forms,
-  see the examples below, they are shorthands for the
-  \code{get.*.attribute} and \code{set.*.attribute} functions, the
-  latter is in effect if it is used on the left hand side of an
-  assignment, see examples below.
+  Similarly the function for vertex attributes are
+  \code{set.vertex.attribute}, \code{get.vertex.attribute},
+  \code{remove.vertex.attribute} and \code{list.vertex.attributes} and
+  for edge attributes they are \code{set.edge.attribute},
+  \code{get.edge.attribute}, \code{remove.edge.attribute} and
+  \code{list.edge.attributes}.
+  
+  There is however a (syntactically) much simpler way to handle vertex
+  and edge attribute by using vertex and edge selectors, it works like this:
+  \code{V(g)} selects all vertices in a graph, and \code{V(g)$name}
+  queries the \code{name} attribute for all vertices. Similarly is
+  \code{vs} is a vertex set \code{vs$name} gives the values of the
+  \code{name} attribute for the vertices in the vertex set.
 
-  An unneeded attribute can be removed by the \code{remove.*.attribute}
-  functions.
+  This form can also be used to set the values of the attributes, like
+  the regular R convention:
+  \preformatted{V(g)$color <- "red"}
+  It works for vertex subsets as well:
+  \preformatted{V(g)[0:5]$color <- "green"}
 
-  You can list the attributes of a graph by giving \code{attrname=NULL}
-  to the query functions (this is the default), or by
-  \code{\link{print.igraph}}.
+  The notation for edges is similar: \code{E(g)} means all edges
+  \code{E(g)$weight} is the \code{weight} attribute for all edges, etc.
+
+  See also the manual page for \code{iterators} about how to create
+  various vertex and edge sets.
 }
-\note{Only numeric constant attributes are implemented right now, string
-  attributes will be added shortly.}
 \value{
-  The \code{add.*.attribute} and \code{remove.*.attribute} and
-  \code{set.*.attribute} functions all return a new graph object with the
-  requested modifications.
+  \code{get.graph.attribute}, \code{get.vertex.attribute} and
+  \code{get.edge.attribute} return an R object, or a list of R objects
+  if attributes of more vertices/edges are requested.
 
-  The \code{get.*.attribute} functions return numeric or character
-  vectors, the values of the attributes if the \code{attrname} argument
-  is not \code{NULL} and a character vector, the name of the attributes
-  if it is \code{NULL}.
+  \code{set.graph.attribute}, \code{set.vertex.attribute},
+  \code{set.edge.attribute}, and also \code{remove.graph.attribute},
+  \code{remove.vertex.attribute} and \code{remove.edge.attribute} return
+  a new graph object with the updates/removes performed.
+
+  \code{list.graph.attributes}, \code{list.vertex.attributes} and
+  \code{list.edge.attributes} return a character vector, the names of
+  the attributes present.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{print.igraph}} can also print attributes}
 \examples{
+g <- graph.ring(10)
+g <- set.graph.attribute(g, "name", "RING")
+
+g <- set.vertex.attribute(g, "color", value=c("red", "green"))
+get.vertex.attribute(g, "color")
+
+g <- set.edge.attribute(g, "weight", value=runif(ecount(g)))
+get.edge.attribute(g, "weight")
+
+# The following notation is more convenient
+
 g <- graph.star(10)
-g <- add.graph.attribute(g, "id")
-g.a(g, "id")
-remove.graph.attribute(g, "id") ## g is unchanged
-g.a(g)
-g.a(g, "id")
 
-g <- add.vertex.attribute(g, "size")
-v.a(g, "size") <- c(1,2)
-v.a(g, "size")
+V(g)$color <- c("red", "green")
+V(g)$color
 
-g <- add.edge.attribute(g, "weight")
-e.a(g, "weight") <- sample(1:100, 20, replace=TRUE)
-e.a(g, "weight")
-
-print.igraph(g, g=TRUE, v=TRUE, e=TRUE)
-
-g2 <- graph.star(10)
-g2 <- add.graph.attribute(g2, "date", "character")
-g.a(g2, "date")
-g.a(g2, "date") <- "2005/10/25"
-g.a(g2, "date")
-remove.graph.attribute(g2, "date") ## g2 is unchanged
-g.a(g2)
-g.a(g2, "date")
-
-g2 <- add.vertex.attribute(g2, "id", "character")
-abc <- strsplit("abcdefghujklmnpqrstuvwxyz", "")[[1]]
-v.a(g2, "id") <- abc
-v.a(g2, "id")
-
-g2 <- add.edge.attribute(g2, "random", "character")
-e.a(g2, "random") <- sample(1:100, 20, replace=TRUE)
-e.a(g2, "random")
-
-print.igraph(g2, g=TRUE, v=TRUE, e=TRUE)
+E(g)$weight <- runif(ecount(g))
+E(g)$weight
 }
 \keyword{graphs}
