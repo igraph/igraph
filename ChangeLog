@@ -1,3 +1,14 @@
+2006-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexededgelist.c (igraph_delete_edges) : rewritten to
+	use edge set as parameter
+	* src/structural_properties.c (igraph_rewire, igraph_simplify) :
+	updated
+	* examples/simple/igraph_delete_edges.c : updated
+
+	* src/iterators.c (igraph_i_eit_pairs, igraph_eit_create) : checks 
+	added
+	
 2006-07-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/type_indexededgelist.c (igraph_get_eid) : added

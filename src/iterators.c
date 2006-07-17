@@ -1037,7 +1037,7 @@ int igraph_i_eit_pairs(const igraph_t *graph,
     long int from=VECTOR(*es.data.path.ptr)[2*i];
     long int to=VECTOR(*es.data.path.ptr)[2*i+1];
     igraph_integer_t eid;
-    igraph_get_eid(graph, &eid, from, to, es.data.path.mode);
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode));
     VECTOR(*eit->vec)[i]=eid;
   }
   
@@ -1076,7 +1076,7 @@ int igraph_i_eit_path(const igraph_t *graph,
     long int from=VECTOR(*es.data.path.ptr)[i];
     long int to=VECTOR(*es.data.path.ptr)[i+1];
     igraph_integer_t eid;
-    igraph_get_eid(graph, &eid, from, to, es.data.path.mode);
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es.data.path.mode));
     VECTOR(*eit->vec)[i]=eid;
   }
 
@@ -1169,10 +1169,10 @@ int igraph_eit_create(const igraph_t *graph,
     eit->end=es.data.seq.to;
     break;
   case IGRAPH_ES_PAIRS:
-    igraph_i_eit_pairs(graph, es, eit);
+    IGRAPH_CHECK(igraph_i_eit_pairs(graph, es, eit));
     break;
   case IGRAPH_ES_PATH:
-    igraph_i_eit_path(graph, es, eit);
+    IGRAPH_CHECK(igraph_i_eit_path(graph, es, eit));
     break;
   default:
     IGRAPH_ERROR("Cannot create iterator, invalid selector", IGRAPH_EINVAL);

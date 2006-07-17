@@ -334,7 +334,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 		     void *attr);
 int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, 
 			void *attr);
-int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges); /*eee*/
+int igraph_delete_edges(igraph_t *graph, igraph_es_t edges);
 int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
 igraph_integer_t igraph_vcount(const igraph_t *graph);
 igraph_integer_t igraph_ecount(const igraph_t *graph);

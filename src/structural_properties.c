@@ -1748,6 +1748,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   long int i, a, b, c, d;
   igraph_i_adjlist_t allneis;
   igraph_vector_t *neis[2], edgevec;
+  igraph_es_t es;
   
   if (mode == IGRAPH_REWIRING_SIMPLE && no_of_nodes<4)
     IGRAPH_ERROR("graph unsuitable for rewiring", IGRAPH_EINVAL);
@@ -1796,7 +1797,11 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
 	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=b;
 	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=d;
 	/*printf("Deleting: %d -> %d, %d -> %d\n", a, b, c, d);*/
-	igraph_delete_edges(graph, &edgevec);
+	IGRAPH_CHECK(igraph_es_pairs(&es, &edgevec, IGRAPH_DIRECTED));
+	IGRAPH_FINALLY(igraph_es_destroy, &es);
+	IGRAPH_CHECK(igraph_delete_edges(graph, es));	
+	igraph_es_destroy(&es);
+	IGRAPH_FINALLY_CLEAN(1);
 	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=d;
 	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=b;
 	/*printf("Adding: %d -> %d, %d -> %d\n", a, d, c, b);*/
@@ -1929,6 +1934,7 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j;
+  igraph_es_t es;
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -1960,7 +1966,11 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
 
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(1);
-  IGRAPH_CHECK(igraph_delete_edges(graph, &edges));
+  IGRAPH_CHECK(igraph_es_pairs(&es, &edges, IGRAPH_DIRECTED));
+  IGRAPH_FINALLY(igraph_es_destroy, &es);
+  IGRAPH_CHECK(igraph_delete_edges(graph, es));
+  igraph_es_destroy(&es);
+  IGRAPH_FINALLY_CLEAN(1);
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
 

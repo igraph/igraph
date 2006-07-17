@@ -1165,15 +1165,15 @@ SEXP R_igraph_neighbors(SEXP graph, SEXP pvid, SEXP pmode) {
   
 SEXP R_igraph_delete_edges(SEXP graph, SEXP edges) {
   
-  igraph_vector_t v;
+  igraph_es_t es;
   igraph_t g;
   SEXP result;
   
   R_igraph_before();
   
-  R_SEXP_to_vector(edges, &v);
   R_SEXP_to_igraph_copy(graph, &g);
-  igraph_delete_edges(&g, &v);
+  R_SEXP_to_igraph_es(edges, &g, &es);
+  igraph_delete_edges(&g, es);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
 

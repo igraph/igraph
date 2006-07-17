@@ -28,6 +28,7 @@ int main() {
   igraph_t g;
   igraph_vector_t v;
   int ret;
+  igraph_es_t es;
 
   igraph_vector_init(&v, 8);
   VECTOR(v)[0]=0; VECTOR(v)[1]=1;
@@ -36,19 +37,17 @@ int main() {
   VECTOR(v)[6]=2; VECTOR(v)[7]=2;
   igraph_create(&g, &v, 0, 0);
   
-  /* resize vector */
-  igraph_vector_resize(&v, 2);
-  VECTOR(v)[0]=3; VECTOR(v)[1]=2;
-  igraph_delete_edges(&g, &v);
+  igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 3,2, -1);
+  igraph_delete_edges(&g, es);
   if (igraph_ecount(&g) != 3) {
     return 1;
   }
 
   /* error test, no such edge to delete */
   igraph_set_error_handler(igraph_error_handler_ignore);
-  VECTOR(v)[0]=3; VECTOR(v)[1]=2;
-  ret=igraph_delete_edges(&g, &v);
+  ret=igraph_delete_edges(&g, es);
   if (ret != IGRAPH_EINVAL) {
+    printf("Error code: %i\n", ret);
     return 2;
   } 
   if (igraph_ecount(&g) != 3) {
@@ -56,8 +55,9 @@ int main() {
   }
 
   /* error test, invalid vertex id */
-  VECTOR(v)[0]=10;
-  ret=igraph_delete_edges(&g, &v);
+  igraph_es_destroy(&es);
+  igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 10,2, -1);
+  ret=igraph_delete_edges(&g, es);
   if (ret != IGRAPH_EINVVID) {
     return 4;
   } 
@@ -65,18 +65,18 @@ int main() {
     return 5;
   }
   
-  /* error test, invalid vertex id */
-  igraph_vector_resize(&v, 3);
-  VECTOR(v)[0]=0; VECTOR(v)[1]=1;
-  VECTOR(v)[2]=2;
-  ret=igraph_delete_edges(&g, &v);
-  if (ret != IGRAPH_EINVEVECTOR) {
+  /* error test, invalid (odd) length */
+  igraph_es_destroy(&es);
+  igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 0,1,2, -1);
+  ret=igraph_delete_edges(&g, es);
+  if (ret != IGRAPH_EINVAL) {
     return 6;
   } 
   if (igraph_ecount(&g) != 3) {
     return 7;
   }  
 
+  igraph_es_destroy(&es);
   igraph_vector_destroy(&v);
   igraph_destroy(&g);
   

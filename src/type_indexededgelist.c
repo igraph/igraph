@@ -323,144 +323,74 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
  * This function invalidates all iterators.
  * \param graph The graph to work on.
  * \param edges The edges to remove.
- * \return Error code:
- *   \c IGRAPH_EINVEVECTOR: invalid (odd) length of
- *   edges vector, \c IGRAPH_EINVVID: invalid vertex
- *   id in edges vector, \c IGRAPH_EINVAL: no such
- *   edge to delete. 
+ * \return Error code.
  *
  * Time complexity: O(|V|+|E|) where
  * |V| 
  * and |E| are the number of vertices
  * and edges in the \em original graph, respectively.
  */
-int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges) {
+int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
-  int directed=graph->directed;
+  igraph_bool_t directed=igraph_is_directed(graph);
   long int no_of_edges=igraph_ecount(graph);
-  long int edges_to_delete=igraph_vector_size(edges)/2;
-  long int really_delete=0;
-  long int i, p;
-  igraph_vector_t newfrom=IGRAPH_VECTOR_NULL, newto=IGRAPH_VECTOR_NULL;  
-  igraph_vector_t newoi=IGRAPH_VECTOR_NULL;
-  long int idx=0;
-  igraph_vector_t backup=IGRAPH_VECTOR_NULL;
-  int ret1, ret2;
-  igraph_error_handler_t *oldhandler;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int edges_to_remove=0;
+  long int remaining_edges;
+  igraph_eit_t eit;
+  
+  igraph_vector_t newfrom, newto, newoi;
 
-  if (igraph_vector_size(edges) % 2 != 0) {
-    IGRAPH_ERROR("invalid (odd) length of edges vector", IGRAPH_EINVEVECTOR);
+  int *mark;
+  long int i, j;
+  
+  mark=Calloc(no_of_edges, int);
+  if (mark==0) {
+    IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM);
   }
-  if (!igraph_vector_isininterval(edges, 0, igraph_vcount(graph)-1)) {
-    IGRAPH_ERROR("invalid vertex id in edges vector", IGRAPH_EINVVID);
+  IGRAPH_FINALLY(igraph_free, mark);
+
+  IGRAPH_CHECK(igraph_eit_create(graph, edges, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+  for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+    long int e=IGRAPH_EIT_GET(eit);
+    if (mark[e]==0) {
+      edges_to_remove++;
+      mark[e]++;
+    }
   }
+  remaining_edges=no_of_edges-edges_to_remove;
 
-  /* backup copy */
-  IGRAPH_CHECK(igraph_vector_copy(&backup, &graph->from));
+  /* We don't need the iterator any more */
+  igraph_eit_destroy(&eit);
+  IGRAPH_FINALLY_CLEAN(1);
 
-  /* result */
-
-  for (i=0; i<edges_to_delete; i++) {
-    long int from=VECTOR(*edges)[2*i];
-    long int to  =VECTOR(*edges)[2*i+1];
-    long int j=VECTOR(graph->os)[from];
-    long int d=-1;
-    while (d==-1 && j<VECTOR(graph->os)[from+1]) {
-      long int idx=VECTOR(graph->oi)[j];
-      if ( VECTOR(graph->to)[idx] == to) {
-	d=idx;
-      }
+  IGRAPH_VECTOR_INIT_FINALLY(&newfrom, remaining_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&newto, remaining_edges);
+  
+  /* Actually remove the edges, move from pos i to pos j in newfrom/newto */
+  for (i=0,j=0; j<remaining_edges; i++) {
+    if (mark[i]==0) {
+      VECTOR(newfrom)[j] = VECTOR(graph->from)[i];
+      VECTOR(newto)[j] = VECTOR(graph->to)[i];
       j++;
     }
-    if (d!=-1) {
-      VECTOR(graph->from)[d]=-1;
-      VECTOR(graph->to)[d]=-1;
-      really_delete++;
-    }
-    if (! directed && d==-1) {
-      j=VECTOR(graph->is)[from];
-      while(d==-1 && j<VECTOR(graph->is)[from+1]) {
-	long int idx=VECTOR(graph->ii)[j];
-	if( VECTOR(graph->from)[idx] == to) {
-	  d=idx;
-	}
-	j++;
-      }
-      if (d!=-1) {
-	VECTOR(graph->from)[d]=-1;
-	VECTOR(graph->to)[d]=-1;
-	really_delete++;
-      }
-    }
-    if (d==-1) {
-      igraph_vector_destroy(&graph->from);
-      graph->from=backup;
-      IGRAPH_ERROR("No such edge to delete", IGRAPH_EINVAL);
-    }
   }
 
-  /* OK, all edges to delete are marked with negative numbers */
-
-  oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
-
-  ret1=igraph_vector_init(&newfrom, no_of_edges-really_delete);
-  ret2=igraph_vector_init(&newto  , no_of_edges-really_delete);
-  if (ret1 != 0 || ret2 != 0) {
-    igraph_vector_destroy(&newfrom);
-    igraph_vector_destroy(&newto);
-    igraph_vector_destroy(&graph->from);
-    graph->from=backup;
-    igraph_set_error_handler(oldhandler);
-    IGRAPH_ERROR("cannot delete edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
-  }
-    
-  for (i=0; idx<no_of_edges-really_delete; i++) {
-    if (VECTOR(graph->from)[i] >= 0) {
-      VECTOR(newfrom)[idx]=VECTOR(graph->from)[i];
-      VECTOR(newto  )[idx]=VECTOR(graph->to  )[i];
-      idx++;
-    }
-  }
-
-  /* update indices */
-  ret1=igraph_vector_init(&newoi, no_of_edges-really_delete);
-  if (ret1 != 0) {
-    igraph_vector_destroy(&newfrom);
-    igraph_vector_destroy(&newto);
-    igraph_vector_destroy(&graph->from);
-    graph->from=backup;
-    igraph_set_error_handler(oldhandler);
-    IGRAPH_ERROR("cannot delete edges", ret1);
-  }
-  ret1=igraph_vector_order(&newfrom, &newoi, graph->n);
-  if (ret1 != 0) {
-    igraph_vector_destroy(&newfrom);
-    igraph_vector_destroy(&newto);
-    igraph_vector_destroy(&graph->from);
-    graph->from=backup;
-    igraph_vector_destroy(&newoi);
-    igraph_set_error_handler(oldhandler);
-    IGRAPH_ERROR("cannot delete edges", ret1);
-  }
-  ret1=igraph_vector_order(&newto  , &graph->ii, graph->n);
-  if (ret1 != 0) {
-    igraph_vector_destroy(&newfrom);
-    igraph_vector_destroy(&newto);
-    igraph_vector_destroy(&graph->from);
-    graph->from=backup;
-    igraph_vector_destroy(&newoi);
-    igraph_set_error_handler(oldhandler);
-    IGRAPH_ERROR("cannot delete edges", ret1);
-  }
-  igraph_vector_destroy(&graph->oi);
-  graph->oi=newoi;
-  igraph_vector_destroy(&backup);
-
-  /* attributes */
+  /* Create index, this might require additional memory */
+  IGRAPH_VECTOR_INIT_FINALLY(&newoi, remaining_edges);
+  IGRAPH_CHECK(igraph_vector_order(&newfrom, &newoi, no_of_nodes));
+  IGRAPH_CHECK(igraph_vector_order(&newto, &graph->ii, no_of_nodes));
+  
+  /* Attributes, we use the original from vector to create an index,
+     needed for the attribute handler. This index is the same as the
+     one used for copying the edges of course The attribute handler is
+     safe, never returns error. */
   if (graph->attr) {
     long int i, j=1;
     for (i=0; i<igraph_vector_size(&graph->from); i++) {
-      if (VECTOR(graph->from)[i] >= 0) {
+      if (mark[i] >= 0) {
 	VECTOR(graph->from)[i]=j++;
       } else {
 	VECTOR(graph->from)[i]=0;
@@ -469,17 +399,23 @@ int igraph_delete_edges(igraph_t *graph, const igraph_vector_t *edges) {
     igraph_i_attribute_delete_edges(graph, &graph->from);
   }
 
-  igraph_set_error_handler(oldhandler);
-
-  /* These are safe */
-  igraph_i_create_start(&graph->os, &newfrom, &newoi, graph->n);
-  igraph_i_create_start(&graph->is, &newto  , &graph->ii, graph->n);
-
+  /* Ok, we've all memory needed, free the old structure  */
   igraph_vector_destroy(&graph->from);
-  igraph_vector_destroy(&graph->to);  
+  igraph_vector_destroy(&graph->to);
+  igraph_vector_destroy(&graph->oi);
   graph->from=newfrom;
-  graph->to=newto;  
+  graph->to=newto;
+  graph->oi=newoi;
+  IGRAPH_FINALLY_CLEAN(3);
 
+  Free(mark);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  /* Create start vectors, no memory is needed for this */
+  igraph_i_create_start(&graph->os, &graph->from, &graph->oi, no_of_nodes);
+  igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, no_of_nodes);
+  
+  /* Nothing to deallocate... */
   return 0;
 }
 
@@ -985,7 +921,7 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
   if (*eid < 0) { 
     IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
   }
-
+  
   return IGRAPH_SUCCESS;  
 }
 

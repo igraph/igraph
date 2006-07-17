@@ -10,7 +10,6 @@ o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions
 o write Pajek file
 o read and write non-structural info from/to GraphML files
-o edge seq argument to delete_edges
 o Add Python interface to igraph_callaway_traits_game,
   igraph_barabasi_aging_game, igraph_recent_degree_aging_game
 o add attribute support to spanning tree functions
@@ -22,7 +21,7 @@ o PAJEK import improvements:
   - multiple edge sets in the same graph (?), Sampson.net, Multi.net, 
     SampsonL.net
   - color conversion, see colors in the Pajek manual
-o rewite add_edges, add_vertices, delete_edges, delete_vertices,
+o rewite add_edges, add_vertices, delete_vertices,
   they're a mess
 o better looking graphs in 3D in the R interface
 o better random number generator handling (init with seed, etc...)
