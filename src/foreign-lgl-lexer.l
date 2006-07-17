@@ -46,6 +46,7 @@
 
 #include "foreign-lgl-parser.h"
 extern long int igraph_lgl_mylineno;
+int igraph_i_lgl_eof;
 void igraph_i_lgl_reset_scanner() {
   YY_FLUSH_BUFFER;
 }
@@ -70,5 +71,13 @@ alnum [^ \t\n#]
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }
+
+<<EOF>>           { if (igraph_i_lgl_eof) {
+                       yyterminate();
+                    } else {
+                       igraph_i_lgl_eof=1;
+                       return NEWLINE; 
+                    }
+                  }
 
 %%

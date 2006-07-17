@@ -14,6 +14,12 @@
 	* src/foreign-ncol-parser.y (igraph_ncol_yyerror) : updated to
 	produce better error message and reset flex scanner
 
+	* src/foreign.c (igraph_read_graph_ncol, igraph_read_graph_lgl)
+	(igraph_read_graph_pajek) : handle end of file better
+	* src/foreign-lgl-lexer.l : added <<EOF>> rule
+	* src/foreign-pajek-lexer.l : added <<EOF>> rule
+	* src/foreign-ncol-lexer.l : added <<EOF>> rule
+
 2006-07-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-pajek-parser.y : a bit rewritten to handle attributes

@@ -117,6 +117,7 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
 
 extern int igraph_ncol_yyparse();
 extern FILE *igraph_ncol_yyin;
+extern int igraph_i_ncol_eof;
 long int igraph_ncol_mylineno;
 igraph_vector_t *igraph_ncol_vector=0;
 igraph_vector_t *igraph_ncol_weights=0;
@@ -215,6 +216,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_ncol_trie=&trie;
   igraph_ncol_yyin=instream;
   igraph_ncol_mylineno=1;
+  igraph_i_ncol_eof=0;
 
   igraph_ncol_yyparse();
 
@@ -262,6 +264,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
 extern int igraph_lgl_yyparse();
 extern FILE *igraph_lgl_yyin;
+extern int igraph_i_lgl_eof;
 long int igraph_lgl_mylineno;
 igraph_vector_t *igraph_lgl_vector=0;
 igraph_vector_t *igraph_lgl_weights=0;
@@ -334,6 +337,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_lgl_trie=&trie;
   igraph_lgl_yyin=instream;
   igraph_lgl_mylineno=1;
+  igraph_i_lgl_eof=0;
 
   igraph_lgl_yyparse();
   
@@ -383,6 +387,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 
 extern int igraph_pajek_yyparse();
 extern FILE *igraph_pajek_yyin;
+extern int igraph_i_pajek_eof;
 long int igraph_pajek_mylineno;
 igraph_vector_t *igraph_pajek_vector=0;
 igraph_bool_t igraph_pajek_directed;
@@ -449,6 +454,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream,
   igraph_i_pajek_edge_attributes=&eattrs;
   igraph_i_pajek_actedge=0;
   igraph_pajek_mylineno=1;
+  igraph_i_pajek_eof=0;
 
   igraph_pajek_yyparse();
 

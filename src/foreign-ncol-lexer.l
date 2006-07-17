@@ -46,6 +46,7 @@
 
 #include "foreign-ncol-parser.h"
 extern long int igraph_ncol_mylineno;
+int igraph_i_ncol_eof;
 void igraph_i_ncol_reset_scanner() {
   YY_FLUSH_BUFFER;
 }
@@ -67,5 +68,13 @@ alnum [^ \t\n]
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }
+
+<<EOF>>           { if (igraph_i_ncol_eof) {
+                       yyterminate();
+                    } else {
+                       igraph_i_ncol_eof=1;
+                       return NEWLINE; 
+                    }
+                  }
 
 %%

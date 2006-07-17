@@ -47,6 +47,7 @@
 #include "foreign-pajek-parser.h"
 extern long int igraph_pajek_mylineno;
 extern int igraph_pajek_mode;
+int igraph_i_pajek_eof;
 void igraph_i_pajek_reset_scanner() {
   YY_FLUSH_BUFFER;
 }
@@ -117,4 +118,11 @@ word [^ \t\r\n]
                              
 {word}+           { return ALNUM; }
 
+<<EOF>>           { if (igraph_i_pajek_eof) {
+                       yyterminate();
+                    } else {
+                       igraph_i_pajek_eof=1;
+                       return NEWLINE; 
+                    }
+                  }
 %%
