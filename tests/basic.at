@@ -68,3 +68,8 @@ AT_SETUP([Degree of the vertices (igraph_degree): ])
 AT_KEYWORDS([igraph_degree])
 AT_COMPILE_CHECK([simple/igraph_degree.c], [simple/igraph_degree.out])
 AT_CLEANUP
+
+AT_SETUP([Query edge ids (igraph_get_eid): ])
+AT_KEYWORDS([igraph_get_eid edge id])
+AT_COMPILE_CHECK([simple/igraph_get_eid.c], [simple/igraph_get_eid.out])
+AT_CLEANUP

@@ -331,6 +331,8 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
 		  igraph_bool_t loops);
 int igraph_edge(const igraph_t *graph, igraph_integer_t eid, 
 		igraph_integer_t *from, igraph_integer_t *to);		
+int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
+		   igraph_integer_t from, igraph_integer_t to);
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
 		    igraph_neimode_t mode);
 

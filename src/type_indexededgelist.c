@@ -898,6 +898,7 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
  * will be placed here.
  * \return Error code. The current implementation always returns with
  * success. 
+ * \sa \ref igraph_get_eid() for the opposite operation.
  * 
  * Added in version 0.2.</para><para>
  * 
@@ -918,6 +919,73 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
 
   return 0;
 }
+
+/**
+ * \function igraph_get_eid
+ * \brief Get the edge id from the end points of an edge
+ * 
+ * \param graph The graph object.
+ * \param eid Pointer to an integer, the edge id will be stored here.
+ * \param from The starting point of the edge.
+ * \param to The end points of the edge.
+ * \return Error code. 
+ * \sa \ref igraph_edge() for the opposite operation.
+ * 
+ * For undirected graphs \c from and \c to are exchangable.
+ * 
+ * Added in version 0.2.</para><para>
+ */
+
+int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
+		   igraph_integer_t pfrom, igraph_integer_t pto) {
+
+  long int from=pfrom, to=pto;
+  long int nov=igraph_vcount(graph);
+  long int start, end, i;
+
+  if (from < 0 || to < 0 || from > nov-1 || to > nov-1) {
+    IGRAPH_ERROR("cannot get edge id", IGRAPH_EINVVID);
+  }
+
+  *eid=-1;
+  if (igraph_is_directed(graph)) {
+    start=VECTOR(graph->os)[from];
+    end=VECTOR(graph->os)[from+1];
+    for (i=start; i<end; i++) {
+      long int e=VECTOR(graph->oi)[i];
+      if (to==VECTOR(graph->to)[e]) {
+	*eid=e; 
+	break;
+      }
+    }
+  } else {
+    start=VECTOR(graph->os)[from];
+    end=VECTOR(graph->os)[from+1];
+    for (i=start; i<end; i++) {
+      long int e=VECTOR(graph->oi)[i];
+      if (to==VECTOR(graph->to)[e]) {
+	*eid=e; 
+	break;
+      }
+    }
+    start=VECTOR(graph->is)[from];
+    end=VECTOR(graph->is)[from+1];
+    for (i=start; i<end; i++) {
+      long int e=VECTOR(graph->ii)[i];
+      if (to==VECTOR(graph->from)[e]) {
+	*eid=e;
+	break;
+      }
+    }
+  }
+
+  if (*eid < 0) { 
+    IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+  }
+
+  return IGRAPH_SUCCESS;  
+}
+
 
 /**
  * \function igraph_adjacent
