@@ -1,182 +1,97 @@
 \name{iterators}
-\alias{igraph.es.adj}
-\alias{igraph.es.all}
-\alias{igraph.es.end}
-\alias{igraph.es.from}
-\alias{igraph.es.fromorder}
-\alias{igraph.es.get}
-\alias{igraph.es.next}
-\alias{igraph.es.reset}
-\alias{$.igraphesseq}
-\alias{igraph.es.to}
-\alias{$.igraphesvector}
-\alias{igraph.es.vector}
-\alias{igraph.vs.adj}
-\alias{igraph.vs.all}
-\alias{igraph.vs.end}
-\alias{igraph.vs.get}
-\alias{igraph.vs.next}
-\alias{igraph.vs.reset}
-\alias{$.igraphvsseq}
-\alias{$.igraphvsvector}
-\alias{igraph.vs.vector}
-\alias{as.vector.igraphvsseq}
-\alias{as.vector.igraphvsvector}
-\alias{as.vector.igraphesseq}
-\alias{as.vector.igraphesvector}
-\alias{as.vector}
-\title{Vertex and edge sequences}
-\description{Vertex and edge sequences are the central concept of
+\alias{V}
+\alias{E}
+\title{Vertex and edge sequences and iterators}
+\description{Vertex and edge sequences are central concepts of
   igraph.}
-\synopsis{
-\method{"$"}{igraphvsseq}(it, cmd)
-\method{"$"}{igraphvsvector}(it, cmd)
-\method{"$"}{igraphesseq}(it, cmd)
-\method{"$"}{igraphesvector}(it, cmd)
-\method{as.vector}{igraphvsseq}(x, mode="any")
-\method{as.vector}{igraphvsvector}(x, mode="any")
-\method{as.vector}{igraphesseq}(x, mode="any")
-\method{as.vector}{igraphesvector}(x, mode="any")
-}
 \usage{
-igraph.vs.all(graph)
-igraph.vs.vector(graph, iterator)
-igraph.vs.adj(graph, vid, mode="all")
-
-igraph.vs.end(graph, iterator)
-igraph.vs.get(graph, iterator)
-igraph.vs.next(graph, iterator)
-igraph.vs.reset(graph, iterator)
-
-vs$end
-vs$step
-vs$v
-
-igraph.es.all(graph)
-igraph.es.fromorder(graph)
-igraph.es.vector(graph, iterator)
-igraph.es.adj(graph, vid, mode="all")
-
-igraph.es.end(graph, iterator)
-igraph.es.get(graph, iterator)
-igraph.es.from(graph, iterator)
-igraph.es.to(graph, iterator)
-igraph.es.next(graph, iterator)
-igraph.es.reset(graph, iterator)
-
-es$end
-es$e
-es$from
-es$to
-
-as.vector(iterator)
+V(graph)
+E(graph)
 }
 \arguments{
   \item{graph}{A graph object.}
-  \item{iterator}{A vertex or edge sequence.}
-  \item{vid}{Id of the vertex of which the adjacent vertices or edges
-    will be selected.}
-  \item{mode}{Defines the type of adjacent vertices/edges to
-    select. \code{out} is for outgoing edges, \code{in} for incoming
-    ones, while \code{all} is both both of them.}
-  \item{vs}{A vertex sequence.}
-  \item{es}{An edge sequence.}
-  \item{end}{Not a real parameter, \code{vs$end} is TRUE if the
-    \code{vs} sequence has no more vertices/edges to visit. See example
-    below.} 
-  \item{step}{Not a real parameter, \code{vs$step} is a shorthand for
-    \code{igraph.vs.next(graph,vs)} and \code{igraph.es.next(graph,es)}.}
-  \item{v}{Shorthand for \code{igraph.vs.get}.}
-  \item{e}{Shorthand for \code{igraph.es.get}.}
-  \item{from}{\code{es$from(graph)} is a shorthand for
-    \code{igraph.es.from(graph, es)}.}
-  \item{to}{\code{es$to(graph)} is a shorthand for
-    \code{igraph.es.to(graph, es)}.}
 }
 \details{
-  \code{igraph.vs.all} creates a vertex sequence with all vertices of a
-  graph.
+  It is often needed to perform an operation on a subset of vertices of
+  edges in a graph.
 
-  \code{igraph.vs.vector} creates a vertex sequence from a vector of
-  vertex ids.
+  A vertex sequence is simply a vector containing vertex ids, but it has
+  a special class attribute which makes it possible to perform graph
+  specific operations on it, like selecting a subset of the vertices
+  based on some vertex attributes.
 
-  \code{igraph.vs.adj} creates a vertex sequence containing the adjacent
-  vertices of a vertex.
+  A vertex sequence is created by \code{V(g)} this selects are vertices
+  in increasing vertex id order. A vertex sequence can be indexed by a
+  numberic vector, this way only a subset of all vertices can be
+  selected.
 
-  \code{igraph.vs.end}, \code{igraph.vs.step}, \code{igraph.vs.get}
-  provide an iterator abstraction of a vertex set.
-  \code{igraph.vs.end} checks whether there is another vertex to step to
-  with the iterator. \code{igraph.vs.get} returns the vertex id at the
-  current position of the iterator. \code{igraph.vs.step} moves to the
-  next position.
+  Vertex sequences provide powerful operations for dealing with vertex
+  attributes. A vertex sequence can be indexed with the
+  \sQuote{\code{$}} operator to select (or modify) the attributes of a
+  subset of vertices. A vertex sequence can be indexed by a logical
+  expression, and this expression may contain the names of the vertex
+  attributes and ordinary variables as well. The return value of such a
+  construct (ie. a vertex sequence indexed by a logical expression) is
+  another vertex sequence containing only vertices from the original
+  sequence for which the expression evaluates to TRUE.
 
-  \code{igraph.vs.reset} resets the iterator, this is equivalent to
-  creating a new iterator of the same type, with the same parameters.
+  Let us see an example to make everything clear. We assign random
+  numbers between 1 and 100 to the vertices, and select those vertices
+  for which the number is less than 50. We set the color of these
+  vertices to red.
+  \preformatted{
+    g <- graph.ring(10)
+    V(g)$number <- sample(1:100, vcount(g), replace=TRUE)
+    V(g)$color <- "grey"
+    V(g)[ number < 50 ]$color <- "red"
+    plot(g, layout=layout.circle, vertex.color="a:color")
+  }
 
-  \code{vs$end}, \code{vs$step}, \code{vs$v} provide a simpler
-  iterator-like interface. See the examples section below.
+  There is a similar notation for edges. \code{E(g)} selects all edges
+  from the \sQuote{\code{g}} graph. Edge sequences can be also indexed
+  with logical expressions containing edge attributes:
+  \preformatted{
+    g <- graph.ring(10)
+    E(g)$weight <- runif(ecount(g))
+    E(g)$width <- 1
+    E(g)[ weight >= 0.5 ]$width <- 2
+    plot(g, layout=layout.circle, edge.width="a:width", edge.color="black")
+  }
 
-  \code{as.vector} can be used on a vertex and edge sequence to coerce
-  it to a regular numeric vector.
+  Edge sequence indexing is a bit different than vertex sequence
+  indexing because it specifies two special variable and three special
+  operators to be used in the logical indexing expression.
+  The two variables are called \sQuote{\code{from}} and
+  \sQuote{\code{to}} and they contain the vertex ids of the two end
+  points of the edge. For undirected edges \sQuote{\code{from}} is the
+  source vertex and \sQuote{\code{to}} is the target vertex; they are
+  the same for undirected graphs. Ie. to select all edges adjacent to a
+  given vertex you can write
+  \preformatted{
+    g <- barabasi.game(100)
+    E(g)[ from==2 | to==2 ]    
+  }
 
-  \code{igraph.es.all} creates an edge sequence containing all edges in
-  the graph, their order will be arbitrary.
+  The special operators preform similar function but they allow a more
+  convenient notation. \sQuote{\code{\%->\%}} is a binary operator and
+  evaluates to   TRUE for all edges pointing from vertices in the first
+  argument to those in the second.
 
-  \code{igraph.es.fromorder}
-  creates an edge sequence with all edges. It is somewhat less efficient
-  than \code{igraph.es.all}, but the order of the edges is defined by
-  the starting vertex of the edge.
+  The arguments of this operator can be numberic vectors or vertex
+  sequences. 
+  
+  There is also a
+  \sQuote{\code{\%<-\%}} operator for completeness. This is the same as
+  the previous one with the arguments exchanged.
 
-  \code{igraph.es.vector} creates an edge set from a vector containing
-  edge ids.
+  The undirected version of the \dQuote{connects} operator is
+  \sQuote{\code{\%--\%}}. In directed graphs this selects edges pointing
+  from the first argument to the second or backwards.
 
-  \code{igraph.es.adj} creates an edge set containing the adjacent edges
-  of a vertex.
+  For undirected graphs \sQuote{\code{\%->\%}}, \sQuote{\code{\%<-\%}}
+  and \sQuote{\code{\%--\%}} are the same.
 
-  \code{igraph.es.get} returns the id of the edge at the current
-  iterator position.
-
-  \code{igraph.es.from} returns the starting vertex
-  of the current edge.
-
-  \code{igraph.es.to} returns the end vertex of the current edge.
-
-  \code{igraph.es.end} checks whether there are more edges in the edge
-  set to step to.
-
-  \code{igraph.es.next} steps to the next edge in the edge sequence.
-
-  \code{igraph.es.reset} resets the iterator, it is equivalent to but slightly
-  more efficient than creating a new edge sequence of the same type with
-  the same parameters.
-
-  \code{es$end}, \code{es$e}, \code{es$from(graph)} and
-  \code{es$to(graph)} provide a simpler iterator interface to edge
-  sequences, see the examples below.
-
-  Note that \code{igraph.vs.next}, \code{igraph.vs.reset},
-  \code{igraph.es.next} and \code{igraph.es.reset} don't change the
-  iterator supplied as a parameter, but return the new, modified
-  iterator. 
-}
-\value{
-  \code{igraph.vs.all}, \code{igraph.vs.vector}, \code{igraph.vs.adj}
-  return a vertex sequence.
-
-  \code{igraph.vs.end} and \code{igraph.es.end} return a logical
-  constant.
-
-  \code{igraph.vs.get}, \code{igraph.es.get}, \code{igraph.es.get},
-  \code{igraph.es.from} and \code{igraph.es.to} return a numeric
-  constant.
-
-  \code{igraph.vs.next} and \code{igraph.vs.reset} return the new vertex
-  sequence.
-
-  \code{igraph.es.next} and \code{igraph.es.reset} return the new vertex
-  sequence.
-
-  \code{as.vector} returns a numeric vector.
+  See also the examples below.  
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
@@ -185,26 +100,24 @@ as.vector(iterator)
 # mean degree of vertices in the largest cluster in a random graph
 g <- erdos.renyi.game(100, 2/100)
 c <- clusters(g)
-vsl <- igraph.vs.vector(g, which(which.max(c$csize)-1==c$membership)-1)
+vsl <- which(which.max(c$csize)-1==c$membership)-1
 mean(degree(g, vsl))
 
 # set the color of these vertices to red, others greens
-g <- add.vertex.attribute(g, "color", type="string")
-v.a(g, "color") <- "green"
-v.a(g, "color", vsl) <- "red"
-\dontrun{plot(g, vertex.size=3, labels=NA, vertex.color="a:color")}
+V(g)$color <- "green"
+V(g)[vsl]$color <- "red"
+\dontrun{plot(g, vertex.size=3, labels=NA, vertex.color="a:color",
+              layout=layout.fruchterman.reingold)}
 
 # the longest geodesic within the largest cluster
-vsl <- igraph.vs.reset(g, vsl) # just to be sure
 long <- numeric()
-while (!vsl$end) {
-  paths <- get.shortest.paths(g, vsl$v)
-  paths <- paths[ as.vector(vsl)+1  ]
+for (v in vsl) {
+  paths <- get.shortest.paths(g, v)
+  paths <- paths[ vsl+1  ]
   fl <- paths[[ which.max(sapply(paths, length)) ]]
   if (length(fl) > length(long)) {
     long <- fl
   }
-  vsl <- vsl$step
 }
 }
 \keyword{graphs}
