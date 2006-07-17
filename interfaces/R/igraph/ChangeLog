@@ -4,6 +4,9 @@
 	(set.vertex.attribute, get.edge.attribute, set.edge.attribute) :
 	bugs eliminated ('g' in the argument list instead of 'graph')
 
+	* interfaces/R/igraph/R/structural.properties.R (get.shortest.paths) :
+	bug eliminated
+
 2006-07-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/foreign.R (read.graph) : pajek format added
