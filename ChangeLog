@@ -1,3 +1,10 @@
+2006-07-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_read_graph_pajek) : reset line number
+	* src/foreign-pajek-lexer.l (igraph_i_pajek_reset_scanner) : added
+	* src/foreign-pajek-parser.y (igraph_pajek_yyerror) : updated 
+	to produce better error message and reset flex scanner
+
 2006-07-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-pajek-parser.y : a bit rewritten to handle attributes

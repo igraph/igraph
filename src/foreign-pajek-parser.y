@@ -79,6 +79,7 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 					const char *attrname,
 					igraph_integer_t vid,
 					const char *str);
+void igraph_i_pajek_reset_scanner();
 extern igraph_vector_t *igraph_pajek_vector;
 extern igraph_bool_t igraph_i_pajek_attr;
 extern igraph_bool_t igraph_pajek_directed;
@@ -476,8 +477,11 @@ word: ALNUM { $$.str=igraph_pajek_yytext; $$.len=igraph_pajek_yyleng; }
 
 int igraph_pajek_yyerror(char *s)
 {
-  fprintf(stderr, "hiba: %i\n", igraph_pajek_mylineno); 
-  IGRAPH_ERROR("Cannot read pajek file", IGRAPH_PARSEERROR);
+  char str[200];  
+  igraph_i_pajek_reset_scanner();
+  snprintf(str, sizeof(str), "Parse error in pajek file, line %li", 
+	   igraph_pajek_mylineno);
+  IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
 }
 
 igraph_real_t igraph_pajek_get_number(const char *str, long int length) {

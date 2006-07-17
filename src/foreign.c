@@ -379,6 +379,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 
 extern int igraph_pajek_yyparse();
 extern FILE *igraph_pajek_yyin;
+long int igraph_pajek_mylineno;
 igraph_vector_t *igraph_pajek_vector=0;
 igraph_bool_t igraph_pajek_directed;
 igraph_bool_t igraph_i_pajek_attr;
@@ -443,7 +444,8 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream,
   igraph_i_pajek_edge_attribute_names=&eattrnames;
   igraph_i_pajek_edge_attributes=&eattrs;
   igraph_i_pajek_actedge=0;
-  
+  igraph_pajek_mylineno=1;
+
   igraph_pajek_yyparse();
 
   for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {

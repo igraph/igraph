@@ -45,8 +45,11 @@
 */
 
 #include "foreign-pajek-parser.h"
-long int igraph_pajek_mylineno=0;
+extern long int igraph_pajek_mylineno;
 extern int igraph_pajek_mode;
+void igraph_i_pajek_reset_scanner() {
+  YY_FLUSH_BUFFER;
+}
 %}
 
 %option noyywrap
