@@ -11,6 +11,8 @@
 
 	* src/iterators.c (igraph_vs_as_vector, igraph_vit_as_vector)
 	(igraph_es_as_vector, igraph_eit_as_vector) : added
+
+	* src/iterators.c (igraph_i_eit_path) : length bug corrected
 	
 2006-07-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 

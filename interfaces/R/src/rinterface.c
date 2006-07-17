@@ -3728,3 +3728,57 @@ SEXP R_igraph_constraint(SEXP graph, SEXP vids) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_es_path(SEXP graph, SEXP pp, SEXP pdir) {
+  
+  igraph_t g;
+  igraph_vector_t p;
+  igraph_bool_t dir=LOGICAL(pdir)[0];
+  igraph_es_t es;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pp, &p);
+  igraph_es_path(&es, &p, dir);
+  igraph_vector_init(&res, 0);
+  igraph_es_as_vector(&g, es, &res);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  igraph_es_destroy(&es);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_es_pairs(SEXP graph, SEXP pp, SEXP pdir) {
+
+  igraph_t g;
+  igraph_vector_t p;
+  igraph_bool_t dir=LOGICAL(pdir)[0];
+  igraph_es_t es;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pp, &p);
+  igraph_es_pairs(&es, &p, dir);
+  igraph_vector_init(&res, 0);
+  igraph_es_as_vector(&g, es, &res);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  igraph_es_destroy(&es);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

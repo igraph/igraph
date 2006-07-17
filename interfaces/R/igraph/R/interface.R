@@ -49,7 +49,7 @@ delete.edges <- function(graph, edges) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  .Call("R_igraph_delete_edges", graph, as.numeric(edges),
+  .Call("R_igraph_delete_edges", graph, as.igraph.es(edges),
         PACKAGE="igraph")
 }
 

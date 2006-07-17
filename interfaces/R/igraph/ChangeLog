@@ -3,6 +3,13 @@
 	* interfaces/R/src/rinterface.c : updated to new delete_edges 
 	interface
 
+	* interfaces/R/igraph/R/interface.R (delete.edges) : edge sequence 
+	argument
+
+	* interfaces/R/igraph/R/iterators.R (P, path) : added
+	* interfaces/R/src/rinterface.c (R_igraph_es_path, R_igraph_es_pairs) :
+	added
+	
 2006-07-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (edge.betweenness) :

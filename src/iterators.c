@@ -1066,7 +1066,7 @@ int igraph_i_eit_pairs(const igraph_t *graph,
   long int i;
 
   if (n % 2 != 0) {
-    IGRAPH_ERROR("Cannot create edge iterator from odd number of pairs",
+    IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
 		 IGRAPH_EINVAL);
   }
   if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes-1)) {
@@ -1106,21 +1106,22 @@ int igraph_i_eit_path(const igraph_t *graph,
     IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
   }
   
+  if (n<=1) { 
+    len=0;
+  } else {
+    len=n-1;
+  }
+
   eit->type=IGRAPH_EIT_VECTOR;
   eit->pos=0;
   eit->start=0;
-  eit->end=n/2;
+  eit->end=len;
   eit->vec=Calloc(1, igraph_vector_t);
   if (eit->vec==0) {
     IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)eit->vec);
 
-  if (n<=1) { 
-    len=0;
-  } else {
-    len=n-1;
-  }
   IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t *)eit->vec, len);
   
   for (i=0; i<len; i++) {

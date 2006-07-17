@@ -226,6 +226,30 @@ print.igraph.es <- function(x, ...) {
   }
 }
 
+path <- function(graph, ..., directed=TRUE) {
+  p <- unlist(list(...))
+
+  res <- .Call("R_igraph_es_path", graph, as.numeric(p), as.logical(directed),
+               PACKAGE="igraph")
+  class(res) <- "igraph.es"
+  ne <- new.env()
+  assign("graph", graph, envir=ne)
+  attr(res, "env") <- ne
+  res
+}
+
+P <- function(graph, ..., directed=TRUE) {
+  p <- unlist(list(...))
+
+  res <- .Call("R_igraph_es_pairs", graph, as.numeric(p), as.logical(directed),
+               PACKAGE="igraph")
+  class(res) <- "igraph.es"
+  ne <- new.env()
+  assign("graph", graph, envir=ne)
+  attr(res, "env") <- ne
+  res
+}
+
 # these are internal
 
 as.igraph.vs <- as.numeric

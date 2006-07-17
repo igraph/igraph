@@ -15,7 +15,7 @@ export(get.graph.attribute, set.graph.attribute,
 
 # iterators
 
-export(V, E, "$.igraph.vs", "$.igraph.es",
+export(V, E, P, path, "$.igraph.vs", "$.igraph.es",
        "[.igraph.vs", "[.igraph.es", "[<-.igraph.vs", "[<-.igraph.es",
        "$<-.igraph.vs", "$<-.igraph.es", "V<-", "E<-",
        print.igraph.vs, print.igraph.es, "%--%", "%->%", "%<-%")
