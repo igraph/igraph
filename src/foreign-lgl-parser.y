@@ -46,7 +46,7 @@
 #include <stdio.h>
 #include <string.h>
 extern int igraph_lgl_yylex();
-extern int mylineno;
+extern long int igraph_lgl_mylineno;
 extern char *igraph_lgl_yytext;
 extern int igraph_lgl_yyleng;
 int igraph_lgl_yyerror(char *s);
@@ -57,6 +57,7 @@ extern igraph_vector_t *igraph_lgl_vector;
 extern igraph_vector_t *igraph_lgl_weights;
 extern igraph_trie_t *igraph_lgl_trie;
 igraph_real_t igraph_lgl_get_number(const char *str, long int len);
+void igraph_i_lgl_reset_scanner();
 long int igraph_lgl_actvertex;
 %}
 
@@ -113,7 +114,11 @@ weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yytext,
 
 int igraph_lgl_yyerror (char *s)
 {
-  IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
+  char str[200];  
+  igraph_i_lgl_reset_scanner();
+  snprintf(str, sizeof(str), "Parse error in LGL file, line %li", 
+	   igraph_lgl_mylineno);
+  IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
 }
 
 igraph_real_t igraph_lgl_get_number(const char *str, long int length) {

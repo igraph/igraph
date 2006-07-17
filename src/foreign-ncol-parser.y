@@ -47,7 +47,7 @@
 #include <stdio.h>
 #include <string.h>
 extern int igraph_ncol_yylex();
-extern int mylineno;
+extern long int igraph_ncol_mylineno;
 extern char *igraph_ncol_yytext;
 extern int igraph_ncol_yyleng;
 int igraph_ncol_yyerror(char *s);
@@ -58,6 +58,7 @@ extern igraph_vector_t *igraph_ncol_vector;
 extern igraph_vector_t *igraph_ncol_weights;
 extern igraph_trie_t *igraph_ncol_trie;
 igraph_real_t igraph_ncol_get_number(const char *str, long int len);
+void igraph_i_ncol_reset_scanner();
 %}
 
 %output="y.tab.c"
@@ -105,7 +106,11 @@ weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yytext,
 
 int igraph_ncol_yyerror (char *s)
 {
-  IGRAPH_ERROR("Parse error", IGRAPH_PARSEERROR);
+  char str[200];  
+  igraph_i_ncol_reset_scanner();
+  snprintf(str, sizeof(str), "Parse error in .ncol file, line %li", 
+	   igraph_ncol_mylineno);
+  IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
 }
 
 igraph_real_t igraph_ncol_get_number(const char *str, long int length) {

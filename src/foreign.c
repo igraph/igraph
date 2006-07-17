@@ -117,6 +117,7 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
 
 extern int igraph_ncol_yyparse();
 extern FILE *igraph_ncol_yyin;
+long int igraph_ncol_mylineno;
 igraph_vector_t *igraph_ncol_vector=0;
 igraph_vector_t *igraph_ncol_weights=0;
 igraph_trie_t *igraph_ncol_trie=0;
@@ -213,6 +214,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_ncol_weights=&ws;
   igraph_ncol_trie=&trie;
   igraph_ncol_yyin=instream;
+  igraph_ncol_mylineno=1;
 
   igraph_ncol_yyparse();
 
@@ -260,6 +262,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
 extern int igraph_lgl_yyparse();
 extern FILE *igraph_lgl_yyin;
+long int igraph_lgl_mylineno;
 igraph_vector_t *igraph_lgl_vector=0;
 igraph_vector_t *igraph_lgl_weights=0;
 igraph_trie_t *igraph_lgl_trie=0;
@@ -330,6 +333,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_lgl_weights=&ws;
   igraph_lgl_trie=&trie;
   igraph_lgl_yyin=instream;
+  igraph_lgl_mylineno=1;
 
   igraph_lgl_yyparse();
   

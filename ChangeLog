@@ -5,6 +5,15 @@
 	* src/foreign-pajek-parser.y (igraph_pajek_yyerror) : updated 
 	to produce better error message and reset flex scanner
 
+	* src/foreign.c (igraph_read_graph_lgl, igraph_read_graph_ncol) :
+	reset line number
+	* src/foreign-lgl-lexer.l (igraph_i_lgl_reset_scanner) : added
+	* src/foreign-lgl-parser.y (igraph_lgl_yyerror) : updated to
+	produce better error message and reset flex scanner
+	* src/foreign-ncol-lexer.l (igraph_i_ncol_reset_scanner) : added
+	* src/foreign-ncol-parser.y (igraph_ncol_yyerror) : updated to
+	produce better error message and reset flex scanner
+
 2006-07-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-pajek-parser.y : a bit rewritten to handle attributes
