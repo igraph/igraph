@@ -1,7 +1,6 @@
 
 Needed for 0.2:
 
-o range checks for vertex/edge sequences in R
 o check reading and writing (big) files from the R interface, possibly
   rewrite
 o document bison requirements
@@ -23,7 +22,6 @@ o PAJEK import improvements:
   - affiliation networks, AFFIL.NET: *Vertices n n1 
   - multiple edge sets in the same graph (?), Sampson.net, Multi.net, 
     SampsonL.net
-  - no newline at the end of the last line, url.net
   - color conversion, see colors in the Pajek manual
 o rewite add_edges, add_vertices, delete_edges, delete_vertices,
   they're a mess

@@ -215,6 +215,10 @@ edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  e <- as.numeric(e)
+  if (any( e<0 | e >=ecount(graph))) {
+    stop("Invalid edge id")
+  }
   .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
         PACKAGE="igraph")[ as.numeric(e)+1 ]  
 }
