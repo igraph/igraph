@@ -195,6 +195,9 @@ void igraph_vs_destroy(igraph_vs_t *vs);
 
 igraph_bool_t igraph_vs_is_all(igraph_vs_t *vs);
 
+int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs, 
+			igraph_vector_t *v);
+
 /* -------------------------------------------------- */
 /* Vertex iterators                                   */
 /* -------------------------------------------------- */
@@ -222,6 +225,8 @@ typedef struct igraph_vit_t {
 int igraph_vit_create(const igraph_t *graph, 
 		      igraph_vs_t vs, igraph_vit_t *vit);
 void igraph_vit_destroy(const igraph_vit_t *vit); 
+
+int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v);
 
 /* -------------------------------------------------- */
 /* Edge Selectors                                     */
@@ -295,6 +300,9 @@ void igraph_es_destroy(igraph_es_t *es);
 
 igraph_bool_t igraph_es_is_all(igraph_es_t *es);
 
+int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es, 
+			igraph_vector_t *v);
+
 /* -------------------------------------------------- */
 /* Edge Iterators                                     */
 /* -------------------------------------------------- */
@@ -322,6 +330,8 @@ typedef struct igraph_eit_t {
 int igraph_eit_create(const igraph_t *graph, 
 		      igraph_es_t es, igraph_eit_t *eit);
 void igraph_eit_destroy(const igraph_eit_t *eit); 
+
+int igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v);
 
 /* -------------------------------------------------- */
 /* Interface                                          */

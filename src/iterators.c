@@ -406,6 +406,18 @@ igraph_bool_t igraph_vs_is_all(igraph_vs_t *vs) {
   return vs->type == IGRAPH_VS_ALL;
 }
 
+int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs, 
+			igraph_vector_t *v) {
+  igraph_vit_t vit;
+  
+  IGRAPH_CHECK(igraph_vit_create(graph, vs, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  IGRAPH_CHECK(igraph_vit_as_vector(&vit, v));
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+} 
+
 /***************************************************/
 
 /**
@@ -526,6 +538,33 @@ void igraph_vit_destroy(const igraph_vit_t *vit) {
 /*     IGRAPH_ERROR("Cannot destroy iterator, unknown type", IGRAPH_EINVAL); */
     break;
   }
+}
+
+int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
+
+  long int i;
+
+  IGRAPH_CHECK(igraph_vector_resize(v, IGRAPH_VIT_SIZE(*vit)));
+  
+  switch (vit->type) {
+  case IGRAPH_VIT_SEQ: 
+    for (i=0; i<IGRAPH_VIT_SIZE(*vit); i++) {
+      VECTOR(*v)[i] = vit->start+i;
+    }
+    break;
+  case IGRAPH_VIT_VECTOR:
+  case IGRAPH_VIT_VECTORPTR:
+    for (i=0; i<IGRAPH_VIT_SIZE(*vit); i++) {
+      VECTOR(*v)[i] = VECTOR(*vit->vec)[i];
+    }
+    break;
+  default:
+    IGRAPH_ERROR("Cannot convert to vector, unknown iterator type", 
+		 IGRAPH_EINVAL);
+    break;
+  }
+  
+  return 0;
 }
 
 /*******************************************************/
@@ -946,6 +985,18 @@ igraph_bool_t igraph_es_is_all(igraph_es_t *es) {
   return es->type == IGRAPH_ES_ALL;
 }
 
+int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es, 
+			igraph_vector_t *v) {
+  igraph_eit_t eit;
+  
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+  IGRAPH_CHECK(igraph_eit_as_vector(&eit, v));
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+} 
+
 /**************************************************/
 
 int igraph_i_eit_create_allfromto(const igraph_t *graph,
@@ -1204,4 +1255,31 @@ void igraph_eit_destroy(const igraph_eit_t *eit) {
 /*     IGRAPH_ERROR("Cannot destroy iterator, unknown type", IGRAPH_EINVAL); */
     break;
   }
+}
+
+int igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v) {
+
+  long int i;
+
+  IGRAPH_CHECK(igraph_vector_resize(v, IGRAPH_EIT_SIZE(*eit)));
+  
+  switch (eit->type) {
+  case IGRAPH_EIT_SEQ: 
+    for (i=0; i<IGRAPH_EIT_SIZE(*eit); i++) {
+      VECTOR(*v)[i] = eit->start+i;
+    }
+    break;
+  case IGRAPH_EIT_VECTOR:
+  case IGRAPH_EIT_VECTORPTR:
+    for (i=0; i<IGRAPH_EIT_SIZE(*eit); i++) {
+      VECTOR(*v)[i] = VECTOR(*eit->vec)[i];
+    }
+    break;
+  default:
+    IGRAPH_ERROR("Cannot convert to vector, unknown iterator type", 
+		 IGRAPH_EINVAL);
+    break;
+  }
+  
+  return 0;
 }
