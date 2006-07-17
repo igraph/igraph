@@ -26,12 +26,22 @@ AT_KEYWORDS([iterator vector igraph_vs_vector igraph_vs_vectorview])
 AT_COMPILE_CHECK([simple/igraph_vs_vector.c], [simple/igraph_vs_vector.out])
 AT_CLEANUP
 
-AT_SETUP([Adjacent edges (igraph_es_adj): ])
-AT_KEYWORDS([iterator adjacent igraph_es_adj])
-AT_COMPILE_CHECK([simple/igraph_es_adj.c], [simple/igraph_es_adj.out])
+#AT_SETUP([Adjacent edges (igraph_es_adj): ])
+#AT_KEYWORDS([iterator adjacent igraph_es_adj])
+#AT_COMPILE_CHECK([simple/igraph_es_adj.c], [simple/igraph_es_adj.out])
+#AT_CLEANUP
+
+#AT_SETUP([Edges connecting two vertex sets (igraph_es_fromto): ])
+#AT_KEYWORDS([iterator igraph_es_fromto])
+#AT_COMPILE_CHECK([simple/igraph_es_fromto.c], [simple/igraph_es_fromto.out])
+#AT_CLEANUP
+
+AT_SETUP([Edges given by end points (igraph_es_pairs): ])
+AT_KEYWORDS([iterator igraph_es_pairs])
+AT_COMPILE_CHECK([simple/igraph_es_pairs.c])
 AT_CLEANUP
 
-AT_SETUP([Edges connecting two vertex sets (igraph_es_fromto): ])
-AT_KEYWORDS([iterator igraph_es_fromto])
-AT_COMPILE_CHECK([simple/igraph_es_fromto.c], [simple/igraph_es_fromto.out])
+AT_SETUP([Edges in a path (igraph_es_path): ])
+AT_KEYWORDS([iterator, igraph_es_path])
+AT_COMPILE_CHECK([simple/igraph_es_path.c])
 AT_CLEANUP

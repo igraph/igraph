@@ -3,6 +3,13 @@
 	* src/type_indexededgelist.c (igraph_get_eid) : added
 	* examples/simple/igraph_get_eid.c : added
 
+	* src/iterators.c (igraph_es_pairs, igraph_es_pairs_small)
+	(igraph_es_path, igraph_es_path_small, igraph_i_eit_pairs)
+	(igraph_i_eit_path) : added
+	(igraph_es_destroy, igraph_eit_create) : added PAIRS and PATH
+	* examples/simple/igraph_es_pairs.c : added
+	* examples/simple/igraph_es_path.c : added
+
 2006-07-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_pajek) : reset line number

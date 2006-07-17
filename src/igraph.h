@@ -234,7 +234,10 @@ void igraph_vit_destroy(const igraph_vit_t *vit);
 #define IGRAPH_ES_NONE      4
 #define IGRAPH_ES_1         5
 #define IGRAPH_ES_VECTORPTR 6
-#define IGRAPH_ES_SEQ       7
+#define IGRAPH_ES_VECTOR    7
+#define IGRAPH_ES_SEQ       8
+#define IGRAPH_ES_PAIRS     9
+#define IGRAPH_ES_PATH      10
 
 typedef struct igraph_es_t {
   int type;
@@ -275,6 +278,12 @@ int igraph_es_fromto(igraph_es_t *es,
 
 int igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
 igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
+
+int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v);
+int igraph_es_pairs_small(igraph_es_t *es, ...);
+
+int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v);
+int igraph_es_path_small(igraph_es_t *es, ...);
 
 void igraph_es_destroy(igraph_es_t *es);
 

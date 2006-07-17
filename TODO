@@ -8,7 +8,6 @@ o repair simplify
 o add references to SNA, paper by Carter
 o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions
-o check importing pajek files
 o write Pajek file
 o read and write non-structural info from/to GraphML files
 o edge seq argument to delete_edges
