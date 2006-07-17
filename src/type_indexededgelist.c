@@ -928,6 +928,8 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
  * \param eid Pointer to an integer, the edge id will be stored here.
  * \param from The starting point of the edge.
  * \param to The end points of the edge.
+ * \param directed Logical constant, whether to search for directed
+ *        edges in a directed graph. Ignored for undirected graphs.
  * \return Error code. 
  * \sa \ref igraph_edge() for the opposite operation.
  * 
@@ -937,7 +939,8 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
  */
 
 int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
-		   igraph_integer_t pfrom, igraph_integer_t pto) {
+		   igraph_integer_t pfrom, igraph_integer_t pto,
+		   igraph_bool_t directed) {
 
   long int from=pfrom, to=pto;
   long int nov=igraph_vcount(graph);
@@ -948,7 +951,7 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
   }
 
   *eid=-1;
-  if (igraph_is_directed(graph)) {
+  if (igraph_is_directed(graph) && directed) {
     start=VECTOR(graph->os)[from];
     end=VECTOR(graph->os)[from+1];
     for (i=start; i<end; i++) {

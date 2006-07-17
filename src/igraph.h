@@ -253,6 +253,10 @@ typedef struct igraph_es_t {
       igraph_integer_t from;
       igraph_integer_t to;
     } seq;
+    struct {
+      const igraph_vector_t *ptr;
+      igraph_bool_t mode;
+    } path;
   } data;
 } igraph_es_t;
 
@@ -279,11 +283,13 @@ int igraph_es_fromto(igraph_es_t *es,
 int igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
 igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
-int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v);
-int igraph_es_pairs_small(igraph_es_t *es, ...);
+int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v, 
+		    igraph_bool_t directed);
+int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...);
 
-int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v);
-int igraph_es_path_small(igraph_es_t *es, ...);
+int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v, 
+		   igraph_bool_t directed);
+int igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...);
 
 void igraph_es_destroy(igraph_es_t *es);
 
@@ -341,7 +347,8 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
 int igraph_edge(const igraph_t *graph, igraph_integer_t eid, 
 		igraph_integer_t *from, igraph_integer_t *to);		
 int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
-		   igraph_integer_t from, igraph_integer_t to);
+		   igraph_integer_t from, igraph_integer_t to,
+		   igraph_bool_t directed);
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
 		    igraph_neimode_t mode);
 

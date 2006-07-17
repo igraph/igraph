@@ -36,7 +36,8 @@ int main() {
   for (i=0; i<100; i++) {
     igraph_es_t es;
     igraph_eit_t it;
-    igraph_es_pairs_small(&es, 0,1,0,2,0,5,0,2,0,3,0,4,0,7,0,9, -1);
+    igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 
+			  0,1,0,2,0,5,0,2,0,3,0,4,0,7,0,9, -1);
     igraph_eit_create(&g, es, &it);
     IGRAPH_EIT_RESET(it);
     while (!IGRAPH_EIT_END(it)) {
@@ -54,7 +55,8 @@ int main() {
   for (i=0; i<100; i++) {
     igraph_es_t es;
     igraph_eit_t it;
-    igraph_es_pairs_small(&es, 0,1,2,0,5,0,0,2,3,0,0,4,7,0,0,9, -1);
+    igraph_es_pairs_small(&es, IGRAPH_DIRECTED,
+			  0,1,2,0,5,0,0,2,3,0,0,4,7,0,0,9, -1);
     igraph_eit_create(&g, es, &it);
     IGRAPH_EIT_RESET(it);
     while (!IGRAPH_EIT_END(it)) {

@@ -34,7 +34,7 @@ int main() {
   /* DIRECTED */
   
   igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 1);
-  igraph_es_path_small(&es, 0,1,2,3,4,5,6,7,8,9,0,1,2,3, -1);
+  igraph_es_path_small(&es, IGRAPH_DIRECTED, 0,1,2,3,4,5,6,7,8,9,0,1,2,3, -1);
   igraph_eit_create(&g, es, &eit);
   while (!IGRAPH_EIT_END(eit)) {
     long int edge=IGRAPH_EIT_GET(eit);
@@ -50,7 +50,8 @@ int main() {
   /* UNDIRECTED */
   
   igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
-  igraph_es_path_small(&es, 0,1,2,3,4,3,2,3,4,5,6,5,4,5,6,7,8,9,0,1,0,9, -1);
+  igraph_es_path_small(&es, IGRAPH_DIRECTED, 
+		       0,1,2,3,4,3,2,3,4,5,6,5,4,5,6,7,8,9,0,1,0,9, -1);
   igraph_eit_create(&g, es, &eit);
   while (!IGRAPH_EIT_END(eit)) {
     long int edge=IGRAPH_EIT_GET(eit);

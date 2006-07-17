@@ -795,31 +795,34 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
   return es;
 }
 
-int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v) {
+int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v, 
+		    igraph_bool_t directed) {
   es->type=IGRAPH_ES_PAIRS;
-  es->data.vecptr=Calloc(1, igraph_vector_t);
-  if (es->data.vecptr==0) {
+  es->data.path.mode=directed;
+  es->data.path.ptr=Calloc(1, igraph_vector_t);
+  if (es->data.path.ptr==0) {
     IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.vecptr);
+  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.path.ptr);
   
-  IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.vecptr, v));
+  IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
   
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
-int igraph_es_pairs_small(igraph_es_t *es, ...) {
+int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
   va_list ap;
   long int i, n=0;
   es->type=IGRAPH_ES_PAIRS;
-  es->data.vecptr=Calloc(1, igraph_vector_t);
-  if (es->data.vecptr==0) {
+  es->data.path.mode=directed;
+  es->data.path.ptr=Calloc(1, igraph_vector_t);
+  if (es->data.path.ptr==0) {
     IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.vecptr);
+  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.path.ptr);
   
-  va_start(ap, es);
+  va_start(ap, directed);
   while (1) {
     int num = va_arg(ap, int);
     if (num == -1) {
@@ -829,11 +832,11 @@ int igraph_es_pairs_small(igraph_es_t *es, ...) {
   }
   va_end(ap);
 
-  IGRAPH_VECTOR_INIT_FINALLY( (igraph_vector_t*) es->data.vecptr, n);
+  IGRAPH_VECTOR_INIT_FINALLY( (igraph_vector_t*) es->data.path.ptr, n);
   
-  va_start(ap, es);
+  va_start(ap, directed);
   for (i=0; i<n; i++) {
-    VECTOR(*es->data.vecptr)[i]=(igraph_real_t) va_arg(ap, int);
+    VECTOR(*es->data.path.ptr)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);
   
@@ -841,31 +844,34 @@ int igraph_es_pairs_small(igraph_es_t *es, ...) {
   return 0;
 }
 
-int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v) {
+int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v, 
+		   igraph_bool_t directed) {
   es->type=IGRAPH_ES_PATH;
-  es->data.vecptr=Calloc(1, igraph_vector_t);
-  if (es->data.vecptr==0) {
+  es->data.path.mode=directed;
+  es->data.path.ptr=Calloc(1, igraph_vector_t);
+  if (es->data.path.ptr==0) {
     IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.vecptr);
+  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.path.ptr);
   
-  IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.vecptr, v));
+  IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
   
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
-int igraph_es_path_small(igraph_es_t *es, ...) {
+int igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
   va_list ap;
   long int i, n=0;
   es->type=IGRAPH_ES_PATH;
-  es->data.vecptr=Calloc(1, igraph_vector_t);
-  if (es->data.vecptr==0) {
+  es->data.path.mode=directed;
+  es->data.path.ptr=Calloc(1, igraph_vector_t);
+  if (es->data.path.ptr==0) {
     IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.vecptr);
+  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.path.ptr);
   
-  va_start(ap, es);
+  va_start(ap, directed);
   while (1) {
     int num = va_arg(ap, int);
     if (num == -1) {
@@ -875,11 +881,11 @@ int igraph_es_path_small(igraph_es_t *es, ...) {
   }
   va_end(ap);
 
-  IGRAPH_VECTOR_INIT_FINALLY( (igraph_vector_t*) es->data.vecptr, n);
+  IGRAPH_VECTOR_INIT_FINALLY( (igraph_vector_t*) es->data.path.ptr, n);
   
-  va_start(ap, es);
+  va_start(ap, directed);
   for (i=0; i<n; i++) {
-    VECTOR(*es->data.vecptr)[i]=(igraph_real_t) va_arg(ap, int);
+    VECTOR(*es->data.path.ptr)[i]=(igraph_real_t) va_arg(ap, int);
   }
   va_end(ap);
   
@@ -912,10 +918,13 @@ void igraph_es_destroy(igraph_es_t *es) {
   case IGRAPH_ES_SEQ:
     break;
   case IGRAPH_ES_VECTOR:
-  case IGRAPH_ES_PAIRS:
-  case IGRAPH_ES_PATH:
     igraph_vector_destroy((igraph_vector_t*)es->data.vecptr);
     Free(es->data.vecptr);
+    break;
+  case IGRAPH_ES_PAIRS:
+  case IGRAPH_ES_PATH:
+    igraph_vector_destroy((igraph_vector_t*)es->data.path.ptr);
+    Free(es->data.path.ptr);
     break;
   default:
     break;
@@ -1001,7 +1010,7 @@ int igraph_i_eit_create_allfromto(const igraph_t *graph,
 
 int igraph_i_eit_pairs(const igraph_t *graph, 
 		       igraph_es_t es, igraph_eit_t *eit) {
-  long int n=igraph_vector_size(es.data.vecptr);
+  long int n=igraph_vector_size(es.data.path.ptr);
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
 
@@ -1009,7 +1018,7 @@ int igraph_i_eit_pairs(const igraph_t *graph,
     IGRAPH_ERROR("Cannot create edge iterator from odd number of pairs",
 		 IGRAPH_EINVAL);
   }
-  if (!igraph_vector_isininterval(es.data.vecptr, 0, no_of_nodes-1)) {
+  if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
   }
 
@@ -1025,10 +1034,10 @@ int igraph_i_eit_pairs(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, n/2);
   
   for (i=0; i<igraph_vector_size(eit->vec); i++) {
-    long int from=VECTOR(*es.data.vecptr)[2*i];
-    long int to=VECTOR(*es.data.vecptr)[2*i+1];
+    long int from=VECTOR(*es.data.path.ptr)[2*i];
+    long int to=VECTOR(*es.data.path.ptr)[2*i+1];
     igraph_integer_t eid;
-    igraph_get_eid(graph, &eid, from, to);
+    igraph_get_eid(graph, &eid, from, to, es.data.path.mode);
     VECTOR(*eit->vec)[i]=eid;
   }
   
@@ -1038,11 +1047,11 @@ int igraph_i_eit_pairs(const igraph_t *graph,
 
 int igraph_i_eit_path(const igraph_t *graph, 
 		      igraph_es_t es, igraph_eit_t *eit) {
-  long int n=igraph_vector_size(es.data.vecptr);
+  long int n=igraph_vector_size(es.data.path.ptr);
   long int no_of_nodes=igraph_vcount(graph);
   long int i, len;
 
-  if (!igraph_vector_isininterval(es.data.vecptr, 0, no_of_nodes-1)) {
+  if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
   }
   
@@ -1064,10 +1073,10 @@ int igraph_i_eit_path(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t *)eit->vec, len);
   
   for (i=0; i<len; i++) {
-    long int from=VECTOR(*es.data.vecptr)[i];
-    long int to=VECTOR(*es.data.vecptr)[i+1];
+    long int from=VECTOR(*es.data.path.ptr)[i];
+    long int to=VECTOR(*es.data.path.ptr)[i+1];
     igraph_integer_t eid;
-    igraph_get_eid(graph, &eid, from, to);
+    igraph_get_eid(graph, &eid, from, to, es.data.path.mode);
     VECTOR(*eit->vec)[i]=eid;
   }
 

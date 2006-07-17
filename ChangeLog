@@ -10,6 +10,15 @@
 	* examples/simple/igraph_es_pairs.c : added
 	* examples/simple/igraph_es_path.c : added
 
+	* src/igraph.h (igraph_es_t) : 'path' data type added
+	* src/type_indexededgelist.c (igraph_get_eid) : 'directed' option added
+	* src/iterators.c (igraph_es_pairs, igraph_es_pairs_small)
+	(igraph_es_path, igraph_es_path_small) : 'directed' option added
+	(igraph_eit_destroy, igraph_i_eit_pairs, igraph_i_eit_path) : updated
+	* examples/simple/igraph_get_eid.c : updated
+	* examples/simple/igraph_es_pairs.c : updated
+	* examples/simple/igraph_es_path.c : updated
+
 2006-07-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_pajek) : reset line number
