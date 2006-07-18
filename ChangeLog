@@ -1,5 +1,13 @@
 2006-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/topology.c (igraph_isoclass, igraph_isoclass_subgraph) 
+	(igraph_isoclass_create) : check for 3-4 size graph
+	(igraph_isomorphic) : check for number of nodes/edges, needed to work
+	properly
+
+	* src/motifs.c (igraph_motifs_randesu_estimate) : slight changes 
+	in parameters, parsample can be null pointer
+
 	* src/foreign.c (igraph_read_graph_pajek) : drop 'attr' argument
 	* src/foreign-pajek-parser.y (igraph_i_pajek_attr) : removed
 	* examples/simple/foreign.c : updated

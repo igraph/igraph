@@ -8,7 +8,7 @@
   <xsl:include href="version-greater-or-equal.xsl"/>
 
   <!-- change some parameters -->
-  <xsl:param name="toc.section.depth">1</xsl:param>
+  <xsl:param name="toc.section.depth">0</xsl:param>
   <xsl:param name="generate.section.toc.level">1</xsl:param>
   <xsl:param name="generate.toc">
     book	toc

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<chapter id="igraph-Motifs">
+<title>Graph Motifs</title>
+
+<section><title>Counting the motifs in a graph</title>
+<!-- doxrox-include igraph_motifs_randesu -->
+</section>
+
+<section><title>Estimating the number of motifs in a graph</title>
+<!-- doxrox-include igraph_motifs_randesu_no -->
+<!-- doxrox-include igraph_motifs_randesu_estimate -->
+</section>
+
+</chapter>

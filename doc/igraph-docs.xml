@@ -60,13 +60,19 @@
 
   <xi:include href="iterators.xml"/>  
 
-  <xi:include href="structural.xml"/>
-  
   <xi:include href="attributes.xml"/>  
 
+  <xi:include href="structural.xml"/>
+
+  <xi:include href="isomorphism.xml"/>
+
+  <xi:include href="motifs.xml"/>
+  
   <xi:include href="layout.xml"/>  
 
-  <xi:include href="foreign.xml"/>  
+  <xi:include href="foreign.xml"/>
+
+  <xi:include href="operators.xml"/>
 
   <xi:include href="nongraph.xml"/>  
 

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<chapter id="igraph-Isomorphism">
+<title>Graph Isomorphism</title>
+
+<section><title>Deciding whether two graphs are isomorphic</title>
+<!-- doxrox-include igraph_isomorphic -->
+</section>
+
+<section><title>Isomorphism classes</title>
+<!-- doxrox-include igraph_isoclass -->
+<!-- doxrox-include igraph_isoclass_subgraph -->
+<!-- doxrox-include igraph_isoclass_create -->
+</section>
+
+</chapter>

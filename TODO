@@ -8,6 +8,12 @@ o repair simplify
 o add references to SNA, paper by Carter
 o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions
+  docbook: read_graph_pajek, nonlinear_barabasi_game,
+           recent_degree_game, barabasi_aging_game, recent_degree_aging_game,
+	   igraph_layout_merge_dla, operators: disjoint_union,
+           disjoint_union_many, intersection, intersection_many, union,
+	   union_many, difference, complementer, compose; constraint, 
+	   igraph_small
 o write Pajek file
 o read and write non-structural info from/to GraphML files
 o Add Python interface to igraph_callaway_traits_game,

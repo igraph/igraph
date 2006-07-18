@@ -25,6 +25,10 @@
 #include "error.h"
 #include "memory.h"
 
+/**
+ * \function igraph_disjoint_union
+ */
+
 int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right) {
 
   long int no_of_nodes_left=igraph_vcount(left);

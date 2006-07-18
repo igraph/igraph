@@ -27,8 +27,61 @@
 
 #include <string.h>
 
+/**
+ * \function igraph_motifs_randesu
+ * \brief Count the number of motifs in a graph
+ * 
+ * </para><para>
+ * Motifs are small subgraphs of a given structure in a graph. It is
+ * argued that the motif profile (ie. the number of different motifs
+ * in the graph) is characteristic for different types of networks and
+ * network function is related to the motifs in the graph. 
+ * 
+ * </para><para>
+ * This function is able to find the different motifs of size three
+ * and four (ie. the number of different subgraphs with three and four
+ * vertices) in the network. (This limitation is the result of the
+ * lack of code to decide graph isomorphism for larger graphs.)
+ * 
+ * </para><para>
+ * In a big network the total number of motifs can be very large, so
+ * it takes a lot of time to find all of them, a sampling method can
+ * be used. This function is capable of doing sampling via the
+ * \c cut_prob argument. This argument gives the probability that
+ * a branch of the motif search tree will not be explored. See
+ * S. Wernicke and F. Rasche: FANMOD: a tool for fast network motif
+ * detection, Bioinformatics 22(9), 1152--1153, 2006 for details.
+ * 
+ * </para><para>
+ * Set the \c cut_prob argument to a zero vector for finding all
+ * motifs. 
+ * 
+ * </para><para> 
+ * Directed motifs will be counted in directed graphs and undirected
+ * motifs in undirected graphs.
+ *
+ * \param graph The graph to find the motifs in.
+ * \param hist The result of the computation, it gives the number of
+ *        motifs found for each isomorphism class. See
+ *        \ref igraph_isoclass() for help about isomorphism classes.
+ * \param size The size of the motifs to search for. Only three and
+ *        four are implemented currently. The limitation is not in the
+ *        motif finding code, but the graph isomorphism code.
+ * \param cut_prob Vector of probabilities for cutting the search tree
+ *        at a given level. The first element is the first level, etc.
+ *        Supply all zeros here (of length \c size) to find all motifs 
+ *        in a graph.
+ * \return Error code.
+ * \sa \ref igraph_motifs_randesu_estimate() for estimating the number
+ * of motifs in a graph, this can help to set the \c cut_prob
+ * parameter; \ref igraph_motifs_randesu_no() to calculate the total
+ * number of motifs of a given size in a graph.
+ * 
+ * Time complexity: TODO.
+ */
+
 int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
-			  int size, igraph_vector_t *cut_prob) {
+			  int size, const igraph_vector_t *cut_prob) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_i_adjlist_t allneis;
@@ -240,10 +293,51 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   return 0;
 }
 
+/**
+ * \function igraph_motifs_randesu_estimate
+ * \brief Estimate the total number of motifs in a graph
+ * 
+ * </para><para>
+ * This function is useful for large graphs for which it is not
+ * feasible to count all the different motifs, because there is very
+ * many of them.
+ *
+ * </para><para>
+ * The total number of motifs is estimated by taking a sample of
+ * vertices and counts all motifs in which these vertices are
+ * included. (There is also a \c cut_prob parameter which gives the
+ * probabilities to cut a branch of the search tree.)
+ *
+ * </para><para> 
+ * Directed motifs will be counted in directed graphs and undirected
+ * motifs in undirected graphs.
+ *
+ * \param graph The graph object to study.
+ * \param est Pointer to an integer type, the result will be stored
+ *        here.
+ * \param size The size of the motif to look for.
+ * \param cut_prob Vector giving the probabilities to cut a branch of
+ *        the search tree and omit counting the motifs in that branch.
+ *        It contains a probability for each level. Supply \c size
+ *        zeros here to count all the motifs in the sample.
+ * \param sample_size The number of vertices to use as the
+ *        sample. This parameter is only used if the \c parsample
+ *        argument is a null pointer.
+ * \param parsample Either pointer to an initialized vector or a null
+ *        pointer. If a vector then the vertex ids in the vector are
+ *        used as a sample. If a null pointer then the \c sample_size
+ *        argument is used to create a sample of vertices drawn with
+ *        uniform probability.
+ * \return Error code.
+ * \sa \ref igraph_motifs_randesu(), \ref igraph_motifs_randesu_no().
+ * 
+ * Time complexity: TODO.
+ */
+
 int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
-				   int size, igraph_vector_t *cut_prob, 
+				   int size, const igraph_vector_t *cut_prob, 
 				   igraph_integer_t sample_size, 
-				   igraph_vector_t *parsample) {
+				   const igraph_vector_t *parsample) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t neis;
@@ -252,7 +346,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
   igraph_vector_t adjverts;	/* this is V_E */
   igraph_stack_t stack;		/* this is S */
   long int *added;
-  igraph_vector_t sample;
+  igraph_vector_t *sample;
   long int sam;
   long int i;
 
@@ -268,18 +362,23 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
-  if (igraph_vector_size(parsample)==0) {
-    IGRAPH_VECTOR_INIT_FINALLY(&sample, 0);  
-    IGRAPH_CHECK(igraph_random_sample(&sample, 0, no_of_nodes-1, sample_size));
+  if (parsample==0) {
+    sample=Calloc(1, igraph_vector_t);
+    if (sample==0) {
+      IGRAPH_ERROR("Cannot estimate motifs", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, sample);
+    IGRAPH_VECTOR_INIT_FINALLY(sample, 0);  
+    IGRAPH_CHECK(igraph_random_sample(sample, 0, no_of_nodes-1, sample_size));
   } else {
-    sample=*parsample;
-    sample_size=igraph_vector_size(&sample);
+    sample=(igraph_vector_t*)parsample;
+    sample_size=igraph_vector_size(sample);
   }
 
   *est=0;
 
   for (sam=0; sam<sample_size; sam++) {
-    long int father=VECTOR(sample)[sam];
+    long int father=VECTOR(*sample)[sam];
     long int level, s;
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -380,9 +479,10 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
   (*est) *= ((double)no_of_nodes/sample_size);
   (*est) /= size;
 
-  if (igraph_vector_size(parsample)==0) {
-    igraph_vector_destroy(&sample);
-    IGRAPH_FINALLY_CLEAN(1);
+  if (parsample==0) {
+    igraph_vector_destroy(sample);
+    Free(sample);
+    IGRAPH_FINALLY_CLEAN(2);
   }
 
   Free(added);
@@ -394,8 +494,33 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
   return 0;
 }
 
+/**
+ * \function igraph_motifs_randesu_no
+ * \brief Count the total number of motifs in a graph
+ *
+ * </para><para> 
+ * This function counts the total number of motifs in a graph without
+ * assigning isomorphism classes to them. 
+ *
+ * </para><para> 
+ * Directed motifs will be counted in directed graphs and undirected
+ * motifs in undirected graphs.
+ *
+ * \param graph The graph object to study.
+ * \param no Pointer to an integer type, the result will be stored
+ *        here. 
+ * \param size The size of the motifs to count.
+ * \param cut_prob Vector giving the probabilities that a branch of
+ *        the search tree will be cut at a given level.
+ * \return Error code.
+ * \sa \ref igraph_motifs_randesu(), \ref
+ *     igraph_motifs_randesu_estimate(). 
+ * 
+ * Time complexity: TODO.
+ */
+
 int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
-			     int size, igraph_vector_t *cut_prob) {
+			     int size, const igraph_vector_t *cut_prob) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t neis;

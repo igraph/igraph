@@ -647,14 +647,14 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 /* -------------------------------------------------- */
 
 int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
-			  int size, igraph_vector_t *cut_prob);
+			  int size, const igraph_vector_t *cut_prob);
 
 int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
-				   int size, igraph_vector_t *cut_prob, 
+				   int size, const igraph_vector_t *cut_prob, 
 				   igraph_integer_t sample_size, 
-				   igraph_vector_t *sample);
+				   const igraph_vector_t *sample);
 int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
-			     int size, igraph_vector_t *cut_prob);
+			     int size, const igraph_vector_t *cut_prob);
 
 /* -------------------------------------------------- */
 /* Progress handlers                                  */

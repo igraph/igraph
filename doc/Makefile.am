@@ -6,7 +6,8 @@ SRCDIR=$(top_srcdir)/src
 
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
-	      foreign.xml nongraph.xml
+	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
+	      operators.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml
@@ -43,9 +44,10 @@ basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c
 
 generators.xml: generators.xxml $(SRCDIR)/structure_generators.c $(SRCDIR)/games.c \
-		$(SRCDIR)/atlas.c
+		$(SRCDIR)/atlas.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
-	$(SRCDIR)/structure_generators.c $(SRCDIR)/games.c $(SRCDIR)/atlas.c
+	$(SRCDIR)/structure_generators.c $(SRCDIR)/games.c $(SRCDIR)/atlas.c \
+	$(SRCDIR)/structural_properties.c
 
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c \
@@ -70,6 +72,14 @@ foreign.xml: foreign.xxml $(SRCDIR)/foreign.c
 nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/other.c $(SRCDIR)/random.c
 
+isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c 
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c
+
+motifs.xml: motifs.xxml $(SRCDIR)/motifs.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/motifs.c
+
+operators.xml: operators.xxml $(SRCDIR)/operators.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

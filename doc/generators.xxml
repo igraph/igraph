@@ -25,6 +25,7 @@
 <!-- doxrox-include igraph_barabasi_game -->
 <!-- doxrox-include igraph_erdos_renyi_game -->
 <!-- doxrox-include igraph_degree_sequence_game -->
+<!-- doxrox-include igraph_rewire -->
 <!-- doxrox-include igraph_growing_random_game -->
 <!-- doxrox-include igraph_callaway_traits_game -->
 <!-- doxrox-include igraph_establishment_game -->

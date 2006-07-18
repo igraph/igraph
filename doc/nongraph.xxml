@@ -15,4 +15,8 @@
 <!-- doxrox-include igraph_random_sample -->
 </section>
 
+<section><title>Convex hull of a set of points on a plane</title>
+<!-- doxrox-include igraph_convex_hull -->
+</section>
+
 </chapter>

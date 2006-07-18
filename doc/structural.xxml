@@ -43,6 +43,7 @@
 
 <section><title>Other Operations</title>
 <!-- doxrox-include igraph_simplify -->
+<!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_transitivity -->	
 <!-- doxrox-include igraph_bibcoupling -->
 <!-- doxrox-include igraph_cocitation -->

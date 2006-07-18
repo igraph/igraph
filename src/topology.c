@@ -621,6 +621,37 @@ unsigned int igraph_i_classedges_4[] = { 2,3, 1,3, 0,3, 3,2, 1,2, 0,2,
 					 3,1, 2,1, 0,1, 3,0, 2,0, 1,0 };
 unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
 
+/**
+ * \function igraph_isoclass
+ * \brief Determine the isomorphism class of a graph
+ * 
+ * All graphs with a given number of vertices belong to a number of
+ * isomorpism classes, with every graph in a given class being
+ * isomorphic to each other.
+ * 
+ * This function gives the isomorphism class (a number) of a
+ * graph. Two graphs have the same isomorphism class if and only if
+ * they are isomorphic.
+ * 
+ * The first isomorphism class is numbered zero and it is the empty
+ * graph, the last isomorphism class is the full graph. The number of
+ * isomorphism class for directed graphs with three vertices is 16
+ * (between 0 and 15), for undirected graph it is only 4. For graphs
+ * with four vertices it is 218 (directed) and 11 (undirected).
+ * 
+ * \param graph The graph object.
+ * \param isoclass Pointer to an integer, the isomorphism class will
+ *        be stored here.
+ * \return Error code.
+ * \sa \ref igraph_isomorphic(), \ref igraph_isoclass_subgraph(),
+ * \ref igraph_isoclass_create(), \ref igraph_motifs_randesu().
+ * 
+ * Because of some limitations this function works only for graphs
+ * with three of four vertices.
+ * 
+ * Time complexity: O(|E|), the number of edges in the graph.
+ */
+
 int igraph_isoclass(const igraph_t *graph, int *isoclass) {
   long int e;
   long int no_of_nodes=igraph_vcount(graph);
@@ -629,6 +660,11 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
   unsigned char idx, mul;
   unsigned int *arr_idx, *arr_code;
   int code=0;
+
+  if (no_of_nodes < 3 || no_of_nodes > 4) {
+    IGRAPH_ERROR("Only implemented for graphs with 3 or 4 vertices",
+		 IGRAPH_UNIMPLEMENTED);
+  }
 
   if (igraph_is_directed(graph)) {
     if (no_of_nodes==3) {
@@ -650,7 +686,8 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
       arr_code=igraph_i_isoclass2_4u;
       mul=4;
     }
-  }
+  } 
+
   for (e=0; e<no_of_edges; e++) {
     igraph_edge(graph, e, &from, &to);
     idx=mul*from+to;
@@ -661,14 +698,63 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
   return 0;
 }
 
+/**
+ * \function igraph_isomorphic 
+ * \brief Decides whether two graphs are isomorphic
+ * 
+ * From Wikipedia: The graph isomorphism problem or GI problem is the
+ * graph theory problem of determining whether, given two graphs G1
+ * and G2, it is possible to permute (or relabel) the vertices of one
+ * graph so that it is equal to the other. Such a permutation is
+ * called a graph isomorphism.
+ * 
+ * \param graph1 The first graph.
+ * \param graph2 The second graph.
+ * \param iso Pointer to a logical variable, will be set to TRUE (1)
+ *        if the two graphs are isomorphic, and FALSE (0) otherwise.
+ * \return Error code.
+ * \sa \ref igraph_isoclass(), \ref igraph_isoclass_subgraph(),
+ * \ref igraph_isoclass_create().
+ * 
+ * Time complexity: O(|E|), the number of edges in the
+ * graphs. (If they don't have the same number edges they're trivially
+ * non-isomorphic and this is recognized in O(1) time.)
+ */
+
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 		      igraph_bool_t *iso) {
-  int class1, class2;
-  IGRAPH_CHECK(igraph_isoclass(graph1, &class1));
-  IGRAPH_CHECK(igraph_isoclass(graph2, &class2));
-  *iso= (class1 == class2);
+  int class1, class2;  
+  
+  if (igraph_vcount(graph1) != igraph_vcount(graph2) ||
+      igraph_ecount(graph1) != igraph_ecount(graph2)) {
+    *iso=0;
+  } else { 
+    IGRAPH_CHECK(igraph_isoclass(graph1, &class1));
+    IGRAPH_CHECK(igraph_isoclass(graph2, &class2));
+    *iso= (class1 == class2);
+  }
+
   return 0;
 }
+
+/**
+ * \function igraph_isoclass_subgraph
+ * \brief The isomorphism class of a subgraph of a graph.
+ * 
+ * This function is only implemented for subgraphs with three or four
+ * vertices.
+ * \param graph The graph object.
+ * \param vids A vector containing the vertex ids to be considered as
+ *        a subgraph. Each vertex id should be included at most once.
+ * \param isoclass Pointer to an integer, this will be set to the
+ *        isomorphism class.
+ * \return Error code.
+ * \sa \ref igraph_isoclass(), \ref igraph_isomorphic(),
+ * \ref igraph_isoclass_create().
+ * 
+ * Time complexity: O((d+n)*n), d is the average degree in the network,
+ * and n is the number of vertices in \c vids.
+ */
 
 int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
 			     int *isoclass) {
@@ -681,6 +767,11 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
   int code=0;
   
   long int i, j, s;
+
+  if (nodes < 3 || nodes > 4) { 
+    IGRAPH_ERROR("Only for three- or four-vertex subgraphs",
+		 IGRAPH_UNIMPLEMENTED);
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   
@@ -725,6 +816,26 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
   return 0;
 }
 
+/**
+ * \function igraph_isoclass_create
+ * \brief Creates a graph from the given isomorphism class.
+ *
+ * This function is implemented only for graphs with three or four
+ * vertices. 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param size The number of vertices to add to the graph.
+ * \param number The isomorphism class.
+ * \param directed Logical constant, whether to create a directed
+ *        graph. 
+ * \return Error code.
+ * \sa \ref igraph_isoclass(), 
+ * \ref igraph_isoclass_subgraph(),
+ * \ref igraph_isomorphic().
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges in the graph to create.
+ */
+
 int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 			   igraph_integer_t number, igraph_bool_t directed) {
   igraph_vector_t edges;
@@ -732,7 +843,12 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
   long int power;
   long int code;
   long int pos;
-  
+
+  if (size < 3 || size > 4) {
+    IGRAPH_ERROR("Only for graphs with three of four vertices", 
+		 IGRAPH_UNIMPLEMENTED);
+  }
+
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
   if (directed) {
