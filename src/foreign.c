@@ -391,7 +391,6 @@ extern int igraph_i_pajek_eof;
 long int igraph_pajek_mylineno;
 igraph_vector_t *igraph_pajek_vector=0;
 igraph_bool_t igraph_pajek_directed;
-igraph_bool_t igraph_i_pajek_attr;
 long int igraph_pajek_vcount=0;
 long int igraph_pajek_actfrom, igraph_pajek_actto;
 int igraph_pajek_mode=0;	/* 0 - general, 1 - vertex, 2 - edge */
@@ -423,8 +422,8 @@ long int igraph_i_pajek_actedge=0;
 /*   return 0; */
 /* } */
 
-int igraph_read_graph_pajek(igraph_t *graph, FILE *instream, 
-			    igraph_bool_t attr) {
+int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
+
   igraph_vector_t edges;
   igraph_trie_t vattrnames;
   igraph_vector_ptr_t vattrs;
@@ -447,7 +446,6 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream,
   igraph_pajek_mode=0;
   igraph_pajek_vcount=0;
   igraph_i_pajek_vertexid=0;
-  igraph_i_pajek_attr=attr;
   igraph_i_pajek_vertex_attribute_names=&vattrnames;
   igraph_i_pajek_vertex_attributes=&vattrs;
   igraph_i_pajek_edge_attribute_names=&eattrnames;

@@ -81,7 +81,6 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 					const char *str);
 void igraph_i_pajek_reset_scanner();
 extern igraph_vector_t *igraph_pajek_vector;
-extern igraph_bool_t igraph_i_pajek_attr;
 extern igraph_bool_t igraph_pajek_directed;
 extern long int igraph_pajek_vcount;
 extern int igraph_pajek_mode;

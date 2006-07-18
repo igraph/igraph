@@ -1,3 +1,9 @@
+2006-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_read_graph_pajek) : drop 'attr' argument
+	* src/foreign-pajek-parser.y (igraph_i_pajek_attr) : removed
+	* examples/simple/foreign.c : updated
+
 2006-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/type_indexededgelist.c (igraph_delete_edges) : rewritten to

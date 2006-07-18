@@ -3102,7 +3102,7 @@ SEXP R_igraph_read_graph_pajek(SEXP pvfile) {
 #endif
   if (file==0) { igraph_error("Cannot read Pajek file", __FILE__, __LINE__,
 			      IGRAPH_EFILE); }
-  igraph_read_graph_pajek(&g, file, 1);
+  igraph_read_graph_pajek(&g, file);
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
