@@ -339,3 +339,13 @@ page.rank <- function(graph, nodes=V(graph), directed=is.directed(graph),
 }
 
 
+reciprocity <- function(graph, ignore.loops=TRUE) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  .Call("R_igraph_reciprocity", graph, as.logical(ignore.loops),
+        PACKAGE="igraph")
+}
+

@@ -3,6 +3,9 @@
 	* interfaces/R/igraph/R/structural.properties.R (page.rank) : added
 	* interfaces/R/src/rinterface.c (R_igraph_pagerank) : added
 
+	* interfaces/R/igraph/R/structural.properties.R (reciprocity) : added
+	* interfaces/R/src/rinterface.c (R_igraph_reciprocity) : added	
+
 2006-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c : updated, 'attr' attribute removed.
