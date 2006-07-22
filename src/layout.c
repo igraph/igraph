@@ -146,7 +146,8 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res) {
 /**
  * \function igraph_layout_sphere
  * \brief Places vertices (more or less) uniformly on a sphere.
- * 
+ *
+ * </para><para> 
  * The algorithm was described in the following paper:
  * Distributing many points on a sphere by E.B. Saff and
  * A.B.J. Kuijlaars, \emb Mathematical Intelligencer \eme 19.1 (1997)
@@ -206,6 +207,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
  * \brief Places the vertices on a plane according to the
  * Fruchterman-Reingold algorithm.
  *
+ * </para><para>
  * This is a force-directed layout, see Fruchterman, T.M.J. and
  * Reingold, E.M.: Graph Drawing by Force-directed Placement.
  * Software -- Practice and Experience, 21/11, 1129--1164,
@@ -334,6 +336,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
  * Fruchterman-Reingold layout (see \ref
  * igraph_layout_fruchterman_reingold for the 2D version
  *
+ * </para><para>
  * This function was ported from the SNA R package.
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
@@ -479,6 +482,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
  * \brief Places the vertices on a plane according the Kamada-Kawai
  * algorithm. 
  *
+ * </para><para>
  * This is a force directed layout, see  Kamada, T. and Kawai, S.: An
  * Algorithm for Drawing General Undirected Graphs. Information
  * Processing Letters, 31/1, 7--15, 1989.
@@ -577,6 +581,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  * \brief 3D version of the force based Kamada-Kawai layout, the pair
  * of the \ref igraph_layout_kamada_kawai 2D layout generator
  * 
+ * </para><para>
  * This function was ported from the SNA R package.
  * \param graph A graph object.
  * \param res Pointer to an initialized matrix object. This will
@@ -682,6 +687,7 @@ void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  * \function igraph_layout_lgl
  * \brief Force based layout algorithm for large graphs.
  * 
+ * </para><para>
  * This is a layout generator similar to the Large Graph Layout
  * algorithm and program
  * (http://bioinformatics.icmb.utexas.edu/lgl/). But unlike LGL, this
@@ -963,6 +969,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_layout_grid_fruchterman_reingold
  * \brief Force based layout generator for large graphs.
  * 
+ * </para><para>
  * This algorithm is the same as the Fruchterman-Reingold layout
  * generator, but it partitions the 2d space to a grid and and vertex
  * repulsion is calculated only for vertices nearby.
@@ -1128,13 +1135,16 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
  * \function igraph_layout_reingold_tilford
  * \brief Reingold-Tilford layout for tree graphs
  * 
+ * </para><para>
  * Arranges the nodes in a tree where the given node is used as the root.
  * The tree is directed downwards and the parents are centered above its
  * children. For the exact algorithm, see:
  * 
+ * </para><para>
  * Reingold, E and Tilford, J: Tidier drawing of trees.
  * IEEE Trans. Softw. Eng., SE-7(2):223--228, 1981
  *
+ * </para><para>
  * If the given graph is not a tree, a breadth-first search is executed
  * first to obtain a possible spanning tree.
  * 
@@ -1146,6 +1156,7 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
  *
  * Added in version 0.2.
  * 
+ * </para><para>
  * TODO: decompose and merge for not fully connected graphs
  * TODO: possible speedup could be achieved if we use a table for storing
  * the children of each node in the tree. (Now the implementation uses a

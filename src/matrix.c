@@ -40,6 +40,7 @@
  * \function igraph_matrix_init
  * \brief Initializes a matrix.
  * 
+ * </para><para>
  * Every matrix needs to be initialized before using it, this is done
  * by calling this function. A matrix has to be destroyed if it is not
  * needed any more, see \ref igraph_matrix_destroy().
@@ -67,6 +68,7 @@ int igraph_matrix_init(igraph_matrix_t *m, long int nrow, long int ncol) {
  * \function igraph_matrix_destroy
  * \brief Destroys a matrix object.
  * 
+ * </para><para>
  * This function frees all the memory allocated for a matrix
  * object. The destroyed object needs to be reinitialized before using
  * it again.
@@ -88,6 +90,7 @@ void igraph_matrix_destroy(igraph_matrix_t *m) {
  * \function igraph_matrix_resize
  * \brief Resizes a matrix.
  *
+ * </para><para>
  * This function resizes a matrix by adding more elements to it.
  * The matrix contains arbitrary data after resizing it.
  * Ie. after calling this function you cannot expect that element
@@ -160,6 +163,7 @@ long int igraph_matrix_ncol(const igraph_matrix_t *m) {
  * \ingroup matrix
  * \brief Copies a matrix to a regular C array.
  *
+ * </para><para>
  * The matrix is copied columnwise, as this is the format most
  * programs and languages use.
  * The C array should be of sufficient size, there are (of course) not
@@ -308,6 +312,7 @@ int igraph_matrix_delete_rows_neg(igraph_matrix_t *m, igraph_vector_t *neg, long
  * \function igraph_matrix_copy
  * \brief Copies a matrix.
  *
+ * </para><para>
  * Creates a matrix object by copying another one.
  * \param to Pointer to an uninitialized matrix object.
  * \param from The initialized matrix object to copy.

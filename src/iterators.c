@@ -76,6 +76,7 @@
  * This selector includes all vertices of a given graph in
  * increasing vertex id order.
  * 
+ * </para><para>
  * Time complexity: O(1).
  */
 
@@ -260,6 +261,7 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
  * last vertex id, the behavior of the function is undefined if you
  * don't use a <code>-1</code> properly.
  * 
+ * </para><para>
  * Note that the vertex ids supplied will be parsed as
  * <code>int</code>'s so you cannot supply arbitrarily large (too
  * large for int) vertex ids here. 
@@ -433,6 +435,7 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
  * this contains the actual vertex ids in the graph supplied as a
  * parameter. 
  * 
+ * </para><para>
  * The same vertex selector object can be used to instantiate any
  * number vertex iterators.
  *
@@ -517,6 +520,7 @@ int igraph_vit_create(const igraph_t *graph,
  * \function igraph_vit_destroy
  * \brief Destroys a vertex iterator.
  * 
+ * </para><para>
  * Deallocates memory allocated for a vertex iterator. 
  * 
  * \param vit Pointer to an initialized vertex iterator object.
@@ -673,6 +677,7 @@ int igraph_es_none(igraph_es_t *es) {
  * \function igraph_ess_none
  * \brief Immediate empty edge selector.
  * 
+ * </para><para>
  * Immediate version of the empty edge selector.
  * 
  * \return Initialized empty edge selector.
@@ -727,6 +732,7 @@ igraph_es_t igraph_ess_1(igraph_integer_t eid) {
  * \function igraph_es_vector
  * \brief Handle a vector as an edge selector.
  * 
+ * </para><para>
  * Creates an edge selector which serves as a view to a vector
  * containing edge ids. Do not destroy the vector before destroying
  * the view. 
@@ -752,6 +758,7 @@ int igraph_es_vector(igraph_es_t *es,
  * \function igraph_ess_vector
  * \brief Immediate vector view edge selector.
  * 
+ * </para><para>
  * This is the immediate version of the vector of edge ids edge
  * selector. 
  * 
@@ -773,6 +780,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
  * \function igraph_es_fromto
  * \brief Edge selector, all edges between two vertex sets.
  * 
+ * </para><para>
  * This function is not implemented yet.
  * 
  * \param es Pointer to an uninitialized edge selector.
@@ -936,6 +944,7 @@ int igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...) {
  * \function igraph_es_destroy
  * \brief Destroys an edge selector object.
  * 
+ * </para><para>
  * Call this function on an edge selector when it is not needed any
  * more. Do \em not call this function on edge selectors created by
  * immediate constructors, those don't need to be destroyed.
@@ -1140,9 +1149,11 @@ int igraph_i_eit_path(const igraph_t *graph,
  * \function igraph_eit_create
  * \brief Creates an edge iterator from an edge selector.
  * 
+ * </para><para>
  * This function creates an edge iterator based on an edge selector
  * and a graph. 
  * 
+ * </para><para>
  * The same edge selector can be used to create many edge iterators,
  * also for different graphs.
  * 

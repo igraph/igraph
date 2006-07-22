@@ -267,12 +267,15 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
  * \function igraph_minimum_spanning_tree_unweighted
  * \brief Calculates one minimum spanning tree of an unweighted graph.
  * 
+ * </para><para>
  * If the graph has more minimum spanning trees (this is always the
  * case, except if it is a forest) this implementation returns only
  * the same one.
  * 
+ * </para><para>
  * Directed graphs are considered as undirected for this computation.
  *
+ * </para><para>
  * If the graph is not connected then its minimum spanning forest is
  * returned. This is the set of the minimum spanning trees of each
  * component.
@@ -353,17 +356,21 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
  * \function igraph_minimum_spanning_tree_prim
  * \brief Calculates one minimum spanning tree of a weighted graph.
  *
+ * </para><para>
  * This function uses Prim's method for carrying out the computation,
  * see Prim, R.C.: Shortest connection networks and some
  * generalizations, Bell System Technical
  * Journal, Vol. 36, 
  * 1957, 1389--1401.
  * 
+ * </para><para>
  * If the graph has more than one minimum spanning tree, the current
  * implementation returns always the same one.
  *
+ * </para><para>
  * Directed graphs are considered as undirected for this computation. 
  * 
+ * </para><para>
  * If the graph is not connected then its minimum spanning forest is
  * returned. This is the set of the minimum spanning trees of each
  * component.
@@ -484,12 +491,14 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
  * \function igraph_closeness
  * \brief Closeness centrality calculations for some vertices.
  *
+ * </para><para>
  * The closeness centrality of a vertex measures how easily other
  * vertices can be reached from it (or the other way: how easily it
  * can be reached from the other vertices). It is defined as the
  * number of the number of vertices minus one divided by the sum of the
  * lengths of all geodesics from/to the given vertex.
  *
+ * </para><para>
  * If the graph is not connected, and there is no path between two
  * vertices, the number of vertices is used instead the length of the
  * geodesic. This is always longer than the longest possible geodesic.
@@ -729,6 +738,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_get_shortest_paths
  * \brief Calculates the shortest paths from/to one vertex.
  * 
+ * </para><para>
  * If there is more than one geodesic between two vertices, this
  * function gives only one of them. 
  * \param graph The graph object.
@@ -1196,6 +1206,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  * \function igraph_betweenness
  * \brief Betweenness centrality of some vertices.
  * 
+ * </para><para>
  * The betweenness centrality of a vertex is the number of geodesics
  * going through it. If there are more than one geodesic between two
  * vertices, the value of these geodesics are weighted by one over the 
@@ -1363,6 +1374,7 @@ int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_edge_betweenness
  * \brief Betweenness centrality of the edges.
  * 
+ * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
  * vertices, the value of these geodesics are weighted by one over the 
@@ -1548,6 +1560,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  * \function igraph_pagerank
  * \brief Calculates the Google PageRank for the specified vertices.
  * 
+ * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank
  * of all other vertices, so even if you want to calculate the PageRank for
  * only some of the vertices, all of them must be calculated. Requesting
@@ -1590,6 +1603,8 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  *         temporary data. 
  *         \c IGRAPH_EINVVID, invalid vertex id in
  *         \p vids. 
+ * 
+ * Time complexity: TODO.
  */
 
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res, 
@@ -1718,6 +1733,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_rewire
  * \brief Randomly rewires a graph while preserving the degree distribution.
  * 
+ * </para><para>
  * This function generates a new graph based on the original one by randomly
  * rewiring edges while preserving the original graph's degree distribution.
  * Please note that the rewiring is done "in place", so no new graph will
@@ -1741,6 +1757,8 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
  *           \cli IGRAPH_ENOMEM
  *                Not enough memory for temporary data.
  *         \endclist
+ *
+ * Time complexity: TODO.
  */
 
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
@@ -1835,6 +1853,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
  * \function igraph_subgraph
  * \brief Creates a subgraph with the specified vertices.
  * 
+ * </para><para>
  * This function collects the specified vertices and all edges between
  * them to a new graph.
  * As the vertex ids in a graph always start with one, this function
@@ -2040,6 +2059,7 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
  * \function igraph_transitivity
  * \brief Calculates the transitivity (clustering coefficient) of a graph.
  * 
+ * </para><para>
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. See the \p type parameter for
  * different definitions (more to be expected soon).
@@ -2089,6 +2109,7 @@ int igraph_transitivity(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_reciprocity
  * \brief Calculates the reciprocity of a directed graph.
  * 
+ * </para><para>
  * A vertex pair (A, B) is said to be reciprocal if there are edges
  * between them in both directions. The reciprocity of a directed graph
  * is the proportion of all possible (A, B) pairs which are reciprocal,

@@ -10,7 +10,7 @@ o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions
   docbook: read_graph_pajek, nonlinear_barabasi_game,
            recent_degree_game, barabasi_aging_game, recent_degree_aging_game,
-	   igraph_layout_merge_dla, constraint
+	   igraph_layout_merge_dla, constraint, igraph_vector_ptr_t
 o write Pajek file
 o read and write non-structural info from/to GraphML files
 o Add Python interface to igraph_callaway_traits_game,

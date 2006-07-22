@@ -31,6 +31,7 @@
  * \function igraph_running_mean
  * \brief Calculates the running mean of a vector.
  * 
+ * </para><para>
  * The running mean is defined by the mean of the
  * previous \p binwidth values.
  * \param data The vector containing the data.
@@ -84,9 +85,11 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
  * \function igraph_convex_hull
  * \brief Determines the convex hull of a given set of points in the 2D plane
  *
+ * </para><para>
  * The convex hull is determined by the Graham scan algorithm.
  * See the following reference for details:
  * 
+ * </para><para>
  * Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford
  * Stein. Introduction to Algorithms, Second Edition. MIT Press and
  * McGraw-Hill, 2001. ISBN 0262032937. Pages 949-955 of section 33.3:

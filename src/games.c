@@ -546,6 +546,7 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  * \function igraph_growing_random_game
  * \brief Generates a growing random graph.
  *
+ * </para><para>
  * This function simulates a growing random graph. In each discrete
  * time step a new vertex is added and a number of new edges are also
  * added. These graphs are known to be different from standard (not
@@ -618,10 +619,12 @@ int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
 /**
  * \function igraph_callaway_traits_game
  * 
+ * </para><para>
  * This function simulates a growing network with vertex types.
  * The different types of vertices prefer to connect other types of
  * vertices with a given probability.</para><para>
  * 
+ * </para><para>
  * The simulation goes like this: in each discrete time step a new
  * vertex is added to the graph. The type of this vertex is generated
  * based on \p type_dist. Then two vertices are selected uniformly
@@ -700,6 +703,7 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
  * \brief Generates a graph with a simple growing model with vertex
  * types 
  * 
+ * </para><para>
  * The simulation goes like this: a single vertex is added at each
  * time step. This new vertex tries to connect to \p k vertices in the
  * graph. The probability that such a connection is realized depends

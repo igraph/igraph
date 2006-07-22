@@ -29,6 +29,7 @@
  * \function igraph_get_adjacency
  * \brief Returns the adjacency matrix of a graph
  * 
+ * </para><para>
  * The result is an incidence matrix, it contains numbers greater
  * than one if there are multiple edges in the graph.
  * \param graph Pointer to the graph to convert

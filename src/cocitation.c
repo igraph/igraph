@@ -33,6 +33,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_cocitation
  * \brief Cocitation coupling.
  * 
+ * </para><para>
  * Two vertices are cocited if there is another vertex citing both of
  * them. \ref igraph_cocitation() simply counts how many types two vertices are
  * cocited.
@@ -66,6 +67,7 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  * \function igraph_bibcoupling
  * \brief Bibliographic coupling.
  * 
+ * </para><para>
  * The bibliographic coupling of two vertices is the number
  * of other vertices they both cite, \ref igraph_bibcoupling() calculates
  * this.

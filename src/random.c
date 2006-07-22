@@ -71,6 +71,7 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
  * \function igraph_random_sample
  * \brief Generates an increasing random sequence of integers.
  * 
+ * </para><para>
  * This function generates an incresing sequence of random integer
  * numbers from a given interval. The algorithm is taken literally
  * from Jeffrey Scott Vitter: 'An Efficient Algorithm for Sequential

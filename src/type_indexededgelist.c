@@ -47,6 +47,7 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * \function igraph_empty
  * \brief Creates an empty graph with some vertices and no edges.
  *
+ * </para><para>
  * The most basic constructor, all the other constructors should call
  * this to create a minimal graph object.
  * \param graph Pointer to a not-yet initialized graph object.
@@ -94,8 +95,10 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
  * \function igraph_destroy
  * \brief Frees the memory allocated for a graph object. 
  * 
+ * </para><para>
  * This function should be called for every graph object exactly once.
  *
+ * </para><para>
  * This function invalidates all iterators (of course), but the
  * iterators of are graph should be destroyed before the graph itself
  * anyway. 
@@ -123,10 +126,12 @@ int igraph_destroy(igraph_t *graph) {
  * \function igraph_copy
  * \brief Creates an exact (deep) copy of a graph.
  * 
+ * </para><para>
  * This function deeply copies a graph object to create an exact
  * replica of it. The new replica should be destroyed by calling
  * \ref igraph_destroy() on it when not needed any more.
  * 
+ * </para><para>
  * You can also create a shallow copy of a graph by simply using the
  * standard assignment operator, but be careful and do \em not
  * destroy a shallow replica. To avoid this mistake creating shallow
@@ -167,6 +172,7 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  * \function igraph_add_edges
  * \brief Adds edges to a graph object. 
  * 
+ * </para><para>
  * The edges are given in a vector, the
  * first two elements define the first edge (the order is
  * <code>from</code>, <code>to</code> for directed
@@ -183,6 +189,7 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  *
  * This function invalidates all iterators.
  *
+ * </para><para>
  * Time complexity: O(|V|+|E|) where
  * |V| is the number of vertices and
  * |E| is the number of
@@ -268,6 +275,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
  * \function igraph_add_vertices
  * \brief Adds vertices to a graph. 
  *
+ * </para><para>
  * This function invalidates all iterators.
  *
  * \param graph The graph object to extend.
@@ -314,12 +322,14 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
  * \function igraph_delete_edges
  * \brief Removes edges from a graph.
  *
- * The edges to remove are given in a vector, the first two numbers
- * define the first edge, etc. The vector should contain even number
- * of elements.
+ * </para><para>
+ * The edges to remove are given as an edge selector.
+ *
+ * </para><para>
  * This function cannot remove vertices, they will be kept, even if
  * they lose all their edges.
  *
+ * </para><para>
  * This function invalidates all iterators.
  * \param graph The graph to work on.
  * \param edges The edges to remove.
@@ -424,9 +434,11 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  * \function igraph_delete_vertices
  * \brief Removes vertices (with all their edges) from the graph.
  *
+ * </para><para>
  * This function changes the ids of the vertices (except in some very
  * special cases, but these should not be relied on anyway).
  *
+ * </para><para>
  * This function invalidates all iterators.
  * 
  * \param graph The graph to work on.
@@ -720,6 +732,7 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * \function igraph_degree
  * \brief The degree of some vertices in a graph.
  *
+ * </para><para>
  * This function calculates the in-, out- or total degree of the
  * specified vertices. 
  * \param graph The graph.

@@ -625,14 +625,17 @@ unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
  * \function igraph_isoclass
  * \brief Determine the isomorphism class of a graph
  * 
+ * </para><para>
  * All graphs with a given number of vertices belong to a number of
  * isomorpism classes, with every graph in a given class being
  * isomorphic to each other.
  * 
+ * </para><para>
  * This function gives the isomorphism class (a number) of a
  * graph. Two graphs have the same isomorphism class if and only if
  * they are isomorphic.
  * 
+ * </para><para>
  * The first isomorphism class is numbered zero and it is the empty
  * graph, the last isomorphism class is the full graph. The number of
  * isomorphism class for directed graphs with three vertices is 16
@@ -649,6 +652,7 @@ unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
  * Because of some limitations this function works only for graphs
  * with three of four vertices.
  * 
+ * </para><para>
  * Time complexity: O(|E|), the number of edges in the graph.
  */
 
@@ -702,6 +706,7 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
  * \function igraph_isomorphic 
  * \brief Decides whether two graphs are isomorphic
  * 
+ * </para><para>
  * From Wikipedia: The graph isomorphism problem or GI problem is the
  * graph theory problem of determining whether, given two graphs G1
  * and G2, it is possible to permute (or relabel) the vertices of one
@@ -741,6 +746,7 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
  * \function igraph_isoclass_subgraph
  * \brief The isomorphism class of a subgraph of a graph.
  * 
+ * </para><para>
  * This function is only implemented for subgraphs with three or four
  * vertices.
  * \param graph The graph object.
@@ -820,6 +826,7 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
  * \function igraph_isoclass_create
  * \brief Creates a graph from the given isomorphism class.
  *
+ * </para><para>
  * This function is implemented only for graphs with three or four
  * vertices. 
  * \param graph Pointer to an uninitialized graph object.

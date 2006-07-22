@@ -679,6 +679,7 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
  * \brief Creates a full graph (directed or undirected, with or
  * without loops). 
  * 
+ * </para><para>
  * In a full graph every possible edge is present, every vertex is
  * connected to every other vertex. 
  * 

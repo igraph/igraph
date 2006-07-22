@@ -48,6 +48,7 @@
  * \function igraph_read_graph_edgelist
  * \brief Reads an edge list from a file and creates a graph.
  * 
+ * </para><para>
  * This format is simply a series of even number integers separated by
  * whitespace. The one edge (ie. two integers) per line format is thus
  * not required (but recommended for readability). Edges of directed
@@ -130,6 +131,7 @@ igraph_trie_t *igraph_ncol_trie=0;
  * useful for creating graphs from \quote named\endquote (and
  * optionally weighted) edge lists. 
  * 
+ * </para><para>
  * This format is used by the Large Graph Layout program
  * (http://bioinformatics.icmb.utexas.edu/lgl/), and it is simply a
  * symbolic weighted edge list. It is a simple text file with one edge
@@ -140,6 +142,7 @@ igraph_trie_t *igraph_ncol_trie=0;
  * scientific notation. If there is no weight specified to an edge it
  * is assumed to be zero.
  *
+ * </para><para>
  * The resulting graph is always undirected.
  * LGL cannot deal with files which contain multiple or loop edges, 
  * this is however not checked here, as \a igraph is happy with
@@ -275,6 +278,7 @@ igraph_trie_t *igraph_lgl_trie=0;
  * \function igraph_read_graph_lgl
  * \brief Reads a graph from an <code>.lgl</code> file
  * 
+ * </para><para>
  * The <code>.lgl</code> format is used by the Large Graph
  * Layout visualization software
  * (http://bioinformatics.icmb.utexas.edu/lgl/), it can 
@@ -294,6 +298,7 @@ vertex3name [optionalWeight] \endverbatim
  * '#'.  Then each vertex that shares an edge with that vertex is
  * listed one per line on subsequent lines.</para> \endblockquote
  * 
+ * </para><para>
  * LGL cannot handle loop and multiple edges or directed graphs, but
  * in \a igraph it is not an error to have multiple and loop edges.
  * \param graph Pointer to an uninitialized graph object.
@@ -836,6 +841,7 @@ static xmlSAXHandler igraph_i_graphml_sax_handler={
  * \function igraph_read_graph_graphml
  * \brief Reads a graph from a GraphML file.
  * 
+ * </para><para>
  * GraphML is an XML-based file format for representing various types of
  * graphs. Currently only the most basic import functionality is implemented
  * in igraph: it can read GraphML files without nested graphs and hyperedges.
@@ -908,6 +914,7 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
  * \function igraph_write_graph_edgelist
  * \brief Writes the edge list of a graph to a file.
  * 
+ * </para><para>
  * One edge is written per line, separated by a single space.
  * For directed graphs edges are written in from, to order.
  * \param graph The graph object to write.
@@ -953,9 +960,11 @@ int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
  * \function igraph_write_graph_ncol
  * \brief Writes the graph to a file in <code>.ncol</code> format
  * 
+ * </para><para>
  * <code>.ncol</code> is a format used by LGL, see \ref
  * igraph_read_graph_ncol() for details. 
  * 
+ * </para><para>
  * Note that having multiple or loop edges in an
  * <code>.ncol</code> file breaks the  LGL software but 
  * \a igraph does not check for this condition. 
@@ -1127,9 +1136,11 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
  * \function igraph_write_graph_lgl
  * \brief Writes the graph to a file in <code>.lgl</code> format
  *
+ * </para><para>
  * <code>.lgl</code> is a format used by LGL, see \ref
  * igraph_read_graph_lgl() for details.
  *
+ * </para><para>
  * Note that having multiple or loop edges in an
  * <code>.lgl</code> file breaks the  LGL software but \a igraph
  * does not check for this condition. 
@@ -1357,10 +1368,12 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
  * \function igraph_write_graph_graphml
  * \brief Writes the graph to a file in GraphML format
  *
+ * </para><para>
  * GraphML is an XML-based file format for representing various types of
  * graphs. See the GraphML Primer (<ulink>http://graphml.graphdrawing.org/primer/graphml-primer.html</ulink>)
  * for detailed format description.
  * 
+ * </para><para>
  * No attributes are written at present.
  *
  * \param graph The graph to write. 

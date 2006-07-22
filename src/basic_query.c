@@ -38,6 +38,7 @@
  * 
  * The function is of course symmetric for undirected graphs.
  *
+ * </para><para>
  * Time complexity: O(d),
  * d is the
  * out-degree of \p v1.

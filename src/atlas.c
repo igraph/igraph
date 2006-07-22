@@ -28,6 +28,7 @@
  * \function igraph_atlas
  * \brief Create a small graph from the \quote Graph Atlas \endquote.
  * 
+ * </para><para>
  * The number of the graph is given as a parameter. 
  * The graphs are listed: \olist
  *      \oli in increasing order of number of nodes;
@@ -39,9 +40,11 @@
  *           automorphisms.
  *      \endolist
  *
+ * </para><para>
  * The data was converted from the networkx software package, 
  * see http://networkx.lanl.gov.
  * 
+ * </para><para>
  * See \emb An Atlas of Graphs \eme by Ronald C. Read and Robin J. Wilson, 
  * Oxford University Press, 1998.
  * 
