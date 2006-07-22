@@ -11,6 +11,7 @@
 
 <section><title>Deterministic Graph Generators</title>
 <!-- doxrox-include igraph_create -->
+<!-- doxrox-include igraph_small -->
 <!-- doxrox-include igraph_adjacency -->
 <!-- doxrox-include igraph_star -->
 <!-- doxrox-include igraph_lattice -->

@@ -756,6 +756,34 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
   return 0;
 }
 
+/**
+ * \function igraph_small
+ * \brief Shortand to create a short graph, giving the edges as agruments
+ * 
+ * </para><para>
+ * This function is handy when a relatively small graph needs to be created. 
+ * Instead giving the edges in vector, they are given simply as
+ * arguments and a '-1' needs to be given after the last meaningful
+ * edge argument. 
+ * 
+ * </para><para>Note that only graphs which have vertices less than
+ * the highest value of the 'int' type can be created this way. If you
+ * give larger values then the result is undefined.
+ * 
+ * \param graph Pointer to an uninitialized graph object, the result
+ *        will be stored here.
+ * \param n The number of vertices in the graph, an integer.
+ * \param directed Logical constant, gives whether the graph should be
+ *        directed. 
+ * \param ... The additional arguments giving the edges of the
+ *        graph. Don't forget to supply an additional '-1' after the last
+ *        (meaningful) argument.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges in the graph to create.
+ */
+
 int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, 
 		 ...) {
   igraph_vector_t edges;
