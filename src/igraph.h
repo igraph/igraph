@@ -672,15 +672,20 @@ igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 /* Graph operators                                    */
 /* -------------------------------------------------- */
 
-int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right);
-int igraph_disjoint_union_many(igraph_t *res, igraph_vector_ptr_t *graphs);
-int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right);
-int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs);
-int igraph_intersection(igraph_t *res, igraph_t *left, igraph_t *right);
-int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs);
-int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub);
-int igraph_complementer(igraph_t *res, igraph_t *graph, igraph_bool_t loops);
-int igraph_compose(igraph_t *res, igraph_t *g1, igraph_t *g2);
+int igraph_disjoint_union(igraph_t *res, 
+			  const igraph_t *left, const igraph_t *right);
+int igraph_disjoint_union_many(igraph_t *res, 
+			       const igraph_vector_ptr_t *graphs);
+int igraph_union(igraph_t *res, const igraph_t *left, const igraph_t *right);
+int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs);
+int igraph_intersection(igraph_t *res, 
+			const igraph_t *left, const igraph_t *right);
+int igraph_intersection_many(igraph_t *res, const igraph_vector_ptr_t *graphs);
+int igraph_difference(igraph_t *res, 
+		      const igraph_t *orig, const igraph_t *sub);
+int igraph_complementer(igraph_t *res, const igraph_t *graph, 
+			igraph_bool_t loops);
+int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */

@@ -27,9 +27,38 @@
 
 /**
  * \function igraph_disjoint_union
+ * \brief Creates the union of two disjoint graphs
+ *
+ * </para><para>
+ * First the vertices of the second graph will be relabeled with new
+ * vertex ids to have two disjoint sets of vertex ids, then the union
+ * of the two graphs will be formed.
+ * If the two graphs have |V1| and |V2| vertices and |E1| and |E2|
+ * edges respectively then the new graph will have |V1|+|V2| vertices
+ * and |E1|+|E2| edges. 
+ *
+ * </para><para>
+ * Both graphs need to have the same directedness, ie. either both
+ * directed or both undirected.
+ * 
+ * </para><para>
+ * The current version of this function cannot handle graph, vertex
+ * and edge attributes, they will be lost.
+ *
+ * \param res  Pointer to an uninitialized graph object, the result
+ *        will stored here.
+ * \param left The first graph.
+ * \param right The second graph.
+ * \return Error code.
+ * \sa \ref igraph_disjoint_union_many() for creating the disjoint union
+ * of more than two graphs, \ref igraph_union() for non-disjoint
+ * union.
+ * 
+ * Time complexity: O(|V1|+|V2|+|E1|+|E2|).
  */
 
-int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right) {
+int igraph_disjoint_union(igraph_t *res, const igraph_t *left, 
+			  const igraph_t *right) {
 
   long int no_of_nodes_left=igraph_vcount(left);
   long int no_of_nodes_right=igraph_vcount(right);
@@ -66,7 +95,39 @@ int igraph_disjoint_union(igraph_t *res, igraph_t *left, igraph_t *right) {
   return 0;
 }
 
-int igraph_disjoint_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
+/**
+ * \function igraph_disjoint_union_many
+ * The disjint union of many graphs.
+ *
+ * </para><para>
+ * First the vertices in the graphs will be relabed with new vertex
+ * ids to have pairwise disjoint vertex id sets and then the union of
+ * the graphs is formed.
+ * The number of vertices and edges in the result is the total number
+ * of vertices and edges in the graphs.
+ * 
+ * </para><para>
+ * Both graphs need to have the same directedness, ie. either both
+ * directed or both undirected.
+ * 
+ * </para><para>
+ * The current version of this function cannot handle graph, vertex
+ * and edge attributes, they will be lost.
+ *
+ * \param res Pointer to an uninitialized graph object, the result of
+ *        the operation will be stored here.
+ * \param graphs Pointer vector, contains pointers to initialized
+ *        graph objects.
+ * \return Error code.
+ * \sa \ref igraph_disjoint_union() for an easier syntax if you have
+ * only two graphs, \ref igraph_union_many() for non-disjoint union.
+ *
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges in the result.
+ */
+
+int igraph_disjoint_union_many(igraph_t *res, 
+			       const igraph_vector_ptr_t *graphs) {
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
   igraph_bool_t directed=1;
   igraph_vector_t edges;
@@ -110,7 +171,31 @@ int igraph_disjoint_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   return 0;
 }
 
-int igraph_intersection(igraph_t *res, igraph_t *left, igraph_t *right) {
+/**
+ * \function igraph_intersection
+ * \brief Collect the common edges from two graphs.
+ * 
+ * </para><para>
+ * The result graph contains only edges present both in the first and
+ * the second graph. The number of vertices in the result graph is the
+ * same as the larger from the two arguments.
+ * 
+ * \param res Pointer to an uninitialized graph object. This will
+ * contain the result of the operation.
+ * \param left The first operand, a graph object.
+ * \param right The second operand, a graph object.
+ * \return Error code.
+ * \sa \ref igraph_intersection_many() to calculate the intersection
+ * of many graphs at once, \ref igraph_union(), \ref
+ * igraph_difference() for other operators.
+ * 
+ * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of nodes in
+ * the smaller graph of the two, d is the average degree in the two graphs, |E|
+ * is the number of edges in the smaller graph.
+ */
+
+int igraph_intersection(igraph_t *res,
+			const igraph_t *left, const igraph_t *right) {
   
   long int no_of_nodes_left=igraph_vcount(left);
   long int no_of_nodes_right=igraph_vcount(right);
@@ -183,7 +268,35 @@ void igraph_i_intersection_many_free(igraph_vector_ptr_t *v) {
   igraph_vector_ptr_destroy(v);
 }
 
-int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
+/**
+ * \function igraph_intersection_many
+ * \brief The intersection of more than two graphs.
+ * 
+ * </para><para> 
+ * This function calculates the intersection of the graphs stored in
+ * the \c graphs argument. Only those edges will be included in the
+ * result graph which are part of every graph in \c graphs.
+ *
+ * </para><para>
+ * The number of vertices in the result graph will be the maximum
+ * number of vertices in the argument graphs.
+ *
+ * \param res Pointer to an uninitialized graph object, the result of
+ *        the operation will be stored here.
+ * \param graphs Pointer vector, contains pointers to graphs objects,
+ *        the operands of the intersection operator.
+ * \return Error code.
+ * \sa \ref igraph_intersection() for the intersection of two graphs, 
+ * \ref igraph_union_many(), \ref igraph_union() and \ref
+ * igraph_difference() for other operators.
+ * 
+ * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of vertices
+ * in the smallest graph, d is the average degree in the graphs, |E|
+ * is the number of edges in the smallest graph.
+ */
+
+int igraph_intersection_many(igraph_t *res, 
+			     const igraph_vector_ptr_t *graphs) {
 
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
   long int no_of_nodes=0;
@@ -316,7 +429,31 @@ int igraph_intersection_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   return 0;
 }
 
-int igraph_union(igraph_t *res, igraph_t *left, igraph_t *right) {
+/**
+ * \function igraph_union
+ * \brief Calculates the union of two graphs.
+ * 
+ * </para><para>
+ * The number of vertices in the result is that of the larger graph
+ * from the two arguments. The result graph contains edges which are
+ * present in at least one of the operand graphs.
+ * 
+ * \param res Pointer to an uninitialized graph object, the result
+ *        will be stored here.
+ * \param left The first graph.
+ * \param right The second graph.
+ * \return Error code.
+ * \sa \ref igraph_union_many() for the union of many graphs, 
+ * \ref igraph_intersection() and \ref igraph_difference() for other
+ * operators. 
+ * 
+ * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of
+ * vertices, |E| the number of edges in the result graph and d is the
+ * average degree in the two operands.
+ */
+
+int igraph_union(igraph_t *res, 
+		 const igraph_t *left, const igraph_t *right) {
   
   long int no_of_nodes_left=igraph_vcount(left);
   long int no_of_nodes_right=igraph_vcount(right);
@@ -395,7 +532,34 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
   igraph_vector_ptr_destroy(v);
 }
 
-int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
+/**
+ * \function igraph_union_many
+ * \brief Creates the union of many graphs.
+ * 
+ * </para><para> 
+ * The result graph will contain as many vertices as the largest graph
+ * among the agruments does, and an edge will be included in it if it
+ * is part of at least one operand graph.
+ * 
+ * </para><para>
+ * The directedness of the operand graphs must be the same.
+ * 
+ * \param res Pointer to an uninitialized graph object, this will
+ *        contain the result.
+ * \param graphs Pointer vector, contains pointers to the operands of
+ *        the union operator, graph objects of course.
+ * \return Error code.
+ * \sa \ref igraph_union() for the union of two graphs, \ref
+ * igraph_intersection_many(), \ref igraph_intersection() and \ref
+ * igraph_difference for other operators.
+ * 
+ * 
+ * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of vertices
+ * in largest graph, d is the average degree in the graphs and |E| is
+ * the number of edges in the result graph.
+ */
+
+int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
   
   long int no_of_graphs=igraph_vector_ptr_size(graphs);
   long int no_of_nodes=0;
@@ -429,7 +593,7 @@ int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   /* Init neighbor vectors */
   if (no_of_graphs != 0) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&neivects, no_of_graphs));
-    IGRAPH_FINALLY(igraph_i_intersection_many_free, &neivects);
+    IGRAPH_FINALLY(igraph_i_union_many_free, &neivects);
   }
   for (i=0; i<no_of_graphs; i++) {
     VECTOR(neivects)[i]=Calloc(1, igraph_vector_t);
@@ -513,7 +677,31 @@ int igraph_union_many(igraph_t *res, igraph_vector_ptr_t *graphs) {
   return 0;
 }
 
-int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub) {
+/**
+ * \function igraph_difference
+ * \brief Calculate the difference of two graphs
+ * 
+ * </para><para>
+ * The number of vertices in the result is the number of vertices in
+ * the original graph, ie. the left, first operand. In the results
+ * graph only edges will be included from \c orig which are not
+ * present in \c sub.
+ * 
+ * \param res Pointer to an uninitialized graph object, the result
+ * will be stored here.
+ * \param orig The left operand of the operator, a graph object.
+ * \param sub The right operand of the operator, a graph object.
+ * \return Error code.
+ * \sa \ref igraph_intersection() and \ref igraph_union() for other
+ * operators.
+ * 
+ * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number vertices in
+ * the smaller graph, d is the average degree in the graph, |E| is the
+ * number of edges in the result graph.
+ */
+
+int igraph_difference(igraph_t *res, 
+		      const igraph_t *orig, const igraph_t *sub) {
   long int no_of_nodes_orig=igraph_vcount(orig);
   long int no_of_nodes_sub =igraph_vcount(sub);
   long int no_of_nodes=no_of_nodes_orig;
@@ -592,7 +780,28 @@ int igraph_difference(igraph_t *res, igraph_t *orig, igraph_t *sub) {
   return 0;
 }
 
-int igraph_complementer(igraph_t *res, igraph_t *graph, igraph_bool_t loops) {
+/**
+ * \function igraph_complementer
+ * \brief Create the complementer of a graph
+ * 
+ * </para><para>The complementer graph means that all edges which are
+ * not part of the original graph will be included in the result.
+ * 
+ * \param res Pointer to an uninitialized graph object.
+ * \param graph The original graph.
+ * \param loops Whether to add loop edges to the complementer graph. 
+ * \return Error code.
+ * \sa \ref igraph_union(), \ref igraph_intersection() and \ref
+ * igraph_difference().
+ * 
+ * Time complexity: O(|V|*d*log(d)+|E1|+|E2|), |V| is the number of
+ * vertices in the graph, d is the average degree in the original
+ * graph, |E1| is the number of edges in the original and |E2| in the
+ * complementer graph.
+ */
+
+int igraph_complementer(igraph_t *res, const igraph_t *graph, 
+			igraph_bool_t loops) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t edges;
@@ -644,7 +853,35 @@ int igraph_complementer(igraph_t *res, igraph_t *graph, igraph_bool_t loops) {
   return 0;
 }
 
-int igraph_compose(igraph_t *res, igraph_t *g1, igraph_t *g2) {
+/**
+ * \function igraph_compose
+ * \brief Calculates the composition of two graphs
+ * 
+ * The composition of graphs contains the same number of vertices as
+ * the bigger graph of the two operands. It contains an (i,j) edge if
+ * and only if there is a k vertex, such that the first graphs
+ * contains an (i,k) edge and the second graph a (k,j) edge. 
+ * 
+ * </para><para>This is of course exactly the composition of two
+ * binary relations.
+ *
+ * </para><para>Two two graphs must have the same directedness,
+ * otherwise the function returns with an error message.
+ * Note that for undirected graphs the two relations are by definition
+ * symmetric. 
+ * 
+ * \param res Pointer to an uninitialized graph object, the result
+ *        will be stored here.
+ * \param g1 The firs operarand, a graph object.
+ * \param g2 The second operand, another graph object.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|*d1*d2), |V| is the number of vertices in the
+ * first graph, d1 and d2 the average degree in the first and second
+ * graphs. 
+ */
+
+int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2) {
   
   long int no_of_nodes_left=igraph_vcount(g1);
   long int no_of_nodes_right=igraph_vcount(g2);

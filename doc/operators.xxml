@@ -8,5 +8,13 @@
 <title>Graph Operators</title>
 
 <!-- doxrox-include igraph_disjoint_union -->
+<!-- doxrox-include igraph_disjoint_union_many -->
+<!-- doxrox-include igraph_union -->
+<!-- doxrox-include igraph_union_many -->
+<!-- doxrox-include igraph_intersection -->
+<!-- doxrox-include igraph_intersection_many -->
+<!-- doxrox-include igraph_difference -->
+<!-- doxrox-include igraph_complementer -->
+<!-- doxrox-include igraph_compose -->
 
 </chapter>
