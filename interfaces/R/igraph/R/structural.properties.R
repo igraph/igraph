@@ -325,3 +325,17 @@ constraint <- function(graph, nodes=V(graph)) {
   .Call("R_igraph_constraint", graph, as.igraph.vs(nodes),
         PACKAGE="igraph")
 }
+
+page.rank <- function(graph, nodes=V(graph), directed=is.directed(graph),
+                      niter=1000, eps=0.001, damping=0.85) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  .Call("R_igraph_pagerank", graph, as.igraph.vs(nodes), as.logical(directed),
+        as.numeric(niter), as.numeric(eps), as.numeric(damping),
+        PACKAGE="igraph")
+}
+
+
