@@ -6,6 +6,11 @@
 	* interfaces/R/igraph/R/structural.properties.R (reciprocity) : added
 	* interfaces/R/src/rinterface.c (R_igraph_reciprocity) : added	
 
+	* interfaces/R/igraph/R/layout.R (layout.reingold.tilford) : added
+	* interfaces/R/igraph/R/tkplot.R : added Reingold-Tilford layout to menu
+	* interfaces/R/src/rinterface.c (R_igraph_layout_reingold_tilford) : 
+	added
+	
 2006-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c : updated, 'attr' attribute removed.

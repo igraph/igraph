@@ -69,7 +69,8 @@ export(read.graph, write.graph)
 
 export(layout.random, layout.circle, layout.fruchterman.reingold,
        layout.spring, layout.kamada.kawai, layout.lgl,
-       layout.fruchterman.reingold.grid, layout.sphere, layout.merge)
+       layout.fruchterman.reingold.grid, layout.sphere, layout.merge,
+       layout.reingold.tilford)
 
 
 # structural properties

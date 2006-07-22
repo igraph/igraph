@@ -177,6 +177,21 @@ layout.lgl <- function(graph, ..., params=list()) {
         PACKAGE="igraph")
 }
 
+layout.reingold.tilford <- function(graph, ..., params=list()) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (length(params)==0) {
+    params <- list(...)
+  }
+
+  if (is.null(params$root)) { params$root <- 0 }
+
+  .Call("R_igraph_layout_reingold_tilford", graph, as.double(params$root),
+        PACKAGE="igraph")
+}
+
 layout.merge <- function(graphs, layouts, method="dla",
                          verbose=igraph.par("verbose")) {
 

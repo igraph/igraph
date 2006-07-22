@@ -448,7 +448,16 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                          )
                        )
                   )
-                         
+.tkplot.addlayout("reingold.tilford",
+                  list(names="Reingold-Tilford",
+                       f=layout.reingold.tilford,
+                       params=list(
+                         root=list(name="Root vertex",
+                           type="numeric",
+                           default=0)
+                         )
+                       )
+                  )
                        
 ###################################################################
 # Other public functions, misc.
