@@ -1,3 +1,15 @@
+2006-07-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexededgelist.c (igraph_get_eids) : added
+
+	* src/iterators.c (igraph_es_multipairs, igraph_i_eit_multipairs) :
+	added
+	(igraph_es_destroy, igraph_eit_create) : added MULTIPAIRS
+	
+	* src/structural_properties.c (igraph_simplify) : several bugs 
+	eliminated, updated to use MULTIPAIRS
+	* examples/simple/igraph_simplify.c : added
+
 2006-07-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/operators.c (igraph_union_many) : free bug corrected

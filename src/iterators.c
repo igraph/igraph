@@ -891,6 +891,22 @@ int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
   return 0;
 }
 
+int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
+			 igraph_bool_t directed) {
+  es->type=IGRAPH_ES_MULTIPAIRS;
+  es->data.path.mode=directed;
+  es->data.path.ptr=Calloc(1, igraph_vector_t);
+  if (es->data.path.ptr==0) {
+    IGRAPH_ERROR("Cannor create edge selector", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) es->data.path.ptr);
+  
+  IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*) es->data.path.ptr, v));
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v, 
 		   igraph_bool_t directed) {
   es->type=IGRAPH_ES_PATH;
@@ -971,6 +987,7 @@ void igraph_es_destroy(igraph_es_t *es) {
     break;
   case IGRAPH_ES_PAIRS:
   case IGRAPH_ES_PATH:
+  case IGRAPH_ES_MULTIPAIRS:
     igraph_vector_destroy((igraph_vector_t*)es->data.path.ptr);
     Free(es->data.path.ptr);
     break;
@@ -1105,6 +1122,38 @@ int igraph_i_eit_pairs(const igraph_t *graph,
   return 0;
 }
 
+int igraph_i_eit_multipairs(const igraph_t *graph,
+			    igraph_es_t es, igraph_eit_t *eit) {
+  long int n=igraph_vector_size(es.data.path.ptr);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  
+  if (n % 2 != 0) {
+    IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
+		 IGRAPH_EINVAL);
+  }
+  if (!igraph_vector_isininterval(es.data.path.ptr, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_EINVVID);
+  }
+
+  eit->type=IGRAPH_EIT_VECTOR;
+  eit->pos=0;
+  eit->start=0;
+  eit->end=n/2;
+  eit->vec=Calloc(1, igraph_vector_t);
+  if (eit->vec==0) {
+    IGRAPH_ERROR("Cannot create edge iterator", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)eit->vec);
+  IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t*)eit->vec, n/2);
+  
+  IGRAPH_CHECK(igraph_get_eids(graph, (igraph_vector_t *) eit->vec,
+			       es.data.path.ptr, es.data.path.mode));
+  
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
 int igraph_i_eit_path(const igraph_t *graph, 
 		      igraph_es_t es, igraph_eit_t *eit) {
   long int n=igraph_vector_size(es.data.path.ptr);
@@ -1233,6 +1282,9 @@ int igraph_eit_create(const igraph_t *graph,
     break;
   case IGRAPH_ES_PAIRS:
     IGRAPH_CHECK(igraph_i_eit_pairs(graph, es, eit));
+    break;
+  case IGRAPH_ES_MULTIPAIRS:
+    IGRAPH_CHECK(igraph_i_eit_multipairs(graph, es, eit));
     break;
   case IGRAPH_ES_PATH:
     IGRAPH_CHECK(igraph_i_eit_path(graph, es, eit));

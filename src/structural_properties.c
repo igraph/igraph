@@ -1954,38 +1954,78 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j;
   igraph_es_t es;
+  igraph_bool_t directed=igraph_is_directed(graph);
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
-  for (i=0; i<no_of_nodes; i++) {
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-
-    IGRAPH_ALLOW_INTERRUPTION();
-	
-    if (loops) {
-      for (j=0; j<igraph_vector_size(&neis); j++) {
-	if (VECTOR(neis)[j]==i) {
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+  if (directed) { 
+    for (i=0; i<no_of_nodes; i++) {
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      if (loops) {
+	for (j=0; j<igraph_vector_size(&neis); j++) {
+	  if (VECTOR(neis)[j]==i) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  }
+	}
+      } /* if loops */
+      
+      if (multiple) {
+	igraph_vector_sort(&neis);
+	for (j=1; j<igraph_vector_size(&neis); j++) {
+	  if (VECTOR(neis)[j]==VECTOR(neis)[j-1] && 
+	      (!loops || VECTOR(neis)[j] != i) ) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(neis)[j]));
+	  }
 	}
       }
-    } /* if loops */
-    
-    if (multiple) {
-      igraph_vector_sort(&neis);
-      for (j=1; j<igraph_vector_size(&neis); j++) {
-	if (VECTOR(neis)[j]==VECTOR(neis)[j-1]) {
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(neis)[j]));
+    }
+  } else { 			/* not directed */
+    for (i=0; i<no_of_nodes; i++) {
+      int flip=0;
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      if (loops) {
+	for (j=0; j<igraph_vector_size(&neis); j++) {
+	  if (VECTOR(neis)[j]==i) {
+	    flip=1-flip;
+	    if (flip==0) {
+	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	    }
+	  }
+	}
+      } /* if loops */
+      
+      if (multiple) {
+	igraph_vector_sort(&neis);
+	for (j=1; j<igraph_vector_size(&neis); j++) {
+	  if (VECTOR(neis)[j] > i && VECTOR(neis)[j]==VECTOR(neis)[j-1]) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(neis)[j]));
+	  }
+	  if (VECTOR(neis)[j]==i && VECTOR(neis)[j-1]==i && !loops) {
+	    flip=1-flip;
+	    if (flip==0) {
+	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	    }
+	  }
 	}
       }
     }
   }
-
+    
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(1);
-  IGRAPH_CHECK(igraph_es_pairs(&es, &edges, IGRAPH_DIRECTED));
+  IGRAPH_CHECK(igraph_es_multipairs(&es, &edges, IGRAPH_DIRECTED));
   IGRAPH_FINALLY(igraph_es_destroy, &es);
   IGRAPH_CHECK(igraph_delete_edges(graph, es));
   igraph_es_destroy(&es);

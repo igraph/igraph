@@ -243,6 +243,7 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v);
 #define IGRAPH_ES_SEQ       8
 #define IGRAPH_ES_PAIRS     9
 #define IGRAPH_ES_PATH      10
+#define IGRAPH_ES_MULTIPAIRS 11
 
 typedef struct igraph_es_t {
   int type;
@@ -291,6 +292,9 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v, 
 		    igraph_bool_t directed);
 int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...);
+
+int igraph_es_multipairs(igraph_es_t *es, const igraph_vector_t *v,
+			 igraph_bool_t directed);
 
 int igraph_es_path(igraph_es_t *es, const igraph_vector_t *v, 
 		   igraph_bool_t directed);
@@ -359,6 +363,8 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
 int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 		   igraph_integer_t from, igraph_integer_t to,
 		   igraph_bool_t directed);
+int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
+		    const igraph_vector_t *pairs, igraph_bool_t directed);
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
 		    igraph_neimode_t mode);
 

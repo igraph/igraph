@@ -939,6 +939,83 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 }
 
 
+int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
+		    const igraph_vector_t *pairs, igraph_bool_t directed) {
+  long int n=igraph_vector_size(pairs);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_bool_t *seen;
+  long int i, j;
+    
+  if (n % 2 != 0) {
+    IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
+		 IGRAPH_EINVAL);
+  }
+  if (!igraph_vector_isininterval(pairs, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
+  }
+
+  seen=Calloc(no_of_edges, igraph_bool_t);
+  if (seen==0) {
+    IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, seen);
+  IGRAPH_CHECK(igraph_vector_resize(eids, n));
+  
+  if (igraph_is_directed(graph) && directed) {
+    for (i=0; i<n/2; i++) {
+      long int from=VECTOR(*pairs)[2*i];
+      long int to=VECTOR(*pairs)[2*i+1];
+      long int start=VECTOR(graph->os)[from];
+      long int end=VECTOR(graph->os)[from+1];
+      for (j=start; j<end; j++) {
+	long int e=VECTOR(graph->oi)[j];
+	if (!seen[e] && to==VECTOR(graph->to)[e]) {
+	  VECTOR(*eids)[i]=e;
+	  seen[e]=1;
+	  break;
+	}
+      }
+      if (j==end) {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  } else {
+    for (i=0; i<n/2; i++) {
+      long int from=VECTOR(*pairs)[2*i];
+      long int to=VECTOR(*pairs)[2*i+1];
+      long int start=VECTOR(graph->os)[from];
+      long int end=VECTOR(graph->os)[from+1];
+      for (j=start; j<end; j++) {
+	long int e=VECTOR(graph->oi)[j];
+	if (!seen[e] && to==VECTOR(graph->to)[e]) {
+	  VECTOR(*eids)[i]=e;
+	  seen[e]=1;
+	  break;
+	}
+      }
+      if (j!=end) { continue; } /* Already found it */
+      start=VECTOR(graph->is)[from];
+      end=VECTOR(graph->is)[from+1];
+      for (j=start; j<end; j++) {
+	long int e=VECTOR(graph->ii)[j];
+	if (!seen[e] && to==VECTOR(graph->from)[e]) {
+	  VECTOR(*eids)[i]=e;
+	  seen[e]=1;
+	  break;
+	}
+      }
+      if (j==end) {
+	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
+      }
+    }
+  }
+  
+  Free(seen);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 /**
  * \function igraph_adjacent
  * \brief Gives the adjacent edges of a vertex.
