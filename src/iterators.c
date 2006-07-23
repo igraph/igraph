@@ -811,7 +811,7 @@ int igraph_es_fromto(igraph_es_t *es,
  * \return Error code.
  * \sa \ref igraph_ess_seq()
  * 
- * Time complecity: O(1).
+ * Time complexity: O(1).
  */
 
 int igraph_es_seq(igraph_es_t *es, 

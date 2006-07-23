@@ -15,6 +15,7 @@ o write Pajek file
 o read and write non-structural info from/to GraphML files
 o Add Python interface to igraph_callaway_traits_game,
   igraph_barabasi_aging_game, igraph_recent_degree_aging_game
+o Add Python edge/vertex selector support
 
 Other bits:
 

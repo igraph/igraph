@@ -427,36 +427,41 @@ PyObject* igraphmodule_Graph_delete_edges(igraphmodule_GraphObject *self,
 						 PyObject *args,
 						 PyObject *kwds) 
 {
-   PyObject *list;
-   igraph_vector_t v;
-
-   if (!PyArg_ParseTuple(args, "O", &list)) return NULL;
-   Py_INCREF(list);
+  PyObject *list;
+  igraph_vector_t v, v2;
+  igraph_es_t es;
+  int i;
+  
+  if (!PyArg_ParseTuple(args, "O", &list)) return NULL;
+  Py_INCREF(list);
    
-   if (igraphmodule_PyList_to_vector_t(list, &v, 1, 1))
-     {
-	// something bad happened during conversion, release the
-	// list reference and return immediately
-	Py_DECREF(list);
-	return NULL;
-     }
+  if (igraphmodule_PyList_to_vector_t(list, &v, 1, 1)) {
+    /* something bad happened during conversion, release the
+       list reference and return immediately */
+    Py_DECREF(list);
+    return NULL;
+  }
    
-   // do the hard work :)
-   if (igraph_delete_edges(&self->g, &v)) 
-     {
-	igraphmodule_handle_igraph_error();
-	Py_DECREF(list);
-	igraph_vector_destroy(&v);
-	return NULL;
-     }
+  /* do the hard work :) */
+  if (igraph_es_pairs(&es, &v, IGRAPH_DIRECTED)) {
+    igraphmodule_handle_igraph_error();
+    Py_DECREF(list);
+    igraph_vector_destroy(&v);
+    return NULL;
+  }
+  if (igraph_delete_edges(&self->g, es)) {
+    igraphmodule_handle_igraph_error();
+    Py_DECREF(list);
+    igraph_vector_destroy(&v);
+    return NULL;
+  }
    
-   Py_DECREF(list);
+  Py_DECREF(list);
+  Py_INCREF(self);
    
-   Py_INCREF(self);
+  igraph_vector_destroy(&v);
    
-   igraph_vector_destroy(&v);
-   
-   return (PyObject*)self;
+  return (PyObject*)self;
 }
 
 /** \ingroup python_interface_graph
@@ -785,14 +790,14 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
 {
   igraphmodule_GraphObject *self;
   long n, m=0;
-  float power=0.0;
+  float power=0.0, zeroappeal=0.0;
   igraph_vector_t outseq;
   PyObject *m_obj, *outpref=Py_False, *directed=Py_False;
   
-  char *kwlist[] = {"n", "m", "outpref", "directed", "power", NULL};
+  char *kwlist[] = {"n", "m", "outpref", "directed", "power", "zeroappeal", NULL};
   
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO|OOf", kwlist,
-				   &n, &m_obj, &outpref, &directed, &power))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO|OOff", kwlist,
+				   &n, &m_obj, &outpref, &directed, &power, &zeroappeal))
     return NULL;
   
   if (n<0) {
@@ -832,6 +837,7 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
 					 (igraph_real_t)power,
 					 (igraph_integer_t)m,
 					 &outseq, PyObject_IsTrue(outpref),
+					 (igraph_real_t)zeroappeal,
 					 PyObject_IsTrue(directed))) {
 	igraphmodule_handle_igraph_error();
 	igraph_vector_destroy(&outseq);
@@ -3794,8 +3800,8 @@ PyTypeObject igraphmodule_GraphType = {
   0,                                        /* tp_hash */
   0,                                        /* tp_call */
   (reprfunc)igraphmodule_Graph_str,         /* tp_str */
-  PyObject_GenericGetAttr,                  /* tp_getattro */
-  PyObject_GenericSetAttr,                  /* tp_setattro */
+  0,                                        /* tp_getattro */
+  0,                                        /* tp_setattro */
   0,                                        /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, /* tp_flags */
   "Class representing a graph in the igraph library.",                    /* tp_doc */
@@ -3808,7 +3814,7 @@ PyTypeObject igraphmodule_GraphType = {
   0,                                        /* tp_methods */
   0,                                        /* tp_members */
   0,                                        /* tp_getset */
-  &PyBaseObject_Type,                       /* tp_base */
+  0,                                        /* tp_base */
   0,                                        /* tp_dict */
   0,                                        /* tp_descr_get */
   0,                                        /* tp_descr_set */
