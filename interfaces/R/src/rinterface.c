@@ -3853,5 +3853,23 @@ SEXP R_igraph_layout_reingold_tilford(SEXP graph, SEXP proot) {
   return result;
 }
 
+SEXP R_igraph_rewire(SEXP graph, SEXP pn, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_integer_t n=REAL(pn)[0];
+  igraph_rewiring_t mode=REAL(pmode)[0];
+  SEXP result;
+  
+  R_igraph_before();
 
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_rewire(&g, n, mode);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
   

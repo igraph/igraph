@@ -10,6 +10,9 @@
 	* interfaces/R/igraph/R/tkplot.R : added Reingold-Tilford layout to menu
 	* interfaces/R/src/rinterface.c (R_igraph_layout_reingold_tilford) : 
 	added
+
+	* interfaces/R/igraph/R/structural.properties.R (rewire) : added
+	* interfaces/R/src/rinterface.c (R_igraph_rewire) : added
 	
 2006-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 

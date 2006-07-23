@@ -349,3 +349,16 @@ reciprocity <- function(graph, ignore.loops=TRUE) {
         PACKAGE="igraph")
 }
 
+rewire <- function(graph, mode="simple", niter=100) {
+  
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  
+  if (is.character(mode)) {
+    mode <- switch(mode, "simple"=0)
+  }
+  
+  .Call("R_igraph_rewire", graph, as.numeric(niter), as.numeric(mode),
+        PACKAGE="igraph")
+}
