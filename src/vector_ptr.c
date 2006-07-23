@@ -31,11 +31,46 @@
 #include <stdlib.h>
 
 /**
+ * \section about_igraph_vector_ptr_objects Pointer vectors
+ * (<type>igraph_vector_ptr_t</type>)
+ * 
+ * <para>The \type igraph_vector_ptr_t data type is very similar to
+ * the \type igraph_vector_t type, but it stores generic pointers instead of
+ * real numbers.</para>
+ * 
+ * <para>This type has the same space complexity as \type
+ * igraph_vector_t, and most implemented operations work the same way
+ * as for \type igraph_vector_t. </para>
+ * 
+ * <para>This type is mostly used to pass to or receive from a set of
+ * graphs to some \a igraph functions, such as \ref
+ * igraph_decompose(), which decomposes a graph to connected
+ * components.</para>
+ * 
+ * <para>The same \ref VECTOR macro used for ordinary vectors can be
+ * used for pointer vectors as well, please note that a typeless
+ * generic pointer will be provided by this macro and you may need to
+ * cast it to a specific pointer before starting to work with it.</para>
+ */
+
+
+/**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_init
  * \brief Initialize a poiter vector (constructor).
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * </para><para>
+ * This is the constructor of the pointer vector data type. All
+ * pointer vectors constructed this way should be destroyed via
+ * calling \ref igraph_vector_ptr_destroy().
+ * \param v Pointer to an uninitialized
+ *        <type>igraph_vector_ptr_t</type> object, to be created.
+ * \param size Integer, the size of the pointer vector.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if out of memory
+ * 
+ * Time complexity: operating system dependent, the amount of \quote
+ * time \endquote required to allocate \p size elements.
  */
 
 int igraph_vector_ptr_init      (igraph_vector_ptr_t* v, int long size) {	
@@ -66,7 +101,17 @@ const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_destroy
  * \brief Destroys a pointer vector.
+ * 
+ * </para><para>
+ * The destructor for pointer vectors.
+ * \param v Pointer to the pointer vector to destroy.
+ * 
+ * Time complexity: operating system dependend, the \quote time
+ * \endquote required to deallocate O(n) bytes, n is the number of
+ * elements allocated for the pointer vector (not neccessarily the
+ * number of elements in the vector).
  */
 
 void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v) {
@@ -143,19 +188,40 @@ igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_size
  * \brief Gives the number of elements in the pointer vector.
- * \todo why does the assert fail???
+ * 
+ * \param v The pointer vector object.
+ * \return The size of the object, ie. the number of pointers stored.
+ * 
+ * Time complexity: O(1).
  */
 
 long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v) {
 	assert(v != NULL);
-/* 	assert(v->stor_begin != NULL);		 */
+/* 	assert(v->stor_begin != NULL);		 */ /* TODO */
 	return v->end - v->stor_begin;
 }
 
 /**
  * \ingroup vectorptr
- * \brief Removes all elements in a pointer vector.
+ * \function igraph_vector_ptr_clear
+ * \brief Removes all elements from a pointer vector.
+ * 
+ * </para><para>
+ * This function resizes a pointer to vector to zero length. Note that
+ * the pointed objects are \em not deallocated, you should call
+ * free() on them, or make sure that their allocated memory is freed
+ * in some other way, you'll get memory leaks otherwise.
+ * 
+ * </para><para>
+ * Note that the current implementation of this function does
+ * \em not deallocate the memory required for storing the
+ * pointers, so making a pointer vector smaller this way does not give
+ * back any memory. This behavior might change in the future.
+ * \param v The pointer vector to clear.
+ * 
+ * Time complexity: O(1).
  */
 
 void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v) {
@@ -166,7 +232,18 @@ void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_push_back
  * \brief Appends an elements to the back of a pointer vector.
+ * 
+ * \param v The pointer vector.
+ * \param e The new element to include in the pointer vector.
+ * \return Error code.
+ * \sa igraph_vector_push_back() for the corresponding operation of
+ * the ordinary vector type.
+ * 
+ * Time complexity: O(1) or O(n), n is the number of elements in the
+ * vector. The pointer vector implementation ensures that n subsequent
+ * push_back operations need O(n) time to complete.
  */
 
 int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e) {
@@ -188,7 +265,14 @@ int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_e
  * \brief Access an element of a pointer vector.
+ * 
+ * \param v Pointer to a pointer vector.
+ * \param pos The index of the pointer to return.
+ * \return The pointer at \p pos position.
+ * 
+ * Time complexity: O(1).
  */
 
 void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos) {
@@ -199,7 +283,14 @@ void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_set
  * \brief Assign to an element of a pointer vector.
+ * 
+ * \param v Pointer to a pointer vector.
+ * \param pos The index of the pointer to update.
+ * \param value The new pointer to set in the vector.
+ *
+ * Time complexity: O(1).
  */
 
 void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* value) {
@@ -223,7 +314,19 @@ void igraph_vector_ptr_null      (igraph_vector_ptr_t* v) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_resize
  * \brief Resizes a pointer vector.
+ * 
+ * </para><para>
+ * Note that if a vector is made smaller the pointed object are not
+ * deallocated by this function.
+ * \param v A pointer vector.
+ * \param newsize The new size of the pointer vector.
+ * \return Error code.
+ * 
+ * Time complexity: O(1) if the vector if made smaller. Operating
+ * system dependent otherwise, the amount of \quote time \endquote
+ * needed to allocate the memory for the vector elements.
  */
 
 int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
@@ -236,8 +339,8 @@ int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
  * \ingroup vectorptr
  * \brief Initializes a pointer vector from an array (constructor).
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if out of memory
  */
 
 int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void* *data, long int length) {
@@ -267,16 +370,24 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_copy
  * \brief Copy a pointer vector (constructor).
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
- * \todo why does the assert fail???
+ * </para><para>
+ * This function creates a pointer vector by copying another one. This
+ * is shallow copy, only the pointers in the vector will be copyed.
+ * \param to Pointer to an uninitialized pointer vector object.
+ * \param from A pointer vector object.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM if out of memory
+ * 
+ * Time complexity: O(n) if allocating memory for n elements can be
+ * done in O(n) time.
  */
 
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
   assert(from != NULL);
-/*   assert(from->stor_begin != NULL); */
+/*   assert(from->stor_begin != NULL); */ /* TODO */
   to->stor_begin=Calloc(igraph_vector_ptr_size(from), void*);
   if (to->stor_begin==0) {
     IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);

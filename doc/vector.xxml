@@ -72,4 +72,17 @@
 <!-- doxrox-include igraph_vector_remove_negidx -->
 </section>
 
+<section>
+<!-- doxrox-include about_igraph_vector_ptr_objects -->
+<!-- doxrox-include igraph_vector_ptr_init -->
+<!-- doxrox-include igraph_vector_ptr_copy -->
+<!-- doxrox-include igraph_vector_ptr_destroy -->
+<!-- doxrox-include igraph_vector_ptr_size -->
+<!-- doxrox-include igraph_vector_ptr_clear -->
+<!-- doxrox-include igraph_vector_ptr_push_back -->
+<!-- doxrox-include igraph_vector_ptr_e -->
+<!-- doxrox-include igraph_vector_ptr_set -->
+<!-- doxrox-include igraph_vector_ptr_resize -->
+</section>
+
 </section>

@@ -105,7 +105,7 @@ typedef struct s_vector {
  * 
  * Time complexity: O(1).
  */
-#define VECTOR(v) ((v).stor_begin) /* DIRTY */
+#define VECTOR(v) ((v).stor_begin) 
 int igraph_vector_init      (igraph_vector_t* v, long int size);
 int igraph_vector_init_copy (igraph_vector_t* v, igraph_real_t* data, long int length);
 int igraph_vector_init_seq(igraph_vector_t *v, igraph_real_t from, igraph_real_t to);
