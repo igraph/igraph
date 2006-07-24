@@ -603,13 +603,14 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
   SEXP val=VECTOR_ELT(graph->attr, 2);
   SEXP va=R_igraph_getListElement(val, name);
   igraph_vector_t newvalue;
-  
+
   if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
+  PROTECT(va=AS_NUMERIC(va));
 
   if (igraph_vs_is_all(&vs)) {
-    R_SEXP_to_vector_copy(AS_NUMERIC(va), &newvalue);
+    R_SEXP_to_vector_copy(va, &newvalue);
     igraph_vector_destroy(value);
     *value=newvalue;
   } else {
@@ -628,6 +629,7 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
+  UNPROTECT(1);
   return 0;
 }
 
@@ -675,10 +677,11 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
   SEXP eal=VECTOR_ELT(graph->attr, 3);
   SEXP ea=R_igraph_getListElement(eal, name);
   igraph_vector_t newvalue;
-  
+
   if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
+  PROTECT(ea=AS_NUMERIC(ea));
   
   if (igraph_es_is_all(&es)) {    
     R_SEXP_to_vector_copy(AS_NUMERIC(ea), &newvalue);
@@ -700,6 +703,7 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
+  UNPROTECT(1);
   return 0;
 }
 
@@ -2920,6 +2924,40 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   if (stream==0) { igraph_error("Cannot write edgelist", __FILE__, __LINE__,
 				IGRAPH_EFILE); }
   igraph_write_graph_edgelist(&g, stream);
+  fclose(stream);
+#if HAVE_OPEN_MEMSTREAM == 1
+  PROTECT(result=allocVector(RAWSXP, size));
+  memcpy(RAW(result), bp, sizeof(char)*size);
+  free(bp);
+#else 
+  PROTECT(result=NEW_NUMERIC(0));
+#endif
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_write_graph_pajek(SEXP graph, SEXP file) {
+  
+  igraph_t g;
+  FILE *stream;
+  char *bp;
+  size_t size;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+#if HAVE_OPEN_MEMSTREAM == 1
+  stream=open_memstream(&bp, &size);
+#else
+  stream=fopen(CHAR(STRING_ELT(file, 0)), "w");
+#endif
+  if (stream==0) { igraph_error("Cannot write oajek file", __FILE__, __LINE__,
+				IGRAPH_EFILE); }
+  igraph_write_graph_pajek(&g, stream);
   fclose(stream);
 #if HAVE_OPEN_MEMSTREAM == 1
   PROTECT(result=allocVector(RAWSXP, size));

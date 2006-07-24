@@ -1,3 +1,13 @@
+2006-07-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (write.graph) : added pajek format
+	(write.graph.pajek) : added
+	* interfaces/R/src/rinterface.c (R_igraph_write_graph_pajek) : added
+
+	* interfaces/R/src/rinterface.c 
+	(R_igraph_attribute_get_numeric_vertex_attr)
+	(R_igraph_attribute_get_numeric_edge_attr) : convert to NUMERIC
+
 2006-07-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (page.rank) : added

@@ -31,6 +31,12 @@ AT_KEYWORDS([igraph_read_graph_graphml igraph_write_graph_graphml foreign graphm
 AT_COMPILE_CHECK([simple/graphml.c], [simple/graphml.out], [simple/test.gxl])
 AT_CLEANUP
 
+AT_SETUP([Writing Pajek (igraph_write_graph_pajek):])
+AT_KEYWORDS([igraph_write_graph_pajek foreign pajek])
+AT_COMPILE_CHECK([simple/igraph_write_graph_pajek.c], 
+ 		 [simple/igraph_write_graph_pajek.out])
+AT_CLEANUP
+
 AT_SETUP([Reading an LGL file (igraph_read_graph_lgl):])
 AT_KEYWORDS([igraph_read_graph_lgl LGL foreign])
 AT_COMPILE_CHECK([simple/igraph_read_graph_lgl.c],

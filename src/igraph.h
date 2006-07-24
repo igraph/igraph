@@ -635,6 +635,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 			   const char *names, const char *weights,
 			   igraph_bool_t isolates);
 int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream);
+int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */

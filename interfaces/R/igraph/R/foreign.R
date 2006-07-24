@@ -104,7 +104,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
   }
   
   res <- switch(format,
-#                "pajek"=write.graph.pajek(graph, file, ...),
+                "pajek"=write.graph.pajek(graph, file, ...),
                 "edgelist"=write.graph.edgelist(graph, file, ...),
                 "ncol"=write.graph.ncol(graph, file, ...),
                 "lgl"=write.graph.lgl(graph, file, ...),
@@ -193,3 +193,8 @@ read.graph.pajek <- function(file, ...) {
         PACKAGE="igraph")
 }
 
+write.graph.pajek <- function(graph, file, ...) {
+
+  .Call("R_igraph_write_graph_pajek", graph, file,
+        PACKAGE="igraph")
+}

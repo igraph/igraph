@@ -25,6 +25,7 @@
 #include <config.h>
 
 #include <ctype.h>		/* isspace */
+#include <string.h>
 #include "memory.h"
 
 #ifdef HAVE_LIBXML
@@ -1433,5 +1434,329 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
   fprintf(outstream, "</graphml>\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
   
+  return 0;
+}
+
+/* Order matters here! */
+#define V_ID                0
+#define V_X                 1
+#define V_Y                 2
+#define V_Z                 3
+#define V_SHAPE             4
+#define V_XFACT             5
+#define V_YFACT             6
+#define V_COLOR_RED         7
+#define V_COLOR_GREEN       8
+#define V_COLOR_BLUE        9
+#define V_FRAMECOLOR_RED   10
+#define V_FRAMECOLOR_GREEN 11
+#define V_FRAMECOLOR_BLUE  12
+#define V_LABELCOLOR_RED   13
+#define V_LABELCOLOR_GREEN 14
+#define V_LABELCOLOR_BLUE  15
+#define V_LABELDIST        16
+#define V_LABELDEGREE2     17
+#define V_FRAMEWIDTH       18
+#define V_FONTSIZE         19
+#define V_ROTATION         20
+#define V_RADIUS           21
+#define V_DIAMONDRATIO     22
+#define V_LABELDEGREE      23
+#define V_VERTEXSIZE       24
+#define V_FONT             25
+#define V_URL              26
+#define V_COLOR            27
+#define V_FRAMECOLOR       28
+#define V_LABELCOLOR       29
+#define V_LAST             30
+
+#define E_WEIGHT            0
+#define E_COLOR_RED         1
+#define E_COLOR_GREEN       2
+#define E_COLOR_BLUE        3
+#define E_ARROWSIZE         4
+#define E_EDGEWIDTH         5
+#define E_HOOK1             6
+#define E_HOOK2             7
+#define E_ANGLE1            8
+#define E_ANGLE2            9
+#define E_VELOCITY1        10
+#define E_VELOCITY2        11
+#define E_ARROWPOS         12
+#define E_LABELPOS         13
+#define E_LABELANGLE       14
+#define E_LABELANGLE2      15
+#define E_LABELDEGREE      16
+#define E_FONTSIZE         17
+#define E_ARROWTYPE        18
+#define E_LINEPATTERN      19
+#define E_LABEL            20
+#define E_LABELCOLOR       21
+#define E_COLOR            22
+#define E_LAST             23
+
+int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int i, j;
+
+  igraph_attribute_type_t vtypes[V_LAST], etypes[E_LAST];
+  igraph_bool_t write_vertex_attrs=0;  
+
+  /* Same order as the #define's */
+  const char *vnames[] = { "id", "x", "y", "z", "shape", "xfact", "yfact",
+			   "color-red", "color-green", "color-blue",
+			   "framecolor-red", "framecolor-green", 
+			   "framecolor-blue", "labelcolor-red", 
+			   "labelcolor-green", "labelcolor-blue",
+			   "labeldist", "labeldegree2", "framewidth",
+			   "fontsize", "rotation", "radius", 
+			   "diamondratio", "labeldegree", "vertexsize", 
+			   "font", "url", "color", "framecolor",
+			   "labelcolor" };
+
+  const char *vnumnames[] = { "xfact", "yfact", "labeldist", 
+			      "labeldegree2", "framewidth", "fontsize",
+			      "rotation", "radius", "diamondratio",
+			      "labeldegree", "vertexsize" };
+  const char *vnumnames2[]= { "x_fact", "y_fact", "lr", "lphi", "bw",
+			      "fos", "phi", "q", "la", "size" };
+  const char *vstrnames[] = { "font", "url", "color", "framecolor", 
+			      "labelcolor" };
+  const char *vstrnames2[]= { "font", "url", "ic", "bc", "lc" };  
+  
+  const char *enames[] = { "weight", "color-red", "color-green", "color-blue", 
+			   "arrowsize", "edgewidth", "hook1", "hook2", 
+			   "angle1", "angle2", "velocity1", "velocity2",
+			   "arrowpos", "labelpos", "labelangle",
+			   "labelangle2", "labeldegree", "fontsize",
+			   "arrowtype", "linepattern", "label", "labelcolor",
+			   "color" };
+  const char *enumnames[] = { "arrowsize", "edgewidth", "hook1", "hook2",
+			      "angle1", "angle2", "velocity1", "velocity2", 
+			      "arrowpos", "labelpos", "labelangle",
+			      "labelangle2", "labeldegree", "fontsize" };
+  const char *enumnames2[]= { "s", "w", "h1", "h2", "a1", "a2", "k1", "k2", 
+			      "ap", "lp", "lr", "lphi", "la", "fos" };
+  const char *estrnames[] = { "arrowtype", "linepattern", "label",
+			      "labelcolor", "color" };
+  const char *estrnames2[]= { "a", "p", "l", "lc", "c" };
+
+  const char *newline="\n\r";
+  
+  igraph_es_t es;
+  igraph_eit_t eit;
+
+  igraph_vector_t numv;
+  igraph_strvector_t strv;
+
+  igraph_vector_t ex_numa;
+  igraph_vector_t ex_stra;
+  igraph_vector_t vx_numa;
+  igraph_vector_t vx_stra;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
+  IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&ex_numa, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&ex_stra, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&vx_numa, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&vx_stra, 0);
+
+  /* Write header */
+  if (fprintf(outstream, "*Vertices %li%s", no_of_nodes, newline) < 0) {
+    IGRAPH_ERROR("Cannot write pajek file", IGRAPH_EFILE);
+  }
+
+  /* Check the vertex attributes */
+  memset(vtypes, 0, sizeof(vtypes[0])*V_LAST);
+  for (i=0; i<V_LAST; i++) {
+    if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, 
+				    vnames[i])) { 
+      igraph_i_attribute_gettype(graph, &vtypes[i], IGRAPH_ATTRIBUTE_VERTEX, 
+				 vnames[i]);
+      write_vertex_attrs=1;
+    } else {
+      vtypes[i]=-1;
+    }
+  }
+  for (i=0; i<sizeof(vnumnames)/sizeof(const char*); i++) {
+    igraph_attribute_type_t type;
+    if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, 
+				    vnumnames[i])) {
+      igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_VERTEX, 
+				 vnumnames[i]);
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	IGRAPH_CHECK(igraph_vector_push_back(&vx_numa, i));
+      }
+    }
+  }
+  for (i=0; i<sizeof(vstrnames)/sizeof(const char*); i++) {
+    igraph_attribute_type_t type;
+    if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, 
+				    vstrnames[i])) {
+      igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_VERTEX, 
+				 vstrnames[i]);
+      if (type==IGRAPH_ATTRIBUTE_STRING) {
+	IGRAPH_CHECK(igraph_vector_push_back(&vx_stra, i));
+      }
+    }
+  }
+
+  /* Write vertices */
+  if (write_vertex_attrs) {
+    for (i=0; i<no_of_nodes; i++) {
+
+      /* vertex id */
+      fprintf(outstream, "%li", i+1);
+      if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_NUMERIC) {
+	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_ID], 
+						   igraph_vss_1(i), &numv);
+	fprintf(outstream, " \"%g\"", VECTOR(numv)[0]);
+      } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {
+	char *s;
+	igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_ID],
+						  igraph_vss_1(i), &strv);
+	igraph_strvector_get(&strv, 0, &s);
+	fprintf(outstream, " \"%s\"", s);
+      }
+      
+      /* coordinates */
+      if (vtypes[V_X] == IGRAPH_ATTRIBUTE_NUMERIC &&
+	  vtypes[V_Y] == IGRAPH_ATTRIBUTE_NUMERIC) {
+	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_X], 
+						   igraph_vss_1(i), &numv);
+	fprintf(outstream, " %g", VECTOR(numv)[0]);
+	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_Y], 
+						   igraph_vss_1(i), &numv);
+	fprintf(outstream, " %g", VECTOR(numv)[0]);
+	if (vtypes[V_Z] == IGRAPH_ATTRIBUTE_NUMERIC) {
+	  igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_Z], 
+						     igraph_vss_1(i), &numv);
+	  fprintf(outstream, " %g", VECTOR(numv)[0]);
+	}
+      }
+      
+      /* shape */
+      if (vtypes[V_SHAPE] == IGRAPH_ATTRIBUTE_STRING) {
+	char *s;
+	igraph_i_attribute_get_string_vertex_attr(graph, vnames[V_SHAPE],
+						  igraph_vss_1(i), &strv);
+	igraph_strvector_get(&strv, 0, &s);
+	fprintf(outstream, " %s", s);
+      }
+      
+      /* numeric parameters */
+      for (j=0; j<igraph_vector_size(&vx_numa); j++) {
+	int idx=VECTOR(vx_numa)[j];
+	igraph_i_attribute_get_numeric_vertex_attr(graph, vnumnames[idx],
+						   igraph_vss_1(i), &numv);
+	fprintf(outstream, " %s %g", vnumnames2[idx], VECTOR(numv)[0]);
+      }
+
+      /* string parameters */
+      for (j=0; j<igraph_vector_size(&vx_stra); j++) {
+	int idx=VECTOR(vx_numa)[j];
+	char *s;
+	igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
+						  igraph_vss_1(i), &strv);
+	igraph_strvector_get(&strv, 0, &s);
+	fprintf(outstream, " %s \"%s\"", vstrnames2[idx], s);
+      }      
+      
+      /* trailing newline */
+      fprintf(outstream, "%s", newline);
+    }
+  }
+
+  /* edges header */
+  if (igraph_is_directed(graph)) {
+    fprintf(outstream, "*Arcs%s", newline);
+  } else {
+    fprintf(outstream, "*Edges%s", newline);
+  }
+  
+  IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+  IGRAPH_FINALLY(igraph_es_destroy, &es);
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+  /* Check edge attributes */
+  for (i=0; i<E_LAST; i++) {
+    if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE,
+				    enames[i])) {
+      igraph_i_attribute_gettype(graph, &etypes[i], IGRAPH_ATTRIBUTE_EDGE,
+				 enames[i]);
+    } else {
+      etypes[i]=-1;
+    }
+  }
+  for (i=0; i<sizeof(enumnames)/sizeof(const char*); i++) {
+    igraph_attribute_type_t type;
+    if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, 
+				    enumnames[i])) {
+      igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_EDGE, 
+				 enumnames[i]);
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	IGRAPH_CHECK(igraph_vector_push_back(&ex_numa, i));
+      }
+    }
+  }
+  for (i=0; i<sizeof(estrnames)/sizeof(const char*); i++) {
+    igraph_attribute_type_t type;
+    if (igraph_i_attribute_has_attr(graph, IGRAPH_ATTRIBUTE_EDGE, 
+				    estrnames[i])) {
+      igraph_i_attribute_gettype(graph, &type, IGRAPH_ATTRIBUTE_EDGE, 
+				 estrnames[i]);
+      if (type==IGRAPH_ATTRIBUTE_STRING) {
+	IGRAPH_CHECK(igraph_vector_push_back(&ex_stra, i));
+      }
+    }
+  }
+  
+  for (i=0; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit), i++) {
+    long int edge=IGRAPH_EIT_GET(eit);
+    igraph_integer_t from, to;
+    igraph_edge(graph, edge, &from,  &to);
+    fprintf(outstream, "%li %li", (long int) from+1, (long int) to+1);
+    
+    /* Weights */
+    if (etypes[E_WEIGHT] == IGRAPH_ATTRIBUTE_NUMERIC) {
+      igraph_i_attribute_get_numeric_edge_attr(graph, enames[E_WEIGHT],
+					       igraph_ess_1(edge), &numv);
+      fprintf(outstream, " %g", VECTOR(numv)[0]);
+    }
+    
+    /* numeric parameters */
+    for (j=0; j<igraph_vector_size(&ex_numa); j++) {
+      int idx=VECTOR(ex_numa)[j];
+      igraph_i_attribute_get_numeric_edge_attr(graph, enumnames[idx],
+					       igraph_ess_1(edge), &numv);
+      fprintf(outstream, " %s %g", enumnames2[idx], VECTOR(numv)[0]);
+    }
+    
+    /* string parameters */
+    for (j=0; j<igraph_vector_size(&ex_stra); j++) {
+      int idx=VECTOR(ex_stra)[j];
+      char *s;
+      igraph_i_attribute_get_string_edge_attr(graph, estrnames[idx],
+					      igraph_ess_1(edge), &strv);
+      igraph_strvector_get(&strv, 0, &s);
+      fprintf(outstream, " %s \"%s\"", estrnames2[idx], s);
+    }
+
+    /* trailing newline */
+    fprintf(outstream, "%s", newline);
+  }
+
+  igraph_eit_destroy(&eit);
+  igraph_es_destroy(&es);
+  igraph_vector_destroy(&ex_numa);
+  igraph_vector_destroy(&ex_stra);
+  igraph_vector_destroy(&vx_numa);
+  igraph_vector_destroy(&vx_stra);
+  igraph_strvector_destroy(&strv);
+  igraph_vector_destroy(&numv);
+  IGRAPH_FINALLY_CLEAN(8);
   return 0;
 }

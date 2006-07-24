@@ -376,7 +376,7 @@ edgeparam:
    | EP_LA number {
        igraph_i_pajek_add_numeric_edge_attribute("labeldegree", $2);
    }
-   | EP_SIZE number {
+   | EP_SIZE number {		/* what is this??? */
        igraph_i_pajek_add_numeric_edge_attribute("arrowsize", $2);
    }
    | EP_FOS number {

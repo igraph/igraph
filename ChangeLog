@@ -2,6 +2,9 @@
 
 	* src/iterators.c (igraph_ess_1) : type bug corrected
 
+	* src/foreign.c (igraph_write_graph_pajek) : added
+	* examples/simple/igraph_write_graph_pajek.c : added
+
 2006-07-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/type_indexededgelist.c (igraph_get_eids) : added
