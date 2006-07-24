@@ -1,3 +1,7 @@
+2006-07-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_ess_1) : type bug corrected
+
 2006-07-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/type_indexededgelist.c (igraph_get_eids) : added

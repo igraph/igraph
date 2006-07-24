@@ -723,7 +723,7 @@ int igraph_es_1(igraph_es_t *es, igraph_integer_t eid) {
 
 igraph_es_t igraph_ess_1(igraph_integer_t eid) {
   igraph_es_t es;
-  es.type=IGRAPH_ES_NONE;
+  es.type=IGRAPH_ES_1;
   es.data.eid=eid;
   return es;
 }
