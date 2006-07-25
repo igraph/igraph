@@ -1,3 +1,10 @@
+2006-07-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/conversion.R (as.directed, as.undirected) :
+	added
+	* interfaces/R/src/rinterface.c (R_igraph_to_directed)
+	(R_igraph_to_undirected) : added
+
 2006-07-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/foreign.R (write.graph) : added pajek format

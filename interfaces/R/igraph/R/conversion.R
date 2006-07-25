@@ -39,3 +39,29 @@ get.edgelist <- function(graph) {
   matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
                PACKAGE="igraph"), nc=2)
 }
+
+as.directed <- function(graph, mode="mutual") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (is.character(mode)) {
+    mode <- switch(mode, "arbitrary"=0, "mutual"=1)
+  }
+  
+  .Call("R_igraph_to_directed", graph, as.numeric(mode),
+        PACKAGE="igraph")
+}
+
+as.undirected <- function(graph, mode="collapse") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (is.character(mode)) {
+    mode <- switch(mode, "each"=0, "collapse"=1)
+  }
+  
+  .Call("R_igraph_to_undirected", graph, as.numeric(mode),
+        PACKAGE="igraph")  
+}

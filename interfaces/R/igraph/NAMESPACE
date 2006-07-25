@@ -55,7 +55,7 @@ export(community.eb, community.cut, edge.type.matrix,
 
 # conversion
 
-export(get.adjacency, get.edgelist)
+export(get.adjacency, get.edgelist, as.directed, as.undirected)
 
 # fitting, other
 

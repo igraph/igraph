@@ -141,6 +141,12 @@ typedef enum { IGRAPH_EDGEORDER_ID=0,
 	       IGRAPH_EDGEORDER_FROM,
 	       IGRAPH_EDGEORDER_TO } igraph_edgeorder_type_t;
 
+typedef enum { IGRAPH_TO_DIRECTED_ARBITRARY=0,
+	       IGRAPH_TO_DIRECTED_MUTUAL } igraph_to_directed_t;
+
+typedef enum { IGRAPH_TO_UNDIRECTED_EACH=0,
+	       IGRAPH_TO_UNDIRECTED_COLLAPSE } igraph_to_undirected_t;
+
 /* -------------------------------------------------- */
 /* Vertex selectors                                   */
 /* -------------------------------------------------- */
@@ -612,6 +618,11 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 			 igraph_get_adjacency_t type);
 int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
+
+int igraph_to_directed(igraph_t *graph, 
+		       igraph_to_directed_t flags);
+int igraph_to_undirected(igraph_t *graph,
+			 igraph_to_undirected_t flags);
 
 /* -------------------------------------------------- */
 /* Read and write foreign formats                     */

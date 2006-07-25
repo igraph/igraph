@@ -171,3 +171,153 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+int igraph_to_directed(igraph_t *graph,
+		       igraph_to_directed_t mode) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t edges;
+  long int size;
+  igraph_t orig;
+
+  if (mode != IGRAPH_TO_DIRECTED_ARBITRARY &&
+      mode != IGRAPH_TO_DIRECTED_MUTUAL) {
+    IGRAPH_ERROR("Cannot directed graph, invalid mode", IGRAPH_EINVAL);
+  }
+
+  if (igraph_is_directed(graph)) {
+    return 0;
+  }
+
+  if (mode==IGRAPH_TO_DIRECTED_ARBITRARY) {
+    size=no_of_edges*2;
+  } else if (mode==IGRAPH_TO_DIRECTED_MUTUAL) {
+    size=no_of_edges*4;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, size);
+  size=0;
+
+  if (mode==IGRAPH_TO_DIRECTED_ARBITRARY) {
+    igraph_es_t es;
+    igraph_eit_t eit;
+    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+    IGRAPH_FINALLY(igraph_es_destroy, &es);
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+    
+    while (!IGRAPH_EIT_END(eit)) {
+      long int edge=IGRAPH_EIT_GET(eit);
+      igraph_integer_t from, to;
+      igraph_edge(graph, edge, &from, &to);
+      VECTOR(edges)[size++] = from;
+      VECTOR(edges)[size++] = to;
+      IGRAPH_EIT_NEXT(eit);
+    }
+    
+    igraph_eit_destroy(&eit);
+    igraph_es_destroy(&es);
+    IGRAPH_FINALLY_CLEAN(2);
+  } else if (mode==IGRAPH_TO_DIRECTED_MUTUAL) {
+    igraph_es_t es;
+    igraph_eit_t eit;
+    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+    IGRAPH_FINALLY(igraph_es_destroy, &es);
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+    while (!IGRAPH_EIT_END(eit)) {
+      long int edge=IGRAPH_EIT_GET(eit);
+      igraph_integer_t from, to;
+      igraph_edge(graph, edge, &from, &to);
+      VECTOR(edges)[size++] = from;
+      VECTOR(edges)[size++] = to;
+      VECTOR(edges)[size++] = to;
+      VECTOR(edges)[size++] = from;
+      IGRAPH_EIT_NEXT(eit);
+    }
+    
+    igraph_eit_destroy(&eit);
+    igraph_es_destroy(&es);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+  
+  orig=*graph;
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
+  igraph_destroy(&orig);
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+int igraph_to_undirected(igraph_t *graph,
+			 igraph_to_undirected_t mode) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t edges;
+  igraph_t orig;
+  
+  if (mode != IGRAPH_TO_UNDIRECTED_EACH &&
+      mode != IGRAPH_TO_UNDIRECTED_COLLAPSE) {
+    IGRAPH_ERROR("Cannot undirect graph, invalid mode", IGRAPH_EINVAL);
+  }
+  
+  if (!igraph_is_directed(graph)) {
+    return 0;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  
+  if (mode==IGRAPH_TO_UNDIRECTED_EACH) {
+    igraph_es_t es;
+    igraph_eit_t eit;
+
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
+    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+    IGRAPH_FINALLY(igraph_es_destroy, &es);
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+    IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+    
+    while (!IGRAPH_EIT_END(eit)) {
+      long int edge=IGRAPH_EIT_GET(eit);
+      igraph_integer_t from, to;
+      igraph_edge(graph, edge, &from, &to);
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+      IGRAPH_EIT_NEXT(eit);
+    }
+    
+    igraph_eit_destroy(&eit);
+    igraph_es_destroy(&es);
+    IGRAPH_FINALLY_CLEAN(2);
+  } else if (mode==IGRAPH_TO_UNDIRECTED_COLLAPSE) {
+    igraph_vector_t seen, nei;
+    long int i,j;
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
+    IGRAPH_VECTOR_INIT_FINALLY(&seen, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&nei, 0);
+    
+    for (i=0; i<no_of_nodes; i++) {
+      IGRAPH_CHECK(igraph_neighbors(graph, &nei, i, IGRAPH_ALL));
+      for (j=0; j<igraph_vector_size(&nei); j++) {
+	long int node=VECTOR(nei)[j];
+	if (VECTOR(seen)[node] != i+1) {
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, node));
+	  VECTOR(seen)[node]=i+1;
+	}
+      }
+    }    
+
+    igraph_vector_destroy(&nei);
+    igraph_vector_destroy(&seen);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+
+  orig=*graph;
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+  igraph_destroy(&orig);
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}

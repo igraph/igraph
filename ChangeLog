@@ -1,3 +1,7 @@
+2006-07-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/conversion.c (igraph_to_directed, igraph_to_undirected) : added
+
 2006-07-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/iterators.c (igraph_ess_1) : type bug corrected
