@@ -511,6 +511,11 @@ long int igraph_i_pajek_actedge=0;
  * http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf for
  * information on the Pajek file format.
  *
+ * </para><para>
+ * Time complexity: O(|V|+|E|+|A|), |V| is the number of vertices, |E|
+ * the number of edges, |A| the number of attributes (vertex + edge)
+ * in the graph if there are attribute handlers installed.
+ * 
  * \sa \ref igraph_write_graph_pajek() for writing Pajek files, \ref
  * igraph_read_graph_graphml() for reading GraphML files.
  */
@@ -1584,6 +1589,27 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
 
 /**
  * \function igraph_write_graph_pajek
+ * \brief Writes a graph to a file in Pajek format.
+ * 
+ * </para><para>
+ * The Pajek vertex and edge parameters (like color) are determined by
+ * the attributes of the vertices and edges, of course this requires
+ * an attribute handler to be installed. The names of the
+ * corresponding vertex and edge attributes are listed at \ref
+ * igraph_read_graph_pajek(), eg. the `\c color' vertex attributes
+ * determines the color (`\c c' in Pajek) parameter.
+ * \param graph The graph object to write.
+ * \param outstream The file to write to. It should be opened and
+ * writable.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|+|A|), |V| is the number of vertices, |E|
+ * is the number of edges, |A| the number of attributes (vertex +
+ * edge) in the graph if there are attribute handlers installed. 
+ *
+ * \sa \ref igraph_read_graph_pajek() for reading Pajek graphs, \ref
+ * igraph_write_graph_graphml() for writing a graph in GraphML format,
+ * this suites <command>igraph</command> graphs better.
  */
 
 int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
