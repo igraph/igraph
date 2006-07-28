@@ -1611,7 +1611,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 			      "rotation", "radius", "diamondratio",
 			      "labeldegree", "vertexsize" };
   const char *vnumnames2[]= { "x_fact", "y_fact", "lr", "lphi", "bw",
-			      "fos", "phi", "q", "la", "size" };
+			      "fos", "phi", "r", "q", "la", "size" };
   const char *vstrnames[] = { "font", "url", "color", "framecolor", 
 			      "labelcolor" };
   const char *vstrnames2[]= { "font", "url", "ic", "bc", "lc" };  
