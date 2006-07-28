@@ -507,7 +507,7 @@ WITH
 
 REPLACE ----- doxygen \c command is for <constant> ----------------------------
 
-\\c\s+(?P<word>\w+)\b
+\\c\s+(?P<word>[\w\-^\']+)\b
 
 WITH
 

@@ -9,16 +9,23 @@
 
 <!-- doxrox-include about_loadsave -->
 
-<section><title>Reading graphs from files</title>
+<section><title>Simple edge list and similar formats</title>
 <!-- doxrox-include igraph_read_graph_edgelist -->
+<!-- doxrox-include igraph_write_graph_edgelist -->
 <!-- doxrox-include igraph_read_graph_ncol -->
+<!-- doxrox-include igraph_write_graph_ncol -->
 <!-- doxrox-include igraph_read_graph_lgl -->
+<!-- doxrox-include igraph_write_graph_lgl -->
 </section>
 
-<section><title>Writing graphs to files</title>
-<!-- doxrox-include igraph_write_graph_edgelist -->
-<!-- doxrox-include igraph_write_graph_ncol -->
-<!-- doxrox-include igraph_write_graph_lgl -->
+<section><title>GraphML format</title>
+<!-- doxrox-include igraph_read_graph_graphml -->
+<!-- doxrox-include igraph_write_graph_graphml -->
+</section>
+
+<section><title>Pajek format</title>
+<!-- doxrox-include igraph_read_graph_pajek -->
+<!-- doxrox-include igraph_write_graph_pajek -->
 </section>
 
 </chapter>
