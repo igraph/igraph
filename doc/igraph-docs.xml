@@ -76,10 +76,8 @@
 
   <xi:include href="nongraph.xml"/>  
 
-  <xi:include href="fdl.xml"/>
+  <xi:include href="licenses.xml"/>
 
-  <xi:include href="gpl.xml"/>
-  
   <index/>
 
 </book>

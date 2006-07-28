@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
-<chapter id="igraph-gpl">
-  <chapterinfo>
+<section id="igraph-gpl">
+  <sectioninfo>
     <edition>Version 2, June 1991</edition>
     <copyright><year>1989</year><year>1991</year>
     <holder> Free Software Foundation, Inc.
@@ -13,7 +13,7 @@
     Everyone is permitted to copy and distribute verbatim copies
     of this license document, but changing it is not allowed.
     </para></legalnotice>
-  </chapterinfo>
+  </sectioninfo>
 
 <title>THE GNU GENERAL PUBLIC LICENSE</title>
 <section><title>Preamble</title>
@@ -441,4 +441,4 @@ Public License instead of this License.
 </para>
 
 </section>
-</chapter>
+</section>

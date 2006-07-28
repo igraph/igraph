@@ -8,7 +8,8 @@ WITH --------------------------------------------------------------------------
 REPLACE ----- function object, extract its signature --------------------------
 
 (?P<before>\A.*?)                # head of the comment
-\\function\s+(?P<name>\w+)       # \function keyword
+\\function\s+                    # \function keyword
+(?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+)) # the keyword, remove igraph_ prefix
 (?P<after>.*?)\*\/               # tail of the comment
 \s*
 (?P<def>.*?\))                   # function head
@@ -19,7 +20,7 @@ WITH --------------------------------------------------------------------------
 
 <section id="\g<name>">
 <title>\g<name></title>
-<indexterm><primary>\g<name></primary></indexterm>
+<indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <informalexample><programlisting>
 \g<def>;
@@ -117,7 +118,8 @@ WITH ----------------------------------------------------------------------TODO
 REPLACE ----- variables -------------------------------------------------------
 
 (?P<before>\A.*?)                 # head of the comment
-\\var\s+(?P<name>\w+)             # \var keyword + argument
+\\var\s+                          # \var keyword + argument
+(?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 (?P<after>.*?)\*\/                # tail of the comment
 \s*(?P<def>[^;]*;)                # the definition of the variable
 .*\Z                              # and the remainder
@@ -125,7 +127,7 @@ REPLACE ----- variables -------------------------------------------------------
 WITH --------------------------------------------------------------------------
 
 <section id="\g<name>"><title>\g<name></title>
-<indexterm><primary>\g<name></primary></indexterm>
+<indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
 \g<def>
@@ -138,7 +140,8 @@ WITH --------------------------------------------------------------------------
 REPLACE ----- \define ---------------------------------------------------------
 
 (?P<before>\A.*?)                 # head of the comment
-\\define\s+(?P<name>\w+)          # \define command
+\\define\s+                       # \define command
+(?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 (?P<after>.*?)\*\/                # tail of the comment
 \s*                               # whitespace
 (?P<def>.*?)                      # macro definition
@@ -148,7 +151,7 @@ REPLACE ----- \define ---------------------------------------------------------
 WITH --------------------------------------------------------------------------
 
 <section id="\g<name>"><title>\g<name></title>
-<indexterm><primary>\g<name></primary></indexterm>
+<indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
 \g<def>
@@ -200,7 +203,8 @@ WITH
 REPLACE ----- an enumeration typedef ------------------------------------------
 
 (?P<before>\A.*?)                 # head of the comment
-\\typedef\s+(?P<name>\w+)         # \typedef command
+\\typedef\s+                      # \typedef command
+(?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 (?P<after>.*?)                    # tail of the comment
  \*\/\s*                          # closing the comment
 (?P<def>typedef\s*enum\s*\{       # typedef enum
@@ -210,7 +214,7 @@ REPLACE ----- an enumeration typedef ------------------------------------------
 WITH --------------------------------------------------------------------------
 
 <section id="\g<name>"><title>\g<name></title>
-<indexterm><primary>\g<name></primary></indexterm>
+<indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
 \g<def>
@@ -265,7 +269,8 @@ WITH --------------------------------------------------------------------------
 REPLACE ----- \struct ---------------------------------------------------------
 
 (?P<before>\A.*?)                 # head of the comment
-\\struct\s+(?P<name>[\w_]+)       # \struct command
+\\struct\s+                       # \struct command
+(?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>[\w_]+))
 (?P<after>.*?)                    # tail of the command
 \*\/\s*                           # closing the comment
 (?P<def>typedef \s*struct\s*\w+\s*\{
@@ -275,7 +280,7 @@ REPLACE ----- \struct ---------------------------------------------------------
 WITH --------------------------------------------------------------------------
 
 <section id="\g<name>"><title>\g<name></title>
-<indexterm><primary>\g<name></primary></indexterm>
+<indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
 \g<def>
@@ -330,7 +335,8 @@ WITH --------------------------------------------------------------------------
 REPLACE ----- \typedef function -----------------------------------------------
 
 (?P<before>.*?)                   # comment head
-\\typedef\s+(?P<name>\w+)         # \typedef command
+\\typedef\s+                      # \typedef command
+(?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 (?P<after>.*?)                    # comment tail
 \*\/                              # end of comment block
 \s*
@@ -340,7 +346,7 @@ REPLACE ----- \typedef function -----------------------------------------------
 WITH --------------------------------------------------------------------------
 
 <section id="\g<name>"><title>\g<name></title>
-<indexterm><primary>\g<name></primary></indexterm>
+<indexterm><primary>\g<tail></primary></indexterm>
 <para><programlisting>
 \g<src>
 </programlisting></para>

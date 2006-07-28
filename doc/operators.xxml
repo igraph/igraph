@@ -7,14 +7,19 @@
 <chapter id="igraph-Operators">
 <title>Graph Operators</title>
 
+<section><title>Union and intersection</title>
 <!-- doxrox-include igraph_disjoint_union -->
 <!-- doxrox-include igraph_disjoint_union_many -->
 <!-- doxrox-include igraph_union -->
 <!-- doxrox-include igraph_union_many -->
 <!-- doxrox-include igraph_intersection -->
 <!-- doxrox-include igraph_intersection_many -->
+</section>
+
+<section><title>Other set-like operators</title>
 <!-- doxrox-include igraph_difference -->
 <!-- doxrox-include igraph_complementer -->
 <!-- doxrox-include igraph_compose -->
+</section>
 
 </chapter>

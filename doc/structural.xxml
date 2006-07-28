@@ -46,6 +46,11 @@
 <!-- doxrox-include igraph_to_undirected -->
 </section>
 
+<section><title>Directedness conversion</title>
+<!-- doxrox-include igraph_to_directed -->
+<!-- doxrox-include igraph_to_undirected -->
+</section>
+
 <section><title>Other Operations</title>
 <!-- doxrox-include igraph_simplify -->
 <!-- doxrox-include igraph_reciprocity -->

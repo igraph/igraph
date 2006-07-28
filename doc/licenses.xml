@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % local.common.attrib    "xmlns:xi            CDATA       #FIXED       
+'http://www.w3.org/2001/XInclude'" >
+]>
+
+<chapter id="igraph-Licenses">
+<title>Licenses for <command>igraph</command> and this manual</title>
+
+  <xi:include href="gpl.xml"/>
+  <xi:include href="fdl.xml"/>
+
+</chapter>

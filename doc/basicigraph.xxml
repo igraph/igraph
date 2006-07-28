@@ -5,8 +5,49 @@
 ]>
 
 <chapter id="igraph-Basic">
-<title>The Basic <command>igraph</command> Interface</title>
+<title>About <command>igraph</command> graphs, the basic interface</title>
 
+<section><title>The <command>igraph</command> data model</title>
+<para>
+The <command>igraph</command> library can handle directed and
+undirected graphs. The <command>igraph</command> graphs are multisets
+of ordered (if directed) or unordered (if undirected) labeled pairs.
+The labels of the pairs plus the number of vertices always starts with
+zero and ends with the number of edges minus one. In addition to that
+a table of metadata is also attached to every graph, its most
+important entries are the number of vertices in the graph and whether
+the graph is directed or undirected.
+</para>
+
+<para>
+Like the edges, the <command>igraph</command> vertices are also
+labeled by number between zero and the number of vertices minus one. 
+So, to summarize, a directed graph can be imagined like this:
+TODO
+and an undirected like this:
+TODO
+</para>
+
+<para>It is possible to convert a directed graph to an undirected one,
+see the <link linkend="igraph_to_directed">
+<function>igraph_to_directed()</function></link> 
+and <link linkend="igraph_to_undirected"> 
+<function>igraph_to_undirected()</function></link> functions.
+</para>
+
+<para>Note that <command>igraph</command> has some limited support for
+graphs with multiple edges. The support means that multiple edges can
+be stored in <command>igraph</command> graphs, but for most functions
+(like <link linkend="igraph_betweenness">
+<function>igraph_betweenness()</function></link>) it is not checked
+that they work well on graphs with multiple edges.
+To eliminate multiple edges from a graph, you can use 
+<link linkend="igraph_simplify">
+  <function>igraph_simplify()</function></link>. 
+</para>
+</section>
+
+<section><title>The basic interface</title>
 <!-- doxrox-include about_basic_interface -->
 
 <section><title>Graph Constructors and Destructors</title>
@@ -26,11 +67,12 @@
 <!-- doxrox-include igraph_degree -->
 </section>
 
-<section><title>Adding and Deleting Vertices</title>
+<section><title>Adding and Deleting Vertices and Edges</title>
 <!-- doxrox-include igraph_add_edges -->
 <!-- doxrox-include igraph_add_vertices -->
 <!-- doxrox-include igraph_delete_edges -->
 <!-- doxrox-include igraph_delete_vertices -->
+</section>
 </section>
 
 </chapter>
