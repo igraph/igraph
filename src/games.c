@@ -774,6 +774,53 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
   return 0;
 }
 
+/**
+ * \function igraph_nonlinear_barabasi_game
+ * \brief Generates graph with non-linear preferential attachment
+ * 
+ * </para><para>
+ * This function is very similar to \ref igraph_barabasi_game(), only
+ * in this game the probability that a new vertex attaches to a given
+ * old vertex is not proportional to the degree of the old node, but
+ * some power of the degree of the old node.
+ * 
+ * </para><para>
+ * More precisely the attachment probability is the degree to the
+ * power of \p power plus \p zeroappeal.
+ * 
+ * </para><para>
+ * This function might generate graphs with multiple edges if the
+ * value of \p m is at least two. You can call \ref igraph_simplify()
+ * to get rid of the multiple edges. 
+ * \param graph Pointer to an uninitialized graph object, the
+ *        generated graph will be stored here.
+ * \param n The number of vertices in the generated graph.
+ * \param power The power of the preferential attachment.
+ * \param m The number of edges to generate in each time step, if the
+ *        \p outseq parameter is a null vector or a vector with length
+ *        zero. It is ignored otherwise.
+ * \param outseq The number of edges to generate in each time
+ *        step. For directed graphs this is exactly the out-degree of
+ *        the vertices. The first element of the vector is ignored. If
+ *        this is a null vector or a vector of length zero then it is
+ *        ignored and the value of the \p m argument is used.
+ * \param outpref Logical constant, if TRUE then the preferential
+ *        attachment is based on the total degree of the nodes instead
+ *        of the in-degree.
+ * \param zeroappeal Positive number, the attachment probability for
+ *        vertices with degree zero. 
+ * \param directed Logical constant, whether to generate a directed
+ *        graph.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|*m*log(|V|)+|E|), |V| is the number of
+ * vertices, |E| is the number of edges and m is the average number of
+ * edges added in a time step.
+ * 
+ * \sa \ref igraph_barabasi_game() for the slightly more efficient
+ * implementation of the special case \p power=1.
+ */
+
 int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
 				   igraph_real_t power,
 				   igraph_integer_t m,  
@@ -860,6 +907,40 @@ int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
 
   return 0;
 }
+
+/**
+ * \function igraph_recent_degree_game
+ * \brief Stochastic graph generator based on the number of adjacent
+ * edges a node has gained recently
+ * 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of vertices in the graph, this is the same as
+ *        the number of time steps. 
+ * \param power The exponent, the probability that a node gains a
+ *        new edge is proportional to the number of edges it has
+ *        gained recently (in the last \p window time steps) to \p
+ *        power.
+ * \param window Integer constant, the size of the time window to use
+ *        to count the number of recent edges.
+ * \param m Integer constant, the number of edges to add per time
+ *        step if the \p outseq parameter is a null pointer or a
+ *        zero-length vector.
+ * \param outseq The number of edges to add in each time step. This
+ *        argument is ignored if it is a null pointer or a zero length
+ *        vector, is this case the constant \p m parameter is used. 
+ * \param outpref Logical constant, if true the edges originated by a
+ *        vertex also count as recent adjacent edges. It is false in
+ *        most cases.
+ * \param zero_appeal Constant giving the attractiveness of the
+ *        vertices which haven't gained any edge recently. 
+ * \param directed Logical constant, whether to generate a directed
+ *        graph. 
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|*log(|V|)+|E|), |V| is the number of
+ * vertices, |E| is the number of edges in the graph.
+ *
+ */ 
 
 int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 			      igraph_real_t power,
@@ -968,6 +1049,55 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 
   return 0;
 }
+
+/**
+ * \function igraph_barabasi_aging_game
+ * \brief Preferential attachment with aging of vertices
+ * 
+ * </para><para>
+ * In this game, the probability that a node gains a new edge is
+ * given by its (in-)degree (k) and age (l). This probability has a
+ * degree dependent component multiplied by an age dependent
+ * component. The degree dependent part is: \p deg_coef times k to the
+ * power of \p pa_exp plus \p zero_deg_appeal; and the age dependent
+ * part is \p age_coef times l to the power of \p aging_exp plus \p
+ * zero_age_appeal. 
+ * 
+ * </para><para>
+ * The age is based on the number of vertices in the
+ * network and the \p aging_bin argument: vertices grew one unit older
+ * after each \p aging_bin vertices added to the network.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param nodes The number of vertices in the graph.
+ * \param m The number of edges to add in each time step. If the \p
+ *        outseq argument is not a null vector and not a zero-length
+ *        vector. 
+ * \param outseq The number of edges to add in each time step. If it
+ *        is a null pointer or a zero-length vector then it is ignored
+ *        and the \p m argument is used instead.
+ * \param outpref Logical constant, whether the edges
+ *        initiated by a vertex contribute to the probability to gain
+ *        a new edge.
+ * \param pa_exp The exponent of the preferential attachment, a small
+ *        positive number usually, the value 1 yields the classic
+ *        linear preferential attachment.
+ * \param aging_exp The exponent of the aging, this is a negative
+ *        number usually.
+ * \param aging_bin Integer constant, the number of vertices to add
+ *        before vertices in the network grew one unit older.
+ * \param zero_deg_appeal The degree dependent part of the
+ *        attractiveness of the zero degree vertices.
+ * \param zero_age_appeal The age dependent part of the attractiveness
+ *        of the vertices of age zero. This parameter is usually zero.
+ * \param deg_coef The coefficient for the degree.
+ * \param age_coef The coefficient for the age.
+ * \param directed Logical constant, whether to generate a directed
+ *        graph. 
+ * \return Error code.
+ * 
+ * Time complexity: O((|V|+|V|/aging_bin)*log(|V|)+|E|). |V| is the number
+ * of vertices, |E| the number of edges.
+ */
 
 int igraph_barabasi_aging_game(igraph_t *graph, 
 			       igraph_integer_t nodes,
@@ -1081,6 +1211,50 @@ int igraph_barabasi_aging_game(igraph_t *graph,
   
   return 0;
 }
+
+/** 
+ * \function igraph_recent_degree_aging_game
+ * \brief Preferential attachment based on the number of edges gained
+ * recently, with aging of vertices
+ * 
+ * </para><para>
+ * This game is very similar to \ref igraph_barabasi_aging_game(),
+ * except that instead of the total number of adjacent edges the
+ * number of edges gained in the last \p time_window time steps are
+ * counted. 
+ * 
+ * </para><para>The degree dependent part of the attractiveness is
+ * given by k to the power of \p pa_exp plus \p zero_appeal; the age
+ * dependent part is l to the power to \p aging_exp. 
+ * k is the number of edges gained in the last \p time_window time
+ * steps, l is the age of the vertex.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param nodes The number of vertices in the graph.
+ * \param m The number of edges to add in each time step. If the \p
+ *        outseq argument is not a null vector or a zero-length vector
+ *        then it is ignored.
+ * \param outseq Vector giving the number of edges to add in each time
+ *        step. If it is a null pointer or a zero-length vector then
+ *        it is ignored and the \p m argument is used.
+ * \param outpref Logical constant, if true the edges initiated by a
+ *        vertex are also counted. Normally it is false.
+ * \param pa_exp The exponent for the preferential attachment. 
+ * \param aging_exp The exponent for the aging, normally it is
+ *        negative: old vertices gain edges with less probability.
+ * \param aging_bin Integer constant, gives the scale of the aging. 
+ *        The age of the vertices is incremented by one after every \p
+ *        aging_bin vertex added.
+ * \param time_window The time window to use to count the number of 
+ *        adjacent edges for the vertices.
+ * \param zero_appeal The degree dependent part of the attractiveness
+ *        for zero degree vertices.
+ * \param directed Logical constant, whether to create a directed
+ *        graph. 
+ * \return Error code.
+ * 
+ * Time complexity: O((|V|+|V|/aging_bin)*log(|V|)+|E|). |V| is the number
+ * of vertices, |E| the number of edges.
+ */
 
 int igraph_recent_degree_aging_game(igraph_t *graph,
 				    igraph_integer_t nodes,

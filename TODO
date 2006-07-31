@@ -7,14 +7,11 @@ o document bison requirements
 o add references to SNA, paper by Carter
 o R interface to all (sensible) functions
 o proper documentation (docbook & R) for all (sensible) functions
-  docbook: read_graph_pajek, nonlinear_barabasi_game,
-           recent_degree_game, barabasi_aging_game, recent_degree_aging_game,
-	   igraph_layout_merge_dla
-o write Pajek file
 o read and write non-structural info from/to GraphML files
 o Add Python interface to igraph_callaway_traits_game,
   igraph_barabasi_aging_game, igraph_recent_degree_aging_game
 o Add Python edge/vertex selector support
+o portability tests
 
 Other bits:
 

@@ -25,4 +25,8 @@
 <!-- doxrox-include igraph_layout_kamada_kawai_3d -->
 </section>
 
+<section><title>Merging layouts</title>
+<!-- doxrox-include igraph_layout_merge_dla -->
+</section>
+
 </chapter>

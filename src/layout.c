@@ -1363,6 +1363,29 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
 			      igraph_real_t cx, igraph_real_t cy, igraph_real_t startr, 
 			      igraph_real_t killr);
 
+/**
+ * \function igraph_layout_merge_dla
+ * \brief Merge multiple layouts by using a DLA algorithm
+ * 
+ * </para><para>
+ * First each layout is covered by a circle. Then the layout of the
+ * largest graph is placed at the origin. Then the other layouts are
+ * placed by the DLA algorithm, larger ones first and smaller ones
+ * last.
+ * \param thegraphs Pointer vector containing the graph object of
+ *        which the layouts will be merged.
+ * \param coords Pointer vector containing matrix objects with the 2d
+ *        layouts of the graphs in \p thegraphs.
+ * \param res Pointer to an initialized matrix object, the result will
+ *        be stored here. It will be resized if needed.
+ * \return Error code.
+ * 
+ * Added in version 0.2. This function is experimental.
+ * 
+ * </para><para>
+ * Time complexity: TODO.
+ */
+
 int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
 			    igraph_vector_ptr_t *coords, 
 			    igraph_matrix_t *res) {
