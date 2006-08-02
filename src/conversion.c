@@ -385,7 +385,7 @@ int igraph_to_undirected(igraph_t *graph,
       IGRAPH_CHECK(igraph_neighbors(graph, &nei, i, IGRAPH_ALL));
       for (j=0; j<igraph_vector_size(&nei); j++) {
 	long int node=VECTOR(nei)[j];
-	if (VECTOR(seen)[node] != i+1) {
+	if (VECTOR(seen)[node] != i+1 && node >= i) {
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, node));
 	  VECTOR(seen)[node]=i+1;

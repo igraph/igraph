@@ -1,3 +1,9 @@
+2006-08-02  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/conversion.c (igraph_to_directed) : 
+	IGRAPH_TO_UNDIRECTED_COLLAPSE bug corrected
+	* examples/simple/igraph_to_undirected.c : added
+
 2006-07-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_write_graph_pajek) : bug corrected
