@@ -23,9 +23,47 @@ the graph is directed or undirected.
 Like the edges, the <command>igraph</command> vertices are also
 labeled by number between zero and the number of vertices minus one. 
 So, to summarize, a directed graph can be imagined like this:
-TODO
-and an undirected like this:
-TODO
+<informalexample>
+<programlisting>
+  ( vertices: 6, 
+    directed: yes,
+    {
+     (0,2),
+     (2,2),
+     (2,3),
+     (3,3),
+     (3,4),
+     (3,4),
+     (4,1)
+    }
+  )
+</programlisting>
+</informalexample>
+Here the edges are ordered pairs or vertex ids, and the graph is a multiset
+of edges plus some meta-data.
+</para>
+
+<para>
+An undirected graph is like this:
+<informalexample>
+<programlisting>
+  ( vertices: 6,
+    directed: no,
+    {
+     {0,2},
+     {2},
+     {2,3},
+     {3},
+     {3,4},
+     {3,4},
+     {4,1}
+    }
+  )
+</programlisting>
+</informalexample>
+Here an edge is a set of one or two vertex ids, two for most of the
+time, except for loop edges. A graph is a multiset of edges plus meta data,
+just like in the directed case.
 </para>
 
 <para>It is possible to convert a directed graph to an undirected one,
