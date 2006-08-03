@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % local.common.attrib    "xmlns:xi            CDATA       #FIXED       
+'http://www.w3.org/2001/XInclude'" >
+]>
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <title>Network Analysis with igraph</title>
+    <authorgroup>
+      <author><firstname>Gábor</firstname><surname>Csárdi</surname>
+      <affiliation><orgname>Department of Biophysics, Research
+      Institute for Nuclear and Particle Physics of the Hungarian
+      Academy of Sciences</orgname>
+      <address>29-33 Konkoly-Thege Miklós road, Budapest H-1121, Hungary</address>
+      </affiliation>
+      <affiliation><orgname>Center for Complex Systems Studies,
+      Kalamazoo College</orgname>
+      <address>1200 Academy st, Kalamazoo, 49006, MI, USA</address></affiliation>
+      </author>
+    </authorgroup>
+
+    <legalnotice><para>
+      Copyright (C)  2006  Gábor Csárdi
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the GNU Free Documentation License, Version 1.2
+      or any later version published by the Free Software Foundation;
+      with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+      Texts.  A copy of the license is included in the section entitled 
+      <quote>GNU Free Documentation License</quote>.
+    </para></legalnotice>
+  </bookinfo>
+
+<xi:include href="introduction.xml" />
+<xi:include href="short.xml" />
+<xi:include href="installation.xml" />
+<xi:include href="datamodel.xml" />
+<xi:include href="structures.xml" />
+
+<xi:include href="../licenses.xml"/>
+
+<index/>
+
+</book>

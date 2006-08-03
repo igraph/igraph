@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<application>igraph</application>">
+]>
+
+<chapter id="igraphbook-datamodel">
+<title>The igraph data model</title>
+
+<para>
+This section introduces the &igraph; data model. It is recommended
+that the reader should be familiar with this model of computation to
+understand the semantics of the &igraph; functions better.
+</para>
+
+<para>
+An &igraph; graph is either <glossterm>directed</glossterm> or
+<glossterm>undirected</glossterm>, &igraph; cannot handle mixed graphs
+with both directed and undirected edges.
+</para>
+
+<section><title>Directed graphs</title>
+
+<para>
+The &igraph; data model is slightly different for directed and
+undirected graphs, we start with the directed case. In &igraph;
+vertices are identified by <glossterm>vertex id</glossterm>s: integer
+number between zero and |V|-1, if |V| is the number of vertices in the
+graph. Thus the numbering of vertex ids is always continual, all
+&igraph; operations on graphs keep this important property. 
+</para>
+
+<para>
+Directed &igraph; edges are ordered pairs or vertex ids. A directed
+graph is an ordered multiset of directed edges and some additional
+meta data: the number of vertices in the graph and whether the graph
+is directed. Here is an example of a directed &igraph; graph:
+<informalexample>
+<programlisting>
+  ( vertices: 6, 
+    directed: yes,
+    {
+     (0,2),
+     (2,2),
+     (2,3),
+     (3,3),
+     (3,4),
+     (3,4),
+     (4,1)
+    }
+  )
+</programlisting>
+</informalexample>
+</para>
+
+<para>
+Just like the vertices have vertex ids, &igraph; edges also have ids:
+edge ids are integer numbers between zero and |E|-1, |E| is the number
+of edges in the graph. 
+</para>
+
+</section>
+
+<section><title>Undirected graphs</title>
+
+<para>
+An undirected &igraph; edge is a two-element or one-element set of
+vertex ids. The two element set is a non-loop edge, ie. the edge
+connects different vertices, while loop edges are represented with a
+single-element set. An undirected graph is an ordered multiset of
+undirected edges, plus the usual meta data: the number of vertices and
+the fact that the graph is undirected. Here is an example for an
+undirected graph:
+<informalexample>
+<programlisting>
+  ( vertices: 6,
+    directed: no,
+    {
+     {0,2},
+     {2},
+     {2,3},
+     {3},
+     {3,4},
+     {3,4},
+     {4,1}
+    }
+  )
+</programlisting>
+</informalexample>
+This graph contains both loop edges ({2} and {3}, ie. (2-2) and (3-3))
+and multiple edges ({3,4} twice). 
+</para>
+
+</section>
+
+</chapter>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<application>igraph</application>">
+]>
+
+<chapter id="igraphbook-install">
+<title>Installation</title>
+
+<para>
+The &igraph; R package can be installed just like any other R
+packages. Perhaps the easiest way is to use the
+<command>install.packages()</command> command. This downloads either a
+source of binary package appropriate for the running system from CRAN
+and installs it by default to the system directories. The package can
+be loaded by typing 
+<informalexample><programlisting>
+library(igraph)
+</programlisting></informalexample>
+after installation.
+</para>
+
+<para> 
+If the user doesn't have rights to write to system directories the
+<parameter>lib</parameter> argument of the
+<command>install.packages()</command> command can be used to set an
+alternate installation directory. It is good R practice to keep the
+user's privately installed packages in a separate directory (say
+<filename>~/.R/library</filename>), if this is the case &igraph; can
+be installed like this:
+<informalexample><programlisting>
+install.packages("igraph", lib="~/.R/library")
+</programlisting></informalexample>
+The R package search path needs to be modified as well to let R know
+about our private package directory:
+<informalexample><programlisting>
+.libPaths( c("~/.R/library", .libPaths()) )
+</programlisting></informalexample>
+This command can also be added to the <filename>~/.Rprofile</filename>
+file to set the search path automatically every time you start R.
+</para>
+
+<para>
+See <command>?Startup</command> and <command>?.libPaths()</command>
+for more information about R's startup mechanism and the way
+directories are searched for packages and
+<command>?install.packages</command> about installing R packages.
+</para>
+
+</chapter>

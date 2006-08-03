@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<application>igraph</application>">
+]>
+
+<chapter id="igraphbook-structures">
+<title>Creating Regular Graphs</title>
+
+<section><title>Empty graphs</title>
+
+<para>&igraph; privides some ways for generating regular graph
+strucures: lattices, trees, etc. Let us begin with the simplest case:
+the empty graph:
+<informalexample><programlisting>
+<prompt>&gt; </prompt>g &lt;- graph.empty()
+</programlisting></informalexample>
+This command creates an empty graph and stores in a variable named
+<varname>g</varname>. If you type in the name of a variable
+containing a graph object, R prints some information about the graph,
+and its edge list:
+<informalexample><programlisting>
+<prompt>&gt; </prompt>g
+</programlisting>
+<screen>
+Vertices: 0 
+Edges: 0 
+Directed: TRUE
+</screen>
+</informalexample>
+</para>
+
+<para>
+This small example illustrates a number of things: empty graphs can be
+created by the <command>graph.empty</command> command; by default this
+command creates a graph with no vertices and no edges (well this is
+what the word empty means); by default this command created directed
+graphs. <command>graph.empty</command> has an optional parameter:
+<parameter>n</parameter>, the number of vertices in the graph. (A
+graph with non-zero number of vertices and no edges is still called
+and empty graph.)
+<informalexample><programlisting>
+<prompt>&gt; </prompt>g &lt;- graph.empty(n=10)
+<prompt>&gt; </prompt>g
+</programlisting>
+<screen>
+Vertices: 10
+Edges: 0 
+Directed: TRUE
+</screen>
+</informalexample>
+This is a graph with ten vertices and zero edges.
+</para>
+
+</section>
+<section><title>Full graphs</title> 
+
+<para>
+A full graph is completely the opposite of empty graphs: it
+contains (one copy of) all possible edges. A full graph can be created
+by the <command>graph.full()</command> command. By default it creates
+undirected graphs with no loop (ie. self) edges:
+<informalexample><programlisting>
+<prompt>&gt; </prompt>f &lt;- graph.full(3)
+<prompt>&gt; </prompt>f
+</programlisting>
+<screen>
+Vertices: 3 
+Edges: 3 
+Directed: FALSE 
+
+Edges:
+[0] 0 -- 1
+[1] 0 -- 2
+[2] 1 -- 2
+</screen>
+</informalexample>
+The command has a <parameter>directed</parameter> parameter which can
+be set to <constant>TRUE</constant> to generated directed graphs:
+<informalexample><programlisting>
+<prompt>&gt; </prompt>f &lt;- graph.full(3, directed=TRUE)
+<prompt>&gt; </prompt>f
+</programlisting>
+<screen>
+Vertices: 3 
+Edges: 6 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 0 -> 2
+[2] 1 -> 0
+[3] 1 -> 2
+[4] 2 -> 0
+[5] 2 -> 1
+</screen>
+</informalexample>
+Note that igraph prints undirected edges with `--' and directed ones
+with '-&gt;', stressing that the order of the vertex ids in the edges are
+important only in directed graphs.
+TODO: figure with directed and undirected full graphs.
+</para>
+
+<para>
+If a graph is very big, then it is probably not a good idea to list
+its edges to the screen. In this case the standard
+<command>summary()</command> can be used to print some useful
+information about the graph:
+<informalexample><programlisting>
+<prompt>&gt; </prompt>big &lt;- graph.full(1000)
+<prompt>&gt; </prompt>summary(big)
+</programlisting>
+<screen>
+Vertices: 1000 
+Edges: 499500
+Directed: FALSE 
+</screen>
+</informalexample>
+</para>
+
+<para>
+<command>graph.full()</command> also has a <parameter>loops</parameter>
+parameter to include loop edges in graph.
+</para>
+
+<para>
+<command>graph.full()</command> never creates graphs with multiple
+edges.
+</para>
+
+</section>
+<section><title>Stars and Rings</title>
+
+<para>In a star graph, a single distinguished vertex is connected to
+every other vertices and there are no other edges present. In &igraph;
+three types of star graphs can be created, the
+<parameter>mode</parameter> decides which one to generate:
+<parameter>in</parameter> creates a directed graph in which every edge
+points to the distinguished vertex, <parameter>out</parameter> creates
+a directed graph with opposite directedness and
+<parameter>undirected</parameter> creates an undirected star.
+TODO: figure with the three stars here.
+</para>
+
+<para>
+The <command>graph_ring()</command> command can create various ring
+graphs (ie. one-dimensional lattices). The
+<parameter>directed</parameter>, <parameter>mutual</parameter> and
+<parameter>circular</parameter> parameters give the exact shape of the
+graph, see the figure for details.
+</para>
+
+</section>
+<section><title>Lattices</title>
+
+<para>
+</para>
+
+</section>
+
+</chapter>
