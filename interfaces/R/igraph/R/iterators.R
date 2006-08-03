@@ -101,9 +101,14 @@ E <- function(graph) {
     # language expression, we also do attribute based indexing
     graph <- get("graph", attr(x, "env"))
     i <- substitute(i)
+    adj <- function(idx) {
+      from <- get("from", parent.frame())
+      to <- get("to", parent.frame())
+      (from %in% idx) | (to %in% idx)
+    }
     i <- eval(i, c(graph[[9]][[4]], from=list(graph[[3]][ as.numeric(x)+1 ]),
                    to=list(graph[[4]][as.numeric(x)+1]), graph=list(graph),
-                   as.list(parent.frame())))
+                   adj=adj, as.list(parent.frame())))
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
       res <- i[ i %in% x ]
