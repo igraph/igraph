@@ -22,7 +22,7 @@
 */
 
 #include "igraph.h"
-#include <config.h>
+#include "config.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>
