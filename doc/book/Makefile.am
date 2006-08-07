@@ -1,7 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
 DOCFIX = datamodel.xml igraph.xml installation.xml introduction.xml \
-	 short.xml structures.xml ../licenses.xml
+	 short.xml structures.xml ../licenses.xml creating.xml graph.xml \
+	 random.xml bibliography.xml ../bibdatabase.xml foreign.xml \
+	 operators.xml motifs.xml pathlength.xml centrality.xml citation.xml \
+	 components.xml attributes.xml iterators.xml plotting.xml
 
 DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/book/%,$(DOCFIX))
 
@@ -22,9 +25,9 @@ doctemplate: $(DOCINCLUDES)
 igraph.xml: $(DOCINCLUDES)
 	touch igraph.xml
 
-html/stamp: igraph.xml $(DOCFIX2) ../gtk-doc.xsl
+html/stamp: igraph.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph.xml \
+	xmlto -x $(top_srcdir)/doc/book/gtk-doc.xsl -o html xhtml igraph.xml \
 	&& touch html/stamp
 
 igraph.info: igraph.xml $(DOCFIX2)

@@ -8,9 +8,9 @@
   <xsl:include href="version-greater-or-equal.xsl"/>
 
   <!-- change some parameters -->
-  <xsl:param name="bibliography.collection">bibdatabase.xml</xsl:param>
+  <xsl:param name="bibliography.collection">../bibdatabase.xml</xsl:param>
   <xsl:param name="bibliography.numbered">1</xsl:param>
-  <xsl:param name="toc.section.depth">1</xsl:param>
+  <xsl:param name="toc.section.depth">0</xsl:param>
   <xsl:param name="generate.section.toc.level">2</xsl:param>
   <xsl:param name="generate.toc">
     book	toc
@@ -21,6 +21,7 @@
   <xsl:param name="default.encoding" select="'US-ASCII'"/>
   <xsl:param name="chunker.output.encoding" select="'US-ASCII'"/>
   <xsl:param name="chunker.output.indent" select="'yes'"/>
+  <xsl:param name="chunk.section.depth">0</xsl:param>
   <xsl:param name="chunk.fast" select="1"/> 
   <xsl:param name="chapter.autolabel" select="0"/>
   <xsl:param name="use.id.as.filename" select="1"/>

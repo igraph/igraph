@@ -1,0 +1,253 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<application>igraph</application>">
+]>
+
+<chapter id="igraphbook-creating">
+<title>Creating Graphs</title>
+
+<section><title>Edge lists</title>
+
+<para>
+&igraph; graphs are most often created by giving the list of the edges
+to the <function>graph()</function> function:
+<informalexample><programlisting>
+<prompt>> </prompt> g1 &lt;- graph( c( 0,1, 1,2, 2,2, 2,3 ) )
+<prompt>> </prompt> g1
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 4 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 1 -> 2
+[2] 2 -> 2
+[3] 2 -> 3
+</screen>
+</informalexample>
+</para>
+
+<para>The <parameter>directed</parameter> parameter can be set to
+<constant>FALSE</constant> to create undirected graphs:
+<informalexample><programlisting>
+<prompt>> </prompt> g1 &lt;- graph( c( 0,1, 1,2, 2,2, 2,3 ), directed=FALSE )
+<prompt>> </prompt> g1
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 4 
+Directed: FALSE
+
+Edges:
+[0] 0 -- 1
+[1] 1 -- 2
+[2] 2 -- 2
+[3] 2 -- 3
+</screen>
+</informalexample>
+</para>
+
+<para>
+By default the number of vertices in the graph are determined
+from the edge list vector, it is the largest vertex id plus one. 
+The <parameter>n</parameter> parameter can be supplied to override
+this. Giving a small number here than the largest vertex id plus one
+in the edge list has no effect at all:
+<informalexample><programlisting>
+<prompt>> </prompt> graph( c( 0,1, 1,2, 2,2, 2,3, ), n=10)
+</programlisting>
+<screen>
+Vertices: 10 
+Edges: 4 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 1 -> 2
+[2] 2 -> 2
+[3] 2 -> 3
+</screen>
+<programlisting>
+<prompt>> </prompt> graph( c( 0,1, 1,2, 2,2, 2,3, ), n=1)
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 4 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 1 -> 2
+[2] 2 -> 2
+[3] 2 -> 3
+</screen>
+</informalexample>
+</para>
+
+<para>
+If you happen to have the edge list of a graph in a two-column matrix,
+then you can create an &igraph; graph by simply giving the transposed
+matrix to <function>graph()</function>:
+<informalexample><programlisting>
+<prompt>> </prompt> edgelist
+</programlisting>
+<screen>
+     [,1] [,2]
+[1,]    0    1
+[2,]    1    2
+[3,]    2    2
+[4,]    2    3
+</screen>
+<programlisting>
+<prompt>> </prompt> graph( t(edgelist) )
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 4 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 1 -> 2
+[2] 2 -> 2
+[3] 2 -> 3
+</screen>
+</informalexample>
+</para>
+
+<para>
+The <quote>inverse</quote> operation of <function>graph()</function>
+is <function>get.edgelist()</function>; this takes a graph object as
+an argument and returns an edge list in a two-column matrix.
+</para>
+
+</section>
+
+<!-- ################################################################## -->
+
+<section><title>Adjacency matrices</title>
+
+<para>
+An A adjacency matrix is a representation of a directed
+graph, it is a |V|x|V| matrix, |V| being the number of vertices and
+A(i,j) is 1 if there is an edge from vertex i-1 to
+vertex j-1 and zero otherwise. This definition can be generalized to
+represent multiple edges, ie. A(i,j) is the number of edges from
+vertex i-1 to vertex j-1, and can represent undirected graphs as
+well. 
+</para>
+
+<para>
+&igraph; provides the <function>graph.adjacency()</function> to create
+graphs from adjacency matrices. Its only required parameter is the
+adjacency matrix, and it has an optional <parameter>mode</parameter>
+parameter which specifies how to interpret the adjacency matrix. Its
+possible values:
+<glosslist>
+<glossentry>
+<glossterm><constant>directed</constant></glossterm>
+<glossdef><para>A directed graph will be created, A(i,j) gives the number of
+edges from vertex i-1 to vertex j-1.</para></glossdef>
+</glossentry>
+<glossentry>
+<glossterm><constant>undirected</constant></glossterm>
+<glossdef><para>An undirected graph will be created, the number of
+edges added from vertex i-1 to vertex j-1 is the maximum of A(i,j) and
+A(j,i).</para></glossdef>
+</glossentry>
+<glossentry>
+<glossterm><constant>max</constant></glossterm>
+<glossdef><para>An undirected graph will be created, the number of
+edges added from vertex i-1 to vertex j-1 is the maximum of A(i,j) and
+A(j,i). This mode is the same as <constant>undirected</constant>.
+</para></glossdef>
+</glossentry>
+<glossentry>
+<glossterm><constant>min</constant></glossterm>
+<glossdef><para>An undirected graph will be created, the number of
+edges from vertex i-1 to vertex j-1 is the minimum if A(i,j) and
+A(j,i).</para></glossdef>
+</glossentry>
+<glossentry>
+<glossterm><constant>upper</constant></glossterm>
+<glossdef><para>An undirected graph will be created, the number of
+edges between vertices is given by the upper triangle of the 
+adjacency matrix, the lower triangle is ignored. (The diagonal is
+considered to be part of the upper triangle so loop edges might be
+created.)</para></glossdef>
+</glossentry>
+<glossentry>
+<glossterm><constant>lower</constant></glossterm>
+<glossdef><para>An undirected graph will be created, the number of
+edges between vertices is given by the lower triangle of the adjacency
+matrix, the upper triangle is ignored. (The diagonal is considered to
+be part of the lower triangle so loop edges might be
+created.)</para></glossdef> 
+</glossentry>
+<glossentry>
+<glossterm><constant>plus</constant></glossterm>
+<glossdef><para>An undirected graph will be created, the number of
+edges from vertex i-1 to vertex j-1 is given by A(i,j)+A(j,i).
+</para></glossdef>
+</glossentry>
+</glosslist>
+</para>
+
+<para>
+Here are some examples, we use the same adjacency matrix with
+different <parameter>mode</parameter> parameter.
+TODO
+</para>
+
+<para>
+<function>graph.adjacency()</function> also accepts logical matrices,
+the TRUE value corresponds to 1 and FALSE is interpreted as 0. This
+can be used to create graph based on a <emphasis>threshold</emphasis>
+on the A(i,j) values: 
+<informalexample><programlisting>
+<prompt>> </prompt> M &lt;- matrix( runif(100), nr=10 )
+<prompt>> </prompt> graph.adjacency( M >= 0.9 )
+</programlisting>
+<screen>
+Vertices: 10 
+Edges: 13 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 7
+[1] 1 -> 1
+[2] 1 -> 4
+[3] 1 -> 5
+[4] 3 -> 0
+[5] 4 -> 0
+[6] 4 -> 2
+[7] 4 -> 7
+[8] 6 -> 8
+[9] 7 -> 4
+[10] 7 -> 5
+[11] 7 -> 7
+[12] 9 -> 7
+</screen>
+</informalexample>
+</para>
+
+<para>The <quote>inverse</quote> operation of
+<function>graph.adjacency()</function> is
+<function>get.adjacency()</function>, this takes a graph and returns an
+adjacency matrix. For undirected graphs it also takes an optional
+argument called <parameter>type</parameter>. If its value is
+<constant>both</constant> then a symmetric adjacency matrix is
+returned, for <constant>upper</constant> only the upper triangle
+of the adjacency matrix will contain the data (including the
+diagonal), the lower triangle is filled with
+zeros. <constant>lower</constant> is the opposite: the lower triangle
+(including the diagonal) contains data, the upper triangle is filled
+with zeros.
+</para>
+
+</section>
+
+</chapter>

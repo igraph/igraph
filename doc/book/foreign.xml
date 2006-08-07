@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<application>igraph</application>">
+]>
+
+<chapter id="igraphbook-foreign">
+<title>Importing and Exporting Graphs</title>
+
+<para>
+&igraph; provides the <function>read.graph()</function> and
+<function>write.graph()</function> functions for reading and writing
+graphs from and to files. Both of these functions can handle a number
+of different file formats, which can be selected by the
+<parameter>format</parameter> argument.
+</para>
+
+<para>
+Note however that you don't neccessarily need special &igraph;
+functions to read and write graphs in various formats, as there is a
+wealth of R functions for importing and exporting data in a variety of
+formats. For example you can use the standard R
+<function>scan()</function> to read an edge list from a file
+and then <function>graph()</function> to create a graph object from
+it. Similarly you can use <function>get.edgelist()</function> to
+create an edge list from a graph object and the standard
+<function>write()</function> to export it to a file.
+</para>
+
+<para>
+As R can also import Excel files via the <filename>.csv</filename>
+file format, Excel files can also easily converted to &igraph; graph
+objects; just like nearly any other format.
+</para>
+
+<para>
+Another possiblity to store graph data in files is to use the
+<function>save()</function> and <function>load()</function> functions
+as provided by R. Graph objects can be safely saved and loaded this
+way. </para>
+
+<section><title>Simple formats</title>
+
+<para>
+Simple formats can tipically store the structure of a graph but no
+or just limited amount of meta-data like edge weights, vertex colors,
+etc.
+</para>
+
+<section><title>Edge List Files</title>
+
+<para>
+Perhaps the simplest file format &igraph; can handle is the edge
+list format. This is nothing more than a simple text file with two
+whitespace separated columns containing vertex ids (ie. non-negative
+numbers). 
+So if the <filename>graph.txt</filename> contains the following
+edge list:
+<screen>
+0 1
+2 3
+3 2
+1 0
+</screen>
+then it can be read by setting the <parameter>format</parameter>
+argument to <constant>edgelist</constant>:
+<informalexample><programlisting>
+<prompt>> </prompt>read.graph("graph.txt", format="edgelist")
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 4 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 2 -> 3
+[2] 3 -> 2
+[3] 1 -> 0
+</screen>
+</informalexample>
+<function>read.graph()</function> has an optional
+<parameter>directed</parameter> argument, set this to
+<constant>FALSE</constant> to create an undirected graph, the
+default is directed. There is also an optional
+<parameter>n</parameter> argument, this is the number of vertices in
+the graph. Set this to the desired value if it is bigger than the
+highest vertex id in the edge list file. (If it is set to a smaller
+value then it will be ignored.)
+</para>
+</section>
+
+<section><title>Large Graph Layout Formats</title>
+
+<para>
+These two formats were introduced by the Large Graph Layout
+program, they are abre to store edge weights and symbolic vertex
+names. See also 
+<ulink url="http://bioinformatics.icmb.utexas.edu/lgl">the LGL
+homepage</ulink>.
+</para>
+
+<para>
+The <constant>ncol</constant> format is simply a weighted edge list
+with symbolic vertex names. The vertex names and the weight are
+separaeted by white space, the vertex names themselves cannot contain
+white space. The weights are optional. The vertex names are stored in
+the vertex attribute <constant>name</constant>, the edge weights are
+stored in the edge attribute <constant>weight</constant>. You may set
+the <parameter>names</parameter> and/or <parameter>weights</parameter>
+optional arguments to <constant>FALSE</constant> if you don't want to
+set these attributes.
+</para>
+
+<para>
+If the file <filename>graph.ncol</filename> contains
+the following graph:
+<screen>
+foo    bar 1
+bar    baz -1
+foobar foo 
+foo    baz 2
+</screen>
+then we get the following graph object:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- read.graph("graph.ncol", format="ncol")
+<prompt>> </prompt>g
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 4 
+Directed: FALSE 
+
+Edges:
+[0] 0 -- 1
+[1] 1 -- 2
+[2] 0 -- 3
+[3] 0 -- 2
+</screen>
+<programlisting>
+<prompt>> </prompt>V(g)$name
+</programlisting>
+<screen>
+[1] "foo"    "bar"    "baz"    "foobar"
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g)$weight
+</programlisting>
+<screen>
+[1]  1 -1  0  2
+</screen>
+</informalexample>
+</para>
+
+<para>The other LGL format is the <constant>lgl</constant>
+format. This is adjacency list like format, it might contain symbolic
+vertex names and optionally edge weights: 
+<screen>
+# vertex1name
+vertex2name [optionalWeight]
+vertex3name [optionalWeight]
+</screen>
+
+</para>
+
+</section>
+
+</section>
+
+<section><title>The Pajek format</title>
+<para></para>
+</section>
+
+<section><title>The GraphML format</title>
+<para></para>
+</section>
+
+</chapter>

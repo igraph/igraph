@@ -5,7 +5,7 @@
 ]>
 
 <chapter id="igraphbook-structures">
-<title>Creating Regular Graphs</title>
+<title>Regular Graphs</title>
 
 <section><title>Empty graphs</title>
 
@@ -32,10 +32,10 @@ Directed: TRUE
 
 <para>
 This small example illustrates a number of things: empty graphs can be
-created by the <command>graph.empty</command> command; by default this
+created by the <function>graph.empty()</function> command; by default this
 command creates a graph with no vertices and no edges (well this is
 what the word empty means); by default this command created directed
-graphs. <command>graph.empty</command> has an optional parameter:
+graphs. <function>graph.empty()</function> has an optional parameter:
 <parameter>n</parameter>, the number of vertices in the graph. (A
 graph with non-zero number of vertices and no edges is still called
 and empty graph.)
@@ -58,7 +58,7 @@ This is a graph with ten vertices and zero edges.
 <para>
 A full graph is completely the opposite of empty graphs: it
 contains (one copy of) all possible edges. A full graph can be created
-by the <command>graph.full()</command> command. By default it creates
+by the <function>graph.full()</function> command. By default it creates
 undirected graphs with no loop (ie. self) edges:
 <informalexample><programlisting>
 <prompt>&gt; </prompt>f &lt;- graph.full(3)
@@ -95,16 +95,65 @@ Edges:
 [5] 2 -> 1
 </screen>
 </informalexample>
-Note that igraph prints undirected edges with `--' and directed ones
+Note that &igraph; prints undirected edges with `--' and directed ones
 with '-&gt;', stressing that the order of the vertex ids in the edges are
 important only in directed graphs.
-TODO: figure with directed and undirected full graphs.
+</para>
+
+<para>
+Here is an example of an undirected full graph:
+<mediaobject>
+<imageobject><imagedata fileref="full.pdf" format="PDF" /></imageobject>
+<imageobject><imagedata fileref="full.png" format="PNG"
+/></imageobject>
+</mediaobject>
+</para>
+
+<para>
+Some &igraph; functions provide information about the structure of a
+graph, <function>is.directed()</function> returns a logical constant,
+<constant>TRUE</constant> is the argument graph is directed and
+<constant>FALSE</constant>
+otherwise. <function>are.connected()</function> gives
+<constant>TRUE</constant> if the given vertices are connected with an
+edge and <constant>FALSE</constant> otherwise. It works slightly
+differently for directed and undirected graphs; for undirected graphs
+the order of the vertex id parameters doesn't matter; for directed
+graph it searches for an edge from the first vertex to the second:
+<informalexample>
+<programlisting>
+<prompt>> </prompt>is.directed(graph.full(10))
+</programlisting>
+<screen>
+[1] FALSE
+</screen>
+<programlisting>
+<prompt>> </prompt>is.directed(graph.full(10, directed=TRUE))
+</programlisting>
+<screen>
+[1] TRUE
+</screen>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph.full(10)
+<prompt>> </prompt>are.connected(g, 1,4)
+</programlisting>
+<screen>
+[1] TRUE
+</screen>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph.empty(n=10)
+<prompt>> </prompt>are.connected(g, 1,4)
+</programlisting>
+<screen>
+[1] FALSE
+</screen>
+</informalexample>
 </para>
 
 <para>
 If a graph is very big, then it is probably not a good idea to list
 its edges to the screen. In this case the standard
-<command>summary()</command> can be used to print some useful
+<function>summary()</function> can be used to print some useful
 information about the graph:
 <informalexample><programlisting>
 <prompt>&gt; </prompt>big &lt;- graph.full(1000)
@@ -119,12 +168,12 @@ Directed: FALSE
 </para>
 
 <para>
-<command>graph.full()</command> also has a <parameter>loops</parameter>
+<function>graph.full()</function> also has a <parameter>loops</parameter>
 parameter to include loop edges in graph.
 </para>
 
 <para>
-<command>graph.full()</command> never creates graphs with multiple
+<function>graph.full()</function> never creates graphs with multiple
 edges.
 </para>
 
@@ -139,11 +188,14 @@ three types of star graphs can be created, the
 points to the distinguished vertex, <parameter>out</parameter> creates
 a directed graph with opposite directedness and
 <parameter>undirected</parameter> creates an undirected star.
-TODO: figure with the three stars here.
+<mediaobject>
+<imageobject><imagedata fileref="stars.pdf" format="PDF" /></imageobject>
+<imageobject><imagedata fileref="stars.png" format="PNG" width="960" /></imageobject>
+</mediaobject>
 </para>
 
 <para>
-The <command>graph_ring()</command> command can create various ring
+The <function>graph_ring()</function> command can create various ring
 graphs (ie. one-dimensional lattices). The
 <parameter>directed</parameter>, <parameter>mutual</parameter> and
 <parameter>circular</parameter> parameters give the exact shape of the
@@ -154,6 +206,103 @@ graph, see the figure for details.
 <section><title>Lattices</title>
 
 <para>
+An n-dimensional lattice (sometimes also called grid) is a graph in
+which the vertices are placed at the integer coordinate points of the
+n-dimensional Euclidean space and each vertex connects to vertices
+which are exactly one unit away from it. Ie. if the lattice is two
+dimensional and the length of the lattice is 5 along the first and 3
+along the second dimension, than it has 15 vertices and they're placed
+at coordinates (1,1), (1,2), (1,3), (2,1), &hellip; (5,3) and two
+vertices are connected if the difference of one of their coordinates is
+one or minus one and all their other coordinates are exactly the same.
+<mediaobject>
+<imageobject><imagedata fileref="lattice.pdf" format="PDF" /></imageobject>
+<imageobject><imagedata fileref="lattice.png" format="PNG" /></imageobject>
+</mediaobject>
+</para>
+
+<para>
+In &igraph; lattices are generated with
+<function>graph.lattice()</function>. It has two different forms. In the
+first form, the parameter <parameter>length</parameter>, the length of the
+lattice along every dimension  and parameter
+<parameter>dim</parameter>, the dimensionality of the lattice are
+given. In the second form the parameter
+<parameter>dimvector</parameter> is given, this contains the length of
+the lattice along each dimensions separately. The default is the
+second form. The following two are equivalent, they create the same
+graphs: 
+<informalexample><programlisting>
+<prompt>&gt; </prompt>l1 &lt;- graph.lattice(length=5, dim=2)
+<prompt>&gt; </prompt>l2 &lt;- graph.lattice( c(5,5) )
+</programlisting></informalexample>
+The second form is obviously more general.
+</para>
+
+<para>
+<function>graph.lattice()</function> generates non-circular lattice by
+defaults. In a circular lattice the difference of the coordinates of
+the vertices is calculated modulo the size of the lattice along the
+given dimension so for example in the circular 5x3 two dimensional
+lattice vertices (1,1) and (1,3) are also connected just like (1,1)
+and (5,1). The <parameter>circular</parameter> parameter of
+<function>graph.lattice()</function> can be set to
+<constant>TRUE</constant> to generate circular graphs.
+</para>
+
+<para><function>graph.lattice()</function> generates undirected graphs
+by default, but the <parameter>directed</parameter> parameter can be
+set to <constant>TRUE</constant> to generate directed lattices. The
+direction of the edges is such that the edge points from the vertex
+with the smaller vertex id to the vertex with the larger vertex id. 
+If the <parameter>mutual</parameter> parameter is also set to
+<constant>TRUE</constant> then two directed edges are created in both
+direction. 
+</para>
+</section>
+
+<section><title>Trees</title>
+
+<para>
+&igraph; has some limited capabilities for creating trees with the
+<function>graph.tree()</function> function. The only kind of trees this
+function can generate are almost complete regular trees. In a complete
+regular tree every vertex has the same number of children except for
+the leafs which have no children at all. An almost complete regular
+tree is made from a complete regular tree by removing some of the
+leafs from it. 
+</para>
+
+<para>The directedness of the edges of tree is determined by the
+<parameter>mode</parameter> parameter. See the figure for the possible
+values of this parameter.
+TODO: figure with different mode parameters.
+</para>
+
+</section>
+
+<section><title>The Graph Atlas</title>
+
+<para>
+&igraph; can generate graphs from the book <citetitle>An Atlas of
+Graphs</citetitle> by Roland C. Read and Robin J. Wilson. The atlas
+contains all undirected graphs with up to seven vertices, numbered
+from 0 up to 1252. The graphs are listed:
+<orderedlist>
+<listitem><para>
+in increasing order of number of nodes;
+</para></listitem>
+<listitem><para>
+for a fixed number of nodes, in increasing order of the number of
+edges;
+</para></listitem>
+<listitem><para>for fixed numbers of nodes and edges, in increasing
+order of the degree sequence, for example 111223 &lt; 112222;
+</para></listitem>
+<listitem><para>
+for fixed degree sequence, in increasing number of automorphisms.
+</para></listitem>
+</orderedlist>
 </para>
 
 </section>

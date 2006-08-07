@@ -15,6 +15,7 @@ o portability tests
 
 Other bits:
 
+o iterator for the non-neighbors of a vertex
 o index in pdf manual
 o add attribute support to spanning tree functions
 o PAJEK import improvements: 

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE bibliography PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+]>
+
+<bibliography>
+
+  <biblioentry id="bib:barabasi99a">
+    <authorgroup>
+      <author><firstname>Albert-László</firstname>
+      <surname>Barabási</surname></author>
+      <author><firstname>Réka</firstname><surname>Albert</surname></author>
+    </authorgroup>
+    <subtitle>Emergence of scaling in random networks</subtitle>
+    <title>Science</title>
+    <pubdate>1999</pubdate>
+    <volumenum>286</volumenum>
+    <pagenums>509-512</pagenums>
+  </biblioentry>
+  
+  <biblioentry id="bib:zalanyi03">
+    <authorgroup>
+      <author><firstname>László</firstname><surname>Zalányi</surname></author>
+      <author><firstname>Gábor</firstname><surname>Csárdi</surname></author>
+      <author><firstname>Tamás</firstname><surname>Kiss</surname></author>
+      <author><firstname>Máté</firstname><surname>Lengyel</surname></author>
+      <author><firstname>Rebecca</firstname><surname>Warner</surname></author>
+      <author><firstname>Jan</firstname><surname>Tobochnik</surname></author>
+      <author><firstname>Péter</firstname><surname>Érdi</surname></author>
+    </authorgroup>
+    <subtitle>Properties of a random attachment growing network</subtitle>
+    <title>Phyisical Review E</title>
+    <pubdate>2003</pubdate>
+    <volumenum>68</volumenum>
+    <pagenums>066104</pagenums>
+  </biblioentry>
+
+</bibliography>

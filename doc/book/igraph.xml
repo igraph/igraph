@@ -35,9 +35,24 @@
 <xi:include href="short.xml" />
 <xi:include href="installation.xml" />
 <xi:include href="datamodel.xml" />
+<xi:include href="graph.xml" />
 <xi:include href="structures.xml" />
+<xi:include href="creating.xml" />
+<xi:include href="random.xml" />
+<xi:include href="foreign.xml" />
+<xi:include href="plotting.xml" />
+<xi:include href="attributes.xml" />
+<xi:include href="iterators.xml" />
+<xi:include href="components.xml" />
+<xi:include href="citation.xml" />
+<xi:include href="centrality.xml" />
+<xi:include href="pathlength.xml" />
+<xi:include href="motifs.xml" />
+<xi:include href="operators.xml" />
 
 <xi:include href="../licenses.xml"/>
+
+<xi:include href="bibliography.xml" />
 
 <index/>
 

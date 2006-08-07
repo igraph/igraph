@@ -64,3 +64,8 @@ a:hover
   text-decoration: underline;
   color: #FF0000;
 }
+body
+{
+  margin-left: 10%;
+  margin-right: 10%;
+}

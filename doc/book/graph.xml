@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<application>igraph</application>">
+]>
+
+<chapter id="igraphbook-graph">
+<title>Graphs Objects</title>
+
+<para>
+&igraph; uses graph objects to represent graphs, a graph object is an
+opaque type in the sense that users are not expected to manipulate
+graph objects directly. Instead &igraph; provides functions to create
+and manipulate graph objcets. This organization has the advantage that
+the internal representation can be changed any time without breaking
+any code, assuming the users keep the rules. To facilitate the proper
+usage of &igraph; graph object we do not present the internal graph
+representation here.
+</para>
+
+<para>
+There are several functions which create graph objects, here is a
+very incomplete list of them: <function>graph()</function>,
+<function>graph.star()</function>, <function>graph.tree()</function>,
+<function>graph.adjacency()</function>,
+<function>barabasi.game()</function>.
+</para>
+
+<para>
+For example <function>graph()</function> creates a directed graph from
+a list of edges:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- graph( c(0,1, 1,2, 3,4, 5,6) )
+<prompt>> </prompt>g
+</programlisting>
+<screen>
+Vertices: 7 
+Edges: 4 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 1 -> 2
+[2] 3 -> 4
+[3] 5 -> 6
+</screen>
+</informalexample>
+</para>
+
+<para>
+Graph objects have an R class, it is called
+<constant>igraph</constant> and the <function>is.igraph</function>
+function can also be used to check that an R object is an &igraph;
+graph object:
+<informalexample><programlisting>
+<prompt>> </prompt>class( graph( 1:10 ) )
+</programlisting>
+<screen>
+[1] "igraph"
+</screen>
+<programlisting>
+<prompt>> </prompt>is.igraph( graph( 1:10 ) )
+</programlisting>
+<screen>
+[1] TRUE
+</screen>
+<programlisting>
+<prompt>> </prompt>is.igraph( 1:10 )
+</programlisting>
+<screen>
+[1] FALSE
+</screen>
+</informalexample>
+</para>
+
+</chapter>
