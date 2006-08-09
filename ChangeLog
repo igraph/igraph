@@ -1,5 +1,11 @@
 2006-08-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/foreign-graphml.c (igraph_read_graph_graphml) : remove
+	'directed' attribute, (somewhat) better error handling, memory leaks
+	corrected
+
+2006-08-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* src/foreign.c (igraph_read_graph_graphml, igraph_write_graph_graphml)
 	: moved to src/foreign-graphml.c
 

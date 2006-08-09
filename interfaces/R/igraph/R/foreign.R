@@ -205,10 +205,9 @@ write.graph.pajek <- function(graph, file, ...) {
 # GraphML
 ################################################################
 
-read.graph.graphml <- function(file, directed=NULL, index=0, ...) {
+read.graph.graphml <- function(file, index=0, ...) {
 
-  .Call("R_igraph_read_graph_graphml", file, as.logical(directed),
-        as.numeric(index),
+  .Call("R_igraph_read_graph_graphml", file, as.numeric(index),
         PACKAGE="igraph")
 }
 

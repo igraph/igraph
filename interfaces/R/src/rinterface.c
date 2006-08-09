@@ -3949,9 +3949,8 @@ SEXP R_igraph_to_undirected(SEXP graph, SEXP pmode) {
   return result;
 }
 
-SEXP R_igraph_read_graph_graphml(SEXP pvfile, SEXP pdirected, SEXP pindex) {
+SEXP R_igraph_read_graph_graphml(SEXP pvfile, SEXP pindex) {
   igraph_t g;
-  igraph_bool_t directed=LOGICAL(pdirected)[0];
   int index=REAL(pindex)[0];
   FILE *file;
   SEXP result;
@@ -3965,7 +3964,7 @@ SEXP R_igraph_read_graph_graphml(SEXP pvfile, SEXP pdirected, SEXP pindex) {
 #endif
   if (file==0) { igraph_error("Cannot open GraphML file", __FILE__, __LINE__,
 			      IGRAPH_EFILE); }
-  igraph_read_graph_graphml(&g, file, directed, index);
+  igraph_read_graph_graphml(&g, file, index);
   fclose(file);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
