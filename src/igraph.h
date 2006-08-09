@@ -158,6 +158,7 @@ typedef enum { IGRAPH_TO_UNDIRECTED_EACH=0,
 #define IGRAPH_VS_VECTORPTR 4
 #define IGRAPH_VS_VECTOR    5
 #define IGRAPH_VS_SEQ       6
+#define IGRAPH_VS_NONADJ    7
 
 typedef struct igraph_vs_t {
   int type;
@@ -181,6 +182,9 @@ igraph_vs_t igraph_vss_all();
 int igraph_vs_adj(igraph_vs_t *vs, 
 		  igraph_integer_t vid, igraph_neimode_t mode);
 igraph_vs_t igraph_vss_adj(igraph_integer_t vid, igraph_neimode_t mode);
+
+int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid, 
+		     igraph_neimode_t mode);
 
 int igraph_vs_none(igraph_vs_t *vs);
 igraph_vs_t igraph_vss_none();

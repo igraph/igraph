@@ -4,6 +4,10 @@
 	'directed' attribute, (somewhat) better error handling, memory leaks
 	corrected
 
+	* src/iterators.c (igraph_vs_nonadj) : added
+	(igraph_vs_destroy, igraph_vit_create) : added NONADJ type
+	* examples/simple/igraph_vs_nonadj.c : added
+	
 2006-08-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_graphml, igraph_write_graph_graphml)

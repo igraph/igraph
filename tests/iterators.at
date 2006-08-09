@@ -26,6 +26,11 @@ AT_KEYWORDS([iterator vector igraph_vs_vector igraph_vs_vectorview])
 AT_COMPILE_CHECK([simple/igraph_vs_vector.c], [simple/igraph_vs_vector.out])
 AT_CLEANUP
 
+AT_SETUP([Non-adjacent vertices (igraph_vs_nonadj): ])
+AT_KEYWORDS([iterator igraph_vs_nonadj])
+AT_COMPILE_CHECK([simple/igraph_vs_nonadj.c], [simple/igraph_vs_nonadj.out])
+AT_CLEANUP
+
 #AT_SETUP([Adjacent edges (igraph_es_adj): ])
 #AT_KEYWORDS([iterator adjacent igraph_es_adj])
 #AT_COMPILE_CHECK([simple/igraph_es_adj.c], [simple/igraph_es_adj.out])

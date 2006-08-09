@@ -135,6 +135,14 @@ int igraph_vs_adj(igraph_vs_t *vs,
   return 0;
 }
 
+int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid, 
+		     igraph_neimode_t mode) {
+  vs->type=IGRAPH_VS_NONADJ;
+  vs->data.adj.vid=vid;
+  vs->data.adj.mode=mode;
+  return 0;
+}
+
 /** 
  * \function igraph_vs_none
  * 
@@ -378,6 +386,7 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
   case IGRAPH_VS_1:
   case IGRAPH_VS_VECTORPTR:
   case IGRAPH_VS_SEQ:
+  case IGRAPH_VS_NONADJ:
     break;
   case IGRAPH_VS_VECTOR:
     igraph_vector_destroy((igraph_vector_t*)vs->data.vecptr);
@@ -455,6 +464,10 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
 
 int igraph_vit_create(const igraph_t *graph, 
 		      igraph_vs_t vs, igraph_vit_t *vit) {
+  igraph_vector_t vec;
+  igraph_bool_t *seen;
+  long int i, j, n;
+
   switch (vs.type) {
   case IGRAPH_VS_ALL:
     vit->type=IGRAPH_VIT_SEQ;
@@ -476,6 +489,43 @@ int igraph_vit_create(const igraph_t *graph,
 				  vs.data.adj.vid, vs.data.adj.mode));
     vit->end=igraph_vector_size(vit->vec);
     IGRAPH_FINALLY_CLEAN(2);
+    break;
+  case IGRAPH_VS_NONADJ:
+    vit->type=IGRAPH_VIT_VECTOR;
+    vit->pos=0;
+    vit->start=0;
+    vit->vec=Calloc(1, igraph_vector_t);
+    if (vit->vec == 0) {
+      IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) vit->vec);
+    IGRAPH_VECTOR_INIT_FINALLY((igraph_vector_t *) vit->vec, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+    IGRAPH_CHECK(igraph_neighbors(graph, &vec, 
+				  vs.data.adj.vid, vs.data.adj.mode));
+    n=igraph_vcount(graph);
+    seen=Calloc(n, igraph_bool_t);
+    if (seen==0) {
+      IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, seen);
+    for (i=0; i<igraph_vector_size(&vec); i++) {
+      if (! seen [ (long int) VECTOR(vec)[i] ] ) {
+	n--;
+	seen[ (long int) VECTOR(vec)[i] ] = 1;
+      }
+    }
+    IGRAPH_CHECK(igraph_vector_resize((igraph_vector_t*)vit->vec, n));
+    for (i=0, j=0; j<n; i++) {
+      if (!seen[i]) {
+	VECTOR(*vit->vec)[j++] = i;
+      }
+    }
+    
+    Free(seen);
+    igraph_vector_destroy(&vec);
+    vit->end=n;
+    IGRAPH_FINALLY_CLEAN(4);
     break;
   case IGRAPH_VS_NONE:
     vit->type=IGRAPH_VIT_SEQ;
