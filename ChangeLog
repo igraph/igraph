@@ -1,3 +1,9 @@
+2006-08-09  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+ 
+ 	* configure.in : modified to generate a proper makefile for
+ 	Intel-based Macs.
+ 	* interfaces/python/*.c : removed some unused variables
+
 2006-08-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-graphml.c (igraph_read_graph_graphml) : remove

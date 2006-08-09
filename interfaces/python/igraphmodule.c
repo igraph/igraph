@@ -278,7 +278,7 @@ static void igraphmodule_i_attribute_destroy(igraph_t *graph) {
 
 /* Copying */
 static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from) {
-  PyObject **fromattrs, **toattrs, *key, *value, *newval, *o;
+  PyObject **fromattrs, **toattrs, *key, *value, *newval, *o=NULL;
   int i, j, pos;
  
   /* printf("Copying attribute table\n"); */
@@ -319,7 +319,7 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from) {
 /* Adding vertices */
 static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr) {
   /* Extend the end of every value in the vertex hash with nv pieces of None */
-  PyObject *key, *value, *dict, *l, *r;
+  PyObject *key, *value, *dict;
   int pos=0;
   long int i;
   
@@ -402,7 +402,7 @@ static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
 /* Adding edges */
 static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vector_t *edges, igraph_vector_ptr_t *attr) {
   /* Extend the end of every value in the edge hash with ne pieces of None */
-  PyObject *key, *value, *dict, *l, *r;
+  PyObject *key, *value, *dict;
   int pos=0;
   long int i, ne;
 
@@ -634,7 +634,7 @@ initigraph(void)
   if (PyType_Ready(&igraphmodule_BFSIterType) < 0) return;
   
   igraphmodule_InternalError =
-    PyErr_NewException("igraph.InternalError", NULL, NULL);
+    PyErr_NewException("igraph.InternalError", PyExc_Exception, NULL);
   
   Py_INCREF(igraphmodule_InternalError);
   

@@ -47,8 +47,6 @@ PyTypeObject igraphmodule_GraphType;
  * \c tp_alloc
  */
 void igraphmodule_Graph_init_internal(igraphmodule_GraphObject *self) {
-  int i;
-  
   if (!self) return;
   self->vseq = NULL;
   self->eseq = NULL;
@@ -100,8 +98,6 @@ PyObject* igraphmodule_Graph_new(PyTypeObject *type, PyObject *args,
  */
 int igraphmodule_Graph_clear(igraphmodule_GraphObject *self) {
   PyObject *tmp;
-  int i;
-  
   PyObject_GC_UnTrack(self);
   
   tmp=self->vseq;
@@ -209,7 +205,7 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject* self)
 int igraphmodule_Graph_init(igraphmodule_GraphObject *self,
 			    PyObject *args, PyObject *kwds) {
   char *kwlist[] = {"n", "edges", "directed", NULL};
-  int n=1, i;
+  int n=1;
   PyObject *edges=NULL, *dir=Py_False;
   igraph_vector_t edges_vector;
    
@@ -428,9 +424,8 @@ PyObject* igraphmodule_Graph_delete_edges(igraphmodule_GraphObject *self,
 						 PyObject *kwds) 
 {
   PyObject *list;
-  igraph_vector_t v, v2;
+  igraph_vector_t v;
   igraph_es_t es;
-  int i;
   
   if (!PyArg_ParseTuple(args, "O", &list)) return NULL;
   Py_INCREF(list);

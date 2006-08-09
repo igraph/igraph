@@ -19,7 +19,7 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdlib.h string.h time.h unistd.h])
 
-AC_DEFUN(IGRAPH_WARNING,
+AC_DEFUN([IGRAPH_WARNING],
 [AC_MSG_CHECKING(whether compiler accepts $1)
 AC_SUBST(WARNING_CFLAGS)
 ac_save_CFLAGS="$CFLAGS"
@@ -31,7 +31,7 @@ AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 CFLAGS="$ac_save_CFLAGS"])
 
-AC_DEFUN(IGRAPH_CC_SWITCH,
+AC_DEFUN([IGRAPH_CC_SWITCH],
 [AC_MSG_CHECKING(whether compiler supports $1)
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $1"
@@ -145,16 +145,20 @@ if test $use_python = yes -a $HAVE_PYTHON -gt 0; then
   
   AC_CHECK_LIB([python${PYTHON_VERSION}], Py_NewInterpreter,
     [PyPYTHONLIBS="-lpython${PYTHON_VERSION}"],
-    [if test -f ${PyLIBPL}/libpython${PYTHON_VERSION}.a; then
-      PyPYTHONLIBS=${PyLIBPL}/libpython${PYTHON_VERSION}.a
-    else
-      # Mac OS X doesn't have libpython*.a but supports dynamic lookup
+    [
       IGRAPH_CC_SWITCH([-undefined dynamic_lookup], [
+        # Mac OS X doesn't have libpython*.a but supports dynamic lookup
         PyPYTHONLIBS=""
+        PyLIBS="-undefined dynamic_lookup -module"
+        PyMODLIBS=""
         PYTHON_LDFLAGS="-undefined dynamic_lookup -module"
-      ], [AC_ERROR([cannot link to Python and no dynamic lookup available])]
-      )
-    fi
+      ], [
+        if test -f ${PyLIBPL}/libpython${PYTHON_VERSION}.a; then
+          PyPYTHONLIBS=${PyLIBPL}/libpython${PYTHON_VERSION}.a
+        else
+          AC_ERROR([cannot link to Python and no dynamic lookup available])
+        fi
+      ])
     ], [ ${PyLIBS} ${PyMODLIBS} ])
     
   PYTHON_LIBS="${PyPYTHONLIBS} ${PyLIBS} ${PyMODLIBS}"
