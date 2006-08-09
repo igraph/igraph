@@ -44,7 +44,8 @@ if test $graphml_support = yes; then
     ])
   fi
 fi
+AC_SUBST(HAVE_LIBXML)
 
-AC_CONFIG_FILES([src/config.h R/config.R])
+AC_CONFIG_FILES([src/config.h R/config.R src/Makevars])
 
 AC_OUTPUT

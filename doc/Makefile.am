@@ -67,8 +67,9 @@ attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(SRCDIR)/attributes.h
 layout.xml: layout.xxml $(SRCDIR)/layout.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c
 
-foreign.xml: foreign.xxml $(SRCDIR)/foreign.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c
+foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c \
+	$(SRCDIR)/foreign-graphml.c
 
 nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/other.c $(SRCDIR)/random.c

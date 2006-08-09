@@ -14,7 +14,8 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	igraph_strvector.c igraph_trie.c matrix.c \
 	vector.c vector_ptr.c memory.c adjlist.c visitors.c \
 	igraph_grid.c atlas.c topology.c motifs.c progress.c \
-	operators.c interrupt.c igraph_psumtree.c array.c igraph_hashtable.c
+	operators.c interrupt.c igraph_psumtree.c array.c \
+	igraph_hashtable.c foreign-graphml.c
 
 RSNAMES_H = memory.h random.h atlas-edges.h
 
@@ -37,7 +38,7 @@ RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 	$(top_srcdir)/include/interrupt.h
 
 RSRCSOURCES = $(top_srcdir)/interfaces/R/src/rinterface.c \
-	$(top_srcdir)/interfaces/R/src/Makevars \
+	$(top_srcdir)/interfaces/R/src/Makevars.in \
 	$(top_srcdir)/interfaces/R/src/Makevars.win \
 	$(top_srcdir)/interfaces/R/src/config.h.in  \
 	$(top_srcdir)/interfaces/R/src/config.h

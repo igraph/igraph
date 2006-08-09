@@ -1,3 +1,11 @@
+2006-08-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (read.graph, write.graph) :
+	added graphml format
+	(read.graph.graphml, write.graph.graphml) : added
+	* interfaces/R/src/rinterface.c (R_igraph_read_graph_graphml)
+	(R_igraph_write_graph_graphml) : added
+
 2006-08-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/iterators.R ([.igraph.es) : adj function added

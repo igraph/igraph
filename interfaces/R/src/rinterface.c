@@ -3128,7 +3128,7 @@ SEXP R_igraph_write_graph_lgl(SEXP graph, SEXP file, SEXP pnames,
 
 SEXP R_igraph_read_graph_pajek(SEXP pvfile) {
   igraph_t g;
-  FILE *file;
+  FILE *file;  
   SEXP result;
   
   R_igraph_before();
@@ -3949,3 +3949,63 @@ SEXP R_igraph_to_undirected(SEXP graph, SEXP pmode) {
   return result;
 }
 
+SEXP R_igraph_read_graph_graphml(SEXP pvfile, SEXP pdirected, SEXP pindex) {
+  igraph_t g;
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  int index=REAL(pindex)[0];
+  FILE *file;
+  SEXP result;
+
+  R_igraph_before();
+  
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
+#else
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "r");
+#endif
+  if (file==0) { igraph_error("Cannot open GraphML file", __FILE__, __LINE__,
+			      IGRAPH_EFILE); }
+  igraph_read_graph_graphml(&g, file, directed, index);
+  fclose(file);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file) {
+  
+  igraph_t g;
+  FILE *stream;
+  char *bp;
+  size_t size;
+  SEXP result;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+#if HAVE_OPEN_MEMSTREAM == 1
+  stream=open_memstream(&bp, &size);
+#else
+  stream=fopen(CHAR(STRING_ELT(file, 0)), "w");
+#endif
+  if (stream==0) { igraph_error("Cannot write GraphML file", __FILE__, 
+				__LINE__, IGRAPH_EFILE); }
+  igraph_write_graph_graphml(&g, stream);
+  fclose(stream);
+#if HAVE_OPEN_MEMSTREAM == 1
+  PROTECT(result=allocVector(RAWSXP, size));
+  memcpy(RAW(result), bp, sizeof(char)*size);
+  free(bp);
+#else
+  PROTECT(result=NEW_NUMERIC(0));
+#endif
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

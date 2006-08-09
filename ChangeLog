@@ -1,3 +1,11 @@
+2006-08-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_read_graph_graphml, igraph_write_graph_graphml)
+	: moved to src/foreign-graphml.c
+
+	* src/foreign-graphml.c (igraph_read_graph_graphml) : added
+	attribute handling, quite messy and contains known memory leaks
+
 2006-08-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/conversion.c (igraph_to_directed) : 
