@@ -15,6 +15,7 @@
 <!-- doxrox-include about_vertex_selectors -->
 <!-- doxrox-include igraph_vs_all -->
 <!-- doxrox-include igraph_vs_adj -->
+<!-- doxrox-include igraph_vs_nonadj -->	
 <!-- doxrox-include igraph_vs_none -->
 <!-- doxrox-include igraph_vs_1 -->
 <!-- doxrox-include igraph_vs_vector -->

@@ -135,6 +135,29 @@ int igraph_vs_adj(igraph_vs_t *vs,
   return 0;
 }
 
+/**
+ * \function igraph_vs_nonadj
+ * 
+ * All non-neighboring vertices of a given vertex. The \p mode
+ * argument controls the type of neighboring vertics \em not to
+ * select.
+ * \param vs Pointer to an uninitialized vertex selector object.
+ * \param vid Vertex id, the \quote center \endquote of the
+ *        non-neighborhood.
+ * \param mode The type of neighborhood not to select in directed
+ *        graphs. Possible values:
+ *        \c IGRAPH_OUT, all vertices will be selected except those to
+ *           which there is a directed edge from \p vid.
+ *        \c IGRAPH_IN, all vertices will be selected except those
+ *           from which there is a directed edge to \p vid.
+ *        \c IGRAPH_ALL, all vertices will be selected exvept those 
+ *           from or to which there is a directed edge to or from \p
+ *           vid. 
+ * \return Error code.
+ *
+ * Time complexity: O(1).
+ */
+
 int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid, 
 		     igraph_neimode_t mode) {
   vs->type=IGRAPH_VS_NONADJ;
@@ -459,7 +482,8 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
  * igraph_vs_none(), \ref igraph_vs_1, \ref igraph_vs_vector, \ref
  * igraph_vs_seq(), \ref igraph_vs_vector(), \ref
  * igraph_vs_vector_small(). O(d) for \ref igraph_vs_adj(), d is the
- * number of vertex ids to be included in the iterator.
+ * number of vertex ids to be included in the iterator. O(|V|) for 
+ * \ref igraph_vs_nonadj(), |V| is the number of vertices in the graph.
  */
 
 int igraph_vit_create(const igraph_t *graph, 
