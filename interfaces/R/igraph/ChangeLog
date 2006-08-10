@@ -1,3 +1,10 @@
+2006-08-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/iterators.R ([.igraph.vs, [.igraph.es) : 
+	new indexing functions: nei(), adj(), from(), to()
+	* interfaces/R/src/rinterface.c (R_igraph_vs_nei, R_igraph_vs_adj)
+	(R_igraph_es_adj) : added
+
 2006-08-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/foreign.R (read.graph.graphml) : removed 

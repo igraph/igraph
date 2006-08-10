@@ -1160,6 +1160,7 @@ SEXP R_igraph_neighbors(SEXP graph, SEXP pvid, SEXP pmode) {
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&neis)));
   igraph_vector_copy_to(&neis, REAL(result));
+  igraph_vector_destroy(&neis);
 
   R_igraph_after();
   
@@ -4008,3 +4009,123 @@ SEXP R_igraph_write_graph_graphml(SEXP graph, SEXP file) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_vs_nei(SEXP graph, SEXP px, SEXP pv, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_vs_t v;
+  igraph_integer_t mode=REAL(pmode)[0];
+  SEXP result;
+
+  igraph_vit_t vv;
+  igraph_vector_t neis;
+  long int i;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_vs(pv, &g, &v);
+
+  igraph_vector_init(&neis, 0);  
+  igraph_vit_create(&g, v, &vv);
+  PROTECT(result=NEW_LOGICAL(igraph_vcount(&g)));
+  memset(LOGICAL(result), 0, sizeof(LOGICAL(result)[0])*igraph_vcount(&g));
+  
+  while (!IGRAPH_VIT_END(vv)) {
+    igraph_neighbors(&g, &neis, IGRAPH_VIT_GET(vv), mode);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int nei=VECTOR(neis)[i];
+      LOGICAL(result)[nei]=1;
+    }
+    IGRAPH_VIT_NEXT(vv);
+  }
+
+  igraph_vit_destroy(&vv);
+  igraph_vector_destroy(&neis);
+  igraph_vs_destroy(&v);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vs_adj(SEXP graph, SEXP px, SEXP pe, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_es_t e;
+  int mode=REAL(pmode)[0];
+  SEXP result;
+
+  igraph_integer_t from, to;
+  igraph_eit_t ee;
+
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_es(pe, &g, &e);
+  
+  igraph_eit_create(&g, e, &ee);
+  PROTECT(result=NEW_LOGICAL(igraph_vcount(&g)));
+  memset(LOGICAL(result), 0, sizeof(LOGICAL(result)[0])*igraph_vcount(&g));
+
+  while (!IGRAPH_EIT_END(ee)) {
+    igraph_edge(&g, IGRAPH_EIT_GET(ee), &from, &to);
+    if (mode & 1) { 
+      LOGICAL(result)[ (long int)from]=1;
+    }
+    if (mode & 2) {
+      LOGICAL(result)[ (long int)to]=1;
+    }
+    IGRAPH_EIT_NEXT(ee);
+  }
+  
+  igraph_eit_destroy(&ee);
+  igraph_es_destroy(&e);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_es_adj(SEXP graph, SEXP x, SEXP pv, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_vs_t v;
+  igraph_integer_t mode=REAL(pmode)[0];
+  SEXP result;
+  
+  igraph_vector_t adje;
+  igraph_vit_t vv;
+  long int i;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_vs(pv, &g, &v);
+  
+  igraph_vit_create(&g, v, &vv);
+  igraph_vector_init(&adje, 0);
+  PROTECT(result=NEW_LOGICAL(igraph_ecount(&g)));
+  memset(LOGICAL(result), 0, sizeof(LOGICAL(result)[0])*igraph_ecount(&g));
+  
+  while (!IGRAPH_VIT_END(vv)) {
+    igraph_adjacent(&g, &adje, IGRAPH_VIT_GET(vv), mode);
+    for (i=0; i<igraph_vector_size(&adje); i++) {
+      long int edge=VECTOR(adje)[i];
+      LOGICAL(result)[edge]=1;
+    }
+    IGRAPH_VIT_NEXT(vv);
+  }
+
+  igraph_vector_destroy(&adje);
+  igraph_vit_destroy(&vv);
+  igraph_vs_destroy(&v);
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
