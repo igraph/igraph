@@ -8,6 +8,13 @@
 <title>Importing and Exporting Graphs</title>
 
 <para>
+The &igraph; library and the &igraph; R package do not introduce a new
+file format to store graphs. Instead if recommends using the GraphML
+format for smaller graphs and some simple edge list format for larger
+graphs, perhaps also complessed.
+</para>
+
+<para>
 &igraph; provides the <function>read.graph()</function> and
 <function>write.graph()</function> functions for reading and writing
 graphs from and to files. Both of these functions can handle a number
@@ -160,7 +167,19 @@ vertex names and optionally edge weights:
 vertex2name [optionalWeight]
 vertex3name [optionalWeight]
 </screen>
+This is similar to an adjacency list format, the neighboring vertices
+for each vertex are listed. The name of the initial vertex is preceded
+by <quote>#</quote>, then in the following lines the names of its
+neighbors are listed optionally with the weights of the edges.
+</para>
 
+<para>
+The LGL software works with undirected graphs containing no multiple
+edges, this means that if vertex <quote>B</quote> is listed as a
+neighbor of vertex <quote>A</quote> then vertex <quote>A</quote> must
+not be listed as a neighbor of vertex <quote>B</quote>. &igraph; of
+course is happy with multiple edges and is able to read and write
+<constant>lgl</constant> files which break the original LGL software.
 </para>
 
 </section>
@@ -168,11 +187,409 @@ vertex3name [optionalWeight]
 </section>
 
 <section><title>The Pajek format</title>
-<para></para>
+<para>Pajek it a popular network analysis program for Windows. (See
+the <ulink url="http://vlado.fmf.uni-lj.si/pub/networks/pajek/"> Pajek
+hompage</ulink>.) It has a quite flexible but not very well documented
+file format, see the Pajek manual on the Pajek homepage for some
+information about the file format.
+</para>
+
+<para>
+&igraph; can read and write Pajek files, with some limitations:
+<itemizedlist>
+  <listitem><para>
+    Only <constant>.net</constant> files are supported, Pajek project
+    files (which can contain many graph and also other type of data)
+    are not. Poject files might be supported in a forthcoming &igraph;
+    release if they turned out to be needed.
+  </para></listitem>
+  <listitem><para>
+    Time events networks are not supported.
+  </para></listitem>
+  <listitem><para>
+    Hypergraphs (graphs with non-binary edges) are not supported as
+    &igraph; cannot handle them.
+  </para></listitem>
+  <listitem><para>
+    Graphs containing both directed and undirected edges are not
+    supported as &igraph; cannot represent them.
+  </para></listitem>
+  <listitem><para>
+    Bipartite (also called affiliation) networks are not
+    supported. The surrent &igraph; version imports the network
+    structure correctly but vertex type information is omitted.
+  </para></listitem>
+  <listitem><para>
+    Graph with multiple edge sets are not supported
+  </para></listitem>
+</itemizedlist>
+</para>
+
+<para>
+&igraph; also reads the non-structural information from Pajek files,
+like edge weights and vertex colors and assign these as vertex and
+edge attributes. Note however that the names of the attributes are not
+always the same as in the Pajek file, some of them are renamed to
+be more informative, or other reasons. The following table contains
+the vertex attributes created by &igraph;:
+<informaltable><tgroup cols="2" align="left">
+  <thead><row>
+    <entry>&igraph; attribute name</entry>
+    <entry>description, Pajek attribute</entry>
+  </row></thead>
+  <tbody>
+
+    <row>
+      <entry>id</entry>
+      <entry>Vertex id</entry>
+    </row>
+    
+    <row>
+      <entry>x, y, z</entry>
+      <entry>The <quote>x</quote>, <quote>y</quote> and 
+      <quote>z</quote> coordinate of the vertex</entry>
+    </row>
+    
+    <row>
+      <entry>vertexsize</entry>
+      <entry>The size of the vertex when plotted
+      (<constant>size</constant> in Pajek).</entry>
+    </row>
+    
+    <row>
+      <entry>shape</entry>
+      <entry>The shape of the vertex when plotted.</entry>
+    </row>
+
+    <row>
+      <entry>color</entry>
+      <entry>Vertex color (<constant>ic</constant> in Pajek) if given
+      with symbolic name</entry>
+    </row>
+
+    <row>
+      <entry>color-red, color-green, color-blue</entry>
+      <entry>Vertex color (<constant>ic</constant> in Pajek) if given 
+      in RGB notation</entry>
+    </row>
+
+    <row>
+      <entry>framecolor</entry>
+      <entry>Border color (<constant>bc</constant> in Pajek) if given
+      with symbolic name</entry>
+    </row>
+    
+    <row>
+      <entry>framecolor-red, framecolor-green, framecolor-blue</entry>
+      <entry>Border color (<constant>bc</constant> in Pajek) if given
+      in RGB notation</entry>
+    </row>
+      
+    <row>
+      <entry>labelcolor</entry>
+      <entry>Label color (<constant>lc</constant> in Pajek) if given
+      with symbolic name</entry>
+    </row>
+    
+    <row>
+      <entry>labelcolor-red, labelcolor-green, labelcolor-blue</entry>
+      <entry>Label color (<constant>lc</constant> in Pajek) if given
+      in RGB notation</entry>
+    </row>
+      
+    <row>
+      <entry>xfact, yfact</entry>
+      <entry>The <constant>x_fact</constant> and
+      <constant>y_fact</constant> Pajek attributes.</entry>
+    </row>
+
+    <row>
+      <entry>labeldist</entry>
+      <entry>The distance of the label from the
+      vertex. (<constant>lr</constant> in Pajek.)</entry>
+    </row>
+
+    <row>
+      <entry>labeldegree, labeldegree2</entry>
+      <entry>The <constant>la</constant> and <constant>lphi</constant>
+      Pajek attributes</entry>
+    </row>
+    
+    <row>
+      <entry>framewidth</entry>
+      <entry>The width of the border (<constant>bw</constant> in
+      Pajek).</entry>
+    </row>
+
+    <row>
+      <entry>fontsize</entry>
+      <entry>Size of the label font (<constant>fos</constant> in
+      Pajek.)</entry>
+    </row>
+
+    <row>
+      <entry>rotation</entry>
+      <entry>The rotation of the vertex (<constant>phi</constant> in
+      Pajek). </entry>
+    </row>
+
+    <row>
+      <entry>radius</entry>
+      <entry>Radius, for some vertex shapes (<constant>r</constant> in
+      Pajek). </entry>
+    </row>
+
+    <row>
+      <entry>diamondratio</entry>
+      <entry>For the diamond shape (<constant>q</constant> in
+      Pajek).</entry> 
+    </row>
+        
+  </tbody>
+</tgroup></informaltable>
+</para>
+
+<para>
+These &igraph; attributes are only created if there is at least one
+vertex in the Pajek file which has the corresponding associated
+information. Eg. if there are vertex coordinates for at least one
+vertex then the <quote>x</quote>, <quote>y</quote> and possibly also
+<quote>z</quote> vertex attributes will be created. For those vertices
+for which the attribute is not defined, <constant>NaN</constant> is
+assigned. 
+</para>
+
+<para>
+The following edge attributes might be created:
+<informaltable><tgroup cols="2" align="left">
+  <thead><row>
+    <entry>&igraph; attribute name</entry>
+    <entry>description, Pajek attribute</entry>
+  </row></thead>
+  <tbody>
+    
+    <row>
+      <entry>weight</entry>
+      <entry>Edge weights.</entry>
+    </row>
+
+    <row>
+      <entry>label</entry>
+      <entry><constant>l</constant> in Pajek.</entry>
+    </row>
+    
+    <row>
+      <entry>color</entry>
+      <entry>Edge color, if the color is given with a symbolic name, 
+      <constant>c</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>color-red, color-green, color-blue</entry>
+      <entry>Edge color if it was given in RGB notation,
+      <constant>c</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>edgewidth</entry>
+      <entry><constant>w</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>arrowsize</entry>
+      <entry><constant>s</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>hook1, hook2</entry>
+      <entry><constant>h1</constant> and <constant>h2</constant> in
+      Pajek. </entry>
+    </row>
+
+    <row>
+      <entry>angle1, angle2</entry>
+      <entry><constant>a1</constant> and <constant>a2</constant> in
+      Pajek, Bezier curve parameters.</entry>
+    </row>
+
+    <row>
+      <entry>velocity1, velocity2</entry>
+      <entry><constant>k1</constant> and <constant>k2</constant> in
+      Pajek, Bezier curve parameter.</entry>
+    </row>
+
+    <row>
+      <entry>arrowpos</entry>
+      <entry><constant>ap</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>labelpos</entry>
+      <entry><constant>lp</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>labelangle, labelangle2</entry>
+      <entry><constant>lr</constant> and <constant>lphi</constant> in
+      Pajek. </entry>
+    </row>
+    
+    <row>
+      <entry>labeldegree</entry>
+      <entry><constant>la</constant> in Pajek.</entry>
+    </row>
+    
+    <row>
+      <entry>fontsize</entry>
+      <entry><constant>fos</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>arrowtype</entry>
+      <entry><constant>a</constant> in Pajek.</entry>
+    </row>
+    
+    <row>
+      <entry>linepattern</entry>
+      <entry><constant>p</constant> in Pajek.</entry>
+    </row>
+
+    <row>
+      <entry>labelcolor</entry>
+      <entry><constant>lc</constant> in Pajek.</entry>
+    </row>
+
+  </tbody>
+</tgroup></informaltable>
+</para>
+
+<para>
+Note vertices are numbered starting with one in Pajek, but &igraph;
+numbering starts with zero.
+</para>
+
+<para>
+Here is an example Pajek file, it is part of the Pajek distribution
+under the name <filename>LINKS.NET</filename>:
+<informalexample><screen>
+*Network TRALALA
+*vertices 4
+   1 "1"                                           0.0938 0.0896   ellipse x_fact 1 y_fact 1
+   2 "2"                                           0.8188 0.2458   ellipse x_fact 1 y_fact 1
+   3 "3"                                           0.3688 0.7792   ellipse x_fact 1
+   4 "4"                                           0.9583 0.8563   ellipse x_fact 1
+*arcs
+1 1 1  h2 0 w 3 c Blue s 3 a1 -130 k1 0.6 a2 -130 k2 0.6 ap 0.5 l "Bezier loop" lc BlueViolet fos 20 lr 58 lp 0.3 la 360
+2 1 1  h2 0 a1 120 k1 1.3 a2 -120 k2 0.3 ap 25 l "Bezier arc" lphi 270 la 180 lr 19 lp 0.5
+1 2 1  h2 0 a1 40 k1 2.8 a2 30 k2 0.8 ap 25 l "Bezier arc" lphi 90 la 0 lp 0.65
+4 2 -1  h2 0 w 1 k1 -2 k2 250 ap 25 l "Circular arc" c Red lc OrangeRed
+3 4 1  p Dashed h2 0 w 2 c OliveGreen ap 25 l "Straight arc" lc PineGreen
+1 3 1  p Dashed h2 0 w 5 k1 -1 k2 -20 ap 25 l "Oval arc" c Brown lc Black
+3 3 -1  h1 6 w 1 h2 12 k1 -2 k2 -15 ap 0.5 l "Circular loop" c Red lc OrangeRed lphi 270 la 180
+</screen></informalexample>
+This can be read into &igraph; with
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- read.graph(file="LINKS.NET", format="pajek")
+<prompt>> </prompt>g
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 7 
+Directed: FALSE 
+
+Edges:
+[0] 0 -- 0
+[1] 0 -- 1
+[2] 0 -- 1
+[3] 1 -- 3
+[4] 2 -- 3
+[5] 0 -- 2
+[6] 2 -- 2
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g)$color
+</programlisting>
+<screen>
+[1] "Blue"       ""           ""           "Red"        "OliveGreen"
+[6] "Brown"      "Red"
+</screen>
+</informalexample>
+</para>
+
+<para>
+When writing a Pajek file with <function>write.graph()</function> the
+vertex and edge attributes in the previous two tables are written to
+the file if they're present in the graph.
+</para>
+
+<para>
+The Pajek file format is included in &igraph; to allow users to
+convert their Pajek files to formats more suitable for &igraph;, like
+GraphML for example. The Pajek format is not intended to be used as a
+standard file format of &igraph; because of the lack of proper
+documentation. 
+</para>
+
 </section>
 
 <section><title>The GraphML format</title>
+
+<para>GraphML is an XML-based file format (an XML application in the
+XML terminology) to describe graphs. It is a modern format, and can
+store graphs with an extensible set of vertex and edge attributes, and
+generalized graphs which &igraph; cannot handle. Thus &igraph;
+supports only a subset of the GraphML language:
+<itemizedlist>
+  <listitem><para>
+    Hypergraphs are not supported.
+  </para></listitem>
+  <listitem><para>
+    Nested graphs are not supported.
+  </para></listitem>
+  <listitem><para>
+    Mixed graphs, ie. graphs with both directed and undirected edges
+    are not supported. <function>read.graph()</function> sets the
+    graph directed if this is the default in the GraphML file, even if
+    all the edges are in fact undirected.
+  </para></listitem>
+</itemizedlist>
+</para>
+
+<para> See the <ulink url="http://graphml.graphdrawing.org/">
+GraphML homepage</ulink> for more information about the GraphML
+format. 
+</para>
+
+</section>
+
+<!-- ############################################################# -->
+
+<section><title>Connection to Other Network Analysis Software</title>
+
+<section><title>The SNA R Package</title>
 <para></para>
+</section>
+
+<section><title>Pajek</title>
+<para>
+As &igraph; can read and write Pajek <constant>.net</constant>
+files, this is quite easy, all you have to do is to save your graph in
+Pajek format and read it into Pajek or the other way: read your
+<constant>.net</constant> file into &igraph;. If you happen to have a
+different file Pajek file, then you can do the following: TODO.
+</para>
+</section>
+
+</section>
+
+<!-- ############################################################# -->
+
+<section><title>Connection to Other Software</title>
+
+<section><title>Microsoft Excel</title>
+<para></para>
+</section>
+
 </section>
 
 </chapter>

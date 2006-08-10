@@ -444,7 +444,7 @@ long int igraph_i_pajek_actedge=0;
  * project files (<filename>.paj</filename>) are not. These might be
  * supported in the future if there is need for it.
  * \oli Time events networks are not supported.
- * \oli Multigraphs (ie. graphs with non-binary edges) are not
+ * \oli Hypergraphs (ie. graphs with non-binary edges) are not
  * supported.
  * \oli Graphs with both directed and non-directed edges are not
  * supported, are they cannot be represented in
