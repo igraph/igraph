@@ -96,7 +96,7 @@ if test $use_python == yes; then
     # MinGW returns Python path with backslashes, replace them with
     # forward slashes
     PYTHON_INCLUDES=`echo $PYTHON_INCLUDES | tr '\\\\' '/'`
-    pyexecdir=`echo $pyexecdir | tr '\\\\' '/'`
+    pyexecdir=`$PYTHON -c "from distutils import sysconfig; print sysconfig.get_python_lib(1,0)" | tr '\\\\' '/'`
   ], [
     HAVE_PYTHON=0
     use_python=no

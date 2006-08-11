@@ -17,8 +17,9 @@ EXTRA_DIST = test.py test.sh
 ## We don't need libtool's versioning information in the Python
 ## library, so remove them
 install-data-hook:
-	rm -f $(pyexecdir)/igraph.so $(pyexecdir)/igraph.so.0 $(pyexecdir)/igraph.so.0.0
+	rm -f $(pyexecdir)/igraph.so $(pyexecdir)/igraph.so.0 $(pyexecdir)/igraph.so.0.0 $(pyexecdir)/igraph.0.so $(pyexecdir)/igraph.0.0.so
 	rm -f $(pyexecdir)/igraph.a $(pyexecdir)/igraph.la
-	mv $(pyexecdir)/igraph.so.0.0.0 $(pyexecdir)/igraph.so
+	if [ -f $(pyexecdir)/igraph.so.0.0.0 ]; then mv $(pyexecdir)/igraph.so.0.0.0 $(pyexecdir)/igraph.so; fi
+	if [ -f $(pyexecdir)/igraph.0.0.0.so ]; then mv $(pyexecdir)/igraph.0.0.0.so $(pyexecdir)/igraph.so; fi
 
 MAINTAINERCLEANFILES = Makefile.in

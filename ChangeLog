@@ -1,3 +1,9 @@
+2006-08-11  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/graphobject.[ch] : fixed Python interface
+	* configure.in, interfaces/python/Makefile.am : better installation
+	in Mac OS X (now works with Fink's Python installation as well)
+	
 2006-08-09  Tamas Nepusz  <ntamas@rmki.kfki.hu>
  
  	* configure.in : modified to generate a proper makefile for

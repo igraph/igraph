@@ -606,11 +606,6 @@ g=igraph.Graph.Read_GraphML("examples/simple/test.gxl")
 ok()
 #test(g.vcount() == 11 and g.ecount() == 22)
 
-start("Trying to load GraphML file as undirected")
-g=igraph.Graph.Read_GraphML("examples/simple/test.gxl", directed=False)
-ok()
-#test(g.vcount() == 11 and g.ecount() == 12)
-
 start("Trying to load GraphML file with invalid index")
 try:
     g=igraph.Graph.Read_GraphML("examples/simple/test.gxl", index=2)

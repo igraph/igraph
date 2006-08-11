@@ -669,13 +669,6 @@ static xmlSAXHandler igraph_i_graphml_sax_handler={
  * Attributes of the graph are not loaded yet.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.
- * \param directed Whether the imported graph should be directed. Please
- *              note that if you ask for a directed graph, but the
- *              GraphML file to be read contains an undirected graph,
- *              the resulting \c igraph_t graph will be undirected as
- *              well, but it will appear as directed. If you ask for an
- *              undirected graph, the result will be undirected even if
- *              the original GraphML file contained a directed graph.
  * \param index If the GraphML file contains more than one graph, the one
  *              specified by this index will be loaded. Indices start from
  *              zero, so supply zero here if your GraphML file contains only

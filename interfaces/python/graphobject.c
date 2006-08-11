@@ -2989,14 +2989,13 @@ PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type,
   igraphmodule_GraphObject *self;
   char* fname=NULL;
   FILE* f;
-  PyObject *directed=Py_True;
   long int index=0;
   igraph_t g;
   
-  char *kwlist[] = {"f", "directed", "index", NULL};
+  char *kwlist[] = {"f", "index", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|Oi", kwlist,
-				   &fname, &directed, &index))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|i", kwlist,
+				   &fname, &index))
      return NULL;
 
   f=fopen(fname, "r");
@@ -3004,7 +3003,7 @@ PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type,
     PyErr_SetString(PyExc_IOError, strerror(errno));
     return NULL;
   }
-  if (igraph_read_graph_graphml(&g, f, PyObject_IsTrue(directed), index)) {
+  if (igraph_read_graph_graphml(&g, f, index)) {
     igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
