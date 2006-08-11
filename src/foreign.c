@@ -367,7 +367,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     VECTOR(weight)[0]=&weightrec;
   }
 
-  IGRAPH_CHECK(igraph_add_vertices(graph, igraph_vector_max(&edges)+1, pname));
+  IGRAPH_CHECK(igraph_add_vertices(graph, igraph_trie_size(&trie), pname));
   IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
   
   if (pweight) {
