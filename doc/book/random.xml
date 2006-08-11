@@ -204,6 +204,114 @@ parameters: TODO.
 <section><title>The Configuration Model</title>
 
 <para>
+The configuration model is a random in which the degree sequence is
+given. Ie. in an undirected graph the degree of each node is given and 
+one should create a random graph with the given degree sequence. Note
+that this is not always possible, eg. if the sum of the degrees is odd
+then there is no such graph which could be the realization of this
+model since in a graph the sum of the degrees is always even. 
+</para>
+
+<para>
+If the sum of the degrees is even in an undirected, then there is
+always a graph which has the given degree sequence, but it may happen
+that no simple graphs fit the model, ie. every graph with the given
+degree sequence has either multiple or loop edges or both.
+</para>
+
+<para>
+For a directed graph, two degree sequences are given, one for the in-
+and one for the out-degree. It is required that the sum of these be
+the same even number. Note that for some degree sequences all the
+possible realizations contain either multiple or loop edges or both,
+ie. there are no simple graphs with the given degree sequences.
+</para>
+
+<para>
+In &igraph; the <function>degree.sequence.game()</function> can
+generate a graph with the given degree sequence(s). If only one
+argument is given then an undirected graph will be created using the
+single argument as a degree sequence. (Obviously the number of vertices
+can be determined from the length of the degree sequence.)
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- degree.sequence.game( rep(2, 10) )
+<prompt>> </prompt>g
+</programlisting>
+<screen>
+Vertices: 10 
+Edges: 10 
+Directed: FALSE 
+
+Edges:
+[0] 4 -- 6
+[1] 0 -- 7
+[2] 0 -- 8
+[3] 2 -- 5
+[4] 1 -- 3
+[5] 1 -- 4
+[6] 5 -- 9
+[7] 2 -- 7
+[8] 3 -- 8
+[9] 6 -- 9
+</screen>
+<programlisting>
+<prompt>> </prompt>degree(g)
+</programlisting>
+<screen>
+ [1] 2 2 2 2 2 2 2 2 2 2
+</screen>
+</informalexample>
+</para>
+
+<para>
+If two arguments are given then the first is used as the out-degree
+and the second as the in-degree sequence:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- degree.sequence.game( rep(1,10), rep(1,10) )
+<prompt>> </prompt>g
+</programlisting>
+<screen>
+Vertices: 10 
+Edges: 10 
+Directed: TRUE 
+
+Edges:
+[0] 8 -> 2
+[1] 2 -> 0
+[2] 4 -> 4
+[3] 6 -> 1
+[4] 3 -> 5
+[5] 9 -> 7
+[6] 0 -> 8
+[7] 7 -> 3
+[8] 1 -> 9
+[9] 5 -> 6
+</screen>
+<programlisting>
+<prompt>> </prompt>degree(g, mode="in") ; degree(g, mode="out")
+</programlisting>
+<screen>
+ [1] 1 1 1 1 1 1 1 1 1 1
+ [1] 1 1 1 1 1 1 1 1 1 1
+</screen>
+</informalexample>
+</para>
+
+<para>
+Function <function>degree.sequence.game()</function> also has an
+argument called <parameter>method</parameter>, which specifies the
+algorithm to use for the graph generation. Right now only the
+<constant>simple</constant> algorithm is implemented so this is the
+default method. 
+</para>
+
+<para>
+The <constant>simple</constant> method first assigns degrees to
+vertices and then creates stubs, uncorrected edge end-points, the
+appropriate number for each vertex. Then it simply connects the stubs
+randomly. This way multiple and loop edges might be generated.
+It is known that this algorithm does not sample uniformly from the
+ensemble of the random graphs with the given degree sequence.
 </para>
 
 </section>
@@ -213,6 +321,7 @@ parameters: TODO.
 <section><title>Growing Random Graphs</title>
 
 <para>
+<function>growing.random.game()</function>
 </para>
 
 </section>
@@ -222,6 +331,8 @@ parameters: TODO.
 <section><title>Trait Based Random Graphs</title>
 
 <para>
+<function>callaway.traits.game()</function>
+<function>establishment.game()</function>
 </para>
 
 </section>
@@ -231,6 +342,7 @@ parameters: TODO.
 <section><title>Preferential Attachment and Aging</title>
 
 <para>
+<function>aging.barabasi.game()</function>
 </para>
 
 </section>

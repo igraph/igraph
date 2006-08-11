@@ -7,6 +7,13 @@
 <chapter id="igraphbook-plotting">
 <title>Graph Visualization</title>
 
-<para></para>
+<section><title>Non-interactive Graph Plotting</title>
+<para>TODO</para>
+</section>
+
+<section><title>The <function>tkplot()</function> Interactive Graph
+Drawing Facility</title>
+<para>TODO</para>
+</section>
 
 </chapter>

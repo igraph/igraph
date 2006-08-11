@@ -7,6 +7,263 @@
 <chapter id="igraphbook-iterators">
 <title>Vertex and Edge Sequences</title>
 
-<para></para>
+<!-- ###################################################### -->
+
+<section><title>Introduction</title>
+
+<para>
+  Vertex and edge sequences are basically numeric vectors containing
+  vertex/edge ids. For many functions there is an argument which is a
+  vertex or edge sequence. Eg. <function>degree()</function> calculates
+  vertex degree and it has an optional argument called
+  <parameter>v</parameter> giving the vertices of which the degree will
+  be calculated. (In this particular case the default value is all
+  vertices.) Everywhere in &igraph; if a vertex or edge sequence is
+  expected a simple numeric can also be supplied instead of a
+  vertex/edge sequence object.
+</para>
+
+<para>
+A vertex sequence object can be created with the function
+<function>V()</function> giving a graph object as a parameter, the
+vertex sequence will contain all vertices in the graph in vertex id
+order. (It is thus hardly more than a vector from 0 to
+<code>vcount(g)-1</code>.)  Similarly, the <function>E()</function>
+function creates an edge sequence with all edges
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- graph.ring(10)
+<prompt>> </prompt>V(g)
+</programlisting>
+<screen>
+ [1] 0 1 2 3 4 5 6 7 8 9
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g)
+</programlisting>
+<screen>
+Edge sequence:
+[0] 0 -- 1
+[1] 1 -- 2
+[2] 2 -- 3
+[3] 3 -- 4
+[4] 4 -- 5
+[5] 5 -- 6
+[6] 6 -- 7
+[7] 7 -- 8
+[8] 8 -- 9
+[9] 0 -- 9
+</screen></informalexample>
+</para>
+
+<para>
+Note that even if an edge sequence is just a vector of edge ids, it is
+<quote>pretty printed</quote> in R, instead of the edge ids, the end
+points of the edges are listed, in a nice format. If you wish to see
+the edge ids use the <function>as.vector()</function> function on the
+edge sequence:
+<informalexample><programlisting>
+<prompt>> </prompt>as.vector(E(g))
+</programlisting>
+<screen>
+ [1] 0 1 2 3 4 5 6 7 8 9
+</screen>
+</informalexample>
+</para>
+
+</section>
+
+<!-- ###################################################### -->
+
+<section><title>Smart Indexing</title>
+
+<para>
+Of course selecting all vertices or all edges in a graph is not always
+what we want; they can be indexed in various flexible ways to create a
+subset of vertices. Vertex sequences can be indexed by numeric or
+logical vectors to select a subset of vertices:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- barabasi.game(100)
+<prompt>> </prompt>V(g) [ degree(g) > 5 ]
+</programlisting>
+<screen>
+Vertex sequence:
+[1]  0  3  6 14
+</screen>
+<programlisting>
+<prompt>> </prompt>V(g) [ degree(g) > 5 ] [ 0:9 ]
+</programlisting>
+<screen>
+Vertex sequence:
+[1] 0 3 6
+</screen></informalexample>
+Here the first example selects vertices with (total) vertex degree
+higher than five by indexing with a logical vector. As the result of
+the indexing is also a vertex sequence, it can indexed again, like in
+the second example, this time with a numeric vector; we get all
+vertices with degree higher than five among the first 10 vertices as a
+final result.
+</para>
+
+<para>
+There are some functions which make vertex sequence indexing easier,
+these cannot be use anywhere else, they are defined only in the
+indexing operation of vertex/edge sequences. For vertex sequences
+these are: <function>nei()</function>, <function>adj()</function>,
+<function>from()</function> and <function>to()</function> and for edge
+sequences: <function>adj()</function>, <function>from()</function> and
+<function>to()</function>.
+</para>
+
+<para>
+<function>nei()</function> takes a vertex sequence as a parameter
+(remember a simple vector of vertex ids is also allowed), and returns
+a logical vector which is <function>TRUE</function> for those vertices
+from the indexed vertex sequence which have at least one neighbor
+in the vertex sequence supplied as a parameter. To select those
+vertices which have vertex degree higher than five and are connected to
+vertex 0 one can write:
+<informalexample><programlisting>
+<prompt>> </prompt>V(g) [ degree(g) > 5 &amp; nei(0) ]
+</programlisting>
+<screen>
+Vertex sequence:
+[1]  3 14
+</screen>
+</informalexample>
+Of course more than one vertex can be supplied as an argument to
+<function>nei()</function>, all neighbors of vertices 0, 1 and 10:
+<informalexample><programlisting>
+<prompt>> </prompt>V(g) [ nei(c(0,1,10)) ]
+</programlisting>
+<screen>
+Vertex sequence:
+ [1]  0  1  2  3  5  7 10 12 14 21 22 42 45 53 64 70 73 88 89
+</screen>
+</informalexample>
+</para>
+
+<para>
+For vertex sequences <function>adj()</function> takes an edge sequence
+as its single argument and it returns <constant>TRUE</constant> for
+those vertices which are adjacent to at least one edge in the
+parameter edge sequence. Here are the vertices adjacent to the edges
+with high edge betweenness:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- barabasi.game(1000)
+<prompt>> </prompt>es &lt;- E(g) [ edge.betweenness(g) > 100 ]
+<prompt>> </prompt>es
+</programlisting>
+<screen>
+Edge sequence:
+[0] 1 -> 0
+[1] 2 -> 0
+[2] 3 -> 0
+[3] 4 -> 1
+[14] 15 -> 12
+[26] 27 -> 2
+</screen>
+<programlisting>
+<prompt>> </prompt>V(g) [ adj(es) ]
+</programlisting>
+<screen>
+Vertex sequence:
+[1]  0  1  2  3  4 12 15 27
+</screen>
+</informalexample>
+</para>
+
+<para>
+For edge sequences <function>adj()</function> is similar, is takes a
+vertex sequence as its argument and returns <constant>TRUE</constant>
+for edge which are adjacent to at least one vertex in the parameter.
+</para>
+
+<para>
+The <function>from()</function> and <function>to()</function>
+functions are exactly the same as <function>adj()</function> for
+undirected graphs. For directed graphs they are a bit different,
+<function>from()</function> is only <constant>TRUE</constant> for
+those vertices/edge which are connected at the origin (source) of the
+edge, while <function>to()</function> is <constant>TRUE</constant> at
+the opposite end. For example to get all the outgoing edges of
+some vertices one can write:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- erdos.renyi.game(100, 3/100, directed=TRUE)
+<prompt>> </prompt>E(g) [ from(0:2) ]
+</programlisting>
+<screen>
+Edge sequence:
+[0] 0 -> 4
+[1] 0 -> 15
+[2] 0 -> 46
+[3] 0 -> 97
+[4] 1 -> 5
+[5] 1 -> 79
+[6] 1 -> 84
+[7] 1 -> 86
+[8] 2 -> 10
+[9] 2 -> 12
+[10] 2 -> 22
+[11] 2 -> 52
+[12] 2 -> 61
+[13] 2 -> 91
+</screen>
+</informalexample>
+</para>
+
+</section>
+
+<section><title>Vertex/Edge Sequences and Attributes</title>
+
+<para>
+Vertex and edge attributes can be used in a very powerful way via
+vertex/edge sequences: the <quote><constant>$</constant></quote>
+operator accesses the vertex/edge attributes for the vertices/edges in
+the sequence. This form can be be used for assigning new values as
+well. In the following example we assign uniformly random weights to
+the edges and set the <constant>color</constant> edge attribute to
+<quote>red</quote> for edges with high weight.
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- graph.lattice( c(10,10) )
+<prompt>> </prompt>E(g)$weight &lt;- runif(ecount(g))
+<prompt>> </prompt>E(g)$color &lt;- "grey"
+<prompt>> </prompt>E(g)[ weight > 0.9 ]$color &lt;- "red"
+<prompt>> </prompt>plot(g, layout=layout.kamada.kawai,
+       edge.color=E(g)$color, vertex.size=3, edge.width=2, label.dist=0.6)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="seqattr.pdf" format="PDF" /></imageobject>
+<imageobject><imagedata fileref="seqattr.png" format="PNG" /></imageobject>
+</mediaobject></informalexample>
+</para>
+
+<para>
+The previous example also shows that attribute names can be used in
+index expressions, eg. giving <constant>weight</constant> in the index
+of an edge sequence means the <constant>weight</constant> attribute
+for those edges in the sequence.
+</para>
+
+</section>
+
+<!-- ###################################################### -->
+
+<section><title>Examples</title>
+
+<para>
+TODO
+</para>
+
+</section>
+
+<!-- ###################################################### -->
+
+<section><title>Internal Representation</title>
+
+<para>
+TODO
+</para>
+
+</section>
 
 </chapter>
