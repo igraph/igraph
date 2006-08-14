@@ -244,11 +244,133 @@ of an edge sequence means the <constant>weight</constant> attribute
 for those edges in the sequence.
 </para>
 
+<para>
+Just like for the ordinary attribute assignment functions, if the
+vector (or list) giving the attribute values is shorter than the one
+giving the vertex/edge ids then if will be recycled:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- graph.ring(10)
+<prompt>> </prompt>V(g)$color &lt;- c("red", "blue")
+<prompt>> </prompt>plot(g, layout=layout.circle, vertex.color=V(g)$color)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="pepcircle.pdf" format="PDF" /></imageobject>
+<imageobject><imagedata fileref="pepcircle.png" format="PNG" /></imageobject>
+</mediaobject>
+</informalexample>
+</para>
+
+</section>
+
+<section><title>Even Smarter Indexing</title>
+
+<para>
+The <function>E()</function> function has two optional parameters
+which can be used often conveniently.
+</para>
+
+<para>
+If the <parameter>P</parameter> parameter is given then
+<function>E()</function> creates an edge sequence based
+on the end points of the edges. Eg. to select the edge connecting
+vertices 0 and 1 one can write <code>E(g, c(0,1))</code> (as
+<parameter>P</parameter> is the next positional argument after the
+graph, it is not required to write <code>E(g, P=c(0,1))</code>. The
+following example calculates the edge betweenness for a particular
+edge only:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- barabasi.game(100, directed=FALSE)
+<prompt>> </prompt>edge.betweenness(g, E(g, c(0,1)))
+</programlisting>
+<screen>
+[1] 736
+</screen>
+</informalexample>
+</para>
+
+<para>
+If the <parameter>path</parameter> argument is given then
+<function>E()</function> selects edges along the (directed or
+undirected) path in <parameter>path</parameter>. The path is given via
+the vertex ids visited. In the following example we use
+<function>path()</function> to set some edge attributes on edges along
+the longest geodesic (ie. diameter) in a graph:
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- barabasi.game(100, directed=FALSE)
+<prompt>> </prompt>d &lt;- get.diameter(g)
+<prompt>> </prompt>E(g)$color &lt;- "SkyBlue2"
+<prompt>> </prompt>E(g)$width &lt;- 1
+<prompt>> </prompt>E(g, path=d)$color &lt;- "red"
+<prompt>> </prompt>E(g, path=d)$width &lt;- 2
+<prompt>> </prompt>V(g)$labelcolor &lt;- V(g)$color  &lt;- "blue"
+<prompt>> </prompt>V(g)[ d ]$labelcolor &lt;- V(g)[ d ]$color &lt;- "red"
+<prompt>> </prompt>plot(g, layout=layout.kamada.kawai, 
+     edge.color=E(g)$color,edge.width=E(g)$width,
+     vertex.color=V(g)$color, label.color=V(g)$labelcolor,
+     label.dist=0.4, vertex.size=3)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="reddiameter.pdf" format="PDF" /></imageobject>
+<imageobject><imagedata fileref="reddiameter.png" format="PDF" /></imageobject>
+</mediaobject>
+</informalexample>
+</para>
+
+<para>
+There are other three special operators defined in the index
+expressions of edge sequences only: <function>%->%</function>,
+<function>%&lt;-%</function> and <function>%--%</function>. These
+operators can be used effectively for selecting the edges connecting
+the vertices in two vertex sequences. For undirected graphs they are
+work the same way. For directed graphs <function>%--%</function>
+ignores the direction of the edges while <function>%->%</function>
+selects only edges pointing from the left hand side argument to the
+right hand side and the opposite for <function>%&lt;-%</function>. 
+<informalexample><programlisting>
+<prompt>> </prompt>g &lt;- graph( c(0,1, 1,1, 1,2, 2,3, 3,1) )
+<prompt>> </prompt>g
+</programlisting>
+<screen>
+Vertices: 4 
+Edges: 4 
+Directed: TRUE 
+
+Edges:
+[0] 0 -> 1
+[1] 1 -> 1
+[2] 1 -> 2
+[3] 2 -> 3
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g) [ 0:1 %--% 2:3 ]
+</programlisting>
+<screen>
+Edge sequence:
+[2] 1 -> 2
+[4] 3 -> 1
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g) [ 0:1 %->% 2:3 ]
+</programlisting>
+<screen>
+Edge sequence:
+[2] 1 -> 2
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g) [ 0:1 %&lt;-% 2:3 ]
+</programlisting>
+<screen>
+Edge sequence:
+[4] 3 -> 1
+</screen>
+</informalexample>
+</para>
+
 </section>
 
 <!-- ###################################################### -->
 
-<section><title>Examples</title>
+<section><title>More Examples</title>
 
 <para>
 TODO
