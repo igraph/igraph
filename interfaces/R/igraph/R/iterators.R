@@ -213,14 +213,14 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   }
 }
 
-"%<-%" <- function(t, f) {
+"%<-%" <- function(t, value) {
   from <- get("from", parent.frame())
   to <- get("to", parent.frame())
   graph <- get("graph", parent.frame())
   if (is.directed(graph)) {
-    from %in% f & to %in% t
+    from %in% value & to %in% t
   } else {
-    (from %in% f & to %in% t) | (to %in% f & from %in% t)
+    (from %in% value & to %in% t) | (to %in% value & from %in% t)
   }
 }
 
@@ -272,7 +272,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                        value=attr(value, "value"))
 }
 
-"E<-" <- function(x, value, path=NULL, P=NULL) {
+"E<-" <- function(x, value, path=NULL, P=NULL, directed=TRUE) {
   if (!is.igraph(x)) {
     stop("Not a graph object")
   }

@@ -6,7 +6,7 @@
   eigenvector centralities of positions \code{v} within it
 }
 \usage{
-evcent(graph, v=igraph.vs.all(graph))
+evcent(graph, v=V(graph))
 }
 \arguments{
   \item{graph}{Graph to be analyzed.}

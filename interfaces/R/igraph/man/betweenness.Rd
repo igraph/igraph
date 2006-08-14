@@ -7,8 +7,8 @@
   edge. 
 }
 \usage{
-betweenness(graph, v=igraph.vs.all(graph), directed = TRUE)
-edge.betweenness(graph, e=igraph.es.all(graph), directed = TRUE)
+betweenness(graph, v=V(graph), directed = TRUE)
+edge.betweenness(graph, e=E(graph), directed = TRUE)
 }
 \arguments{
   \item{graph}{The graph to analyze.}

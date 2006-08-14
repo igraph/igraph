@@ -7,6 +7,7 @@
 \alias{graph.ring}
 \alias{graph.tree}
 \alias{graph.full}
+\alias{graph.atlas}
 \title{Various methods for creating graphs}
 \description{These method can create various (mostly regular) graphs:
   empty graphs, graphs with the given edges, graphs from adjacency
@@ -27,6 +28,7 @@ graph.lattice(length, dim, nei = 1, directed = FALSE, mutual = FALSE,
 graph.ring(n, directed = FALSE, mutual = FALSE, circular=TRUE)
 graph.tree(n, children = 2, mode="out")
 graph.full(n, directed = FALSE, loops = FALSE)
+graph.atlas(n)
 }
 \arguments{
   \item{edges}{Numeric vector defining the edges, the first edge points
@@ -38,12 +40,16 @@ graph.full(n, directed = FALSE, loops = FALSE)
     for \code{graph.lattice} and \code{graph.ring} it is FALSE. For
     \code{graph.star} the \code{mode} argument should be used for
     creating an undirected graph.}
-  \item{n}{The number of vertices in the graph.
+  \item{n}{The number of vertices in the graph for most functions.
 
     For \code{graph} this parameter is ignored if there is a bigger
     vertex id in \code{edges}. This means that for this function it is
     safe to supply zero here if the vertex with the largest id is not an
-    isolate.} 
+    isolate.
+
+    For \code{graph.atlas} this is the number (id) of the graph to
+    create. 
+  }
   \item{mode}{
     For \code{graph.adjacency} the possible values of this argument are
     \itemize{
@@ -117,6 +123,20 @@ graph.full(n, directed = FALSE, loops = FALSE)
 
   \code{graph.full} simply creates full graphs.
 
+  \code{graph.atlas} creates graphs from the book An Atlas of Graphs by
+  Roland C. Read and Robin J. Wilson. The atlas contains all undirected
+  graphs with up to seven vertices, numbered from 0 up to 1252. The
+  graphs are listed: 
+  \enumerate{
+    \item{}{in increasing order of number of nodes;}
+    \item{}{for a fixed number of nodes, in increasing order of the number
+      of edges;}
+    \item{}{for fixed numbers of nodes and edges, in increasing order of
+      the degree sequence, for example 111223 < 112222;}
+    \item{}{for fixed degree sequence, in increasing number of
+      automorphisms.}
+  }
+
 }
 \value{Every function documented here returns a \code{graph} object.}
 %\references{}
@@ -133,5 +153,6 @@ g6 <- graph.lattice(length=5, dim=3)
 g7 <- graph.ring(10)
 g8 <- graph.tree(10, 2)
 g9 <- graph.full(5, loops=TRUE)
+g10 <- graph.atlas(sample(0:1252, 1))
 }
 \keyword{graphs}

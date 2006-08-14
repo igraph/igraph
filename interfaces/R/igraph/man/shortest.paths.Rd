@@ -1,6 +1,7 @@
 \name{shortest.paths}
 \alias{shortest.paths}
 \alias{get.shortest.paths}
+\alias{get.all.shortest.paths}
 \alias{average.path.length}
 \title{Shortest (directed or undirected) paths between vertices}
 \description{\code{shortest.paths} calculates the length of all the
@@ -8,8 +9,9 @@
   network. \code{get.shortest.paths} calculates one shortest path (the
   path itself, and not just its length) from or to the given vertex.}
 \usage{
-shortest.paths(graph, v=igraph.vs.all(graph), mode = "all")
-get.shortest.paths(graph, from, mode = "all")
+shortest.paths(graph, v=V(graph), mode = "all")
+get.shortest.paths(graph, from, to=V(graph), mode = "all")
+get.all.shortest.paths(graph, from, to = V(graph), mode = "all") 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
 }
 \arguments{
@@ -18,14 +20,16 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
     paths will be calculated.}
   \item{mode}{Character constant, gives whether the shortest paths to or
     from the given vertices should be calculated for directed graphs. If
-  \code{out} then the shortest paths \emph{from} the vertex, if
-  \code{in} then \emph{to} it will be considered. If \code{all}, the
-  default, then the corresponding undirected graph will be used,
-  ie. not directed paths are searched. This argument is ignored for
-  undirected graphs.}
+    \code{out} then the shortest paths \emph{from} the vertex, if
+    \code{in} then \emph{to} it will be considered. If \code{all}, the
+    default, then the corresponding undirected graph will be used,
+    ie. not directed paths are searched. This argument is ignored for
+    undirected graphs.}
   \item{from}{Numeric constant, the vertex from or to the shortest paths
     will be calculated. Note that right now this is not a vector of
     vertex ids, but only a single vertex.}
+  \item{to}{Numeric vector, only the shortest paths to these vertices
+    will be calculated. Defaults to all vertices.}
   \item{directed}{Whether to consider directed paths in directed graphs,
     this argument is ignored for undirected graphs.}
   \item{unconnected}{What to do if the graph is unconnected (not
@@ -46,6 +50,9 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
 
   Also note that \code{get.shortest.paths} gives only one shortest path,
   however more than one might exists between two vertices.
+
+  \code{get.all.shortest.paths} calculates all shortest paths from a
+  vertex to other vertices given in the \code{to} argument.
 }
 \value{
   For \code{shortest.paths} a numeric matrix with \code{vcount(graph)}
@@ -61,6 +68,11 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
   included once. If there is no path between two vertices then a
   numeric vector of length zero is returned as the list element.
 
+  For \code{get.all.shortest.paths} a list is returned, each list
+  element contains a shortest path from \code{from} to a vertex in
+  \code{to}. The shortest paths to the same vertex are collected into
+  consecutive elements of the list.
+  
   For \code{average.path.length} a single number is returned.
 }
 \references{ West, D.B. (1996). \emph{Introduction to Graph Theory.} Upper
@@ -71,6 +83,7 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
 g <- graph.ring(10)
 shortest.paths(g)
 get.shortest.paths(g, 5)
+get.all.shortest.paths(g, 0, 5:7)
 average.path.length(g)
 }
 \keyword{graphs}

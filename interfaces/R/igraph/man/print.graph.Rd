@@ -5,8 +5,11 @@
 \description{These functions attempt to print a graph to the terminal in
   a human readable form.}
 \usage{
-\method{print}{igraph}(x, graph.attributes=FALSE,
-  vertex.attributes=FALSE, edge.attributes=FALSE, \dots)
+\method{print}{igraph}(x,
+  graph.attributes=igraph.par("print.graph.attributes"),
+  vertex.attributes=igraph.par("print.vertex.attributes"),
+  edge.attributes=igraph.par("print.edge.attributes"),
+  \dots)
 \method{summary}{igraph}(object, \dots)
 }
 \arguments{

@@ -9,7 +9,8 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
     labels = NULL, label.color = "darkblue", label.font = NULL, 
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
     vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
-    edge.labels = NA, axes = FALSE, xlab = "", ylab = "", \dots)
+    edge.labels = NA, vertex.frame.color="black",
+    axes = FALSE, xlab = "", ylab = "", xlim=c(-1,1), ylim=c(-1,1), \dots)
 }
 \arguments{
   \item{x}{The graph to plot.}
@@ -38,11 +39,16 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
   \item{edge.labels}{Labels for the edges, this will be converted to a
     character vector. The default is \code{NA} which suppresses edge
     labels. The vector might contain \code{NA}'s as well to suppress
-    labels for some edges.}  
+    labels for some edges.}
+  \item{vertex.frame.color}{The color(s) of the border of the vertices.}
   \item{axes}{Logical, whether to plot axes, defaults to FALSE.}
   \item{xlab}{The label of the horizontal axis. Defaults to the empty string.}
   \item{ylab}{The label of the vertical axis. Defaults to the empty
     string.}
+  \item{xlim}{The limits for the horizontal axis, it is unlikely that
+    you want to modify this.}
+  \item{ylim}{The limits for the vertical axis, it is unlikely that you
+    want to modify this.}
   \item{\dots}{Additional arguments, passed to \code{\link{plot}}.}
 }
 \details{

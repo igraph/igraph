@@ -4,7 +4,7 @@
 \description{Cloness centrality measures how many steps is required
   to access every other vertex from a given vertex.}
 \usage{
-closeness(graph, v=igraph.vs.all(graph), mode = "all")
+closeness(graph, v=V(graph), mode = "all")
 }
 \arguments{
   \item{graph}{The graph to analyze.}

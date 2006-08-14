@@ -79,5 +79,7 @@ decompose.graph <- function(graph, mode="weak", max.comps=NA,
     max.comps=-1
   }
   .Call("R_igraph_decompose", graph, as.numeric(mode),
-                      as.numeric(max.comps), as.numeric(min.vertices))
+        as.numeric(max.comps), as.numeric(min.vertices),
+        PACKAGE="igraph"
+        )
 }

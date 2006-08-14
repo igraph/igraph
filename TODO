@@ -1,6 +1,8 @@
 
 Needed for 0.2:
 
+o graph.isocreate check limits
+o graph.motifs.est doesn't work (?)
 o check reading and writing (big) files from the R interface, possibly
   rewrite
 o document bison requirements

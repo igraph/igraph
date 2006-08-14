@@ -1,10 +1,14 @@
 \name{diameter}
 \alias{diameter}
+\alias{get.diameter}
+\alias{farthest.nodes}
 \title{Diameter of a graph}
 \description{The diameter of a graph is the length of the longest
   geodesic.}
 \usage{
 diameter(graph, directed = TRUE, unconnected = TRUE)
+get.diameter (graph, directed = TRUE, unconnected = TRUE) 
+farthest.nodes (graph, directed = TRUE, unconnected = TRUE) 
 }
 \arguments{
   \item{graph}{The graph to analyize.}
@@ -16,8 +20,19 @@ diameter(graph, directed = TRUE, unconnected = TRUE)
     components will be calculated and the largest one will be returned.}
 }
 \details{The diameter is calculated by using a breadth-first search like
-  method.}
-\value{A numeric constant.}
+  method.
+
+  \code{get.diameter} returns a path with the actual diameter. If there
+  are many shortest paths of the length of the diameter, then it returns
+  the first one found.
+
+  \code{farthest.points} returns two vertex ids, the vertices which are
+  connected by the diameter path.
+}
+\value{A numeric constant for \code{diameter}, a numeric vector for
+  \code{get.diameter} and a numeric vector of length two for
+  \code{farthest.nodes}.
+}
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{shortest.paths}}}

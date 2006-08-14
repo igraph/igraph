@@ -14,9 +14,9 @@ delete.vertices(graph, v)
 }
 \arguments{
   \item{graph}{The graph to work on.}
-  \item{edges}{Numeric vector, the edges to add or remove.}
+  \item{edges}{Edge sequence, the edges to remove.}
   \item{nv}{Numeric constant, the number of vertices to add.}
-  \item{v}{Numeric vector, the vertices to remove.}
+  \item{v}{Vector sequence, the vertices to remove.}
 }
 \details{
   \code{add.edges} adds the specified edges to the graph. The ids of the
@@ -41,7 +41,7 @@ delete.vertices(graph, v)
 \examples{
 g <- graph.ring(10)
 add.edges(g, c(1,5,2,6) )
-delete.edges(g, c(0,9, 1,2) )
+delete.edges(g, E(g, P=c(0,9, 1,2)) )
 delete.vertices(g, c(1,6,7) )
 }
 \keyword{graphs}

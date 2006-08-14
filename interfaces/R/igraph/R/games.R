@@ -126,7 +126,7 @@ growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
 aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
                                out.dist=NULL, out.seq=NULL,
                                out.pref=FALSE, directed=TRUE,
-                               zero.deg.appeal=1, zero.age.appeal=1,
+                               zero.deg.appeal=1, zero.age.appeal=0,
                                deg.coef=1, age.coef=1,
                                time.window=NULL) {
   # Checks
@@ -209,7 +209,8 @@ callaway.traits.game <- function(nodes, types, edge.per.step=1,
   .Call("R_igraph_callaway_traits_game", as.double(nodes),
         as.double(types), as.double(edge.per.step),
         as.double(type.dist), matrix(as.double(pref.matrix), types, types),
-        as.logical(directed))
+        as.logical(directed),
+        PACKAGE="igraph")
 }
 
 establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
@@ -218,5 +219,6 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
   .Call("R_igraph_establishment_game", as.double(nodes),
         as.double(types), as.double(k), as.double(type.dist),
         matrix(as.double(pref.matrix), types, types),
-        as.logical(directed))
+        as.logical(directed),
+        PACKAGE="igraph")
 }

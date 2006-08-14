@@ -12,7 +12,8 @@ write.graph(graph, file, format="edgelist", \dots)
   \item{file}{A connection or a string giving the file name to write the
     graph to.}
   \item{format}{Character string giving the file format. Right now 
-    \code{edgelist}, \code{lgl} and \code{ncol} are implemented.}
+    \code{pajek}, \code{graphml}, \code{edgelist}, \code{lgl} and
+    \code{ncol} are implemented.} 
   \item{\dots}{Other, format specific arguments, see below.}
 }
 \details{
@@ -20,6 +21,15 @@ write.graph(graph, file, format="edgelist", \dots)
   line, the two vertex ids separated by a space character. The file is
   sorted by the first and the second column.
 
+  The Pajek format is a text file, see \code{\link{read.graph}} for
+  details. Appropriate vertex and edge attributes are also written to
+  the file. This format has no additional arguments.
+
+  The GraphML format is a flexible XML based format. See
+  \code{\link{read.graph}} for GraphML details. Vertex and edge
+  attributes are also written to the file. This format has no additional
+  arguments.
+  
   The \code{lgl} format is also a simple text file, this is the
   format expected by the 'Large Graph Layout' layout generator software.
   See \link{read.graph} for details.

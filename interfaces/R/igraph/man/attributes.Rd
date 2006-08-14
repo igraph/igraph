@@ -19,13 +19,13 @@
   the graph is plotted, or simply the weights of the edges in a weighted
   graph.}
 \usage{
-get.graph.attribute(graph, attrname=NULL)
+get.graph.attribute(graph, name)
 graph <- set.graph.attribute(graph, attrname, value)
 graph <- remove.graph.attribute(graph, attrname)
-get.vertex.attribute(graph, attrname=NULL, index=V(graph))
+get.vertex.attribute(graph, name, index=V(graph))
 graph <- set.vertex.attribute(graph, attrname, index=V(graph), value)
 graph <- remove.vertex.attribute(graph, attrname)
-get.edge.attribute(graph, attrname=NULL, index=E(graph))
+get.edge.attribute(graph, name, index=E(graph))
 graph <- set.edge.attribute(graph, attrname, index=E(graph), value)
 graph <- remove.edge.attribute(graph, attrname)
 }
@@ -34,9 +34,7 @@ graph <- remove.edge.attribute(graph, attrname)
   is never modified, a new graph object is returned instead; if you don't
   assign it to a variable your modifications will be lost! See examples
   below.}
-  \item{attrname}{Character constant, the name of the attribute. For
-    query functions this can be \code{NULL}, in this case the list of
-    the attributes will be returned.}
+  \item{name}{Character constant, the name of the attribute.}
   \item{index}{Numeric vector, the ids of the vertices or edges.
     It is not recycled, even if \code{value} is longer.}
   \item{value}{Numeric vector, the new value(s) of the attributes, it

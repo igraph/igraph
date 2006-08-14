@@ -1,15 +1,38 @@
 \name{iterators}
+\alias{iterators}
 \alias{V}
 \alias{E}
+\alias{V<-}
+\alias{E<-}
+\alias{\%--\%}
+\alias{\%->\%}
+\alias{\%<-\%}
+\alias{[<-.igraph.es}
+\alias{[.igraph.es}
+\alias{$<-.igraph.es}
+\alias{$.igraph.es}
+\alias{[<-.igraph.vs}
+\alias{[.igraph.vs}
+\alias{$<-.igraph.vs}
+\alias{$.igraph.vs}
+\alias{print.igraph.es}
+\alias{print.igraph.vs}
 \title{Vertex and edge sequences and iterators}
 \description{Vertex and edge sequences are central concepts of
   igraph.}
 \usage{
 V(graph)
-E(graph)
+E(graph, P=NULL, path=NULL, directed=TRUE)
 }
 \arguments{
   \item{graph}{A graph object.}
+  \item{P}{Numeric vector for selecting edges by giving their end
+    points. See details below.}
+  \item{path}{Numeric vector, this is for selecting all edges along a
+    path. See also details below.}
+  \item{directed}{Logcal constant, can be supplied only if either
+    \code{P} or \code{path} is also present and gives whether the pairs
+    or the path are directed or not.} 
 }
 \details{
   It is often needed to perform an operation on a subset of vertices of
@@ -58,39 +81,56 @@ E(graph)
     plot(g, layout=layout.circle, edge.width="a:width", edge.color="black")
   }
 
-  Edge sequence indexing is a bit different than vertex sequence
-  indexing because it specifies two special variable and three special
-  operators to be used in the logical indexing expression.
-  The two variables are called \sQuote{\code{from}} and
-  \sQuote{\code{to}} and they contain the vertex ids of the two end
-  points of the edge. For undirected edges \sQuote{\code{from}} is the
-  source vertex and \sQuote{\code{to}} is the target vertex; they are
-  the same for undirected graphs. Ie. to select all edges adjacent to a
-  given vertex you can write
+  There are some special functions which are only defined in the
+  indexing expressions of vertex and edge sequences. For vertex
+  sequences these are: \code{nei}, \code{adj}, \code{from} and
+  \code{to}.
+
+  \code{nei} has a mandatory and an optional argument, the first is
+  another vertex sequence, the second is a mode argument similar to that
+  of the \code{\link{neighbors}} function. \code{nei} returns a logical
+  vector of the same length as the indexed vertex sequence and evaluates
+  to \code{TRUE} for those vertices only which have a neighbor vertex in
+  the vertex sequence supplied as a parameter. Thus for selecting all
+  neighbors of vertices 0 and 1 one can write:
   \preformatted{
-    g <- barabasi.game(100)
-    E(g)[ from==2 | to==2 ]    
+    V(g) [ nei( 0:1 ) ]
   }
+  The mode argument (just like for \code{\link{neighbors}}) gives the
+  type of the neighbors to be included, it is interpreted only in
+  directed graphs, and defaults to all types of neighbors. See the
+  example below.
 
-  The special operators preform similar function but they allow a more
-  convenient notation. \sQuote{\code{\%->\%}} is a binary operator and
-  evaluates to   TRUE for all edges pointing from vertices in the first
-  argument to those in the second.
+  \code{adj} takes an edge sequence as an argument and returns
+  \code{TRUE} for vertices which have at least one adjacent edge in it.
 
-  The arguments of this operator can be numberic vectors or vertex
-  sequences. 
+  \code{from} and \code{to} are similar to \code{adj} but only edges
+  originated at (\code{from}) or pointing to (\code{to}) are taken into
+  account.
+
+  For edge sequences the special functions are: \code{adj}, \code{from},
+  \code{to}, \code{\%--\%}, \code{\%->\%} and \code{\%<-\%}.
+
+  \code{adj} takes a vertex sequence as an argument and returns
+  \code{NULL} for edges which have an adjacent vertex in it.
+
+  \code{from} and \code{to} are similar to \code{adj}, but only vertices
+  at the source (\code{from}) or target (\code{to}) of the edge.
+
+  The \code{\%--\%} operator selects edges connecting two vertex
+  sequences, the direction of the edges is ignored. The \code{\%->\%} is
+  different only for directed graphs and only edges pointing from the
+  left hand side argument to the right hand side argument are selected.
+  \code{\%<-\%} is exactly the opposite, it selects edges pointing from
+  the right hand side to the left hand side.  
+
+  \code{E} has two optional arguments: \code{P} and \code{path}. If
+  given \code{P} can be used to select edges based on their end points,
+  eg. \code{E(g, P=c(0,1))} selects edge \code{0->1}.
+
+  \code{path} can be used to select all edges along a path. The path
+  should be given with the visited vertex ids in the appropriate order.
   
-  There is also a
-  \sQuote{\code{\%<-\%}} operator for completeness. This is the same as
-  the previous one with the arguments exchanged.
-
-  The undirected version of the \dQuote{connects} operator is
-  \sQuote{\code{\%--\%}}. In directed graphs this selects edges pointing
-  from the first argument to the second or backwards.
-
-  For undirected graphs \sQuote{\code{\%->\%}}, \sQuote{\code{\%<-\%}}
-  and \sQuote{\code{\%--\%}} are the same.
-
   See also the examples below.  
 }
 % \references{}
@@ -118,5 +158,22 @@ for (v in vsl) {
     long <- fl
   }
 }
+
+# the mode argument of the nei() function
+g <- graph( c(0,1, 1,2, 1,3, 3,1) )
+V(g)[ nei( c(1,3) ) ]
+V(g)[ nei( c(1,3), "in") ]
+V(g)[ nei( c(1,3), "out") ]
+
+# operators for edge sequences
+g <- barabasi.game(100, power=0.3)
+E(g) [ 0:2 \%--\% 1:5 ]
+E(g) [ 0:2 \%->\% 1:5 ]
+E(g) [ 0:2 \%<-\% 1:5 ]
+
+# the edges along the diameter
+g <- barabasi.game(100, directed=FALSE)
+d <- get.diameter(g)
+E(g, path=d)
 }
 \keyword{graphs}

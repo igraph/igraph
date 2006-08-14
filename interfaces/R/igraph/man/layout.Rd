@@ -2,24 +2,40 @@
 \alias{layout}
 \alias{layout.random}
 \alias{layout.circle}
+\alias{layout.sphere}
 \alias{layout.fruchterman.reingold}
+\alias{layout.fruchterman.reingold.grid}
 \alias{layout.kamada.kawai}
 \alias{layout.spring}
+\alias{layout.reingold.tilford}
+\alias{layout.lgl}
 \title{Generate coordinates for plotting graphs}
 \description{Some simple and not so simple functions determining the
   placement of the vertices for drawing a graph.}
 \usage{
-layout.random(graph, params)
+layout.random(graph, params, dim=2)
 layout.circle(graph, params)
-layout.fruchterman.reingold(graph, \dots, params)
-layout.kamada.kawai(graph, \dots, params)
+layout.sphere(graph, params)
+layout.fruchterman.reingold(graph, \dots, dim=2,
+      verbose=igraph.par("verbose"), params)
+layout.kamada.kawai(graph, \dots, dim=2,
+      verbose=igraph.par("verbose"), params)
 layout.spring(graph, \dots, params)
+layout.reingold.tilford(graph, \dots, params)
+layout.fruchterman.reingold.grid(graph, \dots,
+      verbose=igraph.par("verbose"), params)
+layout.lgl(graph, \dots, params)
 }
 \arguments{
   \item{graph}{The graph to place.}
   \item{params}{The list of function dependent parameters.}
+  \item{dim}{Numeric constant, either 2 or 3. Some functions are able
+    to generate 2d and 3d layouts as well, supply this argument to
+    change the default behavior.}
   \item{\dots}{Function dependent parameters, this is an alternative
     notation to the \code{params} argument.}
+  \item{verbose}{Logial constant, whether to show a progress bar while
+    calculating the layout.}
 }
 \details{
   These functions calculate the coordinates of the vertices for a graph
@@ -31,6 +47,10 @@ layout.spring(graph, \dots, params)
   \code{layout.circle} places the vertices on a unit circle
   equidistantly. It has no paramaters.
 
+  \code{layout.sphere} places the vertices (approximately) uniformly on
+  the surface of a sphere, this is thus a 3d layout. It is not clear
+  however what \dQuote{uniformly on a sphere} means.
+  
   \code{layout.fruchterman.reingold} uses a force-based algorithm
   proposed by Fruchterman and Reingold, see references. Parameters and
   their default values:
@@ -74,7 +94,55 @@ layout.spring(graph, \dots, params)
       \sQuote{quasi-Newton quasi-kilograms}). (Defaults to 0.01.)}
     \item{repulse}{Should repulsion be used? (Defaults to FALSE.)}
   }
-  This function was ported from the SNA package. 
+  This function was ported from the SNA package.
+
+  \code{layout.reingold.tilford} generates a tree-like layout, so it is
+  mainly for trees. Parameters and default values:
+  \itemize{
+    \item{root}{The id of the root vertex, defaults to 0.}
+  }  
+  
+  \code{layout.fruchterman.reingold.grid} is similar to
+  \code{layout.fruchterman.reingold} but repelling force is calculated
+  only between vertices that are closer to each other than a limit, so
+  it is faster. Patameters and default values:
+  \itemize{
+    \item{niter}{Numeric, the number of iterations to perform (500).}
+    \item{maxdelta}{Maximum change for one vertex in one iteration. (The
+      number of vertices in the graph.)}
+    \item{area}{The area of the surface on which the vertices are placed.
+      (The square of the number of vertices.)}
+    \item{coolexp}{The cooling exponent of the simulated annealing
+      (1.5).}
+    \item{repulserad}{Cancellation radius for the repulsion (the
+      \code{area} times the number of vertices).}
+    \item{cellsize}{The size of the cells for the grid. When calculating
+      the repulsion forces between vertices only vertices in the same or
+      neighboring grid cells are taken into account (the fourth root of
+      the number of \code{area}.}
+  }
+  
+  \code{layout.lgl} is for large connected graphs, it is similar to the
+  layout generator of the Large Graph Layout software
+  (\url{http://bioinformatics.icmb.utexas.edu/lgl}). Parameters and
+  default values:
+  \itemize{
+    \item{maxiter}{The maximum number of iterations to perform (150).}
+    \item{maxdelta}{The maximum change for a vertex during an iteration
+      (the number of vertices).}
+    \item{area}{The area of the surface on which the vertices are placed
+      (square of the number of vertices). }
+    \item{coolexp}{The cooling exponent of the simulated annealing (1.5).}
+    \item{repulserad}{Cancellation radius for the repulsion (the
+      \code{area} times the number of vertices).}
+    \item{cellsize}{The size of the cells for the grid. When calculating
+      the repulsion forces between vertices only vertices in the same or
+      neighboring grid cells are taken into account (the fourth root of
+      the number of \code{area}.}
+    \item{root}{The id of the vertex to place at the middle of the
+      layout. The default value is -1 which means that a random vertex
+      is selected.}
+  }
 }
 \value{All these functions return a numeric matrix with at least two
   columns and the same number of lines as the number of vertices.}
@@ -85,6 +153,9 @@ layout.spring(graph, \dots, params)
 
   Kamada, T. and Kawai, S. (1989). An Algorithm for Drawing General
   Undirected Graphs. \emph{Information Processing Letters}, 31(1):7-15. 
+
+  Reingold, E and Tilford, J (1981). Tidier drawing of trees.
+  \emph{IEEE Trans. on Softw. Eng.}, SE-7(2):223--228.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{plot.igraph}}, \code{\link{tkplot}}}

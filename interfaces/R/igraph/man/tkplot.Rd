@@ -18,7 +18,7 @@ tkplot (graph, layout = layout.random, layout.par = list(),
     labels = NULL, label.color = "darkblue", label.font = NULL, 
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
     vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
-    edge.labels=NA, \dots)
+    edge.labels=NA, vertex.frame.color="black", \dots)
 
 tkplot.close(tkp.id, window.close = TRUE) 
 tkplot.off()
@@ -96,10 +96,15 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \item{edge.labels}{Labels for the edges, this will be converted to a
     character vector. The default is \code{NA} which suppresses edge
     labels. The vector might contain \code{NA}'s as well to suppress
-    labels for some edges.}  
+    labels for some edges.}
+  \item{vertex.frame.color}{The border color of the vertices,
+    either a character constant with prefix \dQuote{\code{a:}} for using
+    an attribute or without it: a constant color for all vertices, or a
+    numeric or character or numeric vector giving the different colors
+    for the vertices.}
   \item{tkp.id}{The id of the tkplot window to close.}
   \item{window.close}{Leave this on the default value.}
-  \item{width}{The width of the rectangle for generating new
+   \item{width}{The width of the rectangle for generating new
     coordinates.}
   \item{height}{The height of the rectangle for generating new
     coordinates.}
