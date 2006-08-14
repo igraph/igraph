@@ -41,16 +41,32 @@ V <- function(graph) {
   res
 }
 
-E <- function(graph) {
+E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  ec <- ecount(graph)
-  if (ec == 0) {
-    res <- numeric()
-  } else {
-    res <- 0:(ec-1)
+
+  if (!is.null(P) && !is.null(path)) {
+    stop("Cannot give both `P' and `path' at the same time")
   }
+  
+  if (is.null(P) && is.null(path)) {  
+    ec <- ecount(graph)
+    if (ec == 0) {
+      res <- numeric()
+    } else {
+      res <- 0:(ec-1)
+    }
+  } else if (!is.null(P)) {
+    res <- .Call("R_igraph_es_pairs", graph, as.numeric(P),
+                 as.logical(directed),
+                 PACKAGE="igraph")
+  } else {
+    res <- .Call("R_igraph_es_path", graph, as.numeric(path),
+                 as.logical(directed),
+                 PACKAGE="igraph")
+  }
+    
   class(res) <- "igraph.es"
   ne <- new.env()
   assign("graph", graph, envir=ne)
@@ -256,7 +272,7 @@ E <- function(graph) {
                        value=attr(value, "value"))
 }
 
-"E<-" <- function(x, value) {
+"E<-" <- function(x, value, path=NULL, P=NULL) {
   if (!is.igraph(x)) {
     stop("Not a graph object")
   }
@@ -285,30 +301,6 @@ print.igraph.es <- function(x, ...) {
     edge <- get.edge(graph, i)
     cat(sep="", "[", i, "] ", edge[1], arrow, edge[2], "\n")
   }
-}
-
-path <- function(graph, ..., directed=TRUE) {
-  p <- unlist(list(...))
-
-  res <- .Call("R_igraph_es_path", graph, as.numeric(p), as.logical(directed),
-               PACKAGE="igraph")
-  class(res) <- "igraph.es"
-  ne <- new.env()
-  assign("graph", graph, envir=ne)
-  attr(res, "env") <- ne
-  res
-}
-
-P <- function(graph, ..., directed=TRUE) {
-  p <- unlist(list(...))
-
-  res <- .Call("R_igraph_es_pairs", graph, as.numeric(p), as.logical(directed),
-               PACKAGE="igraph")
-  class(res) <- "igraph.es"
-  ne <- new.env()
-  assign("graph", graph, envir=ne)
-  attr(res, "env") <- ne
-  res
 }
 
 # these are internal
