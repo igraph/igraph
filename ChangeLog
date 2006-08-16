@@ -3,6 +3,15 @@
 	* src/topology.c (igraph_isoclass_create) : error message if 'number' 
 	is out of range
 
+	* examples/simple/graphml.c : updated
+
+	* src/foreign-graphml.c (igraph_i_graphml_parser_state)
+	(igraph_i_graphml_destroy_state)
+	(igraph_i_graphml_sax_handler_start_element)
+	(igraph_i_graphml_sax_handler_end_document)
+	(igraph_i_graphml_sax_handler_start_document) : added edgeids
+	(igraph_i_graphml_sax_handler_start_document) : trie should note keys
+
 2006-08-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_lgl) : read isolates correctly

@@ -57,6 +57,7 @@ struct igraph_i_graphml_parser_state {
       INSIDE_KEY, INSIDE_DEFAULT, INSIDE_DATA, FINISH, UNKNOWN, ERROR } st;
   igraph_t *g;
   igraph_trie_t node_trie;
+  igraph_strvector_t edgeids;
   igraph_vector_t edgelist;
   unsigned int prev_state;
   unsigned int unknown_depth;
@@ -96,6 +97,7 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
 
   /* this is the easy part */
   igraph_trie_destroy(&state->node_trie);
+  igraph_strvector_destroy(&state->edgeids);
   igraph_trie_destroy(&state->v_names);
   igraph_trie_destroy(&state->e_names);
   igraph_vector_destroy(&state->edgelist);
@@ -159,11 +161,16 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
     igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
   }
   IGRAPH_FINALLY(igraph_vector_destroy, &state->edgelist);
-  ret=igraph_trie_init(&state->node_trie, 0);
+  ret=igraph_trie_init(&state->node_trie, 1);
   if (ret) {
     igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
   }
   IGRAPH_FINALLY(igraph_trie_destroy, &state->node_trie);
+  ret=igraph_strvector_init(&state->edgeids, 0);
+  if (ret) {
+    igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
+  }
+  IGRAPH_FINALLY(igraph_strvector_destroy, &state->edgeids);
   ret=igraph_trie_init(&state->v_names, 0);
   if (ret) {
     igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
@@ -175,7 +182,7 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
   }
   IGRAPH_FINALLY(igraph_trie_destroy, &state->e_names);
   
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(7);
   IGRAPH_FINALLY(igraph_i_graphml_destroy_state, state);
 }
 
@@ -184,16 +191,23 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     (struct igraph_i_graphml_parser_state*)state0;
   long i, l;
   int r;
+  igraph_i_attribute_record_t idrec, eidrec;
+  const char *idstr="id";
 
   if (state->index<0) {
 
     igraph_vector_ptr_t vattr, eattr;
-    r=igraph_vector_ptr_init(&vattr, igraph_vector_ptr_size(&state->v_attrs));
+    long int esize=igraph_vector_ptr_size(&state->e_attrs);
+    r=igraph_vector_ptr_init(&vattr, 
+			     igraph_vector_ptr_size(&state->v_attrs)+1);
     if (r) {
       igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, r);
     }
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &vattr);
-    r=igraph_vector_ptr_init(&eattr, igraph_vector_ptr_size(&state->e_attrs));
+    if (igraph_strvector_size(&state->edgeids) != 0) {
+      esize++;      
+    }
+    r=igraph_vector_ptr_init(&eattr, esize);
     if (r) {
       igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, r);
     }
@@ -222,6 +236,11 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       }
       VECTOR(vattr)[i]=rec;
     }
+    idrec.name=idstr;
+    idrec.type=IGRAPH_ATTRIBUTE_STRING;
+    igraph_trie_getkeys(&state->node_trie, 
+			(const igraph_strvector_t **)(&idrec.value));
+    VECTOR(vattr)[i]=&idrec;
 
     for (i=0; i<igraph_vector_ptr_size(&state->e_attrs); i++) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
@@ -245,6 +264,18 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 	}
       }
       VECTOR(eattr)[i]=rec;
+    }
+    if (igraph_strvector_size(&state->edgeids) != 0) {
+      long int origsize=igraph_strvector_size(&state->edgeids);
+      eidrec.name=idstr;
+      eidrec.type=IGRAPH_ATTRIBUTE_STRING;
+      igraph_strvector_resize(&state->edgeids, 
+			      igraph_vector_size(&state->edgelist)/2);
+      for (; origsize < igraph_strvector_size(&state->edgeids); origsize++) {
+	igraph_strvector_set(&state->edgeids, origsize, "");
+      }
+      eidrec.value=&state->edgeids;
+      VECTOR(eattr)[(long int)igraph_vector_ptr_size(&eattr)-1]=&eidrec;
     }
     
     igraph_empty(state->g, 0, state->edges_directed);
@@ -530,6 +561,15 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
 	}
 	if (xmlStrEqual(*it, toXmlChar("target"))) {
 	  igraph_trie_get(&state->node_trie, fromXmlChar(*(it+1)), &id2);
+	}
+	if (xmlStrEqual(*it, toXmlChar("id"))) {
+	  long int edges=igraph_vector_size(&state->edgelist)/2+1;
+	  long int origsize=igraph_strvector_size(&state->edgeids);
+	  igraph_strvector_resize(&state->edgeids, edges);
+	  for (;origsize < edges-1; origsize++) {
+	    igraph_strvector_set(&state->edgeids, origsize, "");
+	  }
+	  igraph_strvector_set(&state->edgeids, edges-1, fromXmlChar(*(it+1)));
 	}
       }
       if (id1>=0 && id2>=0) {

@@ -7,8 +7,8 @@ o document bison requirements
 o add references to SNA, paper by Carter
 o R interface to all (sensible) functions
 o read and write non-structural info from/to GraphML files
-  read: 
-    - assign node and edge ids as attributes
+  read:
+    - error handling
     - handle different types of attributes properly (eg. boolean)
   write:
     - implement
