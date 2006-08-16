@@ -1,19 +1,22 @@
 
 Needed for 0.2:
 
-o graph.isocreate check limits
-o graph.motifs.est doesn't work (?)
 o check reading and writing (big) files from the R interface, possibly
   rewrite
 o document bison requirements
 o add references to SNA, paper by Carter
 o R interface to all (sensible) functions
-o proper documentation (docbook & R) for all (sensible) functions
 o read and write non-structural info from/to GraphML files
+  read: 
+    - assign node and edge ids as attributes
+    - handle different types of attributes properly (eg. boolean)
+  write:
+    - implement
 o portability tests
 
 Other bits:
 
+o the number of isomorphism classes for a given graph size
 o Add Python interface to igraph_callaway_traits_game,
   igraph_barabasi_aging_game, igraph_recent_degree_aging_game
 o Add Python edge/vertex selector support

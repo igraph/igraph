@@ -1,3 +1,8 @@
+2006-08-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_motifs_randesu_estimate) :
+	repaired
+
 2006-08-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/iterators.R (P, path) : removed, they're 

@@ -1,3 +1,8 @@
+2006-08-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_isoclass_create) : error message if 'number' 
+	is out of range
+
 2006-08-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_lgl) : read isolates correctly

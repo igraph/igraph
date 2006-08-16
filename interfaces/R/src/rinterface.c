@@ -3387,16 +3387,20 @@ SEXP R_igraph_motifs_randesu_estimate(SEXP graph, SEXP psize, SEXP pcutprob,
   igraph_vector_t cutprob;
   igraph_integer_t samplesize=REAL(psamplesize)[0];
   igraph_vector_t sample;
+  igraph_vector_t *sampleptr=0;
   igraph_integer_t res;
   SEXP result;
   
   R_igraph_before();
 
   R_SEXP_to_vector(pcutprob, &cutprob);
-  R_SEXP_to_vector(psample, &sample);
+  if (GET_LENGTH(psample) != 0) {
+    R_SEXP_to_vector(psample, &sample);
+    sampleptr=&sample;
+  }
   R_SEXP_to_igraph(graph, &g);
   igraph_motifs_randesu_estimate(&g, &res, size, &cutprob, samplesize,
-				 &sample);
+				 sampleptr);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
 

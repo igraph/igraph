@@ -861,20 +861,44 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
   if (directed) {
     if (size==3) {
       classedges=igraph_i_classedges_3;
+
+      if (number < 0 || 
+	  number >= sizeof(igraph_i_isographs_3)/sizeof(unsigned int)) {
+	IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+      }
+
       code=igraph_i_isographs_3[ (long int) number];
       power=32;
     } else {
       classedges=igraph_i_classedges_4;
+
+      if (number < 0 ||
+	  number >= sizeof(igraph_i_isographs_4)/sizeof(unsigned int)) {
+	IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+      }
+
       code=igraph_i_isographs_4[ (long int) number];
       power=2048;
     }
   } else {
     if (size==3) {
       classedges=igraph_i_classedges_3u;
+
+      if (number < 0 ||
+	  number >= sizeof(igraph_i_isographs_3u)/sizeof(unsigned int)) {
+	IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+      }
+
       code=igraph_i_isographs_3u[ (long int) number];
       power=4;
     } else {
       classedges=igraph_i_classedges_4u;
+
+      if (number < 0 ||
+	  number >= sizeof(igraph_i_isographs_4u)/sizeof(unsigned int)) {
+	IGRAPH_ERROR("`number' invalid, cannot create graph", IGRAPH_EINVAL);
+      }
+
       code=igraph_i_isographs_4u[ (long int) number];
       power=32;
     }
