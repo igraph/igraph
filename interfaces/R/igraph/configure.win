@@ -1,0 +1,4 @@
+#! /bin/sh
+mkdir $DPKG/libs
+cp $LIB_XML/lib/libxml2.dll $DPKG/libs
+cp $LIB_XML/lib/iconv.dll $DPKG/libs
