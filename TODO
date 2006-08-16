@@ -1,18 +1,14 @@
 
 Needed for 0.2:
 
-o check reading and writing (big) files from the R interface, possibly
-  rewrite
-o read and write non-structural info from/to GraphML files
-  read:
-    - error handling
-    - handle different types of attributes properly (eg. boolean)
-  write:
-    - implement
 o portability tests
 
 Other bits:
 
+o read and write non-structural info from/to GraphML files
+  read:
+    - error handling
+    - handle different types of attributes properly (eg. boolean)
 o the number of isomorphism classes for a given graph size
 o Add Python interface to igraph_callaway_traits_game,
   igraph_barabasi_aging_game, igraph_recent_degree_aging_game

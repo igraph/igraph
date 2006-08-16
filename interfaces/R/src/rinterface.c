@@ -481,16 +481,17 @@ int R_igraph_attribute_get_info(const igraph_t *graph,
     igraph_strvector_t *n=names[i];
     igraph_vector_t *t=types[i];
     SEXP al=VECTOR_ELT(attr, i+1);
-    
+
     if (n) {			/* return names */
       SEXP names=GET_NAMES(al);
       R_igraph_SEXP_to_strvector_copy(names, n);
     }
 
     if (t) {			/* return types */
+      igraph_vector_resize(t, GET_LENGTH(al));
       for (j=0; j<GET_LENGTH(al); j++) {
 	SEXP a=VECTOR_ELT(al, j);
-	if (IS_NUMERIC(a)) {
+	if (TYPEOF(a)==REALSXP || TYPEOF(a)==INTSXP) {
 	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_NUMERIC;
 	} else if (IS_CHARACTER(a)) {
 	  VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_STRING;
