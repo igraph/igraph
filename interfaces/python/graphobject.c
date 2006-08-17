@@ -447,6 +447,7 @@ PyObject* igraphmodule_Graph_delete_edges(igraphmodule_GraphObject *self,
   if (igraph_delete_edges(&self->g, es)) {
     igraphmodule_handle_igraph_error();
     Py_DECREF(list);
+    igraph_es_destroy(&es);
     igraph_vector_destroy(&v);
     return NULL;
   }
@@ -454,6 +455,7 @@ PyObject* igraphmodule_Graph_delete_edges(igraphmodule_GraphObject *self,
   Py_DECREF(list);
   Py_INCREF(self);
    
+  igraph_es_destroy(&es);
   igraph_vector_destroy(&v);
    
   return (PyObject*)self;

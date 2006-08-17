@@ -573,6 +573,34 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   IGRAPH_CHECK(igraph_add_vertices(graph, igraph_pajek_vcount, &vattrs));
   IGRAPH_CHECK(igraph_add_edges(graph, &edges, &eattrs));
 
+  for (i=0; i<igraph_vector_ptr_size(&vattrs); i++) {
+    igraph_i_attribute_record_t *rec=VECTOR(vattrs)[i];
+    if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+      igraph_vector_t *vec=(igraph_vector_t*) rec->value;
+      igraph_vector_destroy(vec);
+      Free(vec);
+    } else if (rec->type==IGRAPH_ATTRIBUTE_STRING) {
+      igraph_strvector_t *strvec=(igraph_strvector_t *)rec->value;
+      igraph_strvector_destroy(strvec);
+      Free(strvec);
+    }
+    Free(rec);
+  }
+
+  for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
+    igraph_i_attribute_record_t *rec=VECTOR(eattrs)[i];
+    if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+      igraph_vector_t *vec=(igraph_vector_t*) rec->value;
+      igraph_vector_destroy(vec);
+      Free(vec);
+    } else if (rec->type==IGRAPH_ATTRIBUTE_STRING) {
+      igraph_strvector_t *strvec=(igraph_strvector_t *)rec->value;
+      igraph_strvector_destroy(strvec);
+      Free(strvec);
+    }
+    Free(rec);
+  }
+
   igraph_vector_destroy(&edges);  
   igraph_vector_ptr_destroy(&eattrs);
   igraph_trie_destroy(&eattrnames);

@@ -71,27 +71,6 @@ struct igraph_i_graphml_parser_state {
   igraph_attribute_elemtype_t data_type;
 };
 
-void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
-  struct igraph_i_graphml_parser_state *state=
-    (struct igraph_i_graphml_parser_state*)state0;
-  state->successful=0;
-  state->st=ERROR;
-  /* TODO: use the message */
-}
-
-xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
-						     const xmlChar* name) {
-  return xmlGetPredefinedEntity(name);
-}
-
-void igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {
-  if (state->st != UNKNOWN) {
-    state->prev_state=state->st;
-    state->st=UNKNOWN;
-    state->unknown_depth=1;
-  } else state->unknown_depth++;
-}
-
 void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state) {
   long int i;
 
@@ -101,6 +80,8 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
   igraph_trie_destroy(&state->v_names);
   igraph_trie_destroy(&state->e_names);
   igraph_vector_destroy(&state->edgelist);
+
+  if (state->data_key) { free(state->data_key); }
   
   for (i=0; i<igraph_vector_ptr_size(&state->v_attrs); i++) {
     igraph_i_graphml_attribute_record_t *rec=VECTOR(state->v_attrs)[i];
@@ -132,9 +113,31 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
       }
     }
     Free(rec);
-  }	   
+  }
 
   IGRAPH_FINALLY_CLEAN(1);
+}
+
+void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
+  struct igraph_i_graphml_parser_state *state=
+    (struct igraph_i_graphml_parser_state*)state0;
+  state->successful=0;
+  state->st=ERROR;
+  igraph_i_graphml_destroy_state(state); /* Is this correct???? */
+  /* TODO: use the message */
+}
+
+xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
+						     const xmlChar* name) {
+  return xmlGetPredefinedEntity(name);
+}
+
+void igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {
+  if (state->st != UNKNOWN) {
+    state->prev_state=state->st;
+    state->st=UNKNOWN;
+    state->unknown_depth=1;
+  } else state->unknown_depth++;
 }
 
 void igraph_i_graphml_sax_handler_start_document(void *state0) {
@@ -402,7 +405,7 @@ void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state 
   for (it=(xmlChar**)attrs; *it; it+=2) {
     if (xmlStrEqual(*it, toXmlChar("key"))) {
       if (state->data_key) {
-	Free(state->data_key);
+	free(state->data_key);
       }
       state->data_key=xmlStrdup(*(it+1));
       state->data_type=type;
