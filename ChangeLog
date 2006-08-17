@@ -1,9 +1,9 @@
 2006-08-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* src/foreign-graphml.c (igraph_read_graph_pajek) : serious memory
+	* src/foreign.c (igraph_read_graph_pajek) : serious memory
 	leaks eliminated
 
-	* src/foreign.c (igraph_i_graphml_sax_handler_error)
+	* src/foreign-graphml.c (igraph_i_graphml_sax_handler_error)
 	(igraph_i_graphml_destroy_state) : some memory leaks eliminated
 
 	* src/interfaces/python/graphobject.c (igraphmodule_Graph_delete_edges)
