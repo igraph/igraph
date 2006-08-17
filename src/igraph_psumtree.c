@@ -27,9 +27,13 @@
 #include <math.h>
 #include <stdio.h>
 
+double igraph_i_log2(double f) {
+  return log(f) / log(2.0);
+}
+
 int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
   t->size=size;
-  t->offset=pow(2, ceil(log2(size)))-1;
+  t->offset=pow(2, ceil(igraph_i_log2(size)))-1;
   IGRAPH_CHECK(igraph_vector_init((igraph_vector_t *)t, t->offset+t->size));
   return 0;
 }

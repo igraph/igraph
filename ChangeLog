@@ -9,6 +9,9 @@
 	* src/interfaces/python/graphobject.c (igraphmodule_Graph_delete_edges)
 	: memory leak eliminated
 
+	* src/igraph_psumtree.c (igraph_i_log2) : added
+	(igraph_psumtree_init) : igraph_i_log2 instead of log2 
+
 2006-08-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-graphml.c (igraph_write_graph_graphml) : 

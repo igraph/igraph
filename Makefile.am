@@ -2,6 +2,8 @@
 
 SUBDIRS=src interfaces debian tests
 DOC_FILES = $(top_builddir)/doc/html \
+	$(top_builddir)/doc/book/Makefile.in \
+	$(top_builddir)/doc/book/html \
 	$(top_builddir)/doc/igraph-docs.info \
 	$(top_builddir)/doc/igraph-docs.pdf \
 	$(top_srcdir)/doc/Makefile.in
