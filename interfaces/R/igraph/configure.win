@@ -1,4 +1,7 @@
 #! /bin/sh
+if test -z "$LIB_XML" ; then
+  LIB_XML="D:/cygwin/home/duncan"
+fi
 mkdir $DPKG/libs
 cp $LIB_XML/lib/libxml2.dll $DPKG/libs
 cp $LIB_XML/lib/iconv.dll $DPKG/libs
