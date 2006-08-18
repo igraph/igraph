@@ -1,5 +1,51 @@
 
 =========
+igraph 0.2
+=========
+
+Released Aug 18, 2006
+
+Release time at last! There are many new things in igraph 0.2, the
+most important ones:
+- reading writing Pajek and GraphML formats with attributes
+  (not all Pajek and GraphML files are supported, see documentation
+  for details)
+- iterators totally rewritten, it is much faster and cleaner now
+- the RANDEDU fast motif search algorithm is implemented
+- many new graph generators, both games and regular graphs
+- many new structural properties: transitivity, reciprocity, etc.
+- graph operators: union, intersection, difference, structural holes, etc.
+- conversion between directed and undirected graphs
+- new layout algorithms for trees and large graphs, 3D layouts
+and many more.
+
+New things in the R package:
+- support for CTRL+C
+- new functions: Graph Laplacian
+- vertex/edge sequences totally rewritten, smart indexing (see manual)
+- new R manual and tutorial: `Network Analysis with igraph', still 
+  under development but useful
+- very basic 3D plotting using OpenGL
+
+Although this release was somewhat tested on Linux, MS Windows, Mac
+OSX, Solaris 8 and FreeBSD, no heavy testing was done, so it might
+contain bugs, and we kindly ask you to send bug reports to make igraph
+better.
+
+====================
+igraph mailing lists
+====================
+
+Aug 18, 2006
+
+I've set up two igraph mailing lists: igraph-help for
+general igraph questions and discussion and
+igraph-anonunce for announcements. See 
+http://lists.nongnu.org/mailman/listinfo/igraph-help and
+http://lists.nongnu.org/mailman/listinfo/igraph-announce
+for subscription information, archives, etc.
+
+=========
 igraph 0.1
 =========
 

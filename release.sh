@@ -1,7 +1,7 @@
 #! /bin/bash
 
 repohost=cneurocvs.rmki.kfki.hu
-repodir=/var/www/igraph
+repodir=/var/www/igraph-new
 
 # Get current version
 version="`head -1 configure.in | cut -f2 -d, | tr -d ' '`"
@@ -54,6 +54,8 @@ reg=re.compile(r"</li>\s*<p>", re.MULTILINE)
 news=reg.sub("</li></ul><p>", news)
 reg=re.compile(r"</p>\s*<li>", re.MULTILINE)
 news=reg.sub("</p><ul><li>", news)
+reg=re.compile(r"(?P<url>http://[^\n ]+)")
+news=reg.sub("<a href=\"\g<url>\">\g<url></a>", news)
 
 htmlfile=open("doc/igraph.html")
 html=htmlfile.read()
@@ -71,9 +73,9 @@ scp doc/igraph3.html ${repohost}:${repodir}/igraph.html &&
 scp doc/*.png doc/*.jpg ${repohost}:${repodir}/ || exit 1
 
 #################################################
-make debian packages and upload them to the igraph homepage
-make deb &&
-scp ../*igraph*.deb ${repohost}:${repodir}/debian
+# make debian packages and upload them to the igraph homepage
+# make deb &&
+# scp ../*igraph*.deb ${repohost}:${repodir}/debian
 
 #################################################
 # make an R source package and upload that too
