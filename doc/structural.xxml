@@ -34,6 +34,7 @@
 <!-- doxrox-include igraph_betweenness -->
 <!-- doxrox-include igraph_edge_betweenness -->
 <!-- doxrox-include igraph_pagerank -->
+<!-- doxrox-include igraph_constaint -->
 </section>
 
 <section><title>Spanning Tree</title>

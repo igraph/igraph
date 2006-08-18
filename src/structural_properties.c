@@ -2123,7 +2123,7 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
  *         temporary data. 
  * 
  * Time complexity: O(|V|*d^2) for
- * IGRAPH_TRANSITIVITY_UNDIRECTED.
+ * \c IGRAPH_TRANSITIVITY_UNDIRECTED.
  * |V| is the number of vertices in
  * the graph, d is the highest node
  * degree. 
@@ -2235,6 +2235,51 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
   
   return 0;
 }
+
+/**
+ * \function igraph_constaint
+ * \brief Burt's constaint scores
+ * 
+ * </para><para>
+ * This function calculates Burt's constraint scores for the given
+ * vertices, also known as structural holes.
+ * 
+ * </para><para>
+ * Burt's constraint is higher if ego has less, or mutually stronger
+ * related (i.e. more redundant) contacts. Burt's measure of
+ * constraint, C[i], of vertex i's ego network V[i], is defined for
+ * directed and valued graphs,
+ * <blockquote><para>
+ * C[i] = sum( sum( (p[i,q] p[q,j])^2, q in V[i], q != i,j ), j in
+ * V[], j != i)
+ * </para></blockquote>
+ * for a graph of order (ie. number od vertices) N, where proportional
+ * tie strengths are defined as 
+ * <blockquote><para>
+ * p[i,j]=(a[i,j]+a[j,i]) / sum(a[i,k]+a[k,i], k in V[i], k != i),
+ * </para></blockquote>
+ * a[i,j] are elements of A and
+ * the latter being the graph adjacency matrix. For isolated vertices,
+ * constraint is undefined. 
+ * 
+ * </para><para>
+ * Burt, R.S. (2004). Structural holes and good ideas. American
+ * Journal of Sociology 110, 349-399.
+ *
+ * </para><para>
+ * The first R version of this function was contributed by Jeroen
+ * Bruggeman. 
+ * \param graph A graph object.
+ * \param res Pointer to an initialized vector, the result will be
+ *        stored here. The vector will be resized to have the
+ *        appropropriate size for holding the result.
+ * \param vids Vertex selector containing the vertices for which the
+ *        constaint should be calculated.
+ * \return Error code.
+ * 
+ * Time complexity: O(n*d^2), n is the number of vertices for which
+ * the constaint is calculated and d is the average degree.
+ */
 
 int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 		      igraph_vs_t vids) {
