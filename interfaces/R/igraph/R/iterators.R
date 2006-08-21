@@ -272,7 +272,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                        value=attr(value, "value"))
 }
 
-"E<-" <- function(x, value, path=NULL, P=NULL, directed=TRUE) {
+"E<-" <- function(x, path=NULL, P=NULL, directed=NULL, value) {
   if (!is.igraph(x)) {
     stop("Not a graph object")
   }
