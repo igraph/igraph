@@ -4,4 +4,4 @@ if test -z "$LIB_XML" ; then
 fi
 mkdir $DPKG/libs
 cp $LIB_XML/lib/libxml2.dll $DPKG/libs
-cp $LIB_XML/lib/iconv.dll $DPKG/libs
+cp $LIB_XML/lib/zlib1.dll $DPKG/libs
