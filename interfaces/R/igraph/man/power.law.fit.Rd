@@ -14,7 +14,7 @@ power.law.fit(x, xmin = NULL, start = 2, \dots)
   \item{start}{The initial value of the exponent for the minimizing
     function. Ususally it is safe to leave this untouched.}
   \item{\dots}{Additional arguments, passed to the maximum likelyhood
-    optimizing function, \code{\link{mle}}.}
+    optimizing function, \code{\link[stats4]{mle}}.}
 }
 \details{
   A power-law distribution is fitted with maximum likelyhood
