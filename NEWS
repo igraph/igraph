@@ -1,5 +1,16 @@
 
 =========
+igraph 0.2.1
+=========
+
+Released Aug 23, 2006
+
+This is a bug-fix release. Bugs fixed:
+- igraph_reciprocity (reciprocity in R) corrected to avoid segfaults
+- some docs updates
+- various R package updated to make it conform to the CRAN rules
+
+=========
 igraph 0.2
 =========
 
@@ -21,7 +32,7 @@ and many more.
 
 New things in the R package:
 - support for CTRL+C
-- new functions: Graph Laplacian
+- new functions: Graph Laplacian, Burt's constraint, etc.
 - vertex/edge sequences totally rewritten, smart indexing (see manual)
 - new R manual and tutorial: `Network Analysis with igraph', still 
   under development but useful
