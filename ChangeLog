@@ -1,3 +1,8 @@
+2006-08-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_reciprocity) : rewritten to
+	eliminate invalid read (& sometimes segfault on windows)
+
 2006-08-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_pajek) : serious memory
