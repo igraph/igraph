@@ -224,10 +224,91 @@ typedef struct igraph_vit_t {
   const igraph_vector_t *vec;
 } igraph_vit_t;
 
+/**
+ * \section IGRAPH_VIT Stepping over the vertices
+ *
+ * <para>After creating an iterator with \ref igraph_eit_create(), it
+ * points to the first vertex in the vertex determined by the vertex
+ * selector (if there is any). The \ref IGRAPH_VIT_NEXT() macro steps
+ * to the next vertex, \ref IGRAPH_VIT_END() checks whether there are
+ * more vertices to visit, \ref IGRAPH_VIT_SIZE() gives the total size
+ * of the vertices visited so far and to be visited. \ref
+ * IGRAPH_VIT_RESET() resets the iterator, it will point to the first
+ * vertex again. Finally \ref IGRAPH_VIT_GET() gives the current vertex
+ * pointed by the iterator (call this only if \ref IGRAPH_VIT_END()
+ * is false).
+ * </para>
+ * <para>
+ * Here is an example on how to step over the neighbors of vertex 0:
+ * <informalexample><programlisting>
+ * igraph_vs_t vs;
+ * igraph_vit_t vit;
+ * ...
+ * igraph_vs_adj(&amp;vs, 0, IGRAPH_ALL);
+ * igraph_vit_create(&amp;graph, vs, &amp;vit);
+ * while (!IGRAPH_VIT_END(VIT)) {
+ *   printf(" %li", (long int) IGRAPH_VIT_GET(vit));
+ *   IGRAPH_VIT_NEXT(vit);
+ * }
+ * printf("\n");
+ * ...
+ * igraph_vit_destroy(&amp;vit);
+ * igraph_vs_destroy(&amp;vs);
+ * </programlisting></informalexample>
+ * </para>
+ */
+
+/**
+ * \define IGRAPH_VIT_NEXT
+ * 
+ * Steps the iterator to the next vertex. Only call this function if
+ * \ref IGRAPH_VIT_END() returns false.
+ * \param vit The vertex iterator to step.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_VIT_NEXT(vit)  (++((vit).pos))
+/**
+ * \define IGRAPH_VIT_END
+ * 
+ * Checks whether there are more vertices to step to.
+ * \param vit The vertex iterator to check.
+ * \return Logical value, if true there are no more vertices to step
+ * to.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_VIT_END(vit)   ((vit).pos >= (vit).end)
+/**
+ * \define IGRAPH_VIT_SIZE
+ * 
+ * Gives the number of vertices in a vertex iterator.
+ * \param vit The vertex iterator.
+ * \return The number of vertices.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_VIT_SIZE(vit)  ((vit).end - (vit).start)
+/**
+ * \define IGRAPH_VIT_RESET
+ * 
+ * Resets a vertex iterator. After calling this macro the iterator
+ * will point to the first vertex.
+ * \param vit The vertex iterator.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_VIT_RESET(vit) ((vit).pos = (vit).start)
+/**
+ * \define IGRAPH_VIT_GET
+ * 
+ * Gives the vertex id of the current vertex poited to by the
+ * iterator. 
+ * \param vit The vertex iterator.
+ * \return The vertex id of the current vertex.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_VIT_GET(vit)  \
   (((vit).type == IGRAPH_VIT_SEQ) ? (vit).pos : \
   VECTOR(*(vit).vec)[(vit).pos])
@@ -333,10 +414,68 @@ typedef struct igraph_eit_t {
   const igraph_vector_t *vec;
 } igraph_eit_t;
 
+/**
+ * \section IGRAPH_EIT Stepping over the edges
+ * 
+ * <para>Just like for vertex iterators, macros are provided for
+ * stepping over a sequence of edges: \ref IGRAPH_EIT_NEXT() goes to
+ * the next edge, \ref IGRAPH_EIT_END() checks whether there are more
+ * edges to visit, \ref IGRAPH_EIT_SIZE() gives the number of edges in
+ * the edge sequence, \ref IGRAPH_EIT_RESET() resets the iterator to
+ * the first edge and \ref IGRAPH_EIT_GET() returns the id of the
+ * current edge.</para>
+ */
+
+/**
+ * \define IGRAPH_EIT_NEXT
+ * 
+ * Steps the iterator to the next edge. Call this function only if
+ * \ref IGRAPH_EIT_END() returns false.
+ * \param eit The edge iterator to step.
+ * 
+ * Time complecity: O(1).
+ */
 #define IGRAPH_EIT_NEXT(eit) (++((eit).pos))
+/**
+ * \define IGRAPH_EIT_END
+ * 
+ * Checks whether there are more edges to step to.
+ * \param wit The edge iterator to check.
+ * \return Logical value, if true there are no more edges
+ * to step to.
+ *
+ * Time complexity: O(1).
+ */
 #define IGRAPH_EIT_END(eit)   ((eit).pos >= (eit).end)
+/**
+ * \define IGRAPH_EIT_SIZE
+ * 
+ * Gives the number of edges in an edge iterator.
+ * \param eit The edge iterator.
+ * \return The number of edges.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_EIT_SIZE(eit)  ((eit).end - (eit).start)
+/**
+ * \define IGRAPH_EIT_RESET
+ * 
+ * Resets an ege iterator. After calling this macro the iterator will
+ * point to the first edge.
+ * \param eit The edge iterator.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_EIT_RESET(eit) ((eit).pos = (eit).start)
+/**
+ * \define IGRAPH_EIT_GET
+ * 
+ * Gives the edge id of the current edge pointed to by an iterator.
+ * \param eit The edge iterator.
+ * \return The id of the current edge.
+ * 
+ * Time complexity: O(1).
+ */
 #define IGRAPH_EIT_GET(eit)  \
   (((eit).type == IGRAPH_EIT_SEQ) ? (eit).pos : \
   VECTOR(*(eit).vec)[(eit).pos])

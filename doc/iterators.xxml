@@ -39,6 +39,12 @@
 <section><title>Vertex iterators</title>
 <!-- doxrox-include igraph_vit_create -->
 <!-- doxrox-include igraph_vit_destroy -->
+<section><!-- doxrox-include IGRAPH_VIT --></section>
+<!-- doxrox-include IGRAPH_VIT_NEXT -->
+<!-- doxrox-include IGRAPH_VIT_END -->
+<!-- doxrox-include IGRAPH_VIT_SIZE -->
+<!-- doxrox-include IGRAPH_VIT_RESET -->
+<!-- doxrox-include IGRAPH_VIT_GET -->
 </section>
 
 <section><title>Edge selector constructors</title>
@@ -67,6 +73,12 @@
 <section><title>Edge iterators</title>
 <!-- doxrox-include igraph_eit_create -->
 <!-- doxrox-include igraph_eit_destroy -->
+<section><!-- doxrox-include IGRAPH_EIT --></section>
+<!-- doxrox-include IGRAPH_EIT_NEXT -->
+<!-- doxrox-include IGRAPH_EIT_END -->
+<!-- doxrox-include IGRAPH_EIT_SIZE -->
+<!-- doxrox-include IGRAPH_EIT_RESET -->
+<!-- doxrox-include IGRAPH_EIT_GET -->
 </section>
 
 
