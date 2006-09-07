@@ -85,3 +85,8 @@ AT_SETUP([Small graph (igraph_small):])
 AT_KEYWORDS([graph constructor small igraph_small])
 AT_COMPILE_CHECK([simple/igraph_small.c], [simple/igraph_small.out])
 AT_CLEANUP
+
+AT_SETUP([Geomeric random graphs (igraph_grg_game):])
+AT_KEYWORDS([graph GRG grg geometric random graph igraph_grg_game])
+AT_COMPILE_CHECK([simple/igraph_grg_game.c])
+AT_CLEANUP

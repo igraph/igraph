@@ -604,6 +604,9 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
 			      igraph_vector_t *type_dist,
 			      igraph_matrix_t *pref_matrix,
 			      igraph_bool_t directed);
+int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
+		    igraph_real_t radius, igraph_bool_t torus);
+
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */

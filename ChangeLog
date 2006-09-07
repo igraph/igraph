@@ -1,3 +1,13 @@
+2006-09-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_grg_game) : added
+	* examples/simple/igraph_grg_game.c : added
+
+	* src/games.c (igraph_barabasi_game, igraph_nonlinear_barabasi_game)
+	(igraph_recent_degree_game, igraph_barabasi_aging_game)
+	(igraph_recent_degree_aging_game) : use actual number of nodes instead
+	of 0 in igraph_create, shouldn't change anything but looks nicer
+
 2006-09-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_maxdegree) : added

@@ -222,3 +222,9 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
         as.logical(directed),
         PACKAGE="igraph")
 }
+
+grg.game <- function(nodes, radius, torus=FALSE) {
+  .Call("R_igraph_grg_game", as.double(nodes), as.double(radius),
+        as.logical(torus),
+        PACKAGE="igraph")
+}

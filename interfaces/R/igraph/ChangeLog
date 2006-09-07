@@ -1,3 +1,8 @@
+2006-09-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/games.R (grg.game) : added
+	* interfaces/R/src/rinterface.c (R_igraph_grg_game) : added
+
 2006-09-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/conversion.R (get.adjacency) : added 'attr', 

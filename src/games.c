@@ -138,7 +138,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m
   RNG_END();
 
   Free(bag);
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(2);
 
@@ -901,7 +901,7 @@ int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(2);
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -1043,7 +1043,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(3);
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -1205,7 +1205,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
   igraph_psumtree_destroy(&sumtree);
   IGRAPH_FINALLY_CLEAN(2);
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
@@ -1378,11 +1378,66 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
   igraph_psumtree_destroy(&sumtree);
   IGRAPH_FINALLY_CLEAN(3);
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
 }
+
+/**
+ * \function igraph_grg_game
+ * \brief Generating geometric random graphs.
+ *
+ * \param graph Pointer to an uninitialized graph object,
+ * \param nodes The number of vertices in the graph.
+ * \param radius The radius within which the vertices will be connected.
+ * \param torus Logical constant, if true periodic boundary conditions
+ *        will be used, ie. the vertices are assumed to be on a torus.
+ * \return Error code.
+ * 
+ * Time complexity: TODO, less than O(|V|^2+|E|).
+ */
 				    
-				   
+int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
+		    igraph_real_t radius, igraph_bool_t torus) {
+
+  long int i,j;
+  igraph_vector_t x, y, edges;
+  igraph_real_t dx, dy, r2=radius*radius;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes));
+  IGRAPH_VECTOR_INIT_FINALLY(&x, nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&y, nodes);
+
+  RNG_BEGIN();
+  
+  for (i=0; i<nodes; i++) {
+    VECTOR(x)[i]=RNG_UNIF01(); VECTOR(y)[i]=RNG_UNIF01();
+    for (j=0; j<i; j++) {
+      dx=fabs(VECTOR(x)[i]-VECTOR(x)[j]);
+      if (torus && dx>0.5) dx=1.0-dx;
+      if (dx<radius) {
+        dy=fabs(VECTOR(y)[i]-VECTOR(y)[j]);
+        if (torus && dy>0.5) dy=1.0-dy;
+        if (dy<radius && dx*dx+dy*dy<r2) { // we have an edge
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+        }
+      }
+    }
+  }
+
+  RNG_END();
+  
+  igraph_vector_destroy(&y);
+  igraph_vector_destroy(&x);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, IGRAPH_UNDIRECTED));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}

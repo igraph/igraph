@@ -4134,3 +4134,23 @@ SEXP R_igraph_es_adj(SEXP graph, SEXP x, SEXP pv, SEXP pmode) {
   return result;
 }
 
+SEXP R_igraph_grg_game(SEXP pn, SEXP pradius, SEXP ptorus) {
+  
+  igraph_t g;
+  igraph_integer_t n=REAL(pn)[0];
+  igraph_real_t radius=REAL(pradius)[0];
+  igraph_bool_t torus=LOGICAL(ptorus)[0];
+  SEXP result;
+
+  R_igraph_before();
+  
+  igraph_grg_game(&g, n, radius, torus);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+

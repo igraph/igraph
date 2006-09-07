@@ -23,6 +23,7 @@
 
 <section><title>Games: Randomized Graph Generators</title>
 <!-- doxrox-include about_games -->
+<!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->
 <!-- doxrox-include igraph_nonlinear_barabasi_game -->
 <!-- doxrox-include igraph_erdos_renyi_game -->
