@@ -657,6 +657,9 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 
 int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 		      igraph_vs_t vids);
+int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
+		     igraph_vs_t vids, igraph_neimode_t mode, 
+		     igraph_bool_t loops);
 
 /* TODO: degree.distribution (?) */
 

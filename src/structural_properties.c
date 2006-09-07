@@ -2333,3 +2333,50 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 
   return 0;
 }
+
+/**
+ * \function igraph_maxdegree
+ * \brief Calculate the maximum degree in a graph (or set of vertices).
+ * 
+ * </para><para>
+ * The largest in-, out- or total degree of the specified vertices is
+ * calculated.
+ * \param graph The input graph.
+ * \param res Pointer to an integer (\c igraph_integer_t), the result
+ *        will be stored here.
+ * \param mode Defines the type of the degree.
+ *        \c IGRAPH_OUT, out-degree,
+ *        \c IGRAPH_IN, in-degree,
+ *        \c IGRAPH_ALL, total degree (sum of the
+ *        in- and out-degree). 
+ *        This parameter is ignored for undirected graphs. 
+ * \param loops Boolean, gives whether the self-loops should be
+ *        counted.
+ * \return Error code:
+ *         \c IGRAPH_EINVVID: invalid vertex id.
+ *         \c IGRAPH_EINVMODE: invalid mode argument.
+ *
+ * Time complexity: O(v) if
+ * loops is 
+ * TRUE, and
+ * O(v*d)
+ * otherwise. v is the number
+ * vertices for which the degree will be calculated, and
+ * d is their (average) degree. 
+ */
+
+int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
+		     igraph_vs_t vids, igraph_neimode_t mode, 
+		     igraph_bool_t loops) {
+
+  igraph_vector_t tmp;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+  
+  igraph_degree(graph, &tmp, vids, mode, loops);  
+  *res=igraph_vector_max(&tmp);
+  
+  igraph_vector_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}

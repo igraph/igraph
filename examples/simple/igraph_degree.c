@@ -36,6 +36,7 @@ int main() {
   igraph_t g;
   igraph_vector_t v, seq;
   int ret;
+  igraph_integer_t mdeg;
 
   /* Create graph */
   igraph_vector_init(&v, 8);
@@ -114,6 +115,38 @@ int main() {
   igraph_destroy(&g);
   igraph_vector_destroy(&v);
   igraph_vector_destroy(&seq);
+
+  /* Maximum degree */
+  
+  igraph_ring(&g, 10, 0 /*undirected*/, 0 /*undirected*/, 0/*uncircular*/);
+  igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+  if (mdeg != 2) { 
+    return 3;
+  }
+  igraph_destroy(&g);
+  
+  igraph_full(&g, 10, 0 /*undirected*/, 0/*no loops*/);
+  igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+  if (mdeg != 9) {
+    return 4;
+  }
+  igraph_destroy(&g);
+
+  igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);
+  igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
+  if (mdeg != 9) {
+    return 5;
+  }
+  igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS);
+  if (mdeg != 1) {
+    return 6;
+  }
+  igraph_maxdegree(&g, &mdeg, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
+  if (mdeg != 9) {
+    return 7;
+  }
+  igraph_destroy(&g);
+  
 
   return 0;
 }
