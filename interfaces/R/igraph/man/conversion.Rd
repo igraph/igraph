@@ -5,7 +5,7 @@
 \description{Sometimes it is useful to have a standard representation of
   a graph, like an adjacency matrix or an edge list.}
 \usage{
-get.adjacency(graph, type="both")
+get.adjacency(graph, type="both", attr=NULL, names=TRUE, binary=FALSE)
 get.edgelist(graph)
 }
 \arguments{
@@ -15,7 +15,18 @@ get.edgelist(graph)
     \code{upper}: the upper right triangle of the matrix is used,
     \code{lower}: the lower left triangle of the matrix is
     used. \code{both}: the whole matrix is used, a symmetric matrix is
-    returned.} 
+    returned.}
+  \item{attr}{Either \code{NULL} or a character string giving an edge
+    attribute name. If \code{NULL} a traditional adjacency matrix is
+    returned. If not \code{NULL} then the values of the given edge
+    attribute are included in the adjacency matrix. If the graph has
+    multiple edges, the edge attribute of an arbitrarily chosen edge
+    (for the multiple edges) is included.}
+  \item{names}{Logical constant, whether to assign row and column names
+    to the matrix. These are only assigned if the \code{name} vertex
+    attribute is present in the graph.}
+  \item{binary}{Logical, whether to return a binary matrix. This argument
+    is ignored if \code{attr} is not \code{NULL}.}
 }
 \details{
   \code{get.adjacency} returns the adjacency matrix of a graph.
@@ -23,8 +34,10 @@ get.edgelist(graph)
   \code{get.edgelist} returns the list of edges in a graph.  
 }
 \value{
-  A \code{vcount(graph)} by \code{vcount(graph)} numeric matrix for
-  \code{get.adjacency}. (This can be huge!)
+  A \code{vcount(graph)} by \code{vcount(graph)} (usually) numeric
+  matrix for \code{get.adjacency}. (This can be huge!) Note that a
+  non-numeric matrix might be returned if \code{attr} is a non-numeric
+  edge attribute.
 
   A \code{ecount(graph)} by 2 numeric matrix for \code{get.edgelist}.
 }
@@ -33,7 +46,11 @@ get.edgelist(graph)
 \seealso{\code{\link{graph.adjacency}}, \code{\link{read.graph}}}
 \examples{
 g <- erdos.renyi.game(10, 2/10)
-get.adjacency(g)
 get.edgelist(g)
+get.adjacency(g)
+V(g)$name <- letters[1:vcount(g)]
+get.adjacency(g)
+E(g)$weight <- runif(ecount(g))
+get.adjacency(g, attr="weight")
 }
 \keyword{graphs}
