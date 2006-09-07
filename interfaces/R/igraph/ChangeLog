@@ -1,3 +1,8 @@
+2006-08-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R (bonpow) : added, 
+	ported from SNA
+
 2006-08-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/iterators.R (E<-) : value is last argument,

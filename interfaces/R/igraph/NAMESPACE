@@ -96,7 +96,7 @@ export(clusters, cluster.distribution, is.connected, decompose.graph)
 
 # centrality
 
-export(evcent)
+export(evcent, bonpow)
 
 # dynamics measurement
 

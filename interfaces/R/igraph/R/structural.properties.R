@@ -362,3 +362,28 @@ rewire <- function(graph, mode="simple", niter=100) {
   .Call("R_igraph_rewire", graph, as.numeric(niter), as.numeric(mode),
         PACKAGE="igraph")
 }
+
+bonpow <- function(graph, nodes=V(graph),
+                   loops=FALSE, tmaxdev=FALSE, exponent=1,
+                   rescale=FALSE, tol=1e-7){
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }  
+  
+  d <- get.adjacency(graph)
+  if (!loops) {
+    diag(d) <- 0
+  }
+  n <- vcount(graph)
+  id <- matrix(0,nrow=n,ncol=n)
+  diag(id) <- 1
+
+  ev <- apply(solve(id-exponent*d,tol=tol)%*%d,1,sum)
+  if(rescale) {
+    ev <- ev/sum(ev)
+  } else {
+    ev <- ev*sqrt(n/sum((ev)^2))
+  } 
+  ev[as.numeric(nodes)+1]
+}
