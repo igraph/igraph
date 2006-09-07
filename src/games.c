@@ -1389,11 +1389,18 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
  * \function igraph_grg_game
  * \brief Generating geometric random graphs.
  *
+ * A geometric random graph is created by dropping points (=vertices)
+ * randomly to the unit square and then connecting all those pairs
+ * which are less than \c radius apart in Euclidean norm.
+ * 
+ * </para><para>
+ * Original code contributed by Keith Briggs, thanks Keith.
  * \param graph Pointer to an uninitialized graph object,
  * \param nodes The number of vertices in the graph.
  * \param radius The radius within which the vertices will be connected.
  * \param torus Logical constant, if true periodic boundary conditions
- *        will be used, ie. the vertices are assumed to be on a torus.
+ *        will be used, ie. the vertices are assumed to be on a torus 
+ *        instead of a square.
  * \return Error code.
  * 
  * Time complexity: TODO, less than O(|V|^2+|E|).
@@ -1401,35 +1408,79 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 				    
 int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 		    igraph_real_t radius, igraph_bool_t torus) {
-
-  long int i,j;
+  
+  long int i, j;
   igraph_vector_t x, y, edges;
-  igraph_real_t dx, dy, r2=radius*radius;
-
+  igraph_real_t r2=radius*radius;
+  
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes));
   IGRAPH_VECTOR_INIT_FINALLY(&x, nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&y, nodes);
-
+  
   RNG_BEGIN();
   
   for (i=0; i<nodes; i++) {
-    VECTOR(x)[i]=RNG_UNIF01(); VECTOR(y)[i]=RNG_UNIF01();
-    for (j=0; j<i; j++) {
-      dx=fabs(VECTOR(x)[i]-VECTOR(x)[j]);
-      if (torus && dx>0.5) dx=1.0-dx;
-      if (dx<radius) {
-        dy=fabs(VECTOR(y)[i]-VECTOR(y)[j]);
-        if (torus && dy>0.5) dy=1.0-dy;
-        if (dy<radius && dx*dx+dy*dy<r2) { // we have an edge
+    VECTOR(x)[i]=RNG_UNIF01();
+    VECTOR(y)[i]=RNG_UNIF01();
+  }
+  
+  RNG_END();
+
+  igraph_vector_sort(&x);
+
+  if (!torus) {
+    for (i=0; i<nodes; i++) {
+      igraph_real_t x1=VECTOR(x)[i];
+      igraph_real_t y1=VECTOR(y)[i];
+      long int j=i+1;
+      igraph_real_t dx, dy;
+      while ( j<nodes && (dx=VECTOR(x)[j] - x1) < radius) {
+	dy=VECTOR(y)[j]-y1;
+      }
+      if (dx*dx+dy*dy < r2) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+      }
+      j++;
+    }
+  } else { 
+    for (i=0; i<nodes; i++) {
+      igraph_real_t x1=VECTOR(x)[i];
+      igraph_real_t y1=VECTOR(y)[i];
+      long int j=i+1;
+      igraph_real_t dx, dy;
+      while ( j<nodes && (dx=VECTOR(x)[j] - x1) < radius) {
+	dy=fabs(VECTOR(y)[j]-y1);
+	if (dx > 0.5) {
+	  dx=1-dx;
+	}
+	if (dy > 0.5) {
+	  dy=1-dy;
+	}
+	if (dx*dx+dy*dy < r2) {
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
-        }
+	}
+	j++;
+      }
+      if (j==nodes) {
+	j=0;      
+	while (j<i && (dx=1-x1+VECTOR(x)[j]) < radius && 
+	       x1-VECTOR(x)[j]>=radius) {
+	  dy=fabs(VECTOR(y)[j]-y1);
+	  if (dy > 0.5) {
+	    dy=1-dy;
+	  }
+	  if (dx*dx+dy*dy < r2) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+	  }
+	  j++;
+	}
       }
     }
   }
-
-  RNG_END();
   
   igraph_vector_destroy(&y);
   igraph_vector_destroy(&x);
@@ -1441,3 +1492,4 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
   
   return 0;
 }
+  

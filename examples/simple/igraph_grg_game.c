@@ -23,9 +23,19 @@
 
 #include <igraph.h>
 
+#include <unistd.h>
+#include <sys/times.h>
+#include <math.h>
+
 int main() {
   
   igraph_t g;
+  long int i;
+  struct tms time;
+  clock_t current_time,start_time;
+  int tps;
+  long int runs=100, n=10000;
+  igraph_real_t r=0.01;
   
   /* Empty graph */
   igraph_grg_game(&g, 100, 0, 0);
@@ -35,11 +45,32 @@ int main() {
   igraph_destroy(&g);
   
   /* Full graph */
-  igraph_grg_game(&g, 10, 0.7, 1);
+  igraph_grg_game(&g, 10, sqrt(2.0)/2, 1);
   if (igraph_ecount(&g) != igraph_vcount(&g) * (igraph_vcount(&g)-1)/2) {
     return 2;
   }
   igraph_destroy(&g);
-  
+
+  /* Measure running time */
+/*   tps=sysconf(_SC_CLK_TCK); // clock ticks per second  */
+/*   times(&time); start_time=time.tms_utime; */
+/*   for (i=0; i<runs; i++) { */
+/*     igraph_grg_game2(&g, n, r, 1);  */
+/*     igraph_destroy(&g); */
+/*   } */
+/*   times(&time); current_time=time.tms_utime; */
+/*   fprintf(stdout,"    sorted: time=%.3fs\n",(current_time-start_time)/(double)tps); */
+
+/*   tps=sysconf(_SC_CLK_TCK); // clock ticks per second  */
+/*   times(&time); start_time=time.tms_utime; */
+/*   for (i=0; i<runs; i++) { */
+/*     igraph_grg_game(&g, n, r, 1); */
+/*     igraph_destroy(&g); */
+/*   } */
+/*   times(&time); current_time=time.tms_utime; */
+/*   fprintf(stdout,"non-sorted: time=%.3fs\n", */
+/* 	  (current_time-start_time)/(double)tps); */
+
+
   return 0;
 }

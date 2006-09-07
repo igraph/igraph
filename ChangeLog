@@ -1,3 +1,9 @@
+2006-09-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_grg_game) : new, faster implementation
+	* examples/simple/igraph_grg_game.c : slight change to make test 
+	succeed with probability 1
+
 2006-09-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_grg_game) : added
