@@ -1,3 +1,7 @@
+2006-09-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_grg_game) : bug corrected
+
 2006-09-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_grg_game) : new, faster implementation

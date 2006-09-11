@@ -1437,12 +1437,12 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
       igraph_real_t dx, dy;
       while ( j<nodes && (dx=VECTOR(x)[j] - x1) < radius) {
 	dy=VECTOR(y)[j]-y1;
+	if (dx*dx+dy*dy < r2) {
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+	}
+	j++;
       }
-      if (dx*dx+dy*dy < r2) {
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
-      }
-      j++;
     }
   } else { 
     for (i=0; i<nodes; i++) {
