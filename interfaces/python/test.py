@@ -247,7 +247,7 @@ section("Graph generators")
 
 start("Generating a directed graph from adjacency matrix")
 g=igraph.Graph.Adjacency([[0, 1, 1, 1], [1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]])
-test(g.vcount() == 4 and g.ecount() == 4)
+test(g.vcount() == 4 and g.ecount() == 4 and len(g.neighbors(0, igraph.OUT)) == 3)
 
 start("Generating an undirected graph from adjacency matrix with method ADJ_PLUS")
 g=igraph.Graph.Adjacency([[0, 1, 1, 1], [1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]], igraph.ADJ_PLUS)
@@ -938,14 +938,14 @@ results()
 print "\nTesting for possible leaks..."
 
 # This is a list containing all possible leaky objects.
-# Don't EVER use a list here. Lists don't get deallocated immediately even
-# when using their __del__ method. Python keeps track of the last 80 lists
-# and doesn't free them in order to speed up new list allocation. So if
-# we use a real list here, our graphs won't get deallocated even when we
-# __del__ them because of their references in the list. The real
-# deallocation will take place only when Python destroys the list at
-# last, which mostly happens at the end of the testing framework, after
-# the last print message.
+# Don't EVER include a list in this list. Lists don't get deallocated
+# immediately even when using their __del__ method. Python keeps track of
+# the last 80 lists and doesn't free them in order to speed up new list
+# allocation. So if we use a real list here, our graphs won't get
+# deallocated even when we __del__ them because of their references in
+# the list. The real deallocation will take place only when Python
+# destroys the list at last, which mostly happens at the end of the
+# testing framework, after the last print message.
 rootnames=["g", "g2", "degs", "neis"]
 roots=[degs, neis]
 objs=get_all_objects(roots)

@@ -1,3 +1,10 @@
+2006-09-15  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+ 
+ 	* src/type_indexededgelist.c (igraph_delete_edges) : corrected
+ 	attribute handling bug
+ 	* interfaces/python/graphobject.c : changed some default params
+ 	* interfaces/python/graphobject.h : corrected docstrings
+ 	
 2006-08-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_reciprocity) : rewritten to

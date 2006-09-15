@@ -1924,7 +1924,7 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self,
 {
    char *kwlist[] = {"v", "mode", NULL};
    igraph_vector_t *res;
-   igraph_neimode_t mode=IGRAPH_ALL;
+   igraph_neimode_t mode=IGRAPH_OUT;
    long from0, i, j;
    igraph_integer_t from;
    PyObject *list, *item;
@@ -2008,7 +2008,7 @@ PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *se
 {
   char *kwlist[] = {"v", "mode", NULL};
   igraph_vector_ptr_t res;
-  igraph_neimode_t mode=IGRAPH_ALL;
+  igraph_neimode_t mode=IGRAPH_OUT;
   long from0, i, j, k;
   igraph_integer_t from;
   PyObject *list, *item;
@@ -2074,7 +2074,7 @@ PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self,
    PyObject *vobj=NULL, *list=NULL;
    igraph_vector_t vids;
    igraph_matrix_t res;
-   igraph_neimode_t mode=IGRAPH_ALL;
+   igraph_neimode_t mode=IGRAPH_OUT;
    int return_single=0;
    
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Ol", kwlist, &vobj, &mode))
