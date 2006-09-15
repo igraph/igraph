@@ -1,3 +1,7 @@
+2006-09-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_proterties.c (igraph_density) : added
+
 2006-09-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_grg_game) : bug corrected

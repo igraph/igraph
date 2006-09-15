@@ -4154,3 +4154,22 @@ SEXP R_igraph_grg_game(SEXP pn, SEXP pradius, SEXP ptorus) {
   return result;
 }
 
+SEXP R_igraph_density(SEXP graph) {
+  
+  igraph_t g;
+  igraph_real_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_density(&g, &res);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

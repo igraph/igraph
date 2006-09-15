@@ -80,7 +80,8 @@ export(subgraph, simplify, degree, degree.distribution, diameter,
        shortest.paths, minimum.spanning.tree, edge.betweenness,
        get.shortest.paths, average.path.length, transitivity,
        get.all.shortest.paths, get.diameter, farthest.nodes,
-       graph.laplacian, constraint, page.rank, reciprocity, rewire)
+       graph.laplacian, constraint, page.rank, reciprocity, rewire,
+       graph.density)
 
 # plotting
 

@@ -387,3 +387,13 @@ bonpow <- function(graph, nodes=V(graph),
   } 
   ev[as.numeric(nodes)+1]
 }
+
+graph.density <- function(graph) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }  
+  
+  .Call("R_igraph_density", graph,
+        PACKAGE="igraph")
+}

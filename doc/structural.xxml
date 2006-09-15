@@ -49,6 +49,7 @@
 </section>
 
 <section><title>Other Operations</title>
+<!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_simplify -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_transitivity -->	

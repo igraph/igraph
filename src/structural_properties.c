@@ -2380,3 +2380,37 @@ int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_density
+ * Calculate the density of a graph.
+ * 
+ * </para><para>The density of a graph is simply the ratio number of
+ * edges and the number of possible edges. Note that density is
+ * ill-defined for graphs with multiple and/or loop edges, so consider
+ * calling \ref igraph_simplify() on the graph if you know that it
+ * contains multiple or loop edges. 
+ * \param graph The input graph object.
+ * \param res Pointer to a real number, the result will be stored
+ * here.
+ * \param loops Logical constant, whether to include loops in the
+ * calculation.
+ * \return Error code.
+ *
+ * Time complexity: O(1).
+ */
+
+int igraph_density(const igraph_t *graph, igraph_real_t *res) {
+
+  igraph_integer_t no_of_nodes=igraph_vcount(graph);
+  igraph_integer_t no_of_edges=igraph_ecount(graph);
+  igraph_bool_t directed=igraph_is_directed(graph);
+  
+  if (directed) {
+    *res = no_of_edges / (no_of_nodes*(no_of_nodes-1));
+  } else {
+    *res = no_of_edges / (no_of_nodes*(no_of_nodes-1)/2);
+  }
+  
+  return 0;
+}
