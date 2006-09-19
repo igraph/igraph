@@ -57,12 +57,32 @@ add.edges <- function(graph, edges, ...) {
   graph
 }
 
-add.vertices <- function(graph, nv) {
+add.vertices <- function(graph, nv, ...) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  .Call("R_igraph_add_vertices", graph, as.numeric(nv),
-        PACKAGE="igraph")
+
+  attrs <- list(...)
+  nam <- names(attrs)
+  if (length(attrs) != 0 && (is.null(nam) || any(nam==""))) {
+    stop("please supply names for attributes")
+  }
+
+  vertices.orig <- vcount(graph)  
+  graph <- .Call("R_igraph_add_vertices", graph, as.numeric(nv),
+                 PACKAGE="igraph")
+  vertices.new <- vcount(graph)
+
+  if (vertices.new-vertices.orig != 0) {
+    idx <- seq(vertices.orig+1, vertices.new)
+  } else {
+    idx <- numeric()
+  }
+  for (i in seq(attrs)) {
+    graph[[9]][[3]][[nam[i]]][idx] <- attrs[[nam[i]]]
+  }
+                  
+  graph
 }
 
 delete.edges <- function(graph, edges) {

@@ -5,7 +5,10 @@
 
 	* interfaces/R/igraph/R/interface.R (add.edges) : attribute handling
 	added
-		
+
+	* interfaces/R/igraph/R/interface.R (add.vertices) : attribute handling
+	added
+	
 2006-09-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/games.R (grg.game) : added

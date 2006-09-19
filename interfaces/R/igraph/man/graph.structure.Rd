@@ -8,7 +8,7 @@
   adding and deleting edges and vertices.}
 \usage{
 add.edges(graph, edges, \dots)
-add.vertices(graph, nv)
+add.vertices(graph, nv, \dots)
 delete.edges(graph, edges)
 delete.vertices(graph, v)
 }
@@ -28,7 +28,10 @@ delete.vertices(graph, v)
   be \code{NA}.
 
   \code{add.vertices} adds the specified number of isolate vertices to
-  the graph. The ids of the old vertices are preserved.
+  the graph. The ids of the old vertices are preserved. The additionally
+  supplied named arguments will be added as vertex attributes for the
+  new vertices. If an attribute was not present in the original graph,
+  its value is set to \code{NA} for the original vertices.
 
   \code{delete.edges} removes the specified edges from the graph. If a
   specified edge is not present, the function gives an error message,
