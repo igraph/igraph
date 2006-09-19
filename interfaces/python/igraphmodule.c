@@ -446,7 +446,7 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
 
   n=igraph_vector_size(idx);
   for (i=0; i<n; i++) {
-    /*printf("%ld:%f ", i, VECTOR(*idx)[i]);*/
+    /* printf("%ld:%f ", i, VECTOR(*idx)[i]); */
     if (!VECTOR(*idx)[i]) {
       ndeleted++;
       continue;

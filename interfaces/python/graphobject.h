@@ -622,7 +622,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_get_shortest_paths
   {"get_shortest_paths", (PyCFunction)igraphmodule_Graph_get_shortest_paths,
       METH_VARARGS | METH_KEYWORDS,
-      "get_shortest_paths(v, mode=ALL) -> list\n\n"
+      "get_shortest_paths(v, mode=OUT) -> list\n\n"
       "Calculates the shortest paths from/to a given node in a graph.\n\n"
       "@param v: the source/destination for the calculated paths\n"
       "@param mode: the directionality of the paths. C{IN} means to\n"
@@ -637,7 +637,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_get_all_shortest_paths
   {"get_all_shortest_paths", (PyCFunction)igraphmodule_Graph_get_all_shortest_paths,
       METH_VARARGS | METH_KEYWORDS,
-      "get_all_shortest_paths(v, mode=ALL) -> list\n\n"
+      "get_all_shortest_paths(v, mode=OUT) -> list\n\n"
       "Calculates all of the shortest paths from/to a given node in a graph.\n\n"
       "@param v: the source/destination for the calculated paths\n"
       "@param mode: the directionality of the paths. C{IN} means to calculate\n"
@@ -699,7 +699,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // interface to igraph_shortest_paths
   {"shortest_paths", (PyCFunction)igraphmodule_Graph_shortest_paths,
       METH_VARARGS | METH_KEYWORDS,
-      "shortest_paths(vertices, mode) -> matrix\n\n"
+      "shortest_paths(vertices, mode=OUT) -> matrix\n\n"
       "Calculates shortest path lengths for given nodes in a graph.\n\n"
       "@param vertices: a list containing the vertex IDs which should be\n"
       "  included in the result.\n"
