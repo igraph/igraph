@@ -3,6 +3,9 @@
 	* interfaces/R/igraph/R/structural.properties.R (graph.density) : added
 	* interfaces/R/src/rinterface.c (R_igraph_density) : added
 
+	* interfaces/R/igraph/R/interface.R (add.edges) : attribute handling
+	added
+		
 2006-09-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/games.R (grg.game) : added

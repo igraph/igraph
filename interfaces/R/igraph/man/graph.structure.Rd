@@ -7,7 +7,7 @@
 \description{These are the methods for simple manipulation of graphs:
   adding and deleting edges and vertices.}
 \usage{
-add.edges(graph, edges)
+add.edges(graph, edges, \dots)
 add.vertices(graph, nv)
 delete.edges(graph, edges)
 delete.vertices(graph, v)
@@ -15,12 +15,17 @@ delete.vertices(graph, v)
 \arguments{
   \item{graph}{The graph to work on.}
   \item{edges}{Edge sequence, the edges to remove.}
+  \item{\dots}{Additional parameters will be added as edge/vertex
+    attributes. Note that these arguments have to be named.}
   \item{nv}{Numeric constant, the number of vertices to add.}
   \item{v}{Vector sequence, the vertices to remove.}
 }
 \details{
   \code{add.edges} adds the specified edges to the graph. The ids of the
-  vertices are preserved.
+  vertices are preserved. The additionally supplied named arguments will
+  be added as edge attributes for the new edges. If an attribute was not
+  present in the original graph, its value for the original edges will
+  be \code{NA}.
 
   \code{add.vertices} adds the specified number of isolate vertices to
   the graph. The ids of the old vertices are preserved.
