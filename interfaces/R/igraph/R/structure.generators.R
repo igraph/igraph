@@ -153,7 +153,7 @@ graph.atlas <- function(n) {
 # Create a graph from a data frame
 ###################################################################
 
-graph.data.frame <- function(d) {
+graph.data.frame <- function(d, directed=TRUE) {
 
   if (ncol(d) < 2) {
     stop("the data frame should contain at least two columns")
@@ -165,7 +165,7 @@ graph.data.frame <- function(d) {
   names(ids) <- names
 
   # create graph
-  g <- graph.empty(n=0)
+  g <- graph.empty(n=0, directed=directed)
   g <- add.vertices(g, length(ids), name=names)
 
   # create edge list

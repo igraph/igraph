@@ -30,7 +30,7 @@ graph.ring(n, directed = FALSE, mutual = FALSE, circular=TRUE)
 graph.tree(n, children = 2, mode="out")
 graph.full(n, directed = FALSE, loops = FALSE)
 graph.atlas(n)
-graph.data.frame(d)
+graph.data.frame(d, directed=TRUE)
 }
 \arguments{
   \item{edges}{Numeric vector defining the edges, the first edge points
