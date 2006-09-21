@@ -1,3 +1,10 @@
+2006-09-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/interace.R (add.vertices, add.edges) :
+	attr argument added
+	* interfaces/R/igraph/R/structure.generators.R (graph.data.frame) : 
+	added
+
 2006-09-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (graph.density) : added

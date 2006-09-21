@@ -7,8 +7,8 @@
 \description{These are the methods for simple manipulation of graphs:
   adding and deleting edges and vertices.}
 \usage{
-add.edges(graph, edges, \dots)
-add.vertices(graph, nv, \dots)
+add.edges(graph, edges, \dots, attr=list())
+add.vertices(graph, nv, \dots, attr=list())
 delete.edges(graph, edges)
 delete.vertices(graph, v)
 }
@@ -17,6 +17,8 @@ delete.vertices(graph, v)
   \item{edges}{Edge sequence, the edges to remove.}
   \item{\dots}{Additional parameters will be added as edge/vertex
     attributes. Note that these arguments have to be named.}
+  \item{attr}{Additional edge/vertex attributes to add. This will be
+    concatenated to the other supplied attributes.}
   \item{nv}{Numeric constant, the number of vertices to add.}
   \item{v}{Vector sequence, the vertices to remove.}
 }

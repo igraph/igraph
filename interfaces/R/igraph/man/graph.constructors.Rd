@@ -8,6 +8,7 @@
 \alias{graph.tree}
 \alias{graph.full}
 \alias{graph.atlas}
+\alias{graph.data.frame}
 \title{Various methods for creating graphs}
 \description{These method can create various (mostly regular) graphs:
   empty graphs, graphs with the given edges, graphs from adjacency
@@ -29,6 +30,7 @@ graph.ring(n, directed = FALSE, mutual = FALSE, circular=TRUE)
 graph.tree(n, children = 2, mode="out")
 graph.full(n, directed = FALSE, loops = FALSE)
 graph.atlas(n)
+graph.data.frame(d)
 }
 \arguments{
   \item{edges}{Numeric vector defining the edges, the first edge points
@@ -101,6 +103,7 @@ graph.atlas(n)
     (except for leafs) for \code{graph.tree}.}
   \item{loops}{If TRUE also loops edges (self edges) are added.}
   \item{graph}{An object.}
+  \item{d}{A data frame object, this will be converted to a graph.}
 }
 \details{All these functions create graphs in a deterministic way.
 
@@ -137,6 +140,10 @@ graph.atlas(n)
       automorphisms.}
   }
 
+  \code{graph.data.frame} creates a graph from a data frame. The data
+  frame should have at least two columns. The first two columns will be
+  used as a symbolic edge list and the other columns will be added as
+  edge attributes.
 }
 \value{Every function documented here returns a \code{graph} object.}
 %\references{}

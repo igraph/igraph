@@ -29,12 +29,13 @@ graph.empty <- function(n=0, directed=TRUE) {
         PACKAGE="igraph")
 }
 
-add.edges <- function(graph, edges, ...) {
+add.edges <- function(graph, edges, ..., attr=list()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
   attrs <- list(...)
+  attrs <- append(attrs, attr)
   nam <- names(attrs)
   if (length(attrs) != 0 && (is.null(nam) || any(nam==""))) {
     stop("please supply names for attributes")
@@ -57,12 +58,13 @@ add.edges <- function(graph, edges, ...) {
   graph
 }
 
-add.vertices <- function(graph, nv, ...) {
+add.vertices <- function(graph, nv, ..., attr=list()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
   attrs <- list(...)
+  attrs <- append(attrs, attr)
   nam <- names(attrs)
   if (length(attrs) != 0 && (is.null(nam) || any(nam==""))) {
     stop("please supply names for attributes")

@@ -148,3 +148,44 @@ graph.atlas <- function(n) {
   .Call("R_igraph_atlas", as.numeric(n),
         PACKAGE="igraph")
 }
+
+###################################################################
+# Create a graph from a data frame
+###################################################################
+
+graph.data.frame <- function(d) {
+
+  if (ncol(d) < 2) {
+    stop("the data frame should contain at least two columns")
+  }
+
+  # assign vertex ids
+  names <- unique( c(as.character(d[,1]), as.character(d[,2])) )
+  ids <- seq(along=names)-1
+  names(ids) <- names
+
+  # create graph
+  g <- graph.empty(n=0)
+  g <- add.vertices(g, length(ids), name=names)
+
+  # create edge list
+  from <- as.character(d[,1])
+  to <- as.character(d[,2])
+  edges <- t(matrix(c(ids[from], ids[to]), nc=2))
+
+  # edge attributes
+  attrs <- list()
+  if (ncol(d) > 2) {
+    for (i in 3:ncol(d)) {
+      newval <- d[,i]
+      if (class(newval) == "factor") {
+        newval <- as.character(newval)
+      }
+      attrs[[ names(d)[i] ]] <- newval
+    }
+  }
+  
+  # add the edges
+  g <- add.edges(g, edges, attr=attrs)
+  g
+}
