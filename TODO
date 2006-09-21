@@ -1,5 +1,4 @@
 
-o add attributes parameter(s) to add.vertices in R
 o find a way for writing equations in DocBook.
 o read and write non-structural info from/to GraphML files
   read:

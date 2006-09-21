@@ -592,4 +592,363 @@ different file Pajek file, then you can do the following: TODO.
 
 </section>
 
+<!-- ############################################################ -->
+
+<section><title>A detailed example</title>
+
+<para>
+This section show a detailed example on how to convert your data into
+an igraph graph.
+</para>
+
+<para>Suppose you're just back from your field research or you've
+found some nice piece of data online and you want to turn your data
+into an igraph graph object to play with it. Although we cannot give a
+general receipt which works in all cases, the following example should
+provide you enough guidelines to handle almost any type of data you'll
+find.</para>
+
+<para>
+If your data is not in an electronic format, then you need to type it
+in into one or more files first. This can be done by any basic editor
+you are familiar with, for example notepad or wordpad on Microsoft
+operating systems, emacs or vi on Unix-like systems. You can also use
+a speadsheet program if you like but make sure that it can export CSV
+(comma separated value) files.
+</para>
+
+<para>
+You can also type in your data directly into R, in the first example
+we will show you how this can be done.
+</para>
+
+<para> Let us suppose that you've colledted information about the
+social network of a small group, say ten people. You want to store
+various attributes of the people and different types of relations
+(like friendship, business relationship, etc.) among them. You decide
+to store everything in a single graph, for simplicity.
+</para>
+
+<para>
+The following traits are collected about the people in the
+experiment: name, age, gender and R will assign numeric ids to them.
+Here is the complete data set:
+<informaltable frame="all">
+<tgroup cols="3">
+<thead>
+  <row><entry>Name</entry><entry>Age</entry><entry>Gender</entry></row>
+</thead>
+<tbody>
+  <row><entry>Alice Anderson</entry><entry>48</entry><entry>F</entry></row>
+  <row><entry>Bob Bradford</entry>  <entry>33</entry><entry>M</entry></row>
+  <row><entry>Cecil Connor</entry>  <entry>45</entry><entry>F</entry></row>
+  <row><entry>David Daugher</entry> <entry>34</entry><entry>M</entry></row>
+  <row><entry>Esmeralda Escobar</entry><entry>21</entry><entry>F</entry></row>
+  <row><entry>Frank Finley</entry>  <entry>36</entry><entry>M</entry></row>
+  <row><entry>Gabi Garbo</entry>    <entry>44</entry><entry>F</entry></row>
+  <row><entry>Helen Hunt</entry>    <entry>40</entry><entry>F</entry></row>
+  <row><entry>Iris Irving</entry>   <entry>25</entry><entry>F</entry></row>
+  <row><entry>James Jones </entry>  <entry>47</entry><entry>M</entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+</para>
+
+<para>The next table contains all the different relations among these
+people, some relations are binary (YES or NO, eg. the one indicating
+whether or not two people work in the same room), others like
+friendship might have values between zero and five.
+<informaltable>
+<tgroup cols="5">
+<thead>
+<row>
+  <entry>Name 1</entry>
+  <entry>Name 2</entry>
+  <entry>Same department</entry>
+  <entry>Friendship</entry>
+  <entry>Advice</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>Bob</entry><entry>Alice</entry>
+  <entry>N</entry><entry>4</entry><entry>4</entry>
+</row>
+<row>
+  <entry>Cecil</entry><entry>Bob</entry>
+  <entry>N</entry><entry>5</entry><entry>5</entry>
+</row>
+<row>
+  <entry>Cecil</entry><entry>Alice</entry>
+  <entry>Y</entry><entry>5</entry><entry>5</entry>
+</row>
+<row>
+  <entry>David</entry><entry>Alice</entry>
+  <entry>N</entry><entry>2</entry><entry>4</entry>
+</row>
+<row>
+  <entry>David</entry><entry>Bob</entry>
+  <entry>N</entry><entry>1</entry><entry>2</entry>
+</row>
+<row>
+  <entry>Esmeralda</entry><entry>Alice</entry>
+  <entry>Y</entry><entry>1</entry><entry>3</entry>
+</row>
+<row>
+  <entry>...</entry><entry>...</entry>
+  <entry>...</entry><entry>...</entry><entry>...</entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+</para>
+
+<para>
+Note that we will have a directed graph because the relations are not
+symmetric. Ie. according to line 1 Alice asks Bob very rarely for
+advice, but (line 2) Bob seeks Alice's advice quite often.
+</para>
+
+<para>
+Let us assume that this data is save to a file in CSV format, this
+simply means that the entries in the table are separated by commas.
+The first file (<filename>traits.csv</filename>) contains the traits
+and looks like this:
+<screen>
+Alice Anderson,    48, F
+Bob Bradford,      33, M
+Cecil Connor,      45, F
+David Daugher,     34, M
+Esmeralda Escobar, 21, F
+Frank Finley,      36, M
+Gabi Garbo,        44, F
+Helen Hunt,        40, F
+Iris Irving,       25, F
+James Jones,       47, M
+</screen> and the second file which contains the relations looks like
+this:
+<screen>
+Bob,       Alice,     N, 4, 4
+Cecil,     Bob,       N, 5, 5
+Cecil,     Alice,     Y, 5, 5
+David,     Alice,     N, 2, 4
+David,     Bob,       N, 1, 2
+Esmeralda, Alice,     Y, 1, 3
+...
+</screen>
+</para>
+
+<para>Click here for the full files: <ulink
+url="traits.csv"><filename>traits.csv</filename></ulink> and <ulink
+url="relations.csv"><filename>relations.csv</filename></ulink>.</para> 
+
+<para>
+Let us now import this data into R and create an igraph graph from it. 
+First we will import the data into data frames. (If you don't know
+what data frames are, don't worry you'll still survice this section,
+but it might worth to consult the R tutorial. For now the important
+thing is that a data frame is like a table.) The command
+<function>read.csv()</function> can read a CSV file and stores the
+data in a data frame:
+<informalexample>
+<programlisting>
+<prompt>> </prompt>traits &lt;- read.csv("traits.csv", head=FALSE)
+<prompt>> </prompt>rel &lt;- read.csv("relations.csv", head=FALSE)
+</programlisting>
+</informalexample>
+The <parameter>head</parameter> parameter is set to
+<constant>FALSE</constant>, this instructs R not to interpret the
+first line of the file as a header. Set this to
+<constant>TRUE</constant> (or omit the parameter) if you have a header
+with column names in your file.
+</para>
+
+<para>
+We will first create an empty graph with ten vertices and the traits
+as vertex attributes. This can be done with a single command after
+loading the package:
+<informalexample>
+<programlisting>
+<prompt>> </prompt>library(igraph)
+<prompt>> </prompt>g &lt;- graph.empty()
+<prompt>> </prompt>g &lt;- add.vertices(g, nrow(traits), 
+                     name=as.character(traits[,1]), age=traits[,2],
+                     gender=as.character(traits[,3]))
+</programlisting>
+</informalexample>
+</para>
+
+<para>
+We can check that the graph is created properly:
+<informalexample>
+<programlisting>
+<prompt>> </prompt>V(g)$name
+</programlisting>
+<screen>
+ [1] "Alice Anderson"    "Bob Bradford"      "Cecil Connor"     
+ [4] "David Daugher"     "Esmeralda Escobar" "Frank Finley"     
+ [7] "Gabi Garbo"        "Helen Hunt"        "Iris Irving"      
+[10] "James Jones"
+</screen>
+<programlisting>
+<prompt>> </prompt>V(g)$age
+</programlisting>
+<screen>
+ [1] 48 33 45 34 21 36 44 40 25 47
+</screen>
+<programlisting>
+<prompt>> </prompt>V(g)$gender
+</programlisting>
+<screen>
+ [1] "F" "M" "F" "M" "F" "M" "F" "F" "F" "M"
+</screen>
+</informalexample>
+</para>
+
+<para>
+Now we continue by adding the edges. First we need to cut the first
+names from the full names, since the edges are given with the first
+names only. If you want to spare this step use the same names in both
+files. 
+<informalexample>
+<programlisting>
+<prompt>> </prompt>names &lt;- sapply(strsplit(V(g)$name, " "), "[",1)
+<prompt>> </prompt>ids &lt;- 1:length(names)-1
+<prompt>> </prompt>names(ids) &lt;- names
+<prompt>> </prompt>ids
+</programlisting>
+<screen>
+    Alice       Bob     Cecil     David Esmeralda     Frank      Gabi     Helen
+        0         1         2         3         4         5         6         7
+     Iris     James 
+        8         9 
+</screen>
+</informalexample>
+</para>
+
+<para>
+Then, we create an edge list with vertex ids instead of symbolic
+names:
+<informalexample>
+<programlisting>
+<prompt>> </prompt>from &lt;- as.character(rel[,1])
+<prompt>> </prompt>to &lt;- as.character(rel[,2])
+<prompt>> </prompt>edges &lt;- matrix(c(ids[from], ids[to]), nc=2)
+<prompt>> </prompt>edges
+</programlisting>
+<screen>
+      [,1] [,2]
+ [1,]    1    0
+ [2,]    2    1
+ [3,]    2    0
+ [4,]    3    0
+ [5,]    3    1
+ [6,]    4    0
+ [7,]    5    0
+ [8,]    5    4
+ [9,]    6    1
+[10,]    6    0
+[11,]    7    0
+[12,]    8    2
+[13,]    8    1
+[14,]    8    4
+[15,]    9    0
+[16,]    9    1
+[17,]    9    6
+[18,]    0    1
+[19,]    1    2
+[20,]    0    2
+[21,]    0    3
+[22,]    1    3
+[23,]    0    4
+[24,]    0    5
+[25,]    4    5
+[26,]    1    6
+[27,]    0    6
+[28,]    0    7
+[29,]    2    8
+[30,]    1    8
+[31,]    4    8
+[32,]    0    9
+[33,]    1    9
+[34,]    6    9
+</screen>
+</informalexample>
+</para>
+
+<para>
+And finally we can add the edges together with their attributes:
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- add.edges(g, t(edges), 
+               room=as.character(rel[,3]),
+	       friend=rel[,4], advice=rel[,5])
+<prompt>> </prompt>g
+</programlisting>
+<screen>
+Vertices: 10 
+Edges: 34 
+Directed: TRUE 
+
+Edges:
+[0] 1 -> 0
+[1] 2 -> 1
+[2] 2 -> 0
+[3] 3 -> 0
+[4] 3 -> 1
+[5] 4 -> 0
+[6] 5 -> 0
+[7] 5 -> 4
+[8] 6 -> 1
+[9] 6 -> 0
+[10] 7 -> 0
+[11] 8 -> 2
+[12] 8 -> 1
+[13] 8 -> 4
+[14] 9 -> 0
+[15] 9 -> 1
+[16] 9 -> 6
+[17] 0 -> 1
+[18] 1 -> 2
+[19] 0 -> 2
+[20] 0 -> 3
+[21] 1 -> 3
+[22] 0 -> 4
+[23] 0 -> 5
+[24] 4 -> 5
+[25] 1 -> 6
+[26] 0 -> 6
+[27] 0 -> 7
+[28] 2 -> 8
+[29] 1 -> 8
+[30] 4 -> 8
+[31] 0 -> 9
+[32] 1 -> 9
+[33] 6 -> 9
+</screen>
+</informalexample>
+</para>
+
+<para>
+You can find the whole program creating the graph in file
+<ulink url="import.R"><filename>import.R</filename></ulink>.
+</para>
+
+<para>
+Finally we can create a nice plot of the graph, with the edges
+connecting people working in the same room colored red.
+<informalexample>
+<programlisting>
+<prompt>> </prompt>E(g)$color &lt;- "black"
+<prompt>> </prompt>E(g)[ room=="y" ]$color &lt;- "red"
+<prompt>> </prompt>tkplot(g, layout=layout.kamada.kawai, edge.color=E(g)$color)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="import.pdf" format="PDF"/></imageobject>
+<imageobject><imagedata fileref="import.png" format="PNG"/></imageobject>
+</mediaobject></informalexample>
+</para>
+
+</section>
+
 </chapter>
