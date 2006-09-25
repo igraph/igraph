@@ -2392,24 +2392,37 @@ int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
  * contains multiple or loop edges. 
  * \param graph The input graph object.
  * \param res Pointer to a real number, the result will be stored
- * here.
+ *   here.
  * \param loops Logical constant, whether to include loops in the
- * calculation.
+ *   calculation. If this constant is TRUE then
+ *   loop edges are thought to be possible in the graph (this does not
+ *   neccessary means that the graph really contains any loops). If
+ *   this FALSE then the result is only correct if the graph does not
+ *   contain loops.
  * \return Error code.
  *
  * Time complexity: O(1).
  */
 
-int igraph_density(const igraph_t *graph, igraph_real_t *res) {
+int igraph_density(const igraph_t *graph, igraph_real_t *res, 
+		   igraph_bool_t loops) {
 
   igraph_integer_t no_of_nodes=igraph_vcount(graph);
   igraph_integer_t no_of_edges=igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
   
-  if (directed) {
-    *res = no_of_edges / (no_of_nodes*(no_of_nodes-1));
+  if (!loops) {
+    if (directed) {
+      *res = no_of_edges / (no_of_nodes*(no_of_nodes-1));
+    } else {
+      *res = no_of_edges / (no_of_nodes*(no_of_nodes-1)/2);
+    }
   } else {
-    *res = no_of_edges / (no_of_nodes*(no_of_nodes-1)/2);
+    if (directed) {
+      *res = no_of_edges / (no_of_nodes*no_of_nodes);
+    } else {
+      *res = no_of_edges / (no_of_nodes*no_of_nodes/2);
+    }
   }
   
   return 0;

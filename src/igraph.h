@@ -662,7 +662,8 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
 		     igraph_vs_t vids, igraph_neimode_t mode, 
 		     igraph_bool_t loops);
-int igraph_density(const igraph_t *graph, igraph_real_t *res);
+int igraph_density(const igraph_t *graph, igraph_real_t *res, 
+		   igraph_bool_t loops);
 
 /* TODO: degree.distribution (?) */
 
