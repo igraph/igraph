@@ -79,12 +79,17 @@ get.adjacency <- function(graph, type="both", attr=NULL, names=TRUE,
   res
 }
 
-get.edgelist <- function(graph) {
+get.edgelist <- function(graph, names=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
-               PACKAGE="igraph"), nc=2)
+  res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
+                      PACKAGE="igraph"), nc=2)
+  if (names && "name" %in% list.vertex.attributes(graph)) {
+    res <- matrix(V(g)$name[ res+1 ], nc=2)
+  }
+
+  res
 }
 
 as.directed <- function(graph, mode="mutual") {

@@ -39,7 +39,7 @@ export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed,
 # structure generators
 
 export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice,
-       graph.ring, graph.full, graph.atlas, graph.data.frame)
+       graph.ring, graph.full, graph.atlas, graph.data.frame, graph.edgelist)
 
 # games
 

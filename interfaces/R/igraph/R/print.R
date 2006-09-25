@@ -28,6 +28,7 @@ print.igraph <- function(x,
                          graph.attributes=igraph.par("print.graph.attributes"),
                          vertex.attributes=igraph.par("print.vertex.attributes"),
                          edge.attributes=igraph.par("print.edge.attributes"),
+                         names=TRUE,
                          ...) {
   
   if (!is.igraph(x)) {
@@ -75,7 +76,7 @@ print.igraph <- function(x,
       cat("\nEdges and their attributes:\n")
     }
     i <- 0
-    el <- get.edgelist(x)
+    el <- get.edgelist(x, names=names)
     apply(el, 1, function(v) {
       cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
       if (edge.attributes) {

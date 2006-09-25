@@ -1,3 +1,13 @@
+2006-09-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structure.generators.R (graph.edgelist) : added
+
+	* interfaces/R/igraph/R/conversion.R (get.edgelist) : names argument 
+	added
+	* interfaces/R/igraph/R/print.R (print.igraph) : updated
+	* interfaces/R/igraph/R/community.R (edge.type.matrix) : updated
+	* interfaces/R/igraph/R/plot.R (rglplot) : updated
+
 2006-09-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : loop edges added

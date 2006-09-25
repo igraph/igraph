@@ -59,7 +59,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   layout <- i.layout.norm(layout, -1, 1, -1, 1)
   
   # add the edges
-  el <- get.edgelist(graph)
+  el <- get.edgelist(graph, names=FALSE)
   loops.v <- el[,1] [ el[,1] == el[,2] ] + 1
   loops.e <- which(el[,1] == el[,2])
   loop.labels <- edge.labels[el[,1] == el[,2]]
@@ -235,12 +235,13 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
   
   # add the edges
   # TODO: loops
-  x0 <- layout[,1][get.edgelist(graph)[,1]+1]
-  y0 <- layout[,2][get.edgelist(graph)[,1]+1]
-  z0 <- layout[,3][get.edgelist(graph)[,1]+1]
-  x1 <- layout[,1][get.edgelist(graph)[,2]+1]
-  y1 <- layout[,2][get.edgelist(graph)[,2]+1]
-  z1 <- layout[,3][get.edgelist(graph)[,2]+1]
+  el <- get.edgelist(graph, names=FALSE)
+  x0 <- layout[,1][el[,1]+1]
+  y0 <- layout[,2][el[,1]+1]
+  z0 <- layout[,3][el[,1]+1]
+  x1 <- layout[,1][el[,2]+1]
+  y1 <- layout[,2][el[,2]+1]
+  z1 <- layout[,3][el[,2]+1]
 
   # we do this for undirected graphs also because some
   # graphics drivers do not handle 'depth' properly (or at all)
@@ -250,7 +251,8 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
   } else {
     vsize.from <- vsize.to <- vertex.size
   }
-
+  rm(el)
+  
   rgl.lines(as.numeric(t(matrix( c(x0,x1), nc=2))),
             as.numeric(t(matrix( c(y0,y1), nc=2))),
             as.numeric(t(matrix( c(z0,z1), nc=2))),

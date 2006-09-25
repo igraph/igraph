@@ -189,3 +189,29 @@ graph.data.frame <- function(d, directed=TRUE) {
   g <- add.edges(g, edges, attr=attrs)
   g
 }
+
+graph.edgelist <- function(el, directed=TRUE) {
+
+  if (!is.matrix(el) || ncol(el) != 2) {
+    stop("graph.edgelist expects a matrix with two columns")
+  }
+
+  if (nrow(el) == 0) {
+    res <- graph.empty(directed=directed)
+  } else {  
+    if (is.character(el)) {
+      ## symbolic edge list
+      names <- unique(as.character(t(el)))
+      ids <- seq(names)-1
+      names(ids) <- names
+      res <- graph( unname(ids[t(el)]), directed=directed)
+      rm(ids)
+      V(res)$name <- names
+    } else {
+      ## normal edge list
+      res <- graph( t(el), directed=directed )
+    }
+  }
+
+  res
+}

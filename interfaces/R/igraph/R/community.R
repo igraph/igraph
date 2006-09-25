@@ -74,7 +74,7 @@ edge.type.matrix <- function(graph, types) {
   no.of.types <- max(types)
   res <- matrix(0, nr=no.of.types, nc=no.of.types)
 
-  el <- get.edgelist(graph)
+  el <- get.edgelist(graph, names=FALSE)
   if (length(el) != 0) {
     for (i in 1:nrow(el)) {
       res[ types[el[i,1]], types[el[i,2]] ] <-
