@@ -26,7 +26,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        vertex.color="SkyBlue2", vertex.size=15,
                        edge.color="darkgrey", edge.width=1,
                        edge.labels=NA, 
-                       vertex.frame.color="black",
+                       vertex.frame.color="black", loop.cex=1.0,
                        # SPECIFIC: #####################################
                        axes=FALSE, xlab="", ylab="",
                        xlim=c(-1,1), ylim=c(-1,1),
@@ -56,20 +56,25 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   layout <- i.layout.norm(layout, -1, 1, -1, 1)
   
   # add the edges
-  # TODO: loops
-  x0 <- layout[,1][get.edgelist(graph)[,1]+1]
-  y0 <- layout[,2][get.edgelist(graph)[,1]+1]
-  x1 <- layout[,1][get.edgelist(graph)[,2]+1]
-  y1 <- layout[,2][get.edgelist(graph)[,2]+1]
+  el <- get.edgelist(graph)
+  loops.v <- el[,1] [ el[,1] == el[,2] ] + 1
+  loops.e <- which(el[,1] == el[,2])
+  el <- el[el[,1] != el[,2],]
+  dim(el) <- c(length(el)/2, 2)
+  x0 <- layout[,1][el[,1]+1]
+  y0 <- layout[,2][el[,1]+1]
+  x1 <- layout[,1][el[,2]+1]
+  y1 <- layout[,2][el[,2]+1]
 
   # we do this for undirected graphs also because some
   # graphics drivers do not handle 'depth' properly (or at all)
   if (length(vertex.size)!=1) {
-    vsize.from <- vertex.size[get.edgelist(graph)[,1]+1]
-    vsize.to   <- vertex.size[get.edgelist(graph)[,2]+1]
+    vsize.from <- vertex.size[el[,1]+1]
+    vsize.to   <- vertex.size[el[,2]+1]
   } else {
     vsize.from <- vsize.to <- vertex.size
   }
+  rm (el)
   phi <- atan2(y1-y0, x1-x0)
   r <- sqrt( (x1-x0)^2 + (y1-y0)^2 )
   x1 <- x0 + (r-vsize.to)*cos(phi)
@@ -77,16 +82,36 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   x0 <- x0 + vsize.from*cos(phi)
   y0 <- y0 + vsize.from*sin(phi)
   
+  # add the loop edges
+  if (length(loops.e) > 0) {
+    ec <- edge.color
+    if (length(ec)>1) { ec <- ec[loops.e] }
+    symbols(x=layout[loops.v,1]+.08*loop.cex,
+            y=layout[loops.v,2], fg=ec, bg="white",
+            circles=rep(.08*loop.cex, length(loops.e)), add=TRUE, inches=FALSE)
+    if (is.directed(graph)) {
+      # arrows
+      lr0 <- vertex.size
+      if (length(vertex.size)>1) { lr0 <- vertex.size[loops.v] }
+      lx0 <- layout[loops.v,1]
+      ly0 <- layout[loops.v,2]
+      lr1 <- .08*loop.cex
+      lcx <- (lr0^2+2*lx0*lr1)/(2*lr1)
+      lcy <- ly0+sqrt(ly0^2-((lcx-lx0)^2+ly0^2-lr0^2))
+      arrows(lcx+.001, lcy+.001, lcx, lcy, angle=20, length=0.2,
+             col=edge.color, lwd=edge.width)
+    }
+  }
+  
   arrow.code <- ifelse(is.directed(graph), 2, 0)
-  if (length(x0) != 0) {
+  if (length(x0) != 0) {    
     arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.code,
            col=edge.color, lwd=edge.width)
     x <- (x0+x1)/2
     y <- (y0+y1)/2
     text(x, y, labels=edge.labels, col=label.color)
   }
-  # add the edge labels 
-
+  
   rm(x0, y0, x1, y1)
   
   # add the vertices

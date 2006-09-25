@@ -1,3 +1,7 @@
+2006-09-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : loop edges added
+
 2006-09-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/interace.R (add.vertices, add.edges) :
