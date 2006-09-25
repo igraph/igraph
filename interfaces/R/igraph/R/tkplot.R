@@ -41,6 +41,7 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                    edge.color="darkgrey", edge.width=1,
                    edge.labels=NA,
                    vertex.frame.color="black",
+                   loop.angle=0, margin=30,
                    ...) {
 
   if (!is.igraph(graph)) {
@@ -71,7 +72,7 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   
   # Label degree
   label.degree <- i.get.label.degree(graph, label.degree)
-  
+
   # Label font
   if (is.null(label.font)) {
     label.font=tkfont.create(family="helvetica", size=16, weight="bold")
@@ -86,10 +87,10 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   # Create parameters
   params <- list(vertex.color=vertex.color, vertex.size=vertex.size,
                  edge.color=edge.color, label.color=label.color,
-                 labels.state=1, edge.width=edge.width, padding=30,
+                 labels.state=1, edge.width=edge.width, padding=margin,
                  grid=0, label.font=label.font, label.degree=label.degree,
                  label.dist=label.dist, edge.labels=edge.labels,
-                 vertex.frame.color=vertex.frame.color)
+                 vertex.frame.color=vertex.frame.color, loop.angle=loop.angle)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
@@ -762,18 +763,35 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   edge.width <- ifelse(length(tkp$params$edge.width)>1,
                        tkp$params$edge.width[id],
                        tkp$params$edge.width)
-  tkcreate(tkp$canvas, "line", from.c[1], from.c[2], to.c[1], to.c[2],
-           width=edge.width, activewidth=2*edge.width,
-           arrow=arrow, arrowshape=c(10, 10, 5),
-           fill=edge.color, activefill="red",           
-           tags=c("edge", paste(sep="", "edge-", id),
-             paste(sep="", "from-", from),
-             paste(sep="", "to-", to)))
+  if (from != to) {
+    ## non-loop edge
+    tkcreate(tkp$canvas, "line", from.c[1], from.c[2], to.c[1], to.c[2],
+             width=edge.width, activewidth=2*edge.width,
+             arrow=arrow, arrowshape=c(10, 10, 5),
+             fill=edge.color, activefill="red",           
+             tags=c("edge", paste(sep="", "edge-", id),
+               paste(sep="", "from-", from),
+               paste(sep="", "to-", to)))
+  } else {
+    ## loop edge
+    ## the coordinates are not correct but we will call update anyway...
+    tkcreate(tkp$canvas, "line", from.c[1], from.c[2],
+             from.c[1]+20, from.c[1]-10, from.c[2]+30, from.c[2],
+             from.c[1]+20, from.c[1]+10, from.c[1], from.c[2],
+             width=edge.width, activewidth=2*edge.width,
+             arrow=arrow, arrowshape=c(10,10,5),
+             fill=edge.color, activefill="red", smooth=TRUE,
+             tags=c("edge", "loop", paste(sep="", "edge-", id),
+               paste(sep="", "from-", from),
+               paste(sep="", "to-", to)))
+    
+  }
 
   edge.label <- ifelse(length(tkp$params$edge.labels)>1,
                        tkp$params$edge.labels[id],
                        tkp$params$edge.labels)
   if (!is.na(edge.label)) {
+    ## not correct for loop edges but we will update anyway...
     label.x <- (to.c[1]+from.c[1])/2
     label.y <- (to.c[2]+from.c[2])/2
     litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
@@ -803,7 +821,10 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   to <- as.numeric(substring(grep("to-", tags, value=TRUE, fixed=TRUE),4))
   from.c <- tkp$coords[from+1,]
   to.c <- tkp$coords[to+1,]
-  if (is.directed(tkp$graph)) {
+
+  edgeid <- as.numeric(substring(tags[ pmatch("edge-", tags) ], 6))
+
+  if (from != to) {
     phi <- atan2(to.c[2]-from.c[2], to.c[1]-from.c[1])
     r <- sqrt( (to.c[1]-from.c[1])^2 + (to.c[2]-from.c[2])^2 )
     vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
@@ -811,16 +832,40 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
                           tkp$params$vertex.size)
     to.c[1] <- from.c[1] + (r-vertex.size)*cos(phi)
     to.c[2] <- from.c[2] + (r-vertex.size)*sin(phi)
-  }
-  tkcoords(tkp$canvas, itemid, from.c[1], from.c[2], to.c[1], to.c[2])
+    tkcoords(tkp$canvas, itemid, from.c[1], from.c[2], to.c[1], to.c[2])
+  } else {
+    vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
+                          tkp$params$vertex.size[to+1],
+                          tkp$params$vertex.size)
+    loop.angle <- ifelse(length(tkp$param$loop.angle)>1,
+                         tkp$params$loop.angle[edgeid+1],
+                         tkp$params$loop.angle)
+    xx <- from.c[1] + cos(loop.angle/180*pi)*vertex.size
+    yy <- from.c[2] + sin(loop.angle/180*pi)*vertex.size
+    cc <- matrix(c(xx,yy, xx+20,yy-10, xx+30,yy, xx+20,yy+10, xx,yy),
+                 nc=2, byrow=TRUE)
 
-  edgeid <- as.numeric(substring(tags[ pmatch("edge-", tags) ], 6))
+    phi <- atan2(cc[,2]-yy, cc[,1]-xx)
+    r <- sqrt((cc[,1]-xx)**2 + (cc[,2]-yy)**2)
+    phi <- phi+loop.angle/180*pi
+    cc[,1] <- xx+r*cos(phi)
+    cc[,2] <- yy+r*sin(phi)
+    tkcoords(tkp$canvas, itemid, cc[1,1], cc[1,2], cc[2,1], cc[2,2],
+             cc[3,1], cc[3,2], cc[4,1], cc[4,2], cc[5,1]+0.001, cc[5,2]+0.001)
+  }
+
   edge.label <- ifelse(length(tkp$params$edge.labels)>1,
                        tkp$params$edge.labels[edgeid],
                        tkp$params$edge.labels)
   if (!is.na(edge.label)) {
-    label.x <- (to.c[1]+from.c[1])/2
-    label.y <- (to.c[2]+from.c[2])/2
+    if (from != to) {
+      label.x <- (to.c[1]+from.c[1])/2
+      label.y <- (to.c[2]+from.c[2])/2
+    } else {
+      ## loops
+      label.x <- xx+cos(loop.angle/180*pi)*30
+      label.y <- yy+sin(loop.angle/180*pi)*30
+    }
     litem <- as.numeric(tkfind(tkp$canvas, "withtag",
                                paste(sep="", "label&&edge-", edgeid)))
     tkcoords(tkp$canvas, litem, label.x, label.y)
