@@ -8,6 +8,9 @@
 	* interfaces/R/igraph/R/community.R (edge.type.matrix) : updated
 	* interfaces/R/igraph/R/plot.R (rglplot) : updated
 
+	* interfaces/R/igraph/R/flow.R (graph.maxflow) : added
+	* interfaces/R/src/rinterface.R (R_igraph_maxflow) : added
+	
 2006-09-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : loop edges added

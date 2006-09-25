@@ -1,3 +1,7 @@
+2006-09-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/flow.c (igraph_maxflow) : added
+
 2006-09-15  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/type_indexededgelist.c (igraph_delete_edges) : corrected

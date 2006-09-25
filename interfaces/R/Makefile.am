@@ -15,7 +15,7 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	vector.c vector_ptr.c memory.c adjlist.c visitors.c \
 	igraph_grid.c atlas.c topology.c motifs.c progress.c \
 	operators.c interrupt.c igraph_psumtree.c array.c \
-	igraph_hashtable.c foreign-graphml.c
+	igraph_hashtable.c foreign-graphml.c flow.c
 
 RSNAMES_H = memory.h random.h atlas-edges.h
 

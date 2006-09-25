@@ -72,6 +72,8 @@
 
   <xi:include href="foreign.xml"/>
 
+  <xi:include href="flows.xml"/>
+
   <xi:include href="operators.xml"/>
 
   <xi:include href="nongraph.xml"/>  

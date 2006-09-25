@@ -4173,3 +4173,27 @@ SEXP R_igraph_density(SEXP graph) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_maxflow(SEXP graph, SEXP psource, SEXP ptarget, 
+		      SEXP pcapacity) {
+
+  igraph_t g;
+  igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
+  igraph_vector_t capacity;
+  igraph_real_t value;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pcapacity, &capacity);
+  igraph_maxflow(&g, &value, source, target, &capacity);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=value;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

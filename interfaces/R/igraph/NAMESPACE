@@ -118,3 +118,7 @@ export(graph.disjoint.union, "%du%", graph.intersection, "%s%",
 # parameters, config
 
 export(igraph.par)
+
+# flows, cuts, etc.
+
+export(graph.maxflow)

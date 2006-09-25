@@ -7,7 +7,7 @@ SRCDIR=$(top_srcdir)/src
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
-	      operators.xml
+	      operators.xml flows.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml
@@ -83,6 +83,9 @@ motifs.xml: motifs.xxml $(SRCDIR)/motifs.c
 
 operators.xml: operators.xxml $(SRCDIR)/operators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c
+
+flows.xml: flows.xxml $(SRCDIR)/flow.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

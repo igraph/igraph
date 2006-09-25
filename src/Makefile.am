@@ -23,7 +23,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     visitors.c igraph_grid.c atlas.c topology.c \
 			     motifs.c progress.c atlas-edges.h operators.c \
 			     igraph_psumtree.c array.c igraph_hashtable.c \
-			     foreign-graphml.c
+			     foreign-graphml.c flow.c
 libigraph_la_CFLAGS        = -O2
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS)

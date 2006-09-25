@@ -1,4 +1,10 @@
 
+o check the maximum flow algorithm, find out what happens if the graph is
+  (1) not connected, (2) cyclic or (3) undirected
+o calculate the actual maximum flow
+o cohesion/adhesion algorithm based on maximum flows
+o implement splay trees, implement faster maximum flow algorithm
+o local transitivity, average local transitivity.
 o find a way for writing equations in DocBook.
 o read and write non-structural info from/to GraphML files
   read:

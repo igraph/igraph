@@ -855,6 +855,14 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
 int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2);
 
 /* -------------------------------------------------- */
+/* MAximum flows, minimum cuts & such                 */
+/* -------------------------------------------------- */
+
+int igraph_maxflow(const igraph_t *graph, igraph_real_t *value, 
+		   igraph_integer_t source, igraph_integer_t target,
+		   const igraph_vector_t *capacity);
+
+/* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 
