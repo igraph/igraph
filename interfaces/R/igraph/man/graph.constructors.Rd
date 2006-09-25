@@ -8,6 +8,7 @@
 \alias{graph.tree}
 \alias{graph.full}
 \alias{graph.atlas}
+\alias{graph.edgelist}
 \alias{graph.data.frame}
 \title{Various methods for creating graphs}
 \description{These method can create various (mostly regular) graphs:
@@ -30,6 +31,7 @@ graph.ring(n, directed = FALSE, mutual = FALSE, circular=TRUE)
 graph.tree(n, children = 2, mode="out")
 graph.full(n, directed = FALSE, loops = FALSE)
 graph.atlas(n)
+graph.edgelist(el, directed=TRUE)
 graph.data.frame(d, directed=TRUE)
 }
 \arguments{
@@ -103,6 +105,8 @@ graph.data.frame(d, directed=TRUE)
     (except for leafs) for \code{graph.tree}.}
   \item{loops}{If TRUE also loops edges (self edges) are added.}
   \item{graph}{An object.}
+  \item{el}{An edge list, a two column matrix, character or numeric. See
+    details below.}
   \item{d}{A data frame object, this will be converted to a graph.}
 }
 \details{All these functions create graphs in a deterministic way.
@@ -140,6 +144,13 @@ graph.data.frame(d, directed=TRUE)
       automorphisms.}
   }
 
+  \code{graph.edgelist} creates a graph from an edge list. Its argument
+  is a two-column matrix, each row defines one edge. If it is 
+  a numeric matrix then its elements are interpreted as vertex ids. If
+  it is a character matrix then it is interpreted as symbolic vertex
+  names and a vertex id will be assigned to each name, and also a
+  \code{name} vertex attribute will be added.
+  
   \code{graph.data.frame} creates a graph from a data frame. The data
   frame should have at least two columns. The first two columns will be
   used as a symbolic edge list and the other columns will be added as
@@ -161,5 +172,10 @@ g7 <- graph.ring(10)
 g8 <- graph.tree(10, 2)
 g9 <- graph.full(5, loops=TRUE)
 g10 <- graph.atlas(sample(0:1252, 1))
+el <- matrix( c("foo", "bar", "bar", "foobar"), nc=2, byrow=TRUE)
+g11 <- graph.edgelist(el)
+d <- as.data.frame(el)
+d$weight <- 1:2
+g12 <- graph.data.frame(d)
 }
 \keyword{graphs}

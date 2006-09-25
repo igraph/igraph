@@ -86,7 +86,7 @@ get.edgelist <- function(graph, names=TRUE) {
   res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
                       PACKAGE="igraph"), nc=2)
   if (names && "name" %in% list.vertex.attributes(graph)) {
-    res <- matrix(V(g)$name[ res+1 ], nc=2)
+    res <- matrix(V(graph)$name[ res+1 ], nc=2)
   }
 
   res

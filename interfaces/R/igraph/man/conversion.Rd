@@ -6,7 +6,7 @@
   a graph, like an adjacency matrix or an edge list.}
 \usage{
 get.adjacency(graph, type="both", attr=NULL, names=TRUE, binary=FALSE)
-get.edgelist(graph)
+get.edgelist(graph, names=TRUE)
 }
 \arguments{
   \item{graph}{The graph to convert.}
@@ -22,9 +22,16 @@ get.edgelist(graph)
     attribute are included in the adjacency matrix. If the graph has
     multiple edges, the edge attribute of an arbitrarily chosen edge
     (for the multiple edges) is included.}
-  \item{names}{Logical constant, whether to assign row and column names
+  \item{names}{Logical constant.
+
+    For \code{graph.adjacenct} it gives whether to assign row and column names
     to the matrix. These are only assigned if the \code{name} vertex
-    attribute is present in the graph.}
+    attribute is present in the graph.
+
+    for \code{get.edgelist} it gives whether to return a character
+    matrix containing vertex names (ie. the \code{name} vertex
+    attribute) if they exist or numeric vertex ids.
+  }
   \item{binary}{Logical, whether to return a binary matrix. This argument
     is ignored if \code{attr} is not \code{NULL}.}
 }

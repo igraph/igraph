@@ -26,7 +26,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        vertex.color="SkyBlue2", vertex.size=15,
                        edge.color="darkgrey", edge.width=1,
                        edge.labels=NA, 
-                       vertex.frame.color="black", loop.cex=1.0,
+                       vertex.frame.color="black", 
                        margin=0, loop.angle=0,
                        # SPECIFIC: #####################################
                        axes=FALSE, xlab="", ylab="",

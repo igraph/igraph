@@ -27,8 +27,8 @@ graph.density(graph, loops=FALSE)
   Methods and Applications.  Cambridge: Cambridge University Press.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\link{\code{vcount}}, \link{\code{ecount}},
-  \link{\code{simplify}} to get rid of the multiple and/or loop edges.}
+\seealso{\code{\link{vcount}}, \code{\link{ecount}},
+  \code{\link{simplify}} to get rid of the multiple and/or loop edges.}
 \examples{
 g1 <- graph.empty(n=10)
 g2 <- graph.full(n=10)

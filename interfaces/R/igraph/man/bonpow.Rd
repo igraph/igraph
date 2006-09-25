@@ -13,7 +13,7 @@
   normalize the observed centralization score). 
 }
 \usage{
-bonpow(graph, nodes=V(graph), loops=FALSE, tmaxdev=FALSE, exponent=1,
+bonpow(graph, nodes=V(graph), loops=FALSE, exponent=1,
     rescale=FALSE, tol=1e-7)
 }
 %- maybe also `usage' for other objects documented here.
@@ -91,7 +91,7 @@ a non-ad hoc basis.
 \note{ This function was ported (ie. copied) from the SNA package. }
 \examples{
 #Generate some test data
-g <- erdos.renyi.game(10, 0.5)
+g <- barabasi.game(10)
 #Compute Bonpow scores
 bonpow(g,exponent=1,tol=1e-20)
 bonpow(g,exponent=-1,tol=1e-20)

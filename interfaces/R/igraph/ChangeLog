@@ -5,6 +5,14 @@
 	* interfaces/R/src/rinterface.c (R_igraph_density) : added loops 
 	argument
 
+	* interfaces/R/igraph/R/conversion.R (get.edgelist) : bug corrected
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : removed unused 
+	argument 'loop.cex'
+
+	* interfaces/R/igraph/R/structural.properties.R (bonpow) : removed
+	unused argument 'tmaxdev'
+
 2006-09-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.edgelist) : added

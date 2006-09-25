@@ -364,7 +364,7 @@ rewire <- function(graph, mode="simple", niter=100) {
 }
 
 bonpow <- function(graph, nodes=V(graph),
-                   loops=FALSE, tmaxdev=FALSE, exponent=1,
+                   loops=FALSE, exponent=1,
                    rescale=FALSE, tol=1e-7){
 
   if (!is.igraph(graph)) {

@@ -9,6 +9,7 @@
   graph.attributes=igraph.par("print.graph.attributes"),
   vertex.attributes=igraph.par("print.vertex.attributes"),
   edge.attributes=igraph.par("print.edge.attributes"),
+  names=TRUE,
   \dots)
 \method{summary}{igraph}(object, \dots)
 }
@@ -16,7 +17,10 @@
   \item{x}{The graph to print.}
   \item{graph.attributes}{Logical constant, whether to print graph attributes.}
   \item{vertex.attributes}{Logical constant, whether to print vertex attributes.}
-  \item{edge.attributes}{Logical constant, whether to print edge attributes.}
+  \item{edge.attributes}{Logical constant, whether to print edge
+    attributes.}
+  \item{names}{Logical constant, whether to print symbolic vertex names
+    (ie. the \code{name} vertex attribute) or vertex ids.}
   \item{object}{The graph of which the summary will be printed.}
   \item{\dots}{Ignored.}
 }
