@@ -84,6 +84,7 @@ read.graph <- function(file, format="edgelist", ...) {
                 "edgelist"=read.graph.edgelist(file, ...),
                 "lgl"=read.graph.lgl(file, ...),
                 "graphml"=read.graph.graphml(file, ...),
+                "dimacs"=read.graph.dimacs(file, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -110,6 +111,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
                 "ncol"=write.graph.ncol(graph, file, ...),
                 "lgl"=write.graph.lgl(graph, file, ...),
                 "graphml"=write.graph.graphml(graph, file, ...),
+                "dimacs"=write.graph.dimacs(graph, file, ...),
                 stop(paste("Unknown file format:",format))
                 )
 
@@ -198,6 +200,35 @@ read.graph.pajek <- function(file, ...) {
 write.graph.pajek <- function(graph, file, ...) {
 
   .Call("R_igraph_write_graph_pajek", graph, file,
+        PACKAGE="igraph")
+}
+
+read.graph.dimacs <- function(file, directed=TRUE, ...) {
+
+  res <- .Call("R_igraph_read_graph_dimacs", file, as.logical(directed),
+               PACKAGE="igraph")
+  graph <- res[[1]]
+  graph <- set.graph.attribute(graph, "source", res[[2]])
+  graph <- set.graph.attribute(graph, "target", res[[3]])
+  E(graph)$capacity <- res[[4]]
+  graph
+}
+
+write.graph.dimacs <- function(graph, file,
+                               source=NULL, target=NULL, capacity=NULL) {
+
+  if (is.null(source)) {
+    source <- get.graph.attribute(graph, "source")
+  }
+  if (is.null(target)) {
+    target <- get.graph.attribute(graph, "target")
+  }
+  if (is.null(capacity)) {
+    capacity <- E(g)$capacity
+  }
+  
+  .Call("R_igraph_write_graph_dimacs", graph, file, as.numeric(source),
+        as.numeric(target), as.numeric(capacity),
         PACKAGE="igraph")
 }
 

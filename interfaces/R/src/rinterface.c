@@ -4198,3 +4198,83 @@ SEXP R_igraph_maxflow(SEXP graph, SEXP psource, SEXP ptarget,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_read_graph_dimacs(SEXP pvfile, SEXP pdirected) {
+  
+  igraph_t g;
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  FILE *file;
+  igraph_integer_t source, target;
+  igraph_vector_t cap;
+  SEXP result;
+  
+  R_igraph_before();
+  
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
+#else
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "r");
+#endif
+  if (file==0) { igraph_error("Cannot read edgelist", __FILE__, __LINE__,
+			      IGRAPH_EFILE); 
+  }
+  igraph_vector_init(&cap, 0);
+  igraph_read_graph_dimacs(&g, file, &source, &target, &cap, directed);
+  fclose(file);
+  PROTECT(result=NEW_LIST(4));
+  SET_VECTOR_ELT(result, 0, R_igraph_to_SEXP(&g));
+  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(1));
+  REAL(VECTOR_ELT(result, 1))[0]=source;
+  SET_VECTOR_ELT(result, 2, NEW_NUMERIC(1));
+  REAL(VECTOR_ELT(result, 2))[0]=target;
+  SET_VECTOR_ELT(result, 3, NEW_NUMERIC(igraph_vector_size(&cap)));
+  igraph_vector_copy_to(&cap, REAL(VECTOR_ELT(result,3)));
+  igraph_destroy(&g);
+  igraph_vector_destroy(&cap);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
+				 SEXP psource, SEXP ptarget,
+				 SEXP pcap) {
+  
+  igraph_t g;
+  FILE *stream;
+  char *bp;
+  size_t size;
+  igraph_integer_t source=REAL(psource)[0];
+  igraph_integer_t target=REAL(ptarget)[0];
+  igraph_vector_t cap;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pcap, &cap);
+#if HAVE_OPEN_MEMSTREAM == 1
+  stream=open_memstream(&bp, &size);
+#else
+  stream=fopen(CHAR(STRING_ELT(file, 0)), "w");
+#endif
+  if (stream==0) { igraph_error("Cannot write edgelist", __FILE__, __LINE__,
+				IGRAPH_EFILE); 
+  }
+  igraph_write_graph_dimacs(&g, stream, source, target, &cap);
+  fclose(stream);
+#if HAVE_OPEN_MEMSTREAM == 1
+  PROTECT(result=allocVector(RAWSXP, size));
+  memcpy(RAW(result), bp, sizeof(char)*size);
+  free(bp);
+#else
+  PROTECT(result=NEW_NUMERIC(0));
+#endif
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

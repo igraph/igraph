@@ -612,6 +612,124 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 }
 
 /**
+ * \function igraph_read_graph_dimacs
+ */
+
+int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+			     igraph_integer_t *source, 
+			     igraph_integer_t *target, 
+			     igraph_vector_t *capacity, 
+			     igraph_bool_t directed) {
+  
+  igraph_vector_t edges;
+  long int no_of_nodes=-1;
+  long int no_of_edges=-1;
+  long int tsource=-1;
+  long int ttarget=-1;
+  char problem[6];
+  char c;      
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  if (capacity) {
+    igraph_vector_clear(capacity);
+  }
+  
+  while (!feof(instream)) {
+    int read;
+    char str[3];
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    read=fscanf(instream, "%2c", str);
+    if (feof(instream)) {
+      break;
+    }
+    if (read != 1) {
+      IGRAPH_ERROR("parsing dimacs file failed", IGRAPH_PARSEERROR);
+    }
+    switch (str[0]) {
+      long int tmp;
+      long int from, to;
+      igraph_real_t cap;
+
+    case 'c':
+      /* comment */
+      break;
+
+    case 'p':
+      if (no_of_nodes != -1) {
+	IGRAPH_ERROR("reading dimacs file failed, double 'p' line", 
+		     IGRAPH_PARSEERROR);
+      }
+      read=fscanf(instream, "%5s %li %li", problem, 
+		  &no_of_nodes, &no_of_edges);
+      if (read != 3) {
+	IGRAPH_ERROR("reading dimacs file failed", IGRAPH_PARSEERROR);
+      }
+      IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
+      if (capacity) {
+	IGRAPH_CHECK(igraph_vector_reserve(capacity, no_of_edges));
+      }
+      break;
+
+    case 'n':
+      read=fscanf(instream, "%li %1c", &tmp, str);
+      if (str[0]=='s') {
+	if (tsource != -1) {
+	  IGRAPH_ERROR("reading dimacsfile: multiple source vertex line", 
+		       IGRAPH_PARSEERROR);
+	} else {
+	  tsource=tmp;
+	}
+      } else if (str[0]=='t') {
+	if (ttarget != -1) {
+	  IGRAPH_ERROR("reading dimacsfile: multiple source vertex line", 
+		       IGRAPH_PARSEERROR);
+	} else {
+	  ttarget=tmp;
+	}
+      } else {
+	IGRAPH_ERROR("invalid node descriptor line in dimacs file",
+		     IGRAPH_PARSEERROR);
+      }
+      
+      break;
+      
+    case 'a':
+      read=fscanf(instream, "%li %li %lf", &from, &to, &cap);
+      if (read != 3) {
+	IGRAPH_ERROR("reading dimacs file", IGRAPH_PARSEERROR);
+      }
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, from-1));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, to-1));
+      if (capacity) {
+	IGRAPH_CHECK(igraph_vector_push_back(capacity, cap));
+      }
+      break;           
+
+    default:
+      IGRAPH_ERROR("unknown line type in dimacs file", IGRAPH_PARSEERROR);
+    }
+
+    /* Go to next line */
+    while (!feof(instream) && (c=getc(instream)) != '\n') ;      
+  }
+
+  if (source) {
+    *source=tsource-1;
+  }
+  if (target) {
+    *target=ttarget-1;
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/**
  * \ingroup loadsave
  * \function igraph_write_graph_edgelist
  * \brief Writes the edge list of a graph to a file.
@@ -1412,4 +1530,47 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
   igraph_vector_destroy(&numv);
   IGRAPH_FINALLY_CLEAN(8);
   return 0;
+}
+
+int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+			      long int source, long int target,
+			      const igraph_vector_t *capacity) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_eit_t it;
+  long int i=0;
+  int ret;
+
+  if (igraph_vector_size(capacity) != no_of_edges) {
+    IGRAPH_ERROR("invalid capacity vector length", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
+				 &it));
+  IGRAPH_FINALLY(igraph_eit_destroy, &it);
+  
+  ret=fprintf(outstream, 
+	      "c created by igraph\np max %li %li\nn %li s\nn %li t\n",
+	      no_of_nodes, no_of_edges, source+1, target+1);
+  if (ret < 0) {
+    IGRAPH_ERROR("Write error", IGRAPH_EFILE);
+  }
+  
+
+  while (!IGRAPH_EIT_END(it)) {
+    igraph_integer_t from, to, cap;
+    igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
+    cap=VECTOR(*capacity)[i++];
+    ret=fprintf(outstream, "a %li %li %e\n", 
+		(long int) from+1, (long int) to+1, cap);
+    if (ret < 0) {
+      IGRAPH_ERROR("Write error", IGRAPH_EFILE);
+    }
+    IGRAPH_EIT_NEXT(it);
+  }
+  
+  igraph_eit_destroy(&it);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;  
 }

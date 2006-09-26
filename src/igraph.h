@@ -788,6 +788,11 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 int igraph_read_graph_pajek(igraph_t *graph, FILE *instream);
 int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
 			      int index);
+int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+			     igraph_integer_t *source, 
+			     igraph_integer_t *target, 
+			     igraph_vector_t *capacity, 
+			     igraph_bool_t directed);
 
 int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream);
 int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
@@ -797,6 +802,9 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 			   igraph_bool_t isolates);
 int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream);
 int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream);
+int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+			      long int source, long int target,
+			      const igraph_vector_t *capacity);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */
