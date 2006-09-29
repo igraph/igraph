@@ -282,6 +282,15 @@ int main() {
   print_vector(&v, stdout);
   igraph_vector_destroy(&v);
 
+  /* rank */
+  igraph_vector_init_int_end(&v, -1, 0,1,2,6,5,2,1,0, -1);
+  igraph_vector_init(&v2, 0);
+  igraph_vector_rank(&v, &v2, 7);
+  print_vector(&v, stdout);
+  print_vector(&v2, stdout);
+  igraph_vector_destroy(&v);
+  igraph_vector_destroy(&v2);
+
   return 0;
 }
   

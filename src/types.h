@@ -154,6 +154,8 @@ int igraph_vector_filter_smaller(igraph_vector_t *v, igraph_real_t elem);
 int igraph_vector_append(igraph_vector_t *to, const igraph_vector_t *from);
 int igraph_vector_get_interval(const igraph_vector_t *v, igraph_vector_t *res,
 			       long int from, long int to);
+int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
+		       long int nodes);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */

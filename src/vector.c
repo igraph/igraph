@@ -1338,3 +1338,35 @@ int igraph_vector_get_interval(const igraph_vector_t *v, igraph_vector_t *res,
   memcpy(res->stor_begin, v->stor_begin+from, (to-from)*sizeof(igraph_real_t));
   return 0;
 }
+
+int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
+		       long int nodes) {
+  
+  igraph_vector_t rad;
+  igraph_vector_t ptr;
+  long int edges = igraph_vector_size(v);
+  long int i, c=0;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&rad, nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&ptr, edges);
+  IGRAPH_CHECK(igraph_vector_resize(res, edges));
+	       
+  for (i=0; i<edges; i++) {
+    long int elem=VECTOR(*v)[i];
+    VECTOR(ptr)[i] = VECTOR(rad)[elem];
+    VECTOR(rad)[elem] = i+1;
+  }
+  
+  for (i=0; i<nodes; i++) {
+    long int p=VECTOR(rad)[i];
+    while (p != 0) {      
+      VECTOR(*res)[p-1]=c++;
+      p=VECTOR(ptr)[p-1];
+    }
+  }
+
+  igraph_vector_destroy(&ptr);
+  igraph_vector_destroy(&rad);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}

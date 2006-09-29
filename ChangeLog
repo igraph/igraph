@@ -6,6 +6,8 @@
 	* src/foreign.c (igraph_write_graph_dimacs) : minor change, capacity
 	is written with %g instead of %e
 
+	* src/vector.c (igraph_vector_rank) : added
+
 2006-09-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_density) : added loops argument
