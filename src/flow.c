@@ -42,132 +42,195 @@
  * Time complexity: O(n^3).
  */
 
-int igraph_maxflow(const igraph_t *graph, igraph_real_t *value, 
+int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 		   igraph_integer_t source, igraph_integer_t target,
 		   const igraph_vector_t *capacity) {
 
-  /* TODO: what if not directed? Gives correct result??? */
-  /* TODO: what if not connected? Gives correctly zero??? */
-  /* TODO: what if not acyclic? Gives correct results??? */
-  /* TODO: return the vertices in the cut. */
-
   long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  long int no_of_orig_edges=igraph_ecount(graph);
+  long int no_of_edges=2*no_of_orig_edges;
 
-  igraph_vector_t flow;
-  igraph_vector_t current;
-  igraph_dqueue_t queue;
-  igraph_vector_t distance;
-  igraph_vector_t excess;
-  
-  igraph_i_adjlist_t out_adjlist;
-  igraph_i_adjedgelist_t out_adjedgelist;
+  igraph_vector_t from, to, rev, cap, rescap, excess, distance;
+  igraph_vector_t edges, rank;
+  igraph_vector_t current, first;
+  igraph_dqueue_t q;
 
-  igraph_vector_t *neis, *neis2;
+  long int i, j, k, l, idx;
 
-  long int i;
-
-  if (igraph_vector_size(capacity) != no_of_edges) {
-    IGRAPH_ERROR("Invalid length of capacity vector", IGRAPH_EINVAL);
+  if (igraph_vector_size(capacity) != no_of_orig_edges) {
+    IGRAPH_ERROR("Invalid capacity vector", IGRAPH_EINVAL);
   }
-
-  IGRAPH_VECTOR_INIT_FINALLY(&flow, no_of_edges);
-  IGRAPH_VECTOR_INIT_FINALLY(&current, no_of_nodes);
-  IGRAPH_DQUEUE_INIT_FINALLY(&queue, 100);
-  IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&excess, no_of_nodes);
   
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &out_adjlist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &out_adjlist);
+  IGRAPH_VECTOR_INIT_FINALLY(&to,       no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&rev,      no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&rescap,   no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&excess,   no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
 
-  IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &out_adjedgelist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &out_adjedgelist);  
+  IGRAPH_VECTOR_INIT_FINALLY(&from,     no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges,    no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&rank,     no_of_edges);
+  
+  /* Create the basic data structure */
+  IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
+  IGRAPH_CHECK(igraph_vector_rank(&edges, &rank, no_of_nodes));
+  
+  for (i=0; i<no_of_edges; i+=2) {
+    long int pos=VECTOR(rank)[i];
+    long int pos2=VECTOR(rank)[i+1];
+    VECTOR(from)[pos] = VECTOR(edges)[i];
+    VECTOR(to)[pos]   = VECTOR(edges)[i+1];
+    VECTOR(from)[pos2] = VECTOR(edges)[i+1];
+    VECTOR(to)[pos2]   = VECTOR(edges)[i];
+    VECTOR(rev)[pos] = pos2;
+    VECTOR(rev)[pos2] = pos;
+    VECTOR(rescap)[pos] = VECTOR(*capacity)[i/2];
+    VECTOR(rescap)[pos2] = 0.0;
+  }  
+ 
+  igraph_vector_destroy(&rank);
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(2);
 
-  /* Initialization */
-  /* flowvalue[] == 0 initialized already */
-  neis=igraph_i_adjedgelist_get(&out_adjedgelist, source);
-  neis2=igraph_i_adjlist_get(&out_adjlist, source);
-  for (i=0; i<igraph_vector_size(neis); i++) {
-    long int edge=VECTOR(*neis)[i];
-    long int nei=VECTOR(*neis2)[i];
-    VECTOR(flow)[edge] = VECTOR(*capacity)[edge];
-    VECTOR(excess)[nei] = VECTOR(*capacity)[edge];
-    if (nei != target) {
-      IGRAPH_CHECK(igraph_dqueue_push(&queue, nei));
+  /* The first pointers */
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&first, no_of_nodes+1);
+  idx=-1;
+  for (i=0; i<=VECTOR(from)[0]; i++) {
+    idx++; VECTOR(first)[idx]=0;
+  }
+  for (i=1; i<no_of_edges; i++) {
+    long int n=VECTOR(from)[i]-VECTOR(from)[ (long int) VECTOR(first)[idx] ];
+    for (j=0; j<n; j++) {
+      idx++; VECTOR(first)[idx]=i;
     }
   }
-  VECTOR(distance)[ (long int) source ] = no_of_nodes;  
+  idx++;
+  while (idx < no_of_nodes+1) {
+    VECTOR(first)[idx++] = no_of_edges;
+  }
+
+  igraph_vector_destroy(&from);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* And the current pointers, initially the same as the first */
+  IGRAPH_VECTOR_INIT_FINALLY(&current, no_of_nodes);
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(current)[i] = VECTOR(first)[i];
+  }
+
+  /* Some useful macros */
+  
+#define FIRST(i)       ((long int)VECTOR(first)[(long int)(i)])
+#define LAST(i)        ((long int)VECTOR(first)[(long int)(i)+1])
+#define CURRENT(i)     (VECTOR(current)[(i)])
+#define RESCAP(i)      (VECTOR(rescap)[(i)])
+#define REV(i)         ((long int)VECTOR(rev)[(i)])
+#define HEAD(i)        ((long int)VECTOR(to)[(i)])
+#define EXCESS(i)      (VECTOR(excess)[(long int)(i)])
+#define DIST(i)        (VECTOR(distance)[(long int)(i)])
+  
+  /* OK, the graph is set up, initialization */
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  for (i=0; i<no_of_nodes; i++) {
+    DIST(i) = 1;
+  }
+  DIST(source)=no_of_nodes;
+  DIST(target)=0;
+  
+  for (i=FIRST(source), j=LAST(source); i<j; i++) {
+    if (HEAD(i) != source) {
+      igraph_real_t delta=RESCAP(i);
+      RESCAP(i) -= delta;
+      RESCAP(REV(i)) += delta;
+      EXCESS(HEAD(i)) += delta;
+    }
+  }
+  
+  for (i=0; i<no_of_nodes; i++) {
+    if (EXCESS(i) > 0.0) {
+      IGRAPH_CHECK(igraph_dqueue_push(&q, i));
+    }
+  }
 
   /* The main part comes here */
-  while (!igraph_dqueue_empty(&queue)) {
-    long int vertex=igraph_dqueue_pop(&queue);
-    igraph_real_t origdist=VECTOR(distance)[vertex];
+  while (!igraph_dqueue_empty(&q)) {
+    long int vertex=igraph_dqueue_pop(&q);
+    igraph_bool_t endoflist=0;
+    /* DISCHARGE(vertex) comes here */
     do {
-      /* PUSH/RELABEL */
-      long int cedge, nei;
-      igraph_real_t res;
-      neis=igraph_i_adjedgelist_get(&out_adjedgelist, vertex);
-      neis2=igraph_i_adjlist_get(&out_adjlist, vertex);
-      cedge=VECTOR(*neis)[ (long int) VECTOR(current)[vertex] ];
-      nei=VECTOR(*neis2)[ (long int) VECTOR(current)[vertex] ];
-      res=VECTOR(*capacity)[cedge]-VECTOR(flow)[cedge];
-      /* Is the push applicable? */
-      if (res > 0.0 && VECTOR(distance)[vertex] == VECTOR(distance)[nei]) {
-	/* PUSH */
-	igraph_real_t delta=
-	  VECTOR(excess)[vertex] < res ? VECTOR(excess)[vertex] : res;
-	VECTOR(flow)[cedge] += delta;
-	VECTOR(excess)[vertex] -= delta;
-	VECTOR(excess)[nei] += delta;
-	if (VECTOR(excess)[nei] == delta && nei != target) {
-	  /* becomes active */
-	  IGRAPH_CHECK(igraph_dqueue_push(&queue, nei));
-	}
-      } else {
-	if (VECTOR(current)[vertex] < igraph_vector_size(neis)-1) {
-	  VECTOR(current)[vertex] += 1;
-	} else {
-	  igraph_bool_t l=0;
-	  igraph_real_t min;
-	  VECTOR(current)[vertex] = 0;
-	  /* RELABEL */	  
-	  for (i=0; i<igraph_vector_size(neis2); i++) {
-	    long int ee=VECTOR(*neis)[i];
-	    long int nn=VECTOR(*neis2)[i];
-	    if (VECTOR(flow)[ee] < VECTOR(*capacity)[ee]) {
-	      if (!l) {
-		min=VECTOR(distance)[nn];
-		l=1;
-	      } else if (min > VECTOR(distance)[nn]) {
-		min=VECTOR(distance)[nn];
-	      }
+      for (i=CURRENT(vertex), j=LAST(vertex); i<j; i++) {
+	if (RESCAP(i) > 0) {
+	  long int nei=HEAD(i);
+	  
+	  if (DIST(vertex) == DIST(nei)+1) {
+	    igraph_real_t delta=
+	      RESCAP(i) < EXCESS(vertex) ? RESCAP(i) : EXCESS(vertex);
+	    RESCAP(i) -= delta;
+	    RESCAP(REV(i)) += delta;
+	    
+	    if (nei != target && EXCESS(nei) == 0.0 &&
+		DIST(nei) != no_of_nodes) {
+	      IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
 	    }
-	  } /* for (neis2) */
-	  if (!l) { 
-	    VECTOR(distance)[vertex] = 1.0/0.0;	/* infinity */
-	  } else {
-	    VECTOR(distance)[vertex] = min+1;
+	    
+	    EXCESS(nei) += delta;
+	    EXCESS(vertex) -= delta;
+	    
+	    if (EXCESS(vertex) == 0) break;
+	    
 	  }
 	}
       }
-    } while (VECTOR(excess)[vertex] != 0.0 && 
-	     VECTOR(distance)[vertex] == origdist);
+      
+      if (i==j) {
+	
+	/* RELABEL(vertex) comes here */
+	igraph_real_t min;
+	long int min_edge;
+	DIST(vertex)=min=no_of_nodes;
+	for (k=FIRST(vertex), l=LAST(vertex); k<l; k++) {
+	  if (RESCAP(k) > 0) {
+	    if (DIST(HEAD(k)) < min) {
+	      min=DIST(HEAD(k));
+	      min_edge=k;
+	    }
+	  }
+	}
+	
+	min++;
+
+	if (min < no_of_nodes) {
+	  DIST(vertex)=min;
+	  CURRENT(vertex)=min_edge;
+	  /* Vertex is still active */
+	  IGRAPH_CHECK(igraph_dqueue_push(&q, vertex));
+	}
+	
+	if (DIST(vertex) == no_of_nodes) break;
+
+	/* TODO: gap heuristics here */
+	
+      } else {
+	CURRENT(vertex) = FIRST(vertex);
+	break;
+      }
+    } while (1);
   }
 
   /* Store the result */
   if (value) {
-    *value=VECTOR(excess)[(long int)target];
+    *value=EXCESS(target);
   }
 
-  /* Clean up everything */
-  igraph_i_adjedgelist_destroy(&out_adjedgelist);
-  igraph_i_adjlist_destroy(&out_adjlist);
-  
-  igraph_vector_destroy(&excess);
-  igraph_vector_destroy(&distance);
-  igraph_dqueue_destroy(&queue);
+  igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&current);
-  igraph_vector_destroy(&flow);
+  igraph_vector_destroy(&distance);
+  igraph_vector_destroy(&excess);
+  igraph_vector_destroy(&rescap);
+  igraph_vector_destroy(&rev);
+  igraph_vector_destroy(&to);
   IGRAPH_FINALLY_CLEAN(7);
+
   return 0;
 }

@@ -1,3 +1,7 @@
+2006-09-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/flow.c (igraph_maxflow) : rewritten
+
 2006-09-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_dimacs, igraph_write_graph_dimacs)

@@ -1,6 +1,10 @@
+2006-09-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/flow.R (graph.maxflow) : bug corrected
+
 2006-09-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* interfaces/R/igraph/foreign.R (read.graph, write.graph) : 
+	* interfaces/R/igraph/R/foreign.R (read.graph, write.graph) : 
 	dimacs format added
 	(read.graph.dimacs, write.graph.dimacs) : added
 	* interfaces/R/src/rinterface.c (R_igraph_read_graph_dimacs)

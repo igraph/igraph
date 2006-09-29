@@ -26,7 +26,7 @@ graph.maxflow <- function(graph, source, target, capacity=NULL) {
     stop("Not a graph object")
   }
   if (is.null(capacity) && "capacity" %in% list.edge.attributes(graph)) {
-    capacity <- E(g)$capacity
+    capacity <- E(graph)$capacity
   }
   capacity <- as.numeric(capacity)
   
