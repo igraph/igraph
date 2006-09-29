@@ -1,3 +1,13 @@
+2006-09-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_buckets.c (igraph_buckets_init)
+	(igraph_buckets_destroy, igraph_buckets_popmax)
+	(igraph_buckets_add) : added
+	* src/flow.c (igraph_maxflow) : speed up by using buckets instead
+	of a dqueue
+	* examples/simple/flow.c : do a real test with a moderate size
+	network
+
 2006-09-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/flow.c (igraph_maxflow) : error checks added, bugs corrected

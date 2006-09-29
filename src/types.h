@@ -588,5 +588,20 @@ int igraph_hashtable_getkeys(igraph_hashtable_t *ht,
 			     const igraph_strvector_t **sv);
 int igraph_hashtable_reset(igraph_hashtable_t *ht);
 
+/* Buckets, needed for the maximum flow algorithm */
+
+typedef struct igraph_buckets_t {
+  igraph_vector_t bptr;
+  igraph_vector_t buckets;
+  igraph_integer_t max, no;
+} igraph_buckets_t;
+
+int igraph_buckets_init(igraph_buckets_t *b, long int bsize, long int size);
+void igraph_buckets_destroy(igraph_buckets_t *b);
+long int igraph_buckets_popmax(igraph_buckets_t *b);
+igraph_bool_t igraph_buckets_empty(const igraph_buckets_t *b);
+void igraph_buckets_add(igraph_buckets_t *b, long int bucket,
+		       igraph_real_t elem);
+
 #endif
 

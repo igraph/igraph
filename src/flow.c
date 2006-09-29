@@ -29,7 +29,7 @@
 
 /**
  * \function igraph_maxflow
- * \brief Maximum flow in a network
+ * \brief Maximum flow in a network with the push/relabel algorithm
  * 
  * </para><para>This function implements the Goldberg-Tarjan algorithm for
  * calculating the maximum flow in a network. The algorithm was given
@@ -56,7 +56,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_t from, to, rev, cap, rescap, excess, distance;
   igraph_vector_t edges, rank;
   igraph_vector_t current, first;
-  igraph_dqueue_t q;
+  igraph_buckets_t buckets;
 
   long int i, j, k, l, idx;
 
@@ -139,9 +139,12 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 #define HEAD(i)        ((long int)VECTOR(to)[(i)])
 #define EXCESS(i)      (VECTOR(excess)[(long int)(i)])
 #define DIST(i)        (VECTOR(distance)[(long int)(i)])
-  
+
   /* OK, the graph is set up, initialization */
-  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+
+  IGRAPH_CHECK(igraph_buckets_init(&buckets, no_of_nodes+1, no_of_nodes));
+  IGRAPH_FINALLY(igraph_buckets_destroy, &buckets);
+
   for (i=FIRST(source), j=LAST(source); i<j; i++) {
     if (HEAD(i) != source) {
       igraph_real_t delta=RESCAP(i);
@@ -159,13 +162,13 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     
   for (i=0; i<no_of_nodes; i++) {
     if (EXCESS(i) > 0.0 && i != target) {
-      IGRAPH_CHECK(igraph_dqueue_push(&q, i));
+      igraph_buckets_add(&buckets, DIST(i), i);
     }
   }
 
   /* The main part comes here */
-  while (!igraph_dqueue_empty(&q)) {
-    long int vertex=igraph_dqueue_pop(&q);
+  while (!igraph_buckets_empty(&buckets)) {
+    long int vertex=igraph_buckets_popmax(&buckets);
     igraph_bool_t endoflist=0;
     /* DISCHARGE(vertex) comes here */
     do {
@@ -181,7 +184,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 	    
 	    if (nei != target && EXCESS(nei) == 0.0 &&
 		DIST(nei) != no_of_nodes) {
-	      IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
+	      igraph_buckets_add(&buckets, DIST(nei), nei);
 	    }
 	    
 	    EXCESS(nei) += delta;
@@ -195,7 +198,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
       
       if (i==j) {
 	
-	/* RELABEL(vertex) comes here */
+	/* RELABEL(vertex) comes here */	
 	igraph_real_t min;
 	long int min_edge;
 	DIST(vertex)=min=no_of_nodes;
@@ -214,17 +217,17 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 	  DIST(vertex)=min;
 	  CURRENT(vertex)=min_edge;
 	  /* Vertex is still active */
-	  IGRAPH_CHECK(igraph_dqueue_push(&q, vertex));
+	  igraph_buckets_add(&buckets, DIST(vertex), vertex);
 	}
 	
-	if (DIST(vertex) == no_of_nodes) break;
+	/* TODO: gap heuristics here ??? */
 
-	/* TODO: gap heuristics here */
-	
       } else {
 	CURRENT(vertex) = FIRST(vertex);
-	break;
       }
+
+      break;
+
     } while (1);
   }
 
@@ -233,7 +236,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     *value=EXCESS(target);
   }
 
-  igraph_dqueue_destroy(&q);
+  igraph_buckets_destroy(&buckets);
   igraph_vector_destroy(&current);
   igraph_vector_destroy(&first);
   igraph_vector_destroy(&distance);

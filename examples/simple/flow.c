@@ -23,27 +23,98 @@
 
 #include <igraph.h>
 
+#include <sys/time.h>
+#include <sys/resource.h>
+
+float timer ()
+{
+  struct rusage r;
+
+  getrusage(0, &r);
+  return (float)(r.ru_utime.tv_sec+r.ru_utime.tv_usec/(float)1000000);
+}
+
 int main() {
   
   igraph_t g;
   igraph_real_t flow;
   igraph_vector_t capacity;
   long int i;
+  igraph_integer_t source, target;
+  FILE *infile;
+  float t;
 
-  igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100, 5/100, 
-			  IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-  
-  igraph_vector_init(&capacity, igraph_ecount(&g));
-  for (i=0; i<igraph_ecount(&g); i++) {
-    VECTOR(capacity)[i] = 1.0;
+  igraph_vector_init(&capacity, 0);
+
+  /***************/
+  infile=fopen("ak-4102.max", "r");
+  igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity,
+			   IGRAPH_DIRECTED);
+  fclose(infile);
+
+  t=timer();
+  igraph_maxflow(&g, &flow, source, target, &capacity);
+  t=timer()-t;
+/*   printf("4102: %g (time %.10f)\n", flow, t); */
+  if (flow != 8207) {
+    return 1;
   }
-  
-  for (i=0; i<10; i++) {
-    igraph_maxflow(&g, &flow, 0, igraph_vcount(&g)-1, &capacity);
-  }
-  
+  igraph_destroy(&g);  
+  /***************/
+
+/*   /\***************\/ */
+/*   infile=fopen("ak-8198.max", "r"); */
+/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/* 			   IGRAPH_DIRECTED); */
+/*   fclose(infile); */
+
+/*   t=timer(); */
+/*   igraph_maxflow(&g, &flow, source, target, &capacity); */
+/*   t=timer()-t; */
+/*   printf("8198: %g (time %.10f)\n", flow, t); */
+/*   igraph_destroy(&g); */
+/*   /\***************\/ */
+
+/*   /\***************\/ */
+/*   infile=fopen("ak-16390.max", "r"); */
+/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/* 			   IGRAPH_DIRECTED); */
+/*   fclose(infile); */
+
+/*   t=timer(); */
+/*   igraph_maxflow(&g, &flow, source, target, &capacity); */
+/*   t=timer()-t; */
+/*   printf("16390: %g (time %.10f)\n", flow, t); */
+/*   igraph_destroy(&g); */
+/*   /\***************\/ */
+
+/*   /\***************\/ */
+/*   infile=fopen("ak-32774.max", "r"); */
+/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/* 			   IGRAPH_DIRECTED); */
+/*   fclose(infile); */
+
+/*   t=timer(); */
+/*   igraph_maxflow(&g, &flow, source, target, &capacity); */
+/*   t=timer()-t; */
+/*   printf("32774: %g (time %.10f)\n", flow, t); */
+/*   igraph_destroy(&g); */
+/*   /\***************\/ */
+
+/*   /\***************\/ */
+/*   infile=fopen("ak-65542.max", "r"); */
+/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/* 			   IGRAPH_DIRECTED); */
+/*   fclose(infile); */
+
+/*   t=timer(); */
+/*   igraph_maxflow(&g, &flow, source, target, &capacity); */
+/*   t=timer()-t; */
+/*   printf("65542: %g (time %.10f)\n", flow, t); */
+/*   igraph_destroy(&g); */
+/*   /\***************\/ */
+
   igraph_vector_destroy(&capacity);
-  igraph_destroy(&g);
   
   return 0;
 }
