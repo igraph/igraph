@@ -1562,7 +1562,7 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
     igraph_integer_t from, to, cap;
     igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
     cap=VECTOR(*capacity)[i++];
-    ret=fprintf(outstream, "a %li %li %e\n", 
+    ret=fprintf(outstream, "a %li %li %g\n",
 		(long int) from+1, (long int) to+1, cap);
     if (ret < 0) {
       IGRAPH_ERROR("Write error", IGRAPH_EFILE);

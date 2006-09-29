@@ -1,7 +1,10 @@
 2006-09-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* src/foreign.c (igrap_read_graph_dimacs, igraph_write_graph_dimacs)
+	* src/foreign.c (igraph_read_graph_dimacs, igraph_write_graph_dimacs)
 	: added
+
+	* src/foreign.c (igraph_write_graph_dimacs) : minor change, capacity
+	is written with %g instead of %e
 
 2006-09-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
