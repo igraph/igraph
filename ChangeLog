@@ -1,3 +1,10 @@
+2006-09-28  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/flow.c (igraph_maxflow) : error checks added, bugs corrected
+	(igraph_edge_connectivity_pair, igraph_edge_connectivity)
+	(igraph_vertex_connectivity_pair, igraph_vertex_connectivity) : added
+	* examples/simple/flow.c : added
+
 2006-09-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/flow.c (igraph_maxflow) : rewritten

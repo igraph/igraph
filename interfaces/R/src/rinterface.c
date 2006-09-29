@@ -4278,3 +4278,82 @@ SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_edge_connectivity_pair(SEXP graph, SEXP psource, SEXP ptarget) {
+  
+  igraph_t g;
+  igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
+  igraph_real_t value;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_edge_connectivity_pair(&g, &value, source, target);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=value;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_edge_connectivity(SEXP graph) {
+  
+  igraph_t g;
+  igraph_integer_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_edge_connectivity(&g, &res);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vertex_connectivity_pair(SEXP graph, SEXP psource, 
+				       SEXP ptarget) {
+  
+  igraph_t g;
+  igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
+  igraph_integer_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vertex_connectivity_pair(&g, &res, source, target);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vertex_connectivity(SEXP graph) {
+  
+  igraph_t g;
+  igraph_integer_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vertex_connectivity(&g, &res);
+  
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+
+  UNPROTECT(1);
+  return result;
+}

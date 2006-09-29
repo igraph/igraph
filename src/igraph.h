@@ -871,6 +871,17 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 		   igraph_integer_t source, igraph_integer_t target,
 		   const igraph_vector_t *capacity);
 
+int igraph_edge_connectivity_pair(const igraph_t *graph, igraph_integer_t *res,
+				  igraph_integer_t source, 
+				  igraph_integer_t target);
+
+int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res);
+
+int igraph_vertex_connectivity_pair(const igraph_t *graph, 
+				    igraph_integer_t *res,
+				    igraph_integer_t source, 
+				    igraph_integer_t target);
+
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */

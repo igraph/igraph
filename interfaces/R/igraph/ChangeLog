@@ -1,3 +1,12 @@
+2006-09-28  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/flow.R (edge.connectivity, graph.adhesion)
+	(edge.dosjoint.paths, vertex.connectivity, graph.cohesion)
+	(vertex.disjoint.paths) : added
+	* interfaces/R/src/rinterface.c (R_igraph_edge_connectivity_pair)
+	(R_igraph_edge_connectivity, R_igraph_vertex_connectivity_pair)
+	(R_igraph_vertex_connectivity) : added
+
 2006-09-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/flow.R (graph.maxflow) : bug corrected

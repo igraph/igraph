@@ -34,3 +34,45 @@ graph.maxflow <- function(graph, source, target, capacity=NULL) {
         capacity,
         PACKAGE="igraph")
 }
+
+edge.connectivity <- function(graph, source=NULL, target=NULL) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (is.null(source) && is.null(target)) {    
+    .Call("R_igraph_edge_connectivity", graph,
+          PACKAGE="igraph")
+  } else if (!is.null(source) && !is.null(target)) {
+    .Call("R_igraph_edge_connectivity_pair", graph,
+          as.numeric(source), as.numeric(target),
+          PACKAGE="igraph")
+  } else {
+    stop("either give both source and target or neither")
+  }
+}
+
+graph.adhesion <- edge.connectivity
+edge.disjoint.paths <- edge.connectivity
+
+vertex.connectivity <- function(graph, source=NULL, target=NULL) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (is.null(source) && is.null(target)) {
+    .Call("R_igraph_vertex_connectivity", graph,
+          PACKAGE="igraph")
+  } else if (!is.null(source) && !is.null(target)) {
+    .Call("R_igraph_vertex_connectivity_pair", graph, as.numeric(source),
+          as.numeric(target),
+          PACKAGE="igraph")
+  } else {
+    stop("either give both source and target or neither")
+  }
+}
+
+graph.cohesion <- vertex.connectivity
+vertex.disjoint.paths <- vertex.connectivity
