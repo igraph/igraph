@@ -491,16 +491,18 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
 					     igraph_vector_t *etypes) {
   igraph_strvector_t *names[3] = { gnames, vnames, enames };
   igraph_vector_t *types[3] = { gtypes, vtypes, etypes };
-  long int i, j, k;
+  long int i, j, k, l, m;
   
   for (i=0; i<3; i++) {
     igraph_strvector_t *n = names[i];
     igraph_vector_t *t = types[i];
     PyObject *dict = ((PyObject**)graph->attr)[i];
     PyObject *keys;
+    PyObject *values;
+    PyObject *o;
     keys=PyDict_Keys(dict);
     if (!keys) IGRAPH_ERROR("Internal error in PyDict_Keys", IGRAPH_FAILURE);
-    
+ 
     if (n) {
       j=igraphmodule_PyList_to_strvector_t(keys, n);
       if (j) return j;
@@ -508,12 +510,24 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
     if (t) {
       k=PyList_Size(keys);
       igraph_vector_init(t, k);
-      for (j=0; j<k; j++) VECTOR(*t)[j]=IGRAPH_ATTRIBUTE_PY_OBJECT;
+      for (j=0; j<k; j++) {
+	int is_numeric = 1; 
+	values=PyDict_GetItem(dict, PyList_GetItem(keys, j));
+	if (PyList_Check(values)) {
+	  m=PyList_Size(values);
+	  for (l=0; l<m && is_numeric; l++) {
+	    o=PyList_GetItem(values, l);
+	    if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
+	  }
+	} else if (o != Py_None && !PyNumber_Check(values)) is_numeric=0;
+      
+	VECTOR(*t)[j]=is_numeric ? IGRAPH_ATTRIBUTE_NUMERIC : IGRAPH_ATTRIBUTE_STRING;
+      }
     }
     
     Py_DECREF(keys);
   }
-  
+ 
   return 0;
 }
 
@@ -539,7 +553,8 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
 				      igraph_attribute_type_t *type,
 				      igraph_attribute_elemtype_t elemtype,
 				      const char *name) {
-  long int attrnum;
+  long int attrnum, i, j;
+  int is_numeric;
   PyObject *o, *dict;
   switch (elemtype) {
   case IGRAPH_ATTRIBUTE_GRAPH: attrnum=0; break;
@@ -550,7 +565,216 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
   dict = ((PyObject**)graph->attr)[attrnum];
   o = PyDict_GetItemString(dict, name);
   if (o != 0) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
-  *type = IGRAPH_ATTRIBUTE_PY_OBJECT;
+  is_numeric = 1;
+  if (attrnum>0) {
+    if (!PyList_Check(o)) IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
+    if (!PyList_Size(o))  IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
+    j = PyList_Size(o);
+    for (i=0; i<j && is_numeric; i++)
+      if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
+  } else if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
+  if (is_numeric)
+    *type = IGRAPH_ATTRIBUTE_NUMERIC;
+  else
+    *type = IGRAPH_ATTRIBUTE_STRING;
+  return 0;
+}
+
+/* Getting numeric graph attributes */
+int igraphmodule_i_get_numeric_graph_attr(const igraph_t *graph,
+					  const char *name, igraph_vector_t *value) {
+  PyObject *dict, *o, *result;
+  dict = ((PyObject**)graph->attr)[0];
+  /* No error checking, if we get here, the type has already been checked by previous
+     attribute handler calls... hopefully :) Same applies for the other handlers. */
+  o = PyDict_GetItemString(dict, name);
+  if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  IGRAPH_CHECK(igraph_vector_resize(value, 1));
+  if (o == Py_None) {
+    VECTOR(*value)[0] = NAN;
+    return 0;
+  }
+  result = PyNumber_Float(o);
+  if (result) {
+    VECTOR(*value)[0] = PyFloat_AsDouble(o);
+    Py_DECREF(result);
+  } else IGRAPH_ERROR("Internal error in PyFloat_AsDouble", IGRAPH_EINVAL); 
+
+  return 0;
+}
+
+/* Getting string graph attributes */
+int igraphmodule_i_get_string_graph_attr(const igraph_t *graph,
+					 const char *name, igraph_strvector_t *value) {
+  PyObject *dict, *o, *result;
+  dict = ((PyObject**)graph->attr)[0];
+  o = PyDict_GetItemString(dict, name);
+  if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  IGRAPH_CHECK(igraph_strvector_resize(value, 1));
+  result = PyObject_Str(o);
+  if (result) {
+    IGRAPH_CHECK(igraph_strvector_set(value, 0, PyString_AsString(result)));
+    Py_DECREF(result);
+  } else IGRAPH_ERROR("Internal error in PyObject_Str", IGRAPH_EINVAL); 
+
+  return 0;
+}
+
+/* Getting numeric vertex attributes */
+int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
+					   const char *name,
+					   igraph_vs_t vs,
+					   igraph_vector_t *value) {
+  PyObject *dict, *list, *result, *o;
+  igraph_vector_t newvalue;
+
+  dict = ((PyObject**)graph->attr)[1];
+  list = PyDict_GetItemString(dict, name);
+  if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+
+  if (igraph_vs_is_all(&vs)) {
+    if (igraphmodule_PyList_to_vector_t(list, &newvalue, 0, 0))
+      IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
+    igraph_vector_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_vit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
+    IGRAPH_FINALLY(igraph_vit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_VIT_SIZE(it)));
+    while (!IGRAPH_VIT_END(it)) {
+      long int v=IGRAPH_VIT_GET(it);
+      o = PyList_GetItem(list, v);
+      if (o != Py_None) {
+	result = PyNumber_Float(o);
+	VECTOR(*value)[i] = PyFloat_AsDouble(result);
+	Py_XDECREF(result);
+      } else VECTOR(*value)[i] = NAN;
+      IGRAPH_VIT_NEXT(it);
+      i++;
+    }
+    igraph_vit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  return 0;
+}
+
+/* Getting string vertex attributes */
+int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
+					  const char *name,
+					  igraph_vs_t vs,
+					  igraph_strvector_t *value) {
+  PyObject *dict, *list, *result;
+  igraph_strvector_t newvalue;
+
+  dict = ((PyObject**)graph->attr)[1];
+  list = PyDict_GetItemString(dict, name);
+  if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+
+  if (igraph_vs_is_all(&vs)) {
+    if (igraphmodule_PyList_to_strvector_t(list, &newvalue))
+      IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
+    igraph_strvector_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_vit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
+    IGRAPH_FINALLY(igraph_vit_destroy, &it);
+    IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
+    while (!IGRAPH_VIT_END(it)) {
+      long int v=IGRAPH_VIT_GET(it);
+      result = PyObject_Str(PyList_GetItem(list, v));
+      igraph_strvector_set(value, i, PyString_AsString(result));
+      Py_XDECREF(result);
+      IGRAPH_VIT_NEXT(it);
+      i++;
+    }
+    igraph_vit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  return 0;
+}
+
+/* Getting numeric edge attributes */
+int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
+					 const char *name,
+					 igraph_es_t es,
+					 igraph_vector_t *value) {
+  PyObject *dict, *list, *result, *o;
+  igraph_vector_t newvalue;
+
+  dict = ((PyObject**)graph->attr)[2];
+  list = PyDict_GetItemString(dict, name);
+  if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+
+  if (igraph_es_is_all(&es)) {
+    if (igraphmodule_PyList_to_vector_t(list, &newvalue, 0, 0))
+      IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
+    igraph_vector_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_eit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
+    IGRAPH_FINALLY(igraph_eit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_EIT_SIZE(it)));
+    while (!IGRAPH_EIT_END(it)) {
+      long int v=IGRAPH_EIT_GET(it);
+      o = PyList_GetItem(list, v);
+      if (o != Py_None) {
+	result = PyNumber_Float(o);
+	VECTOR(*value)[i] = PyFloat_AsDouble(result);
+	Py_XDECREF(result);
+      } else VECTOR(*value)[i] = NAN;
+      IGRAPH_EIT_NEXT(it);
+      i++;
+    }
+    igraph_eit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  return 0;
+}
+
+/* Getting string edge attributes */
+int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
+					const char *name,
+					igraph_es_t es,
+					igraph_strvector_t *value) {
+  PyObject *dict, *list, *result;
+  igraph_strvector_t newvalue;
+
+  dict = ((PyObject**)graph->attr)[2];
+  list = PyDict_GetItemString(dict, name);
+  if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+
+  if (igraph_es_is_all(&es)) {
+    if (igraphmodule_PyList_to_strvector_t(list, &newvalue))
+      IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
+    igraph_strvector_destroy(value);
+    *value=newvalue;
+  } else {
+    igraph_eit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
+    IGRAPH_FINALLY(igraph_eit_destroy, &it);
+    IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
+    while (!IGRAPH_EIT_END(it)) {
+      long int v=IGRAPH_EIT_GET(it);
+      result = PyObject_Str(PyList_GetItem(list, v));
+      igraph_strvector_set(value, i, PyString_AsString(result));
+      Py_XDECREF(result);
+      IGRAPH_EIT_NEXT(it);
+      i++;
+    }
+    igraph_eit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
   return 0;
 }
 
@@ -565,12 +789,12 @@ static igraph_attribute_table_t igraphmodule_i_attribute_table = {
   igraphmodule_i_attribute_get_info,
   igraphmodule_i_attribute_has_attr,
   igraphmodule_i_attribute_get_type,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
+  igraphmodule_i_get_numeric_graph_attr,
+  igraphmodule_i_get_string_graph_attr,
+  igraphmodule_i_get_numeric_vertex_attr,
+  igraphmodule_i_get_string_vertex_attr,
+  igraphmodule_i_get_numeric_edge_attr,
+  igraphmodule_i_get_string_edge_attr,
 };
 
 /** \ingroup python_interface
