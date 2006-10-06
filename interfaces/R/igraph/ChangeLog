@@ -1,3 +1,10 @@
+2006-10-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/flow.R (graph.mincut, graph.vertex.mincut) :
+	added
+	* interfaces/R/src/rinterface.c (R_igraph_minimum_cut)
+	(R_igraph_minimum_vertex_cut_pair, R_igraph_minimum_vertex_cut)
+
 2006-09-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/flow.R (edge.connectivity, graph.adhesion)

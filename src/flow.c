@@ -437,7 +437,7 @@ int igraph_vertex_connectivity_pair(const igraph_t *graph,
     VECTOR(edges)[ 2*(no_of_edges+i)   ] = no_of_nodes+i;
     VECTOR(edges)[ 2*(no_of_edges+i)+1 ] = i;
   }
-
+  
   IGRAPH_CHECK(igraph_create(&newgraph, &edges, 2*no_of_nodes, 
 			     igraph_is_directed(graph)));
 
@@ -507,6 +507,211 @@ int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res) {
   if (res) {
     *res = minconn;
   }
+
+  return 0;
+}
+
+/* void print_vector(igraph_vector_t *v, FILE *f) { */
+/*   long int i; */
+/*   for (i=0; i<igraph_vector_size(v); i++) { */
+/*     fprintf(f, " %li", (long int) VECTOR(*v)[i]); */
+/*   } */
+/*   fprintf(f, "\n"); */
+/* } */
+
+/* void print_adjlist(igraph_i_adjlist_t *a, long int n) { */
+/*   long int i; */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_vector_t *v=igraph_i_adjlist_get(a, i); */
+/*     long int j, m=igraph_vector_size(v); */
+/*     printf("%li: ", i); */
+/*     for (j=0; j<m; j++) { */
+/*       printf("%li ", (long int) VECTOR(*v)[j]); */
+/*     } */
+/*     printf("\n"); */
+/*   } */
+/*   printf("-------------\n"); */
+/* } */
+
+int igraph_minimum_cut(const igraph_t *graph, igraph_integer_t *res,
+		       igraph_vector_t *capacity) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+
+  igraph_i_cutheap_t heap;
+  igraph_real_t mincut=1.0/0.0;	/* infinity */
+  long int i;
+  
+  igraph_i_adjlist_t adjlist;
+  igraph_i_adjedgelist_t adjedgelist;
+  
+  if (igraph_is_directed(graph)) {
+    IGRAPH_ERROR("The minimum cut function expects undirected graphs",
+		 IGRAPH_EINVAL);
+  }
+  
+  if (igraph_vector_size(capacity) != no_of_edges) {
+    IGRAPH_ERROR("Invalid capacity vector size", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_i_cutheap_init(&heap, no_of_nodes));
+  IGRAPH_FINALLY(igraph_i_cutheap_destroy, &heap);
+
+  IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &adjedgelist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &adjedgelist);
+
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &adjlist);
+
+  while (igraph_i_cutheap_size(&heap) >= 2) {
+
+    long int last;
+    igraph_real_t acut;
+    long int a, n;
+
+    igraph_vector_t *edges, *neis, *edges2, *neis2;
+   
+/*     print_adjlist(&adjlist, no_of_nodes); */
+ 
+    do {
+      a=igraph_i_cutheap_popmax(&heap);
+
+      /* update the weights of the active vertices connected to a */
+      edges=igraph_i_adjedgelist_get(&adjedgelist, a);
+      neis=igraph_i_adjlist_get(&adjlist, a);
+      n=igraph_vector_size(edges);
+      for (i=0; i<n; i++) {
+	igraph_integer_t edge=VECTOR(*edges)[i];
+	igraph_integer_t to=VECTOR(*neis)[i];
+	igraph_real_t weight=VECTOR(*capacity)[(long int)edge];
+	igraph_i_cutheap_update(&heap, to, weight);
+/* 	print_vector(&heap.heap, stdout); */
+/* 	print_vector(&heap.hptr, stdout); */
+      }
+            
+    } while (igraph_i_cutheap_active_size(&heap) > 1);
+
+    /* Now, there is only one active vertex left, 
+       calculate the cut of the phase */
+    acut=igraph_i_cutheap_maxvalue(&heap);
+    last=igraph_i_cutheap_popmax(&heap);
+
+/*     printf("acut: %g\n", acut); */
+    if (acut < mincut) {
+      mincut=acut;
+    }    
+
+    if (mincut == 0) {
+      break;
+    }
+
+    /* And contract the last and the remaining vertex (a and last) */
+    /* First remove the a--last edge if there is one, a is still the
+       last deactivated vertex */
+/*     printf("contracting %li into %li \n", (long int)last, (long int)a); */
+    edges=igraph_i_adjedgelist_get(&adjedgelist, a);
+    neis=igraph_i_adjlist_get(&adjlist, a);
+    n=igraph_vector_size(edges);
+    for (i=0; i<n; ) {
+      if (VECTOR(*neis)[i]==last) {
+	VECTOR(*neis)[i] = VECTOR(*neis)[n-1];
+	VECTOR(*edges)[i] = VECTOR(*edges)[n-1];
+	igraph_vector_pop_back(neis);
+	igraph_vector_pop_back(edges);
+	n--;
+      } else {
+	i++;
+      }
+    }
+    
+    edges=igraph_i_adjedgelist_get(&adjedgelist, last);
+    neis=igraph_i_adjlist_get(&adjlist, last);
+    n=igraph_vector_size(edges);
+    for (i=0; i<n; ) {
+      if (VECTOR(*neis)[i] == a) {
+	VECTOR(*neis)[i] = VECTOR(*neis)[n-1];
+	VECTOR(*edges)[i] = VECTOR(*edges)[n-1];
+	igraph_vector_pop_back(neis);
+	igraph_vector_pop_back(edges);
+	n--;
+      } else {
+	i++;
+      }
+    }
+
+    /* Now rewrite the edge lists of last's neighbors */
+    neis=igraph_i_adjlist_get(&adjlist, last);
+    n=igraph_vector_size(neis);    
+    for (i=0; i<n; i++) {     
+      igraph_integer_t nei=VECTOR(*neis)[i];
+      neis2=igraph_i_adjlist_get(&adjlist, nei);
+      long int n2=igraph_vector_size(neis2);
+      long int j;
+      for (j=0; j<n2; j++) {
+	if (VECTOR(*neis2)[j] == last) {
+	  VECTOR(*neis2)[j] = a;
+	}
+      }
+    }
+    
+    /* And append the lists of last to the lists of a */
+    edges=igraph_i_adjedgelist_get(&adjedgelist, a);
+    neis=igraph_i_adjlist_get(&adjlist, a);
+    edges2=igraph_i_adjedgelist_get(&adjedgelist, last);
+    neis2=igraph_i_adjlist_get(&adjlist, last);
+    IGRAPH_CHECK(igraph_vector_append(edges, edges2));
+    IGRAPH_CHECK(igraph_vector_append(neis, neis2));
+    igraph_vector_clear(edges2); /* TODO: free it */
+    igraph_vector_clear(neis2);	 /* TODO: free it */
+
+    /* Remove the deleted vertex from the heap entirely */
+    igraph_i_cutheap_reset_undefine(&heap, last);    
+  }
+
+  *res=mincut;
+
+  igraph_i_adjedgelist_destroy(&adjedgelist);
+  igraph_i_cutheap_destroy(&heap);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
+int igraph_minimum_vertex_cut_pair(const igraph_t *graph, 
+				   igraph_integer_t *res,
+				   igraph_integer_t source,
+				   igraph_integer_t target) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_t newgraph;
+
+  IGRAPH_CHECK(igraph_copy(&newgraph, graph));
+  IGRAPH_FINALLY(igraph_destroy, &newgraph);
+  IGRAPH_CHECK(igraph_to_directed(&newgraph, IGRAPH_TO_DIRECTED_MUTUAL));
+  
+  IGRAPH_CHECK(igraph_vertex_connectivity_pair(&newgraph, res, 
+					       source, target));
+  
+  igraph_destroy(&newgraph);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_minimum_vertex_cut(const igraph_t *graph,
+			      igraph_integer_t *res) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_t newgraph;
+  
+  IGRAPH_CHECK(igraph_copy(&newgraph, graph));
+  IGRAPH_FINALLY(igraph_destroy, &newgraph);
+  IGRAPH_CHECK(igraph_to_directed(&newgraph, IGRAPH_TO_DIRECTED_MUTUAL));
+  
+  IGRAPH_CHECK(igraph_vertex_connectivity(&newgraph, res));
+  
+  igraph_destroy(&newgraph);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }

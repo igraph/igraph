@@ -54,7 +54,7 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
 void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
-    igraph_vector_destroy(&al->adjs[i]);
+    if (&al->adjs[i]) { igraph_vector_destroy(&al->adjs[i]); }
   }
   Free(al->adjs);
 }

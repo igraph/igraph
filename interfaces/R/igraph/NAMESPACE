@@ -122,4 +122,5 @@ export(igraph.par)
 # flows, cuts, etc.
 
 export(graph.maxflow, edge.connectivity, graph.adhesion, edge.disjoint.paths,
-       vertex.connectivity, graph.cohesion, vertex.disjoint.paths)
+       vertex.connectivity, graph.cohesion, vertex.disjoint.paths,
+       graph.mincut, graph.vertex.mincut)

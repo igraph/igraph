@@ -1,3 +1,20 @@
+2006-10-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/heap.c (igraph_i_cutheap_switch, igraph_i_cutheap_sink)
+	(igraph_i_cutheap_shift_up, igraph_i_cutheap_init)
+	(igraph_i_cutheap_destroy, igraph_i_cutheap_empty)
+	(igraph_i_cutheap_active_size, igraph_i_cutheap_size)
+	(igraph_i_cutheap_maxvalue, igraph_i_cutheap_popmax)
+	(igraph_i_cutheap_update, igraph_i_cutheap_reset_undefine) : added
+	
+	* examples/simple/igraph_i_cutheap.c : added
+
+	* src/adjlist.c (igraph_i_adjlist_destroy) : check for NULL pointer
+	
+	* src/flow.c (igraph_minimum_cut, igraph_minimum_vertex_cut_pair)
+	(igraph_minimum_vertex_cut) : added
+	
+
 2006-09-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph_buckets.c (igraph_buckets_init)

@@ -85,3 +85,8 @@ AT_SETUP([Hash table (string->string) (igraph_hashtable_t): ])
 AT_KEYWORDS([igraph_hashtable_t hash table])
 AT_COMPILE_CHECK([simple/igraph_hashtable.c], [simple/igraph_hashtable.out])
 AT_CLEANUP
+
+AT_SETUP([Special heap for minimum cuts (igraph_i_cutheap_t): ])
+AT_KEYWORDS([heap minimum cut])
+AT_COMPILE_CHECK([simple/igraph_i_cutheap.c], [simple/igraph_i_cutheap.out])
+AT_CLEANUP

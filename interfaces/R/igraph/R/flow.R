@@ -113,3 +113,35 @@ vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
         as.numeric(target),
         PACKAGE="igraph")
 }
+
+graph.mincut <- function(graph, capacity=NULL) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.null(capacity) && "capacity" %in% list.edge.attributes(graph)) {
+    capacity <- E(graph)$capacity
+  }
+  capacity <- as.numeric(capacity)
+
+  .Call("R_igraph_minimum_cut", graph, capacity,
+        PACKAGE="igraph")
+}
+
+graph.vertex.mincut <- function(graph, source=NULL, target=NULL) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (is.null(source) && is.null(target)) {
+    .Call("R_igraph_minimum_vertex_cut", graph,
+          PACKAGE="igraph")
+  } else if (!is.null(source) && !is.null(target)) {
+    .Call("R_igraph_minimum_vertex_cut_pair", graph, as.numeric(source),
+          as.numeric(target),
+          PACKAGE="igraph")
+  } else {
+    stop("either give both source and target or neither")
+  }
+}
