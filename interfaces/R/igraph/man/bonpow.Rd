@@ -3,14 +3,10 @@
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{ Find Bonacich Power Centrality Scores of Network Positions }
 \description{
-  \code{bonpow} takes one or more graphs (\code{dat}) and returns the
-  Boncich power centralities of positions (selected by \code{nodes})
-  within the graphs indicated by \code{g}.  The decay rate for power
-  contributions is specified by \code{exponent} (1 by default).  This
-  function is compatible with \code{\link{centralization}}, and will
-  return the theoretical maximum absolute deviation (from maximum)
-  conditional on size (which is used by \code{\link{centralization}} to
-  normalize the observed centralization score). 
+  \code{bonpow} takes a graph (\code{dat}) and returns the
+  Boncich power centralities of positions (selected by \code{nodes}).
+  The decay rate for power contributions is specified by \code{exponent}
+  (1 by default).
 }
 \usage{
 bonpow(graph, nodes=V(graph), loops=FALSE, exponent=1,
@@ -81,7 +77,8 @@ a non-ad hoc basis.
   Bonacich, P.  (1987).  ``Power and Centrality: A Family of Measures.''
   \emph{American Journal of Sociology}, 92, 1170-1182. 
  }
-\author{ Carter T. Butts \email{buttsc@uci.edu}}
+\author{ Carter T. Butts \email{buttsc@uci.edu}, ported to igraph by
+  Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \section{Warning }{Singular adjacency matrices cause no end of headaches
   for this algorithm; thus, the routine may fail in certain cases.  This
   will be fixed when I get a better algorithm.  \code{bonpow} will not
@@ -91,7 +88,7 @@ a non-ad hoc basis.
 \note{ This function was ported (ie. copied) from the SNA package. }
 \examples{
 #Generate some test data
-g <- barabasi.game(10)
+g <- graph.tree(10, mode="undirected")
 #Compute Bonpow scores
 bonpow(g,exponent=1,tol=1e-20)
 bonpow(g,exponent=-1,tol=1e-20)

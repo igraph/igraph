@@ -32,17 +32,47 @@
  * \brief Maximum flow in a network with the push/relabel algorithm
  * 
  * </para><para>This function implements the Goldberg-Tarjan algorithm for
- * calculating the maximum flow in a network. The algorithm was given
+ * calculating the maximum flow in a directed graph. The algorithm was given
  * in Andrew V. Goldberg, Robert E. Tarjan: A New Approach to the
  * Maximum-Flow Problem, Journal of the ACM, 35(4), 921-940, 1988.
- * \param graph The input graph.
+ * </para>
+ * 
+ * <para> The input of the function is a directed graph, a vector
+ * of real numbers giving the capacity of the edges and two vertices
+ * of the graph, the source and the target. A flow is a function 
+ * assigning positive real numbers to the edges and satisfying two
+ * requirements: (1) the flow value is less than the capacity of the
+ * edge and (2) at each vertex except the source and the target, the
+ * incoming flow (ie. the sum of the flow on the incoming edges) is
+ * the same as the outgoing flow (ie. the sum of the flow on the
+ * outgoing edges). The value of the flow is the incoming flow at the
+ * target vertex. The maximum flow is the flow with the maximum
+ * value. </para>
+ * 
+ * <para> This function can only calculate the value of the maximum
+ * flow, but not the flow itself (may be added later). </para>
+ * 
+ * <para> Note that the value of the maximum flow is the same as the
+ * minimum cut in the graph.
+ * \param graph The input graph, it has to be directed.
  * \param value Pointer to a real number, the result will be placed here.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
  * \param capacity Vector containing the capacity of the edges.
  * \return Error code.
  * 
- * Time complexity: O(n^3).
+ * Time complexity: O(|V|^3). In practice it is much faster, but i
+ * cannot prove a better lower bound for the data structure i've
+ * used. In fact, this implementation runs much faster than the
+ * \c hi_pr implementation discussed in
+ * B. V. Cherkassky and A. V. Goldberg: On implementing the
+ * push-relabel method for the maximum flow problem, (TODO: citation)
+ * on all the graph classes i've tried.
+ * 
+ * \sa \ref igraph_edge_connectivity_pair(), \ref
+ * igraph_edge_connectivity, \ref igraph_vertex_connectivity_pair(),
+ * \ref igraph_vertex_connectivity() for 
+ * properties based on the maximum flow.
  */
 
 int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
@@ -249,6 +279,29 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
   return 0;
 }
 
+/**
+ * \function igraph_edge_connectivity_pair
+ * \brief Edge connectivity of a pair of vertices
+ * 
+ * </para><para> The edge connectivity of two vertices (\c source and
+ * \c target) in a directed graph is the minimum number of edges that
+ * have to be deleted from the graph to eliminate all paths from \c
+ * source to \c target.</para>
+ * 
+ * <para>This function uses the maximum flow algorithm to calculate
+ * the edge connectivity.
+ * \param graph The input graph, it has to be directed.
+ * \param res Pointer to an integer, the result will be stored here.
+ * \param source The id of the source vertex.
+ * \param target The id of the target vertex.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|^3). 
+ * 
+ * \sa \ref igraph_maxflow(), \refigraph_edge_connectivity_pair(),
+ * \ref igraph_vertex_connectivity_pair(), \ref
+ * igraph_vertex_connectivity(). 
+ */
 int igraph_edge_connectivity_pair(const igraph_t *graph, igraph_integer_t *res,
 				  igraph_integer_t source, 
 				  igraph_integer_t target) {
@@ -271,6 +324,25 @@ int igraph_edge_connectivity_pair(const igraph_t *graph, igraph_integer_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_edge_connectivity
+ * \brief The minimum edge connectivity in a graph.
+ * 
+ * </para><para>
+ * The edge connectivity of a graph is the same as group adhesion as
+ * defined in Douglas R. White and Frank Harary: The cohesiveness of
+ * blocks in social networks: node connectivity and conditional
+ * density, TODO: citation
+ * \param graph The input graph, it must be directed.
+ * \param res Pointer to an integer, the result will be stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|^4).
+ * 
+ * \sa \ref igraph_edge_connectivity_pair(), \ref igraph_maxflow(), 
+ * \ref igraph_vertex_connectivity().
+ */
+
 int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -292,6 +364,11 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res) {
       minmaxflow = flow;
       if (flow==0) break;
     }
+    IGRAPH_CHECK(igraph_maxflow(graph, &flow, i, 0, &capacity));
+    if (flow < minmaxflow) {
+      minmaxflow = flow;
+      if (flow==0) break;
+    }
   }
 
   if (res) {
@@ -302,6 +379,33 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res) {
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_vertex_connectivity_pair
+ * The vertex connectivity of a pair of vertices
+ * 
+ * </para><para>The vertex connectivity of two vertices (\c source and
+ * \c target) is the minimum number of vertices that have to be
+ * deleted to eliminate all paths from \c source to \c target.</para>
+ * 
+ * <para>The vertex connectivity of a pair is the same as the number
+ * of different (ie. node-independent) paths from source to
+ * target.</para> 
+ *
+ * <para>The current implementation uses a maximum flow calculation to
+ * obtain the result.
+ * \param graph The input graph, it must be directed.
+ * \param res Pointer to an integer, the result will be stored here.
+ * \param source The id of the source vertex.
+ * \param target The id of the target vertex.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|^3).
+ * 
+ * \sa \ref igraph_vertex_connectivity(), \ref
+ * igraph_edge_connectivity_pair(), \ref igraph_edge_connectivity(), 
+ * \ref igraph_maxflow().
+ */
 
 int igraph_vertex_connectivity_pair(const igraph_t *graph,
 				    igraph_integer_t *res,
@@ -359,6 +463,28 @@ int igraph_vertex_connectivity_pair(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_vertex_connectivity
+ * The vertex connectivity of a directed graph
+ * 
+ * </para><para> The vertex connectivity of a graph is the minimum
+ * vertex connectivity along each pairs of vertices in the graph.
+ * </para>
+ * <para> The vertex connectivity of a graph is the same as group
+ * cohesion as defined in Douglas R. White and Frank Harary: The
+ * cohesiveness of blocks in social networks: node connectivity and
+ * conditional density, TODO: citation
+ * \param graph The input graph, it must be directed.
+ * \param res Pointer to an integer, the result will be stored here. 
+ * \return Error code.
+ * 
+ * Time complecity: O(|V|^4).
+ * 
+ * \sa \ref igraph_vertex_connectivity_pair(), \ref igraph_maxflow(),
+ * \ref igraph_edge_connectivity_pair() and \ref
+ * igraph_edge_connectivity(). 
+ */
+
 int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -367,6 +493,11 @@ int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res) {
 
   for (i=1; i<no_of_nodes; i++) {
     IGRAPH_CHECK(igraph_vertex_connectivity_pair(graph, &conn, 0, i));
+    if (conn < minconn) {
+      minconn = conn;
+      if (conn == 0) { break; }
+    }
+    IGRAPH_CHECK(igraph_vertex_connectivity_pair(graph, &conn, i, 0));
     if (conn < minconn) {
       minconn = conn;
       if (conn == 0) { break; }

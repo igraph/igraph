@@ -5,11 +5,20 @@
 ]>
 
 <chapter id="igraph-Flows">
-<title>Maximum Flows and Minimum Cuts</title>
+<title>Maximum Flows, Minimum Cuts and related measures</title>
 
 <section><title>Maximum Flows</title>
 
 <!-- doxrox-include igraph_maxflow -->
+</section>
+
+<section><title>Connectivity</title>
+
+<!-- doxrox-include igraph_edge_connectivity_pair -->
+<!-- doxrox-include igraph_edge_connectivity -->
+<!-- doxrox-include igraph_vertex_connectivity_pair -->
+<!-- doxrox-include igraph_vertex_connectivity -->
+
 </section>
 
 </chapter>

@@ -53,8 +53,27 @@ edge.connectivity <- function(graph, source=NULL, target=NULL) {
   }
 }
 
-graph.adhesion <- edge.connectivity
-edge.disjoint.paths <- edge.connectivity
+graph.adhesion <- function(graph) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  
+  .Call("R_igraph_edge_connectivity", graph,
+        PACKAGE="igraph")
+}
+
+edge.disjoint.paths <- function(graph, source, target) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  .Call("R_igraph_edge_connectivity_pair", graph,
+        as.numeric(source), as.numeric(target),
+        PACKAGE="igraph")
+}
+
 
 vertex.connectivity <- function(graph, source=NULL, target=NULL) {
 
@@ -74,5 +93,23 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL) {
   }
 }
 
-graph.cohesion <- vertex.connectivity
-vertex.disjoint.paths <- vertex.connectivity
+graph.cohesion <- function(graph) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  .Call("R_igraph_vertex_connectivity", graph,
+        PACKAGE="igraph")
+}
+  
+vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  .Call("R_igraph_vertex_connectivity_pair", graph, as.numeric(source),
+        as.numeric(target),
+        PACKAGE="igraph")
+}
