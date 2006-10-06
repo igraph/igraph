@@ -464,6 +464,41 @@ void R_igraph_attribute_delete_edges(igraph_t *graph,
   }
 }
 
+int R_igraph_attribute_permute_edges(igraph_t *graph,
+				     const igraph_vector_t *idx) {
+  SEXP attr=graph->attr;
+  SEXP eal;
+  long int ealno, i;
+  if (REAL(VECTOR_ELT(attr, 0))[0]+REAL(VECTOR_ELT(attr, 0))[1] > 1) {
+    SEXP newattr;
+    PROTECT(newattr=duplicate(attr));
+    REAL(VECTOR_ELT(attr, 0))[1] -= 1;
+    if (REAL(VECTOR_ELT(attr, 0))[1] == 0) {
+      UNPROTECT_PTR(attr);
+    }
+    REAL(VECTOR_ELT(newattr, 0))[0] = 0;
+    REAL(VECTOR_ELT(newattr, 0))[1] = 1;
+    attr=graph->attr=newattr;
+  }
+
+  eal=VECTOR_ELT(attr, 3);
+  ealno=GET_LENGTH(eal);
+  for (i=0; i<ealno; i++) {
+    SEXP oldea=VECTOR_ELT(eal, i), newea, ss;
+    long int j, k;
+    long int newlen=igraph_vector_size(idx);
+    /* create subscript vector */
+    PROTECT(ss=NEW_NUMERIC(newlen));
+    for (j=0; j<newlen; j++) {
+      REAL(ss)[j] = VECTOR(*idx)[j];
+    }
+    PROTECT(newea=EVAL(lang3(install("["), oldea, ss)));
+    SET_VECTOR_ELT(eal, i, newea);
+    UNPROTECT(2);
+  }
+  return 0;
+}
+
 int R_igraph_attribute_get_info(const igraph_t *graph,
 				igraph_strvector_t *gnames,
 				igraph_vector_t *gtypes,
@@ -747,7 +782,8 @@ igraph_attribute_table_t R_igraph_attribute_table={
   &R_igraph_attribute_init, &R_igraph_attribute_destroy,
   &R_igraph_attribute_copy, &R_igraph_attribute_add_vertices,
   &R_igraph_attribute_delete_vertices, &R_igraph_attribute_add_edges,
-  &R_igraph_attribute_delete_edges, &R_igraph_attribute_get_info,
+  &R_igraph_attribute_delete_edges, &R_igraph_attribute_permute_edges,
+  &R_igraph_attribute_get_info,
   &R_igraph_attribute_has_attr, &R_igraph_attribute_gettype,
   &R_igraph_attribute_get_numeric_graph_attr,
   &R_igraph_attribute_get_string_graph_attr,

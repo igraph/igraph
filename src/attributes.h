@@ -78,6 +78,12 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
  * \member delete_edges Called when edges were deleted. The edge
  *    recoding vector is supplied, in the same form as for the \c
  *    delete_vertices function.
+ * \member permute_edges Tipically called when a new graph is created and 
+ *    some of the new edges should carry the attributes of some of the
+ *    old edges. The idx vector shows the mapping between the old edges and 
+ *    the new ones. Its length is the same as the number of edges in the new 
+ *    graph, and for each edge it gives the id of the old edge (the edge in
+ *    the old graph).
  */
 
 typedef struct igraph_attribute_table_t {
@@ -90,6 +96,7 @@ typedef struct igraph_attribute_table_t {
   int (*add_edges)(igraph_t *graph, const igraph_vector_t *edges, 
 		   igraph_vector_ptr_t *attr);
   void (*delete_edges)(igraph_t *graph, const igraph_vector_t *idx);
+  int (*permute_edges)(igraph_t *graph, const igraph_vector_t *idx);
 
   int (*get_info)(const igraph_t *graph,
 		  igraph_strvector_t *gnames, igraph_vector_t *gtypes,
@@ -130,8 +137,8 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table);
         do {if ((graph)->attr) igraph_i_attribute_delete_vertices((graph),(eidx),(vidx));} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from) do { \
         int igraph_i_ret=0; \
-        if (from->attr) { \
-          IGRAPH_CHECK(igraph_i_ret=igraph_i_attribute_copy(to, from)); \
+        if ((from)->attr) { \
+          IGRAPH_CHECK(igraph_i_ret=igraph_i_attribute_copy((to), (from))); \
         } \
         if (igraph_i_ret != 0) { \
           IGRAPH_ERROR("", igraph_i_ret); \
@@ -148,6 +155,8 @@ void igraph_i_attribute_delete_vertices(igraph_t *graph,
 int igraph_i_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges, void *attr);
 void igraph_i_attribute_delete_edges(igraph_t *graph, 
+				     const igraph_vector_t *idx);
+int igraph_i_attribute_permute_edges(igraph_t *graph, 
 				     const igraph_vector_t *idx);
 
 int igraph_i_attribute_get_info(const igraph_t *graph,

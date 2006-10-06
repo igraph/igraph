@@ -1,3 +1,12 @@
+2006-10-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/attributes.h (igraph_attribute_table_t) : added permute_edges
+	* src/attributes.c (igraph_i_attribute_permute_edges) : added
+	* interfaces/python/igraphmodule.c (igraphmodule_i_attribute_table) :
+	updated
+	
+	* src/conversion.c (igraph_to_directed) : updated to handle attributes
+
 2006-10-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/heap.c (igraph_i_cutheap_switch, igraph_i_cutheap_sink)

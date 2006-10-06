@@ -102,6 +102,13 @@ void igraph_i_attribute_delete_edges(igraph_t *graph,
   }
 }
 
+int igraph_i_attribute_permute_edges(igraph_t *graph, 
+				      const igraph_vector_t *idx) {
+  if (igraph_i_attribute_table) {
+    igraph_i_attribute_table->permute_edges(graph, idx);
+  }
+}
+
 int igraph_i_attribute_get_info(const igraph_t *graph,
 				igraph_strvector_t *gnames, 
 				igraph_vector_t *gtypes,

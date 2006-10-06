@@ -786,6 +786,7 @@ static igraph_attribute_table_t igraphmodule_i_attribute_table = {
   igraphmodule_i_attribute_delete_vertices,
   igraphmodule_i_attribute_add_edges,
   igraphmodule_i_attribute_delete_edges,
+  0,
   igraphmodule_i_attribute_get_info,
   igraphmodule_i_attribute_has_attr,
   igraphmodule_i_attribute_get_type,

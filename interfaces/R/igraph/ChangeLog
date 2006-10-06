@@ -1,3 +1,8 @@
+2006-10-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_permute_edges) :
+	added
+
 2006-10-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/flow.R (graph.mincut, graph.vertex.mincut) :
