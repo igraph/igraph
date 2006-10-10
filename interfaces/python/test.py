@@ -580,7 +580,7 @@ f.write("c d 3.0\n")
 f.write("a c\n")
 f.close()
 g=igraph.Graph.Read_Ncol(fname)
-test(g.vcount() == 4 and g.ecount() == 4)
+test(g.vcount() == 4 and g.ecount() == 4 and g.vs.get_attribute_values("name") == ["a", "b", "c", "d"] and g.es.get_attribute_values("weight") == [2.0, 0.0, 3.0, 0.0])
 os.unlink(fname)
 
 start("Trying to save graph edge list as NCOL file")

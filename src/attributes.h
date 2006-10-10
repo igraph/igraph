@@ -78,7 +78,7 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
  * \member delete_edges Called when edges were deleted. The edge
  *    recoding vector is supplied, in the same form as for the \c
  *    delete_vertices function.
- * \member permute_edges Tipically called when a new graph is created and 
+ * \member permute_edges Typically called when a new graph is created and 
  *    some of the new edges should carry the attributes of some of the
  *    old edges. The idx vector shows the mapping between the old edges and 
  *    the new ones. Its length is the same as the number of edges in the new 

@@ -298,10 +298,6 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     IGRAPH_ERROR("cannot add negative number of vertices", IGRAPH_EINVAL);
   }
 
-  if (graph->attr) {
-    IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
-  }
-
   IGRAPH_CHECK(igraph_vector_reserve(&graph->os, graph->n+nv+1));
   IGRAPH_CHECK(igraph_vector_reserve(&graph->is, graph->n+nv+1));
   
@@ -314,6 +310,10 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
   
   graph->n += nv;   
   
+  if (graph->attr) {
+    IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
+  }
+
   return 0;
 }
 

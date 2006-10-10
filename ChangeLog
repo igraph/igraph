@@ -1,3 +1,13 @@
+2006-10-10  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/attributes.h : corrected a typo
+	* interfaces/python/igraphmodule.c
+	(igraphmodule_i_attribute_add_vertices)
+	(igraphmodule_i_attribute_add_edges) : added attr parameter support
+	* interfaces/python/test.py : extended NCOL test case
+	* src/type_indexededgelist.c (igraph_add_vertices) :
+	moved invocation of attribute handler to the end
+	
 2006-10-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/flow.c (igraph_maxflow_value) : range check bug corrected
