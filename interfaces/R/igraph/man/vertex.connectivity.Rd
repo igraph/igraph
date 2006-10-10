@@ -11,7 +11,7 @@ vertex.disjoint.paths(graph, source, target)
 graph.cohesion(graph)
 }
 \arguments{
-  \item{graph}{The input graph, it must be directed.}
+  \item{graph}{The input graph.}
   \item{source}{The id of the source vertex, for
     \code{vertex.connectivity} it can be \code{NULL}, see details
     below.}
@@ -22,7 +22,7 @@ graph.cohesion(graph)
 \details{
   The vertex connectivity of two vertices (\code{source} and
   \code{target}) in a directed graph is the minimum number of vertices
-  needed to remove from the graph to eliminate all directed paths from
+  needed to remove from the graph to eliminate all (directed) paths from
   \code{source} to \code{target}. \code{vertex.connectivity} 
   calculates this quantity if both the \code{source} and \code{target}
   arguments are given and they're not \code{NULL}.

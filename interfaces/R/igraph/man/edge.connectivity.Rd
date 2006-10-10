@@ -11,7 +11,7 @@ edge.disjoint.paths(graph, source, target)
 graph.adhesion(graph)
 }
 \arguments{
-  \item{graph}{The input graph, it must be directed.}
+  \item{graph}{The input graph.}
   \item{source}{The id of the source vertex, for
     \code{edge.connectivity} it can be \code{NULL}, see details below.}
   \item{target}{The id of the target vertex, for
@@ -20,7 +20,7 @@ graph.adhesion(graph)
 \details{
   The edge connectivity of a pair of vertices (\code{source} and
   \code{target}) is the minimum number of edges needed to remove to
-  eliminate all directed paths from \code{source} to \code{target}.
+  eliminate all (directed) paths from \code{source} to \code{target}.
   \code{edge.connectivity} calculates this quantity if both the
   \code{source} and \code{target} arguments are given (and not
   \code{NULL}). 
