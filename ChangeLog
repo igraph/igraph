@@ -1,3 +1,15 @@
+2006-10-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/flow.c (igraph_maxflow_value) : range check bug corrected
+	(igraph_st_mincut_value) : check source==target
+	(igraph_i_mincut_value_undirected) : remove unneeded directedness check
+	(igraph_i_st_vertex_connectivity_directed) : correct neighbor check
+	(igraph_i_st_vertex_connectivity_undirected) : add range check
+	(igraph_st_vertex_connectivity) : check source==target
+	(igraph_st_edge_connectivity) : check source==target
+	(igraph_edge_disjoint_paths) : rewritten (unnecessarily)
+	(igraph_vertex_disjoint_paths) : rewritten
+
 2006-10-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-graphml.c (igraph_i_xml_escape) : change ENOMEM to

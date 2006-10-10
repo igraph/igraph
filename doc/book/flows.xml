@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<application>igraph</application>">
+]>
+
+<chapter id="igraphbook-flows">
+<title>Network Flows and Related Concepts</title>
+
+<section><title>Flows in Directed Graphs</title>
+
+<para>
+In this chapter we will discuss how to use igraph to solve a
+fundamental graph problem: the maximum flow problem. Let us have a 
+</para>
+
+</section>
+
+<!--- ################################################################ -->
+
+<section><title>Flows in Undirected Graphs</title>
+<para></para>
+</section>
+
+<!--- ################################################################ -->
+
+<section><title>Minumum Cuts</title>
+<para></para>
+</section>
+
+<section><title>Edge Connectivity</title>
+<para></para>
+</section>
+
+<section><title>Edge-disjoint Paths</title>
+<para></para>
+</section>
+
+<section><title>Vertex Connectivity</title>
+<para></para>
+</section>
+
+<section><title>Vertex-disjoint Paths</title>
+<para></para>
+</section>
+
+<section><title>Graph Cohesion and Adhesion</title>
+<para></para>
+</section>
+
+</chapter>

@@ -4,7 +4,7 @@ DOCFIX = datamodel.xml igraph.xml installation.xml introduction.xml \
 	 short.xml structures.xml ../licenses.xml creating.xml graph.xml \
 	 random.xml bibliography.xml ../bibdatabase.xml foreign.xml \
 	 operators.xml motifs.xml pathlength.xml centrality.xml citation.xml \
-	 components.xml attributes.xml iterators.xml plotting.xml
+	 components.xml attributes.xml iterators.xml plotting.xml flows.xml
 
 DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/book/%,$(DOCFIX))
 

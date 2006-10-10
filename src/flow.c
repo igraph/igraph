@@ -146,7 +146,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   if (igraph_vector_size(capacity) != no_of_orig_edges) {
     IGRAPH_ERROR("Invalid capacity vector", IGRAPH_EINVAL);
   }
-  if (source<0 || source>no_of_nodes || target<0 || target>no_of_nodes) {
+  if (source<0 || source>=no_of_nodes || target<0 || target>=no_of_nodes) {
     IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
   }
   
@@ -359,6 +359,10 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
 			   igraph_integer_t source, igraph_integer_t target,
 			   const igraph_vector_t *capacity) {
   
+  if (source == target) {
+    IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
+  }
+  
   IGRAPH_CHECK(igraph_maxflow_value(graph, value, source, target, capacity));
   return 0;
 }			    
@@ -419,11 +423,6 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
   
   igraph_i_adjlist_t adjlist;
   igraph_i_adjedgelist_t adjedgelist;
-  
-  if (igraph_is_directed(graph)) {
-    IGRAPH_ERROR("The minimum cut function expects undirected graphs",
-		 IGRAPH_EINVAL);
-  }
   
   if (igraph_vector_size(capacity) != no_of_edges) {
     IGRAPH_ERROR("Invalid capacity vector size", IGRAPH_EINVAL);
@@ -577,6 +576,7 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
  * O(|V|^4) for directed graphs, but see also the discussion at the
  * documentation of \ref igraph_maxflow_value().
  */
+
 int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res, 
 			const igraph_vector_t *capacity) {
 
@@ -624,21 +624,23 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   igraph_vector_t capacity;
   igraph_t newgraph;
   long int i;
-  igraph_bool_t conn1, conn2;
+  igraph_bool_t conn1;
   
+  if (source<0 || source>=no_of_nodes || target<0 || target>=no_of_nodes) {
+    IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
+  }
+
   switch (neighbors) {
   case IGRAPH_VCONN_NEI_ERROR:
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-    IGRAPH_CHECK(igraph_are_connected(graph, target, source, &conn2));
-    if (conn1 && conn2) {
-      IGRAPH_ERROR("vertices (reciprocally) connected", IGRAPH_EINVAL);
+    if (conn1) {
+      IGRAPH_ERROR("vertices connected", IGRAPH_EINVAL);
       return 0;
     }
     break;
   case IGRAPH_VCONN_NEI_INFINITY:
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
-    IGRAPH_CHECK(igraph_are_connected(graph, target, source, &conn2));
-    if (conn1 && conn2) {
+    if (conn1) {
       *res=1.0/0.0;
       return 0;
     }
@@ -706,6 +708,10 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
   igraph_t newgraph;
   igraph_bool_t conn;
   
+  if (source<0 || source>=no_of_nodes || target<0 || target>=no_of_nodes) {
+    IGRAPH_ERROR("Invalid source or target vertex", IGRAPH_EINVAL);
+  }
+
   switch (neighbors) {
   case IGRAPH_VCONN_NEI_ERROR:
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
@@ -762,8 +768,7 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
  * \param neighbors A constant giving what to do if the two vertices
- *     are connected (if the graph is undirected) or reciprocally
- *     connected (if the graph is directed). Possible values: 
+ *     are connected. Possible values: 
  *     \c IGRAPH_VCONN_NEI_ERROR, stop with an error message,
  *     \c IGRAPH_VCONN_INFINITY, return infinity (ie. 1.0/0.0).
  *     \c IGRAPH_VCONN_IGNORE, ignore the fact that the two vertices
@@ -785,6 +790,10 @@ int igraph_st_vertex_connectivity(const igraph_t *graph,
 				  igraph_integer_t source,
 				  igraph_integer_t target,
 				  igraph_vconn_nei_t neighbors) {
+
+  if (source == target) { 
+    IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
+  }
   
   if (igraph_is_directed(graph)) {
     IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
@@ -847,7 +856,7 @@ int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
 
 /**
  * \function igraph_vertex_connectivity
- * The vertex connectivity of a directed graph
+ * The vertex connectivity of a graph
  * 
  * </para><para> The vertex connectivity of a graph is the minimum
  * vertex connectivity along each pairs of vertices in the graph.
@@ -899,6 +908,7 @@ int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res) {
  * \ref igraph_st_vertex_connectivity(), \ref
  * igraph_vertex_connectivity().
  */
+
 int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 				igraph_integer_t source, 
 				igraph_integer_t target) {
@@ -907,6 +917,10 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
   igraph_vector_t capacity;
   igraph_real_t flow;
   long int i;
+
+  if (source == target) {
+    IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
   for (i=0; i<no_of_edges; i++) {
@@ -934,7 +948,7 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * defined in Douglas R. White and Frank Harary: The cohesiveness of
  * blocks in social networks: node connectivity and conditional
  * density, TODO: citation
- * \param graph The input graph, it must be directed.
+ * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
  * \return Error code.
  * 
@@ -995,8 +1009,29 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res) {
 int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_integer_t source, 
 			       igraph_integer_t target) {
+
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t capacity;
+  igraph_real_t flow;
+  long int i;
+
+  if (source == target) {
+    IGRAPH_ERROR("Not implemented for source=target", IGRAPH_UNIMPLEMENTED);
+  }
+
+
+  IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
+  for (i=0; i<no_of_edges; i++) {
+    VECTOR(capacity)[i]=1.0;
+  }
   
-  IGRAPH_CHECK(igraph_st_edge_connectivity(graph, res, source, target));
+  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target,
+				    &capacity));
+  *res = flow;
+  
+  igraph_vector_destroy(&capacity);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -1011,8 +1046,7 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
  * 
  * <para> Note that the number of vertex-disjoint paths is the same as
  * the vertex connectivity of the two vertices in most cases (if the
- * two vertices are not connected by an edge or reciprocally connected
- * by two edges in the undirected and directed case).
+ * two vertices are not connected by an edge).
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be
  *        stored here. 
@@ -1029,10 +1063,30 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 				 igraph_integer_t source,
 				 igraph_integer_t target) {
+
+  igraph_bool_t conn;
+
+  if (source==target) {
+    IGRAPH_ERROR("The source==target case is not implemented",
+		 IGRAPH_UNIMPLEMENTED);
+  }
+
+  igraph_are_connected(graph, source, target, &conn);
+  if (conn) { 
+    IGRAPH_ERROR("cannot calculate number of disjoint paths between neighbors",
+		 IGRAPH_EINVAL);
+  }
+
+  if (igraph_is_directed(graph)) {
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
+							  source, target,
+							  IGRAPH_VCONN_NEI_IGNORE));
+  } else {
+    IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(graph, res,
+							    source, target,
+							    IGRAPH_VCONN_NEI_IGNORE));
+  }    
   
-  /* TODO: neighbors???? +1 ????? */
-  IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, res, source, target,
-					     IGRAPH_VCONN_NEI_IGNORE));
   return 0;
 }
 

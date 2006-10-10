@@ -48,6 +48,7 @@
 <xi:include href="centrality.xml" />
 <xi:include href="pathlength.xml" />
 <xi:include href="motifs.xml" />
+<xi:include href="flows.xml" />
 <xi:include href="operators.xml" />
 
 <xi:include href="../licenses.xml"/>
