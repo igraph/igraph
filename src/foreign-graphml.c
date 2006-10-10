@@ -28,7 +28,7 @@
 #include <string.h>
 #include "memory.h"
 
-#ifdef HAVE_LIBXML
+#if HAVE_LIBXML == 1
 #include <libxml/encoding.h>
 #include <libxml/parser.h>
 
@@ -759,7 +759,7 @@ int igraph_i_xml_escape(char* src, char** dest) {
 int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
 			      int index) {
 
-#ifdef HAVE_LIBXML
+#if HAVE_LIBXML == 1
   xmlParserCtxtPtr ctxt;
   struct igraph_i_graphml_parser_state state;
   int res;

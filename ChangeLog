@@ -18,6 +18,9 @@
 	(igraph_vertex_connectivity, igraph_minimum_cut)
 	(igraph_minimum_vertex_cut_pair, igraph_minimum_vertex_cut) : 
 	removed or renamed
+
+	* src/foreign-graphml.c : #ifdef checks updated to make it work in 
+	the R package
 	
 2006-10-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
