@@ -4224,7 +4224,7 @@ SEXP R_igraph_maxflow(SEXP graph, SEXP psource, SEXP ptarget,
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcapacity, &capacity);
-  igraph_maxflow(&g, &value, source, target, &capacity);
+  igraph_maxflow_value(&g, &value, source, target, &capacity);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=value;
@@ -4315,37 +4315,18 @@ SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
   return result;
 }
 
-SEXP R_igraph_edge_connectivity_pair(SEXP graph, SEXP psource, SEXP ptarget) {
+SEXP R_igraph_mincut_value(SEXP graph, SEXP pcapacity) {
   
   igraph_t g;
-  igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
-  igraph_real_t value;
-  SEXP result;
-  
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  igraph_edge_connectivity_pair(&g, &value, source, target);
-  
-  PROTECT(result=NEW_NUMERIC(1));
-  REAL(result)[0]=value;
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
-SEXP R_igraph_edge_connectivity(SEXP graph) {
-  
-  igraph_t g;
+  igraph_vector_t capacity;
   igraph_integer_t res;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_edge_connectivity(&g, &res);
+  R_SEXP_to_vector(pcapacity, &capacity);
+  igraph_mincut_value(&g, &res, &capacity);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
@@ -4354,8 +4335,8 @@ SEXP R_igraph_edge_connectivity(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_vertex_connectivity_pair(SEXP graph, SEXP psource, 
-				       SEXP ptarget) {
+SEXP R_igraph_st_vertex_connectivity(SEXP graph, SEXP psource, 
+				     SEXP ptarget) {
   
   igraph_t g;
   igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
@@ -4365,7 +4346,8 @@ SEXP R_igraph_vertex_connectivity_pair(SEXP graph, SEXP psource,
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_vertex_connectivity_pair(&g, &res, source, target);
+  igraph_st_vertex_connectivity(&g, &res, source, target, 
+				IGRAPH_VCONN_NEI_ERROR);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
@@ -4394,18 +4376,17 @@ SEXP R_igraph_vertex_connectivity(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_minimum_cut(SEXP graph, SEXP pcapacity) {
+SEXP R_igraph_st_edge_connectivity(SEXP graph, SEXP psource, SEXP ptarget) {
   
   igraph_t g;
-  igraph_vector_t capacity;
+  igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
   igraph_real_t value;
   SEXP result;
-
+  
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_vector(pcapacity, &capacity);
-  igraph_minimum_cut(&g, &value, &capacity);
+  igraph_st_edge_connectivity(&g, &value, source, target);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=value;
@@ -4416,18 +4397,38 @@ SEXP R_igraph_minimum_cut(SEXP graph, SEXP pcapacity) {
   return result;
 }
 
-SEXP R_igraph_minimum_vertex_cut_pair(SEXP graph, SEXP psource, SEXP ptarget) {
+SEXP R_igraph_edge_connectivity(SEXP graph) {
   
   igraph_t g;
-  igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
   igraph_integer_t res;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_minimum_vertex_cut_pair(&g, &res, source, target);
+  igraph_edge_connectivity(&g, &res);
   
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_st_mincut_value(SEXP graph, SEXP psource, SEXP ptarget,
+			      SEXP pcapacity) {
+  igraph_t g;
+  igraph_integer_t source=REAL(psource)[0];
+  igraph_integer_t target=REAL(ptarget)[0];
+  igraph_vector_t capacity;
+  igraph_real_t res;
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pcapacity, &capacity);
+  igraph_st_mincut_value(&g, &res, source, target, &capacity);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   
@@ -4437,7 +4438,49 @@ SEXP R_igraph_minimum_vertex_cut_pair(SEXP graph, SEXP psource, SEXP ptarget) {
   return result;
 }
 
-SEXP R_igraph_minimum_vertex_cut(SEXP graph) {
+SEXP R_igraph_edge_disjoint_paths(SEXP graph, SEXP psource, SEXP ptarget) {
+  
+  igraph_t g;
+  igraph_integer_t source=REAL(psource)[0];
+  igraph_integer_t target=REAL(ptarget)[0];
+  igraph_integer_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_edge_disjoint_paths(&g, &res, source, target);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vertex_disjoint_paths(SEXP graph, SEXP psource, SEXP ptarget) {
+  
+  igraph_t g;
+  igraph_integer_t source=REAL(psource)[0];
+  igraph_integer_t target=REAL(ptarget)[0];
+  igraph_integer_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vertex_disjoint_paths(&g, &res, source, target);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_adhesion(SEXP graph) {
   
   igraph_t g;
   igraph_integer_t res;
@@ -4446,8 +4489,26 @@ SEXP R_igraph_minimum_vertex_cut(SEXP graph) {
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_minimum_vertex_cut(&g, &res);
+  igraph_adhesion(&g, &res);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
   
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_cohesion(SEXP graph) {
+  
+  igraph_t g;
+  igraph_integer_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_cohesion(&g, &res);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   

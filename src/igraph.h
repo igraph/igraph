@@ -147,6 +147,10 @@ typedef enum { IGRAPH_TO_DIRECTED_ARBITRARY=0,
 typedef enum { IGRAPH_TO_UNDIRECTED_EACH=0,
 	       IGRAPH_TO_UNDIRECTED_COLLAPSE } igraph_to_undirected_t;
 
+typedef enum { IGRAPH_VCONN_NEI_ERROR=0,
+	       IGRAPH_VCONN_NEI_INFINITY,
+	       IGRAPH_VCONN_NEI_IGNORE }igraph_vconn_nei_t;
+
 /* -------------------------------------------------- */
 /* Vertex selectors                                   */
 /* -------------------------------------------------- */
@@ -867,9 +871,16 @@ int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2);
 /* MAximum flows, minimum cuts & such                 */
 /* -------------------------------------------------- */
 
-int igraph_maxflow(const igraph_t *graph, igraph_real_t *value, 
-		   igraph_integer_t source, igraph_integer_t target,
-		   const igraph_vector_t *capacity);
+int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
+			 igraph_integer_t source, igraph_integer_t target,
+			 const igraph_vector_t *capacity);
+int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res, 
+			const igraph_vector_t *capacity);
+
+
+
+
+
 
 int igraph_edge_connectivity_pair(const igraph_t *graph, igraph_integer_t *res,
 				  igraph_integer_t source, 

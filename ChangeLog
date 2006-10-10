@@ -1,3 +1,24 @@
+2006-10-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign-graphml.c (igraph_i_xml_escape) : change ENOMEM to
+	IGRAPH_ENOMEM
+
+	* src/conversion.c (igraph_to_directed) : bug eliminated,
+	destroy order was different than FINALLY order
+
+	* src/flow.c (igraph_i_maxflow_value_undirected, igraph_maxflow_value)
+	(igraph_st_mincut_value, igraph_i_mincut_value_undirected)
+	(igraph_mincut_value, igrpah_i_st_vertex_connectivity_undirected)
+	(igraph_st_vertex_connectivity,	igraph_i_vertex_connectivity_directed)
+	(igraph_i_vertex_connectivity_undirected, igraph_st_edge_connectivity)
+	(igraph_edge_connectivity, igraph_edge_disjoint_paths)
+	(igraph_vertex_disjoint_paths, igraph_adhesion, igraph_cohesion): added
+	(igraph_maxflow, igraph_edge_connectivity_pair)
+	(igraph_edge_connectivity, igraph_vertex_connectivity_pair)
+	(igraph_vertex_connectivity, igraph_minimum_cut)
+	(igraph_minimum_vertex_cut_pair, igraph_minimum_vertex_cut) : 
+	removed or renamed
+	
 2006-10-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/attributes.h (igraph_attribute_table_t) : added permute_edges

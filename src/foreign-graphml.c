@@ -711,7 +711,7 @@ int igraph_i_xml_escape(char* src, char** dest) {
     else if (*s == '\'') destlen += 5;
   }
   *dest=Calloc(destlen+1, char);
-  if (!*dest) IGRAPH_ERROR("Not enough memory", ENOMEM);
+  if (!*dest) IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
   for (s=src, d=*dest; *s; s++, d++) {
     switch (*s) {
     case '&':

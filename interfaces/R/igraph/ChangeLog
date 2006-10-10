@@ -1,3 +1,19 @@
+2006-10-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/flow.R (graph.vertex.mincut) : removed
+	(graph.maxflow, graph.mincut, vertex.connectivity, edge.connectivity)
+	(edge.disjoint.paths, vertex.disjoint.paths, graph.adhesion)
+	(graph.cohesion) : rewritten
+	* interfaces/R/src/rinterface.c (R_igraph_edge_connectivity_pair)
+	(R_igraph_vertex_connectivity_pair, R_igraph_minimum_cut) 
+	(R_igraph_minimum_vertex_cut_pair, R_igraph_minimum_vertex_cut) :
+	removed
+	(R_igraph_mincut_value, R_igraph_st_vertex_connectivity)
+	(R_igraph_vertex_connectivity, R_igraph_st_edge_connectivity)
+	(R_igraph_edge_connectivity, R_igraph_st_mincut_value)
+	(R_igraph_edge_disjoint_paths, R_igraph_vertex_disjoint_paths)
+	(R_igraph_adhesion, R_igraph_cohesion) : added
+
 2006-10-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_attribute_permute_edges) :

@@ -25,14 +25,64 @@ graph.maxflow <- function(graph, source, target, capacity=NULL) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.null(capacity) && "capacity" %in% list.edge.attributes(graph)) {
-    capacity <- E(graph)$capacity
+  if (is.null(capacity)) {
+    if ("capacity" %in% list.edge.attributes(graph)) {
+      capacity <- E(graph)$capacity
+    } else {
+      stop("capacity argument is not given and no `capacity' attribute")
+    }
   }
   capacity <- as.numeric(capacity)
   
   .Call("R_igraph_maxflow", graph, as.numeric(source), as.numeric(target),
         capacity,
         PACKAGE="igraph")
+}
+
+graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.null(capacity)) {
+    if ("capacity" %in% list.edge.attributes(graph)) {
+      capacity <- E(graph)$capacity
+    } else {
+      stop("capacity argument is not given and no `capacity' attribute")
+    }
+  }
+  if (is.null(source) && !is.null(target) ||
+      is.null(target) && !is.null(source)) {
+    stop("Please give both source and target oe neither")
+  }
+  capacity <- as.numeric(capacity)
+  
+  if (is.null(target) && is.null(source)) {
+    .Call("R_igraph_mincut_value", graph, capacity,
+          PACKAGE="igraph")
+  } else {
+    .Call("R_igraph_st_mincut_value", graph, as.numeric(source),
+          as.numeric(target), capacity,
+          PACKAGE="igraph")
+  }
+}
+
+vertex.connectivity <- function(graph, source=NULL, target=NULL) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (is.null(source) && is.null(target)) {
+    .Call("R_igraph_vertex_connectivity", graph,
+          PACKAGE="igraph")
+  } else if (!is.null(source) && !is.null(target)) {
+    .Call("R_igraph_st_vertex_connectivity", graph, as.numeric(source),
+          as.numeric(target),
+          PACKAGE="igraph")
+  } else {
+    stop("either give both source and target or neither")
+  }
 }
 
 edge.connectivity <- function(graph, source=NULL, target=NULL) {
@@ -45,22 +95,12 @@ edge.connectivity <- function(graph, source=NULL, target=NULL) {
     .Call("R_igraph_edge_connectivity", graph,
           PACKAGE="igraph")
   } else if (!is.null(source) && !is.null(target)) {
-    .Call("R_igraph_edge_connectivity_pair", graph,
+    .Call("R_igraph_st_edge_connectivity", graph,
           as.numeric(source), as.numeric(target),
           PACKAGE="igraph")
   } else {
     stop("either give both source and target or neither")
   }
-}
-
-graph.adhesion <- function(graph) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  
-  .Call("R_igraph_edge_connectivity", graph,
-        PACKAGE="igraph")
 }
 
 edge.disjoint.paths <- function(graph, source, target) {
@@ -69,28 +109,30 @@ edge.disjoint.paths <- function(graph, source, target) {
     stop("Not a graph object")
   }
 
-  .Call("R_igraph_edge_connectivity_pair", graph,
+  .Call("R_igraph_edge_disjoint_paths", graph,
         as.numeric(source), as.numeric(target),
         PACKAGE="igraph")
 }
 
-
-vertex.connectivity <- function(graph, source=NULL, target=NULL) {
+vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
-  if (is.null(source) && is.null(target)) {
-    .Call("R_igraph_vertex_connectivity", graph,
-          PACKAGE="igraph")
-  } else if (!is.null(source) && !is.null(target)) {
-    .Call("R_igraph_vertex_connectivity_pair", graph, as.numeric(source),
-          as.numeric(target),
-          PACKAGE="igraph")
-  } else {
-    stop("either give both source and target or neither")
+  .Call("R_igraph_vertex_disjoint_paths", graph, as.numeric(source),
+        as.numeric(target),
+        PACKAGE="igraph")
+}
+
+graph.adhesion <- function(graph) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
   }
+  
+  .Call("R_igraph_adhesion", graph,
+        PACKAGE="igraph")
 }
 
 graph.cohesion <- function(graph) {
@@ -99,49 +141,7 @@ graph.cohesion <- function(graph) {
     stop("Not a graph object")
   }
 
-  .Call("R_igraph_vertex_connectivity", graph,
-        PACKAGE="igraph")
-}
-  
-vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-
-  .Call("R_igraph_vertex_connectivity_pair", graph, as.numeric(source),
-        as.numeric(target),
+  .Call("R_igraph_cohesion", graph,
         PACKAGE="igraph")
 }
 
-graph.mincut <- function(graph, capacity=NULL) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  if (is.null(capacity) && "capacity" %in% list.edge.attributes(graph)) {
-    capacity <- E(graph)$capacity
-  }
-  capacity <- as.numeric(capacity)
-
-  .Call("R_igraph_minimum_cut", graph, capacity,
-        PACKAGE="igraph")
-}
-
-graph.vertex.mincut <- function(graph, source=NULL, target=NULL) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-
-  if (is.null(source) && is.null(target)) {
-    .Call("R_igraph_minimum_vertex_cut", graph,
-          PACKAGE="igraph")
-  } else if (!is.null(source) && !is.null(target)) {
-    .Call("R_igraph_minimum_vertex_cut_pair", graph, as.numeric(source),
-          as.numeric(target),
-          PACKAGE="igraph")
-  } else {
-    stop("either give both source and target or neither")
-  }
-}
