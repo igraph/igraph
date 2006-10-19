@@ -1,3 +1,8 @@
+2006-10-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_erdos_renyi_game_gnp) : bug corrected,
+	use igraph_real_t, long int is not enough
+
 2006-10-10  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/attributes.h : corrected a typo
