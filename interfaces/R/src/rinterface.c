@@ -3784,10 +3784,11 @@ SEXP R_igraph_get_edge(SEXP graph, SEXP peid) {
   return result;
 }
 
-SEXP R_igraph_constraint(SEXP graph, SEXP vids) {
+SEXP R_igraph_constraint(SEXP graph, SEXP vids, SEXP pweights) {
   
   igraph_t g;
   igraph_vs_t vs;
+  igraph_vector_t weights, *wptr=0;
   igraph_vector_t res;
   SEXP result;
 
@@ -3795,8 +3796,12 @@ SEXP R_igraph_constraint(SEXP graph, SEXP vids) {
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(vids, &g, &vs);
+  if (GET_LENGTH(pweights) != 0) {
+    R_SEXP_to_vector(pweights, &weights);
+    wptr=&weights;
+  } 
   igraph_vector_init(&res, 0);
-  igraph_constraint(&g, &res, vs);
+  igraph_constraint(&g, &res, vs, wptr);
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));

@@ -261,22 +261,22 @@ graph.laplacian <- function(graph, normalized=FALSE) {
 ## Structural holes a'la Burt, code contributed by
 ## Jeroen Bruggeman
 
-## constraint <- function(graph, nodes=V(graph)) {
+## constraint.orig <- function(graph, nodes=V(graph), attr=NULL) {
 
 ##   if (!is.igraph(graph)) {
 ##     stop("Not a graph object")
 ##   }
 
 ##   idx <- degree(graph) != 0
-##   A <- get.adjacency(graph)
+##   A <- get.adjacency(graph, attr=attr)
 ##   A <- A[idx, idx]
 ##   n <- sum(idx)
   
 ##   one <- c(rep(1,n))
 ##   CZ <- A + t(A)
-##   cs <- CZ %*% one
+##   cs <- CZ %*% one                      # degree of vertices
 ##   ics <- 1/cs
-##   CS <- ics %*% t(one)
+##   CS <- ics %*% t(one)                  # 1/degree of vertices
 ##   P <- CZ * CS  #intermediate result: proportionate tie strengths
 ##   PSQ <- P%*%P #sum paths of length two
 ##   P.bi <- as.numeric(P>0)  #exclude paths to non-contacts (& reflexive):
@@ -290,39 +290,65 @@ graph.laplacian <- function(graph, normalized=FALSE) {
 ##   ci2[nodes+1]
 ## }
 
-## Second implementation
+## Newest implementation, hopefully correct, there is a C implementation
+## now so we don't need this
 
-## constraint <- function(graph, nodes=V(graph)) {
+## constraint.old <- function(graph, nodes=V(graph)) {
 
 ##   if (!is.igraph(graph)) {
 ##     stop("Not a graph object")
 ##   }
 
-##   nodes <-as.numeric(nodes)
-  
-##   weights <- 1/degree(graph)
+##   nodes <- as.numeric(nodes)
 ##   res <- numeric(length(nodes))
-##   for (i in seq(along=nodes)) {
-##     res[i] <- res[i] + weights[nodes[i]+1]
-##     first <- neighbors(graph, nodes[i], mode="all")
-##     first <- first [ first != nodes[i] ]
-##     for (j in seq(along=first)) {
-##       second <- neighbors(graph, first[j], mode="all")
-##       second <- second [ second %in% first ]
-##       res[i] <- res[i] + sum(weights[first[j]+1] * weights[second+1])
+##   deg <- degree(graph, mode="all", loops=FALSE)
+
+##   not <- function(i, v) v[ v!=i ]
+
+##   for (a in seq(along=nodes)) {
+##     i <- nodes[a]
+    
+##     first <- not(i, neighbors(graph, i, mode="all"))
+##     first <- unique(first)
+##     for (b in seq(along=first)) {
+##       j <- first[b]
+
+##       ## cj is the contribution of j
+##       cj <- are.connected(graph, i, j)      / deg[i+1]
+##       cj <- cj + are.connected(graph, j, i) / deg[i+1]
+
+##       second <- not(i, not(j, neighbors(graph, j, mode="all")))
+##       for (c in seq(along=second)) {
+##         q <- second[c]
+##         cj <- cj + are.connected(graph, i, q) / deg[q+1] / deg[i+1]
+##         cj <- cj + are.connected(graph, q, i) / deg[q+1] / deg[i+1]
+##       }
+                            
+##       ## Ok, we have the total contribution of j
+##       res[a] <- res[a] + cj*cj
 ##     }
 ##   }
-##   res [ res == Inf ] <- NaN
+
+##   if (!is.directed(graph)) {
+##     res <- res/4
+##   }
 ##   res
 ## }
 
-constraint <- function(graph, nodes=V(graph)) {
+constraint <- function(graph, nodes=V(graph), weights=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
+  if (is.null(weights)) {
+    if ("weight" %in% list.edge.attributes(graph)) {
+      weights <- E(g)$weight
+    }
+  }
+  
   .Call("R_igraph_constraint", graph, as.igraph.vs(nodes),
+        as.numeric(weights),        
         PACKAGE="igraph")
 }
 

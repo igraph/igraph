@@ -2261,76 +2261,243 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
  *        appropropriate size for holding the result.
  * \param vids Vertex selector containing the vertices for which the
  *        constaint should be calculated.
+ * \param weights Vector giving the weights of the edges. If it is
+ *        \c NULL then each edge is supposed to have the same weight.
  * \return Error code.
  * 
- * Time complexity: O(n*d^2), n is the number of vertices for which
- * the constaint is calculated and d is the average degree.
+ * Time complexity: O(|V|+E|+n*d^2), n is the number of vertices for
+ * which the constraint is calculated and d is the average degree, |V|
+ * is the number of vertices, |E| the number of edges in the
+ * graph. If the weights argument is \c NULL then the time complexity
+ * is O(|V|+n*d^2).
  */
 
 int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
-		      igraph_vs_t vids) {
+		      igraph_vs_t vids, const igraph_vector_t *weights) {
   
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_vector_t first, second;
-  igraph_vector_t first_vec;
-  igraph_vector_t invdeg;
-  
-  long int i,j,k;
+  long int no_of_edges=igraph_ecount(graph);
   igraph_vit_t vit;
   long int nodes_to_calc;
+  long int a, b, c, i, j, q;
+  igraph_integer_t edge, from, to, edge2, from2, to2;
+  
+  igraph_vector_t contrib;
+  igraph_vector_t degree;
+  igraph_vector_t ineis_in, ineis_out, jneis_in, jneis_out;
 
+  if (weights != 0 && igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid length of weight vector", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&contrib, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&ineis_in, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&ineis_out, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&jneis_in, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&jneis_out, 0);
+  
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-
   nodes_to_calc=IGRAPH_VIT_SIZE(vit);
- 
-  IGRAPH_VECTOR_INIT_FINALLY(&first, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&second, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&first_vec, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&invdeg, no_of_nodes);
- 
-  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
-  igraph_vector_null(res);
-  
-  IGRAPH_CHECK(igraph_degree(graph, &invdeg, igraph_vss_all(), IGRAPH_ALL, 
-			     IGRAPH_NO_LOOPS));
-  for (i=0; i<no_of_nodes; i++) {
-    if (VECTOR(invdeg)[i] != 0) {
-      VECTOR(invdeg)[i] = 1 / VECTOR(invdeg)[i];
-    } else {
-      VECTOR(invdeg)[i] = (0.0 / 0.0);
+
+  if (weights==0) {
+    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+			       IGRAPH_ALL, IGRAPH_NO_LOOPS));
+  } else {
+    for (a=0; a<no_of_edges; a++) {
+      igraph_edge(graph, a, &from, &to);
+      if (from != to) {
+	VECTOR(degree)[(long int) from] += VECTOR(*weights)[a];
+	VECTOR(degree)[(long int) to  ] += VECTOR(*weights)[a];
+      }
     }
   }
   
-  /* Do it! */
-  for (i=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); 
-       i++, IGRAPH_VIT_NEXT(vit)) {
-    IGRAPH_CHECK(igraph_neighbors(graph, &first, 
-				  IGRAPH_VIT_GET(vit), IGRAPH_ALL));
-    for (j=0; j<igraph_vector_size(&first); j++) {
-      VECTOR(first_vec)[ (long int) VECTOR(first)[j] ] = i+1;
+  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
+  igraph_vector_null(res);
+  
+  for (a=0; a<nodes_to_calc; a++, IGRAPH_VIT_NEXT(vit)) {
+    i=IGRAPH_VIT_GET(vit);
+    
+    /* get neighbors of i */
+    IGRAPH_CHECK(igraph_adjacent(graph, &ineis_in, i, IGRAPH_IN));
+    IGRAPH_CHECK(igraph_adjacent(graph, &ineis_out, i, IGRAPH_OUT));
+
+    /* NaN for isolates */
+    if (igraph_vector_size(&ineis_in) == 0 &&
+	igraph_vector_size(&ineis_out) == 0) {
+      VECTOR(*res)[a] = 0.0 / 0.0;
     }
-    VECTOR(*res)[i] += VECTOR(invdeg)[(long int) IGRAPH_VIT_GET(vit)];
-    for (j=0; j<igraph_vector_size(&first); j++) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &second,
-				    VECTOR(first)[j], IGRAPH_ALL));
-      for (k=0; k<igraph_vector_size(&second); k++) {
-	long int snei=VECTOR(second)[k];
-	if (VECTOR(first_vec)[snei] == i+1) {
-	  VECTOR(*res)[i] += VECTOR(invdeg)[(long int)IGRAPH_VIT_GET(vit)] * 
-	    VECTOR(invdeg)[(long int)VECTOR(first)[j]];
+
+    /* zero their contribution */
+    for (b=0; b<igraph_vector_size(&ineis_in); b++) {
+      edge=VECTOR(ineis_in)[b];
+      igraph_edge(graph, edge, &from, &to);
+      if (to==i) { to=from; }
+      j=to;
+      VECTOR(contrib)[j]=0.0;
+    }
+    for (b=0; b<igraph_vector_size(&ineis_out); b++) {
+      edge=VECTOR(ineis_out)[b];
+      igraph_edge(graph, edge, &from, &to);
+      if (to==i) { to=from; }
+      j=to;
+      VECTOR(contrib)[j]=0.0;
+    }
+
+    /* add the direct contibutions, in-neighbors and out-neighbors */
+    for (b=0; b<igraph_vector_size(&ineis_in); b++) {
+      edge=VECTOR(ineis_in)[b];
+      igraph_edge(graph, edge, &from, &to);
+      if (to==i) { to=from; }
+      j=to;
+      if (i != j) {		/* excluding loops */
+	if (weights) {
+	  VECTOR(contrib)[j] += 
+	    VECTOR(*weights)[(long int)edge]/VECTOR(degree)[i];
+	} else {
+	  VECTOR(contrib)[j] += 1.0/VECTOR(degree)[i];
 	}
+      }
+    }
+    if (igraph_is_directed(graph)) {
+      for (b=0; b<igraph_vector_size(&ineis_out); b++) {
+	edge=VECTOR(ineis_out)[b];
+	igraph_edge(graph, edge, &from, &to);
+	if (to==i) { to=from; }
+	j=to;
+	if (i != j) {
+	  if (weights) {
+	    VECTOR(contrib)[j] += 
+	      VECTOR(*weights)[(long int)edge]/VECTOR(degree)[i];
+	  } else {
+	    VECTOR(contrib)[j] += 1.0/VECTOR(degree)[i];
+	  }
+	}
+      }
+    }
+
+    /* add the indirect contributions, in-in, in-out, out-in, out-out */
+    for (b=0; b<igraph_vector_size(&ineis_in); b++) {
+      edge=VECTOR(ineis_in)[b];
+      igraph_edge(graph, edge, &from, &to);
+      if (to==i) { to=from; }
+      j=to;
+      if (i == j) { continue; }
+      IGRAPH_CHECK(igraph_adjacent(graph, &jneis_in, j, IGRAPH_IN));
+      IGRAPH_CHECK(igraph_adjacent(graph, &jneis_out, j, IGRAPH_OUT));
+      for (c=0; c<igraph_vector_size(&jneis_in); c++) {
+	edge2=VECTOR(jneis_in)[c];
+	igraph_edge(graph, edge2, &from2, &to2);
+	if (to2==j) { to2=from2; }
+	q=to2;
+	if (j != q) {
+	  if (weights) {
+	    VECTOR(contrib)[q] += 
+	      VECTOR(*weights)[(long int)edge]*
+	      VECTOR(*weights)[(long int)edge2]/
+	      VECTOR(degree)[i]/VECTOR(degree)[j];
+	  } else {
+	    VECTOR(contrib)[q] += 1/VECTOR(degree)[i]/VECTOR(degree)[j];
+	  }
+	}
+      }
+      if (igraph_is_directed(graph)) {
+	for (c=0; c<igraph_vector_size(&jneis_out); c++) {
+	  edge2=VECTOR(jneis_out)[c];
+	  igraph_edge(graph, edge2, &from2, &to2);
+	  if (to2==j) { to2=from2; }
+	  q=to2;
+	  if (j != q) {
+	    if (weights) {
+	      VECTOR(contrib)[q] += 
+		VECTOR(*weights)[(long int)edge]*
+		VECTOR(*weights)[(long int)edge2]/
+		VECTOR(degree)[i]/VECTOR(degree)[j];
+	    } else {
+	      VECTOR(contrib)[q] += 1/VECTOR(degree)[i]/VECTOR(degree)[j];
+	    }
+	  }
+	}
+      }
+    }
+    if (igraph_is_directed(graph)) {
+      for (b=0; b<igraph_vector_size(&ineis_out); b++) {
+	edge=VECTOR(ineis_out)[b];
+	igraph_edge(graph, edge, &from, &to);
+	if (to==i) { to=from; }
+	j=to;
+	if (i == j) { continue; }
+	IGRAPH_CHECK(igraph_adjacent(graph, &jneis_in, j, IGRAPH_IN));
+	IGRAPH_CHECK(igraph_adjacent(graph, &jneis_out, j, IGRAPH_OUT));
+	for (c=0; c<igraph_vector_size(&jneis_in); c++) {
+	  edge2=VECTOR(jneis_in)[c];
+	  igraph_edge(graph, edge2, &from2, &to2);
+	  if (to2==j) { to2=from2; }
+	  q=to2;
+	  if (j != q) {
+	    if (weights) {
+	      VECTOR(contrib)[q] += 
+		VECTOR(*weights)[(long int)edge]*
+		VECTOR(*weights)[(long int)edge2]/
+		VECTOR(degree)[i]/VECTOR(degree)[j];
+	    } else {
+	      VECTOR(contrib)[q] += 1/VECTOR(degree)[i]/VECTOR(degree)[j];
+	    }
+	  }
+	}
+	for (c=0; c<igraph_vector_size(&jneis_out); c++) {
+	  edge2=VECTOR(jneis_out)[c];
+	  igraph_edge(graph, edge2, &from2, &to2);
+	  if (to2==j) { to2=from2; }
+	  q=to2;
+	  if (j != q) {
+	    if (weights) {
+	      VECTOR(contrib)[q] += 
+		VECTOR(*weights)[(long int)edge]*
+		VECTOR(*weights)[(long int)edge2]/
+		VECTOR(degree)[i]/VECTOR(degree)[j];
+	    } else {
+	      VECTOR(contrib)[q] += 1/VECTOR(degree)[i]/VECTOR(degree)[j];
+	    }
+	  }
+	}
+      }
+    }
+    
+    /* squared sum of the contributions */
+    for (b=0; b<igraph_vector_size(&ineis_in); b++) {
+      edge=VECTOR(ineis_in)[b];
+      igraph_edge(graph, edge, &from, &to);
+      if (to==i) { to=from; }
+      j=to;
+      if (i == j) { continue; }
+      VECTOR(*res)[a] += VECTOR(contrib)[j] * VECTOR(contrib)[j];
+      VECTOR(contrib)[j]=0.0;
+    }
+    if (igraph_is_directed(graph)) {
+      for (b=0; b<igraph_vector_size(&ineis_out); b++) {
+	edge=VECTOR(ineis_out)[b];
+	igraph_edge(graph, edge, &from, &to);
+	if (to==i) { to=from; }
+	j=to;
+	if (i == j) { continue; }
+	VECTOR(*res)[a] += VECTOR(contrib)[j] * VECTOR(contrib)[j];
+	VECTOR(contrib)[j]=0.0;
       }
     }
   }
 
-  igraph_vector_destroy(&first);
-  igraph_vector_destroy(&second);
-  igraph_vector_destroy(&first_vec);
-  igraph_vector_destroy(&invdeg);
   igraph_vit_destroy(&vit);
-  IGRAPH_FINALLY_CLEAN(5);
-
+  igraph_vector_destroy(&jneis_out);
+  igraph_vector_destroy(&jneis_in);
+  igraph_vector_destroy(&ineis_out);
+  igraph_vector_destroy(&ineis_in);
+  igraph_vector_destroy(&degree);
+  igraph_vector_destroy(&contrib);
+  IGRAPH_FINALLY_CLEAN(7);
+  
   return 0;
 }
 

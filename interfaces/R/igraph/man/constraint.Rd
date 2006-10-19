@@ -5,12 +5,15 @@
   each vertex.
 }
 \usage{
-constraint(graph, nodes=V(graph))
+constraint(graph, nodes=V(graph), weights=NULL)
 }
 \arguments{
   \item{graph}{A graph object, the input graph.}
   \item{nodes}{The vertices for which the constraint will be
     calculated. Defaults to all vertices.}
+  \item{weights}{The weights of the edges. If this is \code{NULL} and
+    there is a \code{weight} edge attribute this is used. If there is no
+    such edge attribute all edges will have the same weight.}
 }
 \details{Burt's constraint is higher if ego has less, or mutually
   stronger related (i.e. more redundant) contacts. Burt's measure of

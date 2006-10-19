@@ -1,3 +1,10 @@
+2006-10-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R (constraint) :
+	weight parameter added
+	* interfaces/R/igraph/src/rinterface.c (R_igraph_constraint) :
+	weight parameter added
+
 2006-10-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/flow.R (graph.vertex.mincut) : removed

@@ -3,6 +3,9 @@
 	* src/games.c (igraph_erdos_renyi_game_gnp) : bug corrected,
 	use igraph_real_t, long int is not enough
 
+	* src/structural_properties.c (igraph_constraint) : rewritten,
+	weight argument added
+	
 2006-10-10  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/attributes.h : corrected a typo
