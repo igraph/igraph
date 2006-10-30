@@ -285,32 +285,10 @@ int igraph_to_directed(igraph_t *graph,
 
 /**
  * \function igraph_to_undirected
- * \brief Convert a directed graph to and undirected one.
+ * \brief Convert a directed graph to an undirected one.
  * 
  * </para><para>
- * If the supplied graph is undirected, this function not nothing.
- * \param graph The graph object to convert.
- * \param mode Constant, specifies the details of how exactly the
- *        convesion is done. Possible values: \c 
- *        IGRAPH_TO_UNDIRECTED_EACH: the number of edges remains
- *        constant, an undirected edge is created for each directed
- *        one, this version might create graphs with multiple edges; 
- *        \c IGRAPH_TO_UNDIRECTED_COLLAPSE: one undirected edge will
- *        be created for each pair of vertices which are connected
- *        with at least one directed edge, no multiple edges will be
- *        created. 
- * \return Error code.
- * 
- * Time complexity: O(|V|+|E|), the number of vertices plus the number
- * of edges. 
- */
-
-/**
- * \function igraph_to_undirected
- * \brief Convert a directed graph to and undirected one.
- * 
- * </para><para>
- * If the supplied graph is undirected, this function not nothing.
+ * If the supplied graph is undirected, this function does nothing.
  * \param graph The graph object to convert.
  * \param mode Constant, specifies the details of how exactly the
  *        convesion is done. Possible values: \c 

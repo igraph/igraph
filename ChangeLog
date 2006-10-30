@@ -1,3 +1,9 @@
+2006-10-30  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/graphobject.c (igraphmodule_Graph_to_directed)
+	(igraphmodule_Graph_to_undirected) : added
+	* interfaces/python/test.py : added test cases
+	
 2006-10-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_erdos_renyi_game_gnp) : bug corrected,

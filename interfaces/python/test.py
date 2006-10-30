@@ -451,6 +451,21 @@ start("Retrieving adjacency matrix, only upper half, undirected graph");
 g=igraph.Graph(edges=[(0,1), (1,2), (2,0), (3,0)])
 test(g.get_adjacency(igraph.GET_ADJACENCY_UPPER)==[[0,1,1,1], [0,0,1,0], [0,0,0,0], [0,0,0,0]]);
 
+start("Converting a directed graph to undirected (mode=collapse)");
+g=igraph.Graph.Tree(10, 3, igraph.TREE_OUT)
+g.to_undirected()
+test(g.vcount() == 10 and g.ecount() == 9)
+
+start("Converting an undirected graph to directed (mode=mutual)");
+g=igraph.Graph.Tree(10, 3)
+g.to_directed()
+test(g.vcount() == 10 and g.ecount() == 18)
+
+start("Converting an undirected graph to directed (mode=arbitrary)");
+g=igraph.Graph.Tree(10, 3)
+g.to_directed(False)
+test(g.vcount() == 10 and g.ecount() == 9)
+
 start("Calculating bibliographic coupling")
 g=igraph.Graph(edges=[(0,1), (2,1), (2,0), (3,0)], directed=True)
 print g.bibcoupling()

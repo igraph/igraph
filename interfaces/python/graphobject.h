@@ -123,6 +123,8 @@ PyObject* igraphmodule_Graph_layout_reingold_tilford(igraphmodule_GraphObject *s
 
 PyObject* igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_to_undirected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_to_directed(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -961,9 +963,9 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@return: the BFS iterator as a L{BFSIter} object.\n"
   },
   
-  //////////////////////////////////////////////////////
-  // CONVERT A GRAPH TO EDGE LIST OR ADJACENCY MATRIX //
-  //////////////////////////////////////////////////////
+  /////////////////
+  // CONVERSIONS //
+  /////////////////
   
   // interface to igraph_get_adjacency
   {"get_adjacency", (PyCFunction)igraphmodule_Graph_get_adjacency,
@@ -984,6 +986,26 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "Returns the edge list of a graph."
   },
   
+  // interface to igraph_to_directed
+  {"to_directed", (PyCFunction)igraphmodule_Graph_to_directed,
+   METH_VARARGS | METH_KEYWORDS,
+   "to_directed(mutual=True) -> None\n\n"
+   "Converts an undirected graph to directed.\n\n"
+   "@param mutual: C{True} if mutual directed edges should be\n"
+   "  created for every undirected edge. If C{False}, a directed\n"
+   "  edge with arbitrary direction is created.\n"
+  },
+
+  // interface to igraph_to_undirected
+  {"to_undirected", (PyCFunction)igraphmodule_Graph_to_undirected,
+   METH_VARARGS | METH_KEYWORDS,
+   "to_undirected(collapse=True) -> None\n\n"
+   "Converts a directed graph to undirected.\n\n"
+   "@param collapse: C{True} if only a single edge should be\n"
+   "  created from multiple directed edges going between the\n"
+   "  same vertex pair. If C{False}, the edge count is kept constant.\n"
+  },
+
   ///////////////////////////////
   // LOADING AND SAVING GRAPHS //
   ///////////////////////////////

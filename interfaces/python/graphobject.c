@@ -2812,6 +2812,49 @@ PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \function igraphmodule_Graph_to_undirected
+ * \brief Converts a directed graph to an undirected one.
+ * \return The undirected graph.
+ * \sa igraph_to_undirected
+ */
+PyObject* igraphmodule_Graph_to_undirected(igraphmodule_GraphObject *self,
+					   PyObject *args,
+					   PyObject *kwds) {
+  PyObject *collapse=Py_True;
+  igraph_to_undirected_t mode=IGRAPH_TO_UNDIRECTED_COLLAPSE;
+  static char *kwlist[] = { "collapse", NULL };
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &collapse))
+    return NULL;
+  mode=(PyObject_IsTrue(collapse) ? IGRAPH_TO_UNDIRECTED_COLLAPSE : IGRAPH_TO_UNDIRECTED_EACH);
+  if (igraph_to_undirected(&self->g, mode)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  Py_RETURN_NONE;
+}
+
+
+/** \ingroup python_interface_graph
+ * \function igraphmodule_Graph_to_directed
+ * \brief Converts an undirected graph to a directed one.
+ * \return The directed graph.
+ * \sa igraph_to_directed
+ */
+PyObject* igraphmodule_Graph_to_directed(igraphmodule_GraphObject *self,
+					 PyObject *args,
+					 PyObject *kwds) {
+  PyObject *mutual=Py_True;
+  igraph_to_directed_t mode=IGRAPH_TO_DIRECTED_MUTUAL;
+  static char *kwlist[] = { "mutual", NULL };
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &mutual))
+    return NULL;
+  mode=(PyObject_IsTrue(mutual) ? IGRAPH_TO_DIRECTED_MUTUAL : IGRAPH_TO_DIRECTED_ARBITRARY);
+  if (igraph_to_directed(&self->g, mode)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface_graph
  * \brief Reads an edge list from a file and creates a graph from it.
  * \return the graph
  * \sa igraph_read_graph_edgelist
