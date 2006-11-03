@@ -81,9 +81,6 @@ binary-arch: build install
 			usr/lib/libigraph.la        \
 			usr/lib/pkgconfig/igraph.pc
 			
-	dh_movefiles -ppython2.4-igraph    \
-	    usr/lib/python2.4/site-packages/igraph.so
-			
 #	dh_installdebconf	
 	dh_installdocs
 #	dh_installexamples
