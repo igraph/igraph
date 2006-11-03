@@ -35,6 +35,7 @@
 #include "edgeseqobject.h"
 #include "edgeobject.h"
 #include "bfsiter.h"
+#include "config.h"
 
 /**
  * \defgroup python_interface Python module implementation
@@ -1028,9 +1029,7 @@ static PyMethodDef igraphmodule_methods[] =
 
 extern PyObject* igraphmodule_InternalError;
 
-PyMODINIT_FUNC
-initigraph(void)
-{
+PyMODINIT_FUNC init_igraph(void) {
   PyObject* m;  ///< igraph module object
   
   igraphmodule_VertexSeqType.tp_traverse = (traverseproc)igraphmodule_VertexSeq_traverse;
@@ -1060,7 +1059,7 @@ initigraph(void)
   
   Py_INCREF(igraphmodule_InternalError);
   
-  m = Py_InitModule3("igraph", igraphmodule_methods,
+  m = Py_InitModule3("igraph._igraph", igraphmodule_methods,
 		     "Python interface for the igraph library");
   
   Py_INCREF(&igraphmodule_GraphType);
@@ -1098,7 +1097,10 @@ initigraph(void)
   PyModule_AddIntConstant(m, "ADJ_PLUS", IGRAPH_ADJ_PLUS);
   PyModule_AddIntConstant(m, "ADJ_UPPER", IGRAPH_ADJ_UPPER);
   PyModule_AddIntConstant(m, "ADJ_LOWER", IGRAPH_ADJ_LOWER);
-  
+
+  PyModule_AddStringConstant(m, "__version__", VERSION);
+  PyModule_AddStringConstant(m, "__build_date__", __DATE__);
+
   /* initialize error, progress and interruption handler */
   igraph_set_error_handler(igraphmodule_igraph_error_hook);
   igraph_set_progress_handler(igraphmodule_igraph_progress_hook);

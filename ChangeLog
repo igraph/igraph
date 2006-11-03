@@ -1,3 +1,13 @@
+2006-11-03  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python, configure.in : modified to use Python's
+	distutils build mechanism instead.
+	* interfaces/python/package/__init__.py : the Python package is
+	now divided into two submodule: igraph._igraph is the interface
+	to the C functions, while the main igraph module just imports
+	igraph._igraph and adds non time-critical functionality on top
+	of it
+
 2006-10-30  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/graphobject.c (igraphmodule_Graph_to_directed)

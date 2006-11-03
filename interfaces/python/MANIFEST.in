@@ -1,0 +1,4 @@
+include src/*.h
+include igraph/*.h
+MANIFEST.in
+LICENSE
