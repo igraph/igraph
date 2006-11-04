@@ -2,6 +2,9 @@
 
 	* src/flow.c (igraph_i_vertex_connectivity_directed) : corrected
 
+	* src/flow.c (igraph_vertex_disjoint_paths) : make it work for
+	adjacent vertices
+	
 2006-11-03  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python, configure.in : modified to use Python's

@@ -1074,8 +1074,40 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 
   igraph_are_connected(graph, source, target, &conn);
   if (conn) { 
-    IGRAPH_ERROR("cannot calculate number of disjoint paths between neighbors",
-		 IGRAPH_EINVAL);
+    /* We need to remove every (possibly directed) edge between source
+       and target and calculate the disjoint paths on the new
+       graph. Finally we add 1 for the removed connection(s).  */
+    igraph_es_t es;
+    igraph_vector_t v;
+    igraph_t newgraph;
+    IGRAPH_VECTOR_INIT_FINALLY(&v, 2);
+    VECTOR(v)[0]=source;
+    VECTOR(v)[1]=target;
+    IGRAPH_CHECK(igraph_es_multipairs(&es, &v, IGRAPH_DIRECTED));
+    IGRAPH_FINALLY(igraph_es_destroy, &es);
+    
+    IGRAPH_CHECK(igraph_copy(&newgraph, graph));    
+    IGRAPH_FINALLY(igraph_destroy, &newgraph);
+    IGRAPH_CHECK(igraph_delete_edges(&newgraph, es));
+
+    if (igraph_is_directed(graph)) {
+      IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(&newgraph, res,
+							    source, target,
+							    IGRAPH_VCONN_NEI_IGNORE));
+    } else {
+      IGRAPH_CHECK(igraph_i_st_vertex_connectivity_undirected(&newgraph, res,
+							      source, target, 
+							      IGRAPH_VCONN_NEI_IGNORE));
+    }
+
+    if (res) {
+      *res += 1;
+    }
+    
+    IGRAPH_FINALLY_CLEAN(3);
+    igraph_destroy(&newgraph);
+    igraph_es_destroy(&es);
+    igraph_vector_destroy(&v);
   }
 
   if (igraph_is_directed(graph)) {
