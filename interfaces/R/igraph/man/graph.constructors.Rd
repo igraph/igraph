@@ -21,7 +21,7 @@ graph.lattice(dimvector = NULL, length = NULL, dim = NULL, nei = 1,
 \usage{
 graph.empty(n=0, directed=TRUE)
 graph(edges, n=max(edges)+1, directed=TRUE)
-graph.adjacency(adjmatrix, mode="directed")
+graph.adjacency(adjmatrix, mode="directed", weighted=NULL)
 graph.star(n, mode = "in", center = 0)
 graph.lattice(dimvector, nei = 1, directed = FALSE, mutual = FALSE, 
               circular = FALSE)
@@ -89,13 +89,21 @@ graph.data.frame(d, directed=TRUE)
     to their parents, while \code{undirected} creates an undirected
     graph. 
   }
+  \item{weighted}{This argument specifies whether to create a weighted
+    graph from an adjacency matrix. If it is \code{NULL} then an
+    unweighted graph is created and the elements of the adjacency matrix
+    gives the number of edges between the vertices. If it is a character
+    constant then for every non-zero matrix entry an edge is created and
+    the value of the entry is added as an edge attribute named by the
+    \code{weighted} argument. If it is \code{TRUE} then the name of the
+    edge attribute will be \code{weight}.}
   \item{center}{For \code{graph.star} the center vertex of the graph, by
     default the first vertex.}
   \item{dimvector}{A vector giving the size of the lattice in each
     dimension, for \code{graph.lattice}.}
   \item{nei}{The distance within which (inclusive) the neighbors on the
     lattice will be connected. This parameter is not used right now.}
-  \item{mutual}{Logical, if TRUE directed lattices we be mutually
+  \item{mutual}{Logical, if TRUE directed lattices will be mutually
     connected.} 
   \item{circular}{Logical, if TRUE the lattice or ring will be circular.}
   \item{length}{Integer constant, for regular lattices, the size of the
@@ -165,17 +173,21 @@ g1 <- graph.empty()
 g2 <- graph( c(1,2,2,3,3,4,5,6), directed=FALSE )
 adjm <- matrix(sample(0:1, 100, replace=TRUE, prob=c(0.9,0.1)), nc=10)
 g3 <- graph.adjacency( adjm )
-g4 <- graph.star(10, mode="out")
-g5 <- graph.lattice(c(5,5,5))
-g6 <- graph.lattice(length=5, dim=3)
-g7 <- graph.ring(10)
-g8 <- graph.tree(10, 2)
-g9 <- graph.full(5, loops=TRUE)
-g10 <- graph.atlas(sample(0:1252, 1))
+adjm <- matrix(sample(0:5, 100, replace=TRUE,
+                      prob=c(0.9,0.02,0.02,0.02,0.02,0.02)), nc=10)
+g4 <- graph.adjacency(adjm, weighted=TRUE)
+E(g4)$weight
+g5 <- graph.star(10, mode="out")
+g6 <- graph.lattice(c(5,5,5))
+g7 <- graph.lattice(length=5, dim=3)
+g8 <- graph.ring(10)
+g9 <- graph.tree(10, 2)
+g10 <- graph.full(5, loops=TRUE)
+g11 <- graph.atlas(sample(0:1252, 1))
 el <- matrix( c("foo", "bar", "bar", "foobar"), nc=2, byrow=TRUE)
-g11 <- graph.edgelist(el)
+g12 <- graph.edgelist(el)
 d <- as.data.frame(el)
 d$weight <- 1:2
-g12 <- graph.data.frame(d)
+g13 <- graph.data.frame(d)
 }
 \keyword{graphs}

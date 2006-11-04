@@ -26,7 +26,7 @@ graph <- function( edges, n=max(edges)+1, directed=TRUE ) {
         PACKAGE="igraph")
 }
 
-graph.adjacency <- function( adjmatrix, mode="directed" ) {
+graph.adjacency <- function( adjmatrix, mode="directed", weighted=NULL ) {
   mode <- switch(mode,
                  "directed"=0,
                  "undirected"=1,
@@ -35,11 +35,54 @@ graph.adjacency <- function( adjmatrix, mode="directed" ) {
                  "lower"=3,
                  "min"=4,
                  "plus"=5)
-  attrs <- attributes(adjmatrix)
-  adjmatrix <- as.numeric(adjmatrix)
-  attributes(adjmatrix) <- attrs
-  .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),
-        PACKAGE="igraph")
+  if (!is.null(weighted)) {
+    if (is.logical(weighted) && weighted) {
+      weighted <- "weight"
+    }
+    if (!is.character(weighted)) {
+      stop("invalid value supplied for `weighted' argument, please see docs.")
+    }
+
+    if (nrow(adjmatrix) != ncol(adjmatrix)) {
+      stop("not a square matrix")
+    }
+    
+    no.edges <- sum(adjmatrix > 0)
+    edges <- numeric(2*no.edges)
+    weight <- numeric(no.edges)
+    ptr <- 1
+    if (no.edges == 0) {
+      res <- graph.empty(directed=(mode==0))
+      res <- set.edge.attribute(res, weighted, value=1)
+      res
+    } else {
+      for (i in 1:nrow(adjmatrix)) {
+        for (j in 1:ncol(adjmatrix)) {
+          if (adjmatrix[i,j] != 0) {
+            edges[2*ptr-1] <- i-1
+            edges[2*ptr] <- j-1
+            weight[ptr] <- adjmatrix[i,j]
+            ptr <- ptr + 1
+          }          
+        }
+      }
+      res <- graph.empty(n=nrow(adjmatrix), directed=(mode==0))
+      weight <- list(weight)
+      names(weight) <- weighted
+      res <- add.edges(res, edges, attr=weight)
+      res
+    }
+    
+  } else {
+  
+    adjmatrix <- as.matrix(adjmatrix)
+    attrs <- attributes(adjmatrix)
+    adjmatrix <- as.numeric(adjmatrix)
+    attributes(adjmatrix) <- attrs
+    
+    .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),
+          PACKAGE="igraph")
+  }
 }
   
 
