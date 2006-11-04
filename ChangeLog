@@ -1,3 +1,7 @@
+2006-11-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/flow.c (igraph_i_vertex_connectivity_directed) : corrected
+
 2006-11-03  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python, configure.in : modified to use Python's

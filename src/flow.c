@@ -641,8 +641,11 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   case IGRAPH_VCONN_NEI_INFINITY:
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
     if (conn1) {
+/*       fprintf(stderr, "%li -> %li connected\n", (long int)source, (long int) target); */
       *res=1.0/0.0;
       return 0;
+/*     } else { */
+/*       fprintf(stderr, "not connected\n"); */
     }
     break;
   case IGRAPH_VCONN_NEI_IGNORE:
@@ -812,22 +815,20 @@ int igraph_i_vertex_connectivity_directed(const igraph_t *graph,
 					igraph_integer_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  long int i;
-  igraph_integer_t minconn=LONG_MAX, conn;
+  long int i, j;
+  igraph_integer_t minconn=no_of_nodes-1, conn;
 
-  for (i=1; i<no_of_nodes; i++) {
-    IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn, 0, i, 
-					       IGRAPH_VCONN_NEI_INFINITY));
-    if (conn < minconn) {
-      minconn = conn;
-      if (conn == 0) { break; }
+  for (i=0; i<no_of_nodes; i++) {
+    for (j=0; j<no_of_nodes; j++) {
+      if (i==j) { continue; }
+      IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn, i, j, 
+						 IGRAPH_VCONN_NEI_INFINITY));
+      if (conn < minconn) {
+	minconn = conn;
+	if (conn == 0) { break; }
+      }
     }
-    IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn, i, 0, 
-					       IGRAPH_VCONN_NEI_INFINITY));
-    if (conn < minconn) {
-      minconn = conn;
-      if (conn == 0) { break; }
-    }
+    if (conn == 0) { break; }
   }
 
   if (res) {
@@ -841,7 +842,7 @@ int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
 					    igraph_integer_t *res) {
   long int no_of_nodes=igraph_vcount(graph);
   igraph_t newgraph;
-  
+
   IGRAPH_CHECK(igraph_copy(&newgraph, graph));
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
   IGRAPH_CHECK(igraph_to_directed(&newgraph, IGRAPH_TO_DIRECTED_MUTUAL));
@@ -869,7 +870,7 @@ int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
  * \param res Pointer to an integer, the result will be stored here. 
  * \return Error code.
  * 
- * Time complecity: O(|V|^4).
+ * Time complecity: O(|V|^5).
  * 
  * \sa \ref igraph_st_vertex_connectivity(), \ref igraph_maxflow_value(),
  * and \ref igraph_edge_connectivity(). 
