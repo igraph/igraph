@@ -10,8 +10,109 @@
 <section><title>Flows in Directed Graphs</title>
 
 <para>
-In this chapter we will discuss how to use igraph to solve a
-fundamental graph problem: the maximum flow problem. Let us have a 
+Imagine that you have a transportation network described by a directed
+graph. Each transportation route has a given capacity, the amount of
+goods that can be carried from a given city to another one in unit
+time. Imagine also that you have a factory (the source vertex) in a
+given city that produces the goods and there is a consumer (the target
+vertex) which consumes the goods produced in the factory. The factory
+can produce arbitrary an large volume of goods, and the consumer can
+comsume an arbitrary large volume of goods as well. The bottleneck of
+the system is the transportation. We want to know the amount of goods
+that can be transported from the source to the target in a time unit.
+This is the maximum flow problem.
+</para>
+
+<para>
+The mathematical definition of this problem is as follows: let G=(V,E)
+be a directed graph with vertices V and edges E, and let c:E->R+, a
+function which assigns non-negative numbers to the edges of the graph,
+this is the capacity of the edge. Let s and t two different vertices
+of the graph, the source and the target vertex respectively. A flow is
+a f:E->R+ function assigning non-negative number to the edges, such
+that: (1) f(e) &lt;= c(e) for every edge, (2) the incoming flow is the
+same as the outgoing flow except for s and t, 
+sum(f(i->j), i) == sum(f(j->k), k) for every j vertex. The value of
+the flow is the incoming flow at the target vertex: sum(f(i->t), i).
+The maximum flow is the flow of maximal value.
+</para>
+
+<para>
+There are many algorithms for determining the maximum flow in a
+directed networks, the classic one was suggested by Ford and Furkelson
+(TODO: cite). A popular algorithm is the push/relabel method of
+Goldberg and Tarjan (TODO: cite) and this is implemented in &igraph;. 
+The current &igraph; implementation does not actually calculate the
+maximum flow itself, only its value. Let us see a small example:
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g1 &lt;- graph.ring(9, directed=TRUE)
+<prompt>> </prompt>g2 &lt;- graph.star(10, center=9, mode="out")
+<prompt>> </prompt>g &lt;- graph.union(g1, g2)
+<prompt>> </prompt>g &lt;- add.edges(g, c(3,9))
+<prompt>> </prompt>E(g)$capacity &lt;- sample(1:10, ecount(g), replace=TRUE)
+<prompt>> </prompt>E(g)[ 3 %--% 9 ]$capacity &lt;- 5
+<prompt>> </prompt>id &lt;- tkplot(g, layout=layout.kamada.kawai, edge.labels=E(g)$capacity)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="flow1.pdf" format="PDF"/></imageobject>
+<imageobject><imagedata fileref="flow1.png" format="PNG"/></imageobject>
+</mediaobject>
+</informalexample>
+We create a wheel graph, as the union of a star and a ring graph as
+there is no built-in wheel graph constructor in &igraph;. Then we add a
+directed edge (3->9) to make the graph strongly connected. We assign
+random capacities to the edges and make sure that edges 3->9 and 9->3
+have the same capacity, just to make the plot clear. Let us now do
+some maximum flow calculations:
+<informalexample><programlisting>
+<prompt>> </prompt>graph.maxflow(g, 2, 7)
+</programlisting>
+<screen>
+[1] 7
+</screen>
+<programlisting>
+<prompt>> </prompt>graph.maxflow(g, 3, 6)
+</programlisting>
+<screen>
+[1] 7
+</screen>
+</informalexample>
+The maximum flow from 2 to 7 is 7, 5 amounts of flow along 2->3->9->7
+and 2 amounts along 2->3->4->5->6->7. The maximum flow from 3 to 6 is 
+also 7, 4 amounts of flow along 3->9->6, 1 along 3->9->5->6,
+and 2 amounts along 3->4->5->6.
+</para>
+
+<para>
+Let us create a nice plot with the maximum flow from 3 to
+6. Unfortunately we must set the edge labels by hand, as &igraph; cannot
+calculate the flow itself. 
+<informalexample>
+<programlisting>
+<prompt>> </prompt>E(g)$color &lt;- "grey"
+<prompt>> </prompt>E(g, path=c(3,9,6))$color &lt;- "red"
+<prompt>> </prompt>E(g, path=c(3,9,5,6))$color &lt;- "red"
+<prompt>> </prompt>E(g, path=c(3,4,5,6))$color &lt;- "red"
+<prompt>> </prompt>V(g)$color &lt;- "lightblue"
+<prompt>> </prompt>V(g)[3]$color &lt;- "pink"
+<prompt>> </prompt>V(g)[6]$color &lt;- "orange"
+<prompt>> </prompt>E(g)$label &lt;- E(g)$capacity
+<prompt>> </prompt>E(g)[ 3 %->% 9 ]$label &lt;- "5/5"
+<prompt>> </prompt>E(g)[ 3 %->% 4 ]$label &lt;- "2/2"
+<prompt>> </prompt>E(g)[ 9 %->% 6 ]$label &lt;- "4/4"
+<prompt>> </prompt>E(g)[ 9 %->% 5 ]$label &lt;- "1/2"
+<prompt>> </prompt>E(g)[ 4 %->% 5 ]$label &lt;- "2/8"
+<prompt>> </prompt>E(g)[ 5 %->% 6 ]$label &lt;- "3/3"
+<prompt>> </prompt>coords &lt;- tkplot.getcoords(id)
+<prompt>> </prompt>tkplot(g, layout=coords, edge.labels=E(g)$label,
+       edge.color=E(g)$color, vertex.color=V(g)$color)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="flow2.pdf" format="PDF"/></imageobject>
+<imageobject><imagedata fileref="flow2.png" format="PNG"/></imageobject>
+</mediaobject>
+</informalexample>
 </para>
 
 </section>
@@ -19,33 +120,386 @@ fundamental graph problem: the maximum flow problem. Let us have a
 <!--- ################################################################ -->
 
 <section><title>Flows in Undirected Graphs</title>
-<para></para>
+<para>
+A maximum flow in an undirected graph is of course similar to the
+directed version. We assume that on an edge e with capacity c(e) it is
+possible to have flows in both directions at the same time, ie. we
+replace the undirected graph with a directed graph by rewriting each
+undirected edge with two directed edges having the same capacities as
+the undirected edge. There is a slight problem with this
+representation: the total flow on the undirected edge can be
+larger than its capacity if there is big enogh flow on both
+corresponding directed edges. This is not a real problem however since
+the flow can be replaced with another flow of the same value and not
+violating the capacity limits. If the flow on the two edges are f(e1)
+and f(e2) then these can be replaced by f(e1)-min(f(e1), f(e2)) and
+f(e2)-min(f(e1), f(e2)).
+</para>
+
+<para>
+Let us see the previous example, but this time with an undirected
+graph:
+<informalexample><programlisting>
+<prompt>> </prompt>el &lt;- cbind(get.edgelist(g), E(g)$capacity)
+<prompt>> </prompt>el &lt;- el[ el[,1] != 3 | el[,2] != 9, ]
+<prompt>> </prompt>g2 &lt;- graph.empty(n=vcount(g), directed=FALSE)
+<prompt>> </prompt>g2 &lt;- add.edges(g2, t(el[,1:2]), attr=list(capacity=el[,3]))
+<prompt>> </prompt>tkplot(g2, layout=coords, edge.labels=E(g2)$capacity)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="flow3.pdf" format="PDF"/></imageobject>
+<imageobject><imagedata fileref="flow3.png" format="PNG"/></imageobject>
+</mediaobject>
+<programlisting>
+<prompt>> </prompt>graph.maxflow(g, 2, 7)
+</programlisting>
+<screen>
+[1] 13
+</screen>
+<programlisting>
+<prompt>> </prompt>graph.maxflow(g, 3, 6)
+</programlisting>
+<screen>
+[1] 13
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g2)$label &lt;- E(g2)$capacity
+<prompt>> </prompt>flow.edges &lt;- c(1,2, 2,3, 3,4, 4,5, 5,6, 6,7, 
+        1,9, 2,9, 3,9, 5,9, 6,9, 7,9)
+<prompt>> </prompt>E(g2, P=flow.edges)$label &lt;- c("3/3","6/7","2/2","2/8","3/3","6/7",
+        "3/6","3/3","5/5","1/2","4/4","6/6")
+<prompt>> </prompt>E(g2)$color &lt;- "grey"
+<prompt>> </prompt>E(g2, P=flow.edges)$color &lt;- "red"
+<prompt>> </prompt>V(g2)$color &lt;- V(g)$color
+<prompt>> </prompt>tkplot(g2, layout=coords, edge.color=E(g2)$color, 
+       edge.label=E(g2)$label, vertex.color=V(g2)$color)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="flow4.pdf" format="PDF"/></imageobject>
+<imageobject><imagedata fileref="flow4.png" format="PNG"/></imageobject>
+</mediaobject>
+</informalexample>
+This example would be of course much more simpler if &igraph; could
+calculate the actual maximum flow.
+</para>
+
 </section>
 
 <!--- ################################################################ -->
 
 <section><title>Minumum Cuts</title>
-<para></para>
+<para>
+Let us first deal with the directed minimum s-t cut problem. Let
+G=(V,E) be a directed graph and s, t two vertices from V. Let w:E->R+ a
+function which assigns non-negative weights to the vertices. What is
+the minimum total weight of the edges needed to remove to eliminate
+all directed paths from s to t?
+</para>
+
+<para>
+If there is no directed path at all from s to t, then the minimum s-t
+cut is zero.
+</para>
+
+<para>
+Note that in the directed case the problem is not symmetric, the edges
+required to remove the paths from s to t are not neccesarily the same
+needed to remove all paths from t to s. Here is an example for a
+simple tree.
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph.tree(15)
+<prompt>> </prompt>E(g)$capacity &lt;- 1
+<prompt>> </prompt>plot(g, layout=layout.reingold.tilford)
+</programlisting>
+<mediaobject>
+<imageobject><imagedata fileref="flow5.pdf" format="PDF"/></imageobject>
+<imageobject><imagedata fileref="flow5.png" format="PNG"/></imageobject>
+</mediaobject>
+<programlisting>
+<prompt>> </prompt>graph.mincut(g, 0, 10)
+</programlisting>
+<screen>
+[1] 1
+</screen>
+<programlisting>
+<prompt>> </prompt>graph.mincut(g, 10, 0)
+</programlisting>
+<screen>
+[1] 0
+</screen>
+</informalexample>
+</para>
+
+<para>
+Calculating the minimum s-t cut requires a maximum flow computation
+from vertex s to vertex t, moreover in fact the value of the minimum
+cut is the same as the value of the maximum flow from s to t.
+</para>
+
+<para>
+The minimum cut in a graph is a the minimum cut of all possible s-t
+cuts. <function>graph.mincut()</function> cat calculate this as well,
+but (as usual) it does not give the actual edges in cut, only the
+value of the cut, the total weight (called capacity in the maximum
+flow problem).
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph.full(10)
+<prompt>> </prompt>E(g)$capacity &lt;- 1
+<prompt>> </prompt>graph.mincut(g, 0, 5)
+</programlisting>
+<screen>
+[1] 9
+</screen>
+<programlisting>
+<prompt>> </prompt>graph.mincut(g)
+</programlisting>
+<screen>
+[1] 9
+</screen>
+<programlisting>
+<prompt>> </prompt>graph.maxflow(g, 0, 5)
+</programlisting>
+<screen>
+[1] 9
+</screen>
+</informalexample>
+</para>
+
 </section>
 
 <section><title>Edge Connectivity</title>
-<para></para>
+<para>
+The edge connectivity of two vertices (say s and t) in a graph is
+simply the number of edges that needed to be removed to eliminate all
+paths from s to d. Note that this is a special case of a minimum s-t
+cut, where all edges have capacity 1. In the following example we use
+the wheel graph, as shown previously at the discussion of undirected
+maximum flows. 
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph.union(graph.ring(9), 
+                   graph.star(10, c=9, mode="undirected"))
+<prompt>> </prompt>edge.connectivity(g, 1, 6)
+</programlisting>
+<screen>
+[1] 3
+</screen>
+<programlisting>
+<prompt>> </prompt>E(g)$capacity &lt;- 1
+<prompt>> </prompt>graph.mincut(g, 1, 6)
+</programlisting>
+<screen>
+[1] 3
+</screen>
+</informalexample>
+</para>
+
+<para>
+The edge connectivity of a graph is the minimum number of edges needed
+to remove to disconnect the graph. This happens to be the same as the
+minimum of the edge connectivities of every pairs of vertices,
+although the edge connectivity of a graph is calculated in a different
+way, as the following example demonstrates.
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- simplify(ba.game(10,m=4,directed=F))
+<prompt>> </prompt>edge.connectivity(g)
+</programlisting>
+<screen>
+[1] 2
+</screen>
+<programlisting>
+<prompt>> </prompt>sapply(1:9, function(i) edge.connectivity(g,0,i))
+</programlisting>
+<screen>
+[1] 4 2 4 3 2 4 3 3 4
+</screen>
+<programlisting>
+<prompt>> </prompt>min(sapply(1:9, function(i) edge.connectivity(g,0,i)))
+</programlisting>
+<screen>
+[1] 2
+</screen>
+</informalexample>
+It is possible to calculate the edge connectivity of a graph without
+calculating the edge connectivity of all possible pairs of vertices;
+this is done by fixing a vertex (like vertex 0 in the example) and
+calculating the edge connectivity between this vertex and all the
+other vertices in the graph. Note that if the graph is directed then 
+the edge connectivity between the fixed vertex and the other vertices
+has to be calculated both ways.
+</para>
+
 </section>
 
 <section><title>Edge-disjoint Paths</title>
-<para></para>
+<para>
+Two paths are edge-disjoint if they do not contain common edges. The
+number of edge-disjoint paths between two vertices can be also
+calculated by maximum flow techniques, moreover this number is simply
+the same the the edge-connectivity of the two vertices. In &igraph;
+the <function>edge.disjoint.paths()</function> function does simply the
+same as <function>edge.connectivity()</function> called with three
+arguments. 
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- simplify(ba.game(10,m=4,directed=F))
+<prompt>> </prompt>sapply(1:9, function(i) edge.disjoint.paths(g,0,i))
+</programlisting>
+<screen>
+[1] 5 6 3 2 2 3 3 2 3
+</screen>
+<programlisting>
+<prompt>> </prompt>sapply(1:9, function(i) edge.connectivity(g,0,i))
+</programlisting>
+<screen>
+[1] 5 6 3 2 2 3 3 2 3
+</screen>
+</informalexample>
+</para>
 </section>
 
 <section><title>Vertex Connectivity</title>
-<para></para>
+<para>
+The vertex connectivity (also called connectivity) of two vertices (s
+and t) is the number of vertices needed to remove from the graph to
+eliminate all (possible directed) paths from s to t. Note that this
+quantity is not defined if s and t are adjacent.
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- simplify(ba.game(10,m=4,directed=F))
+<prompt>> </prompt>nodes &lt;- V(g)[!nei(9)] ; nodes &lt;- nodes[ nodes != 9 ]
+<prompt>> </prompt>vc &lt;- rep(NA, vcount(g))
+<prompt>> </prompt>vc[nodes] &lt;- sapply(nodes, function(i)
+          vertex.connectivity(g,9,i))
+<prompt>> </prompt>vc
+</programlisting>
+<screen>
+ [1] NA  1  2  3 NA  2  2  1 NA NA
+</screen>
+</informalexample>
+Here we first extract those vertices to which it makes sence to
+calculate the vertex connectivity from vertex 9. These are all
+non-adjacent vertices to vertex 9, except for  vertex 9 itself. Then
+we calculate the vertex connectivity to these vertices.
+</para>
+
+<para>
+The vertex connectivity (or simply connectivity) of a graph the
+minimum number of vertices needed to remove from it to disconnect the
+graph. For a full graph, the vertex connectivity is defined to be the
+number of vertices minus one. The vertex connectivity of a graph can
+be obtained if the vertex connectivity of every non-adjacent pairs of
+vertices is calculated and the minimum of these is taken.
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph.union(graph.ring(9), 
+                   graph.star(10, c=9, mode="undirected"))
+<prompt>> </prompt>vc &lt;- vcount(g)
+<prompt>> </prompt>for (i in 1:vcount(g)) {
+  for (j in 1:vcount(g)) {
+    if (i!=j &amp;&amp; ! (j-1) %in% neighbors(g, i-1)) {
+      vc2 &lt;- vertex.connectivity(g, i-1, j-1)
+      if (vc2 &lt; vc) { vc &lt;- vc2 }
+    }
+  }
+}
+<prompt>> </prompt>vc
+</programlisting>
+<screen>
+[1] 3
+</screen>
+<programlisting>
+<prompt>> </prompt>vertex.connectivity(g)
+</programlisting>
+<screen>
+[1] 3
+</screen>
+</informalexample>
+In this example we calculate the vertex connectivity of the wheel
+graph in two ways, first by taking the minimum of all possible
+pairwise vertex connectivities and then by simply calling
+<function>vertex.connectivity()</function>.
+</para>
 </section>
 
 <section><title>Vertex-disjoint Paths</title>
-<para></para>
+
+<para>
+A set of (possibly directed) paths from vertex s to vertex is said to
+be vertex-disjoint is they don't contain common vertices (apart from
+s and t). The maximum number of vertex disjoint paths can be
+calculated with the <function>vertex.disjoint.paths()</function>
+function in &igraph;. Actually in most cases the number of vertex
+disjoint paths is the same as the vertex connectivity of the two
+vertices in question, see the previous section. The only exception is
+when the two vertices are connected by an edge (or more edges). In the
+latter case the vertex connectivity is not defined (it makes no
+sense), but it is meaningful to ask the number of vertex disjoint
+paths between the connected vertices, so this can be calculated by
+<function>vertex.disjoint.paths()</function>.
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph.union(graph.ring(9), 
+                   graph.star(10, c=9, mode="undirected"))
+<prompt>> </prompt>vertex.connectivity(g, 0, 1)
+</programlisting>
+<screen>
+Error in vertex.connectivity(g, 0, 1) : At flow.c:722 : vertices
+connected, Invalid value
+</screen>
+<programlisting>
+<prompt>> </prompt>vertex.disjoint.paths(g, 0, 1)
+</programlisting>
+<screen>
+[1] 3
+</screen>
+</informalexample>
+</para>
+
 </section>
 
 <section><title>Graph Cohesion and Adhesion</title>
-<para></para>
+
+<para>
+Group cohesion and group adhesion was defined in a nice paper by
+Douglas R. White and Frank Harary (TODO: citation). Simply put,
+the cohesion of a group is the vertex connectivity of its subgraph and
+adhesion of a group is the edge connectivity of its subgraph. Thus
+<function>graph.cohesion()</function> and
+<function>graph.adhesion()</function> always give the same results in
+&igraph;.
+<informalexample>
+<programlisting>
+<prompt>> </prompt>g &lt;- graph( c(0,1, 0,2, 1,2, 2,3, 2,4, 3,4), dir=F)
+<prompt>> </prompt>vertex.connectivity(g)
+</programlisting>
+<screen>
+[1] 1
+</screen>
+<programlisting>
+<prompt>> </prompt>graph.cohesion(g)
+</programlisting>
+<screen>
+[1] 1
+</screen>
+<programlisting>
+<prompt>> </prompt>edge.connectivity(g)
+</programlisting>
+<screen>
+[1] 2
+</screen>
+<programlisting>
+<prompt>> </prompt>graph.adhesion(g)
+</programlisting>
+<screen>
+[1] 2
+</screen>
+</informalexample>
+</para>
+
 </section>
 
 </chapter>
