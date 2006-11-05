@@ -1,5 +1,6 @@
 include src/*.h
 include igraph/*.h
+include test.py
 include MANIFEST.in
 include LICENSE
 
