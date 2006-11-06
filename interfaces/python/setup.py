@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from distutils.core import setup, Extension
+from distutils.file_util import copy_file
 from sys import version, exit
 import glob
 import os.path
@@ -45,14 +46,16 @@ def detect_libxml2_library_dirs(default = LIBXML2_FALLBACK_LIBRARY_DIRS):
 
 def detect_igraph_source():
     """Tries to detect the igraph sources and copy it to igraph/ if necessary"""
-    if os.path.isfile(os.path.join('igraph', 'igraph.h')): return
     if not os.path.isdir('igraph'): os.mkdir('igraph')
     if os.path.isfile(os.path.join('..', '..', 'src', 'igraph.h')):
 	files_to_copy = ['*.c', '*.h', '*.y']
 	src_files = [os.path.join('..', '..', 'config.h')]
 	for wildcard in files_to_copy:
 	    src_files.extend(glob.glob(os.path.join('..', '..', 'src', wildcard)))
-	for src_file in src_files: copy2(src_file, 'igraph')
+	for src_file in src_files:
+	    copy_file(src_file, 'igraph', update=1)
+	
+	return
 	
 def igraph_version():
     """Returns igraph version number"""
