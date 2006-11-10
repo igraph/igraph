@@ -95,7 +95,11 @@ class PottsModel {
     long   WriteSoftClusters(char *filename, double threshold);
     double Get_Energy(void) { return energy;}
     double FindCommunityFromStart(double gamma, double prob, char *nodename,
-				  igraph_vector_t *result);
+				  igraph_vector_t *result, 
+				  igraph_real_t *cohesion,
+				  igraph_real_t *adhesion,
+				  igraph_integer_t *inner_links,
+				  igraph_integer_t *outer_links);
 };
 
 #endif

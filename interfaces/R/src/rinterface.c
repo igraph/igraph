@@ -4590,6 +4590,10 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
   igraph_spincomm_update_t update_rule=REAL(pupdate_rule)[0];
   igraph_real_t gamma=REAL(pgamma)[0];
   igraph_vector_t community;
+  igraph_real_t cohesion;
+  igraph_real_t adhesion;
+  igraph_integer_t inner_links;
+  igraph_integer_t outer_links;
   SEXP result, names;
 
   R_igraph_before();
@@ -4598,14 +4602,27 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
   R_SEXP_to_vector(pweights, &weights);
   igraph_vector_init(&community, 0);
   igraph_spinglass_my_community(&g, &weights, vertex, &community,
-				spins, update_rule, gamma);
+				&cohesion, &adhesion, &inner_links,
+				&outer_links, spins, update_rule, gamma);
   
-  PROTECT(result=NEW_LIST(1));
-  PROTECT(names=NEW_CHARACTER(1));
+  PROTECT(result=NEW_LIST(5));
+  PROTECT(names=NEW_CHARACTER(5));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(igraph_vector_size(&community)));
+  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(1));
+  SET_VECTOR_ELT(result, 2, NEW_NUMERIC(1));
+  SET_VECTOR_ELT(result, 3, NEW_NUMERIC(1));
+  SET_VECTOR_ELT(result, 4, NEW_NUMERIC(1));
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("community"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("cohesion"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("adhesion"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("inner.links"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("outer.links"));
   SET_NAMES(result, names);
   igraph_vector_copy_to(&community, REAL(VECTOR_ELT(result, 0)));
+  REAL(VECTOR_ELT(result, 1))[0] = cohesion;
+  REAL(VECTOR_ELT(result, 2))[0] = adhesion;
+  REAL(VECTOR_ELT(result, 3))[0] = inner_links;
+  REAL(VECTOR_ELT(result, 4))[0] = outer_links;
   
   igraph_vector_destroy(&community);
   

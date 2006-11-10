@@ -1102,8 +1102,13 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob, char *noden
 //###############################################################################################
 //# Here we try to minimize the affinity to the rest of the network
 //###############################################################################################
-double PottsModel::FindCommunityFromStart(double gamma, double prob, char *nodename, igraph_vector_t *result)
-{
+double PottsModel::FindCommunityFromStart(double gamma, double prob, 
+					  char *nodename, 
+					  igraph_vector_t *result,
+					  igraph_real_t *cohesion, 
+					  igraph_real_t *adhesion,
+					  igraph_integer_t *my_inner_links,
+					  igraph_integer_t *my_outer_links) {
   DLList_Iter<NNode*> iter, iter2;
   DLList_Iter<NLink*> l_iter;
   DLList<NNode*>* to_do;
@@ -1175,6 +1180,9 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob, char *noden
       //#############################
       //calculate the affinity changes of all nodes for adding every node in the to_do list to the community
       //##############################
+
+      IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
+
       max_delta_aff=0.0;
       max_aff_node=NULL;
       add=false;
@@ -1305,6 +1313,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob, char *noden
 	to_do->Push(max_aff_node);
 // 	printf("Removing node %s from community with affinity of %f delta_aff: %f.\n",max_aff_node->Get_Name(), max_aff_node->Get_Affinity(),max_delta_aff);
       }
+      IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
   }
   //###################
   //write the node in the community to a file
@@ -1316,13 +1325,27 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob, char *noden
 //   fprintf(file,"Cohesion:\t%f\n",inner_links-gamma/total_degree_sum*Ks*Ks*0.5);
 //   fprintf(file,"Adhesion:\t%f\n",outer_links-gamma/total_degree_sum*Ks*Kr);
 //   fprintf(file,"\n");
-  node=iter.First(community);
-  igraph_vector_resize(result, 0);
-  while (!iter.End()) {
-    // printf("%s in community.\n",node->Get_Name());
-    // fprintf(file,"%s\t%f\n",node->Get_Name(),node->Get_Affinity());
-    IGRAPH_CHECK(igraph_vector_push_back(result, node->Get_Index()));
-    node=iter.Next();
+  if (cohesion) {
+    *cohesion=inner_links-gamma/total_degree_sum*Ks*Ks*0.5;
+  } 
+  if (adhesion) {
+    *adhesion=outer_links-gamma/total_degree_sum*Ks*Kr;
+  }
+  if (my_inner_links) {
+    *my_inner_links=inner_links;
+  }
+  if (my_outer_links) {
+    *my_outer_links=outer_links;
+  }
+  if (result) {
+    node=iter.First(community);
+    igraph_vector_resize(result, 0);
+    while (!iter.End()) {
+      // printf("%s in community.\n",node->Get_Name());
+      // fprintf(file,"%s\t%f\n",node->Get_Name(),node->Get_Affinity());
+      IGRAPH_CHECK(igraph_vector_push_back(result, node->Get_Index()));
+      node=iter.Next();
+    }
   }
 //   printf("%d nodes in community around %s\n",community->Size(),start_node->Get_Name());
 //   fclose(file);

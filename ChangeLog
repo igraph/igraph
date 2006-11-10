@@ -1,3 +1,18 @@
+2006-11-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/clustertool.cpp (igraph_spinglass_my_community) : 
+	return more data: adhesion, cohesion, inner & outer links
+	* src/pottsmodel_2.cpp (PottsModel::FindCommunityFromStart) :
+	return more data: adhesion, cohesion, inner & outer links
+
+	* src/clustertool.cpp (igraph_spinglass_community) :
+	allow interruption
+	* src/pottsmodel_2.cpp (PottModel::FindCommunityFromStart) :
+	allow interruption
+
+	* src/clustertoop.cpp (igraph_spinglass_my_community) : 
+	better error handling
+ 	
 2006-11-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/clustertool.cpp (igraph_spinglass_my_community) : removed 

@@ -205,6 +205,9 @@ int igraph_spinglass_community(const igraph_t *graph,
   changes=1;
 
   while (changes>0 && (kT/stoptemp>1.0 || zeroT && runs<150)) {
+
+    IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
+    
     runs++;
     if (!zeroT) {
       kT*=coolfact;
@@ -272,6 +275,15 @@ int igraph_spinglass_community(const igraph_t *graph,
  * \param community Pointer to an initialized vector, the result, the
  *    ids of the vertices in the community of the input vertex will be
  *    stored here. The vector will be resized as needed.
+ * \param cohesion Pointer to a real variable, if not \c NULL the
+ *     cohesion index of the community will be stored here.
+ * \param adhesion Pointer to a real variable, if not \c NULL the
+ *     adhesion index of the community will be stored here.
+ * \param inner_links Pointer to an integer, if not \c NULL the 
+ *     number of edges within the community is stored here.
+ * \param outer_links Pointer to an integer, if not \c NULL the 
+ *     number of edges between the community and the rest of the graph  
+ *     will be stored here.
  * \param spins The number of spins to use, this can be higher than
  *    the actual number of clusters in the network, in which case some
  *    clusters will contain zero vertices.
@@ -304,6 +316,10 @@ int igraph_spinglass_my_community(const igraph_t *graph,
 				  const igraph_vector_t *weights,
 				  igraph_integer_t vertex,
 				  igraph_vector_t *community,
+				  igraph_real_t *cohesion,
+				  igraph_real_t *adhesion,
+				  igraph_integer_t *inner_links,
+				  igraph_integer_t *outer_links,
 				  igraph_integer_t spins,
 				  igraph_spincomm_update_t update_rule,
 				  igraph_real_t gamma) {
@@ -332,6 +348,9 @@ int igraph_spinglass_my_community(const igraph_t *graph,
   }
   if (gamma < 0.0) {
     IGRAPH_ERROR("Invalid gamme value", IGRAPH_EINVAL);
+  }
+  if (vertex < 0 || vertex > igraph_vcount(graph)) {
+    IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVAL);
   }
   
   /* Check whether we have a single component */
@@ -363,7 +382,8 @@ int igraph_spinglass_my_community(const igraph_t *graph,
      the degree of the nodes is not in the weight property, stupid!!! */
   pm->assign_initial_conf(-1);
   snprintf(startnode, 255, "%li", (long int)vertex+1);
-  pm->FindCommunityFromStart(gamma, prob, startnode, community);
+  pm->FindCommunityFromStart(gamma, prob, startnode, community,
+			     cohesion, adhesion, inner_links, outer_links);
   
   while (net->link_list->Size()) delete net->link_list->Pop();
   while (net->node_list->Size()) delete net->node_list->Pop();
