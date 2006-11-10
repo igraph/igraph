@@ -21,7 +21,7 @@
 
 */
 
-/* The original version of this file was written by Jörg Reichardt 
+/* The original version of this file was written by Joerg Reichardt 
    The original copyright notice follows here */
 
 /***************************************************************************
@@ -57,6 +57,72 @@
 #include "igraph.h"
 #include "error.h"
 #include "random.h"
+
+/**
+ * \function igraph_spinglass_community
+ * \brief Community detection based on statistical mechanics
+ * 
+ * This function implements the community structure detection
+ * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. 
+ * The algorithm is described in their paper: Statistical Mechanics of 
+ * Community Detection, http://arxiv.org/abs/cond-mat/0603718.
+ * \param graph The input graph, it may be directed but the direction
+ *     of the edge is not used in the algorithm.
+ * \param weights The vector giving the edge weights, it may be \c NULL, 
+ *     in which case all edges are weighted equally.
+ * \param modularity Pointer to a real number, if not \c NULL then the
+ *     modularity score of the solution will be stored here, see
+ *     M. E. J. Newman and M. Girvan, Phys. Rev. E 69, 026113 (2004)
+ *     for details. 
+ * \param temperature Pointer to a real number, if not \c NULL then
+ *     the temperature at the end of the algorithm will be stored
+ *     here.
+ * \param membership Pointer to an initialized vector or \c NULL. If
+ *     not \c NULL then the result of the clustering will be stored
+ *     here, for each vertex the number of its cluster is given, the 
+ *     first cluster is numbered zero. The vector will be resized as
+ *     needed. 
+ * \param csize Pointer to an initialized vector or \c NULL. If not \c
+ *     NULL then the sizes of the clusters will stored here in cluster
+ *     number order. The vector will be resized as needed.
+ * \param spins Integer giving the number of spins, ie. the maximum
+ *     number of clusters. Usually it is not a program to give a high
+ *     number here, the default was 25 in the original code. Even if
+ *     the number of spins is high the number of clusters in the
+ *     result might small.
+ * \param parupdate A logical constant, whether to update all spins in
+ *     parallel. The default for this argument was \c FALSE (ie. 0) in
+ *     the original code.
+ * \param starttemp Real number, the temperature at the start. The
+ *     value of this argument was 1.0 in the original code.
+ * \param stoptemp Real number, the algorithm stops at this
+ *     temperature. The default was 0.01 in the original code.
+ * \param coolfact Real number, the coolinf factor for the simulated
+ *     annealing. The default was 0.99 in the original code.
+ * \param update_rule The type of the update rule. Possible values: \c
+ *     IGRAPH_SPINCOMM_UPDATE_SIMPLE and \c
+ *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defined
+ *     the null model based on which the actual clustering is done. If
+ *     this is \c IGRAPH_SPINCOMM_UPDATE_SIMPLE then the random graph
+ *     (ie. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
+ *     configuration model is used. The configuration means that the
+ *     baseline for the clustering is a random graph with the same
+ *     degree distribution as the input graph.
+ * \param gamma Real number. The gamma parameter of the
+ *     algorithm. This defined the weight of the missing and existing
+ *     links in the quality function for the clustering. The default
+ *     value in the original code was 1.0, which is equal weight to 
+ *     missing and existing edges. Smaller values make the existing
+ *     links contibute more to the energy function which is minimized
+ *     in the algorithm. Bigger values make the missing links more
+ *     important. (If my understanding is correct.)
+ * \return Error code.
+ * 
+ * \sa igraph_spinglass_my_community() for calculating the community
+ * of a single vertex.
+ * 
+ * Time complexity: TODO.
+ */
 
 int igraph_spinglass_community(const igraph_t *graph,
 			       const igraph_vector_t *weights,
@@ -183,15 +249,62 @@ int igraph_spinglass_community(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_spinglass_my_community
+ * \brief Community of a single node based on statistical mechanics
+ * 
+ * This function implements the community structure detection
+ * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. It is
+ * described in their paper: Statistical Mechanics of 
+ * Community Detection, http://arxiv.org/abs/cond-mat/0603718.
+ * 
+ * </para><para>
+ * This function calculates the community of a single vertex without
+ * calculating all the communities in the graph.
+ * 
+ * \param graph The input graph, it may be directed but the direction
+ *    of the edges is not used in the algorithm.
+ * \param weights Pointer to a vector with the weights of the edges.
+ *    Alternatively \c NULL can be supplied to have the same weight
+ *    for every edge.
+ * \param vertex The vertex id of the vertex of which ths community is 
+ *    calculated.
+ * \param community Pointer to an initialized vector, the result, the
+ *    ids of the vertices in the community of the input vertex will be
+ *    stored here. The vector will be resized as needed.
+ * \param spins The number of spins to use, this can be higher than
+ *    the actual number of clusters in the network, in which case some
+ *    clusters will contain zero vertices.
+ * \param update_rule The type of the update rule. Possible values: \c
+ *     IGRAPH_SPINCOMM_UPDATE_SIMPLE and \c
+ *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defined
+ *     the null model based on which the actual clustering is done. If
+ *     this is \c IGRAPH_SPINCOMM_UPDATE_SIMPLE then the random graph
+ *     (ie. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
+ *     configuration model is used. The configuration means that the
+ *     baseline for the clustering is a random graph with the same
+ *     degree distribution as the input graph.
+ * \param gamma Real number. The gamma parameter of the
+ *     algorithm. This defined the weight of the missing and existing
+ *     links in the quality function for the clustering. The default
+ *     value in the original code was 1.0, which is equal weight to 
+ *     missing and existing edges. Smaller values make the existing
+ *     links contibute more to the energy function which is minimized
+ *     in the algorithm. Bigger values make the missing links more
+ *     important. (If my understanding is correct.)
+ * \return Error code.
+ * 
+ * \sa igraph_spinglass_community() for the traditional version of the 
+ * algorithm.
+ * 
+ * Time complexity: TODO.
+ */
+
 int igraph_spinglass_my_community(const igraph_t *graph,
 				  const igraph_vector_t *weights,
 				  igraph_integer_t vertex,
 				  igraph_vector_t *community,
 				  igraph_integer_t spins,
-				  igraph_bool_t parupdate,
-				  igraph_real_t starttemp,
-				  igraph_real_t stoptemp,
-				  igraph_real_t coolfact,
 				  igraph_spincomm_update_t update_rule,
 				  igraph_real_t gamma) {
 
@@ -217,15 +330,8 @@ int igraph_spinglass_my_community(const igraph_t *graph,
     }
     use_weights=1;
   }
-  if (coolfact < 0 || coolfact>=1.0) {
-    IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
-  }
   if (gamma < 0.0) {
     IGRAPH_ERROR("Invalid gamme value", IGRAPH_EINVAL);
-  }
-  if (starttemp/stoptemp<1.0) {
-    IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
-		 IGRAPH_EINVAL);
   }
   
   /* Check whether we have a single component */

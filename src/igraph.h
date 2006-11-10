@@ -787,10 +787,6 @@ int igraph_spinglass_my_community(const igraph_t *graph,
 				  igraph_integer_t vertex,
 				  igraph_vector_t *community,
 				  igraph_integer_t spins,
-				  igraph_bool_t parupdate,
-				  igraph_real_t starttemp,
-				  igraph_real_t stoptemp,
-				  igraph_real_t coolfact,
 				  igraph_spincomm_update_t update_rule,
 				  igraph_real_t gamma);
 

@@ -4581,19 +4581,12 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
 }
 
 SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
-				     SEXP pvertex,
-				     SEXP pspins, SEXP pparupdate,
-				     SEXP pstarttemp, SEXP pstoptemp,
-				     SEXP pcoolfact, SEXP pupdate_rule,
-				     SEXP pgamma) {
+				     SEXP pvertex, SEXP pspins,
+				     SEXP pupdate_rule, SEXP pgamma) {
   igraph_t g;
   igraph_vector_t weights;
   igraph_integer_t vertex=REAL(pvertex)[0];
   igraph_integer_t spins=REAL(pspins)[0];
-  igraph_bool_t parupdate=LOGICAL(pparupdate)[0];
-  igraph_real_t starttemp=REAL(pstarttemp)[0];
-  igraph_real_t stoptemp=REAL(pstoptemp)[0];
-  igraph_real_t coolfact=REAL(pcoolfact)[0];
   igraph_spincomm_update_t update_rule=REAL(pupdate_rule)[0];
   igraph_real_t gamma=REAL(pgamma)[0];
   igraph_vector_t community;
@@ -4604,10 +4597,8 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pweights, &weights);
   igraph_vector_init(&community, 0);
-  igraph_spinglass_my_community(&g, &weights, vertex,
-				&community,
-				spins, parupdate, starttemp, stoptemp,
-				coolfact, update_rule, gamma);
+  igraph_spinglass_my_community(&g, &weights, vertex, &community,
+				spins, update_rule, gamma);
   
   PROTECT(result=NEW_LIST(1));
   PROTECT(names=NEW_CHARACTER(1));

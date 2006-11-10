@@ -1,4 +1,11 @@
-2006-11-06  Gabor Csardi  <csardi@localdomain>
+2006-11-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/community.R (spinglass.community) :
+	removed unneccesary arguments from .Call
+	* interfaces/R/src/rinterface.c (R_igraph_spinglass_my_community) :
+	removed unneccesary arguments
+
+2006-11-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/community.R (spinglass.community) : added
 	* interfaces/R/src/rinterface.c (R_igraph_spinglass_community) 
