@@ -17,13 +17,17 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	operators.c interrupt.c igraph_psumtree.c array.c \
 	igraph_hashtable.c foreign-graphml.c flow.c igraph_buckets.c
 
-RSNAMES_H = memory.h random.h atlas-edges.h
+RSNAMES_CPP = NetDataTypes.cpp clustertool.cpp NetRoutines.cpp \
+	pottsmodel_2.cpp
+
+RSNAMES_H = memory.h random.h atlas-edges.h NetDataTypes.h \
+	NetRoutines.h pottsmodel_2.h
 
 RSNAMES_Y = foreign-ncol-parser.y foreign-lgl-parser.y foreign-pajek-parser.y
 
 RSNAMES_L = foreign-ncol-lexer.l foreign-lgl-lexer.l foreign-pajek-lexer.l
 
-RSCNAMES = $(RSNAMES_C) $(RSNAMES_H)
+RSCNAMES = $(RSNAMES_C) $(RSNAMES_H) $(RSNAMES_CPP)
 
 RSCNAMES2 = $(RSNAMES_Y:.y=.c) $(RSNAMES_Y:.y=.h) \
 	$(RSNAMES_L:.l=.c)

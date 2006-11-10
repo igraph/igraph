@@ -151,6 +151,9 @@ typedef enum { IGRAPH_VCONN_NEI_ERROR=0,
 	       IGRAPH_VCONN_NEI_INFINITY,
 	       IGRAPH_VCONN_NEI_IGNORE }igraph_vconn_nei_t;
 
+typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
+	       IGRAPH_SPINCOMM_UPDATE_CONFIG } igraph_spincomm_update_t; 
+
 /* -------------------------------------------------- */
 /* Vertex selectors                                   */
 /* -------------------------------------------------- */
@@ -764,6 +767,21 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
 /* TODO: edge.type.matrix */
 /* TODO: modularity */
 /* TODO:  */
+
+int igraph_spinglass_community(const igraph_t *graph,
+			       const igraph_vector_t *weights,
+			       igraph_real_t *q,
+			       igraph_real_t *modularity,
+			       igraph_real_t *temperature,
+			       igraph_vector_t *membership, 
+			       igraph_vector_t *csize, 
+			       igraph_integer_t spins,
+			       igraph_bool_t parupdate,
+			       igraph_real_t starttemp,
+			       igraph_real_t stoptemp,
+			       igraph_real_t coolfact,
+			       igraph_spincomm_update_t update_rule,
+			       igraph_real_t gamma);
 
 /* -------------------------------------------------- */
 /* Conversion                                         */

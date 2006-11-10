@@ -23,7 +23,9 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     visitors.c igraph_grid.c atlas.c topology.c \
 			     motifs.c progress.c atlas-edges.h operators.c \
 			     igraph_psumtree.c array.c igraph_hashtable.c \
-			     foreign-graphml.c flow.c igraph_buckets.c
+			     foreign-graphml.c flow.c igraph_buckets.c \
+			     NetDataTypes.cpp NetRoutines.cpp clustertool.cpp \
+			     pottsmodel_2.cpp
 libigraph_la_CFLAGS        = -O6
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS)
