@@ -1,3 +1,29 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+/* The original version of this file was written by Jörg Reichardt 
+   The original copyright notice follows here */
+
 /***************************************************************************
                           pottsmodel.h  -  description
                              -------------------
@@ -62,13 +88,14 @@ class PottsModel {
     double GammaSweepZeroTemp(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel=true, int repetitions=1);
     long   WriteCorrelationMatrix(char *filename);
     double calculate_energy(double gamma);
-    long   WriteClusters(igraph_real_t *q, igraph_real_t *modularity,
+    long   WriteClusters(igraph_real_t *modularity,
 			 igraph_real_t *temperature, 
 			 igraph_vector_t *csize, igraph_vector_t *membership,
 			 double kT);
     long   WriteSoftClusters(char *filename, double threshold);
     double Get_Energy(void) { return energy;}
-    double FindCommunityFromStart(double gamma, double prob, char *nodename);
+    double FindCommunityFromStart(double gamma, double prob, char *nodename,
+				  igraph_vector_t *result);
 };
 
 #endif

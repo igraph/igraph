@@ -4522,3 +4522,104 @@ SEXP R_igraph_cohesion(SEXP graph) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
+				  SEXP pspins, SEXP pparupdate,
+				  SEXP pstarttemp, SEXP pstoptemp,
+				  SEXP pcoolfact, SEXP pupdate_rule,
+				  SEXP pgamma) {
+  igraph_t g;
+  igraph_vector_t weights;
+  igraph_integer_t spins=REAL(pspins)[0];
+  igraph_bool_t parupdate=LOGICAL(pparupdate)[0];
+  igraph_real_t starttemp=REAL(pstarttemp)[0];
+  igraph_real_t stoptemp=REAL(pstoptemp)[0];
+  igraph_real_t coolfact=REAL(pcoolfact)[0];
+  igraph_spincomm_update_t update_rule=REAL(pupdate_rule)[0];
+  igraph_real_t gamma=REAL(pgamma)[0];
+  igraph_real_t modularity;
+  igraph_real_t temperature;
+  igraph_vector_t membership;
+  igraph_vector_t csize;
+  SEXP result, names;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pweights, &weights);
+  igraph_vector_init(&membership, 0);
+  igraph_vector_init(&csize, 0);
+  igraph_spinglass_community(&g, &weights, 
+			     &modularity, &temperature, 
+			     &membership, &csize,
+			     spins, parupdate, starttemp, stoptemp,
+			     coolfact, update_rule, gamma);
+  
+  PROTECT(result=NEW_LIST(4));
+  PROTECT(names=NEW_CHARACTER(4));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(igraph_vector_size(&membership)));
+  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(igraph_vector_size(&csize)));
+  SET_VECTOR_ELT(result, 2, NEW_NUMERIC(1));
+  SET_VECTOR_ELT(result, 3, NEW_NUMERIC(1));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("membership"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("csize"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("modularity"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("temperature"));
+  SET_NAMES(result, names);
+  igraph_vector_copy_to(&membership, REAL(VECTOR_ELT(result, 0)));
+  igraph_vector_copy_to(&csize, REAL(VECTOR_ELT(result, 1)));
+  REAL(VECTOR_ELT(result, 2))[0]=modularity;
+  REAL(VECTOR_ELT(result, 3))[0]=temperature;
+  
+  igraph_vector_destroy(&membership);
+  igraph_vector_destroy(&csize);
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+}
+
+SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
+				     SEXP pvertex,
+				     SEXP pspins, SEXP pparupdate,
+				     SEXP pstarttemp, SEXP pstoptemp,
+				     SEXP pcoolfact, SEXP pupdate_rule,
+				     SEXP pgamma) {
+  igraph_t g;
+  igraph_vector_t weights;
+  igraph_integer_t vertex=REAL(pvertex)[0];
+  igraph_integer_t spins=REAL(pspins)[0];
+  igraph_bool_t parupdate=LOGICAL(pparupdate)[0];
+  igraph_real_t starttemp=REAL(pstarttemp)[0];
+  igraph_real_t stoptemp=REAL(pstoptemp)[0];
+  igraph_real_t coolfact=REAL(pcoolfact)[0];
+  igraph_spincomm_update_t update_rule=REAL(pupdate_rule)[0];
+  igraph_real_t gamma=REAL(pgamma)[0];
+  igraph_vector_t community;
+  SEXP result, names;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pweights, &weights);
+  igraph_vector_init(&community, 0);
+  igraph_spinglass_my_community(&g, &weights, vertex,
+				&community,
+				spins, parupdate, starttemp, stoptemp,
+				coolfact, update_rule, gamma);
+  
+  PROTECT(result=NEW_LIST(1));
+  PROTECT(names=NEW_CHARACTER(1));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(igraph_vector_size(&community)));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("community"));
+  SET_NAMES(result, names);
+  igraph_vector_copy_to(&community, REAL(VECTOR_ELT(result, 0)));
+  
+  igraph_vector_destroy(&community);
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+}

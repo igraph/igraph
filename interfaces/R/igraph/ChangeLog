@@ -1,3 +1,9 @@
+2006-11-06  Gabor Csardi  <csardi@localdomain>
+
+	* interfaces/R/igraph/R/community.R (spinglass.community) : added
+	* interfaces/R/src/rinterface.c (R_igraph_spinglass_community) 
+	(R_igraph_spinglass_my_community) : added
+
 2006-10-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.adjacency) :

@@ -6,6 +6,16 @@
 	* src/clustertool.cpp : added
 	* examples/simple/spinglass.c : added
 
+	* src/clustertool.cpp (igraph_spinglass_community) : cleanup
+	(igraph_spinglass_my_community) : added
+	* src/pottsmodel_2.cpp (PottsModel::assign_initital_conf)
+	(PottsModel::HeatBathLoopupZeroTemp)
+	(PottsModel::HeatBathParallelLookup)
+	(PottsModel::HeatBathLookup) : update random number generation
+	(PottsModel::FindCommunityFromStart) : update to return result
+	(PottsModel::WriteClusters) : myq argument not needed
+	* examples/simple/spinglass.c : updated
+	
 2006-11-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/flow.c (igraph_i_vertex_connectivity_directed) : corrected

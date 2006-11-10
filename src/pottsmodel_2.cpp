@@ -1,3 +1,29 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+/* The original version of this file was written by Jörg Reichardt 
+   The original copyright notice follows here */
+
 /***************************************************************************
                           pottsmodel.cpp  -  description
                              -------------------
@@ -21,6 +47,8 @@
 #include <math.h>
 #include "pottsmodel_2.h"
 #include "NetRoutines.h"
+
+#include "random.h"
 
 //#################################################################################################
 PottsModel::PottsModel(network *n, unsigned int qvalue, int m)
@@ -96,7 +124,7 @@ unsigned long PottsModel::assign_initial_conf(int spin)
   n_cur=iter.First(net->node_list);
   while (!iter.End())
   {
-    if (spin<0) s=rand() % q +1; else s=spin;
+    if (spin<0) s=RNG_INTEGER(1,q); else s=spin;
     n_cur->Set_ClusterIndex(s);
       l_cur=l_iter.First(n_cur->Get_Links());
       sum_weight=0;
@@ -442,7 +470,8 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
     {
       r=-1;
       while ((r<0) || (r>num_of_nodes-1))
-        r=long(double(num_of_nodes*double(rand())/double(RAND_MAX+1.0)));
+	r=RNG_INTEGER(0,num_of_nodes-1);
+      /* r=long(double(num_of_nodes*double(rand())/double(RAND_MAX+1.0)));*/
       node=net->node_list->Get(r);
       // Wir zaehlen, wieviele Nachbarn von jedem spin vorhanden sind
       // erst mal alles Null setzen
@@ -622,7 +651,8 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
       }   // for spin
 
      //now choose a new spin
-     r = norm*double(rand())/double(RAND_MAX + 1.0);
+     r = RNG_UNIF(0, norm);
+     /* norm*double(rand())/double(RAND_MAX + 1.0); */
      new_spin=1;
      found=false;
      while (!found && new_spin<=q) {
@@ -734,7 +764,8 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     {
       rn=-1;
       while ((rn<0) || (rn>num_of_nodes-1))
-        rn=long(double(num_of_nodes*double(rand())/double(RAND_MAX+1.0)));
+	rn=RNG_INTEGER(0, num_of_nodes-1);
+      /* rn=long(double(num_of_nodes*double(rand())/double(RAND_MAX+1.0))); */
         
       node=net->node_list->Get(rn);
       // initialize the neighbours and the weights
@@ -800,7 +831,8 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
       
 
      //choose a new spin
-     r = norm*double(rand())/double(RAND_MAX + 1.0);
+/*      r = norm*double(rand())/double(RAND_MAX + 1.0); */
+     r=RNG_UNIF(0, norm);
      new_spin=1;
      found=false;
      while (!found && new_spin<=q) {
@@ -1070,7 +1102,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob, char *noden
 //###############################################################################################
 //# Here we try to minimize the affinity to the rest of the network
 //###############################################################################################
-double PottsModel::FindCommunityFromStart(double gamma, double prob, char *nodename)
+double PottsModel::FindCommunityFromStart(double gamma, double prob, char *nodename, igraph_vector_t *result)
 {
   DLList_Iter<NNode*> iter, iter2;
   DLList_Iter<NLink*> l_iter;
@@ -1284,12 +1316,14 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob, char *noden
 //   fprintf(file,"Cohesion:\t%f\n",inner_links-gamma/total_degree_sum*Ks*Ks*0.5);
 //   fprintf(file,"Adhesion:\t%f\n",outer_links-gamma/total_degree_sum*Ks*Kr);
 //   fprintf(file,"\n");
-//   node=iter.First(community);
-//   while (!iter.End()) {
-//     printf("%s in community.\n",node->Get_Name());
-//     fprintf(file,"%s\t%f\n",node->Get_Name(),node->Get_Affinity());
-//     node=iter.Next();
-//   }
+  node=iter.First(community);
+  igraph_vector_resize(result, 0);
+  while (!iter.End()) {
+    // printf("%s in community.\n",node->Get_Name());
+    // fprintf(file,"%s\t%f\n",node->Get_Name(),node->Get_Affinity());
+    IGRAPH_CHECK(igraph_vector_push_back(result, node->Get_Index()));
+    node=iter.Next();
+  }
 //   printf("%d nodes in community around %s\n",community->Size(),start_node->Get_Name());
 //   fclose(file);
   return community->Size();
@@ -1298,8 +1332,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob, char *noden
 //################################################################################################
 // this Function writes the clusters to disk
 //################################################################################################
-long PottsModel::WriteClusters(igraph_real_t *myq,
-			       igraph_real_t *modularity,
+long PottsModel::WriteClusters(igraph_real_t *modularity,
 			       igraph_real_t *temperature,
 			       igraph_vector_t *csize,
 			       igraph_vector_t *membership,
@@ -1325,7 +1358,6 @@ long PottsModel::WriteClusters(igraph_real_t *myq,
 //   fprintf(file,"Temperature=\t%f\n", kT);
 //   fprintf(file,"Cluster\tNodes\tInnerLinks\tOuterLinks\tp_in\tp_out\t<Ln(#comm.)>\n");
   
-  if (myq)         { *myq=q; }
   if (modularity)  { *modularity=calculate_Q(); }
   if (temperature) { *temperature=kT; }
 

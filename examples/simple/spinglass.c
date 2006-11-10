@@ -25,7 +25,7 @@
 
 int main() {
   igraph_t g;
-  igraph_real_t q, modularity, temperature;
+  igraph_real_t  modularity, temperature;
   igraph_vector_t membership, csize;
   long int i;
   
@@ -36,7 +36,6 @@ int main() {
   igraph_vector_init(&csize, 0);
   igraph_spinglass_community(&g, 
 			     0, /* no weights */
-			     &q,
 			     &modularity,
 			     &temperature,
 			     &membership,
@@ -49,7 +48,6 @@ int main() {
 			     IGRAPH_SPINCOMM_UPDATE_CONFIG,
 			     1.0); /* gamma */
 
-/*   printf("Q:           %f\n", q); */
 /*   printf("Modularity:  %f\n", modularity); */
 /*   printf("Temperature: %f\n", temperature); */
 /*   printf("Cluster sizes: "); */
