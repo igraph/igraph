@@ -48,17 +48,17 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
     \dQuote{config}. \dQuote{simple} uses a random graph with the same
     number of edges as the baseline probability and \dQuote{config} uses
     a random graph with the same vertex degrees as the input graph.}
-  }
   \item{gamma}{Real constant, the gamma argument of the algorithm. This
     specifies the balance between the importance of present and
     non-present edges in a community. Roughly, a comunity is a set of
     vertices having many edges inside the community and few edges
     outside the community. The default 1.0 value makes existing and
     non-existing links equally important. Smaller values make the
-    existing links, greater values the missing links more important.
+    existing links, greater values the missing links more important.}
   \item{vertex}{This parameter can be used to calculate the community of
-    a given vertex without calculating all communities. Note that if
-    this argument is present then some other arguments are ignored.}
+      a given vertex without calculating all communities. Note that if
+      this argument is present then some other arguments are ignored.}
+  }
 }
 \details{
   This function tries to find communities in a graph. A community is a
@@ -106,12 +106,12 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
   igraph glue code}
 \seealso{\code{\link{clusters}}}
 \examples{
-  g <- erdos.renyi.game(10, 5/10) %du% erdos.renyi.game(9, 5/9)
+  g <- erdos.renyi.game(10, 5/10) \%du\% erdos.renyi.game(9, 5/9)
   g <- add.edges(g, c(0, 11))
   g <- subgraph(g, subcomponent(g, 0))
   spinglass.community(g, spins=2)
   spinglass.community(g, vertex=0)
 }
-\keyword{graph}
+\keyword{graphs}
 
     
