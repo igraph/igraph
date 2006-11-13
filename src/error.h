@@ -360,7 +360,7 @@ void IGRAPH_FINALLY_CLEAN(int num);
  * as well.
  */
 
-void IGRAPH_FINALLY_FREE();
+void IGRAPH_FINALLY_FREE(void);
 
 /**
  * \define IGRAPH_FINALLY

@@ -446,8 +446,7 @@ PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v) {
  */
 int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) {
   int n, i;
-  char* ptr;
-  static const char* empty = "";
+  static char* empty = "";
   
   if (!PyList_Check(v)) {
     PyErr_SetString(PyExc_TypeError, "expected list");

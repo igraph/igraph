@@ -105,7 +105,9 @@ void igraph_i_attribute_delete_edges(igraph_t *graph,
 int igraph_i_attribute_permute_edges(igraph_t *graph, 
 				      const igraph_vector_t *idx) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->permute_edges(graph, idx);
+    return igraph_i_attribute_table->permute_edges(graph, idx);
+  } else {
+    return 0;
   }
 }
 
@@ -117,9 +119,9 @@ int igraph_i_attribute_get_info(const igraph_t *graph,
 				igraph_strvector_t *enames,
 				igraph_vector_t *etypes) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->get_info(graph, gnames, gtypes, 
-				       vnames, vtypes, 
-				       enames, etypes);
+    return igraph_i_attribute_table->get_info(graph, gnames, gtypes, 
+	  			              vnames, vtypes, 
+				              enames, etypes);
   } else {
     return 0;
   }
@@ -151,7 +153,7 @@ int igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
 					      const char *name,
 					      igraph_vector_t *value) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->get_numeric_graph_attr(graph, name, value);
+    return igraph_i_attribute_table->get_numeric_graph_attr(graph, name, value);
   } else {
     return 0;
   }
@@ -162,7 +164,7 @@ int igraph_i_attribute_get_numeric_vertex_attr(const igraph_t *graph,
 					       igraph_vs_t vs,
 					       igraph_vector_t *value) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->get_numeric_vertex_attr(graph, name, vs, value);
+    return igraph_i_attribute_table->get_numeric_vertex_attr(graph, name, vs, value);
   } else {
     return 0;
   }
@@ -173,7 +175,7 @@ int igraph_i_attribute_get_numeric_edge_attr(const igraph_t *graph,
 					     igraph_es_t es,
 					     igraph_vector_t *value) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->get_numeric_edge_attr(graph, name, es, value);
+    return igraph_i_attribute_table->get_numeric_edge_attr(graph, name, es, value);
   } else {
     return 0;
   }
@@ -183,7 +185,7 @@ int igraph_i_attribute_get_string_graph_attr(const igraph_t *graph,
 					     const char *name,
 					     igraph_strvector_t *value) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->get_string_graph_attr(graph, name, value);
+    return igraph_i_attribute_table->get_string_graph_attr(graph, name, value);
   } else {
     return 0;
   }
@@ -194,7 +196,7 @@ int igraph_i_attribute_get_string_vertex_attr(const igraph_t *graph,
 					      igraph_vs_t vs,
 					      igraph_strvector_t *value) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->get_string_vertex_attr(graph, name, vs, value);
+    return igraph_i_attribute_table->get_string_vertex_attr(graph, name, vs, value);
   } else {
     return 0;
   }
@@ -205,7 +207,7 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
 					    igraph_es_t es,
 					    igraph_strvector_t *value) {
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->get_string_edge_attr(graph, name, es, value);
+    return igraph_i_attribute_table->get_string_edge_attr(graph, name, es, value);
   } else {
     return 0;
   }

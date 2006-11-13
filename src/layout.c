@@ -866,8 +866,8 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 	long int eid=VECTOR(eids)[k];
 	igraph_integer_t from, to;
 	igraph_edge(graph, eid, &from, &to);
-	if (from != vid && igraph_2dgrid_in(&grid, from) ||
-	    to   != vid && igraph_2dgrid_in(&grid, to)) {
+	if ((from != vid && igraph_2dgrid_in(&grid, from)) ||
+	    (to   != vid && igraph_2dgrid_in(&grid, to))) {
 	  igraph_vector_push_back(&edges, eid);
 	}
       }
@@ -1166,8 +1166,7 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
 int igraph_layout_reingold_tilford(const igraph_t *graph, 
 				   igraph_matrix_t *res, long int root) {
   long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
-  long int i, n, j, it=0;
+  long int i, n, j;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_i_adjlist_t allneis;
   igraph_vector_t *neis;
@@ -1240,7 +1239,6 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
                                                  igraph_matrix_t *res, long int node,
 												 long int vcount, igraph_real_t xpos) {
   long int i, n;
-  igraph_real_t avg=0.0;
   MATRIX(*res, node, 0) = xpos;
   for (i=0, n=0; i<vcount; i++) {
     if (i == node) continue;
@@ -1249,6 +1247,7 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
 						   xpos+vdata[i].offset);
     }
   }
+  return 0;
 }
 
 int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,

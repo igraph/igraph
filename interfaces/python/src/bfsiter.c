@@ -24,6 +24,7 @@
 #include "bfsiter.h"
 #include "vertexobject.h"
 #include "common.h"
+#include "error.h"
 
 /**
  * \ingroup python_interface

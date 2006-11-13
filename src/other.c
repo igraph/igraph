@@ -112,7 +112,7 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
 int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 		       igraph_matrix_t *rescoords) {
   igraph_integer_t no_of_nodes;
-  long int i, pivot_idx=0, last_idx, before_last_idx, next_idx, j, k;
+  long int i, pivot_idx=0, last_idx, before_last_idx, next_idx, j;
   igraph_real_t* angles;
   igraph_vector_t stack;
   igraph_indheap_t order;

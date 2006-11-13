@@ -201,7 +201,7 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
      * It took me 1.5 hours between London and Manchester to figure it out */
     Py_INCREF(v);
     r=PyList_SetItem(result, self->idx, v);
-    if (r == -1) Py_DECREF(v);
+    if (r == -1) { Py_DECREF(v); }
     return r;
   }
   

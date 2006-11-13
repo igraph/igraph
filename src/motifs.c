@@ -98,7 +98,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   
   long int histlen;
   unsigned int *arr_idx, *arr_code;
-  int class=0, code=0;
+  int code=0;
   unsigned char mul, idx;
 
   igraph_vector_t deg;

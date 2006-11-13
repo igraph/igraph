@@ -292,7 +292,6 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
   long int ec=igraph_ecount(graph);
   long int i;
-  int ret;
 
   if (nv < 0) {
     IGRAPH_ERROR("cannot add negative number of vertices", IGRAPH_EINVAL);
@@ -341,8 +340,6 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
  * and edges in the \em original graph, respectively.
  */
 int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
-
-  igraph_bool_t directed=igraph_is_directed(graph);
   long int no_of_edges=igraph_ecount(graph);
   long int no_of_nodes=igraph_vcount(graph);
   long int edges_to_remove=0;
@@ -461,7 +458,7 @@ int igraph_delete_vertices(igraph_t *graph, igraph_vs_t vertices) {
   long int really_delete=0;
   long int edges_to_delete=0;
   igraph_vector_t index;
-  long int i, j, p;
+  long int i, j;
   long int idx2=0;
   igraph_t result;
   igraph_vit_t vit;

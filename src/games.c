@@ -1195,7 +1195,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
       long int shnode=i-binwidth*k;
       long int deg=VECTOR(degree)[shnode];
       long int age=(i-shnode)/binwidth;
-      igraph_real_t old=igraph_psumtree_get(&sumtree, shnode);
+      /* igraph_real_t old=igraph_psumtree_get(&sumtree, shnode); */
       igraph_psumtree_update(&sumtree, shnode,
 			     (deg_coef*pow(deg, pa_exp)+zero_deg_appeal) * 
 			     (age_coef*pow(age+2, aging_exp)+zero_age_appeal));
@@ -1412,7 +1412,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 		    igraph_real_t radius, igraph_bool_t torus) {
   
-  long int i, j;
+  long int i;
   igraph_vector_t x, y, edges;
   igraph_real_t r2=radius*radius;
   

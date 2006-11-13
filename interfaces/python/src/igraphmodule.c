@@ -501,7 +501,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
   PyObject *key, *value, *dict;
   int pos=0;
   long int i, j, k, l, ne;
-  igraph_bool_t *added_attrs;
+  igraph_bool_t *added_attrs=0;
   igraph_i_attribute_record_t *attr_rec;
 
   ne=igraph_vector_size(edges)/2;
@@ -697,7 +697,7 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
     PyObject *dict = ((PyObject**)graph->attr)[i];
     PyObject *keys;
     PyObject *values;
-    PyObject *o;
+    PyObject *o=0;
     keys=PyDict_Keys(dict);
     if (!keys) IGRAPH_ERROR("Internal error in PyDict_Keys", IGRAPH_FAILURE);
  

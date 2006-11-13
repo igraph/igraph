@@ -605,7 +605,7 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
   
   /* Main part */
   for (i=0; i<no_of_nodes; i++) {
-    igraph_bool_t l;
+    igraph_bool_t l=0;
     long int bigtail;
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -806,7 +806,7 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t edges;
   igraph_vector_t neis;
-  long int i, j, k;
+  long int i, j;
   long int zero=0, *limit;
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);

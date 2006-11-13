@@ -25,6 +25,7 @@
 #include "config.h"
 
 #include <ctype.h>		/* isspace */
+#include <math.h>               /* isnan */
 #include <string.h>
 #include "memory.h"
 
@@ -300,8 +301,8 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 void igraph_i_graphml_add_attribute_key(const xmlChar** attrs, 
 					struct igraph_i_graphml_parser_state *state) {
   xmlChar **it;
-  igraph_trie_t *trie;
-  igraph_vector_ptr_t *ptrvector;
+  igraph_trie_t *trie=0;
+  igraph_vector_ptr_t *ptrvector=0;
   long int id;
   int ret;
   igraph_i_graphml_attribute_record_t *rec=
@@ -320,7 +321,7 @@ void igraph_i_graphml_add_attribute_key(const xmlChar** attrs,
       rec->record.name=strdup(name);
     } else if (xmlStrEqual(*it, toXmlChar("attr.type"))) {
       if (xmlStrEqual(*(it+1), (xmlChar*)"boolean")) { 
-	rec->type==I_GRAPHML_BOOLEAN;
+	rec->type=I_GRAPHML_BOOLEAN;
 	rec->record.type=IGRAPH_ATTRIBUTE_NUMERIC;	    
       } else if (xmlStrEqual(*(it+1), toXmlChar("string"))) {
 	rec->type=I_GRAPHML_STRING;
@@ -421,12 +422,12 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
   char *chardata;
   const xmlChar *end=xmlStrchr(data, (xmlChar) '<');
   igraph_attribute_elemtype_t type=state->data_type;
-  igraph_trie_t *trie;
-  igraph_vector_ptr_t *ptrvector;
+  igraph_trie_t *trie=0;
+  igraph_vector_ptr_t *ptrvector=0;
   igraph_i_graphml_attribute_record_t *graphmlrec;
   igraph_i_attribute_record_t *rec;
   long int recid;
-  long int id;
+  long int id=0;
   int ret;
 
   chardata=Calloc( (end-data)+1, char);  
@@ -448,7 +449,7 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
     ptrvector=&state->e_attrs;
     id=igraph_vector_size(&state->edgelist)/2-1; /* hack */
     break;
-  defaults:
+  default:
     /* impossible */
     break;
   }
@@ -978,7 +979,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
       }
     }
 
-    ret=fprintf(outstream, "    </node>\n", (long)l);
+    ret=fprintf(outstream, "    </node>\n");
     if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);    
   }
   

@@ -73,7 +73,6 @@ int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
 int igraph_psumtree_update(igraph_psumtree_t *t, long int idx, 
 			   igraph_real_t new_value) {
   const igraph_vector_t *tree=&t->v;
-  long int treesize = igraph_vector_size(tree);
   igraph_real_t difference;
   
   idx = idx + t->offset+1;

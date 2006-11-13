@@ -112,7 +112,7 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
   return 0;
 }
 
-extern int igraph_ncol_yyparse();
+extern int igraph_ncol_yyparse(void);
 extern FILE *igraph_ncol_yyin;
 extern int igraph_i_ncol_eof;
 long int igraph_ncol_mylineno;
@@ -261,7 +261,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   return 0;
 }
 
-extern int igraph_lgl_yyparse();
+extern int igraph_lgl_yyparse(void);
 extern FILE *igraph_lgl_yyin;
 extern int igraph_i_lgl_eof;
 long int igraph_lgl_mylineno;
@@ -386,7 +386,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   return 0;
 }
 
-extern int igraph_pajek_yyparse();
+extern int igraph_pajek_yyparse(void);
 extern FILE *igraph_pajek_yyin;
 extern int igraph_i_pajek_eof;
 long int igraph_pajek_mylineno;
@@ -522,8 +522,8 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   igraph_vector_ptr_t vattrs;
   igraph_trie_t eattrnames;
   igraph_vector_ptr_t eattrs;
-  igraph_hashtable_t vattrhash;
-  igraph_hashtable_t eattrhash;
+  /* igraph_hashtable_t vattrhash; */
+  /* igraph_hashtable_t eattrhash; */
   long int i, j;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -1091,10 +1091,10 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
       igraph_edge(graph, edge, &from, &to);
       igraph_strvector_get(&wvec, edge, &str1);
       if (from==actvertex) {
-	ret=fprintf(outstream, "%li %s\n", to, str1);
+	ret=fprintf(outstream, "%li %s\n", (long)to, str1);
       } else {
 	actvertex=from;
-	ret=fprintf(outstream, "# %li\n%li %s\n", from, to, str1);
+	ret=fprintf(outstream, "# %li\n%li %s\n", (long)from, (long)to, str1);
       }
       if (ret<0) {
 	IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -1268,7 +1268,6 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 
 int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
   long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
   long int i, j;
 
   igraph_attribute_type_t vtypes[V_LAST], etypes[E_LAST];

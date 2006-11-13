@@ -41,11 +41,10 @@ int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_ver
   igraph_vector_t neis;
   
   long int node;
-  long int i, j, k;
+  long int i;
   long int edges=0;
   
   igraph_bool_t lsd=(significance != 0);
-  int signidx=0;
 
   igraph_vector_init(&neis, 0);
   indegree=Calloc(no_of_nodes, int);
@@ -172,7 +171,7 @@ int igraph_measure_dynamics_id_st(const igraph_t *graph,
   igraph_vector_t neis;
   
   long int node;
-  long int i, k;
+  long int i;
   
   igraph_vector_init(&neis, 0);
   
@@ -1391,7 +1390,6 @@ int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
 					       igraph_integer_t pno_cats) {
   long int agebins=igraph_array3_n(adkl, 3);
   long int no_of_nodes=igraph_vcount(graph);
-  long int no_cats=pno_cats;
   long int binwidth;
   
   int *indegree;
@@ -1585,7 +1583,6 @@ int igraph_measure_dynamics_citingcat_id_age(const igraph_t *graph,
   /* measurement done, update change */
   for (k=0; k<no_cats; k++) {
     for (i=0; i<maxind+1; i++) {
-      igraph_real_t tuppercrit;
       for (j=0; j<agebins; j++) {
 	igraph_real_t oldmean;
 	if (MATRIX(ntkl, i, j) != 0) {
@@ -2008,7 +2005,6 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
       long int edge=VECTOR(etimeidx)[eptr];
       igraph_integer_t from, to;
       long int xidx, yidx;
-      igraph_real_t tmp;
       igraph_edge(graph, edge, &from, &to);
       xidx=VECTOR(degree)[ (long int)from];
       yidx=VECTOR(degree)[ (long int)to];

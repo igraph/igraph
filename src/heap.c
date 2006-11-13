@@ -968,7 +968,6 @@ igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch) {
 igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
   long int size=igraph_vector_size(&ch->heap);
   igraph_integer_t maxindex=VECTOR(ch->index)[0];
-  long int index;
   /* put the last element to the top */
   igraph_i_cutheap_switch(ch, 0, size-1);
   /* remove the last element */
@@ -992,6 +991,7 @@ int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
     igraph_i_cutheap_sink(ch, hidx2);
     igraph_i_cutheap_shift_up(ch, hidx2);
   }
+  return 0;
 }
 
 /* Reset the value of all vertices to zero and make them active */

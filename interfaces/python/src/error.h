@@ -29,7 +29,7 @@
 /** \defgroup python_interface_errors Error handling
  * \ingroup python_interface */
 
-PyObject* igraphmodule_handle_igraph_error();
+PyObject* igraphmodule_handle_igraph_error(void);
 void igraphmodule_igraph_error_hook(const char *reason, const char *file,
 				    int line, int igraph_errno);
 

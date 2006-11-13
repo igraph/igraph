@@ -112,7 +112,7 @@ void IGRAPH_FINALLY_CLEAN(int minus) {
   /* printf("<-- Finally stack contains now %d elements\n", igraph_i_finally_stack[0].all); */
 }
 
-void IGRAPH_FINALLY_FREE() {
+void IGRAPH_FINALLY_FREE(void) {
   int p;
 /*   printf("[X] Finally stack will be cleaned (contained %d elements)\n", igraph_i_finally_stack[0].all);  */
   for (p=igraph_i_finally_stack[0].all-1; p>=0; p--) {

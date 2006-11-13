@@ -28,6 +28,7 @@
 #include "bfsiter.h"
 #include "convert.h"
 #include "error.h"
+#include "memory.h"
 
 #define ATTRHASH_IDX_GRAPH 0
 #define ATTRHASH_IDX_VERTEX 1
@@ -2025,7 +2026,7 @@ PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *se
   }
   
   if (igraph_get_all_shortest_paths(&self->g, &res, NULL, from, 
-				    igraph_vss_all(&self->g), mode)) {
+				    igraph_vss_all(), mode)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_ptr_destroy(&res);
     return NULL;

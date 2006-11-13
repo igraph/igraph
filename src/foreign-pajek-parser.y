@@ -52,7 +52,7 @@
 #include "attributes.h"
 #include <math.h>
 char * strndup (const char *S, size_t SIZE);
-extern int igraph_pajek_yylex();
+extern int igraph_pajek_yylex(void);
 extern int igraph_pajek_mylineno;
 extern char *igraph_pajek_yytext;
 extern int igraph_pajek_yyleng;
@@ -79,7 +79,7 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 					const char *attrname,
 					igraph_integer_t vid,
 					const char *str);
-void igraph_i_pajek_reset_scanner();
+void igraph_i_pajek_reset_scanner(void);
 extern igraph_vector_t *igraph_pajek_vector;
 extern igraph_bool_t igraph_pajek_directed;
 extern long int igraph_pajek_vcount;
@@ -479,7 +479,7 @@ int igraph_pajek_yyerror(char *s)
   char str[200];  
   igraph_i_pajek_reset_scanner();
   snprintf(str, sizeof(str), "Parse error in pajek file, line %li", 
-	   igraph_pajek_mylineno);
+	   (long)igraph_pajek_mylineno);
   IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
 }
 

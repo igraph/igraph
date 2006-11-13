@@ -1035,7 +1035,6 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
 
       /* copy all existing paths to the parent */
       while (fatherptr != 0) {
-	long int tmp;
 	vptr=Calloc(1, igraph_vector_t);
 	IGRAPH_CHECK(igraph_vector_ptr_push_back(&paths, vptr));
 	IGRAPH_CHECK(igraph_vector_copy(vptr, VECTOR(paths)[fatherptr-1]));
@@ -1655,7 +1654,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
 
   /* Calculate outdegrees for every node */
-  igraph_degree(graph, &outdegree, igraph_vss_all(graph),
+  igraph_degree(graph, &outdegree, igraph_vss_all(),
 		directed?IGRAPH_OUT:IGRAPH_ALL, 0);
   /* Initialize PageRank values */
   for (i=0; i<no_of_nodes; i++) {

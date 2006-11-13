@@ -184,7 +184,7 @@ typedef struct igraph_vs_t {
 } igraph_vs_t;
     
 int igraph_vs_all(igraph_vs_t *vs);
-igraph_vs_t igraph_vss_all();
+igraph_vs_t igraph_vss_all(void);
 
 int igraph_vs_adj(igraph_vs_t *vs, 
 		  igraph_integer_t vid, igraph_neimode_t mode);
@@ -194,7 +194,7 @@ int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
 		     igraph_neimode_t mode);
 
 int igraph_vs_none(igraph_vs_t *vs);
-igraph_vs_t igraph_vss_none();
+igraph_vs_t igraph_vss_none(void);
 
 int igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid);
 igraph_vs_t igraph_vss_1(igraph_integer_t vid);
@@ -372,7 +372,7 @@ int igraph_es_adj(igraph_es_t *es,
 		  igraph_integer_t vid, igraph_neimode_t mode);
 
 int igraph_es_none(igraph_es_t *es);
-igraph_es_t igraph_ess_none();
+igraph_es_t igraph_ess_none(void);
 
 int igraph_es_1(igraph_es_t *es, igraph_integer_t eid);
 igraph_es_t igraph_ess_1(igraph_integer_t eid);

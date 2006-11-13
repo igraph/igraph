@@ -98,7 +98,7 @@ int igraph_vs_all(igraph_vs_t *vs) {
  * Time complexity: O(1).
  */
 
-igraph_vs_t igraph_vss_all() {
+igraph_vs_t igraph_vss_all(void) {
   igraph_vs_t allvs;
   allvs.type=IGRAPH_VS_ALL;
   return allvs;  
@@ -194,7 +194,7 @@ int igraph_vs_none(igraph_vs_t *vs) {
  * Time complexity: O(1).
  */
 
-igraph_vs_t igraph_vss_none() {
+igraph_vs_t igraph_vss_none(void) {
   igraph_vs_t nonevs;
   nonevs.type=IGRAPH_VS_NONE;
   return nonevs;
@@ -760,7 +760,7 @@ int igraph_es_none(igraph_es_t *es) {
  * Time complexity: O(1).
  */
 
-igraph_es_t igraph_ess_none() {
+igraph_es_t igraph_ess_none(void) {
   igraph_es_t es;
   es.type=IGRAPH_ES_NONE;
   return es;
@@ -870,6 +870,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
 int igraph_es_fromto(igraph_es_t *es,
 		     igraph_vs_t from, igraph_vs_t to) {
   /* TODO */
+  return 0;
 }
 
 /**
@@ -1200,7 +1201,6 @@ int igraph_i_eit_multipairs(const igraph_t *graph,
 			    igraph_es_t es, igraph_eit_t *eit) {
   long int n=igraph_vector_size(es.data.path.ptr);
   long int no_of_nodes=igraph_vcount(graph);
-  long int i;
   
   if (n % 2 != 0) {
     IGRAPH_ERROR("Cannot create edge iterator from odd number of vertices",
