@@ -2,6 +2,10 @@
 
 	* src/foreign-graphml.c (igraph_graphml_destroy_state) :
 	fixed memory leaks
+        * src/foreign-graphml.c (igraph_read_graph_graphml) :
+	corrected error handling (former implementation assumed that
+	execution is stopped after the call to igraph_error, which
+	is not true if the error handler is overridden)
 
 2006-11-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
