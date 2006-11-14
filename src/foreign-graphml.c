@@ -97,6 +97,8 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
 	Free(rec->record.value);
       }
     }
+    if (rec->id != 0) Free(rec->id);
+    if (rec->record.name != 0) Free(rec->record.name);
     Free(rec);
   }	 
 
@@ -113,9 +115,14 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
 	Free(rec->record.value);
       }
     }
+    if (rec->id != 0) Free(rec->id);
+    if (rec->record.name != 0) Free(rec->record.name);
     Free(rec);
   }
 
+  igraph_vector_ptr_destroy(&state->v_attrs);
+  igraph_vector_ptr_destroy(&state->e_attrs);
+  
   IGRAPH_FINALLY_CLEAN(1);
 }
 
@@ -290,6 +297,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     igraph_vector_ptr_destroy(&vattr);
     igraph_vector_ptr_destroy(&eattr);
     IGRAPH_FINALLY_CLEAN(2);
+     
   }
 
   igraph_i_graphml_destroy_state(state);
