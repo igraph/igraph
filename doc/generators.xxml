@@ -19,6 +19,7 @@
 <!-- doxrox-include igraph_tree -->
 <!-- doxrox-include igraph_full -->	
 <!-- doxrox-include igraph_atlas -->
+<!-- doxrox-include igraph_extended_chordal_ring -->
 </section>
 
 <section><title>Games: Randomized Graph Generators</title>

@@ -10,6 +10,7 @@
 \alias{graph.atlas}
 \alias{graph.edgelist}
 \alias{graph.data.frame}
+\alias{graph.extended.chordal.ring}
 \title{Various methods for creating graphs}
 \description{These method can create various (mostly regular) graphs:
   empty graphs, graphs with the given edges, graphs from adjacency
@@ -33,6 +34,7 @@ graph.full(n, directed = FALSE, loops = FALSE)
 graph.atlas(n)
 graph.edgelist(el, directed=TRUE)
 graph.data.frame(d, directed=TRUE)
+graph.extended.chordal.ring(n, w)
 }
 \arguments{
   \item{edges}{Numeric vector defining the edges, the first edge points
@@ -116,6 +118,8 @@ graph.data.frame(d, directed=TRUE)
   \item{el}{An edge list, a two column matrix, character or numeric. See
     details below.}
   \item{d}{A data frame object, this will be converted to a graph.}
+  \item{w}{A matrix which specifies the extended chordal ring. See
+    details below.}
 }
 \details{All these functions create graphs in a deterministic way.
 
@@ -163,6 +167,20 @@ graph.data.frame(d, directed=TRUE)
   frame should have at least two columns. The first two columns will be
   used as a symbolic edge list and the other columns will be added as
   edge attributes.
+
+  \code{graph.extended.chordal.ring} creates an extended chordal ring.
+  An extended chordal ring is regular graph, each node has the same
+  degree. It can be obtained from a simple ring by adding some extra
+  edges specified by a matrix. Let p denote the number of columns in
+  the \sQuote{\code{W}} matrix. The extra edges of vertex \code{i}
+  are added according to column \code{i mod p} in
+  \sQuote{\code{W}}. The number of extra edges is the number
+  of rows in \sQuote{\code{W}}: for each row \code{j} an edge
+  \code{i->i+w[ij]} is added if \code{i+w[ij]} is less than the number
+  of total nodes. See also Kotsis, G: Interconnection Topologies for
+  Parallel Processing Systems, PARS Mitteilungen 11, 1-6, 1993.
+
+  
 }
 \value{Every function documented here returns a \code{graph} object.}
 %\references{}
@@ -189,5 +207,6 @@ g12 <- graph.edgelist(el)
 d <- as.data.frame(el)
 d$weight <- 1:2
 g13 <- graph.data.frame(d)
+g14 <- graph.extended.chordal.ring(15, matrix(c(3,12,4,7,8,11), nr=2))
 }
 \keyword{graphs}

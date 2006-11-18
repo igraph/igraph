@@ -258,3 +258,10 @@ graph.edgelist <- function(el, directed=TRUE) {
 
   res
 }
+
+graph.extended.chordal.ring <- function(n, w) {
+  
+  .Call("R_igraph_extended_chordal_ring", as.numeric(n),
+        as.matrix(w),
+        PACKAGE="igraph")
+}

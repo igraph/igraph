@@ -4631,3 +4631,23 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
   UNPROTECT(2);
   return result;
 }
+
+SEXP R_igraph_extended_chordal_ring(SEXP pnodes, SEXP pw) {
+
+  igraph_t g;
+  igraph_integer_t nodes=REAL(pnodes)[0];
+  igraph_matrix_t w;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_matrix(pw, &w);
+  igraph_extended_chordal_ring(&g, nodes, &w);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

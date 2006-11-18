@@ -807,3 +807,82 @@ int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_extended_chordal_ring
+ * Create an extended chordal ring
+ * 
+ * An extended chordal ring is regular graph, each node has the same
+ * degree. It can be obtained from a simple ring by adding some extra
+ * edges specified by a matrix. Let p denote the number of columns in
+ * the <parameter>W</parameter> matrix. The extra edges of vertex i
+ * are added according to column (i mod p) in
+ * <parameter>W</parameter>. The number of extra edges is the number
+ * of rows in <parameter>W</parameter>: for each row j an edge
+ * i->i+w[ij] is added if i+w[ij] is less than the number of total
+ * nodes. 
+ * 
+ * </para><para>
+ * See also Kotsis, G: Interconnection Topologies for Parallel Processing
+ * Systems, PARS Mitteilungen 11, 1-6, 1993.
+ * 
+ * \param graph Pointer to an uninitialized graph object, the result
+ *   will be stored here. The result is always an undirected graph.
+ * \param nodes Integer constant, the number of vertices in the
+ *   graph. It must be at least 3.
+ * \param W The matrix specifying the extra edges. The number of
+ *   columns should divide the number of total vertices.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_ring().
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges.
+ */
+
+int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
+				 const igraph_matrix_t *W) {
+
+  igraph_vector_t edges;
+  long int period=igraph_matrix_ncol(W);
+  long int degree=igraph_matrix_nrow(W)+2;
+  long int i, j, mpos=0, epos=0;
+  
+  if (nodes<3) {
+    IGRAPH_ERROR("An extended chordal ring has at least 3 nodes",
+		 IGRAPH_EINVAL);
+  }
+  
+  if ((long int)nodes % period != 0) {
+    IGRAPH_ERROR("The period (number of columns in W) should divide the " 
+		 "number of nodes", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, nodes*degree);
+
+  for (i=0; i<nodes-1; i++) {
+    VECTOR(edges)[epos++] = i;
+    VECTOR(edges)[epos++] = i+1;
+  }
+  VECTOR(edges)[epos++] = 0;
+  VECTOR(edges)[epos++] = nodes-1;
+  
+  if (degree > 2) {
+    for (i=0; i<nodes; i++) {
+      for (j=0; j<degree-2; j++) {
+	long int offset=MATRIX(*W, j, mpos);
+	if (i+offset < nodes) {
+	  VECTOR(edges)[epos++] = i;
+	  VECTOR(edges)[epos++] = i+offset;
+	}
+      }
+      mpos++; if (mpos==period) { mpos=0; }
+    }
+  }
+  
+  igraph_vector_resize(&edges, epos);
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, IGRAPH_UNDIRECTED));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;  
+}
