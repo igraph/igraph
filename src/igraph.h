@@ -877,6 +877,8 @@ extern igraph_progress_handler_t igraph_progress_handler_stderr;
 igraph_progress_handler_t *
 igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
+int igraph_progress(const char *message, igraph_real_t percent, void *data);
+
 /* -------------------------------------------------- */
 /* Graph operators                                    */
 /* -------------------------------------------------- */

@@ -1,3 +1,7 @@
+2006-11-18  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/igraph.h (igraph_progress) : prototype added
+
 2006-11-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_extended_chordal_ring) : added
