@@ -1,23 +1,28 @@
-2006-11-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-18  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/components.R (no.clusters) : added
+	* interfaces/R/src/rinterface.c (R_igraph_no_clusters) : added
+
+2006-11-14  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/structure.generators.R 
 	(graph.extended.chordal.ring) : added
 	* interfaces/R/src/rinterface.c (R_igraph_extended_chordal_ring) :
 	added
 
-2006-11-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-09  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_spinglass_my_community) :
 	return more data: cohesion, adhesion, inner & outer links
 
-2006-11-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-07  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/community.R (spinglass.community) :
 	removed unneccesary arguments from .Call
 	* interfaces/R/src/rinterface.c (R_igraph_spinglass_my_community) :
 	removed unneccesary arguments
 
-2006-11-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-06  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/community.R (spinglass.community) : added
 	* interfaces/R/src/rinterface.c (R_igraph_spinglass_community) 

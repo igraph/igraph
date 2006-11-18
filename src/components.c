@@ -27,10 +27,10 @@
 #include <limits.h>
 
 int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
-			 igraph_vector_t *csize);
+			 igraph_vector_t *csize, igraph_integer_t *no);
 
 int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
-			   igraph_vector_t *csize);
+			   igraph_vector_t *csize, igraph_integer_t *no);
 
 /**
  * \ingroup structural
@@ -41,10 +41,15 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
  * \param graph The graph object to analyze.
  * \param membership First half of the result will be stored here. For
  *        every vertex the id of its component is given. The vector
- *        has to be preinitialized and will be resized.
+ *        has to be preinitialized and will be resized. Alternatively 
+ *        this argument can be \c NULL, in which case it is ignored.
  * \param csize The second half of the result. For every component it
  *        gives its size, the order is defined by the component ids.
  *        The vector has to be preinitialized and will be resized.
+ *        Alternatively this argument can be \c NULL, in which
+ *        case it is ignored.
+ * \param no Pointer to an integer, if not \c NULL then the number of 
+ *        clusters will be stored here.
  * \param mode For directed graph this specifies whether to calculate
  *        weakly or strongly connected components. Possible values: 
  *        \c IGRAPH_WEAK,
@@ -60,11 +65,12 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
  */
 
 int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership, 
-		    igraph_vector_t *csize, igraph_connectedness_t mode) {
+		    igraph_vector_t *csize, igraph_integer_t *no,
+		    igraph_connectedness_t mode) {
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
-    return igraph_clusters_weak(graph, membership, csize);
+    return igraph_clusters_weak(graph, membership, csize, no);
   } else if (mode==IGRAPH_STRONG) {
-    return igraph_clusters_strong(graph, membership, csize);
+    return igraph_clusters_strong(graph, membership, csize, no);
   } else {
     IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
   }
@@ -73,7 +79,7 @@ int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
 }
 
 int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
-			 igraph_vector_t *csize) {
+			 igraph_vector_t *csize, igraph_integer_t *no) {
 
   long int no_of_nodes=igraph_vcount(graph);
   char *already_added;
@@ -88,14 +94,18 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
   if (already_added==0) {
     IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+  IGRAPH_FINALLY(igraph_free, already_added);
 
   IGRAPH_DQUEUE_INIT_FINALLY(&q, no_of_nodes > 100000 ? 10000 : no_of_nodes/10);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 
   /* Memory for result, csize is dynamically allocated */
-  IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
-  igraph_vector_clear(csize);
+  if (membership) { 
+    IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+  }
+  if (csize) { 
+    igraph_vector_clear(csize);
+  }
 
   /* The algorithm */
 
@@ -105,7 +115,9 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
 
     already_added[first_node]=1;
     act_cluster_size=1;
-    VECTOR(*membership)[first_node]=no_of_clusters-1;
+    if (membership) {
+      VECTOR(*membership)[first_node]=no_of_clusters-1;
+    }
     IGRAPH_CHECK(igraph_dqueue_push(&q, first_node));
     
     while ( !igraph_dqueue_empty(&q) ) {
@@ -117,14 +129,20 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
 	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	already_added[neighbor]=1;
 	act_cluster_size++;
-	VECTOR(*membership)[neighbor]=no_of_clusters-1;
+	if (membership) {
+	  VECTOR(*membership)[neighbor]=no_of_clusters-1;
+	}
       }
     }
     no_of_clusters++;
-    IGRAPH_CHECK(igraph_vector_push_back(csize, act_cluster_size));
+    if (csize) {
+      IGRAPH_CHECK(igraph_vector_push_back(csize, act_cluster_size));
+    }
   }
   
   /* Cleaning up */
+  
+  if (no) { *no = no_of_clusters-1; }
   
   Free(already_added);
   igraph_dqueue_destroy(&q);
@@ -135,7 +153,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
 }
 
 int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
-			   igraph_vector_t *csize) {
+			   igraph_vector_t *csize, igraph_integer_t *no) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t next_nei=IGRAPH_VECTOR_NULL;
@@ -156,11 +174,15 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
 
-  IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+  if (membership) {
+    IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+  }
   IGRAPH_CHECK(igraph_vector_reserve(&out, no_of_nodes));
 
   igraph_vector_null(&out);
-  igraph_vector_clear(csize);
+  if (csize) {
+    igraph_vector_clear(csize);
+  }
   
   for (i=0; i<no_of_nodes; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
@@ -200,7 +222,9 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
     if (VECTOR(next_nei)[grandfather] != 0) { continue; }
     VECTOR(next_nei)[grandfather]=1;
     act_cluster_size=1;
-    VECTOR(*membership)[grandfather]=no_of_clusters-1;
+    if (membership) {
+      VECTOR(*membership)[grandfather]=no_of_clusters-1;
+    }
     IGRAPH_CHECK(igraph_dqueue_push(&q, grandfather));
     
     while (!igraph_dqueue_empty(&q)) {
@@ -212,13 +236,19 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	VECTOR(next_nei)[neighbor]=1;
 	act_cluster_size++;
-	VECTOR(*membership)[neighbor]=no_of_clusters-1;
+	if (membership) {
+	  VECTOR(*membership)[neighbor]=no_of_clusters-1;
+	}
       }
     }
     no_of_clusters++;
-    IGRAPH_CHECK(igraph_vector_push_back(csize, act_cluster_size));
+    if (csize) {
+      IGRAPH_CHECK(igraph_vector_push_back(csize, act_cluster_size));
+    }
   }
   
+  if (no) { *no=no_of_clusters-1; }
+
   /* Clean up, return */
 
   igraph_vector_destroy(&out);
@@ -259,16 +289,10 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
     return igraph_is_connected_weak(graph, res);
   } else if (mode==IGRAPH_STRONG) {
-    igraph_vector_t membership=IGRAPH_VECTOR_NULL;
-    igraph_vector_t csize=IGRAPH_VECTOR_NULL;
     int retval;
-    IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
-    retval = igraph_clusters_strong(graph, &membership, &csize);
-    *res = (igraph_vector_size(&csize)==1);
-    igraph_vector_destroy(&membership);
-    igraph_vector_destroy(&csize);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_integer_t no;
+    retval = igraph_clusters_strong(graph, 0, 0, &no);
+    *res = (no==1);
     return retval;
   } else {
     IGRAPH_ERROR("mode argument", IGRAPH_EINVAL);

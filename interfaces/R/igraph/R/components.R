@@ -34,7 +34,18 @@ clusters <- function(graph, mode="weak") {
   .Call("R_igraph_clusters", graph, as.numeric(mode),
         PACKAGE="igraph")
 }
-  
+
+no.clusters <- function(graph, mode="weak") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "weak"=1, "strong"=2)
+  }
+  .Call("R_igraph_no_clusters", graph, as.numeric(mode),
+        PACKAGE="igraph")
+}
+
 cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
                                  ...) {
   if (!is.igraph(graph)) {

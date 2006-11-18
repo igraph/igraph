@@ -1,4 +1,5 @@
 \name{clusters}
+\alias{no.clusters}
 \alias{clusters}
 \alias{is.connected}
 \alias{cluster.distribution}
@@ -7,6 +8,7 @@
 \usage{
 is.connected(graph, mode="weak")
 clusters(graph, mode="weak")
+no.clusters(graph, mode="weak")
 cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
 }
 \arguments{
@@ -29,6 +31,10 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
   \code{clusters} finds the maximal (weakly or strongly) connected
   components of a graph.
 
+  \code{no.clusters} does almost the same as \code{clusters} but returns
+  only the number of clusters found instead of returning the actual
+  clusters.
+
   \code{cluster.distribution} creates a histogram for the maximal
   connected component sizes.
   
@@ -44,6 +50,8 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
     \item{csize}{numeric vector giving the sizes of the clusters.}
   }
 
+  For \code{no.clusters} an integer constant is returned.
+  
   For \code{cluster.distribution} a numeric vector with the relative
   frequencies. The length of the vector is the number of components.
 }

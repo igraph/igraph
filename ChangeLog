@@ -2,7 +2,10 @@
 
 	* src/igraph.h (igraph_progress) : prototype added
 
-2006-11-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+	* src/components.c (igraph_clusters, igraph_clusters_weak)
+	(igraph_clusters_strong) : 'no' argument added
+
+2006-11-14  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/structure_generators.c (igraph_extended_chordal_ring) : added
 
@@ -15,7 +18,7 @@
 	execution is stopped after the call to igraph_error, which
 	is not true if the error handler is overridden)
 
-2006-11-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-09  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/clustertool.cpp (igraph_spinglass_my_community) : 
 	return more data: adhesion, cohesion, inner & outer links
@@ -30,12 +33,12 @@
 	* src/clustertoop.cpp (igraph_spinglass_my_community) : 
 	better error handling
  	
-2006-11-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-07  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/clustertool.cpp (igraph_spinglass_my_community) : removed 
 	unneccesary arguments
 
-2006-11-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-06  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/NetDataTypes.cpp : added
 	* src/NetRoutines.cpp : added
@@ -53,7 +56,7 @@
 	(PottsModel::WriteClusters) : myq argument not needed
 	* examples/simple/spinglass.c : updated
 	
-2006-11-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+2006-11-04  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/flow.c (igraph_i_vertex_connectivity_directed) : corrected
 

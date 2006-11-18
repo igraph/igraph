@@ -94,7 +94,8 @@ S3method(rglplot, igraph)
 
 # components
 
-export(clusters, cluster.distribution, is.connected, decompose.graph)
+export(clusters, cluster.distribution, is.connected, decompose.graph,
+       no.clusters)
 
 # centrality
 

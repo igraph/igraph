@@ -1324,7 +1324,7 @@ SEXP R_igraph_clusters(SEXP graph, SEXP pmode) {
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&csize, 0);
-  igraph_clusters(&g, &membership, &csize, mode);
+  igraph_clusters(&g, &membership, &csize, 0, mode);
   
   PROTECT(result=NEW_LIST(2));
   PROTECT(names=NEW_CHARACTER(2));
@@ -4645,6 +4645,26 @@ SEXP R_igraph_extended_chordal_ring(SEXP pnodes, SEXP pw) {
   igraph_extended_chordal_ring(&g, nodes, &w);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_no_clusters(SEXP graph, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_integer_t mode=REAL(pmode)[0];
+  igraph_integer_t res;
+  SEXP result;
+
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  igraph_clusters(&g, 0, 0, &res, mode);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
   
   R_igraph_after();
   

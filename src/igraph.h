@@ -679,7 +679,8 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
 /* -------------------------------------------------- */
 
 int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership, 
-		    igraph_vector_t *csize, igraph_connectedness_t mode);
+		    igraph_vector_t *csize, igraph_integer_t *no,
+		    igraph_connectedness_t mode);
 int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res, 
 			igraph_connectedness_t mode);
 int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
