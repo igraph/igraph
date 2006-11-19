@@ -300,22 +300,28 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
 					    igraph_t *mst) {
 
   long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
   char *already_added;
+  char *added_edges;
   
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
   long int i, j;
 
+  added_edges=Calloc(no_of_edges, char);
+  if (added_edges==0) {
+    IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, added_edges);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   already_added=Calloc(no_of_nodes, char);
   if (already_added==0) {
     IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+  IGRAPH_FINALLY(igraph_free, already_added);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
-  IGRAPH_CHECK(igraph_vector_reserve(&edges, (no_of_nodes-1)*2));
   
   for (i=0; i<no_of_nodes; i++) {
     if (already_added[i]>0) { continue; }
@@ -326,14 +332,18 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
     IGRAPH_CHECK(igraph_dqueue_push(&q, i));
     while (! igraph_dqueue_empty(&q)) {
       long int act_node=igraph_dqueue_pop(&q);
-      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, act_node, 3));
+      IGRAPH_CHECK(igraph_adjacent(graph, &tmp, act_node, IGRAPH_ALL));
       for (j=0; j<igraph_vector_size(&tmp); j++) {
-	long int neighbor=VECTOR(tmp)[j];
-	if (already_added[neighbor]==0) {
-	  already_added[neighbor]=1;
-	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, act_node));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, neighbor));
+	long int edge=VECTOR(tmp)[j];
+	if (added_edges[edge]==0) {
+	  igraph_integer_t from, to;
+	  igraph_edge(graph, edge, &from, &to);
+	  if (act_node==to) { to=from; }
+	  if (already_added[(long int) to]==0) {
+	    already_added[(long int) to]=1;
+	    added_edges[edge]=1;
+	    IGRAPH_CHECK(igraph_dqueue_push(&q, to));
+	  }
 	}
       }
     }
@@ -344,9 +354,28 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
   igraph_vector_destroy(&tmp);
   IGRAPH_FINALLY_CLEAN(3);
 
-  IGRAPH_CHECK(igraph_create(mst, &edges, 0, igraph_is_directed(graph)));
+  /* summarize the edges to delete */
+  j=0;
+  for (i=0; i<no_of_edges; i++) {
+    if (added_edges[i]==0) {
+      j++;
+    }
+  }
+  IGRAPH_CHECK(igraph_vector_resize(&edges, j));
+  j=0;
+  for (i=0; i<no_of_edges; i++) {
+    if (added_edges[i]==0) {
+      VECTOR(edges)[j++]=i;
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_copy(mst, graph));
+  IGRAPH_FINALLY(igraph_destroy, mst);
+  IGRAPH_CHECK(igraph_delete_edges(mst, igraph_ess_vector(&edges)));
+  
   igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(1);
+  Free(added_edges);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
 }
@@ -400,7 +429,9 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 				      const igraph_vector_t *weights) {
 
   long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
   char *already_added;
+  char *added_edges;
 
   igraph_d_indheap_t heap=IGRAPH_D_INDHEAP_NULL;
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
@@ -414,15 +445,19 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
     IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL);
   }
 
+  added_edges=Calloc(no_of_edges, char);
+  if (added_edges==0) {
+    IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_destroy, added_edges);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   already_added=Calloc(no_of_nodes, char);
   if (already_added == 0) {
     IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+  IGRAPH_FINALLY(igraph_free, already_added);
   IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
   IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
-  IGRAPH_CHECK(igraph_vector_reserve(&edges, (no_of_nodes-1)*2));
   IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
 
   for (i=0; i<no_of_nodes; i++) {
@@ -440,34 +475,39 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
       neighbor= edgefrom != i ? edgefrom : edgeto;
       if (already_added[neighbor] == 0) {
 	IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
-				    neighbor));
+					   edgeno));
       }
     }
 
     while(! igraph_d_indheap_empty(&heap)) {
       /* Get minimal edge */
-      long int from, to;
-      igraph_d_indheap_max_index(&heap, &from, &to);
-
+      long int from, edge;
+      igraph_integer_t tmp, to;
+      igraph_d_indheap_max_index(&heap, &from, &edge);
+      igraph_edge(graph, edge, &tmp, &to);
+      
       /* Erase it */
       igraph_d_indheap_delete_max(&heap);
-      
-      /* Does it point to a visited node? */
-      if (already_added[to]==0) {
-	already_added[to]=1;
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
-	/* add all outgoing edges */
-	igraph_adjacent(graph, &adj, to, mode);
-	for (j=0; j<igraph_vector_size(&adj); j++) {
-	  long int edgeno=VECTOR(adj)[j];
-	  igraph_integer_t edgefrom, edgeto;
-	  long int neighbor;
-	  igraph_edge(graph, edgeno, &edgefrom, &edgeto);
-	  neighbor= edgefrom != to ? edgefrom : edgeto;
-	  if (already_added[neighbor] == 0) {
-	    IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
-					neighbor));
+
+      /* Is this edge already included? */
+      if (added_edges[edge]==0) {
+	if (from==to) { to=tmp; }
+	/* Does it point to a visited node? */      
+	if (already_added[(long int)to]==0) {
+	  already_added[(long int)to]=1;
+	  added_edges[edge]=1;
+	  /* add all outgoing edges */
+	  igraph_adjacent(graph, &adj, to, mode);
+	  for (j=0; j<igraph_vector_size(&adj); j++) {
+	    long int edgeno=VECTOR(adj)[j];
+	    igraph_integer_t edgefrom, edgeto;
+	    long int neighbor;
+	    igraph_edge(graph, edgeno, &edgefrom, &edgeto);
+	    neighbor= edgefrom != to ? edgefrom : edgeto;
+	    if (already_added[neighbor] == 0) {
+	      IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
+						 edgeno));
+	    }
 	  }
 	} /* for */
       } /* if !already_added */
@@ -476,11 +516,30 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 
   igraph_d_indheap_destroy(&heap);
   Free(already_added);
-  IGRAPH_FINALLY_CLEAN(2);
-
-  IGRAPH_CHECK(igraph_create(mst, &edges, 0, igraph_is_directed(graph)));
-  igraph_vector_destroy(&edges);
   igraph_vector_destroy(&adj);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  /* Ok, collect the edges to delete */
+  j=0;
+  for (i=0; i<no_of_edges; i++) {
+    if (added_edges[i]==0) {
+      j++;
+    }
+  }
+  IGRAPH_CHECK(igraph_vector_resize(&edges, j));
+  j=0;
+  for (i=0; i<no_of_edges; i++) {
+    if (added_edges[i]==0) {
+      VECTOR(edges)[j++]=i;
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_copy(mst, graph));
+  IGRAPH_FINALLY(igraph_destroy, mst);
+  IGRAPH_CHECK(igraph_delete_edges(mst, igraph_ess_vector(&edges)));
+  
+  igraph_vector_destroy(&edges);
+  Free(added_edges);
   IGRAPH_FINALLY_CLEAN(2);
   
   return 0;
@@ -1915,7 +1974,7 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
   IGRAPH_FINALLY_CLEAN(1);
   
   /* must set res->attr to 0 before calling igraph_copy */
-  res->attr=0;
+  res->attr=0;           /* Why is this needed? TODO */
   IGRAPH_CHECK(igraph_copy(res, graph));
   IGRAPH_FINALLY(igraph_destroy, res);
   IGRAPH_CHECK(igraph_delete_vertices(res, igraph_vss_vector(&delete)));

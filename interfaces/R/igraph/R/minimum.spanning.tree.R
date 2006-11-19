@@ -21,18 +21,32 @@
 ###################################################################
 
 minimum.spanning.tree <- function(graph, weights=NULL,
-                                  algorithm="unweighted", ...) {
+                                  algorithm=NULL, ...) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+
+  if (is.null(algorithm)) {
+    if (!is.null(weights) || "weight" %in% list.edge.attributes(graph)) {
+      algorithm <- "prim"
+    } else {
+      algorithm <- "unweighted"
+    }
+  }
+  
   if (algorithm=="unweighted") {
     .Call("R_igraph_minimum_spanning_tree_unweighted", graph,
           PACKAGE="igraph")
   } else if (algorithm=="prim") {
+    if (is.null(weights) && ! "weight" %in% list.edge.attributes(graph)) {
+      stop("edges weights must be supplied for Prim's algorithm")
+    } else if (is.null(weights)) {
+      weights <- E(g)$weight
+    }
     .Call("R_igraph_minimum_spanning_tree_prim", graph, as.numeric(weights),
           PACKAGE="igraph")    
   } else {
-    error("Invalid algorithm")
+    stop("Invalid algorithm")
   }
 }

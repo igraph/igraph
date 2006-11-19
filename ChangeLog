@@ -5,6 +5,10 @@
 	* src/components.c (igraph_clusters, igraph_clusters_weak)
 	(igraph_clusters_strong) : 'no' argument added
 
+	* src/structural_properties.c (igraph_minimum_spanning_tree_unweighted)
+	(igraph_minimum_spanning_tree_prim) : vertex and edge attributes are 
+	preserved
+
 2006-11-14  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/structure_generators.c (igraph_extended_chordal_ring) : added

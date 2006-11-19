@@ -12,13 +12,18 @@ minimum.spanning.tree(graph, weights=NULL, algorithm="unweighted", \dots)
 \arguments{
   \item{graph}{The graph object to analyze.}
   \item{weights}{Numeric algorithm giving the weights of the edges in
-    the graph. The order should be the same as for given by
-    \code{\link{get.edgelist}}. This is ignored for the \code{unweighted}
-    algorithm.
+    the graph. The order is determined by the edge ids. This is ignored
+    if the \code{unweighted} algorithm is chosen
   }
   \item{algorithm}{The algorithm to use for
     calculation. \code{unweighted} can be used for unwieghted graphs,
-    and \code{prim} runs Prim's algorithm for weighted graphs.}
+    and \code{prim} runs Prim's algorithm for weighted graphs.
+    If this is \code{NULL} then igraph tries to select the algorithm
+    automatically: if the graph has an edge attribute called
+    \code{weight} of the \code{weights} argument is not \code{NULL} then
+    Prim's algorithm is chosen, otherwise the unwweighted algorithm is
+    performed.
+  }
   \item{\dots}{Additional arguments, unused.}
 }
 \details{
@@ -27,6 +32,8 @@ minimum.spanning.tree(graph, weights=NULL, algorithm="unweighted", \dots)
 \value{
   A graph object with the minimum spanning forest. (To check that it is
   a tree check that the number of its edges is \code{vcount(graph)-1}.)
+  The edge and vertex attributes of the original graph are preserved in
+  the result.
 }
 \references{ Prim, R.C. 1957. Shortest connection networks and some
   generalizations \emph{Bell System Technical Journal}, 37 1389--1401.}
