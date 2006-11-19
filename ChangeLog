@@ -1,3 +1,11 @@
+2006-11-19  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/structural_properties.c (igraph_transitivity) : removed
+	(igraph_transitivity_undirected) : made public, modified to "return" 
+	with scalar instead of a vector
+	(igraph_transitivity_local_undirected) : added
+	* examples/simple/igraph_transitivity.c : updated
+
 2006-11-18  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/igraph.h (igraph_progress) : prototype added

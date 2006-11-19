@@ -127,7 +127,9 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER=0,
 
 typedef enum { IGRAPH_DEGSEQ_SIMPLE=0 } igraph_degseq_t;
 
-typedef enum { IGRAPH_TRANSITIVITY_UNDIRECTED=0 } igraph_transitivity_type_t;
+typedef enum { IGRAPH_TRANSITIVITY_UNDIRECTED=0,
+               IGRAPH_TRANSITIVITY_LOCAL_UNDIRECTED } 
+                                            igraph_transitivity_type_t;
 
 typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
 	       IGRAPH_FILEFORMAT_NCOL,
@@ -659,8 +661,11 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
 int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 			       igraph_bool_t directed, igraph_bool_t unconn);
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops);
-int igraph_transitivity(const igraph_t *graph, igraph_vector_t *res, 
-			igraph_transitivity_type_t type); /* vvv + add */
+int igraph_transitivity_undirected(const igraph_t *graph, 
+				   igraph_real_t *res);
+int igraph_transitivity_local_undirected(const igraph_t *graph, 
+					 igraph_vector_t *res,
+					 const igraph_vs_t vids);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops);
 

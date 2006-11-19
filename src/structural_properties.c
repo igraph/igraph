@@ -2094,7 +2094,115 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
   return 0;
 }
 
-int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) {
+/**
+ * \function igraph_transitivity_local_undirected
+ * \brief Calculates the local transitivity (clustering coefficient)
+ * of a graph
+ * 
+ * The transitivity mesures the probability that two neighbors of a
+ * vertex are connected. In case of the local transitivity, this
+ * probability is calculated separately for each vertex.
+ * \param graph The input graph, it can be directed but direction of
+ *   the edges will be ignored.
+ * \param res Pointer to an initialized vector, the result will be
+ *   stored here. It will be resized as needed.
+ * \param vids Vertex set, the vertices for which the local
+ *   transitivity will be calculated.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_transitivity_undirected().
+ * 
+ * Time complexity: O(n*d^2), n is the number of vertices for which
+ * the transitivity is calculated, d is the average vertex degree.
+ */
+
+int igraph_transitivity_local_undirected(const igraph_t *graph, 
+					 igraph_vector_t *res,
+					 const igraph_vs_t vids) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vit_t vit;
+  long int nodes_to_calc;
+  igraph_vector_t neis1, neis2;
+  igraph_real_t triples, triangles;
+  long int i, j, k;
+  long int neilen1, neilen2;
+  long int *neis;
+
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  nodes_to_calc=IGRAPH_VIT_SIZE(vit);
+
+  neis=Calloc(no_of_nodes, long int);
+  if (neis==0) {
+    IGRAPH_ERROR("local undirected transitivity failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, neis);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
+  IGRAPH_VECTOR_INIT_FINALLY(&neis1, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis2, 0);
+
+  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    long int node=IGRAPH_VIT_GET(vit);
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis1, node, IGRAPH_ALL));
+    neilen1=igraph_vector_size(&neis1);
+    for (j=0; j<neilen1; j++) {
+      neis[ (long int)VECTOR(neis1)[j] ] = i+1;
+    }
+    triples = neilen1*(neilen1-1);
+    triangles = 0;
+
+    for (j=0; j<neilen1; j++) {
+      long int v=VECTOR(neis1)[j];
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis2, v, IGRAPH_ALL));
+      neilen2=igraph_vector_size(&neis2);
+      for (k=0; k<neilen2; k++) {
+	long int v2=VECTOR(neis2)[k];
+	if (neis[v2] == i+1) {
+	  triangles += 1.0;
+	}
+      }
+    }
+    VECTOR(*res)[i] = triangles/triples;
+  }
+
+  Free(neis);
+  igraph_vector_destroy(&neis1);
+  igraph_vector_destroy(&neis2);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(4);
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_transitivity_undirected
+ * \brief Calculates the transitivity (clustering coefficient) of a graph.
+ * 
+ * </para><para>
+ * The transitivity measures the probability that two neighbors of a
+ * vertex are connected. More precisely this is the ratio of the
+ * triangles and connected triples in the graph, the result is a
+ * single real number or NaN (0/0) if there are no connected triples
+ * in the graph.  Directed graphs are considered as undirected ones.
+ * \param graph The graph object.  
+ * \param res Pointer to a real variable, the result will be stored here.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM: not enough memory for
+ *         temporary data. 
+ *
+ * \sa \ref igraph_transitivity_local_undirected().
+ *
+ * Time complexity: O(|V|*d^2), |V| is the number of vertices in 
+ * the graph, d is the average node degree. 
+ */
+
+int igraph_transitivity_undirected(const igraph_t *graph, 
+				   igraph_real_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_real_t triples=0, triangles=0;
@@ -2110,8 +2218,7 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
   if (neis==0) {
     IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, neis);	/* TODO: hack */
-  IGRAPH_CHECK(igraph_vector_resize(res, 1));
+  IGRAPH_FINALLY(igraph_free, neis);
 
   IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
@@ -2147,60 +2254,10 @@ int igraph_transitivity_undirected(const igraph_t *graph, igraph_vector_t *res) 
   igraph_i_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(2);
 
-  VECTOR(*res)[0] = triangles/triples;
+  *res = triangles/triples;
 
   return 0;
 }
-
-/**
- * \ingroup structural
- * \function igraph_transitivity
- * \brief Calculates the transitivity (clustering coefficient) of a graph.
- * 
- * </para><para>
- * The transitivity measures the probability that two neighbors of a
- * vertex are connected. See the \p type parameter for
- * different definitions (more to be expected soon).
- * \param graph The graph object.
- * \param res Pointer to an initialized vector, this will be resized
- *        to contain the result.
- * \param type It gives the type of the transitivity to
- *        calculate. Possible values:
- *        \clist
- *        \cli IGRAPH_TRANSITIVITY_UNDIRECTED
- *          the most common
- *          definition, the ratio of the triangles and connected
- *          triples in the graph, the result is a single real number
- *          or NaN (0/0) if there are no connected triples in the
- *          graph.  Directed graphs are considered as
- *          undirected ones. 
- *        \endclist
- * \return Error code:
- *         \c IGRAPH_EINVAL: unknown transitivity type.
- *         \c IGRAPH_ENOMEM: not enough memory for
- *         temporary data. 
- * 
- * Time complexity: O(|V|*d^2) for
- * \c IGRAPH_TRANSITIVITY_UNDIRECTED.
- * |V| is the number of vertices in
- * the graph, d is the highest node
- * degree. 
- */
-
-int igraph_transitivity(const igraph_t *graph, igraph_vector_t *res, 
-			igraph_transitivity_type_t type) {
-  
-  int retval;
-  
-  if (type == IGRAPH_TRANSITIVITY_UNDIRECTED) {
-    retval=igraph_transitivity_undirected(graph, res);
-  } else {
-    IGRAPH_ERROR("unknown transitivity type", IGRAPH_EINVAL);
-  }
-  
-  return retval;
-}
-
 
 /**
  * \ingroup structural

@@ -5,21 +5,40 @@
   vertices of a vertex are connected. This is sometimes also called the
   clustering coefficient. }
 \usage{
-transitivity(graph, type="undirected")
+transitivity(graph, type="undirected", vids=V(graph))
 }
 \arguments{
   \item{graph}{The graph to analyze.}
   \item{type}{The type of the transitivity to calculate. Possible
-    values: \sQuote{\code{undirected}} calculates the global transitivity of an
-    undirected graph (directed graphs are considered as undirected ones
-    as well). This is simply the ratio of the triangles and the
-    connected triples in the graph.
+    values:
+    \itemize{
+      \item{\code{global}}{The global transitivity of an
+	undirected graph (directed graphs are considered as undirected ones
+	as well). This is simply the ratio of the triangles and the
+	connected triples in the graph. For directed graph the direction
+	of the edges is ignored. }
+      \item{\code{local}}{The local transitivity of an undirected graph,
+	this is calculated for each vertex given in the \code{vids}
+	argument. The local transitivity of a vertex is the ratio of the
+	triangles connected to the vertex and the triples centered on
+	the vertex. For directed graph the direction of the edges is
+	ignored. }
+      \item{\code{undirected}}{This is the same as \code{global}.}
+      \item{\code{globalundirected}}{This is the same as \code{global}.}
+      \item{\code{localundirected}}{This is the same as \code{local}.}
+    }
+  }
+  \item{vids}{The vertex ids for the local transitivity will be
+    calculated. This will be ignored for global transitivity types.
   }
 }
 %\details{}
 \value{
-  For \sQuote{\code{undirected}} a single number, or \code{NaN} if there are no
+  For \sQuote{\code{global}} a single number, or \code{NaN} if there are no
   connected triples in the graph.
+
+  For \sQuote{\code{local}} a vector of transitivity scores, one for
+  each vertex in \sQuote{\code{vids}}.
 }
 \references{ Wasserman, S., and Faust, K. (1994). \emph{Social Network
   Analysis: Methods and Applications.} Cambridge: Cambridge University

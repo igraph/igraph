@@ -1,3 +1,12 @@
+2006-11-19  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/structural.properties.R (transitivity) :
+	slightly rewritten, updated, more types are supported now
+	* interfaces/R/src/rinterface.c (R_igraph_transitivity) : removed
+	(R_igraph_transitivity_undirected)
+	(R_igraph_transitivity_local_undirected) : added
+	
+
 2006-11-18  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/components.R (no.clusters) : added

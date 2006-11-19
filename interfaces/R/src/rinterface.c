@@ -2894,22 +2894,43 @@ SEXP R_igraph_degree_sequence_game(SEXP pout_seq, SEXP pin_seq,
   return result;
 }
   
-SEXP R_igraph_transitivity(SEXP graph, SEXP ptype) {
+SEXP R_igraph_transitivity_undirected(SEXP graph) {
   
   igraph_t g;
-  igraph_vector_t res;
-  igraph_integer_t type=REAL(ptype)[0];
+  igraph_real_t res;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
+  igraph_transitivity_undirected(&g, &res);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_transitivity_local_undirected(SEXP graph, SEXP pvids) {
+  
+  igraph_t g;
+  igraph_vs_t vs;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_vs(pvids, &g, &vs);
   igraph_vector_init(&res, 0);
-  igraph_transitivity(&g, &res, type);
+  igraph_transitivity_local_undirected(&g, &res, vs);
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
   igraph_vector_destroy(&res);
+  igraph_vs_destroy(&vs);
   
   R_igraph_after();
   

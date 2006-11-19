@@ -223,16 +223,22 @@ edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
         PACKAGE="igraph")[ as.numeric(e)+1 ]  
 }
 
-transitivity <- function(graph, type="undirected") {
+transitivity <- function(graph, type="undirected", vids=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   if (is.character(type)) {
-    type <- switch(type, "undirected"=0)
+    type <- switch(type, "undirected"=0, "global"=0, "globalundirected"=0,
+                   "localundirected"=1, "local"=1)
   }
-
-  .Call("R_igraph_transitivity", graph, as.numeric(type),
-        PACKAGE="igraph")
+  
+  if (type==0) {
+    .Call("R_igraph_transitivity_undirected", graph,
+          PACKAGE="igraph")
+  } else if (type==1) {
+    .Call("R_igraph_transitivity_local_undirected", graph, as.numeric(vids),
+          PACKAGE="igraph")
+  }
 }
 
 graph.laplacian <- function(graph, normalized=FALSE) {

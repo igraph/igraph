@@ -26,25 +26,23 @@
 int main() {
   
   igraph_t g;
-  igraph_vector_t res;
-
-  igraph_vector_init(&res, 0);
+  igraph_real_t res;
 
   /* Trivial cases */
 
   igraph_ring(&g, 100, IGRAPH_UNDIRECTED, 0, 0);
-  igraph_transitivity(&g, &res, IGRAPH_TRANSITIVITY_UNDIRECTED);
+  igraph_transitivity_undirected(&g, &res);
   igraph_destroy(&g);
 
-  if (VECTOR(res)[0] != 0) {
+  if (res != 0) {
     return 1;
   }
 
   igraph_full(&g, 20, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-  igraph_transitivity(&g, &res, IGRAPH_TRANSITIVITY_UNDIRECTED);
+  igraph_transitivity_undirected(&g, &res);
   igraph_destroy(&g);
   
-  if (VECTOR(res)[0] != 1) {
+  if (res != 1) {
     return 2;
   }
 
@@ -69,15 +67,13 @@ int main() {
 	       31, 32, 31, 33, 32, 33,
 	       -1);  
   
-  igraph_transitivity(&g, &res, IGRAPH_TRANSITIVITY_UNDIRECTED);
+  igraph_transitivity_undirected(&g, &res);
   igraph_destroy(&g);
   
-  if (VECTOR(res)[0] != 0.2556818181818181767717) {
-    fprintf(stderr, "%f != %f\n", VECTOR(res)[0], 0.2556818181818181767717);
+  if (res != 0.2556818181818181767717) {
+    fprintf(stderr, "%f != %f\n", res, 0.2556818181818181767717);
     return 3;
   }
-
-  igraph_vector_destroy(&res);
 
   return 0;
 }
