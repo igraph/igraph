@@ -1,5 +1,4 @@
 
-o attribute support in minimum spanning tree
 o attribute support in to_undirected
 o calculate the actual maximum flow
 o local transitivity, average local transitivity.

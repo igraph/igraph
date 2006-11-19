@@ -7,7 +7,7 @@
   is the graph consisting of the minimum spanning trees of its
   components.}
 \usage{
-minimum.spanning.tree(graph, weights=NULL, algorithm="unweighted", \dots)
+minimum.spanning.tree(graph, weights=NULL, algorithm=NULL, \dots)
 }
 \arguments{
   \item{graph}{The graph object to analyze.}
