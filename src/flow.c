@@ -512,9 +512,9 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
     n=igraph_vector_size(neis);    
     for (i=0; i<n; i++) {     
       igraph_integer_t nei=VECTOR(*neis)[i];
+      long int n2, j;
       neis2=igraph_i_adjlist_get(&adjlist, nei);
-      long int n2=igraph_vector_size(neis2);
-      long int j;
+      n2=igraph_vector_size(neis2);
       for (j=0; j<n2; j++) {
 	if (VECTOR(*neis2)[j] == last) {
 	  VECTOR(*neis2)[j] = a;

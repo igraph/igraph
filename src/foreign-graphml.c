@@ -28,6 +28,7 @@
 #include <math.h>               /* isnan */
 #include <string.h>
 #include "memory.h"
+#include <stdarg.h> 		/* va_start & co */
 
 #if HAVE_LIBXML == 1
 #include <libxml/encoding.h>

@@ -6,6 +6,11 @@
 	(igraph_transitivity_local_undirected) : added
 	* examples/simple/igraph_transitivity.c : updated
 
+	* ssrc/flow.c (igraph_i_mincut_value_undirected) : minor change to 
+	make it compile with older gcc
+	* src/foreign-graphml.c : include <stdarg.h> to make it compile with
+	older gcc
+	
 2006-11-18  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/igraph.h (igraph_progress) : prototype added
