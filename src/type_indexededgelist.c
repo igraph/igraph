@@ -485,10 +485,10 @@ int igraph_delete_vertices(igraph_t *graph, igraph_vs_t vertices) {
   }
   /* create edge recoding vector */
   for (remaining_edges=0, i=0; i<no_of_edges; i++) {
-    igraph_integer_t from, to;
-    igraph_edge(graph, i, &from, &to);
-    if (VECTOR(vertex_recoding)[ (long int) from] != 0 &&
-	VECTOR(vertex_recoding)[ (long int) to  ] != 0) {
+    long int from=VECTOR(graph->from)[i];
+    long int to=VECTOR(graph->to)[i];
+    if (VECTOR(vertex_recoding)[from] != 0 &&
+	VECTOR(vertex_recoding)[to  ] != 0) {
       VECTOR(edge_recoding)[i]=remaining_edges+1;
       remaining_edges++;
     } 
