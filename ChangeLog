@@ -1,3 +1,7 @@
+2006-11-21  Gabor Csardi  <csardi@kzoo.edu>
+
+	* src/type_indexededgelist.c (igraph_delete_vertices) : rewritten
+
 2006-11-19  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/structural_properties.c (igraph_transitivity) : removed
