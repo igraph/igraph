@@ -87,7 +87,7 @@ sources=glob.glob(os.path.join('igraph', '*.c'))
 
 sources.extend(module_sources)
 
-include_dirs=['igraph']
+include_dirs=['igraph', '.']
 library_dirs=[]
 libraries=[]
 

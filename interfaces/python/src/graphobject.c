@@ -1718,6 +1718,7 @@ PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self,
    char *kwlist[] = {"mode", NULL};
    igraph_connectedness_t mode=IGRAPH_STRONG;
    igraph_vector_t res1, res2;
+   igraph_integer_t no;
    PyObject *list;
    
    if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &mode))
@@ -1732,7 +1733,7 @@ PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self,
    igraph_vector_init(&res1, igraph_vcount(&self->g));
    igraph_vector_init(&res2, 10);
    
-   if (igraph_clusters(&self->g, &res1, &res2, mode)) 
+   if (igraph_clusters(&self->g, &res1, &res2, &no, mode)) 
      {
 	igraphmodule_handle_igraph_error();
 	igraph_vector_destroy(&res1);
@@ -2320,35 +2321,65 @@ PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self,
 /** \ingroup python_interface_graph
  * \brief Calculates the graph transitivity (a.k.a. clustering coefficient)
  * \return the clustering coefficient
- * \sa igraph_transitivity
+ * \sa igraph_transitivity_undirected
  */
-PyObject* igraphmodule_Graph_transitivity(igraphmodule_GraphObject *self,
-					  PyObject *args,
-					  PyObject *kwds) {
-  char *kwlist[] = {"type", NULL};
-  igraph_transitivity_type_t type = IGRAPH_TRANSITIVITY_UNDIRECTED;
-  igraph_vector_t result;
-  
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &type))
-    return NULL;
+PyObject* igraphmodule_Graph_transitivity_undirected(igraphmodule_GraphObject *self,
+						     PyObject *args,
+						     PyObject *kwds) {
+  igraph_real_t res;
 
-  igraph_vector_init(&result, 1);
-  
-  if (igraph_transitivity(&self->g, &result, type)) {
+  if (igraph_transitivity_undirected(&self->g, &res)) {
     igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  PyObject *r = Py_BuildValue("d", (double)(res));
+  return r;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the local transitivity of given vertices
+ * \return the transitivities in a list
+ * \sa igraph_transitivity_local_undirected
+ */
+PyObject* igraphmodule_Graph_transitivity_local_undirected(igraphmodule_GraphObject *self,
+							   PyObject *args,
+							   PyObject *kwds) {
+  char *kwlist[] = {"vertices", NULL};
+  PyObject *vobj = NULL, *list = NULL;
+  igraph_vector_t result;
+  igraph_bool_t return_single=0;
+  igraph_vs_t vs;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&result, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_transitivity_local_undirected(&self->g, &result, vs)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
     igraph_vector_destroy(&result);
     return NULL;
   }
 
-  if (type == IGRAPH_TRANSITIVITY_UNDIRECTED) {
-    PyObject *r = Py_BuildValue("d", (double)(VECTOR(result)[0]));
-    igraph_vector_destroy(&result);
-    return r;
-  }
-  
+  if (!return_single)
+    list=igraphmodule_vector_t_to_float_PyList(&result);
+  else
+    list=PyFloat_FromDouble(VECTOR(result)[0]);
+
+  igraph_vs_destroy(&vs);
   igraph_vector_destroy(&result);
-  Py_INCREF(Py_None);
-  return Py_None;
+
+  return list;
 }
 
 /** \ingroup python_interface_graph

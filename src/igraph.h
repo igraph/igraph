@@ -236,7 +236,7 @@ typedef struct igraph_vit_t {
 /**
  * \section IGRAPH_VIT Stepping over the vertices
  *
- * <para>After creating an iterator with \ref igraph_eit_create(), it
+ * <para>After creating an iterator with \ref igraph_vit_create(), it
  * points to the first vertex in the vertex determined by the vertex
  * selector (if there is any). The \ref IGRAPH_VIT_NEXT() macro steps
  * to the next vertex, \ref IGRAPH_VIT_END() checks whether there are

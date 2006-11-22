@@ -1,10 +1,11 @@
 import unittest
-from igraph.test import basic
+from igraph.test import basic, structural
 from igraph import *
 
 def suite():
     return unittest.TestSuite( \
-        basic.suite() \
+        [basic.suite(),
+	structural.suite()] \
     )
     
 def test():

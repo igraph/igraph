@@ -2099,7 +2099,7 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
  * \brief Calculates the local transitivity (clustering coefficient)
  * of a graph
  * 
- * The transitivity mesures the probability that two neighbors of a
+ * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the local transitivity, this
  * probability is calculated separately for each vertex.
  * \param graph The input graph, it can be directed but direction of

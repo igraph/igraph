@@ -26,6 +26,7 @@
 #include "graphobject.h"
 #include "convert.h"
 #include "error.h"
+#include "memory.h"
 
 /**
  * \ingroup python_interface_conversion
@@ -507,3 +508,77 @@ int igraphmodule_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v) {
   
   return 0;
 }
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Tries to interpret a Python object as a vertex selector
+ * 
+ * \param o the Python object
+ * \param vs the \c igraph_vs_t which will contain the result
+ * \param return_single will be 1 if the selector selected only a single vertex,
+ * 0 otherwise
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
+				  igraph_bool_t *return_single) {
+  *return_single=0;
+  if (o==NULL || o == Py_None) {
+    /* Returns a vertex sequence for all vertices */
+    igraph_vs_all(vs);
+  } else if (PyInt_Check(o)) {
+    /* Returns a vertex sequence for a single vertex ID */
+    igraph_vs_1(vs, PyInt_AsLong(o));
+    *return_single=1;
+  } else if (PyLong_Check(o)) {
+    /* Returns a vertex sequence for a single vertex ID */
+    igraph_vs_1(vs, PyLong_AsLong(o));
+    *return_single=1;
+  } else {
+    /* Returns a vertex sequence with the IDs returned by the iterator */
+    PyObject *iterator = PyObject_GetIter(o);
+    PyObject *item;
+    igraph_vector_t *vector;
+
+    if (iterator == NULL) {
+      PyErr_SetString(PyExc_TypeError, "integer, long, iterable or None expected");
+      return 1;
+    }
+
+    vector=Calloc(1, igraph_vector_t);
+    if (!vector) {
+      PyErr_SetString(PyExc_MemoryError, "out of memory");
+      Py_DECREF(iterator);
+      return 1;
+    }
+
+    IGRAPH_CHECK(igraph_vector_init(vector, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, vector);
+    IGRAPH_CHECK(igraph_vector_reserve(vector, 20));
+
+    while (item = PyIter_Next(iterator)) {
+      long val=-1;
+      if (PyInt_Check(item)) val=PyInt_AsLong(item);
+      else if (PyLong_Check(item)) val=PyLong_AsLong(item);
+      Py_DECREF(item);
+
+      if (val >= 0) igraph_vector_push_back(vector, val);
+      else {
+	PyErr_SetString(PyExc_TypeError, "integer or long expected");
+      }
+
+      if (PyErr_Occurred()) break;
+    }
+    Py_DECREF(iterator);
+
+    if (PyErr_Occurred()) {
+      igraph_vector_destroy(vector);
+      IGRAPH_FINALLY_CLEAN(1);
+      return 1;
+    } else {
+      igraph_vs_vector(vs, vector);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
+  return 0;
+}
+

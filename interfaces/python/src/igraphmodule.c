@@ -673,9 +673,51 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
 }
 
 /* Permuting edges */
-int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
-					   const igraph_vector_t *idx) {
-  /* TODO */
+static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
+						  const igraph_vector_t *idx) { 
+  long int n, i, ndeleted=0;
+  PyObject *key, *value, *dict, *o;
+  int pos=0;
+
+  return 0;
+
+  dict=((PyObject**)graph->attr)[2];
+  if (!PyDict_Check(dict)) return 1;
+
+  n=igraph_vector_size(idx);
+  for (i=0; i<n; i++) {
+    /* printf("%ld:%f ", i, VECTOR(*idx)[i]); */
+    if (!VECTOR(*idx)[i]) {
+      ndeleted++;
+      continue;
+    }
+
+    pos=0;
+    /* TODO: maybe it would be more efficient to get the values from the
+     * hash in advance? */
+    while (PyDict_Next(dict, &pos, &key, &value)) {
+      /* Move the element from index i to VECTOR(*idx)[i]-1 */
+      o=PyList_GetItem(value, i);
+      if (!o) {
+	/* IndexError is already set, clear it and return */
+	PyErr_Clear();
+	return 1;
+      }
+      Py_INCREF(o);
+      PyList_SetItem(value, VECTOR(*idx)[i]-1, o);
+    }
+  }
+  /*printf("\n");*/
+  
+  /* Clear the remaining parts of the lists that aren't needed anymore */
+  pos=0;
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    n=PySequence_Size(value);
+    if (PySequence_DelSlice(value, n-ndeleted, n) == -1) return 1;
+    /*printf("key: "); PyObject_Print(key, stdout, Py_PRINT_RAW); printf("\n");
+    printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");*/
+  }
+  
   return 0;
 }
 
@@ -1002,7 +1044,7 @@ static igraph_attribute_table_t igraphmodule_i_attribute_table = {
 static PyMethodDef igraphmodule_methods[] = 
 {
   {"convex_hull", (PyCFunction)igraphmodule_convex_hull, METH_VARARGS,
-      "convex_hull(vs, coords=False) -> list\n\n"
+      "convex_hull(vs, coords=False)\n\n"
       "Calculates the convex hull of a given point set.\n\n"
       "@param vs: the point set as a list of lists\n"
       "@param coords: if C{True}, the function returns the\n"

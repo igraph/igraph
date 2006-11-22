@@ -1,3 +1,14 @@
+2006-11-22  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/convert.c (igraphmodule_PyObject_to_vs_t) :
+	added
+	* interfaces/python/src/graphobject.c
+	(igraphmodule_Graph_transitivity_undirected,
+	igraphmodule_Graph_transitivity_local_undirected) : added
+	* interfaces/python/src/test.py : modified to use the igraph.test
+	package
+	* interfaces/python/src/old_test.py : renamed from test.py
+
 2006-11-21  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/type_indexededgelist.c (igraph_delete_vertices) : rewritten
