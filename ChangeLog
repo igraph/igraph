@@ -1,3 +1,13 @@
+2006-11-23  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/igraphmodule.c
+	(igraphmodule_i_attribute_permute_edges) : added
+	* interfaces/python/src/graphobject.c : now all functions expecting
+	a vertex list accept a single vertex or a None object denoting all
+	vertices
+	* interfaces/python/src/old_test.py : now checks for proper attribute
+	handling in Graph.to_directed
+
 2006-11-22  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/convert.c (igraphmodule_PyObject_to_vs_t) :

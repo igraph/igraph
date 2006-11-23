@@ -1456,63 +1456,42 @@ PyObject* igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *self,
  * \return the betweennesses as a list (or a single float)
  * \sa igraph_betweenness
  */
-PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds)
-{
-   char *kwlist[] = {"vertices", "directed", NULL};
-   PyObject *directed=Py_True;
-   PyObject *vobj=NULL, *list=NULL;
-   igraph_vector_t vids;
-   igraph_vector_t res;
-   int return_single=0;
-
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-				    &vobj, &directed)) {
-     return NULL;
-   }
+PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  char *kwlist[] = {"vertices", "directed", NULL};
+  PyObject *directed=Py_True;
+  PyObject *vobj=Py_None, *list;
+  igraph_vector_t res;
+  igraph_bool_t return_single=0;
+  igraph_vs_t vs;
   
-   if (vobj == NULL) 
-     {
-	// no vertex list was supplied
-	if (igraph_vcount(&self->g)>0) 
-	  {
-	     if (igraph_vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1)) 
-	       return igraphmodule_handle_igraph_error();
-	  }
-	else
-	  {
-	     if (igraph_vector_init(&vids, 0)) return igraphmodule_handle_igraph_error();
-	  }
-     }
-   else
-     {
-	if (PyInt_Check(vobj)) return_single=1;
-	
-	Py_INCREF(vobj);
-	// vertex list was specified, convert to igraph_vector_t
-	if (igraphmodule_PyList_to_vector_t(vobj, &vids, 1, 0)) {
-	   Py_DECREF(vobj);
-	   return NULL;
-	}
-	Py_DECREF(vobj);
-     }
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+				   &vobj, &directed)) {
+    return NULL;
+  }
+  
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  if (igraph_vector_init(&res, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
 
-   
-   if (igraph_vector_init(&res, igraph_vector_size(&vids))) return igraphmodule_handle_igraph_error();
-   
-   if (igraph_betweenness(&self->g, &res, igraph_vss_vector(&vids), PyObject_IsTrue(directed)))
-     {
-	igraphmodule_handle_igraph_error(); return NULL;
-     }
-   
-   if (!return_single)
-     list=igraphmodule_vector_t_to_float_PyList(&res);
-   else
-     list=PyFloat_FromDouble(VECTOR(res)[0]);
-   
-   igraph_vector_destroy(&res);
-   igraph_vector_destroy(&vids);
-   
-   return list;
+  if (igraph_betweenness(&self->g, &res, vs, PyObject_IsTrue(directed))) {
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  if (!return_single)
+    list=igraphmodule_vector_t_to_float_PyList(&res);
+  else
+    list=PyFloat_FromDouble(VECTOR(res)[0]);
+  
+  igraph_vector_destroy(&res);
+  igraph_vs_destroy(&vs);
+  
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -1520,45 +1499,32 @@ PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObjec
  * \return the PageRank values
  * \sa igraph_pagerank
  */
-PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds)
-{
+PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
   char *kwlist[] = {"vertices", "directed", "niter", "eps", "damping", NULL};
   PyObject *directed=Py_True;
-  PyObject *vobj=NULL, *list=NULL;
+  PyObject *vobj=Py_None, *list;
   long int niter=1000; /// @todo maybe it should be selected adaptively based on the number of vertices?
   double eps=0.001, damping=0.85;
-  igraph_vector_t vids;
   igraph_vector_t res;
-  int return_single=0;
-  
+  igraph_bool_t return_single=0;
+  igraph_vs_t vs;
+
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOldd", kwlist,
 				   &vobj, &directed, &niter, &eps, &damping))
     return NULL;
 
-  if (vobj == NULL) {
-    // no vertex list was supplied
-    if (igraph_vcount(&self->g)>0)  {
-      if (igraph_vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1)) 
-	return igraphmodule_handle_igraph_error();
-    } else {
-      if (igraph_vector_init(&vids, 0)) return igraphmodule_handle_igraph_error();
-    }
-  } else {
-    if (PyInt_Check(vobj)) return_single=1;
-      
-    Py_INCREF(vobj);
-    // vertex list was specified, convert to igraph_vector_t
-    if (igraphmodule_PyList_to_vector_t(vobj, &vids, 1, 0)) {
-      Py_DECREF(vobj);
-      return NULL;
-    }
-    Py_DECREF(vobj);
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error(); return NULL;
   }
-   
-  if (igraph_vector_init(&res, igraph_vector_size(&vids))) return igraphmodule_handle_igraph_error();
-   
-  if (igraph_pagerank(&self->g, &res, igraph_vss_vector(&vids),
+
+  if (igraph_vector_init(&res, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_pagerank(&self->g, &res, vs,
 		      PyObject_IsTrue(directed), niter, eps, damping)) {
+    igraph_vs_destroy(&vs);
     igraphmodule_handle_igraph_error(); return NULL;
   }
    
@@ -1568,7 +1534,7 @@ PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *
     list=PyFloat_FromDouble(VECTOR(res)[0]);
    
   igraph_vector_destroy(&res);
-  igraph_vector_destroy(&vids);
+  igraph_vs_destroy(&vs);
    
   return list;
 }
@@ -1580,59 +1546,38 @@ PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *
  */
 PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self,
 						PyObject *args,
-						PyObject *kwds) 
-{
-   char *kwlist[] = {"vertices", NULL};
-   PyObject *vobj=NULL, *list=NULL;
-   igraph_vector_t vids;
-   igraph_matrix_t res;
-   int return_single=0;
-   
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
-     return NULL;
+						PyObject *kwds) {
+  char *kwlist[] = {"vertices", NULL};
+  PyObject *vobj=NULL, *list;
+  igraph_matrix_t res;
+  igraph_vs_t vs;
+  igraph_bool_t return_single=0;
 
-   if (vobj == NULL) 
-     {
-	// no vertex list was supplied
-	if (igraph_vcount(&self->g)>0) 
-	  {
-	     if (igraph_vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1)) 
-	       return igraphmodule_handle_igraph_error();
-	  }
-	else
-	  {
-	     if (igraph_vector_init(&vids, 0)) return igraphmodule_handle_igraph_error();
-	  }
-     }
-   else
-     {
-	if (PyInt_Check(vobj)) return_single=1;
-	
-	Py_INCREF(vobj);
-	// vertex list was specified, convert to igraph_vector_t
-	if (igraphmodule_PyList_to_vector_t(vobj, &vids, 1, 0)) {
-	   Py_DECREF(vobj);
-	   return NULL;
-	}
-	Py_DECREF(vobj);
-     }
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
+    return NULL;
 
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
    
-   if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
-     return igraphmodule_handle_igraph_error();
-   
-   if (igraph_bibcoupling(&self->g, &res, igraph_vss_vector(&vids)))
-     {
-	igraphmodule_handle_igraph_error(); return NULL;
-     }
+  if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
 
-   /// \todo Return a single list instead of a matrix if only one vertex was given
-   list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  if (igraph_bibcoupling(&self->g, &res, vs)) {
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+
+  /* TODO: Return a single list instead of a matrix if only one vertex was given */
+  list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
    
-   igraph_matrix_destroy(&res);
-   igraph_vector_destroy(&vids);
+  igraph_matrix_destroy(&res);
+  igraph_vs_destroy(&vs);
    
-   return list;
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -1641,69 +1586,47 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self,
  * \sa igraph_betweenness
  */
 PyObject* igraphmodule_Graph_closeness(igraphmodule_GraphObject *self,
-					      PyObject *args,
-					      PyObject *kwds) 
-{
-   char *kwlist[] = {"vertices", "mode", NULL};
-   PyObject *vobj=NULL, *list=NULL;
-   igraph_vector_t vids;
-   igraph_vector_t res;
-   igraph_neimode_t mode=IGRAPH_ALL;
-   int return_single=0;
+				       PyObject *args,
+				       PyObject *kwds) {
+  char *kwlist[] = {"vertices", "mode", NULL};
+  PyObject *vobj=Py_None, *list=NULL;
+  igraph_vector_t res;
+  igraph_neimode_t mode=IGRAPH_ALL;
+  int return_single=0;
+  igraph_vs_t vs;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Ol", kwlist,
+				   &vobj, &mode))
+    return NULL;
+  
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+    PyErr_SetString(PyExc_ValueError, "mode must be one of IN, OUT or ALL");
+    return NULL;
+  }
    
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Ol", kwlist,
-				    &vobj, &mode))
-     return NULL;
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  if (igraph_vector_init(&res, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
 
-   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) 
-     {
-	PyErr_SetString(PyExc_ValueError, "mode must be one of IN, OUT or ALL");
-	return NULL;
-     }
+  if (igraph_closeness(&self->g, &res, vs, mode)) {
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
    
-   if (vobj == NULL) 
-     {
-	// no vertex list was supplied
-	if (igraph_vcount(&self->g)>0) 
-	  {
-	     if (igraph_vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1)) 
-	       return igraphmodule_handle_igraph_error();
-	  }
-	else
-	  {
-	     if (igraph_vector_init(&vids, 0)) return igraphmodule_handle_igraph_error();
-	  }
-     }
-   else
-     {
-	if (PyInt_Check(vobj)) return_single=1;
-	
-	Py_INCREF(vobj);
-	// vertex list was specified, convert to igraph_vector_t
-	if (igraphmodule_PyList_to_vector_t(vobj, &vids, 1, 0)) {
-	   Py_DECREF(vobj);
-	   return NULL;
-	}
-	Py_DECREF(vobj);
-     }
-
+  if (!return_single)
+    list=igraphmodule_vector_t_to_float_PyList(&res);
+  else
+    list=PyFloat_FromDouble(VECTOR(res)[0]);
+  
+  igraph_vector_destroy(&res);
+  igraph_vs_destroy(&vs);
    
-   if (igraph_vector_init(&res, igraph_vector_size(&vids))) return igraphmodule_handle_igraph_error();
-   
-   if (igraph_closeness(&self->g, &res, igraph_vss_vector(&vids), mode))
-     {
-	igraphmodule_handle_igraph_error(); return NULL;
-     }
-   
-   if (!return_single)
-     list=igraphmodule_vector_t_to_float_PyList(&res);
-   else
-     list=PyFloat_FromDouble(VECTOR(res)[0]);
-   
-   igraph_vector_destroy(&res);
-   igraph_vector_destroy(&vids);
-   
-   return list;
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -1828,60 +1751,39 @@ PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self,
  * \sa igraph_cocitation
  */
 PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self,
-					       PyObject *args,
-					       PyObject *kwds) 
-{
-   char *kwlist[] = {"vertices", NULL};
-   PyObject *vobj=NULL, *list=NULL;
-   igraph_vector_t vids;
-   igraph_matrix_t res;
-   int return_single=0;
-   
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
-     return NULL;
+					PyObject *args,
+					PyObject *kwds) {
+  char *kwlist[] = {"vertices", NULL};
+  PyObject *vobj=NULL, *list=NULL;
+  igraph_matrix_t res;
+  int return_single=0;
+  igraph_vs_t vs;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
+    return NULL;
+  
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
 
-   if (vobj == NULL) 
-     {
-	// no vertex list was supplied
-	if (igraph_vcount(&self->g)>0) 
-	  {
-	     if (igraph_vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1)) 
-	       return igraphmodule_handle_igraph_error();
-	  }
-	else
-	  {
-	     if (igraph_vector_init(&vids, 0)) return igraphmodule_handle_igraph_error();
-	  }
-     }
-   else
-     {
-	if (PyInt_Check(vobj)) return_single=1;
-	
-	Py_INCREF(vobj);
-	// vertex list was specified, convert to igraph_vector_t
-	if (igraphmodule_PyList_to_vector_t(vobj, &vids, 1, 0)) {
-	   Py_DECREF(vobj);
-	   return NULL;
-	}
-	Py_DECREF(vobj);
-     }
+  if (igraph_cocitation(&self->g, &res, vs)) {
+    igraph_matrix_destroy(&res);
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
 
+  /* TODO: Return a single list instead of a matrix if only one vertex was given */
+  list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
    
-   if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
-     return igraphmodule_handle_igraph_error();
-   
-   if (igraph_cocitation(&self->g, &res, igraph_vss_vector(&vids)))
-     {
-	igraphmodule_handle_igraph_error(); return NULL;
-     }
-
-   /// \todo Return a single list instead of a matrix if only one vertex was given
-   list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
-   
-   igraph_matrix_destroy(&res);
-   igraph_vector_destroy(&vids);
-   
-   return list;
+  igraph_matrix_destroy(&res);
+  igraph_vs_destroy(&vs);
+  
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -1890,29 +1792,27 @@ PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self,
  * \sa igraph_edge_betweenness
  */
 PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self,
-						     PyObject *args,
-						     PyObject *kwds) 
-{
-   char *kwlist[] = {"directed", NULL};
-   igraph_vector_t res;
-   PyObject *list, *directed=Py_True;
-   
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist,
-				    &PyBool_Type, &directed))
-     return NULL;
-
-   igraph_vector_init(&res, igraph_ecount(&self->g));
-   
-   if (igraph_edge_betweenness(&self->g, &res, (directed==Py_True)))
-     {
-	igraphmodule_handle_igraph_error();
-	igraph_vector_destroy(&res);
-	return NULL;
-     }
-   
-   list=igraphmodule_vector_t_to_float_PyList(&res);
-   igraph_vector_destroy(&res);
-   return list;
+					      PyObject *args,
+					      PyObject *kwds) {
+  char *kwlist[] = {"directed", NULL};
+  igraph_vector_t res;
+  PyObject *list, *directed=Py_True;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist,
+				   &PyBool_Type, &directed))
+    return NULL;
+  
+  igraph_vector_init(&res, igraph_ecount(&self->g));
+  
+  if (igraph_edge_betweenness(&self->g, &res, (directed==Py_True))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+  
+  list=igraphmodule_vector_t_to_float_PyList(&res);
+  igraph_vector_destroy(&res);
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -2069,67 +1969,45 @@ PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *se
  * \sa igraph_shortest_paths
  */
 PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self,
-						   PyObject *args,
-						   PyObject *kwds) 
-{
-   char *kwlist[] = {"vertices", "mode", NULL};
-   PyObject *vobj=NULL, *list=NULL;
-   igraph_vector_t vids;
-   igraph_matrix_t res;
-   igraph_neimode_t mode=IGRAPH_OUT;
-   int return_single=0;
-   
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Ol", kwlist, &vobj, &mode))
-     return NULL;
+					    PyObject *args,
+					    PyObject *kwds) {
+  char *kwlist[] = {"vertices", "mode", NULL};
+  PyObject *vobj=NULL, *list=NULL;
+  igraph_matrix_t res;
+  igraph_neimode_t mode=IGRAPH_OUT;
+  int return_single=0;
+  igraph_vs_t vs;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Ol", kwlist, &vobj, &mode))
+    return NULL;
+  
+  if (mode!=IGRAPH_IN && mode!=IGRAPH_OUT && mode!=IGRAPH_ALL) {
+    PyErr_SetString(PyExc_ValueError, "mode must be either IN or OUT or ALL");
+    return NULL;
+  }
+  
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
+  
+  if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
 
-   if (mode!=IGRAPH_IN && mode!=IGRAPH_OUT && mode!=IGRAPH_ALL) 
-     {
-	PyErr_SetString(PyExc_ValueError, "mode must be either IN or OUT or ALL");
-	return NULL;
-     }
-   
-   if (vobj == NULL) 
-     {
-	// no vertex list was supplied
-	if (igraph_vcount(&self->g)>0) 
-	  {
-	     if (igraph_vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1)) 
-	       return igraphmodule_handle_igraph_error();
-	  }
-	else
-	  {
-	     if (igraph_vector_init(&vids, 0)) return igraphmodule_handle_igraph_error();
-	  }
-     }
-   else
-     {
-	if (PyInt_Check(vobj)) return_single=1;
-	
-	Py_INCREF(vobj);
-	// vertex list was specified, convert to igraph_vector_t
-	if (igraphmodule_PyList_to_vector_t(vobj, &vids, 1, 0)) {
-	   Py_DECREF(vobj);
-	   return NULL;
-	}
-	Py_DECREF(vobj);
-     }
+  if (igraph_shortest_paths(&self->g, &res, vs, mode)) {
+    igraph_matrix_destroy(&res);
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error(); return NULL;
+  }
 
+  /* TODO Return a single list instead of a matrix if only one vertex was given */
+  list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
    
-   if (igraph_matrix_init(&res, igraph_vector_size(&vids), igraph_vcount(&self->g)))
-     return igraphmodule_handle_igraph_error();
+  igraph_matrix_destroy(&res);
+  igraph_vs_destroy(&vs);
    
-   if (igraph_shortest_paths(&self->g, &res, igraph_vss_vector(&vids), mode))
-     {
-	igraphmodule_handle_igraph_error(); return NULL;
-     }
-
-   /// \todo Return a single list instead of a matrix if only one vertex was given
-   list=igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
-   
-   igraph_matrix_destroy(&res);
-   igraph_vector_destroy(&vids);
-   
-   return list;
+  return list;
 }
 
 /** \ingroup python_interface_graph

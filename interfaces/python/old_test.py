@@ -465,8 +465,11 @@ test(g.vcount() == 10 and g.ecount() == 9)
 
 start("Converting an undirected graph to directed (mode=mutual)");
 g=igraph.Graph.Tree(10, 3)
+g.es[0]["name"]="test"
 g.to_directed()
-test(g.vcount() == 10 and g.ecount() == 18)
+test(g.vcount() == 10 and g.ecount() == 18 and
+     g.es.get_attribute_values("name")[0] == "test" and
+     g.es.get_attribute_values("name")[9] == "test")
 
 start("Converting an undirected graph to directed (mode=arbitrary)");
 g=igraph.Graph.Tree(10, 3)

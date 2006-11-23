@@ -676,48 +676,36 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
 static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
 						  const igraph_vector_t *idx) { 
   long int n, i, ndeleted=0;
-  PyObject *key, *value, *dict, *o;
+  PyObject *key, *value, *dict, *newdict, *newlist, *o;
   int pos=0;
-
-  return 0;
 
   dict=((PyObject**)graph->attr)[2];
   if (!PyDict_Check(dict)) return 1;
 
-  n=igraph_vector_size(idx);
-  for (i=0; i<n; i++) {
-    /* printf("%ld:%f ", i, VECTOR(*idx)[i]); */
-    if (!VECTOR(*idx)[i]) {
-      ndeleted++;
-      continue;
-    }
+  newdict=PyDict_New();
+  if (!newdict) return 1;
 
-    pos=0;
-    /* TODO: maybe it would be more efficient to get the values from the
-     * hash in advance? */
-    while (PyDict_Next(dict, &pos, &key, &value)) {
-      /* Move the element from index i to VECTOR(*idx)[i]-1 */
-      o=PyList_GetItem(value, i);
+  n=igraph_vector_size(idx);
+  pos=0;
+
+  while (PyDict_Next(dict, &pos, &key, &value)) {
+    newlist=PyList_New(n);
+    for (i=0; i<n; i++) {
+      o=PyList_GetItem(value, VECTOR(*idx)[i]-1);
       if (!o) {
-	/* IndexError is already set, clear it and return */
 	PyErr_Clear();
 	return 1;
       }
       Py_INCREF(o);
-      PyList_SetItem(value, VECTOR(*idx)[i]-1, o);
+      PyList_SET_ITEM(newlist, i, o);
     }
+    PyDict_SetItem(newdict, key, newlist);
+    Py_DECREF(newlist);
   }
-  /*printf("\n");*/
-  
-  /* Clear the remaining parts of the lists that aren't needed anymore */
-  pos=0;
-  while (PyDict_Next(dict, &pos, &key, &value)) {
-    n=PySequence_Size(value);
-    if (PySequence_DelSlice(value, n-ndeleted, n) == -1) return 1;
-    /*printf("key: "); PyObject_Print(key, stdout, Py_PRINT_RAW); printf("\n");
-    printf("value: "); PyObject_Print(value, stdout, Py_PRINT_RAW); printf("\n");*/
-  }
-  
+
+  ((PyObject**)graph->attr)[2]=newdict;
+  Py_DECREF(dict);
+
   return 0;
 }
 
