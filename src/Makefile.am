@@ -31,6 +31,7 @@ libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS)
 
 includedir = $(prefix)/include/igraph
-include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h
+include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
+		  NetDataTypes.h NetRoutines.h pottsmodel_2.h
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
