@@ -1,3 +1,11 @@
+2006-11-24  Gabor Csardi  <csardi@kzoo.edu>
+
+	* interfaces/R/igraph/R/structural.properties.R (neighborhood.size)
+	(neighborhood, graph.neighborhood) : added
+	* interfaces/R/src/rinterface.c (R_igraph_neighborhood_size)
+	(R_igraph_neighborhood, R_igraph_neighborhood_graphs) : added
+	
+
 2006-11-19  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/structural.properties.R (transitivity) :

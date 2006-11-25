@@ -4692,3 +4692,94 @@ SEXP R_igraph_no_clusters(SEXP graph, SEXP pmode) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_neighborhood_size(SEXP graph, SEXP pvids, SEXP porder, 
+				SEXP pmode) {
+  igraph_t g;
+  igraph_vs_t vids;
+  igraph_integer_t order=REAL(porder)[0];
+  igraph_integer_t mode=REAL(pmode)[0];
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_vs(pvids, &g, &vids);
+  igraph_vector_init(&res, 0);
+  igraph_neighborhood_size(&g, &res, vids, order, mode);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  igraph_vs_destroy(&vids);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_neighborhood(SEXP graph, SEXP pvids, SEXP porder, 
+			   SEXP pmode) {
+  igraph_t g;
+  igraph_vs_t vids;
+  igraph_integer_t order=REAL(porder)[0];
+  igraph_integer_t mode=REAL(pmode)[0];
+  igraph_vector_ptr_t res;
+  long int i;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_vs(pvids, &g, &vids);
+  igraph_vector_ptr_init(&res, 0);
+  igraph_neighborhood(&g, &res, vids, order, mode);
+  PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&res)));
+  for (i=0; i<igraph_vector_ptr_size(&res); i++) {
+    igraph_vector_t *v=VECTOR(res)[i];
+    SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(v)));
+    igraph_vector_copy_to(v, REAL(VECTOR_ELT(result, i)));
+    igraph_vector_destroy(v);
+    Free(v);
+  }
+  igraph_vector_ptr_destroy(&res);
+  igraph_vs_destroy(&vids);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_neighborhood_graphs(SEXP graph, SEXP pvids, SEXP porder, 
+				  SEXP pmode) {
+  igraph_t g;
+  igraph_vs_t vids;
+  igraph_integer_t order=REAL(porder)[0];
+  igraph_integer_t mode=REAL(pmode)[0];
+  igraph_vector_ptr_t res;
+  long int i;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_vs(pvids, &g, &vids);
+  igraph_vector_ptr_init(&res, 0);
+  igraph_neighborhood_graphs(&g, &res, vids, order, mode);
+  PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&res)));
+  for (i=0; i<igraph_vector_ptr_size(&res); i++) {
+    igraph_t *g=VECTOR(res)[i];
+    SET_VECTOR_ELT(result, i, R_igraph_to_SEXP(g));
+    igraph_destroy(g);
+    Free(g);
+  }
+  igraph_vector_ptr_destroy(&res);
+  igraph_vs_destroy(&vids);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

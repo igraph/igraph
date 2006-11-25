@@ -2709,3 +2709,378 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
   
   return 0;
 }
+
+/**
+ * \function igraph_neighborhood_size
+ * \brief Calculates the size of the neighborhood of a given vertex
+ * 
+ * The neighborhood of a given order of a vertex includes all vertices
+ * which are closer to the vertex than the order. Ie. order 0 is
+ * always the vertex itself, order 1 is the vertex plus its immediate
+ * neighbors, order 2 is order 1 plus the immediate neighbors of the
+ * vertices in order 1, etc. 
+ * 
+ * </para><para> This function calculates the size of the neighborhood
+ * of the given order for the given vertices. 
+ * \param graph The input graph.
+ * \param res Pointer to an initialized vector, the result will be
+ *    stored here. It will be resized as needed.
+ * \param vids The vertices for which the calculation is performed.
+ * \param order Integer giving the order of the neighborhood.
+ * \param mode Specifies how to use the direction of the edges if a
+ *   directed graph is analyzed. For \c IGRAPH_OUT only the outgoing
+ *   edges are followed, so all vertices reachable from the source
+ *   vertex in at most \c order steps are counted. For \c IGRAPH_IN
+ *   all vertices from which the source vertex is reachable in at most
+ *   \c order steps are counted. \c IGRAPH_ALL ignores the direction
+ *   of the edges. This argument is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_neighborhood() for calculating the actual neighborhood, 
+ * \ref igraph_neighborhood_graphs() for creating separate graphs from
+ * the neighborhoods.
+ * 
+ * Time complexity: O(n*d*o), where n is the number vertices for which
+ * the calculation is performed, d is the average degree, o is the order.
+ */ 
+
+int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
+			     igraph_vs_t vids, igraph_integer_t order,
+			     igraph_neimode_t mode) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_dqueue_t q;
+  igraph_vit_t vit;
+  long int i, j;
+  long int *added;
+  igraph_vector_t neis;
+  
+  if (order < 0) {
+    IGRAPH_ERROR("Negative order in neighborhood size", IGRAPH_EINVAL);
+  }
+
+  added=Calloc(no_of_nodes, long int);
+  if (added==0) {
+    IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, added);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
+  
+  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    long int node=IGRAPH_VIT_GET(vit);
+    long int size=1;
+    added[node]=i+1;
+    igraph_dqueue_clear(&q);
+    if (order > 0) {
+      igraph_dqueue_push(&q, node);
+      igraph_dqueue_push(&q, 0);
+    }
+    
+    while (!igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
+      long int actdist=igraph_dqueue_pop(&q);
+      long int n;
+      igraph_neighbors(graph, &neis, actnode, mode);
+      n=igraph_vector_size(&neis);
+
+      if (actdist<order-1) {
+	/* we add them to the q */
+	for (j=0; j<n; j++) {
+	  long int nei=VECTOR(neis)[j];
+	  if (added[nei] != i+1) {
+	    added[nei]=i+1;
+	    IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
+	    IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+	    size++;
+	  }
+	}
+      } else {
+	/* we just count them, but don't add them */
+	for (j=0; j<n; j++) {
+	  long int nei=VECTOR(neis)[j];
+	  if (added[nei] != i+1) {
+	    added[nei]=i+1;
+	    size++;
+	  }
+	}
+      }
+
+    } /* while q not empty */
+
+    VECTOR(*res)[i]=size;
+  } /* for VIT, i */
+
+  igraph_vector_destroy(&neis);
+  igraph_vit_destroy(&vit);
+  igraph_dqueue_destroy(&q);
+  Free(added);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}
+
+/** 
+ * \function igraph_neighborhood
+ * Calculate the neighborhood of vertices
+ * 
+ * The neighborhood of a given order of a vertex includes all vertices
+ * which are closer to the vertex than the order. Ie. order 0 is
+ * always the vertex itself, order 1 is the vertex plus its immediate
+ * neighbors, order 2 is order 1 plus the immediate neighbors of the
+ * vertices in order 1, etc. 
+ * 
+ * </para><para> This function calculates the vertices within the
+ * neighborhood of the specified vertices.
+ * \param graph The input graph.
+ * \param res An initialized pointer vector. Note that the objects
+ *    (pointers) in the vector will \em not be freed, but the pointer
+ *    vector will be resized as needed. The result of the calculation
+ *    will be stored here in \c vector_t objects.
+ * \param vids The vertices for which the calculation is performed.
+ * \param order Integer giving the order of the neighborhood.
+ * \param mode Specifies how to use the direction of the edges if a
+ *   directed graph is analyzed. For \c IGRAPH_OUT only the outgoing
+ *   edges are followed, so all vertices reachable from the source
+ *   vertex in at most \c order steps are included. For \c IGRAPH_IN
+ *   all vertices from which the source vertex is reachable in at most
+ *   \c order steps are included. \c IGRAPH_ALL ignores the direction
+ *   of the edges. This argument is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_neighborhood_size() to calculate the size of the
+ * neighborhood, \ref igraph_neighborhood_graphs() for creating
+ * graphs from the neighborhoods.
+ * 
+ * Time complexity: O(n*d*o), n is the number of vertices for which
+ * the calculation is performed, d is the average degree, o is the
+ * order.
+ */
+
+int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
+			igraph_vs_t vids, igraph_integer_t order,
+			igraph_neimode_t mode) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_dqueue_t q;
+  igraph_vit_t vit;
+  long int i, j;
+  long int *added;
+  igraph_vector_t neis;
+  igraph_vector_t tmp;
+  igraph_vector_t *newv;
+
+  if (order < 0) {
+    IGRAPH_ERROR("Negative order in neighborhood size", IGRAPH_EINVAL);
+  }
+  
+  added=Calloc(no_of_nodes, long int);
+  if (added==0) {
+    IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, added);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+  IGRAPH_CHECK(igraph_vector_ptr_resize(res, IGRAPH_VIT_SIZE(vit)));
+  
+  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    long int node=IGRAPH_VIT_GET(vit);
+    added[node]=i+1;
+    igraph_vector_clear(&tmp);
+    IGRAPH_CHECK(igraph_vector_push_back(&tmp, node));
+    if (order > 0) {
+      igraph_dqueue_push(&q, node);
+      igraph_dqueue_push(&q, 0);
+    }
+
+    while (!igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
+      long int actdist=igraph_dqueue_pop(&q);
+      long int n;
+      igraph_neighbors(graph, &neis, actnode, mode);
+      n=igraph_vector_size(&neis);
+      
+      if (actdist<order-1) {
+	/* we add them to the q */
+	for (j=0; j<n; j++) {
+	  long int nei=VECTOR(neis)[j];
+	  if (added[nei] != i+1) {
+	    added[nei]=i+1;
+	    IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
+	    IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+	    IGRAPH_CHECK(igraph_vector_push_back(&tmp, nei));
+	  }
+	}
+      } else {
+	/* we just count them but don't add them to q */
+	for (j=0; j<n; j++) {
+	  long int nei=VECTOR(neis)[j];
+	  if (added[nei] != i+1) {
+	    added[nei]=i+1;
+	    IGRAPH_CHECK(igraph_vector_push_back(&tmp, nei));
+	  }
+	}
+      }
+
+    } /* while q not empty */
+
+    newv=Calloc(1, igraph_vector_t);
+    if (newv==0) {
+      IGRAPH_ERROR("Cannot calculate neighborhood", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, newv);
+    IGRAPH_CHECK(igraph_vector_copy(newv, &tmp));
+    VECTOR(*res)[i]=newv;
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&tmp);
+  igraph_vector_destroy(&neis);
+  igraph_vit_destroy(&vit);
+  igraph_dqueue_destroy(&q);
+  Free(added);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  return 0;
+}
+
+/**
+ * \function igraph_neighborhood_graphs
+ * Create graphs from the neighborhood(s) of some vertex/vertices
+ * 
+ * The neighborhood of a given order of a vertex includes all vertices
+ * which are closer to the vertex than the order. Ie. order 0 is
+ * always the vertex itself, order 1 is the vertex plus its immediate
+ * neighbors, order 2 is order 1 plus the immediate neighbors of the
+ * vertices in order 1, etc. 
+ * 
+ * </para><para> This function finds every vertex in the neighborhood
+ * of a given parameter vertex and creates a graph from these
+ * vertices. 
+ * 
+ * </para><para> The first version of this function was written by 
+ * Vincent Matossian, thanks Vincent.
+ * \param graph The input graph.
+ * \param res Pointer to a pointer vector, the result will be stored
+ *   here, ie. \c res will contain pointers to \c igraph_t
+ *   objects. It vector will be resized if needed but note that the
+ *   objects in the pointer vector will not be freed.
+ * \param vids The vertices for which the calculation is performed.
+ * \param order Integer giving the order of the neighborhood.
+ * \param mode Specifies how to use the direction of the edges if a
+ *   directed graph is analyzed. For \c IGRAPH_OUT only the outgoing
+ *   edges are followed, so all vertices reachable from the source
+ *   vertex in at most \c order steps are counted. For \c IGRAPH_IN
+ *   all vertices from which the source vertex is reachable in at most
+ *   \c order steps are counted. \c IGRAPH_ALL ignores the direction
+ *   of the edges. This argument is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_neighborhood_size() for calculating the neighborhood
+ * sizes only, \ref igraph_neighborhood() for calculating the
+ * neighborhoods (but not creating graphs).
+ * 
+ * Time complexity: O(n*(|V|+|E|)), where n is the number vertices for
+ * which the calculation is performed, |V| and |E| are the number of
+ * vertices and edges in the original input graph.
+ */
+
+int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
+			       igraph_vs_t vids, igraph_integer_t order,
+			       igraph_neimode_t mode) {
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_dqueue_t q;
+  igraph_vit_t vit;
+  long int i, j;
+  long int *added;
+  igraph_vector_t neis;
+  igraph_vector_t tmp;
+  igraph_t *newg;
+  
+  if (order < 0) {
+    IGRAPH_ERROR("Negative order in neighborhood size", IGRAPH_EINVAL);
+  }
+  
+  added=Calloc(no_of_nodes, long int);
+  if (added==0) {
+    IGRAPH_ERROR("Cannot calculate neighborhood size", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, added);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+  IGRAPH_CHECK(igraph_vector_ptr_resize(res, IGRAPH_VIT_SIZE(vit)));
+  
+  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    long int node=IGRAPH_VIT_GET(vit);
+    added[node]=i+1;
+    igraph_vector_clear(&tmp);
+    IGRAPH_CHECK(igraph_vector_push_back(&tmp, node));
+    if (order > 0) {
+      igraph_dqueue_push(&q, node);
+      igraph_dqueue_push(&q, 0);
+    }
+
+    while (!igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
+      long int actdist=igraph_dqueue_pop(&q);
+      long int n;
+      igraph_neighbors(graph, &neis, actnode, mode);
+      n=igraph_vector_size(&neis);
+      
+      if (actdist<order-1) {
+	/* we add them to the q */
+	for (j=0; j<n; j++) {
+	  long int nei=VECTOR(neis)[j];
+	  if (added[nei] != i+1) {
+	    added[nei]=i+1;
+	    IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
+	    IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+	    IGRAPH_CHECK(igraph_vector_push_back(&tmp, nei));
+	  }
+	}
+      } else {
+	/* we just count them but don't add them to q */
+	for (j=0; j<n; j++) {
+	  long int nei=VECTOR(neis)[j];
+	  if (added[nei] != i+1) {
+	    added[nei]=i+1;
+	    IGRAPH_CHECK(igraph_vector_push_back(&tmp, nei));
+	  }
+	}
+      }
+
+    } /* while q not empty */
+
+    newg=Calloc(1, igraph_t);
+    if (newg==0) {
+      IGRAPH_ERROR("Cannot create neighborhood graph", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, newg);
+    if (igraph_vector_size(&tmp) < no_of_nodes) {
+      IGRAPH_CHECK(igraph_subgraph(graph, newg, igraph_vss_vector(&tmp)));
+    } else {
+      IGRAPH_CHECK(igraph_copy(newg, graph));
+    }
+    VECTOR(*res)[i]=newg;
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&tmp);
+  igraph_vector_destroy(&neis);
+  igraph_vit_destroy(&vit);
+  igraph_dqueue_destroy(&q);
+  Free(added);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  return 0;
+}
+

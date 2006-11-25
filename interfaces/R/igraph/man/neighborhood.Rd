@@ -1,0 +1,66 @@
+\name{neighborhood}
+\alias{neighborhood}
+\alias{neighborhood.size}
+\alias{graph.neighborhood}
+\title{Neighborhood of graph vertices}
+\description{These functions find the vertices not farther than a given
+  limit from another fixed vertex, these are called the neighborhood of
+  the vertex.}
+\usage{
+neighborhood.size(graph, order, nodes=V(graph), mode="all")
+neighborhood(graph, order, nodes=V(graph), mode="all")
+graph.neighborhood(graph, order, nodes=V(graph), mode="all")
+}
+\arguments{
+  \item{graph}{The input graph.}
+  \item{order}{Integer giving the order of the neighborhood.}
+  \item{nodes}{The vertices for which the calculation is performed.}
+  \item{mode}{Character constatnt, it specifies how to use the direction
+    of the edges if a directed graph is analyzed. For \sQuote{out} only
+    the outgoing edges are followed, so all vertices reachable from the
+    source vertex in at most \code{order} steps are counted. For
+    \sQuote{"in"} all vertices from which the source vertex is reachable
+    in at most \code{order} steps are counted. \sQuote{"all"} ignores
+    the direction of the edges. This argument is ignored for undirected
+    graphs.} 
+}
+\details{
+  The neighborhood of a given order \code{o} of a vertex \code{v}
+  includes all vertices which are closer to \code{v} than the
+  order. Ie. order 0 is always \code{v} itself, order 1 is \code{v}
+  plus its immediate neighbors, order 2 is order 1 plus the immediate
+  neighbors of the vertices in order 1, etc.
+
+  \code{neighborhood.size} calculates the size of the neighborhoods for
+  the given vertices with the given order.
+
+  \code{neighborhood} calculates the neighborhoods of the given vertices
+  with the given order parameter.
+
+  \code{neighborhood} is creates (sub)graphs from all neighborhoods of
+  the given vertices with the given order parameter. This function
+  preserves the vertex, edge and graph attributes.
+}
+\value{
+  \code{neighborhood.size} returns with an integer vector.
+
+  \code{neighborhood} returns with a list of integer vectors.
+
+  \code{graph.neighborhood} returns with a list of graphs.
+}
+\author{Gabor Csardi \email{csardi@rmki.kfki.hu}, the first version was
+  done by Vincent Matossian}
+\examples{
+g <- graph.ring(10)
+neighborhood.size(g, 0, 1:3)
+neighborhood.size(g, 1, 1:3)
+neighborhood.size(g, 2, 1:3)
+neighborhood(g, 0, 1:3)
+neighborhood(g, 1, 1:3)
+neighborhood(g, 2, 1:3)
+
+# attributes are preserved
+V(g)$name <- c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j")
+graph.neighborhood(g, 2, 1:3)
+}
+\keyword{graphs}

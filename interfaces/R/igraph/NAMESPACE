@@ -82,7 +82,7 @@ export(subgraph, simplify, degree, degree.distribution, diameter,
        get.shortest.paths, average.path.length, transitivity,
        get.all.shortest.paths, get.diameter, farthest.nodes,
        graph.laplacian, constraint, page.rank, reciprocity, rewire,
-       graph.density)
+       graph.density, neighborhood.size, neighborhood, graph.neighborhood)
 
 # plotting
 

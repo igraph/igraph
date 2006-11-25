@@ -429,3 +429,39 @@ graph.density <- function(graph, loops=FALSE) {
   .Call("R_igraph_density", graph, as.logical(loops),
         PACKAGE="igraph")
 }
+
+neighborhood.size <- function(graph, order, nodes=V(graph), mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
+  .Call("R_igraph_neighborhood_size", graph, 
+        as.igraph.vs(nodes), as.numeric(order), as.numeric(mode),
+        PACKAGE="igraph")
+}
+
+neighborhood <- function(graph, order, nodes=V(graph), mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
+  .Call("R_igraph_neighborhood", graph, 
+        as.igraph.vs(nodes), as.numeric(order), as.numeric(mode),
+        PACKAGE="igraph")
+}
+
+graph.neighborhood <- function(graph, order, nodes=V(graph), mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
+  .Call("R_igraph_neighborhood_graphs", graph, 
+        as.igraph.vs(nodes), as.numeric(order), as.numeric(mode),
+        PACKAGE="igraph")
+}

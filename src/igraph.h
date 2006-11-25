@@ -677,6 +677,16 @@ int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
 int igraph_density(const igraph_t *graph, igraph_real_t *res, 
 		   igraph_bool_t loops);
 
+int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
+			     igraph_vs_t vids, igraph_integer_t order, 
+			     igraph_neimode_t mode);
+int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
+			igraph_vs_t vids, igraph_integer_t order,
+			igraph_neimode_t mode);
+int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
+			       igraph_vs_t vids, igraph_integer_t order,
+			       igraph_neimode_t mode);
+
 /* TODO: degree.distribution (?) */
 
 /* -------------------------------------------------- */

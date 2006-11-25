@@ -21,6 +21,12 @@
 <!-- doxrox-include igraph_diameter -->
 </section>
 
+<section><title>Neighborhood of a vertex</title>
+<!-- doxrox-include igraph_neighborhood_size -->
+<!-- doxrox-include igraph_neighborhood -->
+<!-- doxrox-include igraph_neighborhood_graphs -->
+</section>
+
 <section><title>Graph Components</title>
 <!-- doxrox-include igraph_subcomponent -->
 <!-- doxrox-include igraph_subgraph -->
