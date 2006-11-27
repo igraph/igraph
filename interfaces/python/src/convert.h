@@ -31,6 +31,7 @@
 
 #include <Python.h>
 #include "types.h"
+#include "graphobject.h"
 
 typedef enum { IGRAPHMODULE_TYPE_INT=0, IGRAPHMODULE_TYPE_FLOAT }
 igraphmodule_conv_t;
@@ -47,4 +48,9 @@ int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result);
 int igraphmodule_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v);
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
 				  igraph_bool_t *return_single);
+int igraphmodule_PyObject_to_attribute_values(PyObject *o,
+					      igraph_vector_t *v,
+					      igraphmodule_GraphObject* g,
+					      int type,
+					      igraph_real_t def);
 #endif

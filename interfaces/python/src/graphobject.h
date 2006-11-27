@@ -70,6 +70,7 @@ PyObject* igraphmodule_Graph_degree(igraphmodule_GraphObject *self, PyObject *ar
 PyObject* igraphmodule_Graph_neighbors(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_successors(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_predecessors(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_get_eid(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_Adjacency(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type, PyObject *args);
@@ -85,7 +86,6 @@ PyObject* igraphmodule_Graph_Tree(PyTypeObject *type, PyObject *args, PyObject *
 PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Isoclass(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
-PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_is_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_are_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -96,9 +96,12 @@ PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self, PyObject *
 PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_copy(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_density(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_maxdegree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_reciprocity(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_rewire(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -161,6 +164,9 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
 PyObject* igraphmodule_Graph_bfs(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_Graph_bfsiter(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
+PyObject* igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_mincut_value(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
@@ -209,6 +215,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@return: the number of vertices in the graph.\n"
       "@rtype: integer"
   },
+   
   // interface to igraph_ecount
   {"ecount", (PyCFunction)igraphmodule_Graph_ecount,
       METH_NOARGS,
@@ -217,6 +224,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@return: the number of edges in the graph.\n"
       "@rtype: integer"
   },
+   
   // interface to igraph_is_directed
   {"is_directed", (PyCFunction)igraphmodule_Graph_is_directed,
       METH_NOARGS,
@@ -225,6 +233,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@return: C{True} if it is directed, C{False} otherwise.\n"
       "@rtype: boolean"
   },
+   
   // interface to igraph_add_vertices
   {"add_vertices", (PyCFunction)igraphmodule_Graph_add_vertices,
       METH_VARARGS,
@@ -233,6 +242,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@param n: the number of vertices to be added\n"
       "@return: the same graph object\n"
   },
+   
   // interface to igraph_delete_vertices
   {"delete_vertices", (PyCFunction)igraphmodule_Graph_delete_vertices,
       METH_VARARGS,
@@ -242,6 +252,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "  to be deleted.\n"
       "@return: the same graph object\n"
   },
+   
   // interface to igraph_add_edges
   {"add_edges", (PyCFunction)igraphmodule_Graph_add_edges,
       METH_VARARGS,
@@ -254,6 +265,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "  of only one pair.\n"
       "@return: the same graph object\n"
   },
+   
   // interface to igraph_delete_edges
   {"delete_edges", (PyCFunction)igraphmodule_Graph_delete_edges,
       METH_VARARGS,
@@ -267,6 +279,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "  All vertices will be kept, even if they lose all their edges.\n"
       "@return: the same graph object\n"
   },
+   
   // interface to igraph_degree
   {"degree", (PyCFunction)igraphmodule_Graph_degree,
       METH_VARARGS | METH_KEYWORDS,
@@ -283,6 +296,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "  them).\n"
       "@param loops: whether self-loops should be counted.\n"
   },
+   
   // interfaces to igraph_neighbors
   {"neighbors", (PyCFunction)igraphmodule_Graph_neighbors,
       METH_VARARGS | METH_KEYWORDS,
@@ -293,19 +307,31 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "  successors (L{OUT}) or both (L{ALL}). Ignored for undirected\n"
       "  graphs."
   },
+   
   {"successors", (PyCFunction)igraphmodule_Graph_successors,
       METH_VARARGS | METH_KEYWORDS,
       "successors(vertex)\n\n"
       "Returns the successors of a given vertex.\n\n"
       "Equivalent to calling the L{Graph.neighbors} method with type=L{OUT}."
   },
+   
   {"predecessors", (PyCFunction)igraphmodule_Graph_predecessors,
       METH_VARARGS | METH_KEYWORDS,
       "predecessors(vertex)\n\n"
       "Returns the predecessors of a given vertex.\n\n"
       "Equivalent to calling the L{Graph.neighbors} method with type=L{IN}."
   },
-  
+
+  /* interface to igraph_get_eid */
+  {"get_eid", (PyCFunction)igraphmodule_Graph_get_eid,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_eid(v1, v2)\n\n"
+   "Returns the edge ID of an arbitrary edge between vertices v1 and v2\n\n"
+   "@param v1: the first vertex ID\n"
+   "@param v2: the second vertex ID\n"
+   "@return: the edge ID of an arbitrary edge between vertices v1 and v2\n"
+  },
+
   //////////////////////
   // GRAPH GENERATORS //
   //////////////////////
@@ -607,6 +633,18 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@return: cocitation scores for all given vertices in a matrix."
   },
   
+  /* interface to igraph_density */
+  {"density", (PyCFunction)igraphmodule_Graph_density,
+      METH_VARARGS | METH_KEYWORDS,
+       "density(loops=False)\n\n"
+       "Calculates the density of the graph.\n\n"
+       "@param loops: whether to take loops into consideration. If C{True},\n"
+       "  the algorithm assumes that there might be some loops in the graph\n"
+       "  and calculates the density accordingly. If C{False}, the algorithm\n"
+       "  assumes that there can't be any loops.\n"
+      "@return: the reciprocity of the graph."
+  },
+  
   // interface to igraph_diameter
   {"diameter", (PyCFunction)igraphmodule_Graph_diameter,
       METH_VARARGS | METH_KEYWORDS,
@@ -666,6 +704,24 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@return: C{True} if the graph is connected, C{False} otherwise.\n"
   },
   
+  /* interface to igraph_maxdegree */
+  {"maxdegree", (PyCFunction)igraphmodule_Graph_maxdegree,
+      METH_VARARGS | METH_KEYWORDS,
+      "maxdegree(vertices=None, type=ALL, loops=False)\n\n"
+      "Returns the maximum degree of a vertex set in the graph.\n\n"
+      "This method accepts a single vertex ID or a list of vertex IDs as a\n"
+      "parameter, and returns the degree of the given vertices (in the\n"
+      "form of a single integer or a list, depending on the input\n"
+      "parameter).\n"
+      "\n"
+      "@param vertices: a single vertex ID or a list of vertex IDs or\n"
+      "  C{None} meaning all the vertices in the graph.\n"
+      "@param type: the type of degree to be returned (L{OUT} for\n"
+      "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
+      "  them).\n"
+      "@param loops: whether self-loops should be counted.\n"
+  },
+   
   // interface to igraph_pagerank
   {"pagerank", (PyCFunction)igraphmodule_Graph_pagerank,
       METH_VARARGS | METH_KEYWORDS,
@@ -1221,7 +1277,36 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@param graphs: the list of graphs to be intersected with\n"
       "  the current one.\n"
   },
-  
+
+  /**************************/
+  /* FLOW RELATED FUNCTIONS */  
+  /**************************/
+  {"maxflow_value", (PyCFunction)igraphmodule_Graph_maxflow_value,
+   METH_VARARGS | METH_KEYWORDS,
+   "maxflow_value(source, target, capacity=None)\n\n"
+   "Returns the maximum flow between the source and target vertices.\n\n"
+   "@param source: the source vertex ID\n"
+   "@param target: the target vertex ID\n"
+   "@param capacity: the capacity of the edges. It must be a list or a valid\n"
+   "  attribute name or C{None}. In the latter case, every edge will have the\n"
+   "  same capacity.\n"
+   "@return: the value of the maximum flow between the given vertices\n"
+  },
+
+  {"mincut_value", (PyCFunction)igraphmodule_Graph_mincut_value,
+   METH_VARARGS | METH_KEYWORDS,
+   "mincut_value(source=-1, target=-1, capacity=None)\n\n"
+   "Returns the minimum cut between the source and target vertices.\n\n"
+   "@param source: the source vertex ID. If negative, the calculation is\n"
+   "  done for every vertex except the target and the minimum is returned.\n"
+   "@param target: the target vertex ID. If negative, the calculation is\n"
+   "  done for every vertex except the source and the minimum is returned.\n"
+   "@param capacity: the capacity of the edges. It must be a list or a valid\n"
+   "  attribute name or C{None}. In the latter case, every edge will have the\n"
+   "  same capacity.\n"
+   "@return: the value of the minimum cut between the given vertices\n"
+  },
+
   ////////////////////////////////////
   // INTERNAL/DEVELOPMENT FUNCTIONS //
   ////////////////////////////////////

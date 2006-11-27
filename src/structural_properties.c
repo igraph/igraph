@@ -2338,8 +2338,8 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 }
 
 /**
- * \function igraph_constaint
- * \brief Burt's constaint scores
+ * \function igraph_constraint
+ * \brief Burt's constraint scores
  * 
  * </para><para>
  * This function calculates Burt's constraint scores for the given
@@ -2373,9 +2373,9 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
  * \param graph A graph object.
  * \param res Pointer to an initialized vector, the result will be
  *        stored here. The vector will be resized to have the
- *        appropropriate size for holding the result.
+ *        appropriate size for holding the result.
  * \param vids Vertex selector containing the vertices for which the
- *        constaint should be calculated.
+ *        constraint should be calculated.
  * \param weights Vector giving the weights of the edges. If it is
  *        \c NULL then each edge is supposed to have the same weight.
  * \return Error code.

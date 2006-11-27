@@ -30,10 +30,6 @@
 #include "error.h"
 #include "memory.h"
 
-#define ATTRHASH_IDX_GRAPH 0
-#define ATTRHASH_IDX_VERTEX 1
-#define ATTRHASH_IDX_EDGE 2
-
 PyTypeObject igraphmodule_GraphType;
 
 /** \defgroup python_interface_graph Graph object
@@ -471,20 +467,17 @@ PyObject* igraphmodule_Graph_degree(igraphmodule_GraphObject *self,
 					   PyObject *args,
 					   PyObject *kwds) 
 {
-   PyObject *list=NULL;
+   PyObject *list=Py_None;
    int dtype=IGRAPH_ALL;
-   igraph_bool_t input_was_list;
    PyObject *loops = Py_False;
-   igraph_vector_t vids, result;
+   igraph_vector_t result;
+   igraph_vs_t vs;
+   igraph_bool_t return_single=0;
    
-   char *kwlist[] = 
-     {
-	"vertices", "type", "loops", NULL
-     }
-   ;
+   static char *kwlist[] = { "vertices", "type", "loops", NULL };
 
-   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO!", kwlist,
-				    &list, &dtype, &PyBool_Type, &loops))
+   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist,
+				    &list, &dtype, &loops))
 	return NULL;
    
    if (dtype!=IGRAPH_ALL && dtype!=IGRAPH_OUT && dtype!=IGRAPH_IN) 
@@ -492,58 +485,84 @@ PyObject* igraphmodule_Graph_degree(igraphmodule_GraphObject *self,
 	PyErr_SetString(PyExc_ValueError, "dtype should be either ALL or IN or OUT");
 	return NULL;
      }
-   
-   Py_INCREF(loops);
-   if (list)
-     {
-	Py_INCREF(list);
-	if (igraphmodule_PyList_to_vector_t(list, &vids, 1, 0)) 
-	  {
-	     // something bad happened during conversion, release the
-	     // list reference and return immediately
-	     Py_DECREF(list);
-	     Py_DECREF(loops);
-	     return NULL;
-	  }
-	input_was_list=PyList_Check(list);
-     }
-   else
-     {
-	// no list was given, so we assume that the user wanted to
-	// retrieve the degrees of all vertices
-	if (igraph_vcount(&self->g)>0)
-	  igraph_vector_init_seq(&vids, 0, igraph_vcount(&self->g)-1);
-	else
-	  igraph_vector_init(&vids, 0);
-	input_was_list=1;
-     }
 
-   igraph_vector_init(&result, 0);
-   if (igraph_degree(&self->g, &result, igraph_vss_vector(&vids),
-		     (igraph_neimode_t)dtype, (igraph_bool_t)(loops == Py_True))) 
+   if (igraphmodule_PyObject_to_vs_t(list, &vs, &return_single)) 
+     {
+	igraphmodule_handle_igraph_error();
+	return NULL;
+     }
+   
+   if (igraph_vector_init(&result, 0)) 
+     {
+	igraph_vs_destroy(&vs);
+	return NULL;
+     }
+   
+   if (igraph_degree(&self->g, &result, vs,
+		     (igraph_neimode_t)dtype, PyObject_IsTrue(loops)))
      {
        igraphmodule_handle_igraph_error();
-       Py_DECREF(list);
-       Py_DECREF(loops);
-       igraph_vector_destroy(&vids);
+       igraph_vs_destroy(&vs);
        igraph_vector_destroy(&result);
        return NULL;
      }
    
-   Py_DECREF(loops);
-   if (list) {
-     Py_DECREF(list);
-   }
-   
-   if (input_was_list) 
+   if (!return_single)
      list=igraphmodule_vector_t_to_PyList(&result);
    else
      list=PyInt_FromLong(VECTOR(result)[0]);
    
    igraph_vector_destroy(&result);
-   igraph_vector_destroy(&vids);
+   igraph_vs_destroy(&vs);
    
    return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief The maximum degree of some vertices in an \c igraph.Graph
+ * \return the maxium degree as a Python object
+ * \sa igraph_maxdegree
+ */
+PyObject* igraphmodule_Graph_maxdegree(igraphmodule_GraphObject *self,
+				       PyObject *args,
+				       PyObject *kwds) 
+{
+   PyObject *list=Py_None;
+   int dtype=IGRAPH_ALL;
+   PyObject *loops = Py_False;
+   igraph_integer_t result;
+   igraph_vs_t vs;
+   igraph_bool_t return_single=0;
+   
+   static char *kwlist[] = { "vertices", "type", "loops", NULL };
+
+   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist,
+				    &list, &dtype, &loops))
+	return NULL;
+   
+   if (dtype!=IGRAPH_ALL && dtype!=IGRAPH_OUT && dtype!=IGRAPH_IN) 
+     {
+	PyErr_SetString(PyExc_ValueError, "dtype should be either ALL or IN or OUT");
+	return NULL;
+     }
+
+   if (igraphmodule_PyObject_to_vs_t(list, &vs, &return_single)) 
+     {
+	igraphmodule_handle_igraph_error();
+	return NULL;
+     }
+   
+   if (igraph_maxdegree(&self->g, &result, vs,
+			(igraph_neimode_t)dtype, PyObject_IsTrue(loops)))
+     {
+       igraphmodule_handle_igraph_error();
+       igraph_vs_destroy(&vs);
+       return NULL;
+     }
+   
+   igraph_vs_destroy(&vs);
+   
+   return PyInt_FromLong((long)result);
 }
 
 /** \ingroup python_interface_graph
@@ -664,6 +683,25 @@ PyObject* igraphmodule_Graph_predecessors(igraphmodule_GraphObject *self,
    igraph_vector_destroy(&result);
    
    return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the ID of an arbitrary edge between the given two nodes
+ * \sa igraph_get_eid
+ */
+PyObject* igraphmodule_Graph_get_eid(igraphmodule_GraphObject *self,
+				     PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "v1", "v2", "directed", NULL };
+  long v1, v2;
+  igraph_integer_t result;
+  PyObject *directed = Py_False;
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|O", kwlist, &v1, &v2,
+				   &directed))
+    return NULL;
+  if (igraph_get_eid(&self->g, &result, v1, v2, PyObject_IsTrue(directed)))
+    return igraphmodule_handle_igraph_error();
+
+  return Py_BuildValue("i", (long)result);
 }
 
 /** \ingroup python_interface_graph
@@ -2283,6 +2321,28 @@ PyObject* igraphmodule_Graph_reciprocity(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the graph density
+ * \return the density
+ * \sa igraph_density
+ */
+PyObject* igraphmodule_Graph_density(igraphmodule_GraphObject *self,
+				     PyObject *args, PyObject *kwds) {
+  char *kwlist[] = {"loops", NULL};
+  igraph_real_t result;
+  PyObject *loops = Py_False;
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &loops))
+    return NULL;
+
+  if (igraph_density(&self->g, &result, PyObject_IsTrue(loops))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("d", (double)result);
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices of a graph uniformly on a circle.
  * \return the calculated coordinates as a Python list of lists
  * \sa igraph_layout_circle
@@ -3621,6 +3681,103 @@ PyObject* igraphmodule_Graph_bfsiter(igraphmodule_GraphObject* self, PyObject* a
     return NULL;
   
   return igraphmodule_BFSIter_new(self, root, mode, PyObject_IsTrue(adv));
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the value of the maximum flow in the graph
+ */
+PyObject* igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject* self,
+					   PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = {"source", "target", "capacity", NULL};
+  PyObject *capacity_object = Py_None;
+  igraph_vector_t capacity_vector;
+  igraph_real_t result;
+  long vid1=-1, vid2=-1;
+  igraph_integer_t v1, v2;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|O", kwlist,
+				   &vid1, &vid2, &capacity_object))
+    return NULL;
+
+  v1=vid1; v2=vid2;
+  if (igraphmodule_PyObject_to_attribute_values(capacity_object,
+						&capacity_vector,
+						self, ATTRHASH_IDX_EDGE,
+						1.0))
+    return igraphmodule_handle_igraph_error();
+
+  
+  if (igraph_maxflow_value(&self->g, &result, v1, v2, &capacity_vector)) {
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vector_destroy(&capacity_vector);
+  return Py_BuildValue("d", (double)result);
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the value of the minimum cut in the graph
+ */
+PyObject* igraphmodule_Graph_mincut_value(igraphmodule_GraphObject* self,
+					  PyObject* args, PyObject* kwds) {
+  static char* kwlist[] = {"source", "target", "capacity", NULL};
+  PyObject *capacity_object = Py_None;
+  igraph_vector_t capacity_vector;
+  igraph_real_t result, mincut;
+  igraph_integer_t v1, v2;
+  long vid1=-1, vid2=-1;
+  long n;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iiO", kwlist,
+				   &vid1, &vid2, &capacity_object))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_attribute_values(capacity_object,
+						&capacity_vector,
+						self, ATTRHASH_IDX_EDGE,
+						1.0))
+    return igraphmodule_handle_igraph_error();
+
+  v1=vid1; v2=vid2;
+  if (v1 == -1 && v2 == -1) {
+    if (igraph_mincut_value(&self->g, &result, &capacity_vector)) {
+      igraph_vector_destroy(&capacity_vector);
+      return igraphmodule_handle_igraph_error();
+    }
+  } else if (v1 == -1) {
+    n=igraph_vcount(&self->g);
+    result=-1;
+    for (v1=0; v1<n; v1++) {
+      if (v2 == v1) continue;
+      if (igraph_st_mincut_value(&self->g, &mincut, v1, v2, &capacity_vector)) {
+	igraph_vector_destroy(&capacity_vector);
+	return igraphmodule_handle_igraph_error();
+      }
+      if (result<0 || result>mincut) result=mincut;
+    }
+    if (result<0) result=0.0;
+  } else if (v2 == -1) {
+    n=igraph_vcount(&self->g);
+    result=-1;
+    for (v2=0; v2<n; v2++) {
+      if (v2 == v1) continue;
+      if (igraph_st_mincut_value(&self->g, &mincut, v1, v2, &capacity_vector)) {
+	igraph_vector_destroy(&capacity_vector);
+	return igraphmodule_handle_igraph_error();
+      }
+      if (result<0.0 || result>mincut) result=mincut;
+    }
+    if (result<0) result=0.0;
+  } else {
+    if (igraph_st_mincut_value(&self->g, &result, v1, v2, &capacity_vector)) {
+      igraph_vector_destroy(&capacity_vector);
+      return igraphmodule_handle_igraph_error();
+    }
+  }
+
+  igraph_vector_destroy(&capacity_vector);
+  return Py_BuildValue("d", (double)result);
 }
 
 /** \defgroup python_interface_internal Internal functions

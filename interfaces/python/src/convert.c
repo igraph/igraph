@@ -582,3 +582,71 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
   return 0;
 }
 
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Tries to interpret a Python object as a numeric attribute value list
+ * 
+ * \param o the Python object
+ * \param v the \c igraph_vector_t which will contain the result
+ * \param g a \c igraphmodule_GraphObject object or \c NULL - used when the
+ * provided Python object is not a list and we're trying to interpret it as
+ * an attribute name.
+ * \param type the attribute type (graph = 0, vertex = 1, edge = 2) to be used
+ * \param def default value if the attribute name supplied is \c None
+ * if \c o is not a list.
+ * \return 0 if everything was OK, 1 otherwise
+ *
+ * If the Python object is not a list, tries to interpret it as an attribute
+ * name.
+ */
+int igraphmodule_PyObject_to_attribute_values(PyObject *o,
+					      igraph_vector_t *v,
+					      igraphmodule_GraphObject* g,
+					      int type, igraph_real_t def) {
+  PyObject* list = o;
+  long i, n;
+
+  if (o==NULL) return 1;
+  
+  if (o == Py_None) {
+    if (type == ATTRHASH_IDX_VERTEX) n=igraph_vcount(&g->g);
+    else if (type == ATTRHASH_IDX_EDGE) n=igraph_ecount(&g->g);
+    else n=1;
+
+    if (igraph_vector_init(v, n)) return 1;
+    for (i=0; i<n; i++) VECTOR(*v)[i] = def;
+    return 0;
+  }
+
+  if (!PyList_Check(o)) {
+    list = PyDict_GetItem(((PyObject**)g->g.attr)[type], o);
+    if (!list) {
+      if (!PyErr_Occurred())
+	PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
+      return 1;
+    }
+  }
+
+  n=PyList_Size(list);
+  if (igraph_vector_init(v, n)) return 1;
+
+  for (i=0; i<n; i++) {
+    PyObject *item = PyList_GetItem(list, i);
+    if (!item) {
+      igraph_vector_destroy(v);
+      return 1;
+    }
+
+    if (PyInt_Check(item))
+      VECTOR(*v)[i] = PyInt_AsLong(item);
+    else if (PyLong_Check(item))
+      VECTOR(*v)[i] = PyLong_AsLong(item);
+    else if (PyFloat_Check(item))
+      VECTOR(*v)[i] = PyFloat_AsDouble(item);
+    else
+      VECTOR(*v)[i] = def;
+  }
+
+  return 0;
+}
