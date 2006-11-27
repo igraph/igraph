@@ -555,7 +555,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     IGRAPH_FINALLY(igraph_vector_destroy, vector);
     IGRAPH_CHECK(igraph_vector_reserve(vector, 20));
 
-    while (item = PyIter_Next(iterator)) {
+    while ((item = PyIter_Next(iterator))) {
       long val=-1;
       if (PyInt_Check(item)) val=PyInt_AsLong(item);
       else if (PyLong_Check(item)) val=PyLong_AsLong(item);

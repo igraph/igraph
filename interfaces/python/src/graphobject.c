@@ -2927,9 +2927,8 @@ PyObject* igraphmodule_Graph_Read_DIMACS(PyTypeObject *type,
   igraphmodule_GraphObject *self;
   char* fname=NULL;
   FILE* f;
-  long int index=0;
   igraph_integer_t source=0, target=0;
-  igraph_vector_t *capacity;
+  igraph_vector_t capacity;
   igraph_t g;
   PyObject *directed=Py_False, *capacity_obj;
   
@@ -2943,23 +2942,23 @@ PyObject* igraphmodule_Graph_Read_DIMACS(PyTypeObject *type,
     PyErr_SetString(PyExc_IOError, strerror(errno));
     return NULL;
   }
-  if (igraph_vector_init(capacity, 0)) {
+  if (igraph_vector_init(&capacity, 0)) {
     igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
   }
 
-  if (igraph_read_graph_dimacs(&g, f, &source, &target, capacity,
+  if (igraph_read_graph_dimacs(&g, f, &source, &target, &capacity,
 			       PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(capacity);
+    igraph_vector_destroy(&capacity);
     fclose(f);
     return NULL;
   }
 
-  capacity_obj=igraphmodule_vector_t_to_float_PyList(capacity);
+  capacity_obj=igraphmodule_vector_t_to_float_PyList(&capacity);
   if (!capacity_obj) {
-    igraph_vector_destroy(capacity);
+    igraph_vector_destroy(&capacity);
     fclose(f);
     return NULL;
   }
@@ -2971,7 +2970,7 @@ PyObject* igraphmodule_Graph_Read_DIMACS(PyTypeObject *type,
     self->g=g;
   }
   fclose(f);
-  igraph_vector_destroy(capacity);
+  igraph_vector_destroy(&capacity);
 
   return Py_BuildValue("NiiN", (PyObject*)self, (long)source,
 		       (long)target, capacity_obj);

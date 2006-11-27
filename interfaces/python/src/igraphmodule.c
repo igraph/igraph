@@ -675,7 +675,7 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
 /* Permuting edges */
 static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
 						  const igraph_vector_t *idx) { 
-  long int n, i, ndeleted=0;
+  long int n, i;
   PyObject *key, *value, *dict, *newdict, *newlist, *o;
   int pos=0;
 
