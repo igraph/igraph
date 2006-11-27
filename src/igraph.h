@@ -207,6 +207,9 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_t *v);
 
 int igraph_vs_vector_small(igraph_vs_t *vs, ...);			   
 
+int igraph_vs_vector_copy(igraph_vs_t *vs,
+			  const igraph_vector_t *v);
+
 int igraph_vs_seq(igraph_vs_t *vs, igraph_integer_t from, igraph_integer_t to);
 igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
 
@@ -923,7 +926,9 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 			 const igraph_vector_t *capacity);
 int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res, 
 			const igraph_vector_t *capacity);
-
+int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
+                           igraph_integer_t source, igraph_integer_t target,
+			   const igraph_vector_t *capacity);
 
 
 

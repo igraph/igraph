@@ -1826,7 +1826,7 @@ PyObject* igraphmodule_Graph_constraint(igraphmodule_GraphObject *self,
 						self, ATTRHASH_IDX_EDGE,
 						1.0)) {
     igraph_vector_destroy(&result);
-    if (weight_obj_was_created) Py_DECREF(weight_obj);
+    if (weight_obj_was_created) { Py_DECREF(weight_obj); }
     return NULL;
   }
   
@@ -3286,12 +3286,12 @@ PyObject* igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject *self,
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&capacity);
     fclose(f);
-    if (capacity_obj_created) Py_DECREF(capacity_obj);
+    if (capacity_obj_created) { Py_DECREF(capacity_obj); }
     return NULL;
   }
   igraph_vector_destroy(&capacity);
   fclose(f);
-  if (capacity_obj_created) Py_DECREF(capacity_obj);
+  if (capacity_obj_created) { Py_DECREF(capacity_obj); }
   
   Py_RETURN_NONE;
 }

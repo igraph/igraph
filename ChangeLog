@@ -1,3 +1,13 @@
+2006-11-27  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_vs_vector_copy) : added
+	* interfaces/python/src/convert.c
+	(igraphmodule_PyObject_to_vs_t) : fixed a memory leak
+	* src/flow.c (igraph_i_mincut_value_undirected) :
+	fixed a memory leak
+	* src/igraph.h : added igraph_st_mincut_value declaration
+	* interfaces/python/src/graphobject.c : added some new functions
+
 2006-11-24  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/structural_properties.c (igraph_neighborhood_size)

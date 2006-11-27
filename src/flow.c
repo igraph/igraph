@@ -539,6 +539,7 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
   *res=mincut;
 
   igraph_i_adjedgelist_destroy(&adjedgelist);
+  igraph_i_adjlist_destroy(&adjlist);
   igraph_i_cutheap_destroy(&heap);
   IGRAPH_FINALLY_CLEAN(3);
   return 0;

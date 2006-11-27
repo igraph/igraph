@@ -537,23 +537,16 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     /* Returns a vertex sequence with the IDs returned by the iterator */
     PyObject *iterator = PyObject_GetIter(o);
     PyObject *item;
-    igraph_vector_t *vector;
+    igraph_vector_t vector;
 
     if (iterator == NULL) {
       PyErr_SetString(PyExc_TypeError, "integer, long, iterable or None expected");
       return 1;
     }
 
-    vector=Calloc(1, igraph_vector_t);
-    if (!vector) {
-      PyErr_SetString(PyExc_MemoryError, "out of memory");
-      Py_DECREF(iterator);
-      return 1;
-    }
-
-    IGRAPH_CHECK(igraph_vector_init(vector, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, vector);
-    IGRAPH_CHECK(igraph_vector_reserve(vector, 20));
+    IGRAPH_CHECK(igraph_vector_init(&vector, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &vector);
+    IGRAPH_CHECK(igraph_vector_reserve(&vector, 20));
 
     while ((item = PyIter_Next(iterator))) {
       long val=-1;
@@ -561,7 +554,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
       else if (PyLong_Check(item)) val=PyLong_AsLong(item);
       Py_DECREF(item);
 
-      if (val >= 0) igraph_vector_push_back(vector, val);
+      if (val >= 0) igraph_vector_push_back(&vector, val);
       else {
 	PyErr_SetString(PyExc_TypeError, "integer or long expected");
       }
@@ -571,11 +564,12 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     Py_DECREF(iterator);
 
     if (PyErr_Occurred()) {
-      igraph_vector_destroy(vector);
+      igraph_vector_destroy(&vector);
       IGRAPH_FINALLY_CLEAN(1);
       return 1;
     } else {
-      igraph_vs_vector(vs, vector);
+      igraph_vs_vector_copy(vs, &vector);
+      igraph_vector_destroy(&vector);
       IGRAPH_FINALLY_CLEAN(1);
     }
   }
