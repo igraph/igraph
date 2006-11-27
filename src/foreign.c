@@ -726,6 +726,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
   igraph_vector_destroy(&edges);
 
   IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 

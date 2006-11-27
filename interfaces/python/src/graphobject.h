@@ -75,16 +75,18 @@ PyObject* igraphmodule_Graph_get_eid(igraphmodule_GraphObject *self, PyObject *a
 PyObject* igraphmodule_Graph_Adjacency(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type, PyObject *args);
 PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Establishment(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Erdos_Renyi(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Full(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_GRG(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Growing_Random(PyTypeObject *type, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_Star(PyTypeObject *type, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_Ring(PyTypeObject *type, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_Tree(PyTypeObject *type, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Isoclass(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Recent_Degree(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Ring(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Star(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Tree(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_is_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_are_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -130,6 +132,7 @@ PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self, PyObje
 PyObject* igraphmodule_Graph_to_undirected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_to_directed(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
+PyObject* igraphmodule_Graph_Read_DIMACS(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -431,6 +434,19 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@param loops: whether self-loops are allowed.\n"
   },
   
+  /* interface to igraph_grg_game */
+  {"GRG", (PyCFunction)igraphmodule_Graph_GRG,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "GRG(n, radius, torus=False)\n\n"
+   "Generates a growing random geometric graph.\n\n"
+   "The algorithm drops the vertices randomly on the 2D unit square and connects\n"
+   "them if they are closer to each other than the given radius.\n\n"
+   "@param n: The number of vertices in the graph\n"
+   "@param radius: The given radius\n"
+   "@param torus: This should be C{True} if we want to use a torus instead of a\n"
+   "  square."
+  },
+  
   // interface to igraph_growing_random_game
   {"Growing_Random", (PyCFunction)igraphmodule_Graph_Growing_Random,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -443,6 +459,28 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "   recently added vertex.\n"
   },
   
+  /* interface to igraph_barabasi_game */
+  {"Recent_Degree", (PyCFunction)igraphmodule_Graph_Recent_Degree,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Recent_Degree(n, m, window, outpref=False, directed=False, power=1)\n\n"
+   "Generates a graph based on a stochastic model where the probability\n"
+   "of an edge gaining a new node is proportional to the edges gained in\n"
+   "a given time window.\n\n"
+   "@param n: the number of vertices\n"
+   "@param m: either the number of outgoing edges generated for\n"
+   "  each vertex or a list containing the number of outgoing\n"
+   "  edges for each vertex explicitly.\n"
+   "@param window: size of the window in time steps\n"
+   "@param outpref: C{True} if the out-degree of a given vertex\n"
+   "  should also increase its citation probability (as well as\n"
+   "  its in-degree), but it defaults to C{False}.\n"
+   "@param directed: C{True} if the generated graph should be\n"
+   "  directed (default: C{False}).\n"
+   "@param power: the power constant of the nonlinear model.\n"
+   "  It can be omitted, and in this case the usual linear model\n"
+   "  will be used.\n"
+  },
+
   // interface to igraph_star
   {"Star", (PyCFunction)igraphmodule_Graph_Star,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -1083,6 +1121,25 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   // LOADING AND SAVING GRAPHS //
   ///////////////////////////////
   
+  // interface to igraph_read_graph_dimacs
+  {"Read_DIMACS", (PyCFunction)igraphmodule_Graph_Read_DIMACS,
+   METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+   "Read_DIMACS(f, directed=False)\n\n"
+   "Reads a graph from a file conforming to the DIMACS minimum-cost flow file format\n\n."
+   "For the exact description of the format, see:\n"
+   "L{http://lpsolve.sourceforge.net/5.5/DIMACS.htm}\n\n"
+   "Restrictions compared to the official description of the format:\n\n"
+   " * igraph's DIMACS reader requires only three fields in an arc definition,\n"
+   "   describing the edge's source and target node and its capacity.\n\n"
+   " * Source nodes are identified by 's' in the FLOW field, target nodes are\n"
+   "   identified by 't'.\n\n"
+   " * Node indices start from 1. Only a single source and target node is allowed.\n\n"
+   "@param f: the name of the file\n"
+   "@param directed: whether the generated graph should be directed.\n"
+   "@return: the generated graph, the source and the target of the flow and the edge\n"
+   "  capacities in a tuple\n"
+  },
+
   // interface to igraph_read_graph_edgelist
   {"Read_Edgelist", (PyCFunction)igraphmodule_Graph_Read_Edgelist,
       METH_VARARGS | METH_KEYWORDS | METH_CLASS,

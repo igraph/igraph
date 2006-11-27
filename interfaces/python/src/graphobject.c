@@ -826,14 +826,14 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
 {
   igraphmodule_GraphObject *self;
   long n, m=0;
-  float power=0.0, zeroappeal=0.0;
+  float power=0.0, zero_appeal=0.0;
   igraph_vector_t outseq;
   PyObject *m_obj, *outpref=Py_False, *directed=Py_False;
   
-  char *kwlist[] = {"n", "m", "outpref", "directed", "power", "zeroappeal", NULL};
+  char *kwlist[] = {"n", "m", "outpref", "directed", "power", "zero_appeal", NULL};
   
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO|OOff", kwlist,
-				   &n, &m_obj, &outpref, &directed, &power, &zeroappeal))
+				   &n, &m_obj, &outpref, &directed, &power, &zero_appeal))
     return NULL;
   
   if (n<0) {
@@ -873,7 +873,7 @@ PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type,
 					 (igraph_real_t)power,
 					 (igraph_integer_t)m,
 					 &outseq, PyObject_IsTrue(outpref),
-					 (igraph_real_t)zeroappeal,
+					 (igraph_real_t)zero_appeal,
 					 PyObject_IsTrue(directed))) {
 	igraphmodule_handle_igraph_error();
 	igraph_vector_destroy(&outseq);
@@ -1067,6 +1067,40 @@ PyObject* igraphmodule_Graph_Full(PyTypeObject *type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a graph based on the geometric random model
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_grg_game
+ */
+PyObject* igraphmodule_Graph_GRG(PyTypeObject *type,
+				 PyObject *args,
+				 PyObject *kwds) {
+  igraphmodule_GraphObject *self;
+  long n;
+  double r;
+  PyObject *torus=Py_False;
+  
+  char *kwlist[] = {"n", "radius", "torus", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ld|O", kwlist,
+				   &n, &r, &torus))
+    return NULL;
+      
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_grg_game(&self->g, (igraph_integer_t)n, (igraph_real_t)r,
+			PyObject_IsTrue(torus))) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+   
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a growing random graph
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_growing_random_game
@@ -1219,6 +1253,65 @@ PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type,
   }
    
   igraph_vector_destroy(&dimvector);
+  
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a graph based on sort of a "windowed" Barabasi-Albert model
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_recent_degree_game
+ */
+PyObject* igraphmodule_Graph_Recent_Degree(PyTypeObject *type,
+					   PyObject *args,
+					   PyObject *kwds) {
+  igraphmodule_GraphObject *self;
+  long n, m=0, window=0;
+  float power=0.0, zero_appeal=0.0;
+  igraph_vector_t outseq;
+  PyObject *m_obj, *outpref=Py_False, *directed=Py_False;
+  
+  char *kwlist[] = {"n", "m", "window", "outpref", "directed", "power", "zero_appeal", NULL};
+  
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lOl|OOff", kwlist,
+				   &n, &m_obj, &window, &outpref, &directed, &power,
+				   &zero_appeal))
+    return NULL;
+  
+  if (n<0) {
+    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
+    return NULL;
+  }
+  
+  // let's check whether we have a constant out-degree or a list
+  if (PyInt_Check(m_obj)) {
+    m=PyInt_AsLong(m_obj);
+    igraph_vector_init(&outseq, 0);
+  } else if (PyList_Check(m_obj)) {
+    if (igraphmodule_PyList_to_vector_t(m_obj, &outseq, 1, 0)) {
+      // something bad happened during conversion
+      return NULL;
+    }
+  }
+  
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_recent_degree_game(&self->g, (igraph_integer_t)n,
+				  (igraph_real_t)power, (igraph_integer_t)window,
+				  (igraph_integer_t)m,
+				  &outseq, PyObject_IsTrue(outpref),
+				  (igraph_real_t)zero_appeal,
+				  PyObject_IsTrue(directed))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&outseq);
+      return NULL;
+    }
+  }
+
+  igraph_vector_destroy(&outseq);
   
   return (PyObject*)self;
 }
@@ -2822,6 +2915,66 @@ PyObject* igraphmodule_Graph_to_directed(igraphmodule_GraphObject *self,
     igraphmodule_handle_igraph_error(); return NULL;
   }
   Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Reads a DIMACS file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_graphml
+ */
+PyObject* igraphmodule_Graph_Read_DIMACS(PyTypeObject *type,
+					 PyObject *args, PyObject *kwds) {
+  igraphmodule_GraphObject *self;
+  char* fname=NULL;
+  FILE* f;
+  long int index=0;
+  igraph_integer_t source=0, target=0;
+  igraph_vector_t *capacity;
+  igraph_t g;
+  PyObject *directed=Py_False, *capacity_obj;
+  
+  char *kwlist[] = {"f", "directed", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|O", kwlist, &fname, &directed))
+     return NULL;
+
+  f=fopen(fname, "r");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_vector_init(capacity, 0)) {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+
+  if (igraph_read_graph_dimacs(&g, f, &source, &target, capacity,
+			       PyObject_IsTrue(directed))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(capacity);
+    fclose(f);
+    return NULL;
+  }
+
+  capacity_obj=igraphmodule_vector_t_to_float_PyList(capacity);
+  if (!capacity_obj) {
+    igraph_vector_destroy(capacity);
+    fclose(f);
+    return NULL;
+  }
+
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+  if (self != NULL) {
+    RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(self);
+    self->g=g;
+  }
+  fclose(f);
+  igraph_vector_destroy(capacity);
+
+  return Py_BuildValue("NiiN", (PyObject*)self, (long)source,
+		       (long)target, capacity_obj);
 }
 
 /** \ingroup python_interface_graph
