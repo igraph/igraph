@@ -81,13 +81,21 @@ class LocalTransitivityTests(unittest.TestCase):
 	trans = [round(x, 3) for x in trans]
 	self.failUnless(trans == [0.667, 1.0])
 
+
+class MiscTests(unittest.TestCase):
+    def testConstraint(self):
+	g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
+	self.failUnless(isinstance(g.constraint(), list)) # TODO check more
+
 def suite():
     simple_suite = unittest.makeSuite(SimplePropertiesTests)
     degree_suite = unittest.makeSuite(DegreeTests)
     local_transitivity_suite = unittest.makeSuite(LocalTransitivityTests)
+    misc_suite = unittest.makeSuite(MiscTests)
     return unittest.TestSuite((simple_suite,
 			       degree_suite,
-	                       local_transitivity_suite))
+	                       local_transitivity_suite,
+			       misc_suite))
 
 def test():
     runner = unittest.TextTestRunner()

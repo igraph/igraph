@@ -1801,6 +1801,58 @@ PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self,
    return list;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Calculates Burt's constraint scores for a given graph
+ * \sa igraph_constraint
+ */
+PyObject* igraphmodule_Graph_constraint(igraphmodule_GraphObject *self,
+					PyObject *args,
+					PyObject *kwds) {
+  char *kwlist[] = {"vertices", "weights", NULL};
+  PyObject *vids_obj=Py_None, *weight_obj=Py_None, *list;
+  igraph_vector_t result, weights;
+  igraph_vs_t vids;
+  igraph_bool_t return_single=0, weight_obj_was_created=0;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &vids_obj, weight_obj))
+    return NULL;
+  
+  if (igraph_vector_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  if (igraphmodule_PyObject_to_attribute_values(weight_obj, &weights,
+						self, ATTRHASH_IDX_EDGE,
+						1.0)) {
+    igraph_vector_destroy(&result);
+    if (weight_obj_was_created) Py_DECREF(weight_obj);
+    return NULL;
+  }
+  
+  if (igraphmodule_PyObject_to_vs_t(vids_obj, &vids, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    igraph_vector_destroy(&weights);
+    return NULL;
+  }
+
+  if (igraph_constraint(&self->g, &result, vids, &weights)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vids);
+    igraph_vector_destroy(&result);
+    igraph_vector_destroy(&weights);
+    return NULL;
+  }
+  
+  list=igraphmodule_vector_t_to_PyList(&result);
+  igraph_vs_destroy(&vids);
+  igraph_vector_destroy(&result);
+  igraph_vector_destroy(&weights);
+
+  return list;
+}
+
 /** \ingroup python_interface_copy
  * \brief Creates an exact deep copy of the graph
  * \return the copy of the graph
@@ -3187,6 +3239,64 @@ PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Writes the graph as a DIMACS file
+ * \return none
+ * \sa igraph_write_graph_dimacs
+ */
+PyObject* igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject *self,
+					  PyObject *args,
+					  PyObject *kwds)
+{
+  char* fname=NULL;
+  FILE* f;
+  long source, target;
+  PyObject* capacity_obj=Py_None;
+  igraph_vector_t capacity;
+  igraph_bool_t capacity_obj_created=0;
+
+  char *kwlist[] =
+  {
+    "f", "source", "target", "capacity", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "sii|O", kwlist, &fname,
+				   &source, &target, &capacity_obj))
+     return NULL;
+      
+  f=fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_attribute_values(capacity_obj,
+						&capacity,
+						self, ATTRHASH_IDX_EDGE,
+						1.0)) {
+    fclose(f);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (capacity_obj == Py_None) {
+    capacity_obj_created=1;
+    capacity_obj = PyString_FromString("capacity");
+  }
+
+  if (igraph_write_graph_dimacs(&self->g, f, source, target, &capacity)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&capacity);
+    fclose(f);
+    if (capacity_obj_created) Py_DECREF(capacity_obj);
+    return NULL;
+  }
+  igraph_vector_destroy(&capacity);
+  fclose(f);
+  if (capacity_obj_created) Py_DECREF(capacity_obj);
+  
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface_graph
  * \brief Writes the edge list to a file
  * \return none
  * \sa igraph_write_graph_edgelist
@@ -3211,8 +3321,8 @@ PyObject* igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject *self,
     PyErr_SetString(PyExc_IOError, strerror(errno));
     return NULL;
   }
-  if (igraph_write_graph_edgelist(&self->g, f))
-  {
+
+  if (igraph_write_graph_edgelist(&self->g, f)) {
     igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;

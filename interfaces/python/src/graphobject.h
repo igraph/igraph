@@ -96,6 +96,7 @@ PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self, PyObjec
 PyObject* igraphmodule_Graph_closeness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_clusters(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_cocitation(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_constraint(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_copy(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_density(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -138,6 +139,7 @@ PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObj
 PyObject* igraphmodule_Graph_Read_Lgl(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Pajek(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_GraphML(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_ncol(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_write_lgl(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -671,6 +673,27 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@return: cocitation scores for all given vertices in a matrix."
   },
   
+  /* interface to igraph_constraint */
+  {"constraint", (PyCFunction)igraphmodule_Graph_constraint,
+   METH_VARARGS | METH_KEYWORDS,
+   "cocitation(vertices=None, weights=None)\n\n"
+   "Calculates Burt's constraint scores for given vertices in a graph.\n\n"
+   "Burt's constraint is higher if ego has less, or mutually stronger\n"
+   "related (i.e. more redundant) contacts. Burt's measure of\n"
+   "constraint, C[i], of vertex i's ego network V[i], is defined for\n"
+   "directed and valued graphs as follows:\n\n"
+   "C[i] = sum( sum( (p[i,q] p[q,j])^2, q in V[i], q != i,j ), j in V[], j != i)\n\n"
+   "for a graph of order (ie. number od vertices) N, where proportional\n"
+   "tie strengths are defined as follows:\n\n"
+   "p[i,j]=(a[i,j]+a[j,i]) / sum(a[i,k]+a[k,i], k in V[i], k != i),\n"
+   "a[i,j] are elements of A and the latter being the graph adjacency matrix.\n\n"
+   "For isolated vertices, constraint is undefined.\n\n"
+   "@param vertices: the vertices to be analysed or C{None} for all vertices.\n"
+   "@param weights: weights associated to the edges. Can be an attribute name\n"
+   "  as well. If C{None}, every edge will have the same weight.\n"
+   "@return: cocitation scores for all given vertices in a matrix."
+  },
+  
   /* interface to igraph_density */
   {"density", (PyCFunction)igraphmodule_Graph_density,
       METH_VARARGS | METH_KEYWORDS,
@@ -1126,14 +1149,14 @@ static PyMethodDef igraphmodule_Graph_methods[] =
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_DIMACS(f, directed=False)\n\n"
    "Reads a graph from a file conforming to the DIMACS minimum-cost flow file format\n\n."
-   "For the exact description of the format, see:\n"
-   "L{http://lpsolve.sourceforge.net/5.5/DIMACS.htm}\n\n"
+   "For the exact description of the format, see\n"
+   "X{http://lpsolve.sourceforge.net/5.5/DIMACS.htm}\n\n"
    "Restrictions compared to the official description of the format:\n\n"
-   " * igraph's DIMACS reader requires only three fields in an arc definition,\n"
-   "   describing the edge's source and target node and its capacity.\n\n"
-   " * Source nodes are identified by 's' in the FLOW field, target nodes are\n"
-   "   identified by 't'.\n\n"
-   " * Node indices start from 1. Only a single source and target node is allowed.\n\n"
+   "  * igraph's DIMACS reader requires only three fields in an arc definition,\n"
+   "    describing the edge's source and target node and its capacity.\n\n"
+   "  * Source nodes are identified by 's' in the FLOW field, target nodes are\n"
+   "    identified by 't'.\n\n"
+   "  * Node indices start from 1. Only a single source and target node is allowed.\n\n"
    "@param f: the name of the file\n"
    "@param directed: whether the generated graph should be directed.\n"
    "@return: the generated graph, the source and the target of the flow and the edge\n"
@@ -1204,6 +1227,19 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "  specifies the one that should be loaded. Graph indices\n"
       "  start from zero, so if you want to load the first graph,\n"
       "  specify 0 here.\n"
+  },
+  // interface to igraph_write_graph_dimacs
+  {"write_dimacs", (PyCFunction)igraphmodule_Graph_write_dimacs,
+   METH_VARARGS | METH_KEYWORDS,
+   "write_dimacs(f, source, target, capacity=None)\n\n"
+   "Writes the graph in DIMACS format to the given file.\n\n"
+   "edge list of a graph to a file.\n\n"
+   "@param f: the name of the file to be written\n"
+   "@param source: the source vertex ID\n"
+   "@param target: the target vertex ID\n"
+   "@param capacity: the capacities of the edges in a list. If it is not a\n"
+   "  list, the corresponding edge attribute will be used to retrieve\n"
+   "  capacities."
   },
   // interface to igraph_write_graph_edgelist
   {"write_edgelist", (PyCFunction)igraphmodule_Graph_write_edgelist,

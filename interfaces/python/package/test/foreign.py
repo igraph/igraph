@@ -28,11 +28,14 @@ a 3 4 5
 """
 	tmpf.close()
 	g, src, dst, cap=Graph.Read_DIMACS(tmpfname, False)
-	os.unlink(tmpfname)
 	self.failUnless(isinstance(g, Graph))
 	self.failUnless(g.vcount() == 4 and g.ecount() == 5)
 	self.failUnless(src == 0 and dst == 3)
 	self.failUnless(cap == [4,2,2,3,5])
+	
+	g.write_dimacs(tmpfname, src, dst, cap)
+	os.unlink(tmpfname)
+	
 
 def suite():
     foreign_suite = unittest.makeSuite(ForeignTests)
