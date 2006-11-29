@@ -1,3 +1,13 @@
+2006-11-29  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/games.c (igraph_preference_game)
+	(igraph_asymmetric_preference_game) : added
+	* src/igraph.h : added new function declarations
+	* interfaces/python/src/graphobject.c
+	(igraphmodule_Graph_Preference)
+	(igraphmodule_Graph_Asymmetric_Preference) : added
+	* interfaces/python/package/test/games.py : added test cases
+
 2006-11-27  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/iterators.c (igraph_vs_vector_copy) : added

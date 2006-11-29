@@ -1496,3 +1496,189 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
   return 0;
 }
   
+/**
+ * \function igraph_preference_game
+ * \brief Generates a graph with vertex types and connection preferences 
+ * 
+ * </para><para>
+ * This is practically the nongrowing variant of \c igraph_establishment_game .
+ * A given number of vertices are generated. Every vertex is assigned to a
+ * vertex type according to the given type probabilities. Finally, every
+ * vertex pair is evaluated and an edge is created between them with a
+ * probability depending on the types of the vertices involved.
+ * 
+ * \param graph Pointer to an uninitialized graph.
+ * \param nodes The number of vertices in the graph.
+ * \param types The number of vertex types.
+ * \param type_dist Vector giving the distribution of vertex types.
+ * \param pref_matrix Matrix giving the connection probabilities for
+ * different vertex types.
+ * \param directed Logical, whether to generate a directed graph. If undirected
+ *   graphs are requested, only the lower left triangle of the preference
+ *   matrix is considered.
+ * \param loops Logical, whether loop edges are allowed.
+ * \return Error code.
+ *
+ * Added in version 0.3.</para><para>
+ *
+ * Time complexity: O(|V|^2), |V| is the number of vertices.
+ *
+ * \sa igraph_establishment_game
+ */
+
+int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
+			   igraph_integer_t types,
+			   igraph_vector_t *type_dist,
+			   igraph_matrix_t *pref_matrix,
+			   igraph_bool_t directed,
+			   igraph_bool_t loops) {
+  
+  long int i, j;
+  igraph_vector_t edges;
+  igraph_vector_t cumdist;
+  igraph_vector_t nodetypes;
+  igraph_real_t maxcum;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes, nodes);
+
+  VECTOR(cumdist)[0]=0;
+  for (i=0; i<types; i++) {
+    VECTOR(cumdist)[i+1] = VECTOR(cumdist)[i]+VECTOR(*type_dist)[i];
+  }
+  maxcum=igraph_vector_tail(&cumdist);
+
+  RNG_BEGIN();
+
+  for (i=0; i<nodes; i++) {
+    long int type1;
+    igraph_real_t uni1=RNG_UNIF(0, maxcum);
+    igraph_vector_binsearch(&cumdist, uni1, &type1);
+    VECTOR(nodetypes)[i] = type1;
+  }
+
+  igraph_vector_destroy(&cumdist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  for (i=0; i<nodes; i++) {
+    for (j=(directed?0:i); j<nodes; j++) {
+      long type1, type2;
+
+      if (!loops && i == j) continue;
+
+      type1=VECTOR(nodetypes)[i];
+      type2=VECTOR(nodetypes)[j];
+
+      if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+      }
+    }
+  }
+  
+  RNG_END();
+  
+  igraph_vector_destroy(&nodetypes);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+/**
+ * \function igraph_asymmetric_preference_game
+ * \brief Generates a graph with asymmetric vertex types and connection preferences 
+ * 
+ * </para><para>
+ * This is the asymmetric variant of \c igraph_preference_game .
+ * A given number of vertices are generated. Every vertex is assigned to an
+ * "incoming" and an "outgoing" vertex type according to the given joint
+ * type probabilities. Finally, every vertex pair is evaluated and a
+ * directed edge is created between them with a probability depending on the
+ * "outgoing" type of the source vertex and the "incoming" type of the target
+ * vertex.
+ * 
+ * \param graph Pointer to an uninitialized graph.
+ * \param nodes The number of vertices in the graph.
+ * \param types The number of vertex types.
+ * \param type_dist_matrix Matrix giving the joint distribution of vertex types.
+ * \param pref_matrix Matrix giving the connection probabilities for
+ * different vertex types.
+ * \param loops Logical, whether loop edges are allowed.
+ * \return Error code.
+ *
+ * Added in version 0.3.</para><para>
+ *
+ * Time complexity: O(|V|^2), |V| is the number of vertices.
+ *
+ * \sa igraph_preference_game
+ */
+
+int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
+				      igraph_integer_t types,
+				      igraph_matrix_t *type_dist_matrix,
+				      igraph_matrix_t *pref_matrix,
+				      igraph_bool_t loops) {
+  
+  long int i, j, k;
+  igraph_vector_t edges;
+  igraph_vector_t cumdist;
+  igraph_vector_t nodetypes_in;
+  igraph_vector_t nodetypes_out;
+  igraph_real_t maxcum;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types*types+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes_in, nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes_out, nodes);
+
+  VECTOR(cumdist)[0]=0;
+  for (i=0, k=0; i<types; i++) {
+    for (j=0; j<types; j++, k++) {
+      VECTOR(cumdist)[k+1] = VECTOR(cumdist)[k]+MATRIX(*type_dist_matrix, i, j);
+    }
+  }
+  maxcum=igraph_vector_tail(&cumdist);
+
+  RNG_BEGIN();
+
+  for (i=0; i<nodes; i++) {
+    long int type1;
+    igraph_real_t uni1=RNG_UNIF(0, maxcum);
+    igraph_vector_binsearch(&cumdist, uni1, &type1);
+    VECTOR(nodetypes_in)[i] = type1 / (int)types;
+    VECTOR(nodetypes_out)[i] = type1 % (int)types;
+  }
+
+  igraph_vector_destroy(&cumdist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  for (i=0; i<nodes; i++) {
+    for (j=0; j<nodes; j++) {
+      long type1, type2;
+
+      if (!loops && i == j) continue;
+
+      type1=VECTOR(nodetypes_out)[i];
+      type2=VECTOR(nodetypes_in)[j];
+
+      if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+      }
+    }
+  }
+  
+  RNG_END();
+  
+  igraph_vector_destroy(&nodetypes_out);
+  igraph_vector_destroy(&nodetypes_in);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, 1));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}

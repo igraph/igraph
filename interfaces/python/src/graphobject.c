@@ -1258,6 +1258,140 @@ PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a graph based on vertex types and connection preferences
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_preference_game
+ */
+PyObject* igraphmodule_Graph_Preference(PyTypeObject *type,
+					PyObject *args,
+					PyObject *kwds) {
+  igraphmodule_GraphObject *self;
+  long n, types;
+  PyObject *type_dist, *pref_matrix;
+  PyObject *directed = Py_False;
+  PyObject *loops = Py_False;
+  igraph_matrix_t pm;
+  igraph_vector_t td;
+  
+  char *kwlist[] = {"n", "type_dist", "pref_matrix", "directed", "loops", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|OO", kwlist,
+				   &n, &PyList_Type, &type_dist,
+				   &PyList_Type, &pref_matrix,
+				   &directed, &loops))
+    return NULL;
+      
+  if (n<=0) {
+    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
+    return NULL;
+  }
+  types = PyList_Size(type_dist);
+  
+  if (igraphmodule_PyList_to_matrix_t(pref_matrix, &pm)) {
+    PyErr_SetString(PyExc_TypeError, "Error while converting preference matrix");
+    return NULL;
+  }
+
+  if (igraph_matrix_nrow(&pm) != igraph_matrix_ncol(&pm) ||
+      igraph_matrix_nrow(&pm) != types) {
+    PyErr_SetString(PyExc_ValueError, "Preference matrix must have exactly the same rows and columns as the number of types");
+    igraph_matrix_destroy(&pm);
+    return NULL;
+  }
+  if (igraphmodule_PyList_to_vector_t(type_dist, &td, 1, 0)) {
+    PyErr_SetString(PyExc_ValueError, "Error while converting type distribution vector");
+    igraph_matrix_destroy(&pm);
+    return NULL;
+  }
+  
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_preference_game(&self->g, (igraph_integer_t)n,
+			       (igraph_integer_t)types, &td, &pm,
+			       PyObject_IsTrue(directed),
+			       PyObject_IsTrue(loops))) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&pm);
+      igraph_vector_destroy(&td);
+      return NULL;
+    }
+  }
+   
+  igraph_matrix_destroy(&pm);
+  igraph_vector_destroy(&td);
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a graph based on asymmetric vertex types and connection preferences
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_asymmetric_preference_game
+ */
+PyObject* igraphmodule_Graph_Asymmetric_Preference(PyTypeObject *type,
+						   PyObject *args,
+						   PyObject *kwds) {
+  igraphmodule_GraphObject *self;
+  long n, types;
+  PyObject *type_dist_matrix, *pref_matrix;
+  PyObject *loops = Py_False;
+  igraph_matrix_t pm;
+  igraph_matrix_t td;
+  
+  char *kwlist[] = {"n", "type_dist_matrix", "pref_matrix", "loops", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|O", kwlist,
+				   &n, &PyList_Type, &type_dist_matrix,
+				   &PyList_Type, &pref_matrix,
+				   &loops))
+    return NULL;
+      
+  if (n<=0) {
+    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
+    return NULL;
+  }
+  types = PyList_Size(type_dist_matrix);
+  
+  if (igraphmodule_PyList_to_matrix_t(pref_matrix, &pm)) {
+    PyErr_SetString(PyExc_TypeError, "Error while converting preference matrix");
+    return NULL;
+  }
+
+  if (igraph_matrix_nrow(&pm) != igraph_matrix_ncol(&pm) ||
+      igraph_matrix_nrow(&pm) != types) {
+    PyErr_SetString(PyExc_ValueError, "Preference matrix must have exactly the same rows and columns as the number of types");
+    igraph_matrix_destroy(&pm);
+    return NULL;
+  }
+  if (igraphmodule_PyList_to_matrix_t(type_dist_matrix, &td)) {
+    PyErr_SetString(PyExc_ValueError, "Error while converting type distribution matrix");
+    igraph_matrix_destroy(&pm);
+    return NULL;
+  }
+  
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_asymmetric_preference_game(&self->g, (igraph_integer_t)n,
+					  (igraph_integer_t)types, &td, &pm,
+					  PyObject_IsTrue(loops))) {
+      igraphmodule_handle_igraph_error();
+      igraph_matrix_destroy(&pm);
+      igraph_matrix_destroy(&td);
+      return NULL;
+    }
+  }
+   
+  igraph_matrix_destroy(&pm);
+  igraph_matrix_destroy(&td);
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a graph based on sort of a "windowed" Barabasi-Albert model
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_recent_degree_game

@@ -73,6 +73,7 @@ PyObject* igraphmodule_Graph_predecessors(igraphmodule_GraphObject *self, PyObje
 PyObject* igraphmodule_Graph_get_eid(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_Adjacency(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Asymmetric_Preference(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Atlas(PyTypeObject *type, PyObject *args);
 PyObject* igraphmodule_Graph_Barabasi(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Degree_Sequence(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -83,6 +84,7 @@ PyObject* igraphmodule_Graph_GRG(PyTypeObject *type, PyObject *args, PyObject *k
 PyObject* igraphmodule_Graph_Growing_Random(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Isoclass(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Preference(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Recent_Degree(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Ring(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Star(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -363,6 +365,26 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       " Optional, defaults to ADJ_DIRECTED.\n"
   },
   
+  /* interface to igraph_asymmetric_preference_game */
+  {"Asymmetric_Preference", (PyCFunction)igraphmodule_Graph_Asymmetric_Preference,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Preference(n, type_dist_matrix, pref_matrix, loops=False)\n\n"
+   "Generates a graph based on asymmetric vertex types and connection probabilities.\n\n"
+   "This is the asymmetric variant of L{Graph.Preference}.\n"
+   "A given number of vertices are generated. Every vertex is assigned to an\n"
+   "\"incoming\" and an \"outgoing\" vertex typeaccording to the given joint\n"
+   "type probabilities. Finally, every vertex pair is evaluated and a\n"
+   "directed edge is created between them with a probability depending on\n"
+   "the \"outgoing\" type of the source vertex and the \"incoming\" type of\n"
+   "the target vertex.\n\n"
+   "@param n: the number of vertices in the graph\n"
+   "@param type_dist_matrix: matrix giving the joint distribution of vertex\n"
+   "  types\n"
+   "@param pref_matrix: matrix giving the connection probabilities for\n"
+   "  different vertex types.\n"
+   "@param loops: whether loop edges are allowed.\n"
+  },
+  
   // interface to igraph_atlas
   {"Atlas", (PyCFunction)igraphmodule_Graph_Atlas,
       METH_CLASS | METH_KEYWORDS,
@@ -426,7 +448,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "@param loops: whether self-loops are allowed.\n"
   },
   
-  // interface to igraph_full_game
+  /* interface to igraph_full */
   {"Full", (PyCFunction)igraphmodule_Graph_Full,
       METH_VARARGS | METH_CLASS | METH_KEYWORDS,
       "Full(n, directed=False, loops=False)\n\n"
@@ -461,7 +483,25 @@ static PyMethodDef igraphmodule_Graph_methods[] =
       "   recently added vertex.\n"
   },
   
-  /* interface to igraph_barabasi_game */
+  /* interface to igraph_preference_game */
+  {"Preference", (PyCFunction)igraphmodule_Graph_Preference,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Preference(n, type_dist, pref_matrix, directed=False, loops=False)\n\n"
+   "Generates a graph based on vertex types and connection probabilities.\n\n"
+   "This is practically the nongrowing variant of L{Graph.Establishment}.\n"
+   "A given number of vertices are generated. Every vertex is assigned to a\n"
+   "vertex type according to the given type probabilities. Finally, every\n"
+   "vertex pair is evaluated and an edge is created between them with a\n"
+   "probability depending on the types of the vertices involved.\n\n"
+   "@param n: the number of vertices in the graph\n"
+   "@param type_dist: list giving the distribution of vertex types\n"
+   "@param pref_matrix: matrix giving the connection probabilities for\n"
+   "  different vertex types.\n"
+   "@param directed: whether to generate a directed graph.\n"
+   "@param loops: whether loop edges are allowed.\n"
+  },
+  
+  /* interface to igraph_recent_degree_game */
   {"Recent_Degree", (PyCFunction)igraphmodule_Graph_Recent_Degree,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "Recent_Degree(n, m, window, outpref=False, directed=False, power=1)\n\n"

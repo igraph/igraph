@@ -618,6 +618,16 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
 			      igraph_bool_t directed);
 int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 		    igraph_real_t radius, igraph_bool_t torus);
+int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
+			   igraph_integer_t types, igraph_vector_t *type_dist,
+			   igraph_matrix_t *pref_matrix,
+			   igraph_bool_t directed, igraph_bool_t loops);
+int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
+				      igraph_integer_t types,
+				      igraph_matrix_t *type_dist_matrix,
+				      igraph_matrix_t *pref_matrix,
+				      igraph_bool_t loops);
+
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */
