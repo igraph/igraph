@@ -11,10 +11,10 @@
 &igraph; uses graph objects to represent graphs, a graph object is an
 opaque type in the sense that users are not expected to manipulate
 graph objects directly. Instead &igraph; provides functions to create
-and manipulate graph objcets. This organization has the advantage that
+and manipulate graph objects. This organization has the advantage that
 the internal representation can be changed any time without breaking
 any code, assuming the users keep the rules. To facilitate the proper
-usage of &igraph; graph object we do not present the internal graph
+usage of &igraph; graph objects we do not present the internal graph
 representation here.
 </para>
 
@@ -48,10 +48,9 @@ Edges:
 </para>
 
 <para>
-Graph objects have an R class, it is called
-<constant>igraph</constant> and the <function>is.igraph</function>
-function can also be used to check that an R object is an &igraph;
-graph object:
+Graph objects have an R class <constant>igraph</constant> and the
+<function>is.igraph</function> function can be used to check that
+an R object is an &igraph; graph object:
 <informalexample><programlisting>
 <prompt>> </prompt>class( graph( 1:10 ) )
 </programlisting>

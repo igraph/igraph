@@ -94,8 +94,10 @@ int igraph_i_maxflow_value_undirected(const igraph_t *graph,
  * <para> This function can only calculate the value of the maximum
  * flow, but not the flow itself (may be added later). </para>
  * 
- * <para> According to a theorem by Ford and Furkelson (TODO:
- * citation) the maximum flow between two vertices is the same as the
+ * <para> According to a theorem by Ford and Furkelson 
+ * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
+ * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
+ * between two vertices is the same as the 
  * minimum between them (also called the minimum s-t cut). So the \ref
  * igraph_st_mincut_value() gives the same result in all cases as \c
  * igraph_maxflow_value().</para>
@@ -113,9 +115,9 @@ int igraph_i_maxflow_value_undirected(const igraph_t *graph,
  * cannot prove a better lower bound for the data structure i've
  * used. In fact, this implementation runs much faster than the
  * \c hi_pr implementation discussed in
- * B. V. Cherkassky and A. V. Goldberg: On implementing the
- * push-relabel method for the maximum flow problem, (TODO: citation)
- * on all the graph classes i've tried.
+ * B. V. Cherkassky and A. V. Goldberg: On implementing the 
+ * push-relabel method for the maximum flow problem, (Algorithmica, 
+ * 19:390--410, 1997) on all the graph classes i've tried.
  * 
  * \sa \ref igraph_mincut_value(), \ref igraph_edge_connectivity(),
  * \ref igraph_vertex_connectivity() for 
@@ -558,7 +560,9 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
  * <para> The minimum cut can be calculated with maximum flow
  * techniques, although the current implementation does this only for
  * directed graphs and a separate non-flow based implementation is
- * used for undirected graphs. See TODO: citation. For directed graphs
+ * used for undirected graphs. See Mechthild Stoer and Frank Wagner: A
+ * simple min-cut algorithm, Journal of the ACM 44 585--591, 1997.
+ * For directed graphs
  * the maximum flow is calculated between a fixed vertex and all the
  * other vertices in the graph and this is done in both
  * directions. Then the minimum is taken to get the minimum cut.
@@ -866,7 +870,7 @@ int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
  * <para> The vertex connectivity of a graph is the same as group
  * cohesion as defined in Douglas R. White and Frank Harary: The
  * cohesiveness of blocks in social networks: node connectivity and
- * conditional density, TODO: citation
+ * conditional density, Sociological Methodology 31:305--359, 2001.
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here. 
  * \return Error code.
@@ -949,7 +953,7 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * The edge connectivity of a graph is the same as group adhesion as
  * defined in Douglas R. White and Frank Harary: The cohesiveness of
  * blocks in social networks: node connectivity and conditional
- * density, TODO: citation
+ * density, Sociological Methodology 31:305--359, 2001.
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
  * \return Error code.
@@ -1129,8 +1133,10 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
  * \brief Graph adhesion, this is (almost) the same as edge
  * connectivity.
  * 
- * </para><para> This quantity is defined by White and Harary in TODO:
- * citation, and basically it is the edge connectivity of the graph
+ * </para><para> This quantity is defined by White and Harary in
+ * The cohesiveness of blocks in social networks: node connectivity and
+ * conditional density, (Sociological Methodology 31:305--359, 2001)
+ * and basically it is the edge connectivity of the graph
  * with uniform edge weights.
  * \param graph The input graph, either directed or undirected.
  * \param res Pointer to an integer, the result will be stored here.
@@ -1167,8 +1173,10 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res) {
  * \brief Graph cohesion, this is the same as vertex
  * connectivity. 
  * 
- * </para><para> This quantity was defined by White and Harary (TODO:
- * citation), and it is the same as the vertex connectivity of a
+ * </para><para> This quantity was defined by White and Harary in <quote>The
+ * cohesiveness of blocks in social networks: node connectivity and
+ * conditional density</quote>, (Sociological Methodology 31:305--359, 2001)
+ * and it is the same as the vertex connectivity of a 
  * graph. 
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be

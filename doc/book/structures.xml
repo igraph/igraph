@@ -15,7 +15,7 @@ the empty graph:
 <informalexample><programlisting>
 <prompt>&gt; </prompt>g &lt;- graph.empty()
 </programlisting></informalexample>
-This command creates an empty graph and stores in a variable named
+This command creates an empty graph and stores it in a variable named
 <varname>g</varname>. If you type in the name of a variable
 containing a graph object, R prints some information about the graph,
 and its edge list:
@@ -34,7 +34,7 @@ Directed: TRUE
 This small example illustrates a number of things: empty graphs can be
 created by the <function>graph.empty()</function> command; by default this
 command creates a graph with no vertices and no edges (well this is
-what the word empty means); by default this command created directed
+what the word empty means); by default this command creates directed
 graphs. <function>graph.empty()</function> has an optional parameter:
 <parameter>n</parameter>, the number of vertices in the graph. (A
 graph with non-zero number of vertices and no edges is still called
@@ -95,9 +95,9 @@ Edges:
 [5] 2 -> 1
 </screen>
 </informalexample>
-Note that &igraph; prints undirected edges with `--' and directed ones
-with '-&gt;', stressing that the order of the vertex ids in the edges are
-important only in directed graphs.
+Note that &igraph; prints undirected edges with <quote>--</quote> and
+directed ones with <quote>-&gt;</quote>, stressing that the order of
+the vertex ids in the edges are important only in directed graphs. 
 </para>
 
 <para>
@@ -153,7 +153,7 @@ graph it searches for an edge from the first vertex to the second:
 <para>
 If a graph is very big, then it is probably not a good idea to list
 its edges to the screen. In this case the standard
-<function>summary()</function> can be used to print some useful
+<function>summary()</function> function can be used to print some useful
 information about the graph:
 <informalexample><programlisting>
 <prompt>&gt; </prompt>big &lt;- graph.full(1000)
@@ -183,7 +183,7 @@ edges.
 <para>In a star graph, a single distinguished vertex is connected to
 every other vertices and there are no other edges present. In &igraph;
 three types of star graphs can be created, the
-<parameter>mode</parameter> decides which one to generate:
+<parameter>mode</parameter> argument decides which one to generate:
 <parameter>in</parameter> creates a directed graph in which every edge
 points to the distinguished vertex, <parameter>out</parameter> creates
 a directed graph with opposite directedness and
@@ -211,7 +211,7 @@ which the vertices are placed at the integer coordinate points of the
 n-dimensional Euclidean space and each vertex connects to vertices
 which are exactly one unit away from it. Ie. if the lattice is two
 dimensional and the length of the lattice is 5 along the first and 3
-along the second dimension, than it has 15 vertices and they're placed
+along the second dimension, then it has 15 vertices and they're placed
 at coordinates (1,1), (1,2), (1,3), (2,1), &hellip; (5,3) and two
 vertices are connected if the difference of one of their coordinates is
 one or minus one and all their other coordinates are exactly the same.
@@ -240,7 +240,7 @@ The second form is obviously more general.
 </para>
 
 <para>
-<function>graph.lattice()</function> generates non-circular lattice by
+<function>graph.lattice()</function> generates non-circular lattices by
 defaults. In a circular lattice the difference of the coordinates of
 the vertices is calculated modulo the size of the lattice along the
 given dimension so for example in the circular 5x3 two dimensional
@@ -276,7 +276,9 @@ leafs from it.
 <para>The directedness of the edges of tree is determined by the
 <parameter>mode</parameter> parameter. See the figure for the possible
 values of this parameter.
-TODO: figure with different mode parameters.
+<mediaobject>
+<imageobject><imagedata fileref="trees.png" format="PNG" /></imageobject>
+</mediaobject>
 </para>
 
 </section>
@@ -303,6 +305,10 @@ order of the degree sequence, for example 111223 &lt; 112222;
 for fixed degree sequence, in increasing number of automorphisms.
 </para></listitem>
 </orderedlist>
+Here is a random selection from the graph atlas:
+<mediaobject>
+<imageobject><imagedata fileref="atlas.png" format="PNG" /></imageobject>
+</mediaobject>
 </para>
 
 </section>

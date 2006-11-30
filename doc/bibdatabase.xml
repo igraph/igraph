@@ -35,4 +35,17 @@
     <pagenums>066104</pagenums>
   </biblioentry>
 
+  <biblioentry id="bib:ford56">
+    <authorgroup>
+      <author><firstname>L. R.</firstname><surname>Ford Jr.</surname></author>
+      <author><firstname>D. R.</firstname><surname>Fulkerson</surname></author>
+    </authorgroup>
+    <subtitle>Maximal ow through a network</subtitle>
+    <title>Canadian J. Math.</title>
+    <pubdate>1956</pubdate>
+    <volumenum>8</volumenum>
+    <pagenums>399--404</pagenums>
+  </biblioentry>
+
+
 </bibliography>

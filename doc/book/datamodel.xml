@@ -33,13 +33,14 @@ graph. Thus the numbering of vertex ids is always continual, all
 <para>
 Directed &igraph; edges are ordered pairs or vertex ids. A directed
 graph is an ordered multiset of directed edges and some additional
-meta data: the number of vertices in the graph and whether the graph
-is directed. Here is an example of a directed &igraph; graph:
+meta data: the number of vertices in the graph and a boolean tag to
+mark the graph as directed. Here is an example of a directed &igraph;
+graph: 
 <informalexample>
 <programlisting>
   ( vertices: 6, 
     directed: yes,
-    {
+    (
      (0,2),
      (2,2),
      (2,3),
@@ -47,7 +48,7 @@ is directed. Here is an example of a directed &igraph; graph:
      (3,4),
      (3,4),
      (4,1)
-    }
+    )
   )
 </programlisting>
 </informalexample>
@@ -75,7 +76,7 @@ undirected graph:
 <programlisting>
   ( vertices: 6,
     directed: no,
-    {
+    (
      {0,2},
      {2},
      {2,3},
@@ -83,12 +84,80 @@ undirected graph:
      {3,4},
      {3,4},
      {4,1}
-    }
+    )
   )
 </programlisting>
 </informalexample>
 This graph contains both loop edges ({2} and {3}, ie. (2-2) and (3-3))
 and multiple edges ({3,4} twice). 
+</para>
+
+</section>
+
+<section><title>Examples</title>
+
+<para>
+We give some simple examples on how this data model is used in
+computations. The first example is the
+<function>are.connected()</function> function, this decides whether two
+vertices are connected by an edge. Lets assume that G1 and G2 are the
+graphs from the previous two sections, G1 is the directed, G2 the
+undirected graph. Now if we check with
+<function>are.connected()</function> whether vertices 0 and 2 are
+connectedin G1, the function searches for the (0,2) <emphasis>directed
+pair</emphasis>, and since it finds it it returns positive result. If the
+same search is performed on G2, the function searches for the {0,2}
+set and the result is, again, positive. Now it is perhaps obvious by
+now that if we suppply the vertices in the opposite order, ie. 2 and 0
+then in G1 the (2,0) ordered pair is requested, so the answer is
+negative. For G2 {0,2}={2,0} is searched again, the answer is still
+positive.
+</para>
+
+<para>
+Another simple example is the <function>neighbors()</function> command,
+this can be used to find the neighboring vertices of a
+vertex. <function>neighbors()</function> (like many other functions in
+&igraph;) has a parameter called <parameter>mode</parameter>. This
+parameter defines how the search is performed in directed graphs. Let
+us assume that we are interested in the neighbors of vertex 3. If
+<parameter>mode</parameter> is <constant>out</constant> then the
+graph's edge list (which is a multiset) is searched for elements
+having 3 in the first position of the ordered pair and returns the
+vertex ids in the second position in these elements. So the answer is
+(3,4,4). Now if <parameter>mode</parameter> is <constant>in</constant>
+then the role of the first and second positions is exchanged and 
+(2,3) is returned. The third possible value of
+<parameter>mode</parameter> is <constant>all</constant>, in this case
+pairs having 3 at either at the first or second positions are searched
+and the <emphasis>other</emphasis> vertex id in the pair is returned:
+(2,3,4,4). Note that 3 is returned only once even if it is found both
+ways. This of course corresponds to the normal graph theoretic
+conventions. 
+</para>
+
+<para>
+The <parameter>mode</parameter> argument is always ignored when
+dealing with undirected graphs, as these graphs store an edge as an
+unordered pair (ie. a set). For example running
+<function>neighbors()</function> on graph G2 and vertex 3, the result is 
+(2,3,4,4). 
+</para>
+
+<para>
+Note that if we set <parameter>mode</parameter> to
+<constant>all</constant> on a directed graph that essentially means
+that we use the corresponding undirected graph for calculation. Also
+note that the corresponding undirected graph always have the same
+number of edges as the directed counterpart, eg. if the directed graph
+contains (3,4) and (4,3) these edges make two {3,4} edges in the
+undirected graph.
+</para>
+
+<para>
+Some &igraph; functions have a <parameter>mode</parameter> for other
+purposes: eg. <function>graph.tree()</function> and
+<function>graph.star()</function>. 
 </para>
 
 </section>
