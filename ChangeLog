@@ -8,6 +8,11 @@
 	(igraphmodule_Graph_Asymmetric_Preference) : added
 	* interfaces/python/package/test/games.py : added test cases
 
+2006-11-28  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c 
+	(igraph_transitivity_avglocal_undirected) : added
+
 2006-11-27  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/iterators.c (igraph_vs_vector_copy) : added

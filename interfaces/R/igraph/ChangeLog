@@ -1,3 +1,10 @@
+2006-11-28  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R (transitivity) :
+	added local average type
+	* interfaces/R/src/rinterface.c 
+	(R_igraph_transitivity_avglocal_undirected) : added
+
 2006-11-24  Gabor Csardi  <csardi@kzoo.edu>
 
 	* interfaces/R/igraph/R/structural.properties.R (neighborhood.size)

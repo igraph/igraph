@@ -49,6 +49,12 @@
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
 </section>
 
+<section><title>Transitivity or Clustering Coefficient</title>
+<!-- doxrox-include igraph_transitivity_undirected -->
+<!-- doxrox-include igraph_transitivity_local_undirected -->
+<!-- doxrox-include igraph_transitivity_avglocal_undirected -->
+</section>
+
 <section><title>Directedness conversion</title>
 <!-- doxrox-include igraph_to_directed -->
 <!-- doxrox-include igraph_to_undirected -->
@@ -58,8 +64,6 @@
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_simplify -->
 <!-- doxrox-include igraph_reciprocity -->
-<!-- doxrox-include igraph_transitivity_undirected -->
-<!-- doxrox-include igraph_transitivity_local_undirected -->
 <!-- doxrox-include igraph_bibcoupling -->
 <!-- doxrox-include igraph_cocitation -->
 <!-- doxrox-include igraph_get_adjacency -->	

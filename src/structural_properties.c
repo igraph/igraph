@@ -2095,6 +2095,88 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
 }
 
 /**
+ * \function igraph_transitivity_avglocal_undirected
+ * \brief Average local transitivity (clustering coefficient)
+ * 
+ * The transitivity measures the probability that two neighbors of a
+ * vertex are connected. In case of the average local transitivity
+ * this probability if calculated for each vertex and then the average
+ * is taken for those vertices which have at least two neighbors. If
+ * there are no such vertices then \c NaN is returned. 
+ * \param graph The input graph, directed graphs are considered as 
+ *    undirected ones.
+ * \param res Pointer to a real variable, the result will be stored here.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_transitivity_undirected(), \ref
+ * igraph_transitivity_local_undirected().
+ * 
+ * Time complexity: O(|V|*d^2), |V| is the number of vertices in the
+ * graph and d is the average degree.
+ */
+
+int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
+					    igraph_real_t *res) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_real_t sum=0.0;
+  igraph_integer_t count=0;
+  long int node, i, j;
+  igraph_i_adjlist_t allneis;
+  igraph_vector_t *neis1, *neis2;
+  long int neilen1, neilen2;
+  igraph_integer_t triples, triangles;
+  long int *neis;
+  
+  neis=Calloc(no_of_nodes, long int);
+  if (neis==0) {
+    IGRAPH_ERROR("undirected average local transitivity failed",
+		 IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, neis);
+  
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+
+  for (node=0; node<no_of_nodes; node++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    neis1=igraph_i_adjlist_get(&allneis, node);
+    neilen1=igraph_vector_size(neis1);
+    /* Mark the neighbors of 'node' */
+    for (i=0; i<neilen1; i++) {
+      neis[ (long int)VECTOR(*neis1)[i] ] = node+1;
+    }
+    triples=neilen1*(neilen1-1);
+    triangles=0;
+    
+    for (i=0; i<neilen1; i++) {
+      long int v=VECTOR(*neis1)[i];
+      neis2=igraph_i_adjlist_get(&allneis, v);
+      neilen2=igraph_vector_size(neis2);
+      for (j=0; j<neilen2; j++) {
+	long int v2=VECTOR(*neis2)[j];
+	if (neis[v2] == node+1) {
+	  triangles += 1;
+	}
+      }
+    }
+    
+    if (triples != 0) {
+      sum += triangles / triples;
+      count++;
+    }
+  }
+
+  *res = sum/count;
+
+  igraph_i_adjlist_destroy(&allneis);
+  Free(neis);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+  
+/**
  * \function igraph_transitivity_local_undirected
  * \brief Calculates the local transitivity (clustering coefficient)
  * of a graph
@@ -2110,10 +2192,12 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
  *   transitivity will be calculated.
  * \return Error code.
  * 
- * \sa \ref igraph_transitivity_undirected().
+ * \sa \ref igraph_transitivity_undirected(), \ref
+ * igraph_transitivity_avglocal_undirected().
  * 
- * Time complexity: O(n*d^2), n is the number of vertices for which
- * the transitivity is calculated, d is the average vertex degree.
+ * Time complexity: O(n*d^2+|V|), n is the number of vertices for which
+ * the transitivity is calculated, d is the average vertex degree and |V| the 
+ * total number if vertices in the graph.
  */
 
 int igraph_transitivity_local_undirected(const igraph_t *graph, 
@@ -2127,7 +2211,7 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
   igraph_real_t triples, triangles;
   long int i, j, k;
   long int neilen1, neilen2;
-  long int *neis;
+  long int *neis;		/* TODO: get rid of this */
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -2195,7 +2279,8 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
  *         \c IGRAPH_ENOMEM: not enough memory for
  *         temporary data. 
  *
- * \sa \ref igraph_transitivity_local_undirected().
+ * \sa \ref igraph_transitivity_local_undirected(), 
+ * \ref igraph_transitivity_avglocal_undirected().
  *
  * Time complexity: O(|V|*d^2), |V| is the number of vertices in 
  * the graph, d is the average node degree. 
