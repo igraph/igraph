@@ -1,7 +1,7 @@
 
 o attribute support in to_undirected
 o calculate the actual maximum flow
-o local transitivity, average local transitivity.
+o average local transitivity.
 o find a way for writing equations in DocBook.
 o read and write non-structural info from/to GraphML files
   read:
@@ -12,14 +12,12 @@ o Add Python interface to igraph_callaway_traits_game,
   igraph_barabasi_aging_game, igraph_recent_degree_aging_game
 o Add Python edge/vertex selector support
 o index in pdf manual
-o add attribute support to spanning tree functions
 o PAJEK import improvements: 
   - affiliation networks, AFFIL.NET: *Vertices n n1 
   - multiple edge sets in the same graph (?), Sampson.net, Multi.net, 
     SampsonL.net
   - color conversion, see colors in the Pajek manual
-o rewite add_edges, add_vertices, delete_vertices,
-  they're a mess
+o rewite add_edges, add_vertices, they're a mess
 o better looking graphs in 3D in the R interface
 o better random number generator handling (init with seed, etc...)
 o uniform graph operators (union, intersection, etc...)

@@ -549,6 +549,8 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
 		igraph_tree_mode_t type);
 int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 int igraph_atlas(igraph_t *graph, int number);
+int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
+				 const igraph_matrix_t *W);
 
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */
@@ -940,20 +942,24 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
                            igraph_integer_t source, igraph_integer_t target,
 			   const igraph_vector_t *capacity);
 
-
-
-
-
-int igraph_edge_connectivity_pair(const igraph_t *graph, igraph_integer_t *res,
-				  igraph_integer_t source, 
-				  igraph_integer_t target);
-
+int igraph_st_vertex_connectivity(const igraph_t *graph, 
+				  igraph_integer_t *res,
+				  igraph_integer_t source,
+				  igraph_integer_t target,
+				  igraph_vconn_nei_t neighbors);
+int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res);
+int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+				igraph_integer_t source, 
+				igraph_integer_t target);
 int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res);
-
-int igraph_vertex_connectivity_pair(const igraph_t *graph, 
-				    igraph_integer_t *res,
-				    igraph_integer_t source, 
-				    igraph_integer_t target);
+int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+			       igraph_integer_t source, 
+			       igraph_integer_t target);
+int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+				 igraph_integer_t source,
+				 igraph_integer_t target);
+int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res);
+int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */
