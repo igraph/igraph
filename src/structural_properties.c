@@ -540,7 +540,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
   
   igraph_vector_destroy(&edges);
   Free(added_edges);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(3);
   
   return 0;
 }
