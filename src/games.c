@@ -661,11 +661,13 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
   igraph_vector_t edges;
   igraph_vector_t cumdist;
   igraph_real_t maxcum;
+  igraph_vector_t nodetypes;
 
   /* TODO: parameter checks */
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes, nodes);
   
   VECTOR(cumdist)[0]=0;
   for (i=0; i<types; i++) {
@@ -675,14 +677,19 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
 
   RNG_BEGIN();
 
+  for (i=0; i<nodes; i++) {
+    igraph_real_t uni=RNG_UNIF(0, maxcum);
+    long int type;
+    igraph_vector_binsearch(&cumdist, uni, &type);
+    VECTOR(nodetypes)[i]=type;
+  }    
+
   for (i=1; i<nodes; i++) {
     for (j=0; j<edges_per_step; j++) {
       long int node1=RNG_INTEGER(0, i);
       long int node2=RNG_INTEGER(0, i);
-      igraph_real_t uni1=RNG_UNIF(0, maxcum), uni2=RNG_UNIF(0, maxcum);
-      long int type1, type2;
-      igraph_vector_binsearch(&cumdist, uni1, &type1);
-      igraph_vector_binsearch(&cumdist, uni2, &type2);
+      long int type1=VECTOR(nodetypes)[node1];
+      long int type2=VECTOR(nodetypes)[node2];
 /*    printf("unif: %f, %f, types: %li, %li\n", uni1, uni2, type1, type2); */
       if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, node1));
@@ -693,8 +700,9 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
 
   RNG_END();
 
+  igraph_vector_destroy(&nodetypes);
   igraph_vector_destroy(&cumdist);
-  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY_CLEAN(2);
   IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);

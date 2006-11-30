@@ -1,3 +1,7 @@
+2006-11-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_callaway_traits_game) : bug corrected
+
 2006-11-29  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/games.c (igraph_preference_game)
