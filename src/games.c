@@ -739,10 +739,12 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_vector_t cumdist;
   igraph_vector_t potneis;
   igraph_real_t maxcum;
+  igraph_vector_t nodetypes;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
   IGRAPH_VECTOR_INIT_FINALLY(&potneis, k);
+  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes, nodes);
   
   VECTOR(cumdist)[0]=0;
   for (i=0; i<types; i++) {
@@ -751,14 +753,19 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
   maxcum=igraph_vector_tail(&cumdist);
 
   RNG_BEGIN();
-  
-  for (i=k; i<nodes; i++) {
+
+  for (i=0; i<nodes; i++) {
+    igraph_real_t uni=RNG_UNIF(0, maxcum);
+    long int type;
+    igraph_vector_binsearch(&cumdist, uni, &type);
+    VECTOR(nodetypes)[i]=type;
+  }
+
+  for (i=k; i<nodes; i++) {    
+    long int type1=VECTOR(nodetypes)[i];
     igraph_random_sample(&potneis, 0, i-1, k);
     for (j=0; j<k; j++) {
-      long int type1, type2;
-      igraph_real_t uni1=RNG_UNIF(0, maxcum), uni2=RNG_UNIF(0, maxcum);
-      igraph_vector_binsearch(&cumdist, uni1, &type1);
-      igraph_vector_binsearch(&cumdist, uni2, &type2);
+      long int type2=VECTOR(nodetypes)[ (long int)VECTOR(potneis)[j] ];
       if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, VECTOR(potneis)[j]));
@@ -768,9 +775,10 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
   
   RNG_END();
   
+  igraph_vector_destroy(&nodetypes);
   igraph_vector_destroy(&potneis);
   igraph_vector_destroy(&cumdist);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(3);
   IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);

@@ -23,6 +23,8 @@
 	* src/igraph.h : added igraph_st_mincut_value declaration
 	* interfaces/python/src/graphobject.c : added some new functions
 
+	* src/games.c (igraph_establishment_game) : bug corrected
+
 2006-11-24  Gabor Csardi  <csardi@kzoo.edu>
 
 	* src/structural_properties.c (igraph_neighborhood_size)
