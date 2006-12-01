@@ -4802,3 +4802,57 @@ SEXP R_igraph_neighborhood_graphs(SEXP graph, SEXP pvids, SEXP porder,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_preference_game(SEXP pnodes, SEXP ptypes,
+			      SEXP ptype_dist, SEXP pmatrix,
+			      SEXP pdirected, SEXP ploops) {
+  igraph_t g;
+  igraph_integer_t nodes=REAL(pnodes)[0];
+  igraph_integer_t types=REAL(ptypes)[0];
+  igraph_vector_t type_dist;
+  igraph_matrix_t matrix;
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  igraph_bool_t loops=LOGICAL(ploops)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_vector(ptype_dist, &type_dist);
+  R_SEXP_to_matrix(pmatrix, &matrix);
+  igraph_preference_game(&g, nodes, types, &type_dist, &matrix,
+			 directed, loops);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_asymmetric_preference_game(SEXP pnodes, SEXP ptypes,
+					 SEXP ptype_dist_matrix, SEXP pmatrix,
+					 SEXP ploops) {
+  
+  igraph_t g;
+  igraph_integer_t nodes=REAL(pnodes)[0];
+  igraph_integer_t types=REAL(ptypes)[0];
+  igraph_matrix_t type_dist_matrix;
+  igraph_matrix_t matrix;
+  igraph_bool_t loops=LOGICAL(ploops)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_matrix(ptype_dist_matrix, &type_dist_matrix);
+  R_SEXP_to_matrix(pmatrix, &matrix);
+  igraph_asymmetric_preference_game(&g, nodes, types, &type_dist_matrix,
+				    &matrix, loops);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

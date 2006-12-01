@@ -1,3 +1,11 @@
+2006-12-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/igraph/games,R (preference.game)
+	(asymmetric.preference.game) : added
+	* interfaces/R/igraph/R/src/rinterface.c 
+	(R_igraph_preference_game, R_igraph_asymmetric_preference_game) :
+	added
+
 2006-11-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (transitivity) :

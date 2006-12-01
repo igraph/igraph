@@ -1539,7 +1539,7 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
  *
  * Time complexity: O(|V|^2), |V| is the number of vertices.
  *
- * \sa igraph_establishment_game
+ * \sa igraph_establishment_game()
  */
 
 int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
@@ -1629,7 +1629,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  *
  * Time complexity: O(|V|^2), |V| is the number of vertices.
  *
- * \sa igraph_preference_game
+ * \sa \ref igraph_preference_game()
  */
 
 int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,

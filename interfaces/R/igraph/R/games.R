@@ -228,3 +228,35 @@ grg.game <- function(nodes, radius, torus=FALSE) {
         as.logical(torus),
         PACKAGE="igraph")
 }
+
+preference.game <- function(nodes, types, type.dist=rep(1, types),
+                            pref.matrix=matrix(1, types, types),
+                            directed=FALSE, loops=FALSE) {
+
+  if (nrow(pref.matrix) != types || ncol(pref.matrix) != types) {
+    stop("Invalid size for preference matrix")
+  }
+  
+  .Call("R_igraph_preference_game", as.double(nodes), as.double(types),
+        as.double(type.dist), matrix(as.double(pref.matrix), types, types),
+        as.logical(directed), as.logical(loops))
+}
+
+asymmetric.preference.game <- function(nodes, types,
+                                       type.dist.matrix=matrix(1, types,types),
+                                       pref.matrix=matrix(1, types, types),
+                                       loops=FALSE) {
+  
+  if (nrow(pref.matrix) != types || ncol(pref.matrix) != types) {
+    stop("Invalid size for preference matrix")
+  }
+  if (nrow(type.dist.matrix) != types || ncol(type.dist.matrix) != types) {
+    stop("Invalid size for type distribution matrix")
+  }
+  
+  .Call("R_igraph_asymmetric_preference_game",
+        as.double(nodes), as.double(types),
+        matrix(as.double(type.dist.matrix), types, types),
+        matrix(as.double(pref.matrix), types, types),
+        as.logical(loops))
+}
