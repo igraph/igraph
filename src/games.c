@@ -1556,8 +1556,8 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_real_t maxcum;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
   IGRAPH_VECTOR_INIT_FINALLY(&nodetypes, nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
 
   VECTOR(cumdist)[0]=0;
   for (i=0; i<types; i++) {
@@ -1646,9 +1646,9 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_real_t maxcum;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types*types+1);
   IGRAPH_VECTOR_INIT_FINALLY(&nodetypes_in, nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&nodetypes_out, nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types*types+1);
 
   VECTOR(cumdist)[0]=0;
   for (i=0, k=0; i<types; i++) {
