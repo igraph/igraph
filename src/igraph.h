@@ -703,6 +703,13 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
 /* TODO: degree.distribution (?) */
 
 /* -------------------------------------------------- */
+/* Spectral Properties                                */
+/* -------------------------------------------------- */
+
+int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+		     igraph_bool_t normalized);
+
+/* -------------------------------------------------- */
 /* Components                                         */
 /* -------------------------------------------------- */
 

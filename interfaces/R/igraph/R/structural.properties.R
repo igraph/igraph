@@ -250,23 +250,34 @@ graph.laplacian <- function(graph, normalized=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.directed(graph)) {
-    warning("Laplacian of a directed graph???")
-  }
-
-  M <- get.adjacency(graph)
-  if (!normalized) {
-    M <- structure(ifelse(M>0, -1, 0), dim=dim(M))
-    diag(M) <- degree(graph)
-  } else {
-    deg <- degree(graph)
-    deg <- outer(deg, deg, "*")
-    M <- structure(ifelse(M>0, -1/deg, 0))
-    diag(M) <- 1
-  }
   
-  M
+  .Call("R_igraph_laplacian", graph, as.logical(normalized),
+        PACKAGE="igraph")
 }
+  
+## OLD implementation
+## graph.laplacian <- function(graph, normalized=FALSE) {
+
+##   if (!is.igraph(graph)) {
+##     stop("Not a graph object")
+##   }
+##   if (is.directed(graph)) {
+##     warning("Laplacian of a directed graph???")
+##   }
+
+##   M <- get.adjacency(graph)
+##   if (!normalized) {
+##     M <- structure(ifelse(M>0, -1, 0), dim=dim(M))
+##     diag(M) <- degree(graph)
+##   } else {
+##     deg <- degree(graph)
+##     deg <- outer(deg, deg, "*")
+##     M <- structure(ifelse(M>0, -1/deg, 0))
+##     diag(M) <- 1
+##   }
+  
+##   M
+## }
 
 ## Structural holes a'la Burt, code contributed by
 ## Jeroen Bruggeman

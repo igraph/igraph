@@ -4856,3 +4856,25 @@ SEXP R_igraph_asymmetric_preference_game(SEXP pnodes, SEXP ptypes,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_laplacian(SEXP graph, SEXP pnormalized) {
+  
+  igraph_t g;
+  igraph_matrix_t res;
+  igraph_bool_t normalized=LOGICAL(pnormalized)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&res, 0, 0);
+  igraph_laplacian(&g, &res, normalized);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+

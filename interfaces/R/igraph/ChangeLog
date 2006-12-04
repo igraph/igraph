@@ -6,6 +6,10 @@
 	(R_igraph_preference_game, R_igraph_asymmetric_preference_game) :
 	added
 
+	* interfaces/R/igraph/R/igraph/structural.properties.R 
+	(graph.laplacian) : updated to use the C version
+	* interfaces/R/src/rinterface.c (R_igraph_laplacian) : added
+
 2006-11-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (transitivity) :

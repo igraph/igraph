@@ -40,7 +40,7 @@
 <!-- doxrox-include igraph_betweenness -->
 <!-- doxrox-include igraph_edge_betweenness -->
 <!-- doxrox-include igraph_pagerank -->
-<!-- doxrox-include igraph_constaint -->
+<!-- doxrox-include igraph_constraint -->
 <!-- doxrox-include igraph_maxdegree -->
 </section>
 
@@ -58,6 +58,10 @@
 <section><title>Directedness conversion</title>
 <!-- doxrox-include igraph_to_directed -->
 <!-- doxrox-include igraph_to_undirected -->
+</section>
+
+<section><title>Spectral properties</title>
+<!-- doxrox-include igraph_laplacian -->
 </section>
 
 <section><title>Other Operations</title>

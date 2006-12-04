@@ -34,6 +34,7 @@ Changes in the C library
   igraph_neighborhood_size, igraph_neighborhood_graphs
 * two new games added based on different node types:
   igraph_preference_game and igraph_asymmetric_preference_game
+* Laplacian of a graph can be calculated by the igraph_laplacian function
 
 Changes in the R interface
 --------------------------
@@ -77,7 +78,6 @@ Changes in the R interface
 * new graph generators based on vertex types: preference.game and
   asymmetric.preference.game
 
-
 Bugs corrected
 --------------
 
@@ -90,3 +90,5 @@ Bugs corrected
 * bug in constraint calculation corrected, it works well now
 * fixed memory leaks in igraph_read_graph_graphml
 * error handling bug corrected in igraph_read_graph_graphml
+* bug corrected in R version of graph.laplacian when normalized
+  Laplacian is requested

@@ -15,7 +15,8 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	vector.c vector_ptr.c memory.c adjlist.c visitors.c \
 	igraph_grid.c atlas.c topology.c motifs.c progress.c \
 	operators.c interrupt.c igraph_psumtree.c array.c \
-	igraph_hashtable.c foreign-graphml.c flow.c igraph_buckets.c
+	igraph_hashtable.c foreign-graphml.c flow.c igraph_buckets.c \
+        spectral_properties.c
 
 RSNAMES_CPP = NetDataTypes.cpp clustertool.cpp NetRoutines.cpp \
 	pottsmodel_2.cpp
