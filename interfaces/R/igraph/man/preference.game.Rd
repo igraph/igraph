@@ -52,7 +52,7 @@ pf <- matrix( c(0, 1, 0, 0), nr=2)
 g <- asymmetric.preference.game(20, 2, pref.matrix=pf)
 \dontrun{tkplot(g, layout=layout.circle)}
 }
-\seealso{\link{\code{establishment.game}}.
-  \link{\code{callaway.traits.game}}
+\seealso{\code{\link{establishment.game}}.
+  \code{\link{callaway.traits.game}}
 }
 \keyword{graphs}

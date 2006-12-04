@@ -1608,7 +1608,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  * \brief Generates a graph with asymmetric vertex types and connection preferences 
  * 
  * </para><para>
- * This is the asymmetric variant of \c igraph_preference_game .
+ * This is the asymmetric variant of \ref igraph_preference_game() .
  * A given number of vertices are generated. Every vertex is assigned to an
  * "incoming" and an "outgoing" vertex type according to the given joint
  * type probabilities. Finally, every vertex pair is evaluated and a
