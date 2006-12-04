@@ -1,3 +1,9 @@
+2006-12-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/src/rinterface.c 
+	(R_igraph_get_all_shortest_paths) : memory leak corrected
+	(R_igraph_neighborhood, R_igraph_neighborhood_graphs) : bug corrected
+
 2006-12-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/igraph/games,R (preference.game)

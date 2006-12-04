@@ -3510,6 +3510,7 @@ SEXP R_igraph_get_all_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
     SET_VECTOR_ELT(result, i, NEW_NUMERIC(len));
     igraph_vector_copy_to(VECTOR(res)[i], REAL(VECTOR_ELT(result, i)));
     igraph_vector_destroy(VECTOR(res)[i]);
+    igraph_free(VECTOR(res)[i]);
   }
   igraph_vector_ptr_destroy(&res);
   igraph_vs_destroy(&to);
@@ -4760,7 +4761,7 @@ SEXP R_igraph_neighborhood(SEXP graph, SEXP pvids, SEXP porder,
     SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(v)));
     igraph_vector_copy_to(v, REAL(VECTOR_ELT(result, i)));
     igraph_vector_destroy(v);
-    Free(v);
+    igraph_free(v);
   }
   igraph_vector_ptr_destroy(&res);
   igraph_vs_destroy(&vids);
@@ -4792,7 +4793,7 @@ SEXP R_igraph_neighborhood_graphs(SEXP graph, SEXP pvids, SEXP porder,
     igraph_t *g=VECTOR(res)[i];
     SET_VECTOR_ELT(result, i, R_igraph_to_SEXP(g));
     igraph_destroy(g);
-    Free(g);
+    igraph_free(g);
   }
   igraph_vector_ptr_destroy(&res);
   igraph_vs_destroy(&vids);
