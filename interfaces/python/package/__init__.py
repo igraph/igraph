@@ -1,21 +1,24 @@
-#   IGraph library.
-#   Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
-#   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
-#   
-#   This program is free software; you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation; either version 2 of the License, or
-#   (at your option) any later version.
-#   
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#   
-#   You should have received a copy of the GNU General Public License
-#   along with this program; if not, write to the Free Software
-#   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
-#   02110-1301 USA
+"""
+IGraph library.
+Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
+MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+02110-1301 USA
+"""
+
 from igraph._igraph import *
 from igraph._igraph import __version__, __build_date__
 
@@ -64,9 +67,7 @@ class Histogram:
 	@param data: the data set to be used. Must contain real numbers.
 	"""
 	self._bin_width = float(bin_width)
-	self._bins = {}
-	self._min = None
-	self._max = None
+	self.clear()
 	self.add_many(data)
 
     def _get_bin(self, num, create = False):
@@ -110,6 +111,12 @@ class Histogram:
 	for x in it: self.add(x)
     __lshift__ = add_many
 
+    def clear(self):
+	"""Clears the collected data"""
+	self._bins = {}
+	self._min = None
+	self._max = None
+	
     def __str__(self):
 	"""Returns the string representation of the histogram"""
 	if self._min is None or self._max is None: return str()
@@ -190,6 +197,8 @@ class Graph(_igraph.Graph):
     def degree_distribution(self, bin_width = 1, *args, **kwds):
 	"""degree_distribution(bin_width=1, ...)
 
+	Calculates the degree distribution of the graph.
+
 	Unknown keyword arguments are directly passed to L{degree()}.
 
 	@param bin_width: the bin width of the histogram
@@ -199,13 +208,77 @@ class Graph(_igraph.Graph):
 	result = Histogram(bin_width, self.degree(*args, **kwds))
 	return result
 
+    def edge_betweenness_clustering(self, clusters = None, steps = None, \
+				    return_graph = False, \
+				    return_removed_edges = False):
+	"""edge_betweenness_clustering(clusters = None, steps = None, return_graph = False, return_removed_edges = False)
+
+	Newman's edge betweenness clustering.
+
+	Iterative removal of edges with the largest edge betweenness until
+	the given number of steps is reached or until the graph is decomposed
+	to the given number of clusters. Edge betweennesses are recalculated
+	after every run.
+
+	For more information, see the original paper of Girvan and Newman:
+	Girvan, M and Newman, MEJ: Community structure in social and
+	biological networks. Proc. Natl. Acad. Sci. USA 99, 7821-7826 (2002)
+
+	@param clusters: the desired number of clusters.
+	@param steps: the number of tests to take.
+	@param return_graph: whether to return the state of the graph when
+	  the iteration ended.
+
+        @return: the cluster index for every node. If C{return_graph} is
+	  C{True}, the clustered graph is also returned. If
+	  C{return_removed_edges} is C{True}, the list of removed edges is
+	  also returned."""
+	g = self.copy()
+	number_of_steps = 0
+	removed_edges = [None, []][return_removed_edges]
+
+	directed = g.is_directed()
+
+	while True:
+	    if clusters is not None:
+		cl = g.clusters()
+		if max(cl)+1 >= clusters: break
+
+	    if steps is not None:
+		if number_of_steps > steps: break
+
+	    ebs = g.edge_betweenness(directed)
+
+	    if len(ebs) == 0: break
+
+	    eb_max = max(ebs)
+	    eb_max_index = ebs.index(eb_max)
+
+	    if return_removed_edges:
+		removed_edges.append(g.es[eb_max_index].tuple)
+
+	    g.delete_edges(eb_max_index, by_index=True)
+	    number_of_steps += 1
+
+	if return_graph and return_removed_edges:
+	    return g.clusters(), g, removed_edges
+	elif return_graph:
+	    return g.clusters(), g
+	elif return_removed_edges:
+	    return g.clusters(), removed_edges
+	return g.clusters()
+
+
+
     def write_graphmlz(self, f, compresslevel=9):
 	"""write_graphmlz(f, compresslevel=9)
     
-	Writes the graph to a zipped GraphML file. The library uses
-	the gzip compression algorithm, so the resulting file can be
-	unzipped with regular gzip uncompression (like C{gunzip} or C{zcat}
-	from Unix command line) or the Python C{gzip} module.
+	Writes the graph to a zipped GraphML file.
+
+	The library uses the gzip compression algorithm, so the resulting
+	file can be unzipped with regular gzip uncompression (like
+	C{gunzip} or C{zcat} from Unix command line) or the Python C{gzip}
+	module.
 
 	Uses a temporary file to store intermediate GraphML data, so
 	make sure you have enough free space to store the unzipped

@@ -275,16 +275,19 @@ static PyMethodDef igraphmodule_Graph_methods[] =
    
   // interface to igraph_delete_edges
   {"delete_edges", (PyCFunction)igraphmodule_Graph_delete_edges,
-      METH_VARARGS,
-      "delete_edges(es)\n\n"
-      "Removes edges from the graph.\n\n"
-      "@param es: the list of edges to be removed. Every edge is\n"
-      "  represented with a tuple, containing the vertex IDs of the\n"
-      "  two endpoints. Vertices are enumerated from zero. It is\n"
-      "  allowed to provide a single pair instead of a list consisting\n"
-      "  of only one pair. Nonexistent edges will be silently ignored.\n"
-      "  All vertices will be kept, even if they lose all their edges.\n"
-      "@return: the same graph object\n"
+      METH_VARARGS | METH_KEYWORDS,
+   "delete_edges(es, by_index=False)\n\n"
+   "Removes edges from the graph.\n\n"
+   "All vertices will be kept, even if they lose all their edges.\n"
+   "Nonexistent edges will be silently ignored.\n\n"
+   "@param es: the list of edges to be removed.\n"
+   "@param by_index: determines how edges are identified. If C{by_index} is\n"
+   "  C{False}, every edge is represented with a tuple, containing the\n"
+   "  vertex IDs of the two endpoints. Vertices are enumerated from zero.\n"
+   "  It is allowed to provide a single pair instead of a list consisting\n"
+   "  of only one pair. If C{by_index} is C{True}, edges are identified by\n"
+   "  their IDs starting from zero.\n"
+   "@return: the same graph object\n"
   },
    
   // interface to igraph_degree

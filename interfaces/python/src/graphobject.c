@@ -417,39 +417,49 @@ PyObject* igraphmodule_Graph_add_edges(igraphmodule_GraphObject *self,
  * \sa igraph_delete_edges
  */
 PyObject* igraphmodule_Graph_delete_edges(igraphmodule_GraphObject *self,
-						 PyObject *args,
-						 PyObject *kwds) 
-{
-  PyObject *list;
+					  PyObject *args,
+					  PyObject *kwds) {
+  PyObject *list, *by_index=Py_False;
   igraph_vector_t v;
   igraph_es_t es;
+  static char* kwlist[] = {"edges", "by_index", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist,
+				   &list, &by_index)) return NULL;
   
-  if (!PyArg_ParseTuple(args, "O", &list)) return NULL;
-  Py_INCREF(list);
+  if (PyObject_IsTrue(by_index)) {
+    if (igraphmodule_PyList_to_vector_t(list, &v, 1, 0)) {
+      /* something bad happened during conversion, return immediately */
+      return NULL;
+    }
    
-  if (igraphmodule_PyList_to_vector_t(list, &v, 1, 1)) {
-    /* something bad happened during conversion, release the
-       list reference and return immediately */
-    Py_DECREF(list);
-    return NULL;
-  }
+    /* do the hard work :) */
+    if (igraph_es_vector(&es, &v)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&v);
+      return NULL;
+    }
+  } else {
+    if (igraphmodule_PyList_to_vector_t(list, &v, 1, 1)) {
+      /* something bad happened during conversion, return immediately */
+      return NULL;
+    }
    
-  /* do the hard work :) */
-  if (igraph_es_pairs(&es, &v, IGRAPH_DIRECTED)) {
-    igraphmodule_handle_igraph_error();
-    Py_DECREF(list);
-    igraph_vector_destroy(&v);
-    return NULL;
+    /* do the hard work :) */
+    if (igraph_es_pairs(&es, &v, IGRAPH_DIRECTED)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&v);
+      return NULL;
+    }
   }
+
   if (igraph_delete_edges(&self->g, es)) {
     igraphmodule_handle_igraph_error();
-    Py_DECREF(list);
     igraph_es_destroy(&es);
     igraph_vector_destroy(&v);
     return NULL;
   }
    
-  Py_DECREF(list);
   Py_INCREF(self);
    
   igraph_es_destroy(&es);
