@@ -4,6 +4,9 @@
 	(R_igraph_get_all_shortest_paths) : memory leak corrected
 	(R_igraph_neighborhood, R_igraph_neighborhood_graphs) : bug corrected
 
+	* interfaces/R/igraph/R/games.c (preference.game)
+	(asymmetric.preference.game) : 'PACKAGE' argument added to .Call
+
 2006-12-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/igraph/games,R (preference.game)

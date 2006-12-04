@@ -239,7 +239,8 @@ preference.game <- function(nodes, types, type.dist=rep(1, types),
   
   .Call("R_igraph_preference_game", as.double(nodes), as.double(types),
         as.double(type.dist), matrix(as.double(pref.matrix), types, types),
-        as.logical(directed), as.logical(loops))
+        as.logical(directed), as.logical(loops),
+        PACKAGE="igraph")
 }
 
 asymmetric.preference.game <- function(nodes, types,
@@ -258,5 +259,6 @@ asymmetric.preference.game <- function(nodes, types,
         as.double(nodes), as.double(types),
         matrix(as.double(type.dist.matrix), types, types),
         matrix(as.double(pref.matrix), types, types),
-        as.logical(loops))
+        as.logical(loops),
+        PACKAGE="igraph")
 }

@@ -1,12 +1,12 @@
 \name{preference.game}
 \alias{preference.game}
-\alias{asymmetrix.preference.game}
+\alias{asymmetric.preference.game}
 \title{Trait-based random generation}
 \description{Generation of random graphs based on different vertex types.}
 \usage{
 preference.game(nodes, types, type.dist=rep(1, types),
     pref.matrix=matrix(1, types, types), directed=FALSE, loops=FALSE) 
-asymmetrix.preference.game(nodes, types,
+asymmetric.preference.game(nodes, types,
     type.dist.matrix=matrix(1,types,types),
     pref.matrix = matrix(1, types, types), loops=FALSE) 
 }
