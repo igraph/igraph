@@ -132,7 +132,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   long int no_of_orig_edges=igraph_ecount(graph);
   long int no_of_edges=2*no_of_orig_edges;
 
-  igraph_vector_t from, to, rev, cap, rescap, excess, distance;
+  igraph_vector_t from, to, rev, rescap, excess, distance;
   igraph_vector_t edges, rank;
   igraph_vector_t current, first;
   igraph_buckets_t buckets;
@@ -250,7 +250,6 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   /* The main part comes here */
   while (!igraph_buckets_empty(&buckets)) {
     long int vertex=igraph_buckets_popmax(&buckets);
-    igraph_bool_t endoflist=0;
     /* DISCHARGE(vertex) comes here */
     do {
       for (i=CURRENT(vertex), j=LAST(vertex); i<j; i++) {
@@ -281,7 +280,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 	
 	/* RELABEL(vertex) comes here */	
 	igraph_real_t min;
-	long int min_edge;
+	long int min_edge=0;
 	DIST(vertex)=min=no_of_nodes;
 	for (k=FIRST(vertex), l=LAST(vertex); k<l; k++) {
 	  if (RESCAP(k) > 0) {
@@ -586,9 +585,8 @@ int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
 			const igraph_vector_t *capacity) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
   igraph_real_t minmaxflow, flow;
-  long int i, j;
+  long int i;
 
   minmaxflow=1.0/0.0;
 
@@ -845,7 +843,6 @@ int igraph_i_vertex_connectivity_directed(const igraph_t *graph,
 
 int igraph_i_vertex_connectivity_undirected(const igraph_t *graph, 
 					    igraph_integer_t *res) {
-  long int no_of_nodes=igraph_vcount(graph);
   igraph_t newgraph;
 
   IGRAPH_CHECK(igraph_copy(&newgraph, graph));
@@ -968,7 +965,6 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 
 int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res) {
   
-  long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t capacity;
   long int i;

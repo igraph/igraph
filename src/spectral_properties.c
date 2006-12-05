@@ -22,6 +22,7 @@
 */
 
 #include <igraph.h>
+#include <math.h>
 
 /**
  * \function igraph_laplacian

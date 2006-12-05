@@ -24,6 +24,18 @@
 #ifndef IGRAPH_ERROR_H
 #define IGRAPH_ERROR_H
 
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+__BEGIN_DECLS
+
 /* This file contains the igraph error handling.
  * Most bits are taken literally from the GSL library (with the GSL_
  * prefix renamed to IGRAPH_), as I couldn't find a better way to do
@@ -409,5 +421,7 @@ int igraph_warning(const char *reason, const char *file, int line,
        do { \
          igraph_warning(reason, __FILE__, __LINE__, -1); \
        } while (0)
+
+__END_DECLS
 
 #endif

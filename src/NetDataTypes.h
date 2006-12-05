@@ -348,7 +348,5 @@ struct network
 } ;
 */
 
-void test2(void);
-
 #endif
 

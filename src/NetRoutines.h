@@ -53,12 +53,6 @@ int igraph_i_read_network(const igraph_t *graph,
 			  igraph_bool_t use_weights,
 			  unsigned int states);
 
-unsigned long make_spanning_tree( char*, network*, DLList<char*>* , char*, bool tree=true, float limit=0.0, bool useweights=false, unsigned int states=0) ;
-unsigned long read_network(char*, network*, float limit=0.0, DLList<char*>* = NULL, bool use_weights=false, unsigned int states=0);
-unsigned long read_network_fast(char*, network*);   //unfertig
-unsigned long read_network_mtx(char*, network*, float limit=0.0, bool use_weights=false, unsigned int states=0);  
-unsigned long read_network_mtx_bi(char*, network*, float limit=0.0, bool use_weights=false, unsigned int states=0);  
-
 unsigned long read_marker_list(char*, DLList<char*>*);
 int mark_special_nodes(DLList<NNode*>*, DLList<char*>*, RGBcolor);
 unsigned long write_tulip_file(char*, long, network* net, char* rootname=NULL);

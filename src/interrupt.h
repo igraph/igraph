@@ -26,6 +26,18 @@
 
 #include "error.h"
 
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+__BEGIN_DECLS
+
 /* This file contains the igraph interruption handling. */
 
 /**
@@ -136,5 +148,7 @@ int igraph_allow_interruption(void* data);
 
 igraph_interruption_handler_t *
 igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
+
+__END_DECLS
 
 #endif

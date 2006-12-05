@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "NetRoutines.h"
+#include "NetDataTypes.h"
 
 #include "igraph.h"
 
@@ -70,7 +71,7 @@ unsigned long re_mark(NNode* parent, unsigned long index)
 unsigned long mark_tree_nodes(network *net, char* rootname)
 {
   unsigned long num_of_nodes, max_degree=0, running_index, index;
-  NNode *root, *n_cur;
+  NNode *root=0, *n_cur;
   DLList_Iter<NNode*> iter;
   bool found;
   
@@ -110,187 +111,6 @@ unsigned long mark_tree_nodes(network *net, char* rootname)
    printf("Done\n");
    return index;
 }
-//##############################################################################
-unsigned long make_spanning_tree(char *filename, network *net, DLList<char*> *ex_list, char* rootname, bool tree, float limit, bool use_weights,unsigned int states)
-{
-  FILE *file1;
-  float Links;
-  char S1[255],S2[255];//,Sh[15];
-  int result=0;
-  unsigned long index=0, max_k=0, min_k=99999999;
-  double sum_weight=0.0, av_k=0.0, min_weight=1e60, max_weight=-1e60;
-  unsigned long cluster_index=0;
-  unsigned long num_of_clusters=0;
-  unsigned long c1,c2,ch;
-  ClusterList<NNode*> *cluster_item_list1,*cluster_item_list2;
-  NNode *node1,*node2;
-  NNode *n_cur;
-  DLList_Iter<NNode*> iter;
-  DLList_Iter<ClusterList<NNode*>*> c_iter;
-  DLList_Iter<char*> ex_iter;
-  char* ex_item;
-  bool excluded;
-  bool A_in_tree, B_in_tree;
-
-  file1=fopen(filename,"r");
-  if (!file1) {
-    printf("Error Opening File %s for reading!\n", filename);
-    return 0;
-  }
-  printf("Reading file %s....\n",filename);
-
-
-  do
-  {
-    excluded=false;
-    result=fscanf(file1,"%s %s %f\n",S1,S2,&Links);
-   if (Links>=limit)
-   {
-     // In case we do not use the weights, set them to one, this will make everything else easier...
-     if (!use_weights) Links=1.0;
-   
-
-     //Befindet sich einer der beiden in der Exclusion_List, gibt es die ueberhaupt??
-    if (result>0 && ex_list)
-    {
-      ex_item=ex_iter.First(ex_list);
-      while (!excluded && !ex_iter.End())
-      {
-       if (strcmp(ex_item,S1)==0 || strcmp(ex_item,S2)==0) excluded=true;
-       ex_item=ex_iter.Next();
-      }
-    }     
-    if (result>0 && !excluded)
-      {
-	if (Links>max_weight) max_weight=Links;
-	if (Links<min_weight) min_weight=Links;
-	sum_weight+=Links;            
-	A_in_tree=B_in_tree=false;
-        //printf("%s\t%s\t%d\n",S1,S2,Links);
-
-        n_cur=iter.First(net->node_list);
-        while (!(iter.End()) && !(A_in_tree && B_in_tree)) {
-            if ((!strcmp(n_cur->Get_Name(), S1)) && (strlen(n_cur->Get_Name())==strlen(S1)))
-              {
-               A_in_tree=true;
-               node1=n_cur;
-              }
-           if ((!strcmp(n_cur->Get_Name(), S2)) && (strlen(n_cur->Get_Name())==strlen(S2)))
-              {
-               B_in_tree=true;
-               node2=n_cur;
-              }
-            n_cur=iter.Next();
-        }
-
-        if (A_in_tree)
-        {// A ist im Baum zu finden
-            if (B_in_tree) { // B finden wir auch
-              c1=node1->Get_ClusterIndex();
-              c2=node2->Get_ClusterIndex();
-              if (c1!=c2)
-              { //wir verbinden zwei alleinstehende Cluster...
-                if (c1>c2) { ch=c1; c1=c2; c2=ch;}// strcpy(Sh,S1); strcpy(S1,S2); strcpy(S2,Sh);}
-         //       printf("\tVerbinde %s in Cluster %u und %s in Cluster %u.\n", S1,c1,S2,c2);
-                node1->Connect_To(node2,Links);
-                //wir gehen durch die Cluster_item_list von node2
-                //faerben um und schieben den Knoten in Cluster c1
-                cluster_item_list1=net->cluster_list->Get(c1);
-                cluster_item_list2=net->cluster_list->Get(c2);
-                 //auf C1 umfaerben...
-                while (cluster_item_list2->Size()) {
-                       n_cur=cluster_item_list2->Pop();
-                       n_cur->Set_ClusterIndex(c1);
-                       cluster_item_list1->Push(n_cur);
-                }
-                //net->cluster_list->fDelete(cluster_item_list2);
-                //delete c2;
-                num_of_clusters--;
-              } else {
-                    //printf("%s und %s hatten wir schon im gleichen Cluster!\n", S1, S2);
-		if (!tree) if (!node1->Connect_To(node2,Links)) {
-		  printf("Found a double link between %s and %s\n",node1->Get_Name(), node2->Get_Name());
-		  sum_weight-=Links;
-		}   //if (!tree) node1->Connect_To(node2,Links);  // wenn wir ein ganzes Netz wollen, muessen wir nur diese Links hinzufuegen
-              }
-              
-            } else { // A, aber nicht B ist im Baum zu finden
-            c1=node1->Get_ClusterIndex();
- //           printf("Fuege %s zum Baum an %s in Cluster %d hinzu!\n",S2, S1, c1);
-            node2 = new NNode(index,c1,net->link_list,S2,states);
-            //der erste Index soll 0 sein, weil das auch die erste Feldpostion ist
-            //das ist wichtig, weil sonst nicht der richtige Index an der richtigen Stelle steht!!
-            //das gleiche gilt auch fuer die ClusterIndices!!
-            net->node_list->Push(node2);  
-            index++;
-            cluster_item_list1=net->cluster_list->Get(c1);
-            cluster_item_list1->Push(node2);
-
-            node1->Connect_To(node2,Links);
-	    }
-
-        } else { // A ist nicht im Baum zu finden
-            if (B_in_tree) { // nur B ist im Baum zu finden
-            c2=node2->Get_ClusterIndex();
-//            printf("Fuege %s zum Baum an %s in Cluster %u hinzu!\n",S1, S2, c2);
-            node1 = new NNode(index,c2,net->link_list,S1,states);
-            net->node_list->Push(node1);
-            index++;
-            cluster_item_list2=net->cluster_list->Get(c2);
-            cluster_item_list2->Push(node1);
-
-            node1->Connect_To(node2,Links);
-
-            } else {  //keiner von beiden im Baum
-    
-            num_of_clusters++;
-            cluster_item_list1 = net->cluster_list->Push(new ClusterList<NNode*>());
-            node1 = net->node_list->Push(new NNode(index,cluster_index,net->link_list,S1,states));
-            index++;
-            node2 = net->node_list->Push(new NNode(index,cluster_index,net->link_list,S2,states));
-            index++;
-            cluster_item_list1->Push(node1);
-            cluster_item_list1->Push(node2);
-            cluster_index++;
-
-            node1->Connect_To(node2,Links);
-
- //           printf("Neuer Cluster %u mit %s und %s!\n",cluster_index,S1,S2);
-
-            }
-        }
-      }
-   }  // if links>limit
-  } while (result>0);
-  fclose(file1);
-
-  node1=iter.First(net->node_list);
-  while (!iter.End())
-  {
-    if (node1->Get_Degree()>max_k) max_k=node1->Get_Degree();
-    if (node1->Get_Degree()<min_k) min_k=node1->Get_Degree();
-    av_k+=node1->Get_Degree();
-    node1=iter.Next();
-  }
-  net->av_k=av_k/double(net->node_list->Size());
-  net->sum_weights=sum_weight;
-  net->av_weight=sum_weight/double(net->link_list->Size());
-  net->min_k=min_k;
-  net->max_k=max_k;
-  net->min_weight=min_weight;
-  net->max_weight=max_weight;
-  //  printf("Sum of Link weights: %f\n",sum_weight);
-  printf("%d nodes and %d links read in %d connected components.\n",net->node_list->Size(),net->link_list->Size(), num_of_clusters);
-  printf("Min - Average - Maximum Connectivity: %d - %f - %d\n",net->min_k,net->av_k, net->max_k);
-  printf("Min - Average - Maximum link weight : %f - %f - %f\n",net->min_weight,net->av_weight,net->max_weight);     
-  return (net->node_list->Size());
-}
-
-//#################################################################################
-unsigned long read_network(char *filename, network *net, float limit, DLList<char*> *exlist, bool use_weights,unsigned int states)
-{
-  return make_spanning_tree(filename, net, exlist, NULL, false, limit, use_weights,states);
-}
 //#################################################################################
 
 int igraph_i_read_network(const igraph_t *graph, 
@@ -299,16 +119,13 @@ int igraph_i_read_network(const igraph_t *graph,
 			  igraph_bool_t use_weights, 
 			  unsigned int states) {
   
-  float Links;
   double av_k=0.0, sum_weight=0.0, min_weight=1e60, max_weight=-1e60;
   unsigned long min_k=999999999, max_k=0;
   long max_index=0;
   char name[255];
-  int result=0;
   NNode *node1,*node2;
   DLList_Iter<NNode*> iter;
   igraph_vector_t edgelist;
-  long int no_of_nodes=(long int)igraph_vcount(graph);
   long int no_of_edges=(long int)igraph_ecount(graph);
   long int ii;
   
@@ -337,11 +154,11 @@ int igraph_i_read_network(const igraph_t *graph,
     }
     
     node1=net->node_list->Get(i1-1);
-    sprintf(name,"%d",i1);
+    sprintf(name,"%li",i1);
     node1->Set_Name(name);
     
     node2=net->node_list->Get(i2-1);
-    sprintf(name,"%d",i2);
+    sprintf(name,"%li",i2);
     node2->Set_Name(name);
     
     node1->Connect_To(node2,Links);
@@ -374,201 +191,6 @@ int igraph_i_read_network(const igraph_t *graph,
   net->max_bids=0;
   
   return 0;
-}
-
-unsigned long read_network_mtx(char *filename, network *net, float limit, bool use_weights,unsigned int states)
-{
-
-  FILE *file1;
-  float Links;
-  double av_k=0.0, sum_weight=0.0, min_weight=1e60, max_weight=-1e60;
-  unsigned long min_k=999999999, max_k=0;
-  long i1, i2, max_index=0;
-  char name[255];
-  int result=0;
-  NNode *node1,*node2;
-  DLList_Iter<NNode*> iter;
-
-  file1=fopen(filename,"r");
-  if (!file1) {
-    printf("Error Opening File %s!\n",filename);
-    return(0);
-  }
-  printf("Reading file %s.....\n",filename);
-  while (0<(result=fscanf(file1,"%ld %ld %f\n",&i1,&i2,&Links)))
-  {
-             //haben wir schon so viele Knoten im Netz?
-             //wenn nicht, dann Speicher belegen
-             //der Index ist eins kleiner als der Name des Knotens, weil diese bei 1 und nicht
-             //bei Null anfangen
-       if (Links>=limit)
-       {      
-         if (!use_weights) Links=1.0;    
-	 if (max_index<i1)
-             {
-                for (int i=max_index; i<i1; i++)
-		  net->node_list->Push(new NNode(i,0,net->link_list,"",states));
-                max_index=i1;
-             }
-             if (max_index<i2)
-             {
-                for (int i=max_index; i<i2; i++)
-		  net->node_list->Push(new NNode(i,0,net->link_list,"",states));
-                max_index=i2;
-             }
-                 
-             node1=net->node_list->Get(i1-1);
-             sprintf(name,"%d",i1);
-             node1->Set_Name(name);
-            
-             node2=net->node_list->Get(i2-1);
-             sprintf(name,"%d",i2);
-             node2->Set_Name(name);
-             
-             node1->Connect_To(node2,Links);
-
-	     if (Links<min_weight) min_weight=Links;
-	     if (Links>max_weight) max_weight=Links;
-	     sum_weight+=Links;
-       }
-    //  printf("Zeile gelesen\n");
-  };
-  fclose(file1);
-  node1=iter.First(net->node_list);
-  while (!iter.End())
-  {
-    if (node1->Get_Degree()>max_k) max_k=node1->Get_Degree();
-    if (node1->Get_Degree()<min_k) min_k=node1->Get_Degree();
-    av_k+=node1->Get_Degree();
-    node1=iter.Next();
-  }
-  net->av_k=av_k/double(net->node_list->Size());
-  net->sum_weights=sum_weight;
-  net->av_weight=sum_weight/double(net->link_list->Size());
-  net->min_k=min_k;
-  net->max_k=max_k;
-  net->min_weight=min_weight;
-  net->max_weight=max_weight;
-  net->sum_bids=0;
-  net->min_bids=0;
-  net->max_bids=0;
-
-  printf("%d nodes and %d links read.\n",net->node_list->Size(),net->link_list->Size());
-  printf("Min - Average - Maximum Connectivity: %d - %f - %d\n",net->min_k,net->av_k, net->max_k);
-  printf("Min - Average - Maximum link weight : %f - %f - %f\n",net->min_weight,net->av_weight,net->max_weight);  
-  return (net->node_list->Size());
-}
-
-//#################################################################################
-unsigned long read_network_mtx_bi(char *filename, network *net, float limit, bool use_weights,unsigned int states)
-{
-
-  FILE *file1;
-  float Links;
-  double av_k=0.0, sum_weight=0.0, min_weight=1e60, max_weight=-1e60;
-  unsigned long min_k=999999999, max_k=0, min_bids=99999999, max_bids=0, sum_bids=0;
-  long i1, i2, bids1,bids2,max_index=0;
-  char name[255];
-  int result=0;
-  NNode *node1,*node2;
-  DLList_Iter<NNode*> iter;
-
-  file1=fopen(filename,"r");
-  if (!file1) {
-    printf("Error Opening File %s!\n",filename);
-    return(0);
-  }
-  printf("Reading file %s.....\n",filename);
-  while (0<(result=fscanf(file1,"%ld %ld %f %d %d\n",&i1,&i2,&Links,&bids1,&bids2)))
-  {
-             //haben wir schon so viele Knoten im Netz?
-             //wenn nicht, dann Speicher belegen
-             //der Index ist eins kleiner als der Name des Knotens, weil diese bei 1 und nicht
-             //bei Null anfangen
-       if (Links>=limit)
-       {      
-         if (!use_weights) Links=1.0;    
-	 if (max_index<i1)
-             {
-                for (int i=max_index; i<i1; i++)
-		  net->node_list->Push(new NNode(i,0,net->link_list,"",states));
-                max_index=i1;
-             }
-             if (max_index<i2)
-             {
-                for (int i=max_index; i<i2; i++)
-		  net->node_list->Push(new NNode(i,0,net->link_list,"",states));
-                max_index=i2;
-             }
-                 
-             node1=net->node_list->Get(i1-1);
-             sprintf(name,"%d",i1);
-             node1->Set_Name(name);
-	     if (node1->Get_Affiliations()==0) {
-	       node1->Set_Affiliations(bids1);
-	       sum_bids+=bids1;
-	     } else {
-	       if (node1->Get_Affiliations()!=bids1) {
-		 printf("Error: node %s has different number of bids (%ld and %ld)!\n",node1->Get_Name(),node1->Get_Affiliations(),bids1);
-	       }
-	     }
-            
-             node2=net->node_list->Get(i2-1);
-             sprintf(name,"%d",i2);
-             node2->Set_Name(name);
-	     if (node2->Get_Affiliations()==0) {
-	       node2->Set_Affiliations(bids2);
-	       sum_bids+=bids2;
-	     } else {
-	       if (node2->Get_Affiliations()!=bids2) {
-		 printf("Error: node %s has different number of bids (%ld and %ld)!\n",node2->Get_Name(),node2->Get_Affiliations(),bids2);
-	       }
-	     }
-             
-             node1->Connect_To(node2,Links);
-
-	     if (Links<min_weight) min_weight=Links;
-	     if (Links>max_weight) max_weight=Links;
-
-	     if (bids1<min_bids) min_bids=bids1;
-	     if (bids2>max_bids) max_bids=bids1;
-
-	     if (bids2<min_bids) min_bids=bids2;
-	     if (bids2>max_bids) max_bids=bids2;
-
-
-	     sum_weight+=Links;
-	     
-       }
-    //  printf("Zeile gelesen\n");
-  };
-  fclose(file1);
-  node1=iter.First(net->node_list);
-  while (!iter.End())
-  {
-    if (node1->Get_Degree()>max_k) max_k=node1->Get_Degree();
-    if (node1->Get_Degree()<min_k) min_k=node1->Get_Degree();
-    av_k+=node1->Get_Degree();
-    node1=iter.Next();
-  }
-  net->av_k=av_k/double(net->node_list->Size());
-  net->sum_weights=sum_weight;
-  net->sum_bids=sum_bids;
-  net->av_weight=sum_weight/double(net->link_list->Size());
-  net->min_k=min_k;
-  net->max_k=max_k;
-  net->min_weight=min_weight;
-  net->max_weight=max_weight;
-  net->min_bids=min_bids;
-  net->max_bids=max_bids;
-  net->av_bids=sum_bids/double(net->node_list->Size());
-  printf("%d nodes and %d links read.\n",net->node_list->Size(),net->link_list->Size());
-  printf("Min - Average - Maximum Connectivity: %d - %f - %d\n",net->min_k,net->av_k, net->max_k);
-  printf("Min - Average - Maximum link weight : %f - %f - %f\n",net->min_weight,net->av_weight,net->max_weight);  
-  printf("Min - Average - Maximum number of bids : %d - %f - %d\n",net->min_bids,net->av_bids,net->max_bids);  
-  
-
-  return (net->node_list->Size());
 }
 
 //#################################################################################
@@ -747,7 +369,7 @@ void net_stats(network *net, double &average_k, double &average_c, char *pvk_fil
   //###################################################################################
   // jetzt schreiben wir die Files uns lassen alles mit Gnuplot ausgeben.
 
-  FILE *file1, *file2;
+  FILE *file1=0, *file2=0;
   if (pvk_file) {
     file1=fopen(pvk_file,"w");
     if (!file1) {
@@ -822,7 +444,7 @@ unsigned long write_tulip_file(char *filename, long clusterindex, network *net, 
   fprintf(file,"(nodes");
   n_cur=iter.First(net->node_list);
   while (!(iter.End())) {
-      if ((n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0))
+      if (((long)n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0))
       {
         written_nodes++;
         fprintf(file," %lu",n_cur->Get_Marker());
@@ -835,7 +457,7 @@ unsigned long write_tulip_file(char *filename, long clusterindex, network *net, 
   l_cur=l_iter.First(net->link_list);
   unsigned long link_index=0;
   while (!(l_iter.End())) {
-    if ((clusterindex<0) || ((l_cur->Get_Start()->Get_ClusterIndex()==clusterindex) && (l_cur->Get_End()->Get_ClusterIndex()==clusterindex)))
+    if ((clusterindex<0) || (((long)(l_cur->Get_Start()->Get_ClusterIndex())==clusterindex) && ((long)(l_cur->Get_End()->Get_ClusterIndex())==clusterindex)))
     {
        link_index++;
        if (l_cur->Get_Start()->Get_Marker()>l_cur->Get_End()->Get_Marker())
@@ -853,7 +475,7 @@ unsigned long write_tulip_file(char *filename, long clusterindex, network *net, 
  fprintf(file,"(default \"(0.100000,0.100000,0.100000)\" \"(1.000000,1.000000,1.000000)\" )\n");
  n_cur=iter.First(net->node_list);
   while (!(iter.End())) {
-     if ((n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0))
+     if (((long)n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0))
       {
         if (n_cur->Get_Color().red==255) {
         fprintf(file,"(node  %lu \"(%1.6f,%1.6f,%1.6f)\")\n",n_cur->Get_Marker(), 0.3,0.3,0.3);
@@ -868,7 +490,7 @@ unsigned long write_tulip_file(char *filename, long clusterindex, network *net, 
  fprintf(file,"(default \"(0,0,0,255)\" \"(0,0,0,255)\" )\n");
  n_cur=iter.First(net->node_list);
   while (!(iter.End())) {
-     if ((n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0))
+     if (((long)n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0))
       {
         fprintf(file,"(node  %lu \"(%u,%u,%u,%u)\")\n",n_cur->Get_Marker(), n_cur->Get_Color().red,n_cur->Get_Color().green,n_cur->Get_Color().blue,255);
       }
@@ -881,7 +503,7 @@ unsigned long write_tulip_file(char *filename, long clusterindex, network *net, 
  fprintf(file,"(default \"\" \"\")\n");
   n_cur=iter.First(net->node_list);
   while (!(iter.End())) {
-     if (((n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0)) && (strcmp(n_cur->Get_Name(),"")!=0))
+     if ((((long)n_cur->Get_ClusterIndex()==clusterindex) || (clusterindex<0)) && (strcmp(n_cur->Get_Name(),"")!=0))
       {
         fprintf(file,"(node  %lu \"%s\")\n",n_cur->Get_Marker(),n_cur->Get_Name());
       }
@@ -969,7 +591,7 @@ unsigned long group_clusters(DLList<ClusterList<NNode*>*> *cluster_list, DLList<
   unsigned long size, pos;
   char format_string[256];
   bool in_subset;
-  ClusterList<NNode*> *c_cur, *largest_c;
+  ClusterList<NNode*> *c_cur, *largest_c=0;
   DLList<ClusterList<NNode*>*> *subsets;
   DLList_Iter<ClusterList<NNode*>*> c_iter, sub_iter;
   DLList_Iter<NNode*> iter;
@@ -1066,7 +688,7 @@ unsigned long group_clusters(DLList<ClusterList<NNode*>*> *cluster_list, DLList<
 void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *file)
 {
   unsigned long size;
-  ClusterList<NNode*> *c_cur, *largest_c;
+  ClusterList<NNode*> *c_cur, *largest_c=0;
   DLList<ClusterList<NNode*>*> *subsets;
   DLList_Iter<ClusterList<NNode*>*> c_iter, sub_iter;
   DLList_Iter<NNode*> iter;
@@ -1128,7 +750,7 @@ void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *fil
 void reduce_cliques2(network *net, bool only_double, long marker)
 {
   unsigned long size;
-  ClusterList<NNode*> *c_cur, *largest_c;
+  ClusterList<NNode*> *c_cur, *largest_c=0;
   DLList_Iter<ClusterList<NNode*>*> c_iter;
   do
   {
@@ -1377,7 +999,7 @@ unsigned long write_remaining_clusters(network *net, long cluster_except, char *
     if (c_cur->Size())
     {
       n_cur=iter.First(c_cur);
-      if (n_cur->Get_ClusterIndex()!=cluster_except)
+      if ((long)n_cur->Get_ClusterIndex()!=cluster_except)
       {
         //fprintf(file,"[ ");
         while(!iter.End())
@@ -1467,7 +1089,7 @@ unsigned long write_cluster(char *filename, network *net, unsigned long cl_index
 unsigned long write_tree_clustering(network *net,char *filename)
 {
   FILE *file;
-  NLink *l_cur, *mw_l;
+  NLink *l_cur, *mw_l=0;
   NNode *n1, *n2;
   unsigned long count=0;
   double weight, mw;
@@ -1537,7 +1159,7 @@ unsigned long min(unsigned long a, unsigned long b)
 unsigned long write_tree_similarity(network *net,char *filename)
 {
   FILE *file;
-  NLink *l_cur, *mw_l;
+  NLink *l_cur, *mw_l=0;
   NNode *n1, *n2, *neighbour;
   unsigned long count=0, common_neighbours;
   
@@ -1608,7 +1230,7 @@ unsigned long find_component(char* startname, network *net, unsigned long &links
   DLList_Iter<NNode*> iter;
   DLList_Iter<NLink*> l_iter;
   NLink *l_cur;
-  NNode *n_cur, *start;
+  NNode *n_cur, *start=0;
   bool found=false;
   n_cur=iter.First(net->node_list);
   while (!iter.End() && !found)
@@ -1780,7 +1402,7 @@ unsigned long reduce_to_component(network *net, char* startname)
   DL_Indexed_List<NNode*> *component_nodes;
   DL_Indexed_List<NLink*> *component_links;
   NLink *l_cur;
-  NNode *n_cur, *start;
+  NNode *n_cur, *start=0;
   bool found=false;
   
   printf("Reducing nework to component around %s ...\n",startname);
@@ -1849,7 +1471,7 @@ unsigned long reduce_to_component(network *net, char* startname)
   net->max_k=max_k;
   net->min_k=min_k;
   printf("Component around %s has %lu nodes and %lu links.\n",startname, net->node_list->Size(),net->link_list->Size());
-  printf("Min - Average - Maximum Connectivity: %d - %f - %d\n",net->min_k,net->av_k, net->max_k);
+  printf("Min - Average - Maximum Connectivity: %lu - %f - %lu\n",net->min_k,net->av_k, net->max_k);
   printf("Min - Average - Maximum link weight : %f - %f - %f\n",net->min_weight,net->av_weight,net->max_weight);
   return net->node_list->Size();
 }

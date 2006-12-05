@@ -313,9 +313,9 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
   unsigned int *SPIN, *P_SPIN, new_spin, spin_opt, old_spin, spin, sweep;
   // long h; // degree;
   unsigned long changes;
-  double h, delta, deltaE, deltaEmin, w, degree;
+  double h, delta=0, deltaE, deltaEmin, w, degree;
   //HugeArray<double> neighbours;
-  bool cyclic;
+  bool cyclic=0;
   
   sweep=0;
   changes=1;  
@@ -455,7 +455,7 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
   unsigned int new_spin, spin_opt, old_spin, spin, sweep;
   long r;// degree;
   unsigned long changes;
-  double delta, h, deltaE, deltaEmin,w,degree;
+  double delta=0, h, deltaE, deltaEmin,w,degree;
   //HugeArray<int> neighbours;
   bool cyclic;
 
@@ -469,7 +469,7 @@ double PottsModel::HeatBathLookupZeroTemp(double gamma, double prob, unsigned in
     for (unsigned long n=0; n<num_of_nodes; n++)
     {
       r=-1;
-      while ((r<0) || (r>num_of_nodes-1))
+      while ((r<0) || (r>(long)num_of_nodes-1))
 	r=RNG_INTEGER(0,num_of_nodes-1);
       /* r=long(double(num_of_nodes*double(rand())/double(RAND_MAX+1.0)));*/
       node=net->node_list->Get(r);
@@ -574,8 +574,8 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
   long max_q;
   unsigned long changes, /*degree,*/ problemcount;
   //HugeArray<int> neighbours;
-  double h, delta, norm, r, beta,minweight, mag, prefac,w, degree;
-  bool cyclic, found;
+  double h, delta=0, norm, r, beta,minweight, mag, prefac=0,w, degree;
+  bool cyclic=0, found;
   unsigned long num_of_nodes;
 
   sweep=0;
@@ -747,9 +747,9 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
   unsigned int sweep;
   long max_q, rn;
   unsigned long changes, /*degree,*/ problemcount;
-  double degree,w, delta, h;
+  double degree,w, delta=0, h;
   //HugeArray<int> neighbours;
-  double norm, r, beta,minweight, mag, prefac;
+  double norm, r, beta,minweight, mag, prefac=0;
   bool cyclic, found;
   long int num_of_nodes;
   sweep=0;
@@ -760,7 +760,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     cyclic=true;
     sweep++;
     //loop over all nodes in network
-    for (unsigned int n=0; n<num_of_nodes; n++)
+    for (int n=0; n<num_of_nodes; n++)
     {
       rn=-1;
       while ((rn<0) || (rn>num_of_nodes-1))
@@ -1113,10 +1113,10 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
   DLList_Iter<NLink*> l_iter;
   DLList<NNode*>* to_do;
   DLList<NNode*>* community;
-  NNode *start_node, *n_cur, *neighbor, *max_aff_node, *node;
+  NNode *start_node=0, *n_cur, *neighbor, *max_aff_node, *node;
   NLink *l_cur;
   bool found=false, add=false, remove=false;
-  double degree, delta_aff_add, delta_aff_rem, max_delta_aff, Ks=0.0, Kr, kis, kir, w;
+  double degree, delta_aff_add, delta_aff_rem, max_delta_aff, Ks=0.0, Kr=0, kis, kir, w;
   long community_marker=5;
   long to_do_marker=10;
   double inner_links, outer_links, aff_r, aff_s, css;
@@ -1161,7 +1161,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
     //now add at the second neighbors to the to_do list
     neighbor=iter2.First(node->Get_Neighbours());
     while (!iter2.End()) {
-      if (neighbor->Get_Marker()!=community_marker && neighbor->Get_Marker()!=to_do_marker) {
+      if ((long)neighbor->Get_Marker()!=community_marker && (long)neighbor->Get_Marker()!=to_do_marker) {
 	to_do->Push(neighbor);
 	neighbor->Set_Marker(to_do_marker);
 // 	printf("Adding node %s to to_do list.\n",neighbor->Get_Name());
@@ -1202,7 +1202,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
 	  } else { 
 	    n_cur=l_cur->Get_Start(); 
 	  }
-	  if (n_cur->Get_Marker()==community_marker) {
+	  if ((long)n_cur->Get_Marker()==community_marker) {
 	    kis+=w;  //the weight/number of links to the community
 	  } else {
 	    kir+=w;  //the weight/number of links to the rest of the network
@@ -1246,7 +1246,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
 	  } else { 
 	    n_cur=l_cur->Get_Start(); 
 	  }
-	  if (n_cur->Get_Marker()==community_marker) {
+	  if ((long)n_cur->Get_Marker()==community_marker) {
 	    kis+=w;
 	    inner_links+=w;  //summing all w gives twice the number of inner links(weights)
 	  } else {
@@ -1292,7 +1292,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
 	//in the to_do list or in the community
 	neighbor=iter.First(max_aff_node->Get_Neighbours());
 	while (!iter.End()) {
-	  if (neighbor->Get_Marker()!=community_marker && neighbor->Get_Marker()!=to_do_marker) {
+	  if ((long)neighbor->Get_Marker()!=community_marker && (long)neighbor->Get_Marker()!=to_do_marker) {
 	    to_do->Push(neighbor);
 	    neighbor->Set_Marker(to_do_marker);
 	    //printf("Adding node %s to to_do list.\n",neighbor->Get_Name());
@@ -1361,7 +1361,6 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 			       igraph_vector_t *membership,
 			       double kT)
 {
-  FILE *file=stdout;
   NNode *n_cur, *n_cur2;
   bool found;
   double p_in, p_out, log_num_exp, a1,a2,a3,p,p1,p2;
@@ -1588,7 +1587,7 @@ double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) {
 	    changes=HeatBathParallelLookup(gamma, prob, kT, 50);
-              printf("kT: %f   \t Changes %d\n",kT, changes);
+              printf("kT: %f   \t Changes %li\n",kT, changes);
           } else {
 	    acc=HeatBathLookup(gamma, prob, kT, 50);
              if (acc>(1.0-1.0/double(q))*0.01) changes=1; else changes=0;
@@ -1663,7 +1662,7 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
           //initialize_lookup(kT,kmax,net->node_list->Size());
           if (!non_parallel) {
 	    changes=HeatBathParallelLookupZeroTemp(gamma, prob, 1);
-              printf("Changes %d\n", changes);
+              printf("Changes %li\n", changes);
           } else {
             acc=HeatBathLookupZeroTemp(gamma, prob, 1);
             if (acc>(1.0-1.0/double(q))*0.01) changes=1; else changes=0;
@@ -1742,7 +1741,7 @@ long PottsModel::WriteCorrelationMatrix(char *filename)
     {
       c++;
       fprintf(file,"\t%f",correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
-      fprintf(file2,"%d\t%d\t%f\n",r,c,correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
+      fprintf(file2,"%li\t%li\t%f\n",r,c,correlation[n_cur->Get_Index()]->Get(n_cur2->Get_Index()));
       n_cur2=iter2.Next();
     }
     fprintf(file,"\n");

@@ -24,6 +24,18 @@
 #ifndef REST_TYPES_H
 #define REST_TYPES_H
 
+#undef __BEGIN_DECLS
+#undef __END_DECLS
+#ifdef __cplusplus
+# define __BEGIN_DECLS extern "C" {
+# define __END_DECLS }
+#else
+# define __BEGIN_DECLS /* empty */
+# define __END_DECLS /* empty */
+#endif
+
+__BEGIN_DECLS
+
 #ifndef _GNU_SOURCE
 # define _GNU_SOURCE
 #endif
@@ -622,6 +634,8 @@ igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch);
 int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
 			    igraph_real_t add);
 int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex);
+
+__END_DECLS
 
 #endif
 

@@ -516,7 +516,7 @@ int NNode::Connect_To(NNode* neighbour, double weight)
 NLink *NNode::Get_LinkToNeighbour(NNode* neighbour)
 {
   DLList_Iter<NLink*> iter;
-  NLink *l_cur, *link;
+  NLink *l_cur, *link=0;
   bool found=false;
   // finde einen bestimmten Link aus der Liste der links eines Knotens
   l_cur=iter.First(n_links);
@@ -677,14 +677,14 @@ bool DLList_Iter<L_DATA>::Swap(DLList_Iter<L_DATA> b)
  void test2(void)
  {
    
-   char *test;
-   int *test31, inum;
-   unsigned long *test2;
-   long *test12;
-   double *test3, dnum;
-   NNode *test4;
-   NLink *link;
-   char *test_c;
+   char *test=0;
+   int *test31=0, inum;
+   unsigned long *test2=0;
+   long *test12=0;
+   double *test3=0, dnum;
+   NNode *test4=0;
+   NLink *link=0;
+   char *test_c=0;
    DLList_Iter<NNode*> *n_iter, *iter;
    DLList_Iter<ClusterList<NNode*>*> *cl_iter;
    DLList_Iter<DLList<NNode*>*> *dl_iter;
@@ -741,7 +741,7 @@ bool DLList_Iter<L_DATA>::Swap(DLList_Iter<L_DATA> b)
    DLList<cluster_join_move*> *moveset;
    moveset=new DLList<cluster_join_move*>();
    m_iter=new DLList_Iter<cluster_join_move*>();
-   cluster_join_move *move;
+   cluster_join_move *move=0;
    moveset->Is_In_List(move);
    moveset->Push(move);
    move=moveset->Pop();
@@ -821,7 +821,7 @@ bool DLList_Iter<L_DATA>::Swap(DLList_Iter<L_DATA> b)
 
    DL_Indexed_List<unsigned long*> *t15;
    t15=new DL_Indexed_List<unsigned long*>();
-   unsigned long *test13;
+   unsigned long *test13=0;
    t15->Push(test13);
    t15->Get(1);
    t15->Pop();
@@ -833,7 +833,7 @@ bool DLList_Iter<L_DATA>::Swap(DLList_Iter<L_DATA> b)
 
    DL_Indexed_List<unsigned int*> *t16;
    t16=new DL_Indexed_List<unsigned int*>();
-   unsigned int *test17;
+   unsigned int *test17=0;
    t16->Push(test17);
    t16->Get(1);
    t16->Pop();
@@ -912,7 +912,7 @@ bool DLList_Iter<L_DATA>::Swap(DLList_Iter<L_DATA> b)
    DLList<ClusterList<NNode*>*> *t7;
    t7=new DLList<ClusterList<NNode*>*>();
    cl_iter = new DLList_Iter<ClusterList<NNode*>*>();
-   ClusterList<NNode*> *t71;
+   ClusterList<NNode*> *t71=0;
    n_iter = new DLList_Iter<NNode*>();
    test4=n_iter->First(t71);
    test4=n_iter->Next();
