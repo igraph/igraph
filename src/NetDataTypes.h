@@ -348,5 +348,456 @@ struct network
 } ;
 */
 
+template <class DATA>
+HugeArray<DATA>::HugeArray(void)
+{
+ max_bit_left=1<<31;   //wir setzen das 31. Bit auf 1
+ size=2;
+ max_index=0;
+ highest_field_index=0;
+ data=new DATA[2]; //ein extra Platz fuer das Nullelement
+ data[0]=0;
+ data[1]=0; 
+ for (int i=0; i<32; i++) fields[i]=NULL;
+ fields[highest_field_index]=data;
+}
+
+template <class DATA> HugeArray<DATA>::~HugeArray(void)
+{
+ for (unsigned int i=0; i<=highest_field_index; i++)
+ {
+   data=fields[i];
+   delete(data);
+ }
+}
+
+template <class DATA>
+HUGE_INDEX HugeArray<DATA>::get_huge_index(unsigned long index)
+{
+  HUGE_INDEX h_index;
+  unsigned int shift_index=0;
+  unsigned long help_index;
+  help_index=index;
+  if (index<2) {
+    h_index.field_index=0;
+    h_index.in_field_index=index;
+    return h_index;
+  }
+  // wie oft muessen wir help_index nach links shiften, damit das 31. Bit gesetzt ist??
+  while (!(max_bit_left & help_index))
+  {
+    help_index <<= 1;
+    shift_index++;
+  }
+  h_index.field_index=31-shift_index;       // das hoechste  besetzte Bit im Index
+  help_index=1 << h_index.field_index;    // in help_index wird das hoechste besetzte Bit von Index gesetzt
+  h_index.in_field_index=(index ^ help_index);   // index XOR help_index, womit alle bits unter dem hoechsten erhalten bleiben
+  return h_index;
+}
+
+template <class DATA>
+DATA &HugeArray<DATA>::Set(unsigned long int index)
+{
+ HUGE_INDEX h_index;
+ unsigned long data_size;
+ while (size<index+1)
+ {
+    highest_field_index++;
+    data_size=1<<highest_field_index;
+    data=new DATA[data_size];
+    for (unsigned long i=0; i<data_size; i++)
+    {
+      data[i]=0;
+    }
+    size=size+data_size;   //overflow noch abfangen
+    //printf("Vergroesserung auf: %u bei index %u\n",size,index);
+    fields[highest_field_index]=data;
+ }
+ h_index=get_huge_index(index);
+ //printf("index %lu = %lu . %lu\n",index,h_index.field_index,h_index.in_field_index);
+ data=fields[h_index.field_index];
+ if (max_index<index) {max_index=index;}
+ return(data[h_index.in_field_index]);
+}
+
+template <class DATA>
+DATA HugeArray<DATA>::Get(unsigned long index)
+{
+  return(Set(index));
+}
+
+
+template <class DATA>
+DATA &HugeArray<DATA>::operator[](unsigned long index)
+{
+  return(Set(index));
+}
+
+                                                                                                                                                                                                                                                                                                                                                                  
+//###############################################################################
+template <class L_DATA>
+DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind) : item(i), index(ind), previous(0), next(0)
+{
+}
+
+template <class L_DATA>
+DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n) : item(i), index(ind), previous(p), next(n)
+{
+}
+
+template <class L_DATA>
+DLItem<L_DATA>::~DLItem()
+{
+//  delete item;      //eigentlich muessten wir pruefen, ob item ueberhaupt ein Pointer ist...
+ //previous=NULL;
+ //next=NULL;
+}
+
+
+//######################################################################################################################
+template <class L_DATA>
+DLList<L_DATA>::DLList(void)
+{
+   head=tail=NULL;
+   number_of_items=0;
+   head=new DLItem<L_DATA>(NULL,0);  //fuer head und Tail gibt es das gleiche Array-Element!! Vorsicht!!
+   tail=new DLItem<L_DATA>(NULL,0);
+   if ( !head || !tail )
+     {
+      if (head) delete(head);
+      if (tail) delete(tail);
+      return;
+     }  else {
+     head->next=tail;
+     tail->previous=head;
+   }
+}
+
+template <class L_DATA>
+DLList<L_DATA>::~DLList()
+{
+  DLItem<L_DATA> *cur=head, *next;
+  while (cur)
+    {
+      next=cur->next;
+      delete(cur);
+      cur=next;
+    }
+    number_of_items=0;
+  //  printf("Liste Zerstoert!\n");
+}
+//privates Insert
+template <class L_DATA>
+DLItem<L_DATA> *DLList<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos)
+{
+   DLItem<L_DATA> *i=new DLItem<L_DATA>(data, number_of_items+1, pos->previous, pos);
+   if (i)
+      {
+      pos->previous->next=i;
+      pos->previous=i;
+      number_of_items++;
+      return(i);
+      }
+   else return(0);
+}
+//privates delete
+template <class L_DATA>
+L_DATA DLList<L_DATA>::pDelete(DLItem<L_DATA> *i)
+{
+  L_DATA data=i->item;
+  i->previous->next=i->next;
+  i->next->previous=i->previous;
+//  array[i->index]=0;
+  delete(i);
+  number_of_items--;
+  return(data);
+}
+//oeffentliches Insert
+template <class L_DATA>
+int DLList<L_DATA>::Insert(L_DATA data, unsigned long pos)
+{
+  if ((pos<0)||(pos>(number_of_items))) return(0);
+  DLItem<L_DATA> *cur=head;
+  while(pos--) cur=cur->next;
+  return(pInsert(data,cur)!=0);
+}
+//oeffentliche Delete
+template <class L_DATA>
+int DLList<L_DATA>::Delete(unsigned long pos)
+{
+  if ((pos<0)||(pos>(number_of_items))) return(0);
+  DLItem<L_DATA> *cur=head;
+  while(pos--) cur=cur->next;
+  return(pDelete(cur)!=0);
+}
+
+//oeffentliche Delete
+template <class L_DATA>
+int DLList<L_DATA>::fDelete(L_DATA data)
+{
+  if ((number_of_items==0) || (!data)) return(0);
+  DLItem<L_DATA> *cur;
+  cur=head->next;
+  while ((cur!=tail) && (cur->item!=data)) cur=cur->next;
+  if (cur!=tail) return(pDelete(cur)!=0);
+  return(0);
+}
+
+template <class L_DATA>
+L_DATA DLList<L_DATA>::Push(L_DATA data)
+{
+  DLItem<L_DATA> *tmp;
+  tmp=pInsert(data,tail);
+  if (tmp) return (tmp->item);
+  return(0);
+}
+
+template <class L_DATA>
+L_DATA DLList<L_DATA>::Pop(void)
+{
+  return(pDelete(tail->previous));
+}
+
+
+template <class L_DATA>
+L_DATA DLList<L_DATA>::Get(unsigned long pos)
+{
+  if ((pos<1)||(pos>(number_of_items+1))) return(0);
+//  return(array[pos]->item);
+  DLItem<L_DATA> *cur=head;
+  while(pos--) cur=cur->next;
+  return(cur->item);
+}
+
+
+template <class L_DATA>
+int DLList<L_DATA>::Enqueue(L_DATA data)
+{
+  return(pInsert(data,tail)!=0);
+}
+
+template <class L_DATA>
+L_DATA DLList<L_DATA>::Dequeue(void)
+{
+  return(pDelete(head->next));
+}
+
+//gibt Index des gesuchte Listenelement zurueck, besser waere eigentlich zeiger
+template <class L_DATA>
+unsigned long DLList<L_DATA>::Is_In_List(L_DATA data)
+{
+  DLItem<L_DATA> *cur=head, *next;
+  unsigned long pos=0;
+  while (cur)
+    {
+      next=cur->next;
+      if (cur->item==data) return(pos) ;
+      cur=next;
+      pos++;
+    }
+  return(0);
+}
+
+//######################################################################################################################
+template <class L_DATA>
+DL_Indexed_List<L_DATA>::DL_Indexed_List(void) : DLList<L_DATA>()
+{
+  last_index=0;
+}
+
+template <class L_DATA>
+DL_Indexed_List<L_DATA>::~DL_Indexed_List()
+{
+  DLItem<L_DATA> *cur, *next;
+  cur=this->head;
+  while (cur)
+    {
+      next=cur->next;
+      delete(cur);
+      cur=next;
+    }
+    this->number_of_items=0;
+  //  printf("Liste Zerstoert!\n");
+}
+
+//privates Insert
+template <class L_DATA>
+DLItem<L_DATA> *DL_Indexed_List<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos)
+{
+    DLItem<L_DATA> *i=new DLItem<L_DATA>(data, last_index, pos->previous, pos);
+   if (i)
+      {
+      pos->previous->next=i;
+      pos->previous=i;
+      this->number_of_items++;
+      array[last_index]=i;
+      last_index++;
+      return(i);
+      }
+   else return(0);
+}
+//privates delete
+template <class L_DATA>
+L_DATA DL_Indexed_List<L_DATA>::pDelete(DLItem<L_DATA> *i)
+{
+  L_DATA data=i->item;
+  i->previous->next=i->next;
+  i->next->previous=i->previous;
+  array[i->index]=0;
+  last_index=i->index;
+  delete(i);
+  this->number_of_items--;
+  return(data);
+}
+template <class L_DATA>
+L_DATA DL_Indexed_List<L_DATA>::Push(L_DATA data)
+{
+  DLItem<L_DATA> *tmp;
+  tmp=pInsert(data,this->tail);
+  if (tmp) return (tmp->item);
+  return(0);
+}
+
+template <class L_DATA>
+L_DATA DL_Indexed_List<L_DATA>::Pop(void)
+{
+  return(pDelete(this->tail->previous));
+}
+
+template <class L_DATA>
+L_DATA DL_Indexed_List<L_DATA>::Get(unsigned long pos)
+{
+  if ((pos<0)||(pos>(this->number_of_items-1))) return(0);
+  return(array[pos]->item);
+}
+
+//#######################################################################################
+
+//************************************************************************************************************
+template <class L_DATA>
+ClusterList<L_DATA>::ClusterList(void) : DLList<L_DATA>()
+{
+  links_out_of_cluster=0;
+  links_inside_cluster=0;
+  frequency=1;
+  cluster_energy=1e30;
+  candidates=new DLList<L_DATA>();
+  marker=0;
+}
+
+template <class L_DATA>
+ClusterList<L_DATA>::~ClusterList() 
+{
+  while (candidates->Size()) {
+    candidates->Pop();
+  }
+  delete candidates;
+}
+
+
+template <class L_DATA>
+bool ClusterList<L_DATA>::operator==(ClusterList<L_DATA> &b)
+{
+bool found=false;
+L_DATA n_cur, n_cur_b;
+DLList_Iter<L_DATA> a_iter,b_iter;
+
+if (this->Size()!=b.Size()) return false;
+
+n_cur=a_iter.First(this);
+while (!(a_iter.End()))
+{
+  found=false;
+  n_cur_b=b_iter.First(&b);
+  while (!(b_iter.End()) && !found)
+  {
+    if (n_cur==n_cur_b) found=true;
+    n_cur_b=b_iter.Next();
+  }
+  if (!found) return false;
+  n_cur=a_iter.Next();
+}
+return(found);
+}
+//A<B ist Wahr, wenn A echte Teilmenge von B ist
+template <class L_DATA>
+bool ClusterList<L_DATA>::operator<(ClusterList<L_DATA> &b)
+{
+bool found=false;
+L_DATA n_cur, n_cur_b;
+DLList_Iter<L_DATA> a_iter, b_iter;
+
+if (this->Size()>=b.Size()) return false;
+n_cur=a_iter.First(this);
+while (!(a_iter.End()))
+{
+  found=false;
+  n_cur_b=b_iter.First(&b);
+  while (!(b_iter.End()) && !found)
+  {
+    if (n_cur==n_cur_b) found=true;
+    n_cur_b=b_iter.Next();
+  }
+  if (!found) return false;
+  n_cur=a_iter.Next();
+}
+return(found);
+}
+
+//#####################################################################################
+template <class L_DATA>
+DLList_Iter<L_DATA>::DLList_Iter()
+{
+  list=NULL;
+  current=NULL;
+  end_reached=true;
+}
+
+template <class L_DATA>
+L_DATA DLList_Iter<L_DATA>::Next(void)
+{
+  current=current->next;
+  if (current==(list->tail)) end_reached=true;
+  return(current->item);
+}
+
+template <class L_DATA>
+L_DATA DLList_Iter<L_DATA>::Previous(void)
+{
+  current=current->previous;
+  if (current==(list->head)) end_reached=true;
+  return(current->item);
+}
+
+template <class L_DATA>
+L_DATA DLList_Iter<L_DATA>::First(DLList<L_DATA> *l)
+{
+    list=l;
+    current=list->head->next;
+    if (current==(list->tail)) end_reached=true;
+    else end_reached=false;
+    return(current->item);
+}
+
+template <class L_DATA>
+L_DATA DLList_Iter<L_DATA>::Last(DLList<L_DATA> *l)
+{
+    list=l;
+    current=list->tail->previous;
+    if (current==(list->head)) end_reached=true;         // falls die List leer ist
+    else end_reached=false;
+    return(current->item);
+}
+
+template <class L_DATA>
+bool DLList_Iter<L_DATA>::Swap(DLList_Iter<L_DATA> b)
+{
+  L_DATA h;
+  if (list!=b.list) return false; //elemeten muessen aus der gleichen List stammen
+  if (end_reached || b.end_reached) return false;
+  h=current->item; current->item=b.current->item; b.current->item=h;
+  return true;
+} 
+
 #endif
 
