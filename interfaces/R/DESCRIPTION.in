@@ -1,9 +1,11 @@
 Package: igraph
 Version: @VERSION@
-Date: Januar 25, 2005
-Title:  IGraph class
+Date: December 5, 2006
+Title:  Routines for simple graphs, network analysis.
 Author: Gabor Csardi <csardi@rmki.kfki.hu>
 Maintainer: Gabor Csardi <csardi@rmki.kfki.hu>
-Description: Routines for simple graphs.
+Description: Routines for simple graphs and network analysis. igraph can
+  handle large graphs very well and provides functions for generating random
+  and regular graphs, graph visualization, centrality indices and much more.
 License: GPL version 2 or later (June, 1991)
 URL: http://cneurocvs.rmki.kfki.hu/igraph
