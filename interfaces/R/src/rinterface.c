@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "error.h"
+#include "memory.h"
 
 #include "config.h"
 
@@ -4871,7 +4872,7 @@ SEXP R_igraph_laplacian(SEXP graph, SEXP pnormalized) {
   igraph_matrix_init(&res, 0, 0);
   igraph_laplacian(&g, &res, normalized);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
-  igraph_matrix_destroy(&g);
+  igraph_matrix_destroy(&res);
   
   R_igraph_after();
   
