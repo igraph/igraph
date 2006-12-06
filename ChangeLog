@@ -1,3 +1,10 @@
+2006-12-06  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/spectral_properties.c (igraph_laplacian) : isolated vertex
+	handling bug corrected
+	* interfaces/python/src/graphobject.c (igraphmodule_Graph_laplacian) :
+	added
+
 2006-12-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/pottsmodel_2.cpp

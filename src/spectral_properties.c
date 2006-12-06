@@ -92,7 +92,7 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
       }
     } else {
       for (i=0;i<no_of_nodes;i++) {
-	MATRIX(*res, i, i) = 1;
+	MATRIX(*res, i, i) = VECTOR(degree)[i]>0 ? 1 : 0;
       }
       
       while (!IGRAPH_EIT_END(edgeit)) {

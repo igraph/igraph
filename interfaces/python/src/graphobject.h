@@ -135,6 +135,8 @@ PyObject* igraphmodule_Graph_get_edgelist(igraphmodule_GraphObject *self, PyObje
 PyObject* igraphmodule_Graph_to_undirected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_to_directed(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
+PyObject* igraphmodule_Graph_laplacian(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+
 PyObject* igraphmodule_Graph_Read_DIMACS(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Edgelist(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Read_Ncol(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -1183,6 +1185,23 @@ static PyMethodDef igraphmodule_Graph_methods[] =
    "  same vertex pair. If C{False}, the edge count is kept constant.\n"
   },
 
+  /* interface to igraph_laplacian */
+  {"laplacian", (PyCFunction)igraphmodule_Graph_laplacian,
+   METH_VARARGS | METH_KEYWORDS,
+   "laplacian(normalized=False)\n\n"
+   "Returns the Laplacian matrix of a graph.\n\n"
+   "The Laplacian matrix is similar to the adjacency matrix, but the edges\n"
+   "are denoted with -1 and the diagonal contains the node degrees.\n\n"
+   "Normalized Laplacian matrices have 1 or 0 in their diagonals (0 for nodes\n"
+   "with no edges), edges are denoted by 1 / sqrt(d_i * d_j) where d_i is the\n"
+   "degree of node i.\n\n"
+   "Multiple edges and self-loops are silently ignored. Although it is\n"
+   "possible to calculate the Laplacian matrix of a directed graph, it does\n"
+   "not make much sense.\n\n"
+   "@param normalized: whether to return the normalized Laplacian matrix.\n"
+   "@return: the Laplacian matrix.\n"
+  },
+  
   ///////////////////////////////
   // LOADING AND SAVING GRAPHS //
   ///////////////////////////////

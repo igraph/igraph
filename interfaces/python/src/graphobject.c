@@ -3045,6 +3045,43 @@ PyObject* igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Returns the Laplacian matrix of a graph.
+ * \return the Laplacian matrix as a Python list of lists
+ * \sa igraph_laplacian
+ */
+PyObject* igraphmodule_Graph_laplacian(igraphmodule_GraphObject *self,
+				       PyObject *args,
+				       PyObject *kwds) 
+{
+   char *kwlist[] = {"normalized", NULL};
+   igraph_matrix_t m;
+   PyObject *result;
+   PyObject *normalized=Py_False;
+
+   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &normalized))
+     return NULL;
+   
+   if (igraph_matrix_init(&m, igraph_vcount(&self->g), igraph_vcount(&self->g))) 
+     {
+       igraphmodule_handle_igraph_error(); return NULL;
+     }
+   
+   if (igraph_laplacian(&self->g, &m, PyObject_IsTrue(normalized))) {
+     igraphmodule_handle_igraph_error();
+     igraph_matrix_destroy(&m);
+     return NULL;
+   }
+   
+   if (PyObject_IsTrue(normalized)) {
+     result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+   } else {
+     result=igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_INT);
+   }
+   igraph_matrix_destroy(&m);
+   return result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Returns the list of edges in a graph.
  * \return the list of edges, every edge is represented by a pair
  * \sa igraph_get_edgelist
