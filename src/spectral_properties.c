@@ -86,7 +86,7 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	from=ffrom;
 	to=fto;
 	if (from != to) {
-	  MATRIX(*res, from, to) = -1;
+	  MATRIX(*res, from, to) -= 1;
 	}
 	IGRAPH_EIT_NEXT(edgeit);
       }
@@ -118,14 +118,14 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	from=ffrom;
 	to=fto;	
 	
-	MATRIX(*res, to, from) = -1;
-	MATRIX(*res, from, to) = -1;
+	MATRIX(*res, to, from) -= 1;
+	MATRIX(*res, from, to) -= 1;
 	
 	IGRAPH_EIT_NEXT(edgeit);
       }
     } else {
       for (i=0;i<no_of_nodes;i++) {
-	MATRIX(*res, i, i) = 1;
+	MATRIX(*res, i, i) = VECTOR(degree)[i]>0 ? 1: 0;
       }
       
       while (!IGRAPH_EIT_END(edgeit)) {
