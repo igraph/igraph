@@ -373,7 +373,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   /* interface to igraph_asymmetric_preference_game */
   {"Asymmetric_Preference", (PyCFunction)igraphmodule_Graph_Asymmetric_Preference,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Preference(n, type_dist_matrix, pref_matrix, loops=False)\n\n"
+   "Asymmetric_Preference(n, type_dist_matrix, pref_matrix, attribute=None, loops=False)\n\n"
    "Generates a graph based on asymmetric vertex types and connection probabilities.\n\n"
    "This is the asymmetric variant of L{Graph.Preference}.\n"
    "A given number of vertices are generated. Every vertex is assigned to an\n"
@@ -387,6 +387,8 @@ static PyMethodDef igraphmodule_Graph_methods[] =
    "  types\n"
    "@param pref_matrix: matrix giving the connection probabilities for\n"
    "  different vertex types.\n"
+   "@param attribute: the vertex attribute name used to store the vertex\n"
+   "  types. If C{None}, vertex types are not stored.\n"
    "@param loops: whether loop edges are allowed.\n"
   },
   
@@ -491,7 +493,7 @@ static PyMethodDef igraphmodule_Graph_methods[] =
   /* interface to igraph_preference_game */
   {"Preference", (PyCFunction)igraphmodule_Graph_Preference,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Preference(n, type_dist, pref_matrix, directed=False, loops=False)\n\n"
+   "Preference(n, type_dist, pref_matrix, attribute=None, directed=False, loops=False)\n\n"
    "Generates a graph based on vertex types and connection probabilities.\n\n"
    "This is practically the nongrowing variant of L{Graph.Establishment}.\n"
    "A given number of vertices are generated. Every vertex is assigned to a\n"
@@ -502,6 +504,8 @@ static PyMethodDef igraphmodule_Graph_methods[] =
    "@param type_dist: list giving the distribution of vertex types\n"
    "@param pref_matrix: matrix giving the connection probabilities for\n"
    "  different vertex types.\n"
+   "@param attribute: the vertex attribute name used to store the vertex\n"
+   "  types. If C{None}, vertex types are not stored.\n"
    "@param directed: whether to generate a directed graph.\n"
    "@param loops: whether loop edges are allowed.\n"
   },

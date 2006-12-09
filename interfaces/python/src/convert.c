@@ -254,29 +254,61 @@ PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v) {
  */
 PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v) {
    PyObject *list, *pair;
-   int n, i, j;
+   long n, i, j;
    
    n=igraph_vector_size(v);
    if (n<0) return igraphmodule_handle_igraph_error();
    if (n%2) return igraphmodule_handle_igraph_error();
    
-   // create a new Python list
+   /* create a new Python list */
    n>>=1;
    list=PyList_New(n);
    
-   // populate the list with data
-   for (i=0, j=0; i<n; i++, j+=2)
-     {
-	pair=Py_BuildValue("(ll)", (long)VECTOR(*v)[j], (long)VECTOR(*v)[j+1]);
-	if (pair==NULL || PyList_SetItem(list, i, pair)) 
-	  {
-	     // error occurred while populating the list, return immediately
-	     Py_DECREF(pair);
-	     Py_DECREF(list);
-	     return NULL;
-	  }
+   /* populate the list with data */
+   for (i=0, j=0; i<n; i++, j+=2) {
+     pair=Py_BuildValue("(ll)", (long)VECTOR(*v)[j], (long)VECTOR(*v)[j+1]);
+     if (pair==NULL || PyList_SetItem(list, i, pair)) {
+       /* error occurred while populating the list, return immediately */
+       Py_DECREF(pair);
+       Py_DECREF(list);
+       return NULL;
      }
-   // return the list
+   }
+
+   return list;
+}
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts two igraph \c igraph_vector_t vectors to a Python list of integer pairs
+ * 
+ * \param v1 the \c igraph_vector_t containing the 1st vector to be converted
+ * \param v2 the \c igraph_vector_t containing the 2nd vector to be converted
+ * \return the Python integer pair list as a \c PyObject*, or \c NULL if an error occurred
+ */
+PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
+					       igraph_vector_t *v2) {
+   PyObject *list, *pair;
+   long n, i, j;
+   
+   n=igraph_vector_size(v1);
+   if (n<0) return igraphmodule_handle_igraph_error();
+   if (igraph_vector_size(v2) != n) return igraphmodule_handle_igraph_error();
+
+   /* create a new Python list */
+   list=PyList_New(n);
+   
+   /* populate the list with data */
+   for (i=0; i<n; i++) {
+     pair=Py_BuildValue("(ll)", (long)VECTOR(*v1)[i], (long)VECTOR(*v2)[i]);
+     if (pair==NULL || PyList_SetItem(list, i, pair)) {
+       /* error occurred while populating the list, return immediately */
+       Py_DECREF(pair);
+       Py_DECREF(list);
+       return NULL;
+     }
+   }
+
    return list;
 }
 

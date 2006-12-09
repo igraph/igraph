@@ -146,7 +146,7 @@ PyObject* igraphmodule_VertexSeq_attributes(igraphmodule_VertexSeqObject* self) 
   return igraphmodule_Graph_vertex_attributes(o);
 }
 
-/** \ingroup python_interface_vertexseq
+/** \ingroup python_interface_edgeseq
  * \brief Returns the list of values for a given attribute
  */
 PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObject* self, PyObject* o) {
@@ -156,7 +156,7 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
   gr=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!gr) return NULL;
   
-  result=PyDict_GetItem(((PyObject**)gr->g.attr)[1], o);
+  result=PyDict_GetItem(((PyObject**)gr->g.attr)[ATTRHASH_IDX_VERTEX], o);
   if (result) {
     Py_INCREF(result);
     return result;
@@ -167,21 +167,58 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
   return NULL;
 }
 
+/** \ingroup python_interface_vertexseq
+ * \brief Sets the list of values for a given attribute
+ */
+PyObject* igraphmodule_VertexSeq_set_attribute_values(igraphmodule_VertexSeqObject* self, PyObject* args, PyObject* kwds) {
+  igraphmodule_GraphObject *gr;
+  PyObject *attrname, *values;
+  long n;
+  static char* kwlist[] = { "attrname", "values", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist,
+				   &attrname, &values))
+    return NULL;
+
+  gr=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
+  if (!gr) return NULL;
+
+  n=PySequence_Size(values);
+  if (n<0) return NULL;
+  if (n != (long)igraph_vcount(&gr->g)) {
+    PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of vertices in the graph");
+    return NULL;
+  }
+
+  if (PyDict_SetItem(((PyObject**)gr->g.attr)[ATTRHASH_IDX_VERTEX],
+		     attrname, values) == -1)
+    return NULL;
+
+  Py_RETURN_NONE;
+}
+
 /**
  * \ingroup python_interface_vertexseq
  * Method table for the \c igraph.VertexSeq object
  */
 PyMethodDef igraphmodule_VertexSeq_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_VertexSeq_attributes,
-      METH_NOARGS,
-      "attributes() -> list\n\n"
-      "Returns the attribute name list of the graph's vertices\n"
+   METH_NOARGS,
+   "attributes() -> list\n\n"
+   "Returns the attribute name list of the graph's vertices\n"
   },
   {"get_attribute_values", (PyCFunction)igraphmodule_VertexSeq_get_attribute_values,
-      METH_O,
-      "get_attribute_values(attrname) -> list\n"
-      "Returns the value of a given vertex attribute for all edges\n"
-      "@param attrname: the name of the attribute\n"
+   METH_O,
+   "get_attribute_values(attrname) -> list\n"
+   "Returns the value of a given vertex attribute for all vertices\n"
+   "@param attrname: the name of the attribute\n"
+  },
+  {"set_attribute_values", (PyCFunction)igraphmodule_VertexSeq_set_attribute_values,
+   METH_VARARGS | METH_KEYWORDS,
+   "set_attribute_values(attrname, values) -> list\n"
+   "Sets the value of a given vertex attribute for all vertices\n"
+   "@param attrname: the name of the attribute\n"
+   "@param values: the new attribute values in a list\n"
   },
   {NULL}
 };

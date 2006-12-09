@@ -1282,13 +1282,17 @@ PyObject* igraphmodule_Graph_Preference(PyTypeObject *type,
   PyObject *loops = Py_False;
   igraph_matrix_t pm;
   igraph_vector_t td;
-  
-  char *kwlist[] = {"n", "type_dist", "pref_matrix", "directed", "loops", NULL};
+  igraph_vector_t type_vec;
+  PyObject *type_vec_o;
+  PyObject *attribute_key=Py_None;
+  igraph_bool_t store_attribs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|OO", kwlist,
+  char *kwlist[] = {"n", "type_dist", "pref_matrix", "attribute", "directed", "loops", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|OOO", kwlist,
 				   &n, &PyList_Type, &type_dist,
 				   &PyList_Type, &pref_matrix,
-				   &directed, &loops))
+				   &attribute_key, &directed, &loops))
     return NULL;
       
   if (n<=0) {
@@ -1318,15 +1322,50 @@ PyObject* igraphmodule_Graph_Preference(PyTypeObject *type,
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
+    store_attribs = (attribute_key && attribute_key != Py_None);
+    if (store_attribs && igraph_vector_init(&type_vec, (igraph_integer_t)n)) {
+      igraph_matrix_destroy(&pm);
+      igraph_vector_destroy(&td);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
     igraphmodule_Graph_init_internal(self);
     if (igraph_preference_game(&self->g, (igraph_integer_t)n,
 			       (igraph_integer_t)types, &td, &pm,
+			       store_attribs ? &type_vec : 0,
 			       PyObject_IsTrue(directed),
 			       PyObject_IsTrue(loops))) {
       igraphmodule_handle_igraph_error();
       igraph_matrix_destroy(&pm);
       igraph_vector_destroy(&td);
+      if (store_attribs) igraph_vector_destroy(&type_vec);
       return NULL;
+    }
+
+    if (store_attribs) {
+      type_vec_o=igraphmodule_vector_t_to_PyList(&type_vec);
+      if (type_vec_o == 0) {
+	igraph_matrix_destroy(&pm);
+	igraph_vector_destroy(&td);
+	igraph_vector_destroy(&type_vec);
+	Py_DECREF(self);
+	return NULL;
+      }
+      if (attribute_key != Py_None && attribute_key != 0) {
+	if (PyDict_SetItem(((PyObject**)self->g.attr)[ATTRHASH_IDX_VERTEX],
+			   attribute_key, type_vec_o) == -1) {
+	  Py_DECREF(type_vec_o);
+	  igraph_matrix_destroy(&pm);
+	  igraph_vector_destroy(&td);
+	  igraph_vector_destroy(&type_vec);
+	  Py_DECREF(self);
+	  return NULL;
+	}
+      }
+
+      Py_DECREF(type_vec_o);
+      igraph_vector_destroy(&type_vec);
     }
   }
    
@@ -1349,13 +1388,17 @@ PyObject* igraphmodule_Graph_Asymmetric_Preference(PyTypeObject *type,
   PyObject *loops = Py_False;
   igraph_matrix_t pm;
   igraph_matrix_t td;
+  igraph_vector_t in_type_vec, out_type_vec;
+  PyObject *type_vec_o;
+  PyObject *attribute_key=Py_None;
+  igraph_bool_t store_attribs;
   
-  char *kwlist[] = {"n", "type_dist_matrix", "pref_matrix", "loops", NULL};
+  char *kwlist[] = {"n", "type_dist_matrix", "pref_matrix", "attribute", "loops", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|O", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|OO", kwlist,
 				   &n, &PyList_Type, &type_dist_matrix,
 				   &PyList_Type, &pref_matrix,
-				   &loops))
+				   &attribute_key, &loops))
     return NULL;
       
   if (n<=0) {
@@ -1385,14 +1428,64 @@ PyObject* igraphmodule_Graph_Asymmetric_Preference(PyTypeObject *type,
   RC_ALLOC("Graph", self);
   
   if (self != NULL) {
+    store_attribs = (attribute_key && attribute_key != Py_None);
+    if (store_attribs) {
+      if (igraph_vector_init(&in_type_vec, (igraph_integer_t)n)) {
+	igraph_matrix_destroy(&pm);
+	igraph_matrix_destroy(&td);
+	igraphmodule_handle_igraph_error();
+	return NULL;
+      }
+      if (igraph_vector_init(&out_type_vec, (igraph_integer_t)n)) {
+	igraph_matrix_destroy(&pm);
+	igraph_matrix_destroy(&td);
+	igraph_vector_destroy(&in_type_vec);
+	igraphmodule_handle_igraph_error();
+	return NULL;
+      }
+    }
+
     igraphmodule_Graph_init_internal(self);
     if (igraph_asymmetric_preference_game(&self->g, (igraph_integer_t)n,
 					  (igraph_integer_t)types, &td, &pm,
+					  store_attribs ? &in_type_vec : 0,
+					  store_attribs ? &out_type_vec : 0,
 					  PyObject_IsTrue(loops))) {
       igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&in_type_vec);
+      igraph_vector_destroy(&out_type_vec);
       igraph_matrix_destroy(&pm);
       igraph_matrix_destroy(&td);
       return NULL;
+    }
+
+    if (store_attribs) {
+      type_vec_o=igraphmodule_vector_t_pair_to_PyList(&in_type_vec,
+						      &out_type_vec);
+      if (type_vec_o == NULL) {
+	igraph_matrix_destroy(&pm);
+	igraph_vector_destroy(&td);
+	igraph_vector_destroy(&in_type_vec);
+	igraph_vector_destroy(&out_type_vec);
+	Py_DECREF(self);
+	return NULL;
+      }
+      if (attribute_key != Py_None && attribute_key != 0) {
+	if (PyDict_SetItem(((PyObject**)self->g.attr)[ATTRHASH_IDX_VERTEX],
+			   attribute_key, type_vec_o) == -1) {
+	  Py_DECREF(type_vec_o);
+	  igraph_matrix_destroy(&pm);
+	  igraph_vector_destroy(&td);
+	  igraph_vector_destroy(&in_type_vec);
+	  igraph_vector_destroy(&out_type_vec);
+	  Py_DECREF(self);
+	  return NULL;
+	}
+      }
+
+      Py_DECREF(type_vec_o);
+      igraph_vector_destroy(&in_type_vec);
+      igraph_vector_destroy(&out_type_vec);
     }
   }
    

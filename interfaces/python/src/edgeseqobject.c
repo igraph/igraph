@@ -167,21 +167,58 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* 
   return NULL;
 }
 
+/** \ingroup python_interface_edgeseq
+ * \brief Sets the list of values for a given attribute
+ */
+PyObject* igraphmodule_EdgeSeq_set_attribute_values(igraphmodule_EdgeSeqObject* self, PyObject* args, PyObject* kwds) {
+  igraphmodule_GraphObject *gr;
+  PyObject *attrname, *values;
+  long n;
+  static char* kwlist[] = { "attrname", "values", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist,
+				   &attrname, &values))
+    return NULL;
+
+  gr=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
+  if (!gr) return NULL;
+
+  n=PySequence_Size(values);
+  if (n<0) return NULL;
+  if (n != (long)igraph_ecount(&gr->g)) {
+    PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of edges in the graph");
+    return NULL;
+  }
+
+  if (PyDict_SetItem(((PyObject**)gr->g.attr)[ATTRHASH_IDX_EDGE],
+		     attrname, values) == -1)
+    return NULL;
+
+  Py_RETURN_NONE;
+}
+
 /**
  * \ingroup python_interface_edgeseq
  * Method table for the \c igraph.EdgeSeq object
  */
 PyMethodDef igraphmodule_EdgeSeq_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_EdgeSeq_attributes,
-      METH_NOARGS,
-      "attributes() -> list\n\n"
-      "Returns the attribute name list of the graph's edges\n"
+   METH_NOARGS,
+   "attributes() -> list\n\n"
+   "Returns the attribute name list of the graph's edges\n"
   },
   {"get_attribute_values", (PyCFunction)igraphmodule_EdgeSeq_get_attribute_values,
-      METH_O,
-      "get_attribute_values(attrname) -> list\n\n"
-      "Returns the value of a given edge attribute for all edges.\n\n"
-      "@param attrname: the name of the attribute\n"
+   METH_O,
+   "get_attribute_values(attrname) -> list\n\n"
+   "Returns the value of a given edge attribute for all edges.\n\n"
+   "@param attrname: the name of the attribute\n"
+  },
+  {"set_attribute_values", (PyCFunction)igraphmodule_EdgeSeq_set_attribute_values,
+   METH_VARARGS | METH_KEYWORDS,
+   "set_attribute_values(attrname, values) -> list\n"
+   "Sets the value of a given edge attribute for all vertices\n"
+   "@param attrname: the name of the attribute\n"
+   "@param values: the new attribute values in a list\n"
   },
   {NULL}
 };

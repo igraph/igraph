@@ -16,8 +16,21 @@ class GameTests(unittest.TestCase):
 	g=Graph.Preference(100, [1, 1], [[1, 0], [0, 1]])
 	self.failUnless(isinstance(g, Graph) and max(g.clusters()) == 1)
 
+	g=Graph.Preference(100, [1, 1], [[1, 0], [0, 1]], attribute="type")
+	l=g.vs.get_attribute_values("type")
+	self.failUnless(min(l) == 0 and max(l) == 1)
+
+    def testAsymmetricPreference(self):
 	g=Graph.Asymmetric_Preference(100, [[0, 1], [1, 0]], [[0, 1], [1, 0]])
 	self.failUnless(isinstance(g, Graph) and max(g.clusters()) == 1)
+
+	g=Graph.Asymmetric_Preference(100, [[0, 1], [1, 0]], [[1, 0], [0, 1]],\
+				      attribute="type")
+	l=g.vs.get_attribute_values("type")
+	l1=[i[0] for i in l]
+	l2=[i[1] for i in l]
+	self.failUnless(min(l1) == 0 and max(l1) == 1 and
+			min(l2) == 0 and max(l2) == 1)
 
 	g=Graph.Asymmetric_Preference(100, [[0, 1], [1, 0]], [[1, 0], [0, 1]])
 	self.failUnless(isinstance(g, Graph) and max(g.clusters()) == 0)

@@ -4821,7 +4821,7 @@ SEXP R_igraph_preference_game(SEXP pnodes, SEXP ptypes,
   
   R_SEXP_to_vector(ptype_dist, &type_dist);
   R_SEXP_to_matrix(pmatrix, &matrix);
-  igraph_preference_game(&g, nodes, types, &type_dist, &matrix,
+  igraph_preference_game(&g, nodes, types, &type_dist, &matrix, 0,
 			 directed, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
@@ -4849,7 +4849,7 @@ SEXP R_igraph_asymmetric_preference_game(SEXP pnodes, SEXP ptypes,
   R_SEXP_to_matrix(ptype_dist_matrix, &type_dist_matrix);
   R_SEXP_to_matrix(pmatrix, &matrix);
   igraph_asymmetric_preference_game(&g, nodes, types, &type_dist_matrix,
-				    &matrix, loops);
+				    &matrix, 0, 0, loops);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   

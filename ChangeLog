@@ -1,3 +1,18 @@
+2006-12-09  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/games.c (igraph_preference_game)
+	(igraph_asymmetric_preference_game) : the types of the generated
+	vertices can now be returned.
+	* interfaces/python/src/graphobject.c (igraphmodule_Graph_Preference)
+	(igraphmodule_Graph_Asymmetric_Preference) : added attribute argument
+	to store vertex types in the given attribute
+	* interfaces/python/src/edgeseqobject.c,
+	interfaces/python/src/vertexseqobject.c : mass assignment of attributes
+	are now supported
+	* interfaces/R/src/rinterface.c (R_igraph_preference_game)
+	(R_igraph_asymmetric_preference_game) : adopted to the new interface,
+	vertex types are silently dropped now
+
 2006-12-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/spectral_properties.c (igraph_laplacian) : isolated vertex bug

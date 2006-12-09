@@ -1528,7 +1528,9 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
  * \param types The number of vertex types.
  * \param type_dist Vector giving the distribution of vertex types.
  * \param pref_matrix Matrix giving the connection probabilities for
- * different vertex types.
+ *   different vertex types.
+ * \param node_type_vec A vector where the individual generated vertex types
+ *   will be stored. If NULL, the vertex types won't be saved.
  * \param directed Logical, whether to generate a directed graph. If undirected
  *   graphs are requested, only the lower left triangle of the preference
  *   matrix is considered.
@@ -1546,19 +1548,30 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
 			   igraph_integer_t types,
 			   igraph_vector_t *type_dist,
 			   igraph_matrix_t *pref_matrix,
+			   igraph_vector_t *node_type_vec,
 			   igraph_bool_t directed,
 			   igraph_bool_t loops) {
   
   long int i, j;
   igraph_vector_t edges;
   igraph_vector_t cumdist;
-  igraph_vector_t nodetypes;
+  igraph_vector_t* nodetypes;
   igraph_real_t maxcum;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes, nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types+1);
 
+  if (node_type_vec) {
+    IGRAPH_CHECK(igraph_vector_resize(node_type_vec, nodes));
+    nodetypes = node_type_vec;
+  } else {
+    nodetypes = Calloc(1, igraph_vector_t);
+    if (nodetypes == 0) {
+      IGRAPH_ERROR("preference_game failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_VECTOR_INIT_FINALLY(nodetypes, nodes);
+  }
+  
   VECTOR(cumdist)[0]=0;
   for (i=0; i<types; i++) {
     VECTOR(cumdist)[i+1] = VECTOR(cumdist)[i]+VECTOR(*type_dist)[i];
@@ -1571,7 +1584,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     long int type1;
     igraph_real_t uni1=RNG_UNIF(0, maxcum);
     igraph_vector_binsearch(&cumdist, uni1, &type1);
-    VECTOR(nodetypes)[i] = type1;
+    VECTOR(*nodetypes)[i] = type1;
   }
 
   igraph_vector_destroy(&cumdist);
@@ -1583,8 +1596,8 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
       if (!loops && i == j) continue;
 
-      type1=VECTOR(nodetypes)[i];
-      type2=VECTOR(nodetypes)[j];
+      type1=VECTOR(*nodetypes)[i];
+      type2=VECTOR(*nodetypes)[j];
 
       if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
@@ -1595,14 +1608,18 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
   
   RNG_END();
   
-  igraph_vector_destroy(&nodetypes);
-  IGRAPH_FINALLY_CLEAN(1);
+  if (node_type_vec == 0) {
+    igraph_vector_destroy(nodetypes);
+    Free(nodetypes);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
 /**
  * \function igraph_asymmetric_preference_game
  * \brief Generates a graph with asymmetric vertex types and connection preferences 
@@ -1622,6 +1639,10 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  * \param type_dist_matrix Matrix giving the joint distribution of vertex types.
  * \param pref_matrix Matrix giving the connection probabilities for
  * different vertex types.
+ * \param node_type_in_vec A vector where the individual generated "incoming"
+ *   vertex types will be stored. If NULL, the vertex types won't be saved.
+ * \param node_type_out_vec A vector where the individual generated "outgoing"
+ *   vertex types will be stored. If NULL, the vertex types won't be saved.
  * \param loops Logical, whether loop edges are allowed.
  * \return Error code.
  *
@@ -1636,20 +1657,42 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 				      igraph_integer_t types,
 				      igraph_matrix_t *type_dist_matrix,
 				      igraph_matrix_t *pref_matrix,
+				      igraph_vector_t *node_type_in_vec,
+				      igraph_vector_t *node_type_out_vec,
 				      igraph_bool_t loops) {
   
   long int i, j, k;
   igraph_vector_t edges;
   igraph_vector_t cumdist;
-  igraph_vector_t nodetypes_in;
-  igraph_vector_t nodetypes_out;
+  igraph_vector_t *nodetypes_in;
+  igraph_vector_t *nodetypes_out;
   igraph_real_t maxcum;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes_in, nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&nodetypes_out, nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types*types+1);
 
+  if (node_type_in_vec) {
+    nodetypes_in=node_type_in_vec;
+    IGRAPH_CHECK(igraph_vector_resize(nodetypes_in, nodes));
+  } else {
+    nodetypes_in = Calloc(1, igraph_vector_t);
+    if (nodetypes_in == 0) {
+      IGRAPH_ERROR("asymmetric_preference_game failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_VECTOR_INIT_FINALLY(nodetypes_in, nodes);
+  }
+   
+  if (node_type_out_vec) {
+    nodetypes_out=node_type_out_vec;
+    IGRAPH_CHECK(igraph_vector_resize(nodetypes_out, nodes));
+  } else {
+    nodetypes_out = Calloc(1, igraph_vector_t);
+    if (nodetypes_out == 0) {
+      IGRAPH_ERROR("asymmetric_preference_game failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_VECTOR_INIT_FINALLY(nodetypes_out, nodes);
+  }
+   
   VECTOR(cumdist)[0]=0;
   for (i=0, k=0; i<types; i++) {
     for (j=0; j<types; j++, k++) {
@@ -1664,8 +1707,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     long int type1;
     igraph_real_t uni1=RNG_UNIF(0, maxcum);
     igraph_vector_binsearch(&cumdist, uni1, &type1);
-    VECTOR(nodetypes_in)[i] = type1 / (int)types;
-    VECTOR(nodetypes_out)[i] = type1 % (int)types;
+    VECTOR(*nodetypes_in)[i] = type1 / (int)types;
+    VECTOR(*nodetypes_out)[i] = type1 % (int)types;
   }
 
   igraph_vector_destroy(&cumdist);
@@ -1677,8 +1720,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
       if (!loops && i == j) continue;
 
-      type1=VECTOR(nodetypes_out)[i];
-      type2=VECTOR(nodetypes_in)[j];
+      type1=VECTOR(*nodetypes_out)[i];
+      type2=VECTOR(*nodetypes_in)[j];
 
       if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
@@ -1689,10 +1732,18 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   
   RNG_END();
   
-  igraph_vector_destroy(&nodetypes_out);
-  igraph_vector_destroy(&nodetypes_in);
-  IGRAPH_FINALLY_CLEAN(2);
-
+  if (node_type_out_vec == 0) {
+    igraph_vector_destroy(nodetypes_out);
+    Free(nodetypes_out);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+   
+  if (node_type_in_vec == 0) {
+    igraph_vector_destroy(nodetypes_in);
+    Free(nodetypes_in);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
   IGRAPH_CHECK(igraph_create(graph, &edges, nodes, 1));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
