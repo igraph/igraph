@@ -289,7 +289,7 @@ PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v) {
 PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
 					       igraph_vector_t *v2) {
    PyObject *list, *pair;
-   long n, i, j;
+   long n, i;
    
    n=igraph_vector_size(v1);
    if (n<0) return igraphmodule_handle_igraph_error();

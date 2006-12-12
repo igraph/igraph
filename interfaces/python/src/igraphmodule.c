@@ -1078,8 +1078,6 @@ PyMODINIT_FUNC init_igraph(void) {
   igraphmodule_EdgeType.tp_clear = (inquiry)igraphmodule_Edge_clear;
   if (PyType_Ready(&igraphmodule_EdgeType) < 0) return;
   
-  igraphmodule_GraphType.tp_methods = igraphmodule_Graph_methods;
-  igraphmodule_GraphType.tp_getset = igraphmodule_Graph_getseters;
   if (PyType_Ready(&igraphmodule_GraphType) < 0) return;
   
   if (PyType_Ready(&igraphmodule_BFSIterType) < 0) return;
