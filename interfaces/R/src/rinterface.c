@@ -127,7 +127,7 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
   } else {
     nattrno=igraph_vector_ptr_size(nattr); 
   }
-  origlen=igraph_vcount(graph);
+  origlen=igraph_vcount(graph)-nv;
 
   /* First add the new attributes, if any */
   newattrs=0;
