@@ -21,7 +21,7 @@
 
 */
 
-#include <igraph.h>
+#include "igraph.h"
 #include <math.h>
 
 /**

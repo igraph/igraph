@@ -23,7 +23,6 @@
 
 #include "igraph.h"
 #include "error.h"
-#include "memory.h"
 
 #include "config.h"
 
@@ -33,6 +32,8 @@
 #include <Rinternals.h>
 
 #include <stdio.h>
+
+int igraph_free(void *p);
 
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
 SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
@@ -961,8 +962,7 @@ int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv) {
 
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv) {
   long int i;
-  sv->len=GET_LENGTH(rval);
-  sv->data=Calloc(sv->len, char*);
+  igraph_strvector_init(sv, GET_LENGTH(rval));
   for (i=0; i<sv->len; i++) {
     igraph_strvector_set(sv, i, CHAR(STRING_ELT(rval, i)));
   }

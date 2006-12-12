@@ -3,6 +3,9 @@
 	* interfaces/R/igraph/src/rinterface.c 
 	(R_igraph_attrivute_add_vertices) : bug corrected
 
+	* interfaces/R/igraph/src/rinterface.c
+	(R_igraph_SEXP_to_strvector_copy) : eliminate 'Calloc'
+
 2006-12-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/src/rinterface.c (R_igraph_laplacian) :
