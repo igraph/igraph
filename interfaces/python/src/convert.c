@@ -44,7 +44,7 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_b
 {
    PyObject *item, *i1, *i2;
    int i, j, k, ok;
-   long idx, idx2=0;
+   long idx=0, idx2=0;
 
    if (!PyList_Check(list)) 
      {

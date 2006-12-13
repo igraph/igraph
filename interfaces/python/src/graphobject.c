@@ -1464,7 +1464,7 @@ PyObject* igraphmodule_Graph_Asymmetric_Preference(PyTypeObject *type,
 						      &out_type_vec);
       if (type_vec_o == NULL) {
 	igraph_matrix_destroy(&pm);
-	igraph_vector_destroy(&td);
+	igraph_matrix_destroy(&td);
 	igraph_vector_destroy(&in_type_vec);
 	igraph_vector_destroy(&out_type_vec);
 	Py_DECREF(self);
@@ -1475,7 +1475,7 @@ PyObject* igraphmodule_Graph_Asymmetric_Preference(PyTypeObject *type,
 			   attribute_key, type_vec_o) == -1) {
 	  Py_DECREF(type_vec_o);
 	  igraph_matrix_destroy(&pm);
-	  igraph_vector_destroy(&td);
+	  igraph_matrix_destroy(&td);
 	  igraph_vector_destroy(&in_type_vec);
 	  igraph_vector_destroy(&out_type_vec);
 	  Py_DECREF(self);
@@ -2625,13 +2625,14 @@ PyObject* igraphmodule_Graph_transitivity_undirected(igraphmodule_GraphObject *s
 						     PyObject *args,
 						     PyObject *kwds) {
   igraph_real_t res;
-
+  PyObject *r;
+   
   if (igraph_transitivity_undirected(&self->g, &res)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  PyObject *r = Py_BuildValue("d", (double)(res));
+  r = Py_BuildValue("d", (double)(res));
   return r;
 }
 
@@ -4372,7 +4373,7 @@ PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *s
  */
 #define OFF(x) offsetof(igraphmodule_GraphObject, x)
 
-PyGetSetDef igraphmodule_Graph_getseters[] = {
+struct PyGetSetDef igraphmodule_Graph_getseters[] = {
   {"vs", (getter)igraphmodule_Graph_get_vertices, NULL,
       "The sequence of vertices in the graph.", NULL
   },
@@ -4398,7 +4399,7 @@ static PyMemberDef igraphmodule_Graph_members[] = {
 /** \ingroup python_interface
  * \brief Method list of the \c igraph.Graph object type
  */
-PyMethodDef igraphmodule_Graph_methods[] = 
+struct PyMethodDef igraphmodule_Graph_methods[] = 
 {
   ////////////////////////////
   // BASIC IGRAPH INTERFACE //
@@ -5763,9 +5764,9 @@ PyTypeObject igraphmodule_GraphType = {
   offsetof(igraphmodule_GraphObject, weakreflist), /* tp_weaklistoffset */
   0,                                        /* tp_iter */
   0,                                        /* tp_iternext */
-  &igraphmodule_Graph_methods,              /* tp_methods */
+  igraphmodule_Graph_methods,               /* tp_methods */
   0,                                        /* tp_members */
-  &igraphmodule_Graph_getseters,            /* tp_getset */
+  igraphmodule_Graph_getseters,             /* tp_getset */
   0,                                        /* tp_base */
   0,                                        /* tp_dict */
   0,                                        /* tp_descr_get */
