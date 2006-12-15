@@ -29,7 +29,7 @@ class MaxFlowTests(unittest.TestCase):
 
 def suite():
     flow_suite = unittest.makeSuite(MaxFlowTests)
-    return unittest.TestSuite((flow_suite))
+    return unittest.TestSuite([flow_suite])
 
 def test():
     runner = unittest.TextTestRunner()

@@ -7,7 +7,7 @@ class BasicTests(unittest.TestCase):
 	
 def suite():
     basic_suite = unittest.makeSuite(BasicTests)
-    return unittest.TestSuite((basic_suite))
+    return unittest.TestSuite([basic_suite])
 
 def test():
     runner = unittest.TextTestRunner()

@@ -16,7 +16,7 @@ class AttributeTests(unittest.TestCase):
 	
 def suite():
     attribute_suite = unittest.makeSuite(AttributeTests)
-    return unittest.TestSuite((attribute_suite))
+    return unittest.TestSuite([attribute_suite])
 
 def test():
     runner = unittest.TextTestRunner()

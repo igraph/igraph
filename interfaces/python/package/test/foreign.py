@@ -39,7 +39,7 @@ a 3 4 5
 
 def suite():
     foreign_suite = unittest.makeSuite(ForeignTests)
-    return unittest.TestSuite((foreign_suite))
+    return unittest.TestSuite([foreign_suite])
 
 def test():
     runner = unittest.TextTestRunner()

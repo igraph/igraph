@@ -37,7 +37,7 @@ class GameTests(unittest.TestCase):
 
 def suite():
     game_suite = unittest.makeSuite(GameTests)
-    return unittest.TestSuite((game_suite))
+    return unittest.TestSuite([game_suite])
 
 def test():
     runner = unittest.TextTestRunner()

@@ -92,10 +92,10 @@ def suite():
     degree_suite = unittest.makeSuite(DegreeTests)
     local_transitivity_suite = unittest.makeSuite(LocalTransitivityTests)
     misc_suite = unittest.makeSuite(MiscTests)
-    return unittest.TestSuite((simple_suite,
+    return unittest.TestSuite([simple_suite,
 			       degree_suite,
 	                       local_transitivity_suite,
-			       misc_suite))
+			       misc_suite])
 
 def test():
     runner = unittest.TextTestRunner()

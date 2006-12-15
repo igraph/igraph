@@ -22,7 +22,7 @@ class SpectralTests(unittest.TestCase):
 	
 def suite():
     spectral_suite = unittest.makeSuite(SpectralTests)
-    return unittest.TestSuite((spectral_suite))
+    return unittest.TestSuite([spectral_suite])
 
 def test():
     runner = unittest.TextTestRunner()
