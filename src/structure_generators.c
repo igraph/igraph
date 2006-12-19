@@ -837,6 +837,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
   long int i, j, in;
   long int *added;
   igraph_vector_t neis;
+  igraph_bool_t directed;
   
   if (order<0) {
     IGRAPH_ERROR("Negative order, cannot connect neighborhood", IGRAPH_EINVAL);
@@ -845,6 +846,8 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
   if (order<2) { 
     IGRAPH_WARNING("Order smaller than two, graph will be unchanged");
   }
+
+  directed=igraph_is_directed(graph);
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   added=Calloc(no_of_nodes, long int);
@@ -882,12 +885,14 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 	    added[nei]=i+1;
 	    IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
 	    IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
-	    if (mode == IGRAPH_OUT) {
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
-	    } else {
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+	    if (directed || i < nei) {
+	      if (mode == IGRAPH_IN) {
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	      } else {
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+	      }
 	    }
 	  }
 	}
@@ -896,12 +901,14 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 	  long int nei=VECTOR(neis)[j];
 	  if (added[nei] != i+1) {
 	    added[nei]=i+1;
-	    if (mode == IGRAPH_OUT) {
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
-	    } else {
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	      IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+	    if (directed || i < nei) {
+	      if (mode == IGRAPH_IN) {
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+	      } else {
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+		IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
+	      }
 	    }
 	  }
 	}

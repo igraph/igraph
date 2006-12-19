@@ -4,6 +4,9 @@
 	(igraph_lattice) : 'nei' argument implemented
 
 	* src/games.c (igraph_rewire_edges, igraph_watts_strogatz_game) : added
+
+	* src/structure_generators.c (igraph_connect_neighorhood) : two bugs
+	corrected
 	
 2006-12-09  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
