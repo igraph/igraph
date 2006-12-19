@@ -276,3 +276,17 @@ connect.neighborhood <- function(graph, order, mode="all") {
         PACKAGE="igraph")
 }
 
+rewire.edges <- function(graph, prob) {
+  if (!is.graph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_rewire_edges", graph, as.numeric(prob),
+        PACKAGE="igraph")
+}
+
+watts.strogatz.game <- function(dim, size, nei, p) {
+  .Call("R_igraph_watts_strogatz_game", as.numeric(dim), as.numeric(size),
+        as.numeric(nei), as.numeric(p),
+        PACKAGE="igraph")
+}
+

@@ -4900,3 +4900,42 @@ SEXP R_igraph_connect_neighborhood(SEXP graph, SEXP porder, SEXP pmode) {
   return result;
 }
 
+SEXP R_igraph_rewire_edges(SEXP graph, SEXP pprob) {
+  
+  igraph_t g;
+  igraph_real_t prob=REAL(pprob)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_rewire_edges(&g, prob);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_watts_strogatz_game(SEXP pdim, SEXP psize, SEXP pnei, SEXP pp) {
+  
+  igraph_t g;
+  igraph_integer_t dim=REAL(pdim)[0];
+  igraph_integer_t size=REAL(psize)[0];
+  igraph_integer_t nei=REAL(pnei)[0];
+  igraph_real_t p=REAL(pp)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  igraph_watts_strogatz_game(&g, dim, size, nei, p);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

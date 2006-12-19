@@ -4,6 +4,11 @@
 	* interfaces/R/src/rinterface.c (R_igraph_connect_neighborhood) : 
 	added
 
+	* interfaces/R/igraph/R/games.R (rewire.edges, watts.strogatz.game) :
+	added
+	* interfaces/R/src/rinterface.c (R_igraph_rewire_edges)
+	(R_igraph_watts_strogatz_game) : added
+
 2006-12-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/tkplot.R (.tkplot.select.color) : 

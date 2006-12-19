@@ -1749,3 +1749,77 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
+
+  igraph_t newgraph;
+  igraph_vector_t edges;
+  long int no_of_edges=igraph_ecount(graph);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int endpoints=no_of_edges*2;
+  long int to_rewire;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, endpoints);
+  IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
+  
+  /* Now do the rewiring, fast method. 
+     Each endpoint of an edge is rewired with probability p.
+     So the "skips" between the really rewired endpoints follow a 
+     geometric distribution.
+  */
+
+  RNG_BEGIN();
+
+  if (prob != 0) {
+    to_rewire=RNG_GEOM(prob)+1;
+    while (to_rewire <= endpoints) {
+      VECTOR(edges)[ to_rewire-1 ] = RNG_INTEGER(0, no_of_nodes-1);
+      to_rewire += RNG_GEOM(prob)+1;
+    }
+  }
+  
+  RNG_END();
+  
+  IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, 
+			     igraph_is_directed(graph)));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1); 
+  
+  IGRAPH_FINALLY(igraph_destroy, &newgraph);
+  IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
+  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph);
+  IGRAPH_FINALLY_CLEAN(1);
+  igraph_destroy(graph);
+  *graph=newgraph;
+  
+  return 0;
+}
+
+int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
+			       igraph_integer_t size, igraph_integer_t nei,
+			       igraph_real_t p) {
+  
+  igraph_vector_t dimvector;
+  long int i;
+
+  /* Create the lattice first */
+
+  IGRAPH_VECTOR_INIT_FINALLY(&dimvector, dim);
+  for (i=0; i<dim; i++) {
+    VECTOR(dimvector)[i] = size;
+  }
+  
+  IGRAPH_CHECK(igraph_lattice(graph, &dimvector, nei, IGRAPH_UNDIRECTED,
+			      0 /* mutual */, 1 /* circular */));
+  igraph_vector_destroy(&dimvector);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  
+  /* Rewire the edges then */
+
+  IGRAPH_CHECK(igraph_rewire_edges(graph, p));
+
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+  

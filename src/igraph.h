@@ -547,6 +547,8 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
 int igraph_atlas(igraph_t *graph, int number);
 int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
 				 const igraph_matrix_t *W);
+int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
+				igraph_neimode_t mode);
 
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */
@@ -629,8 +631,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 				      igraph_vector_t *node_type_out_vec,
 				      igraph_bool_t loops);
 
-int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
-				igraph_neimode_t mode);
+int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob);
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */
