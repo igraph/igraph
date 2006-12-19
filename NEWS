@@ -1,3 +1,105 @@
+=========
+igraph 0.3.2
+=========
+
+Released Dec 19, 2006
+
+This is a new major release, it contains many new things:
+
+Changes in the C library
+------------------------
+
+- igraph_maxdegree added, calculates the maximum degree in the graph
+- igraph_grg_game, geometric random graphs
+- igraph_density, graph density calculation
+- push-relabel maximum flow algorithm added, igraph_maxflow_value
+- minimum cut functions added based on maximum flow:
+  igraph_st_mincut_value, igraph_mincut_value, the Stoer-Wagner
+  algorithm is implemented for undirected graphs
+- vertex connectivity functions, usually based on maximum flow:
+  igraph_st_vertex_connectivity, igraph_vertex_connectivity
+- edge connectivity functions, usually based on maximum flow:
+  igraph_st_edge_connectivity, igraph_edge_connectivity
+- other functions based on maximum flow: igraph_edge_disjoint_paths,
+  igraph_vertex_disjoint_paths, igraph_adhesion, igraph_cohesion
+- dimacs file format added
+- igraph_to_directed handles attributes
+- igraph_constraint calculation corrected, it handles weighted graphs
+- spinglass-based community structure detection, the Joerg Reichardt --
+  Stefan Bornholdt algorithm added: igraph_spinglass_community,
+  igraph_spinglass_my_community
+- igraph_extended_chordal_rings, it creates extended chordal rings
+- 'no' argument added to igraph_clusters, it is possible to calculate
+  the number of clusters without calculating the clusters themselves
+- minimum spanning tree functions keep attributes now and also the 
+  direction of the edges is kept in directed graphs
+- there are separate functions to calculate different types of
+  transitivity now
+- igraph_delete_vertices rewritten to allocate less memory for the new
+  graph 
+- neighborhood related functions added: igraph_neighborhood,
+  igraph_neighborhood_size, igraph_neighborhood_graphs
+- two new games added based on different node types:
+  igraph_preference_game and igraph_asymmetric_preference_game
+- Laplacian of a graph can be calculated by the igraph_laplacian function
+
+Changes in the R interface
+--------------------------
+
+- bonpow function ported from SNA to calculate Bonacich power centrality
+- get.adjacency supports attributes now, this means that it sets the
+  colnames  and rownames attributes and can return attribute values in
+  the matrix instead of 0/1
+- grg.game, geometric random graphs
+- graph.density, graph density calculation
+- edge and vertex attributes can be added easily now when added new
+  edges with add.edges or new vertices with add.vertices
+- graph.data.frame creates graph from data frames, this can be used to 
+  create graphs with edge attributes easily
+- plot.igraph and tkplot can plot self-loop edges now
+- graph.edgelist to create a graph from an edge list, can also handle 
+  edge lists with symbolic names
+- get.edgelist has now a 'names' argument and can return symbolic
+  vertex names instead of vertex ids, by default id uses the 'name'
+  vertex attribute is returned 
+- printing graphs on screen also prints symbolic symbolic names
+  (the 'name' attribute if present)
+- maximum flow and minimum cut functions: graph.maxflow, graph.mincut
+- vertex and edge connectivity: edge.connectivity, vertex.connectivity
+- edge and vertex disjoint paths: edge.disjoint.paths, 
+  vertex.disjoint.paths
+- White's cohesion and adhesion measure: graph.adhesion, graph.cohesion
+- dimacs file format added
+- as.directed handles attributes now
+- constraint corrected, it handles weighted graphs as well now
+- weighted attribute to graph.adjacency
+- spinglass-based community structure detection, the Joerg Reichardt --
+  Stefan Bornholdt algorithm added: spinglass.community
+- graph.extended.chordal.ring, extended chordal ring generation
+- no.clusters calculates the number of clusters without calculating
+  the clusters themselves
+- minimum spanning tree functions updated to keep attributes
+- transitivity can calculate local transitivity as well
+- neighborhood related functions added: neighborhood,
+  neighborhood.size, graph.neighborhood
+- new graph generators based on vertex types: preference.game and
+  asymmetric.preference.game
+
+Bugs corrected
+--------------
+
+- attribute handling bug when deleting edges corrected
+- GraphML escaping and NaN handling corrected
+- bug corrected to make it possible compile the R package without the 
+  libxml2 library
+- a bug in Erdos-Renyi graph generation corrected: it had problems 
+  with generating large directed graphs
+- bug in constraint calculation corrected, it works well now
+- fixed memory leaks in igraph_read_graph_graphml
+- error handling bug corrected in igraph_read_graph_graphml
+- bug corrected in R version of graph.laplacian when normalized
+  Laplacian is requested
+- memory leak corrected in get.all.shortest.paths in the R package
 
 =========
 igraph 0.2.1

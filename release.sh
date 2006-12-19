@@ -56,6 +56,8 @@ reg=re.compile(r"</p>\s*<li>", re.MULTILINE)
 news=reg.sub("</p><ul><li>", news)
 reg=re.compile(r"(?P<url>http://[^\n ]+)")
 news=reg.sub("<a href=\"\g<url>\">\g<url></a>", news)
+reg=re.compile(r"^(?P<text>.*)\n-------*$", re.MULTILINE)
+news=reg.sub("<h3>\g<text></h3>", news)
 
 htmlfile=open("doc/igraph.html")
 html=htmlfile.read()
