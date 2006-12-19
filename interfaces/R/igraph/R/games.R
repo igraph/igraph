@@ -277,7 +277,7 @@ connect.neighborhood <- function(graph, order, mode="all") {
 }
 
 rewire.edges <- function(graph, prob) {
-  if (!is.graph(graph)) {
+  if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   .Call("R_igraph_rewire_edges", graph, as.numeric(prob),
