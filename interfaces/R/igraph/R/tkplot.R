@@ -807,7 +807,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 .tkplot.create.edges <- function(tkp.id) {
   tkp <- .tkplot.get(tkp.id)
   n <- ecount(tkp$graph)
-  edgematrix <- get.edgelist(tkp$graph)
+  edgematrix <- get.edgelist(tkp$graph, names=FALSE)
   mapply(function(from, to, id) .tkplot.create.edge(tkp.id, from, to, id),
          edgematrix[,1],
          edgematrix[,2], 1:nrow(edgematrix))
