@@ -1361,7 +1361,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
 .tkplot.select.color <- function(initialcolor) {
   
-  color <- tclvalue(tkcmd("tk_chooseColor", initialcolor=initialcolor,
-                          title="Choose a color"))
+  color <- tclvalue(tcl("tk_chooseColor", initialcolor=initialcolor,
+                        title="Choose a color"))
   return(color);
 }
