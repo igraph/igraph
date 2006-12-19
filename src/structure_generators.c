@@ -393,10 +393,10 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  *         \c IGRAPH_EINVAL: invalid (negative)
  *         dimension vector. 
  *
- * Time complexity: O(|V|+|E|) (as
- * far as i remember), |V| and
- * |E| are the number of vertices 
- * and edges in the generated graph.
+ * Time complexity: if \p nei is less than two then it is O(|V|+|E|) (as
+ * far as i remember), |V| and |E| are the number of vertices 
+ * and edges in the generated graph. Otherwise it is O(|V|*d^o+|E|), d
+ * is the average degree of the graph, o is the \p nei argument.
  */
 int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_integer_t nei, 
 		   igraph_bool_t directed, igraph_bool_t mutual, igraph_bool_t circular) {
@@ -826,6 +826,34 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
 /**
  * \function igraph_connect_neighborhood
  * \brief Connects every vertex to its neighborhood
+ * 
+ * This function adds new edges to graph. For each vertex 
+ * vertices reachable by at most \p order steps and not yet connected
+ * to the vertex a new edge is created.
+ * 
+ * </para><para> Note that the input graph is modified in place, no
+ * new graph is created, call \ref igraph_copy() if you want to keep
+ * the original graph as well.
+ * 
+ * </para><para> For undirected graphs reachability is always
+ * symmetric, if vertex A can be reached from vertex B in at
+ * most \p order steps, then the opposite is also true. Only one
+ * undirected (A,B) edge will be added in this case.
+ * \param graph The input graph, this is the output graph as well.
+ * \param order Integer constant, it gives the distance within which
+ *    the vertices will be connected to the source vertex.
+ * \param mode Constant, it specifies how the neighborhood search is
+ *    performed for directed graphs. If \c IGRAPH_OUT then vertices
+ *    reachable from the source vertex will be connected, \c IGRAPH_IN
+ *    is the opposite. If \c IGRAPH_ALL then the directed graph is
+ *    considered as an undirected one.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_lattice() uses this function to connect the
+ * neighborhood of the vertices.
+ * 
+ * Time complexity: O(|V|*d^o), |V| is the number of vertices in the
+ * graph, d is the average degree and o is the \p order argument.
  */
 
 int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
@@ -837,7 +865,6 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
   long int i, j, in;
   long int *added;
   igraph_vector_t neis;
-  igraph_bool_t directed;
   
   if (order<0) {
     IGRAPH_ERROR("Negative order, cannot connect neighborhood", IGRAPH_EINVAL);
@@ -847,7 +874,9 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
     IGRAPH_WARNING("Order smaller than two, graph will be unchanged");
   }
 
-  directed=igraph_is_directed(graph);
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   added=Calloc(no_of_nodes, long int);
@@ -885,7 +914,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 	    added[nei]=i+1;
 	    IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
 	    IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
-	    if (directed || i < nei) {
+	    if (mode != IGRAPH_ALL || i < nei) {
 	      if (mode == IGRAPH_IN) {
 		IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
 		IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
@@ -901,7 +930,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 	  long int nei=VECTOR(neis)[j];
 	  if (added[nei] != i+1) {
 	    added[nei]=i+1;
-	    if (directed || i < nei) {
+	    if (mode != IGRAPH_ALL || i < nei) {
 	      if (mode == IGRAPH_IN) {
 		IGRAPH_CHECK(igraph_vector_push_back(&edges, nei));
 		IGRAPH_CHECK(igraph_vector_push_back(&edges, i));

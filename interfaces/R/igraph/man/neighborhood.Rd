@@ -2,6 +2,7 @@
 \alias{neighborhood}
 \alias{neighborhood.size}
 \alias{graph.neighborhood}
+\alias{connect.neighborhood}
 \title{Neighborhood of graph vertices}
 \description{These functions find the vertices not farther than a given
   limit from another fixed vertex, these are called the neighborhood of
@@ -10,6 +11,7 @@
 neighborhood.size(graph, order, nodes=V(graph), mode="all")
 neighborhood(graph, order, nodes=V(graph), mode="all")
 graph.neighborhood(graph, order, nodes=V(graph), mode="all")
+connect.neighborhood(graph, order, mode="all")
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -37,9 +39,12 @@ graph.neighborhood(graph, order, nodes=V(graph), mode="all")
   \code{neighborhood} calculates the neighborhoods of the given vertices
   with the given order parameter.
 
-  \code{neighborhood} is creates (sub)graphs from all neighborhoods of
+  \code{graph.neighborhood} is creates (sub)graphs from all neighborhoods of
   the given vertices with the given order parameter. This function
   preserves the vertex, edge and graph attributes.
+
+  \code{connect.neighborhood} creates a new graph by connecting each
+  vertex to all other vertices in its neighborhood.
 }
 \value{
   \code{neighborhood.size} returns with an integer vector.
@@ -47,6 +52,8 @@ graph.neighborhood(graph, order, nodes=V(graph), mode="all")
   \code{neighborhood} returns with a list of integer vectors.
 
   \code{graph.neighborhood} returns with a list of graphs.
+
+  \code{connect.neighborhood} returns with a new graph object.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}, the first version was
   done by Vincent Matossian}
@@ -62,5 +69,9 @@ neighborhood(g, 2, 1:3)
 # attributes are preserved
 V(g)$name <- c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j")
 graph.neighborhood(g, 2, 1:3)
+
+# connecting to the neighborhood
+g <- graph.ring(10)
+g <- connect.neighborhood(g, 2)
 }
 \keyword{graphs}

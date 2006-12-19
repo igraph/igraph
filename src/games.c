@@ -1750,6 +1750,30 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   return 0;
 }
 
+/**
+ * \function igraph_rewire_edges
+ * \brief Rewire the edges of a graph with constant probability
+ * 
+ * This function rewires the edges of a graph with a constant
+ * probability. More precisely each end point of each edge is rewired
+ * to an uniformly randomly chosen vertex with constant probability \p
+ * prob.
+ * 
+ * </para><para> Note that this function modifies the input \p graph,
+ * call \ref igraph_copy() if you want to keep it.
+ * 
+ * \param graph The input graph, this will be rewired, it can be
+ *    directed or undirected.
+ * \param prob The rewiring probability a constant between zero and
+ *    one (inclusive).
+ * \return Error code.
+ * 
+ * \sa \ref igraph_watts_strogatz_game() uses this function for the
+ * rewiring.
+ * 
+ * Time complexity: O(|V|+|E|).
+ */
+
 int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
 
   igraph_t newgraph;
@@ -1799,6 +1823,37 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
   
   return 0;
 }
+
+/**
+ * \function igraph_watts_strogatz_game
+ * \brief The Watts-Strogatz small-world model
+ * 
+ * This function generates a graph according to the Watts-Strogatz
+ * model of small-world networks. The graph is obtained by creating a
+ * circular undirected lattice and then rewire the edges randomly with
+ * a constant probability.
+ * 
+ * </para><para>See also: Duncan J Watts and Steven H Strogatz:
+ * Collective dynamics of <quote>small world</quote> networks, Nature
+ * 393, 440-442, 1998.
+ * \param graph The graph to initialize.
+ * \param dim The dimension of the lattice.
+ * \param size The size of the lattice along each dimension.
+ * \param nei The size of the neighborhood for each vertex. This is
+ *    the same as the \p nei argument of \ref
+ *    igraph_connect_neighborhood(). 
+ * \param p The rewiring probability. A real number between zero and
+ *   one (inclusive). 
+ * \return Error code.
+ * 
+ * \sa \ref igraph_lattice(), \ref igraph_connect_neighborhood() and
+ * \ref igraph_rewire_edges() can be used if more flexibility is
+ * needed, eg. a different type of lattice.
+ * 
+ * Time complexity: O(|V|*d^o+|E|), |V| ans |E| are the number of
+ * vertices and edges, d is the average degree, o is the \p nei
+ * argument.
+ */
 
 int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 			       igraph_integer_t size, igraph_integer_t nei,
