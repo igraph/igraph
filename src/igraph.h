@@ -632,6 +632,10 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 				      igraph_bool_t loops);
 
 int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob);
+int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
+			       igraph_integer_t size, igraph_integer_t nei,
+			       igraph_real_t p);
+
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */
