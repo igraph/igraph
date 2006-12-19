@@ -629,6 +629,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 				      igraph_vector_t *node_type_out_vec,
 				      igraph_bool_t loops);
 
+int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
+				igraph_neimode_t mode);
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */

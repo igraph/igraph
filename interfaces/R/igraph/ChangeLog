@@ -1,3 +1,14 @@
+2006-12-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/games.R (connect.neighborhood) : added
+	* interfaces/R/src/rinterface.c (R_igraph_connect_neighborhood) : 
+	added
+
+2006-12-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/tkplot.R (.tkplot.select.color) : 
+	replaced deprecated 'tkcmd' with 'tcl'
+
 2006-12-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/src/rinterface.c 

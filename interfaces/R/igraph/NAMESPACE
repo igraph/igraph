@@ -48,7 +48,7 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
        aging.prefatt.game, aging.barabasi.game, aging.ba.game,
        growing.random.game, barabasi.game, ba.game,
        callaway.traits.game, establishment.game, grg.game,
-       preference.game, asymmetric.preference.game)
+       preference.game, asymmetric.preference.game, connect.neighborhood)
 
 # community structure
 

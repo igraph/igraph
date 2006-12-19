@@ -262,3 +262,17 @@ asymmetric.preference.game <- function(nodes, types,
         as.logical(loops),
         PACKAGE="igraph")
 }
+
+connect.neighborhood <- function(graph, order, mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+  }
+
+  .Call("R_igraph_connect_neighborhood", graph, as.numeric(order),
+        as.numeric(mode),
+        PACKAGE="igraph")
+}
+

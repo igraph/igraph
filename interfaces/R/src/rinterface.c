@@ -4880,3 +4880,23 @@ SEXP R_igraph_laplacian(SEXP graph, SEXP pnormalized) {
   return result;
 }
 
+SEXP R_igraph_connect_neighborhood(SEXP graph, SEXP porder, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_integer_t order=REAL(porder)[0];
+  igraph_integer_t mode=REAL(pmode)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph_copy(graph, &g);
+  igraph_connect_neighborhood(&g, order, mode);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
