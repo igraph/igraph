@@ -7,6 +7,9 @@
 
 	* src/structure_generators.c (igraph_connect_neighorhood) : two bugs
 	corrected
+
+	* src/games.c (igraph_rewire_edges, igraph_watts_strogatz_game) : 
+	argument checks added
 	
 2006-12-09  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 

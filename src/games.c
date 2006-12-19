@@ -1758,6 +1758,11 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
   long int no_of_nodes=igraph_vcount(graph);
   long int endpoints=no_of_edges*2;
   long int to_rewire;
+
+  if (prob < 0 || prob > 1) {
+    IGRAPH_ERROR("Rewiring probability should be between zero and one",
+		 IGRAPH_EINVAL);
+  }
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, endpoints);
   IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
@@ -1801,6 +1806,18 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
   
   igraph_vector_t dimvector;
   long int i;
+
+  if (dim < 1) {
+    IGRAPH_ERROR("WS game: dimension should be at least one", IGRAPH_EINVAL);
+  }
+  if (size < 1) { 
+    IGRAPH_ERROR("WS game: lattice size should be at least one", 
+		 IGRAPH_EINVAL);
+  }
+  if (p < 0 || p > 1) {
+    IGRAPH_ERROR("WS game: rewiring probability should be between 0 and 1",
+		 IGRAPH_EINVAL);
+  }
 
   /* Create the lattice first */
 
