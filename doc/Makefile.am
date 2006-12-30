@@ -53,11 +53,11 @@ generators.xml: generators.xxml $(SRCDIR)/structure_generators.c $(SRCDIR)/games
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c \
 		$(SRCDIR)/cocitation.c $(SRCDIR)/components.c \
-		$(SRCDIR)/spectral_properties.c
+		$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/conversion.c \
 	$(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c $(SRCDIR)/components.c \
-	$(SRCDIR)/spectral_properties.c
+	$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(SRCDIR)/igraph.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \

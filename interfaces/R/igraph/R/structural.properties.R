@@ -480,3 +480,15 @@ graph.neighborhood <- function(graph, order, nodes=V(graph), mode="all") {
         as.igraph.vs(nodes), as.numeric(order), as.numeric(mode),
         PACKAGE="igraph")
 }
+
+graph.kcores <- function(graph, mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
+  .Call("R_igraph_k_cores", graph, as.numeric(mode),
+        PACKAGE="igraph")
+}
+

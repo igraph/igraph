@@ -64,6 +64,10 @@
 <!-- doxrox-include igraph_laplacian -->
 </section>
 
+<section><title>K-Cores</title>
+<!-- doxrox-include igraph_k_cores -->
+</section>
+
 <section><title>Other Operations</title>
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_simplify -->

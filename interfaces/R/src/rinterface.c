@@ -4939,3 +4939,26 @@ SEXP R_igraph_watts_strogatz_game(SEXP pdim, SEXP psize, SEXP pnei, SEXP pp) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_k_cores(SEXP graph, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_integer_t mode=REAL(pmode)[0];
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&res, 0);
+  igraph_k_cores(&g, &res, mode);
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}

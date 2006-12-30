@@ -977,6 +977,13 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res);
 int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res);
 
 /* -------------------------------------------------- */
+/* K-Cores                                            */
+/* -------------------------------------------------- */
+
+int igraph_k_cores(const igraph_t *graph, igraph_vector_t *cores,
+		   igraph_neimode_t mode);
+
+/* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 

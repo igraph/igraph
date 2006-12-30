@@ -25,7 +25,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     igraph_psumtree.c array.c igraph_hashtable.c \
 			     foreign-graphml.c flow.c igraph_buckets.c \
 			     NetDataTypes.cpp NetRoutines.cpp clustertool.cpp \
-			     pottsmodel_2.cpp spectral_properties.c
+			     pottsmodel_2.cpp spectral_properties.c cores.c
 libigraph_la_CFLAGS        = -O6 -Wall
 libigraph_la_CXXFLAGS	   = -O6 -Wall
 libigraph_la_LDFLAGS       = -no-undefined
