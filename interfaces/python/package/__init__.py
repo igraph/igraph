@@ -326,3 +326,137 @@ class Graph(_igraph.Graph):
 	    if tmpfilename is not None: os.unlink(tmpfilename)
 	return result
     Read_GraphMLz = classmethod(Read_GraphMLz)
+
+    def write_svg(self, fname, layout, width = None, height = None, \
+		  labels = "label", colors = "color", \
+		  vertex_size = 10, *args, **kwds):
+	"""Saves the graph as an SVG (Scalable Vector Graphics) file
+	
+	@param fname: the name of the file
+	@param layout: the layout of the graph. Can be either an
+	  explicitly specified layout (using a list of coordinate
+	  pairs) or the name of a layout algorithm (which should
+	  refer to a method in the L{Graph} object, but without
+	  the C{layout_} prefix.
+        @param width: the preferred width in pixels (default: 400)
+	@param height: the preferred height in pixels (default: 400)
+	@param labels: the vertex labels. Either it is the name of
+	  a vertex attribute to use, or a list explicitly specifying
+	  the labels.
+        @param colors: the vertex colors. Either it is the name of
+	  a vertex attribute to use, or a list explicitly specifying
+	  the colors. A color can be anything acceptable in an SVG
+	  file.
+        @param vertex_size: vertex size in pixels
+	"""
+	if width is None and height is None:
+	    width = 400
+	    height = 400
+	elif width is None:
+	    width = height
+	elif height is None:
+	    height = width
+		
+	if width<=0 or height<=0:
+	    raise ValueError, "width and height must be positive"
+
+	if isinstance(layout, str):
+	    f=getattr(Graph, "layout_"+layout);
+	    layout=f(self, *args)
+
+	if isinstance(labels, str):
+	    try:
+		labels = self.vs.get_attribute_values(labels)
+	    except KeyError:
+		labels = [x+1 for x in xrange(self.vcount())]
+
+	if isinstance(colors, str):
+	    try:
+		colors = self.vs.get_attribute_values(colors)
+	    except KeyError:
+		colors = ["red" for x in xrange(self.vcount())]
+
+	vc = self.vcount()
+	while len(labels)<vc: labels.append(len(labels)+1)
+	while len(colors)<vc: colors.append("red")
+
+	f=open(fname, "w")
+		
+	maxs=[layout[0][dim] for dim in range(2)]
+	mins=[layout[0][dim] for dim in range(2)]
+		
+	for rowidx in range(1, len(layout)):
+	    row = layout[rowidx]
+	    for dim in range(0, 2):
+		if maxs[dim]<row[dim]: maxs[dim]=row[dim]
+		if mins[dim]>row[dim]: mins[dim]=row[dim]
+		
+	sizes=[width, height]
+	halfsizes=[(maxs[dim]+mins[dim])/2.0 for dim in range(2)]
+	ratios=[sizes[dim]/(maxs[dim]-mins[dim]) for dim in range(2)]
+	layout=[[(row[0]-halfsizes[0])*ratios[0], \
+		 (row[1]-halfsizes[1])*ratios[1]] \
+		for row in layout]
+
+	print >>f, "<?xml version=\"1.0\" standalone=\"no\"?>"
+	print >>f, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
+	print >>f, "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
+	
+	print >>f, "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">" % (width+2*vertex_size, height+2*vertex_size)
+	print >>f, "<!-- Created by igraph -->"
+	print >>f
+	print >>f, "<defs>"
+	print >>f, "  <marker id=\"Triangle\" viewBox=\"0 0 10 10\""
+	print >>f, "    refX=\"10\" refY=\"5\" orient=\"auto\""
+	print >>f, "    markerUnits=\"strokeWidth\""
+	print >>f, "    markerWidth=\"16\" markerHeight=\"8\">"
+	print >>f, "    <path d=\"M 0 0 L 10 5 L 0 10 z\"/>"
+	print >>f, "  </marker>"
+	print >>f, "  <style type=\"text/css\">"
+	print >>f, "    <![CDATA["
+	print >>f, "#vertices circle { stroke: black; stroke-width: 1 }"
+	print >>f, "#vertices text { text-anchor: middle; font-size: 16; font-family: sans-serif; font-weight: normal }"
+	if self.is_directed():
+	    print >>f, "#edges line { stroke: black; stroke-width: 1; marker-end: url(#Triangle) }"
+	else:
+	    print >>f, "#edges line { stroke: black; stroke-width: 1 }"
+        print >>f, "    ]]>"
+	print >>f, "  </style>"
+	print >>f, "</defs>"
+	print >>f
+	print >>f, "<g transform=\"translate(%.4f,%.4f)\">" % (width/2.0+vertex_size, height/2.0+vertex_size)
+	print >>f, "  <g id=\"edges\">"
+	print >>f, "  <!-- Edges -->"
+
+	has_edge_opacities = "opacity" in self.edge_attributes()
+	for edge in self.es:
+	    vidxs = edge.tuple
+	    x1 = layout[vidxs[0]][0]
+	    y1 = layout[vidxs[0]][1]
+	    x2 = layout[vidxs[1]][0]
+	    y2 = layout[vidxs[1]][1]
+	    angle = math.atan2(y2-y1, x2-x1)
+	    x2 = x2 - 10*math.cos(angle)
+	    y2 = y2 - 10*math.sin(angle)
+	    if has_edge_opacities:
+		print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\" style=\"stroke-opacity:%.2f\"/>" % (x1, y1, x2, y2, float(edge["opacity"]))
+	    else:
+		print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\"/>" % (x1, y1, x2, y2)
+
+	print >>f, "  </g>"
+	print >>f
+
+	print >>f, "  <g id=\"vertices\">"
+	print >>f, "  <!-- Vertices -->"
+	for vidx in range(self.vcount()):
+	    print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % (layout[vidx][0], layout[vidx][1])
+	    print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"10\" fill=\"%s\"/>" % str(colors[vidx])
+	    print >>f, "      <text x=\"0\" y=\"5\">%s</text>" % str(labels[vidx])
+	    print >>f, "    </g>"
+
+	print >>f, "  </g>"
+	print >>f, "</g>"
+	print >>f
+	print >>f, "</svg>"
+		
+	f.close()

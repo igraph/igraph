@@ -64,6 +64,8 @@
 
   <xi:include href="structural.xml"/>
 
+  <xi:include href="cliques.xml"/>
+
   <xi:include href="isomorphism.xml"/>
 
   <xi:include href="motifs.xml"/>

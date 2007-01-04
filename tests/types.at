@@ -90,3 +90,9 @@ AT_SETUP([Special heap for minimum cuts (igraph_i_cutheap_t): ])
 AT_KEYWORDS([heap minimum cut])
 AT_COMPILE_CHECK([simple/igraph_i_cutheap.c], [simple/igraph_i_cutheap.out])
 AT_CLEANUP
+
+AT_SETUP([Set (igraph_set_t): ])
+AT_KEYWORDS([set igraph_set_t])
+AT_COMPILE_CHECK([simple/igraph_set.c], [simple/igraph_set.out])
+AT_CLEANUP
+

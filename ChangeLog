@@ -1,3 +1,16 @@
+2007-01-04  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/cliques.c (igraph_cliques, igraph_independent_vertex_sets)
+	(igraph_maximal_cliques, igraph_maximal_independent_vertex_sets)
+	(igraph_clique_number, igraph_independence_number) : added
+
+	* src/igraph_set.c : added
+
+	* src/adjlist.c (igraph_i_adjlist_sort)
+	(igraph_i_adjlist_init_complementer) : added
+
+	* tests/cliques.at : added
+
 2006-12-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/cores.c (igraph_kcores) : added

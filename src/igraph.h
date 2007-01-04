@@ -735,6 +735,23 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
 /* TODO: cluster.distribution (?) */
 
 /* -------------------------------------------------- */
+/* Cliques, maximal independent vertex sets           */
+/* -------------------------------------------------- */
+
+int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
+                   igraph_integer_t min_size, igraph_integer_t max_size);
+int igraph_maximal_cliques(const igraph_t *graph,
+			   igraph_vector_ptr_t *res);
+int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
+int igraph_independent_vertex_sets(const igraph_t *graph,
+				   igraph_vector_ptr_t *res,
+				   igraph_integer_t min_size,
+				   igraph_integer_t max_size);
+int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
+					   igraph_vector_ptr_t *res);
+int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no);
+
+/* -------------------------------------------------- */
 /* Layouts                                            */
 /* -------------------------------------------------- */
 
@@ -1125,7 +1142,12 @@ typedef struct igraph_i_adjlist_t {
 
 int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al, 
 			  igraph_neimode_t mode);
+int igraph_i_adjlist_init_complementer(const igraph_t *graph,
+				       igraph_i_adjlist_t *al, 
+				       igraph_neimode_t mode,
+				       igraph_bool_t loops);
 void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al);
+void igraph_i_adjlist_sort(igraph_i_adjlist_t *al);
 /* igraph_vector_t *igraph_i_adjlist_get(const igraph_i_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
 #define igraph_i_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])

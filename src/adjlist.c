@@ -24,6 +24,8 @@
 #include "igraph.h"
 #include "memory.h"
 
+#include <string.h>   /* memset */
+
 int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al, 
 			  igraph_neimode_t mode) {
   long int i;
@@ -51,6 +53,63 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
   return 0;
 }
 
+int igraph_i_adjlist_init_complementer(const igraph_t *graph,
+				       igraph_i_adjlist_t *al, 
+				       igraph_neimode_t mode,
+				       igraph_bool_t loops) {
+  long int i, j, k, n;
+  igraph_bool_t* seen;
+  igraph_vector_t vec;
+
+  if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_EINVMODE);
+  }
+
+  if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
+
+  al->length=igraph_vcount(graph);
+  al->adjs=Calloc(al->length, igraph_vector_t);
+  if (al->adjs == 0) {
+    IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
+  }
+
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, al);
+
+  n=al->length;
+  seen=Calloc(n, igraph_bool_t);
+  if (seen==0) {
+    IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, seen);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+
+  for (i=0; i<al->length; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    igraph_neighbors(graph, &vec, i, mode);
+    memset(seen, 0, sizeof(igraph_bool_t)*al->length);
+    n=al->length;
+    if (!loops) { seen[i] = 1; n--; }
+    for (j=0; j<igraph_vector_size(&vec); j++) {
+      if (! seen [ (long int) VECTOR(vec)[j] ] ) {
+	n--;
+	seen[ (long int) VECTOR(vec)[j] ] = 1;
+      }
+    }
+    IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], n));
+    for (j=0, k=0; k<n; j++) {
+      if (!seen[j]) {
+	VECTOR(al->adjs[i])[k++] = j;
+      }
+    }
+  }
+
+  Free(seen);
+  igraph_vector_destroy(&vec);
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}
+
 void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
@@ -62,6 +121,12 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
 /* igraph_vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, igraph_integer_t no) { */
 /*   return &al->adjs[(long int)no]; */
 /* } */
+
+void igraph_i_adjlist_sort(igraph_i_adjlist_t *al) {
+  long int i;
+  for (i=0; i<al->length; i++)
+    igraph_vector_sort(&al->adjs[i]);
+}
 
 int igraph_i_adjedgelist_init(const igraph_t *graph, 
 			      igraph_i_adjedgelist_t *ael, 

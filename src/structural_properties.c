@@ -3054,7 +3054,7 @@ int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
  *   here, ie. \c res will contain pointers to \c igraph_t
- *   objects. It vector will be resized if needed but note that the
+ *   objects. It will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
  * \param vids The vertices for which the calculation is performed.
  * \param order Integer giving the order of the neighborhood.
