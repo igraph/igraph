@@ -84,7 +84,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   There are some special functions which are only defined in the
   indexing expressions of vertex and edge sequences. For vertex
   sequences these are: \code{nei}, \code{adj}, \code{from} and
-  \code{to}.
+  \code{to}, \code{innei} and \code{outnei}.
 
   \code{nei} has a mandatory and an optional argument, the first is
   another vertex sequence, the second is a mode argument similar to that
@@ -99,7 +99,10 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   The mode argument (just like for \code{\link{neighbors}}) gives the
   type of the neighbors to be included, it is interpreted only in
   directed graphs, and defaults to all types of neighbors. See the
-  example below.
+  example below. \code{innei(v)} is a shorthand for the \sQuote{incoming}
+  neighbors (\code{nei(v, mode="in")}), and \code{outnei(v)} is a
+  shorthand for the \sQuote{outgoing} neighbors
+  (\code{nei(v,mode="out")}).
 
   \code{adj} takes an edge sequence as an argument and returns
   \code{TRUE} for vertices which have at least one adjacent edge in it.

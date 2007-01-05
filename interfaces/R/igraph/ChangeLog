@@ -1,3 +1,8 @@
+2006-12-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/iterators.R (V) : added 'innei' and 'outnei'
+	shorthands
+
 2006-12-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (graph.kcores: added

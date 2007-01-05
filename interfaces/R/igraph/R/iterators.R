@@ -101,6 +101,12 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                    PACKAGE="igraph")
       tmp[as.numeric(x)+1]
     }
+    innei <- function(v, mode=2) {
+      nei(v, mode)
+    }
+    outnei <- function(v, mode=1) {
+      nei(v, mode)
+    }
     adj <- function(e) {
       ## TRUE iff the vertex (in the vs) is adjacent
       ## to at least one edge in e
