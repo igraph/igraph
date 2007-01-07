@@ -106,7 +106,12 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
       clique_count = old_clique_count;
       i--;
     }
-    
+
+    /* If we reached the largest and collected all that needed */
+    if (!only_largest && clique_count==0) {
+      break;
+    }
+
     /* If we had cliques AND (we requested cliques of this size OR
      * we requested for the largest and we have reached them) */
     if (clique_count>0 &&
