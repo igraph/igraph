@@ -43,7 +43,11 @@ int main() {
 
   igraph_tree(&g, 5, 2, IGRAPH_TREE_OUT);
   for (j=0; j<sizeof(params)/(2*sizeof(params[0])); j++) {
-    igraph_independent_vertex_sets(&g, &result, params[2*j], params[2*j+1]);
+    if (params[2*j+1] != 0) {
+      igraph_independent_vertex_sets(&g, &result, params[2*j], params[2*j+1]);
+    } else {
+      igraph_largest_independent_vertex_sets(&g, &result);
+    }
     n = igraph_vector_ptr_size(&result);
     printf("%ld independent sets found\n", (long)n);
     for (i=0; i<n; i++) {

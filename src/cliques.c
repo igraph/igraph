@@ -25,18 +25,15 @@
 #include "memory.h"
 #include "random.h"
 
-/**
- * \section about_cliques
- *
- * <para>These functions calculate various graph properties related
- * to cliques and independent vertex sets.</para>
- */
 
 void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
   long i, n;
   
   n = igraph_vector_ptr_size(res);
-  for (i=0; i<n; i++) igraph_vector_destroy(VECTOR(*res)[i]);
+  for (i=0; i<n; i++) { 
+    igraph_vector_destroy(VECTOR(*res)[i]);
+    igraph_free(VECTOR(*res)[i]);
+  }
 }
 
 /* Internal function for calculating cliques or independent vertex sets.
@@ -48,7 +45,7 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 		     igraph_bool_t independent_vertices) {
   igraph_bool_t only_largest = 0, reached_largest = 0;
   igraph_integer_t no_of_nodes;
-  igraph_vector_t *new_cliques, neis;
+  igraph_vector_t *new_cliques=0, neis;
   igraph_real_t *member_storage, *new_member_storage, *c1, *c2, v1, v2;
   igraph_bool_t ok;
   long int i, j, k, l, m, n, clique_count, old_clique_count;
@@ -117,10 +114,16 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     if (clique_count>0 &&
         ((!only_largest && (i >= min_size+1 && i <= max_size+1))
 	 || reached_largest)) {
+      if (new_cliques != 0) {
+	igraph_free(new_cliques);
+	new_cliques=0;
+	IGRAPH_FINALLY_CLEAN(1);
+      }
       new_cliques = Calloc(clique_count, igraph_vector_t);
       if (new_cliques == 0) {
         IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
       }
+      IGRAPH_FINALLY(igraph_free, new_cliques);
       
       /*
       printf("%d-clique storage vector:\n", (int)(i-1));
@@ -132,12 +135,14 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
       
       for (j=0, k=0; j<clique_count; j++, k+=i-1) {
         IGRAPH_CHECK(igraph_vector_init_copy(&new_cliques[j], &member_storage[k], i-1));
-        /* TODO: free igraph_vector_t's in new_cliques */
       }
 
-      for (j=0; j<clique_count; j++)
-        IGRAPH_CHECK(igraph_vector_ptr_push_back(res, &new_cliques[j]));
-        
+      for (j=0; j<clique_count; j++) {
+	igraph_vector_t *tmp=Calloc(1, igraph_vector_t);
+	*tmp=new_cliques[j];
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(res, tmp));
+      }
+      
       if (reached_largest) break;
     }
     
@@ -235,6 +240,12 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
         }
       }
     }
+
+    if (new_cliques != 0) {
+      igraph_free(new_cliques);
+      IGRAPH_FINALLY_CLEAN(1);
+      new_cliques=0;
+    }
     
     /* Now all i-cliques are in new_member_storage. Swap it with
      * member_storage */
@@ -245,7 +256,7 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     /* Calculate how many cliques have we found */
     old_clique_count = clique_count;
     clique_count = n/i;
-  }
+  }    
 
   igraph_free(new_member_storage);
   igraph_free(member_storage);
@@ -262,7 +273,7 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * Cliques are fully connected subgraphs of a graph.
  *
  * If you are only interested in the size of the largest clique in the graph,
- * use \ref igraph_clique_number instead.
+ * use \ref igraph_clique_number() instead.
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
@@ -273,17 +284,44 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be
- *   returned. If negative, no upper bound will be used. If zero, only
- *   the largest cliques will be returned, regardless of the value of
- *   min_size.
+ *   returned. If negative or zero, no upper bound will be used.
+ * \return Error code.
  *
- * \sa igraph_clique_number
+ * \sa \ref igraph_largest_cliques() and \ref igraph_clique_number().
  *
  * Time complexity: TODO
  */
 int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size) {
+  if (max_size == 0) {
+    max_size=-1;
+  }
   return igraph_i_cliques(graph, res, min_size, max_size, 0);
+}
+
+/**
+ * \function igraph_largest_cliques
+ * \brief Finds the largest clique(s) in a graph.
+ * 
+ * A clique is largest (quite intuitively) if there is no other clique
+ * in the graph which contains more vertices. 
+ * 
+ * </para><para>
+ * Note that this is not neccessarily the same as a maximal clique,
+ * ie. the largest cliques are always maximal but a maximal clique is
+ * not always largest.
+ * \param graph The input graph.
+ * \param res Pointer to an initialized pointer vector, the result
+ *        will be stored here. It will be resized as needed.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
+ * 
+ * Time complexity: TODO.
+ */
+
+int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
+  return igraph_i_cliques(graph, res, 0, 0, 0);
 }
 
 /**
@@ -295,7 +333,7 @@ int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  *
  * </para><para>
  * If you are interested in the size of the largest independent vertex set,
- * use \ref igraph_independence_number instead.
+ * use \ref igraph_independence_number() instead.
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
@@ -306,11 +344,11 @@ int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \param min_size Integer giving the minimum size of the sets to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the sets to be
- *   returned. If negative, no upper bound will be used. If zero, only
- *   the largest cliques will be returned, regardless of the value of
- *   min_size.
+ *   returned. If negative or zero, no upper bound will be used. 
+ * \return Error code.
  *
- * \sa igraph_independence_number
+ * \sa \ref igraph_largest_independent_vertex_sets(), 
+ * \ref igraph_independence_number().
  *
  * Time complexity: TODO
  */
@@ -318,9 +356,33 @@ int igraph_independent_vertex_sets(const igraph_t *graph,
 				   igraph_vector_ptr_t *res,
 				   igraph_integer_t min_size,
 				   igraph_integer_t max_size) {
+  if (max_size==0) {
+    max_size=-1;
+  }
   return igraph_i_cliques(graph, res, min_size, max_size, 1);
 }
 
+/**
+ * \function igraph_largest_independent_vertex_sets
+ * \brief Finds the largest independent vertex set(s) in a graph.
+ * 
+ * An independent vertex set is largest if there is no other
+ * independent vertex set with more vertices in the graph.
+ * \param graph The input graph.
+ * \param res Pointer to a pointer vector, the result will be stored
+ *     here. It will be resized as needed.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_independent_vertex_sets(), \ref
+ * igraph_maximal_independent_vertex_sets().
+ * 
+ * Time complexity: TODO
+ */
+
+int igraph_largest_independent_vertex_sets(const igraph_t *graph,
+					   igraph_vector_ptr_t *res) {
+  return igraph_i_cliques(graph, res, 0, 0, 1);
+}
 
 typedef struct igraph_i_max_ind_vsets_data_t {
   igraph_integer_t matrix_size;
@@ -468,7 +530,7 @@ void igraph_i_free_set_array(igraph_set_t* array) {
  * 
  * </para><para>
  * If you are interested in the size of the largest independent vertex set,
- * use \ref igraph_independence_number instead.
+ * use \ref igraph_independence_number() instead.
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
@@ -476,8 +538,12 @@ void igraph_i_free_set_array(igraph_set_t* array) {
  *   objects which contain the indices of vertices involved in an independent
  *   vertex set. The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
+ * \return Error code.
  *
- * \sa igraph_maximal_cliques, igraph_independence_number
+ * \sa \ref igraph_maximal_cliques(), \ref
+ * igraph_independence_number()
+ * 
+ * Time complexity: TODO.
  */
 int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 					   igraph_vector_ptr_t *res) {
@@ -531,8 +597,13 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
  * independent vertex set.
  *
  * \param graph The input graph.
- * \param no The independence number will be returned to the \c igraph_integer_t
- *   pointed by this variable.
+ * \param no The independence number will be returned to the \c
+ *   igraph_integer_t pointed by this variable.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_independent_vertex_sets().
+ *
+ * Time complexity: TODO.
  */
 int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
   igraph_i_max_ind_vsets_data_t clqdata;
@@ -587,7 +658,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
  * complementer of the graph.
  * 
  * If you are only interested in the size of the largest clique in the graph,
- * use \ref igraph_clique_number instead.
+ * use \ref igraph_clique_number() instead.
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
@@ -595,8 +666,12 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
+ * \return Error code.
  *
- * \sa igraph_maximal_independent_vertex_sets, igraph_clique_number
+ * \sa \ref igraph_maximal_independent_vertex_sets(), \ref
+ * igraph_clique_number() 
+ * 
+ * Time complexity: TODO.
  */
 int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
   igraph_i_max_ind_vsets_data_t clqdata;
@@ -651,6 +726,11 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * \param graph The input graph.
  * \param no The clique number will be returned to the \c igraph_integer_t
  *   pointed by this variable.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_cliques(), \ref igraph_largest_cliques().
+ * 
+ * Time complexity: TODO.
  */
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
   igraph_i_max_ind_vsets_data_t clqdata;

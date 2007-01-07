@@ -1,0 +1,28 @@
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "<command>igraph</command>">
+]>
+
+<chapter id="igraph-Cliques">
+<title>Cliques and Independent Vertex Sets</title>
+
+<para>
+These functions calculate various graph properties related
+to cliques and independent vertex sets.
+</para>
+
+<section><title>Cliques</title>
+<!-- doxrox-include igraph_cliques -->
+<!-- doxrox-include igraph_largest_cliques -->
+<!-- doxrox-include igraph_maximal_cliques -->
+<!-- doxrox-include igraph_clique_number -->
+</section>
+
+<section><title>Independent Vertex Sets</title>
+<!-- doxrox-include igraph_independent_vertex_sets -->
+<!-- doxrox-include igraph_largest_independent_vertex_sets -->
+<!-- doxrox-include igraph_maximal_independent_vertex_sets -->
+<!-- doxrox-include igraph_independence_number -->
+</section>
+
+</chapter>

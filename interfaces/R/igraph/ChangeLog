@@ -1,3 +1,16 @@
+2007-01-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/cliques.R (cliques, largest.cliques)
+	(maximal.cliques, clique.number, independent.vertex.sets)
+	(largest.independent.vertex.sets, maximal.independent.vertex.sets)
+	(independence.number) : added
+	* interfaces/R/src/rinterface.c (R_igraph_cliques)
+	(R_igraph_largest_cliques, R_igraph_maximal_cliques)
+	(R_igraph_clique_number, R_igraph_independent_vertex_sets)
+	(R_igraph_largest_independent_vertex_sets)
+	(R_igraph_maximal_independent_vertex_sets)
+	(R_igraph_independence_number)
+
 2006-12-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/iterators.R (V) : added 'innei' and 'outnei'

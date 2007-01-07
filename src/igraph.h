@@ -740,6 +740,8 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
 
 int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size);
+int igraph_largest_cliques(const igraph_t *graph, 
+			   igraph_vector_ptr_t *cliques);
 int igraph_maximal_cliques(const igraph_t *graph,
 			   igraph_vector_ptr_t *res);
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
@@ -747,6 +749,8 @@ int igraph_independent_vertex_sets(const igraph_t *graph,
 				   igraph_vector_ptr_t *res,
 				   igraph_integer_t min_size,
 				   igraph_integer_t max_size);
+int igraph_largest_independent_vertex_sets(const igraph_t *graph,
+					   igraph_vector_ptr_t *res);
 int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 					   igraph_vector_ptr_t *res);
 int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no);

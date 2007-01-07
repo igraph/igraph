@@ -1,3 +1,18 @@
+2007-01-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/cliques.c (igraph_i_cliques) : free storage after an error,
+	allocate each vector in the pointer vector separately
+
+	* src/cliques.c (igraph_cliques) : max_size=0 means no limit and
+	not the largest cliques
+	(igraph_largest_cliques) : added
+	(igraph_independent_vertex_sets) : max_size=0 means no limit and
+	not the largest cliques
+	(igraph_largest_independent_vertex_sets) : added
+
+	* examples/simple/igraph_independent_sets.c : updated
+	* examples/simple/igraph_cliques.c : updated
+
 2007-01-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/cliques.c (igraph_i_cliques) : bug corrected

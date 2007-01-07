@@ -129,3 +129,11 @@ export(igraph.par)
 export(graph.maxflow, graph.mincut, vertex.connectivity, edge.connectivity,
        edge.disjoint.paths, vertex.disjoint.paths, graph.adhesion,
        graph.cohesion)
+
+# cliques
+
+export(cliques, largest.cliques, maximal.cliques, clique.number,
+       independent.vertex.sets, largest.independent.vertex.sets,
+       maximal.independent.vertex.sets, independence.number)
+
+
