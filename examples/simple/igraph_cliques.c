@@ -42,7 +42,7 @@ int main() {
   
   igraph_vector_ptr_init(&result, 0);
   igraph_full(&g, 6, 0, 0);
-  igraph_es_pairs_small(&es, 1, 0, 1, 0, 2, 3, 5, -1);
+  igraph_es_pairs_small(&es, 0, 0, 1, 0, 2, 3, 5, -1);
   igraph_delete_edges(&g, es);
   igraph_es_destroy(&es);
   

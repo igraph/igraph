@@ -13,6 +13,14 @@
 	* examples/simple/igraph_independent_sets.c : updated
 	* examples/simple/igraph_cliques.c : updated
 
+	* src/cliques.c (igraph_i_cliques_free_res) : make it a bit more
+	sophisticated
+	(igraph_i_find_k_cliques) : added
+	(igraph_i_cliques) : separated into 3
+	(igraph_cliques, igraph_largest_cliques) : updated
+	(igraph_i_largest_cliques) : added
+	(igraph_largest_independent_vertex_sets) : updated
+
 2007-01-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/cliques.c (igraph_i_cliques) : bug corrected
