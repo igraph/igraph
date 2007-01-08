@@ -4950,9 +4950,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] =
       "diameter(directed=True, unconn=True)\n\n"
       "Calculates the diameter of the graph.\n\n"
       "@param directed: whether to consider directed paths.\n"
-      "@param unconn: if C{True} and the graph is undirected, the\n"
+      "@param unconn: if C{True} and the graph is unconnected, the\n"
       "  longest geodesic within a component will be returned. If\n"
-      "  C{False} and the graph is undirected, the result is the\n"
+      "  C{False} and the graph is unconnected, the result is the\n"
       "  number of vertices."
   },
   
