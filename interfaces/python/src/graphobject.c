@@ -5403,15 +5403,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] =
   {"Read_DIMACS", (PyCFunction)igraphmodule_Graph_Read_DIMACS,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_DIMACS(f, directed=False)\n\n"
-   "Reads a graph from a file conforming to the DIMACS minimum-cost flow file format\n\n."
+   "Reads a graph from a file conforming to the DIMACS minimum-cost flow file format.\n\n"
    "For the exact description of the format, see\n"
-   "X{http://lpsolve.sourceforge.net/5.5/DIMACS.htm}\n\n"
+   "U{http://lpsolve.sourceforge.net/5.5/DIMACS.htm}\n\n"
    "Restrictions compared to the official description of the format:\n\n"
-   "  * igraph's DIMACS reader requires only three fields in an arc definition,\n"
-   "    describing the edge's source and target node and its capacity.\n\n"
-   "  * Source nodes are identified by 's' in the FLOW field, target nodes are\n"
-   "    identified by 't'.\n\n"
-   "  * Node indices start from 1. Only a single source and target node is allowed.\n\n"
+   "  - igraph's DIMACS reader requires only three fields in an arc definition,\n"
+   "    describing the edge's source and target node and its capacity.\n"
+   "  - Source nodes are identified by 's' in the FLOW field, target nodes are\n"
+   "    identified by 't'.\n"
+   "  - Node indices start from 1. Only a single source and target node is allowed.\n\n"
    "@param f: the name of the file\n"
    "@param directed: whether the generated graph should be directed.\n"
    "@return: the generated graph, the source and the target of the flow and the edge\n"
@@ -5757,7 +5757,7 @@ PyTypeObject igraphmodule_GraphType = {
   0,                                        /* tp_setattro */
   0,                                        /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, /* tp_flags */
-  "Class representing a graph in the igraph library.",                    /* tp_doc */
+  "Low-level representation of a graph.\n\nDon't use it directly, use L{igraph.Graph} instead.",                    /* tp_doc */
   (traverseproc)igraphmodule_Graph_traverse,/* tp_traverse */
   (inquiry)igraphmodule_Graph_clear,        /* tp_clear */
   0,                                        /* tp_richcompare */

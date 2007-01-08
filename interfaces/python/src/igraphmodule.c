@@ -1059,8 +1059,8 @@ static PyMethodDef igraphmodule_methods[] =
 
 extern PyObject* igraphmodule_InternalError;
 
-PyMODINIT_FUNC init_igraph(void) {
-  PyObject* m;  ///< igraph module object
+PyMODINIT_FUNC initcore(void) {
+  PyObject* m;
   
   igraphmodule_VertexSeqType.tp_traverse = (traverseproc)igraphmodule_VertexSeq_traverse;
   igraphmodule_VertexSeqType.tp_clear = (inquiry)igraphmodule_VertexSeq_clear;
@@ -1083,16 +1083,16 @@ PyMODINIT_FUNC init_igraph(void) {
   if (PyType_Ready(&igraphmodule_BFSIterType) < 0) return;
   
   igraphmodule_InternalError =
-    PyErr_NewException("igraph.InternalError", PyExc_Exception, NULL);
+    PyErr_NewException("igraph.core.InternalError", PyExc_Exception, NULL);
   
   Py_INCREF(igraphmodule_InternalError);
   
-  m = Py_InitModule3("igraph._igraph", igraphmodule_methods,
+  m = Py_InitModule3("igraph.core", igraphmodule_methods,
 		     "Python interface for the igraph library");
   
   Py_INCREF(&igraphmodule_GraphType);
   
-  PyModule_AddObject(m, "Graph", (PyObject*)&igraphmodule_GraphType);
+  PyModule_AddObject(m, "GraphBase", (PyObject*)&igraphmodule_GraphType);
   PyModule_AddObject(m, "BFSIter", (PyObject*)&igraphmodule_BFSIterType);
   /* These types are not necessary to be registered, but I want epydoc to
    * see them so the proper documentation can be generated for them */

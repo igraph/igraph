@@ -17,16 +17,16 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 02110-1301 USA
+
 """
 
-from igraph._igraph import *
-from igraph._igraph import __version__, __build_date__
+from core import *
+from core import __version__, __build_date__
 
 import os
 import math
 import gzip
 from tempfile import mkstemp
-
 
 class Interval:
     """A class representing an interval over the real numbers"""
@@ -41,9 +41,11 @@ class Interval:
 	self._right = max(left, right)
 
     def __contains__(self, x):
+	"""Returns true if x is in the interval, false otherwise"""
 	return (x >= self._left and x < self._right)
 
     def __eq__(self, x):
+	"""Tests for the equality of two intervals"""
 	return (isinstance(x, Interval) and \
 		x.left == self._left and x.right == self._right)
  
@@ -58,7 +60,16 @@ class Interval:
     def __str__(self): return "[%f, %f)" % (self._left, self._right)
 
 class Histogram:
-    """Generic histogram class for real numbers"""
+    """Generic histogram class for real numbers
+    
+    Example:
+	
+	>>> h = Histogram(5)     # Initializing, bin width = 5
+	>>> h << [2,3,2,7,8,5,5,0,7,9]     # Adding more items
+	>>> print h
+        [ 0.000,  5.000): ****
+        [ 5.000, 10.000): ******
+    """
 
     def __init__(self, bin_width = 1, data = []):
 	"""Initializes the histogram with the given data set.
@@ -145,29 +156,34 @@ class Histogram:
 
 	return "\n".join(result)
 
-class Graph(_igraph.Graph):
+class Graph(core.GraphBase):
+    """Generic graph.
+    
+    This class is built on top of L{core.GraphBase}, so the order of the
+    methods in the Epydoc documentation is a little bit obscure:
+    inherited methods come after the ones implemented directly in the
+    subclass.
+    """
+    
     def indegree(self, *args, **kwds):
-	"""indegree(...)
-
-	Returns the in-degrees in a list. See L{degree} for possible
-	arguments.
+	"""Returns the in-degrees in a list.
+	
+	See L{degree} for possible arguments.
 	"""
 	kwds['degree']=_igraph.IN
 	return self.degree(*args, **kwds)
 
     def outdegree(self, *args, **kwds):
-	"""outdegree(...)
-
-	Returns the out-degrees in a list. See L{degree} for possible
-	arguments.
+	"""Returns the out-degrees in a list.
+	
+	See L{degree} for possible arguments.
 	"""
 	kwds['degree']=_igraph.OUT
 	return self.degree(*args, **kwds)
 
     def eccentricity(self, nodes=None):
-	"""eccentricity(self, vertices=None)
-
-	Calculates eccentricities for vertices with the given indices.
+	"""Calculates eccentricities for vertices with the given indices.
+	
 	Eccentricity is given as the reciprocal of the greatest distance
 	between the vertex being considered and any other vertex in the
 	graph.
@@ -175,7 +191,7 @@ class Graph(_igraph.Graph):
 	Please note that for any unconnected graph, eccentricities will
 	all be equal to 1 over the number of vertices, since for all vertices
 	the greatest distance will be equal to the number of vertices (this
-	is how C{shortest_paths} denotes vertex pairs where it is impossible
+	is how L{shortest_paths} denotes vertex pairs where it is impossible
 	to reach one from the other).
 
 	@param vertices: the vertices to consider. If C{None}, all
@@ -211,9 +227,7 @@ class Graph(_igraph.Graph):
     def edge_betweenness_clustering(self, clusters = None, steps = None, \
 				    return_graph = False, \
 				    return_removed_edges = False):
-	"""edge_betweenness_clustering(clusters = None, steps = None, return_graph = False, return_removed_edges = False)
-
-	Newman's edge betweenness clustering.
+	"""Newman's edge betweenness clustering.
 
 	Iterative removal of edges with the largest edge betweenness until
 	the given number of steps is reached or until the graph is decomposed
@@ -271,9 +285,7 @@ class Graph(_igraph.Graph):
 
 
     def write_graphmlz(self, f, compresslevel=9):
-	"""write_graphmlz(f, compresslevel=9)
-    
-	Writes the graph to a zipped GraphML file.
+	"""Writes the graph to a zipped GraphML file.
 
 	The library uses the gzip compression algorithm, so the resulting
 	file can be unzipped with regular gzip uncompression (like

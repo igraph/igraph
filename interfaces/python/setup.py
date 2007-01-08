@@ -104,7 +104,7 @@ include_dirs.extend(detect_libxml2_include_dirs())
 library_dirs.extend(detect_libxml2_library_dirs())
 libraries.extend(detect_libxml2_libraries())
 
-igraph_extension = Extension('igraph._igraph', sources, \
+igraph_extension = Extension('igraph.core', sources, \
   library_dirs=library_dirs, libraries=libraries, \
   include_dirs=include_dirs)
        
