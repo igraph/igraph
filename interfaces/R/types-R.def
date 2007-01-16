@@ -1,0 +1,11 @@
+
+TYPE GRAPH:
+	INCONV:	if (!is.igraph(%I%)) {
+		  stop("Not a graph object")
+		};
+
+TYPE INTEGER:
+	INCONV: %C% <- as.numeric(%I%);
+
+TYPE BOOL:
+	INCONV:	%C% <- as.logical(%I%);

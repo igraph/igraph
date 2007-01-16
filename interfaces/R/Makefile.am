@@ -1,7 +1,7 @@
 
 all: igraph_$(VERSION).tar.gz
 
-RRFILES = $(wildcard igraph/R/*.R) \
+RRFILES = $(wildcard igraph/R/*.R) igraph/R/auto.R \
 	  $(wildcard igraph/man/*.Rd) \
 	  igraph/NAMESPACE igraph/DESCRIPTION
 
@@ -47,6 +47,15 @@ RSRCSOURCES = $(top_srcdir)/interfaces/R/src/rinterface.c \
 	$(top_srcdir)/interfaces/R/src/Makevars.win \
 	$(top_srcdir)/interfaces/R/src/config.h.in  \
 	$(top_srcdir)/interfaces/R/src/config.h
+
+../../interfaces/R/src/rinterface.c: config.def ../functions.def ../../interfaces/R/src/rinterface.c.in
+	../../tools/inger.py -c config.def -f ../functions.def
+
+igraph/R/auto.R: config.def ../functions.def igraph/R/auto.R.in
+	../../tools/inger.py -c config.def -f ../functions.def
+
+igraph/NAMESPACE: config.def ../functions.def igraph/NAMESPACE.in
+	../../tools/inger.py -c config.def -f ../functions.def
 
 igraph_$(VERSION).tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_srcdir)/interfaces/R/igraph .; fi

@@ -1,0 +1,23 @@
+
+TYPE GRAPH:
+	CTYPE:	igraph_t *
+	ITYPE:	SEXP
+	DECL: 	igraph_t %C%;
+	OUTCONV:	PROTECT(%I%=R_igraph_to_SEXP(&%C%)); 
+		igraph_destroy(&%C%);
+	FCALL:	&%C%
+
+TYPE INTEGER:
+	CTYPE:	igraph_integer_t
+	ITYPE:	SEXP
+	INCONV:	%C%=REAL(%I%)[0];
+	OUTCONV:	PROTECT(%I%=NEW_NUMERIC(1));
+		REAL(%I%)[0]=%C%;
+
+TYPE BOOL:
+	CTYPE:	igraph_bool_t
+	ITYPE:	SEXP
+	INCONV:	%C%=LOGICAL(%I%)[0];
+	OUTCONV:	PROTECT(%I%=NEW_LOGICAL(1));
+		LOGICAL(%I%)[0]=%C%;
+
