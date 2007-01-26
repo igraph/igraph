@@ -1,3 +1,19 @@
+2007-01-26  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/foreign-graphml.c : now supports graph attributes
+	* src/type_indexededgelist.c (igraph_empty_attrs) : added
+	* src/igraph.h : updated
+	
+	* src/attributes.c (igraph_i_attribute_init) : added attr parameter
+	* src/attributes.h (igraph_i_attribute_init) : updated
+	
+	* interfaces/python/igraphmodule.c : updated for new init attribute
+	handler
+	* interfaces/R/src/rinterface.c : updated for new init attribute
+	handler
+	
+	* examples/simple/test.gxl : added a graph attribute for testing
+
 2007-01-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/cliques.c (igraph_i_cliques) : free storage after an error,

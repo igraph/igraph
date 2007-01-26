@@ -246,9 +246,9 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
 /* Attribute handlers for the Python interface */
 
 /* Initialization */ 
-static int igraphmodule_i_attribute_init(igraph_t *graph) {
+static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   PyObject** attrs;
-  int i;
+  long int i, n;
   
   attrs=(PyObject**)calloc(3, sizeof(PyObject*));
   /* printf("Created attribute table at %p\n", attrs); */
@@ -259,6 +259,43 @@ static int igraphmodule_i_attribute_init(igraph_t *graph) {
     attrs[i] = PyDict_New();
   }
   graph->attr=(void*)attrs;
+
+  /* See if we have graph attributes */
+  if (attr) {
+    PyObject *dict=attrs[ATTRHASH_IDX_GRAPH], *value;
+    char *s;
+    n = igraph_vector_ptr_size(attr);
+    for (i=0; i<n; i++) {
+      igraph_i_attribute_record_t *attr_rec;
+      attr_rec = VECTOR(*attr)[i];
+      switch (attr_rec->type) {
+      case IGRAPH_ATTRIBUTE_NUMERIC:
+	value=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[0]);
+	break;
+      case IGRAPH_ATTRIBUTE_STRING:
+	igraph_strvector_get((igraph_strvector_t*)attr_rec->value, 0, &s);
+	value=PyString_FromString(s);
+	break;
+      default:
+	IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+	value=0;
+	break;
+      }
+      if (value) {
+	if (PyDict_SetItemString(dict, attr_rec->name, value)) {
+	  Py_DECREF(value);
+	  Py_DECREF(attrs[0]);
+	  Py_DECREF(attrs[1]);
+	  Py_DECREF(attrs[2]);
+	  Free(graph->attr);
+	  IGRAPH_ERROR("failed to add attributes to graph attribute hash",
+		       IGRAPH_FAILURE);
+	}
+	Py_DECREF(value);
+	value=0;
+      }
+    }
+  }
 
   return IGRAPH_SUCCESS;
 }

@@ -61,6 +61,30 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
  * |V| vertices (and no edges).
  */
 int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+  return igraph_empty_attrs(graph, n, directed, 0);
+}
+
+
+/** 
+ * \ingroup interface
+ * \function igraph_empty
+ * \brief Creates an empty graph with some vertices, no edges and some graph attributes.
+ *
+ * </para><para>
+ * Use this instead of \ref igraph_empty() if you wish to add some graph
+ * attributes right after initialization.
+ * \param graph Pointer to a not-yet initialized graph object.
+ * \param n The number of vertices in the graph, a non-negative
+ *          integer number is expected.
+ * \param directed Whether the graph is directed or not.
+ * \param
+ * \return Error code:
+ *         \c IGRAPH_EINVAL: invalid number of vertices.
+ * 
+ * Time complexity: O(|V|) for a graph with
+ * |V| vertices (and no edges).
+ */
+int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void* attr) {
 
   if (n<0) {
     IGRAPH_ERROR("cannot create empty graph with negative number of vertices",
@@ -81,7 +105,7 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
 
   /* init attributes */
   graph->attr=0;
-  IGRAPH_CHECK(igraph_i_attribute_init(graph));
+  IGRAPH_CHECK(igraph_i_attribute_init(graph, attr));
 
   /* add the vertices */
   IGRAPH_CHECK(igraph_add_vertices(graph, n, 0));

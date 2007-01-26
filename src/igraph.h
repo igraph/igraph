@@ -499,6 +499,7 @@ int igraph_eit_as_vector(const igraph_eit_t *eit, igraph_vector_t *v);
 /* -------------------------------------------------- */
 
 int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
+int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr);
 int igraph_destroy(igraph_t *graph);
 int igraph_copy(igraph_t *to, const igraph_t *from);
 int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges, 

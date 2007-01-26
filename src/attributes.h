@@ -99,7 +99,7 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
  */
 
 typedef struct igraph_attribute_table_t {
-  int (*init)(igraph_t *graph);
+  int (*init)(igraph_t *graph, igraph_vector_ptr_t *attr);
   void (*destroy)(igraph_t *graph);
   int (*copy)(igraph_t *to, const igraph_t *from);
   int (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
@@ -157,7 +157,7 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table);
         } \
    } while(0)        
 
-int igraph_i_attribute_init(igraph_t *graph);
+int igraph_i_attribute_init(igraph_t *graph, void *attr);
 void igraph_i_attribute_destroy(igraph_t *graph);
 int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from);
 int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr);

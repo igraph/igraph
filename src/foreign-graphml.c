@@ -69,6 +69,8 @@ struct igraph_i_graphml_parser_state {
   igraph_vector_ptr_t v_attrs;
   igraph_trie_t e_names;
   igraph_vector_ptr_t e_attrs;
+  igraph_trie_t g_names;
+  igraph_vector_ptr_t g_attrs;
   xmlChar *data_key;
   igraph_attribute_elemtype_t data_type;
   char *error_message;
@@ -85,6 +87,7 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
   igraph_strvector_destroy(&state->edgeids);
   igraph_trie_destroy(&state->v_names);
   igraph_trie_destroy(&state->e_names);
+  igraph_trie_destroy(&state->g_names);
   igraph_vector_destroy(&state->edgelist);
    
   if (state->error_message) { free(state->error_message); }
@@ -126,8 +129,27 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
     Free(rec);
   }
 
+  for (i=0; i<igraph_vector_ptr_size(&state->g_attrs); i++) {
+    igraph_i_graphml_attribute_record_t *rec=VECTOR(state->g_attrs)[i];
+    if (rec->record.type==IGRAPH_ATTRIBUTE_NUMERIC) {
+      if (rec->record.value != 0) {
+	igraph_vector_destroy((igraph_vector_t*)rec->record.value);
+	Free(rec->record.value);
+      }
+    } else if (rec->record.type==IGRAPH_ATTRIBUTE_STRING) {
+      if (rec->record.value != 0) {
+	igraph_strvector_destroy((igraph_strvector_t*)rec->record.value);
+	Free(rec->record.value);
+      }
+    }
+    if (rec->id != 0) Free(rec->id);
+    if (rec->record.name != 0) Free(rec->record.name);
+    Free(rec);
+  }
+
   igraph_vector_ptr_destroy(&state->v_attrs);
   igraph_vector_ptr_destroy(&state->e_attrs);
+  igraph_vector_ptr_destroy(&state->g_attrs);
   
   IGRAPH_FINALLY_CLEAN(1);
 }
@@ -187,6 +209,13 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
     return;
   }
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->e_attrs);
+  ret=igraph_vector_ptr_init(&state->g_attrs, 0);
+  if (ret) {
+    igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
+    igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
+    return;
+  }
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &state->g_attrs);
   ret=igraph_vector_init(&state->edgelist, 0);
   if (ret) {
     igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
@@ -222,8 +251,15 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
     return;
   }
   IGRAPH_FINALLY(igraph_trie_destroy, &state->e_names);
+  ret=igraph_trie_init(&state->g_names, 0);
+  if (ret) {
+    igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
+    igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
+    return;
+  }
+  IGRAPH_FINALLY(igraph_trie_destroy, &state->g_names);
   
-  IGRAPH_FINALLY_CLEAN(7);
+  IGRAPH_FINALLY_CLEAN(9);
   IGRAPH_FINALLY(igraph_i_graphml_destroy_state, state);
 }
 
@@ -232,14 +268,14 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     (struct igraph_i_graphml_parser_state*)state0;
   long i, l;
   int r;
-  igraph_i_attribute_record_t idrec, eidrec;
+  igraph_i_attribute_record_t idrec, eidrec, grec;
   const char *idstr="id";
 
   if (!state->successful) return;
 
   if (state->index<0) {
 
-    igraph_vector_ptr_t vattr, eattr;
+    igraph_vector_ptr_t vattr, eattr, gattr;
     long int esize=igraph_vector_ptr_size(&state->e_attrs);
     r=igraph_vector_ptr_init(&vattr, 
 			     igraph_vector_ptr_size(&state->v_attrs)+1);
@@ -259,6 +295,13 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       return;
     }
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, &eattr);
+    r=igraph_vector_ptr_init(&gattr, igraph_vector_ptr_size(&state->g_attrs));
+    if (r) {
+      igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, r);
+      igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
+      return;
+    }
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &gattr);
 
     for (i=0; i<igraph_vector_ptr_size(&state->v_attrs); i++) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
@@ -324,16 +367,23 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       eidrec.value=&state->edgeids;
       VECTOR(eattr)[(long int)igraph_vector_ptr_size(&eattr)-1]=&eidrec;
     }
+
+    for (i=0; i<igraph_vector_ptr_size(&state->g_attrs); i++) {
+      igraph_i_graphml_attribute_record_t *graphmlrec=
+	VECTOR(state->g_attrs)[i];
+      igraph_i_attribute_record_t *rec=&graphmlrec->record;
+      VECTOR(gattr)[i]=rec;
+    }
     
-    igraph_empty(state->g, 0, state->edges_directed);
+    igraph_empty_attrs(state->g, 0, state->edges_directed, &gattr);
     igraph_add_vertices(state->g, igraph_trie_size(&state->node_trie),
 			&vattr);
     igraph_add_edges(state->g, &state->edgelist, &eattr);
 
     igraph_vector_ptr_destroy(&vattr);
     igraph_vector_ptr_destroy(&eattr);
-    IGRAPH_FINALLY_CLEAN(2);
-     
+    igraph_vector_ptr_destroy(&gattr);
+    IGRAPH_FINALLY_CLEAN(3);     
   }
 
   igraph_i_graphml_destroy_state(state);
@@ -396,10 +446,8 @@ void igraph_i_graphml_add_attribute_key(const xmlChar** attrs,
     } else if (xmlStrEqual(*it, toXmlChar("for"))) {
       /* graph, vertex or edge attribute? */
       if (xmlStrEqual(*(it+1), toXmlChar("graph"))) { 
-	igraph_error("Cannot parse GraphML file, graph attributes not implemented",
-		     __FILE__, __LINE__, IGRAPH_UNIMPLEMENTED);	
-        igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file, graph attributes not implemented");
-        return;
+	trie=&state->g_names;
+	ptrvector=&state->g_attrs;
       } else if (xmlStrEqual(*(it+1), toXmlChar("node"))) {
 	trie=&state->v_names;
 	ptrvector=&state->v_attrs;
@@ -512,6 +560,11 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
   chardata[(end-data)]='\0';
 
   switch (type) {
+  case IGRAPH_ATTRIBUTE_GRAPH:
+    trie=&state->g_names;
+    ptrvector=&state->g_attrs;
+    id=0;
+    break;
   case IGRAPH_ATTRIBUTE_VERTEX:
     trie=&state->v_names;
     ptrvector=&state->v_attrs;
@@ -672,6 +725,10 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
 	}
       }
       state->st=INSIDE_NODE;
+    } else if (xmlStrEqual(name, toXmlChar("data"))) {
+      igraph_i_graphml_attribute_data_setup(state, attrs, IGRAPH_ATTRIBUTE_GRAPH);
+      state->prev_state=state->st;
+      state->st=INSIDE_DATA;
     } else
       igraph_i_graphml_handle_unknown_start_tag(state);
     break;

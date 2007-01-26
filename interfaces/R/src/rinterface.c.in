@@ -69,7 +69,7 @@ SEXP R_igraph_getListElement(SEXP list, const char *str)
 /******************************************************
  * Attributes                                         *
  *****************************************************/
-int R_igraph_attribute_init(igraph_t *graph) {
+int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   SEXP result;
   long int i;
   PROTECT(result=NEW_LIST(4));

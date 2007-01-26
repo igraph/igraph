@@ -36,7 +36,7 @@
  * <para>Attribute handling has been largely changed in \a igraph
  * 0.2. From now on it is possible to attach an attribute handling
  * interface to \a igraph. This is simply a table of functions, of
- * type \ref igraph_attribute_table_t. This functions are invoked no
+ * type \ref igraph_attribute_table_t. This functions are invoked to
  * notify the attribute handling code about the structural changes in
  * a graph. See the documentation of this type for details.</para>
  *
@@ -46,10 +46,10 @@
  *
  */
 
-int igraph_i_attribute_init(igraph_t *graph) {
+int igraph_i_attribute_init(igraph_t *graph, void *attr) {
   graph->attr=0;
   if (igraph_i_attribute_table) {
-    return igraph_i_attribute_table->init(graph);
+    return igraph_i_attribute_table->init(graph, attr);
   } else {
     return 0;
   }
