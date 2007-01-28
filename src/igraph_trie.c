@@ -125,6 +125,11 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 			 igraph_real_t newvalue, long int *id) {
   char *str;
   long int i;
+  igraph_bool_t add;
+
+  /* If newvalue is negative, we don't add the node if nonexistent, only check
+   * for its existence */
+  add = (newvalue>=0);
 
   for (i=0; i<igraph_strvector_size(&t->strs); i++) {
     long int diff;
@@ -156,7 +161,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       igraph_trie_node_t *node=VECTOR(t->children)[i];
       if (node != 0) {
 	return igraph_trie_get_node(node, key+diff, newvalue, id);
-      } else {
+      } else if (add) {
 	igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
 	if (node==0) {
 	  IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
@@ -173,9 +178,12 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 	*id=newvalue;
 	IGRAPH_FINALLY_CLEAN(3);
 	return 0;
+      } else {
+	*id=-1;
+	return 0;
       }
 
-    } else if (key[diff]=='\0') {
+    } else if (key[diff]=='\0' && add) {
 
       /* ------------------------------------ */
       /* key is prefix of str, the node has to be cut */
@@ -209,7 +217,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       *id=newvalue;
       return 0;
 
-    } else {
+    } else if (add) {
 
       /* ------------------------------------ */
       /* the first diff characters match */
@@ -244,20 +252,31 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       
       *id=newvalue;
       return 0;
+    } else {
+      
+      /* ------------------------------------------------- */
+      /* No match, but we requested not to add the new key */
+      *id=-1;
+      return 0;
     }
   }
 
   /* ------------------------------------ */
   /* Nothing matches */
 
-  IGRAPH_CHECK(igraph_vector_ptr_reserve(&t->children, 
-				  igraph_vector_ptr_size(&t->children)+1));
-  IGRAPH_CHECK(igraph_vector_reserve(&t->values, igraph_vector_size(&t->values)+1));
-  IGRAPH_CHECK(igraph_strvector_add(&t->strs, key));
+  if (add) {
+    IGRAPH_CHECK(igraph_vector_ptr_reserve(&t->children, 
+					   igraph_vector_ptr_size(&t->children)+1));
+    IGRAPH_CHECK(igraph_vector_reserve(&t->values, igraph_vector_size(&t->values)+1));
+    IGRAPH_CHECK(igraph_strvector_add(&t->strs, key));
 
-  igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
-  igraph_vector_push_back(&t->values, newvalue); /* allocated */
-  *id=newvalue;
+    igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
+    igraph_vector_push_back(&t->values, newvalue); /* allocated */
+    *id=newvalue;
+  } else {
+    *id=-1;
+  }
+
   return 0;
 }
 
@@ -326,6 +345,19 @@ int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
   IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
   Free(tmp);
   IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/**
+ * \ingroup igraphtrie
+ * \brief Search in a trie.
+ * This variant does not add \c key to the trie if it does not exist.
+ * In this case, a negative id is returned.
+ */
+
+int igraph_trie_check(igraph_trie_t *t, const char *key, long int *id) {
+  IGRAPH_CHECK(igraph_trie_get_node( (igraph_trie_node_t*) t, 
+				     key, -1, id));
   return 0;
 }
 

@@ -9,6 +9,8 @@ xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdr
     <data key="d2">2006-11-12</data>
     <node id="n0">
       <data key="d0">green</data>
+      <data key="d3">incorrect</data>
+      <!-- incorrect attribute key, should issue a warning -->
     </node>
     <node id="n1"/>
     <node id="n2">

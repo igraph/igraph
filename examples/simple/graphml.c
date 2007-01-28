@@ -23,9 +23,15 @@
 #include <igraph.h>
 #include <stdio.h>
 
+void custom_warning_handler (const char *reason, const char *file,
+			     int line, int igraph_errno) {
+  printf("Warning: %s\n", reason);
+}
+
 int main(int argc, char **argv) {
   igraph_t g;
   igraph_error_handler_t* oldhandler;
+  igraph_warning_handler_t* oldwarnhandler;
   int result;
   FILE *ifile, *ofile;
 
@@ -36,13 +42,14 @@ int main(int argc, char **argv) {
   }
   
   oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
+  oldwarnhandler=igraph_set_warning_handler(custom_warning_handler);
   if (result=igraph_read_graph_graphml(&g, ifile, 0)) {
     // maybe it is simply disabled at compile-time
     if (result == IGRAPH_UNIMPLEMENTED) return 77;
     return 1;
   }
   igraph_set_error_handler(oldhandler);
-    
+
   fclose(ifile);
 
   /* Write it back */
@@ -75,6 +82,7 @@ int main(int argc, char **argv) {
   printf("Directed: %i\n", (int) igraph_is_directed(&g));
   igraph_write_graph_edgelist(&g, stdout);
   igraph_destroy(&g);
+  igraph_set_warning_handler(oldwarnhandler);
   
   return 0;
 }

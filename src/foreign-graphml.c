@@ -580,7 +580,14 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
     break;
   }
   
-  igraph_trie_get(trie, key, &recid);
+  igraph_trie_check(trie, key, &recid);
+  if (recid < 0) {
+    /* no such attribute key, issue a warning */
+    IGRAPH_WARNING("unknown attribute key in GraphML file, ignoring attribute");
+    Free(chardata);
+    return;
+  }
+   
   graphmlrec=VECTOR(*ptrvector)[recid];
   rec=&graphmlrec->record;
 

@@ -1,3 +1,12 @@
+2007-01-28  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/igraph_trie.c (igraph_trie_check) : added
+	* src/foreign-graphml.c : fixed a bug when reading a graph with
+	invalid attribute keys
+	* examples/simple/test.gxl : extended to include an invalid attribute
+	* examples/simple/igraph_trie.c : added test case for
+	igraph_trie_check
+
 2007-01-26  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/foreign-graphml.c : now supports graph attributes

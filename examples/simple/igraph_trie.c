@@ -52,7 +52,11 @@ int main() {
   igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
   igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
   igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
- 
+
+  /* check for existence */
+  igraph_trie_check(&trie, "head", &id); printf("head:  %li\n", id);
+  igraph_trie_check(&trie, "alma", &id); printf("alma:  %li\n", id);
+   
   /* destroy */
   igraph_trie_destroy(&trie);
 
@@ -76,6 +80,10 @@ int main() {
   igraph_trie_get(&trie, "hepp", &id);   printf("hepp:  %li\n", id);
   igraph_trie_get(&trie, "alma", &id);   printf("alma:  %li\n", id);
   igraph_trie_get(&trie, "also", &id);   printf("also:  %li\n", id);
+
+  /* check for existence */
+  igraph_trie_check(&trie, "head", &id); printf("head:  %li\n", id);
+  igraph_trie_check(&trie, "alma", &id); printf("alma:  %li\n", id);
 
   for (i=0; i<igraph_trie_size(&trie); i++) {
     igraph_trie_idx(&trie, i, &str);
