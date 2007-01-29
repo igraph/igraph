@@ -1,4 +1,5 @@
 
+o faster transitivity calculation for graphs with large degree vertices
 * R interface: uniform 'y' coordinates in plot.igraph and tkplot
 o attribute support in to_undirected
 o calculate the actual maximum flow

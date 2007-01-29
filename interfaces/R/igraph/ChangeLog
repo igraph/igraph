@@ -1,3 +1,7 @@
+2007-01-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : corrected loop drawing
+
 2007-01-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c.in (R_igraph_empty) : removed,

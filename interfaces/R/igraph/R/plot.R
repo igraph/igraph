@@ -120,7 +120,6 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
     
     loop <- function(x0, y0, cx=x0, cy=y0, color, angle=0, label=NA,
                      width=1, arrows=FALSE) {
-
       rad <- angle/180*pi
       center <- c(cx,cy)
       cp <- matrix( c(x0,y0, x0+.4,y0+.2, x0+.4,y0-.2, x0,y0),
@@ -129,7 +128,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
       r <- sqrt((cp[,1]-center[1])**2 + (cp[,2]-center[2])**2)
       
       phi <- phi + rad
-      
+
       cp[,1] <- cx+r*cos(phi)
       cp[,2] <- cy+r*sin(phi)
 
@@ -155,11 +154,13 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
     vs <- vertex.size
     if (length(vertex.size)>1) { vs <- vs[loops.e] }
     ew <- edge.width
-    if (length(edge.width)>1) { ew <- ew[loops.el] }
-    xx0 <- layout[loops.v,1] + cos(loop.angle[loops.e]/180*pi) * vs
-    yy0 <- layout[loops.v,2] + sin(loop.angle[loops.e]/180*pi) * vs
+    if (length(edge.width)>1) { ew <- ew[loops.e] }
+    la <- loop.angle
+    if (length(loop.angle)>1) { la <- la[loops.e] }
+    xx0 <- layout[loops.v,1] + cos(la/180*pi) * vs
+    yy0 <- layout[loops.v,2] + sin(la/180*pi) * vs
     mapply(loop, xx0, yy0,
-           color=ec, angle=loop.angle[loops.e], label=loop.labels,
+           color=ec, angle=la, label=loop.labels,
            width=ew, MoreArgs=list(arrows=is.directed(graph)))
 
   }
