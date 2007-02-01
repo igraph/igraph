@@ -25,7 +25,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        label.font=NULL, label.degree=-pi/4, label.dist=0,
                        vertex.color="SkyBlue2", vertex.size=15,
                        edge.color="darkgrey", edge.width=1,
-                       edge.labels=NA, 
+                       edge.labels=NA, edge.lty=1,
                        vertex.frame.color="black", 
                        margin=0, loop.angle=0,
                        # SPECIFIC: #####################################
@@ -45,6 +45,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   vertex.size <- (1/200) * i.get.vertex.size(graph, vertex.size)
   edge.color <- i.get.edge.color(graph, edge.color)
   edge.width <- i.get.edge.width(graph, edge.width)
+  edge.lty <- i.get.edge.lty(graph, edge.lty)
   label.degree <- i.get.label.degree(graph, label.degree)
   labels <- i.get.labels(graph, labels)
   edge.labels <- i.get.edge.labels(graph, edge.labels)
@@ -62,6 +63,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   el <- get.edgelist(graph, names=FALSE)
   loops.v <- el[,1] [ el[,1] == el[,2] ] + 1
   loops.e <- which(el[,1] == el[,2])
+  nonloops.e <- which(el[,1] != el[,2])
   loop.labels <- edge.labels[el[,1] == el[,2]]
   edge.labels <- edge.labels[el[,1] != el[,2]]
   el <- el[el[,1] != el[,2],]
@@ -109,17 +111,17 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
       sapply(dt, function(t) point.on.cubic.bezier(cp, t))
     }
     
-    plot.bezier <- function(cp, points, color, width, arrows) {
+    plot.bezier <- function(cp, points, color, width, arrows, lty) {
       p <- compute.bezier( cp, points )
-      polygon(p[1,], p[2,], border=color, lwd=width)
+      polygon(p[1,], p[2,], border=color, lwd=width, lty=lty)
       if (arrows) {
         arrows(p[1,ncol(p)-1], p[2,ncol(p)-1], p[1,ncol(p)], p[2,ncol(p)],
-               length=.2, angle=20, col=color)
+               length=.2, angle=20, col=color, lwd=width)
       }
     }
     
     loop <- function(x0, y0, cx=x0, cy=y0, color, angle=0, label=NA,
-                     width=1, arrows=FALSE) {
+                     width=1, arrows=FALSE, lty=1) {
       rad <- angle/180*pi
       center <- c(cx,cy)
       cp <- matrix( c(x0,y0, x0+.4,y0+.2, x0+.4,y0-.2, x0,y0),
@@ -132,7 +134,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
       cp[,1] <- cx+r*cos(phi)
       cp[,2] <- cy+r*sin(phi)
 
-      plot.bezier(cp, 50, color, width, arrows=arrows)
+      plot.bezier(cp, 50, color, width, arrows=arrows, lty=lty)
 
       if (!is.na(label)) {
         lx <- x0+.3
@@ -157,18 +159,30 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
     if (length(edge.width)>1) { ew <- ew[loops.e] }
     la <- loop.angle
     if (length(loop.angle)>1) { la <- la[loops.e] }
+    lty <- edge.lty
+    if (length(edge.lty)>1) { lty <- lty[loops.e] }
     xx0 <- layout[loops.v,1] + cos(la/180*pi) * vs
     yy0 <- layout[loops.v,2] + sin(la/180*pi) * vs
     mapply(loop, xx0, yy0,
-           color=ec, angle=la, label=loop.labels,
+           color=ec, angle=la, label=loop.labels, lty=lty,
            width=ew, MoreArgs=list(arrows=is.directed(graph)))
 
   }
   
   arrow.code <- ifelse(is.directed(graph), 2, 0)
-  if (length(x0) != 0) {    
+  if (length(x0) != 0) {
+    if (length(edge.color)>1) { edge.color <- edge.color[nonloops.e] }
+    if (length(edge.width)>1) { edge.width <- edge.width[nonloops.e] }
+    if (length(edge.lty)>1) { edge.lty <- edge.lty[nonloops.e] }
     arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.code,
-           col=edge.color, lwd=edge.width)
+           col=edge.color, lwd=edge.width, lty=edge.lty)
+    if (any(lty != 1)) {
+      pp <- atan2(y0-y1, x0-x1)
+      xx <- x1+0.01*cos(pp)
+      yy <- y1+0.01*sin(pp)
+      arrows(xx, yy, x1, y1, angle=20, length=0.2, code=arrow.code,
+             col=edge.color, lwd=edge.width, lty=1)
+    }
     x <- (x0+x1)/2
     y <- (y0+y1)/2
     if (!is.null(label.font)) par(family=label.font)

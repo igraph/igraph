@@ -2,6 +2,13 @@
 
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : corrected loop drawing
 
+	* interfaces/R/igraph/R/plot.common.R (i.get.edge.lty) : added
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : edge.lty argument
+	added, edge.color and edge.width handled well even if loops edges
+	are present
+	* interfaces/R/igraph/R/tkplot.R (tkplot) : edge.lty argument
+	added
+	
 2007-01-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c.in (R_igraph_empty) : removed,

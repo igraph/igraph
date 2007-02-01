@@ -39,9 +39,9 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                    label.font=NULL, label.degree=-pi/4, label.dist=0,
                    vertex.color="SkyBlue2", vertex.size=15,
                    edge.color="darkgrey", edge.width=1,
-                   edge.labels=NA,
+                   edge.labels=NA, edge.lty=1,
                    vertex.frame.color="black",
-                   loop.angle=0, margin=30,
+                   loop.angle=0, margin=0,
                    ...) {
 
   if (!is.igraph(graph)) {
@@ -67,6 +67,13 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   # Edge width
   edge.width <- i.get.edge.width(graph, edge.width)
 
+  # Edge line type
+  edge.lty <- i.get.edge.lty(graph, edge.lty)
+  if (is.numeric(edge.lty)) {
+    lty <- c( " ", "", "-", ".", "-.", "--", "--.")
+    edge.lty <- lty[edge.lty+1]
+  }
+
   # Edge labels
   edge.labels <- i.get.edge.labels(graph, edge.labels)
   
@@ -87,10 +94,11 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   # Create parameters
   params <- list(vertex.color=vertex.color, vertex.size=vertex.size,
                  edge.color=edge.color, label.color=label.color,
-                 labels.state=1, edge.width=edge.width, padding=margin,
+                 labels.state=1, edge.width=edge.width, padding=margin*300+30,
                  grid=0, label.font=label.font, label.degree=label.degree,
                  label.dist=label.dist, edge.labels=edge.labels,
-                 vertex.frame.color=vertex.frame.color, loop.angle=loop.angle)
+                 vertex.frame.color=vertex.frame.color,
+                 loop.angle=loop.angle, edge.lty=edge.lty)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
@@ -763,12 +771,15 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   edge.width <- ifelse(length(tkp$params$edge.width)>1,
                        tkp$params$edge.width[id],
                        tkp$params$edge.width)
+  edge.lty <- ifelse(length(tkp$params$edge.lty)>1,
+                       tkp$params$edge.lty[[id]],
+                       tkp$params$edge.lty)
   if (from != to) {
     ## non-loop edge
     tkcreate(tkp$canvas, "line", from.c[1], from.c[2], to.c[1], to.c[2],
              width=edge.width, activewidth=2*edge.width,
              arrow=arrow, arrowshape=c(10, 10, 5),
-             fill=edge.color, activefill="red",           
+             fill=edge.color, activefill="red", dash=edge.lty,
              tags=c("edge", paste(sep="", "edge-", id),
                paste(sep="", "from-", from),
                paste(sep="", "to-", to)))
@@ -779,7 +790,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
              from.c[1]+20, from.c[1]-10, from.c[2]+30, from.c[2],
              from.c[1]+20, from.c[1]+10, from.c[1], from.c[2],
              width=edge.width, activewidth=2*edge.width,
-             arrow=arrow, arrowshape=c(10,10,5),
+             arrow=arrow, arrowshape=c(10,10,5), dash=edge.lty,
              fill=edge.color, activefill="red", smooth=TRUE,
              tags=c("edge", "loop", paste(sep="", "edge-", id),
                paste(sep="", "from-", from),
@@ -1130,7 +1141,13 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 .tkplot.deselect.edge <- function(tkp.id, tkid) {
   canvas <- .tkplot.get(tkp.id, "canvas")
   tkdtag(canvas, tkid, "selected")
-  tkitemconfigure(canvas, tkid, "-dash", "")
+  tkp <- .tkplot.get(tkp.id)
+  tags <- as.character(tkgettags(canvas, tkid))
+  id <- as.numeric(substring(tags[pmatch("edge-", tags)], 6))
+  edge.lty <- ifelse(length(tkp$params$edge.lty)>1,
+                     tkp$params$edge.lty[[id]],
+                     tkp$params$edge.lty)
+  tkitemconfigure(canvas, tkid, "-dash", edge.lty)
 }
 
 .tkplot.deselect.label <- function(tkp.id, tkid) {
