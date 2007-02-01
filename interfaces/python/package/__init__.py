@@ -1,6 +1,9 @@
 """
 IGraph library.
-Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
+
+Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>, Tamas Nepusz
+<ntamas@rmki.kfki.hu>
+
 MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
 
 This program is free software; you can redistribute it and/or modify
@@ -165,7 +168,11 @@ class Graph(core.GraphBase):
     inherited methods come after the ones implemented directly in the
     subclass.
     """
-    
+
+    # Some useful aliases
+    omega = core.GraphBase.clique_number
+    alpha = core.GraphBase.independence_number
+
     def indegree(self, *args, **kwds):
 	"""Returns the in-degrees in a list.
 	

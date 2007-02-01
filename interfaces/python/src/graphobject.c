@@ -4317,6 +4317,295 @@ PyObject* igraphmodule_Graph_mincut_value(igraphmodule_GraphObject* self,
   return Py_BuildValue("d", (double)result);
 }
 
+
+/** \ingroup python_interface_graph
+ * \brief Find all or some cliques in a graph
+ */
+PyObject* igraphmodule_Graph_cliques(igraphmodule_GraphObject *self,
+				     PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = {"min", "max", NULL};
+  PyObject *list, *item;
+  long min_size=0, max_size=0;
+  long int i, j, n;
+  igraph_vector_ptr_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ii", kwlist,
+				   &min_size, &max_size))
+    return NULL;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    PyErr_SetString(PyExc_MemoryError, "");
+    return NULL;
+  }  
+  
+  if (igraph_cliques(&self->g, &result, min_size, max_size)) {
+    igraph_vector_ptr_destroy(&result);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  n = (long)igraph_vector_ptr_size(&result);
+  list = PyList_New(n);
+  if (!list) return NULL;
+
+  for (i=0; i<n; i++) {
+    igraph_vector_t* vec=(igraph_vector_t*)VECTOR(result)[i];
+    item = igraphmodule_vector_t_to_PyTuple(vec);
+    if (!item) {
+      for (j=i; j<n; j++)
+	igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[j]);
+      igraph_vector_ptr_destroy(&result);
+      Py_DECREF(list);
+      return NULL;
+    } else {
+      PyList_SET_ITEM(list, i, item);
+    }
+    igraph_vector_destroy(vec);
+  }
+  igraph_vector_ptr_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Find all largest cliques in a graph
+ */
+PyObject* igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject *self) {
+  PyObject *list, *item;
+  long int i, j, n;
+  igraph_vector_ptr_t result;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    PyErr_SetString(PyExc_MemoryError, "");
+    return NULL;
+  }  
+  
+  if (igraph_largest_cliques(&self->g, &result)) {
+    igraph_vector_ptr_destroy(&result);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  n = (long)igraph_vector_ptr_size(&result);
+  list = PyList_New(n);
+  if (!list) return NULL;
+
+  for (i=0; i<n; i++) {
+    igraph_vector_t* vec=(igraph_vector_t*)VECTOR(result)[i];
+    item = igraphmodule_vector_t_to_PyTuple(vec);
+    if (!item) {
+      for (j=i; j<n; j++)
+	igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[j]);
+      igraph_vector_ptr_destroy(&result);
+      Py_DECREF(list);
+      return NULL;
+    } else {
+      PyList_SET_ITEM(list, i, item);
+    }
+    igraph_vector_destroy(vec);
+  }
+  igraph_vector_ptr_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Find all maximal cliques in a graph
+ */
+PyObject* igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject *self) {
+  PyObject *list, *item;
+  long int i, j, n;
+  igraph_vector_ptr_t result;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    PyErr_SetString(PyExc_MemoryError, "");
+    return NULL;
+  }  
+  
+  if (igraph_maximal_cliques(&self->g, &result)) {
+    igraph_vector_ptr_destroy(&result);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  n = (long)igraph_vector_ptr_size(&result);
+  list = PyList_New(n);
+  if (!list) return NULL;
+
+  for (i=0; i<n; i++) {
+    igraph_vector_t* vec=(igraph_vector_t*)VECTOR(result)[i];
+    item = igraphmodule_vector_t_to_PyTuple(vec);
+    if (!item) {
+      for (j=i; j<n; j++)
+	igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[j]);
+      igraph_vector_ptr_destroy(&result);
+      Py_DECREF(list);
+      return NULL;
+    } else {
+      PyList_SET_ITEM(list, i, item);
+    }
+    igraph_vector_destroy(vec);
+  }
+  igraph_vector_ptr_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the clique number of the graph
+ */
+PyObject* igraphmodule_Graph_clique_number(igraphmodule_GraphObject *self) {
+  PyObject *result;
+  igraph_integer_t i;
+
+  if (igraph_clique_number(&self->g, &i))
+    return igraphmodule_handle_igraph_error();
+
+  result = PyInt_FromLong((long)i);
+  return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Find all or some independent vertex sets in a graph
+ */
+PyObject* igraphmodule_Graph_independent_vertex_sets(igraphmodule_GraphObject *self,
+						     PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = {"min", "max", NULL};
+  PyObject *list, *item;
+  long min_size=0, max_size=0;
+  long int i, j, n;
+  igraph_vector_ptr_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ii", kwlist,
+				   &min_size, &max_size))
+    return NULL;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    PyErr_SetString(PyExc_MemoryError, "");
+    return NULL;
+  }  
+  
+  if (igraph_independent_vertex_sets(&self->g, &result, min_size, max_size)) {
+    igraph_vector_ptr_destroy(&result);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  n = (long)igraph_vector_ptr_size(&result);
+  list = PyList_New(n);
+  if (!list) return NULL;
+
+  for (i=0; i<n; i++) {
+    igraph_vector_t* vec=(igraph_vector_t*)VECTOR(result)[i];
+    item = igraphmodule_vector_t_to_PyTuple(vec);
+    if (!item) {
+      for (j=i; j<n; j++)
+	igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[j]);
+      igraph_vector_ptr_destroy(&result);
+      Py_DECREF(list);
+      return NULL;
+    } else {
+      PyList_SET_ITEM(list, i, item);
+    }
+    igraph_vector_destroy(vec);
+  }
+  igraph_vector_ptr_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Find all largest independent_vertex_sets in a graph
+ */
+PyObject* igraphmodule_Graph_largest_independent_vertex_sets(igraphmodule_GraphObject *self) {
+  PyObject *list, *item;
+  long int i, j, n;
+  igraph_vector_ptr_t result;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    PyErr_SetString(PyExc_MemoryError, "");
+    return NULL;
+  }  
+  
+  if (igraph_largest_independent_vertex_sets(&self->g, &result)) {
+    igraph_vector_ptr_destroy(&result);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  n = (long)igraph_vector_ptr_size(&result);
+  list = PyList_New(n);
+  if (!list) return NULL;
+
+  for (i=0; i<n; i++) {
+    igraph_vector_t* vec=(igraph_vector_t*)VECTOR(result)[i];
+    item = igraphmodule_vector_t_to_PyTuple(vec);
+    if (!item) {
+      for (j=i; j<n; j++)
+	igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[j]);
+      igraph_vector_ptr_destroy(&result);
+      Py_DECREF(list);
+      return NULL;
+    } else {
+      PyList_SET_ITEM(list, i, item);
+    }
+    igraph_vector_destroy(vec);
+  }
+  igraph_vector_ptr_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Find all maximal independent vertex sets in a graph
+ */
+PyObject* igraphmodule_Graph_maximal_independent_vertex_sets(igraphmodule_GraphObject *self) {
+  PyObject *list, *item;
+  long int i, j, n;
+  igraph_vector_ptr_t result;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    PyErr_SetString(PyExc_MemoryError, "");
+    return NULL;
+  }  
+  
+  if (igraph_maximal_independent_vertex_sets(&self->g, &result)) {
+    igraph_vector_ptr_destroy(&result);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  n = (long)igraph_vector_ptr_size(&result);
+  list = PyList_New(n);
+  if (!list) return NULL;
+
+  for (i=0; i<n; i++) {
+    igraph_vector_t* vec=(igraph_vector_t*)VECTOR(result)[i];
+    item = igraphmodule_vector_t_to_PyTuple(vec);
+    if (!item) {
+      for (j=i; j<n; j++)
+	igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[j]);
+      igraph_vector_ptr_destroy(&result);
+      Py_DECREF(list);
+      return NULL;
+    } else {
+      PyList_SET_ITEM(list, i, item);
+    }
+    igraph_vector_destroy(vec);
+  }
+  igraph_vector_ptr_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the independence number of the graph
+ */
+PyObject* igraphmodule_Graph_independence_number(igraphmodule_GraphObject *self) {
+  PyObject *result;
+  igraph_integer_t i;
+
+  if (igraph_independence_number(&self->g, &i))
+    return igraphmodule_handle_igraph_error();
+
+  result = PyInt_FromLong((long)i);
+  return result;
+}
+
 /** \defgroup python_interface_internal Internal functions
  * \ingroup python_interface */
 
@@ -5655,9 +5944,93 @@ struct PyMethodDef igraphmodule_Graph_methods[] =
    "@return: the value of the minimum cut between the given vertices\n"
   },
 
-  ////////////////////////////////////
-  // INTERNAL/DEVELOPMENT FUNCTIONS //
-  ////////////////////////////////////
+  /********************************/
+  /* CLIQUES AND INDEPENDENT SETS */
+  /********************************/
+  {"cliques", (PyCFunction)igraphmodule_Graph_cliques,
+   METH_VARARGS | METH_KEYWORDS,
+   "cliques(min=0, max=0)\n\n"
+   "Returns some or all cliques of the graph as a list of tuples.\n\n"
+   "A clique is a complete subgraph -- a set of vertices where an edge\n"
+   "is present between any two of them (excluding loops)\n\n"
+   "@param min: the minimum size of cliques to be returned. If zero or\n"
+   "  negative, no lower bound will be used.\n"
+   "@param max: the maximum size of cliques to be returned. If zero or\n"
+   "  negative, no upper bound will be used."
+  },
+  {"largest_cliques", (PyCFunction)igraphmodule_Graph_largest_cliques,
+   METH_NOARGS,
+   "largest_cliques()\n\n"
+   "Returns the largest cliques of the graph as a list of tuples.\n\n"
+   "Quite intuitively a clique is considered largest if there is no clique\n"
+   "with more vertices in the whole graph. All largest cliques are maximal\n"
+   "(i.e. nonextendable) but not all maximal cliques are largest.\n\n"
+   "@see: L{clique_number()} for the size of the largest cliques or\n"
+   "  L{maximal_cliques()} for the maximal cliques"
+  },
+  {"maximal_cliques", (PyCFunction)igraphmodule_Graph_maximal_cliques,
+   METH_NOARGS,
+   "maximal_cliques()\n\n"
+   "Returns the maximal cliques of the graph as a list of tuples.\n\n"
+   "A maximal clique is a clique which can't be extended by adding any other\n"
+   "vertex to it. A maximal clique is not necessarily one of the largest\n"
+   "cliques in the graph.\n\n"
+   "@see: L{largest_cliques()} for the largest cliques."
+  },
+  {"clique_number", (PyCFunction)igraphmodule_Graph_clique_number,
+   METH_NOARGS,
+   "clique_number()\n\n"
+   "Returns the clique number of the graph.\n\n"
+   "The clique number of the graph is the size of the largest clique.\n\n"
+   "@see: L{largest_cliques()} for the largest cliques."
+  },
+  {"independent_vertex_sets", (PyCFunction)igraphmodule_Graph_independent_vertex_sets,
+   METH_VARARGS | METH_KEYWORDS,
+   "independent_vertex_sets(min=0, max=0)\n\n"
+   "Returns some or all independent vertex sets of the graph as a list of tuples.\n\n"
+   "Two vertices are independent if there is no edge between them. Members\n"
+   "of an independent vertex set are mutually independent.\n\n"
+   "@param min: the minimum size of sets to be returned. If zero or\n"
+   "  negative, no lower bound will be used.\n"
+   "@param max: the maximum size of sets to be returned. If zero or\n"
+   "  negative, no upper bound will be used."
+  },
+  {"largest_independent_vertex_sets", (PyCFunction)igraphmodule_Graph_largest_independent_vertex_sets,
+   METH_NOARGS,
+   "largest_independent_vertex_sets()\n\n"
+   "Returns the largest independent vertex sets of the graph as a list of tuples.\n\n"
+   "Quite intuitively an independent vertex set is considered largest if\n"
+   "there is no other set with more vertices in the whole graph. All largest\n"
+   "sets are maximal (i.e. nonextendable) but not all maximal sets\n"
+   "are largest.\n\n"
+   "@see: L{independence_number()} for the size of the largest independent\n"
+   "  vertex sets or L{maximal_independent_vertex_sets()} for the maximal\n"
+   "  (nonextendable) independent vertex sets"
+  },
+  {"maximal_independent_vertex_sets", (PyCFunction)igraphmodule_Graph_maximal_independent_vertex_sets,
+   METH_NOARGS,
+   "maximal_independent_vertex_sets()\n\n"
+   "Returns the maximal independent vertex sets of the graph as a list of tuples.\n\n"
+   "A maximal independent vertex set is an independent vertex set\n"
+   "which can't be extended by adding any other vertex to it. A maximal\n"
+   "independent vertex set is not necessarily one of the largest\n"
+   "independent vertex sets in the graph.\n\n"
+   "@see: L{largest_independent_vertex_sets()} for the largest independent\n"
+   "  vertex sets"
+  },
+  {"independence_number", (PyCFunction)igraphmodule_Graph_independence_number,
+   METH_NOARGS,
+   "independence_number()\n\n"
+   "Returns the independence number of the graph.\n\n"
+   "The independence number of the graph is the size of the largest\n"
+   "independent vertex set.\n\n"
+   "@see: L{largest_independent_vertex_sets()} for the largest independent\n"
+   "  vertex sets"
+  },
+
+  /**********************/
+  /* INTERNAL FUNCTIONS */
+  /**********************/
   {"__graph_as_cobject", (PyCFunction)igraphmodule_Graph___graph_as_cobject__,
       METH_VARARGS | METH_KEYWORDS,
       "__graph_as_cobject()\n\n"

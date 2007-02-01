@@ -176,6 +176,15 @@ PyObject* igraphmodule_Graph_bfsiter(igraphmodule_GraphObject* self, PyObject* a
 PyObject* igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_Graph_mincut_value(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
 
+PyObject* igraphmodule_Graph_cliques(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_largest_cliques(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_clique_number(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_independent_sets(igraphmodule_GraphObject* self, PyObject* args, PyObject* kwds);
+PyObject* igraphmodule_Graph_maximal_independent_sets(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_largest_independent_sets(igraphmodule_GraphObject* self);
+PyObject* igraphmodule_Graph_independence_number(igraphmodule_GraphObject* self);
+
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 

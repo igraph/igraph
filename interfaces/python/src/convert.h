@@ -38,6 +38,7 @@ igraphmodule_conv_t;
 
 int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs);
 PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v);
+PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v);
 PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
 					       igraph_vector_t *v2);
 PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v);

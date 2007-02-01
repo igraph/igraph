@@ -223,26 +223,50 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_b
  * \return the Python integer list as a \c PyObject*, or \c NULL if an error occurred
  */
 PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v) {
-   PyObject* list;
-   int n, i;
+  PyObject* list;
+  int n, i;
    
-   n=igraph_vector_size(v);
-   if (n<0) return igraphmodule_handle_igraph_error();
+  n=igraph_vector_size(v);
+  if (n<0) return igraphmodule_handle_igraph_error();
 
-   // create a new Python list
-   list=PyList_New(n);
-   // populate the list with data
-   for (i=0; i<n; i++) 
-     {
-	if (PyList_SetItem(list, i, PyInt_FromLong(VECTOR(*v)[i]))) 
-	  {
-	     // error occurred while populating the list, return immediately
-	     Py_DECREF(list);
-	     return NULL;
-	  }
-     }
-   // return the list
-   return list;
+  list=PyList_New(n);
+  for (i=0; i<n; i++) {
+    PyObject *item=PyInt_FromLong((long)VECTOR(*v)[i]);
+    if (!item) {
+      Py_DECREF(list);
+      return NULL;
+    }
+    PyList_SET_ITEM(list, i, item);
+  }
+
+  return list;
+}
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts an igraph \c igraph_vector_t to a Python integer tuple
+ * 
+ * \param v the \c igraph_vector_t containing the vector to be converted
+ * \return the Python integer tuple as a \c PyObject*, or \c NULL if an error occurred
+ */
+PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v) {
+  PyObject* tuple;
+  int n, i;
+  
+  n=igraph_vector_size(v);
+  if (n<0) return igraphmodule_handle_igraph_error();
+  
+  tuple=PyTuple_New(n);
+  for (i=0; i<n; i++) {
+    PyObject *item=PyInt_FromLong((long)VECTOR(*v)[i]);
+    if (!item) {
+      Py_DECREF(tuple);
+      return NULL;
+    }
+    PyTuple_SET_ITEM(tuple, i, item);
+  }
+
+  return tuple;
 }
 
 /**
