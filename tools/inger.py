@@ -108,14 +108,25 @@ def apply_template(temp, functions):
     if temp["OMODE"] == "append":
         if not temp.has_key("OUTPUT"):
             print("Error: output file not defined in template")
-            sys.exit()
+            sys.exit(5)
         shutil.copyfile(temp["OUTPUT"]+".in", temp["OUTPUT"])
         output=open(temp["OUTPUT"], "a")
     else:
         print("Unkwown output mode")
-        sys.exit()
+        sys.exit(6)
 
     for funcname in functions:
+
+        # ignore?
+        if functions[funcname].has_key("IGNORE"):
+            igns=functions[funcname]["IGNORE"]
+            br=False
+            for ign in igns:
+                if temp["NAME"] in ign:
+                    br=True
+                    break
+            if br: continue
+        
         entries=dict()
 
         if verbose:
@@ -128,8 +139,9 @@ def apply_template(temp, functions):
             if so==None: break
             ind=so.end(1)+2
             entry=text[so.start(1):so.end(1)]
-            value=get_entry(entry, temp, functions[funcname])
-            entries[entry]=value
+            if not entries.has_key(entry):
+                value=get_entry(entry, temp, functions[funcname])
+                entries[entry]=value
 
         for entryname in entries:
             text=text.replace("%"+entryname+"%", entries[entryname])
@@ -177,9 +189,6 @@ def get_entry(entry, temp, func):
                 res=res+decl
             else:
                 decl=typerec["CTYPE"] + " " + cpref+arg[2] + ";"
-                res=res+decl
-            if arg[0]=="OUT":
-                decl=typerec["ITYPE"] + " " + ipref+arg[2] + ";"
                 res=res+decl
     ############### INCONV ####################
     elif entry=="INCONV":
@@ -241,7 +250,6 @@ def get_entry(entry, temp, func):
             if res != "":
                 res=res+", "
             res=res+name
-
     ############### CINPAR ####################
     elif entry=="CINPAR":
         res=""
@@ -303,7 +311,7 @@ def get_entry(entry, temp, func):
     ###########################################
     else:
         print "Error, unknown entry in template:", entry
-        sys.exit()
+        sys.exit(7)
     
     return res
 
@@ -319,6 +327,7 @@ def remove_comments(string):
         elif string[i]=="\\" and i<len(string)-1:
             i=i+1
             res=res+string[i]
+            i=i+1
         elif string[i]=="\\":
             i=i+1
         else:
@@ -355,7 +364,7 @@ def parse_template(lines, templates):
     if not mo:
         print("Template file parse error in line "+str(lineno))
         print(lines[0])
-        sys.exit()
+        sys.exit(8)
     template_name=mo.group(1)
     commands["NAME"] = template_name
     lines=lines[1:]
@@ -413,7 +422,7 @@ def parse_type(lines, types):
     if not mo:
         print("Type file parse error in line "+str(lineno))
         print(lines[0])
-        sys.exit()
+        sys.exit(9)
     type_name=mo.group(1)
     if verbose:
         print("      Parsing type " + type_name)
@@ -422,9 +431,13 @@ def parse_type(lines, types):
 
     # entries
     while len(lines) > 0 and len(lines[0]) > 0 and lines[0][0]=="\t":
-        mo=re.match("^\t\s*([\w\-\.]+)\s*:\s*(.*)$", lines[0])
+        mo=re.match("^\t\s*([\w\-\.]+)\s*(\(!?[\w, ]+\))?\s*:\s*(.*)$", lines[0])
+        if not mo:
+            print("      Parse error while parsing type " + type_name)
+            print(lines[0])
+            sys.exit(20)
         entry=mo.group(1)
-        arg=mo.group(2)
+        arg=mo.group(3)
         lines=lines[1:]
         lineno=lineno+1
         # multi-line arguments
@@ -455,7 +468,7 @@ def parse_function(lines, functions):
     if not mo:
         print("Function file parse error in line "+str(lineno))
         print(lines[0])
-        sys.exit()
+        sys.exit(10)
     function_name=mo.group(1)
     entries["NAME"]=function_name
     lines=lines[1:]
@@ -488,6 +501,7 @@ def parse_function(lines, functions):
 
 def parse_function_entry(entry, arg):
     global lineno
+    ####################### ARG #######################
     if entry=="ARG":
         words=arg.split()
         if len(words)==3:
@@ -496,14 +510,16 @@ def parse_function_entry(entry, arg):
             res=("IN", words[0], words[1])
         else:
             print("Error in function entry, line" + lineno-1)
-            sys.exit()
+            sys.exit(11)
+    ####################### RETURN #####################
     elif entry=="RETURN":
         res=arg
+    ####################### DEFAULT ####################
     elif entry=="DEFAULT":
         mo=re.match("^([^\"]*)\s*\"(.*)\"$", arg)
         if not mo:
             print("Error in function entry, line" + lineno-1)
-            sys.exit()
+            sys.exit(12)
         value=mo.group(2)
         words=mo.group(1).split()
         if len(words)==1:
@@ -512,16 +528,26 @@ def parse_function_entry(entry, arg):
             res=( words[0], words[1], value)
         else:
             print("Error in function entry, line" + lineno-1)
-            sys.exit()
+            sys.exit(13)
+    ####################### INAME #####################
     elif entry=="INAME":
         words=arg.split()
         if len(words)==2:
             res=(words[0], words[1])
         else:
             res=(None, words[0])
+    ####################### IGNORE ####################
+    elif entry=="IGNORE":
+        res=tuple(arg.split())
+    ####################### FLAG ######################
+    elif entry=="FLAG":
+        res=tuple(arg.split())
+    elif entry=="RETTYPE":
+        res=arg
+    ###################################################        
     else:
         print "Error: unknown function entry in line", lineno-1
-        sys.exit()
+        sys.exit(14)
 
     return res
 

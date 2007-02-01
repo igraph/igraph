@@ -8,14 +8,26 @@ FUNCTION igraph_empty:			# name of the function in the C source
 	DEFAULT:directed "TRUE"		# directed=TRUE is the default value
 	INAME:	R-R graph.empty		# in R function renamed to graph.empty
 	INAME:	R-NAMESPACE graph.empty
+	FLAG:	SHOUT graph
+	IGNORE:	R-R R-C R-NAMESPACE
 
-# This is too difficult yet
-#
-#FUNCTION igraph_add_edges:
-#	ARG:	INOUT GRAPH graph
-#	ARG:	IN VECTOR edges
-#	ARG:	IN ATTRIBUTES attr
-#	RETURN:	graph
-#	INAME:	R-R add.edges
-#	INAME:	R_NAMESPACE add.edges
+FUNCTION igraph_add_edges:
+	ARG:	INOUT GRAPH graph
+	ARG:	IN VECTOR edges
+	ARG:	IN ATTRIBUTES attr
+	RETURN:	graph
+	INAME:	R-R add.edges
+	INAME:	R_NAMESPACE add.edges
+	IGNORE:	R-R R-C R-NAMESPACE
+	FLAG:	SHIN graph
+	FLAG:	SHOUT graph
 
+FUNCTION igraph_vcount:
+	ARG:	IN GRAPH graph
+	RETTYPE: INTEGER	        # return type is not int
+	RETURN:	RETURN                  # the output of the func. is returned
+	INAME:	R-R vcount
+	INAME:	R-NAMESPACE vcount
+	IGNORE:	R-R R-C R-NAMESPACE
+	FLAG:	SHIN graph
+	FLAG:	SHOUT RETURN
