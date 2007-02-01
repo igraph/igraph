@@ -18,8 +18,8 @@ tkplot (graph, layout = layout.random, layout.par = list(),
     labels = NULL, label.color = "darkblue", label.font = NULL, 
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
     vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
-    edge.labels=NA, vertex.frame.color="black", loop.angle=0,
-    margin=30, \dots)
+    edge.labels=NA, edge.lty=1, vertex.frame.color="black", loop.angle=0,
+    margin=0, \dots)
 
 tkplot.close(tkp.id, window.close = TRUE) 
 tkplot.off()
@@ -98,6 +98,12 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
     character vector. The default is \code{NA} which suppresses edge
     labels. The vector might contain \code{NA}'s as well to suppress
     labels for some edges.}
+  \item{edge.lty}{The line types for drawing the edges, the default
+    is a solid line. This argument can also be a vector to define
+    different line types for different edges. If this argument is
+    numeric then the line types defined in the manual page of the
+    \code{par} command will be used. If the argument is not numeric
+    then it is interpreted as a Tk dash.}
   \item{vertex.frame.color}{The border color of the vertices,
     either a character constant with prefix \dQuote{\code{a:}} for using
     an attribute or without it: a constant color for all vertices, or a
@@ -105,7 +111,10 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
     for the vertices.}
   \item{loop.angle}{Numeric vector of constant giving the angle in
     degrees for the visualization of loop edges.}
-  \item{margin}{The margin at each side of the canvas.}
+  \item{margin}{The margin at each side of the canvas. The unit is 300
+    to have a similar parameter range as for nonintertive graph
+    plots. Note that a 30 pixel wide margin will be always added to the
+    value of this parameter.}
   \item{tkp.id}{The id of the tkplot window to close.}
   \item{window.close}{Leave this on the default value.}
    \item{width}{The width of the rectangle for generating new

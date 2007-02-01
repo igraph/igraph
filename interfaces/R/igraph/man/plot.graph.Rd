@@ -9,8 +9,9 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
     labels = NULL, label.color = "darkblue", label.font = NULL, 
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
     vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
-    edge.labels = NA, vertex.frame.color="black", margin=0, loop.angle=0,
-    axes = FALSE, xlab = "", ylab = "", xlim=c(-1,1), ylim=c(-1,1), \dots)
+    edge.labels = NA, edge.lty=1, vertex.frame.color="black", margin=0,
+    loop.angle=0, axes = FALSE, xlab = "", ylab = "",
+    xlim=c(-1,1), ylim=c(-1,1), \dots)
 }
 \arguments{
   \item{x}{The graph to plot.}
@@ -40,6 +41,10 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
     character vector. The default is \code{NA} which suppresses edge
     labels. The vector might contain \code{NA}'s as well to suppress
     labels for some edges.}
+  \item{edge.lty}{The line type for the edges, see the manual page
+    of \code{par} for the possible values. This can be also a vector
+    to define different a line type for each edge.
+  }
   \item{vertex.frame.color}{The color(s) of the border of the vertices.}
   \item{margin}{The margin to add to each side of the plot.}
   \item{loop.angle}{Numeric vector or constant giving the angle in
