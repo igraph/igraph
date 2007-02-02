@@ -35,6 +35,10 @@ class GameTests(unittest.TestCase):
 	g=Graph.Asymmetric_Preference(100, [[0, 1], [1, 0]], [[1, 0], [0, 1]])
 	self.failUnless(isinstance(g, Graph) and max(g.clusters()) == 0)
 
+    def testWattsStrogatz(self):
+	g=Graph.Watts_Strogatz(1, 20, 1, 0.2)
+	self.failUnless(isinstance(g, Graph) and g.vcount()==20 and g.ecount()==20)
+	
 def suite():
     game_suite = unittest.makeSuite(GameTests)
     return unittest.TestSuite([game_suite])

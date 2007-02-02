@@ -89,6 +89,7 @@ PyObject* igraphmodule_Graph_Recent_Degree(PyTypeObject *type, PyObject *args, P
 PyObject* igraphmodule_Graph_Ring(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Star(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Tree(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_Watts_Strogatz(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_is_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_are_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);

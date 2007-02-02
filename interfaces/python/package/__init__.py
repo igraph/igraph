@@ -34,6 +34,7 @@ from tempfile import mkstemp
 
 class Interval:
     """A class representing an interval over the real numbers"""
+
     def __init__(self, left, right):
 	"""Constructor.
 
@@ -167,11 +168,14 @@ class Graph(core.GraphBase):
     methods in the Epydoc documentation is a little bit obscure:
     inherited methods come after the ones implemented directly in the
     subclass.
+
+    @deffield ref: Reference
     """
 
     # Some useful aliases
     omega = core.GraphBase.clique_number
     alpha = core.GraphBase.independence_number
+    shell_index = core.GraphBase.coreness
 
     def indegree(self, *args, **kwds):
 	"""Returns the in-degrees in a list.
@@ -242,10 +246,6 @@ class Graph(core.GraphBase):
 	to the given number of clusters. Edge betweennesses are recalculated
 	after every run.
 
-	For more information, see the original paper of Girvan and Newman:
-	Girvan, M and Newman, MEJ: Community structure in social and
-	biological networks. Proc. Natl. Acad. Sci. USA 99, 7821-7826 (2002)
-
 	@param clusters: the desired number of clusters.
 	@param steps: the number of tests to take.
 	@param return_graph: whether to return the state of the graph when
@@ -254,7 +254,11 @@ class Graph(core.GraphBase):
         @return: the cluster index for every node. If C{return_graph} is
 	  C{True}, the clustered graph is also returned. If
 	  C{return_removed_edges} is C{True}, the list of removed edges is
-	  also returned."""
+	  also returned.
+
+	@ref: Girvan, M and Newman, MEJ: Community structure in social and
+	  biological networks. Proc. Natl. Acad. Sci. USA 99, 7821-7826 (2002)
+        """
 	g = self.copy()
 	number_of_steps = 0
 	removed_edges = [None, []][return_removed_edges]
@@ -290,6 +294,42 @@ class Graph(core.GraphBase):
 	    return g.clusters(), removed_edges
 	return g.clusters()
 
+
+    def k_core(self, *args):
+	"""Returns some k-cores of the graph.
+
+	The method accepts an arbitrary number of arguments representing
+	the desired indices of the M{k}-cores to be returned. The arguments
+	can also be lists or tuples. The result is a single L{Graph} object
+	if an only integer argument was given, otherwise the result is a
+	list of L{Graph} objects representing the desired k-cores in the
+	order the arguments were specified. If no argument is given, returns
+	all M{k}-cores in increasing order of M{k}.
+	"""
+	if len(args) == 0:
+	    indices = xrange(self.vcount())
+	    return_single = False
+	else:
+	    return_single = True
+	    indices = []
+	    for arg in args:
+		try:
+		    indices.extend(arg)
+		except:
+		    indices.append(arg)
+
+	if len(indices)>1 or hasattr(args[0], "__iter__"):
+	    return_single = False
+
+	corenesses = self.coreness()
+	result = []
+	vidxs = xrange(self.vcount())
+	for idx in indices:
+	    core_idxs = [vidx for vidx in vidxs if corenesses[vidx] >= idx]
+	    result.append(self.subgraph(core_idxs))
+
+	if return_single: return result[0]
+	return result
 
 
     def write_graphmlz(self, f, compresslevel=9):

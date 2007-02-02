@@ -1213,12 +1213,12 @@ PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type,
 				     PyObject *args,
 				     PyObject *kwds) {
   igraph_vector_t dimvector;
-  long nei=1, ndims, i;
+  long nei=1;
   igraph_bool_t directed;
   igraph_bool_t mutual;
   igraph_bool_t circular;
   PyObject *o_directed=Py_False, *o_mutual=Py_True, *o_circular=Py_True;
-  PyObject *o_dimvector=Py_None, *o;
+  PyObject *o_dimvector=Py_None;
   igraphmodule_GraphObject *self;
   
   char *kwlist[] = {"dim", "nei", "directed", "mutual", "circular", NULL};
@@ -1232,23 +1232,8 @@ PyObject* igraphmodule_Graph_Lattice(PyTypeObject *type,
   mutual=PyObject_IsTrue(o_mutual);
   circular=PyObject_IsTrue(o_circular);
 
-  ndims=PyList_Size(o_dimvector);
-  igraph_vector_init(&dimvector, ndims);
-  for (i=0; i<ndims; i++) {
-    o=PyList_GetItem(o_dimvector, i);
-    if (o) {
-      if (PyInt_Check(o))
-	VECTOR(dimvector)[i] = (igraph_integer_t)PyInt_AsLong(o);
-      else {
-	PyErr_SetString(PyExc_TypeError, "Dimension list must contain integers");
-	igraph_vector_destroy(&dimvector);
-	return NULL;
-      }
-    } else {
-      igraph_vector_destroy(&dimvector);
-      return NULL;
-    }
-  }
+  if (igraphmodule_PyList_to_vector_t(o_dimvector, &dimvector, 1, 0))
+    return NULL;
 	
   self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
@@ -1729,6 +1714,38 @@ PyObject* igraphmodule_Graph_Isoclass(PyTypeObject *type,
     }
   }
     
+  return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a graph based on the Watts-Strogatz model
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_watts_strogatz_game
+ */
+PyObject* igraphmodule_Graph_Watts_Strogatz(PyTypeObject *type,
+					    PyObject *args,
+					    PyObject *kwds) {
+  long nei=1, dim, size;
+  double p;
+  igraphmodule_GraphObject *self;
+  
+  char *kwlist[] = {"dim", "size", "nei", "p", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "llld", kwlist,
+				   &dim, &size, &nei, &p))
+    return NULL;
+
+  self = (igraphmodule_GraphObject*)type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+  
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_watts_strogatz_game(&self->g, dim, size, nei, p)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+  
   return (PyObject*)self;
 }
 
@@ -4318,6 +4335,8 @@ PyObject* igraphmodule_Graph_mincut_value(igraphmodule_GraphObject* self,
 }
 
 
+/* {{{ CLIQUES AND INDEPENDENT SETS */
+
 /** \ingroup python_interface_graph
  * \brief Find all or some cliques in a graph
  */
@@ -4606,6 +4625,40 @@ PyObject* igraphmodule_Graph_independence_number(igraphmodule_GraphObject *self)
   return result;
 }
 
+/* }}} */
+
+/* {{{ K-CORES */
+
+/** \ingroup python_interface_graph
+ * \brief Returns the corenesses of the graph vertices
+ * \return a new PyCObject
+ */
+PyObject* igraphmodule_Graph_coreness(igraphmodule_GraphObject *self,
+				      PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = {"mode", NULL};
+  long mode = (long)IGRAPH_ALL;
+  igraph_vector_t result;
+  PyObject *o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|i", kwlist, &mode))
+    return NULL;
+
+  if (igraph_vector_init(&result, igraph_vcount(&self->g)))
+    return igraphmodule_handle_igraph_error();
+
+  if (igraph_k_cores(&self->g, &result, mode)) {
+    igraph_vector_destroy(&result);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  o=igraphmodule_vector_t_to_PyList(&result);
+  igraph_vector_destroy(&result);
+
+  return o;
+}
+
+/* }}} */
+
 /** \defgroup python_interface_internal Internal functions
  * \ingroup python_interface */
 
@@ -4887,21 +4940,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] =
 	
   // interface to igraph_barabasi_game
   {"Barabasi", (PyCFunction)igraphmodule_Graph_Barabasi,
-      METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-      "Barabasi(n, m, outpref=False, directed=False, power=1)\n\n"
-      "Generates a graph based on the Barabasi-Albert model.\n\n"
-      "@param n: the number of vertices\n"
-      "@param m: either the number of outgoing edges generated for\n"
-      "  each vertex or a list containing the number of outgoing\n"
-      "  edges for each vertex explicitly.\n"
-      "@param outpref: C{True} if the out-degree of a given vertex\n"
-      "  should also increase its citation probability (as well as\n"
-      "  its in-degree), but it defaults to C{False}.\n"
-      "@param directed: C{True} if the generated graph should be\n"
-      "  directed (default: C{False}).\n"
-      "@param power: the power constant of the nonlinear model.\n"
-      "  It can be omitted, and in this case the usual linear model\n"
-      "  will be used.\n"
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Barabasi(n, m, outpref=False, directed=False, power=1)\n\n"
+   "Generates a graph based on the Barabasi-Albert model.\n\n"
+   "@param n: the number of vertices\n"
+   "@param m: either the number of outgoing edges generated for\n"
+   "  each vertex or a list containing the number of outgoing\n"
+   "  edges for each vertex explicitly.\n"
+   "@param outpref: C{True} if the out-degree of a given vertex\n"
+   "  should also increase its citation probability (as well as\n"
+   "  its in-degree), but it defaults to C{False}.\n"
+   "@param directed: C{True} if the generated graph should be\n"
+   "  directed (default: C{False}).\n"
+   "@param power: the power constant of the nonlinear model.\n"
+   "  It can be omitted, and in this case the usual linear model\n"
+   "  will be used.\n\n"
+   "@deffield ref: Reference\n"
+   "@ref: Barabasi, A-L and Albert, R. 1999. Emergence of scaling\n"
+   "  in random networks. Science, 286 509-512."
   },
 
   // interface to igraph_establishment_game
@@ -5080,7 +5136,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] =
       "@param class: the isomorphy class\n"
       "@param directed: whether the graph should be directed.\n"
   },
-  
+
+  /* interface to igraph_watts_strogatz_game */
+  {"Watts_Strogatz", (PyCFunction)igraphmodule_Graph_Watts_Strogatz,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Watts_Strogatz(dim, nei, p)"
+   "@param dim: list with the dimensions of the lattice\n"
+   "@param nei: value giving the distance (number of steps) within which\n"
+   "   two vertices will be connected. Not implemented yet, should be 1.\n"
+   "@param p: rewiring probability\n\n"
+   "@see: L{Lattice()}, L{rewire()} if more flexibility is needed"
+  },
+
   /////////////////////////////////////
   // STRUCTURAL PROPERTIES OF GRAPHS //
   /////////////////////////////////////
@@ -6028,6 +6095,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] =
    "  vertex sets"
   },
 
+  /********************************/
+  /* CLUSTERING AND DECOMPOSITION */
+  /********************************/
+  {"coreness", (PyCFunction)igraphmodule_Graph_coreness,
+   METH_VARARGS | METH_KEYWORDS,
+   "coreness(mode=ALL)\n\n"
+   "Finds the coreness (a.k.a. shell index) of the vertices of the network.\n\n"
+   "The M{k}-core of a graph is a maximal subgraph in which each vertex\n"
+   "has at least degree k. (Degree here means the degree in the\n"
+   "subgraph of course). The coreness of a vertex is M{k} if it\n"
+   "is a member of the M{k}-core but not a member of the M{k+1}-core.\n\n"
+   "@param mode: whether to compute the in-corenesses (L{IN}), the\n"
+   "  out-corenesses (L{OUT}) or the undirected corenesses (L{ALL}).\n"
+   "  Ignored and assumed to be L{ALL} for undirected graphs.\n"
+   "@return: the corenesses for each vertex."
+  },
+
   /**********************/
   /* INTERNAL FUNCTIONS */
   /**********************/
@@ -6048,7 +6132,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] =
       "Python. This function should not be used directly by igraph users."
   },
   {NULL}
-
 };
 
 /** \ingroup python_interface_graph
@@ -6130,7 +6213,9 @@ PyTypeObject igraphmodule_GraphType = {
   0,                                        /* tp_setattro */
   0,                                        /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, /* tp_flags */
-  "Low-level representation of a graph.\n\nDon't use it directly, use L{igraph.Graph} instead.",                    /* tp_doc */
+  "Low-level representation of a graph.\n\n"
+  "Don't use it directly, use L{igraph.Graph} instead.\n\n"
+  "@deffield ref: Reference",                    /* tp_doc */
   (traverseproc)igraphmodule_Graph_traverse,/* tp_traverse */
   (inquiry)igraphmodule_Graph_clear,        /* tp_clear */
   0,                                        /* tp_richcompare */
