@@ -1,3 +1,9 @@
+2007-02-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/adjlist.c (igraph_i_adjlist_simplify) : added
+	* src/structural_properties.c (igraph_transitivity_undirected) :
+	rewritten to be faster for graphs with skewed degree distribution
+
 2007-02-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/cores.c (igraph_k_cores) : renamed to igraph_coreness

@@ -128,6 +128,33 @@ void igraph_i_adjlist_sort(igraph_i_adjlist_t *al) {
     igraph_vector_sort(&al->adjs[i]);
 }
 
+int igraph_i_adjlist_simplify(igraph_i_adjlist_t *al) {
+  long int i;
+  long int n=al->length;
+  igraph_vector_t mark;
+  IGRAPH_VECTOR_INIT_FINALLY(&mark, n);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=&al->adjs[i];
+    long int j, l=igraph_vector_size(v);
+    VECTOR(mark)[i] = i+1;
+    for (j=0; j<l; /* nothing */) {
+      long int e=VECTOR(*v)[j];
+      if (VECTOR(mark)[e] != i+1) {
+	VECTOR(mark)[e]=i+1;
+	j++;
+      } else {
+	VECTOR(*v)[j] = igraph_vector_tail(v);
+	igraph_vector_pop_back(v);
+	l--;
+      }
+    }
+  }
+  
+  igraph_vector_destroy(&mark);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 int igraph_i_adjedgelist_init(const igraph_t *graph, 
 			      igraph_i_adjedgelist_t *ael, 
 			      igraph_neimode_t mode) {

@@ -1155,6 +1155,7 @@ int igraph_i_adjlist_init_complementer(const igraph_t *graph,
 				       igraph_bool_t loops);
 void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al);
 void igraph_i_adjlist_sort(igraph_i_adjlist_t *al);
+int igraph_i_adjlist_simplify(igraph_i_adjlist_t *al);
 /* igraph_vector_t *igraph_i_adjlist_get(const igraph_i_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
 #define igraph_i_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])

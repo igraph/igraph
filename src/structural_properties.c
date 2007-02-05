@@ -2286,70 +2286,8 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
  * the graph, d is the average node degree. 
  */
 
-int igraph_transitivity_undirected(const igraph_t *graph, 
+int igraph_transitivity_undirected(const igraph_t *graph,
 				   igraph_real_t *res) {
-
-  long int no_of_nodes=igraph_vcount(graph);
-  igraph_real_t triples=0, triangles=0;
-  long int node;
-  long int *neis;
-  long int deg;
-
-  igraph_i_adjlist_t allneis;
-  igraph_vector_t *neis1, *neis2;
-  long int i, j, neilen1, neilen2;
-  
-  neis=Calloc(no_of_nodes, long int);
-  if (neis==0) {
-    IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, neis);
-
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
-  for (node=0; node<no_of_nodes; node++) {
-
-    IGRAPH_ALLOW_INTERRUPTION();
-
-    neis1=igraph_i_adjlist_get(&allneis, node);
-    neilen1=igraph_vector_size(neis1);
-    deg=0;
-    /* Mark the neighbors of 'node' */
-    for (i=0; i<neilen1; i++) {
-      neis[ (long int)VECTOR(*neis1)[i] ] = node+1;
-      deg++;
-    }
-    triples += deg*(deg-1);
-    
-    /* Count the triangles and triples */
-    for (i=0; i<neilen1; i++) {
-      long int v=VECTOR(*neis1)[i];
-      neis2=igraph_i_adjlist_get(&allneis, v);
-      neilen2=igraph_vector_size(neis2);
-      for (j=0; j<neilen2; j++) {
-	long int v2=VECTOR(*neis2)[j];
-	if (neis[v2] == node+1) {
-	  triangles += 1.0;
-	}
-      }
-    }
-  }
-
-  Free(neis);
-  igraph_i_adjlist_destroy(&allneis);
-  IGRAPH_FINALLY_CLEAN(2);
-
-  *res = triangles/triples;
-
-  return 0;
-}
-
-/* TODO: multiple edges? This is a problem if we've a directed 
-   graph and there is some reciprocity.
-   TODO: ordering */
-
-int igraph_transitivity_undirected2(const igraph_t *graph,
-				    igraph_real_t *res) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_real_t triples=0, triangles=0;
@@ -2363,7 +2301,6 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
   igraph_i_adjlist_t allneis;
   igraph_vector_t *neis1, *neis2;
   long int i, j, neilen1, neilen2;
-  long int deg;
 
   IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
@@ -2379,14 +2316,16 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
     VECTOR(rank)[ (long int) VECTOR(order)[i] ]=no_of_nodes-i-1;
   }
   
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  IGRAPH_CHECK(igraph_i_adjlist_simplify(&allneis));
+
   neis=Calloc(no_of_nodes, long int);
   if (neis==0) {
     IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, neis);
   
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
   for (nn=no_of_nodes-1; nn >=0; nn--) { 
     node=VECTOR(order)[nn];
 
@@ -2394,7 +2333,7 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
     
     neis1=igraph_i_adjlist_get(&allneis, node);
     neilen1=igraph_vector_size(neis1);
-    deg=0;
+    triples += neilen1 * (neilen1-1);
     /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
       long int nei=VECTOR(*neis1)[i];
@@ -2402,7 +2341,6 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
     }
     for (i=0; i<neilen1; i++) {
       long int nei=VECTOR(*neis1)[i];
-      deg += 1;
       /* If 'nei' is not ready yet */      
       if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
 	neis2=igraph_i_adjlist_get(&allneis, nei);
@@ -2415,7 +2353,6 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
 	}
       }
     }
-    triples += deg * (deg-1);
   }
     
   Free(neis);
@@ -2425,6 +2362,8 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(4);
   
   *res = triangles / triples * 2.0;
+  fprintf(stderr, "Triples:   %li\n", (long int) triples);
+  fprintf(stderr, "Triangles: %li\n", (long int) triangles);
   
   return 0;
 }
