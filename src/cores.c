@@ -25,12 +25,13 @@
 #include "memory.h"
 
 /**
- * \function igraph_k_cores 
- * \brief Finding k-cores in a network
+ * \function igraph_coreness 
+ * \brief Finding the coreness of the vertices in a network.
  *
  * The k-core of a graph is a maximal subgraph in which each vertex
  * has at least degree k. (Degree here means the degree in the
- * subgraph of course.)
+ * subgraph of course.). The coreness of a vertex is the highest order 
+ * of a k-core containing the vertex.
  * 
  * </para><para>
  * This function implements the algorithm presented in Vladimir
@@ -51,8 +52,8 @@
  * Time complexity: O(|E|), the number of edges.
  */
 
-int igraph_k_cores(const igraph_t *graph, igraph_vector_t *cores, 
-		   igraph_neimode_t mode) {
+int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores, 
+		    igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int *bin, *vert, *pos;
