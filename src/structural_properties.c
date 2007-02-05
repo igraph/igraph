@@ -2121,58 +2121,92 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_real_t sum=0.0;
   igraph_integer_t count=0;
-  long int node, i, j;
+  long int node, i, j, nn;
   igraph_i_adjlist_t allneis;
   igraph_vector_t *neis1, *neis2;
   long int neilen1, neilen2;
-  igraph_integer_t triples, triangles;
+  igraph_integer_t triples;
   long int *neis;
+  long int maxdegree;
+
+  igraph_vector_t order;
+  igraph_vector_t rank;
+  igraph_vector_t degree;
+  igraph_vector_t triangles;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   
+  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
+			     IGRAPH_LOOPS));
+  maxdegree=igraph_vector_max(&degree)+1;
+  igraph_vector_order(&degree, &order, maxdegree);
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(rank)[ (long int) VECTOR(order)[i] ] = no_of_nodes-i-1;
+  }
+  
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  IGRAPH_CHECK(igraph_i_adjlist_simplify(&allneis));
+
   neis=Calloc(no_of_nodes, long int);
   if (neis==0) {
     IGRAPH_ERROR("undirected average local transitivity failed",
 		 IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, neis);
-  
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
 
-  for (node=0; node<no_of_nodes; node++) {
+  IGRAPH_VECTOR_INIT_FINALLY(&triangles, no_of_nodes);
+  
+  for (nn=no_of_nodes-1; nn >= 0; nn--) {
+    node=VECTOR(order)[nn];
+
     IGRAPH_ALLOW_INTERRUPTION();
     
     neis1=igraph_i_adjlist_get(&allneis, node);
     neilen1=igraph_vector_size(neis1);
+    triples = neilen1 * (neilen1-1) / 2;
     /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
       neis[ (long int)VECTOR(*neis1)[i] ] = node+1;
     }
-    triples=neilen1*(neilen1-1);
-    triangles=0;
     
     for (i=0; i<neilen1; i++) {
-      long int v=VECTOR(*neis1)[i];
-      neis2=igraph_i_adjlist_get(&allneis, v);
-      neilen2=igraph_vector_size(neis2);
-      for (j=0; j<neilen2; j++) {
-	long int v2=VECTOR(*neis2)[j];
-	if (neis[v2] == node+1) {
-	  triangles += 1;
+      long int nei=VECTOR(*neis1)[i];
+      if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
+	neis2=igraph_i_adjlist_get(&allneis, nei);
+	neilen2=igraph_vector_size(neis2);
+	for (j=0; j<neilen2; j++) {
+	  long int nei2=VECTOR(*neis2)[j];
+	  if (VECTOR(rank)[nei2] < VECTOR(rank)[nei]) {
+	    continue;
+	  }
+	  if (neis[nei2] == node+1) {
+	    VECTOR(triangles)[nei2] += 1;
+	    VECTOR(triangles)[nei] += 1;
+	    VECTOR(triangles)[node] += 1;
+	  }
 	}
       }
     }
     
     if (triples != 0) {
-      sum += triangles / triples;
+      sum += VECTOR(triangles)[node] / triples;
       count++;
     }
   }
-
+  
   *res = sum/count;
 
-  igraph_i_adjlist_destroy(&allneis);
+  igraph_vector_destroy(&triangles);
   Free(neis);
-  IGRAPH_FINALLY_CLEAN(2);
+  igraph_i_adjlist_destroy(&allneis);
+  igraph_vector_destroy(&rank);
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(5);
   return 0;
 }
   
