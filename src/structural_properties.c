@@ -2344,6 +2344,70 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   return 0;
 }
 
+/* TODO: multiple edges? This is a problem if we've a directed 
+   graph and there is some reciprocity.
+   TODO: ordering */
+
+int igraph_transitivity_undirected2(const igraph_t *graph,
+				    igraph_real_t *res) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_real_t triples=0, triangles=0;
+  long int node;
+  long int *neis;
+  
+  igraph_i_adjlist_t allneis;
+  igraph_vector_t *neis1, *neis2;
+  long int i, j, neilen1, neilen2;
+  long int deg;
+  
+  neis=Calloc(no_of_nodes, long int);
+  if (neis==0) {
+    IGRAPH_ERROR("undirected transitivity failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, neis);
+  
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  for (node=0; node<no_of_nodes; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    neis1=igraph_i_adjlist_get(&allneis, node);
+    neilen1=igraph_vector_size(neis1);
+    deg=0;
+    /* Mark the neighbors of 'node' and also do the counting */
+    for (i=0; i<neilen1; i++) {
+      long int nei=VECTOR(*neis1)[i];
+      if (nei != node & neis[nei] != node+1) {
+	deg += 1;
+      }
+      /* If 'nei' is not ready yet */      
+      if (nei > node && neis[nei] != node+1) {
+	neis2=igraph_i_adjlist_get(&allneis, nei);
+	neilen2=igraph_vector_size(neis2);
+	for (j=0; j<neilen2; j++) {
+	  long int nei2=VECTOR(*neis2)[j];
+	  if (nei2 != nei && nei2 != node && neis[nei2] == node+1) {
+	    triangles += 1.0;
+	    neis[nei2]=0;
+	  }
+	}
+      }
+      neis[nei] = node+1;
+    }
+    triples += deg * (deg-1);
+  }
+    
+  Free(neis);
+  igraph_i_adjlist_destroy(&allneis);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  *res = triangles / triples * 3.0;
+  
+  return 0;
+}
+
 /**
  * \ingroup structural
  * \function igraph_reciprocity

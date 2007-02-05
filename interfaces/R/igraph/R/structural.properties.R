@@ -230,7 +230,8 @@ transitivity <- function(graph, type="undirected", vids=V(graph)) {
   if (is.character(type)) {
     type <- switch(type, "undirected"=0, "global"=0, "globalundirected"=0,
                    "localundirected"=1, "local"=1, "average"=2,
-                   "localaverage"=2, "localaverageundirected"=2)
+                   "localaverage"=2, "localaverageundirected"=2,
+                   "undirected2"=3)
   }
   
   if (type==0) {
@@ -241,6 +242,9 @@ transitivity <- function(graph, type="undirected", vids=V(graph)) {
           PACKAGE="igraph")
   } else if (type==2) {
     .Call("R_igraph_transitivity_avglocal_undirected", graph,
+          PACKAGE="igraph")
+  } else if (type==3) {
+    .Call("R_igraph_transitivity_undirected2", graph,
           PACKAGE="igraph")
   }
 }
