@@ -2353,13 +2353,31 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_real_t triples=0, triangles=0;
-  long int node;
+  long int node, nn;
+  long int maxdegree;
   long int *neis;
+  igraph_vector_t order;
+  igraph_vector_t rank;
+  igraph_vector_t degree;
   
   igraph_i_adjlist_t allneis;
   igraph_vector_t *neis1, *neis2;
   long int i, j, neilen1, neilen2;
   long int deg;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+
+  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
+			     IGRAPH_LOOPS));
+  maxdegree=igraph_vector_max(&degree)+1;
+  igraph_vector_order(&degree, &order, maxdegree);
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(rank)[ (long int) VECTOR(order)[i] ]=no_of_nodes-i-1;
+  }
   
   neis=Calloc(no_of_nodes, long int);
   if (neis==0) {
@@ -2369,41 +2387,44 @@ int igraph_transitivity_undirected2(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
-  for (node=0; node<no_of_nodes; node++) {
-    
+  for (nn=no_of_nodes-1; nn >=0; nn--) { 
+    node=VECTOR(order)[nn];
+
     IGRAPH_ALLOW_INTERRUPTION();
     
     neis1=igraph_i_adjlist_get(&allneis, node);
     neilen1=igraph_vector_size(neis1);
     deg=0;
-    /* Mark the neighbors of 'node' and also do the counting */
+    /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
       long int nei=VECTOR(*neis1)[i];
-      if (nei != node & neis[nei] != node+1) {
-	deg += 1;
-      }
+      neis[nei] = node+1;
+    }
+    for (i=0; i<neilen1; i++) {
+      long int nei=VECTOR(*neis1)[i];
+      deg += 1;
       /* If 'nei' is not ready yet */      
-      if (nei > node && neis[nei] != node+1) {
+      if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
 	neis2=igraph_i_adjlist_get(&allneis, nei);
 	neilen2=igraph_vector_size(neis2);
 	for (j=0; j<neilen2; j++) {
 	  long int nei2=VECTOR(*neis2)[j];
-	  if (nei2 != nei && nei2 != node && neis[nei2] == node+1) {
+	  if (neis[nei2] == node+1) {
 	    triangles += 1.0;
-	    neis[nei2]=0;
 	  }
 	}
       }
-      neis[nei] = node+1;
     }
     triples += deg * (deg-1);
   }
     
   Free(neis);
   igraph_i_adjlist_destroy(&allneis);
-  IGRAPH_FINALLY_CLEAN(2);
+  igraph_vector_destroy(&rank);
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(4);
   
-  *res = triangles / triples * 3.0;
+  *res = triangles / triples * 2.0;
   
   return 0;
 }
