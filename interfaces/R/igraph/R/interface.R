@@ -24,6 +24,20 @@
 # Structure building
 ###################################################################
 
+graph.empty <- function(n=0, directed=TRUE) {
+  n <- as.numeric(n);
+  directed <- as.logical(directed);
+  .Call("R_igraph_empty", n, directed,
+        PACKAGE="igraph")
+}
+
+graph.empty <- function(n=0, directed=TRUE) {
+  n <- as.numeric(n);
+  directed <- as.logical(directed);
+  .Call("R_igraph_empty", n, directed,
+        PACKAGE="igraph")
+}
+
 add.edges <- function(graph, edges, ..., attr=list()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
