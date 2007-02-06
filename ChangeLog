@@ -3,6 +3,12 @@
 	* src/vector_ptr.c (igraph_vector_ptr_remove) : replaced
 	memcpy with memmove
 
+	* src/igraph.h (igraph_i_lazy_adjlist_t, igraph_i_lazy_adjlist_get) :
+	added
+	* src/adjlist.c (igraph_i_lazy_adjlist_init)
+	(igraph_i_lazy_adjlist_destroy, igraph_i_lazy_adjlist_get_real) :
+	added
+	
 2007-02-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/adjlist.c (igraph_i_adjlist_simplify) : added
