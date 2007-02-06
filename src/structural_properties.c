@@ -2396,8 +2396,6 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(4);
   
   *res = triangles / triples * 2.0;
-  fprintf(stderr, "Triples:   %f\n", triples);
-  fprintf(stderr, "Triangles: %f\n", triangles);
   
   return 0;
 }
