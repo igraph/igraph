@@ -2168,7 +2168,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     
     neis1=igraph_i_adjlist_get(&allneis, node);
     neilen1=igraph_vector_size(neis1);
-    triples = neilen1 * (neilen1-1) / 2;
+    triples = (double)neilen1 * (neilen1-1) / 2;
     /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
       neis[ (long int)VECTOR(*neis1)[i] ] = node+1;
@@ -2271,7 +2271,7 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     for (j=0; j<neilen1; j++) {
       neis[ (long int)VECTOR(neis1)[j] ] = i+1;
     }
-    triples = neilen1*(neilen1-1);
+    triples = (double)neilen1*(neilen1-1);
     triangles = 0;
 
     for (j=0; j<neilen1; j++) {
@@ -2367,7 +2367,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     
     neis1=igraph_i_adjlist_get(&allneis, node);
     neilen1=igraph_vector_size(neis1);
-    triples += neilen1 * (neilen1-1);
+    triples += (double)neilen1 * (neilen1-1);
     /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
       long int nei=VECTOR(*neis1)[i];
@@ -2396,8 +2396,8 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(4);
   
   *res = triangles / triples * 2.0;
-  fprintf(stderr, "Triples:   %li\n", (long int) triples);
-  fprintf(stderr, "Triangles: %li\n", (long int) triangles);
+  fprintf(stderr, "Triples:   %f\n", triples);
+  fprintf(stderr, "Triangles: %f\n", triangles);
   
   return 0;
 }
