@@ -54,3 +54,5 @@ o Add Python edge/vertex selector support
 o iterator over all components
 o iterator over all circles
 o make del operator work for attributes
+o make in-place addition and subtraction operators NOT copy the graph if
+  a disjoint union or difference is taken

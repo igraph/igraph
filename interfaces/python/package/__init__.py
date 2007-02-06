@@ -520,3 +520,135 @@ class Graph(core.GraphBase):
 	print >>f, "</svg>"
 		
 	f.close()
+
+
+    def __iadd__(self, other):
+	"""In-place addition (disjoint union).
+
+	@see: L{__add__}
+        """
+	if isinstance(other, int):
+	    return self.add_vertices(other)
+	elif isinstance(other, tuple) and len(other) == 2:
+	    return self.add_edges([other])
+	elif isinstance(other, list):
+	    if len(other)>0:
+		if isinstance(other[0], tuple):
+		    return self.add_edges(other)
+	    else:
+		return self
+
+	return NotImplemented
+
+
+    def __add__(self, other):
+	"""Copies the graph and extends the copy depending on the type of
+	the other object given.
+
+	@param other: if it is an integer, the copy is extended by the given
+	  number of vertices. If it is a tuple with two elements, the copy
+	  is extended by a single edge. If it is a list of tuples, the copy
+	  is extended by multiple edges. If it is a L{Graph}, a disjoint
+	  union is performed.
+        """
+	if isinstance(other, int):
+	    g = self.copy()
+	    g.add_vertices(other)
+	elif isinstance(other, tuple) and len(other) == 2:
+	    g = self.copy()
+	    g.add_edges([other])
+	elif isinstance(other, list):
+	    if len(other)>0:
+		if isinstance(other[0], tuple):
+		    g = self.copy()
+		    g.add_edges(other)
+		elif isinstance(other[0], Graph):
+		    return self.disjoint_union(other)
+		else:
+		    return NotImplemented
+	    else:
+		return self.copy()
+
+	elif isinstance(other, Graph):
+	    return self.disjoint_union(other)
+	else:
+	    return NotImplemented
+
+	return g
+
+
+    def __isub__(self, other):
+	"""In-place subtraction (difference).
+
+	@see: L{__sub__}"""
+	if isinstance(other, int):
+	    return self.delete_vertices(other)
+	elif isinstance(other, tuple) and len(other) == 2:
+	    return self.delete_edges(other)
+	elif isinstance(other, list):
+	    if len(other)>0:
+		if isinstance(other[0], tuple):
+		    return self.delete_edges(other)
+		elif isinstance(other[0], int):
+		    return self.delete_vertices(other)
+	    else:
+		return self
+
+	return NotImplemented
+
+
+    def __sub__(self, other):
+	"""Removes the given object(s) from the graph
+
+	@param other: if it is an integer, removes the vertex with the given
+	  ID from the graph (note that the remaining vertices will get
+	  re-indexed!). If it is a tuple, removes the given edge. If it is
+	  a graph, takes the difference of the two graphs. Accepts
+	  lists of integers or lists of tuples as well, but they can't be
+	  mixed!
+        """
+	if isinstance(other, int):
+	    return self.copy().delete_vertices(other)
+	elif isinstance(other, tuple) and len(other) == 2:
+	    return self.copy().delete_edges(other)
+	elif isinstance(other, list):
+	    if len(other)>0:
+		if isinstance(other[0], tuple):
+		    return self.copy().delete_edges(other)
+		elif isinstance(other[0], int):
+		    return self.copy().delete_vertices(other)
+	    else:
+		return self.copy()
+	elif isinstance(other, Graph):
+	    return self.difference(other)
+
+	return NotImplemented
+
+    def __mul__(self, other):
+	"""Copies exact replicas of the original graph an arbitrary number of times.
+
+	@param other: if it is an integer, multiplies the graph by creating the
+	  given number of identical copies and taking the disjoint union of
+	  them.
+        """
+	if isinstance(other, int):
+	    if other == 0:
+		return Graph()
+	    elif other == 1:
+		return self
+	    elif other > 1:
+		# TODO: should make it more efficient - powers of 2?
+		return self.disjoint_union([self]*(other-1))
+	    else:
+		return NotImplemented
+
+	return NotImplemented
+    
+    def __coerce__(self, other):
+	"""Coercion rules.
+
+	This method is needed to allow the graph to react to additions
+	with lists, tuples or integers.
+	"""
+	if type(other) in [int, tuple, list]:
+	    return self, other

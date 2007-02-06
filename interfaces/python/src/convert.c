@@ -534,28 +534,23 @@ int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) 
 
 /**
  * \ingroup python_interface_conversion
- * \brief Converts a Python iterator returning graphs to an \c igraph_vectorptr_t
- * The incoming \c igraph_vector_ptr_t should be uninitialized. Raises suitable
- * Python exceptions when needed.
+ * \brief Appends the contents of a Python iterator returning graphs to
+ * an \c igraph_vectorptr_t
+ *
+ * The incoming \c igraph_vector_ptr_t should be INITIALIZED.
+ * Raises suitable Python exceptions when needed.
  * 
  * \param it the Python iterator
  * \param v the \c igraph_vector_ptr_t which will contain the result
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v) {
+int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v) {
   PyObject *t;
   
-  if (igraph_vector_ptr_init(v, 0)) {
-    igraphmodule_handle_igraph_error();
-    return 1;
-  }
-    
   while ((t=PyIter_Next(it))) {
     if (!PyObject_TypeCheck(t, &igraphmodule_GraphType)) {
       PyErr_SetString(PyExc_TypeError, "iterable argument must contain graphs");
-      igraph_vector_ptr_destroy(v);
       Py_DECREF(t);
-      Py_DECREF(it);
       return 1;
     }
     igraph_vector_ptr_push_back(v, &((igraphmodule_GraphObject*)t)->g);

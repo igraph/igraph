@@ -1,3 +1,10 @@
+2007-02-06  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/graphobject.c : removed some operator
+	implementations from the low-level interface
+	* interfaces/python/package/__init__.py : added addition, subtraction,
+	multiplication operators with the usual semantics
+
 2007-02-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c

@@ -3918,7 +3918,17 @@ PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyOb
   if (it) {
     /* Get all elements, store the graphs in an igraph_vector_ptr */
     igraph_vector_ptr_t gs;
-    if (igraphmodule_PyIter_to_vector_ptr_t(it, &gs)) {
+    if (igraph_vector_ptr_init(&gs, 0)) {
+      Py_DECREF(it);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraph_vector_ptr_push_back(&gs, &self->g)) {
+      Py_DECREF(it);
+      igraph_vector_ptr_destroy(&gs);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraphmodule_append_PyIter_to_vector_ptr_t(it, &gs)) {
+      igraph_vector_ptr_destroy(&gs);
       Py_DECREF(it);
       return NULL;
     }
@@ -3927,8 +3937,7 @@ PyObject* igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject* self, PyOb
     /* Create disjoint union */
     if (igraph_disjoint_union_many(&g, &gs)) {
       igraph_vector_ptr_destroy(&gs);
-      igraphmodule_handle_igraph_error();
-      return NULL;
+      return igraphmodule_handle_igraph_error();
     }
     
     igraph_vector_ptr_destroy(&gs);
@@ -3972,8 +3981,18 @@ PyObject* igraphmodule_Graph_union(igraphmodule_GraphObject* self, PyObject* oth
   if (it) {
     /* Get all elements, store the graphs in an igraph_vector_ptr */
     igraph_vector_ptr_t gs;
-    if (igraphmodule_PyIter_to_vector_ptr_t(it, &gs)) {
+    if (igraph_vector_ptr_init(&gs, 0)) {
       Py_DECREF(it);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraph_vector_ptr_push_back(&gs, &self->g)) {
+      Py_DECREF(it);
+      igraph_vector_ptr_destroy(&gs);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraphmodule_append_PyIter_to_vector_ptr_t(it, &gs)) {
+      Py_DECREF(it);
+      igraph_vector_ptr_destroy(&gs);
       return NULL;
     }
     Py_DECREF(it);
@@ -4026,8 +4045,18 @@ PyObject* igraphmodule_Graph_intersection(igraphmodule_GraphObject* self, PyObje
   if (it) {
     /* Get all elements, store the graphs in an igraph_vector_ptr */
     igraph_vector_ptr_t gs;
-    if (igraphmodule_PyIter_to_vector_ptr_t(it, &gs)) {
+    if (igraph_vector_ptr_init(&gs, 0)) {
       Py_DECREF(it);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraph_vector_ptr_push_back(&gs, &self->g)) {
+      Py_DECREF(it);
+      igraph_vector_ptr_destroy(&gs);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraphmodule_append_PyIter_to_vector_ptr_t(it, &gs)) {
+      Py_DECREF(it);
+      igraph_vector_ptr_destroy(&gs);
       return NULL;
     }
     Py_DECREF(it);
@@ -4656,6 +4685,10 @@ PyObject* igraphmodule_Graph_coreness(igraphmodule_GraphObject *self,
 
   return o;
 }
+
+/* }}} */
+
+/* {{{ SPECIAL METHODS */
 
 /* }}} */
 
@@ -6152,8 +6185,8 @@ PyMappingMethods igraphmodule_Graph_as_mapping = {
  * \brief Collection of methods to allow numeric operators to be used on the graph
  */
 PyNumberMethods igraphmodule_Graph_as_number = {
-    (binaryfunc)igraphmodule_Graph_disjoint_union, /* nb_add */
-    (binaryfunc)igraphmodule_Graph_difference,	/*nb_subtract*/
+    0,     /* nb_add */
+    0,	/*nb_subtract*/
     0,	/*nb_multiply*/
     0,	/*nb_divide*/
     0,	/*nb_remainder*/
@@ -6175,7 +6208,7 @@ PyNumberMethods igraphmodule_Graph_as_number = {
     0,	/*nb_float*/
     0,	/*nb_oct*/
     0, 	/*nb_hex*/
-    0,	/*nb_inplace_add*/
+    0,  /*nb_inplace_add*/
     0,	/*nb_inplace_subtract*/
     0,	/*nb_inplace_multiply*/
     0,	/*nb_inplace_divide*/
