@@ -90,6 +90,7 @@ To eliminate multiple edges from a graph, you can use
 
 <section><title>Graph Constructors and Destructors</title>
 <!-- doxrox-include igraph_empty -->
+<!-- doxrox-include igraph_empty_attrs -->
 <!-- doxrox-include igraph_copy -->
 <!-- doxrox-include igraph_destroy -->
 </section>

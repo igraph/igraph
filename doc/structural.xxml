@@ -65,7 +65,7 @@
 </section>
 
 <section><title>K-Cores</title>
-<!-- doxrox-include igraph_k_cores -->
+<!-- doxrox-include igraph_coreness -->
 </section>
 
 <section><title>Other Operations</title>

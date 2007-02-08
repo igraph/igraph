@@ -67,17 +67,19 @@ int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
 
 /** 
  * \ingroup interface
- * \function igraph_empty
+ * \function igraph_empty_attrs
  * \brief Creates an empty graph with some vertices, no edges and some graph attributes.
  *
  * </para><para>
  * Use this instead of \ref igraph_empty() if you wish to add some graph
- * attributes right after initialization.
+ * attributes right after initialization. This function is currently
+ * not very interesting for the ordinary user, just supply 0 here or 
+ * use \ref igraph_empty().
  * \param graph Pointer to a not-yet initialized graph object.
  * \param n The number of vertices in the graph, a non-negative
  *          integer number is expected.
  * \param directed Whether the graph is directed or not.
- * \param
+ * \param attr The attributes. 
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid number of vertices.
  * 
@@ -206,6 +208,8 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
  * want to add new vertices, call igraph_add_vertices() first.
  * \param graph The graph to which the edges will be added.
  * \param edges The edges themselves.
+ * \param attr The attributes of the new edges, only used by high level
+ *        interfaces currently, you can supply 0 here.
  * \return Error code:
  *    \c IGRAPH_EINVEVECTOR: invalid (odd)
  *    edges vector length, \c IGRAPH_EINVVID:
@@ -305,6 +309,8 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
  * \param graph The graph object to extend.
  * \param nv Non-negative integer giving the number of 
  *           vertices to add.
+ * \param attr The attributes of the new vertices, only used by 
+ *           high level interfaces, you can supply 0 here.
  * \return Error code: 
  *         \c IGRAPH_EINVAL: invalid number of new
  *         vertices. 
