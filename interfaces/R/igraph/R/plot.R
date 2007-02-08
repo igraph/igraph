@@ -176,7 +176,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
     if (length(edge.lty)>1) { edge.lty <- edge.lty[nonloops.e] }
     arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.code,
            col=edge.color, lwd=edge.width, lty=edge.lty)
-    if (any(lty != 1)) {
+    if (any(edge.lty != 1)) {
       pp <- atan2(y0-y1, x0-x1)
       xx <- x1+0.01*cos(pp)
       yy <- y1+0.01*sin(pp)
