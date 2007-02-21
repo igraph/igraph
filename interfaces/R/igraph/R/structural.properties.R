@@ -223,7 +223,7 @@ edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
         PACKAGE="igraph")[ as.numeric(e)+1 ]  
 }
 
-transitivity <- function(graph, type="undirected", vids=V(graph)) {
+transitivity <- function(graph, type="undirected", vids=NULL) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -237,8 +237,14 @@ transitivity <- function(graph, type="undirected", vids=V(graph)) {
     .Call("R_igraph_transitivity_undirected", graph,
           PACKAGE="igraph")
   } else if (type==1) {
-    .Call("R_igraph_transitivity_local_undirected", graph, as.numeric(vids),
-          PACKAGE="igraph")
+    if (is.null(vids)) {
+      .Call("R_igraph_transitivity_local_undirected_all", graph,
+            PACKAGE="igraph")
+    } else {
+      vids <- as.igraph.vs(vids)
+      .Call("R_igraph_transitivity_local_undirected", graph, as.numeric(vids),
+            PACKAGE="igraph")
+    }
   } else if (type==2) {
     .Call("R_igraph_transitivity_avglocal_undirected", graph,
           PACKAGE="igraph")

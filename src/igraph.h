@@ -690,11 +690,18 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops);
 int igraph_transitivity_undirected(const igraph_t *graph, 
 				   igraph_real_t *res);
-int igraph_transitivity_undirected2(const igraph_t *graph, 
-				   igraph_real_t *res);
 int igraph_transitivity_local_undirected(const igraph_t *graph, 
 					 igraph_vector_t *res,
 					 const igraph_vs_t vids);
+int igraph_transitivity_local_undirected1(const igraph_t *graph, 
+					  igraph_vector_t *res,
+					  const igraph_vs_t vids);
+int igraph_transitivity_local_undirected2(const igraph_t *graph, 
+					  igraph_vector_t *res,
+					  const igraph_vs_t vids);
+int igraph_transitivity_local_undirected4(const igraph_t *graph, 
+					  igraph_vector_t *res,
+					  const igraph_vs_t vids);
 int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
 					    igraph_real_t *res);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,

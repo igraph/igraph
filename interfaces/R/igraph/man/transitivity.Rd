@@ -5,7 +5,7 @@
   vertices of a vertex are connected. This is sometimes also called the
   clustering coefficient. }
 \usage{
-transitivity(graph, type="undirected", vids=V(graph))
+transitivity(graph, type="undirected", vids=NULL)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -30,6 +30,9 @@ transitivity(graph, type="undirected", vids=V(graph))
   }
   \item{vids}{The vertex ids for the local transitivity will be
     calculated. This will be ignored for global transitivity types.
+    The default value is \code{NULL}, in this case all vertices are
+    considered. It is slightly faster to supply \code{NULL} here than
+    \code{V(graph)}.
   }
 }
 %\details{}

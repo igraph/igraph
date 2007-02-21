@@ -2938,6 +2938,28 @@ SEXP R_igraph_transitivity_local_undirected(SEXP graph, SEXP pvids) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_transitivity_local_undirected_all(SEXP graph) {
+  
+  igraph_t g;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&res, 0);
+  igraph_transitivity_local_undirected(&g, &res, igraph_vss_all());
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
   
 SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   igraph_t g;
