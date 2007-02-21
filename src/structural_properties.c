@@ -2241,11 +2241,12 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vit_t vit;
   long int nodes_to_calc;
-  igraph_vector_t neis1, neis2;
+  igraph_vector_t *neis1, *neis2;
   igraph_real_t triples, triangles;
   long int i, j, k;
   long int neilen1, neilen2;
-  long int *neis;		/* TODO: get rid of this */
+  long int *neis;
+  igraph_i_lazy_adjlist_t adjlist;
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -2258,28 +2259,29 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_free, neis);
 
   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
-  IGRAPH_VECTOR_INIT_FINALLY(&neis1, 0);
-  IGRAPH_VECTOR_INIT_FINALLY(&neis2, 0);
+
+  igraph_i_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, 1 /* simplify */);
+  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &adjlist);  
 
   for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     long int node=IGRAPH_VIT_GET(vit);
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis1, node, IGRAPH_ALL));
-    neilen1=igraph_vector_size(&neis1);
+    neis1=igraph_i_lazy_adjlist_get(&adjlist, node);
+    neilen1=igraph_vector_size(neis1);
     for (j=0; j<neilen1; j++) {
-      neis[ (long int)VECTOR(neis1)[j] ] = i+1;
+      neis[ (long int)VECTOR(*neis1)[j] ] = i+1;
     }
     triples = (double)neilen1*(neilen1-1);
     triangles = 0;
 
     for (j=0; j<neilen1; j++) {
-      long int v=VECTOR(neis1)[j];
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis2, v, IGRAPH_ALL));
-      neilen2=igraph_vector_size(&neis2);
+      long int v=VECTOR(*neis1)[j];
+      neis2=igraph_i_lazy_adjlist_get(&adjlist, v);
+      neilen2=igraph_vector_size(neis2);
       for (k=0; k<neilen2; k++) {
-	long int v2=VECTOR(neis2)[k];
+	long int v2=VECTOR(*neis2)[k];
 	if (neis[v2] == i+1) {
 	  triangles += 1.0;
 	}
@@ -2288,11 +2290,10 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     VECTOR(*res)[i] = triangles/triples;
   }
 
+  igraph_i_lazy_adjlist_destroy(&adjlist);
   Free(neis);
-  igraph_vector_destroy(&neis1);
-  igraph_vector_destroy(&neis2);
   igraph_vit_destroy(&vit);
-  IGRAPH_FINALLY_CLEAN(4);
+  IGRAPH_FINALLY_CLEAN(3);
   return 0;
 }
 
