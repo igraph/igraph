@@ -1,9 +1,24 @@
+2007-02-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/adjlist.c (igraph_i_lazy_adjlist_init)
+	(igraph_i_lazy_adjlist_destroy, igraph_i_lazy_adjlist_get_real) :
+	added IGRAPH_I_SORT_SIMPLIFY type of lazy adjlist, this sorts 
+	and simplifies the adjacency vectors
+	
+	* src/structural_properties.c (igraph_transitivity_local_undirected)
+	(igraph_transitivity_local_undirected1)
+	(igraph_transitivity_local_undirected2)
+	(igraph_transitivity_local_undirected4) : local transitivity 
+	calculation reorganized
+	* examples/simple/igraph_local_transitivity.c : added, but not part
+	of the test cases yet
+
 2007-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_transitivity_local_undirected) :
 	rewritten to use lazy adjacency lists
 
-	* src/adjlist.c (igrpah_i_lazy_adjlist_get_real) : error handling
+	* src/adjlist.c (igraph_i_lazy_adjlist_get_real) : error handling
 	rewritten to eliminate compiler warnings
 
 2007-02-06  Tamas Nepusz  <ntamas@rmki.kfki.hu>
