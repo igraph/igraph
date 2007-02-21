@@ -1,5 +1,5 @@
 
-o R interface: translate V(g) properly to igraph_vss_all()
+o Pareto option in degree.distribution
 o igraph_vs_seq bug, the last node is omitted???
 o R interface: implement max.print option
 o faster transitivity calculation for graphs with large degree vertices
