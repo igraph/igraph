@@ -3,6 +3,9 @@
 	* src/structural_properties.c (igraph_transitivity_local_undirected) :
 	rewritten to use lazy adjacency lists
 
+	* src/adjlist.c (igrpah_i_lazy_adjlist_get_real) : error handling
+	rewritten to eliminate compiler warnings
+
 2007-02-06  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c : removed some operator

@@ -235,13 +235,21 @@ void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al) {
 igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
 						igraph_integer_t pno) {
   long int no=pno;
+  int ret;
   if (al->adjs[no] == 0) {
     al->adjs[no] = Calloc(1, igraph_vector_t);
     if (al->adjs[no] == 0) {
-      IGRAPH_ERROR("Lazy adjlist failed", IGRAPH_ENOMEM);
+      igraph_error("Lazy adjlist failed", __FILE__, __LINE__, 
+		   IGRAPH_ENOMEM);
     }
-    IGRAPH_CHECK(igraph_vector_init(al->adjs[no], 0));
-    IGRAPH_CHECK(igraph_neighbors(al->graph, al->adjs[no], no, al->mode));
+    ret=igraph_vector_init(al->adjs[no], 0);
+    if (ret != 0) {
+      igraph_error("", __FILE__, __LINE__, ret);
+    }
+    ret=igraph_neighbors(al->graph, al->adjs[no], no, al->mode);
+    if (ret != 0) {
+      igraph_error("", __FILE__, __LINE__, ret);
+    }
 
     if (al->simplify) {
       long int j, n=igraph_vector_size(al->adjs[no]);
