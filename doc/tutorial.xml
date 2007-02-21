@@ -51,7 +51,7 @@ For compiling this program you need a C compiler, if this is called
 <command>gcc</command> and the previous code is saved in file
 <filename>igraph_test.c</filename>, you will need a command like this:
 <programlisting>
-gcc -I/usr/local/igraph -L/usr/local/lib -ligraph igraph_test.c -o igraph_test
+gcc igraph_test.c -I/usr/local/igraph -L/usr/local/lib -ligraph -o igraph_test
 </programlisting>
 </para>
 
@@ -92,7 +92,10 @@ LD_PRELOAD=/home/user/libs/igraph/libigraph.so ./igraph_test
 </programlisting>
 Please note that <envar>LD_PRELOAD</envar> and
 <envar>LD_LIBRARY_PATH</envar> are usually available only on
-Un*x-like systems.
+Un*x-like systems. On Windows using Cygwin it is usually enough to set the
+<envar>PATH</envar> enviroment variable to include the folder in which
+the <command>igraph</command> library is installed, look for the 
+<filename>cygigraph-0.dll</filename> or similar file.
 </para>
 
 </section>

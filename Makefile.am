@@ -12,6 +12,11 @@ EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) \
 	examples $(top_srcdir)/interfaces/R/Makefile.in \
 	$(top_srcdir)/interfaces/R/DESCRIPTION.in
 
+install-exec-hook:
+	if test -f $(top_builddir)/src/.libs/cygigraph-0.dll ; \
+		then cp $(top_builddir)/src/.libs/cygigraph-0.dll \
+		$(DESTDIR)$(libdir) ; fi
+
 MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make doc will always call doxygen rule
