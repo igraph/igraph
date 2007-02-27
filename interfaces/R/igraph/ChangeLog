@@ -1,3 +1,8 @@
+2007-02-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R (alpha.centrality) : 
+	added
+
 2007-02-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (transitivity) :
