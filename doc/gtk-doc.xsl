@@ -301,6 +301,15 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
     </xsl:if>
   </xsl:template>
 
+  <xsl:template name="user.footer.content">
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      _uacct = "UA-1392972-1";
+      urchinTracker();
+    </script>
+  </xsl:template>
+
   <!-- avoid creating multiple identical indices 
        if the stylesheets don't support filtered indices
     -->
