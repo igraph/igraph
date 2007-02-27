@@ -1,0 +1,46 @@
+
+New in the C library
+--------------------
+
+* igraph_connect_neighborhood, nomen est omen
+* igraph_watts_strogatz_game and igraph_rewire_edges
+* K-core decomposition: igraph_coreness
+* Clique and independent vertex set related functions:
+  igraph_cliques, igraph_independent_vertex_sets,
+  igraph_maximal_cliques, igraph_maximal_independent_vertex_sets,
+  igraph_independence_number, igraph_clique_number,
+  Some of these function were ported from the very_nauty library
+  of Keith Briggs, thanks Keith!
+* The GraphML file format now supports graph attributes
+* Transitivity calculation speeded up
+* Correct transitivity calculation for multigraphs (ie. non-simple graphs)
+
+New in the R interface
+----------------------
+
+* connect.neighborhood
+* watts.strogatz.game and rewire.edges
+* K-core decomposition: graph.coreness
+* added the 'innei' and 'outnei' shorthands for vertex sequence indexing
+  see help(iterators)
+* Clique and independent vertex set related functions:
+  cliques, largest.cliques, maximal.cliques, clique.number,
+  independent.vertex.sets, largest.independent.vertex.sets,
+  maximal.independent.vertex.sets, independence.number
+* The GraphML file format now supports graph attributes
+* edge.lty argument added to plot.igraph and tkplot
+* Transitivity calculation speeded up
+* Correct transitivity calculation for multigraphs (ie. non-simple graphs)
+* alpha.centrality added, calculates Bonacich alpha centrality, see docs.
+
+Bugs corrected
+--------------
+
+* 'make install' installs the library correctly on Cygwin now
+* Pajek parser corrected to read files with MacOS newline characters correctly
+* overflow bug in transitivity calculation for large graphs corrected 
+* an internal memcpy/memmove bug causing some segfaults removed 
+* R interface: tkplot bug with graphs containing a 'name' attribute
+* R interface: attribute handling bug when adding vertices
+* R interface: color selection bug corrected
+* R interface: plot.igraph when plotting loops
