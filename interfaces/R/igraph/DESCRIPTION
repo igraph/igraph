@@ -1,5 +1,5 @@
 Package: igraph
-Version: 0.3.3
+Version: 0.4
 Date: December 5, 2006
 Title:  Routines for simple graphs, network analysis.
 Author: Gabor Csardi <csardi@rmki.kfki.hu>
