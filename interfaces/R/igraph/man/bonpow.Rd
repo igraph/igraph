@@ -87,10 +87,26 @@ a non-ad hoc basis.
 \seealso{ \code{\link{evcent}} }
 \note{ This function was ported (ie. copied) from the SNA package. }
 \examples{
-#Generate some test data
-g <- graph.tree(10, mode="undirected")
-#Compute Bonpow scores
-bonpow(g,exponent=1,tol=1e-20)
-bonpow(g,exponent=-1,tol=1e-20)
+# Generate some test data from Bonacich, 1987:
+g.c <- graph( c(1,2,1,3,2,4,3,5)-1, dir=FALSE)
+g.d <- graph( c(1,2,1,3,1,4,2,5,3,6,4,7)-1, dir=FALSE)
+g.e <- graph( c(1,2,1,3,1,4,2,5,2,6,3,7,3,8,4,9,4,10)-1, dir=FALSE)
+g.f <- graph( c(1,2,1,3,1,4,2,5,2,6,2,7,3,8,3,9,3,10,4,11,4,12,4,13)-1, dir=F)
+# Compute Bonpow scores
+for (e in seq(-0.5,.5, by=0.1)) {
+  print(round(bonpow(g.c, exp=e)[c(1,2,4)], 2))
+}
+
+for (e in seq(-0.4,.4, by=0.1)) {
+  print(round(bonpow(g.d, exp=e)[c(1,2,5)], 2))
+}
+
+for (e in seq(-0.4,.4, by=0.1)) {
+  print(round(bonpow(g.e, exp=e)[c(1,2,5)], 2))
+}
+
+for (e in seq(-0.4,.4, by=0.1)) {
+  print(round(bonpow(g.f, exp=e)[c(1,2,5)], 2))
+}
 }
 \keyword{graphs}
