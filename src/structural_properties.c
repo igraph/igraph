@@ -1,4 +1,4 @@
- /* -*- mode: C -*-  */
+/* -*- mode: C -*-  */
 /* 
    IGraph library.
    Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -3543,6 +3543,92 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
   igraph_dqueue_destroy(&q);
   Free(added);
   IGRAPH_FINALLY_CLEAN(5);
+
+  return 0;
+}
+
+/**
+ * \function igraph_topological_sorting
+ * Calculate a possible topological sorting of the graph
+ *
+ * </para><para>
+ * A topological sorting of a directed acyclic graph is a linear ordering
+ * of its nodes where each node comes before all nodes to which it has
+ * edges. Every DAG has at least one topological sort, and may have many.
+ * This function returns a possible topological sort among them. If the
+ * graph is not acyclic (it has at least one cycle), a partial topological
+ * sort is returned and a warning is issued.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to a vector, the result will be stored here.
+ *   It will be resized if needed.
+ * \param mode Specifies how to use the direction of the edges.
+ *   For \c IGRAPH_OUT, the sorting order ensures that each node comes
+ *   before all nodes to which it has edges, so nodes with no incoming
+ *   edges go first. For \c IGRAPH_IN, it is quite the opposite: each
+ *   node comes before all nodes from which it receives edges. Nodes 
+ *   with no outgoing edges go first.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), where |V| and |E| are the number of
+ * vertices and edges in the original input graph.
+ */
+int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
+			       igraph_neimode_t mode) {
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t degrees, neis;
+  igraph_dqueue_t sources;
+  igraph_neimode_t deg_mode;
+  long int node, i, j;
+
+  if (mode == IGRAPH_ALL || !igraph_is_directed(graph)) {
+    IGRAPH_ERROR("topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
+  } else if (mode == IGRAPH_OUT) {
+    deg_mode = IGRAPH_IN;
+  } else if (mode == IGRAPH_IN) {
+    deg_mode = IGRAPH_OUT;
+  } else {
+    IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_dqueue_init(&sources, 0));
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &sources);
+  IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), deg_mode, 0));
+
+  igraph_vector_clear(res);
+
+  /* Do we have nodes with no incoming vertices? */
+  for (i=0; i<no_of_nodes; i++) {
+    if (VECTOR(degrees)[i] == 0)
+      IGRAPH_CHECK(igraph_dqueue_push(&sources, i));
+  }
+
+  /* Take all nodes with no incoming vertices and remove them */
+  while (!igraph_dqueue_empty(&sources)) {
+    node=(long)igraph_dqueue_pop(&sources);
+    /* Add the node to the result vector */
+    igraph_vector_push_back(res, node);
+    /* Exclude the node from further source searches */
+    VECTOR(degrees)[node]=-1;
+    /* Get the neighbors and decrease their degrees by one */
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, mode));
+    j=igraph_vector_size(&neis);
+    for (i=0; i<j; i++) {
+      VECTOR(degrees)[(long)VECTOR(neis)[i]]--;
+      if (VECTOR(degrees)[(long)VECTOR(neis)[i]] == 0)
+	IGRAPH_CHECK(igraph_dqueue_push(&sources, VECTOR(neis)[i]));
+    }
+  }
+
+  if (igraph_vector_size(res)<no_of_nodes)
+    IGRAPH_WARNING("graph contains a cycle, partial result is returned");
+
+  igraph_vector_destroy(&degrees);
+  igraph_vector_destroy(&neis);
+  igraph_dqueue_destroy(&sources);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
 }

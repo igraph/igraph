@@ -1,8 +1,8 @@
 """
 IGraph library.
 
-Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>, Tamas Nepusz
-<ntamas@rmki.kfki.hu>
+Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
+Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
 
@@ -46,7 +46,7 @@ class Interval:
 	self._right = max(left, right)
 
     def __contains__(self, x):
-	"""Returns true if x is in the interval, false otherwise"""
+	"""Returns C{True} if x is in the interval, C{False} otherwise"""
 	return (x >= self._left and x < self._right)
 
     def __eq__(self, x):

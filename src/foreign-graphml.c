@@ -956,9 +956,6 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
  * graphs. See the GraphML Primer (http://graphml.graphdrawing.org/primer/graphml-primer.html)
  * for detailed format description.
  * 
- * </para><para>
- * No attributes are written at present.
- *
  * \param graph The graph to write. 
  * \param outstream The stream object to write to, it should be
  *        writable.
