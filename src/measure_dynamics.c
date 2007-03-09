@@ -1547,7 +1547,7 @@ int igraph_measure_dynamics_citingcat_id_age(const igraph_t *graph,
       MATRIX(ntkl, xidx+1, yidx)++;
       if (MATRIX(ntkl, xidx+1, yidx)==1) {
 	for (j=0; j<no_cats; j++) {
-	  ARRAY3(ch, j, xidx, yidx)=VECTOR(edges)[j];
+	  ARRAY3(ch, j, xidx+1, yidx)=VECTOR(edges)[j];
 	}
       }
       VECTOR(edges)[cidx]++;
