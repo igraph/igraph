@@ -185,7 +185,7 @@ measure.dynamics.idage <- function(graph, start.vertex=0, agebins=300,
 }
 
 measure.dynamics.citedcat.id.age <- function(graph, categories, agebins=300,
-                                             iterations=5, significance=0,
+                                             iterations=5,
                                              number=FALSE, norm=c(1,1,1)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -193,15 +193,15 @@ measure.dynamics.citedcat.id.age <- function(graph, categories, agebins=300,
   maxind <- max(degree(graph, mode="in"))
 
   st <- rep(1, vcount(graph))
-  sd <- (significance != 0)
+  sd <- TRUE                            # calculate sd?
 
   for (i in seq(along=numeric(iterations))) {
 
     # Standard deviation only at the last iteration
     if (sd && i==iterations) {
-      sd.real <- significance
+      sd.real <- TRUE
     } else {
-      sd.real <- 0.0
+      sd.real <- FALSE
     }
 
     # Number of estimates also
@@ -219,7 +219,7 @@ measure.dynamics.citedcat.id.age <- function(graph, categories, agebins=300,
                  as.numeric(0),
                  as.numeric(st), as.numeric(categories),
                  as.numeric(max(categories))+1,
-                 as.numeric(agebins), as.numeric(maxind), as.numeric(sd.real),
+                 as.numeric(agebins), as.numeric(maxind), as.logical(sd.real),
                  as.logical(number.real),
                  PACKAGE="igraph")
     
@@ -232,20 +232,19 @@ measure.dynamics.citedcat.id.age <- function(graph, categories, agebins=300,
 
 #  print(mes[[1]][1,1])
   
-  if (sd.real != 0) {
+  if (sd.real) {
     mes[[2]] <- mes[[2]]/mes[[1]][norm[1],norm[2],norm[3]]
-    mes[[3]] <- mes[[3]]/mes[[1]][norm[1],norm[2],norm[3]]
   }
   mes[[1]] <- mes[[1]]/mes[[1]][norm[1],norm[2],norm[3]]
 
   res <- list(akl=mes[[1]], st=st, sd=mes[[2]],
-              error=mes[[3]], no=mes[[4]], est=NULL)
+              no=mes[[3]], est=NULL)
   
   res
 }  
 
 measure.dynamics.citingcat.id.age <- function(graph, categories, agebins=300,
-                                              iterations=5, significance=0,
+                                              iterations=5,
                                               number=FALSE, norm=c(1,1,1)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -253,15 +252,15 @@ measure.dynamics.citingcat.id.age <- function(graph, categories, agebins=300,
   maxind <- max(degree(graph, mode="in"))
 
   st <- rep(1, vcount(graph))
-  sd <- (significance != 0)
+  sd <- TRUE
 
   for (i in seq(along=numeric(iterations))) {
 
     # Standard deviation only at the last iteration
     if (sd && i==iterations) {
-      sd.real <- significance
+      sd.real <- TRUE
     } else {
-      sd.real <- 0.0
+      sd.real <- FALSE
     }
 
     # Number of estimates also
@@ -279,7 +278,7 @@ measure.dynamics.citingcat.id.age <- function(graph, categories, agebins=300,
                  as.numeric(0),
                  as.numeric(st), as.numeric(categories),
                  as.numeric(max(categories))+1,
-                 as.numeric(agebins), as.numeric(maxind), as.numeric(sd.real),
+                 as.numeric(agebins), as.numeric(maxind), as.logical(sd.real),
                  as.logical(number.real),
                  PACKAGE="igraph")
     
@@ -294,12 +293,11 @@ measure.dynamics.citingcat.id.age <- function(graph, categories, agebins=300,
   
   if (sd.real != 0) {
     mes[[2]] <- mes[[2]]/mes[[1]][norm[1],norm[2],norm[3]]
-    mes[[3]] <- mes[[3]]/mes[[1]][norm[1],norm[2],norm[3]]
   }
   mes[[1]] <- mes[[1]]/mes[[1]][norm[1],norm[2],norm[3]]
 
   res <- list(akl=mes[[1]], st=st, sd=mes[[2]],
-              error=mes[[3]], no=mes[[4]], est=NULL)
+              no=mes[[3]], est=NULL)
   
   res
 }  

@@ -1,3 +1,11 @@
+2007-03-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R 
+	(mesasure.dynamics.citingcat.id.age, measure.dynamics.citedcat.id.age) :
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_citedcat_id_age)
+	(R_igraph_measure_dynamics_citingcat_id_age) : 	standard deviation 
+	calculation corrected 	
+
 2007-02-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (alpha.centrality) : 
