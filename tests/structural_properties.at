@@ -78,3 +78,8 @@ AT_SETUP([Simplification of non-simple graphs (igraph_simplify): ])
 AT_KEYWORDS([simplify multiple edge loop edges non-simple graphs simple graphs])
 AT_COMPILE_CHECK([simple/igraph_simplify.c], [simple/igraph_simplify.out])
 AT_CLEANUP
+
+AT_SETUP([Topological sorting (igraph_topological_sorting, igraph_is_dag): ])
+AT_KEYWORDS([topological sorting directed acyclic graphs])
+AT_COMPILE_CHECK([simple/igraph_topological_sorting.c], [simple/igraph_topological_sorting.out])
+AT_CLEANUP

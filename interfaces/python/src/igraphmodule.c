@@ -1125,7 +1125,7 @@ PyMODINIT_FUNC initcore(void) {
   Py_INCREF(igraphmodule_InternalError);
   
   m = Py_InitModule3("igraph.core", igraphmodule_methods,
-		     "Low-level Python interface for the igraph library."
+		     "Low-level Python interface for the igraph library. "
 		     "Should not be used directly.");
   
   Py_INCREF(&igraphmodule_GraphType);

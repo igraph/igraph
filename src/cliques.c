@@ -266,8 +266,10 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \function igraph_cliques
  * Find all or some cliques in a graph
  *
+ * </para><para>
  * Cliques are fully connected subgraphs of a graph.
  *
+ * </para><para>
  * If you are only interested in the size of the largest clique in the graph,
  * use \ref igraph_clique_number() instead.
  *
@@ -384,6 +386,7 @@ int igraph_i_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \function igraph_largest_cliques
  * \brief Finds the largest clique(s) in a graph.
  * 
+ * </para><para>
  * A clique is largest (quite intuitively) if there is no other clique
  * in the graph which contains more vertices. 
  * 
@@ -410,6 +413,7 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * \function igraph_independent_vertex_sets
  * Find all independent vertex sets in a graph
  *
+ * </para><para>
  * A vertex set is considered independent if there are no edges between
  * them.
  *
@@ -445,6 +449,7 @@ int igraph_independent_vertex_sets(const igraph_t *graph,
  * \function igraph_largest_independent_vertex_sets
  * \brief Finds the largest independent vertex set(s) in a graph.
  * 
+ * </para><para>
  * An independent vertex set is largest if there is no other
  * independent vertex set with more vertices in the graph.
  * \param graph The input graph.
@@ -593,6 +598,7 @@ void igraph_i_free_set_array(igraph_set_t* array) {
  * \function igraph_maximal_independent_vertex_sets
  * \brief Find all maximal independent vertex sets of a graph
  *
+ * </para><para>
  * A maximal independent vertex set is an independent vertex set which
  * can't be extended any more by adding a new vertex to it.
  *
@@ -672,6 +678,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
  * \function igraph_independence_number
  * \brief Find the independence number of the graph
  *
+ * </para><para>
  * The independence number of a graph is the cardinality of the largest
  * independent vertex set.
  *
@@ -731,11 +738,13 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
  * \function igraph_maximal_cliques
  * \brief Find all maximal cliques of a graph
  *
+ * </para><para>
  * A maximal clique is a clique which
  * can't be extended any more by adding a new vertex to it. This is actually
  * implemented by looking for a maximal independent vertex set in the
  * complementer of the graph.
  * 
+ * </para><para>
  * If you are only interested in the size of the largest clique in the graph,
  * use \ref igraph_clique_number() instead.
  *
@@ -800,6 +809,7 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * \function igraph_clique_number
  * \brief Find the clique number of the graph
  *
+ * </para><para>
  * The clique number of a graph is the size of the largest clique.
  *
  * \param graph The input graph.
