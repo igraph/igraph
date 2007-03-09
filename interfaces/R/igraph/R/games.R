@@ -290,8 +290,9 @@ watts.strogatz.game <- function(dim, size, nei, p) {
         PACKAGE="igraph")
 }
 
-lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3) {
+lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
+                         directed=TRUE) {
   .Call("R_igraph_lastcit_game", as.numeric(n), as.numeric(edges), as.numeric(agebins),
-        as.numeric(pref),
+        as.numeric(pref), as.logical(directed),
         PACKAGE="igraph")
 }

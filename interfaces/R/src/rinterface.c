@@ -5257,19 +5257,20 @@ SEXP R_igraph_empty(SEXP n, SEXP directed) {
 }
 
 SEXP R_igraph_lastcit_game(SEXP pnodes, SEXP pedges, SEXP pagebins,
-			   SEXP ppreference) {
+			   SEXP ppreference, SEXP pdirected) {
   
   igraph_t g;
   igraph_integer_t nodes=REAL(pnodes)[0];
   igraph_integer_t edges=REAL(pedges)[0];
   igraph_integer_t agebins=REAL(pagebins)[0];
   igraph_vector_t preference;
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_vector(ppreference, &preference);
-  igraph_lastcit_game(&g, nodes, edges, agebins, &preference);
+  igraph_lastcit_game(&g, nodes, edges, agebins, &preference, directed);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
   

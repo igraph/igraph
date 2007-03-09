@@ -5,6 +5,9 @@
 	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_lastcit)
 	(R_igraph_measure_dynamics_lastcit_st, R_igraph_lastcit_game) : added
 
+	* interfaces/R/igraph/R/games.R (lastcit.game) : added 'directed' argument
+	* interfaces/R/src/rinterface.c (R_igraph_lastcit_game) : 'directed' arg. added
+	
 2007-03-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/measure.dynamics.R 

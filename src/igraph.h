@@ -645,7 +645,7 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 int igraph_lastcit_game(igraph_t *graph, 
 			igraph_integer_t nodes, igraph_integer_t edges_per_node, 
 			igraph_integer_t agebins,
-			const igraph_vector_t *preference);
+			const igraph_vector_t *preference, igraph_bool_t directed);
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */
