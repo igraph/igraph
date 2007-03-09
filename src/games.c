@@ -1895,3 +1895,100 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
   return 0;
 }
   
+int igraph_lastcit_game(igraph_t *graph, 
+			igraph_integer_t nodes, igraph_integer_t edges_per_node, 
+			igraph_integer_t pagebins,
+			const igraph_vector_t *preference) {
+
+  long int no_of_nodes=nodes;
+  igraph_psumtree_t sumtree;
+  igraph_vector_t edges;
+  long int i, j, k;
+  long int *lastcit;
+  long int *index;
+  long int agebins=pagebins;
+  long int binwidth=no_of_nodes/agebins+1;
+
+  if (agebins != igraph_vector_size(preference)-1) {
+    IGRAPH_ERROR("`preference' vector should be of length `agebins' plus one",
+		 IGRAPH_EINVAL);
+  }
+  if (agebins <=1 ) {
+    IGRAPH_ERROR("at least two age bins are need for lastcit game",
+		 IGRAPH_EINVAL);
+  }
+  if (VECTOR(*preference)[agebins] <= 0) {
+    IGRAPH_ERROR("the last element of the `preference' vector needs to be positive",
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
+  lastcit=Calloc(no_of_nodes, long int);
+  if (!lastcit) {
+    IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, lastcit);
+
+  index=Calloc(no_of_nodes+1, long int);
+  if (!index) {
+    IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, index);
+
+  IGRAPH_CHECK(igraph_psumtree_init(&sumtree, nodes));
+  IGRAPH_FINALLY(igraph_psumtree_destroy, &sumtree);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes*edges_per_node));  
+  
+  /* The first node */
+  igraph_psumtree_update(&sumtree, 0, VECTOR(*preference)[agebins]);
+  index[0]=0;
+  index[1]=0;
+
+  RNG_BEGIN();
+
+  for (i=1; i<no_of_nodes; i++) {
+
+    /* Add new edges */
+    for (j=0; j<edges_per_node; j++) {
+      long int to;
+      igraph_real_t sum=igraph_psumtree_sum(&sumtree);
+      igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+      igraph_vector_push_back(&edges, i);
+      igraph_vector_push_back(&edges, to);
+      lastcit[to]=i+1;
+      igraph_psumtree_update(&sumtree, to, VECTOR(*preference)[0]);
+    }
+
+    /* Add the node itself */
+    igraph_psumtree_update(&sumtree, i, VECTOR(*preference)[agebins]);
+    index[i+1]=index[i]+edges_per_node;
+
+    /* Update the preference of some vertices if they got to another bin.
+       We need to know the citations of some older vertices, this is in the index. */
+    for (k=1; i-binwidth*k >= 1; k++) {
+      long int shnode=i-binwidth*k;
+      long int m=index[shnode], n=index[shnode+1];
+      for (j=2*m; j<2*n; j+=2) {
+	long int cnode=VECTOR(edges)[j+1];
+	if (lastcit[cnode]==shnode+1) {
+	  igraph_psumtree_update(&sumtree, cnode, VECTOR(*preference)[k]);
+	}
+      }
+    }
+    
+  }
+  
+  RNG_END();
+  
+  igraph_psumtree_destroy(&sumtree);
+  igraph_free(index);
+  igraph_free(lastcit);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, IGRAPH_DIRECTED));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}

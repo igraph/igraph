@@ -49,7 +49,7 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
        growing.random.game, barabasi.game, ba.game,
        callaway.traits.game, establishment.game, grg.game,
        preference.game, asymmetric.preference.game, connect.neighborhood,
-       rewire.edges, watts.strogatz.game)
+       rewire.edges, watts.strogatz.game, lastcit.game)
 
 # community structure
 
@@ -107,7 +107,8 @@ export(evcent, bonpow, alpha.centrality)
 # dynamics measurement
 
 export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
-       measure.dynamics.citedcat.id.age, measure.dynamics.citingcat.id.age)
+       measure.dynamics.citedcat.id.age, measure.dynamics.citingcat.id.age,
+       measure.dynamics.lastcit)
 
 # isomorphism, motifs
 

@@ -347,4 +347,46 @@ measure.dynamics.d.d <- function(graph, vtime, etime,
   res
 }
                  
-                 
+measure.dynamics.lastcit <- function(graph, agebins, iterations=5) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  st <- rep(1, vcount(graph))
+
+  for (i in seq(along=numeric(iterations))) {
+
+    ## Standard deviation only at the last iteration
+    if (i==iterations) {
+      sd.real <- TRUE
+    } else {
+      sd.real <- FALSE
+    }
+
+    if (i != 1) {
+      mes[[1]] <- mes[[1]]/mes[[1]][1]
+    }
+
+    mes <- .Call("R_igraph_measure_dynamics_lastcit", graph,
+                 as.numeric(st), as.numeric(agebins),
+                 PACKAGE="igraph")
+
+    mes[[1]][!is.finite(mes[[1]])] <- 0
+
+    st <- .Call("R_igraph_measure_dynamics_lastcit_st", graph, mes[[1]],
+                PACKAGE="igraph")
+  }
+
+  if (sd.real) {
+    mes[[2]] <- mes[[2]]/mes[[1]][1]
+  }
+  mes[[1]] <- mes[[1]]/mes[[1]][1]
+  
+  res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  
+  res
+}
+
+  
+                                     

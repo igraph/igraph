@@ -5,6 +5,7 @@
 \alias{measure.dynamics.d.d}
 \alias{measure.dynamics.citedcat.id.age}
 \alias{measure.dynamics.citingcat.id.age}
+\alias{measure.dynamics.lastcit}
 \title{Measuring the driving force in evolving networks}
 \description{These functions assume a simple evolving network model and
   measure the functional form of a so-called \emph{attractiveness
@@ -24,6 +25,7 @@ measure.dynamics.citedcat.id.age(graph, categories, agebins = 300,
 measure.dynamics.citingcat.id.age(graph, categories, agebins = 300,
     iterations = 5, significance = 0,  
     number = FALSE, norm = c(1, 1, 1))
+measure.dynamics.lastcit(graph, agebins, iterations=5)
 }
 \arguments{
   \item{graph}{The graph of which the evolution is quantified. It is

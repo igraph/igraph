@@ -642,6 +642,10 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 			       igraph_integer_t size, igraph_integer_t nei,
 			       igraph_real_t p);
 
+int igraph_lastcit_game(igraph_t *graph, 
+			igraph_integer_t nodes, igraph_integer_t edges_per_node, 
+			igraph_integer_t agebins,
+			const igraph_vector_t *preference);
 
 /* -------------------------------------------------- */
 /* Basic query functions                              */
@@ -1134,6 +1138,13 @@ int igraph_measure_dynamics_idwindow_st(const igraph_t *graph,
 					igraph_vector_t *res,
 					const igraph_matrix_t *ak,
 					igraph_integer_t time_window);
+
+int igraph_measure_dynamics_lastcit(const igraph_t *graph, igraph_vector_t *al,
+				    igraph_vector_t *sd, const igraph_vector_t *st,
+				    igraph_integer_t pagebins);
+int igraph_measure_dynamics_lastcit_st(const igraph_t *graph, 
+				       igraph_vector_t *res,
+				       const igraph_vector_t *al);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */

@@ -1,3 +1,9 @@
+2007-03-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_lastcit_game) : added
+	* src/measure_dynamics.c (igraph_measure_dynamics_lastcit)
+	(igraph_measure_dynamics_lastcit_st) : added
+
 2007-03-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_citingcat_id_age)

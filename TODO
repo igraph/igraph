@@ -1,4 +1,5 @@
 
+o R interface: curved edges in plots (tkplot and plot)
 o igraph_vs_seq bug, the last node is omitted???
 o R interface: implement max.print option
 * R interface: uniform 'y' coordinates in plot.igraph and tkplot

@@ -2431,6 +2431,58 @@ SEXP R_igraph_measure_dynamics_d_d_st(SEXP graph, SEXP pntime, SEXP petime,
   return result;
 }
 
+SEXP R_igraph_measure_dynamics_lastcit(SEXP graph, SEXP pst,
+				       SEXP pagebins) {
+  igraph_t g;
+  igraph_vector_t al, sd;
+  igraph_vector_t st;
+  igraph_integer_t agebins=REAL(pagebins)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_vector(pst, &st);
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&al, 0);
+  igraph_vector_init(&sd, 0);
+  igraph_measure_dynamics_lastcit(&g, &al, &sd, &st, agebins);
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(igraph_vector_size(&al)));
+  igraph_vector_copy_to(&al, REAL(VECTOR_ELT(result, 0)));
+  igraph_vector_destroy(&al);
+  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(igraph_vector_size(&sd)));
+  igraph_vector_copy_to(&sd, REAL(VECTOR_ELT(result, 1)));
+  igraph_vector_destroy(&sd);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_measure_dynamics_lastcit_st(SEXP graph, SEXP pal) {
+  
+  igraph_t g;
+  igraph_vector_t al;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pal, &al);
+  igraph_vector_init(&res, 0);
+  igraph_measure_dynamics_lastcit_st(&g, &res, &al);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto, 
 				 SEXP pmode, SEXP pno) {
 
@@ -5202,6 +5254,29 @@ SEXP R_igraph_empty(SEXP n, SEXP directed) {
 
   UNPROTECT(1);
   return graph;
+}
+
+SEXP R_igraph_lastcit_game(SEXP pnodes, SEXP pedges, SEXP pagebins,
+			   SEXP ppreference) {
+  
+  igraph_t g;
+  igraph_integer_t nodes=REAL(pnodes)[0];
+  igraph_integer_t edges=REAL(pedges)[0];
+  igraph_integer_t agebins=REAL(pagebins)[0];
+  igraph_vector_t preference;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_vector(ppreference, &preference);
+  igraph_lastcit_game(&g, nodes, edges, agebins, &preference);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
 }
 
 /***********************************************/
