@@ -1,3 +1,8 @@
+2007-03-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : 'arrow.mode' argument added
+	* interfaces/R/igraph/R/plot.common.R (i.get.arrow.mode) : added
+
 2007-03-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/games.R (lastcit.game) : added

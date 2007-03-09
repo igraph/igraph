@@ -147,3 +147,29 @@ i.get.labels <- function(graph, labels) {
   }
   labels
 }
+
+i.get.arrow.mode <- function(graph, arrow.mode) {
+
+  if (is.character(arrow.mode) &&
+      length(arrow.mode)==1 && substr(arrow.mode, 1, 2)=="a:") {
+    arrow.mode <- get.vertex.attribute(graph, substring(arrow.mode,3))
+  }
+
+  if (is.character(arrow.mode)) {
+    tmp <- numeric(length(arrow.mode))
+    tmp[ arrow.mode %in% c("<", "<-") ] <- 1
+    tmp[ arrow.mode %in% c(">", "->") ] <- 2
+    tmp[ arrow.mode %in% c("<>", "<->") ] <- 3
+    arrow.mode <- tmp
+  }
+
+  if (is.null(arrow.mode)) {
+    if (is.directed(graph)) {
+      arrow.mode <- 2
+    } else {
+      arrow.mode <- 0
+    }
+  }
+
+  arrow.mode
+}

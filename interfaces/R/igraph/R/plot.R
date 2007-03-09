@@ -29,6 +29,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
                        vertex.frame.color="black", 
                        margin=0, loop.angle=0,
                        # SPECIFIC: #####################################
+                       arrow.mode=NULL,
                        axes=FALSE, xlab="", ylab="",
                        xlim=c(-1,1), ylim=c(-1,1),
                        ...) {
@@ -49,6 +50,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   label.degree <- i.get.label.degree(graph, label.degree)
   labels <- i.get.labels(graph, labels)
   edge.labels <- i.get.edge.labels(graph, edge.labels)
+  arrow.mode <- i.get.arrow.mode(graph, arrow.mode)
 
   # create the plot
   xlim <- c(xlim[1]-margin, xlim[2]+margin)
@@ -111,17 +113,17 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
       sapply(dt, function(t) point.on.cubic.bezier(cp, t))
     }
     
-    plot.bezier <- function(cp, points, color, width, arrows, lty) {
+    plot.bezier <- function(cp, points, color, width, arr, lty) {
       p <- compute.bezier( cp, points )
       polygon(p[1,], p[2,], border=color, lwd=width, lty=lty)
-      if (arrows) {
+      if (arr != 0) {
         arrows(p[1,ncol(p)-1], p[2,ncol(p)-1], p[1,ncol(p)], p[2,ncol(p)],
-               length=.2, angle=20, col=color, lwd=width)
+               length=.2, angle=20, col=color, lwd=width, code=arr)
       }
     }
     
     loop <- function(x0, y0, cx=x0, cy=y0, color, angle=0, label=NA,
-                     width=1, arrows=FALSE, lty=1) {
+                     width=1, arr=2, lty=1) {
       rad <- angle/180*pi
       center <- c(cx,cy)
       cp <- matrix( c(x0,y0, x0+.4,y0+.2, x0+.4,y0-.2, x0,y0),
@@ -134,7 +136,7 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
       cp[,1] <- cx+r*cos(phi)
       cp[,2] <- cy+r*sin(phi)
 
-      plot.bezier(cp, 50, color, width, arrows=arrows, lty=lty)
+      plot.bezier(cp, 50, color, width, arr=arr, lty=lty)
 
       if (!is.na(label)) {
         lx <- x0+.3
@@ -161,27 +163,52 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
     if (length(loop.angle)>1) { la <- la[loops.e] }
     lty <- edge.lty
     if (length(edge.lty)>1) { lty <- lty[loops.e] }
+    arr <- arrow.mode
+    if (length(arrow.mode)>1) { arrow.mode <- arrow.mode[loops.e] }
     xx0 <- layout[loops.v,1] + cos(la/180*pi) * vs
     yy0 <- layout[loops.v,2] + sin(la/180*pi) * vs
     mapply(loop, xx0, yy0,
            color=ec, angle=la, label=loop.labels, lty=lty,
-           width=ew, MoreArgs=list(arrows=is.directed(graph)))
-
+           width=ew, arrows=arr)
+    
   }
   
-  arrow.code <- ifelse(is.directed(graph), 2, 0)
   if (length(x0) != 0) {
     if (length(edge.color)>1) { edge.color <- edge.color[nonloops.e] }
     if (length(edge.width)>1) { edge.width <- edge.width[nonloops.e] }
     if (length(edge.lty)>1) { edge.lty <- edge.lty[nonloops.e] }
-    arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.code,
-           col=edge.color, lwd=edge.width, lty=edge.lty)
-    if (any(edge.lty != 1)) {
-      pp <- atan2(y0-y1, x0-x1)
-      xx <- x1+0.01*cos(pp)
-      yy <- y1+0.01*sin(pp)
-      arrows(xx, yy, x1, y1, angle=20, length=0.2, code=arrow.code,
-             col=edge.color, lwd=edge.width, lty=1)
+    if (length(arrow.mode)>1) { arrow.mode <- arrow.mode[nonloops.e] }
+    if (length(unique(arrow.mode))==1) {
+      arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.mode,
+             col=edge.color, lwd=edge.width, lty=edge.lty)
+      if (any(edge.lty != 1)) {
+        pp <- atan2(y0-y1, x0-x1)
+        xx <- x1+0.01*cos(pp)
+        yy <- y1+0.01*sin(pp)
+        arrows(xx, yy, x1, y1, angle=20, length=0.2, code=arrow.mode,
+               col=edge.color, lwd=edge.width, lty=1)
+      }
+    } else {
+      ## different kinds of arrow drawn separately as 'arrows' cannot
+      ## handle a vector as the 'code' argument
+      for (code in 0:3) {
+        valid <- arrow.mode==code
+        if (!any(valid)) { next }
+        ec <- edge.color ; if (length(ec)>1) { ec <- ec[valid] }
+        ew <- edge.width ; if (length(ew)>1) { ew <- ew[valid] }
+        el <- edge.lty   ; if (length(el)>1) { el <- el[valid] }        
+        arrows(x0[valid], y0[valid], x1[valid], y1[valid],
+               angle=20, length=0.2, code=code,
+               col=ec, lwd=ew, lty=el)
+        if (any(el != 1)) {
+          pp <- atan2(y0-y1, x0-x1)
+          xx <- x1+0.01*cos(pp)
+          yy <- y1+0.01*sin(pp)
+          arrows(xx[valid], yy[valid], x1[valid], y1[valid],
+                 angle=20, length=0.2, code=code,
+                 col=ec, lwd=ew, lty=1)
+        }
+      }
     }
     x <- (x0+x1)/2
     y <- (y0+y1)/2

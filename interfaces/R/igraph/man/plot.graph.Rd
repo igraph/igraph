@@ -10,7 +10,7 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
     label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
     vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
     edge.labels = NA, edge.lty=1, vertex.frame.color="black", margin=0,
-    loop.angle=0, axes = FALSE, xlab = "", ylab = "",
+    loop.angle=0, arrow.mode=NULL, axes = FALSE, xlab = "", ylab = "",
     xlim=c(-1,1), ylim=c(-1,1), \dots)
 }
 \arguments{
@@ -49,6 +49,18 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
   \item{margin}{The margin to add to each side of the plot.}
   \item{loop.angle}{Numeric vector or constant giving the angle in
     degrees for the drawing of the loop edges.}
+  \item{arrow.mode}{Numeric or character constant or vector giving
+    whether or not to draw arrows on the edges. If a single number or
+    string is given then that is valid for all edges. If a vector is
+    given then it should have the same length as the number of edges in
+    the graph. The possible codes: 0, \code{-} and
+    \code{--} mean no arrows, 1, \code{<} and
+    \code{<-} mean backward arrows, 2, \code{>} and
+    \code{->} mean forward arrows and finally, 3,
+    \code{<>} and \code{<->} mean double arrows.
+    The default \code{NULL} value means no arrows for undirected graphs
+    and forward arrows for directed graphs.    
+  }
   \item{axes}{Logical, whether to plot axes, defaults to FALSE.}
   \item{xlab}{The label of the horizontal axis. Defaults to the empty string.}
   \item{ylab}{The label of the vertical axis. Defaults to the empty
