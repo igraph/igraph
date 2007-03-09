@@ -3,6 +3,9 @@
 	* interfaces/R/igraph/R/structural.properties.R (alpha.centrality) : 
 	added
 
+	* interfaces/R/igraph/R/print.R (print.igraph) : better printing of 
+	vertex and edge arguments 
+
 2007-02-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (transitivity) :

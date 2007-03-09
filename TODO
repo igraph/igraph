@@ -1,8 +1,6 @@
 
-o Pareto option in degree.distribution
 o igraph_vs_seq bug, the last node is omitted???
 o R interface: implement max.print option
-o faster transitivity calculation for graphs with large degree vertices
 * R interface: uniform 'y' coordinates in plot.igraph and tkplot
 o attribute support in to_undirected
 o calculate the actual maximum flow

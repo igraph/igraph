@@ -54,38 +54,65 @@ print.igraph <- function(x,
   if (vertex.attributes) {
     cat("Vertex attributes:\n")
     list <- list.vertex.attributes(x)
-    if (vc != 0) {
-      for (i in 0:(vc-1)) {
-        cat("  ", i, "  ")
-        sapply(list, function(n) {
-          cat(n, "=", get.vertex.attribute(x, n, i), "\t")})
-        cat("\n")
+    if (length(list) == 0) {
+      cat("No vertex attributes\n")
+    } else {
+      if (vc==0 ||
+          all(sapply(list, function(v) is.numeric(v) |
+                     is.character(v) | is.logical(v)))) {
+        ## create a table
+        tab <- data.frame(v=paste(sep="", "[", seq(length=vc)-1, "]"), row.names="v")
+        for (i in list) {
+          tab[i] <- get.vertex.attribute(x, i)
+        }
+        print(tab)
+      } else {
+        for (i in 0:(vc-1)) {
+          cat("  ", i, "  ")
+          sapply(list, function(n) {
+            cat(n, "=", get.vertex.attribute(x, n, i), "\t")})
+          cat("\n")
+        }
       }
     }
   }
 
   if (edge.attributes) {
     list <- list.edge.attributes(x)
+  } else {
+    list <- character()
   }
   
   arrow <- ifelse(is.directed(x), "->", "--")
   if (ec != 0) {
     if (!edge.attributes) {
-      cat("\nEdges:\n")
+      cat("Edges:\n")
     } else {
-      cat("\nEdges and their attributes:\n")
+      cat("Edges and their attributes:\n")
     }
-    i <- 0
     el <- get.edgelist(x, names=names)
-    apply(el, 1, function(v) {
-      cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
-      if (edge.attributes) {
-        sapply(list, function(n) {
-          cat("  ", n, "=", get.edge.attribute(x, n, i), "\t")})
+    if (ec==0 || 
+        all(sapply(list, function(v) is.numeric(v) |
+                   is.character(v) | is.logical(v)))) {
+      ## create a table
+      tab <- data.frame(e=paste(sep="", "[", seq(length=ec)-1, "]"), row.names="e")
+      tab[" "] <- paste(el[,1], arrow, el[,2])
+      for (i in list) {
+        tab[i] <- get.edge.attribute(x, i)
       }
-      cat("\n")
-      i <<- i+1
-    })
+      print(tab)
+    } else {
+      i <- 0
+      apply(el, 1, function(v) {
+        cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
+        if (edge.attributes) {
+          sapply(list, function(n) {
+            cat("  ", n, "=", get.edge.attribute(x, n, i), "\t")})
+        }
+        cat("\n")
+        i <<- i+1
+      })
+    }
   }
   
   invisible(x)
