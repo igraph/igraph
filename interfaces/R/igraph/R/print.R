@@ -126,6 +126,24 @@ summary.igraph <- function(object, ...) {
   cat("Vertices:", vcount(object), "\n")
   cat("Edges:", ecount(object), "\n")
   cat("Directed:", is.directed(object), "\n")
+  l <- list.graph.attributes(object)
+  if (length(l)==0) {
+    cat("No graph attributes.\n")
+  } else {
+    cat(sep="", "Graph attributes: ", paste(l, collapse=", "), ".\n")
+  }
+  l <- list.vertex.attributes(object)
+  if (length(l)==0) {
+    cat("No vertex attributes.\n")
+  } else {
+    cat(sep="", "Vertex attributes: ", paste(l, collapse=", "), ".\n")
+  }
+  l <- list.edge.attributes(object)
+  if (length(l)==0) {
+    cat("No edge attributes.\n")
+  } else {
+    cat(sep="", "Edge attributes: ", paste(l, collapse=", "), ".\n")
+  }
   
   invisible(object)
 }

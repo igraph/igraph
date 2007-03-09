@@ -6,6 +6,8 @@
 	* interfaces/R/igraph/R/print.R (print.igraph) : better printing of 
 	vertex and edge arguments 
 
+	* interfaces/R/igraph/R/print.R (summary.igraph) : print attribute names
+
 2007-02-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (transitivity) :
