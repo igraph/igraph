@@ -1,3 +1,8 @@
+2007-03-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/measure_dynamics.c (igraph_measure_dynamics_citedcat)
+	(igraph_measure_dynamics_citedcat_st) : added
+
 2007-03-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_id)

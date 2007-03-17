@@ -1134,6 +1134,19 @@ int igraph_measure_dynamics_age_st(const igraph_t *graph,
 				   igraph_vector_t *res,
 				   const igraph_vector_t *al);
 
+int igraph_measure_dynamics_citedcat(const igraph_t *graph, 
+				     const igraph_vector_t *cats,
+				     igraph_integer_t pnocats,
+				     igraph_vector_t *ak, 
+				     igraph_vector_t  *sd,
+				     igraph_vector_t *no,
+				     const igraph_vector_t *st);
+int igraph_measure_dynamics_citedcat_st(const igraph_t *graph,
+					igraph_vector_t *res,
+					const igraph_vector_t *ak,
+					const igraph_vector_t *cats,
+					igraph_integer_t pnocats);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
