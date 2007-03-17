@@ -647,6 +647,12 @@ int igraph_lastcit_game(igraph_t *graph,
 			igraph_integer_t agebins,
 			const igraph_vector_t *preference, igraph_bool_t directed);
 
+int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+			   const igraph_vector_t *types,
+			   const igraph_vector_t *pref,
+			   igraph_integer_t edges_per_step,
+			   igraph_bool_t directed);
+
 /* -------------------------------------------------- */
 /* Basic query functions                              */
 /* -------------------------------------------------- */

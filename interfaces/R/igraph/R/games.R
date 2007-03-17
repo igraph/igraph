@@ -296,3 +296,16 @@ lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
         as.numeric(pref), as.logical(directed),
         PACKAGE="igraph")
 }
+
+cited.type.game <- function(n, edges=1, types=rep(0, n),
+                            pref=rep(1, length(types)),
+                            directed=TRUE, attr=TRUE) {
+  res <- .Call("R_igraph_cited_type_game", as.numeric(n), as.numeric(edges),
+               as.numeric(types), as.numeric(pref), as.logical(directed),
+               PACKAGE="igraph")
+  if (attr) {
+    V(res)$type <- types
+  }
+  res
+}
+

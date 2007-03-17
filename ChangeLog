@@ -1,5 +1,7 @@
 2007-03-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/games.c (igraph_cited_type_game) : added
+
 	* src/measure_dynamics.c (igraph_measure_dynamics_citedcat)
 	(igraph_measure_dynamics_citedcat_st) : added
 

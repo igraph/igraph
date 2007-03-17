@@ -1,3 +1,4 @@
+
 /* -*- mode: C -*-  */
 /* 
    IGraph R library.
@@ -1987,6 +1988,50 @@ int igraph_lastcit_game(igraph_t *graph,
   igraph_free(lastcit);
   IGRAPH_FINALLY_CLEAN(3);
   
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+			   const igraph_vector_t *types,
+			   const igraph_vector_t *pref,
+			   igraph_integer_t edges_per_step,
+			   igraph_bool_t directed) {
+  
+  igraph_vector_t edges;
+  igraph_vector_t cumsum;
+  igraph_real_t sum;
+  long int i,j;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&cumsum, 2);
+  IGRAPH_CHECK(igraph_vector_reserve(&cumsum, nodes+1));
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes*edges_per_step));
+  
+  /* first node */
+  VECTOR(cumsum)[0]=0;
+  sum=VECTOR(cumsum)[1]=VECTOR(*pref)[ (long int) VECTOR(*types)[0] ];
+  
+  RNG_BEGIN();
+
+  for (i=1; i<nodes; i++) {
+    for (j=0; j<edges_per_step; j++) {
+      long int to;
+      igraph_vector_binsearch(&cumsum, RNG_UNIF(0, sum), &to);
+      igraph_vector_push_back(&edges, i);
+      igraph_vector_push_back(&edges, to);
+    }
+    sum+=VECTOR(*pref)[(long int) VECTOR(*types)[i] ];
+    igraph_vector_push_back(&cumsum, sum);
+  }
+  
+  RNG_END();
+
+  igraph_vector_destroy(&cumsum);
+  IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
