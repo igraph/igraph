@@ -8,6 +8,11 @@
 	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id)
 	(R_igraph_measure_dynamics_idage, R_igraph_measure_dynamics_lastcit) :
 	updated
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.age) :
+	added
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_age)
+	(R_igraph_measure_dynamics_age_st) : added
 	
 2007-03-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 

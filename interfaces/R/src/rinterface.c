@@ -2459,6 +2459,81 @@ SEXP R_igraph_measure_dynamics_lastcit_st(SEXP graph, SEXP pal) {
   return result;
 }
 
+SEXP R_igraph_measure_dynamics_age(SEXP graph, SEXP pst, SEXP pagebins,
+				   SEXP psd, SEXP pno) {
+  igraph_t g;
+  igraph_vector_t al, sd, no;
+  igraph_vector_t *ppsd=&sd, *ppno=&no;
+  igraph_vector_t st;
+  igraph_bool_t lsd=LOGICAL(psd)[0];
+  igraph_bool_t lno=LOGICAL(pno)[0];
+  igraph_integer_t agebins=REAL(pagebins)[0];
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_vector(pst, &st);
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&al, 0);
+  if (lsd) {
+    igraph_vector_init(&sd, 0);
+  } else {
+    ppsd=0;
+  }
+  if (lno) {
+    igraph_vector_init(&no, 0);
+  } else {
+    ppno=0;
+  }
+  igraph_measure_dynamics_age(&g, &al, ppsd, ppno, &st, agebins);
+  PROTECT(result=NEW_LIST(3));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(igraph_vector_size(&al)));
+  igraph_vector_copy_to(&al, REAL(VECTOR_ELT(result, 0)));
+  igraph_vector_destroy(&al);
+  if (lsd) {
+    SET_VECTOR_ELT(result, 1, NEW_NUMERIC(igraph_vector_size(&sd)));
+    igraph_vector_copy_to(&sd, REAL(VECTOR_ELT(result, 1)));
+    igraph_vector_destroy(&sd);
+  } else {
+    SET_VECTOR_ELT(result, 1, R_NilValue);
+  }
+  if (lno) {
+    SET_VECTOR_ELT(result, 2, NEW_NUMERIC(igraph_vector_size(&no)));
+    igraph_vector_copy_to(&no, REAL(VECTOR_ELT(result, 2)));
+    igraph_vector_destroy(&no);
+  } else {
+    SET_VECTOR_ELT(result, 2, R_NilValue);
+  }
+  
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_measure_dynamics_age_st(SEXP graph, SEXP pal) {
+  
+  igraph_t g;
+  igraph_vector_t al;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pal, &al);
+  igraph_vector_init(&res, 0);
+  igraph_measure_dynamics_age_st(&g, &res, &al);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto, 
 				 SEXP pmode, SEXP pno) {
 

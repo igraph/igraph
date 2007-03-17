@@ -108,7 +108,7 @@ export(evcent, bonpow, alpha.centrality)
 
 export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
        measure.dynamics.citedcat.id.age, measure.dynamics.citingcat.id.age,
-       measure.dynamics.lastcit)
+       measure.dynamics.lastcit, measure.dynamics.age)
 
 # isomorphism, motifs
 

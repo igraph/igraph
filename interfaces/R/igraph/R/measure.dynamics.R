@@ -379,5 +379,65 @@ measure.dynamics.lastcit <- function(graph, agebins, iterations=5,
   res
 }
 
-  
-                                     
+measure.dynamics.age <- function(graph, agebins,
+                                 iterations=5,
+                                 norm.method="old",
+                                 number=FALSE) {
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  st <- rep(1, vcount(graph))
+
+  for (i in seq(along=numeric(iterations))) {
+
+    ## standard deviation only in the last iteration
+    if (i==iterations) {
+      sd.real <- TRUE
+    } else {
+      sd.real <- FALSE
+    }
+    number.real <- number & sd.real
+
+    if (i != 1) {
+      if (norm.method=="old") {
+        mes[[1]] <- mes[[1]]/mes[[1]][1]
+      } else {
+        mes[[1]] <- mes[[1]]/sum(mes[[1]])
+      }
+    }
+
+    mes <- .Call("R_igraph_measure_dynamics_age", graph,
+                 as.numeric(st), as.numeric(agebins), as.logical(sd.real),
+                 as.logical(number.real),
+                 PACKAGE="igraph")
+
+    mes[[1]][!is.finite(mes[[1]])] <- 0
+
+    st <- .Call("R_igraph_measure_dynamics_age_st", graph, mes[[1]],
+                PACKAGE="igraph")
+  }
+
+  if (sd.real) {
+    if (norm.method=="old") {
+      mes[[2]] <- mes[[2]]/mes[[1]][1]
+    } else {
+      mes[[2]] <- mes[[2]]/sum(mes[[1]])
+    }
+  }
+  if (norm.method=="old") {
+    mes[[1]] <- mes[[1]]/mes[[1]][1]
+  } else {
+    mes[[1]] <- mes[[1]]/sum(mes[[1]])
+  }
+
+  if (number) {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], no=mes[[3]])
+  } else {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  }
+
+  res
+}
+                                 

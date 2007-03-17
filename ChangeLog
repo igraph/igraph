@@ -9,6 +9,9 @@
 	* interfaces/python/package/__init__.py : added Graph.summary,
 	extended Histogram with mean and sd calculations
 
+	* src/measure_dynamics.c (igraph_measure_dynamics_age)
+	(igraph_measure_dynamics_age_st) : added
+
 2007-03-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_id) : 

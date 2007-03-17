@@ -1824,3 +1824,145 @@ int igraph_measure_dynamics_lastcit_st(const igraph_t *graph,
 
   return 0;
 }
+
+int igraph_measure_dynamics_age(const igraph_t *graph, 
+				igraph_vector_t *al,
+				igraph_vector_t *sd,
+				igraph_vector_t *no,
+				const igraph_vector_t *st,
+				igraph_integer_t pagebins) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  
+  long int agebins=pagebins;
+  long int binwidth=no_of_nodes/agebins+1;
+
+  igraph_vector_t ntl, ch, notnull, normfact;
+  
+  long int node, i, k;
+  
+  igraph_vector_t neis;
+  
+  long int edges=0;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&ntl, agebins);
+  IGRAPH_VECTOR_INIT_FINALLY(&ch, agebins);
+  IGRAPH_VECTOR_INIT_FINALLY(&notnull, agebins);
+  IGRAPH_VECTOR_INIT_FINALLY(&normfact, agebins);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  IGRAPH_CHECK(igraph_vector_resize(al, agebins));
+  igraph_vector_null(al);
+  if (sd) {
+    IGRAPH_CHECK(igraph_vector_resize(sd, agebins));
+    igraph_vector_null(sd);
+  }
+  
+  for (node=0; node<no_of_nodes; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* update A() */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=(node-to)/binwidth;
+      
+      double xk=VECTOR(*st)[node]/VECTOR(ntl)[xidx];
+      double oldm=VECTOR(*al)[xidx];
+      
+      VECTOR(notnull)[xidx] += 1;
+      VECTOR(*al)[xidx] += (xk-oldm)/VECTOR(notnull)[xidx];
+      if (sd) {
+	VECTOR(*sd)[xidx] += (xk-oldm)*(xk-VECTOR(*al)[xidx]);
+      }
+    }
+    
+    /* update ntl, ch, normfact */
+    /* these is omitted, no change in ntl, except for aging */
+    edges += igraph_vector_size(&neis);
+    
+    /* new node */
+    VECTOR(ntl)[0]++;
+    if (VECTOR(ntl)[0]==1) {
+      VECTOR(ch)[0]=edges;
+    }
+    
+    /* aging, this could be written much simpler */
+    for (k=1; node-binwidth*k+1 >=1; k++) {
+      VECTOR(ntl)[k-1]--;
+      if (VECTOR(ntl)[k-1]==0) {
+	VECTOR(normfact)[k-1] += (edges-VECTOR(ch)[k-1]+1);
+	VECTOR(ch)[k-1] = edges;
+      }
+      VECTOR(ntl)[k]++;
+      if (VECTOR(ntl)[k]==1) {
+	VECTOR(ch)[k]=edges;
+      }
+    }
+    
+  } /* node<no_of_nodes */
+
+  /* measurement done, update change */
+  for (i=0; i<agebins; i++) {
+    igraph_real_t oldmean;
+    if (VECTOR(ntl)[i] != 0) {
+      VECTOR(normfact)[i] += (edges-VECTOR(ch)[i]+1);
+    }
+    oldmean=VECTOR(*al)[i];
+    VECTOR(*al)[i] *= VECTOR(notnull)[i]/VECTOR(normfact)[i];
+    if (sd) {
+      VECTOR(*sd)[i] += oldmean * oldmean * VECTOR(notnull)[i] *
+	(1-VECTOR(notnull)[i]/VECTOR(normfact)[i]);
+      if (VECTOR(normfact)[i] > 0) {
+	VECTOR(*sd)[i] = sqrt(VECTOR(*sd)[i]/(VECTOR(normfact)[i]-1));
+      }
+    }
+  }
+  
+  if (no) {
+    igraph_vector_destroy(no);
+    *no=normfact;
+  } else {
+    igraph_vector_destroy(&normfact);
+  }
+
+  igraph_vector_destroy(&ntl);
+  igraph_vector_destroy(&ch);
+  igraph_vector_destroy(&notnull);
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(5);
+  return 0;
+}
+
+int igraph_measure_dynamics_age_st(const igraph_t *graph, 
+				   igraph_vector_t *res,
+				   const igraph_vector_t *al) {
+  
+  long int agebins=igraph_vector_size(al);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  long int node, i, k;
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  igraph_vector_null(res);
+  VECTOR(*res)[0]=VECTOR(*al)[0];
+  
+  for (node=1; node<no_of_nodes; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* new node, aging */
+    VECTOR(*res)[node] = VECTOR(*res)[node-1] + VECTOR(*al)[0];
+    for (k=1; node-binwidth*k+1 >= 1; k++) {
+      VECTOR(*res)[node] += -VECTOR(*al)[k-1] + VECTOR(*al)[k];
+    }
+    
+    /* inspecting outgoing edges is not needed at all */
+
+  }
+  
+  return 0;
+}

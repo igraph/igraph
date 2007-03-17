@@ -1124,6 +1124,16 @@ int igraph_measure_dynamics_lastcit_st(const igraph_t *graph,
 				       igraph_vector_t *res,
 				       const igraph_vector_t *al);
 
+int igraph_measure_dynamics_age(const igraph_t *graph, 
+				igraph_vector_t *al,
+				igraph_vector_t *sd,
+				igraph_vector_t *no,
+				const igraph_vector_t *st,
+				igraph_integer_t pagebins);
+int igraph_measure_dynamics_age_st(const igraph_t *graph, 
+				   igraph_vector_t *res,
+				   const igraph_vector_t *al);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
