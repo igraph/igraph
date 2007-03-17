@@ -2538,7 +2538,7 @@ SEXP R_igraph_measure_dynamics_citedcat(SEXP graph, SEXP pcats,
 					SEXP pnocats, SEXP pst, SEXP psd, SEXP pno) {
   igraph_t g;
   igraph_vector_t al, sd, no;
-  igraph_vector_t *ppsd, *ppno=&no;
+  igraph_vector_t *ppsd=&sd, *ppno=&no;
   igraph_vector_t st;
   igraph_vector_t cats;
   igraph_bool_t lsd=LOGICAL(psd)[0];

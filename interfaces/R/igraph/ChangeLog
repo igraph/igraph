@@ -1,3 +1,11 @@
+2007-03-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/games.R (barabasi.game) : bug corrected,
+	call nonlinear game is zero.appeal is not 1
+
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_ditedcat) :
+	bug corrected, sd was never calculated
+
 2007-03-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/measure.dynamics.R 

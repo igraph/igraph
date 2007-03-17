@@ -80,7 +80,7 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
     .Call("R_igraph_recent_degree_game", n, power, time.window, m, out.seq,
           out.pref, as.numeric(zero.appeal), directed,
           PACKAGE="igraph")
-  } else if (power==1) {    
+  } else if (power==1 && zero.appeal==1) {    
     .Call("R_igraph_barabasi_game", n, m, out.seq, out.pref, directed,
           PACKAGE="igraph")
   } else {
