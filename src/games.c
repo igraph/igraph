@@ -2038,3 +2038,82 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
   return 0;
 }
+
+
+typedef struct {
+  long int no;
+  igraph_psumtree_t *sumtrees;
+} igraph_i_citing_cited_type_game_struct_t;
+
+void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct_t *s) {
+  long int i;
+  if (!s->sumtrees) { return; }
+  for (i=0; i<s->no; i++) {
+    igraph_psumtree_destroy(&s->sumtrees[i]);
+  }
+}
+
+int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+				  const igraph_vector_t *types,
+				  const igraph_matrix_t *pref,
+				  igraph_integer_t edges_per_step,
+				  igraph_bool_t directed) {
+
+  igraph_vector_t edges;
+  igraph_i_citing_cited_type_game_struct_t str = { 0, 0 };
+  igraph_psumtree_t *sumtrees;
+  igraph_vector_t sums;
+  long int nocats=igraph_matrix_ncol(pref);
+  long int i, j;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges,0);
+  str.sumtrees=sumtrees=Calloc(nocats, igraph_psumtree_t);  
+  if (!sumtrees) {
+    IGRAPH_ERROR("Citing-cited type game failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_i_citing_cited_type_game_free, &str);
+  
+  for (i=0; i<nocats; i++) {
+    IGRAPH_CHECK(igraph_psumtree_init(&sumtrees[i], nodes));
+    str.no++;    
+  }
+  IGRAPH_VECTOR_INIT_FINALLY(&sums, nocats);
+					       
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes*edges_per_step));
+
+  /* First node */
+  for (i=0; i<nocats; i++) {
+    long int type=VECTOR(*types)[0];
+    igraph_psumtree_update(&sumtrees[i], 0, MATRIX(*pref, i, type));
+    VECTOR(sums)[i]=MATRIX(*pref, i, type);
+  }
+
+  RNG_BEGIN();
+    
+  for (i=1; i<nodes; i++) {
+    long int type=VECTOR(*types)[i];
+    igraph_real_t sum=VECTOR(sums)[type];
+    for (j=0; j<edges_per_step; j++) {
+      long int to;
+      igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
+      igraph_vector_push_back(&edges, i);
+      igraph_vector_push_back(&edges, to);
+    }
+    
+    /* add i */
+    for (j=0; j<nocats; j++) {
+      igraph_psumtree_update(&sumtrees[j], i, MATRIX(*pref, j,  type));
+      VECTOR(sums)[j] += MATRIX(*pref, j, type);
+    }
+  }
+
+  RNG_END();
+  
+  igraph_i_citing_cited_type_game_free(&str);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  igraph_create(graph, &edges, nodes, directed);
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}

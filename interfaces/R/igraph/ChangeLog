@@ -1,5 +1,9 @@
 2007-03-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/gamse.R (citing.cited.type.game) : added
+	* interfaces/R/src/rinterface.c (R_igraph_citing_cited_type_game)
+	: added
+
 	* interfaces/R/igraph/R/games.R (cited.type.game) : added
 	* interfaces/R/src/rinterface.c (R_igraph_cited_type_game) : added
 

@@ -653,6 +653,12 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 			   igraph_integer_t edges_per_step,
 			   igraph_bool_t directed);
 
+int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+				  const igraph_vector_t *types,
+				  const igraph_matrix_t *pref,
+				  igraph_integer_t edges_per_step,
+				  igraph_bool_t directed);
+
 /* -------------------------------------------------- */
 /* Basic query functions                              */
 /* -------------------------------------------------- */

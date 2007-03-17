@@ -309,3 +309,17 @@ cited.type.game <- function(n, edges=1, types=rep(0, n),
   res
 }
 
+citing.cited.type.game <- function(n, edges=1, types=rep(0, n),
+                                   pref=matrix(1, nr=length(types), nc=length(types)),
+                                   directed=TRUE, attr=TRUE) {
+  pref <- structure(as.numeric(pref), dim=dim(pref))
+  res <- .Call("R_igraph_citing_cited_type_game", as.numeric(n),
+               as.numeric(types), pref, as.numeric(edges),
+               as.logical(directed),
+               PACKAGE="igraph")
+  if (attr) {
+    V(res)$type <- types
+  }
+  res
+}
+
