@@ -23,6 +23,7 @@
 measure.dynamics.id <- function(graph, 
                                 iterations=5,
                                 time.window=NULL,
+                                number=FALSE,
                                 norm.method="old") {
 
   if (!is.igraph(graph)) {
@@ -41,7 +42,8 @@ measure.dynamics.id <- function(graph,
     } else {
       sd.real <- FALSE
     }
-
+    number.real <- number & sd.real
+    
     if (i != 1) {
       if (norm.method=="old") {
         mes[[1]] <- mes[[1]]/mes[[1]][1]
@@ -54,6 +56,7 @@ measure.dynamics.id <- function(graph,
       mes <- .Call("R_igraph_measure_dynamics_id", graph,
                    as.numeric(st),
                    as.numeric(maxind), as.logical(sd.real),
+                   as.logical(number.real),
                    PACKAGE="igraph")
     } else {
       mes <- .Call("R_igraph_measure_dynamics_idwindow", graph,
@@ -91,7 +94,11 @@ measure.dynamics.id <- function(graph,
     mes[[1]] <- mes[[1]]/sum(mes[[1]])
   }
 
-  res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  if (number) {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], no=mes[[3]])
+  } else {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  }
   
   res
 }
@@ -99,6 +106,7 @@ measure.dynamics.id <- function(graph,
 measure.dynamics.idage <- function(graph, agebins=300,
                                    iterations=5,
                                    time.window=NULL,
+                                   number=FALSE,
                                    norm.method="old") {
 
   if (!is.igraph(graph)) {
@@ -121,6 +129,7 @@ measure.dynamics.idage <- function(graph, agebins=300,
     } else {
       sd.real <- FALSE
     }
+    number.real <- sd.real & number
 
     if (i != 1) {
       if (norm.method=="old") {
@@ -133,6 +142,7 @@ measure.dynamics.idage <- function(graph, agebins=300,
     mes <- .Call("R_igraph_measure_dynamics_idage", graph,
                  as.numeric(st), as.numeric(agebins),
                  as.numeric(maxind), as.logical(sd.real),
+                 as.logical(number.real),
                  time.window,
                  PACKAGE="igraph")
 
@@ -157,7 +167,11 @@ measure.dynamics.idage <- function(graph, agebins=300,
     mes[[1]] <- mes[[1]]/sum(mes[[1]])
   }
 
-  res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  if (number) {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], no=mes[[3]])
+  } else {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  }
   
   res
 }
@@ -304,7 +318,9 @@ measure.dynamics.d.d <- function(graph, vtime, etime,
   res
 }
                  
-measure.dynamics.lastcit <- function(graph, agebins, iterations=5) {
+measure.dynamics.lastcit <- function(graph, agebins, iterations=5,
+                                     norm.method="old",
+                                     number=FALSE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -320,13 +336,19 @@ measure.dynamics.lastcit <- function(graph, agebins, iterations=5) {
     } else {
       sd.real <- FALSE
     }
+    number.real <- number & sd.real
 
     if (i != 1) {
-      mes[[1]] <- mes[[1]]/mes[[1]][1]
+      if (norm.method=="old") {
+        mes[[1]] <- mes[[1]]/mes[[1]][1]
+      } else {
+        mes[[1]] <- mes[[1]]/sum(mes[[1]])
+      }
     }
 
     mes <- .Call("R_igraph_measure_dynamics_lastcit", graph,
-                 as.numeric(st), as.numeric(agebins),
+                 as.numeric(st), as.numeric(agebins), as.logical(sd.real),
+                 as.logical(number.real),
                  PACKAGE="igraph")
 
     mes[[1]][!is.finite(mes[[1]])] <- 0
@@ -336,11 +358,23 @@ measure.dynamics.lastcit <- function(graph, agebins, iterations=5) {
   }
 
   if (sd.real) {
-    mes[[2]] <- mes[[2]]/mes[[1]][1]
+    if (norm.method=="old") {
+      mes[[2]] <- mes[[2]]/mes[[1]][1]
+    } else {
+      mes[[2]] <- mes[[2]]/sum(mes[[1]])
+    }
   }
-  mes[[1]] <- mes[[1]]/mes[[1]][1]
-  
-  res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  if (norm.method=="old") {
+    mes[[1]] <- mes[[1]]/mes[[1]][1]
+  } else {
+    mes[[1]] <- mes[[1]]/sum(mes[[1]])
+  }
+
+  if (number) {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], no=mes[[3]])
+  } else {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  }
   
   res
 }

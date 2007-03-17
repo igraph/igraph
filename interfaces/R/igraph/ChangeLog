@@ -1,3 +1,14 @@
+2007-03-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id)
+	(measure.dynamics.idage, measure.dynamics.lastcit) : (re)added 'number'
+	argument
+	(measure.dynamics.lastcit) : added 'norm.method' argument
+
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id)
+	(R_igraph_measure_dynamics_idage, R_igraph_measure_dynamics_lastcit) :
+	updated
+	
 2007-03-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id) :

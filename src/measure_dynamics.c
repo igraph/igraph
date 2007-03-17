@@ -28,6 +28,7 @@
 
 int igraph_measure_dynamics_id(const igraph_t *graph,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,
+			       igraph_matrix_t *no,
 			       const igraph_vector_t *st, 
 			       igraph_integer_t pmaxind) {
   
@@ -119,8 +120,13 @@ int igraph_measure_dynamics_id(const igraph_t *graph,
       }
     }
   }
-  
-  igraph_matrix_destroy(&normfact);
+
+  if (no) {
+    igraph_matrix_destroy(no);
+    *no=normfact;
+  } else {
+    igraph_matrix_destroy(&normfact);
+  }
   
   Free(indegree);
   igraph_vector_destroy(&ntk);
@@ -366,6 +372,7 @@ int igraph_measure_dynamics_idwindow_st(const igraph_t *graph,
 int igraph_measure_dynamics_idage(const igraph_t *graph,
 				  igraph_matrix_t *akl, 
 				  igraph_matrix_t *sd,
+				  igraph_matrix_t *no,
 				  const igraph_vector_t *st, igraph_integer_t pagebins,
 				  igraph_integer_t pmaxind) {
 
@@ -478,8 +485,14 @@ int igraph_measure_dynamics_idage(const igraph_t *graph,
       }
     }
   }
-  
-  igraph_matrix_destroy(&normfact);
+
+  if (no) {
+    igraph_matrix_destroy(no);
+    *no=normfact;
+  } else {
+    igraph_matrix_destroy(&normfact);
+  }
+
   Free(indegree);
   igraph_matrix_destroy(&ntkl);
   igraph_matrix_destroy(&ch);
@@ -1412,7 +1425,7 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
 	MATRIX(*sd, i, j) += oldakk * oldakk * MATRIX(notnull, i, j) *
 	  (1-MATRIX(notnull, i, j)/MATRIX(normfact, i, j));
 	if (MATRIX(normfact, i, j) > 0) {
-	  MATRIX(*sd, i, j) = sqrt(MATRIX(*sd, i, j)/MATRIX(normfact, i, j));
+	  MATRIX(*sd, i, j)=sqrt(MATRIX(*sd, i, j)/(MATRIX(normfact, i, j)-1));
 	  MATRIX(*sd, j, i) = MATRIX(*sd, i, j);
 	}
       }
@@ -1607,7 +1620,9 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
 /* } */
 
 int igraph_measure_dynamics_lastcit(const igraph_t *graph, igraph_vector_t *al,
-				    igraph_vector_t *sd, const igraph_vector_t *st,
+				    igraph_vector_t *sd, 
+				    igraph_vector_t *no,
+				    const igraph_vector_t *st,
 				    igraph_integer_t pagebins) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -1734,11 +1749,17 @@ int igraph_measure_dynamics_lastcit(const igraph_t *graph, igraph_vector_t *al,
       }
     }
   }  
+
+  if (no) {
+    igraph_vector_destroy(no);
+    *no=normfact;
+  } else {
+    igraph_vector_destroy(&normfact);
+  }
  
   igraph_vector_destroy(&ntl);
   igraph_vector_destroy(&ch);
   igraph_vector_destroy(&notnull);
-  igraph_vector_destroy(&normfact);
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(6);
   return 0;

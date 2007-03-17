@@ -1032,6 +1032,7 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
 int igraph_measure_dynamics_idage(const igraph_t *graph,
 				  igraph_matrix_t *akl, 
 				  igraph_matrix_t *sd, 
+				  igraph_matrix_t *no,
 				  const igraph_vector_t *st, igraph_integer_t agebins,
 				  igraph_integer_t maxind);
 int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res,
@@ -1079,6 +1080,7 @@ int igraph_measure_dynamics_citingcat_id_age_st(const igraph_t *graph,
 
 int igraph_measure_dynamics_id(const igraph_t *graph,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,
+			       igraph_matrix_t *no,
 			       const igraph_vector_t *st, igraph_integer_t pmaxind);
 int igraph_measure_dynamics_id_st(const igraph_t *graph, 
 				  igraph_vector_t *res, 
@@ -1114,7 +1116,9 @@ int igraph_measure_dynamics_idwindow_st(const igraph_t *graph,
 					igraph_integer_t time_window);
 
 int igraph_measure_dynamics_lastcit(const igraph_t *graph, igraph_vector_t *al,
-				    igraph_vector_t *sd, const igraph_vector_t *st,
+				    igraph_vector_t *sd,
+				    igraph_vector_t *no,
+				    const igraph_vector_t *st,
 				    igraph_integer_t pagebins);
 int igraph_measure_dynamics_lastcit_st(const igraph_t *graph, 
 				       igraph_vector_t *res,
