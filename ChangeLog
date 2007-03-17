@@ -1,5 +1,9 @@
 2007-03-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/measure_dynamics.c 
+	(igraph_measure_dynamics_citingcat_citedcat_st) : 
+	two bugs corrected
+
 	* src/measure_dynamics.c
 	(igraph_measure_dynamics_citingcat_citedcat)
 	(igraph_measure_dynamics_citingcat_citedcat_st) : added

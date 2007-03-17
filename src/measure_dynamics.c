@@ -2203,8 +2203,7 @@ int igraph_measure_dynamics_citingcat_citedcat_st(const igraph_t *graph,
   for (j=0; j<nocats; j++) {
     MATRIX(allst, j, 0)=MATRIX(*agd, j, (long int)VECTOR(*cats)[0]);
   }
-  VECTOR(*res)[0]=MATRIX(allst, (long int) VECTOR(*cats)[0], 
-			 (long int) VECTOR(*cats)[0]);
+  VECTOR(*res)[0]=MATRIX(allst, (long int) VECTOR(*cats)[0], 0);
   
   for (node=1; node<no_of_nodes; node++) {
     long int citingcat=VECTOR(*cats)[node];
@@ -2216,7 +2215,7 @@ int igraph_measure_dynamics_citingcat_citedcat_st(const igraph_t *graph,
       MATRIX(allst, j, node)=MATRIX(allst, j, node-1) + 
 	MATRIX(*agd, j, citingcat);
     }
-    VECTOR(*res)[node]=MATRIX(allst, citingcat, citingcat);
+    VECTOR(*res)[node]=MATRIX(allst, citingcat, node);
   }
   
   igraph_matrix_destroy(&allst);
