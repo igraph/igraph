@@ -1159,6 +1159,19 @@ int igraph_measure_dynamics_citedcat_st(const igraph_t *graph,
 					const igraph_vector_t *cats,
 					igraph_integer_t pnocats);
 
+int igraph_measure_dynamics_citingcat_citedcat(const igraph_t *graph,
+					       igraph_matrix_t *agd,
+					       igraph_matrix_t *sd,
+					       igraph_matrix_t *no,
+					       const igraph_vector_t *st,
+					       const igraph_vector_t *cats,
+					       igraph_integer_t pnocats);
+int igraph_measure_dynamics_citingcat_citedcat_st(const igraph_t *graph,
+						  igraph_vector_t *res,
+						  const igraph_matrix_t *agd,
+						  const igraph_vector_t *cats,
+						  igraph_integer_t pnocats);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */

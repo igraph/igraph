@@ -1,6 +1,14 @@
+2007-03-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R 
+	(measure.dynamics.citingcat.citedcat) : added
+	* interfaces/R/src/rinterface.c
+	(R_igraph_measure_dynamics_citingcat_citedcat)
+	(R_igraph_measure_dynamics_citingcat_citedcat_st) : added
+
 2007-03-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* interfaces/R/igraph/R/gamse.R (citing.cited.type.game) : added
+	* interfaces/R/igraph/R/games.R (citing.cited.type.game) : added
 	* interfaces/R/src/rinterface.c (R_igraph_citing_cited_type_game)
 	: added
 

@@ -2082,3 +2082,145 @@ int igraph_measure_dynamics_citedcat_st(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_measure_dynamics_citingcat_citedcat(const igraph_t *graph,
+					       igraph_matrix_t *agd,
+					       igraph_matrix_t *sd,
+					       igraph_matrix_t *no,
+					       const igraph_vector_t *st,
+					       const igraph_vector_t *cats,
+					       igraph_integer_t pnocats) {
+  long int nocats=pnocats;
+  long int no_of_nodes=igraph_vcount(graph);
+  
+  igraph_vector_t ntd;
+  igraph_matrix_t ch, normfact, notnull;
+  igraph_vector_t neis;
+  
+  long int node;
+  long int i, j;
+  igraph_vector_t edges;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&ntd, nocats);
+  IGRAPH_MATRIX_INIT_FINALLY(&ch, nocats, nocats);
+  IGRAPH_MATRIX_INIT_FINALLY(&normfact, nocats, nocats);
+  IGRAPH_MATRIX_INIT_FINALLY(&notnull, nocats, nocats);  
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, nocats);
+  
+  IGRAPH_CHECK(igraph_matrix_resize(agd, nocats, nocats));
+  igraph_matrix_null(agd);
+  if (sd) {
+    IGRAPH_CHECK(igraph_matrix_resize(sd, nocats, nocats));
+    igraph_matrix_null(sd);
+  }
+  
+  for (node=0; node<no_of_nodes; node++) {
+    long int citingcat=VECTOR(*cats)[node];
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* update A() */
+    igraph_neighbors(graph, &neis, node, IGRAPH_OUT);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(*cats)[to];
+      
+      double xk=VECTOR(*st)[node] / VECTOR(ntd)[xidx];
+      double oldm=MATRIX(*agd, citingcat, xidx);
+      MATRIX(notnull, citingcat, xidx) += 1;
+      MATRIX(*agd, citingcat, xidx) += 
+	(xk-oldm)/MATRIX(notnull, citingcat, xidx);
+      if (sd) {
+	MATRIX(*sd, citingcat, xidx) +=
+	  (xk-oldm)*(xk-MATRIX(*agd, citingcat, xidx));
+      }
+    }
+
+    VECTOR(edges)[citingcat]+=igraph_vector_size(&neis);
+
+    /* only the new node needs to be added */
+    VECTOR(ntd)[citingcat]++;
+    if (VECTOR(ntd)[citingcat]==1) {
+      for (j=0;j<nocats;j++) {
+	MATRIX(ch, j, citingcat)=VECTOR(edges)[j];
+      }
+    }
+    
+  }
+
+  /* done, updates */
+  for (i=0; i<nocats; i++) {
+    for (j=0; j<nocats; j++) {
+      igraph_real_t oldmean;
+      if (VECTOR(ntd)[j] != 0) {
+	MATRIX(normfact, i, j) += (VECTOR(edges)[i]-MATRIX(ch, i,  j)+1);
+      }
+      oldmean=MATRIX(*agd, i, j);
+      MATRIX(*agd, i, j) *= MATRIX(notnull, i, j)/MATRIX(normfact,i, j);
+      if (sd) {
+	MATRIX(*sd, i, j) += oldmean * oldmean * MATRIX(notnull, i, j) *
+	  (1-MATRIX(notnull, i, j)/MATRIX(normfact, i, j));
+	if (MATRIX(normfact, i, j)>0) {
+	  MATRIX(*sd, i, j)=
+	    sqrt(MATRIX(*sd, i, j)/(MATRIX(normfact, i, j)-1));
+	}
+      }
+    }
+  }
+
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&neis);
+  
+  if (no) {
+    igraph_matrix_destroy(no);
+    *no=normfact;
+  } else {
+    igraph_matrix_destroy(&normfact);
+  }
+  
+  igraph_matrix_destroy(&notnull);
+  igraph_matrix_destroy(&ch);
+  igraph_vector_destroy(&ntd);
+  IGRAPH_FINALLY_CLEAN(6);
+  return 0;
+}
+  
+int igraph_measure_dynamics_citingcat_citedcat_st(const igraph_t *graph,
+						  igraph_vector_t *res,
+						  const igraph_matrix_t *agd,
+						  const igraph_vector_t *cats,
+						  igraph_integer_t pnocats) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int nocats=pnocats;
+  
+  igraph_matrix_t allst;
+  long int j, node;
+
+  IGRAPH_MATRIX_INIT_FINALLY(&allst, nocats, no_of_nodes);
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  for (j=0; j<nocats; j++) {
+    MATRIX(allst, j, 0)=MATRIX(*agd, j, (long int)VECTOR(*cats)[0]);
+  }
+  VECTOR(*res)[0]=MATRIX(allst, (long int) VECTOR(*cats)[0], 
+			 (long int) VECTOR(*cats)[0]);
+  
+  for (node=1; node<no_of_nodes; node++) {
+    long int citingcat=VECTOR(*cats)[node];
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    /* new node */
+    for (j=0; j<nocats; j++) {
+      MATRIX(allst, j, node)=MATRIX(allst, j, node-1) + 
+	MATRIX(*agd, j, citingcat);
+    }
+    VECTOR(*res)[node]=MATRIX(allst, citingcat, citingcat);
+  }
+  
+  igraph_matrix_destroy(&allst);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}

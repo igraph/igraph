@@ -501,3 +501,60 @@ measure.dynamics.citedcat <- function(graph, categories, iterations=5,
   res
 }
         
+measure.dynamics.citingcat.citedcat <- function(graph, categories, iterations=5,
+                                                number=FALSE, norm.method="old",
+                                                norm=c(1,1)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  st <- rep(1, vcount(graph))
+
+  for (i in seq(along=numeric(iterations))) {
+
+    if (i==iterations) {
+      sd.real <- TRUE
+    } else {
+      sd.real <- FALSE
+    }
+    number.real <- sd.real & number
+
+    if (i!=1) {
+      if (norm.method=="old") {
+        mes[[1]] <- mes[[1]]/mes[[1]][norm[1],norm[2]]
+      } else {
+        mes[[1]] <- mes[[1]]/sum(mes[[1]])
+      }
+    }
+
+    mes <- .Call("R_igraph_measure_dynamics_citingcat_citedcat", graph,
+                 as.numeric(categories), as.numeric(max(categories)+1),
+                 as.numeric(st), as.logical(sd.real), as.logical(number.real),
+                 PACKAGE="igraph")
+    mes[[1]][!is.finite(mes[[1]])] <- 0
+    st <- .Call("R_igraph_measure_dynamics_citingcat_citedcat_st", graph,
+                mes[[1]], as.numeric(categories), as.numeric(max(categories)+1),
+                PACKAGE="igraph")
+  }
+
+  if (sd.real) {
+    if (norm.method=="old") {
+      mes[[2]] <- mes[[2]]/mes[[1]][norm[1], norm[2]]
+    } else {
+      mes[[2]] <- mes[[2]]/sum(mes[[1]])
+    }
+  }
+  if (norm.method=="old") {
+    mes[[1]] <- mes[[1]]/mes[[1]][norm[1], norm[1]]
+  } else {
+    mes[[1]] <- mes[[1]]/sum(mes[[1]])
+  }
+
+  if (number) {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]], no=mes[[3]])
+  } else {
+    res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  }
+
+  res
+}

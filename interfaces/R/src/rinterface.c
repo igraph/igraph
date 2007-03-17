@@ -2612,7 +2612,78 @@ SEXP R_igraph_measure_dynamics_citedcat_st(SEXP graph, SEXP pal, SEXP pcats,
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_measure_dynamics_citingcat_citedcat(SEXP graph, SEXP pcats,
+						  SEXP pnocats, SEXP pst,
+						  SEXP psd, SEXP pno) {
+  igraph_t g;
+  igraph_vector_t cats;
+  igraph_integer_t nocats=REAL(pnocats)[0];
+  igraph_vector_t st;
+  igraph_matrix_t agd, sd, no;
+  igraph_matrix_t *ppsd=&sd, *ppno=&no;
+  igraph_bool_t lsd=LOGICAL(psd)[0];
+  igraph_bool_t lno=LOGICAL(pno)[0];
+  SEXP result;
+
+  R_igraph_before();
   
+  R_SEXP_to_vector(pcats, &cats);
+  R_SEXP_to_vector(pst, &st);
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&agd, 0, 0);
+  if (lsd) { igraph_matrix_init(&sd, 0, 0); } else { ppsd=0; }
+  if (lno) { igraph_matrix_init(&no, 0, 0); } else { ppno=0; }
+  igraph_measure_dynamics_citingcat_citedcat(&g, &agd, ppsd, 
+					     ppno, &st, &cats, nocats);
+  PROTECT(result=NEW_LIST(3));
+  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&agd));
+  igraph_matrix_destroy(&agd);
+  if (lsd) {
+    SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
+    igraph_matrix_destroy(&sd);
+  } else {
+    SET_VECTOR_ELT(result, 1, R_NilValue);
+  }
+  if (lno) {
+    SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&no));
+    igraph_matrix_destroy(&no);
+  } else {
+    SET_VECTOR_ELT(result, 2, R_NilValue);
+  }
+  
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_measure_dynamics_citingcat_citedcat_st(SEXP graph, 
+						     SEXP pagd, SEXP pcats,
+						     SEXP pnocats) {
+  igraph_t g;
+  igraph_matrix_t agd;
+  igraph_vector_t cats;
+  igraph_integer_t nocats=REAL(pnocats)[0];
+  igraph_vector_t res;
+  SEXP result;
+
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_matrix(pagd, &agd);
+  R_SEXP_to_vector(pcats, &cats);
+  igraph_vector_init(&res, 0);
+  igraph_measure_dynamics_citingcat_citedcat_st(&g, &res, &agd, &cats, nocats);
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
 
 SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto, 
 				 SEXP pmode, SEXP pno) {
