@@ -1757,6 +1757,7 @@ int igraph_measure_dynamics_lastcit(const igraph_t *graph, igraph_vector_t *al,
     igraph_vector_destroy(&normfact);
   }
  
+  igraph_free(lastcit);
   igraph_vector_destroy(&ntl);
   igraph_vector_destroy(&ch);
   igraph_vector_destroy(&notnull);
@@ -1944,7 +1945,7 @@ int igraph_measure_dynamics_age_st(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int binwidth=no_of_nodes/agebins+1;
   
-  long int node, i, k;
+  long int node, k;
   
   IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
   igraph_vector_null(res);
