@@ -1941,17 +1941,15 @@ SEXP R_igraph_edge_betweenness(SEXP graph, SEXP pdirected) {
   return result;
 }
 
-SEXP R_igraph_measure_dynamics_id(SEXP graph, SEXP pstartvertex,
-				  SEXP pst, SEXP pmaxind, 
-				  SEXP psign, SEXP pno) {
+SEXP R_igraph_measure_dynamics_id(SEXP graph,
+				  SEXP pst, SEXP pmaxind, SEXP psd) {
   
   igraph_t g;
-  igraph_matrix_t ak, sd, confint, no;
+  igraph_matrix_t ak, sd;
+  igraph_matrix_t *ppsd=&sd;
   igraph_vector_t st;
-  igraph_integer_t startvertex=REAL(pstartvertex)[0];
+  igraph_bool_t lsd=LOGICAL(psd)[0];
   igraph_integer_t maxind=REAL(pmaxind)[0];
-  igraph_real_t sign=REAL(psign)[0];
-  igraph_bool_t lno=LOGICAL(pno)[0];
   SEXP result;
   
   R_igraph_before();
@@ -1959,20 +1957,20 @@ SEXP R_igraph_measure_dynamics_id(SEXP graph, SEXP pstartvertex,
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&ak, 0, 0);
-  igraph_matrix_init(&sd, 0, 0);
-  igraph_matrix_init(&confint, 0, 0);
-  igraph_matrix_init(&no, 0, 0);
-  igraph_measure_dynamics_id(&g, startvertex, &ak, &sd, &confint, &no, &st,
-			     maxind, sign, lno);
-  PROTECT(result=NEW_LIST(4));
+  if (lsd) {
+    igraph_matrix_init(&sd, 0, 0);
+  } else {
+    ppsd=0;
+  }
+  igraph_measure_dynamics_id(&g, &ak, ppsd, &st,
+			     maxind);
+  PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&ak));
   igraph_matrix_destroy(&ak);
-  SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
-  igraph_matrix_destroy(&sd);
-  SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&confint));
-  igraph_matrix_destroy(&confint);
-  SET_VECTOR_ELT(result, 3, R_igraph_matrix_to_SEXP(&no));
-  igraph_matrix_destroy(&no);
+  if (lsd) { 
+    SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
+    igraph_matrix_destroy(&sd);
+  }
   
   R_igraph_after();
   
@@ -2004,16 +2002,15 @@ SEXP R_igraph_measure_dynamics_id_st(SEXP graph, SEXP pak) {
   return result;
 }
 
-SEXP R_igraph_measure_dynamics_idwindow(SEXP graph, SEXP pstartvertex,
+SEXP R_igraph_measure_dynamics_idwindow(SEXP graph,
 					SEXP pst, SEXP pwindow, SEXP pmaxind,
-					SEXP psign, SEXP pno) {
+					SEXP psd) {
   igraph_t g;
-  igraph_matrix_t ak, sd, confint, no;
+  igraph_matrix_t ak, sd;
+  igraph_matrix_t *ppsd=&sd;
   igraph_vector_t st;
-  igraph_integer_t startvertex=REAL(pstartvertex)[0];
+  igraph_bool_t lsd=LOGICAL(psd)[0];
   igraph_integer_t maxind=REAL(pmaxind)[0];
-  igraph_real_t sign=REAL(psign)[0];
-  igraph_bool_t lno=LOGICAL(pno)[0];
   igraph_real_t window=REAL(pwindow)[0];
   SEXP result;
   
@@ -2022,20 +2019,20 @@ SEXP R_igraph_measure_dynamics_idwindow(SEXP graph, SEXP pstartvertex,
   R_SEXP_to_vector(pst, &st);
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&ak, 0, 0);
-  igraph_matrix_init(&sd, 0, 0);
-  igraph_matrix_init(&confint, 0, 0);
-  igraph_matrix_init(&no, 0, 0);
-  igraph_measure_dynamics_idwindow(&g, startvertex, &ak, &sd, &confint,
-				   &no, &st, maxind, sign, window);
-  PROTECT(result=NEW_LIST(4));
+  if (lsd) {
+    igraph_matrix_init(&sd, 0, 0);
+  } else {
+    ppsd=0;
+  }
+  igraph_measure_dynamics_idwindow(&g, &ak, ppsd,
+				   &st, maxind, window);
+  PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&ak));
   igraph_matrix_destroy(&ak);
-  SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
-  igraph_matrix_destroy(&sd);
-  SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&confint));
-  igraph_matrix_destroy(&confint);
-  SET_VECTOR_ELT(result, 3, R_igraph_matrix_to_SEXP(&no));
-  igraph_matrix_destroy(&no);
+  if (lsd) {
+    SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
+    igraph_matrix_destroy(&sd);
+  }
 
   R_igraph_after();
 
@@ -2067,19 +2064,18 @@ SEXP R_igraph_measure_dynamics_idwindow_st(SEXP graph, SEXP pak,
   return result;
 }
 
-SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pstartvertex,
+SEXP R_igraph_measure_dynamics_idage(SEXP graph,
 				     SEXP pst, SEXP pagebins,
-				     SEXP pmaxind, SEXP psign, SEXP pno, 
+				     SEXP pmaxind, SEXP psd,
 				     SEXP ptime_window) {
 
   igraph_t g;
-  igraph_matrix_t akl, sd, confint, no;
+  igraph_matrix_t akl, sd;
+  igraph_matrix_t *ppsd=&sd;
   igraph_vector_t st;
-  igraph_integer_t startvertex=REAL(pstartvertex)[0];
+  igraph_bool_t lsd=LOGICAL(psd)[0];
   igraph_integer_t agebins=REAL(pagebins)[0];
   igraph_integer_t maxind=REAL(pmaxind)[0];
-  igraph_real_t sign=REAL(psign)[0];
-  igraph_bool_t lno=LOGICAL(pno)[0];
   SEXP result;
   
   R_igraph_before();
@@ -2088,27 +2084,27 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pstartvertex,
 
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&akl, 0, 0);
-  igraph_matrix_init(&sd, 0, 0);
-  igraph_matrix_init(&confint, 0, 0);
-  igraph_matrix_init(&no, 0, 0);
-  if (ptime_window==R_NilValue) {
-    igraph_measure_dynamics_idage(&g, startvertex, &akl, &sd, &confint, 
-				  &no, &st, agebins, maxind, sign, lno);
+  if (lsd) {
+    igraph_matrix_init(&sd, 0, 0);
   } else {
-    igraph_measure_dynamics_idwindowage(&g, startvertex, &akl, &sd,
-					&confint, &no, &st, agebins, maxind,
-					sign, lno, REAL(ptime_window)[0]);
+    ppsd=0;
+  }
+  if (ptime_window==R_NilValue) {
+    igraph_measure_dynamics_idage(&g, &akl, ppsd,
+				  &st, agebins, maxind);
+  } else {
+    igraph_measure_dynamics_idwindowage(&g, &akl, ppsd,
+					&st, agebins, maxind,
+					REAL(ptime_window)[0]);
   }
     
-  PROTECT(result=NEW_LIST(4));  
+  PROTECT(result=NEW_LIST(2));  
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akl));
   igraph_matrix_destroy(&akl);
-  SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
-  igraph_matrix_destroy(&sd);
-  SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&confint));
-  igraph_matrix_destroy(&confint);
-  SET_VECTOR_ELT(result, 3, R_igraph_matrix_to_SEXP(&no));
-  igraph_matrix_destroy(&no);
+  if (lsd) {
+    SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
+    igraph_matrix_destroy(&sd);
+  }
 
   R_igraph_after();
   
@@ -2116,56 +2112,6 @@ SEXP R_igraph_measure_dynamics_idage(SEXP graph, SEXP pstartvertex,
   return result;
 }
 
-SEXP R_igraph_measure_dynamics_idage_debug(SEXP graph, SEXP pst, 
-					   SEXP pagebins, SEXP pmaxind, 
-					   SEXP psign, SEXP pest_ind, 
-					   SEXP pest_age, SEXP pno) {
-  igraph_t g;
-  igraph_matrix_t akl, sd, confint, no;
-  igraph_vector_t st;
-  igraph_integer_t agebins=REAL(pagebins)[0];
-  igraph_integer_t maxind=REAL(pmaxind)[0];
-  igraph_real_t sign=REAL(psign)[0];
-  igraph_bool_t lno=LOGICAL(pno)[0];
-  igraph_integer_t est_ind=REAL(pest_ind)[0];
-  igraph_integer_t est_age=REAL(pest_age)[0];
-  igraph_vector_t estimates;
-  SEXP result;
-  
-  R_igraph_before();
-
-  R_SEXP_to_vector(pst, &st);
-  
-  R_SEXP_to_igraph(graph, &g);
-  igraph_matrix_init(&akl, 0, 0);
-  igraph_matrix_init(&sd, 0, 0);
-  igraph_matrix_init(&confint, 0, 0);
-  igraph_matrix_init(&no, 0, 0);
-  igraph_vector_init(&estimates, 0);
-  igraph_measure_dynamics_idage_debug(&g, &akl, &sd, &no, &confint, 
-				      &st, agebins, 
-				      maxind, sign, &estimates, est_ind, 
-				      est_age, lno);
-    
-  PROTECT(result=NEW_LIST(5));
-  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akl));
-  igraph_matrix_destroy(&akl);
-  SET_VECTOR_ELT(result, 1, R_igraph_matrix_to_SEXP(&sd));
-  igraph_matrix_destroy(&sd);
-  SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&confint));
-  igraph_matrix_destroy(&confint);
-  SET_VECTOR_ELT(result, 3, R_igraph_matrix_to_SEXP(&no));
-  igraph_matrix_destroy(&no);
-  SET_VECTOR_ELT(result, 4, NEW_NUMERIC(igraph_vector_size(&estimates)));
-  igraph_vector_copy_to(&estimates, REAL(VECTOR_ELT(result, 4)));
-  igraph_vector_destroy(&estimates);
-
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-  
 SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl, 
 					SEXP ptime_window) {
   
@@ -2197,20 +2143,17 @@ SEXP R_igraph_measure_dynamics_idage_st(SEXP graph, SEXP pakl,
   return result;
 }
 
-SEXP R_igraph_measure_dynamics_citedcat_id_age(SEXP graph, SEXP pstartvertex,
+SEXP R_igraph_measure_dynamics_citedcat_id_age(SEXP graph,
 					       SEXP pst, SEXP pcats, 
 					       SEXP pcatno, SEXP pagebins,
-					       SEXP pmaxind, SEXP psd,
-					       SEXP pno) {
+					       SEXP pmaxind, SEXP psd) {
   igraph_t g;
-  igraph_array3_t adkl, sd, no;
+  igraph_array3_t adkl, sd;
   igraph_vector_t st;
-  igraph_integer_t startvertex=REAL(pstartvertex)[0];
   igraph_integer_t agebins=REAL(pagebins)[0];
   igraph_vector_t cats;
   igraph_integer_t catno=REAL(pcatno)[0];
   igraph_integer_t maxind=REAL(pmaxind)[0];
-  igraph_bool_t lno=LOGICAL(pno)[0];
   igraph_bool_t lsd=LOGICAL(psd)[0];
   igraph_array3_t *ppsd=&sd;
   SEXP result;
@@ -2227,10 +2170,9 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age(SEXP graph, SEXP pstartvertex,
   } else {
     ppsd=0;
   }
-  igraph_array3_init(&no, 0, 0, 0);
-  igraph_measure_dynamics_citedcat_id_age(&g, startvertex, &adkl, ppsd, 
-					  &no, &st, &cats, catno,
-					  agebins, maxind, lno);
+  igraph_measure_dynamics_citedcat_id_age(&g, &adkl, ppsd, 
+					  &st, &cats, catno,
+					  agebins, maxind);
   PROTECT(result=NEW_LIST(3));
   SET_VECTOR_ELT(result, 0, R_igraph_array3_to_SEXP(&adkl));
   igraph_array3_destroy(&adkl);
@@ -2238,8 +2180,6 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age(SEXP graph, SEXP pstartvertex,
     SET_VECTOR_ELT(result, 1, R_igraph_array3_to_SEXP(&sd));
     igraph_array3_destroy(&sd);
   } 
-  SET_VECTOR_ELT(result, 2, R_igraph_array3_to_SEXP(&no));
-  igraph_array3_destroy(&no);
   
   R_igraph_after();
 
@@ -2274,20 +2214,17 @@ SEXP R_igraph_measure_dynamics_citedcat_id_age_st(SEXP graph, SEXP padkl,
   return result;
 }
 
-SEXP R_igraph_measure_dynamics_citingcat_id_age(SEXP graph, SEXP pstartvertex,
+SEXP R_igraph_measure_dynamics_citingcat_id_age(SEXP graph,
 						SEXP pst, SEXP pcats, 
 						SEXP pcatno, SEXP pagebins,
-						SEXP pmaxind, SEXP psd,
-						SEXP pno) {
+						SEXP pmaxind, SEXP psd) {
   igraph_t g;
-  igraph_array3_t adkl, sd, confint, no;
+  igraph_array3_t adkl, sd;
   igraph_vector_t st;
-  igraph_integer_t startvertex=REAL(pstartvertex)[0];
   igraph_integer_t agebins=REAL(pagebins)[0];
   igraph_vector_t cats;
   igraph_integer_t catno=REAL(pcatno)[0];
   igraph_integer_t maxind=REAL(pmaxind)[0];
-  igraph_bool_t lno=LOGICAL(pno)[0];
   igraph_bool_t lsd=LOGICAL(psd)[0];
   igraph_array3_t *ppsd=&sd;
   SEXP result;
@@ -2304,10 +2241,9 @@ SEXP R_igraph_measure_dynamics_citingcat_id_age(SEXP graph, SEXP pstartvertex,
   } else {
     ppsd=0;
   }
-  igraph_array3_init(&no, 0, 0, 0);
-  igraph_measure_dynamics_citingcat_id_age(&g, startvertex, &adkl, ppsd, 
-					   &no, &st, &cats, catno,
-					   agebins, maxind, lno);
+  igraph_measure_dynamics_citingcat_id_age(&g, &adkl, ppsd, 
+					   &st, &cats, catno,
+					   agebins, maxind);
   PROTECT(result=NEW_LIST(3));
   SET_VECTOR_ELT(result, 0, R_igraph_array3_to_SEXP(&adkl));
   igraph_array3_destroy(&adkl);
@@ -2315,8 +2251,6 @@ SEXP R_igraph_measure_dynamics_citingcat_id_age(SEXP graph, SEXP pstartvertex,
     SET_VECTOR_ELT(result, 1, R_igraph_array3_to_SEXP(&sd));
     igraph_array3_destroy(&sd);
   }
-  SET_VECTOR_ELT(result, 2, R_igraph_array3_to_SEXP(&no));
-  igraph_array3_destroy(&no);
   
   R_igraph_after();
 
@@ -2353,11 +2287,11 @@ SEXP R_igraph_measure_dynamics_citingcat_id_age_st(SEXP graph, SEXP padkl,
   
 SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
 				   SEXP pevents, SEXP pst, SEXP pmaxdeg, 
-				   SEXP psd, SEXP pno) {
+				   SEXP psd) {
   igraph_t g;
   igraph_vector_t ntime, etime;
   igraph_integer_t events=REAL(pevents)[0];
-  igraph_matrix_t akk, sd, *ppsd=0, no, *ppno=0;
+  igraph_matrix_t akk, sd, *ppsd=0;
   igraph_vector_t st;
   igraph_integer_t maxdeg=REAL(pmaxdeg)[0];
   SEXP result;
@@ -2372,13 +2306,9 @@ SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
     igraph_matrix_init(&sd, 0, 0);
     ppsd=&sd;
   }
-  if (LOGICAL(pno)[0]) {
-    igraph_matrix_init(&no, 0, 0);
-    ppno=&no;
-  }
   R_SEXP_to_vector(pst, &st);
   igraph_measure_dynamics_d_d(&g, &ntime, &etime, events, &akk, 
-			      ppsd, ppno, &st, maxdeg);
+			      ppsd, &st, maxdeg);
   PROTECT(result=NEW_LIST(3));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&akk));
   igraph_matrix_destroy(&akk);
@@ -2387,12 +2317,6 @@ SEXP R_igraph_measure_dynamics_d_d(SEXP graph, SEXP pntime, SEXP petime,
     igraph_matrix_destroy(&sd);
   } else {
     SET_VECTOR_ELT(result, 1, R_NilValue);
-  }
-  if (LOGICAL(pno)[0]) {
-    SET_VECTOR_ELT(result, 2, R_igraph_matrix_to_SEXP(&no));
-    igraph_matrix_destroy(&no);
-  } else {
-    SET_VECTOR_ELT(result, 2, R_NilValue);
   }
   
   R_igraph_after();

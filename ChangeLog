@@ -3,6 +3,28 @@
 	* interfaces/python/package/__init__.py : added Graph.summary,
 	extended Histogram with mean and sd calculations
 
+2007-03-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/measure_dynamics.c (igraph_measure_dynamics_id) : 
+	'start_vertex', 'confint', 'no', 'significance', 'lno' arguments
+	removed
+	(igraph_measure_dynamics_idwindow) : 'start.vertex', 'confint', 'no',
+	'significance' arguments removed
+	(igraph_i_tuppercrit_length, igraph_i_tuppercrit) : removed
+	(igraph_measure_dynamics_idage) : 'confint', 'no', 'significance',
+	'lno' arguments removed
+	(igraph_measure_dynamics_idage_debug) : removed
+	(igraph_measure_dynamics_idwindowage) : 'start_vertex', 'confint',
+	'no', 'significance', 'lno' arguments removed
+	(igraph_measure_dynamics_citedcat_id_age) : 'start_vertex',
+	'no', 'lno' arguments removed
+	(igraph_measure_dynamics_citingcat_id_age) : 'start_vertex',
+	'no', 'lno' arguments removed
+
+	* src/measure_dynamics.c (igraph_measure_dynamics_id)
+	(igraph_measure_dynamics_idwindow) : 'sd' calculation bug corrected,
+	always 'null' a resized matrix!
+
 2007-03-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_lastcit_game) : added

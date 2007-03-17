@@ -1029,34 +1029,19 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 
-int igraph_measure_dynamics_idage(const igraph_t *graph, igraph_integer_t start_vertex,
+int igraph_measure_dynamics_idage(const igraph_t *graph,
 				  igraph_matrix_t *akl, 
-				  igraph_matrix_t *sd, igraph_matrix_t *confint, 
-				  igraph_matrix_t *no,
+				  igraph_matrix_t *sd, 
 				  const igraph_vector_t *st, igraph_integer_t agebins,
-				  igraph_integer_t maxind, igraph_real_t significance,
-				  igraph_bool_t lno);
+				  igraph_integer_t maxind);
 int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res,
 				     const igraph_matrix_t *akl);
-int igraph_measure_dynamics_idage_debug(const igraph_t *graph, igraph_matrix_t *akl,
-					igraph_matrix_t *sd, igraph_matrix_t *confint, 
-					igraph_matrix_t *no,
-					const igraph_vector_t *st, igraph_integer_t pagebins,
-					igraph_integer_t pmaxind, igraph_real_t significance,
-					igraph_vector_t *estimates, 
-					igraph_integer_t est_ind, igraph_integer_t est_age,
-					igraph_bool_t lno);
 int igraph_measure_dynamics_idwindowage(const igraph_t *graph, 
-					igraph_integer_t start_vertex,
 					igraph_matrix_t *akl, 
 					igraph_matrix_t *sd, 
-					igraph_matrix_t *confint, 
-					igraph_matrix_t *no,
 					const igraph_vector_t *st, 
 					igraph_integer_t pagebins,
 					igraph_integer_t pmaxind, 
-					igraph_real_t significance,
-					igraph_bool_t lno, 
 					igraph_integer_t time_window);
 int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph, 
 					   igraph_vector_t *res,
@@ -1064,16 +1049,13 @@ int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph,
 					   igraph_integer_t time_window);
 
 int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
-					    igraph_integer_t start_vertex,
 					    igraph_array3_t *adkl,
 					    igraph_array3_t *sd,
-					    igraph_array3_t *no,
 					    const igraph_vector_t *st,
 					    const igraph_vector_t *cats,
 					    igraph_integer_t pno_cats,
 					    igraph_integer_t pagebins,
-					    igraph_integer_t pmaxind,
-					    igraph_bool_t lno);
+					    igraph_integer_t pmaxind);
 
 int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
 					       igraph_vector_t *res,
@@ -1082,27 +1064,22 @@ int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
 					       igraph_integer_t pno_cats);
 
 int igraph_measure_dynamics_citingcat_id_age(const igraph_t *graph,
-					     igraph_integer_t start_vertex,
 					     igraph_array3_t *adkl,
 					     igraph_array3_t *sd,
-					     igraph_array3_t *no,
 					     const igraph_vector_t *st,
 					     const igraph_vector_t *cats,
 					     igraph_integer_t pno_cats,
 					     igraph_integer_t pagebins,
-					     igraph_integer_t pmaxind,
-					     igraph_bool_t lno);
+					     igraph_integer_t pmaxind);
 int igraph_measure_dynamics_citingcat_id_age_st(const igraph_t *graph,
 						igraph_vector_t *res,
 						const igraph_array3_t *adkl,
 						const igraph_vector_t *cats,
 						igraph_integer_t pno_cats);
 
-int igraph_measure_dynamics_id(const igraph_t *graph, igraph_integer_t start_vertex,
+int igraph_measure_dynamics_id(const igraph_t *graph,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,
-			       igraph_matrix_t *confint, igraph_matrix_t *no,
-			       const igraph_vector_t *st, igraph_integer_t pmaxind,
-			       igraph_real_t significance, igraph_bool_t lno);
+			       const igraph_vector_t *st, igraph_integer_t pmaxind);
 int igraph_measure_dynamics_id_st(const igraph_t *graph, 
 				  igraph_vector_t *res, 
 				  const igraph_matrix_t *ak);
@@ -1113,7 +1090,6 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
 				igraph_integer_t events,
 				igraph_matrix_t *akk,
 				igraph_matrix_t *sd,
-				igraph_matrix_t *no,
 				const igraph_vector_t *st,
 				igraph_integer_t pmadeg);
 
@@ -1126,14 +1102,10 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,
 				   igraph_vector_t *st);
 
 int igraph_measure_dynamics_idwindow(const igraph_t *graph, 
-				     igraph_integer_t start_vertex,
 				     igraph_matrix_t *ak, 
 				     igraph_matrix_t *sd,
-				     igraph_matrix_t *confint,
-				     igraph_matrix_t *no,
 				     const igraph_vector_t *st,
 				     igraph_integer_t pmaxind,
-				     igraph_real_t significance,
 				     igraph_integer_t time_window);
 
 int igraph_measure_dynamics_idwindow_st(const igraph_t *graph,

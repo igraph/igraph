@@ -1,3 +1,23 @@
+2007-03-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id) :
+	'start.vertex', 'significance', 'estind', 'estage', 'number'
+	arguments removed, 'norm.method' added
+	(measure.dynamics.idage) : 'start.vertex', 'significance',
+	'estind', 'estage', 'number' arguments removec, 'norm.method'
+	added
+	(measure.dynamics.citedcat.id.age) : 'number' argument removed
+	(measure.dynamics.citingcat.id.age) : 'number' argument removed
+	(measure.dynamics.d.d) : 'sd' and 'no' arguments removed
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id)
+	(R_igraph_measure_dynamics_idwindow)
+	(R_igraph_measure_dynamics_idage)
+	(R_igraph_measure_dynamics_citedcat_id_age)
+	(R_igraph_mesaure_dynamics_citingcat_id_age)
+	(R_igraph_measure_dynamics_d_d) : updated
+	(R_igrpah_measure_dynamics_idage_debug) : removed
+	
+
 2007-03-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : 'arrow.mode' argument added
