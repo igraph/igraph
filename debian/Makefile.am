@@ -4,7 +4,7 @@ EXTRA_DIST =					\
 	control.in					\
 	rules					\
 	changelog.in				\
-	copyright \
+	copyright.in \
 	prepare
 
 MAINTAINERCLEANFILES = Makefile.in
