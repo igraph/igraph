@@ -1,3 +1,13 @@
+2007-03-19  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (rglplot) :
+	1) plotting edges as boxes
+	2) plotting arrows 
+	3) arrow.mode argument added
+	4) layout argument can be a 2d layout as well
+	5) warnings about labels and edge.labels eliminated
+	6) the '00' label bug corrected 
+
 2007-03-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/games.R (barabasi.game) : bug corrected,

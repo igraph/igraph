@@ -242,6 +242,7 @@ rglplot        <- function(x, layout=layout.random, layout.par=list(),
                            edge.color="darkgrey", edge.width=1,
                            edge.labels=NA, 
                            # SPECIFIC: #####################################
+                           arrow.mode=NULL,
                            ...)
   UseMethod("rglplot", x)
 
@@ -253,6 +254,7 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
                            edge.color="darkgrey", edge.width=1,
                            edge.labels=NA, 
                            # SPECIFIC: #####################################
+                           arrow.mode=NULL,
                            ...) {
 
   require(rgl)
@@ -271,8 +273,10 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
   label.degree <- i.get.label.degree(graph, label.degree)
   labels <- i.get.labels(graph, labels)
   edge.labels <- i.get.edge.labels(graph, edge.labels)
+  arrow.mode <- i.get.arrow.mode(graph, arrow.mode)
 
   # norm layout to (-1, 1)
+  if (ncol(layout)==2) { layout <- cbind(layout, 0) }
   layout <- i.layout.norm(layout, -1, 1, -1, 1, -1, 1)
   
   # add the edges
@@ -284,41 +288,112 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
   x1 <- layout[,1][el[,2]+1]
   y1 <- layout[,2][el[,2]+1]
   z1 <- layout[,3][el[,2]+1]
-
-  # we do this for undirected graphs also because some
-  # graphics drivers do not handle 'depth' properly (or at all)
+  
   if (length(vertex.size)!=1) {
     vsize.from <- vertex.size[get.edgelist(graph)[,1]+1]
     vsize.to   <- vertex.size[get.edgelist(graph)[,2]+1]
   } else {
     vsize.from <- vsize.to <- vertex.size
   }
-  rm(el)
   
-  rgl.lines(as.numeric(t(matrix( c(x0,x1), nc=2))),
-            as.numeric(t(matrix( c(y0,y1), nc=2))),
-            as.numeric(t(matrix( c(z0,z1), nc=2))),
-            col=edge.color, size=edge.width)
+  # edges
+  indices <- c(1,2,3,4,
+               5,6,7,8,
+               1,2,6,5,
+               2,3,7,6,
+               3,4,8,7,
+               4,1,5,8)
+  
+  indices2 <- c(1,2,3,3,
+                1,3,4,4,
+                1,4,5,5,
+                1,5,2,2,
+                2,3,4,5)
 
+  for (i in seq(x0)) {
+    v1 <- c(x0[i], y0[i], z0[i])
+    v2 <- c(x1[i], y1[i], z1[i])
+    r <- vsize.to; if (length(r)>1) { r <- r[i] }
+    alen <- sqrt(sum((v2-v1)^2))
+
+    vertices <- c(-1,-1,alen,1,
+                   1,-1,alen,1,
+                   1, 1,alen,1,
+                  -1, 1,alen,1,
+                  -1,-1,0,   1,
+                   1,-1,0,   1,
+                   1, 1,0,   1,
+                  -1, 1,0,   1)
+
+    edge.prot <- qmesh3d(vertices, indices)
+    ew <- edge.width; if (length(ew)>1) { ew <- ew[i] }
+    edge <- transform3d(edge.prot, scaleMatrix(.01*ew, .01*ew, 1))
+    phi<--atan2(v2[2]-v1[2],v1[1]-v2[1])-pi/2
+    psi<-acos((v2[3]-v1[3])/alen)
+    rot1 <- rbind(c(1,0,0),c(0,cos(psi),sin(psi)), c(0,-sin(psi),cos(psi)))
+    rot2 <- rbind(c(cos(phi),sin(phi),0),c(-sin(phi),cos(phi),0), c(0,0,1))
+    edge <- transform3d(edge, rotationMatrix(matrix=rot1))
+    edge <- transform3d(edge, rotationMatrix(matrix=rot2))
+    edge <- transform3d(edge, translationMatrix(v1[1], v1[2], v1[3]))
+    ec <- edge.color; if (length(ec)>1) { ec <- ec[i] }
+    shade3d(edge, col=ec)
+
+    arr <- arrow.mode; if (length(arrow.mode)>1) { arr <- arr[i] }
+    if (arr == 2 || arr==3) {
+      ## forward
+      vertices <- c( 0,  0,  0, 1,
+                    -1, -1, -2, 1,
+                     1, -1, -2, 1,
+                     1,  1, -2, 1,
+                    -1,  1, -2, 1)
+      
+      arrow <- qmesh3d(vertices, indices2)
+      arrow <- transform3d(arrow, scaleMatrix(0.03*ew, 0.03*ew, .05*ew))
+      arrow <- transform3d(arrow, translationMatrix(0,0,-r))
+      arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
+      arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
+      arrow <- transform3d(arrow, translationMatrix(v2[1], v2[2], v2[3]))
+      shade3d(arrow, col=ec)    
+    }
+    if (arr == 1 || arr==3) {
+      ## backward
+      vertices <- c( 0,  0,  0, 1,
+                    -1, -1,  2, 1,
+                     1, -1,  2, 1,
+                     1,  1,  2, 1,
+                    -1,  1,  2, 1)
+      
+      arrow <- qmesh3d(vertices, indices2)
+      arrow <- transform3d(arrow, scaleMatrix(0.03*ew, 0.03*ew, .05*ew))
+      arrow <- transform3d(arrow, translationMatrix(0,0,r))
+      arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
+      arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
+      arrow <- transform3d(arrow, translationMatrix(v1[1], v1[2], v1[3]))
+      shade3d(arrow, col=ec)      
+    }
+  }
+    
   # add the vertices
   if (length(vertex.size)==1) { vertex.size <- rep(vertex.size, nrow(layout)) }
   rgl.spheres(layout[,1], layout[,2], layout[,3], radius=vertex.size,
               col=vertex.color)
 
-  # add the labels
-  if (!is.na(labels)) {
-    x <- layout[,1]+label.dist*cos(-label.degree)* 
-      (vertex.size+6*10*log10(nchar(labels)+1))/200
-    y <- layout[,2]+label.dist*sin(-label.degree)*
-      (vertex.size+6*10*log10(nchar(labels)+1))/200
-    z <- layout[,3]
-    rgl.texts(x,y,z, labels, col=label.color, justify="left")
-  }
-  
-  if (!is.na(edge.labels)) {
-    rgl.texts((x0+x1)/2, (y0+y1)/2, (z0+z1)/2, edge.labels,
-              col=label.color)
-  }
+  # add the labels, 'l1' is a stupid workaround of a mysterious rgl bug
+  labels[is.na(labels)] <- ""
+  x <- layout[,1]+label.dist*cos(-label.degree)* 
+    (vertex.size+6*10*log10(nchar(labels)+1))/200
+  y <- layout[,2]+label.dist*sin(-label.degree)*
+    (vertex.size+6*10*log10(nchar(labels)+1))/200
+  z <- layout[,3]
+  l1 <- labels[1]
+  labels[1] <- ""
+  rgl.texts(x,y,z, labels, col=label.color, adj=0)
+  rgl.texts(c(0,x[1]), c(0,y[1]), c(0,z[1]),
+            c("",l1), col=c(label.color[1],label.color[1]), adj=0)
+
+  edge.labels[is.na(edge.labels)] <- ""
+  rgl.texts((x0+x1)/2, (y0+y1)/2, (z0+z1)/2, edge.labels,
+            col=label.color)
   
   invisible(NULL)
 }
