@@ -295,6 +295,9 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
   } else {
     vsize.from <- vsize.to <- vertex.size
   }
+
+  # It is faster this way
+  par3d(skipRedraw=TRUE)
   
   # edges
   indices <- c(1,2,3,4,
@@ -394,6 +397,9 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
   edge.labels[is.na(edge.labels)] <- ""
   rgl.texts((x0+x1)/2, (y0+y1)/2, (z0+z1)/2, edge.labels,
             col=label.color)
+
+  # draw everything
+  par3d(skipRedraw=FALSE)
   
   invisible(NULL)
 }

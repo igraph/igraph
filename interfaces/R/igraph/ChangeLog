@@ -1,6 +1,9 @@
 2007-03-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* interfaces/R/igraph/R/plot.R (rglplot) :
+	* interfaces/R/igraph/R/plot.R (rglplot.igraph) :
+	suspend updating while plotting the graph
+
+	* interfaces/R/igraph/R/plot.R (rglplot.igraph) :
 	1) plotting edges as boxes
 	2) plotting arrows 
 	3) arrow.mode argument added
