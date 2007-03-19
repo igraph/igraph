@@ -1,3 +1,17 @@
+==================================
+Debian package repository available
+==================================
+
+Debian Linux users can now install and update the C interface
+using the standard package manager. Just add the following two
+lines to /etc/apt/sources.list and install the libigraph and
+libigraph-dev packages. Packages for the Python interface are
+coming soon.
+
+deb http://cneurocvs.rmki.kfki.hu /packages/binary/
+
+deb-src http://cneurocvs.rmki.kfki.hu /packages/source/
+
 =========
 igraph 0.3.3
 =========
