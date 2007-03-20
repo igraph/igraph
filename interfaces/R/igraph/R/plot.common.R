@@ -24,6 +24,76 @@
 # Common functions for plot and tkplot
 ###################################################################
 
+i.parse.plot.params <- function(graph, params) {
+  
+  ## TODO: check that names are present
+
+  ## store the arguments
+  p <- list(vertex=list(), edge=list(), plot=list())
+  for (n in names(params)) {
+    if (substr(n, 1, 7)=="vertex.") {
+      nn <- substring(n, 8)
+      p[["vertex"]][[nn]] <- params[[n]]
+    } else if (substr(n, 1, 5)=="edge.") {
+      nn <- substring(n, 6)
+      p[["edge"]][[nn]] <- params[[n]]
+    } else {
+      p[["plot"]][[n]] <- params[[n]]
+    }
+  }
+
+  func <- function(type, name, range=NULL, dontcall=FALSE) {
+    if (! type %in% names(p)) {
+      stop("Invalid plot option type")
+    }
+    ret <- function() {
+      v <- p[[type]][[name]]
+      if (is.function(v) && !dontcall) {
+        v <- v(graph)
+      }
+      if (is.null(range)) {
+        return (v)        
+      } else {
+        if (length(v)==1) {
+          return(rep(v, length(range)))
+        } else {
+          return (rep(v, length=max(range)+1)[[range+1]])
+        }
+      }
+    }
+    if (name %in% names(p[[type]])) {
+      ## we already have the parameter
+      return(ret())
+    } else {
+      ## we don't have the parameter, check attributes first
+      if (type=="vertex" && name %in% list.vertex.attributes(graph)) {
+        p[[type]][[name]] <- get.vertex.attribute(graph, name)
+        return(ret())
+      } else if (type=="edge" && name %in% list.edge.attributes(graph)) {
+        p[[type]][[name]] <- get.edge.attribute(graph, name)
+        return(ret())
+      } else if (type=="plot" && name %in% list.graph.attributes(graph)) {
+        p[[type]][[name]] <- get.graph.attribute(graph, name)
+        return(ret())
+      } else {
+        ## no attributes either, check igraph parameters
+        n <- paste(sep="", type, ".", name)
+        v <- igraph.par(n)
+        if (!is.null(v)) {
+          p[[type]][[name]] <- v
+          return(ret())
+        }
+        ## no igraph parameter either, use default value
+        p[[type]][[name]] <- i.default.values[[type]][[name]]
+        return(ret())
+      }
+    }
+    
+  }
+
+  return (func)
+}
+
 i.get.layout <- function(graph, layout, layout.par) {
 
   if (is.function(layout)) {
@@ -116,13 +186,12 @@ i.get.edge.lty <- function(graph, edge.lty) {
   edge.lty
 }
 
-i.get.edge.labels <- function(graph, edge.labels) {
+i.get.edge.labels <- function(graph, edge.labels=NULL) {
 
-  if (is.character(edge.labels) &&
-      length(edge.labels)==1 && substr(edge.labels, 1, 2)=="a:") {
-    edge.labels <- as.character(get.edge.attribute
-                               (graph, substring(edge.labels,3)))
+  if (is.null(edge.labels)) {
+    edge.labels <- rep(NA, ecount(graph))
   }
+
   edge.labels
 }
 
@@ -136,19 +205,15 @@ i.get.label.degree <- function(graph, label.degree) {
   label.degree
 }
 
-i.get.labels <- function(graph, labels) {
+i.get.labels <- function(graph, labels=NULL) {
 
   if (is.null(labels)) {
     labels <- 0:(vcount(graph)-1)
-  } else if (is.na(labels[1])) {
-  } else if (is.character(labels) && length(labels)==1 &&
-             substr(labels, 1, 2)=="a:") {
-    labels <- unlist(get.vertex.attribute(graph, substring(labels, 3)))
   }
   labels
 }
 
-i.get.arrow.mode <- function(graph, arrow.mode) {
+i.get.arrow.mode <- function(graph, arrow.mode=NULL) {
 
   if (is.character(arrow.mode) &&
       length(arrow.mode)==1 && substr(arrow.mode, 1, 2)=="a:") {
@@ -173,3 +238,19 @@ i.get.arrow.mode <- function(graph, arrow.mode) {
 
   arrow.mode
 }
+
+i.default.values <- list(vertex=list(color="SkyBlue2",
+                           size=15,
+                           label=i.get.labels,
+                           label.font="",
+                           label.degree=-pi/4,
+                           label.color="darkblue",
+                           label.dist=0,
+                           frame.color="black"),                           
+                         edge=list(color="darkgrey",
+                           label=i.get.edge.labels,
+                           lty=1,
+                           width=1,
+                           arrow.mode=i.get.arrow.mode),
+                         plot=list(layout=layout.random,
+                           margin=0))

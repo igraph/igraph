@@ -1,5 +1,13 @@
 2007-03-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : modified for the 
+	new parameter handling
+	* interfaces/R/igraph/R/plot.common.R (i.parse.plot.params)
+	(i.default.values) : added, new parameter handling
+
+	* interfaces/R/igraph/R/plot.common.R (plot.igraph) : make the margin
+	bigger with the size of the vertices
+
 	* interfaces/R/igraph/R/plot.R (plot.igraph) :
 	bug corrected, arrows were drawn improperly when any(edge.lty!=1)
 

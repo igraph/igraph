@@ -20,16 +20,8 @@
 #
 ###################################################################
 
-plot.igraph <- function(x, layout=layout.random, layout.par=list(),
-                       labels=NULL, label.color="darkblue",
-                       label.font=NULL, label.degree=-pi/4, label.dist=0,
-                       vertex.color="SkyBlue2", vertex.size=15,
-                       edge.color="darkgrey", edge.width=1,
-                       edge.labels=NA, edge.lty=1,
-                       vertex.frame.color="black", 
-                       margin=0, loop.angle=0,
+plot.igraph <- function(x, 
                        # SPECIFIC: #####################################
-                       arrow.mode=NULL,
                        axes=FALSE, xlab="", ylab="",
                        xlim=c(-1,1), ylim=c(-1,1),
                        ...) {
@@ -38,25 +30,36 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+
+  # Visual parameters
+  params <- i.parse.plot.params(graph, list(...))
+  vertex.color       <- params("vertex", "color")
+  vertex.frame.color <- params("vertex", "frame.color")
+  vertex.size        <- (1/200) * params("vertex", "size")
+  label.font         <- params("vertex", "label.font")
+  label.degree       <- params("vertex", "label.degree")
+  label.color        <- params("vertex", "label.color")
+  label.dist         <- params("vertex", "label.dist")
+  labels             <- params("vertex", "label")
+
+  edge.color         <- params("edge", "color")
+  edge.width         <- params("edge", "width")
+  edge.lty           <- params("edge", "lty")
+  arrow.mode         <- params("edge", "arrow.mode")
+  edge.labels        <- params("edge", "label")
   
-  # Interpret parameters
-  layout <- i.get.layout(graph, layout, layout.par)
-  vertex.color <- i.get.vertex.color(graph, vertex.color)
-  vertex.frame.color <- i.get.vertex.frame.color(graph, vertex.frame.color)
-  vertex.size <- (1/200) * i.get.vertex.size(graph, vertex.size)
-  edge.color <- i.get.edge.color(graph, edge.color)
-  edge.width <- i.get.edge.width(graph, edge.width)
-  edge.lty <- i.get.edge.lty(graph, edge.lty)
-  label.degree <- i.get.label.degree(graph, label.degree)
-  labels <- i.get.labels(graph, labels)
-  edge.labels <- i.get.edge.labels(graph, edge.labels)
-  arrow.mode <- i.get.arrow.mode(graph, arrow.mode)
+  layout             <- params("plot", "layout")
+  margin             <- params("plot", "margin")
+
+  # the new style parameters can't do this yet
+  arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
 
   # create the plot
-  xlim <- c(xlim[1]-margin, xlim[2]+margin)
-  ylim <- c(ylim[1]-margin, ylim[2]+margin)
+  maxv <- max(vertex.size)
+  xlim <- c(xlim[1]-margin-maxv, xlim[2]+margin+maxv)
+  ylim <- c(ylim[1]-margin-maxv, ylim[2]+margin+maxv)
   plot(0, 0, type="n", xlab=xlab, ylab=ylab, asp=1, xlim=xlim, ylim=ylim,
-       axes=axes, ...)
+       axes=axes)
 
   # norm layout to (-1, 1)
   layout <- i.layout.norm(layout, -1, 1, -1, 1)
