@@ -2,6 +2,7 @@
 
 repohost=cneurocvs.rmki.kfki.hu
 repodir=/var/www/igraph-new
+debianrepodir=/var/www/packages
 
 # Get current version
 version="`head -1 configure.in | cut -f2 -d, | tr -d ' '`"
@@ -75,9 +76,31 @@ scp doc/igraph3.html ${repohost}:${repodir}/igraph.html &&
 scp doc/*.png doc/*.jpg ${repohost}:${repodir}/ || exit 1
 
 #################################################
+# symlink the uploaded .tar.gz to the proper .orig.tar.gz name
+# for debian source package creation
+mkdir ../debian-package &&
+ln igraph-${version}.tar.gz ../debian-package/igraph_${version}.orig.tar.gz || exit 1
+
+#################################################
+# extract the original source .tar.gz to the proper directory
+# (debian needs this -- we don't want our arch specific files to
+# be included in the diff file created by dpkg-buildpackage
+cd ../debian-package &&
+tar -xvvzf igraph_${version}.orig.tar.gz &&
+cd igraph-${version} || exit 1
+
+#################################################
 # make debian packages and upload them to the igraph homepage
-# make deb &&
-# scp ../*igraph*.deb ${repohost}:${repodir}/debian
+make deb &&
+scp ../libigraph_${version}_i386.deb ${repohost}:${debianrepodir}/binary/ &&
+scp ../libigraph-dev_${version}_i386.deb ${repohost}:${debianrepodir}/binary/ &&
+scp ../igraph_${version}.orig.tar.gz ${repohost}:${debianrepodir}/source/ &&
+scp ../igraph_${version}.diff.gz ${repohost}:${debianrepodir}/source/ &&
+scp ../igraph_${version}.dsc ${repohost}:${debianrepodir}/source/ || exit 1
+
+######################
+# clean up some stuff
+cd ../.. && rm -rf debian-package || exit 1
 
 #################################################
 # make an R source package and upload that too
@@ -104,6 +127,7 @@ scp igraph-manual.pdf ${repohost}:${repodir}/doc/R/igraph.pdf
 
 cat <<EOF
 DONE. Don't forget to 
+ * upload the Python package to the Python Package Index
  * create a tla tag for the release:
    tla tag igraph--main--${version} igraph--release--${version}
  * create a new tla version:

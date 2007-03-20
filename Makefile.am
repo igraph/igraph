@@ -28,11 +28,7 @@ dox:
 
 deb: clean
 	debian/prepare
-	fakeroot debian/rules binary
-
-debcvs: clean
-	debian/prepare cvs
-	fakeroot debian/rules binary
+	dpkg-buildpackage -rfakeroot
 
 test: all
 	for i in interfaces/*; do \

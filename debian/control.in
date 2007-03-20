@@ -9,32 +9,24 @@ Package: libigraph
 Architecture: any
 Section: libs
 Priority: optional
-Depends: libc6 (>= 2.3.2)
-Description: A library for creating and manipulating graphs.
+Depends: ${shlibs:Depends}
+Description: A library for creating and manipulating graphs
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
  analysis of large graphs.
  .
- It was started as an additional package to the GNU R system, but most
- of its functions can also be used as a separate library. Additional
- Python bindings are also available as a separate package.
- .
- Homepage: http://cneuro.rmki.kfki.hu/projects/igraph
+ Homepage: http://cneurocvs.rmki.kfki.hu/igraph
 
 Package: libigraph-dev
 Architecture: any
 Section: libdevel
 Priority: optional
-Depends: libc6-dev, libigraph (>= @VERSION@)
+Depends: libc6-dev, libxml2-dev, libigraph (= ${Source-Version})
 Description: A library for creating and manipulating graphs - development files
  igraph is a library for creating and manipulating graphs.
  It is intended to be as powerful (ie. fast) as possible to enable the
  analysis of large graphs.
  .
- It was started as an additional package to the GNU R system, but most
- of its functions can also be used as a separate library. Additional
- Python bindings are also available as a separate package.
+ This package contains the include files and static library for igraph.
  .
- This package contains the include files and static library for libigraph.
- .
- Homepage: http://cneuro.rmki.kfki.hu/projects/igraph
+ Homepage: http://cneurocvs.rmki.kfki.hu/igraph
