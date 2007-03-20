@@ -1,3 +1,8 @@
+2007-03-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) :
+	bug corrected, arrows were drawn improperly when any(edge.lty!=1)
+
 2007-03-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (rglplot.igraph) :

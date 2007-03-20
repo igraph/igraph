@@ -182,11 +182,20 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
       arrows(x0, y0, x1, y1, angle=20, length=0.2, code=arrow.mode,
              col=edge.color, lwd=edge.width, lty=edge.lty)
       if (any(edge.lty != 1)) {
-        pp <- atan2(y0-y1, x0-x1)
-        xx <- x1+0.01*cos(pp)
-        yy <- y1+0.01*sin(pp)
-        arrows(xx, yy, x1, y1, angle=20, length=0.2, code=arrow.mode,
-               col=edge.color, lwd=edge.width, lty=1)
+        if (arrow.mode==2 || arrow.mode==3) {
+          pp <- atan2(y0-y1, x0-x1)
+          xx <- x1+0.001*cos(pp)
+          yy <- y1+0.001*sin(pp)
+          arrows(xx, yy, x1, y1, angle=20, length=0.2, code=2,
+                 col=edge.color, lwd=edge.width, lty=1)
+        }
+        if (arrow.mode==1 || arrow.mode==3) {          
+          pp <- atan2(y1-y0, x1-x0)
+          xx <- x0+0.001*cos(pp)
+          yy <- y0+0.001*sin(pp)
+          arrows(xx, yy, x0, y0, angle=20, length=0.2, code=2,
+                 col=edge.color, lwd=edge.width, lty=1)
+        }
       }
     } else {
       ## different kinds of arrow drawn separately as 'arrows' cannot
@@ -200,12 +209,20 @@ plot.igraph <- function(x, layout=layout.random, layout.par=list(),
         arrows(x0[valid], y0[valid], x1[valid], y1[valid],
                angle=20, length=0.2, code=code,
                col=ec, lwd=ew, lty=el)
-        if (any(el != 1)) {
+        if (any(el != 1) && code %in% c(2,3)) {
           pp <- atan2(y0-y1, x0-x1)
           xx <- x1+0.01*cos(pp)
           yy <- y1+0.01*sin(pp)
           arrows(xx[valid], yy[valid], x1[valid], y1[valid],
-                 angle=20, length=0.2, code=code,
+                 angle=20, length=0.2, code=2,
+                 col=ec, lwd=ew, lty=1)
+        }
+        if (any(el != 1) && code %in% c(1,3)) {
+          pp <- atan2(y1-y0, x1-x0)
+          xx <- x0+0.01*cos(pp)
+          yy <- y0+0.01*sin(pp)
+          arrows(xx[valid], yy[valid], x0[valid], y0[valid],
+                 angle=20, length=0.2, code=2,
                  col=ec, lwd=ew, lty=1)
         }
       }
