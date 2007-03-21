@@ -47,6 +47,7 @@ plot.igraph <- function(x,
   edge.lty           <- params("edge", "lty")
   arrow.mode         <- params("edge", "arrow.mode")
   edge.labels        <- params("edge", "label")
+  loop.angle         <- params("edge", "loop.angle")
   
   layout             <- params("plot", "layout")
   margin             <- params("plot", "margin")

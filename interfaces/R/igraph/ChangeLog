@@ -1,5 +1,15 @@
 2007-03-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (plot.igraph)
+	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 
+	loop.angle edge parameter added
+
+	* interfaces/R/igraph/R/tkplot.R (tkplot) : new parameter handling 
+	style added
+
+	* interfaces/R/igraph/R/tkplot.R (tkplot) : added support for
+	arrow.mode argument
+
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : modified for the 
 	new parameter handling
 	* interfaces/R/igraph/R/plot.common.R (i.parse.plot.params)

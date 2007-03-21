@@ -34,15 +34,7 @@ if (!exists(".tkplot.env")) {
 # Main function
 ###################################################################
 
-tkplot <- function(graph, layout=layout.random, layout.par=list(),
-                   labels=NULL, label.color="darkblue",
-                   label.font=NULL, label.degree=-pi/4, label.dist=0,
-                   vertex.color="SkyBlue2", vertex.size=15,
-                   edge.color="darkgrey", edge.width=1,
-                   edge.labels=NA, edge.lty=1,
-                   vertex.frame.color="black",
-                   loop.angle=0, margin=0,
-                   ...) {
+tkplot <- function(graph, ...) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -51,39 +43,38 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
   # Libraries
   require(tcltk) || stop("tcl/tk library not available")
 
-  # Layout
-  layout <- i.get.layout(graph, layout, layout.par)
+  # Visual parameters
+  params <- i.parse.plot.params(graph, list(...))
+  labels <- params("vertex", "label")
+  label.color <- params("vertex", "label.color")
+  label.font <- params("vertex", "label.font")
+  label.degree <- params("vertex", "label.degree")
+  label.dist <- params("vertex", "label.dist")
+  vertex.color <- params("vertex", "color")
+  vertex.size <- params("vertex", "size")
+  vertex.frame.color <- params("vertex", "frame.color")
 
-  # Vertex color
-  vertex.color <- i.get.vertex.color(graph, vertex.color)
-  vertex.frame.color <- i.get.vertex.frame.color(graph, vertex.frame.color)
+  edge.color <- params("edge", "color")
+  edge.width <- params("edge", "width")
+  edge.labels <- params("edge", "label")
+  edge.lty <- params("edge", "lty")
+  loop.angle <- params("edge", "loop.angle")
+  arrow.mode <- params("edge", "arrow.mode")
+
+  layout <- params("plot", "layout")
+  margin <- params("plot", "margin")
+
+  # the new style parameters can't do this yet
+  arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
   
-  # Vertex size
-  vertex.size <- i.get.vertex.size(graph, vertex.size)
-  
-  # Edge color
-  edge.color <- i.get.edge.color(graph, edge.color)
-
-  # Edge width
-  edge.width <- i.get.edge.width(graph, edge.width)
-
   # Edge line type
-  edge.lty <- i.get.edge.lty(graph, edge.lty)
   if (is.numeric(edge.lty)) {
     lty <- c( " ", "", "-", ".", "-.", "--", "--.")
     edge.lty <- lty[edge.lty+1]
   }
 
-  # Edge labels
-  edge.labels <- i.get.edge.labels(graph, edge.labels)
-  
-  # Label degree
-  label.degree <- i.get.label.degree(graph, label.degree)
-
   # Label font
-  if (is.null(label.font)) {
-    label.font=tkfont.create(family="helvetica", size=16, weight="bold")
-  }
+  label.font=tkfont.create(family="helvetica", size=16, weight="bold")
   
   # Create window & canvas
   top <- tktoplevel(background="lightgrey")
@@ -98,7 +89,7 @@ tkplot <- function(graph, layout=layout.random, layout.par=list(),
                  grid=0, label.font=label.font, label.degree=label.degree,
                  label.dist=label.dist, edge.labels=edge.labels,
                  vertex.frame.color=vertex.frame.color,
-                 loop.angle=loop.angle, edge.lty=edge.lty)
+                 loop.angle=loop.angle, edge.lty=edge.lty, arrow.mode=arrow.mode)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
@@ -762,7 +753,6 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 # Creates tk object for edge 'id'
 .tkplot.create.edge <- function(tkp.id, from, to, id) {
   tkp <- .tkplot.get(tkp.id)  
-  arrow <- ifelse(is.directed(tkp$graph), "last", "none")
   from.c <- tkp$coords[from+1,]
   to.c   <- tkp$coords[to+1,]
   edge.color <- ifelse(length(tkp$params$edge.color)>1,
@@ -774,6 +764,11 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   edge.lty <- ifelse(length(tkp$params$edge.lty)>1,
                        tkp$params$edge.lty[[id]],
                        tkp$params$edge.lty)
+  arrow.mode <- ifelse(length(tkp$params$arrow.mode)>1,
+                       tkp$params$arrow.mode[[id]],
+                       tkp$params$arrow.mode)
+  arrow <- c("none", "first", "last", "both")[arrow.mode+1]
+  
   if (from != to) {
     ## non-loop edge
     tkcreate(tkp$canvas, "line", from.c[1], from.c[2], to.c[1], to.c[2],
@@ -843,6 +838,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
                           tkp$params$vertex.size)
     to.c[1] <- from.c[1] + (r-vertex.size)*cos(phi)
     to.c[2] <- from.c[2] + (r-vertex.size)*sin(phi)
+    from.c[1] <- from.c[1] + vertex.size*cos(phi)
+    from.c[2] <- from.c[2] + vertex.size*sin(phi)
     tkcoords(tkp$canvas, itemid, from.c[1], from.c[2], to.c[1], to.c[2])
   } else {
     vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
