@@ -277,6 +277,8 @@ rglplot.igraph <- function(x, ...) {
   label.dist <- params("vertex", "label.dist")
   vertex.color <- params("vertex", "color")
   vertex.size <- (1/200) * params("vertex", "size")
+  loop.angle <- params("edge", "loop.angle")
+  loop.angle2 <- params("edge", "loop.angle2")
 
   edge.color <- params("edge", "color")
   edge.width <- params("edge", "width")
@@ -292,27 +294,13 @@ rglplot.igraph <- function(x, ...) {
   if (ncol(layout)==2) { layout <- cbind(layout, 0) }
   layout <- i.layout.norm(layout, -1, 1, -1, 1, -1, 1)
   
-  # add the edges
-  # TODO: loops
+  # add the edges, the loops are handled separately
   el <- get.edgelist(graph, names=FALSE)
-  x0 <- layout[,1][el[,1]+1]
-  y0 <- layout[,2][el[,1]+1]
-  z0 <- layout[,3][el[,1]+1]
-  x1 <- layout[,1][el[,2]+1]
-  y1 <- layout[,2][el[,2]+1]
-  z1 <- layout[,3][el[,2]+1]
   
-  if (length(vertex.size)!=1) {
-    vsize.from <- vertex.size[get.edgelist(graph)[,1]+1]
-    vsize.to   <- vertex.size[get.edgelist(graph)[,2]+1]
-  } else {
-    vsize.from <- vsize.to <- vertex.size
-  }
-
   # It is faster this way
   par3d(skipRedraw=TRUE)
   
-  # edges
+  # edges, some constants first
   indices <- c(1,2,3,4,
                5,6,7,8,
                1,2,6,5,
@@ -326,66 +314,168 @@ rglplot.igraph <- function(x, ...) {
                 1,5,2,2,
                 2,3,4,5)
 
-  for (i in seq(x0)) {
-    v1 <- c(x0[i], y0[i], z0[i])
-    v2 <- c(x1[i], y1[i], z1[i])
-    r <- vsize.to; if (length(r)>1) { r <- r[i] }
-    alen <- sqrt(sum((v2-v1)^2))
+  loop.indices <- c(1,2,8,7,
+                    2,3,9,8,
+                    3,1,7,9,
+                    4,5,11,10,
+                    5,6,12,11,
+                    6,4,10,12,
+                    1,2,5,4,
+                    2,3,6,5,
+                    3,1,4,6,
+                    7,8,11,10,
+                    8,9,12,11,
+                    9,7,10,12)  
 
-    vertices <- c(-1,-1,alen,1,
-                   1,-1,alen,1,
-                   1, 1,alen,1,
-                  -1, 1,alen,1,
-                  -1,-1,0,   1,
-                   1,-1,0,   1,
-                   1, 1,0,   1,
-                  -1, 1,0,   1)
+  arrow1.vertices <- c( 0,  0,  0, 1,
+                       -1, -1, -2, 1,
+                       1, -1, -2, 1,
+                       1,  1, -2, 1,
+                       -1,  1, -2, 1)
 
-    edge.prot <- qmesh3d(vertices, indices)
-    ew <- edge.width; if (length(ew)>1) { ew <- ew[i] }
-    edge <- transform3d(edge.prot, scaleMatrix(.01*ew, .01*ew, 1))
-    phi<--atan2(v2[2]-v1[2],v1[1]-v2[1])-pi/2
-    psi<-acos((v2[3]-v1[3])/alen)
-    rot1 <- rbind(c(1,0,0),c(0,cos(psi),sin(psi)), c(0,-sin(psi),cos(psi)))
-    rot2 <- rbind(c(cos(phi),sin(phi),0),c(-sin(phi),cos(phi),0), c(0,0,1))
-    edge <- transform3d(edge, rotationMatrix(matrix=rot1))
-    edge <- transform3d(edge, rotationMatrix(matrix=rot2))
-    edge <- transform3d(edge, translationMatrix(v1[1], v1[2], v1[3]))
-    ec <- edge.color; if (length(ec)>1) { ec <- ec[i] }
-    shade3d(edge, col=ec)
-
+  arrow2.vertices <- c( 0,  0,  0, 1,
+                       -1, -1,  2, 1,
+                       1, -1,  2, 1,
+                       1,  1,  2, 1,
+                       -1,  1,  2, 1)
+  
+  ## Ok, plot the edges 
+  for (i in seq(along=numeric(nrow(el)))) {
+    from <- el[i,1]
+    to <- el[i,2]
+    v1 <- layout[from+1,]
+    v2 <- layout[to+1,]
     arr <- arrow.mode; if (length(arrow.mode)>1) { arr <- arr[i] }
-    if (arr == 2 || arr==3) {
-      ## forward
-      vertices <- c( 0,  0,  0, 1,
-                    -1, -1, -2, 1,
-                     1, -1, -2, 1,
-                     1,  1, -2, 1,
-                    -1,  1, -2, 1)
+    ew <- edge.width; if (length(ew)>1) { ew <- ew[i] }
+      ec <- edge.color; if (length(ec)>1) { ec <- ec[i] }
+    if (from != to) {
+      ## nonloop
+      alen <- sqrt(sum((v2-v1)^2))
+
+      vertices <- c(-1,-1,alen,1,
+                    1,-1,alen,1,
+                    1, 1,alen,1,
+                    -1, 1,alen,1,
+                    -1,-1,0,   1,
+                    1,-1,0,   1,
+                    1, 1,0,   1,
+                    -1, 1,0,   1)
       
-      arrow <- qmesh3d(vertices, indices2)
-      arrow <- transform3d(arrow, scaleMatrix(0.03*ew, 0.03*ew, .05*ew))
-      arrow <- transform3d(arrow, translationMatrix(0,0,-r))
-      arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
-      arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
-      arrow <- transform3d(arrow, translationMatrix(v2[1], v2[2], v2[3]))
-      shade3d(arrow, col=ec)    
-    }
-    if (arr == 1 || arr==3) {
-      ## backward
-      vertices <- c( 0,  0,  0, 1,
-                    -1, -1,  2, 1,
-                     1, -1,  2, 1,
-                     1,  1,  2, 1,
-                    -1,  1,  2, 1)
+      edge.prot <- qmesh3d(vertices, indices)
+      edge <- transform3d(edge.prot, scaleMatrix(.005*ew, .005*ew, 1))
+      phi<--atan2(v2[2]-v1[2],v1[1]-v2[1])-pi/2
+      psi<-acos((v2[3]-v1[3])/alen)
+      rot1 <- rbind(c(1,0,0),c(0,cos(psi),sin(psi)), c(0,-sin(psi),cos(psi)))
+      rot2 <- rbind(c(cos(phi),sin(phi),0),c(-sin(phi),cos(phi),0), c(0,0,1))
+      edge <- transform3d(edge, rotationMatrix(matrix=rot1))
+      edge <- transform3d(edge, rotationMatrix(matrix=rot2))
+      edge <- transform3d(edge, translationMatrix(v1[1], v1[2], v1[3]))
+      shade3d(edge, col=ec)
       
-      arrow <- qmesh3d(vertices, indices2)
-      arrow <- transform3d(arrow, scaleMatrix(0.03*ew, 0.03*ew, .05*ew))
-      arrow <- transform3d(arrow, translationMatrix(0,0,r))
-      arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
-      arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
-      arrow <- transform3d(arrow, translationMatrix(v1[1], v1[2], v1[3]))
-      shade3d(arrow, col=ec)      
+      if (arr == 2 || arr==3) {
+        ## forward
+        r <- vertex.size; if (length(r)>1) { r <- r[to+1] }
+        
+        arrow <- qmesh3d(arrow1.vertices, indices2)
+        arrow <- transform3d(arrow, scaleMatrix(0.02*ew, 0.02*ew, .04*ew))
+        arrow <- transform3d(arrow, translationMatrix(0,0,-r))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
+        arrow <- transform3d(arrow, translationMatrix(v2[1], v2[2], v2[3]))
+        shade3d(arrow, col=ec)    
+      }
+      if (arr == 1 || arr==3) {
+        ## backward
+        r <- vertex.size; if (length(r)>1) { r <- r[from+1] }        
+        
+        arrow <- qmesh3d(arrow2.vertices, indices2)
+        arrow <- transform3d(arrow, scaleMatrix(0.02*ew, 0.02*ew, .04*ew))
+        arrow <- transform3d(arrow, translationMatrix(0,0,r))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
+        arrow <- transform3d(arrow, translationMatrix(v1[1], v1[2], v1[3]))
+        shade3d(arrow, col=ec)      
+      }
+    } else {
+      ## loop edge
+      w <- 0.01*ew
+      r <- vertex.size; if (length(r)>1) { r <- r[to+1] }
+      a <- 3*r
+      b <- a-(2+2/sqrt(3))*w
+      loop.vertices <- c( -a/2 , 0,              0,  1,
+                           a/2 , 0,              0,  1,
+                           0   , sqrt(3)/2*a,    0,  1,
+                          -a/2 , 0,              w, 1,
+                           a/2 , 0,              w, 1,
+                           0   , sqrt(3)/2*a,    w, 1,
+                          -b/2 , w,             0,  1,
+                           b/2 , w,             0,  1,
+                           0   , sqrt(3)/2*b+w, 0,  1,
+                          -b/2 , w,             w, 1,
+                           b/2 , w,             w, 1,
+                           0   , sqrt(3)/2*b+w, w, 1 )
+
+      handle <- qmesh3d(loop.vertices, loop.indices)
+      handle <- transform3d(handle, translationMatrix(0,-sqrt(3)/2*a, -w/2))
+
+      phi <- loop.angle; if (length(phi)>1) { phi <- phi[i] }
+      psi <- loop.angle2; if (length(psi)>1) { psi <- psi[i] }
+      
+      rot1 <- rbind(c(1,0,0),c(0,cos(psi),sin(psi)), c(0,-sin(psi),cos(psi)))
+      rot2 <- rbind(c(cos(phi),sin(phi),0),c(-sin(phi),cos(phi),0), c(0,0,1))
+      
+      handle <- transform3d(handle, translationMatrix(0,-r+sqrt(3)*a/4,0))
+      handle <- transform3d(handle, rotationMatrix(matrix=rot1))
+      handle <- transform3d(handle, rotationMatrix(matrix=rot2))
+      handle <- transform3d(handle, translationMatrix(v1[1], v1[2], v1[3]))
+      shade3d(handle, col=ec)
+
+      if (arr==1 || arr==2 || arr==3) {
+        arrow <- qmesh3d(arrow1.vertices, indices2)
+        arrow <- transform3d(arrow, scaleMatrix(0.02*ew, 0.02*ew, .04*ew))
+        av1 <- c(-a/2,0,w/2)
+        av2 <- c(0,sqrt(3)/2*a, w/2)
+        aphi<--atan2(av2[2]-av1[2],av1[1]-av2[1])-pi/2
+        apsi<-acos((av2[3]-av1[3])/a)
+        arot1 <- rbind(c(1,0,0),c(0,cos(apsi),sin(apsi)), c(0,-sin(apsi),cos(apsi)))
+        arot2 <- rbind(c(cos(aphi),sin(aphi),0),c(-sin(aphi),cos(aphi),0), c(0,0,1))
+        
+        arrow <- transform3d(arrow, rotationMatrix(matrix=arot1))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=arot2))
+        arrow <- transform3d(arrow, translationMatrix(-a/4+w/2, sqrt(3)/4*a, 0))
+        arrow <- transform3d(arrow, translationMatrix(0,-sqrt(3)/2*a, 0))
+
+        arrow <- transform3d(arrow, translationMatrix(0,-r+sqrt(3)*a/4,0))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
+        arrow <- transform3d(arrow, translationMatrix(v1[1], v1[2], v1[3]))        
+        
+        shade3d(arrow, col=ec)
+      }
+      if (arr==3) {
+        arrow <- qmesh3d(arrow1.vertices, indices2)
+        arrow <- transform3d(arrow, scaleMatrix(0.02*ew, 0.02*ew, .04*ew))
+        av1 <- c(a/2,0,w/2)
+        av2 <- c(0,sqrt(3)/2*a, w/2)
+        aphi<--atan2(av2[2]-av1[2],av1[1]-av2[1])-pi/2
+        apsi<-acos((av2[3]-av1[3])/a)
+        arot1 <- rbind(c(1,0,0),c(0,cos(apsi),sin(apsi)), c(0,-sin(apsi),cos(apsi)))
+        arot2 <- rbind(c(cos(aphi),sin(aphi),0),c(-sin(aphi),cos(aphi),0), c(0,0,1))
+        
+        arrow <- transform3d(arrow, rotationMatrix(matrix=arot1))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=arot2))
+        arrow <- transform3d(arrow, translationMatrix(a/4-w/2, sqrt(3)/4*a, 0))
+        arrow <- transform3d(arrow, translationMatrix(0,-sqrt(3)/2*a, 0))
+
+        arrow <- transform3d(arrow, translationMatrix(0,-r+sqrt(3)*a/4,0))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot1))
+        arrow <- transform3d(arrow, rotationMatrix(matrix=rot2))
+        arrow <- transform3d(arrow, translationMatrix(v1[1], v1[2], v1[3]))        
+        
+        shade3d(arrow, col=ec)
+        
+      }
+      
     }
   }
     
@@ -408,8 +498,16 @@ rglplot.igraph <- function(x, ...) {
             c("",l1), col=c(label.color[1],label.color[1]), adj=0)
 
   edge.labels[is.na(edge.labels)] <- ""
-  rgl.texts((x0+x1)/2, (y0+y1)/2, (z0+z1)/2, edge.labels,
-            col=label.color)
+  if (any(edge.labels != "")) {
+    x0 <- layout[,1][el[,1]+1]
+    x1 <- layout[,1][el[,2]+1]
+    y0 <- layout[,2][el[,1]+1]
+    y1 <- layout[,2][el[,2]+1]
+    z0 <- layout[,3][el[,1]+1]
+    z1 <- layout[,4][el[,2]+1]
+    rgl.texts((x0+x1)/2, (y0+y1)/2, (z0+z1)/2, edge.labels,
+              col=label.color)
+  }
 
   # draw everything
   par3d(skipRedraw=FALSE)

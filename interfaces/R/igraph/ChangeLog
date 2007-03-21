@@ -1,3 +1,10 @@
+2007-03-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (rglplot) : support for loop edges
+
+	* interfaces/R/igraph/R/plot.common.R (i.default.values) 
+	* interfaces/R/igraph/R/plot.R (rglplot) : loop.angle2 argument added
+
 2007-03-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (rglplot) : new parameter handling

@@ -3,6 +3,7 @@ o R interface graphics improvements:
   - loop edges in 3d
   - better looking arrows in 3d
   - better looking edges in plot
+  - rewrite documentation
   - uniform handling of fonts 
   - uniform handlind of colors
   - uniform y coordinates (in plot and tkplot, mirror tkplot (?))
