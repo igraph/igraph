@@ -1,8 +1,15 @@
 
+o R interface graphics improvements:
+  - loop edges in 3d
+  - better looking arrows in 3d
+  - better looking edges in plot
+  - uniform handling of fonts 
+  - uniform handlind of colors
+  - uniform y coordinates (in plot and tkplot, mirror tkplot (?))
+
 o R interface: curved edges in plots (tkplot and plot)
 o igraph_vs_seq bug, the last node is omitted???
 o R interface: implement max.print option
-* R interface: uniform 'y' coordinates in plot.igraph and tkplot
 o attribute support in to_undirected
 o calculate the actual maximum flow
 o find a way for writing equations in DocBook.

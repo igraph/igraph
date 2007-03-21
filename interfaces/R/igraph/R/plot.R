@@ -256,27 +256,10 @@ plot.igraph <- function(x,
   invisible(NULL)
 }
 
-rglplot        <- function(x, layout=layout.random, layout.par=list(),
-                           labels=NULL, label.color="darkblue",
-                           label.font=NULL, label.degree=-pi/4, label.dist=0,
-                           vertex.color="SkyBlue2", vertex.size=15,
-                           edge.color="darkgrey", edge.width=1,
-                           edge.labels=NA, 
-                           # SPECIFIC: #####################################
-                           arrow.mode=NULL,
-                           ...)
+rglplot        <- function(x, ...)
   UseMethod("rglplot", x)
 
-
-rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
-                           labels=NULL, label.color="darkblue",
-                           label.font=NULL, label.degree=-pi/4, label.dist=0,
-                           vertex.color="SkyBlue2", vertex.size=15,
-                           edge.color="darkgrey", edge.width=1,
-                           edge.labels=NA, 
-                           # SPECIFIC: #####################################
-                           arrow.mode=NULL,
-                           ...) {
+rglplot.igraph <- function(x, ...) {
 
   require(rgl)
   
@@ -285,17 +268,26 @@ rglplot.igraph <- function(x, layout=layout.random, layout.par=list(),
     stop("Not a graph object")
   }
 
-  # Interpret parameters
-  layout <- i.get.layout(graph, layout, layout.par)
-  vertex.color <- i.get.vertex.color(graph, vertex.color)
-  vertex.size <- (1/200) * i.get.vertex.size(graph, vertex.size)
-  edge.color <- i.get.edge.color(graph, edge.color)
-  edge.width <- i.get.edge.width(graph, edge.width)
-  label.degree <- i.get.label.degree(graph, label.degree)
-  labels <- i.get.labels(graph, labels)
-  edge.labels <- i.get.edge.labels(graph, edge.labels)
-  arrow.mode <- i.get.arrow.mode(graph, arrow.mode)
+  # Visual parameters
+  params <- i.parse.plot.params(graph, list(...))
+  labels <- params("vertex", "label")
+  label.color <- params("vertex", "label.color")
+  label.font <- params("vertex", "label.font")
+  label.degree <- params("vertex", "label.degree")
+  label.dist <- params("vertex", "label.dist")
+  vertex.color <- params("vertex", "color")
+  vertex.size <- (1/200) * params("vertex", "size")
 
+  edge.color <- params("edge", "color")
+  edge.width <- params("edge", "width")
+  edge.labels <- params("edge","label")
+  arrow.mode <- params("edge","arrow.mode")
+  
+  layout <- params("plot", "layout")
+
+  # the new style parameters can't do this yet
+  arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
+  
   # norm layout to (-1, 1)
   if (ncol(layout)==2) { layout <- cbind(layout, 0) }
   layout <- i.layout.norm(layout, -1, 1, -1, 1, -1, 1)

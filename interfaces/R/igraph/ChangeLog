@@ -1,5 +1,8 @@
 2007-03-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (rglplot) : new parameter handling
+	style added
+
 	* interfaces/R/igraph/R/plot.R (plot.igraph)
 	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 
 	loop.angle edge parameter added
