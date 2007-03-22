@@ -100,11 +100,12 @@ html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
 	&& touch html/stamp
 
-igraph-docs.info: igraph-docs.xml $(DOCFIX2)
+igraph-docs.info: igraph-docs.xml $(DOCFIX2) igraph-docs.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	db2x_xsltproc --xinclude -s texi igraph-docs.xml -o igraph-docs.txml \
 	&& db2x_texixml igraph-docs.txml \
-	&& makeinfo --no-split igraph-docs.texi
+	&& makeinfo --no-split igraph-docs.texi \
+	&& patch -p2 <igraph-docs.info.diff
 
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
