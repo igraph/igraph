@@ -1,3 +1,7 @@
+2007-03-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (rglplot) : edge plotting rewritten
+
 2007-03-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (rglplot) : support for loop edges
