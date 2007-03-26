@@ -46,15 +46,15 @@ tkplot <- function(graph, ...) {
   # Visual parameters
   params <- i.parse.plot.params(graph, list(...))
   labels <- params("vertex", "label")
-  label.color <- params("vertex", "label.color")
+  label.color <- .tkplot.convert.color(params("vertex", "label.color"))
   label.font <- params("vertex", "label.font")
   label.degree <- params("vertex", "label.degree")
   label.dist <- params("vertex", "label.dist")
-  vertex.color <- params("vertex", "color")
+  vertex.color <- .tkplot.convert.color(params("vertex", "color"))
   vertex.size <- params("vertex", "size")
-  vertex.frame.color <- params("vertex", "frame.color")
+  vertex.frame.color <- .tkplot.convert.color(params("vertex", "frame.color"))
 
-  edge.color <- params("edge", "color")
+  edge.color <- .tkplot.convert.color(params("edge", "color"))
   edge.width <- params("edge", "width")
   edge.labels <- params("edge", "label")
   edge.lty <- params("edge", "lty")
@@ -1378,4 +1378,18 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   color <- tclvalue(tcl("tk_chooseColor", initialcolor=initialcolor,
                         title="Choose a color"))
   return(color);
+}
+
+###################################################################
+# Internal functions: other
+###################################################################
+
+.tkplot.convert.color <- function(col) {
+  if (is.numeric(col)) {
+    p <- palette()
+    col <- col %% length(p)
+    col[col==0] <- length(p)
+    col <- palette()[col]
+  }
+  col
 }

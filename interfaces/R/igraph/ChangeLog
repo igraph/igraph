@@ -1,3 +1,8 @@
+2007-03-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/tkplot.R (.tkplot.convert.color, tkplot) : 
+	added, convert numeric colors to color names 
+
 2007-03-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (rglplot) : edge plotting rewritten
