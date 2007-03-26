@@ -1,6 +1,14 @@
+2007-03-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id) :
+	which argument added to choose from the two expected citations
+	calculation versions
+	* interfaces/R/src/rinterface.c
+	(R_igraph_measure_dynamics_id_expected) : updated accordingly
+
 2007-03-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* interfaces/R/igraph/R/measure.dynamics.R (mesure.dynamics.id)
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id)
 	(measure.dynamics.idage) : 'error' argument added
 	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id_expected)
 	(R_igraph_measure_dynamics_idage_expected) : added

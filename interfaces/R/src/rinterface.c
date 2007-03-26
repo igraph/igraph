@@ -2040,11 +2040,12 @@ SEXP R_igraph_measure_dynamics_id_st(SEXP graph, SEXP pak) {
 }
 
 SEXP R_igraph_measure_dynamics_id_expected(SEXP graph, SEXP pak, 
-					   SEXP pst, SEXP pmaxind) {
+					   SEXP pst, SEXP pmaxind, SEXP pwhich) {
   igraph_t g;
   igraph_vector_t ak, st;
   igraph_integer_t maxind=REAL(pmaxind)[0];
   igraph_vector_t err;
+  igraph_integer_t which=REAL(pwhich)[0];
   SEXP result;
 
   R_igraph_before();
@@ -2053,7 +2054,11 @@ SEXP R_igraph_measure_dynamics_id_expected(SEXP graph, SEXP pak,
   R_SEXP_to_vector(pak, &ak);
   R_SEXP_to_vector(pst, &st);
   igraph_vector_init(&err, 0);
-  igraph_measure_dynamics_id_expected(&g, &err, &ak, &st, maxind);
+  if (which==1) {
+    igraph_measure_dynamics_id_expected(&g, &err, &ak, &st, maxind);
+  } else {
+    igraph_measure_dynamics_id_expected2(&g, &err, &ak, &st, maxind);
+  }
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&err)));
   igraph_vector_copy_to(&err, REAL(result));
   igraph_vector_destroy(&err);

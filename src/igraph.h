@@ -1111,6 +1111,11 @@ int igraph_measure_dynamics_id_expected(const igraph_t *graph,
 					const igraph_vector_t *ak,
 					const igraph_vector_t *st,
 					igraph_integer_t pmaxind);
+int igraph_measure_dynamics_id_extected2(const igraph_t *graph,
+					 igraph_vector_t *res,
+					 const igraph_vector_t *ak,
+					 const igraph_vector_t *st,
+					 igraph_integer_t pmaxind);
 
 int igraph_measure_dynamics_d_d(const igraph_t *graph,
 				const igraph_vector_t *ntime,

@@ -200,6 +200,93 @@ int igraph_measure_dynamics_id_expected(const igraph_t *graph,
   return 0;
 }
 
+int igraph_measure_dynamics_id_expected2(const igraph_t *graph,
+					 igraph_vector_t *res,
+					 const igraph_vector_t *ak,
+					 const igraph_vector_t *st,
+					 igraph_integer_t pmaxind) {
+  long int maxind=pmaxind;
+  
+  igraph_vector_t ntk;
+  igraph_vector_t cumst;
+  igraph_vector_t ch;
+  igraph_vector_t indegree;
+  igraph_vector_t outdegree;
+  igraph_vector_t neis;
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int node, i;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&ntk, maxind+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&ch, maxind+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&cumst, no_of_nodes+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
+
+  IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
+			     IGRAPH_OUT, IGRAPH_LOOPS));
+
+  /* create the cumulative sum of dt/S(t) */
+  VECTOR(cumst)[0]=0;
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(cumst)[i+1] = VECTOR(cumst)[i] + 
+      VECTOR(outdegree)[i]/VECTOR(*st)[i];
+  }
+
+  igraph_vector_destroy(&outdegree);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, maxind+1));
+  igraph_vector_null(res);
+  
+  for (node=0; node<no_of_nodes; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    
+    /* update degree and ntk */
+    /* update result if needed */
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(indegree)[to];
+      VECTOR(indegree)[to]++;
+      
+      VECTOR(ntk)[xidx]--;
+      VECTOR(*res)[xidx] += (VECTOR(ntk)[xidx]+1)*
+	(VECTOR(cumst)[node]-VECTOR(cumst)[(long int)VECTOR(ch)[xidx]]);
+      VECTOR(ch)[xidx]=node;
+
+      VECTOR(ntk)[xidx+1]++;
+      VECTOR(*res)[xidx+1] += (VECTOR(ntk)[xidx+1]-1)*
+	(VECTOR(cumst)[node]-VECTOR(cumst)[(long int)VECTOR(ch)[xidx+1]]);
+      VECTOR(ch)[xidx+1]=node;
+    }
+    
+    VECTOR(ntk)[0]++;
+    VECTOR(*res)[0] += (VECTOR(ntk)[0]-1)*
+      (VECTOR(cumst)[node]-VECTOR(cumst)[(long int)VECTOR(ch)[0]]);
+    VECTOR(ch)[0]=node;
+  }
+  
+  /* complete res */
+  for (i=0; i<maxind+1; i++) {
+    VECTOR(*res)[i] += VECTOR(ntk)[i]*
+      (VECTOR(cumst)[node]-VECTOR(cumst)[(long int)VECTOR(ch)[i]]);
+    VECTOR(*res)[i] *= VECTOR(*ak)[i];
+  }
+  
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&indegree);
+  igraph_vector_destroy(&cumst);
+  igraph_vector_destroy(&ch);
+  igraph_vector_destroy(&ntk);
+  IGRAPH_FINALLY_CLEAN(5);
+  
+  return 0;
+}
+
 int igraph_measure_dynamics_id_st(const igraph_t *graph, 
 				  igraph_vector_t *res, 
 				  const igraph_matrix_t *ak) {

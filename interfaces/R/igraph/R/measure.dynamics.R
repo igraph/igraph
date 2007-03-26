@@ -28,7 +28,8 @@ measure.dynamics.id <- function(graph,
                                 cites=FALSE,
                                 norm.method="old",
                                 debug=FALSE,
-                                debugdeg=0) {
+                                debugdeg=0,
+                                which=2) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -107,7 +108,7 @@ measure.dynamics.id <- function(graph,
 
   if (error && is.null(time.window)) {
     res$exp <- .Call("R_igraph_measure_dynamics_id_expected", graph,
-                     res$akl, res$st, as.numeric(maxind),
+                     res$akl, res$st, as.numeric(maxind), as.numeric(which),
                      PACKAGE="igraph")
   }
   
