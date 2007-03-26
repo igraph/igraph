@@ -1386,10 +1386,16 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 
 .tkplot.convert.color <- function(col) {
   if (is.numeric(col)) {
+    ## convert numeric color based on current palette
     p <- palette()
     col <- col %% length(p)
     col[col==0] <- length(p)
     col <- palette()[col]
+  } else if (is.character(col) && any(substr(col,1,1)=="#" & nchar(col)==9)) {
+    ## drop alpha channel, tcltk doesn't support it
+    idx <- substr(col,1,1)=="#" & nchar(col)==9
+    col[idx] <- substr(col[idx],1,7)
   }
+  
   col
 }

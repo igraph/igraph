@@ -1,5 +1,8 @@
 2007-03-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/tkplot.R (.tkplot.convert.color) : drop
+	alpha channel if present
+
 	* interfaces/R/igraph/R/tkplot.R (.tkplot.convert.color, tkplot) : 
 	added, convert numeric colors to color names 
 
