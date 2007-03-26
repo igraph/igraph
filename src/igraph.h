@@ -1045,10 +1045,17 @@ int igraph_measure_dynamics_idage(const igraph_t *graph,
 				  igraph_matrix_t *akl, 
 				  igraph_matrix_t *sd, 
 				  igraph_matrix_t *no,
+				  igraph_matrix_t *cites,
 				  const igraph_vector_t *st, igraph_integer_t agebins,
 				  igraph_integer_t maxind);
 int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res,
 				     const igraph_matrix_t *akl);
+int igraph_measure_dynamics_idage_expected(const igraph_t *graph,
+					   igraph_matrix_t *res,
+					   const igraph_matrix_t *akl,
+					   const igraph_vector_t *st,
+					   igraph_integer_t pmaxind);
+
 int igraph_measure_dynamics_idwindowage(const igraph_t *graph, 
 					igraph_matrix_t *akl, 
 					igraph_matrix_t *sd, 
@@ -1092,11 +1099,18 @@ int igraph_measure_dynamics_citingcat_id_age_st(const igraph_t *graph,
 
 int igraph_measure_dynamics_id(const igraph_t *graph,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,
-			       igraph_matrix_t *no,
+			       igraph_matrix_t *no, igraph_vector_t *cites,
+			       igraph_vector_t *debug,
+			       igraph_integer_t debugdeg,
 			       const igraph_vector_t *st, igraph_integer_t pmaxind);
 int igraph_measure_dynamics_id_st(const igraph_t *graph, 
 				  igraph_vector_t *res, 
 				  const igraph_matrix_t *ak);
+int igraph_measure_dynamics_id_expected(const igraph_t *graph,
+					igraph_vector_t *res,
+					const igraph_vector_t *ak,
+					const igraph_vector_t *st,
+					igraph_integer_t pmaxind);
 
 int igraph_measure_dynamics_d_d(const igraph_t *graph,
 				const igraph_vector_t *ntime,

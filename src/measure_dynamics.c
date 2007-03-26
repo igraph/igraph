@@ -28,7 +28,9 @@
 
 int igraph_measure_dynamics_id(const igraph_t *graph,
 			       igraph_matrix_t *ak, igraph_matrix_t *sd,
-			       igraph_matrix_t *no,
+			       igraph_matrix_t *no, igraph_vector_t *cites,
+			       igraph_vector_t *debug, 
+			       igraph_integer_t debugdeg,
 			       const igraph_vector_t *st, 
 			       igraph_integer_t pmaxind) {
   
@@ -75,6 +77,9 @@ int igraph_measure_dynamics_id(const igraph_t *graph,
       MATRIX(*ak, xidx, 0) += (xk-oldm)/VECTOR(notnull)[xidx];
       if (lsd) {
 	MATRIX(*sd, xidx, 0) += (xk-oldm)*(xk-MATRIX(*ak, xidx, 0));
+      }
+      if (debug && xidx==debugdeg) {
+	igraph_vector_push_back(debug, xk);
       }
     }
 
@@ -127,12 +132,70 @@ int igraph_measure_dynamics_id(const igraph_t *graph,
   } else {
     igraph_matrix_destroy(&normfact);
   }
+  if (cites) {
+    igraph_vector_destroy(cites);
+    *cites=notnull;
+  } else {
+    igraph_vector_destroy(&notnull);
+  }
   
   Free(indegree);
   igraph_vector_destroy(&ntk);
   igraph_vector_destroy(&ch);
-  igraph_vector_destroy(&notnull);
   igraph_vector_destroy(&neis);
+  
+  return 0;
+}
+
+int igraph_measure_dynamics_id_expected(const igraph_t *graph,
+					igraph_vector_t *res,
+					const igraph_vector_t *ak,
+					const igraph_vector_t *st,
+					igraph_integer_t pmaxind) {
+  long int maxind=pmaxind;
+  
+  igraph_vector_t ntk;
+  igraph_vector_t indegree;
+  igraph_vector_t neis;
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int node, i, j;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&ntk, maxind+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, maxind+1));
+  igraph_vector_null(res);
+
+  for (node=0; node<no_of_nodes; node++) {    
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* measure expected number of citations */
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      for (j=0; j<maxind+1; j++) {
+	VECTOR(*res)[j] +=
+	  VECTOR(*ak)[j]*VECTOR(ntk)[j]/VECTOR(*st)[node]; 
+      }      
+    }
+
+    /* update degree & ntk */
+    VECTOR(ntk)[0]++;
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(indegree)[to];
+      VECTOR(indegree)[to]++;
+      VECTOR(ntk)[xidx]--;
+      VECTOR(ntk)[xidx+1]++;
+    }
+  }
+
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&indegree);
+  igraph_vector_destroy(&ntk);
+  IGRAPH_FINALLY_CLEAN(3);
   
   return 0;
 }
@@ -373,6 +436,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph,
 				  igraph_matrix_t *akl, 
 				  igraph_matrix_t *sd,
 				  igraph_matrix_t *no,
+				  igraph_matrix_t *cites,
 				  const igraph_vector_t *st, igraph_integer_t pagebins,
 				  igraph_integer_t pmaxind) {
 
@@ -492,13 +556,82 @@ int igraph_measure_dynamics_idage(const igraph_t *graph,
   } else {
     igraph_matrix_destroy(&normfact);
   }
+  if (cites) {
+    igraph_matrix_destroy(cites);
+    *cites=notnull;
+  } else {
+    igraph_matrix_destroy(&notnull);
+  }
 
   Free(indegree);
   igraph_matrix_destroy(&ntkl);
   igraph_matrix_destroy(&ch);
-  igraph_matrix_destroy(&notnull);
   igraph_vector_destroy(&neis);
 
+  return 0;
+}
+
+int igraph_measure_dynamics_idage_expected(const igraph_t *graph,
+					   igraph_matrix_t *res,
+					   const igraph_matrix_t *akl,
+					   const igraph_vector_t *st,
+					   igraph_integer_t pmaxind) {
+  long int agebins=igraph_matrix_ncol(akl);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth=no_of_nodes/agebins+1;
+  long int maxind=pmaxind;
+  
+  igraph_vector_t indegree;
+  igraph_vector_t neis;
+  igraph_matrix_t ntkl;
+
+  long int node, i, j, k;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_MATRIX_INIT_FINALLY(&ntkl, maxind+1, agebins+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, maxind+1, agebins));
+  igraph_matrix_null(res);
+  
+  for (node=0; node<no_of_nodes; node++) {
+    long int n;
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* expected number of citations */
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    n=igraph_vector_size(&neis);
+    for (j=0; j<maxind+1; j++) {
+      for (k=0; k<agebins; k++) {
+	MATRIX(*res, j, k) += 
+	  n * MATRIX(*akl, j, k)*MATRIX(ntkl, j, k)/VECTOR(*st)[node];
+      }
+    }
+    
+    /* update degree & ntkl */
+    MATRIX(ntkl, 0, 0) += 1;
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(indegree)[to];
+      long int yidx=(node-to)/binwidth;
+      MATRIX(ntkl, xidx, yidx) -= 1;
+      MATRIX(ntkl, xidx+1, yidx) += 1;
+      VECTOR(indegree)[to] += 1;
+    }
+    for (k=1; node-binwidth*k+1 >= 1; k++) {
+      long int shnode=node-binwidth*k;
+      long int deg=VECTOR(indegree)[shnode];
+      MATRIX(ntkl, deg, k-1) -= 1;
+      MATRIX(ntkl, deg, k) += 1;
+    }
+  }
+  
+  igraph_vector_destroy(&neis);
+  igraph_matrix_destroy(&ntkl);
+  igraph_vector_destroy(&indegree);
+  IGRAPH_FINALLY_CLEAN(3);
+  
   return 0;
 }
 

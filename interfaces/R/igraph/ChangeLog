@@ -1,3 +1,24 @@
+2007-03-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/measure.dynamics.R (mesure.dynamics.id)
+	(measure.dynamics.idage) : 'error' argument added
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id_expected)
+	(R_igraph_measure_dynamics_idage_expected) : added
+	
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id)
+	(measure.dynamics.idage) : 'cites' argument added
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id)
+	(R_igraph_measure_dynamics_idage) : updated to have 'cites'
+
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id) :
+	'debug' and 'debugdeg' added
+	* interfaces/R/src/rinterface.c (R_igraph_measure_dynamics_id) :
+	updated to have 'debug' and 'debugdeg'
+	
+	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id)
+	(measure.dynamics.idage) : some reorganization to return
+	consistent 'st'
+
 2007-03-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/tkplot.R (.tkplot.convert.color) : drop

@@ -22,9 +22,13 @@
 
 measure.dynamics.id <- function(graph, 
                                 iterations=5,
+                                error=TRUE,
                                 time.window=NULL,
                                 number=FALSE,
-                                norm.method="old") {
+                                cites=FALSE,
+                                norm.method="old",
+                                debug=FALSE,
+                                debugdeg=0) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -43,20 +47,15 @@ measure.dynamics.id <- function(graph,
       sd.real <- FALSE
     }
     number.real <- number & sd.real
+    cites.real <- cites & sd.real
+    debug.real <- debug & sd.real
     
-    if (i != 1) {
-      if (norm.method=="old") {
-        mes[[1]] <- mes[[1]]/mes[[1]][1]
-      } else {
-        mes[[1]] <- mes[[1]]/sum(mes[[1]])
-      }
-    }    
-
     if (is.null(time.window)) {
       mes <- .Call("R_igraph_measure_dynamics_id", graph,
                    as.numeric(st),
                    as.numeric(maxind), as.logical(sd.real),
-                   as.logical(number.real),
+                   as.logical(number.real), as.logical(cites.real),
+                   as.logical(debug.real), as.numeric(debugdeg),
                    PACKAGE="igraph")
     } else {
       mes <- .Call("R_igraph_measure_dynamics_idwindow", graph,
@@ -66,7 +65,21 @@ measure.dynamics.id <- function(graph,
                    PACKAGE="igraph")
     }
 
+    if (norm.method=="old") {
+      mes[[1]] <- mes[[1]]/mes[[1]][1]
+    } else {
+      mes[[1]] <- mes[[1]]/sum(mes[[1]])
+    }
     mes[[1]][!is.finite(mes[[1]])] <- 0
+
+    if (sd.real) {
+      if (norm.method=="old") {
+        mes[[2]] <- mes[[2]]/mes[[1]][1]
+      } else if (norm.method=="new") {
+        mes[[2]] <- mes[[2]]/sum(mes[[1]])
+      }
+    }
+    
     if (is.null(time.window)) {
       st <- .Call("R_igraph_measure_dynamics_id_st", graph,
                   mes[[1]], 
@@ -80,24 +93,22 @@ measure.dynamics.id <- function(graph,
 
 #  print(mes[[1]][1])
 
-  if (sd.real) {
-    if (norm.method=="old") {
-      mes[[2]] <- mes[[2]]/mes[[1]][1]
-    } else {
-      mes[[2]] <- mes[[2]]/sum(mes[[1]])
-    }
-  }
-
-  if (norm.method=="old") {
-    mes[[1]] <- mes[[1]]/mes[[1]][1]
-  } else {
-    mes[[1]] <- mes[[1]]/sum(mes[[1]])
-  }
-
   if (number) {
     res <- list(akl=mes[[1]], st=st, sd=mes[[2]], no=mes[[3]])
   } else {
     res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
+  }
+  if (cites) {
+    res$cites <- mes[[4]]
+  }
+  if (debug) {
+    res$debug <- mes[[5]]
+  }
+
+  if (error && is.null(time.window)) {
+    res$exp <- .Call("R_igraph_measure_dynamics_id_expected", graph,
+                     res$akl, res$st, as.numeric(maxind),
+                     PACKAGE="igraph")
   }
   
   res
@@ -105,8 +116,10 @@ measure.dynamics.id <- function(graph,
 
 measure.dynamics.idage <- function(graph, agebins=300,
                                    iterations=5,
+                                   error=TRUE,
                                    time.window=NULL,
                                    number=FALSE,
+                                   cites=FALSE,
                                    norm.method="old") {
 
   if (!is.igraph(graph)) {
@@ -130,23 +143,30 @@ measure.dynamics.idage <- function(graph, agebins=300,
       sd.real <- FALSE
     }
     number.real <- sd.real & number
+    cites.real <- sd.real & cites
 
-    if (i != 1) {
-      if (norm.method=="old") {
-        mes[[1]] <- mes[[1]]/mes[[1]][1,1]
-      } else {
-        mes[[1]] <- mes[[1]]/sum(mes[[1]])
-      }
-    }    
-    
     mes <- .Call("R_igraph_measure_dynamics_idage", graph,
                  as.numeric(st), as.numeric(agebins),
                  as.numeric(maxind), as.logical(sd.real),
-                 as.logical(number.real),
+                 as.logical(number.real), as.logical(cites.real),
                  time.window,
                  PACKAGE="igraph")
 
     mes[[1]][!is.finite(mes[[1]])] <- 0
+    if (norm.method=="old") {
+      mes[[1]] <- mes[[1]]/mes[[1]][1,1]
+    } else {
+      mes[[1]] <- mes[[1]]/sum(mes[[1]])
+    }
+    
+    if (sd.real) {
+      if (norm.method=="old") {
+        mes[[2]] <- mes[[2]]/mes[[1]][1,1]
+      } else {
+        mes[[2]] <- mes[[2]]/sum(mes[[1]])
+      }
+    }
+    
     st <- .Call("R_igraph_measure_dynamics_idage_st", graph,
                 mes[[1]], time.window,
                 PACKAGE="igraph")
@@ -154,13 +174,6 @@ measure.dynamics.idage <- function(graph, agebins=300,
 
 #  print(mes[[1]][1,1])
 
-  if (sd.real) {
-    if (norm.method=="old") {
-      mes[[2]] <- mes[[2]]/mes[[1]][1,1]
-    } else {
-      mes[[2]] <- mes[[2]]/sum(mes[[1]])
-    }
-  }
   if (norm.method=="old") {
     mes[[1]] <- mes[[1]]/mes[[1]][1,1]
   } else {
@@ -173,6 +186,16 @@ measure.dynamics.idage <- function(graph, agebins=300,
     res <- list(akl=mes[[1]], st=st, sd=mes[[2]])
   }
   
+  if (cites) {
+    res$cites <- mes[[4]]
+  }
+
+  if (error && is.null(time.window)) {
+    res$exp <- .Call("R_igraph_measure_dynamics_idage_expected", graph,
+                     res$akl, res$st, as.numeric(maxind),
+                     PACKAGE="igraph")
+  }
+
   res
 }
 
