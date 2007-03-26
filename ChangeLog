@@ -1,3 +1,7 @@
+2007-03-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/matrix.c (igraph_matrix_sum) : added
+
 2007-03-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_id_expected) 

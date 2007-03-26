@@ -266,6 +266,7 @@ int igraph_matrix_select_rows(const igraph_matrix_t *m, igraph_matrix_t *res,
 			      const igraph_vector_t *rows);
 int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
 			  long int index);
+igraph_real_t igraph_matrix_sum(const igraph_matrix_t *m);
 
 /* -------------------------------------------------- */
 /* 3D array                                           */

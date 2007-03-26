@@ -385,3 +385,7 @@ int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
 					  nrow*index, nrow*(index+1)));
   return 0;
 }
+
+igraph_real_t igraph_matrix_sum(const igraph_matrix_t *m) {
+  return igraph_vector_sum(&m->data);
+}
