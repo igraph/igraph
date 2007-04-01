@@ -26,22 +26,22 @@
 
 read.graph.toraw <- function(filename) {
   if (is.character(filename)) {
-    filename <- file(filename)
+    filename <- file(filename, open="rb")
   }
   if (!isOpen(filename)) {
-    open(filename)
+    open(filename, open="rb")
   }
 
   tmpbufsize <- 20000
-  buffer <- tmpbuffer <- readChar(filename, tmpbufsize)
-  while (nchar(tmpbuffer) == tmpbufsize) {
-    tmpbuffer <- readChar(filename, tmpbufsize)
-    buffer <- paste(sep="", buffer, tmpbuffer)
+  buffer <- tmpbuffer <- readBin(filename, what=raw(0), n=tmpbufsize)
+  while (length(tmpbuffer) == tmpbufsize) {
+    tmpbuffer <- readBin(filename, what=raw(0), n=tmpbufsize)
+    buffer <- c(buffer, tmpbuffer)
   }
   close(filename)
   rm(tmpbuffer)
   
-  charToRaw(buffer)  
+  buffer
 }
 
 write.graph.fromraw <- function(buffer, file) {
@@ -85,6 +85,7 @@ read.graph <- function(file, format="edgelist", ...) {
                 "lgl"=read.graph.lgl(file, ...),
                 "graphml"=read.graph.graphml(file, ...),
                 "dimacs"=read.graph.dimacs(file, ...),
+                "graphdb"=read.graph.graphdb(file, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -253,9 +254,10 @@ write.graph.graphml <- function(graph, file, ...) {
 # isomorphic problems
 ################################################################
 
-graph.graphdb <- function(prefix="iso", type="r001", nodes=NULL, pair="A", which=0,
+graph.graphdb <- function(url=NULL,
+                          prefix="iso", type="r001", nodes=NULL, pair="A", which=0,
                           base="http://cneurocvs.rmki.kfki.hu/graphdb/gzip",
-                          url=NULL, compressed=TRUE, directed=TRUE) {
+                          compressed=TRUE, directed=TRUE) {
   
   if (is.null(nodes) && is.null(url)) {
     stop("The `nodes' or the `url' argument must be non-null")
@@ -295,26 +297,21 @@ graph.graphdb <- function(prefix="iso", type="r001", nodes=NULL, pair="A", which
   if (inherits(f, "try-error")) {
     stop(paste("Cannot open URL:", filename));
   }
-  on.exit(close(f))
 
-  getNumber <- function(n) {
-    readBin(f, what=integer(0), n=n, size=2, signed=FALSE, endian="little")
+  if (igraph.i.have.fmemopen) {
+    f <- read.graph.toraw(f)
+  } else {
+    buffer <- read.graph.toraw(f)
+    f <- tempfile()
+    write.graph.fromraw(buffer, f)
   }
+
+  .Call("R_igraph_read_graph_graphdb", f, as.logical(directed),
+        PACKAGE="igraph")
   
-  size <- getNumber(1)
-  if (!is.null(nodes) && nodes != size) {
-    stop("Mysterious error, number of vertices mismatch!")
-  }
-
-  el <- numeric()
-  for (v in seq(length=size)-1) {
-    no.neis <- getNumber(1)
-    neis <- getNumber(no.neis)
-    if (length(neis) != 0) {
-      el <- c(el, t(cbind(v, neis)))
-    }
-  }
-
-  graph(el, n=size, directed=directed)
 }
 
+read.graph.graphdb <- function(file, directed=TRUE, ...) {
+  .Call("R_igraph_read_graph_graphdb", file, as.logical(directed),
+        PACKAGE="igraph")
+}

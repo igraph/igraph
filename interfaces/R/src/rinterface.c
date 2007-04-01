@@ -3369,6 +3369,32 @@ SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   return result;  
 }
 
+SEXP R_igraph_read_graph_graphdb(SEXP pvfile, SEXP pdirected) {
+  igraph_t g;
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  FILE *file;
+  SEXP result;
+  
+  R_igraph_before();
+  
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "rb");
+#else
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "rb");
+#endif
+  if (file==0) { igraph_error("Cannot read graphdb file", __FILE__, __LINE__,
+			      IGRAPH_EFILE); }
+  igraph_read_graph_graphdb(&g, file, directed);
+  fclose(file);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   igraph_t g;
   FILE *stream;
