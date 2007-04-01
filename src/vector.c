@@ -1333,6 +1333,25 @@ igraph_bool_t igraph_vector_binsearch(const igraph_vector_t *v, igraph_real_t wh
   return VECTOR(*v)[left]==what;
 }
 
+igraph_bool_t igraph_vector_binsearch2(const igraph_vector_t *v, igraph_real_t what) {
+  long int left=0;
+  long int right=v->end - v->stor_begin-1;
+
+  while (left < right-1) {
+    long int middle=(left+right)/2;
+    if (VECTOR(*v)[middle] > what) {
+      right=middle;
+    } else if (VECTOR(*v)[middle] < what) {
+      left=middle;
+    } else {
+      left=middle;
+      break;
+    }
+  }
+
+  return VECTOR(*v)[left]==what || VECTOR(*v)[right]==what;
+}
+
 /**
  * \function igraph_vector_multiply
  * \brief Multiply all elements of a vector by a constant

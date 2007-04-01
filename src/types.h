@@ -162,6 +162,7 @@ igraph_bool_t igraph_vector_isininterval(const igraph_vector_t *v, igraph_real_t
 igraph_bool_t igraph_vector_any_smaller(const igraph_vector_t *v, igraph_real_t limit);
 igraph_bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t *rhs);
 igraph_bool_t igraph_vector_binsearch(const igraph_vector_t *v, igraph_real_t what, long int *pos);
+igraph_bool_t igraph_vector_binsearch2(const igraph_vector_t *v, igraph_real_t what);
 void igraph_vector_multiply(igraph_vector_t *v, igraph_real_t by);
 igraph_bool_t igraph_vector_contains(const igraph_vector_t *v, igraph_real_t e);
 igraph_bool_t igraph_vector_search(const igraph_vector_t *v, long int from, igraph_real_t what, 

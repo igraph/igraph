@@ -123,9 +123,10 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
 /* } */
 
 void igraph_i_adjlist_sort(igraph_i_adjlist_t *al) {
-  long int i;
-  for (i=0; i<al->length; i++)
-    igraph_vector_sort(&al->adjs[i]);
+  /* Nothing to do, it is sorted */
+/*   long int i; */
+/*   for (i=0; i<al->length; i++) */
+/*     igraph_vector_sort(&al->adjs[i]); */
 }
 
 int igraph_i_adjlist_simplify(igraph_i_adjlist_t *al) {
@@ -266,12 +267,12 @@ igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
 	}
       }
     } else if (al->simplify == IGRAPH_I_SORT) {
-      igraph_vector_t *v=al->adjs[no];
-      igraph_vector_sort(v);
+      /* nothing to do, it is sorted */
     } else if (al->simplify == IGRAPH_I_SORT_SIMPLIFY) {
       igraph_vector_t *v=al->adjs[no];
       long int i, p=0, n=igraph_vector_size(v);
-      igraph_vector_sort(v);
+      /* sorting is not needed any more */
+/*       igraph_vector_sort(v); */
       for (i=0; i<n; i++) {
 	if (VECTOR(*v)[i] != no && 
 	    (i==n-1 || VECTOR(*v)[i+1] != VECTOR(*v)[i])) {

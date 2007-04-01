@@ -1,5 +1,12 @@
 2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/adjlist.c (igraph_i_adjlist_sort)
+	(igraph_i_lazy_adjlist_get_real) : updated to take advantage of 
+	the sorted neighbor lists
+
+	* src/vector.c (igraph_vector_binsearch2) : added
+	* src/topology.c (igraph_isomorphism_vf2) : updated to use binsearch2
+
 	* src/vector.c (igraph_vector_order, igraph_vector_order1) : two vectors 
 	can be supplied now as the basis of the ranking, 
 	old version renamed to igraph_vector_order1
