@@ -265,6 +265,9 @@ igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
 	  n--;
 	}
       }
+    } else if (al->simplify == IGRAPH_I_SORT) {
+      igraph_vector_t *v=al->adjs[no];
+      igraph_vector_sort(v);
     } else if (al->simplify == IGRAPH_I_SORT_SIMPLIFY) {
       igraph_vector_t *v=al->adjs[no];
       long int i, p=0, n=igraph_vector_size(v);

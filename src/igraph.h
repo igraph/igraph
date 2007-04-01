@@ -154,7 +154,8 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 
 typedef enum { IGRAPH_I_DONT_SIMPLIFY=0,
 	       IGRAPH_I_SIMPLIFY,
-	       IGRAPH_I_SORT_SIMPLIFY } igraph_i_lazy_adlist_simplify_t;
+	       IGRAPH_I_SORT_SIMPLIFY,
+	       IGRAPH_I_SORT } igraph_i_lazy_adlist_simplify_t;
 	       
 
 /* -------------------------------------------------- */

@@ -1,5 +1,8 @@
 2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/adjlist.c (igraph_i_lazy_adjlist_get_real) 
+	* src/igraph.h (igraph_i_lazy_adjlist_simplify_t) : SORT option added
+
 	* src/topology.c (igraph_isomorphic_vf2) : heuristics added
 
 	* src/vector.c (igraph_vector_contains) : added
