@@ -1,6 +1,8 @@
 2007-03-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* interfaces/R/igraph/R/topology.R (igraph.isomorphic.vf2) : added
+	* interfaces/R/igraph/R/foreign.R (graph.graphdb) : added
+
+	* interfaces/R/igraph/R/topology.R (graph.isomorphic.vf2) : added
 	* interfaces/R/src/rinterface.c (R_igraph_isomorphic_vf2) : added
 
 2007-03-29  Gabor Csardi  <csardi@rmki.kfki.hu>

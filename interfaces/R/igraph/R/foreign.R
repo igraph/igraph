@@ -247,3 +247,74 @@ write.graph.graphml <- function(graph, file, ...) {
   .Call("R_igraph_write_graph_graphml", graph, file,
         PACKAGE="igraph")
 }
+
+################################################################
+# Download a file from the graph database for
+# isomorphic problems
+################################################################
+
+graph.graphdb <- function(prefix="iso", type="r001", nodes=NULL, pair="A", which=0,
+                          base="http://cneurocvs.rmki.kfki.hu/graphdb/gzip",
+                          url=NULL, compressed=TRUE, directed=TRUE) {
+  
+  if (is.null(nodes) && is.null(url)) {
+    stop("The `nodes' or the `url' argument must be non-null")
+  }
+
+  if (is.null(url)) {
+  
+    prefixes <- c("iso", "si6", "mcs10", "mcs30", "mcs50", "mcs70", "mcs90")
+    types <- c("r001", "r005", "r01", "r02", "m2D", "m2Dr2", "m2Dr4", "m2Dr6",
+               "m3D", "m3Dr2", "m3Dr4", "m3Dr6", "m4D", "m4Dr2", "m4Dr4",
+               "m4Dr6", "b03", "b03m", "b06", "b06m", "b09", "b09m")
+    sizecode <- if (nodes<=100) "s" else if (nodes<2000) "m" else "l" # "l" ????
+    typegroups <- c("rand", "rand", "rand", "rand",
+                    "m2D", "m2D", "m2D", "m2D",
+                    "m2D", "m3D", "m3D", "m3D",
+                    "m4D", "m4D", "m4D", "m4D",
+                    "bvg", "bvg", "bvg", "bvg", "bvg", "bvg")
+    typegroup <- typegroups[which(types==type)]
+    
+    if (!prefix %in% prefixes) {
+      stop("Invalid prefix!")
+    }
+    if (!type %in% types) {
+      stop("Invalid graph type!")
+    }
+    suff <- if (compressed) ".gz" else ""
+    filename <- paste(sep="", base, "/", prefix, "/", typegroup, "/", type, "/",
+                      prefix, "_", type, "_", sizecode, nodes,
+                      ".", pair, formatC(which, width=2, flag="0"), suff)
+  } else {
+    filename <- url
+  }
+  
+  ## ok, we have the filename
+
+  f <- try(gzcon(file(filename, open="rb")))
+  if (inherits(f, "try-error")) {
+    stop(paste("Cannot open URL:", filename));
+  }
+  on.exit(close(f))
+
+  getNumber <- function(n) {
+    readBin(f, what=integer(0), n=n, size=2, signed=FALSE, endian="little")
+  }
+  
+  size <- getNumber(1)
+  if (!is.null(nodes) && nodes != size) {
+    stop("Mysterious error, number of vertices mismatch!")
+  }
+
+  el <- numeric()
+  for (v in seq(length=size)-1) {
+    no.neis <- getNumber(1)
+    neis <- getNumber(no.neis)
+    if (length(neis) != 0) {
+      el <- c(el, t(cbind(v, neis)))
+    }
+  }
+
+  graph(el, n=size, directed=directed)
+}
+
