@@ -84,7 +84,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 			  int size, const igraph_vector_t *cut_prob) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_i_adjlist_t allneis;
+  igraph_i_adjlist_t allneis, alloutneis;
   igraph_vector_t *neis;
   long int father;
   long int i, j, s;
@@ -101,11 +101,6 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   int code=0;
   unsigned char mul, idx;
 
-  igraph_vector_t deg;
-
-  IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
-  igraph_degree(graph, &deg, igraph_vss_all(), IGRAPH_OUT, 1);
-  
   if (size != 3 && size != 4) {
     IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
 		 IGRAPH_EINVAL);
@@ -149,8 +144,10 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   }
   IGRAPH_FINALLY(igraph_free, subg);
 
-  igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL);
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);  
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &alloutneis, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &alloutneis);  
 
   IGRAPH_VECTOR_INIT_FINALLY(&vids, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&adjverts, 0);
@@ -202,8 +199,8 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 	  code=0; idx=0;
 	  for (k=0; k<size; k++) {
 	    long int from=VECTOR(vids)[k];
- 	    neis=igraph_i_adjlist_get(&allneis, from);
-	    s2=VECTOR(deg)[from];
+ 	    neis=igraph_i_adjlist_get(&alloutneis, from);
+	    s2=igraph_vector_size(neis);
 	    for (j=0; j<s2; j++) {
 	      long int nei=VECTOR(*neis)[j];
 	      if (subg[nei] && k != subg[nei]-1) {
@@ -286,9 +283,9 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   Free(subg);
   igraph_vector_destroy(&vids);
   igraph_vector_destroy(&adjverts);
+  igraph_i_adjlist_destroy(&alloutneis);
   igraph_i_adjlist_destroy(&allneis);
   igraph_stack_destroy(&stack);
-  igraph_vector_destroy(&deg);
   IGRAPH_FINALLY_CLEAN(7);
   return 0;
 }

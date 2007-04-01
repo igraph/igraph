@@ -1,5 +1,11 @@
 2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/type_indexededgelist.c (igraph_neighbors) : always return 
+	sorted vertex id lise
+	* src/motifs.c (igraph_motifs_randesu) : this nasty implementation
+	used the fact that for a directed graph and IGRAPH_ALL, the outgoing 
+	edges came first. Not anymore, updated.
+
 	* src/type_indexededgelist.c (igraph_add_edges) : make sure that
 	for undirected graphs the smaller node id is in 'from'
 
