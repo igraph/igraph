@@ -949,13 +949,17 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
   IGRAPH_VECTOR_INIT_FINALLY(&out_2, no_of_nodes);
   IGRAPH_CHECK(igraph_stack_init(&path, 0));
   IGRAPH_FINALLY(igraph_stack_destroy, &path);
-  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, 0));
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, 
+					  IGRAPH_I_SORT));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &inadj1);
-  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT, 0));
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT, 
+					  IGRAPH_I_SORT));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &outadj1);
-  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph2, &inadj2, IGRAPH_IN, 0));
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph2, &inadj2, IGRAPH_IN, 
+					  IGRAPH_I_SORT));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &inadj2);
-  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, 0));
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, 
+					  IGRAPH_I_SORT));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &outadj2);
   IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);
@@ -1132,7 +1136,7 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 	if (VECTOR(core_1)[node]!=0) {
 	  long int node2=VECTOR(core_1)[node]-1;
 	  /* check if there is a node2->cand2 edge */
-	  if (!igraph_vector_contains(inneis_2, node2)) {
+	  if (!igraph_vector_binsearch(inneis_2, node2, 0)) {
 	    end=1;
 	  }
 	} else { 
@@ -1149,7 +1153,7 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 	if (VECTOR(core_1)[node]!=0) {
 	  long int node2=VECTOR(core_1)[node]-1;
 	  /* check if there is a cand2->node2 edge */
-	  if (!igraph_vector_contains(outneis_2, node2)) {
+	  if (!igraph_vector_binsearch(outneis_2, node2, 0)) {
 	    end=1;
 	  }
 	} else {
@@ -1166,7 +1170,7 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 	if (VECTOR(core_2)[node]!=0) {
 	  long int node2=VECTOR(core_2)[node]-1;
 	  /* check if there is a node2->cand1 edge */
-	  if (!igraph_vector_contains(inneis_1, node2)) {
+	  if (!igraph_vector_binsearch(inneis_1, node2, 0)) {
 	    end=1;
 	  }
 	} else { 
@@ -1183,7 +1187,7 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 	if (VECTOR(core_2)[node] != 0) {
 	  long int node2=VECTOR(core_2)[node]-1;
 	  /* check if there is a cand1->node2 edge */
-	  if (!igraph_vector_contains(outneis_1, node2)) {
+	  if (!igraph_vector_binsearch(outneis_1, node2, 0)) {
 	    end=1;
 	  }
 	} else {
