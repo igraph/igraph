@@ -1,3 +1,12 @@
+2007-04-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/flow.c (igraph_i_mincut_value_undirected)
+	(igraph_i_mincut_undirected) : former renamed to latter and 
+	minimum cut calculation added, there is a simple wrapper under the 
+	name of the former
+	(igraph_mincut) : added, simple wrapper
+	* examples/simple/igraph_mincut.c : added
+
 2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/topology.c (igraph_isoclass_create) : bug corrected, sometimes 

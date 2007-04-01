@@ -25,3 +25,8 @@ AT_SETUP([Maximum flow (igraph_maxflow): ])
 AT_KEYWORDS([maximum flow maxflow minimum cut])
 AT_COMPILE_CHECK([simple/flow.c], [], [simple/ak-4102.max])
 AT_CLEANUP
+
+AT_SETUP([Minimum cut (igraph_mincut): ])
+AT_KEYWORDS([minimum cut Stoer-Wagner])
+AT_COMPILE_CHECK([simple/igraph_mincut.c], [simple/igraph_mincut.out])
+AT_CLEANUP

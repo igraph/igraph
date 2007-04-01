@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "error.h"
+#include "memory.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -411,12 +412,13 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
 /*   return 0; */
 /* } */
 
-int igraph_i_mincut_value_undirected(const igraph_t *graph, 
-				     igraph_integer_t *res,
-				     const igraph_vector_t *capacity) {
+int igraph_i_mincut_undirected(const igraph_t *graph, 
+			       igraph_integer_t *res,
+			       igraph_vector_t *partition,
+			       const igraph_vector_t *capacity) {
   
   long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  long int no_of_edges=igraph_ecount(graph);  
 
   igraph_i_cutheap_t heap;
   igraph_real_t mincut=1.0/0.0;	/* infinity */
@@ -424,11 +426,19 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
   
   igraph_i_adjlist_t adjlist;
   igraph_i_adjedgelist_t adjedgelist;
+
+  igraph_vector_t mergehist;
+  long int act_step=0, mincut_step=0;
   
   if (igraph_vector_size(capacity) != no_of_edges) {
     IGRAPH_ERROR("Invalid capacity vector size", IGRAPH_EINVAL);
   }
   
+  if (partition) {
+    IGRAPH_VECTOR_INIT_FINALLY(&mergehist, 0);
+    IGRAPH_CHECK(igraph_vector_reserve(&mergehist, no_of_nodes*2));
+  }
+
   IGRAPH_CHECK(igraph_i_cutheap_init(&heap, no_of_nodes));
   IGRAPH_FINALLY(igraph_i_cutheap_destroy, &heap);
 
@@ -469,6 +479,7 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
 
     if (acut < mincut) {
       mincut=acut;
+      mincut_step=act_step;
     }    
 
     if (mincut == 0) {
@@ -476,6 +487,12 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
     }
 
     /* And contract the last and the remaining vertex (a and last) */
+    /* Before actually doing that, make some notes */
+    act_step++;
+    if (partition) {
+      IGRAPH_CHECK(igraph_vector_push_back(&mergehist, a));
+      IGRAPH_CHECK(igraph_vector_push_back(&mergehist, last));
+    }
     /* First remove the a--last edge if there is one, a is still the
        last deactivated vertex */
     edges=igraph_i_adjedgelist_get(&adjedgelist, a);
@@ -543,7 +560,67 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
   igraph_i_adjlist_destroy(&adjlist);
   igraph_i_cutheap_destroy(&heap);
   IGRAPH_FINALLY_CLEAN(3);
+
+  if (partition) {
+    long int bignode=VECTOR(mergehist)[2*mincut_step+1];
+    long int i;
+    long int size=1;
+    char *mark;
+    mark=Calloc(no_of_nodes, char);
+    if (!mark) { 
+      IGRAPH_ERROR("Not enough memory for minumum cut", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, mark);
+    
+    /* first count the vertices in the partition */
+    mark[bignode]=1;
+    for (i=mincut_step-1; i>=0; i--) {
+      if ( mark[ (long int) VECTOR(mergehist)[2*i] ] ) {
+	size++;
+	mark [ (long int) VECTOR(mergehist)[2*i+1] ]=1;
+      }
+    }
+	
+    /* now store them */
+    IGRAPH_CHECK(igraph_vector_resize(partition, size));
+    size=0;
+    VECTOR(*partition)[size++]=bignode;
+    for (i=mincut_step-1; i>=0; i--) {
+      if (mark[ (long int) VECTOR(mergehist)[2*i] ]) {
+	VECTOR(*partition)[size++] = VECTOR(mergehist)[2*i+1];
+      }
+    }
+    
+    igraph_free(mark);
+    igraph_vector_destroy(&mergehist);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+  
   return 0;
+}
+
+int igraph_mincut(const igraph_t *graph,
+		  igraph_integer_t *value,
+		  igraph_vector_t *partition,
+		  const igraph_vector_t *capacity) {
+  
+  if (igraph_is_directed(graph) && partition) {
+    IGRAPH_ERROR("Minumum cut for directed graph not yet implemented", 
+		 IGRAPH_UNIMPLEMENTED);
+  } else if (!partition) {
+    return igraph_mincut_value(graph, value, capacity);
+  } else {
+    return igraph_i_mincut_undirected(graph, value, partition, capacity);
+  }
+  
+  return 0;
+}
+    
+
+int igraph_i_mincut_value_undirected(const igraph_t *graph, 
+				     igraph_integer_t *res,
+				     const igraph_vector_t *capacity) {
+  return igraph_i_mincut_undirected(graph, res, 0, capacity);
 }
 
 /** 

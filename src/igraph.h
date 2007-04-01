@@ -1016,6 +1016,11 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
                            igraph_integer_t source, igraph_integer_t target,
 			   const igraph_vector_t *capacity);
 
+int igraph_mincut(const igraph_t *graph,
+		  igraph_integer_t *value,
+		  igraph_vector_t *partition,
+		  const igraph_vector_t *capacity);
+
 int igraph_st_vertex_connectivity(const igraph_t *graph, 
 				  igraph_integer_t *res,
 				  igraph_integer_t source,
