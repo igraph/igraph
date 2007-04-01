@@ -123,7 +123,7 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
 /* } */
 
 void igraph_i_adjlist_sort(igraph_i_adjlist_t *al) {
-  /* Nothing to do, it is sorted */
+  /* nothing to do */
 /*   long int i; */
 /*   for (i=0; i<al->length; i++) */
 /*     igraph_vector_sort(&al->adjs[i]); */

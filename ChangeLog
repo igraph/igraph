@@ -1,5 +1,8 @@
 2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/type_indexededgelist.c (igraph_add_edges) : make sure that
+	for undirected graphs the smaller node id is in 'from'
+
 	* src/adjlist.c (igraph_i_adjlist_sort)
 	(igraph_i_lazy_adjlist_get_real) : updated to take advantage of 
 	the sorted neighbor lists

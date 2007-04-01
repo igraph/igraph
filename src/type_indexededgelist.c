@@ -231,6 +231,7 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
   igraph_error_handler_t *oldhandler;
   int ret1, ret2;
   igraph_vector_t newoi, newii;
+  igraph_bool_t directed=igraph_is_directed(graph);
 
   if (igraph_vector_size(edges) % 2 != 0) {
     IGRAPH_ERROR("invalid (odd) length of edges vector", IGRAPH_EINVEVECTOR);
@@ -244,8 +245,13 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
   IGRAPH_CHECK(igraph_vector_reserve(&graph->to  , no_of_edges+edges_to_add));
 
   while (i<edges_to_add*2) {
-    igraph_vector_push_back(&graph->from, VECTOR(*edges)[i++]); /* reserved */
-    igraph_vector_push_back(&graph->to,   VECTOR(*edges)[i++]); /* reserved */
+    if (directed || VECTOR(*edges)[i] > VECTOR(*edges)[i+1]) {
+      igraph_vector_push_back(&graph->from, VECTOR(*edges)[i++]); /* reserved */
+      igraph_vector_push_back(&graph->to,   VECTOR(*edges)[i++]); /* reserved */
+    } else {
+      igraph_vector_push_back(&graph->to,   VECTOR(*edges)[i++]); /* reserved */
+      igraph_vector_push_back(&graph->from, VECTOR(*edges)[i++]); /* reserved */
+    }      
   }
 
   /* disable the error handler temporarily */
