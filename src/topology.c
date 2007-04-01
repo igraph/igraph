@@ -915,7 +915,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
     pos++;
   }
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, size, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
