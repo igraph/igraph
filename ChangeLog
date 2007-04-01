@@ -1,5 +1,9 @@
 2007-04-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/flow.c (igraph_mincut, igraph_i_mincut_undirected) :
+	'partition2' and 'cut' arguments added
+	* examples/simple/igraph_mincut.c : updated
+
 	* src/flow.c (igraph_i_mincut_value_undirected)
 	(igraph_i_mincut_undirected) : former renamed to latter and 
 	minimum cut calculation added, there is a simple wrapper under the 

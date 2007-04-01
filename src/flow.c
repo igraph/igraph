@@ -415,6 +415,8 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
 int igraph_i_mincut_undirected(const igraph_t *graph, 
 			       igraph_integer_t *res,
 			       igraph_vector_t *partition,
+			       igraph_vector_t *partition2,
+			       igraph_vector_t *cut,
 			       const igraph_vector_t *capacity) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -428,13 +430,14 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   igraph_i_adjedgelist_t adjedgelist;
 
   igraph_vector_t mergehist;
+  igraph_bool_t calc_cut=partition || partition2 || cut;
   long int act_step=0, mincut_step=0;
   
   if (igraph_vector_size(capacity) != no_of_edges) {
     IGRAPH_ERROR("Invalid capacity vector size", IGRAPH_EINVAL);
   }
-  
-  if (partition) {
+
+  if (calc_cut) {
     IGRAPH_VECTOR_INIT_FINALLY(&mergehist, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&mergehist, no_of_nodes*2));
   }
@@ -489,7 +492,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     /* And contract the last and the remaining vertex (a and last) */
     /* Before actually doing that, make some notes */
     act_step++;
-    if (partition) {
+    if (calc_cut) {
       IGRAPH_CHECK(igraph_vector_push_back(&mergehist, a));
       IGRAPH_CHECK(igraph_vector_push_back(&mergehist, last));
     }
@@ -561,9 +564,9 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   igraph_i_cutheap_destroy(&heap);
   IGRAPH_FINALLY_CLEAN(3);
 
-  if (partition) {
+  if (calc_cut) {
     long int bignode=VECTOR(mergehist)[2*mincut_step+1];
-    long int i;
+    long int i, idx;
     long int size=1;
     char *mark;
     mark=Calloc(no_of_nodes, char);
@@ -581,16 +584,47 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       }
     }
 	
-    /* now store them */
-    IGRAPH_CHECK(igraph_vector_resize(partition, size));
-    size=0;
-    VECTOR(*partition)[size++]=bignode;
-    for (i=mincut_step-1; i>=0; i--) {
-      if (mark[ (long int) VECTOR(mergehist)[2*i] ]) {
-	VECTOR(*partition)[size++] = VECTOR(mergehist)[2*i+1];
+    /* now store them, if requested */
+    if (partition) {
+      IGRAPH_CHECK(igraph_vector_resize(partition, size));
+      idx=0;
+      VECTOR(*partition)[idx++]=bignode;
+      for (i=mincut_step-1; i>=0; i--) {
+	if (mark[ (long int) VECTOR(mergehist)[2*i] ]) {
+	  VECTOR(*partition)[idx++] = VECTOR(mergehist)[2*i+1];
+	}
+      }
+    }
+
+    /* The other partition too? */
+    if (partition2) {
+      IGRAPH_CHECK(igraph_vector_resize(partition2, no_of_nodes-size));
+      idx=0;
+      for (i=0; i<no_of_nodes; i++) {
+	if (!mark[i]) {
+	  VECTOR(*partition2)[idx++]=i;
+	}
       }
     }
     
+    /* The edges in the cut are also requested? */
+    /* We want as few memory allocated for 'cut' as possible,
+       so we first collect the edges in mergehist, we don't 
+       need that anymore. Then we copy it to 'cut';  */
+    if (cut) {
+      igraph_integer_t from, to;
+      igraph_vector_clear(&mergehist);
+      for (i=0; i<no_of_edges; i++) {
+	igraph_edge(graph, i, &from, &to);
+	if ((mark[(long int)from] && !mark[(long int)to]) ||
+	    (mark[(long int)to] && !mark[(long int)from])) {
+	  IGRAPH_CHECK(igraph_vector_push_back(&mergehist, i));
+	}
+      }
+      igraph_vector_clear(cut);
+      IGRAPH_CHECK(igraph_vector_append(cut, &mergehist));
+    }
+
     igraph_free(mark);
     igraph_vector_destroy(&mergehist);
     IGRAPH_FINALLY_CLEAN(2);
@@ -602,15 +636,19 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
 int igraph_mincut(const igraph_t *graph,
 		  igraph_integer_t *value,
 		  igraph_vector_t *partition,
+		  igraph_vector_t *partition2,
+		  igraph_vector_t *cut,
 		  const igraph_vector_t *capacity) {
   
-  if (igraph_is_directed(graph) && partition) {
-    IGRAPH_ERROR("Minumum cut for directed graph not yet implemented", 
+  if (igraph_is_directed(graph) && 
+      (partition || partition2 || cut)) {
+    IGRAPH_ERROR("Minimum cut for directed graph not yet implemented", 
 		 IGRAPH_UNIMPLEMENTED);
-  } else if (!partition) {
+  } else if (!partition && !partition2 && !cut) {
     return igraph_mincut_value(graph, value, capacity);
   } else {
-    return igraph_i_mincut_undirected(graph, value, partition, capacity);
+    return igraph_i_mincut_undirected(graph, value, partition, 
+				      partition2, cut, capacity);
   }
   
   return 0;
@@ -620,7 +658,7 @@ int igraph_mincut(const igraph_t *graph,
 int igraph_i_mincut_value_undirected(const igraph_t *graph, 
 				     igraph_integer_t *res,
 				     const igraph_vector_t *capacity) {
-  return igraph_i_mincut_undirected(graph, res, 0, capacity);
+  return igraph_i_mincut_undirected(graph, res, 0, 0, 0, capacity);
 }
 
 /** 

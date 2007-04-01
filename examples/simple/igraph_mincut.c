@@ -23,10 +23,18 @@
 
 #include <igraph.h>
 
+int print_vector(const igraph_vector_t *v) {
+  long int i, size=igraph_vector_size(v);
+  for (i=0; i<size; i++) {
+    printf("%g ", (double) VECTOR(*v)[i]);
+  }
+  printf("\n");
+}
+
 int main() {
   
   igraph_t g;
-  igraph_vector_t weights, partition;
+  igraph_vector_t weights, partition, partition2, cut;
   igraph_integer_t value;
   long int i;
   
@@ -37,17 +45,34 @@ int main() {
   igraph_vector_init_int_end(&weights, -1, 2,3,3,2,2, 4,2,2,2,3, 1,3, -1);
   
   igraph_vector_init(&partition, 0);
+  igraph_vector_init(&partition2, 0);
+  igraph_vector_init(&cut, 0);
   
-  igraph_mincut(&g, &value, &partition, &weights);
+  igraph_mincut(&g, &value, &partition, &partition2, &cut, &weights);
   
   printf("mincut value: %g\n", (double) value);
   
-  printf("first partition: ");
-  for (i=0; i<igraph_vector_size(&partition); i++) {
-    printf("%g ", (double) VECTOR(partition)[i]);
+  printf("first partition:  ");
+  igraph_vector_sort(&partition);
+  print_vector(&partition);
+  printf("second partition: ");
+  igraph_vector_sort(&partition2);
+  print_vector(&partition2);
+  printf("edges in the cut: ");
+  for (i=0; i<igraph_vector_size(&cut); i++) {
+    igraph_integer_t from, to;
+    igraph_edge(&g, VECTOR(cut)[i], &from, &to);
+    if (from > to) {
+      igraph_integer_t tmp=from;
+      from=to;
+      to=tmp;
+    }
+    printf("%li-%li ", (long int)from, (long int)to);
   }
   printf("\n");
- 
+
+  igraph_vector_destroy(&cut);
+  igraph_vector_destroy(&partition2);
   igraph_vector_destroy(&partition);
   igraph_vector_destroy(&weights);
   igraph_destroy(&g);
