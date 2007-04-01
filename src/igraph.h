@@ -927,6 +927,8 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
 			     igraph_integer_t *target, 
 			     igraph_vector_t *capacity, 
 			     igraph_bool_t directed);
+int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream, 
+			      igraph_bool_t directed);
 
 int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream);
 int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,

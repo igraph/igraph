@@ -730,6 +730,62 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
   return 0;
 }
 
+int igraph_i_read_graph_graphdb_getword(FILE *instream) {
+  int b1, b2;
+  unsigned char c1, c2;
+  b1 = fgetc(instream);
+  b2 = fgetc(instream);
+  if (b1 != EOF) {
+    c1=b1; c2=b2;
+    return c1 | (c2<<8);
+  } else {
+    return -1;
+  }
+}
+
+int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream, 
+			      igraph_bool_t directed) {
+  
+  igraph_vector_t edges;
+  long int nodes;
+  long int i, j;
+  igraph_bool_t end=0;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
+  nodes=igraph_i_read_graph_graphdb_getword(instream);
+  if (nodes<0) {
+    IGRAPH_ERROR("Can't read from file", IGRAPH_EFILE);
+  }
+  for (i=0; !end && i<nodes; i++) {
+    long int len=igraph_i_read_graph_graphdb_getword(instream);
+    if (len<0) {
+      end=1;
+      break;
+    }
+    for (j=0; ! end && j<len; j++) {
+      long int to=igraph_i_read_graph_graphdb_getword(instream);
+      if (to<0) {
+	end=1; 
+	break;
+      }
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+    }
+  }
+
+  if (end) {
+    IGRAPH_ERROR("Truncated graphdb file", IGRAPH_EFILE);
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+  igraph_vector_destroy(&edges);
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+		             
+
 /**
  * \ingroup loadsave
  * \function igraph_write_graph_edgelist

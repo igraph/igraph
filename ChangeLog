@@ -1,5 +1,7 @@
 2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/foreign.c (igraph_read_graph_graphdb) : added
+
 	* src/adjlist.c (igraph_i_lazy_adjlist_get_real) 
 	* src/igraph.h (igraph_i_lazy_adjlist_simplify_t) : SORT option added
 

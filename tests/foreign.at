@@ -49,3 +49,9 @@ AT_KEYWORDS([igraph_write_graph_lgl foreign LGL])
 AT_COMPILE_CHECK([simple/igraph_write_graph_lgl.c])
 AT_CLEANUP
 
+AT_SETUP([Reading a graph from the graph database (igraph_read_graph_graphdb):])
+AT_KEYWORDS([igraph_read_graph_graphdb foreign graphdb database isomorphism])
+AT_COMPILE_CHECK([simple/igraph_read_graph_graphdb.c],
+	[simple/igraph_read_graph_graphdb.out],
+	[simple/iso_b03_m1000.A00])
+AT_CLEANUP
