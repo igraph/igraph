@@ -117,7 +117,7 @@ export(evolver.d, evolver.ad)
 # isomorphism, motifs
 
 export(graph.isoclass, graph.isomorphic, graph.motifs,
-       graph.motifs.est, graph.isocreate, graph.motifs.no)
+       graph.motifs.est, graph.isocreate, graph.motifs.no, graph.isomorphic.vf2)
 
 # operators
 

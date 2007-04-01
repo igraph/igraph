@@ -920,3 +920,266 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/* TODO: use lazy adjacency lists! */
+/* TODO: implement heuristics */
+/* TODO: return matching */
+/* TODO: does not work for unconnected graphs */
+int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+			  igraph_bool_t *iso) {
+  
+  long int no_of_nodes=igraph_vcount(graph1);
+  igraph_vector_t core_1, core_2;
+  igraph_vector_t in_1, in_2, out_1, out_2;
+  long int in_1_size=0, in_2_size=0, out_1_size=0, out_2_size=0;
+  igraph_vector_t neis;
+  long int matched_nodes=0;
+  long int depth;
+  long int cand1, cand2;
+  long int last1, last2;
+  igraph_stack_t path;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&core_1, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&core_2, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&in_1, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&in_2, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&out_1, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&out_2, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_stack_init(&path, 0));
+  IGRAPH_FINALLY(igraph_stack_destroy, &path);
+
+  *iso=0;
+
+  depth=0; last1=-1; last2=-1;
+  while (matched_nodes != no_of_nodes && depth >= 0) {
+    long int i;
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    cand1=-1; cand2=-1;
+    /* Search for the next pair to try */
+    if ((in_1_size == 0 && in_2_size != 0) ||
+	(in_1_size != 0 && in_2_size == 0) ||
+	(out_1_size == 0 && out_2_size != 0) ||
+	(out_1_size != 0 && out_2_size == 0)) {
+      /* step back, nothing to do */
+/*       fprintf(stderr, "  CASE 1 (%li,%li,%li,%li)\n",  */
+/* 	      in_1_size, out_1_size, in_2_size, out_2_size); */
+    } else if (out_1_size > 0 && out_2_size > 0) {
+      /**************************************************************/
+      /* cand2, search not always needed */
+/*       fprintf(stderr, "  CASE 2 (%li,%li,%li,%li)\n",  */
+/* 	      in_1_size, out_1_size, in_2_size, out_2_size); */
+      if (last2 >= 0) {
+	cand2=last2;
+      } else {
+	i=0;
+	while (cand2<0) {
+	  if (VECTOR(out_2)[i]>0 && VECTOR(core_2)[i]==0) {
+	    cand2=i;
+	  }
+	  i++;
+	}
+      }
+      /* search for cand1 now, it should be bigger than last1 */
+      i=last1+1;
+      while (cand1<0 && i<no_of_nodes) {
+	if (VECTOR(out_1)[i]>0 && VECTOR(core_1)[i]==0) {
+	  cand1=i;
+	}
+	i++;
+      }
+    } else if (in_1_size > 0 && in_2_size > 0) {
+      /**************************************************************/
+      /* cand2, search not always needed */
+/*       fprintf(stderr, "  CASE 3 (%li,%li,%li,%li)\n",  */
+/* 	      in_1_size, out_1_size, in_2_size, out_2_size); */
+      if (last2 >= 0) {
+	cand2=last2;
+      } else {
+	i=0;
+	while (cand2<0) {
+	  if (VECTOR(in_2)[i]>0 && VECTOR(core_2)[i]==0) {
+	    cand2=i;
+	  }
+	  i++;
+	}
+      }
+      /* search for cand1 now, should be bigger than last1 */
+      i=last1+1;
+      while (cand1<0 && i<no_of_nodes) {
+	if (VECTOR(in_1)[i]>0 && VECTOR(core_1)[i]==0) {
+	  cand1=i;
+	}
+	i++;
+      }
+    } else {
+      /**************************************************************/
+      /* cand2, search not always needed */
+/*       fprintf(stderr, "  CASE 4 (%li,%li,%li,%li)\n",  */
+/* 	      in_1_size, out_1_size, in_2_size, out_2_size); */
+      if (last2 >= 0) {
+	cand2=last2;
+      } else {
+	i=0;
+	while (cand2<0) {
+	  if (VECTOR(core_2)[i]==0) { 
+	    cand2=i;
+	  }
+	  i++;
+	}
+      }
+      /* search for cand1, should be bigger than last1 */
+      i=last1+1;
+      while (cand1<0 && i<no_of_nodes) {
+	if (VECTOR(core_1)[i]==0) {
+	  cand1=i;
+	}
+	i++;
+      }
+    }
+
+    /* Ok, we have cand1, cand2 as candidates. Or not? */
+    if (cand1<0 || cand2<0) {
+      /**************************************************************/
+      /* dead end, step back, if possible. Otherwise we'll terminate */
+      if (depth >= 1) {
+	last2=igraph_stack_pop(&path);
+	last1=igraph_stack_pop(&path);
+	matched_nodes -= 1;
+/* 	fprintf(stderr, "removing match %li-%li\n", last1, last2); */
+	VECTOR(core_1)[last1]=0;
+	VECTOR(core_2)[last2]=0;
+
+	if (VECTOR(in_1)[last1] != 0) {
+	  in_1_size += 1;
+	}
+	if (VECTOR(out_1)[last1] != 0) {
+	  out_1_size += 1;
+	}
+	if (VECTOR(in_2)[last2] != 0) {
+	  in_2_size += 1;
+	} 
+	if (VECTOR(out_2)[last2] != 0) {
+	  out_2_size += 1;
+	}
+	
+	IGRAPH_CHECK(igraph_neighbors(graph1, &neis, last1, IGRAPH_IN));
+	for (i=0; i<igraph_vector_size(&neis); i++) {
+	  long int node=VECTOR(neis)[i];
+	  if (VECTOR(in_1)[node] == depth) {
+	    VECTOR(in_1)[node]=0;
+	    in_1_size -= 1;
+	  }
+	}
+	IGRAPH_CHECK(igraph_neighbors(graph1, &neis, last1, IGRAPH_OUT));
+	for (i=0; i<igraph_vector_size(&neis); i++) {
+	  long int node=VECTOR(neis)[i];
+	  if (VECTOR(out_1)[node] == depth) {
+	    VECTOR(out_1)[node]=0;
+	    out_1_size -= 1;
+	  }
+	}
+	IGRAPH_CHECK(igraph_neighbors(graph2, &neis, last2, IGRAPH_IN));
+	for (i=0; i<igraph_vector_size(&neis); i++) {
+	  long int node=VECTOR(neis)[i];
+	  if (VECTOR(in_2)[node] == depth) {
+	    VECTOR(in_2)[node]=0;
+	    in_2_size -= 1;
+	  }
+	}
+	IGRAPH_CHECK(igraph_neighbors(graph2, &neis, last2, IGRAPH_OUT));      
+	for (i=0; i<igraph_vector_size(&neis); i++) {
+	  long int node=VECTOR(neis)[i];
+	  if (VECTOR(out_2)[node] == depth) {
+	    VECTOR(out_2)[node]=0;
+	    out_2_size -= 1;
+	  }
+	}
+	
+      }	/* end of stepping back */
+      
+      depth -= 1;
+
+    } else {
+      /**************************************************************/
+      /* step forward if worth, or take next candidate */
+      /* TODO: check whether it is worth stepping this way */
+      
+      /* Ok, we add the (cand1, cand2) pair to the mapping */
+      depth += 1;
+/*       fprintf(stderr, "matching %li-%li\n", cand1, cand2); */
+      IGRAPH_CHECK(igraph_stack_push(&path, cand1));
+      IGRAPH_CHECK(igraph_stack_push(&path, cand2));
+      matched_nodes += 1;
+      VECTOR(core_1)[cand1]=cand2+1;
+      VECTOR(core_2)[cand2]=cand1+1;
+
+      /* update in_*, out_* */
+      if (VECTOR(in_1)[cand1] != 0) {
+	in_1_size -= 1;
+      }
+      if (VECTOR(out_1)[cand1] != 0) {
+	out_1_size -= 1;
+      }
+      if (VECTOR(in_2)[cand2] != 0) {
+	in_2_size -= 1;
+      }
+      if (VECTOR(out_2)[cand2] != 0) {
+	out_2_size -= 1;
+      }
+	
+      IGRAPH_CHECK(igraph_neighbors(graph1, &neis, cand1, IGRAPH_IN));
+      for (i=0; i<igraph_vector_size(&neis); i++) {
+	long int node=VECTOR(neis)[i];
+	if (VECTOR(in_1)[node]==0 && VECTOR(core_1)[node]==0) {
+	  VECTOR(in_1)[node]=depth;
+	  in_1_size += 1;
+	}
+      }
+      IGRAPH_CHECK(igraph_neighbors(graph1, &neis, cand1, IGRAPH_OUT));
+      for (i=0; i<igraph_vector_size(&neis); i++) {
+	long int node=VECTOR(neis)[i];
+	if (VECTOR(out_1)[node]==0 && VECTOR(core_1)[node]==0) {
+	  VECTOR(out_1)[node]=depth;
+	  out_1_size += 1;
+	}
+      }
+      IGRAPH_CHECK(igraph_neighbors(graph2, &neis, cand2, IGRAPH_IN));
+      for (i=0; i<igraph_vector_size(&neis); i++) {
+	long int node=VECTOR(neis)[i];
+	if (VECTOR(in_2)[node]==0 && VECTOR(core_2)[node]==0) {
+	  VECTOR(in_2)[node]=depth;
+	  in_2_size += 1;
+	}
+      }
+      IGRAPH_CHECK(igraph_neighbors(graph2, &neis, cand2, IGRAPH_OUT));
+      for (i=0; i<igraph_vector_size(&neis); i++) {
+	long int node=VECTOR(neis)[i];
+	if (VECTOR(out_2)[node]==0 && VECTOR(core_2)[node]==0) {
+	  VECTOR(out_2)[node]=depth;
+	  out_2_size += 1;
+	}
+      }
+      last1=-1; last2=-1;    	      /* this the first time here */
+      
+    } /* end of stepping down */
+
+  }
+
+  *iso=(matched_nodes==no_of_nodes);
+  
+  igraph_stack_destroy(&path);
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&out_2);
+  igraph_vector_destroy(&out_1);
+  igraph_vector_destroy(&in_2);
+  igraph_vector_destroy(&in_1);
+  igraph_vector_destroy(&core_2);
+  igraph_vector_destroy(&core_1);
+  IGRAPH_FINALLY_CLEAN(8);
+  
+  return 0;
+}
+

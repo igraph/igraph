@@ -44,3 +44,13 @@ graph.isocreate <- function(size, number, directed=TRUE) {
         as.numeric(number), as.logical(directed),
         PACKAGE="igraph")
 }
+
+graph.isomorphic.vf2 <- function(graph1, graph2) {
+
+  if (!is.igraph(graph1) || !is.igraph(graph2)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_isomorphic_vf2", graph1, graph2,
+        PACKAGE="igraph")
+}  
+

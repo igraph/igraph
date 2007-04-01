@@ -950,6 +950,8 @@ int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
 			     int *isoclass);
 int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 			   igraph_integer_t number, igraph_bool_t directed);
+int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+			  igraph_bool_t *iso);
 
 /* -------------------------------------------------- */
 /* Graph motifs                                       */

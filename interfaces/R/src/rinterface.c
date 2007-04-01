@@ -5649,6 +5649,26 @@ SEXP R_igraph_citing_cited_type_game(SEXP pnodes, SEXP ptypes, SEXP ppref,
   return result;
 }
 
+SEXP R_igraph_isomorphic_vf2(SEXP graph1, SEXP graph2) {
+  
+  igraph_t g1, g2;
+  igraph_bool_t iso;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph1, &g1);
+  R_SEXP_to_igraph(graph2, &g2);
+  igraph_isomorphic_vf2(&g1, &g2, &iso);
+  PROTECT(result=NEW_LOGICAL(1));
+  LOGICAL(result)[0]=iso;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP pdebug) {
   igraph_t g;

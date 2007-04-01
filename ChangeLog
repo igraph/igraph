@@ -1,3 +1,7 @@
+2007-03-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_isomorphic_vf2) : added
+
 2007-03-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/evolver.c (igraph_evolver_d, igraph_evolver_mes_d)
