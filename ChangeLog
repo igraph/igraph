@@ -1,5 +1,19 @@
 2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/vector.c (igraph_vector_order, igraph_vector_order1) : two vectors 
+	can be supplied now as the basis of the ranking, 
+	old version renamed to igraph_vector_order1
+	* src/measure_dynamics.c (igraph_measure_dynamics_d_d)
+	(igraph_measure_dynamics_d_d_st)
+	* src/structural_properties.c (igraph_transitivity_avglocal_undirected)
+	(igraph_transitivity_local_undirected2)
+	(igraph_transitivity_local_undirected4)
+	(igraph_transitivity_undirected)
+	* src/type_indexededgelist.c (igraph_add_edges, igraph_delete_edges)
+	(igraph_delete_vertices) : updated
+	
+	* examples/simple/vector.c
+
 	* src/topology.c (igraph_isomorphic_vf2) : modified to use 
 	sorted adjacency lists
 

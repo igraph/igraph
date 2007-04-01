@@ -34,7 +34,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 
 int main() {
   
-  igraph_vector_t v, v2;
+  igraph_vector_t v, v2, v3;
   int i;
   igraph_real_t *ptr;
 
@@ -113,7 +113,7 @@ int main() {
   /* igraph_vector_init_seq, igraph_vector_order */
   igraph_vector_init_seq(&v, 1, 10);
   igraph_vector_init(&v2, 0);
-  igraph_vector_order(&v, &v2, 10);
+  igraph_vector_order1(&v, &v2, 10);
   print_vector(&v2, stdout);
   igraph_vector_destroy(&v2);
   igraph_vector_destroy(&v);
@@ -291,6 +291,16 @@ int main() {
   igraph_vector_destroy(&v);
   igraph_vector_destroy(&v2);
 
+  /* order */
+  igraph_vector_init_int_end(&v,  -1, 1,1,2,2, -1);
+  igraph_vector_init_int_end(&v2, -1, 2,3,1,3, -1);
+  igraph_vector_init(&v3, 0);
+  igraph_vector_order(&v, &v2, &v3, 3);
+  print_vector(&v3, stdout);
+  igraph_vector_destroy(&v);
+  igraph_vector_destroy(&v2);
+  igraph_vector_destroy(&v3);
+  
   return 0;
 }
   

@@ -2140,7 +2140,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
 			     IGRAPH_LOOPS));
   maxdegree=igraph_vector_max(&degree)+1;
-  igraph_vector_order(&degree, &order, maxdegree);
+  igraph_vector_order1(&degree, &order, maxdegree);
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
@@ -2331,7 +2331,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
     VECTOR(degree)[i]=deg=igraph_vector_size(neis);
     if (deg > maxdegree) { maxdegree = deg; }
   }
-  igraph_vector_order(&degree, &order, maxdegree+1);
+  igraph_vector_order1(&degree, &order, maxdegree+1);
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_VECTOR_INIT_FINALLY(&rank, affected_nodes);
@@ -2506,7 +2506,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
   IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
 			     IGRAPH_LOOPS));
   maxdegree=igraph_vector_max(&degree)+1;
-  igraph_vector_order(&degree, &order, maxdegree);
+  igraph_vector_order1(&degree, &order, maxdegree);
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
@@ -2664,7 +2664,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
 			     IGRAPH_LOOPS));
   maxdegree=igraph_vector_max(&degree)+1;
-  igraph_vector_order(&degree, &order, maxdegree);
+  igraph_vector_order1(&degree, &order, maxdegree);
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);

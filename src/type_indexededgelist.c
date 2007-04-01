@@ -260,8 +260,8 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
     igraph_set_error_handler(oldhandler);
     IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
   }  
-  ret1=igraph_vector_order(&graph->from, &newoi, graph->n);
-  ret2=igraph_vector_order(&graph->to  , &newii, graph->n);
+  ret1=igraph_vector_order(&graph->from, &graph->to, &newoi, graph->n);
+  ret2=igraph_vector_order(&graph->to  , &graph->from, &newii, graph->n);
   if (ret1 != 0 || ret2 != 0) {
     igraph_vector_resize(&graph->from, no_of_edges);
     igraph_vector_resize(&graph->to, no_of_edges);
@@ -417,8 +417,8 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 
   /* Create index, this might require additional memory */
   IGRAPH_VECTOR_INIT_FINALLY(&newoi, remaining_edges);
-  IGRAPH_CHECK(igraph_vector_order(&newfrom, &newoi, no_of_nodes));
-  IGRAPH_CHECK(igraph_vector_order(&newto, &graph->ii, no_of_nodes));
+  IGRAPH_CHECK(igraph_vector_order(&newfrom, &newto, &newoi, no_of_nodes));
+  IGRAPH_CHECK(igraph_vector_order(&newto, &newfrom, &graph->ii, no_of_nodes));
   
   /* Attributes, we use the original from vector to create an index,
      needed for the attribute handler. This index is the same as the
@@ -547,9 +547,9 @@ int igraph_delete_vertices(igraph_t *graph, igraph_vs_t vertices) {
     }
   }
   /* update oi & ii */
-  IGRAPH_CHECK(igraph_vector_order(&newgraph.from, &newgraph.oi, 
+  IGRAPH_CHECK(igraph_vector_order(&newgraph.from, &newgraph.to, &newgraph.oi, 
 				   remaining_vertices));
-  IGRAPH_CHECK(igraph_vector_order(&newgraph.to, &newgraph.ii, 
+  IGRAPH_CHECK(igraph_vector_order(&newgraph.to, &newgraph.from, &newgraph.ii, 
 				   remaining_vertices));  
 
   IGRAPH_CHECK(igraph_i_create_start(&newgraph.os, &newgraph.from, 

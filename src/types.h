@@ -139,7 +139,10 @@ igraph_real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos);
 void igraph_vector_set       (igraph_vector_t* v, long int pos, igraph_real_t value);
 igraph_real_t igraph_vector_tail(const igraph_vector_t *v);
 igraph_real_t igraph_vector_pop_back(igraph_vector_t* v);
-int igraph_vector_order(const igraph_vector_t* v, igraph_vector_t* res, igraph_integer_t maxval);
+int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
+			igraph_vector_t* res, igraph_integer_t maxval);
+int igraph_vector_order1(const igraph_vector_t* v, 
+			igraph_vector_t* res, igraph_integer_t maxval);
 int igraph_vector_order2(igraph_vector_t *v);
 void igraph_vector_sort(igraph_vector_t *v);
 int igraph_vector_resize(igraph_vector_t* v, long int newsize);
