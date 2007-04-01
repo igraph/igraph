@@ -1,3 +1,10 @@
+2007-03-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/evolver.c (igraph_evolver_d, igraph_evolver_mes_d)
+	(igraph_evolver_st_d, igraph_evolver_exp_d, igraph_evolver_ad)
+	(igraph_evolver_mes_ad, igraph_evolver_st_ad, igraph_evolver_exp_ad) :
+	added
+
 2007-03-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/measure_dynamics.c (igraph_measure_dynamics_id_expected2) : added

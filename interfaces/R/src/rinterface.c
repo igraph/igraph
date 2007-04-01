@@ -35,6 +35,7 @@
 
 int igraph_free(void *p);
 
+SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v);
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
 SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
@@ -860,6 +861,26 @@ int R_igraph_progress_handler(const char *message, igraph_real_t percent,
  * functions to convert igraph objects to SEXP
  *****************************************************/
 
+SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v) {
+  SEXP result;
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(v)));
+  igraph_vector_copy_to(v, REAL(result));
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v) {
+  SEXP result;
+  if (v) {
+    PROTECT(result=R_igraph_vector_to_SEXP(v));
+  } else {
+    PROTECT(result=R_NilValue);
+  }
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m) {
 
   SEXP result, dim; 
@@ -874,6 +895,18 @@ SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m) {
   UNPROTECT(2);
   return result;
 }
+
+SEXP R_igraph_0ormatrix_to_SEXP(igraph_matrix_t *m) {
+  SEXP result;
+  if (m) {
+    PROTECT(result=R_igraph_matrix_to_SEXP(m));
+  } else {
+    PROTECT(result=R_NilValue);
+  }
+  UNPROTECT(1);
+  return result;
+}
+
 
 SEXP R_igraph_array3_to_SEXP(igraph_array3_t *a) {
   SEXP result, dim;
@@ -5616,6 +5649,133 @@ SEXP R_igraph_citing_cited_type_game(SEXP pnodes, SEXP ptypes, SEXP ppref,
   return result;
 }
 
+SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
+			SEXP pcites, SEXP pexpected, SEXP pdebug) {
+  igraph_t g;
+  igraph_vector_t kernel;
+  igraph_integer_t niter=REAL(pniter)[0];
+  igraph_bool_t sd=LOGICAL(psd)[0];
+  igraph_bool_t norm=LOGICAL(pnorm)[0];
+  igraph_bool_t cites=LOGICAL(pcites)[0];
+  igraph_bool_t expected=LOGICAL(pexpected)[0];
+  igraph_vector_t debug, *ppdebug=0;
+  igraph_vector_ptr_t debugres, *ppdebugres=0;
+  igraph_vector_t vsd, vnorm, vcites, vexpected;
+  igraph_vector_t *pvsd=0, *pvnorm=0, *pvcites=0, *pvexpected=0;
+  SEXP result, names;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&kernel, 0);
+  if (sd) { igraph_vector_init(&vsd, 0); pvsd=&vsd; }
+  if (norm) { igraph_vector_init(&vnorm, 0); pvnorm=&vnorm; }
+  if (cites) { igraph_vector_init(&vcites, 0); pvcites=&vcites; }
+  if (expected) { igraph_vector_init(&vexpected, 0); pvexpected=&vexpected; }
+  if (!isNull(pdebug) && GET_LENGTH(pdebug)!=0) {
+    R_SEXP_to_vector(pdebug, &debug); ppdebug=&debug; 
+    igraph_vector_ptr_init(&debugres, 0); ppdebugres=&debugres;
+  }
+    
+  igraph_evolver_d(&g, niter, &kernel, pvsd, pvnorm, pvcites, pvexpected,
+		   ppdebug, ppdebugres);
+  
+  PROTECT(result=NEW_LIST(6));
+  SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&kernel));
+  igraph_vector_destroy(&kernel);
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(pvsd));
+  if (pvsd) { igraph_vector_destroy(pvsd); }
+  SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(pvnorm));
+  if (pvnorm) { igraph_vector_destroy(pvnorm); }
+  SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP(pvcites));
+  if (pvcites) { igraph_vector_destroy(pvcites); }
+  SET_VECTOR_ELT(result, 4, R_igraph_0orvector_to_SEXP(pvexpected));
+  if (pvexpected) { igraph_vector_destroy(pvexpected); }
+  if (!isNull(pdebug) && GET_LENGTH(pdebug) != 0) {
+    /* TODO */
+  } else {
+    SET_VECTOR_ELT(result, 5, R_NilValue);
+  }
+  PROTECT(names=NEW_CHARACTER(6));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("kernel"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("sd"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("norm"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("cites"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("expected"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("debug"));
+  SET_NAMES(result, names);
+  
+  R_igraph_after();  
+
+  UNPROTECT(2);
+  return result;
+}
+
+SEXP R_igraph_evolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
+			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
+			 SEXP pdebug) {
+  igraph_t g;
+  igraph_matrix_t kernel;
+  igraph_integer_t niter=REAL(pniter)[0];
+  igraph_integer_t agebins=REAL(pagebins)[0];
+  igraph_bool_t sd=LOGICAL(psd)[0];
+  igraph_bool_t norm=LOGICAL(pnorm)[0];
+  igraph_bool_t cites=LOGICAL(pcites)[0];
+  igraph_bool_t expected=LOGICAL(pexpected)[0];
+  igraph_matrix_t debug, *ppdebug=0;
+  igraph_vector_ptr_t debugres, *ppdebugres=0;
+  igraph_matrix_t vsd, vnorm, vcites, vexpected;
+  igraph_matrix_t *pvsd=0, *pvnorm=0, *pvcites=0, *pvexpected=0;
+  SEXP result, names;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&kernel, 0, 0);
+  if (sd) { igraph_matrix_init(&vsd, 0, 0); pvsd=&vsd; }
+  if (norm) { igraph_matrix_init(&vnorm, 0, 0); pvnorm=&vnorm; }
+  if (cites) { igraph_matrix_init(&vcites, 0, 0); pvcites=&vcites; }
+  if (expected) { igraph_matrix_init(&vexpected, 0, 0); pvexpected=&vexpected; }
+  if (!isNull(pdebug) && GET_LENGTH(pdebug)!=0) {
+    R_SEXP_to_matrix(pdebug, &debug); ppdebug=&debug; 
+    igraph_vector_ptr_init(&debugres, 0); ppdebugres=&debugres;
+  }
+
+  igraph_evolver_ad(&g, niter, agebins, &kernel, pvsd, pvnorm, pvcites,
+		    pvexpected, ppdebug, ppdebugres);
+
+  PROTECT(result=NEW_LIST(6));
+  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&kernel));
+  igraph_matrix_destroy(&kernel);
+  SET_VECTOR_ELT(result, 1, R_igraph_0ormatrix_to_SEXP(pvsd));
+  if (pvsd) { igraph_matrix_destroy(pvsd); }
+  SET_VECTOR_ELT(result, 2, R_igraph_0ormatrix_to_SEXP(pvnorm));
+  if (pvnorm) { igraph_matrix_destroy(pvnorm); }
+  SET_VECTOR_ELT(result, 3, R_igraph_0ormatrix_to_SEXP(pvcites));
+  if (pvcites) { igraph_matrix_destroy(pvcites); }
+  SET_VECTOR_ELT(result, 4, R_igraph_0ormatrix_to_SEXP(pvexpected));
+  if (pvexpected) { igraph_matrix_destroy(pvexpected); }
+  if (!isNull(pdebug) && GET_LENGTH(pdebug) != 0) {
+    /* TODO */
+  } else {
+    SET_VECTOR_ELT(result, 5, R_NilValue);
+  }
+  PROTECT(names=NEW_CHARACTER(6));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("kernel"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("sd"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("norm"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("cites"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("expected"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("debug"));
+  SET_NAMES(result, names);
+  
+  R_igraph_after();  
+
+  UNPROTECT(2);
+  return result;
+  
+}
+			 
 /***********************************************/
 /* THE REST IS GENERATED BY inger.py           */
 /***********************************************/

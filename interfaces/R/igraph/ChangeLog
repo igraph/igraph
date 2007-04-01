@@ -1,3 +1,12 @@
+2007-03-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/revolver.R (evolver.d, evolver.ad) : added
+	* interfaces/R/src/rinterface.c (R_igraph_evolver_d)
+	(R_igraph_evolver_ad) : added
+
+	* interfaces/R/src/rinterface.c (R_igraph_vector_to_SEXP)
+	(R_igraph_0orvector_to_SEXP, R_igraph_0ormatrix_to_SEXP) : added	
+
 2007-03-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/measure.dynamics.R (measure.dynamics.id) :

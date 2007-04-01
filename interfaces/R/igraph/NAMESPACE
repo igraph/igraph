@@ -112,6 +112,8 @@ export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
        measure.dynamics.lastcit, measure.dynamics.age, measure.dynamics.citedcat,
        measure.dynamics.citingcat.citedcat)
 
+export(evolver.d, evolver.ad)
+
 # isomorphism, motifs
 
 export(graph.isoclass, graph.isomorphic, graph.motifs,

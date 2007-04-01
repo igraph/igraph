@@ -1111,7 +1111,7 @@ int igraph_measure_dynamics_id_expected(const igraph_t *graph,
 					const igraph_vector_t *ak,
 					const igraph_vector_t *st,
 					igraph_integer_t pmaxind);
-int igraph_measure_dynamics_id_extected2(const igraph_t *graph,
+int igraph_measure_dynamics_id_expected2(const igraph_t *graph,
 					 igraph_vector_t *res,
 					 const igraph_vector_t *ak,
 					 const igraph_vector_t *st,
@@ -1190,6 +1190,87 @@ int igraph_measure_dynamics_citingcat_citedcat_st(const igraph_t *graph,
 						  const igraph_matrix_t *agd,
 						  const igraph_vector_t *cats,
 						  igraph_integer_t pnocats);
+
+/* -------------------------------------------------- */
+/* Network evolution measurement, new implementation  */
+/* -------------------------------------------------- */
+
+int igraph_evolver_d(const igraph_t *graph,
+		     igraph_integer_t niter,
+		     igraph_vector_t *kernel,		     
+		     igraph_vector_t *sd,
+		     igraph_vector_t *norm,
+		     igraph_vector_t *cites,
+		     igraph_vector_t *expected,
+		     const igraph_vector_t *debug,
+		     igraph_vector_ptr_t *debugres);
+int igraph_evolver_mes_d(const igraph_t *graph,
+			 igraph_vector_t *kernel,
+			 igraph_vector_t *sd,
+			 igraph_vector_t *norm,
+			 igraph_vector_t *cites,
+			 const igraph_vector_t *debug,
+			 igraph_vector_ptr_t *debugres,
+			 const igraph_vector_t *st,
+			 igraph_integer_t pmaxind);
+int igraph_evolver_st_d(const igraph_t *graph,
+			igraph_vector_t *st,
+			const igraph_vector_t *kernel);
+int igraph_evolver_exp_d(const igraph_t *graphm,
+			 igraph_vector_t *expected,
+			 const igraph_vector_t *kernel,
+			 const igraph_vector_t *st,
+			 igraph_integer_t pmaxind);
+
+int igraph_evolver_ad(const igraph_t *graph,
+		      igraph_integer_t niter,
+		      igraph_integer_t agebins,
+		      igraph_matrix_t *kernel,
+		      igraph_matrix_t *sd,
+		      igraph_matrix_t *norm,
+		      igraph_matrix_t *cites,
+		      igraph_matrix_t *expected,
+		      const igraph_matrix_t *debug,
+		      igraph_vector_ptr_t *debugres);
+int igraph_evolver_mes_ad(const igraph_t *graph,
+			  igraph_matrix_t *kernel,
+			  igraph_matrix_t *sd,
+			  igraph_matrix_t *norm,
+			  igraph_matrix_t *cites,
+			  const igraph_matrix_t *debug,
+			  igraph_vector_ptr_t *debugres,
+			  const igraph_vector_t *st,
+			  igraph_integer_t pmaxind,
+			  igraph_integer_t agebins);
+int igraph_evolver_ad2(const igraph_t *graph,
+		      igraph_integer_t niter,
+		      igraph_integer_t agebins,
+		      igraph_matrix_t *kernel,
+		      igraph_matrix_t *sd,
+		      igraph_matrix_t *norm,
+		      igraph_matrix_t *cites,
+		      igraph_matrix_t *expected,
+		      const igraph_matrix_t *debug,
+		      igraph_vector_ptr_t *debugres);
+int igraph_evolver_mes_ad2(const igraph_t *graph,
+			  igraph_matrix_t *kernel,
+			  igraph_matrix_t *sd,
+			  igraph_matrix_t *norm,
+			  igraph_matrix_t *cites,
+			  const igraph_matrix_t *debug,
+			  igraph_vector_ptr_t *debugres,
+			  const igraph_vector_t *st,
+			  igraph_integer_t pmaxind,
+			  igraph_integer_t agebins);
+int igraph_evolver_st_ad(const igraph_t *graph,
+			 igraph_vector_t *st,
+			 const igraph_matrix_t *kernel);
+int igraph_evolver_exp_ad(const igraph_t *graph,
+			  igraph_matrix_t *expected,
+			  const igraph_matrix_t *kernel,
+			  const igraph_vector_t *st,
+			  igraph_integer_t pmaxind,
+			  igraph_integer_t agebins);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
