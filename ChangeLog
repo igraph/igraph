@@ -1,3 +1,11 @@
+2007-03-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_isomorphic_vf2) : heuristics added
+
+	* src/vector.c (igraph_vector_contains) : added
+	
+	* src/vector.c (igraph_vector_search) : added const to vector argument
+	
 2007-03-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/topology.c (igraph_isomorphic_vf2) : added

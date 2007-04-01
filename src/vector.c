@@ -1286,7 +1286,18 @@ void igraph_vector_multiply(igraph_vector_t *v, igraph_real_t by) {
   }
 }
 
-igraph_bool_t igraph_vector_search(igraph_vector_t *v, long int from, igraph_real_t what, 
+igraph_bool_t igraph_vector_contains(const igraph_vector_t *v, igraph_real_t e) {
+  igraph_real_t *p=v->stor_begin;
+  while (p<v->end) {
+    if (*p==e) { 
+      return 1;
+    }
+    p++;
+  }
+  return 0;
+}
+
+igraph_bool_t igraph_vector_search(const igraph_vector_t *v, long int from, igraph_real_t what, 
 			    long int *pos) {
   long int i, n=igraph_vector_size(v);  
   for (i=from; i<n; i++) {
