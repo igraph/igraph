@@ -74,27 +74,13 @@ walktrap.community <- function(graph, weights=E(g)$weight, steps=4, merges=TRUE,
         PACKAGE="igraph")
 }
 
-community.eb <- function(graph, directed=TRUE) {
+edge.betweenness.community <- function(graph, directed=TRUE) {
   if (!is.igraph(graph)) {
-    stop("Not a graph object")
+    stop("Not a graph object!")
   }
 
-  all.nodes <- vcount(graph)
-  all.edges <- ecount(graph)
-  res <- matrix(0, nc=2, nr=all.edges);
-
-  for (i in 1:all.edges) {
-
-    print(i)
-    
-    max.eb <- which.max(edge.betweenness(graph, directed=directed))
-    res[i,1] <- (max.eb-1) %%  all.nodes + 1
-    res[i,2] <- (max.eb-1) %/% all.nodes + 1
-
-    graph <- delete.edges(graph, res[i,])
-  }
-  
-  res
+  .Call("R_igraph_community_edge_betweenness", graph, as.logical(directed),
+        PACKAGE="igraph")
 }
 
 community.cut <- function(graph, edges, after.removing) {
@@ -146,31 +132,4 @@ modularity <- function(graph, types) {
   res <- sum(diag(etm)) - sum(etm %*% etm)
   
   res
-}
-
-community.eb2 <- function(graph, directed=TRUE) {
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-
-  all.nodes <- vcount(graph)
-  all.edges <- ecount(graph)
-  cno <- length(clusters(graph)$csize)
-  res <- numeric()
-
-  for (i in 1:all.edges) {
-
-    print(i)
-    
-    max.eb <- which.max(edge.betweenness(graph, directed=directed))
-    from <- (max.eb-1) %%  all.nodes + 1
-    to <- (max.eb-1) %/% all.nodes + 1
-
-    res <- c(res, from, to)
-    graph <- delete.edges(graph, c(from, to))
-    cno2 <- length(clusters(graph)$csize)
-    if (cno2 > cno) { break }
-  }
-  
-  matrix(res, nc=2, byrow=TRUE)
 }

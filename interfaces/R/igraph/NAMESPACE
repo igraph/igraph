@@ -54,8 +54,8 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
 
 # community structure
 
-export(community.eb, community.cut, edge.type.matrix,
-       modularity, community.eb2, spinglass.community, walktrap.community)
+export(edge.betweenness.community, community.cut, edge.type.matrix,
+       modularity, spinglass.community, walktrap.community)
 
 # conversion
 

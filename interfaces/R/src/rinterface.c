@@ -5760,6 +5760,27 @@ SEXP R_igraph_topological_sorting(SEXP graph, SEXP pneimode) {
   return result;
 }
 
+SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected) {
+  igraph_t g;
+  igraph_vector_t res;
+  igraph_bool_t directed=LOGICAL(pdirected)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_vector_init(&res, 0);
+  igraph_community_edge_betweenness(&g, &res, directed);
+  
+  PROTECT(result=R_igraph_vector_to_SEXP(&res));
+  igraph_vector_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP pdebug) {
   igraph_t g;

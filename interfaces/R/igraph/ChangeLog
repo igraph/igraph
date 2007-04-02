@@ -1,5 +1,10 @@
 2007-04-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/community.R 
+	(edge.betweenness.community) : added
+	* interfaces/R/src/rinterface.c 
+	(R_igraph_community_edge_betweenness) : added
+
 	* interfaces/R/igraph/R/structural.properties.R 
 	(topological.sort) : added
 	* interfaces/R/src/rinterface.c (R_igraph_topological_sorting) : added
