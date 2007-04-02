@@ -895,6 +895,12 @@ int igraph_spinglass_my_community(const igraph_t *graph,
 				  igraph_spincomm_update_t update_rule,
 				  igraph_real_t gamma);
 
+int igraph_walktrap_community(const igraph_t *graph, 
+			      const igraph_vector_t *weights,
+			      int steps,
+			      igraph_matrix_t *merges,
+			      igraph_vector_t *modularity);
+
 /* -------------------------------------------------- */
 /* Conversion                                         */
 /* -------------------------------------------------- */

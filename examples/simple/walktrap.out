@@ -1,0 +1,10 @@
+Merges:
+ 6 +  7 -> 10 (modularity 0.00)
+ 2 +  4 -> 11 (modularity -0.07)
+ 8 + 10 -> 12 (modularity -0.04)
+ 3 + 11 -> 13 (modularity 0.02)
+ 9 + 12 -> 14 (modularity 0.08)
+ 1 + 13 -> 15 (modularity 0.16)
+ 0 + 15 -> 16 (modularity 0.25)
+ 5 + 14 -> 17 (modularity 0.35)
+16 + 17 -> 18 (modularity 0.45)

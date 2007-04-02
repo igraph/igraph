@@ -26,7 +26,9 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     foreign-graphml.c flow.c igraph_buckets.c \
 			     NetDataTypes.cpp NetRoutines.cpp clustertool.cpp \
 			     pottsmodel_2.cpp spectral_properties.c cores.c \
-			     igraph_set.c cliques.c evolver.c
+			     igraph_set.c cliques.c evolver.c \
+			     walktrap.cpp walktrap_heap.cpp \
+			     walktrap_graph.cpp walktrap_communities.cpp
 
 libigraph_la_CFLAGS        = -O6 -Wall
 libigraph_la_CXXFLAGS	   = -O6 -Wall

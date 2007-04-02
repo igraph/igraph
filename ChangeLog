@@ -1,5 +1,11 @@
 2007-04-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/walktrap.cpp
+	* src/walktrap_communities.cpp
+	* src/walktrap_graph.cpp
+	* src/walktrap_heap.cpp : added
+	* examples/simple/walktrap.c : added
+
 	* src/flow.c (igraph_mincut, igraph_i_mincut_undirected) :
 	'partition2' and 'cut' arguments added
 	* examples/simple/igraph_mincut.c : updated

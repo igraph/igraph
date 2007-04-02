@@ -1,4 +1,4 @@
-# Spinglass community structure
+# Community structure
 
 # Test suite for the IGraph library.
 # Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -19,10 +19,14 @@
 # Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 # 02110-1301 USA
 
-AT_BANNER([[Spinglass community structure]])
+AT_BANNER([[Community structure]])
 
 AT_SETUP([Spinglass clustering (igraph_spinglass_community): ])
 AT_KEYWORDS([spin glass spinglass community clustering])
 AT_COMPILE_CHECK([simple/spinglass.c])
 AT_CLEANUP
 
+AT_SETUP([Walktrap community structure (igraph_walktrap_community): ])
+AT_KEYWORDS([random walk community structure clustering walktrap])
+AT_COMPILE_CHECK([simple/walktrap.c], [simple/walktrap.out])
+AT_CLEANUP
