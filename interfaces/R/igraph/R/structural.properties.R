@@ -521,3 +521,13 @@ graph.coreness <- function(graph, mode="all") {
         PACKAGE="igraph")
 }
 
+topological.sort <- function(graph, mode="out") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (is.character(mode)) {
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  }
+  .Call("R_igraph_topological_sorting", graph, as.numeric(mode),
+        PACKAGE="igraph")
+}

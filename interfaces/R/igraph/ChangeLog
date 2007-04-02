@@ -1,5 +1,9 @@
 2007-04-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/structural.properties.R 
+	(topological.sort) : added
+	* interfaces/R/src/rinterface.c (R_igraph_topological_sorting) : added
+
 	* interfaces/R/igraph/R/community.R (walktrap.community) : added
 	* interfaces/R/src/rinterface.c (R_igraph_walktrap_community) : added
 
