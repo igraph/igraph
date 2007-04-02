@@ -59,6 +59,21 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
   }    
 }
 
+walktrap.community <- function(graph, weights=E(g)$weight, steps=4, merges=TRUE,
+                               modularity=FALSE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  if (!is.null(weights)) {
+    weight <- as.numeric(weight)
+  }
+
+  .Call("R_igraph_walktrap_community", graph, weights, as.numeric(steps),
+        as.logical(merges), as.logical(modularity),
+        PACKAGE="igraph")
+}
+
 community.eb <- function(graph, directed=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
