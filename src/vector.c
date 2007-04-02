@@ -924,6 +924,43 @@ long int igraph_vector_which_max(const igraph_vector_t* v) {
   return which;
 }
 
+igraph_real_t igraph_vector_min(const igraph_vector_t* v) {
+  igraph_real_t min;
+  igraph_real_t *ptr;
+  assert(v != NULL);
+  assert(v->stor_begin != NULL);
+  min=*(v->stor_begin);
+  ptr=v->stor_begin+1;
+  while (ptr < v->end) {
+    if ((*ptr) < min) {
+      min=*ptr;
+    }
+    ptr++;
+  }
+  return min;
+}
+
+long int igraph_vector_which_min(const igraph_vector_t* v) {
+  long int which=-1;
+  if (!igraph_vector_empty(v)) {
+    igraph_real_t min;
+    igraph_real_t *ptr;
+    long int pos;
+    assert(v != NULL);
+    assert(v->stor_begin != NULL);
+    min=*(v->stor_begin); which=0;
+    ptr=v->stor_begin+1; pos=1;
+    while (ptr < v->end) {
+      if ((*ptr) < min) {
+	min=*ptr;
+	which=pos;
+      }
+      ptr++; pos++;
+    }
+  }
+  return which;
+}
+
 /**
  * \ingroup vector
  * \function igraph_vector_init_copy

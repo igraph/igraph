@@ -148,6 +148,8 @@ void igraph_vector_sort(igraph_vector_t *v);
 int igraph_vector_resize(igraph_vector_t* v, long int newsize);
 igraph_real_t igraph_vector_max(const igraph_vector_t* v);
 long int igraph_vector_which_max(const igraph_vector_t* v);
+igraph_real_t igraph_vector_min(const igraph_vector_t* v);
+long int igraph_vector_which_min(const igraph_vector_t* v);
 void igraph_vector_copy_to(const igraph_vector_t *v, igraph_real_t* to);
 int igraph_vector_copy(igraph_vector_t *to, const igraph_vector_t *from);
 igraph_real_t igraph_vector_sum(const igraph_vector_t *v);
