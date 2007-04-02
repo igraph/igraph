@@ -1476,6 +1476,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
   long int i;
   igraph_integer_t modein, modeout;
 
+  directed=directed && igraph_is_directed(graph);
   if (directed) {
     modeout=IGRAPH_OUT;
     modein=IGRAPH_IN;
