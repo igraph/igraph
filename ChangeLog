@@ -1,5 +1,8 @@
 2007-04-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/community.c (igraph_community_edge_betweenness) : added
+	* examples/simple/igraph_community_edge_betweenness.c : added
+
 	* src/structural_properties.c (igraph_edge_betweenness) : 
 	always use one adjacency list for undirected graphs
 

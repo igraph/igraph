@@ -30,3 +30,9 @@ AT_SETUP([Walktrap community structure (igraph_walktrap_community): ])
 AT_KEYWORDS([random walk community structure clustering walktrap])
 AT_COMPILE_CHECK([simple/walktrap.c], [simple/walktrap.out])
 AT_CLEANUP
+
+AT_SETUP([Edge betweenness community structure (igraph_community_edge_betweenness): ])
+AT_KEYWORDS([community structure edge betweenness Newman Girvan])
+AT_COMPILE_CHECK([simple/igraph_community_edge_betweenness.c],
+		 [simple/igraph_community_edge_betweenness.out])
+AT_CLEANUP

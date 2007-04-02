@@ -901,6 +901,10 @@ int igraph_walktrap_community(const igraph_t *graph,
 			      igraph_matrix_t *merges,
 			      igraph_vector_t *modularity);
 
+int igraph_community_edge_betweenness(const igraph_t *graph, 
+				      igraph_vector_t *result,
+				      igraph_bool_t directed);
+
 /* -------------------------------------------------- */
 /* Conversion                                         */
 /* -------------------------------------------------- */
