@@ -903,6 +903,7 @@ int igraph_walktrap_community(const igraph_t *graph,
 
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,
+				      igraph_vector_t *edge_betweenness,
 				      igraph_bool_t directed);
 
 /* -------------------------------------------------- */

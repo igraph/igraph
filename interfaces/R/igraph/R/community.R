@@ -74,12 +74,14 @@ walktrap.community <- function(graph, weights=E(g)$weight, steps=4, merges=TRUE,
         PACKAGE="igraph")
 }
 
-edge.betweenness.community <- function(graph, directed=TRUE) {
+edge.betweenness.community <- function(graph, directed=TRUE,
+                                       edge.betweenness=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
 
   .Call("R_igraph_community_edge_betweenness", graph, as.logical(directed),
+        as.logical(edge.betweenness),
         PACKAGE="igraph")
 }
 

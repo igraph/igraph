@@ -26,7 +26,7 @@
 int main() {
   
   igraph_t g;
-  igraph_vector_t edges;
+  igraph_vector_t edges, eb;
   long int i;
   long int no_of_edges;
 
@@ -51,14 +51,22 @@ int main() {
 	       -1);  
   
   igraph_vector_init(&edges, 0);
-  igraph_community_edge_betweenness(&g, &edges, IGRAPH_UNDIRECTED);
+  igraph_vector_init(&eb, 0);
+  igraph_community_edge_betweenness(&g, &edges, &eb,
+				    IGRAPH_UNDIRECTED);
   
   no_of_edges=igraph_ecount(&g);
   for (i=0; i<no_of_edges; i++) {
     printf("%li ", (long int)VECTOR(edges)[i]);
   }
   printf("\n");
+  
+  for (i=0; i<no_of_edges; i++) {
+    printf("%.2f ", VECTOR(eb)[i]);
+  }
+  printf("\n");
 
+  igraph_vector_destroy(&eb);
   igraph_vector_destroy(&edges);
   igraph_destroy(&g);
   

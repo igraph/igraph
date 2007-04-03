@@ -5760,24 +5760,37 @@ SEXP R_igraph_topological_sorting(SEXP graph, SEXP pneimode) {
   return result;
 }
 
-SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected) {
+SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected, 
+					 SEXP peb) {
   igraph_t g;
   igraph_vector_t res;
+  igraph_vector_t eb, *ppeb=0;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
-  SEXP result;
+  SEXP result, names;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&res, 0);
-  igraph_community_edge_betweenness(&g, &res, directed);
+  if (LOGICAL(peb)[0]) {
+    ppeb=&eb;
+    igraph_vector_init(&eb, 0);
+  }
+  igraph_community_edge_betweenness(&g, &res, ppeb, directed);
   
-  PROTECT(result=R_igraph_vector_to_SEXP(&res));
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&res));
   igraph_vector_destroy(&res);
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(ppeb));
+  if (ppeb) { igraph_vector_destroy(ppeb); }
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("removed.edges"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("edge.betweenness"));
+  SET_NAMES(result, names);
   
   R_igraph_after();
   
-  UNPROTECT(1);
+  UNPROTECT(2);
   return result;
 }
 

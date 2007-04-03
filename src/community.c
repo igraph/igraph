@@ -49,6 +49,7 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
   
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,
+				      igraph_vector_t *edge_betweenness,
 				      igraph_bool_t directed) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -108,6 +109,10 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
   
   IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
+  if (edge_betweenness) {
+    IGRAPH_CHECK(igraph_vector_resize(edge_betweenness, no_of_edges));
+    VECTOR(*edge_betweenness)[no_of_edges-1]=0;
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&eb, no_of_edges);
   
@@ -193,6 +198,12 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     /* and eliminate that edge from the network */
     maxedge=igraph_i_vector_which_max_not_null(&eb, passive);
     VECTOR(*result)[e]=maxedge;
+    if (edge_betweenness) {
+      VECTOR(*edge_betweenness)[e]=VECTOR(eb)[maxedge];
+      if (!directed) { 
+	VECTOR(*edge_betweenness)[e] /= 2.0;
+      }
+    }
     passive[maxedge]=1;
     igraph_edge(graph, maxedge, &from, &to);
 
