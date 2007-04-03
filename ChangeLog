@@ -2,6 +2,7 @@
 
 	* src/community.c (igraph_community_edge_betweenness) : 
 	optionally returns the e.b. values for the cuts
+	* examples/simple/igraph_community_edge_betweenness.c : updated
 
 2007-04-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
