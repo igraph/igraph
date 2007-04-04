@@ -63,7 +63,7 @@
 
 using namespace std;
 
-int igraph_walktrap_community(const igraph_t *graph, 
+int igraph_community_walktrap(const igraph_t *graph, 
 			      const igraph_vector_t *weights,
 			      int steps,
 			      igraph_matrix_t *merges,

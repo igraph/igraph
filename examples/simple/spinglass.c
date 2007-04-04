@@ -34,7 +34,7 @@ int main() {
 	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9, 0,5, -1);
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&csize, 0);
-  igraph_spinglass_community(&g, 
+  igraph_community_spinglass(&g, 
 			     0, /* no weights */
 			     &modularity,
 			     &temperature,

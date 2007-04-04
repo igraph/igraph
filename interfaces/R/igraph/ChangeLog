@@ -1,5 +1,9 @@
 2007-04-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/src/rinterface.c (R_igraph_spinglass_community)
+	(R_igraph_spinglass_my_community, R_igraph_walktrap_community) : updated
+	after renames
+	
 	* interfaces/R/igraph/R/community.R 
 	(edge.betweenness.community) : optionally return eb values
 	* interfaces/R/src/rinterface.c 

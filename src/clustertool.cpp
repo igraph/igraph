@@ -59,7 +59,7 @@
 #include "random.h"
 
 /**
- * \function igraph_spinglass_community
+ * \function igraph_community_spinglass
  * \brief Community detection based on statistical mechanics
  * 
  * This function implements the community structure detection
@@ -118,13 +118,13 @@
  *     important. (If my understanding is correct.)
  * \return Error code.
  * 
- * \sa igraph_spinglass_my_community() for calculating the community
+ * \sa igraph_community_spinglass_single() for calculating the community
  * of a single vertex.
  * 
  * Time complexity: TODO.
  */
 
-int igraph_spinglass_community(const igraph_t *graph,
+int igraph_community_spinglass(const igraph_t *graph,
 			       const igraph_vector_t *weights,
 			       igraph_real_t *modularity,
 			       igraph_real_t *temperature,
@@ -252,8 +252,29 @@ int igraph_spinglass_community(const igraph_t *graph,
   return 0;
 }
 
+int igraph_spinglass_community(const igraph_t *graph,
+			       const igraph_vector_t *weights,
+			       igraph_real_t *modularity,
+			       igraph_real_t *temperature,
+			       igraph_vector_t *membership, 
+			       igraph_vector_t *csize, 
+			       igraph_integer_t spins,
+			       igraph_bool_t parupdate,
+			       igraph_real_t starttemp,
+			       igraph_real_t stoptemp,
+			       igraph_real_t coolfact,
+			       igraph_spincomm_update_t update_rule,
+			       igraph_real_t gamma) {
+
+  IGRAPH_WARNING("This function was renamed to igraph_community_spinglass");
+  return igraph_community_spinglass(graph, weights, modularity, temperature,
+				    membership, csize, spins, parupdate,
+				    starttemp, stoptemp, coolfact, update_rule,
+				    gamma);
+}
+
 /**
- * \function igraph_spinglass_my_community
+ * \function igraph_community_spinglass_single
  * \brief Community of a single node based on statistical mechanics
  * 
  * This function implements the community structure detection
@@ -306,23 +327,23 @@ int igraph_spinglass_community(const igraph_t *graph,
  *     important. (If my understanding is correct.)
  * \return Error code.
  * 
- * \sa igraph_spinglass_community() for the traditional version of the 
+ * \sa igraph_community_spinglass() for the traditional version of the 
  * algorithm.
  * 
  * Time complexity: TODO.
  */
 
-int igraph_spinglass_my_community(const igraph_t *graph,
-				  const igraph_vector_t *weights,
-				  igraph_integer_t vertex,
-				  igraph_vector_t *community,
-				  igraph_real_t *cohesion,
-				  igraph_real_t *adhesion,
-				  igraph_integer_t *inner_links,
-				  igraph_integer_t *outer_links,
-				  igraph_integer_t spins,
-				  igraph_spincomm_update_t update_rule,
-				  igraph_real_t gamma) {
+int igraph_community_spinglass_single(const igraph_t *graph,
+				      const igraph_vector_t *weights,
+				      igraph_integer_t vertex,
+				      igraph_vector_t *community,
+				      igraph_real_t *cohesion,
+				      igraph_real_t *adhesion,
+				      igraph_integer_t *inner_links,
+				      igraph_integer_t *outer_links,
+				      igraph_integer_t spins,
+				      igraph_spincomm_update_t update_rule,
+				      igraph_real_t gamma) {
 
   igraph_bool_t use_weights=0;
   double prob;
@@ -397,4 +418,23 @@ int igraph_spinglass_my_community(const igraph_t *graph,
   RNG_END();
 
   return 0;
+}
+
+int igraph_spinglass_my_community(const igraph_t *graph,
+				  const igraph_vector_t *weights,
+				  igraph_integer_t vertex,
+				  igraph_vector_t *community,
+				  igraph_real_t *cohesion,
+				  igraph_real_t *adhesion,
+				  igraph_integer_t *inner_links,
+				  igraph_integer_t *outer_links,
+				  igraph_integer_t spins,
+				  igraph_spincomm_update_t update_rule,
+				  igraph_real_t gamma) {
+
+  IGRAPH_WARNING("this function was renamed to `igraph_community_spinglass_single");
+  return igraph_community_spinglass_single(graph, weights, vertex, community,
+					   cohesion, adhesion, inner_links, 
+					   outer_links, spins, update_rule,
+					   gamma);
 }

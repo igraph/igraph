@@ -869,6 +869,19 @@ int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
 /* TODO: modularity */
 /* TODO:  */
 
+int igraph_community_spinglass(const igraph_t *graph,
+			       const igraph_vector_t *weights,
+			       igraph_real_t *modularity,
+			       igraph_real_t *temperature,
+			       igraph_vector_t *membership, 
+			       igraph_vector_t *csize, 
+			       igraph_integer_t spins,
+			       igraph_bool_t parupdate,
+			       igraph_real_t starttemp,
+			       igraph_real_t stoptemp,
+			       igraph_real_t coolfact,
+			       igraph_spincomm_update_t update_rule,
+			       igraph_real_t gamma);
 int igraph_spinglass_community(const igraph_t *graph,
 			       const igraph_vector_t *weights,
 			       igraph_real_t *modularity,
@@ -883,6 +896,17 @@ int igraph_spinglass_community(const igraph_t *graph,
 			       igraph_spincomm_update_t update_rule,
 			       igraph_real_t gamma);
 
+int igraph_community_spinglass_single(const igraph_t *graph,
+				      const igraph_vector_t *weights,
+				      igraph_integer_t vertex,
+				      igraph_vector_t *community,
+				      igraph_real_t *cohesion,
+				      igraph_real_t *adhesion,
+				      igraph_integer_t *inner_links,
+				      igraph_integer_t *outer_links,
+				      igraph_integer_t spins,
+				      igraph_spincomm_update_t update_rule,
+				      igraph_real_t gamma);
 int igraph_spinglass_my_community(const igraph_t *graph,
 				  const igraph_vector_t *weights,
 				  igraph_integer_t vertex,
@@ -895,7 +919,7 @@ int igraph_spinglass_my_community(const igraph_t *graph,
 				  igraph_spincomm_update_t update_rule,
 				  igraph_real_t gamma);
 
-int igraph_walktrap_community(const igraph_t *graph, 
+int igraph_community_walktrap(const igraph_t *graph, 
 			      const igraph_vector_t *weights,
 			      int steps,
 			      igraph_matrix_t *merges,

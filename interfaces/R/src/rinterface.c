@@ -5001,7 +5001,7 @@ SEXP R_igraph_spinglass_community(SEXP graph, SEXP pweights,
   R_SEXP_to_vector(pweights, &weights);
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&csize, 0);
-  igraph_spinglass_community(&g, &weights, 
+  igraph_community_spinglass(&g, &weights, 
 			     &modularity, &temperature, 
 			     &membership, &csize,
 			     spins, parupdate, starttemp, stoptemp,
@@ -5053,9 +5053,9 @@ SEXP R_igraph_spinglass_my_community(SEXP graph, SEXP pweights,
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pweights, &weights);
   igraph_vector_init(&community, 0);
-  igraph_spinglass_my_community(&g, &weights, vertex, &community,
-				&cohesion, &adhesion, &inner_links,
-				&outer_links, spins, update_rule, gamma);
+  igraph_community_spinglass_single(&g, &weights, vertex, &community,
+				    &cohesion, &adhesion, &inner_links,
+				    &outer_links, spins, update_rule, gamma);
   
   PROTECT(result=NEW_LIST(5));
   PROTECT(names=NEW_CHARACTER(5));
@@ -5721,7 +5721,7 @@ SEXP R_igraph_walktrap_community(SEXP graph, SEXP pweights,
     igraph_vector_init(ppmodularity, 0);
   }
 
-  igraph_walktrap_community(&g, ppweights, steps, ppmerges, ppmodularity);
+  igraph_community_walktrap(&g, ppweights, steps, ppmerges, ppmodularity);
 
   PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_0ormatrix_to_SEXP(ppmerges));

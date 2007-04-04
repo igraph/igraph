@@ -1,5 +1,12 @@
 2007-04-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/clustertool.cpp (igraph_spinglass_community)
+	(igraph_community_spinglass, igraph_spinglass_my_community)
+	(igraph_community_spinglass_single)
+	* src/walktrap.cpp (igraph_walktrap_community)
+	(igraph_community_walktrap) : community structure functions
+	renamed to igraph_community_*
+
 	* src/community.c (igraph_community_edge_betweenness) : 
 	optionally returns the e.b. values for the cuts
 	* examples/simple/igraph_community_edge_betweenness.c : updated

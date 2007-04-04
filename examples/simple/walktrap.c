@@ -36,7 +36,7 @@ int main() {
   igraph_vector_init(&modularity, 0);
   igraph_matrix_init(&merges, 0, 0);
   
-  igraph_walktrap_community(&g, 0 /* no weights */,
+  igraph_community_walktrap(&g, 0 /* no weights */,
 			    4 /* steps */,
 			    &merges, &modularity);
   
