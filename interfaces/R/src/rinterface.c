@@ -5761,10 +5761,12 @@ SEXP R_igraph_topological_sorting(SEXP graph, SEXP pneimode) {
 }
 
 SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected, 
-					 SEXP peb) {
+					 SEXP peb, SEXP pmerges, SEXP pbridges) {
   igraph_t g;
   igraph_vector_t res;
   igraph_vector_t eb, *ppeb=0;
+  igraph_matrix_t merges, *ppmerges=0;
+  igraph_vector_t bridges, *ppbridges=0;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   SEXP result, names;
   
@@ -5776,18 +5778,65 @@ SEXP R_igraph_community_edge_betweenness(SEXP graph, SEXP pdirected,
     ppeb=&eb;
     igraph_vector_init(&eb, 0);
   }
-  igraph_community_edge_betweenness(&g, &res, ppeb, directed);
+  if (LOGICAL(pmerges)[0]) {
+    ppmerges=&merges;
+    igraph_matrix_init(&merges, 0, 0);
+  }
+  if (LOGICAL(pbridges)[0]) {
+    ppbridges=&bridges;
+    igraph_vector_init(&bridges, 0);
+  }
+  igraph_community_edge_betweenness(&g, &res, ppeb, ppmerges, ppbridges, 
+				    directed);
   
-  PROTECT(result=NEW_LIST(2));
+  PROTECT(result=NEW_LIST(4));
   SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&res));
   igraph_vector_destroy(&res);
   SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(ppeb));
   if (ppeb) { igraph_vector_destroy(ppeb); }
-  PROTECT(names=NEW_CHARACTER(2));
+  SET_VECTOR_ELT(result, 2, R_igraph_0ormatrix_to_SEXP(ppmerges));
+  if (ppmerges) { igraph_matrix_destroy(ppmerges); }
+  SET_VECTOR_ELT(result, 3, R_igraph_0orvector_to_SEXP(ppbridges));
+  if (ppbridges) { igraph_vector_destroy(ppbridges); }
+  PROTECT(names=NEW_CHARACTER(4));
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("removed.edges"));
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("edge.betweenness"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("merges"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("bridges"));
   SET_NAMES(result, names);
   
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+}
+
+SEXP R_igraph_community_eb_get_merges(SEXP graph, 
+				      SEXP pedges) {
+  
+  igraph_t g;
+  igraph_vector_t edges;
+  igraph_vector_t bridges;
+  igraph_matrix_t res;
+  SEXP result, names;
+  
+  R_igraph_before();
+ 
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pedges, &edges);
+  igraph_matrix_init(&res, 0, 0);
+  igraph_vector_init(&bridges, 0);
+  igraph_community_eb_get_merges(&g, &edges, &res, &bridges);
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);    
+  SET_VECTOR_ELT(result, 1, R_igraph_vector_to_SEXP(&bridges));
+  igraph_vector_destroy(&bridges);
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("bridges"));  
+  SET_NAMES(result, names);
+
   R_igraph_after();
   
   UNPROTECT(2);

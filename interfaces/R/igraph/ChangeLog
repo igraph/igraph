@@ -1,3 +1,19 @@
+2007-04-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/community.R (.memberDend)
+	(as.dendrogram.igraph.walktrap, as.dendrogram.igraph.ebc) : added
+
+	* interfaces/R/igraph/community.R (edge.betweenness.community)
+	(walktrap.community) : 'labels' argument added
+	
+	* interfaces/R/igraph/R/community.R (edge.betweenness.community) : 
+	'merges' and 'bridges' options added
+	(edge.betweenness.community.merges) : added
+	* interfaces/R/src/rinterface.c 
+	(R_igraph_community_edge_betweenness) : 'merges' and 'bridges' 
+	arguments added
+	(R_igraph_community_eb_get_merges) : added
+
 2007-04-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c (R_igraph_spinglass_community)

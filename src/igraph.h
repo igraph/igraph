@@ -928,7 +928,13 @@ int igraph_community_walktrap(const igraph_t *graph,
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,
 				      igraph_vector_t *edge_betweenness,
+				      igraph_matrix_t *merges,
+				      igraph_vector_t *bridges,
 				      igraph_bool_t directed);
+int igraph_community_eb_get_merges(const igraph_t *graph, 
+				   const igraph_vector_t *edges,
+				   igraph_matrix_t *merges,
+				   igraph_vector_t *bridges);
 
 /* -------------------------------------------------- */
 /* Conversion                                         */

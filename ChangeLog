@@ -1,3 +1,10 @@
+2007-04-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/community.c (igraph_community_edge_betweenness) : 
+	'merges' and 'bridges' options added
+	* src/community.c (igraph_community_eb_get_merges) : added
+	* examples/simple/igraph_community_edge_betweenness: updated
+
 2007-04-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/clustertool.cpp (igraph_spinglass_community)

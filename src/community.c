@@ -26,6 +26,62 @@
 
 #include <string.h>
 
+int igraph_community_eb_get_merges(const igraph_t *graph, 
+				   const igraph_vector_t *edges,
+				   igraph_matrix_t *res,
+				   igraph_vector_t *bridges) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t ptr;
+  long int i, midx=0;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&ptr, no_of_nodes*2-1);
+  if (res) { 
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes-1, 2));
+  }
+  if (bridges) {
+    IGRAPH_CHECK(igraph_vector_resize(bridges, no_of_nodes-1));
+  }
+  
+  for (i=igraph_vector_size(edges)-1; i>=0; i--) {
+    long int edge=VECTOR(*edges)[i];
+    igraph_integer_t from, to;
+    long int c1, c2, idx;
+    igraph_edge(graph, edge, &from, &to);
+    idx=from+1;
+    while (VECTOR(ptr)[idx-1] != 0) {
+      idx=VECTOR(ptr)[idx-1];
+    }
+    c1=idx-1;
+    idx=to+1;
+    while (VECTOR(ptr)[idx-1] != 0) {
+      idx=VECTOR(ptr)[idx-1];
+    }
+    c2=idx-1;
+    if (c1 != c2) {		/* this is a merge */
+      if (res) {
+	MATRIX(*res, midx, 0)=c1;
+	MATRIX(*res, midx, 1)=c2;
+      }
+      if (bridges) {
+	VECTOR(*bridges)[midx]=i+1;
+      }
+      
+      VECTOR(ptr)[c1]=no_of_nodes+midx+1;
+      VECTOR(ptr)[c2]=no_of_nodes+midx+1;
+      VECTOR(ptr)[(long int)from]=no_of_nodes+midx+1;
+      VECTOR(ptr)[(long int)to]=no_of_nodes+midx+1;
+      
+      midx++;
+    }
+  }
+
+  igraph_vector_destroy(&ptr);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
 /* Find the smallest active element in the vector */
 long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v, 
 					    const char *passive) {
@@ -50,6 +106,8 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,
 				      igraph_vector_t *edge_betweenness,
+				      igraph_matrix_t *merges,
+				      igraph_vector_t *bridges,
 				      igraph_bool_t directed) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -236,6 +294,10 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   } else {
     igraph_i_adjedgelist_destroy(&elist_out);
     IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (merges || bridges) {
+    IGRAPH_CHECK(igraph_community_eb_get_merges(graph, result, merges, bridges));
   }
   
   return 0;
