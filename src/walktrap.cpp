@@ -71,6 +71,11 @@ using namespace std;
  * communities in large networks using random walks, 
  * http://arxiv.org/abs/physics/0512106
  * 
+ * </para><para>
+ * Currently the original C++ implementation is used in igraph, 
+ * see http://www.liafa.jussieu.fr/~pons/index.php?item=prog&item2=walktrap&lang=en
+ * i'm grateful for Matthieu Latapy and Pascal Pons for providing this 
+ * source code.
  * \param graph The input graph.
  * \param weights Numeric vector giving the weights of the edges. 
  *     If it is a NULL pointer then all edges will have equal
