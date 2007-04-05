@@ -1895,6 +1895,53 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_lastcit_game
+ * 
+ * This is a quite special stochastic graph generator, it models an
+ * evolving graph. In each time step a single vertex is added to the 
+ * network and it cites a number of other vertices (as specified by 
+ * the \p edges_per_step argument). The cited vertices are selected
+ * based on the last time they were cited. Time is mesaured by the 
+ * addition of vertices and it is binned into \p pagebins bins. 
+ * So if the current time step is \c t and the last citation to a 
+ * given \c i vertex was made in time step \c t0, then \c
+ * (t-t0)/binwidth is calculated where binwidth is \c nodes/pagebins+1,
+ * in the last expression '/' denotes integer division, so the
+ * fraction part is omitted. 
+ * 
+ * </para><para>
+ * The \p preference argument specifies the preferences for the
+ * citation lags, ie. its first elements contains the attractivity 
+ * of the very recently cited vertices, etc. The last element is
+ * special, it contains the attractivity of the vertices which were
+ * never cited. This element should be bigger than zero.
+ * 
+ * </para><para>
+ * Note that this function generates networks with multiple edges if 
+ * \p edges_per_step is bigger than one, call \ref igraph_simplify()
+ * on the result to get rid of these edges.
+ * \param graph Pointer to an uninitialized graph object, the result
+ *     will be stored here.
+ * \param node The number of vertices in the network.
+ * \param edges_per_node The number of edges to add in each time
+ *     step. 
+ * \param pagebins The number of age bins to use.
+ * \param preference Pointer to an initialized vector of length
+ *     \c pagebins+1. This contains the `attractivity' of the various
+ *     age bins, the last element is the attractivity of the vertices 
+ *     which were never cited, and it should be greater than zero.
+ *     It is a good idea to have all positive values in this vector.
+ * \param directed Logical constant, whether to create directed
+ *      networks. 
+ * \return Error code.
+ * 
+ * \sa \ref igraph_barabasi_aging_game().
+ * 
+ * Time complexity: O(|V|*a+|E|*log|V|), |V| is the number of vertices,
+ * |E| is the total number of edges, a is the \p pagebins parameter.
+ */
   
 int igraph_lastcit_game(igraph_t *graph, 
 			igraph_integer_t nodes, igraph_integer_t edges_per_node, 
@@ -1995,6 +2042,40 @@ int igraph_lastcit_game(igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_cited_type_game
+ * 
+ * Function to create a network based on some vertex categories. This
+ * function creates a citation network, in each step a single vertex
+ * and \p edges_per_step citating edges are added, nodes with
+ * different categories (may) have different probabilities to get
+ * cited, as given by the \p pref vector.
+ *
+ * </para><para>
+ * Note that this function might generate networks with multiple edges 
+ * if \p edges_per_step is greater than one. You might want to call
+ * \ref igraph_simplify() on the result to remove multiple edges.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param nodes The number of vertices in the network.
+ * \param types Numeric vector giving the categories of the vertices,
+ *     so it should contain \p nodes non-negative integer
+ *     numbers. Types are numbered from zero.
+ * \param pref The attractivity of the different vertex categories in
+ *     a vector. Its length should be the maximum element in \p types
+ *     plus one (types are numbered from zero).
+ * \param edges_per_step Integer constant, the number of edges to add
+ *     in each time step.
+ * \param directed Logical constant, whether to create a directed
+ *     network. 
+ * \return Error code.
+ * 
+ * \sa \ref igraph_citing_cited_type_game() for a bit more general
+ * game. 
+ * 
+ * Time complexity: O((|V|+|E|)log|V|), |V| and |E| are number of
+ * vertices and edges, respectively.
+ */
+
 int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 			   const igraph_vector_t *types,
 			   const igraph_vector_t *pref,
@@ -2052,6 +2133,43 @@ void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct
     igraph_psumtree_destroy(&s->sumtrees[i]);
   }
 }
+
+/**
+ * \function igraph_citing_cited_type_game
+ *
+ * This game is similar to \ref igraph_cited_type_game() but here the
+ * category of the citing vertex is also considered. 
+ * 
+ * </para><para>
+ * An evolving citation network is modeled here, a single vertex and
+ * its \p edges_per_step citation are added in each time step. The 
+ * odds the a given vertex is cited by the new vertex depends on the 
+ * category of both the citing and the cited vertex and is given in
+ * the \p pref matrix. The categories of the citing vertex correspond
+ * to the rows, the categories of the cited vertex to the columns of
+ * this matrix. Ie. the element in row \c i and column \c j gives the
+ * probability that a \c j vertex is cited, if the category of the
+ * citing vertex is \c i.
+ * 
+ * </para><para>
+ * Note that this function might generate networks with multiple edges 
+ * if \p edges_per_step is greater than one. You might want to call
+ * \ref igraph_simplify() on the result to remove multiple edges.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param nodes The number of vertices in the network.
+ * \param types A numeric matrix of length \p nodes, containing the
+ *    categories of the vertices. The categories are numbered from
+ *    zero.
+ * \param pref The preference matrix, a square matrix is required, 
+ *     both the number of rows and columns should be the maximum
+ *     element in \p types plus one (types are numbered from zero).
+ * \param directed Logical constant, whether to create a directed
+ *     network.
+ * \return Error code.
+ * 
+ * Time complexity: O((|V|+|E|)log|V|), |V| and |E| are number of
+ * vertices and edges, respectively.
+ */
 
 int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 				  const igraph_vector_t *types,

@@ -9,6 +9,7 @@
 
 <section><title>Deciding whether two graphs are isomorphic</title>
 <!-- doxrox-include igraph_isomorphic -->
+<!-- doxrox-include igraph_isomorphic_vf2 -->
 </section>
 
 <section><title>Isomorphism classes</title>

@@ -26,6 +26,47 @@
 
 #include <string.h>
 
+/**
+ * \function igraph_community_eb_get_merges
+ * \brief Calculating the merges, ie. the dendrogram for an edge betweenness
+ * community structure
+ * 
+ * </para><para> 
+ * This function is handy if you have a sequence of edge which are
+ * gradually removed from the network and you would like to know how
+ * the network falls apart into separate components. The edge sequence
+ * may come from the \ref igraph_community_edge_betweenness()
+ * function, but this is not neccessary. Note that \ref
+ * igraph_community_edge_betweenness can also calculate the
+ * dendrogram, via its \p merges argument.
+ *
+ * \param graph The input graph.
+ * \param edges Vector containing the edges to be removed from the
+ *    network, all edges are expected to appear exactly once in the
+ *    vector.
+ * \param res Pointer to an initialized matrix, if not NULL then the 
+ *    dendrogram will be stored here, in the same form as for the \ref
+ *    igraph_community_walktrap() function: the matrix has two columns
+ *    and each line is a merge given by the ids of the merged
+ *    components. The component ids are number from zero and
+ *    component ids smaller than the number of vertices in the graph
+ *    belong to individual vertices. The non-trivial components
+ *    containing at least two vertices are numbered from \c n, \c n is
+ *    the number of vertices in the graph. So if the first line
+ *    contains \c a and \c b that means that components \c a and \c b
+ *    are merged into component \c n, the second line creates
+ *    component \c n+1, etc. The matrix will be resized as needed.
+ * \param bridges Pointer to an initialized vector or NULL. If not
+ *    null then the index of the edge removals which split the network
+ *    will be stored here. The vector will be resized as needed.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_community_edge_betweenness().
+ * 
+ * Time complexity: O(|E|+|V|log|V|), |V| is the number of vertices,
+ * |E| is the number of edges.
+ */
+
 int igraph_community_eb_get_merges(const igraph_t *graph, 
 				   const igraph_vector_t *edges,
 				   igraph_matrix_t *res,
@@ -102,6 +143,52 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
   
   return which;
 }
+
+/**
+ * \function igraph_community_edge_betweenness
+ * 
+ * Community structure detection based on the betweenness of the edges
+ * in the network. The algorithm was invented by M. Girvan ans
+ * M. Newman, see TODO: citation.
+ * 
+ * </para><para>
+ * The idea is that the betweenness of the edges connecting two
+ * communities is typically high, as many of the shortest paths
+ * between nodes in separate communities go through them. So we
+ * gradually remove the edge with highest betweenness from the
+ * network, and recalculate edge betweenness after every removal. 
+ * This way sooner or later the network falls off to two components,
+ * then after a while one of these components falls off to two smaller 
+ * components, etc. until all edges are removed. This is a divisive
+ * hieararchical approach, the result is a dendrogram.
+ * \param graph The input graph.
+ * \param result Pointer to an initialized vector, the result will be
+ *     stored here, the ids of the removed edges in the order of their 
+ *     removal. It will be resized as needed.
+ * \param edge_betweenness Pointer to an initialized vector or
+ *     NULL. In the former case the edge betweenness of the removed
+ *     edge is stored here. The vector will be resized as needed.
+ * \param merges Pointer to an initialized matrix or NULL. If not NULL
+ *     then merges performed by the algorithm are stored here. Even if
+ *     this is a divisive algorithm, we can replay it backwards and
+ *     note which two clusters were merged. Clusters are numbered from
+ *     zero, see the \p merges argument of \ref
+ *     igraph_community_walktrap() for details. The matrix will be
+ *     resized as needed.
+ * \param bridges Pointer to an initialized vector of NULL. If not
+ *     NULL then all edge removals which separated the network into
+ *     more components are marked here.
+ * \param directed Logical constant, whether to calculate directed
+ *    betweenness (ie. directed paths) for directed graphs. It is
+ *    ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_community_eb_get_merges(), \ref
+ * igraph_community_spinglass(), \ref igraph_community_walktrap().
+ * 
+ * Time complexity: O(|V|^3), as the betweenness calculation requires
+ * O(|V|^2) and we do it |V|-1 times.
+ */
   
 int igraph_community_edge_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *result,

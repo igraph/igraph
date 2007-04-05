@@ -194,26 +194,6 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
  * of edges.
  */
 
-/**
- * \function igraph_to_directed
- * \brief Convert an undirected graph to a directed one
- * 
- * </para><para>
- * If the supplied graph is directed, this function does nothing.
- * \param graph The graph object to convert.
- * \param mode Constant, specifies the details of how exactly the
- *        conversion is done. Possible values: \c
- *        IGRAPH_TO_DIRECTED_ARBITRARY: the number of edges in the
- *        graph stays the same, an arbitrarily directed edge is
- *        created for each undirected edge; 
- *         \c IGRAPH_TO_DIRECTED_MUTUAL: two directed edges are
- *        created for each undirected edge, one in each direction.
- * \return Error code.
- * 
- * Time complexity: O(|V|+|E|), the number of vertices plus the number
- * of edges.
- */
-
 int igraph_to_directed(igraph_t *graph,
 		       igraph_to_directed_t mode) {
 

@@ -923,8 +923,33 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 
 /* TODO: return matching */
 /* TODO: does not work for unconnected graphs */
-/* TODO: use the adjacency list for the degree calculation */
-/* TODO: binary search in the neighbor lists */
+/**
+ * \function igraph_isomorphic_vf2
+ * \brief Decides whether two graphs are isomorphic.
+ * 
+ * </para><para>
+ * This function is an implementation of the VF2 isomorphism algorithm, 
+ * see P. Foggia, C. Sansone, M. Vento, An Improved algorithm for
+ * matching large graphs, Prof. of the 3rd IAPR-TC-15 International
+ * Workshop on Graph-based Representations, Italy, 2001.
+ * 
+ * </para><para> In the future the general \ref igraph_isomorphic()
+ * function should be responsible for calling this function.
+ * 
+ * </para><para> Note that this function cannot be used for subgraph
+ * deciding subgraph isomorphism.
+ * \param graph1 The first graph, it should be connected.
+ * \param graph2 The second graph, it should be connected and should
+ *    have the same number of vertices and edges as \p graph1.
+ * \param iso Pointer to a logical constant, the result of the
+ *    algorithm will be placed here.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_isomorphic().
+ * 
+ * Time complexity: exponential, what did you expect?
+ */
+
 int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
 			  igraph_bool_t *iso) {
   

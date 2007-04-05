@@ -14,6 +14,7 @@
 <section><title>Minimum cuts</title>
 <!-- doxrox-include igraph_st_mincut_value -->
 <!-- doxrox-include igraph_mincut_value -->
+<!-- doxrox-include igraph_mincut -->
 </section>
 
 <section><title>Connectivity</title>

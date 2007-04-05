@@ -29,6 +29,8 @@
 <!-- doxrox-include igraph_barabasi_game -->
 <!-- doxrox-include igraph_nonlinear_barabasi_game -->
 <!-- doxrox-include igraph_erdos_renyi_game -->
+<!-- doxrox-include igraph_watts_strogatz_game -->
+<!-- doxrox-include igraph_rewire_edges -->
 <!-- doxrox-include igraph_degree_sequence_game -->
 <!-- doxrox-include igraph_rewire -->
 <!-- doxrox-include igraph_growing_random_game -->
@@ -39,8 +41,9 @@
 <!-- doxrox-include igraph_recent_degree_game -->
 <!-- doxrox-include igraph_barabasi_aging_game -->
 <!-- doxrox-include igraph_recent_degree_aging_game -->
-<!-- doxrox-include igraph_watts_strogatz_game -->
-<!-- doxrox-include igraph_rewire_edges -->
+<!---doxrox-include igraph_lastcit_game -->
+<!-- doxrox-include igraph_cited_type_game -->
+<!-- doxrox-include igraph_citing_cited_type_game -->
 </section>
 
 </chapter>

@@ -89,8 +89,8 @@ operators.xml: operators.xxml $(SRCDIR)/operators.c
 flows.xml: flows.xxml $(SRCDIR)/flow.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c
 
-community.xml: community.xxml $(SRCDIR)/clustertool.cpp
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/clustertool.cpp
+community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp
 
 cliques.xml: cliques.xxml $(SRCDIR)/cliques.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c

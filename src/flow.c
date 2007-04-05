@@ -633,6 +633,49 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   return 0;
 }
 
+/** 
+ * \function igraph_mincut
+ * Calculates the minimum cut in a graph.
+ * 
+ * This function calculates the minimum cut in a graph. Right now it
+ * is implemented only for undirected graphs, in which case it uses
+ * the Stoer-Wagner algorithm, as described in M. Stoer and F. Wagner: 
+ * A simple min-cut algorithm, Journal of the ACM, 44 585-591, 1997. 
+ * 
+ * </para><para>
+ * The minimum cut is the mimimum set of edges which needs to be
+ * removed to disconnect the graph. The minimum is calculated using
+ * the weigths (\p capacity) of the edges, so the cut with the minimum
+ * total capacity is calculated. 
+ * 
+ * </para><para>
+ * The first implementation of the actual cut calculation was made by 
+ * Gregory Benison, thanks Greg.
+ * \param graph The input graph.
+ * \param value Pointer to an integer, the value of the cut will be
+ *    stored here.
+ * \param partition Pointer to an initialized vector, the ids
+ *    of the vertices in the first partition after separating the
+ *    graph will be stored here. The vector will be resized as
+ *    needed. This argument is ignored if it is a NULL pointer. 
+ * \param partition2 Pointer to an initialized vector the ids
+ *    of the vertices in the second partition will be stored here. 
+ *    The vector will be resized as needed. This argument is ignored
+ *    if it is a NULL pointer.
+ * \param cut Pointer to an initialized vector, the ids of the edges
+ *    in the cut will be stored here. This argument is ignored if it
+ *    is a NULL pointer.
+ * \param capacity A numeric vector giving the capacities of the
+ *    edges. 
+ * \return Error code.
+ * 
+ * \sa \ref igraph_mincut_value(), a simpler interface for calculating
+ * the value of the cut only.
+ *
+ * Time complexity: for undirected graphs it is O(|V|E|+|V|^2 log|V|),
+ * |V| and |E| are the number of vertices and edges respectively.
+ */
+
 int igraph_mincut(const igraph_t *graph,
 		  igraph_integer_t *value,
 		  igraph_vector_t *partition,
@@ -689,7 +732,8 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
  *    the graph.
  * \return Error code.
  *
- * \sa \ref igraph_maxflow_value(), \ref igraph_st_mincut_value().
+ * \sa \ref igraph_mincut(), \ref igraph_maxflow_value(), \ref
+ * igraph_st_mincut_value(). 
  * 
  * Time complexity: O(log(|V|)*|V|^2) for undirected graphs and 
  * O(|V|^4) for directed graphs, but see also the discussion at the

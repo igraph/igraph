@@ -63,6 +63,42 @@
 
 using namespace std;
 
+/** 
+ * \function igraph_community_walktrap
+ * 
+ * This function is the implementation of the Walktrap community
+ * finding algorithm, see Pascal Pons, Matthieu Latapy: Computing
+ * communities in large networks using random walks, 
+ * http://arxiv.org/abs/physics/0512106
+ * 
+ * \param graph The input graph.
+ * \param weights Numeric vector giving the weights of the edges. 
+ *     If it is a NULL pointer then all edges will have equal
+ *     weights. 
+ * \param steps Integer constant, the length of the random walks.
+ * \param merges Pointer to a matrix, the merges performed by the
+ *     algorithm will be stored here (if not NULL). Each merge is a
+ *     row in a two-column matrix and contains the ids of the merged
+ *     clusters. Clusters are numbered from zero and cluster number 
+ *     smaller than the number of nodes in the network belong to the
+ *     individual vertices as singleton clusters. In each step a new
+ *     cluster is created from two other clusters and its id will be 
+ *     one larger than the largest cluster id so far. This means that 
+ *     before the first merge we have \c n clusters (the number of
+ *     vertices in the graph) numbered from zero to \c n-1. The first
+ *     merge created cluster \c n, the second cluster \c n+1, etc.
+ * \param modularity Pointer to a vector. If not NULL then the
+ *     modularity score of the current clustering is stored here after
+ *     each merge operation. 
+ * \return Error code.
+ * 
+ * \sa \ref igraph_community_spinglass(), \ref
+ * igraph_community_edge_betweenness(). 
+ * 
+ * Time complexity: O(|E||V|^2) in the worst case, O(|V|^2 log|V|) typically, 
+ * |V| is the number of vertices, |E| is the number of edges.
+ */
+
 int igraph_community_walktrap(const igraph_t *graph, 
 			      const igraph_vector_t *weights,
 			      int steps,

@@ -8,8 +8,17 @@
 <title>Detecting Community Structure</title>
 
 <section><title>Community structure based on statistical mechanics</title>
-<!-- doxrox-include igraph_spinglass_community -->
-<!-- doxrox-include igraph_spinglass_my_community -->
+<!-- doxrox-include igraph_community_spinglass -->
+<!-- doxrox-include igraph_community_spinglass_single -->
+</section>
+
+<section><title>Walktrap: community structure based on random walks</title>
+<!-- doxrox-include igraph_community_walktrap -->
+</section>
+
+<section><title>Edge betweenness based community detection</title>
+<!-- doxrox-include igraph_community_edge_betweenness -->
+<!-- doxrox-include igraph_community_eb_get_merges -->
 </section>
 
 </chapter>
