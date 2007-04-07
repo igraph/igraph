@@ -32,13 +32,6 @@ int main() {
   long int i, n;
 
   f=fopen("igraph_layout_reingold_tilford.in", "r");
-  if (!f) {
-    /* required when used from test suite */
-    f=fopen("../../../examples/simple/igraph_layout_reingold_tilford.in", "r");
-    if (!f) {
-      return 1;
-    }
-  }
   igraph_read_graph_edgelist(&g, f, 0, 1);
   igraph_matrix_init(&coords, 0, 0);
   igraph_layout_reingold_tilford(&g, &coords, 0); 

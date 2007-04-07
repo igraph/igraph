@@ -49,6 +49,8 @@
  * \return Error code:
  *        \c IGRAPH_EINVAL invalid type argument.
  *
+ * \sa igraph_get_adjacency_sparse if you want a sparse matrix representation
+ *
  * Time complexity: O(|V||V|),
  * |V| is the 
  * number of vertices in the graph.
@@ -109,6 +111,106 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
       MATRIX(*res, from, to) += 1;
       if (from != to) {
 	MATRIX(*res, to, from) += 1;
+      }
+      IGRAPH_EIT_NEXT(edgeit);
+    }
+  } else {
+    IGRAPH_ERROR("Invalid type argument", IGRAPH_EINVAL);
+  }
+
+  igraph_eit_destroy(&edgeit);
+  IGRAPH_FINALLY_CLEAN(1);
+  return retval;
+}
+
+/**
+ * \ingroup conversion
+ * \function igraph_get_adjacency_sparse
+ * \brief Returns the adjacency matrix of a graph in sparse matrix format
+ * 
+ * </para><para>
+ * The result is an incidence matrix, it contains numbers greater
+ * than one if there are multiple edges in the graph.
+ * \param graph Pointer to the graph to convert
+ * \param res Pointer to an initialized sparse matrix object, it will be
+ *        resized if needed.
+ * \param type Constant giving the type of the adjacency matrix to
+ *        create for undirected graphs. It is ignored for directed
+ *        graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_GET_ADJACENCY_UPPER 
+ *          the upper right triangle of the matrix is used.
+ *        \cli IGRAPH_GET_ADJACENCY_LOWER 
+ *          the lower left triangle of the matrix is used.
+ *        \cli IGRAPH_GET_ADJACENCY_BOTH 
+ *          the whole matrix is used, a symmetric matrix is returned.
+ *        \endclist
+ * \return Error code:
+ *        \c IGRAPH_EINVAL invalid type argument.
+ *
+ * \sa igraph_get_adjacency if you would like to get a normal matrix
+ *   ( \ref igraph_matrix_t )
+ *
+ * Time complexity: O(|V||V|),
+ * |V| is the 
+ * number of vertices in the graph.
+ */
+
+int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
+			 igraph_get_adjacency_t type) {
+  
+  igraph_eit_t edgeit;
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_bool_t directed=igraph_is_directed(graph);
+  int retval=0;
+  long int from, to;
+  igraph_integer_t ffrom, fto;
+  
+  igraph_spmatrix_null(res);
+  IGRAPH_CHECK(igraph_spmatrix_resize(res, no_of_nodes, no_of_nodes));
+  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
+  
+  if (directed) {
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
+      igraph_spmatrix_add_e(res, from, to, 1);
+      IGRAPH_EIT_NEXT(edgeit);
+    }
+  } else if (type==IGRAPH_GET_ADJACENCY_UPPER) {
+    while (!IGRAPH_EIT_END(edgeit)) {  
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
+      if (to < from) {
+        igraph_spmatrix_add_e(res, to, from, 1);
+      } else {
+        igraph_spmatrix_add_e(res, from, to, 1);
+      }
+      IGRAPH_EIT_NEXT(edgeit);
+    }
+  } else if (type==IGRAPH_GET_ADJACENCY_LOWER) {
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
+      if (to > from) {
+        igraph_spmatrix_add_e(res, to, from, 1);
+      } else {
+        igraph_spmatrix_add_e(res, from, to, 1);
+      }
+      IGRAPH_EIT_NEXT(edgeit);
+    }
+  } else if (type==IGRAPH_GET_ADJACENCY_BOTH) {
+    while (!IGRAPH_EIT_END(edgeit)) {
+      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+      from=ffrom;
+      to=fto;
+      igraph_spmatrix_add_e(res, from, to, 1);
+      if (from != to) {
+        igraph_spmatrix_add_e(res, to, from, 1);
       }
       IGRAPH_EIT_NEXT(edgeit);
     }

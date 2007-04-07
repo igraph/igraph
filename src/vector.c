@@ -507,6 +507,28 @@ int igraph_vector_push_back (igraph_vector_t* v, igraph_real_t e) {
 
 /**
  * \ingroup vector
+ * \function igraph_vector_insert
+ * \brief Inserts a single element into a vector.
+ *
+ * Note that this function does not do range checking. Insertion will shift the
+ * elements from the position given to the end of the vector one position to the
+ * right, and the new element will be inserted in the empty space created at
+ * the given position. The size of the vector will increase by one.
+ *
+ * \param v The vector object.
+ * \param pos The position where the new element is inserted.
+ */
+int igraph_vector_insert(igraph_vector_t *v, long int pos, igraph_real_t value) {
+  long int size = igraph_vector_size(v);
+  IGRAPH_CHECK(igraph_vector_resize(v, size+1));
+  if (pos<size)
+	memmove(v->stor_begin+pos+1, v->stor_begin+pos, sizeof(igraph_real_t)*(size-pos));
+  v->stor_begin[pos] = value;
+  return 0;
+}
+
+/**
+ * \ingroup vector
  * \section igraph_vector_accessing_elements Accessing elements of a
  * \type igraph_vector_t.
  * 

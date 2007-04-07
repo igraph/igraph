@@ -936,12 +936,21 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
 				   igraph_matrix_t *merges,
 				   igraph_vector_t *bridges);
 
+int igraph_community_clauset(const igraph_t *graph,
+                             const igraph_vector_t *weights,
+                             const igraph_integer_t no,
+                             igraph_real_t *modularity,
+                             igraph_vector_t *membership,
+                             igraph_matrix_t *merges);
+
 /* -------------------------------------------------- */
 /* Conversion                                         */
 /* -------------------------------------------------- */
 
 int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
 			 igraph_get_adjacency_t type);
+int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
+			        igraph_get_adjacency_t type);
 int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
 
 int igraph_to_directed(igraph_t *graph, 

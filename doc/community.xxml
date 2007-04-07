@@ -21,4 +21,8 @@
 <!-- doxrox-include igraph_community_eb_get_merges -->
 </section>
 
+<section><title>Community structure based on fast greedy optimization of modularity</title>
+<!-- doxrox-include igraph_community_clauset -->
+</section>
+
 </chapter>

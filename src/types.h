@@ -134,6 +134,7 @@ long int igraph_vector_size      (const igraph_vector_t* v);
 void igraph_vector_clear     (igraph_vector_t* v);
 void igraph_vector_null      (igraph_vector_t* v);
 int igraph_vector_push_back (igraph_vector_t* v, igraph_real_t e);
+int igraph_vector_insert(igraph_vector_t *v, long int pos, igraph_real_t value);
 igraph_real_t igraph_vector_e         (const igraph_vector_t* v, long int pos);
 igraph_real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos);
 void igraph_vector_set       (igraph_vector_t* v, long int pos, igraph_real_t value);
@@ -274,6 +275,65 @@ int igraph_matrix_select_rows(const igraph_matrix_t *m, igraph_matrix_t *res,
 int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
 			  long int index);
 igraph_real_t igraph_matrix_sum(const igraph_matrix_t *m);
+
+/* -------------------------------------------------- */
+/* Sparse matrix                                      */
+/* -------------------------------------------------- */
+
+/** 
+ * \section about_igraph_spmatrix_t_objects About \type igraph_spmatrix_t objects
+ * 
+ * <para>The \type igraph_spmatrix_t type stores a sparse matrix with the
+ * assumption that the number of nonzero elements in the matrix scales
+ * linearly with the row or column count of the matrix (so most of the
+ * elements are zero). Of course it can store an arbitrary real matrix,
+ * but if most of the elements are nonzero, one should use \type igraph_matrix_t
+ * instead.</para>
+ *
+ * <para>The elements are stored in column compressed format, so the elements
+ * in the same column are stored adjacent in the computer's memory. The storage
+ * requirement for a sparse matrix is O(n) where n is the number of nonzero
+ * elements. Actually it can be a bit larger, see the documentation of
+ * the vector type for an explanation.</para>
+ */
+typedef struct s_spmatrix {
+  igraph_vector_t ridx, cidx, data;
+  long int nrow, ncol;
+} igraph_spmatrix_t;
+
+#define IGRAPH_SPMATRIX_INIT_FINALLY(m, nr, nc) \
+  do { IGRAPH_CHECK(igraph_spmatrix_init(m, nr, nc)); \
+  IGRAPH_FINALLY(igraph_spmatrix_destroy, m); } while (0)
+
+int igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol);
+void igraph_spmatrix_destroy(igraph_spmatrix_t *m);
+int igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol);
+igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m, long int row, long int col);
+int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
+                        igraph_real_t value);
+int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
+                        igraph_real_t value);
+int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int from);
+long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m);
+long int igraph_spmatrix_size(const igraph_spmatrix_t *m);
+long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m);
+long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m);
+int igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to);
+int igraph_spmatrix_null(igraph_spmatrix_t *m);
+int igraph_spmatrix_add_cols(igraph_spmatrix_t *m, long int n);
+int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n);
+int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col);
+int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row);
+int igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from);
+igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
+    igraph_real_t *ridx, igraph_real_t *cidx);
+igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
+    igraph_real_t *ridx, igraph_real_t *cidx);
+void igraph_spmatrix_multiply(igraph_spmatrix_t *m, igraph_real_t by);
+int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
+
+int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
+    igraph_vector_t *res, long int col);
 
 /* -------------------------------------------------- */
 /* 3D array                                           */
