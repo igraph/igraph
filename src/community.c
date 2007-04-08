@@ -148,8 +148,10 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * \function igraph_community_edge_betweenness
  * 
  * Community structure detection based on the betweenness of the edges
- * in the network. The algorithm was invented by M. Girvan ans
- * M. Newman, see TODO: citation.
+ * in the network. The algorithm was invented by M. Girvan and
+ * M. Newman, see: M. Girvan and M. E. J. Newman: Community structure in
+ * social and biological networks, Proc. Nat. Acad. Sci. USA 99, 7821-7826
+ * (2002).
  * 
  * </para><para>
  * The idea is that the betweenness of the edges connecting two
@@ -235,17 +237,17 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   
   distance=Calloc(no_of_nodes, long int);
   if (distance==0) {
-    IGRAPH_ERROR("edge betweenness community struture failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, distance);
   nrgeo=Calloc(no_of_nodes, long int);
   if (nrgeo==0) {
-    IGRAPH_ERROR("edge betweenness community struture failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, nrgeo);
   tmpscore=Calloc(no_of_nodes, double);
   if (tmpscore==0) {
-    IGRAPH_ERROR("edge betweenness community struture failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, tmpscore);
 
@@ -263,7 +265,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   
   passive=Calloc(no_of_edges, char);
   if (!passive) {
-    IGRAPH_ERROR("edge betweenness community struture failed", IGRAPH_ENOMEM);
+    IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, passive);
 
