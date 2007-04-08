@@ -1,6 +1,10 @@
 """
 IGraph library.
 
+@undocumented: test
+"""
+
+__license__ = """
 Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
 Tamas Nepusz <ntamas@rmki.kfki.hu>
 
@@ -20,12 +24,11 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 02110-1301 USA
-
-@undocumented: test
 """
 
 from core import *
 from core import __version__, __build_date__
+from clustering import *
 
 import os
 import math
@@ -257,9 +260,28 @@ class Graph(core.GraphBase):
         result = Histogram(bin_width, self.degree(*args, **kwds))
         return result
 
-    def edge_betweenness_clustering(self, clusters = None, steps = None, \
-                                    return_graph = False, \
-                                    return_removed_edges = False):
+    # Various clustering algorithms -- mostly wrappers around GraphBase
+
+    def community_clauset(self, clusters = None):
+        """Community structure based on the greedy optimization of modularity.
+
+        This algorithm merges individual nodes into communities in a way that
+        greedily maximizes the modularity score of the graph. It can be proven
+        that if no merge can increase the current modularity score, the algorithm
+        can be stopped since no further increase can be achieved.
+
+        This algorithm is said to run almost in linear time on sparse graphs.
+
+        @param clusters: the desired number of clusters. If C{None}, the optimal
+          cluster count will be determined automatically.
+        @return: an appropriate L{VertexClustering} object.
+        """
+        if clusters is None: clusters = -1
+        cl, q, merges = GraphBase.community_clauset(self, clusters)
+        return VertexClustering(self, cl, q, merges)
+
+
+    def edge_betweenness_clustering(self, clusters = None, steps = None):
         """Newman's edge betweenness clustering.
 
         Iterative removal of edges with the largest edge betweenness until
@@ -269,20 +291,14 @@ class Graph(core.GraphBase):
 
         @param clusters: the desired number of clusters.
         @param steps: the number of tests to take.
-        @param return_graph: whether to return the state of the graph when
-          the iteration ended.
 
-        @return: the cluster index for every node. If C{return_graph} is
-          C{True}, the clustered graph is also returned. If
-          C{return_removed_edges} is C{True}, the list of removed edges is
-          also returned.
+        @return: an appropriate L{VertexClustering} object.
 
         @ref: Girvan, M and Newman, MEJ: Community structure in social and
           biological networks. Proc. Natl. Acad. Sci. USA 99, 7821-7826 (2002)
         """
         g = self.copy()
         number_of_steps = 0
-        removed_edges = [None, []][return_removed_edges]
 
         directed = g.is_directed()
 
@@ -301,19 +317,10 @@ class Graph(core.GraphBase):
             eb_max = max(ebs)
             eb_max_index = ebs.index(eb_max)
 
-            if return_removed_edges:
-                removed_edges.append(g.es[eb_max_index].tuple)
-
             g.delete_edges(eb_max_index, by_index=True)
             number_of_steps += 1
 
-        if return_graph and return_removed_edges:
-            return g.clusters(), g, removed_edges
-        elif return_graph:
-            return g.clusters(), g
-        elif return_removed_edges:
-            return g.clusters(), removed_edges
-        return g.clusters()
+        return VertexClustering(self, g.clusters()) 
 
 
     def k_core(self, *args):

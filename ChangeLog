@@ -1,3 +1,11 @@
+2007-04-08  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/graphobject.c : adjusted interface of
+	community_clauset
+	* interfaces/python/package/clustering.py : added
+	* interfaces/python/package/__init__.py : modified clustering
+	functions to return instances of VertexClustering
+
 2007-04-07  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/spmatrix.c : added

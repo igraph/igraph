@@ -17,14 +17,15 @@ class CommunityTests(unittest.TestCase):
     def testClauset(self):
         g = Graph.Full(5) + Graph.Full(5)
         g.add_edges([(0, 5)])
-        cl, q = g.community_clauset(return_q = True)
-        self.failUnless(cl == [0,0,0,0,0,1,1,1,1,1])
-        self.assertAlmostEqual(q, 0.4523)
-        self.failUnless(max(g.community_clauset(3)) == 2)
+        cl = g.community_clauset()
+        self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
+        self.assertAlmostEqual(cl.q, 0.4523, places=3)
+        self.failUnless(len(g.community_clauset(3)) == 3)
         
 def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
-    return unittest.TestSuite([decomposition_suite])
+    community_suite = unittest.makeSuite(CommunityTests)
+    return unittest.TestSuite([decomposition_suite, community_suite])
 
 def test():
     runner = unittest.TextTestRunner()

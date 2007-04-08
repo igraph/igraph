@@ -4927,17 +4927,16 @@ PyObject *igraphmodule_Graph_coreness(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_community_clauset(igraphmodule_GraphObject * self,
 	PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "n", "weights", "return_q", "return_merges", NULL };
+  static char *kwlist[] = { "n", "weights", "return_merges", NULL };
   long n=-1;
   PyObject *weights = Py_None;
-  PyObject *return_q = Py_False;
   PyObject *return_merges = Py_False;
-  PyObject *cl, *res;
+  PyObject *cl, *res, *merges;
   igraph_real_t q;
   igraph_vector_t members;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iOOO", kwlist,
-	  &n, &weights, &return_q, &return_merges)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iOO", kwlist,
+	  &n, &weights, &return_merges)) {
   }
 
   if (igraph_vector_init(&members, 0)) return igraphmodule_handle_igraph_error();
@@ -4949,13 +4948,14 @@ PyObject *igraphmodule_Graph_community_clauset(igraphmodule_GraphObject * self,
   igraph_vector_destroy(&members);
   if (cl == 0) return 0;
 
-  if (PyObject_IsTrue(return_q)) {
-    res=Py_BuildValue("Od", cl, (double)q);
-    Py_DECREF(cl);
-	return res;
-  } else {
-    return cl;
-  }
+  merges = Py_None;
+  Py_INCREF(merges);
+
+  res=Py_BuildValue("OdO", cl, (double)q, &merges);
+  Py_DECREF(merges);
+  Py_DECREF(cl);
+
+  return res;
 }
 
 /* }}} */
@@ -6341,21 +6341,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  for Core Decomposition of Networks.}"},
   {"community_clauset", (PyCFunction) igraphmodule_Graph_community_clauset,
    METH_VARARGS | METH_KEYWORDS,
-   "community_clauset(n=-1, weights=None, return_q=False, return_merges=False)\n\n"
+   "community_clauset(n=-1, weights=None, return_merges=False)\n\n"
    "Finds the community structure of the graph according to the algorithm of\n"
    "Clauset et al based on the greedy optimization of modularity.\n\n"
+   "@attention: this function is wrapped in a more convenient syntax in the\n"
+   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
    "@param n: the desired number of communities. If zero or negative, the\n"
    "  community count is chosen in a way that maximizes the modularity.\n"
    "@param weights: the weights to be used for the edges. Currently unimplemented.\n"
-   "@param return_q: if C{True}, returns the modularity (Q) score of the optimal\n"
-   "  community structure.\n"
    "@param return_merges: if C{True}, returns the order in which the individual\n"
    "  vertices are merged into communities. Currently unimplemented.\n"
-   "@return: a list containing the index of the community each vertex belongs to.\n"
-   "  The values of the parameters C{return_q} and C{return_merges} also affect\n"
-   "  the returned value -- if any of them is C{True}, the returned value is a\n"
-   "  tuple containing the membership list, the modularity score and the list of\n"
-   "  merges, according to the values of C{return_q} and C{return_merges}.\n\n"
+   "@return: a tuple with the following elements:\n"
+   "  1. A list containing the index of the community each vertex belongs to.\n"
+   "  2. The modularity score at the community structure returned.\n"
+   "  3. The list of merges if C{return_merges} is C{True}, or C{None} if it is\n"
+   "      C{False}\n"
+   "\n"
    "@ref: A. Clauset, M. E. J. Newman and C. Moore: I{Finding community\n"
    "  structure in very large networks.} Physical Review E 70, 066111 (2004)."
   },
