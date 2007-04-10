@@ -1,3 +1,28 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+// The original copyright notice follows
+
 ////////////////////////////////////////////////////////////////////////
 // --- COPYRIGHT NOTICE ---------------------------------------------
 // FastCommunityMH - infers community structure of networks
@@ -195,6 +220,34 @@ void igraph_i_readInputFile(igraph_i_netparameters_t &gparm, igraph_i_groupstats
 // ----------------------------------- GLOBAL VARIABLES -------------------------------
 
 enum {NONE};
+
+/**
+ * \function igraph_community_fastgreedy
+ * \brief Finding community structure by greedy optimization of modularity
+ * 
+ * This function implements the fast greedy modularity optimization
+ * algorithm for finding community structure, see 
+ * A Clauset, MEJ Newman, C Moore: Finding community structure in very
+ * large networks, http://www.arxiv.org/abs/cond-mat/0408187 for the
+ * details.
+ * \param graph The input graph.
+ * \param merges Pointer to an initialized matrix or NULL, the result of the
+ *    computation is stored here. TODO: format.
+ * \param modularity Pointer to an initialized matrix or NULL pointer,
+ *    in the former case the modularity scores along the stages of the
+ *    computation are recorded here. The vector will be resized as
+ *    needed.
+ * \return Error code.
+ *
+ * \sa \ref igraph_community_walktrap(), \ref
+ * igraph_community_edge_betweenness() for other community detection
+ * algorithms.
+ *
+ * Time complexity: O(|E||V|log|V|) in the worst case,
+ * O(|E|+|V|log^2|V|) typically, |V| is the number of vertices, |E| is
+ * the number of edges.
+ */
+ 
 
 int igraph_community_fastgreedy(const igraph_t *graph,
 				igraph_matrix_t *merges,

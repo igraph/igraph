@@ -25,4 +25,8 @@
 <!-- doxrox-include igraph_community_clauset -->
 </section>
 
+<section><title>Greedy optimization of modularity</title>
+<!-- doxrox-include igraph_community_fastgreedy -->
+</section>
+
 </chapter>

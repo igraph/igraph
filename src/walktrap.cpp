@@ -73,7 +73,7 @@ using namespace std;
  * 
  * </para><para>
  * Currently the original C++ implementation is used in igraph, 
- * see http://www.liafa.jussieu.fr/~pons/index.php?item=prog&item2=walktrap&lang=en
+ * see http://www.liafa.jussieu.fr/~pons/index.php?item=prog&amp;item2=walktrap&amp;lang=en
  * i'm grateful for Matthieu Latapy and Pascal Pons for providing this 
  * source code.
  * \param graph The input graph.
