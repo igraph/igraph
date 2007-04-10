@@ -21,11 +21,12 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 
 RSNAMES_CPP = NetDataTypes.cpp clustertool.cpp NetRoutines.cpp \
 	pottsmodel_2.cpp walktrap.cpp walktrap_heap.cpp walktrap_graph.cpp \
-	walktrap_communities.cpp
+	walktrap_communities.cpp fastcommunity_mh.cc
 
 RSNAMES_H = memory.h random.h atlas-edges.h NetDataTypes.h \
 	NetRoutines.h pottsmodel_2.h walktrap_communities.h \
-	walktrap_heap.h walktrap_graph.h
+	walktrap_heap.h walktrap_graph.h fastcommunity_vektor.h \
+	fastcommunity_maxheap.h
 
 RSNAMES_Y = foreign-ncol-parser.y foreign-lgl-parser.y foreign-pajek-parser.y
 

@@ -943,6 +943,10 @@ int igraph_community_clauset(const igraph_t *graph,
                              igraph_vector_t *membership,
                              igraph_matrix_t *merges);
 
+int igraph_community_fastgreedy(const igraph_t *graph,
+				igraph_matrix_t *merges,
+				igraph_vector_t *modularity);
+
 /* -------------------------------------------------- */
 /* Conversion                                         */
 /* -------------------------------------------------- */

@@ -263,6 +263,15 @@ as.dendrogram.igraph.ebc <- function (object, hang=-1,
   z
 }
 
+fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
+        as.logical(modularity), 
+        PACKAGE="igraph")
+} 
 
 community.cut <- function(graph, edges, after.removing) {
   if (!is.igraph(graph)) {

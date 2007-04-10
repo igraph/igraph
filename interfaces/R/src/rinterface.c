@@ -5843,6 +5843,41 @@ SEXP R_igraph_community_eb_get_merges(SEXP graph,
   return result;
 }
 
+SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity) {
+  
+  igraph_t g;
+  igraph_matrix_t merges, *ppmerges=0;
+  igraph_vector_t modularity, *ppmodularity;
+  SEXP result, names;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  if (LOGICAL(pmerges)[0]) {
+    ppmerges=&merges;
+    igraph_matrix_init(&merges, 0, 0);
+  }
+  if (LOGICAL(pmodularity)[0]) {
+    ppmodularity=&modularity;
+    igraph_vector_init(&modularity, 0);
+  }
+  igraph_community_fastgreedy(&g, ppmerges, ppmodularity);
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_igraph_0ormatrix_to_SEXP(ppmerges));
+  if (ppmerges) { igraph_matrix_destroy(ppmerges); }
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(ppmodularity));
+  if (ppmodularity) { igraph_vector_destroy(ppmodularity); }
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("modularity"));
+  SET_NAMES(result, names);
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+} 
+
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP pdebug) {
   igraph_t g;
