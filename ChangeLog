@@ -1,5 +1,9 @@
 2007-04-10  Gabor Csardi  <csardi@rmki.kfki.hu>
  
+	* src/vector.c (igraph_vector_maxdifference) : added
+	* src/matrix.c (igraph_matrix_is_equal, igraph_matrix_maxdifference) :
+	added
+
 	* src/error.f (IGRAPH_DIVERGED) : added new error type
 
 2007-04-08  Tamas Nepusz  <ntamas@rmki.kfki.hu>

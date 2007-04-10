@@ -176,6 +176,8 @@ int igraph_vector_get_interval(const igraph_vector_t *v, igraph_vector_t *res,
 			       long int from, long int to);
 int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
 		       long int nodes);
+igraph_real_t igraph_vector_maxdifference(const igraph_vector_t *m1,
+					  const igraph_vector_t *m2);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
@@ -275,6 +277,10 @@ int igraph_matrix_select_rows(const igraph_matrix_t *m, igraph_matrix_t *res,
 int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
 			  long int index);
 igraph_real_t igraph_matrix_sum(const igraph_matrix_t *m);
+igraph_bool_t igraph_matrix_is_equal(const igraph_matrix_t *m1, 
+				     const igraph_matrix_t *m2);
+igraph_real_t igraph_matrix_maxdifference(const igraph_matrix_t *m1,
+					  const igraph_matrix_t *m2);
 
 /* -------------------------------------------------- */
 /* Sparse matrix                                      */

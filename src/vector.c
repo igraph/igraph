@@ -1526,3 +1526,21 @@ int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
+
+igraph_real_t igraph_vector_maxdifference(const igraph_vector_t *m1,
+					  const igraph_vector_t *m2) {
+  long int n1=igraph_vector_size(m1);
+  long int n2=igraph_vector_size(m2);
+  long int n= n1 < n2 ? n1 : n2;
+  long int i;
+  igraph_real_t diff=0.0;
+  
+  for (i=0; i<n; i++) {
+    igraph_real_t d=fabs(VECTOR(*m1)[i]-VECTOR(*m2)[i]);
+    if (d > diff) {
+      diff=d;
+    }
+  }
+  
+  return diff;
+}

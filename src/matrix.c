@@ -389,3 +389,20 @@ int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
 igraph_real_t igraph_matrix_sum(const igraph_matrix_t *m) {
   return igraph_vector_sum(&m->data);
 }
+
+igraph_bool_t igraph_matrix_is_equal(const igraph_matrix_t *m1, 
+				     const igraph_matrix_t *m2) {
+  return igraph_vector_is_equal(&m1->data, &m2->data);
+}
+
+igraph_real_t igraph_matrix_maxdifference(const igraph_matrix_t *m1,
+					  const igraph_matrix_t *m2) {
+  long int col1=igraph_matrix_ncol(m1);
+  long int col2=igraph_matrix_ncol(m2);
+  long int row1=igraph_matrix_nrow(m1);
+  long int row2=igraph_matrix_nrow(m2);
+  if (col1 != col2 || row1 != row2) {
+    IGRAPH_WARNING("Comparing non-conformant matrices");
+  }
+  return igraph_vector_maxdifference(&m1->data, &m2->data);
+}
