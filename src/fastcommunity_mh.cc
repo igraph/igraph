@@ -232,7 +232,14 @@ enum {NONE};
  * details.
  * \param graph The input graph.
  * \param merges Pointer to an initialized matrix or NULL, the result of the
- *    computation is stored here. TODO: format.
+ *    computation is stored here. The matrix has two columns and each
+ *    merge corresponds to one merge, the ids of the two merged
+ *    components are stored. The component ids are numbered from zero and 
+ *    the first \c n components are the individual vertices, \c n is
+ *    the number of vertices in the graph. Component \c n is created
+ *    in the first merge, component \c n+1 in the second merge, etc.
+ *    The matrix will be resized as needed. If this argument is NULL
+ *    then it is ignored completely.
  * \param modularity Pointer to an initialized matrix or NULL pointer,
  *    in the former case the modularity scores along the stages of the
  *    computation are recorded here. The vector will be resized as
@@ -248,7 +255,6 @@ enum {NONE};
  * the number of edges.
  */
  
-
 int igraph_community_fastgreedy(const igraph_t *graph,
 				igraph_matrix_t *merges,
 				igraph_vector_t *modularity) {
@@ -328,6 +334,26 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 
     t++;									// increment time
   } // ------------- end community merging loop
+
+  // Rewrite the merge matrix in the usual form
+  if (merges) {
+    igraph_vector_t idx;
+    long int i;
+    IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
+    for (i=0; i<no_of_nodes-1; i++) {
+      long int from=(long int)MATRIX(*merges, i, 0);
+      long int to=(long int)MATRIX(*merges, i, 1);
+      if (VECTOR(idx)[from] != 0) {
+	MATRIX(*merges, i, 0)=VECTOR(idx)[from];
+      }
+      if (VECTOR(idx)[to] != 0) {
+	MATRIX(*merges, i, 1)=VECTOR(idx)[to];
+      }
+      VECTOR(idx)[to]=no_of_nodes+i;
+    }
+    igraph_vector_destroy(&idx);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 	
   return 0;  
 }
