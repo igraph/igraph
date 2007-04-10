@@ -953,6 +953,10 @@ int igraph_community_to_membership(const igraph_t *graph,
 				   igraph_vector_t *membership,
 				   igraph_vector_t *csize);
 
+int igraph_modularity(const igraph_t *graph, 
+		      const igraph_vector_t *membership,
+		      igraph_real_t *modularity);
+
 /* -------------------------------------------------- */
 /* Conversion                                         */
 /* -------------------------------------------------- */

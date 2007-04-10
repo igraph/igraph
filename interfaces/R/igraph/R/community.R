@@ -335,14 +335,11 @@ edge.type.matrix <- function(graph, types) {
   res
 }
 
-modularity <- function(graph, types) {
+modularity <- function(graph, membership) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
-  etm <- edge.type.matrix(graph, types)
-
-  res <- sum(diag(etm)) - sum(etm %*% etm)
-  
-  res
+  .Call("R_igraph_modularity", graph, as.numeric(membership),
+        PACKAGE="igraph")
 }

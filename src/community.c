@@ -770,3 +770,71 @@ int igraph_community_to_membership(const igraph_t *graph,
   
   return 0;
 }
+
+/**
+ * \function igraph_modularity
+ * \brief Calculate the modularity of a graph with respect to some
+ * vertex types
+ * 
+ * The modularity of a graph with respect to some division (or vertex
+ * types) measures how good the division is, or how separated are the 
+ * different vertex types from each other. It defined as 
+ * Q=1/(2m) * sum(Aij-ki*kj/(2m)delta(ci,cj),i,j), here `m' is the
+ * number of edges, `Aij' is the element of the `A' adjacency matrix
+ * in row `i' and column `j', `ki' is the degree of `'i', `kj' is the
+ * degree of `j', `ci' is the type (or component) of `i', `cj' that of
+ * `j', the sum goes over all `i' and `j' pairs of vertices, and
+ * `delta(x,y)' is one if x=y and zero otherwise.
+ * 
+ * </para><para>
+ * See also MEJ Newman and M Girvan: Finding and evaluating community
+ * structure in networks. Physical Review E 69 026113, 2004.
+ * \param graph The input graph.
+ * \param membership Numeric vector which gives the type of each
+ *     vertex, ie. the component to which it belongs.
+ * \param modularity Pointer to a real number, the result will be
+ *     stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges.
+ */
+
+int igraph_modularity(const igraph_t *graph, 
+		      const igraph_vector_t *membership,
+		      igraph_real_t *modularity) {
+  
+  igraph_vector_t e, a;
+  long int types=igraph_vector_max(membership)+1;
+  long int no_of_edges=igraph_ecount(graph);
+  long int i;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&e, types);
+  IGRAPH_VECTOR_INIT_FINALLY(&a, types);
+  
+  for (i=0; i<no_of_edges; i++) {
+    igraph_integer_t from, to;
+    long int c1, c2;
+    igraph_edge(graph, i, &from, &to);
+    c1=VECTOR(*membership)[(long int)from];
+    c2=VECTOR(*membership)[(long int)to];
+    if (c1==c2) {
+      VECTOR(e)[c1] += 2;
+    }
+    VECTOR(a)[c1]+=1;
+    VECTOR(a)[c2]+=1;
+  }
+
+  *modularity=0.0;
+  for (i=0; i<types; i++) {
+    igraph_real_t tmp=VECTOR(a)[i]/2/no_of_edges;
+    *modularity += VECTOR(e)[i]/2/no_of_edges;
+    *modularity -= tmp*tmp;
+  }
+  
+  igraph_vector_destroy(&e);
+  igraph_vector_destroy(&a);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  return 0;
+}

@@ -7,6 +7,11 @@
 <chapter id="igraph-Community">
 <title>Detecting Community Structure</title>
 
+<section><title>Common functions related to community structure</title>
+<!-- doxrox-include igraph_modularity -->
+<!-- doxrox-include igraph_community_to_membership -->
+</section>
+
 <section><title>Community structure based on statistical mechanics</title>
 <!-- doxrox-include igraph_community_spinglass -->
 <!-- doxrox-include igraph_community_spinglass_single -->

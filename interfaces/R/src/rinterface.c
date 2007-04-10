@@ -5917,6 +5917,27 @@ SEXP R_igraph_community_to_membership(SEXP graph, SEXP pmerges,
   return result;
 }
 
+SEXP R_igraph_modularity(SEXP graph, SEXP pmembership) {
+  
+  igraph_t g;
+  igraph_vector_t membership;
+  igraph_real_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pmembership, &membership);
+  igraph_modularity(&g, &membership, &res);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=res;
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP pdebug) {
   igraph_t g;

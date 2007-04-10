@@ -15,6 +15,10 @@
 	* src/vector.c (igraph_vector_insert) : added
 	* src/conversion.c (igraph_get_adjacency_sparse) : added
 
+2007-04-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/community.c (igraph_modularity) : added
+
 2007-04-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/community.c (igraph_community_to_membership) : added
