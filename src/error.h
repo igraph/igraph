@@ -256,6 +256,7 @@ igraph_set_error_handler(igraph_error_handler_t new_handler);
  * \enumval IGRAPH_EUNFOLDINF Attempted to unfold an infinite iterator.
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
+ * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
  */
 
 typedef enum {
@@ -273,6 +274,7 @@ typedef enum {
   IGRAPH_EUNFOLDINF    = 11,
   IGRAPH_UNIMPLEMENTED = 12,
   IGRAPH_INTERRUPTED   = 13,
+  IGRAPH_DIVERGED      = 14,
 } igraph_i_error_type_t;
 
 /**

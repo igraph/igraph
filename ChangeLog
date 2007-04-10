@@ -1,3 +1,7 @@
+2007-04-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+ 
+	* src/error.f (IGRAPH_DIVERGED) : added new error type
+
 2007-04-08  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c : adjusted interface of
