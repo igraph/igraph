@@ -20,7 +20,7 @@ TESTSUITE_AT = \
 	types.at basic.at structure_generators.at \
 	structural_properties.at iterators.at components.at \
 	visitors.at layout.at motifs.at topology.at foreign.at operators.at \
-        other.at foreign.at conversion.at flow.at spinglass.at
+        other.at foreign.at conversion.at flow.at spinglass.at eigen.at
 
 TESTSUITE = testsuite
 

@@ -1114,6 +1114,30 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
 		    igraph_neimode_t mode);
 
 /* -------------------------------------------------- */
+/* Eigenvectors and eigenvalues                       */
+/* -------------------------------------------------- */
+
+int igraph_eigen_tred2(const igraph_matrix_t *A,
+		       igraph_vector_t *D,
+		       igraph_vector_t *E,
+		       igraph_matrix_t *Z);
+
+int igraph_eigen_tql2(igraph_vector_t *D,
+		      igraph_vector_t *E,
+		      igraph_matrix_t *Z);
+
+int igraph_eigen_tred1(const igraph_matrix_t *A,
+		       igraph_vector_t *D,
+		       igraph_vector_t *E2);
+
+int igraph_eigen_tqlrat(igraph_vector_t *D,
+			igraph_vector_t *E2);
+
+int igraph_eigen_rs(const igraph_matrix_t *A,
+		    igraph_vector_t *values,
+		    igraph_matrix_t *vectors);
+
+/* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */
 

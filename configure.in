@@ -125,12 +125,14 @@ if test "$debug" == "yes"; then
   CFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
   CPPFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
   CXXFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
+  FFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
 fi
 
 if test "$use_gprof" == "yes"; then
   CFLAGS="${CFLAGS} -pg"
   CPPFLAGS="${CFLAGS} -pg"
   CXXFLAGS="${CFLAGS} -pg"
+  FFLAGS="${FFLAGS} -pg"
 fi
 
 if test "$use_shell" == "yes"; then

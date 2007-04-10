@@ -1,5 +1,13 @@
 2007-04-10  Gabor Csardi  <csardi@rmki.kfki.hu>
  
+	* src/eigen.c (igraph_eigen_tred2, igraph_eigen_tql2)
+	(igraph_eigen_tred1, igraph_eigen_tqlrat, igraph_eigen_rs) : added
+	* src/eispack_eigen.f (BALANC, BALBAK, CBABK2, CBAL, CDIV)
+	(COMQR, COMQR2, CORTH, CSROOT, ELMHES, ELTRAN, HQR, HQR2)
+	(HTRIBK, HTRIDI, TQL1, TQL2, TQLRAT, TRED1, TRED2, RG)
+	(RS, CG, CH) added (ie. copyied from the R source code)
+	* examples/simple/eigen.c : added
+
 	* src/vector.c (igraph_vector_maxdifference) : added
 	* src/matrix.c (igraph_matrix_is_equal, igraph_matrix_maxdifference) :
 	added
