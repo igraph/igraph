@@ -643,3 +643,130 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
   return 0;
 }
 
+
+/**
+ * \function igraph_community_to_membership 
+ * Create membership vector from community structure dendrogram
+ * 
+ * This function creates a membership vector from a community
+ * structure dendrogram. A membership vector contains for each vertex
+ * the id of its graph component, the graph components are numbered
+ * from zero, see the same argument of \ref igraph_clusters() for an
+ * example of a membership vector.
+ * 
+ * </para><para>
+ * Many community detection algorithms return with a \em merges
+ * matrix, \ref igraph_community_walktrap() an \ref
+ * igraph_community_edge_betweenness() are two examples. The matrix
+ * contains the merge operations performed while mapping the
+ * hierarchical structure of a network. If the matrix has \c n-1 rows,
+ * where \c n is the number of vertices in the graph, then it contains
+ * the hierarchical structure of the whole network and it is called a
+ * dendrogram. 
+ * 
+ * </para><para>
+ * This function performs \p steps merge operations as prescribed by
+ * the \p merges matrix and returns the current state of the network.
+ * 
+ * </para><para>
+ * If if \p merges is not a complete dendrogram, it is possible to
+ * take \p steps steps if \p steps is not bigger than the number 
+ * lines in \p merges.
+ * \param graph The input graph.
+ * \param merges The two-column matrix containing the merge
+ *    operations. See \ref igraph_community_walktrap() for the
+ *    detailed syntax.
+ * \param steps Integer constant, the number of steps to take.
+ * \param membership Pointer to an initialied vector, the membership
+ *    results will be stored here, if not NULL. The vector will be
+ *    resized as needed.
+ * \param csize Pointer to an initialized vector, or NULL. If not NULL
+ *    then the sizes of the components will be stored here, the vector
+ *    will be resized as needed.
+ * 
+ * \sa \ref igraph_community_walktrap(), \ref
+ * igraph_community_edge_betweenness(), \ref
+ * igraph_community_fastgreedy() for community structure detection
+ * algorithms.
+ * 
+ * Time complexity: O(|V|), the number of vertices in the graph.
+ */
+
+int igraph_community_to_membership(const igraph_t *graph,
+				   const igraph_matrix_t *merges,
+				   igraph_integer_t steps,
+				   igraph_vector_t *membership,
+				   igraph_vector_t *csize) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int components=no_of_nodes-steps;
+  long int i, found=0;
+  igraph_vector_t tmp;
+  
+  if (steps > igraph_matrix_nrow(merges)) {
+    IGRAPH_ERROR("`steps' to big or `merges' matrix too short", IGRAPH_EINVAL);
+  }
+
+  if (membership) {
+    IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+    igraph_vector_null(membership);
+  }
+  if (csize) {
+    IGRAPH_CHECK(igraph_vector_resize(csize, components));
+    igraph_vector_null(csize);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, steps);
+  
+  for (i=steps-1; i>=0; i--) {
+    long int c1=MATRIX(*merges, i, 0);
+    long int c2=MATRIX(*merges, i, 1);
+
+    /* new component? */
+    if (VECTOR(tmp)[i]==0) {
+      found++;
+      VECTOR(tmp)[i]=found;
+    }
+
+    if (c1<no_of_nodes) {
+      long int cid=VECTOR(tmp)[i]-1;
+      if (membership) { VECTOR(*membership)[c1]=cid+1; }
+      if (csize) { VECTOR(*csize)[cid] += 1; }
+    } else {
+      VECTOR(tmp)[c1-no_of_nodes]=VECTOR(tmp)[i];
+    }
+    
+    if (c2<no_of_nodes) { 
+      long int cid=VECTOR(tmp)[i]-1;
+      if (membership) {	VECTOR(*membership)[c2]=cid+1; }
+      if (csize) { VECTOR(*csize)[cid] += 1; }
+    } else {
+      VECTOR(tmp)[c2-no_of_nodes]=VECTOR(tmp)[i];
+    }
+    
+  }
+  
+  if (membership || csize) {
+    for (i=0; i<no_of_nodes; i++) {
+      long int tmp=VECTOR(*membership)[i];
+      if (tmp!=0) {
+	if (membership) {
+	  VECTOR(*membership)[i]=tmp-1;
+	}
+      } else {
+	if (csize) {
+	  VECTOR(*csize)[found]+=1;
+	}
+	if (membership) {
+	  VECTOR(*membership)[i]=found;
+	}
+	found++;
+      }
+    }
+  }
+  
+  igraph_vector_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}

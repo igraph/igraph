@@ -273,6 +273,29 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE) {
         PACKAGE="igraph")
 } 
 
+community.to.membership <- function(graph, merges, steps, membership=TRUE,
+                                    csize=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  merges <- as.matrix(merges)
+  merges <- structure(as.numeric(merges), dim=dim(merges))
+  
+  .Call("R_igraph_community_to_membership", graph, merges, as.numeric(steps),
+        as.logical(membership), as.logical(csize),
+        PACKAGE="igraph")
+}
+
+
+
+
+
+
+
+
+###################################
+
 community.cut <- function(graph, edges, after.removing) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")

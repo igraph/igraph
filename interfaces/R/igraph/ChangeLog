@@ -1,5 +1,9 @@
 2007-04-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/community.R (community.to.membership) : added
+	* interfaces/R/src/rinterface.c (R_igraph_community_to_membership) : 
+	added
+
 	* interfaces/R/igraph/community.R (fastgreedy.community) : added
 	* interfaces/R/src/rinterface.c (R_igraph_community_fastgreedy) : added
 

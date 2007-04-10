@@ -5878,6 +5878,45 @@ SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity) {
   return result;
 } 
 
+SEXP R_igraph_community_to_membership(SEXP graph, SEXP pmerges, 
+				      SEXP psteps, SEXP pmembership,
+				      SEXP pcsize) {
+  igraph_t g;
+  igraph_matrix_t merges;
+  igraph_integer_t steps=REAL(psteps)[0];
+  igraph_vector_t membership, *ppmembership=0;
+  igraph_vector_t csize, *ppcsize=0;
+  SEXP result, names;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_matrix(pmerges, &merges);
+  if (LOGICAL(pmembership)[0]) {
+    ppmembership=&membership;
+    igraph_vector_init(ppmembership, 0);
+  } 
+  if (LOGICAL(pcsize)[0]) {
+    ppcsize=&csize;
+    igraph_vector_init(ppcsize, 0);
+  }
+  igraph_community_to_membership(&g, &merges, steps, ppmembership, ppcsize);
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_igraph_0orvector_to_SEXP(ppmembership));
+  if (ppmembership) { igraph_vector_destroy(ppmembership); }
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(ppcsize)); 
+  if (ppcsize) { igraph_vector_destroy(ppcsize); }
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("membership"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("csize"));
+  SET_NAMES(result, names);
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+}
+
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP pdebug) {
   igraph_t g;

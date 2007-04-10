@@ -17,6 +17,8 @@
 
 2007-04-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/community.c (igraph_community_to_membership) : added
+
 	* src/fastcommunity_mh.cc (igraph_community_fastgreedy) :
 	return the usual merge matrix format
 

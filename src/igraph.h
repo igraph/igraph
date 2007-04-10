@@ -947,6 +947,12 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 				igraph_matrix_t *merges,
 				igraph_vector_t *modularity);
 
+int igraph_community_to_membership(const igraph_t *graph,
+				   const igraph_matrix_t *merges,
+				   igraph_integer_t steps,
+				   igraph_vector_t *membership,
+				   igraph_vector_t *csize);
+
 /* -------------------------------------------------- */
 /* Conversion                                         */
 /* -------------------------------------------------- */
