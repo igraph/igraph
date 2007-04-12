@@ -294,7 +294,7 @@ vpwordpar: word { $$=$1; };
 
 edgeblock: /* empty */ | edgeblock arcs | edgeblock edges | edgeblock arcslist | edgeblock edgeslist | edgeblock adjmatrix;
 
-arcs: ARCSLINE NEWLINE arcsdefs { igraph_pajek_directed=0; };
+arcs: ARCSLINE NEWLINE arcsdefs { igraph_pajek_directed=1; };
 
 arcsdefs: /* empty */ | arcsdefs arcsline;
 
