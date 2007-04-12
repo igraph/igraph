@@ -1,3 +1,8 @@
+2007-04-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/tkplot.R (.tkplot.update.edge) :
+	bug corrected, edge endpoints were calculated with wrong vertex size
+
 2007-04-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/community.R (modularity) : rewritten to call

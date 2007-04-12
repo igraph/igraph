@@ -836,10 +836,13 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
                           tkp$params$vertex.size[to+1],
                           tkp$params$vertex.size)
+    vertex.size2 <- ifelse(length(tkp$params$vertex.size)>1,
+                           tkp$params$vertex.size[from+1],
+                           tkp$params$vertex.size)
     to.c[1] <- from.c[1] + (r-vertex.size)*cos(phi)
     to.c[2] <- from.c[2] + (r-vertex.size)*sin(phi)
-    from.c[1] <- from.c[1] + vertex.size*cos(phi)
-    from.c[2] <- from.c[2] + vertex.size*sin(phi)
+    from.c[1] <- from.c[1] + vertex.size2*cos(phi)
+    from.c[2] <- from.c[2] + vertex.size2*sin(phi)
     tkcoords(tkp$canvas, itemid, from.c[1], from.c[2], to.c[1], to.c[2])
   } else {
     vertex.size <- ifelse(length(tkp$params$vertex.size)>1,
