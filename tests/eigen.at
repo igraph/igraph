@@ -19,9 +19,4 @@
 # Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 # 02110-1301 USA
 
-AT_BANNER([[Eigenvalues, eigenvectors]])
-
-AT_SETUP([The EISPACK routines])
-AT_KEYWORDS([eigenvalue eigenvector eispack EISPACK])
-AT_COMPILE_CHECK([simple/eigen.c], [simple/eigen.out])
-AT_CLEANUP
+# AT_BANNER([[Eigenvalues, eigenvectors]])

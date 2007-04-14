@@ -1,3 +1,8 @@
+2007-04-14  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/eigen.c 
+	* examples/simple/eigen.c : removed, not needed
+
 2007-04-10  Gabor Csardi  <csardi@rmki.kfki.hu>
  
 	* src/eigen.c (igraph_eigen_tred2, igraph_eigen_tql2)
