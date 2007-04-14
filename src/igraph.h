@@ -957,6 +957,11 @@ int igraph_modularity(const igraph_t *graph,
 		      const igraph_vector_t *membership,
 		      igraph_real_t *modularity);
 
+int igraph_community_leading_eigenvector(const igraph_t *graph,
+					 igraph_vector_t *merges,
+					 igraph_vector_t *membership,
+					 long int steps);
+
 /* -------------------------------------------------- */
 /* Conversion                                         */
 /* -------------------------------------------------- */

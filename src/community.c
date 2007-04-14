@@ -23,8 +23,10 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include "random.h"
 
 #include <string.h>
+#include <math.h>
 
 /**
  * \function igraph_community_eb_get_merges
@@ -838,3 +840,245 @@ int igraph_modularity(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_community_leading_eigenvector(const igraph_t *graph,
+					 igraph_vector_t *merges,
+					 igraph_vector_t *membership,
+					 long int steps) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_dqueue_t tosplit;
+  igraph_vector_t x, x2;
+  igraph_vector_t idx;
+  long int niter=100;
+  long int staken=0;
+  igraph_i_adjlist_t adjlist;
+  long int i, j, k, l, m;
+  long int communities=1;
+
+  if (igraph_is_directed(graph)) {
+    IGRAPH_WARNING("This method was developed for undirected graphs");
+  }
+
+  if (steps > no_of_nodes-1) {
+    steps=no_of_nodes-1;
+  }
+
+  IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
+  IGRAPH_VECTOR_INIT_FINALLY(&x, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&x2, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &adjlist);
+  
+  IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+  igraph_vector_null(membership);  
+  igraph_vector_clear(merges);
+  IGRAPH_CHECK(igraph_vector_reserve(merges, steps*2));
+
+  RNG_BEGIN();
+
+/*   printf("I'll take %li steps.\n", steps); */
+  igraph_dqueue_push(&tosplit, 0);
+  
+  while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
+    long int comm=igraph_dqueue_pop_back(&tosplit); /* depth first search */
+    long int size=0;
+    igraph_real_t sumsq=0.0;
+    igraph_real_t ktx=0.0;
+    long int sumdeg=0;
+    igraph_bool_t bfound=0;
+    long int bidx=0;
+    igraph_real_t bval=0.0, bval2=0.0;
+    igraph_real_t mneg=0.0;
+
+/*     printf("step %li of %li, community %li\n", staken+1, steps, comm); */
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    for (i=0; i<no_of_nodes; i++) {
+      if (VECTOR(*membership)[i]==comm) {
+	VECTOR(idx)[size++]=i;
+      }
+    }
+
+    /* now 'size' is the size of the current community and 
+       idx[0:(size-1)] contains the original ids of the vertices in 
+       the current community. We need this to index the neighbor list.  */
+
+    staken++;
+    if (size==1) {
+      continue;			/* nothing to do */
+    }
+
+    /* we might need to do the whole iteration twice if a 
+       negative eigenvalue is found first, we break at the first 
+       positive eigenvalue, which is either in the first or second turn  */
+    mneg=0.0;
+    while (1) {
+    
+      /* create a normalized random vector */
+      IGRAPH_CHECK(igraph_vector_resize(&x, size));
+      IGRAPH_CHECK(igraph_vector_resize(&x2, size));
+      for (i=0; i<size; i++) {
+/*       VECTOR(x)[i]=RNG_UNIF01(); */
+	VECTOR(x)[i]=1.0;
+	sumsq += VECTOR(x)[i] * VECTOR(x)[i];
+      }
+      sumsq=sqrt(sumsq);
+      for (i=0; i<size; i++) {
+	VECTOR(x)[i] /= sumsq;      
+      }
+      
+      /* do some iterations */
+      for (i=0; i<niter; i++) {
+	
+	IGRAPH_ALLOW_INTERRUPTION();
+
+	/* Calculate Ax first */
+	igraph_vector_null(&x2);
+	for (j=0; j<size; j++) {
+	  long int oldid=VECTOR(idx)[j];
+	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  long int n=igraph_vector_size(neis);
+	  for (k=0; k<n; k++) {
+	    long int nei=VECTOR(*neis)[k];
+	    VECTOR(x2)[j] += VECTOR(x)[nei];
+	  }
+	}
+      
+	/* Now calculate k^Tx/2m */
+	ktx=0.0; sumdeg=0;
+	for (j=0; j<size; j++) {
+	  long int oldid=VECTOR(idx)[j];
+	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  long int degree=igraph_vector_size(neis);
+	  sumdeg += degree;
+	  ktx += VECTOR(x)[j] * degree;
+	}
+	ktx = ktx / sumdeg;	/* every edge has been counted twice */
+
+	/* We need to know whether the eigenvalue is positive */
+	if (i==niter-1) {
+	  bfound=0;
+	  bidx=0;
+	  while (bidx<size) {
+	    if (VECTOR(x)[bidx] != 0) {
+	      bfound=1;
+	      bval=VECTOR(x)[bidx];
+	      break;
+	    }
+	    bidx++;
+	  }
+	  if (!bfound) {
+	    /* all zero eigenvector, what to do know?? */
+	    /* TODO */
+	  }
+	}
+      
+	/* Now calculate Bx */
+	sumsq=0.0;
+	for (j=0; j<size; j++) {
+	  long int oldid=VECTOR(idx)[j];
+	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  long int degree=igraph_vector_size(neis);
+	  /* the last term is the diagonal of B which should be zero */
+	  VECTOR(x)[j] = VECTOR(x2)[j] - ktx*degree
+	    + degree*degree*VECTOR(x)[j]/sumdeg-mneg*VECTOR(x)[j];
+	  sumsq += VECTOR(x)[j] * VECTOR(x)[j];
+	}
+
+	bval2=VECTOR(x)[bidx];
+      
+	/* Normalization */
+	sumsq=sqrt(sumsq);
+	for (j=0; j<size; j++) {
+	  VECTOR(x)[j] = VECTOR(x)[j] / sumsq;
+	}
+      
+      } /* i<niter */
+      
+      /* Check if we found a positive eigenvalue, TODO */
+      if (bval * bval2 < 0) {
+	/* Negative, do the same iteration with a modified matrix */
+	mneg=bval2 / bval;
+/* 	printf("Negative eigenvalue: %f\n", mneg); */
+      } else {
+/* 	printf("Positive eigenvalue: %f\n", bval2/bval); */
+	/* No second turn */
+	break;
+      }
+      
+    } /* neg */
+    
+    /* Ok, we have the eigenvector */
+    
+    /* We create an index vector in x2 to renumber the vertices */
+    l=0; m=0;
+    for (j=0; j<size; j++) {
+      if (VECTOR(x)[j] <= 0) {
+	VECTOR(x2)[j]=l++;
+      } else {
+	VECTOR(x2)[j]=m++;
+      }
+    }    
+    /* if l==0 or m==0 then there was no split */
+    if (l==0 || m==0) {
+      continue;
+    }
+    communities++;
+    
+    /* Rewrite the adjacency lists */
+    for (j=0; j<size; j++) {
+      long int oldid=VECTOR(idx)[j];
+      igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+      long int n=igraph_vector_size(neis);
+      for (k=0; k<n; ) {
+	long int nei=VECTOR(*neis)[k];
+	if ((VECTOR(x)[j] <= 0 && VECTOR(x)[nei] <= 0) ||
+	    (VECTOR(x)[j] > 0 && VECTOR(x)[nei] > 0)) {
+	  /* they remain in the same community */
+	  VECTOR(*neis)[k] = VECTOR(x2)[nei];
+	  k++;
+	} else {
+	  /* nei in the other community, remove from neighbor list */
+	  VECTOR(*neis)[k] = VECTOR(*neis)[n-1];
+	  igraph_vector_pop_back(neis);
+	  n--;
+	}
+      }
+    }    
+
+    /* Also rewrite the membership vector */
+    for (j=0; j<size; j++) {
+      if (VECTOR(x)[j] <= 0) {
+	long int oldid=VECTOR(idx)[j];
+	VECTOR(*membership)[oldid]=communities-1;
+      }
+    }
+
+    /* Record merge */
+    IGRAPH_CHECK(igraph_vector_push_back(merges, comm));
+    IGRAPH_CHECK(igraph_vector_push_back(merges, communities-1));
+
+    /* Store the resulting communities in the queue if needed */
+    if (l > 1) {
+      IGRAPH_CHECK(igraph_dqueue_push(&tosplit, communities-1));
+    }
+    if (m > 1) {
+      IGRAPH_CHECK(igraph_dqueue_push(&tosplit, comm));
+    }
+  }
+  
+  RNG_END();
+
+  igraph_i_adjlist_destroy(&adjlist);
+  igraph_vector_destroy(&idx);
+  igraph_vector_destroy(&x2);
+  igraph_vector_destroy(&x);
+  igraph_dqueue_destroy(&tosplit);
+  IGRAPH_FINALLY_CLEAN(5);
+  
+  return 0;
+}
+
