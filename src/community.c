@@ -1359,3 +1359,203 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_community_leading_eigenvector_step(const igraph_t *graph,
+					      igraph_vector_t *membership,
+					      igraph_integer_t community,
+					      igraph_bool_t *split,
+					      igraph_vector_t *eigenvector,
+					      igraph_real_t *eigenvalue) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t x2;
+  igraph_vector_t idx, idx2;
+  long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
+  long int i, j, k;
+  long int communities=1;
+  igraph_i_lazy_adjlist_t adjlist;
+  long int size=0;
+  
+  if (igraph_vector_size(membership) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid membership vector length", IGRAPH_EINVAL);
+  }
+  
+  if (igraph_is_directed(graph)) {
+    IGRAPH_WARNING("This method was developed for undirected graphs");
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&idx2, no_of_nodes);
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, 
+					  IGRAPH_I_DONT_SIMPLIFY));  
+  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &adjlist);
+
+  RNG_BEGIN();
+  
+  {
+    long int comm=community;
+    igraph_real_t sumsq=0.0;
+    igraph_real_t ktx=0.0;
+    igraph_bool_t bfound=0;
+    long int bidx=0;
+    igraph_real_t bval=0.0, bval2=0.0;
+    igraph_real_t mneg=0.0;
+    igraph_real_t kig;
+    igraph_real_t comm_edges;
+    
+    for (i=0; i<no_of_nodes; i++) {
+      if (VECTOR(*membership)[i]==comm) {
+	VECTOR(idx)[size]=i;
+	VECTOR(idx2)[i]=size;
+	size++;
+      }
+      if (VECTOR(*membership)[i] > communities-1) {
+	communities=VECTOR(*membership)[i]+1;
+      }
+    }
+    
+    IGRAPH_VECTOR_INIT_FINALLY(&x2, size);
+    IGRAPH_CHECK(igraph_vector_resize(eigenvector, size));
+    
+    while (1) {
+      
+      /* create a normalized random vector */
+      for (i=0; i<size; i++) {
+	VECTOR(*eigenvector)[i]=RNG_UNIF01();
+	sumsq += VECTOR(*eigenvector)[i] * VECTOR(*eigenvector)[i];
+      }
+      sumsq=sqrt(sumsq);
+      for (i=0; i<size; i++) {
+	VECTOR(*eigenvector)[i] /= sumsq;      
+      }
+      
+      /* do some iterations */
+      for (i=0; i<niter; i++) {
+	
+	IGRAPH_ALLOW_INTERRUPTION();
+	
+	/* Calculate Ax first */
+	comm_edges=0.0;
+	igraph_vector_null(&x2);
+	for (j=0; j<size; j++) {
+	  long int oldid=VECTOR(idx)[j];
+	  igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	  long int n=igraph_vector_size(neis);
+	  comm_edges += n;
+	  kig=0;
+	  for (k=0; k<n; k++) {
+	    long int nei=VECTOR(*neis)[k];
+	    if (VECTOR(*membership)[nei]==comm) {
+	      kig+=1;
+	      VECTOR(x2)[j] += VECTOR(*eigenvector)[ (long int) VECTOR(idx2)[nei]];
+	    }
+	  }
+	  VECTOR(x2)[j] -= kig * VECTOR(*eigenvector)[j];
+	}
+	
+	/* Now calculate k^Tx/2m */
+	ktx=0.0;
+	for (j=0; j<size; j++) {
+	  long int oldid=VECTOR(idx)[j];
+	  igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	  long int degree=igraph_vector_size(neis);
+	  VECTOR(x2)[j] += degree * comm_edges / no_of_edges * 
+	    VECTOR(*eigenvector)[j] / 2;
+	  ktx += VECTOR(*eigenvector)[j] * degree;
+	}
+	ktx = ktx / no_of_edges / 2;
+	
+	/* We need to know whether the eigenvalue is positive */
+	/* x is not yet modified, contains the previous iteration */
+	if (i==niter-1) {
+	  bfound=0;
+	  bidx=0;
+	  while (bidx<size) {
+	    if (VECTOR(*eigenvector)[bidx] != 0) {
+	      bfound=1;
+	      bval=VECTOR(*eigenvector)[bidx];
+	      break;
+	    }
+	    bidx++;
+	  }
+	  if (!bfound) {
+	    /* all zero eigenvector, what to do know?? */
+	    IGRAPH_ERROR("Zero eigenvector found", IGRAPH_DIVERGED);
+	  }
+	}
+	
+	/* Now calculate Bx */
+	sumsq=0.0;
+	for (j=0; j<size; j++) {
+	  long int oldid=VECTOR(idx)[j];
+	  igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	  long int degree=igraph_vector_size(neis);
+	  VECTOR(*eigenvector)[j] = VECTOR(x2)[j] - ktx*degree +
+	    degree*degree*VECTOR(*eigenvector)[j]/no_of_edges/2-
+	    mneg*VECTOR(*eigenvector)[j];
+	  sumsq += VECTOR(*eigenvector)[j] * VECTOR(*eigenvector)[j];
+	}
+	
+	bval2=VECTOR(*eigenvector)[bidx];
+	
+	/* Normalization */
+	sumsq=sqrt(sumsq);
+	for (j=0; j<size; j++) {
+	  VECTOR(*eigenvector)[j] = VECTOR(*eigenvector)[j] / sumsq;
+	}
+
+      } /* i < niter */
+      
+      /* Check if we found a positive eigenvalue */
+      if (bval * bval2 < 0) {
+	/* Negative, do the same iteration with a modified matrix */
+	mneg=bval2 / bval;
+      } else {
+	/* No second turn */
+	*eigenvalue=bval2/bval;
+	break;
+      }
+      
+    } /* neg */    
+  }
+  
+  RNG_END();
+
+  /* just to have the always the same result, we multiply by -1
+     if the first element is not positive
+  */
+  for (i=0; i<size; i++) {
+      if (VECTOR(*eigenvector)[i] != 0) { break; }
+  }
+  if (VECTOR(*eigenvector)[i]<0) {
+    for (; i<size; i++) {
+      VECTOR(*eigenvector)[i] = -VECTOR(*eigenvector)[i];
+    }
+  }
+  
+  /* Ok, we have the eigenvector */
+
+  /* Rewrite the membership vector, check if there was a split */
+  for (j=0, k=0; j<size; j++) {
+    if (VECTOR(*eigenvector)[j] <= 0) {
+      long int oldid=VECTOR(idx)[j];
+      VECTOR(*membership)[oldid]=communities;
+      k++;
+    }
+  }
+  
+  if (k>0) {
+    *split=1;
+  } else {
+    *split=0;
+  }
+  
+  igraph_vector_destroy(&x2);
+  igraph_i_lazy_adjlist_destroy(&adjlist);
+  igraph_vector_destroy(&idx2);
+  igraph_vector_destroy(&idx);
+  IGRAPH_FINALLY_CLEAN(4);
+  
+  return 0;
+}

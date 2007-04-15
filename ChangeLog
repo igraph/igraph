@@ -1,5 +1,8 @@
 2007-04-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/community.c (igraph_community_leading_eigenvector_step) : added
+	* examples/simple/igraph_community_leading_eigenvector.c : updated
+
 	* src/community.c (igraph_community_leading_eigenvector) :
 	serious bug corrected by adding the 'idx2' vector
 

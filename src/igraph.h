@@ -965,6 +965,12 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_vector_t *merges,
 					 igraph_vector_t *membership,
 					 long int steps);
+int igraph_community_leading_eigenvector_step(const igraph_t *graph,
+					      igraph_vector_t *membership,
+					      igraph_integer_t community,
+					      igraph_bool_t *split,
+					      igraph_vector_t *eigenvector,
+					      igraph_real_t *eigenvalue);
 
 /* -------------------------------------------------- */
 /* Conversion                                         */

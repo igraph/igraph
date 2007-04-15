@@ -26,7 +26,7 @@
 int print_vector(const igraph_vector_t *v) {
   long int i, n=igraph_vector_size(v);
   for (i=0; i<n; i++) {
-    printf("%g", (double)VECTOR(*v)[i]);
+    printf("%.2g", (double)VECTOR(*v)[i]);
     if (i!=n-1) { printf(" "); }
   }
   printf("\n");
@@ -37,7 +37,9 @@ int main() {
   igraph_t g;
   igraph_vector_t merges, membership;
   long int i, j;
-  igraph_vector_t idx;
+  igraph_bool_t split;
+  igraph_vector_t x;
+  igraph_real_t val;
   
   /* Zachary Karate club */
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
@@ -59,9 +61,10 @@ int main() {
 	       31, 32, 31, 33, 32, 33,
 	       -1);  
  
-  /* Make one step with both methods */
+  /* Make one step with all methods */
   igraph_vector_init(&merges, 0);
   igraph_vector_init(&membership, 0);
+  igraph_vector_init(&x, 0);
   igraph_community_leading_eigenvector_naive(&g, &merges, &membership, 1);
 
   print_vector(&merges);
@@ -72,29 +75,32 @@ int main() {
   print_vector(&merges);
   print_vector(&membership);
 
+  igraph_vector_null(&membership);
+  igraph_community_leading_eigenvector_step(&g, &membership, 0, &split,
+					    &x, &val);
+
+  print_vector(&membership);
+  print_vector(&x);
+
   printf("\n");
 
   /* Make all the steps */
   igraph_community_leading_eigenvector(&g, &merges, &membership, igraph_vcount(&g));
 
-  /* Rewrite the membership vector into some canonical form */
-  /* Note that after this the merges and membership vectors do
-     not match. For this is not a problem for this simple check. */
-  igraph_vector_init(&idx, igraph_vector_size(&membership));
-  for (i=0, j=0; i<igraph_vector_size(&membership); i++) {
-    long int cl=VECTOR(membership)[i];
-    if (VECTOR(idx)[cl] != 0) {
-      VECTOR(membership)[i]=VECTOR(idx)[cl]-1;
-    } else {
-      VECTOR(idx)[cl]=++j;
-      VECTOR(membership)[i]=j-1;
-    }
-  }
-  igraph_vector_destroy(&idx);
-
   print_vector(&merges);
   print_vector(&membership);
-					 
+
+  /* Try to make one more step from here, should fail */
+  for (i=0; i<igraph_vector_size(&merges)/2+1; i++) {
+    igraph_community_leading_eigenvector_step(&g, &membership,
+					      i, &split, &x, &val);
+    if (split) {
+      printf("Impossible, community %li splitted.\n", i);
+      return 1;
+    }
+  }
+  
+  igraph_vector_destroy(&x);
   igraph_vector_destroy(&membership);
   igraph_vector_destroy(&merges);
   igraph_destroy(&g);
