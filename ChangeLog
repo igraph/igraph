@@ -1,5 +1,31 @@
 2007-04-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/community.c (igraph_community_leading_eigenvector) :
+	serious bug corrected by adding the 'idx2' vector
+
+	* src/community.c (igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_naive) : error if zero found as an 
+	eigenvector
+
+	* src/community.c (igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_naive) : multiply 
+	eigenvector by -1 if needed to have a positive first non-null
+	element. This way the method always produces the same result
+	* examples/simple/igraph_community_leading_eigenvector.c : updated
+
+	* src/community.c (igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_naive) : use random vector
+	as a starting point for the leading eigenvector iteration	
+
+	* src/community.c (igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_naive) : return 'merges'
+	vector in the usual form, the same as for other community
+	detection methods
+
+	* src/community.c (igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_naive) : minimum iterations
+	for eigenvector calculation increased to 1000
+
 	* src/community.c (igraph_community_leading_eigenvector)
 	(igraph_community_leading_eigenvector_naive) : original renamed to
 	'_naive' and new version added
