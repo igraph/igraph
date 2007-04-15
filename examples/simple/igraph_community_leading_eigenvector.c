@@ -30,12 +30,26 @@ int print_vector(const igraph_vector_t *v) {
     if (i!=n-1) { printf(" "); }
   }
   printf("\n");
+  return 0;
+}
+
+int print_matrix(const igraph_matrix_t *m) {
+  long int i, j, nrow=igraph_matrix_nrow(m), ncol=igraph_matrix_ncol(m);
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<ncol; j++) {
+      printf("%.2g", (double)MATRIX(*m, i, j));
+      if (j!=ncol-1) { printf(" "); }
+    }
+    printf("\n");
+  }
+  return 0;
 }
 
 int main() {
 
   igraph_t g;
-  igraph_vector_t merges, membership;
+  igraph_matrix_t merges;
+  igraph_vector_t membership;
   long int i, j;
   igraph_bool_t split;
   igraph_vector_t x;
@@ -62,17 +76,17 @@ int main() {
 	       -1);  
  
   /* Make one step with all methods */
-  igraph_vector_init(&merges, 0);
+  igraph_matrix_init(&merges, 0, 0);
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&x, 0);
   igraph_community_leading_eigenvector_naive(&g, &merges, &membership, 1);
 
-  print_vector(&merges);
+  print_matrix(&merges);
   print_vector(&membership);
 
   igraph_community_leading_eigenvector(&g, &merges, &membership, 1);
 
-  print_vector(&merges);
+  print_matrix(&merges);
   print_vector(&membership);
 
   igraph_vector_null(&membership);
@@ -87,11 +101,11 @@ int main() {
   /* Make all the steps */
   igraph_community_leading_eigenvector(&g, &merges, &membership, igraph_vcount(&g));
 
-  print_vector(&merges);
+  print_matrix(&merges);
   print_vector(&membership);
 
   /* Try to make one more step from here, should fail */
-  for (i=0; i<igraph_vector_size(&merges)/2+1; i++) {
+  for (i=0; i<igraph_matrix_nrow(&merges)+1; i++) {
     igraph_community_leading_eigenvector_step(&g, &membership,
 					      i, &split, &x, &val);
     if (split) {
@@ -102,7 +116,7 @@ int main() {
   
   igraph_vector_destroy(&x);
   igraph_vector_destroy(&membership);
-  igraph_vector_destroy(&merges);
+  igraph_matrix_destroy(&merges);
   igraph_destroy(&g);
   
   return 0;

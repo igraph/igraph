@@ -1,5 +1,10 @@
 2007-04-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/community.c (igraph_community_leading_eigenvector_naive)
+	(igraph_community_leading_eigenvector) : returns a matrix in the 
+	usual form in 'merges'
+	* examples/simple/igraph_community_leading_eigenvector.c : updated
+
 	* src/error.c (igraph_i_error_strings) : added text for IGRAPH_DIVERGED
 
 	* src/community.c (igraph_community_leading_eigenvector_step) : added

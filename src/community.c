@@ -841,14 +841,33 @@ int igraph_modularity(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \ingroup communities
+ * \function igraph_community_leading_eigenvector_naive
+ * 
+ * A naive implementation of Newman's eigenvector community structure
+ * detection.
+ * \param graph The input graph, should be undirected to make sense.
+ * \param merges
+ * \param membership
+ * \param steps
+ * \return Error code.
+ * 
+ * \sa \ref igraph_community_leading_eigenvector() for the proper way, 
+ * \ref igraph_community_leading_eigenvector_step() to do just one split.
+ * 
+ * Time complexity: O((E|+|V|)^2 * steps), |V| is the number of vertices,
+ * |E| is the number of edges.
+ */ 
+
 int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
-					       igraph_vector_t *merges,
+					       igraph_matrix_t *merges,
 					       igraph_vector_t *membership,
 					       long int steps) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_dqueue_t tosplit;
-  igraph_vector_t x, x2;
+  igraph_vector_t x, x2, mymerges;
   igraph_vector_t idx;
   long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
   long int staken=0;
@@ -864,6 +883,8 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     steps=no_of_nodes-1;
   }
 
+  IGRAPH_VECTOR_INIT_FINALLY(&mymerges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&mymerges, steps*2));
   IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
   IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
   IGRAPH_VECTOR_INIT_FINALLY(&x, no_of_nodes);
@@ -873,8 +894,6 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
   igraph_vector_null(membership);  
-  igraph_vector_clear(merges);
-  IGRAPH_CHECK(igraph_vector_reserve(merges, steps*2));
 
   RNG_BEGIN();
 
@@ -1063,8 +1082,8 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     }
 
     /* Record merge */
-    IGRAPH_CHECK(igraph_vector_push_back(merges, comm));
-    IGRAPH_CHECK(igraph_vector_push_back(merges, communities-1));
+    IGRAPH_CHECK(igraph_vector_push_back(&mymerges, comm));
+    IGRAPH_CHECK(igraph_vector_push_back(&mymerges, communities-1));
 
     /* Store the resulting communities in the queue if needed */
     if (l > 1) {
@@ -1083,31 +1102,41 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   igraph_dqueue_destroy(&tosplit);
   IGRAPH_FINALLY_CLEAN(4);
 
-  /* reform the merges vector */
+  /* reform the mymerges vector into merges matrix */
   igraph_vector_null(&idx);
-  l=igraph_vector_size(merges);
+  l=igraph_vector_size(&mymerges);
   k=communities;
+  j=0;
+  IGRAPH_CHECK(igraph_matrix_resize(merges, l/2, 2));
   for (i=l; i>0; i-=2) {
-    long int from=VECTOR(*merges)[i-1];
-    long int to=VECTOR(*merges)[i-2];
+    long int from=VECTOR(mymerges)[i-1];
+    long int to=VECTOR(mymerges)[i-2];
+    MATRIX(*merges, j, 0)=VECTOR(mymerges)[i-2];
+    MATRIX(*merges, j, 1)=VECTOR(mymerges)[i-1];    
     if (VECTOR(idx)[from]!=0) {
-      VECTOR(*merges)[i-1] = VECTOR(idx)[from]-1;
+      MATRIX(*merges, j, 1)=VECTOR(idx)[from]-1;
     }
     if (VECTOR(idx)[to]!=0) {
-      VECTOR(*merges)[i-2] = VECTOR(idx)[to]-1;
+      MATRIX(*merges, j, 0)=VECTOR(idx)[to]-1;
     }
     VECTOR(idx)[to]=++k;
+    j++;
   }  
 
   igraph_vector_destroy(&idx);
-  IGRAPH_FINALLY_CLEAN(1);
-  
+  igraph_vector_destroy(&mymerges);
+  IGRAPH_FINALLY_CLEAN(2);
+ 
   return 0;
 }
 
+/**
+ * \ingroup communities
+ * \function igraph_community_leading_eigenvector
+ */
 
 int igraph_community_leading_eigenvector(const igraph_t *graph,
-					 igraph_vector_t *merges,
+					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,
 					 long int steps) {
   
@@ -1115,7 +1144,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_dqueue_t tosplit;
   igraph_vector_t x, x2;
-  igraph_vector_t idx, idx2;
+  igraph_vector_t idx, idx2, mymerges;
   long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
   long int staken=0;
   igraph_i_adjlist_t adjlist;
@@ -1130,6 +1159,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     steps=no_of_nodes-1;
   }
 
+  IGRAPH_VECTOR_INIT_FINALLY(&mymerges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&mymerges, steps*2));
   IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&idx2, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&x, no_of_nodes);
@@ -1140,8 +1171,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   
   IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
   igraph_vector_null(membership);  
-  igraph_vector_clear(merges);
-  IGRAPH_CHECK(igraph_vector_reserve(merges, steps*2));
 
   RNG_BEGIN();
 
@@ -1317,8 +1346,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     /* Record merge */
-    IGRAPH_CHECK(igraph_vector_push_back(merges, comm));
-    IGRAPH_CHECK(igraph_vector_push_back(merges, communities-1));
+    IGRAPH_CHECK(igraph_vector_push_back(&mymerges, comm));
+    IGRAPH_CHECK(igraph_vector_push_back(&mymerges, communities-1));
 
     /* Store the resulting communities in the queue if needed */
     if (l > 1) {
@@ -1338,27 +1367,38 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_destroy(&idx2);
   IGRAPH_FINALLY_CLEAN(5);
   
-  /* reform the merges vector */
+  /* reform the mymerges vector */
   igraph_vector_null(&idx);
-  l=igraph_vector_size(merges);
+  l=igraph_vector_size(&mymerges);
   k=communities;
+  j=0;
+  IGRAPH_CHECK(igraph_matrix_resize(merges, l/2, 2));
   for (i=l; i>0; i-=2) {
-    long int from=VECTOR(*merges)[i-1];
-    long int to=VECTOR(*merges)[i-2];
+    long int from=VECTOR(mymerges)[i-1];
+    long int to=VECTOR(mymerges)[i-2];
+    MATRIX(*merges, j, 0)=VECTOR(mymerges)[i-2];
+    MATRIX(*merges, j, 1)=VECTOR(mymerges)[i-1];    
     if (VECTOR(idx)[from]!=0) {
-      VECTOR(*merges)[i-1] = VECTOR(idx)[from]-1;
+      MATRIX(*merges, j, 1)=VECTOR(idx)[from]-1;
     }
     if (VECTOR(idx)[to]!=0) {
-      VECTOR(*merges)[i-2] = VECTOR(idx)[to]-1;
+      MATRIX(*merges, j, 0)=VECTOR(idx)[to]-1;
     }
     VECTOR(idx)[to]=++k;
+    j++;
   }  
 
   igraph_vector_destroy(&idx);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_vector_destroy(&mymerges);
+  IGRAPH_FINALLY_CLEAN(2);
   
   return 0;
 }
+
+/**
+ * \ingroup communities
+ * \function igraph_community_leading_eigenvector_step
+ */
 
 int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 					      igraph_vector_t *membership,
