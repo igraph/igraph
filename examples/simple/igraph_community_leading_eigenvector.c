@@ -59,9 +59,21 @@ int main() {
 	       31, 32, 31, 33, 32, 33,
 	       -1);  
  
-  /* Make one step */
+  /* Make one step with both methods */
   igraph_vector_init(&merges, 0);
   igraph_vector_init(&membership, 0);
+  igraph_community_leading_eigenvector_naive(&g, &merges, &membership, 1);
+
+  /* Rewrite the membership to start with community 1 if needed */
+  if (VECTOR(membership)[0] != 1) {
+    for (i=0; i<igraph_vector_size(&membership); i++) {
+      VECTOR(membership)[i] = 1-VECTOR(membership)[i];
+    }
+  }
+
+  print_vector(&merges);
+  print_vector(&membership);
+
   igraph_community_leading_eigenvector(&g, &merges, &membership, 1);
 
   /* Rewrite the membership to start with community 1 if needed */
