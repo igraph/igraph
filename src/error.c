@@ -43,6 +43,7 @@ static char *igraph_i_error_strings[]={ "No error",            /* 0 */
 					"Unfold infinite iterator", /* 11 */
                                         "Unimplemented function call", /* 12 */
                                         "Interrupted",         /* 13 */
+					"Numeric procedure did not converge",/* 14 */
 };
 
 const char* igraph_strerror(const int igraph_errno) {
