@@ -1,6 +1,10 @@
 2007-04-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/community.c (igraph_community_leading_eigenvector_naive)
+	(igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_step) : make most arguments optional
+
+	* src/community.c (igraph_community_leading_eigenvector_naive)
 	(igraph_community_leading_eigenvector) : returns a matrix in the 
 	usual form in 'merges'
 	* examples/simple/igraph_community_leading_eigenvector.c : updated
