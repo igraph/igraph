@@ -833,15 +833,15 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
                                       PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  long n, m = 0;
+  long n, m = 1;
   float power = 0.0, zero_appeal = 0.0;
   igraph_vector_t outseq;
-  PyObject *m_obj, *outpref = Py_False, *directed = Py_False;
+  PyObject *m_obj = 0, *outpref = Py_False, *directed = Py_False;
 
   char *kwlist[] =
     { "n", "m", "outpref", "directed", "power", "zero_appeal", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO|OOff", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OOOff", kwlist,
                                    &n, &m_obj, &outpref, &directed, &power,
                                    &zero_appeal))
     return NULL;
@@ -851,15 +851,19 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
     return NULL;
   }
 
-  // let's check whether we have a constant out-degree or a list
-  if (PyInt_Check(m_obj)) {
-    m = PyInt_AsLong(m_obj);
-    igraph_vector_init(&outseq, 0);
-  }
-  else if (PyList_Check(m_obj)) {
-    if (igraphmodule_PyList_to_vector_t(m_obj, &outseq, 1, 0)) {
-      // something bad happened during conversion
-      return NULL;
+  if (m_obj == 0) {
+	igraph_vector_init(&outseq, 0);
+	m = 1;
+  } else if (m_obj != 0) {
+    /* let's check whether we have a constant out-degree or a list */
+    if (PyInt_Check(m_obj)) {
+      m = PyInt_AsLong(m_obj);
+      igraph_vector_init(&outseq, 0);
+    } else if (PyList_Check(m_obj)) {
+      if (igraphmodule_PyList_to_vector_t(m_obj, &outseq, 1, 0)) {
+        /* something bad happened during conversion */
+       return NULL;
+      }
     }
   }
 

@@ -22,6 +22,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+from statistics import Histogram
+
 class Clustering(object):
 	"""Class representing a clustering of an arbitrary ordered set.
 	
@@ -78,6 +80,37 @@ class Clustering(object):
 	def _get_membership(self): return self._membership
 	membership = property(_get_membership, doc = "The membership vector (read only)")
 
+	def size(self, idx):
+		"""Returns the size of a given cluster.
+
+		@param idx: the cluster in which we are interested.
+		"""
+		return len([1 for x in self._membership if x == idx])
+
+	def sizes(self, *args):
+		"""Returns the size of given clusters.
+
+		@param idxs: the cluster indices in which we are interested. If C{None},
+		  defaults to all clusters
+		"""
+		idxs = args
+		if len(idxs) == 0: idxs = None
+		counts = [0] * len(self)
+		m = min(self._membership)
+		for x in self._membership: counts[x+m] += 1
+		if idxs is None: return counts
+		result = []
+		for idx in idxs: result.append(counts[idx-m])
+		return result
+	
+	def size_histogram(self, bin_width = 1):
+		"""Returns the histogram of cluster sizes.
+
+		@param bin_width: the bin width of the histogram
+		@return: a L{Histogram} object
+		"""
+		return Histogram(bin_width, self.sizes())
+
 
 class VertexClustering(Clustering):
 	"""The clustering of the vertex set of a graph.
@@ -118,3 +151,29 @@ class VertexClustering(Clustering):
 	modularity = property(_get_modularity, doc = "The modularity score")
 	q = modularity
 
+
+	def subgraph(self, idx):
+		"""Get the subgraph belonging to a given cluster.
+
+		@param idx: the cluster index
+		@return: a copy of the subgraph
+		@precondition: the vertex set of the graph hasn't been modified since
+		  the moment the clustering was constructed.
+		"""
+		return self._graph.subgraph(self[idx])
+
+
+	def giant(self):
+		"""Returns the giant community of the clustered graph.
+
+		The giant component a community for which no larger community exists.
+		@note: there can be multiple giant communities, this method will return
+		  the copy of an arbitrary one if there are multiple giant communities.
+
+		@return: a copy of the giant community.
+		@precondition: the vertex set of the graph hasn't been modified since
+		  the moment the clustering was constructed.
+		"""
+		ss = self.sizes()
+		max_size = max(ss)
+		return self.subgraph(ss.index(max_size))

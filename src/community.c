@@ -433,7 +433,7 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
   igraph_spmatrix_t dq;    /* matrix dq (see paper for details) */
   igraph_vector_t a;       /* vector a (see paper for details) */
   igraph_integer_t no_of_nodes, no_of_edges;  /* trivial :) */
-  long int i, j, no_of_joins, from, to; /* counters and such */
+  long int i, j, total_joins, no_of_joins, from, to; /* counters and such */
   igraph_bool_t allow_suboptimal=0;   /* whether to allow suboptimal solutions */
   igraph_real_t q, maxq, maxdq;       /* maxq - the current value of q */
   igraph_eit_t edgeit;                /* edge iterator for initializing dq */
@@ -497,14 +497,14 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
 
   /* Calculate how many joins will be needed */
   if (no>0) {
-    no_of_joins = no_of_nodes - no;
+    total_joins = no_of_nodes - no;
     allow_suboptimal = 1;
   } else {
-    no_of_joins = no_of_nodes - 1;
+    total_joins = no_of_nodes - 1;
   }
 
-  maxdq = 0;
-  while (no_of_joins>0) {
+  maxdq = 0; no_of_joins = 0;
+  while (no_of_joins<total_joins) {
     /*printf("Joins left: %ld\n", (long)no_of_joins);
     printf("Q = %.4f\n", (float)maxq);
     printf("Matrix dq:\n");
@@ -521,6 +521,8 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
       printf(" %.4f", (float)VECTOR(a)[i]);
     printf("\n");*/
 
+    IGRAPH_ALLOW_INTERRUPTION();
+    igraph_progress("modularity based community detection", 100.0*no_of_joins/total_joins, 0); 
     /* Select the maximal element, excluding zeroes */
     maxdq = igraph_spmatrix_max_nonzero(&dq, &ffrom, &fto);
     from = ffrom; to = fto;
@@ -602,7 +604,7 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
     /* Update members */
     for (i=0; i<no_of_nodes; i++)
       if (VECTOR(members)[i] == from) VECTOR(members)[i] = to;
-    no_of_joins--;
+    no_of_joins++;
     /* Update maxq */
     maxq += maxdq;
     /*printf("====================================\n");*/
