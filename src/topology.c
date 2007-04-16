@@ -975,16 +975,16 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
   IGRAPH_CHECK(igraph_stack_init(&path, 0));
   IGRAPH_FINALLY(igraph_stack_destroy, &path);
   IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph1, &inadj1, IGRAPH_IN, 
-					  IGRAPH_I_SORT));
+					  IGRAPH_I_SIMPLIFY));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &inadj1);
   IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph1, &outadj1, IGRAPH_OUT, 
-					  IGRAPH_I_SORT));
+					  IGRAPH_I_SIMPLIFY));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &outadj1);
   IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph2, &inadj2, IGRAPH_IN, 
-					  IGRAPH_I_SORT));
+					  IGRAPH_I_SIMPLIFY));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &inadj2);
   IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph2, &outadj2, IGRAPH_OUT, 
-					  IGRAPH_I_SORT));
+					  IGRAPH_I_SIMPLIFY));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &outadj2);
   IGRAPH_VECTOR_INIT_FINALLY(&indeg1, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&indeg2, 0);

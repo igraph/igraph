@@ -153,9 +153,7 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 	       IGRAPH_SPINCOMM_UPDATE_CONFIG } igraph_spincomm_update_t; 
 
 typedef enum { IGRAPH_I_DONT_SIMPLIFY=0,
-	       IGRAPH_I_SIMPLIFY,
-	       IGRAPH_I_SORT_SIMPLIFY,
-	       IGRAPH_I_SORT } igraph_i_lazy_adlist_simplify_t;
+	       IGRAPH_I_SIMPLIFY } igraph_i_lazy_adlist_simplify_t;
 	       
 
 /* -------------------------------------------------- */
@@ -1437,7 +1435,6 @@ typedef struct igraph_i_lazy_adjlist_t {
   igraph_vector_t **adjs;
   igraph_neimode_t mode;
   igraph_i_lazy_adlist_simplify_t simplify;
-  igraph_vector_t svect;
 } igraph_i_lazy_adjlist_t;
 
 int igraph_i_lazy_adjlist_init(const igraph_t *graph,

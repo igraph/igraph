@@ -189,9 +189,9 @@ int igraph_disjoint_union_many(igraph_t *res,
  * of many graphs at once, \ref igraph_union(), \ref
  * igraph_difference() for other operators.
  * 
- * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of nodes in
- * the smaller graph of the two, d is the average degree in the two graphs, |E|
- * is the number of edges in the smaller graph.
+ * Time complexity: O(|V|+|E|), |V| is the number of nodes, |E|
+ * is the number of edges in the smaller graph of the two. (The one 
+ * containing less vertices is considered smaller.)
  */
 
 int igraph_intersection(igraph_t *res,
@@ -225,8 +225,6 @@ int igraph_intersection(igraph_t *res,
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(left, &nei1, i, IGRAPH_OUT));
     IGRAPH_CHECK(igraph_neighbors(right, &nei2, i, IGRAPH_OUT));
-    igraph_vector_sort(&nei1);
-    igraph_vector_sort(&nei2);
     if (!directed) {
       igraph_vector_filter_smaller(&nei1, i);
       igraph_vector_filter_smaller(&nei2, i);
@@ -290,9 +288,9 @@ void igraph_i_intersection_many_free(igraph_vector_ptr_t *v) {
  * \ref igraph_union_many(), \ref igraph_union() and \ref
  * igraph_difference() for other operators.
  * 
- * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of vertices
- * in the smallest graph, d is the average degree in the graphs, |E|
- * is the number of edges in the smallest graph.
+ * Time complexity: O(|V|+|E|), |V| is the number of vertices,
+ * |E| is the number of edges in the smallest graph (ie. the graph having
+ * the less vertices).
  */
 
 int igraph_intersection_many(igraph_t *res, 
@@ -355,7 +353,6 @@ int igraph_intersection_many(igraph_t *res,
     for (j=0; j<no_of_graphs; j++) {
       IGRAPH_CHECK(igraph_neighbors(VECTOR(*graphs)[j], VECTOR(neivects)[j], i,
 				    IGRAPH_OUT));
-      igraph_vector_sort(VECTOR(neivects)[j]);
       if (!directed) {
 	igraph_vector_filter_smaller(VECTOR(neivects)[j], i);
       }
@@ -447,9 +444,8 @@ int igraph_intersection_many(igraph_t *res,
  * \ref igraph_intersection() and \ref igraph_difference() for other
  * operators. 
  * 
- * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of
- * vertices, |E| the number of edges in the result graph and d is the
- * average degree in the two operands.
+ * Time complexity: O(|V|+|E|), |V| is the number of
+ * vertices, |E| the number of edges in the result graph.
  */
 
 int igraph_union(igraph_t *res, 
@@ -480,7 +476,6 @@ int igraph_union(igraph_t *res,
     IGRAPH_ALLOW_INTERRUPTION();
     if (i<no_of_nodes_left) {
       IGRAPH_CHECK(igraph_neighbors(left, &nei1, i, IGRAPH_OUT));
-      igraph_vector_sort(&nei1);
       if (!directed) {
 	igraph_vector_filter_smaller(&nei1, i);
       }
@@ -488,7 +483,6 @@ int igraph_union(igraph_t *res,
     }
     if (i<no_of_nodes_right) {
       IGRAPH_CHECK(igraph_neighbors(right, &nei2, i, IGRAPH_OUT));
-      igraph_vector_sort(&nei2);
       if (!directed) {
 	igraph_vector_filter_smaller(&nei2, i);
       }
@@ -554,9 +548,8 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
  * igraph_difference for other operators.
  * 
  * 
- * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number of vertices
- * in largest graph, d is the average degree in the graphs and |E| is
- * the number of edges in the result graph.
+ * Time complexity: O(|V|+|E|), |V| is the number of vertices
+ * in largest graph and |E| is the number of edges in the result graph.
  */
 
 int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
@@ -615,7 +608,6 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
       if (i<igraph_vcount(VECTOR(*graphs)[j])) {
 	IGRAPH_CHECK(igraph_neighbors(VECTOR(*graphs)[j], VECTOR(neivects)[j], 
 				      i, IGRAPH_OUT));
-	igraph_vector_sort(VECTOR(neivects)[j]);
 	if (!directed) {
 	  igraph_vector_filter_smaller(VECTOR(neivects)[j], i);
 	}
@@ -695,8 +687,8 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
  * \sa \ref igraph_intersection() and \ref igraph_union() for other
  * operators.
  * 
- * Time complexity: O(|V|*d*log(d)+|E|), |V| is the number vertices in
- * the smaller graph, d is the average degree in the graph, |E| is the
+ * Time complexity: O(|V|+|E|), |V| is the number vertices in
+ * the smaller graph, |E| is the
  * number of edges in the result graph.
  */
 
@@ -728,8 +720,6 @@ int igraph_difference(igraph_t *res,
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(orig, &nei1, i, IGRAPH_OUT));
     IGRAPH_CHECK(igraph_neighbors(sub, &nei2, i, IGRAPH_OUT));
-    igraph_vector_sort(&nei1);
-    igraph_vector_sort(&nei2);
     if (!directed) {
       igraph_vector_filter_smaller(&nei1, i);
       igraph_vector_filter_smaller(&nei2, i);
@@ -761,7 +751,6 @@ int igraph_difference(igraph_t *res,
   /* copy remaining edges, use the previous value of 'i' */
   for (; i<no_of_nodes_orig; i++) {
     IGRAPH_CHECK(igraph_neighbors(orig, &nei1, i, IGRAPH_OUT));
-    igraph_vector_sort(&nei1);
     if (!directed) {
       igraph_vector_filter_smaller(&nei1, i);
     }
@@ -794,10 +783,9 @@ int igraph_difference(igraph_t *res,
  * \sa \ref igraph_union(), \ref igraph_intersection() and \ref
  * igraph_difference().
  * 
- * Time complexity: O(|V|*d*log(d)+|E1|+|E2|), |V| is the number of
- * vertices in the graph, d is the average degree in the original
- * graph, |E1| is the number of edges in the original and |E2| in the
- * complementer graph.
+ * Time complexity: O(|V|+|E1|+|E2|), |V| is the number of
+ * vertices in the graph, |E1| is the number of edges in the original
+ * and |E2| in the complementer graph.
  */
 
 int igraph_complementer(igraph_t *res, const igraph_t *graph, 
@@ -821,7 +809,6 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
   for (i=0; i<no_of_nodes; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
-    igraph_vector_sort(&neis);
     if (loops) {
       for (j=no_of_nodes-1; j>=*limit; j--) {
 	if (igraph_vector_empty(&neis) || j>igraph_vector_tail(&neis)) {

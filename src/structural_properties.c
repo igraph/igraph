@@ -1997,13 +1997,7 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
  * \return Error code:
  *    \c IGRAPH_ENOMEM if we are out of memory.
  *
- * Time complexity: O(|V|+|E|) for
- * removing the loops,
- * O(|V|d*log(d)+|E|) for removing
- * the multiple edges. |V| and
- * |E| are the number of vertices and
- * edges in the graph, d is the
- * highest out-degree in the graph.
+ * Time complexity: O(|V|+|E|).
  */
 
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops) {
@@ -2436,7 +2430,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 /*   nodes_to_calc=IGRAPH_VIT_SIZE(vit); */
   
 /*   IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, */
-/* 					  IGRAPH_I_SORT_SIMPLIFY)); */
+/* 					  IGRAPH_I_SIMPLIFY)); */
 /*   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &adjlist); */
   
 /*   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc)); */
@@ -2589,9 +2583,8 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
  * \sa \ref igraph_transitivity_undirected(), \ref
  * igraph_transitivity_avglocal_undirected().
  * 
- * Time complexity: O(n*d^2+|V|), n is the number of vertices for which
- * the transitivity is calculated, d is the average vertex degree and |V| the 
- * total number if vertices in the graph.
+ * Time complexity: O(n*d^2), n is the number of vertices for which
+ * the transitivity is calculated, d is the average vertex degree.
  */
 
 int igraph_transitivity_local_undirected(const igraph_t *graph,
@@ -2742,8 +2735,8 @@ int igraph_transitivity_undirected(const igraph_t *graph,
  *         \c IGRAPH_ENOMEM: not enough memory for
  *         temporary data. 
  * 
- * Time complexity: O(|V|d*log(d)+|E|), |V| is the number of vertices, 
- * |E| is the number of edges, d is the average degree of the vertices.
+ * Time complexity: O(|V|+|E|), |V| is the number of vertices, 
+ * |E| is the number of edges.
  */
 
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res, 
@@ -2766,8 +2759,6 @@ int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     long int ip, op;
     igraph_neighbors(graph, &inneis, i, IGRAPH_IN);
     igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
-    igraph_vector_sort(&inneis);
-    igraph_vector_sort(&outneis);
     
     ip=op=0;
     while (ip < igraph_vector_size(&inneis) &&

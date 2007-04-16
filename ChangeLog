@@ -1,5 +1,25 @@
 2007-04-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/adjlist.c (IGRAPH_I_SORT_SIMPLIFY, IGRAPH_I_SORT) : removed
+	* src/topology.c (igraph_isomorphic_vf2) : updated, uses 
+	SIMPLIFY now, so it works for multigraphs
+
+	* src/adjlist.c (igraph_i_adjlist_sort) : readded, might be needed if 
+	the adjlist vectors were changed by hand
+
+	* src/adjlist.c (igraph_i_lazy_adjlist_init)
+	(igraph_i_lazy_djlist_destroy, igraph_i_lazy_adjlist_get_real) : 
+	make use of the shorted vectors returned by neighbors()
+	
+	* src/operators.c (igraph_intersection, igraph_intersection_many)
+	(igraph_union, igraph_union_many, igraph_difference)
+	(igraph_complementer) : removed unneccessary neighbor list sorting
+	* src/structural_properties.c (igraph_reciprocity) :
+	removed unneccessary sorting of neighbor lists
+	* src/cliques (igraph_maximal_independent_vertex_sets)
+	(igraph_independence_number, igraph_maximal_cliques)
+	(igraph_clique_number) : sorting of the adjacency list not needed
+
 	* src/structural_properties.c (igraph_simplify) : sorting removed
 
 	* src/community.c (igraph_community_leading_eigenvector_naive)

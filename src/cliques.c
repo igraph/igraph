@@ -639,7 +639,6 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 
   IGRAPH_CHECK(igraph_i_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &clqdata.adj_list);
-  igraph_i_adjlist_sort(&clqdata.adj_list);
 
   clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
@@ -699,7 +698,6 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
 
   IGRAPH_CHECK(igraph_i_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &clqdata.adj_list);
-  igraph_i_adjlist_sort(&clqdata.adj_list);
 
   clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
@@ -770,7 +768,6 @@ int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
   IGRAPH_CHECK(igraph_i_adjlist_init_complementer(graph, &clqdata.adj_list,
 						  IGRAPH_ALL, 0));
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &clqdata.adj_list);
-  igraph_i_adjlist_sort(&clqdata.adj_list);
 
   clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
@@ -830,7 +827,6 @@ int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
   IGRAPH_CHECK(igraph_i_adjlist_init_complementer(graph, &clqdata.adj_list,
 						  IGRAPH_ALL, 0));
   IGRAPH_FINALLY(igraph_i_adjlist_destroy, &clqdata.adj_list);
-  igraph_i_adjlist_sort(&clqdata.adj_list);
 
   clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
