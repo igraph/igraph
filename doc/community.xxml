@@ -17,6 +17,13 @@
 <!-- doxrox-include igraph_community_spinglass_single -->
 </section>
 
+<section><title>Community structure based on eigenvectors of matrices</title>
+<!-- doxrox-include about_leading_eigenvector_methods -->
+<!-- doxrox-include igraph_community_leading_eigenvector -->
+<!-- doxrox-include igraph_community_leading_eigenvector_naive -->
+<!-- doxrox-include igraph_community_leading_eigenvector_step -->
+</section>
+
 <section><title>Walktrap: community structure based on random walks</title>
 <!-- doxrox-include igraph_community_walktrap -->
 </section>
@@ -28,9 +35,6 @@
 
 <section><title>Community structure based on fast greedy optimization of modularity</title>
 <!-- doxrox-include igraph_community_clauset -->
-</section>
-
-<section><title>Greedy optimization of modularity</title>
 <!-- doxrox-include igraph_community_fastgreedy -->
 </section>
 

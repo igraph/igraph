@@ -38,8 +38,8 @@ vector.xml: vector.xxml $(SRCDIR)/types.h $(SRCDIR)/vector.c $(SRCDIR)/vector_pt
 error.xml: error.xxml $(SRCDIR)/error.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/error.h
 
-matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.c
+matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.c $(SRCDIR)/spmatrix.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.c $(SRCDIR)/spmatrix.c
 
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c

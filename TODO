@@ -8,6 +8,8 @@ o R interface graphics improvements:
   - uniform handlind of colors
   - uniform y coordinates (in plot and tkplot, mirror tkplot (?))
 
+o missing documentation igraph_read_graph_dimacs,
+  igraph_read_graph_graphdb, igraph_write_graph_dimacs
 o R interface: curved edges in plots (tkplot and plot)
 o igraph_vs_seq bug, the last node is omitted???
 o R interface: implement max.print option
@@ -32,19 +34,14 @@ o uniform graph operators (union, intersection, etc...)
 o attribute handling for operators
 o merging layouts properly, multicompartmental layout functions
 o eccentricity
-o bi-connected components (or k connected component), articulations points,
-  k-cores
+o bi-connected components (or k connected component), articulations points
 o connectedness, efficiency, hierarchy, lubness
 
-o topological equaivalence of graphs (hard)
 o make possible building in separate directory (make check, r package,
   make dist do not work)
 o write tutorial
 o add some iterators: in-, pre-, post-order, depth-first, breadth-first
   search, iterators based on attributes etc.
-o add methods for reading & saving a file together with its attributes
-o add conversion methods for different file formats
-o community detection algorithms
 o add data sets to the R package
 o add automatic tests, add valgrind option to tests (?)
 o make docs look better: index, section tocs

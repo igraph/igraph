@@ -844,21 +844,88 @@ int igraph_modularity(const igraph_t *graph,
 }
 
 /**
+ * \section about_leading_eigenvector_methods
+ * 
+ * <para>
+ * The functions documented in these section implement the 
+ * <quote>leading eigenvector</quote> method developed by Mark Newman and 
+ * published in MEJ Newman: Finding community structure using the
+ * eigenvectors of matrices, arXiv:physics/0605087. TODO: proper
+ * citation.</para>
+ * 
+ * <para>
+ * The heart of the method is the definition of the modularity matrix,
+ * B, which is B=A-P, A being the adjacency matrix of the (undirected)
+ * network, and P contains the probability that certain edges are
+ * present according to the <quote>configuration model</quote> In
+ * other words, a Pij element of P is the probability that there is an
+ * edge between vertices i and j in a random network in which the
+ * degrees of all vertices are the same as in the input graph.</para>
+ * 
+ * <para>
+ * The leading eigenvector method works by calculating the eigenvector
+ * of the modularity matrix for the largest positive eigenvalue and
+ * then separating vertices into two community based on the sign of
+ * the corresponding element in the eigenvector. If all elements in
+ * the eigenvector are of the same sign that means that the network
+ * has no underlying comuunity structure.
+ * Check Newman's paper to understand why this is a good method for
+ * detecting community structure. </para>
+ * 
+ * <para>
+ * Three function are implemented, they all work accoding to the same
+ * principles. The simplest is perhaps \ref
+ * igraph_community_leading_eigenvector_naive(). This function splits
+ * the network as described above and then recursively splits the 
+ * two components after the split as individual networks, if possible.
+ * This however is not a good way for maximizing moduilarity, again
+ * see the paper for explanation and the proper definition of
+ * modularity.</para>
+ * 
+ * <para>
+ * The correct recursive community structure detection method is 
+ * implemented in \ref igraph_community_leading_eigenvector(). 
+ * Here, after the initial split, the following splits are done in a
+ * way to optimize modularity regarding the original network. 
+ * I can't say it enough, see the paper, particularly section VI.
+ * </para>
+ * 
+ * <para>
+ * The third function is \ref
+ * igraph_community_leading_eigenvector_step(), this starts from a
+ * division of the network and tries to split a given community into 
+ * two subcommunities via the same (correct) method as \ref
+ * igraph_community_leading_eigenvector().
+ * </para>
+ */
+
+/**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector_naive
  * 
  * A naive implementation of Newman's eigenvector community structure
- * detection.
+ * detection. This function splits the network into two components 
+ * according to the leading eigenvector of the modularity matrix and
+ * then recursively takes \p steps steps by splitting the components
+ * as individual network. This is not the correct way however, see
+ * MEJ Newman: Finding community structure in networks using the
+ * eigenvectors of matrices, arXiv:physics/0605087. Consider using the 
+ * correct \ref igraph_community_leading_eigenvector() function instead.
  * \param graph The input graph, should be undirected to make sense.
- * \param merges
- * \param membership
- * \param steps
+ * \param merges The merge matrix. The splits done by the algorithm
+ *    are stored here, its structure is the same ad for \ref
+ *    igraph_community_leading_eigenvector(). 
+ * \param membership The membership vector, for each vertex it gives
+ *    the id of its community after all the splits are performed.
+ * \param steps The number of splits to do, if possible. Supply the
+ *    number of vertices in the network here to perform as many steps 
+ *    as possible.
  * \return Error code.
  * 
  * \sa \ref igraph_community_leading_eigenvector() for the proper way, 
  * \ref igraph_community_leading_eigenvector_step() to do just one split.
  * 
- * Time complexity: O((E|+|V|)^2 * steps), |V| is the number of vertices,
+ * Time complexity: O(E|+|V|^2*steps), |V| is the number of vertices,
  * |E| is the number of edges.
  */ 
 
@@ -1135,6 +1202,43 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector
+ * 
+ * Newman's leading eigenvector method for detecting community
+ * structure. This is the proper implementation of the recursive,
+ * divisive algorithm: each split is done by maximizing the modularity 
+ * regarding the original network, see MEJ Newman: Finding community
+ * structure in networks using the eigenvectors of matrices,
+ * arXiv:physics/0605087.
+ * 
+ * \param graph The undirected input graph.
+ * \param merges The result of the algorithm, a matrix containing the
+ *    information about the splits performed. The matrix is built in
+ *    the opposite way however, it is like the result of an
+ *    agglomerative algorithm. If at the end of the algorithm (after
+ *    \p steps steps was done) there are <quote>p</quote> communities,
+ *    then these are numbered from zero to <quote>p-1</quote>. The
+ *    first line of the matrix contains the first <quote>merge</quote>
+ *    (which is in reality the last split) of two communities into
+ *    community <quote>p</quote>, the merge in the second line forms 
+ *    community <quote>p+1</quote>, etc. The matrix should be
+ *    initialized before calling and will be resized as needed.
+ * \param membership The membership of the vertices after all the
+ *    splits were performed will be stored here. The vector must be
+ *    initialized  before calling and will be resized as needed.
+ * \param steps The maximum number of steps to perform. It might
+ *    happen that some component (or the whole network) has no
+ *    underlying community structure and no further steps can be
+ *    done. If you wany as many steps as possible then supply the 
+ *    number of vertices in the network here.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_community_walktrap() and \ref
+ * igraph_community_spinglass() for other community structure
+ * detection methods.
+ * 
+ * Time complexity: O(|E|+|V|^2*steps), |V| is the number of vertices,
+ * |E| the number of edges, <quote>steps</quote> the number of splits
+ * performed.
  */
 
 int igraph_community_leading_eigenvector(const igraph_t *graph,
@@ -1400,6 +1504,39 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector_step
+ * 
+ * Do one split according to Mark Newman's leading eigenvector
+ * community detection method. See MEJ Newman: Finding community
+ * structure in networks using the eigenvectors of matrices,
+ * arXiv:phyisics/0605087 for the details.
+ * 
+ * </para><para>Use this function instead of \ref
+ * igraph_community_leading_eigenvector() if you want to have full
+ * controll over and information about each split performed along
+ * community structure detection. \ref
+ * igraph_community_leading_eigenvector() can be simulated by
+ * repeatedly calling this function.
+ * 
+ * \param graph The undirected input graph.
+ * \param membership Numeric vector giving a division of \p graph.
+ *    The result will be also stored here. The vector contains the
+ *    community ids for each vertex, these are numbered from 0.
+ * \param community The id of the community to split.
+ * \param split Pointer to a logical variable, if it was possible to
+ *    split community \p community then 1, otherwise 0 will be stored
+ *    here.
+ * \param eigenvector Pointer to an initialized vector, the
+ *    eigenvector on which the split was done will be stored here. 
+ *    It will be resised to have the same length as the number of
+ *    vertices in community \p community.
+ * \param eigenvalue Pointer to a real variable, the eigenvalue
+ *    associated with \p eigenvector will be stored here.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_community_leading_eigenvector().
+ * 
+ * Time complexity: O(|E|+|V|^2), |E| is the number of edges, |V| is
+ * the number of vertices.
  */
 
 int igraph_community_leading_eigenvector_step(const igraph_t *graph,

@@ -74,7 +74,7 @@ using namespace std;
  * </para><para>
  * Currently the original C++ implementation is used in igraph, 
  * see http://www.liafa.jussieu.fr/~pons/index.php?item=prog&amp;item2=walktrap&amp;lang=en
- * i'm grateful for Matthieu Latapy and Pascal Pons for providing this 
+ * I'm grateful to Matthieu Latapy and Pascal Pons for providing this 
  * source code.
  * \param graph The input graph.
  * \param weights Numeric vector giving the weights of the edges. 

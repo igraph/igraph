@@ -113,7 +113,7 @@ int igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
 }
 
 /**
- * \section igraph_matrix_accessing_elements Accessing elements of a sparse matrix
+ * \section igraph_spmatrix_accessing_elements Accessing elements of a sparse matrix
  */
 
 /**
