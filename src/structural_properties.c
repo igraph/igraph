@@ -2034,7 +2034,6 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
       } /* if loops */
       
       if (multiple) {
-	igraph_vector_sort(&neis);
 	for (j=1; j<igraph_vector_size(&neis); j++) {
 	  if (VECTOR(neis)[j]==VECTOR(neis)[j-1] && 
 	      (!loops || VECTOR(neis)[j] != i) ) {
@@ -2064,7 +2063,6 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
       } /* if loops */
       
       if (multiple) {
-	igraph_vector_sort(&neis);
 	for (j=1; j<igraph_vector_size(&neis); j++) {
 	  if (VECTOR(neis)[j] > i && VECTOR(neis)[j]==VECTOR(neis)[j-1]) {
 	    IGRAPH_CHECK(igraph_vector_push_back(&edges, i));

@@ -1,5 +1,7 @@
 2007-04-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_simplify) : sorting removed
+
 	* src/community.c (igraph_community_leading_eigenvector_naive)
 	(igraph_community_leading_eigenvector)
 	(igraph_community_leading_eigenvector_step) : make most arguments optional
