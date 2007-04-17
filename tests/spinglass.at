@@ -39,7 +39,8 @@ AT_CLEANUP
 
 AT_SETUP([Modularity optimization (igraph_community_clauset): ])
 AT_KEYWORDS([community structure Clauset modularity])
-AT_COMPILE_CHECK([simple/igraph_community_clauset.c], [simple/igraph_community_clauset.out])
+AT_COMPILE_CHECK([simple/igraph_community_clauset.c],
+                 [simple/igraph_community_clauset.out])
 AT_CLEANUP
 
 AT_SETUP([Leadin eigenvector community structure (igraph_community_leading_eigenvector) :])

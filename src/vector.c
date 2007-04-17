@@ -1223,10 +1223,11 @@ int igraph_vector_move_interval(igraph_vector_t *v, long int begin, long int end
  */
 
 void igraph_vector_permdelete(igraph_vector_t *v, long int *index, long int nremove) {
-  long int i;
+  long int i, n;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  for (i=0; i<igraph_vector_size(v); i++) {
+  n = igraph_vector_size(v);
+  for (i=0; i<n; i++) {
     if (index[i] != 0) {
       VECTOR(*v)[ index[i]-1 ] = VECTOR(*v)[i];
     }

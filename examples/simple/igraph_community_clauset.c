@@ -23,12 +23,18 @@
 
 #include <igraph.h>
 
+void warning_handler(const char *reason, const char *file,
+				   int line, int igraph_errno) {
+  printf("Warning: %s\n", reason);
+}
+
 int main() {
   igraph_t g;
   igraph_real_t  modularity;
   igraph_vector_t membership;
   long int i;
   
+  igraph_set_warning_handler(warning_handler);
   igraph_vector_init(&membership, 0);
  
   igraph_small(&g, 5, IGRAPH_UNDIRECTED, 
@@ -74,11 +80,11 @@ int main() {
 
   igraph_community_clauset(&g, 
 			     0,
-			     0,
+			     2,
            &modularity,
 			     &membership,
            0);
-
+  
   printf("Modularity:  %f\n", modularity);
   printf("Membership: ");
   for (i=0; i<igraph_vector_size(&membership); i++) {

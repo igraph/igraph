@@ -547,7 +547,7 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
         printf(" %ld", (long)VECTOR(neis_to)[i]);
     printf(" ]\n");*/
     for (i=0; i<igraph_vector_size(&neis_from); i++) {
-      if (VECTOR(neis_from)[i] == to || VECTOR(neis_from)[i] == from) continue;
+      if ((long)VECTOR(neis_from)[i] == to || (long)VECTOR(neis_from)[i] == from) continue;
       /* neis_from[i] is connected to 'from', see if it's connected to 'to' */
       if (igraph_vector_binsearch(&neis_to, VECTOR(neis_from)[i], 0)) {
         /* Assumption: neis_to is sorted */
@@ -568,11 +568,12 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
           from, (long)VECTOR(neis_from)[i], to, to,
           (long)VECTOR(neis_from)[i], q);*/
       }
+       
       igraph_spmatrix_set(&dq, to, (long)VECTOR(neis_from)[i], q);
       igraph_spmatrix_set(&dq, (long)VECTOR(neis_from)[i], to, q);
     }
     for (i=0; i<igraph_vector_size(&neis_to); i++) {
-      if (VECTOR(neis_to)[i] == from || VECTOR(neis_to)[i] == from) continue;
+      if ((long)VECTOR(neis_to)[i] == from || (long)VECTOR(neis_to)[i] == to) continue;
       /* neis_to[i] is connected to 'to', see if it's connected to 'from' */
       if (igraph_vector_binsearch(&neis_from, VECTOR(neis_to)[i], 0)) {
         /* Yes -- it is rule 1, but has already been handled before */
@@ -591,9 +592,14 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
     igraph_spmatrix_add_col_values(&neis, to, from);
     /* Set all elements in row and column 'from' of dq and neis to zero */
     igraph_spmatrix_clear_col(&dq, from);
-    igraph_spmatrix_clear_row(&dq, from);
+    igraph_i_spmatrix_clear_row_fast(&dq, from);
     igraph_spmatrix_clear_col(&neis, from);
-    igraph_spmatrix_clear_row(&neis, from);
+    igraph_i_spmatrix_clear_row_fast(&neis, from);
+    /* Cleanup in every 20th step */
+    if (no_of_joins % 20 == 0) {
+      igraph_i_spmatrix_cleanup(&dq);
+      igraph_i_spmatrix_cleanup(&neis);
+    }
     /* Update a */
     /*printf("Updating a[%ld] to %.4f\n", to, VECTOR(a)[to]+VECTOR(a)[from]);*/
     VECTOR(a)[to] += VECTOR(a)[from];
@@ -607,10 +613,13 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
     no_of_joins++;
     /* Update maxq */
     maxq += maxdq;
+    /*printf("[%.4f] Joined %d -> %d, %d join(s) left\n", (float)maxdq, (int)from, (int)to, total_joins - no_of_joins);
+    for (i=0; i<no_of_nodes; i++) printf("%ld ", (long)VECTOR(members)[i]);
+    printf("\n");*/   
     /*printf("====================================\n");*/
   }
 
-  if (allow_suboptimal && maxdq < 0) {
+  if (allow_suboptimal && maxdq <= 0) {
     IGRAPH_WARNING("Modularity of the result is less than the maximum modularity possible");
   }
 

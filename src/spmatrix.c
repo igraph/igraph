@@ -597,6 +597,52 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
   return 0;
 }
 
+int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
+  long int ei, n;
+
+  assert(m != NULL);
+  n = igraph_vector_size(&m->data);
+  for (ei=0; ei<n; ei++) {
+    if (VECTOR(m->ridx)[ei] == row) VECTOR(m->data)[ei]=0.0;
+  }
+  return 0;
+}
+
+int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
+  long int ci, ei, i, j, nremove=0, nremove_old=0, *permvec;
+
+  assert(m != NULL);
+  permvec=Calloc(igraph_vector_size(&m->data), long int);
+  if (permvec == 0) {
+    IGRAPH_ERROR("can't perform cleanup on sparse matrix", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(free, permvec);
+  for (ci=0, i=0, j=1; ci < m->ncol; ci++) {
+    for (ei=VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci+1]; ei++) {
+      if (VECTOR(m->data)[ei] == 0.0) {
+        /* this element will be deleted, so all elements in cidx from the
+         * column index of this element will have to be decreased by one */
+        nremove++;
+      } else {
+        /* this element will be kept */
+        permvec[i] = j;
+        j++;
+      }
+      i++;
+    }
+    if (ci > 0) {
+      VECTOR(m->cidx)[ci] -= nremove_old;
+    }
+    nremove_old = nremove;
+  }
+  VECTOR(m->cidx)[m->ncol] -= nremove;
+  igraph_vector_permdelete(&m->ridx, permvec, nremove);
+  igraph_vector_permdelete(&m->data, permvec, nremove);
+  free(permvec);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 /**
  * \function igraph_spmatrix_clear_col
  *
@@ -675,12 +721,20 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
 igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
     igraph_real_t *ridx, igraph_real_t *cidx) {
   igraph_real_t res;
-  long int i, j, k, maxidx;
+  long int i, n, maxidx;
 
   assert(m != NULL);
-  i=igraph_vector_size(&m->data);
-  if (i == 0) return 0.0;
-  maxidx=(long)igraph_vector_which_max(&m->data);
+  n=igraph_vector_size(&m->data);
+  if (n == 0) return 0.0;
+   
+  maxidx = -1;
+  for (i=0; i<n; i++)
+    if (VECTOR(m->data)[i] != 0.0 &&
+	(maxidx == -1 || VECTOR(m->data)[i] >= VECTOR(m->data)[maxidx]))
+      maxidx = i;
+	
+  if (maxidx == -1) return 0.0;
+	
   res=VECTOR(m->data)[maxidx];
   if (ridx != 0) *ridx = VECTOR(m->ridx)[maxidx];
   if (cidx != 0) {

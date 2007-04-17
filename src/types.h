@@ -340,6 +340,8 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
 
 int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
     igraph_vector_t *res, long int col);
+int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row);
+int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 
 /* -------------------------------------------------- */
 /* 3D array                                           */
