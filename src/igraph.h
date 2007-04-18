@@ -1315,6 +1315,8 @@ int igraph_evolver_d(const igraph_t *graph,
 		     igraph_vector_t *norm,
 		     igraph_vector_t *cites,
 		     igraph_vector_t *expected,
+		     igraph_real_t *logprob,
+		     igraph_real_t *lognull,
 		     const igraph_vector_t *debug,
 		     igraph_vector_ptr_t *debugres);
 int igraph_evolver_mes_d(const igraph_t *graph,
@@ -1334,6 +1336,12 @@ int igraph_evolver_exp_d(const igraph_t *graphm,
 			 const igraph_vector_t *kernel,
 			 const igraph_vector_t *st,
 			 igraph_integer_t pmaxind);
+int igraph_evolver_error_d(const igraph_t *graph,
+			   const igraph_vector_t *kernel,
+			   const igraph_vector_t *st,
+			   igraph_integer_t maxind,
+			   igraph_real_t *logprob,
+			   igraph_real_t *lognull);
 
 int igraph_evolver_ad(const igraph_t *graph,
 		      igraph_integer_t niter,

@@ -37,6 +37,8 @@ int igraph_evolver_d(const igraph_t *graph,
 		     igraph_vector_t *norm,
 		     igraph_vector_t *cites,
 		     igraph_vector_t *expected,
+		     igraph_real_t *logprob,
+		     igraph_real_t *lognull,
 		     const igraph_vector_t *debug,
 		     igraph_vector_ptr_t *debugres) {
 
@@ -83,6 +85,12 @@ int igraph_evolver_d(const igraph_t *graph,
       if (expected) {
 	IGRAPH_CHECK(igraph_evolver_exp_d(graph, expected, kernel,
 					  &st, maxdegree));
+      }
+      
+      /* error calculation */
+      if (logprob || lognull) {
+	IGRAPH_CHECK(igraph_evolver_error_d(graph, kernel, &st, maxdegree,
+					    logprob, lognull));
       }
     }
     
@@ -351,6 +359,70 @@ int igraph_evolver_exp_d(const igraph_t *graph,
   return 0;
 }
 
+int igraph_evolver_error_d(const igraph_t *graph,
+			   const igraph_vector_t *kernel,
+			   const igraph_vector_t *st,
+			   igraph_integer_t maxind,
+			   igraph_real_t *logprob,
+			   igraph_real_t *lognull) {
+
+  long int classes=maxind+1;
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t indegree;
+  igraph_vector_t neis;
+  igraph_vector_t ntk;
+  
+  long int node;
+  long int i;
+
+  igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&ntk, classes);
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  if (!mylogprob) { mylogprob=&rlogprob; }
+  if (!mylognull) { mylognull=&rlognull; }
+
+  *logprob=0;
+  *lognull=0;
+  
+  for (node=0; node<no_of_nodes; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(indegree)[to];
+      
+      igraph_real_t prob=VECTOR(*kernel)[xidx]*VECTOR(ntk)[xidx]/VECTOR(*st)[node-1];
+      igraph_real_t nullprob=VECTOR(ntk)[xidx]/node;
+      
+      *logprob += log(prob);
+      *lognull += log(nullprob);
+    }
+    
+    /* update */
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int xidx=VECTOR(indegree)[to];
+      
+      VECTOR(indegree)[to] += 1;
+      VECTOR(ntk)[xidx] -= 1;
+      VECTOR(ntk)[xidx+1] += 1;
+    }
+    VECTOR(ntk)[0] += 1;
+  }
+  
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&indegree);
+  igraph_vector_destroy(&ntk);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  return 0;
+} 
+  
 /***********************************************/
 /* in-degree, age                              */
 /***********************************************/

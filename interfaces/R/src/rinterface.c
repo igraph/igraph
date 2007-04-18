@@ -6018,7 +6018,7 @@ SEXP R_igraph_community_leading_eigenvector_step(SEXP graph,
 }
 
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
-			SEXP pcites, SEXP pexpected, SEXP pdebug) {
+			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug) {
   igraph_t g;
   igraph_vector_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -6030,6 +6030,7 @@ SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
   igraph_vector_ptr_t debugres, *ppdebugres=0;
   igraph_vector_t vsd, vnorm, vcites, vexpected;
   igraph_vector_t *pvsd=0, *pvnorm=0, *pvcites=0, *pvexpected=0;
+  igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
   R_igraph_before();
@@ -6040,15 +6041,16 @@ SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
   if (norm) { igraph_vector_init(&vnorm, 0); pvnorm=&vnorm; }
   if (cites) { igraph_vector_init(&vcites, 0); pvcites=&vcites; }
   if (expected) { igraph_vector_init(&vexpected, 0); pvexpected=&vexpected; }
+  if (LOGICAL(perror)[0]) { pplogprob=&rlogprob; pplognull=&rlognull; }
   if (!isNull(pdebug) && GET_LENGTH(pdebug)!=0) {
     R_SEXP_to_vector(pdebug, &debug); ppdebug=&debug; 
     igraph_vector_ptr_init(&debugres, 0); ppdebugres=&debugres;
   }
-    
+
   igraph_evolver_d(&g, niter, &kernel, pvsd, pvnorm, pvcites, pvexpected,
-		   ppdebug, ppdebugres);
+		   pplogprob, pplognull, ppdebug, ppdebugres);
   
-  PROTECT(result=NEW_LIST(6));
+  PROTECT(result=NEW_LIST(7));
   SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&kernel));
   igraph_vector_destroy(&kernel);
   SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(pvsd));
@@ -6064,13 +6066,21 @@ SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
   } else {
     SET_VECTOR_ELT(result, 5, R_NilValue);
   }
-  PROTECT(names=NEW_CHARACTER(6));
+  if (pplogprob) {
+    SET_VECTOR_ELT(result, 6, NEW_NUMERIC(2));
+    REAL(VECTOR_ELT(result, 6))[0]=*pplogprob;
+    REAL(VECTOR_ELT(result, 6))[1]=*pplognull;
+  } else {
+    SET_VECTOR_ELT(result, 6, R_NilValue);
+  }
+  PROTECT(names=NEW_CHARACTER(7));
   SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("kernel"));
   SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("sd"));
   SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("norm"));
   SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("cites"));
   SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("expected"));
   SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("debug"));
+  SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
   R_igraph_after();  

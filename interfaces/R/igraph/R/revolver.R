@@ -21,7 +21,7 @@
 ###################################################################
 
 evolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
-                      cites=TRUE, expected=TRUE, debug=numeric()) {
+                      cites=TRUE, expected=TRUE, error=TRUE, debug=numeric()) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -29,7 +29,7 @@ evolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
 
   .Call("R_igraph_evolver_d", graph, as.numeric(niter), as.logical(sd),
         as.logical(norm), as.logical(cites), as.logical(expected),
-        as.numeric(debug),
+        as.logical(error), as.numeric(debug),
         PACKAGE="igraph")
 }
 
