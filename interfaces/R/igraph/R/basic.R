@@ -20,11 +20,8 @@
 #
 ###################################################################
 
-is.igraph <- function(graph) {
-
-  res <- (class(graph) == "igraph")
-
-  res
+is.igraph <- function(graph){
+  "igraph" %in% class(graph)
 }
 
 is.directed <- function(graph) {

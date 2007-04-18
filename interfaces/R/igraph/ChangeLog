@@ -1,5 +1,8 @@
 2007-04-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/basic.R (is.igraph) : modified to conform the
+	R rules
+
 	* interfaces/R/igraph/R/revolver.R (evolver.ad) 
 	* interfaces/R/src/rinterface.c (R_igraph_evolver_ad) :
 	error calculation added
