@@ -5847,7 +5847,7 @@ SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity) {
   
   igraph_t g;
   igraph_matrix_t merges, *ppmerges=0;
-  igraph_vector_t modularity, *ppmodularity;
+  igraph_vector_t modularity, *ppmodularity=0;
   SEXP result, names;
   
   R_igraph_before();
@@ -5935,6 +5935,85 @@ SEXP R_igraph_modularity(SEXP graph, SEXP pmembership) {
   R_igraph_after();
   
   UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP psteps, SEXP pnaive) {
+  
+  igraph_t g;
+  long int steps=REAL(psteps)[0];
+  igraph_matrix_t merges;
+  igraph_vector_t membership;
+  SEXP result, names;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_matrix_init(&merges, 0, 0);
+  igraph_vector_init(&membership, 0);
+  if (LOGICAL(pnaive)[0]) {
+    igraph_community_leading_eigenvector_naive(&g, &merges, &membership, steps);
+  } else {
+    igraph_community_leading_eigenvector(&g, &merges, &membership, steps);
+  }
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&merges));
+  igraph_matrix_destroy(&merges);
+  SET_VECTOR_ELT(result, 1, R_igraph_vector_to_SEXP(&membership));
+  igraph_vector_destroy(&membership);
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("membership"));
+  SET_NAMES(result, names);
+  
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+} 
+
+SEXP R_igraph_community_leading_eigenvector_step(SEXP graph, 
+						 SEXP pmembership,
+						 SEXP pcommunity,
+						 SEXP peigenvector) {
+
+  igraph_t g;
+  igraph_vector_t membership;
+  igraph_integer_t community=REAL(pcommunity)[0];
+  igraph_bool_t split;
+  igraph_vector_t eigenvector, *ppeigenvector=0;
+  igraph_real_t eigenvalue;
+  SEXP result, names;
+
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector_copy(pmembership, &membership);
+  if (LOGICAL(peigenvector)[0]) {
+    ppeigenvector=&eigenvector;
+    igraph_vector_init(ppeigenvector, 0);
+  }
+  igraph_community_leading_eigenvector_step(&g, &membership, community, 
+					    &split, ppeigenvector, &eigenvalue);
+  PROTECT(result=NEW_LIST(4));
+  SET_VECTOR_ELT(result, 0, R_igraph_vector_to_SEXP(&membership));
+  igraph_vector_destroy(&membership);
+  SET_VECTOR_ELT(result, 1, NEW_LOGICAL(1));
+  LOGICAL(VECTOR_ELT(result, 1))[0]=split;
+  SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(ppeigenvector));
+  if (ppeigenvector) { igraph_vector_destroy(ppeigenvector); }
+  SET_VECTOR_ELT(result, 3, NEW_NUMERIC(1));
+  REAL(VECTOR_ELT(result, 3))[0]=eigenvalue;  
+  PROTECT(names=NEW_CHARACTER(4));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("membership"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("split"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("eigenvector"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("eigenvalue"));
+  SET_NAMES(result, names);
+
+  R_igraph_after();
+
+  UNPROTECT(2);
   return result;
 }
 

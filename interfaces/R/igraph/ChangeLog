@@ -1,3 +1,14 @@
+2007-04-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/community.R (leading.eigenvector.community)
+	(leading.eigenvector.community.step) 
+	(as.dendrogram.igraph.eigenc) : added
+	* interfaces/R/src/rinterface.c (R_igraph_leading_eigenvector_community)
+	(R_igraph_leading_eigenvector_community_step) : added
+
+	* interfaces/R/igraph/R/community.R (community.cut)
+	(edge.type.matrix) : removed
+
 2007-04-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/tkplot.R (.tkplot.update.edge) :

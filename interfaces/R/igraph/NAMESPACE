@@ -54,13 +54,15 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
 
 # community structure
 
-export(edge.betweenness.community, community.cut, edge.type.matrix,
+export(edge.betweenness.community,
        modularity, spinglass.community, walktrap.community,
        edge.betweenness.community.merges, fastgreedy.community,
-       community.to.membership)
+       community.to.membership, leading.eigenvector.community,
+       leading.eigenvector.community.step)
 
 S3method("as.dendrogram", igraph.walktrap)
 S3method("as.dendrogram", igraph.ebc)
+S3method("as.dendrogram", igraph.eigenc)
 
 # conversion
 
