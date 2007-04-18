@@ -1,5 +1,11 @@
 2007-04-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver.c (igraph_evolver_ad, igraph_evolver_error_d) :
+	error calculation added
+	
+	* src/evolver.c (igraph_evolver_error_d) : bug corrected when
+	logprob/lognull is NULL
+
 	* src/evolver.c (igraph_evolver_d, igraph_evolver_error_d) :
 	error calculation added
 

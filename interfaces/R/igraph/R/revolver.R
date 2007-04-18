@@ -34,7 +34,7 @@ evolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
 }
 
 evolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
-                       sd=FALSE, norm=FALSE, cites=TRUE, expected=TRUE,
+                       sd=FALSE, norm=FALSE, cites=TRUE, expected=TRUE, error=TRUE,
                        debug=matrix(nc=2, nr=0)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -42,6 +42,7 @@ evolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
 
   .Call("R_igraph_evolver_ad", graph, as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites),
-        as.logical(expected), structure(as.numeric(debug), dim=dim(debug)),
+        as.logical(expected), as.logical(error),
+        structure(as.numeric(debug), dim=dim(debug)),
         PACKAGE="igraph")
 }
