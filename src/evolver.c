@@ -396,9 +396,12 @@ int igraph_evolver_error_d(const igraph_t *graph,
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(indegree)[to];
       
-      igraph_real_t prob=VECTOR(*kernel)[xidx]*VECTOR(ntk)[xidx]/VECTOR(*st)[node-1];
-      igraph_real_t nullprob=VECTOR(ntk)[xidx]/node;
-      
+/*       igraph_real_t prob=VECTOR(*kernel)[xidx]*VECTOR(ntk)[xidx]/VECTOR(*st)[node-1]; */
+/*       igraph_real_t nullprob=VECTOR(ntk)[xidx]/node; */
+
+      igraph_real_t prob=VECTOR(*kernel)[xidx]/VECTOR(*st)[node-1];
+      igraph_real_t nullprob=1.0/node;
+
       *mylogprob += log(prob);
       *mylognull += log(nullprob);
     }
@@ -863,9 +866,12 @@ int igraph_evolver_error_ad(const igraph_t *graph,
       long int xidx=VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
-      igraph_real_t prob=MATRIX(*kernel, xidx, yidx)*MATRIX(ntkl, xidx, yidx) /
-	VECTOR(*st)[node];
-      igraph_real_t nullprob=MATRIX(ntkl, xidx, yidx)/(node+1);
+/*       igraph_real_t prob=MATRIX(*kernel, xidx, yidx)*MATRIX(ntkl, xidx, yidx) / */
+/* 	VECTOR(*st)[node]; */
+/*       igraph_real_t nullprob=MATRIX(ntkl, xidx, yidx)/(node+1); */
+
+      igraph_real_t prob=MATRIX(*kernel, xidx, yidx) / VECTOR(*st)[node];
+      igraph_real_t nullprob=1.0/(node+1);
       
       *mylogprob += log(prob);
       *mylognull += log(nullprob);

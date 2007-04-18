@@ -1,5 +1,8 @@
 2007-04-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver.c (igraph_evolver_error_d, igraph_evolver_error_ad) :
+	error calculation modified
+
 	* src/evolver.c (igraph_evolver_ad, igraph_evolver_error_d) :
 	error calculation added
 	
