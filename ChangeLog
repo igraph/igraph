@@ -1,5 +1,10 @@
 2007-04-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver.c (igraph_evolver_e, igraph_evolver_mes_e)
+	(igraph_evolver_st_e, igraph_evolver_error_e) : added
+
+	* src/evolver.c (igraph_evolver_mes_ade) : bug corrected
+
 	* src/evolver.c (igraph_evolver_ade, igraph_evolver_mes_ade)
 	(igraph_evolver_st_ade, igraph_evolver_error_ade) : added
 

@@ -1429,6 +1429,46 @@ int igraph_evolver_error_ade(const igraph_t *graph,
 			     igraph_real_t *logprob,
 			     igraph_real_t *lognull);
 
+int igraph_evolver_e(const igraph_t *graph,
+		     igraph_integer_t niter,
+		     const igraph_vector_t *cats,
+		     igraph_vector_t *kernel,
+		     igraph_vector_t *sd,
+		     igraph_vector_t *norm,
+		     igraph_vector_t *cites,
+		     igraph_vector_t *expected,
+		     igraph_real_t *logprob,
+		     igraph_real_t *lognull,
+		     const igraph_vector_t *debug,
+		     igraph_vector_ptr_t *debugres);
+int igraph_evolver_mes_e(const igraph_t *graph,
+			 igraph_vector_t *kernel,
+			 igraph_vector_t *sd,
+			 igraph_vector_t *norm,
+			 igraph_vector_t *cites,
+			 const igraph_vector_t *debug,
+			 igraph_vector_ptr_t *debugres,
+			 const igraph_vector_t *st,
+			 const igraph_vector_t *cats,
+			 igraph_integer_t pnocats);
+int igraph_evolver_st_e(const igraph_t *graph,
+			igraph_vector_t *st,
+			const igraph_vector_t *kernel,
+			const igraph_vector_t *cats);
+int igraph_evolver_exp_e(const igraph_t *graph,
+			 igraph_vector_t *expected,
+			 const igraph_vector_t *kernel,
+			 const igraph_vector_t *st,
+			 const igraph_vector_t *cats,
+			 igraph_integer_t pnocats);
+int igraph_evolver_error_e(const igraph_t *graph,
+			   const igraph_vector_t *kernel,
+			   const igraph_vector_t *st,
+			   const igraph_vector_t *cats,
+			   igraph_integer_t pnocats,
+			   igraph_real_t *logprob,
+			   igraph_real_t *lognull);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */

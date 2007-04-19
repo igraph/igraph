@@ -60,3 +60,17 @@ evolver.ade <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10
         structure(as.numeric(debug), dim=dim(debug)),
         PACKAGE="igraph")
 }
+
+evolver.e <- function(graph, cats, niter=5,
+                      sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
+                      error=TRUE, debug=numeric()) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  .Call("R_igraph_evolver_e", graph, as.numeric(cats), as.numeric(niter),
+        as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
+        as.logical(error), as.numeric(debug),
+        PACKAGE="igraph")
+}
+                                                     

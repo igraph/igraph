@@ -1,6 +1,9 @@
 2007-04-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* interfaces/R/igraph/R/evolver.R (evolver.ade) : added
+	* interfaces/R/igraph/R/revolver.R (evolver.e) : added
+	* interfaces/R/src/rinterface.c (R_igraph_evolver_e) : added
+
+	* interfaces/R/igraph/R/revolver.R (evolver.ade) : added
 	* interfaces/R/src/rinterface.c (R_igraph_evolver_ade) : added
 
 	* interfaces/R/src/rinterface.c (R_igraph_0orarray3_to_SEXP) : added
