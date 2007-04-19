@@ -352,6 +352,10 @@ typedef struct s_array3 {
   long int n1, n2, n3, n1n2;
 } igraph_array3_t;
 
+#define IGRAPH_ARRAY3_INIT_FINALLY(a, n1, n2, n3) \
+  do { IGRAPH_CHECK(igraph_array3_init(a, n1, n2, n3)); \
+  IGRAPH_FINALLY(igraph_array3_destroy, a); } while (0)
+
 #define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
 int igraph_array3_init(igraph_array3_t *a, long int n1, long int n2, 
 		       long int n3);
@@ -361,6 +365,8 @@ long int igraph_array3_n(const igraph_array3_t *a, long int idx);
 int igraph_array3_resize(igraph_array3_t *a, long int n1, long int n2, 
 			 long int n3);
 void igraph_array3_null(igraph_array3_t *a);
+igraph_real_t igraph_array3_sum(const igraph_array3_t *a);
+void igraph_array3_multiply(igraph_array3_t *a, igraph_real_t by);
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */

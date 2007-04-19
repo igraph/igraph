@@ -905,3 +905,390 @@ int igraph_evolver_error_ad(const igraph_t *graph,
   
   return 0;
 }
+
+/***********************************************/
+/* in-degree, age, cited category              */
+/***********************************************/
+
+
+int igraph_evolver_ade(const igraph_t *graph,
+		       igraph_integer_t niter,
+		       igraph_integer_t agebins,
+		       const igraph_vector_t *cats,
+		       igraph_array3_t *kernel,
+		       igraph_array3_t *sd,
+		       igraph_array3_t *norm,
+		       igraph_array3_t *cites,
+		       igraph_array3_t *expected,
+		       igraph_real_t *logprob,
+		       igraph_real_t *lognull,
+		       const igraph_matrix_t *debug,
+		       igraph_vector_ptr_t *debugres) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  long int i;
+  igraph_integer_t maxdegree;
+  igraph_integer_t nocats;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(st)[i]=1;
+  }
+  
+  nocats=igraph_vector_max(cats)+1;
+  
+  IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
+				IGRAPH_IN, IGRAPH_LOOPS));
+  
+  for (i=0; i<niter; i++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    if (i+1 != niter) {		/* not the last iteration */
+      /* measure */
+      IGRAPH_CHECK(igraph_evolver_mes_ade(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+					  0/*cites*/, 0/*debug*/, 0 /*debugres*/,
+					  &st, cats, nocats, maxdegree, agebins));
+      
+      /* normalize */
+      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      
+      /* update st */
+      IGRAPH_CHECK(igraph_evolver_st_ade(graph, &st, kernel, cats));
+    } else { 
+      /* measure */
+      IGRAPH_CHECK(igraph_evolver_mes_ade(graph, kernel, sd, norm, cites, debug,
+					  debugres, &st, cats, nocats, 
+					  maxdegree, agebins));
+      
+      /* normalize */
+      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      
+      /* update st */
+      IGRAPH_CHECK(igraph_evolver_st_ade(graph, &st, kernel, cats));
+      
+      /* expected number of citations */
+      if (expected) {
+	IGRAPH_CHECK(igraph_evolver_exp_ade(graph, expected, kernel,
+					    &st, cats, nocats, 
+					    maxdegree, agebins));
+      }
+      
+      /* error calculattion */
+      if (logprob || lognull) {
+	IGRAPH_CHECK(igraph_evolver_error_ade(graph, kernel, &st,
+					      cats, nocats, maxdegree, 
+					      agebins, logprob, lognull));
+      }
+    }
+
+  }
+
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_evolver_mes_ade(const igraph_t *graph, 
+			   igraph_array3_t *kernel, 
+			   igraph_array3_t *sd,
+			   igraph_array3_t *norm,
+			   igraph_array3_t *cites,
+			   const igraph_matrix_t *debug,
+			   igraph_vector_ptr_t *debugres,
+			   const igraph_vector_t *st,
+			   const igraph_vector_t *cats,
+			   igraph_integer_t pnocats,
+			   igraph_integer_t pmaxind,
+			   igraph_integer_t pagebins) {
+  long int nocats=pnocats, maxind=pmaxind, agebins=pagebins;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  igraph_vector_t indegree;
+  igraph_array3_t ntkl, ch, v_normfact, *normfact, v_notnull, *notnull;
+  
+  igraph_vector_t neis;
+  
+  long int node, j, i, k;
+  long int edges=0;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_ARRAY3_INIT_FINALLY(&ntkl, nocats, maxind+1, agebins+1);
+  IGRAPH_ARRAY3_INIT_FINALLY(&ch, nocats, maxind+1, agebins+1);
+  
+  if (norm) {
+    normfact=norm;
+    IGRAPH_CHECK(igraph_array3_resize(normfact, nocats, maxind+1, agebins));
+    igraph_array3_null(normfact);
+  } else {
+    normfact=&v_normfact;
+    IGRAPH_ARRAY3_INIT_FINALLY(normfact, nocats, maxind+1, agebins);
+  }
+  if (cites) {
+    notnull=cites;
+    IGRAPH_CHECK(igraph_array3_resize(normfact, nocats, maxind+1, agebins));
+    igraph_array3_null(notnull);
+  } else {
+    notnull=&v_notnull;
+    IGRAPH_ARRAY3_INIT_FINALLY(notnull, nocats, maxind+1, agebins);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  IGRAPH_CHECK(igraph_array3_resize(kernel, nocats, maxind+1, agebins));
+  igraph_array3_null(kernel);
+  if (sd) {
+    IGRAPH_CHECK(igraph_array3_resize(sd, nocats, maxind+1, agebins));
+    igraph_array3_null(sd);
+  }
+  
+  if (binwidth>1) {
+    ARRAY3(ntkl, (long int)VECTOR(*cats)[0], 0, 0)=1;
+  } else {
+    ARRAY3(ntkl, (long int)VECTOR(*cats)[0], 0, 1)=1;
+  }
+
+  for (node=0; node<no_of_nodes-1; node++) {
+    long int cidx;
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* Estimate A() */
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int cidx=VECTOR(*cats)[to];
+      long int xidx=VECTOR(indegree)[to];
+      long int yidx=(node+1-to)/binwidth;
+      
+      double xk=VECTOR(*st)[node]/ARRAY3(ntkl, cidx, xidx, yidx);
+      double oldm=ARRAY3(*kernel, cidx, xidx, yidx);
+      ARRAY3(*notnull, cidx, xidx, yidx) += 1;
+      ARRAY3(*kernel, cidx, xidx, yidx) += 
+	(xk-oldm)/ARRAY3(*notnull, cidx, xidx, yidx);
+      if (sd) {
+	ARRAY3(*sd, cidx, xidx, yidx) += 
+	  (xk-oldm)*(xk-ARRAY3(*kernel, cidx, xidx, yidx));
+      }
+      /* TODO: debug */
+    }
+    
+    /* Update ntkl & co */
+    edges += igraph_vector_size(&neis);
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int cidx=VECTOR(*cats)[to];
+      long int xidx=VECTOR(indegree)[to];
+      long int yidx=(node+1-to)/binwidth;
+      
+      VECTOR(indegree)[to] += 1;
+      ARRAY3(ntkl, cidx, xidx, yidx) -= 1;
+      if (ARRAY3(ntkl, cidx, xidx, yidx)==0) {
+	ARRAY3(*normfact, cidx, xidx, yidx) += (edges-ARRAY3(ch, cidx, xidx, yidx));
+      }
+      ARRAY3(ntkl, cidx, xidx+1, yidx) += 1;
+      if (ARRAY3(ntkl, cidx, xidx+1, yidx)==1) {
+	ARRAY3(ch, cidx, xidx+1, yidx)=edges;
+      }
+    }
+    /* new node */
+    cidx=VECTOR(*cats)[node];
+    ARRAY3(ntkl, cidx, 0, 0) += 1;
+    if (ARRAY3(ntkl, cidx, 0, 0)==1) {
+      ARRAY3(ch, cidx, 0, 0)=edges;
+    }
+    /* aging */
+    for (k=1; node+1-binwidth*k+1>=0; k++) {
+      long int shnode=node+1-binwidth*k+1;
+      long int cidx=VECTOR(*cats)[shnode];
+      long int deg=VECTOR(indegree)[shnode];
+      ARRAY3(ntkl, cidx, deg, k-1) -= 1;
+      if (ARRAY3(ntkl, cidx, deg, k-1)==0) {
+	ARRAY3(*normfact, cidx, deg, k-1) += (edges-ARRAY3(ch, cidx, deg, k-1));
+      }
+      ARRAY3(ntkl, cidx, deg, k) += 1;
+      if (ARRAY3(ntkl, cidx, deg, k)==1) {
+	ARRAY3(ch, cidx, deg, k)=edges;
+      }
+    }
+  }
+  
+  /* Make normfact up to date, calculate mean, sd */
+  for (k=0; k<nocats; k++) {
+    for (i=0; i<maxind+1; i++) {
+      for (j=0; j<agebins; j++) {
+	igraph_real_t oldmean;
+	if (ARRAY3(ntkl, k, i, j) != 0) {
+	  ARRAY3(*normfact, k, i, j) += (edges-ARRAY3(ch, k, i, j));
+	}
+	if (ARRAY3(*normfact, k, i, j)==0) {
+	  ARRAY3(*kernel, k, i, j)=0;
+	  ARRAY3(*normfact, k, i, j)=1;
+	}
+	oldmean=ARRAY3(*kernel, k, i, j);
+	ARRAY3(*kernel, k, i, j) *= 
+	  ARRAY3(*notnull, k, i, j)/ARRAY3(*normfact, k, i, j);	  
+	if (sd) {
+	  ARRAY3(*sd, k, i, j) +=
+	    oldmean*oldmean*ARRAY3(*notnull, k, i, j)*
+	    (1-ARRAY3(*notnull, k, i, j)/ARRAY3(*normfact, k, i, j));
+	  ARRAY3(*sd, k, i, j)=
+	    sqrt(ARRAY3(*sd, k, i, j)/(ARRAY3(*normfact, k, i, j)-1));
+	}
+      }
+    }
+  }
+  
+  if (!cites) {
+    igraph_array3_destroy(notnull);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (!norm) {
+    igraph_array3_destroy(normfact);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  igraph_vector_destroy(&neis);
+  igraph_array3_destroy(&ch);
+  igraph_array3_destroy(&ntkl);
+  igraph_vector_destroy(&indegree);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}
+
+int igraph_evolver_st_ade(const igraph_t *graph,
+			  igraph_vector_t *st,
+			  const igraph_array3_t *kernel,
+			  const igraph_vector_t *cats) {
+
+  long int agebins=igraph_array3_n(kernel, 3);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  igraph_vector_t indegree;
+  igraph_vector_t neis;
+  
+  long int node, i, k;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_resize(st, no_of_nodes));
+
+  VECTOR(*st)[0]=ARRAY3(*kernel, (long int) VECTOR(*cats)[0], 0, 
+			binwidth > 1 ? 0 : 1);
+  
+  for (node=1; node<no_of_nodes; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    /* new node */
+    VECTOR(*st)[node]=
+      VECTOR(*st)[node-1]+ARRAY3(*kernel, (long int)VECTOR(*cats)[node], 0, 0);
+    
+    /* outgoing edges */
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int cidx=VECTOR(*cats)[to];
+      long int xidx=VECTOR(indegree)[to];
+      long int yidx=(node-to)/binwidth;
+      VECTOR(indegree)[to] += 1;
+      VECTOR(*st)[node] += 
+	-ARRAY3(*kernel, cidx, xidx, yidx) + ARRAY3(*kernel, cidx, xidx+1, yidx);
+    }
+    
+    /* aging */
+    for (k=1; node-binwidth*k+1 >= 0; k++) {
+      long int shnode=node-binwidth*k+1;
+      long int cidx=VECTOR(*cats)[shnode];
+      long int deg=VECTOR(indegree)[shnode];
+      VECTOR(*st)[node] += 
+	-ARRAY3(*kernel, cidx, deg, k-1) + ARRAY3(*kernel, cidx, deg, k);
+    }
+
+  }
+  
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&indegree);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  return 0;
+}
+
+int igraph_evolver_exp_ade(const igraph_t *graph, 
+			   igraph_array3_t *expected,
+			   const igraph_array3_t *kernel,
+			   const igraph_vector_t *st,
+			   const igraph_vector_t *cats,
+			   igraph_integer_t pnocats,
+			   igraph_integer_t pmaxind,
+			   igraph_integer_t pagebins) {
+  
+  /* TODO */
+  return 0;
+}
+
+int igraph_evolver_error_ade(const igraph_t *graph,
+			     const igraph_array3_t *kernel,
+			     const igraph_vector_t *st,
+			     const igraph_vector_t *cats,
+			     igraph_integer_t pnocats,
+			     igraph_integer_t pmaxdegree,
+			     igraph_integer_t pagebins,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull) {
+  
+  long int agebins=pagebins;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth=no_of_nodes/agebins+1;
+  igraph_vector_t indegree;
+  igraph_vector_t neis;
+
+  long int node, i;
+
+  igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  if (!logprob) { mylogprob=&rlogprob; }
+  if (!lognull) { mylognull=&rlognull; }
+  
+  *mylogprob=0;
+  *mylognull=0;
+  
+  for (node=0; node<no_of_nodes-1; node++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      long int cidx=VECTOR(*cats)[to];
+      long int xidx=VECTOR(indegree)[to];
+      long int yidx=(node+1-to)/binwidth;
+      
+      igraph_real_t prob=ARRAY3(*kernel, cidx, xidx, yidx) / VECTOR(*st)[node];
+      igraph_real_t nullprob=1.0/(node+1);
+      
+      *mylogprob += log(prob);
+      *mylognull += log(nullprob);
+    }
+    
+    /* update */
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      VECTOR(indegree)[to] += 1;
+    }
+    
+  }
+  
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&indegree);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  return 0;
+}

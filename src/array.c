@@ -69,3 +69,11 @@ int igraph_array3_resize(igraph_array3_t *a, long int n1, long int n2,
 void igraph_array3_null(igraph_array3_t *a) {
   igraph_vector_null(&a->data);
 }
+
+igraph_real_t igraph_array3_sum(const igraph_array3_t *a) {
+  return igraph_vector_sum(&a->data);
+}
+
+void igraph_array3_multiply(igraph_array3_t *a, igraph_real_t by) {
+  igraph_vector_multiply(&a->data, by);
+}

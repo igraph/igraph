@@ -1,3 +1,11 @@
+2007-04-19  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/evolver.c (igraph_evolver_ade, igraph_evolver_mes_ade)
+	(igraph_evolver_st_ade, igraph_evolver_error_ade) : added
+
+	* src/types.c (IGRAPH_ARRAY3_INIT_FINALLY) : added
+	* src/array.c (igraph_array3_sum, igraph_array_multiply) : added
+
 2007-04-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/evolver.c (igraph_evolver_error_d, igraph_evolver_error_ad) :
