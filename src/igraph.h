@@ -1512,6 +1512,30 @@ int igraph_evolver_error_de(const igraph_t *graph,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
 
+int igraph_evolver_mes_l(const igraph_t *graph,
+			 igraph_vector_t *kernel,
+			 igraph_vector_t *sd,
+			 igraph_vector_t *norm,
+			 igraph_vector_t *cites,
+			 const igraph_vector_t *debug,
+			 igraph_vector_ptr_t *debugres,
+			 const igraph_vector_t *st,
+			 igraph_integer_t pagebins);
+int igraph_evolver_st_l(const igraph_t *graph,
+			igraph_vector_t *st,
+			const igraph_vector_t *kernel);
+int igraph_evolver_exp_l(const igraph_t *graph,
+			 igraph_vector_t *expected,
+			 const igraph_vector_t *kernel,
+			 const igraph_vector_t *st,
+			 igraph_integer_t pagebins);
+int igraph_evolver_error_l(const igraph_t *graph,
+			   const igraph_vector_t *kernel,
+			   const igraph_vector_t *st,
+			   igraph_integer_t pagebins,
+			   igraph_real_t *logprob,
+			   igraph_real_t *lognull);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
