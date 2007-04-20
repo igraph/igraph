@@ -112,3 +112,17 @@ evolver.dl <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
         as.logical(error), as.numeric(debug),
         PACKAGE="igraph")
 }
+
+evolver.el <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
+                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
+                       error=TRUE, debug=numeric()) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  .Call("R_igraph_evolver_el", graph, as.numeric(cats), as.numeric(niter),
+        as.numeric(agebins),
+        as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
+        as.logical(error), as.numeric(debug),
+        PACKAGE="igraph")
+}

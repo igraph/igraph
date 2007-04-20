@@ -120,7 +120,7 @@ export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
        measure.dynamics.citingcat.citedcat)
 
 export(evolver.d, evolver.ad, evolver.ade, evolver.e, evolver.de, evolver.l,
-       evolver.dl)
+       evolver.dl, evolver.el)
 
 # isomorphism, motifs
 
