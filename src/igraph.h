@@ -1512,6 +1512,18 @@ int igraph_evolver_error_de(const igraph_t *graph,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
 
+int igraph_evolver_l(const igraph_t *graph,
+		     igraph_integer_t niter,
+		     igraph_integer_t agebins,
+		     igraph_vector_t *kernel,
+		     igraph_vector_t *sd,
+		     igraph_vector_t *norm,
+		     igraph_vector_t *cites,
+		     igraph_vector_t *expected,
+		     igraph_real_t *logprob,
+		     igraph_real_t *lognull,
+		     const igraph_vector_t *debug,
+		     igraph_vector_ptr_t *debugres);
 int igraph_evolver_mes_l(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *sd,
@@ -1535,6 +1547,45 @@ int igraph_evolver_error_l(const igraph_t *graph,
 			   igraph_integer_t pagebins,
 			   igraph_real_t *logprob,
 			   igraph_real_t *lognull);
+
+int igraph_evolver_dl(const igraph_t *graph,
+		      igraph_integer_t niter,
+		      igraph_integer_t agebins,
+		      igraph_matrix_t *kernel,
+		      igraph_matrix_t *sd,
+		      igraph_matrix_t *norm,
+		      igraph_matrix_t *cites,
+		      igraph_matrix_t *expected,
+		      igraph_real_t *logprob,
+		      igraph_real_t *lognull,
+		      const igraph_matrix_t *debug,
+		      igraph_vector_ptr_t *debugres);
+int igraph_evolver_mes_dl(const igraph_t *graph,
+			  igraph_matrix_t *kernel,
+			  igraph_matrix_t *sd,
+			  igraph_matrix_t *norm,
+			  igraph_matrix_t *cites,
+			  const igraph_matrix_t *debug,
+			  igraph_vector_ptr_t *debugres,
+			  const igraph_vector_t *st,
+			  igraph_integer_t pmaxind,
+			  igraph_integer_t pagebins);
+int igraph_evolver_st_dl(const igraph_t *graph,
+			 igraph_vector_t *st,
+			 const igraph_matrix_t *kernel);
+int igraph_evolver_exp_dl(const igraph_t *graph,
+			  igraph_matrix_t *expected,
+			  const igraph_matrix_t *kernel,
+			  const igraph_vector_t *st,
+			  igraph_integer_t pmaxind,
+			  igraph_integer_t pagebins);
+int igraph_evolver_error_dl(const igraph_t *graph,
+			    const igraph_matrix_t *kernel,
+			    const igraph_vector_t *st,
+			    igraph_integer_t pagebins,
+			    igraph_integer_t pmaxind,
+			    igraph_real_t *logprob,
+			    igraph_real_t *lognull);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
