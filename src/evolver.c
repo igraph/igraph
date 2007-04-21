@@ -153,18 +153,20 @@ int igraph_evolver_mes_d(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(sd, classes)); 
     igraph_vector_null(sd);
   }
+
+  VECTOR(ntk)[0]=1;
   
-  for (node=0; node<no_of_nodes; node++) {
+  for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(indegree)[to];
       
-      double xk=VECTOR(*st)[node-1]/VECTOR(ntk)[xidx];
+      double xk=VECTOR(*st)[node]/VECTOR(ntk)[xidx];
       double oldm=VECTOR(*kernel)[xidx];
       VECTOR(*notnull)[xidx]+=1;
       VECTOR(*kernel)[xidx] += (xk-oldm)/VECTOR(*notnull)[xidx];
@@ -384,17 +386,17 @@ int igraph_evolver_error_d(const igraph_t *graph,
   *mylogprob=0;
   *mylognull=0;
   
-  for (node=0; node<no_of_nodes; node++) {
+  for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(indegree)[to];
       
-      igraph_real_t prob=VECTOR(*kernel)[xidx]/VECTOR(*st)[node-1];
-      igraph_real_t nullprob=1.0/node;
+      igraph_real_t prob=VECTOR(*kernel)[xidx]/VECTOR(*st)[node];
+      igraph_real_t nullprob=1.0/(node+1.0);
 
       *mylogprob += log(prob);
       *mylognull += log(nullprob);

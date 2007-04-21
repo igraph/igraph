@@ -1,5 +1,8 @@
 2007-04-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver.c (igraph_evolver_mes_d, igraph_evolver_error_d) : 
+	modify to comply the usual scheme
+
 	* src/evolver.c (igraph_evolver_adi, igraph_evolver_mes_adi)
 	(igraph_evolver_st_adi, igraph_evolver_error_adi) : added
 
