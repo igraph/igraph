@@ -1758,6 +1758,53 @@ int igraph_evolver_error_di(const igraph_t *graph,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
 
+int igraph_evolver_adi(const igraph_t *graph,
+		       igraph_integer_t niter,
+		       igraph_integer_t agebins,
+		       const igraph_vector_t *cats,
+		       igraph_array3_t *kernel,
+		       igraph_array3_t *sd,
+		       igraph_array3_t *norm,
+		       igraph_array3_t *cites,
+		       igraph_array3_t *expected,
+		       igraph_real_t *logprob,
+		       igraph_real_t *lognull,
+		       const igraph_matrix_t *debug,
+		       igraph_vector_ptr_t *debugres);
+int igraph_evolver_mes_adi(const igraph_t *graph,
+			   igraph_array3_t *kernel,
+			   igraph_array3_t *sd,
+			   igraph_array3_t *norm,
+			   igraph_array3_t *cites,
+			   const igraph_matrix_t *debug,
+			   igraph_vector_ptr_t *debugres,
+			   const igraph_vector_t *st,
+			   const igraph_vector_t *cats,
+			   igraph_integer_t pnocats,
+			   igraph_integer_t pmaxind,
+			   igraph_integer_t pagebins);
+int igraph_evolver_st_adi(const igraph_t *graph,
+			  igraph_vector_t *st,
+			  const igraph_array3_t *kernel,
+			  const igraph_vector_t *cats);
+int igraph_evolver_exp_adi(const igraph_t *graph,
+			   igraph_array3_t *expected,
+			   const igraph_array3_t *kernel,
+			   const igraph_vector_t *st,
+			   const igraph_vector_t *cats,
+			   igraph_integer_t pnocats,
+			   igraph_integer_t pmaxind,
+			   igraph_integer_t pagebins);
+int igraph_evolver_error_adi(const igraph_t *graph,
+			     const igraph_array3_t *kernel,
+			     const igraph_vector_t *st,
+			     const igraph_vector_t *cats,
+			     igraph_integer_t pnocats,
+			     igraph_integer_t pmaxind,
+			     igraph_integer_t pagebins,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
