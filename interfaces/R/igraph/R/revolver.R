@@ -139,3 +139,19 @@ evolver.r <- function(graph, window, niter=5, sd=FALSE, norm=FALSE,
         as.logical(error), as.numeric(debug),
         PACKAGE="igraph")
 }
+
+evolver.ar <- function(graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
+                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
+                       debug=matrix(nc=2, nr=0)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  .Call("R_igraph_evolver_ar", graph, as.numeric(niter), as.numeric(agebins),
+        as.numeric(window),
+        as.logical(sd), as.logical(norm), as.logical(cites),
+        as.logical(expected), as.logical(error),
+        structure(as.numeric(debug), dim=dim(debug)),
+        PACKAGE="igraph")
+}
+

@@ -1671,6 +1671,52 @@ int igraph_evolver_error_r(const igraph_t *graph,
 			   igraph_real_t *logprob,
 			   igraph_real_t *lognull);
 
+int igraph_evolver_ar(const igraph_t *graph,
+		      igraph_integer_t niter,
+		      igraph_integer_t agebins,
+		      igraph_integer_t window,
+		      igraph_matrix_t *kernel,
+		      igraph_matrix_t *sd,
+		      igraph_matrix_t *norm,
+		      igraph_matrix_t *cites,
+		      igraph_matrix_t *expected,
+		      igraph_real_t *logprob,
+		      igraph_real_t *lognull,
+		      const igraph_matrix_t *debug,
+		      igraph_vector_ptr_t *debugres);
+int igraph_evolver_mes_ar(const igraph_t *graph,
+			  igraph_matrix_t *kernel,
+			  igraph_matrix_t *sd,
+			  igraph_matrix_t *norm,
+			  igraph_matrix_t *cites,
+			  const igraph_matrix_t *debug,
+			  igraph_vector_ptr_t *debugres,
+			  const igraph_vector_t *st,
+			  igraph_integer_t pagebins,
+			  igraph_integer_t pwindow,
+			  igraph_integer_t maxind);
+int igraph_evolver_st_ar(const igraph_t *graph,
+			 igraph_vector_t *st,
+			 const igraph_matrix_t *kernel,
+			 igraph_integer_t pwindow);
+int igraph_evolver_exp_ar(const igraph_t *graph,
+			  igraph_matrix_t *expected,
+			  const igraph_matrix_t *kernel,
+			  const igraph_vector_t *st,
+			  igraph_integer_t agebins,
+			  igraph_integer_t window,
+			  igraph_integer_t pmaxind);
+int igraph_evolver_error_ar(const igraph_t *graph,
+			    const igraph_matrix_t *kernel,
+			    const igraph_vector_t *st,
+			    igraph_integer_t pagebins,
+			    igraph_integer_t pwindow,
+			    igraph_integer_t maxind,			   
+			    igraph_real_t *logprob,
+			    igraph_real_t *lognull);
+
+
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
