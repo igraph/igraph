@@ -464,7 +464,6 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
   IGRAPH_FINALLY(igraph_spmatrix_destroy, &dq);
   IGRAPH_CHECK(igraph_spmatrix_init(&neis, no_of_nodes, no_of_nodes));
   IGRAPH_FINALLY(igraph_spmatrix_destroy, &neis);
-  IGRAPH_CHECK(igraph_get_adjacency_sparse(graph, &neis, IGRAPH_GET_ADJACENCY_BOTH));
   IGRAPH_CHECK(igraph_vector_init(&a, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_destroy, &a);
   IGRAPH_CHECK(igraph_degree(graph, &a, igraph_vss_all(), IGRAPH_ALL, 0));
@@ -481,6 +480,8 @@ int igraph_community_clauset(const igraph_t *graph, const igraph_vector_t *weigh
       q *= 2; /* don't know why, it was in the original implentation */
       igraph_spmatrix_set(&dq, from, to, q);
       igraph_spmatrix_set(&dq, to, from, q);
+	  igraph_spmatrix_set(&neis, from, to, 1);
+	  igraph_spmatrix_set(&neis, to, from, 1);
       IGRAPH_EIT_NEXT(edgeit);
     }
 

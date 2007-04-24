@@ -401,6 +401,58 @@ int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
 
 /**
  * \ingroup indheap
+ * \brief Adds an element to an indexed heap with a given index.
+ */
+
+int igraph_indheap_push_index(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
+  assert(h != 0);
+  assert(h->stor_begin != 0);
+	
+  /* full, allocate more storage */
+  if (h->stor_end == h->end) {
+    long int new_size = igraph_indheap_size(h) * 2;
+    if (new_size == 0) { new_size = 1; }
+    IGRAPH_CHECK(igraph_indheap_reserve(h, new_size));
+  }
+	
+  *(h->end) = elem;
+  h->end += 1;
+  *(h->index_begin+igraph_indheap_size(h)-1)=idx;
+
+  /* maintain indheap */
+  igraph_indheap_i_shift_up(h, igraph_indheap_size(h)-1);
+	
+  return 0;
+}
+
+/**
+ * \ingroup indheap
+ * \brief Modifies an element in an indexed heap.
+ */
+
+int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
+  long int i, n;
+
+  assert(h != 0);
+  assert(h->stor_begin != 0);
+
+  n = igraph_indheap_size(h);
+  for (i=0; i<n; i++)
+    if (h->index_begin[i] == idx) {
+	  h->stor_begin[i] = elem;
+	  break;
+	}
+
+  if (i == n) return 0;
+
+  /* maintain indheap */
+  igraph_indheap_i_build(h, 0);
+
+  return 0;
+}
+
+/**
+ * \ingroup indheap
  * \brief Returns the largest element in an indexed heap.
  */
 
@@ -877,7 +929,7 @@ void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2) 
 #define PARENT(x)     ((x)/2)
 #define LEFTCHILD(x)  ((x)*2+1)
 #define RIGHTCHILD(x) ((x)*2)
-#define INACTIVE      (1.0/0.0)
+#define INACTIVE      IGRAPH_INFINITY
 #define UNDEFINED     0.0
 #define INDEXINC      1
 

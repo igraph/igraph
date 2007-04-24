@@ -268,7 +268,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     (struct igraph_i_graphml_parser_state*)state0;
   long i, l;
   int r;
-  igraph_i_attribute_record_t idrec, eidrec, grec;
+  igraph_i_attribute_record_t idrec, eidrec;
   const char *idstr="id";
 
   if (!state->successful) return;
@@ -313,7 +313,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 	long int nodes=igraph_trie_size(&state->node_trie);
 	igraph_vector_resize(vec, nodes);
 	for (l=origsize; l<nodes; l++) {
-	  VECTOR(*vec)[l]=0.0/0.0;
+	  VECTOR(*vec)[l]=IGRAPH_NAN;
 	}
       } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
 	igraph_strvector_t *strvec=(igraph_strvector_t*)rec->value;
@@ -342,7 +342,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 	long int edges=igraph_vector_size(&state->edgelist)/2;
 	igraph_vector_resize(vec, edges);
 	for (l=origsize; l<edges; l++) {
-	  VECTOR(*vec)[l]=0.0/0.0;
+	  VECTOR(*vec)[l]=IGRAPH_NAN;
 	}
       } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
 	igraph_strvector_t *strvec=(igraph_strvector_t*)rec->value;
@@ -607,7 +607,7 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
         return;
       }
       for (i=s; i<id; i++) {
-	VECTOR(*vec)[i]=0.0/0.0;
+	VECTOR(*vec)[i]=IGRAPH_NAN;
       }
     }
     sscanf(chardata, "%lf", &num);

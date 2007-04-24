@@ -526,7 +526,7 @@ int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
     long int origsize=igraph_vector_size(na);
     IGRAPH_CHECK(igraph_vector_resize(na, (long int)vid+1));
     for (;origsize<count; origsize++) {
-      VECTOR(*na)[origsize] = 0.0/0.0;
+      VECTOR(*na)[origsize] = IGRAPH_NAN;
     }
     VECTOR(*na)[(long int) vid] = number;
   } else { 

@@ -452,6 +452,8 @@ int igraph_indheap_init_array     (igraph_indheap_t *t, igraph_real_t* data, lon
 void igraph_indheap_destroy        (igraph_indheap_t* h);
 igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h);
 int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem);
+int igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem);
+int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem);
 igraph_real_t igraph_indheap_max       (igraph_indheap_t* h);
 igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h);
 long int igraph_indheap_size      (igraph_indheap_t* h);
@@ -749,6 +751,41 @@ int igraph_set_add (igraph_set_t* v, igraph_integer_t e);
 igraph_bool_t igraph_set_contains (igraph_set_t* set, igraph_integer_t e);
 igraph_bool_t igraph_set_iterate (igraph_set_t* set, long int* state,
 				  igraph_integer_t* element);
+
+/*
+ * Compiler-related hacks, mostly because of Microsoft Visual C++
+ */
+double igraph_i_fdiv(const double a, const double b);
+int igraph_i_sprintf(char *buffer, size_t count, const char format*, ...);
+
+#ifdef _MSC_VER
+#  pragma warning (disable:4244)
+
+#  define vsnprintf(a, b, c, d) _vsnprintf((a), (b), (c), (d))
+#  define isnan(x) _isnan(x)
+#  define inline __inline
+#  define sprintf igraph_i_sprintf
+#endif
+
+#if defined(INFINITY)
+#  define IGRAPH_INFINITY INFINITY
+#elif defined(HUGE_VAL)
+#  define IGRAPH_INFINITY HUGE_VAL
+#else
+#  define IGRAPH_INFINITY (igraph_i_fdiv(1.0, 0.0))
+#endif
+
+#if defined(NAN)
+#  define IGRAPH_NAN NAN
+#elif defined(INFINITY)
+#  define IGRAPH_NAN (INFINITY/INFINITY)
+#else
+#  define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
+#endif
+
+#ifndef M_PI
+#  define M_PI 3.14159265358979323846
+#endif
 
 __END_DECLS
 

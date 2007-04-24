@@ -196,6 +196,25 @@ static double expm1 (double x)
 }
 #endif
 
+#ifdef __MSVC__
+/* An even dumber replacement for Microsoft Visual C */
+static double expm1 (double x)
+{
+   return expl(x) - 1.0L;
+}
+
+/* We also need rint and rintf */
+static double rint (double x)
+{
+   return ( (x<0.) ? -floor(-x+.5) : floor(x+.5) );
+}
+
+static float rintf (float x)
+{
+   return ( (x<(float)0.) ? -(float)floor(-x+.5) : (float)floor(x+.5) );
+}
+#endif
+
 /*
  *  Mathlib : A C Library of Special Functions
  *  Copyright (C) 1998 Ross Ihaka

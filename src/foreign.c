@@ -556,7 +556,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
       long int origsize=igraph_vector_size(vec);
       igraph_vector_resize(vec, igraph_i_pajek_actedge);
       for (j=origsize; j<igraph_i_pajek_actedge; j++) {
-	VECTOR(*vec)[j] = 0.0/0.0;
+	VECTOR(*vec)[j] = IGRAPH_NAN;
       }
     } else if (rec->type==IGRAPH_ATTRIBUTE_STRING) {
       igraph_strvector_t *strvec=(igraph_strvector_t*)rec->value;

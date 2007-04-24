@@ -423,7 +423,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);  
 
   igraph_i_cutheap_t heap;
-  igraph_real_t mincut=1.0/0.0;	/* infinity */
+  igraph_real_t mincut=IGRAPH_INFINITY;	/* infinity */
   long int i;
   
   igraph_i_adjlist_t adjlist;
@@ -747,7 +747,7 @@ int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
   igraph_real_t minmaxflow, flow;
   long int i;
 
-  minmaxflow=1.0/0.0;
+  minmaxflow=IGRAPH_INFINITY;
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, res, capacity));
@@ -804,7 +804,7 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
     if (conn1) {
 /*       fprintf(stderr, "%li -> %li connected\n", (long int)source, (long int) target); */
-      *res=1.0/0.0;
+      *res=IGRAPH_INFINITY;
       return 0;
 /*     } else { */
 /*       fprintf(stderr, "not connected\n"); */
@@ -888,7 +888,7 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
   case IGRAPH_VCONN_NEI_INFINITY:
     IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
     if (conn) {
-      *res=1.0/0.0;
+      *res=IGRAPH_INFINITY;
       return 0;
     }
     break;
