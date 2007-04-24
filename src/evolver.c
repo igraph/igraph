@@ -55,6 +55,7 @@ int igraph_evolver_d(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));  
   
+  igraph_progress("Evolver d", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -94,6 +95,7 @@ int igraph_evolver_d(const igraph_t *graph,
       }
     }
     
+    igraph_progress("Evolver d", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -446,6 +448,7 @@ int igraph_evolver_ad(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
+  igraph_progress("Evolver ad", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -485,6 +488,7 @@ int igraph_evolver_ad(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver ad", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -905,6 +909,7 @@ int igraph_evolver_ade(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
+  igraph_progress("Evolver ade", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -947,6 +952,7 @@ int igraph_evolver_ade(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver ade", 100*(i+1)/niter, NULL);
   }
 
   igraph_vector_destroy(&st);
@@ -1286,6 +1292,7 @@ int igraph_evolver_e(const igraph_t *graph,
   
   nocats=igraph_vector_max(cats)+1;
 
+  igraph_progress("Evolver e", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1325,6 +1332,7 @@ int igraph_evolver_e(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver e", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -1565,6 +1573,7 @@ int igraph_evolver_de(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
+  igraph_progress("Evolver de", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
@@ -1606,6 +1615,7 @@ int igraph_evolver_de(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver de", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -1897,6 +1907,7 @@ int igraph_evolver_l(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
+  igraph_progress("Evolver l", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1936,6 +1947,7 @@ int igraph_evolver_l(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver l", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -2248,6 +2260,7 @@ int igraph_evolver_dl(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
 
+  igraph_progress("Evolver dl", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2287,6 +2300,7 @@ int igraph_evolver_dl(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver dl", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -2625,6 +2639,7 @@ int igraph_evolver_el(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
 
+  igraph_progress("Evolver el", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2664,6 +2679,7 @@ int igraph_evolver_el(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver el", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3016,6 +3032,7 @@ int igraph_evolver_r(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
+  igraph_progress("Evolver r", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3055,6 +3072,7 @@ int igraph_evolver_r(const igraph_t *graph,
       }
     }
     
+    igraph_progress("Evolver r", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3393,6 +3411,7 @@ int igraph_evolver_ar(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
+  igraph_progress("Evolver ar", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3433,6 +3452,7 @@ int igraph_evolver_ar(const igraph_t *graph,
       }
     }
     
+    igraph_progress("Evolver ar", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3797,6 +3817,7 @@ int igraph_evolver_di(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
+  igraph_progress("Evolver di", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
@@ -3838,6 +3859,7 @@ int igraph_evolver_di(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver di", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -4153,6 +4175,7 @@ int igraph_evolver_adi(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
+  igraph_progress("Evolver adi", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
@@ -4194,6 +4217,7 @@ int igraph_evolver_adi(const igraph_t *graph,
       }
     }
 
+    igraph_progress("Evolver adi", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);

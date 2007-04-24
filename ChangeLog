@@ -1,3 +1,11 @@
+2007-04-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/evolver.c (igraph_evolver_d, igraph_evolver_ad)
+	(igraph_evolver_ade, igraph_evolver_e, igraph_evolver_de)
+	(igraph_evolver_l, igraph_evolver_dl, igraph_evolver_el)
+	(igraph_evolver_r, igraph_evolver_ar, igraph_evolver_di)
+	(igraph_evolver_adi) : progress bar added
+
 2007-04-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/evolver.c (igraph_evolver_mes_d, igraph_evolver_error_d) : 

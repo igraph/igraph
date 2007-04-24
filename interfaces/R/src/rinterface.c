@@ -813,6 +813,7 @@ void R_igraph_myhandler (const char *reason, const char *file,
 }
 
 igraph_interruption_handler_t *R_igraph_oldinterrupt;
+igraph_progress_handler_t *R_igraph_oldprogress;
 
 extern int R_interrupts_pending;
 
@@ -830,22 +831,8 @@ int R_igraph_interrupt_handler(void *data) {
   return 0;
 }
 
-R_INLINE void R_igraph_before() {
-  R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
-  R_igraph_oldinterrupt=
-    igraph_set_interruption_handler(R_igraph_interrupt_handler);
-  R_igraph_attribute_oldtable=
-    igraph_i_set_attribute_table(&R_igraph_attribute_table);
-}
-
-R_INLINE void R_igraph_after() {
-  igraph_set_error_handler(R_igraph_oldhandler);
-  igraph_set_interruption_handler(R_igraph_oldinterrupt);
-  igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
-}
-
 int R_igraph_progress_handler(const char *message, igraph_real_t percent,
-			      void* data) {
+			      void * data) {
   static igraph_real_t last=0;
   if (percent == 0) {
     last=0;
@@ -855,6 +842,42 @@ int R_igraph_progress_handler(const char *message, igraph_real_t percent,
     last+=2;
   }
   return 0;
+}
+
+R_INLINE void R_igraph_before() {
+  R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
+  R_igraph_oldinterrupt=
+    igraph_set_interruption_handler(R_igraph_interrupt_handler);
+  R_igraph_attribute_oldtable=
+    igraph_i_set_attribute_table(&R_igraph_attribute_table);
+}
+
+R_INLINE void R_igraph_before2(SEXP verbose, const char *str) {
+  R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
+  R_igraph_oldinterrupt=
+    igraph_set_interruption_handler(R_igraph_interrupt_handler);
+  R_igraph_attribute_oldtable=
+    igraph_i_set_attribute_table(&R_igraph_attribute_table);
+  if (LOGICAL(verbose)[0]) {
+    fprintf(stderr, "%s", str);
+    R_igraph_oldprogress=igraph_set_progress_handler(R_igraph_progress_handler);
+  }
+}  
+
+R_INLINE void R_igraph_after() {
+  igraph_set_error_handler(R_igraph_oldhandler);
+  igraph_set_interruption_handler(R_igraph_oldinterrupt);
+  igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
+}
+
+R_INLINE void R_igraph_after2(SEXP verbose) {
+  igraph_set_error_handler(R_igraph_oldhandler);
+  igraph_set_interruption_handler(R_igraph_oldinterrupt);
+  igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
+  if (LOGICAL(verbose)[0]) {
+    igraph_set_progress_handler(R_igraph_oldprogress);
+    fputc('\n', stderr);
+  }
 }
 
 /******************************************************
@@ -6029,7 +6052,8 @@ SEXP R_igraph_community_leading_eigenvector_step(SEXP graph,
 }
 
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
-			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug) {
+			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
+			SEXP verbose) {
   igraph_t g;
   igraph_vector_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -6044,7 +6068,7 @@ SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver d ");
 
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&kernel, 0);
@@ -6094,7 +6118,7 @@ SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6102,7 +6126,7 @@ SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 
 SEXP R_igraph_evolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug) {
+			 SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_matrix_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -6118,7 +6142,7 @@ SEXP R_igraph_evolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver ad ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&kernel, 0, 0);
@@ -6168,7 +6192,7 @@ SEXP R_igraph_evolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6177,7 +6201,7 @@ SEXP R_igraph_evolver_ad(SEXP graph, SEXP pniter, SEXP pagebins,
 
 SEXP R_igraph_evolver_ade(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
 			  SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			  SEXP perror, SEXP pdebug) {
+			  SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_array3_t kernel;
@@ -6190,7 +6214,7 @@ SEXP R_igraph_evolver_ade(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver ade ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -6245,7 +6269,7 @@ SEXP R_igraph_evolver_ade(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6253,7 +6277,7 @@ SEXP R_igraph_evolver_ade(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   
 SEXP R_igraph_evolver_e(SEXP graph, SEXP pcats, SEXP pniter, 
 			SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			SEXP perror, SEXP pdebug) {
+			SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_vector_t kernel;
@@ -6265,7 +6289,7 @@ SEXP R_igraph_evolver_e(SEXP graph, SEXP pcats, SEXP pniter,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver e ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -6319,7 +6343,7 @@ SEXP R_igraph_evolver_e(SEXP graph, SEXP pcats, SEXP pniter,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6327,7 +6351,7 @@ SEXP R_igraph_evolver_e(SEXP graph, SEXP pcats, SEXP pniter,
 
 SEXP R_igraph_evolver_de(SEXP graph, SEXP pcats, SEXP pniter,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug) {
+			 SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_matrix_t kernel;
@@ -6339,7 +6363,7 @@ SEXP R_igraph_evolver_de(SEXP graph, SEXP pcats, SEXP pniter,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver de ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -6393,7 +6417,7 @@ SEXP R_igraph_evolver_de(SEXP graph, SEXP pcats, SEXP pniter,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6401,7 +6425,7 @@ SEXP R_igraph_evolver_de(SEXP graph, SEXP pcats, SEXP pniter,
   
 SEXP R_igraph_evolver_l(SEXP graph, SEXP pniter, SEXP pagebins,
 			SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			SEXP perror, SEXP pdebug) {
+			SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_vector_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -6413,7 +6437,7 @@ SEXP R_igraph_evolver_l(SEXP graph, SEXP pniter, SEXP pagebins,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver l ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&kernel, 0);
@@ -6467,7 +6491,7 @@ SEXP R_igraph_evolver_l(SEXP graph, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6475,7 +6499,7 @@ SEXP R_igraph_evolver_l(SEXP graph, SEXP pniter, SEXP pagebins,
 
 SEXP R_igraph_evolver_dl(SEXP graph, SEXP pniter, SEXP pagebins,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug) {
+			 SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_matrix_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -6487,7 +6511,7 @@ SEXP R_igraph_evolver_dl(SEXP graph, SEXP pniter, SEXP pagebins,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver dl ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&kernel, 0, 0);
@@ -6541,7 +6565,7 @@ SEXP R_igraph_evolver_dl(SEXP graph, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6549,7 +6573,7 @@ SEXP R_igraph_evolver_dl(SEXP graph, SEXP pniter, SEXP pagebins,
   
 SEXP R_igraph_evolver_el(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug) {
+			 SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_matrix_t kernel;
@@ -6562,7 +6586,7 @@ SEXP R_igraph_evolver_el(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver el ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -6617,7 +6641,7 @@ SEXP R_igraph_evolver_el(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6625,7 +6649,8 @@ SEXP R_igraph_evolver_el(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
 
 SEXP R_igraph_evolver_r(SEXP graph, SEXP pniter, SEXP pwindow,
 			SEXP psd, SEXP pnorm,
-			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug) {
+			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
+			SEXP verbose) {
   igraph_t g;
   igraph_vector_t kernel;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -6641,7 +6666,7 @@ SEXP R_igraph_evolver_r(SEXP graph, SEXP pniter, SEXP pwindow,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver r ");
 
   R_SEXP_to_igraph(graph, &g);
   igraph_vector_init(&kernel, 0);
@@ -6691,7 +6716,7 @@ SEXP R_igraph_evolver_r(SEXP graph, SEXP pniter, SEXP pwindow,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6699,7 +6724,7 @@ SEXP R_igraph_evolver_r(SEXP graph, SEXP pniter, SEXP pwindow,
 
 SEXP R_igraph_evolver_ar(SEXP graph, SEXP pniter, SEXP pagebins, SEXP pwindow,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug) {
+			 SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_matrix_t kernel;  
   igraph_integer_t niter=REAL(pniter)[0];  
@@ -6716,7 +6741,7 @@ SEXP R_igraph_evolver_ar(SEXP graph, SEXP pniter, SEXP pagebins, SEXP pwindow,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver ar ");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&kernel, 0, 0);
@@ -6766,7 +6791,7 @@ SEXP R_igraph_evolver_ar(SEXP graph, SEXP pniter, SEXP pagebins, SEXP pwindow,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6775,7 +6800,7 @@ SEXP R_igraph_evolver_ar(SEXP graph, SEXP pniter, SEXP pagebins, SEXP pwindow,
 
 SEXP R_igraph_evolver_di(SEXP graph, SEXP pcats, SEXP pniter,
 			 SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			 SEXP perror, SEXP pdebug) {
+			 SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_matrix_t kernel;
@@ -6787,7 +6812,7 @@ SEXP R_igraph_evolver_di(SEXP graph, SEXP pcats, SEXP pniter,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver di ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -6841,7 +6866,7 @@ SEXP R_igraph_evolver_di(SEXP graph, SEXP pcats, SEXP pniter,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;
@@ -6849,7 +6874,7 @@ SEXP R_igraph_evolver_di(SEXP graph, SEXP pcats, SEXP pniter,
 
 SEXP R_igraph_evolver_adi(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
 			  SEXP psd, SEXP pnorm, SEXP pcites, SEXP pexpected,
-			  SEXP perror, SEXP pdebug) {
+			  SEXP perror, SEXP pdebug, SEXP verbose) {
   igraph_t g;
   igraph_vector_t cats;
   igraph_array3_t kernel;
@@ -6862,7 +6887,7 @@ SEXP R_igraph_evolver_adi(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   igraph_real_t rlogprob, rlognull, *pplogprob=0, *pplognull=0;
   SEXP result, names;
   
-  R_igraph_before();
+  R_igraph_before2(verbose, "Evolver adi ");
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pcats, &cats);
@@ -6917,7 +6942,7 @@ SEXP R_igraph_evolver_adi(SEXP graph, SEXP pcats, SEXP pniter, SEXP pagebins,
   SET_STRING_ELT(names, 6, CREATE_STRING_VECTOR("error"));
   SET_NAMES(result, names);
   
-  R_igraph_after();  
+  R_igraph_after2(verbose);  
 
   UNPROTECT(2);
   return result;

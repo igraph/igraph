@@ -21,7 +21,8 @@
 ###################################################################
 
 evolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
-                      cites=FALSE, expected=FALSE, error=TRUE, debug=numeric()) {
+                      cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
+                      verbose=igraph.par("verbose")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -29,13 +30,13 @@ evolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
 
   .Call("R_igraph_evolver_d", graph, as.numeric(niter), as.logical(sd),
         as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0)) {
+                       debug=matrix(nc=2, nr=0), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -43,13 +44,14 @@ evolver.ad <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
   .Call("R_igraph_evolver_ad", graph, as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)),
+        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.ade <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+                        error=TRUE, debug=matrix(nc=2, nr=0),
+                        verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -57,65 +59,65 @@ evolver.ade <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10
   .Call("R_igraph_evolver_ade", graph, as.numeric(cats), as.numeric(niter),
         as.numeric(agebins), as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)),
+        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.e <- function(graph, cats, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric()) {
+                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
 
   .Call("R_igraph_evolver_e", graph, as.numeric(cats), as.numeric(niter),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
                                                      
 evolver.de <- function(graph, cats, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric()) {
+                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
 
   .Call("R_igraph_evolver_de", graph, as.numeric(cats), as.numeric(niter),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
                        
 evolver.l <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric()) {
+                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
 
   .Call("R_igraph_evolver_l", graph, as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.dl <- function(graph, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                       error=TRUE, debug=numeric()) {
+                       error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
 
   .Call("R_igraph_evolver_dl", graph, as.numeric(niter), as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.el <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                       error=TRUE, debug=numeric()) {
+                       error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -123,12 +125,13 @@ evolver.el <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10)
   .Call("R_igraph_evolver_el", graph, as.numeric(cats), as.numeric(niter),
         as.numeric(agebins),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.r <- function(graph, window, niter=5, sd=FALSE, norm=FALSE,
-                      cites=FALSE, expected=FALSE, error=TRUE, debug=numeric()) {
+                      cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
+                      verbose=igraph.par("verbose")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -136,13 +139,13 @@ evolver.r <- function(graph, window, niter=5, sd=FALSE, norm=FALSE,
 
   .Call("R_igraph_evolver_r", graph, as.numeric(niter), as.numeric(window),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.ar <- function(graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
                        sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
-                       debug=matrix(nc=2, nr=0)) {
+                       debug=matrix(nc=2, nr=0), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -151,26 +154,27 @@ evolver.ar <- function(graph, window, niter=5, agebins=max(vcount(graph)/7100, 1
         as.numeric(window),
         as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)),
+        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.di <- function(graph, cats, niter=5,
                       sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                      error=TRUE, debug=numeric()) {
+                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
 
   .Call("R_igraph_evolver_di", graph, as.numeric(cats), as.numeric(niter),
         as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
-        as.logical(error), as.numeric(debug),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
         PACKAGE="igraph")
 }
 
 evolver.adi <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
-                        error=TRUE, debug=matrix(nc=2, nr=0)) {
+                        error=TRUE, debug=matrix(nc=2, nr=0),
+                        verbose=igraph.par("verbose")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
   }
@@ -178,6 +182,6 @@ evolver.adi <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10
   .Call("R_igraph_evolver_adi", graph, as.numeric(cats), as.numeric(niter),
         as.numeric(agebins), as.logical(sd), as.logical(norm), as.logical(cites),
         as.logical(expected), as.logical(error),
-        structure(as.numeric(debug), dim=dim(debug)),
+        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
         PACKAGE="igraph")
 }

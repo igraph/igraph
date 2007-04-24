@@ -1,3 +1,19 @@
+2007-04-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/revolver.R (evolver.d, evolver.ad)
+	(evolver.ade, evolver.e, evolver.de, evolver.l, evolver.dl)
+	(evolver.el, evolver.r, evolver.ar, evolver.di, evolvecr.adi) :
+	verbose option added
+	* interfaces/R/src/rinterface.c (R_igraph_evolver_d)
+	(R_igraph_evolver_ad, R_igraph_evolver_ade, R_igraph_evolver_e)
+	(R_igraph_evolver_de, R_igraph_evolver_l, R_igraph_evolver_dl)
+	(R_igraph_evolver_el, R_igraph_evolver_r, R_igraph_evolver_ar)
+	(R_igraph_evolver_r, R_igraph_evolver_ar, R_igraph_evolver_di)
+	(R_igraph_evolver_adi) : verbose option added
+	
+	* interfaces/R/src/rinterface.c 
+	(R_igraph_before2, R_igraph_after2): added
+
 2007-04-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/revolver.R (evolver.adi) : added
