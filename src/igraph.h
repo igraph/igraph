@@ -1875,6 +1875,23 @@ void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al);
 igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
 						igraph_integer_t no);
 
+typedef struct igraph_i_lazy_adjedgelist_t {
+  const igraph_t *graph;
+  igraph_integer_t length;
+  igraph_vector_t **adjs;
+  igraph_neimode_t mode;
+} igraph_i_lazy_adjedgelist_t;
+
+int igraph_i_lazy_adjedgelist_init(const igraph_t *graph,
+				   igraph_i_lazy_adjedgelist_t *al,
+				   igraph_neimode_t mode);
+void igraph_i_lazy_adjedgelist_destroy(igraph_i_lazy_adjedgelist_t *al);
+#define igraph_i_lazy_adjedgelist_get(al, no) \
+  ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
+   (igraph_i_lazy_adjedgelist_get_real(al, no)))
+igraph_vector_t *igraph_i_lazy_adjedgelist_get_real(igraph_i_lazy_adjedgelist_t *al,
+						    igraph_integer_t no);
+
 extern unsigned int igraph_i_isoclass_3[];
 extern unsigned int igraph_i_isoclass_4[];
 extern unsigned int igraph_i_isoclass_3u[];

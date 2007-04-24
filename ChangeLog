@@ -1,3 +1,9 @@
+2007-04-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/adjlist.c (igraph_i_lazy_adjedgelist_init)
+	(igraph_i_lazy_adjedgelist_destroy, igraph_i_lazy_adjedgelist_get)
+	(igraph_i_lazy_adjedgelist_get_real) : added
+
 2007-04-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_is_loop) : added

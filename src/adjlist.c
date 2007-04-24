@@ -260,3 +260,58 @@ igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
   
   return al->adjs[no];
 }
+
+int igraph_i_lazy_adjedgelist_init(const igraph_t *graph,
+				   igraph_i_lazy_adjedgelist_t *al,
+				   igraph_neimode_t mode) {
+
+  if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_EINVMODE);
+  }
+  
+  if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
+  
+  al->mode=mode;
+  al->graph=graph;
+  
+  al->length=igraph_vcount(graph);
+  al->adjs=Calloc(al->length, igraph_vector_t*);
+  if (al->adjs == 0) {
+    IGRAPH_ERROR("Cannot create lazy adjedgelist view", IGRAPH_ENOMEM);
+  }
+
+  return 0;
+  
+}
+
+void igraph_i_lazy_adjedgelist_destroy(igraph_i_lazy_adjedgelist_t *al) {
+  long int i, n=al->length;
+  for (i=0; i<n; i++) {
+    if (al->adjs[i] != 0) {
+      igraph_vector_destroy(al->adjs[i]);
+      Free(al->adjs[i]);
+    }
+  }
+}
+
+igraph_vector_t *igraph_i_lazy_adjedgelist_get_real(igraph_i_lazy_adjedgelist_t *al,
+						    igraph_integer_t pno) {
+  long int no=pno;
+  int ret;
+  if (al->adjs[no] == 0) {
+    al->adjs[no] = Calloc(1, igraph_vector_t);
+    if (al->adjs[no] == 0) {
+      igraph_error("Lazy adjedgelist failed", __FILE__, __LINE__, 
+		   IGRAPH_ENOMEM);
+    }
+    ret=igraph_vector_init(al->adjs[no], 0);
+    if (ret != 0) {
+      igraph_error("", __FILE__, __LINE__, ret);
+    }
+    ret=igraph_adjacent(al->graph, al->adjs[no], no, al->mode);
+    if (ret != 0) {
+      igraph_error("", __FILE__, __LINE__, ret);
+    }
+  }
+  return al->adjs[no];
+}
