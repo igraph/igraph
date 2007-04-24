@@ -1955,7 +1955,7 @@ int igraph_evolver_l(const igraph_t *graph,
   
   return 0;
 }
-      
+
 int igraph_evolver_mes_l(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *sd,
@@ -2017,7 +2017,7 @@ int igraph_evolver_mes_l(const igraph_t *graph,
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ? 
-	(node+2-VECTOR(lastcit)[to])/binwidth :	agebins;      
+	(node+2-(long int)VECTOR(lastcit)[to])/binwidth :	agebins;      
       
       double xk=VECTOR(*st)[node]/VECTOR(ntl)[xidx];
       double oldm=VECTOR(*kernel)[xidx];
@@ -2137,7 +2137,7 @@ int igraph_evolver_st_l(const igraph_t *graph,
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ?
-	(node+1-VECTOR(lastcit)[to])/binwidth : agebins;
+	(node+1-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       VECTOR(lastcit)[to]=node+1;
       VECTOR(*st)[node] += -VECTOR(*kernel)[xidx]+VECTOR(*kernel)[0];
     }
@@ -2206,7 +2206,7 @@ int igraph_evolver_error_l(const igraph_t *graph,
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ?
-	(node+2-VECTOR(lastcit)[to])/binwidth : agebins;
+	(node+2-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       
       igraph_real_t prob=VECTOR(*kernel)[xidx] / VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -2229,7 +2229,7 @@ int igraph_evolver_error_l(const igraph_t *graph,
 
   return 0;
 }
-
+      
 /***********************************************/
 /* degree, time since last citation            */
 /***********************************************/
@@ -2391,7 +2391,7 @@ int igraph_evolver_mes_dl(const igraph_t *graph,
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(indegree)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ? 
-	(node+2-VECTOR(lastcit)[to])/binwidth :	agebins;
+	(node+2-(long int)VECTOR(lastcit)[to])/binwidth :	agebins;
 
       VECTOR(indegree)[to]+=1;
       VECTOR(lastcit)[to]=node+2;
@@ -2502,7 +2502,7 @@ int igraph_evolver_st_dl(const igraph_t *graph,
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(indegree)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ?
-	(node+1-VECTOR(lastcit)[to])/binwidth : agebins;
+	(node+1-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       VECTOR(indegree)[to] += 1;
       VECTOR(lastcit)[to]=node+1;
       VECTOR(*st)[node] += 
@@ -2579,7 +2579,7 @@ int igraph_evolver_error_dl(const igraph_t *graph,
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(indegree)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ?
-	(node+2-VECTOR(lastcit)[to])/binwidth : agebins;
+	(node+2-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       
       igraph_real_t prob=MATRIX(*kernel, xidx, yidx) / VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);

@@ -1,5 +1,7 @@
 2007-04-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver.c (igraph_evolver_l, igraph_evolver_dl) : slight change
+
 	* src/evolver.c (igraph_evolver_d, igraph_evolver_ad)
 	(igraph_evolver_ade, igraph_evolver_e, igraph_evolver_de)
 	(igraph_evolver_l, igraph_evolver_dl, igraph_evolver_el)
