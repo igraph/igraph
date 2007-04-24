@@ -1,5 +1,13 @@
 2007-04-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/src/rinterface.c (R_igraph_progress_handler)
+	(R_igraph_before2) : new progress handler
+	(R_igraph_layout_kamada_kawai, R_igraph_layout_kamada_kawai_3d)
+	(R_igraph_layout_fruchterman_reingold_grid)
+	(R_igraph_layout_fruchterman_reingold)
+	(R_igraph_layout_fruchterman_reingold_3d)
+	(R_igraph_layout_merge_dla) : updated to new progress handler
+
 	* interfaces/R/igraph/R/revolver.R (evolver.d, evolver.ad)
 	(evolver.ade, evolver.e, evolver.de, evolver.l, evolver.dl)
 	(evolver.el, evolver.r, evolver.ar, evolver.di, evolvecr.adi) :
