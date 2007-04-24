@@ -88,3 +88,8 @@ AT_SETUP([Loop edges test (igraph_is_loop): ])
 AT_KEYWORDS([loop edge igraph_is_loop])
 AT_COMPILE_CHECK([simple/igraph_is_loop.c], [simple/igraph_is_loop.out])
 AT_CLEANUP
+
+AT_SETUP([Multiple edges test (igraph_is_multiple): ])
+AT_KEYWORDS([multiple edge parallel edge igraph_is_multiple])
+AT_COMPILE_CHECK([simple/igraph_is_multiple.c], [simple/igraph_is_multiple.out])
+AT_CLEANUP

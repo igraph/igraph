@@ -3641,3 +3641,36 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) 
   return 0;
 }
 
+int igraph_is_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
+  igraph_eit_t eit;
+  long int i;
+  igraph_i_lazy_adjedgelist_t adjlist;
+  
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+  IGRAPH_CHECK(igraph_i_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_i_lazy_adjedgelist_destroy, &adjlist);
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
+  
+  for (i=0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
+    long int e=IGRAPH_EIT_GET(eit);
+    long int from=IGRAPH_FROM(graph, e);
+    long int to=IGRAPH_TO(graph, e);
+    igraph_vector_t *neis=igraph_i_lazy_adjedgelist_get(&adjlist, from);
+    long int j, n=igraph_vector_size(neis);
+    VECTOR(*res)[i]=0;
+    for (j=0; j<n; j++) {
+      long int e2=VECTOR(*neis)[j];
+      long int to2=IGRAPH_OTHER(graph,e2,from);
+      if (to2==to && e2<e) {
+	VECTOR(*res)[i]=1;
+      }
+    }
+  }
+  
+  igraph_i_lazy_adjedgelist_destroy(&adjlist);
+  igraph_eit_destroy(&eit);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
