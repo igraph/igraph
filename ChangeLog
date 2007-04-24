@@ -1,5 +1,10 @@
 2007-04-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_is_loop) : added
+	* examples/simple/igraph_is_loop.c : added
+
+	* src/igraph.h (IGRAPH_FROM, IGRAPH_TO, IGRAPH_OTHER) : added
+
 	* src/evolver.c (igraph_evolver_l, igraph_evolver_dl) : slight change
 
 	* src/evolver.c (igraph_evolver_d, igraph_evolver_ad)

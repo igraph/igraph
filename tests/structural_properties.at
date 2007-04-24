@@ -83,3 +83,8 @@ AT_SETUP([Topological sorting (igraph_topological_sorting, igraph_is_dag): ])
 AT_KEYWORDS([topological sorting directed acyclic graphs])
 AT_COMPILE_CHECK([simple/igraph_topological_sorting.c], [simple/igraph_topological_sorting.out])
 AT_CLEANUP
+
+AT_SETUP([Loop edges test (igraph_is_loop): ])
+AT_KEYWORDS([loop edge igraph_is_loop])
+AT_COMPILE_CHECK([simple/igraph_is_loop.c], [simple/igraph_is_loop.out])
+AT_CLEANUP

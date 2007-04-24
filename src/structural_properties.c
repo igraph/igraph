@@ -3623,3 +3623,21 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
   return 0;
 }
 
+int igraph_is_loop(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
+  igraph_eit_t eit;  
+  long int i;
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
+
+  for (i=0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
+    long int e=IGRAPH_EIT_GET(eit);
+    VECTOR(*res)[i] = (IGRAPH_FROM(graph, e)==IGRAPH_TO(graph, e)) ? 1 : 0;
+  }
+  
+  igraph_eit_destroy(&eit);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+

@@ -745,6 +745,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
 			       igraph_neimode_t mode);
 int igraph_topological_sorting(const igraph_t *graph, igraph_vector_t *res,
 			       igraph_neimode_t mode);
+int igraph_is_loop(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es);
 
 /* TODO: degree.distribution (?) */
 
