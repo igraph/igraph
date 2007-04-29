@@ -41,6 +41,7 @@ __BEGIN_DECLS
 #endif
 
 #include "error.h"
+#include <stddef.h>
 
 typedef double igraph_integer_t;
 typedef double igraph_real_t;
@@ -681,7 +682,7 @@ igraph_bool_t igraph_set_iterate (igraph_set_t* set, long int* state,
  * Compiler-related hacks, mostly because of Microsoft Visual C++
  */
 double igraph_i_fdiv(const double a, const double b);
-int igraph_i_sprintf(char *buffer, size_t count, const char format*, ...);
+int igraph_i_sprintf(char *buffer, size_t count, const char *format, ...);
 
 #ifdef _MSC_VER
 #  pragma warning (disable:4244)
