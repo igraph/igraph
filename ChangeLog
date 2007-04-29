@@ -1,5 +1,9 @@
 2007-04-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/vector_pmt.hc (igraph_vector_init_real)
+	(igraph_vector_init_real_end) : va_arg type corrected to be 
+	self-promoting
+
 	* src/types.h
 	* src/vector.c
 	* src/igraph_pmt.h

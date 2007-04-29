@@ -25,6 +25,7 @@
 #include "types.h"
 #include "memory.h"
 #include <math.h>
+#include <stdarg.h>
 
 /**
  * \ingroup nongraph

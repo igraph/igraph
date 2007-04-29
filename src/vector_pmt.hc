@@ -192,7 +192,7 @@ int FUNCTION(igraph_vector,init_real)(TYPE(igraph_vector) *v, int no, ...) {
 
   va_start(ap, no);
   for (i=0; i<no; i++) {
-    VECTOR(*v)[i]=(BASE) va_arg(ap, BASE);
+    VECTOR(*v)[i]=(BASE) va_arg(ap, double);
   }
   va_end(ap);
   
@@ -231,7 +231,7 @@ int FUNCTION(igraph_vector,init_real_end)(TYPE(igraph_vector) *v,
 
   va_start(ap, endmark);
   while (1) {
-    BASE num = va_arg(ap, BASE);
+    BASE num = va_arg(ap, double);
     if (num == endmark) {
       break;
     }
@@ -244,7 +244,7 @@ int FUNCTION(igraph_vector,init_real_end)(TYPE(igraph_vector) *v,
   
   va_start(ap, endmark);
   for (i=0; i<n; i++) {
-    VECTOR(*v)[i]=(BASE) va_arg(ap, BASE);
+    VECTOR(*v)[i]=(BASE) va_arg(ap, double);
   }
   va_end(ap);
   
