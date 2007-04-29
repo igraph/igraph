@@ -83,101 +83,26 @@ int igraph_dqueue_push    (igraph_dqueue_t* q, igraph_real_t elem);
 /* Flexible vector                                    */
 /* -------------------------------------------------- */
 
-/** 
- * Vector, dealing with arrays efficiently.
- * \ingroup types
- */
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "vector.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
 
-typedef struct s_vector {
-  igraph_real_t* stor_begin;
-  igraph_real_t* stor_end;
-  igraph_real_t* end;
-} igraph_vector_t;
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "vector.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
 
-#define IGRAPH_VECTOR_NULL { 0,0,0 }
-#define IGRAPH_VECTOR_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_vector_init(v, size)); \
-  IGRAPH_FINALLY(igraph_vector_destroy, v); } while (0)
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "igraph_pmt.h"
+#include "vector.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
 
-/**
- * \ingroup vector
- * \define VECTOR
- * \brief Accessing an element of a vector.
- * 
- * Usage: 
- * \verbatim VECTOR(v)[0] \endverbatim 
- * to access the first element of the vector, you can also use this in
- * assignments, like: 
- * \verbatim VECTOR(v)[10]=5; \endverbatim
- *
- * Note that there are no range checks right now.
- * This functionality might be redefined later as a real function
- * instead of a <code>#define</code>. 
- * \param v The vector object.
- * 
- * Time complexity: O(1).
- */
-#define VECTOR(v) ((v).stor_begin) 
-int igraph_vector_init      (igraph_vector_t* v, long int size);
-int igraph_vector_init_copy (igraph_vector_t* v, igraph_real_t* data, long int length);
-int igraph_vector_init_seq(igraph_vector_t *v, igraph_real_t from, igraph_real_t to);
-int igraph_vector_init_real(igraph_vector_t *v, int no, ...);
-int igraph_vector_init_int(igraph_vector_t *v, int no, ...);
-int igraph_vector_init_real_end(igraph_vector_t *v, igraph_real_t endmark, ...);
-int igraph_vector_init_int_end(igraph_vector_t *v, int endmark, ...);
-const igraph_vector_t *igraph_vector_view (const igraph_vector_t *v, const igraph_real_t *data, 
-			     long int length);
-void igraph_vector_destroy   (igraph_vector_t* v);
-int igraph_vector_reserve   (igraph_vector_t* v, long int size);
-igraph_bool_t igraph_vector_empty     (const igraph_vector_t* v);
-long int igraph_vector_size      (const igraph_vector_t* v);
-void igraph_vector_clear     (igraph_vector_t* v);
-void igraph_vector_null      (igraph_vector_t* v);
-int igraph_vector_push_back (igraph_vector_t* v, igraph_real_t e);
-int igraph_vector_insert(igraph_vector_t *v, long int pos, igraph_real_t value);
-igraph_real_t igraph_vector_e         (const igraph_vector_t* v, long int pos);
-igraph_real_t*igraph_vector_e_ptr  (const igraph_vector_t* v, long int pos);
-void igraph_vector_set       (igraph_vector_t* v, long int pos, igraph_real_t value);
-igraph_real_t igraph_vector_tail(const igraph_vector_t *v);
-igraph_real_t igraph_vector_pop_back(igraph_vector_t* v);
-int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
-			igraph_vector_t* res, igraph_integer_t maxval);
-int igraph_vector_order1(const igraph_vector_t* v, 
-			igraph_vector_t* res, igraph_integer_t maxval);
 int igraph_vector_order2(igraph_vector_t *v);
-void igraph_vector_sort(igraph_vector_t *v);
-int igraph_vector_resize(igraph_vector_t* v, long int newsize);
-igraph_real_t igraph_vector_max(const igraph_vector_t* v);
-long int igraph_vector_which_max(const igraph_vector_t* v);
-igraph_real_t igraph_vector_min(const igraph_vector_t* v);
-long int igraph_vector_which_min(const igraph_vector_t* v);
-void igraph_vector_copy_to(const igraph_vector_t *v, igraph_real_t* to);
-int igraph_vector_copy(igraph_vector_t *to, const igraph_vector_t *from);
-igraph_real_t igraph_vector_sum(const igraph_vector_t *v);
-igraph_real_t igraph_vector_prod(const igraph_vector_t *v);
-void igraph_vector_remove_section(igraph_vector_t *v, long int from, long int to);
-int igraph_vector_move_interval(igraph_vector_t *v, long int begin, long int end, 
-			 long int to);
-void igraph_vector_remove(igraph_vector_t *v, long int elem);
-void igraph_vector_permdelete(igraph_vector_t *v, long int *index, long int nremove);
-void igraph_vector_remove_negidx(igraph_vector_t *v, const igraph_vector_t *neg, long int nremove);
-igraph_bool_t igraph_vector_isininterval(const igraph_vector_t *v, igraph_real_t low, igraph_real_t high);
-igraph_bool_t igraph_vector_any_smaller(const igraph_vector_t *v, igraph_real_t limit);
-igraph_bool_t igraph_vector_is_equal(const igraph_vector_t *lhs, const igraph_vector_t *rhs);
-igraph_bool_t igraph_vector_binsearch(const igraph_vector_t *v, igraph_real_t what, long int *pos);
-igraph_bool_t igraph_vector_binsearch2(const igraph_vector_t *v, igraph_real_t what);
-void igraph_vector_multiply(igraph_vector_t *v, igraph_real_t by);
-igraph_bool_t igraph_vector_contains(const igraph_vector_t *v, igraph_real_t e);
-igraph_bool_t igraph_vector_search(const igraph_vector_t *v, long int from, igraph_real_t what, 
-			    long int *pos);
-int igraph_vector_filter_smaller(igraph_vector_t *v, igraph_real_t elem);
-int igraph_vector_append(igraph_vector_t *to, const igraph_vector_t *from);
-int igraph_vector_get_interval(const igraph_vector_t *v, igraph_vector_t *res,
-			       long int from, long int to);
-int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
-		       long int nodes);
-igraph_real_t igraph_vector_maxdifference(const igraph_vector_t *m1,
-					  const igraph_vector_t *m2);
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */

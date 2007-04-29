@@ -21,41 +21,78 @@
 
 */
 
-#include "types.h"
+#ifdef ATOMIC
+#undef ATOMIC
+#endif
 
-#define BASE_IGRAPH_REAL
-#include "igraph_pmt.h"
-#include "vector_pmt.hc"
-#include "igraph_pmt_off.h"
-#undef BASE_IGRAPH_REAL
+#ifdef ATOMIC_IO
+#undef ATOMIC_IO
+#endif
 
-#define BASE_LONG
-#include "igraph_pmt.h"
-#include "vector_pmt.hc"
-#include "igraph_pmt_off.h"
-#undef BASE_LONG
+#ifdef BASE
+#undef BASE
+#endif
 
-#define BASE_CHAR
-#include "igraph_pmt.h"
-#include "vector_pmt.hc"
-#include "igraph_pmt_off.h"
-#undef BASE_CHAR
+#ifdef BASE_EPSILON
+#undef BASE_EPSILON
+#endif
 
-int igraph_vector_order2(igraph_vector_t *v) {
+#ifdef CONCAT2
+#undef CONCAT2
+#endif
 
-  igraph_indheap_t heap;
-  
-  igraph_indheap_init_array(&heap, VECTOR(*v), igraph_vector_size(v));
-  IGRAPH_FINALLY(igraph_indheap_destroy, &heap);
+#ifdef CONCAT2x
+#undef CONCAT2x
+#endif
 
-  igraph_vector_clear(v);
-  while (!igraph_indheap_empty(&heap)) {
-    IGRAPH_CHECK(igraph_vector_push_back(v, igraph_indheap_max_index(&heap)-1));
-    igraph_indheap_delete_max(&heap);
-  }
-  
-  igraph_indheap_destroy(&heap);
-  IGRAPH_FINALLY_CLEAN(1);
-  return 0;
-}
+#ifdef CONCAT3
+#undef CONCAT3
+#endif
 
+#ifdef CONCAT3x
+#undef CONCAT3x
+#endif
+
+#ifdef CONCAT4
+#undef CONCAT4
+#endif
+
+#ifdef CONCAT4x
+#undef CONCAT4x
+#endif
+
+#ifdef FP
+#undef FP
+#endif
+
+#ifdef FUNCTION
+#undef FUNCTION
+#endif
+
+#ifdef IN_FORMAT
+#undef IN_FORMAT
+#endif
+
+#ifdef MULTIPLICITY
+#undef MULTIPLICITY
+#endif
+
+#ifdef ONE
+#undef ONE
+#endif
+
+#ifdef OUT_FORMAT
+#undef OUT_FORMAT
+#endif
+
+#ifdef SHORT
+#undef SHORT
+#endif
+
+#ifdef TYPE
+#undef TYPE
+#endif
+
+#ifdef ZERO
+#undef ZERO
+#endif

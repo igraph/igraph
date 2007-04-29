@@ -1,3 +1,14 @@
+2007-04-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/types.h
+	* src/vector.c
+	* src/igraph_pmt.h
+	* src/igraph_pmt_off.h
+	* src/vector.h
+	* src/vector_pmt.hc : vector functions moved from vector.c to 
+	vector_pmt.hc, from types.h to vector.h, poor man's templates 
+	introduced based on GSL
+
 2007-04-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/adjlist.c (igraph_i_lazy_adjedgelist_init)
