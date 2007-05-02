@@ -1,5 +1,8 @@
 2007-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver.c (igraph_evolver_ir, igraph_evolver_mes_ir)
+	(igraph_evolver_st_ir, igraph_evolver_error_ir) : added
+
 	* src/evolver.c (igraph_evolver_il, igraph_evolver_mes_il)
 	(igraph_evolver_st_il, igraph_evolver_error_il) : added
 

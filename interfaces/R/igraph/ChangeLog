@@ -1,5 +1,8 @@
 2007-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/revolver.R (evolver.ir) : added
+	* interfaces/R/src/rinterface.c (R_igraph_evolver_ir) : added
+
 	* interfaces/R/igraph/R/revolver.R (evolver.il) : added
 	* interfaces/R/src/rinterface.c (R_igraph_evolver_il) : added
 

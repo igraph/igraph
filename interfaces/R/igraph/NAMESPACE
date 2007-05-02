@@ -121,7 +121,7 @@ export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
 
 export(evolver.d, evolver.ad, evolver.ade, evolver.e, evolver.de, evolver.l,
        evolver.dl, evolver.el, evolver.r, evolver.ar, evolver.di, evolver.adi,
-       evolver.il)
+       evolver.il, evolver.ir)
 
 # isomorphism, motifs
 
