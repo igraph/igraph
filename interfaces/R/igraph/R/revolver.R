@@ -185,3 +185,17 @@ evolver.adi <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10
         structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
         PACKAGE="igraph")
 }
+
+evolver.il <- function(graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
+                      sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
+                      error=TRUE, debug=numeric(), verbose=igraph.par("verbose")) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  .Call("R_igraph_evolver_il", graph, as.numeric(cats),
+        as.numeric(niter), as.numeric(agebins),
+        as.logical(sd), as.logical(norm), as.logical(cites), as.logical(expected),
+        as.logical(error), as.numeric(debug), as.logical(verbose),
+        PACKAGE="igraph")
+}
