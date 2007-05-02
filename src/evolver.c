@@ -4793,7 +4793,7 @@ int igraph_evolver_mes_il(const igraph_t *graph,
   igraph_matrix_destroy(&ch);
   igraph_vector_destroy(&ntl);
   igraph_vector_destroy(&lastcit);
-  IGRAPH_FINALLY_CLEAN(4);  
+  IGRAPH_FINALLY_CLEAN(5);  
 
   return 0;
 }
@@ -4866,7 +4866,7 @@ int igraph_evolver_st_il(const igraph_t *graph,
   igraph_matrix_destroy(&allst);
   igraph_vector_destroy(&neis);
   igraph_vector_destroy(&lastcit);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
 }
