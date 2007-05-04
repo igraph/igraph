@@ -1,5 +1,8 @@
 2007-05-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/tkplot.R (tkplot) : mirror the y coordinate to
+	have the sample plot as for plot.igraph
+
 	* interfaces/R/igraph/R/plot.R
 	* interfaces/R/igraph/R/plot.common.R
 	* interfaces/R/igraph/R/tkplot.R : different parameters for 

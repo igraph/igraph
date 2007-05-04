@@ -68,6 +68,7 @@ tkplot <- function(graph, ...) {
   edge.label.color <- params("edge", "label.color")
   
   layout <- params("plot", "layout")
+  layout[,2] <- -layout[,2]
   margin <- params("plot", "margin")
 
   # the new style parameters can't do this yet

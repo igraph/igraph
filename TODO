@@ -1,10 +1,7 @@
 
 o R interface graphics improvements:
-  - loop edges in 3d
-  - better looking arrows in 3d
   - better looking edges in plot
   - rewrite documentation
-  - uniform y coordinates (in plot and tkplot, mirror tkplot (?))
 
 o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
   index.
