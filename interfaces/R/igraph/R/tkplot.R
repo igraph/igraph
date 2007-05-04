@@ -62,7 +62,11 @@ tkplot <- function(graph, ...) {
   edge.lty <- params("edge", "lty")
   loop.angle <- params("edge", "loop.angle")
   arrow.mode <- params("edge", "arrow.mode")
-
+  edge.label.font <- .tkplot.convert.font(params("edge", "label.font"),
+                                          params("edge", "label.family"),
+                                          params("edge", "label.cex"))
+  edge.label.color <- params("edge", "label.color")
+  
   layout <- params("plot", "layout")
   margin <- params("plot", "margin")
 
@@ -88,7 +92,9 @@ tkplot <- function(graph, ...) {
                  grid=0, label.font=label.font, label.degree=label.degree,
                  label.dist=label.dist, edge.labels=edge.labels,
                  vertex.frame.color=vertex.frame.color,
-                 loop.angle=loop.angle, edge.lty=edge.lty, arrow.mode=arrow.mode)
+                 loop.angle=loop.angle, edge.lty=edge.lty, arrow.mode=arrow.mode,
+                 edge.label.font=edge.label.font,
+                 edge.label.color=edge.label.color)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
@@ -801,8 +807,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     label.y <- (to.c[2]+from.c[2])/2
     litem <- tkcreate(tkp$canvas, "text", label.x, label.y,
                       text=as.character(edge.label), state="normal",
-                      fill=tkp$params$label.color,
-                      font=tkp$params$label.font)
+                      fill=tkp$params$edge.label.color,
+                      font=tkp$params$edge.label.font)
     tkaddtag(tkp$canvas, "label", "withtag", litem)
     tkaddtag(tkp$canvas, paste(sep="", "edge-", id), "withtag", litem)
   }

@@ -50,6 +50,10 @@ plot.igraph <- function(x,
   arrow.mode         <- params("edge", "arrow.mode")
   edge.labels        <- params("edge", "label")
   loop.angle         <- params("edge", "loop.angle")
+  edge.label.font    <- params("edge", "label.font")
+  edge.label.family  <- params("edge", "label.family")
+  edge.label.cex     <- params("edge", "label.cex")
+  edge.label.color   <- params("edge", "label.color")
   
   layout             <- params("plot", "layout")
   margin             <- params("plot", "margin")
@@ -155,7 +159,8 @@ plot.igraph <- function(x,
         lx <- cx+r*cos(phi)
         ly <- cy+r*sin(phi)
 
-        text(lx, ly, label, col=label.color)
+        text(lx, ly, label, col=edge.label.color, font=edge.label.font,
+             family=edge.label.family, cex=edge.label.cex)
       }
     }
 
@@ -235,8 +240,8 @@ plot.igraph <- function(x,
     }
     x <- (x0+x1)/2
     y <- (y0+y1)/2
-    text(x, y, labels=edge.labels, col=label.color, family=label.family,
-         font=label.font, cex=label.cex)
+    text(x, y, labels=edge.labels, col=edge.label.color, family=edge.label.family,
+         font=edge.label.font, cex=edge.label.cex)
   }
   
   rm(x0, y0, x1, y1)

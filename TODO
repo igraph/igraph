@@ -4,8 +4,6 @@ o R interface graphics improvements:
   - better looking arrows in 3d
   - better looking edges in plot
   - rewrite documentation
-  - uniform handling of fonts 
-  - uniform handlind of colors
   - uniform y coordinates (in plot and tkplot, mirror tkplot (?))
 
 o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
