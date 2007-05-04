@@ -16,9 +16,11 @@
 }
 \usage{
 measure.dynamics.idage (graph, agebins = 300, iterations = 5, 
-    time.window = NULL, number = FALSE, norm.method="old")
-measure.dynamics.id(graph, iterations = 5, 
-    time.window = NULL, number = FALSE, norm.method="old") 
+    error=TRUE, time.window = NULL, number = FALSE, cites=FALSE,
+    norm.method="old")
+measure.dynamics.id(graph, iterations = 5, error=TRUE, 
+    time.window = NULL, number = FALSE, cites=FALSE, norm.method="old",
+    debug=FALSE, debugdeg=0, which=2) 
 measure.dynamics.d.d(graph, vtime, etime, iterations = 5)
 measure.dynamics.citedcat.id.age(graph, categories, agebins = 300,
     iterations = 5, norm = c(1, 1, 1)) 
@@ -50,6 +52,8 @@ measure.dynamics.citingcat.citedcat(graph, categories, iterations=5,
   \item{norm}{}
   \item{number}{}
   \item{norm.method}{}
+  \item{error}{}
+  \item{cites}{}
 }
 \details{
   The functions should be considered as experimental, so no

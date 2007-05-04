@@ -1552,7 +1552,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
  * 
  * </para><para>Use this function instead of \ref
  * igraph_community_leading_eigenvector() if you want to have full
- * controll over and information about each split performed along
+ * control over and information about each split performed along
  * community structure detection. \ref
  * igraph_community_leading_eigenvector() can be simulated by
  * repeatedly calling this function.
