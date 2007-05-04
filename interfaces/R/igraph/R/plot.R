@@ -36,7 +36,9 @@ plot.igraph <- function(x,
   vertex.color       <- params("vertex", "color")
   vertex.frame.color <- params("vertex", "frame.color")
   vertex.size        <- (1/200) * params("vertex", "size")
+  label.family       <- params("vertex", "label.family")
   label.font         <- params("vertex", "label.font")
+  label.cex          <- params("vertex", "label.cex")
   label.degree       <- params("vertex", "label.degree")
   label.color        <- params("vertex", "label.color")
   label.dist         <- params("vertex", "label.dist")
@@ -233,8 +235,8 @@ plot.igraph <- function(x,
     }
     x <- (x0+x1)/2
     y <- (y0+y1)/2
-    if (!is.null(label.font)) par(family=label.font)
-    text(x, y, labels=edge.labels, col=label.color)
+    text(x, y, labels=edge.labels, col=label.color, family=label.family,
+         font=label.font, cex=label.cex)
   }
   
   rm(x0, y0, x1, y1)
@@ -245,13 +247,13 @@ plot.igraph <- function(x,
           circles=vertex.size, add=TRUE, inches=FALSE)
 
   # add the labels
-  if (!is.null(label.font)) par(family=label.font)
   par(xpd=TRUE)
   x <- layout[,1]+label.dist*cos(-label.degree)* 
     (vertex.size+6*8*log10(nchar(labels)+1))/200
   y <- layout[,2]+label.dist*sin(-label.degree)*
     (vertex.size+6*8*log10(nchar(labels)+1))/200
-  text(x, y, labels=labels, col=label.color)
+  text(x, y, labels=labels, col=label.color, family=label.family, font=label.font,
+       cex=label.cex)
   rm(x, y)
   invisible(NULL)
 }

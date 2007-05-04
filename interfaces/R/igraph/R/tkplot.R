@@ -47,7 +47,9 @@ tkplot <- function(graph, ...) {
   params <- i.parse.plot.params(graph, list(...))
   labels <- params("vertex", "label")
   label.color <- .tkplot.convert.color(params("vertex", "label.color"))
-  label.font <- params("vertex", "label.font")
+  label.font <- .tkplot.convert.font(params("vertex", "label.font"),
+                                     params("vertex", "label.family"),
+                                     params("vertex", "label.cex"))
   label.degree <- params("vertex", "label.degree")
   label.dist <- params("vertex", "label.dist")
   vertex.color <- .tkplot.convert.color(params("vertex", "color"))
@@ -73,9 +75,6 @@ tkplot <- function(graph, ...) {
     edge.lty <- lty[edge.lty+1]
   }
 
-  # Label font
-  label.font=tkfont.create(family="helvetica", size=16, weight="bold")
-  
   # Create window & canvas
   top <- tktoplevel(background="lightgrey")
   canvas <- tkcanvas(top, relief="raised", width=450, height=450,
@@ -1401,4 +1400,62 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   }
   
   col
+}
+
+.tkplot.convert.font <- function(font, family, cex) {
+  tk.fonts <- as.character(tkfont.names())
+  if (as.character(font) %in% tk.fonts) {
+    ## already defined Tk font
+    as.character(font)
+  } else {
+    ## we create a font from familiy, font & cex
+    font <- as.numeric(font)
+    family <- as.character(family)
+    cex <- as.numeric(cex)    
+
+    ## set slant & weight
+    if (font==2) {
+      slant <- "roman"
+      weight <- "bold"
+    } else if (font==3) {
+      slant <- "italic"
+      weight <- "normal"
+    } else if (font==4) {
+      slant <- "italic"
+      weight <- "bold"
+    } else {
+      slant <- "roman"
+      weight <- "normal"
+    }
+
+    ## set tkfamily
+    if (family=="symbol" || font==5) {
+      ## try to find a symbol font
+      fams <- as.character(tkplot.families())
+      if ("symbol" %in% fams) {
+        tkfamily <- "symbol"
+      } else {
+        i <- grep("symbol", fams, ignore.case=TRUE)
+        if (length(i)>=1) {
+          tkfamily <- fams[i[1]]
+        } else {
+          warning("Could not find proper symbol font.")
+          tkfamily <- "Times"
+        }
+      }
+    } else if (family=="serif") {
+      tkfamily <- "Times"
+    } else if (family=="sans") {
+      tkfamily <- "Helvetica"
+    } else if (family=="mono") {
+      tkfamily <- "Courier"
+    } else {
+      ## pass the family and see what happens
+      tkfamily <- family
+    }
+    
+    newfont <- tkfont.create(family=tkfamily, slant=slant, weight=weight,
+                             size=12*par("cex")*cex)
+    as.character(newfont)
+  }
 }

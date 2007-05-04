@@ -1,3 +1,10 @@
+2007-05-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : uniform font handling
+	* interfaces/R/igraph/plot.common.R (i.default.values) : font options added
+	* interfaces/R/igraph/tkplot.R (tkplot) : uniform font handling
+	(.tkplot.convert.font) : added
+
 2007-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/revolver.R (evolver.air) : added
