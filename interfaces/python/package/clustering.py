@@ -23,157 +23,272 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 
 from statistics import Histogram
+from copy import copy
 
 class Clustering(object):
-	"""Class representing a clustering of an arbitrary ordered set.
-	
-	This is now used as a base for L{VertexClustering}, but it might be
-	useful for other purposes as well.
-	
-	Members of an individual cluster can be accessed by the C{[]} operator:
-	
-	  >>> cl = Clustering([0,0,0,0,1,1,1,2,2,2,2])
-	  >>> cl[0]
-	  [0, 1, 2, 3]
-	
-	The membership vector can be accessed by the C{membership} property:
+    """Class representing a clustering of an arbitrary ordered set.
+    
+    This is now used as a base for L{VertexClustering}, but it might be
+    useful for other purposes as well.
+    
+    Members of an individual cluster can be accessed by the C{[]} operator:
+    
+      >>> cl = Clustering([0,0,0,0,1,1,1,2,2,2,2])
+      >>> cl[0]
+      [0, 1, 2, 3]
+    
+    The membership vector can be accessed by the C{membership} property:
 
-	  >>> cl.membership
-	  [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2]
+      >>> cl.membership
+      [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2]
 
-	The number of clusters can be retrieved by the C{len} function:
+    The number of clusters can be retrieved by the C{len} function:
 
-	  >>> len(cl)
-	  3
-	"""
+      >>> len(cl)
+      3
+    """
 
-	def __init__(self, membership):
-		"""Constructor.
+    def __init__(self, membership, params = {}):
+        """Constructor.
 
-		@param membership: the membership list -- that is, the cluster
-		  index in which each element of the set belongs to.
-		"""
-		self._membership = list(membership)
-	
-	def __getitem__(self, idx):
-		"""Returns the members of the specified cluster.
+        @param membership: the membership list -- that is, the cluster
+          index in which each element of the set belongs to.
+        @param params: additional parameters to be stored in this
+          object's dictionary."""
+        self._membership = list(membership)
+        self.__dict__.update(params)
+    
+    def __getitem__(self, idx):
+        """Returns the members of the specified cluster.
 
-		@param idx: the index of the cluster
-		@return: the members of the specified cluster as a list
-		"""
-		return [i for i,e in enumerate(self._membership) if e==idx]
+        @param idx: the index of the cluster
+        @return: the members of the specified cluster as a list
+        """
+        return [i for i,e in enumerate(self._membership) if e==idx]
 
-	def __len__(self):
-		"""Returns the number of clusters.
+    def __len__(self):
+        """Returns the number of clusters.
 
-		@note: the result is calculated by taking the difference between
-		the minimum and maximum elements of the membership vector and adding
-		it to 1. So if there are empty clusters, they are still counted in the
-		number of clusters -- except when the clusters with the largest or smallest
-		indices are empty!
+        @note: the result is calculated by taking the difference between
+        the minimum and maximum elements of the membership vector and adding
+        it to 1. So if there are empty clusters, they are still counted in the
+        number of clusters -- except when the clusters with the largest or smallest
+        indices are empty!
 
-		@return: the number of clusters
-		"""
-		if len(self._membership) == 0: return 0
-		return max(self._membership) - min(self._membership) + 1
+        @return: the number of clusters
+        """
+        if len(self._membership) == 0: return 0
+        return max(self._membership) - min(self._membership) + 1
 
-	def _get_membership(self): return self._membership
-	membership = property(_get_membership, doc = "The membership vector (read only)")
+    def _get_membership(self): return self._membership
+    membership = property(_get_membership, doc = "The membership vector (read only)")
 
-	def size(self, idx):
-		"""Returns the size of a given cluster.
+    def size(self, idx):
+        """Returns the size of a given cluster.
 
-		@param idx: the cluster in which we are interested.
-		"""
-		return len([1 for x in self._membership if x == idx])
+        @param idx: the cluster in which we are interested.
+        """
+        return len([1 for x in self._membership if x == idx])
 
-	def sizes(self, *args):
-		"""Returns the size of given clusters.
+    def sizes(self, *args):
+        """Returns the size of given clusters.
 
-		@param idxs: the cluster indices in which we are interested. If C{None},
-		  defaults to all clusters
-		"""
-		idxs = args
-		if len(idxs) == 0: idxs = None
-		counts = [0] * len(self)
-		m = min(self._membership)
-		for x in self._membership: counts[x+m] += 1
-		if idxs is None: return counts
-		result = []
-		for idx in idxs: result.append(counts[idx-m])
-		return result
-	
-	def size_histogram(self, bin_width = 1):
-		"""Returns the histogram of cluster sizes.
+        @param idxs: the cluster indices in which we are interested. If C{None},
+          defaults to all clusters
+        """
+        idxs = args
+        if len(idxs) == 0: idxs = None
+        counts = [0] * len(self)
+        m = min(self._membership)
+        for x in self._membership: counts[x+m] += 1
+        if idxs is None: return counts
+        result = []
+        for idx in idxs: result.append(counts[idx-m])
+        return result
+    
+    def size_histogram(self, bin_width = 1):
+        """Returns the histogram of cluster sizes.
 
-		@param bin_width: the bin width of the histogram
-		@return: a L{Histogram} object
-		"""
-		return Histogram(bin_width, self.sizes())
+        @param bin_width: the bin width of the histogram
+        @return: a L{Histogram} object
+        """
+        return Histogram(bin_width, self.sizes())
 
 
 class VertexClustering(Clustering):
-	"""The clustering of the vertex set of a graph.
+    """The clustering of the vertex set of a graph.
 
-	This class extends L{Clustering} by linking it to a specific L{Graph} object
-	and by optionally storing the modularity score of the clustering.
+    This class extends L{Clustering} by linking it to a specific L{Graph} object
+    and by optionally storing the modularity score of the clustering.
 
-	@note: since this class is linked to a L{Graph}, destroying the graph by the
-	  C{del} operator does not free the memory occupied by the graph if there
-	  exists a L{VertexClustering} that references the L{Graph}.
-	"""
+    @note: since this class is linked to a L{Graph}, destroying the graph by the
+      C{del} operator does not free the memory occupied by the graph if there
+      exists a L{VertexClustering} that references the L{Graph}.
+    """
 
-	def __init__(self, graph, membership = None, modularity = None, *args, **kwds):
-		"""Creates a clustering object for a given graph.
+    def __init__(self, graph, membership = None, modularity = None, params = {}):
+        """Creates a clustering object for a given graph.
 
-		@param graph: the graph that will be associated to the clustering
-		@param membership: the membership list. The length of the list must
-		  be equal to the number of vertices in the graph. If C{None}, every
-		  vertex is assumed to belong to the same cluster.
-		@param modularity: the modularity score of the clustering. If C{None},
-		  it will be calculated.
-		"""
-		self._graph = graph
+        @param graph: the graph that will be associated to the clustering
+        @param membership: the membership list. The length of the list must
+          be equal to the number of vertices in the graph. If C{None}, every
+          vertex is assumed to belong to the same cluster.
+        @param modularity: the modularity score of the clustering. If C{None},
+          it will be calculated.
+        @param params: additional parameters to be stored in this object.
+        """
+        self._graph = graph
 
-		if membership is None:
-			Clustering.__init__(self, [0]*graph.vcount())
-		else:
-			if len(membership) != graph.vcount():
-				raise ValueError, "membership list is too short"
-			Clustering.__init__(self, membership)
+        if membership is None:
+            Clustering.__init__(self, [0]*graph.vcount(), params)
+        else:
+            if len(membership) != graph.vcount():
+                raise ValueError, "membership list is too short"
+            Clustering.__init__(self, membership, params)
 
-		if modularity is None:
-			self._q = 0 # TODO
-		else:
-			self._q = modularity
+        if modularity is None:
+            self._q = graph.modularity(membership)
+        else:
+            self._q = modularity
 
-	def _get_modularity(self): return self._q
-	modularity = property(_get_modularity, doc = "The modularity score")
-	q = modularity
+    def _get_modularity(self): return self._q
+    modularity = property(_get_modularity, doc = "The modularity score")
+    q = modularity
+
+    def _get_graph(self): return self._graph
+    modularity = property(_get_graph, doc = "The graph belonging to this object")
+
+    def recalculate_modularity(self):
+        """Recalculates the stored modularity value.
+
+        This method must be called before querying the modularity score of the
+        clustering through the class member C{modularity} or C{q} if the
+        graph has been modified (edges have been added or removed) since the
+        creation of the L{VertexClustering} object.
+        
+        @return: the new modularity score
+        """
+        self._q = self._graph.modularity(self._membership)
+        return self._q
 
 
-	def subgraph(self, idx):
-		"""Get the subgraph belonging to a given cluster.
+    def subgraph(self, idx):
+        """Get the subgraph belonging to a given cluster.
 
-		@param idx: the cluster index
-		@return: a copy of the subgraph
-		@precondition: the vertex set of the graph hasn't been modified since
-		  the moment the clustering was constructed.
-		"""
-		return self._graph.subgraph(self[idx])
+        @param idx: the cluster index
+        @return: a copy of the subgraph
+        @precondition: the vertex set of the graph hasn't been modified since
+          the moment the clustering was constructed.
+        """
+        return self._graph.subgraph(self[idx])
 
 
-	def giant(self):
-		"""Returns the giant community of the clustered graph.
+    def giant(self):
+        """Returns the giant community of the clustered graph.
 
-		The giant component a community for which no larger community exists.
-		@note: there can be multiple giant communities, this method will return
-		  the copy of an arbitrary one if there are multiple giant communities.
+        The giant component a community for which no larger community exists.
+        @note: there can be multiple giant communities, this method will return
+          the copy of an arbitrary one if there are multiple giant communities.
 
-		@return: a copy of the giant community.
-		@precondition: the vertex set of the graph hasn't been modified since
-		  the moment the clustering was constructed.
-		"""
-		ss = self.sizes()
-		max_size = max(ss)
-		return self.subgraph(ss.index(max_size))
+        @return: a copy of the giant community.
+        @precondition: the vertex set of the graph hasn't been modified since
+          the moment the clustering was constructed.
+        """
+        ss = self.sizes()
+        max_size = max(ss)
+        return self.subgraph(ss.index(max_size))
+
+
+class HierarchicalClustering(Clustering):
+    """The hierarchical clustering of some dataset.
+
+    A hierarchical clustering means that we know not only the way the
+    elements are separated into groups, but also the exact history of
+    how individual elements were joined into larger subgroups.
+
+    This class internally represents the hierarchy by a tuple containing
+    tuples containing tuples... and so on. The individual node indices
+    are on the lowest level of this hierarchy. As an example, look at the
+    dendrogram and the internal representation of a given clustering of
+    five nodes::
+
+      a -+
+         |
+      b -+-+
+           |
+      e ---+-+        <====>   ((('a', 'b'), 'e'), ('c', 'd'))
+             |
+      c -+   |
+         |   |
+      d -+---+---
+
+    Since I{theoretically} a dendrogram can also be incomplete (the joining
+    process stops when there is more than a single group left), the internal
+    representation wraps the tuple into a list. This list will contain
+    multiple elements if the dendrogram is incomplete.
+
+    Moreover, the original format that the C core of C{igraph} uses for
+    representing a hierarchical clustering is a matrix of size M{2} x M{n-1},
+    where the M{i}th row of the matrix contains the indices of the two clusters
+    being joined in time step M{i}. The joint group will be represented by the
+    ID M{n+i}, with M{i} starting from 0. The ID of the joint group will be
+    referenced in the upcoming steps instead of any of its individual members.
+    For instance, the matrix representing the hierarchical clustering above is
+    as follows (C{'a'} = 0, C{'b'} = 1, C{'c'} = 2 and so on)::
+
+      0 1
+      4 5
+      2 3
+      6 7
+    """
+
+    def __init__(self, merges):
+        """Creates a hierarchical clustering.
+
+        @param merges: the merge history either in matrix or tuple format"""
+        Clustering.__init__(self)    
+        if isinstance(merges, tuple):
+            self._merges = [merges]
+        else:
+            self._merges = self._convert_matrix_to_tuple_repr(merges)
+    
+    def _convert_matrix_to_tuple_repr(merges, n=None):
+        if n is None: n = len(merges)+1
+        t = range(n)
+        idxs = range(n)
+        for rowidx, row in enumerate(merges):
+            i, j = row
+            try:
+                idxi, idxj = idxs[i], idxs[j]
+                t[idxi] = (t[idxi], t[idxj])
+                t[idxj] = None
+            except IndexError:
+                raise ValueError, "malformed matrix, subgroup referenced before being created in step %d" % rowidx
+            idxs.append(j)
+        return [x for x in t if x is not None]
+
+
+    def _get_merges(self): return copy(self._merges)
+    merges = property(_get_merges, doc = "The performed merges in tuple format")
+
+class HierarchicalVertexClustering(VertexClustering, HierarchicalClustering):
+    """The hierarchical clustering of the vertex set of a graph."""
+
+    def __init__(self, graph, merges, membership = None, modularity = None, params = {}):
+        """Creates a hierarchical clustering object for a given graph.
+
+        @param graph: the graph that will be associated to the clustering
+        @param merges: the merges performed given in either the form of a tuple
+          or a matrix. Matrix representation will be converted to the tuple
+          representation on the fly. No validity check is performed on this
+          parameter.
+        @param membership: the membership list. The length of the list must
+          be equal to the number of vertices in the graph. If C{None}, every
+          vertex is assumed to belong to the same cluster.
+        @param modularity: the modularity score of the clustering. If C{None},
+          it will be calculated.
+        @param params: additional parameters to be stored in this object.
+        """
+        VertexClustering.__init__(self, graph, membership, modularity, params)
+        HierarchicalClustering.__init__(self, merges)
+

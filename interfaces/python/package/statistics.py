@@ -24,6 +24,38 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+class Interval:
+    """A class representing an interval over the real numbers"""
+
+    def __init__(self, left, right):
+        """Constructor.
+
+        @param left: the left edge of the interval
+        @param right: the right edge of the interval"""
+        if left == right:
+            raise ArgumentError, "Interval can't have zero length"""
+        self._left = min(left, right)
+        self._right = max(left, right)
+
+    def __contains__(self, x):
+        """Returns C{True} if x is in the interval, C{False} otherwise"""
+        return (x >= self._left and x < self._right)
+
+    def __eq__(self, x):
+        """Tests for the equality of two intervals"""
+        return (isinstance(x, Interval) and \
+                x.left == self._left and x.right == self._right)
+ 
+    def __cmp__(self, x): return cmp(self._left, x.left)
+    def __getattr__(self, attr):
+        if attr == "left": return self._left
+        if attr == "right": return self._right
+        return object.__getattr__(self, attr)
+
+    def __hash__(self): return hash(self._left) | hash(self._right)
+
+    def __str__(self): return "[%f, %f)" % (self._left, self._right)
+
 class Histogram(object):
     """Generic histogram class for real numbers
     

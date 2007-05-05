@@ -47,7 +47,17 @@ class CommunityTests(unittest.TestCase):
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
         self.failUnless(len(g.community_clauset(3)) == 3)
-        
+
+    def testEigenvector(self):
+        g = Graph.Full(5) + Graph.Full(5)
+        g.add_edges([(0, 5)])
+        cl = g.community_leading_eigenvector_naive()
+        self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
+        self.assertAlmostEqual(cl.q, 0.4523, places=3)
+        cl = g.community_leading_eigenvector(2)
+        self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
+        self.assertAlmostEqual(cl.q, 0.4523, places=3)
+
 def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
     clustering_suite = unittest.makeSuite(ClusteringTests)

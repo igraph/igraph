@@ -186,7 +186,11 @@ PyObject* igraphmodule_Graph_maximal_independent_sets(igraphmodule_GraphObject* 
 PyObject* igraphmodule_Graph_largest_independent_sets(igraphmodule_GraphObject* self);
 PyObject* igraphmodule_Graph_independence_number(igraphmodule_GraphObject* self);
 
+PyObject* igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_clauset(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_modularity(igraphmodule_GraphObject* self, PyObject *o);
 
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);

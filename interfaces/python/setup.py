@@ -48,7 +48,7 @@ def detect_igraph_source():
     """Tries to detect the igraph sources and copy it to igraph/ if necessary"""
     if not os.path.isdir('igraph'): os.mkdir('igraph')
     if os.path.isfile(os.path.join('..', '..', 'src', 'igraph.h')):
-	files_to_copy = ['*.c', '*.h', '*.y']
+	files_to_copy = ['*.c', '*.h', '*.hc', '*.y']
 	src_files = [os.path.join('..', '..', 'config.h')]
 	for wildcard in files_to_copy:
 	    src_files.extend(glob.glob(os.path.join('..', '..', 'src', wildcard)))

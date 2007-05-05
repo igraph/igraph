@@ -4926,6 +4926,161 @@ PyObject *igraphmodule_Graph_coreness(igraphmodule_GraphObject * self,
 /* {{{ COMMUNITY STRUCTURE */
 
 /**
+ * Modularity calculation
+ */
+PyObject *igraphmodule_Graph_modularity(igraphmodule_GraphObject *self, PyObject *o) {
+  igraph_vector_t membership;
+  igraph_real_t modularity;
+  if (igraphmodule_PyList_to_vector_t(o, &membership, 1, 0)) return NULL;
+  if (igraph_modularity(&self->g, &membership, &modularity)) {
+	igraph_vector_destroy(&membership);
+	return NULL;
+  }
+  return Py_BuildValue("d", (double)modularity);
+}
+
+/**
+ * Newman's edge betweenness method
+ */
+PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = {"directed", "return_removed_edges", "return_ebs",
+    "return_merges", "return_bridges", NULL };
+  PyObject *directed = Py_True;
+  PyObject *return_removed_edges = Py_False;
+  PyObject *return_merges = Py_True;
+  PyObject *return_bridges = Py_False;
+  PyObject *return_ebs = Py_False;
+  PyObject *res;
+  igraph_matrix_t merges;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist, &directed,
+	  &return_removed_edges, &return_merges, &return_bridges, &return_ebs))
+	  return NULL;
+
+  if (igraph_matrix_init(&merges, 0, 0))
+	  return igraphmodule_handle_igraph_error();
+
+  /* TODO */
+  if (igraph_community_edge_betweenness(&self->g, 0, 0, &merges, 0, PyObject_IsTrue(directed))) {
+	igraphmodule_handle_igraph_error();
+	igraph_matrix_destroy(&merges);
+	return NULL;
+  }
+
+  res = igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
+  return res;
+}
+
+/**
+ * Newman's leading eigenvector method, naive implementation
+ */
+PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "n", "return_merges", NULL };
+  long int n=-1;
+  PyObject *return_merges = Py_False;
+  PyObject *cl, *res, *merges;
+  igraph_vector_t members;
+  igraph_matrix_t *mptr = 0;
+  igraph_matrix_t m;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
+	  &n, &return_merges)) {
+    return NULL;
+  }
+
+  if (igraph_vector_init(&members, 0)) return igraphmodule_handle_igraph_error();
+  if (PyObject_IsTrue(return_merges)) {
+    mptr = &m;
+	if (igraph_matrix_init(mptr, 0, 0)) return igraphmodule_handle_igraph_error();
+  }
+
+  if (n<0) n = igraph_vcount(&self->g); else n -= 1;
+
+  if (igraph_community_leading_eigenvector_naive(&self->g, mptr, &members, n)){
+    if (mptr) igraph_matrix_destroy(mptr);
+	igraph_vector_destroy(&members);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  cl = igraphmodule_vector_t_to_PyList(&members);
+  igraph_vector_destroy(&members);
+  if (cl == 0) {
+	if (mptr) igraph_matrix_destroy(mptr);
+	return 0;
+  }
+
+  if (mptr) {
+	merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
+	igraph_matrix_destroy(mptr);
+	if (merges == 0) return 0;
+  } else {
+	merges=Py_None;
+	Py_INCREF(merges);
+  }
+
+  res=Py_BuildValue("OO", cl, merges);
+  Py_DECREF(merges);
+  Py_DECREF(cl);
+
+  return res;
+}
+
+/**
+ * Newman's leading eigenvector method, precise implementation
+ * The code is almost exactly the same as igraphmodule_Graph_community_leading_eigenvector_naive
+ */
+PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "n", "return_merges", NULL };
+  long int n=-1;
+  PyObject *return_merges = Py_False;
+  PyObject *cl, *res, *merges;
+  igraph_vector_t members;
+  igraph_matrix_t *mptr = 0;
+  igraph_matrix_t m;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
+	  &n, &return_merges)) {
+    return NULL;
+  }
+
+  if (igraph_vector_init(&members, 0)) return igraphmodule_handle_igraph_error();
+  if (PyObject_IsTrue(return_merges)) {
+    mptr = &m;
+	if (igraph_matrix_init(mptr, 0, 0)) return igraphmodule_handle_igraph_error();
+  }
+
+  if (n<0) n = igraph_vcount(&self->g); else n -= 1;
+
+  if (igraph_community_leading_eigenvector(&self->g, mptr, &members, n)){
+    if (mptr) igraph_matrix_destroy(mptr);
+	igraph_vector_destroy(&members);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  cl = igraphmodule_vector_t_to_PyList(&members);
+  igraph_vector_destroy(&members);
+  if (cl == 0) {
+	if (mptr) igraph_matrix_destroy(mptr);
+	return 0;
+  }
+
+  if (mptr) {
+	merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
+	igraph_matrix_destroy(mptr);
+	if (merges == 0) return 0;
+  } else {
+	merges=Py_None;
+	Py_INCREF(merges);
+  }
+
+  res=Py_BuildValue("OO", cl, merges);
+  Py_DECREF(merges);
+  Py_DECREF(cl);
+
+  return res;
+}
+
+/**
  * Clauset et al's greedy modularity optimization algorithm
  */
 PyObject *igraphmodule_Graph_community_clauset(igraphmodule_GraphObject * self,
@@ -4941,10 +5096,12 @@ PyObject *igraphmodule_Graph_community_clauset(igraphmodule_GraphObject * self,
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iOO", kwlist,
 	  &n, &weights, &return_merges)) {
+    return NULL;
   }
 
   if (igraph_vector_init(&members, 0)) return igraphmodule_handle_igraph_error();
   if (igraph_community_clauset(&self->g, 0, n, &q, &members, 0)) {
+	igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
   }
 
@@ -4955,7 +5112,7 @@ PyObject *igraphmodule_Graph_community_clauset(igraphmodule_GraphObject * self,
   merges = Py_None;
   Py_INCREF(merges);
 
-  res=Py_BuildValue("OdO", cl, (double)q, &merges);
+  res=Py_BuildValue("OdO", cl, (double)q, merges);
   Py_DECREF(merges);
   Py_DECREF(cl);
 
@@ -6329,6 +6486,28 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /*********************************/
   /* COMMUNITIES AND DECOMPOSITION */
   /*********************************/
+  {"modularity", (PyCFunction) igraphmodule_Graph_modularity,
+   METH_O,
+   "modularity(membership)\n\n"
+   "Calculates the modularity of the graph with respect to some vertex types.\n\n"
+   "The modularity of a graph w.r.t. some division measures how good the\n"
+   "division is, or how separated are the different vertex types from each\n"
+   "other. It is defined as M{Q=1/(2m) * sum(Aij-ki*kj/(2m)delta(ci,cj),i,j)}.\n"
+   "M{m} is the number of edges, M{Aij} is the element of the M{A} adjacency\n"
+   "matrix in row M{i} and column M{j}, M{ki} is the degree of node M{i},\n"
+   "M{kj} is the degree of node M{j}, and M{Ci} and C{cj} are the types of\n"
+   "the two vertices (M{i} and M{j}). M{delta(x,y)} is one iff M{x=y}, 0\n"
+   "otherwise.\n\n"
+   "@attention: method overridden in L{Graph} to allow L{VertexClustering}\n"
+   "  objects as a parameter. This method is not strictly necessary, since\n"
+   "  the L{VertexClustering} class provides a variable called C{modularity}.\n"
+   "@ref: MEJ Newman and M Girvan: Finding and evaluating community structure\n"
+   "  in networks. Phys Rev E 69 026113, 2004.\n"
+   "@param membership: the membership vector, e.g. the vertex type index for\n"
+   "  each vertex.\n"
+   "@return: the modularity score. Score larger than 0.3 usually indicates\n"
+   "  strong community structure.\n"
+  },
   {"coreness", (PyCFunction) igraphmodule_Graph_coreness,
    METH_VARARGS | METH_KEYWORDS,
    "coreness(mode=ALL)\n\n"
@@ -6364,7 +6543,79 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: A. Clauset, M. E. J. Newman and C. Moore: I{Finding community\n"
    "  structure in very large networks.} Physical Review E 70, 066111 (2004)."
   },
-
+  {"community_leading_eigenvector_naive", (PyCFunction) igraphmodule_Graph_community_leading_eigenvector_naive,
+   METH_VARARGS | METH_KEYWORDS,
+   "community_leading_eigenvector_naive(n=-1, return_merges=False)\n\n"
+   "A naive implementation of Newman's eigenvector community structure\n"
+   "detection. This function splits the network into two components\n"
+   "according to the leading eigenvector of the modularity matrix and\n"
+   "then recursively takes the given number of steps by splitting the\n"
+   "communities as individual networks. This is not the correct way,\n"
+   "however, see the reference for explanation. Consider using the\n"
+   "correct L{community_leading_eigenvector} method instead.\n\n"
+   "@attention: this function is wrapped in a more convenient syntax in the\n"
+   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
+   "@param n: the desired number of communities. If negative, the algorithm\n"
+   "  tries to do as many splits as possible. Note that the algorithm\n"
+   "  won't split a community further if the signs of the leading eigenvector\n"
+   "  are all the same.\n"
+   "@param return_merges: if C{True}, returns the order in which the individual\n"
+   "  vertices are merged into communities.\n"
+   "@return: a tuple where the first element is the membership vector of the\n"
+   "  clustering and the second element is the merge matrix.\n\n"
+	"@ref: MEJ Newman: Finding community structure in networks using the\n"
+	"  eigenvectors of matrices, arXiv:physics/0605087\n"
+  },
+  {"community_leading_eigenvector", (PyCFunction) igraphmodule_Graph_community_leading_eigenvector,
+   METH_VARARGS | METH_KEYWORDS,
+   "community_leading_eigenvector(n=-1, return_merges=False)\n\n"
+   "A proper implementation of Newman's eigenvector community structure\n"
+   "detection. Each split is done by maximizing the modularity regarding\n"
+   "the original network. See the reference for details.\n\n"
+   "@attention: this function is wrapped in a more convenient syntax in the\n"
+   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
+   "@param n: the desired number of communities. If negative, the algorithm\n"
+   "  tries to do as many splits as possible. Note that the algorithm\n"
+   "  won't split a community further if the signs of the leading eigenvector\n"
+   "  are all the same.\n"
+   "@param return_merges: if C{True}, returns the order in which the individual\n"
+   "  vertices are merged into communities.\n"
+   "@return: a tuple where the first element is the membership vector of the\n"
+   "  clustering and the second element is the merge matrix.\n\n"
+	"@ref: MEJ Newman: Finding community structure in networks using the\n"
+	"  eigenvectors of matrices, arXiv:physics/0605087\n"
+  },
+  {"community_edge_betweenness",
+  (PyCFunction)igraphmodule_Graph_community_edge_betweenness,
+  METH_VARARGS | METH_KEYWORDS,
+  "community_edge_betweenness(directed=True, return_removed_edges=False,\n"
+  "return_merges=True, return_ebs=False, return_bridges=False)\n\n"
+  "Community structure detection based on the betweenness of the edges in\n"
+  "the network. This algorithm was invented by M Girvan and MEJ Newman,\n"
+  "see: M Girvan and MEJ Newman: Community structure in social and biological\n"
+  "networks, Proc. Nat. Acad. Sci. USA 99, 7821-7826 (2002).\n\n"
+  "The idea is that the betweenness of the edges connecting two communities\n"
+  "is typically high. So we gradually remove the edge with the highest\n"
+  "betweenness from the network and recalculate edge betweenness after every\n"
+  "removal, as long as all edges are removed.\n\n"
+   "@attention: this function is wrapped in a more convenient syntax in the\n"
+   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
+  "@param directed: whether to take into account the directedness of the edges\n"
+  "  when we calculate the betweenness values.\n"
+  "@param return_removed_edges: whether to return the IDs of the edges in the\n"
+  "  order of removal.\n"
+  "@param return_merges: if C{True}, returns the order in which the individual\n"
+  "  vertices are merged into communities.\n"
+  "@param return_ebs: if C{True}, returns the edge betweenness of the removed\n"
+  "  edges at the time of the removal.\n"
+  "@param return_bridges: if C{True}, returns the IDs of the edges whose\n"
+  "  removal increased the number of connected components (these are the\n"
+  "  so-called bridges).\n"
+  "@return: a tuple with the removed edges IDs, the merge matrix, the edge\n"
+  "  betweennesses of the removed edges and the IDs of the bridges. Any\n"
+  "  of these elements can be equal to C{None} based on the C{return_*}\n"
+  "  arguments."
+  },
   /**********************/
   /* INTERNAL FUNCTIONS */
   /**********************/

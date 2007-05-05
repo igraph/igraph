@@ -36,38 +36,6 @@ import gzip
 from tempfile import mkstemp
 from warnings import warn
 
-class Interval:
-    """A class representing an interval over the real numbers"""
-
-    def __init__(self, left, right):
-        """Constructor.
-
-        @param left: the left edge of the interval
-        @param right: the right edge of the interval"""
-        if left == right:
-            raise ArgumentError, "Interval can't have zero length"""
-        self._left = min(left, right)
-        self._right = max(left, right)
-
-    def __contains__(self, x):
-        """Returns C{True} if x is in the interval, C{False} otherwise"""
-        return (x >= self._left and x < self._right)
-
-    def __eq__(self, x):
-        """Tests for the equality of two intervals"""
-        return (isinstance(x, Interval) and \
-                x.left == self._left and x.right == self._right)
- 
-    def __cmp__(self, x): return cmp(self._left, x.left)
-    def __getattr__(self, attr):
-        if attr == "left": return self._left
-        if attr == "right": return self._right
-        return object.__getattr__(self, attr)
-
-    def __hash__(self): return hash(self._left) | hash(self._right)
-
-    def __str__(self): return "[%f, %f)" % (self._left, self._right)
-
 class Graph(core.GraphBase):
     """Generic graph.
     
@@ -143,6 +111,34 @@ class Graph(core.GraphBase):
         result = Histogram(bin_width, self.degree(*args, **kwds))
         return result
 
+    def modularity(self, membership):
+        """modularity(membership)
+
+        Calculates the modularity score of the graph with respect to a given
+        clustering.
+        
+        The modularity of a graph w.r.t. some division measures how good the
+        division is, or how separated are the different vertex types from each
+        other. It is defined as M{Q=1/(2m)*sum(Aij-ki*kj/(2m)delta(ci,cj),i,j)}.
+        M{m} is the number of edges, M{Aij} is the element of the M{A} adjacency
+        matrix in row M{i} and column M{j}, M{ki} is the degree of node M{i},
+        M{kj} is the degree of node M{j}, and M{Ci} and C{cj} are the types of
+        the two vertices (M{i} and M{j}). M{delta(x,y)} is one iff M{x=y}, 0
+        otherwise.
+
+        @param membership: a membership list or a L{VertexClustering} object
+        @return: the modularity score
+        
+        @ref: MEJ Newman and M Girvan: Finding and evaluating community
+          structure in networks. Phys Rev E 69 026113, 2004.
+        """
+        if isinstance(membership, VertexClustering):
+            if membership.graph != self:
+                raise ValueError, "clustering object belongs to a different graph"
+            return GraphBase.modularity(self, membership.membership)
+        else:
+            return GraphBase.modularity(self, membership)
+
     # Various clustering algorithms -- mostly wrappers around GraphBase
 
     def community_clauset(self, clusters = None, return_merges = False):
@@ -163,7 +159,68 @@ class Graph(core.GraphBase):
         """
         if clusters is None: clusters = -1
         cl, q, merges = GraphBase.community_clauset(self, clusters, return_merges)
-        return VertexClustering(self, cl, q, merges)
+        if merges is None:
+            return VertexClustering(self, cl, q)
+        else:
+            return HierarchicalVertexClustering(self, merges, cl, q)
+
+
+    def community_leading_eigenvector_naive(self, clusters=None, return_merges = False):
+        """community_leading_eigenvector_naive(clusters=None, return_merges=False)
+        A naive implementation of Newman's eigenvector community structure
+        detection. This function splits the network into two components
+        according to the leading eigenvector of the modularity matrix and
+        then recursively takes the given number of steps by splitting the
+        communities as individual networks. This is not the correct way,
+        however, see the reference for explanation. Consider using the
+        correct L{community_leading_eigenvector} method instead.
+
+        @param clusters: the desired number of communities. If C{None}, the algorithm
+          tries to do as many splits as possible. Note that the algorithm
+          won't split a community further if the signs of the leading eigenvector
+          are all the same, so the actual number of discovered communities can be
+          less than the desired one.
+        @param return_merges: whether the returned L{VertexClustering} object
+          should contain information about the merges performed on the graph.
+        @return: an appropriate L{VertexClustering} object.
+        @param return_merges: whether 
+        
+        @ref: MEJ Newman: Finding community structure in networks using the
+        eigenvectors of matrices, arXiv:physics/0605087"""
+        if clusters is None: clusters=-1
+        cl, merges = GraphBase.community_leading_eigenvector_naive(self, clusters, return_merges)
+        if merges is None:
+            return VertexClustering(self, cl)
+        else:
+            return HierarchicalVertexClustering(self, merges, cl)
+
+
+    def community_leading_eigenvector(self, clusters=None, return_merges = False):
+        """community_leading_eigenvector(clusters=None, return_merges=False)
+        
+        Newman's leading eigenvector method for detecting community structure.
+        This is the proper implementation of the recursive, divisive algorithm:
+        each split is done by maximizing the modularity regarding the
+        original network.
+        
+        @param clusters: the desired number of communities. If C{None}, the algorithm
+          tries to do as many splits as possible. Note that the algorithm
+          won't split a community further if the signs of the leading eigenvector
+          are all the same, so the actual number of discovered communities can be
+          less than the desired one.
+        @param return_merges: whether the returned L{VertexClustering} object
+          should contain information about the merges performed on the graph.
+        @return: an appropriate L{VertexClustering} object.
+        @param return_merges: whether 
+        
+        @ref: MEJ Newman: Finding community structure in networks using the
+        eigenvectors of matrices, arXiv:physics/0605087"""
+        if clusters is None: clusters=-1
+        cl, merges = GraphBase.community_leading_eigenvector(self, clusters, return_merges)
+        if merges is None:
+            return VertexClustering(self, cl)
+        else:
+            return HierarchicalVertexClustering(self, merges, cl)
 
 
     def community_edge_betweenness(self, clusters = 2, return_removed_ebs = False,
@@ -341,8 +398,8 @@ class Graph(core.GraphBase):
     Read_GraphMLz = classmethod(Read_GraphMLz)
 
     def write_svg(self, fname, layout, width = None, height = None, \
-                  labels = "label", colors = "color", \
-                  vertex_size = 10, *args, **kwds):
+                  labels = "label", colors = "color", shapes = "shape", \
+                  vertex_size = 10, font_size = 16, *args, **kwds):
         """Saves the graph as an SVG (Scalable Vector Graphics) file
         
         @param fname: the name of the file
@@ -360,7 +417,16 @@ class Graph(core.GraphBase):
           a vertex attribute to use, or a list explicitly specifying
           the colors. A color can be anything acceptable in an SVG
           file.
+	@param shapes: the vertex shapes. Either it is the name of
+	  a vertex attribute to use, or a list explicitly specifying
+	  the shapes as integers. Shape 0 means hidden (nothing is drawn),
+	  shape 1 is a circle, shape 2 is a rectangle.
         @param vertex_size: vertex size in pixels
+	@param font_size: font size. If it is a string, it is written into
+	  the SVG file as-is (so you can specify anything which is valid
+	  as the value of the C{font-size} style). If it is a number, it
+	  is interpreted as pixel size and converted to the proper attribute
+	  value accordingly.
         """
         if width is None and height is None:
             width = 400
@@ -389,6 +455,18 @@ class Graph(core.GraphBase):
             except KeyError:
                 colors = ["red" for x in xrange(self.vcount())]
 
+	if isinstance(shapes, str):
+	    try:
+		shapes = self.vs.get_attribute_values(shapes)
+	    except KeyError:
+		shapes = [1]*self.vcount()
+		
+	if not isinstance(font_size, str):
+	    font_size = "%spx" % str(font_size)
+	else:
+	    if ";" in font_size:
+		raise ValueError, "font size can't contain a semicolon"
+
         vc = self.vcount()
         while len(labels)<vc: labels.append(len(labels)+1)
         while len(colors)<vc: colors.append("red")
@@ -404,7 +482,7 @@ class Graph(core.GraphBase):
                 if maxs[dim]<row[dim]: maxs[dim]=row[dim]
                 if mins[dim]>row[dim]: mins[dim]=row[dim]
                 
-        sizes=[width, height]
+        sizes=[width-2*vertex_size, height-2*vertex_size]
         halfsizes=[(maxs[dim]+mins[dim])/2.0 for dim in range(2)]
         ratios=[sizes[dim]/(maxs[dim]-mins[dim]) for dim in range(2)]
         layout=[[(row[0]-halfsizes[0])*ratios[0], \
@@ -415,7 +493,7 @@ class Graph(core.GraphBase):
         print >>f, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
         print >>f, "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
         
-        print >>f, "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">" % (width+2*vertex_size, height+2*vertex_size)
+        print >>f, "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">" % (width, height)
         print >>f, "<!-- Created by igraph -->"
         print >>f
         print >>f, "<defs>"
@@ -428,7 +506,8 @@ class Graph(core.GraphBase):
         print >>f, "  <style type=\"text/css\">"
         print >>f, "    <![CDATA["
         print >>f, "#vertices circle { stroke: black; stroke-width: 1 }"
-        print >>f, "#vertices text { text-anchor: middle; font-size: 16; font-family: sans-serif; font-weight: normal }"
+        print >>f, "#vertices rect { stroke: black; stroke-width: 1 }"
+        print >>f, "#vertices text { text-anchor: middle; font-size: %s; font-family: sans-serif; font-weight: normal }" % font_size
         if self.is_directed():
             print >>f, "#edges line { stroke: black; stroke-width: 1; marker-end: url(#Triangle) }"
         else:
@@ -437,7 +516,7 @@ class Graph(core.GraphBase):
         print >>f, "  </style>"
         print >>f, "</defs>"
         print >>f
-        print >>f, "<g transform=\"translate(%.4f,%.4f)\">" % (width/2.0+vertex_size, height/2.0+vertex_size)
+        print >>f, "<g transform=\"translate(%.4f,%.4f)\">" % (width/2.0, height/2.0)
         print >>f, "  <g id=\"edges\">"
         print >>f, "  <!-- Edges -->"
 
@@ -463,7 +542,10 @@ class Graph(core.GraphBase):
         print >>f, "  <!-- Vertices -->"
         for vidx in range(self.vcount()):
             print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % (layout[vidx][0], layout[vidx][1])
-            print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"10\" fill=\"%s\"/>" % str(colors[vidx])
+            if shapes[vidx] == 1:
+		print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(colors[vidx]))
+	    elif shapes[vidx] == 2:
+		print >>f, "      <rect x=\"-%s\" y=\"-%s\" width=\"%s\" height=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(vertex_size), str(2*vertex_size), str(2*vertex_size), str(colors[vidx]))
             print >>f, "      <text x=\"0\" y=\"5\">%s</text>" % str(labels[vidx])
             print >>f, "    </g>"
 
