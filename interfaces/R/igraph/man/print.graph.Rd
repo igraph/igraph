@@ -29,6 +29,9 @@
   graph is directed.
   \code{print.igraph} prints the same information, aand also lists
   the edges, and optionally graph, vertex and/or edge attributes.
+
+  As of igraph 0.4 \code{print.igraph} uses the \code{max.print} option,
+  see \code{\link[base]{options}} for details.
 }
 \value{Both functions return the graph invisibly.}
 % \references{}

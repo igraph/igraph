@@ -14,7 +14,6 @@ These are needed for 0.4:
   o rename evolver functions
 
 o R interface: curved edges in plots (tkplot and plot)
-o R interface: implement max.print option
 o attribute support in to_undirected
 o calculate the actual maximum flow
 o find a way for writing equations in DocBook.
@@ -29,7 +28,7 @@ o PAJEK import improvements:
   - multiple edge sets in the same graph (?), Sampson.net, Multi.net, 
     SampsonL.net
   - color conversion, see colors in the Pajek manual
-o rewite add_edges, add_vertices, they're a mess
+o rewrite add_edges, add_vertices, they're a mess
 o better random number generator handling (init with seed, etc...)
 o uniform graph operators (union, intersection, etc...)
 o attribute handling for operators

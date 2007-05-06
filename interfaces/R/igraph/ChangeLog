@@ -1,5 +1,10 @@
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/print.R (print.igraph) : format edge list better
+
+	* interfaces/R/igraph/R/print.R (print.igraph) : handle 
+	getOption("max.print")
+
 	* interfaces/R/igraph/R/plot.R (plot.igraph)
 	* interfaces/R/igraph/R/tkplot.R (tkplot, tkplot.fit.to.screen) :
 	better margin

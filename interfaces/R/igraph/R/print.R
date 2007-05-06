@@ -57,23 +57,37 @@ print.igraph <- function(x,
     if (length(list) == 0) {
       cat("No vertex attributes\n")
     } else {
+      mp <- getOption("max.print")
+      options(max.print=1000000000)      # no built-in limit, we handle it by hand
+      if (vc <= mp) {
+        omitted.vertices <- 0
+        ind <- V(x)
+      } else {
+        omitted.vertices <- vc-mp
+        ind <- seq(length=mp)-1
+      }
       if (vc==0 ||
           all(sapply(list, function(v) is.numeric(v) |
                      is.character(v) | is.logical(v)))) {
         ## create a table
-        tab <- data.frame(v=paste(sep="", "[", seq(length=vc)-1, "]"), row.names="v")
+        tab <- data.frame(v=paste(sep="", "[", ind, "]"), row.names="v")
         for (i in list) {
-          tab[i] <- get.vertex.attribute(x, i)
+          tab[i] <- get.vertex.attribute(x, i, ind)
         }
         print(tab)
       } else {
-        for (i in 0:(vc-1)) {
+        for (i in ind) {
           cat("  ", i, "  ")
           sapply(list, function(n) {
             cat(n, "=", get.vertex.attribute(x, n, i), "\t")})
           cat("\n")
         }
       }
+      options(max.print=mp)
+      if (omitted.vertices != 0) {
+        cat(paste('[ reached getOption("max.print") -- omitted',
+                  omitted.vertices, "vertices ]\n\n"))
+      }      
     }
   }
 
@@ -91,12 +105,20 @@ print.igraph <- function(x,
       cat("Edges and their attributes:\n")
     }
     el <- get.edgelist(x, names=names)
+    mp <- getOption("max.print")
+    if (mp >= nrow(el)) {
+      omitted.edges <- 0
+    } else {
+      omitted.edges <- nrow(el)-mp
+      el <- el[1:mp,]
+    }
     if (ec==0 || 
         all(sapply(list, function(v) is.numeric(v) |
                    is.character(v) | is.logical(v)))) {
       ## create a table
-      tab <- data.frame(e=paste(sep="", "[", seq(length=ec)-1, "]"), row.names="e")
-      tab[" "] <- paste(el[,1], arrow, el[,2])
+      tab <- data.frame(e=paste(sep="", "[", seq(length=nrow(el))-1, "]"), row.names="e")
+      if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
+      tab[" "] <- paste(format(el[,1], width=w), arrow, format(el[,2], width=w))
       for (i in list) {
         tab[i] <- get.edge.attribute(x, i)
       }
@@ -113,6 +135,10 @@ print.igraph <- function(x,
         i <<- i+1
       })
     }
+    if (omitted.edges != 0) {
+      cat(paste('[ reached getOption("max.print") -- omitted', omitted.edges,
+                'edges ]\n\n'))
+    }    
   }
   
   invisible(x)
