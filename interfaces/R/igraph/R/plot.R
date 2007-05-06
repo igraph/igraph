@@ -197,25 +197,8 @@ plot.igraph <- function(x,
     if (length(arrow.mode)>1) { arrow.mode <- arrow.mode[nonloops.e] }
     if (length(unique(arrow.mode))==1) {
       igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
-                    sh.lwd=edge.width, h.lwd=edge.width, open=FALSE, code=arrow.mode)
-      if (any(edge.lty != 1)) {
-        if (arrow.mode==2 || arrow.mode==3) {
-          pp <- atan2(y0-y1, x0-x1)
-          xx <- x1+0.001*cos(pp)
-          yy <- y1+0.001*sin(pp)
-          igraph.Arrows(xx, yy, x1, y1, h.col=edge.color, sh.col=edge.color,
-                        sh.lwd=edge.width, h.lwd=edge.width, open=FALSE,
-                        sh.lty=1, h.lty=1, code=2)
-        }
-        if (arrow.mode==1 || arrow.mode==3) {          
-          pp <- atan2(y1-y0, x1-x0)
-          xx <- x0+0.001*cos(pp)
-          yy <- y0+0.001*sin(pp)
-          igraph.Arrows(xx, yy, x0, y0, sh.col=edge.color, h.col=edge.color,
-                        sh.lwd=edge.width, h.lwd=edge.width, h.lty=1, sh.lty=1,
-                        code=2, open=FALSE)
-        }
-      }
+                    sh.lwd=edge.width, h.lwd=edge.width, open=FALSE, code=arrow.mode,
+                    sh.lty=edge.lty, h.lty=1)
     } else {
       ## different kinds of arrow drawn separately as 'arrows' cannot
       ## handle a vector as the 'code' argument
@@ -227,23 +210,7 @@ plot.igraph <- function(x,
         el <- edge.lty   ; if (length(el)>1) { el <- el[valid] }        
         igraph.Arrows(x0[valid], y0[valid], x1[valid], y1[valid],
                       code=code, sh.col=ec, h.col=ec, sh.lwd=ew, h.lwd=ew,
-                      h.lty=el, sh.lty=el, open=FALSE)
-        if (any(el != 1) && code %in% c(2,3)) {
-          pp <- atan2(y0-y1, x0-x1)
-          xx <- x1+0.01*cos(pp)
-          yy <- y1+0.01*sin(pp)
-          igraph.Arrows(xx[valid], yy[valid], x1[valid], y1[valid],
-                        code=2, h.col=ec, sh.col=ec, h.lwd=ew, sh.lwd=ew,
-                        h.lty=1, sh.lty=1, open=FALSE)
-        }
-        if (any(el != 1) && code %in% c(1,3)) {
-          pp <- atan2(y1-y0, x1-x0)
-          xx <- x0+0.01*cos(pp)
-          yy <- y0+0.01*sin(pp)
-          igraph.Arrows(xx[valid], yy[valid], x0[valid], y0[valid],
-                        code=2, h.col=ec, sh.col=ec, h.lwd=ew, sh.lwd=ew,
-                        h.lty=1, sh.lty=1, open=FALSE)
-        }
+                      h.lty=1, sh.lty=el, open=FALSE)
       }
     }
     x <- (x0+x1)/2
@@ -552,7 +519,7 @@ function (x1, y1, x2, y2,
 {
   cin <- size * par("cin")[2]
   if (code==0) {
-    segments(x1, y1, x2, y2, col=sh.col, lty=sh.lty)
+    segments(x1, y1, x2, y2, col=sh.col, lty=sh.lty, lwd=sh.lwd)
     return()
   } else if (code==1) {
     igraph.Arrows(x2,y2, x1,y1, code=2, size=size, width=width,

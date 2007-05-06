@@ -75,10 +75,7 @@ tkplot <- function(graph, ...) {
   arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
   
   # Edge line type
-  if (is.numeric(edge.lty)) {
-    lty <- c( " ", "", "-", ".", "-.", "--", "--.")
-    edge.lty <- lty[edge.lty+1]
-  }
+  edge.lty <- i.tkplot.get.edge.lty(edge.lty)
 
   # Create window & canvas
   top <- tktoplevel(background="lightgrey")
@@ -1465,4 +1462,20 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
                              size=12*cex)
     as.character(newfont)
   }
+}
+
+i.tkplot.get.edge.lty <- function(edge.lty) {
+
+  if (is.numeric(edge.lty)) {
+    lty <- c( " ", "", "-", ".", "-.", "--", "--.")
+    edge.lty <- lty[edge.lty %% 7 + 1]
+  } else if (is.character(edge.lty)) {
+    wh <- edge.lty %in% c("blank", "solid", "dashed", "dotted", "dotdash",
+                          "longdash", "twodash")
+    lty <- c( " ", "", "-", ".", "-.", "--", "--.")
+    names(lty) <- c("blank", "solid", "dashed", "dotted", "dotdash",
+                    "longdash", "twodash")
+    edge.lty[wh] <- lty[ edge.lty[wh] ]
+  }
+  edge.lty
 }

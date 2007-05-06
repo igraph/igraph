@@ -212,8 +212,17 @@
 
       The default value is 1.
     }
-    \item{lty}{The line type for the edges. TODO
+    \item{lty}{The line type for the edges. Almost the same format is
+      accepted as for the standard graphics \code{\link[graphics]{par}},
+      0 and \dQuote{blank} mean no edges, 1 and \dQuote{solid} are for
+      solid lines, the other possible values are: 2 (\dQuote{dashed}),
+      3 (\dQuote{dotted}), 4 (\dQuote{dotdash}), 5 (\dQuote{longdash}),
+      6 (\dQuote{twodash}).
 
+      \code{\link{tkplot}} also accepts standard Tk line type strings,
+      it does not however support \dQuote{blank} lines, instead of type
+      \sQuote{0} type \sQuote{1}, ie. solid lines will be drawn.
+      
       This argument is ignored for \code{\link{rglplot}}.
 
       The default value is type 1, a solid line.

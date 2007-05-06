@@ -2,8 +2,11 @@
 These are needed for 0.4:
 
   o R interface graphics improvements:
-    - rewrite documentation, write missing pieces, search for TODO
-    - edge.lty bug ?
+    - rlgplot: arrow head size should depend on the edge width
+    - igraph.Arrows: better implementation of code, the current
+      implementtation might have problems when edge.lty != 1,
+      it shouls also handle the case when 'code' is a vector
+    - add examples to documentation
     - better 'margin' handling, make it possible to give different
       top, bottom, left & right margins.
 

@@ -1,3 +1,16 @@
+2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/tkplot.R (tkplot, i.tkplot.get.edge.lty) :
+	the latter was added
+
+	* interfaces/R/igraph/R/plot.common.R (i.get.edge.lty) : removed
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : some simplification, 
+	we don't need to plot arrow heads separately if lty!=1 any more
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : edge width bug for 
+	edges without an arrow corrected
+
 2007-05-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : a loop plotting bug 

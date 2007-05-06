@@ -176,16 +176,6 @@ i.get.edge.width <- function(graph, edge.width) {
   edge.width
 }
 
-i.get.edge.lty <- function(graph, edge.lty) {
-
-  if (is.character(edge.lty) &&
-      length(edge.lty)==1 && substr(edge.lty, 1, 2)=="a:") {
-    edge.lty <- as.character(get.edge.attribute
-                               (graph, substring(edge.lty,3)))
-  }
-  edge.lty
-}
-
 i.get.edge.labels <- function(graph, edge.labels=NULL) {
 
   if (is.null(edge.labels)) {
