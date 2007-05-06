@@ -1,0 +1,309 @@
+\name{Drawing graphs}
+\alias{igraph.plotting}
+\title{Drawing graphs}
+\description{The common bits of the three plotting functions
+  \code{plot.igraph}, \code{tkplot} and \code{rglplot} are discussed in
+  this manual page}
+\details{
+  There are currently three different functions in the igraph package
+  which can draw graph in various ways:
+
+  \code{plot.igraph} does simple non-interactive 2D plotting to R devices.
+  Actually it is an implementation of the \code{\link[graphics]{plot}}
+  generic function, 
+  so you can write \code{plot(graph)} instead of
+  \code{plot.igraph(graph)}. As it used the standard R devices it
+  supports every output format for which R has an output device. The
+  list is quite impressing: PostScript, PDF files, XFig files, SVG
+  files, JPG, PNG and of course you can plot to the screen as well using
+  the default devices, or the good-looking anti-aliased Cairo device.
+  See \code{\link{plot.igraph}} for some more information.
+
+  \code{\link{tkplot}} does interactive 2D plotting using the \code{tcltk}
+  package. It can only handle graphs of moderate size, a thousend
+  vertices is probably already too many. Some parameters of the plotted
+  graph can be changed interactively after issuing the \code{tkplot}
+  command: the position, color and size of the vertices and the color
+  and width of the edges. See \code{\link{tkplot}} for details.
+    
+  \code{\link{rglplot}} is an experimental function to draw graphs in 3D
+  using OpenGL. See \code{\link{rglplot}} for some more information.
+
+  Please also check the examples below.
+}
+\section{How to specify graphical parameters}{
+  There are three ways to give values to the parameters described below,
+  in section 'Parameters'. We give these three ways here in the order of
+  their precedence. 
+
+  The first method is to supply named arguments to the plotting commands:
+  \code{\link{plot.igraph}}, \code{\link{tkplot}} or
+  \code{\link{rglplot}}. Parameters for vertices start with prefix
+  \sQuote{\code{vertex.}}, parameters for edges have prefix
+  \sQuote{\code{edge.}}, and global parameters have now prefix. Eg. the
+  color of the vertices can be given via argument \code{vertex.color},
+  whereas \code{edge.color} sets the color of the edges. \code{layout}
+  gives the layout of the graphs.
+
+  The second way is to assign vertex, edge and graph attributes to the
+  graph. These attributes have now prefix, ie. the color of the vertices
+  is taken from the \code{color} vertex attribute and the color of the
+  edges from the \code{color} edge attribute. The layout of the graph is
+  given by the \code{layout} graph attribute. (Always assuming that the
+  corresponding command argument is not present.) Setting vertex and
+  edge attributes are handy if you want to assign a given \sQuote{look}
+  to a graph, attributes are saved with the graph is you save it with
+  \code{\link[base]{save}} or in GraphML format with
+  \code{\link{write.graph}}, so the graph will have the same look after
+  loading it again.
+
+  If a parameter is not given in the command line, and the corresponding
+  vertex/edge/graph attribute is also missing then the general igraph
+  parameters handled by \code{\link{igraph.par}} are also
+  checked. Vertex parameters have prefix \sQuote{\code{vertex.}}, edge
+  parameters are prefixed with \sQuote{\code{edge.}}, general parameters
+  like layout are not prefixed. These parameters are useful if you want
+  all or most of your graphs to have the same look, vertex size, vertex
+  color, etc. Then you don't need to set these at every plotting, and
+  you also don't need to assign vertex/edge attributes to every graph.
+
+  If the value of a parameter is not specified by any of the three ways
+  described here, its default valued is used, as given in the source
+  code.
+
+  Different parameters can have different type, eg. vertex colors can be
+  given as a character vector with color names, or as an integer vector
+  with the color numbers from the current palette. Different types are
+  valid for different parameters, this is discussed in detail in the
+  next section. It is however always true that the parameter can always
+  be a function object in which it will be called with the graph as its
+  single argument to get the \dQuote{proper} value of the parameter.
+  (If the function returns another function object that will \emph{not}
+  be called again\dots)
+}
+\section{The list of parameters}{
+  Vertex parameters first, note that the \sQuote{\code{vertex.}} prefix
+  needs to be added if they are used as an argument or when setting via
+  \code{\link{igraph.par}}. The value of the parameter may be scalar
+  valid for every vertex or a vector with a separate value for each
+  vertex. (Shorter vectors are recycled.)
+  \itemize{
+    \item{size}{The size of the vertex, a numeric scalar or vector, in
+      the latter case each vertex sizes may differ. This vertex sizes
+      are scaled in order have about the same size of vertices for a
+      given value for all three plotting commands. It does not need to
+      be an integer number.
+
+      The default value is 15. This is big enough to place short labels
+      on vertices.}
+    \item{color}{The fill color of the vertex. If it is numeric then
+      the current palette is used, see
+      \code{\link[grDevices]{palette}}. If it is a character vector then
+      it may either contain named colors or RGB specified colors with
+      three or four bytes. All strings starting with \sQuote{\code{#}}
+      are assumed to be RGB color specifications. It is possible to mix
+      named color and RGB colors. Note that \code{\link{tkplot}} ignores
+      the fourth byte (alpha channel) in the RGB color specification.
+
+      The default value is \dQuote{\code{SkyBlue2}}.
+    }
+    \item{frame.color}{The color of the frame of the vertices, the same
+      formats are allowed as for the fill color.
+
+      By default it is \dQuote{black}.
+    }    
+    \item{label}{The vertex labels. They will be converted to
+      character. Specify \code{NA} to omit vertex labels.
+
+      The default vertex labels are the vertex ids.
+    }
+    \item{label.family}{The font family to be used for vertex labels.
+      As different plotting commands can used different fonts, they
+      interpret this parameter different ways. The basic notation is,
+      however, understood by both \code{\link{plot.igraph}} and
+      \code{\link{tkplot}}. \code{\link{rglplot}} does not support fonts
+      at all right now, it ignores this parameter completely.
+
+      For \code{\link{plot.igraph}} this parameter is simply passed to
+      \code{\link[graphics]{text}} as argument \code{family}.
+
+      For \code{\link{tkplot}} some
+      conversion is performed. If this parameter is the name of an
+      exixting Tk font, then that font is used and the \code{label.font}
+      and \code{label.cex} parameters are ignored complerely. If it is
+      one of the base families (serif, sans, mono) then Times,
+      Helvetica or Courier fonts are used, there are guaranteed to exist
+      on all systems. For the \sQuote{symbol} base family we used the
+      symbol font is available, otherwise the first font which has
+      \sQuote{symbol} in its name. If the parameter is not a name of the
+      base families and it is also not a named Tk font then we pass it
+      to \code{\link[tcltk]{tkfont.create}} and hope the user knows what
+      she is doing. The \code{label.font} and \code{label.cex}
+      parameters are also passed to \code{\link[tcltk]{tkfont.create}}
+      in this case.
+
+      The default value is \sQuote{serif}.
+    }
+    \item{label.font}{The font within the font family to use for the
+      vertex labels. It is interpreted the same way as the the
+      \code{font} graphical parameter: 1 is plain text, 2 is bold face,
+      3 is italic, 4 is bold and italic and 5 specifies the symbol
+      font.
+
+      For \code{\link{plot.igraph}} this parameter is simply passed to
+      \code{\link[graphics]{text}}.
+
+      For \code{\link{tkplot}}, if the \code{label.family} parameter is
+      not the name of a Tk font then this parameter is used to set
+      whether the newly created font should be italic and/or
+      boldface. Otherwise it is ignored.
+
+      For \code{\link{rglplot}} it is ignored.
+
+      The default value is 1.
+    }
+    \item{label.cex}{The font size for vertex labels. It is interpreted
+      as a multiplication factor of some device-dependent base font
+      size.
+
+      For \code{\link{plot.igraph}} it is simply passed to
+      \code{\link[graphics]{text}} as argument \code{cex}.
+
+      For \code{\link{tkplot}} it is multiplied by 12 and then used as
+      the \code{size} argument for \code{\link[tcltk]{tkfont.create}}.
+      The base font is thus 12 for tkplot.
+
+      For \code{\link{rglplot}} it is ignored.
+
+      The default value is 1.
+    }
+    \item{label.dist}{
+      The distance of the label from the center of the vertex. If it is 0
+      then the label is centered on the vertex. If it is 1 then the
+      label is displayed beside the vertex.
+
+      The default value is 0.
+    }
+    \item{label.degree}{
+      It defines the position of the vertex labels, relative to the
+      center of the vertices. It is interpreted as an angle in radian,
+      zero means \sQuote{to the right}, and \sQuote{\code{pi}} means to
+      the left, up is \code{-pi/2} and down is \code{pi/2}.
+
+      The default value is \code{-pi/4}.
+    }
+    \item{label.color}{The color of the labels, see the \code{color}
+      vertex parameter discussed earlier for the possible values.
+
+      The default value is \code{black}.
+    }    
+  }
+
+  Edge parameters require to add the \sQuote{\code{edge.}} prefix when
+  used as arguments or set by \code{\link{igraph.par}}. The edge
+  parameters:
+  \itemize{
+    \item{color}{The color of the edges, see the \code{color} vertex
+      parameter for the possible values.
+
+      By default this parameter is \code{darkgrey}.
+    }
+    \item{width}{The width of the edges.
+
+      The default value is 1.
+    }
+    \item{lty}{The line type for the edges. TODO
+
+      This argument is ignored for \code{\link{rglplot}}.
+
+      The default value is type 1, a solid line.
+    }
+    \item{label}{The edge labels. They will be converted to
+      character. Specify \code{NA} to omit edge labels.
+
+      Edge labels are omitted by default.}
+    \item{label.family}{Font family of the edge labels. See the vertex
+      parameter with the same name for the details.}
+    \item{label.font}{The font for the edge labels. See the
+      corresponding vertex parameter discussed earlier for details.}
+    \item{label.cex}{The font size for the edge labels, see the
+      corresponding vertex parameter for details.}
+    \item{label.color}{The color of the edge labels, see the
+      \code{color} vertex parameters on how to specify colors. }
+    \item{arrow.mode}{This parameter can be used to specify for which
+      edges should arrows be drawn. If this parameter is given by the
+      user (in either of the three ways) then it specifies which edges
+      will have forward, backward arrows, or both, or no arrows at all.
+      As usual, this parameter can be a vector or a scalar value.
+      It can be an integer or character type. If it is integer then 0
+      means no arrows, 1 means backward arrows, 2 is for forward arrows
+      and 3 for both. If it is a character vector then \dQuote{<} and
+      \dQuote{<-} specify backward, \dQuote{>} and \dQuote{->} forward
+      arrows and \dQuote{<>} and \dQuote{<->} stands for both arrows.
+      All other values mean no arrows, perhaps you should use \dQuote{-}
+      or \dQuote{--} to specify no arrows.
+
+      Hint: this parameter can be used as a \sQuote{cheap} solution for
+      drawing \dQuote{mixed} graphs: graphs in which some edges are
+      directed some are not. If you want do this, then please create a
+      \emph{directed} graph, because as of version 0.4 the vertex pairs
+      in the edge lists can be swapped in undirected graphs.
+
+      By default, no arrows will be drawn for undirected graphs, and for 
+      directed graphs, an arrow will be drawn for each edge, according
+      to its direction. This is not very surprising, it is the expected
+      behavior.
+    }
+    \item{loop.angle}{Gives the angle in radian for plotting loop
+      edges. See the \code{label.dist} vertex parameter to see how this
+      is interpreted.
+
+      The default value is 0.
+    }    
+    \item{loop.angle2}{Gives the second angle in radian for plotting
+      loop edges. This is only used in 3D, \code{loop.angle} is enough
+      in 2D.
+
+      The default value is 0.
+    }
+  }
+
+  Other parameters:
+  \itemize{
+    \item{layout}{
+      Either a function or a numeric
+      matrix. It specifies how the vertices will be placed on the plot.
+      
+      If it is a numeric matrix, then the matrix has to have one line for
+      each vertex, specifying its coordinates. The matrix should have at
+      least two columns, for the \code{x} and \code{y} coordinates, and
+      it can also have third column, this will be the \code{z}
+      coordinate for 3D plots and it is ignored for 2D plots.
+
+      If a two column matrix is given for the 3D plotting function
+      \code{\link{rglplot}} then the third column is assumed to be 1 for
+      each vertex.
+
+      If \code{layout} is a function, this function will be called with the
+      \code{graph} as the single parameter to determine the
+      actual coordinates. The function should return a matrix with two
+      or three columns. For the 2D plots the third column is ignored.
+
+      The default value is \code{layout.random}, ie. a function
+      returning with 2D random placement.}
+    \item{margin}{The amount of empty space below, over and beside the
+      plot, it is a numeric scale currently (not very flexible). Usually
+      values between 0 and 0.5 are meaningful, but negative values are
+      also possible, that will zoom into the center of the plot.
+
+      Its default value is 0.
+    }
+  }
+}
+\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
+\seealso{ \code{\link{plot.igraph}}, \code{\link{tkplot}},
+  \code{\link{rglplot}}, \code{\link{igraph.par}}}
+\examples{
+# TODO
+}
+\keyword{graphs}

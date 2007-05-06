@@ -54,6 +54,9 @@ measure.dynamics.citingcat.citedcat(graph, categories, iterations=5,
   \item{norm.method}{}
   \item{error}{}
   \item{cites}{}
+  \item{debug}{}
+  \item{debugdeg}{}
+  \item{which}{}
 }
 \details{
   The functions should be considered as experimental, so no

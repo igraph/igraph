@@ -5,62 +5,10 @@
   device. It is the non-interactive companion of the \code{tkplot}
   function.}
 \usage{
-plot.igraph(x, layout = layout.random, layout.par = list(), 
-    labels = NULL, label.color = "darkblue", label.font = NULL, 
-    label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
-    vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
-    edge.labels = NA, edge.lty=1, vertex.frame.color="black", margin=0,
-    loop.angle=0, arrow.mode=NULL, axes = FALSE, xlab = "", ylab = "",
-    xlim=c(-1,1), ylim=c(-1,1), \dots)
+plot.igraph(x, axes=FALSE, xlab="", ylab="", xlim=c(-1,1), ylim=c(-1,1), \dots)
 }
 \arguments{
   \item{x}{The graph to plot.}
-  \item{layout}{The coordinates of the vertices, or the method to
-    calculate them. See the same argument of \code{\link{tkplot}}.}
-  \item{layout.par}{List, the parameters of the layout function. See the
-    same argument of \code{\link{tkplot}}.}
-  \item{labels}{The labels of the vertices. See the same argument of
-    \code{\link{tkplot}}.}
-  \item{label.color}{The color(s) of the labels. See the same argument
-    of \code{\link{tkplot}}.}
-  \item{label.font}{The font to be used for the labels. Right now all
-    labels use the same font.}
-  \item{label.degree}{Specifies the placement of the labels of the
-    vertices. See the same argument of \code{\link{tkplot}}.}
-  \item{label.dist}{Specifies the placement of the vertex labels. See
-    the same argument of \code{\link{tkplot}}.}
-  \item{vertex.color}{The color(s) of the vertices. See the same
-    argument of \code{\link{tkplot}}.}
-  \item{vertex.size}{The size(s) of the vertices. See the same argument
-    of \code{\link{tkplot}}.}
-  \item{edge.color}{The color(s) of the edges. See the same argument of
-    \code{\link{tkplot}}. }
-  \item{edge.width}{The width(s) of the edges. See the same argument of
-    \code{\link{tkplot}}.}
-  \item{edge.labels}{Labels for the edges, this will be converted to a
-    character vector. The default is \code{NA} which suppresses edge
-    labels. The vector might contain \code{NA}'s as well to suppress
-    labels for some edges.}
-  \item{edge.lty}{The line type for the edges, see the manual page
-    of \code{par} for the possible values. This can be also a vector
-    to define different a line type for each edge.
-  }
-  \item{vertex.frame.color}{The color(s) of the border of the vertices.}
-  \item{margin}{The margin to add to each side of the plot.}
-  \item{loop.angle}{Numeric vector or constant giving the angle in
-    degrees for the drawing of the loop edges.}
-  \item{arrow.mode}{Numeric or character constant or vector giving
-    whether or not to draw arrows on the edges. If a single number or
-    string is given then that is valid for all edges. If a vector is
-    given then it should have the same length as the number of edges in
-    the graph. The possible codes: 0, \code{-} and
-    \code{--} mean no arrows, 1, \code{<} and
-    \code{<-} mean backward arrows, 2, \code{>} and
-    \code{->} mean forward arrows and finally, 3,
-    \code{<>} and \code{<->} mean double arrows.
-    The default \code{NULL} value means no arrows for undirected graphs
-    and forward arrows for directed graphs.    
-  }
   \item{axes}{Logical, whether to plot axes, defaults to FALSE.}
   \item{xlab}{The label of the horizontal axis. Defaults to the empty string.}
   \item{ylab}{The label of the vertical axis. Defaults to the empty
@@ -75,16 +23,14 @@ plot.igraph(x, layout = layout.random, layout.par = list(),
   One convenient way to plot graphs is to plot with \code{\link{tkplot}}
   first, handtune the placement of the vertices, query the coordinates
   by the \code{\link{tkplot.getcoords}} function and use them with
-  \code{plot} to plot the graph to any R device.
-  
-  The additional arguments specified are passed to the \code{plot}
-  function.} 
+  \code{plot} to plot the graph to any R device.}
 \value{Returns \code{NULL}, invisibly.}
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{layout}} for different layouts,
-  \code{\link{tkplot}} for the better description of the parameters and
-  an interactive version.}
+  \code{\link{igraph.plotting}} for the detailed description of the
+  plotting parameters and \code{\link{tkplot}} and \code{\link{rglplot}}
+  for other graph plotting functions. }
 \examples{
 g <- graph.ring(10)
 \dontrun{plot(g, layout=layout.kamada.kawai, vertex.color="green")}

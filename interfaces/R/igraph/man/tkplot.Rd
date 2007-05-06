@@ -14,12 +14,7 @@
   be changed interactively right now though, eg. the colors of vertices,
   edges, and also others have to be pre-defined.}
 \usage{
-tkplot (graph, layout = layout.random, layout.par = list(), 
-    labels = NULL, label.color = "darkblue", label.font = NULL, 
-    label.degree = -pi/4, label.dist = 0, vertex.color = "SkyBlue2", 
-    vertex.size = 15, edge.color = "darkgrey", edge.width = 1,
-    edge.labels=NA, edge.lty=1, vertex.frame.color="black", loop.angle=0,
-    margin=0, \dots)
+tkplot(graph, \dots)
 
 tkplot.close(tkp.id, window.close = TRUE) 
 tkplot.off()
@@ -32,92 +27,9 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
 }
 \arguments{
   \item{graph}{The \code{graph} to plot.}
-  \item{layout}{Either a function, or a character string or a numeric
-    matrix. It specifies how the vertices will be placed on the plot.
-
-    If it is a function, this function will be called with the
-    \code{graph} and \code{layout.param} as parameters to determine the
-    actual coordinates.
-
-    If it is a character sting starting with \dQuote{\code{a:}} then the
-    remaining part of the string specifies the name of the vertex
-    attribute to use as coordinates.
-
-    If it is a numeric matrix, then the matrix has to have one line for
-    each vertex, specifying its coordinates. The matrix should have at
-    least two columns, for the \code{x} and \code{y} coordinates, but it
-    can also have more (eg. for a future \code{z} coordinate).
-  }
-  \item{layout.par}{
-    A named list specifying the optional parameters of the layout
-    function, only used if the \code{layout} argument is a
-    function. The parameters themselves are layout function dependent,
-    they are discussed in the \code{\link{layout}} manual page. 
-  }
-  \item{labels}{Gives the labels to use for the vertices. It can be a
-    numeric or character vector. If \code{NA} the plot will have no
-    labels, if \code{NULL} numeric ids starting from one will be
-    used. If a character vector of length one with prefix
-    \dQuote{\code{a:}} is given then the corresponding vertex attribute
-    (without the \dQuote{\code{a:}} prefix) is used for the labels.}
-  \item{label.color}{The color of the labels. If it is a character
-    scalar with prefix \dQuote{\code{a:}} then the corresponding vertex
-    attribute will be used. Otherwise if it is a vector of length one
-    then all labels will be the same color. It can also be a character
-    or numeric vector of the same length as the number of
-    vertices. Colors can be given as strings or integers, in the latter
-    case the actual color palette will be used.}
-  \item{label.font}{The font for the labels, a tkfont object, by default
-    16pt Helvetica bold is used.}
-  \item{label.degree}{Governs the placement of the vertex labels. 0
-    is right, pi/2 is down, pi is left. This argument can be a constant
-    (for all labels) or a numeric vector. If it is a constant string
-    with prefix \dQuote{\code{a:}} then the corresponding vertex
-    argument will be used.} 
-  \item{label.dist}{Numeric constant, gives the distance between the
-    labels and the vertices. 1 is some \dQuote{ideal} distance,
-    based on the vertex and label sizes. Use 0 for drawing the labels on
-    the vertices.}
-  \item{vertex.color}{The color of the vertices, either a character
-    constant with prefix \dQuote{\code{a:}} for using an attribute or
-    without it: a constant color for all vertices, or a numeric or
-    character or numeric vector giving the different colors for the
-    vertices.} 
-  \item{vertex.size}{The size of the vertices. Either a numeric
-    constant, or a numeric vector, or a string with prefix
-    \quote{\code{a:}} giving the vertex attribute to use.}
-  \item{edge.color}{The color of the edges. Either a character vector
-    with prefix \dQuote{\code{a:}} naming the edge attribute to use or
-    one without it, or a numeric or character vector giving the colors
-    for each edge.
-  }
-  \item{edge.width}{The width of the edges. Either a numeric constant or
-  a numeric vector, or a string with prefix \dQuote{\code{a:}} giving
-  the edge attribute to use.}
-  \item{edge.labels}{Labels for the edges, this will be converted to a
-    character vector. The default is \code{NA} which suppresses edge
-    labels. The vector might contain \code{NA}'s as well to suppress
-    labels for some edges.}
-  \item{edge.lty}{The line types for drawing the edges, the default
-    is a solid line. This argument can also be a vector to define
-    different line types for different edges. If this argument is
-    numeric then the line types defined in the manual page of the
-    \code{par} command will be used. If the argument is not numeric
-    then it is interpreted as a Tk dash.}
-  \item{vertex.frame.color}{The border color of the vertices,
-    either a character constant with prefix \dQuote{\code{a:}} for using
-    an attribute or without it: a constant color for all vertices, or a
-    numeric or character or numeric vector giving the different colors
-    for the vertices.}
-  \item{loop.angle}{Numeric vector of constant giving the angle in
-    degrees for the visualization of loop edges.}
-  \item{margin}{The margin at each side of the canvas. The unit is 300
-    to have a similar parameter range as for nonintertive graph
-    plots. Note that a 30 pixel wide margin will be always added to the
-    value of this parameter.}
-  \item{tkp.id}{The id of the tkplot window to close.}
+  \item{tkp.id}{The id of the tkplot window to close/reshape/etc.}
   \item{window.close}{Leave this on the default value.}
-   \item{width}{The width of the rectangle for generating new
+  \item{width}{The width of the rectangle for generating new
     coordinates.}
   \item{height}{The height of the rectangle for generating new
     coordinates.}
@@ -132,7 +44,7 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \code{tkplot} is an interactive graph drawing facility. It is not very
   well developed at this stage, but it should be still useful.
 
-  It's hangling should be quite straightforward most of the time, here
+  It's handling should be quite straightforward most of the time, here
   are some remarks and hints.
 
   There are different popup menus, activated by the right mouse button,

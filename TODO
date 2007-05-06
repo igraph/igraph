@@ -1,7 +1,9 @@
 
 o R interface graphics improvements:
-  - better looking edges in plot
-  - rewrite documentation
+  - rewrite documentation, write missing pieces, search for TODO
+  - edge.lty bug ?
+  - better 'margin' handling, make it possible to give different
+    margins top, bottom, left & right margins.
 
 o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
   index.
