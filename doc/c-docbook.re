@@ -5,6 +5,35 @@ REPLACE ----- remove the " *" lines -------------------------------------------
 ^[ ]\*\s*\n
 WITH --------------------------------------------------------------------------
 \n
+REPLACE ----- for the template functions --------------------------------------
+
+FUNCTION\(
+(?P<base>[^,\)]*),
+(?P<suffix>[^\)]*)
+\)
+
+WITH
+
+\g<base>_\g<suffix>
+
+REPLACE ----- template type ---------------------------------------------------
+
+TYPE\(
+(?P<type>[^\)]*)
+\)
+
+WITH
+
+\g<type>_t
+
+REPLACE ----- template base type, we cowardly assume real number --------------
+
+BASE
+
+WITH 
+
+igraph_real_t 
+
 REPLACE ----- function object, extract its signature --------------------------
 
 (?P<before>\A.*?)                # head of the comment

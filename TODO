@@ -1,16 +1,21 @@
 
-o R interface graphics improvements:
-  - rewrite documentation, write missing pieces, search for TODO
-  - edge.lty bug ?
-  - better 'margin' handling, make it possible to give different
-    margins top, bottom, left & right margins.
+These are needed for 0.4:
 
-o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
-  index.
-o missing documentation igraph_read_graph_dimacs,
-  igraph_read_graph_graphdb, igraph_write_graph_dimacs
+  o R interface graphics improvements:
+    - rewrite documentation, write missing pieces, search for TODO
+    - edge.lty bug ?
+    - better 'margin' handling, make it possible to give different
+      top, bottom, left & right margins.
+
+  o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
+    index.
+  o missing documentation igraph_read_graph_dimacs,
+    igraph_read_graph_graphdb, igraph_write_graph_dimacs
+  o igraph_vs_seq bug, the last node is omitted???
+  o girth
+  o some heuristics for vertex and edge commectivity
+
 o R interface: curved edges in plots (tkplot and plot)
-o igraph_vs_seq bug, the last node is omitted???
 o R interface: implement max.print option
 o attribute support in to_undirected
 o calculate the actual maximum flow
@@ -27,7 +32,6 @@ o PAJEK import improvements:
     SampsonL.net
   - color conversion, see colors in the Pajek manual
 o rewite add_edges, add_vertices, they're a mess
-o better looking graphs in 3D in the R interface
 o better random number generator handling (init with seed, etc...)
 o uniform graph operators (union, intersection, etc...)
 o attribute handling for operators
