@@ -70,6 +70,7 @@ tkplot <- function(graph, ...) {
   layout <- params("plot", "layout")
   layout[,2] <- -layout[,2]
   margin <- params("plot", "margin")
+  margin <- rep(margin, length=4)
 
   # the new style parameters can't do this yet
   arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
@@ -86,7 +87,8 @@ tkplot <- function(graph, ...) {
   # Create parameters
   params <- list(vertex.color=vertex.color, vertex.size=vertex.size,
                  edge.color=edge.color, label.color=label.color,
-                 labels.state=1, edge.width=edge.width, padding=margin*300+30,
+                 labels.state=1, edge.width=edge.width,
+                 padding=margin*300+max(vertex.size)+5,
                  grid=0, label.font=label.font, label.degree=label.degree,
                  label.dist=label.dist, edge.labels=edge.labels,
                  vertex.frame.color=vertex.frame.color,
@@ -497,10 +499,13 @@ tkplot.fit.to.screen <- function(tkp.id, width=NULL, height=NULL) {
   coords[,1] <- coords[,1]-min(coords[,1])
   coords[,2] <- coords[,2]-min(coords[,2])
   # Scale
-  coords[,1] <- coords[,1] / max(coords[,1]) * (width-(tkp$params$padding*2))
-  coords[,2] <- coords[,2] / max(coords[,2]) * (height-(tkp$params$padding*2))
+  coords[,1] <- coords[,1] / max(coords[,1]) *
+    (width-(tkp$params$padding[2]+tkp$params$padding[4]))
+  coords[,2] <- coords[,2] / max(coords[,2]) *
+    (height-(tkp$params$padding[1]+tkp$params$padding[3]))
   # Padding
-  coords <- coords+tkp$params$padding
+  coords[,1] <- coords[,1]+tkp$params$padding[2]
+  coords[,2] <- coords[,2]+tkp$params$padding[3]
   # Store
   .tkplot.set(tkp.id, "coords", coords)
   # Update

@@ -300,11 +300,15 @@
 
       The default value is \code{layout.random}, ie. a function
       returning with 2D random placement.}
-    \item{margin}{The amount of empty space below, over and beside the
-      plot, it is a numeric scale currently (not very flexible). Usually
+    \item{margin}{The amount of empty space below, over, at the left and
+      right of the plot, it is a numeric vector of length four. Usually
       values between 0 and 0.5 are meaningful, but negative values are
-      also possible, that will zoom into the center of the plot.
+      also possible, that will make the plot zoom in to a part of the
+      graph. If it is shorter than four then it is recycled.
 
+      \code{\link{rglplot}} does not support this parameter, as it can
+      zoom in and out the graph in a more flexible way.
+      
       Its default value is 0.
     }
   }

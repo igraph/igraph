@@ -3,8 +3,6 @@ These are needed for 0.4:
 
   o R interface graphics improvements:
     - add examples to documentation
-    - better 'margin' handling, make it possible to give different
-      top, bottom, left & right margins.
 
   o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
     index.

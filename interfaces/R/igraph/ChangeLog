@@ -1,5 +1,9 @@
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (plot.igraph)
+	* interfaces/R/igraph/R/tkplot.R (tkplot, tkplot.fit.to.screen) :
+	better margin
+
 	* interfaces/R/igraph/R/plot.R (rglplot.igraph) : arrow head size
 	depends on edge width now
 

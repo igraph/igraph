@@ -251,4 +251,4 @@ i.default.values <- list(vertex=list(color="SkyBlue2",
                            label.color="darkblue",
                            arrow.mode=i.get.arrow.mode),
                          plot=list(layout=layout.random,
-                           margin=0))
+                           margin=c(0,0,0,0)))

@@ -57,14 +57,15 @@ plot.igraph <- function(x,
   
   layout             <- params("plot", "layout")
   margin             <- params("plot", "margin")
+  margin <- rep(margin, length=4)
 
   # the new style parameters can't do this yet
   arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
 
   # create the plot
   maxv <- max(vertex.size)
-  xlim <- c(xlim[1]-margin-maxv, xlim[2]+margin+maxv)
-  ylim <- c(ylim[1]-margin-maxv, ylim[2]+margin+maxv)
+  xlim <- c(xlim[1]-margin[2]-maxv, xlim[2]+margin[4]+maxv)
+  ylim <- c(ylim[1]-margin[1]-maxv, ylim[2]+margin[3]+maxv)
   plot(0, 0, type="n", xlab=xlab, ylab=ylab, asp=1, xlim=xlim, ylim=ylim,
        axes=axes)
 
