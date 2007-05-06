@@ -3948,18 +3948,16 @@ PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
     return NULL;
   other = (igraphmodule_GraphObject *) o;
 
-  if (igraph_vcount(&self->g) < 3 || igraph_vcount(&self->g) > 4) {
-    PyErr_SetString(PyExc_ValueError, "Graph must have 3 or 4 vertices.");
-    return NULL;
-  }
-  if (igraph_vcount(&other->g) < 3 || igraph_vcount(&other->g) > 4) {
-    PyErr_SetString(PyExc_ValueError, "Graph must have 3 or 4 vertices.");
-    return NULL;
-  }
-
-  if (igraph_isomorphic(&self->g, &other->g, &result)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (igraph_vcount(&self->g) == 3 || igraph_vcount(&self->g) == 4) {
+    if (igraph_isomorphic(&self->g, &other->g, &result)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    if (igraph_isomorphic_vf2(&self->g, &other->g, &result)) {
+	  igraphmodule_handle_igraph_error();
+	  return NULL;
+	}
   }
 
   if (result)
@@ -6322,7 +6320,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "isomorphic(other)\n\n"
    "Checks whether the graph is isomorphic with another graph.\n\n"
-   "Works only for graphs with 3 or 4 vertices.\n\n"
    "@param other: the other graph with which we want to compare the graph.\n"
    "@return: C{True} if the graphs are isomorphic, C{False} if not.\n"},
 
