@@ -6,8 +6,6 @@ These are needed for 0.4:
 
   o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
     index.
-  o missing documentation igraph_read_graph_dimacs,
-    igraph_read_graph_graphdb, igraph_write_graph_dimacs
   o igraph_vs_seq bug, the last node is omitted???
   o girth
   o some heuristics for vertex and edge commectivity

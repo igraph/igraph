@@ -613,6 +613,46 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
 /**
  * \function igraph_read_graph_dimacs
+ * 
+ * This function reads the DIMACS file format, more specifically the 
+ * version for network flow problems, see the files at
+ * ftp://dimacs.rutgers.edu/pub/netflow/general-info/
+ * 
+ * </para><para>
+ * This is a line-oriented text file (ASCII) format. The first
+ * character of each line defines the type of the line. If the first
+ * character is <code>c</code> the line is a comment line and it is
+ * ignored. There is one problem line (<code>p</code> in the file, it
+ * must appear before any node and arc descriptor lines. The problem
+ * line has three fields separated by spaces: the problem type
+ * (<code>min</code>, <code>max</code> or <code>asn</code>), the
+ * number of vertices and number of edges in the graph.
+ * Exactly two node identification lines are expected
+ * (<code>n</code>), one for the source, one for the target vertex.
+ * These have two fields: the id of the vertex and the type of the
+ * vertex, either <code>s</code> (=source) or <code>t</code>
+ * (=target). Arc lines start with <code>a</code> and have three
+ * fields: the source vertex, the target vertex and the edge capacity.
+ * 
+ * </para><para>
+ * Vertex ids are numbered from 1.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param instream The file to read from.
+ * \param source Pointer to an integer, the id of the source node will
+ *    be stored here. (The igraph vertex id, which is one less than
+ *    the actual number in the file.) It is ignored if
+ *    <code>NULL</code>.
+ * \param target Pointer to an integer, the (igraph) id of the target
+ *    node will be stored here. It is ignored if <code>NULL</code>.
+ * \param capacity Pointer to an initialized vector, the capacity of
+ *    the edges will be stored here if not <code>NULL</code>.
+ * \param directed Boolean, whether to create a directed graph.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|+c), the number of vertices plus the
+ * number of edges, plus the size of the file in characters.
+ * 
+ * \sa \ref igraph_write_graph_dimacs()
  */
 
 int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
@@ -1587,6 +1627,31 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
   IGRAPH_FINALLY_CLEAN(8);
   return 0;
 }
+
+/**
+ * \function igraph_write_graph_dimacs
+ * 
+ * This function writes a graph to an output stream in DIMACS format,
+ * describing a maximum flow problem.
+ * See ftp://dimacs.rutgers.edu/pub/netflow/general-info/
+ * 
+ * </para><para>
+ * This file format is discussed in the documentation of \ref
+ * igraph_read_graph_dimacs(), see that for more information.
+ * 
+ * \param graph The graph to write to the stream.
+ * \param outstream The stream.
+ * \param source Integer, the id of the source vertex for the maximum
+ *     flow. 
+ * \param target Integer, the id of the target vertex.
+ * \param capacity Pointer to an initialized vector containing the
+ *     edge capacity values.
+ * \return Error code.
+ * 
+ * Time complexity: O(|E|), the number of edges in the graph.
+ * 
+ * \sa igraph_read_graph_dimacs()
+ */
 
 int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
 			      long int source, long int target,

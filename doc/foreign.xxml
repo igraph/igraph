@@ -16,6 +16,8 @@
 <!-- doxrox-include igraph_write_graph_ncol -->
 <!-- doxrox-include igraph_read_graph_lgl -->
 <!-- doxrox-include igraph_write_graph_lgl -->
+<!-- doxrox-include igraph_read_graph_dimacs -->
+<!-- doxrox-include igraph_write_graph_dimacs -->
 </section>
 
 <section><title>GraphML format</title>
