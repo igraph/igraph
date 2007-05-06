@@ -518,26 +518,6 @@ function (x1, y1, x2, y2,
   ## Version: 2005-10-17
 {
   cin <- size * par("cin")[2]
-  if (code==0) {
-    segments(x1, y1, x2, y2, col=sh.col, lty=sh.lty, lwd=sh.lwd)
-    return()
-  } else if (code==1) {
-    igraph.Arrows(x2,y2, x1,y1, code=2, size=size, width=width,
-                  open=open, sh.adj=sh.adj, sh.lwd=sh.lwd, sh.col=sh.col,
-                  sh.lty=sh.lty, h.col=h.col, h.col.bo=h.col.bo,
-                  h.lwd=h.lwd, h.lty=h.lty)
-    return()
-  } else if (code==3) {
-    igraph.Arrows(x1,y1, x2,y2, code=2, size=size, width=width,
-                  open=open, sh.adj=sh.adj, sh.lwd=sh.lwd, sh.col=sh.col,
-                  sh.lty=sh.lty, h.col=h.col, h.col.bo=h.col.bo,
-                  h.lwd=h.lwd, h.lty=h.lty)
-    igraph.Arrows(x2,y2, x1,y1, code=2, size=size, width=width,
-                  open=open, sh.adj=sh.adj, sh.lwd=sh.lwd, sh.col=sh.col,
-                  sh.lty=sh.lty, h.col=h.col, h.col.bo=h.col.bo,
-                  h.lwd=h.lwd, h.lty=h.lty)
-    return()
-  }
   uin <- if (is.R()) 
     1/xyinch()
   else par("uin")
@@ -548,23 +528,51 @@ function (x1, y1, x2, y2,
   y.arr <- c(-rev(wx2 + delta), wx2 + delta)
   deg.arr <- c(atan2(y.arr, x.arr), NA)
   r.arr <- c(sqrt(x.arr^2 + y.arr^2), NA)
+  
+  ## forward arrowhead
   theta <- atan2((y2 - y1) * uin[2], (x2 - x1) * uin[1])
   lx <- length(x1)
   Rep <- rep(length(deg.arr), lx)
   p.x2 <- rep(x2, Rep)
   p.y2 <- rep(y2, Rep)
   ttheta <- rep(theta, Rep) + rep(deg.arr, lx)
-  r.arr <- rep(r.arr, lx)
-
-  if(open) lines((p.x2 + r.arr * cos(ttheta)/uin[1]),
-                 (p.y2 + r.arr*sin(ttheta)/uin[2]), 
-                 lwd=h.lwd, col = h.col.bo, lty=h.lty) else
-  polygon(p.x2 + r.arr * cos(ttheta)/uin[1], p.y2 + r.arr*sin(ttheta)/uin[2], 
-          col = h.col, lwd=h.lwd,
-          border=h.col.bo, lty=h.lty)
+  r.arr <- rep(r.arr, lx)  
+  if (code %in% c(2,3)) {
+    if(open) lines((p.x2 + r.arr * cos(ttheta)/uin[1]),
+                   (p.y2 + r.arr*sin(ttheta)/uin[2]), 
+                   lwd=h.lwd, col = h.col.bo, lty=h.lty) else
+    polygon(p.x2 + r.arr * cos(ttheta)/uin[1], p.y2 + r.arr*sin(ttheta)/uin[2], 
+            col = h.col, lwd=h.lwd,
+            border=h.col.bo, lty=h.lty)
+  }
+  
+  ## shaft
   r.seg <- rep(cin*sh.adj, lx)
   th.seg <- theta + rep(atan2(0, -cin), lx)
   segments(x1, y1, x2+r.seg*cos(th.seg)/uin[1], y2+r.seg*sin(th.seg)/uin[2], 
            lwd=sh.lwd, col=sh.col, lty=sh.lty)
+
+  ## backward arrow head
+  if (code %in% c(1,3)) {
+    tmp <- x1 ; x1 <- x2 ; x2 <- tmp
+    tmp <- y1 ; y1 <- y2 ; y2 <- tmp
+    theta <- atan2((y2 - y1) * uin[2], (x2 - x1) * uin[1])
+    lx <- length(x1)
+    Rep <- rep(length(deg.arr), lx)
+    p.x2 <- rep(x2, Rep)
+    p.y2 <- rep(y2, Rep)
+    ttheta <- rep(theta, Rep) + rep(deg.arr, lx)
+    r.arr <- rep(r.arr, lx)
+
+    if(open) lines((p.x2 + r.arr * cos(ttheta)/uin[1]),
+                   (p.y2 + r.arr*sin(ttheta)/uin[2]), 
+                   lwd=h.lwd, col = h.col.bo, lty=h.lty) else
+    polygon(p.x2 + r.arr * cos(ttheta)/uin[1], p.y2 + r.arr*sin(ttheta)/uin[2], 
+            col = h.col, lwd=h.lwd,
+            border=h.col.bo, lty=h.lty)
+    r.seg <- rep(cin*sh.adj, lx)
+    th.seg <- theta + rep(atan2(0, -cin), lx)
+    
+  }
 } # Arrows
 
