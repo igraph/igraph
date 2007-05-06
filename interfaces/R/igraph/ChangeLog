@@ -1,5 +1,8 @@
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (rglplot.igraph) : arrow head size
+	depends on edge width now
+
 	* interfaces/R/igraph/R/plot.R (igraph.Arrows) : code argument
 	reimplemented, now works properly even if lty!=1 & arrow.mode=3
 

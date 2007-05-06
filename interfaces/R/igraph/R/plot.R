@@ -252,8 +252,8 @@ rglplot.igraph <- function(x, ...) {
 
   create.edge <- function(v1, v2, r1, r2, ec, ew, am) {
     ## these could also be parameters:
-    aw <- 3/200                         # arrow width
-    al <- 4/200                         # arrow length    
+    aw <- 3*ew                      # arrow width
+    al <- 4*ew                      # arrow length    
     
     dist <- sqrt(sum((v2-v1)^2))   # distance of the centers
 
@@ -314,8 +314,8 @@ rglplot.igraph <- function(x, ...) {
   }
   
   create.loop <- function(v, r, ec, ew, am, la, la2) {
-    aw <- 3/200
-    al <- 4/200
+    aw <- 3*ew
+    al <- 4*ew
     wi <- aw*2                          # size of the loop
     wi2 <- wi+aw-ew                     # size including the arrow heads
     hi <- al*2+ew*2
