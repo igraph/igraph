@@ -1,5 +1,11 @@
 2007-05-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : a loop plotting bug 
+	corrected
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : plot better looking edges
+	(igraph.Arrow) : added
+
 	* interfaces/R/igraph/R/tkplot.R (tkplot) : mirror the y coordinate to
 	have the sample plot as for plot.igraph
 
