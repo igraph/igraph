@@ -1,3 +1,7 @@
+2007-05-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_girth) : a bug corrected
+
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/flow.c (igraph_vertex_connectivity, igraph_edge_connectivity) :

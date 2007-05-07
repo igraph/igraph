@@ -3747,7 +3747,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    while (!anycircle && !igraph_dqueue_empty(&q)) {
+    while (!igraph_dqueue_empty(&q)) {
       long int actnode=igraph_dqueue_pop(&q);
       long int actlevel=VECTOR(level)[actnode];
       long int i, n;
@@ -3765,6 +3765,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 	if (VECTOR(level)[nei] != 0) {
 	  /* found circle */
 	  stoplevel=neilevel;
+	  anycircle=1;
 	  if (actlevel<mincirc) {
 	    /* Is it a minimum circle? */
 	    mincirc=actlevel+neilevel-1;
@@ -3775,7 +3776,6 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 	      triangle=1;
 	    }	    
 	  }
-	  anycircle=1;
 	  if (neilevel==actlevel) {
 	    break;
 	  }
