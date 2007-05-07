@@ -216,7 +216,7 @@ read.graph(file, format = "edgelist", \dots)
       This is a line-oriented text file (ASCII) format. The first
       character of each line defines the type of the line. If the first
       character is \code{c} the line is a comment line and it is
-      ignored. There is one problem line (\code{p} in the file, it
+      ignored. There is one problem line (\code{p}) in the file, it
       must appear before any node and arc descriptor lines. The problem
       line has three fields separated by spaces: the problem type
       (\code{min}, \code{max} or \code{asn}), the
@@ -239,6 +239,32 @@ read.graph(file, format = "edgelist", \dots)
 	\item{directed}{Logical scalar, whether to create a directed
 	  graph. By default a directed graph is created.
 	}
+      }
+    }
+    \item{graphdb}{This is a binary format, used in the graph database
+      for isomorphism testing (\url{http://amalfi.dis.unina.it/graph/})
+      From the graph database homepage
+      (\url{http://amalfi.dis.unina.it/graph/db/doc/graphdbat-2.html}):
+
+      \emph{The graphs are stored in a compact binary format, one graph per
+	file. The file is composed of 16 bit words, which are represented
+	using the so-called little-endian convention, i.e. the least
+	significant byte of the word is stored first.}
+      
+      \emph{Then, for each node, the file contains the list of edges coming
+	out of the node itself. The list is represented by a word encoding
+	its length, followed by a word for each edge, representing the
+	destination node of the edge. Node numeration is 0-based, so the
+	first node of the graph has index 0.}
+
+      See also \code{\link{graph.graphdb}}.
+      
+      Only unlabelled graphs are implemented.
+
+      Additional attributes:
+      \itemize{
+	\item{directed}{Logical scalar. Whether to create a directed
+	  graph.}
       }
     }
   }
