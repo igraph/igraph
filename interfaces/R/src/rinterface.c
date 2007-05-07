@@ -4798,16 +4798,17 @@ SEXP R_igraph_st_vertex_connectivity(SEXP graph, SEXP psource,
   return result;
 }
 
-SEXP R_igraph_vertex_connectivity(SEXP graph) {
+SEXP R_igraph_vertex_connectivity(SEXP graph, SEXP pchecks) {
   
   igraph_t g;
   igraph_integer_t res;
+  igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_vertex_connectivity(&g, &res);
+  igraph_vertex_connectivity(&g, &res, checks);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
@@ -4837,16 +4838,17 @@ SEXP R_igraph_st_edge_connectivity(SEXP graph, SEXP psource, SEXP ptarget) {
   return result;
 }
 
-SEXP R_igraph_edge_connectivity(SEXP graph) {
+SEXP R_igraph_edge_connectivity(SEXP graph, SEXP pchecks) {
   
   igraph_t g;
   igraph_integer_t res;
+  igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_edge_connectivity(&g, &res);
+  igraph_edge_connectivity(&g, &res, checks);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
@@ -4920,16 +4922,17 @@ SEXP R_igraph_vertex_disjoint_paths(SEXP graph, SEXP psource, SEXP ptarget) {
   return result;
 }
 
-SEXP R_igraph_adhesion(SEXP graph) {
+SEXP R_igraph_adhesion(SEXP graph, SEXP pchecks) {
   
   igraph_t g;
   igraph_integer_t res;
+  igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_adhesion(&g, &res);
+  igraph_adhesion(&g, &res, checks);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   
@@ -4939,16 +4942,17 @@ SEXP R_igraph_adhesion(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_cohesion(SEXP graph) {
+SEXP R_igraph_cohesion(SEXP graph, SEXP pchecks) {
   
   igraph_t g;
   igraph_integer_t res;
+  igraph_bool_t checks=LOGICAL(pchecks)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_cohesion(&g, &res);
+  igraph_cohesion(&g, &res, checks);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   

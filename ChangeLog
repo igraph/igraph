@@ -1,5 +1,10 @@
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/flow.c (igraph_vertex_connectivity, igraph_edge_connectivity) :
+	check that the graph is connected and also minimum degree
+	(igraph_cohesion) : added 'checks' argument
+	(igraph_adhesion) : added 'checks' argument, calls edge_connectivity now
+
 	* src/structural_properties.c (igraph_girth) : added
 
 2007-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>

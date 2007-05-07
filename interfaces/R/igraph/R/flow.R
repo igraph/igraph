@@ -67,14 +67,14 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL) {
   }
 }
 
-vertex.connectivity <- function(graph, source=NULL, target=NULL) {
+vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
   if (is.null(source) && is.null(target)) {
-    .Call("R_igraph_vertex_connectivity", graph,
+    .Call("R_igraph_vertex_connectivity", graph, as.logical(checks),
           PACKAGE="igraph")
   } else if (!is.null(source) && !is.null(target)) {
     .Call("R_igraph_st_vertex_connectivity", graph, as.numeric(source),
@@ -85,14 +85,14 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL) {
   }
 }
 
-edge.connectivity <- function(graph, source=NULL, target=NULL) {
+edge.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
   if (is.null(source) && is.null(target)) {    
-    .Call("R_igraph_edge_connectivity", graph,
+    .Call("R_igraph_edge_connectivity", graph, as.logical(checks),
           PACKAGE="igraph")
   } else if (!is.null(source) && !is.null(target)) {
     .Call("R_igraph_st_edge_connectivity", graph,
@@ -125,23 +125,23 @@ vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
         PACKAGE="igraph")
 }
 
-graph.adhesion <- function(graph) {
+graph.adhesion <- function(graph, checks=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   
-  .Call("R_igraph_adhesion", graph,
+  .Call("R_igraph_adhesion", graph, as.logical(checks),
         PACKAGE="igraph")
 }
 
-graph.cohesion <- function(graph) {
+graph.cohesion <- function(graph, checks=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
-  .Call("R_igraph_cohesion", graph,
+  .Call("R_igraph_cohesion", graph, as.logical(checks),
         PACKAGE="igraph")
 }
 

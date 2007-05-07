@@ -1,5 +1,11 @@
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/flow.R (vertex.connectivity, edge.connectivity)
+	(graph.cohesion, graph.adhesion) : added 'checks' argument
+	* interfaces/R/src/rinterface.c (R_igraph_vertex_connectivity)
+	(R_igraph_edge_connectivity, R_igraph_cohesion, R_igraph_adhesion) :
+	updated
+
 	* interfaces/R/igraph/R/structural.properties.R (girth) : added
 	* interfaces/R/src/rinterface.c (R_igraph_girth) : added
 

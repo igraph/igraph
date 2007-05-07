@@ -1016,6 +1016,48 @@ int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
   return 0;  
 }
 
+/* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
+int igraph_i_connectivity_checks(const igraph_t *graph,
+				 igraph_integer_t *res,
+				 igraph_bool_t *found) {
+  igraph_bool_t conn;
+  *found=0;
+  IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_STRONG));
+  if (!conn) {
+    *res=0;
+    *found=1;
+  } else {
+    igraph_vector_t degree;
+    IGRAPH_VECTOR_INIT_FINALLY(&degree, 0);
+    if (!igraph_is_directed(graph)) {
+      IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+				 IGRAPH_OUT, IGRAPH_LOOPS));
+      if (igraph_vector_min(&degree)==1) {
+	*res=1;
+	*found=1;
+      }
+    } else {
+      /* directed, check both in- & out-degree */
+      IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+				 IGRAPH_OUT, IGRAPH_LOOPS));
+      if (igraph_vector_min(&degree)==1) {
+	*res=1;
+	*found=1;
+      } else {
+	IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+				   IGRAPH_IN, IGRAPH_LOOPS));
+	if (igraph_vector_min(&degree)==1) {
+	  *res=1;
+	  *found=1;
+	}
+      }
+    }
+    igraph_vector_destroy(&degree);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  return 0;
+}
+
 /**
  * \function igraph_vertex_connectivity
  * The vertex connectivity of a graph
@@ -1029,6 +1071,13 @@ int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
  * conditional density, Sociological Methodology 31:305--359, 2001.
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here. 
+ * \param checks Logical constant. Whether to check that the graph is
+ *    connected and also the degree of the vertices. If the graph is
+ *    not (strongly) connected then the connectivity is obviously zero. Otherwise
+ *    if the minimum degree is one then the vertex connectivity is also
+ *    one. It is a good idea to perform these checks, as they can be
+ *    done quickly compared to the connectivity calculation itself. 
+ *    They were suggested by Peter McMahan, thanks Peter.
  * \return Error code.
  * 
  * Time complecity: O(|V|^5).
@@ -1037,13 +1086,24 @@ int igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
  * and \ref igraph_edge_connectivity(). 
  */
 
-int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res) {
-  
-  if (igraph_is_directed(graph)) {
-    IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(graph, res));
-  } else {
-    IGRAPH_CHECK(igraph_i_vertex_connectivity_undirected(graph, res));
+int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res, 
+			       igraph_bool_t checks) {
+
+  igraph_bool_t ret=0;
+
+  if (checks) {
+    IGRAPH_CHECK(igraph_i_connectivity_checks(graph, res, &ret));
   }
+  
+  /* Are we done yet? */
+  if (!ret) {
+    if (igraph_is_directed(graph)) {
+      IGRAPH_CHECK(igraph_i_vertex_connectivity_directed(graph, res));
+    } else {
+      IGRAPH_CHECK(igraph_i_vertex_connectivity_undirected(graph, res));
+    }
+  }
+
   return 0;
 }
 
@@ -1112,6 +1172,13 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * density, Sociological Methodology 31:305--359, 2001.
  * \param graph The input graph.
  * \param res Pointer to an integer, the result will be stored here.
+ * \param checks Logical constant. Whether to check that the graph is
+ *    connected and also the degree of the vertices. If the graph is
+ *    not (strongly) connected then the connectivity is obviously zero. Otherwise
+ *    if the minimum degree is one then the edge connectivity is also
+ *    one. It is a good idea to perform these checks, as they can be
+ *    done quickly compared to the connectivity calculation itself. 
+ *    They were suggested by Peter McMahan, thanks Peter.
  * \return Error code.
  * 
  * Time complexity: O(log(|V|)*|V|^2) for undirected graphs and 
@@ -1122,21 +1189,31 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
  * \ref igraph_vertex_connectivity().
  */
 
-int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res) {
+int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+			     igraph_bool_t checks) {
   
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t capacity;
   long int i;
+  igraph_bool_t ret;
+  
+  /* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
+  if (checks) {
+    IGRAPH_CHECK(igraph_i_connectivity_checks(graph, res, &ret));
+  }  
 
-  IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
-  for (i=0; i<no_of_edges; i++) {
-    VECTOR(capacity)[i]=1.0;
+  if (!ret) {
+    IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
+    for (i=0; i<no_of_edges; i++) {
+      VECTOR(capacity)[i]=1.0;
+    }
+    
+    IGRAPH_CHECK(igraph_mincut_value(graph, res, &capacity));
+    
+    igraph_vector_destroy(&capacity);
+    IGRAPH_FINALLY_CLEAN(1);
   }
-  
-  IGRAPH_CHECK(igraph_mincut_value(graph, res, &capacity));
-  
-  igraph_vector_destroy(&capacity);
-  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -1295,7 +1372,14 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
  * with uniform edge weights.
  * \param graph The input graph, either directed or undirected.
  * \param res Pointer to an integer, the result will be stored here.
- * \return Error code.
+ * \param checks Logical constant. Whether to check that the graph is
+ *    connected and also the degree of the vertices. If the graph is
+ *    not (strongly) connected then the adhesion is obviously zero. Otherwise
+ *    if the minimum degree is one then the adhesion is also
+ *    one. It is a good idea to perform these checks, as they can be
+ *    done quickly compared to the edge connectivity calculation itself. 
+ *    They were suggested by Peter McMahan, thanks Peter.
+* \return Error code.
  * 
  * Time complexity: O(log(|V|)*|V|^2) for undirected graphs and 
  * O(|V|^4) for directed graphs, but see also the discussion at the
@@ -1305,22 +1389,9 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
  * igraph_edge_connectivity(), \ref igraph_mincut_value().
  */
 
-int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res) {
-  
-  long int no_of_edges=igraph_ecount(graph);
-  igraph_vector_t capacity;
-  long int i;
-  
-  IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
-  for (i=0; i<no_of_edges; i++) {
-    VECTOR(capacity)[i]=1.0;
-  }
-
-  IGRAPH_CHECK(igraph_mincut_value(graph, res, &capacity));
-  
-  igraph_vector_destroy(&capacity);
-  IGRAPH_FINALLY_CLEAN(1);
-  return 0;
+int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
+		    igraph_bool_t checks) {
+  return igraph_edge_connectivity(graph, res, checks);
 }
 
 /**
@@ -1336,6 +1407,13 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res) {
  * \param graph The input graph.
  * \param res Pointer to an integer variable, the result will be
  *        stored here.
+ * \param checks Logical constant. Whether to check that the graph is
+ *    connected and also the degree of the vertices. If the graph is
+ *    not (strongly) connected then the cohesion is obviously zero. Otherwise
+ *    if the minimum degree is one then the cohesion is also
+ *    one. It is a good idea to perform these checks, as they can be
+ *    done quickly compared to the vertex connectivity calculation itself. 
+ *    They were suggested by Peter McMahan, thanks Peter.
  * \return Error code.
  * 
  * Time complexity: O(|V|^4), |V| is the number of vertices. In
@@ -1345,8 +1423,9 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res) {
  * \ref igraph_maxflow_value().
  */
 
-int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res) {
+int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
+		    igraph_bool_t checks) {
   
-  IGRAPH_CHECK(igraph_vertex_connectivity(graph, res));
+  IGRAPH_CHECK(igraph_vertex_connectivity(graph, res, checks));
   return 0;
 }

@@ -6,9 +6,9 @@
 \description{The edge connectivity of a graph or two vertices, this is
   recently also called group adhesion.}
 \usage{
-edge.connectivity(graph, source=NULL, target=NULL)
+edge.connectivity(graph, source=NULL, target=NULL, checks=TRUE)
 edge.disjoint.paths(graph, source, target)
-graph.adhesion(graph)
+graph.adhesion(graph, checks=TRUE)
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -16,6 +16,14 @@ graph.adhesion(graph)
     \code{edge.connectivity} it can be \code{NULL}, see details below.}
   \item{target}{The id of the target vertex, for
     \code{edge.connectivity} it can be \code{NULL}, see details below.}
+  \item{checks}{Logical constant. Whether to check that the graph is
+    connected and also the degree of the vertices. If the graph is
+    not (strongly) connected then the connectivity is obviously zero. Otherwise
+    if the minimum degree is one then the edge connectivity is also
+    one. It is a good idea to perform these checks, as they can be
+    done quickly compared to the connectivity calculation itself. 
+    They were suggested by Peter McMahan, thanks Peter.
+  }
 }
 \details{
   The edge connectivity of a pair of vertices (\code{source} and
