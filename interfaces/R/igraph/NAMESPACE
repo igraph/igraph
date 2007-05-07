@@ -121,9 +121,9 @@ export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
        measure.dynamics.lastcit, measure.dynamics.age, measure.dynamics.citedcat,
        measure.dynamics.citingcat.citedcat)
 
-export(evolver.d, evolver.ad, evolver.ade, evolver.e, evolver.de, evolver.l,
-       evolver.dl, evolver.el, evolver.r, evolver.ar, evolver.di, evolver.adi,
-       evolver.il, evolver.ir, evolver.air)
+export(revolver.d, revolver.ad, revolver.ade, revolver.e, revolver.de, revolver.l,
+       revolver.dl, revolver.el, revolver.r, revolver.ar, revolver.di, revolver.adi,
+       revolver.il, revolver.ir, revolver.air)
 
 # isomorphism, motifs
 

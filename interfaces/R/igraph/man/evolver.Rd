@@ -1,71 +1,71 @@
-\name{evolver}
-\alias{evolver}
-\alias{evolver.d}
-\alias{evolver.ad}
-\alias{evolver.ade}
-\alias{evolver.adi}
-\alias{evolver.air}
-\alias{evolver.ar}
-\alias{evolver.de}
-\alias{evolver.di}
-\alias{evolver.dl}
-\alias{evolver.e}
-\alias{evolver.el}
-\alias{evolver.il}
-\alias{evolver.ir}
-\alias{evolver.l}
-\alias{evolver.r}
+\name{revolver}
+\alias{revolver}
+\alias{revolver.d}
+\alias{revolver.ad}
+\alias{revolver.ade}
+\alias{revolver.adi}
+\alias{revolver.air}
+\alias{revolver.ar}
+\alias{revolver.de}
+\alias{revolver.di}
+\alias{revolver.dl}
+\alias{revolver.e}
+\alias{revolver.el}
+\alias{revolver.il}
+\alias{revolver.ir}
+\alias{revolver.l}
+\alias{revolver.r}
 \title{Measuring the driving force in evolving networks}
 \description{These functions assume a simple evolving network model and
   measure the functional form of a so-called \emph{attractiveness
     function} governing the evolution of the network.
 }
 \usage{
-evolver.d (graph, niter=5, sd=FALSE, norm=FALSE,
+revolver.d (graph, niter=5, sd=FALSE, norm=FALSE,
            cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
            verbose=igraph.par("verbose"))
-evolver.ad (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.ad (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
             debug=matrix(nc=2, nr=0), verbose=igraph.par("verbose"))
-evolver.ade (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.ade (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
              error=TRUE, debug=matrix(nc=2, nr=0),
                         verbose=igraph.par("verbose"))
-evolver.e (graph, cats, niter=5,
+revolver.e (graph, cats, niter=5,
            sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
            error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.de (graph, cats, niter=5,
+revolver.de (graph, cats, niter=5,
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.l (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.l (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
            sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
            error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.dl (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.dl (graph, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.el (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.el (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.r (graph, window, niter=5, sd=FALSE, norm=FALSE,
+revolver.r (graph, window, niter=5, sd=FALSE, norm=FALSE,
            cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
            verbose=igraph.par("verbose"))
-evolver.ar (graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.ar (graph, window, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE, error=TRUE,
             debug=matrix(nc=2, nr=0), verbose=igraph.par("verbose"))
-evolver.di (graph, cats, niter=5,
+revolver.di (graph, cats, niter=5,
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.adi (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.adi (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
              error=TRUE, debug=matrix(nc=2, nr=0),
              verbose=igraph.par("verbose"))
-evolver.il (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
+revolver.il (graph, cats, niter=5, agebins=max(vcount(graph)/7100, 10),
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.ir (graph, cats, window, niter=5,
+revolver.ir (graph, cats, window, niter=5,
             sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
             error=TRUE, debug=numeric(), verbose=igraph.par("verbose"))
-evolver.air (graph, cats, window,
+revolver.air (graph, cats, window,
              niter=5, agebins=max(vcount(graph)/7100, 10),
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
              error=TRUE, debug=matrix(nc=2, nr=0),

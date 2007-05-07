@@ -1,5 +1,7 @@
 2007-05-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver.R : all evolver_* renamed to revolver_*
+
 	* example/simple/igraph_girth.c : added
 
 	* src/structural_properties.c (igraph_girth) : some speedup

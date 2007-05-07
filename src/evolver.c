@@ -30,7 +30,7 @@
 /* in-degree                                   */
 /***********************************************/
 
-int igraph_evolver_d(const igraph_t *graph,
+int igraph_revolver_d(const igraph_t *graph,
 		     igraph_integer_t niter,
 		     igraph_vector_t *kernel,
 		     igraph_vector_t *sd,
@@ -55,14 +55,14 @@ int igraph_evolver_d(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));  
   
-  igraph_progress("Evolver d", 0, NULL);
+  igraph_progress("Revolver d", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1!=niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_d(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
+      IGRAPH_CHECK(igraph_revolver_mes_d(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					&st, maxdegree));
       
@@ -70,32 +70,32 @@ int igraph_evolver_d(const igraph_t *graph,
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_d(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_d(graph, &st, kernel));
     } else {			/* last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_d(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_d(graph, kernel, sd, norm, cites, debug,
 					debugres, &st, maxdegree));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_d(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_d(graph, &st, kernel));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_d(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_d(graph, expected, kernel,
 					  &st, maxdegree));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_d(graph, kernel, &st, maxdegree,
+	IGRAPH_CHECK(igraph_revolver_error_d(graph, kernel, &st, maxdegree,
 					    logprob, lognull));
       }
     }
     
-    igraph_progress("Evolver d", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver d", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -104,7 +104,7 @@ int igraph_evolver_d(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_d(const igraph_t *graph,
+int igraph_revolver_mes_d(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *sd,
 			 igraph_vector_t *norm,
@@ -236,7 +236,7 @@ int igraph_evolver_mes_d(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_d(const igraph_t *graph,
+int igraph_revolver_st_d(const igraph_t *graph,
 			igraph_vector_t *st,
 			const igraph_vector_t *kernel) {
   
@@ -276,7 +276,7 @@ int igraph_evolver_st_d(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_d(const igraph_t *graph,
+int igraph_revolver_exp_d(const igraph_t *graph,
 			 igraph_vector_t *expected,
 			 const igraph_vector_t *kernel,
 			 const igraph_vector_t *st,
@@ -363,7 +363,7 @@ int igraph_evolver_exp_d(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_d(const igraph_t *graph,
+int igraph_revolver_error_d(const igraph_t *graph,
 			   const igraph_vector_t *kernel,
 			   const igraph_vector_t *st,
 			   igraph_integer_t maxind,
@@ -422,7 +422,7 @@ int igraph_evolver_error_d(const igraph_t *graph,
 /* in-degree, age                              */
 /***********************************************/
 
-int igraph_evolver_ad(const igraph_t *graph,
+int igraph_revolver_ad(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      igraph_integer_t agebins,
 		      igraph_matrix_t *kernel,
@@ -448,14 +448,14 @@ int igraph_evolver_ad(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Evolver ad", 0, NULL);
+  igraph_progress("Revolver ad", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ad(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_ad(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					 &st, maxdegree, agebins));
       
@@ -463,32 +463,32 @@ int igraph_evolver_ad(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ad(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_ad(graph, &st, kernel));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ad(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_ad(graph, kernel, sd, norm, cites, debug,
 					 debugres, &st, maxdegree, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ad(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_ad(graph, &st, kernel));
 
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_ad(graph, expected, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_exp_ad(graph, expected, kernel, &st,
 					   maxdegree, agebins));
       }
 
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_ad(graph, kernel, &st, maxdegree,
+	IGRAPH_CHECK(igraph_revolver_error_ad(graph, kernel, &st, maxdegree,
 					     agebins, logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver ad", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver ad", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -497,7 +497,7 @@ int igraph_evolver_ad(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_ad(const igraph_t *graph,
+int igraph_revolver_mes_ad(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -652,7 +652,7 @@ int igraph_evolver_mes_ad(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_ad(const igraph_t *graph,
+int igraph_revolver_st_ad(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel) {
   long int agebins=igraph_matrix_ncol(kernel);
@@ -707,7 +707,7 @@ int igraph_evolver_st_ad(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_ad(const igraph_t *graph,
+int igraph_revolver_exp_ad(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -813,7 +813,7 @@ int igraph_evolver_exp_ad(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_ad(const igraph_t *graph, 
+int igraph_revolver_error_ad(const igraph_t *graph, 
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    igraph_integer_t pmaxind,
@@ -879,7 +879,7 @@ int igraph_evolver_error_ad(const igraph_t *graph,
 /***********************************************/
 
 
-int igraph_evolver_ade(const igraph_t *graph,
+int igraph_revolver_ade(const igraph_t *graph,
 		       igraph_integer_t niter,
 		       igraph_integer_t agebins,
 		       const igraph_vector_t *cats,
@@ -909,14 +909,14 @@ int igraph_evolver_ade(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Evolver ade", 0, NULL);
+  igraph_progress("Revolver ade", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ade(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_ade(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					  0/*cites*/, 0/*debug*/, 0 /*debugres*/,
 					  &st, cats, nocats, maxdegree, agebins));
       
@@ -924,10 +924,10 @@ int igraph_evolver_ade(const igraph_t *graph,
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ade(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_ade(graph, &st, kernel, cats));
     } else { 
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ade(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_ade(graph, kernel, sd, norm, cites, debug,
 					  debugres, &st, cats, nocats, 
 					  maxdegree, agebins));
       
@@ -935,24 +935,24 @@ int igraph_evolver_ade(const igraph_t *graph,
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ade(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_ade(graph, &st, kernel, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_ade(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_ade(graph, expected, kernel,
 					    &st, cats, nocats, 
 					    maxdegree, agebins));
       }
       
       /* error calculattion */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_ade(graph, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_error_ade(graph, kernel, &st,
 					      cats, nocats, maxdegree, 
 					      agebins, logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver ade", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver ade", 100*(i+1)/niter, NULL);
   }
 
   igraph_vector_destroy(&st);
@@ -961,7 +961,7 @@ int igraph_evolver_ade(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_ade(const igraph_t *graph, 
+int igraph_revolver_mes_ade(const igraph_t *graph, 
 			   igraph_array3_t *kernel, 
 			   igraph_array3_t *sd,
 			   igraph_array3_t *norm,
@@ -1129,7 +1129,7 @@ int igraph_evolver_mes_ade(const igraph_t *graph,
   return 0;
 }
  
-int igraph_evolver_st_ade(const igraph_t *graph,
+int igraph_revolver_st_ade(const igraph_t *graph,
 			  igraph_vector_t *st,
 			  const igraph_array3_t *kernel,
 			  const igraph_vector_t *cats) {
@@ -1188,7 +1188,7 @@ int igraph_evolver_st_ade(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_ade(const igraph_t *graph, 
+int igraph_revolver_exp_ade(const igraph_t *graph, 
 			   igraph_array3_t *expected,
 			   const igraph_array3_t *kernel,
 			   const igraph_vector_t *st,
@@ -1201,7 +1201,7 @@ int igraph_evolver_exp_ade(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_ade(const igraph_t *graph,
+int igraph_revolver_error_ade(const igraph_t *graph,
 			     const igraph_array3_t *kernel,
 			     const igraph_vector_t *st,
 			     const igraph_vector_t *cats,
@@ -1267,7 +1267,7 @@ int igraph_evolver_error_ade(const igraph_t *graph,
 /* cited category                              */
 /***********************************************/
 
-int igraph_evolver_e(const igraph_t *graph,
+int igraph_revolver_e(const igraph_t *graph,
 		     igraph_integer_t niter,
 		     const igraph_vector_t *cats,
 		     igraph_vector_t *kernel,
@@ -1292,14 +1292,14 @@ int igraph_evolver_e(const igraph_t *graph,
   
   nocats=igraph_vector_max(cats)+1;
 
-  igraph_progress("Evolver e", 0, NULL);
+  igraph_progress("Revolver e", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_e(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_e(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					&st, cats, nocats));
       
@@ -1307,32 +1307,32 @@ int igraph_evolver_e(const igraph_t *graph,
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_e(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_e(graph, &st, kernel, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_e(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_e(graph, kernel, sd, norm, cites, debug,
 					debugres,&st, cats, nocats));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_e(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_e(graph, &st, kernel, cats));
 
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_e(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_e(graph, expected, kernel,
 					  &st, cats, nocats));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_e(graph, kernel, &st, cats, nocats,
+	IGRAPH_CHECK(igraph_revolver_error_e(graph, kernel, &st, cats, nocats,
 					    logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver e", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver e", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -1341,7 +1341,7 @@ int igraph_evolver_e(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_e(const igraph_t *graph,
+int igraph_revolver_mes_e(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *sd,
 			 igraph_vector_t *norm,
@@ -1458,7 +1458,7 @@ int igraph_evolver_mes_e(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_e(const igraph_t *graph,
+int igraph_revolver_st_e(const igraph_t *graph,
 			igraph_vector_t *st,
 			const igraph_vector_t *kernel,
 			const igraph_vector_t *cats) {
@@ -1484,7 +1484,7 @@ int igraph_evolver_st_e(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_e(const igraph_t *graph,
+int igraph_revolver_exp_e(const igraph_t *graph,
 			 igraph_vector_t *expected,
 			 const igraph_vector_t *kernel,
 			 const igraph_vector_t *st,
@@ -1494,7 +1494,7 @@ int igraph_evolver_exp_e(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_e(const igraph_t *graph,
+int igraph_revolver_error_e(const igraph_t *graph,
 			   const igraph_vector_t *kernel,
 			   const igraph_vector_t *st,
 			   const igraph_vector_t *cats,
@@ -1544,7 +1544,7 @@ int igraph_evolver_error_e(const igraph_t *graph,
 /* in-degree, cited category                   */
 /***********************************************/
 
-int igraph_evolver_de(const igraph_t *graph,
+int igraph_revolver_de(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      const igraph_vector_t *cats,
 		      igraph_matrix_t *kernel,
@@ -1573,14 +1573,14 @@ int igraph_evolver_de(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Evolver de", 0, NULL);
+  igraph_progress("Revolver de", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_de(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_de(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0/*cites*/, 0/*debug*/, 0 /*debugres*/,
 					 &st, cats, nocats, maxdegree));
       
@@ -1588,10 +1588,10 @@ int igraph_evolver_de(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_de(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_de(graph, &st, kernel, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_de(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_de(graph, kernel, sd, norm, cites, debug,
 					 debugres, &st, cats, nocats, 
 					 maxdegree));
       
@@ -1599,23 +1599,23 @@ int igraph_evolver_de(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_de(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_de(graph, &st, kernel, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_de(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_de(graph, expected, kernel,
 					   &st, cats, nocats, maxdegree)); 
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_de(graph, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_error_de(graph, kernel, &st,
 					     cats, nocats, maxdegree, 
 					     logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver de", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver de", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -1624,7 +1624,7 @@ int igraph_evolver_de(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_de(const igraph_t *graph,
+int igraph_revolver_mes_de(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -1768,7 +1768,7 @@ int igraph_evolver_mes_de(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_de(const igraph_t *graph,
+int igraph_revolver_st_de(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel,
 			 const igraph_vector_t *cats) {
@@ -1814,7 +1814,7 @@ int igraph_evolver_st_de(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_de(const igraph_t *graph,
+int igraph_revolver_exp_de(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -1825,7 +1825,7 @@ int igraph_evolver_exp_de(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_de(const igraph_t *graph,
+int igraph_revolver_error_de(const igraph_t *graph,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    const igraph_vector_t *cats,
@@ -1885,7 +1885,7 @@ int igraph_evolver_error_de(const igraph_t *graph,
 /* time since last citation                    */
 /***********************************************/
 
-int igraph_evolver_l(const igraph_t *graph,
+int igraph_revolver_l(const igraph_t *graph,
 		     igraph_integer_t niter,
 		     igraph_integer_t agebins,
 		     igraph_vector_t *kernel,
@@ -1907,14 +1907,14 @@ int igraph_evolver_l(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  igraph_progress("Evolver l", 0, NULL);
+  igraph_progress("Revolver l", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1 != niter) { 	/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_l(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_l(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					&st, agebins));
       
@@ -1922,32 +1922,32 @@ int igraph_evolver_l(const igraph_t *graph,
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_l(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_l(graph, &st, kernel));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_l(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_l(graph, kernel, sd, norm, cites, debug,
 					debugres, &st, agebins));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
 
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_l(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_l(graph, &st, kernel));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_l(graph, expected, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_exp_l(graph, expected, kernel, &st,
 					  agebins));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_l(graph, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_error_l(graph, kernel, &st,
 					    agebins, logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver l", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver l", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -1956,7 +1956,7 @@ int igraph_evolver_l(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_l(const igraph_t *graph,
+int igraph_revolver_mes_l(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *sd,
 			 igraph_vector_t *norm,
@@ -2108,7 +2108,7 @@ int igraph_evolver_mes_l(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_l(const igraph_t *graph,
+int igraph_revolver_st_l(const igraph_t *graph,
 			igraph_vector_t *st,
 			const igraph_vector_t *kernel) {
   long int agebins=igraph_vector_size(kernel)-1;
@@ -2163,7 +2163,7 @@ int igraph_evolver_st_l(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_l(const igraph_t *graph,
+int igraph_revolver_exp_l(const igraph_t *graph,
 			 igraph_vector_t *expected,
 			 const igraph_vector_t *kernel,
 			 const igraph_vector_t *st,
@@ -2172,7 +2172,7 @@ int igraph_evolver_exp_l(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_l(const igraph_t *graph,
+int igraph_revolver_error_l(const igraph_t *graph,
 			   const igraph_vector_t *kernel,
 			   const igraph_vector_t *st,
 			   igraph_integer_t pagebins,
@@ -2234,7 +2234,7 @@ int igraph_evolver_error_l(const igraph_t *graph,
 /* degree, time since last citation            */
 /***********************************************/
 
-int igraph_evolver_dl(const igraph_t *graph,
+int igraph_revolver_dl(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      igraph_integer_t agebins,
 		      igraph_matrix_t *kernel,
@@ -2260,14 +2260,14 @@ int igraph_evolver_dl(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
 
-  igraph_progress("Evolver dl", 0, NULL);
+  igraph_progress("Revolver dl", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1 != niter) { 	/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_dl(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_dl(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					 &st, maxdegree, agebins));
       
@@ -2275,32 +2275,32 @@ int igraph_evolver_dl(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_dl(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_dl(graph, &st, kernel));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_dl(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_dl(graph, kernel, sd, norm, cites, debug,
 					debugres, &st, maxdegree, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
 
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_dl(graph, &st, kernel));
+      IGRAPH_CHECK(igraph_revolver_st_dl(graph, &st, kernel));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_dl(graph, expected, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_exp_dl(graph, expected, kernel, &st,
 					   maxdegree, agebins));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_dl(graph, kernel, &st, maxdegree,
+	IGRAPH_CHECK(igraph_revolver_error_dl(graph, kernel, &st, maxdegree,
 					     agebins, logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver dl", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver dl", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -2309,7 +2309,7 @@ int igraph_evolver_dl(const igraph_t *graph,
   return 0;
 }
   
-int igraph_evolver_mes_dl(const igraph_t *graph,
+int igraph_revolver_mes_dl(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -2471,7 +2471,7 @@ int igraph_evolver_mes_dl(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_dl(const igraph_t *graph,
+int igraph_revolver_st_dl(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel) {
   long int agebins=igraph_matrix_ncol(kernel)-1;
@@ -2532,7 +2532,7 @@ int igraph_evolver_st_dl(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_dl(const igraph_t *graph,
+int igraph_revolver_exp_dl(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -2542,7 +2542,7 @@ int igraph_evolver_exp_dl(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_dl(const igraph_t *graph,
+int igraph_revolver_error_dl(const igraph_t *graph,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    igraph_integer_t pmaxind,
@@ -2609,7 +2609,7 @@ int igraph_evolver_error_dl(const igraph_t *graph,
 /* cited category, time since last citation    */
 /***********************************************/
 
-int igraph_evolver_el(const igraph_t *graph,
+int igraph_revolver_el(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      const igraph_vector_t *cats,
 		      igraph_integer_t agebins,
@@ -2639,14 +2639,14 @@ int igraph_evolver_el(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
 
-  igraph_progress("Evolver el", 0, NULL);
+  igraph_progress("Revolver el", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1 != niter) { 	/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_el(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_el(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					 &st, cats, nocats, agebins));
       
@@ -2654,32 +2654,32 @@ int igraph_evolver_el(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_el(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_el(graph, &st, kernel, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_el(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_el(graph, kernel, sd, norm, cites, debug,
 					 debugres, &st, cats, nocats, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
 
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_el(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_el(graph, &st, kernel, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_el(graph, expected, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_exp_el(graph, expected, kernel, &st,
 					   cats, nocats, agebins));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_el(graph, kernel, &st, cats, nocats,
+	IGRAPH_CHECK(igraph_revolver_error_el(graph, kernel, &st, cats, nocats,
 					     agebins, logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver el", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver el", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -2688,7 +2688,7 @@ int igraph_evolver_el(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_el(const igraph_t *graph,
+int igraph_revolver_mes_el(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -2850,7 +2850,7 @@ int igraph_evolver_mes_el(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_el(const igraph_t *graph,
+int igraph_revolver_st_el(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel,
 			 const igraph_vector_t *cats) {
@@ -2910,7 +2910,7 @@ int igraph_evolver_st_el(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_el(const igraph_t *graph,
+int igraph_revolver_exp_el(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -2921,7 +2921,7 @@ int igraph_evolver_exp_el(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_el(const igraph_t *graph,
+int igraph_revolver_error_el(const igraph_t *graph,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    const igraph_vector_t *cats,
@@ -2986,7 +2986,7 @@ int igraph_evolver_error_el(const igraph_t *graph,
 /* recent in-degree                            */
 /***********************************************/
 
-int igraph_evolver_r(const igraph_t *graph,
+int igraph_revolver_r(const igraph_t *graph,
 		     igraph_integer_t niter,
 		     igraph_integer_t window,
 		     igraph_vector_t *kernel,
@@ -3032,14 +3032,14 @@ int igraph_evolver_r(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  igraph_progress("Evolver r", 0, NULL);
+  igraph_progress("Revolver r", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1!=niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_r(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
+      IGRAPH_CHECK(igraph_revolver_mes_r(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					&st, window, maxdegree));
       
@@ -3047,32 +3047,32 @@ int igraph_evolver_r(const igraph_t *graph,
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_r(graph, &st, kernel, window));
+      IGRAPH_CHECK(igraph_revolver_st_r(graph, &st, kernel, window));
     } else {			/* last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_r(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_r(graph, kernel, sd, norm, cites, debug,
 					debugres, &st, window, maxdegree));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_r(graph, &st, kernel, window));
+      IGRAPH_CHECK(igraph_revolver_st_r(graph, &st, kernel, window));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_r(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_r(graph, expected, kernel,
 					  &st, window, maxdegree));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_r(graph, kernel, &st, window, maxdegree,
+	IGRAPH_CHECK(igraph_revolver_error_r(graph, kernel, &st, window, maxdegree,
 					    logprob, lognull));
       }
     }
     
-    igraph_progress("Evolver r", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver r", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3080,7 +3080,7 @@ int igraph_evolver_r(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_r(const igraph_t *graph,
+int igraph_revolver_mes_r(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *sd,
 			 igraph_vector_t *norm,
@@ -3231,7 +3231,7 @@ int igraph_evolver_mes_r(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_r(const igraph_t *graph,
+int igraph_revolver_st_r(const igraph_t *graph,
 			igraph_vector_t *st,
 			const igraph_vector_t *kernel,
 			igraph_integer_t pwindow) {
@@ -3284,7 +3284,7 @@ int igraph_evolver_st_r(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_r(const igraph_t *graph,
+int igraph_revolver_exp_r(const igraph_t *graph,
 			 igraph_vector_t *expected,
 			 const igraph_vector_t *kernel,
 			 const igraph_vector_t *st,
@@ -3294,7 +3294,7 @@ int igraph_evolver_exp_r(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_r(const igraph_t *graph,
+int igraph_revolver_error_r(const igraph_t *graph,
 			   const igraph_vector_t *kernel,
 			   const igraph_vector_t *st,
 			   igraph_integer_t pwindow,
@@ -3364,7 +3364,7 @@ int igraph_evolver_error_r(const igraph_t *graph,
 /* age, recent in-degree                       */
 /***********************************************/
 
-int igraph_evolver_ar(const igraph_t *graph,
+int igraph_revolver_ar(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      igraph_integer_t agebins,
 		      igraph_integer_t window,
@@ -3411,14 +3411,14 @@ int igraph_evolver_ar(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  igraph_progress("Evolver ar", 0, NULL);
+  igraph_progress("Revolver ar", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1!=niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ar(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
+      IGRAPH_CHECK(igraph_revolver_mes_ar(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					 &st, agebins, window, maxdegree));
       
@@ -3426,33 +3426,33 @@ int igraph_evolver_ar(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ar(graph, &st, kernel, window));
+      IGRAPH_CHECK(igraph_revolver_st_ar(graph, &st, kernel, window));
     } else {			/* last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ar(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_ar(graph, kernel, sd, norm, cites, debug,
 					debugres, &st, agebins, window, maxdegree));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ar(graph, &st, kernel, window));
+      IGRAPH_CHECK(igraph_revolver_st_ar(graph, &st, kernel, window));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_ar(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_ar(graph, expected, kernel,
 					  &st, agebins, window, maxdegree));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_ar(graph, kernel, &st, 
+	IGRAPH_CHECK(igraph_revolver_error_ar(graph, kernel, &st, 
 					     agebins, window, maxdegree,
 					     logprob, lognull));
       }
     }
     
-    igraph_progress("Evolver ar", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver ar", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3460,7 +3460,7 @@ int igraph_evolver_ar(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_ar(const igraph_t *graph,
+int igraph_revolver_mes_ar(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -3635,7 +3635,7 @@ int igraph_evolver_mes_ar(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_ar(const igraph_t *graph,
+int igraph_revolver_st_ar(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel,
 			 igraph_integer_t pwindow) {
@@ -3701,7 +3701,7 @@ int igraph_evolver_st_ar(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_ar(const igraph_t *graph,
+int igraph_revolver_exp_ar(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -3712,7 +3712,7 @@ int igraph_evolver_exp_ar(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_ar(const igraph_t *graph,
+int igraph_revolver_error_ar(const igraph_t *graph,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    igraph_integer_t pagebins,
@@ -3788,7 +3788,7 @@ int igraph_evolver_error_ar(const igraph_t *graph,
 /* in-degree, citing category                  */
 /***********************************************/
 
-int igraph_evolver_di(const igraph_t *graph,
+int igraph_revolver_di(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      const igraph_vector_t *cats,
 		      igraph_matrix_t *kernel,
@@ -3817,14 +3817,14 @@ int igraph_evolver_di(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Evolver di", 0, NULL);
+  igraph_progress("Revolver di", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_di(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_di(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0/*cites*/, 0/*debug*/, 0 /*debugres*/,
 					 &st, cats, nocats, maxdegree));
       
@@ -3832,10 +3832,10 @@ int igraph_evolver_di(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_di(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_di(graph, &st, kernel, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_di(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_di(graph, kernel, sd, norm, cites, debug,
 					 debugres, &st, cats, nocats, 
 					 maxdegree));
       
@@ -3843,23 +3843,23 @@ int igraph_evolver_di(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_di(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_di(graph, &st, kernel, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_di(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_di(graph, expected, kernel,
 					   &st, cats, nocats, maxdegree)); 
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_di(graph, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_error_di(graph, kernel, &st,
 					     cats, nocats, maxdegree, 
 					     logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver di", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver di", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3868,7 +3868,7 @@ int igraph_evolver_di(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_di(const igraph_t *graph,
+int igraph_revolver_mes_di(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -4017,7 +4017,7 @@ int igraph_evolver_mes_di(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_di(const igraph_t *graph,
+int igraph_revolver_st_di(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel,
 			 const igraph_vector_t *cats) {
@@ -4074,7 +4074,7 @@ int igraph_evolver_st_di(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_di(const igraph_t *graph,
+int igraph_revolver_exp_di(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -4085,7 +4085,7 @@ int igraph_evolver_exp_di(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_di(const igraph_t *graph,
+int igraph_revolver_error_di(const igraph_t *graph,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    const igraph_vector_t *cats,
@@ -4145,7 +4145,7 @@ int igraph_evolver_error_di(const igraph_t *graph,
 /* age, in-degree, citing category             */
 /***********************************************/
 
-int igraph_evolver_adi(const igraph_t *graph,
+int igraph_revolver_adi(const igraph_t *graph,
 		       igraph_integer_t niter,
 		       igraph_integer_t agebins,
 		       const igraph_vector_t *cats,
@@ -4175,14 +4175,14 @@ int igraph_evolver_adi(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Evolver adi", 0, NULL);
+  igraph_progress("Revolver adi", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_adi(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_adi(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					  0/*cites*/, 0/*debug*/, 0 /*debugres*/,
 					  &st, cats, nocats, maxdegree, agebins));
       
@@ -4190,10 +4190,10 @@ int igraph_evolver_adi(const igraph_t *graph,
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_adi(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_adi(graph, &st, kernel, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_adi(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_adi(graph, kernel, sd, norm, cites, debug,
 					  debugres, &st, cats, nocats, 
 					  maxdegree, agebins));
       
@@ -4201,23 +4201,23 @@ int igraph_evolver_adi(const igraph_t *graph,
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_adi(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_adi(graph, &st, kernel, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_adi(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_adi(graph, expected, kernel,
 					    &st, cats, nocats, maxdegree, agebins)); 
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_adi(graph, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_error_adi(graph, kernel, &st,
 					      cats, nocats, maxdegree, agebins,
 					      logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver adi", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver adi", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -4226,7 +4226,7 @@ int igraph_evolver_adi(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_adi(const igraph_t *graph,
+int igraph_revolver_mes_adi(const igraph_t *graph,
 			   igraph_array3_t *kernel,
 			   igraph_array3_t *sd,
 			   igraph_array3_t *norm,
@@ -4402,7 +4402,7 @@ int igraph_evolver_mes_adi(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_adi(const igraph_t *graph,
+int igraph_revolver_st_adi(const igraph_t *graph,
 			  igraph_vector_t *st,
 			  const igraph_array3_t *kernel,
 			  const igraph_vector_t *cats) {
@@ -4472,7 +4472,7 @@ int igraph_evolver_st_adi(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_adi(const igraph_t *graph,
+int igraph_revolver_exp_adi(const igraph_t *graph,
 			   igraph_array3_t *expected,
 			   const igraph_array3_t *kernel,
 			   const igraph_vector_t *st,
@@ -4484,7 +4484,7 @@ int igraph_evolver_exp_adi(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_adi(const igraph_t *graph,
+int igraph_revolver_error_adi(const igraph_t *graph,
 			     const igraph_array3_t *kernel,
 			     const igraph_vector_t *st,
 			     const igraph_vector_t *cats,
@@ -4548,7 +4548,7 @@ int igraph_evolver_error_adi(const igraph_t *graph,
 /* time since last citation, citing category   */
 /***********************************************/
 
-int igraph_evolver_il(const igraph_t *graph,
+int igraph_revolver_il(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      igraph_integer_t agebins,
 		      const igraph_vector_t *cats,
@@ -4574,14 +4574,14 @@ int igraph_evolver_il(const igraph_t *graph,
   
   nocats=igraph_vector_max(cats)+1;
 
-  igraph_progress("Evolver il", 0, NULL);
+  igraph_progress("Revolver il", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     if (i+1 != niter) { 	/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_il(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_il(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
 					 &st, cats, nocats, agebins));
       
@@ -4589,32 +4589,32 @@ int igraph_evolver_il(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_il(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_il(graph, &st, kernel, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_il(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_il(graph, kernel, sd, norm, cites, debug,
 					 debugres, &st, cats, nocats, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
 
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_il(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_il(graph, &st, kernel, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_il(graph, expected, kernel, &st,
+	IGRAPH_CHECK(igraph_revolver_exp_il(graph, expected, kernel, &st,
 					   cats, nocats, agebins));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_il(graph, kernel, &st, cats, nocats,
+	IGRAPH_CHECK(igraph_revolver_error_il(graph, kernel, &st, cats, nocats,
 					     agebins, logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver il", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver il", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -4623,7 +4623,7 @@ int igraph_evolver_il(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_il(const igraph_t *graph,
+int igraph_revolver_mes_il(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -4798,7 +4798,7 @@ int igraph_evolver_mes_il(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_il(const igraph_t *graph,
+int igraph_revolver_st_il(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel,
 			 const igraph_vector_t *cats) {
@@ -4871,7 +4871,7 @@ int igraph_evolver_st_il(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_il(const igraph_t *graph,
+int igraph_revolver_exp_il(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -4882,7 +4882,7 @@ int igraph_evolver_exp_il(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_il(const igraph_t *graph,
+int igraph_revolver_error_il(const igraph_t *graph,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    const igraph_vector_t *cats,
@@ -4947,7 +4947,7 @@ int igraph_evolver_error_il(const igraph_t *graph,
 /* in-degree, citing category                  */
 /***********************************************/
 
-int igraph_evolver_ir(const igraph_t *graph,
+int igraph_revolver_ir(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      igraph_integer_t window,
 		      const igraph_vector_t *cats,
@@ -4997,14 +4997,14 @@ int igraph_evolver_ir(const igraph_t *graph,
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(1);
   
-  igraph_progress("Evolver di", 0, NULL);
+  igraph_progress("Revolver di", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ir(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_ir(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0/*cites*/, 0/*debug*/, 0 /*debugres*/,
 					 &st, window, cats, nocats, maxdegree));
       
@@ -5012,10 +5012,10 @@ int igraph_evolver_ir(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ir(graph, &st, kernel, window, cats));
+      IGRAPH_CHECK(igraph_revolver_st_ir(graph, &st, kernel, window, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_ir(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_ir(graph, kernel, sd, norm, cites, debug,
 					 debugres, &st, window, cats, nocats, 
 					 maxdegree));
       
@@ -5023,23 +5023,23 @@ int igraph_evolver_ir(const igraph_t *graph,
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_ir(graph, &st, kernel, window, cats));
+      IGRAPH_CHECK(igraph_revolver_st_ir(graph, &st, kernel, window, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_ir(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_ir(graph, expected, kernel,
 					   &st, window, cats, nocats, maxdegree)); 
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_ir(graph, kernel, &st, window,
+	IGRAPH_CHECK(igraph_revolver_error_ir(graph, kernel, &st, window,
 					     cats, nocats, maxdegree, 
 					     logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver di", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver di", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -5048,7 +5048,7 @@ int igraph_evolver_ir(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_ir(const igraph_t *graph,
+int igraph_revolver_mes_ir(const igraph_t *graph,
 			  igraph_matrix_t *kernel,
 			  igraph_matrix_t *sd,
 			  igraph_matrix_t *norm,
@@ -5222,7 +5222,7 @@ int igraph_evolver_mes_ir(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_ir(const igraph_t *graph,
+int igraph_revolver_st_ir(const igraph_t *graph,
 			 igraph_vector_t *st,
 			 const igraph_matrix_t *kernel,
 			 igraph_integer_t pwindow,
@@ -5295,7 +5295,7 @@ int igraph_evolver_st_ir(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_ir(const igraph_t *graph,
+int igraph_revolver_exp_ir(const igraph_t *graph,
 			  igraph_matrix_t *expected,
 			  const igraph_matrix_t *kernel,
 			  const igraph_vector_t *st,
@@ -5307,7 +5307,7 @@ int igraph_evolver_exp_ir(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_ir(const igraph_t *graph,
+int igraph_revolver_error_ir(const igraph_t *graph,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
 			    igraph_integer_t pwindow,
@@ -5378,7 +5378,7 @@ int igraph_evolver_error_ir(const igraph_t *graph,
 /* age, recent in-degree, citing category      */
 /***********************************************/
 
-int igraph_evolver_air(const igraph_t *graph,
+int igraph_revolver_air(const igraph_t *graph,
 		       igraph_integer_t niter,
 		       igraph_integer_t window,
 		       igraph_integer_t agebins,
@@ -5400,7 +5400,7 @@ int igraph_evolver_air(const igraph_t *graph,
   igraph_integer_t nocats;
   igraph_vector_t neis;
     
-  igraph_progress("Evolver air", 0, NULL);
+  igraph_progress("Revolver air", 0, NULL);
 
   nocats=igraph_vector_max(cats)+1;
 
@@ -5437,7 +5437,7 @@ int igraph_evolver_air(const igraph_t *graph,
     
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_air(graph, kernel, 0 /*sd*/, 0 /*norm*/,
+      IGRAPH_CHECK(igraph_revolver_mes_air(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					  0/*cites*/, 0/*debug*/, 0 /*debugres*/,
 					  &st, window, 
 					  cats, nocats, maxdegree, agebins));
@@ -5446,10 +5446,10 @@ int igraph_evolver_air(const igraph_t *graph,
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_air(graph, &st, kernel, window, cats));
+      IGRAPH_CHECK(igraph_revolver_st_air(graph, &st, kernel, window, cats));
     } else {
       /* measure */
-      IGRAPH_CHECK(igraph_evolver_mes_air(graph, kernel, sd, norm, cites, debug,
+      IGRAPH_CHECK(igraph_revolver_mes_air(graph, kernel, sd, norm, cites, debug,
 					  debugres, &st, window, cats, nocats, 
 					  maxdegree, agebins));
       
@@ -5457,24 +5457,24 @@ int igraph_evolver_air(const igraph_t *graph,
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_evolver_st_air(graph, &st, kernel, window, cats));
+      IGRAPH_CHECK(igraph_revolver_st_air(graph, &st, kernel, window, cats));
       
       /* expected number of citations */
       if (expected) {
-	IGRAPH_CHECK(igraph_evolver_exp_air(graph, expected, kernel,
+	IGRAPH_CHECK(igraph_revolver_exp_air(graph, expected, kernel,
 					    &st, window, 
 					    cats, nocats, maxdegree, agebins)); 
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_evolver_error_air(graph, kernel, &st, window,
+	IGRAPH_CHECK(igraph_revolver_error_air(graph, kernel, &st, window,
 					      cats, nocats, maxdegree, agebins,
 					      logprob, lognull));
       }
     }
 
-    igraph_progress("Evolver air", 100*(i+1)/niter, NULL);
+    igraph_progress("Revolver air", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -5483,7 +5483,7 @@ int igraph_evolver_air(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_mes_air(const igraph_t *graph,
+int igraph_revolver_mes_air(const igraph_t *graph,
 			   igraph_array3_t *kernel,
 			   igraph_array3_t *sd,
 			   igraph_array3_t *norm,
@@ -5686,7 +5686,7 @@ int igraph_evolver_mes_air(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_st_air(const igraph_t *graph,
+int igraph_revolver_st_air(const igraph_t *graph,
 			  igraph_vector_t *st,
 			  const igraph_array3_t *kernel,
 			  igraph_integer_t pwindow,
@@ -5773,7 +5773,7 @@ int igraph_evolver_st_air(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_exp_air(const igraph_t *graph,
+int igraph_revolver_exp_air(const igraph_t *graph,
 			   igraph_array3_t *expected,
 			   const igraph_array3_t *kernel,
 			   const igraph_vector_t *st,
@@ -5786,7 +5786,7 @@ int igraph_evolver_exp_air(const igraph_t *graph,
   return 0;
 }
 
-int igraph_evolver_error_air(const igraph_t *graph,
+int igraph_revolver_error_air(const igraph_t *graph,
 			     const igraph_array3_t *kernel,
 			     const igraph_vector_t *st,
 			     igraph_integer_t pwindow,
