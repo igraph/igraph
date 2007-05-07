@@ -885,7 +885,8 @@ int igraph_i_xml_escape(char* src, char** dest) {
  * GraphML is an XML-based file format for representing various types of
  * graphs. Currently only the most basic import functionality is implemented
  * in igraph: it can read GraphML files without nested graphs and hyperedges.
- * Attributes of the graph are not loaded yet.
+ * Attributes of the graph are loaded only if an attribute interface
+ * is attached, ie. if you use igraph from R or Python.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.
  * \param index If the GraphML file contains more than one graph, the one

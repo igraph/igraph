@@ -783,6 +783,40 @@ int igraph_i_read_graph_graphdb_getword(FILE *instream) {
   }
 }
 
+/**
+ * \function igraph_read_graph_graphdb
+ * Read a graph in the binary graph database format.
+ * 
+ * This is a binary format, used in the graph database
+ * for isomorphism testing (http://amalfi.dis.unina.it/graph/)
+ * From the graph database homepage
+ * (http://amalfi.dis.unina.it/graph/db/doc/graphdbat-2.html):
+ * </para>
+ * 
+ * \blockquote <para>
+ * The graphs are stored in a compact binary format, one graph per
+ * file. The file is composed of 16 bit words, which are represented
+ * using the so-called little-endian convention, i.e. the least
+ * significant byte of the word is stored first.</para>
+ * 
+ * <para>
+ * Then, for each node, the file contains the list of edges coming
+ * out of the node itself. The list is represented by a word encoding
+ * its length, followed by a word for each edge, representing the
+ * destination node of the edge. Node numeration is 0-based, so the
+ * first node of the graph has index 0.</para> \endblockquote
+ * 
+ * <para>
+ * Only unlabelled graphs are implemented.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param instream The stream to read from.
+ * \param directed Logical scalar, whether to create a directed graph.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the 
+ * number of edges.
+ */
+
 int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream, 
 			      igraph_bool_t directed) {
   

@@ -20,6 +20,10 @@
 <!-- doxrox-include igraph_write_graph_dimacs -->
 </section>
 
+<section><title>Binary formats</title>
+<!-- doxrox-include igraph_read_graph_graphdb -->
+</section>
+
 <section><title>GraphML format</title>
 <!-- doxrox-include igraph_read_graph_graphml -->
 <!-- doxrox-include igraph_write_graph_graphml -->
