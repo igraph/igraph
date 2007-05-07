@@ -1,5 +1,8 @@
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/structural.properties.R (girth) : added
+	* interfaces/R/src/rinterface.c (R_igraph_girth) : added
+
 	* interfaces/R/igraph/R/print.R (print.igraph) : format edge list better
 
 	* interfaces/R/igraph/R/print.R (print.igraph) : handle 

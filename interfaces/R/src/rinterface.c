@@ -6000,6 +6000,36 @@ SEXP R_igraph_community_leading_eigenvector_step(SEXP graph,
   return result;
 }
 
+SEXP R_igraph_girth(SEXP graph, SEXP pcircle) {
+  
+  igraph_t g;
+  igraph_vector_t circle, *ppcircle=0;
+  igraph_integer_t girth;
+  SEXP result, names;
+  
+  R_igraph_before();
+
+  R_SEXP_to_igraph(graph, &g);
+  if (LOGICAL(pcircle)[0]) { igraph_vector_init(&circle, 0); ppcircle=&circle; }
+
+  igraph_girth(&g, &girth, ppcircle);
+
+  PROTECT(result=NEW_LIST(2));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
+  REAL(VECTOR_ELT(result, 0))[0]=girth;
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(ppcircle));
+  if (ppcircle) { igraph_vector_destroy(ppcircle); }
+  PROTECT(names=NEW_CHARACTER(2));
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("girth"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("circle"));
+  SET_NAMES(result, names);
+
+  R_igraph_after();
+  
+  UNPROTECT(2);
+  return result;
+}
+
 SEXP R_igraph_evolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
 			SEXP verbose) {

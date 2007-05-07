@@ -531,3 +531,11 @@ topological.sort <- function(graph, mode="out") {
   .Call("R_igraph_topological_sorting", graph, as.numeric(mode),
         PACKAGE="igraph")
 }
+
+girth <- function(graph, circle=TRUE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_girth", graph, as.logical(circle),
+        PACKAGE="igraph")
+}

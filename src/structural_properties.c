@@ -26,6 +26,7 @@
 #include "random.h"
 
 #include <string.h>
+#include <limits.h>
 
 /** 
  * \section about_structural
@@ -3674,3 +3675,170 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t 
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
+
+/**
+ * \function igraph_girth
+ * \brief The girth of a graph is the length of the shortest circle in it.
+ * 
+ * </para><para>
+ * The current implementation works for undirected graphs only, 
+ * directed graphs are treated as undirected graphs. Loop edges and
+ * multiple edges are ignored.
+ * </para><para>
+ * If the graph is a forest (ie. acyclic), then zero is returned.
+ * </para><para>
+ * This implementation is based on Alon Itai and Michael Rodeh:
+ * Finding a minimum circuit in a graph
+ * \emb Proceedings of the ninth annual ACM symposium on Theory of
+ * computing \eme, 1-10, 1977. The first implementation of this
+ * function was done by Keith Briggs, thanks Keith.
+ * \param graph The input graph.
+ * \param girth Pointer to an integer, if not \c NULL then the result
+ *     will be stored here.
+ * \param circle Pointer to an initialized vector, the vertex ids in
+ *     the shortest circle will be stored here. If \c NULL then it is
+ *     ignored. 
+ * \return Error code.
+ *
+ * Time complexity: O((|V|+|E|)^2), |V| is the number of vertices, |E|
+ * is the number of edges in the general case. If the graph has no
+ * circles at all then the function needs O(|V|+|E|) time to realize
+ * this and then it stops.
+ */
+
+int igraph_girth(const igraph_t *graph, igraph_integer_t *girth, 
+		 igraph_vector_t *circle) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_dqueue_t q;
+  igraph_i_lazy_adjlist_t adjlist;
+  long int mincirc=LONG_MAX, minvertex=0;
+  long int node;
+  igraph_bool_t triangle=0;
+  igraph_vector_t *neis;
+  igraph_vector_t level;
+  long int stoplevel=no_of_nodes+1;
+  igraph_bool_t anycircle=0;
+  long int t1=0, t2=0;
+  
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, 
+					  IGRAPH_I_SIMPLIFY));
+  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &adjlist);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_VECTOR_INIT_FINALLY(&level, no_of_nodes);
+  
+  for (node=0; !triangle && node<no_of_nodes; node++) {
+
+    /* Are there circles in this graph at all? */
+    if (node==1 && anycircle==0) { 
+      igraph_bool_t conn;
+      IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
+      if (conn) {
+	/* No, there are none */
+	break;
+      }
+    }
+
+    anycircle=0;
+    igraph_dqueue_clear(&q);
+    igraph_vector_null(&level);
+    IGRAPH_CHECK(igraph_dqueue_push(&q, node));
+    VECTOR(level)[node]=1;    
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    while (!anycircle && !igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
+      long int actlevel=VECTOR(level)[actnode];
+      long int i, n;
+
+      if (actlevel>=stoplevel) { break; }
+
+      neis=igraph_i_lazy_adjlist_get(&adjlist, actnode);
+      n=igraph_vector_size(neis);
+      for (i=0; i<n; i++) {
+	long int nei=VECTOR(*neis)[i];
+	long int neilevel=VECTOR(level)[nei];
+	if (neilevel != 0 && neilevel==actlevel-1) {
+	  continue;
+	}
+	if (VECTOR(level)[nei] != 0) {
+	  /* found circle */
+	  stoplevel=neilevel;
+	  if (actlevel<mincirc) {
+	    /* Is it a minimum circle? */
+	    mincirc=actlevel+neilevel-1;
+	    minvertex=node;
+	    t1=actnode; t2=nei;
+	    if (neilevel==2) {
+	      /* Is it a triangle? */
+	      triangle=1;
+	    }	    
+	  }
+	  anycircle=1;
+	  if (neilevel==actlevel) {
+	    break;
+	  }
+	} else {
+	  igraph_dqueue_push(&q, nei);
+	  VECTOR(level)[nei]=actlevel+1;
+	}
+      }
+
+    } /* while q !empty */
+  } /* node */
+
+  if (girth) {
+    if (mincirc==LONG_MAX) {
+      *girth=mincirc=0;
+    } else {
+      *girth=mincirc;
+    }
+  }
+
+  /* Store the actual circle, if needed */
+  if (circle) {
+    IGRAPH_CHECK(igraph_vector_resize(circle, mincirc));
+    if (mincirc != 0) {
+      long int i, n, idx=0;
+      igraph_dqueue_clear(&q);
+      igraph_vector_null(&level); /* used for father pointers */
+#define FATHER(x) (VECTOR(level)[(x)])
+      IGRAPH_CHECK(igraph_dqueue_push(&q, minvertex));
+      FATHER(minvertex)=minvertex;
+      while (FATHER(t1)==0 || FATHER(t2)==0) {
+	long int actnode=igraph_dqueue_pop(&q);
+	neis=igraph_i_lazy_adjlist_get(&adjlist, actnode);
+	n=igraph_vector_size(neis);
+	for (i=0; i<n; i++) {
+	  long int nei=VECTOR(*neis)[i];
+	  if (FATHER(nei) == 0) {
+	    FATHER(nei)=actnode+1;
+	    igraph_dqueue_push(&q, nei);
+	  }
+	}
+      }  /* while q !empty */
+      /* Ok, now use FATHER to create the path */
+      while (t1!=minvertex) {
+	VECTOR(*circle)[idx++]=t1;
+	t1=FATHER(t1)-1;
+      }
+      VECTOR(*circle)[idx]=minvertex;
+      idx=mincirc-1;
+      while (t2!=minvertex) {
+	VECTOR(*circle)[idx--]=t2;
+	t2=FATHER(t2)-1;
+      }
+    } /* anycircle */
+  } /* circle */
+#undef FATHER
+
+  igraph_vector_destroy(&level);
+  igraph_dqueue_destroy(&q);
+  igraph_i_lazy_adjlist_destroy(&adjlist);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  return 0;
+}
+    
+    

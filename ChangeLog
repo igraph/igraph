@@ -1,3 +1,7 @@
+2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_girth) : added
+
 2007-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/evolver.c (igraph_evolver_air, igraph_evolver_mes_air)

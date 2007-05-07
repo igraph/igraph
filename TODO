@@ -7,9 +7,9 @@ These are needed for 0.4:
   o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
     index.
   o igraph_vs_seq bug, the last node is omitted???
-  o girth
   o some heuristics for vertex and edge commectivity
   o rename evolver functions
+  o document graphdb format in read.graph
 
 o R interface: curved edges in plots (tkplot and plot)
 o attribute support in to_undirected

@@ -19,6 +19,7 @@
 <!-- doxrox-include igraph_get_all_shortest_paths -->
 <!-- doxrox-include igraph_average_path_length -->
 <!-- doxrox-include igraph_diameter -->
+<!-- doxrox-include igraph_girth -->
 </section>
 
 <section><title>Neighborhood of a vertex</title>
