@@ -93,3 +93,8 @@ AT_SETUP([Multiple edges test (igraph_is_multiple): ])
 AT_KEYWORDS([multiple edge parallel edge igraph_is_multiple])
 AT_COMPILE_CHECK([simple/igraph_is_multiple.c], [simple/igraph_is_multiple.out])
 AT_CLEANUP
+
+AT_SETUP([Girth (igraph_girth): ])
+AT_KEYWORDS([girth igraph_girth])
+AT_COMPILE_CHECK([simple/igraph_girth.c])
+AT_CLEANUP

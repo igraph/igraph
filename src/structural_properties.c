@@ -3716,7 +3716,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
   long int node;
   igraph_bool_t triangle=0;
   igraph_vector_t *neis;
-  igraph_vector_t level;
+  igraph_vector_long_t level;
   long int stoplevel=no_of_nodes+1;
   igraph_bool_t anycircle=0;
   long int t1=0, t2=0;
@@ -3725,7 +3725,8 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 					  IGRAPH_I_SIMPLIFY));
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &adjlist);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
-  IGRAPH_VECTOR_INIT_FINALLY(&level, no_of_nodes);
+  IGRAPH_CHECK(igraph_vector_long_init(&level, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &level);
   
   for (node=0; !triangle && node<no_of_nodes; node++) {
 
@@ -3741,7 +3742,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 
     anycircle=0;
     igraph_dqueue_clear(&q);
-    igraph_vector_null(&level);
+    igraph_vector_long_null(&level);
     IGRAPH_CHECK(igraph_dqueue_push(&q, node));
     VECTOR(level)[node]=1;    
     
@@ -3759,25 +3760,26 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
       for (i=0; i<n; i++) {
 	long int nei=VECTOR(*neis)[i];
 	long int neilevel=VECTOR(level)[nei];
-	if (neilevel != 0 && neilevel==actlevel-1) {
-	  continue;
-	}
-	if (VECTOR(level)[nei] != 0) {
-	  /* found circle */
-	  stoplevel=neilevel;
-	  anycircle=1;
-	  if (actlevel<mincirc) {
-	    /* Is it a minimum circle? */
-	    mincirc=actlevel+neilevel-1;
-	    minvertex=node;
-	    t1=actnode; t2=nei;
-	    if (neilevel==2) {
-	      /* Is it a triangle? */
-	      triangle=1;
-	    }	    
-	  }
-	  if (neilevel==actlevel) {
-	    break;
+	if (neilevel != 0) {
+	  if (neilevel==actlevel-1) {
+	    continue;
+	  } else {
+	    /* found circle */
+	    stoplevel=neilevel;
+	    anycircle=1;
+	    if (actlevel<mincirc) {
+	      /* Is it a minimum circle? */
+	      mincirc=actlevel+neilevel-1;
+	      minvertex=node;
+	      t1=actnode; t2=nei;
+	      if (neilevel==2) {
+		/* Is it a triangle? */
+		triangle=1;
+	      }	    
+	    }
+	    if (neilevel==actlevel) {
+	      break;
+	    }
 	  }
 	} else {
 	  igraph_dqueue_push(&q, nei);
@@ -3802,7 +3804,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     if (mincirc != 0) {
       long int i, n, idx=0;
       igraph_dqueue_clear(&q);
-      igraph_vector_null(&level); /* used for father pointers */
+      igraph_vector_long_null(&level); /* used for father pointers */
 #define FATHER(x) (VECTOR(level)[(x)])
       IGRAPH_CHECK(igraph_dqueue_push(&q, minvertex));
       FATHER(minvertex)=minvertex;
@@ -3833,7 +3835,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
   } /* circle */
 #undef FATHER
 
-  igraph_vector_destroy(&level);
+  igraph_vector_long_destroy(&level);
   igraph_dqueue_destroy(&q);
   igraph_i_lazy_adjlist_destroy(&adjlist);
   IGRAPH_FINALLY_CLEAN(3);

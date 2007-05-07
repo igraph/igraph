@@ -1,5 +1,9 @@
 2007-05-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* example/simple/igraph_girth.c : added
+
+	* src/structural_properties.c (igraph_girth) : some speedup
+
 	* src/structural_properties.c (igraph_girth) : a bug corrected
 
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
