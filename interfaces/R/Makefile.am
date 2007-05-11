@@ -17,7 +17,7 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	operators.c interrupt.c igraph_psumtree.c array.c \
 	igraph_hashtable.c foreign-graphml.c flow.c igraph_buckets.c \
         spectral_properties.c cores.c cliques.c igraph_set.c \
-	evolver.c evolver2.c community.c spmatrix.c vector_pmt.hc
+	revolver_cit.c revolver_grow.c community.c spmatrix.c vector_pmt.hc
 
 RSNAMES_F = 
 
