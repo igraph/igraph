@@ -264,3 +264,33 @@ revolver.d.d <- function(graph, vtime=V(g)$time, etime=E(g)$time, niter=5,
         PACKAGE="igraph")
 }
 
+revolver.p.p <- function(graph, events=get.graph.attribute(graph, "events"),
+                         vtime=V(g)$time, etime=E(g)$time,
+                         niter=5, sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
+                         error=TRUE, debug=matrix(nc=2, nr=0),
+                         verbose=igraph.par("verbose")) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+  if (is.null(events) || !is.list(events)) {
+    stop("events missing or not a list")
+  }
+  if (is.null(vtime)) {
+    ## TODO: calculate from events
+    stop("vtime missing")
+  }
+  if (is.null(etime)) {
+    ## TODO: calculate from events
+    stop("etime missing")
+  }
+  
+  authors <- unlist(events)
+  eventsizes <- sapply(events, length)
+  
+  .Call("R_igraph_revolver_p_p", graph, as.numeric(niter),
+        as.numeric(vtime), as.numeric(etime), as.numeric(authors),
+        as.numeric(eventsizes), as.logical(sd), as.logical(norm), as.logical(cites),
+        as.logical(expected), as.logical(error),
+        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        PACKAGE="igraph")
+}
