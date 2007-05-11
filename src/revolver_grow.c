@@ -1196,6 +1196,7 @@ int igraph_revolver_exp_p_p(const igraph_t *graph,
 			    const igraph_vector_t *authors,
 			    const igraph_vector_t *eventsizes,
 			    igraph_integer_t pmaxpapers) {
+
   /* TODO */
   return 0;
 }
@@ -1214,6 +1215,66 @@ int igraph_revolver_error_p_p(const igraph_t *graph,
 			      igraph_integer_t pmaxpapers,
 			      igraph_real_t *logprob,
 			      igraph_real_t *lognull) {
-  /* TODO */
+
+  long int no_of_events=pno_of_events;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+
+  igraph_vector_long_t papers;
+  
+  long int timestep, nptr=0, eptr=0, aptr=0, eptr_save;
+  long int edges=0, vertices=0, i;
+  
+  igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
+
+  IGRAPH_CHECK(igraph_vector_long_init(&papers, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &papers);
+
+  if (!logprob) { mylogprob=&rlogprob; }
+  if (!lognull) { mylognull=&rlognull; }
+  
+  *mylogprob=0;
+  *mylognull=0;
+  
+  for (timestep=0; timestep<no_of_events; timestep++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+  
+    while (nptr < no_of_nodes && 
+	   VECTOR(*vtime)[ (long int) VECTOR(*vtimeidx)[nptr] ] == timestep) {
+      vertices++;
+      nptr++;
+    }
+    
+    eptr_save=eptr;
+    while (eptr < no_of_edges && 
+	   VECTOR(*etime)[ (long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
+      long int edge=VECTOR(*etimeidx)[eptr];
+      long int from=IGRAPH_FROM(graph, edge);
+      long int to=IGRAPH_TO(graph, edge);
+      long int xidx=VECTOR(papers)[from];
+      long int yidx=VECTOR(papers)[to];
+      
+      igraph_real_t prob=MATRIX(*kernel, xidx, yidx)/VECTOR(*st)[timestep];
+      igraph_real_t nullprob=1.0/(vertices*(vertices-1)/2-eptr_save);
+            
+      *mylogprob += log(prob);
+      *mylognull += log(nullprob);
+      
+      edges++;
+      eptr++;
+    }
+    
+    for (i=aptr; i<aptr+VECTOR(*eventsizes)[timestep]; i++) {
+      long int aut=VECTOR(*authors)[i];
+      VECTOR(papers)[aut] += 1;
+    }
+    aptr += VECTOR(*eventsizes)[timestep];
+    
+  }
+  
+  igraph_vector_long_destroy(&papers);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }

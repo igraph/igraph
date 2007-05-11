@@ -1,5 +1,7 @@
 2007-05-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/revolver_grow.c (igraph_revolver_error_p_p) : implemented
+
 	* src/revolver_grow.c (igraph_revolver_p_p, igraph_revolver_st_p_p)
 	(igraph_revolver_mes_p_p, igraph_revolver_error_p_p) : added
 
