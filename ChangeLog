@@ -1,3 +1,8 @@
+2007-05-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/evolver2.c (igraph_revolver_d_d, igraph_revolver_mes_d_d)
+	(igraph_revolver_st_d_d, igraph_revolver_error_d_d) : added
+
 2007-05-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* example/simple/igraph_vs_seq : added

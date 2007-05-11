@@ -230,3 +230,27 @@ revolver.air <- function(graph, cats, window,
         structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
         PACKAGE="igraph")
 }
+
+revolver.d.d <- function(graph, vtime=V(g)$time, etime=E(g)$time, niter=5,
+                         sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
+                         error=TRUE, debug=matrix(nc=2, nr=0),
+                         verbose=igraph.par("verbose")) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object!")
+  }
+
+  if (is.null(vtime)) {
+    stop("vtime missing")
+  }
+  if (is.null(etime)) {
+    stop("etime missing")
+  }
+
+  .Call("R_igraph_revolver_d_d", graph, as.numeric(niter),
+        as.numeric(vtime), as.numeric(etime), 
+        as.logical(sd), as.logical(norm), as.logical(cites),
+        as.logical(expected), as.logical(error),
+        structure(as.numeric(debug), dim=dim(debug)), as.logical(verbose),
+        PACKAGE="igraph")
+}
+

@@ -1542,7 +1542,7 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
       xidx=VECTOR(degree)[ (long int)from ];
       yidx=VECTOR(degree)[ (long int)to ];
       MATRIX(notnull, xidx, yidx) += 1;
-      MATRIX(notnull, yidx, xidx) += 1;
+      MATRIX(notnull, yidx, xidx) += 1;	/* bug */
 
       ntkkval=NTKK(xidx, yidx);
       xk=VECTOR(*st)[timestep]/ntkkval;
@@ -1718,7 +1718,7 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
       akk_inc=0;
       for (i=0; i<=maxdeg; i++) {
 	akk_inc += VECTOR(ntk)[i]*MATRIX(*akk, i, 0);
-	akk_inc += VECTOR(ntk)[i]*MATRIX(*akk, i, 0);
+	akk_inc += VECTOR(ntk)[i]*MATRIX(*akk, i, 0); /* why this? */
       }
       VECTOR(*st)[timestep] += akk_inc;
       VECTOR(ntk)[0]++;
@@ -1749,7 +1749,7 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
 	akk_inc += VECTOR(ntk)[i] * MATRIX(*akk, i, yidx+1);
       }
       akk_inc += MATRIX(*akk, xidx, xidx);
-      akk_inc += MATRIX(*akk, yidx, yidx);
+      akk_inc += MATRIX(*akk, yidx, yidx); /* why twice???? */
       akk_inc -= MATRIX(*akk, xidx+1, xidx+1);
       akk_inc -= MATRIX(*akk, yidx+1, yidx+1);
 

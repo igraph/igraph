@@ -125,6 +125,8 @@ export(revolver.d, revolver.ad, revolver.ade, revolver.e, revolver.de, revolver.
        revolver.dl, revolver.el, revolver.r, revolver.ar, revolver.di, revolver.adi,
        revolver.il, revolver.ir, revolver.air)
 
+export (revolver.d.d)
+
 # isomorphism, motifs
 
 export(graph.isoclass, graph.isomorphic, graph.motifs,

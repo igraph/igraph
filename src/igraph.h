@@ -1958,6 +1958,77 @@ int igraph_revolver_error_air(const igraph_t *graph,
 			     igraph_real_t *logprob,
 			     igraph_real_t *lognull);
 
+/* Should be moved to to types.h? */
+typedef struct igraph_i_lazy_adjedgelist_t {
+  const igraph_t *graph;
+  igraph_integer_t length;
+  igraph_vector_t **adjs;
+  igraph_neimode_t mode;
+} igraph_i_lazy_adjedgelist_t;
+
+/* Non-citation networks */
+
+int igraph_revolver_d_d(const igraph_t *graph,
+			igraph_integer_t niter,
+			const igraph_vector_t *vtime,
+			const igraph_vector_t *etime,
+			igraph_matrix_t *kernel,
+			igraph_matrix_t *sd,
+			igraph_matrix_t *norm,
+			igraph_matrix_t *cites,
+			igraph_matrix_t *expected,
+			igraph_real_t *logprob,
+			igraph_real_t *lognull,
+			const igraph_matrix_t *debug,
+			igraph_vector_ptr_t *debugres);
+int igraph_revolver_mes_d_d(const igraph_t *graph, 
+			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_matrix_t *kernel,
+			    igraph_matrix_t *sd,
+			    igraph_matrix_t *norm,
+			    igraph_matrix_t *cites,
+			    const igraph_matrix_t *debug,
+			    igraph_vector_ptr_t *debugres,
+			    const igraph_vector_t *st,
+			    const igraph_vector_t *vtime,
+			    const igraph_vector_t *vtimeidx,
+			    const igraph_vector_t *etime,
+			    const igraph_vector_t *etimeidx,
+			    igraph_integer_t pno_of_events,
+			    igraph_integer_t pmaxdegree);
+int igraph_revolver_st_d_d(const igraph_t *graph,
+			   igraph_i_lazy_adjedgelist_t *adjlist,
+			   igraph_vector_t *st,
+			   const igraph_matrix_t *kernel,
+			   const igraph_vector_t *vtime,
+			   const igraph_vector_t *vtimeidx,
+			   const igraph_vector_t *etime,
+			   const igraph_vector_t *etimeidx,
+			   igraph_integer_t pno_of_events);
+int igraph_revolver_exp_d_d(const igraph_t *graph,
+			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_matrix_t *expected,
+			    const igraph_matrix_t *kernel,
+			    const igraph_vector_t *st,
+			    const igraph_vector_t *vtime,
+			    const igraph_vector_t *vtimeidx,
+			    const igraph_vector_t *etime,
+			    const igraph_vector_t *etimeidx,
+			    igraph_integer_t pno_of_events,
+			    igraph_integer_t pmaxdegree);
+int igraph_revolver_error_d_d(const igraph_t *graph,
+			      igraph_i_lazy_adjedgelist_t *adjlist,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *st,
+			      const igraph_vector_t *vtime,
+			      const igraph_vector_t *vtimeidx,
+			      const igraph_vector_t *etime,
+			      const igraph_vector_t *etimeidx,
+			      igraph_integer_t pno_of_events,
+			      igraph_integer_t pmaxdegree, 
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
@@ -2022,13 +2093,6 @@ void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al);
    (igraph_i_lazy_adjlist_get_real(al, no)))
 igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
 						igraph_integer_t no);
-
-typedef struct igraph_i_lazy_adjedgelist_t {
-  const igraph_t *graph;
-  igraph_integer_t length;
-  igraph_vector_t **adjs;
-  igraph_neimode_t mode;
-} igraph_i_lazy_adjedgelist_t;
 
 int igraph_i_lazy_adjedgelist_init(const igraph_t *graph,
 				   igraph_i_lazy_adjedgelist_t *al,
