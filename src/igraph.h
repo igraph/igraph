@@ -1320,6 +1320,14 @@ int igraph_measure_dynamics_citingcat_citedcat_st(const igraph_t *graph,
 /* Network evolution measurement, new implementation  */
 /* -------------------------------------------------- */
 
+int igraph_evolver_d(igraph_t *graph,
+		     igraph_integer_t nodes,
+		     igraph_vector_t *kernel,
+		     const igraph_vector_t *outseq,
+		     const igraph_vector_t *outdist,
+		     igraph_integer_t m,
+		     igraph_bool_t directed);
+
 int igraph_revolver_d(const igraph_t *graph,
 		     igraph_integer_t niter,
 		     igraph_vector_t *kernel,		     

@@ -1,5 +1,7 @@
 2007-05-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver_cit.c (igraph_evolver_d) : added
+
 	* src/evolver2.c (igraph_revolver_error_d_d) : bugs corrected
 
 	* src/evolver2.c (igraph_revolver_d_d, igraph_revolver_mes_d_d)

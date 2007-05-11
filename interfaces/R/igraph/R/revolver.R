@@ -20,6 +20,16 @@
 #
 ###################################################################
 
+evolver.d <- function(nodes, kernel, outseq=NULL, outdist=NULL,
+                      m=1, directed=TRUE, verbose=igraph.par("verbose")) {
+
+  if (!is.null(outseq)) { outseq <- as.numeric(outseq) }
+  if (!is.null(outdist)) { outdist <- as.numeric(outdist) }
+  .Call("R_igraph_evolver_d", as.numeric(nodes), as.numeric(kernel),
+        outseq, outdist, m, as.logical(directed), as.logical(verbose),
+        PACKAGE="igraph")
+}
+  
 revolver.d <- function(graph, niter=5, sd=FALSE, norm=FALSE,
                       cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
                       verbose=igraph.par("verbose")) {
