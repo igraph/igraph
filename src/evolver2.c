@@ -620,7 +620,7 @@ int igraph_revolver_error_d_d(const igraph_t *graph,
   long int edges=0, vertices=0;
   
   igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
-  
+
   IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
 
@@ -637,6 +637,7 @@ int igraph_revolver_error_d_d(const igraph_t *graph,
     while (nptr < no_of_nodes && 
 	   VECTOR(*vtime)[ (long int) VECTOR(*vtimeidx)[nptr] ] == timestep) {
       vertices++;
+      nptr++;
     }
 
     eptr_save=eptr;
@@ -649,12 +650,13 @@ int igraph_revolver_error_d_d(const igraph_t *graph,
       long int yidx=VECTOR(degree)[to];
       
       igraph_real_t prob=MATRIX(*kernel, xidx, yidx)/VECTOR(*st)[timestep];
-      igraph_real_t nullprob=1.0/(vertices*(vertices-1)/2-edges);
+      igraph_real_t nullprob=1.0/(vertices*(vertices-1)/2-eptr_save);
             
       *mylogprob += log(prob);
       *mylognull += log(nullprob);
       
       edges++;
+      eptr++;
     }
 
     eptr=eptr_save;
@@ -665,6 +667,7 @@ int igraph_revolver_error_d_d(const igraph_t *graph,
       long int to=IGRAPH_TO(graph, edge);
       VECTOR(degree)[from] += 1;
       VECTOR(degree)[to] += 1;
+      eptr++;
     }
   }
 
