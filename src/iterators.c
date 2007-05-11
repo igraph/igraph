@@ -391,7 +391,7 @@ int igraph_vs_seq(igraph_vs_t *vs,
 		  igraph_integer_t from, igraph_integer_t to) {
   vs->type=IGRAPH_VS_SEQ;
   vs->data.seq.from=from;
-  vs->data.seq.to=to;
+  vs->data.seq.to=to+1;
   return 0;
 }
 
@@ -414,7 +414,7 @@ igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
   igraph_vs_t vs;
   vs.type=IGRAPH_VS_SEQ;
   vs.data.seq.from=from;
-  vs.data.seq.to=to;
+  vs.data.seq.to=to+1;
   return vs;
 }
 

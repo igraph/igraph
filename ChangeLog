@@ -1,5 +1,10 @@
 2007-05-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* example/simple/igraph_vs_seq : added
+
+	* src/iterators.c (igraph_vs_seq, igraph_vs_seq) : bug corrected, last 
+	vertex was omitted
+
 	* src/evolver.R : all evolver_* renamed to revolver_*
 
 	* example/simple/igraph_girth.c : added

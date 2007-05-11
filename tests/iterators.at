@@ -31,6 +31,11 @@ AT_KEYWORDS([iterator igraph_vs_nonadj])
 AT_COMPILE_CHECK([simple/igraph_vs_nonadj.c], [simple/igraph_vs_nonadj.out])
 AT_CLEANUP
 
+AT_SETUP([Sequence (igraph_vs_seq): ])
+AT_KEYWORDS([iterator igraph_vs_seq seq sequence])
+AT_COMPILE_CHECK([simple/igraph_vs_seq.c], [simple/igraph_vs_seq.out])
+AT_CLEANUP
+
 #AT_SETUP([Adjacent edges (igraph_es_adj): ])
 #AT_KEYWORDS([iterator adjacent igraph_es_adj])
 #AT_COMPILE_CHECK([simple/igraph_es_adj.c], [simple/igraph_es_adj.out])
