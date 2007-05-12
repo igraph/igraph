@@ -138,12 +138,14 @@ long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v);
 void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v);
 void igraph_vector_ptr_null      (igraph_vector_ptr_t* v);
 int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e);
+int igraph_vector_ptr_insert(igraph_vector_ptr_t *v, long int pos, void* e);
 void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos);
 void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* value);
 int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize);
 void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
 void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
+void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));
 
 /* -------------------------------------------------- */
 /* Matrix, very similar to vector                     */

@@ -57,7 +57,7 @@
 /**
  * \ingroup vectorptr
  * \function igraph_vector_ptr_init
- * \brief Initialize a poiter vector (constructor).
+ * \brief Initialize a pointer vector (constructor).
  *
  * </para><para>
  * This is the constructor of the pointer vector data type. All
@@ -265,6 +265,31 @@ int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e) {
 
 /**
  * \ingroup vectorptr
+ * \function igraph_vector_ptr_insert
+ * \brief Inserts a single element into a pointer vector.
+ *
+ * Note that this function does not do range checking. Insertion will shift the
+ * elements from the position given to the end of the vector one position to the
+ * right, and the new element will be inserted in the empty space created at
+ * the given position. The size of the vector will increase by one.
+ *
+ * \param v The pointer vector object.
+ * \param pos The position where the new element is inserted.
+ * \param e The inserted element
+ */
+int igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
+  long int size = igraph_vector_ptr_size(v);
+  IGRAPH_CHECK(igraph_vector_ptr_resize(v, size+1));
+  if (pos<size) {
+    memmove(v->stor_begin+pos+1, v->stor_begin+pos, 
+	    sizeof(void*)*(size-pos));
+  }
+  v->stor_begin[pos] = e;
+  return 0;
+}
+
+/**
+ * \ingroup vectorptr
  * \function igraph_vector_ptr_e
  * \brief Access an element of a pointer vector.
  * 
@@ -413,3 +438,22 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
   }
   v->end--;
 }
+
+/**
+ * \ingroup vectorptr
+ * \brief Sort the pointer vector based on an external comparison function
+ *
+ * Sometimes it is necessary to sort the pointers in the vector based on
+ * the property of the element being referenced by the pointer. This
+ * function allows us to sort the vector based on an arbitrary external
+ * comparison function which accepts two \c void* pointers \c p1 and \c p2
+ * and returns an integer less than, equal to or greater than zero if the
+ * first argument is considered to be respectively less than, equal to, or
+ * greater than the second. \c p1 and \c p2 will point to the pointer in the
+ * vector, so they have to be double-dereferenced if one wants to get access
+ * to the underlying object the address of which is stored in \c v .
+ */
+void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, const void*)) {
+  qsort(v->stor_begin, igraph_vector_ptr_size(v), sizeof(void*), compar);
+}
+

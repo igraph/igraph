@@ -58,3 +58,5 @@ o iterator over all circles
 o make del operator work for attributes
 o make in-place addition and subtraction operators NOT copy the graph if
   a disjoint union or difference is taken
+o igraph_is_loop, igraph_is_multiple
+o igraph_cited_type_game, igraph_citing_cited_type_game, igraph_lastcit_game

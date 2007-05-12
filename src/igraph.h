@@ -942,13 +942,6 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
 				   igraph_matrix_t *merges,
 				   igraph_vector_t *bridges);
 
-int igraph_community_clauset(const igraph_t *graph,
-                             const igraph_vector_t *weights,
-                             const igraph_integer_t no,
-                             igraph_real_t *modularity,
-                             igraph_vector_t *membership,
-                             igraph_matrix_t *merges);
-
 int igraph_community_fastgreedy(const igraph_t *graph,
 				igraph_matrix_t *merges,
 				igraph_vector_t *modularity);

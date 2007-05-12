@@ -1,3 +1,8 @@
+2007-05-12  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/fast_community.c (igraph_community_fastgreedy) : rewritten in
+	plain C, should be faster now
+
 2007-05-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_grow.c (igraph_revolver_error_p_p) : implemented
@@ -30,6 +35,13 @@
 	* src/structural_properties.c (igraph_girth) : some speedup
 
 	* src/structural_properties.c (igraph_girth) : a bug corrected
+
+2007-05-06  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/graphobject.c
+	(igraphmodule_Graph_isomorphic) : modified to call VF2
+	isomorphism if necessary
+
 
 2007-05-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
