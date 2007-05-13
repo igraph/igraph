@@ -55,3 +55,8 @@ AT_COMPILE_CHECK([simple/igraph_read_graph_graphdb.c],
 	[simple/igraph_read_graph_graphdb.out],
 	[simple/iso_b03_m1000.A00])
 AT_CLEANUP
+
+AT_SETUP([Reading a GML file (igraph_read_graph_gml):])
+AT_KEYWORDS([igraph_read_graph_gml foreign GML])
+AT_COMPILE_CHECK([simple/gml.c], [simple/gml.out], [simple/karate.gml])
+AT_CLEANUP

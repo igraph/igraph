@@ -117,6 +117,28 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
   return 0;
 }
 
+int igraph_strvector_set2(igraph_strvector_t *sv, long int idx, 
+			  const char *value, int len) {
+  assert(sv != 0);
+  assert(sv->data != 0);
+  if (sv->data[idx] == 0) {
+    sv->data[idx] = Calloc(len+1, char);
+    if (sv->data[idx]==0) {
+      IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+    }
+  } else {
+    char *tmp=Realloc(sv->data[idx], len+1, char);
+    if (tmp==0) { 
+      IGRAPH_ERROR("strvector set failed", IGRAPH_ENOMEM);
+    }
+    sv->data[idx]=tmp;
+  }
+  memcpy(sv->data[idx], value, len*sizeof(char));
+  sv->data[idx][len]='\0';
+  
+  return 0;
+}
+
 /**
  * \ingroup strvector
  * \brief Removes a section from a string vector.

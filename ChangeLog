@@ -1,3 +1,20 @@
+2007-05-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign-gml-lexer.l
+	* src/foreign-gml-parser.y : added
+	* src/foreign.c (igraph_read_graph_gml) : added
+	* examples/simple/gml.c : added
+
+	* src/gml_tree.c (igraph_gml_tree_init_integer, igraph_gml_tree_init_real)
+	(igraph_gml_tree_init_string, igraph_gml_tree_init_tree)
+	(igraph_gml_tree_mergedest, igraph_gml_tree_destroy)
+	(igraph_gml_tree_length, igraph_gml_tree_find, igraph_gml_tree_findback)
+	(igraph_gml_tree_type, igraph_gml_tree_get_integer)
+	(igraph_gml_tree_get_real, igraph_gml_tree_get_string)
+	(igraph_gml_tree_get_tree) : added
+
+	* src/igraph_strvector.c (igraph_strvector_set2) : added
+
 2007-05-12  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/fast_community.c (igraph_community_fastgreedy) : rewritten in

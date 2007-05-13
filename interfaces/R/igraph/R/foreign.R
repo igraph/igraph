@@ -77,6 +77,8 @@ read.graph <- function(file, format="edgelist", ...) {
       write.graph.fromraw(buffer, file)
     }
   }
+
+  format <- tolower(format)
   
   res <- switch(format,
                 "pajek"=read.graph.pajek(file, ...),
@@ -86,6 +88,7 @@ read.graph <- function(file, format="edgelist", ...) {
                 "graphml"=read.graph.graphml(file, ...),
                 "dimacs"=read.graph.dimacs(file, ...),
                 "graphdb"=read.graph.graphdb(file, ...),
+                "gml"=read.graph.gml(file, ...),
                 stop(paste("Unknown file format:",format))
                 )
   res
@@ -246,6 +249,15 @@ read.graph.graphml <- function(file, index=0, ...) {
 write.graph.graphml <- function(graph, file, ...) {
 
   .Call("R_igraph_write_graph_graphml", graph, file,
+        PACKAGE="igraph")
+}
+
+################################################################
+# GML
+################################################################
+
+read.graph.gml <- function(file, ...) {
+  .Call("R_igraph_read_graph_gml", file,
         PACKAGE="igraph")
 }
 

@@ -3362,6 +3362,32 @@ SEXP R_igraph_read_graph_edgelist(SEXP pvfile, SEXP pn, SEXP pdirected) {
   return result;  
 }
 
+SEXP R_igraph_read_graph_gml(SEXP pvfile) {
+
+  igraph_t g;
+  FILE *file;
+  SEXP result;
+  
+  R_igraph_before();
+  
+#if HAVE_FMEMOPEN == 1
+  file=fmemopen(RAW(pvfile), GET_LENGTH(pvfile), "r");
+#else 
+  file=fopen(CHAR(STRING_ELT(pvfile, 0)), "r");
+#endif
+  if (file==0) { igraph_error("Cannot read GML file", __FILE__, __LINE__,
+			      IGRAPH_EFILE); }
+  igraph_read_graph_gml(&g, file);
+  fclose(file);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;  
+}
+
 SEXP R_igraph_read_graph_graphdb(SEXP pvfile, SEXP pdirected) {
   igraph_t g;
   igraph_bool_t directed=LOGICAL(pdirected)[0];

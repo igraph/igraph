@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "config.h"
+#include "gml_tree.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>
@@ -858,7 +859,140 @@ int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
-		             
+
+extern int igraph_gml_yyparse(void);
+extern FILE *igraph_gml_yyin;
+extern int igraph_gml_eof;
+extern igraph_gml_tree_t *igraph_i_gml_parsed_tree;
+long int igraph_gml_mylineno;
+
+/**
+ * \function igraph_read_graph_gml
+ */
+
+int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
+  
+  long int i, p;
+  long int no_of_nodes=0;
+  igraph_trie_t trie;
+  igraph_vector_t edges;
+  igraph_bool_t directed=IGRAPH_UNDIRECTED;
+  igraph_gml_tree_t *gtree;
+  long int gidx;
+
+  igraph_gml_yyin=instream;
+  igraph_gml_mylineno=1;
+  igraph_gml_eof=0;
+  
+  igraph_gml_yyparse();
+
+  /* Check version, if present, integer and not '1' then ignored */
+  i=igraph_gml_tree_find(igraph_i_gml_parsed_tree, "Version", 0);
+  if (i>=0 && 
+      igraph_gml_tree_type(igraph_i_gml_parsed_tree, i)==IGRAPH_I_GML_TREE_INTEGER &&
+      igraph_gml_tree_get_integer(igraph_i_gml_parsed_tree, i) != 1) {
+    igraph_gml_tree_destroy(igraph_i_gml_parsed_tree);
+    IGRAPH_ERROR("Unknown GML version", IGRAPH_UNIMPLEMENTED);
+    /* RETURN HERE!!!! */
+  } 
+  
+  /* get the graph */
+  gidx=igraph_gml_tree_find(igraph_i_gml_parsed_tree, "graph", 0);
+  if (gidx==-1) {
+    IGRAPH_ERROR("No 'graph' object in GML file", IGRAPH_PARSEERROR);
+  }
+  if (igraph_gml_tree_type(igraph_i_gml_parsed_tree, gidx) != 
+      IGRAPH_I_GML_TREE_TREE) {
+    IGRAPH_ERROR("Invalid type for 'graph' object in GML file", IGRAPH_PARSEERROR);
+  }
+  gtree=igraph_gml_tree_get_tree(igraph_i_gml_parsed_tree, gidx);
+
+  /* Is is directed? */
+  i=igraph_gml_tree_find(gtree, "directed", 0);
+  if (i>=0 && igraph_gml_tree_type(gtree, i)==IGRAPH_I_GML_TREE_INTEGER && 
+      igraph_gml_tree_get_integer(gtree, i) == 0) {
+    directed=IGRAPH_DIRECTED;
+  }
+  
+  /* read the vertices into a trie */
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_TRIE_INIT_FINALLY(&trie, 0);
+  p=igraph_gml_tree_length(gtree);
+  while ( (p=igraph_gml_tree_findback(gtree, "node", p-1)) != -1) {
+    igraph_gml_tree_t *node;
+    long int iidx, id;
+    char name[100];
+    no_of_nodes++;
+    if (igraph_gml_tree_type(gtree, p) != IGRAPH_I_GML_TREE_TREE) {
+      IGRAPH_ERROR("'node' is not a list", IGRAPH_PARSEERROR);
+    }
+    node=igraph_gml_tree_get_tree(gtree, p);
+    /* get the id of the node */
+    iidx=igraph_gml_tree_find(node, "id", 0);
+    if (iidx == -1) {
+      IGRAPH_ERROR("Found 'node' without 'id' attribute", IGRAPH_PARSEERROR);
+    }
+    if (igraph_gml_tree_type(node, iidx) != IGRAPH_I_GML_TREE_INTEGER) {
+      IGRAPH_ERROR("'id' attribute not an integer", IGRAPH_PARSEERROR);
+    }
+    id=igraph_gml_tree_get_integer(node, iidx);
+    snprintf(name, sizeof(name)/sizeof(char)-1, "%li", id);
+    IGRAPH_CHECK(igraph_trie_get(&trie, name, &id));
+  }
+  
+  /* check id uniqueness */
+  if (igraph_trie_size(&trie) != no_of_nodes) {
+    IGRAPH_ERROR("Node 'id' not unique", IGRAPH_PARSEERROR);
+  }
+  
+  /* Ok, now the edges */
+  p=igraph_gml_tree_length(gtree);
+  while ( (p=igraph_gml_tree_findback(gtree, "edge", p-1)) != -1) {
+    igraph_gml_tree_t *edge;
+    long int from, to, fromidx, toidx;
+    char name[100];
+    if (igraph_gml_tree_type(gtree, p) != IGRAPH_I_GML_TREE_TREE) {
+      IGRAPH_ERROR("'edge' is not a list", IGRAPH_PARSEERROR);
+    }
+    edge=igraph_gml_tree_get_tree(gtree, p);
+    fromidx=igraph_gml_tree_find(edge, "source", 0);
+    if (fromidx==-1) {
+      IGRAPH_ERROR("No 'source' attribute for 'edge'", IGRAPH_PARSEERROR);	
+    }
+    toidx=igraph_gml_tree_find(edge, "target", 0);
+    if (toidx==-1) {
+      IGRAPH_ERROR("No 'target' attribute for 'edge'", IGRAPH_PARSEERROR);	
+    }
+    if (igraph_gml_tree_type(edge, fromidx) != IGRAPH_I_GML_TREE_INTEGER) {
+      IGRAPH_ERROR("'source' attribute of 'edge' not integer", IGRAPH_PARSEERROR);
+    }
+    if (igraph_gml_tree_type(edge, toidx) != IGRAPH_I_GML_TREE_INTEGER) {
+      IGRAPH_ERROR("'target' attribute of 'edge' not integer", IGRAPH_PARSEERROR);
+    }
+    from=igraph_gml_tree_get_integer(edge, fromidx);
+    to=igraph_gml_tree_get_integer(edge, toidx);
+    snprintf(name, sizeof(name)/sizeof(char)-1, "%li", from);
+    IGRAPH_CHECK(igraph_trie_get(&trie, name, &from));
+    snprintf(name, sizeof(name)/sizeof(char)-1, "%li", to);
+    IGRAPH_CHECK(igraph_trie_get(&trie, name, &to));
+    if (igraph_trie_size(&trie) != no_of_nodes) {
+      IGRAPH_ERROR("Unkown node id found at an edge", IGRAPH_PARSEERROR);
+    }
+    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+  }
+    
+  igraph_gml_tree_destroy(igraph_i_gml_parsed_tree);
+  
+  igraph_trie_destroy(&trie);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
 
 /**
  * \ingroup loadsave

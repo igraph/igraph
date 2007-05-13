@@ -17,6 +17,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
 			     foreign-pajek-parser.y foreign-pajek-lexer.l \
+			     foreign-gml-parser.y foreign-gml-lexer.l \
 			     dqueue.c heap.c igraph_stack.c \
 			     igraph_strvector.c igraph_trie.c matrix.c \
 			     vector.c vector_ptr.c memory.c adjlist.c \
@@ -30,7 +31,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     spmatrix.c community.c fast_community.c \
-			     evolver_cit.c 
+			     evolver_cit.c gml_tree.c
 
 libigraph_la_CFLAGS        = -O6 -Wall
 libigraph_la_CXXFLAGS	   = -O6 -Wall

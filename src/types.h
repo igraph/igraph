@@ -457,6 +457,8 @@ void igraph_strvector_get(const igraph_strvector_t *sv,
 			  long int idx, char **value);
 int igraph_strvector_set(igraph_strvector_t *sv, long int idx, 
 			 const char *value);
+int igraph_strvector_set2(igraph_strvector_t *sv, long int idx, 
+			  const char *value, int len);
 void igraph_strvector_remove_section(igraph_strvector_t *v, long int from, 
 				     long int to);
 void igraph_strvector_remove(igraph_strvector_t *v, long int elem);

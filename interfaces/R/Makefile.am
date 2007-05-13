@@ -18,7 +18,7 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	igraph_hashtable.c foreign-graphml.c flow.c igraph_buckets.c \
         spectral_properties.c cores.c cliques.c igraph_set.c \
 	revolver_cit.c revolver_grow.c community.c spmatrix.c vector_pmt.hc \
-	evolver_cit.c
+	evolver_cit.c gml_tree.c
 
 RSNAMES_F = 
 
@@ -29,11 +29,13 @@ RSNAMES_CPP = NetDataTypes.cpp clustertool.cpp NetRoutines.cpp \
 RSNAMES_H = memory.h random.h atlas-edges.h NetDataTypes.h \
 	NetRoutines.h pottsmodel_2.h walktrap_communities.h \
 	walktrap_heap.h walktrap_graph.h fastcommunity_vektor.h \
-	fastcommunity_maxheap.h
+	fastcommunity_maxheap.h gml_tree.h
 
-RSNAMES_Y = foreign-ncol-parser.y foreign-lgl-parser.y foreign-pajek-parser.y
+RSNAMES_Y = foreign-ncol-parser.y foreign-lgl-parser.y foreign-pajek-parser.y \
+	    foreign-gml-parser.y
 
-RSNAMES_L = foreign-ncol-lexer.l foreign-lgl-lexer.l foreign-pajek-lexer.l
+RSNAMES_L = foreign-ncol-lexer.l foreign-lgl-lexer.l foreign-pajek-lexer.l \
+	    foreign-gml-lexer.l
 
 RSCNAMES = $(RSNAMES_C) $(RSNAMES_H) $(RSNAMES_CPP) $(RSNAMES_F)
 

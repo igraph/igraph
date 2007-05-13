@@ -1,3 +1,9 @@
+2007-05-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (read.graph, read.graph.gml) :
+	GML format added
+	* interfaces/R/src/rinterface.c (R_igraph_read_graph_gml) : added
+
 2007-05-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/revolver.R (revolver.p.p) : added
