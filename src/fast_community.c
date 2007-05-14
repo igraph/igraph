@@ -527,6 +527,10 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     
 	/* Create the pairs themselves */
 	from = (long int)ffrom; to = (long int)fto;
+	if (from == to) {
+	  IGRAPH_ERROR("loop edge detected, simplify the graph before starting community detection", IGRAPH_EINVAL);
+	}
+
 	if (from>to) {
 	  dummy=from; from=to; to=dummy;
 	}
@@ -547,7 +551,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	  communities.e[from].maxdq = &pairs[i];
 	if (communities.e[to].maxdq==0 || *communities.e[to].maxdq->dq < *pairs[i+1].dq)
 	  communities.e[to].maxdq = &pairs[i+1];
-	/* Iterate */
+
+    /* Iterate */
 	i+=2; j++;
     IGRAPH_EIT_NEXT(edgeit);
   }
