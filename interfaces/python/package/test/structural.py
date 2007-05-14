@@ -20,10 +20,10 @@ class SimplePropertiesTests(unittest.TestCase):
         
     def testDiameter(self):
         self.failUnless(self.gfull.diameter() == 1)
-        self.failUnless(self.gempty.diameter() == 10)
+        self.failUnless(self.gempty.diameter(unconn=False) == 10)
         self.failUnless(self.g.diameter() == 2)
-        self.failUnless(self.gdir.diameter() == 2)
-        self.failUnless(self.gdir.diameter(True) == 3)
+        self.failUnless(self.gdir.diameter(False) == 2)
+        self.failUnless(self.gdir.diameter() == 3)
         self.failUnless(self.tree.diameter() == 4)
         
     def testTransitivity(self):

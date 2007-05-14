@@ -222,8 +222,9 @@ int igraphmodule_PyList_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_b
  * \param v the \c igraph_vector_t containing the vector to be converted
  * \return the Python integer list as a \c PyObject*, or \c NULL if an error occurred
  */
-PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v) {
-  PyObject* list;
+PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v,
+    igraphmodule_conv_t type) {
+  PyObject *list, *item;
   int n, i;
    
   n=igraph_vector_size(v);
@@ -231,7 +232,14 @@ PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v) {
 
   list=PyList_New(n);
   for (i=0; i<n; i++) {
-    PyObject *item=PyInt_FromLong((long)VECTOR(*v)[i]);
+    if (type == IGRAPHMODULE_TYPE_INT) {
+      item=PyInt_FromLong((long)VECTOR(*v)[i]);
+    } else if (type == IGRAPHMODULE_TYPE_FLOAT) {
+      item=PyFloat_FromDouble((double)VECTOR(*v)[i]);
+    } else {
+      item=Py_None;
+      Py_INCREF(item);
+    }
     if (!item) {
       Py_DECREF(list);
       return NULL;
@@ -333,36 +341,6 @@ PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
      }
    }
 
-   return list;
-}
-
-/**
- * \ingroup python_interface_conversion
- * \brief Converts an igraph \c igraph_vector_t to a Python float list
- * 
- * \param v the \c igraph_vector_t containing the vector to be converted
- * \return the Python float list as a \c PyObject*, or \c NULL if an error occurred
- */
-PyObject* igraphmodule_vector_t_to_float_PyList(igraph_vector_t *v) {
-   PyObject* list;
-   int n, i;
-   
-   n=igraph_vector_size(v);
-   if (n<0) return igraphmodule_handle_igraph_error();
-
-   // create a new Python list
-   list=PyList_New(igraph_vector_size(v));
-   // populate the list with data
-   for (i=0; i<n; i++) 
-     {
-	if (PyList_SetItem(list, i, PyFloat_FromDouble(VECTOR(*v)[i]))) 
-	  {
-	     // error occurred while populating the list, return immediately
-	     Py_DECREF(list);
-	     return NULL;
-	  }
-     }
-   // return the list
    return list;
 }
 

@@ -141,7 +141,7 @@ class Graph(core.GraphBase):
 
     # Various clustering algorithms -- mostly wrappers around GraphBase
 
-    def community_clauset(self, clusters = None, return_merges = False):
+    def community_fastgreedy(self):
         """Community structure based on the greedy optimization of modularity.
 
         This algorithm merges individual nodes into communities in a way that
@@ -151,18 +151,13 @@ class Graph(core.GraphBase):
 
         This algorithm is said to run almost in linear time on sparse graphs.
 
-        @param clusters: the desired number of clusters. If C{None}, the optimal
-          cluster count will be determined automatically.
-        @param return_merges: whether the returned L{VertexClustering} object
-          should contain information about the merges performed on the graph.
         @return: an appropriate L{VertexClustering} object.
+
+        @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
+          in very large networks. Phys Rev E 70, 066111 (2004).
         """
-        if clusters is None: clusters = -1
-        cl, q, merges = GraphBase.community_clauset(self, clusters, return_merges)
-        if merges is None:
-            return VertexClustering(self, cl, q)
-        else:
-            return HierarchicalVertexClustering(self, merges, cl, q)
+        merges, qs = GraphBase.community_fastgreedy(self, True)
+        return HierarchicalVertexClustering(self, merges, None, qs)
 
 
     def community_leading_eigenvector_naive(self, clusters=None, return_merges = False):
@@ -417,16 +412,16 @@ class Graph(core.GraphBase):
           a vertex attribute to use, or a list explicitly specifying
           the colors. A color can be anything acceptable in an SVG
           file.
-	@param shapes: the vertex shapes. Either it is the name of
-	  a vertex attribute to use, or a list explicitly specifying
-	  the shapes as integers. Shape 0 means hidden (nothing is drawn),
-	  shape 1 is a circle, shape 2 is a rectangle.
+        @param shapes: the vertex shapes. Either it is the name of
+          a vertex attribute to use, or a list explicitly specifying
+          the shapes as integers. Shape 0 means hidden (nothing is drawn),
+          shape 1 is a circle, shape 2 is a rectangle.
         @param vertex_size: vertex size in pixels
-	@param font_size: font size. If it is a string, it is written into
-	  the SVG file as-is (so you can specify anything which is valid
-	  as the value of the C{font-size} style). If it is a number, it
-	  is interpreted as pixel size and converted to the proper attribute
-	  value accordingly.
+        @param font_size: font size. If it is a string, it is written into
+          the SVG file as-is (so you can specify anything which is valid
+          as the value of the C{font-size} style). If it is a number, it
+          is interpreted as pixel size and converted to the proper attribute
+          value accordingly.
         """
         if width is None and height is None:
             width = 400
@@ -455,17 +450,17 @@ class Graph(core.GraphBase):
             except KeyError:
                 colors = ["red" for x in xrange(self.vcount())]
 
-	if isinstance(shapes, str):
-	    try:
-		shapes = self.vs.get_attribute_values(shapes)
-	    except KeyError:
-		shapes = [1]*self.vcount()
-		
-	if not isinstance(font_size, str):
-	    font_size = "%spx" % str(font_size)
-	else:
-	    if ";" in font_size:
-		raise ValueError, "font size can't contain a semicolon"
+        if isinstance(shapes, str):
+            try:
+                shapes = self.vs.get_attribute_values(shapes)
+            except KeyError:
+                shapes = [1]*self.vcount()
+        
+        if not isinstance(font_size, str):
+            font_size = "%spx" % str(font_size)
+        else:
+            if ";" in font_size:
+                raise ValueError, "font size can't contain a semicolon"
 
         vc = self.vcount()
         while len(labels)<vc: labels.append(len(labels)+1)
@@ -543,9 +538,9 @@ class Graph(core.GraphBase):
         for vidx in range(self.vcount()):
             print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % (layout[vidx][0], layout[vidx][1])
             if shapes[vidx] == 1:
-		print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(colors[vidx]))
-	    elif shapes[vidx] == 2:
-		print >>f, "      <rect x=\"-%s\" y=\"-%s\" width=\"%s\" height=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(vertex_size), str(2*vertex_size), str(2*vertex_size), str(colors[vidx]))
+                print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(colors[vidx]))
+            elif shapes[vidx] == 2:
+                print >>f, "      <rect x=\"-%s\" y=\"-%s\" width=\"%s\" height=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(vertex_size), str(2*vertex_size), str(2*vertex_size), str(colors[vidx]))
             print >>f, "      <text x=\"0\" y=\"5\">%s</text>" % str(labels[vidx])
             print >>f, "    </g>"
 

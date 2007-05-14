@@ -23,7 +23,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 """
 
 from statistics import Histogram
-from copy import copy
+from copy import copy, deepcopy
 
 class Clustering(object):
     """Class representing a clustering of an arbitrary ordered set.
@@ -206,51 +206,36 @@ class HierarchicalClustering(Clustering):
     elements are separated into groups, but also the exact history of
     how individual elements were joined into larger subgroups.
 
-    This class internally represents the hierarchy by a tuple containing
-    tuples containing tuples... and so on. The individual node indices
-    are on the lowest level of this hierarchy. As an example, look at the
-    dendrogram and the internal representation of a given clustering of
-    five nodes::
+    This class internally represents the hierarchy by a matrix with n rows
+    and 2 columns -- or more precisely, a list of lists of size 2. This is
+    exactly the same as the original format used by C{igraph}'s C core.
+    The M{i}th row of the matrix contains the indices of the two clusters
+    being joined in time step M{i}. The joint group will be represented by
+    the ID M{n+i}, with M{i} starting from one. The ID of the joint group
+    will be referenced in the upcoming steps instead of any of its individual
+    members. So, IDs less than or equal to M{n} (where M{n} is the number of
+    rows in the matrix) mean the original members of the dataset (with ID
+    from 0 to M{n}), while IDs up from M{n+1} mean joint groups. As an
+    example, take a look at the dendrogram and the internal representation of
+    a given clustering of five nodes::
 
-      a -+
+      0 -+
          |
-      b -+-+
+      1 -+-+
            |
-      e ---+-+        <====>   ((('a', 'b'), 'e'), ('c', 'd'))
+      2 ---+-+        <====>   [[0, 1], [4, 5], [2, 3], [6, 7]]
              |
-      c -+   |
+      3 -+   |
          |   |
-      d -+---+---
-
-    Since I{theoretically} a dendrogram can also be incomplete (the joining
-    process stops when there is more than a single group left), the internal
-    representation wraps the tuple into a list. This list will contain
-    multiple elements if the dendrogram is incomplete.
-
-    Moreover, the original format that the C core of C{igraph} uses for
-    representing a hierarchical clustering is a matrix of size M{2} x M{n-1},
-    where the M{i}th row of the matrix contains the indices of the two clusters
-    being joined in time step M{i}. The joint group will be represented by the
-    ID M{n+i}, with M{i} starting from 0. The ID of the joint group will be
-    referenced in the upcoming steps instead of any of its individual members.
-    For instance, the matrix representing the hierarchical clustering above is
-    as follows (C{'a'} = 0, C{'b'} = 1, C{'c'} = 2 and so on)::
-
-      0 1
-      4 5
-      2 3
-      6 7
+      4 -+---+---
     """
 
     def __init__(self, merges):
         """Creates a hierarchical clustering.
 
         @param merges: the merge history either in matrix or tuple format"""
-        Clustering.__init__(self)    
-        if isinstance(merges, tuple):
-            self._merges = [merges]
-        else:
-            self._merges = self._convert_matrix_to_tuple_repr(merges)
+        Clustering.__init__(self, [0]*(len(merges)+1))
+        self._merges = deepcopy(merges)
     
     def _convert_matrix_to_tuple_repr(merges, n=None):
         if n is None: n = len(merges)+1
@@ -269,7 +254,7 @@ class HierarchicalClustering(Clustering):
 
 
     def _get_merges(self): return copy(self._merges)
-    merges = property(_get_merges, doc = "The performed merges in tuple format")
+    merges = property(_get_merges, doc = "The performed merges in matrix format")
 
 class HierarchicalVertexClustering(VertexClustering, HierarchicalClustering):
     """The hierarchical clustering of the vertex set of a graph."""
@@ -283,12 +268,70 @@ class HierarchicalVertexClustering(VertexClustering, HierarchicalClustering):
           representation on the fly. No validity check is performed on this
           parameter.
         @param membership: the membership list. The length of the list must
-          be equal to the number of vertices in the graph. If C{None}, every
-          vertex is assumed to belong to the same cluster.
-        @param modularity: the modularity score of the clustering. If C{None},
-          it will be calculated.
+          be equal to the number of vertices in the graph. If C{None}, the
+          dendrogram will be cut at the level where the modularity is maximized
+          and the membership list will represent this state.
+        @param modularity: the modularity score of the clustering on each
+          level of the dendrogram starting from the fully decomposed state.
+          If C{None}, it will be calculated.
         @param params: additional parameters to be stored in this object.
         """
-        VertexClustering.__init__(self, graph, membership, modularity, params)
+        if modularity is None:
+            # TODO: this is a fairly simple way to calculate the modularity
+            ms = range(graph.vcount())
+            communities = range(graph.vcount())
+            modularity = []
+            n = graph.vcount()
+            modularity.append(g.modularity(ms))
+            for c1, c2 in merges:
+                try:
+                    cidx1 = communities[c1]
+                    cidx2 = communities[c2]
+                except IndexError:
+                    raise ValueError, "invalid merge matrix, referencing nonexisting community"
+                if cidx1 == -1 or cidx2 == -1:
+                    raise ValueError, "invalid merge matrix, referencing already joined community"
+                for idx, m in enumerate(ms):
+                    if m == cidx2: ms[idx] = cidx1
+                communities.append(communities[c1])
+                communities[c1] = -1
+                communities[c2] = -1
+                modularity.append(g.modularity(ms))
+
+        if membership is None:
+            maxmod = max(modularity)
+            maxidx = modularity.index(maxmod)
+            membership = range(graph.vcount())
+            communities = range(graph.vcount())
+            while maxidx>0:
+                maxidx -= 1
+                c1, c2 = merges.pop(0)
+                try:
+                    cidx1 = communities[c1]
+                    cidx2 = communities[c2]
+                except IndexError:
+                    raise ValueError, "invalid merge matrix, referencing nonexisting community"
+
+                if cidx1 == -1 or cidx2 == -1:
+                    raise ValueError, "invalid merge matrix, referencing already joined community"
+
+                for idx, m in enumerate(membership):
+                    if m == cidx2: membership[idx] = cidx1
+
+                communities.append(communities[c1])
+                communities[c1] = -1
+                communities[c2] = -1
+
+            recoding = {}
+            n=0
+            for idx, m in enumerate(membership):
+                try:
+                    v = recoding[m]
+                except KeyError:
+                    recoding[m], v = n, n
+                    n += 1
+                membership[idx] = v
+        
         HierarchicalClustering.__init__(self, merges)
+        VertexClustering.__init__(self, graph, membership, None, params)
 
