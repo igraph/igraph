@@ -57,38 +57,27 @@ void igraph_i_gml_reset_scanner() {
 %option prefix="igraph_gml_yy"
 %option outfile="lex.yy.c"
 
-letter    [a-zA-Z]
-num       [0-9]
-whitespace [ \t\n\r]
+digit       [0-9]
+whitespace  [ \r\n\t]
 
 %%
 
-^#[^\n\r]*[\n]|[\r]     { }
+^#[^\n\r]*[\n]|[\r]     { igraph_gml_mylineno++; /* comments ignored */ }
 
-\n                      { igraph_gml_mylineno++; return WS; }
-
-e                       { return 'e'; }
-E                       { return 'E'; }
-\"                      { return '"'; }
-\&                      { return '&'; }
-\;                      { return ';'; }
-\[                      { return '['; }
-\]                      { return ']'; }
-
-{whitespace}            { return WS; }
-
-{letter}                { return LETTER; }
-
-{num}                   { return NUM; }
-
-.                       { return OTHER; }
+\"[^\"]*\"                                      { return STRING; }
+\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
+[a-zA-Z][a-zA-Z0-9]*    { return KEYWORD; }
+\[                      { return LISTOPEN; }
+\]                      { return LISTCLOSE; }
+[\n\r|\r\n|\r]          { igraph_gml_mylineno++; }
+{whitespace}            { /* other whitespace ignored */ }
 
 <<EOF>>                 { 
                           if (igraph_gml_eof) {
 			    yyterminate();
 			  } else {
 			    igraph_gml_eof=1;
-			    return WS;
+			    return EOFF;
 			  }			  
                         }
 

@@ -1,3 +1,15 @@
+2007-05-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_read_graph_gml) : added attribute support
+
+	* src/foreign-gml-lexer.l : rewritten
+	* src/foreign-gml-parser.y : rewritten
+	* src/gml_tree.c (igraph_gml_tree_init_integer)
+	(igraph_gml_tree_init_real, igraph_gml_tree_init_tree) : do not copy 
+	name and for string the value
+
+	* src/gml_tree.c (igraph_gml_tree_name, igraph_gml_tree_delete) : added
+
 2007-05-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-gml-lexer.l
