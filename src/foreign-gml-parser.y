@@ -63,6 +63,8 @@ void igraph_i_gml_get_keyword(char *s, int len, void *res);
 void igraph_i_gml_get_string(char *s, int len, void *res);
 double igraph_i_gml_get_real(char *s, int len);
 igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value);
+igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len, 
+					      char *v, int vlen);
 igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len, 
 					    char *value, int valuelen);
 igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len, 
@@ -102,7 +104,7 @@ input:   list      { igraph_i_gml_parsed_tree=$1; }
        | list EOFF { igraph_i_gml_parsed_tree=$1; }
 
 list:   keyvalue      { $$=$1; } 
-      | keyvalue list { $$=igraph_i_gml_merge($2, $1); };
+      | list keyvalue { $$=igraph_i_gml_merge($1, $2); };
 
 keyvalue:   key num
             { $$=igraph_i_gml_make_numeric($1.s, $1.len, $2); }
@@ -110,6 +112,8 @@ keyvalue:   key num
             { $$=igraph_i_gml_make_string($1.s, $1.len, $2.s, $2.len); }
           | key LISTOPEN list LISTCLOSE
             { $$=igraph_i_gml_make_list($1.s, $1.len, $3); }
+          | key key
+            { $$=igraph_i_gml_make_numeric2($1.s, $1.len, $2.s, $2.len); }
 ;
 
 key: KEYWORD { igraph_i_gml_get_keyword(igraph_gml_yytext, 
@@ -125,8 +129,9 @@ int igraph_gml_yyerror(char *s)
 {
   char str[200];  
   igraph_i_gml_reset_scanner();
-  snprintf(str, sizeof(str), "Parse error in GML file, line %li", 
-	   (long)igraph_gml_mylineno);
+
+  snprintf(str, sizeof(str), "Parse error in GML file, line %li (%s)", 
+	   (long)igraph_gml_mylineno, s);
   IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
   return IGRAPH_PARSEERROR;
 }
@@ -174,6 +179,29 @@ igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
     igraph_gml_tree_init_real(t, s, len, value);
   }
   
+  return t;
+}
+
+igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len, 
+					      char *v, int vlen) {
+  igraph_gml_tree_t *t=Calloc(1, igraph_gml_tree_t);
+  char tmp=v[vlen];
+  igraph_real_t value=0;
+  if (!t) { 
+    igraph_error("Cannot build GML tree", __FILE__, __LINE__, IGRAPH_ENOMEM);
+    return 0;
+  }
+  v[vlen]='\0';
+  if (strcasecmp(v, "inf")) {
+    value=IGRAPH_INFINITY;
+  } else if (strcasecmp(v, "nan")) {
+    value=IGRAPH_NAN;
+  } else {
+    igraph_error("Parse error", __FILE__, __LINE__, IGRAPH_PARSEERROR);
+  }
+  v[vlen]=tmp;
+  igraph_gml_tree_init_real(t, s, len, value);  
+
   return t;
 }
 

@@ -1,5 +1,18 @@
 2007-05-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* gml_tree.c (igraph_gml_tree_destroy, igraph_gml_tree_mergedest) :
+	memory leaks eliminated
+	
+	* foreign-gml-parser.y (igraph_i_gml_make_numeric2) : added,
+	support for 'inf' and 'nan'
+
+	* foreign.c (igraph_read_graph_gml)
+	* foreign-gml-parser.y : correct the order of the elements in a list
+
+	* foreign-gml-parser.y (igraph_gml_error) : show bison error as well
+
+	* foreign.c (igraph_i_gml_destroy_attrs) : added
+
 	* src/foreign.c (igraph_read_graph_gml) : added attribute support
 
 	* src/foreign-gml-lexer.l : rewritten

@@ -866,8 +866,28 @@ extern int igraph_gml_eof;
 extern igraph_gml_tree_t *igraph_i_gml_parsed_tree;
 long int igraph_gml_mylineno;
 
-void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
-  /* TODO */
+void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {  
+  long int i;
+  igraph_vector_ptr_t *vec;
+  for (i=0; i<3; i++) {
+    long int j;
+    vec=ptr[i];
+    for (j=0; j<igraph_vector_ptr_size(vec); j++) {
+      igraph_i_attribute_record_t *atrec=VECTOR(*vec)[j];
+      if (atrec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+	igraph_vector_t *value=(igraph_vector_t*)atrec->value;
+	igraph_vector_destroy(value);
+	Free(value);
+      } else {
+	igraph_strvector_t *value=(igraph_strvector_t*)atrec->value;
+	igraph_strvector_destroy(value);
+	Free(value);
+      }
+      Free(atrec->name);
+      Free(atrec);
+    }
+    igraph_vector_ptr_destroy(vec);
+  }
 }
 
 igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) {
@@ -987,10 +1007,9 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
   }
 
-  /* Now we go over all object in the graph and collect the attribute names and
+  /* Now we go over all objects in the graph and collect the attribute names and
      types. Plus we collect node ids. We also do some checks. */
-  
-  for (i=igraph_gml_tree_length(gtree)-1; i>=0; i--) {
+  for (i=0; i<igraph_gml_tree_length(gtree); i++) {
     long int j;
     char cname[100];
     const char *name=igraph_gml_tree_name(gtree, i);
@@ -1147,8 +1166,8 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
   /* Ok, now the edges, attributes too */
   IGRAPH_CHECK(igraph_vector_resize(&edges, no_of_edges*2));
-  p=igraph_gml_tree_length(gtree);
-  while ( (p=igraph_gml_tree_findback(gtree, "edge", p-1)) != -1) {
+  p=-1;
+  while ( (p=igraph_gml_tree_find(gtree, "edge", p+1)) != -1) {
     igraph_gml_tree_t *edge;
     long int from, to, fromidx=0, toidx=0;
     char name[100];
@@ -1192,7 +1211,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   }
 
   /* and add vertex attributes */
-  for (i=igraph_gml_tree_length(gtree)-1; i>=0; i--) {
+  for (i=0; i<igraph_gml_tree_length(gtree); i++) {
     const char *n;
     char name[100];
     long int j, k;
