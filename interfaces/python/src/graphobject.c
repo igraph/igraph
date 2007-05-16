@@ -3439,7 +3439,7 @@ PyObject *igraphmodule_Graph_to_directed(igraphmodule_GraphObject * self,
 /** \ingroup python_interface_graph
  * \brief Reads a DIMACS file and creates a graph from it.
  * \return the graph
- * \sa igraph_read_graph_graphml
+ * \sa igraph_read_graph_dimacs
  */
 PyObject *igraphmodule_Graph_Read_DIMACS(PyTypeObject * type,
                                          PyObject * args, PyObject * kwds)
@@ -3655,6 +3655,46 @@ PyObject *igraphmodule_Graph_Read_Pajek(PyTypeObject * type, PyObject * args,
     return NULL;
   }
   if (igraph_read_graph_pajek(&g, f)) {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  if (self != NULL) {
+    RC_ALLOC("Graph", self);
+    igraphmodule_Graph_init_internal(self);
+    self->g = g;
+  }
+  fclose(f);
+
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Reads a GML file and creates a graph from it.
+ * \return the graph
+ * \sa igraph_read_graph_ghml
+ */
+PyObject *igraphmodule_Graph_Read_GML(PyTypeObject * type,
+                                      PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  char *fname = NULL;
+  FILE *f;
+  long int index = 0;
+  igraph_t g;
+
+  static char *kwlist[] = { "f", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+    return NULL;
+
+  f = fopen(fname, "r");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+  if (igraph_read_graph_gml(&g, f)) {
     igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
@@ -6251,7 +6291,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Please note that the vertex indices are zero-based.\n\n"
    "@param f: the name of the file\n"
    "@param directed: whether the generated graph should be directed.\n"},
-  // interface to igraph_read_graph_ncol
+  /* interface to igraph_read_graph_graphml */
+  {"Read_GraphML", (PyCFunction) igraphmodule_Graph_Read_GraphML,
+   METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+   "Read_GraphML(f, directed=True, index=0)\n\n"
+   "Reads a GraphML format file and creates a graph based on it.\n\n"
+   "@param f: the name of the file\n"
+   "@param index: if the GraphML file contains multiple graphs,\n"
+   "  specifies the one that should be loaded. Graph indices\n"
+   "  start from zero, so if you want to load the first graph,\n"
+   "  specify 0 here.\n"},
+  /* interface to igraph_read_graph_gml */
+  {"Read_GML", (PyCFunction) igraphmodule_Graph_Read_GML,
+   METH_VARARGS | METH_KEYWORDS | METH_CLASS,
+   "Read_GML(f)\n\n"
+   "Reads a GML file and creates a graph based on it.\n\n"
+   "@param f: the name of the file\n"
+  },
+  /* interface to igraph_read_graph_ncol */
   {"Read_Ncol", (PyCFunction) igraphmodule_Graph_Read_Ncol,
    METH_VARARGS | METH_KEYWORDS | METH_CLASS,
    "Read_Ncol(f, names=True, weights=True)\n\n"
@@ -6293,16 +6350,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Read_Pajek(f)\n\n"
    "Reads a Pajek format file and creates a graph based on it.\n\n"
    "@param f: the name of the file\n"},
-  // interface to igraph_read_graph_graphml
-  {"Read_GraphML", (PyCFunction) igraphmodule_Graph_Read_GraphML,
-   METH_VARARGS | METH_KEYWORDS | METH_CLASS,
-   "Read_GraphML(f, directed=True, index=0)\n\n"
-   "Reads a GraphML format file and creates a graph based on it.\n\n"
-   "@param f: the name of the file\n"
-   "@param index: if the GraphML file contains multiple graphs,\n"
-   "  specifies the one that should be loaded. Graph indices\n"
-   "  start from zero, so if you want to load the first graph,\n"
-   "  specify 0 here.\n"},
   // interface to igraph_write_graph_dimacs
   {"write_dimacs", (PyCFunction) igraphmodule_Graph_write_dimacs,
    METH_VARARGS | METH_KEYWORDS,
