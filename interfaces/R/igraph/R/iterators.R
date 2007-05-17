@@ -292,21 +292,31 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 
 print.igraph.vs <- function(x, ...) {
   cat("Vertex sequence:\n")
-  print(as.numeric(x))
+  graph <- get("graph", attr(x, "env"))
+  x <- as.numeric(x)
+  if ("name" %in% list.vertex.attributes(graph)) {
+    x <- V(g)$name[x+1]
+  }
+  print(x)
 }
 
 print.igraph.es <- function(x, ...) {
   cat("Edge sequence:\n")
   graph <- get("graph", attr(x, "env"))
   if (is.directed(graph)) {
-    arrow <- " -> "
+    arrow <- "->"
   } else {
-    arrow <- " -- "
+    arrow <- "--"
   }
-  for (i in as.numeric(x)) {
-    edge <- get.edge(graph, i)
-    cat(sep="", "[", i, "] ", edge[1], arrow, edge[2], "\n")
+  x <- as.numeric(x)
+  el <- matrix(get.edges(graph, x), nc=2, byrow=TRUE)
+  if ("name" %in% list.vertex.attributes(graph)) {
+    el <- matrix(V(graph)$name[el+1], nc=2)
   }
+  tab <- data.frame(e=paste(sep="", "[", x, "]"), row.names="e")
+  if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
+  tab[" "] <- paste(format(el[,1], width=w), arrow, format(el[,2], width=w))
+  print(tab)
 }
 
 # these are internal

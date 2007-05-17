@@ -3,7 +3,6 @@ These are needed for 0.4:
 
   o R interface graphics improvements:
     - add examples to documentation
-  o R interface: pretty printing of edge sequences
 
 o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
   index.
