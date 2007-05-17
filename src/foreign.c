@@ -939,6 +939,42 @@ const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
 
 /**
  * \function igraph_read_graph_gml
+ * \brief Read a graph in GML format.
+ * 
+ * GML is a simple textual format, see
+ * http://www.infosun.fim.uni-passau.de/Graphlet/GML/ for details.
+ * 
+ * </para><para>
+ * Although all syntactically correct GML can be parsed, 
+ * we implement only a subset of this format, some attributes might be
+ * ignored. Here is a list of all the differences:
+ * \olist
+ * \oli Only <code>node</code> and <code>edge</code> attributes are 
+ *      used, and only if they have a simple type: integer, real or
+ *      string. So if an attribute is an array or a record, then it is 
+ *      ignored. This is also true if only some values of the
+ *      attribute are complex. 
+ * \oli Top level attributes except for <code>Version</code> and the
+ *      first <code>graph</code> attribute are completely ignored.
+ * \oli Graph attributes except for <code>node</code> and
+ *      <code>edge</code> are completely ignored.
+ * \oli There is no maximum line length. 
+ * \oli There is no maximum keyword length.
+ * \oli Character entities in strings are not interpreted.
+ * \oli We allow <code>inf</code> (infinity) and <code>nan</code>
+ *      (not a number) as a real number. This is case insensitive, so
+ *      <code>nan</code>, <code>NaN</code> and <code>NAN</code> are equal.
+ * \endolist
+ * 
+ * </para><para> Please contact us if you cannot live with these
+ * limitations of the GML parser.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param instream The stream to read the GML file from. 
+ * \return Error code.
+ * 
+ * Time complexity: should be proportional to the length of the file.
+ * 
+ * \sa \ref igraph_read_graph_graphml() for a more modern format.
  */
 
 int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
@@ -964,7 +1000,10 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   igraph_gml_mylineno=1;
   igraph_gml_eof=0;
   
-  igraph_gml_yyparse();
+  i=igraph_gml_yyparse();
+  if (i != 0) {
+    IGRAPH_ERROR("Cannot read GML file", IGRAPH_PARSEERROR);
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 

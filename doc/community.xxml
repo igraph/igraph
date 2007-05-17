@@ -34,7 +34,6 @@
 </section>
 
 <section><title>Community structure based on fast greedy optimization of modularity</title>
-<!-- doxrox-include igraph_community_clauset -->
 <!-- doxrox-include igraph_community_fastgreedy -->
 </section>
 

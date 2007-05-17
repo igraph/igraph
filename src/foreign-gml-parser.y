@@ -56,7 +56,7 @@ extern int igraph_gml_yylex(void);
 extern long int igraph_gml_mylineno;
 extern char *igraph_gml_yytext;
 extern int igraph_gml_yyleng;
-igraph_gml_tree_t *igraph_i_gml_parsed_tree;
+igraph_gml_tree_t *igraph_i_gml_parsed_tree=0;
 int igraph_gml_yyerror(char *s);
 void igraph_i_gml_reset_scanner(void);
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
@@ -93,15 +93,19 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 
 %token STRING
 %token NUM
-%token KEYWORD
+%token <str>    KEYWORD
 %token LISTOPEN
 %token LISTCLOSE
 %token EOFF
+
+%destructor { Free($$.s); } string key KEYWORD;
+%destructor { igraph_gml_tree_destroy($$); } list keyvalue;
 
 %%
 
 input:   list      { igraph_i_gml_parsed_tree=$1; } 
        | list EOFF { igraph_i_gml_parsed_tree=$1; }
+;
 
 list:   keyvalue      { $$=$1; } 
       | list keyvalue { $$=igraph_i_gml_merge($1, $2); };
@@ -127,13 +131,9 @@ string: STRING { igraph_i_gml_get_string(igraph_gml_yytext,
 
 int igraph_gml_yyerror(char *s)
 {
-  char str[200];  
   igraph_i_gml_reset_scanner();
-
-  snprintf(str, sizeof(str), "Parse error in GML file, line %li (%s)", 
-	   (long)igraph_gml_mylineno, s);
-  IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
-  return IGRAPH_PARSEERROR;
+  /* TODO: return the place of the error */
+  return 0;
 }
 
 void igraph_i_gml_get_keyword(char *s, int len, void *res) {

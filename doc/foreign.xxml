@@ -29,6 +29,10 @@
 <!-- doxrox-include igraph_write_graph_graphml -->
 </section>
 
+<section><title>GML format</title>
+<!-- doxrox-include igraph_read_graph_gml -->
+</section>
+
 <section><title>Pajek format</title>
 <!-- doxrox-include igraph_read_graph_pajek -->
 <!-- doxrox-include igraph_write_graph_pajek -->
