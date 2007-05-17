@@ -44,6 +44,8 @@ int main() {
   }
     
   igraph_write_graph_edgelist(&g, stdout);
+  printf("-----------------\n");
+  igraph_write_graph_gml(&g, stdout, 0, "test suite");
   igraph_destroy(&g);
   
   return 0;

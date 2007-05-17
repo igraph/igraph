@@ -1,5 +1,10 @@
 2007-05-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/foreign.c (igraph_write_graph_gml) : added
+	* examples/simple/gml.c : update to test write_graph_gml as well
+
+	* src/igraph.h (IGRAPH_VERSION_STRING) : added
+
 	* src/foreign-gml-parser.y
 	* src/foreign.c (igraph_read_graph_gml) : print better error message
 

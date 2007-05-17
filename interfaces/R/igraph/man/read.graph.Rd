@@ -3,6 +3,7 @@
 \alias{LGL}
 \alias{Pajek}
 \alias{GraphML}
+\alias{GML}
 \title{Reading foreign file formats}
 \description{The \code{read.graph} function is able to read graphs in
   various representations from a file, or from a http
@@ -15,8 +16,11 @@ read.graph(file, format = "edgelist", \dots)
     a \code{http} or \code{ftp} connection. It can also be a character
     string  with the file name or URI.}
   \item{format}{Character constant giving the file format. Right now
-    \code{edgelist}, \code{pajek}, \code{graphml}, \code{ncol} and
-    \code{lgl} are supported, the default is \code{edgelist}. }
+    \code{edgelist}, \code{pajek}, \code{graphml}, \code{gml},
+    \code{ncol}, \code{lgl}, \code{dimacs} and \code{graphdb}
+    are supported, the default is \code{edgelist}. As of igraph 0.4 this
+    argument is case insensitive.
+  }
   \item{\dots}{Additional arguments, see below.}
 }
 \details{
@@ -151,6 +155,34 @@ read.graph(file, format = "edgelist", \dots)
 	  this argument can be used to select the graph to read. By
 	  default the first graph is read (index 0).}
       }
+    }
+    \item{GML}{
+      GML is a simple textual format, see
+      \url{http://www.infosun.fim.uni-passau.de/Graphlet/GML/} for details.
+ 
+      Although all syntactically correct GML can be parsed, 
+      we implement only a subset of this format, some attributes might be
+      ignored. Here is a list of all the differences:
+      \itemize{
+	\item{}{Only \code{node} and \code{edge} attributes are 
+	  used, and only if they have a simple type: integer, real or
+	  string. So if an attribute is an array or a record, then it is 
+	  ignored. This is also true if only some values of the
+	  attribute are complex.}
+	\item{}{Top level attributes except for \code{Version} and the
+	  first \code{graph} attribute are completely ignored.}
+	\item{}{Graph attributes except for \code{node} and
+	  \code{edge} are completely ignored.}
+	\item{}{ There is no maximum line length.}
+	\item{}{ There is no maximum keyword length.}
+	\item{}{ Character entities in strings are not interpreted.}
+	\item{}{ We allow \code{inf} (infinity) and \code{nan}
+	  (not a number) as a real number. This is case insensitive, so
+	  \code{nan}, \code{NaN} and \code{NAN} are equal.}
+      }
+      
+      Please contact us if you cannot live with these
+      limitations of the GML parser.
     }
     \item{ncol}{
       This format is used by the Large Graph Layout program

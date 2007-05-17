@@ -109,6 +109,8 @@ write.graph <- function(graph, file, format="edgelist", ...) {
     }
   }
   
+  format <- tolower(format)
+
   res <- switch(format,
                 "pajek"=write.graph.pajek(graph, file, ...),
                 "edgelist"=write.graph.edgelist(graph, file, ...),
@@ -116,6 +118,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
                 "lgl"=write.graph.lgl(graph, file, ...),
                 "graphml"=write.graph.graphml(graph, file, ...),
                 "dimacs"=write.graph.dimacs(graph, file, ...),
+                "gml"=write.graph.gml(graph, file, ...),
                 stop(paste("Unknown file format:",format))
                 )
 
@@ -258,6 +261,17 @@ write.graph.graphml <- function(graph, file, ...) {
 
 read.graph.gml <- function(file, ...) {
   .Call("R_igraph_read_graph_gml", file,
+        PACKAGE="igraph")
+}
+
+write.graph.gml <- function(graph, file, id=NULL, creator=NULL, ...) {
+  if (!is.null(id)) {
+    id <- as.numeric(id)
+  }
+  if (!is.null(creator)) {
+    creator <- as.character(creator)
+  }
+  .Call("R_igraph_write_graph_gml", graph, file, id, creator,
         PACKAGE="igraph")
 }
 

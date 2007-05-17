@@ -1,3 +1,12 @@
+2007-05-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (write.graph) : convert format name to
+	lowercase
+
+	* interfaces/R/igraph/R/foreign.R (write.graph, write.graph.gml) :
+	GML format added
+	* interfaces/R/src/rinterface.c (R_igraph_write_graph_gml) : added
+
 2007-05-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/foreign.R (read.graph, read.graph.gml) :

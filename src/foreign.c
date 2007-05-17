@@ -24,10 +24,11 @@
 #include "igraph.h"
 #include "config.h"
 #include "gml_tree.h"
+#include "memory.h"
 
 #include <ctype.h>		/* isspace */
 #include <string.h>
-#include "memory.h"
+#include <time.h>
 
 /**
  * \section about_loadsave 
@@ -975,7 +976,8 @@ const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
  * 
  * Time complexity: should be proportional to the length of the file.
  * 
- * \sa \ref igraph_read_graph_graphml() for a more modern format.
+ * \sa \ref igraph_read_graph_graphml() for a more modern format, 
+ * \ref igraph_write_graph_gml() for writing GML files.
  */
 
 int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
@@ -2173,3 +2175,250 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;  
 }
+
+int igraph_i_gml_convert_to_key(const char *orig, char **key) {
+  static int no=1;
+  char strno[50];
+  long int i, len=strlen(orig), newlen=0, plen=0;
+  igraph_bool_t pref=0;  
+  /* do we need a prefix? */
+  if (len==0 || !isalpha(orig[0])) { 
+    pref=1; no++;
+    snprintf(strno, sizeof(strno)-1, "igraph");
+    plen=newlen=strlen(strno);
+  }
+  for (i=0; i<len; i++) {
+    if (isalnum(orig[i])) { newlen++; }
+  }
+  *key=Calloc(newlen+1, char);
+  if (! *key) {
+    IGRAPH_ERROR("Writing GML file failed", IGRAPH_ENOMEM);
+  }
+  memcpy(*key, strno, plen*sizeof(char));
+  for (i=0; i<len; i++) {
+    if (isalnum(orig[i])) { 
+      (*key)[plen++] = orig[i];
+    }
+  }
+  (*key)[newlen]='\0';
+  
+  return 0;
+}
+
+#define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE); } while (0)
+
+/** 
+ * \function igraph_write_graph_gml
+ * \brief Write the graph to a stream in GML format 
+ * 
+ * GML is a quite general textual format, see 
+ * http://www.infosun.fim.uni-passau.de/Graphlet/GML/ for details.
+ * 
+ * </para><para> The graph, vertex and edges attributes are written to the
+ * file as well, if they are numeric of string.
+ * 
+ * </para><para> As igraph is more forgiving about attribute names, it might 
+ * be neccessary to simplify the them before writing to the GML file.
+ * This way we'll have a syntactically correct GML file. The following 
+ * simple procedure is performed on each attribute name: first the alphanumeric 
+ * characters are extracted, the others are ignored. Then if the first character
+ * is not a letter then the attribute name is prefixed with <quote>igraph</quote>.
+ * Note that this might result identical names for two attributes, igraph 
+ * does not check this. 
+ * 
+ * </para><para> The <quote>id</quote> vertex attribute is treated specially. 
+ * If the <parameter>id</parameter> argument is not 0 then it should be a numeric 
+ * vector with the vertex ids and the <quote>id</quote> vertex attribute is 
+ * ignored (if there is one). If <parameter>id</parameter> is 0 and there is a 
+ * numeric <quote>id</quote> vertex attribute that is used instead. If ids
+ * are not specified in either way then the regular igraph vertex ids are used.
+ * 
+ * </para><para> Note that whichever way vertex ids are specified, their 
+ * uniqueness is not checked.
+ * 
+ * </para><para> If the graph has edge attributes named <quote>source</quote> 
+ * or <quote>target</quote> they're silently ignored. GML uses these attributes
+ * to specify the edges, so we cannot write them to the file. Rename them 
+ * before calling this function if you want to preserve them.
+ * \param graph The graph to write to the stream.
+ * \param outstream The stream to write the file to.
+ * \param id Either <code>NULL</code> or a numeric vector with the vertex ids.
+ *        See details above.
+ * \param creator An optional string to write to the stream in the creator line.
+ *        If this is 0 then the current date and time is added.
+ * \return Error code.
+ * 
+ * Time complexity: should be proportional to the number of characters written
+ * to the file.
+ * 
+ * \sa \ref igraph_read_graph_gml() for reading GML files, 
+ * \ref igraph_read_graph_graphml() for a more modern format.
+ */
+
+int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream, 
+			   const igraph_vector_t *id, const char *creator) {
+  int ret;
+  igraph_strvector_t gnames, vnames, enames;
+  igraph_vector_t gtypes, vtypes, etypes;
+  igraph_vector_t numv;
+  igraph_strvector_t strv;
+  long int i;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+
+  igraph_vector_t v_myid;
+  const igraph_vector_t *myid=id;
+
+  time_t curtime=time(0);
+  char *timestr=ctime(&curtime);
+  timestr[strlen(timestr)-1]='\0'; /* nicely remove \n */
+  
+  CHECK(fprintf(outstream, 
+		"Creator \"igraph version %s %s\"\nVersion 1\ngraph\n[\n", 
+		IGRAPH_VERSION_STRING, creator ? creator : timestr));
+  
+  IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
+  IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
+  IGRAPH_STRVECTOR_INIT_FINALLY(&enames, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&gtypes, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&vtypes, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&etypes, 0);
+  IGRAPH_CHECK(igraph_i_attribute_get_info(graph, 
+					   &gnames, &gtypes,
+					   &vnames, &vtypes,
+					   &enames, &etypes));  
+
+  IGRAPH_VECTOR_INIT_FINALLY(&numv, 1);
+  IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
+
+  /* Check whether there is an 'id' node attribute if the supplied is 0 */
+  if (!id) {
+    igraph_bool_t found=0; 
+    for (i=0; i<igraph_vector_size(&vtypes); i++) {
+      char *n;
+      igraph_strvector_get(&vnames, i, &n);
+      if (!strcmp(n, "id") && VECTOR(vtypes)[i]==IGRAPH_ATTRIBUTE_NUMERIC) { 
+	found=1; break; 
+      }
+    }
+    if (found) {
+      IGRAPH_VECTOR_INIT_FINALLY(&v_myid, no_of_nodes);
+      IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, "id", 
+							      igraph_vss_all(),
+							      &v_myid));
+      myid=&v_myid;
+    }
+  }      
+
+  /* directedness */
+  CHECK(fprintf(outstream, "  directed %i\n", igraph_is_directed(graph) ? 0 : 1));
+
+  /* Graph attributes first */
+  for (i=0; i<igraph_vector_size(&gtypes); i++) {
+    char *name, *newname;
+    igraph_strvector_get(&gnames, i, &name);
+    IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
+    if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
+      IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
+      CHECK(fprintf(outstream, "  %s %g\n", newname, VECTOR(numv)[0]));
+      Free(newname);
+    } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
+      char *s;
+      IGRAPH_CHECK(igraph_i_attribute_get_string_graph_attr(graph, name, &strv));
+      igraph_strvector_get(&strv, 0, &s);
+      CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
+      Free(newname);
+    } else { 
+      IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored");
+    }
+  } 
+  
+  /* Now come the vertices */
+  for (i=0; i<no_of_nodes; i++) {
+    long int j;
+    CHECK(fprintf(outstream, "  node\n  [\n"));
+    /* id */
+    CHECK(fprintf(outstream, "    id %li\n", myid ? (long int)VECTOR(*myid)[i] : i));
+    /* other attributes */
+    for (j=0; j<igraph_vector_size(&vtypes); j++) {
+      int type=VECTOR(vtypes)[j];
+      char *name, *newname;
+      igraph_strvector_get(&vnames, j, &name);
+      if (!strcmp(name, "id")) { continue; }	
+      IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	IGRAPH_CHECK(igraph_i_attribute_get_numeric_vertex_attr(graph, name, 
+								igraph_vss_1(i),
+								&numv));
+	CHECK(fprintf(outstream, "    %s %g\n", newname, VECTOR(numv)[0]));
+      } else if (type==IGRAPH_ATTRIBUTE_STRING) { 
+	char *s;
+	IGRAPH_CHECK(igraph_i_attribute_get_string_vertex_attr(graph, name,
+							       igraph_vss_1(i),
+							       &strv));
+	igraph_strvector_get(&strv, 0, &s);
+	CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+	Free(newname);
+      }
+    }
+    CHECK(fprintf(outstream, "  ]\n"));
+  }
+
+  /* The edges too */
+  for (i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    long int j;
+    CHECK(fprintf(outstream, "  edge\n  [\n"));
+    /* source and target */
+    CHECK(fprintf(outstream, "    source %li\n", 
+		  myid ? (long int)VECTOR(*myid)[from] : from));
+    CHECK(fprintf(outstream, "    target %li\n", 
+		  myid ? (long int)VECTOR(*myid)[to] : to));
+
+    /* other attributes */
+    for (j=0; j<igraph_vector_size(&etypes); j++) {
+      int type=VECTOR(etypes)[j];
+      char *name, *newname;
+      igraph_strvector_get(&enames, j, &name);
+      if (!strcmp(name, "source") || !strcmp(name, "target")) { continue; }	
+      IGRAPH_CHECK(igraph_i_gml_convert_to_key(name, &newname));
+      if (type==IGRAPH_ATTRIBUTE_NUMERIC) {
+	IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(graph, name, 
+							      igraph_ess_1(i),
+							      &numv));
+	CHECK(fprintf(outstream, "    %s %g\n", newname, VECTOR(numv)[0]));
+      } else if (type==IGRAPH_ATTRIBUTE_STRING) { 
+	char *s;
+	IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(graph, name,
+							     igraph_ess_1(i),
+							     &strv));
+	igraph_strvector_get(&strv, 0, &s);
+	CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
+	Free(newname);
+      }
+    }
+    CHECK(fprintf(outstream, "  ]\n"));
+  }
+
+  CHECK(fprintf(outstream, "]\n"));
+
+  if (&v_myid == myid) { 
+    igraph_vector_destroy(&v_myid);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_strvector_destroy(&strv);
+  igraph_vector_destroy(&numv);
+  igraph_vector_destroy(&etypes);
+  igraph_vector_destroy(&vtypes);
+  igraph_vector_destroy(&gtypes);
+  igraph_strvector_destroy(&enames);
+  igraph_strvector_destroy(&vnames);
+  igraph_strvector_destroy(&gnames);
+  IGRAPH_FINALLY_CLEAN(8);
+  
+  return 0;
+}
+
+#undef CHECK

@@ -98,6 +98,8 @@ typedef struct igraph_s {
 /* Constants                                          */
 /* -------------------------------------------------- */
 
+#define IGRAPH_VERSION_STRING "0.4"
+
 typedef enum { IGRAPH_UNDIRECTED=0, IGRAPH_DIRECTED=1 } igraph_i_directed_t;
 
 typedef enum { IGRAPH_NO_LOOPS=0, IGRAPH_LOOPS=1 } igraph_i_loops_t;
@@ -1020,6 +1022,8 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream);
 int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
 			      long int source, long int target,
 			      const igraph_vector_t *capacity);
+int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream, 
+			   const igraph_vector_t *id, const char *creator);
 
 /* -------------------------------------------------- */
 /* Graph isomorphisms                                 */

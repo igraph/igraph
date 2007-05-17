@@ -3448,6 +3448,43 @@ SEXP R_igraph_write_graph_edgelist(SEXP graph, SEXP file) {
   return result;
 }
 
+SEXP R_igraph_write_graph_gml(SEXP graph, SEXP file, SEXP pid, SEXP pcreator) {
+  igraph_t g;
+  FILE *stream;
+  char *bp;
+  size_t size;
+  igraph_vector_t id, *ppid=0;
+  const char *creator=0;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  if (!isNull(pid)) { R_SEXP_to_vector(pid, &id); ppid=&id; }
+  if (!isNull(pcreator)) { creator=CHAR(STRING_ELT(pcreator, 0)); } 
+  R_SEXP_to_igraph(graph, &g);
+#if HAVE_OPEN_MEMSTREAM == 1
+  stream=open_memstream(&bp, &size);
+#else
+  stream=fopen(CHAR(STRING_ELT(file, 0)), "w");
+#endif
+  if (stream==0) { igraph_error("Cannot write edgelist", __FILE__, __LINE__,
+				IGRAPH_EFILE); }
+  igraph_write_graph_gml(&g, stream, ppid, creator);
+  fclose(stream);
+#if HAVE_OPEN_MEMSTREAM == 1
+  PROTECT(result=allocVector(RAWSXP, size));
+  memcpy(RAW(result), bp, sizeof(char)*size);
+  free(bp);
+#else 
+  PROTECT(result=NEW_NUMERIC(0));
+#endif
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_write_graph_pajek(SEXP graph, SEXP file) {
   
   igraph_t g;
