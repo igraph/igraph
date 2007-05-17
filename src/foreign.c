@@ -865,6 +865,7 @@ extern FILE *igraph_gml_yyin;
 extern int igraph_gml_eof;
 extern igraph_gml_tree_t *igraph_i_gml_parsed_tree;
 long int igraph_gml_mylineno;
+extern char *igraph_i_gml_errmsg;
 
 void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {  
   long int i;
@@ -1002,7 +1003,11 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   
   i=igraph_gml_yyparse();
   if (i != 0) {
-    IGRAPH_ERROR("Cannot read GML file", IGRAPH_PARSEERROR);
+    if (igraph_i_gml_errmsg) {
+      IGRAPH_ERROR(igraph_i_gml_errmsg, IGRAPH_PARSEERROR);
+    } else {
+      IGRAPH_ERROR("Cannot read GML file", IGRAPH_PARSEERROR);
+    }
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);

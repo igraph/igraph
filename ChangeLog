@@ -1,5 +1,8 @@
 2007-05-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/foreign-gml-parser.y
+	* src/foreign.c (igraph_read_graph_gml) : print better error message
+
 	* src/foreign-gml-parser.y 
 	* src/foreign.c (igraph_read_graph_gml) : some memory leaks corrected
 

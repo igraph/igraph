@@ -5,7 +5,6 @@ These are needed for 0.4:
     - add examples to documentation
   o R interface: pretty printing of edge sequences
   o add missing docs (GML mostly)
-  o error handling in GML parser
   o write GML file
 
 o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the

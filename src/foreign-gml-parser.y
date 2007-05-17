@@ -57,6 +57,7 @@ extern long int igraph_gml_mylineno;
 extern char *igraph_gml_yytext;
 extern int igraph_gml_yyleng;
 igraph_gml_tree_t *igraph_i_gml_parsed_tree=0;
+char *igraph_i_gml_errmsg=0;
 int igraph_gml_yyerror(char *s);
 void igraph_i_gml_reset_scanner(void);
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
@@ -131,8 +132,12 @@ string: STRING { igraph_i_gml_get_string(igraph_gml_yytext,
 
 int igraph_gml_yyerror(char *s)
 {
+  static char str[300];
   igraph_i_gml_reset_scanner();
-  /* TODO: return the place of the error */
+
+  snprintf(str, sizeof(str)-1, "Parse error in GML file, line %li (%s)", 
+	   (long)igraph_gml_mylineno, s);
+  igraph_i_gml_errmsg=str;
   return 0;
 }
 
