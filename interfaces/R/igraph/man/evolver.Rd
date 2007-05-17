@@ -1,5 +1,7 @@
 \name{revolver}
+\alias{evolver}
 \alias{revolver}
+\alias{evolver.d}
 \alias{revolver.d}
 \alias{revolver.ad}
 \alias{revolver.ade}
@@ -15,12 +17,17 @@
 \alias{revolver.ir}
 \alias{revolver.l}
 \alias{revolver.r}
+\alias{revolver.d.d}
+\alias{revolver.p.p}
 \title{Measuring the driving force in evolving networks}
 \description{These functions assume a simple evolving network model and
   measure the functional form of a so-called \emph{attractiveness
     function} governing the evolution of the network.
 }
 \usage{
+evolver.d (nodes, kernel, outseq = NULL, outdist = NULL, m = 1, 
+           directed = TRUE, verbose = igraph.par("verbose"))
+
 revolver.d (graph, niter=5, sd=FALSE, norm=FALSE,
            cites=FALSE, expected=FALSE, error=TRUE, debug=numeric(),
            verbose=igraph.par("verbose"))
@@ -70,8 +77,24 @@ revolver.air (graph, cats, window,
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
              error=TRUE, debug=matrix(nc=2, nr=0),
              verbose=igraph.par("verbose"))
+revolver.d.d (graph, vtime = V(g)$time, etime = E(g)$time, niter = 5, 
+             sd = FALSE, norm = FALSE, cites = FALSE, expected = FALSE, 
+             error = TRUE, debug = matrix(nc = 2, nr = 0),
+             verbose = igraph.par("verbose")) 
+revolver.p.p (graph, events = get.graph.attribute(graph, "events"), 
+             vtime = V(g)$time, etime = E(g)$time, niter = 5, sd = FALSE, 
+             norm = FALSE, cites = FALSE, expected = FALSE, error = TRUE, 
+             debug = matrix(nc = 2, nr = 0), verbose = igraph.par("verbose")) 
+
 }
 \arguments{
+  \item{nodes}{}
+  \item{kernel}{}
+  \item{outseq}{}
+  \item{outdist}{}
+  \item{m}{}
+  \item{directed}{}
+  \item{verbose}{}
   \item{graph}{}
   \item{niter}{}
   \item{sd}{}
@@ -80,10 +103,12 @@ revolver.air (graph, cats, window,
   \item{expected}{}
   \item{error}{}
   \item{debug}{}
-  \item{verbose}{}
   \item{agebins}{}
   \item{cats}{}
   \item{window}{}
+  \item{vtime}{}
+  \item{etime}{}
+  \item{events}{}  
 }
 \details{
   The functions should be considered as experimental, so no

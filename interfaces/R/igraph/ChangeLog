@@ -1,5 +1,8 @@
 2007-05-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/interface.R (get.edges) : return a matrix
+	* interfaces/R/igraph/R/iterators.R (print.igraph.es) : updated
+
 	* interfaces/R/igraph/R/iterators.R (print.igraph.es, print.igraph.vs) :
 	pretty printing
 

@@ -156,6 +156,7 @@ get.edges <- function(graph, es) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  .Call("R_igraph_edges", graph, as.igraph.es(es),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_edges", graph, as.igraph.es(es),
+               PACKAGE="igraph")
+  matrix(res, nc=2, byrow=TRUE)
 }

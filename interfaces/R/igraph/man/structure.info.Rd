@@ -5,6 +5,7 @@
 \alias{is.directed}
 \alias{are.connected}
 \alias{get.edge}
+\alias{get.edges}
 \title{Gaining information about graph structure}
 \description{Functions for exploring the basic structure of a network:
   number of vertices and edges, the neighbors of a node, test whether
@@ -17,6 +18,7 @@ neighbors(graph, v, mode = 1)
 is.directed(graph)
 are.connected(graph, v1, v2)
 get.edge(graph, id)
+get.edges(graph, es)
 }
 \arguments{
   \item{graph}{The graph.}
@@ -32,6 +34,7 @@ get.edge(graph, id)
   \item{v2}{The id of the second vertex. For directed graphs only edges
     pointing from \code{v1} to \code{v2} are searched.}
   \item{id}{A numeric edge id.}
+  \item{es}{An edge sequence.}
 }
 \details{
   These functions provide the basic structural information of a graph.
@@ -53,12 +56,16 @@ get.edge(graph, id)
   \code{get.edge} returns the end points of the edge with the supplied
   edge id. For directed graph the source vertex comes first, for
   undirected graphs, the order is arbitrary.
+
+  \code{get.edges} returns a matrix with the endpoints of the edges in
+  the edge sequence argument. 
 }
 \value{
   \code{vcount} and \code{ecount} return integer
   constants. \code{neighbors} returns an integer
   vector. \code{is.directed} and \code{are.connected} return boolean
   constants. \code{get.edge} returns a numeric vector of length two.
+  \code{get.edges} returns a two-column matrix.
 }
 %\references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
@@ -70,5 +77,6 @@ ecount(g)
 neighbors(g, 5)
 are.connected(g, 1, 2)
 are.connected(g, 2, 4)
+get.edges(g, 0:5)
 }
 \keyword{graphs}

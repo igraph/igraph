@@ -309,7 +309,7 @@ print.igraph.es <- function(x, ...) {
     arrow <- "--"
   }
   x <- as.numeric(x)
-  el <- matrix(get.edges(graph, x), nc=2, byrow=TRUE)
+  el <- get.edges(graph, x)
   if ("name" %in% list.vertex.attributes(graph)) {
     el <- matrix(V(graph)$name[el+1], nc=2)
   }
