@@ -4283,6 +4283,30 @@ SEXP R_igraph_get_edge(SEXP graph, SEXP peid) {
   return result;
 }
 
+SEXP R_igraph_edges(SEXP graph, SEXP eids) {
+  igraph_t g;
+  igraph_es_t es;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_es(eids, &g, &es);
+  igraph_vector_init(&res, 0);
+  igraph_edges(&g, es, &res);
+  
+  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
+  igraph_vector_copy_to(&res, REAL(result));
+  igraph_vector_destroy(&res);
+  igraph_es_destroy(&es);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}  
+
 SEXP R_igraph_constraint(SEXP graph, SEXP vids, SEXP pweights) {
   
   igraph_t g;

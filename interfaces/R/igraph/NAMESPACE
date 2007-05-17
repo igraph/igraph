@@ -4,7 +4,7 @@ importFrom(stats, as.dendrogram)
 # The igraph interface
 
 export(add.edges, add.vertices, delete.edges,
-       delete.vertices, vcount, ecount, neighbors)
+       delete.vertices, vcount, ecount, neighbors, get.edges)
 
 # Attributes
 

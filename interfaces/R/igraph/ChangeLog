@@ -1,3 +1,8 @@
+2007-05-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/interface.R (get.edges) : added
+	* interfaces/R/src/rinterface.c (R_igraph_get_edges) : added
+
 2007-05-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/foreign.R (write.graph) : convert format name to

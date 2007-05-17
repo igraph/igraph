@@ -932,6 +932,27 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
   return 0;
 }
 
+int igraph_edges(const igraph_t *graph, igraph_es_t eids,
+		 igraph_vector_t *edges) {
+  
+  igraph_eit_t eit;
+  long int i, n, ptr=0;
+
+  IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+  n=IGRAPH_EIT_SIZE(eit);
+  IGRAPH_CHECK(igraph_vector_resize(edges, n*2));
+  for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+    long int e=IGRAPH_EIT_GET(eit);
+    VECTOR(*edges)[ptr++]=IGRAPH_FROM(graph, e);
+    VECTOR(*edges)[ptr++]=IGRAPH_TO(graph, e);
+  }
+  
+  igraph_eit_destroy(&eit);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
 /**
  * \function igraph_get_eid
  * \brief Get the edge id from the end points of an edge
