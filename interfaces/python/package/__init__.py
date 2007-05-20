@@ -33,8 +33,21 @@ from clustering import *
 import os
 import math
 import gzip
+import sys
 from tempfile import mkstemp
 from warnings import warn
+
+def summary(o, f=sys.stdout):
+    """Prints a summary of object o to a given stream
+
+    @param o: the object about which a human-readable summary is requested.
+    @param f: the stream to be used
+    """
+    if hasattr(o, "summary"):
+        print >>f, o.summary()
+    else:
+        print >>f, str(o)
+
 
 class Graph(core.GraphBase):
     """Generic graph.
@@ -157,7 +170,7 @@ class Graph(core.GraphBase):
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
         merges, qs = GraphBase.community_fastgreedy(self, True)
-        return HierarchicalVertexClustering(self, merges, None, qs)
+        return VertexDendrogram(self, merges, None, qs)
 
 
     def community_leading_eigenvector_naive(self, clusters=None, return_merges = False):
@@ -187,7 +200,7 @@ class Graph(core.GraphBase):
         if merges is None:
             return VertexClustering(self, cl)
         else:
-            return HierarchicalVertexClustering(self, merges, cl)
+            return VertexDendrogram(self, merges, cl)
 
 
     def community_leading_eigenvector(self, clusters=None, return_merges = False):
@@ -215,11 +228,10 @@ class Graph(core.GraphBase):
         if merges is None:
             return VertexClustering(self, cl)
         else:
-            return HierarchicalVertexClustering(self, merges, cl)
+            return VertexDendrogram(self, merges, cl)
 
 
-    def community_edge_betweenness(self, clusters = 2, return_removed_ebs = False,
-        return_bridges = False, directed = True):
+    def community_edge_betweenness(self, clusters = None, directed = True):
         """Community structure based on the betweenness of the edges in the network.
 
         The idea is that the betweenness of the edges connecting two communities
@@ -232,17 +244,8 @@ class Graph(core.GraphBase):
 
         @param clusters: the number of clusters we would like to see. This
           practically defines the "level" where we "cut" the dendrogram to
-          get the membership vector of the vertices.
-        @param return_removed_ebs: whether to record the edge betweenness of the
-          removed edges. If C{True}, the recorded edge betweennesses can be
-          retrieved by asking for the C{removed_ebs} member of the returned
-          L{VertexClustering} object.
-        @param return_bridges: during the iterative removal process, some removals
-          result in the increase of the number of components in the graph, while
-          others don't. An edge is called a I{bridge} if its removal resulted in
-          a split of an already existing component. By setting this parameter
-          to C{True}, the edge IDs of the bridges are recorded in the C{bridges}
-          member of the returned L{VertexClustering} object.
+          get the membership vector of the vertices. If C{None}, the dendrogram
+          is cut at the level which maximizes the modularity.
         @param directed: whether the directionality of the edges should be taken
           into account or not.
         @return: a L{VertexClustering} object. Besides the usual methods and members,
@@ -255,7 +258,9 @@ class Graph(core.GraphBase):
           merge, M{n+1} means the community created after the second merge and
           so on...
         """
-        pass
+        d = VertexDendrogram(self, GraphBase.community_edge_betweenness(self, directed));
+        if clusters is not None: d.cut(clusters)
+        return d
     
     def edge_betweenness_clustering(self, clusters = None, steps = None):
         """Newman's edge betweenness clustering.
@@ -407,7 +412,7 @@ class Graph(core.GraphBase):
         @param height: the preferred height in pixels (default: 400)
         @param labels: the vertex labels. Either it is the name of
           a vertex attribute to use, or a list explicitly specifying
-          the labels.
+          the labels. It can also be C{None}.
         @param colors: the vertex colors. Either it is the name of
           a vertex attribute to use, or a list explicitly specifying
           the colors. A color can be anything acceptable in an SVG
@@ -443,6 +448,8 @@ class Graph(core.GraphBase):
                 labels = self.vs.get_attribute_values(labels)
             except KeyError:
                 labels = [x+1 for x in xrange(self.vcount())]
+        elif labels is None:
+            labels = [""] * self.vcount()
 
         if isinstance(colors, str):
             try:
@@ -538,16 +545,16 @@ class Graph(core.GraphBase):
         for vidx in range(self.vcount()):
             print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % (layout[vidx][0], layout[vidx][1])
             if shapes[vidx] == 1:
-		# Undocumented feature: can handle two colors
-		c = str(colors[vidx])
-		if " " in c:
-		    c = c.split(" ")
-		    vs = str(vertex_size)
-		    print >>f, "      <path d=\"M -%s,0 A%s,%s 0 0,0 %s,0 L -%s,0\" fill=\"%s\"/>" % (vs,vs,vs,vs,vs,c[0])
-		    print >>f, "      <path d=\"M -%s,0 A%s,%s 0 0,1 %s,0 L -%s,0\" fill=\"%s\"/>" % (vs,vs,vs,vs,vs,c[1])
-		    print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"none\"/>" % vs
-		else:
-		    print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(colors[vidx]))
+                # Undocumented feature: can handle two colors
+                c = str(colors[vidx])
+                if " " in c:
+                    c = c.split(" ")
+                    vs = str(vertex_size)
+                    print >>f, "      <path d=\"M -%s,0 A%s,%s 0 0,0 %s,0 L -%s,0\" fill=\"%s\"/>" % (vs,vs,vs,vs,vs,c[0])
+                    print >>f, "      <path d=\"M -%s,0 A%s,%s 0 0,1 %s,0 L -%s,0\" fill=\"%s\"/>" % (vs,vs,vs,vs,vs,c[1])
+                    print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"none\"/>" % vs
+                else:
+                    print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(colors[vidx]))
             elif shapes[vidx] == 2:
                 print >>f, "      <rect x=\"-%s\" y=\"-%s\" width=\"%s\" height=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(vertex_size), str(2*vertex_size), str(2*vertex_size), str(colors[vidx]))
             print >>f, "      <text x=\"0\" y=\"5\">%s</text>" % str(labels[vidx])

@@ -5074,6 +5074,7 @@ PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject
   PyObject *return_ebs = Py_False;
   PyObject *res;
   igraph_matrix_t merges;
+  igraph_vector_t removed_edges;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist, &directed,
 	  &return_removed_edges, &return_merges, &return_bridges, &return_ebs))
@@ -5081,15 +5082,20 @@ PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject
 
   if (igraph_matrix_init(&merges, 0, 0))
 	  return igraphmodule_handle_igraph_error();
-
-  /* TODO */
-  if (igraph_community_edge_betweenness(&self->g, 0, 0, &merges, 0, PyObject_IsTrue(directed))) {
+  if (igraph_vector_init(&removed_edges, 0)) {
+	  igraph_matrix_destroy(&merges);
+	  return igraphmodule_handle_igraph_error();
+  }
+  if (igraph_community_edge_betweenness(&self->g, &removed_edges, 0, &merges, 0, PyObject_IsTrue(directed))) {
 	igraphmodule_handle_igraph_error();
+	igraph_vector_destroy(&removed_edges);
 	igraph_matrix_destroy(&merges);
 	return NULL;
   }
 
   res = igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&removed_edges);
+  igraph_matrix_destroy(&merges);
   return res;
 }
 

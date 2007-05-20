@@ -80,7 +80,7 @@ class Clustering(object):
         if len(self._membership) == 0: return 0
         return max(self._membership) - min(self._membership) + 1
 
-    def _get_membership(self): return self._membership
+    def _get_membership(self): return copy(self._membership)
     membership = property(_get_membership, doc = "The membership vector (read only)")
 
     def size(self, idx):
@@ -199,8 +199,8 @@ class VertexClustering(Clustering):
         return self.subgraph(ss.index(max_size))
 
 
-class HierarchicalClustering(Clustering):
-    """The hierarchical clustering of some dataset.
+class Dendrogram(Clustering):
+    """The hierarchical clustering (dendrogram) of some dataset.
 
     A hierarchical clustering means that we know not only the way the
     elements are separated into groups, but also the exact history of
@@ -235,7 +235,9 @@ class HierarchicalClustering(Clustering):
 
         @param merges: the merge history either in matrix or tuple format"""
         Clustering.__init__(self, [0]*(len(merges)+1))
-        self._merges = deepcopy(merges)
+        self._merges = [tuple(pair) for pair in merges]
+        self._nmerges = len(self._merges)
+        self._n = max(self._merges[-1])-self._nmerges+2
     
     def _convert_matrix_to_tuple_repr(merges, n=None):
         if n is None: n = len(merges)+1
@@ -252,21 +254,53 @@ class HierarchicalClustering(Clustering):
             idxs.append(j)
         return [x for x in t if x is not None]
 
+    def _traverse_inorder(self):
+        """Conducts an inorder traversal of the merge tree.
+
+        The inorder traversal returns the nodes on the last level in the order
+        they should be drawn so that no edges cross each other.
+
+        @return: the result of the inorder traversal in a list."""
+        stack = [self._merges[-1]]
+        result = []
+        while len(stack)>0:
+            last = stack[-1]
+            if len(last) == 0:
+                stack.pop()
+                continue
+            elif len(last) == 1:       # Right child
+                stack[-1] = ()
+                last = last[0]
+            else:                      # Left child
+                stack[-1] = (last[1],)
+                last = last[0]
+            if last < self._n: # This will be a regular node
+                result.append(last)
+            else:        # This is a merge node, proceed towards left
+                stack.append(self._merges[last-self._n])
+
+        return result
+
+    def __str__(self):
+        return "Hierarchical clustering, %d elements, %d merges" % (self._n, self._nmerges)
+
+    # def summary(self):
+    #     """Draws the dendrogram of the hierarchical clustering in a string"""
+    #     return " ".join(map(str,self._traverse_inorder()))
+
 
     def _get_merges(self): return copy(self._merges)
     merges = property(_get_merges, doc = "The performed merges in matrix format")
 
-class HierarchicalVertexClustering(VertexClustering, HierarchicalClustering):
-    """The hierarchical clustering of the vertex set of a graph."""
+class VertexDendrogram(VertexClustering, Dendrogram):
+    """The dendrogram resulting from the hierarchical clustering of the
+    vertex set of a graph."""
 
     def __init__(self, graph, merges, membership = None, modularity = None, params = {}):
-        """Creates a hierarchical clustering object for a given graph.
+        """Creates a dendrogram object for a given graph.
 
         @param graph: the graph that will be associated to the clustering
-        @param merges: the merges performed given in either the form of a tuple
-          or a matrix. Matrix representation will be converted to the tuple
-          representation on the fly. No validity check is performed on this
-          parameter.
+        @param merges: the merges performed given in matrix form.
         @param membership: the membership list. The length of the list must
           be equal to the number of vertices in the graph. If C{None}, the
           dendrogram will be cut at the level where the modularity is maximized
@@ -282,7 +316,7 @@ class HierarchicalVertexClustering(VertexClustering, HierarchicalClustering):
             communities = range(graph.vcount())
             modularity = []
             n = graph.vcount()
-            modularity.append(g.modularity(ms))
+            modularity.append(graph.modularity(ms))
             for c1, c2 in merges:
                 try:
                     cidx1 = communities[c1]
@@ -296,16 +330,18 @@ class HierarchicalVertexClustering(VertexClustering, HierarchicalClustering):
                 communities.append(communities[c1])
                 communities[c1] = -1
                 communities[c2] = -1
-                modularity.append(g.modularity(ms))
+                modularity.append(graph.modularity(ms))
 
         if membership is None:
             maxmod = max(modularity)
             maxidx = modularity.index(maxmod)
             membership = range(graph.vcount())
             communities = range(graph.vcount())
+            midx = 0
             while maxidx>0:
                 maxidx -= 1
-                c1, c2 = merges.pop(0)
+                c1, c2 = merges[midx]
+                midx += 1
                 try:
                     cidx1 = communities[c1]
                     cidx2 = communities[c2]
@@ -332,6 +368,51 @@ class HierarchicalVertexClustering(VertexClustering, HierarchicalClustering):
                     n += 1
                 membership[idx] = v
         
-        HierarchicalClustering.__init__(self, merges)
+        Dendrogram.__init__(self, merges)
         VertexClustering.__init__(self, graph, membership, None, params)
 
+
+    def cut(self, n):
+        """Cuts the dendrogram at a given level.
+
+        @param n: the desired number of clusters. Merges are replayed from the
+          beginning until the membership vector has exactly M{n} distinct elements
+          or until there are no more recorded merges, whichever happens first.
+        @return: the membership vector
+        """
+        num_elts = self._graph.vcount()
+        membership = range(self._graph.vcount())
+        communities = range(self._graph.vcount())
+        midx = 0
+        while num_elts>n:
+            num_elts -= 1
+            c1, c2 = self._merges[midx]
+            midx += 1
+            try:
+                cidx1 = communities[c1]
+                cidx2 = communities[c2]
+            except IndexError:
+                raise ValueError, "invalid merge matrix, referencing nonexisting community in row %d" % idx
+
+            if cidx1 == -1 or cidx2 == -1:
+                raise ValueError, "invalid merge matrix, referencing already joined community in row %d" % idx
+
+            for idx, m in enumerate(membership):
+                if m == cidx2: membership[idx] = cidx1
+
+            communities.append(communities[c1])
+            communities[c1] = -1
+            communities[c2] = -1
+
+        recoding = {}
+        n=0
+        for idx, m in enumerate(membership):
+            try:
+                v = recoding[m]
+            except KeyError:
+                recoding[m], v = n, n
+                n += 1
+            membership[idx] = v
+ 
+        self._membership = membership
+        return copy(membership)
