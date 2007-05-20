@@ -5526,7 +5526,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "    3. for fixed numbers of nodes and edges, in increasing order\n"
    "       of the degree sequence, for example 111223 < 112222;\n"
    "    4. for fixed degree sequence, in increasing number of automorphisms.\n\n"
-   /* "@deffield ref: Reference\n" */
+   "@newfield ref: Reference\n"
    "@ref: I{An Atlas of Graphs} by Ronald C. Read and Robin J. Wilson,\n"
    "  Oxford University Press, 1998."},
 
@@ -5547,7 +5547,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param power: the power constant of the nonlinear model.\n"
    "  It can be omitted, and in this case the usual linear model\n"
    "  will be used.\n\n"
-   "@deffield ref: Reference\n"
+   "@newfield ref: Reference\n"
    "@ref: Barabasi, A-L and Albert, R. 1999. Emergence of scaling\n"
    "  in random networks. Science, 286 509-512."},
 
@@ -5724,6 +5724,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "   two vertices will be connected. Not implemented yet, should be 1.\n"
    "@param p: rewiring probability\n\n"
    "@see: L{Lattice()}, L{rewire()} if more flexibility is needed\n"
+   "@newfield ref: Reference\n"
    "@ref: Duncan J Watts and Steven H Strogatz: I{Collective dynamics of\n"
    "  small world networks}, Nature 393, 440-442, 1998\n"},
 
@@ -5966,6 +5967,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  incoming links.\n"
    "@return: a list with the Google PageRank values of the specified\n"
    "  vertices.\n\n"
+   "@newfield ref: Reference\n"
    "@ref: Sergey Brin and Larry Page: I{The Anatomy of a Large-Scale\n"
    "  Hypertextual Web Search Engine}. Proceedings of the 7th\n"
    "  World-Wide Web Conference, Brisbane, Australia, April 1998.\n"},
@@ -6017,6 +6019,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param weights: a vector containing weights for every edge in\n"
    "  the graph. C{None} means that the graph is unweighted.\n"
    "@return: the spanning tree as a L{Graph} object.\n\n"
+   "@newfield ref: Reference\n"
    "@ref: Prim, R.C.: I{Shortest connection networks and some\n"
    "  generalizations}, Bell System Technical Journal, Vol. 36.,\n"
    "  1957, 1389--1401."},
@@ -6643,6 +6646,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "independent vertex sets in the graph.\n\n"
    "@see: L{largest_independent_vertex_sets()} for the largest independent\n"
    "  vertex sets\n\n"
+   "@newfield ref: Reference\n"
    "@ref: S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka: I{A new\n"
    "  algorithm for generating all the maximal independent sets}.\n"
    "  SIAM J Computing, 6:505--517, 1977."},
@@ -6678,6 +6682,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  each vertex.\n"
    "@return: the modularity score. Score larger than 0.3 usually indicates\n"
    "  strong community structure.\n"
+   "@newfield ref: Reference\n"
    "@ref: MEJ Newman and M Girvan: Finding and evaluating community structure\n"
    "  in networks. Phys Rev E 69 026113, 2004.\n"
   },
@@ -6693,6 +6698,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  out-corenesses (L{OUT}) or the undirected corenesses (L{ALL}).\n"
    "  Ignored and assumed to be L{ALL} for undirected graphs.\n"
    "@return: the corenesses for each vertex.\n\n"
+   "@newfield ref: Reference\n"
    "@ref: Vladimir Batagelj, Matjaz Zaversnik: I{An M{O(m)} Algorithm\n"
    "  for Core Decomposition of Networks.}"},
   {"community_fastgreedy",
@@ -6716,6 +6722,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  2. The modularity scores before each merge if C{return_qs} is C{True}, or\n"
    "     C{None} otherwise\n"
    "\n"
+   "@newfield ref: Reference\n"
    "@ref: A. Clauset, M. E. J. Newman and C. Moore: I{Finding community\n"
    "  structure in very large networks.} Phys Rev E 70, 066111 (2004).\n"
    "@see: modularity()\n"
@@ -6740,6 +6747,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  vertices are merged into communities.\n"
    "@return: a tuple where the first element is the membership vector of the\n"
    "  clustering and the second element is the merge matrix.\n"
+   "@newfield ref: Reference\n"
    "@ref: MEJ Newman: Finding community structure in networks using the\n"
    "  eigenvectors of matrices, arXiv:physics/0605087\n"
   },
@@ -6759,6 +6767,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  vertices are merged into communities.\n"
    "@return: a tuple where the first element is the membership vector of the\n"
    "  clustering and the second element is the merge matrix.\n\n"
+   "@newfield ref: Reference\n"
 	"@ref: MEJ Newman: Finding community structure in networks using the\n"
 	"  eigenvectors of matrices, arXiv:physics/0605087\n"
   },

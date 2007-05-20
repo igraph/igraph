@@ -56,8 +56,6 @@ class Graph(core.GraphBase):
     methods in the Epydoc documentation is a little bit obscure:
     inherited methods come after the ones implemented directly in the
     subclass.
-
-    @deffield ref: Reference
     """
 
     # Some useful aliases
@@ -142,6 +140,7 @@ class Graph(core.GraphBase):
         @param membership: a membership list or a L{VertexClustering} object
         @return: the modularity score
         
+        @newfield ref: Reference
         @ref: MEJ Newman and M Girvan: Finding and evaluating community
           structure in networks. Phys Rev E 69 026113, 2004.
         """
@@ -166,6 +165,7 @@ class Graph(core.GraphBase):
 
         @return: an appropriate L{VertexClustering} object.
 
+        @newfield ref: Reference
         @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
@@ -193,6 +193,7 @@ class Graph(core.GraphBase):
         @return: an appropriate L{VertexClustering} object.
         @param return_merges: whether 
         
+        @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None: clusters=-1
@@ -221,6 +222,7 @@ class Graph(core.GraphBase):
         @return: an appropriate L{VertexClustering} object.
         @param return_merges: whether 
         
+        @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None: clusters=-1
@@ -275,6 +277,7 @@ class Graph(core.GraphBase):
 
         @return: an appropriate L{VertexClustering} object.
 
+        @newfield ref: Reference
         @ref: Girvan, M and Newman, MEJ: Community structure in social and
           biological networks. Proc. Natl. Acad. Sci. USA 99, 7821-7826 (2002)
         """
