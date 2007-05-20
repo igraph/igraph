@@ -24,6 +24,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 
 from statistics import Histogram
 from copy import copy, deepcopy
+from StringIO import StringIO
 
 class Clustering(object):
     """Class representing a clustering of an arbitrary ordered set.
@@ -282,12 +283,45 @@ class Dendrogram(Clustering):
         return result
 
     def __str__(self):
-        return "Hierarchical clustering, %d elements, %d merges" % (self._n, self._nmerges)
+        return "Dendrogram, %d elements, %d merges" % (self._n, self._nmerges)
 
-    # def summary(self):
-    #     """Draws the dendrogram of the hierarchical clustering in a string"""
-    #     return " ".join(map(str,self._traverse_inorder()))
+    def summary(self):
+        """Draws the dendrogram of the hierarchical clustering in a string"""
+        out = StringIO()
+        print >>out, str(self)
+        if self._n == 0: return out.getvalue()
+            
+        print >>out
 
+        positions = [None] * self._n
+        inorder = self._traverse_inorder()
+        distance = 2
+        level_distance = 2
+        nextp = 0
+        for idx, element in enumerate(inorder):
+            positions[element] = nextp
+            inorder[idx] = str(element)
+            nextp += max(distance, len(inorder[idx])+1)
+
+        width = max(positions)+1
+
+        # Print the nodes on the lowest level
+        print >>out, (" "*(distance-1)).join(inorder)
+        for v1, v2 in self._merges:
+            s = [" "]*width
+            for p in positions:
+                if p >= 0: s[p] = "|"
+            for i in xrange(level_distance-1): print >>out, "".join(s) # Print the lines
+            p1 = positions[v1]
+            p2 = positions[v2]
+            s[p1:(p2+1)] = "+%s+" % ("-" * (p2-p1-1))
+            print >>out, "".join(s)
+            positions[v1] = -1
+            positions[v2] = -1
+            positions.append((p1+p2)/2)
+
+
+        return out.getvalue()
 
     def _get_merges(self): return copy(self._merges)
     merges = property(_get_merges, doc = "The performed merges in matrix format")
