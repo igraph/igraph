@@ -5804,6 +5804,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "clusters(mode=STRONG)\n\n"
    "Calculates the (strong or weak) clusters for a given graph.\n\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a L{VertexClustering} object.\n"
+   "  It is advised to use that.\n"
    "@param mode: must be either C{STRONG} or C{WEAK}, depending on\n"
    "  the clusters being sought. Optional, defaults to C{STRONG}.\n"
    "@return: the component index for every node in the graph.\n"},

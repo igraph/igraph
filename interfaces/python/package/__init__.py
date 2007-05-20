@@ -108,6 +108,18 @@ class Graph(core.GraphBase):
 
         return result
 
+    def clusters(self, mode=STRONG):
+        """clusters(mode=STRONG)
+
+        Calculates the (strong or weak) clusters (connected components) for
+        a given graph.
+
+        @param mode: must be either C{STRONG} or C{WEAK}, depending on the
+          clusters being sought. Optional, defaults to C{STRONG}.
+        @return: a L{VertexClustering} object"""
+        return VertexClustering(self, GraphBase.clusters(self, mode))
+    components = clusters
+
     def degree_distribution(self, bin_width = 1, *args, **kwds):
         """degree_distribution(bin_width=1, ...)
 
@@ -714,7 +726,7 @@ class Graph(core.GraphBase):
         output.append("%d nodes, %d edges, %sdirected" % \
             (self.vcount(), self.ecount(), ["un", ""][self.is_directed()]))
         output.append("")
-        output.append("Number of components: %d" % (max(self.clusters())+1))
+        output.append("Number of components: %d" % (len(self.clusters())+1))
         output.append("Diameter: %d" % self.diameter(unconn=True))
         output.append("Density: %.4f" % self.density())
         # output.append("Transitivity: %.4f" % self.transitivity())
