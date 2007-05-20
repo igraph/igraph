@@ -219,7 +219,7 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
       igraph_vector_destroy(&result);
       return NULL;
     }    
-    o=igraphmodule_vector_t_to_PyList(&result);
+    o=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
     igraph_vector_destroy(&result);
   } else {
     if (igraph_matrix_init(&resmat, 0, 0)) {
