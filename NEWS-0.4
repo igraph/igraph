@@ -1,0 +1,80 @@
+
+New in the C library
+--------------------
+
+* internal representation changed
+* neighbors always returns an ordered list
+* igraph_is_loop and igraph_is_multiple added
+
+* topological sorting
+* VF2 isomorphism algorithm
+* support for reading the file format of the Graph Database for isomorphism
+* igraph_mincut cat calculate the actual minimum cut
+* girth calculation added, thanks to Keith Briggs
+* support for reading and writing GML files
+
+* Walktrap community detection algorithm added, thanks to Matthieu Latapy 
+  and Pascal Pons
+* edge betweenness based community detection algorithm added
+* fast greedy algorithm for community detection by Clauset et al. added
+  thanks to Aaron Clauset for sharing his code
+* leading eigenvector community detection algorithm by Mark Newman added
+* igraph_community_to_membership supporting function added, creates 
+  a membership vector from a community structure merge tree
+* modularity calculation added
+
+New in the R interface
+----------------------
+
+* as the internal representation changed, graphs stored with 'save' 
+  with an older igraph version cannot be read back with the new
+  version reliably.
+* neighbors returns ordered lists
+
+* topological sorting
+* VF2 isomorphism algorithm
+* support for reading graphs from the Graph Database for isomorphism
+* girth calculation added, thanks to Keith Briggs
+* support for reading and writing GML files
+
+* Walktrap community detection algorithm added, thanks to Matthieu Latapy 
+  and Pascal Pons
+* edge betweenness based community detection algorithm added
+* fast greedy algorithm for community detection by Clauset et al. added
+  thanks to Aaron Clauset for sharing his code  
+* leading eigenvector community detection algorithm by Mark Newman added
+* functions for creating denrdograms from the output of the 
+  community detection algorithms added
+* community.membership supporting function added, creates 
+  a membership vector from a community structure merge tree
+* modularity calculation added
+
+* graphics parameter handling is completely rewritten, uniform handling 
+  of colors and fonts, make sure you read ?igraph.plotting
+* new plotting parameter for edges: arrow.mode
+* a bug corrected when playing a nonlinear barabasi.game
+* better looking plotting in 3d using rglplot: edges are 3d too
+* rglplot layout is allowed to be two dimensional now
+* rglplot suspends updates while drawing, this makes it faster
+* loop edges are correctly plotted by all three plotting functions
+
+* better printing of attributes when printing graphs
+* summary of a graph prints attribute names
+* is.igraph rewritten to make it possible to inherit from the 'igraph' class
+* somewhat better looking progress meter for functions which support it
+
+Others
+------
+
+* proper support for Debian packages (re)added
+* many functions benefit from the new internal representation and are 
+  faster now: transitivity, reciprocity, graph operator functions like 
+  intersection and union, etc.
+* igraph compiles with Microsoft Visual C++ now
+* there were some internal changes to make igraph a real graph algorithm
+  platform in the near future, but these are undocumented now
+
+Bugs corrected
+--------------
+
+* corrected a bug when reading Pajek files: directed graphs were read as undirected
