@@ -307,18 +307,30 @@ class Dendrogram(Clustering):
 
         # Print the nodes on the lowest level
         print >>out, (" "*(distance-1)).join(inorder)
-        for v1, v2 in self._merges:
+        midx = 0
+        max_community_idx = self._n
+        while midx < self._nmerges:
             s = [" "]*width
             for p in positions:
                 if p >= 0: s[p] = "|"
             for i in xrange(level_distance-1): print >>out, "".join(s) # Print the lines
-            p1 = positions[v1]
-            p2 = positions[v2]
-            s[p1:(p2+1)] = "+%s+" % ("-" * (p2-p1-1))
+            
+            cidx_incr = 0
+            while midx < self._nmerges:
+                v1, v2 = self._merges[midx]
+                if v1 >= max_community_idx or v2 >= max_community_idx: break
+                midx += 1
+                p1 = positions[v1]
+                p2 = positions[v2]
+                positions[v1] = -1
+                positions[v2] = -1
+                positions.append((p1+p2)/2)
+                s[p1:(p2+1)] = "+%s+" % ("-" * (p2-p1-1))
+                cidx_incr += 1
+            
+            max_community_idx += cidx_incr
+
             print >>out, "".join(s)
-            positions[v1] = -1
-            positions[v2] = -1
-            positions.append((p1+p2)/2)
 
 
         return out.getvalue()
