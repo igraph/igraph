@@ -102,9 +102,9 @@ g <- karate
 
 wt <- walktrap.community(g, modularity=TRUE)
 dend <- as.dendrogram(wt, use.modularity=TRUE)
-xfig(file="dendrogram.fig")
+#xfig(file="dendrogram.fig")
 plot(dend, nodePar=list(pch=c(NA, 20)))
-dev.off()
+#dev.off()
 
 # SOME DEGREE DISTRIBUTIONS
 
@@ -113,27 +113,16 @@ d <- degree(g, mode="in")
 dd <- degree.distribution(g, mode="in", cumulative=TRUE)
 alpha <- power.law.fit(d, xmin=20)
 plot(dd, log="xy", xlab="degree", ylab="cumulative frequency",
-     col="red", main="Nonlinear preferential attachment")
+     col=1, main="Nonlinear preferential attachment")
 lines(10:500, 10*(10:500)^(-coef(alpha)+1))
 
-g <- barabasi.game(100000, power=0.9)
-dd <- degree.distribution(g, mode="in", cumulative=TRUE)
-points(dd, col="green", pch=2)
+powers <- c(0.9, 0.8, 0.7, 0.6)
+for (p in seq(powers)) {
+  g <- barabasi.game(100000, power=powers[p])
+  dd <- degree.distribution(g, mode="in", cumulative=TRUE)
+  points(dd, col=p+1, pch=p+1)
+}
 
-g <- barabasi.game(100000, power=0.8)
-dd <- degree.distribution(g, mode="in", cumulative=TRUE)
-points(dd, col="blue", pch=3)
-
-g <- barabasi.game(100000, power=0.7)
-dd <- degree.distribution(g, mode="in", cumulative=TRUE)
-points(dd, col="orange", pch=4)
-
-g <- barabasi.game(100000, power=0.6)
-dd <- degree.distribution(g, mode="in", cumulative=TRUE)
-points(dd, col="purple", pch=5)
-
-legend(1, 1e-5, c("1.0", "0.9", "0.8", "0.7", "0.6"),
-       col=c("red", "green", "blue", "orange", "purple"),
-       pch=1:5, ncol=1, yjust=0, lty=0)
+legend(1, 1e-5, powers, col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
 
        
