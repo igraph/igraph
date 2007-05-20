@@ -3844,6 +3844,59 @@ PyObject *igraphmodule_Graph_write_edgelist(igraphmodule_GraphObject * self,
   Py_RETURN_NONE;
 }
 
+
+/** \ingroup python_interface_graph
+ * \brief Writes the graph as a GML file
+ * \return none
+ * \sa igraph_write_graph_gml
+ */
+PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
+                                       PyObject * args, PyObject * kwds)
+{
+  char *fname = NULL;
+  FILE *f;
+  PyObject *ids = Py_None;
+  PyObject *creator = Py_None, *o=0;
+  igraph_vector_t idvec, *idvecptr=0;
+  char *creator_str=0;
+
+  static char *kwlist[] = {
+    "f", "creator", "ids", NULL
+  };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|OO", kwlist, &fname, &creator, &ids))
+    return NULL;
+
+  f = fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+
+  if (PyList_Check(ids)) {
+	idvecptr = &idvec;
+    if (igraphmodule_PyList_to_vector_t(ids, idvecptr, 0, 0)) return NULL;
+  }
+
+  if (creator != Py_None) {
+	o = PyObject_Str(creator);
+    creator_str = PyString_AS_STRING(o);
+  }
+
+  if (igraph_write_graph_gml(&self->g, f, idvecptr, creator_str)) {
+    if (idvecptr) igraph_vector_destroy(idvecptr);
+	if (o) Py_DECREF(o);
+	igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  if (idvecptr) igraph_vector_destroy(idvecptr);
+  if (o) Py_DECREF(o);
+  fclose(f);
+
+  Py_RETURN_NONE;
+}
+
 /** \ingroup python_interface_graph
  * \brief Writes the edge list to a file in .ncol format
  * \return none
@@ -6355,7 +6408,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "write_dimacs(f, source, target, capacity=None)\n\n"
    "Writes the graph in DIMACS format to the given file.\n\n"
-   "edge list of a graph to a file.\n\n"
    "@param f: the name of the file to be written\n"
    "@param source: the source vertex ID\n"
    "@param target: the target vertex ID\n"
@@ -6369,6 +6421,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Writes the edge list of a graph to a file.\n\n"
    "Directed edges are written in (from, to) order.\n\n"
    "@param f: the name of the file to be written\n"},
+  /* interface to igraph_write_graph_gml */
+  {"write_gml", (PyCFunction) igraphmodule_Graph_write_gml,
+   METH_VARARGS | METH_KEYWORDS,
+   "write_gml(f, creator=None, ids=None)\n\n"
+   "Writes the graph in GML format to the given file.\n\n"
+   "@param f: the name of the file to be written\n"
+   "@param creator: optional creator information to be written to the file.\n"
+   "  If C{None}, the current date and time is added.\n"
+   "@param ids: optional numeric vertex IDs to use in the file. This must\n"
+   "  be a list of integers or C{None}. If C{None}, the C{id} attribute of\n"
+   "  the vertices are used, or if they don't exist, numeric vertex IDs\n"
+   "  will be generated automatically."},
   // interface to igraph_write_graph_ncol
   {"write_ncol", (PyCFunction) igraphmodule_Graph_write_ncol,
    METH_VARARGS | METH_KEYWORDS,
@@ -6604,12 +6668,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@attention: method overridden in L{Graph} to allow L{VertexClustering}\n"
    "  objects as a parameter. This method is not strictly necessary, since\n"
    "  the L{VertexClustering} class provides a variable called C{modularity}.\n"
-   "@ref: MEJ Newman and M Girvan: Finding and evaluating community structure\n"
-   "  in networks. Phys Rev E 69 026113, 2004.\n"
    "@param membership: the membership vector, e.g. the vertex type index for\n"
    "  each vertex.\n"
    "@return: the modularity score. Score larger than 0.3 usually indicates\n"
    "  strong community structure.\n"
+   "@ref: MEJ Newman and M Girvan: Finding and evaluating community structure\n"
+   "  in networks. Phys Rev E 69 026113, 2004.\n"
   },
   {"coreness", (PyCFunction) igraphmodule_Graph_coreness,
    METH_VARARGS | METH_KEYWORDS,
@@ -6669,9 +6733,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param return_merges: if C{True}, returns the order in which the individual\n"
    "  vertices are merged into communities.\n"
    "@return: a tuple where the first element is the membership vector of the\n"
-   "  clustering and the second element is the merge matrix.\n\n"
-	"@ref: MEJ Newman: Finding community structure in networks using the\n"
-	"  eigenvectors of matrices, arXiv:physics/0605087\n"
+   "  clustering and the second element is the merge matrix.\n"
+   "@ref: MEJ Newman: Finding community structure in networks using the\n"
+   "  eigenvectors of matrices, arXiv:physics/0605087\n"
   },
   {"community_leading_eigenvector", (PyCFunction) igraphmodule_Graph_community_leading_eigenvector,
    METH_VARARGS | METH_KEYWORDS,
