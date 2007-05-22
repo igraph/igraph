@@ -84,7 +84,6 @@ except:
 
 module_sources=glob.glob(os.path.join('src', '*.c'))
 sources=glob.glob(os.path.join('igraph', '*.c'))
-
 sources.extend(module_sources)
 
 include_dirs=['igraph', '.']
