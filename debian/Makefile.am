@@ -5,6 +5,9 @@ EXTRA_DIST =					\
 	rules					\
 	changelog.in				\
 	copyright.in \
+	libigraph-dev.examples \
+	libigraph-dev.info \
+	libigraph.manpages \
 	prepare
 
 MAINTAINERCLEANFILES = Makefile.in
