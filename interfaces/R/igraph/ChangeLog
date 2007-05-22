@@ -1,3 +1,14 @@
+2007-05-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/community.R (edge.betweenness.community) 	
+	(walktrap.community, spinglass.community)
+	* interfaces/R/igraph/R/iterators.R (write.graph.dimacs)
+	* interfaces/R/igraph/R/iterators.R (print.igraph.vs)
+	* interfaces/R/igraph/R/minimum.spanning.tree (minimum.spanning.tree)
+	* interfaces/R/igraph/R/revolver.R (revolver.d.d, revolver.p.p)
+	* interfaces/R/igraph/structural.properties.R (constraint) :
+	bugs corrected, i tend to write V(g) instead of the correct V(graph)...
+
 2007-05-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/interface.R (get.edges) : return a matrix

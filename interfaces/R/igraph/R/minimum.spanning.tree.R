@@ -42,7 +42,7 @@ minimum.spanning.tree <- function(graph, weights=NULL,
     if (is.null(weights) && ! "weight" %in% list.edge.attributes(graph)) {
       stop("edges weights must be supplied for Prim's algorithm")
     } else if (is.null(weights)) {
-      weights <- E(g)$weight
+      weights <- E(graph)$weight
     }
     .Call("R_igraph_minimum_spanning_tree_prim", graph, as.numeric(weights),
           PACKAGE="igraph")    

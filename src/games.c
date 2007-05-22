@@ -1007,7 +1007,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   IGRAPH_CHECK(igraph_dqueue_init(&history, 
 				  time_window*(no_of_neighbors+1)+10));
-  IGRAPH_FINALLY(&history, igraph_dqueue_destroy);
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
   
   RNG_BEGIN();
   
@@ -1328,7 +1328,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   IGRAPH_CHECK(igraph_dqueue_init(&history, 
 				  time_window*(no_of_neighbors+1)+10));
-  IGRAPH_FINALLY(&history, igraph_dqueue_destroy);
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &history);
   
   RNG_BEGIN();
   

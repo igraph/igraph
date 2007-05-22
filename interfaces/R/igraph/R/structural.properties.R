@@ -370,7 +370,7 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
 
   if (is.null(weights)) {
     if ("weight" %in% list.edge.attributes(graph)) {
-      weights <- E(g)$weight
+      weights <- E(graph)$weight
     }
   }
   

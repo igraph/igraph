@@ -231,7 +231,7 @@ write.graph.dimacs <- function(graph, file,
     target <- get.graph.attribute(graph, "target")
   }
   if (is.null(capacity)) {
-    capacity <- E(g)$capacity
+    capacity <- E(graph)$capacity
   }
   
   .Call("R_igraph_write_graph_dimacs", graph, file, as.numeric(source),

@@ -77,12 +77,12 @@ revolver.air (graph, cats, window,
              sd=FALSE, norm=FALSE, cites=FALSE, expected=FALSE,
              error=TRUE, debug=matrix(nc=2, nr=0),
              verbose=igraph.par("verbose"))
-revolver.d.d (graph, vtime = V(g)$time, etime = E(g)$time, niter = 5, 
+revolver.d.d (graph, vtime = V(graph)$time, etime = E(graph)$time, niter = 5, 
              sd = FALSE, norm = FALSE, cites = FALSE, expected = FALSE, 
              error = TRUE, debug = matrix(nc = 2, nr = 0),
              verbose = igraph.par("verbose")) 
 revolver.p.p (graph, events = get.graph.attribute(graph, "events"), 
-             vtime = V(g)$time, etime = E(g)$time, niter = 5, sd = FALSE, 
+             vtime = V(graph)$time, etime = E(graph)$time, niter = 5, sd = FALSE, 
              norm = FALSE, cites = FALSE, expected = FALSE, error = TRUE, 
              debug = matrix(nc = 2, nr = 0), verbose = igraph.par("verbose")) 
 

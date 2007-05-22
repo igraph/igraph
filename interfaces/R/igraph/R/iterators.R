@@ -295,7 +295,7 @@ print.igraph.vs <- function(x, ...) {
   graph <- get("graph", attr(x, "env"))
   x <- as.numeric(x)
   if ("name" %in% list.vertex.attributes(graph)) {
-    x <- V(g)$name[x+1]
+    x <- V(graph)$name[x+1]
   }
   print(x)
 }

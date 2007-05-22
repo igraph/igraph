@@ -35,7 +35,7 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
 
   if (is.null(weights)) {
     if ("weight" %in% list.edge.attributes(graph)) {
-      weights <- as.numeric(E(g)$weight)
+      weights <- as.numeric(E(graph)$weight)
     } else {
       weights <- as.numeric(rep(1, ecount(graph)))
     }
@@ -59,7 +59,7 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
   }    
 }
 
-walktrap.community <- function(graph, weights=E(g)$weight, steps=4, merges=TRUE,
+walktrap.community <- function(graph, weights=E(graph)$weight, steps=4, merges=TRUE,
                                modularity=FALSE, labels=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -73,7 +73,7 @@ walktrap.community <- function(graph, weights=E(g)$weight, steps=4, merges=TRUE,
         as.logical(merges), as.logical(modularity),
         PACKAGE="igraph")
   if (labels && "name" %in% list.vertex.attributes(graph)) {
-    res$labels <- V(g)$name
+    res$labels <- V(graph)$name
   }
   class(res) <- "igraph.walktrap"
   res
@@ -171,7 +171,7 @@ edge.betweenness.community <- function(graph, directed=TRUE,
                as.logical(merges), as.logical(bridges),
                PACKAGE="igraph")
   if (labels && "name" %in% list.vertex.attributes(graph)) {
-    res$labels <- V(g)$name
+    res$labels <- V(graph)$name
   }
   class(res) <- "igraph.ebc"
   res

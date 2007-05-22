@@ -6,7 +6,7 @@
   short random walks tend to stay in the same community.
 }
 \usage{
-walktrap.community(graph, weights = E(g)$weight, steps = 4, merges =
+walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
           TRUE, modularity = FALSE, labels = TRUE)
 }
 \arguments{

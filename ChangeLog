@@ -1,3 +1,7 @@
+2007-05-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_recent_degree_game) : error handling bug corrected
+
 2007-05-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/type_indexededgelist.c (igraph_edges) : added
