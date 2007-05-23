@@ -3,7 +3,8 @@
 SUBDIRS=src debian tests interfaces
 DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
 	$(top_builddir)/doc/igraph-docs.info \
-	$(top_srcdir)/doc/Makefile.in
+	$(top_srcdir)/doc/Makefile.in \
+	$(top_srcdir)/doc/igraph.3
 
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
