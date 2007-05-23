@@ -936,7 +936,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
 		 igraph_vector_t *edges) {
   
   igraph_eit_t eit;
-  long int i, n, ptr=0;
+  long int n, ptr=0;
 
   IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);

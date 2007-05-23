@@ -908,7 +908,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
   double degree, delta_aff_add, delta_aff_rem, max_delta_aff, Ks=0.0, Kr=0, kis, kir, w;
   long community_marker=5;
   long to_do_marker=10;
-  double inner_links, outer_links, aff_r, aff_s, css;
+  double inner_links=0, outer_links=0, aff_r, aff_s, css;
 
   to_do=new DLList<NNode*>;
   community=new DLList<NNode*>;

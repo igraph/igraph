@@ -28,10 +28,10 @@
 power.law.fit <- function(x, xmin=NULL, start=2, ...) {
 
   if (length(x) == 0) {
-    error("zero length vector")
+    stop("zero length vector")
   }
   if (length(x) == 1) {
-    error("vector should be at least of length two")
+    stop("vector should be at least of length two")
   }  
 
   require(stats4)

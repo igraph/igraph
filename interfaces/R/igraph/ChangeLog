@@ -1,3 +1,7 @@
+2007-05-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/fit.R (power.law.fit) : error/stop bug corrected
+
 2007-05-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/community.R (edge.betweenness.community) 	
