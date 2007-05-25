@@ -545,8 +545,8 @@ class Graph(core.GraphBase):
             x2 = layout[vidxs[1]][0]
             y2 = layout[vidxs[1]][1]
             angle = math.atan2(y2-y1, x2-x1)
-            x2 = x2 - 10*math.cos(angle)
-            y2 = y2 - 10*math.sin(angle)
+            x2 = x2 - vertex_size*math.cos(angle)
+            y2 = y2 - vertex_size*math.sin(angle)
             if has_edge_opacities:
                 print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\" style=\"stroke-opacity:%.2f\"/>" % (x1, y1, x2, y2, float(edge["opacity"]))
             else:

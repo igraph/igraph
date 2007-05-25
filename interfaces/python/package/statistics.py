@@ -145,6 +145,20 @@ class Histogram(object):
         self._s = 0.0
         self._sd = 0.0
 
+    def bins(self):
+        """Generator returning the bins of the histogram in increasing order
+        
+        @return: a tuple with the following elements: left bound, right bound,
+          number of elements in the bin"""
+        x = self._min
+        while x < self._max:
+            bin = self._get_bin(x)
+            if bin is None:
+                yield (x, x+self._bin_width, 0)
+            else:
+                yield (x, x+self._bin_width, self._bins[bin])
+            x += self._bin_width
+
     def __str__(self):
         """Returns the string representation of the histogram"""
         if self._min is None or self._max is None: return str()
@@ -162,15 +176,9 @@ class Histogram(object):
 
         if scale>1: result.append("Each * represents %d items" % scale)
 
-        x = self._min
-        while x < self._max:
-            bin = self._get_bin(x)
-            if bin is None:
-                cnt = 0
-            else:
-                cnt = self._bins[bin] // scale
-            result.append(format_string % (x, x+self._bin_width, '*'*cnt))
-            x += self._bin_width
+        for left, right, cnt in self.bins():
+            cnt //= scale
+            result.append(format_string % (left, right, '*'*cnt))
 
         return "\n".join(result)
 
