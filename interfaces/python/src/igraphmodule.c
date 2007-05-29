@@ -856,7 +856,7 @@ int igraphmodule_i_get_numeric_graph_attr(const igraph_t *graph,
   if (!o) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   IGRAPH_CHECK(igraph_vector_resize(value, 1));
   if (o == Py_None) {
-    VECTOR(*value)[0] = NAN;
+    VECTOR(*value)[0] = IGRAPH_NAN;
     return 0;
   }
   result = PyNumber_Float(o);
@@ -915,7 +915,7 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
 	result = PyNumber_Float(o);
 	VECTOR(*value)[i] = PyFloat_AsDouble(result);
 	Py_XDECREF(result);
-      } else VECTOR(*value)[i] = NAN;
+      } else VECTOR(*value)[i] = IGRAPH_NAN;
       IGRAPH_VIT_NEXT(it);
       i++;
     }
@@ -994,7 +994,7 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
 	result = PyNumber_Float(o);
 	VECTOR(*value)[i] = PyFloat_AsDouble(result);
 	Py_XDECREF(result);
-      } else VECTOR(*value)[i] = NAN;
+      } else VECTOR(*value)[i] = IGRAPH_NAN;
       IGRAPH_EIT_NEXT(it);
       i++;
     }

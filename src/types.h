@@ -686,7 +686,7 @@ igraph_bool_t igraph_set_iterate (igraph_set_t* set, long int* state,
  * Compiler-related hacks, mostly because of Microsoft Visual C++
  */
 double igraph_i_fdiv(const double a, const double b);
-int igraph_i_sprintf(char *buffer, size_t count, const char *format, ...);
+int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 
 #ifdef _MSC_VER
 #  pragma warning (disable:4244)
@@ -694,13 +694,14 @@ int igraph_i_sprintf(char *buffer, size_t count, const char *format, ...);
 #  define vsnprintf(a, b, c, d) _vsnprintf((a), (b), (c), (d))
 #  define isnan(x) _isnan(x)
 #  define inline __inline
-#  define sprintf igraph_i_sprintf
+#  define strcasecmp strcmpi
+#ifndef snprintf
+#  define snprintf igraph_i_snprintf
+#endif
 #endif
 
 #if defined(INFINITY)
 #  define IGRAPH_INFINITY INFINITY
-#elif defined(HUGE_VAL)
-#  define IGRAPH_INFINITY HUGE_VAL
 #else
 #  define IGRAPH_INFINITY (igraph_i_fdiv(1.0, 0.0))
 #endif

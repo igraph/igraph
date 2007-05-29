@@ -599,7 +599,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
  */
 
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res, 
-		     igraph_vs_t vids, 
+		     const igraph_vs_t vids, 
 		     igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -715,7 +715,7 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
  */
 
 int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
-			  igraph_vs_t from, igraph_neimode_t mode) {
+			  const igraph_vs_t from, igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_from;
@@ -846,7 +846,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
  
 
 int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
-			      igraph_integer_t from, igraph_vs_t to, 
+			      igraph_integer_t from, const igraph_vs_t to, 
 			      igraph_neimode_t mode) {
 
   /* TODO: use adjlist_t if to is long (longer than 1?) */
@@ -1016,7 +1016,7 @@ void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
 int igraph_get_all_shortest_paths(const igraph_t *graph,
 				  igraph_vector_ptr_t *res, 
 				  igraph_vector_t *nrgeo,
-				  igraph_integer_t from, igraph_vs_t to,
+				  igraph_integer_t from, const igraph_vs_t to,
 				  igraph_neimode_t mode) {
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -1296,7 +1296,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  */
 
 int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res, 
-			igraph_vs_t vids, 
+			const igraph_vs_t vids, 
 			igraph_bool_t directed) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -1668,8 +1668,8 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  */
 
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res, 
-		    igraph_vs_t vids, igraph_bool_t directed, igraph_integer_t niter, 
-		    igraph_real_t eps, igraph_real_t damping) {
+		    const igraph_vs_t vids, igraph_bool_t directed,
+            igraph_integer_t niter, igraph_real_t eps, igraph_real_t damping) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n, nodes_to_calc;
   igraph_real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
@@ -1940,7 +1940,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
  */
 
 int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
-		    igraph_vs_t vids) {
+		    const igraph_vs_t vids) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t delete=IGRAPH_VECTOR_NULL;

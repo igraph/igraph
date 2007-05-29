@@ -486,7 +486,7 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
  * |E| are the number of vertices and
  * edges in the original graph.
  */
-int igraph_delete_vertices(igraph_t *graph, igraph_vs_t vertices) {
+int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
 
   long int no_of_edges=igraph_ecount(graph);
   long int no_of_nodes=igraph_vcount(graph);
@@ -824,7 +824,7 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * d is their (average) degree. 
  */
 int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
-		  igraph_vs_t vids, 
+		  const igraph_vs_t vids, 
 		  igraph_neimode_t mode, igraph_bool_t loops) {
 
   long int nodes_to_calc;

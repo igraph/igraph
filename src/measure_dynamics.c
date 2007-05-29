@@ -2220,9 +2220,9 @@ int igraph_measure_dynamics_citedcat(const igraph_t *graph,
   
   for (node=0; node<no_of_nodes; node++) {
     
-    IGRAPH_ALLOW_INTERRUPTION();
-    
     long int ccat=VECTOR(*cats)[node];
+    
+    IGRAPH_ALLOW_INTERRUPTION();
     
     /* estimake A */
     igraph_neighbors(graph, &neis, node, IGRAPH_OUT);

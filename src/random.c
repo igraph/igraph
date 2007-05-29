@@ -28,6 +28,59 @@
 
 int igraph_rng_inited = 0;
 
+#ifdef __MINGW32__
+/** MinGW does not have an expm1 function at the time of writing (Nov 1 2005),
+so let's provide a replacement */
+static double expm1 (double x)
+{
+   if (-M_LN2 < x && x < M_LN2)
+     {
+     x *= M_LOG2E;
+     __asm__("f2xm1\n\t" : "=t" (x) : "0" (x));
+     return x;
+     }
+   else
+     return expl(x) - 1.0L;
+}
+#endif
+
+#ifdef __MSVC__
+/* expm1 replacement for Microsoft Visual C */
+static double expm1 (double x)
+{
+    if (fabs(x) < M_LN2)
+    {
+        /* Compute the taylor series S = x + (1/2!) x^2 + (1/3!) x^3 + ... */
+
+        double i = 1.0;
+        double sum = x;
+        double term = x / 1.0;
+
+        do
+        {
+            term *= x / ++i;
+            sum += term;
+        }
+        while (fabs(term) > fabs(sum) * 2.22e-16);
+      
+        return sum;
+    }
+
+    return expl(x) - 1.0L;
+}
+
+/* We also need rint and rintf */
+static double rint (double x)
+{
+   return ( (x<0.) ? -floor(-x+.5) : floor(x+.5) );
+}
+
+static float rintf (float x)
+{
+   return ( (x<(float)0.) ? -(float)floor(-x+.5) : (float)floor(x+.5) );
+}
+#endif
+
 /*
  * \ingroup internal
  * 
@@ -180,41 +233,6 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
 
 #else
 
-#ifdef __MINGW32__
-/** MinGW does not have an expm1 function at the time of writing (Nov 1 2005),
-so let's provide a replacement */
-static double expm1 (double x)
-{
-   if (-M_LN2 < x && x < M_LN2)
-     {
-     x *= M_LOG2E;
-     __asm__("f2xm1\n\t" : "=t" (x) : "0" (x));
-     return x;
-     }
-   else
-     return expl(x) - 1.0L;
-}
-#endif
-
-#ifdef __MSVC__
-/* An even dumber replacement for Microsoft Visual C */
-static double expm1 (double x)
-{
-   return expl(x) - 1.0L;
-}
-
-/* We also need rint and rintf */
-static double rint (double x)
-{
-   return ( (x<0.) ? -floor(-x+.5) : floor(x+.5) );
-}
-
-static float rintf (float x)
-{
-   return ( (x<(float)0.) ? -(float)floor(-x+.5) : (float)floor(x+.5) );
-}
-#endif
-
 /*
  *  Mathlib : A C Library of Special Functions
  *  Copyright (C) 1998 Ross Ihaka
@@ -287,9 +305,15 @@ static float rintf (float x)
 #ifndef MATHLIB_PRIVATE_H
 #define MATHLIB_PRIVATE_H
 
-#define ML_POSINF	(1.0 / 0.0)
-#define ML_NEGINF	((-1.0) / 0.0)
-#define ML_NAN		(0.0 / 0.0)
+#ifdef _MSC_VER
+#  define ML_POSINF IGRAPH_INFINITY
+#  define ML_NEGINF -IGRAPH_INFINITY
+#  define ML_NAN    IGRAPH_NAN
+#else
+#  define ML_POSINF	(1.0 / 0.0)
+#  define ML_NEGINF	((-1.0) / 0.0)
+#  define ML_NAN		(0.0 / 0.0)
+#endif
 
 #define ML_ERROR(x)	/* nothing */
 #define ML_UNDERFLOW	(DBL_MIN * DBL_MIN)
@@ -562,7 +586,9 @@ int R_finite(double x)
 # ifdef _AIX
 #  include <fp.h>
      return FINITE(x);
-# else
+# elif defined(_MSC_VER)
+     return _finite(x);
+#else
     return (!isnan(x) & (x != 1/0.0) & (x != -1.0/0.0));
 # endif
 #endif

@@ -26,10 +26,22 @@
 
 /* #define IGRAPH_FASTCOMM_DEBUG */
 
+#ifdef _MSC_VER
+/* MSVC does not support variadic macros */
+void debug(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
 #ifdef IGRAPH_FASTCOMM_DEBUG
-#define debug(...) fprintf(stderr, __VA_ARGS__)
+    vfprintf(stderr, fmt, args);
+#endif
+    va_end(args);
+}
 #else
-#define debug(...) 
+#  ifdef IGRAPH_FASTCOMM_DEBUG
+#    define debug(...) fprintf(stderr, __VA_ARGS__)
+#  else
+#    define debug(...) 
+#  endif
 #endif
 
 /*

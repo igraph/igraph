@@ -329,7 +329,10 @@ igraph_integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
   return ret;
 }
 
-inline igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
+#ifndef _MSC_VER
+inline
+#endif
+igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
 				 igraph_2dgrid_iterator_t *it) {
   long int ret=it->nei;
 

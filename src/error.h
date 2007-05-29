@@ -231,7 +231,7 @@ extern igraph_error_handler_t igraph_error_handler_printignore;
  */
 
 igraph_error_handler_t*
-igraph_set_error_handler(igraph_error_handler_t new_handler);
+igraph_set_error_handler(igraph_error_handler_t* new_handler);
 
 /**
  * \typedef igraph_i_error_type_t
@@ -412,7 +412,7 @@ void IGRAPH_FINALLY_FREE(void);
 typedef igraph_error_handler_t igraph_warning_handler_t;
 
 igraph_warning_handler_t*
-igraph_set_warning_handler(igraph_warning_handler_t new_handler);
+igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
 extern igraph_warning_handler_t igraph_warning_handler_print;
 

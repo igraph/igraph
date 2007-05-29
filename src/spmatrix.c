@@ -803,8 +803,9 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
 
 int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
   igraph_vector_t *res, long int col) {
+  long int i, n;
   assert(m != NULL);
-  long int i, n = VECTOR(m->cidx)[col+1]-VECTOR(m->cidx)[col];
+  n = VECTOR(m->cidx)[col+1]-VECTOR(m->cidx)[col];
   IGRAPH_CHECK(igraph_vector_resize(res, n));
   for (i=VECTOR(m->cidx)[col], n=0; i<VECTOR(m->cidx)[col+1]; i++, n++)
     if (VECTOR(m->data)[i] != 0.0) VECTOR(*res)[n] = VECTOR(m->ridx)[i];

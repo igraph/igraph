@@ -58,7 +58,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res, 
-		      igraph_vs_t vids) {
+		      const igraph_vs_t vids) {
   return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT);
 }
 
@@ -92,7 +92,7 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res, 
-		       igraph_vs_t vids) {
+		       const igraph_vs_t vids) {
   return igraph_cocitation_real(graph, res, vids, IGRAPH_IN);
 }
 
