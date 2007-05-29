@@ -1,6 +1,9 @@
 #!/usr/bin/env python
-
-from distutils.core import setup, Extension
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
+from distutils.core import Extension
 from distutils.file_util import copy_file
 from sys import version, exit
 import glob

@@ -583,6 +583,37 @@ class Graph(core.GraphBase):
         f.close()
 
 
+    def Read(klass, f, format=None, *args, **kwds):
+        """Unified reading function for graphs.
+
+        This method tries to identify the format of the graph given in
+        the first parameter and calls the corresponding reader method.
+
+        The remaining arguments are passed to the reader method without
+        any changes.
+
+        @param f: the file containing the graph to be loaded
+        @param format: the format of the file (if known in advance).
+          C{None} means auto-detection. Possible values are: C{"ncol"}
+          (NCOL format), C{"lgl"} (LGL format), C{"graphml"}, C{"graphmlz"}
+          (GraphML and gzipped GraphML format), C{"gml"} (GML format),
+          C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
+          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list).
+        @raises: L{IOError} if the file format can't be identified and
+          none was given.
+        """
+        if format is None: format = klass._identify_format(f)
+        try:
+            reader = klass._format_mapping[format][0]
+        except KeyError, IndexError:
+            raise IOError, "unknown file format: %s" % str(format)
+        if reader is None:
+            raise IOError, "no loader method for file format: %s" % str(format)
+        reader = getattr(klass, reader)
+        return reader(f, *args, **kwds)
+    Read = classmethod(Read)
+    Load = Read
+
     def __iadd__(self, other):
         """In-place addition (disjoint union).
 
@@ -750,4 +781,20 @@ class Graph(core.GraphBase):
                 output.append(str(self.degree_distribution(binwidth, type=OUT)))
 
         return "\n".join(output)
+
+    _format_mapping = {
+          "ncol":       ("Read_Ncol", "write_ncol"),
+          "lgl":        ("Read_Lgl", "write_lgl"),
+          "graphmlz":   ("Read_GraphMLz", "write_graphmlz"),
+          "graphml":    ("Read_GraphML", "write_graphml"),
+          "gml":        ("Read_GML", "write_gml"),
+          "net":        ("Read_Pajek", None),
+          "pajek":      ("Read_Pajek", None),
+          "dimacs":     ("Read_DIMACS", "write_dimacs"),
+          #"adjacency":  ("Read_Adjacency", "write_adjacency"),
+          #"adj":        ("Read_Adjacency", "write_adjacency),
+          "edgelist":   ("Read_Edgelist", "write_edgelist"),
+          "edge":       ("Read_Edgelist", "write_edgelist"),
+          "edges":      ("Read_Edgelist", "write_edgelist")
+    }
 
