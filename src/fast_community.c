@@ -766,6 +766,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	
 	no_of_joins++;
   }
+  igraph_progress("fast greedy community detection", 100.0, 0);
 
   if (modularity) VECTOR(*modularity)[no_of_joins] = q;
 

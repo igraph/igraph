@@ -136,11 +136,17 @@ int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent
 PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
   PyObject* o;
   if (!PyArg_ParseTuple(args, "O", &o)) return NULL;
-  if (!PyCallable_Check(o)) {
+  if (!PyCallable_Check(o) && o != Py_None) {
     PyErr_SetString(PyExc_TypeError, "Progress handler must be callable.");
     return NULL;
   }
-  igraphmodule_progress_handler=o;
+  Py_XDECREF(igraphmodule_progress_handler);
+  if (o == Py_None)
+     igraphmodule_progress_handler=NULL;
+  else {
+    Py_INCREF(o);
+    igraphmodule_progress_handler=o;
+  }
   Py_RETURN_NONE;
 }
 

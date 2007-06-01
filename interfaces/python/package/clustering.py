@@ -57,6 +57,10 @@ class Clustering(object):
         @param params: additional parameters to be stored in this
           object's dictionary."""
         self._membership = list(membership)
+        if len(self._membership)>0:
+            self._len = max(self._membership)+1
+        else:
+            self._len = 0
         self.__dict__.update(params)
     
     def __getitem__(self, idx):
@@ -64,22 +68,17 @@ class Clustering(object):
 
         @param idx: the index of the cluster
         @return: the members of the specified cluster as a list
-        """
+        @raise: C{IndexError} if the index is out of bounds"""
+        if idx<0 or idx>self._len:
+            raise IndexError, "cluster index out of range"
         return [i for i,e in enumerate(self._membership) if e==idx]
 
     def __len__(self):
         """Returns the number of clusters.
 
-        @note: the result is calculated by taking the difference between
-        the minimum and maximum elements of the membership vector and adding
-        it to 1. So if there are empty clusters, they are still counted in the
-        number of clusters -- except when the clusters with the largest or smallest
-        indices are empty!
-
         @return: the number of clusters
         """
-        if len(self._membership) == 0: return 0
-        return max(self._membership) - min(self._membership) + 1
+        return self._len
 
     def _get_membership(self): return copy(self._membership)
     membership = property(_get_membership, doc = "The membership vector (read only)")
@@ -89,6 +88,8 @@ class Clustering(object):
 
         @param idx: the cluster in which we are interested.
         """
+        if idx<0 or idx>self._len:
+            raise IndexError, "cluster index out of range"
         return len([1 for x in self._membership if x == idx])
 
     def sizes(self, *args):

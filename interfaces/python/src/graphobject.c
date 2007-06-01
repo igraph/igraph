@@ -3681,7 +3681,6 @@ PyObject *igraphmodule_Graph_Read_GML(PyTypeObject * type,
   igraphmodule_GraphObject *self;
   char *fname = NULL;
   FILE *f;
-  long int index = 0;
   igraph_t g;
 
   static char *kwlist[] = { "f", NULL };
@@ -5215,7 +5214,6 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
 	PyObject * args, PyObject * kwds)
 {
   static char *kwlist[] = { "return_q", NULL };
-  long n=-1;
   PyObject *return_modularities = Py_False;
   PyObject *ms, *qs, *res;
   igraph_matrix_t merges;
