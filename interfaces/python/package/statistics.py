@@ -24,7 +24,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
-class Interval:
+class Interval(object):
     """A class representing an interval over the real numbers"""
 
     def __init__(self, left, right):
@@ -182,4 +182,92 @@ class Histogram(object):
 
         return "\n".join(result)
 
+
+
+class RunningMean(object):
+    """Running mean calculator.
+    
+    This class can be used to calculate the mean of elements from a
+    list, tuple, iterable or any other data source. The mean is
+    calculated on the fly without explicitly summing the values,
+    so it can be used for data sets with arbitrary item count. Also
+    capable of returning the standard deviation (also calculated on
+    the fly)
+    """
+    
+    def __init__(self, n = 0.0, mean = 0.0, sd = 0.0):
+        """RunningMean(n=0.0, mean=0.0, sd=0.0)
+        
+        Initializes the running mean calculator. Optionally the
+        number of already processed elements and an initial mean
+        can be supplied if we want to continue an interrupted
+        calculation.
+
+        @param n: the initial number of elements already processed
+        @param mean: the initial mean
+        @param sd: the initial standard deviation"""
+        self._n = float(n)
+        self._mean = float(mean)
+        if n>1:
+            self._s = float(sd) ** 2 * float(n-1)
+            self._sd = float(sd)
+        else:
+            self._s = 0.0
+            self._sd = 0.0
+        
+    def add(self, value):
+        """RunningMean.add(value)
+        
+        Adds the given value to the elements from which we calculate
+        the mean and the standard deviation.
+
+        @param value: the element to be added
+        @return: the new mean and standard deviation as a tuple"""
+        self._n += 1
+        delta = value - self._mean
+        self._mean = self._mean + delta / self._n
+        self._s = self._s + delta * (value - self._mean)
+        if self._n > 1:
+            self._sd = (self._s / (self._n-1)) ** 0.5
+        return self._mean, self._sd
+
+    def add_many(self, values):
+        """RunningMean.add(values)
+        
+        Adds the values in the given iterable to the elements from
+        which we calculate the mean. Can also accept a single number.
+        The left shift (C{<<}) operator is aliased to this function,
+        so you can use it to add elements as well:
+            
+          >>> rm=RunningMean()
+          >>> rm << [1,2,3,4]
+          (2.5, 1.6666666666667)
+        
+        @param values: the element(s) to be added
+        @type values: iterable
+        @return: the new mean"""
+        try:
+            iterator=iter(values)
+        except TypeError:
+            iterator=iter([values])
+        for value in iterator: self.add(value)
+        return self._mean, self._sd
+        
+    def _get_result(self): return self._mean, self._sd
+    def _get_mean(self): return self._mean
+    def _get_sd(self): return self._sd
+    mean = property(_get_mean, doc="the current mean")
+    sd = property(_get_sd, doc="the current standard deviation")
+    result = property(_get_result, doc="the current mean and standard deviation as a tuple")
+
+    def __str__(self):
+        return "Running mean (N=%d, %f +- %f)" % \
+            (int(self._n), self._mean, self._sd)
+    
+    __lshift__ = add_many
+    
+    def __float__(self): return float(self._mean)
+    def __int__(self): return int(self._mean)
+    def __long__(self): return long(self._mean)
+    def __complex__(self): return complex(self._mean)
 

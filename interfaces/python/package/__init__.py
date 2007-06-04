@@ -29,6 +29,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from core import *
 from core import __version__, __build_date__
 from clustering import *
+from layout import *
 
 import os
 import math
