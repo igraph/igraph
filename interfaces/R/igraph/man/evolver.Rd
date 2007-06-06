@@ -17,6 +17,21 @@
 \alias{revolver.ir}
 \alias{revolver.l}
 \alias{revolver.r}
+\alias{revolver.error.d}
+\alias{revolver.error.ad}
+\alias{revolver.error.ade}
+\alias{revolver.error.adi}
+\alias{revolver.error.air}
+\alias{revolver.error.ar}
+\alias{revolver.error.de}
+\alias{revolver.error.di}
+\alias{revolver.error.dl}
+\alias{revolver.error.e}
+\alias{revolver.error.el}
+\alias{revolver.error.il}
+\alias{revolver.error.ir}
+\alias{revolver.error.l}
+\alias{revolver.error.r}
 \alias{revolver.d.d}
 \alias{revolver.p.p}
 \title{Measuring the driving force in evolving networks}
@@ -85,6 +100,21 @@ revolver.p.p (graph, events = get.graph.attribute(graph, "events"),
              vtime = V(graph)$time, etime = E(graph)$time, niter = 5, sd = FALSE, 
              norm = FALSE, cites = FALSE, expected = FALSE, error = TRUE, 
              debug = matrix(nc = 2, nr = 0), verbose = igraph.par("verbose")) 
+revolver.error.d (graph, kernel)
+revolver.error.ad (graph, kernel)
+revolver.error.ade (graph, kernel, cats)
+revolver.error.adi (graph, kernel, cats)
+revolver.error.air (graph, kernel, cats, window)
+revolver.error.ar (graph, kernel, window)
+revolver.error.de (graph, kernel, cats)
+revolver.error.di (graph, kernel, cats)
+revolver.error.dl (graph, kernel)
+revolver.error.e (graph, kernel, cats)
+revolver.error.el (graph, kernel, cats)
+revolver.error.il (graph, kernel, cats)
+revolver.error.ir (graph, kernel, cats, window)
+revolver.error.l (graph, kernel)
+revolver.error.r (graph, kernel, window)
 
 }
 \arguments{
