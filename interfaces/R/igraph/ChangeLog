@@ -1,5 +1,8 @@
 2007-06-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/src/rinterface.c (R_igraph_write_graph_pajek) : 
+	open file in binary format if we don't have open_memstream 
+
 	* interfaces/R/igraph/R/layout.R (layout.reingold.tilford)
 	* interfaces/R/src/rinterface.c (R_igraph_layout_reingold_tilford) :
 	circular argument added	

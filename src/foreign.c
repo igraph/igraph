@@ -1831,7 +1831,9 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
  * determines the color (`\c c' in Pajek) parameter.
  * \param graph The graph object to write.
  * \param outstream The file to write to. It should be opened and
- * writable.
+ * writable. Make sure that you open the file in binary format if you use MS Windows,
+ * otherwise end of line characters will be messed up. (igraph will be able
+ * to read back these messed up files, but Pajek won't.)
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|+|A|), |V| is the number of vertices, |E|
@@ -1889,7 +1891,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 			      "labelcolor", "color" };
   const char *estrnames2[]= { "a", "p", "l", "lc", "c" };
 
-  const char *newline="\n\r";
+  const char *newline="\x0d\x0a";
   
   igraph_es_t es;
   igraph_eit_t eit;

@@ -1,5 +1,7 @@
 2007-06-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/foreign.c (igraph_write_graph_pajek) : correct newline
+
 	* src/layout.c (igraph_layout_reingold_tilford_circular) : added
 
 	* src/revolver_cit.c (igraph_revolver_d, igraph_revolver_mes_d)

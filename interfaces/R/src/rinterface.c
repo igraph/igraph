@@ -3500,7 +3500,7 @@ SEXP R_igraph_write_graph_pajek(SEXP graph, SEXP file) {
 #if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
 #else
-  stream=fopen(CHAR(STRING_ELT(file, 0)), "w");
+  stream=fopen(CHAR(STRING_ELT(file, 0)), "wb");
 #endif
   if (stream==0) { igraph_error("Cannot write oajek file", __FILE__, __LINE__,
 				IGRAPH_EFILE); }
