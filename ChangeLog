@@ -1,3 +1,14 @@
+2007-06-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_cit.c (igraph_revolver_error2_d, igraph_revolver_error2_ad)
+	(igraph_revolver_error2_ade, igraph_revolver_error2_e)
+	(igraph_revolver_error2_de, igraph_revolver_error2_l)
+	(igraph_revolver_error2_dl, igraph_revolver_error2_el)
+	(igraph_revolver_error2_r, igraph_revolver_error2_ar)
+	(igraph_revolver_error2_di, igraph_revolver_error2_adi)
+	(igraph_revolver_error2_il, igraph_revolver_error2_ir)
+	(igraph_revolver_error2_air) : added
+
 2007-05-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_recent_degree_game) : error handling bug corrected

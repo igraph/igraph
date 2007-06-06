@@ -417,6 +417,33 @@ int igraph_revolver_error_d(const igraph_t *graph,
   
   return 0;
 } 
+
+int igraph_revolver_error2_d(const igraph_t *graph,
+			     const igraph_vector_t *kernel,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t maxdegree=igraph_vector_size(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_d(graph, &st, kernel));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_d(graph, kernel, &st, maxdegree,
+					 logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}		
+
   
 /***********************************************/
 /* in-degree, age                              */
@@ -874,6 +901,33 @@ int igraph_revolver_error_ad(const igraph_t *graph,
   return 0;
 }
 
+int igraph_revolver_error2_ad(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t maxdegree=igraph_matrix_nrow(kernel)-1;
+  igraph_integer_t agebins=igraph_matrix_ncol(kernel);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_ad(graph, &st, kernel));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_ad(graph, kernel, &st, maxdegree, agebins,
+					  logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+  
 /***********************************************/
 /* in-degree, age, cited category              */
 /***********************************************/
@@ -1263,6 +1317,37 @@ int igraph_revolver_error_ade(const igraph_t *graph,
   return 0;
 }
 
+int igraph_revolver_error2_ade(const igraph_t *graph,
+			       const igraph_array3_t *kernel,
+			       const igraph_vector_t *cats,
+			       igraph_real_t *logprob,
+			       igraph_real_t *lognull) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_array3_n(kernel, 1);
+  igraph_integer_t maxdegree=igraph_array3_n(kernel, 2)-1;
+  igraph_integer_t agebins=igraph_array3_n(kernel, 3);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_ade(graph, &st, kernel, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_ade(graph, kernel, &st, cats, 
+					   nocats, maxdegree, agebins, 
+					   logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+			       
+
 /***********************************************/
 /* cited category                              */
 /***********************************************/
@@ -1537,6 +1622,33 @@ int igraph_revolver_error_e(const igraph_t *graph,
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(1);
 
+  return 0;
+}
+
+int igraph_revolver_error2_e(const igraph_t *graph,
+			     const igraph_vector_t *kernel,
+			     const igraph_vector_t *cats,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_vector_size(kernel);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_e(graph, &st, kernel, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_e(graph, kernel, &st, cats, nocats,
+					 logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }
 
@@ -1878,6 +1990,34 @@ int igraph_revolver_error_de(const igraph_t *graph,
   igraph_vector_destroy(&indegree);
   IGRAPH_FINALLY_CLEAN(2);
   
+  return 0;
+}
+
+int igraph_revolver_error2_de(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
+  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_de(graph, &st, kernel, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_de(graph, kernel, &st, cats, nocats,
+					  maxdegree, logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -2227,6 +2367,32 @@ int igraph_revolver_error_l(const igraph_t *graph,
   igraph_vector_destroy(&lastcit);
   IGRAPH_FINALLY_CLEAN(2);
 
+  return 0;
+}
+
+int igraph_revolver_error2_l(const igraph_t *graph,
+			     const igraph_vector_t *kernel,			     
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t agebins=igraph_vector_size(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_l(graph, &st, kernel));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_l(graph, kernel, &st, agebins, 
+					 logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }
       
@@ -2601,6 +2767,33 @@ int igraph_revolver_error_dl(const igraph_t *graph,
   igraph_vector_destroy(&lastcit);
   igraph_vector_destroy(&indegree);
   IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
+int igraph_revolver_error2_dl(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t maxdegree=igraph_matrix_nrow(kernel)-1;
+  igraph_integer_t agebins=igraph_matrix_ncol(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_dl(graph, &st, kernel));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_dl(graph, kernel, &st, maxdegree, agebins,
+					  logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }
@@ -2982,6 +3175,35 @@ int igraph_revolver_error_el(const igraph_t *graph,
   return 0;
 }
 
+int igraph_revolver_error2_el(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
+  igraph_integer_t agebins=igraph_matrix_ncol(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_el(graph, &st, kernel, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_el(graph, kernel, &st, cats, nocats, agebins,
+					  logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+
 /***********************************************/
 /* recent in-degree                            */
 /***********************************************/
@@ -3359,6 +3581,35 @@ int igraph_revolver_error_r(const igraph_t *graph,
 
   return 0;
 }
+
+int igraph_revolver_error2_r(const igraph_t *graph,
+			     const igraph_vector_t *kernel,
+			     igraph_integer_t window,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t maxdegree=igraph_vector_size(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_r(graph, &st, kernel, window));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_r(graph, kernel, &st, window, maxdegree,
+					 logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+  
+  
 
 /***********************************************/
 /* age, recent in-degree                       */
@@ -3784,6 +4035,36 @@ int igraph_revolver_error_ar(const igraph_t *graph,
   return 0;
 }
 
+int igraph_revolver_error2_ar(const igraph_t *graph, 
+			      const igraph_matrix_t *kernel,
+			      igraph_integer_t window, 
+			      igraph_real_t *logprob, 
+			      igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t agebins=igraph_matrix_nrow(kernel)-1;
+  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_ar(graph, &st, kernel, window));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_ar(graph, kernel, &st, agebins, window,
+					  maxdegree,
+					  logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+  
+
 /***********************************************/
 /* in-degree, citing category                  */
 /***********************************************/
@@ -4137,6 +4418,35 @@ int igraph_revolver_error_di(const igraph_t *graph,
   igraph_vector_destroy(&neis);
   igraph_vector_destroy(&indegree);
   IGRAPH_FINALLY_CLEAN(2);
+  
+  return 0;
+}
+
+int igraph_revolver_error2_di(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
+  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_di(graph, &st, kernel, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_di(graph, kernel, &st, cats, nocats,
+					  maxdegree,
+					  logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
 }
@@ -4544,6 +4854,36 @@ int igraph_revolver_error_adi(const igraph_t *graph,
   return 0;
 }
 
+int igraph_revolver_error2_adi(const igraph_t *graph,
+			       const igraph_array3_t *kernel,
+			       const igraph_vector_t *cats,
+			       igraph_real_t *logprob,
+			       igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_array3_n(kernel, 1);
+  igraph_integer_t maxdegree=igraph_array3_n(kernel, 2)-1;
+  igraph_integer_t agebins=igraph_array3_n(kernel, 3);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_adi(graph, &st, kernel, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_adi(graph, kernel, &st, cats, nocats, 
+					   maxdegree, agebins,
+					   logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}  
+
 /***********************************************/
 /* time since last citation, citing category   */
 /***********************************************/
@@ -4940,6 +5280,34 @@ int igraph_revolver_error_il(const igraph_t *graph,
   igraph_vector_destroy(&lastcit);
   IGRAPH_FINALLY_CLEAN(2);
 
+  return 0;
+}
+
+int igraph_revolver_error2_il(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
+  igraph_integer_t agebins=igraph_matrix_ncol(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_il(graph, &st, kernel, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_il(graph, kernel, &st, cats, nocats,
+					  agebins, logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }
 
@@ -5371,6 +5739,35 @@ int igraph_revolver_error_ir(const igraph_t *graph,
   igraph_vector_destroy(&indegree);
   IGRAPH_FINALLY_CLEAN(2);
 
+  return 0;
+}
+
+int igraph_revolver_error2_ir(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_integer_t window,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
+  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_ir(graph, &st, kernel, window, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_ir(graph, kernel, &st, window, cats, nocats,
+					  maxdegree, logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }
 
@@ -5852,5 +6249,36 @@ int igraph_revolver_error_air(const igraph_t *graph,
   igraph_vector_destroy(&indegree);
   IGRAPH_FINALLY_CLEAN(2);
 
+  return 0;
+}
+
+int igraph_revolver_error2_air(const igraph_t *graph,
+			       const igraph_array3_t *kernel,
+			       const igraph_vector_t *cats,
+			       igraph_integer_t window,
+			       igraph_real_t *logprob,
+			       igraph_real_t *lognull) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t st;
+  igraph_integer_t nocats=igraph_array3_n(kernel, 1);
+  igraph_integer_t maxdegree=igraph_array3_n(kernel, 2)-1;
+  igraph_integer_t agebins=igraph_array3_n(kernel, 3);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  
+  /* update st */
+  IGRAPH_CHECK(igraph_revolver_st_air(graph, &st, kernel, window, cats));
+  
+  /* error calculation */
+  if (logprob || lognull) {
+    IGRAPH_CHECK(igraph_revolver_error_air(graph, kernel, &st, window, cats, nocats,
+					   maxdegree, agebins,
+					   logprob, lognull));
+  }
+  
+  igraph_vector_destroy(&st);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   return 0;
 }

@@ -1362,6 +1362,10 @@ int igraph_revolver_error_d(const igraph_t *graph,
 			   igraph_integer_t maxind,
 			   igraph_real_t *logprob,
 			   igraph_real_t *lognull);
+int igraph_revolver_error2_d(const igraph_t *graph,
+			     const igraph_vector_t *kernel,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull);
 
 int igraph_revolver_ad(const igraph_t *graph,
 		      igraph_integer_t niter,
@@ -1401,6 +1405,10 @@ int igraph_revolver_error_ad(const igraph_t *graph,
 			    igraph_integer_t pagebins,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_ad(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
 
 int igraph_revolver_ade(const igraph_t *graph,
 		       igraph_integer_t niter,
@@ -1448,6 +1456,11 @@ int igraph_revolver_error_ade(const igraph_t *graph,
 			     igraph_integer_t pagebins,
 			     igraph_real_t *logprob,
 			     igraph_real_t *lognull);
+int igraph_revolver_error2_ade(const igraph_t *graph,
+			       const igraph_array3_t *kernel,
+			       const igraph_vector_t *cats,
+			       igraph_real_t *logprob,
+			       igraph_real_t *lognull);
 
 int igraph_revolver_e(const igraph_t *graph,
 		     igraph_integer_t niter,
@@ -1488,6 +1501,11 @@ int igraph_revolver_error_e(const igraph_t *graph,
 			   igraph_integer_t pnocats,
 			   igraph_real_t *logprob,
 			   igraph_real_t *lognull);
+int igraph_revolver_error2_e(const igraph_t *graph,
+			     const igraph_vector_t *kernel,
+			     const igraph_vector_t *cats,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull);
 
 int igraph_revolver_de(const igraph_t *graph,
 		      igraph_integer_t niter,
@@ -1531,6 +1549,11 @@ int igraph_revolver_error_de(const igraph_t *graph,
 			    igraph_integer_t pmaxind,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_de(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
 
 int igraph_revolver_l(const igraph_t *graph,
 		     igraph_integer_t niter,
@@ -1567,6 +1590,10 @@ int igraph_revolver_error_l(const igraph_t *graph,
 			   igraph_integer_t pagebins,
 			   igraph_real_t *logprob,
 			   igraph_real_t *lognull);
+int igraph_revolver_error2_l(const igraph_t *graph,
+			     const igraph_vector_t *kernel,			     
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull);
 
 int igraph_revolver_dl(const igraph_t *graph,
 		      igraph_integer_t niter,
@@ -1606,6 +1633,10 @@ int igraph_revolver_error_dl(const igraph_t *graph,
 			    igraph_integer_t pmaxind,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_dl(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
 
 int igraph_revolver_el(const igraph_t *graph,
 		      igraph_integer_t niter,
@@ -1650,6 +1681,11 @@ int igraph_revolver_error_el(const igraph_t *graph,
 			    igraph_integer_t pagebins,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_el(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
 
 int igraph_revolver_r(const igraph_t *graph,
 		     igraph_integer_t niter,
@@ -1690,6 +1726,11 @@ int igraph_revolver_error_r(const igraph_t *graph,
 			   igraph_integer_t maxind,			   
 			   igraph_real_t *logprob,
 			   igraph_real_t *lognull);
+int igraph_revolver_error2_r(const igraph_t *graph,
+			     const igraph_vector_t *kernel,
+			     igraph_integer_t window,
+			     igraph_real_t *logprob,
+			     igraph_real_t *lognull);
 
 int igraph_revolver_ar(const igraph_t *graph,
 		      igraph_integer_t niter,
@@ -1734,6 +1775,11 @@ int igraph_revolver_error_ar(const igraph_t *graph,
 			    igraph_integer_t maxind,			   
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_ar(const igraph_t *graph, 
+			      const igraph_matrix_t *kernel,
+			      igraph_integer_t window, 
+			      igraph_real_t *logprob, 
+			      igraph_real_t *lognull);
 
 int igraph_revolver_di(const igraph_t *graph,
 		      igraph_integer_t niter,
@@ -1777,6 +1823,11 @@ int igraph_revolver_error_di(const igraph_t *graph,
 			    igraph_integer_t pmaxind,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_di(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
 
 int igraph_revolver_adi(const igraph_t *graph,
 		       igraph_integer_t niter,
@@ -1824,6 +1875,12 @@ int igraph_revolver_error_adi(const igraph_t *graph,
 			     igraph_integer_t pagebins,
 			     igraph_real_t *logprob,
 			     igraph_real_t *lognull);
+int igraph_revolver_error2_adi(const igraph_t *graph,
+			       const igraph_array3_t *kernel,
+			       const igraph_vector_t *cats,
+			       igraph_real_t *logprob,
+			       igraph_real_t *lognull);
+
 int igraph_revolver_il(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      igraph_integer_t agebins,
@@ -1867,6 +1924,12 @@ int igraph_revolver_error_il(const igraph_t *graph,
 			    igraph_integer_t pagebins,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_il(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
+
 int igraph_revolver_ir(const igraph_t *graph,
 		      igraph_integer_t niter,
 		      igraph_integer_t window,
@@ -1914,6 +1977,13 @@ int igraph_revolver_error_ir(const igraph_t *graph,
 			    igraph_integer_t pmaxind,
 			    igraph_real_t *logprob,
 			    igraph_real_t *lognull);
+int igraph_revolver_error2_ir(const igraph_t *graph,
+			      const igraph_matrix_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_integer_t window,
+			      igraph_real_t *logprob,
+			      igraph_real_t *lognull);
+
 int igraph_revolver_air(const igraph_t *graph,
 		       igraph_integer_t niter,
 		       igraph_integer_t window,
@@ -1965,6 +2035,12 @@ int igraph_revolver_error_air(const igraph_t *graph,
 			     igraph_integer_t pagebins,
 			     igraph_real_t *logprob,
 			     igraph_real_t *lognull);
+int igraph_revolver_error2_air(const igraph_t *graph,
+			       const igraph_array3_t *kernel,
+			       const igraph_vector_t *cats,
+			       igraph_integer_t window,
+			       igraph_real_t *logprob,
+			       igraph_real_t *lognull);
 
 /* Should be moved to to types.h? */
 typedef struct igraph_i_lazy_adjedgelist_t {
