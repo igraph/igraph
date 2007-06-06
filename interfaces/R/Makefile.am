@@ -74,6 +74,7 @@ igraph_$(VERSION).tar.gz: $(RSCNAMES_ORIGPLACE) $(RSRCSOURCES) $(RRFILES)
 	cp $(RTOPHEADERS) igraph/src
 	cp $(RSRCSOURCES) igraph/src
 	cp DESCRIPTION igraph/
+	rm -f igraph/R/config.R
 	R CMD build igraph
 
 CLEANFILES = igraph/src/*
