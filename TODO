@@ -1,12 +1,4 @@
 
-These are needed for 0.4:
-
-  o R interface graphics improvements:
-    - add examples to documentation
-    - document arrow.size
-    - use arrow.size in tkplot (?) and rglplot
-    - check font names when using postscript device
-
 o rewrite igraph_i_eit_create_allfromto, etc., it's just a copy of the
   index.
 o R interface: curved edges in plots (tkplot and plot)
