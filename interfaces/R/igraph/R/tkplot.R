@@ -66,6 +66,7 @@ tkplot <- function(graph, ...) {
                                           params("edge", "label.family"),
                                           params("edge", "label.cex"))
   edge.label.color <- params("edge", "label.color")
+  arrow.size  <- params("edge", "arrow.size")[1]
   
   layout <- params("plot", "layout")
   layout[,2] <- -layout[,2]
@@ -94,7 +95,7 @@ tkplot <- function(graph, ...) {
                  vertex.frame.color=vertex.frame.color,
                  loop.angle=loop.angle, edge.lty=edge.lty, arrow.mode=arrow.mode,
                  edge.label.font=edge.label.font,
-                 edge.label.color=edge.label.color)
+                 edge.label.color=edge.label.color, arrow.size=arrow.size)
 
   # The popup menu
   popup.menu <- tkmenu(canvas)
@@ -775,13 +776,14 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   arrow.mode <- ifelse(length(tkp$params$arrow.mode)>1,
                        tkp$params$arrow.mode[[id]],
                        tkp$params$arrow.mode)
+  arrow.size <- tkp$params$arrow.size
   arrow <- c("none", "first", "last", "both")[arrow.mode+1]
   
   if (from != to) {
     ## non-loop edge
     tkcreate(tkp$canvas, "line", from.c[1], from.c[2], to.c[1], to.c[2],
              width=edge.width, activewidth=2*edge.width,
-             arrow=arrow, arrowshape=c(10, 10, 5),
+             arrow=arrow, arrowshape=arrow.size * c(10, 10, 5),
              fill=edge.color, activefill="red", dash=edge.lty,
              tags=c("edge", paste(sep="", "edge-", id),
                paste(sep="", "from-", from),
@@ -793,7 +795,7 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
              from.c[1]+20, from.c[1]-10, from.c[2]+30, from.c[2],
              from.c[1]+20, from.c[1]+10, from.c[1], from.c[2],
              width=edge.width, activewidth=2*edge.width,
-             arrow=arrow, arrowshape=c(10,10,5), dash=edge.lty,
+             arrow=arrow, arrowshape=arrow.size * c(10,10,5), dash=edge.lty,
              fill=edge.color, activefill="red", smooth=TRUE,
              tags=c("edge", "loop", paste(sep="", "edge-", id),
                paste(sep="", "from-", from),

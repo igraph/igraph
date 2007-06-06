@@ -255,10 +255,10 @@ rglplot.igraph <- function(x, ...) {
     stop("Not a graph object")
   }
 
-  create.edge <- function(v1, v2, r1, r2, ec, ew, am) {
+  create.edge <- function(v1, v2, r1, r2, ec, ew, am, as) {
     ## these could also be parameters:
-    aw <- 3*ew                      # arrow width
-    al <- 4*ew                      # arrow length    
+    aw <- 0.005*3*as                      # arrow width
+    al <- 0.005*4*as                      # arrow length    
     
     dist <- sqrt(sum((v2-v1)^2))   # distance of the centers
 
@@ -318,9 +318,9 @@ rglplot.igraph <- function(x, ...) {
     shade3d(edge, col=ec)
   }
   
-  create.loop <- function(v, r, ec, ew, am, la, la2) {
-    aw <- 3*ew
-    al <- 4*ew
+  create.loop <- function(v, r, ec, ew, am, la, la2, as) {
+    aw <- 0.005*3*as
+    al <- 0.005*4*as
     wi <- aw*2                          # size of the loop
     wi2 <- wi+aw-ew                     # size including the arrow heads
     hi <- al*2+ew*2
@@ -428,6 +428,7 @@ rglplot.igraph <- function(x, ...) {
   edge.width <- (1/200) * params("edge", "width")
   edge.labels <- params("edge","label")
   arrow.mode <- params("edge","arrow.mode")
+  arrow.size <- params("edge","arrow.size")
   
   layout <- params("plot", "layout")
 
@@ -457,11 +458,11 @@ rglplot.igraph <- function(x, ...) {
     r2 <- vertex.size; if (length(r2)>1) { r2 <- r2[to+1] }
 
     if (from!=to) {
-      create.edge(v1,v2,r1,r2,ec,ew,am)
+      create.edge(v1,v2,r1,r2,ec,ew,am,arrow.size)
     } else {
       la <- loop.angle; if (length(la)>1) { la <- la[i] }
       la2 <- loop.angle2; if (length(la2)>1) { la2 <- la2[i] }      
-      create.loop(v1,r1,ec,ew,am,la,la2)
+      create.loop(v1,r1,ec,ew,am,la,la2,arrow.size)
     }
     
   }

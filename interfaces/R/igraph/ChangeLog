@@ -1,5 +1,8 @@
 2007-05-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (rglplot)
+	* interfaces/R/igraph/R/tkplot.R (tkplot) : arrow.size support added
+
 	* interfaces/R/igraph/R/plot.R (plot) : arrow.size parameter added
 
 2007-05-23  Gabor Csardi  <csardi@rmki.kfki.hu>

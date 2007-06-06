@@ -212,6 +212,14 @@
 
       The default value is 1.
     }
+    \item{arrow.size}{The size of the arrows. Currently this is a
+      constant, so it is the same for every edge. If a vector is
+      submitted then only the first element is used, ie. if this is
+      taken from an edge attribute then only the attribute of the first
+      edge is used for all arrows. This will likely change in the future.
+
+      The default value is 1.
+    }
     \item{lty}{The line type for the edges. Almost the same format is
       accepted as for the standard graphics \code{\link[graphics]{par}},
       0 and \dQuote{blank} mean no edges, 1 and \dQuote{solid} are for
