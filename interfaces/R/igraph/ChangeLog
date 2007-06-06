@@ -1,3 +1,7 @@
+2007-05-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot) : arrow.size parameter added
+
 2007-05-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/fit.R (power.law.fit) : error/stop bug corrected

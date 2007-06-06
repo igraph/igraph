@@ -249,6 +249,7 @@ i.default.values <- list(vertex=list(color="SkyBlue2",
                            label.font=1,
                            label.cex=1,
                            label.color="darkblue",
+                           arrow.size=1,
                            arrow.mode=i.get.arrow.mode),
                          plot=list(layout=layout.random,
                            margin=c(0,0,0,0)))
