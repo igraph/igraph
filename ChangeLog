@@ -1,3 +1,21 @@
+2007-06-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_cit.c (igraph_revolver_d, igraph_revolver_mes_d)
+	(igraph_revolver_ad, igraph_revolver_mes_ad)
+	(igraph_revolver_ade, igraph_revolver_mes_ade)
+	(igraph_revolver_e, igraph_revolver_mes_e)
+	(igraph_revolver_de, igraph_revolver_mes_de)
+	(igraph_revolver_l, igraph_revolver_mes_l)
+	(igraph_revolver_dl, igraph_revolver_mes_dl)
+	(igraph_revolver_el, igraph_revolver_mes_el)
+	(igraph_revolver_r, igraph_revolver_mes_r)
+	(igraph_revolver_ar, igraph_revolver_mes_ar)
+	(igraph_revolver_di, igraph_revolver_mes_di)
+	(igraph_revolver_adi, igraph_revolver_mes_adi)
+	(igraph_revolver_il, igraph_revolver_mes_il)
+	(igraph_revolver_ir, igraph_revolver_mes_ir)
+	(igraph_revolver_air, igraph_revolver_mes_air) : logmax argument added
+
 2007-06-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_cit.c (igraph_revolver_error2_d, igraph_revolver_error2_ad)

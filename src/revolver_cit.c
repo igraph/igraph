@@ -39,6 +39,7 @@ int igraph_revolver_d(const igraph_t *graph,
 		     igraph_vector_t *expected,
 		     igraph_real_t *logprob,
 		     igraph_real_t *lognull,
+		     igraph_real_t *logmax,
 		     const igraph_vector_t *debug,
 		     igraph_vector_ptr_t *debugres) {
 
@@ -63,8 +64,9 @@ int igraph_revolver_d(const igraph_t *graph,
     if (i+1!=niter) {		/* not the last iteration */
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_d(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
-					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					&st, maxdegree));
+					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
+					 0 /*logmax*/,
+					 &st, maxdegree));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -74,7 +76,7 @@ int igraph_revolver_d(const igraph_t *graph,
     } else {			/* last iteration */
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_d(graph, kernel, sd, norm, cites, debug,
-					debugres, &st, maxdegree));
+					debugres, logmax, &st, maxdegree));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -111,6 +113,7 @@ int igraph_revolver_mes_d(const igraph_t *graph,
 			 igraph_vector_t *cites,
 			 const igraph_vector_t *debug,
 			 igraph_vector_ptr_t *debugres,
+			 igraph_real_t *logmax,
 			 const igraph_vector_t *st,
 			 igraph_integer_t maxind) {
   
@@ -157,7 +160,9 @@ int igraph_revolver_mes_d(const igraph_t *graph,
   }
 
   VECTOR(ntk)[0]=1;
-  
+
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -176,6 +181,9 @@ int igraph_revolver_mes_d(const igraph_t *graph,
 	VECTOR(*sd)[xidx] += (xk-oldm)*(xk-VECTOR(*kernel)[xidx]);
       }
       /* TODO: debug */
+      if (logmax) {
+	*logmax += log(1.0/VECTOR(ntk)[xidx]);
+      }
     }
     
     /* Update ntk & co */
@@ -459,6 +467,7 @@ int igraph_revolver_ad(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
 
@@ -484,7 +493,7 @@ int igraph_revolver_ad(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ad(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					 &st, maxdegree, agebins));
+					 0 /*logmax*/, &st, maxdegree, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -494,7 +503,8 @@ int igraph_revolver_ad(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ad(graph, kernel, sd, norm, cites, debug,
-					 debugres, &st, maxdegree, agebins));
+					  debugres, logmax, &st, 
+					  maxdegree, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -531,6 +541,7 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  igraph_integer_t pmaxind,
 			  igraph_integer_t pagebins) {
@@ -582,6 +593,8 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
     MATRIX(ntkl, 0, 1)=1;
   }
 
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -601,6 +614,9 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
 	MATRIX(*sd, xidx, yidx) += (xk-oldm)*(xk-MATRIX(*kernel, xidx, yidx));
       }
       /* TODO: debug */
+      if (logmax) {
+	*logmax += log(1.0/MATRIX(ntkl, xidx, yidx));
+      }
     }
     
     /* Update ntkl & co */
@@ -944,6 +960,7 @@ int igraph_revolver_ade(const igraph_t *graph,
 		       igraph_array3_t *expected,
 		       igraph_real_t *logprob,
 		       igraph_real_t *lognull,
+		       igraph_real_t *logmax,
 		       const igraph_matrix_t *debug,
 		       igraph_vector_ptr_t *debugres) {
   
@@ -971,8 +988,9 @@ int igraph_revolver_ade(const igraph_t *graph,
     if (i+1 != niter) {		/* not the last iteration */
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ade(graph, kernel, 0 /*sd*/, 0 /*norm*/,
-					  0/*cites*/, 0/*debug*/, 0 /*debugres*/,
-					  &st, cats, nocats, maxdegree, agebins));
+					   0/*cites*/, 0/*debug*/, 0 /*debugres*/,
+					   0/*logmax*/,
+					   &st, cats, nocats, maxdegree, agebins));
       
       /* normalize */
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
@@ -982,7 +1000,7 @@ int igraph_revolver_ade(const igraph_t *graph,
     } else { 
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ade(graph, kernel, sd, norm, cites, debug,
-					  debugres, &st, cats, nocats, 
+					  debugres, logmax, &st, cats, nocats, 
 					  maxdegree, agebins));
       
       /* normalize */
@@ -1022,6 +1040,7 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
 			   igraph_array3_t *cites,
 			   const igraph_matrix_t *debug,
 			   igraph_vector_ptr_t *debugres,
+			   igraph_real_t *logmax,
 			   const igraph_vector_t *st,
 			   const igraph_vector_t *cats,
 			   igraph_integer_t pnocats,
@@ -1075,6 +1094,8 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
     ARRAY3(ntkl, (long int)VECTOR(*cats)[0], 0, 1)=1;
   }
 
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx;
     
@@ -1098,6 +1119,9 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
 	  (xk-oldm)*(xk-ARRAY3(*kernel, cidx, xidx, yidx));
       }
       /* TODO: debug */
+      if (logmax) { 
+	*logmax += log(1.0/ARRAY3(ntkl, cidx, xidx, yidx));
+      }
     }
     
     /* Update ntkl & co */
@@ -1362,6 +1386,7 @@ int igraph_revolver_e(const igraph_t *graph,
 		     igraph_vector_t *expected,
 		     igraph_real_t *logprob,
 		     igraph_real_t *lognull,
+		     igraph_real_t *logmax,
 		     const igraph_vector_t *debug,
 		     igraph_vector_ptr_t *debugres) {
   
@@ -1386,7 +1411,7 @@ int igraph_revolver_e(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_e(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					&st, cats, nocats));
+				        0 /*logmax*/, &st, cats, nocats));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -1396,7 +1421,7 @@ int igraph_revolver_e(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_e(graph, kernel, sd, norm, cites, debug,
-					debugres,&st, cats, nocats));
+					debugres, logmax, &st, cats, nocats));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -1433,6 +1458,7 @@ int igraph_revolver_mes_e(const igraph_t *graph,
 			 igraph_vector_t *cites,
 			 const igraph_vector_t *debug,
 			 igraph_vector_ptr_t *debugres,
+			 igraph_real_t *logmax,
 			 const igraph_vector_t *st,
 			 const igraph_vector_t *cats,
 			 igraph_integer_t pnocats) {
@@ -1476,7 +1502,9 @@ int igraph_revolver_mes_e(const igraph_t *graph,
   }
   
   VECTOR(ntk)[ (long int) VECTOR(*cats)[0] ]=1;
-  
+
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx;
     
@@ -1496,6 +1524,7 @@ int igraph_revolver_mes_e(const igraph_t *graph,
 	VECTOR(*sd)[idx] += (xk-oldm)*(xk-VECTOR(*kernel)[idx]);
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/VECTOR(ntk)[idx]); }
     }
     
     /* Update ntk & co */
@@ -1666,6 +1695,7 @@ int igraph_revolver_de(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
   
@@ -1694,7 +1724,7 @@ int igraph_revolver_de(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_de(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0/*cites*/, 0/*debug*/, 0 /*debugres*/,
-					 &st, cats, nocats, maxdegree));
+					 0/*logmax*/, &st, cats, nocats, maxdegree));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -1704,7 +1734,7 @@ int igraph_revolver_de(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_de(graph, kernel, sd, norm, cites, debug,
-					 debugres, &st, cats, nocats, 
+					 debugres, logmax, &st, cats, nocats, 
 					 maxdegree));
       
       /* normalize */
@@ -1743,6 +1773,7 @@ int igraph_revolver_mes_de(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  const igraph_vector_t *cats,
 			  igraph_integer_t pnocats,
@@ -1790,6 +1821,8 @@ int igraph_revolver_mes_de(const igraph_t *graph,
   
   MATRIX(ntkl, (long int)VECTOR(*cats)[0], 0)=1;
   
+  if (logmax) { *logmax=0.0; }
+  
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx;
     
@@ -1812,6 +1845,7 @@ int igraph_revolver_mes_de(const igraph_t *graph,
 	  (xk-oldm)*(xk-MATRIX(*kernel, cidx, xidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/MATRIX(ntkl, cidx, xidx)); }
     }
         
     /* Update ntkl & co */
@@ -2035,6 +2069,7 @@ int igraph_revolver_l(const igraph_t *graph,
 		     igraph_vector_t *expected,
 		     igraph_real_t *logprob,
 		     igraph_real_t *lognull,
+		     igraph_real_t *logmax,
 		     const igraph_vector_t *debug,
 		     igraph_vector_ptr_t *debugres) {
   
@@ -2056,7 +2091,7 @@ int igraph_revolver_l(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_l(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					&st, agebins));
+					0 /*logmax*/, &st, agebins));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -2066,7 +2101,7 @@ int igraph_revolver_l(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_l(graph, kernel, sd, norm, cites, debug,
-					debugres, &st, agebins));
+					debugres, logmax, &st, agebins));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -2103,6 +2138,7 @@ int igraph_revolver_mes_l(const igraph_t *graph,
 			 igraph_vector_t *cites,
 			 const igraph_vector_t *debug,
 			 igraph_vector_ptr_t *debugres,
+			 igraph_real_t *logmax,
 			 const igraph_vector_t *st,
 			 igraph_integer_t pagebins) {
 
@@ -2148,6 +2184,8 @@ int igraph_revolver_mes_l(const igraph_t *graph,
 
   VECTOR(ntl)[agebins]=1;
   
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2167,6 +2205,7 @@ int igraph_revolver_mes_l(const igraph_t *graph,
 	VECTOR(*sd)[xidx] += (xk-oldm)*(xk-VECTOR(*kernel)[xidx]);
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/VECTOR(ntl)[xidx]); }
     }
     
     /* Update ntkl & co */
@@ -2410,6 +2449,7 @@ int igraph_revolver_dl(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
   
@@ -2435,7 +2475,7 @@ int igraph_revolver_dl(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_dl(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					 &st, maxdegree, agebins));
+					 0 /*logmax */, &st, maxdegree, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -2445,7 +2485,7 @@ int igraph_revolver_dl(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_dl(graph, kernel, sd, norm, cites, debug,
-					debugres, &st, maxdegree, agebins));
+					debugres, logmax, &st, maxdegree, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -2482,6 +2522,7 @@ int igraph_revolver_mes_dl(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  igraph_integer_t pmaxind,
 			  igraph_integer_t pagebins) {
@@ -2529,6 +2570,8 @@ int igraph_revolver_mes_dl(const igraph_t *graph,
   
   MATRIX(ntkl, 0, agebins)=1;
   
+  if (logmax) { *logmax=0.0; }
+  
   for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2549,6 +2592,7 @@ int igraph_revolver_mes_dl(const igraph_t *graph,
 	MATRIX(*sd, xidx, yidx) += (xk-oldm)*(xk-MATRIX(*kernel, xidx, yidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/MATRIX(ntkl, xidx, yidx)); }
     }
     
     /* Update ntkl & co */
@@ -2813,6 +2857,7 @@ int igraph_revolver_el(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
   
@@ -2841,7 +2886,7 @@ int igraph_revolver_el(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_el(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					 &st, cats, nocats, agebins));
+					 0 /*logmax */, &st, cats, nocats, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -2851,7 +2896,8 @@ int igraph_revolver_el(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_el(graph, kernel, sd, norm, cites, debug,
-					 debugres, &st, cats, nocats, agebins));
+					  debugres, logmax, 
+					  &st, cats, nocats, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -2888,6 +2934,7 @@ int igraph_revolver_mes_el(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  const igraph_vector_t *cats,
 			  igraph_integer_t pnocats,
@@ -2935,6 +2982,8 @@ int igraph_revolver_mes_el(const igraph_t *graph,
   
   MATRIX(ntkl, (long int)VECTOR(*cats)[0], agebins)=1;
   
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx;
     
@@ -2956,6 +3005,7 @@ int igraph_revolver_mes_el(const igraph_t *graph,
 	MATRIX(*sd, xidx, yidx) += (xk-oldm)*(xk-MATRIX(*kernel, xidx, yidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/MATRIX(ntkl, xidx, yidx)); }
     }
     
     /* Update ntkl & co */
@@ -3218,6 +3268,7 @@ int igraph_revolver_r(const igraph_t *graph,
 		     igraph_vector_t *expected,
 		     igraph_real_t *logprob,
 		     igraph_real_t *lognull,
+		     igraph_real_t *logmax,
 		     const igraph_vector_t *debug,
 		     igraph_vector_ptr_t *debugres) {
 
@@ -3263,7 +3314,7 @@ int igraph_revolver_r(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_r(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					&st, window, maxdegree));
+					0 /*logmax*/, &st, window, maxdegree));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -3273,7 +3324,7 @@ int igraph_revolver_r(const igraph_t *graph,
     } else {			/* last iteration */
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_r(graph, kernel, sd, norm, cites, debug,
-					debugres, &st, window, maxdegree));
+					debugres, logmax, &st, window, maxdegree));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
@@ -3309,6 +3360,7 @@ int igraph_revolver_mes_r(const igraph_t *graph,
 			 igraph_vector_t *cites,
 			 const igraph_vector_t *debug,
 			 igraph_vector_ptr_t *debugres,
+			 igraph_real_t *logmax,
 			 const igraph_vector_t *st,
 			 igraph_integer_t pwindow,
 			 igraph_integer_t maxind) {
@@ -3357,6 +3409,8 @@ int igraph_revolver_mes_r(const igraph_t *graph,
 
   VECTOR(ntk)[0]=1;
   
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3375,6 +3429,7 @@ int igraph_revolver_mes_r(const igraph_t *graph,
 	VECTOR(*sd)[xidx] += (xk-oldm)*(xk-VECTOR(*kernel)[xidx]);
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/VECTOR(ntk)[xidx]); }
     }
     
     /* Update ntk & co */
@@ -3626,6 +3681,7 @@ int igraph_revolver_ar(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
 
@@ -3671,7 +3727,8 @@ int igraph_revolver_ar(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ar(graph, kernel, 0 /*sd*/, 0 /*norm*/, 
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					 &st, agebins, window, maxdegree));
+					 0 /*logmax*/, &st, agebins,
+					 window, maxdegree));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -3681,7 +3738,8 @@ int igraph_revolver_ar(const igraph_t *graph,
     } else {			/* last iteration */
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ar(graph, kernel, sd, norm, cites, debug,
-					debugres, &st, agebins, window, maxdegree));
+					  debugres, logmax, 
+					  &st, agebins, window, maxdegree));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -3718,6 +3776,7 @@ int igraph_revolver_mes_ar(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  igraph_integer_t pagebins,
 			  igraph_integer_t pwindow,
@@ -3770,6 +3829,8 @@ int igraph_revolver_mes_ar(const igraph_t *graph,
 
   MATRIX(ntk, binwidth>1 ? 0 : 1, 0)=1;
   
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3789,6 +3850,7 @@ int igraph_revolver_mes_ar(const igraph_t *graph,
 	MATRIX(*sd, xidx, yidx) += (xk-oldm)*(xk-MATRIX(*kernel, xidx, yidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/MATRIX(ntk, xidx, yidx)); }
     }
     
     /* Update ntk & co */
@@ -4079,6 +4141,7 @@ int igraph_revolver_di(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
   
@@ -4107,7 +4170,7 @@ int igraph_revolver_di(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_di(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0/*cites*/, 0/*debug*/, 0 /*debugres*/,
-					 &st, cats, nocats, maxdegree));
+					 0/*logmax*/, &st, cats, nocats, maxdegree));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -4117,7 +4180,7 @@ int igraph_revolver_di(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_di(graph, kernel, sd, norm, cites, debug,
-					 debugres, &st, cats, nocats, 
+					 debugres, logmax, &st, cats, nocats, 
 					 maxdegree));
       
       /* normalize */
@@ -4156,6 +4219,7 @@ int igraph_revolver_mes_di(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  const igraph_vector_t *cats,
 			  igraph_integer_t pnocats,
@@ -4204,6 +4268,8 @@ int igraph_revolver_mes_di(const igraph_t *graph,
   
   VECTOR(ntkl)[0]=1;
   
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx=VECTOR(*cats)[node+1];
     
@@ -4225,6 +4291,7 @@ int igraph_revolver_mes_di(const igraph_t *graph,
 	  (xk-oldm)*(xk-MATRIX(*kernel, cidx, xidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/VECTOR(ntkl)[xidx]); }
     }
         
     /* Update ntkl & co */
@@ -4466,6 +4533,7 @@ int igraph_revolver_adi(const igraph_t *graph,
 		       igraph_array3_t *expected,
 		       igraph_real_t *logprob,
 		       igraph_real_t *lognull,
+		       igraph_real_t *logmax,
 		       const igraph_matrix_t *debug,
 		       igraph_vector_ptr_t *debugres) {
   
@@ -4494,7 +4562,8 @@ int igraph_revolver_adi(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_adi(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					  0/*cites*/, 0/*debug*/, 0 /*debugres*/,
-					  &st, cats, nocats, maxdegree, agebins));
+					  0/*logmax*/, &st, cats,
+					  nocats, maxdegree, agebins));
       
       /* normalize */
       igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
@@ -4504,7 +4573,7 @@ int igraph_revolver_adi(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_adi(graph, kernel, sd, norm, cites, debug,
-					  debugres, &st, cats, nocats, 
+					  debugres, logmax, &st, cats, nocats, 
 					  maxdegree, agebins));
       
       /* normalize */
@@ -4543,6 +4612,7 @@ int igraph_revolver_mes_adi(const igraph_t *graph,
 			   igraph_array3_t *cites,
 			   const igraph_matrix_t *debug,
 			   igraph_vector_ptr_t *debugres,
+			   igraph_real_t *logmax,
 			   const igraph_vector_t *st,
 			   const igraph_vector_t *cats,
 			   igraph_integer_t pnocats,
@@ -4594,6 +4664,8 @@ int igraph_revolver_mes_adi(const igraph_t *graph,
   
   MATRIX(ntkl, 0, binwidth>1 ? 0 : 1)=1;
   
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx=VECTOR(*cats)[node+1];
     
@@ -4616,6 +4688,7 @@ int igraph_revolver_mes_adi(const igraph_t *graph,
 	  (xk-oldm)*(xk-ARRAY3(*kernel, cidx, xidx, yidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/MATRIX(ntkl, xidx, yidx)); }
     }
         
     /* Update ntkl & co */
@@ -4899,6 +4972,7 @@ int igraph_revolver_il(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
   
@@ -4923,7 +4997,7 @@ int igraph_revolver_il(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_il(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-					 &st, cats, nocats, agebins));
+					 0 /*logmax*/, &st, cats, nocats, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -4933,7 +5007,8 @@ int igraph_revolver_il(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_il(graph, kernel, sd, norm, cites, debug,
-					 debugres, &st, cats, nocats, agebins));
+					 debugres, logmax, &st, 
+					 cats, nocats, agebins));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -4970,6 +5045,7 @@ int igraph_revolver_mes_il(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  const igraph_vector_t *cats,
 			  igraph_integer_t pnocats,
@@ -5021,6 +5097,8 @@ int igraph_revolver_mes_il(const igraph_t *graph,
 
   VECTOR(ntl)[agebins]=1;
   
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx=VECTOR(*cats)[node+1];
     
@@ -5041,6 +5119,7 @@ int igraph_revolver_mes_il(const igraph_t *graph,
 	MATRIX(*sd, cidx, xidx) += (xk-oldm)*(xk-MATRIX(*kernel, cidx, xidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/VECTOR(ntl)[xidx]); }
     }
   
     /* Update ntkl & co */
@@ -5326,6 +5405,7 @@ int igraph_revolver_ir(const igraph_t *graph,
 		      igraph_matrix_t *expected,
 		      igraph_real_t *logprob,
 		      igraph_real_t *lognull,
+		      igraph_real_t *logmax,
 		      const igraph_matrix_t *debug,
 		      igraph_vector_ptr_t *debugres) {
   
@@ -5374,7 +5454,8 @@ int igraph_revolver_ir(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ir(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					 0/*cites*/, 0/*debug*/, 0 /*debugres*/,
-					 &st, window, cats, nocats, maxdegree));
+					 0/*logmax*/, &st, window, 
+					 cats, nocats, maxdegree));
       
       /* normalize */
       igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
@@ -5384,7 +5465,7 @@ int igraph_revolver_ir(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_ir(graph, kernel, sd, norm, cites, debug,
-					 debugres, &st, window, cats, nocats, 
+					 debugres, logmax, &st, window, cats, nocats,
 					 maxdegree));
       
       /* normalize */
@@ -5423,6 +5504,7 @@ int igraph_revolver_mes_ir(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  const igraph_matrix_t *debug,
 			  igraph_vector_ptr_t *debugres,
+			  igraph_real_t *logmax,
 			  const igraph_vector_t *st,
 			  igraph_integer_t pwindow,
 			  const igraph_vector_t *cats,
@@ -5473,7 +5555,9 @@ int igraph_revolver_mes_ir(const igraph_t *graph,
   }
   
   VECTOR(ntkl)[0]=1;
-  
+
+  if (logmax) { *logmax=0.0; }
+
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx=VECTOR(*cats)[node+1];
     
@@ -5495,6 +5579,7 @@ int igraph_revolver_mes_ir(const igraph_t *graph,
 	  (xk-oldm)*(xk-MATRIX(*kernel, cidx, xidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/VECTOR(ntkl)[xidx]); }
     }
         
     /* Update ntkl & co */
@@ -5787,6 +5872,7 @@ int igraph_revolver_air(const igraph_t *graph,
 		       igraph_array3_t *expected,
 		       igraph_real_t *logprob,
 		       igraph_real_t *lognull,
+		       igraph_real_t *logmax,
 		       const igraph_matrix_t *debug,
 		       igraph_vector_ptr_t *debugres) {
   
@@ -5836,7 +5922,7 @@ int igraph_revolver_air(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_air(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					  0/*cites*/, 0/*debug*/, 0 /*debugres*/,
-					  &st, window, 
+					  0/*logmax*/, &st, window, 
 					  cats, nocats, maxdegree, agebins));
       
       /* normalize */
@@ -5847,7 +5933,8 @@ int igraph_revolver_air(const igraph_t *graph,
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_air(graph, kernel, sd, norm, cites, debug,
-					  debugres, &st, window, cats, nocats, 
+					  debugres, logmax, &st, window, 
+					  cats, nocats, 
 					  maxdegree, agebins));
       
       /* normalize */
@@ -5887,6 +5974,7 @@ int igraph_revolver_mes_air(const igraph_t *graph,
 			   igraph_array3_t *cites,
 			   const igraph_matrix_t *debug,
 			   igraph_vector_ptr_t *debugres,
+			   igraph_real_t *logmax,
 			   const igraph_vector_t *st,
 			   igraph_integer_t pwindow,
 			   const igraph_vector_t *cats,
@@ -5940,6 +6028,8 @@ int igraph_revolver_mes_air(const igraph_t *graph,
   }
   
   MATRIX(ntkl, 0, binwidth>1 ? 0 : 1)=1;
+
+  if (logmax) { *logmax=0.0; }
   
   for (node=0; node<no_of_nodes-1; node++) {
     long int cidx=VECTOR(*cats)[node+1];
@@ -5963,6 +6053,7 @@ int igraph_revolver_mes_air(const igraph_t *graph,
 	  (xk-oldm)*(xk-ARRAY3(*kernel, cidx, xidx, yidx));
       }
       /* TODO: debug */
+      if (logmax) { *logmax += log(1.0/MATRIX(ntkl, xidx, yidx)); }
     }
         
     /* Update ntkl & co */

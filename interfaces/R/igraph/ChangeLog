@@ -1,3 +1,12 @@
+2007-06-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c (R_igraph_revolver_d)
+	(R_igraph_revolver_ad, R_igraph_revolver_ade, R_igraph_revolver_e)
+	(R_igraph_revolver_de, R_igraph_revolver_l, R_igraph_revolver_dl)
+	(R_igraph_revolver_el, R_igraph_revolver_r, R_igraph_revolver_ar)
+	(R_igraph_revolver_di, R_igraph_revolver_adi, R_igraph_revolver_il)
+	(R_igraph_revolver_ir, R_igraph_revolver_air) : logmax calculation added
+
 2007-05-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (rglplot)
