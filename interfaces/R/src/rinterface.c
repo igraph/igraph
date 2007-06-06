@@ -4441,18 +4441,23 @@ SEXP R_igraph_reciprocity(SEXP graph, SEXP pignore_loops) {
   return result;
 }
   
-SEXP R_igraph_layout_reingold_tilford(SEXP graph, SEXP proot) {
+SEXP R_igraph_layout_reingold_tilford(SEXP graph, SEXP proot, SEXP pcirc) {
   
   igraph_t g;
   igraph_integer_t root=REAL(proot)[0];
   igraph_matrix_t res;
+  igraph_bool_t circ=LOGICAL(pcirc)[0];
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
-  igraph_layout_reingold_tilford(&g, &res, root);
+  if (!circ) {
+    igraph_layout_reingold_tilford(&g, &res, root);
+  } else {
+    igraph_layout_reingold_tilford_circular(&g, &res, root);
+  }
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   

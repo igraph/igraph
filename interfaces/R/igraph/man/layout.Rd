@@ -100,7 +100,9 @@ layout.lgl(graph, \dots, params)
   mainly for trees. Parameters and default values:
   \itemize{
     \item{root}{The id of the root vertex, defaults to 0.}
-  }  
+    \item{circular}{Logical scalar, whether to plot the tree in a
+      circular fashion, defaults to \code{FALSE}.}
+  }
   
   \code{layout.fruchterman.reingold.grid} is similar to
   \code{layout.fruchterman.reingold} but repelling force is calculated

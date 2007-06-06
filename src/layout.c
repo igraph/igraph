@@ -1162,6 +1162,8 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
  * the children of each node in the tree. (Now the implementation uses a
  * single array containing the parent of each node and a node's children
  * are determined by looking for other nodes that have this node as parent)
+ * 
+ * \sa \ref igraph_layout_reingold_tilford_circular().
  */
 int igraph_layout_reingold_tilford(const igraph_t *graph, 
 				   igraph_matrix_t *res, long int root) {
@@ -1352,6 +1354,48 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
   for (i=0, j=0; i<vcount; i++) {
     if (i == node) continue;
     if (vdata[i].parent == node) vdata[i].offset -= avg;
+  }
+  
+  return 0;
+}
+
+/** 
+ * \function igraph_layout_reingold_tilford_circular
+ * \brief Circular Reingold-Tilford layout for trees
+ * 
+ * </para><para>
+ * This layout is almost the same as \ref igraph_layout_reingold_tilford(), but 
+ * the tree is drawn in a circular way, with the root vertex in the center.
+ * 
+ * \param graph The graph object.
+ * \param res The result, the coordinates in a matrix. The parameter
+ *   should point to an initialized matrix object and will be resized.
+ * \param root The index of the root vertex.
+ * \return Error code.
+ *
+ * \sa \ref igraph_layout_reingold_tilford().
+ */
+
+int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
+					    igraph_matrix_t *res, long int root) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+  igraph_real_t pi2=2*M_PI*(no_of_nodes-1.0)/no_of_nodes;
+  igraph_real_t mm=0;
+
+  IGRAPH_CHECK(igraph_layout_reingold_tilford(graph, res, root));
+  
+  for (i=0; i<no_of_nodes; i++) {
+    if (MATRIX(*res, i, 0) > mm) {
+      mm=MATRIX(*res, i, 0);
+    }
+  }
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_real_t phi=MATRIX(*res, i, 0)/mm*pi2;
+    igraph_real_t r=MATRIX(*res, i, 1);
+    MATRIX(*res, i, 0) = r*cos(phi);
+    MATRIX(*res, i, 1) = r*sin(phi);
   }
   
   return 0;

@@ -186,9 +186,11 @@ layout.reingold.tilford <- function(graph, ..., params=list()) {
     params <- list(...)
   }
 
-  if (is.null(params$root)) { params$root <- 0 }
+  if (is.null(params$root))          { params$root       <- 0     }
+  if (is.null(params$circular))      { params$circular   <- FALSE }
 
   .Call("R_igraph_layout_reingold_tilford", graph, as.double(params$root),
+        as.logical(params$circular),
         PACKAGE="igraph")
 }
 

@@ -828,6 +828,8 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 		      igraph_real_t repulserad, igraph_real_t cellsize, igraph_integer_t root);
 int igraph_layout_reingold_tilford(const igraph_t *graph, igraph_matrix_t *res,
               long int root);
+int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
+					    igraph_matrix_t *res, long int root);
 
 int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);
