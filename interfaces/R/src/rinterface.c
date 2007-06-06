@@ -186,7 +186,7 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
     }
     if (l) {
       /* This attribute is present in nattr */
-      SEXP app;
+      SEXP app=0;
       igraph_i_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
       switch (tmprec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
@@ -210,9 +210,11 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
 	warning("Ignoring unknown attribute type");
 	break;
       }
-      PROTECT(newva=EVAL(lang3(install("c"), oldva, app)));
-      SET_VECTOR_ELT(val, i, newva);
-      UNPROTECT(2);		/* app & newva */
+      if (app!=0) {
+	PROTECT(newva=EVAL(lang3(install("c"), oldva, app)));
+	SET_VECTOR_ELT(val, i, newva);
+	UNPROTECT(2);		/* app & newva */
+      }
     } else {
       /* No such attribute, append NA's */
       if (rep==0) {
@@ -382,7 +384,7 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
     }
     if (l) {
       /* This attribute is present in nattr */
-      SEXP app;
+      SEXP app=0;
       igraph_i_attribute_record_t *tmprec=VECTOR(*nattr)[j-1];
       switch (tmprec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
@@ -406,9 +408,11 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
 	warning("Ignoring unknown attribute type");
 	break;
       }
-      PROTECT(newea=EVAL(lang3(install("c"), oldea, app)));
-      SET_VECTOR_ELT(eal, i, newea);
-      UNPROTECT(2);		/* app & newea */
+      if (app!=0) {
+	PROTECT(newea=EVAL(lang3(install("c"), oldea, app)));
+	SET_VECTOR_ELT(eal, i, newea);
+	UNPROTECT(2);		/* app & newea */
+      }
     } else {
       /* No such attribute, append NA's */
       if (rep==0) {
@@ -449,7 +453,7 @@ void R_igraph_attribute_delete_edges(igraph_t *graph,
   for (i=0; i<ealno; i++) {
     SEXP oldea=VECTOR_ELT(eal, i), newea, ss;
     long int origlen=GET_LENGTH(oldea);
-    long int newlen=0, j, k;
+    long int newlen=0, j;
     /* create subscript vector */
     for (j=0; j<origlen; j++) {
       if (VECTOR(*idx)[j] > 0) {
@@ -489,7 +493,7 @@ int R_igraph_attribute_permute_edges(igraph_t *graph,
   ealno=GET_LENGTH(eal);
   for (i=0; i<ealno; i++) {
     SEXP oldea=VECTOR_ELT(eal, i), newea, ss;
-    long int j, k;
+    long int j;
     long int newlen=igraph_vector_size(idx);
     /* create subscript vector */
     PROTECT(ss=NEW_NUMERIC(newlen));
@@ -679,7 +683,6 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
 					      igraph_strvector_t *value) {
   /* TODO: serialization */
   SEXP val, va;
-  igraph_vector_t newvalue;
 
   val=VECTOR_ELT(graph->attr, 2);  
   va=R_igraph_getListElement(val, name);
@@ -754,7 +757,6 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
   /* TODO: serialization */
   SEXP eal=VECTOR_ELT(graph->attr, 3);
   SEXP ea=R_igraph_getListElement(eal, name);
-  igraph_vector_t newvalue;
   
   if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
@@ -989,7 +991,6 @@ SEXP R_igraph_to_SEXP(igraph_t *graph) {
   SEXP result;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  SEXP attr;
   
   PROTECT(result=NEW_LIST(9));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));

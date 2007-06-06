@@ -1,5 +1,8 @@
 2007-06-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/src/rinterface.c (R_igraph_attribute_add_vertices)
+	(R_igraph_attribute_add_edges) : bug corrected
+
 	* interfaces/R/src/rinterface.c (R_igraph_revolver_d)
 	(R_igraph_revolver_ad, R_igraph_revolver_ade, R_igraph_revolver_e)
 	(R_igraph_revolver_de, R_igraph_revolver_l, R_igraph_revolver_dl)
