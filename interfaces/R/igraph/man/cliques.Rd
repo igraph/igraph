@@ -44,7 +44,7 @@ clique.number(graph)
   \code{clique.number} returns an integer constant.
 }
 %\references{TODO}
-\author{Tamás Nepusz \email{ntamas@rmki.kfki.hu} and Gábor Csárdi
+\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
   \email{csardi@rmki.kfki.hu} for the R interface and the manual page. }
 \seealso{\code{\link{independent.vertex.sets}}}
 \examples{

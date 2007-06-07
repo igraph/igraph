@@ -1,4 +1,19 @@
 =========
+igraph 0.4.2
+=========
+
+Released June 7, 2007
+
+This is another bugfix release, as there was a serious bug in the 
+R package of the previous version: it could not read and write graphs
+to files in any format under MS Windows.
+
+Some other bits added: 
+- circular Reingold-Tilford layout generator for trees
+- corrected a bug, Pajek files are written properly under MS Windows now.
+- arrow.size graphical edge parameter added in the R interface.
+
+=========
 igraph 0.4.1
 =========
 

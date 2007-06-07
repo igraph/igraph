@@ -80,7 +80,7 @@ barabasi.game(n, power = 1, m = NULL, out.dist = NULL, out.seq = NULL,
   edges.
 }
 \value{A graph object.}
-\references{  Barabási, A.-L. and Albert R. 1999. Emergence of scaling
+\references{  Barabasi, A.-L. and Albert R. 1999. Emergence of scaling
   in random networks \emph{Science}, 286 509--512.}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{random.graph.game}}}

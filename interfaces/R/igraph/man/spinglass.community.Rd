@@ -101,7 +101,7 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
   M. E. J. Newman and M. Girvan: Finding and evaluating community
   structure in networks, \emph{Phys. Rev. E} 69, 026113 (2004)  
 }
-\author{Jörg Reichardt \email{lastname@physik.uni-wuerzburg.de} for the
+\author{Jorg Reichardt \email{lastname@physik.uni-wuerzburg.de} for the
   original code and Gabor Csardi \email{csardi@rmki.kfki.hu} for the
   igraph glue code}
 \seealso{\code{\link{clusters}}}
