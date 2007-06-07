@@ -53,7 +53,7 @@ def summary(o, f=sys.stdout):
 class Graph(core.GraphBase):
     """Generic graph.
     
-    This class is built on top of L{core.GraphBase}, so the order of the
+    This class is built on top of L{GraphBase}, so the order of the
     methods in the Epydoc documentation is a little bit obscure:
     inherited methods come after the ones implemented directly in the
     subclass.
@@ -600,7 +600,7 @@ class Graph(core.GraphBase):
           (GraphML and gzipped GraphML format), C{"gml"} (GML format),
           C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
           C{"edgelist"}, C{"edges"} or C{"edge"} (edge list).
-        @raises: L{IOError} if the file format can't be identified and
+        @raises IOError: if the file format can't be identified and
           none was given.
         """
         if format is None: format = klass._identify_format(f)

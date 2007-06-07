@@ -3286,6 +3286,39 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford(igraphmodule_GraphObject
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices of a graph according to the Reingold-Tilford
+ * tree layout algorithm in a polar coordinate system
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_reingold_tilford
+ */
+PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
+  igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
+{
+  char *kwlist[] = { "root", NULL };
+  igraph_matrix_t m;
+  long int root = 0;
+  PyObject *result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &root))
+    return NULL;
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_layout_reingold_tilford_circular(&self->g, &m, root)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Returns the adjacency matrix of a graph.
  * \return the adjacency matrix as a Python list of lists
  * \sa igraph_get_adjacency
@@ -6218,7 +6251,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  etc. C{None} means a random vertex.\n"
    "@return: the calculated coordinate pairs in a list."},
 
-  // interface to igraph_layout_reingold_tilford
+  /* interface to igraph_layout_reingold_tilford */
   {"layout_reingold_tilford",
    (PyCFunction) igraphmodule_Graph_layout_reingold_tilford,
    METH_VARARGS | METH_KEYWORDS,
@@ -6227,7 +6260,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "layout algorithm.\n\n"
    "@param root: the root of the tree.\n"
    "@return: the calculated coordinate pairs in a list.\n\n"
-   "@see: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"
+   "@see: layout_reingold_tilford_circular\n"
+   "@ref: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"
+   "IEEE Transactions on Software Engineering 7:22, 223-228, 1981."},
+
+  /* interface to igraph_layout_reingold_tilford_circular */
+  {"layout_reingold_tilford_circular",
+   (PyCFunction) igraphmodule_Graph_layout_reingold_tilford_circular,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_reingold_tilford_circular(root)\n"
+   "Circular Reingold-Tilford layout for trees.\n\n"
+   "This layout is similar to the Reingold-Tilford layout, but the vertices\n"
+   "are placed in a circular way, with the root vertex in the center.\n\n"
+   "@param root: the root of the tree.\n"
+   "@return: the calculated coordinate pairs in a list.\n\n"
+   "@see: layout_reingold_tilford\n"
+   "@ref: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"
    "IEEE Transactions on Software Engineering 7:22, 223-228, 1981."},
 
   // interface to igraph_layout_random

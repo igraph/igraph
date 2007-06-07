@@ -368,7 +368,7 @@ PyTypeObject igraphmodule_VertexSeqType =
   "  ...   v[\"value\"] = v.index ** 2\n"
   "  ...\n"
   "  >>> [v[\"value\"] ** 0.5 for v in g.vs]\n"
-  "  [0.0, 1.0, 2.0]\n"
+  "  [0.0, 1.0, 2.0]\n\n"
   "The vertex set can also be used as a dictionary where the keys are the\n"
   "attribute names. The values corresponding to the keys are the values\n"
   "of the given attribute of every vertex in the graph:\n\n"
