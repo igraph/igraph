@@ -80,11 +80,16 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
   if (is.null(params$area))      { params$area       <- vc^2 }
   if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
   if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
+  if (is.null(params$weights))   {
+    params$weights <- NULL
+  } else {
+    params$weights <- as.numeric(params$weights)
+  }
 
   .Call(fn, graph,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
-        as.double(params$repulserad), as.logical(verbose),
+        as.double(params$repulserad), params$weights, as.logical(verbose),
         PACKAGE="igraph")
 }
 

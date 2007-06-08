@@ -3176,7 +3176,8 @@ SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
 
 SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter, 
 					  SEXP pmaxdelta, SEXP parea,
-					  SEXP pcoolexp, SEXP prepulserad, 
+					  SEXP pcoolexp, SEXP prepulserad,
+					  SEXP pweights,
 					  SEXP verbose) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -3185,14 +3186,16 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
   igraph_real_t coolexp=REAL(pcoolexp)[0];
   igraph_real_t repulserad=REAL(prepulserad)[0];
   igraph_matrix_t res;
+  igraph_vector_t weights, *ppweights=0;
   SEXP result;
   
   R_igraph_before2(verbose, "FR layout");
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
+  if (!isNull(pweights)) { R_SEXP_to_vector(pweights, &weights);ppweights=&weights; }
   igraph_layout_fruchterman_reingold(&g, &res, niter, maxdelta, area, 
-				     coolexp, repulserad, 0);
+				     coolexp, repulserad, 0, ppweights);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
@@ -3205,6 +3208,7 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter,
 SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter, 
 					     SEXP pmaxdelta, SEXP parea,
 					     SEXP pcoolexp, SEXP prepulserad,
+					     SEXP pweights,
 					     SEXP verbose) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
@@ -3212,15 +3216,17 @@ SEXP R_igraph_layout_fruchterman_reingold_3d(SEXP graph, SEXP pniter,
   igraph_real_t area=REAL(parea)[0];
   igraph_real_t coolexp=REAL(pcoolexp)[0];
   igraph_real_t repulserad=REAL(prepulserad)[0];
+  igraph_vector_t weights, *ppweights=0;
   igraph_matrix_t res;
   SEXP result;
   
   R_igraph_before2(verbose, "3D FR layout");
   
   R_SEXP_to_igraph(graph, &g);
+  if (!isNull(pweights)) { R_SEXP_to_vector(pweights, &weights);ppweights=&weights; }
   igraph_matrix_init(&res, 0, 0);
   igraph_layout_fruchterman_reingold_3d(&g, &res, niter, maxdelta, area, 
-				     coolexp, repulserad, 0);
+					coolexp, repulserad, 0, ppweights);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   

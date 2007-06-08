@@ -808,7 +808,8 @@ int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res);
 int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
 				       igraph_integer_t niter, igraph_real_t maxdelta,
 				       igraph_real_t area, igraph_real_t coolexp, 
-				       igraph_real_t repulserad, igraph_bool_t use_seed);
+				       igraph_real_t repulserad, igraph_bool_t use_seed,
+				       const igraph_vector_t *weight);
 int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
 					    igraph_matrix_t *res,
 					    igraph_integer_t niter, igraph_real_t maxdelta, 
@@ -838,7 +839,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 					  igraph_integer_t niter, igraph_real_t maxdelta,
 					  igraph_real_t volume, igraph_real_t coolexp,
 					  igraph_real_t repulserad,
-					  igraph_bool_t use_seed);
+					  igraph_bool_t use_seed,
+					  const igraph_vector_t *weight);
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  igraph_integer_t niter, igraph_real_t sigma, 
 				  igraph_real_t initemp, igraph_real_t coolexp, 

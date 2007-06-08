@@ -227,6 +227,9 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
  * \param use_seed Logical, if true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
+ * \param weight Pointer to a vector containing edge weights, 
+ *        the attraction along the edges will be multiplied by these. 
+ *        It will be ignored if it is a null-pointer.
  * \return Error code.
  * 
  * Time complexity: O(|V|^2) in each
@@ -237,7 +240,8 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
 				       igraph_integer_t niter, igraph_real_t maxdelta,
 				       igraph_real_t area, igraph_real_t coolexp, 
-				       igraph_real_t repulserad, igraph_bool_t use_seed) {
+				       igraph_real_t repulserad, igraph_bool_t use_seed,
+				       const igraph_vector_t *weight) {
   igraph_real_t frk,t,ded,xd,yd;
   igraph_real_t rf,af;
   long int i,j,k;
@@ -246,6 +250,10 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
   igraph_matrix_t dxdy=IGRAPH_MATRIX_NULL;
   igraph_eit_t edgeit;
   igraph_integer_t from, to;
+  
+  if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
@@ -289,7 +297,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
     /* Calculate the attractive "force" */
     IGRAPH_EIT_RESET(edgeit);
     while (!IGRAPH_EIT_END(edgeit)) {
-      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+      long int edge=IGRAPH_EIT_GET(edgeit);
+      igraph_real_t w= weight ? VECTOR(*weight)[ edge ] : 1.0;
+      igraph_edge(graph, edge, &from, &to);
       j=from; 
       k=to;
       xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
@@ -299,7 +309,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 	xd/=ded;                /* Rescale differences to length 1 */
 	yd/=ded;
       }
-      af=ded*ded/frk;
+      af=ded*ded/frk*w;
       MATRIX(dxdy, j, 0)-=xd*af; /* Add to the position change vector */
       MATRIX(dxdy, k, 0)+=xd*af;
       MATRIX(dxdy, j, 1)-=yd*af;
@@ -352,6 +362,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
  * \param use_seed Logical, if true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
+ * \param weight Pointer to a vector containing edge weights, 
+ *        the attraction along the edges will be multiplied by these. 
+ *        It will be ignored if it is a null-pointer.
  * \return Error code.
  *
  * Added in version 0.2.</para><para>
@@ -367,7 +380,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 					  igraph_integer_t niter, igraph_real_t maxdelta,
 					  igraph_real_t volume, igraph_real_t coolexp,
 					  igraph_real_t repulserad,
-					  igraph_bool_t use_seed) {
+					  igraph_bool_t use_seed,
+					  const igraph_vector_t *weight) {
   
   igraph_real_t frk, t, ded, xd, yd, zd;
   igraph_matrix_t dxdydz;
@@ -377,6 +391,10 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_eit_t edgeit;
   igraph_integer_t from, to;
+
+  if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_matrix_init(&dxdydz, no_of_nodes, 3));
   IGRAPH_FINALLY(igraph_matrix_destroy, &dxdydz);
@@ -429,7 +447,9 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     /*Calculate the attractive "force"*/
     IGRAPH_EIT_RESET(edgeit);
     while (!IGRAPH_EIT_END(edgeit)) {
-      igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+      long int edge=IGRAPH_EIT_GET(edgeit);
+      igraph_real_t w= weight ? VECTOR(*weight)[edge] : 1.0;
+      igraph_edge(graph, edge, &from, &to);
       j=from;
       k=to;
       xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
@@ -441,7 +461,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 	yd/=ded;
 	zd/=ded;
       }
-      af=ded*ded/frk;
+      af=ded*ded/frk*w;
       MATRIX(dxdydz, j, 0)-=xd*af;   /*Add to the position change vector*/
       MATRIX(dxdydz, k, 0)+=xd*af;
       MATRIX(dxdydz, j, 1)-=yd*af;

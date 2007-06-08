@@ -61,6 +61,9 @@ layout.lgl(graph, \dots, params)
     \item{maxdelta}{Maximum change (\code{vcount(graph)}).}
     \item{area}{Area parameter (\code{vcount(graph)^2}).}
     \item{repulserad}{Cancellation radius (\code{area}*vcount(graph)).}
+    \item{weights}{A vector giving edge weights or \code{NULL}. If not
+      \code{NULL} then the attraction along the edges will be multiplied
+      by the given edge weights (\code{NULL}).}
   }
   This function was ported from the SNA package.
 
