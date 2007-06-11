@@ -31,15 +31,15 @@ doctemplate: $(DOCINCLUDES)
 igraph-docs.xml: $(DOCINCLUDES)
 	touch igraph-docs.xml
 
-vector.xml: vector.xxml $(SRCDIR)/types.h $(SRCDIR)/vector_pmt.hc $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.h $(SRCDIR)/vector.c
+vector.xml: vector.xxml $(SRCDIR)/types.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.h $(SRCDIR)/vector.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h \
-	$(SRCDIR)/vector_pmt.hc $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.h $(SRCDIR)/vector.c
+	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.h $(SRCDIR)/vector.c
 
 error.xml: error.xxml $(SRCDIR)/error.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/error.h
 
-matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.c $(SRCDIR)/spmatrix.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.c $(SRCDIR)/spmatrix.c
+matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt $(SRCDIR)/spmatrix.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt $(SRCDIR)/spmatrix.c
 
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c

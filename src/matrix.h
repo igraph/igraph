@@ -21,15 +21,6 @@
 
 */
 
-/** 
- * \section about_igraph_matrix_t_objects About \type igraph_matrix_t objects
- * 
- * <para>This type is just an interface to \type igraph_vector_t.</para>
- *
- * <para>The \type igraph_matrix_t type usually stores n
- * elements in O(n) space, but not always, see the documentation of
- * the vector type.</para>
- */
 typedef struct TYPE(igraph_matrix) {
   TYPE(igraph_vector) data;
   long int nrow, ncol;

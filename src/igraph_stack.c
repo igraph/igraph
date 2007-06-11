@@ -25,18 +25,18 @@
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
-#include "stack_pmt.hc"
+#include "stack.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
 #define BASE_LONG
 #include "igraph_pmt.h"
-#include "stack_pmt.hc"
+#include "stack.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_LONG
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "stack_pmt.hc"
+#include "stack.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
