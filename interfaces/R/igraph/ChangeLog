@@ -1,3 +1,8 @@
+2007-06-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structure.generators.R (line.graph)
+	* interfaces/R/src/rinterface.c (R_igraph_line_graph) : added
+
 2007-06-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/layout.R (layout.fruchterman.reingold)

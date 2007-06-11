@@ -562,6 +562,7 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
 				 const igraph_matrix_t *W);
 int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 				igraph_neimode_t mode);
+int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);
 
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */

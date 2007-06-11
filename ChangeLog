@@ -1,3 +1,7 @@
+2007-06-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_linegraph) : added
+
 2007-06-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/layout.c (igraph_layout_fruchterman_reingold)

@@ -6134,6 +6134,24 @@ SEXP R_igraph_girth(SEXP graph, SEXP pcircle) {
   return result;
 }
 
+SEXP R_igraph_line_graph(SEXP graph) {
+  
+  igraph_t g, lg;
+  SEXP result, names;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  igraph_linegraph(&g, &lg);
+  PROTECT(result=R_igraph_to_SEXP(&lg));
+  igraph_destroy(&lg);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
 			SEXP verbose) {
