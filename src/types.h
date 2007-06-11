@@ -278,28 +278,25 @@ void igraph_array3_multiply(igraph_array3_t *a, igraph_real_t by);
 /* Plain stack                                        */
 /* -------------------------------------------------- */
 
-/**
- * Stack data type.
- * \ingroup internal
- */
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "stack.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
 
-typedef struct s_stack {
-  igraph_real_t* stor_begin;
-  igraph_real_t* stor_end;
-  igraph_real_t* end;
-} igraph_stack_t;
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "stack.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
+
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "stack.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
 
 #define IGRAPH_STACK_NULL { 0,0,0 }
-
-int igraph_stack_init       (igraph_stack_t* s, long int size);
-void igraph_stack_destroy    (igraph_stack_t* s);
-int igraph_stack_reserve    (igraph_stack_t* s, long int size);
-igraph_bool_t igraph_stack_empty      (igraph_stack_t* s);
-long int igraph_stack_size       (igraph_stack_t* s);
-void igraph_stack_clear      (igraph_stack_t* s);
-int igraph_stack_push       (igraph_stack_t* s, igraph_real_t elem);
-igraph_real_t igraph_stack_pop        (igraph_stack_t* s);
-igraph_real_t igraph_stack_top        (const igraph_stack_t* s);
 
 /* -------------------------------------------------- */
 /* Heap                                               */
