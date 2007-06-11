@@ -19,6 +19,8 @@
 <!-- doxrox-include igraph_tree -->
 <!-- doxrox-include igraph_full -->	
 <!-- doxrox-include igraph_atlas -->
+<!-- doxrox-include igraph_de_bruijn -->
+<!-- doxrox-include igraph_kautz -->
 <!-- doxrox-include igraph_extended_chordal_ring -->
 <!-- doxrox-include igraph_connect_neighborhood -->
 </section>

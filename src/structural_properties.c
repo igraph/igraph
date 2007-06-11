@@ -3913,7 +3913,6 @@ int igraph_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
   
   for (i=0; i<no_of_edges; i++) {
     long int from=IGRAPH_FROM(graph, i);
-    long int to=IGRAPH_TO(graph, i);
 
     IGRAPH_ALLOW_INTERRUPTION();
     

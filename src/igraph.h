@@ -564,6 +564,9 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 				igraph_neimode_t mode);
 int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);
 
+int igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);
+int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);
+
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */
 /* -------------------------------------------------- */

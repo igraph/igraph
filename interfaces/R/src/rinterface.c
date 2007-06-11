@@ -6137,7 +6137,7 @@ SEXP R_igraph_girth(SEXP graph, SEXP pcircle) {
 SEXP R_igraph_line_graph(SEXP graph) {
   
   igraph_t g, lg;
-  SEXP result, names;
+  SEXP result;
   
   R_igraph_before();
   
@@ -6145,6 +6145,44 @@ SEXP R_igraph_line_graph(SEXP graph) {
   igraph_linegraph(&g, &lg);
   PROTECT(result=R_igraph_to_SEXP(&lg));
   igraph_destroy(&lg);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_de_bruijn(SEXP pm, SEXP pn) {
+
+  igraph_t g;
+  igraph_integer_t m=REAL(pm)[0];
+  igraph_integer_t n=REAL(pn)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  igraph_de_bruijn(&g, m, n);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_kautz(SEXP pm, SEXP pn) {
+
+  igraph_t g;
+  igraph_integer_t m=REAL(pm)[0];
+  igraph_integer_t n=REAL(pn)[0];
+  SEXP result;
+  
+  R_igraph_before();
+  
+  igraph_kautz(&g, m, n);
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
   
   R_igraph_after();
   

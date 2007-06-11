@@ -277,3 +277,15 @@ line.graph <- function(graph) {
 }
   
   
+graph.de.bruijn <- function(m, n) {
+
+  .Call("R_igraph_de_bruijn", as.numeric(m), as.numeric(n),
+        PACKAGE="igraph")
+}
+
+graph.kautz <- function(m, n) {
+
+  .Call("R_igraph_kautz", as.numeric(m), as.numeric(n),
+        PACKAGE="igraph")
+}
+

@@ -1,3 +1,7 @@
+2007-06-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structure_generators.c (igraph_de_bruijn, igraph_kautz) : added
+
 2007-06-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_linegraph) : added

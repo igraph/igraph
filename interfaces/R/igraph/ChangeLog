@@ -1,3 +1,10 @@
+2007-06-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structure.generators.R (graph.de.bruijn)
+	(graph.kautz)
+	* interfaces/R/src/rinterface.c (R_igraph_de_bruijn, R_igraph_kautz) :
+	added
+
 2007-06-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (line.graph)
