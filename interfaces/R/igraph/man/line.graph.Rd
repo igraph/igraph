@@ -25,7 +25,7 @@ line.graph(graph)
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}, the first version of the C
-  code was written by Vincent Motossian.}
+  code was written by Vincent Matossian.}
 % \seealso{}
 \examples{
 # generate the first De-Bruijn graphs
