@@ -688,8 +688,12 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 
 #if defined(INFINITY)
 #  define IGRAPH_INFINITY INFINITY
+#  define IGRAPH_POSINFINITY INFINITY
+#  define IGRAPH_NEGINFINITY (-INFINITY)
 #else
 #  define IGRAPH_INFINITY (igraph_i_fdiv(1.0, 0.0))
+#  define IGRAPH_POSINFINITY (igraph_i_fdiv(1.0, 0.0))
+#  define IGRAPH_NEGINFINITY (igraph_i_fdiv(-1.0, 0.0))
 #endif
 
 #if defined(NAN)

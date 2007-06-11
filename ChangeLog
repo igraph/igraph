@@ -1,3 +1,7 @@
+2007-06-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/types.h (IGRAPH_POSINFINITY, IGRAPH_NEGINFINITY) : added
+
 2007-06-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_de_bruijn, igraph_kautz) : added
