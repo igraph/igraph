@@ -222,7 +222,7 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject * self,
   if (edges && PyList_Check(edges)) {
     // Caller specified an edge list, so we use igraph_create
     // We have to convert the Python list to a igraph_vector_t
-    if (igraphmodule_PyList_to_vector_t(edges, &edges_vector, 1, 1)) {
+    if (igraphmodule_PyObject_to_vector_t(edges, &edges_vector, 1, 1)) {
       igraphmodule_handle_igraph_error();
       return -1;
     }
@@ -356,7 +356,7 @@ PyObject *igraphmodule_Graph_delete_vertices(igraphmodule_GraphObject * self,
 
   if (!PyArg_ParseTuple(args, "O", &list))
     return NULL;
-  if (igraphmodule_PyList_to_vector_t(list, &v, 1, 0)) {
+  if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 0)) {
     // something bad happened during conversion
     return NULL;
   }
@@ -393,7 +393,7 @@ PyObject *igraphmodule_Graph_add_edges(igraphmodule_GraphObject * self,
     return NULL;
   Py_INCREF(list);
 
-  if (igraphmodule_PyList_to_vector_t(list, &v, 1, 1)) {
+  if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 1)) {
     // something bad happened during conversion, release the
     // list reference and return immediately
     Py_DECREF(list);
@@ -438,7 +438,7 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
     return NULL;
 
   if (PyObject_IsTrue(by_index)) {
-    if (igraphmodule_PyList_to_vector_t(list, &v, 1, 0)) {
+    if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 0)) {
       /* something bad happened during conversion, return immediately */
       return NULL;
     }
@@ -451,7 +451,7 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
     }
   }
   else {
-    if (igraphmodule_PyList_to_vector_t(list, &v, 1, 1)) {
+    if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 1)) {
       /* something bad happened during conversion, return immediately */
       return NULL;
     }
@@ -890,7 +890,7 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
       m = PyInt_AsLong(m_obj);
       igraph_vector_init(&outseq, 0);
     } else if (PyList_Check(m_obj)) {
-      if (igraphmodule_PyList_to_vector_t(m_obj, &outseq, 1, 0)) {
+      if (igraphmodule_PyObject_to_vector_t(m_obj, &outseq, 1, 0)) {
         /* something bad happened during conversion */
        return NULL;
       }
@@ -1047,7 +1047,7 @@ PyObject *igraphmodule_Graph_Establishment(PyTypeObject * type,
     igraph_matrix_destroy(&pm);
     return NULL;
   }
-  if (igraphmodule_PyList_to_vector_t(type_dist, &td, 1, 0)) {
+  if (igraphmodule_PyObject_to_vector_t(type_dist, &td, 1, 0)) {
     PyErr_SetString(PyExc_ValueError,
                     "Error while converting type distribution vector");
     igraph_matrix_destroy(&pm);
@@ -1274,7 +1274,7 @@ PyObject *igraphmodule_Graph_Lattice(PyTypeObject * type,
   mutual = PyObject_IsTrue(o_mutual);
   circular = PyObject_IsTrue(o_circular);
 
-  if (igraphmodule_PyList_to_vector_t(o_dimvector, &dimvector, 1, 0))
+  if (igraphmodule_PyObject_to_vector_t(o_dimvector, &dimvector, 1, 0))
     return NULL;
 
   self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
@@ -1343,7 +1343,7 @@ NULL };
     igraph_matrix_destroy(&pm);
     return NULL;
   }
-  if (igraphmodule_PyList_to_vector_t(type_dist, &td, 1, 0)) {
+  if (igraphmodule_PyObject_to_vector_t(type_dist, &td, 1, 0)) {
     PyErr_SetString(PyExc_ValueError,
                     "Error while converting type distribution vector");
     igraph_matrix_destroy(&pm);
@@ -1566,7 +1566,7 @@ NULL };
     igraph_vector_init(&outseq, 0);
   }
   else if (PyList_Check(m_obj)) {
-    if (igraphmodule_PyList_to_vector_t(m_obj, &outseq, 1, 0)) {
+    if (igraphmodule_PyObject_to_vector_t(m_obj, &outseq, 1, 0)) {
       // something bad happened during conversion
       return NULL;
     }
@@ -1703,12 +1703,12 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
                                    &PyList_Type, &indeg))
     return NULL;
 
-  if (igraphmodule_PyList_to_vector_t(outdeg, &outseq, 1, 0)) {
+  if (igraphmodule_PyObject_to_vector_t(outdeg, &outseq, 1, 0)) {
     // something bad happened during conversion
     return NULL;
   }
   if (indeg) {
-    if (igraphmodule_PyList_to_vector_t(indeg, &inseq, 1, 0)) {
+    if (igraphmodule_PyObject_to_vector_t(indeg, &inseq, 1, 0)) {
       // something bad happened during conversion
       igraph_vector_destroy(&outseq);
       return NULL;
@@ -2566,7 +2566,7 @@ PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
   if (!weights)
     err = igraph_minimum_spanning_tree_unweighted(&self->g, &mst);
   else {
-    if (igraphmodule_PyList_to_vector_t(weights, &ws, 1, 0))
+    if (igraphmodule_PyObject_to_vector_t(weights, &ws, 1, 0))
       return NULL;
     err = igraph_minimum_spanning_tree_prim(&self->g, &mst, &ws);
   }
@@ -2705,7 +2705,7 @@ PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyList_to_vector_t(list, &vertices, 1, 0))
+  if (igraphmodule_PyObject_to_vector_t(list, &vertices, 1, 0))
     return NULL;
 
   if (igraph_subgraph(&self->g, &sg, igraph_vss_vector(&vertices))) {
@@ -3083,19 +3083,20 @@ PyObject
                                                   self, PyObject * args,
                                                   PyObject * kwds)
 {
-  char *kwlist[] =
-    { "maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL };
+  static char *kwlist[] =
+    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL };
   igraph_matrix_t m;
+  igraph_vector_t *weights=0;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad;
-  PyObject *result;
+  PyObject *result, *wobj=Py_None;
 
   maxdelta = igraph_vcount(&self->g);
   area = maxdelta * maxdelta;
   coolexp = 1.5;
   repulserad = area * maxdelta;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oldddd", kwlist, &wobj,
                                    &niter, &maxdelta, &area, &coolexp,
                                    &repulserad))
     return NULL;
@@ -3105,15 +3106,27 @@ PyObject
     return NULL;
   }
 
-  if (igraph_layout_fruchterman_reingold
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0)) {
+  /* Convert the weight parameter to a vector */
+  if (igraphmodule_attrib_to_vector_t(wobj, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
     igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (igraph_layout_fruchterman_reingold
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
+    igraph_matrix_destroy(&m);
+	if (weights) {
+	  igraph_vector_destroy(weights); free(weights);
+	}
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
+  if (weights) {
+    igraph_vector_destroy(weights); free(weights);
+  }
   return (PyObject *) result;
 }
 
@@ -3127,19 +3140,20 @@ PyObject
                                                      * self, PyObject * args,
                                                      PyObject * kwds)
 {
-  char *kwlist[] =
-    { "maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL };
+  static char *kwlist[] =
+    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL };
   igraph_matrix_t m;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad;
-  PyObject *result;
+  PyObject *result, *wobj;
+  igraph_vector_t *weights;
 
   maxdelta = igraph_vcount(&self->g);
   area = maxdelta * maxdelta;
   coolexp = 1.5;
   repulserad = area * maxdelta;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oldddd", kwlist, &wobj,
                                    &niter, &maxdelta, &area, &coolexp,
                                    &repulserad))
     return NULL;
@@ -3149,15 +3163,27 @@ PyObject
     return NULL;
   }
 
-  if (igraph_layout_fruchterman_reingold_3d
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0)) {
+  /* Convert the weight parameter to a vector */
+  if (igraphmodule_attrib_to_vector_t(wobj, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
     igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (igraph_layout_fruchterman_reingold_3d
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
+    igraph_matrix_destroy(&m);
+	if (weights) {
+      igraph_vector_destroy(weights); free(weights);
+    }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
+  if (weights) {
+    igraph_vector_destroy(weights); free(weights);
+  }
   return (PyObject *) result;
 }
 
@@ -3907,7 +3933,7 @@ PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
 
   if (PyList_Check(ids)) {
 	idvecptr = &idvec;
-    if (igraphmodule_PyList_to_vector_t(ids, idvecptr, 0, 0)) return NULL;
+    if (igraphmodule_PyObject_to_vector_t(ids, idvecptr, 0, 0)) return NULL;
   }
 
   if (creator != Py_None) {
@@ -4067,7 +4093,7 @@ PyObject *igraphmodule_Graph_isoclass(igraphmodule_GraphObject * self,
 
   if (vids) {
     igraph_vector_t vidsvec;
-    if (igraphmodule_PyList_to_vector_t(vids, &vidsvec, 1, 0)) {
+    if (igraphmodule_PyObject_to_vector_t(vids, &vidsvec, 1, 0)) {
       PyErr_SetString(PyExc_ValueError,
                       "Error while converting PyList to igraph_vector_t");
       return NULL;
@@ -5085,7 +5111,7 @@ PyObject *igraphmodule_Graph_coreness(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_modularity(igraphmodule_GraphObject *self, PyObject *o) {
   igraph_vector_t membership;
   igraph_real_t modularity;
-  if (igraphmodule_PyList_to_vector_t(o, &membership, 1, 0)) return NULL;
+  if (igraphmodule_PyObject_to_vector_t(o, &membership, 1, 0)) return NULL;
   if (igraph_modularity(&self->g, &membership, &modularity)) {
 	igraph_vector_destroy(&membership);
 	return NULL;
@@ -6171,11 +6197,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta)\n\n"
+   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta)\n\n"
    "Places the vertices on a 2D plane according to the Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
    "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@param maxiter: the number of iterations to perform.\n"
    "@param maxdelta: the maximum distance to move a vertex in\n"
    "  an iteration. C{None} means the number of vertices.\n"
@@ -6191,11 +6219,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_fruchterman_reingold_3d",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold_3d,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold_3d(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta)\n\n"
+   "layout_fruchterman_reingold_3d(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta)\n\n"
    "Places the vertices in the 3D space according to the Fruchterman-Reingold grid algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
    "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@param maxiter: the number of iterations to perform.\n"
    "@param maxdelta: the maximum distance to move a vertex in\n"
    "  an iteration. C{None} means the number of vertices.\n"

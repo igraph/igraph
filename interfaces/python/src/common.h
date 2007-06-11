@@ -55,6 +55,8 @@
 #define ATTRHASH_IDX_VERTEX 1
 #define ATTRHASH_IDX_EDGE 2
 
+#define ATTRIBUTE_TYPE_VERTEX 1
+#define ATTRIBUTE_TYPE_EDGE 2
 
 PyObject* igraphmodule_unimplemented(PyObject* self, PyObject* args, PyObject* kwds);
 PyObject* igraphmodule_resolve_graph_weakref(PyObject* ref);

@@ -904,7 +904,7 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
   if (igraph_vs_is_all(&vs)) {
-    if (igraphmodule_PyList_to_vector_t(list, &newvalue, 0, 0))
+    if (igraphmodule_PyObject_to_vector_t(list, &newvalue, 0, 0))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
     igraph_vector_destroy(value);
     *value=newvalue;
@@ -983,7 +983,7 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
   if (igraph_es_is_all(&es)) {
-    if (igraphmodule_PyList_to_vector_t(list, &newvalue, 0, 0))
+    if (igraphmodule_PyObject_to_vector_t(list, &newvalue, 0, 0))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
     igraph_vector_destroy(value);
     *value=newvalue;
