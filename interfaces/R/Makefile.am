@@ -18,7 +18,8 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	igraph_hashtable.c foreign-graphml.c flow.c igraph_buckets.c \
         spectral_properties.c cores.c cliques.c igraph_set.c \
 	revolver_cit.c revolver_grow.c community.c spmatrix.c vector_pmt.hc \
-	evolver_cit.c gml_tree.c fast_community.c matrix_pmt.hc stack_pmt.hc
+	evolver_cit.c gml_tree.c fast_community.c matrix_pmt.hc stack_pmt.hc \
+	dqueue_pmt.hc
 
 RSNAMES_F = 
 
@@ -53,7 +54,8 @@ RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 	$(top_srcdir)/include/igraph_pmt_off.h \
 	$(top_srcdir)/include/vector.h \
 	$(top_srcdir)/include/matrix.h \
-	$(top_srcdir)/include/stack.h
+	$(top_srcdir)/include/stack.h \
+	$(top_srcdir)/include/dqueue.h
 
 RSRCSOURCES = $(top_srcdir)/interfaces/R/src/rinterface.c \
 	$(top_srcdir)/interfaces/R/src/Makevars.in \

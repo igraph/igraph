@@ -51,34 +51,28 @@ typedef int    igraph_bool_t;
 /* double ended queue, very useful                    */
 /* -------------------------------------------------- */
 
-/**
- * Double ended queue data type.
- * \ingroup internal
- */
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "dqueue.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
 
-typedef struct s_dqueue {
-  igraph_real_t *begin;
-  igraph_real_t *end;
-  igraph_real_t *stor_begin;
-  igraph_real_t *stor_end;
-} igraph_dqueue_t;
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "dqueue.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
+
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "dqueue.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
 
 #define IGRAPH_DQUEUE_NULL { 0,0,0,0 }
 #define IGRAPH_DQUEUE_INIT_FINALLY(v, size) \
   do { IGRAPH_CHECK(igraph_dqueue_init(v, size)); \
   IGRAPH_FINALLY(igraph_dqueue_destroy, v); } while (0)
-
-int igraph_dqueue_init    (igraph_dqueue_t* q, long int size);
-void igraph_dqueue_destroy (igraph_dqueue_t* q);
-igraph_bool_t igraph_dqueue_empty   (igraph_dqueue_t* q);
-void igraph_dqueue_clear   (igraph_dqueue_t* q);
-igraph_bool_t igraph_dqueue_full    (igraph_dqueue_t* q);
-long int igraph_dqueue_size    (igraph_dqueue_t* q);
-igraph_real_t igraph_dqueue_pop     (igraph_dqueue_t* q);
-igraph_real_t igraph_dqueue_pop_back(igraph_dqueue_t* q);
-igraph_real_t igraph_dqueue_head    (igraph_dqueue_t* q);
-igraph_real_t igraph_dqueue_back    (igraph_dqueue_t* q);
-int igraph_dqueue_push    (igraph_dqueue_t* q, igraph_real_t elem);
 
 /* -------------------------------------------------- */
 /* Flexible vector                                    */

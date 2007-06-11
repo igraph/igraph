@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /* 
    IGraph library.
-   Copyright (C) 2003, 2004, 2005  Gabor Csardi <csardi@rmki.kfki.hu>
+   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
    This program is free software; you can redistribute it and/or modify
@@ -16,228 +16,27 @@
    
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
    02110-1301 USA
 
 */
 
 #include "types.h"
-#include "memory.h"
-#include "random.h"
-#include "error.h"
 
-#include <assert.h>
-#include <string.h> 		/* memcpy & co. */
-#include <stdlib.h>
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "dqueue_pmt.hc"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
 
-/**
- * \ingroup dqueue
- * \brief Initializes a double ended queue (constructor).
- *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
- */
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "dqueue_pmt.hc"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
 
-int igraph_dqueue_init (igraph_dqueue_t* q, long int size) {
-        assert(q != 0);
-	if (size <= 0 ) { size=1; }
-	q->stor_begin=Calloc(size, igraph_real_t);
-	if (q->stor_begin==0) {
-	  IGRAPH_ERROR("dqueue init failed", IGRAPH_ENOMEM);
-	}
-	q->stor_end=q->stor_begin + size;
-	q->begin=q->stor_begin;
-	q->end=NULL;
-	
-	return 0;
-}
-
-/**
- * \ingroup dqueue
- * \brief Destroys a double ended queue.
- */
-
-void igraph_dqueue_destroy (igraph_dqueue_t* q) {
-  assert(q != 0);
-  if (q->stor_begin != 0) {
-    Free(q->stor_begin);
-    q->stor_begin=0;
-  }
-}
-
-/**
- * \ingroup dqueue
- * \brief Decides whether the queue is empty.
- */
-
-igraph_bool_t igraph_dqueue_empty (igraph_dqueue_t* q) {
-  assert(q != 0);
-  assert(q->stor_begin != 0);
-  return q->end == NULL;
-}
-
-/**
- * \ingroup dqueue
- * \brief Removes all elements from the queue.
- */
-
-void igraph_dqueue_clear   (igraph_dqueue_t* q) {
-  assert(q != 0);
-  assert(q->stor_begin != 0);
-  q->begin=q->stor_begin;
-  q->end=NULL;
-}
-
-/**
- * \ingroup dqueue
- * \brief Checks whether the queue is full.
- *
- * If a queue is full the next igraph_dqueue_push() operation will allocate
- * more memory.
- */
-
-igraph_bool_t igraph_dqueue_full (igraph_dqueue_t* q) {
-  assert(q != 0);
-  assert(q->stor_begin != 0);
-  return q->begin == q->end;
-}
-
-/**
- * \ingroup dqueue
- * \brief Returns the number of elements in the queue.
- */
-
-long int igraph_dqueue_size (igraph_dqueue_t* q) {
-        assert(q != 0);
-        assert(q->stor_begin != 0);
-	if (q->end==NULL) {
-		return 0;
-	} else if (q->begin < q->end) {
-		return q->end - q->begin;
-	} else {
-		return q->stor_end - q->begin + q->end - q->stor_begin;
-	}
-}
-
-/**
- * \ingroup dqueue
- * \brief Returns the element at the head of the queue.
- */
-
-igraph_real_t igraph_dqueue_head (igraph_dqueue_t* q) {
-        assert(q != 0);
-	assert(q->stor_begin != 0);
-	return *(q->begin);
-}
-
-/**
- * \ingroup dqueue
- * \brief Returns the element at the tail of the queue.
- */
-
-igraph_real_t igraph_dqueue_back (igraph_dqueue_t* q) {
-        assert(q != 0);
-	assert(q->stor_begin != 0);
-	return *(q->end-1);
-}
-
-/**
- * \ingroup dqueue
- * \brief Returns and removes the element at the head of the queue.
- */
-
-igraph_real_t igraph_dqueue_pop (igraph_dqueue_t* q) {
-	igraph_real_t tmp=*(q->begin);
-        assert(q != 0);
-	assert(q->stor_begin != 0);
-	(q->begin)++;
-	if (q->begin==q->stor_end) {
-		q->begin=q->stor_begin;
-	}
-	if (q->begin==q->end) {
-		q->end=NULL;
-	}
-
-	return tmp;
-}
-
-/**
- * \ingroup dqueue
- * \brief Returns and removes the element at the tail of the queue.
- */
-
-igraph_real_t igraph_dqueue_pop_back (igraph_dqueue_t* q) {
-	igraph_real_t tmp;
-        assert(q != 0);
-	assert(q->stor_begin != 0);
-	if (q->end != q->stor_begin) {
-		tmp=*((q->end)-1);
-		q->end = (q->end)-1;
-	} else {
-		tmp=*((q->stor_end)-1);
-		q->end = (q->stor_end)-1;
-	}
-	if (q->begin==q->end) {
-		q->end=NULL;
-	}
-	
-	return tmp;
-}
-
-/**
- * \ingroup dqueue
- * \brief Appends an element to the back of the queue.
- *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
- */
-
-int igraph_dqueue_push (igraph_dqueue_t* q, igraph_real_t elem) {
-        assert(q != 0);
-	assert(q->stor_begin != 0);
-	if (q->begin != q->end) {
-		/* not full */
-		if (q->end==NULL) {
-			q->end=q->begin;
-		}			
-		*(q->end) = elem;
-		(q->end)++;
-		if (q->end==q->stor_end) {
-			q->end=q->stor_begin;
-		}
-	} else {
-		/* full, allocate more storage */
-		
-		igraph_real_t *bigger=NULL, *old=q->stor_begin;
-
-		bigger=Calloc( 2*(q->stor_end - q->stor_begin)+1, igraph_real_t );
-		if (bigger==0) {
-		  IGRAPH_ERROR("dqueue push failed", IGRAPH_ENOMEM);
-		}
-
-		if (q->stor_end - q->begin) {
-			memcpy(bigger, q->begin, 
-			       (q->stor_end - q->begin) * sizeof(igraph_real_t));
-		}
-		if (q->end - q->stor_begin > 0) {
-			memcpy(bigger + (q->stor_end - q->begin),
-			       q->stor_begin, (q->end - q->stor_begin) * sizeof(igraph_real_t));
-		}
-		
-		q->end       =bigger + (q->stor_end - q->stor_begin);
-		q->stor_end  =bigger + 2*(q->stor_end - q->stor_begin) + 1;
-		q->stor_begin=bigger;
-		q->begin     =bigger;
-				
-		*(q->end) = elem;
-		(q->end)++;
-		if (q->end==q->stor_end) {
-			q->end=q->stor_begin;
-		}
-
-		Free(old);
-	}
-	
-	return 0;
-}
-
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "dqueue_pmt.hc"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
