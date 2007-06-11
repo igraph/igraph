@@ -74,3 +74,27 @@
 #define FUNCTION(a,c) CONCAT3(a,SHORT,c)
 #define TYPE(dir) CONCAT3(dir,SHORT,t)
 #endif
+
+#if defined(HEAP_TYPE_MIN)
+#define HEAPMORE <
+#define HEAPMOREEQ <=
+#define HEAPLESS >
+#define HEAPLESSEQ >=
+#undef FUNCTION
+#undef TYPE
+#if defined(BASE_IGRAPH_REAL)
+#define FUNCTION(dir,name) CONCAT3(dir,min,name)
+#define TYPE(dir) CONCAT3(dir,min,t)
+#else
+#define FUNCTION(a,c) CONCAT4(a,min,SHORT,c)
+#define TYPE(dir) CONCAT4(dir,min,SHORT,t)
+#endif
+#endif
+
+#if defined(HEAP_TYPE_MAX)
+#define HEAPMORE >
+#define HEAPMOREEQ >=
+#define HEAPLESS <
+#define HEAPLESSEQ <=
+#endif
+

@@ -301,29 +301,46 @@ void igraph_array3_multiply(igraph_array3_t *a, igraph_real_t by);
  * \ingroup internal
  */
 
-typedef struct s_heap {
-  igraph_real_t* stor_begin;
-  igraph_real_t* stor_end;
-  igraph_real_t* end;
-  int destroy;
-} igraph_heap_t;
+#define BASE_IGRAPH_REAL
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "heap.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "heap.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_IGRAPH_REAL
+
+#define BASE_LONG
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "heap.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "heap.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_LONG
+
+#define BASE_CHAR
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "heap.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "heap.h"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_CHAR
 
 #define IGRAPH_HEAP_NULL { 0,0,0 }
-
-int igraph_heap_init           (igraph_heap_t* h, long int size);
-int igraph_heap_init_array     (igraph_heap_t *t, igraph_real_t* data, long int len);
-void igraph_heap_destroy        (igraph_heap_t* h);
-igraph_bool_t igraph_heap_empty          (igraph_heap_t* h);
-int igraph_heap_push           (igraph_heap_t* h, igraph_real_t elem);
-igraph_real_t igraph_heap_max       (igraph_heap_t* h);
-igraph_real_t igraph_heap_delete_max(igraph_heap_t* h);
-long int igraph_heap_size      (igraph_heap_t* h);
-int igraph_heap_reserve        (igraph_heap_t* h, long int size);
-
-void igraph_heap_i_build(igraph_real_t* arr, long int size, long int head);
-void igraph_heap_i_shift_up(igraph_real_t* arr, long int size, long int elem);
-void igraph_heap_i_sink(igraph_real_t* arr, long int size, long int head);
-void igraph_heap_i_switch(igraph_real_t* arr, long int e1, long int e2);
 
 /* -------------------------------------------------- */
 /* Indexed heap                                       */

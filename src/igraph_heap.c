@@ -21,94 +21,43 @@
 
 */
 
-#ifdef ATOMIC
-#undef ATOMIC
-#endif
+#include "types.h"
 
-#ifdef ATOMIC_IO
-#undef ATOMIC_IO
-#endif
+#define BASE_IGRAPH_REAL
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "heap.pmt"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "heap.pmt"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_IGRAPH_REAL
 
-#ifdef BASE
-#undef BASE
-#endif
+#define BASE_LONG
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "heap.pmt"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "heap.pmt"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_LONG
 
-#ifdef BASE_EPSILON
-#undef BASE_EPSILON
-#endif
-
-#ifdef CONCAT2
-#undef CONCAT2
-#endif
-
-#ifdef CONCAT2x
-#undef CONCAT2x
-#endif
-
-#ifdef CONCAT3
-#undef CONCAT3
-#endif
-
-#ifdef CONCAT3x
-#undef CONCAT3x
-#endif
-
-#ifdef CONCAT4
-#undef CONCAT4
-#endif
-
-#ifdef CONCAT4x
-#undef CONCAT4x
-#endif
-
-#ifdef FP
-#undef FP
-#endif
-
-#ifdef FUNCTION
-#undef FUNCTION
-#endif
-
-#ifdef IN_FORMAT
-#undef IN_FORMAT
-#endif
-
-#ifdef MULTIPLICITY
-#undef MULTIPLICITY
-#endif
-
-#ifdef ONE
-#undef ONE
-#endif
-
-#ifdef OUT_FORMAT
-#undef OUT_FORMAT
-#endif
-
-#ifdef SHORT
-#undef SHORT
-#endif
-
-#ifdef TYPE
-#undef TYPE
-#endif
-
-#ifdef ZERO
-#undef ZERO
-#endif
-
-#ifdef HEAPMORE
-#undef HEAPMORE
-#endif
-
-#ifdef HEAPLESS
-#undef HEAPLESS
-#endif
-
-#ifdef HEAPMOREEQ
-#undef HEAPMOREEQ
-#endif
-
-#ifdef HEAPLESSEQ
-#undef HEAPLESSEQ
-#endif
+#define BASE_CHAR
+#define HEAP_TYPE_MAX
+#include "igraph_pmt.h"
+#include "heap.pmt"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MAX
+#define HEAP_TYPE_MIN
+#include "igraph_pmt.h"
+#include "heap.pmt"
+#include "igraph_pmt_off.h"
+#undef HEAP_TYPE_MIN
+#undef BASE_CHAR

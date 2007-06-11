@@ -10,7 +10,7 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
 	structure_generators.c conversion.c \
 	measure_dynamics.c type_indexededgelist.c \
 	error.c other.c foreign.c random.c \
-	attributes.c dqueue.c heap.c igraph_stack.c \
+	attributes.c dqueue.c heap.c igraph_heap.c igraph_stack.c \
 	igraph_strvector.c igraph_trie.c matrix.c \
 	vector.c vector_ptr.c memory.c adjlist.c visitors.c \
 	igraph_grid.c atlas.c topology.c motifs.c progress.c \
@@ -19,7 +19,7 @@ RSNAMES_C = basic_query.c games.c cocitation.c iterators.c \
         spectral_properties.c cores.c cliques.c igraph_set.c \
 	revolver_cit.c revolver_grow.c community.c spmatrix.c vector.pmt \
 	evolver_cit.c gml_tree.c fast_community.c matrix.pmt stack.pmt \
-	dqueue.pmt
+	dqueue.pmt heap.pmt
 
 RSNAMES_F = 
 
@@ -55,7 +55,8 @@ RTOPHEADERS = $(top_srcdir)/include/attributes.h \
 	$(top_srcdir)/include/vector.h \
 	$(top_srcdir)/include/matrix.h \
 	$(top_srcdir)/include/stack.h \
-	$(top_srcdir)/include/dqueue.h
+	$(top_srcdir)/include/dqueue.h \
+	$(top_srcdir)/include/heap.h
 
 RSRCSOURCES = $(top_srcdir)/interfaces/R/src/rinterface.c \
 	$(top_srcdir)/interfaces/R/src/Makevars.in \

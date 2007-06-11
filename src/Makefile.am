@@ -18,7 +18,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
 			     foreign-pajek-parser.y foreign-pajek-lexer.l \
 			     foreign-gml-parser.y foreign-gml-lexer.l \
-			     dqueue.c heap.c igraph_stack.c \
+			     dqueue.c heap.c igraph_heap.c igraph_stack.c \
 			     igraph_strvector.c igraph_trie.c matrix.c \
 			     vector.c vector_ptr.c memory.c adjlist.c \
 			     visitors.c igraph_grid.c atlas.c topology.c \
@@ -44,6 +44,6 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  igraph_pmt.h igraph_pmt_off.h vector.h gml_tree.h \
 		  vector.pmt walktrap_graph.h walktrap_communities.h \
 		  walktrap_heap.h matrix.h matrix.pmt stack.h stack.pmt \
-		  dqueue.pmt dqueue.h
+		  dqueue.pmt dqueue.h heap.pmt
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
