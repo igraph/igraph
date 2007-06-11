@@ -34,3 +34,4 @@ line.graph(g)
 line.graph(line.graph(g))
 line.graph(line.graph(line.graph(g)))
 }
+\keyword{graphs}
