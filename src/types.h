@@ -98,12 +98,53 @@ int igraph_dqueue_push    (igraph_dqueue_t* q, igraph_real_t elem);
 
 #define BASE_CHAR
 #include "igraph_pmt.h"
-#include "igraph_pmt.h"
 #include "vector.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
 int igraph_vector_order2(igraph_vector_t *v);
+
+/* -------------------------------------------------- */
+/* Matrix, very similar to vector                     */
+/* -------------------------------------------------- */
+
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "matrix.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
+
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "matrix.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
+
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "matrix.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
+
+#define IGRAPH_MATRIX_NULL { IGRAPH_VECTOR_NULL, 0, 0 }
+#define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
+  do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \
+  IGRAPH_FINALLY(igraph_matrix_destroy, m); } while (0)
+
+/**
+ * \ingroup matrix
+ * \define MATRIX
+ * \brief Accessing an element of a matrix.
+ *
+ * Note that there are no range checks right now. 
+ * This functionality might be redefines as a proper function later. 
+ * \param m The matrix object.
+ * \param i The index of the row, starting with zero.
+ * \param j The index of the column, starting with zero.
+ *
+ * Time complexity: O(1).
+ */
+#define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
@@ -146,69 +187,6 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
 void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));
-
-/* -------------------------------------------------- */
-/* Matrix, very similar to vector                     */
-/* -------------------------------------------------- */
-
-/** 
- * \section about_igraph_matrix_t_objects About \type igraph_matrix_t objects
- * 
- * <para>This type is just an interface to \type igraph_vector_t.</para>
- *
- * <para>The \type igraph_matrix_t type usually stores n
- * elements in O(n) space, but not always, see the documentation of
- * the vector type.</para>
- */
-typedef struct s_matrix {
-  igraph_vector_t data;
-  long int nrow, ncol;
-} igraph_matrix_t;
-
-#define IGRAPH_MATRIX_NULL { IGRAPH_VECTOR_NULL, 0, 0 }
-#define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
-  do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \
-  IGRAPH_FINALLY(igraph_matrix_destroy, m); } while (0)
-
-/**
- * \ingroup matrix
- * \define MATRIX
- * \brief Accessing an element of a matrix.
- *
- * Note that there are no range checks right now. 
- * This functionality might be redefines as a proper function later. 
- * \param m The matrix object.
- * \param i The index of the row, starting with zero.
- * \param j The index of the column, starting with zero.
- *
- * Time complexity: O(1).
- */
-#define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
-int igraph_matrix_init(igraph_matrix_t *m, long int nrow, long int ncol);
-void igraph_matrix_destroy(igraph_matrix_t *m);
-int igraph_matrix_resize(igraph_matrix_t *m, long int nrow, long int ncol);
-long int igraph_matrix_size(const igraph_matrix_t *m);
-long int igraph_matrix_nrow(const igraph_matrix_t *m);
-long int igraph_matrix_ncol(const igraph_matrix_t *m);
-int igraph_matrix_copy_to(const igraph_matrix_t *m, igraph_real_t *to);
-int igraph_matrix_null(igraph_matrix_t *m);
-int igraph_matrix_add_cols(igraph_matrix_t *m, long int n);
-int igraph_matrix_add_rows(igraph_matrix_t *m, long int n);
-int igraph_matrix_remove_col(igraph_matrix_t *m, long int col);
-int igraph_matrix_permdelete_rows(igraph_matrix_t *m, long int *index, long int nremove);
-int igraph_matrix_delete_rows_neg(igraph_matrix_t *m, igraph_vector_t *neg, long int nremove);
-int igraph_matrix_copy(igraph_matrix_t *to, const igraph_matrix_t *from);
-igraph_real_t igraph_matrix_max(const igraph_matrix_t *m);
-void igraph_matrix_multiply(igraph_matrix_t *m, igraph_real_t by);
-int igraph_matrix_select_rows(const igraph_matrix_t *m, igraph_matrix_t *res, 
-			      const igraph_vector_t *rows);
-int igraph_matrix_get_col(const igraph_matrix_t *m, igraph_vector_t *res,
-			  long int index);
-igraph_real_t igraph_matrix_sum(const igraph_matrix_t *m);
-igraph_bool_t igraph_matrix_is_equal(const igraph_matrix_t *m1, 
-				     const igraph_matrix_t *m2);
-igraph_real_t igraph_matrix_maxdifference(const igraph_matrix_t *m1,
-					  const igraph_matrix_t *m2);
 
 /* -------------------------------------------------- */
 /* Sparse matrix                                      */

@@ -43,6 +43,6 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  NetDataTypes.h NetRoutines.h pottsmodel_2.h \
 		  igraph_pmt.h igraph_pmt_off.h vector.h gml_tree.h \
 		  vector_pmt.hc walktrap_graph.h walktrap_communities.h \
-		  walktrap_heap.h 
+		  walktrap_heap.h matrix.h matrix_pmt.hc
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
