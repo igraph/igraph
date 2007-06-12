@@ -151,7 +151,9 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table);
         int igraph_i_ret=0; \
         if ((from)->attr) { \
           IGRAPH_CHECK(igraph_i_ret=igraph_i_attribute_copy((to), (from))); \
-        } \
+        } else { \
+	  (to)->attr = 0; \
+	} \
         if (igraph_i_ret != 0) { \
           IGRAPH_ERROR("", igraph_i_ret); \
         } \
