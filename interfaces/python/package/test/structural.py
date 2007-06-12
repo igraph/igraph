@@ -41,8 +41,8 @@ class DegreeTests(unittest.TestCase):
     def testDegree(self):
         self.failUnless(self.gfull.degree() == [9] * 10)
         self.failUnless(self.gempty.degree() == [0] * 10)
-        self.failUnless(self.g.degree() == [3, 3, 2, 2])
-        self.failUnless(self.g.degree(loops=True) == [5, 3, 2, 2])
+        self.failUnless(self.g.degree(loops=False) == [3, 3, 2, 2])
+        self.failUnless(self.g.degree() == [5, 3, 2, 2])
         self.failUnless(self.gdir.degree(type=IN) == [1, 2, 2, 2])
         self.failUnless(self.gdir.degree(type=OUT) == [3, 2, 1, 1])
         self.failUnless(self.gdir.degree(type=ALL) == [4, 4, 3, 3])

@@ -489,7 +489,7 @@ PyObject *igraphmodule_Graph_degree(igraphmodule_GraphObject * self,
 {
   PyObject *list = Py_None;
   int dtype = IGRAPH_ALL;
-  PyObject *loops = Py_False;
+  PyObject *loops = Py_True;
   igraph_vector_t result;
   igraph_vs_t vs;
   igraph_bool_t return_single = 0;
@@ -5557,7 +5557,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_degree
   {"degree", (PyCFunction) igraphmodule_Graph_degree,
    METH_VARARGS | METH_KEYWORDS,
-   "degree(vertices, type=ALL, loops=False)\n\n"
+   "degree(vertices, type=ALL, loops=True)\n\n"
    "Returns some vertex degrees from the graph.\n\n"
    "This method accepts a single vertex ID or a list of vertex IDs as a\n"
    "parameter, and returns the degree of the given vertices (in the\n"
