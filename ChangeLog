@@ -1,3 +1,7 @@
+2007-06-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_cit.c (igraph_revolver_e) : added 'st' option
+
 2007-06-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/types.h (IGRAPH_POSINFINITY, IGRAPH_NEGINFINITY) : added

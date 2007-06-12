@@ -1380,6 +1380,7 @@ int igraph_revolver_e(const igraph_t *graph,
 		     igraph_integer_t niter,
 		     const igraph_vector_t *cats,
 		     igraph_vector_t *kernel,
+		     igraph_vector_t *st,
 		     igraph_vector_t *sd,
 		     igraph_vector_t *norm,
 		     igraph_vector_t *cites,
@@ -1391,13 +1392,18 @@ int igraph_revolver_e(const igraph_t *graph,
 		     igraph_vector_ptr_t *debugres) {
   
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_vector_t st;
+  igraph_vector_t vst, *myst=st;
   long int i;
   igraph_integer_t nocats;
   
-  IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
+  if (!myst) {     
+    IGRAPH_VECTOR_INIT_FINALLY(&vst, no_of_nodes);
+    myst=&vst;
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(myst, no_of_nodes));
+  }
   for (i=0; i<no_of_nodes; i++) {
-    VECTOR(st)[i]=1;
+    VECTOR(*myst)[i]=1;
   }
   
   nocats=igraph_vector_max(cats)+1;
@@ -1411,42 +1417,45 @@ int igraph_revolver_e(const igraph_t *graph,
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_e(graph, kernel, 0 /*sd*/, 0 /*norm*/,
 					0 /*cites*/, 0 /*debug*/, 0 /*debugres*/,
-				        0 /*logmax*/, &st, cats, nocats));
+				        0 /*logmax*/, myst, cats, nocats));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_revolver_st_e(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_e(graph, myst, kernel, cats));
     } else {
       /* measure */
       IGRAPH_CHECK(igraph_revolver_mes_e(graph, kernel, sd, norm, cites, debug,
-					debugres, logmax, &st, cats, nocats));
+					debugres, logmax, myst, cats, nocats));
       
       /* normalize */
       igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
-      IGRAPH_CHECK(igraph_revolver_st_e(graph, &st, kernel, cats));
+      IGRAPH_CHECK(igraph_revolver_st_e(graph, myst, kernel, cats));
 
       /* expected number of citations */
       if (expected) {
 	IGRAPH_CHECK(igraph_revolver_exp_e(graph, expected, kernel,
-					  &st, cats, nocats));
+					  myst, cats, nocats));
       }
       
       /* error calculation */
       if (logprob || lognull) {
-	IGRAPH_CHECK(igraph_revolver_error_e(graph, kernel, &st, cats, nocats,
+	IGRAPH_CHECK(igraph_revolver_error_e(graph, kernel, myst, cats, nocats,
 					    logprob, lognull));
       }
     }
 
     igraph_progress("Revolver e", 100*(i+1)/niter, NULL);
+
   }
-  
-  igraph_vector_destroy(&st);
-  IGRAPH_FINALLY_CLEAN(1);
+
+  if (!st) {
+    igraph_vector_destroy(myst);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
   
   return 0;
 }

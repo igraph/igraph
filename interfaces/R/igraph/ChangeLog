@@ -1,3 +1,9 @@
+2007-06-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/revolver.R (revolver.e) 
+	* interfaces/R/src/rinterface.c (R_igraph_revolver_e) 
+	: added 'st' option
+
 2007-06-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.de.bruijn)
