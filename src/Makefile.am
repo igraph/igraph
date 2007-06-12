@@ -44,6 +44,6 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  igraph_pmt.h igraph_pmt_off.h vector.h gml_tree.h \
 		  vector.pmt walktrap_graph.h walktrap_communities.h \
 		  walktrap_heap.h matrix.h matrix.pmt stack.h stack.pmt \
-		  dqueue.pmt dqueue.h heap.pmt
+		  dqueue.pmt dqueue.h heap.pmt heap.h
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
