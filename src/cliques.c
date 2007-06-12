@@ -491,25 +491,25 @@ int igraph_i_maximal_independent_vertex_sets_backtrack(const igraph_t *graph,
   IGRAPH_ALLOW_INTERRUPTION();
 
   if (level >= clqdata->matrix_size-1) {
-    igraph_vector_t *vec;
     igraph_integer_t size=0;
-    vec = Calloc(1, igraph_vector_t);
-    if (vec == 0)
-      IGRAPH_ERROR("igraph_i_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
-    IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
     if (res) {
+      igraph_vector_t *vec;
+      vec = Calloc(1, igraph_vector_t);
+      if (vec == 0)
+        IGRAPH_ERROR("igraph_i_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
+      IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
       for (v1=0; v1<clqdata->matrix_size; v1++)
 	if (clqdata->IS[v1] == 0) {
 	  IGRAPH_CHECK(igraph_vector_push_back(vec, v1));
 	}
       IGRAPH_CHECK(igraph_vector_ptr_push_back(res, vec));
       size=igraph_vector_size(vec);
+      IGRAPH_FINALLY_CLEAN(1);
     } else {
       for (v1=0, size=0; v1<clqdata->matrix_size; v1++)
 	if (clqdata->IS[v1] == 0) size++;
     }
     if (size>clqdata->largest_set_size) clqdata->largest_set_size=size;
-    IGRAPH_FINALLY_CLEAN(1);
   } else {
     v1 = level+1;
     /* Count the number of vertices with an index less than v1 that have

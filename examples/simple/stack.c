@@ -84,5 +84,7 @@ int main() {
     return 8;
   }
   
+  igraph_stack_destroy(&st);
+
   return 0;
 }

@@ -52,6 +52,8 @@ int main() {
   igraph_vector_destroy(&res);
   igraph_vector_destroy(&v);
   
+  igraph_destroy(&g);
+
   igraph_vector_init(&v, 28);
   VECTOR(v)[ 0]=0; VECTOR(v)[ 1]=1;
   VECTOR(v)[ 2]=0; VECTOR(v)[ 3]=2;

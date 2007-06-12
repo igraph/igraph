@@ -44,7 +44,8 @@ int main() {
   for (i=0; i<igraph_vector_size(&result); i++)
     printf("%ld ", (long)VECTOR(result)[i]);
   printf("\n");
-  
+  igraph_vector_destroy(&result);
+
   /* Testing with coordinate output mode */
   igraph_matrix_init(&resmat, 0, 0);
   if (igraph_convex_hull(&coords, 0, &resmat))

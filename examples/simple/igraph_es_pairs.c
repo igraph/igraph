@@ -44,6 +44,8 @@ int main() {
       IGRAPH_EIT_GET(it);
       IGRAPH_EIT_NEXT(it);
     }
+    igraph_eit_destroy(&eit);
+    igraph_es_destroy(&es);
   }
 
   igraph_destroy(&g);
@@ -63,6 +65,8 @@ int main() {
       IGRAPH_EIT_GET(it);
       IGRAPH_EIT_NEXT(it);
     }
+    igraph_eit_destroy(&eit);
+    igraph_es_destroy(&es);
   }
 
   igraph_destroy(&g);

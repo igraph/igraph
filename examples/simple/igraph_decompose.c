@@ -70,6 +70,7 @@ int main() {
     igraph_write_graph_edgelist(VECTOR(complist)[i], stdout);
   }
   free_complist(&complist);
+  igraph_destroy(&g);
 
   /* The same graph, this time with vertex attributes */
 /*   igraph_vector_init_seq(&idvect, 0, igraph_vcount(&g)-1); */

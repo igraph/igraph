@@ -34,6 +34,7 @@ int main() {
     igraph_vector_destroy(VECTOR(vecs)[i]);
     free(VECTOR(vecs)[i]);
   }
+  igraph_vector_ptr_destroy(&vecs);
   igraph_vs_destroy(&vs);
   igraph_destroy(&g);
   

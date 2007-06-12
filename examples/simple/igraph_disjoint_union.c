@@ -82,6 +82,7 @@ int main() {
   igraph_get_edgelist(&uni, &v, 0);
   igraph_vector_sort(&v);
   print_vector(&v);
+  igraph_vector_destroy(&v);
 
   for (i=0; i<igraph_vector_ptr_size(&glist); i++) {
     igraph_destroy(VECTOR(glist)[i]);

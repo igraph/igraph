@@ -119,5 +119,7 @@ int main() {
   /* TODO: igraph_strvector_permdelete */
   /* TODO: igraph_strvector_remove_negidx */
   
+  igraph_strvector_destroy(&sv1);
+
   return 0;
 }

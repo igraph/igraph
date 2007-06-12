@@ -59,9 +59,10 @@ int main() {
       v=igraph_vector_ptr_e(&result,i);
       print_vector((igraph_vector_t*)v);
       igraph_vector_destroy(v);
+      free(v);
     }
   }
-
+   
   igraph_clique_number(&g, &omega);
   printf("omega=%ld\n", (long)omega);
 
@@ -72,6 +73,7 @@ int main() {
   if (igraph_vector_ptr_size(&result) != 0) return 1;
 
   igraph_destroy(&g);
+  igraph_vector_ptr_destroy(&result);
 
   return 0;
 }

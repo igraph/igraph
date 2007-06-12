@@ -57,6 +57,8 @@ int main() {
   igraph_vector_init(&eb, igraph_vcount(&g));
   igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED);
   print_vector(&eb, stdout);
+  igraph_vector_destroy(&eb);
+  igraph_destroy(&g);
 
   return 0;
 }

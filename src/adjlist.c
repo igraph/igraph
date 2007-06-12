@@ -223,6 +223,7 @@ void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al) {
       Free(al->adjs[i]);
     }
   }
+  Free(al->adjs);
 }
 
 igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
@@ -292,6 +293,7 @@ void igraph_i_lazy_adjedgelist_destroy(igraph_i_lazy_adjedgelist_t *al) {
       Free(al->adjs[i]);
     }
   }
+  Free(al->adjs);
 }
 
 igraph_vector_t *igraph_i_lazy_adjedgelist_get_real(igraph_i_lazy_adjedgelist_t *al,

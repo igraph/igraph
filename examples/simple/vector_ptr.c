@@ -175,6 +175,7 @@ int main() {
   if (igraph_vector_ptr_e(&v1, 4) != &d5) {
     return 16;
   }
+  igraph_vector_ptr_destroy(&v1);
 
   /* igraph_vector_ptr_view */
   ptr=(void**) malloc(5 * sizeof(void*));
@@ -232,5 +233,7 @@ int main() {
       return 23;
   }
 
+  igraph_vector_ptr_destroy(&v2);
+   
   return 0;
 }

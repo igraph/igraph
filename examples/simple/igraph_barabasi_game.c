@@ -85,6 +85,7 @@ int main() {
   if (!igraph_is_directed(&g)) {
     return 8;
   }
+  igraph_vector_destroy(&v);
   igraph_destroy(&g);
 
   /* Error tests */
