@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+# Valgrind leak check for the given subdirectory.
+# The given subdirectory must be an igraph root subdir
+function usage {
+  echo Usage: $0 [directory]
+  echo directory must be the root of an igraph tree.
+  echo If omitted, assumes that the script itself is in the igraph tree
+}
+
+VALGRIND=`which valgrind`
+
+if [ x$VALGRIND == x ]; then
+  echo Error: Valgrind is not installed
+  exit 3
+fi
+
+if [ x$1 == -h -o x$1 == --help ]; then
+  usage
+  exit 1
+fi
+
+ORIGDIR=`pwd`
+DIR=$1
+if [ x$DIR == x ]; then
+  # No directory was given, start backtracking from the current
+  OK=0
+  PREVDIR="/"
+  DIR=`pwd`
+  while [ $OK -eq 0 -a ${PREVDIR} != ${DIR} ]; do
+    if [ -f include/igraph.h ]; then
+      OK=1
+    else
+      cd ..
+      DIR=`pwd`
+    fi
+  done
+  cd ${ORIGDIR}
+  if [ $OK -eq 0 ]; then
+    echo Error: no igraph tree was given and not in an igraph tree
+    usage
+    exit 4
+  fi
+fi
+
+if [ ! -d $DIR -o ! -f $DIR/include/igraph.h ]; then
+  echo $DIR is not an igraph root subdirectory
+  exit 2
+fi
+
+TESTBED="valgrind-testbed"
+FULLDIR=`cd $DIR && pwd && cd ..`
+
+if [ ! -f $DIR/configure ]; then
+  cd $DIR
+  ./bootstrap.sh
+  cd $ORIGDIR
+fi
+
+if [ ! -d $TESTBED ]; then
+  mkdir $TESTBED
+fi
+
+# run make distclean on the original tree if necessary
+if [ -f ${FULLDIR}/Makefile ]; then
+  cd ${FULLDIR} && make distclean && cd ${ORIGDIR}
+fi
+
+cd $TESTBED || exit 3
+${FULLDIR}/configure --enable-debug || ( cd $ORIGDIR; exit 4 )
+make || (cd $ORIGDIR; exit 5 )
+rm -f a.out
+
+mkdir -p examples/simple
+rm -rf examples/simple/*
+cp ${FULLDIR}/examples/simple/* examples/simple
+
+mkdir -p valgrind-logs
+rm -rf valgrind-logs/*
+
+cd examples/simple
+
+SKIPS="igraph_layout_merge.c"
+for i in *.c; do
+  current=$i
+  OK=1
+  for skip in $SKIPS; do
+    if [ $skip == $current ]; then OK=0; fi
+  done
+  echo -n "${current}... "
+  if [ $OK -eq 0 ]; then
+    echo "skipped."
+  else
+    gcc -g -o a.out $i -I${FULLDIR}/include -L../../src/.libs -ligraph
+    if [ -x a.out ]; then
+      echo -n "compiled... "
+      LOG=../../valgrind-logs/`basename ${current} .c`.log
+      LD_LIBRARY_PATH=../../src/.libs valgrind --tool=memcheck --error-exitcode=63 --leak-check=yes --log-file-exactly=${LOG} ./a.out >/dev/null
+      if [ $? -eq 63 ]; then
+        echo "executed, memory access problems found!"
+      elif [ `cat $LOG | grep -c 'no leaks are possible'` -ne 1 ]; then
+        if [ `cat $LOG | grep -c 'lost: 0 bytes'` -lt 2 ]; then
+	  echo "executed, leaks found!"
+        else
+	  echo "executed, OK"
+	  rm ${LOG}
+	fi
+      else
+        echo "executed, OK"
+	rm ${LOG}
+      fi
+    else
+      echo "compilation FAILED!"
+    fi
+    rm -f a.out
+  fi
+done
+cd ../..
+
+cd $ORIGDIR
