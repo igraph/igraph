@@ -757,26 +757,26 @@ PyObject *igraphmodule_Graph_girth(igraphmodule_GraphObject *self,
 {
   PyObject *sc = Py_False;
   static char *kwlist[] = {
-	"return_shortest_circle", NULL
+  "return_shortest_circle", NULL
   };
   igraph_integer_t girth;
   igraph_vector_t vids;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &sc))
-	return NULL;
+  return NULL;
 
   igraph_vector_init(&vids, 0);
   if (igraph_girth(&self->g, &girth, &vids)) {
-	igraphmodule_handle_igraph_error();
-	igraph_vector_destroy(&vids);
-	return NULL;
+  igraphmodule_handle_igraph_error();
+  igraph_vector_destroy(&vids);
+  return NULL;
   }
 
   if (PyObject_IsTrue(sc)) {
-	PyObject* o;
-	o=igraphmodule_vector_t_to_PyList(&vids, IGRAPHMODULE_TYPE_INT);
-	igraph_vector_destroy(&vids);
-	return o;
+  PyObject* o;
+  o=igraphmodule_vector_t_to_PyList(&vids, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&vids);
+  return o;
   }
   return PyInt_FromLong((long)girth);
 }
@@ -882,8 +882,8 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
   }
 
   if (m_obj == 0) {
-	igraph_vector_init(&outseq, 0);
-	m = 1;
+  igraph_vector_init(&outseq, 0);
+  m = 1;
   } else if (m_obj != 0) {
     /* let's check whether we have a constant out-degree or a list */
     if (PyInt_Check(m_obj)) {
@@ -931,6 +931,32 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
   igraph_vector_destroy(&outseq);
 
   return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a De Bruijn graph
+ * \sa igraph_kautz
+ */
+PyObject *igraphmodule_Graph_De_Bruijn(PyTypeObject *type, PyObject *args,
+  PyObject *kwds) {
+  long m, n;
+  igraphmodule_GraphObject *self;
+
+  static char *kwlist[] = {"m", "n", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &m, &n))
+    return NULL;
+
+  self = (igraphmodule_GraphObject*) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_de_bruijn(&self->g, m, n)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+
+  return (PyObject*)self;
 }
 
 /** \ingroup python_interface_graph
@@ -1244,6 +1270,32 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
   }
 
   return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a Kautz graph
+ * \sa igraph_kautz
+ */
+PyObject *igraphmodule_Graph_Kautz(PyTypeObject *type, PyObject *args,
+  PyObject *kwds) {
+  long m, n;
+  igraphmodule_GraphObject *self;
+
+  static char *kwlist[] = {"m", "n", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &m, &n))
+    return NULL;
+
+  self = (igraphmodule_GraphObject*) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_kautz(&self->g, m, n)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
+
+  return (PyObject*)self;
 }
 
 /** \ingroup python_interface_graph
@@ -2464,7 +2516,7 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
     item =
       igraphmodule_vector_t_to_PyList((igraph_vector_t *)
                                       igraph_vector_ptr_e(&res, i),
-									  IGRAPHMODULE_TYPE_INT);
+                    IGRAPHMODULE_TYPE_INT);
     if (!item) {
       Py_DECREF(list);
       for (k = 0; k < j; k++)
@@ -2486,6 +2538,30 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
     igraph_vector_destroy(igraph_vector_ptr_e(&res, i));
   igraph_vector_ptr_destroy_all(&res);
   return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the line graph of the graph
+ * \return the line graph as a new igraph object
+ * \sa igraph_linegraph
+ */
+PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
+  igraph_t lg;
+  igraphmodule_GraphObject *result;
+
+  if (igraph_linegraph(&self->g, &lg)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  result =
+    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
+  RC_ALLOC("Graph", result);
+  if (result != NULL)
+    result->g = lg;
+  igraphmodule_Graph_init_internal(result);
+
+  return (PyObject *) result;
 }
 
 /** \ingroup python_interface_graph
@@ -3115,9 +3191,9 @@ PyObject
   if (igraph_layout_fruchterman_reingold
       (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
     igraph_matrix_destroy(&m);
-	if (weights) {
-	  igraph_vector_destroy(weights); free(weights);
-	}
+  if (weights) {
+    igraph_vector_destroy(weights); free(weights);
+  }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -3172,7 +3248,7 @@ PyObject
   if (igraph_layout_fruchterman_reingold_3d
       (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
     igraph_matrix_destroy(&m);
-	if (weights) {
+  if (weights) {
       igraph_vector_destroy(weights); free(weights);
     }
     igraphmodule_handle_igraph_error();
@@ -3932,19 +4008,19 @@ PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
   }
 
   if (PyList_Check(ids)) {
-	idvecptr = &idvec;
+  idvecptr = &idvec;
     if (igraphmodule_PyObject_to_vector_t(ids, idvecptr, 0, 0)) return NULL;
   }
 
   if (creator != Py_None) {
-	o = PyObject_Str(creator);
+  o = PyObject_Str(creator);
     creator_str = PyString_AS_STRING(o);
   }
 
   if (igraph_write_graph_gml(&self->g, f, idvecptr, creator_str)) {
     if (idvecptr) igraph_vector_destroy(idvecptr);
-	if (o) Py_DECREF(o);
-	igraphmodule_handle_igraph_error();
+  if (o) Py_DECREF(o);
+  igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
   }
@@ -4137,9 +4213,9 @@ PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
     }
   } else {
     if (igraph_isomorphic_vf2(&self->g, &other->g, &result)) {
-	  igraphmodule_handle_igraph_error();
-	  return NULL;
-	}
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
   }
 
   if (result)
@@ -5113,8 +5189,8 @@ PyObject *igraphmodule_Graph_modularity(igraphmodule_GraphObject *self, PyObject
   igraph_real_t modularity;
   if (igraphmodule_PyObject_to_vector_t(o, &membership, 1, 0)) return NULL;
   if (igraph_modularity(&self->g, &membership, &modularity)) {
-	igraph_vector_destroy(&membership);
-	return NULL;
+  igraph_vector_destroy(&membership);
+  return NULL;
   }
   return Py_BuildValue("d", (double)modularity);
 }
@@ -5135,20 +5211,20 @@ PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject
   igraph_vector_t removed_edges;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist, &directed,
-	  &return_removed_edges, &return_merges, &return_bridges, &return_ebs))
-	  return NULL;
+    &return_removed_edges, &return_merges, &return_bridges, &return_ebs))
+    return NULL;
 
   if (igraph_matrix_init(&merges, 0, 0))
-	  return igraphmodule_handle_igraph_error();
+    return igraphmodule_handle_igraph_error();
   if (igraph_vector_init(&removed_edges, 0)) {
-	  igraph_matrix_destroy(&merges);
-	  return igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&merges);
+    return igraphmodule_handle_igraph_error();
   }
   if (igraph_community_edge_betweenness(&self->g, &removed_edges, 0, &merges, 0, PyObject_IsTrue(directed))) {
-	igraphmodule_handle_igraph_error();
-	igraph_vector_destroy(&removed_edges);
-	igraph_matrix_destroy(&merges);
-	return NULL;
+  igraphmodule_handle_igraph_error();
+  igraph_vector_destroy(&removed_edges);
+  igraph_matrix_destroy(&merges);
+  return NULL;
   }
 
   res = igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
@@ -5170,38 +5246,38 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_Gr
   igraph_matrix_t m;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
-	  &n, &return_merges)) {
+    &n, &return_merges)) {
     return NULL;
   }
 
   if (igraph_vector_init(&members, 0)) return igraphmodule_handle_igraph_error();
   if (PyObject_IsTrue(return_merges)) {
     mptr = &m;
-	if (igraph_matrix_init(mptr, 0, 0)) return igraphmodule_handle_igraph_error();
+  if (igraph_matrix_init(mptr, 0, 0)) return igraphmodule_handle_igraph_error();
   }
 
   if (n<0) n = igraph_vcount(&self->g); else n -= 1;
 
   if (igraph_community_leading_eigenvector_naive(&self->g, mptr, &members, n)){
     if (mptr) igraph_matrix_destroy(mptr);
-	igraph_vector_destroy(&members);
+  igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
   }
 
   cl = igraphmodule_vector_t_to_PyList(&members, IGRAPHMODULE_TYPE_INT);
   igraph_vector_destroy(&members);
   if (cl == 0) {
-	if (mptr) igraph_matrix_destroy(mptr);
-	return 0;
+  if (mptr) igraph_matrix_destroy(mptr);
+  return 0;
   }
 
   if (mptr) {
-	merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
-	igraph_matrix_destroy(mptr);
-	if (merges == 0) return 0;
+  merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
+  igraph_matrix_destroy(mptr);
+  if (merges == 0) return 0;
   } else {
-	merges=Py_None;
-	Py_INCREF(merges);
+  merges=Py_None;
+  Py_INCREF(merges);
   }
 
   res=Py_BuildValue("OO", cl, merges);
@@ -5225,38 +5301,38 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
   igraph_matrix_t m;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
-	  &n, &return_merges)) {
+    &n, &return_merges)) {
     return NULL;
   }
 
   if (igraph_vector_init(&members, 0)) return igraphmodule_handle_igraph_error();
   if (PyObject_IsTrue(return_merges)) {
     mptr = &m;
-	if (igraph_matrix_init(mptr, 0, 0)) return igraphmodule_handle_igraph_error();
+  if (igraph_matrix_init(mptr, 0, 0)) return igraphmodule_handle_igraph_error();
   }
 
   if (n<0) n = igraph_vcount(&self->g); else n -= 1;
 
   if (igraph_community_leading_eigenvector(&self->g, mptr, &members, n)){
     if (mptr) igraph_matrix_destroy(mptr);
-	igraph_vector_destroy(&members);
+  igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
   }
 
   cl = igraphmodule_vector_t_to_PyList(&members, IGRAPHMODULE_TYPE_INT);
   igraph_vector_destroy(&members);
   if (cl == 0) {
-	if (mptr) igraph_matrix_destroy(mptr);
-	return 0;
+  if (mptr) igraph_matrix_destroy(mptr);
+  return 0;
   }
 
   if (mptr) {
-	merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
-	igraph_matrix_destroy(mptr);
-	if (merges == 0) return 0;
+  merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
+  igraph_matrix_destroy(mptr);
+  if (merges == 0) return 0;
   } else {
-	merges=Py_None;
-	Py_INCREF(merges);
+  merges=Py_None;
+  Py_INCREF(merges);
   }
 
   res=Py_BuildValue("OO", cl, merges);
@@ -5270,7 +5346,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
  * Clauset et al's greedy modularity optimization algorithm
  */
 PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * self,
-	PyObject * args, PyObject * kwds)
+  PyObject * args, PyObject * kwds)
 {
   static char *kwlist[] = { "return_q", NULL };
   PyObject *return_modularities = Py_False;
@@ -5286,31 +5362,31 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
   if (PyObject_IsTrue(return_modularities)) {
     igraph_vector_init(&q, 0);
     if (igraph_community_fastgreedy(&self->g, &merges, &q)) {
-	  igraph_vector_destroy(&q);
+    igraph_vector_destroy(&q);
       igraph_matrix_destroy(&merges);
-	  return igraphmodule_handle_igraph_error();
-	}
-	qs=igraphmodule_vector_t_to_PyList(&q, IGRAPHMODULE_TYPE_FLOAT);
-	igraph_vector_destroy(&q);
-	if (!qs) {
-	  igraph_matrix_destroy(&merges);
-	  return NULL;
-	}
+    return igraphmodule_handle_igraph_error();
+  }
+  qs=igraphmodule_vector_t_to_PyList(&q, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&q);
+  if (!qs) {
+    igraph_matrix_destroy(&merges);
+    return NULL;
+  }
   } else {
-	if (igraph_community_fastgreedy(&self->g, &merges, 0)) {
-	  igraph_matrix_destroy(&merges);
-	  return igraphmodule_handle_igraph_error();
-	}
-	qs=Py_None;
-	Py_INCREF(qs);
+  if (igraph_community_fastgreedy(&self->g, &merges, 0)) {
+    igraph_matrix_destroy(&merges);
+    return igraphmodule_handle_igraph_error();
+  }
+  qs=Py_None;
+  Py_INCREF(qs);
   }
 
   ms=igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
   igraph_matrix_destroy(&merges);
 
   if (ms == NULL) {
-	Py_DECREF(qs);
-	return NULL;
+  Py_DECREF(qs);
+  return NULL;
   }
 
   res=Py_BuildValue("OO", ms, qs);
@@ -5608,6 +5684,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: Barabasi, A-L and Albert, R. 1999. Emergence of scaling\n"
    "  in random networks. Science, 286 509-512."},
 
+  /* interface to igraph_de_bruijn */
+  {"De_Bruijn", (PyCFunction) igraphmodule_Graph_De_Bruijn,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "De_Bruijn(m, n)\n\n"
+   "Generates a de Bruijn graph with parameters (m, n)\n\n"
+   "A de Bruijn graph represents relationships between strings. An alphabet\n"
+   "of M{m} letters are used and strings of length M{n} are considered.\n"
+   "A vertex corresponds to every possible string and there is a directed edge\n"
+   "from vertex M{v} to vertex M{w} if the string of M{v} can be transformed into\n"
+   "the string of M{w} by removing its first letter and appending a letter to it.\n"
+   "\n"
+   "Please note that the graph will have M{m^n} vertices and even more edges,\n" 
+   "so probably you don't want to supply too big numbers for M{m} and M{n}.\n\n"
+   "@param m: the size of the alphabet\n"
+   "@param n: the length of the strings\n"
+  },
+
   // interface to igraph_establishment_game
   {"Establishment", (PyCFunction) igraphmodule_Graph_Establishment,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -5666,6 +5759,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param directed: whether the graph should be directed.\n"
    "@param citation: whether the new edges should originate from the most\n"
    "   recently added vertex.\n"},
+
+  /* interface to igraph_kautz */
+  {"Kautz", (PyCFunction) igraphmodule_Graph_Kautz,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Kautz(m, n)\n\n"
+   "Generates a Kautz graph with parameters (m, n)\n\n"
+   "A Kautz graph is a labeled graph, vertices are labeled by strings\n"
+   "of length M{n+1} above an alphabet with M{m+1} letters, with\n"
+   "the restriction that every two consecutive letters in the string\n"
+   "must be different. There is a directed edge from a vertex M{v} to\n"
+   "another vertex M{w} if it is possible to transform the string of\n"
+   "M{v} into the string of M{w} by removing the first letter and\n"
+   "appending a letter to it.\n\n"
+   "@param m: the size of the alphabet minus one\n"
+   "@param n: the length of the strings minus one\n"
+   },
 
   /* interface to igraph_preference_game */
   {"Preference", (PyCFunction) igraphmodule_Graph_Preference,
@@ -5991,9 +6100,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"is_connected", (PyCFunction) igraphmodule_Graph_is_connected,
    METH_VARARGS | METH_KEYWORDS,
    "is_connected(mode=STRONG)\n\n"
-   "Decides whether a graph is connected.\n\n"
+   "Decides whether the graph is connected.\n\n"
    "@param mode: whether we should calculate strong or weak connectivity.\n"
    "@return: C{True} if the graph is connected, C{False} otherwise.\n"},
+
+  /* interface to igraph_linegraph */
+  {"linegraph", (PyCFunction) igraphmodule_Graph_linegraph,
+   METH_VARARGS | METH_KEYWORDS,
+   "linegraph()\n\n"
+   "Returns the line graph of the graph.\n\n"
+   "The line graph M{L(G)} of an undirected graph is defined as follows:\n"
+   "M{L(G)} has one vertex for each edge in G and two vertices in M{L(G)}\n"
+   "are connected iff their corresponding edges in the original graph\n"
+   "share an end point.\n\n"
+   "The line graph of a directed graph is slightly different: two vertices\n"
+   "are connected by a directed edge iff the target of the first vertex's\n"
+   "corresponding edge is the same as the source of the second vertex's\n"
+   "corresponding edge.\n"
+  },
 
   /* interface to igraph_maxdegree */
   {"maxdegree", (PyCFunction) igraphmodule_Graph_maxdegree,
@@ -6847,8 +6971,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: a tuple where the first element is the membership vector of the\n"
    "  clustering and the second element is the merge matrix.\n\n"
    "@newfield ref: Reference\n"
-	"@ref: MEJ Newman: Finding community structure in networks using the\n"
-	"  eigenvectors of matrices, arXiv:physics/0605087\n"
+  "@ref: MEJ Newman: Finding community structure in networks using the\n"
+  "  eigenvectors of matrices, arXiv:physics/0605087\n"
   },
   {"community_edge_betweenness",
   (PyCFunction)igraphmodule_Graph_community_edge_betweenness,

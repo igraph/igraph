@@ -31,7 +31,6 @@ class SimplePropertiesTests(unittest.TestCase):
         self.failUnless(self.tree.transitivity_undirected() == 0.0)
         self.failUnless(self.g.transitivity_undirected() == 0.75)
 
-
 class DegreeTests(unittest.TestCase):
     gfull  = Graph.Full(10)
     gempty = Graph(10)
@@ -93,6 +92,17 @@ class MiscTests(unittest.TestCase):
         self.failUnless(g.topological_sorting(IN) == [3, 4, 2, 1, 0])
         g.to_undirected()
         self.assertRaises(InternalError, g.topological_sorting)
+
+    def testLineGraph(self):
+        g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
+        el = g.linegraph().get_edgelist()
+        el.sort()
+        self.failUnless(el == [(0, 1), (0, 2), (0, 3), (0, 4), (1, 2), (1, 3), (2, 4), (3, 4)])
+
+        g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)], directed=True)
+        el = g.linegraph().get_edgelist()
+        el.sort()
+        self.failUnless(el == [(0, 2), (0, 4)])
 
 
 def suite():

@@ -1,12 +1,13 @@
 import unittest
 from igraph.test import basic, layouts, games, foreign, structural, flow, \
-    spectral, attributes, cliques, decomposition, operators
+    spectral, attributes, cliques, decomposition, operators, generators
 from igraph import *
 
 def suite():
     return unittest.TestSuite( \
         [basic.suite(),
          layouts.suite(),
+         generators.suite(),
          games.suite(),
          foreign.suite(),
          structural.suite(),
