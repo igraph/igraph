@@ -63,11 +63,15 @@ binary-arch: build install
 	    usr/include/igraph/igraph.h \
 	    usr/include/igraph/types.h  \
 	    usr/include/igraph/attributes.h  \
+	    usr/include/igraph/dqueue.h  \
 	    usr/include/igraph/error.h  \
+	    usr/include/igraph/heap.h  \
 	    usr/include/igraph/interrupt.h  \
-		usr/include/igraph/igraph_pmt.h \
-		usr/include/igraph/igraph_pmt_off.h \
-		usr/include/igraph/vector.h \
+	    usr/include/igraph/igraph_pmt.h \
+	    usr/include/igraph/igraph_pmt_off.h \
+	    usr/include/igraph/matrix.h  \
+	    usr/include/igraph/stack.h  \
+	    usr/include/igraph/vector.h \
 	    usr/lib/libigraph.so        \
 	    usr/lib/libigraph.a         \
 	    usr/lib/libigraph.la        \
