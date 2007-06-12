@@ -434,7 +434,7 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
   assert(v->stor_begin != NULL);
   if (pos+1<igraph_vector_ptr_size(v)) { /* TOOD: why is this needed */
     memmove(v->stor_begin+pos, v->stor_begin+pos+1,
-	    sizeof(void*)*(igraph_vector_ptr_size(v)-pos));
+	    sizeof(void*)*(igraph_vector_ptr_size(v)-pos-1));
   }
   v->end--;
 }
