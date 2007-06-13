@@ -798,6 +798,15 @@ class Graph(core.GraphBase):
             return self, other
 
 
+    def __reduce__(self):
+        """Support for pickling."""
+        import warnings
+        warnings.warn("pickled graphs do not contain their attributes yet!")
+        constructor = self.__class__
+        parameters = (self.vcount(), self.get_edgelist(), self.is_directed())
+        return (constructor, parameters, {})
+
+
     def summary(self, verbosity=0):
         """Returns basic statistics about the graph in a string
         
