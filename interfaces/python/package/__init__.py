@@ -584,6 +584,56 @@ class Graph(core.GraphBase):
         f.close()
 
 
+    def _identify_format(klass, filename):
+        """_identify_format(filename)
+
+        Tries to identify the format of the graph stored in the file with the
+        given filename. It identifies most file formats based on the extension
+        of the file (and not on syntactic evaluation). The only exception is
+        the adjacency matrix format and the edge list format: the first few
+        lines of the file are evaluated to decide between the two.
+
+        @note: Internal function, should not be called directly.
+
+        @param filename: the name of the file
+        @return: the format of the file as a string.
+        """
+        import os.path
+        root, ext = os.path.splitext(filename)
+        ext = ext.lower()
+        
+        if ext in [".graphml", ".graphmlz", ".lgl", ".ncol", ".pajek",
+            ".gml", ".dimacs", ".edgelist", ".edges", ".edge", ".net"]:
+            return ext[1:]
+
+        if ext == ".txt" or ext == ".dat":
+            # Most probably an adjacency matrix or an edge list
+            f = open(filename, "r")
+            line = f.readline()
+            if line is None: return "edges"
+            parts = line.strip().split()
+            if len(parts) == 2:
+                line = f.readline()
+                if line is None: return "edges"
+                parts = line.strip().split()
+                if len(parts) == 2:
+                    line = f.readline()
+                    if line is None:
+                        # This is a 2x2 matrix, it can be a matrix or an edge list
+                        return None
+                    else:
+                        parts = line.strip().split()
+                        if len(parts) == 0:
+                            return None
+                    return "edges"
+                else:
+                    # Not a matrix
+                    return None
+            else:
+                return "adjacency"
+
+
+    _identify_format = classmethod(_identify_format)
     def Read(klass, f, format=None, *args, **kwds):
         """Unified reading function for graphs.
 
@@ -599,7 +649,8 @@ class Graph(core.GraphBase):
           (NCOL format), C{"lgl"} (LGL format), C{"graphml"}, C{"graphmlz"}
           (GraphML and gzipped GraphML format), C{"gml"} (GML format),
           C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
-          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list).
+          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list),
+          C{"adjacency"} (adjacency matrix).
         @raises IOError: if the file format can't be identified and
           none was given.
         """
@@ -792,10 +843,22 @@ class Graph(core.GraphBase):
           "net":        ("Read_Pajek", None),
           "pajek":      ("Read_Pajek", None),
           "dimacs":     ("Read_DIMACS", "write_dimacs"),
-          #"adjacency":  ("Read_Adjacency", "write_adjacency"),
-          #"adj":        ("Read_Adjacency", "write_adjacency),
+          "adjacency":  ("Read_Adjacency", "write_adjacency"),
+          "adj":        ("Read_Adjacency", "write_adjacency"),
           "edgelist":   ("Read_Edgelist", "write_edgelist"),
           "edge":       ("Read_Edgelist", "write_edgelist"),
           "edges":      ("Read_Edgelist", "write_edgelist")
     }
+
+def read(filename, *args, **kwds):
+    """Loads a graph from the given filename.
+
+    This is just a convenience function, calls L{Graph.Read} directly.
+    All arguments are passed unchanged to L{Graph.Read}
+    
+    @param filename: the name of the file to be loaded
+    """
+    return Graph.Read(filename, *args, **kwds)
+
+load=read
 
