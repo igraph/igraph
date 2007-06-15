@@ -55,6 +55,8 @@
 <!-- doxrox-include igraph_es_vector -->
 <!-- doxrox-include igraph_es_fromto -->
 <!-- doxrox-include igraph_es_seq -->
+<!-- doxrox-include igraph_es_pairs -->
+<!-- doxrox-include igraph_es_pairs_small -->
 </section>
 
 <section><title>Immediate edge selectors</title>

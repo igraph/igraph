@@ -948,6 +948,26 @@ igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to) {
   return es;
 }
 
+/**
+ * \function igraph_es_pairs
+ * \brief Edge selector, multiple edges defined by their endpoints in a vector
+ * 
+ * The edges between the given pairs of vertices will be included in the
+ * edge selection. The vertex pairs must be defined in the vector <code>v</code>,
+ * the first element of the vector is the first vertex of the first edge
+ * to be selected, the second element is the second vertex of the first
+ * edge, the third element is the first vertex of the second edge and
+ * so on.
+ * 
+ * \param es Pointer to an uninitialized edge selector object.
+ * \param v The vector containing the endpoints of the edges.
+ * \param directed Whether the graph is directed or not.
+ * \return Error code.
+ * \sa \ref igraph_es_pairs_small()
+ * 
+ * Time complexity: O(n), the number of edges being selected.
+ */
+
 int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v, 
 		    igraph_bool_t directed) {
   es->type=IGRAPH_ES_PAIRS;
@@ -963,6 +983,25 @@ int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_es_pairs_small
+ * \brief Edge selector, multiple edges defined by their endpoints as arguments
+ * 
+ * The edges between the given pairs of vertices will be included in the
+ * edge selection. The vertex pairs must be given as the arguments of the
+ * function call, the third argument is the first vertex of the first edge,
+ * the fourth argument is the second vertex of the first edge, the fifth
+ * is the first vertex of the second edge and so on. The last element of the
+ * argument list must be -1 to denote the end of the argument list.
+ * 
+ * \param es Pointer to an uninitialized edge selector object.
+ * \param directed Whether the graph is directed or not.
+ * \return Error code.
+ * \sa \ref igraph_es_pairs()
+ * 
+ * Time complexity: O(n), the number of edges being selected.
+ */
 
 int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...) {
   va_list ap;
