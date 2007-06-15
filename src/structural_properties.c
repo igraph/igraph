@@ -1797,7 +1797,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
  * This function generates a new graph based on the original one by randomly
  * rewiring edges while preserving the original graph's degree distribution.
  * Please note that the rewiring is done "in place", so no new graph will
- * be generated. If you would like to keep the original graph intact, use
+ * be allocated. If you would like to keep the original graph intact, use
  * \ref igraph_copy() before.
  * 
  * \param graph The graph object to be rewired.
@@ -1826,10 +1826,13 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
   long int i, a, b, c, d;
   igraph_i_adjlist_t allneis;
   igraph_vector_t *neis[2], edgevec;
+  igraph_bool_t directed;
   igraph_es_t es;
   
   if (mode == IGRAPH_REWIRING_SIMPLE && no_of_nodes<4)
     IGRAPH_ERROR("graph unsuitable for rewiring", IGRAPH_EINVAL);
+  
+  directed = igraph_is_directed(graph);
   
   RNG_BEGIN();
   
@@ -1869,20 +1872,15 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
       if (!igraph_vector_search(neis[0], 0, d, NULL) &&
 	  !igraph_vector_search(neis[1], 0, b, NULL) &&
 	  b!=c && a!=d && a!=b && c!=d) {
-	/* TODO: maybe it would be more efficient to implement an
-	 * igraph_replace_edges function?
-	 */
-	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=b;
-	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=d;
-	/*printf("Deleting: %d -> %d, %d -> %d\n", a, b, c, d);*/
-	IGRAPH_CHECK(igraph_es_pairs(&es, &edgevec, IGRAPH_DIRECTED));
+	/* printf("Deleting: %d -> %d, %d -> %d\n", a, b, c, d); */
+	IGRAPH_CHECK(igraph_es_pairs_small(&es, directed, a, b, c, d, -1));
 	IGRAPH_FINALLY(igraph_es_destroy, &es);
 	IGRAPH_CHECK(igraph_delete_edges(graph, es));	
 	igraph_es_destroy(&es);
 	IGRAPH_FINALLY_CLEAN(1);
 	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=d;
 	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=b;
-	/*printf("Adding: %d -> %d, %d -> %d\n", a, d, c, b);*/
+	/* printf("Adding: %d -> %d, %d -> %d\n", a, d, c, b); */
 	igraph_add_edges(graph, &edgevec, 0);
 	/* We have to adjust the adjacency list view as well.
 	   It's a luck that we have the pointers in neis[0] and neis[1] */
@@ -1890,6 +1888,16 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
 	  if (VECTOR(*neis[0])[i]==b) { VECTOR(*neis[0])[i]=d; break; }
 	for (i=igraph_vector_size(neis[1])-1; i>=0; i--)
 	  if (VECTOR(*neis[1])[i]==d) { VECTOR(*neis[1])[i]=b; break; }
+	/* In case of an undirected graph, we have to adjust the
+	 * adjacency view of vertices b and d as well */
+	if (!directed) {
+	  neis[0] = igraph_i_adjlist_get(&allneis, b);
+	  neis[1] = igraph_i_adjlist_get(&allneis, d);
+	  for (i=igraph_vector_size(neis[0])-1; i>=0; i--)
+	    if (VECTOR(*neis[0])[i]==a) { VECTOR(*neis[0])[i]=c; break; }
+	  for (i=igraph_vector_size(neis[1])-1; i>=0; i--)
+	    if (VECTOR(*neis[1])[i]==c) { VECTOR(*neis[1])[i]=a; break; }
+	}
       }
       break;
     default:
