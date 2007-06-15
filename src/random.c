@@ -44,7 +44,7 @@ static double expm1 (double x)
 }
 #endif
 
-#ifdef __MSVC__
+#ifdef _MSC_VER
 /* expm1 replacement for Microsoft Visual C */
 static double expm1 (double x)
 {

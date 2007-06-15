@@ -44,6 +44,7 @@
 
 */
 
+#include <stdlib.h>
 #include "foreign-lgl-parser.h"
 extern long int igraph_lgl_mylineno;
 int igraph_i_lgl_eof;

@@ -150,7 +150,7 @@ PyObject* igraphmodule_EdgeSeq_attributes(igraphmodule_EdgeSeqObject* self) {
  * \brief Returns the count of attribute names
  */
 PyObject* igraphmodule_EdgeSeq_attribute_count(igraphmodule_EdgeSeqObject* self) {
-  PyObject *list, *result;
+  PyObject *list;
   long int size;
   igraphmodule_GraphObject *o;
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);

@@ -150,7 +150,7 @@ PyObject* igraphmodule_VertexSeq_attributes(igraphmodule_VertexSeqObject* self) 
  * \brief Returns the count of attribute names
  */
 PyObject* igraphmodule_VertexSeq_attribute_count(igraphmodule_VertexSeqObject* self) {
-  PyObject *list, *result;
+  PyObject *list;
     long int size;
     igraphmodule_GraphObject *o;
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);

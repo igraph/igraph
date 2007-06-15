@@ -677,7 +677,10 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 #ifdef _MSC_VER
 #  pragma warning (disable:4244)
 
-#  define vsnprintf(a, b, c, d) _vsnprintf((a), (b), (c), (d))
+#  ifndef vsprintf
+#    define vsnprintf(a, b, c, d) _vsnprintf((a), (b), (c), (d))
+#  endif
+
 #  define isnan(x) _isnan(x)
 #  define inline __inline
 #  define strcasecmp strcmpi
@@ -706,6 +709,9 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 
 #ifndef M_PI
 #  define M_PI 3.14159265358979323846
+#endif
+#if !defined(M_LN2)
+#  define M_LN2 0.69314718055994530942
 #endif
 
 __END_DECLS

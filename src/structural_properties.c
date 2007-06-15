@@ -2896,7 +2896,7 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     /* NaN for isolates */
     if (igraph_vector_size(&ineis_in) == 0 &&
 	igraph_vector_size(&ineis_out) == 0) {
-      VECTOR(*res)[a] = 0.0 / 0.0;
+      VECTOR(*res)[a] = IGRAPH_NAN;
     }
 
     /* zero their contribution */

@@ -44,6 +44,7 @@
 
 */
 
+#include <stdlib.h>
 #include "foreign-pajek-parser.h"
 extern long int igraph_pajek_mylineno;
 extern int igraph_pajek_mode;
