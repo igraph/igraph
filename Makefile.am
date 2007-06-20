@@ -18,11 +18,14 @@ install-exec-hook:
 		then cp $(top_builddir)/src/.libs/cygigraph-0.dll \
 		$(DESTDIR)$(libdir) ; fi
 
+dist-hook:
+	rm -rf `find $(distdir)/examples -type d -name .arch-ids`
+
 MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make doc will always call doxygen rule
 ## and deb will generate Debian packages
-.PHONY: dox deb debcvs
+.PHONY: dox deb debcvs framework
 
 dox:
 	doxygen Doxyfile
@@ -31,7 +34,7 @@ deb: clean
 	debian/prepare
 	dpkg-buildpackage -rfakeroot
 
-framework:
+framework: all
 	rm -rf $(top_builddir)/igraph.framework
 	mkdir -p $(top_builddir)/igraph.framework/Versions/$(VERSION)/Headers
 	mkdir -p $(top_builddir)/igraph.framework/Versions/$(VERSION)/Resources
