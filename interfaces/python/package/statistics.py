@@ -23,38 +23,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 02110-1301 USA
 """
-
-class Interval(object):
-    """A class representing an interval over the real numbers"""
-
-    def __init__(self, left, right):
-        """Constructor.
-
-        @param left: the left edge of the interval
-        @param right: the right edge of the interval"""
-        if left == right:
-            raise ArgumentError, "Interval can't have zero length"""
-        self._left = min(left, right)
-        self._right = max(left, right)
-
-    def __contains__(self, x):
-        """Returns C{True} if x is in the interval, C{False} otherwise"""
-        return (x >= self._left and x < self._right)
-
-    def __eq__(self, x):
-        """Tests for the equality of two intervals"""
-        return (isinstance(x, Interval) and \
-                x.left == self._left and x.right == self._right)
- 
-    def __cmp__(self, x): return cmp(self._left, x.left)
-    def __getattr__(self, attr):
-        if attr == "left": return self._left
-        if attr == "right": return self._right
-        return object.__getattr__(self, attr)
-
-    def __hash__(self): return hash(self._left) | hash(self._right)
-
-    def __str__(self): return "[%f, %f)" % (self._left, self._right)
+import math
 
 class Histogram(object):
     """Generic histogram class for real numbers
@@ -80,27 +49,35 @@ class Histogram(object):
         self.add_many(data)
 
     def _get_bin(self, num, create = False):
-        """Returns the bin corresponding to the given number.
+        """Returns the bin index corresponding to the given number.
 
         @param num: the number for which the bin is being sought
         @param create: whether to create a new bin if no bin exists yet.
-        @return: the range of the bin or C{None} if no bin exists yet and
+        @return: the index of the bin or C{None} if no bin exists yet and
           {create} is C{False}."""
-        for bin in self._bins.keys():
-            if num in bin: return bin
+        if len(self._bins) == 0:
+            if not create: return None
+            self._min = int(num/self._bin_width)*self._bin_width
+            self._max = self._min+self._bin_width
+            self._bins = [0]
+            return 0
 
-        if create:
-            left = (num // self._bin_width) * self._bin_width
-            right = left + self._bin_width
-            bin = Interval(left, right)
-            self._bins[bin] = 0
+        if num >= self._min:
+            binidx = int((num-self._min)/self._bin_width)
+            if binidx < len(self._bins): return binidx
+            if not create: return None
+            extra_bins = binidx-len(self._bins)+1
+            self._bins.extend([0]*extra_bins)
+            self._max = self._min + len(self._bins)*self._bin_width
+            return binidx
 
-            if self._min is None or left < self._min: self._min = left
-            if self._max is None or right > self._max: self._max = right
+        if not create: return None
 
-            return bin
-
-        return None
+        extra_bins = int(math.ceil((self._min-num)/self._bin_width))
+        self._bins[0:0] = [0]*extra_bins
+        self._min -= extra_bins*self._bin_width
+        self._max = self._min + len(self._bins)*self._bin_width
+        return 0
 
     def _get_n(self): return self._n
     def _get_mean(self): return self._mean
@@ -115,6 +92,7 @@ class Histogram(object):
         """Adds a single number to the histogram.
         
         @param num: the number to be added"""
+        num = float(num)
         bin = self._get_bin(num, True)
         self._bins[bin] += 1
         self._n += 1
@@ -137,13 +115,10 @@ class Histogram(object):
 
     def clear(self):
         """Clears the collected data"""
-        self._bins = {}
-        self._min = None
-        self._max = None
+        self._bins = []
+        self._min, self._max = None, None
         self._n = 0
-        self._mean = 0.0
-        self._s = 0.0
-        self._sd = 0.0
+        self._mean, self._s, self._sd = 0.0, 0.0, 0.0
 
     def bins(self):
         """Generator returning the bins of the histogram in increasing order
@@ -151,12 +126,8 @@ class Histogram(object):
         @return: a tuple with the following elements: left bound, right bound,
           number of elements in the bin"""
         x = self._min
-        while x < self._max:
-            bin = self._get_bin(x)
-            if bin is None:
-                yield (x, x+self._bin_width, 0)
-            else:
-                yield (x, x+self._bin_width, self._bins[bin])
+        for elem in self._bins:
+            yield (x, x+self._bin_width, elem)
             x += self._bin_width
 
     def __str__(self):
@@ -165,9 +136,7 @@ class Histogram(object):
         num_length = max(len("%.3f" % self._min), \
                          len("%.3f" % self._max))
         format_string = "[%%%d.3f, %%%d.3f): %%s" % (num_length, num_length)
-        #bins = self._bins.keys()
-        #bins.sort()
-        maxval = max(self._bins.itervalues())
+        maxval = max(self._bins)
         scale = maxval // (70-2*num_length)
         if scale<1: scale = 1
 
