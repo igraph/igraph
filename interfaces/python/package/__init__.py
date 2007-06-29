@@ -415,7 +415,8 @@ class Graph(core.GraphBase):
 
     def write_svg(self, fname, layout, width = None, height = None, \
                   labels = "label", colors = "color", shapes = "shape", \
-                  vertex_size = 10, font_size = 16, *args, **kwds):
+                  vertex_size = 10, edge_colors = "color", \
+		  font_size = 16, *args, **kwds):
         """Saves the graph as an SVG (Scalable Vector Graphics) file
         
         @param fname: the name of the file
@@ -438,6 +439,10 @@ class Graph(core.GraphBase):
           the shapes as integers. Shape 0 means hidden (nothing is drawn),
           shape 1 is a circle, shape 2 is a rectangle.
         @param vertex_size: vertex size in pixels
+	@param edge_colors: the edge colors. Either it is the name
+	  of an edge attribute to use, or a list explicitly specifying
+	  the colors. A color can be anything acceptable in an SVG
+	  file.
         @param font_size: font size. If it is a string, it is written into
           the SVG file as-is (so you can specify anything which is valid
           as the value of the C{font-size} style). If it is a number, it
@@ -479,6 +484,12 @@ class Graph(core.GraphBase):
             except KeyError:
                 shapes = [1]*self.vcount()
         
+	if isinstance(edge_colors, str):
+	    try:
+		edge_colors = self.es.get_attribute_values(edge_colors)
+	    except KeyError:
+		colors = ["black" for x in xrange(self.ecount())]
+		
         if not isinstance(font_size, str):
             font_size = "%spx" % str(font_size)
         else:
@@ -506,30 +517,26 @@ class Graph(core.GraphBase):
         layout=[[(row[0]-halfsizes[0])*ratios[0], \
                  (row[1]-halfsizes[1])*ratios[1]] \
                 for row in layout]
+		
+	directed=self.is_directed()
 
         print >>f, "<?xml version=\"1.0\" standalone=\"no\"?>"
         print >>f, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
         print >>f, "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
         
-        print >>f, "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">" % (width, height)
+        print >>f, "<svg width=\"%d\" height=\"%d\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">" % (width, height)
         print >>f, "<!-- Created by igraph -->"
         print >>f
         print >>f, "<defs>"
-        print >>f, "  <marker id=\"Triangle\" viewBox=\"0 0 10 10\""
-        print >>f, "    refX=\"10\" refY=\"5\" orient=\"auto\""
-        print >>f, "    markerUnits=\"strokeWidth\""
-        print >>f, "    markerWidth=\"16\" markerHeight=\"8\">"
-        print >>f, "    <path d=\"M 0 0 L 10 5 L 0 10 z\"/>"
-        print >>f, "  </marker>"
+        print >>f, "  <symbol id=\"Triangle\" overflow=\"visible\">"
+        print >>f, "    <path d=\"M 0 0 L 10 -5 L 10 5 z\"/>"
+        print >>f, "  </symbol>"
         print >>f, "  <style type=\"text/css\">"
         print >>f, "    <![CDATA["
         print >>f, "#vertices circle { stroke: black; stroke-width: 1 }"
         print >>f, "#vertices rect { stroke: black; stroke-width: 1 }"
         print >>f, "#vertices text { text-anchor: middle; font-size: %s; font-family: sans-serif; font-weight: normal }" % font_size
-        if self.is_directed():
-            print >>f, "#edges line { stroke: black; stroke-width: 1; marker-end: url(#Triangle) }"
-        else:
-            print >>f, "#edges line { stroke: black; stroke-width: 1 }"
+	print >>f, "#edges line { stroke-width: 1 }"
         print >>f, "    ]]>"
         print >>f, "  </style>"
         print >>f, "</defs>"
@@ -539,7 +546,7 @@ class Graph(core.GraphBase):
         print >>f, "  <!-- Edges -->"
 
         has_edge_opacities = "opacity" in self.edge_attributes()
-        for edge in self.es:
+        for eidx, edge in enumerate(self.es):
             vidxs = edge.tuple
             x1 = layout[vidxs[0]][0]
             y1 = layout[vidxs[0]][1]
@@ -548,10 +555,14 @@ class Graph(core.GraphBase):
             angle = math.atan2(y2-y1, x2-x1)
             x2 = x2 - vertex_size*math.cos(angle)
             y2 = y2 - vertex_size*math.sin(angle)
-            if has_edge_opacities:
-                print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\" style=\"stroke-opacity:%.2f\"/>" % (x1, y1, x2, y2, float(edge["opacity"]))
-            else:
-                print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\"/>" % (x1, y1, x2, y2)
+	    if directed:
+		# Dirty hack because the SVG specification: markers do not inherit stroke colors
+		print >>f, "    <g transform=\"translate(%.4f,%.4f)\" fill=\"%s\" stroke=\"%s\">\n" % (x2, y2, edge_colors[eidx], edge_colors[eidx]) 
+		print >>f, "      <line x1=\"%.4f\" y1=\"%.4f\" x2=\"0\" y2=\"0\"/>" % (x1-x2, y1-y2)
+		print >>f, "      <use x=\"0\" y=\"0\" xlink:href=\"#Triangle\" transform=\"rotate(%.4f)\"/>" % (180+angle*180/math.pi,)
+		print >>f, "    </g>\n"
+	    else:
+		print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\" style=\"stroke: %s\"/>" % (x1, y1, x2, y2, edge_colors[eidx])
 
         print >>f, "  </g>"
         print >>f
