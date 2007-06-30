@@ -56,13 +56,63 @@ class Graph(core.GraphBase):
     This class is built on top of L{GraphBase}, so the order of the
     methods in the Epydoc documentation is a little bit obscure:
     inherited methods come after the ones implemented directly in the
-    subclass.
+    subclass. L{Graph} provides many functions that L{GraphBase} does not,
+    mostly because these functions are not speed critical and they were
+    easier to implement in Python than in pure C. An example is the
+    attribute handling in the constructor: the constructor of L{Graph}
+    accepts three dictionaries corresponding to the graph, vertex and edge
+    attributes while the constructor of L{GraphBase} does not. This extension
+    was needed to make L{Graph} serializable through the C{pickle} module.
     """
 
     # Some useful aliases
     omega = core.GraphBase.clique_number
     alpha = core.GraphBase.independence_number
     shell_index = core.GraphBase.coreness
+
+    def __init__(self, n=1, edges=None, directed=None, \
+        graph_attrs=None, vertex_attrs=None, edge_attrs=None):
+        """Constructs a graph from scratch.
+
+        @param n: the number of vertices. Can be omitted.
+        @param edges: the edge list where every list item is a pair of integers.
+            If any of the integers is larger than M{n-1}, the number of vertices
+            is adjusted accordingly.
+        @param directed: whether the graph should be directed
+        @param graph_attrs: the attributes of the graph as a dictionary.
+        @param vertex_attrs: the attributes of the vertices as a dictionary.
+        	Every dictionary value must be an iterable with exactly M{n} items.
+        @param edge_attrs: the attributes of the edges as a dictionary. Every
+        	dictionary value must be an iterable with exactly M{m} items where
+            M{m} is the number of edges.
+        """
+        # Check if n is a list. If so, that means that the number of vertices
+        # were omitted, so we should shift the whole parameter list with 1.
+        if isinstance(n, list) or isinstance(n, tuple):
+            edge_attrs = vertex_attrs
+            vertex_attrs = graph_attrs
+            graph_attrs = directed
+            directed = edges
+            edges = n
+            n = 1
+        edges = edges or []
+        directed = directed or False
+        graph_attrs = graph_attrs or {}
+        vertex_attrs = vertex_attrs or {}
+        edge_attrs = edge_attrs or {}
+        core.GraphBase.__init__(self, n, edges, directed)
+        # Set the graph attributes
+        for k, v in graph_attrs.iteritems():
+            if isinstance(k, int) or isinstance(k, long): k=str(k)
+            self[k]=v
+        # Set the vertex attributes
+        for k, v in vertex_attrs.iteritems():
+            if isinstance(k, int) or isinstance(k, long): k=str(k)
+            self.vs[k]=v
+        # Set the edge attributes
+        for k, v in edge_attrs.iteritems():
+            if isinstance(k, int) or isinstance(k, long): k=str(k)
+            self.es[k]=v
 
     def indegree(self, *args, **kwds):
         """Returns the in-degrees in a list.
@@ -488,7 +538,7 @@ class Graph(core.GraphBase):
 	    try:
 		edge_colors = self.es.get_attribute_values(edge_colors)
 	    except KeyError:
-		colors = ["black" for x in xrange(self.ecount())]
+		edge_colors = ["black" for x in xrange(self.ecount())]
 		
         if not isinstance(font_size, str):
             font_size = "%spx" % str(font_size)
@@ -812,9 +862,16 @@ class Graph(core.GraphBase):
     def __reduce__(self):
         """Support for pickling."""
         import warnings
-        warnings.warn("pickled graphs do not contain their attributes yet!")
         constructor = self.__class__
-        parameters = (self.vcount(), self.get_edgelist(), self.is_directed())
+        graph_attr_names = self.attributes()
+        vertex_attr_names = self.vs.attributes()
+        edge_attr_names = self.es.attributes()
+        gattrs, vattrs, eattrs = {}, {}, {}
+        for a in graph_attr_names: gattrs[a] = self[a]
+        for a in vertex_attr_names: vattrs[a] = self.vs[a]
+        for a in edge_attr_names: eattrs[a] = self.es[a]
+        parameters = (self.vcount(), self.get_edgelist(), self.is_directed(), \
+            gattrs, vattrs, eattrs)
         return (constructor, parameters, {})
 
 
