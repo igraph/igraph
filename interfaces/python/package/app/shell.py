@@ -14,6 +14,7 @@ Supported Python shells are:
 from igraph import *
 from igraph import __version__
 import sys, re
+import igraph.config
 
 class TerminalController:
     """
@@ -208,7 +209,7 @@ class Shell(object):
 
     def __init__(self):
         raise ValueError, "abstract class"
-    def __call__(self):
+    def __call__(self, namespace=None):
         raise ValueError, "abstract class"
 
 class IPythonShell(Shell):
@@ -225,12 +226,13 @@ class IPythonShell(Shell):
         from IPython.Shell import IPShellEmbed
         self._shell = IPShellEmbed(['-nosep'])
 
-    def __call__(self):
-        """Starts the embedded shell."""
-        set_progress_handler(IPythonShell._progress_handler)
+    def __call__(self, namespace=None):
+        """Starts the embedded shell.
+        
+        @param namespace: global namespace to use"""
         print "igraph %s running inside" % __version__,
         print self._shell.IP.BANNER,
-        self._shell()
+        self._shell(local_ns=namespace)
 
     def _progress_handler(message, percentage):
         """Progress bar handler, called when C{igraph} reports the progress
@@ -257,11 +259,12 @@ class ClassicPythonShell(Shell):
 
         Imports Python's classic shell"""
         from code import InteractiveConsole
-        self._shell = InteractiveConsole()
 
-    def __call__(self):
-        """Starts the embedded shell."""
-        set_progress_handler(ClassicPythonShell._progress_handler)
+    def __call__(self, namespace=None):
+        """Starts the embedded shell.
+        
+        @param namespace: global namespace to use"""
+        self._shell = InteractiveConsole(locals=namespace)
         print >>sys.stderr, "igraph %s running inside " % __version__,
         self._shell.runsource("from igraph import *")
         self._shell.interact()
@@ -279,10 +282,31 @@ class ClassicPythonShell(Shell):
             ClassicPythonShell.progress_bar.update(percentage, message)
     _progress_handler = staticmethod(_progress_handler)
 
-
-shell_classes = [IPythonShell, ClassicPythonShell]
-
 def main():
+    cfile = igraph.config.get_user_config_file()
+    try:
+        config = igraph.config.Configuration(cfile)
+        print >>sys.stderr, "Using configuration from %s" % cfile
+    except IOError:
+        # No config file yet, whatever
+        config = igraph.config.Configuration()
+        pass
+
+    if config.has_key("shells"):
+        parts = [part.strip() for part in config["shells"].split(",")]
+        shell_classes = []
+        available_classes = dict([(k, v) for k, v in globals().iteritems() \
+            if isinstance(v, type) and issubclass(v, Shell)])
+        for part in parts:
+            klass = available_classes.get(part, None)
+            if klass is None:
+                print >>sys.stderr, "Warning: unknown shell class `%s'" % part
+            else:
+                shell_classes.append(klass)
+    else:
+        shell_classes = [IPythonShell, ClassicPythonShell]
+
+    shell = None
     for shell_class in shell_classes:
         try:
             shell = shell_class()
@@ -292,9 +316,12 @@ def main():
             pass
 
     if isinstance(shell, Shell):
-        shell()
+        if config["verbose"]:
+            set_progress_handler(shell._progress_handler)
+        shell(namespace={"config": config})
     else:
-        print "No suitable Python shell was found"
+        print >>sys.stderr, "No suitable Python shell was found."
+        print >>sys.stderr, "Check configuration variable `general.shells'."
 
 if __name__ == '__main__': main()
 
