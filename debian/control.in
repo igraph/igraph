@@ -2,8 +2,9 @@ Source: igraph
 Section: libs
 Priority: optional
 Maintainer: Tamas Nepusz <ntamas@rmki.kfki.hu>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 4.0.0), python-dev (>= 2.3), python-central
 Standards-Version: 3.6.1
+XS-Python-Verion: >= 2.3
 
 Package: libigraph
 Architecture: any
@@ -28,5 +29,19 @@ Description: A library for creating and manipulating graphs - development files
  analysis of large graphs.
  .
  This package contains the include files and static library for igraph.
+ .
+ Homepage: http://cneurocvs.rmki.kfki.hu/igraph
+
+Package: python-igraph
+Architecture: any
+Section: python
+Priority: optional
+Depends: libigraph (= ${Source-Version}), python (>= 2.3)
+Description: Python interface for the igraph library
+ igraph is a library for creating and manipulating graphs.
+ It is intended to be as powerful (ie. fast) as possible to enable the
+ analysis of large graphs.
+ .
+ This package contains the Python interface of igraph.
  .
  Homepage: http://cneurocvs.rmki.kfki.hu/igraph
