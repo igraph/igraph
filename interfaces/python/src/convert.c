@@ -97,7 +97,7 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
     if (it) {
       PyObject *item;
       igraph_vector_init(v, 0);
-      while (item = PyIter_Next(it)) {
+      while ((item = PyIter_Next(it)) != 0) {
         ok = 1;
         if (pairs) {
           if (!PySequence_Check(item) || PySequence_Size(item) != 2) {

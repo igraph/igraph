@@ -4019,13 +4019,14 @@ PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
 
   if (igraph_write_graph_gml(&self->g, f, idvecptr, creator_str)) {
     if (idvecptr) igraph_vector_destroy(idvecptr);
-  if (o) Py_DECREF(o);
+  if (o) { Py_DECREF(o); }
   igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
   }
   if (idvecptr) igraph_vector_destroy(idvecptr);
-  if (o) Py_DECREF(o);
+  if (o) { Py_DECREF(o); }
+
   fclose(f);
 
   Py_RETURN_NONE;
