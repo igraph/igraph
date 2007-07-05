@@ -51,7 +51,6 @@
 #include "error.h"
 #include "attributes.h"
 #include <math.h>
-char * strndup (const char *S, size_t SIZE);
 extern int igraph_pajek_yylex(void);
 extern int igraph_pajek_mylineno;
 extern char *igraph_pajek_yytext;
