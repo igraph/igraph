@@ -210,6 +210,10 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
   gr=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!gr) return -1;
 
+  dict = ((PyObject**)gr->g.attr)[ATTRHASH_IDX_VERTEX];
+  
+  if (values == 0) return PyDict_DelItem(dict, attrname);
+
   n=PySequence_Size(values);
   if (n<0) return -1;
   if (n != (long)igraph_vcount(&gr->g)) {
@@ -218,7 +222,6 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
   }
 
   /* Check if we already have attributes with the given name */
-  dict = ((PyObject**)gr->g.attr)[ATTRHASH_IDX_VERTEX];
   list = PyDict_GetItem(dict, attrname);
   if (list != 0) {
     /* Yes, we have. Modify its items to the items found in values */
@@ -231,7 +234,7 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
         return -1;
       } /* PyList_SetItem stole a reference to the item automatically */ 
     }
-  } else {
+  } else if (values != 0) {
     /* We don't have attributes with the given name yet. Create an entry
      * in the dict, create a new list and copy everything */
     list = PyList_New(n);

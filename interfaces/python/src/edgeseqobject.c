@@ -210,6 +210,9 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
   gr=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!gr) return -1;
 
+  dict = ((PyObject**)gr->g.attr)[ATTRHASH_IDX_EDGE];
+  if (values == 0) return PyDict_DelItem(dict, attrname);
+
   n=PySequence_Size(values);
   if (n<0) return -1;
   if (n != (long)igraph_ecount(&gr->g)) {
@@ -218,7 +221,6 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
   }
 
   /* Check if we already have attributes with the given name */
-  dict = ((PyObject**)gr->g.attr)[ATTRHASH_IDX_EDGE];
   list = PyDict_GetItem(dict, attrname);
   if (list != 0) {
     /* Yes, we have. Modify its items to the items found in values */
