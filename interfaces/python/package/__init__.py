@@ -463,6 +463,49 @@ class Graph(core.GraphBase):
         return result
     Read_GraphMLz = classmethod(Read_GraphMLz)
 
+
+    def write_pickle(self, fname=None, version=-1):
+        """Saves the graph in Python pickled format
+
+        @param fname: the name of the file or a stream to save to. If
+          C{None}, saves the graph to a string and returns the string.
+        @param version: pickle protocol version to be used. If -1, uses
+          the highest protocol available
+        @return: C{None} if the graph was saved successfully to the
+          file given, or a string if C{fname} was C{None}.
+        """
+        import cPickle
+        if fname is None: return cPickle.dumps(self, version)
+        if not isinstance(fname, file):
+            file_was_opened=True
+            fname=open(fname, 'wb')
+        result=cPickle.dump(self, fname, version)
+        if file_was_opened: fname.close()
+        return result
+
+
+    def Read_Pickle(klass, fname=None):
+        """Reads a graph from Python pickled format
+
+        @param fname: the name of the file, a stream to read from, or
+          a string containing the pickled data. The string is assumed to
+          hold pickled data if it is longer than 40 characters and
+          contains the substring C{cigraph\nGraph\n}.
+        @return: the created graph object.
+        """
+        import cPickle
+        if len(fname)>40 and "cigraph\nGraph\n" in fname:
+            return cPickle.loads(fname)
+        if not isinstance(fname, file):
+            file_was_opened=True
+            fname=open(fname, 'rb')
+        result=cPickle.load(fname)
+        if file_was_opened: fname.close()
+        if not isinstance(result, klass):
+            raise TypeError, "unpickled object is not a %s" % klass.__name__
+        return result
+    Read_Pickle = classmethod(Read_Pickle)
+
     def write_svg(self, fname, layout, width = None, height = None, \
                   labels = "label", colors = "color", shapes = "shape", \
                   vertex_size = 10, edge_colors = "color", \
@@ -607,7 +650,7 @@ class Graph(core.GraphBase):
             y2 = y2 - vertex_size*math.sin(angle)
 	    if directed:
 		# Dirty hack because the SVG specification: markers do not inherit stroke colors
-		print >>f, "    <g transform=\"translate(%.4f,%.4f)\" fill=\"%s\" stroke=\"%s\">\n" % (x2, y2, edge_colors[eidx], edge_colors[eidx]) 
+		print >>f, "    <g transform=\"translate(%.4f,%.4f)\" fill=\"%s\" stroke=\"%s\">" % (x2, y2, edge_colors[eidx], edge_colors[eidx]) 
 		print >>f, "      <line x1=\"%.4f\" y1=\"%.4f\" x2=\"0\" y2=\"0\"/>" % (x1-x2, y1-y2)
 		print >>f, "      <use x=\"0\" y=\"0\" xlink:href=\"#Triangle\" transform=\"rotate(%.4f)\"/>" % (180+angle*180/math.pi,)
 		print >>f, "    </g>\n"
@@ -664,7 +707,8 @@ class Graph(core.GraphBase):
         ext = ext.lower()
         
         if ext in [".graphml", ".graphmlz", ".lgl", ".ncol", ".pajek",
-            ".gml", ".dimacs", ".edgelist", ".edges", ".edge", ".net"]:
+            ".gml", ".dimacs", ".edgelist", ".edges", ".edge", ".net",
+            ".pickle"]:
             return ext[1:]
 
         if ext == ".txt" or ext == ".dat":
@@ -711,7 +755,8 @@ class Graph(core.GraphBase):
           (GraphML and gzipped GraphML format), C{"gml"} (GML format),
           C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
           C{"edgelist"}, C{"edges"} or C{"edge"} (edge list),
-          C{"adjacency"} (adjacency matrix).
+          C{"adjacency"} (adjacency matrix), C{"pickle"} (Python pickled
+          format).
         @raises IOError: if the file format can't be identified and
           none was given.
         """
@@ -924,7 +969,8 @@ class Graph(core.GraphBase):
           "adj":        ("Read_Adjacency", "write_adjacency"),
           "edgelist":   ("Read_Edgelist", "write_edgelist"),
           "edge":       ("Read_Edgelist", "write_edgelist"),
-          "edges":      ("Read_Edgelist", "write_edgelist")
+          "edges":      ("Read_Edgelist", "write_edgelist"),
+          "pickle":     ("Read_Pickle", "write_pickle")
     }
 
 def read(filename, *args, **kwds):
