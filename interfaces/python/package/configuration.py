@@ -36,7 +36,7 @@ def get_platform_image_viewer():
     plat = platform.system()
     if plat == "Darwin":
         # Most likely Mac OS X
-        return "open /Applications/Preview.app/"
+        return "open"
     elif plat == "Linux":
         # Linux has a whole lot of choices, try to find one
         choices = ["gthumb", "gqview", "kuickshow", "xnview", "display"]
@@ -48,7 +48,7 @@ def get_platform_image_viewer():
         return ""
     elif plat == "Windows":
         # Use the built-in Windows image viewer, if available
-        return ""
+        return "start"
     else:
         # Unknown system
         return ""
@@ -155,6 +155,7 @@ class Configuration(object):
         @param fp: file or file pointer to be read. Can be omitted.
         """
         self._config = SafeConfigParser()
+        self._filename = None
 
         # Create default sections
         for sec in self._sections: self._config.add_section(sec)
@@ -164,6 +165,17 @@ class Configuration(object):
                 self[name]=definition["default"]
 
         if filename is not None: self.load(filename)
+
+    def _get_filename(self):
+        """Returns the filename associated to the object.
+
+        It is usually the name of the configuration file that was used when
+        creating the object. L{Configuration.load} always overwrites it with
+        the filename given to it. If C{None}, the configuration was either
+        created from scratch or it was updated from a stream without name
+        information."""
+        return self._filename
+    filename=property(_get_filename, doc=_get_filename.__doc__)
 
     def _item_to_section_key(item):
         """Converts an item description to a section-key pair.
@@ -243,6 +255,7 @@ class Configuration(object):
             fp=open(fp, "r")
             file_was_open=True
         self._config.readfp(fp)
+        self._filename = getattr(fp, "name", None)
         if file_was_open: fp.close()
 
     def save(self, fp=None):
@@ -263,4 +276,23 @@ def get_user_config_file():
     """Returns the path where the user-level configuration file is stored"""
     import os.path
     return os.path.expanduser("~/.igraphrc")
+
+
+def init():
+    """Default mechanism to initiate igraph configuration
+
+    This method loads the user-specific configuration file from the
+    user's home directory, or if it does not exist, creates a default
+    configuration
+    
+    @return: the L{Configuration} object loaded or created"""
+    cfile = get_user_config_file()
+    try:
+        config = Configuration(cfile)
+        return config
+    except IOError:
+        # No config file yet, whatever
+        config = Configuration()
+        return config
+
 

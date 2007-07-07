@@ -14,7 +14,6 @@ Supported Python shells are:
 from igraph import *
 from igraph import __version__
 import sys, re
-import igraph.config
 
 class TerminalController:
     """
@@ -283,14 +282,7 @@ class ClassicPythonShell(Shell):
     _progress_handler = staticmethod(_progress_handler)
 
 def main():
-    cfile = igraph.config.get_user_config_file()
-    try:
-        config = igraph.config.Configuration(cfile)
-        print >>sys.stderr, "Using configuration from %s" % cfile
-    except IOError:
-        # No config file yet, whatever
-        config = igraph.config.Configuration()
-        pass
+    print >>sys.stderr, "Using configuration from %s" % config.filename
 
     if config.has_key("shells"):
         parts = [part.strip() for part in config["shells"].split(",")]
@@ -318,7 +310,7 @@ def main():
     if isinstance(shell, Shell):
         if config["verbose"]:
             set_progress_handler(shell._progress_handler)
-        shell(namespace={"config": config})
+        shell()
     else:
         print >>sys.stderr, "No suitable Python shell was found."
         print >>sys.stderr, "Check configuration variable `general.shells'."

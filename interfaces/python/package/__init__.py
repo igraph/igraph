@@ -30,6 +30,8 @@ from core import *
 from core import __version__, __build_date__
 from clustering import *
 from layout import *
+from drawing import *
+from configuration import Configuration
 
 import os
 import math
@@ -1038,4 +1040,6 @@ def write(filename, graph, *args, **kwds):
     """
     return graph.write(filename, *args, **kwds)
 save=write
+
+config = configuration.init()
 
