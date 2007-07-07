@@ -28,6 +28,30 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 from ConfigParser import SafeConfigParser
+import platform
+import os.path
+
+def get_platform_image_viewer():
+    """Returns the path of an image viewer on the given platform"""
+    plat = platform.system()
+    if plat == "Darwin":
+        # Most likely Mac OS X
+        return "open /Applications/Preview.app/"
+    elif plat == "Linux":
+        # Linux has a whole lot of choices, try to find one
+        choices = ["gthumb", "gqview", "kuickshow", "xnview", "display"]
+        paths = ["/usr/bin", "/bin"]
+        for path in paths:
+            for choice in choices:
+                full_path = os.path.join(path, choice)
+                if os.path.isfile(full_path): return full_path
+        return ""
+    elif plat == "Windows":
+        # Use the built-in Windows image viewer, if available
+        return ""
+    else:
+        # Unknown system
+        return ""
 
 class Configuration(object):
     """Class representing igraph configuration details.
@@ -82,7 +106,20 @@ class Configuration(object):
           used can be found in L{igraph.app.shell}. Example:
           C{IPythonShell, ClassicPythonShell}. This is the default, by the way.
         - B{verbose}: whether L{igraph} should talk more than really necessary.
-          For instance, if set to C{True}, some functions display progress bars. 
+          For instance, if set to C{True}, some functions display progress bars.
+
+      Application settings
+      --------------------
+
+      These settings specify the external applications that are possibly
+      used by C{igraph}. They are all stored in section C{apps}.
+
+        - B{image_viewer}: image viewer application. If set to an empty string,
+          it will be determined automatically from the platform C{igraph} runs
+          on. On Mac OS X, it defaults to the Preview application. On Linux,
+          it chooses a viewer from several well-known Linux viewers like
+          C{gthumb}, C{kuickview} and so on (see the source code for the full
+          list). On Windows, it defaults to the system's built-in image viewer.
     """
     class Types:
         """Static class for the implementation of custom getter/setter functions
@@ -104,10 +141,12 @@ class Configuration(object):
         }
     }
 
-    _sections = ("general", )
+    _sections = ("general", "apps", )
     _definitions = {
         "general.shells": { "default": "IPythonShell,ClassicPythonShell" },
-        "general.verbose": { "default": True, "type": "boolean" }
+        "general.verbose": { "default": True, "type": "boolean" },
+
+        "apps.image_viewer": { "default": get_platform_image_viewer() },
     }
 
     def __init__(self, filename=None):
@@ -126,15 +165,28 @@ class Configuration(object):
 
         if filename is not None: self.load(filename)
 
+    def _item_to_section_key(item):
+        """Converts an item description to a section-key pair.
+        
+        @param item: the item to be converted
+        @return: if C{item} contains a period (C{.}), it is splitted into two parts
+          at the first period, then the two parts are returned, so the part before
+          the period is the section. If C{item} does not contain a period, the
+          section is assumed to be C{general}, and the second part of the returned
+          pair contains C{item} unchanged"""
+        if "." in item:
+            section, key = item.split(".", 1)
+        else:
+            section, key = "general", item
+        return section, key
+    _item_to_section_key=staticmethod(_item_to_section_key)
+
     def __getitem__(self, item):
         """Returns the given configuration item.
 
         @param item: the configuration key to retrieve.
         @return: the configuration value"""
-        if "." in item:
-            section, key = item.split(".", 1)
-        else:
-            section, key = "general", item
+        section, key = self._item_to_section_key(item)
         definition = self._definitions.get("%s.%s" % (section,key), {})
         getter = None
         if definition.has_key("type"):
@@ -148,16 +200,26 @@ class Configuration(object):
         @param item: the configuration key to set
         @param value: the new value of the configuration key
         """
-        if "." in item:
-            section, key = item.split(".", 1)
-        else:
-            section, key = "general", item
+        section, key = self._item_to_section_key(item)
         definition = self._definitions.get("%s.%s" % (section,key), {})
         setter = None
         if definition.has_key("type"):
             setter = self._types[definition["type"]].get("setter", None)
         if setter is None: setter = self._config.__class__.set
         return setter(self._config, section, key, value)
+
+    def __delitem__(self, item):
+        """Deletes the given item from the configuration.
+
+        If the item has a default value, the default value is written back instead
+        of the current value. Without a default value, the item is really deleted.
+        """
+        section, key = self._item_to_section_key(item)
+        definition = self._definitions.get("%s.%s" % (section, key), {})
+        if definition.has_key("default"):
+            self[item]=definition["default"]
+        else:
+            self._config.remove_option(section, key)
 
     def has_key(self, item):
         """Checks if the configuration has a given key.

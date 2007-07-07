@@ -699,10 +699,17 @@ class Graph(core.GraphBase):
 
         @note: Internal function, should not be called directly.
 
-        @param filename: the name of the file
+        @param filename: the name of the file or a file object whose C{name}
+          attribute is set.
         @return: the format of the file as a string.
         """
         import os.path
+        if isinstance(filename, file):
+            try:
+                filename=filename.name
+            except:
+                return None
+
         root, ext = os.path.splitext(filename)
         ext = ext.lower()
         
@@ -736,9 +743,9 @@ class Graph(core.GraphBase):
                     return None
             else:
                 return "adjacency"
-
-
     _identify_format = classmethod(_identify_format)
+    
+    
     def Read(klass, f, format=None, *args, **kwds):
         """Unified reading function for graphs.
 
@@ -766,11 +773,46 @@ class Graph(core.GraphBase):
         except KeyError, IndexError:
             raise IOError, "unknown file format: %s" % str(format)
         if reader is None:
-            raise IOError, "no loader method for file format: %s" % str(format)
+            raise IOError, "no reader method for file format: %s" % str(format)
         reader = getattr(klass, reader)
         return reader(f, *args, **kwds)
     Read = classmethod(Read)
     Load = Read
+
+    
+    def write(klass, f, format=None, *args, **kwds):
+        """Unified writing function for graphs.
+
+        This method tries to identify the format of the graph given in
+        the first parameter (based on extension) and calls the corresponding
+        writer method.
+
+        The remaining arguments are passed to the writer method without
+        any changes.
+
+        @param f: the file containing the graph to be saved
+        @param format: the format of the file (if one wants to override the
+          format determined from the filename extension, or the filename itself
+          is a stream). C{None} means auto-detection. Possible values are: C{"ncol"}
+          (NCOL format), C{"lgl"} (LGL format), C{"graphml"}, C{"graphmlz"}
+          (GraphML and gzipped GraphML format), C{"gml"} (GML format),
+          C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
+          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list),
+          C{"adjacency"} (adjacency matrix), C{"pickle"} (Python pickled
+          format), C{"svg"} (Scalable Vector Graphics).
+        @raises IOError: if the file format can't be identified and
+          none was given.
+        """
+        if format is None: format = klass._identify_format(f)
+        try:
+            writer = klass._format_mapping[format][1]
+        except KeyError, IndexError:
+            raise IOError, "unknown file format: %s" % str(format)
+        if writer is None:
+            raise IOError, "no writer method for file format: %s" % str(format)
+        writer = getattr(klass, writer)
+        return writer(f, *args, **kwds)
+    save = write
 
     def __iadd__(self, other):
         """In-place addition (disjoint union).
@@ -970,7 +1012,8 @@ class Graph(core.GraphBase):
           "edgelist":   ("Read_Edgelist", "write_edgelist"),
           "edge":       ("Read_Edgelist", "write_edgelist"),
           "edges":      ("Read_Edgelist", "write_edgelist"),
-          "pickle":     ("Read_Pickle", "write_pickle")
+          "pickle":     ("Read_Pickle", "write_pickle"),
+          "svg":        (None, "write_svg")
     }
 
 def read(filename, *args, **kwds):
@@ -982,6 +1025,17 @@ def read(filename, *args, **kwds):
     @param filename: the name of the file to be loaded
     """
     return Graph.Read(filename, *args, **kwds)
-
 load=read
+
+def write(filename, graph, *args, **kwds):
+    """Saves a graph to the given file.
+
+    This is just a convenience function, calls L{Graph.write} directly.
+    All arguments are passed unchanged to L{Graph.write}
+
+    @param filename: the name of the file to be written
+    @param graph: the graph to be saved
+    """
+    return graph.write(filename, *args, **kwds)
+save=write
 
