@@ -3221,7 +3221,7 @@ PyObject
   igraph_matrix_t m;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad;
-  PyObject *result, *wobj;
+  PyObject *result, *wobj=Py_None;
   igraph_vector_t *weights;
 
   maxdelta = igraph_vcount(&self->g);
