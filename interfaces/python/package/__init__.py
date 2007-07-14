@@ -410,6 +410,50 @@ class Graph(core.GraphBase):
         return result
 
 
+    def layout(self, layout, *args, **kwds):
+        """Returns the layout of the graph according to a layout algorithm.
+
+        Parameters and keyword arguments not specified here are passed to the
+        layout algorithm directly. See the documentation of the layout
+        algorithms for the explanation of these parameters.
+
+        Registered layout names understood by this method are:
+
+          * C{circle}, C{circular}: circular layout (see L{Graph.layout_circle})
+          * C{fr}, C{fruchterman_reingold}: Fruchterman-Reingold layout
+            (see L{Graph.layout_fruchterman_reingold}).
+          * C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-Reingold
+            layout (see L{Graph.layout_fruchterman_reingold_3d}).
+          * C{gfr}, C{grid_fr}, C{grid_fruchterman_reingold}: grid-based
+            Fruchterman-Reingold layout
+            (see L{Graph.layout_grid_fruchterman_reingold})
+          * C{kk}, C{kamada_kawai}: Kamada-Kawai layout
+            (see L{Graph.layout_kamada_kawai}).
+          * C{kk_3d}, C{kk3d}, C{kamada_kawai_3d}: 3D Kamada-Kawai layout
+            (see L{Graph.layout_kamada_kawai_3d}).
+          * C{lgl}, C{large}, C{large_graph}: Large Graph Layout
+            (see L{Graph.layout_lgl})
+          * C{random}: random layout (see L{Graph.layout_random})
+          * C{random_3d}: random 3D layout (see L{Graph.layout_random_3d})
+          * C{rt}, C{tree}, C{reingold_tilford}: Reingold-Tilford tree
+            layout (see L{Graph.layout_reingold_tilford}).
+          * C{sphere}, C{spherical}, C{circle_3d}, C{circular_3d}: spherical
+            layout (see L{Graph.layout_sphere})
+
+        @param layout: the layout to use. This can be one of the registered
+          layout names or a callable which returns either a L{Layout} object or
+          a list of lists containing the coordinates.
+        @return: a L{Layout} object.
+        """
+        if callable(layout):
+            method = layout
+        else:
+            method = getattr(self.__class__, self._layout_mapping[layout])
+        if not callable(method): raise ValueError, "layout method must be callable"
+        l=method(self, *args, **kwds)
+        if not isinstance(l, Layout): l=Layout(l)
+        return l
+
     def write_graphmlz(self, f, compresslevel=9):
         """Writes the graph to a zipped GraphML file.
 
@@ -782,7 +826,7 @@ class Graph(core.GraphBase):
     Load = Read
 
     
-    def write(klass, f, format=None, *args, **kwds):
+    def write(self, f, format=None, *args, **kwds):
         """Unified writing function for graphs.
 
         This method tries to identify the format of the graph given in
@@ -805,14 +849,14 @@ class Graph(core.GraphBase):
         @raises IOError: if the file format can't be identified and
           none was given.
         """
-        if format is None: format = klass._identify_format(f)
+        if format is None: format = self._identify_format(f)
         try:
-            writer = klass._format_mapping[format][1]
+            writer = self._format_mapping[format][1]
         except KeyError, IndexError:
             raise IOError, "unknown file format: %s" % str(format)
         if writer is None:
             raise IOError, "no writer method for file format: %s" % str(format)
-        writer = getattr(klass, writer)
+        writer = getattr(self, writer)
         return writer(f, *args, **kwds)
     save = write
 
@@ -964,6 +1008,10 @@ class Graph(core.GraphBase):
         return (constructor, parameters, {})
 
 
+    def __plot__(self, context, bbox):
+        """Plots the graph to the given Cairo context and bounding box"""
+        return
+
     def summary(self, verbosity=0):
         """Returns basic statistics about the graph in a string
         
@@ -1017,6 +1065,41 @@ class Graph(core.GraphBase):
           "pickle":     ("Read_Pickle", "write_pickle"),
           "svg":        (None, "write_svg")
     }
+
+    _layout_mapping = {
+        "circle": "layout_circle",
+        "circular": "layout_circle",
+        "fr": "layout_fruchterman_reingold",
+        "fruchterman_reingold": "layout_fruchterman_reingold",
+        "fr3d": "layout_fruchterman_reingold_3d",
+        "fr_3d": "layout_fruchterman_reingold_3d",
+        "fruchterman_reingold_3d": "layout_fruchterman_reingold_3d",
+        "gfr": "layout_grid_fruchterman_reingold",
+        "grid_fr": "layout_grid_fruchterman_reingold",
+        "grid_fruchterman_reingold": "layout_grid_fruchterman_reingold",
+        "kk": "layout_kamada_kawai",
+        "kamada_kawai": "layout_kamada_kawai",
+        "kk3d": "layout_kamada_kawai_3d",
+        "kk_3d": "layout_kamada_kawai_3d",
+        "kamada_kawai_3d": "layout_kamada_kawai_3d",
+        "lgl": "layout_lgl",
+        "large": "layout_lgl",
+        "large_graph": "layout_lgl",
+        "random": "layout_random",
+        "random_3d": "layout_random_3d",
+        "rt": "layout_reingold_tilford",
+        "tree": "layout_reingold_tilford",
+        "reingold_tilford": "layout_reingold_tilford",
+        "rt_circular": "layout_reingold_tilford_circular",
+        "reingold_tilford_circular": "layout_reingold_tilford_circular",
+        "sphere": "layout_sphere",
+        "spherical": "layout_sphere",
+        "circle_3d": "layout_sphere",
+        "circular_3d": "layout_sphere",
+    }
+
+    # After adjusting something here, don't forget to update the docstring
+    # of Graph.layout if necessary!
 
 def read(filename, *args, **kwds):
     """Loads a graph from the given filename.
