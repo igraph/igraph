@@ -376,7 +376,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   igraph_free(tmpscore);
   igraph_free(nrgeo);
   igraph_free(distance);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(7);
   
   if (directed) {
     igraph_i_adjedgelist_destroy(&elist_out);

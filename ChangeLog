@@ -1,3 +1,8 @@
+2007-07-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/community.c (igraph_community_edge_betweenness) : FINALLY
+	bug corrected
+
 2007-06-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_cit.c (igraph_revolver_e) : added 'st' option
