@@ -34,6 +34,31 @@
 #include <libxml/encoding.h>
 #include <libxml/parser.h>
 
+
+xmlEntity blankEntityStruct = {
+#ifndef XML_WITHOUT_CORBA
+  0,
+#endif
+  XML_ENTITY_DECL,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  XML_EXTERNAL_GENERAL_PARSED_ENTITY,
+  0,
+  0,
+  0,
+  0
+};
+
+xmlEntityPtr blankEntity = &blankEntityStruct;
+
 /* TODO: proper error handling */
 
 typedef struct igraph_i_graphml_attribute_record_t {
@@ -74,6 +99,7 @@ struct igraph_i_graphml_parser_state {
   xmlChar *data_key;
   igraph_attribute_elemtype_t data_type;
   char *error_message;
+  char *data_char;
 };
 
 void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state) {
@@ -92,6 +118,7 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
    
   if (state->error_message) { free(state->error_message); }
   if (state->data_key) { free(state->data_key); }
+  if (state->data_char) { free(state->data_char); }
   
   for (i=0; i<igraph_vector_ptr_size(&state->v_attrs); i++) {
     igraph_i_graphml_attribute_record_t *rec=VECTOR(state->v_attrs)[i];
@@ -173,7 +200,10 @@ void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
 
 xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
 						     const xmlChar* name) {
-  return xmlGetPredefinedEntity(name);
+  xmlEntityPtr predef = xmlGetPredefinedEntity(name);
+  if (predef != NULL) return predef;
+  IGRAPH_WARNING("unknown XML entity found\n");
+  return blankEntity;
 }
 
 void igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {
@@ -195,6 +225,8 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
   state->destroyed=0;
   state->data_key=0;
   state->error_message=0;
+  state->data_char=0;
+  
   ret=igraph_vector_ptr_init(&state->v_attrs, 0);
   if (ret) {
     igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
@@ -526,6 +558,10 @@ void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state 
 	free(state->data_key);
       }
       state->data_key=xmlStrdup(*(it+1));
+      if (state->data_char) {
+        free(state->data_char);
+      }
+      state->data_char=0;
       state->data_type=type;
     } else {
       /* ignore */
@@ -534,31 +570,37 @@ void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state 
 }
 
 void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *state,
-					 const xmlChar *data) {
-  const char *key=fromXmlChar(state->data_key);
-  char *chardata;
-  const xmlChar *end=xmlStrchr(data, (xmlChar) '<');
-  igraph_attribute_elemtype_t type=state->data_type;
-  igraph_trie_t *trie=0;
-  igraph_vector_ptr_t *ptrvector=0;
-  igraph_i_graphml_attribute_record_t *graphmlrec;
-  igraph_i_attribute_record_t *rec;
-  long int recid;
-  long int id=0;
-  int ret;
+					 const xmlChar *data, int len) {
+  long int data_char_new_start=0;
 
   if (!state->successful) return;
 
-  chardata=Calloc( (end-data)+1, char);  
-  if (chardata==0) {
+  if (state->data_char) {
+    data_char_new_start=strlen(state->data_char);
+    state->data_char=Realloc(state->data_char, data_char_new_start+len+1, char);
+  } else {
+    state->data_char=Calloc(len+1, char);
+  }
+  if (state->data_char==0) {
     igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, 
 		 IGRAPH_ENOMEM);
     igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
     return;
   }
-  memcpy(chardata, data, (end-data)*sizeof(char));
-  chardata[(end-data)]='\0';
+  memcpy(state->data_char+data_char_new_start, data, len*sizeof(xmlChar));
+  state->data_char[data_char_new_start+len]='\0';
+}
 
+void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state *state) {
+  const char *key=fromXmlChar(state->data_key);
+  igraph_attribute_elemtype_t type=state->data_type;
+  igraph_trie_t *trie=0;
+  igraph_vector_ptr_t *ptrvector=0;
+  igraph_i_graphml_attribute_record_t *graphmlrec;
+  igraph_i_attribute_record_t *rec;
+  long int recid, id=0;
+  int ret;
+  
   switch (type) {
   case IGRAPH_ATTRIBUTE_GRAPH:
     trie=&state->g_names;
@@ -584,7 +626,7 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
   if (recid < 0) {
     /* no such attribute key, issue a warning */
     IGRAPH_WARNING("unknown attribute key in GraphML file, ignoring attribute");
-    Free(chardata);
+    Free(state->data_char);
     return;
   }
    
@@ -610,7 +652,7 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
 	VECTOR(*vec)[i]=IGRAPH_NAN;
       }
     }
-    sscanf(chardata, "%lf", &num);
+    sscanf(state->data_char, "%lf", &num);
     VECTOR(*vec)[id]=num;
     break;
   case IGRAPH_ATTRIBUTE_STRING:
@@ -627,7 +669,7 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
 	igraph_strvector_set(strvec, i, "");
       }
     }
-    ret=igraph_strvector_set(strvec, id, chardata);
+    ret=igraph_strvector_set(strvec, id, (char*)state->data_char);
     if (ret) {
       igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
       igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
@@ -638,7 +680,7 @@ void igraph_i_graphml_attribute_data_add(struct igraph_i_graphml_parser_state *s
     break;
   }
 
-  Free(chardata);
+  Free(state->data_char);
 }
 
 void igraph_i_graphml_sax_handler_start_element(void *state0,
@@ -794,6 +836,7 @@ void igraph_i_graphml_sax_handler_end_element(void *state0,
     break;
 
   case INSIDE_DATA:
+    igraph_i_graphml_attribute_data_finish(state);
     state->st=state->prev_state;
     break;
     
@@ -817,7 +860,7 @@ void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len
     break;
     
   case INSIDE_DATA:
-    igraph_i_graphml_attribute_data_add(state, ch);
+    igraph_i_graphml_attribute_data_add(state, ch, len);
     break;
     
   default:
@@ -1195,4 +1238,3 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream) {
 
   return 0;
 }
-
