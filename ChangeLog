@@ -1,3 +1,8 @@
+2007-07-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/community.c (igraph_community_edge_betweenness) : FINALLY
+	bug corrected
+
 2007-07-07  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c
