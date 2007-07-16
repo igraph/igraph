@@ -19,7 +19,9 @@ xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdr
     <node id="n3">
       <data key="d0">red &quot;with entities&quot;</data>
     </node>
-    <node id="n4"/>
+    <node id="n4">
+      <data key="d0"><!-- empty key body --></data>
+    </node>
     <node id="n5">
       <data key="d0">turquoise</data>
     </node>

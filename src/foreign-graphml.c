@@ -652,7 +652,10 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
 	VECTOR(*vec)[i]=IGRAPH_NAN;
       }
     }
-    sscanf(state->data_char, "%lf", &num);
+    if (state->data_char)
+      sscanf(state->data_char, "%lf", &num);
+    else
+      num=0;
     VECTOR(*vec)[id]=num;
     break;
   case IGRAPH_ATTRIBUTE_STRING:
@@ -669,7 +672,10 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
 	igraph_strvector_set(strvec, i, "");
       }
     }
-    ret=igraph_strvector_set(strvec, id, (char*)state->data_char);
+    if (state->data_char)
+      ret=igraph_strvector_set(strvec, id, (char*)state->data_char);
+    else
+      ret=igraph_strvector_set(strvec, id, "");
     if (ret) {
       igraph_error("Cannot parse GraphML file", __FILE__, __LINE__, ret);
       igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
@@ -680,7 +686,7 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
     break;
   }
 
-  Free(state->data_char);
+  if (state->data_char) Free(state->data_char);
 }
 
 void igraph_i_graphml_sax_handler_start_element(void *state0,
