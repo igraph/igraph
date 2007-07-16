@@ -280,7 +280,8 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
 	break;
       case IGRAPH_ATTRIBUTE_STRING:
 	igraph_strvector_get((igraph_strvector_t*)attr_rec->value, 0, &s);
-	value=PyString_FromString(s);
+	if (s == 0) value=PyString_FromString("");
+	else value=PyString_FromString(s);
 	break;
       default:
 	IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");

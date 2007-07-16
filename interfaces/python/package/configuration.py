@@ -120,6 +120,14 @@ class Configuration(object):
           it chooses a viewer from several well-known Linux viewers like
           C{gthumb}, C{kuickview} and so on (see the source code for the full
           list). On Windows, it defaults to the system's built-in image viewer.
+
+      Plotting settings
+      -----------------
+
+      These settings specify the default values used by plotting functions.
+      They are all stored in section C{plotting}.
+
+        - B{layout}: default graph layout algorithm to be used.
     """
     class Types:
         """Static class for the implementation of custom getter/setter functions
@@ -141,12 +149,14 @@ class Configuration(object):
         }
     }
 
-    _sections = ("general", "apps", )
+    _sections = ("general", "apps", "plotting", )
     _definitions = {
         "general.shells": { "default": "IPythonShell,ClassicPythonShell" },
         "general.verbose": { "default": True, "type": "boolean" },
 
         "apps.image_viewer": { "default": get_platform_image_viewer() },
+
+        "plotting.layout": { "default": "random" },
     }
 
     def __init__(self, filename=None):

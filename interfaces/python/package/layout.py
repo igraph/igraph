@@ -192,7 +192,8 @@ class Layout(object):
             col = [row[d] for row in self._coords]
             mins.append(min(col)-border)
             maxs.append(max(col)+border)
-        return mins, maxs
+        mins.extend(maxs)
+        return tuple(mins)
 
     def center(self, *args, **kwds):
         """Centers the layout around the given point.

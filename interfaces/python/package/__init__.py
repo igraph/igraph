@@ -410,7 +410,7 @@ class Graph(core.GraphBase):
         return result
 
 
-    def layout(self, layout, *args, **kwds):
+    def layout(self, layout=None, *args, **kwds):
         """Returns the layout of the graph according to a layout algorithm.
 
         Parameters and keyword arguments not specified here are passed to the
@@ -442,9 +442,11 @@ class Graph(core.GraphBase):
 
         @param layout: the layout to use. This can be one of the registered
           layout names or a callable which returns either a L{Layout} object or
-          a list of lists containing the coordinates.
+          a list of lists containing the coordinates. If C{None}, uses the
+          value of the C{plotting.layout} configuration key.
         @return: a L{Layout} object.
         """
+        if layout is None: layout = config["plotting.layout"]
         if callable(layout):
             method = layout
         else:
@@ -1008,8 +1010,38 @@ class Graph(core.GraphBase):
         return (constructor, parameters, {})
 
 
-    def __plot__(self, context, bbox):
-        """Plots the graph to the given Cairo context and bounding box"""
+    def __plot__(self, context, bbox, *args, **kwds):
+        """Plots the graph to the given Cairo context in the given bounding box"""
+        import drawing
+
+        vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", "color", kwds, self.vs, config, "red", drawing.color_to_rgb)
+        vertex_sizes = drawing.collect_attributes(self.vcount(), "vertex_size", "size", kwds, self.vs, config, 10, float)
+        max_vertex_size = max(vertex_sizes)
+
+        layout = self.layout(kwds.get("layout", None))
+        sl, st, sr, sb = layout.bounding_box()
+        sw, sh = sr-sl, sb-st
+        rx, ry = float(bbox.width-max_vertex_size)/sw, float(bbox.height-max_vertex_size)/sh
+        layout.scale(rx, ry)
+        layout.translate(-sl*rx+max_vertex_size/2., -st*ry+max_vertex_size/2.)
+
+        context.set_line_width(1)
+
+        context.set_source_rgb(*drawing.color_to_rgb("black"))
+        for idx, e in enumerate(self.es):
+            src, tgt = e.tuple
+            context.move_to(*layout[src])
+            context.line_to(*layout[tgt])
+            context.stroke()
+
+        # Draw the vertices
+        for idx, v in enumerate(self.vs):
+            context.arc(layout[idx][0], layout[idx][1], vertex_sizes[idx]/2., 0, 2*math.pi)
+            context.set_source_rgb(*vertex_colors[idx])
+            context.fill_preserve()
+            context.set_source_rgb(0., 0., 0.)
+            context.stroke()
+
         return
 
     def summary(self, verbosity=0):
