@@ -1,3 +1,8 @@
+2007-07-17  Csardi Gabor  <csardi@duplakave.rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : corrected bug when
+	igraph.Arrows called with a vector argument for h.lwd
+
 2007-06-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/revolver.R (revolver.e) 
