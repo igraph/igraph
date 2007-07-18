@@ -1011,9 +1011,16 @@ class Graph(core.GraphBase):
 
 
     def __plot__(self, context, bbox, *args, **kwds):
-        """Plots the graph to the given Cairo context in the given bounding box"""
+        """Plots the graph to the given Cairo context in the given bounding box
+        
+        TODO: documentation of keyword arguments
+        """
         import drawing
         import cairo
+
+        directed = self.is_directed()
+        margin = kwds.get("margin", 0)
+        if margin<0: margin=0
 
         vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", "color", kwds, self.vs, config, "red", drawing.color_to_rgb)
         vertex_sizes = drawing.collect_attributes(self.vcount(), "vertex_size", "size", kwds, self.vs, config, 10, float)
@@ -1022,18 +1029,33 @@ class Graph(core.GraphBase):
         layout = self.layout(kwds.get("layout", None))
         sl, st, sr, sb = layout.bounding_box()
         sw, sh = sr-sl, sb-st
-        rx, ry = float(bbox.width-max_vertex_size)/sw, float(bbox.height-max_vertex_size)/sh
+        rx, ry = float(bbox.width-max_vertex_size-2*margin)/sw, float(bbox.height-max_vertex_size-2*margin)/sh
         layout.scale(rx, ry)
-        layout.translate(-sl*rx+max_vertex_size/2., -st*ry+max_vertex_size/2.)
+        layout.translate(-sl*rx+max_vertex_size/2.+margin, -st*ry+max_vertex_size/2.+margin)
 
         context.set_line_width(1)
 
+        # Draw the edges
         context.set_source_rgb(*drawing.color_to_rgb("black"))
         for idx, e in enumerate(self.es):
             src, tgt = e.tuple
             context.move_to(*layout[src])
             context.line_to(*layout[tgt])
             context.stroke()
+
+            if directed:
+                # Draw an arrowhead
+                angle = math.atan2(layout[tgt][1]-layout[src][1],
+                    layout[tgt][0]-layout[src][0])
+                a1 = (layout[tgt][0]-15*math.cos(angle-math.pi/10.),
+                  layout[tgt][1]-15*math.sin(angle-math.pi/10.))
+                a2 = (layout[tgt][0]-15*math.cos(angle+math.pi/10.),
+                  layout[tgt][1]-15*math.sin(angle+math.pi/10.))
+                context.move_to(*layout[tgt])
+                context.line_to(*a1)
+                context.line_to(*a2)
+                context.line_to(*layout[tgt])
+                context.fill()
 
         # Draw the vertices
         for idx, v in enumerate(self.vs):
@@ -1047,6 +1069,8 @@ class Graph(core.GraphBase):
         # Draw the vertex labels
         if not kwds.has_key("vertex_label") and "label" not in self.vs.attributes():
             vertex_labels = map(str, xrange(self.vcount()))
+        elif kwds.has_key("vertex_label") and kwds["vertex_label"] is None:
+            vertex_labels = [None] * self.vcount()
         else:
             vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", "label", kwds, self.vs, config, None)
         vertex_dists = drawing.collect_attributes(self.vcount(), "vertex_dist", "dist", kwds, self.vs, config, 1, float)
