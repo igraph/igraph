@@ -1013,6 +1013,7 @@ class Graph(core.GraphBase):
     def __plot__(self, context, bbox, *args, **kwds):
         """Plots the graph to the given Cairo context in the given bounding box"""
         import drawing
+        import cairo
 
         vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", "color", kwds, self.vs, config, "red", drawing.color_to_rgb)
         vertex_sizes = drawing.collect_attributes(self.vcount(), "vertex_size", "size", kwds, self.vs, config, 10, float)
@@ -1041,6 +1042,27 @@ class Graph(core.GraphBase):
             context.fill_preserve()
             context.set_source_rgb(0., 0., 0.)
             context.stroke()
+        del vertex_colors
+
+        # Draw the vertex labels
+        if not kwds.has_key("vertex_label") and "label" not in self.vs.attributes():
+            vertex_labels = map(str, xrange(self.vcount()))
+        else:
+            vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", "label", kwds, self.vs, config, None)
+        vertex_dists = drawing.collect_attributes(self.vcount(), "vertex_dist", "dist", kwds, self.vs, config, 1, float)
+        vertex_degrees = drawing.collect_attributes(self.vcount(), "vertex_degree", "degree", kwds, self.vs, config, -math.pi/4, float)
+        context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+        context.set_font_size(14)
+
+        for idx, v in enumerate(self.vs):
+            xb, yb, w, h = context.text_extents(vertex_labels[idx])[:4]
+            cx, cy = layout[idx]
+            cx += math.cos(vertex_degrees[idx]) * vertex_dists[idx] * vertex_sizes[idx]
+            cy += math.sin(vertex_degrees[idx]) * vertex_dists[idx] * vertex_sizes[idx]
+            cx -= w/2. + xb
+            cy -= h/2. + yb
+            context.move_to(cx, cy)
+            context.show_text(vertex_labels[idx])
 
         return
 
