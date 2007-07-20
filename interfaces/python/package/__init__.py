@@ -1019,31 +1019,54 @@ class Graph(core.GraphBase):
         import cairo
 
         directed = self.is_directed()
-        margin = kwds.get("margin", 0)
-        if margin<0: margin=0
+        margin = kwds.get("margin", [0., 0., 0., 0.])
+        try:
+            margin = list(margin)
+        except TypeError:
+            margin = [margin]
+        while len(margin)<4: margin.extend(margin)
+        margin = tuple(map(float, margin[:4]))
 
         vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", "color", kwds, self.vs, config, "red", drawing.color_to_rgb)
         vertex_sizes = drawing.collect_attributes(self.vcount(), "vertex_size", "size", kwds, self.vs, config, 10, float)
         max_vertex_size = max(vertex_sizes)
 
-        layout = self.layout(kwds.get("layout", None))
+        layout = kwds.get("layout", None)
+        if not isinstance(layout, Layout):
+            layout = self.layout(layout)
         sl, st, sr, sb = layout.bounding_box()
         sw, sh = sr-sl, sb-st
-        rx, ry = float(bbox.width-max_vertex_size-2*margin)/sw, float(bbox.height-max_vertex_size-2*margin)/sh
+        if sw == 0: sw=1
+        if sh == 0: sh=1
+        rx, ry = float(bbox.width-max_vertex_size-margin[1]-margin[3])/sw, \
+          float(bbox.height-max_vertex_size-margin[0]-margin[2])/sh
         layout.scale(rx, ry)
-        layout.translate(-sl*rx+max_vertex_size/2.+margin, -st*ry+max_vertex_size/2.+margin)
+        layout.translate(-sl*rx+max_vertex_size/2.+margin[1], \
+          -st*ry+max_vertex_size/2.+margin[0])
 
         context.set_line_width(1)
 
+        edge_colors = drawing.collect_attributes(self.ecount(), "edge_color", "color", kwds, self.es, config, "black", drawing.color_to_rgb)
+        edge_widths = drawing.collect_attributes(self.ecount(), "edge_width", "width", kwds, self.es, config, 1, float)
+
         # Draw the edges
-        context.set_source_rgb(*drawing.color_to_rgb("black"))
         for idx, e in enumerate(self.es):
+            context.set_source_rgb(*edge_colors[idx])
+            context.set_line_width(edge_widths[idx])
+
             src, tgt = e.tuple
-            context.move_to(*layout[src])
-            context.line_to(*layout[tgt])
+            if src == tgt:
+                # Loop edge
+                r = vertex_sizes[src]*2
+                cx, cy = layout[src][0]+math.cos(math.pi/4)*r/2, \
+                  layout[src][1]-math.sin(math.pi/4)*r/2
+                context.arc(cx, cy, r/2., 0, math.pi*2)
+            else:
+                context.move_to(*layout[src])
+                context.line_to(*layout[tgt])
             context.stroke()
 
-            if directed:
+            if directed and src != tgt:
                 # Draw an arrowhead
                 angle = math.atan2(layout[tgt][1]-layout[src][1],
                     layout[tgt][0]-layout[src][0])
@@ -1058,6 +1081,7 @@ class Graph(core.GraphBase):
                 context.fill()
 
         # Draw the vertices
+        context.set_line_width(1)
         for idx, v in enumerate(self.vs):
             context.arc(layout[idx][0], layout[idx][1], vertex_sizes[idx]/2., 0, 2*math.pi)
             context.set_source_rgb(*vertex_colors[idx])
@@ -1070,7 +1094,7 @@ class Graph(core.GraphBase):
         if not kwds.has_key("vertex_label") and "label" not in self.vs.attributes():
             vertex_labels = map(str, xrange(self.vcount()))
         elif kwds.has_key("vertex_label") and kwds["vertex_label"] is None:
-            vertex_labels = [None] * self.vcount()
+            vertex_labels = [""] * self.vcount()
         else:
             vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", "label", kwds, self.vs, config, None)
         vertex_dists = drawing.collect_attributes(self.vcount(), "vertex_dist", "dist", kwds, self.vs, config, 1, float)
