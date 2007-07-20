@@ -31,6 +31,7 @@ from core import __version__, __build_date__
 from clustering import *
 from layout import *
 from drawing import *
+from colors import *
 from configuration import Configuration
 
 import os
@@ -1010,12 +1011,26 @@ class Graph(core.GraphBase):
         return (constructor, parameters, {})
 
 
-    def __plot__(self, context, bbox, *args, **kwds):
+    def __plot__(self, context, bbox, palette, *args, **kwds):
         """Plots the graph to the given Cairo context in the given bounding box
         
-        TODO: documentation of keyword arguments
+        Besides the usual self-explanatory plotting parameters (C{context},
+        C{bbox}, C{palette}), it accepts the following keyword arguments:
+        
+          * C{layout}: the layout to be used. If not an instance of
+            L{Layout}, it will be passed to L{Graph.layout} to calculate
+            the layout. Note that if you want a deterministic layout that
+            does not change with every plot, you must either use a deterministic
+            layout function (like L{Graph.layout_circle}) or calculate the
+            layout in advance and pass a L{Layout} object here.
+            
+          * C{margin}: the top, right, bottom, left margins as a 4-tuple.
+            If it has less than 4 elements or is a single float, the elements
+            will be re-used until the length is at least 4.
+            
+        TODO: vertex, edge parameters
         """
-        import drawing
+        import colors
         import cairo
 
         directed = self.is_directed()
@@ -1027,7 +1042,7 @@ class Graph(core.GraphBase):
         while len(margin)<4: margin.extend(margin)
         margin = tuple(map(float, margin[:4]))
 
-        vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", "color", kwds, self.vs, config, "red", drawing.color_to_rgb)
+        vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", "color", kwds, self.vs, config, "red", palette.get)
         vertex_sizes = drawing.collect_attributes(self.vcount(), "vertex_size", "size", kwds, self.vs, config, 10, float)
         max_vertex_size = max(vertex_sizes)
 
@@ -1046,7 +1061,7 @@ class Graph(core.GraphBase):
 
         context.set_line_width(1)
 
-        edge_colors = drawing.collect_attributes(self.ecount(), "edge_color", "color", kwds, self.es, config, "black", drawing.color_to_rgb)
+        edge_colors = drawing.collect_attributes(self.ecount(), "edge_color", "color", kwds, self.es, config, "black", palette.get)
         edge_widths = drawing.collect_attributes(self.ecount(), "edge_width", "width", kwds, self.es, config, 1, float)
 
         # Draw the edges

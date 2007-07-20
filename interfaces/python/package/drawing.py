@@ -34,9 +34,9 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 from warnings import warn
-from colors import known_colors
 import os
 import platform
+import colors
 import time
 
 __all__ = ["BoundingBox", "Plot", "plot"]
@@ -135,11 +135,16 @@ class Plot(object):
     which surface class will be used. Please note that not all surfaces might
     be available, depending on your C{pycairo} installation.
 
+    A C{Plot} has an assigned default palette (see L{colors.Palette}) which
+    is used for plottingo bjects.
+
     A C{Plot} object also has a list of objects to be plotted with their
-    respective bounding boxes. Objects can be added by the L{Plot.add} method.
+    respective bounding boxes, palettes and opacities. Palettes assigned
+    to an object override the default palette of the plot. Objects can be
+    added by the L{Plot.add} method and removed by the L{Plot.remove} method.
     """
     
-    def __init__(self, target=None, bbox=None):
+    def __init__(self, target=None, bbox=None, palette=None):
         """Creates a new plot.
 
         @param target: the target surface to write to. It can be one of the
@@ -157,6 +162,13 @@ class Plot(object):
           treat it as pixels. SVG surfaces will treat it as an abstract
           unit, but it will mostly be interpreted as pixels when viewing
           the SVG file in Firefox.
+
+        @param palette: the palette primarily used on the plot if the
+          added objects do not specify a private palette. Must be either
+          a L{colors.Palette} object or a string referring to a valid
+          key of C{colors.palettes} (see module L{colors}) or C{None}.
+          In the latter case, the default palette given by the configuration
+          key C{plotting.palette} is used.
         """
         self._filename=None
         self._surface_was_created=not isinstance(target, cairo.Surface)
@@ -167,6 +179,13 @@ class Plot(object):
 
         if bbox is None:
             bbox = BoundingBox(600, 600)
+
+        if palette is None:
+            from igraph import config
+            palette = config["plotting.palette"]
+        if not isinstance(palette, colors.Palette):
+            palette = colors.palettes[palette]
+        self._palette = palette
 
         if target is None:
             self._tmpfile=True
@@ -197,26 +216,31 @@ class Plot(object):
         self._objects = []
         self._is_dirty = False
 
-    def add(self, object, bbox=None, *args, **kwds):
+    def add(self, object, bbox=None, palette=None, opacity=1.0, *args, **kwds):
         """Adds an object to the plot.
 
-        Arguments not specified here are stored and passed to the object's plotting
-        function when necessary.
+        Arguments not specified here are stored and passed to the object's
+        plotting function when necessary. Since you are most likely interested
+        in the arguments acceptable by graphs, see L{Graph.__plot__} for more
+        details.
 
         @param object: the object to be added
         @param bbox: the bounding box of the object. If C{None}, the object
           will fill the entire area of the plot.
+        @param palette: the color palette used for drawing the object. If the
+          object tries to get a color assigned to a positive integer, it
+          will use this palette. If C{None}, defaults to the global palette
+          of the plot.
+        @param opacity: the opacity of the object being plotted, in the range
+          0.0-1.0
+
+        @see: Graph.__plot__
         """
-        opacity = 1.0
-        if "alpha" in kwds.keys():
-            opacity = kwds["alpha"]
-            del kwds["alpha"]
-        if "opacity" in kwds.keys():
-            opacity = kwds["opacity"]
-            del kwds["opacity"]
+        if opacity<0.0 or opacity>1.0:
+            raise ValueError, "opacity must be between 0.0 and 1.0"
         bbox = bbox or (0,0,self._width,self._height)
         if not isinstance(bbox, BoundingBox): bbox = BoundingBox(bbox)
-        self._objects.append((object, bbox, opacity, args, kwds))
+        self._objects.append((object, bbox, palette, opacity, args, kwds))
         self.mark_dirty()
 
     def remove(self, object, bbox=None, idx=1):
@@ -236,7 +260,7 @@ class Plot(object):
           C{False} if the object was not on the plot at all or M{idx}
           was larger than the count of occurrences
         """
-        for i, (o, b, _, _, _) in enumerate(self._objects):
+        for i, (o, b, _, _, _, _) in enumerate(self._objects):
             if o == object and (bbox is None or b == bbox):
                 idx -= 1
                 if idx == 0:
@@ -257,13 +281,14 @@ class Plot(object):
             ctx.rectangle(0, 0, self._width, self._height)
             ctx.fill()
 
-        for obj, bbox, opacity, args, kwds in self._objects:
+        for obj, bbox, palette, opacity, args, kwds in self._objects:
+            palette = palette or self._palette
             plotter = getattr(obj, "__plot__", None)
             if plotter is None:
                 warn("%s does not support plotting" % obj)
             else:
                 ctx.push_group()
-                plotter(ctx, bbox, *args, **kwds)
+                plotter(ctx, bbox, palette, *args, **kwds)
                 ctx.pop_group_to_source()
                 ctx.paint_with_alpha(opacity)
 
@@ -336,23 +361,37 @@ class Plot(object):
 def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     """Plots the given object to the given target.
 
+    Positional and keyword arguments not explicitly mentioned here will be
+    passed down to the C{__plot__} method of the object being plotted.
+    Since you are most likely interested in the keyword arguments available
+    for graph plots, see L{Graph.__plot__} as well.
+
     @param obj: the object to be plotted
     @param target: the target where the object should be plotted. It can be one
       of the following types:
       
         * C{None} -- an appropriate surface will be created and the object will
           be plotted there.
-        * C{cairo.Surface} -- the given Cairo surface will be used. This can refer
-          to a PNG image, an arbitrary window, an SVG file, anything that Cairo can
-          handle.
+        * C{cairo.Surface} -- the given Cairo surface will be used. This can
+          refer to a PNG image, an arbitrary window, an SVG file, anything that
+          Cairo can handle.
         * C{string} -- a file with the given name will be created and an
           appropriate Cairo surface will be attached to it.
           
-    @param bbox: the bounding box of the plot. It must be a tuple with four integers,
-      the first two denoting the X and Y coordinates of a corner and the latter two
-      denoting the X and Y coordinates of the opposite corner. Can also be a
-      L{BoundingBox} object.
+    @param bbox: the bounding box of the plot. It must be a tuple with four
+      integers, the first two denoting the X and Y coordinates of a corner
+      and the latter two denoting the X and Y coordinates of the opposite
+      corner. It can also be a L{BoundingBox} object.
+
+    @keyword opacity: the opacity of the object being plotted. It can be
+      used to overlap several plots of the same graph if you use the same
+      layout for them -- for instance, you might plot a graph with opacity
+      0.5 and then plot its spanning tree over it with opacity 0.1. To
+      achieve this, you'll need to modify the L{Plot} object returned with
+      L{Plot.add}.
     @return: an appropriate L{Plot} object.
+
+    @see: Graph.__plot__
     """
     if not isinstance(bbox, BoundingBox): bbox=BoundingBox(bbox)
     result = Plot(target, bbox)
@@ -360,82 +399,6 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     if target is None: result.show()
     if isinstance(target, basestring): result.save()
     return result
-
-
-def clamp(value, min, max):
-    """Clamps the given value between min and max"""
-    if value>max: return max
-    if value<min: return min
-    return value
-
-
-def color_to_rgb(color):
-    """Converts a color given in one of the supported color formats to R-G-B values.
-
-    Examples:
-
-      >>> color_to_rgb("red")
-      (1., 0., 0.)
-      >>> color_to_rgb("#ff8000")
-      (1., 0.50196078431372548, 0.)
-      >>> color_to_rgb("#08f")
-      (0., 0.53333333333333333, 1.)
-      >>> color_to_rgb("rgb(100%, 50%, 0%)")
-      (1., 0.5, 0.)
-
-    @param color: the color to be converted in one of the following formats:
-      - B{CSS color specification}: C{#rrggbb} or C{#rgb} or C{rgb(red, green, blue)}
-        where the red-green-blue components are given as hexadecimal numbers in the
-        first two cases and as decimals (in the range of 0-255) or percentages
-        (0-100) in the third case. Of course these are given as strings.
-      - B{Valid HTML color names}, i.e. those that are present in the HTML 4.0
-        specification
-      - B{Valid X11 color names}, see U{http://en.wikipedia.org/wiki/X11_color_names}
-      - B{Red-green-blue components} given separately in either a comma-, slash- or
-        whitespace-separated string or a list or a tuple, in the range of 0-255
-      - B{A single luminosity component} given either as a string or a number, in the
-        range of 0-255
-
-    @return: the R-G-B values corresponding to the given color in a 3-tuple. Since
-      these colors are primarily used by Cairo routines, the tuples contain floats
-      in the range 0.0-1.0
-    """
-    global known_colors
-
-    if not isinstance(color, basestring):
-        try:
-            components = [c/255. for c in color]
-        except TypeError:
-            # A single luminosity component is given as a number
-            components = [color/255.]*3
-    else:
-        if color[0] == '#':
-            color = color[1:]
-            if len(color) == 3:
-                components = [int(i, 16) * 17. / 255. for i in color]
-            elif len(color) == 6:
-                components = [int(color[(2*i):(2*i+2)], 16) / 255. for i in range(3)]
-        else:
-            if color.startswith("rgb(") and color[-1] == ")": color = color[4:-1]
-            if " " in color or "/" in color or "," in color:
-                color = color.replace(",", " ")
-                color = color.replace("/", " ")
-                components = color.split()
-                for idx, c in enumerate(components):
-                    if c[-1] == "%":
-                        components[idx] = float(c[:-1])/100.
-                    else:
-                        components[idx] = float(c)/255.
-            else:
-                try:
-                    luminosity = float(color)
-                    components = [luminosity/255.]*3
-                except ValueError:
-                    components = known_colors[color.lower()]
-
-    # At this point, the components are floats
-    return tuple([clamp(val, 0., 1.) for val in components])
-
 
 def collect_attributes(n, name, alt_name, kwds, vs, config, default, transform=None):
     """Collects graph visualization attributes from various sources.

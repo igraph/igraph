@@ -24,6 +24,183 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
+__all__ = ["Palette", "GradientPalette", "color_name_to_rgb", "palettes",
+    "known_colors"]
+
+class Palette(object):
+    """Base class of color palettes.
+
+    Color palettes are mappings that assign integers from the range
+    0..M{n-1} to colors (3-tuples). M{n} is called the size or length
+    of the palette. C{igraph} comes with a number of predefined palettes,
+    so this class is useful for you only if you want to define your
+    own palette. This can be done by subclassing this class and implementing
+    the L{Palette._get} method as necessary.
+
+    Palettes can also be used as lists or dicts, for the C{__getitem__}
+    method is overridden properly to call L{Palette.get}.
+    """
+    def __init__(self, n):
+        self._length = n
+        self._cache = {}
+
+    def _get_length(self): return self._length
+    length = property(_get_length, "the length of the palette")
+    def __len__(self): return self._length
+
+    def clear_cache(self):
+        """Clears the result cache.
+        
+        The return values of L{Palette.get} are cached. Use this method
+        to clear the cache.
+        """
+        self._cache = {}
+
+    def get(self, v):
+        """Returns the given color from the palette.
+
+        Values are cached: if the specific value given has already been
+        looked upon, its value will be returned from the cache instead of
+        calculating it again. Use L{Palette.clear_cache} to clear the cache
+        if necessary.
+
+        @note: you shouldn't override this method in subclasses, override
+          L{_get} instead. If you override this method, lookups in the
+          L{known_colors} dict won't work, so you won't be able to refer to
+          colors by names or RGB triplets, only by integer indices. The
+          caching functionality will disappear as well. However,
+          feel free to override this method if this is exactly the behaviour
+          you want.
+
+        @param v: the color to be retrieved. If it is an integer, it is
+          passed to L{Palette._get} to be translated to an RGB triplet.
+          Otherwise it is passed to L{color_to_rgb} to determine the
+          RGB values.
+
+        @return: the color as an RGB triplet"""
+        if v in self._cache: return self._cache[v] 
+        if isinstance(v, int) or isinstance(v, long):
+            if v<0: raise ValueError, "color index must be non-negative"
+            if v>=self._length: raise ValueError, "color index too large"
+            result=self._get(v)
+        else:
+            result=color_name_to_rgb(v)
+        self._cache[v]=result
+        return result
+
+    def _get(self, v):
+        """Override this method in a subclass to create a custom palette.
+
+        You can safely assume that v is an integer in the range 0..M{n-1}
+        where M{n} is the size of the palette.
+
+        @param v: numerical index of the color to be retrieved
+        @return: a 3-tuple containing the RGB values"""
+        raise ValueError, "abstract class"
+
+    __getitem__ = get
+
+
+class GradientPalette(Palette):
+    """Base class for gradient palettes
+
+    Gradient palettes contain a gradient between two given colors.
+    """
+    def __init__(self, color1, color2, n=256):
+        """Creates a gradient palette.
+
+        @param color1: the color where the gradient starts.
+        @param color2: the color where the gradient ends.
+        @param n: the number of colors in the palette.
+        """
+        Palette.__init__(self, n)
+        self._color1 = color_name_to_rgb(color1)
+        self._color2 = color_name_to_rgb(color2)
+
+    def _get(self, v):
+        ratio = float(v)/(len(self)-1)
+        return tuple([self._color1[x]*(1-ratio)+self._color2[x]*ratio for x in range(3)])
+
+def _clamp(value, min, max):
+    """Clamps the given value between min and max"""
+    if value>max: return max
+    if value<min: return min
+    return value
+
+def color_name_to_rgb(color, palette=None):
+    """Converts a color given in one of the supported color formats to R-G-B values.
+
+    Examples:
+
+      >>> color_name_to_rgb("red")
+      (1., 0., 0.)
+      >>> color_name_to_rgb("#ff8000")
+      (1., 0.50196078431372548, 0.)
+      >>> color_name_to_rgb("#08f")
+      (0., 0.53333333333333333, 1.)
+      >>> color_name_to_rgb("rgb(100%, 50%, 0%)")
+      (1., 0.5, 0.)
+
+    @param color: the color to be converted in one of the following formats:
+      - B{CSS color specification}: C{#rrggbb} or C{#rgb} or C{rgb(red, green, blue)}
+        where the red-green-blue components are given as hexadecimal numbers in the
+        first two cases and as decimals (in the range of 0-255) or percentages
+        (0-100) in the third case. Of course these are given as strings.
+      - B{Valid HTML color names}, i.e. those that are present in the HTML 4.0
+        specification
+      - B{Valid X11 color names}, see U{http://en.wikipedia.org/wiki/X11_color_names}
+      - B{Red-green-blue components} given separately in either a comma-, slash- or
+        whitespace-separated string or a list or a tuple, in the range of 0-255
+      - B{A single palette index} given either as a string or a number. Uses
+        the palette given in the C{palette} parameter of the method call.
+    @param palette: the palette to be used if a single number is passed to
+      the method. Must be an instance of L{colors.Palette}.
+
+    @return: the R-G-B values corresponding to the given color in a 3-tuple.
+      Since these colors are primarily used by Cairo routines, the tuples
+      contain floats in the range 0.0-1.0
+    """
+    global known_colors
+
+    if not isinstance(color, basestring):
+        try:
+            components = [c/255. for c in color]
+        except TypeError:
+            # A single index is given as a number
+            try:
+                components = palette.get(color)
+            except AttributeError:
+                raise ValueError, "palette index used when no palette was given"
+    else:
+        if color[0] == '#':
+            color = color[1:]
+            if len(color) == 3:
+                components = [int(i, 16) * 17. / 255. for i in color]
+            elif len(color) == 6:
+                components = [int(color[(2*i):(2*i+2)], 16) / 255. for i in range(3)]
+        else:
+            if color.startswith("rgb(") and color[-1] == ")": color = color[4:-1]
+            if " " in color or "/" in color or "," in color:
+                color = color.replace(",", " ")
+                color = color.replace("/", " ")
+                components = color.split()
+                for idx, c in enumerate(components):
+                    if c[-1] == "%":
+                        components[idx] = float(c[:-1])/100.
+                    else:
+                        components[idx] = float(c)/255.
+            else:
+                try:
+                    components = palette.get(int(color))
+                except ValueError:
+                    components = known_colors[color.lower()]
+                except AttributeError:
+                    components = known_colors[color.lower()]
+
+    # At this point, the components are floats
+    return tuple([_clamp(val, 0., 1.) for val in components])
+
+
 known_colors = \
 {   'alice blue': (0.94117647058823528, 0.97254901960784312, 1.0),
     'aliceblue': (0.94117647058823528, 0.97254901960784312, 1.0),
@@ -1331,3 +1508,10 @@ known_colors = \
     'yellowgreen': (   0.60392156862745094,
                        0.80392156862745101,
                        0.19607843137254902)}
+
+palettes = {
+    "gray": GradientPalette("black", "white"),
+    "red-blue": GradientPalette("red", "blue")
+}
+
+
