@@ -66,7 +66,7 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4, merges=T
   }
 
   if (!is.null(weights)) {
-    weight <- as.numeric(weight)
+    weights <- as.numeric(weights)
   }
 
   res <- .Call("R_igraph_walktrap_community", graph, weights, as.numeric(steps),
