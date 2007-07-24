@@ -77,13 +77,16 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t ptr;
   long int i, midx=0;
+  igraph_integer_t no_comps;
+  
+  IGRAPH_CHECK(igraph_clusters(graph, 0, 0, &no_comps, IGRAPH_WEAK));
   
   IGRAPH_VECTOR_INIT_FINALLY(&ptr, no_of_nodes*2-1);
   if (res) { 
-    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes-1, 2));
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes-no_comps, 2));
   }
   if (bridges) {
-    IGRAPH_CHECK(igraph_vector_resize(bridges, no_of_nodes-1));
+    IGRAPH_CHECK(igraph_vector_resize(bridges, no_of_nodes-no_comps));
   }
   
   for (i=igraph_vector_size(edges)-1; i>=0; i--) {

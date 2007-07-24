@@ -1,3 +1,8 @@
+2007-07-24  Gabor Csardi  <csardi@localhost.localdomain>
+
+	* src/community.c (igraph_community_edge_betweenness) : handle
+	unconnected input graphs properly
+
 2007-07-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/community.c (igraph_community_edge_betweenness) : FINALLY
