@@ -418,6 +418,34 @@ class RectangleDrawer(ShapeDrawer):
         ctx.rectangle(cx-w/2., cy-h/2., w, h)
     draw_path=staticmethod(draw_path)
 
+    def intersection_point(cx, cy, sx, sy, w, h=None):
+        h = h or w
+        dx, dy = cx-sx, cy-sy
+        if dx == 0 and dy == 0: return cx, cy
+        if dy>0 and dx<=dy and dx>=-dy: # top edge
+            ry = cy - h/2.
+            ratio = (h/2.) / dy
+            return cx-ratio*dx, ry
+        if dy<0 and dx<=-dy and dx>=dy: # bottom edge
+            ry = cy + h/2.
+            ratio = (h/2.) / -dy
+            return cx-ratio*dx, ry
+        if dx>0 and dy<=dx and dy>=-dx: # left edge
+            rx = cx - w/2.
+            ratio = (w/2.) / dx
+            return rx, cy-ratio*dy
+        if dx<0 and dy<=-dx and dy>=dx: # right edge
+            rx = cx + w/2.
+            ratio = (w/2.) / -dx
+            return rx, cy-ratio*dy
+        if dx == 0:
+            if dy>0: return cx, cy - h/2.
+            return cx, cy + h/2.
+        if dy == 0:
+            if dx>0: return cx - w/2., cy
+            return cx + w/2., cy
+    intersection_point=staticmethod(intersection_point)
+
 
 class CircleDrawer(ShapeDrawer):
     """Static class which draws circular vertices"""

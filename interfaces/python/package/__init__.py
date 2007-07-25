@@ -1086,7 +1086,9 @@ class Graph(core.GraphBase):
                 context.arc(cx, cy, r/2., 0, math.pi*2)
             else:
                 # Determine where the edge intersects the circumference of the
-                # vertex shape
+                # vertex shape. TODO: theoretically this need not to be done
+                # if there are no arrowheads on the edge, but maybe it's not worth
+                # testing for
                 p1 = vertex_shapes[src].intersection_point( \
                     layout[src][0], layout[src][1], layout[tgt][0], layout[tgt][1],
                     vertex_sizes[src])
@@ -1104,10 +1106,10 @@ class Graph(core.GraphBase):
                   p2[1]-15*math.sin(angle-math.pi/10.))
                 a2 = (p2[0]-15*math.cos(angle+math.pi/10.),
                   p2[1]-15*math.sin(angle+math.pi/10.))
-                context.move_to(*layout[tgt])
+                context.move_to(*p2)
                 context.line_to(*a1)
                 context.line_to(*a2)
-                context.line_to(*layout[tgt])
+                context.line_to(*p2)
                 context.fill()
 
         del edge_colors
