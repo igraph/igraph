@@ -78,6 +78,7 @@ class Palette(object):
           RGB values.
 
         @return: the color as an RGB triplet"""
+        if isinstance(v, list): v=tuple(v)
         if v in self._cache: return self._cache[v] 
         if isinstance(v, int) or isinstance(v, long):
             if v<0: raise ValueError, "color index must be non-negative"

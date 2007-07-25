@@ -1042,8 +1042,14 @@ class Graph(core.GraphBase):
         while len(margin)<4: margin.extend(margin)
         margin = tuple(map(float, margin[:4]))
 
-        vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", "color", kwds, self.vs, config, "red", palette.get)
-        vertex_sizes = drawing.collect_attributes(self.vcount(), "vertex_size", "size", kwds, self.vs, config, 10, float)
+        vertex_colors = drawing.collect_attributes(self.vcount(), "vertex_color", \
+            "color", kwds, self.vs, config, "red", palette.get)
+        vertex_sizes = drawing.collect_attributes(self.vcount(), "vertex_size", \
+            "size", kwds, self.vs, config, 10, float)
+        vertex_shapes = [drawing.known_shapes.get(x, drawing.NullDrawer) \
+            for x in drawing.collect_attributes(self.vcount(), "vertex_shape", \
+            "shape", kwds, self.vs, config, "circle")]
+
         max_vertex_size = max(vertex_sizes)
 
         layout = kwds.get("layout", None)
@@ -1061,8 +1067,10 @@ class Graph(core.GraphBase):
 
         context.set_line_width(1)
 
-        edge_colors = drawing.collect_attributes(self.ecount(), "edge_color", "color", kwds, self.es, config, "black", palette.get)
-        edge_widths = drawing.collect_attributes(self.ecount(), "edge_width", "width", kwds, self.es, config, 1, float)
+        edge_colors = drawing.collect_attributes(self.ecount(), "edge_color", \
+            "color", kwds, self.es, config, "black", palette.get)
+        edge_widths = drawing.collect_attributes(self.ecount(), "edge_width", \
+            "width", kwds, self.es, config, 1, float)
 
         # Draw the edges
         for idx, e in enumerate(self.es):
@@ -1077,33 +1085,44 @@ class Graph(core.GraphBase):
                   layout[src][1]-math.sin(math.pi/4)*r/2
                 context.arc(cx, cy, r/2., 0, math.pi*2)
             else:
-                context.move_to(*layout[src])
-                context.line_to(*layout[tgt])
+                # Determine where the edge intersects the circumference of the
+                # vertex shape
+                p1 = vertex_shapes[src].intersection_point( \
+                    layout[src][0], layout[src][1], layout[tgt][0], layout[tgt][1],
+                    vertex_sizes[src])
+                p2 = vertex_shapes[tgt].intersection_point( \
+                    layout[tgt][0], layout[tgt][1], layout[src][0], layout[src][1],
+                    vertex_sizes[tgt])
+                context.move_to(*p1)
+                context.line_to(*p2)
             context.stroke()
 
             if directed and src != tgt:
                 # Draw an arrowhead
-                angle = math.atan2(layout[tgt][1]-layout[src][1],
-                    layout[tgt][0]-layout[src][0])
-                a1 = (layout[tgt][0]-15*math.cos(angle-math.pi/10.),
-                  layout[tgt][1]-15*math.sin(angle-math.pi/10.))
-                a2 = (layout[tgt][0]-15*math.cos(angle+math.pi/10.),
-                  layout[tgt][1]-15*math.sin(angle+math.pi/10.))
+                angle = math.atan2(p2[1]-p1[1], p2[0]-p1[0])
+                a1 = (p2[0]-15*math.cos(angle-math.pi/10.),
+                  p2[1]-15*math.sin(angle-math.pi/10.))
+                a2 = (p2[0]-15*math.cos(angle+math.pi/10.),
+                  p2[1]-15*math.sin(angle+math.pi/10.))
                 context.move_to(*layout[tgt])
                 context.line_to(*a1)
                 context.line_to(*a2)
                 context.line_to(*layout[tgt])
                 context.fill()
 
+        del edge_colors
+        del edge_widths
+
         # Draw the vertices
         context.set_line_width(1)
         for idx, v in enumerate(self.vs):
-            context.arc(layout[idx][0], layout[idx][1], vertex_sizes[idx]/2., 0, 2*math.pi)
+            vertex_shapes[idx].draw_path(context, layout[idx][0], layout[idx][1], vertex_sizes[idx])
             context.set_source_rgb(*vertex_colors[idx])
             context.fill_preserve()
             context.set_source_rgb(0., 0., 0.)
             context.stroke()
         del vertex_colors
+        del vertex_shapes
 
         # Draw the vertex labels
         if not kwds.has_key("vertex_label") and "label" not in self.vs.attributes():
@@ -1111,10 +1130,16 @@ class Graph(core.GraphBase):
         elif kwds.has_key("vertex_label") and kwds["vertex_label"] is None:
             vertex_labels = [""] * self.vcount()
         else:
-            vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", "label", kwds, self.vs, config, None)
-        vertex_dists = drawing.collect_attributes(self.vcount(), "vertex_dist", "dist", kwds, self.vs, config, 1, float)
-        vertex_degrees = drawing.collect_attributes(self.vcount(), "vertex_degree", "degree", kwds, self.vs, config, -math.pi/4, float)
-        context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+            vertex_labels = drawing.collect_attributes(self.vcount(), "vertex_label", \
+                "label", kwds, self.vs, config, None)
+        vertex_dists = drawing.collect_attributes(self.vcount(), "vertex_label_dist", \
+            "label_dist", kwds, self.vs, config, 1, float)
+        vertex_degrees = drawing.collect_attributes(self.vcount(), \
+            "vertex_label_angle", "label_angle", kwds, self.vs, config, \
+            -math.pi/4, float)
+
+        context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
+            cairo.FONT_WEIGHT_BOLD)
         context.set_font_size(14)
 
         for idx, v in enumerate(self.vs):
@@ -1126,8 +1151,6 @@ class Graph(core.GraphBase):
             cy -= h/2. + yb
             context.move_to(cx, cy)
             context.show_text(vertex_labels[idx])
-
-        return
 
     def summary(self, verbosity=0):
         """Returns basic statistics about the graph in a string

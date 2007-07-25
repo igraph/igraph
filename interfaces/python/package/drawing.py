@@ -38,6 +38,7 @@ import os
 import platform
 import colors
 import time
+import math
 
 __all__ = ["BoundingBox", "Plot", "plot"]
 
@@ -357,6 +358,120 @@ class Plot(object):
                 time.sleep(5)
         self._close_tmpfile()
 
+#####################################################################
+
+class ShapeDrawer(object):
+    """Static class, the ancestor of all vertex shape drawer classes.
+    
+    Custom shapes must implement at least the C{draw_path} method of the class.
+    The method I{must not} stroke or fill, it should just set up the current
+    Cairo path appropriately."""
+    
+    def draw_path(ctx, cx, cy, w, h=None):
+        """Draws the path of the shape on the given Cairo context, without stroking
+        or filling it.
+
+        This method must be overridden in derived classes implementing custom shapes
+        and declared as a static method using C{staticmethod(...)}.
+
+        @param ctx: the context to draw on
+        @param cx: the X coordinate of the center of the object
+        @param cy: the Y coordinate of the center of the object
+        @param w: the width of the object
+        @param h: the height of the object. If C{None}, equals to the width.
+        """
+        raise TypeError, "abstract class"
+    draw_path=staticmethod(draw_path)
+
+
+    def intersection_point(cx, cy, sx, sy, w, h=None):
+        """Determines where the shape centered at (cx, cy) intersects with a
+        line drawn from (sx, sy) to (cx, cy).
+
+        Can be overridden in derived classes. Must always be defined as a static
+        method using C{staticmethod(...)}
+
+        @param w: the width of the shape
+        @param h: the height of the shape. If C{None}, defaults to the width
+        @return: the intersection point (the closest to (sx, sy) if there are
+            more than one) or (cx, cy) if there is no intersection
+        """
+        return cx, cy
+    intersection_point=staticmethod(intersection_point)
+
+class NullDrawer(ShapeDrawer):
+    """Static drawer class which draws nothing.
+
+    This class is used for graph vertices with unknown shapes"""
+    def draw_path(ctx, cx, cy, w, h=None): pass
+    draw_path=staticmethod(draw_path)
+
+
+class RectangleDrawer(ShapeDrawer):
+    """Static class which draws rectangular vertices"""
+
+    def draw_path(ctx, cx, cy, w, h=None):
+        """Draws a rectangle-shaped path on the Cairo context without stroking or
+        filling it.
+        @see: ShapeDrawer.draw_path"""
+        h = h or w
+        ctx.rectangle(cx-w/2., cy-h/2., w, h)
+    draw_path=staticmethod(draw_path)
+
+
+class CircleDrawer(ShapeDrawer):
+    """Static class which draws circular vertices"""
+    
+    def draw_path(ctx, cx, cy, w, h=None):
+        """Draws a circular path on the Cairo context without stroking or filling.
+
+        Height is ignored, it is the width that determines the diameter of the circle.
+
+        @see ShapeDrawer.draw_path"""
+        ctx.arc(cx, cy, w/2., 0, 2*math.pi)
+    draw_path=staticmethod(draw_path)
+
+    def intersection_point(cx, cy, sx, sy, w, h=None):
+        h = h or w
+        angle = math.atan2(cy-sy, cx-sx)
+        return cx-w/2.*math.cos(angle), cy-h/2.*math.sin(angle)
+    intersection_point=staticmethod(intersection_point)
+
+
+def draw_shape_path(shape, ctx, cx, cy, w, h=None):
+    """Draws a path of a shape on the given Cairo context.
+
+    @param shape: the shape to be drawn
+    @param ctx: the context to draw on
+    @param cx: X coordinate of the center of the shape
+    @param cy: Y coordinate of the center of the shape
+    @param w: desired width of the shape
+    @param h: desired height of the shape. If omitted, defaults to the width.
+    """
+    global known_shapes
+    try:
+        drawer = known_shapes[shape]
+    except:
+        raise ValueError, "unknown shape: %s" % shape
+    drawer.draw_path(ctx, cx, cy, w, h)
+
+known_shapes = {
+    "rectangle": RectangleDrawer,
+    "rect": RectangleDrawer,
+    "rectangular": RectangleDrawer,
+    "square": RectangleDrawer,
+    "box": RectangleDrawer,
+
+    "circle": CircleDrawer,
+    "circular": CircleDrawer,
+
+    "null": NullDrawer,
+    "": NullDrawer,
+    "empty": NullDrawer,
+    "hidden": NullDrawer,
+}
+
+#####################################################################
 
 def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     """Plots the given object to the given target.
@@ -400,6 +515,8 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     if isinstance(target, basestring): result.save()
     return result
 
+#####################################################################
+
 def collect_attributes(n, name, alt_name, kwds, vs, config, default, transform=None):
     """Collects graph visualization attributes from various sources.
 
@@ -439,7 +556,8 @@ def collect_attributes(n, name, alt_name, kwds, vs, config, default, transform=N
         m = len(result)
     except TypeError:
         result = [result] * n
-    
+
+    if not hasattr(result, "extend"): result = [result]
     m = len(result)
     while len(result) < n:
         if len(result) <= n/2:
