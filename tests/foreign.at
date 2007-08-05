@@ -60,3 +60,9 @@ AT_SETUP([Reading a GML file (igraph_read_graph_gml):])
 AT_KEYWORDS([igraph_read_graph_gml foreign GML])
 AT_COMPILE_CHECK([simple/gml.c], [simple/gml.out], [simple/karate.gml])
 AT_CLEANUP
+
+AT_SETUP([Writing a DOT file (igraph_write_graph_dot):])
+AT_KEYWORDS([igraph_write_graph_dot foreign DOT GraphViz])
+AT_COMPILE_CHECK([simple/dot.c], [simple/dot.out], [simple/karate.gml])
+AT_CLEANUP
+

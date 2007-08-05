@@ -2423,4 +2423,59 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
   return 0;
 }
 
+/**
+ * \function igraph_write_graph_dot
+ * \brief Write the graph to a stream in DOT format
+ *
+ * DOT is the format used by the widely known GraphViz software, see
+ * http://www.graphviz.org for details. The grammar of the DOT format
+ * can be found here: http://www.graphviz.org/doc/info/lang.html
+ *
+ * </para><para>This is only a preliminary implementation, only the vertices
+ * and the edges are written but not the attributes or any visualization
+ * information.
+ *
+ * \param graph The graph to write to the stream.
+ * \param outstream The stream to write the file to.
+ *
+ * Time complexity: should be proportional to the number of characters written
+ * to the file.
+ * 
+ * \sa \ref igraph_write_graph_graphml() for a more modern format.
+ */
+int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
+  int ret;
+  long int i;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  char edgeop[3];
+
+  CHECK(fprintf(outstream, "/* Created by igraph %s */\n",
+	IGRAPH_VERSION_STRING));
+
+  if (igraph_is_directed(graph)) {
+	CHECK(fprintf(outstream, "digraph {\n"));
+	strcpy(edgeop, "->");
+  } else {
+	CHECK(fprintf(outstream, "graph {\n"));
+	strcpy(edgeop, "--");
+  }
+
+  /* Write the nodes */
+  for (i=0; i<no_of_nodes; i++) {
+	CHECK(fprintf(outstream, "  %ld;\n", i));
+  }
+  CHECK(fprintf(outstream, "\n"));
+
+  /* Write the edges */
+  for (i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+	CHECK(fprintf(outstream, "  %ld %s %ld;\n", from, edgeop, to));
+  }
+
+  CHECK(fprintf(outstream, "}\n"));
+  return 0;
+}
+
 #undef CHECK
