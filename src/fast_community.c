@@ -269,6 +269,8 @@ void igraph_i_fastgreedy_community_list_remove2(
   if (idx == list->no_of_communities-1) {
     /* We removed the rightmost element on the bottom level, no problem,
      * there's nothing to be done */
+    list->heapindex[comm] = -1;
+    list->no_of_communities--;
     return;
   }
 

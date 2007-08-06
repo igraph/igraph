@@ -96,8 +96,11 @@ for i in *.c; do
       echo -n "compiled... "
       LOG=../../valgrind-logs/`basename ${current} .c`.log
       LD_LIBRARY_PATH=../../src/.libs valgrind --tool=memcheck --error-exitcode=63 --leak-check=yes --log-file-exactly=${LOG} ./a.out >/dev/null
-      if [ $? -eq 63 ]; then
+      ERRCODE=$?
+      if [ $ERRCODE -eq 63 ]; then
         echo "executed, memory access problems found!"
+      elif [ $ERRCODE -ne 0 ]; then
+        echo "test case failed, error code: $ERRCODE!"
       elif [ `cat $LOG | grep -c 'no leaks are possible'` -ne 1 ]; then
         if [ `cat $LOG | grep -c 'lost: 0 bytes'` -lt 2 ]; then
 	  echo "executed, leaks found!"
