@@ -764,7 +764,7 @@ class Graph(core.GraphBase):
         
         if ext in [".graphml", ".graphmlz", ".lgl", ".ncol", ".pajek",
             ".gml", ".dimacs", ".edgelist", ".edges", ".edge", ".net",
-            ".pickle"]:
+            ".pickle", ".dot"]:
             return ext[1:]
 
         if ext == ".txt" or ext == ".dat":
@@ -810,9 +810,8 @@ class Graph(core.GraphBase):
           (NCOL format), C{"lgl"} (LGL format), C{"graphml"}, C{"graphmlz"}
           (GraphML and gzipped GraphML format), C{"gml"} (GML format),
           C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
-          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list),
-          C{"adjacency"} (adjacency matrix), C{"pickle"} (Python pickled
-          format).
+          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
+          (adjacency matrix), C{"pickle"} (Python pickled format).
         @raises IOError: if the file format can't be identified and
           none was given.
         """
@@ -845,10 +844,11 @@ class Graph(core.GraphBase):
           is a stream). C{None} means auto-detection. Possible values are: C{"ncol"}
           (NCOL format), C{"lgl"} (LGL format), C{"graphml"}, C{"graphmlz"}
           (GraphML and gzipped GraphML format), C{"gml"} (GML format),
-          C{"net"}, C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
-          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list),
-          C{"adjacency"} (adjacency matrix), C{"pickle"} (Python pickled
-          format), C{"svg"} (Scalable Vector Graphics).
+          C{"dot"}, C{"graphviz"} (DOT format, used by GraphViz), C{"net"},
+          C{"pajek"} (Pajek format), C{"dimacs"} (DIMACS format),
+          C{"edgelist"}, C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
+          (adjacency matrix), C{"pickle"} (Python pickled format),
+          C{"svg"} (Scalable Vector Graphics).
         @raises IOError: if the file format can't be identified and
           none was given.
         """
@@ -1196,6 +1196,8 @@ class Graph(core.GraphBase):
           "graphmlz":   ("Read_GraphMLz", "write_graphmlz"),
           "graphml":    ("Read_GraphML", "write_graphml"),
           "gml":        ("Read_GML", "write_gml"),
+          "dot":		(None, "write_dot"),
+          "graphviz":	(None, "write_dot"),
           "net":        ("Read_Pajek", None),
           "pajek":      ("Read_Pajek", None),
           "dimacs":     ("Read_DIMACS", "write_dimacs"),

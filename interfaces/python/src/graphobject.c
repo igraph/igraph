@@ -3808,7 +3808,7 @@ PyObject *igraphmodule_Graph_Read_Pajek(PyTypeObject * type, PyObject * args,
 /** \ingroup python_interface_graph
  * \brief Reads a GML file and creates a graph from it.
  * \return the graph
- * \sa igraph_read_graph_ghml
+ * \sa igraph_read_graph_gml
  */
 PyObject *igraphmodule_Graph_Read_GML(PyTypeObject * type,
                                       PyObject * args, PyObject * kwds)
@@ -3940,6 +3940,37 @@ PyObject *igraphmodule_Graph_write_dimacs(igraphmodule_GraphObject * self,
   if (capacity_obj_created) {
     Py_DECREF(capacity_obj);
   }
+
+  Py_RETURN_NONE;
+}
+
+
+/** \ingroup python_interface_graph
+ * \brief Writes the graph as a DOT (GraphViz) file
+ * \return none
+ * \sa igraph_write_graph_dot
+ */
+PyObject *igraphmodule_Graph_write_dot(igraphmodule_GraphObject * self,
+  PyObject * args, PyObject * kwds) {
+  char *fname = NULL;
+  FILE *f;
+  static char *kwlist[] = { "f", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+    return NULL;
+
+  f = fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+
+  if (igraph_write_graph_dot(&self->g, f)) {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  fclose(f);
 
   Py_RETURN_NONE;
 }
@@ -6616,7 +6647,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Read_Pajek(f)\n\n"
    "Reads a Pajek format file and creates a graph based on it.\n\n"
    "@param f: the name of the file\n"},
-  // interface to igraph_write_graph_dimacs
+  /* interface to igraph_write_graph_dimacs */
   {"write_dimacs", (PyCFunction) igraphmodule_Graph_write_dimacs,
    METH_VARARGS | METH_KEYWORDS,
    "write_dimacs(f, source, target, capacity=None)\n\n"
@@ -6627,7 +6658,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param capacity: the capacities of the edges in a list. If it is not a\n"
    "  list, the corresponding edge attribute will be used to retrieve\n"
    "  capacities."},
-  // interface to igraph_write_graph_edgelist
+  /* interface to igraph_write_graph_dot */
+  {"write_dot", (PyCFunction) igraphmodule_Graph_write_dot,
+   METH_VARARGS | METH_KEYWORDS,
+   "write_dot(f)\n\n"
+   "Writes the graph in DOT format to the given file.\n\n"
+   "DOT is the format used by the U{GraphViz <http://www.graphviz.org>}\n"
+   "software package.\n\n"
+   "@param f: the name of the file to be written\n"
+   },
+  /* interface to igraph_write_graph_edgelist */
   {"write_edgelist", (PyCFunction) igraphmodule_Graph_write_edgelist,
    METH_VARARGS | METH_KEYWORDS,
    "write_edgelist(f)\n\n"
