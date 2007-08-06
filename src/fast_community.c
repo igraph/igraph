@@ -834,7 +834,10 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   }
   igraph_progress("fast greedy community detection", 100.0, 0);
 
-  if (modularity) VECTOR(*modularity)[no_of_joins] = q;
+  if (modularity) {
+	VECTOR(*modularity)[no_of_joins] = q;
+	igraph_vector_resize(modularity, no_of_joins+1);
+  }
 
   debug("Freeing memory\n");
   free(pairs);

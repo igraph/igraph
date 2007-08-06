@@ -90,6 +90,14 @@ int main() {
   show_results(&g, &modularity, &merges, stdout); 
   igraph_destroy(&g);
 
+  /* Disjoint union of two rings */
+  igraph_small(&g, 20, IGRAPH_UNDIRECTED,
+           0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,0,
+		   10,11,11,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,19,0,-1);
+  igraph_community_fastgreedy(&g, &merges, &modularity);
+  show_results(&g, &modularity, &merges, stdout);
+  igraph_destroy(&g);
+
   igraph_vector_destroy(&modularity);
   igraph_matrix_destroy(&merges);
   
