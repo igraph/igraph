@@ -69,16 +69,6 @@ typedef struct igraph_i_graphml_attribute_record_t {
   igraph_i_attribute_record_t record;
 } igraph_i_graphml_attribute_record_t;
 
-int igraph_i_libxml2_read_callback(void *instream, char* buffer, int len) {
-  int res;  
-  res=fread(buffer, 1, len, (FILE*)instream);
-  if (res) return res;
-  if (feof((FILE*)instream)) return 0;
-  return -1;
-}
-
-int igraph_i_libxml2_close_callback(void *instream) { return 0; }
-
 struct igraph_i_graphml_parser_state {
   enum { START, INSIDE_GRAPHML, INSIDE_GRAPH, INSIDE_NODE, INSIDE_EDGE,
       INSIDE_KEY, INSIDE_DEFAULT, INSIDE_DATA, FINISH, UNKNOWN, ERROR } st;
@@ -965,10 +955,16 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
   // Create a progressive parser context
   state.g=graph;
   state.index=index<0?0:index;
-  ctxt=xmlCreateIOParserCtxt(&igraph_i_graphml_sax_handler, &state,
-			     igraph_i_libxml2_read_callback,
-			     igraph_i_libxml2_close_callback,
-			     instream, XML_CHAR_ENCODING_NONE);
+  res=fread(buffer, 1, 4096, instream);
+  ctxt=xmlCreatePushParserCtxt(&igraph_i_graphml_sax_handler,
+			       &state,
+			       buffer,
+			       res,
+			       NULL);
+/*   ctxt=xmlCreateIOParserCtxt(&igraph_i_graphml_sax_handler, &state, */
+/* 			     igraph_i_libxml2_read_callback, */
+/* 			     igraph_i_libxml2_close_callback, */
+/* 			     instream, XML_CHAR_ENCODING_NONE); */
   if (ctxt==NULL)
     IGRAPH_ERROR("Can't create progressive parser context", IGRAPH_PARSEERROR);
 

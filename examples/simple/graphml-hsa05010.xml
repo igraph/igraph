@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Created by igraph -->
+  <key id="organism" for="graph" attr.name="organism" attr.type="string"/>
+  <key id="pathway_number" for="graph" attr.name="pathway_number" attr.type="string"/>
+  <key id="title" for="graph" attr.name="title" attr.type="string"/>
+  <key id="type" for="node" attr.name="type" attr.type="string"/>
+  <key id="pathway_id" for="node" attr.name="pathway_id" attr.type="string"/>
+  <key id="name" for="node" attr.name="name" attr.type="string"/>
+  <key id="title" for="node" attr.name="title" attr.type="string"/>
+  <key id="uniprot" for="node" attr.name="uniprot" attr.type="string"/>
+  <key id="gene" for="node" attr.name="gene" attr.type="string"/>
+  <key id="GO" for="node" attr.name="GO" attr.type="string"/>
+  <key id="sim_BP_resnik" for="edge" attr.name="sim_BP_resnik" attr.type="double"/>
+  <key id="sim_BP_lin" for="edge" attr.name="sim_BP_lin" attr.type="double"/>
+  <key id="sim_BP_jiang" for="edge" attr.name="sim_BP_jiang" attr.type="double"/>
+  <key id="sim_BP_rel" for="edge" attr.name="sim_BP_rel" attr.type="double"/>
+  <key id="sim_CC_resnik" for="edge" attr.name="sim_CC_resnik" attr.type="double"/>
+  <key id="sim_CC_lin" for="edge" attr.name="sim_CC_lin" attr.type="double"/>
+  <key id="sim_CC_jiang" for="edge" attr.name="sim_CC_jiang" attr.type="double"/>
+  <key id="sim_CC_rel" for="edge" attr.name="sim_CC_rel" attr.type="double"/>
+  <key id="sim_MF_resnik" for="edge" attr.name="sim_MF_resnik" attr.type="double"/>
+  <key id="sim_MF_lin" for="edge" attr.name="sim_MF_lin" attr.type="double"/>
+  <key id="sim_MF_jiang" for="edge" attr.name="sim_MF_jiang" attr.type="double"/>
+  <key id="sim_MF_rel" for="edge" attr.name="sim_MF_rel" attr.type="double"/>
+  <graph id="G" edgedefault="directed">
+    <data key="organism">hsa</data>
+    <data key="pathway_number">05010</data>
+    <node id="n0">
+      <data key="type">compound</data>
+      <data key="pathway_id">1</data>
+      <data key="name">cpd:C00027</data>
+      <data key="title">C00027</data>
+      <data key="uniprot"></data>
+      <data key="gene"></data>
+      <data key="GO"></data>
+    </node>
+    <node id="n1">
+      <data key="type">compound</data>
+      <data key="pathway_id">2</data>
+      <data key="name">cpd:C00070</data>
+      <data key="title">C00070...</data>
+      <data key="uniprot"></data>
+      <data key="gene"></data>
+      <data key="GO"></data>
+    </node>
+    <node id="n2">
+      <data key="type">compound</data>
+      <data key="pathway_id">2</data>
+      <data key="name">cpd:C14818</data>
+      <data key="title">C00070...</data>
+      <data key="uniprot"></data>
+      <data key="gene"></data>
+      <data key="GO"></data>
+    </node>
+    <node id="n3">
+      <data key="type">gene</data>
+      <data key="pathway_id">4</data>
+      <data key="name">hsa:51107</data>
+      <data key="title">APH1A</data>
+      <data key="uniprot">Q96BI3</data>
+      <data key="gene">APH1A</data>
+      <data key="GO">GO:0005515,GO:0016021,GO:0016485,GO:0043085</data>
+    </node>
+    <node id="n4">
+      <data key="type">gene</data>
+      <data key="pathway_id">6</data>
+      <data key="name">hsa:4311</data>
+      <data key="title">MME</data>
+      <data key="uniprot">P08473</data>
+      <data key="gene">MME</data>
+      <data key="GO">GO:0004245,GO:0016021,GO:0016787,GO:0008237,GO:0007267,GO:0006508,GO:0005887,GO:0005886,GO:0016020</data>
+    </node>
+    <node id="n5">
+      <data key="type">gene</data>
+      <data key="pathway_id">7</data>
+      <data key="name">hsa:2932</data>
+      <data key="title">GSK3B</data>
+      <data key="uniprot">P49841</data>
+      <data key="gene">GSK3B</data>
+      <data key="GO">GO:0016301,GO:0016740,GO:0005977,GO:0004696,GO:0005524,GO:0004674,GO:0006468,GO:0004672</data>
+    </node>
+    <node id="n6">
+      <data key="type">gene</data>
+      <data key="pathway_id">8</data>
+      <data key="name">hsa:4137</data>
+      <data key="title">MAPT</data>
+      <data key="uniprot"></data>
+      <data key="gene"></data>
+      <data key="GO"></data>
+    </node>
+    <node id="n7">
+      <data key="type">gene</data>
+      <data key="pathway_id">9</data>
+      <data key="name">hsa:836</data>
+      <data key="title">CASP3</data>
+      <data key="uniprot">P42574</data>
+      <data key="gene">CASP3</data>
+      <data key="GO">GO:0016787,GO:0008233,GO:0006917,GO:0030693,GO:0008234,GO:0006915,GO:0006508</data>
+    </node>
+    <node id="n8">
+      <data key="type">gene</data>
+      <data key="pathway_id">11</data>
+      <data key="name">hsa:840</data>
+      <data key="title">CASP7</data>
+      <data key="uniprot">P55210</data>
+      <data key="gene">CASP7</data>
+      <data key="GO">GO:0008233,GO:0016787,GO:0008632,GO:0008234,GO:0006915,GO:0005737,GO:0006508</data>
+    </node>
+    <node id="n9">
+      <data key="type">gene</data>
+      <data key="pathway_id">12</data>
+      <data key="name">hsa:55851</data>
+      <data key="title">PSENEN</data>
+      <data key="uniprot">Q9NZ42</data>
+      <data key="gene">PEN2</data>
+      <data key="GO"></data>
+    </node>
+    <node id="n10">
+      <data key="type">gene</data>
+      <data key="pathway_id">13</data>
+      <data key="name">hsa:6622</data>
+      <data key="title">SNCA</data>
+      <data key="uniprot">P37840</data>
+      <data key="gene">SNCA</data>
+      <data key="GO">GO:0005737,GO:0007417,GO:0006916</data>
+    </node>
+    <node id="n11">
+      <data key="type">gene</data>
+      <data key="pathway_id">14</data>
+      <data key="name">hsa:5663</data>
+      <data key="title">PSEN1...</data>
+      <data key="uniprot">P49768</data>
+      <data key="gene"></data>
+      <data key="GO">GO:0016021,GO:0007059,GO:0007001,GO:0006916,GO:0000776,GO:0000775,GO:0005639,GO:0005624,GO:0005783,GO:0007242</data>
+    </node>
+    <node id="n12">
+      <data key="type">gene</data>
+      <data key="pathway_id">14</data>
+      <data key="name">hsa:5664</data>
+      <data key="title">PSEN1...</data>
+      <data key="uniprot">P49810</data>
+      <data key="gene">PSEN2</data>
+      <data key="GO">GO:0016021,GO:0008632,GO:0007059,GO:0007001,GO:0000776,GO:0005639,GO:0005783,GO:0007242</data>
+    </node>
+    <node id="n13">
+      <data key="type">gene</data>
+      <data key="pathway_id">15</data>
+      <data key="name">hsa:836</data>
+      <data key="title">CASP3</data>
+      <data key="uniprot">P42574</data>
+      <data key="gene">CASP3</data>
+      <data key="GO">GO:0016787,GO:0008233,GO:0006917,GO:0030693,GO:0008234,GO:0006915,GO:0006508</data>
+    </node>
+    <node id="n14">
+      <data key="type">gene</data>
+      <data key="pathway_id">16</data>
+      <data key="name">hsa:23385</data>
+      <data key="title">NCSTN</data>
+      <data key="uniprot">Q92542</data>
+      <data key="gene">NCSTN</data>
+      <data key="GO">GO:0016021,GO:0016485,GO:0006508</data>
+    </node>
+    <node id="n15">
+      <data key="type">gene</data>
+      <data key="pathway_id">17</data>
+      <data key="name">hsa:2</data>
+      <data key="title">A2M</data>
+      <data key="uniprot">P01023</data>
+      <data key="gene">A2M</data>
+      <data key="GO">GO:0017114,GO:0004866,GO:0051260,GO:0019899,GO:0008320,GO:0006886,GO:0004867</data>
+    </node>
+    <node id="n16">
+      <data key="type">gene</data>
+      <data key="pathway_id">18</data>
+      <data key="name">hsa:3416</data>
+      <data key="title">IDE</data>
+      <data key="uniprot">P14735</data>
+      <data key="gene">IDE</data>
+      <data key="GO">GO:0004231,GO:0016787,GO:0008237,GO:0007548,GO:0007267,GO:0007165,GO:0006508,GO:0005777,GO:0005625,GO:0005615,GO:0004871,GO:0003824,GO:0004222</data>
+    </node>
+    <node id="n17">
+      <data key="type">gene</data>
+      <data key="pathway_id">19</data>
+      <data key="name">hsa:8883</data>
+      <data key="title">APPBP1</data>
+      <data key="uniprot">Q13564</data>
+      <data key="gene">APPBP1</data>
+      <data key="GO">GO:0007165,GO:0005737,GO:0003824</data>
+    </node>
+    <node id="n18">
+      <data key="type">gene</data>
+      <data key="pathway_id">20</data>
+      <data key="name">hsa:23621</data>
+      <data key="title">BACE1...</data>
+      <data key="uniprot">P56817</data>
+      <data key="gene">BACE1</data>
+      <data key="GO">GO:0004190,GO:0008233,GO:0009049,GO:0016021,GO:0016787,GO:0050435,GO:0005768,GO:0006508,GO:0005794,GO:0006509,GO:0008798,GO:0005887,GO:0004194</data>
+    </node>
+    <node id="n19">
+      <data key="type">gene</data>
+      <data key="pathway_id">20</data>
+      <data key="name">hsa:25825</data>
+      <data key="title">BACE1...</data>
+      <data key="uniprot">Q9Y5Z0</data>
+      <data key="gene"></data>
+      <data key="GO">GO:0004190,GO:0009049,GO:0016021,GO:0016787,GO:0009306,GO:0006464,GO:0005624,GO:0006508,GO:0004194</data>
+    </node>
+    <node id="n20">
+      <data key="type">gene</data>
+      <data key="pathway_id">22</data>
+      <data key="name">hsa:351</data>
+      <data key="title">APP, AD1</data>
+      <data key="uniprot">P05067</data>
+      <data key="gene">APP</data>
+      <data key="GO">GO:0008201,GO:0007155,GO:0006915,GO:0005905,GO:0006897,GO:0016021,GO:0005515,GO:0005887,GO:0005576,GO:0004867</data>
+    </node>
+    <node id="n21">
+      <data key="type">gene</data>
+      <data key="pathway_id">23</data>
+      <data key="name">hsa:2597</data>
+      <data key="title">GAPDH, GAPD</data>
+      <data key="uniprot">P04406</data>
+      <data key="gene"></data>
+      <data key="GO"></data>
+    </node>
+    <node id="n22">
+      <data key="type">gene</data>
+      <data key="pathway_id">24</data>
+      <data key="name">hsa:348</data>
+      <data key="title">APOE, AD2</data>
+      <data key="uniprot">P02649</data>
+      <data key="gene">APOE</data>
+      <data key="GO">GO:0001540,GO:0008015,GO:0007271,GO:0005737,GO:0005319,GO:0008201,GO:0006869,GO:0008289</data>
+    </node>
+    <node id="n23">
+      <data key="type">gene</data>
+      <data key="pathway_id">25</data>
+      <data key="name">hsa:322</data>
+      <data key="title">APBB1, RIR</data>
+      <data key="uniprot">O00213</data>
+      <data key="gene">APBB1</data>
+      <data key="GO">GO:0007165,GO:0001540,GO:0008134,GO:0045449,GO:0050821,GO:0005634,GO:0030308,GO:0045749,GO:0035035,GO:0007050,GO:0030048,GO:0045202,GO:0030027,GO:0030426,GO:0007409,GO:0050760</data>
+    </node>
+    <node id="n24">
+      <data key="type">gene</data>
+      <data key="pathway_id">26</data>
+      <data key="name">hsa:4023</data>
+      <data key="title">LPL</data>
+      <data key="uniprot">P06858</data>
+      <data key="gene">LPL</data>
+      <data key="GO">GO:0005319,GO:0004465,GO:0016787,GO:0016042,GO:0008201,GO:0008015,GO:0006631,GO:0005576,GO:0006629,GO:0003824</data>
+    </node>
+    <node id="n25">
+      <data key="type">gene</data>
+      <data key="pathway_id">27</data>
+      <data key="name">hsa:4035</data>
+      <data key="title">LRP1, APR, A2MR</data>
+      <data key="uniprot">Q07954</data>
+      <data key="gene">LRP1</data>
+      <data key="GO">GO:0016021,GO:0004872,GO:0016020,GO:0008283,GO:0008034,GO:0006629,GO:0005887,GO:0005624,GO:0005509,GO:0005319,GO:0006897,GO:0005905</data>
+    </node>
+    <edge source="n20" target="n23">
+      <data key="sim_BP_resnik">4.95265</data>
+      <data key="sim_BP_lin">0.693152</data>
+      <data key="sim_BP_jiang">0.185704</data>
+      <data key="sim_BP_rel">0.670769</data>
+      <data key="sim_CC_resnik">0.145403</data>
+      <data key="sim_CC_lin">0.05698</data>
+      <data key="sim_CC_jiang">0.172033</data>
+      <data key="sim_CC_rel">0.00546283</data>
+      <data key="sim_MF_resnik">2.93737</data>
+      <data key="sim_MF_lin">0.556617</data>
+      <data key="sim_MF_jiang">0.176068</data>
+      <data key="sim_MF_rel">0.483953</data>
+    </edge>
+    <edge source="n17" target="n20">
+      <data key="sim_BP_resnik">0.50493</data>
+      <data key="sim_BP_lin">0.112413</data>
+      <data key="sim_BP_jiang">0.111437</data>
+      <data key="sim_BP_rel">0.033196</data>
+      <data key="sim_CC_resnik">0.145403</data>
+      <data key="sim_CC_lin">0.0605613</data>
+      <data key="sim_CC_jiang">0.181454</data>
+      <data key="sim_CC_rel">0.00580618</data>
+      <data key="sim_MF_resnik">-0</data>
+      <data key="sim_MF_lin">-0</data>
+      <data key="sim_MF_jiang">0.171988</data>
+      <data key="sim_MF_rel">-0</data>
+    </edge>
+    <edge source="n20" target="n25">
+      <data key="sim_BP_resnik">7.8977</data>
+      <data key="sim_BP_lin">1</data>
+      <data key="sim_BP_jiang">1</data>
+      <data key="sim_BP_rel">0.995807</data>
+      <data key="sim_CC_resnik">9.64739</data>
+      <data key="sim_CC_lin">1</data>
+      <data key="sim_CC_jiang">1</data>
+      <data key="sim_CC_rel">0.998753</data>
+      <data key="sim_MF_resnik">2.93737</data>
+      <data key="sim_MF_lin">0.400174</data>
+      <data key="sim_MF_jiang">0.136512</data>
+      <data key="sim_MF_rel">0.347932</data>
+    </edge>
+    <edge source="n15" target="n25">
+      <data key="sim_BP_resnik">3.5307</data>
+      <data key="sim_BP_lin">0.498171</data>
+      <data key="sim_BP_jiang">0.123255</data>
+      <data key="sim_BP_rel">0.455066</data>
+      <data key="sim_MF_resnik">4.0529</data>
+      <data key="sim_MF_lin">0.366988</data>
+      <data key="sim_MF_jiang">0.0822633</data>
+      <data key="sim_MF_rel">0.344877</data>
+    </edge>
+    <edge source="n24" target="n25">
+      <data key="sim_BP_resnik">5.41325</data>
+      <data key="sim_BP_lin">1</data>
+      <data key="sim_BP_jiang">1</data>
+      <data key="sim_BP_rel">0.976533</data>
+      <data key="sim_CC_resnik">-0</data>
+      <data key="sim_CC_lin">-0</data>
+      <data key="sim_CC_jiang">0.151863</data>
+      <data key="sim_CC_rel">-0</data>
+      <data key="sim_MF_resnik">9.56439</data>
+      <data key="sim_MF_lin">1</data>
+      <data key="sim_MF_jiang">1</data>
+      <data key="sim_MF_rel">0.998679</data>
+    </edge>
+    <edge source="n20" target="n22">
+      <data key="sim_BP_resnik">3.20433</data>
+      <data key="sim_BP_lin">0.383125</data>
+      <data key="sim_BP_jiang">0.0883496</data>
+      <data key="sim_BP_rel">0.341558</data>
+      <data key="sim_CC_resnik">0.145403</data>
+      <data key="sim_CC_lin">0.0605613</data>
+      <data key="sim_CC_jiang">0.181454</data>
+      <data key="sim_CC_rel">0.00580618</data>
+      <data key="sim_MF_resnik">10.0077</data>
+      <data key="sim_MF_lin">1</data>
+      <data key="sim_MF_jiang">1</data>
+      <data key="sim_MF_rel">0.999029</data>
+    </edge>
+    <edge source="n20" target="n21">
+    </edge>
+    <edge source="n18" target="n20">
+      <data key="sim_BP_resnik">0.50493</data>
+      <data key="sim_BP_lin">0.0888891</data>
+      <data key="sim_BP_jiang">0.0880977</data>
+      <data key="sim_BP_rel">0.0262494</data>
+      <data key="sim_CC_resnik">5.53428</data>
+      <data key="sim_CC_lin">1</data>
+      <data key="sim_CC_jiang">1</data>
+      <data key="sim_CC_rel">0.978422</data>
+      <data key="sim_MF_resnik">-0</data>
+      <data key="sim_MF_lin">-0</data>
+      <data key="sim_MF_jiang">0.137908</data>
+      <data key="sim_MF_rel">-0</data>
+    </edge>
+    <edge source="n19" target="n20">
+      <data key="sim_BP_resnik">3.17114</data>
+      <data key="sim_BP_lin">0.346041</data>
+      <data key="sim_BP_jiang">0.0972198</data>
+      <data key="sim_BP_rel">0.307624</data>
+      <data key="sim_CC_resnik">2.60224</data>
+      <data key="sim_CC_lin">1</data>
+      <data key="sim_CC_jiang">1</data>
+      <data key="sim_CC_rel">0.835317</data>
+      <data key="sim_MF_resnik">-0</data>
+      <data key="sim_MF_lin">-0</data>
+      <data key="sim_MF_jiang">0.137908</data>
+      <data key="sim_MF_rel">-0</data>
+    </edge>
+    <edge source="n5" target="n6">
+    </edge>
+  </graph>
+</graphml>
