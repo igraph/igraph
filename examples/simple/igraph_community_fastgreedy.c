@@ -23,29 +23,38 @@
 
 #include <igraph.h>
 
-int main() {
-  igraph_t g;
-  igraph_vector_t modularity, membership;
-  igraph_matrix_t merges;
+void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges, FILE* f) {
   long int i;
-  
-  igraph_vector_init(&modularity,0);
-  igraph_vector_init(&membership,0);
-  igraph_matrix_init(&merges,0,0);
-  igraph_small(&g, 5, IGRAPH_UNDIRECTED, 
-	       0,1,0,2,0,3,0,4, 1,2,1,3,1,4, 2,3,2,4, 3,4,
-	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9,
-         0,5, -1);
-  igraph_community_fastgreedy(&g, &merges, &modularity);
-  i=igraph_vector_which_max(&modularity);
-  printf("Modularity:  %f\n", VECTOR(modularity)[i]);
-  igraph_community_to_membership(&g, &merges, i, &membership, 0);
+  igraph_vector_t membership;
+
+  igraph_vector_init(&membership, 0);
+
+  i=igraph_vector_which_max(mod);
+  fprintf(f, "Modularity:  %f\n", VECTOR(*mod)[i]);
+  igraph_community_to_membership(g, merges, i, &membership, 0);
   printf("Membership: ");
   for (i=0; i<igraph_vector_size(&membership); i++) {
     printf("%li ", (long int)VECTOR(membership)[i]);
   }
   printf("\n");
 
+  igraph_vector_destroy(&membership);
+}
+
+int main() {
+  igraph_t g;
+  igraph_vector_t modularity;
+  igraph_matrix_t merges;
+  FILE *f;
+
+  igraph_vector_init(&modularity,0);
+  igraph_matrix_init(&merges,0,0);
+  igraph_small(&g, 5, IGRAPH_UNDIRECTED, 
+	       0,1,0,2,0,3,0,4, 1,2,1,3,1,4, 2,3,2,4, 3,4,
+	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9,
+         0,5, -1);
+  igraph_community_fastgreedy(&g, &merges, &modularity);
+  show_results(&g, &modularity, &merges, stdout); 
   igraph_destroy(&g);
 
   /* Zachary Karate club */
@@ -69,17 +78,26 @@ int main() {
 	       31, 32, 31, 33, 32, 33,
 	       -1);
   igraph_community_fastgreedy(&g, &merges, &modularity);
-  i=igraph_vector_which_max(&modularity);
-  printf("Modularity:  %f\n", VECTOR(modularity)[i]);
-  igraph_community_to_membership(&g, &merges, i, &membership, 0);
-  printf("Membership: ");
-  for (i=0; i<igraph_vector_size(&membership); i++) {
-    printf("%li ", (long int)VECTOR(membership)[i]);
-  }
-  printf("\n");
-
+  show_results(&g, &modularity, &merges, stdout); 
   igraph_destroy(&g);
-  igraph_vector_destroy(&membership);
+   
+  /* Simple disconnected graph with isolates */
+  igraph_small(&g, 9, IGRAPH_UNDIRECTED,
+	       0,  1,  0,  2,  0,  3,  1,  2,  1,  3,  2,  3,
+	       4,  5,  4,  6,  4,  7,  5,  6,  5,  7,  6,  7,
+	       -1);
+  igraph_community_fastgreedy(&g, &merges, &modularity);
+  show_results(&g, &modularity, &merges, stdout); 
+  igraph_destroy(&g);
+
+  /* Disjoint union of two rings */
+  igraph_small(&g, 20, IGRAPH_UNDIRECTED,
+           0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,0,9,
+	   10,11,11,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,10,19,-1);
+  igraph_community_fastgreedy(&g, &merges, &modularity);
+  show_results(&g, &modularity, &merges, stdout);
+  igraph_destroy(&g);
+
   igraph_vector_destroy(&modularity);
   igraph_matrix_destroy(&merges);
   

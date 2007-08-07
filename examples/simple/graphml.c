@@ -83,6 +83,15 @@ int main(int argc, char **argv) {
   igraph_write_graph_edgelist(&g, stdout);
   igraph_destroy(&g);
   igraph_set_warning_handler(oldwarnhandler);
+
+  /* There were sometimes problems with this file */
+  /* Only if called from R though, and only on random occasions, once in every 
+     ten reads. Do testing here doesn't make much sense, but if we have the file 
+     then let's do it anyway. */
+  ifile=fopen("graphml-hsa05010.xml", "r");  
+  igraph_read_graph_graphml(&g, ifile, 0);
+  fclose(ifile);
+  igraph_destroy(&g);
   
   return 0;
 }

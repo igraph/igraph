@@ -263,7 +263,7 @@ int igraph_matrix_remove_col(igraph_matrix_t *m, long int col) {
 /**
  * \ingroup matrix
  * \function igraph_matrix_permdelete_rows
- * \brief Removes columns from a matrix (for internal use).
+ * \brief Removes rows from a matrix (for internal use).
  * 
  * Time complexity: linear with the number of elements of the original
  * matrix. 
@@ -278,6 +278,10 @@ int igraph_matrix_permdelete_rows(igraph_matrix_t *m, long int *index, long int 
       }
     }
   }
+  /* Remove unnecessary elements from the end of each column */
+  for (i=0; i<m->ncol; i++)
+    igraph_vector_remove_section(&m->data, (i+1)*(m->nrow-nremove),
+				 (i+1)*(m->nrow-nremove)+nremove);
   igraph_matrix_resize(m, m->nrow-nremove, m->ncol);
 
   return 0;

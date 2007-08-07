@@ -84,4 +84,16 @@ can be added without too much pain.
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 </para>
 </section>
+
+<section><title>Citing <command>igraph</command></title>
+<para>
+To cite <command>igraph</command> in publications, please use the following
+reference:
+</para><para>
+Gábor Csárdi, Tamás Nepusz: The igraph software package for complex network
+research. InterJournal Complex Systems, 1695, 2006.
+</para>
+
+</section>
+
 </chapter>
