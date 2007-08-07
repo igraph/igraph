@@ -1383,7 +1383,7 @@ int igraph_eit_create(const igraph_t *graph,
     eit->pos=0;
     eit->start=0;
     eit->vec=Calloc(1, igraph_vector_t);
-    if (eit->vec != 0) {
+    if (eit->vec == 0) {
       IGRAPH_ERROR("Cannot create iterator", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, (igraph_vector_t*) eit->vec);
