@@ -202,7 +202,7 @@ plot.igraph <- function(x,
     if (length(arrow.size)>1) { arrow.size <- arrow.size[nonloops.e] }
     if (length(unique(arrow.mode))==1) {
       igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
-                    sh.lwd=edge.width, h.lwd=edge.width, open=FALSE, code=arrow.mode,
+                    sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode,
                     sh.lty=edge.lty, h.lty=1, size=arrow.size)
     } else {
       ## different kinds of arrow drawn separately as 'arrows' cannot
@@ -212,9 +212,9 @@ plot.igraph <- function(x,
         if (!any(valid)) { next }
         ec <- edge.color ; if (length(ec)>1) { ec <- ec[valid] }
         ew <- edge.width ; if (length(ew)>1) { ew <- ew[valid] }
-        el <- edge.lty   ; if (length(el)>1) { el <- el[valid] }        
+        el <- edge.lty   ; if (length(el)>1) { el <- el[valid] }
         igraph.Arrows(x0[valid], y0[valid], x1[valid], y1[valid],
-                      code=code, sh.col=ec, h.col=ec, sh.lwd=ew, h.lwd=ew,
+                      code=code, sh.col=ec, h.col=ec, sh.lwd=ew, h.lwd=1,
                       h.lty=1, sh.lty=el, open=FALSE, size=arrow.size)
       }
     }
