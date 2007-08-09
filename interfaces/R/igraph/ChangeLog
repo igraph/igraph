@@ -1,5 +1,13 @@
 2007-08-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.common.R
+	* interfaces/R/igraph/R/plot.R (plot.igraph, rglplot.igraph) :
+	added 'rescale' plot parameter
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : asp=1 is no longer given
+
+2007-08-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
 	* interfaces/R/igraph/src/rinterface.c
 	(R_igraph_attribute_get_string_vertex_attr)
 	(R_igraph_attribute_get_string_edge_attr)

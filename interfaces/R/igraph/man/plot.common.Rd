@@ -320,6 +320,12 @@
       
       Its default value is 0.
     }
+    \item{rescale}{Logical constant, whether to rescale the coordinates
+      to the [-1,1]x[-1,1](x[-1,1]) interval. This parameter is not
+      implemented for \code{tkplot}.
+
+      Defaults to \code{TRUE}, the layout will be rescaled.
+    }
   }
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
