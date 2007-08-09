@@ -2614,6 +2614,105 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the Jaccard similarities of some nodes in a graph.
+ * \return the similarity scores in a matrix
+ * \sa igraph_similarity_jaccard
+ */
+PyObject *igraphmodule_Graph_similarity_jaccard(igraphmodule_GraphObject * self,
+  PyObject * args, PyObject * kwds) {
+  static char *kwlist[] = { "vertices", "mode", "loops", NULL };
+  PyObject *vobj = NULL, *list = NULL, *loops = Py_True;
+  igraph_matrix_t res;
+  int mode = IGRAPH_ALL;
+  int return_single = 0;
+  igraph_vs_t vs;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist, &vobj,
+	&mode, &loops))
+    return NULL;
+
+  if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
+    PyErr_SetString(PyExc_ValueError,
+                    "mode should be either ALL or IN or OUT");
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_matrix_init(&res, 0, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_similarity_jaccard(&self->g,&res,vs,mode,PyObject_IsTrue(loops))) {
+    igraph_matrix_destroy(&res);
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+
+  igraph_matrix_destroy(&res);
+  igraph_vs_destroy(&vs);
+
+  return list;
+}
+
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the Dice similarities of some nodes in a graph.
+ * \return the similarity scores in a matrix
+ * \sa igraph_similarity_dice
+ */
+PyObject *igraphmodule_Graph_similarity_dice(igraphmodule_GraphObject * self,
+  PyObject * args, PyObject * kwds) {
+  static char *kwlist[] = { "vertices", "mode", "loops", NULL };
+  PyObject *vobj = NULL, *list = NULL, *loops = Py_True;
+  igraph_matrix_t res;
+  int mode = IGRAPH_ALL;
+  int return_single = 0;
+  igraph_vs_t vs;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist, &vobj,
+	&mode, &loops))
+    return NULL;
+
+  if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
+    PyErr_SetString(PyExc_ValueError,
+                    "mode should be either ALL or IN or OUT");
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_matrix_init(&res, 0, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_similarity_dice(&self->g,&res,vs,mode,PyObject_IsTrue(loops))) {
+    igraph_matrix_destroy(&res);
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+
+  igraph_matrix_destroy(&res);
+  igraph_vs_destroy(&vs);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates a spanning tree for a graph
  * \return a list containing the edge betweenness for every edge
  * \sa igraph_minimum_spanning_tree_unweighted
@@ -5965,16 +6064,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param directed: whether to consider directed paths.\n"
    "@return: the betweenness of the given nodes in a list\n"},
 
-  // interface to igraph_bibcoupling
-  {"bibcoupling", (PyCFunction) igraphmodule_Graph_bibcoupling,
-   METH_VARARGS | METH_KEYWORDS,
-   "bibcoupling(vertices)\n\n"
-   "Calculates bibliographic coupling values for given vertices\n"
-   "in a graph.\n\n"
-   "@param vertices: the vertices to be analysed.\n"
-   "@return: bibliographic coupling values for all given\n"
-   "  vertices in a matrix.\n"},
-
   // interface to igraph_closeness
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
@@ -6029,19 +6118,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  as separate components.\n"
    "@return: a list of the subgraphs. Every returned subgraph is a\n"
    "  copy of the original.\n"},
-
-  // interface to igraph_cocitation
-  {"cocitation", (PyCFunction) igraphmodule_Graph_cocitation,
-   METH_VARARGS | METH_KEYWORDS,
-   "cocitation(vertices)\n\n"
-   "Calculates cocitation scores for given vertices in a graph.\n\n"
-   "@param vertices: the vertices to be analysed.\n"
-   "@return: cocitation scores for all given vertices in a matrix."},
-
   /* interface to igraph_constraint */
   {"constraint", (PyCFunction) igraphmodule_Graph_constraint,
    METH_VARARGS | METH_KEYWORDS,
-   "cocitation(vertices=None, weights=None)\n\n"
+   "constraint(vertices=None, weights=None)\n\n"
    "Calculates Burt's constraint scores for given vertices in a graph.\n\n"
    "Burt's constraint is higher if ego has less, or mutually stronger\n"
    "related (i.e. more redundant) contacts. Burt's measure of\n"
@@ -6056,7 +6136,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param vertices: the vertices to be analysed or C{None} for all vertices.\n"
    "@param weights: weights associated to the edges. Can be an attribute name\n"
    "  as well. If C{None}, every edge will have the same weight.\n"
-   "@return: cocitation scores for all given vertices in a matrix."},
+   "@return: constraint scores for all given vertices in a matrix."},
 
   /* interface to igraph_density */
   {"density", (PyCFunction) igraphmodule_Graph_density,
@@ -6295,9 +6375,73 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  included in the result. C{None} means all of the vertices.\n"
    "@return: the transitivities for the given vertices in a list\n"},
 
-  //////////////////////
-  // LAYOUT FUNCTIONS //
-  //////////////////////
+  /***********************/
+  /* SIMILARITY MEASURES */
+  /***********************/
+
+  /* interface to igraph_bibcoupling */
+  {"cocitation", (PyCFunction) igraphmodule_Graph_bibcoupling,
+   METH_VARARGS | METH_KEYWORDS,
+   "bibcoupling(vertices=None)\n\n"
+   "Calculates bibliographic coupling scores for given vertices in a graph.\n\n"
+   "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
+   "  will be considered.\n"
+   "@return: bibliographic coupling scores for all given vertices in a matrix."},
+  /* interface to igraph_cocitation */
+  {"cocitation", (PyCFunction) igraphmodule_Graph_cocitation,
+   METH_VARARGS | METH_KEYWORDS,
+   "cocitation(vertices=None)\n\n"
+   "Calculates cocitation scores for given vertices in a graph.\n\n"
+   "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
+   "  will be considered.\n"
+   "@return: cocitation scores for all given vertices in a matrix."},
+  /* interface to igraph_similarity_dice */
+  {"similarity_dice", (PyCFunction) igraphmodule_Graph_similarity_dice,
+   METH_VARARGS | METH_KEYWORDS,
+   "similarity_dice(vertices=None, mode=IGRAPH_ALL, loops=True)\n\n"
+   "Dice similarity coefficient of vertices.\n\n"
+   "The Dice similarity coefficient of two vertices is twice the number of\n"
+   "their common neighbors divided by the sum of their degrees. This\n"
+   "coefficient is very similar to the Jaccard coefficient, but usually\n"
+   "gives higher similarities than its counterpart.\n\n"
+   "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
+   "  will be considered.\n"
+   "@param mode: which neighbors should be considered for directed graphs.\n"
+   "  Can be C{ALL}, C{IN} or C{OUT}, ignored for undirected graphs.\n"
+   "@param loops: whether vertices should be considered adjacent to\n"
+   "  themselves. Setting this to C{True} assumes a loop edge for all vertices\n"
+   "  even if none is present in the graph. Setting this to C{False} may\n"
+   "  result in strange results: nonadjacent edges may have larger\n"
+   "  similarities compared to the case when an edge is added between them --\n"
+   "  however, this might be exactly the result you want to get.\n"
+   "@return: the pairwise similarity coefficients for the vertices specified,\n"
+   "  in the form of a matrix (list of lists).\n"
+  },
+  /* interface to igraph_similarity_jaccard */
+  {"similarity_jaccard", (PyCFunction) igraphmodule_Graph_similarity_jaccard,
+   METH_VARARGS | METH_KEYWORDS,
+   "similarity_jaccard(vertices=None, mode=IGRAPH_ALL, loops=True)\n\n"
+   "Jaccard similarity coefficient of vertices.\n\n"
+   "The Jaccard similarity coefficient of two vertices is the number of their\n"
+   "common neighbors divided by the number of vertices that are adjacent to\n"
+   "at least one of them.\n\n"
+   "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
+   "  will be considered.\n"
+   "@param mode: which neighbors should be considered for directed graphs.\n"
+   "  Can be C{ALL}, C{IN} or C{OUT}, ignored for undirected graphs.\n"
+   "@param loops: whether vertices should be considered adjacent to\n"
+   "  themselves. Setting this to C{True} assumes a loop edge for all vertices\n"
+   "  even if none is present in the graph. Setting this to C{False} may\n"
+   "  result in strange results: nonadjacent edges may have larger\n"
+   "  similarities compared to the case when an edge is added between them --\n"
+   "  however, this might be exactly the result you want to get.\n"
+   "@return: the pairwise similarity coefficients for the vertices specified,\n"
+   "  in the form of a matrix (list of lists).\n"
+  },
+
+  /********************/
+  /* LAYOUT FUNCTIONS */
+  /********************/
 
   // interface to igraph_layout_circle
   {"layout_circle", (PyCFunction) igraphmodule_Graph_layout_circle,
