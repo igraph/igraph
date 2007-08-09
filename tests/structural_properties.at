@@ -74,6 +74,11 @@ AT_KEYWORDS([cocitation bibliographic coupling])
 AT_COMPILE_CHECK([simple/igraph_cocitation.c], [simple/igraph_cocitation.out])
 AT_CLEANUP
 
+AT_SETUP([Similarity coefficients (igraph_similarity_*):])
+AT_KEYWORDS([similarity jaccard dice])
+AT_COMPILE_CHECK([simple/igraph_similarity.c], [simple/igraph_similarity.out])
+AT_CLEANUP
+
 AT_SETUP([Simplification of non-simple graphs (igraph_simplify): ])
 AT_KEYWORDS([simplify multiple edge loop edges non-simple graphs simple graphs])
 AT_COMPILE_CHECK([simple/igraph_simplify.c], [simple/igraph_simplify.out])

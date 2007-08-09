@@ -45,6 +45,13 @@
 <!-- doxrox-include igraph_maxdegree -->
 </section>
 
+<section><title>Similarity Measures</title>
+<!-- doxrox-include igraph_bibcoupling -->
+<!-- doxrox-include igraph_cocitation -->
+<!-- doxrox-include igraph_similarity_jaccard -->
+<!-- doxrox-include igraph_similarity_dice -->
+</section>
+
 <section><title>Spanning Tree</title>
 <!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
@@ -81,8 +88,6 @@
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_simplify -->
 <!-- doxrox-include igraph_reciprocity -->
-<!-- doxrox-include igraph_bibcoupling -->
-<!-- doxrox-include igraph_cocitation -->
 <!-- doxrox-include igraph_get_adjacency -->	
 <!-- doxrox-include igraph_get_edgelist -->	
 </section>

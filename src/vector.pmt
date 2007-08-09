@@ -1388,8 +1388,9 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v,
     }
   }
 
-  if (VECTOR(*v)[left] != what && VECTOR(*v)[right]==what) {
-    left=right;
+  if (VECTOR(*v)[left] < what) {
+    if (VECTOR(*v)[right] < what) left=right+1;
+    else left=right;
   }
   
   if (pos != 0) {

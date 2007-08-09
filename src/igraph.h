@@ -869,22 +869,26 @@ int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 /* TODO: evcent */
 
 /* -------------------------------------------------- */
-/* Cocitation                                         */
+/* Cocitation and other similarity measures           */
 /* -------------------------------------------------- */
 
 int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res, 
 		      const igraph_vs_t vids);
 int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res, 
 		       const igraph_vs_t vids);
+int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
+              const igraph_vs_t vids, igraph_neimode_t mode,
+			  igraph_bool_t loops);
+int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
+              const igraph_vs_t vids, igraph_neimode_t mode,
+			  igraph_bool_t loops);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */
 /* -------------------------------------------------- */
 
-/* TODO: eb.community */
 /* TODO: cut.community */
 /* TODO: edge.type.matrix */
-/* TODO: modularity */
 /* TODO:  */
 
 int igraph_community_spinglass(const igraph_t *graph,

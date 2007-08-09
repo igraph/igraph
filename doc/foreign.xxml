@@ -39,4 +39,8 @@
 <!-- doxrox-include igraph_write_graph_pajek -->
 </section>
 
+<section><title>Graphviz format</title>
+<!-- doxrox-include igraph_write_graph_dot -->
+</section>
+
 </chapter>

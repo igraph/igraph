@@ -159,3 +159,220 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
 
   return 0;
 }
+
+int igraph_i_neisets_intersect(const igraph_vector_t *v1,
+  const igraph_vector_t *v2, long int *len_union,
+  long int *len_intersection) {
+  /* ASSERT: v1 and v2 are sorted */
+  long int i, j, i0, j0;
+  i0 = igraph_vector_size(v1); j0 = igraph_vector_size(v2);
+  *len_union = i0+j0; *len_intersection = 0;
+  i = 0; j = 0;
+  while (i < i0 && j < j0) {
+    if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
+      (*len_intersection)++; (*len_union)--;
+      i++; j++;
+    } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) i++;
+    else j++;
+  }
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_similarity_jaccard
+ * \brief Jaccard similarity coefficient.
+ *
+ * </para><para>
+ * The Jaccard similarity coefficient of two vertices is the number of common
+ * neighbors divided by the number of vertices that are neighbors of at
+ * least one of the two vertices being considered. This function calculates
+ * the pairwise Jaccard similarities for some (or all) of the vertices.
+ *
+ * \param graph The graph object to analyze
+ * \param res Pointer to a matrix, the result of the calculation will
+ *        be stored here. The number of its rows and columns is the same
+ *        as the number of vertex ids in \p vids.
+ * \param vids The vertex ids of the vertices for which the
+ *        calculation will be done.
+ * \param mode The type of neighbors to be used for the calculation in
+ *        directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the outgoing edges will be considered for each node.
+ *        \cli IGRAPH_IN
+ *          the incoming edges will be considered for each node.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an undirected one for the
+ *          computation.
+ *        \endclist
+ * \param loops Whether to include the vertices themselves in the neighbor
+ *        sets.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           invalid vertex id passed.
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *        \clist
+ * 
+ * Time complexity: O(|V|^2 d),
+ * |V| is the number of vertices in the vertex iterator given, d is the
+ * (maximum) degree of the vertices in the graph.
+ *
+ * \sa \ref igraph_similarity_dice(), a measure very similar to the Jaccard
+ *   coefficient
+ */
+int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
+  igraph_i_lazy_adjlist_t al;
+  igraph_vit_t vit, vit2;
+  long int i, j, k;
+  long int len_union, len_intersection;
+  igraph_vector_t *v1, *v2;
+
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit2));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit2);
+
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &al, mode, IGRAPH_I_SIMPLIFY));
+  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &al);
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, IGRAPH_VIT_SIZE(vit), IGRAPH_VIT_SIZE(vit)));
+
+  if (loops) {
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+      i=IGRAPH_VIT_GET(vit);
+      v1=igraph_i_lazy_adjlist_get(&al, i);
+      if (!igraph_vector_binsearch(v1, i, &k)) igraph_vector_insert(v1, k, i);
+    }
+  }
+
+  for (IGRAPH_VIT_RESET(vit), i=0;
+    !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    MATRIX(*res, i, i) = 1.0;
+    for (IGRAPH_VIT_RESET(vit2), j=0;
+      !IGRAPH_VIT_END(vit2); IGRAPH_VIT_NEXT(vit2), j++) {
+      if (j <= i) continue;
+      v1=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
+      v2=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
+      igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
+      if (len_union > 0)
+        MATRIX(*res, i, j) = ((igraph_real_t)len_intersection)/len_union;
+      else
+        MATRIX(*res, i, j) = 0.0;
+      MATRIX(*res, j, i) = MATRIX(*res, i, j);
+    }
+  }
+
+  igraph_i_lazy_adjlist_destroy(&al);
+  igraph_vit_destroy(&vit);
+  igraph_vit_destroy(&vit2);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
+
+/**
+ * \ingroup structural
+ * \function igraph_similarity_dice
+ * \brief Dice similarity coefficient.
+ *
+ * </para><para>
+ * The Dice similarity coefficient of two vertices is twice the number of common
+ * neighbors divided by the sum of the degrees of the vertices. This function
+ * calculates the pairwise Dice similarities for some (or all) of the vertices.
+ *
+ * \param graph The graph object to analyze
+ * \param res Pointer to a matrix, the result of the calculation will
+ *        be stored here. The number of its rows and columns is the same
+ *        as the number of vertex ids in \p vids.
+ * \param vids The vertex ids of the vertices for which the
+ *        calculation will be done.
+ * \param mode The type of neighbors to be used for the calculation in
+ *        directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the outgoing edges will be considered for each node.
+ *        \cli IGRAPH_IN
+ *          the incoming edges will be considered for each node.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an undirected one for the
+ *          computation.
+ *        \endclist
+ * \param loops Whether to include the vertices themselves as their own
+ *        neighbors.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           invalid vertex id passed.
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *        \clist
+ * 
+ * Time complexity: O(|V|^2 d),
+ * |V| is the number of vertices in the vertex iterator given, d is the
+ * (maximum) degree of the vertices in the graph.
+ *
+ * \sa \ref igraph_similarity_jaccard(), a measure very similar to the Dice
+ *   coefficient
+ */
+int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
+    const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
+  igraph_i_lazy_adjlist_t al;
+  igraph_vit_t vit, vit2;
+  long int i, j, k;
+  long int len_union, len_intersection;
+  igraph_vector_t *v1, *v2;
+
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit2));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit2);
+
+  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &al, mode, IGRAPH_I_SIMPLIFY));
+  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &al);
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, IGRAPH_VIT_SIZE(vit), IGRAPH_VIT_SIZE(vit)));
+
+  if (loops) {
+    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+      i=IGRAPH_VIT_GET(vit);
+      v1=igraph_i_lazy_adjlist_get(&al, i);
+      if (!igraph_vector_binsearch(v1, i, &k)) igraph_vector_insert(v1, k, i);
+    }
+  }
+
+  for (IGRAPH_VIT_RESET(vit), i=0;
+    !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    MATRIX(*res, i, i) = 1.0;
+    for (IGRAPH_VIT_RESET(vit2), j=0;
+      !IGRAPH_VIT_END(vit2); IGRAPH_VIT_NEXT(vit2), j++) {
+      if (j <= i) continue;
+      v1=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
+      v2=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
+      igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
+      len_union += len_intersection;
+      if (len_union > 0)
+        MATRIX(*res, i, j) = (2.0*len_intersection)/len_union;
+      else
+        MATRIX(*res, i, j) = 0.0;
+      MATRIX(*res, j, i) = MATRIX(*res, i, j);
+    }
+  }
+
+  igraph_i_lazy_adjlist_destroy(&al);
+  igraph_vit_destroy(&vit);
+  igraph_vit_destroy(&vit2);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
