@@ -143,6 +143,9 @@ int main() {
   ptr=(igraph_real_t*) malloc(10* sizeof(igraph_real_t));
   igraph_vector_init_copy(&v, ptr, 10);
   free(ptr);
+  for (i=0; i<10; i++) {
+    VECTOR(v)[i]=100-i;
+  }
   print_vector(&v, stdout);
   igraph_vector_destroy(&v);
   
