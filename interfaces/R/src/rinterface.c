@@ -700,7 +700,7 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_VIT_SIZE(it)));
     while (!IGRAPH_VIT_END(it)) {
       long int v=IGRAPH_VIT_GET(it);
-      char *str=CHAR(STRING_ELT(AS_CHARACTER(va), v));
+      const char *str=CHAR(STRING_ELT(AS_CHARACTER(va), v));
       IGRAPH_CHECK(igraph_strvector_set(value, i, str));
       IGRAPH_VIT_NEXT(it);
       i++;
@@ -772,7 +772,7 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_strvector_resize(value, IGRAPH_EIT_SIZE(it)));
     while (!IGRAPH_EIT_END(it)) {
       long int e=IGRAPH_EIT_GET(it);
-      char *str=CHAR(STRING_ELT(AS_CHARACTER(ea), e));
+      const char *str=CHAR(STRING_ELT(AS_CHARACTER(ea), e));
       IGRAPH_CHECK(igraph_strvector_set(value, i, str));
       IGRAPH_EIT_NEXT(it);
       i++;
@@ -1032,7 +1032,7 @@ int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv) {
   sv->len=GET_LENGTH(rval);
   sv->data=(char**) R_alloc(sv->len, sizeof(char*));
   for (i=0; i<sv->len; i++) {
-    sv->data[i]=CHAR(STRING_ELT(rval, i));
+    sv->data[i]=(char*) CHAR(STRING_ELT(rval, i));
   }
 
   return 0;

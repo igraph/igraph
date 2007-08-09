@@ -1,4 +1,14 @@
-2007-07-24  Gabor Csardi  <csardi@localhost.localdomain>
+2007-08-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/src/rinterface.c
+	(R_igraph_attribute_get_string_vertex_attr)
+	(R_igraph_attribute_get_string_edge_attr)
+	(R_igraph_SEXP_to_strvector) : updates, CHAR() returns const char * 
+	in recent R versions
+
+	* interfaces/R/DESCRIPTION.in: suggest tcltk
+
+2007-07-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/community.R (walktrap.community) : bug 
 	corrected for weighted graphs
