@@ -1,3 +1,7 @@
+2007-08-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_count_multiple) : added
+
 2007-08-09  Gabor Csardi  <csardi@belus>
 
 	* src/examples/simple/vector.c : corrected a test case
