@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
+void print_vector(igraph_vector_bool_t *v, FILE *f) {
   long int i;
-  for (i=0; i<igraph_vector_size(v); i++) {
+  for (i=0; i<igraph_vector_bool_size(v); i++) {
     fprintf(f, " %i", (int) VECTOR(*v)[i]);
   }
   fprintf(f, "\n");
@@ -34,9 +34,9 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 int main() {
   
   igraph_t graph;
-  igraph_vector_t v;
+  igraph_vector_bool_t v;
   
-  igraph_vector_init(&v, 0);
+  igraph_vector_bool_init(&v, 0);
 
   igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1, 1,2, 2,1, 0,1, 1,0, 3,4, 11,10, -1);
   igraph_is_loop(&graph, &v, igraph_ess_all(IGRAPH_EDGEORDER_ID));
@@ -49,7 +49,7 @@ int main() {
   print_vector(&v, stdout);
   igraph_destroy(&graph);
 
-  igraph_vector_destroy(&v);
+  igraph_vector_bool_destroy(&v);
   
   return 0;
 }

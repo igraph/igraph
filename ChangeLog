@@ -1,5 +1,10 @@
 2007-08-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_is_multiple, igraph_is_loop) :
+	return bool vector
+	* examples/simple/igraph_is_multiple.c 
+	* examples/simple/igraph_is_loop.c : updated
+
 	* src/igraph_pmt.h
 	* src/types.h
 	* src/vector.c : added igraph_vector_bool_t type

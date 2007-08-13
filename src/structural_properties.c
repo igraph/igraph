@@ -3632,13 +3632,14 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
   return 0;
 }
 
-int igraph_is_loop(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
+int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res, 
+		   igraph_es_t es) {
   igraph_eit_t eit;  
   long int i;
   IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
-  IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
+  IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
 
   for (i=0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
     long int e=IGRAPH_EIT_GET(eit);
@@ -3650,7 +3651,8 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) 
   return 0;
 }
 
-int igraph_is_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
+int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res, 
+		       igraph_es_t es) {
   igraph_eit_t eit;
   long int i;
   igraph_i_lazy_adjedgelist_t adjlist;
@@ -3660,7 +3662,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t 
   IGRAPH_CHECK(igraph_i_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_OUT));
   IGRAPH_FINALLY(igraph_i_lazy_adjedgelist_destroy, &adjlist);
   
-  IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_EIT_SIZE(eit)));
+  IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
   
   for (i=0; !IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
     long int e=IGRAPH_EIT_GET(eit);
