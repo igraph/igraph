@@ -216,7 +216,6 @@ int igraph_i_neisets_intersect(const igraph_vector_t *v1,
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
- *        \clist
  * 
  * Time complexity: O(|V|^2 d),
  * |V| is the number of vertices in the vertex iterator given, d is the
@@ -315,7 +314,6 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
  *        \cli IGRAPH_EINVMODE
  *           invalid mode argument.
  *        \endclist
- *        \clist
  * 
  * Time complexity: O(|V|^2 d),
  * |V| is the number of vertices in the vertex iterator given, d is the
