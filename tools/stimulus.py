@@ -13,7 +13,7 @@ def usage():
     print "Stimulus version", version, date
     print sys.argv[0], "-f <function-file> -t <type-file> -l language "
     print ' ' * len(sys.argv[0]), "-i <input-file> -o <output-file>"
-    print ' ' * len(sys.argv[0]), "-h --help"
+    print ' ' * len(sys.argv[0]), "-h --help -v"
 
 ################################################################################
 class PLexer:
@@ -261,6 +261,12 @@ class RNamespaceCodeGenerator(CodeGenerator):
         CodeGenerator.__init__(self, func, types)
 
     def generate(self, inputs, output):
+        """This is very simple, we include an 'export' line for every
+        function which it not to be ignored by the RNamespace language.
+        Function names are taken from NAME-R if present, otherwise
+        underscores are converted to dots and the leading 'i' (from
+        'igraph') is stripped to create the function name,
+        ie. igraph_clusters is mapped to graph.clusters."""
         out=open(output, "w")
         self.append_inputs(inputs, out)
         for f in self.func.keys():
@@ -295,7 +301,23 @@ class RRCodeGenerator(CodeGenerator):
                 sys.exit(7)
             params[p].setdefault('mode', 'IN')
 
-        # Header
+        ## Header
+        ## do_par handles the translation of a single argument in the
+        ## header. Pretty simple, the only difficulty is that we
+        ## might need to add default values. Default values are taken
+        ## from a language specific dictionary, this is compiled from
+        ## the type file(s).
+        
+        ## So we take all arguments with mode 'IN' or 'INOUT' and
+        ## check whether they have a default value. If yes then we 
+        ## check if the default value is given in the type file. If
+        ## yes then we use the value given there, otherwise the
+        ## default value is ignored silently. (Not very nice.)
+        
+        ## We also check whether the function has a 'PROGRESS' flag.
+        ## If yes then there is an extra 'verbose'
+        ## argument. Alternatively we could just always add this
+        ## argument independently of the 'PROGRESS' flag.
         out.write(name)
         out.write(" <- function(")
         def do_par(pname):
@@ -314,7 +336,15 @@ class RRCodeGenerator(CodeGenerator):
         out.write(", ".join(head))
         out.write(") {\n")
 
-        # Argument checks, INCONV
+        ## Argument checks, INCONV
+        ## We take 'IN' and 'INOUT' mode arguments and if they have an
+        ## INCONV field then we use that. This is typically for
+        ## argument checks, like we check here that the argument
+        ## supplied for a graph is indeed an igraph graph object. We
+        ## also covert numeric vectors to 'double' here.
+
+        ## The INCONV fields are simply concatenated by newline
+        ## characters.
         out.write("  # Argument checks\n")
         def do_par(pname):
             t=self.types[params[pname]['type']]
@@ -329,7 +359,16 @@ class RRCodeGenerator(CodeGenerator):
         inconv=[ i for i in inconv if i != "" ]
         out.write("\n".join(inconv)+"\n\n")
 
-        # Function call
+        ## Function call
+        ## This is a bit more difficult than INCONV. Here we supply
+        ## each argument to the .Call function, if the argument has a
+        ## 'CALL' field then it is used, otherwise we simply use its
+        ## name. We also need to take care about the PROGRESS bar
+        ## argument. Note that arguments with empty CALL fields are
+        ## completely ignored, so giving an empty CALL field is
+        ## different than not giving it at all.
+
+        ## The tail of the function is also written and we're ready.
         def do_par(pname):
             t=self.types[params[pname]['type']]
             call=pname
@@ -375,7 +414,11 @@ class RCCodeGenerator(CodeGenerator):
                 sys.exit(7)
             params[p].setdefault('mode', 'IN')
 
-        # Compile the output
+        ## Compile the output
+        ## This code generator is quite difficult, so we use different
+        ## functions to generate the approprite chunks and then
+        ## compile them together using a simple template.
+        ## See the documentation of each chunk below.
         res={}
         res['func']=function
         res['header']=self.chunk_header(function, params)
@@ -412,12 +455,26 @@ class RCCodeGenerator(CodeGenerator):
         out.write(text)
         
     def chunk_header(self, function, params):
+        """The header. All functions return with a 'SEXP', so this is
+        easy. We just take the 'IN' and 'INOUT' arguments, all will
+        have type SEXP, and concatenate them by commas. If the
+        function has a 'PROGRESS' flag that is used. The function name
+        is created by prefixing the original name with 'R_'."""
         inout=[ "SEXP "+n for n,p in params.items() if p['mode'] in ['IN','INOUT'] ]
         if 'PROGRESS' in self.func[function]['FLAGS']:
             inout.append("SEXP verbose")
         return "SEXP R_" + function + "(" + ", ".join(inout) + ")"
         
     def chunk_declaration(self, function, params):
+        """There are a couple of things to declare. First a C type is
+        needed for every argument, these will be supplied in the C
+        igraph call. Then, all 'OUT' arguments need a SEXP variable as
+        well, the result will be stored here. The return type
+        of the C function also needs to be declared, that comes
+        next. The result and names SEXP variables will contain the
+        final result, these are last. ('names' is not always used, but
+        it is easier to always declare it.)
+        """
         def do_par(pname):
             cname="c_"+pname
             t=self.types[params[pname]['type']]
@@ -444,12 +501,22 @@ class RCCodeGenerator(CodeGenerator):
         return "\n".join(inout + out + [retdecl] + ["  SEXP result, names;"])
 
     def chunk_before(self, function, params):
+        """Quite confusingly, there is a separate igraph_before()
+        function for functions with progress bar, so we call that if
+        the function has a 'PROGRESS' flag. This should be eliminated
+        in the future."""
         if 'PROGRESS' in self.func[function]['FLAGS']:
             return '  R_igraph_before2(verbose, "");'
         else:
             return '  R_igraph_before();'        
 
     def chunk_inconv(self, function, params):
+        """Input conversions. Not only for types with mode 'IN' and
+        'INOUT', eg. for 'OUT' vector types we need to allocate the
+        required memory here, do all the initializations, etc. Types
+        without INCONV fields are ignored. The usual %C%, %I% is
+        performed at the end.
+        """
         def do_par(pname):
             cname="c_"+pname
             t=self.types[params[pname]['type']]
@@ -467,6 +534,11 @@ class RCCodeGenerator(CodeGenerator):
         return "\n".join(inconv)
 
     def chunk_call(self, function, params):
+        """Every single argument is included, independently of their
+        mode. If a type has a 'CALL' field then that is used after the
+        usual %C% and %I% substitutions, otherwise the standard 'c_'
+        prefixed C argument name is used.
+        """
         types=[ self.types[params[n]['type']] for n in params.keys() ]
         call=map( lambda t, n: t.get('CALL', "c_"+n), types, params.keys() )
         call=map( lambda c, n: c.replace("%C%", "c_"+n).replace("%I%", n),
@@ -474,6 +546,28 @@ class RCCodeGenerator(CodeGenerator):
         return "  c_result=" + function + "(" + ", ".join(call) + ");\n"
 
     def chunk_outconv(self, function, params):
+        """The output conversions, this is quite difficult. A function
+        may report its results in two ways: by returning it directly
+        or by setting a variable to which a pointer was passed. igraph
+        usually uses the latter and returns error codes, except for
+        some simple functions like 'igraph_vcount()' which cannot
+        fail.
+
+        First we add the output conversion for all types. This is
+        easy. Note that even 'IN' arguments may have output
+        conversion, eg. this is the place to free memory allocated to
+        them in the 'INCONV' part.
+
+        Then we check how many 'OUT' or 'INOUT' arguments we
+        have. There are three cases. If there is a single such
+        argument then that is already converted and we need to return
+        that. If there is no such argument then the output of the
+        function was returned, so we perform the output conversion for
+        the returned type and this will be the result. If there are
+        more than one 'OUT' and 'INOUT' arguments then they are
+        collected in a named list. The names come from the argument
+        names.
+        """
         def do_par(pname):
             cname="c_"+pname
             t=self.types[params[pname]['type']]
@@ -517,6 +611,8 @@ class RCCodeGenerator(CodeGenerator):
         return ret
 
     def chunk_after(self, function, params):
+        """The pair of igraph_before(), different for functions with
+        progreess reporting."""
         if 'PROGRESS' in self.func[function]['FLAGS']:
             return '  R_igraph_after2(verbose);'
         else:
