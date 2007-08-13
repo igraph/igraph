@@ -55,6 +55,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 int Probabilities::length = 0;
 Communities* Probabilities::C = 0;
