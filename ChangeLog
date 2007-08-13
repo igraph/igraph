@@ -1,7 +1,6 @@
 2007-08-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* src/structural_properties.c (igraph_count_multiple) : add one
-	to really count the multiplicity of the edges
+	* src/structural_properties.c (igraph_count_multiple) : bug corrected
 
 	* src/structural_properties.c (igraph_is_multiple, igraph_is_loop) :
 	return bool vector

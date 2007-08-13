@@ -3708,7 +3708,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     for (j=0; j<n; j++) {
       long int e2=VECTOR(*neis)[j];
       long int to2=IGRAPH_OTHER(graph,e2,from);
-      if (to2==to && e2<e) {
+      if (to2==to && e2!=e) {
 	VECTOR(*res)[i] += 1;
       }
     }
