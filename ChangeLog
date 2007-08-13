@@ -1,5 +1,9 @@
 2007-08-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/igraph_pmt.h
+	* src/types.h
+	* src/vector.c : added igraph_vector_bool_t type
+
 	* src/structural_properties.c (igraph_count_multiple) : added
 
 2007-08-09  Gabor Csardi  <csardi@belus>
