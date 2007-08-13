@@ -326,6 +326,13 @@
 
       Defaults to \code{TRUE}, the layout will be rescaled.
     }
+    \item{asp}{A numberic constant, it gives the \code{asp} parameter
+      for \code{\link{plot}}, the aspect ratio. Supply 0 here if you
+      don't want to give an aspect ratio. It is ignored by \code{tkplot}
+      and \code{rglplot}.
+
+      Defaults to 1.
+    }
   }
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
