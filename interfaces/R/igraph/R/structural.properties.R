@@ -539,3 +539,27 @@ girth <- function(graph, circle=TRUE) {
   .Call("R_igraph_girth", graph, as.logical(circle),
         PACKAGE="igraph")
 }
+
+is.loop <- function(graph, eids=E(graph)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object");
+  }
+  .Call("R_igraph_is_loop", graph, as.igraph.es(eids),
+        PACKAGE="igraph")
+}
+
+is.multiple <- function(graph, eids=E(graph)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object");
+  }
+  .Call("R_igraph_is_multiple", graph, as.igraph.es(eids),
+        PACKAGE="igraph")
+}
+
+count.multiple <- function(graph, eids=E(graph)) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object");
+  }
+  .Call("R_igraph_count_multiple", graph, as.igraph.es(eids),
+        PACKAGE="igraph")
+}

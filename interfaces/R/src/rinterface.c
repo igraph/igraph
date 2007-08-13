@@ -36,6 +36,7 @@
 int igraph_free(void *p);
 
 SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v);
+SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v);
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
 SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
@@ -912,6 +913,24 @@ SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v) {
   } else {
     PROTECT(result=R_NilValue);
   }
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
+  SEXP result;
+  long int n=igraph_vector_bool_size(v);
+  
+  PROTECT(result=NEW_LOGICAL(n));
+  if (sizeof(igraph_bool_t)==sizeof(LOGICAL(result)[0])) {
+    igraph_vector_bool_copy_to(v, LOGICAL(result));
+  } else {
+    long int i;
+    for (i=0; i<n; i++) {
+      LOGICAL(result)[i] = VECTOR(*v)[i];
+    }
+  }
+  
   UNPROTECT(1);
   return result;
 }
@@ -6183,6 +6202,72 @@ SEXP R_igraph_kautz(SEXP pm, SEXP pn) {
   igraph_kautz(&g, m, n);
   PROTECT(result=R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_is_loop(SEXP graph, SEXP edges) {
+  
+  igraph_es_t es;
+  igraph_t g;
+  igraph_vector_bool_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_es(edges, &g, &es);
+  igraph_vector_bool_init(&res, 0);
+  igraph_is_loop(&g, &res, es);
+  PROTECT(result=R_igraph_vector_bool_to_SEXP(&res));
+  igraph_vector_bool_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_is_multiple(SEXP graph, SEXP edges) {
+  
+  igraph_es_t es;
+  igraph_t g;
+  igraph_vector_bool_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_es(edges, &g, &es);
+  igraph_vector_bool_init(&res, 0);
+  igraph_is_multiple(&g, &res, es);
+  PROTECT(result=R_igraph_vector_bool_to_SEXP(&res));
+  igraph_vector_bool_destroy(&res);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_count_multiple(SEXP graph, SEXP edges) {
+  
+  igraph_es_t es;
+  igraph_t g;
+  igraph_vector_t res;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_igraph_es(edges, &g, &es);
+  igraph_vector_init(&res, 0);
+  igraph_count_multiple(&g, &res, es);
+  PROTECT(result=R_igraph_vector_to_SEXP(&res));
+  igraph_vector_destroy(&res);
   
   R_igraph_after();
   

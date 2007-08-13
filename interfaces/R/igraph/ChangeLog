@@ -1,3 +1,12 @@
+2007-08-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R (is.loop, is.multiple)
+	(count.multiple) : added
+	* interfaces/R/src/rinterface.c (R_igraph_is_loop, R_igraph_is_multiple)
+	(R_igraph_count_multiple) : added
+
+	* interfaces/R/src/rinterface.c (R_igraph_vector_bool_to_SEXP) : added
+
 2007-08-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.common.R
