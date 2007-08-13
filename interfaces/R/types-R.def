@@ -1,11 +1,38 @@
 
-TYPE GRAPH:
-	INCONV:	if (!is.igraph(%I%)) {
-		  stop("Not a graph object")
-		};
+GRAPH:
+    INCONV: if (!is.igraph(%I%)) { stop("Not a graph object") }
 
-TYPE INTEGER:
-	INCONV: %C% <- as.numeric(%I%);
+INTEGER:
+    INCONV: %I% <- as.numeric(%I%)
+    DEFAULT:
+       0: 0
 
-TYPE BOOL:
-	INCONV:	%C% <- as.logical(%I%);
+REAL:
+    INCONV: %I% <- as.numeric(%I%)
+
+BOOLEAN:
+    INCONV: %I% <- as.logical(%I%)
+    DEFAULT:
+       True: TRUE
+       False: FALSE
+
+VECTOR:
+    INCONV: %I% <- as.numeric(%I%)
+
+VECTOR_OR_0:
+    INVONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
+
+MATRIX:
+    INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
+
+ATTRIBUTES:
+
+CONNECTEDNESS:
+    INCONV: %I% <- as.numeric(pmatch(%I%, c("weak", "strong"))-1)
+    DEFAULT:
+       WEAK: "weak"
+
+INTEGERPTR:
+
+NULL:
+    CALL:

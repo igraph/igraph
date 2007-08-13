@@ -24,20 +24,6 @@
 # Structure building
 ###################################################################
 
-graph.empty <- function(n=0, directed=TRUE) {
-  n <- as.numeric(n);
-  directed <- as.logical(directed);
-  .Call("R_igraph_empty", n, directed,
-        PACKAGE="igraph")
-}
-
-graph.empty <- function(n=0, directed=TRUE) {
-  n <- as.numeric(n);
-  directed <- as.logical(directed);
-  .Call("R_igraph_empty", n, directed,
-        PACKAGE="igraph")
-}
-
 add.edges <- function(graph, edges, ..., attr=list()) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -115,14 +101,6 @@ delete.vertices <- function(graph, v) {
 ###################################################################
 # Structure query
 ###################################################################
-  
-vcount <- function(graph) {
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  .Call("R_igraph_vcount", graph,
-        PACKAGE="igraph")
-}
   
 ecount <- function(graph) {
   if (!is.igraph(graph)) {

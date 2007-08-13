@@ -24,17 +24,6 @@
 # Connected components, subgraphs, kinda
 ###################################################################
 
-clusters <- function(graph, mode="weak") {
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  if (is.character(mode)) {
-    mode <- switch(mode, "weak"=1, "strong"=2)
-  }
-  .Call("R_igraph_clusters", graph, as.numeric(mode),
-        PACKAGE="igraph")
-}
-
 no.clusters <- function(graph, mode="weak") {
   if (!is.igraph(graph)) {
     stop("Not a graph object")

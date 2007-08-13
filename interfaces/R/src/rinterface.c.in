@@ -1224,23 +1224,6 @@ SEXP R_igraph_add_vertices(SEXP graph, SEXP pnv) {
   return result;
 }
   
-SEXP R_igraph_vcount(SEXP graph) {
-  
-  igraph_t g;
-  SEXP result;
-
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  PROTECT(result=NEW_NUMERIC(1));
-  REAL(result)[0]=igraph_vcount(&g);
-
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
 SEXP R_igraph_ecount(SEXP graph) {
   
   igraph_t g;
@@ -1387,40 +1370,6 @@ SEXP R_igraph_degree(SEXP graph, SEXP vids, SEXP pmode, SEXP ploops) {
   R_igraph_after();
   
   UNPROTECT(1);
-  return result;
-}
-
-SEXP R_igraph_clusters(SEXP graph, SEXP pmode) {
-
-  igraph_t g;
-  igraph_integer_t mode=REAL(pmode)[0];
-  igraph_vector_t membership;
-  igraph_vector_t csize;
-  SEXP result, names;
-  
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  igraph_vector_init(&membership, 0);
-  igraph_vector_init(&csize, 0);
-  igraph_clusters(&g, &membership, &csize, 0, mode);
-  
-  PROTECT(result=NEW_LIST(2));
-  PROTECT(names=NEW_CHARACTER(2));
-  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(igraph_vector_size(&membership)));
-  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(igraph_vector_size(&csize)));
-  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("membership"));
-  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("csize"));
-  SET_NAMES(result, names);
-  igraph_vector_copy_to(&membership, REAL(VECTOR_ELT(result, 0)));
-  igraph_vector_copy_to(&csize, REAL(VECTOR_ELT(result, 1)));
-  
-  igraph_vector_destroy(&membership);
-  igraph_vector_destroy(&csize);
-
-  R_igraph_after();
-  
-  UNPROTECT(2);
   return result;
 }
 
@@ -3188,37 +3137,6 @@ SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
   igraph_destroy(&g);
   
   R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
-SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter, 
-					  SEXP pmaxdelta, SEXP parea,
-					  SEXP pcoolexp, SEXP prepulserad,
-					  SEXP pweights,
-					  SEXP verbose) {
-  igraph_t g;
-  igraph_integer_t niter=REAL(pniter)[0];
-  igraph_real_t maxdelta=REAL(pmaxdelta)[0];
-  igraph_real_t area=REAL(parea)[0];
-  igraph_real_t coolexp=REAL(pcoolexp)[0];
-  igraph_real_t repulserad=REAL(prepulserad)[0];
-  igraph_matrix_t res;
-  igraph_vector_t weights, *ppweights=0;
-  SEXP result;
-  
-  R_igraph_before2(verbose, "FR layout");
-  
-  R_SEXP_to_igraph(graph, &g);
-  igraph_matrix_init(&res, 0, 0);
-  if (!isNull(pweights)) { R_SEXP_to_vector(pweights, &weights);ppweights=&weights; }
-  igraph_layout_fruchterman_reingold(&g, &res, niter, maxdelta, area, 
-				     coolexp, repulserad, 0, ppweights);
-  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
-  igraph_matrix_destroy(&res);
-  
-  R_igraph_after2(verbose);
   
   UNPROTECT(1);
   return result;
@@ -5684,29 +5602,6 @@ SEXP R_igraph_independence_number(SEXP graph) {
   
   UNPROTECT(1);
   return result;
-}
-
-SEXP R_igraph_empty(SEXP n, SEXP directed) {
-  SEXP graph;
-  igraph_t c_graph;
-  igraph_integer_t c_n;
-  igraph_bool_t c_directed;
-  
-  R_igraph_before();
-
-  c_n=REAL(n)[0];
-  c_directed=LOGICAL(directed)[0];
-
-  igraph_empty(&c_graph, c_n, c_directed);
-
-  PROTECT(graph=R_igraph_to_SEXP(&c_graph));
-
-  igraph_destroy(&c_graph);
-
-  R_igraph_after();
-
-  UNPROTECT(1);
-  return graph;
 }
 
 SEXP R_igraph_lastcit_game(SEXP pnodes, SEXP pedges, SEXP pagebins,

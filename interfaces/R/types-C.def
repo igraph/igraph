@@ -1,23 +1,113 @@
 
-TYPE GRAPH:
-	CTYPE:	igraph_t *
-	ITYPE:	SEXP
-	DECL: 	igraph_t %C%;
-	OUTCONV:	PROTECT(%I%=R_igraph_to_SEXP(&%C%)); 
-		igraph_destroy(&%C%);
-	FCALL:	&%C%
+##################################
+# GRAPH
 
-TYPE INTEGER:
-	CTYPE:	igraph_integer_t
-	ITYPE:	SEXP
-	INCONV:	%C%=REAL(%I%)[0];
-	OUTCONV:	PROTECT(%I%=NEW_NUMERIC(1));
-		REAL(%I%)[0]=%C%;
+GRAPH:
+  CTYPE: igraph_t
+  CALL:  &%C%
+  INCONV: 
+    IN: R_SEXP_to_igraph(%I%, &%C%);
+    INOUT: R_SEXP_to_igraph_copy(%I%, &%C%); \
+           IGRAPH_FINALLY(igraph_destroy, &%C%);
+  OUTCONV:
+    OUT: IGRAPH_FINALLY(igraph_destroy, &%C%); \
+         PROTECT(%I%=R_igraph_to_SEXP(&%C%));  \
+         igraph_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+    INOUT: PROTECT(%I%=R_igraph_to_SEXP(&%C%));  \
+           igraph_destroy(&%C%); \
+           IGRAPH_FINALLY_CLEAN(1);
 
-TYPE BOOL:
-	CTYPE:	igraph_bool_t
-	ITYPE:	SEXP
-	INCONV:	%C%=LOGICAL(%I%)[0];
-	OUTCONV:	PROTECT(%I%=NEW_LOGICAL(1));
-		LOGICAL(%I%)[0]=%C%;
+##################################
+# INTEGER
 
+INTEGER:  
+  CTYPE: igraph_integer_t
+  INCONV: 
+    IN: %C%=REAL(%I%)[0];
+
+INTEGERPTR:
+  CTYPE: igraph_integer_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
+         REAL(%I%)[0]=%C%;
+
+##################################
+# REAL
+
+REAL:
+  CTYPE: igraph_real_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+##################################
+# BOOLEAN
+
+BOOLEAN:
+  CTYPE: igraph_bool_t
+  INCONV:
+    IN: %C%=LOGICAL(%I%)[0];
+
+##################################
+# ERROR, used as the return type usually
+
+ERROR:
+  CTYPE: int
+
+##################################
+# CONNECTEDNESS
+
+CONNECTEDNESS:
+  CTYPE: igraph_connectedness_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+##################################
+# VECTOR of real values
+
+VECTOR:
+  CTYPE: igraph_vector_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_vector(%I%, &%C%);
+    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+##################################
+# VECTOR that can be NULL
+
+VECTOR_OR_0:
+  CTYPE: igraph_vector_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN: if (!isNull(%I%)) { R_SEXP_to_vector(%I%, &%C%); }
+
+##################################
+# MATRIX of real values
+
+MATRIX:
+  CTYPE: igraph_matrix_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_matrix(%I%, &%C%);
+    OUT: if (0 != igraph_matrix_init(&%C%, 0, 0)) { \
+            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_matrix_to_SEXP(&%C%)); \
+         igraph_matrix_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+##################################
+# NULL, this is supplied as an argument
+
+NULL:
+  CALL: 0
