@@ -3704,7 +3704,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     long int to=IGRAPH_TO(graph, e);
     igraph_vector_t *neis=igraph_i_lazy_adjedgelist_get(&adjlist, from);
     long int j, n=igraph_vector_size(neis);
-    VECTOR(*res)[i]=0;
+    VECTOR(*res)[i]=1;
     for (j=0; j<n; j++) {
       long int e2=VECTOR(*neis)[j];
       long int to2=IGRAPH_OTHER(graph,e2,from);
