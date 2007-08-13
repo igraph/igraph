@@ -1,3 +1,7 @@
+2007-08-13  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structure.generators.R (graph.formula) : added
+
 2007-08-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/components.R (clusters)
