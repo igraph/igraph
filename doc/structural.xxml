@@ -72,6 +72,13 @@
 <!-- doxrox-include igraph_laplacian -->
 </section>
 
+<section><title>Non-simple graphs: multiple and loop edges</title>
+<!-- doxrox-include igraph_is_loop -->
+<!-- doxrox-include igraph_is_multiple -->
+<!-- doxrox-include igraph_count_multiple -->
+<!-- doxrox-include igraph_simplify -->
+</section>
+
 <section><title>K-Cores</title>
 <!-- doxrox-include igraph_coreness -->
 </section>
@@ -86,7 +93,6 @@
 
 <section><title>Other Operations</title>
 <!-- doxrox-include igraph_density -->
-<!-- doxrox-include igraph_simplify -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_get_adjacency -->	
 <!-- doxrox-include igraph_get_edgelist -->	

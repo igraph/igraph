@@ -3632,6 +3632,23 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_is_loop
+ * \brief Find the loop edges in a graph
+ * 
+ * </para><para>
+ * A loop edge is an edge from a vertex to itself.
+ * \param graph The input graph.
+ * \param res Pointer to an initialized boolean vector for storing the result, 
+ *         it will be resized as needed.
+ * \param es The edges to check, for all edges supply \ref igraph_ess_all() here.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_simplify() to get rid of loop edges.
+ *
+ * Time complexity: O(e), the number of edges to check.
+ */
+
 int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res, 
 		   igraph_es_t es) {
   igraph_eit_t eit;  
@@ -3650,6 +3667,31 @@ int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_is_multiple
+ * \brief Find the multiple edges in a graph
+ * 
+ * </para><para>
+ * An edge is a multiple edge if there is another 
+ * edge with the same head and tail vertices in the graph.
+ * 
+ * </para><para>
+ * Note that this function returns true only for the second or more 
+ * appereances of the multiple edges.
+ * \param graph The input graph.
+ * \param res Pointer to a boolean vector, the result will be stored 
+ *        here. It will be resized as needed.
+ * \param es The edges to check. Supply \ref igraph_ess_all() if you want
+ *        to check all edges.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_count_multiple() and \ref igraph_simplify().
+ * 
+ * Time complexity: O(e*d), e is the number of edges to check and d is the 
+ * average degree (out-degree in directed graphs) of the vertices at the 
+ * tail of the edges.
+ */
 
 int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res, 
 		       igraph_es_t es) {
@@ -3685,6 +3727,34 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
+
+/**
+ * \function igraph_count_multiple
+ * \brief Count the number of appearance of the edges in a graph
+ * 
+ * </para><para>
+ * If the graph has no multiple edges then the result vector will be 
+ * filled with ones.
+ * (An edge is a multiple edge if there is another 
+ * edge with the same head and tail vertices in the graph.)
+ * 
+ * </para><para>
+ * Note that this function returns true only for the second or more 
+ * appereances of the multiple edges.
+ * \param graph The input graph.
+ * \param res Pointer to a vector, the result will be stored 
+ *        here. It will be resized as needed.
+ * \param es The edges to check. Supply \ref igraph_ess_all() if you want
+ *        to check all edges.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_is_multiple() and \ref igraph_simplify().
+ * 
+ * Time complexity: O(e*d), e is the number of edges to check and d is the 
+ * average degree (out-degree in directed graphs) of the vertices at the 
+ * tail of the edges.
+ */
+
 
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
   igraph_eit_t eit;
