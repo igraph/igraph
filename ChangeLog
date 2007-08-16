@@ -1,3 +1,9 @@
+2007-08-16  Gabor Csardi  <csardi@belus>
+
+	* src/igraph_grid.c (igraph_2dgrid_which, igraph_2dgrid_dist)
+	(igraph_2dgrid_dist2, igraph_2dgrid_next_nei)
+	(igraph_i_layout_mergegrid_which) : removed inline
+
 2007-08-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_count_multiple) : bug corrected

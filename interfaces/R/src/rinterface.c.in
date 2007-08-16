@@ -858,7 +858,7 @@ int R_igraph_progress_handler(const char *message, igraph_real_t percent,
   return 0;
 }
 
-R_INLINE void R_igraph_before() {
+static R_INLINE void R_igraph_before() {
   R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
   R_igraph_oldinterrupt=
     igraph_set_interruption_handler(R_igraph_interrupt_handler);
@@ -866,7 +866,7 @@ R_INLINE void R_igraph_before() {
     igraph_i_set_attribute_table(&R_igraph_attribute_table);
 }
 
-R_INLINE void R_igraph_before2(SEXP verbose, const char *str) {
+static R_INLINE void R_igraph_before2(SEXP verbose, const char *str) {
   R_igraph_oldhandler=igraph_set_error_handler(R_igraph_myhandler);
   R_igraph_oldinterrupt=
     igraph_set_interruption_handler(R_igraph_interrupt_handler);
@@ -877,13 +877,13 @@ R_INLINE void R_igraph_before2(SEXP verbose, const char *str) {
   }
 }  
 
-R_INLINE void R_igraph_after() {
+static R_INLINE void R_igraph_after() {
   igraph_set_error_handler(R_igraph_oldhandler);
   igraph_set_interruption_handler(R_igraph_oldinterrupt);
   igraph_i_set_attribute_table(R_igraph_attribute_oldtable);
 }
 
-R_INLINE void R_igraph_after2(SEXP verbose) {
+static R_INLINE void R_igraph_after2(SEXP verbose) {
   igraph_set_error_handler(R_igraph_oldhandler);
   igraph_set_interruption_handler(R_igraph_oldinterrupt);
   igraph_i_set_attribute_table(R_igraph_attribute_oldtable);

@@ -1,3 +1,8 @@
+2007-08-16  Gabor Csardi  <csardi@belus>
+
+	* interfaces/R/src/rinterface.c.in (R_igraph_before, R_igraph_after)
+	(R_igraph_before2, R_igraph_after2) : added static to R_INLINE
+
 2007-08-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.formula) : added

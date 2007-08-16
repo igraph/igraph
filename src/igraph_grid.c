@@ -28,7 +28,7 @@
 
 /* internal function */
 
-inline int igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
+int igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
 			long int *x, long int *y) {
 
   if (xc <= grid->minx) { 
@@ -189,7 +189,7 @@ igraph_bool_t igraph_2dgrid_in(const igraph_2dgrid_t *grid, long int elem) {
   return VECTOR(grid->next)[elem] != -1;
 }
 
-inline igraph_real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid, 
+igraph_real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid, 
 			  long int e1, long int e2) {
   igraph_real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
   igraph_real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
@@ -197,7 +197,7 @@ inline igraph_real_t igraph_2dgrid_dist(const igraph_2dgrid_t *grid,
   return sqrt(x*x + y*y);
 }
 
-inline igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid, 
+igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid, 
 			  long int e1, long int e2) {
   igraph_real_t x=MATRIX(*grid->coords, e1, 0)-MATRIX(*grid->coords, e2, 0);
   igraph_real_t y=MATRIX(*grid->coords, e1, 1)-MATRIX(*grid->coords, e2, 1);
@@ -329,9 +329,6 @@ igraph_integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
   return ret;
 }
 
-#ifndef _MSC_VER
-inline
-#endif
 igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
 				 igraph_2dgrid_iterator_t *it) {
   long int ret=it->nei;
@@ -349,9 +346,9 @@ igraph_integer_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
 
 /*-----------------------------------------------------------------------*/
 
-inline int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
-					   igraph_real_t xc, igraph_real_t yc,
-					   long int *x, long int *y) {
+int igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
+				    igraph_real_t xc, igraph_real_t yc,
+				    long int *x, long int *y) {
   if (xc <= grid->minx) { 
     *x=0; 
   } else if (xc >= grid->maxx) {
