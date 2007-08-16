@@ -1585,7 +1585,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     long int type1;
     igraph_real_t uni1=RNG_UNIF(0, maxcum);
     igraph_vector_binsearch(&cumdist, uni1, &type1);
-    VECTOR(*nodetypes)[i] = type1;
+    VECTOR(*nodetypes)[i] = type1-1;
   }
 
   igraph_vector_destroy(&cumdist);
@@ -1597,10 +1597,10 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
       if (!loops && i == j) continue;
 
-      type1=VECTOR(*nodetypes)[i];
-      type2=VECTOR(*nodetypes)[j];
+      type1=(long)VECTOR(*nodetypes)[i];
+      type2=(long)VECTOR(*nodetypes)[j];
 
-      if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
+      if (RNG_UNIF01() < (igraph_real_t)MATRIX(*pref_matrix, type1, type2)) {
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
       }
@@ -1708,8 +1708,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     long int type1;
     igraph_real_t uni1=RNG_UNIF(0, maxcum);
     igraph_vector_binsearch(&cumdist, uni1, &type1);
-    VECTOR(*nodetypes_in)[i] = type1 / (int)types;
-    VECTOR(*nodetypes_out)[i] = type1 % (int)types;
+    VECTOR(*nodetypes_in)[i] = (type1-1) / (int)types;
+    VECTOR(*nodetypes_out)[i] = (type1-1) % (int)types;
   }
 
   igraph_vector_destroy(&cumdist);
@@ -1721,8 +1721,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
       if (!loops && i == j) continue;
 
-      type1=VECTOR(*nodetypes_out)[i];
-      type2=VECTOR(*nodetypes_in)[j];
+      type1=(long)VECTOR(*nodetypes_out)[i];
+      type2=(long)VECTOR(*nodetypes_in)[j];
 
       if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
