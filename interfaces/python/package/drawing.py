@@ -45,7 +45,7 @@ __all__ = ["BoundingBox", "Plot", "plot"]
 try:
     import cairo
 except ImportError:
-    # No cairo support is installed. Drop a warning and create a fake module
+    # No cairo support is installed. Create a fake module
     class FakeModule(object):
         def __getattr__(self, a):
             raise TypeError, "plotting not available"
@@ -54,7 +54,6 @@ except ImportError:
         def __setattr__(self, k, v):
             raise TypeError, "plotting not available"
     cairo=FakeModule()
-    warn("Cairo support not installed, no plotting functionality will be available")
 
 class BoundingBox(object):
     """Class representing a bounding box (a rectangular area)."""

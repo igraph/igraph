@@ -1355,7 +1355,7 @@ PyObject *igraphmodule_Graph_Preference(PyTypeObject * type,
                                         PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  long n, types;
+  long i, n, types;
   PyObject *type_dist, *pref_matrix;
   PyObject *directed = Py_False;
   PyObject *loops = Py_False;

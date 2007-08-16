@@ -263,6 +263,7 @@ class ClassicPythonShell(Shell):
         """Starts the embedded shell.
         
         @param namespace: global namespace to use"""
+        from code import InteractiveConsole
         self._shell = InteractiveConsole(locals=namespace)
         print >>sys.stderr, "igraph %s running inside " % __version__,
         self._shell.runsource("from igraph import *")

@@ -32,6 +32,7 @@ from clustering import *
 from layout import *
 from drawing import *
 from colors import *
+from datatypes import *
 from configuration import Configuration
 
 import os
@@ -133,6 +134,32 @@ class Graph(core.GraphBase):
         kwds['degree']=_igraph.OUT
         return self.degree(*args, **kwds)
 
+    def clusters(self, mode=STRONG):
+        """clusters(mode=STRONG)
+
+        Calculates the (strong or weak) clusters (connected components) for
+        a given graph.
+
+        @param mode: must be either C{STRONG} or C{WEAK}, depending on the
+          clusters being sought. Optional, defaults to C{STRONG}.
+        @return: a L{VertexClustering} object"""
+        return VertexClustering(self, GraphBase.clusters(self, mode))
+    components = clusters
+
+    def degree_distribution(self, bin_width = 1, *args, **kwds):
+        """degree_distribution(bin_width=1, ...)
+
+        Calculates the degree distribution of the graph.
+
+        Unknown keyword arguments are directly passed to L{degree()}.
+
+        @param bin_width: the bin width of the histogram
+        @return: a histogram representing the degree distribution of the
+          graph.
+        """
+        result = Histogram(bin_width, self.degree(*args, **kwds))
+        return result
+
     def eccentricity(self, nodes=None):
         """Calculates eccentricities for vertices with the given indices.
         
@@ -162,31 +189,47 @@ class Graph(core.GraphBase):
 
         return result
 
-    def clusters(self, mode=STRONG):
-        """clusters(mode=STRONG)
+    def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None):
+        """Returns the adjacency matrix of a graph.
 
-        Calculates the (strong or weak) clusters (connected components) for
-        a given graph.
-
-        @param mode: must be either C{STRONG} or C{WEAK}, depending on the
-          clusters being sought. Optional, defaults to C{STRONG}.
-        @return: a L{VertexClustering} object"""
-        return VertexClustering(self, GraphBase.clusters(self, mode))
-    components = clusters
-
-    def degree_distribution(self, bin_width = 1, *args, **kwds):
-        """degree_distribution(bin_width=1, ...)
-
-        Calculates the degree distribution of the graph.
-
-        Unknown keyword arguments are directly passed to L{degree()}.
-
-        @param bin_width: the bin width of the histogram
-        @return: a histogram representing the degree distribution of the
-          graph.
+        @param type: either C{GET_ADJACENCY_LOWER} (uses the lower
+          triangle of the matrix) or C{GET_ADJACENCY_UPPER}
+          (uses the upper triangle) or C{GET_ADJACENCY_BOTH}
+          (uses both parts). Ignored for directed graphs.
+        @param attribute: if C{None}, returns the ordinary adjacency
+          matrix. When the name of a valid edge attribute is given
+          here, the matrix returned will contain C{None} at the places
+          where there is no edge or the value of the given attribute
+          where there is an edge. Multiple edges are not supported,
+          the value written in the matrix in this case will be
+          unpredictable.
+        @return: the adjacency matrix as a L{Matrix}.
         """
-        result = Histogram(bin_width, self.degree(*args, **kwds))
-        return result
+        if type != GET_ADJACENCY_LOWER and type != GET_ADJACENCY_UPPER and \
+          type != GET_ADJACENCY_BOTH:
+            # Maybe it was called with the first argument as the attribute name
+            type, attribute = attribute, type
+            if type is None: type = GET_ADJACENCY_BOTH
+
+        if attribute is None: return Matrix(GraphBase.get_adjacency(self, type))
+        if attribute not in self.es.attributes():
+            raise ValueError, "Attribute does not exist"
+        data = [[None] * self.vcount() for _ in xrange(self.vcount())]
+
+        if not self.is_directed():
+            if type == GET_ADJACENCY_BOTH:
+                for e in self.es:
+                    data[e.tuple[0]][e.tuple[1]] = e[attribute]
+                    data[e.tuple[1]][e.tuple[0]] = e[attribute]
+            elif type == GET_ADJACENCY_UPPER:
+                for e in self.es: data[min(e.tuple)][max(e.tuple)] = e[attribute]
+            else:
+                for e in self.es: data[max(e.tuple)][min(e.tuple)] = e[attribute]
+        else:
+            for e in self.es: data[e.tuple[0]][e.tuple[1]] = e[attribute]
+
+        return Matrix(data)
+
 
     def modularity(self, membership):
         """modularity(membership)

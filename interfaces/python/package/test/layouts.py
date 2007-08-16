@@ -77,8 +77,8 @@ class LayoutTests(unittest.TestCase):
 
     def testBoundingBox(self):
         layout = Layout([(0,0,1), (0,1,0), (1,0,0), (2,1,3)])
-        self.assertEqual(layout.bounding_box(), ([0,0,0], [2,1,3]))
-        self.assertEqual(layout.bounding_box(1), ([-1,-1,-1], [3,2,4]))
+        self.assertEqual(layout.bounding_box(), (0,0,0,2,1,3))
+        self.assertEqual(layout.bounding_box(1), (-1,-1,-1,3,2,4))
 
 
     def testCenter(self):
