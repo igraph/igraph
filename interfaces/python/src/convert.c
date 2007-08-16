@@ -191,11 +191,14 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
               PyErr_SetString(PyExc_TypeError, "sequence elements must be integer pairs");
               ok=0;
             }
+            Py_XDECREF(i1); Py_XDECREF(i2);
           } else {
             /* this should not happen, but we return anyway.
              * An IndexError exception was set by PySequence_GetItem
              * at this point */
             igraph_vector_destroy(v);
+            Py_XDECREF(i1); Py_XDECREF(i2);
+            Py_XDECREF(item);
             return 1;
           }
         } else {
@@ -213,6 +216,7 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
           PyErr_SetString(PyExc_TypeError, "sequence elements must be integers");
           ok=0;
         }
+        Py_XDECREF(item);
       }
          
       if (!ok) {
