@@ -119,6 +119,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
                 "graphml"=write.graph.graphml(graph, file, ...),
                 "dimacs"=write.graph.dimacs(graph, file, ...),
                 "gml"=write.graph.gml(graph, file, ...),
+                "dot"=write.graph.dot(graph, file, ...),
                 stop(paste("Unknown file format:",format))
                 )
 
@@ -272,6 +273,15 @@ write.graph.gml <- function(graph, file, id=NULL, creator=NULL, ...) {
     creator <- as.character(creator)
   }
   .Call("R_igraph_write_graph_gml", graph, file, id, creator,
+        PACKAGE="igraph")
+}
+
+################################################################
+# Dot
+################################################################
+
+write.graph.dot <- function(graph, file, ...) {
+  .Call("R_igraph_write_graph_dot", graph, file,
         PACKAGE="igraph")
 }
 
