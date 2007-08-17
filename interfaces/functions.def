@@ -88,3 +88,34 @@ igraph_layout_fruchterman_reingold:
         RETURN: ERROR
         FLAGS: PROGRESS
         IGNORE: RR
+
+igraph_layout_graphopt:
+        PARAM-list:
+            graph:
+               type: GRAPH
+            res:
+               type: MATRIX
+               mode: OUT
+            niter:
+               type: INTEGER
+               default: 100
+            node_charge:
+               type: REAL
+               deafult: 0.001
+            node_mass:
+               type: REAL
+               default: 30
+            spring_length:
+               type: INTEGER
+               default: 0
+            spring_constant:
+               type: REAL
+               default: 1
+            max_sa_movement:
+               type: REAL
+               default: 5
+            use_seed:
+               type: NULL
+        NAME-R: layout.graphopt
+        RETURN: ERROR
+        FLAGS: PROGRESS

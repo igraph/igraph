@@ -11,6 +11,7 @@
 <!-- doxrox-include about_layouts -->
 <!-- doxrox-include igraph_layout_random -->
 <!-- doxrox-include igraph_layout_circle -->
+<!-- doxrox-include igraph_layout_graphopt -->
 <!-- doxrox-include igraph_layout_fruchterman_reingold -->
 <!-- doxrox-include igraph_layout_kamada_kawai -->
 <!-- doxrox-include igraph_layout_reingold_tilford -->
