@@ -1096,7 +1096,9 @@ class Graph(core.GraphBase):
         max_vertex_size = max(vertex_sizes)
 
         layout = kwds.get("layout", None)
-        if not isinstance(layout, Layout):
+        if isinstance(layout, Layout):
+            layout = Layout(layout.coords)
+        else:
             layout = self.layout(layout)
         sl, st, sr, sb = layout.bounding_box()
         sw, sh = sr-sl, sb-st
@@ -1105,9 +1107,8 @@ class Graph(core.GraphBase):
         rx, ry = float(bbox.width-max_vertex_size-margin[1]-margin[3])/sw, \
           float(bbox.height-max_vertex_size-margin[0]-margin[2])/sh
         layout.scale(rx, ry)
-        layout.translate(-sl*rx+max_vertex_size/2.+margin[1], \
-          -st*ry+max_vertex_size/2.+margin[0])
-
+        layout.translate(-sl*rx+max_vertex_size/2.+margin[1]+bbox.coords[0], \
+          -st*ry+max_vertex_size/2.+margin[0]+bbox.coords[1])
         context.set_line_width(1)
 
         edge_colors = drawing.collect_attributes(self.ecount(), "edge_color", \
@@ -1299,14 +1300,14 @@ def read(filename, *args, **kwds):
     return Graph.Read(filename, *args, **kwds)
 load=read
 
-def write(filename, graph, *args, **kwds):
+def write(graph, filename, *args, **kwds):
     """Saves a graph to the given file.
 
     This is just a convenience function, calls L{Graph.write} directly.
     All arguments are passed unchanged to L{Graph.write}
 
-    @param filename: the name of the file to be written
     @param graph: the graph to be saved
+    @param filename: the name of the file to be written
     """
     return graph.write(filename, *args, **kwds)
 save=write

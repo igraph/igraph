@@ -103,9 +103,9 @@ class BoundingBox(object):
         return self._coords[3]-self._coords[1]
     def _get_shape(self):
         return self._coords[2]-self._coords[0], self._coords[3]-self._coords[1]
-    width = property(_get_width, "Gets the width of the bounding box")
-    height = property(_get_height, "Gets the height of the bounding box")
-    shape = property(_get_shape, "Gets the shape of the bounding box (width, height)")
+    width = property(_get_width, doc="Gets the width of the bounding box")
+    height = property(_get_height, doc="Gets the height of the bounding box")
+    shape = property(_get_shape, doc="Gets the shape of the bounding box (width, height)")
 
 
 class Plot(object):
