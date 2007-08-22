@@ -327,7 +327,7 @@ class RRCodeGenerator(CodeGenerator):
             if 'default' in params[pname]:
                 if 'DEFAULT' in t and params[pname]['default'] in t['DEFAULT']:
                     default="=" + t['DEFAULT'][ params[pname]['default'] ]
-            return pname + default
+            return pname.replace("_", ".") + default
             
         head=[ do_par(n) for n,p in params.items()
                if p['mode'] in ['IN','INOUT'] ]
@@ -353,7 +353,7 @@ class RRCodeGenerator(CodeGenerator):
                 res="  " + t['INCONV']
             else:
                 res=""
-            return res.replace("%I%", pname)
+            return res.replace("%I%", pname.replace("_", "."))
 
         inconv=[ do_par(n) for n in params.keys() ]
         inconv=[ i for i in inconv if i != "" ]
@@ -371,11 +371,11 @@ class RRCodeGenerator(CodeGenerator):
         ## The tail of the function is also written and we're ready.
         def do_par(pname):
             t=self.types[params[pname]['type']]
-            call=pname
+            call=pname.replace("_", ".")
             if 'CALL' in t:
                 call=t['CALL']
                 if call:
-                    call=call.replace('%I%', pname)
+                    call=call.replace('%I%', pname.replace("_", "."))
                 else:
                     call=""
             return call
