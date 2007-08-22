@@ -28,7 +28,8 @@ MATRIX:
 ATTRIBUTES:
 
 CONNECTEDNESS:
-    INCONV: %I% <- as.numeric(pmatch(%I%, c("weak", "strong"))-1)
+    INCONV: %I% <- as.numeric(pmatch(tolower(%I%), c("weak", "strong"))) ; \
+            if (is.na(%I%)) { stop("invalid `%I%' argument, see docs") }
     DEFAULT:
        WEAK: "weak"
 
