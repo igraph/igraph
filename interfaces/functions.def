@@ -98,10 +98,10 @@ igraph_layout_graphopt:
                mode: OUT
             niter:
                type: INTEGER
-               default: 100
+               default: 500
             node_charge:
                type: REAL
-               deafult: 0.001
+               default: 0.001
             node_mass:
                type: REAL
                default: 30

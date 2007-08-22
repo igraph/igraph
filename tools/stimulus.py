@@ -324,13 +324,23 @@ class RRCodeGenerator(CodeGenerator):
             tname=params[pname]['type']
             t=self.types[tname]
             default=""
+            header=pname.replace("_", ".")
+            if 'HEADER' in t:
+                header=t['HEADER']
+            if header:
+                header=header.replace("%I%", pname.replace("_", "."))
+            else:
+                header=""
             if 'default' in params[pname]:
                 if 'DEFAULT' in t and params[pname]['default'] in t['DEFAULT']:
                     default="=" + t['DEFAULT'][ params[pname]['default'] ]
-            return pname.replace("_", ".") + default
+                else:
+                    default="=" + params[pname]['default']
+            return header + default
             
         head=[ do_par(n) for n,p in params.items()
                if p['mode'] in ['IN','INOUT'] ]
+        head=[ h for h in head if h != "" ]
         if 'PROGRESS' in self.func[function]['FLAGS']:
             head.append('verbose=igraph.par("verbose")')
         out.write(", ".join(head))

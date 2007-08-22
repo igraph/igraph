@@ -4,8 +4,6 @@ GRAPH:
 
 INTEGER:
     INCONV: %I% <- as.numeric(%I%)
-    DEFAULT:
-       0: 0
 
 REAL:
     INCONV: %I% <- as.numeric(%I%)
@@ -37,3 +35,4 @@ INTEGERPTR:
 
 NULL:
     CALL:
+    HEADER:
