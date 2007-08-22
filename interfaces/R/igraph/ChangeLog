@@ -1,5 +1,8 @@
 2007-08-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/layout.R (layout.fruchterman.reingold) :
+	again small update because of stimulus
+
 	* interfaces/R/igraph/R/foreign.R (write.graph, write.graph.dot)
 	* interfaces/R/src/rinterface.c.in (R_igraph_write_graph_dot) : added	
 

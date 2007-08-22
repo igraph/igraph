@@ -470,7 +470,19 @@ class RCCodeGenerator(CodeGenerator):
         have type SEXP, and concatenate them by commas. If the
         function has a 'PROGRESS' flag that is used. The function name
         is created by prefixing the original name with 'R_'."""
-        inout=[ "SEXP "+n for n,p in params.items() if p['mode'] in ['IN','INOUT'] ]
+        def do_par(pname):
+            t=self.types[params[pname]['type']]
+            if 'HEADER' in t:
+                if t['HEADER']:
+                    return t['HEADER'].replace("%I%", pname)
+                else:
+                    return ""
+            else:
+                return pname
+            
+        inout=[ do_par(n) for n,p in params.items()
+                if p['mode'] in ['IN','INOUT'] ]
+        inout=[ "SEXP " + n for n in inout if n != "" ]
         if 'PROGRESS' in self.func[function]['FLAGS']:
             inout.append("SEXP verbose")
         return "SEXP R_" + function + "(" + ", ".join(inout) + ")"
