@@ -1,3 +1,7 @@
+2007-08-23  Gabor Csardi  <csardi@belus>
+
+	* src/vector.pmt (igraph_vector_add) : added
+
 2007-08-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/topology.c (igraph_isomorphic_vf2) : added 'map12' and 'map21' 

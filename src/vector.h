@@ -111,6 +111,7 @@ igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v, 
 igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
 igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v, BASE what, long int *pos);
 igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v, BASE what);
+void FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v, BASE plus);
 void FUNCTION(igraph_vector,multiply)(TYPE(igraph_vector) *v, BASE by);
 igraph_bool_t FUNCTION(igraph_vector,contains)(const TYPE(igraph_vector) *v, BASE e);
 igraph_bool_t FUNCTION(igraph_vector,search)(const TYPE(igraph_vector) *v, long int from, BASE what, 

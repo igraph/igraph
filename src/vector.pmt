@@ -1439,6 +1439,13 @@ void FUNCTION(igraph_vector,multiply)(TYPE(igraph_vector) *v, BASE by) {
   }
 }
 
+void FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v, BASE plus) {
+  long int i, n=FUNCTION(igraph_vector,size);
+  for (i=0; i<n; i++) {
+    VECTOR(*v)[i] += plus;
+  }
+}
+
 igraph_bool_t FUNCTION(igraph_vector,contains)(const TYPE(igraph_vector) *v, 
 					       BASE e) {
   BASE *p=v->stor_begin;
