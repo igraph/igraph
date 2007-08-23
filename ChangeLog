@@ -1,5 +1,7 @@
 2007-08-23  Gabor Csardi  <csardi@belus>
 
+	* src/vector.pmt (igraph_vector_add) : stupid bug corrected
+
 	* src/vector.pmt (igraph_vector_add) : added
 
 2007-08-23  Gabor Csardi  <csardi@rmki.kfki.hu>
