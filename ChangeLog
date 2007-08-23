@@ -1,5 +1,8 @@
 2007-08-23  Gabor Csardi  <csardi@belus>
 
+	* src/topology.c (igraph_isomorphic_vf2) : check directedness,
+	check number of vertices, fix +1 bug for map12 and map21
+
 	* src/vector.pmt (igraph_vector_add) : stupid bug corrected
 
 	* src/vector.pmt (igraph_vector_add) : added

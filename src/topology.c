@@ -936,7 +936,7 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
  * function should be responsible for calling this function.
  * 
  * </para><para> Note that this function cannot be used for subgraph
- * deciding subgraph isomorphism.
+ * subgraph isomorphism.
  * \param graph1 The first graph, it should be connected.
  * \param graph2 The second graph, it should be connected and should
  *    have the same number of vertices and edges as \p graph1.
@@ -973,6 +973,22 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
   igraph_stack_t path;
   igraph_i_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
   igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
+
+  if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
+    IGRAPH_ERROR("Cannot compare directed and undirected graphs",
+		 IGRAPH_EINVAL);
+  }
+
+  if (no_of_nodes != igraph_vcount(graph2)) {
+    *iso=0;
+    if (map12) {
+      igraph_vector_clear(map12);
+    }
+    if (map21) {
+      igraph_vector_clear(map21);
+    }
+    return 0;
+  }
 
   if (!map12) {
     IGRAPH_VECTOR_INIT_FINALLY(core_1, no_of_nodes);
@@ -1100,7 +1116,7 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 	i++;
       }
     }
-
+        
     /* Ok, we have cand1, cand2 as candidates. Or not? */
     if (cand1<0 || cand2<0) {
       /**************************************************************/
@@ -1111,7 +1127,7 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
 	matched_nodes -= 1;
 	VECTOR(*core_1)[last1]=0;
 	VECTOR(*core_2)[last2]=0;
-
+	
 	if (VECTOR(in_1)[last1] != 0) {
 	  in_1_size += 1;
 	}
@@ -1333,10 +1349,14 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
   if (!map21) { 
     igraph_vector_destroy(core_2);
     IGRAPH_FINALLY_CLEAN(1);
-  }
+  } else {
+    igraph_vector_add(core_2, -1);
+  }    
   if (!map12) {
     igraph_vector_destroy(core_1);
     IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    igraph_vector_add(core_1, -1);
   }
 
   return 0;
