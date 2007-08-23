@@ -1,3 +1,8 @@
+2007-08-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_isomorphic_vf2) : added 'map12' and 'map21' 
+	arguments
+
 2007-08-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/layout.c (igraph_layout_graphopt) : added

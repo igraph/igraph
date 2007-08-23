@@ -5709,23 +5709,60 @@ SEXP R_igraph_citing_cited_type_game(SEXP pnodes, SEXP ptypes, SEXP ppref,
   return result;
 }
 
-SEXP R_igraph_isomorphic_vf2(SEXP graph1, SEXP graph2) {
+SEXP R_igraph_isomorphic_vf2(SEXP graph1, SEXP graph2, SEXP pmap12, SEXP pmap21) {
   
   igraph_t g1, g2;
   igraph_bool_t iso;
-  SEXP result;
+  igraph_vector_t my_map12, my_map21, *map12=0, *map21=0;
+  SEXP result, names;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph1, &g1);
   R_SEXP_to_igraph(graph2, &g2);
-  igraph_isomorphic_vf2(&g1, &g2, &iso);
-  PROTECT(result=NEW_LOGICAL(1));
-  LOGICAL(result)[0]=iso;
-  
+  if (LOGICAL(pmap12)[0]) {
+    map12=&my_map12;
+    igraph_vector_init(map12, 0);
+  }
+  if (LOGICAL(pmap21)[0]) {
+    map21=&my_map21;
+    igraph_vector_init(map21, 0);
+  }
+  igraph_isomorphic_vf2(&g1, &g2, &iso, map12, map21);
+  if (!map12 && !map21) {
+    PROTECT(result=NEW_LOGICAL(1));
+    LOGICAL(result)[0]=iso;
+  } else {
+    PROTECT(result=NEW_LIST(3));
+    SET_VECTOR_ELT(result, 0, NEW_LOGICAL(1));
+    LOGICAL(VECTOR_ELT(result, 0))[0]=iso;
+    if (map12 && iso) { 
+      SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(map12));      
+      igraph_vector_destroy(map12);
+    } else {
+      SET_VECTOR_ELT(result, 1, R_NilValue);
+    }
+    if (map21 && iso) {
+      SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(map21));
+      igraph_vector_destroy(map21);
+    } else { 
+      SET_VECTOR_ELT(result, 2, R_NilValue);
+    }
+    
+    PROTECT(names=NEW_CHARACTER(3));
+    SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("isomorphic"));
+    SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("map12"));
+    SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("map21"));
+    SET_NAMES(result, names);
+  }
+
   R_igraph_after();
   
-  UNPROTECT(1);
+  if (map12 || map21) {
+    UNPROTECT(2);
+  } else {
+    UNPROTECT(1);
+  }
   return result;
 }
 
