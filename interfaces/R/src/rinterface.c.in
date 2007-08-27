@@ -6240,6 +6240,23 @@ SEXP R_igraph_count_multiple(SEXP graph, SEXP edges) {
   return result;
 }
 
+SEXP R_igraph_famous(SEXP name) {
+  
+  igraph_t g;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  igraph_famous(&g, CHAR(STRING_ELT(name, 0)));
+  PROTECT(result=R_igraph_to_SEXP(&g));
+  igraph_destroy(&g);
+  
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
 			SEXP verbose) {

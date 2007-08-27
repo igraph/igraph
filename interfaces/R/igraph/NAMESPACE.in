@@ -43,7 +43,7 @@ export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed,
 export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice,
        graph.ring, graph.full, graph.atlas, graph.data.frame, graph.edgelist,
        graph.extended.chordal.ring, line.graph, graph.de.bruijn, graph.kautz,
-       graph.formula)
+       graph.formula, graph.famous)
 
 # games
 

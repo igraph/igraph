@@ -26,6 +26,7 @@
 
 #include <stdarg.h>
 #include <math.h>
+#include <string.h>
 
 /** 
  * \section about_generators
@@ -1180,6 +1181,265 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
+igraph_real_t igraph_i_famous_chvatal[] = { 
+  12, 24, 0, 
+  5, 6, 6, 7, 7, 8, 8, 9, 5, 9, 4, 5, 4, 8, 2, 8, 2, 6, 0, 6, 0, 9, 3, 9, 3, 7, 
+  1, 7, 1, 5, 1, 10, 4, 10, 4, 11, 2, 11, 0, 10, 0, 11, 3, 11, 3, 10, 1, 2
+};
+
+igraph_real_t igraph_i_famous_coxeter[] = {
+  28, 42, 0,
+  0, 1, 0, 2, 0, 7, 1, 4, 1, 13, 2, 3, 2, 8, 3, 6, 3, 9, 4, 5, 4, 12, 5, 6, 5, 
+  11, 6, 10, 7, 19, 7, 24, 8, 20, 8, 23, 9, 14, 9, 22, 10, 15, 10, 21, 11, 16, 
+  11, 27, 12, 17, 12, 26, 13, 18, 13, 25, 14, 17, 14, 18, 15, 18, 15, 19, 16, 19, 
+  16, 20, 17, 20, 21, 23, 21, 26, 22, 24, 22, 27, 23, 25, 24, 26, 25, 27
+};
+
+igraph_real_t igraph_i_famous_cubical[] = {
+  8, 12, 0,
+  0, 1, 1, 2, 2, 3, 0, 3, 4, 5, 5, 6, 6, 7, 4, 7, 0, 4, 1, 5, 2, 6, 3, 7
+};  
+  
+igraph_real_t igraph_i_famous_dodecahedron[] = {
+  20, 30, 0, 
+  0, 1, 0, 4, 0, 5, 1, 2, 1, 6, 2, 3, 2, 7, 3, 4, 3, 8, 4, 9, 5, 10, 5, 11, 6, 
+  10, 6, 14, 7, 13, 7, 14, 8, 12, 8, 13, 9, 11, 9, 12, 10, 15, 11, 16, 12, 17, 
+  13, 18, 14, 19, 15, 16, 15, 19, 16, 17, 17, 18, 18, 19
+};
+
+igraph_real_t igraph_i_famous_folkman[] = {
+  20, 40, 0,
+  0, 5, 0, 8, 0, 10, 0, 13, 1, 7, 1, 9, 1, 12, 1, 14, 2, 6, 2, 8, 2, 11, 2, 13, 
+  3, 5, 3, 7, 3, 10, 3, 12, 4, 6, 4, 9, 4, 11, 4, 14, 5, 15, 5, 19, 6, 15, 6, 16, 
+  7, 16, 7, 17, 8, 17, 8, 18, 9, 18, 9, 19, 10, 15, 10, 19, 11, 15, 11, 16, 12, 
+  16, 12, 17, 13, 17, 13, 18, 14, 18, 14, 19
+};  
+
+igraph_real_t igraph_i_famous_franklin[] = {
+  12, 18, 0,
+  0, 1, 0, 2, 0, 6, 1, 3, 1, 7, 2, 4, 2, 10, 3, 5, 3, 11, 4, 5, 4, 6, 5, 7, 6, 8, 
+  7, 9, 8, 9, 8, 11, 9, 10, 10, 11
+};  
+
+igraph_real_t igraph_i_famous_frucht[] = {
+  12, 18, 0,
+  0, 1, 0, 2, 0, 11, 1, 3, 1, 6, 2, 5, 2, 10, 3, 4, 3, 6, 4, 8, 4, 11, 5, 9, 5, 
+  10, 6, 7, 7, 8, 7, 9, 8, 9, 10, 11
+};  
+
+igraph_real_t igraph_i_famous_grotztsch[] = {
+  11, 20, 0,
+  0, 1, 0, 2, 0, 7, 0, 10, 1, 3, 1, 6, 1, 9, 2, 4, 2, 6, 2, 8, 3, 4, 3, 8, 3, 10, 
+  4, 7, 4, 9, 5, 6, 5, 7, 5, 8, 5, 9, 5, 10
+};  
+
+igraph_real_t igraph_i_famous_heawood[] = {
+  14, 21, 0,
+  0, 1, 0, 5, 0, 13, 1, 2, 1, 10, 2, 3, 2, 7, 3, 4, 3, 12, 4, 5, 4, 9, 5, 6, 6, 
+  7, 6, 11, 7, 8, 8, 9, 8, 13, 9, 10, 10, 11, 11, 12, 12, 13
+};  
+
+igraph_real_t igraph_i_famous_herschel[] = {
+  11, 18, 0,
+  0, 2, 0, 3, 0, 4, 0, 5, 1, 2, 1, 3, 1, 6, 1, 7, 2, 10, 3, 9, 4, 8, 4, 9, 5, 8, 
+  5, 10, 6, 8, 6, 9, 7, 8, 7, 10
+};  
+
+igraph_real_t igraph_i_famous_icosahedron[] = {
+  12, 30, 0,
+  0, 1, 0, 2, 0, 3, 0, 4, 0, 8, 1, 2, 1, 6, 1, 7, 1, 8, 2, 4, 2, 5, 2, 6, 3, 4, 
+  3, 8, 3, 9, 3, 11, 4, 5, 4, 11, 5, 6, 5, 10, 5, 11, 6, 7, 6, 10, 7, 8, 7, 9, 7, 
+  10, 8, 9, 9, 10, 9, 11, 10, 11
+};  
+
+igraph_real_t igraph_i_famous_levi[] = {
+  30, 45, 0,
+  0, 1, 0, 7, 0, 29, 1, 2, 1, 24, 2, 3, 2, 11, 3, 4, 3, 16, 4, 5, 4, 21, 5, 6, 5, 
+  26, 6, 7, 6, 13, 7, 8, 8, 9, 8, 17, 9, 10, 9, 22, 10, 11, 10, 27, 11, 12, 12, 
+  13, 12, 19, 13, 14, 14, 15, 14, 23, 15, 16, 15, 28, 16, 17, 17, 18, 18, 19, 18, 
+  25, 19, 20, 20, 21, 20, 29, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27, 
+  28, 28, 29
+};  
+
+igraph_real_t igraph_i_famous_mcgee[] = {
+  24, 36, 0,
+  0, 1, 0, 7, 0, 23, 1, 2, 1, 18, 2, 3, 2, 14, 3, 4, 3, 10, 4, 5, 4, 21, 5, 6, 5, 
+  17, 6, 7, 6, 13, 7, 8, 8, 9, 8, 20, 9, 10, 9, 16, 10, 11, 11, 12, 11, 23, 12, 
+  13, 12, 19, 13, 14, 14, 15, 15, 16, 15, 22, 16, 17, 17, 18, 18, 19, 19, 20, 20, 
+  21, 21, 22, 22, 23
+};
+
+igraph_real_t igraph_i_famous_meredith[] = {
+  70, 140, 0,
+  0, 4, 0, 5, 0, 6, 1, 4, 1, 5, 1, 6, 2, 4, 2, 5, 2, 6, 3, 4, 3, 5, 3, 6, 7, 11, 
+  7, 12, 7, 13, 8, 11, 8, 12, 8, 13, 9, 11, 9, 12, 9, 13, 10, 11, 10, 12, 10, 13, 
+  14, 18, 14, 19, 14, 20, 15, 18, 15, 19, 15, 20, 16, 18, 16, 19, 16, 20, 17, 18, 
+  17, 19, 17, 20, 21, 25, 21, 26, 21, 27, 22, 25, 22, 26, 22, 27, 23, 25, 23, 26, 
+  23, 27, 24, 25, 24, 26, 24, 27, 28, 32, 28, 33, 28, 34, 29, 32, 29, 33, 29, 34, 
+  30, 32, 30, 33, 30, 34, 31, 32, 31, 33, 31, 34, 35, 39, 35, 40, 35, 41, 36, 39, 
+  36, 40, 36, 41, 37, 39, 37, 40, 37, 41, 38, 39, 38, 40, 38, 41, 42, 46, 42, 47, 
+  42, 48, 43, 46, 43, 47, 43, 48, 44, 46, 44, 47, 44, 48, 45, 46, 45, 47, 45, 48, 
+  49, 53, 49, 54, 49, 55, 50, 53, 50, 54, 50, 55, 51, 53, 51, 54, 51, 55, 52, 53, 
+  52, 54, 52, 55, 56, 60, 56, 61, 56, 62, 57, 60, 57, 61, 57, 62, 58, 60, 58, 61, 
+  58, 62, 59, 60, 59, 61, 59, 62, 63, 67, 63, 68, 63, 69, 64, 67, 64, 68, 64, 69, 
+  65, 67, 65, 68, 65, 69, 66, 67, 66, 68, 66, 69, 2, 50, 1, 51, 9, 57, 8, 58, 16, 
+  64, 15, 65, 23, 36, 22, 37, 30, 43, 29, 44, 3, 21, 7, 24, 14, 31, 0, 17, 10, 
+  28, 38, 42, 35, 66, 59, 63, 52, 56, 45, 49
+};  
+
+igraph_real_t igraph_i_famous_noperfectmatching[] = {
+  16, 27, 0,
+  0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3, 2, 4, 3, 4, 4, 5, 5, 6, 5, 7, 6, 12, 6, 13, 
+  7, 8, 7, 9, 8, 9, 8, 10, 8, 11, 9, 10, 9, 11, 10, 11, 12, 13, 12, 14, 12, 15, 
+  13, 14, 13, 15, 14, 15
+};  
+
+igraph_real_t igraph_i_famous_noline[] = {
+  50, 72, 0,
+  0, 1, 0, 2, 0, 3, 4, 6, 4, 7, 5, 6, 5, 7, 6, 7, 7, 8, 9, 11, 9, 12, 9, 13, 10, 
+  11, 10, 12, 10, 13, 11, 12, 11, 13, 12, 13, 14, 15, 15, 16, 15, 17, 16, 17, 16, 
+  18, 17, 18, 18, 19, 20, 21, 20, 22, 20, 23, 21, 22, 21, 23, 21, 24, 22, 23, 22, 
+  24, 24, 25, 26, 27, 26, 28, 26, 29, 27, 28, 27, 29, 27, 30, 27, 31, 28, 29, 28, 
+  30, 28, 31, 30, 31, 32, 34, 32, 35, 32, 36, 33, 34, 33, 35, 33, 37, 34, 35, 36, 
+  37, 38, 39, 38, 40, 38, 43, 39, 40, 39, 41, 39, 42, 39, 43, 40, 41, 41, 42, 42, 
+  43, 44, 45, 44, 46, 45, 46, 45, 47, 46, 47, 46, 48, 47, 48, 47, 49, 48, 49
+};  
+
+igraph_real_t igraph_i_famous_octahedron[] = {
+  6, 12, 0,
+  0, 1, 0, 2, 1, 2, 3, 4, 3, 5, 4, 5, 0, 3, 0, 5, 1, 3, 1, 4, 2, 4, 2, 5
+};  
+
+igraph_real_t igraph_i_famous_robertson[] = {
+  19, 38, 0,
+  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 
+  12, 13, 13, 14, 14, 15, 15, 16, 16, 17, 17, 18, 0, 18, 0, 4, 4, 9, 9, 13, 13, 
+  17, 2, 17, 2, 6, 6, 10, 10, 15, 0, 15, 1, 8, 8, 16, 5, 16, 5, 12, 1, 12, 7, 18, 
+  7, 14, 3, 14, 3, 11, 11, 18
+};  
+
+igraph_real_t igraph_i_famous_smallestcyclicgroup[] = {
+  9, 15, 0,
+  0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 1, 2, 1, 3, 1, 7, 1, 8, 2, 5, 2, 6, 2, 7, 3, 8, 
+  4, 5, 6, 7
+};  
+
+igraph_real_t igraph_i_famous_tetrahedron[] = {
+  4, 6, 0, 
+  0, 3, 1, 3, 2, 3, 0, 1, 1, 2, 0, 2
+};  
+
+igraph_real_t igraph_i_famous_thomassen[] = {
+  34, 52, 0,
+  0, 2, 0, 3, 1, 3, 1, 4, 2, 4, 5, 7, 5, 8, 6, 8, 6, 9, 7, 9, 10, 12, 10, 13, 11, 
+  13, 11, 14, 12, 14, 15, 17, 15, 18, 16, 18, 16, 19, 17, 19, 9, 19, 4, 14, 24, 
+  25, 25, 26, 20, 26, 20, 21, 21, 22, 22, 23, 23, 27, 27, 28, 28, 29, 29, 30, 30, 
+  31, 31, 32, 32, 33, 24, 33, 5, 24, 6, 25, 7, 26, 8, 20, 0, 20, 1, 21, 2, 22, 3, 
+  23, 10, 27, 11, 28, 12, 29, 13, 30, 15, 30, 16, 31, 17, 32, 18, 33
+};  
+
+igraph_real_t igraph_i_famous_tutte[] = {
+  46, 69, 0, 
+  0, 10, 0, 11, 0, 12, 1, 2, 1, 7, 1, 19, 2, 3, 2, 41, 3, 4, 3, 27, 4, 5, 4, 33, 
+  5, 6, 5, 45, 6, 9, 6, 29, 7, 8, 7, 21, 8, 9, 8, 22, 9, 24, 10, 13, 10, 14, 11, 
+  26, 11, 28, 12, 30, 12, 31, 13, 15, 13, 21, 14, 15, 14, 18, 15, 16, 16, 17, 16, 
+  20, 17, 18, 17, 23, 18, 24, 19, 25, 19, 40, 20, 21, 20, 22, 22, 23, 23, 24, 25, 
+  26, 25, 38, 26, 34, 27, 28, 27, 39, 28, 34, 29, 30, 29, 44, 30, 35, 31, 32, 31, 
+  35, 32, 33, 32, 42, 33, 43, 34, 36, 35, 37, 36, 38, 36, 39, 37, 42, 37, 44, 38, 
+  40, 39, 41, 40, 41, 42, 43, 43, 45, 44, 45
+};
+
+igraph_real_t igraph_i_famous_uniquely3colorable[] = {
+  12, 22, 0,
+  0, 1, 0, 3, 0, 6, 0, 8, 1, 4, 1, 7, 1, 9, 2, 3, 2, 6, 2, 7, 2, 9, 2, 11, 3, 4, 
+  3, 10, 4, 5, 4, 11, 5, 6, 5, 7, 5, 8, 5, 10, 8, 11, 9, 10
+};  
+
+igraph_real_t igraph_i_famous_walther[] = {
+  25, 31, 0,
+  0, 1, 1, 2, 1, 8, 2, 3, 2, 13, 3, 4, 3, 16, 4, 5, 5, 6, 5, 19, 6, 7, 6, 20, 7, 
+  21, 8, 9, 8, 13, 9, 10, 9, 22, 10, 11, 10, 20, 11, 12, 13, 14, 14, 15, 14, 23, 
+  15, 16, 15, 17, 17, 18, 18, 19, 18, 24, 20, 24, 22, 23, 23, 24
+};  
+
+int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
+  long int no_of_nodes=data[0];
+  long int no_of_edges=data[1];
+  igraph_bool_t directed=data[2];
+  igraph_vector_t edges;
+  
+  igraph_vector_view(&edges, data+3, 2*no_of_edges);
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  return 0;  
+}
+
+/**
+ * \function igraph_famous
+ * 
+ * TODO
+ */
+
+int igraph_famous(igraph_t *graph, const char *name) {
+
+  if (!strcasecmp(name, "chvatal")) {
+    return igraph_i_famous(graph, igraph_i_famous_chvatal);
+  } else if (!strcasecmp(name, "coxeter")) {
+    return igraph_i_famous(graph, igraph_i_famous_coxeter);
+  } else if (!strcasecmp(name, "cubical")) {
+    return igraph_i_famous(graph, igraph_i_famous_cubical);
+  } else if (!strcasecmp(name, "dodecahedral") ||
+	     !strcasecmp(name, "dodecahedron")) {
+    return igraph_i_famous(graph, igraph_i_famous_dodecahedron);
+  } else if (!strcasecmp(name, "folkman")) {
+    return igraph_i_famous(graph, igraph_i_famous_folkman);
+  } else if (!strcasecmp(name, "franklin")) {
+    return igraph_i_famous(graph, igraph_i_famous_franklin);
+  } else if (!strcasecmp(name, "frucht")) {
+    return igraph_i_famous(graph, igraph_i_famous_frucht);
+  } else if (!strcasecmp(name, "grotztsch")) {
+    return igraph_i_famous(graph, igraph_i_famous_grotztsch);
+  } else if (!strcasecmp(name, "heawood")) {
+    return igraph_i_famous(graph, igraph_i_famous_heawood);
+  } else if (!strcasecmp(name, "herschel")) {
+    return igraph_i_famous(graph, igraph_i_famous_herschel);
+  } else if (!strcasecmp(name, "icosahedral") ||
+	     !strcasecmp(name, "icosahedron")) {
+    return igraph_i_famous(graph, igraph_i_famous_icosahedron);
+  } else if (!strcasecmp(name, "levi")) {
+    return igraph_i_famous(graph, igraph_i_famous_levi);
+  } else if (!strcasecmp(name, "mcgee")) {
+    return igraph_i_famous(graph, igraph_i_famous_mcgee);
+  } else if (!strcasecmp(name, "meredith")) {
+    return igraph_i_famous(graph, igraph_i_famous_meredith);
+  } else if (!strcasecmp(name, "noperfectmatching")) {
+    return igraph_i_famous(graph, igraph_i_famous_noperfectmatching);
+  } else if (!strcasecmp(name, "noline")) {
+    return igraph_i_famous(graph, igraph_i_famous_noline);
+  } else if (!strcasecmp(name, "octahedral") ||
+	     !strcasecmp(name, "octahedron")) {
+    return igraph_i_famous(graph, igraph_i_famous_octahedron);
+  } else if (!strcasecmp(name, "robertson")) {
+    return igraph_i_famous(graph, igraph_i_famous_robertson);
+  } else if (!strcasecmp(name, "smallestcyclicgroup")) {
+    return igraph_i_famous(graph, igraph_i_famous_smallestcyclicgroup);
+  } else if (!strcasecmp(name, "tetrahedral") ||
+	     !strcasecmp(name, "tetrahedron")) {
+    return igraph_i_famous(graph, igraph_i_famous_tetrahedron);
+  } else if (!strcasecmp(name, "thomassen")) {
+    return igraph_i_famous(graph, igraph_i_famous_thomassen);
+  } else if (!strcasecmp(name, "tutte")) {
+    return igraph_i_famous(graph, igraph_i_famous_tutte);
+  } else if (!strcasecmp(name, "uniquely3colorable")) {
+    return igraph_i_famous(graph, igraph_i_famous_uniquely3colorable);
+  } else if (!strcasecmp(name, "walther")) {
+    return igraph_i_famous(graph, igraph_i_famous_walther);
+  } else {
+    IGRAPH_ERROR("Unknown graph, see documentation", IGRAPH_EINVAL);
+  }
   
   return 0;
 }

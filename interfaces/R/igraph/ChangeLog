@@ -1,3 +1,8 @@
+2007-08-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structure.generators.R (graph.famous) 
+	* interfaces/R/src/rinterface.c.in (R_igraph_famous) : added
+
 2007-08-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/topology.R (graph.isomorphic.vf2)

@@ -377,3 +377,8 @@ graph.kautz <- function(m, n) {
         PACKAGE="igraph")
 }
 
+graph.famous <- function(name) {
+
+  .Call("R_igraph_famous", as.character(name),
+        PACKAGE="igraph")
+}
