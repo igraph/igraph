@@ -1,3 +1,11 @@
+2007-08-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_isomorphic_vf2, igraph_isomorphic_function_vf2)
+	(igraph_count_isomorphisms_vf2, igraph_get_isomorphisms_vf2)
+	(igraph_subisomorphic_function_vf2, igraph_subisomorphic_vf2)
+	(igraph_count_subisomorphisms_vf2, igraph_get_subisomorphisms_vf2) :
+	added, reorganized
+
 2007-08-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_famous) : added

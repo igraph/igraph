@@ -146,7 +146,10 @@ export (evolver.d)
 # isomorphism, motifs
 
 export(graph.isoclass, graph.isomorphic, graph.motifs,
-       graph.motifs.est, graph.isocreate, graph.motifs.no, graph.isomorphic.vf2)
+       graph.motifs.est, graph.isocreate, graph.motifs.no,
+       graph.isomorphic.vf2, graph.subisomorphic.vf2,
+       graph.count.isomorphisms.vf2, graph.count.subisomorphisms.vf2,
+       graph.get.isomorphisms.vf2, graph.get.subisomorphisms.vf2)
 
 # operators
 

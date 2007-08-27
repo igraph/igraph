@@ -1056,6 +1056,9 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE *outstream);
 /* Graph isomorphisms                                 */
 /* -------------------------------------------------- */
 
+typedef igraph_bool_t igraph_isohandler_t(const igraph_vector_t *map12, 
+					  const igraph_vector_t *map21, void *arg);
+
 int igraph_isoclass(const igraph_t *graph, int *isoclass);
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 		      igraph_bool_t *iso);
@@ -1066,6 +1069,30 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
 			  igraph_bool_t *iso, igraph_vector_t *map12, 
 			  igraph_vector_t *map21);
+int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2,
+				   igraph_vector_t *map12, igraph_vector_t *map21,
+				   igraph_isohandler_t *function,
+				   void *arg);
+int igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+				  igraph_integer_t *count);
+int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
+				const igraph_t *graph2,
+				igraph_vector_ptr_t *maps);
+
+int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+			     igraph_bool_t *iso, igraph_vector_t *map12, 
+			     igraph_vector_t *map21);
+int igraph_subisomorphic_function_vf2(const igraph_t *graph1, 
+				      const igraph_t *graph2,
+				      igraph_vector_t *map12,
+				      igraph_vector_t *map21,
+				      igraph_isohandler_t *function,
+				      void *arg);
+int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+				     igraph_integer_t *count);
+int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
+				   const igraph_t *graph2,
+				   igraph_vector_ptr_t *maps);
 
 /* -------------------------------------------------- */
 /* Graph motifs                                       */

@@ -5766,6 +5766,167 @@ SEXP R_igraph_isomorphic_vf2(SEXP graph1, SEXP graph2, SEXP pmap12, SEXP pmap21)
   return result;
 }
 
+SEXP R_igraph_subisomorphic_vf2(SEXP graph1, SEXP graph2, SEXP pmap12, SEXP pmap21) {
+  
+  igraph_t g1, g2;
+  igraph_bool_t iso;
+  igraph_vector_t my_map12, my_map21, *map12=0, *map21=0;
+  SEXP result, names;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph1, &g1);
+  R_SEXP_to_igraph(graph2, &g2);
+  if (LOGICAL(pmap12)[0]) {
+    map12=&my_map12;
+    igraph_vector_init(map12, 0);
+  }
+  if (LOGICAL(pmap21)[0]) {
+    map21=&my_map21;
+    igraph_vector_init(map21, 0);
+  }
+  igraph_subisomorphic_vf2(&g1, &g2, &iso, map12, map21);
+  if (!map12 && !map21) {
+    PROTECT(result=NEW_LOGICAL(1));
+    LOGICAL(result)[0]=iso;
+  } else {
+    PROTECT(result=NEW_LIST(3));
+    SET_VECTOR_ELT(result, 0, NEW_LOGICAL(1));
+    LOGICAL(VECTOR_ELT(result, 0))[0]=iso;
+    if (map12 && iso) { 
+      long int i, n=igraph_vector_size(map12);
+      SEXP tmp;
+      SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(map12));      
+      igraph_vector_destroy(map12);
+      tmp=VECTOR_ELT(result, 1);
+      for (i=0; i<n; i++) {
+	if (REAL(tmp)[i]<0) {
+	  REAL(tmp)[i]=NA_REAL;
+	}
+      }
+    } else {
+      SET_VECTOR_ELT(result, 1, R_NilValue);
+    }
+    if (map21 && iso) {
+      SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(map21));
+      igraph_vector_destroy(map21);
+    } else { 
+      SET_VECTOR_ELT(result, 2, R_NilValue);
+    }
+    
+    PROTECT(names=NEW_CHARACTER(3));
+    SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("isomorphic"));
+    SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("map12"));
+    SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("map21"));
+    SET_NAMES(result, names);
+  }
+
+  R_igraph_after();
+  
+  if (map12 || map21) {
+    UNPROTECT(2);
+  } else {
+    UNPROTECT(1);
+  }
+  return result;
+}
+
+SEXP R_igraph_count_isomorphisms_vf2(SEXP graph1, SEXP graph2) {
+  
+  igraph_t g1, g2;
+  igraph_integer_t count;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph1, &g1);
+  R_SEXP_to_igraph(graph2, &g2);
+  igraph_count_isomorphisms_vf2(&g1, &g2, &count);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=count;
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_count_subisomorphisms_vf2(SEXP graph1, SEXP graph2) {
+  
+  igraph_t g1, g2;
+  igraph_integer_t count;
+  SEXP result;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph1, &g1);
+  R_SEXP_to_igraph(graph2, &g2);
+  igraph_count_subisomorphisms_vf2(&g1, &g2, &count);
+  PROTECT(result=NEW_NUMERIC(1));
+  REAL(result)[0]=count;
+
+  R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_isomorphisms_vf2(SEXP graph1, SEXP graph2) {
+  
+  igraph_t g1, g2;
+  igraph_vector_ptr_t res;
+  SEXP result;
+  long int i, n;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph1, &g1);
+  R_SEXP_to_igraph(graph2, &g2);
+  igraph_vector_ptr_init(&res, 0);
+  igraph_get_isomorphisms_vf2(&g1, &g2, &res);
+  n=igraph_vector_ptr_size(&res);
+  PROTECT(result=NEW_LIST(n));
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(res)[i];
+    SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(v)));
+    igraph_vector_copy_to(v, REAL(VECTOR_ELT(result, i)));
+    igraph_vector_destroy(v);
+    igraph_free(v);
+  }
+  igraph_vector_ptr_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_get_subisomorphisms_vf2(SEXP graph1, SEXP graph2) {
+  
+  igraph_t g1, g2;
+  igraph_vector_ptr_t res;
+  SEXP result;
+  long int i, n;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph1, &g1);
+  R_SEXP_to_igraph(graph2, &g2);
+  igraph_vector_ptr_init(&res, 0);
+  igraph_get_subisomorphisms_vf2(&g1, &g2, &res);
+  n=igraph_vector_ptr_size(&res);
+  PROTECT(result=NEW_LIST(n));
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(res)[i];
+    SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(v)));
+    igraph_vector_copy_to(v, REAL(VECTOR_ELT(result, i)));
+    igraph_vector_destroy(v);
+    igraph_free(v);
+  }
+  igraph_vector_ptr_destroy(&res);
+  
+  UNPROTECT(1);
+  return result;
+}
+  
 SEXP R_igraph_walktrap_community(SEXP graph, SEXP pweights,
 				 SEXP psteps, SEXP pmerges, 
 				 SEXP pmodularity) {

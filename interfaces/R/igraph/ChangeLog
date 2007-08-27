@@ -1,3 +1,12 @@
+2007-08-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/topology.R (graph.count.isomorphisms.vf2)
+	(graph.get.isomorphisms.vf2, graph.subisomorphic.vf2)
+	(graph.count.subisomorphisms.vf2, graph.get.subisomorphisms.vf2)
+	* interfaces/R/src/rinterface.c.in (R_igraph_subisomorphic_vf2)
+	(R_igraph_count_isomorphisms_vf2, R_igraph_count_subisomorphisms_vf2)
+	(R_igraph_get_isomorphisms_vf2, R_igraph_get_subisomorphisms_vf2) : added
+
 2007-08-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.famous) 
