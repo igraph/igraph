@@ -1,0 +1,173 @@
+
+importFrom(stats, as.dendrogram)
+
+# The igraph interface
+
+export(add.vertices, delete.edges,
+       delete.vertices, ecount, neighbors, get.edges)
+
+# Attributes
+
+export(get.graph.attribute, set.graph.attribute,
+       get.vertex.attribute, set.vertex.attribute,
+       get.edge.attribute, set.edge.attribute,
+       list.graph.attributes, list.vertex.attributes,
+       list.edge.attributes, remove.graph.attribute,
+       remove.vertex.attribute, remove.edge.attribute)
+
+# iterators
+
+export(V, E, "$.igraph.vs", "$.igraph.es",
+       "[.igraph.vs", "[.igraph.es", "[<-.igraph.vs", "[<-.igraph.es",
+       "$<-.igraph.vs", "$<-.igraph.es", "V<-", "E<-",
+       print.igraph.vs, print.igraph.es, "%--%", "%->%", "%<-%")
+
+S3method("$", igraph.vs)
+S3method("[", igraph.vs)
+S3method("[<-", igraph.vs)
+S3method("$<-", igraph.vs)
+S3method("$", igraph.es)
+S3method("[", igraph.es)
+S3method("[<-", igraph.es)
+S3method("$<-", igraph.es)
+S3method(print, igraph.vs)
+S3method(print, igraph.es)
+  
+# basic functions, printing
+
+export(is.igraph, are.connected, print.igraph, summary.igraph, is.directed,
+       get.edge)
+
+# structure generators
+
+export(graph, graph.adjacency, graph.star, graph.tree, graph.lattice,
+       graph.ring, graph.full, graph.atlas, graph.data.frame, graph.edgelist,
+       graph.extended.chordal.ring, line.graph, graph.de.bruijn, graph.kautz,
+       graph.formula, graph.famous)
+
+# games
+
+export(erdos.renyi.game, random.graph.game, degree.sequence.game,
+       aging.prefatt.game, aging.barabasi.game, aging.ba.game,
+       growing.random.game, barabasi.game, ba.game,
+       callaway.traits.game, establishment.game, grg.game,
+       preference.game, asymmetric.preference.game, connect.neighborhood,
+       rewire.edges, watts.strogatz.game, lastcit.game, cited.type.game,
+       citing.cited.type.game)
+
+# community structure
+
+export(edge.betweenness.community,
+       modularity, spinglass.community, walktrap.community,
+       edge.betweenness.community.merges, fastgreedy.community,
+       community.to.membership, leading.eigenvector.community,
+       leading.eigenvector.community.step)
+
+S3method("as.dendrogram", igraph.walktrap)
+S3method("as.dendrogram", igraph.ebc)
+S3method("as.dendrogram", igraph.eigenc)
+
+# conversion
+
+export(get.adjacency, get.edgelist, as.directed, as.undirected)
+
+# fitting, other
+
+export(power.law.fit, running.mean, igraph.sample)
+
+# foreign formats
+
+export(read.graph, write.graph, graph.graphdb)
+
+# layouts
+
+export(layout.random, layout.circle,
+       layout.spring, layout.kamada.kawai, layout.lgl,
+       layout.fruchterman.reingold.grid, layout.sphere, layout.merge,
+       layout.reingold.tilford)
+
+
+# structural properties
+
+export(subgraph, simplify, degree, degree.distribution, diameter,
+       closeness, subcomponent, betweenness, bibcoupling, cocitation,
+       shortest.paths, minimum.spanning.tree, edge.betweenness,
+       get.shortest.paths, average.path.length, transitivity,
+       get.all.shortest.paths, get.diameter, farthest.nodes,
+       graph.laplacian, constraint, page.rank, reciprocity, rewire,
+       graph.density, neighborhood.size, neighborhood, graph.neighborhood,
+       graph.coreness, topological.sort, girth, is.loop, is.multiple,
+       count.multiple)
+
+# plotting
+
+export(plot.igraph, tkplot, tkplot.close, tkplot.off, tkplot.fit.to.screen,
+       tkplot.reshape, tkplot.export.postscript, tkplot.getcoords,
+       tkplot.center, tkplot.rotate, rglplot.igraph, rglplot)
+
+S3method(rglplot, igraph)
+
+# components
+
+export(cluster.distribution, is.connected, decompose.graph,
+       no.clusters)
+
+# centrality
+
+export(evcent, bonpow, alpha.centrality)
+
+# dynamics measurement
+
+export(measure.dynamics.id, measure.dynamics.idage, measure.dynamics.d.d,
+       measure.dynamics.citedcat.id.age, measure.dynamics.citingcat.id.age,
+       measure.dynamics.lastcit, measure.dynamics.age, measure.dynamics.citedcat,
+       measure.dynamics.citingcat.citedcat)
+
+export(revolver.d, revolver.error.d,
+       revolver.ad, revolver.error.ad,
+       revolver.ade, revolver.error.ade,
+       revolver.e, revolver.error.e,
+       revolver.de, revolver.error.de,
+       revolver.l, revolver.error.l,
+       revolver.dl, revolver.error.dl,
+       revolver.el, revolver.error.el,
+       revolver.r, revolver.error.r,
+       revolver.ar, revolver.error.ar,
+       revolver.di, revolver.error.di,
+       revolver.adi, revolver.error.adi,
+       revolver.il, revolver.error.il,
+       revolver.ir, revolver.error.ir,
+       revolver.air, revolver.error.air)
+
+export (revolver.d.d, revolver.p.p)
+
+export (evolver.d)
+
+# isomorphism, motifs
+
+export(graph.isoclass, graph.isomorphic, graph.motifs,
+       graph.motifs.est, graph.isocreate, graph.motifs.no, graph.isomorphic.vf2)
+
+# operators
+
+export(graph.disjoint.union, "%du%", graph.intersection, "%s%",
+       graph.union, "%u%", graph.difference, "%m%",
+       graph.complementer, graph.compose, "%c%")
+
+# parameters, config
+
+export(igraph.par)
+
+# flows, cuts, etc.
+
+export(graph.maxflow, graph.mincut, vertex.connectivity, edge.connectivity,
+       edge.disjoint.paths, vertex.disjoint.paths, graph.adhesion,
+       graph.cohesion)
+
+# cliques
+
+export(cliques, largest.cliques, maximal.cliques, clique.number,
+       independent.vertex.sets, largest.independent.vertex.sets,
+       maximal.independent.vertex.sets, independence.number)
+
+######################## REST IS GENERATED BY stimulus
