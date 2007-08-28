@@ -1,3 +1,7 @@
+2007-08-28  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structure_generators.c (igraph_famous): corrected some names
+
 2007-08-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/topology.c (igraph_isomorphic_vf2, igraph_isomorphic_function_vf2)
@@ -10,7 +14,7 @@
 
 	* src/structure_generators.c (igraph_famous) : added
 
-2007-08-23  Gabor Csardi  <csardi@belus>
+2007-08-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/topology.c (igraph_isomorphic_vf2) : check directedness,
 	check number of vertices, fix +1 bug for map12 and map21
@@ -28,7 +32,7 @@
 
 	* src/layout.c (igraph_layout_graphopt) : added
 
-2007-08-16  Gabor Csardi  <csardi@belus>
+2007-08-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph_grid.c (igraph_2dgrid_which, igraph_2dgrid_dist)
 	(igraph_2dgrid_dist2, igraph_2dgrid_next_nei)
@@ -49,7 +53,7 @@
 
 	* src/structural_properties.c (igraph_count_multiple) : added
 
-2007-08-09  Gabor Csardi  <csardi@belus>
+2007-08-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/examples/simple/vector.c : corrected a test case
 
@@ -60,7 +64,7 @@
 	solves the bug reported by Kristian Ovaska. It seems to work.
 	* examples/simple/graphml.c : added a simple test case
 
-2007-07-24  Gabor Csardi  <csardi@localhost.localdomain>
+2007-07-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/community.c (igraph_community_edge_betweenness) : handle
 	unconnected input graphs properly

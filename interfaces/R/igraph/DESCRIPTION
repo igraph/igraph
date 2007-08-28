@@ -1,6 +1,6 @@
 Package: igraph
 Version: 0.5
-Date: Aug 7, 2007
+Date: May 28, 2007
 Title:  Routines for simple graphs, network analysis.
 Author: Gabor Csardi <csardi@rmki.kfki.hu>
 Maintainer: Gabor Csardi <csardi@rmki.kfki.hu>

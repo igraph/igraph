@@ -1231,7 +1231,7 @@ igraph_real_t igraph_i_famous_frucht[] = {
   10, 6, 7, 7, 8, 7, 9, 8, 9, 10, 11
 };  
 
-igraph_real_t igraph_i_famous_grotztsch[] = {
+igraph_real_t igraph_i_famous_grotzsch[] = {
   11, 20, 0,
   0, 1, 0, 2, 0, 7, 0, 10, 1, 3, 1, 6, 1, 9, 2, 4, 2, 6, 2, 8, 3, 4, 3, 8, 3, 10, 
   4, 7, 4, 9, 5, 6, 5, 7, 5, 8, 5, 9, 5, 10
@@ -1298,7 +1298,7 @@ igraph_real_t igraph_i_famous_noperfectmatching[] = {
   13, 14, 13, 15, 14, 15
 };  
 
-igraph_real_t igraph_i_famous_noline[] = {
+igraph_real_t igraph_i_famous_nonline[] = {
   50, 72, 0,
   0, 1, 0, 2, 0, 3, 4, 6, 4, 7, 5, 6, 5, 7, 6, 7, 7, 8, 9, 11, 9, 12, 9, 13, 10, 
   11, 10, 12, 10, 13, 11, 12, 11, 13, 12, 13, 14, 15, 15, 16, 15, 17, 16, 17, 16, 
@@ -1379,8 +1379,133 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
 
 /**
  * \function igraph_famous
+ * \brief Create a famous graph by simply providing its name
  * 
- * TODO
+ * </para><para>
+ * The name of the graph can be simply supplied as a string. 
+ * Note that this function creates graphs which don't take any parameters,
+ * there are separate functions for graphs with parameters, eg. \ref
+ * igraph_full() for creating a full graph.
+ * 
+ * </para><para>
+ * The following graphs are supported:
+ * \clist
+ *   \cli Chvatal 
+ *           This is the smallest triangle-free graph that is
+ *           both 4-chromatic and 4-regular. According to the Grunbaum
+ *           conjecture there exists an m-regular, m-chromatic graph
+ *           with n vertices for every m>1 and n>2. The Chvatal graph
+ *           is an example for m=4 and n=12. It has 24 edges.
+ *   \cli Coxeter 
+ *           A non-Hamiltonian cubic symmetric graph with 28
+ *           vertices and 42 edges.
+ *   \cli Cubical
+ *           The Platonic graph of the cube. A convex regular
+ *           polyhedron with 8 vertices and 12 edges.
+ *   \cli Dodecahedral, Dodecahedron
+ *           Another Platonic solid
+ *           with 20 vertices and 30 edges.
+ *   \cli Folkman 
+ *           The semisymmetric graph with minimum number of
+ *           vertices, 20 and 40 edges. A semisymmetric graph is
+ *           regular, edge transitive and not vertex transitive.
+ *   \cli Franklin 
+ *           This is a graph whose embedding to the Klein
+ *           bottle can be colored with six colors, it is a
+ *           counterexample to the neccessity of the Heawood
+ *           conjecture on a Klein bottle. It has 12 vertices and 18
+ *           edges. 
+ *   \cli Frucht 
+ *           The Frucht Graph is the smallest cubical graph
+ *           whose automorphism group consists only of the identity
+ *           element. It has 12 vertices and 18 edges.
+ *   \cli Grotzsch 
+ *           The Grötzsch graph is a triangle-free graph with
+ *           11 vertices, 20 edges, and chromatic number 4. It is named after
+ *           German mathematician Herbert Grötzsch, and its existence
+ *           demonstrates that the assumption of planarity is necessary in
+ *           Grötzsch's theorem that every triangle-free planar
+ *           graph is 3-colorable. 
+ *   \cli Heawood 
+ *           The Heawood graph is an undirected graph with 14
+ *           vertices and 21 edges. The graph is cubic, and all cycles in the
+ *           graph have six or more edges. Every smaller cubic graph has shorter
+ *           cycles, so this graph is the 6-cage, the smallest cubic graph of
+ *           girth 6. 
+ *   \cli Herschel 
+ *           The Herschel graph is the smallest
+ *           nonhamiltonian polyhedral graph. It is the
+ *           unique such graph on 11 nodes, and has 18 edges.
+ *   \cli Icosahedral, Icosahedron 
+ *           A Platonic solid with 12
+ *           vertices and 30 edges.
+ *   \cli Levi 
+ *           The graph is a 4-arc transitive cubic graph, it has
+ *           30 vertices and 45 edges.
+ *   \cli McGee 
+ *           The McGee graph is the unique 3-regular 7-cage
+ *           graph, it has 24 vertices and 36 edges.
+ *   \cli Meredith 
+ *           The Meredith graph is a quartic graph on 70
+ *           nodes and 140 edges that is a counterexample to the conjecture that
+ *           every 4-regular 4-connected graph is Hamiltonian. 
+ *   \cli Noperfectmatching 
+ *           A connected graph with 16 vertices and
+ *           27 edges containing no perfect matching. A matching in a graph
+ *           is a set of pairwise non-adjacent edges; that is, no two edges
+ *           share a common vertex. A perfect matching is a matching
+ *           which covers all vertices of the graph. 
+ *   \cli Nonline 
+ *           A graph whose connected components are the 9
+ *           graphs whose presence as a vertex-induced subgraph in a
+ *           graph makes a nonline graph. It has 50 vertices and 72 edges.
+ *   \cli Octahedral, Octahedron 
+ *           Platonic solid with 6
+ *           vertices and 12 edges. 
+ *   \cli Robertson 
+ *           The unique (4,5)-cage graph, ie. a 4-regular
+ *           graph of girth 5. It has 19 vertices and 38 edges.
+ *   \cli Smallestcyclicgroup 
+ *           A smallest nontrivial graph
+ *           whose automorphism group is cyclic. It has 9 vertices and
+ *           15 edges.
+ *   \cli Tetrahedral, Tetrahedron 
+ *           Platonic solid with 4
+ *           vertices and 6 edges.
+ *   \cli Thomassen 
+ *           The smallest hypotraceable graph,
+ *           on 34 vertices and 52 edges. A hypotracable graph does
+ *           not contain a Hamiltonian path but after removing any
+ *           single vertex from it the remainder always contains a
+ *           Hamiltonian path. A graph containing a Hamiltonian path
+ *           is called tracable.
+ *   \cli Tutte 
+ *           Tait's Hamiltonian graph conjecture states that
+ *           every 3-connected 3-regular planar graph is Hamiltonian.
+ *           This graph is a counterexample. It has 46 vertices and 69
+ *           edges. 
+ *   \cli Uniquely3colorable 
+ *           Returns a 12-vertex, triangle-free
+ *           graph with chromatic number 3 that is uniquely
+ *           3-colorable.
+ *   \cli Walther 
+ *           An identity graph with 25 vertices and 31
+ *           edges. An identity graph has a single graph automorphism,
+ *           the trivial one.
+ * \endclist
+ * 
+ * \param graph Pointer to an unitialized graph object.
+ * \param name Character constant, the name of the graph to be
+ *     created, it is case insensitive.
+ * \return Error code, IGRAPH_EINVAL if there is no graph with the
+ *     given name.
+ * 
+ * \sa Other functions for creating graph structures:
+ * \ref igraph_ring(), \ref igraph_tree(), \ref igraph_lattice(), \ref
+ * igraph_full().
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges in the graph.
  */
 
 int igraph_famous(igraph_t *graph, const char *name) {
@@ -1400,8 +1525,8 @@ int igraph_famous(igraph_t *graph, const char *name) {
     return igraph_i_famous(graph, igraph_i_famous_franklin);
   } else if (!strcasecmp(name, "frucht")) {
     return igraph_i_famous(graph, igraph_i_famous_frucht);
-  } else if (!strcasecmp(name, "grotztsch")) {
-    return igraph_i_famous(graph, igraph_i_famous_grotztsch);
+  } else if (!strcasecmp(name, "grotzsch")) {
+    return igraph_i_famous(graph, igraph_i_famous_grotzsch);
   } else if (!strcasecmp(name, "heawood")) {
     return igraph_i_famous(graph, igraph_i_famous_heawood);
   } else if (!strcasecmp(name, "herschel")) {
@@ -1417,8 +1542,8 @@ int igraph_famous(igraph_t *graph, const char *name) {
     return igraph_i_famous(graph, igraph_i_famous_meredith);
   } else if (!strcasecmp(name, "noperfectmatching")) {
     return igraph_i_famous(graph, igraph_i_famous_noperfectmatching);
-  } else if (!strcasecmp(name, "noline")) {
-    return igraph_i_famous(graph, igraph_i_famous_noline);
+  } else if (!strcasecmp(name, "nonline")) {
+    return igraph_i_famous(graph, igraph_i_famous_nonline);
   } else if (!strcasecmp(name, "octahedral") ||
 	     !strcasecmp(name, "octahedron")) {
     return igraph_i_famous(graph, igraph_i_famous_octahedron);

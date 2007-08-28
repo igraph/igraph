@@ -10,6 +10,13 @@
 <section><title>Deciding whether two graphs are isomorphic</title>
 <!-- doxrox-include igraph_isomorphic -->
 <!-- doxrox-include igraph_isomorphic_vf2 -->
+<!-- doxrox-include igraph_count_isomorphisms_vf2 -->
+<!-- doxrox-include igraph_get_isomorphisms_vf2 -->
+<!-- doxrox-include igraph_isomorphic_function_vf2 -->
+<!-- doxrox-include igraph_subisomorphic_vf2 -->
+<!-- doxrox-include igraph_subisomorphic_function_vf2 -->
+<!-- doxrox-include igraph_count_subisomorphisms_vf2 -->
+<!-- doxrox-include igraph_get_subisomorphisms_vf2 -->
 </section>
 
 <section><title>Isomorphism classes</title>
