@@ -14,6 +14,8 @@ graph.famous(name)
 \details{
   \code{graph.famous} knows the following graphs:
   \itemize{
+    \item{Bull}{The bull graph, 5 vertices, 5 edges, resembles to the
+      head of a bull if drawn properly.}
     \item{Chvatal}{This is the smallest triangle-free graph that is
       both 4-chromatic and 4-regular. According to the Grunbaum
       conjecture there exists an m-regular, m-chromatic graph
@@ -23,6 +25,8 @@ graph.famous(name)
       vertices and 42 edges.}
     \item{Cubical}{The Platonic graph of the cube. A convex regular
       polyhedron with 8 vertices and 12 edges.}
+    \item{Diamond}{A graph with 4 vertices and 5 edges, resembles to a
+      schematic diamond if drawn properly.}
     \item{Dodecahedral, Dodecahedron}{Another Platonic solid
       with 20 vertices and 30 edges.}
     \item{Folkman}{The semisymmetric graph with minimum number of
@@ -50,8 +54,17 @@ graph.famous(name)
     \item{Herschel}{The Herschel graph is the smallest
       nonhamiltonian polyhedral graph. It is the
       unique such graph on 11 nodes, and has 18 edges.}
+    \item{House}{The house graph is a 5-vertex, 6-edge graph, the
+      schematic draw of a house if drawn properly, basicly a 
+      triangle of the top of a square.}
+    \item{HouseX}{The same as the house graph with an X in the square. 5
+      vertices and 8 edges.}
     \item{Icosahedral, Icosahedron}{A Platonic solid with 12
       vertices and 30 edges.}
+    \item{Krackhardt_Kite}{A social network with 10 vertices and 18 edges.
+      Krackhardt, D. Assessing the Political Landscape:
+      Structure, Cognition, and Power in Organizations.
+      Admin. Sci. Quart. 35, 342-369, 1990.}
     \item{Levi}{The graph is a 4-arc transitive cubic graph, it has
       30 vertices and 45 edges.}
     \item{McGee}{The McGee graph is the unique 3-regular 7-cage
@@ -69,6 +82,10 @@ graph.famous(name)
       graph makes a nonline graph. It has 50 vertices and 72 edges.}
     \item{Octahedral, Octahedron}{Platonic solid with 6
       vertices and 12 edges.} 
+    \item{Petersen}{A 3-regular graph with 10 vertices and 15 edges. It is
+      the smallest hypohamiltonian graph, ie. it is
+      non-hamiltonian but removing any single vertex from it makes it
+      Hamiltonian.}
     \item{Robertson}{The unique (4,5)-cage graph, ie. a 4-regular
       graph of girth 5. It has 19 vertices and 38 edges.}
     \item{Smallestcyclicgroup}{A smallest nontrivial graph

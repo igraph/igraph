@@ -1185,6 +1185,11 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   return 0;
 }
 
+igraph_real_t igraph_i_famous_bull[] = {
+  5, 5, 0,
+  0,1,0,2,1,2,1,3,2,4
+};
+
 igraph_real_t igraph_i_famous_chvatal[] = { 
   12, 24, 0, 
   5, 6, 6, 7, 7, 8, 8, 9, 5, 9, 4, 5, 4, 8, 2, 8, 2, 6, 0, 6, 0, 9, 3, 9, 3, 7, 
@@ -1203,7 +1208,12 @@ igraph_real_t igraph_i_famous_cubical[] = {
   8, 12, 0,
   0, 1, 1, 2, 2, 3, 0, 3, 4, 5, 5, 6, 6, 7, 4, 7, 0, 4, 1, 5, 2, 6, 3, 7
 };  
-  
+
+igraph_real_t igraph_i_famous_diamond[] = {
+  4, 5, 0,
+  0,1,0,2,1,2,1,3,2,3
+};
+
 igraph_real_t igraph_i_famous_dodecahedron[] = {
   20, 30, 0, 
   0, 1, 0, 4, 0, 5, 1, 2, 1, 6, 2, 3, 2, 7, 3, 4, 3, 8, 4, 9, 5, 10, 5, 11, 6, 
@@ -1249,12 +1259,27 @@ igraph_real_t igraph_i_famous_herschel[] = {
   5, 10, 6, 8, 6, 9, 7, 8, 7, 10
 };  
 
+igraph_real_t igraph_i_famous_house[] = {
+  5, 6, 0,
+  0,1,0,2,1,3,2,3,2,4,3,4
+};
+
+igraph_real_t igraph_i_famous_housex[] = {
+  5, 8, 0,
+  0,1,0,2,0,3,1,2,1,3,2,3,2,4,3,4
+};
+
 igraph_real_t igraph_i_famous_icosahedron[] = {
   12, 30, 0,
   0, 1, 0, 2, 0, 3, 0, 4, 0, 8, 1, 2, 1, 6, 1, 7, 1, 8, 2, 4, 2, 5, 2, 6, 3, 4, 
   3, 8, 3, 9, 3, 11, 4, 5, 4, 11, 5, 6, 5, 10, 5, 11, 6, 7, 6, 10, 7, 8, 7, 9, 7, 
   10, 8, 9, 9, 10, 9, 11, 10, 11
 };  
+
+igraph_real_t igraph_i_famous_krackhardt_kite[] = {
+  10,18,0,
+  0,1,0,2,0,3,0,5, 1,3,1,4,1,6, 2,3,2,5, 3,4,3,5,3,6, 4,6, 5,6,5,7, 6,7, 7,8, 8,9
+};
 
 igraph_real_t igraph_i_famous_levi[] = {
   30, 45, 0,
@@ -1313,6 +1338,11 @@ igraph_real_t igraph_i_famous_octahedron[] = {
   6, 12, 0,
   0, 1, 0, 2, 1, 2, 3, 4, 3, 5, 4, 5, 0, 3, 0, 5, 1, 3, 1, 4, 2, 4, 2, 5
 };  
+
+igraph_real_t igraph_i_famous_petersen[] = {
+  10, 15, 0,
+  0,1,0,4,0,5, 1,2,1,6, 2,3,2,7, 3,4,3,8, 4,9, 5,7,5,8, 6,8,6,9, 7,9
+};
 
 igraph_real_t igraph_i_famous_robertson[] = {
   19, 38, 0,
@@ -1390,6 +1420,9 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
  * </para><para>
  * The following graphs are supported:
  * \clist
+ *   \cli Bull
+ *           The bull graph, 5 vertices, 5 edges, resembles to the
+ *           head of a bull if drawn properly.
  *   \cli Chvatal 
  *           This is the smallest triangle-free graph that is
  *           both 4-chromatic and 4-regular. According to the Grunbaum
@@ -1402,6 +1435,9 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
  *   \cli Cubical
  *           The Platonic graph of the cube. A convex regular
  *           polyhedron with 8 vertices and 12 edges.
+ *   \cli Diamond
+ *           A graph with 4 vertices and 5 edges, resembles to a
+ *           schematic diamond if drawn properly.
  *   \cli Dodecahedral, Dodecahedron
  *           Another Platonic solid
  *           with 20 vertices and 30 edges.
@@ -1436,9 +1472,21 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
  *           The Herschel graph is the smallest
  *           nonhamiltonian polyhedral graph. It is the
  *           unique such graph on 11 nodes, and has 18 edges.
+ *   \cli House
+ *           The house graph is a 5-vertex, 6-edge graph, the
+ *           schematic draw of a house if drawn properly, basicly a 
+ *           triangle of the top of a square.
+ *   \cli HouseX
+ *           The same as the house graph with an X in the square. 5
+ *           vertices and 8 edges.
  *   \cli Icosahedral, Icosahedron 
  *           A Platonic solid with 12
  *           vertices and 30 edges.
+ *   \cli Krackhardt_Kite
+ *           A social network with 10 vertices and 18 edges.
+ *           Krackhardt, D. Assessing the Political Landscape:
+ *           Structure, Cognition, and Power in Organizations.
+ *           Admin. Sci. Quart. 35, 342-369, 1990. 
  *   \cli Levi 
  *           The graph is a 4-arc transitive cubic graph, it has
  *           30 vertices and 45 edges.
@@ -1462,6 +1510,11 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
  *   \cli Octahedral, Octahedron 
  *           Platonic solid with 6
  *           vertices and 12 edges. 
+ *   \cli Petersen
+ *           A 3-regular graph with 10 vertices and 15 edges. It is
+ *           the smallest hypohamiltonian graph, ie. it is
+ *           non-hamiltonian but removing any single vertex from it makes it
+ *           Hamiltonian.
  *   \cli Robertson 
  *           The unique (4,5)-cage graph, ie. a 4-regular
  *           graph of girth 5. It has 19 vertices and 38 edges.
@@ -1510,12 +1563,16 @@ int igraph_i_famous(igraph_t *graph, igraph_real_t *data) {
 
 int igraph_famous(igraph_t *graph, const char *name) {
 
-  if (!strcasecmp(name, "chvatal")) {
+  if (!strcasecmp(name, "bull")) {
+    return igraph_i_famous(graph, igraph_i_famous_bull);
+  } else if (!strcasecmp(name, "chvatal")) {
     return igraph_i_famous(graph, igraph_i_famous_chvatal);
   } else if (!strcasecmp(name, "coxeter")) {
     return igraph_i_famous(graph, igraph_i_famous_coxeter);
-  } else if (!strcasecmp(name, "cubical")) {
+  } else if (!strcasecmp(name, "cubical")) {    
     return igraph_i_famous(graph, igraph_i_famous_cubical);
+  } else if (!strcasecmp(name, "diamond")) {
+    return igraph_i_famous(graph, igraph_i_famous_diamond);
   } else if (!strcasecmp(name, "dodecahedral") ||
 	     !strcasecmp(name, "dodecahedron")) {
     return igraph_i_famous(graph, igraph_i_famous_dodecahedron);
@@ -1531,9 +1588,15 @@ int igraph_famous(igraph_t *graph, const char *name) {
     return igraph_i_famous(graph, igraph_i_famous_heawood);
   } else if (!strcasecmp(name, "herschel")) {
     return igraph_i_famous(graph, igraph_i_famous_herschel);
+  } else if (!strcasecmp(name, "house")) {
+    return igraph_i_famous(graph, igraph_i_famous_house);
+  } else if (!strcasecmp(name, "housex")) {
+    return igraph_i_famous(graph, igraph_i_famous_housex);
   } else if (!strcasecmp(name, "icosahedral") ||
 	     !strcasecmp(name, "icosahedron")) {
     return igraph_i_famous(graph, igraph_i_famous_icosahedron);
+  } else if (!strcasecmp(name, "krackhardt_kite")) {
+    return igraph_i_famous(graph, igraph_i_famous_krackhardt_kite);
   } else if (!strcasecmp(name, "levi")) {
     return igraph_i_famous(graph, igraph_i_famous_levi);
   } else if (!strcasecmp(name, "mcgee")) {
@@ -1547,6 +1610,8 @@ int igraph_famous(igraph_t *graph, const char *name) {
   } else if (!strcasecmp(name, "octahedral") ||
 	     !strcasecmp(name, "octahedron")) {
     return igraph_i_famous(graph, igraph_i_famous_octahedron);
+  } else if (!strcasecmp(name, "petersen")) {
+    return igraph_i_famous(graph, igraph_i_famous_petersen);
   } else if (!strcasecmp(name, "robertson")) {
     return igraph_i_famous(graph, igraph_i_famous_robertson);
   } else if (!strcasecmp(name, "smallestcyclicgroup")) {

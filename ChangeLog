@@ -1,5 +1,7 @@
 2007-08-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structure_generators.c (igraph_famous): some more graphs added
+
 	* src/structure_generators.c (igraph_famous): corrected some names
 
 2007-08-27  Gabor Csardi  <csardi@rmki.kfki.hu>
