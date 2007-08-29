@@ -119,3 +119,21 @@ igraph_layout_graphopt:
         NAME-R: layout.graphopt
         RETURN: ERROR
         FLAGS: PROGRESS
+
+#######################################
+# Structure generators
+#######################################
+
+igraph_lcf_vector:
+        PARAM-list:
+            graph:
+              type: GRAPH
+              mode: OUT
+            n:
+              type: INTEGER
+            shifts:
+              type: VECTOR
+            repeats:
+              type: INTEGER
+        NAME-R: graph.lcf
+        RETURN: ERROR

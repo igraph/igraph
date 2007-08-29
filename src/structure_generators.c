@@ -1185,6 +1185,26 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   return 0;
 }
 
+/**
+ * \function igraph_lcf_vector
+ * \brief Create a graph from LCF notation
+ * 
+ * This function is essentially the same as \ref igraph_lcf(), only
+ * the way for giving the arguments is different. See \ref
+ * igraph_lcf() for details.
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n Integer constant giving the number of vertices.
+ * \param shifts A vector giving the shifts.
+ * \param repeats An integer constant giving the number of repeats 
+ *        for the shifts.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_lcf()
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices plus
+ * the number of edges.
+ */
+
 int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 		      const igraph_vector_t *shifts, 
 		      igraph_integer_t repeats) {
@@ -1222,6 +1242,31 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
   
   return 0;			     
 }
+
+/**
+ * \function igraph_lcf
+ * \brief Create a graph from LCF notation
+ * 
+ * </para><para>
+ * LCF is short for Lederberg-Coxeter-Frucht, it is a concise notation for
+ * 3-regular Hamiltonian graphs. It constists of three parameters, the
+ * number of vertices in the graph, a list of shifts giving additional
+ * edges to a cycle backbone and another integer giving how many times
+ * the shifts should be performed. See
+ * http://mathworld.wolfram.com/LCFNotation.html for details. 
+ * 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n Integer, the number of vertices in the graph.
+ * \param ... The shifts and the number of repeats for the shifts,
+ *        plus an additional 0 to mark the end of the arguments.
+ * \return Error code.
+ * 
+ * \sa See \ref igraph_lcf_vector() for a similar function using a
+ * vector_t instead of the variable length argument list.
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges.
+ */
 
 int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
   igraph_vector_t shifts;
