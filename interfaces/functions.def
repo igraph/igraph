@@ -4,35 +4,17 @@
 #######################################
 
 igraph_empty:
-        PARAM-list:
-            graph:
-              type: GRAPH
-              mode: OUT
-            n:
-              type: INTEGER
-              default: 0
-            directed:
-              type: BOOLEAN
-              default: True
-        RETURN: ERROR  
+        PARAMS: OUT GRAPH graph, INTEGER n=0, BOOLEAN directed=True
+        RETURN: ERROR
 
 igraph_add_edges:
-        PARAM-list:
-            graph:
-              type: GRAPH
-              mode: INOUT
-            edges:
-              type: VECTOR
-            attr:
-              type: ATTRIBUTES
+        PARAMS: INOUT GRAPH graph, VECTOR edges, ATTRIBUTES attr
         NAME-R: add.edges
         RETURN: ERROR
         IGNORE: RR, RC
 
 igraph_vcount:
-        PARAM-list:
-            graph:
-              type: GRAPH	
+        PARAMS: GRAPH graph
         NAME-R: vcount
         RETURN: INTEGERPTR
 
@@ -41,21 +23,8 @@ igraph_vcount:
 #######################################
 
 igraph_clusters:
-        PARAM-list:
-            graph:
-              type: GRAPH
-            membership:
-              type: VECTOR
-              mode: OUT
-            csize: 
-              type: VECTOR
-              mode: OUT
-            no:
-              type: INTEGERPTR
-              mode: OUT
-            mode:
-              type: CONNECTEDNESS
-              default: WEAK
+        PARAMS: GRAPH graph, OUT VECTOR membership, OUT VECTOR csize, \
+	        OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
         NAME-R: clusters
         RETURN: ERROR
 
@@ -64,58 +33,19 @@ igraph_clusters:
 #######################################
 
 igraph_layout_fruchterman_reingold:
-        PARAM-list:
-            graph:
-               type: GRAPH
-            res:
-               type: MATRIX
-               mode: OUT
-            niter:
-               type: INTEGER
-            maxdelta:
-               type: REAL
-            area:
-               type: REAL
-            coolexp:
-               type: REAL
-            repulserad:
-               type: REAL
-            use_seed:
-               type: NULL
-            weight:
-               type: VECTOR_OR_0
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter, REAL maxdelta, \
+                REAL area, REAL coolexp, REAL repulserad, NULL use_seed, \
+                VECTOR_OR_0 weight
         NAME-R: layout.fruchterman.reingold
         RETURN: ERROR
         FLAGS: PROGRESS
         IGNORE: RR
 
 igraph_layout_graphopt:
-        PARAM-list:
-            graph:
-               type: GRAPH
-            res:
-               type: MATRIX
-               mode: OUT
-            niter:
-               type: INTEGER
-               default: 500
-            node_charge:
-               type: REAL
-               default: 0.001
-            node_mass:
-               type: REAL
-               default: 30
-            spring_length:
-               type: INTEGER
-               default: 0
-            spring_constant:
-               type: REAL
-               default: 1
-            max_sa_movement:
-               type: REAL
-               default: 5
-            use_seed:
-               type: NULL
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, \
+                REAL node_charge=0.001, REAL node_mass=30, \
+                INTEGER spring_length=0, REAL spring_constant=1, \
+                REAL max_sa_movement=5, NULL use_seed
         NAME-R: layout.graphopt
         RETURN: ERROR
         FLAGS: PROGRESS
@@ -125,15 +55,6 @@ igraph_layout_graphopt:
 #######################################
 
 igraph_lcf_vector:
-        PARAM-list:
-            graph:
-              type: GRAPH
-              mode: OUT
-            n:
-              type: INTEGER
-            shifts:
-              type: VECTOR
-            repeats:
-              type: INTEGER
+        PARAMS: OUT GRAPH graph, INTEGER n, VECTOR shifts, INTEGER repeats
         NAME-R: graph.lcf
         RETURN: ERROR

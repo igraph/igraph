@@ -234,6 +234,30 @@ class CodeGenerator:
         print "Error: invalid code generator, this method should be overridden"
         sys.exit(1)
 
+    def parse_params(self, function):
+        if "PARAMS" not in self.func[function]:
+            return seqdict.seqdict()
+        
+        params=self.func[function]["PARAMS"]
+        params=params.split(",")
+        params=[ p.strip() for p in params ]
+        params=[ p.split(" ", 1) for p in params ]
+        for p in range(len(params)):
+            if params[p][0] in ['OUT', 'IN', 'INOUT']:
+                params[p]=[params[p][0]] + params[p][1].split(" ", 1)
+            else:
+                params[p]=['IN', params[p][0]]+ params[p][1].split(" ", 1)
+            if '=' in params[p][2]:
+                params[p]=params[p][:2] + params[p][2].split("=", 1)
+        params=[ [ p.strip() for p in pp ] for pp in params ]
+        res=seqdict.seqdict()
+        for p in params:
+            if len(p)==3:
+                res[ p[2] ] = { 'mode': p[0], 'type': p[1] }
+            else:
+                res[ p[2] ] = { 'mode': p[0], 'type': p[1], 'default': p[3] }
+        return res
+
     def append_inputs(self, inputs, output):
         for i in inputs:
             ii=open(i)
@@ -288,10 +312,7 @@ class RRCodeGenerator(CodeGenerator):
             return
 
         name=self.func[function].get("NAME-R", function[1:].replace("_", "."))
-        if "PARAM" in self.func[function]:            
-            params=self.func[function]["PARAM"]
-        else:
-            params=seqdict.seqdict()
+        params=self.parse_params(function)
 
         # Check types
         for p in params.keys():
@@ -411,10 +432,7 @@ class RCCodeGenerator(CodeGenerator):
         if self.ignore(function):
             return
 
-        if "PARAM" in self.func[function]:            
-            params=self.func[function]["PARAM"]
-        else:
-            params=seqdict.seqdict()
+        params=self.parse_params(function)
 
         # Check types
         for p in params.keys():
