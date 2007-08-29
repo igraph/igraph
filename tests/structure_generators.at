@@ -90,3 +90,8 @@ AT_SETUP([Geomeric random graphs (igraph_grg_game):])
 AT_KEYWORDS([graph GRG grg geometric random graph igraph_grg_game])
 AT_COMPILE_CHECK([simple/igraph_grg_game.c])
 AT_CLEANUP
+
+AT_SETUP([Graphs in LCF notation (igraph_lcf{,_vector}):])
+AT_KEYWORDS([LCF graph constructor])
+AT_COMPILE_CHECK([simple/igraph_lcf.c])
+AT_CLEANUP

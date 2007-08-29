@@ -567,6 +567,10 @@ int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);
 int igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);
 int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);
 int igraph_famous(igraph_t *graph, const char *name);
+int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
+		      const igraph_vector_t *shifts, 
+		      igraph_integer_t repeats);
+int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...);
 
 /* -------------------------------------------------- */
 /* Constructors, games (=stochastic)                  */

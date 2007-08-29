@@ -1185,6 +1185,72 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   return 0;
 }
 
+int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
+		      const igraph_vector_t *shifts, 
+		      igraph_integer_t repeats) {
+  
+  igraph_vector_t edges;
+  long int no_of_shifts=igraph_vector_size(shifts);
+  long int ptr=0, i, sptr=0;
+  long int no_of_nodes=n;
+  long int no_of_edges=n+no_of_shifts*repeats/2;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
+
+  /* Create a ring first */
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(edges)[ptr++]=i;
+    VECTOR(edges)[ptr++]=i+1;
+  }
+  VECTOR(edges)[ptr-1]=0;
+  
+  /* Then add the rest */
+  while (ptr<2*no_of_edges) {
+    long int sh=VECTOR(*shifts)[sptr % no_of_shifts];
+    long int from=sptr % no_of_nodes;
+    long int to=(no_of_nodes+sptr+sh) % no_of_nodes;
+    if (from < to) {
+      VECTOR(edges)[ptr++]=from;
+      VECTOR(edges)[ptr++]=to;
+    }
+    sptr++;
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;			     
+}
+
+int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
+  igraph_vector_t shifts;
+  igraph_integer_t repeats;
+  va_list ap;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&shifts, 0);
+  
+  va_start(ap, n);
+  while (1) {
+    int num=va_arg(ap, int);
+    if (num==0) {
+      break;
+    }
+    IGRAPH_CHECK(igraph_vector_push_back(&shifts, num));
+  }
+  if (igraph_vector_size(&shifts)==0) {
+    repeats=0;
+  } else {
+    repeats=igraph_vector_pop_back(&shifts);
+  }
+  
+  IGRAPH_CHECK(igraph_lcf_vector(graph, n, &shifts, repeats));
+  igraph_vector_destroy(&shifts);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+
 igraph_real_t igraph_i_famous_bull[] = {
   5, 5, 0,
   0,1,0,2,1,2,1,3,2,4

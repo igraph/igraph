@@ -1,3 +1,7 @@
+2007-08-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structure_generators.c (igraph_lcf, igraph_lcf_vector) : added
+
 2007-08-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_famous): some more graphs added
