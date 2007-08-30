@@ -1306,7 +1306,7 @@ int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res,
   double *tmpscore;
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
-  long int j;
+  long int j, k;
   igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
   igraph_integer_t modein, modeout;
   igraph_vit_t vit;
@@ -1399,9 +1399,10 @@ int igraph_betweenness (const igraph_t *graph, igraph_vector_t *res,
     }
     
     /* Ok, we've the scores for this source */
-    for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+    for (k=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); 
+	 IGRAPH_VIT_NEXT(vit), k++) {
       long int node=IGRAPH_VIT_GET(vit);
-      VECTOR(*res)[node] += tmpscore[node];
+      VECTOR(*res)[k] += tmpscore[node];
       tmpscore[node] = 0.0; /* in case a node is in vids multiple times */
     }
 

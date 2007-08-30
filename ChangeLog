@@ -1,3 +1,8 @@
+2007-08-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_betweenness) : 
+	bug fixed when 'vids' is not all vertices, thanks to Alex Gutteridge
+
 2007-08-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_lcf, igraph_lcf_vector) : added
