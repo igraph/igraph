@@ -78,6 +78,7 @@ igraph_bool_t FUNCTION(igraph_vector,empty)     (const TYPE(igraph_vector)* v);
 long int FUNCTION(igraph_vector,size)      (const TYPE(igraph_vector)* v);
 void FUNCTION(igraph_vector,clear)     (TYPE(igraph_vector)* v);
 void FUNCTION(igraph_vector,null)      (TYPE(igraph_vector)* v);
+void FUNCTION(igraph_vector,fill)      (TYPE(igraph_vector)* v, BASE e);
 int FUNCTION(igraph_vector,push_back) (TYPE(igraph_vector)* v, BASE e);
 int FUNCTION(igraph_vector,insert)(TYPE(igraph_vector) *v, long int pos, BASE value);
 BASE FUNCTION(igraph_vector,e)         (const TYPE(igraph_vector)* v, long int pos);

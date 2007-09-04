@@ -303,6 +303,17 @@ int main() {
   igraph_vector_destroy(&v);
   igraph_vector_destroy(&v2);
   igraph_vector_destroy(&v3);
+
+  /* fill */
+  
+  igraph_vector_init(&v, 100);
+  igraph_vector_fill(&v, 1.234567);
+  for (i=0; i<igraph_vector_size(&v); i++) {
+    if (VECTOR(v)[i] != 1.234567) { 
+      return 15;
+    }
+  }
+  igraph_vector_destroy(&v);
   
   return 0;
 }

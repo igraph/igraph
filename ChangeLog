@@ -1,3 +1,8 @@
+2007-08-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/vector.pmt (igraph_vector_fill) : added
+	* examples/simple/vector.c : fill check added
+
 2007-08-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_betweenness) : 

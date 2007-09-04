@@ -629,6 +629,15 @@ void FUNCTION(igraph_vector,null)      (TYPE(igraph_vector)* v) {
 	}
 }
 
+void FUNCTION(igraph_vector,fill)      (TYPE(igraph_vector)* v, BASE e) {
+  assert(v != NULL);
+  assert(v->stor_begin != NULL);
+  BASE *ptr=v->stor_begin;
+  for (; ptr < v->end; ptr++) {
+    *ptr = e;
+  }  
+}  
+
 /**
  * \ingroup vector
  * \function igraph_vector_tail
