@@ -367,7 +367,7 @@ int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
  * \brief Removes elements from a string vector (for internal use)
  */
 
-void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
+void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *index,
 				long int nremove) {
   long int i;
   char **tmp;
@@ -375,8 +375,8 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index,
   assert(v->data != 0);
 
   for (i=0; i<igraph_strvector_size(v); i++) {
-    if (index[i] != 0) {
-      v->data[ index[i]-1 ] = v->data[i];
+    if (VECTOR(*index)[i] != 0) {
+      v->data[ (long int) VECTOR(*index)[i]-1 ] = v->data[i];
     } else {
       Free(v->data[i]);
     }

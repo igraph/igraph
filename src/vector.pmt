@@ -1230,14 +1230,14 @@ int FUNCTION(igraph_vector,move_interval)(TYPE(igraph_vector) *v,
  */
 
 void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v, 
-					long int *index, long int nremove) {
+					const igraph_vector_t *index, long int nremove) {
   long int i, n;
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   n = FUNCTION(igraph_vector,size)(v);
   for (i=0; i<n; i++) {
-    if (index[i] != 0) {
-      VECTOR(*v)[ index[i]-1 ] = VECTOR(*v)[i];
+    if (VECTOR(*index)[i] != 0) {
+      VECTOR(*v)[ (long int)VECTOR(*index)[i]-1 ] = VECTOR(*v)[i];
     }
   }
   v->end -= nremove;

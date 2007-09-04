@@ -105,7 +105,7 @@ void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v, long int fro
 int FUNCTION(igraph_vector,move_interval)(TYPE(igraph_vector) *v, long int begin, long int end, 
 					  long int to);
 void FUNCTION(igraph_vector,remove)(TYPE(igraph_vector) *v, long int elem);
-void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v, long int *index, long int nremove);
+void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v, const igraph_vector_t *index, long int nremove);
 void FUNCTION(igraph_vector,remove_negidx)(TYPE(igraph_vector) *v, const igraph_vector_t *neg, long int nremove);
 igraph_bool_t FUNCTION(igraph_vector,isininterval)(const TYPE(igraph_vector) *v, BASE low, BASE high);
 igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v, BASE limit);

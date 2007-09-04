@@ -462,7 +462,7 @@ int igraph_strvector_append(igraph_strvector_t *to,
 			    const igraph_strvector_t *from);
 int igraph_strvector_resize(igraph_strvector_t* v, long int newsize);
 int igraph_strvector_add(igraph_strvector_t *v, const char *value);
-void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
+void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *index,
 				 long int nremove);
 void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t *neg,
 				    long int nremove);

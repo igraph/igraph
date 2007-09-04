@@ -563,14 +563,11 @@ int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
  */
 
 int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
-  long int ci, ei, i, j, nremove=0, nremove_old=0, *permvec;
+  long int ci, ei, i, j, nremove=0, nremove_old=0;
+  igraph_vector_t permvec;
 
   assert(m != NULL);
-  permvec=Calloc(igraph_vector_size(&m->data), long int);
-  if (permvec == 0) {
-    IGRAPH_ERROR("can't clear row in sparse matrix", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(free, permvec);
+  IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
   for (ci=0, i=0, j=1; ci < m->ncol; ci++) {
     for (ei=VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci+1]; ei++) {
       if (VECTOR(m->ridx)[ei] == row) {
@@ -579,7 +576,7 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
         nremove++;
       } else {
         /* this element will be kept */
-        permvec[i] = j;
+        VECTOR(permvec)[i] = j;
         j++;
       }
       i++;
@@ -590,9 +587,9 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     nremove_old = nremove;
   }
   VECTOR(m->cidx)[m->ncol] -= nremove;
-  igraph_vector_permdelete(&m->ridx, permvec, nremove);
-  igraph_vector_permdelete(&m->data, permvec, nremove);
-  free(permvec);
+  igraph_vector_permdelete(&m->ridx, &permvec, nremove);
+  igraph_vector_permdelete(&m->data, &permvec, nremove);
+  igraph_vector_destroy(&permvec);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
@@ -609,14 +606,11 @@ int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
 }
 
 int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
-  long int ci, ei, i, j, nremove=0, nremove_old=0, *permvec;
+  long int ci, ei, i, j, nremove=0, nremove_old=0;
+  igraph_vector_t permvec;
 
   assert(m != NULL);
-  permvec=Calloc(igraph_vector_size(&m->data), long int);
-  if (permvec == 0) {
-    IGRAPH_ERROR("can't perform cleanup on sparse matrix", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(free, permvec);
+  IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
   for (ci=0, i=0, j=1; ci < m->ncol; ci++) {
     for (ei=VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci+1]; ei++) {
       if (VECTOR(m->data)[ei] == 0.0) {
@@ -625,7 +619,7 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
         nremove++;
       } else {
         /* this element will be kept */
-        permvec[i] = j;
+        VECTOR(permvec)[i] = j;
         j++;
       }
       i++;
@@ -636,9 +630,9 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     nremove_old = nremove;
   }
   VECTOR(m->cidx)[m->ncol] -= nremove;
-  igraph_vector_permdelete(&m->ridx, permvec, nremove);
-  igraph_vector_permdelete(&m->data, permvec, nremove);
-  free(permvec);
+  igraph_vector_permdelete(&m->ridx, &permvec, nremove);
+  igraph_vector_permdelete(&m->data, &permvec, nremove);
+  igraph_vector_destroy(&permvec);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
