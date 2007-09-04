@@ -23,6 +23,15 @@
 
 #include <igraph.h>
 
+int strvector_print(const igraph_strvector_t *sv) {
+  long int i, s=igraph_strvector_size(sv);
+  for (i=0; i<s; i++) {
+    char *str;
+    igraph_strvector_get(sv, i, &str);
+    printf("---%s---\n", str);
+  }
+}
+
 int main() {
 
   igraph_strvector_t sv1, sv2;
@@ -121,5 +130,34 @@ int main() {
   
   igraph_strvector_destroy(&sv1);
 
+  /* append */
+  printf("---\n");
+  igraph_strvector_init(&sv1, 0);
+  igraph_strvector_init(&sv2, 0);
+  igraph_strvector_append(&sv1, &sv2);
+  strvector_print(&sv1);
+  printf("---\n");
+  
+  igraph_strvector_resize(&sv1, 3);
+  igraph_strvector_append(&sv1, &sv2);
+  strvector_print(&sv1);
+  printf("---\n");   
+
+  igraph_strvector_append(&sv2, &sv1);
+  strvector_print(&sv2);
+  printf("---\n");   
+  
+  igraph_strvector_set(&sv1, 0, "0");
+  igraph_strvector_set(&sv1, 1, "1");
+  igraph_strvector_set(&sv1, 2, "2");
+  igraph_strvector_set(&sv2, 0, "3");
+  igraph_strvector_set(&sv2, 1, "4");
+  igraph_strvector_set(&sv2, 2, "5");
+  igraph_strvector_append(&sv1, &sv2);
+  strvector_print(&sv1);
+  
+  igraph_strvector_destroy(&sv1);
+  igraph_strvector_destroy(&sv2);
+  
   return 0;
 }

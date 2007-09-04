@@ -240,6 +240,28 @@ int igraph_strvector_copy(igraph_strvector_t *to,
   return 0;
 }
 
+int igraph_strvector_append(igraph_strvector_t *to,
+			    const igraph_strvector_t *from) {
+  long int len1=igraph_strvector_size(to), len2=igraph_strvector_size(from);
+  long int i;
+  igraph_bool_t error=0;
+  IGRAPH_CHECK(igraph_strvector_resize(to, len1+len2));
+  for (i=0; i<len2; i++) {
+    if (from->data[i][0] != '\0') {
+      to->data[len1+i] = strdup(from->data[i]);
+      if (!to->data[len1+i]) {
+	error=1; 
+	break;
+      }
+    }
+  }
+  if (error) {
+    igraph_strvector_resize(to, len1);
+    IGRAPH_ERROR("Cannot append string vector", IGRAPH_ENOMEM);
+  }
+  return 0;
+} 
+
 /**
  * \ingroup strvector
  * \brief Resizes a string vector.

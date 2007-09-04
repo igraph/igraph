@@ -1,3 +1,8 @@
+2007-09-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_strvector.c (igraph_strvector_append) : added
+	* examples/simple/igraph_strvector.c : updated
+
 2007-08-31  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/vector.pmt (igraph_vector_fill) : added

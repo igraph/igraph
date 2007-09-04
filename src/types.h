@@ -458,6 +458,8 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
 				   long int end, long int to);
 int igraph_strvector_copy(igraph_strvector_t *to, 
 			  const igraph_strvector_t *from);
+int igraph_strvector_append(igraph_strvector_t *to, 
+			    const igraph_strvector_t *from);
 int igraph_strvector_resize(igraph_strvector_t* v, long int newsize);
 int igraph_strvector_add(igraph_strvector_t *v, const char *value);
 void igraph_strvector_permdelete(igraph_strvector_t *v, long int *index, 
