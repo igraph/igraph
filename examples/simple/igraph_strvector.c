@@ -26,9 +26,7 @@
 int strvector_print(const igraph_strvector_t *sv) {
   long int i, s=igraph_strvector_size(sv);
   for (i=0; i<s; i++) {
-    char *str;
-    igraph_strvector_get(sv, i, &str);
-    printf("---%s---\n", str);
+    printf("---%s---\n", STR(*sv, i));
   }
 }
 
@@ -172,6 +170,17 @@ int main() {
   strvector_print(&sv1);
   igraph_strvector_set(&sv1, 0, "one");
   igraph_strvector_set(&sv1, 2, "two");
+  strvector_print(&sv1);
+  igraph_strvector_destroy(&sv1);
+
+  /* STR */
+  
+  igraph_strvector_init(&sv1, 5);
+  igraph_strvector_set(&sv1, 0, "one");
+  igraph_strvector_set(&sv1, 1, "two");
+  igraph_strvector_set(&sv1, 2, "three");
+  igraph_strvector_set(&sv1, 3, "four");
+  igraph_strvector_set(&sv1, 4, "five");
   strvector_print(&sv1);
   igraph_strvector_destroy(&sv1);
   

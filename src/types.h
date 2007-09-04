@@ -437,6 +437,8 @@ typedef struct s_igraph_strvector {
   long int len;
 } igraph_strvector_t;
 
+#define STR(sv, i) ((const char *)((sv).data[(i)]))
+
 #define IGRAPH_STRVECTOR_NULL { 0,0 }
 #define IGRAPH_STRVECTOR_INIT_FINALLY(v, size) \
   do { IGRAPH_CHECK(igraph_strvector_init(v, size)); \

@@ -1,5 +1,8 @@
 2007-09-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/types.h (STR) : added
+	* examples/simple/igraph_strvector.c : updated	
+
 	* src/igraph_strvector.c (igraph_strvector_clear) : added
 	* examples/simple/igraph_strvector.c : updated
 
