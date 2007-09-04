@@ -159,5 +159,21 @@ int main() {
   igraph_strvector_destroy(&sv1);
   igraph_strvector_destroy(&sv2);
   
+  /* clear */
+  igraph_strvector_init(&sv1, 3);
+  igraph_strvector_set(&sv1, 0, "0");
+  igraph_strvector_set(&sv1, 1, "1");
+  igraph_strvector_set(&sv1, 2, "2");
+  igraph_strvector_clear(&sv1);
+  if (igraph_strvector_size(&sv1) != 0) {
+    return 3;
+  }
+  igraph_strvector_resize(&sv1, 4);
+  strvector_print(&sv1);
+  igraph_strvector_set(&sv1, 0, "one");
+  igraph_strvector_set(&sv1, 2, "two");
+  strvector_print(&sv1);
+  igraph_strvector_destroy(&sv1);
+  
   return 0;
 }

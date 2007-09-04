@@ -262,6 +262,21 @@ int igraph_strvector_append(igraph_strvector_t *to,
   return 0;
 } 
 
+void igraph_strvector_clear(igraph_strvector_t *sv) {
+  long int i, n=igraph_strvector_size(sv);
+  char **tmp;
+
+  for (i=0; i<n; i++) {
+    Free(sv->data[i]);
+  }
+  sv->len=0;
+  /* try to give back some memory */
+  tmp=Realloc(sv->data, 1, char*);
+  if (tmp != 0) {
+    sv->data=tmp;
+  }
+}
+
 /**
  * \ingroup strvector
  * \brief Resizes a string vector.

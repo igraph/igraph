@@ -1,6 +1,11 @@
+2007-09-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/igraph_strvector.c (igraph_strvector_clear) : added
+	* examples/simple/igraph_strvector.c : updated
+
 2007-09-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* src/igraph_strvector_t (igraph_strvector_permdelete)
+	* src/igraph_strvector.c (igraph_strvector_permdelete)
 	* src/vector.pmt (igraph_vector_permdelete) :
 	use vector_t instead of long int* for the index
 	* src/spmatrix.c (igraph_spmatrix_clear_row)
