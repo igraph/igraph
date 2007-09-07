@@ -813,6 +813,7 @@ PyObject *igraphmodule_Graph_Adjacency(PyTypeObject * type,
     igraphmodule_Graph_init_internal(self);
     if (igraph_adjacency(&self->g, &m, mode)) {
       igraphmodule_handle_igraph_error();
+			Py_DECREF(self);
       igraph_matrix_destroy(&m);
       return NULL;
     }
@@ -843,6 +844,7 @@ PyObject *igraphmodule_Graph_Atlas(PyTypeObject * type, PyObject * args)
     igraphmodule_Graph_init_internal(self);
     if (igraph_atlas(&self->g, (igraph_integer_t) n)) {
       igraphmodule_handle_igraph_error();
+			Py_DECREF(self);
       return NULL;
     }
   }
@@ -909,6 +911,7 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
                                &outseq, PyObject_IsTrue(outpref),
                                PyObject_IsTrue(directed))) {
         igraphmodule_handle_igraph_error();
+				Py_DECREF(self);
         igraph_vector_destroy(&outseq);
         return NULL;
       }
@@ -921,6 +924,7 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
                                          &outseq, PyObject_IsTrue(outpref),
                                          (igraph_real_t) zero_appeal,
                                          PyObject_IsTrue(directed))) {
+				Py_DECREF(self);
         igraphmodule_handle_igraph_error();
         igraph_vector_destroy(&outseq);
         return NULL;
@@ -952,6 +956,7 @@ PyObject *igraphmodule_Graph_De_Bruijn(PyTypeObject *type, PyObject *args,
     igraphmodule_Graph_init_internal(self);
     if (igraph_de_bruijn(&self->g, m, n)) {
       igraphmodule_handle_igraph_error();
+			Py_DECREF(self);
       return NULL;
     }
   }
@@ -1025,6 +1030,7 @@ PyObject *igraphmodule_Graph_Erdos_Renyi(PyTypeObject * type,
                                                  : p), (directed == Py_True),
                                 (loops == Py_True))) {
       igraphmodule_handle_igraph_error();
+			Py_DECREF(self);
       return NULL;
     }
   }
@@ -1090,6 +1096,7 @@ PyObject *igraphmodule_Graph_Establishment(PyTypeObject * type,
                                   (igraph_integer_t) k, &td, &pm,
                                   PyObject_IsTrue(directed))) {
       igraphmodule_handle_igraph_error();
+			Py_DECREF(self);
       igraph_matrix_destroy(&pm);
       igraph_vector_destroy(&td);
       return NULL;
@@ -1100,6 +1107,37 @@ PyObject *igraphmodule_Graph_Establishment(PyTypeObject * type,
   igraph_vector_destroy(&td);
   return (PyObject *) self;
 }
+
+/** \ingroup python_interface_graph
+ * \brief Generates a famous graph by name
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_famous
+ */
+PyObject *igraphmodule_Graph_Famous(PyTypeObject * type,
+                                    PyObject * args, PyObject * kwds) {
+  igraphmodule_GraphObject *self;
+  const char* name;
+
+  char *kwlist[] = { "name", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &name))
+    return NULL;
+
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_famous(&self->g, name)) {
+			igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
+      return NULL;
+    }
+  }
+
+  return (PyObject *) self;
+}
+
 
 /** \ingroup python_interface_graph
  * \brief Generates a full graph
@@ -1133,6 +1171,7 @@ PyObject *igraphmodule_Graph_Full(PyTypeObject * type,
     if (igraph_full(&self->g, (igraph_integer_t) n,
                     (directed == Py_True), (loops == Py_True))) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1167,6 +1206,7 @@ PyObject *igraphmodule_Graph_GRG(PyTypeObject * type,
     if (igraph_grg_game(&self->g, (igraph_integer_t) n, (igraph_real_t) r,
                         PyObject_IsTrue(torus))) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1214,6 +1254,7 @@ PyObject *igraphmodule_Graph_Growing_Random(PyTypeObject * type,
                                    (directed == Py_True),
                                    (citation == Py_True))) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1265,6 +1306,7 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
     if (igraph_star
         (&self->g, (igraph_integer_t) n, mode, (igraph_integer_t) center)) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1291,6 +1333,7 @@ PyObject *igraphmodule_Graph_Kautz(PyTypeObject *type, PyObject *args,
     igraphmodule_Graph_init_internal(self);
     if (igraph_kautz(&self->g, m, n)) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1337,11 +1380,52 @@ PyObject *igraphmodule_Graph_Lattice(PyTypeObject * type,
     if (igraph_lattice(&self->g, &dimvector, nei, directed, mutual, circular)) {
       igraph_vector_destroy(&dimvector);
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
 
   igraph_vector_destroy(&dimvector);
+
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a 3-regular Hamiltonian graph from LCF notation
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_lattice
+ */
+PyObject *igraphmodule_Graph_LCF(PyTypeObject *type,
+                                 PyObject *args, PyObject *kwds) {
+  igraph_vector_t shifts;
+  long int repeats;
+	long int n;
+  PyObject *o_shifts;
+  igraphmodule_GraphObject *self;
+
+  static char *kwlist[] = { "n", "shifts", "repeats", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lOl", kwlist,
+                                   &n, &o_shifts, &repeats))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vector_t(o_shifts, &shifts, 0, 0))
+    return NULL;
+
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_lcf_vector(&self->g, n, &shifts, repeats)) {
+      igraph_vector_destroy(&shifts);
+      igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
+      return NULL;
+    }
+  }
+
+  igraph_vector_destroy(&shifts);
 
   return (PyObject *) self;
 }
@@ -1411,6 +1495,7 @@ NULL };
       igraph_matrix_destroy(&pm);
       igraph_vector_destroy(&td);
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
 
@@ -1524,6 +1609,7 @@ PyObject *igraphmodule_Graph_Asymmetric_Preference(PyTypeObject * type,
         igraph_matrix_destroy(&pm);
         igraph_matrix_destroy(&td);
         igraphmodule_handle_igraph_error();
+				Py_DECREF(self);
         return NULL;
       }
       if (igraph_vector_init(&out_type_vec, (igraph_integer_t) n)) {
@@ -1638,6 +1724,7 @@ NULL };
                                   PyObject_IsTrue(directed))) {
       igraphmodule_handle_igraph_error();
       igraph_vector_destroy(&outseq);
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1680,6 +1767,7 @@ PyObject *igraphmodule_Graph_Ring(PyTypeObject * type,
     if (igraph_ring(&self->g, (igraph_integer_t) n, (directed == Py_True),
                     (mutual == Py_True), (circular == Py_True))) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1725,6 +1813,7 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
     if (igraph_tree
         (&self->g, (igraph_integer_t) n, (igraph_integer_t) children, mode)) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1780,6 +1869,7 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
       igraphmodule_handle_igraph_error();
       igraph_vector_destroy(&outseq);
       igraph_vector_destroy(&inseq);
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1826,6 +1916,7 @@ PyObject *igraphmodule_Graph_Isoclass(PyTypeObject * type,
     if (igraph_isoclass_create
         (&self->g, n, isoclass, PyObject_IsTrue(directed))) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -1858,6 +1949,7 @@ PyObject *igraphmodule_Graph_Watts_Strogatz(PyTypeObject * type,
     igraphmodule_Graph_init_internal(self);
     if (igraph_watts_strogatz_game(&self->g, dim, size, nei, p)) {
       igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
       return NULL;
     }
   }
@@ -4343,10 +4435,10 @@ PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
       return NULL;
     }
   } else {
-    if (igraph_isomorphic_vf2(&self->g, &other->g, &result)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
+    if (igraph_isomorphic_vf2(&self->g, &other->g, &result, 0, 0)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
   }
 
   if (result)
@@ -5859,6 +5951,19 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param directed: whether to generate a directed graph.\n"
    "@param loops: whether self-loops are allowed.\n"},
 
+  /* interface to igraph_famous */
+	{"Famous", (PyCFunction) igraphmodule_Graph_Famous,
+	 METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+	 "Famous(name)\n\n"
+	 "Generates a famous graph based on its name.\n\n"
+	 "Several famous graphs are known to C{igraph} including (but not limited to)\n"
+	 "the Chvatal graph, the Petersen graph or the Tutte graph. This method\n"
+	 "generates one of them based on its name (case insensitive). See the\n"
+	 "documentation of the C interface of C{igraph} for the names available:\n"
+	 "U{http://cneurocvs.rmki.kfki.hu/igraph/doc/html/igraph-Generators.html}.\n\n"
+	 "@param name: the name of the graph to be generated.\n"
+	},
+
   /* interface to igraph_full */
   {"Full", (PyCFunction) igraphmodule_Graph_Full,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
@@ -5970,6 +6075,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "    in case of a directed graph.\n"
    "@param circular: whether the generated lattice is periodic.\n"},
 
+  /* interface to igraph_lcf */
+	{"LCF", (PyCFunction) igraphmodule_Graph_LCF,
+	 METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+	 "LCF(n, shifts, repeats)\n\n"
+	 "Generates a graph from LCF notation.\n\n"
+	 "LCF is short for Lederberg-Coxeter-Frucht, it is a concise notation\n"
+	 "for 3-regular Hamiltonian graphs. It consists of three parameters,\n"
+	 "the number of vertices in the graph, a list of shifts giving\n"
+	 "additional edges to a cycle backbone and another integer giving how\n"
+	 "many times the shifts should be performed. See\n"
+	 "U{http://mathworld.wolfram.com/LCFNotation.html} for details.\n\n" 
+	 "@param n: the number of vertices\n"
+	 "@param shifts: the shifts in a list or tuple\n"
+	 "@param repeats: the number of repeats\n"
+	},
+	 
   // interface to igraph_ring
   {"Ring", (PyCFunction) igraphmodule_Graph_Ring,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,

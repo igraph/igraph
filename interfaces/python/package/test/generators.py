@@ -2,11 +2,22 @@ import unittest
 from igraph import *
 
 class GeneratorTests(unittest.TestCase):
+    def testFamous(self):
+        g=Graph.Famous("tutte")
+        self.failUnless(g.vcount() == 46 and g.ecount() == 69)
+        self.assertRaises(InternalError, Graph.Famous, "unknown")
+
     def testFull(self):
         g=Graph.Full(20, directed=True)
         el=g.get_edgelist()
         el.sort()
         self.failUnless(g.get_edgelist() == [(x, y) for x in range(20) for y in range(20) if x!=y])
+
+    def testLCF(self):
+        g1=Graph.LCF(12, (5, -5), 6)
+        g2=Graph.Famous("Franklin")
+        self.failUnless(g1.isomorphic(g2))
+        self.assertRaises(InternalError, Graph.LCF, 12, (5, -5), -3)
 
     def testKautz(self):
         g=Graph.Kautz(2, 2)

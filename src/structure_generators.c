@@ -1214,7 +1214,8 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
   long int ptr=0, i, sptr=0;
   long int no_of_nodes=n;
   long int no_of_edges=n+no_of_shifts*repeats/2;
-  
+
+	if (repeats<0) IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
 
   /* Create a ring first */
@@ -1249,7 +1250,7 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  * 
  * </para><para>
  * LCF is short for Lederberg-Coxeter-Frucht, it is a concise notation for
- * 3-regular Hamiltonian graphs. It constists of three parameters, the
+ * 3-regular Hamiltonian graphs. It consists of three parameters, the
  * number of vertices in the graph, a list of shifts giving additional
  * edges to a cycle backbone and another integer giving how many times
  * the shifts should be performed. See

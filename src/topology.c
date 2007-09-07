@@ -1347,7 +1347,7 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  * </para><para> In the future the general \ref igraph_isomorphic()
  * function should be responsible for calling this function.
  * 
- * </para><para> Note that this function cannot be used for subgraph
+ * </para><para> Note that this function cannot be used for
  * deciding subgraph isomorphism.
  * \param graph1 The first graph, it should be connected.
  * \param graph2 The second graph, it should be connected and should
