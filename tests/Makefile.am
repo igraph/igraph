@@ -21,7 +21,7 @@ TESTSUITE_AT = \
 	structural_properties.at iterators.at components.at \
 	visitors.at layout.at motifs.at topology.at foreign.at operators.at \
         other.at foreign.at conversion.at flow.at community.at eigen.at \
-	cliques.at
+	cliques.at attributes.at
 
 TESTSUITE = testsuite
 

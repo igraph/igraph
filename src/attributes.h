@@ -211,6 +211,81 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
 					    igraph_es_t es,
 					    igraph_strvector_t *value);
 
+/* Experimental attribute handler in C */
+
+extern igraph_attribute_table_t igraph_cattribute_table;
+
+igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name);
+const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name);
+igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
+				      igraph_integer_t vid);
+const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
+				    igraph_integer_t vid);
+igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
+				      igraph_integer_t eid);
+const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
+				    igraph_integer_t eid);
+
+int igraph_cattribute_list(const igraph_t *graph,
+			   igraph_strvector_t *gnames, igraph_vector_t *gtypes,
+			   igraph_strvector_t *vnames, igraph_vector_t *vtypes,
+			   igraph_strvector_t *enames, igraph_vector_t *etypes);
+
+int igraph_cattribute_GAN_set(igraph_t *graph, const char *name, 
+			      igraph_real_t value);
+int igraph_cattribute_GAS_set(igraph_t *graph, const char *name, 
+			      const char *value);
+int igraph_cattribute_VAN_set(igraph_t *graph, const char *name, 
+			      igraph_integer_t vid, igraph_real_t value);
+int igraph_cattribute_VAS_set(igraph_t *graph, const char *name, 
+			      igraph_integer_t vid, const char *value);
+int igraph_cattribute_EAN_set(igraph_t *graph, const char *name, 
+			      igraph_integer_t eid, igraph_real_t value);
+int igraph_cattribute_EAS_set(igraph_t *graph, const char *name, 
+			      igraph_integer_t eid, const char *value);
+
+int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name, 
+			       const igraph_vector_t *v);
+int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
+			       const igraph_strvector_t *sv);
+int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name, 
+			       const igraph_vector_t *v);
+int igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
+			       const igraph_strvector_t *sv);
+
+void igraph_cattribute_remove_g(igraph_t *graph, const char *name);
+void igraph_cattribute_remove_v(igraph_t *graph, const char *name);
+void igraph_cattribute_remove_e(igraph_t *graph, const char *name);
+void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
+				  igraph_bool_t v, igraph_bool_t e);
+
+#define GAN(graph, n) (igraph_cattribute_GAN((graph), (n)))
+#define GAS(graph, n) (igraph_cattribute_GAS((graph), (n)))
+#define VAN(graph, n, v) (igraph_cattribute_VAN((graph), (n), (v)))
+#define VAS(graph, n, v) (igraph_cattribute_VAS((graph), (n), (v)))
+#define EAN(graph, n, e) (igraph_cattribute_EAN((graph), (n), (e)))
+#define EAS(graph, n, e) (igraph_cattribute_EAS((graph), (n), (e)))
+
+#define SETGAN(graph, n, value) (igraph_cattribute_GAN_set((graph),(n),(value)))
+#define SETGAS(graph, n, value) (igraph_cattribute_GAS_set((graph),(n),(value)))
+#define SETVAN(graph, n, vid, value) (igraph_cattribute_VAN_set((graph),(n),(vid),(value)))
+#define SETVAS(graph, n, vid, value) (igraph_cattribute_VAS_set((graph),(n),(vid),(value)))
+#define SETEAN(graph, n, eid, value) (igraph_cattribute_EAN_set((graph),(n),(eid),(value)))
+#define SETEAS(graph, n, eid, value) (igraph_cattribute_EAS_set((graph),(n),(eid),(value)))
+
+#define SETVANV(graph,n,v) (igraph_cattribute_VAN_setv((graph),(n),(v)))
+#define SETVASV(graph,n,v) (igraph_cattribute_VAS_setv((graph),(n),(v)))
+#define SETEANV(graph,n,v) (igraph_cattribute_EAN_setv((graph),(n),(v)))
+#define SETEASV(graph,n,v) (igraph_cattribute_EAS_setv((graph),(n),(v)))
+
+#define DELGA(graph, n) (igraph_cattribute_remove_g((graph),(n)))
+#define DELVA(graph, n) (igraph_cattribute_remove_v((graph),(n)))
+#define DELEA(graph, n) (igraph_cattribute_remove_e((graph),(n)))
+#define DELGAS(graph) (igraph_cattribute_remove_all((graph),1,0,0))
+#define DELVAS(graph) (igraph_cattribute_remove_all((graph),0,1,0))
+#define DELEAS(graph) (igraph_cattribute_remove_all((graph),0,0,1))
+#define DELALL(graph) (igraph_cattribute_remove_all((graph),1,1,1))
+
 __END_DECLS
 
 #endif

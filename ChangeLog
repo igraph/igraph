@@ -1,3 +1,33 @@
+2007-09-08  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/cattributes.c (igraph_i_cattribute_find, igraph_i_cattribute_init)
+	(igraph_i_cattribute_destroy, igraph_i_cattribute_copy)
+	(igraph_i_cattribute_add_vertices, igraph_i_cattribite_delete_vertices)
+	(igraph_i_cattribute_add_edges, igraph_i_cattribute_delete_edges)
+	(igraph_i_cattribute_permute_edges, igraph_i_cattribute_get_info)
+	(igraph_i_cattribute_has_attr, igraph_i_cattribute_gettype)
+	(igraph_i_cattribute_get_numeric_graph_attr)
+	(igraph_i_cattribute_get_string_graph_attr)
+	(igraph_i_cattribute_get_numeric_vertex_attr)
+	(igraph_i_cattribute_get_string_vertex_attr)
+	(igraph_i_cattribute_get_numeric_edge_attr)
+	(igraph_i_cattribute_get_string_edge_attr)
+	(igraph_cattribute_GAN, igraph_cattribute_GAS, igraph_cattribute_VAN)
+	(igraph_cattribute_VAS, igraph_cattribute_EAN, igraph_cattribute_EAS)
+	(igraph_cattribute_list, igraph_cattribute_GAN_set)
+	(igraph_cattribute_GAS_set, igraph_cattribute_VAN_set)
+	(igraph_cattribute_VAS_set, igraph_cattribute_EAN_set)
+	(igraph_cattribute_EAS_set, igraph_cattribute_VAN_setv)
+	(igraph_cattribute_VAS_setv, igraph_cattribute_EAN_setv)
+	(igraph_cattribute_EAS_setv, igraph_cattribute_remove_g)
+	(igraph_cattribute_remove_v, igraph_cattribute_remove_e)
+	(igraph_cattribute_remove_all) : added	
+	* src/attribute.h (GAN, GAS, VAN, VAS, EAN, EAS, SETGAN, SETGAS)
+	(SETVAN, SETVAS, SETEAN, SETEAS, SETVANV, SETVASV, SETEANV, SETEASV)
+	(DELGA, DELVA, DELEA, DELGAS, DELVAS, DELEAS, DELALL) : added
+	* examples/simple/cattributes.c : added
+	* examples/simple/cattributes2.c : added
+
 2007-09-04  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/types.h (STR) : added

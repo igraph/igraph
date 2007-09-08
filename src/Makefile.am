@@ -31,7 +31,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     spmatrix.c community.c fast_community.c \
-			     evolver_cit.c gml_tree.c
+			     evolver_cit.c gml_tree.c cattributes.c
 
 libigraph_la_CFLAGS        = -O6 -Wall
 libigraph_la_CXXFLAGS	   = -O6 -Wall
