@@ -765,6 +765,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es);
 int igraph_girth(const igraph_t *graph, igraph_integer_t *girth, 
 		 igraph_vector_t *circle);
+int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
 
 /* TODO: degree.distribution (?) */
 

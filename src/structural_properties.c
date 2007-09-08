@@ -4068,7 +4068,7 @@ int igraph_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
  * is the same as the source of the second vertex's corresponding edge.
  * 
  * </para><para>
- * The first version of this function was contributed by Vincent Motossian, 
+ * The first version of this function was contributed by Vincent Matossian, 
  * thanks.
  * \param graph The input graph, may be directed or undirected.
  * \param linegraph Pointer to an uninitialized graph object, the
@@ -4085,5 +4085,21 @@ int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph) {
   } else {
     return igraph_linegraph_undirected(graph, linegraph);
   }
+}
+
+int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to) {
+  
+  igraph_vector_t edges;
+  int ret;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 2);
+
+  VECTOR(edges)[0]=from;
+  VECTOR(edges)[1]=to;
+  IGRAPH_CHECK(ret=igraph_add_edges(graph, &edges, 0));
+  
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return ret;
 }
 
