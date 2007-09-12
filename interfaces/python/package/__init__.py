@@ -80,15 +80,15 @@ class Graph(core.GraphBase):
 
         @param n: the number of vertices. Can be omitted.
         @param edges: the edge list where every list item is a pair of integers.
-            If any of the integers is larger than M{n-1}, the number of vertices
-            is adjusted accordingly.
+          If any of the integers is larger than M{n-1}, the number of vertices
+          is adjusted accordingly.
         @param directed: whether the graph should be directed
         @param graph_attrs: the attributes of the graph as a dictionary.
         @param vertex_attrs: the attributes of the vertices as a dictionary.
-        	Every dictionary value must be an iterable with exactly M{n} items.
+          Every dictionary value must be an iterable with exactly M{n} items.
         @param edge_attrs: the attributes of the edges as a dictionary. Every
-        	dictionary value must be an iterable with exactly M{m} items where
-            M{m} is the number of edges.
+          dictionary value must be an iterable with exactly M{m} items where
+          M{m} is the number of edges.
         """
         # Check if n is a list. If so, that means that the number of vertices
         # were omitted, so we should shift the whole parameter list with 1.
@@ -382,7 +382,7 @@ class Graph(core.GraphBase):
         after every run.
 
         @param clusters: the desired number of clusters.
-        @param steps: the number of tests to take.
+        @param steps: the number of steps to take.
 
         @return: an appropriate L{VertexClustering} object.
 
@@ -463,25 +463,35 @@ class Graph(core.GraphBase):
 
         Registered layout names understood by this method are:
 
-          * C{circle}, C{circular}: circular layout (see L{Graph.layout_circle})
-          * C{fr}, C{fruchterman_reingold}: Fruchterman-Reingold layout
+          - C{circle}, C{circular}: circular layout (see L{Graph.layout_circle})
+
+          - C{fr}, C{fruchterman_reingold}: Fruchterman-Reingold layout
             (see L{Graph.layout_fruchterman_reingold}).
-          * C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-Reingold
+
+          - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-Reingold
             layout (see L{Graph.layout_fruchterman_reingold_3d}).
-          * C{gfr}, C{grid_fr}, C{grid_fruchterman_reingold}: grid-based
+
+          - C{gfr}, C{grid_fr}, C{grid_fruchterman_reingold}: grid-based
             Fruchterman-Reingold layout
             (see L{Graph.layout_grid_fruchterman_reingold})
-          * C{kk}, C{kamada_kawai}: Kamada-Kawai layout
-            (see L{Graph.layout_kamada_kawai}).
-          * C{kk_3d}, C{kk3d}, C{kamada_kawai_3d}: 3D Kamada-Kawai layout
-            (see L{Graph.layout_kamada_kawai_3d}).
-          * C{lgl}, C{large}, C{large_graph}: Large Graph Layout
+
+          - C{kk}, C{kamada_kawai}: Kamada-Kawai layout
+            (see L{Graph.layout_kamada_kawai})
+
+          - C{kk_3d}, C{kk3d}, C{kamada_kawai_3d}: 3D Kamada-Kawai layout
+            (see L{Graph.layout_kamada_kawai_3d})
+
+          - C{lgl}, C{large}, C{large_graph}: Large Graph Layout
             (see L{Graph.layout_lgl})
-          * C{random}: random layout (see L{Graph.layout_random})
-          * C{random_3d}: random 3D layout (see L{Graph.layout_random_3d})
-          * C{rt}, C{tree}, C{reingold_tilford}: Reingold-Tilford tree
-            layout (see L{Graph.layout_reingold_tilford}).
-          * C{sphere}, C{spherical}, C{circle_3d}, C{circular_3d}: spherical
+
+          - C{random}: random layout (see L{Graph.layout_random})
+
+          - C{random_3d}: random 3D layout (see L{Graph.layout_random_3d})
+
+          - C{rt}, C{tree}, C{reingold_tilford}: Reingold-Tilford tree
+            layout (see L{Graph.layout_reingold_tilford})
+
+          - C{sphere}, C{spherical}, C{circle_3d}, C{circular_3d}: spherical
             layout (see L{Graph.layout_sphere})
 
         @param layout: the layout to use. This can be one of the registered
@@ -582,7 +592,8 @@ class Graph(core.GraphBase):
         @param fname: the name of the file, a stream to read from, or
           a string containing the pickled data. The string is assumed to
           hold pickled data if it is longer than 40 characters and
-          contains the substring C{cigraph\nGraph\n}.
+          contains a substring that's peculiar to pickled versions
+          of an C{igraph} Graph object.
         @return: the created graph object.
         """
         import cPickle
@@ -1060,14 +1071,14 @@ class Graph(core.GraphBase):
         Besides the usual self-explanatory plotting parameters (C{context},
         C{bbox}, C{palette}), it accepts the following keyword arguments:
         
-          * C{layout}: the layout to be used. If not an instance of
+          - C{layout}: the layout to be used. If not an instance of
             L{Layout}, it will be passed to L{Graph.layout} to calculate
             the layout. Note that if you want a deterministic layout that
             does not change with every plot, you must either use a deterministic
             layout function (like L{Graph.layout_circle}) or calculate the
             layout in advance and pass a L{Layout} object here.
             
-          * C{margin}: the top, right, bottom, left margins as a 4-tuple.
+          - C{margin}: the top, right, bottom, left margins as a 4-tuple.
             If it has less than 4 elements or is a single float, the elements
             will be re-used until the length is at least 4.
             

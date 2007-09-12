@@ -6712,6 +6712,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param root: the root of the tree.\n"
    "@return: the calculated coordinate pairs in a list.\n\n"
    "@see: layout_reingold_tilford_circular\n"
+   "@newfield ref: Reference\n"
    "@ref: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"
    "IEEE Transactions on Software Engineering 7:22, 223-228, 1981."},
 
@@ -6726,6 +6727,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param root: the root of the tree.\n"
    "@return: the calculated coordinate pairs in a list.\n\n"
    "@see: layout_reingold_tilford\n"
+   "@newfield ref: Reference\n"
    "@ref: EM Reingold, JS Tilford: I{Tidier Drawings of Trees.}\n"
    "IEEE Transactions on Software Engineering 7:22, 223-228, 1981."},
 

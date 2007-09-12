@@ -22,7 +22,7 @@ echo "Generating HTML documentation..."
 epydoc --html -o html -v --name="IGraph library" --url="http://cneurocvs.rmki.kfki.hu/igraph" igraph
 
 PDF=0
-which latex && PDF=1
+which latex >/dev/null && PDF=1
 
 if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."

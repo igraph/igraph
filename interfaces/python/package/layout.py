@@ -74,7 +74,7 @@ class Layout(object):
           the coordinate list is empty and this parameter is C{None}.
           Generally, this should be given if the length of the coordinate
           list is zero, otherwise it should be left as is.
-        @throws: L{ValueError} if the coordinate list is empty and the
+        @raise ValueError: if the coordinate list is empty and the
           number of dimensions is not given.
         """
         self._coords = map(list, coords)

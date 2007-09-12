@@ -295,7 +295,7 @@ PyMethodDef igraphmodule_VertexSeq_methods[] = {
   {"set_attribute_values", (PyCFunction)igraphmodule_VertexSeq_set_attribute_values,
    METH_VARARGS | METH_KEYWORDS,
    "set_attribute_values(attrname, values) -> list\n"
-   "Sets the value of a given vertex attribute for all vertices\n"
+   "Sets the value of a given vertex attribute for all vertices\n\n"
    "@param attrname: the name of the attribute\n"
    "@param values: the new attribute values in a list\n"
   },

@@ -159,14 +159,19 @@ class Plot(object):
 
     Current Cairo surfaces that I'm aware of are:
 
-      * C{cairo.GlitzSurface} -- OpenGL accelerated surface for the X11
+      - C{cairo.GlitzSurface} -- OpenGL accelerated surface for the X11
         Window System.
-      * C{cairo.ImageSurface} -- memory buffer surface. Can be written to a
+
+      - C{cairo.ImageSurface} -- memory buffer surface. Can be written to a
         C{PNG} image file.
-      * C{cairo.PdfSurface} -- PDF document surface.
-      * C{cairo.PsSurface} -- PostScript document surface.
-      * C{cairo.Win32Surface} -- Microsoft Windows screen rendering.
-      * C{cairo.XlibSurface} -- X11 Window System screen rendering.
+
+      - C{cairo.PdfSurface} -- PDF document surface.
+
+      - C{cairo.PsSurface} -- PostScript document surface.
+
+      - C{cairo.Win32Surface} -- Microsoft Windows screen rendering.
+
+      - C{cairo.XlibSurface} -- X11 Window System screen rendering.
 
     If you create a C{Plot} object with a string given as the target surface,
     the string will be treated as a filename, and its extension will decide
@@ -188,11 +193,13 @@ class Plot(object):
         @param target: the target surface to write to. It can be one of the
           following types:
 
-          * C{None} -- an appropriate surface will be created and the object
-            will be plotted there.
-          * C{cairo.Surface} -- the given Cairo surface will be used.
-          * C{string} -- a file with the given name will be created and an
-            appropriate Cairo surface will be attached to it.
+            - C{None} -- an appropriate surface will be created and the object
+              will be plotted there.
+
+            - C{cairo.Surface} -- the given Cairo surface will be used.
+
+            - C{string} -- a file with the given name will be created and an
+              appropriate Cairo surface will be attached to it.
 
         @param bbox: the bounding box of the surface. It is interpreted
           differently with different surfaces: PDF and PS surfaces will
@@ -646,12 +653,14 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     @param target: the target where the object should be plotted. It can be one
       of the following types:
       
-        * C{None} -- an appropriate surface will be created and the object will
+        - C{None} -- an appropriate surface will be created and the object will
           be plotted there.
-        * C{cairo.Surface} -- the given Cairo surface will be used. This can
+
+        - C{cairo.Surface} -- the given Cairo surface will be used. This can
           refer to a PNG image, an arbitrary window, an SVG file, anything that
           Cairo can handle.
-        * C{string} -- a file with the given name will be created and an
+
+        - C{string} -- a file with the given name will be created and an
           appropriate Cairo surface will be attached to it.
           
     @param bbox: the bounding box of the plot. It must be a tuple with four
@@ -685,15 +694,15 @@ def collect_attributes(n, name, alt_name, kwds, vs, config, default, transform=N
     This method is used by L{Graph.__plot__} to collect the attributes required
     for graph visualization from various sources. Attribute value sources are:
 
-      * A specific value of a Python dict belonging to a given key. This dict
+      - A specific value of a Python dict belonging to a given key. This dict
         is given by the argument M{kwds}, and the name of the key is determined
         by the argument M{name}.
 
-      * A vertex or edge sequence of a graph, given in M{vs}
+      - A vertex or edge sequence of a graph, given in M{vs}
 
-      * The global configuration, given in M{config}
+      - The global configuration, given in M{config}
 
-      * A default value when all other sources fail to provide the value.
+      - A default value when all other sources fail to provide the value.
         given in M{default}
 
     Attribute sources are considered exactly in the order mentioned above.

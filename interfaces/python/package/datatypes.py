@@ -136,7 +136,7 @@ class Matrix(object):
         Besides the usual self-explanatory plotting parameters (C{context},
         C{bbox}, C{palette}), it accepts the following keyword arguments:
 
-          * C{style}: the style of the plot. C{boolean} is useful for plotting
+          - C{style}: the style of the plot. C{boolean} is useful for plotting
             matrices with boolean (C{True}/C{False} or 0/1) values: C{False}
             will be shown with a white box and C{True} with a black box.
             C{palette} uses the given palette to represent numbers by colors,
@@ -146,15 +146,15 @@ class Matrix(object):
             the matrix are treated specially in both cases: nothing is drawn in
             the cell corresponding to C{None}.
 
-          * C{square}: whether the cells of the matrix should be square or not.
+          - C{square}: whether the cells of the matrix should be square or not.
             Default is C{True}.
 
-          * C{grid_width}: line width of the grid shown on the matrix. If zero or
+          - C{grid_width}: line width of the grid shown on the matrix. If zero or
             negative, the grid is turned off. The grid is also turned off if the size
             of a cell is less than three times the given line width. Default is C{1}.
             Fractional widths are also allowed.
 
-          * C{border_width}: line width of the border shown around the matrix.
+          - C{border_width}: line width of the border shown around the matrix.
             If zero or negative, the border is turned off. Default is C{1}.
         """
         import colors
