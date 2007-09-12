@@ -130,6 +130,28 @@ class Histogram(object):
             yield (x, x+self._bin_width, elem)
             x += self._bin_width
 
+    def __plot__(self, context, bbox, palette):
+        """Plotting support"""
+        max_value = max(self._bins)
+
+        import drawing
+        c = drawing.DescartesCoordinateSystem(context, bbox, \
+            (self._min, 0, self._max, max_value))
+
+        # Draw the boxes
+        context.set_line_width(1)
+        context.set_source_rgb(1., 0., 0.)
+        x = self._min
+        for value in self._bins:
+            x1, y1 = c.local_to_context(x, value)
+            x += self._bin_width
+            x2, y2 = c.local_to_context(x, 0)
+            context.rectangle(x1, y1, x2-x1, y2-y1)
+            context.fill()
+
+        # Draw the axes
+        c.plot()
+
     def __str__(self):
         """Returns the string representation of the histogram"""
         if self._min is None or self._max is None: return str()

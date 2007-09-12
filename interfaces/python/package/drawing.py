@@ -66,7 +66,10 @@ class BoundingBox(object):
         (X and Y coordinates for each corner) or two separate numbers (width
         and height, the upper left corner is assumed to be at (0,0))"""
         if len(args) == 1:
-            coords = tuple(args[0])[0:4]
+            if isinstance(args[0], BoundingBox):
+                coords = args[0].coords
+            else:
+                coords = tuple(args[0])[0:4]
         elif len(args) == 4:
             coords = tuple(args)
         elif len(args) == 2:
@@ -97,15 +100,50 @@ class BoundingBox(object):
     coords = property(_get_coords, _set_coords,
         doc="Sets or returns the coordinates of the corners")
 
-    def _get_width(self):
-        return self._coords[2]-self._coords[0]
-    def _get_height(self):
-        return self._coords[3]-self._coords[1]
+    def _get_width(self): return self._coords[2]-self._coords[0]
+    def _get_height(self): return self._coords[3]-self._coords[1]
+    def _get_left(self): return self._coords[0]
+    def _get_right(self): return self._coords[2]
+    def _get_top(self): return self._coords[1]
+    def _get_bottom(self): return self._coords[3]
     def _get_shape(self):
         return self._coords[2]-self._coords[0], self._coords[3]-self._coords[1]
     width = property(_get_width, doc="Gets the width of the bounding box")
     height = property(_get_height, doc="Gets the height of the bounding box")
+    left = property(_get_left, doc="X coordinate of the left side of the box")
+    right = property(_get_right, doc="X coordinate of the right side of the box")
+    top = property(_get_top, doc="Y coordinate of the top of the box")
+    bottom = property(_get_bottom, doc="Y coordinate of the bottom of the box")
     shape = property(_get_shape, doc="Gets the shape of the bounding box (width, height)")
+
+    def contract(self, margins):
+        """Contracts the bounding box by the given margins.
+
+        @return: a new L{BoundingBox} object.
+        """
+        if isinstance(margins, int) or isinstance(margins, float):
+            margins = [float(margins)] * 4
+        if len(margins) != 4:
+            raise ValueError, "margins must be a 4-tuple or a single number"
+        nx1, ny1 = self._coords[0]+margins[0], self._coords[1]+margins[1]
+        nx2, ny2 = self._coords[2]-margins[2], self._coords[3]-margins[3]
+        if nx1 > nx2:
+            nx1 = (nx1+nx2)/2.
+            nx2 = nx1
+        if ny1 > ny2:
+            ny1 = (ny1+ny2)/2.
+            ny2 = ny1
+        return BoundingBox(nx1, ny1, nx2, ny2)
+
+    def __repr__(self):
+        return "%s(%s, %s, %s, %s)" % (self.__class__.__name__, \
+            self._coords[0], self._coords[1], self._coords[2], \
+            self._coords[3])
+
+    def __eq__(self, other): return self.coords == other.coords
+    def __ne__(self, other): return self.coords != other.coords
+
+
 
 
 class Plot(object):
@@ -500,6 +538,102 @@ known_shapes = {
 
 #####################################################################
 
+class CoordinateSystem(object):
+    """Class implementing a coordinate system object.
+
+    Coordinate system objects are used when drawing plots which
+    2D or 3D coordinate system axes. This is an abstract class
+    which must be extended in order to use it. In general, you'll
+    only need the documentation of this class if you intend to
+    implement an own coordinate system not present in igraph yet.
+    """
+
+    def __init__(self, context, bbox):
+        """Initializes the coordinate system.
+
+        @param context: the context on which the coordinate system will
+          be drawn.
+        @param bbox: the bounding box that will contain the coordinate
+          system.
+        """
+        self.context = context
+        self.bbox = bbox
+
+    def plot(self):
+        """Draws the coordinate system.
+
+        This method must be overridden in derived classes. Note that a coordinate
+        system itself is not plottable (there is no C{__plot__} method), it must
+        be I{initialized} with respect to a Cairo drawing context and a bounding
+        box before being plotted -- hence the different method name.
+        """
+        raise NotImplementedError, "abstract class"
+
+    def local_to_context(self, *args):
+        """Converts local coordinates to the context coordinate system (given
+        by the bounding box).
+        
+        This method must be overridden in derived classes."""
+        raise NotImplementedError, "abstract class"
+
+
+class DescartesCoordinateSystem(object):
+    """Class implementing a 2D Descartes coordinate system object."""
+
+    def __init__(self, context, bbox, bounds):
+        """Initializes the coordinate system.
+
+        @param context: the context on which the coordinate system will
+          be drawn.
+        @param bbox: the bounding box that will contain the coordinate
+          system.
+        @param bounds: minimum and maximum X and Y values in a 4-tuple.
+        """
+        self.context = context
+        self._bounds = None
+        self.bbox = bbox
+        self.bounds = bounds
+        self._recalc_scale_factors()
+
+    def _get_bbox(self): return BoundingBox(self._bbox.coords)
+    def _set_bbox(self, bbox):
+        self._bbox = bbox
+        self._recalc_scale_factors()
+    bbox = property(_get_bbox, _set_bbox, doc="The bounding box of the coordinate system")
+
+    def _get_bounds(self): return self._bounds.coords
+    def _set_bounds(self, bounds):
+        self._bounds = BoundingBox(bounds)
+        self._recalc_scale_factors()
+    bounds = property(_get_bounds, _set_bounds, doc="The lower and upper bounds of the X and Y values")
+
+    def _recalc_scale_factors(self):
+        if self._bounds is None: return
+        self._sx = self._bbox.width / self._bounds.width
+        self._sy = self._bbox.height / self._bounds.height
+        self._ox = self._bounds.left
+        self._oy = self._bounds.top
+        self._ox2 = self._bbox.left
+        self._oy2 = self._bbox.bottom
+
+    def plot(self):
+        """Draws the coordinate system."""
+        # Draw the frame
+        coords = self.bbox.coords
+        self.context.set_source_rgb(0., 0., 0.)
+        self.context.set_line_width(1)
+        self.context.rectangle(coords[0], coords[1], \
+            coords[2]-coords[0], coords[3]-coords[1])
+        self.context.stroke()
+
+    def local_to_context(self, x, y):
+        """Converts local coordinates to the context coordinate system (given
+        by the bounding box).
+        """
+        return (x-self._ox)*self._sx+self._ox2, self._oy2-(y-self._oy)*self._sy
+
+#####################################################################
+
 def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     """Plots the given object to the given target.
 
@@ -537,7 +671,8 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     """
     if not isinstance(bbox, BoundingBox): bbox=BoundingBox(bbox)
     result = Plot(target, bbox)
-    result.add(obj, bbox, *args, **kwds)
+    cw, ch = bbox.width/60., bbox.height/60.
+    result.add(obj, bbox.contract((cw, ch, cw, ch)), *args, **kwds)
     if target is None: result.show()
     if isinstance(target, basestring): result.save()
     return result
