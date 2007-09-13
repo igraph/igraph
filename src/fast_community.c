@@ -28,6 +28,7 @@
 
 #ifdef _MSC_VER
 /* MSVC does not support variadic macros */
+#include <stdarg.h>
 void debug(const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
