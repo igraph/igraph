@@ -422,3 +422,25 @@ BASE FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,
   }
   return FUNCTION(igraph_vector,maxdifference)(&m1->data, &m2->data);
 }
+
+int FUNCTION(igraph_matrix,transpose)(TYPE(igraph_matrix) *m) {
+  long int nrow=m->nrow;
+  long int ncol=m->ncol;
+  if (nrow>1 && ncol>1) {
+    TYPE(igraph_vector) newdata;
+    long int i, size=nrow*ncol, mod=size-1;
+    FUNCTION(igraph_vector,init)(&newdata, size);
+    IGRAPH_FINALLY(FUNCTION(igraph_vector,destroy), &newdata);
+    for (i=0; i<size; i++) {
+      VECTOR(newdata)[i] = VECTOR(m->data)[ (i*nrow) % mod ];
+    }
+    VECTOR(newdata)[size-1]=VECTOR(m->data)[size-1];
+    FUNCTION(igraph_vector,destroy)(&m->data);
+    IGRAPH_FINALLY_CLEAN(1);
+    m->data=newdata;
+  }
+  m->nrow=ncol;
+  m->ncol=nrow;
+  
+  return 0;
+}

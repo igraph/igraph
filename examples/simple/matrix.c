@@ -35,7 +35,7 @@ void print_matrix(igraph_matrix_t *m, FILE *f) {
 
 int main() {
   igraph_matrix_t m, m1;
-  long int i, j;
+  long int i, j, k;
   
   /* igraph_matrix_init, igraph_matrix_destroy */
   igraph_matrix_init(&m, 10, 10);
@@ -129,6 +129,43 @@ int main() {
   print_matrix(&m1, stdout);
   igraph_matrix_destroy(&m);
   igraph_matrix_destroy(&m1);
+
+  /* in-place transpose */
+  igraph_matrix_init(&m,5,2);
+  k=0;
+  for (i=0; i<igraph_matrix_ncol(&m); i++) {
+    for (j=0; j<igraph_matrix_nrow(&m); j++) {
+      MATRIX(m, j, i)=k++;
+    }
+  }
+  print_matrix(&m, stdout);
+  igraph_matrix_transpose(&m);
+  print_matrix(&m, stdout);
+  igraph_matrix_destroy(&m);
+
+  igraph_matrix_init(&m,5,1);
+  k=0;
+  for (i=0; i<igraph_matrix_ncol(&m); i++) {
+    for (j=0; j<igraph_matrix_nrow(&m); j++) {
+      MATRIX(m, j, i)=k++;
+    }
+  }
+  print_matrix(&m, stdout);
+  igraph_matrix_transpose(&m);
+  print_matrix(&m, stdout);
+  igraph_matrix_destroy(&m);
+
+  igraph_matrix_init(&m,1,5);
+  k=0;
+  for (i=0; i<igraph_matrix_ncol(&m); i++) {
+    for (j=0; j<igraph_matrix_nrow(&m); j++) {
+      MATRIX(m, j, i)=k++;
+    }
+  }
+  print_matrix(&m, stdout);
+  igraph_matrix_transpose(&m);
+  print_matrix(&m, stdout);
+  igraph_matrix_destroy(&m);
 
   return 0;
 }

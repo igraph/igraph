@@ -53,3 +53,4 @@ igraph_bool_t FUNCTION(igraph_matrix,is_equal)(const TYPE(igraph_matrix) *m1,
 BASE FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,
 						    const TYPE(igraph_matrix) *m2);
 
+int FUNCTION(igraph_matrix,transpose)(TYPE(igraph_matrix) *m);
