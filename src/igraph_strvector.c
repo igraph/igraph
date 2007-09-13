@@ -248,6 +248,7 @@ int igraph_strvector_append(igraph_strvector_t *to,
   IGRAPH_CHECK(igraph_strvector_resize(to, len1+len2));
   for (i=0; i<len2; i++) {
     if (from->data[i][0] != '\0') {
+      Free(to->data[len1+i]);
       to->data[len1+i] = strdup(from->data[i]);
       if (!to->data[len1+i]) {
 	error=1; 
