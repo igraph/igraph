@@ -2,10 +2,11 @@ GRAPH:
   CTYPE: igraph_t
   CALL: &%C%
   INCONV:
-    IN, INOUT: shell_read_graph(&%C%, optarg);
+    IN: shell_read_graph(&%C%, optarg);
     OUT: shell_arg_%C%=strdup(optarg);
   OUTCONV:
-    OUT, INOUT: shell_write_graph(&%C%, shell_arg_%C%);
+    OUT: shell_write_graph(&%C%, shell_arg_%C%); \
+         igraph_destroy(&%C%);
 
 INTEGER:
   CTYPE: igraph_integer_t
@@ -16,47 +17,67 @@ INTEGERPTR:
   CTYPE: igraph_integer_t
   CALL: &%C%
   INCONV:
-    IN, INOUT: shell_read_integer(&%C%, optarg);
+    IN: shell_read_integer(&%C%, optarg);
     OUT: shell_arg_%C%=strdup(optarg);
   OUTCONV:
-    OUT, INOUT: shell_write_integer(%C%, shell_arg_%C%);
+    OUT: shell_write_integer(%C%, shell_arg_%C%);
 
 REAL:
   CTYPE: igraph_real_t
   INCONV:
-    IN, INOUT: shell_read_real(&%C%, optarg);
+    IN: shell_read_real(&%C%, optarg);
+
+REALPTR:
+  CTYPE: igraph_real_t
+  CALL: &%C%
+  INCONV:
+    IN: shell_read_real(&%C%, optarg);
+    OUT: shell_arg_%C%=strdup(optarg);
   OUTCONV:
-    OUT, INOUT: shell_write_real(%C%, shell_arg_%C%);
+    OUT: shell_write_real(%C%, shell_arg_%C%);
 
 BOOLEAN:
   CTYPE: igraph_bool_t
   INCONV:
-    IN, INOUT: shell_read_boolean(&%C%, optarg);
-  OUTCONV:
-    OUT, INOUT: shell_write_boolean(%C%, shell_arg_%C%);
+    IN: shell_read_boolean(&%C%, optarg);
+  DEFAULT:
+    True: 1
+    False: 0
 
 ERROR:
   CTYPE: int
 
 CONNECTEDNESS:
   CTYPE: igraph_connectedness_t
+  DEFAULT:
+    WEAK: IGRAPH_WEAK
+  INCONV:
+    IN: shell_read_connectedness(&%C%, optarg);
 
 VECTOR:
   CTYPE: igraph_vector_t
   CALL: &%C%
   INCONV:
-    IN,INOUT: shell_read_vector(&%C%, optarg);
-    OUT: shell_arg_%C%=strdup(optarg);
+    IN: shell_read_vector(&%C%, optarg);
+    OUT: shell_arg_%C%=strdup(optarg); \
+         igraph_vector_init(&%C%, 0);
   OUTCONV:
-    OUT,INOUT: shell_write_vector(&%C%, shell_arg_%C%);
+    OUT: shell_write_vector(&%C%, shell_arg_%C%); \
+         igraph_vector_destroy(&%C%);
 
 VECTOR_OR_0:
-  CTYPE: igraph_vector_t
-  CALL: &%C%
+  CALL: 0
 
 MATRIX:
   CTYPE: igraph_matrix_t
   CALL: &%C%
+  INCONV:
+    IN: shell_read_matrix(&%C%, optarg);
+    OUT: shell_arg_%C%=strdup(optarg); \
+         igraph_matrix_init(&%C%, 0, 0);
+  OUTCONV:
+    OUT: shell_write_matrix(&%C%, shell_arg_%C%); \
+         igraph_matrix_destroy(&%C%);
 
 NULL:
   CALL: 0

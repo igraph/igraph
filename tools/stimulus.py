@@ -661,7 +661,24 @@ class RCCodeGenerator(CodeGenerator):
 
 ################################################################################
 # Shell interface, igraph functions directly from the command line
+# TODO: - default values for arguments
+#       - read/write default input/output from/to stdin/stdout
+#       - other input/output graph formats, to be controlled by
+#         environment variables (?): IGRAPH_INGRAPH, IGRAPH_OUTGRAPH
 ################################################################################
+
+class ShellLnCodeGenerator(CodeGenerator):
+    def __init__(self, func, types):
+        CodeGenerator.__init__(self, func, types)
+
+    def generate(self, inputs, output):
+        out=open(output, "w")
+        self.append_inputs(inputs, out)
+        for f in self.func.keys():
+            if (self.ignore(f)):
+                continue
+            out.write(f+"\n")
+        out.close()
 
 class ShellCodeGenerator(CodeGenerator):
     def __init__(self, func, types):
@@ -706,7 +723,7 @@ class ShellCodeGenerator(CodeGenerator):
         params=self.parse_params(function)
 
         # Check types, also enumerate them
-        i=0
+        args=seqdict.seqdict()
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
@@ -715,23 +732,23 @@ class ShellCodeGenerator(CodeGenerator):
             params[p].setdefault('mode', 'IN')
             t=self.types[tname]
             mode=params[p]['mode']
-            if 'INCONV' in t and mode in t['INCONV'] or \
-               'OUTCONV' in t and mode in t['OUTCONV']:
-                params[p]['shell_no']=[i]
-                i=i+1
+            if 'INCONV' in t or 'OUTCONV' in t:
+                args[p]=params[p].copy()
+                args[p]['shell_no']=len(args)-1
                 if mode=="INOUT":
-                    params[p]['shell_no']=[i-1,i]
-                    i=i+1
-            else:
-                params[p]['shell_no']=None
+                    args[p]['mode']='IN'
+                    args[p+'-out']=params[p].copy()
+                    args[p+'-out']['mode']='OUT'
+                    args[p+'-out']['shell_no']=len(args)-1
 
-        res={'nargs': i}
+        res={'nargs': len(args)}
         res['func']=function
-        res['args']=self.chunk_args(function, params)
+        res['args']=self.chunk_args(function, args)
         res['decl']=self.chunk_decl(function, params)
-        res['inconv']=self.chunk_inconv(function, params)
+        res['inconv']=self.chunk_inconv(function, args)
         res['call']=self.chunk_call(function, params)
-        res['outconv']=self.chunk_outconv(function, params)
+        res['outconv']=self.chunk_outconv(function, args)
+        res['default']=self.chunk_default(function, args)
         text="""
 /*-------------------------------------------/
 / %(func)-42s /
@@ -746,7 +763,9 @@ int shell_%(func)s(int argc, char **argv) {
                                    { 0,0,0,0 }
                                  };
 
-  memset(shell_seen, 0, %(nargs)s*sizeof(int));  
+  /* 0 - not seen, 1 - seen as argument, 2 - seen as default */
+  memset(shell_seen, 0, %(nargs)s*sizeof(int));
+%(default)s
   
   /* Parse arguments and read input */
   while (getopt_long(argc, argv, "", shell_options, &shell_index) != -1) {
@@ -755,8 +774,8 @@ int shell_%(func)s(int argc, char **argv) {
       exit(1);
     }
 
-    if (shell_seen[shell_index]) {
-      fprintf(stderr, "Error, '%%s' argument given twice.\\n",
+    if (shell_seen[shell_index]==1) {
+      fprintf(stderr, "Error, `--%%s' argument given twice.\\n",
               shell_options[shell_index].name);
       exit(1);
     }
@@ -768,7 +787,7 @@ int shell_%(func)s(int argc, char **argv) {
   /* Check that we have all arguments */
   for (shell_index=0; shell_index<%(nargs)s; shell_index++) {
     if (!shell_seen[shell_index]) {
-      fprintf(stderr, "Error, argument missing: '%%s'.\\n",
+      fprintf(stderr, "Error, argument missing: `--%%s'.\\n",
               shell_options[shell_index]);
       exit(1);
     }
@@ -784,12 +803,9 @@ int shell_%(func)s(int argc, char **argv) {
 }\n""" % res
         out.write(text)
 
-    def chunk_args(self, function, params):        
-        res=[ ['"'+n+'"',"required_argument","0", str(p['shell_no'][0]) ]
-              for n,p in params.items() if p['shell_no'] != None ] +  \
-            [ ['"'+n+'-out"',"required_argument","0", str(p['shell_no'][1]) ]
-              for n,p in params.items() if p['shell_no'] != None and len(p['shell_no']) > 1]
-        res.sort(key=lambda x: x[3])
+    def chunk_args(self, function, params):
+        res=[ ['"'+n+'"',"required_argument","0", str(p['shell_no']) ]
+              for n,p in params.items() ]
         res=[ "{ "+",".join(e)+" }," for e in res ]
         return "\n                                   ".join(res)
 
@@ -797,10 +813,18 @@ int shell_%(func)s(int argc, char **argv) {
         def do_par(pname):
             t=self.types[params[pname]['type']]
             if 'CTYPE' in t:
-                decl="  " + t['CTYPE'] + " " + pname + ";"
+                decl="  " + t['CTYPE'] + " " + pname
             else:
                 decl=""
-            return decl
+            if 'default' in params[pname]:
+                if 'DEFAULT' in t and params[pname]['default'] in t['DEFAULT']:
+                    default="="+t['DEFAULT'][params[pname]['default']]
+                else:
+                    default="="+params[pname]['default']
+            else:
+                default=""
+            if decl: return decl+default+";"
+            else: return ""
 
         decl=[ do_par(n) for n in params.keys() ]
         inout=[ "  char* shell_arg_"+n+";" for n,p in params.items()
@@ -816,6 +840,19 @@ int shell_%(func)s(int argc, char **argv) {
         retchar="  char *shell_arg_shell_result=\"-\";"
         return "\n".join(decl+inout+[retdecl, retchar])
 
+    def chunk_default(self, function, params):
+        def do_par(pname):
+            t=self.types[params[pname]['type']]
+            if 'default' in params[pname]:
+                res="  shell_seen["+str(params[pname]['shell_no'])+"]=2;"
+            else:
+                res=""
+            return res
+
+        res= [ do_par(n) for n in params.keys() ]
+        res= [ n for n in res if n != "" ]
+        return "\n".join(res)
+
     def chunk_inconv(self, function, params):
         def do_par(pname):
             t=self.types[params[pname]['type']]
@@ -824,12 +861,11 @@ int shell_%(func)s(int argc, char **argv) {
                 inconv="" + t['INCONV'][mode]
             else:
                 inconv=""
+            if pname.endswith('-out'): pname=pname[0:-4]
             return inconv.replace("%C%", pname)
 
-        inconv=[ "    case "+str(p['shell_no'][0])+": /* "+n+" */\n      "+ do_par(n)
-                 for n,p in params.items() if p['shell_no'] != None ] + \
-               [ "    case "+str(p['shell_no'][1])+": /* "+n+"-out */\n      shell_arg_"+n+"=strdup(optarg);"
-                 for n,p in params.items() if p['shell_no'] != None and len(p['shell_no']) >1 ]
+        inconv=[ "    case "+str(p['shell_no'])+": /* "+n+" */\n      "+ do_par(n)
+                 for n,p in params.items() ]
         inconv=[ n+"\n      break;" for n in inconv ]
         inconv=[ "".join(n) for n in inconv ]
         text="\n    switch (shell_index) {\n"+"\n".join(inconv)+ \
@@ -850,6 +886,7 @@ int shell_%(func)s(int argc, char **argv) {
                 outconv="  " + t['OUTCONV'][mode]
             else:
                 outconv=""
+            if pname.endswith('-out'): pname=pname[0:-4]
             return outconv.replace("%C%", pname)
 
         outconv=[ do_par(n) for n in params.keys() ]
