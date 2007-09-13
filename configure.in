@@ -18,6 +18,7 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
 AC_HEADER_STDC
 AC_CHECK_HEADERS([stdarg.h stdlib.h string.h time.h unistd.h])
+AC_CHECK_FUNCS([expm1 rint rintf])
 
 AC_DEFUN([IGRAPH_WARNING],
 [AC_MSG_CHECKING(whether compiler accepts $1)
