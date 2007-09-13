@@ -278,6 +278,7 @@ class CodeGenerator:
 
 ################################################################################
 # GNU R, see http://www.r-project.org
+# TODO: free memory when CTRL+C pressed, even on windows
 ################################################################################
 
 class RNamespaceCodeGenerator(CodeGenerator):
@@ -658,6 +659,209 @@ class RCCodeGenerator(CodeGenerator):
         else:
             return '  R_igraph_after();'
 
+################################################################################
+# Shell interface, igraph functions directly from the command line
+################################################################################
+
+class ShellCodeGenerator(CodeGenerator):
+    def __init__(self, func, types):
+        CodeGenerator.__init__(self, func, types)
+
+    def generate(self, inputs, output):
+        out=open(output, "w")
+        self.append_inputs(inputs, out)
+        out.write("\n/* Function prototypes first */\n\n")
+        
+        for f in self.func.keys():
+            if self.ignore(f): continue
+            if 'FLAGS' in self.func[f]:
+                flags=self.func[f]['FLAGS']
+                flags=flags.split(",")
+                flags=[ flag.strip() for flag in flags ]
+            else:
+                self.func[f]['FLAGS']=[]
+            self.generate_prototype(f, out)
+
+        out.write("\n/* The main function */\n\n")
+        out.write("int main(int argc, char **argv) {\n\n")
+        out.write("  const char *base=basename(argv[0]);\n\n  ")
+        for f in self.func.keys():
+            if self.ignore(f): continue
+            out.write("if (!strcasecmp(base, \""+f+
+                      "\")) {\n    return shell_"+f+"(argc, argv);\n  } else ")
+        out.write("{\n    printf(\"Unknown function, exiting\\n\");\n")
+        out.write("  }\n\n  shell_igraph_usage(argc, argv);\n  return 0;\n\n}\n");
+
+        out.write("\n/* The functions themselves at last */\n")
+        for f in self.func.keys():
+            if self.ignore(f): continue
+            self.generate_function(f, out)
+        
+        out.close()
+
+    def generate_prototype(self, function, out):
+        out.write("int shell_"+function+"(int argc, char **argv);\n")
+        
+    def generate_function(self, function, out):
+        params=self.parse_params(function)
+
+        # Check types, also enumerate them
+        i=0
+        for p in params.keys():
+            tname=params[p]['type']
+            if not tname in self.types.keys():
+                print "Error: Unknown type encountered:", tname
+                sys.exit(7)
+            params[p].setdefault('mode', 'IN')
+            t=self.types[tname]
+            mode=params[p]['mode']
+            if 'INCONV' in t and mode in t['INCONV'] or \
+               'OUTCONV' in t and mode in t['OUTCONV']:
+                params[p]['shell_no']=[i]
+                i=i+1
+                if mode=="INOUT":
+                    params[p]['shell_no']=[i-1,i]
+                    i=i+1
+            else:
+                params[p]['shell_no']=None
+
+        res={'nargs': i}
+        res['func']=function
+        res['args']=self.chunk_args(function, params)
+        res['decl']=self.chunk_decl(function, params)
+        res['inconv']=self.chunk_inconv(function, params)
+        res['call']=self.chunk_call(function, params)
+        res['outconv']=self.chunk_outconv(function, params)
+        text="""
+/*-------------------------------------------/
+/ %(func)-42s /
+/-------------------------------------------*/
+int shell_%(func)s(int argc, char **argv) {
+
+%(decl)s
+
+  int shell_seen[%(nargs)s];
+  int shell_index=-1;
+  struct option shell_options[]= { %(args)s
+                                   { 0,0,0,0 }
+                                 };
+
+  memset(shell_seen, 0, %(nargs)s*sizeof(int));  
+  
+  /* Parse arguments and read input */
+  while (getopt_long(argc, argv, "", shell_options, &shell_index) != -1) {
+
+    if (shell_index==-1) {
+      exit(1);
+    }
+
+    if (shell_seen[shell_index]) {
+      fprintf(stderr, "Error, '%%s' argument given twice.\\n",
+              shell_options[shell_index].name);
+      exit(1);
+    }
+    shell_seen[shell_index]=1;  
+%(inconv)s
+    shell_index=-1;
+  }
+
+  /* Check that we have all arguments */
+  for (shell_index=0; shell_index<%(nargs)s; shell_index++) {
+    if (!shell_seen[shell_index]) {
+      fprintf(stderr, "Error, argument missing: '%%s'.\\n",
+              shell_options[shell_index]);
+      exit(1);
+    }
+  }
+
+  /* Do the operation */
+%(call)s
+
+  /* Write the result */
+%(outconv)s
+
+  return 0;
+}\n""" % res
+        out.write(text)
+
+    def chunk_args(self, function, params):        
+        res=[ ['"'+n+'"',"required_argument","0", str(p['shell_no'][0]) ]
+              for n,p in params.items() if p['shell_no'] != None ] +  \
+            [ ['"'+n+'-out"',"required_argument","0", str(p['shell_no'][1]) ]
+              for n,p in params.items() if p['shell_no'] != None and len(p['shell_no']) > 1]
+        res.sort(key=lambda x: x[3])
+        res=[ "{ "+",".join(e)+" }," for e in res ]
+        return "\n                                   ".join(res)
+
+    def chunk_decl(self, function, params):
+        def do_par(pname):
+            t=self.types[params[pname]['type']]
+            if 'CTYPE' in t:
+                decl="  " + t['CTYPE'] + " " + pname + ";"
+            else:
+                decl=""
+            return decl
+
+        decl=[ do_par(n) for n in params.keys() ]
+        inout=[ "  char* shell_arg_"+n+";" for n,p in params.items()
+                if p['mode'] in ['INOUT','OUT'] ]
+        rt=self.types[self.func[function]['RETURN']]
+        if 'DECL' in rt:
+            retdecl="  " + rt['DECL']
+        elif 'CTYPE' in rt:
+            retdecl="  " + rt['CTYPE'] + " shell_result;"
+        else:
+            retdecl=""
+
+        retchar="  char *shell_arg_shell_result=\"-\";"
+        return "\n".join(decl+inout+[retdecl, retchar])
+
+    def chunk_inconv(self, function, params):
+        def do_par(pname):
+            t=self.types[params[pname]['type']]
+            mode=params[pname]['mode']
+            if 'INCONV' in t and mode in t['INCONV']:
+                inconv="" + t['INCONV'][mode]
+            else:
+                inconv=""
+            return inconv.replace("%C%", pname)
+
+        inconv=[ "    case "+str(p['shell_no'][0])+": /* "+n+" */\n      "+ do_par(n)
+                 for n,p in params.items() if p['shell_no'] != None ] + \
+               [ "    case "+str(p['shell_no'][1])+": /* "+n+"-out */\n      shell_arg_"+n+"=strdup(optarg);"
+                 for n,p in params.items() if p['shell_no'] != None and len(p['shell_no']) >1 ]
+        inconv=[ n+"\n      break;" for n in inconv ]
+        inconv=[ "".join(n) for n in inconv ]
+        text="\n    switch (shell_index) {\n"+"\n".join(inconv)+ \
+             "\n    default:\n      break;\n    }\n"
+        return text
+
+    def chunk_call(self, function, params):
+        types=[ self.types[params[n]['type']] for n in params.keys() ]
+        call=map( lambda t,n: t.get('CALL', n), types, params.keys() )
+        call=map( lambda c,n: c.replace("%C%", n), call, params.keys() )        
+        return "  shell_result=" + function + "(" + ", ".join(call) + ");"
+
+    def chunk_outconv(self, function, params):
+        def do_par(pname):
+            t=self.types[params[pname]['type']]
+            mode=params[pname]['mode']
+            if 'OUTCONV' in t and mode in t['OUTCONV']:
+                outconv="  " + t['OUTCONV'][mode]
+            else:
+                outconv=""
+            return outconv.replace("%C%", pname)
+
+        outconv=[ do_par(n) for n in params.keys() ]
+        rt=self.types[self.func[function]['RETURN']]
+        if 'OUTCONV' in rt and 'OUT' in rt['OUTCONV']:
+            rtout="  " + rt['OUTCONV']['OUT']
+        else:
+            rtout=""
+        outconv.append(rtout.replace("%C%", "shell_result"))
+        outconv=[ o for o in outconv if o != "" ]
+        return "\n".join(outconv)
+    
 ################################################################################
 if __name__ == "__main__":
     main()

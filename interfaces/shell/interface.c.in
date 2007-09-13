@@ -1,0 +1,193 @@
+/* -*- mode: C -*-  */
+/* 
+   IGraph library.
+   Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA
+
+*/
+
+#define _GNU_SOURCE
+
+#include <libgen.h>
+#include <string.h>
+#include <stdio.h>
+#include <getopt.h>
+#include <stdlib.h>
+
+#include "igraph.h"
+
+/* ------------------------------------------------------------------------ */
+/* Conversion & other common functions first                                */
+/* ------------------------------------------------------------------------ */
+
+
+int shell_igraph_usage(int argc, char **argv) {
+  printf("Command line interface to igraph\n");
+  return 0;
+}
+
+FILE *shell_open_file(const char *where, const char *mode) {  
+  static const char *input="input";
+  static const char *output="output";
+  FILE *f;
+
+  if (!strcmp(where, "-")) {
+    if (!strcmp(mode, "r")) {
+      return stdin;
+    } else if (!strcmp(mode, "w")) {
+      return stdout;
+    }
+  }
+
+  f=fopen(where, mode);
+  if (!f) {
+    fprintf(stderr, "Cannot open %s file: %s\n", 
+	    !strcmp(mode, "r") ? input : output, where);
+    exit(1);
+  }
+  return f;
+} 
+
+int shell_read_graph(igraph_t *graph, const char *where) {
+  FILE *fin=shell_open_file(where, "r");
+  igraph_read_graph_graphml(graph, fin, 0);
+  close(fin);
+  return 0;
+}
+
+int shell_write_graph(igraph_t *graph, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  igraph_write_graph_graphml(graph, fout);
+  close(fout);
+  return 0;
+}
+
+int shell_read_vector(igraph_vector_t *v, const char *where) {
+  FILE *fin=shell_open_file(where, "r");
+  igraph_real_t n;
+  int ret=1;
+  igraph_vector_init(v, 0);
+  while (ret > 0) {
+    ret=fscanf(fin, "%lf", &n);
+    if (ret > 0) { 
+      igraph_vector_push_back(v, n);
+    }
+  }
+  close(fin);
+  if (ret != EOF) {
+    fprintf(stderr, "Error reading vector from file: %s\n", where);
+    exit(1);
+  }
+
+  return 0;
+}
+
+int shell_write_vector(igraph_vector_t *v, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  int ret=1;
+  long int i, n=igraph_vector_size(v);
+  if (n>0) { ret=fprintf(fout, "%g", VECTOR(*v)[0]); }
+  if (ret <= 0) { 
+    fprintf(stderr, "Cannot write vector to %s\n", where);
+    close(fout);
+    exit(1);
+  }
+  for (i=1; i<n; i++) {
+    ret=fprintf(fout, " %g", VECTOR(*v)[i]);
+    if (ret <= 0) { 
+      fprintf(stderr, "Cannot write vector to %s\n", where);
+      close(fout);
+      exit(1);
+    }
+  }
+  fprintf(stderr, "\n");
+  close(fout);
+  
+  return 0;
+}
+
+int shell_read_integer(igraph_integer_t *n, const char *where) {
+  long int nn;
+  int ret=sscanf(where, "%li", &nn);
+  if (ret == EOF || ret == 0) {
+    fprintf(stderr, "Error, cannot interpret '%s' as integer\n", where);
+    exit(1);
+  }
+  *n=nn;
+  return 0;
+}
+
+int shell_write_integer(igraph_integer_t n, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  int ret=fprintf(fout, "%li\n", (long int)n);
+  if (ret <= 0) { 
+    fprintf(stderr, "Cannot write integer to '%s'\n", where);
+    close(fout);
+    exit(1);
+  }
+  return 0;
+}
+
+int shell_read_boolean(igraph_bool_t *b, const char *where) {
+  if (strlen(where)==0 || 
+      where[0]=='0' ||
+      where[0]=='F' ||
+      where[0]=='f') {
+    *b=0;
+  } else {
+    *b=1;
+  }
+  return 0;
+}
+
+int shell_write_boolean(igraph_bool_t b, const char *where) {
+  int bb= b==0 ? 0 : 1;
+  FILE *fout=shell_open_file(where, "w");
+  int ret=fprintf(fout, "%i\n", bb);
+  if (ret <= 0) { 
+    fprintf(stderr, "Cannot write integer to '%s'\n", where);
+    close(fout);
+    exit(1);
+  }  
+  return 0;
+}
+
+int shell_read_real(igraph_real_t *b, const char *where) {
+  int ret=sscanf(where, "%lf", b);
+  if (ret == EOF || ret == 0) {
+    fprintf(stderr, "Error, cannot interpret '%s' as real\n", where);
+    exit(1);
+  }  
+  return 0;
+}
+
+int shell_write_real(igraph_real_t b, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  int ret=fprintf(fout, "%g\n", (double)b);
+  if (ret <= 0) { 
+    fprintf(stderr, "Cannot write real to %s\n", where);
+    close(fout);
+    exit(1);
+  }
+  return 0;
+}
+
+/* ------------------------------------------------------------------------ */
+/* Stimulus generated interface next                                        */
+/* ------------------------------------------------------------------------ */
+

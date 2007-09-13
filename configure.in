@@ -137,7 +137,7 @@ if test "$use_shell" == "yes"; then
   AC_PROG_LN_S
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist debian/Makefile doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/DESCRIPTION interfaces/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist debian/Makefile doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/DESCRIPTION interfaces/Makefile interfaces/shell/Makefile])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
