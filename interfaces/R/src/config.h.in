@@ -7,4 +7,6 @@
 
 #define HAVE_LIBXML @HAVE_LIBXML@
 
+#define HAVE_RINTF @HAVE_RINTF@
+
 #endif

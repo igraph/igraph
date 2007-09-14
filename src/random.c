@@ -30,6 +30,7 @@
 int igraph_rng_inited = 0;
 
 #ifndef HAVE_EXPM1
+#ifndef USING_R			/* R provides a replacement */
 /* expm1 replacement */
 static double expm1 (double x)
 {
@@ -54,13 +55,16 @@ static double expm1 (double x)
     return expl(x) - 1.0L;
 }
 #endif
+#endif
 
 #ifndef HAVE_RINT
+#ifndef USING_R			/* R provides a replacement */
 /* rint replacement */
 static double rint (double x)
 {
    return ( (x<0.) ? -floor(-x+.5) : floor(x+.5) );
 }
+#endif
 #endif
 
 #ifndef HAVE_RINTF
