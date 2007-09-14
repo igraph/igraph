@@ -23,29 +23,13 @@
 
 #include "random.h"
 #include "error.h"
+#include "config.h"
 
 #include <math.h>
 
 int igraph_rng_inited = 0;
 
-#ifdef __MINGW32__
-/** MinGW does not have an expm1 function at the time of writing (Nov 1 2005),
-so let's provide a replacement */
-static double expm1 (double x)
-{
-   if (-M_LN2 < x && x < M_LN2)
-     {
-     x *= M_LOG2E;
-     __asm__("f2xm1\n\t" : "=t" (x) : "0" (x));
-     return x;
-     }
-   else
-     return expl(x) - 1.0L;
-}
-#endif
-
-#ifdef __MSVC__
-/* expm1 replacement for Microsoft Visual C */
+#ifndef HAVE_EXPM1
 static double expm1 (double x)
 {
     if (fabs(x) < M_LN2)
@@ -68,13 +52,17 @@ static double expm1 (double x)
 
     return expl(x) - 1.0L;
 }
+#endif
 
-/* We also need rint and rintf */
+#ifndef HAVE_RINT
+/* rint replacement */
 static double rint (double x)
 {
    return ( (x<0.) ? -floor(-x+.5) : floor(x+.5) );
 }
+#endif
 
+#ifndef HAVE_RINTF
 static float rintf (float x)
 {
    return ( (x<(float)0.) ? -(float)floor(-x+.5) : (float)floor(x+.5) );
