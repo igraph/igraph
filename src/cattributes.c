@@ -281,11 +281,13 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
     if (nattr) { l=igraph_i_cattribute_find(nattr, name, &j); }
     if (l) {
       /* This attribute is present in nattr */
+      igraph_vector_t *oldnum, *newnum;
+      igraph_strvector_t *oldstr, *newstr;
       newrec=VECTOR(*nattr)[j];
-      igraph_vector_t *oldnum=(igraph_vector_t*)oldrec->value;
-      igraph_vector_t *newnum=(igraph_vector_t*)newrec->value;
-      igraph_strvector_t *oldstr=(igraph_strvector_t*)oldrec->value;
-      igraph_strvector_t *newstr=(igraph_strvector_t*)newrec->value;
+      oldnum=(igraph_vector_t*)oldrec->value;
+      newnum=(igraph_vector_t*)newrec->value;
+      oldstr=(igraph_strvector_t*)oldrec->value;
+      newstr=(igraph_strvector_t*)newrec->value;
       if (oldrec->type != newrec->type) {
 	IGRAPH_ERROR("Attribute types do not match", IGRAPH_EINVAL);
       }
@@ -475,11 +477,13 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
     if (nattr) { l=igraph_i_cattribute_find(nattr, name, &j); }
     if (l) {
       /* This attribute is present in nattr */
+      igraph_vector_t *oldnum, *newnum;
+      igraph_strvector_t *oldstr, *newstr;
       newrec=VECTOR(*nattr)[j];
-      igraph_vector_t *oldnum=(igraph_vector_t*)oldrec->value;
-      igraph_vector_t *newnum=(igraph_vector_t*)newrec->value;
-      igraph_strvector_t *oldstr=(igraph_strvector_t*)oldrec->value;
-      igraph_strvector_t *newstr=(igraph_strvector_t*)newrec->value;
+      oldnum=(igraph_vector_t*)oldrec->value;
+      newnum=(igraph_vector_t*)newrec->value;
+      oldstr=(igraph_strvector_t*)oldrec->value;
+      newstr=(igraph_strvector_t*)newrec->value;
       if (oldrec->type != newrec->type) {
 	IGRAPH_ERROR("Attribute types do not match", IGRAPH_EINVAL);
       }

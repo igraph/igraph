@@ -1,5 +1,6 @@
 include src/*.h
 include igraph/*.hc
+include igraph/*.pmt
 include igraph/*.h
 include test.py
 include MANIFEST.in
