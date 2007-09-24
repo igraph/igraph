@@ -8,8 +8,15 @@ C{igraph}'s classes and functions in the top-level namespace.
 
 Supported Python shells are:
 
+  - IDLE shell (class L{IDLEShell})
   - IPython shell (class L{IPythonShell})
   - Classic Python shell (class L{ClassicPythonShell})
+
+The shells are tried in the above mentioned preference order one by
+one, unless the C{global.shells} configuration key is set which
+overrides the default order. IDLE shell is only tried in Windows
+unless explicitly stated by C{global.shells}, since Linux and
+Mac OS X users are likely to invoke igraph from the command line.
 """
 from igraph import *
 from igraph import __version__
@@ -210,13 +217,55 @@ class Shell(object):
         raise ValueError, "abstract class"
     def __call__(self, namespace=None):
         raise ValueError, "abstract class"
+    def supports_progress_bar(self):
+        return hasattr(self, "_progress_handler")
+    def get_progress_handler(self):
+        if self.supports_progress_bar(): return self._progress_handler
+        return None
+
+class IDLEShell(Shell):
+    """IDLE embedded shell interface.
+
+    This class allows igraph to be embedded in IDLE (the Tk Python IDE).
+    
+    @todo: no progress bar support yet. Shell/Restart Shell command should
+      re-import igraph again."""
+    
+    def __init__(self):
+        """Constructor.
+
+        Imports IDLE's embedded shell. The implementation of this method is
+        ripped from idlelib.PyShell.main() after removing the unnecessary
+        parts."""
+        import idlelib.PyShell
+        import sys
+        
+        idlelib.PyShell.use_subprocess = True
+        
+        try:
+            sys.ps1
+        except AttributeError:
+            sys.ps1 = '>>> '
+
+        root = idlelib.PyShell.Tk(className="Idle")
+        idlelib.PyShell.fixwordbreaks(root)
+        root.withdraw()
+        flist = idlelib.PyShell.PyShellFileList(root)
+        if not flist.open_shell(): raise NotImplementedError
+        self._shell = flist.pyshell
+        self._root = root
+
+    def __call__(self, namespace=None):
+        """Starts the shell"""
+        self._shell.interp.execsource("from igraph import *")
+        self._root.mainloop()
+        self._root.destroy()
+
 
 class IPythonShell(Shell):
     """IPython embedded shell interface.
 
     This class allows igraph to be embedded in IPython's interactive shell."""
-    term = TerminalController()
-    progress_bar = ProgressBar(term)
 
     def __init__(self):
         """Constructor.
@@ -224,6 +273,11 @@ class IPythonShell(Shell):
         Imports IPython's embedded shell with separator lines removed."""
         from IPython.Shell import IPShellEmbed
         self._shell = IPShellEmbed(['-nosep'])
+        try:
+            self.__class__.progress_bar = ProgressBar(TerminalController())
+        except ValueError:
+            # Terminal is not capable enough, disable progress handler
+            del self.__class__._progress_handler
 
     def __call__(self, namespace=None):
         """Starts the embedded shell.
@@ -250,14 +304,17 @@ class ClassicPythonShell(Shell):
     """Classic Python shell interface.
 
     This class allows igraph to be embedded in Python's shell."""
-    term = TerminalController()
-    progress_bar = ProgressBar(term)
     
     def __init__(self):
         """Constructor.
 
         Imports Python's classic shell"""
         from code import InteractiveConsole
+        try:
+            self.__class__.progress_bar = ProgressBar(TerminalController())
+        except ValueError:
+            # Terminal is not capable enough, disable progress handler
+            del self.__class__._progress_handler
 
     def __call__(self, namespace=None):
         """Starts the embedded shell.
@@ -283,7 +340,10 @@ class ClassicPythonShell(Shell):
     _progress_handler = staticmethod(_progress_handler)
 
 def main():
-    print >>sys.stderr, "Using configuration from %s" % config.filename
+    if config.filename:
+        print >>sys.stderr, "Using configuration from %s" % config.filename
+    else:
+        print >>sys.stderr, "No configuration file, using defaults"
 
     if config.has_key("shells"):
         parts = [part.strip() for part in config["shells"].split(",")]
@@ -298,6 +358,9 @@ def main():
                 shell_classes.append(klass)
     else:
         shell_classes = [IPythonShell, ClassicPythonShell]
+        import platform
+        if platform.system() == "Windows":
+            shell_classes.insert(0, IDLEShell)
 
     shell = None
     for shell_class in shell_classes:
@@ -309,8 +372,8 @@ def main():
             pass
 
     if isinstance(shell, Shell):
-        if config["verbose"]:
-            set_progress_handler(shell._progress_handler)
+        if config["verbose"] and shell.supports_progress_bar():
+            set_progress_handler(shell.get_progress_handler())
         shell()
     else:
         print >>sys.stderr, "No suitable Python shell was found."
