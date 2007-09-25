@@ -44,12 +44,100 @@ you don't need to download anything by hand, just give the command
 in R and select a mirror site close to you. The
 <parameter>lib</parameter> argument specifies the directory to 
 which the package will be installed. If not specified, this will be
-default system wide R package directory. You must have write rights to
-this directory.
+default system wide R package directory. You must have write permissions
+for this directory.
 </para>
 
 <para>
 Also, consult your R documentation.
+</para>
+
+<para>
+Installing the <command>igraph</command> Python package is a little bit
+more difficult, since chances are that you have to compile it for yourself
+(as long as there is no compile farm at the Python Package Index and we can't
+compile it ourselves to all platforms). First, check if there is a compiled
+version available for your system at <ulink
+url="http://www.python.org/pypi/igraph">igraph's Python Package Index
+page</ulink>. If there is, just use that. (Python eggs should be put anywhere
+in your Python library path, executable installers should be executed of
+course). If there isn't, you'll have to compile it by hand. So, first
+install a recent C compiler.
+</para>
+
+<para>
+We usually compile <command>igraph</command> with the
+<ulink url="http://gcc.gnu.org">GNU C compiler</ulink>. If you are a Windows
+user, you can find it as part of the
+<ulink url="http://www.cygwin.com">Cygwin</ulink> environment or in the
+<ulink url="http://www.mingw.org">MinGW+MSYS</ulink> project. You can also
+try Microsoft's free C compiler suite (or even worse, Visual Studio), but
+there are known issues with the compilation of <command>igraph</command>
+in MSVC, and you'll have to resolve them yourself by tweaking the source
+code. (Patches are welcome! :)). If you use Linux, <command>gcc</command> is
+usually included in your default system, but even if it isn't, there will
+be a package from which you can install it. (In Debian and Ubuntu Linux,
+you'll have to install the package called <command>build-essential</command>).
+If you have a Mac, <command>gcc</command> is part of the
+<application>Xcode</application> developer suite, which is usually included
+in your OS X install DVD, or can be obtained freely from the
+<ulink url="http://developer.apple.com/tools/downloads/">Apple Developer
+Connection</ulink> website.
+</para>
+
+<para>
+After having obtained a C compiler, you'll have to install an XML processing
+library called <command>libxml2</command>. Windows users should get it from
+<ulink url="http://xmlsoft.org">this website</ulink> (there are binary
+versions, no need to compile anything), Linux users should be able to find
+a package again in their respective distribution (Debian and Ubuntu users:
+install the <command>libxml2</command> and <command>libxml2-dev</command> libraries).
+Mac users should not do anything, since <command>libxml2</command> is part of the
+default system installation. However, you should check it anyway, launch
+a terminal and type the following command:
+<programlisting>
+$ xml2-config
+</programlisting>
+If you don't receive any error message, you can go on to the next step.
+</para>
+
+<para>
+Now, get the <command>igraph</command> source from the
+<ulink url="http://www.python.org/pypi/igraph">Python Package Index</ulink>,
+extract it to a directory and start the compilation. On Windows, launch
+the Cygwin or MinGW environment and type:
+<programlisting>
+$ python setup.py build --compiler=cygwin
+</programlisting>
+(Instead of <command>--compiler=cygwin</command>,
+<command>--compiler=mingw32</command> should also work, then you have no
+POSIX emulation available (you don't really need it for
+<command>igraph</command> yet), but you also won't need
+<filename>cygwin1.dll</filename>). If the shell keeps on complaining that
+it does not find the Python
+interpreter, use its full path. For instance, if you have Python installed
+in <filename>C:\Devel\Python24</filename>, use the following command:
+<programlisting>
+$ /cygdrive/c/devel/python24/python setup.py build --compiler=cygwin
+</programlisting>
+If the compilation finished without errors, you can install the library:
+<programlisting>
+$ python setup.py install
+</programlisting>
+(Use the full path again if necessary).
+</para>
+
+<para>
+Linux and Mac users should succeed with the following commands issued from the
+<command>igraph</command> root directory:
+<programlisting>
+$ python setup.py build
+$ python setup.py install
+</programlisting>
+Note that you'll need write permissions to the Python library path, so
+usually you must have root permissions to issue the second command. If
+you want to install it to a different directory, just copy everything
+from the <filename>build/lib.*</filename> subdirectory to wherever you want.
 </para>
 
 </chapter>
