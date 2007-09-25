@@ -188,12 +188,10 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
     RNG_BEGIN();
 
     IGRAPH_CHECK(igraph_vector_push_back(&s, RNG_GEOM(p)+1));
-    while (igraph_vector_tail(&s) < maxedges) {
+    while (igraph_vector_tail(&s) <= maxedges) {
       IGRAPH_CHECK(igraph_vector_push_back(&s, igraph_vector_tail(&s)+RNG_GEOM(p)+1));
     }
-    if (igraph_vector_tail(&s) > maxedges+1) {
-      igraph_vector_pop_back(&s);
-    }
+    igraph_vector_pop_back(&s);
 
     RNG_END();
 
@@ -202,16 +200,16 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
 
     if (directed && loops) {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	igraph_real_t to=fmod(VECTOR(s)[i], no_of_nodes);
-	igraph_real_t from=(VECTOR(s)[i]-to)/no_of_nodes;
+	long int to=fmod(VECTOR(s)[i]-1, no_of_nodes);
+	long int from=(VECTOR(s)[i]-to)/no_of_nodes;
 	igraph_vector_push_back(&edges, from);
 	igraph_vector_push_back(&edges, to);
       }
     } else if (directed && !loops) {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	igraph_real_t from=
+	long int from=
 	  (VECTOR(s)[i]-1 - fmod(VECTOR(s)[i]-1, no_of_nodes-1))/(no_of_nodes-1);
-	igraph_real_t to=fmod(VECTOR(s)[i], no_of_nodes-1);
+	long int to=fmod(VECTOR(s)[i], no_of_nodes-1);
 	if (from==to) {
 	  to=no_of_nodes-1;
 	}
@@ -220,15 +218,17 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
       }
     } else if (!directed && loops) {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	igraph_real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
+	long int from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
+	long int to=VECTOR(s)[i]-from*(from-1)/2-1;
 	igraph_vector_push_back(&edges, from-1);
-	igraph_vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
+	igraph_vector_push_back(&edges, to);
       }
     } else {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	igraph_real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
+	long int from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
+	long int to=VECTOR(s)[i]-(from-1)*(from-2)/2-1;
 	igraph_vector_push_back(&edges, from-1);
-	igraph_vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
+	igraph_vector_push_back(&edges, to);
       }
     }      
 
