@@ -1,3 +1,8 @@
+2007-09-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (erdos_renyi_game_gnp) : three bugs corrected,
+	should solve issue #30
+
 2007-08-09  Gabor Csardi  <csardi@belus>
 
 	* src/examples/simple/vector.c : corrected a test case
