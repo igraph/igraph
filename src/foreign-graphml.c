@@ -860,7 +860,7 @@ void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len
     break;
     
   default:
-    // just ignore it
+    /* just ignore it */
     break;
   }
 }
@@ -952,7 +952,7 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
   if (index<0)
     IGRAPH_ERROR("Graph index must be non-negative", IGRAPH_EINVAL);
   
-  // Create a progressive parser context
+  /* Create a progressive parser context */
   state.g=graph;
   state.index=index<0?0:index;
   res=fread(buffer, 1, 4096, instream);
@@ -968,14 +968,14 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
   if (ctxt==NULL)
     IGRAPH_ERROR("Can't create progressive parser context", IGRAPH_PARSEERROR);
 
-  // Parse the file
+  /* Parse the file */
   while ((res=fread(buffer, 1, 4096, instream))>0) {
     xmlParseChunk(ctxt, buffer, res, 0);
     if (!state.successful) break;
   }
   xmlParseChunk(ctxt, buffer, res, 1);
   
-  // Free the context
+  /* Free the context */
   xmlFreeParserCtxt(ctxt);
   if (!state.successful) {
     if (state.error_message != 0)
