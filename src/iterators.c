@@ -732,6 +732,7 @@ int igraph_es_all(igraph_es_t *es,
 
 igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
   igraph_es_t es;
+  es.type=IGRAPH_ES_ALL;	/* avoid stupid gcc warning */
   igraph_es_all(&es, order); /* cannot fail */
   return es;  
 }

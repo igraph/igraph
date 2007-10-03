@@ -50,7 +50,6 @@ alpha.centrality(graph, nodes=V(graph), alpha=1, loops=FALSE,
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}.}
 \section{Warning}{Singular adjacency matrices cause problems for this
   algorithm, the routine may fail is certain cases.}
-}
 \seealso{\code{\link{evcent}} and \code{\link{bonpow}}}
 \examples{
 # The examples from Bonacich's paper

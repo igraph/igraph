@@ -191,7 +191,7 @@ class NNode
     char name[255];
     RGBcolor color;
   public :
-    NNode(unsigned long, unsigned long, DLList<NLink*>*, char*, int);
+    NNode(unsigned long, unsigned long, DLList<NLink*>*, const char*, int);
     ~NNode();
     unsigned long Get_Index(void)  { return(index); }
     unsigned long Get_ClusterIndex(void) { return(cluster_index);}

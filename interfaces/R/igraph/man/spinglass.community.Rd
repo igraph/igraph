@@ -59,7 +59,6 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
       a given vertex without calculating all communities. Note that if
       this argument is present then some other arguments are ignored.}
   }
-}
 \details{
   This function tries to find communities in a graph. A community is a
   set of nodes with many edges inside the community and  few edges
