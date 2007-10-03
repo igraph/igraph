@@ -217,6 +217,11 @@ class CodeGenerator:
             self.types.extend(newtypes)
             ff.close()
 
+        # The default return type is 'ERROR'
+        for f in self.func.keys():
+            if 'RETURN' not in self.func[f]:
+                self.func[f]['RETURN']='ERROR'
+
     def generate(self, inputs, output):
         out=open(output, "w")
         self.append_inputs(inputs, out)
@@ -661,8 +666,10 @@ class RCCodeGenerator(CodeGenerator):
 
 ################################################################################
 # Shell interface, igraph functions directly from the command line
-# TODO: - default values for arguments
-#       - read/write default input/output from/to stdin/stdout
+# TODO: - read/write default input/output from/to stdin/stdout
+#       - short options
+#       - prefixed output (?)
+#       - default values depending on other parameters
 #       - other input/output graph formats, to be controlled by
 #         environment variables (?): IGRAPH_INGRAPH, IGRAPH_OUTGRAPH
 ################################################################################
@@ -718,7 +725,7 @@ class ShellCodeGenerator(CodeGenerator):
 
     def generate_prototype(self, function, out):
         out.write("int shell_"+function+"(int argc, char **argv);\n")
-        
+
     def generate_function(self, function, out):
         params=self.parse_params(function)
 
@@ -740,6 +747,14 @@ class ShellCodeGenerator(CodeGenerator):
                     args[p+'-out']=params[p].copy()
                     args[p+'-out']['mode']='OUT'
                     args[p+'-out']['shell_no']=len(args)-1
+                    if 'INCONV' not in t or 'IN' not in t['INCONV']:
+                        print "Warning: no INCONV for type", tname, ", mode IN"
+                    if 'OUTCONV' not in t or 'OUT' not in t['OUTCONV']:
+                        print "Warning: no OUTCONV for type", tname, ", mode OUT"
+            if mode =='IN' and ('INCONV' not in t or mode not in t['INCONV']):
+                print "Warning: no INCONV for type", tname, ", mode", mode
+            if mode == 'OUT' and ('OUTCONV' not in t or mode not in t['OUTCONV']):
+                print "Warning: no OUTCONV for type", tname, ", mode", mode
 
         res={'nargs': len(args)}
         res['func']=function
@@ -749,10 +764,16 @@ class ShellCodeGenerator(CodeGenerator):
         res['call']=self.chunk_call(function, params)
         res['outconv']=self.chunk_outconv(function, args)
         res['default']=self.chunk_default(function, args)
+        res['usage']=self.chunk_usage(function, args)
         text="""
 /*-------------------------------------------/
 / %(func)-42s /
 /-------------------------------------------*/
+void shell_%(func)s_usage(char **argv) {
+%(usage)s
+  exit(1);
+}
+
 int shell_%(func)s(int argc, char **argv) {
 
 %(decl)s
@@ -760,6 +781,7 @@ int shell_%(func)s(int argc, char **argv) {
   int shell_seen[%(nargs)s];
   int shell_index=-1;
   struct option shell_options[]= { %(args)s
+                                   { "help",no_argument,0,%(nargs)s },
                                    { 0,0,0,0 }
                                  };
 
@@ -788,7 +810,7 @@ int shell_%(func)s(int argc, char **argv) {
   for (shell_index=0; shell_index<%(nargs)s; shell_index++) {
     if (!shell_seen[shell_index]) {
       fprintf(stderr, "Error, argument missing: `--%%s'.\\n",
-              shell_options[shell_index]);
+              shell_options[shell_index].name);
       exit(1);
     }
   }
@@ -812,7 +834,9 @@ int shell_%(func)s(int argc, char **argv) {
     def chunk_decl(self, function, params):
         def do_par(pname):
             t=self.types[params[pname]['type']]
-            if 'CTYPE' in t:
+            if 'DECL' in t:
+                decl="  " + t['DECL'].replace("%C%", pname)
+            elif 'CTYPE' in t:
                 decl="  " + t['CTYPE'] + " " + pname
             else:
                 decl=""
@@ -827,7 +851,7 @@ int shell_%(func)s(int argc, char **argv) {
             else: return ""
 
         decl=[ do_par(n) for n in params.keys() ]
-        inout=[ "  char* shell_arg_"+n+";" for n,p in params.items()
+        inout=[ "  char* shell_arg_"+n+"=0;" for n,p in params.items()
                 if p['mode'] in ['INOUT','OUT'] ]
         rt=self.types[self.func[function]['RETURN']]
         if 'DECL' in rt:
@@ -837,7 +861,10 @@ int shell_%(func)s(int argc, char **argv) {
         else:
             retdecl=""
 
-        retchar="  char *shell_arg_shell_result=\"-\";"
+        if self.func[function]['RETURN'] != 'ERROR':
+            retchar="  char *shell_arg_shell_result=\"-\";"
+        else:
+            retchar=""
         return "\n".join(decl+inout+[retdecl, retchar])
 
     def chunk_default(self, function, params):
@@ -869,6 +896,7 @@ int shell_%(func)s(int argc, char **argv) {
         inconv=[ n+"\n      break;" for n in inconv ]
         inconv=[ "".join(n) for n in inconv ]
         text="\n    switch (shell_index) {\n"+"\n".join(inconv)+ \
+             "\n    case "+str(len(inconv))+":\n      shell_"+function+"_usage(argv);\n      break;"+ \
              "\n    default:\n      break;\n    }\n"
         return text
 
@@ -898,6 +926,10 @@ int shell_%(func)s(int argc, char **argv) {
         outconv.append(rtout.replace("%C%", "shell_result"))
         outconv=[ o for o in outconv if o != "" ]
         return "\n".join(outconv)
+
+    def chunk_usage(self, function, params):
+        res=[ "--"+n+"=<"+n+">" for n in params.keys() ]
+        return "  printf(\"%s "+" ".join(res)+"\\n\", basename(argv[0]));"
     
 ################################################################################
 if __name__ == "__main__":

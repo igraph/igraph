@@ -5,6 +5,7 @@ GRAPH:
     IN: shell_read_graph(&%C%, optarg);
     OUT: shell_arg_%C%=strdup(optarg);
   OUTCONV:
+    IN: igraph_destroy(&%C%);
     OUT: shell_write_graph(&%C%, shell_arg_%C%); \
          igraph_destroy(&%C%);
 
@@ -24,6 +25,11 @@ INTEGERPTR:
 
 REAL:
   CTYPE: igraph_real_t
+  DEFAULT:
+    VCOUNT(graph): 100
+    VCOUNT(graph)^2: 1000
+    VCOUNT(graph)^3: 10000
+    VCOUNT(graph)/4: 10
   INCONV:
     IN: shell_read_real(&%C%, optarg);
 
@@ -44,15 +50,11 @@ BOOLEAN:
     True: 1
     False: 0
 
-ERROR:
-  CTYPE: int
-
-CONNECTEDNESS:
-  CTYPE: igraph_connectedness_t
-  DEFAULT:
-    WEAK: IGRAPH_WEAK
-  INCONV:
-    IN: shell_read_connectedness(&%C%, optarg);
+BOOLEANPTR:
+  CTYPE: igraph_bool_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: shell_write_boolean(%C%, shell_arg_%C%);
 
 VECTOR:
   CTYPE: igraph_vector_t
@@ -64,9 +66,18 @@ VECTOR:
   OUTCONV:
     OUT: shell_write_vector(&%C%, shell_arg_%C%); \
          igraph_vector_destroy(&%C%);
+    IN: igraph_vector_destroy(&%C%);
 
 VECTOR_OR_0:
-  CALL: 0
+  DECL: igraph_vector_t v_%C%; igraph_vector_t *%C%=0
+  INCONV: 
+    IN: %C%=&v_%C%; shell_read_vector(%C%, optarg);
+    OUT: %C%=&v_%C%; igraph_vector_init(%C%, 0); \
+         shell_arg_%C%=strdup(optarg);
+  OUTCONV:
+    IN: if (%C%) { igraph_vector_destroy(%C%); }    
+    OUT: if (%C%) { shell_write_vector(%C%, shell_arg_%C%); \
+                    igraph_vector_destroy(%C%); }
 
 MATRIX:
   CTYPE: igraph_matrix_t
@@ -76,8 +87,210 @@ MATRIX:
     OUT: shell_arg_%C%=strdup(optarg); \
          igraph_matrix_init(&%C%, 0, 0);
   OUTCONV:
+    IN: igraph_matrix_destroy(&%C%);
     OUT: shell_write_matrix(&%C%, shell_arg_%C%); \
          igraph_matrix_destroy(&%C%);
+
+EDGESET:
+  CTYPE: igraph_es_t
+  DECL: igraph_vector_t v_%C%; igraph_es_t %C%
+  DEFAULT:
+    ALL: igraph_ess_all(IGRAPH_EDGEORDER_ID)
+  INCONV: 
+    IN: shell_read_vector(&v_%C%, optarg); igraph_es_vector(&%C%, &v_%C%);
+  OUTCONV:
+    IN: if (!igraph_es_is_all(&%C%)) { igraph_es_destroy(&%C%); }
+
+VERTEXSET:
+  CTYPE: igraph_vs_t
+  DECL: igraph_vector_t v_%C%; igraph_vs_t %C% 
+  DEFAULT:
+    ALL: igraph_vss_all()
+  INCONV:
+    IN: shell_read_vector(&v_%C%, optarg); igraph_vs_vector(&%C%, &v_%C%);
+  OUTCONV:
+    IN: if (!igraph_vs_is_all(&%C%)) { igraph_vector_destroy(&v_%C%); }
+
+CONNECTEDNESS:
+  CTYPE: igraph_connectedness_t
+  DEFAULT:
+    WEAK: IGRAPH_WEAK
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "weak", 1, "strong", 2, 0);
+
+NEIMODE:
+  CTYPE: igraph_neimode_t
+  DEFAULT:
+    OUT: IGRAPH_OUT
+    IN: IGRAPH_IN
+    ALL: IGRAPH_ALL
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "out", 1, "in", 2, "all", 3, "total", 3, 0);
+
+ADJACENCYMODE:
+  CTYPE: igraph_adjacency_t
+  DEFAULT:
+    DIRECTED: IGRAPH_ADJ_DIRECTED
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "directed", 0, "undirected", 1, \
+          "max", 1, "upper", 2, "lower", 3, "min", 4, "plus", 5, 0);
+
+STARMODE:
+  CTYPE: igraph_star_mode_t
+  DEFAULT:
+    OUT: IGRAPH_STAR_OUT
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "out", 0, "in", 1, "undirected", 2, 0);
+
+TREEMODE:
+  CTYPE: igraph_tree_mode_t
+  DEFAULT:
+    OUT: IGRAPH_TREE_OUT
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "out", 0, "in", 1, "undirected", 2, 0);
+
+DEGSEQMODE:
+  CTYPE: igraph_degseq_t
+  DEFAULT:
+    SIMPLE: IGRAPH_DEGSEQ_SIMPLE
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "simple", 0, 0);
+
+SPINCOMMUPDATE:
+  CTYPE: igraph_spincomm_update_t
+  DEFAULT:
+    CONFIG: IGRAPH_SPINCOMM_UPDATE_CONFIG
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "simple", 0, "config", 1, 0);
+
+GETADJACENCY:
+  CTYPE: igraph_get_adjacency_t
+  DEFAULT:
+    BOTH: IGRAPH_GET_ADJACENCY_BOTH
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "upper", 0, "lower", 1, "both", 2, 0);
+
+TODIRECTED:
+  CTYPE: igraph_to_directed_t
+  DEFAULT:
+    MUTUAL: IGRAPH_TO_DIRECTED_MUTUAL
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "arbitrary", 0, "mutual", 1, 0);
+
+TOUNDIRECTED:
+  CTYPE: igraph_to_undirected_t
+  DEFAULT:
+    COLLAPSE: IGRAPH_TO_UNDIRECTED_COLLAPSE
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "each", 0, "collapse", 0);
+
+VCONNNEI:
+  CTYPE: igraph_vconn_nei_t
+  DEFAULT:
+    INFINITY: IGRAPH_VCONN_NEI_INFINITY
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "error", 0, "infinity", 1, "ignore", 2, 0);
+
+REWIRINGMODE:
+  CTYPE: igraph_rewiring_t
+  DEFAULT:
+    SIMPLE: IGRAPH_REWIRING_SIMPLE
+  INCONV:
+    IN: shell_read_enum(&%C%, optarg, "simple", 0, 0);
+
+CSTRING:
+  CTYPE: char *
+  INCONV:
+    IN: %C%=strdup(optarg);
+  OUTCONV:
+    IN: free(%C%);
+
+VECTORLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: igraph_vector_ptr_init(&%C%, 0);
+  OUTCONV:
+    OUT: shell_write_vectorlist(&%C%, shell_arg_%C%); \
+         shell_free_vectorlist(&%C%); \
+         igraph_vector_ptr_destroy(&%C%);
+
+GRAPHLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    IN: shell_read_graphlist(&%C%, optarg);
+    OUT: igraph_vector_ptr_init(&%C%, 0);
+  OUTCONV:
+    IN: shell_free_graphlist(&%C%); \
+        igraph_vector_ptr_destroy(&%C%);
+    OUT: shell_write_graphlist(&%C%, shell_arg_%C%); \
+         shell_free_graphlist(&%C%); \
+         igraph_vector_ptr_destroy(&%C%);
+
+VECTOR_BOOL:
+  CTYPE: igraph_vector_bool_t
+  CALL: &%C%
+  INCONV:
+    OUT: igraph_vector_bool_init(&%C%, 0);
+  OUTCONV:
+    OUT: shell_write_vector_bool(&%C%, shell_arg_%C%); \
+         igraph_vector_bool_destroy(&%C%);
+
+INT:
+  CTYPE: int
+  INCONV:
+    IN: shell_read_int(&%C%, optarg);
+
+LONGINT:
+  CTYPE: long int
+  DEFAULT:
+    VCOUNT(graph): 100
+  INCONV:
+    IN: shell_read_longint(&%C%, optarg);
+
+MATRIXLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    IN: shell_read_matrixlist(&%C%, optarg);
+  OUTCONV:
+    IN: shell_free_matrixlist(&%C%); \
+        igraph_vector_ptr_destroy(&%C%);
+
+INFILE:
+  CTYPE: FILE*
+  DECL: FILE* %C%=0
+  INCONV:
+    IN: shell_read_file(&%C%, optarg, "r");
+  OUTCONV:
+    IN: fclose(%C%);
+
+OUTFILE:
+  CTYPE: FILE*
+  DECL: FILE* %C%=0
+  INCONV:
+    IN: shell_read_file(&%C%, optarg, "w");
+  OUTCONV:
+    IN: fclose(%C%);
+
+STRVECTOR:
+  CTYPE: igraph_strvector_t
+  CALL: &%C%
+  INCONV:
+    IN: shell_read_strvector(&%C%, optarg);
+  OUTCONV:
+    IN: igraph_strvector_destroy(&%C%);
+
+STRVECTOR_OR_0:
+  DECL: igraph_strvector_t v_%C%; igraph_strvector_t *%C%=0;
+  INCONV:
+    IN: %C%=&v_%C%; shell_read_strvector(%C%, optarg);
+  OUTCONV:
+    IN: if (%C%) { igraph_strvector_destroy(%C%); }
+
+ERROR:
+  CTYPE: int
 
 NULL:
   CALL: 0

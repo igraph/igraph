@@ -5,18 +5,399 @@
 
 igraph_empty:
         PARAMS: OUT GRAPH graph, INTEGER n=0, BOOLEAN directed=True
-        RETURN: ERROR
 
 igraph_add_edges:
         PARAMS: INOUT GRAPH graph, VECTOR edges, ATTRIBUTES attr
         NAME-R: add.edges
-        RETURN: ERROR
         IGNORE: RR, RC
+
+igraph_add_vertices:
+        PARAMS: INOUT GRAPH graph, INTEGER nv, ATTRIBUTES attr
+        NAME-R: add.vertices
+        IGNORE: RR, RC, RNamespace
+
+igraph_delete_edges:
+        PARAMS: INOUT GRAPH graph, EDGESET edges
+        NAME-R: delete.edges
+        IGNORE: RR, RC, RNamespace
+
+igraph_delete_vertices:
+        PARAMS: INOUT GRAPH graph, VERTEXSET vertices
+        NAME-R: delete.vertices
+        IGNORE: RR, RC, RNamespace
 
 igraph_vcount:
         PARAMS: GRAPH graph
         NAME-R: vcount
         RETURN: INTEGERPTR
+
+igraph_ecount:
+        PARAMS: GRAPH graph
+        NAME-R: ecount
+        RETURN: INTEGERPTR
+        IGNORE: RR, RC, RNamespace
+
+igraph_neighbors:
+        PARAMS: GRAPH graph, OUT VECTOR neis, INTEGER vid, NEIMODE mode=ALL
+        NAME-R: neighbors
+        IGNORE: RR, RC, RNamespace
+
+igraph_is_directed:
+        PARAMS: GRAPH graph
+        NAME-R: is.directed
+        RETURN: BOOLEANPTR
+        IGNORE: RR, RC, RNamespace
+
+igraph_degree:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \ 
+                BOOLEAN loops
+        NAME-R: degree
+        IGNORE: RR, RC, RNamespace
+
+igraph_edge:
+        PARAMS: GRAPH graph, INTEGER eid, OUT INTEGERPTR from, OUT INTEGERPTR to
+        NAME-R: get.edge
+        IGNORE: RR, RC, RNamespace
+
+igraph_edges:
+        PARAMS: GRAPH graph, EDGESET eids, OUT VECTOR edges
+        NAME-R: get.edges
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_eid:
+        PARAMS: GRAPH graph, OUT INTEGERPTR eid, INTEGER from, \
+                INTEGER to, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_eids:
+        PARAMS: GRAPH graph, OUT VECTOR eids, VECTOR pairs, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_adjacent:
+        PARAMS: GRAPH graph, OUT VECTOR eids, INTEGER vid, NEIMODE mode=ALL
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Constructors, deterministic
+#######################################
+
+igraph_create:
+        PARAMS: OUT GRAPH graph, VECTOR edges, INTEGER n=0, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_adjacency:
+        PARAMS: OUT GRAPH graph, MATRIX adjmatrix, ADJACENCYMODE mode=DIRECTED
+        IGNORE: RR, RC, RNamespace
+
+igraph_star:
+        PARAMS: OUT GRAPH graph, INTEGER n, STARMODE mode=OUT, INTEGER center=0
+        IGNORE: RR, RC, RNamespace
+
+igraph_lattice:
+        PARAMS: OUT GRAPH graph, VECTOR dimvector, INTEGER nei=1, \
+                BOOLEAN directed=False, BOOLEAN mutual=False, BOOLEAN circular=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_ring:
+        PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN mutual=False, \
+                BOOLEAN circular=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_tree:
+        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER children=2, TREEMODE type=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_full:
+        PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN loops=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_atlas:
+        PARAMS: OUT GRAPH graph, INT number=0
+        IGNORE: RR, RC, RNamespace
+
+igraph_extended_chordal_ring:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, MATRIX W
+        IGNORE: RR, RC, RNamespace
+
+igraph_connect_neighborhood:
+        PARAMS: INOUT GRAPH graph, INTEGER order=2, NEIMODE mode=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_linegraph:
+        PARAMS: GRAPH graph, OUT GRAPH linegraph
+        IGNORE: RR, RC, RNamespace
+
+igraph_de_bruijn:
+        PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
+        IGNORE: RR, RC, RNamespace
+
+igraph_kautz:
+        PARAMS: OUT GRAPH graph, INTEGER m, INTEGER n
+        IGNORE: RR, RC, RNamespace
+
+igraph_famous:
+        PARAMS: OUT GRAPH graph, CSTRING name=""
+        IGNORE: RR, RC, RNamespace
+
+igraph_lcf_vector:
+        PARAMS: OUT GRAPH graph, INTEGER n, VECTOR shifts, INTEGER repeats=1
+        NAME-R: graph.lcf
+
+#######################################
+# Constructors, games
+#######################################
+
+igraph_barabasi_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m=1, VECTOR_OR_0 outseq, \
+                BOOLEAN outpref=False, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_nonlinear_barabasi_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, REAL power=1.0, INTEGER m=1, \
+                VECTOR_OR_0 outseq, BOOLEAN outpref=False, REAL zeroappeal=1.0, \
+                BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_erdos_renyi_game_gnp:
+        PARAMS: OUT GRAPH graph, INTEGER n, REAL p, BOOLEAN directed=False, BOOLEAN loops=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_erdos_renyi_game_gnm:
+        PARAMS: OUT GRAPH graph, INTEGER n, REAL m, BOOLEAN directed=False, BOOLEAN loops=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_degree_sequence_game:
+        PARAMS: OUT GRAPH graph, VECTOR out_deg, VECTOR_OR_0 in_deg, \
+                DEGSEQMODE method=SIMPLE
+        IGNORE: RR, RC, RNamespace
+
+igraph_growing_random_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m=1, BOOLEAN directed=False, \
+                BOOLEAN citation=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_barabasi_aging_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER m=1, VECTOR_OR_0 outseq, \
+                BOOLEAN outpref=False, REAL pa_exp=1.0, REAL aging_exp=0.0, INTEGER aging_bin=1, \
+                REAL zero_deg_appeal=1.0, REAL zero_age_appeal=0.0, REAL deg_coef=1.0, \
+                REAL age_coef=1.0, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_recent_degree_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, REAL power=1.0, INTEGER window=1, \
+                INTEGER m=1, VECTOR_OR_0 outseq, BOOLEAN outpref=False, \
+                REAL zero_appeal=1.0, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_recent_degree_aging_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER m=1, VECTOR_OR_0 outseq, \
+                BOOLEAN outpref=False, REAL pa_exp=1.0, REAL aging_exp=0.0, INTEGER aging_bin=1, \
+                INTEGER window=1, REAL zero_appeal=1.0, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_callaway_traits_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, \
+                INTEGER edges_per_step=1, VECTOR type_dist, MATRIX pref_matrix, \
+                BOOLEAN directed=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_establishment_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, INTEGER k=1, \
+                VECTOR type_dist, MATRIX pref_matrix, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_grg_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, REAL radius, BOOLEAN torus=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_preference_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, VECTOR type_dist, \
+                MATRIX pref_matrix, OUT VECTOR node_type_vec, BOOLEAN directed=False, \
+                BOOLEAN loops=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_asymmetric_preference_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER types, \
+                MATRIX type_dist_matrix, MATRIX pref_matrix, \
+                OUT VECTOR node_type_in_vec, OUT VECTOR node_type_out_vec, \
+                BOOLEAN loops=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_rewire_edges:
+        PARAMS: INOUT GRAPH graph, REAL prob
+        IGNORE: RR, RC, RNamespace
+
+igraph_watts_strogatz_game:
+        PARAMS: OUT GRAPH graph, INTEGER dim, INTEGER size, INTEGER nei, REAL p
+        IGNORE: RR, RC, RNamespace
+
+igraph_lastcit_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, INTEGER edges_per_node=1, \
+                INTEGER agebins=1, VECTOR preference, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_cited_type_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, VECTOR types, VECTOR pref, \
+                INTEGER edges_per_step=1, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_citing_cited_type_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, VECTOR types, MATRIX pref, \
+                INTEGER edges_per_step=1, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Basic query functions
+#######################################
+
+igraph_are_connected:
+        PARAMS: GRAPH graph, INTEGER v1, INTEGER v2, OUT BOOLEANPTR res
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Structural properties
+#######################################
+
+igraph_diameter:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, OUT INTEGERPTR from, \
+                OUT INTEGERPTR to, OUT VECTOR_OR_0 path, BOOLEAN directed=True, \
+                BOOLEAN unconnected=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_minimum_spanning_tree_unweighted:
+        PARAMS: GRAPH graph, OUT GRAPH mst
+        IGNORE: RR, RC, RNamespace
+
+igraph_minimum_spanning_tree_prim:
+        PARAMS: GRAPH graph, OUT GRAPH mst, VECTOR weights
+        IGNORE: RR, RC, RNamespace
+
+igraph_closeness:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_shortest_paths:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_shortest_paths:
+        PARAMS: GRAPH graph, OUT VECTORLIST res, INTEGER from, VERTEXSET to=ALL, \
+                NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_all_shortest_paths:
+        PARAMS: GRAPH graph, OUT VECTORLIST res, OUT VECTOR nrgeo, \
+                INTEGER from, VERTEXSET to, NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_subcomponent: 
+        PARAMS: GRAPH graph, OUT VECTOR res, REAL vid, NEIMODE mode=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_betweenness:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_edge_betweenness:
+        PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_pagerank:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True, \
+                INTEGER niter=1000, REAL eps=0.001, REAL damping=0.85
+        IGNORE: RR, RC, RNamespace
+
+igraph_rewire:
+        PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRINGMODE mode=SIMPLE
+        IGNORE: RR, RC, RNamespace
+
+igraph_subgraph:
+        PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids
+        IGNORE: RR, RC, RNamespace
+
+igraph_average_path_length:
+        PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True, BOOLEAN unconn=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_simplify:
+        PARAMS: INOUT GRAPH graph, BOOLEAN multiple=True, BOOLEAN loops=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_transitivity_undirected:
+        PARAMS: GRAPH graph, OUT REALPTR res
+        IGNORE: RR, RC, RNamespace
+
+igraph_transitivity_local_undirected:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_transitivity_avglocal_undirected:
+        PARAMS: GRAPH graph, OUT REALPTR res
+        IGNORE: RR, RC, RNamespace
+
+igraph_reciprocity:
+        PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN ignore_loops=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_constraint:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, VECTOR_OR_0 weights
+        IGNORE: RR, RC, RNamespace
+
+igraph_maxdegree:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
+                BOOLEAN loops=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_density:
+        PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN loops=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_neighborhood_size:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids, INTEGER order, \
+                NEIMODE mode=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_neighborhood:
+        PARAMS: GRAPH graph, OUT VECTORLIST res, VERTEXSET vids, INTEGER order, \
+                NEIMODE mode=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_neighborhood_graphs:
+        PARAMS: GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids, INTEGER order, \
+                NEIMODE mode=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_topological_sorting:
+        PARAMS: GRAPH graph, OUT VECTOR res, NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_is_loop:
+        PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_is_multiple:
+        PARAMS: GRAPH graph, OUT VECTOR_BOOL res, EDGESET es=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_count_multiple:
+        PARAMS: GRAPH graph, OUT VECTOR res, EDGESET es=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_girth:
+        PARAMS: GRAPH graph, OUT INTEGERPTR girth, OUT VECTOR circle
+        IGNORE: RR, RC, RNamespace
+
+igraph_add_edge:
+        PARAMS: INOUT GRAPH graph, INTEGER from, INTEGER to
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Spectral properties
+#######################################
+
+igraph_laplacian:
+        PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False
+        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Components
@@ -26,20 +407,115 @@ igraph_clusters:
         PARAMS: GRAPH graph, OUT VECTOR membership, OUT VECTOR csize, \
 	        OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
         NAME-R: clusters
-        RETURN: ERROR
+
+igraph_is_connected:
+        PARAMS: GRAPH graph, OUT BOOLEANPTR res, CONNECTEDNESS mode=WEAK
+        IGNORE: RR, RC, RNamespace
+
+igraph_decompose:
+        PARAMS: GRAPH graph, OUT GRAPHLIST components, CONNECTEDNESS mode=WEAK, \
+                LONGINT maxcompno=-1, LONGINT minelements=1
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Cliques
+#######################################
+
+igraph_cliques:
+        PARAMS: GRAPH graph, OUT VECTORLIST res, INTEGER min_size=0, INTEGER max_size=0
+        IGNORE: RR, RC, RNamespace
+
+igraph_largest_cliques:
+        PARAMS: GRAPH graph, OUT VECTORLIST res
+        IGNORE: RR, RC, RNamespace
+
+igraph_maximal_cliques:
+        PARAMS: GRAPH graph, OUT VECTORLIST res
+        IGNORE: RR, RC, RNamespace
+
+igraph_clique_number:
+        PARAMS: GRAPH graph, OUT INTEGERPTR no
+        IGNORE: RR, RC, RNamespace
+
+igraph_independent_vertex_sets:
+        PARAMS: GRAPH graph, OUT VECTORLIST res, INTEGER min_size=0, INTEGER max_size=0
+        IGNORE: RR, RC, RNamespace
+
+igraph_largest_independent_vertex_sets:
+        PARAMS: GRAPH graph, OUT VECTORLIST res
+        IGNORE: RR, RC, RNamespace
+
+igraph_maximal_independent_vertex_sets:
+        PARAMS: GRAPH graph, OUT VECTORLIST res
+        IGNORE: RR, RC, RNamespace
+
+igraph_independence_number:
+        PARAMS: GRAPH graph, OUT INTEGERPTR no
+        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Layouts
 #######################################
 
+igraph_layout_random:
+        PARAMS: GRAPH graph, OUT MATRIX res
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_circle:
+        PARAMS: GRAPH graph, OUT MATRIX res
+        IGNORE: RR, RC, RNamespace
+
 igraph_layout_fruchterman_reingold:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter, REAL maxdelta, \
-                REAL area, REAL coolexp, REAL repulserad, NULL use_seed, \
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
+                REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, NULL use_seed, \
                 VECTOR_OR_0 weight
         NAME-R: layout.fruchterman.reingold
-        RETURN: ERROR
         FLAGS: PROGRESS
         IGNORE: RR
+
+igraph_layout_grid_fruchterman_reingold:
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
+                REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph), \
+                NULL use_seed
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_kamada_kawai:
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, REAL sigma=VCOUNT(graph)/4, \
+                REAL initemp=10, REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_lgl:
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER maxiter=150, REAL maxdelta=VCOUNT(graph), \
+                REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph), \
+                INTEGER root=-1
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_reingold_tilford:
+        PARAMS: GRAPH graph, OUT MATRIX res, LONGINT root=0
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_reingold_tilford_circular:
+        PARAMS: GRAPH graph, OUT MATRIX res, LONGINT root=0
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_random_3d:
+        PARAMS: GRAPH graph, OUT MATRIX res
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_sphere:
+        PARAMS: GRAPH graph, OUT MATRIX res
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_fruchterman_reingold_3d:
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
+                REAL volume=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, NULL use_seed, \
+                VECTOR_OR_0 weight
+        IGNORE: RR, RC, RNamespace
+
+igraph_layout_kamada_kawai_3d:
+        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, REAL sigma=VCOUNT(graph)/4, \
+                REAL initemp=10, REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2
+        IGNORE: RR, RC, RNamespace
 
 igraph_layout_graphopt:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, \
@@ -47,17 +523,191 @@ igraph_layout_graphopt:
                 INTEGER spring_length=0, REAL spring_constant=1, \
                 REAL max_sa_movement=5, NULL use_seed
         NAME-R: layout.graphopt
-        RETURN: ERROR
         FLAGS: PROGRESS
 
+igraph_layout_merge_dla:
+        PARAMS: GRAPHLIST graphs, MATRIXLIST coords, OUT MATRIX res
+        IGNORE: RR, RC, RNamespace
+
 #######################################
-# Structure generators
+# Cocitation and other similarity measures
 #######################################
 
-igraph_lcf_vector:
-        PARAMS: OUT GRAPH graph, INTEGER n, VECTOR shifts, INTEGER repeats
-        NAME-R: graph.lcf
-        RETURN: ERROR
+igraph_cocitation:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_bibcoupling:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL
+        IGNORE: RR, RC, RNamespace
+
+igraph_similarity_jaccard:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
+                BOOLEAN loops
+        IGNORE: RR, RC, RNamespace
+
+igraph_similarity_dice:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
+                BOOLEAN loops
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Community structure
+#######################################
+
+igraph_community_spinglass:
+        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT REALPTR modularity,  \
+                OUT REALPTR temperature, OUT VECTOR membership, OUT VECTOR csize, \
+                INTEGER spins=25, BOOLEAN parupdate=False, REAL starttemp=1, REAL stoptemp=0.01, \
+                REAL coolfact=0.99, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
+        IGNORE: RR, RC, RNamespace
+
+igraph_community_spinglass_single:
+        PARAMS: GRAPH graph, VECTOR_OR_0 weights, INTEGER vertex, OUT VECTOR community, \
+                OUT REALPTR cohesion, OUT REALPTR adhesion, \
+                OUT INTEGERPTR inner_links, OUT INTEGERPTR outer_links, \
+                INTEGER spins=25, SPINCOMMUPDATE update_rule=CONFIG, REAL gamma=1.0
+        IGNORE: RR, RC, RNamespace
+
+igraph_community_walktrap:
+        PARAMS: GRAPH graph, VECTOR weights, INT steps=4, OUT MATRIX merges, \
+                OUT VECTOR modularity
+        IGNORE: RR, RC, RNamespace
+
+igraph_community_edge_betweenness:
+        PARAMS: GRAPH graph, OUT VECTOR result, OUT VECTOR edge_betweenness, \
+                OUT MATRIX merges, OUT VECTOR bridges, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_community_eb_get_merges:
+        PARAMS: GRAPH graph, VECTOR edges, OUT MATRIX merges, OUT VECTOR bridges
+        IGNORE: RR, RC, RNamespace
+
+igraph_community_fastgreedy:
+        PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR modularity
+        IGNORE: RR, RC, RNamespace
+
+igraph_community_to_membership:
+        PARAMS: GRAPH graph, MATRIX merges, INTEGER steps, \
+                OUT VECTOR membership, OUT VECTOR csize
+        IGNORE: RR, RC, RNamespace
+
+igraph_modularity:
+        PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity
+        IGNORE: RR, RC, RNamespace
+
+igraph_community_leading_eigenvector:
+        PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, LONGINT steps=VCOUNT(graph)
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Conversion
+#######################################
+
+igraph_get_adjacency:
+        PARAMS: GRAPH graph, OUT MATRIX res, GETADJACENCY type=BOTH
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_edgelist:
+        PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN bycol=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_to_directed:
+        PARAMS: INOUT GRAPH graph, TODIRECTED flags=MUTUAL
+        IGNORE: RR, RC, RNamespace
+
+igraph_to_undirected:
+        PARAMS: INOUT GRAPH graph, TOUNDIRECTED flags=COLLAPSE
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Read and write foreign formats
+#######################################
+
+igraph_read_graph_edgelist:
+        PARAMS: OUT GRAPH graph, INFILE instream, INTEGER n=0, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_read_graph_ncol:
+        PARAMS: OUT GRAPH graph, INFILE instream, STRVECTOR_OR_0 predefnames, \
+                BOOLEAN names=True, BOOLEAN weights=True, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_read_graph_lgl:
+        PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN names=True, BOOLEAN weights=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_read_graph_pajek:
+        PARAMS: OUT GRAPH graph, INFILE instream
+        IGNORE: RR, RC, RNamespace
+
+igraph_read_graph_graphml:
+        PARAMS: OUT GRAPH graph, INFILE instream, INT index=0
+        IGNORE: RR, RC, RNamespace
+
+igraph_read_graph_dimacs:
+        PARAMS: OUT GRAPH graph, INFILE instream, OUT INTEGERPTR source, \
+                OUT INTEGERPTR target, OUT VECTOR capacity, BOOLEAN directed=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_read_graph_graphdb:
+        PARAMS: OUT GRAPH graph, INFILE instream, BOOLEAN directed=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_read_graph_gml:
+        PARAMS: OUT GRAPH graph, INFILE instream
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_edgelist:
+        PARAMS: GRAPH graph, OUTFILE outstream
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_ncol:
+        PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight"
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_lgl:
+        PARAMS: GRAPH graph, OUTFILE outstream, CSTRING names="name", CSTRING weights="weight", \
+                BOOLEAN isolates=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_graphml:
+        PARAMS: GRAPH graph, OUTFILE outstream
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_pajek:
+        PARAMS: GRAPH graph, OUTFILE outstream
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_dimacs:
+        PARAMS: GRAPH graph, OUTFILE outstream, LONGINT source=0, LONGINT target=0, \
+                VECTOR capacity
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_gml:
+        PARAMS: GRAPH graph, OUTFILE outstream, VECTOR id, CSTRING creator="igraph"
+        IGNORE: RR, RC, RNamespace
+
+igraph_write_graph_dot:
+        PARAMS: GRAPH graph, OUTFILE outstream
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Motifs
+#######################################
+
+igraph_motifs_randesu:
+        PARAMS: GRAPH graph, OUT VECTOR hist, INT size=3, VECTOR cut_prob
+        IGNORE: RR, RC, RNamespace
+
+igraph_motifs_randesu_estimate:
+        PARAMS: GRAPH graph, OUT INTEGERPTR est, INT size=3, VECTOR cut_prob, \
+                INTEGER sample_size, VECTOR_OR_0 sample
+        IGNORE: RR, RC, RNamespace
+
+igraph_motifs_randesu_no:
+        PARAMS: GRAPH graph, OUT INTEGERPTR no, INT size=3, VECTOR cut_prob
+        IGNORE: RR, RC, RNamespace
 
 igraph_dyad_census:
         PARAMS: GRAPH graph, OUT INTEGERPTR mut, OUT INTEGERPTR asym, OUT INTEGERPTR null
@@ -68,3 +718,123 @@ igraph_triad_census:
         PARAMS: GRAPH graph, OUT VECTOR res
         NAME-R: triad.census
         RETURN: ERROR
+
+#######################################
+# Graph operators
+#######################################
+
+igraph_disjoint_union:
+        PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+        IGNORE: RR, RC, RNamespace
+
+igraph_disjoint_union_many:
+        PARAMS: OUT GRAPH res, GRAPHLIST graphs
+        IGNORE: RR, RC, RNamespace
+
+igraph_union:
+        PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+        IGNORE: RR, RC, RNamespace
+
+igraph_union_many:
+        PARAMS: OUT GRAPH res, GRAPHLIST graphs
+        IGNORE: RR, RC, RNamespace
+
+igraph_intersection:
+        PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+        IGNORE: RR, RC, RNamespace
+
+igraph_intersection_many:
+        PARAMS: OUT GRAPH res, GRAPHLIST graphs
+        IGNORE: RR, RC, RNamespace
+
+igraph_difference:
+        PARAMS: OUT GRAPH res, GRAPH orig, GRAPH sub
+        IGNORE: RR, RC, RNamespace
+
+igraph_complementer:
+        PARAMS: OUT GRAPH res, GRAPH graph, BOOLEAN loops=False
+        IGNORE: RR, RC, RNamespace
+
+igraph_compose:
+        PARAMS: OUT GRAPH res, GRAPH g1, GRAPH g2
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Maximum flows, minimum cuts
+#######################################
+
+igraph_maxflow_value:
+        PARAMS: GRAPH graph, OUT REALPTR value, INTEGER source, INTEGER target, \
+                VECTOR capacity
+        IGNORE: RR, RC, RNamespace
+
+igraph_mincut_value:
+        PARAMS: GRAPH graph, OUT REALPTR res, VECTOR capacity
+        IGNORE: RR, RC, RNamespace
+
+igraph_st_mincut_value:
+        PARAMS: GRAPH graph, OUT REALPTR res, INTEGER source, INTEGER target, \
+                VECTOR capacity
+        IGNORE: RR, RC, RNamespace
+
+igraph_mincut:
+        PARAMS: GRAPH graph, OUT INTEGERPTR value, OUT VECTOR partition, \
+                OUT VECTOR partition2, OUT VECTOR cut, VECTOR capacity
+        IGNORE: RR, RC, RNamespace
+
+igraph_st_vertex_connectivity:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target, \
+                VCONNNEI neighbors=INFINITY
+        IGNORE: RR, RC, RNamespace
+
+igraph_vertex_connectivity:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_st_edge_connectivity:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        IGNORE: RR, RC, RNamespace
+
+igraph_edge_connectivity:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_edge_disjoint_paths:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        IGNORE: RR, RC, RNamespace
+
+igraph_vertex_disjoint_paths:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, INTEGER source, INTEGER target
+        IGNORE: RR, RC, RNamespace
+
+igraph_adhesion:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+        IGNORE: RR, RC, RNamespace
+
+igraph_cohesion:
+        PARAMS: GRAPH graph, OUT INTEGERPTR res, BOOLEAN checks=True
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# K-Cores
+#######################################
+
+igraph_coreness:
+        PARAMS: GRAPH graph, OUT VECTOR cores, NEIMODE mode=ALL
+        IGNORE: RR, RC, RNamespace
+
+#######################################
+# Other, not graph related
+#######################################
+
+igraph_running_mean:
+        PARAMS: VECTOR data, OUT VECTOR res, INTEGER binwidth
+        IGNORE: RR, RC, RNamespace
+
+igraph_random_sample:
+        PARAMS: OUT VECTOR res, INTEGER l, INTEGER h, INTEGER length
+        IGNORE: RR, RC, RNamespace
+
+igraph_convex_hull:
+        PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
+        IGNORE: RR, RC, RNamespace

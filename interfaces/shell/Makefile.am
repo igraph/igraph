@@ -15,6 +15,7 @@ funcs.txt: interface.c.in ../functions.def ../../tools/stimulus.py
 	-l ShellLn
 
 igraph_CPPFLAGS = -I $(top_srcdir)/include/
+igraph_CFLAGS = -Wall -O2
 igraph_LDFLAGS = -L$(top_srcdir)/src/.libs -ligraph
 igraph_SOURCES = interface.c
 

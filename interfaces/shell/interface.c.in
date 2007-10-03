@@ -28,6 +28,10 @@
 #include <stdio.h>
 #include <getopt.h>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <errno.h>
+#include <limits.h>
+#include <ctype.h>
 
 #include "igraph.h"
 
@@ -38,6 +42,16 @@
 
 int shell_igraph_usage(int argc, char **argv) {
   printf("Command line interface to igraph\n");
+  return 0;
+}
+
+int shell_skip_whitespace(FILE *fin) {
+  int c;
+  c=fgetc(fin);
+  while (isspace(c)) {
+    c=fgetc(fin);
+  }
+  if (c!=EOF) { ungetc(c, fin); }
   return 0;
 }
 
@@ -66,14 +80,14 @@ FILE *shell_open_file(const char *where, const char *mode) {
 int shell_read_graph(igraph_t *graph, const char *where) {
   FILE *fin=shell_open_file(where, "r");
   igraph_read_graph_graphml(graph, fin, 0);
-  close(fin);
+  fclose(fin);
   return 0;
 }
 
 int shell_write_graph(const igraph_t *graph, const char *where) {
   FILE *fout=shell_open_file(where, "w");
   igraph_write_graph_graphml(graph, fout);
-  close(fout);
+  fclose(fout);
   return 0;
 }
 
@@ -88,7 +102,7 @@ int shell_read_vector(igraph_vector_t *v, const char *where) {
       igraph_vector_push_back(v, n);
     }
   }
-  close(fin);
+  fclose(fin);
   if (ret != EOF) {
     fprintf(stderr, "Error reading vector from file: `%s'\n", where);
     exit(1);
@@ -97,38 +111,41 @@ int shell_read_vector(igraph_vector_t *v, const char *where) {
   return 0;
 }
 
-int shell_write_vector(const igraph_vector_t *v, const char *where) {
-  FILE *fout=shell_open_file(where, "w");
+int shell_write_a_vector(const igraph_vector_t *v, FILE *fout, const char *where) {
   int ret=1;
   long int i, n=igraph_vector_size(v);
   if (n>0) { ret=fprintf(fout, "%g", VECTOR(*v)[0]); }
   if (ret <= 0) { 
     fprintf(stderr, "Cannot write vector to `%s'\n", where);
-    close(fout);
+    fclose(fout);
     exit(1);
   }
   for (i=1; i<n; i++) {
     ret=fprintf(fout, " %g", VECTOR(*v)[i]);
     if (ret <= 0) { 
       fprintf(stderr, "Cannot write vector to `%s'\n", where);
-      close(fout);
+      fclose(fout);
       exit(1);
     }
   }
   fprintf(fout, "\n");
-  close(fout);
-  
+  return 0;
+}  
+
+int shell_write_vector(const igraph_vector_t *v, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  shell_write_a_vector(v, fout, where);
+  fclose(fout);  
   return 0;
 }
 
-int shell_read_matrix(igraph_matrix_t *m, const char *where) {
-  FILE *fin=shell_open_file(where, "r");
+int shell_read_a_matrix(igraph_matrix_t *m, FILE *fin, const char *where) {
   long int ncol, nrow, i, j;
   igraph_real_t n;
   int ret;
   if (2 != fscanf(fin, "%li %li", &nrow, &ncol)) {
     fprintf(stderr, "Error reading matrix from file '%s'\n", where);
-    close(fin);
+    fclose(fin);
     exit(1);
   }
   igraph_matrix_init(m,nrow,ncol);
@@ -137,14 +154,19 @@ int shell_read_matrix(igraph_matrix_t *m, const char *where) {
       ret=fscanf(fin, "%lf", &n);
       if (ret <= 0) { 
 	fprintf(stderr, "Error reading matrix from file '%s'\n", where);
-	close(fin);
+	fclose(fin);
 	exit(1);
       }
       MATRIX(*m, i, j)=n;
     }
   }
-  close(fin);
-      
+  return 0;
+}
+
+int shell_read_matrix(igraph_matrix_t *m, const char *where) {
+  FILE *fin=shell_open_file(where, "r");
+  shell_read_a_matrix(m, fin, where);
+  fclose(fin);      
   return 0;
 }
 
@@ -156,7 +178,7 @@ int shell_write_matrix(const igraph_matrix_t *m, const char *where) {
     
   if (0>fprintf(fout, "%li %li\n", nrow, ncol)) {
     fprintf(stderr, "Error writing matrix to file '%s'.\n", where);
-    close(fout);
+    fclose(fout);
     exit(1);
   }
 
@@ -165,13 +187,13 @@ int shell_write_matrix(const igraph_matrix_t *m, const char *where) {
       if (j!=0) { fprintf(fout, " "); }
       if (0>fprintf(fout, "%g", MATRIX(*m, i, j))) {
 	fprintf(stderr, "Error writing matrix to file '%s'.\n", where);
-	close(fout);
+	fclose(fout);
 	exit(1);
       }
     }
     fprintf(fout, "\n");
   }
-  close(fout);
+  fclose(fout);
   
   return 0;
 }
@@ -192,7 +214,7 @@ int shell_write_integer(igraph_integer_t n, const char *where) {
   int ret=fprintf(fout, "%li\n", (long int)n);
   if (ret <= 0) { 
     fprintf(stderr, "Cannot write integer to '%s'\n", where);
-    close(fout);
+    fclose(fout);
     exit(1);
   }
   return 0;
@@ -216,7 +238,7 @@ int shell_write_boolean(igraph_bool_t b, const char *where) {
   int ret=fprintf(fout, "%i\n", bb);
   if (ret <= 0) { 
     fprintf(stderr, "Cannot write integer to '%s'\n", where);
-    close(fout);
+    fclose(fout);
     exit(1);
   }  
   return 0;
@@ -236,26 +258,189 @@ int shell_write_real(igraph_real_t b, const char *where) {
   int ret=fprintf(fout, "%g\n", (double)b);
   if (ret <= 0) { 
     fprintf(stderr, "Cannot write real to `%s'\n", where);
-    close(fout);
+    fclose(fout);
     exit(1);
   }
   return 0;
 }
 
-int shell_read_connectedness(igraph_connectedness_t *c, const char *where) {
-  if (!strcasecmp(where, "w") ||
-      !strcasecmp(where, "weak")) {
-    *c=IGRAPH_WEAK;
-  } else if (!strcasecmp(where, "s") ||
-	     !strcasecmp(where, "strong")) {
-    *c=IGRAPH_STRONG;
-  } else {
-    fprintf(stderr, "Cannot interpret connectedness type: '%s'.\n", where);
+int shell_read_enum(void* value, const char *where, ...) {
+  int result=-1, *p=value;
+  va_list args;
+  va_start(args, where);
+  
+  while (1) {
+    char *name=va_arg(args, char*);
+    int code;
+    if (name) {
+      code=va_arg(args, int);
+      if (!strcmp(optarg, name)) {
+	result=code;
+	break;
+      }
+    } else {
+      break;
+    }
+  }
+  
+  if (result==-1) {
+    fprintf(stderr, "Cannot interpret argument: '%s'.\n", where);
     exit(1);
+  }   
+
+  *p=result;
+
+  return 0;
+}
+
+int shell_read_int(int *value, const char *where) {
+  long int li=strtol(where, 0, 10);
+  if (errno || li<INT_MIN || li>INT_MAX) {
+    fprintf(stderr, "Integer too small/big: '%s'.\n", where);
+  }
+  *value=li;
+  return 0;
+}
+
+int shell_read_longint(long int *value, const char *where) {
+  long int li=strtol(where, 0, 10);
+  if (errno) {
+    fprintf(stderr, "Long integer too small/big: '%s'.\n", where);
+  }
+  *value=li;
+  return 0;
+}
+
+int shell_read_file(FILE **file, const char *where, const char *mode) {
+  *file=fopen(where, mode);
+  if (!*file) {
+    fprintf(stderr, "Cannot open file '%s'\n", where);
   }
   return 0;
 }
+
+int shell_read_matrixlist(igraph_vector_ptr_t *list, const char *where) {
+  FILE *fin=shell_open_file(where, "r");
+  igraph_vector_ptr_init(list, 0);
+  shell_skip_whitespace(fin);
+  while (!feof(fin)) {
+    igraph_matrix_t *m=malloc(sizeof(igraph_matrix_t));
+    shell_read_a_matrix(m, fin, where);
+    igraph_vector_ptr_push_back(list, m);
+    shell_skip_whitespace(fin);
+  }
+  fclose(fin);
+  return 0;
+}
+
+int shell_read_graphlist(igraph_vector_ptr_t *list, const char *where) {
+  FILE *fin=shell_open_file(where, "r");
+  igraph_vector_ptr_init(list, 0);
+  shell_skip_whitespace(fin);
+  while (!feof(fin)) {
+    igraph_t *g=malloc(sizeof(igraph_t));
+    igraph_read_graph_graphml(g, fin, 0);
+    igraph_vector_ptr_push_back(list, g);
+    shell_skip_whitespace(fin);
+  }
+  fclose(fin);
+  return 0;
+}
+
+int shell_read_strvector(igraph_strvector_t *str, const char *where) {
+  FILE *fin=shell_open_file(where, "r");
+  char *buffer=calloc(1000, sizeof(char));
+  size_t size;
+  int c;
+  igraph_strvector_init(str, 0);
+  while(1) {
+    getline(&buffer, &size, fin);
+    igraph_strvector_add(str, buffer);
+    c=getc(fin);
+    if (!feof(fin)) {
+      ungetc(c, fin);
+    } else {
+      break;
+    }
+  }
+  fclose(fin);
+  free(buffer);
   
+  return 0;
+}
+
+int shell_write_vectorlist(igraph_vector_ptr_t *v, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) {
+    shell_write_a_vector(VECTOR(*v)[i], fout, where);
+  }
+  fclose(fout);
+  return 0;
+}
+
+int shell_write_vector_bool(igraph_vector_bool_t *v, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  int ret=1;
+  long int i, n=igraph_vector_bool_size(v);
+  if (n>0) { ret=fprintf(fout, "%i", VECTOR(*v)[0]==0 ? 0 : 1); }
+  if (ret <= 0) { 
+    fprintf(stderr, "Cannot write vector to `%s'\n", where);
+    fclose(fout);
+    exit(1);
+  }
+  for (i=1; i<n; i++) {
+    ret=fprintf(fout, " %i", VECTOR(*v)[i]==0 ? 0 : 1);
+    if (ret <= 0) { 
+      fprintf(stderr, "Cannot write vector to `%s'\n", where);
+      fclose(fout);
+      exit(1);
+    }
+  }
+  fprintf(fout, "\n");
+  fclose(fout);
+  return 0;
+}  
+
+int shell_write_graphlist(igraph_vector_ptr_t *v, const char *where) {
+  FILE *fout=shell_open_file(where, "w");
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) {
+    igraph_write_graph_graphml(VECTOR(*v)[i], fout);
+  }
+  fclose(fout);
+  return 0;
+}
+
+int shell_free_graphlist(igraph_vector_ptr_t *v) {
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) {
+    igraph_destroy(VECTOR(*v)[i]);
+    free(VECTOR(*v)[i]);
+    VECTOR(*v)[i]=0;
+  }
+  return 0;
+}
+
+int shell_free_matrixlist(igraph_vector_ptr_t *v) {
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) {
+    igraph_matrix_destroy(VECTOR(*v)[i]);
+    free(VECTOR(*v)[i]);
+    VECTOR(*v)[i]=0;
+  }
+  return 0;
+}
+
+int shell_free_vectorlist(igraph_vector_ptr_t *v) {
+  long int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) {
+    igraph_vector_destroy(VECTOR(*v)[i]);
+    free(VECTOR(*v)[i]);
+    VECTOR(*v)[i]=0;
+  }
+  return 0;
+}
 
 /* ------------------------------------------------------------------------ */
 /* Stimulus generated interface next                                        */
