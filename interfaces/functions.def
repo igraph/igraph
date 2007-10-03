@@ -58,3 +58,13 @@ igraph_lcf_vector:
         PARAMS: OUT GRAPH graph, INTEGER n, VECTOR shifts, INTEGER repeats
         NAME-R: graph.lcf
         RETURN: ERROR
+
+igraph_dyad_census:
+        PARAMS: GRAPH graph, OUT INTEGERPTR mut, OUT INTEGERPTR asym, OUT INTEGERPTR null
+        NAME-R: dyad.census
+        RETURN: ERROR
+
+igraph_triad_census:
+        PARAMS: GRAPH graph, OUT VECTOR res
+        NAME-R: triad.census
+        RETURN: ERROR

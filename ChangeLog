@@ -1,6 +1,11 @@
+2007-10-02  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/motifs.c (igraph_dyad_census, igraph_triad_census)
+	(igraph_triad_census_24) : added
+
 2007-09-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* src/games.c (erdos_renyi_game_gnp) : three bugs corrected,
+	* src/games.c (igraph_erdos_renyi_game_gnp) : three bugs corrected,
 	should solve issue #30
 
 2007-09-12  Gabor Csardi  <csardi@rmki.kfki.hu>

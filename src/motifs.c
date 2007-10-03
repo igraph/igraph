@@ -651,3 +651,141 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
   IGRAPH_FINALLY_CLEAN(5);
   return 0;
 }
+
+/**
+ * \function igraph_dyad_census
+ * TODO
+ */
+
+int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
+		       igraph_integer_t *asym, igraph_integer_t *null) {
+  
+  igraph_integer_t vc=igraph_vcount(graph);
+  igraph_integer_t ec=igraph_ecount(graph);
+  igraph_real_t rec;
+
+  if (!igraph_is_directed(graph)) {
+    IGRAPH_WARNING("Dyad census called on undirected graph");
+  }
+
+  IGRAPH_CHECK(igraph_reciprocity(graph, &rec, 1));
+  *mut = rec*ec/(rec+1);
+  *asym = ec-2*(*mut);
+  *null = vc*(vc-1)/2-(*mut)-(*asym);
+  
+  return 0;
+}
+
+/**
+ * \function igraph_triad_census_24
+ * TODO
+ */
+
+int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
+			   igraph_integer_t *res4) {
+  
+  long int vc=igraph_vcount(graph);
+  igraph_vector_long_t seen;
+  igraph_vector_t *neis, *neis2;
+  long int i, j, k, s, neilen, neilen2, ign;
+  igraph_i_adjlist_t adjlist;
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&seen, vc));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &seen);
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &adjlist);
+  *res2=*res4=0;
+
+  for (i=0; i<vc; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    neis=igraph_i_adjlist_get(&adjlist, i);
+    neilen=igraph_vector_size(neis);
+    /* mark neighbors of i & i itself */
+    VECTOR(seen)[i]=i+1;
+    ign=0;
+    for (j=0; j<neilen; j++) {
+      long int nei=VECTOR(*neis)[j];
+      if (VECTOR(seen)[nei]==i+1 || VECTOR(seen)[nei]==-(i+1)) {
+	/* multiple edges or loop edge */
+	VECTOR(seen)[nei]=-(i+1);
+	ign++;
+      } else {
+	VECTOR(seen)[nei]=i+1;
+      }
+    }
+    
+    for (j=0; j<neilen; j++) {
+      long int nei=VECTOR(*neis)[j];
+      if (nei<=i || (j>0 && nei==VECTOR(*neis)[j-1])) { continue; }
+      neis2=igraph_i_adjlist_get(&adjlist, nei);
+      neilen2=igraph_vector_size(neis2);
+      s=0;
+      for (k=0; k<neilen2; k++) {
+	long int nei2=VECTOR(*neis2)[k];
+	if (k>0 && nei2==VECTOR(*neis2)[k-1]) { continue; }	
+	if (VECTOR(seen)[nei2] != i+1 && VECTOR(seen)[nei2] != -(i+1)) {
+	  s++;
+	}
+      }
+      if (VECTOR(seen)[nei] > 0) {
+	*res2 += vc-s-neilen+ign-1;
+      } else {
+	*res4 += vc-s-neilen+ign-1;
+      }
+    }
+  }
+
+  igraph_i_adjlist_destroy(&adjlist);
+  igraph_vector_long_destroy(&seen);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
+/**
+ * \function igraph_triad_census
+ * TODO
+ */
+
+int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
+
+  igraph_vector_t cut_prob;
+  igraph_integer_t m2, m4;
+  igraph_vector_t tmp;
+  igraph_integer_t vc=igraph_vcount(graph);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&cut_prob, 3); /* all zeros */
+  IGRAPH_CHECK(igraph_vector_resize(res, 16));
+  IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
+  
+  IGRAPH_CHECK(igraph_triad_census_24(graph, &m2, &m4));
+  VECTOR(tmp)[1]=m2;
+  VECTOR(tmp)[3]=m4;
+  VECTOR(tmp)[0]=vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
+  
+  /* Reorder */
+  VECTOR(*res)[0] = VECTOR(tmp)[0];
+  VECTOR(*res)[1] = VECTOR(tmp)[1];
+  VECTOR(*res)[2] = VECTOR(tmp)[3];
+  VECTOR(*res)[3] = VECTOR(tmp)[6];
+  VECTOR(*res)[4] = VECTOR(tmp)[2];
+  VECTOR(*res)[5] = VECTOR(tmp)[4];
+  VECTOR(*res)[6] = VECTOR(tmp)[5];
+  VECTOR(*res)[7] = VECTOR(tmp)[9];
+  VECTOR(*res)[8] = VECTOR(tmp)[7];
+  VECTOR(*res)[9] = VECTOR(tmp)[11];
+  VECTOR(*res)[10] = VECTOR(tmp)[10];
+  VECTOR(*res)[11] = VECTOR(tmp)[8];
+  VECTOR(*res)[12] = VECTOR(tmp)[13];
+  VECTOR(*res)[13] = VECTOR(tmp)[12];
+  VECTOR(*res)[14] = VECTOR(tmp)[14];
+  VECTOR(*res)[15] = VECTOR(tmp)[15];
+  
+  igraph_vector_destroy(&cut_prob);
+  igraph_vector_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(2);  
+  
+  return 0;
+}
+

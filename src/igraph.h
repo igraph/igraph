@@ -1112,6 +1112,11 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 				   const igraph_vector_t *sample);
 int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 			     int size, const igraph_vector_t *cut_prob);
+int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
+		       igraph_integer_t *asym, igraph_integer_t *null);
+int igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
+int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
+			   igraph_integer_t *res4);
 
 /* -------------------------------------------------- */
 /* Progress handlers                                  */
