@@ -149,7 +149,7 @@ int igraph_evolver_d(igraph_t *graph,
  
     /* Update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
-      long int to=VECTOR(edges)[edgeptr_save+1];
+      long int to=VECTOR(edges)[edgeptr_save+j*2+1];
       long int deg=VECTOR(degree)[to];
       long int a= deg < kernel_size ? VECTOR(*kernel)[deg] : 
 	VECTOR(*kernel)[kernel_size-1];

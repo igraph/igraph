@@ -272,8 +272,11 @@ int igraph_revolver_st_d(const igraph_t *graph,
     for (i=0; i<igraph_vector_size(&neis); i++) {
       long int to=VECTOR(neis)[i];
       long int xidx=VECTOR(indegree)[to];
-      VECTOR(indegree)[to]+=1;
       VECTOR(*st)[node] += -VECTOR(*kernel)[xidx]+VECTOR(*kernel)[xidx+1];
+    }
+    for (i=0; i<igraph_vector_size(&neis); i++) {
+      long int to=VECTOR(neis)[i];
+      VECTOR(indegree)[to]+=1;
     }
   }
   

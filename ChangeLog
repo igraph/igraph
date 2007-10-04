@@ -1,5 +1,8 @@
 2007-10-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/evolver_cit.c (igraph_evolver_d) : bug corrected
+	* src/revolver_cit.c (igraph_revolver_st_d) : bug corrected
+
 	* src/structural_properties.c (igraph_is_simple) : added
 
 2007-10-02  Gabor Csardi  <csardi@rmki.kfki.hu>
