@@ -762,6 +762,7 @@ int igraph_topological_sorting(const igraph_t *graph, igraph_vector_t *res,
 			       igraph_neimode_t mode);
 int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res, 
 		   igraph_es_t es);
+int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
 int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res, 
 		       igraph_es_t es);
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es);

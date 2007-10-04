@@ -49,6 +49,13 @@ BOOLEAN:
   INCONV:
     IN: %C%=LOGICAL(%I%)[0];
 
+BOOLEANPTR:
+  CTYPE: igraph_bool_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_LOGICAL(1)); \
+         LOGICAL(%I%)[0]=%C%;
+
 ##################################
 # ERROR, used as the return type usually
 

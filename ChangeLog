@@ -1,3 +1,7 @@
+2007-10-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_is_simple) : added
+
 2007-10-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/motifs.c (igraph_dyad_census, igraph_triad_census)

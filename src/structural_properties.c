@@ -3634,6 +3634,39 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
 }
 
 /**
+ * \function igraph_is_simple
+ */
+
+int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
+  long int vc=igraph_vcount(graph);
+  long int ec=igraph_ecount(graph);
+  
+  if (vc==0 || ec==0) {
+    *res=1;
+  } else {
+    igraph_vector_t neis;
+    long int i, j, n;
+    igraph_bool_t found=0;
+    IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);    
+    for (i=0; !found && i<vc; i++) {
+      igraph_neighbors(graph, &neis, i, IGRAPH_OUT);
+      n=igraph_vector_size(&neis);
+      for (j=0; j<n; j++) {
+	if (VECTOR(neis)[j]==i) { found=1; break; }
+	if (j>0 && VECTOR(neis)[j-1]==VECTOR(neis)[j]) {
+	  found=1; break;
+	}
+      }
+    }
+    *res=!found;
+    igraph_vector_destroy(&neis);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
+/**
  * \function igraph_is_loop
  * \brief Find the loop edges in a graph
  * 
