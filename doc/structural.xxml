@@ -73,6 +73,7 @@
 </section>
 
 <section><title>Non-simple graphs: multiple and loop edges</title>
+<!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_count_multiple -->

@@ -654,7 +654,33 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 
 /**
  * \function igraph_dyad_census
- * TODO
+ * \brief Calculating the dyad census as defined by Holland and Leinhardt
+ * 
+ * </para><para>
+ * Dyad census means classifying each pair of vertices of a directed
+ * graph into three categories: mutual, there is an edge from \c a to
+ * \c b and also from \c b to \c a; asymmetric, there is an edge
+ * either from \c a to \c b or from \c b to \c a but not the other way
+ * and null, no edges between \c a and \c b.
+ * 
+ * </para><para>
+ * Holland, P.W. and Leinhardt, S.  (1970).  A Method for Detecting
+ * Structure in Sociometric Data.  American Journal of Sociology,
+ * 70, 492-513. 
+ * \param graph The input graph, a warning is given if undirected as 
+ *    the results are undefined for undirected graphs.
+ * \param mut Pointer to an integer, the number of mutual dyads is
+ *    stored here.
+ * \param asym Pointer to an integer, the number of asymmetric dyads
+ *    is stored here.
+ * \param null Pointer to an integer, the number of null dyads is
+ *    stored here.
+ * \return Error code.
+ *
+ * \sa \ref igraph_reciprocity(), \ref igraph_triad_census().
+ * 
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number
+ * of edges.
  */
 
 int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
@@ -745,7 +771,69 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
 
 /**
  * \function igraph_triad_census
- * TODO
+ * \brief Triad census, as defined by Davis and Leinhardt
+ * 
+ * </para><para>
+ * Calculating the triad census means classifying every triples of
+ * vertices in a directed graph. A triple can be in one of 16 states:
+ * \clist
+ * \cli 003 
+ *      A, B, C, the empty graph.
+ * \cli 012 
+ *      A->B, C, a graph with a single directed edge.
+ * \cli 102 
+ *      A&lt;->B, C, a graph with a mutual connection between two vertices.
+ * \cli 021D 
+ *      A&lt;-B->C, the binary out-tree.
+ * \cli 021U 
+ *      A->B&lt;-C, the binary in-tree.
+ * \cli 021C 
+ *      A->B->C, the directed line.
+ * \cli 111D 
+ *      A&lt;->B&lt;-C.
+ * \cli 111U 
+ *      A&lt;->B->C.
+ * \cli 030T 
+ *      A->B&lt;-C, A->C.
+ * \cli 030C 
+ *      A&lt;-B&lt;-C, A->C.
+ * \cli 201 
+ *      A&lt;->B&lt;->C.
+ * \cli 120D 
+ *      A&lt;-B->C, A&lt;->C.
+ * \cli 120U 
+ *      A->B&lt;-C, A&lt;->C.
+ * \cli 120C 
+ *      A->B->C, A&lt;->C.
+ * \cli 210 
+ *      A->B&lt;->C, A&lt;->C.
+ * \cli 300 
+ *      A&lt;->B&lt;->C, A&lt;->C, the complete graph.
+ * \endclist
+ *
+ * </para><para>
+ * See also Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
+ * Positive Interpersonal Relations in Small Groups.  In J. Berger
+ * (Ed.), Sociological Theories in Progress, Volume 2, 218-251. 
+ * Boston: Houghton Mifflin.
+ * 
+ * </para><para>
+ * This function calls \ref igraph_motifs_randesu() which is an
+ * implementation of the FANMOD motif finder tool, see \ref
+ * igraph_motifs_randesu() for details. Note that the order of the
+ * triads is not the same for \ref igraph_triad_census() and \ref
+ * igraph_motifs_randesu().
+ * 
+ * \param graph The input graph. A warning is given for undirected
+ *   graphs, as the result is undefined for those.
+ * \param res Pointer to an initialized vector, the result is stored
+ *   here in the same order as given in the list above. Note that this
+ *   order is different than the one used by \ref igraph_motifs_randesu().
+ * \return Error code.
+ * 
+ * \sa \ref igraph_motifs_randesu(), \ref igraph_dyad_census().
+ * 
+ * Time complexity: TODO.
  */
 
 int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
@@ -754,6 +842,11 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   igraph_integer_t m2, m4;
   igraph_vector_t tmp;
   igraph_integer_t vc=igraph_vcount(graph);
+
+  if (!igraph_is_directed(graph)) {
+    IGRAPH_WARNING("Triad census called on an undirected graph");
+  }
+
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&cut_prob, 3); /* all zeros */
   IGRAPH_CHECK(igraph_vector_resize(res, 16));

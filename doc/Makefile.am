@@ -41,8 +41,8 @@ error.xml: error.xxml $(SRCDIR)/error.h
 matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt $(SRCDIR)/spmatrix.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt $(SRCDIR)/spmatrix.c
 
-basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c
+basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 
 generators.xml: generators.xxml $(SRCDIR)/structure_generators.c $(SRCDIR)/games.c \
 		$(SRCDIR)/atlas.c $(SRCDIR)/structural_properties.c

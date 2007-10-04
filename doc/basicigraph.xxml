@@ -107,6 +107,7 @@ To eliminate multiple edges from a graph, you can use
 </section>
 
 <section><title>Adding and Deleting Vertices and Edges</title>
+<!-- doxrox-include igraph_add_edge -->
 <!-- doxrox-include igraph_add_edges -->
 <!-- doxrox-include igraph_add_vertices -->
 <!-- doxrox-include igraph_delete_edges -->
