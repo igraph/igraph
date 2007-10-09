@@ -132,7 +132,6 @@ int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent
   return 0;
 }
 
-
 PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
   PyObject* o;
   if (!PyArg_ParseTuple(args, "O", &o)) return NULL;
@@ -1128,7 +1127,7 @@ PyMODINIT_FUNC initcore(void) {
   
   igraphmodule_InternalError =
     PyErr_NewException("igraph.core.InternalError", PyExc_Exception, NULL);
-  
+
   Py_INCREF(igraphmodule_InternalError);
   
   m = Py_InitModule3("igraph.core", igraphmodule_methods,
@@ -1174,9 +1173,10 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddStringConstant(m, "__version__", VERSION);
   PyModule_AddStringConstant(m, "__build_date__", __DATE__);
 
-  /* initialize error, progress and interruption handler */
+  /* initialize error, progress, warning and interruption handler */
   igraph_set_error_handler(igraphmodule_igraph_error_hook);
   igraph_set_progress_handler(igraphmodule_igraph_progress_hook);
+  igraph_set_warning_handler(igraphmodule_igraph_warning_hook);
   igraph_set_interruption_handler(igraphmodule_igraph_interrupt_hook);
   
   /* initialize attribute handlers */

@@ -53,6 +53,17 @@ PyObject* igraphmodule_handle_igraph_error()
 
 /**
  * \ingroup python_interface_errors
+ * \brief Warning hook for \c igraph
+ */
+void igraphmodule_igraph_warning_hook(const char *reason, const char *file,
+				    int line, int igraph_errno) {
+  char buf[4096];
+  sprintf(buf, "%s at %s:%i", reason, file, line);
+  PyErr_Warn(PyExc_RuntimeWarning, buf);
+}
+
+/**
+ * \ingroup python_interface_errors
  * \brief Error hook for \c igraph
  */
 void igraphmodule_igraph_error_hook(const char *reason, const char *file,
