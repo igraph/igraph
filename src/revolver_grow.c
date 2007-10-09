@@ -81,7 +81,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
   IGRAPH_CHECK(igraph_i_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_i_lazy_adjedgelist_destroy, &adjlist);
 
-  igraph_progress("Revolver d-d", 0, NULL);
+  IGRAPH_PROGRESS("Revolver d-d", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -139,7 +139,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver d-d", 100.0*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver d-d", 100.0*(i+1)/niter, NULL);
   }
 
   igraph_i_lazy_adjedgelist_destroy(&adjlist);
@@ -738,7 +738,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
   IGRAPH_CHECK(igraph_i_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_i_lazy_adjedgelist_destroy, &adjlist);
 
-  igraph_progress("Revolver p-p", 0, NULL);
+  IGRAPH_PROGRESS("Revolver p-p", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -801,7 +801,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver p-p", 100.0*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver p-p", 100.0*(i+1)/niter, NULL);
   }
 
   igraph_i_lazy_adjedgelist_destroy(&adjlist);

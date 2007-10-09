@@ -56,7 +56,7 @@ int igraph_revolver_d(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));  
   
-  igraph_progress("Revolver d", 0, NULL);
+  IGRAPH_PROGRESS("Revolver d", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -97,7 +97,7 @@ int igraph_revolver_d(const igraph_t *graph,
       }
     }
     
-    igraph_progress("Revolver d", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver d", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -487,7 +487,7 @@ int igraph_revolver_ad(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Revolver ad", 0, NULL);
+  IGRAPH_PROGRESS("Revolver ad", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -528,7 +528,7 @@ int igraph_revolver_ad(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver ad", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver ad", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -983,7 +983,7 @@ int igraph_revolver_ade(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Revolver ade", 0, NULL);
+  IGRAPH_PROGRESS("Revolver ade", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1027,7 +1027,7 @@ int igraph_revolver_ade(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver ade", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver ade", 100*(i+1)/niter, NULL);
   }
 
   igraph_vector_destroy(&st);
@@ -1411,7 +1411,7 @@ int igraph_revolver_e(const igraph_t *graph,
   
   nocats=igraph_vector_max(cats)+1;
 
-  igraph_progress("Revolver e", 0, NULL);
+  IGRAPH_PROGRESS("Revolver e", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1451,7 +1451,7 @@ int igraph_revolver_e(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver e", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver e", 100*(i+1)/niter, NULL);
 
   }
 
@@ -1727,7 +1727,7 @@ int igraph_revolver_de(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Revolver de", 0, NULL);
+  IGRAPH_PROGRESS("Revolver de", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
@@ -1769,7 +1769,7 @@ int igraph_revolver_de(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver de", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver de", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -2094,7 +2094,7 @@ int igraph_revolver_l(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  igraph_progress("Revolver l", 0, NULL);
+  IGRAPH_PROGRESS("Revolver l", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2134,7 +2134,7 @@ int igraph_revolver_l(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver l", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver l", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -2478,7 +2478,7 @@ int igraph_revolver_dl(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
 
-  igraph_progress("Revolver dl", 0, NULL);
+  IGRAPH_PROGRESS("Revolver dl", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2518,7 +2518,7 @@ int igraph_revolver_dl(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver dl", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver dl", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -2889,7 +2889,7 @@ int igraph_revolver_el(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
 
-  igraph_progress("Revolver el", 0, NULL);
+  IGRAPH_PROGRESS("Revolver el", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2930,7 +2930,7 @@ int igraph_revolver_el(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver el", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver el", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3317,7 +3317,7 @@ int igraph_revolver_r(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  igraph_progress("Revolver r", 0, NULL);
+  IGRAPH_PROGRESS("Revolver r", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3357,7 +3357,7 @@ int igraph_revolver_r(const igraph_t *graph,
       }
     }
     
-    igraph_progress("Revolver r", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver r", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -3730,7 +3730,7 @@ int igraph_revolver_ar(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  igraph_progress("Revolver ar", 0, NULL);
+  IGRAPH_PROGRESS("Revolver ar", 0, NULL);
   for (i=0; i<niter; i++) {
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -3773,7 +3773,7 @@ int igraph_revolver_ar(const igraph_t *graph,
       }
     }
     
-    igraph_progress("Revolver ar", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver ar", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -4173,7 +4173,7 @@ int igraph_revolver_di(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Revolver di", 0, NULL);
+  IGRAPH_PROGRESS("Revolver di", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
@@ -4215,7 +4215,7 @@ int igraph_revolver_di(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver di", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver di", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -4565,7 +4565,7 @@ int igraph_revolver_adi(const igraph_t *graph,
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  igraph_progress("Revolver adi", 0, NULL);
+  IGRAPH_PROGRESS("Revolver adi", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
@@ -4608,7 +4608,7 @@ int igraph_revolver_adi(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver adi", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver adi", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -5000,7 +5000,7 @@ int igraph_revolver_il(const igraph_t *graph,
   
   nocats=igraph_vector_max(cats)+1;
 
-  igraph_progress("Revolver il", 0, NULL);
+  IGRAPH_PROGRESS("Revolver il", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION();
@@ -5041,7 +5041,7 @@ int igraph_revolver_il(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver il", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver il", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -5457,7 +5457,7 @@ int igraph_revolver_ir(const igraph_t *graph,
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(1);
   
-  igraph_progress("Revolver di", 0, NULL);
+  IGRAPH_PROGRESS("Revolver di", 0, NULL);
   for (i=0; i<niter; i++) {
     
     IGRAPH_ALLOW_INTERRUPTION(); 
@@ -5500,7 +5500,7 @@ int igraph_revolver_ir(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver di", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver di", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);
@@ -5895,7 +5895,7 @@ int igraph_revolver_air(const igraph_t *graph,
   igraph_integer_t nocats;
   igraph_vector_t neis;
     
-  igraph_progress("Revolver air", 0, NULL);
+  IGRAPH_PROGRESS("Revolver air", 0, NULL);
 
   nocats=igraph_vector_max(cats)+1;
 
@@ -5970,7 +5970,7 @@ int igraph_revolver_air(const igraph_t *graph,
       }
     }
 
-    igraph_progress("Revolver air", 100*(i+1)/niter, NULL);
+    IGRAPH_PROGRESS("Revolver air", 100*(i+1)/niter, NULL);
   }
   
   igraph_vector_destroy(&st);

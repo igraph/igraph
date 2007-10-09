@@ -643,7 +643,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   no_of_joins=0;
   while (no_of_joins<total_joins) {
     IGRAPH_ALLOW_INTERRUPTION();
-	igraph_progress("fast greedy community detection", no_of_joins*100.0/total_joins, 0);
+	IGRAPH_PROGRESS("fast greedy community detection", no_of_joins*100.0/total_joins, 0);
     
 	/* Store the modularity */
 	if (modularity) VECTOR(*modularity)[no_of_joins] = q;
@@ -835,7 +835,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     free(ivec);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  igraph_progress("fast greedy community detection", 100.0, 0);
+  IGRAPH_PROGRESS("fast greedy community detection", 100.0, 0);
 
   if (modularity) {
 	VECTOR(*modularity)[no_of_joins] = q;

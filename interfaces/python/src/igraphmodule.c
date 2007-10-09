@@ -113,7 +113,8 @@ static PyObject* igraphmodule_progress_handler=NULL;
 
 static int igraphmodule_igraph_interrupt_hook(void* data) {
   if (PyErr_CheckSignals()) {
-    return IGRAPH_FAILURE;
+    IGRAPH_FINALLY_FREE();
+    return IGRAPH_INTERRUPTED;
   }
   return IGRAPH_SUCCESS;
 }
@@ -125,11 +126,13 @@ int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent
     if (PyCallable_Check(igraphmodule_progress_handler)) {
       result=PyObject_CallFunction(igraphmodule_progress_handler,
 				   "sd", message, (double)percent);
-      if (result) Py_DECREF(result);
+      if (result)
+        Py_DECREF(result);
+      else return IGRAPH_INTERRUPTED;
     }
   }
   
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {

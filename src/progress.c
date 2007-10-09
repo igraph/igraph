@@ -27,9 +27,10 @@ static igraph_progress_handler_t *igraph_i_progress_handler=0;
 
 int igraph_progress(const char *message, igraph_real_t percent, void *data) {
   if (igraph_i_progress_handler) {
-    igraph_i_progress_handler(message, percent, data);
+    if (igraph_i_progress_handler(message, percent, data) != IGRAPH_SUCCESS)
+      return IGRAPH_INTERRUPTED;
   }
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 int igraph_progress_handler_stderr(const char *message, igraph_real_t percent,

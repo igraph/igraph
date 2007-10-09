@@ -1135,6 +1135,14 @@ igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
 int igraph_progress(const char *message, igraph_real_t percent, void *data);
 
+#define IGRAPH_PROGRESS(message, percent, data) \
+  do { \
+    if (igraph_progress((message), (percent), (data)) != IGRAPH_SUCCESS) { \
+      IGRAPH_FINALLY_FREE(); \
+      return IGRAPH_INTERRUPTED; \
+    } \
+  } while (0)
+
 /* -------------------------------------------------- */
 /* Graph operators                                    */
 /* -------------------------------------------------- */

@@ -70,7 +70,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(kernel, maxdegree+1));
   igraph_vector_fill(kernel, 1);
 
-  igraph_progress("ML Revolver d", 0, NULL);
+  IGRAPH_PROGRESS("ML Revolver d", 0, NULL);
   
   for (it=0; it<niter; it++) {
     
@@ -124,7 +124,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
     fromkernel=kernels[actkernel];
     tokernel=kernels[1-actkernel];
 
-    igraph_progress("ML Revolver d", 100*(it+1)/niter, NULL);
+    IGRAPH_PROGRESS("ML Revolver d", 100*(it+1)/niter, NULL);
 
   } /* it<niter */
 

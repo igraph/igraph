@@ -100,7 +100,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
     already_added[i]=i+1;
 
-    igraph_progress("Diameter: ", 100.0*i/no_of_nodes, NULL);
+    IGRAPH_PROGRESS("Diameter: ", 100.0*i/no_of_nodes, NULL);
 
     IGRAPH_ALLOW_INTERRUPTION();
     
@@ -134,7 +134,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
     }
   } /* for i<no_of_nodes */
 
-  igraph_progress("Diameter: ", 100.0, NULL);
+  IGRAPH_PROGRESS("Diameter: ", 100.0, NULL);
   
   /* return the requested info */
   if (pres != 0) {
