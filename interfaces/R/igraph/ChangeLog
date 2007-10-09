@@ -1,3 +1,8 @@
+2007-10-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c.in (R_igraph_attribute_init) :
+	graph attribute handling added
+
 2007-08-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/topology.R (graph.count.isomorphisms.vf2)

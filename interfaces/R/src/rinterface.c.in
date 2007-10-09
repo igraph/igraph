@@ -71,18 +71,54 @@ SEXP R_igraph_getListElement(SEXP list, const char *str)
 /******************************************************
  * Attributes                                         *
  *****************************************************/
-/* TODO: add graph attributes */
+
 int R_igraph_attribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
-  SEXP result;
+  SEXP result, names, gal;
   long int i;
+  long int attrno;
   PROTECT(result=NEW_LIST(4));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(2));
   REAL(VECTOR_ELT(result, 0))[0]=0; /* R objects */
   REAL(VECTOR_ELT(result, 0))[1]=1; /* igraph_t objects */
-  for (i=0; i<3; i++) {
+  for (i=1; i<3; i++) {
     SET_VECTOR_ELT(result, i+1, NEW_LIST(0)); /* gal, val, eal */
   }
   graph->attr=result;
+
+  /* Add graph attributes */
+  attrno= attr==NULL ? 0 : igraph_vector_ptr_size(attr);
+  SET_VECTOR_ELT(result, 1, NEW_LIST(attrno));
+  gal=VECTOR_ELT(result, 1);
+  PROTECT(names=NEW_CHARACTER(attrno));
+  for (i=0; i<attrno; i++) {
+    igraph_i_attribute_record_t *rec=VECTOR(*attr)[i];
+    igraph_vector_t *vec;
+    igraph_strvector_t *strvec;
+    SET_STRING_ELT(names, i, mkChar(rec->name));
+    SET_VECTOR_ELT(gal, i, R_NilValue);
+    switch (rec->type) {
+    case IGRAPH_ATTRIBUTE_NUMERIC:
+      vec=(igraph_vector_t*) rec->value;
+      if (igraph_vector_size(vec) > 0) {
+	SET_VECTOR_ELT(gal, i, NEW_NUMERIC(1));
+	REAL(VECTOR_ELT(gal, i))[0]=VECTOR(*vec)[0];
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_STRING:
+      strvec=(igraph_strvector_t*) rec->value;
+      if (igraph_strvector_size(strvec) > 0) {
+	SET_VECTOR_ELT(gal, i, NEW_CHARACTER(1));
+	SET_STRING_ELT(VECTOR_ELT(gal,i), 0, mkChar(STR(*strvec, 0)));
+      }
+      break;
+    case IGRAPH_ATTRIBUTE_R_OBJECT:
+      IGRAPH_ERROR("R_objects not implemented yet", IGRAPH_UNIMPLEMENTED);
+      break;
+    }
+  }
+  SET_NAMES(gal, names);
+  
+  UNPROTECT(1);
   return 0;
 }
 
