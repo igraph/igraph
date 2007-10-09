@@ -125,7 +125,7 @@ int igraphmodule_igraph_progress_hook(const char* message, igraph_real_t percent
     if (PyCallable_Check(igraphmodule_progress_handler)) {
       result=PyObject_CallFunction(igraphmodule_progress_handler,
 				   "sd", message, (double)percent);
-      Py_DECREF(result);
+      if (result) Py_DECREF(result);
     }
   }
   
