@@ -194,6 +194,7 @@ class Matrix(object):
                         context.set_source_rgb(1., 1., 1.)
                 elif style == "palette":
                     cidx = int((item-color_offset)*color_ratio)
+                    if cidx < 0: cidx = 0
                     context.set_source_rgb(*palette.get(cidx))
                 context.rectangle(x, y, dx, dy)
                 if grid_width>0:
@@ -233,4 +234,106 @@ class Matrix(object):
         if dim == 1: return map(max, self._data)
         if dim == 0: return map(max, [[row[idx] for row in self._data] for idx in xrange(self._ncol)])
         return max(map(max, self._data))
+
+
+class DyadCensus(tuple):
+    """Dyad census of a graph.
+
+    This is a pretty simple class - basically it is a tuple, but it allows
+    the user to refer to its individual items by the names C{mutual} (or
+    C{mut}), C{asymmetric} (or C{asy} or C{asym} or C{asymm}) and C{null}.
+
+    Examples:
+
+      >>> g=Graph.Erdos_Renyi(100, 0.2, directed=True)
+      >>> dc=g.dyad_census()
+      >>> print dc.mutual
+      179
+      >>> print dc["asym"]
+      1609
+      >>> print tuple(dc), list(dc)
+      (179, 1609, 3162) [179, 1609, 3162]
+      >>> print dc.as_dict()
+      {"mutual": 179, "asymmetric": 1609, "null": 3162}
+    """
+    _remap = {"mutual": 0, "mut": 0, "sym": 0, "symm": 0,
+        "asy": 1, "asym": 1, "asymm": 1, "asymmetric": 1, "null": 2}
+
+    def __getitem__(self, idx):
+        return tuple.__getitem__(self, self._remap.get(idx, idx))
+
+    def __getattr__(self, attr):
+        if attr in self._remap.keys():
+            return tuple.__getitem__(self, self._remap[attr])
+        raise AttributeError, "no such attribute: %s" % attr
+
+    def __repr__(self):
+        return "DyadCensus((%d, %d, %d))" % self
+
+    def __str__(self):
+        return "%d mutual, %d asymmetric, %d null dyads" % self
+
+    def as_dict(self):
+        """Converts the dyad census to a dict using the known dyad names."""
+        return {"mutual": self[0], "asymmetric": self[1], "null": self[2]}
+
+
+class TriadCensus(tuple):
+    """Triad census of a graph.
+
+    This is a pretty simple class - basically it is a tuple, but it allows
+    the user to refer to its individual items by the following triad names:
+
+      - C{003} -- the empty graph
+      - C{012} -- a graph with a single directed edge (C{A --> B, C})
+      - C{102} -- a graph with a single mutual edge (C{A <-> B, C})
+      - C{021D} -- the binary out-tree (C{A <-- B --> C})
+      - C{021U} -- the binary in-tree (C{A --> B <-- C})
+      - C{021C} -- the directed line (C{A --> B --> C})
+      - C{111D} -- C{A <-> B <-- C}
+      - C{111U} -- C{A <-> B --> C}
+      - C{030T} -- C{A --> B <-- C, A --> C}
+      - C{030C} -- C{A <-- B <-- C, A --> C}
+      - C{201} -- C{A <-> B <-> C}
+      - C{120D} -- C{A <-- B --> C, A <-> C}
+      - C{120U} -- C{A --> B <-- C, A <-> C}
+      - C{120C} -- C{A --> B --> C, A <-> C}
+      - C{210C} -- C{A --> B <-> C, A <-> C}
+      - C{300} -- the complete graph (C{A <-> B <-> C, A <-> C})
+
+    Attribute and item accessors are provided. Due to the syntax of Python,
+    attribute names are not allowed to start with a number, therefore the
+    triad names must be prepended with a lowercase C{t} when accessing
+    them as attributes. This is not necessary with the item accessor syntax.
+
+    Examples:
+
+      >>> g=Graph.Erdos_Renyi(100, 0.2, directed=True)
+      >>> tc=g.triad_census()
+      >>> print tc.t003
+      39864
+      >>> print tc["030C"]
+      1206
+    """
+    _remap = {"003": 0, "012": 1, "102": 2, "021D": 3, "021U": 4, "021C": 5, \
+        "111D": 6, "111U": 7, "030T": 8, "030C": 9, "201": 10, "120D": 11, \
+        "120U": 12, "120C": 13, "210": 14, "300": 15}
+
+    def __getitem__(self, idx):
+        if isinstance(idx, basestring): idx=idx.upper()
+        return tuple.__getitem__(self, self._remap.get(idx, idx))
+
+    def __getattr__(self, attr):
+        if isinstance(attr, basestring) and attr[0] == 't' \
+            and attr[1:].upper() in self._remap.keys():
+                return tuple.__getitem__(self, self._remap[attr[1:].upper()])
+        raise AttributeError, "no such attribute: %s" % attr
+
+    def __repr__(self):
+        return "TriadCensus((%s))" % ", ".join(map(str, self))
+
+    def __str__(self):
+        # TODO
+        return "%d mutual, %d asymmetric, %d null dyads" % self
+
 

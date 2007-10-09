@@ -5,11 +5,13 @@ class BasicTests(unittest.TestCase):
     def testGraphCreation(self):
         self.failUnless(isinstance(Graph(), Graph))
         g=Graph(3, [(0,1), (1,2), (2,0)])
-        self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False)
+        self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == True)
         g=Graph(2, [(0,1), (1,2), (2,3)], True)
-        self.failUnless(g.vcount() == 4 and g.ecount() == 3 and g.is_directed() == True)
-        g=Graph([(0,1), (1,2)])
-        self.failUnless(g.vcount() == 3 and g.ecount() == 2 and g.is_directed() == False)
+        self.failUnless(g.vcount() == 4 and g.ecount() == 3 and g.is_directed() == True and g.is_simple())
+        g=Graph([(0,1), (1,2), (2,1)])
+        self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
+        g=Graph([(0,1), (0,0), (1,2)])
+        self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
     def testPickling(self):
         import pickle

@@ -313,6 +313,28 @@ PyObject *igraphmodule_Graph_is_directed(igraphmodule_GraphObject * self)
 }
 
 /** \ingroup python_interface_graph
+ * \brief Checks whether an \c igraph.Graph object is simple.
+ * \return \c True if the graph is simple, \c False otherwise.
+ * \sa igraph_is_simple
+ */
+PyObject *igraphmodule_Graph_is_simple(igraphmodule_GraphObject *self) {
+  igraph_bool_t res;
+
+  if (igraph_is_simple(&self->g, &res)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (res) {
+    Py_INCREF(Py_True);
+    return Py_True;
+  } else {
+    Py_INCREF(Py_False);
+    return Py_False;
+  }
+}
+
+/** \ingroup python_interface_graph
  * \brief Adds vertices to an \c igraph.Graph
  * \return the extended \c igraph.Graph object
  * \sa igraph_add_vertices
@@ -3094,6 +3116,47 @@ PyObject *igraphmodule_Graph_topological_sorting(igraphmodule_GraphObject *
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the triad census of the graph
+ * \return the triad census as a list
+ * \sa igraph_triad_census
+ */
+PyObject *igraphmodule_Graph_triad_census(igraphmodule_GraphObject *self) {
+  igraph_vector_t result;
+  PyObject *list;
+
+  if (igraph_vector_init(&result, 16)) {
+    return igraphmodule_handle_igraph_error();
+  }
+  if (igraph_triad_census(&self->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  list = igraphmodule_vector_t_to_PyTuple(&result);
+  igraph_vector_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the dyad census of the graph
+ * \return the dyad census as a 3-tuple
+ * \sa igraph_dyad_census
+ */
+PyObject *igraphmodule_Graph_dyad_census(igraphmodule_GraphObject *self) {
+  igraph_integer_t mut, asym, nul;
+  PyObject *list;
+
+  if (igraph_dyad_census(&self->g, &mut, &asym, &nul)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  list = Py_BuildValue("lll", (long)mut, (long)asym, (long)nul);
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the graph reciprocity
  * \return the reciprocity
  * \sa igraph_reciprocity
@@ -4240,13 +4303,13 @@ PyObject *igraphmodule_Graph_write_gml(igraphmodule_GraphObject * self,
   }
 
   if (igraph_write_graph_gml(&self->g, f, idvecptr, creator_str)) {
-    if (idvecptr) igraph_vector_destroy(idvecptr);
-  if (o) { Py_DECREF(o); }
-  igraphmodule_handle_igraph_error();
+    if (idvecptr) { igraph_vector_destroy(idvecptr); }
+    if (o) { Py_DECREF(o); }
+    igraphmodule_handle_igraph_error();
     fclose(f);
     return NULL;
   }
-  if (idvecptr) igraph_vector_destroy(idvecptr);
+  if (idvecptr) { igraph_vector_destroy(idvecptr); }
   if (o) { Py_DECREF(o); }
 
   fclose(f);
@@ -5735,6 +5798,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: C{True} if it is directed, C{False} otherwise.\n"
    "@rtype: boolean"},
 
+  // interface to igraph_is_simple
+  {"is_simple", (PyCFunction) igraphmodule_Graph_is_simple,
+   METH_NOARGS,
+   "is_simple()\n\n"
+   "Checks whether the graph is simple (no loop or multiple edges)."
+   "@return: C{True} if it is simple, C{False} otherwise.\n"
+   "@rtype: boolean"},
+
   // interface to igraph_add_vertices
   {"add_vertices", (PyCFunction) igraphmodule_Graph_add_vertices,
    METH_VARARGS,
@@ -6558,6 +6629,38 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  however, this might be exactly the result you want to get.\n"
    "@return: the pairwise similarity coefficients for the vertices specified,\n"
    "  in the form of a matrix (list of lists).\n"
+  },
+
+  /******************/
+  /* MOTIF COUNTING */
+  /******************/
+  {"dyad_census", (PyCFunction) igraphmodule_Graph_dyad_census,
+   METH_NOARGS,
+   "dyad_census()\n\n"
+   "Dyad census, as defined by Holland and Leinhardt\n\n"
+   "Dyad census means classifying each pair of vertices of a directed\n"
+   "graph into three categories: mutual, there is an edge from I{a} to\n"
+   "I{b} and also from I{b} to I{a}; asymmetric, there is an edge\n"
+   "either from I{a} to I{b} or from I{b} to I{a} but not the other way\n"
+   "and null, no edges between I{a} and I{b}.\n\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a L{DyadCensus} object.\n"
+   "  It is advised to use that.\n\n"
+   "@return: the number of mutual, asymmetric and null connections in a\n"
+   "  3-tuple."
+  },
+  {"triad_census", (PyCFunction) igraphmodule_Graph_triad_census,
+   METH_NOARGS,
+   "triad_census()\n\n"
+   "Triad census, as defined by Davis and Leinhardt\n\n"
+   "Calculating the triad census means classifying every triplets of\n"
+   "vertices in a directed graph. A triplet can be in one of 16 states,\n"
+   "these are listed in the documentation of the C interface of igraph.\n"
+   "\n"
+   "@attention: this function has a more convenient interface in class\n"
+   "  L{Graph} which wraps the result in a L{TriadCensus} object.\n"
+   "  It is advised to use that. The name of the triplet classes are\n"
+   "  also documented there.\n\n"
   },
 
   /********************/

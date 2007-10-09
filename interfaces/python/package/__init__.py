@@ -160,6 +160,25 @@ class Graph(core.GraphBase):
         result = Histogram(bin_width, self.degree(*args, **kwds))
         return result
 
+    def dyad_census(self, *args, **kwds):
+        """dyad_census()
+
+        Calculates the dyad census of the graph.
+
+        Dyad census means classifying each pair of vertices of a directed
+        graph into three categories: mutual (there is an edge from I{a} to
+        I{b} and also from I{b} to I{a}), asymmetric (there is an edge
+        from I{a} to I{b} or from I{b} to I{a} but not the other way round)
+        and null (there is no connection between I{a} and I{b}).
+
+        @return: a L{DyadCensus} object.
+        @newfield ref: Reference
+        @ref: Holland, P.W. and Leinhardt, S.  (1970).  A Method for Detecting
+          Structure in Sociometric Data.  American Journal of Sociology, 70,
+          492-513.
+        """
+        return DyadCensus(GraphBase.dyad_census(self, *args, **kwds))
+
     def eccentricity(self, nodes=None):
         """Calculates eccentricities for vertices with the given indices.
         
@@ -259,6 +278,21 @@ class Graph(core.GraphBase):
             return GraphBase.modularity(self, membership.membership)
         else:
             return GraphBase.modularity(self, membership)
+
+    
+    def triad_census(self, *args, **kwds):
+        """triad_census()
+
+        Calculates the triad census of the graph.
+
+        @return: a L{TriadCensus} object.
+        @newfield ref: Reference
+        @ref: Davis, J.A. and Leinhardt, S.  (1972).  The Structure of
+          Positive Interpersonal Relations in Small Groups.  In:
+          J. Berger (Ed.), Sociological Theories in Progress, Volume 2,
+          218-251. Boston: Houghton Mifflin.
+        """
+        return TriadCensus(GraphBase.triad_census(self, *args, **kwds))
 
     # Various clustering algorithms -- mostly wrappers around GraphBase
 
