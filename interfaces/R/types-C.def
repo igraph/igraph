@@ -89,12 +89,25 @@ VECTOR:
 
 ##################################
 # VECTOR that can be NULL
+# 'OUT' arguments are always returned now, in the 
+# future we should have a boolean R argument for them which
+# defines whether or not we want to return them, but this 
+# requires some stimulus development.
 
 VECTOR_OR_0:
   CTYPE: igraph_vector_t
   CALL: (isNull(%I%) ? 0 : &%C%)
   INCONV:
     IN: if (!isNull(%I%)) { R_SEXP_to_vector(%I%, &%C%); }
+    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%); \
+         %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_0orvector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
 
 ##################################
 # MATRIX of real values

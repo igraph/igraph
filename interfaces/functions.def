@@ -842,3 +842,12 @@ igraph_random_sample:
 igraph_convex_hull:
         PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
         IGNORE: RR, RC, RNamespace
+
+#######################################
+# (R)evolver
+#######################################
+
+igraph_revolver_ml_d:
+        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, OUT VECTOR_OR_0 cites
+        NAME-R: revolver.ml.d
+        FLAGS: PROGRESS

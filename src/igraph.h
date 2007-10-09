@@ -2283,6 +2283,15 @@ int igraph_revolver_error_p_p(const igraph_t *graph,
 			      igraph_real_t *lognull);
 
 /* -------------------------------------------------- */
+/* Maximum likelihood revolver                        */
+/* -------------------------------------------------- */
+
+int igraph_revolver_ml_d(const igraph_t *graph,
+			 igraph_integer_t niter,
+			 igraph_vector_t *kernel,
+			 igraph_vector_t *cites);
+
+/* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
 

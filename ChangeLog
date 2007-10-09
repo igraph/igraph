@@ -1,3 +1,7 @@
+2007-10-07  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_d) : added
+
 2007-10-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/evolver_cit.c (igraph_evolver_d) : bug corrected
