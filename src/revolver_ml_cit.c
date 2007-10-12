@@ -1,6 +1,6 @@
 /* -*- mode: C -*-  */
 /* 
-   IGraph R package.
+   IGraph library.
    Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
    MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
    
@@ -22,161 +22,335 @@
 */
 
 #include "igraph.h"
+#include "memory.h"
 
 #include <math.h>
 
+/* This data structure holds the context of the degree based
+   optimizer. */
+
 typedef struct igraph_i_revolver_ml_D_data_t {
+  igraph_scalar_function_t *A;
+  igraph_vector_function_t *dA;  
   const igraph_t *graph;
   long int no_of_nodes;
-  igraph_revolver_ml_fdf_t *fdf;
-  igraph_vector_t *A;
-  igraph_vector_t *dA;
+  igraph_vector_t A_vect;	/* Temporary storage */
+  igraph_vector_ptr_t dA_vects;	/* Temporary storage */
   igraph_integer_t maxdegree;
-  igraph_vector_long_t *ptk;
-  igraph_vector_t *neis;
-  igraph_vector_long_t *degree;
-} igraph_i_revolver_ml_D_data_t;  
-    
-igraph_real_t igraph_i_revolver_ml_D(igraph_real_t arg,
-				      void *info) {
-  
-  igraph_i_revolver_ml_D_data_t *data=info;
-  igraph_real_t sum=0;
-  long int t;
-  igraph_real_t S1=0, S2=0;
-  
-  fprintf(stderr, "Evaluating %f: ", (double)arg);
+  igraph_vector_long_t ptk;
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  igraph_vector_t dS;		/* Temporary storage */
+  igraph_vector_t par1;		/* More tmp storage */
+  igraph_vector_t tmpgrad;      /* More... */
+
+  igraph_vector_t lastparam;	/* The parameter values used last time */
+  igraph_real_t lastf;		/* The evaluated function value  */
+  igraph_vector_t lastgrad;	/* The evaluated gradient */
+} igraph_i_revolver_ml_D_data_t;
+
+/* Evaluate the objective function and calculate its gradient too. */
+
+int igraph_i_revolver_ml_D_eval(const igraph_vector_t *par,
+				igraph_i_revolver_ml_D_data_t *data) {
+
+  igraph_real_t sum=0.0;
+  long int t, i;
+  int dim=igraph_vector_size(par);
+  igraph_vector_t *grad=&data->lastgrad;
+  igraph_real_t S=0.0;		/* sum N_i^t A(p,x) */
   
   /* Init */
-  igraph_vector_long_null(data->ptk);
-  igraph_vector_long_null(data->degree);
+  igraph_vector_long_null(&data->ptk);
+  igraph_vector_long_null(&data->degree);
+  igraph_vector_null(&data->dS);
+  igraph_vector_null(grad);
 
-  /* Calculate all possible A and dA values */
+  /* Calculate all possible A and dA values and store them in A_vect &
+     dA_vects */
   for (t=0; t<=data->maxdegree; t++) {
-    igraph_real_t deg=t;
-    data->fdf(&arg, &deg, VECTOR(*(data->A))+t, VECTOR(*(data->dA))+t);
+    VECTOR(data->par1)[0] = t;
+    for (i=0; i<dim; i++) {
+      VECTOR(data->par1)[i+1] = VECTOR(*par)[i];
+    }
+    VECTOR(data->A_vect)[t] = data->A(&data->par1, 0);
+    data->dA(&data->par1, &data->tmpgrad, 0);
+    for (i=0; i<dim; i++) {
+      igraph_vector_t *v=VECTOR(data->dA_vects)[i];
+      VECTOR(*v)[t] = VECTOR(data->tmpgrad)[i];
+    }
   }
-
+  
   for (t=0; t<data->no_of_nodes; t++) {
     long int n, nneis;
-    IGRAPH_CHECK(igraph_neighbors(data->graph, data->neis, t, IGRAPH_OUT));
-    nneis=igraph_vector_size(data->neis);
+    IGRAPH_CHECK(igraph_neighbors(data->graph, &data->neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&data->neis);
 
-    /* Update sum */
+    /* Update sum(s) */
     for (n=0; n<nneis; n++) {
-      long int to=VECTOR(*(data->neis))[n];
-      long int x=VECTOR(*(data->degree))[to];
+      long int to=VECTOR(data->neis)[n];
+      long int x=VECTOR(data->degree)[to];
       
-      sum += VECTOR(*(data->dA))[x] / VECTOR(*(data->A))[x];
-      sum -= S1/S2;
-    }
-
-    /* Update ptk */
-    for (n=0; n<nneis; n++) {
-      long int to=VECTOR(*(data->neis))[n];
-      long int x=VECTOR(*(data->degree))[to];
-      
-      VECTOR(*(data->degree))[to] += 1;
-      VECTOR(*(data->ptk))[x+1] += 1;
-      VECTOR(*(data->ptk))[x] -= 1;
-      S1 += VECTOR(*(data->dA))[x+1];
-      S1 -= VECTOR(*(data->dA))[x];
-      S2 += VECTOR(*(data->A))[x+1];
-      S2 -= VECTOR(*(data->A))[x];
+      sum -= log( VECTOR(data->A_vect)[x] );
+      sum += log( S );
+      for (i=0; i<dim; i++) {
+	igraph_vector_t *v=VECTOR(data->dA_vects)[i];
+	VECTOR(*grad)[i] -= VECTOR(*v)[x] / VECTOR(data->A_vect)[x];
+	VECTOR(*grad)[i] += VECTOR(data->dS)[i] / S;
+      }
     }
     
-    VECTOR(*(data->ptk))[0] += 1;
-    S1 += VECTOR(*(data->dA))[0];
-    S2 += VECTOR(*(data->A))[0];
+    /* Update ptk, S, data->dS */
+    for (n=0; n<nneis; n++) {
+      long int to=VECTOR(data->neis)[n];
+      long int x=VECTOR(data->degree)[to];
+      
+      VECTOR(data->degree)[to] += 1;
+      VECTOR(data->ptk)[x+1] += 1;
+      VECTOR(data->ptk)[x] -= 1;
+      S += VECTOR(data->A_vect)[x+1];
+      S -= VECTOR(data->A_vect)[x];
+      for (i=0; i<dim; i++) {
+	igraph_vector_t *v=VECTOR(data->dA_vects)[i];
+	VECTOR(data->dS)[i] += VECTOR(*v)[x+1];
+	VECTOR(data->dS)[i] -= VECTOR(*v)[x];
+      }
+    }
+    
+    VECTOR(data->ptk)[0] += 1;
+    S += VECTOR(data->A_vect)[0];
+    for (i=0; i<dim; i++) {
+      igraph_vector_t *v=VECTOR(data->dA_vects)[i];
+      VECTOR(data->dS)[i] += VECTOR(*v)[0];
+    }
   }
 
-  fprintf(stderr, "%f\n", (double) sum);
-  
-  return sum;
+  igraph_vector_update(&data->lastparam, par);
+  data->lastf=sum;
+  /* grad is already udpated */
+
+  return 0;
 }
-			   
+
+/* This function gives the value of the objective function at the 
+   supplied parameter vector. Called by the optimizer.
+*/
+
+double igraph_i_revolver_ml_D_f(const igraph_vector_t *par,
+				void* extra) {
+
+  igraph_i_revolver_ml_D_data_t *data=extra;
+  
+  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+    igraph_i_revolver_ml_D_eval(par, data);
+  }
+
+  return data->lastf;
+}
+
+/* This function gievs the gradient of the objective function at
+   the supplied parameter vector. Called by the optimizer.
+*/
+
+void igraph_i_revolver_ml_D_df(const igraph_vector_t *par,
+			       igraph_vector_t *res, void *extra) {
+
+  igraph_i_revolver_ml_D_data_t *data=extra;
+
+  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+    igraph_i_revolver_ml_D_eval(par, data);
+  }
+
+  fprintf(stderr, "fradeval at %f: %f\n", VECTOR(*par)[0], VECTOR(data->lastgrad)[0]);
+  igraph_vector_update(res, &data->lastgrad);
+}
+
+void igraph_i_revolver_ml_D_free(igraph_vector_ptr_t *ptr) {
+  long int i, n=igraph_vector_ptr_size(ptr);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(*ptr)[i];
+    if (v) {
+      igraph_vector_destroy(v);
+      igraph_free(v);
+    }
+    VECTOR(*ptr)[i]=0;
+  }
+}
+
+/* This is the general degree-based optimizer. The form of the kernel
+   function is given by A_fun, its first parameter (in the parameter vector) 
+   is the degree and the others are the parameters to fit.
+
+   It just initializes the context data structure and calls the optimizer.
+ */
 
 int igraph_revolver_ml_D(const igraph_t *graph,
-			 igraph_real_t *res,
-			 igraph_real_t left,
-			 igraph_real_t right,
-			 igraph_real_t delta,
-			 int maxit,
-			 igraph_revolver_ml_fdf_t *fdf) {
-  
+			 igraph_vector_t *res,
+			 igraph_real_t *Fmin,
+			 igraph_real_t abstol, igraph_real_t reltol, int maxit,
+			 igraph_scalar_function_t *A_fun,
+			 igraph_vector_function_t *dA_fun) {
+
+
   igraph_i_revolver_ml_D_data_t info;
-  long int no_of_nodes=igraph_vcount(graph);
-  igraph_vector_t A, dA, neis;
-  igraph_vector_long_t ptk, degree;
   igraph_integer_t maxdegree;
+  long int no_of_nodes=igraph_vcount(graph);
+  int dim=igraph_vector_size(res);
+  int i, fncount, grcount;
   int ret;
 
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
   
-  IGRAPH_CHECK(igraph_vector_long_init(&ptk, maxdegree+1));
-  IGRAPH_FINALLY(igraph_vector_long_destroy, &ptk);
-  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
-  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
-  
-  IGRAPH_VECTOR_INIT_FINALLY(&A, maxdegree+1);
-  IGRAPH_VECTOR_INIT_FINALLY(&dA, maxdegree+1);
-  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  
-  info.graph=        graph;
-  info.no_of_nodes=  no_of_nodes;
-  info.fdf=          fdf;
-  info.A=           &A;
-  info.dA=          &dA;
-  info.maxdegree=    maxdegree;
-  info.ptk=         &ptk;
-  info.neis=        &neis;
-  info.degree=      &degree;
-  
-  /* Ok, call zero finding */
-  ret=igraph_zeroin(left, right, igraph_i_revolver_ml_D, &info,
-		    &delta, &maxit, res);
+  /* Set up everything */
+  info.A=A_fun;
+  info.dA=dA_fun;
+  info.graph=graph;
+  info.no_of_nodes=no_of_nodes;
+  IGRAPH_VECTOR_INIT_FINALLY(&info.A_vect, maxdegree+1);  
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&info.dA_vects, dim);
+  IGRAPH_FINALLY(igraph_i_revolver_ml_D_free, &info.dA_vects);
+  for (i=0; i<dim; i++) {
+    igraph_vector_t *v=Calloc(1, igraph_vector_t);
+    if (!v) { IGRAPH_ERROR("Cannot perform ML D revolver", IGRAPH_ENOMEM); }
+    IGRAPH_CHECK(igraph_vector_init(v, maxdegree+1));
+    VECTOR(info.dA_vects)[i]=v;
+  }
+  info.maxdegree=maxdegree;
+  IGRAPH_CHECK(igraph_vector_long_init(&info.ptk, maxdegree+1));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &info.ptk);
+  IGRAPH_CHECK(igraph_vector_long_init(&info.degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &info.degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.dS, dim);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.par1, dim+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.tmpgrad, dim);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.lastparam, dim);
+  info.lastf=0.0;
+  IGRAPH_VECTOR_INIT_FINALLY(&info.lastgrad, dim);
 
-  igraph_vector_destroy(&neis);
-  igraph_vector_destroy(&dA);
-  igraph_vector_destroy(&A);
-  igraph_vector_long_destroy(&degree);
-  igraph_vector_long_destroy(&ptk);
-  IGRAPH_FINALLY_CLEAN(5);
-
-  if (ret != 0) {
-    IGRAPH_WARNING("Iteration did not converge!");
-  }  
+  igraph_i_revolver_ml_D_eval(res, &info);
+  ret=igraph_bfgs(res, Fmin, igraph_i_revolver_ml_D_f,
+		  igraph_i_revolver_ml_D_df, maxit, 1, abstol, reltol, 1,
+		  &info, &fncount, &grcount);
   
-  return 0;
+  igraph_vector_destroy(&info.lastgrad);
+  igraph_vector_destroy(&info.lastparam);
+  igraph_vector_destroy(&info.tmpgrad);
+  igraph_vector_destroy(&info.par1);
+  igraph_vector_destroy(&info.dS);
+  igraph_vector_destroy(&info.neis);
+  igraph_vector_long_destroy(&info.degree);
+  igraph_vector_long_destroy(&info.ptk);
+  igraph_i_revolver_ml_D_free(&info.dA_vects);
+  igraph_vector_ptr_destroy(&info.dA_vects);
+  igraph_vector_destroy(&info.A_vect);
+  IGRAPH_FINALLY_CLEAN(11);
+  
+  return ret;
 }
 
-int igraph_i_revolver_ml_D_alpha(const igraph_real_t *param,
-				 const igraph_real_t *arg,
-				 igraph_real_t *fres,
-				 igraph_real_t *dfres) {
+/* These functions assemble the A(d)=d^alpha+1 kernel function and 
+   calls the general degree-based optimizer.
+*/
 
-  if (*arg!=0) {
-    igraph_real_t p=pow(*arg, *param);
-    *fres = p+1.0;
-    *dfres = p * log(*arg);
+double igraph_i_revolver_ml_D_alpha_f(const igraph_vector_t *par, 
+				      void *extra) {
+  igraph_real_t deg=VECTOR(*par)[0];
+  igraph_real_t alpha=VECTOR(*par)[1];
+  if (deg != 0) {
+    return pow(deg, alpha) + 1.0;
   } else {
-    *fres = 1.0;
-    *dfres= 0.0;
+    return 1.0;
   }
+}
 
-  return 0;
+void igraph_i_revolver_ml_D_alpha_df(const igraph_vector_t *par,
+				     igraph_vector_t *res, 
+				     void *extra) {
+  igraph_real_t deg=VECTOR(*par)[0];
+  igraph_real_t alpha=VECTOR(*par)[1];
+  if (deg != 0) {
+    VECTOR(*res)[0] = log(deg) * pow(deg, alpha);
+  } else {
+    VECTOR(*res)[0] = 0.0;
+  }
 }
 
 int igraph_revolver_ml_D_alpha(const igraph_t *graph,
-			       igraph_real_t *res,
-			       igraph_real_t left,
-			       igraph_real_t right,
-			       igraph_real_t delta,
+			       igraph_real_t *alpha, igraph_real_t *Fmin,
+			       igraph_real_t abstol, igraph_real_t reltol, 
 			       int maxit) {
+  
+  igraph_vector_t res;
+  int ret;
 
-  return igraph_revolver_ml_D(graph, res, left, right, delta, maxit, 
-			      igraph_i_revolver_ml_D_alpha);
+  IGRAPH_VECTOR_INIT_FINALLY(&res, 1);
+  VECTOR(res)[0]=*alpha;
+  
+  ret=igraph_revolver_ml_D(graph, &res, Fmin, abstol, reltol, maxit,
+			   igraph_i_revolver_ml_D_alpha_f,
+			   igraph_i_revolver_ml_D_alpha_df);
+
+  *alpha=VECTOR(res)[0];
+  igraph_vector_destroy(&res);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+/* These functions assemble the A(d)=d^alpha+a kernel function and 
+   calls the general degree-based optimizer.
+*/
+
+double igraph_i_revolver_ml_D_alpha_a_f(const igraph_vector_t *par,
+					void *extra) {
+  igraph_real_t deg=VECTOR(*par)[0];
+  igraph_real_t alpha=VECTOR(*par)[1];
+  igraph_real_t a=VECTOR(*par)[2];
+  if (deg != 0) {
+    return pow(deg, alpha) + a;
+  } else {
+    return a;
+  }  
+}
+
+void igraph_i_revolver_ml_D_alpha_a_df(const igraph_vector_t *par,
+				       igraph_vector_t *res,
+				       void *extra) {
+  igraph_real_t deg=VECTOR(*par)[0];
+  igraph_real_t alpha=VECTOR(*par)[1];
+  /* a not needed */
+  if (deg != 0) {
+    VECTOR(*res)[0] = log(deg) * pow(deg, alpha);
+    VECTOR(*res)[1] = 1.0;
+  } else {
+    VECTOR(*res)[0] = 0.0;
+    VECTOR(*res)[0] = 1.0;
+  }    
+}
+
+int igraph_revolver_ml_D_alpha_a(const igraph_t *graph,
+				 igraph_real_t *alpha, igraph_real_t *a,
+				 igraph_real_t *Fmin,
+				 igraph_real_t abstol, igraph_real_t reltol,
+				 int maxit) {
+  igraph_vector_t res;
+  int ret;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&res, 2);
+  VECTOR(res)[0] = *alpha;
+  VECTOR(res)[1] = *a;
+  
+  ret=igraph_revolver_ml_D(graph, &res, Fmin, abstol, reltol, maxit,
+			   igraph_i_revolver_ml_D_alpha_a_f,
+			   igraph_i_revolver_ml_D_alpha_a_df);
+  
+  *alpha=VECTOR(res)[0];
+  *a=VECTOR(res)[1];
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
 }
 
 /* TODO: delta, logprob, lognull */

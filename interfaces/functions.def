@@ -853,5 +853,11 @@ igraph_revolver_ml_d:
         FLAGS: PROGRESS
 
 igraph_revolver_ml_D_alpha:
-        PARAMS: GRAPH graph, OUT REALPTR res, REAL left, REAL right, REAL delta, INT maxit
+        PARAMS: GRAPH graph, INOUT REALPTR alpha, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000
         NAME-R: revolver.ml.D.alpha
+
+igraph_revolver_ml_D_alpha_a:
+        PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
+                OUT REALPTR Fmin, REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000
+        NAME-R: revolver.ml.D.alpha.a

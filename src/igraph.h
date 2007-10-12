@@ -156,7 +156,10 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 
 typedef enum { IGRAPH_I_DONT_SIMPLIFY=0,
 	       IGRAPH_I_SIMPLIFY } igraph_i_lazy_adlist_simplify_t;
-	       
+
+typedef double igraph_scalar_function_t(const igraph_vector_t *par, void* extra);
+typedef void igraph_vector_function_t(const igraph_vector_t * par, 
+				      igraph_vector_t* res, void* extra);	       
 
 /* -------------------------------------------------- */
 /* Vertex selectors                                   */
@@ -2299,25 +2302,23 @@ int igraph_revolver_ml_d(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *cites);
 
-typedef int igraph_revolver_ml_fdf_t(const igraph_real_t *param,
-				     const igraph_real_t *arg,
-				     igraph_real_t *fres,
-				     igraph_real_t *dfres);
-
 int igraph_revolver_ml_D(const igraph_t *graph,
-			 igraph_real_t *res,
-			 igraph_real_t left,
-			 igraph_real_t right,
-			 igraph_real_t delta,
-			 int maxit,
-			 igraph_revolver_ml_fdf_t *fdf);
+			 igraph_vector_t *res,
+			 igraph_real_t *Fmin,
+			 igraph_real_t abstol, igraph_real_t reltol, int maxit,
+			 igraph_scalar_function_t *A_fun,
+			 igraph_vector_function_t *dA_fun);
 
 int igraph_revolver_ml_D_alpha(const igraph_t *graph,
-			       igraph_real_t *res,
-			       igraph_real_t left,
-			       igraph_real_t right,
-			       igraph_real_t delta,
+			       igraph_real_t *alpha, igraph_real_t *Fmin,
+			       igraph_real_t abstol, igraph_real_t reltol, 
 			       int maxit);
+
+int igraph_revolver_ml_D_alpha_a(const igraph_t *graph,
+				 igraph_real_t *alpha, igraph_real_t *a,
+				 igraph_real_t *Fmin,
+				 igraph_real_t abstol, igraph_real_t reltol,
+				 int maxit);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
@@ -2329,9 +2330,14 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
 			 igraph_integer_t length);
 int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 		       igraph_matrix_t *rescoords);
-int igraph_zeroin(igraph_real_t ax, igraph_real_t bx,
+int igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
 		  igraph_real_t (*f)(igraph_real_t x, void *info),
 		  void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
+int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin, 
+		igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
+		int maxit, int trace,
+		igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
+		int *fncount, int *grcount);
 
 /* -------------------------------------------------- */
 /* For internal use only, should move to other header */
