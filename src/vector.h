@@ -126,4 +126,5 @@ int FUNCTION(igraph_vector,rank)(const TYPE(igraph_vector) *v, igraph_vector_t *
 				 long int nodes);
 BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
 					   const TYPE(igraph_vector) *m2);
-
+int FUNCTION(igraph_vector,update)(TYPE(igraph_vector) *to, 
+				   const TYPE(igraph_vector) *from);

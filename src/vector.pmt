@@ -1573,3 +1573,11 @@ BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
   
   return diff;
 }
+
+int FUNCTION(igraph_vector,update)(TYPE(igraph_vector) *to, 
+				   const TYPE(igraph_vector) *from) {
+  long int n=FUNCTION(igraph_vector,size)(from);
+  FUNCTION(igraph_vector,resize)(to, n);
+  memcpy(to->stor_begin, from->stor_begin, sizeof(BASE)*n);
+  return 0;
+}
