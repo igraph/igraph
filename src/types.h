@@ -710,6 +710,9 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 #  define IGRAPH_NEGINFINITY (igraph_i_fdiv(-1.0, 0.0))
 #endif
 
+int igraph_finite(igraph_real_t x);
+#define IGRAPH_FINITE(x) igraph_finite(x)
+
 #if defined(NAN)
 #  define IGRAPH_NAN NAN
 #elif defined(INFINITY)

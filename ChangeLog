@@ -2,6 +2,8 @@
 
 	* src/vector.pmt (igraph_vector_update) : added
 
+	* src/math.c (igraph_finite) : added
+
 2007-10-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_ml_D) 
