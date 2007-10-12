@@ -851,3 +851,7 @@ igraph_revolver_ml_d:
         PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, OUT VECTOR_OR_0 cites
         NAME-R: revolver.ml.d
         FLAGS: PROGRESS
+
+igraph_revolver_ml_D_alpha:
+        PARAMS: GRAPH graph, OUT REALPTR res, REAL left, REAL right, REAL delta, INT maxit
+        NAME-R: revolver.ml.D.alpha

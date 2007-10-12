@@ -2299,6 +2299,26 @@ int igraph_revolver_ml_d(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *cites);
 
+typedef int igraph_revolver_ml_fdf_t(const igraph_real_t *param,
+				     const igraph_real_t *arg,
+				     igraph_real_t *fres,
+				     igraph_real_t *dfres);
+
+int igraph_revolver_ml_D(const igraph_t *graph,
+			 igraph_real_t *res,
+			 igraph_real_t left,
+			 igraph_real_t right,
+			 igraph_real_t delta,
+			 int maxit,
+			 igraph_revolver_ml_fdf_t *fdf);
+
+int igraph_revolver_ml_D_alpha(const igraph_t *graph,
+			       igraph_real_t *res,
+			       igraph_real_t left,
+			       igraph_real_t right,
+			       igraph_real_t delta,
+			       int maxit);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */
@@ -2309,6 +2329,9 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
 			 igraph_integer_t length);
 int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 		       igraph_matrix_t *rescoords);
+int igraph_zeroin(igraph_real_t ax, igraph_real_t bx,
+		  igraph_real_t (*f)(igraph_real_t x, void *info),
+		  void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
 
 /* -------------------------------------------------- */
 /* For internal use only, should move to other header */

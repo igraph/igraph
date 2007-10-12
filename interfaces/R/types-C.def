@@ -33,6 +33,11 @@ INTEGERPTR:
     OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
          REAL(%I%)[0]=%C%;
 
+INT:
+  CTYPE: int
+  INCONV:
+    IN: %C%=INTEGER(%I%)[0];
+
 ##################################
 # REAL
 
@@ -40,6 +45,13 @@ REAL:
   CTYPE: igraph_real_t
   INCONV:
     IN: %C%=REAL(%I%)[0];
+
+REALPTR:
+  CTYPE: igraph_real_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
+         REAL(%I%)[0]=%C%;
 
 ##################################
 # BOOLEAN

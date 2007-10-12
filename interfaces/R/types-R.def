@@ -35,6 +35,11 @@ INTEGERPTR:
 
 BOOLEANPTR:
 
+REALPTR:
+
+INT:
+    INCONV: %I% <- as.integer(%I%)
+
 NULL:
     CALL:
     HEADER:

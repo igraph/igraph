@@ -23,6 +23,162 @@
 
 #include "igraph.h"
 
+#include <math.h>
+
+typedef struct igraph_i_revolver_ml_D_data_t {
+  const igraph_t *graph;
+  long int no_of_nodes;
+  igraph_revolver_ml_fdf_t *fdf;
+  igraph_vector_t *A;
+  igraph_vector_t *dA;
+  igraph_integer_t maxdegree;
+  igraph_vector_long_t *ptk;
+  igraph_vector_t *neis;
+  igraph_vector_long_t *degree;
+} igraph_i_revolver_ml_D_data_t;  
+    
+igraph_real_t igraph_i_revolver_ml_D(igraph_real_t arg,
+				      void *info) {
+  
+  igraph_i_revolver_ml_D_data_t *data=info;
+  igraph_real_t sum=0;
+  long int t;
+  igraph_real_t S1=0, S2=0;
+  
+  fprintf(stderr, "Evaluating %f: ", (double)arg);
+  
+  /* Init */
+  igraph_vector_long_null(data->ptk);
+  igraph_vector_long_null(data->degree);
+
+  /* Calculate all possible A and dA values */
+  for (t=0; t<=data->maxdegree; t++) {
+    igraph_real_t deg=t;
+    data->fdf(&arg, &deg, VECTOR(*(data->A))+t, VECTOR(*(data->dA))+t);
+  }
+
+  for (t=0; t<data->no_of_nodes; t++) {
+    long int n, nneis;
+    IGRAPH_CHECK(igraph_neighbors(data->graph, data->neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(data->neis);
+
+    /* Update sum */
+    for (n=0; n<nneis; n++) {
+      long int to=VECTOR(*(data->neis))[n];
+      long int x=VECTOR(*(data->degree))[to];
+      
+      sum += VECTOR(*(data->dA))[x] / VECTOR(*(data->A))[x];
+      sum -= S1/S2;
+    }
+
+    /* Update ptk */
+    for (n=0; n<nneis; n++) {
+      long int to=VECTOR(*(data->neis))[n];
+      long int x=VECTOR(*(data->degree))[to];
+      
+      VECTOR(*(data->degree))[to] += 1;
+      VECTOR(*(data->ptk))[x+1] += 1;
+      VECTOR(*(data->ptk))[x] -= 1;
+      S1 += VECTOR(*(data->dA))[x+1];
+      S1 -= VECTOR(*(data->dA))[x];
+      S2 += VECTOR(*(data->A))[x+1];
+      S2 -= VECTOR(*(data->A))[x];
+    }
+    
+    VECTOR(*(data->ptk))[0] += 1;
+    S1 += VECTOR(*(data->dA))[0];
+    S2 += VECTOR(*(data->A))[0];
+  }
+
+  fprintf(stderr, "%f\n", (double) sum);
+  
+  return sum;
+}
+			   
+
+int igraph_revolver_ml_D(const igraph_t *graph,
+			 igraph_real_t *res,
+			 igraph_real_t left,
+			 igraph_real_t right,
+			 igraph_real_t delta,
+			 int maxit,
+			 igraph_revolver_ml_fdf_t *fdf) {
+  
+  igraph_i_revolver_ml_D_data_t info;
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t A, dA, neis;
+  igraph_vector_long_t ptk, degree;
+  igraph_integer_t maxdegree;
+  int ret;
+
+  IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
+				IGRAPH_IN, IGRAPH_LOOPS));
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&ptk, maxdegree+1));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &ptk);
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&A, maxdegree+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&dA, maxdegree+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  info.graph=        graph;
+  info.no_of_nodes=  no_of_nodes;
+  info.fdf=          fdf;
+  info.A=           &A;
+  info.dA=          &dA;
+  info.maxdegree=    maxdegree;
+  info.ptk=         &ptk;
+  info.neis=        &neis;
+  info.degree=      &degree;
+  
+  /* Ok, call zero finding */
+  ret=igraph_zeroin(left, right, igraph_i_revolver_ml_D, &info,
+		    &delta, &maxit, res);
+
+  igraph_vector_destroy(&neis);
+  igraph_vector_destroy(&dA);
+  igraph_vector_destroy(&A);
+  igraph_vector_long_destroy(&degree);
+  igraph_vector_long_destroy(&ptk);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  if (ret != 0) {
+    IGRAPH_WARNING("Iteration did not converge!");
+  }  
+  
+  return 0;
+}
+
+int igraph_i_revolver_ml_D_alpha(const igraph_real_t *param,
+				 const igraph_real_t *arg,
+				 igraph_real_t *fres,
+				 igraph_real_t *dfres) {
+
+  if (*arg!=0) {
+    igraph_real_t p=pow(*arg, *param);
+    *fres = p+1.0;
+    *dfres = p * log(*arg);
+  } else {
+    *fres = 1.0;
+    *dfres= 0.0;
+  }
+
+  return 0;
+}
+
+int igraph_revolver_ml_D_alpha(const igraph_t *graph,
+			       igraph_real_t *res,
+			       igraph_real_t left,
+			       igraph_real_t right,
+			       igraph_real_t delta,
+			       int maxit) {
+
+  return igraph_revolver_ml_D(graph, res, left, right, delta, maxit, 
+			      igraph_i_revolver_ml_D_alpha);
+}
+
 /* TODO: delta, logprob, lognull */
 
 int igraph_revolver_ml_d(const igraph_t *graph,

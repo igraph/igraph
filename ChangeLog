@@ -1,3 +1,8 @@
+2007-10-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_D) 
+	(igraph_revolver_ml_D_alpha) : added
+
 2007-10-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_ml_d) : added
