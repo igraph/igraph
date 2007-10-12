@@ -387,7 +387,10 @@ class RRCodeGenerator(CodeGenerator):
             t=self.types[params[pname]['type']]
             m=params[pname]['mode']
             if m in ['IN', 'INOUT'] and 'INCONV' in t:
-                res="  " + t['INCONV']
+                if m in t['INCONV']:
+                    res= "  " + t['INCONV'][m]
+                else:
+                    res="  " + t['INCONV']
             else:
                 res=""
             return res.replace("%I%", pname.replace("_", "."))

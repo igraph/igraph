@@ -32,10 +32,14 @@ CONNECTEDNESS:
        WEAK: "weak"
 
 INTEGERPTR:
+    INCONV:
+       INOUT: %I% <- as.numeric(%I%)
 
 BOOLEANPTR:
 
 REALPTR:
+    INCONV:
+       INOUT: %I% <- as.numeric(%I%)
 
 INT:
     INCONV: %I% <- as.integer(%I%)
