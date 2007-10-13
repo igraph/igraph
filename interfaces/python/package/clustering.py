@@ -462,4 +462,5 @@ class VertexDendrogram(VertexClustering, Dendrogram):
             membership[idx] = v
  
         self._membership = membership
+        self._len = max(membership) - min(membership) + 1
         return copy(membership)

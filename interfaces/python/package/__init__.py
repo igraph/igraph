@@ -1228,11 +1228,16 @@ class Graph(core.GraphBase):
         vertex_degrees = drawing.collect_attributes(self.vcount(), \
             "vertex_label_angle", "label_angle", kwds, self.vs, config, \
             -math.pi/4, float)
+        vertex_label_colors = drawing.collect_attributes(self.vcount(), \
+            "vertex_label_color", "label_color", kwds, self.vs, config, \
+            "black", palette.get)
+        vertex_label_sizes = drawing.collect_attributes(self.vcount(), \
+            "vertex_label_size", "label_size", kwds, self.vs, \
+            config, 14, float)
 
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
             cairo.FONT_WEIGHT_BOLD)
-        context.set_font_size(14)
-
+        
         for idx, v in enumerate(self.vs):
             xb, yb, w, h = context.text_extents(vertex_labels[idx])[:4]
             cx, cy = layout[idx]
@@ -1241,7 +1246,10 @@ class Graph(core.GraphBase):
             cx -= w/2. + xb
             cy -= h/2. + yb
             context.move_to(cx, cy)
-            context.show_text(vertex_labels[idx])
+            context.set_font_size(vertex_label_sizes[idx])
+            context.set_source_rgb(*vertex_label_colors[idx])
+            context.text_path(vertex_labels[idx])
+            context.fill()
 
     def summary(self, verbosity=0):
         """Returns basic statistics about the graph in a string
