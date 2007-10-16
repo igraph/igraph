@@ -2277,7 +2277,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
   
   CHECK(fprintf(outstream, 
 		"Creator \"igraph version %s %s\"\nVersion 1\ngraph\n[\n", 
-		IGRAPH_VERSION_STRING, creator ? creator : timestr));
+		PACKAGE_VERSION, creator ? creator : timestr));
   
   IGRAPH_STRVECTOR_INIT_FINALLY(&gnames, 0);
   IGRAPH_STRVECTOR_INIT_FINALLY(&vnames, 0);
@@ -2511,7 +2511,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
   IGRAPH_STRVECTOR_INIT_FINALLY(&strv, 1);
 
   CHECK(fprintf(outstream, "/* Created by igraph %s */\n",
-	IGRAPH_VERSION_STRING));
+	PACKAGE_VERSION));
 
   if (igraph_is_directed(graph)) {
 	CHECK(fprintf(outstream, "digraph {\n"));

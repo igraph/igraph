@@ -98,8 +98,6 @@ typedef struct igraph_s {
 /* Constants                                          */
 /* -------------------------------------------------- */
 
-#define IGRAPH_VERSION_STRING "0.4"
-
 typedef enum { IGRAPH_UNDIRECTED=0, IGRAPH_DIRECTED=1 } igraph_i_directed_t;
 
 typedef enum { IGRAPH_NO_LOOPS=0, IGRAPH_LOOPS=1 } igraph_i_loops_t;
