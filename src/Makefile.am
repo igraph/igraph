@@ -43,10 +43,10 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     bliss_kqueue.hh bliss_utils.hh bliss.cc
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c
 
-libigraph_la_CFLAGS        = -Wall -g
-libigraph_la_CXXFLAGS	   = -Wall -g
+libigraph_la_CFLAGS        = 
+libigraph_la_CXXFLAGS	   = 
 libigraph_la_LDFLAGS       = -no-undefined
-libigraph_la_LIBADD        = -lm -lgmp $(XML2_LIBS)
+libigraph_la_LIBADD        = -lm $(XML2_LIBS)
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \

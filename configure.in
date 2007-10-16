@@ -125,6 +125,18 @@ if test $graphml_support = yes; then
   fi
 fi
 
+gmp_support=no
+AC_ARG_ENABLE(gmp, AC_HELP_STRING([--disable-gmp], [Compile without the GMP library]))
+if test "x$enable_gmp" != "xno"; then
+  AC_CHECK_LIB([gmp], [__gmpz_add], [
+    AC_CHECK_HEADER([gmp.h], [
+      AC_DEFINE([HAVE_GMP], [1], [Define to 1 if you have the GMP library])
+      gmp_support=yes
+      LDFLAGS="${LDFLAGS} -lgmp"      
+    ])
+  ])
+fi
+
 if test "$debug" == "yes"; then
   CFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
   CPPFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
@@ -146,6 +158,7 @@ AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
 AC_MSG_RESULT([  GraphML format support -- $graphml_support])
+AC_MSG_RESULT([  GMP library support    -- $gmp_support])
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
 AC_MSG_RESULT([  Shell interface        -- $use_shell])

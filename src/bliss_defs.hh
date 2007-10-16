@@ -18,11 +18,14 @@
 #ifndef DEFS_HH
 #define DEFS_HH
 
+#include "config.h"
 #include <assert.h>
 
 /* Define this if you have gmp and want to have exact group sizes.
  * Remember to include -lgmp in LIB in Makefile. */
-#define BLISS_USE_GMP
+#if HAVE_GMP == 1
+#  define BLISS_USE_GMP
+#endif
 
 #if defined(DEBUG)
 #define CONSISTENCY_CHECKS

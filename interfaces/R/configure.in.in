@@ -11,8 +11,11 @@ AC_SUBST(HAVE_OPEN_MEMSTREAM)
 
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([rintf finite])
+AC_CHECK_FUNCS([rintf], [HAVE_RINTF=1], [HAVE_RINTF=0])
+AC_CHECK_FUNCS([finite], [HAVE_FINITE=1], [HAVE_FINITE=0])
 LIBS=$LIBS_SAVE
+AC_SUBST(HAVE_RINTF)
+AC_SUBST(HAVE_FINITE)
 
 graphml_support=yes
 AC_ARG_ENABLE(graphml,
@@ -50,6 +53,21 @@ if test $graphml_support = yes; then
   fi
 fi
 AC_SUBST(HAVE_LIBXML)
+
+HAVE_GMP=1
+gmp_support=no
+AC_ARG_ENABLE(gmp, AC_HELP_STRING([--disable-gmp], [Compile without the GMP library]))
+if test "x$enable_gmp" != "xno"; then
+  AC_CHECK_LIB([gmp], [__gmpz_add], [
+    AC_CHECK_HEADER([gmp.h], [
+      HAVE_GMP=1
+      AC_DEFINE([HAVE_GMP], [1], [Define to 1 if you have the GMP library])
+      gmp_support=yes
+      LDFLAGS="${LDFLAGS} -lgmp"      
+    ])
+  ])
+fi
+AC_SUBST(HAVE_GMP)
 
 AC_CONFIG_FILES([src/config.h R/config.R src/Makevars])
 

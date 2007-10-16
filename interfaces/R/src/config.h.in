@@ -9,4 +9,8 @@
 
 #define HAVE_RINTF @HAVE_RINTF@
 
+#define HAVE_FINITE @HAVE_FINITE@
+
+#define HAVE_GMP @HAVE_GMP@
+
 #endif

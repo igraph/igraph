@@ -28,9 +28,9 @@ int igraph_finite(igraph_real_t x)
 {
 #ifdef isfinite 
     return isfinite(x);
-#elif HAVE_ISFINITE
+#elif HAVE_ISFINITE == 1
     return isfinite(x);
-#elif HAVE_FINITE
+#elif HAVE_FINITE == 1
     return finite(x);
 #else
 /* neither finite nor isfinite work. Do we really need the AIX exception? */
