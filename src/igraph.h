@@ -725,6 +725,8 @@ int igraph_subgraph(const igraph_t *graph, igraph_t *res,
 		    const igraph_vs_t vids);
 int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 			       igraph_bool_t directed, igraph_bool_t unconn);
+int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
+			    igraph_real_t *unconnected, igraph_bool_t directed);
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops);
 int igraph_transitivity_undirected(const igraph_t *graph, 
 				   igraph_real_t *res);

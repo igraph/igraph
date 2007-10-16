@@ -1,5 +1,7 @@
 2007-10-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_path_length_hist) : added
+
 	* src/structure_generators.c (igraph_full_citation) : added
 
 2007-10-13  Gabor Csardi  <csardi@rmki.kfki.hu>

@@ -263,6 +263,84 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
   return 0;
 }
 
+int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
+			    igraph_real_t *unconnected, igraph_bool_t directed) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i,j,n;
+  igraph_vector_long_t already_added;
+  long int nodes_reached;
+  
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  igraph_vector_t *neis;
+  igraph_integer_t dirmode;
+  igraph_i_adjlist_t allneis;
+  long int ressize;
+  
+  if (directed) { dirmode=IGRAPH_OUT; } else { dirmode=IGRAPH_ALL; }
+
+  IGRAPH_CHECK(igraph_vector_long_init(&already_added, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &already_added);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, dirmode));
+  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, 0));
+  ressize=0;
+  
+  *unconnected=0;
+
+  for (i=0; i<no_of_nodes; i++) {
+    nodes_reached=1;		/* itself */
+    IGRAPH_CHECK(igraph_dqueue_push(&q, i));
+    IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+    VECTOR(already_added)[i]=i+1;
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    while (!igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
+      long int actdist=igraph_dqueue_pop(&q);
+      
+      neis=igraph_i_adjlist_get(&allneis, actnode);
+      n=igraph_vector_size(neis);
+      for (j=0; j<n; j++) {
+	long int neighbor=VECTOR(*neis)[j];
+	if (VECTOR(already_added)[neighbor] == i+1) { continue; }
+	VECTOR(already_added)[neighbor] = i+1;
+	nodes_reached++;
+	if (actdist+1 > ressize) {
+	  IGRAPH_CHECK(igraph_vector_resize(res, actdist+1));
+	  for (; ressize<actdist+1; ressize++) {
+	    VECTOR(*res)[ressize]=0;
+	  }
+	}
+	VECTOR(*res)[actdist] += 1;
+
+	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+      }
+    } /* while !igraph_dqueue_empty */
+
+    *unconnected += (no_of_nodes-nodes_reached);
+
+  } /* for i<no_of_nodes */
+
+  /* count every pair only once for an undirected graph */
+  if (!igraph_is_directed(graph)) {
+    for (i=1; i<ressize; i++) {
+      VECTOR(*res)[i] /= 2;
+    }
+  }
+
+  igraph_vector_long_destroy(&already_added);
+  igraph_dqueue_destroy(&q);
+  igraph_i_adjlist_destroy(&allneis);
+  IGRAPH_FINALLY_CLEAN(3);
+  
+  return 0;
+}
+
 /**
  * \ingroup structural
  * \function igraph_minimum_spanning_tree_unweighted

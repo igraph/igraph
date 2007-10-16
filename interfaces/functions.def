@@ -322,6 +322,11 @@ igraph_average_path_length:
         PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True, BOOLEAN unconn=True
         IGNORE: RR, RC, RNamespace
 
+igraph_path_length_hist:
+        PARAMS: GRAPH graph, OUT VECTOR res, OUT REALPTR unconnected, \
+                BOOLEAN directed=True
+        NAME-R: path.length.hist
+
 igraph_simplify:
         PARAMS: INOUT GRAPH graph, BOOLEAN multiple=True, BOOLEAN loops=True
         IGNORE: RR, RC, RNamespace
