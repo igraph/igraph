@@ -11,7 +11,7 @@ AC_SUBST(HAVE_OPEN_MEMSTREAM)
 
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([rintf])
+AC_CHECK_FUNCS([rintf finite])
 LIBS=$LIBS_SAVE
 
 graphml_support=yes

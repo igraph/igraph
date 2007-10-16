@@ -22,6 +22,7 @@
 */
 
 #include "igraph.h"
+#include <math.h>
 
 int igraph_finite(igraph_real_t x)
 {
