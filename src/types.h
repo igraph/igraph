@@ -126,6 +126,12 @@ int igraph_vector_order2(igraph_vector_t *v);
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "matrix.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
+
 #define IGRAPH_MATRIX_NULL { IGRAPH_VECTOR_NULL, 0, 0 }
 #define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
   do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \

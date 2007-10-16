@@ -1,3 +1,7 @@
+2007-10-13  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/matrix.c : add boolean matrices
+
 2007-10-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_ml_D)
