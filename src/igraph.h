@@ -559,6 +559,8 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
 int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children, 
 		igraph_tree_mode_t type);
 int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
+int igraph_full_citation(igraph_t *graph, igraph_integer_t n, 
+			 igraph_bool_t directed);
 int igraph_atlas(igraph_t *graph, int number);
 int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
 				 const igraph_matrix_t *W);

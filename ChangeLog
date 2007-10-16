@@ -1,3 +1,7 @@
+2007-10-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structure_generators.c (igraph_full_citation) : added
+
 2007-10-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_ml_D, igraph_revolver_ml_D_alpha)

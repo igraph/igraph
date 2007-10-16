@@ -111,6 +111,9 @@ igraph_full:
         PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=False, BOOLEAN loops=False
         IGNORE: RR, RC, RNamespace
 
+igraph_full_citation:
+        PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
+
 igraph_atlas:
         PARAMS: OUT GRAPH graph, INT number=0
         IGNORE: RR, RC, RNamespace

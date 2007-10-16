@@ -696,6 +696,29 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
 }
 
 /**
+ * \function igraph_full_citation
+ */
+
+int igraph_full_citation(igraph_t *graph, igraph_integer_t n, 
+			 igraph_bool_t directed) {
+  igraph_vector_t edges;
+  long int i, j, ptr=0;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, n*(n-1));
+  for (i=1; i<n; i++) {
+    for (j=0; j<i; j++) {
+      VECTOR(edges)[ptr++] = i;
+      VECTOR(edges)[ptr++] = j;
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/**
  * \function igraph_small
  * \brief Shortand to create a short graph, giving the edges as agruments
  * 
