@@ -43,7 +43,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
 	    igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
 	    int maxit, int trace,
 	    igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
-	    int *fncount, int *grcount)
+	    igraph_integer_t *fncount, igraph_integer_t *grcount)
 {
   int n=igraph_vector_size(b);
   igraph_bool_t accpoint, enough;
@@ -80,6 +80,9 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
   ilast = gradcount;
 
   do {
+
+    IGRAPH_ALLOW_INTERRUPTION();      
+
     if (ilast == gradcount) {
       for (i = 0; i < n; i++) {
 	for (j = 0; j < i; j++) MATRIX(B,i,j) = 0.0;

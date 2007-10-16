@@ -1,5 +1,19 @@
 2007-10-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/revolver_ml_cit.c (igraph_revolver_ml_D, igraph_revolver_ml_D_alpha)
+	(igraph_revolver_ml_D_alpha_a, igraph_revolver_d) : add interruption
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_AD)
+	(igraph_revolver_ml_AD_alpha_a_beta) : added
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_D) : remove 'ptk', not needed
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_D, igraph_revolver_ml_D_alpha)
+	(igraph_revolver_ml_D_alpha_a) : add fncount, grcount arguments	
+	
+	* src/bfgs.c (igraph_bfgs) : add interruption, change int* arguments
+	to igraph_integer_t*	
+
 	* src/matrix.c : add boolean matrices
 
 2007-10-12  Gabor Csardi  <csardi@rmki.kfki.hu>
@@ -17,6 +31,8 @@
 
 	* src/revolver_ml_cit.c (igraph_revolver_ml_D) 
 	(igraph_revolver_ml_D_alpha) : added
+
+	* src/zeroin.c (igraph_zeroin) : added
 
 2007-10-07  Gabor Csardi  <csardi@rmki.kfki.hu>
 

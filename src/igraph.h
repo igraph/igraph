@@ -157,9 +157,10 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 typedef enum { IGRAPH_I_DONT_SIMPLIFY=0,
 	       IGRAPH_I_SIMPLIFY } igraph_i_lazy_adlist_simplify_t;
 
-typedef double igraph_scalar_function_t(const igraph_vector_t *par, void* extra);
+typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *par, 
+						void* extra);
 typedef void igraph_vector_function_t(const igraph_vector_t * par, 
-				      igraph_vector_t* res, void* extra);	       
+				      igraph_vector_t* res, void* extra);
 
 /* -------------------------------------------------- */
 /* Vertex selectors                                   */
@@ -2304,21 +2305,41 @@ int igraph_revolver_ml_d(const igraph_t *graph,
 
 int igraph_revolver_ml_D(const igraph_t *graph,
 			 igraph_vector_t *res,
-			 igraph_real_t *Fmin,
+			 igraph_real_t *Fmin,			 
 			 igraph_real_t abstol, igraph_real_t reltol, int maxit,
 			 igraph_scalar_function_t *A_fun,
-			 igraph_vector_function_t *dA_fun);
+			 igraph_vector_function_t *dA_fun,
+			 igraph_integer_t *fncount, igraph_integer_t *grcount);
 
 int igraph_revolver_ml_D_alpha(const igraph_t *graph,
 			       igraph_real_t *alpha, igraph_real_t *Fmin,
 			       igraph_real_t abstol, igraph_real_t reltol, 
-			       int maxit);
+			       int maxit, igraph_integer_t *fncount, 
+			       igraph_integer_t *grcount);
 
 int igraph_revolver_ml_D_alpha_a(const igraph_t *graph,
 				 igraph_real_t *alpha, igraph_real_t *a,
 				 igraph_real_t *Fmin,
 				 igraph_real_t abstol, igraph_real_t reltol,
-				 int maxit);
+				 int maxit, igraph_integer_t *fncount, 
+				 igraph_integer_t *grcount);
+
+int igraph_revolver_ml_AD(const igraph_t *graph,
+			  igraph_vector_t *res,
+			  igraph_real_t *Fmin,
+			  igraph_real_t abstol, igraph_real_t reltol, int maxit,
+			  igraph_scalar_function_t *A_fun,
+			  igraph_vector_function_t *dA_fun,
+			  int agebins, igraph_integer_t *fncount, 
+			  igraph_integer_t *grcount);
+
+int igraph_revolver_ml_AD_alpha_a_beta(const igraph_t *graph,
+				       igraph_real_t *alpha, igraph_real_t *a,
+				       igraph_real_t *beta, igraph_real_t *Fmin,
+				       igraph_real_t abstol, igraph_real_t reltol,
+				       int maxit, int agebins, 
+				       igraph_integer_t *fncount,
+				       igraph_integer_t *grcount);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
@@ -2337,7 +2358,7 @@ int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
 		igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
 		int maxit, int trace,
 		igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
-		int *fncount, int *grcount);
+		igraph_integer_t *fncount, igraph_integer_t *grcount);
 
 /* -------------------------------------------------- */
 /* For internal use only, should move to other header */
