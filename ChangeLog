@@ -1,3 +1,10 @@
+2007-10-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/forestfire.c (igraph_forest_fire_game) : forest fire model added
+
+	* src/random.h (RNG_BINOM) : added
+	* src/random.c (igraph_rbinom) : added
+
 2007-10-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_path_length_hist) : added

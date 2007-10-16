@@ -249,6 +249,11 @@ igraph_citing_cited_type_game:
                 INTEGER edges_per_step=1, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
+igraph_forest_fire_game:
+        PARAMS: OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_prob, \
+                INTEGER pabms=1, BOOLEAN directed=True
+        NAME-R: forest.fire.game
+
 #######################################
 # Basic query functions
 #######################################

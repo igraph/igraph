@@ -40,8 +40,9 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     bliss_graph.hh bliss_timer.cc \
 			     bliss_heap.cc bliss_timer.hh \
 			     bliss_heap.hh bliss_utils.cc \
-			     bliss_kqueue.hh bliss_utils.hh bliss.cc
-			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c
+			     bliss_kqueue.hh bliss_utils.hh bliss.cc \
+			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
+			     forestfire.c
 
 libigraph_la_CFLAGS        = 
 libigraph_la_CXXFLAGS	   = 

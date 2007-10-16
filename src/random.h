@@ -48,7 +48,9 @@ void PutRNGstate(void);
 double  unif_rand(void);
 double  norm_rand(void);
 double  Rf_rgeom(double);
+double  Rf_rbinom(double, double);
 #define rgeom Rf_rgeom
+#define rbinom Rf_rbinom
 
 #define RNG_BEGIN()       GetRNGstate()
 #define RNG_END()         PutRNGstate()
@@ -57,11 +59,13 @@ double  Rf_rgeom(double);
 #define RNG_UNIF(l, h)    (unif_rand()*((h)-(l))+(l))
 #define RNG_UNIF01()      (unif_rand())
 #define RNG_GEOM(p)       (rgeom(p))
+#define RNG_BINOM(n,p)    (rbinom((n),(p)))
 
 #else
 
 double igraph_norm_rand(void);
 double igraph_rgeom(double);
+double igraph_rbinom(double, double);
 extern int igraph_rng_inited;
 
 #define RNG_BEGIN()       if (!igraph_rng_inited) { srand(time(0)); igraph_rng_inited=1; }
@@ -71,6 +75,7 @@ extern int igraph_rng_inited;
 #define RNG_UNIF(l, h)    (rand()/((double)RAND_MAX+1)*(double)((h)-(l))+(l))
 #define RNG_UNIF01()      (RNG_UNIF(0,1))
 #define RNG_GEOM(p)       (igraph_rgeom(p))
+#define RNG_BINOM(n,p)    (igraph_rbinom((n),(p)))
 
 #endif
 
