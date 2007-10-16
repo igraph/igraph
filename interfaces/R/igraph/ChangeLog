@@ -1,3 +1,10 @@
+2007-10-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/foreign.R (read.graph.dimacs) : updated to 
+	handle 'edge' problems
+	* interfaces/R/src/rinterface.c.in (R_igraph_read_graph_dimacs) :
+	updated
+
 2007-10-06  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c.in (R_igraph_attribute_init) :

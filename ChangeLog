@@ -1,5 +1,8 @@
 2007-10-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/foreign.c (igraph_read_graph_dimacs) : updated to handle 'edge'
+	problems
+
 	* src/forestfire.c (igraph_forest_fire_game) : forest fire model added
 
 	* src/random.h (RNG_BINOM) : added

@@ -215,11 +215,19 @@ read.graph.dimacs <- function(file, directed=TRUE, ...) {
 
   res <- .Call("R_igraph_read_graph_dimacs", file, as.logical(directed),
                PACKAGE="igraph")
-  graph <- res[[1]]
-  graph <- set.graph.attribute(graph, "source", res[[2]])
-  graph <- set.graph.attribute(graph, "target", res[[3]])
-  E(graph)$capacity <- res[[4]]
-  graph
+  if (res[[1]][1] == "max") {
+    graph <- res[[2]]
+    graph <- set.graph.attribute(graph, "problem", res[[1]])
+    graph <- set.graph.attribute(graph, "source", res[[3]])
+    graph <- set.graph.attribute(graph, "target", res[[4]])
+    E(graph)$capacity <- res[[5]]
+    graph
+  } else if (res[[1]][1] == "edge") {
+    graph <- res[[2]]
+    graph <- set.graph.attribute(graph, "problem", res[[1]])
+    V(graph)$label <- res[[3]]
+    graph
+  }
 }
 
 write.graph.dimacs <- function(graph, file,

@@ -1047,6 +1047,8 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream);
 int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
 			      int index);
 int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+			     igraph_strvector_t *problem,
+			     igraph_vector_t *label,
 			     igraph_integer_t *source, 
 			     igraph_integer_t *target, 
 			     igraph_vector_t *capacity, 

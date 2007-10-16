@@ -658,9 +658,11 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
  */
 
 int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+			     igraph_strvector_t *problem,
+			     igraph_vector_t *label,
 			     igraph_integer_t *source, 
-			     igraph_integer_t *target, 
-			     igraph_vector_t *capacity, 
+			     igraph_integer_t *target,
+			     igraph_vector_t *capacity,			     
 			     igraph_bool_t directed) {
   
   igraph_vector_t edges;
@@ -668,9 +670,13 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
   long int no_of_edges=-1;
   long int tsource=-1;
   long int ttarget=-1;
-  char problem[6];
+  char prob[21];
   char c;      
-  
+  int problem_type;
+
+#define PROBLEM_EDGE  1
+#define PROBLEM_MAX   2  
+
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   if (capacity) {
     igraph_vector_clear(capacity);
@@ -690,7 +696,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
       IGRAPH_ERROR("parsing dimacs file failed", IGRAPH_PARSEERROR);
     }
     switch (str[0]) {
-      long int tmp;
+      long int tmp, tmp2;
       long int from, to;
       igraph_real_t cap;
 
@@ -703,41 +709,77 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
 	IGRAPH_ERROR("reading dimacs file failed, double 'p' line", 
 		     IGRAPH_PARSEERROR);
       }
-      read=fscanf(instream, "%5s %li %li", problem, 
+      read=fscanf(instream, "%20s %li %li", prob, 
 		  &no_of_nodes, &no_of_edges);
       if (read != 3) {
 	IGRAPH_ERROR("reading dimacs file failed", IGRAPH_PARSEERROR);
       }
-      IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
-      if (capacity) {
-	IGRAPH_CHECK(igraph_vector_reserve(capacity, no_of_edges));
+      if (!strcmp(prob, "edge")) {
+	/* edge list */
+	problem_type=PROBLEM_EDGE;
+	if (label) {
+	  long int i;
+	  IGRAPH_CHECK(igraph_vector_resize(label, no_of_nodes));
+	  for (i=0; i<no_of_nodes; i++) {
+	    VECTOR(*label)[i]=i+1;
+	  }
+	}
+      } else if (!strcmp(prob, "max")) {
+	/* maximum flow problem */
+	problem_type=PROBLEM_MAX;
+	if (capacity) {
+	  IGRAPH_CHECK(igraph_vector_reserve(capacity, no_of_edges));
+	}
+      } else {
+	IGRAPH_ERROR("Unknown problem type, should be 'edge' or 'max'",
+		     IGRAPH_PARSEERROR);
       }
+      if (problem) {
+	igraph_strvector_clear(problem);
+	IGRAPH_CHECK(igraph_strvector_add(problem, prob));
+      }
+      IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
       break;
 
     case 'n':
-      read=fscanf(instream, "%li %1c", &tmp, str);
-      if (str[0]=='s') {
-	if (tsource != -1) {
-	  IGRAPH_ERROR("reading dimacsfile: multiple source vertex line", 
-		       IGRAPH_PARSEERROR);
+      /* for MAX this is either the source or target vertex,
+	 for EDGE this is a vertex label */
+      if (problem_type == PROBLEM_MAX) {
+	str[0]='x';
+	read=fscanf(instream, "%li %1s", &tmp, str);
+	if (str[0]=='s') {
+	  if (tsource != -1) {
+	    IGRAPH_ERROR("reading dimacsfile: multiple source vertex line", 
+			 IGRAPH_PARSEERROR);
+	  } else {
+	    tsource=tmp;
+	  }
+	} else if (str[0]=='t') {
+	  if (ttarget != -1) {
+	    IGRAPH_ERROR("reading dimacsfile: multiple target vertex line", 
+			 IGRAPH_PARSEERROR);
+	  } else {
+	    ttarget=tmp;
+	  }
 	} else {
-	  tsource=tmp;
-	}
-      } else if (str[0]=='t') {
-	if (ttarget != -1) {
-	  IGRAPH_ERROR("reading dimacsfile: multiple source vertex line", 
+	  IGRAPH_ERROR("invalid node descriptor line in dimacs file",
 		       IGRAPH_PARSEERROR);
-	} else {
-	  ttarget=tmp;
 	}
       } else {
-	IGRAPH_ERROR("invalid node descriptor line in dimacs file",
-		     IGRAPH_PARSEERROR);
+	read=fscanf(instream, "%li %li", &tmp, &tmp2);
+	if (label) {
+	  VECTOR(*label)[tmp]=tmp2;
+	}
       }
       
       break;
       
     case 'a':
+      /* This is valid only for MAX, a weighted edge */
+      if (problem_type != PROBLEM_MAX) { 
+	IGRAPH_ERROR("'a' lines are allowed only in MAX problem files", 
+		     IGRAPH_PARSEERROR);
+      }
       read=fscanf(instream, "%li %li %lf", &from, &to, &cap);
       if (read != 3) {
 	IGRAPH_ERROR("reading dimacs file", IGRAPH_PARSEERROR);
@@ -747,7 +789,21 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
       if (capacity) {
 	IGRAPH_CHECK(igraph_vector_push_back(capacity, cap));
       }
-      break;           
+      break;
+      
+    case 'e':
+      /* Edge line, only in EDGE */
+      if (problem_type != PROBLEM_EDGE) {
+	IGRAPH_ERROR("'e' lines are allowed only in EDGE problem files",
+		     IGRAPH_PARSEERROR);
+      }
+      read=fscanf(instream, "%li %li", &from, &to);
+      if (read != 2) {
+	IGRAPH_ERROR("reading dimacs file", IGRAPH_PARSEERROR);
+      }
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, from-1));
+      IGRAPH_CHECK(igraph_vector_push_back(&edges, to-1));
+      break;
 
     default:
       IGRAPH_ERROR("unknown line type in dimacs file", IGRAPH_PARSEERROR);
