@@ -560,13 +560,15 @@ igraph_bibcoupling:
 
 igraph_similarity_jaccard:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
-                BOOLEAN loops
-        IGNORE: RR, RC, RNamespace
+                BOOLEAN loops=False
+        DEPS: vids ON graph res, mode ON vids
+        NAME-R: similarity.jaccard
 
 igraph_similarity_dice:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
-                BOOLEAN loops
-        IGNORE: RR, RC, RNamespace
+                BOOLEAN loops=False
+        DEPS: vids ON graph
+        NAME-R: similarity.dice
 
 #######################################
 # Community structure

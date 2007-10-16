@@ -263,6 +263,22 @@ class CodeGenerator:
                 res[ p[2] ] = { 'mode': p[0], 'type': p[1], 'default': p[3] }
         return res
 
+    def parse_deps(self, function):
+        if 'DEPS' not in self.func[function]:
+            return seqdict.seqdict()
+
+        deps=self.func[function]["DEPS"]
+        deps=deps.split(",")
+        deps=[ d.strip() for d in deps ]
+        deps=[ d.split("ON", 1) for d in deps ]
+        deps=[ [ dd.strip() for dd in d ] for d in deps ]
+        deps=[ [d[0]] + d[1].split(" ",1) for d in deps ]
+        deps=[ [ dd.strip() for dd in d ] for d in deps ]
+        res=seqdict.seqdict()
+        for d in deps:
+            res[ d[0] ] = d[1:]
+        return res
+
     def append_inputs(self, inputs, output):
         for i in inputs:
             ii=open(i)
@@ -319,6 +335,7 @@ class RRCodeGenerator(CodeGenerator):
 
         name=self.func[function].get("NAME-R", function[1:].replace("_", "."))
         params=self.parse_params(function)
+        self.deps=self.parse_deps(function)
 
         # Check types
         for p in params.keys():
@@ -363,7 +380,14 @@ class RRCodeGenerator(CodeGenerator):
                     default="=" + t['DEFAULT'][ params[pname]['default'] ]
                 else:
                     default="=" + params[pname]['default']
-            return header + default
+            header = header + default
+
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    header=header.replace("%I"+str(i+1)+"%", deps[i])
+            
+            return header
             
         head=[ do_par(n) for n,p in params.items()
                if p['mode'] in ['IN','INOUT'] ]
@@ -442,6 +466,7 @@ class RCCodeGenerator(CodeGenerator):
             return
 
         params=self.parse_params(function)
+        self.deps = self.parse_deps(function)
 
         # Check types
         for p in params.keys():
@@ -575,6 +600,11 @@ class RCCodeGenerator(CodeGenerator):
             else:
                 inconv=""
 
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    inconv=inconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
+                
             return inconv.replace("%C%", cname).replace("%I%", pname)
 
         inconv=[ do_par(n) for n in params.keys() ]

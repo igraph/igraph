@@ -86,6 +86,11 @@ CONNECTEDNESS:
   INCONV:
     IN: %C%=REAL(%I%)[0];
 
+NEIMODE:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
 ##################################
 # VECTOR of real values
 
@@ -141,6 +146,16 @@ MATRIX:
     OUT: PROTECT(%I%=R_igraph_matrix_to_SEXP(&%C%)); \
          igraph_matrix_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
+
+##################################
+# Some vertices of a graph
+
+VERTEXSET:
+  CTYPE: igraph_vs_t
+  INCONV:
+    IN: R_SEXP_to_igraph_vs(%I%, &%C1%, &%C%);
+  OUTCONV:
+    IN: igraph_vs_destroy(&%C%);
 
 ##################################
 # NULL, this is supplied as an argument

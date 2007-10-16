@@ -31,6 +31,17 @@ CONNECTEDNESS:
     DEFAULT:
        WEAK: "weak"
 
+NEIMODE:
+    INCONV: %I% <- as.numeric(pmatch(tolower(%I%), c("out", "in", "all", "total")));\
+            if (is.na(%I%)) { stop("invalid `%I%' argument, see docs") } \
+            if (%I%==4) { %I% <- 3 } \
+            %I% <- as.numeric(%I%)
+    DEFAULT:
+       ALL: "all"
+       TOTAL: "total"
+       OUT: "out"
+       IN: "in"
+
 INTEGERPTR:
     INCONV:
        INOUT: %I% <- as.numeric(%I%)
@@ -43,6 +54,11 @@ REALPTR:
 
 INT:
     INCONV: %I% <- as.integer(%I%)
+
+VERTEXSET:
+    INCONV: %I% <- as.igraph.vs(%I%)
+    DEFAULT:
+       ALL: V(%I1%)
 
 NULL:
     CALL:
