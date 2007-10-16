@@ -1,3 +1,8 @@
+2007-10-16  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/cliques.c (igraph_i_find_k_cliques) : memory
+	usage reduced, should solve issue #47
+
 2007-10-16  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_read_graph_dimacs) : updated to handle 'edge'

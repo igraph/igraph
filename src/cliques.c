@@ -48,18 +48,19 @@ int igraph_i_find_k_cliques(const igraph_t *graph,
 			    igraph_vector_t *neis,
 			    igraph_bool_t independent_vertices) {
 
-  long int j, k, l, m, n;
+  long int j, k, l, m, n, new_member_storage_size;
   const igraph_real_t *c1, *c2;
   igraph_real_t v1, v2;
   igraph_bool_t ok;
   
   /* Allocate the storage */
   *new_member_storage=Realloc(*new_member_storage, 
-			      size*old_clique_count*(old_clique_count-1)/2,
+			      size*old_clique_count,
 			      igraph_real_t);
   if (*new_member_storage == 0) {
     IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
   }
+  new_member_storage_size = size*old_clique_count;
   IGRAPH_FINALLY(igraph_free, *new_member_storage);
 
   m=n=0;
@@ -141,6 +142,15 @@ int igraph_i_find_k_cliques(const igraph_t *graph,
 	    m=n;
 	  }
 	}
+        /* See if new_member_storage is full. If so, reallocate */
+        if (m == new_member_storage_size) {
+            *new_member_storage = Realloc(*new_member_storage,
+                                          new_member_storage_size*2,
+                                          igraph_real_t);
+            if (*new_member_storage == 0)
+                IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
+            new_member_storage_size *= 2;
+        }
       }
     }
   }
