@@ -43,8 +43,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     bliss_kqueue.hh bliss_utils.hh bliss.cc
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c
 
-libigraph_la_CFLAGS        = -fno-inline -Wall -g
-libigraph_la_CXXFLAGS	   = -fno-inline -Wall -g
+libigraph_la_CFLAGS        = -Wall -g
+libigraph_la_CXXFLAGS	   = -Wall -g
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm -lgmp $(XML2_LIBS)
 
