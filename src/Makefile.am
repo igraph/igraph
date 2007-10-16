@@ -31,13 +31,22 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     spmatrix.c community.c fast_community.c \
-			     evolver_cit.c gml_tree.c cattributes.c \
-			     revolver_ml_cit.c zeroin.c bfgs.c math.c
+			     evolver_cit.c gml_tree.c \
+			     bliss_bignum.hh bliss_kstack.hh \
+			     bliss_defs.hh bliss_orbit.cc \
+			     bliss_eqrefhash.cc bliss_orbit.hh \
+			     bliss_eqrefhash.hh bliss_partition.cc \
+			     bliss_graph.cc bliss_partition.hh \
+			     bliss_graph.hh bliss_timer.cc \
+			     bliss_heap.cc bliss_timer.hh \
+			     bliss_heap.hh bliss_utils.cc \
+			     bliss_kqueue.hh bliss_utils.hh bliss.cc
+			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c
 
 libigraph_la_CFLAGS        = -fno-inline -Wall -g
 libigraph_la_CXXFLAGS	   = -fno-inline -Wall -g
 libigraph_la_LDFLAGS       = -no-undefined
-libigraph_la_LIBADD        = -lm $(XML2_LIBS)
+libigraph_la_LIBADD        = -lm -lgmp $(XML2_LIBS)
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \

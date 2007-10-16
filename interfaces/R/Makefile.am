@@ -52,6 +52,8 @@ YFILES = $(wildcard $(top_srcdir)/src/*.y)
 LFILES = $(wildcard $(top_srcdir)/src/*.l)
 SRCFILES_ORIGPLACE = $(wildcard $(top_srcdir)/src/*.c) \
 	$(wildcard $(top_srcdir)/src/*.h) \
+	$(wildcard $(top_srcdir)/src/*.cc) \
+	$(wildcard $(top_srcdir)/src/*.hh) \
 	$(wildcard $(top_srcdir)/src/*.cpp) \
 	$(wildcard $(top_srcdir)/src/*.pmt) \
 	$(YFILES:.y=.c) $(YFILES:.y=.h) $(LFILES:.l=.c)
@@ -61,6 +63,10 @@ SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE))
 igraph/src/%.c: $(top_srcdir)/src/%.c
 	cp $(top_srcdir)/src/$(@F) $@
 igraph/src/%.h: $(top_srcdir)/src/%.h
+	cp $(top_srcdir)/src/$(@F) $@
+igraph/src/%.cc: $(top_srcdir)/src/%.cc
+	cp $(top_srcdir)/src/$(@F) $@
+igraph/src/%.hh: $(top_srcdir)/src/%.hh
 	cp $(top_srcdir)/src/$(@F) $@
 igraph/src/%.cpp: $(top_srcdir)/src/%.cpp
 	cp $(top_srcdir)/src/$(@F) $@

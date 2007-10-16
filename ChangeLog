@@ -103,6 +103,16 @@
 	* src/structural_properties.c (igraph_betweenness) : 
 	bug fixed when 'vids' is not all vertices, thanks to Alex Gutteridge
 
+	* src/bliss.cc
+	* src/bliss.cc            
+	* src/bliss_heap.cc
+	* src/bliss_timer.cc
+	* src/bliss_eqrefhash.cc  
+	* src/bliss_orbit.cc      
+	* src/bliss_utils.cc
+	* src/bliss_graph.cc      
+	* src/bliss_partition.cc : added	
+
 2007-08-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_lcf, igraph_lcf_vector) : added
