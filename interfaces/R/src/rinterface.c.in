@@ -4882,6 +4882,50 @@ SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
   return result;
 }
 
+SEXP R_igraph_mincut(SEXP graph, SEXP pcapacity) {
+
+  igraph_t g;
+  igraph_vector_t capacity;
+  igraph_integer_t value;
+  igraph_vector_t partition;
+  igraph_vector_t partition2;
+  igraph_vector_t cut;
+  SEXP result, names;
+  
+  R_igraph_before();
+  
+  igraph_vector_init(&cut, 0);
+  igraph_vector_init(&partition, 0);
+  igraph_vector_init(&partition2, 0);
+
+  R_SEXP_to_igraph(graph, &g);
+  R_SEXP_to_vector(pcapacity, &capacity);
+
+  igraph_mincut(&g, &value, &partition,
+		&partition2, &cut, &capacity);
+
+  PROTECT(result=NEW_LIST(4));
+  PROTECT(names=NEW_CHARACTER(4));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
+  REAL(VECTOR_ELT(result, 0))[0]=value;
+  SET_VECTOR_ELT(result, 1, R_igraph_vector_to_SEXP(&cut));
+  igraph_vector_destroy(&cut);
+  SET_VECTOR_ELT(result, 2, R_igraph_vector_to_SEXP(&partition));
+  igraph_vector_destroy(&partition);
+  SET_VECTOR_ELT(result, 3, R_igraph_vector_to_SEXP(&partition2));
+  igraph_vector_destroy(&partition2);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("value"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("cut"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("partition1"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("partition2"));
+  SET_NAMES(result, names);
+
+  R_igraph_after();
+
+  UNPROTECT(2);
+  return result;
+}  
+  
 SEXP R_igraph_mincut_value(SEXP graph, SEXP pcapacity) {
   
   igraph_t g;

@@ -39,7 +39,8 @@ graph.maxflow <- function(graph, source, target, capacity=NULL) {
         PACKAGE="igraph")
 }
 
-graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL) {
+graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
+                         value.only=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -56,10 +57,16 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL) {
     stop("Please give both source and target oe neither")
   }
   capacity <- as.numeric(capacity)
-  
+
+  value.only <- as.logical(value.only)
   if (is.null(target) && is.null(source)) {
-    .Call("R_igraph_mincut_value", graph, capacity,
-          PACKAGE="igraph")
+    if (value.only) {
+      .Call("R_igraph_mincut_value", graph, capacity,
+            PACKAGE="igraph")
+    } else {
+      .Call("R_igraph_mincut", graph, capacity,
+            PACKAGE="igraph")
+    }
   } else {
     .Call("R_igraph_st_mincut_value", graph, as.numeric(source),
           as.numeric(target), capacity,
