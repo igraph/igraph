@@ -13,7 +13,7 @@ c        This is a simple example file to demonstrate the
 c     DIMACS input file format for minimum-cost flow problems.
 c 
 c problem line :
-p min 4 5
+p max 4 5
 c
 c node descriptor lines :
 n 1 s

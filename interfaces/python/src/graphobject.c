@@ -3858,7 +3858,7 @@ PyObject *igraphmodule_Graph_Read_DIMACS(PyTypeObject * type,
     return NULL;
   }
 
-  if (igraph_read_graph_dimacs(&g, f, &source, &target, &capacity,
+  if (igraph_read_graph_dimacs(&g, f, 0, 0, &source, &target, &capacity,
                                PyObject_IsTrue(directed))) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&capacity);
