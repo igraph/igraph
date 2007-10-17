@@ -6519,6 +6519,60 @@ SEXP R_igraph_famous(SEXP name) {
   return result;
 }
 
+SEXP R_igraph_get_adjlist(SEXP graph, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_integer_t mode=REAL(pmode)[0];
+  SEXP result;
+  long int i;
+  long int no_of_nodes;
+  igraph_vector_t neis;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  no_of_nodes=igraph_vcount(&g);
+  igraph_vector_init(&neis, 0);
+  PROTECT(result=NEW_LIST(no_of_nodes));
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_neighbors(&g, &neis, i, mode);
+    SET_VECTOR_ELT(result, i, R_igraph_vector_to_SEXP(&neis));
+  }
+  igraph_vector_destroy(&neis);
+  
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+} 
+
+SEXP R_igraph_get_adjedgelist(SEXP graph, SEXP pmode) {
+  
+  igraph_t g;
+  igraph_integer_t mode=REAL(pmode)[0];
+  SEXP result;
+  long int i;
+  long int no_of_nodes;
+  igraph_vector_t neis;
+  
+  R_igraph_before();
+  
+  R_SEXP_to_igraph(graph, &g);
+  no_of_nodes=igraph_vcount(&g);
+  igraph_vector_init(&neis, 0);
+  PROTECT(result=NEW_LIST(no_of_nodes));
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_adjacent(&g, &neis, i, mode);
+    SET_VECTOR_ELT(result, i, R_igraph_vector_to_SEXP(&neis));
+  }
+  igraph_vector_destroy(&neis);
+  
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return result;
+} 
+
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
 			SEXP verbose) {

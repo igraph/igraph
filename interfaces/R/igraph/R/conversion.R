@@ -117,3 +117,24 @@ as.undirected <- function(graph, mode="collapse") {
   .Call("R_igraph_to_undirected", graph, as.numeric(mode),
         PACKAGE="igraph")  
 }
+
+get.adjlist <- function(graph, mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
+  .Call("R_igraph_get_adjlist", graph, mode,
+        PACKAGE="igraph")
+}
+
+get.adjedgelist <- function(graph, mode="all") {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
+  .Call("R_igraph_get_adjedgelist", graph, mode,
+        PACKAGE="igraph")
+}
+
