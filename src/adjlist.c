@@ -26,7 +26,7 @@
 
 #include <string.h>   /* memset */
 
-int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al, 
+int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
 			  igraph_neimode_t mode) {
   long int i;
 
@@ -42,7 +42,7 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
     IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
   }
 
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, al);
+  IGRAPH_FINALLY(igraph_adjlist_destroy, al);
   for (i=0; i<al->length; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], 0));
@@ -53,8 +53,8 @@ int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al,
   return 0;
 }
 
-int igraph_i_adjlist_init_complementer(const igraph_t *graph,
-				       igraph_i_adjlist_t *al, 
+int igraph_adjlist_init_complementer(const igraph_t *graph,
+				       igraph_adjlist_t *al, 
 				       igraph_neimode_t mode,
 				       igraph_bool_t loops) {
   long int i, j, k, n;
@@ -73,7 +73,7 @@ int igraph_i_adjlist_init_complementer(const igraph_t *graph,
     IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
   }
 
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, al);
+  IGRAPH_FINALLY(igraph_adjlist_destroy, al);
 
   n=al->length;
   seen=Calloc(n, igraph_bool_t);
@@ -110,7 +110,7 @@ int igraph_i_adjlist_init_complementer(const igraph_t *graph,
   return 0;
 }
 
-void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
+void igraph_adjlist_destroy(igraph_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
     if (&al->adjs[i]) { igraph_vector_destroy(&al->adjs[i]); }
@@ -118,17 +118,17 @@ void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al) {
   Free(al->adjs);
 }
 
-/* igraph_vector_t *igraph_i_adjlist_get(igraph_i_adjlist_t *al, igraph_integer_t no) { */
+/* igraph_vector_t *igraph_adjlist_get(igraph_adjlist_t *al, igraph_integer_t no) { */
 /*   return &al->adjs[(long int)no]; */
 /* } */
 
-void igraph_i_adjlist_sort(igraph_i_adjlist_t *al) {
+void igraph_adjlist_sort(igraph_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++)
     igraph_vector_sort(&al->adjs[i]);
 }
 
-int igraph_i_adjlist_simplify(igraph_i_adjlist_t *al) {
+int igraph_adjlist_simplify(igraph_adjlist_t *al) {
   long int i;
   long int n=al->length;
   igraph_vector_t mark;
@@ -155,8 +155,8 @@ int igraph_i_adjlist_simplify(igraph_i_adjlist_t *al) {
   return 0;
 }
 
-int igraph_i_adjedgelist_init(const igraph_t *graph, 
-			      igraph_i_adjedgelist_t *ael, 
+int igraph_adjedgelist_init(const igraph_t *graph, 
+			      igraph_adjedgelist_t *ael, 
 			      igraph_neimode_t mode) {
   long int i;
 
@@ -172,7 +172,7 @@ int igraph_i_adjedgelist_init(const igraph_t *graph,
     IGRAPH_ERROR("Cannot create adjedgelist view", IGRAPH_ENOMEM);
   }
 
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, ael);  
+  IGRAPH_FINALLY(igraph_adjlist_destroy, ael);  
   for (i=0; i<ael->length; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_vector_init(&ael->adjs[i], 0));
@@ -183,7 +183,7 @@ int igraph_i_adjedgelist_init(const igraph_t *graph,
   return 0;
 }
 
-void igraph_i_adjedgelist_destroy(igraph_i_adjedgelist_t *ael) {
+void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael) {
   long int i;
   for (i=0; i<ael->length; i++) {
     /* This works if some igraph_vector_t's are 0, because igraph_vector_destroy can

@@ -212,8 +212,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source, i, e;
   
-  igraph_i_adjedgelist_t elist_out, elist_in;
-  igraph_i_adjedgelist_t *elist_out_p, *elist_in_p;
+  igraph_adjedgelist_t elist_out, elist_in;
+  igraph_adjedgelist_t *elist_out_p, *elist_in_p;
   igraph_vector_t *neip;
   long int neino;
   igraph_integer_t modein, modeout;
@@ -227,16 +227,16 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   if (directed) {
     modeout=IGRAPH_OUT;
     modeout=IGRAPH_IN;
-    IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &elist_out, IGRAPH_OUT));
-    IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &elist_out);
-    IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &elist_in, IGRAPH_IN));
-    IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &elist_in);
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_out, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_in, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_in);
     elist_out_p=&elist_out;
     elist_in_p=&elist_in;
   } else {
     modeout=modein=IGRAPH_ALL;
-    IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &elist_out, IGRAPH_ALL));
-    IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_out, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
     elist_out_p=elist_in_p=&elist_out;
   }
   
@@ -296,7 +296,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
       while (!igraph_dqueue_empty(&q)) {
 	long int actnode=igraph_dqueue_pop(&q);
 	
-	neip=igraph_i_adjedgelist_get(elist_out_p, actnode);
+	neip=igraph_adjedgelist_get(elist_out_p, actnode);
 	neino=igraph_vector_size(neip);
 	for (i=0; i<neino; i++) {
 	  igraph_integer_t edge=VECTOR(*neip)[i], from, to;
@@ -326,7 +326,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 	if (distance[actnode]<1) { continue; } /* skip source node */
 	
 	/* set the temporary score of the friends */
-	neip=igraph_i_adjedgelist_get(elist_in_p, actnode);
+	neip=igraph_adjedgelist_get(elist_in_p, actnode);
 	neino=igraph_vector_size(neip);
 	for (i=0; i<neino; i++) {
 	  igraph_integer_t from, to;
@@ -359,13 +359,13 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     passive[maxedge]=1;
     igraph_edge(graph, maxedge, &from, &to);
 
-    neip=igraph_i_adjedgelist_get(elist_in_p, to);
+    neip=igraph_adjedgelist_get(elist_in_p, to);
     neino=igraph_vector_size(neip);
     igraph_vector_search(neip, 0, maxedge, &pos);
     VECTOR(*neip)[pos]=VECTOR(*neip)[neino-1];
     igraph_vector_pop_back(neip);
     
-    neip=igraph_i_adjedgelist_get(elist_out_p, from);
+    neip=igraph_adjedgelist_get(elist_out_p, from);
     neino=igraph_vector_size(neip);
     igraph_vector_search(neip, 0, maxedge, &pos);
     VECTOR(*neip)[pos]=VECTOR(*neip)[neino-1];
@@ -382,11 +382,11 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(7);
   
   if (directed) {
-    igraph_i_adjedgelist_destroy(&elist_out);
-    igraph_i_adjedgelist_destroy(&elist_in);
+    igraph_adjedgelist_destroy(&elist_out);
+    igraph_adjedgelist_destroy(&elist_in);
     IGRAPH_FINALLY_CLEAN(2);
   } else {
-    igraph_i_adjedgelist_destroy(&elist_out);
+    igraph_adjedgelist_destroy(&elist_out);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -692,7 +692,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   igraph_vector_t idx;
   long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
   long int staken=0;
-  igraph_i_adjlist_t adjlist;
+  igraph_adjlist_t adjlist;
   long int i, j, k, l, m;
   long int communities=1;
   igraph_vector_t vmembership, *mymembership=membership;  
@@ -716,8 +716,8 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
   IGRAPH_VECTOR_INIT_FINALLY(&x, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&x2, no_of_nodes);
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &adjlist, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
   
   IGRAPH_CHECK(igraph_vector_resize(mymembership, no_of_nodes));
   igraph_vector_null(mymembership);  
@@ -781,7 +781,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 	igraph_vector_null(&x2);
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int n=igraph_vector_size(neis);
 	  for (k=0; k<n; k++) {
 	    long int nei=VECTOR(*neis)[k];
@@ -793,7 +793,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 	ktx=0.0; sumdeg=0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);
 	  sumdeg += degree;
 	  ktx += VECTOR(x)[j] * degree;
@@ -822,7 +822,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 	sumsq=0.0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);
 	  /* the last term is the diagonal of B which should be zero */
 	  VECTOR(x)[j] = VECTOR(x2)[j] - ktx*degree
@@ -882,7 +882,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     /* Rewrite the adjacency lists */
     for (j=0; j<size; j++) {
       long int oldid=VECTOR(idx)[j];
-      igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+      igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
       long int n=igraph_vector_size(neis);
       for (k=0; k<n; ) {
 	long int nei=VECTOR(*neis)[k];
@@ -923,7 +923,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   
   RNG_END();
 
-  igraph_i_adjlist_destroy(&adjlist);
+  igraph_adjlist_destroy(&adjlist);
   igraph_vector_destroy(&x2);
   igraph_vector_destroy(&x);
   igraph_dqueue_destroy(&tosplit);
@@ -1020,7 +1020,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_t idx, idx2, mymerges;
   long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
   long int staken=0;
-  igraph_i_adjlist_t adjlist;
+  igraph_adjlist_t adjlist;
   long int i, j, k, l;
   long int communities=1;
   igraph_vector_t vmembership, *mymembership=membership;
@@ -1045,8 +1045,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&x, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&x2, no_of_nodes);
   IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &adjlist, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
   
   IGRAPH_CHECK(igraph_vector_resize(mymembership, no_of_nodes));
   igraph_vector_null(mymembership);  
@@ -1113,7 +1113,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 	igraph_vector_null(&x2);
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int n=igraph_vector_size(neis);
 	  comm_edges += n;
 	  kig=0;
@@ -1131,7 +1131,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 	ktx=0.0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);	  
  	  VECTOR(x2)[j] += degree * comm_edges / no_of_edges * VECTOR(x)[j] / 2;
 	  ktx += VECTOR(x)[j] * degree;
@@ -1161,7 +1161,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 	sumsq=0.0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_adjlist_get(&adjlist, oldid);
+	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);
 	  /* the last term is the diagonal of B which should be zero */
 	  VECTOR(x)[j] = VECTOR(x2)[j] - ktx*degree
@@ -1239,7 +1239,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   
   RNG_END();
   
-  igraph_i_adjlist_destroy(&adjlist);
+  igraph_adjlist_destroy(&adjlist);
   igraph_dqueue_destroy(&tosplit);
   igraph_vector_destroy(&x2);
   igraph_vector_destroy(&x);

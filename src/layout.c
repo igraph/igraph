@@ -1190,7 +1190,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int i, n, j;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-  igraph_i_adjlist_t allneis;
+  igraph_adjlist_t allneis;
   igraph_vector_t *neis;
   struct igraph_i_reingold_tilford_vertex *vdata;
   
@@ -1201,8 +1201,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
   
   vdata=Calloc(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
   if (vdata==0) {
@@ -1227,7 +1227,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   while (!igraph_dqueue_empty(&q)) {
     long int actnode=igraph_dqueue_pop(&q);
     long int actdist=igraph_dqueue_pop(&q);
-    neis=igraph_i_adjlist_get(&allneis, actnode);
+    neis=igraph_adjlist_get(&allneis, actnode);
     n=igraph_vector_size(neis);
     for (j=0; j<n; j++) {
       long int neighbor=VECTOR(*neis)[j];
@@ -1248,7 +1248,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   igraph_i_layout_reingold_tilford_calc_coords(vdata, res, root, no_of_nodes, vdata[root].offset);
   
   igraph_dqueue_destroy(&q);
-  igraph_i_adjlist_destroy(&allneis);
+  igraph_adjlist_destroy(&allneis);
   igraph_free(vdata);
   IGRAPH_FINALLY_CLEAN(3);
   

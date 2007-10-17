@@ -1,5 +1,9 @@
 2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/igraph.h (igraph_i_adjlist_t, igraph_adjlist_t)
+	(igraph_i_adjedgelist_t, igraph_adjedgelist_t) : no longer internal, 
+	renamed
+
 	* src/random.c (igraph_rbinom) : replace unif_rand with RNG_UNIF01 and 
 	fmin2 with fmin
 

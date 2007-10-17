@@ -395,7 +395,7 @@ int igraph_largest_independent_vertex_sets(const igraph_t *graph,
 
 typedef struct igraph_i_max_ind_vsets_data_t {
   igraph_integer_t matrix_size;
-  igraph_i_adjlist_t adj_list;         /* Adjacency list of the graph */
+  igraph_adjlist_t adj_list;         /* Adjacency list of the graph */
   igraph_vector_t deg;                 /* Degrees of individual nodes */
   igraph_set_t* buckets;               /* Bucket array */
   /* The IS value for each node. Still to be explained :) */
@@ -456,7 +456,7 @@ int igraph_i_maximal_independent_vertex_sets_backtrack(const igraph_t *graph,
     v1 = level+1;
     /* Count the number of vertices with an index less than v1 that have
      * an IS value of zero */
-    neis1 = igraph_i_adjlist_get(&clqdata->adj_list, v1);
+    neis1 = igraph_adjlist_get(&clqdata->adj_list, v1);
     c = 0;
     j = 0;
     while (j<VECTOR(clqdata->deg)[v1] && (v2=VECTOR(*neis1)[j]) <= level) {
@@ -488,7 +488,7 @@ int igraph_i_maximal_independent_vertex_sets_backtrack(const igraph_t *graph,
       while (j<VECTOR(clqdata->deg)[v1] && (v2=VECTOR(*neis1)[j]) <= level) {
 	if (clqdata->IS[v2] == 0) {
 	  IGRAPH_CHECK(igraph_set_add(&clqdata->buckets[v1], j));
-	  neis2 = igraph_i_adjlist_get(&clqdata->adj_list, v2);
+	  neis2 = igraph_adjlist_get(&clqdata->adj_list, v2);
 	  k = 0;
 	  while (k<VECTOR(clqdata->deg)[v2] && (v3=VECTOR(*neis2)[k])<=level) {
 	    clqdata->IS[v3]--;
@@ -513,7 +513,7 @@ int igraph_i_maximal_independent_vertex_sets_backtrack(const igraph_t *graph,
       while (igraph_set_iterate(&clqdata->buckets[v1], &it_state, &j1)) {
 	j=(long)j1;
 	v2=VECTOR(*neis1)[j];
-	neis2 = igraph_i_adjlist_get(&clqdata->adj_list, v2);
+	neis2 = igraph_adjlist_get(&clqdata->adj_list, v2);
 	k = 0;
 	while (k<VECTOR(clqdata->deg)[v2] && (v3=VECTOR(*neis2)[k])<=level) {
 	  clqdata->IS[v3]++;
@@ -583,8 +583,8 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
   clqdata.matrix_size=no_of_nodes;
   clqdata.keep_only_largest=0;
 
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &clqdata.adj_list);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
   clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
@@ -593,7 +593,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 
   IGRAPH_VECTOR_INIT_FINALLY(&clqdata.deg, no_of_nodes);
   for (i=0; i<no_of_nodes; i++)
-    VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_i_adjlist_get(&clqdata.adj_list, i));
+    VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_adjlist_get(&clqdata.adj_list, i));
 
   clqdata.buckets = Calloc(no_of_nodes+1, igraph_set_t);
   if (clqdata.buckets == 0)
@@ -611,7 +611,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 
   /* Cleanup */
   for (i=0; i<no_of_nodes; i++) igraph_set_destroy(&clqdata.buckets[i]);
-  igraph_i_adjlist_destroy(&clqdata.adj_list);
+  igraph_adjlist_destroy(&clqdata.adj_list);
   igraph_vector_destroy(&clqdata.deg);
   igraph_free(clqdata.IS);
   igraph_free(clqdata.buckets);
@@ -646,8 +646,8 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
   clqdata.matrix_size=no_of_nodes;
   clqdata.keep_only_largest=0;
 
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &clqdata.adj_list);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
   clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
@@ -656,7 +656,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
 
   IGRAPH_VECTOR_INIT_FINALLY(&clqdata.deg, no_of_nodes);
   for (i=0; i<no_of_nodes; i++)
-    VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_i_adjlist_get(&clqdata.adj_list, i));
+    VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_adjlist_get(&clqdata.adj_list, i));
 
   clqdata.buckets = Calloc(no_of_nodes+1, igraph_set_t);
   if (clqdata.buckets == 0)
@@ -673,7 +673,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
 
   /* Cleanup */
   for (i=0; i<no_of_nodes; i++) igraph_set_destroy(&clqdata.buckets[i]);
-  igraph_i_adjlist_destroy(&clqdata.adj_list);
+  igraph_adjlist_destroy(&clqdata.adj_list);
   igraph_vector_destroy(&clqdata.deg);
   igraph_free(clqdata.IS);
   igraph_free(clqdata.buckets);
@@ -748,10 +748,10 @@ int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
   clqdata.keep_only_largest=keep_only_largest;
 
   if (complementer)
-    IGRAPH_CHECK(igraph_i_adjlist_init_complementer(graph, &clqdata.adj_list, IGRAPH_ALL, 0));
+    IGRAPH_CHECK(igraph_adjlist_init_complementer(graph, &clqdata.adj_list, IGRAPH_ALL, 0));
   else
-    IGRAPH_CHECK(igraph_i_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &clqdata.adj_list);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
   clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
@@ -760,7 +760,7 @@ int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
 
   IGRAPH_VECTOR_INIT_FINALLY(&clqdata.deg, no_of_nodes);
   for (i=0; i<no_of_nodes; i++)
-    VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_i_adjlist_get(&clqdata.adj_list, i));
+    VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_adjlist_get(&clqdata.adj_list, i));
 
   clqdata.buckets = Calloc(no_of_nodes+1, igraph_set_t);
   if (clqdata.buckets == 0)
@@ -778,7 +778,7 @@ int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
 
   /* Cleanup */
   for (i=0; i<no_of_nodes; i++) igraph_set_destroy(&clqdata.buckets[i]);
-  igraph_i_adjlist_destroy(&clqdata.adj_list);
+  igraph_adjlist_destroy(&clqdata.adj_list);
   igraph_vector_destroy(&clqdata.deg);
   igraph_free(clqdata.IS);
   igraph_free(clqdata.buckets);

@@ -2368,38 +2368,38 @@ int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
 		igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
 		igraph_integer_t *fncount, igraph_integer_t *grcount);
 
+typedef struct igraph_adjlist_t { 
+  igraph_integer_t length;
+  igraph_vector_t *adjs;
+} igraph_adjlist_t;
+
+int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
+			  igraph_neimode_t mode);
+int igraph_adjlist_init_complementer(const igraph_t *graph,
+				     igraph_adjlist_t *al, 
+				     igraph_neimode_t mode,
+				     igraph_bool_t loops);
+void igraph_adjlist_destroy(igraph_adjlist_t *al);
+void igraph_adjlist_sort(igraph_adjlist_t *al);
+int igraph_adjlist_simplify(igraph_adjlist_t *al);
+/* igraph_vector_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
+/* 			       igraph_integer_t no); */
+#define igraph_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])
+
+typedef struct igraph_adjedgelist_t {
+  igraph_integer_t length;
+  igraph_vector_t *adjs;
+} igraph_adjedgelist_t;
+
+int igraph_adjedgelist_init(const igraph_t *graph, 
+			    igraph_adjedgelist_t *eal, 
+			    igraph_neimode_t mode);
+void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael);
+#define igraph_adjedgelist_get(ael, no) (&(ael)->adjs[(long int)(no)])
+
 /* -------------------------------------------------- */
 /* For internal use only, should move to other header */
 /* -------------------------------------------------- */
-
-typedef struct igraph_i_adjlist_t { 
-  igraph_integer_t length;
-  igraph_vector_t *adjs;
-} igraph_i_adjlist_t;
-
-int igraph_i_adjlist_init(const igraph_t *graph, igraph_i_adjlist_t *al, 
-			  igraph_neimode_t mode);
-int igraph_i_adjlist_init_complementer(const igraph_t *graph,
-				       igraph_i_adjlist_t *al, 
-				       igraph_neimode_t mode,
-				       igraph_bool_t loops);
-void igraph_i_adjlist_destroy(igraph_i_adjlist_t *al);
-void igraph_i_adjlist_sort(igraph_i_adjlist_t *al);
-int igraph_i_adjlist_simplify(igraph_i_adjlist_t *al);
-/* igraph_vector_t *igraph_i_adjlist_get(const igraph_i_adjlist_t *al,  */
-/* 			       igraph_integer_t no); */
-#define igraph_i_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])
-
-typedef struct igraph_i_adjedgelist_t {
-  igraph_integer_t length;
-  igraph_vector_t *adjs;
-} igraph_i_adjedgelist_t;
-
-int igraph_i_adjedgelist_init(const igraph_t *graph, 
-			      igraph_i_adjedgelist_t *eal, 
-			      igraph_neimode_t mode);
-void igraph_i_adjedgelist_destroy(igraph_i_adjedgelist_t *ael);
-#define igraph_i_adjedgelist_get(ael, no) (&(ael)->adjs[(long int)(no)])
 
 typedef struct igraph_i_lazy_adjlist_t {
   const igraph_t *graph;

@@ -84,7 +84,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 			  int size, const igraph_vector_t *cut_prob) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_i_adjlist_t allneis, alloutneis;
+  igraph_adjlist_t allneis, alloutneis;
   igraph_vector_t *neis;
   long int father;
   long int i, j, s;
@@ -144,10 +144,10 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   }
   IGRAPH_FINALLY(igraph_free, subg);
 
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &allneis, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &allneis);  
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &alloutneis, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &alloutneis);  
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);  
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &alloutneis, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &alloutneis);  
 
   IGRAPH_VECTOR_INIT_FINALLY(&vids, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&adjverts, 0);
@@ -166,7 +166,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
     
     /* init V_E */
     igraph_vector_clear(&adjverts);
-    neis=igraph_i_adjlist_get(&allneis, father);
+    neis=igraph_adjlist_get(&allneis, father);
     s=igraph_vector_size(neis);
     for (i=0; i<s; i++) {
       long int nei=VECTOR(*neis)[i];
@@ -199,7 +199,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 	  code=0; idx=0;
 	  for (k=0; k<size; k++) {
 	    long int from=VECTOR(vids)[k];
- 	    neis=igraph_i_adjlist_get(&alloutneis, from);
+ 	    neis=igraph_adjlist_get(&alloutneis, from);
 	    s2=igraph_vector_size(neis);
 	    for (j=0; j<s2; j++) {
 	      long int nei=VECTOR(*neis)[j];
@@ -230,7 +230,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 	IGRAPH_CHECK(igraph_stack_push(&stack, nei));
 	IGRAPH_CHECK(igraph_stack_push(&stack, level));
 	
-	neis=igraph_i_adjlist_get(&allneis, nei);
+	neis=igraph_adjlist_get(&allneis, nei);
 	s=igraph_vector_size(neis);
 	for (i=0; i<s; i++) {
 	  long int nei2=VECTOR(*neis)[i];
@@ -254,7 +254,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 
 	nei=igraph_vector_pop_back(&vids);
 	subg[nei]=0; added[nei] -= 1; level -= 1;
-	neis=igraph_i_adjlist_get(&allneis, nei);
+	neis=igraph_adjlist_get(&allneis, nei);
 	s=igraph_vector_size(neis);
 	for (i=0; i<s; i++) {
 	  added[ (long int) VECTOR(*neis)[i] ] -= 1;
@@ -271,7 +271,7 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
     /* clear the added vector */
     added[father] -= 1;
     subg[father] = 0;
-    neis=igraph_i_adjlist_get(&allneis, father);
+    neis=igraph_adjlist_get(&allneis, father);
     s=igraph_vector_size(neis);
     for (i=0; i<s; i++) {
       added[ (long int) VECTOR(*neis)[i] ] -= 1;
@@ -283,8 +283,8 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   Free(subg);
   igraph_vector_destroy(&vids);
   igraph_vector_destroy(&adjverts);
-  igraph_i_adjlist_destroy(&alloutneis);
-  igraph_i_adjlist_destroy(&allneis);
+  igraph_adjlist_destroy(&alloutneis);
+  igraph_adjlist_destroy(&allneis);
   igraph_stack_destroy(&stack);
   IGRAPH_FINALLY_CLEAN(7);
   return 0;
@@ -714,18 +714,18 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
   igraph_vector_long_t seen;
   igraph_vector_t *neis, *neis2;
   long int i, j, k, s, neilen, neilen2, ign;
-  igraph_i_adjlist_t adjlist;
+  igraph_adjlist_t adjlist;
   
   IGRAPH_CHECK(igraph_vector_long_init(&seen, vc));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &seen);
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &adjlist, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
   *res2=*res4=0;
 
   for (i=0; i<vc; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     
-    neis=igraph_i_adjlist_get(&adjlist, i);
+    neis=igraph_adjlist_get(&adjlist, i);
     neilen=igraph_vector_size(neis);
     /* mark neighbors of i & i itself */
     VECTOR(seen)[i]=i+1;
@@ -744,7 +744,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
     for (j=0; j<neilen; j++) {
       long int nei=VECTOR(*neis)[j];
       if (nei<=i || (j>0 && nei==VECTOR(*neis)[j-1])) { continue; }
-      neis2=igraph_i_adjlist_get(&adjlist, nei);
+      neis2=igraph_adjlist_get(&adjlist, nei);
       neilen2=igraph_vector_size(neis2);
       s=0;
       for (k=0; k<neilen2; k++) {
@@ -762,7 +762,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
     }
   }
 
-  igraph_i_adjlist_destroy(&adjlist);
+  igraph_adjlist_destroy(&adjlist);
   igraph_vector_long_destroy(&seen);
   IGRAPH_FINALLY_CLEAN(2);
 

@@ -426,8 +426,8 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   igraph_real_t mincut=IGRAPH_INFINITY;	/* infinity */
   long int i;
   
-  igraph_i_adjlist_t adjlist;
-  igraph_i_adjedgelist_t adjedgelist;
+  igraph_adjlist_t adjlist;
+  igraph_adjedgelist_t adjedgelist;
 
   igraph_vector_t mergehist;
   igraph_bool_t calc_cut=partition || partition2 || cut;
@@ -445,11 +445,11 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   IGRAPH_CHECK(igraph_i_cutheap_init(&heap, no_of_nodes));
   IGRAPH_FINALLY(igraph_i_cutheap_destroy, &heap);
 
-  IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &adjedgelist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &adjedgelist);
+  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
 
-  IGRAPH_CHECK(igraph_i_adjlist_init(graph, &adjlist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_i_adjlist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
   while (igraph_i_cutheap_size(&heap) >= 2) {
 
@@ -463,8 +463,8 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       a=igraph_i_cutheap_popmax(&heap);
 
       /* update the weights of the active vertices connected to a */
-      edges=igraph_i_adjedgelist_get(&adjedgelist, a);
-      neis=igraph_i_adjlist_get(&adjlist, a);
+      edges=igraph_adjedgelist_get(&adjedgelist, a);
+      neis=igraph_adjlist_get(&adjlist, a);
       n=igraph_vector_size(edges);
       for (i=0; i<n; i++) {
 	igraph_integer_t edge=VECTOR(*edges)[i];
@@ -498,8 +498,8 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     }
     /* First remove the a--last edge if there is one, a is still the
        last deactivated vertex */
-    edges=igraph_i_adjedgelist_get(&adjedgelist, a);
-    neis=igraph_i_adjlist_get(&adjlist, a);
+    edges=igraph_adjedgelist_get(&adjedgelist, a);
+    neis=igraph_adjlist_get(&adjlist, a);
     n=igraph_vector_size(edges);
     for (i=0; i<n; ) {
       if (VECTOR(*neis)[i]==last) {
@@ -513,8 +513,8 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       }
     }
     
-    edges=igraph_i_adjedgelist_get(&adjedgelist, last);
-    neis=igraph_i_adjlist_get(&adjlist, last);
+    edges=igraph_adjedgelist_get(&adjedgelist, last);
+    neis=igraph_adjlist_get(&adjlist, last);
     n=igraph_vector_size(edges);
     for (i=0; i<n; ) {
       if (VECTOR(*neis)[i] == a) {
@@ -529,12 +529,12 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     }
 
     /* Now rewrite the edge lists of last's neighbors */
-    neis=igraph_i_adjlist_get(&adjlist, last);
+    neis=igraph_adjlist_get(&adjlist, last);
     n=igraph_vector_size(neis);    
     for (i=0; i<n; i++) {     
       igraph_integer_t nei=VECTOR(*neis)[i];
       long int n2, j;
-      neis2=igraph_i_adjlist_get(&adjlist, nei);
+      neis2=igraph_adjlist_get(&adjlist, nei);
       n2=igraph_vector_size(neis2);
       for (j=0; j<n2; j++) {
 	if (VECTOR(*neis2)[j] == last) {
@@ -544,10 +544,10 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     }
     
     /* And append the lists of last to the lists of a */
-    edges=igraph_i_adjedgelist_get(&adjedgelist, a);
-    neis=igraph_i_adjlist_get(&adjlist, a);
-    edges2=igraph_i_adjedgelist_get(&adjedgelist, last);
-    neis2=igraph_i_adjlist_get(&adjlist, last);
+    edges=igraph_adjedgelist_get(&adjedgelist, a);
+    neis=igraph_adjlist_get(&adjlist, a);
+    edges2=igraph_adjedgelist_get(&adjedgelist, last);
+    neis2=igraph_adjlist_get(&adjlist, last);
     IGRAPH_CHECK(igraph_vector_append(edges, edges2));
     IGRAPH_CHECK(igraph_vector_append(neis, neis2));
     igraph_vector_clear(edges2); /* TODO: free it */
@@ -559,8 +559,8 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
 
   *res=mincut;
 
-  igraph_i_adjedgelist_destroy(&adjedgelist);
-  igraph_i_adjlist_destroy(&adjlist);
+  igraph_adjedgelist_destroy(&adjedgelist);
+  igraph_adjlist_destroy(&adjlist);
   igraph_i_cutheap_destroy(&heap);
   IGRAPH_FINALLY_CLEAN(3);
 
