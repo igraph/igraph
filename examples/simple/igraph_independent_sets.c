@@ -31,6 +31,9 @@ int print_vector(igraph_vector_t *v) {
   printf("\n");
 }
 
+void warning_handler_ignore(const char* reason,const char* file,int line,int e) {
+}
+
 int main() {
   
   igraph_t g;
@@ -39,6 +42,7 @@ int main() {
   igraph_integer_t alpha;
   const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
   
+  igraph_set_warning_handler(warning_handler_ignore);
   igraph_vector_ptr_init(&result, 0);
 
   igraph_tree(&g, 5, 2, IGRAPH_TREE_OUT);

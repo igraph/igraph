@@ -31,6 +31,9 @@ int print_vector(igraph_vector_t *v) {
   printf("\n");
 }
 
+void warning_handler_ignore(const char* reason,const char* file,int line,int e) {
+}
+
 int main() {
   
   igraph_t g;
@@ -39,7 +42,9 @@ int main() {
   igraph_integer_t omega;
   long int i, j, n;
   const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
-  
+ 
+  igraph_set_warning_handler(warning_handler_ignore);
+
   igraph_vector_ptr_init(&result, 0);
   igraph_full(&g, 6, 0, 0);
   igraph_es_pairs_small(&es, 0, 0, 1, 0, 2, 3, 5, -1);
