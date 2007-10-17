@@ -108,6 +108,19 @@ VECTOR:
          igraph_vector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VECTORLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP(&%C%)); \
+         R_igraph_vectorlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 ##################################
 # VECTOR that can be NULL
 # 'OUT' arguments are always returned now, in the 

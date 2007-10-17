@@ -780,8 +780,6 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
 		 igraph_vector_t *circle);
 int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
 
-/* TODO: degree.distribution (?) */
-
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
@@ -801,8 +799,12 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
 int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
 		     igraph_connectedness_t mode, 
 		     long int maxcompno, long int minelements);
-
-/* TODO: cluster.distribution (?) */
+int igraph_articulation_points(const igraph_t *graph,
+			       igraph_vector_t *res);
+int igraph_biconnected_components(const igraph_t *graph,
+				  igraph_integer_t *no,
+				  igraph_vector_ptr_t *list,
+				  igraph_vector_t *articulation_points);
 
 /* -------------------------------------------------- */
 /* Cliques, maximal independent vertex sets           */

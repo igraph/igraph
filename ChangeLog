@@ -1,5 +1,8 @@
 2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/components.c (igraph_articulation_points)
+	(igraph_biconnected_components) : added
+
 	* src/igraph.h (igraph_i_adjlist_t, igraph_adjlist_t)
 	(igraph_i_adjedgelist_t, igraph_adjedgelist_t) : no longer internal, 
 	renamed

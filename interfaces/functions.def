@@ -436,6 +436,15 @@ igraph_decompose:
                 LONGINT maxcompno=-1, LONGINT minelements=1
         IGNORE: RR, RC, RNamespace
 
+igraph_articulation_points:
+        PARAMS: GRAPH graph, OUT VECTOR res
+        NAME-R: articulation.points
+
+igraph_biconnected_components:
+        PARAMS: GRAPH graph, OUT INTEGERPTR no, OUT VECTORLIST components, \
+                OUT VECTOR articulation_points
+        NAME-R: biconnected.components
+
 #######################################
 # Cliques
 #######################################

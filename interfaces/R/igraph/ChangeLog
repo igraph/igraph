@@ -1,5 +1,8 @@
 2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/src/rinterface.c.in (R_igraph_vectorlist_to_SEXP)
+	(R_igraph_vectorlist_destroy) : added
+
 	* interfaces/R/igraph/R/conversion.R (get.adjlist, get.adjedgelist)
 	* interfaces/R/src/rinterface.c.in (R_igraph_get_adjlist)
 	(R_igraph_get_adjedgelist) : added
