@@ -37,8 +37,8 @@ class CliqueTests(unittest.TestCase):
 
 class IndependentVertexSetTests(unittest.TestCase):
     def setUp(self):
-        self.g1=Graph.Tree(5, 2, TREE_OUT)
-        self.g2=Graph.Tree(10, 2, TREE_OUT)
+        self.g1=Graph.Tree(5, 2, TREE_UNDIRECTED)
+        self.g2=Graph.Tree(10, 2, TREE_UNDIRECTED)
 
     def testIndependentVertexSets(self):
         tests = {(4, -1): [],
