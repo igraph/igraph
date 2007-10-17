@@ -1,5 +1,8 @@
 2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/random.c (igraph_rbinom) : replace unif_rand with RNG_UNIF01 and 
+	fmin2 with fmin
+
 	* src/forestfire.c (igraph_forest_fire_game) : progress meter and 
 	interruption handler added
 

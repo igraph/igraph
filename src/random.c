@@ -982,7 +982,7 @@ double igraph_rbinom(double nin, double pp)
     if (n == 0 || pp == 0.) return 0;
     if (pp == 1.) return n;
 
-    p = fmin2(pp, 1. - pp);
+    p = fmin(pp, 1. - pp);
     q = 1. - p;
     np = n * p;
     r = p / q;
@@ -1025,8 +1025,8 @@ double igraph_rbinom(double nin, double pp)
 
     /*-------------------------- np = n*p >= 30 : ------------------- */
     repeat {
-      u = unif_rand() * p4;
-      v = unif_rand();
+      u = RNG_UNIF01() * p4;
+      v = RNG_UNIF01();
       /* triangular region */
       if (u <= p1) {
 	  ix = xm - p1 * v + u;
@@ -1096,7 +1096,7 @@ double igraph_rbinom(double nin, double pp)
   repeat {
      ix = 0;
      f = qn;
-     u = unif_rand();
+     u = RNG_UNIF01();
      repeat {
 	 if (u < f)
 	     goto finis;

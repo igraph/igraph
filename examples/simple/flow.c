@@ -64,7 +64,7 @@ int main() {
 
 /*   /\***************\/ */
 /*   infile=fopen("ak-8198.max", "r"); */
-/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
 /* 			   IGRAPH_DIRECTED); */
 /*   fclose(infile); */
 
@@ -77,7 +77,7 @@ int main() {
 
 /*   /\***************\/ */
 /*   infile=fopen("ak-16390.max", "r"); */
-/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
 /* 			   IGRAPH_DIRECTED); */
 /*   fclose(infile); */
 
@@ -90,7 +90,7 @@ int main() {
 
 /*   /\***************\/ */
 /*   infile=fopen("ak-32774.max", "r"); */
-/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
 /* 			   IGRAPH_DIRECTED); */
 /*   fclose(infile); */
 
@@ -103,7 +103,7 @@ int main() {
 
 /*   /\***************\/ */
 /*   infile=fopen("ak-65542.max", "r"); */
-/*   igraph_read_graph_dimacs(&g, infile, &source, &target, &capacity, */
+/*   igraph_read_graph_dimacs(&g, infile, 0, 0, &source, &target, &capacity, */
 /* 			   IGRAPH_DIRECTED); */
 /*   fclose(infile); */
 
