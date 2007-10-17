@@ -250,8 +250,8 @@ igraph_citing_cited_type_game:
         IGNORE: RR, RC, RNamespace
 
 igraph_forest_fire_game:
-        PARAMS: OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_prob, \
-                INTEGER pabms=1, BOOLEAN directed=True
+        PARAMS: OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_factor=1, \
+                INTEGER ambs=1, BOOLEAN directed=True
         NAME-R: forest.fire.game
 
 #######################################

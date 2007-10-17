@@ -8,6 +8,9 @@
 	* src/foreign.c (igraph_read_graph_dimacs) : updated to handle 'edge'
 	problems
 
+	* src/forestfire.c (igraph_forest_fire_game) : updated according to a
+	paper i found on Leskovec's web site
+
 	* src/forestfire.c (igraph_forest_fire_game) : forest fire model added
 
 	* src/random.h (RNG_BINOM) : added

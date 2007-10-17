@@ -41,7 +41,7 @@ void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
 }
 
 int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
-			    igraph_real_t fw_prob, igraph_real_t bw_prob,
+			    igraph_real_t fw_prob, igraph_real_t bw_factor,
 			    igraph_integer_t pambs, igraph_bool_t directed) {
   
   igraph_vector_long_t visited;
@@ -51,15 +51,15 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_i_forest_fire_data_t data;
   igraph_dqueue_t neiq;
   long int ambs=pambs;
-  igraph_real_t param_geom_out=1/(fw_prob+1);
-  igraph_real_t param_geom_in=1/(bw_prob+1);
+  igraph_real_t param_geom_out=1-fw_prob;
+  igraph_real_t param_geom_in=1-fw_prob*bw_factor;
   
   if (fw_prob < 0) {
     IGRAPH_ERROR("Forest fire model: 'fw_prob' should be between non-negative", 
 		 IGRAPH_EINVAL);
   }
-  if (bw_prob < 0) {
-    IGRAPH_ERROR("Forest fire model: 'bw_prob' should be non-negative",
+  if (bw_factor < 0) {
+    IGRAPH_ERROR("Forest fire model: 'bw_factor' should be non-negative",
 		 IGRAPH_EINVAL);
   }
   if (ambs < 0) {

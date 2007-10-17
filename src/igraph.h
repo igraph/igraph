@@ -682,7 +682,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 				  igraph_bool_t directed);
 
 int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
-			    igraph_real_t fw_prob, igraph_real_t bw_prob, 
+			    igraph_real_t fw_prob, igraph_real_t bw_factor,
 			    igraph_integer_t ambs, igraph_bool_t directed);
 
 /* -------------------------------------------------- */
