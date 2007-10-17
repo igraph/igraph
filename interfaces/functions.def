@@ -253,6 +253,7 @@ igraph_forest_fire_game:
         PARAMS: OUT GRAPH graph, INTEGER nodes, REAL fw_prob, REAL bw_factor=1, \
                 INTEGER ambs=1, BOOLEAN directed=True
         NAME-R: forest.fire.game
+        FLAGS: PROGRESS
 
 #######################################
 # Basic query functions
@@ -331,6 +332,7 @@ igraph_path_length_hist:
         PARAMS: GRAPH graph, OUT VECTOR res, OUT REALPTR unconnected, \
                 BOOLEAN directed=True
         NAME-R: path.length.hist
+        FLAGS: PROGRESS
 
 igraph_simplify:
         PARAMS: INOUT GRAPH graph, BOOLEAN multiple=True, BOOLEAN loops=True

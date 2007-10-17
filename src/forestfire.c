@@ -110,7 +110,14 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 	IGRAPH_CHECK(igraph_vector_push_back(inneis+nei, actnode));  \
       }
   
+  igraph_progress("Forest fire: ", 0.0, NULL);
+  
   for (actnode=1; actnode < no_of_nodes; actnode++) {
+
+    igraph_progress("Forest fire: ", 100.0*actnode/no_of_nodes, NULL);
+
+    IGRAPH_ALLOW_INTERRUPTION();    
+    
     /* We don't want to visit the current vertex */
     VECTOR(visited)[actnode] = actnode+1;
 
@@ -124,7 +131,7 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
       long int actamb=igraph_dqueue_pop(&neiq);
       igraph_vector_t *outv=outneis+actamb;
       igraph_vector_t *inv=inneis+actamb;
-      long int no_in=igraph_vector_size(inv)-1;	/* last citation is from actnode */
+      long int no_in=igraph_vector_size(inv);
       long int no_out=igraph_vector_size(outv);
       long int neis_out=RNG_GEOM(param_geom_out);
       long int neis_in=RNG_GEOM(param_geom_in);
@@ -176,6 +183,8 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 #undef ADD_EDGE_TO  
 
   RNG_END();
+
+  igraph_progress("Forest fire: ", 100.0, NULL);
   
   igraph_dqueue_destroy(&neiq);
   igraph_vector_long_destroy(&visited);

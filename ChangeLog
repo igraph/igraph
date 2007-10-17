@@ -1,3 +1,11 @@
+2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/forestfire.c (igraph_forest_fire_game) : progress meter and 
+	interruption handler added
+
+	* src/structural_properties.c (igraph_path_length_hist) : progress
+	meter added
+
 2007-10-16  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/cliques.c (igraph_i_find_k_cliques) : memory

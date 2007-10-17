@@ -296,6 +296,8 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
     VECTOR(already_added)[i]=i+1;
     
+    igraph_progress("Path-hist: ", 100.0*i/no_of_nodes, NULL);
+
     IGRAPH_ALLOW_INTERRUPTION();
     
     while (!igraph_dqueue_empty(&q)) {
@@ -326,8 +328,10 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
 
   } /* for i<no_of_nodes */
 
+  igraph_progress("Path-hist: ", 100.0, NULL);
+
   /* count every pair only once for an undirected graph */
-  if (!igraph_is_directed(graph)) {
+  if (!directed || !igraph_is_directed(graph)) {
     for (i=1; i<ressize; i++) {
       VECTOR(*res)[i] /= 2;
     }
