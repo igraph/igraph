@@ -1,5 +1,10 @@
 2007-10-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/arpack.c (igraph_i_kleinberg, igraph_hub_score)
+	(igraph_authority_score) : added
+
+	* src/arpack.c (igraph_eigenvector_centrality) : free adjlist earlier
+
 	* src/arpack.c (igraph_eigenvector_centrality) : which argument added,
 	use vectors instead of C arrays
 
