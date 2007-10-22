@@ -38,9 +38,15 @@
 
 __BEGIN_DECLS
 
-#define Calloc(n,t)    (t*) calloc( (size_t)(n), sizeof(t) )
-#define Realloc(p,n,t) (t*) realloc((void*)(p), (size_t)((n)*sizeof(t)))
-#define Free(p)        (free( (void *)(p) ), (p) = NULL)
+#define igraph_Calloc(n,t)    (t*) calloc( (size_t)(n), sizeof(t) )
+#define igraph_Realloc(p,n,t) (t*) realloc((void*)(p), (size_t)((n)*sizeof(t)))
+#define igraph_Free(p)        (free( (void *)(p) ), (p) = NULL)
+
+#ifndef IGRAPH_NO_CALLOC
+#  define Calloc igraph_Calloc
+#  define Realloc igraph_Realloc
+#  define Free igraph_Free
+#endif
 
 int igraph_free(void *p);
 
