@@ -19,16 +19,3 @@
 #   02110-1301 USA
 #
 ###################################################################
-
-evcent <- function(graph, v=V(graph)) {
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-
-  ad <- get.adjacency(graph)
-
-  res <- abs(eigen(ad)$vectors[,1])
-  res <- res[as.vector(v)+1]
-
-  res
-}

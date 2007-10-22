@@ -52,14 +52,14 @@ void IGRAPH_F77(dseupd,DSEUPD)(int *rvec, const char *howmny, int *select,
 			       igraph_real_t *workd, igraph_real_t *workl,
 			       int *lworkl, int *info);
 
-
 /* The ARPACK example file dssimp.f is used as a template */
 
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
 				  igraph_real_t *value, igraph_integer_t *retcode,
 				  igraph_integer_t *vmult, igraph_integer_t *aupdate,
 				  igraph_bool_t norm, igraph_real_t tol, 
-				  igraph_integer_t maxit, igraph_integer_t pncv) {
+				  igraph_integer_t maxit, igraph_integer_t pncv,
+				  int pwhich) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
@@ -68,15 +68,28 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
 
   int n=no_of_nodes, nev=1, ncv=pncv, ldv=n;
   
-  igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
+  igraph_vector_t v, workl, workd, d, resid, ax;
   int *select;
   int iparam[11], ipntr[11];
   
-  char *bmat="I", *which="LA", *all="All";
+  char *bmat="I", *LA="LA", *LM="LM", *all="All", *which;
   int ido, lworkl, info, ierr, j, ishfts, mode1, nconv, rvec=1;
   igraph_real_t sigma;
   
   igraph_real_t zero=0.0;
+
+  if (pwhich==0) { 
+    which=LA; 
+  } else if (pwhich==1) {
+    which=LM; 
+  } else {
+    IGRAPH_ERROR("Eigenvector centrality failed, `which' is invalid", 
+		 IGRAPH_ENOMEM);
+  }
+  
+  if (ncv <= 1) { 
+    IGRAPH_ERROR("`ncv'>=3 is required for eigenvector centrality", IGRAPH_EINVAL);
+  }
 
   lworkl = ncv*(ncv+8);
   info = 0;
@@ -91,37 +104,13 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
 
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-  v=      igraph_Calloc( ldv*ncv,     igraph_real_t );
-  if (!v) {
-    IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, v);
-  workl=  igraph_Calloc( ncv*(ncv+8), igraph_real_t );
-  if (!workl) {
-    IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, workl);
-  workd=  igraph_Calloc( 3*n,         igraph_real_t );
-  if (!workd) {
-    IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, workd);
-  d=      igraph_Calloc( ncv*2,       igraph_real_t );
-  if (!d) {
-    IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, d);
-  resid=  igraph_Calloc( n,           igraph_real_t );
-  if (!resid) {
-    IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, resid);
-  ax=     igraph_Calloc( n,           igraph_real_t );
-  if (!ax) {
-    IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, ax);
-  select= igraph_Calloc( ncv,         int);
+  IGRAPH_VECTOR_INIT_FINALLY(&v, ldv*ncv);
+  IGRAPH_VECTOR_INIT_FINALLY(&workl, lworkl);
+  IGRAPH_VECTOR_INIT_FINALLY(&workd, 3*n);
+  IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
+  select= igraph_Calloc(ncv, int);
   if (!select) {
     IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
   }
@@ -129,15 +118,16 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
 
   while (1) {
     
-    IGRAPH_F77(dsaupd, DSAUPD) (&ido, bmat, &n, which, &nev, &tol, resid,
-				&ncv, v, &ldv, iparam, ipntr, workd, workl,
+    IGRAPH_F77(dsaupd, DSAUPD) (&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+				&ncv, VECTOR(v), &ldv, iparam, ipntr, 
+				VECTOR(workd), VECTOR(workl),
 				&lworkl, &info);
     
     if (ido==-1 || ido==1) {
       
       int j, nlen;
-      igraph_real_t *from=&workd[ipntr[0]-1];
-      igraph_real_t *to=&workd[ipntr[1]-1];
+      igraph_real_t *from=VECTOR(workd)+ipntr[0]-1;
+      igraph_real_t *to=VECTOR(workd)+ipntr[1]-1;
 
       for (i=0; i<no_of_nodes; i++) {
 	neis=igraph_adjlist_get(&adjlist, i);
@@ -161,10 +151,10 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   }
 
   iparam[4]=1;			/* get eigenvector */
-  IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, d, v, &ldv, &sigma,
-			      bmat, &n, which, &nev, &tol, resid, &ncv,
-			      v, &ldv, iparam, ipntr, workd, workl, &lworkl,
-			      &ierr);
+  IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv, &sigma,
+			      bmat, &n, which, &nev, &tol, VECTOR(resid), &ncv,
+			      VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd), 
+			      VECTOR(workl), &lworkl, &ierr);
 
   if (ierr < 0) {
 /*     fprintf(stderr, "ARPACK error %i\n", ierr); */
@@ -172,7 +162,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   }
 
   if (value) { 
-    *value = d[0];
+    *value = VECTOR(d)[0];
   }
 
   if (vector) {
@@ -180,11 +170,11 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
     long int which=0;
     IGRAPH_CHECK(igraph_vector_resize(vector, n));
     for (i=0; i<n; i++) {
-      igraph_real_t tmp=fabs(v[i]);
+      igraph_real_t tmp=fabs(VECTOR(v)[i]);
       if (tmp > amax) { amax=tmp; which=i; }
-      VECTOR(*vector)[i]=v[i];
+      VECTOR(*vector)[i]=VECTOR(v)[i];
     }
-    if (norm && amax != 0) { igraph_vector_multiply(vector, 1/v[which]); }
+    if (norm && amax != 0) { igraph_vector_multiply(vector, 1/VECTOR(v)[which]); }
   }
   
   if (retcode) {
@@ -199,12 +189,12 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   
   /* Free resources */
   igraph_free(select);
-  igraph_free(ax);
-  igraph_free(resid);
-  igraph_free(d);
-  igraph_free(workd);
-  igraph_free(workl);
-  igraph_free(v);
+  igraph_vector_destroy(&ax);
+  igraph_vector_destroy(&resid);
+  igraph_vector_destroy(&d);
+  igraph_vector_destroy(&workd);
+  igraph_vector_destroy(&workl);
+  igraph_vector_destroy(&v);
   igraph_adjlist_destroy(&adjlist);
   IGRAPH_FINALLY_CLEAN(8);
   

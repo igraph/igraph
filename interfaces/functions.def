@@ -415,8 +415,8 @@ igraph_eigenvector_centrality:
                 OUT INTEGERPTR retcode, OUT INTEGERPTR vmult, \
                 OUT INTEGERPTR aupdate, \
                 BOOLEAN norm=True, REAL tol=0, INTEGER maxit=300, \
-                INTEGER ncv=3
-        NAME-R: evcent2
+                INTEGER ncv=3, INT which=0
+        NAME-R: evcent
 
 #######################################
 # Spectral properties

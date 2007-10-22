@@ -1,5 +1,8 @@
 2007-10-22  Gabor Csardi  <csardi@rmki.kfki.hu>
-	
+
+	* src/arpack.c (igraph_eigenvector_centrality) : which argument added,
+	use vectors instead of C arrays
+
 	* src/examples/eigenvector_centrality.c : updated
 
 	* src/arpack.c (igraph_eigenvector_centrality) : many improvements
