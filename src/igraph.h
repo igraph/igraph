@@ -898,7 +898,7 @@ int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 /* Centrality                                         */
 /* -------------------------------------------------- */
 
-/* TODO: evcent */
+int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *res);
 
 /* -------------------------------------------------- */
 /* Cocitation and other similarity measures           */

@@ -5,6 +5,28 @@ BUILT_SOURCES = foreign-ncol-parser.h foreign-lgl-parser.h
 # Unfortunately this is not the default behaviour in MinGW/MSYS
 AM_YFLAGS = -d
 
+if INTERNAL_LAPACK
+  LAPACK = lapack/lapack_igraph.f lapack/print.c
+else 
+  LAPACK = lapack/print.c
+endif
+
+if INTERNAL_ARPACK
+  ARPACK = arpack/dgetv0.f arpack/dmout.f arpack/dsaitr.f arpack/dsapps.f \
+         arpack/dsaup2.f arpack/dsaupd.f arpack/dsconv.f arpack/dseigt.f \
+         arpack/dsesrt.f arpack/dseupd.f arpack/dsgets.f arpack/dsortr.f \
+         arpack/dstats.f arpack/dstqrb.f arpack/dvout.f arpack/ivout.f \
+         arpack/second.f
+else
+  ARPACK =
+endif
+
+if INTERNAL_BLAS
+  BLAS = blas/blas_igraph.f
+else
+  BLAS =
+endif
+
 lib_LTLIBRARIES         = libigraph.la
 
 libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
@@ -42,12 +64,14 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     bliss_heap.hh bliss_utils.cc \
 			     bliss_kqueue.hh bliss_utils.hh bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
-			     forestfire.c
+			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) \
+			     arpack.c
 
 libigraph_la_CFLAGS        = 
 libigraph_la_CXXFLAGS	   = 
+libigraph_la_FFLAGS        =
 libigraph_la_LDFLAGS       = -no-undefined
-libigraph_la_LIBADD        = -lm $(XML2_LIBS)
+libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS)
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \

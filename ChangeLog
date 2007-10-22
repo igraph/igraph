@@ -1,3 +1,39 @@
+2007-10-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/arpack.c (igraph_eigenvector_centrality) : evcent calculation
+	based on ARPACK added
+	
+	* src/arpack/dgetv0.f (igraphdgetv0)
+	* src/arpack/dmout.f (igraphdmout)
+	* src/arpack/dsaitr.f (igraphdsaitr)
+	* src/arpack/dsapps.f (igraphdsapps)
+	* src/arpack/dsaup2.f (igraphdsaup2)
+	* src/arpack/dsaupd.f (igraphdsaupd)
+	* src/arpack/dsconv.f (igraphdsconv)
+	* src/arpack/dseigt.f (igraphdseigt)
+	* src/arpack/dsesrt.f (igraphdsesrt)
+	* src/arpack/dseupd.f (igraphdseupd)
+	* src/arpack/dsgets.f (igraphdsgets)
+	* src/arpack/dsortr.f (igraphdsortr)
+	* src/arpack/dstats.f (igraphdstats)
+	* src/arpack/dstqrb.f (igraphdstqrb)
+	* src/arpack/dvout.f (igraphdvout)
+	* src/arpack/ivout.f (igraphivout)
+	* src/arpack/second.f (igraphsecond) : a subset of ARPACK added
+
+	* src/lapack/lapack_igraph.f (igraphdlarnv, igraphdlascl)
+	(igraphdlartg, igraphdlaset, igraphdlae2, igraphdlaev2)
+	(igraphdlasr, igraphdlasrt, igraphdgeqr2, igraphdlacpy)
+	(igraphdorm2r, igraphdsteqr, igraphdlanst, igraphdlapy2)
+	(igraphdlamch, igraphdlaruv, igraphdlarfg, igraphdlarf)
+	(igraphdlae2, igraphdlassq, igraphdlamc2, igraphdlamc1)
+	(igraphdlamc2, igraphdlamc3, igraphdlamc4, igraphdlamc5)
+	* src/lapack/print.c (igraphxerbla) : a subset of LAPACK added
+
+	* src/blas/blas_igraph.f (igraphdaxpy, igraphdger, igraphdcopy)
+	(igraphdscal, igraphdswap, igraphdgemv, igraphddot, igraphdnrm2)
+	(igraphlsame) : a subset of BLAS added
+	
 2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/components.c (igraph_articulation_points)

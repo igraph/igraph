@@ -8,6 +8,10 @@ AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 
 AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_F77
+FFLAGS="-g -O1"
+AC_F77_WRAPPERS
 AM_PROG_LEX
 AC_PROG_YACC
 
@@ -136,6 +140,15 @@ if test "x$enable_gmp" != "xno"; then
     ])
   ])
 fi
+
+# TODO: proper options
+
+internal_arpack=yes
+internal_lapack=yes
+internal_blas=yes
+AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
+AM_CONDITIONAL(INTERNAL_LAPACK, test x$internal_lapack = xyes)
+AM_CONDITIONAL(INTERNAL_BLAS, test x$internal_blas = xyes)
 
 if test "$debug" == "yes"; then
   CFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
