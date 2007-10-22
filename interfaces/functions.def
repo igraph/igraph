@@ -410,6 +410,14 @@ igraph_add_edge:
         PARAMS: INOUT GRAPH graph, INTEGER from, INTEGER to
         IGNORE: RR, RC, RNamespace
 
+igraph_eigenvector_centrality:
+        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
+                OUT INTEGERPTR retcode, OUT INTEGERPTR vmult, \
+                OUT INTEGERPTR aupdate, \
+                BOOLEAN norm=True, REAL tol=0, INTEGER maxit=300, \
+                INTEGER ncv=3
+        NAME-R: evcent2
+
 #######################################
 # Spectral properties
 #######################################

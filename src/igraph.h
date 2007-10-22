@@ -898,7 +898,11 @@ int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 /* Centrality                                         */
 /* -------------------------------------------------- */
 
-int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *res);
+int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
+				  igraph_real_t *value, igraph_integer_t *retcode,
+				  igraph_integer_t *vmult, igraph_integer_t *aupdate,
+				  igraph_bool_t norm, igraph_real_t tol, 
+				  igraph_integer_t maxit, igraph_integer_t pncv);
 
 /* -------------------------------------------------- */
 /* Cocitation and other similarity measures           */

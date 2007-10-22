@@ -141,11 +141,46 @@ if test "x$enable_gmp" != "xno"; then
   ])
 fi
 
-# TODO: proper options
+AC_ARG_WITH([blas], [AS_HELP_STRING([--with-blas],
+		                      [Use external BLAS library [default=no]])],
+            [internal_blas=no],
+	    [internal_blas=yes])
+AC_ARG_WITH([lapack], [AS_HELP_STRING([--with-lapack],
+		                      [Use external LAPACK library [default=no]])],
+            [internal_lapack=no],
+	    [internal_lapack=yes])
+AC_ARG_WITH([arpack], [AS_HELP_STRING([--with-arpack],
+		                      [Use external ARPACK library [default=no]])],
+            [internal_arpack=no],
+	    [internal_arpack=yes])
 
-internal_arpack=yes
-internal_lapack=yes
-internal_blas=yes
+if test "$internal_blas" == "no"; then
+  AC_CHECK_LIB([blas], [daxpy_], [],
+     AC_CHECK_LIB([blas], [daxpy], [],
+        AC_CHECK_LIB([blas], [DAXPY_], [],
+           AC_CHECK_LIB([blas], [DAXPY], [],
+	      [AC_MSG_RESULT(not found, trying to use -lblas anyway.)]))))
+  LDFLAGS="${LDFLAGS} -lblas"
+fi
+
+if test "$internal_lapack" == "no"; then
+  AC_CHECK_LIB([lapack], [dlarnv_], [],
+     AC_CHECK_LIB([lapack], [dlarnv], [],
+        AC_CHECK_LIB([lapack], [DLARNV_], [],
+           AC_CHECK_LIB([lapack], [DLARNV], [],
+	      [AC_MSG_RESULT(not found, trying to use -llapack anyway.)]))))
+  LDFLAGS="${LDFLAGS} -llapack"
+fi
+
+if test "$internal_arpack" == "no"; then
+  AC_CHECK_LIB([arpack], [dsaupd_], [],
+     AC_CHECK_LIB([arpack], [dsaupd], [],
+        AC_CHECK_LIB([arpack], [DSAUPD_], [],
+           AC_CHECK_LIB([arpack], [DSAUPD], [],
+	      [AC_MSG_RESULT(not found, trying to use -larpack anyway.)]))))
+  LDFLAGS="${LDFLAGS} -larpack"
+fi
+
 AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
 AM_CONDITIONAL(INTERNAL_LAPACK, test x$internal_lapack = xyes)
 AM_CONDITIONAL(INTERNAL_BLAS, test x$internal_blas = xyes)
@@ -172,6 +207,9 @@ AC_OUTPUT
 AC_MSG_RESULT([igraph successfully configured.])
 AC_MSG_RESULT([  GraphML format support -- $graphml_support])
 AC_MSG_RESULT([  GMP library support    -- $gmp_support])
+AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
+AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
+AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
 AC_MSG_RESULT([  Shell interface        -- $use_shell])

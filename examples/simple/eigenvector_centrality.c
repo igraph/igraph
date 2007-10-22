@@ -23,16 +23,29 @@
 
 #include "igraph.h"
 
+#include <math.h>
+
 int main() {
   
   igraph_t g;
   igraph_vector_t v;
+  long int i;
+  igraph_integer_t value, retcode;
   
-/*   igraph_star(&g, 100000, IGRAPH_STAR_UNDIRECTED, 0); */
-  igraph_barabasi_game(&g, 100000, 5, 0, 0, 0);
+  igraph_star(&g, 100, IGRAPH_STAR_UNDIRECTED, 0);
   
   igraph_vector_init(&v, 0);
-  igraph_eigenvector_centrality(&g, &v);
+  igraph_eigenvector_centrality(&g, &v, &value, &retcode, /*vmult*/0, /*aupdate*/0, 
+				/*norm=*/0, /*tol=*/0, /*maxiter=*/300, /*ncv=*/3);
+
+  if (retcode != 0) {
+    return 1;
+  }
+
+  for (i=0; i<igraph_vector_size(&v); i++) {
+    printf(" %.3f", fabs(VECTOR(v)[i]));
+  }
+  printf("\n");
   
   igraph_vector_destroy(&v);
   igraph_destroy(&g);

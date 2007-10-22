@@ -24,11 +24,18 @@
 #include "config.h"
 #include "error.h"
 
+#include <stdio.h>
+#include <string.h>
+
 /* This is from GNU R's print.c */
 
 /* Fortran-callable error routine for lapack */
 
+#ifdef USING_R
+void igraphxerbla_(const char *srname, int *info)
+#else
 void F77_FUNC(igraphxerbla,IGRAPHXERBLA)(const char *srname, int *info)
+#endif
 {
    /* srname is not null-terminated.  It should be 6 characters. */
     char buf[7], buf2[200];
