@@ -41,6 +41,22 @@ typedef struct TYPE(igraph_vector) {
   IGRAPH_FINALLY(igraph_vector_destroy, v); } while (0)
 #endif
 
+/*--------------------*/
+/* Allocation         */
+/*--------------------*/
+ 
+int FUNCTION(igraph_vector,init)(TYPE(igraph_vector)* v, long int size);
+int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector)* v, 
+				       BASE* data, long int length);
+int FUNCTION(igraph_vector,init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
+int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to, 
+				 const TYPE(igraph_vector) *from);
+void FUNCTION(igraph_vector,destroy)(TYPE(igraph_vector)* v);
+
+/*--------------------*/
+/* Accessing elements */
+/*--------------------*/
+
 #ifndef VECTOR
 /**
  * \ingroup vector
@@ -62,69 +78,143 @@ typedef struct TYPE(igraph_vector) {
  */
 #define VECTOR(v) ((v).stor_begin) 
 #endif
- 
-int FUNCTION(igraph_vector,init)      (TYPE(igraph_vector)* v, long int size);
-int FUNCTION(igraph_vector,init_copy) (TYPE(igraph_vector)* v, BASE* data, long int length);
-int FUNCTION(igraph_vector,init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
+
+BASE FUNCTION(igraph_vector,e)(const TYPE(igraph_vector)* v, long int pos);
+BASE* FUNCTION(igraph_vector,e_ptr)(const TYPE(igraph_vector)* v, long int pos);
+void FUNCTION(igraph_vector,set)(TYPE(igraph_vector)* v, long int pos, BASE value);
+BASE FUNCTION(igraph_vector,tail)(const TYPE(igraph_vector) *v);
+
+/*-----------------------*/
+/* Initializing elements */
+/*-----------------------*/
+
+void FUNCTION(igraph_vector,null)(TYPE(igraph_vector)* v);
+void FUNCTION(igraph_vector,fill)(TYPE(igraph_vector)* v, BASE e);
+
+/*-----------------------*/
+/* Vector views          */
+/*-----------------------*/
+
+const TYPE(igraph_vector) *FUNCTION(igraph_vector,view)(const TYPE(igraph_vector) *v,
+							const BASE *data, 
+							long int length);
+
+/*-----------------------*/
+/* Copying vectors       */
+/*-----------------------*/
+
+void FUNCTION(igraph_vector,copy_to)(const TYPE(igraph_vector) *v, BASE* to);
+int FUNCTION(igraph_vector,update)(TYPE(igraph_vector) *to, 
+				   const TYPE(igraph_vector) *from);
+int FUNCTION(igraph_vector,append)(TYPE(igraph_vector) *to, 
+				   const TYPE(igraph_vector) *from);
+int FUNCTION(igraph_vector,swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2);
+
+/*-----------------------*/
+/* Exchanging elements   */
+/*-----------------------*/
+
+int FUNCTION(igraph_vector,swap_elements)(TYPE(igraph_vector) *v,
+					  long int i, long int j);
+int FUNCTION(igraph_vector,reverse)(TYPE(igraph_vector) *v);
+
+/*-----------------------*/
+/* Vector operations     */
+/*-----------------------*/
+
+void FUNCTION(igraph_vector,add_constant)(TYPE(igraph_vector) *v, BASE plus);
+void FUNCTION(igraph_vector,scale)(TYPE(igraph_vector) *v, BASE by);
+int FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v1, 
+				const TYPE(igraph_vector) *v2);
+int FUNCTION(igraph_vector,sub)(TYPE(igraph_vector) *v1, 
+				const TYPE(igraph_vector) *v2);
+int FUNCTION(igraph_vector,mul)(TYPE(igraph_vector) *v1, 
+				const TYPE(igraph_vector) *v2);
+int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1, 
+				const TYPE(igraph_vector) *v2);
+
+/*------------------------------*/
+/* Finding minimum and maximum  */
+/*------------------------------*/
+
+BASE FUNCTION(igraph_vector,min)(const TYPE(igraph_vector)* v);
+BASE FUNCTION(igraph_vector,max)(const TYPE(igraph_vector)* v);
+long int FUNCTION(igraph_vector,which_min)(const TYPE(igraph_vector)* v);
+long int FUNCTION(igraph_vector,which_max)(const TYPE(igraph_vector)* v);
+int FUNCTION(igraph_vector,minmax)(const TYPE(igraph_vector) *v,
+				   BASE *min, BASE *max);
+int FUNCTION(igraph_vector,which_minmax)(const TYPE(igraph_vector) *v,
+					 long int *which_min, long int *which_max);
+
+/*-------------------*/
+/* Vector properties */
+/*-------------------*/
+
+igraph_bool_t FUNCTION(igraph_vector,empty)     (const TYPE(igraph_vector)* v);
+long int FUNCTION(igraph_vector,size)      (const TYPE(igraph_vector)* v);
+igraph_bool_t FUNCTION(igraph_vector,isnull)(const TYPE(igraph_vector) *v);
+BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v);
+BASE FUNCTION(igraph_vector,prod)(const TYPE(igraph_vector) *v);
+igraph_bool_t FUNCTION(igraph_vector,isininterval)(const TYPE(igraph_vector) *v, 
+						   BASE low, BASE high);
+igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v, 
+						  BASE limit);
+igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
+					       const TYPE(igraph_vector) *rhs);
+BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
+					   const TYPE(igraph_vector) *m2);
+
+/*------------------------*/
+/* Searching for elements */
+/*------------------------*/
+
+igraph_bool_t FUNCTION(igraph_vector,contains)(const TYPE(igraph_vector) *v, BASE e);
+igraph_bool_t FUNCTION(igraph_vector,search)(const TYPE(igraph_vector) *v,
+					     long int from, BASE what, 
+					     long int *pos);
+igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v, 
+						BASE what, long int *pos);
+igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
+						 BASE what);
+
+/*------------------------*/
+/* Resizing operations    */
+/*------------------------*/
+
+void FUNCTION(igraph_vector,clear)(TYPE(igraph_vector)* v);
+int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize);
+int FUNCTION(igraph_vector,reserve)(TYPE(igraph_vector)* v, long int size);
+int FUNCTION(igraph_vector,push_back)(TYPE(igraph_vector)* v, BASE e);
+BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v);
+int FUNCTION(igraph_vector,insert)(TYPE(igraph_vector) *v, long int pos, BASE value);
+void FUNCTION(igraph_vector,remove)(TYPE(igraph_vector) *v, long int elem);
+void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v, 
+					    long int from, long int to);
+
+/*-----------*/
+/* Sorting   */             
+/*-----------*/
+
+void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v);
+
+/* ----------------------------------------------------------------------------*/
+/* For internal use only, may be removed, rewritten ... */
+/* ----------------------------------------------------------------------------*/
+
 int FUNCTION(igraph_vector,init_real)(TYPE(igraph_vector)*v, int no, ...);
 int FUNCTION(igraph_vector,init_int)(TYPE(igraph_vector)*v, int no, ...);
 int FUNCTION(igraph_vector,init_real_end)(TYPE(igraph_vector)*v, BASE endmark, ...);
 int FUNCTION(igraph_vector,init_int_end)(TYPE(igraph_vector)*v, int endmark, ...);
-const TYPE(igraph_vector) *FUNCTION(igraph_vector,view) (const TYPE(igraph_vector) *v, const BASE *data, 
-			     long int length);
-void FUNCTION(igraph_vector,destroy)   (TYPE(igraph_vector)* v);
-int FUNCTION(igraph_vector,reserve)   (TYPE(igraph_vector)* v, long int size);
-igraph_bool_t FUNCTION(igraph_vector,empty)     (const TYPE(igraph_vector)* v);
-long int FUNCTION(igraph_vector,size)      (const TYPE(igraph_vector)* v);
-void FUNCTION(igraph_vector,clear)     (TYPE(igraph_vector)* v);
-void FUNCTION(igraph_vector,null)      (TYPE(igraph_vector)* v);
-void FUNCTION(igraph_vector,fill)      (TYPE(igraph_vector)* v, BASE e);
-int FUNCTION(igraph_vector,push_back) (TYPE(igraph_vector)* v, BASE e);
-int FUNCTION(igraph_vector,insert)(TYPE(igraph_vector) *v, long int pos, BASE value);
-BASE FUNCTION(igraph_vector,e)         (const TYPE(igraph_vector)* v, long int pos);
-BASE* FUNCTION(igraph_vector,e_ptr)  (const TYPE(igraph_vector)* v, long int pos);
-void FUNCTION(igraph_vector,set)       (TYPE(igraph_vector)* v, long int pos, BASE value);
-BASE FUNCTION(igraph_vector,tail)(const TYPE(igraph_vector) *v);
-BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v);
-/* TODO: order* is meaningful only for interger vectors */
-int FUNCTION(igraph_vector,order)(const TYPE(igraph_vector)* v, const TYPE(igraph_vector) *v2,
-				  igraph_vector_t* res, BASE maxval);
-int FUNCTION(igraph_vector,order1)(const TYPE(igraph_vector)* v, 
-				   igraph_vector_t* res, BASE maxval);
-void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v);
-int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize);
-BASE FUNCTION(igraph_vector,max)(const TYPE(igraph_vector)* v);
-long int FUNCTION(igraph_vector,which_max)(const TYPE(igraph_vector)* v);
-BASE FUNCTION(igraph_vector,min)(const TYPE(igraph_vector)* v);
-long int FUNCTION(igraph_vector,which_min)(const TYPE(igraph_vector)* v);
-void FUNCTION(igraph_vector,copy_to)(const TYPE(igraph_vector) *v, BASE* to);
-int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
-BASE FUNCTION(igraph_vector,sum)(const TYPE(igraph_vector) *v);
-BASE FUNCTION(igraph_vector,prod)(const TYPE(igraph_vector) *v);
-void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v, long int from, long int to);
-int FUNCTION(igraph_vector,move_interval)(TYPE(igraph_vector) *v, long int begin, long int end, 
-					  long int to);
-void FUNCTION(igraph_vector,remove)(TYPE(igraph_vector) *v, long int elem);
-void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v, const igraph_vector_t *index, long int nremove);
-void FUNCTION(igraph_vector,remove_negidx)(TYPE(igraph_vector) *v, const igraph_vector_t *neg, long int nremove);
-igraph_bool_t FUNCTION(igraph_vector,isininterval)(const TYPE(igraph_vector) *v, BASE low, BASE high);
-igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vector) *v, BASE limit);
-igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, const TYPE(igraph_vector) *rhs);
-igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v, BASE what, long int *pos);
-igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v, BASE what);
-void FUNCTION(igraph_vector,add_constant)(TYPE(igraph_vector) *v, BASE plus);
-void FUNCTION(igraph_vector,scale)(TYPE(igraph_vector) *v, BASE by);
-igraph_bool_t FUNCTION(igraph_vector,contains)(const TYPE(igraph_vector) *v, BASE e);
-igraph_bool_t FUNCTION(igraph_vector,search)(const TYPE(igraph_vector) *v, long int from, BASE what, 
-					     long int *pos);
+
+int FUNCTION(igraph_vector,move_interval)(TYPE(igraph_vector) *v, 
+					  long int begin, long int end, long int to);
+void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v, 
+					const igraph_vector_t *index, 
+					long int nremove);
+void FUNCTION(igraph_vector,remove_negidx)(TYPE(igraph_vector) *v, 
+					   const igraph_vector_t *neg, 
+					   long int nremove);
 int FUNCTION(igraph_vector,filter_smaller)(TYPE(igraph_vector) *v, BASE elem);
-int FUNCTION(igraph_vector,append)(TYPE(igraph_vector) *to, const TYPE(igraph_vector) *from);
-int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v, TYPE(igraph_vector) *res,
+int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v, 
+					 TYPE(igraph_vector) *res,
 					 long int from, long int to);
-/* TODO: only for integers??? */
-int FUNCTION(igraph_vector,rank)(const TYPE(igraph_vector) *v, igraph_vector_t *res, 
-				 long int nodes);
-BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
-					   const TYPE(igraph_vector) *m2);
-int FUNCTION(igraph_vector,update)(TYPE(igraph_vector) *to, 
-				   const TYPE(igraph_vector) *from);

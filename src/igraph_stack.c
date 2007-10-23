@@ -40,3 +40,9 @@
 #include "stack.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
+
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "stack.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL

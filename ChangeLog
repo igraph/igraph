@@ -1,5 +1,18 @@
 2007-10-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/dqueue.c : boolean dqueue_t added
+	* src/stack.c : boolean stack_t added
+
+	* src/vector.pmt (igraph_vector_order, igraph_vector_order1)
+	(igraph_vector_rank)
+	* src/vector.c (igraph_vector_order, igraph_vector_order1)
+	(igraph_vector_rank) : moved, not generic any more
+
+	* src/vector.pmt (igraph_vector_swap, igraph_vector_swap_elements)
+	(igraph_vector_reverse, igraph_vector_add, igraph_vector_sub)
+	(igraph_vector_mul, igraph_vector_div, igraph_vector_minmax)
+	(igraph_vector_which_minmax) : added
+
 	* examples/simple/eigenvector_centrality.c : corrected, updated
 
 	* src/vector.pmt (igraph_vector_multiply, igraph_vector_scale) : renamed

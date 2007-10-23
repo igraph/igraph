@@ -69,6 +69,12 @@ typedef int    igraph_bool_t;
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
 
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "dqueue.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
+
 #define IGRAPH_DQUEUE_NULL { 0,0,0,0 }
 #define IGRAPH_DQUEUE_INIT_FINALLY(v, size) \
   do { IGRAPH_CHECK(igraph_dqueue_init(v, size)); \
@@ -102,7 +108,14 @@ typedef int    igraph_bool_t;
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
+/* These are for internal use only */
+int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
+			igraph_vector_t* res, igraph_real_t maxval);
+int igraph_vector_order1(const igraph_vector_t* v, 
+			 igraph_vector_t* res, igraph_real_t maxval);
 int igraph_vector_order2(igraph_vector_t *v);
+int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
+		       long int nodes);
 
 /* -------------------------------------------------- */
 /* Matrix, very similar to vector                     */
@@ -301,6 +314,12 @@ void igraph_array3_scale(igraph_array3_t *a, igraph_real_t by);
 #include "stack.h"
 #include "igraph_pmt_off.h"
 #undef BASE_CHAR
+
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "stack.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
 
 #define IGRAPH_STACK_NULL { 0,0,0 }
 

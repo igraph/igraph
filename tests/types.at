@@ -26,6 +26,11 @@ AT_KEYWORDS([vector vector_t])
 AT_COMPILE_CHECK([simple/vector.c], [simple/vector.out])
 AT_CLEANUP
 
+AT_SETUP([Vector (more) (vector_t): ])
+AT_KEYWORDS([vector vector_t])
+AT_COMPILE_CHECK([simple/vector2.c], [simple/vector2.out])
+AT_CLEANUP
+
 AT_SETUP([Matrix (matrix_t): ])
 AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix.c], [simple/matrix.out])
