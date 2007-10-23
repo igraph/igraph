@@ -36,7 +36,8 @@ int main() {
   
   igraph_vector_init(&v, 0);
   igraph_eigenvector_centrality(&g, &v, &value, &retcode, /*vmult*/0, /*aupdate*/0, 
-				/*norm=*/0, /*tol=*/0, /*maxiter=*/300, /*ncv=*/3);
+				/*norm=*/0, /*tol=*/0, /*maxiter=*/300, /*ncv=*/3,
+				/*which=*/0);
 
   if (retcode != 0) {
     return 1;
