@@ -662,7 +662,7 @@ int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
 }
 
 /**
- * \function igraph_spmatrix_multiply
+ * \function igraph_spmatrix_scale
  * 
  * Multiplies each element of the sparse matrix by a constant.
  * \param m The matrix.
@@ -671,9 +671,9 @@ int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
  * Time complexity: O(n), the number of elements in the matrix.
  */
 
-void igraph_spmatrix_multiply(igraph_spmatrix_t *m, igraph_real_t by) {
+void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
   assert(m != NULL);
-  igraph_vector_multiply(&m->data, by);
+  igraph_vector_scale(&m->data, by);
 }
 
 /**

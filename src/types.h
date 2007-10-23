@@ -247,7 +247,7 @@ igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
     igraph_real_t *ridx, igraph_real_t *cidx);
 igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
     igraph_real_t *ridx, igraph_real_t *cidx);
-void igraph_spmatrix_multiply(igraph_spmatrix_t *m, igraph_real_t by);
+void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by);
 int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res);
 
 int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
@@ -278,7 +278,7 @@ int igraph_array3_resize(igraph_array3_t *a, long int n1, long int n2,
 			 long int n3);
 void igraph_array3_null(igraph_array3_t *a);
 igraph_real_t igraph_array3_sum(const igraph_array3_t *a);
-void igraph_array3_multiply(igraph_array3_t *a, igraph_real_t by);
+void igraph_array3_scale(igraph_array3_t *a, igraph_real_t by);
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */

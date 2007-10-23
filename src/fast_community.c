@@ -628,7 +628,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 
   /* Calculate proper vector a (see paper) and initial modularity */
   q=0;
-  igraph_vector_multiply(&a, 1.0/(2.0*no_of_edges));
+  igraph_vector_scale(&a, 1.0/(2.0*no_of_edges));
   for (i=0; i<no_of_nodes; i++)
 	q -= VECTOR(a)[i]*VECTOR(a)[i];
   maxq=q;

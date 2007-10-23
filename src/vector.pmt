@@ -1429,7 +1429,7 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
 }
 
 /**
- * \function igraph_vector_multiply
+ * \function igraph_vector_scale
  * \brief Multiply all elements of a vector by a constant
  * 
  * \param v The vector.
@@ -1441,14 +1441,14 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
  * Time complexity: O(n), the number of elements in a vector.
  */
 
-void FUNCTION(igraph_vector,multiply)(TYPE(igraph_vector) *v, BASE by) {
+void FUNCTION(igraph_vector,scale)(TYPE(igraph_vector) *v, BASE by) {
   long int i;
   for (i=0; i<FUNCTION(igraph_vector,size)(v); i++) {
     VECTOR(*v)[i] *= by;
   }
 }
 
-void FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v, BASE plus) {
+void FUNCTION(igraph_vector,add_constant)(TYPE(igraph_vector) *v, BASE plus) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   for (i=0; i<n; i++) {
     VECTOR(*v)[i] += plus;

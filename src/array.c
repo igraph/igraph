@@ -74,6 +74,6 @@ igraph_real_t igraph_array3_sum(const igraph_array3_t *a) {
   return igraph_vector_sum(&a->data);
 }
 
-void igraph_array3_multiply(igraph_array3_t *a, igraph_real_t by) {
-  igraph_vector_multiply(&a->data, by);
+void igraph_array3_scale(igraph_array3_t *a, igraph_real_t by) {
+  igraph_vector_scale(&a->data, by);
 }

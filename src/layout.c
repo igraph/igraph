@@ -799,7 +799,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
   /* Place the vertices randomly */
   IGRAPH_CHECK(igraph_layout_random(graph, res));
-  igraph_matrix_multiply(res, 1e6);
+  igraph_matrix_scale(res, 1e6);
   
   /* This is the grid for calculating the vertices near to a given vertex */  
   IGRAPH_CHECK(igraph_2dgrid_init(&grid, res, 
@@ -1041,7 +1041,7 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
   /* initial layout */
   if (!use_seed) {
     IGRAPH_CHECK(igraph_layout_random(graph, res));
-    igraph_matrix_multiply(res, sqrt(area/M_PI));
+    igraph_matrix_scale(res, sqrt(area/M_PI));
   }
   
   /* make grid */

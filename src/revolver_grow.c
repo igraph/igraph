@@ -95,7 +95,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
 					   &etimeidx, no_of_events,
 					   maxdegree));
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_d_d(graph, &adjlist, 
@@ -112,7 +112,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
 					   no_of_events, maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_d_d(graph, &adjlist,
@@ -753,7 +753,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
 					   authors, eventsizes,
 					   maxpapers));
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_p_p(graph, &adjlist, 
@@ -772,7 +772,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
 					   eventsizes, maxpapers));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_p_p(graph, &adjlist,

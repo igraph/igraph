@@ -42,7 +42,7 @@ int FUNCTION(igraph_matrix,delete_rows_neg)(TYPE(igraph_matrix) *m,
 					    const igraph_vector_t *neg, long int nremove);
 int FUNCTION(igraph_matrix,copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from);
 igraph_real_t FUNCTION(igraph_matrix,max)(const TYPE(igraph_matrix) *m);
-void FUNCTION(igraph_matrix,multiply)(TYPE(igraph_matrix) *m, BASE by);
+void FUNCTION(igraph_matrix,scale)(TYPE(igraph_matrix) *m, BASE by);
 int FUNCTION(igraph_matrix,select_rows)(const TYPE(igraph_matrix) *m, TYPE(igraph_matrix) *res, 
 					const igraph_vector_t *rows);
 int FUNCTION(igraph_matrix,get_col)(const TYPE(igraph_matrix) *m, TYPE(igraph_vector) *res,

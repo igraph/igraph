@@ -1315,13 +1315,13 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     igraph_vector_destroy(core_2);
     IGRAPH_FINALLY_CLEAN(1);
   } else {
-    igraph_vector_add(core_2, -1);
+    igraph_vector_add_constant(core_2, -1);
   }
   if (!map12) { 
     igraph_vector_destroy(core_1);
     IGRAPH_FINALLY_CLEAN(1);
   } else {
-    igraph_vector_add(core_1, -1);
+    igraph_vector_add_constant(core_1, -1);
   }
 
   return 0;
@@ -1432,7 +1432,7 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
   }
   IGRAPH_FINALLY(igraph_free, newvector);
   IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
-  igraph_vector_add(newvector, -1);
+  igraph_vector_add_constant(newvector, -1);
   IGRAPH_FINALLY(igraph_vector_destroy, newvector);
   IGRAPH_CHECK(igraph_vector_ptr_push_back(data, newvector));
   IGRAPH_FINALLY_CLEAN(2);
@@ -1844,13 +1844,13 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     igraph_vector_destroy(core_2);
     IGRAPH_FINALLY_CLEAN(1);
   } else {
-    igraph_vector_add(core_2, -1);
+    igraph_vector_add_constant(core_2, -1);
   }    
   if (!map12) {
     igraph_vector_destroy(core_1);
     IGRAPH_FINALLY_CLEAN(1);
   } else {
-    igraph_vector_add(core_1, -1);
+    igraph_vector_add_constant(core_1, -1);
   }
 
   return 0;
@@ -1929,7 +1929,7 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
   }
   IGRAPH_FINALLY(igraph_free, newvector);
   IGRAPH_CHECK(igraph_vector_copy(newvector, map21));
-  igraph_vector_add(newvector, -1);
+  igraph_vector_add_constant(newvector, -1);
   IGRAPH_FINALLY(igraph_vector_destroy, newvector);
   IGRAPH_CHECK(igraph_vector_ptr_push_back(data, newvector));
   IGRAPH_FINALLY_CLEAN(2);

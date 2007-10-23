@@ -178,7 +178,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
       if (tmp > amax) { amax=tmp; which=i; }
       VECTOR(*vector)[i]=VECTOR(v)[i];
     }
-    if (norm && amax != 0) { igraph_vector_multiply(vector, 1/VECTOR(v)[which]); }
+    if (norm && amax != 0) { igraph_vector_scale(vector, 1/VECTOR(v)[which]); }
   }
   
   if (retcode) {
@@ -360,7 +360,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
       if (tmp > amax) { amax=tmp; which=i; }
       VECTOR(*vector)[i]=VECTOR(v)[i];
     }
-    if (norm && amax != 0) { igraph_vector_multiply(vector, 1/VECTOR(v)[which]); }
+    if (norm && amax != 0) { igraph_vector_scale(vector, 1/VECTOR(v)[which]); }
   }
   
   if (retcode) {

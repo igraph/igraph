@@ -361,7 +361,7 @@ igraph_real_t FUNCTION(igraph_matrix,max)(const TYPE(igraph_matrix) *m) {
 }
 
 /**
- * \function igraph_matrix_multiply
+ * \function igraph_matrix_scale
  * 
  * Multiplies each element of the matrix by a constant.
  * \param m The matrix.
@@ -372,8 +372,8 @@ igraph_real_t FUNCTION(igraph_matrix,max)(const TYPE(igraph_matrix) *m) {
  * Time complexity: O(n), the number of elements in the matrix.
  */
 
-void FUNCTION(igraph_matrix,multiply)(TYPE(igraph_matrix) *m, BASE by) {
-  FUNCTION(igraph_vector,multiply)(&m->data, by);
+void FUNCTION(igraph_matrix,scale)(TYPE(igraph_matrix) *m, BASE by) {
+  FUNCTION(igraph_vector,scale)(&m->data, by);
 }
 
 int FUNCTION(igraph_matrix,select_rows)(const TYPE(igraph_matrix) *m, 

@@ -69,7 +69,7 @@ int igraph_revolver_d(const igraph_t *graph,
 					 &st, maxdegree));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_d(graph, &st, kernel));
@@ -79,7 +79,7 @@ int igraph_revolver_d(const igraph_t *graph,
 					debugres, logmax, &st, maxdegree));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_d(graph, &st, kernel));
@@ -499,7 +499,7 @@ int igraph_revolver_ad(const igraph_t *graph,
 					 0 /*logmax*/, &st, maxdegree, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ad(graph, &st, kernel));
@@ -510,7 +510,7 @@ int igraph_revolver_ad(const igraph_t *graph,
 					  maxdegree, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ad(graph, &st, kernel));
@@ -996,7 +996,7 @@ int igraph_revolver_ade(const igraph_t *graph,
 					   &st, cats, nocats, maxdegree, agebins));
       
       /* normalize */
-      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      igraph_array3_scale(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ade(graph, &st, kernel, cats));
@@ -1007,7 +1007,7 @@ int igraph_revolver_ade(const igraph_t *graph,
 					  maxdegree, agebins));
       
       /* normalize */
-      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      igraph_array3_scale(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ade(graph, &st, kernel, cats));
@@ -1423,7 +1423,7 @@ int igraph_revolver_e(const igraph_t *graph,
 				        0 /*logmax*/, myst, cats, nocats));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_e(graph, myst, kernel, cats));
@@ -1433,7 +1433,7 @@ int igraph_revolver_e(const igraph_t *graph,
 					debugres, logmax, myst, cats, nocats));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_e(graph, myst, kernel, cats));
@@ -1739,7 +1739,7 @@ int igraph_revolver_de(const igraph_t *graph,
 					 0/*logmax*/, &st, cats, nocats, maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_de(graph, &st, kernel, cats));
@@ -1750,7 +1750,7 @@ int igraph_revolver_de(const igraph_t *graph,
 					 maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_de(graph, &st, kernel, cats));
@@ -2106,7 +2106,7 @@ int igraph_revolver_l(const igraph_t *graph,
 					0 /*logmax*/, &st, agebins));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_l(graph, &st, kernel));
@@ -2116,7 +2116,7 @@ int igraph_revolver_l(const igraph_t *graph,
 					debugres, logmax, &st, agebins));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
 
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_l(graph, &st, kernel));
@@ -2490,7 +2490,7 @@ int igraph_revolver_dl(const igraph_t *graph,
 					 0 /*logmax */, &st, maxdegree, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_dl(graph, &st, kernel));
@@ -2500,7 +2500,7 @@ int igraph_revolver_dl(const igraph_t *graph,
 					debugres, logmax, &st, maxdegree, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
 
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_dl(graph, &st, kernel));
@@ -2901,7 +2901,7 @@ int igraph_revolver_el(const igraph_t *graph,
 					 0 /*logmax */, &st, cats, nocats, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_el(graph, &st, kernel, cats));
@@ -2912,7 +2912,7 @@ int igraph_revolver_el(const igraph_t *graph,
 					  &st, cats, nocats, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
 
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_el(graph, &st, kernel, cats));
@@ -3329,7 +3329,7 @@ int igraph_revolver_r(const igraph_t *graph,
 					0 /*logmax*/, &st, window, maxdegree));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_r(graph, &st, kernel, window));
@@ -3339,7 +3339,7 @@ int igraph_revolver_r(const igraph_t *graph,
 					debugres, logmax, &st, window, maxdegree));
       
       /* normalize */
-      igraph_vector_multiply(kernel, 1/igraph_vector_sum(kernel));
+      igraph_vector_scale(kernel, 1/igraph_vector_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_r(graph, &st, kernel, window));
@@ -3743,7 +3743,7 @@ int igraph_revolver_ar(const igraph_t *graph,
 					 window, maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ar(graph, &st, kernel, window));
@@ -3754,7 +3754,7 @@ int igraph_revolver_ar(const igraph_t *graph,
 					  &st, agebins, window, maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ar(graph, &st, kernel, window));
@@ -4185,7 +4185,7 @@ int igraph_revolver_di(const igraph_t *graph,
 					 0/*logmax*/, &st, cats, nocats, maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_di(graph, &st, kernel, cats));
@@ -4196,7 +4196,7 @@ int igraph_revolver_di(const igraph_t *graph,
 					 maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_di(graph, &st, kernel, cats));
@@ -4578,7 +4578,7 @@ int igraph_revolver_adi(const igraph_t *graph,
 					  nocats, maxdegree, agebins));
       
       /* normalize */
-      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      igraph_array3_scale(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_adi(graph, &st, kernel, cats));
@@ -4589,7 +4589,7 @@ int igraph_revolver_adi(const igraph_t *graph,
 					  maxdegree, agebins));
       
       /* normalize */
-      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      igraph_array3_scale(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_adi(graph, &st, kernel, cats));
@@ -5012,7 +5012,7 @@ int igraph_revolver_il(const igraph_t *graph,
 					 0 /*logmax*/, &st, cats, nocats, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_il(graph, &st, kernel, cats));
@@ -5023,7 +5023,7 @@ int igraph_revolver_il(const igraph_t *graph,
 					 cats, nocats, agebins));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
 
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_il(graph, &st, kernel, cats));
@@ -5470,7 +5470,7 @@ int igraph_revolver_ir(const igraph_t *graph,
 					 cats, nocats, maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ir(graph, &st, kernel, window, cats));
@@ -5481,7 +5481,7 @@ int igraph_revolver_ir(const igraph_t *graph,
 					 maxdegree));
       
       /* normalize */
-      igraph_matrix_multiply(kernel, 1/igraph_matrix_sum(kernel));
+      igraph_matrix_scale(kernel, 1/igraph_matrix_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_ir(graph, &st, kernel, window, cats));
@@ -5938,7 +5938,7 @@ int igraph_revolver_air(const igraph_t *graph,
 					  cats, nocats, maxdegree, agebins));
       
       /* normalize */
-      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      igraph_array3_scale(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_air(graph, &st, kernel, window, cats));
@@ -5950,7 +5950,7 @@ int igraph_revolver_air(const igraph_t *graph,
 					  maxdegree, agebins));
       
       /* normalize */
-      igraph_array3_multiply(kernel, 1/igraph_array3_sum(kernel));
+      igraph_array3_scale(kernel, 1/igraph_array3_sum(kernel));
       
       /* update st */
       IGRAPH_CHECK(igraph_revolver_st_air(graph, &st, kernel, window, cats));

@@ -1,5 +1,21 @@
 2007-10-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/vector.pmt (igraph_vector_multiply, igraph_vector_scale) : renamed
+	* src/matrix.pmt (igraph_matrix_multiply, igraph_matrix_scale) : renamed
+	* src/array.c (igraph_array3_multiply, igraph_array3_scale) : renamed
+	* src/spmatrix.c (igraph_spmatrix_multiply, igraph_spmatrix_scale) : renamed
+	* src/arpack.c (igraph_i_kleinberg, igraph_eigenvector_centrality)
+	* src/fastcommunity.c (igraph_community_fastgreedy)
+	* src/layout.c (igraph_layout_lgl, igraph_layout_grid_fruchterman_reingold)
+	* src/igraph_revolver_cit.c
+	* src/igraph_revolver_grow.c : updated
+	
+	
+	* src/vector.pmt (igraph_vector_add, igraph_vector_add_constant) : renamed
+	* src/topology.c (igraph_isomorphic_function_vf2)
+	(igraph_i_get_isomorphisms_vf2, igraph_subisomorphic_function_vf2)
+	(igraph_i_get_subisomorphisms_vf2)
+
 	* src/arpack.c (igraph_i_kleinberg, igraph_hub_score)
 	(igraph_authority_score) : added
 
