@@ -1,5 +1,9 @@
 2007-10-23  Gabor Csardi  <csardi@rmki.kfki.hu>	
-	
+
+	* src/games.c (igraph_erdos_renyi_game_gnp, igraph_erdos_renyi_game_gnm) :
+	reworked
+	* examples/simple/igraph_erdos_renyi_game.c : better tests added
+
 	* src/matrix.pmt (igraph_matrix_e, igraph_matrix_e_ptr)
 	(igraph_matrix_set, igraph_matrix_fill, igraph_matrix_update)
 	(igraph_matrix_rbind, igraph_matrix_cbind, igraph_matrix_swap)

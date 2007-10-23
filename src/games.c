@@ -156,7 +156,7 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
   long int no_of_nodes=n;
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   igraph_vector_t s=IGRAPH_VECTOR_NULL;
-  int retval=0;
+  int retval=0;  
 
   if (n<0) {
     IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -172,7 +172,7 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
   } else {
 
     long int i;
-    double maxedges;
+    double maxedges, last;
     if (directed && loops) 
       { maxedges = n * n; }
     else if (directed && !loops)
@@ -187,11 +187,12 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
 
     RNG_BEGIN();
 
-    IGRAPH_CHECK(igraph_vector_push_back(&s, RNG_GEOM(p)+1));
-    while (igraph_vector_tail(&s) <= maxedges) {
-      IGRAPH_CHECK(igraph_vector_push_back(&s, igraph_vector_tail(&s)+RNG_GEOM(p)+1));
+    last=RNG_GEOM(p);
+    while (last < maxedges) {
+      IGRAPH_CHECK(igraph_vector_push_back(&s, last));
+      last += RNG_GEOM(p);
+      last += 1;
     }
-    igraph_vector_pop_back(&s);
 
     RNG_END();
 
@@ -200,34 +201,33 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
 
     if (directed && loops) {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	long int to=fmod(VECTOR(s)[i]-1, no_of_nodes);
-	long int from=(VECTOR(s)[i]-to)/no_of_nodes;
+	long int to=trunc(VECTOR(s)[i]/no_of_nodes);
+	long int from=VECTOR(s)[i]-((igraph_real_t)to)*no_of_nodes;
 	igraph_vector_push_back(&edges, from);
 	igraph_vector_push_back(&edges, to);
       }
     } else if (directed && !loops) {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	long int from=
-	  (VECTOR(s)[i]-1 - fmod(VECTOR(s)[i]-1, no_of_nodes-1))/(no_of_nodes-1);
-	long int to=fmod(VECTOR(s)[i], no_of_nodes-1);
+	long int to=trunc(VECTOR(s)[i]/no_of_nodes);
+	long int from=VECTOR(s)[i]-((igraph_real_t)to)*no_of_nodes;
 	if (from==to) {
 	  to=no_of_nodes-1;
 	}
 	igraph_vector_push_back(&edges, from);
-	igraph_vector_push_back(&edges, to);	
+	igraph_vector_push_back(&edges, to);
       }
     } else if (!directed && loops) {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	long int from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
-	long int to=VECTOR(s)[i]-from*(from-1)/2-1;
-	igraph_vector_push_back(&edges, from-1);
+	long int to=floor((sqrt(8*VECTOR(s)[i]+1)-1)/2);
+	long int from=VECTOR(s)[i]-(((igraph_real_t)to)*(to+1))/2;
+	igraph_vector_push_back(&edges, from);
 	igraph_vector_push_back(&edges, to);
       }
-    } else {
+    } else /* !directed && !loops */ {
       for (i=0; i<igraph_vector_size(&s); i++) {
-	long int from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
-	long int to=VECTOR(s)[i]-(from-1)*(from-2)/2-1;
-	igraph_vector_push_back(&edges, from-1);
+	long int to=floor((sqrt(8*VECTOR(s)[i]+1)+1)/2);
+	long int from=VECTOR(s)[i]-(((igraph_real_t)to)*(to-1))/2;
+	igraph_vector_push_back(&edges, from);
 	igraph_vector_push_back(&edges, to);
       }
     }      
@@ -282,20 +282,22 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real
     } else {
     
       IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-      IGRAPH_CHECK(igraph_random_sample(&s, 1, maxedges, no_of_edges));
+      IGRAPH_CHECK(igraph_random_sample(&s, 0, maxedges-1, no_of_edges));
       
       IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
       IGRAPH_CHECK(igraph_vector_reserve(&edges, igraph_vector_size(&s)*2));
       
       if (directed && loops) {
 	for (i=0; i<igraph_vector_size(&s); i++) {
-	  igraph_vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))/no_of_nodes);
-	  igraph_vector_push_back(&edges, ((long int)(VECTOR(s)[i]-1))%no_of_nodes);
+	  long int to=trunc(VECTOR(s)[i]/no_of_nodes);
+	  long int from=VECTOR(s)[i]-((igraph_real_t)to)*no_of_nodes;
+	  igraph_vector_push_back(&edges, from);
+	  igraph_vector_push_back(&edges, to);
 	}
       } else if (directed && !loops) {
 	for (i=0; i<igraph_vector_size(&s); i++) {
-	  long int from=((long int)(VECTOR(s)[i]-1))/(no_of_nodes-1);
-	  long int to=((long int)VECTOR(s)[i])%(no_of_nodes-1);
+	  long int to=trunc(VECTOR(s)[i]/no_of_nodes);
+	  long int from=VECTOR(s)[i]-((igraph_real_t)to)*no_of_nodes;
 	  if (from==to) {
 	    to=no_of_nodes-1;
 	  }
@@ -304,22 +306,25 @@ int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real
 	}
       } else if (!directed && loops) {
 	for (i=0; i<igraph_vector_size(&s); i++) {
-	  igraph_real_t from=ceil((sqrt(8*(VECTOR(s)[i])+1)-1)/2);
-	  igraph_vector_push_back(&edges, from-1);
-	  igraph_vector_push_back(&edges, VECTOR(s)[i]-from*(from-1)/2-1);
+	  long int to=floor((sqrt(8*VECTOR(s)[i]+1)-1)/2);
+	  long int from=VECTOR(s)[i]-(((igraph_real_t)to)*(to+1))/2;
+	  igraph_vector_push_back(&edges, from);
+	  igraph_vector_push_back(&edges, to);
 	}
-      } else {
+      } else /* !directed && !loops */ {
 	for (i=0; i<igraph_vector_size(&s); i++) {
-	  igraph_real_t from=ceil((sqrt(8*VECTOR(s)[i]+1)-1)/2)+1;
-	  igraph_vector_push_back(&edges, from-1);
-	  igraph_vector_push_back(&edges, VECTOR(s)[i]-(from-1)*(from-2)/2-1);
+	  long int to=floor((sqrt(8*VECTOR(s)[i]+1)+1)/2);
+	  long int from=VECTOR(s)[i]-(((igraph_real_t)to)*(to-1))/2;
+	  igraph_vector_push_back(&edges, from);
+	  igraph_vector_push_back(&edges, to);
 	}
       }  
 
       igraph_vector_destroy(&s);
+      IGRAPH_FINALLY_CLEAN(1);
       retval=igraph_create(graph, &edges, n, directed);
       igraph_vector_destroy(&edges);
-      IGRAPH_FINALLY_CLEAN(2);
+      IGRAPH_FINALLY_CLEAN(1);
     }
   }
   
