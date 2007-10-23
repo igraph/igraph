@@ -186,9 +186,8 @@ long int FUNCTION(igraph_matrix,ncol)(const TYPE(igraph_matrix) *m) {
  * elements in the matrix.
  */
 
-int FUNCTION(igraph_matrix,copy_to)(const TYPE(igraph_matrix) *m, BASE *to) {
+void FUNCTION(igraph_matrix,copy_to)(const TYPE(igraph_matrix) *m, BASE *to) {
   FUNCTION(igraph_vector,copy_to)(&m->data, to);
-  return 0;
 }
 
 /** 
@@ -196,16 +195,14 @@ int FUNCTION(igraph_matrix,copy_to)(const TYPE(igraph_matrix) *m, BASE *to) {
  * \brief Sets all element in a matrix to zero.
  * 
  * \param m Pointer to an initialized matrix object.
- * \return Error code, always returns with success.
  * 
  * Time complexity: O(n),
  * n is the number of  elements in
  * the matrix. 
  */
 
-int FUNCTION(igraph_matrix,null)(TYPE(igraph_matrix) *m) {
+void FUNCTION(igraph_matrix,null)(TYPE(igraph_matrix) *m) {
   FUNCTION(igraph_vector,null)(&m->data);
-  return 0;
 }
 
 /**
@@ -397,6 +394,9 @@ int FUNCTION(igraph_matrix,get_col)(const TYPE(igraph_matrix) *m,
 				    long int index) {
   long int nrow=FUNCTION(igraph_matrix,nrow)(m);
 
+  if (index>=m->ncol) {
+    IGRAPH_ERROR("Index out of range for selecting matrix column", IGRAPH_EINVAL);
+  }
   IGRAPH_CHECK(FUNCTION(igraph_vector,get_interval)(&m->data, res, 
 						    nrow*index, nrow*(index+1)));
   return 0;
@@ -444,3 +444,354 @@ int FUNCTION(igraph_matrix,transpose)(TYPE(igraph_matrix) *m) {
   
   return 0;
 }
+
+BASE FUNCTION(igraph_matrix,e)(const TYPE(igraph_matrix) *m, 
+			       long int row, long int col) {
+  return MATRIX(*m, row, col);
+}
+
+BASE* FUNCTION(igraph_matrix,e_ptr)(const TYPE(igraph_matrix) *m,
+				    long int row, long int col) {
+  return &MATRIX(*m, row, col);
+}
+
+void FUNCTION(igraph_matrix,set)(TYPE(igraph_matrix)* m, long int row, long int col,
+				 BASE value) {
+  MATRIX(*m, row, col) = value;
+}
+
+void FUNCTION(igraph_matrix,fill)(TYPE(igraph_matrix) *m, BASE e) {
+  FUNCTION(igraph_vector,fill)(&m->data, e);
+}
+
+int FUNCTION(igraph_matrix,update)(TYPE(igraph_matrix) *to, 
+				   const TYPE(igraph_matrix) *from) {
+
+  IGRAPH_CHECK(FUNCTION(igraph_matrix,resize)(to, from->nrow, from->ncol));
+  FUNCTION(igraph_vector,update)(&to->data, &from->data);
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,rbind)(TYPE(igraph_matrix) *to,
+				  const TYPE(igraph_matrix) *from) {
+  long int tocols=to->ncol, fromcols=from->ncol;
+  long int torows=to->nrow, fromrows=from->nrow;
+  long int offset, c, r, index, offset2;
+  if (tocols != fromcols) {
+    IGRAPH_ERROR("Cannot do rbind, number of colums do not match", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(&to->data, 
+					      tocols * (fromrows+torows)));
+  to->nrow += fromrows;
+
+  offset=(tocols-1) * fromrows;
+  index=tocols*torows-1;
+  for (c=tocols-1; c>0; c--) {
+    for (r=0; r<torows; r++, index--) {
+      VECTOR(to->data)[index+offset] = VECTOR(to->data)[index];
+    }
+    offset -= fromrows;
+  }
+  
+  offset=torows; offset2=0;
+  for (c=0; c<tocols; c++) {
+    memcpy(VECTOR(to->data)+offset, VECTOR(from->data)+offset2,
+	   sizeof(BASE)*fromrows);
+    offset+=fromrows+torows;
+    offset2+=fromrows;
+  }
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,cbind)(TYPE(igraph_matrix) *to,
+				  const TYPE(igraph_matrix) *from) {
+  
+  long int tocols=to->ncol, fromcols=from->ncol;
+  long int torows=to->nrow, fromrows=from->nrow;
+  if (torows != fromrows) {
+    IGRAPH_ERROR("Cannot do rbind, number of rows do not match", IGRAPH_EINVAL);
+  }
+  IGRAPH_CHECK(FUNCTION(igraph_matrix,resize)(to, torows, tocols+fromcols));
+  FUNCTION(igraph_vector,copy_to)(&from->data, VECTOR(to->data)+tocols*torows);
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
+  if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
+    IGRAPH_ERROR("Cannot swap non-conformant matrices", IGRAPH_EINVAL);
+  }
+  return FUNCTION(igraph_vector,swap)(&m1->data, &m2->data);
+}
+
+int FUNCTION(igraph_matrix,get_row)(const TYPE(igraph_matrix) *m, 
+				    TYPE(igraph_vector) *res, long int index) {
+  long int rows=m->nrow, cols=m->ncol;
+  long int i, j;
+  
+  if (index >= rows) {
+    IGRAPH_ERROR("Index out of range for selecting matrix row", IGRAPH_EINVAL);
+  }
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(res, cols));
+  
+  for (i=index, j=0; j<cols; i+=rows, j++) {
+    VECTOR(*res)[j] = VECTOR(m->data)[i];
+  }
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,set_row)(TYPE(igraph_matrix) *m,
+				    const TYPE(igraph_vector) *v, long int index) {
+  long int rows=m->nrow, cols=m->ncol;
+  long int i, j;
+  
+  if (index >= rows) {
+    IGRAPH_ERROR("Index out of range for selecting matrix row", IGRAPH_EINVAL);
+  }
+  if (FUNCTION(igraph_vector,size)(v) != cols) {
+    IGRAPH_ERROR("Cannot set matrix row, invalid vector length", IGRAPH_EINVAL);
+  }
+  for (i=index, j=0; j<cols; i+=rows, j++) {
+    VECTOR(m->data)[i]=VECTOR(*v)[j];
+  }
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,set_col)(TYPE(igraph_matrix) *m,
+				    const TYPE(igraph_vector) *v, long int index) {
+  long int rows=m->nrow, cols=m->ncol;
+  long int i, j;
+  
+  if (index >= cols) {
+    IGRAPH_ERROR("Index out of range for setting matrix column", IGRAPH_EINVAL);
+  }
+  if (FUNCTION(igraph_vector,size)(v) != rows) {
+    IGRAPH_ERROR("Cannot set matrix column, invalid vector length", IGRAPH_EINVAL);
+  }
+  for (i=index*rows, j=0; j<rows; i++, j++) {
+    VECTOR(m->data)[i]=VECTOR(*v)[j];
+  }
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,swap_rows)(TYPE(igraph_matrix) *m, 
+				      long int i, long int j) {
+  long int ncol=m->ncol, nrow=m->nrow;
+  long int n=nrow*ncol;
+  long int index1, index2;
+  if (i>=nrow || j>=nrow) {
+    IGRAPH_ERROR("Cannot swap rows, index out of range", IGRAPH_EINVAL);
+  }
+  if (i==j) { return 0; }
+  for (index1=i, index2=j; index1<n; index1+=nrow, index2+=nrow) {
+    BASE tmp;
+    tmp=VECTOR(m->data)[index1];
+    VECTOR(m->data)[index1]=VECTOR(m->data)[index2];
+    VECTOR(m->data)[index2]=tmp;
+  }
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,swap_cols)(TYPE(igraph_matrix) *m, 
+				      long int i, long int j) {
+  long int ncol=m->ncol, nrow=m->nrow;
+  long int k, index1, index2;
+  if (i>=ncol || j >= ncol) {
+    IGRAPH_ERROR("Cannot swap columns, index out of range", IGRAPH_EINVAL);
+  }
+  if (i==j) { return 0; }
+  for (index1=i*nrow, index2=j*nrow, k=0; k<nrow; k++, index1++, index2++) {
+    BASE tmp=VECTOR(m->data)[index1];
+    VECTOR(m->data)[index1]=VECTOR(m->data)[index2];
+    VECTOR(m->data)[index2]=tmp;
+  }
+  return 0;
+}
+
+void FUNCTION(igraph_matrix,add_constant)(TYPE(igraph_matrix) *m, BASE plus) {
+  FUNCTION(igraph_vector,add_constant)(&m->data, plus);
+}
+
+int FUNCTION(igraph_matrix,add)(TYPE(igraph_matrix) *m1, 
+				const TYPE(igraph_matrix) *m2) {
+  if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
+    IGRAPH_ERROR("Cannot add non-conformant matrices", IGRAPH_EINVAL);
+  }
+  FUNCTION(igraph_vector,add)(&m1->data, &m2->data);
+}
+
+int FUNCTION(igraph_matrix,sub)(TYPE(igraph_matrix) *m1, 
+				const TYPE(igraph_matrix) *m2) {
+  if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
+    IGRAPH_ERROR("Cannot subtract non-conformant matrices", IGRAPH_EINVAL);
+  }
+  FUNCTION(igraph_vector,sub)(&m1->data, &m2->data);
+}
+
+int FUNCTION(igraph_matrix,mul_elements)(TYPE(igraph_matrix) *m1, 
+					 const TYPE(igraph_matrix) *m2) {
+  if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
+    IGRAPH_ERROR("Cannot multiply non-conformant matrices", IGRAPH_EINVAL);
+  }
+  FUNCTION(igraph_vector,mul)(&m1->data, &m2->data);
+}
+
+int FUNCTION(igraph_matrix,div_elements)(TYPE(igraph_matrix) *m1, 
+					 const TYPE(igraph_matrix) *m2) {
+  if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
+    IGRAPH_ERROR("Cannot divide non-conformant matrices", IGRAPH_EINVAL);
+  }
+  FUNCTION(igraph_vector,div)(&m1->data, &m2->data);
+}
+
+igraph_real_t FUNCTION(igraph_matrix,min)(const TYPE(igraph_matrix) *m) {
+  return FUNCTION(igraph_vector,min)(&m->data);
+}
+
+int FUNCTION(igraph_matrix,which_min)(const TYPE(igraph_matrix) *m,
+				      long int *i, long int *j) {
+  long int vmin=FUNCTION(igraph_vector,which_min)(&m->data);
+  *i = vmin % m->nrow;
+  *j = vmin / m->nrow;
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,which_max)(const TYPE(igraph_matrix) *m,
+				      long int *i, long int *j) {
+  long int vmax=FUNCTION(igraph_vector,which_max)(&m->data);
+  *i = vmax % m->nrow;
+  *j = vmax / m->nrow;
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,minmax)(const TYPE(igraph_matrix) *m,
+				   BASE *min, BASE *max) {
+  return FUNCTION(igraph_vector,minmax)(&m->data, min, max);
+}
+
+int FUNCTION(igraph_matrix,which_minmax)(const TYPE(igraph_matrix) *m,
+					 long int *imin, long int *jmin,
+					 long int *imax, long int *jmax) {
+  long int vmin, vmax;
+  FUNCTION(igraph_vector,which_minmax)(&m->data, &vmin, &vmax);
+  *imin = vmin % m->nrow;
+  *jmin = vmin / m->nrow;
+  *imax = vmax % m->nrow;
+  *jmax = vmax / m->nrow;
+  return 0;
+}
+
+igraph_bool_t FUNCTION(igraph_matrix,isnull)(const TYPE(igraph_matrix) *m) {
+  return FUNCTION(igraph_vector,isnull)(&m->data);
+}
+
+igraph_bool_t FUNCTION(igraph_matrix,empty)(const TYPE(igraph_matrix) *m) {
+  return FUNCTION(igraph_vector,empty)(&m->data);
+}
+
+igraph_bool_t FUNCTION(igraph_matrix,is_symmetric)(const TYPE(igraph_matrix) *m) {
+  
+  long int n=m->nrow;
+  long int r,c;
+  if (m->ncol != n) {
+    return 0;
+  }
+  for (r=1; r<n; r++) {
+    for (c=0; c<r; c++) {
+      if (MATRIX(*m, r, c) != MATRIX(*m, c, r)) {
+	return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+igraph_real_t FUNCTION(igraph_matrix,prod)(const TYPE(igraph_matrix) *m) {
+  return FUNCTION(igraph_vector,prod)(&m->data);
+}
+
+int FUNCTION(igraph_matrix,rowsum)(const TYPE(igraph_matrix) *m,
+				   igraph_vector_t *res) {
+  long int nrow=m->nrow, ncol=m->ncol;
+  long int r, c;
+  igraph_real_t sum;
+  IGRAPH_CHECK(igraph_vector_resize(res, nrow));
+  for (r=0; r<nrow; r++) {
+    sum=0;
+    for (c=0; c<ncol; c++) {
+      sum += MATRIX(*m, r, c);
+    }
+    VECTOR(*res)[r]=sum;
+  }
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,colsum)(const TYPE(igraph_matrix) *m,
+				   igraph_vector_t *res) {
+  long int nrow=m->nrow, ncol=m->ncol;
+  long int r, c;
+  igraph_real_t sum;
+  IGRAPH_CHECK(igraph_vector_resize(res, ncol));
+  for (c=0; c<ncol; c++) {
+    sum=0;
+    for (r=0; r<nrow; r++) {
+      sum += MATRIX(*m, r, c);
+    }
+    VECTOR(*res)[c]=sum;
+  }
+  return 0;
+}
+
+igraph_bool_t FUNCTION(igraph_matrix,contains)(const TYPE(igraph_matrix) *m,
+					       BASE e) {
+  return FUNCTION(igraph_vector,contains)(&m->data, e);
+}
+
+igraph_bool_t FUNCTION(igraph_matrix,search)(const TYPE(igraph_matrix) *m,
+					     long int from, BASE what, 
+					     long int *pos, 
+					     long int *row, long int *col) {
+  igraph_bool_t find=FUNCTION(igraph_vector,search)(&m->data, from, what, pos);
+  if (find) {
+    *row = *pos % m->nrow;
+    *col = *pos / m->nrow;
+  }
+  return find;
+}
+
+int FUNCTION(igraph_matrix,remove_row)(TYPE(igraph_matrix) *m, long int row) {
+  
+  long int c, r, index=row+1, leap=1, n=m->nrow * m->ncol;
+  if (row >= m->nrow) {
+    IGRAPH_ERROR("Cannot remove row, index out of range", IGRAPH_EINVAL);
+  }  
+  
+  for (c=0; c<m->ncol; c++) {    
+    for (r=0; r<m->nrow-1 && index < n; r++) {
+      VECTOR(m->data)[index-leap] = VECTOR(m->data)[index];
+      index++;
+    }
+    leap++;
+    index++;
+  }
+  m->nrow--;
+  FUNCTION(igraph_vector,resize)(&m->data, m->nrow * m->ncol);
+  return 0;
+}
+
+int FUNCTION(igraph_matrix,select_cols)(const TYPE(igraph_matrix) *m,
+					TYPE(igraph_matrix) *res, 
+					const igraph_vector_t *cols) {
+  long int ncols=igraph_vector_size(cols);
+  long int nrows=m->nrow;
+  long int i, j;
+  
+  IGRAPH_CHECK(FUNCTION(igraph_matrix,resize)(res, nrows, ncols));
+  for (i=0; i<nrows; i++) {
+    for (j=0; j<ncols; j++) {
+      MATRIX(*res, i, j) = MATRIX(*m, i, (long int)VECTOR(*cols)[j]);
+    }
+  }
+  return 0;
+}
+

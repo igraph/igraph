@@ -36,6 +36,11 @@ AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix.c], [simple/matrix.out])
 AT_CLEANUP
 
+AT_SETUP([Matrix (more) (matrix_t): ])
+AT_KEYWORDS([matrix matrix_t])
+AT_COMPILE_CHECK([simple/matrix2.c], [simple/matrix2.out])
+AT_CLEANUP
+
 AT_SETUP([Double ended queue (dqueue_t): ])
 AT_KEYWORDS([dqueue double queue dqueue_t])
 AT_COMPILE_CHECK([simple/dqueue.c])

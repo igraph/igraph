@@ -1,3 +1,21 @@
+2007-10-23  Gabor Csardi  <csardi@rmki.kfki.hu>	
+	
+	* src/matrix.pmt (igraph_matrix_e, igraph_matrix_e_ptr)
+	(igraph_matrix_set, igraph_matrix_fill, igraph_matrix_update)
+	(igraph_matrix_rbind, igraph_matrix_cbind, igraph_matrix_swap)
+	(igraph_matrix_get_row, igraph_matrix_set_row, igraph_matrix_swap_rows)
+	(igraph_matrix_swap_cols, igraph_matrix_add_constant, igraph_matrix_add)
+	(igraph_matrix_sub, igraph_matrix_mul_elements)
+	(igraph_matrix_div_elements, igraph_matrix_min, igraph_matrix_which_min)
+	(igraph_matrix_which_max, igraph_matrix_minmax)
+	(igraph_matrix_which_minmax, igraph_matrix_isnull)
+	(igraph_matrix_empty, igraph_matrix_is_symmetric, igraph_matrix_prod)
+	(igraph_matrix_rowsum, igraph_matrix_colsum, igraph_matrix_contains)
+	(igraph_matrix_search, igraph_matrix_remove_row)
+	(igraph_matrix_select_cols) : added
+	(igraph_matrix_null, igraph_matrix_copy_to) : return void now
+	* exaples/simple/matrix2.c : added
+
 2007-10-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/dqueue.c : boolean dqueue_t added

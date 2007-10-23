@@ -521,7 +521,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 
   if (merges != 0) {
 	IGRAPH_CHECK(igraph_matrix_resize(merges, total_joins, 2));
-    IGRAPH_CHECK(igraph_matrix_null(merges));
+	igraph_matrix_null(merges);
   }
   if (modularity != 0) {
 	IGRAPH_CHECK(igraph_vector_resize(modularity, total_joins+1));
