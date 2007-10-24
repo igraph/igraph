@@ -1,3 +1,9 @@
+2007-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c.in (R_SEXP_igraph_arpack_options)
+	(R_igraph_arpack_options_to_SEXP) : added
+	* interfaces/R/igraph/R/centrality.R (igraph.arpack.default) : added
+
 2007-10-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c.in (R_igraph_attribute_copy) :

@@ -43,6 +43,7 @@ __BEGIN_DECLS
 #include "types.h"
 #include "error.h"
 #include "interrupt.h"
+#include "arpack.h"
 
 #include <stdio.h> 		/* FILE */
 
@@ -899,11 +900,8 @@ int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 /* -------------------------------------------------- */
 
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
-				  igraph_real_t *value, igraph_integer_t *retcode,
-				  igraph_integer_t *vmult, igraph_integer_t *aupdate,
-				  igraph_bool_t norm, igraph_real_t tol, 
-				  igraph_integer_t maxit, igraph_integer_t pncv,
-				  int which);
+				  igraph_real_t *value, igraph_real_t scale,
+				  igraph_arpack_options_t *options);
 
 int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
 		     igraph_real_t *value, igraph_integer_t *retcode,

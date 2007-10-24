@@ -1,5 +1,10 @@
 2007-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/arpack.c (igraph_arpack_rssolve) : added
+	(igraph_i_eigenvector_centrality, igraph_eigenvector_centrality) : 
+	interface rewritten
+	* examples/simple/eigenvector_centrality.c : updated
+
 	* src/arpack.c (igraph_eigenvector_centrality, igraph_i_kleinberg) :
 	a bug fixed
 

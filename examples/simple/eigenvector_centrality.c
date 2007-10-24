@@ -31,15 +31,15 @@ int main() {
   igraph_vector_t v;
   long int i;
   igraph_integer_t value, retcode;
+  igraph_arpack_options_t options;
   
   igraph_star(&g, 100, IGRAPH_STAR_UNDIRECTED, 0);
-  
-  igraph_vector_init(&v, 0);
-  igraph_eigenvector_centrality(&g, &v, &value, &retcode, /*vmult*/0, /*aupdate*/0, 
-				/*norm=*/0, /*tol=*/0, /*maxiter=*/300, /*ncv=*/3,
-				/*which=*/0);
 
-  if (retcode != 0) {
+  igraph_arpack_options_init(&options);
+  igraph_vector_init(&v, 0);
+  igraph_eigenvector_centrality(&g, &v, &value, /*scale=*/0, &options);
+
+  if (options.info != 0) {
     return 1;
   }
 

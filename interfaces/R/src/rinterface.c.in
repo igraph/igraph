@@ -1260,6 +1260,91 @@ int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it) {
   return 0;
 }
 
+int R_SEXP_to_igraph_arpack_options(SEXP in, igraph_arpack_options_t *opt) {
+  SEXP tmp;
+  const char *tmpstr;
+  igraph_arpack_options_init(opt);
+  opt -> bmat[0] = CHAR(STRING_ELT(AS_CHARACTER
+				   (R_igraph_getListElement(in, "bmat")), 0))[0];
+  opt -> n = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "n")))[0];
+  tmpstr=CHAR(STRING_ELT(AS_CHARACTER(R_igraph_getListElement(in, "which")), 0));
+  opt -> which[0]=tmpstr[0]; opt -> which[1]=tmpstr[1];
+  opt -> nev = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "nev")))[0];
+  opt -> tol = REAL(AS_NUMERIC(R_igraph_getListElement(in, "tol")))[0];
+  opt -> ncv = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "ncv")))[0];
+  opt -> ldv = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "ldv")))[0];
+  opt -> ishift = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "ishift")))[0];
+  opt -> mxiter = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "maxiter")))[0];
+  opt -> nb = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "nb")))[0];
+  opt -> mode = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "mode")))[0];
+  opt -> start = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "start")))[0];
+  opt -> lworkl = opt -> ncv * (opt->ncv+8);
+  opt -> sigma = REAL(AS_NUMERIC(R_igraph_getListElement(in, "sigma")))[0];
+  opt -> info = opt -> start;
+
+  opt->iparam[0]=opt->ishift;
+  opt->iparam[2]=opt->mxiter; 
+  opt->iparam[3]=opt->nb;
+  opt->iparam[6]=opt->mode;
+  
+  return 0;
+}
+
+SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
+  SEXP result, names;
+  char bmat[2], which[3];
+
+  bmat[0]=opt->bmat[0]; bmat[1]='\0';
+  which[0]=opt->which[0]; which[1]=opt->which[1]; which[2]='\0';
+  
+  PROTECT(result = NEW_LIST(19));
+  SET_VECTOR_ELT(result, 0, NEW_CHARACTER(1)); SET_STRING_ELT(VECTOR_ELT(result, 0), 0, mkChar(bmat));
+  SET_VECTOR_ELT(result, 1, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 1))[0]=opt->n;
+  SET_VECTOR_ELT(result, 2, NEW_CHARACTER(1)); SET_STRING_ELT(VECTOR_ELT(result, 2), 0, mkChar(which));
+  SET_VECTOR_ELT(result, 3, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 3))[0]=opt->nev;
+  SET_VECTOR_ELT(result, 4, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 4))[0]=opt->tol;
+  SET_VECTOR_ELT(result, 5, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 5))[0]=opt->ncv;
+  SET_VECTOR_ELT(result, 6, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 6))[0]=opt->ldv;
+  SET_VECTOR_ELT(result, 7, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 7))[0]=opt->ishift;
+  SET_VECTOR_ELT(result, 8, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 8))[0]=opt->mxiter;
+  SET_VECTOR_ELT(result, 9, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 9))[0]=opt->nb;
+  SET_VECTOR_ELT(result, 10, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 10))[0]=opt->mode;
+  SET_VECTOR_ELT(result, 11, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 11))[0]=opt->start;
+  SET_VECTOR_ELT(result, 12, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 12))[0]=opt->sigma;
+
+  SET_VECTOR_ELT(result, 13, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 13))[0]=opt->info;
+  SET_VECTOR_ELT(result, 14, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 14))[0]=opt->iparam[2];/* mxiter */
+  SET_VECTOR_ELT(result, 15, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 15))[0]=opt->iparam[4];/* nconv */
+  SET_VECTOR_ELT(result, 16, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 16))[0]=opt->iparam[8];/* numop */
+  SET_VECTOR_ELT(result, 17, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 17))[0]=opt->iparam[9];/* numopb */
+  SET_VECTOR_ELT(result, 18, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 18))[0]=opt->iparam[10];/* numreo */
+  
+  PROTECT(names=NEW_CHARACTER(19));
+  SET_STRING_ELT(names, 0, mkChar("bmat"));
+  SET_STRING_ELT(names, 1, mkChar("n"));
+  SET_STRING_ELT(names, 2, mkChar("which"));
+  SET_STRING_ELT(names, 3, mkChar("nev"));
+  SET_STRING_ELT(names, 4, mkChar("tol"));
+  SET_STRING_ELT(names, 5, mkChar("ncv"));
+  SET_STRING_ELT(names, 6, mkChar("ldv"));
+  SET_STRING_ELT(names, 7, mkChar("ishift"));
+  SET_STRING_ELT(names, 8, mkChar("maxiter"));
+  SET_STRING_ELT(names, 9, mkChar("nb"));
+  SET_STRING_ELT(names, 10, mkChar("mode"));
+  SET_STRING_ELT(names, 11, mkChar("start"));
+  SET_STRING_ELT(names, 12, mkChar("sigma"));
+  SET_STRING_ELT(names, 13, mkChar("info"));
+  SET_STRING_ELT(names, 14, mkChar("iter"));
+  SET_STRING_ELT(names, 15, mkChar("nconv"));
+  SET_STRING_ELT(names, 16, mkChar("numop"));
+  SET_STRING_ELT(names, 17, mkChar("numopb"));
+  SET_STRING_ELT(names, 18, mkChar("numreo"));
+  SET_NAMES(result, names);
+  
+  UNPROTECT(2);
+  return result;  
+}
+
 /*******************************************************************/
 
 SEXP R_igraph_add_edges(SEXP graph, SEXP edges) {

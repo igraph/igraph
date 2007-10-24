@@ -176,3 +176,14 @@ VERTEXSET:
 NULL:
   CALL: 0
   HEADER:
+
+##################################
+# Options to the ARPACK solver
+
+ARPACKOPT:
+  CTYPE: igraph_arpack_options_t
+  CALL: &%C%
+  INCONV:
+    INOUT: R_SEXP_to_igraph_arpack_options(%I%, &%C%);
+  OUTCONV:
+    INOUT: PROTECT(%I%=R_igraph_arpack_options_to_SEXP(&%C%));

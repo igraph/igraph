@@ -412,10 +412,8 @@ igraph_add_edge:
 
 igraph_eigenvector_centrality:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                OUT INTEGERPTR retcode, OUT INTEGERPTR vmult, \
-                OUT INTEGERPTR aupdate, \
-                BOOLEAN norm=True, REAL tol=0, INTEGER maxit=300, \
-                INTEGER ncv=3, INT which=0
+                BOOLEAN scale=True, INOUT ARPACKOPT options=igraph.arpack.default
+        DEFAULT-R: options=igraph.arpack.default
         NAME-R: evcent
 
 igraph_hub_score:
