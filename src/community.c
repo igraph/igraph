@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "memory.h"
 #include "random.h"
+#include "arpack.h"
 
 #include <string.h>
 #include <math.h>
@@ -696,6 +697,13 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   long int i, j, k, l, m;
   long int communities=1;
   igraph_vector_t vmembership, *mymembership=membership;  
+  
+  /* These are for the ARPACK routines */
+  int n=no_of_nodes, nev=1, ncv=4, ldv=n, *select, iparam[11], ipntr[11], ido,
+    lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
+  igraph_real_t sigma, zero=0.0, tol=0;
+  igraph_vector_t v, workl, workd, d, resid, ax;
+  char *bmat="I", *LA="LA", *LM="LM", *all="All", *which=LA;
 
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("This method was developed for undirected graphs");
@@ -722,8 +730,19 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(mymembership, no_of_nodes));
   igraph_vector_null(mymembership);  
 
-  RNG_BEGIN();
-
+  /* Allocate ARPACK structures */
+  IGRAPH_VECTOR_INIT_FINALLY(&v, ldv*ncv);
+  IGRAPH_VECTOR_INIT_FINALLY(&workl, lworkl);
+  IGRAPH_VECTOR_INIT_FINALLY(&workd, 3*n);
+  IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
+  select= igraph_Calloc(ncv, int);
+  if (!select) {
+    IGRAPH_ERROR("Cannot calculate eigenvector community", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, select);
+  
   igraph_dqueue_push(&tosplit, 0);
   
   while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
@@ -754,41 +773,40 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
       continue;			/* nothing to do */
     }
 
-    /* we might need to do the whole iteration twice if a 
-       negative eigenvalue is found first, we break at the first 
-       positive eigenvalue, which is either in the first or second turn  */
-    mneg=0.0;
-    while (1) {
-    
-      /* create a normalized random vector */
-      IGRAPH_CHECK(igraph_vector_resize(&x, size));
-      IGRAPH_CHECK(igraph_vector_resize(&x2, size));
-      for (i=0; i<size; i++) {
-	VECTOR(x)[i]=RNG_UNIF01(); 
-	sumsq += VECTOR(x)[i] * VECTOR(x)[i];
-      }
-      sumsq=sqrt(sumsq);
-      for (i=0; i<size; i++) {
-	VECTOR(x)[i] /= sumsq;      
-      }
-      
-      /* do some iterations */
-      for (i=0; i<niter; i++) {
-	
-	IGRAPH_ALLOW_INTERRUPTION();
+    /* Set up ARPACK solver */
+    info=0; ido=0; ishfts=1; mode1=1;
+    iparam[0]=ishfts;
+    iparam[2]=maxit;    
+    iparam[6]=mode1;
+    n=size; ldv=n;
+    if (n<3) { ncv=n; } else { ncv=3; }
+    lworkl=ncv*(ncv+8);
 
+    while (1) {
+      
+      IGRAPH_F77(dsaupd, DSAUPD)(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+				 &ncv, VECTOR(v), &ldv, iparam, ipntr,
+				 VECTOR(workd), VECTOR(workl),
+				 &lworkl, &info);
+      
+      if (ido==-1 || ido==1) {
+	
+	long int j, nlen;
+	igraph_real_t *from=VECTOR(workd)+ipntr[0]-1;
+	igraph_real_t *to=VECTOR(workd)+ipntr[1]-1;
+	
 	/* Calculate Ax first */
-	igraph_vector_null(&x2);
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
-	  long int n=igraph_vector_size(neis);
-	  for (k=0; k<n; k++) {
+	  nlen=igraph_vector_size(neis);
+	  to[j]=0.0;
+	  for (k=0; k<nlen; k++) {
 	    long int nei=VECTOR(*neis)[k];
-	    VECTOR(x2)[j] += VECTOR(x)[nei];
+	    to[j] += from[nei];
 	  }
 	}
-      
+	
 	/* Now calculate k^Tx/2m */
 	ktx=0.0; sumdeg=0;
 	for (j=0; j<size; j++) {
@@ -796,61 +814,44 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);
 	  sumdeg += degree;
-	  ktx += VECTOR(x)[j] * degree;
+	  ktx += from[j] * degree;
 	}
 	ktx = ktx / sumdeg;	/* every edge has been counted twice */
-
-	/* We need to know whether the eigenvalue is positive */
-	if (i==niter-1) {
-	  bfound=0;
-	  bidx=0;
-	  while (bidx<size) {
-	    if (VECTOR(x)[bidx] != 0) {
-	      bfound=1;
-	      bval=VECTOR(x)[bidx];
-	      break;
-	    }
-	    bidx++;
-	  }
-	  if (!bfound) {
-	    /* all zero eigenvector, what to do know?? */
-	    IGRAPH_ERROR("Zero eigenvector found", IGRAPH_DIVERGED);
-	  }
-	}
-      
+	
 	/* Now calculate Bx */
-	sumsq=0.0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);
-	  /* the last term is the diagonal of B which should be zero */
-	  VECTOR(x)[j] = VECTOR(x2)[j] - ktx*degree
-	    + degree*degree*VECTOR(x)[j]/sumdeg-mneg*VECTOR(x)[j];
-	  sumsq += VECTOR(x)[j] * VECTOR(x)[j];
+	  to[j] = to[j] - ktx*degree + degree*degree*from[j]/sumdeg;
 	}
-
-	bval2=VECTOR(x)[bidx];
-      
-	/* Normalization */
-	sumsq=sqrt(sumsq);
-	for (j=0; j<size; j++) {
-	  VECTOR(x)[j] = VECTOR(x)[j] / sumsq;
-	}
-      
-      } /* i<niter */
-      
-      /* Check if we found a positive eigenvalue */
-      if (bval * bval2 < 0) {
-	/* Negative, do the same iteration with a modified matrix */
-	mneg=bval2 / bval;
+	
       } else {
-	/* No second turn */
 	break;
       }
-      
-    } /* neg */
+    } /* while 1, we have the eigenvalue if no error */
 
+    if (info < 0) {
+      fprintf(stderr, "ARPACK error %i\n", info);
+      IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    }
+    
+    /* Get eigenvector */
+
+    IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
+				&sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
+				&ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
+				VECTOR(workl), &lworkl, &info);
+    
+    if (info < 0) {
+      fprintf(stderr, "ARPACK error %i\n", info);
+      IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    }
+    
+    for (i=0; i<n; i++) {
+      VECTOR(x)[i]=VECTOR(v)[i];
+    }
+    
     /* just to have the always the same result, we multiply by -1
        if the first element is not positive  */
     for (i=0; i<size; i++) {
@@ -919,9 +920,19 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     if (m > 1) {
       IGRAPH_CHECK(igraph_dqueue_push(&tosplit, comm));
     }
+
+    /* TODO: do not do any merge if negative */
+    if (VECTOR(d)[0] < 0) { break; } /* Negative eigenvalue */
   }
   
-  RNG_END();
+  igraph_Free(select);
+  igraph_vector_destroy(&ax);
+  igraph_vector_destroy(&resid);
+  igraph_vector_destroy(&d);
+  igraph_vector_destroy(&workd);
+  igraph_vector_destroy(&workl);
+  igraph_vector_destroy(&v);
+  IGRAPH_FINALLY_CLEAN(7);
 
   igraph_adjlist_destroy(&adjlist);
   igraph_vector_destroy(&x2);
@@ -1025,6 +1036,13 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   long int communities=1;
   igraph_vector_t vmembership, *mymembership=membership;
 
+  /* These are for the ARPACK routines */
+  int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
+    lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
+  igraph_real_t sigma, zero=0.0, tol=0;
+  igraph_vector_t v, workl, workd, d, resid, ax;
+  char *bmat="I", *LA="LA", *LM="LM", *all="All", *which=LA;
+
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("This method was developed for undirected graphs");
   }
@@ -1051,7 +1069,18 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(mymembership, no_of_nodes));
   igraph_vector_null(mymembership);  
 
-  RNG_BEGIN();
+  /* Allocate ARPACK structures */
+  IGRAPH_VECTOR_INIT_FINALLY(&v, ldv*ncv);
+  IGRAPH_VECTOR_INIT_FINALLY(&workl, lworkl);
+  IGRAPH_VECTOR_INIT_FINALLY(&workd, 3*n);
+  IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
+  select= igraph_Calloc(ncv, int);
+  if (!select) {
+    IGRAPH_ERROR("Cannot calculate eigenvector community", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, select);
 
   igraph_dqueue_push(&tosplit, 0);
   
@@ -1076,119 +1105,92 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       }
     }
 
-    /* now 'size' is the size of the current community and 
-       idx[0:(size-1)] contains the original ids of the vertices in 
-       the current community. We need this to index the neighbor list.  */
-
     staken++;
-    if (size==1) {
-      continue;			/* nothing to do */
-    }
 
-    /* we might need to do the whole iteration twice if a 
-       negative eigenvalue is found first, we break at the first 
-       positive eigenvalue, which is either in the first or second turn  */
-    mneg=0.0;
-    while (1) {
+    /* Set up ARPACK solver */
+    info=0; ido=0; ishfts=1; mode1=1;
+    iparam[0]=ishfts;
+    iparam[2]=maxit;
+    iparam[6]=mode1;
+    n=size; ldv=n;
+    if (n<3) { ncv=n; } else { ncv=3; }
+    lworkl=ncv*(ncv+8);
     
-      /* create a normalized random vector */
-      IGRAPH_CHECK(igraph_vector_resize(&x, size));
-      IGRAPH_CHECK(igraph_vector_resize(&x2, size));
-      for (i=0; i<size; i++) {
-  	VECTOR(x)[i]=RNG_UNIF01();
-	sumsq += VECTOR(x)[i] * VECTOR(x)[i];
-      }
-      sumsq=sqrt(sumsq);
-      for (i=0; i<size; i++) {
-	VECTOR(x)[i] /= sumsq;      
-      }
+    while (1) {
       
-      /* do some iterations */
-      for (i=0; i<niter; i++) {
+      IGRAPH_F77(dsaupd, DSAUPD)(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+				 &ncv, VECTOR(v), &ldv, iparam, ipntr,
+				 VECTOR(workd), VECTOR(workl),
+				 &lworkl, &info);
+      
+      if (ido==-1 || ido==1) {
 	
-	IGRAPH_ALLOW_INTERRUPTION();
-
+	long int j, nlen;
+	igraph_real_t *from=VECTOR(workd)+ipntr[0]-1;
+	igraph_real_t *to=VECTOR(workd)+ipntr[1]-1;
+	
 	/* Calculate Ax first */
 	comm_edges=0;
-	igraph_vector_null(&x2);
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
-	  long int n=igraph_vector_size(neis);
-	  comm_edges += n;
+	  nlen=igraph_vector_size(neis);
+	  comm_edges += nlen;
 	  kig=0;
-	  for (k=0; k<n; k++) {
+	  to[j]=0.0;
+	  for (k=0; k<nlen; k++) {
 	    long int nei=VECTOR(*neis)[k];
 	    if (VECTOR(*mymembership)[nei]==comm) {
-	      kig+=1;
-	      VECTOR(x2)[j] += VECTOR(x)[ (long int) VECTOR(idx2)[nei]];
+	      kig+=1;	      
+	      to[j] += from[ (long int) VECTOR(idx2)[nei] ];
 	    }
 	  }
- 	  VECTOR(x2)[j] -= kig * VECTOR(x)[j];
+	  to[j] -= kig * from[j];
 	}
-      
+	
 	/* Now calculate k^Tx/2m */
 	ktx=0.0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
-	  long int degree=igraph_vector_size(neis);	  
- 	  VECTOR(x2)[j] += degree * comm_edges / no_of_edges * VECTOR(x)[j] / 2;
-	  ktx += VECTOR(x)[j] * degree;
+	  long int degree=igraph_vector_size(neis);
+	  to[j] += degree * comm_edges / no_of_edges * from[j]/2;
+	  ktx += from[j] * degree;
 	}
 	ktx = ktx / no_of_edges / 2;
-
-	/* We need to know whether the eigenvalue is positive */
-	/* x is not yet modified, contains the previous iteration */
-	if (i==niter-1) {
-	  bfound=0;
-	  bidx=0;
-	  while (bidx<size) {
-	    if (VECTOR(x)[bidx] != 0) {
-	      bfound=1;
-	      bval=VECTOR(x)[bidx];
-	      break;
-	    }
-	    bidx++;
-	  }
-	  if (!bfound) {
-	    /* all zero eigenvector, what to do know?? */
-	    IGRAPH_ERROR("Zero eigenvector found", IGRAPH_DIVERGED);
-	  }
-	}
 	
 	/* Now calculate Bx */
-	sumsq=0.0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);
-	  /* the last term is the diagonal of B which should be zero */
-	  VECTOR(x)[j] = VECTOR(x2)[j] - ktx*degree
-	    + degree*degree*VECTOR(x)[j]/no_of_edges/2-mneg*VECTOR(x)[j];
-	  sumsq += VECTOR(x)[j] * VECTOR(x)[j];
+	  to[j] = to[j] - ktx*degree + degree*degree*from[j]/no_of_edges/2;
 	}
 	
-	bval2=VECTOR(x)[bidx];
-	
-	/* Normalization */
-	sumsq=sqrt(sumsq);
-	for (j=0; j<size; j++) {
-	  VECTOR(x)[j] = VECTOR(x)[j] / sumsq;
-	}
-	
-      } /* i<niter */
-      
-      /* Check if we found a positive eigenvalue */
-      if (bval * bval2 < 0) {
-	/* Negative, do the same iteration with a modified matrix */
-	mneg=bval2 / bval;
       } else {
-	/* No second turn */
 	break;
       }
-      
-    } /* neg */
+    } /* while 1, we have the eigenvalue if no error */
+
+    if (info < 0) {
+      fprintf(stderr, "ARPACK error %i\n", info);
+      IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    }
+    
+    /* Get eigenvector */
+    IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
+				&sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
+				&ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
+				VECTOR(workl), &lworkl, &info);
+    
+    if (info < 0) {
+      fprintf(stderr, "ARPACK error %i\n", info);
+      IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    }
+    
+    for (i=0; i<n; i++) {
+      VECTOR(x)[i]=VECTOR(v)[i];
+    }
 
     /* just to have the always the same result, we multiply by -1
        if the first element is not positive
@@ -1235,10 +1237,20 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     if (size-l > 1) {
       IGRAPH_CHECK(igraph_dqueue_push(&tosplit, comm));
     }
+
+    /* TODO: do not do any merge if negative */
+    if (VECTOR(d)[0] < 0) { break; }
   }
   
-  RNG_END();
-  
+  igraph_Free(select);
+  igraph_vector_destroy(&ax);
+  igraph_vector_destroy(&resid);
+  igraph_vector_destroy(&d);
+  igraph_vector_destroy(&workd);
+  igraph_vector_destroy(&workl);
+  igraph_vector_destroy(&v);
+  IGRAPH_FINALLY_CLEAN(7);  
+
   igraph_adjlist_destroy(&adjlist);
   igraph_dqueue_destroy(&tosplit);
   igraph_vector_destroy(&x2);
@@ -1266,7 +1278,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       }
       VECTOR(idx)[to]=++k;
       j++;
-    }  
+    }      
   }
 
   igraph_vector_destroy(&idx);
@@ -1327,7 +1339,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 					      igraph_bool_t *split,
 					      igraph_vector_t *eigenvector,
 					      igraph_real_t *eigenvalue) {
-
+  
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t x2;
@@ -1338,6 +1350,13 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   igraph_i_lazy_adjlist_t adjlist;
   long int size=0;
   igraph_vector_t veigenvector, *myeigenvector=eigenvector;
+
+  /* These are for the ARPACK routines */
+  int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
+    lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
+  igraph_real_t sigma, zero=0.0, tol=0;
+  igraph_vector_t v, workl, workd, d, resid, ax;
+  char *bmat="I", *LA="LA", *LM="LM", *all="All", *which=LA;  
   
   if (igraph_vector_size(membership) != no_of_nodes) {
     IGRAPH_ERROR("Invalid membership vector length", IGRAPH_EINVAL);
@@ -1358,8 +1377,19 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 					  IGRAPH_I_DONT_SIMPLIFY));  
   IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &adjlist);
 
-  RNG_BEGIN();
-  
+  /* Allocate ARPACK structures */
+  IGRAPH_VECTOR_INIT_FINALLY(&v, ldv*ncv);
+  IGRAPH_VECTOR_INIT_FINALLY(&workl, lworkl);
+  IGRAPH_VECTOR_INIT_FINALLY(&workd, 3*n);
+  IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
+  select= igraph_Calloc(ncv, int);
+  if (!select) {
+    IGRAPH_ERROR("Cannot calculate eigenvector community", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, select);
+
   {
     long int comm=community;
     igraph_real_t sumsq=0.0;
@@ -1381,126 +1411,114 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 	communities=VECTOR(*membership)[i]+1;
       }
     }
-    
-    IGRAPH_VECTOR_INIT_FINALLY(&x2, size);
+
     IGRAPH_CHECK(igraph_vector_resize(myeigenvector, size));
-    
-    while (1) {
-      
-      /* create a normalized random vector */
-      for (i=0; i<size; i++) {
-	VECTOR(*myeigenvector)[i]=RNG_UNIF01();
-	sumsq += VECTOR(*myeigenvector)[i] * VECTOR(*myeigenvector)[i];
-      }
-      sumsq=sqrt(sumsq);
-      for (i=0; i<size; i++) {
-	VECTOR(*myeigenvector)[i] /= sumsq;      
-      }
-      
-      /* do some iterations */
-      for (i=0; i<niter; i++) {
-	
-	IGRAPH_ALLOW_INTERRUPTION();
-	
-	/* Calculate Ax first */
-	comm_edges=0.0;
-	igraph_vector_null(&x2);
-	for (j=0; j<size; j++) {
-	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
-	  long int n=igraph_vector_size(neis);
-	  comm_edges += n;
-	  kig=0;
-	  for (k=0; k<n; k++) {
-	    long int nei=VECTOR(*neis)[k];
-	    if (VECTOR(*membership)[nei]==comm) {
-	      kig+=1;
-	      VECTOR(x2)[j] += VECTOR(*myeigenvector)[ (long int) VECTOR(idx2)[nei]];
-	    }
-	  }
-	  VECTOR(x2)[j] -= kig * VECTOR(*myeigenvector)[j];
-	}
-	
-	/* Now calculate k^Tx/2m */
-	ktx=0.0;
-	for (j=0; j<size; j++) {
-	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
-	  long int degree=igraph_vector_size(neis);
-	  VECTOR(x2)[j] += degree * comm_edges / no_of_edges * 
-	    VECTOR(*myeigenvector)[j] / 2;
-	  ktx += VECTOR(*myeigenvector)[j] * degree;
-	}
-	ktx = ktx / no_of_edges / 2;
-	
-	/* We need to know whether the eigenvalue is positive */
-	/* x is not yet modified, contains the previous iteration */
-	if (i==niter-1) {
-	  bfound=0;
-	  bidx=0;
-	  while (bidx<size) {
-	    if (VECTOR(*myeigenvector)[bidx] != 0) {
-	      bfound=1;
-	      bval=VECTOR(*myeigenvector)[bidx];
-	      break;
-	    }
-	    bidx++;
-	  }
-	  if (!bfound) {
-	    /* all zero eigenvector, what to do know?? */
-	    IGRAPH_ERROR("Zero eigenvector found", IGRAPH_DIVERGED);
-	  }
-	}
-	
-	/* Now calculate Bx */
-	sumsq=0.0;
-	for (j=0; j<size; j++) {
-	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
-	  long int degree=igraph_vector_size(neis);
-	  VECTOR(*myeigenvector)[j] = VECTOR(x2)[j] - ktx*degree +
-	    degree*degree*VECTOR(*myeigenvector)[j]/no_of_edges/2-
-	    mneg*VECTOR(*myeigenvector)[j];
-	  sumsq += VECTOR(*myeigenvector)[j] * VECTOR(*myeigenvector)[j];
-	}
-	
-	bval2=VECTOR(*myeigenvector)[bidx];
-	
-	/* Normalization */
-	sumsq=sqrt(sumsq);
-	for (j=0; j<size; j++) {
-	  VECTOR(*myeigenvector)[j] = VECTOR(*myeigenvector)[j] / sumsq;
-	}
 
-      } /* i < niter */
+    if (size != 1) {
+
+      IGRAPH_VECTOR_INIT_FINALLY(&x2, size);
       
-      /* Check if we found a positive eigenvalue */
-      if (bval * bval2 < 0) {
-	/* Negative, do the same iteration with a modified matrix */
-	mneg=bval2 / bval;
-      } else {
-	/* No second turn */
-	if (eigenvalue) {
-	  *eigenvalue=bval2/bval;
+      /* Set up ARPACK solver */
+      info=0; ido=0; ishfts=1; mode1=1;
+      iparam[0]=ishfts;
+      iparam[2]=maxit;
+      iparam[6]=mode1;
+      n=size; ldv=n;
+      if (n<3) { ncv=n; } else { ncv=3; }
+      lworkl=ncv*(ncv+8);
+      
+      while (1) {
+	
+	IGRAPH_F77(dsaupd, DSAUPD)(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+				   &ncv, VECTOR(v), &ldv, iparam, ipntr,
+				   VECTOR(workd), VECTOR(workl),
+				   &lworkl, &info);
+	
+	if (ido==-1 || ido==1) {
+	  
+	  long int j, nlen;
+	  igraph_real_t *from=VECTOR(workd)+ipntr[0]-1;
+	  igraph_real_t *to=VECTOR(workd)+ipntr[1]-1;
+	  
+	  /* Calculate Ax first */
+	  comm_edges=0;
+	  for (j=0; j<size; j++) {
+	    long int oldid=VECTOR(idx)[j];
+	    igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	    nlen=igraph_vector_size(neis);
+	    comm_edges += nlen;
+	    kig=0;
+	    to[j]=0.0;
+	    for (k=0; k<nlen; k++) {
+	      long int nei=VECTOR(*neis)[k];
+	      if (VECTOR(*membership)[nei]==comm) {
+		kig+=1;	      
+		to[j] += from[ (long int) VECTOR(idx2)[nei] ];
+	      }
+	    }
+	    to[j] -= kig * from[j];
+	  }
+	  
+	  /* Now calculate k^Tx/2m */
+	  ktx=0.0;
+	  for (j=0; j<size; j++) {
+	    long int oldid=VECTOR(idx)[j];
+	    igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	    long int degree=igraph_vector_size(neis);
+	    to[j] += degree * comm_edges / no_of_edges * from[j]/2;
+	    ktx += from[j] * degree;
+	  }
+	  ktx = ktx / no_of_edges / 2;
+	  
+	  /* Now calculate Bx */
+	  for (j=0; j<size; j++) {
+	    long int oldid=VECTOR(idx)[j];
+	    igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	    long int degree=igraph_vector_size(neis);
+	    to[j] = to[j] - ktx*degree + degree*degree*from[j]/no_of_edges/2;
+	  }
+	  
+	} else {
+	  break;
 	}
-	break;
+      } /* while 1, we have the eigenvalue if no error */
+      
+      if (info < 0) {
+	fprintf(stderr, "ARPACK error %i\n", info);
+	IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
       }
       
-    } /* neg */    
-  }
-  
-  RNG_END();
+      /* Get eigenvector */
+      IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
+				  &sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
+				  &ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
+				  VECTOR(workl), &lworkl, &info);
+      
+      if (info < 0) {
+	fprintf(stderr, "ARPACK error %i\n", info);
+	IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+      }
+      
+      for (i=0; i<n; i++) {
+	VECTOR(*myeigenvector)[i]=VECTOR(v)[i];
+      }
 
-  /* just to have the always the same result, we multiply by -1
-     if the first element is not positive
-  */
-  for (i=0; i<size; i++) {
-      if (VECTOR(*myeigenvector)[i] != 0) { break; }
-  }
-  if (VECTOR(*myeigenvector)[i]<0) {
-    for (; i<size; i++) {
-      VECTOR(*myeigenvector)[i] = -VECTOR(*myeigenvector)[i];
+      /* just to have the always the same result, we multiply by -1
+	 if the first element is not positive
+      */
+      for (i=0; i<size; i++) {
+	if (VECTOR(*myeigenvector)[i] != 0) { break; }
+      }
+      if (VECTOR(*myeigenvector)[i]<0) {
+	for (; i<size; i++) {
+	  VECTOR(*myeigenvector)[i] = -VECTOR(*myeigenvector)[i];
+	}
+      }
+
+      igraph_vector_destroy(&x2);
+      IGRAPH_FINALLY_CLEAN(1);
     }
+
   }
   
   /* Ok, we have the eigenvector */
@@ -1521,12 +1539,20 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
       *split=0;
     }
   }
+
+  igraph_Free(select);
+  igraph_vector_destroy(&ax);
+  igraph_vector_destroy(&resid);
+  igraph_vector_destroy(&d);
+  igraph_vector_destroy(&workd);
+  igraph_vector_destroy(&workl);
+  igraph_vector_destroy(&v);
+  IGRAPH_FINALLY_CLEAN(7);  
   
-  igraph_vector_destroy(&x2);
   igraph_i_lazy_adjlist_destroy(&adjlist);
   igraph_vector_destroy(&idx2);
   igraph_vector_destroy(&idx);
-  IGRAPH_FINALLY_CLEAN(4);
+  IGRAPH_FINALLY_CLEAN(3);
 
   if (!eigenvector) {
     igraph_vector_destroy(myeigenvector);

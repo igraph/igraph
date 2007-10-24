@@ -21,35 +21,10 @@
 
 */
 
-#include "igraph.h"
-#include "config.h"
+#include "arpack.h"
 #include "memory.h"
 
 #include <math.h>
-
-#ifdef USING_R
-/* #  include <R.h> */
-/* #  define IGRAPH_F77(a,b) F77_CALL(a) */
-#  define IGRAPH_F77(a,b) igraph ## a ## _
-#else
-#  define IGRAPH_F77(a,b) F77_FUNC(igraph ## a, IGRAPH ## b)
-#endif
-
-void IGRAPH_F77(dsaupd,DSAUPD)(int *ido, const char *bmat, int *n,
-			       const char *which, int *nev, igraph_real_t *tol,
-			       igraph_real_t *resid, int *ncv, igraph_real_t *v,
-			       int *ldv, int *iparam, int *ipntr, 
-			       igraph_real_t *workd, igraph_real_t *workl,
-			       int *lworkl, int *info);
-
-void IGRAPH_F77(dseupd,DSEUPD)(int *rvec, const char *howmny, int *select,
-			       igraph_real_t *d, igraph_real_t *z, int *ldz,
-			       igraph_real_t *sigma, const char *bmat, int *n,
-			       const char *which, int *nev, igraph_real_t *tol,
-			       igraph_real_t *resid, int *ncv, igraph_real_t *v,
-			       int *ldv, int *iparam, int *ipntr, 
-			       igraph_real_t *workd, igraph_real_t *workl,
-			       int *lworkl, int *info);
 
 /* The ARPACK example file dssimp.f is used as a template */
 
@@ -87,7 +62,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   }
   
   if (ncv <= 1) { 
-    IGRAPH_ERROR("`ncv'>=3 is required for eigenvector centrality", IGRAPH_EINVAL);
+    IGRAPH_ERROR("`ncv'>=2 is required for eigenvector centrality", IGRAPH_EINVAL);
   }
 
   lworkl = ncv*(ncv+8);
@@ -153,7 +128,6 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
     IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
   }
 
-  iparam[4]=1;			/* get eigenvector */
   IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv, &sigma,
 			      bmat, &n, which, &nev, &tol, VECTOR(resid), &ncv,
 			      VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd), 
@@ -335,7 +309,6 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
   }
 
-  iparam[4]=1;			/* get eigenvector */
   IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv, &sigma,
 			      bmat, &n, which, &nev, &tol, VECTOR(resid), &ncv,
 			      VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd), 
