@@ -23,7 +23,6 @@
 
 #include "igraph.h"
 #include "config.h"
-#define IGRAPH_NO_CALLOC
 #include "memory.h"
 
 #include <math.h>
@@ -192,7 +191,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   }
   
   /* Free resources */
-  igraph_free(select);
+  igraph_Free(select);
   igraph_vector_destroy(&ax);
   igraph_vector_destroy(&resid);
   igraph_vector_destroy(&d);
@@ -374,7 +373,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   }
   
   /* Free resources */
-  igraph_free(select);
+  igraph_Free(select);
   igraph_vector_destroy(&tmp);
   igraph_vector_destroy(&ax);
   igraph_vector_destroy(&resid);

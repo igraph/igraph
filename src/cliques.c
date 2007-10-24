@@ -1,4 +1,4 @@
-/* -*- mode: C -*-  */
+ /* -*- mode: C -*-  */
 /* 
    IGraph library.
    Copyright (C) 2005  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -54,7 +54,7 @@ int igraph_i_find_k_cliques(const igraph_t *graph,
   igraph_bool_t ok;
   
   /* Allocate the storage */
-  *new_member_storage=Realloc(*new_member_storage, 
+  *new_member_storage=igraph_Realloc(*new_member_storage, 
 			      size*old_clique_count,
 			      igraph_real_t);
   if (*new_member_storage == 0) {
@@ -144,7 +144,7 @@ int igraph_i_find_k_cliques(const igraph_t *graph,
 	}
         /* See if new_member_storage is full. If so, reallocate */
         if (m == new_member_storage_size) {
-            *new_member_storage = Realloc(*new_member_storage,
+            *new_member_storage = igraph_Realloc(*new_member_storage,
                                           new_member_storage_size*2,
                                           igraph_real_t);
             if (*new_member_storage == 0)
@@ -190,14 +190,14 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
     
   /* Will be resized later, if needed. */
-  member_storage=Calloc(1, igraph_real_t);
+  member_storage=igraph_Calloc(1, igraph_real_t);
   if (member_storage==0) {
     IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, member_storage);
   
   /* Find all 1-cliques: every vertex will be a clique */
-  new_member_storage=Calloc(no_of_nodes, igraph_real_t);
+  new_member_storage=igraph_Calloc(no_of_nodes, igraph_real_t);
   if (new_member_storage==0) {
     IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
   }
@@ -214,7 +214,7 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     IGRAPH_CHECK(igraph_vector_ptr_resize(res, no_of_nodes));
     igraph_vector_ptr_null(res);
     for (i=0; i<no_of_nodes; i++) {
-      igraph_vector_t *p=Calloc(1, igraph_vector_t);
+      igraph_vector_t *p=igraph_Calloc(1, igraph_vector_t);
       if (p==0) {
 	IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
       }
@@ -253,7 +253,7 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
     /* Add the cliques just found to the result if requested */
     if (i>=min_size && i<=max_size) {
       for (j=0, k=0; j<clique_count; j++, k+=i) {
-	igraph_vector_t *p=Calloc(1, igraph_vector_t);
+	igraph_vector_t *p=igraph_Calloc(1, igraph_vector_t);
 	if (p==0) {
 	  IGRAPH_ERROR("cliques failed", IGRAPH_ENOMEM);
 	}
@@ -420,7 +420,7 @@ int igraph_i_maximal_independent_vertex_sets_backtrack(const igraph_t *graph,
     igraph_integer_t size=0;
     if (res) {
       igraph_vector_t *vec;
-      vec = Calloc(1, igraph_vector_t);
+      vec = igraph_Calloc(1, igraph_vector_t);
       if (vec == 0)
         IGRAPH_ERROR("igraph_i_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
       IGRAPH_VECTOR_INIT_FINALLY(vec, 0);
@@ -533,7 +533,7 @@ void igraph_i_free_set_array(igraph_set_t* array) {
     igraph_set_destroy(array+i);
     i++;
   }
-  Free(array);
+  igraph_Free(array);
 }
 
 /**
@@ -586,7 +586,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
   IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-  clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
+  clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
     IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(igraph_free, clqdata.IS);
@@ -595,7 +595,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
   for (i=0; i<no_of_nodes; i++)
     VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_adjlist_get(&clqdata.adj_list, i));
 
-  clqdata.buckets = Calloc(no_of_nodes+1, igraph_set_t);
+  clqdata.buckets = igraph_Calloc(no_of_nodes+1, igraph_set_t);
   if (clqdata.buckets == 0)
     IGRAPH_ERROR("igraph_maximal_independent_vertex_sets failed", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
@@ -649,7 +649,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
   IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-  clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
+  clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
     IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(igraph_free, clqdata.IS);
@@ -658,7 +658,7 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
   for (i=0; i<no_of_nodes; i++)
     VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_adjlist_get(&clqdata.adj_list, i));
 
-  clqdata.buckets = Calloc(no_of_nodes+1, igraph_set_t);
+  clqdata.buckets = igraph_Calloc(no_of_nodes+1, igraph_set_t);
   if (clqdata.buckets == 0)
     IGRAPH_ERROR("igraph_independence_number failed", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);
@@ -753,7 +753,7 @@ int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &clqdata.adj_list, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &clqdata.adj_list);
 
-  clqdata.IS = Calloc(no_of_nodes, igraph_integer_t);
+  clqdata.IS = igraph_Calloc(no_of_nodes, igraph_integer_t);
   if (clqdata.IS == 0)
     IGRAPH_ERROR("igraph_i_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(igraph_free, clqdata.IS);
@@ -762,7 +762,7 @@ int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
   for (i=0; i<no_of_nodes; i++)
     VECTOR(clqdata.deg)[i] = igraph_vector_size(igraph_adjlist_get(&clqdata.adj_list, i));
 
-  clqdata.buckets = Calloc(no_of_nodes+1, igraph_set_t);
+  clqdata.buckets = igraph_Calloc(no_of_nodes+1, igraph_set_t);
   if (clqdata.buckets == 0)
     IGRAPH_ERROR("igraph_maximal_or_largest_cliques_or_indsets failed", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(igraph_i_free_set_array, clqdata.buckets);

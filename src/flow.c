@@ -569,7 +569,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     long int i, idx;
     long int size=1;
     char *mark;
-    mark=Calloc(no_of_nodes, char);
+    mark=igraph_Calloc(no_of_nodes, char);
     if (!mark) { 
       IGRAPH_ERROR("Not enough memory for minumum cut", IGRAPH_ENOMEM);
     }

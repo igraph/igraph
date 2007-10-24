@@ -75,12 +75,12 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-  inneis=Calloc(no_of_nodes, igraph_vector_t);
+  inneis=igraph_Calloc(no_of_nodes, igraph_vector_t);
   if (!inneis) {
     IGRAPH_ERROR("Cannot run forest fire model", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, inneis);
-  outneis=Calloc(no_of_nodes, igraph_vector_t);
+  outneis=igraph_Calloc(no_of_nodes, igraph_vector_t);
   if (!outneis) {
     IGRAPH_ERROR("Cannot run forest fire model", IGRAPH_ENOMEM);
   }

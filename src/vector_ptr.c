@@ -77,7 +77,7 @@ int igraph_vector_ptr_init      (igraph_vector_ptr_t* v, int long size) {
         long int alloc_size= size > 0 ? size : 1;
 	assert(v != NULL);
 	if (size < 0) { size=0; }
-	v->stor_begin=Calloc(alloc_size, void*);
+	v->stor_begin=igraph_Calloc(alloc_size, void*);
 	if (v->stor_begin==0) {
 	  IGRAPH_ERROR("vector ptr init failed", IGRAPH_ENOMEM);
 	}
@@ -117,7 +117,7 @@ const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
 void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v) {
   assert(v != 0);
   if (v->stor_begin != 0) {
-    Free(v->stor_begin);
+    igraph_Free(v->stor_begin);
     v->stor_begin = NULL;
   }
 }
@@ -132,7 +132,7 @@ void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v) {
   assert(v != 0);
   assert(v->stor_begin != 0);
   for (ptr=v->stor_begin; ptr<v->end; ptr++) {
-    Free(*ptr);
+    igraph_Free(*ptr);
   }
 }
 
@@ -164,7 +164,7 @@ int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size) {
 	
 	if (size <= igraph_vector_ptr_size(v)) { return 0; }
 
-	tmp=Realloc(v->stor_begin, size, void*);
+	tmp=igraph_Realloc(v->stor_begin, size, void*);
 	if (tmp==0) {
 	  IGRAPH_ERROR("vector ptr reserve failed", IGRAPH_ENOMEM);
 	}
@@ -369,7 +369,7 @@ int igraph_vector_ptr_resize(igraph_vector_ptr_t* v, long int newsize) {
  */
 
 int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void* *data, long int length) {
-  v->stor_begin=Calloc(length, void*);
+  v->stor_begin=igraph_Calloc(length, void*);
   if (v->stor_begin==0) {
     IGRAPH_ERROR("cannot init ptr vector from array", IGRAPH_ENOMEM);
   }
@@ -413,7 +413,7 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
   assert(from != NULL);
 /*   assert(from->stor_begin != NULL); */ /* TODO */
-  to->stor_begin=Calloc(igraph_vector_ptr_size(from), void*);
+  to->stor_begin=igraph_Calloc(igraph_vector_ptr_size(from), void*);
   if (to->stor_begin==0) {
     IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
   }

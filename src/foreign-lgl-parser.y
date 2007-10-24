@@ -123,11 +123,11 @@ int igraph_lgl_yyerror (char *s)
 
 igraph_real_t igraph_lgl_get_number(const char *str, long int length) {
   igraph_real_t num;
-  char *tmp=Calloc(length+1, char);
+  char *tmp=igraph_Calloc(length+1, char);
   
   strncpy(tmp, str, length);
   tmp[length]='\0';
   sscanf(tmp, "%lf", &num);
-  Free(tmp);
+  igraph_Free(tmp);
   return num;
 } 

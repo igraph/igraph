@@ -24,6 +24,6 @@
 #include "memory.h"
 
 int igraph_free(void *p) {
-  Free(p);
+  igraph_Free(p);
   return 0;
 }

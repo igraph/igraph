@@ -416,12 +416,12 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
 
   /* init coords & weights */
 
-  coords=Calloc(dims, long int);
+  coords=igraph_Calloc(dims, long int);
   if (coords==0) {
     IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, coords);	/* TODO: hack */
-  weights=Calloc(dims, long int);
+  weights=igraph_Calloc(dims, long int);
   if (weights == 0) {
     IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
   }
@@ -486,8 +486,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector, igraph_int
   }
 
   /* clean up */
-  Free(coords);
-  Free(weights);
+  igraph_Free(coords);
+  igraph_Free(weights);
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(3);
 
@@ -904,7 +904,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-  added=Calloc(no_of_nodes, long int);
+  added=igraph_Calloc(no_of_nodes, long int);
   if (added==0) {
     IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM);
   }

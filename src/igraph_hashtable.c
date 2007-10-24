@@ -80,7 +80,7 @@ int igraph_hashtable_addset2(igraph_hashtable_t *ht,
 
   IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
-  tmp=Calloc(elemlen+1, char);
+  tmp=igraph_Calloc(elemlen+1, char);
   if (tmp==0) {
     IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
   }
@@ -97,7 +97,7 @@ int igraph_hashtable_addset2(igraph_hashtable_t *ht,
     IGRAPH_CHECK(igraph_strvector_set(&ht->elements, newid, tmp));    
   }
 
-  Free(tmp);
+  igraph_Free(tmp);
   IGRAPH_FINALLY_CLEAN(1);
 
   return 0;

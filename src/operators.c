@@ -260,7 +260,7 @@ void igraph_i_intersection_many_free(igraph_vector_ptr_t *v) {
   for (i=0; i<n; i++) { 
     if (VECTOR(*v)[i] != 0) {
       igraph_vector_destroy(VECTOR(*v)[i]);
-      Free(VECTOR(*v)[i]);
+      igraph_Free(VECTOR(*v)[i]);
     }
   }
   igraph_vector_ptr_destroy(v);
@@ -336,7 +336,7 @@ int igraph_intersection_many(igraph_t *res,
     IGRAPH_FINALLY(igraph_i_intersection_many_free, &neivects);
   }
   for (i=0; i<no_of_graphs; i++) {
-    VECTOR(neivects)[i]=Calloc(1, igraph_vector_t);
+    VECTOR(neivects)[i]=igraph_Calloc(1, igraph_vector_t);
     if (VECTOR(neivects)[i]==0) { 
       IGRAPH_ERROR("Cannot intersect graphs", IGRAPH_ENOMEM);
     }
@@ -413,7 +413,7 @@ int igraph_intersection_many(igraph_t *res,
   if (no_of_graphs != 0) {
     for (i=0; i<no_of_graphs; i++) {
       igraph_vector_destroy(VECTOR(neivects)[i]);
-      Free(VECTOR(neivects)[i]);
+      igraph_Free(VECTOR(neivects)[i]);
     }
     igraph_vector_ptr_destroy(&neivects);
     IGRAPH_FINALLY_CLEAN(1);
@@ -520,7 +520,7 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
   for (i=0; i<n; i++) { 
     if (VECTOR(*v)[i] != 0) {
       igraph_vector_destroy(VECTOR(*v)[i]);
-      Free(VECTOR(*v)[i]);
+      igraph_Free(VECTOR(*v)[i]);
     }
   }
   igraph_vector_ptr_destroy(v);
@@ -589,7 +589,7 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
     IGRAPH_FINALLY(igraph_i_union_many_free, &neivects);
   }
   for (i=0; i<no_of_graphs; i++) {
-    VECTOR(neivects)[i]=Calloc(1, igraph_vector_t);
+    VECTOR(neivects)[i]=igraph_Calloc(1, igraph_vector_t);
     if (VECTOR(neivects)[i]==0) { 
       IGRAPH_ERROR("Cannot union graphs", IGRAPH_ENOMEM);
     }
@@ -657,7 +657,7 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs) {
   if (no_of_graphs != 0) {
     for (i=0; i<no_of_graphs; i++) {
       igraph_vector_destroy(VECTOR(neivects)[i]);
-      Free(VECTOR(neivects)[i]);
+      igraph_Free(VECTOR(neivects)[i]);
     }
     igraph_vector_ptr_destroy(&neivects);
     IGRAPH_FINALLY_CLEAN(1);

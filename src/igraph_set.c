@@ -47,7 +47,7 @@
 int igraph_set_init(igraph_set_t *set, int long size) {
   long int alloc_size = size > 0 ? size : 1;
   if (size < 0) { size = 0; }
-  set->stor_begin=Calloc(alloc_size, igraph_integer_t);
+  set->stor_begin=igraph_Calloc(alloc_size, igraph_integer_t);
   set->stor_end=set->stor_begin + alloc_size;
   set->end=set->stor_begin;
 
@@ -66,7 +66,7 @@ int igraph_set_init(igraph_set_t *set, int long size) {
 void igraph_set_destroy(igraph_set_t* set) {
   assert(set != 0);
   if (set->stor_begin != 0) {
-    Free(set->stor_begin);
+    igraph_Free(set->stor_begin);
     set->stor_begin = NULL;
   }
 }
@@ -79,7 +79,7 @@ void igraph_set_destroy(igraph_set_t* set) {
  * This function checks whether the internal storage for the members of the
  * set has been allocated or not, and it assumes that the pointer for the
  * internal storage area contains \c NULL if the area is not initialized yet.
- * This only applies if you have allocated an array of sets with \c Calloc or
+ * This only applies if you have allocated an array of sets with \c igraph_Calloc or
  * if you used the \c IGRAPH_SET_NULL constant to initialize the set.
  *
  * \param set The set object.
@@ -108,7 +108,7 @@ int igraph_set_reserve(igraph_set_t* set, long int size) {
   assert(set->stor_begin != NULL);
   if (size <= actual_size) return 0;
 
-  tmp=Realloc(set->stor_begin, size, igraph_integer_t);
+  tmp=igraph_Realloc(set->stor_begin, size, igraph_integer_t);
   if (tmp==0) {
     IGRAPH_ERROR("cannot reserve space for set", IGRAPH_ENOMEM);
   }

@@ -110,7 +110,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-  calc=Calloc(no_of_nodes, igraph_bool_t);
+  calc=igraph_Calloc(no_of_nodes, igraph_bool_t);
   if (calc==0) {
     IGRAPH_ERROR("cannot calculate cocitation/bibcoupling", IGRAPH_ENOMEM);
   }  
@@ -153,7 +153,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
   /* Clean up */
   igraph_matrix_destroy(&tmpres);
   igraph_vector_destroy(&neis);
-  Free(calc);
+  igraph_Free(calc);
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(4);
 

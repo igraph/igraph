@@ -240,17 +240,17 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     elist_out_p=elist_in_p=&elist_out;
   }
   
-  distance=Calloc(no_of_nodes, long int);
+  distance=igraph_Calloc(no_of_nodes, long int);
   if (distance==0) {
     IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, distance);
-  nrgeo=Calloc(no_of_nodes, long int);
+  nrgeo=igraph_Calloc(no_of_nodes, long int);
   if (nrgeo==0) {
     IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, nrgeo);
-  tmpscore=Calloc(no_of_nodes, double);
+  tmpscore=igraph_Calloc(no_of_nodes, double);
   if (tmpscore==0) {
     IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }
@@ -268,7 +268,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
   IGRAPH_VECTOR_INIT_FINALLY(&eb, no_of_edges);
   
-  passive=Calloc(no_of_edges, char);
+  passive=igraph_Calloc(no_of_edges, char);
   if (!passive) {
     IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
   }

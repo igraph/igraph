@@ -134,7 +134,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
     return 0;
   }
     
-  angles=Calloc(no_of_nodes, igraph_real_t);
+  angles=igraph_Calloc(no_of_nodes, igraph_real_t);
   if (!angles) IGRAPH_ERROR("not enough memory for angle array", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(free, angles);
   
@@ -168,7 +168,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
   IGRAPH_CHECK(igraph_indheap_init_array(&order, angles, no_of_nodes));
   IGRAPH_FINALLY(igraph_indheap_destroy, &order);
   
-  Free(angles);
+  igraph_Free(angles);
   IGRAPH_FINALLY_CLEAN(1);
 
   if (no_of_nodes == 1) {

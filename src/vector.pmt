@@ -116,7 +116,7 @@
 int FUNCTION(igraph_vector,init)      (TYPE(igraph_vector)* v, int long size) {	
         long int alloc_size= size > 0 ? size : 1;
 	if (size < 0) { size=0; }
-	v->stor_begin=Calloc(alloc_size, BASE);
+	v->stor_begin=igraph_Calloc(alloc_size, BASE);
 	if (v->stor_begin==0) {
 	  IGRAPH_ERROR("cannot init vector", IGRAPH_ENOMEM);
 	}
@@ -360,7 +360,7 @@ int FUNCTION(igraph_vector_init,int_end)(TYPE(igraph_vector) *v, int endmark, ..
 void FUNCTION(igraph_vector,destroy)   (TYPE(igraph_vector)* v) {
   assert(v != 0);
   if (v->stor_begin != 0) {
-    Free(v->stor_begin);
+    igraph_Free(v->stor_begin);
     v->stor_begin = NULL;
   }
 }
@@ -400,7 +400,7 @@ int FUNCTION(igraph_vector,reserve)   (TYPE(igraph_vector)* v, long int size) {
 	assert(v->stor_begin != NULL);
 	if (size <= FUNCTION(igraph_vector,size)(v)) { return 0; }
 
-	tmp=Realloc(v->stor_begin, size, BASE);
+	tmp=igraph_Realloc(v->stor_begin, size, BASE);
 	if (tmp==0) {
 	  IGRAPH_ERROR("cannot reserve space for vector", IGRAPH_ENOMEM);
 	}
@@ -873,7 +873,7 @@ long int FUNCTION(igraph_vector,which_min)(const TYPE(igraph_vector)* v) {
 
 int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector) *v, 
 				      BASE *data, long int length) {
-  v->stor_begin=Calloc(length, BASE);
+  v->stor_begin=igraph_Calloc(length, BASE);
   if (v->stor_begin==0) {
     IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);
   }
@@ -929,7 +929,7 @@ int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to,
 				 const TYPE(igraph_vector) *from) {
   assert(from != NULL);
   assert(from->stor_begin != NULL);
-  to->stor_begin=Calloc(FUNCTION(igraph_vector,size)(from), BASE);
+  to->stor_begin=igraph_Calloc(FUNCTION(igraph_vector,size)(from), BASE);
   if (to->stor_begin==0) {
     IGRAPH_ERROR("canot copy vector", IGRAPH_ENOMEM);
   }

@@ -83,7 +83,7 @@ void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree) {
   }
   igraph_vector_ptr_destroy(&t->children);
   igraph_vector_destroy(&t->values);
-  if (sfree) { Free(t); }
+  if (sfree) { igraph_Free(t); }
 }
 
 /**
@@ -162,7 +162,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       if (node != 0) {
 	return igraph_trie_get_node(node, key+diff, newvalue, id);
       } else if (add) {
-	igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
+	igraph_trie_node_t *node=igraph_Calloc(1, igraph_trie_node_t);
 	if (node==0) {
 	  IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
 	}
@@ -189,7 +189,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       /* key is prefix of str, the node has to be cut */
       char *str2;
       
-      igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
+      igraph_trie_node_t *node=igraph_Calloc(1, igraph_trie_node_t);
       if (node==0) {
 	IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
       }
@@ -223,7 +223,7 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
       /* the first diff characters match */
       char *str2;
 
-      igraph_trie_node_t *node=Calloc(1, igraph_trie_node_t);
+      igraph_trie_node_t *node=igraph_Calloc(1, igraph_trie_node_t);
       if (node==0) {
 	IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
       }
@@ -333,7 +333,7 @@ int igraph_trie_get(igraph_trie_t *t, const char *key, long int *id) {
 
 int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
 		     long int *id) {
-  char *tmp=Calloc(length+1, char);
+  char *tmp=igraph_Calloc(length+1, char);
 
   if (tmp==0) {
     IGRAPH_ERROR("canot get from trie", IGRAPH_ENOMEM);
@@ -343,7 +343,7 @@ int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
   tmp[length]='\0';
   IGRAPH_FINALLY(free, tmp);
   IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
-  Free(tmp);
+  igraph_Free(tmp);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }

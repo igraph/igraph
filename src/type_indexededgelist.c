@@ -387,7 +387,7 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   int *mark;
   long int i, j;
   
-  mark=Calloc(no_of_edges, int);
+  mark=igraph_Calloc(no_of_edges, int);
   if (mark==0) {
     IGRAPH_ERROR("Cannot delete edges", IGRAPH_ENOMEM);
   }
@@ -451,7 +451,7 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   graph->oi=newoi;
   IGRAPH_FINALLY_CLEAN(3);
 
-  Free(mark);
+  igraph_Free(mark);
   IGRAPH_FINALLY_CLEAN(1);
   
   /* Create start vectors, no memory is needed for this */
@@ -1039,7 +1039,7 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
     IGRAPH_ERROR("Cannot get edge ids, invalid vertex id", IGRAPH_EINVVID);
   }
 
-  seen=Calloc(no_of_edges, igraph_bool_t);
+  seen=igraph_Calloc(no_of_edges, igraph_bool_t);
   if (seen==0) {
     IGRAPH_ERROR("Cannot get edge ids", IGRAPH_ENOMEM);
   }
@@ -1095,7 +1095,7 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
     }
   }
   
-  Free(seen);
+  igraph_Free(seen);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }

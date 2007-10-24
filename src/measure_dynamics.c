@@ -49,7 +49,7 @@ int igraph_measure_dynamics_id(const igraph_t *graph,
   igraph_bool_t lsd=(sd != 0);
 
   igraph_vector_init(&neis, 0);
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   igraph_matrix_resize(ak, maxind+1, 1);
   igraph_matrix_null(ak);
   if (lsd) {
@@ -139,7 +139,7 @@ int igraph_measure_dynamics_id(const igraph_t *graph,
     igraph_vector_destroy(&notnull);
   }
   
-  Free(indegree);
+  igraph_Free(indegree);
   igraph_vector_destroy(&ntk);
   igraph_vector_destroy(&ch);
   igraph_vector_destroy(&neis);
@@ -300,7 +300,7 @@ int igraph_measure_dynamics_id_st(const igraph_t *graph,
   
   igraph_vector_init(&neis, 0);
   
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   
   igraph_vector_resize(res, no_of_nodes);
   igraph_vector_null(res);
@@ -324,7 +324,7 @@ int igraph_measure_dynamics_id_st(const igraph_t *graph,
   }
   
   igraph_vector_destroy(&neis);
-  Free(indegree);
+  igraph_Free(indegree);
 
   return 0;
 }
@@ -545,7 +545,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph,
   binwidth = no_of_nodes/agebins+1;
 
   igraph_vector_init(&neis, 0);
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   igraph_matrix_resize(akl, maxind+1, agebins);
   igraph_matrix_null(akl);
   if (lsd) {
@@ -650,7 +650,7 @@ int igraph_measure_dynamics_idage(const igraph_t *graph,
     igraph_matrix_destroy(&notnull);
   }
 
-  Free(indegree);
+  igraph_Free(indegree);
   igraph_matrix_destroy(&ntkl);
   igraph_matrix_destroy(&ch);
   igraph_vector_destroy(&neis);
@@ -737,7 +737,7 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res
 
   igraph_vector_init(&neis, 0);
   
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   binwidth=no_of_nodes/agebins+1;
   
   igraph_vector_resize(res, no_of_nodes);
@@ -771,7 +771,7 @@ int igraph_measure_dynamics_idage_st(const igraph_t *graph, igraph_vector_t *res
   }
   
   igraph_vector_destroy(&neis);
-  Free(indegree);
+  igraph_Free(indegree);
   
   return 0;
 }
@@ -804,7 +804,7 @@ int igraph_measure_dynamics_idwindowage(const igraph_t *graph,
   binwidth = no_of_nodes/agebins+1;
 
   igraph_vector_init(&neis, 0);
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   igraph_matrix_resize(akl, maxind+1, agebins);
   igraph_matrix_null(akl);
   if (lsd) {
@@ -916,7 +916,7 @@ int igraph_measure_dynamics_idwindowage(const igraph_t *graph,
   igraph_matrix_destroy(&normfact);
 
   igraph_dqueue_destroy(&history);
-  Free(indegree);
+  igraph_Free(indegree);
   igraph_matrix_destroy(&ntkl);
   igraph_matrix_destroy(&ch);
   igraph_matrix_destroy(&notnull);
@@ -945,7 +945,7 @@ int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph,
   igraph_vector_init(&neis, 0);
   igraph_dqueue_init(&history, time_window);
   
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   binwidth=no_of_nodes/agebins+1;
   
   igraph_vector_resize(res, no_of_nodes);
@@ -991,7 +991,7 @@ int igraph_measure_dynamics_idwindowage_st(const igraph_t *graph,
   }
   
   igraph_vector_destroy(&neis);
-  Free(indegree);
+  igraph_Free(indegree);
   
   return 0;
 }
@@ -1024,7 +1024,7 @@ int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
   binwidth=no_of_nodes/agebins+1;
   
   igraph_vector_init(&neis, 0);
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   igraph_array3_resize(adkl, no_cats, maxind+1, agebins);
   igraph_array3_null(adkl);
   if (lsd) {
@@ -1129,7 +1129,7 @@ int igraph_measure_dynamics_citedcat_id_age(const igraph_t *graph,
   
   igraph_array3_destroy(&normfact);
   
-  Free(indegree);
+  igraph_Free(indegree);
   igraph_array3_destroy(&ntkl);
   igraph_array3_destroy(&ch);
   igraph_array3_destroy(&notnull);
@@ -1154,7 +1154,7 @@ int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
   long int i, k;
 
   igraph_vector_init(&neis, 0);
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   binwidth=no_of_nodes/agebins+1;
   
   igraph_vector_resize(res, no_of_nodes);
@@ -1192,7 +1192,7 @@ int igraph_measure_dynamics_citedcat_id_age_st(const igraph_t *graph,
   }
 
   igraph_vector_destroy(&neis);
-  Free(indegree);
+  igraph_Free(indegree);
   
   return 0;
 }
@@ -1226,7 +1226,7 @@ int igraph_measure_dynamics_citingcat_id_age(const igraph_t *graph,
   binwidth=no_of_nodes/agebins+1;
   
   igraph_vector_init(&neis, 0);
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   igraph_vector_init(&edges, no_cats);
 
   igraph_array3_resize(adkl, no_cats, maxind+1, agebins);
@@ -1340,7 +1340,7 @@ int igraph_measure_dynamics_citingcat_id_age(const igraph_t *graph,
   }
   
   igraph_array3_destroy(&normfact);
-  Free(indegree);
+  igraph_Free(indegree);
   igraph_matrix_destroy(&ntkl);
   igraph_array3_destroy(&ch);
   igraph_array3_destroy(&notnull);
@@ -1371,7 +1371,7 @@ int igraph_measure_dynamics_citingcat_id_age_st(const igraph_t *graph,
   
   igraph_matrix_init(&allst, no_cats, no_of_nodes+1);
   igraph_vector_init(&neis, 0);
-  indegree=Calloc(no_of_nodes, int);
+  indegree=igraph_Calloc(no_of_nodes, int);
   binwidth=no_of_nodes/agebins+1;
   
   igraph_vector_resize(res, no_of_nodes);
@@ -1420,7 +1420,7 @@ int igraph_measure_dynamics_citingcat_id_age_st(const igraph_t *graph,
 
   igraph_vector_destroy(&neis);
   igraph_matrix_destroy(&allst);
-  Free(indegree);
+  igraph_Free(indegree);
   
   return 0;
 }
@@ -1866,7 +1866,7 @@ int igraph_measure_dynamics_lastcit(const igraph_t *graph, igraph_vector_t *al,
   
   long int edges=0;
   
-  lastcit=Calloc(no_of_nodes, long int);
+  lastcit=igraph_Calloc(no_of_nodes, long int);
   if (!lastcit) {
     IGRAPH_ERROR("Cannot measure dynamics (lastcit)", IGRAPH_ENOMEM);
   }
@@ -2000,7 +2000,7 @@ int igraph_measure_dynamics_lastcit_st(const igraph_t *graph,
   long int node, i, k;
 
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  lastcit=Calloc(no_of_nodes, long int);
+  lastcit=igraph_Calloc(no_of_nodes, long int);
   if (!lastcit) {
     IGRAPH_ERROR("Cannot measure dynamics (lastcit st)", IGRAPH_ENOMEM);
   }

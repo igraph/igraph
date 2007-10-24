@@ -43,7 +43,7 @@
 
 int FUNCTION(igraph_heap,init)(TYPE(igraph_heap)* h, long int alloc_size) {
   if (alloc_size <= 0 ) { alloc_size=1; }
-  h->stor_begin=Calloc(alloc_size, BASE);
+  h->stor_begin=igraph_Calloc(alloc_size, BASE);
   if (h->stor_begin==0) {
     IGRAPH_ERROR("heap init failed", IGRAPH_ENOMEM);
   }
@@ -64,7 +64,7 @@ int FUNCTION(igraph_heap,init)(TYPE(igraph_heap)* h, long int alloc_size) {
  */
 
 int FUNCTION(igraph_heap,init_array)(TYPE(igraph_heap) *h, BASE* data, long int len) {
-  h->stor_begin=Calloc(len, BASE);
+  h->stor_begin=igraph_Calloc(len, BASE);
   if (h->stor_begin==0) {
     IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
   }
@@ -87,7 +87,7 @@ int FUNCTION(igraph_heap,init_array)(TYPE(igraph_heap) *h, BASE* data, long int 
 void FUNCTION(igraph_heap,destroy)(TYPE(igraph_heap)* h) {  
   if (h->destroy) {
     if (h->stor_begin != 0) {
-      Free(h->stor_begin);
+      igraph_Free(h->stor_begin);
       h->stor_begin=0;
     }
   }
@@ -189,7 +189,7 @@ int FUNCTION(igraph_heap,reserve)(TYPE(igraph_heap)* h, long int size) {
   
   if (size <= actual_size) { return 0; }
   
-  tmp=Realloc(h->stor_begin, size, BASE);
+  tmp=igraph_Realloc(h->stor_begin, size, BASE);
   if (tmp==0) {
     IGRAPH_ERROR("heap reserve failed", IGRAPH_ENOMEM);
   }

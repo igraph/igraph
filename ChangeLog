@@ -1,5 +1,53 @@
 2007-10-23  Gabor Csardi  <csardi@rmki.kfki.hu>	
 
+	* src/memory.h (Calloc, igraph_Calloc, Realloc, igraph_Realloc)
+	(Free, igraph_Free) : renames
+	* src/memory.c
+	* src/igraph_grid.c
+	* src/visitors.c
+	* src/foreign-gml-parser.y
+	* src/community.c
+	* src/cattributes.c
+	* src/foreign-graphml.c
+	* src/measure_dynamics.c
+	* src/igraph_hashtable.c
+	* src/heap.c
+	* src/igraph_strvector.c
+	* src/igraph_trie.c
+	* src/vector_ptr.c
+	* src/forestfire.c
+	* src/cores.c
+	* src/motifs.c
+	* src/gml_tree.c
+	* src/vector.pmt
+	* src/type_indexededgelist.c
+	* src/stack.pmt
+	* src/dqueue.pmt
+	* src/heap.pmt
+	* src/arpack.c
+	* src/revolver_ml_cit.c
+	* src/flow.c
+	* src/adjlist.c
+	* src/operators.c
+	* src/topology.c
+	* src/foreign.c
+	* src/layout.c
+	* src/foreign-lgl-parser.y
+	* src/iterators.c
+	* src/foreign-pajek-parser.y
+	* src/games.c
+	* ChangeLog
+	* src/components.c
+	* src/memory.h
+	* src/other.c
+	* src/structural_properties.c
+	* src/structure_generators.c
+	* src/cocitation.c
+	* src/foreign-ncol-parser.y
+	* src/fast_community.c
+	* src/igraph_set.c
+	* src/cliques.c : updated
+
 	* src/conversion.c (igraph_to_undirected) : copy graph, vertex and 
 	for 'EACH' also edge attributes
 	

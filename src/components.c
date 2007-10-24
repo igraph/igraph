@@ -90,7 +90,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
   long int i;
   igraph_vector_t neis=IGRAPH_VECTOR_NULL;
 
-  already_added=Calloc(no_of_nodes,char);
+  already_added=igraph_Calloc(no_of_nodes,char);
   if (already_added==0) {
     IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_ENOMEM);
   }
@@ -144,7 +144,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
   
   if (no) { *no = no_of_clusters-1; }
   
-  Free(already_added);
+  igraph_Free(already_added);
   igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(3);
@@ -309,7 +309,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
   
   long int i, j;
 
-  already_added=Calloc(no_of_nodes, char);
+  already_added=igraph_Calloc(no_of_nodes, char);
   if (already_added==0) {
     IGRAPH_ERROR("is connected (weak) failed", IGRAPH_ENOMEM);
   }
@@ -339,7 +339,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
   /* Connected? */
   *res = (j == no_of_nodes);
 
-  Free(already_added);
+  igraph_Free(already_added);
   igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(3);
@@ -416,7 +416,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
     maxcompno=LONG_MAX;
   }
 
-  already_added=Calloc(no_of_nodes, char);
+  already_added=igraph_Calloc(no_of_nodes, char);
   if (already_added==0) {
     IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
   }
@@ -453,7 +453,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
     /* ok, we have a component */
     if (igraph_vector_size(&verts)<minelements) { continue; }
 
-    newg=Calloc(1, igraph_t);
+    newg=igraph_Calloc(1, igraph_t);
     if (newg==0) {
       IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
     }
@@ -575,7 +575,7 @@ int igraph_biconnected_components(const igraph_t *graph,
 	    }
 	    if (no) { *no += 1; }
 	    if (components) {
-	      igraph_vector_t *v=Calloc(1, igraph_vector_t);
+	      igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
 	      IGRAPH_CHECK(igraph_vector_init(v, 0));
 	      while (!igraph_vector_empty(&edgestack)) {
 		long int e=igraph_vector_pop_back(&edgestack);

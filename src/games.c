@@ -90,7 +90,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m
 
   if (outseq==0 || igraph_vector_size(outseq) == 0) {
     no_of_neighbors=m;
-    bag=Calloc(no_of_nodes * no_of_neighbors + no_of_nodes +
+    bag=igraph_Calloc(no_of_nodes * no_of_neighbors + no_of_nodes +
 	       outpref * no_of_nodes * no_of_neighbors,
 	       long int);
     no_of_edges=(no_of_nodes-1)*no_of_neighbors;
@@ -99,7 +99,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m
     for (i=1; i<igraph_vector_size(outseq); i++) {
       no_of_edges+=VECTOR(*outseq)[i];
     }
-    bag=Calloc(no_of_nodes + no_of_edges + outpref * no_of_edges,
+    bag=igraph_Calloc(no_of_nodes + no_of_edges + outpref * no_of_edges,
 	       long int);
   }
   
@@ -138,7 +138,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n, igraph_integer_t m
 
   RNG_END();
 
-  Free(bag);
+  igraph_Free(bag);
   IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(2);
@@ -428,7 +428,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     no_of_edges=outsum/2;
   }
 
-  bag1=Calloc(outsum, long int);
+  bag1=igraph_Calloc(outsum, long int);
   if (bag1==0) {
     IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
   }
@@ -440,7 +440,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     }
   }
   if (directed) {
-    bag2=Calloc(insum, long int);
+    bag2=igraph_Calloc(insum, long int);
     if (bag2==0) {
       IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
@@ -483,10 +483,10 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
   
   RNG_END();
 
-  Free(bag1);
+  igraph_Free(bag1);
   IGRAPH_FINALLY_CLEAN(1);
   if (directed) {
-    Free(bag2);
+    igraph_Free(bag2);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -1571,7 +1571,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_CHECK(igraph_vector_resize(node_type_vec, nodes));
     nodetypes = node_type_vec;
   } else {
-    nodetypes = Calloc(1, igraph_vector_t);
+    nodetypes = igraph_Calloc(1, igraph_vector_t);
     if (nodetypes == 0) {
       IGRAPH_ERROR("preference_game failed", IGRAPH_ENOMEM);
     }
@@ -1616,7 +1616,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
   
   if (node_type_vec == 0) {
     igraph_vector_destroy(nodetypes);
-    Free(nodetypes);
+    igraph_Free(nodetypes);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
@@ -1681,7 +1681,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     nodetypes_in=node_type_in_vec;
     IGRAPH_CHECK(igraph_vector_resize(nodetypes_in, nodes));
   } else {
-    nodetypes_in = Calloc(1, igraph_vector_t);
+    nodetypes_in = igraph_Calloc(1, igraph_vector_t);
     if (nodetypes_in == 0) {
       IGRAPH_ERROR("asymmetric_preference_game failed", IGRAPH_ENOMEM);
     }
@@ -1692,7 +1692,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     nodetypes_out=node_type_out_vec;
     IGRAPH_CHECK(igraph_vector_resize(nodetypes_out, nodes));
   } else {
-    nodetypes_out = Calloc(1, igraph_vector_t);
+    nodetypes_out = igraph_Calloc(1, igraph_vector_t);
     if (nodetypes_out == 0) {
       IGRAPH_ERROR("asymmetric_preference_game failed", IGRAPH_ENOMEM);
     }
@@ -1740,13 +1740,13 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   
   if (node_type_out_vec == 0) {
     igraph_vector_destroy(nodetypes_out);
-    Free(nodetypes_out);
+    igraph_Free(nodetypes_out);
     IGRAPH_FINALLY_CLEAN(1);
   }
    
   if (node_type_in_vec == 0) {
     igraph_vector_destroy(nodetypes_in);
-    Free(nodetypes_in);
+    igraph_Free(nodetypes_in);
     IGRAPH_FINALLY_CLEAN(1);
   }
   
@@ -1978,13 +1978,13 @@ int igraph_lastcit_game(igraph_t *graph,
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-  lastcit=Calloc(no_of_nodes, long int);
+  lastcit=igraph_Calloc(no_of_nodes, long int);
   if (!lastcit) {
     IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, lastcit);
 
-  index=Calloc(no_of_nodes+1, long int);
+  index=igraph_Calloc(no_of_nodes+1, long int);
   if (!index) {
     IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
   }
@@ -2190,7 +2190,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   long int i, j;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges,0);
-  str.sumtrees=sumtrees=Calloc(nocats, igraph_psumtree_t);  
+  str.sumtrees=sumtrees=igraph_Calloc(nocats, igraph_psumtree_t);  
   if (!sumtrees) {
     IGRAPH_ERROR("Citing-cited type game failed", IGRAPH_ENOMEM);
   }

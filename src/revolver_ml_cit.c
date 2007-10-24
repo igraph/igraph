@@ -206,7 +206,7 @@ int igraph_revolver_ml_D(const igraph_t *graph,
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&info.dA_vects, dim);
   IGRAPH_FINALLY(igraph_i_revolver_ml_D_free, &info.dA_vects);
   for (i=0; i<dim; i++) {
-    igraph_vector_t *v=Calloc(1, igraph_vector_t);
+    igraph_vector_t *v=igraph_Calloc(1, igraph_vector_t);
     if (!v) { IGRAPH_ERROR("Cannot perform ML D revolver", IGRAPH_ENOMEM); }
     IGRAPH_CHECK(igraph_vector_init(v, maxdegree+1));
     VECTOR(info.dA_vects)[i]=v;
@@ -536,7 +536,7 @@ int igraph_revolver_ml_AD(const igraph_t *graph,
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&info.dA_vects, dim);
   IGRAPH_FINALLY(igraph_i_revolver_ml_D_free, &info.dA_vects);
   for (i=0; i<dim; i++) {
-    igraph_matrix_t *m=Calloc(1, igraph_matrix_t);
+    igraph_matrix_t *m=igraph_Calloc(1, igraph_matrix_t);
     if (!m) { IGRAPH_ERROR("Cannot perform ML D revolver", IGRAPH_ENOMEM); }
     IGRAPH_CHECK(igraph_matrix_init(m, maxdegree+1, agebins));
     VECTOR(info.dA_vects)[i]=m;
