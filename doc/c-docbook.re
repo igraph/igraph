@@ -173,8 +173,7 @@ REPLACE ----- \define ---------------------------------------------------------
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
 (?P<after>.*?)\*\/                # tail of the comment
 \s*                               # whitespace
-(?P<def>.*?)                      # macro definition
-[^\\]\n                           # end of the macro definition
+(?P<def>\#define\s+[\w0-9,()]+)           # macro
 .*\Z                              # drop the remainder
 
 WITH --------------------------------------------------------------------------

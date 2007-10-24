@@ -173,7 +173,7 @@ int main(void) {
 This example illustrates some new points. <command>igraph</command> uses 
 <link linkend="igraph_vector_t"><type>igraph_vector_t</type></link>
 instead of plain C arrays. <type>igraph_vector_t</type> is superior to
-regular array in almost every sense. Vectors are created by the
+regular arrays in almost every sense. Vectors are created by the
 <link linkend="igraph_vector_init"><function>igraph_vector_init()</function></link>
 function and like graphs they should be destroyed if not 
 needed any more by calling 
@@ -302,8 +302,10 @@ it to be able to hold the result.
 <para>
 The <constant>igraph_vss_all()</constant> argument tells the functions to
 calculate the property for every vertex in the graph, it is shorthand
-for a <emphasis>vertex selector</emphasis> (<type>igraph_vs_t</type>), one
-of the central concepts in <command>igraph</command>.  
+for a <emphasis>vertex selector</emphasis> (<type>igraph_vs_t</type>). 
+Vertex selectors help performing operations on a subset of vertices,
+you can read more about them in <link linkend="igraph-Iterators">one
+of the following chapters.</link>
 </para>
 </section>
 

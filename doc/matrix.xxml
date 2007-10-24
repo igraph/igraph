@@ -36,7 +36,7 @@
 
 <section>
 <title>Matrix operations</title>
-<!-- doxrox-include igraph_matrix_multiply -->
+<!-- doxrox-include igraph_matrix_scale -->
 <!-- doxrox-include igraph_matrix_add_rows -->
 <!-- doxrox-include igraph_matrix_add_cols -->
 <!-- doxrox-include igraph_matrix_resize -->
@@ -83,7 +83,7 @@
 
 <section>
 <title>Matrix operations</title>
-<!-- doxrox-include igraph_spmatrix_multiply -->
+<!-- doxrox-include igraph_spmatrix_scale -->
 <!-- doxrox-include igraph_spmatrix_add_rows -->
 <!-- doxrox-include igraph_spmatrix_add_cols -->
 <!-- doxrox-include igraph_spmatrix_resize -->

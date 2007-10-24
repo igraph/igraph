@@ -7,7 +7,11 @@
 <chapter id="igraph-Error">
 <title>Error Handling</title>
 
-<section>
+<section id="igraph-errorhandlingbasics">
+<!-- doxrox-include errorhandlingbasics -->
+</section>
+
+<section id="igraph-errorhandlers">
 <!-- doxrox-include errorhandlers -->
 <!-- doxrox-include igraph_error_handler_t -->
 <!-- doxrox-include igraph_error_handler_abort -->
@@ -15,37 +19,42 @@
 <!-- doxrox-include igraph_error_handler_printignore -->
 </section>
 
-<section>
+<section id="igraph-errorcodes">
 <!-- doxrox-include errorcodes -->
-<!-- doxrox-include igraph_i_error_type_t -->
+<!-- doxrox-include igraph_error_type_t -->
 <!-- doxrox-include igraph_strerror -->
 </section>
 
-<section>
+<section id="igraph-erroradvancedtopics">
+<title>Advanced topics</title>
+
+<section id="igraph-writingerrorhandlers">
 <!-- doxrox-include writing_error_handlers -->
 <!-- doxrox-include igraph_set_error_handler -->
 </section>
 
-<section>
+<section id="igraph-errorhandlinginternals">
 <!-- doxrox-include error_handling_internals -->
 <!-- doxrox-include IGRAPH_ERROR -->
 <!-- doxrox-include igraph_error -->
 <!-- doxrox-include IGRAPH_CHECK -->
 </section>
 
-<section>
+<section id="igraph-deallocatingmemory">
 <!-- doxrox-include deallocating_memory -->
 <!-- doxrox-include IGRAPH_FINALLY -->
 <!-- doxrox-include IGRAPH_FINALLY_CLEAN -->
 <!-- doxrox-include IGRAPH_FINALLY_FREE -->
 </section>
 
-<section>
+<section id="igraph-writingfunctionserrorhandling">
 <!-- doxrox-include writing_functions_error_handling -->
 </section>
 
-<section>
+<section id="igraph-errorhandlingthreads">
 <!-- doxrox-include error_handling_threads -->
+</section>
+
 </section>
 
 </chapter>

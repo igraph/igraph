@@ -42,6 +42,23 @@ __BEGIN_DECLS
  * them. */
 
 /**
+ * \section errorhandlingbasics Error handling basics
+ * 
+ * <para>\a igraph functions can run into various problems preventing them 
+ * from normal operation: the user might have supplied invalid arguments,
+ * eg. a non-square matrix when a square-matrix was expected, or the program 
+ * has run out of memory while some more memory allocation is required, etc.
+ * </para>
+ * 
+ * <para>By default \a igraph aborts the program when it runs into an 
+ * error. While this behavior might be good enough for smaller programs, 
+ * it is without doubt avoidable in larger projects. Please read further
+ * if your project requires more sophisticated error handling. You can 
+ * safely skip the rest of this chapter otherwise.
+ * </para>
+ */
+
+/**
  * \section errorhandlers Error handlers
  *
  * <para>
@@ -64,7 +81,7 @@ __BEGIN_DECLS
  * later) and return with the error code. The latter also prints an
  * error message. If you use these error handlers you need to take
  * care about possible errors yourself by checking the return value of
- * every \a igraph function.
+ * (almost) every non-void \a igraph function.
  * </para><para>
  * Independently of the error handler installed, all functions in the
  * library do their best to leave their arguments
@@ -83,7 +100,7 @@ __BEGIN_DECLS
  * single integer error code. Some functions are very simple and
  * cannot run into any error, these may return other types, or
  * \type void as well. The error codes are defined by the
- * \ref igraph_i_error_type_t enumeration.
+ * \ref igraph_error_type_t enumeration.
  * </para>
  */
 
@@ -91,10 +108,16 @@ __BEGIN_DECLS
  * \section writing_error_handlers Writing error handlers
  *
  * <para>
+ * The contents of the rest of this chapter might be useful only
+ * for those who want to create an interface to \a igraph from another
+ * language. Most readers can safely skip to the next chapter.
+ * </para>
+ * 
+ * <para>
  * You can write and install error handlers simply by defining a
  * function of type \ref igraph_error_handler_t and calling
  * \ref igraph_set_error_handler(). This feature is useful for interface
- * writers, as the \a igraph will have the chance to
+ * writers, as \a igraph will have the chance to
  * signal errors the appropriate way, eg. the R interface defines an
  * error handler which calls the <function>error()</function>
  * function, as required by R, while the Python interface has an error
@@ -129,7 +152,7 @@ __BEGIN_DECLS
  * the error handler should deallocate all temporary memory. This is
  * done by storing the address and the destroy function of all temporary
  * objects in a stack. The \ref IGRAPH_FINALLY function declares an object as
- * temporary by placing its address in the stack. If a function returns
+ * temporary by placing its address in the stack. If an \a igraph function returns
  * with success it calls \ref IGRAPH_FINALLY_CLEAN() with the
  * number of objects to remove from the stack. If an error happens
  * however, the error handler should call \ref IGRAPH_FINALLY_FREE() to
@@ -148,8 +171,8 @@ __BEGIN_DECLS
  * behaving well in erroneous situations. First, check the arguments
  * of the functions and call \ref IGRAPH_ERROR if they are invalid. Second,
  * call \ref IGRAPH_FINALLY on each dynamically allocated object and call
- * \ref IGRAPH_FINALLY_CLEAN() with the proper argument. Third, use
- * IGRAPH_CHECK on all function calls which can generate errors.
+ * \ref IGRAPH_FINALLY_CLEAN() with the proper argument before returning. Third, use
+ * IGRAPH_CHECK on all \a igraph function calls which can generate errors.
  * </para>
  * <para>
  * The size of the stack used for this bookkeeping is fixed, and
@@ -225,7 +248,7 @@ extern igraph_error_handler_t igraph_error_handler_printignore;
  * default error handler (which is currently
  * \ref igraph_error_handler_abort). 
  * \param new_handler The error handler function to install.
- * \return the old error handler function. This should be saved and
+ * \return The old error handler function. This should be saved and
  *   restored if \p new_handler is not needed any
  *   more.
  */
@@ -234,11 +257,16 @@ igraph_error_handler_t*
 igraph_set_error_handler(igraph_error_handler_t* new_handler);
 
 /**
- * \typedef igraph_i_error_type_t
+ * \typedef igraph_error_type_t
+ * These are the possible valued returned by \a igraph functions.
+ * Note that these are interesting only if you defined an error handler
+ * with \ref igraph_set_error_handler(). Otherwise the program is aborted 
+ * and the function causing the error never returns.
+ * 
  * \enumval IGRAPH_SUCCESS The function successfully completed its task.
  * \enumval IGRAPH_FAILURE Something went wrong. You'll almost never
  *    meet this error as normally more specific error codes are used.
- * \enumval IGRAPH_ENOMEM There wasn't enough memory to allocate memory
+ * \enumval IGRAPH_ENOMEM There wasn't enough memory to allocate
  *    on the heap. 
  * \enumval IGRAPH_PARSEERROR A parse error was found in a file.
  * \enumval IGRAPH_EINVAL A parameter's value is invalid. Eg. negative
@@ -253,7 +281,6 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
  * \enumval IGRAPH_EFILE A file operation failed. Eg. a file doesn't exist,
  *   or the user ha no rights to open it.
- * \enumval IGRAPH_EUNFOLDINF Attempted to unfold an infinite iterator.
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
@@ -271,16 +298,16 @@ typedef enum {
   IGRAPH_NONSQUARE     = 8,
   IGRAPH_EINVMODE      = 9,
   IGRAPH_EFILE         = 10,
-  IGRAPH_EUNFOLDINF    = 11,
   IGRAPH_UNIMPLEMENTED = 12,
   IGRAPH_INTERRUPTED   = 13,
   IGRAPH_DIVERGED      = 14
-} igraph_i_error_type_t;
+} igraph_error_type_t;
 
 /**
  * \define IGRAPH_ERROR
  * 
- * This macro is called if an error is noticed. It calls
+ * \a igraph functions usually use this macro when they notice and error.
+ * It calls
  * \ref igraph_error() with the proper parameters and if that returns 
  * the macro returns the "calling" function as well, with the error
  * code. If for some (suspicious) reason you want to call the error
@@ -295,7 +322,7 @@ typedef enum {
  * \param igraph_errno The \a igraph error code.
  */
 
-#define IGRAPH_ERROR(reason, igraph_errno) \
+#define IGRAPH_ERROR(reason,igraph_errno) \
        do { \
        igraph_error (reason, __FILE__, __LINE__, igraph_errno) ; \
        return igraph_errno ; \
@@ -304,9 +331,10 @@ typedef enum {
 /**
  * \function igraph_error
  *
- * This is the function which is called (usually via the
- * \ref IGRAPH_ERROR macro) if an error is noticed. See the discussion of
- * this macro as well.
+ * \a igraph functions usually call this fuction (most often via the 
+ * \ref IGRAPH_ERROR macro) if they notice an error.
+ * It calls the currently installed error handler function with the
+ * supplied arguments. 
  *
  * \param reason Textual description of the error.
  * \param file The source file in which the error was noticed.
@@ -388,7 +416,7 @@ void IGRAPH_FINALLY_FREE(void);
  * prevent memory leaks.
  */
 
-#define IGRAPH_FINALLY(func, ptr) \
+#define IGRAPH_FINALLY(func,ptr) \
   IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
 
 /**
@@ -400,8 +428,19 @@ void IGRAPH_FINALLY_FREE(void);
  * \c IGRAPH_SUCCESS, it calls \ref IGRAPH_ERROR with
  * the value as the error code. Here is an example usage:
  * \verbatim IGRAPH_CHECK(vector_push_back(&amp;v, 100)); \endverbatim
+ * 
+ * </para><para>There is only one reason to use this macro when writing 
+ * \a igraph functions. If the user installs an error handler which
+ * returns to the auxilary calling code (like \ref
+ * igraph_error_handler_ignore and \ref
+ * igraph_error_handler_printignore), and the \a igraph function
+ * signalling the error is called from another \a igraph function 
+ * then we need to make sure that the error is propagated back to 
+ * the auxilary (ie. non-igraph) calling function. This is achieved
+ * by using <function>IGRAPH_CHECK</function> on every \a igraph
+ * call which can return an error code.
  */
-
+ 
 #define IGRAPH_CHECK(a) do { \
                  int igraph_i_ret=(a); \
                  if (igraph_i_ret != 0) { \

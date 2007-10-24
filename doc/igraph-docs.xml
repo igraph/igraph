@@ -49,7 +49,7 @@
   <xi:include href="error.xml"/>
 
   <chapter>
-    <title>Basic Types</title>
+    <title>Vectors and matrices</title>
     <xi:include href="vector.xml"/>
     <xi:include href="matrix.xml"/>
   </chapter>
