@@ -1,5 +1,18 @@
 2007-10-23  Gabor Csardi  <csardi@rmki.kfki.hu>	
 
+	* src/conversion.c (igraph_to_undirected) : copy graph, vertex and 
+	for 'EACH' also edge attributes
+	
+	* src/attributes.h (igraph_attribute_table_t) : ga, va, ea arguments 
+	added to copy
+	(IGRAPH_I_ATTRIBUTE_COPY) : updated
+	* src/attributes.c (igraph_i_attribute_copy) : updated
+	* src/cattributes.c (igraph_i_cattribute_copy) : updated
+	* src/conversion.c (igraph_to_directed) : updated
+	* src/games.c (igraph_rewire_edges) : updated
+	* src/type_indexededgelist.c (igraph_copy, igraph_delete_vertices) : updated
+	* examples/simple/cattributes.c : added test for copy
+
 	* src/games.c (igraph_erdos_renyi_game_gnp, igraph_erdos_renyi_game_gnm) :
 	reworked
 	* examples/simple/igraph_erdos_renyi_game.c : better tests added

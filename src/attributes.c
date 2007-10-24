@@ -61,9 +61,10 @@ void igraph_i_attribute_destroy(igraph_t *graph) {
   }
 }
   
-int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from) {
+int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
+			    igraph_bool_t va, igraph_bool_t ea) {
   if (igraph_i_attribute_table) {
-    return igraph_i_attribute_table->copy(to, from);
+    return igraph_i_attribute_table->copy(to, from, ga, va, ea);
   } else {
     return 0;
     }

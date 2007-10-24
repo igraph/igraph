@@ -1822,7 +1822,7 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob) {
   
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
   IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph);
+  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
   IGRAPH_FINALLY_CLEAN(1);
   igraph_destroy(graph);
   *graph=newgraph;

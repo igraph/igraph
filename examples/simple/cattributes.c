@@ -91,7 +91,7 @@ int print_attributes(const igraph_t *g) {
 
 int main() {
   
-  igraph_t g;
+  igraph_t g, g2;
   FILE *ifile;
   igraph_vector_t gtypes, vtypes, etypes;
   igraph_strvector_t gnames, vnames, enames;
@@ -138,6 +138,11 @@ int main() {
   printf("\n");
 
   print_attributes(&g);
+
+  /* Copying a graph */
+  igraph_copy(&g2, &g);
+  print_attributes(&g2);
+  igraph_destroy(&g2);
   
   /* Adding vertices */
   igraph_add_vertices(&g, 3, 0);

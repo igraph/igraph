@@ -133,12 +133,27 @@ void R_igraph_attribute_destroy(igraph_t *graph) {
   graph->attr=0;
 }
 
-int R_igraph_attribute_copy(igraph_t *to, const igraph_t *from) {
+int R_igraph_attribute_copy(igraph_t *to, const igraph_t *from,
+			    igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea) {
   SEXP fromattr=from->attr;
-  to->attr=from->attr;
-  REAL(VECTOR_ELT(fromattr, 0))[1] += 1; /* refcount only */
-  if (REAL(VECTOR_ELT(fromattr, 0))[1] == 1) {
-    PROTECT(to->attr);
+  if (ga && va && ea) {
+    to->attr=from->attr;
+    REAL(VECTOR_ELT(fromattr, 0))[1] += 1; /* refcount only */
+    if (REAL(VECTOR_ELT(fromattr, 0))[1] == 1) {
+      PROTECT(to->attr);
+    }
+  } else {
+    R_igraph_attribute_init(to,0); /* Sets up many things */
+    SEXP toattr=to->attr;
+    if (ga) {
+      SET_VECTOR_ELT(toattr, 1, duplicate(VECTOR_ELT(fromattr, 1)));
+    } 
+    if (va) {
+      SET_VECTOR_ELT(toattr, 2, duplicate(VECTOR_ELT(fromattr, 2)));      
+    } 
+    if (ea) {
+      SET_VECTOR_ELT(toattr, 3, duplicate(VECTOR_ELT(fromattr, 3)));      
+    }
   }
   return 0;
 }

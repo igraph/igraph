@@ -101,7 +101,8 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
 typedef struct igraph_attribute_table_t {
   int (*init)(igraph_t *graph, igraph_vector_ptr_t *attr);
   void (*destroy)(igraph_t *graph);
-  int (*copy)(igraph_t *to, const igraph_t *from);
+  int (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
+	      igraph_bool_t va, igraph_bool_t ea);
   int (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
   void (*delete_vertices)(igraph_t *graph, const igraph_vector_t *eidx,
 			  const igraph_vector_t *vidx);
@@ -147,10 +148,10 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table);
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
 #define IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(graph, eidx, vidx) \
         do {if ((graph)->attr) igraph_i_attribute_delete_vertices((graph),(eidx),(vidx));} while(0)
-#define IGRAPH_I_ATTRIBUTE_COPY(to,from) do { \
+#define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
         int igraph_i_ret=0; \
         if ((from)->attr) { \
-          IGRAPH_CHECK(igraph_i_ret=igraph_i_attribute_copy((to), (from))); \
+          IGRAPH_CHECK(igraph_i_ret=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
         } else { \
 	  (to)->attr = 0; \
 	} \
@@ -161,7 +162,8 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table);
 
 int igraph_i_attribute_init(igraph_t *graph, void *attr);
 void igraph_i_attribute_destroy(igraph_t *graph);
-int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from);
+int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, 
+			    igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea);
 int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr);
 void igraph_i_attribute_delete_vertices(igraph_t *graph, 
 					const igraph_vector_t *eidx,

@@ -187,7 +187,7 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
   IGRAPH_CHECK(igraph_vector_copy(&to->is, &from->is));
   IGRAPH_FINALLY(igraph_vector_destroy, &to->is);
 
-  IGRAPH_I_ATTRIBUTE_COPY(to, from); /* does IGRAPH_CHECK */
+  IGRAPH_I_ATTRIBUTE_COPY(to, from, 1,1,1); /* does IGRAPH_CHECK */
 
   IGRAPH_FINALLY_CLEAN(6);
   return 0;
@@ -564,7 +564,7 @@ int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices) {
 				     &newgraph.ii, remaining_vertices));
   
   /* attributes */
-  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph);
+  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
   IGRAPH_FINALLY_CLEAN(6);
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
   IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(&newgraph, &edge_recoding, 

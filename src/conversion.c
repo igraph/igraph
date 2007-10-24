@@ -323,7 +323,7 @@ int igraph_to_directed(igraph_t *graph,
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     igraph_vector_destroy(&edges);
     IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph);
+    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
     IGRAPH_FINALLY_CLEAN(2);
     igraph_destroy(graph);
     *graph=newgraph;
@@ -352,7 +352,7 @@ int igraph_to_directed(igraph_t *graph,
 			       IGRAPH_DIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph);
+    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
     IGRAPH_CHECK(igraph_i_attribute_permute_edges(&newgraph, &index));
     
     igraph_vector_destroy(&index);
@@ -392,7 +392,7 @@ int igraph_to_undirected(igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t edges;
-  igraph_t orig;
+  igraph_t newgraph;
   
   if (mode != IGRAPH_TO_UNDIRECTED_EACH &&
       mode != IGRAPH_TO_UNDIRECTED_COLLAPSE) {
@@ -427,6 +427,16 @@ int igraph_to_undirected(igraph_t *graph,
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);
     IGRAPH_FINALLY_CLEAN(2);
+    
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+    IGRAPH_FINALLY(igraph_destroy, &newgraph);
+    igraph_vector_destroy(&edges);
+    IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
+    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
+    IGRAPH_FINALLY_CLEAN(2);
+    igraph_destroy(graph);
+    *graph=newgraph;
+    
   } else if (mode==IGRAPH_TO_UNDIRECTED_COLLAPSE) {
     igraph_vector_t seen, nei;
     long int i,j;
@@ -444,17 +454,21 @@ int igraph_to_undirected(igraph_t *graph,
 	  VECTOR(seen)[node]=i+1;
 	}
       }
-    }    
+    }
 
     igraph_vector_destroy(&nei);
     igraph_vector_destroy(&seen);
     IGRAPH_FINALLY_CLEAN(2);
+
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+    IGRAPH_FINALLY(igraph_destroy, &newgraph);
+    igraph_vector_destroy(&edges);
+    IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
+    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,0); /* no edge attributes */
+    IGRAPH_FINALLY_CLEAN(2);
+    igraph_destroy(graph);
+    *graph=newgraph;
   }
 
-  orig=*graph;
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
-  igraph_destroy(&orig);
-  igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }

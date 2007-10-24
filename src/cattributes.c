@@ -167,11 +167,13 @@ int igraph_i_cattributes_copy_attribute_record(igraph_i_attribute_record_t **new
 /* No reference counting here. If you use attributes in C you should
    know what you're doing. */
 
-int igraph_i_cattribute_copy(igraph_t *to, const igraph_t *from) {
+int igraph_i_cattribute_copy(igraph_t *to, const igraph_t *from, 
+			     igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea) {
   igraph_i_cattributes_t *attrfrom=from->attr, *attrto;
   igraph_vector_ptr_t *alto[3], *alfrom[3]={ &attrfrom->gal, &attrfrom->val, 
 					     &attrfrom->eal };
   long int i, n, a;
+  igraph_bool_t copy[3] = { ga, va, ea };
   to->attr=attrto=Calloc(1, igraph_i_cattributes_t);
   if (!attrto) { 
     IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM);
@@ -185,14 +187,16 @@ int igraph_i_cattribute_copy(igraph_t *to, const igraph_t *from) {
 
   alto[0]=&attrto->gal; alto[1]=&attrto->val; alto[2]=&attrto->eal;
   for (a=0; a<3; a++) {
-    n=igraph_vector_ptr_size(alfrom[a]);
-    IGRAPH_CHECK(igraph_vector_ptr_resize(alto[a], n));
-    igraph_vector_ptr_null(alto[a]);
-    for (i=0; i<n; i++) {
-      igraph_i_attribute_record_t *newrec;
-      IGRAPH_CHECK(igraph_i_cattributes_copy_attribute_record(&newrec, 
-							      VECTOR(*alfrom[a])[i]));
-      VECTOR(*alto[a])[i]=newrec;
+    if (copy[a]) {
+      n=igraph_vector_ptr_size(alfrom[a]);
+      IGRAPH_CHECK(igraph_vector_ptr_resize(alto[a], n));
+      igraph_vector_ptr_null(alto[a]);
+      for (i=0; i<n; i++) {
+	igraph_i_attribute_record_t *newrec;
+	IGRAPH_CHECK(igraph_i_cattributes_copy_attribute_record(&newrec, 
+								VECTOR(*alfrom[a])[i]));
+	VECTOR(*alto[a])[i]=newrec;
+      }
     }
   }
   
