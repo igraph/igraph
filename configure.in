@@ -10,7 +10,7 @@ AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_F77
-FFLAGS="-g -O1"
+FFLAGS="-g -O1 -ffloat-store"
 AC_F77_WRAPPERS
 AM_PROG_LEX
 AC_PROG_YACC
