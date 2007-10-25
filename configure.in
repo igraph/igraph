@@ -138,15 +138,15 @@ if test "x$enable_gmp" != "xno"; then
   ])
 fi
 
-AC_ARG_WITH([blas], [AS_HELP_STRING([--with-external-blas],
+AC_ARG_WITH([external-blas], [AS_HELP_STRING([--with-external-blas],
 		                      [Use external BLAS library [default=no]])],
             [internal_blas=no],
 	    [internal_blas=yes])
-AC_ARG_WITH([lapack], [AS_HELP_STRING([--with-external-lapack],
+AC_ARG_WITH([external-lapack], [AS_HELP_STRING([--with-external-lapack],
 		                      [Use external LAPACK library [default=no]])],
             [internal_lapack=no],
 	    [internal_lapack=yes])
-AC_ARG_WITH([arpack], [AS_HELP_STRING([--with-external-arpack],
+AC_ARG_WITH([external-arpack], [AS_HELP_STRING([--with-external-arpack],
 		                      [Use external ARPACK library [default=no]])],
             [internal_arpack=no],
 	    [internal_arpack=yes])

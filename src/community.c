@@ -700,7 +700,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   igraph_vector_t vmembership, *mymembership=membership;  
   
   /* These are for the ARPACK routines */
-  int n=no_of_nodes, nev=1, ncv=4, ldv=n, *select, iparam[11], ipntr[11], ido,
+  long int n=no_of_nodes, nev=1, ncv=4, ldv=n, *select, iparam[11], ipntr[11], ido,
     lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
   igraph_real_t sigma, zero=0.0, tol=0;
   igraph_vector_t v, workl, workd, d, resid, ax;
@@ -738,7 +738,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
   IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
   IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
-  select= igraph_Calloc(ncv, int);
+  select= igraph_Calloc(ncv, long int);
   if (!select) {
     IGRAPH_ERROR("Cannot calculate eigenvector community", IGRAPH_ENOMEM);
   }
@@ -1038,7 +1038,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_vector_t vmembership, *mymembership=membership;
 
   /* These are for the ARPACK routines */
-  int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
+  long int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
     lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
   igraph_real_t sigma, zero=0.0, tol=0;
   igraph_vector_t v, workl, workd, d, resid, ax;
@@ -1077,7 +1077,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
   IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
   IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
-  select= igraph_Calloc(ncv, int);
+  select= igraph_Calloc(ncv, long int);
   if (!select) {
     IGRAPH_ERROR("Cannot calculate eigenvector community", IGRAPH_ENOMEM);
   }
@@ -1353,7 +1353,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   igraph_vector_t veigenvector, *myeigenvector=eigenvector;
 
   /* These are for the ARPACK routines */
-  int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
+  long int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
     lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
   igraph_real_t sigma, zero=0.0, tol=0;
   igraph_vector_t v, workl, workd, d, resid, ax;
@@ -1385,7 +1385,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
   IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
   IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
-  select= igraph_Calloc(ncv, int);
+  select= igraph_Calloc(ncv, long int);
   if (!select) {
     IGRAPH_ERROR("Cannot calculate eigenvector community", IGRAPH_ENOMEM);
   }

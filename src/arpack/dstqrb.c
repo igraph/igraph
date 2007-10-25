@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
 /* Table of constant values */
 
@@ -139,7 +140,7 @@ static doublereal c_b31 = 1.;
     static doublereal p, r__, s;
     static integer l1, ii, mm, lm1, mm1, nm1;
     static doublereal rt1, rt2;
-    extern /* Subroutine */ int igraphigraphdlae2_(doublereal *, doublereal *, 
+    extern /* Subroutine */ int igraphdlae2_(doublereal *, doublereal *, 
 	    doublereal *, doublereal *, doublereal *);
     static doublereal eps;
     static integer lsv;
@@ -402,7 +403,7 @@ L60:
 		z__[l] = s * tst + c__ * z__[l];
 /*              ************************************* */
 	    } else {
-		igraphigraphdlae2_(&d__[l], &e[l], &d__[l + 1], &rt1, &rt2);
+		igraphdlae2_(&d__[l], &e[l], &d__[l + 1], &rt1, &rt2);
 	    }
 	    d__[l] = rt1;
 	    d__[l + 1] = rt2;
@@ -537,7 +538,7 @@ L110:
 		z__[l - 1] = s * tst + c__ * z__[l - 1];
 /*               ************************************* */
 	    } else {
-		igraphigraphdlae2_(&d__[l - 1], &e[l - 1], &d__[l], &rt1, &rt2);
+		igraphdlae2_(&d__[l - 1], &e[l - 1], &d__[l], &rt1, &rt2);
 	    }
 	    d__[l - 1] = rt1;
 	    d__[l] = rt2;

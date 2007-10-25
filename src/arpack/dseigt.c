@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
 /* Common Block Declarations */
 

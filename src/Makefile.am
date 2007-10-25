@@ -20,7 +20,7 @@ if INTERNAL_LAPACK
   libdlamch_la_CFLAGS = -ffloat-store
   LAPACK_DLAMCH = libdlamch.la
 else 
-  LAPACK =
+  LAPACK = lapack/xerbla.c
   LAPACK_DLAMCH = 
 endif
 

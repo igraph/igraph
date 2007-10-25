@@ -65,12 +65,12 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_vector_t *values, igraph_matrix_t *vectors) {
   
   igraph_vector_t v, workl, workd, d, resid, ax; /* just in case */
-  int *select;
+  long int *select;
   igraph_bool_t bv=0, bworkl=0, bworkd=0, bd=0, bresid=0, bax=0, bselect=0;
 
-  int ido=0;
-  int rvec= vectors ? 1 : 0;	/* calculate eigenvectors? */
-  const char *all="All";
+  long int ido=0;
+  long int rvec= vectors ? 1 : 0;	/* calculate eigenvectors? */
+  char *all="All";
   
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
@@ -107,7 +107,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   if (!options->select) {
     bselect=1;
-    select=igraph_Calloc(options->ncv, int);
+    select=igraph_Calloc(options->ncv, long int);
     if (!select) { 
       IGRAPH_ERROR("Cannot do rssolve", IGRAPH_ENOMEM);
     }
@@ -219,7 +219,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 }
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
-				    int n, void *extra) {
+				    long int n, void *extra) {
   igraph_adjlist_t *adjlist=extra;
   igraph_vector_t *neis;
   long int i, j, nlen;
@@ -298,14 +298,14 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   igraph_adjlist_t myinadjlist, myoutadjlist;
   igraph_adjlist_t *inadjlist, *outadjlist;
 
-  int n=no_of_nodes, nev=1, ncv=pncv, ldv=n;
+  long int n=no_of_nodes, nev=1, ncv=pncv, ldv=n;
   
   igraph_vector_t v, workl, workd, d, resid, ax, tmp;
-  int *select;
-  int iparam[11], ipntr[11];
+  long int *select;
+  long int iparam[11], ipntr[11];
   
   char *bmat="I", *LA="LA", *LM="LM", *all="All", *which;
-  int ido, lworkl, info, ierr, j, ishfts, mode1, nconv, rvec=1;
+  long int ido, lworkl, info, ierr, j, ishfts, mode1, nconv, rvec=1;
   igraph_real_t sigma;
   
   igraph_real_t zero=0.0;
@@ -363,7 +363,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
 
-  select= igraph_Calloc(ncv, int);
+  select= igraph_Calloc(ncv, long int);
   if (!select) {
     IGRAPH_ERROR("Cannot calculate eigenvector centrality", IGRAPH_ENOMEM);
   }
@@ -378,7 +378,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     
     if (ido==-1 || ido==1) {
       
-      int j, nlen;
+      long int j, nlen;
       igraph_real_t *from=VECTOR(workd)+ipntr[0]-1;
       igraph_real_t *to=VECTOR(workd)+ipntr[1]-1;
 

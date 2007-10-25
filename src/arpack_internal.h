@@ -28,6 +28,7 @@
    include this header.
 */
 
+#include "igraph.h"
 #include "config.h"
 
 #ifndef INTERNAL_ARPACK
@@ -69,7 +70,6 @@
 #define igraphdlaruv_	dlaruv_
 #define igraphdlarfg_	dlarfg_
 #define igraphdlarf_	dlarf_
-#define igraphdlae2_	dlae2_
 #define igraphdlassq_	dlassq_
 #define igraphdlamc2_	dlamc2_
 #define igraphdlamc1_	dlamc1_
@@ -100,20 +100,20 @@
 #define igraphs_copy	s_copy
 #endif
 
-void igraphdsaupd_(int *ido, const char *bmat, int *n,
-		   const char *which, int *nev, igraph_real_t *tol,
-		   igraph_real_t *resid, int *ncv, igraph_real_t *v,
-		   int *ldv, int *iparam, int *ipntr, 
-		   igraph_real_t *workd, igraph_real_t *workl,
-		   int *lworkl, int *info);
+int igraphdsaupd_(long int *ido, char *bmat, long int *n,
+		  char *which, long int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
+		  long int *ldv, long int *iparam, long int *ipntr, 
+		  igraph_real_t *workd, igraph_real_t *workl,
+		  long int *lworkl, long int *info);
 
-void igraphdseupd_(int *rvec, const char *howmny, int *select,
-		   igraph_real_t *d, igraph_real_t *z, int *ldz,
-		   igraph_real_t *sigma, const char *bmat, int *n,
-		   const char *which, int *nev, igraph_real_t *tol,
-		   igraph_real_t *resid, int *ncv, igraph_real_t *v,
-		   int *ldv, int *iparam, int *ipntr, 
-		   igraph_real_t *workd, igraph_real_t *workl,
-		   int *lworkl, int *info);
+int igraphdseupd_(long int *rvec, char *howmny, long int *select,
+		  igraph_real_t *d, igraph_real_t *z, long int *ldz,
+		  igraph_real_t *sigma, char *bmat, long int *n,
+		  char *which, long int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
+		  long int *ldv, long int *iparam, long int *ipntr, 
+		  igraph_real_t *workd, igraph_real_t *workl,
+		  long int *lworkl, long int *info);
 
 #endif

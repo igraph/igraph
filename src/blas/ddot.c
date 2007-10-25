@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
 doublereal igraphddot_(integer *n, doublereal *dx, integer *incx, doublereal *dy, 
 	integer *incy)

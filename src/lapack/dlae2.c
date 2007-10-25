@@ -12,8 +12,9 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
-/* Subroutine */ int igraphigraphdlae2_(doublereal *a, doublereal *b, doublereal *c__, 
+/* Subroutine */ int igraphdlae2_(doublereal *a, doublereal *b, doublereal *c__, 
 	doublereal *rt1, doublereal *rt2)
 {
     /* System generated locals */
@@ -140,5 +141,5 @@
 
 /*     End of DLAE2 */
 
-} /* igraphigraphdlae2_ */
+} /* igraphdlae2_ */
 

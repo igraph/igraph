@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
 /* Subroutine */ int igraphdlasrt_(char *id, integer *n, doublereal *d__, integer *
 	info)

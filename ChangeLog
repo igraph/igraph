@@ -1,5 +1,15 @@
 2007-10-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/arpack_internal.h : use long int instead of int,
+	don't use 'const' for char*
+	* src/arpack.c
+	* src/comunity.c : updated
+
+	* src/arpack/dstqrb.c
+	* src/lapack/dlamch.c
+	* src/lapack/dsteqr.c
+	* src/lapack/dlae2.c : correct two mistakes, made when prefixing with igraph
+
 	* src/arpack_internal.h : simplified, not using IGRAPH_F77
 	* src/arpack.c (igraph_arpack_rssolve, igraph_i_kleinberg)
 	* src/community.c (igraph_community_leading_eigenvector_naive)

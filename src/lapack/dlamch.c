@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 #include <stdio.h>
 
 doublereal igraphdlamch_(char *cmach)
@@ -38,7 +39,7 @@ doublereal igraphdlamch_(char *cmach)
     static doublereal rmin, rmax, rmach;
     extern logical igraphlsame_(char *, char *);
     static doublereal small, sfmin;
-    extern /* Subroutine */ int igraphigraphdlamc2_(integer *, integer *, logical *, 
+    extern /* Subroutine */ int igraphdlamc2_(integer *, integer *, logical *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *);
 
 
@@ -102,7 +103,7 @@ doublereal igraphdlamch_(char *cmach)
 
     if (first) {
 	first = FALSE_;
-	igraphigraphdlamc2_(&beta, &it, &lrnd, &eps, &imin, &rmin, &imax, &rmax);
+	igraphdlamc2_(&beta, &it, &lrnd, &eps, &imin, &rmin, &imax, &rmax);
 	base = (doublereal) beta;
 	t = (doublereal) it;
 	if (lrnd) {
@@ -398,7 +399,7 @@ static integer c__1 = 1;
 
 /* *********************************************************************** */
 
-/* Subroutine */ int igraphigraphdlamc2_(integer *beta, integer *t, logical *rnd, 
+/* Subroutine */ int igraphdlamc2_(integer *beta, integer *t, logical *rnd, 
 	doublereal *eps, integer *emin, doublereal *rmin, integer *emax, 
 	doublereal *rmax)
 {
@@ -698,7 +699,7 @@ L10:
 
 /*     End of DLAMC2 */
 
-} /* igraphigraphdlamc2_ */
+} /* igraphdlamc2_ */
 
 /*  -- translated by f2c (version 20050501).
    You must link the resulting object file with libf2c:

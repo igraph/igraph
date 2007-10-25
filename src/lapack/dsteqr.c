@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
 /* Table of constant values */
 
@@ -41,7 +42,7 @@ static integer c__2 = 2;
     static integer lsv;
     static doublereal tst, eps2;
     static integer lend, jtot;
-    extern /* Subroutine */ int igraphigraphdlae2_(doublereal *, doublereal *, doublereal 
+    extern /* Subroutine */ int igraphdlae2_(doublereal *, doublereal *, doublereal 
 	    *, doublereal *, doublereal *);
     extern logical igraphlsame_(char *, char *);
     extern /* Subroutine */ int igraphdlasr_(char *, char *, char *, integer *, 
@@ -343,7 +344,7 @@ L60:
 		igraphdlasr_("R", "V", "B", n, &c__2, &work[l], &work[*n - 1 + l], &
 			z__[l * z_dim1 + 1], ldz);
 	    } else {
-		igraphigraphdlae2_(&d__[l], &e[l], &d__[l + 1], &rt1, &rt2);
+		igraphdlae2_(&d__[l], &e[l], &d__[l + 1], &rt1, &rt2);
 	    }
 	    d__[l] = rt1;
 	    d__[l + 1] = rt2;
@@ -465,7 +466,7 @@ L110:
 		igraphdlasr_("R", "V", "F", n, &c__2, &work[m], &work[*n - 1 + m], &
 			z__[(l - 1) * z_dim1 + 1], ldz);
 	    } else {
-		igraphigraphdlae2_(&d__[l - 1], &e[l - 1], &d__[l], &rt1, &rt2);
+		igraphdlae2_(&d__[l - 1], &e[l - 1], &d__[l], &rt1, &rt2);
 	    }
 	    d__[l - 1] = rt1;
 	    d__[l] = rt2;

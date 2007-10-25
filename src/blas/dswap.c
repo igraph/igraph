@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
 /* Subroutine */ int igraphdswap_(integer *n, doublereal *dx, integer *incx, 
 	doublereal *dy, integer *incy)

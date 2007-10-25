@@ -12,6 +12,7 @@
 
 #include "f2c.h"
 #include "config.h"
+#include "arpack_internal.h"
 
 /* Subroutine */ int igraphdscal_(integer *n, doublereal *da, doublereal *dx, 
 	integer *incx)

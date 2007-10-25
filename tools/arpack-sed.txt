@@ -20,7 +20,6 @@ s/dlarnv_/igraphdlarnv_/g
 s/dlascl_/igraphdlascl_/g
 s/dlartg_/igraphdlartg_/g
 s/dlaset_/igraphdlaset_/g
-s/dlae2_/igraphdlae2_/g
 s/dlaev2_/igraphdlaev2_/g
 s/dlasr_/igraphdlasr_/g
 s/dlasrt_/igraphdlasrt_/g
@@ -36,7 +35,6 @@ s/dlarfg_/igraphdlarfg_/g
 s/dlarf_/igraphdlarf_/g
 s/dlae2_/igraphdlae2_/g
 s/dlassq_/igraphdlassq_/g
-s/dlamc2_/igraphdlamc2_/g
 s/dlamc1_/igraphdlamc1_/g
 s/dlamc2_/igraphdlamc2_/g
 s/dlamc3_/igraphdlamc3_/g
