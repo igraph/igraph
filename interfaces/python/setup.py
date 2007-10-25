@@ -56,6 +56,7 @@ def detect_igraph_source():
 	for wildcard in files_to_copy:
 	    src_files.extend(glob.glob(os.path.join('..', '..', 'src', wildcard)))
 	for src_file in src_files:
+	    if src_file.endswith("arpack.c"): continue
 	    copy_file(src_file, 'igraph', update=1)
 	
 	return

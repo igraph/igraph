@@ -296,7 +296,7 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
 	  Py_DECREF(attrs[0]);
 	  Py_DECREF(attrs[1]);
 	  Py_DECREF(attrs[2]);
-	  Free(graph->attr);
+	  igraph_Free(graph->attr);
 	  IGRAPH_ERROR("failed to add attributes to graph attribute hash",
 		       IGRAPH_FAILURE);
 	}
@@ -325,8 +325,10 @@ static void igraphmodule_i_attribute_destroy(igraph_t *graph) {
 }
 
 /* Copying */
-static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from) {
+static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
+  igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea) {
   PyObject **fromattrs, **toattrs, *key, *value, *newval, *o=NULL;
+  igraph_bool_t copy_attrs[3] = { ga, va, ea };
   int i, j, pos;
  
   /* printf("Copying attribute table\n"); */
@@ -335,29 +337,34 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from) {
     /* what to do with the original value of toattrs? */
     toattrs=to->attr=(PyObject**)calloc(3, sizeof(PyObject*));
     for (i=0; i<3; i++) {
+      if (!copy_attrs[i]) {
+        toattrs[i] = PyDict_New();
+        continue;
+      }
+
       if (!PyDict_Check(fromattrs[i])) {
-	toattrs[i]=fromattrs[i];
-	Py_XINCREF(o);
-	continue;
+        toattrs[i]=fromattrs[i];
+        Py_XINCREF(o);
+        continue;
       }
       
       toattrs[i]=PyDict_New();
       
       pos=0;
       while (PyDict_Next(fromattrs[i], &pos, &key, &value)) {
-	/* value is only borrowed, so copy it */
-	if (i>0) {
-	  newval=PyList_New(PyList_GET_SIZE(value));
-	  for (j=0; j<PyList_GET_SIZE(value); j++) {
-	    o=PyList_GetItem(value, j);
-	    Py_INCREF(o);
-	    PyList_SetItem(newval, j, o);
-	  }
-	} else {
-	  newval=value;
-	  Py_INCREF(newval);
-	}
-	PyDict_SetItem(toattrs[i], key, newval);
+        /* value is only borrowed, so copy it */
+        if (i>0) {
+          newval=PyList_New(PyList_GET_SIZE(value));
+          for (j=0; j<PyList_GET_SIZE(value); j++) {
+            o=PyList_GetItem(value, j);
+            Py_INCREF(o);
+            PyList_SetItem(newval, j, o);
+          }
+        } else {
+          newval=value;
+          Py_INCREF(newval);
+        }
+        PyDict_SetItem(toattrs[i], key, newval);
       }
     }
   }
