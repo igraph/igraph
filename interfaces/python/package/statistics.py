@@ -130,13 +130,15 @@ class Histogram(object):
             yield (x, x+self._bin_width, elem)
             x += self._bin_width
 
-    def __plot__(self, context, bbox, palette):
+    def __plot__(self, context, bbox, palette, *args, **kwds):
         """Plotting support"""
-        max_value = max(self._bins)
+        max_value = kwds.get("max_value", max(self._bins))
+        mi = kwds.get("min", self._min)
+        ma = kwds.get("max", self._max)
 
         import drawing
         c = drawing.DescartesCoordinateSystem(context, bbox, \
-            (self._min, 0, self._max, max_value))
+            (mi, 0, ma, max_value))
 
         # Draw the boxes
         context.set_line_width(1)
