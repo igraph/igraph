@@ -5,29 +5,44 @@ BUILT_SOURCES = foreign-ncol-parser.h foreign-lgl-parser.h
 # Unfortunately this is not the default behaviour in MinGW/MSYS
 AM_YFLAGS = -d
 
+lib_LTLIBRARIES         = libigraph.la
+
 if INTERNAL_LAPACK
-  LAPACK = lapack/lapack_igraph.f lapack/print.c
+  LAPACK = lapack/dgeqr2.c  lapack/dlarnv.c  lapack/dlassq.c \
+	lapack/dlacpy.c  lapack/dlartg.c  lapack/dorm2r.c \
+	lapack/dlae2.c   lapack/dlaruv.c  lapack/dsteqr.c \
+	lapack/dlaev2.c  lapack/dlascl.c  lapack/dlanst.c \
+	lapack/dlaset.c  lapack/xerbla.c \
+	lapack/dlarf.c   lapack/dlasr.c   lapack/dlapy2.c \
+	lapack/dlarfg.c  lapack/dlasrt.c
+  noinst_LTLIBRARIES  = libdlamch.la
+  libdlamch_la_SOURCES = lapack/dlamch.c
+  libdlamch_la_CFLAGS = -ffloat-store
+  LAPACK_DLAMCH = libdlamch.la
 else 
-  LAPACK = lapack/print.c
+  LAPACK =
+  LAPACK_DLAMCH = 
 endif
 
 if INTERNAL_ARPACK
-  ARPACK = arpack/dgetv0.f arpack/dmout.f arpack/dsaitr.f arpack/dsapps.f \
-         arpack/dsaup2.f arpack/dsaupd.f arpack/dsconv.f arpack/dseigt.f \
-         arpack/dsesrt.f arpack/dseupd.f arpack/dsgets.f arpack/dsortr.f \
-         arpack/dstats.f arpack/dstqrb.f arpack/dvout.f arpack/ivout.f \
-         arpack/second.f
+  ARPACK = arpack/dgetv0.c arpack/dmout.c arpack/dsaitr.c arpack/dsapps.c \
+         arpack/dsaup2.c arpack/dsaupd.c arpack/dsconv.c arpack/dseigt.c \
+         arpack/dsesrt.c arpack/dseupd.c arpack/dsgets.c arpack/dsortr.c \
+         arpack/dstats.c arpack/dstqrb.c arpack/dvout.c arpack/ivout.c \
+         arpack/second.c
 else
   ARPACK =
 endif
 
 if INTERNAL_BLAS
-  BLAS = blas/blas_igraph.f
+  BLAS = blas/daxpy.c  blas/ddot.c   blas/dger.c   blas/dscal.c  blas/lsame.c \
+	blas/dcopy.c  blas/dgemv.c  blas/dnrm2.c  blas/dswap.c
 else
   BLAS =
 endif
 
-lib_LTLIBRARIES         = libigraph.la
+F2C = f2c/d_sign.c f2c/etime_.c  f2c/pow_dd.c f2c/pow_di.c f2c/s_cmp.c \
+	f2c/s_copy.c
 
 libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
@@ -64,14 +79,13 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     bliss_heap.hh bliss_utils.cc \
 			     bliss_kqueue.hh bliss_utils.hh bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
-			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) \
+			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
 			     arpack.c
 
 libigraph_la_CFLAGS        = 
 libigraph_la_CXXFLAGS	   = 
-libigraph_la_FFLAGS        =
 libigraph_la_LDFLAGS       = -no-undefined
-libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS)
+libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
@@ -79,6 +93,6 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  igraph_pmt.h igraph_pmt_off.h vector.h gml_tree.h \
 		  vector.pmt walktrap_graph.h walktrap_communities.h \
 		  walktrap_heap.h matrix.h matrix.pmt stack.h stack.pmt \
-		  dqueue.pmt dqueue.h heap.pmt heap.h
+		  dqueue.pmt dqueue.h heap.pmt heap.h arpack.h
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h

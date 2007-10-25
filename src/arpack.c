@@ -123,13 +123,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   
   /* Ok, we have everything */
   while (1) {
-    IGRAPH_F77(dsaupd, DSAUPD)(&ido, options->bmat, &options->n, options->which,
-			       &options->nev, &options->tol, 
-			       VECTOR(*(options->resid)), &options->ncv,
-			       VECTOR(*(options->v)), &options->ldv, 
-			       options->iparam, options->ipntr,
-			       VECTOR(*(options->workd)), VECTOR(*(options->workl)),
-			       &options->lworkl, &options->info);
+    igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
+		  &options->nev, &options->tol, 
+		  VECTOR(*(options->resid)), &options->ncv,
+		  VECTOR(*(options->v)), &options->ldv, 
+		  options->iparam, options->ipntr,
+		  VECTOR(*(options->workd)), VECTOR(*(options->workl)),
+		  &options->lworkl, &options->info);
     if (ido==-1 || ido==1) {
 
       igraph_real_t *from=VECTOR(*(options->workd))+options->ipntr[0]-1;
@@ -149,15 +149,15 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
   }
   
-  IGRAPH_F77(dseupd,DSEUPD) (&rvec, all, options->select, VECTOR(*(options->d)),
-			     VECTOR(*(options->v)), &options->ldv,
-			     &options->sigma, options->bmat, &options->n,
-			     options->which, &options->nev, &options->tol,
-			     VECTOR(*(options->resid)), &options->ncv,
-			     VECTOR(*(options->v)), &options->ldv, options->iparam,
-			     options->ipntr, VECTOR(*(options->workd)), 
-			     VECTOR(*(options->workl)), &options->lworkl,
-			     &options->ierr);
+  igraphdseupd_(&rvec, all, options->select, VECTOR(*(options->d)),
+		VECTOR(*(options->v)), &options->ldv,
+		&options->sigma, options->bmat, &options->n,
+		options->which, &options->nev, &options->tol,
+		VECTOR(*(options->resid)), &options->ncv,
+		VECTOR(*(options->v)), &options->ldv, options->iparam,
+		options->ipntr, VECTOR(*(options->workd)), 
+		VECTOR(*(options->workl)), &options->lworkl,
+		&options->ierr);
   
   if (options->ierr < 0) {
     fprintf(stderr, "ARPACK error: %i\n", options->ierr);
@@ -371,10 +371,10 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
   while (1) {
     
-    IGRAPH_F77(dsaupd, DSAUPD) (&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
-				&ncv, VECTOR(v), &ldv, iparam, ipntr, 
-				VECTOR(workd), VECTOR(workl),
-				&lworkl, &info);
+    igraphdsaupd_(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+		  &ncv, VECTOR(v), &ldv, iparam, ipntr, 
+		  VECTOR(workd), VECTOR(workl),
+		  &lworkl, &info);
     
     if (ido==-1 || ido==1) {
       
@@ -417,10 +417,10 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
     IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
   }
 
-  IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv, &sigma,
-			      bmat, &n, which, &nev, &tol, VECTOR(resid), &ncv,
-			      VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd), 
-			      VECTOR(workl), &lworkl, &ierr);
+  igraphdseupd_(&rvec, all, select, VECTOR(d), VECTOR(v), &ldv, &sigma,
+		bmat, &n, which, &nev, &tol, VECTOR(resid), &ncv,
+		VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd), 
+		VECTOR(workl), &lworkl, &ierr);
 
   if (ierr < 0) {
 /*     fprintf(stderr, "ARPACK error %i\n", ierr); */

@@ -785,10 +785,10 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 
     while (1) {
       
-      IGRAPH_F77(dsaupd, DSAUPD)(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
-				 &ncv, VECTOR(v), &ldv, iparam, ipntr,
-				 VECTOR(workd), VECTOR(workl),
-				 &lworkl, &info);
+      igraphdsaupd_(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+		    &ncv, VECTOR(v), &ldv, iparam, ipntr,
+		    VECTOR(workd), VECTOR(workl),
+		    &lworkl, &info);
       
       if (ido==-1 || ido==1) {
 	
@@ -839,10 +839,10 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     
     /* Get eigenvector */
 
-    IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
-				&sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
-				&ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
-				VECTOR(workl), &lworkl, &info);
+    igraphdseupd_(&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
+		  &sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
+		  &ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
+		  VECTOR(workl), &lworkl, &info);
     
     if (info < 0) {
       fprintf(stderr, "ARPACK error %i\n", info);
@@ -1119,10 +1119,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     
     while (1) {
       
-      IGRAPH_F77(dsaupd, DSAUPD)(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
-				 &ncv, VECTOR(v), &ldv, iparam, ipntr,
-				 VECTOR(workd), VECTOR(workl),
-				 &lworkl, &info);
+      igraphdsaupd_(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+		    &ncv, VECTOR(v), &ldv, iparam, ipntr,
+		    VECTOR(workd), VECTOR(workl),
+		    &lworkl, &info);
       
       if (ido==-1 || ido==1) {
 	
@@ -1179,10 +1179,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
     
     /* Get eigenvector */
-    IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
-				&sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
-				&ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
-				VECTOR(workl), &lworkl, &info);
+    igraphdseupd_(&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
+		  &sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
+		  &ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
+		  VECTOR(workl), &lworkl, &info);
     
     if (info < 0) {
       fprintf(stderr, "ARPACK error %i\n", info);
@@ -1430,10 +1430,10 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
       
       while (1) {
 	
-	IGRAPH_F77(dsaupd, DSAUPD)(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
-				   &ncv, VECTOR(v), &ldv, iparam, ipntr,
-				   VECTOR(workd), VECTOR(workl),
-				   &lworkl, &info);
+	igraphdsaupd_(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
+		      &ncv, VECTOR(v), &ldv, iparam, ipntr,
+		      VECTOR(workd), VECTOR(workl),
+		      &lworkl, &info);
 	
 	if (ido==-1 || ido==1) {
 	  
@@ -1490,10 +1490,10 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
       }
       
       /* Get eigenvector */
-      IGRAPH_F77(dseupd, DSEUPD) (&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
-				  &sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
-				  &ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
-				  VECTOR(workl), &lworkl, &info);
+      igraphdseupd_(&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
+		    &sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
+		    &ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
+		    VECTOR(workl), &lworkl, &info);
       
       if (info < 0) {
 	fprintf(stderr, "ARPACK error %i\n", info);

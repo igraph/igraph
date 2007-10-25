@@ -1,3 +1,34 @@
+2007-10-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/arpack_internal.h : simplified, not using IGRAPH_F77
+	* src/arpack.c (igraph_arpack_rssolve, igraph_i_kleinberg)
+	* src/community.c (igraph_community_leading_eigenvector_naive)
+	(igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_step) : updated
+	
+	* src/arpack/dgetv0.f
+	* src/arpack/dmout.f
+	* src/arpack/dsaitr.f
+	* src/arpack/dsapps.f
+	* src/arpack/dsaup2.f
+	* src/arpack/dsaupd.f
+	* src/arpack/dsconv.f
+	* src/arpack/dseigt.f
+	* src/arpack/dsesrt.f
+	* src/arpack/dseupd.f
+	* src/arpack/dsgets.f
+	* src/arpack/dsortr.f
+	* src/arpack/dstats.f
+	* src/arpack/dstqrb.f
+	* src/arpack/dvout.f
+	* src/arpack/ivout.f
+	* src/arpack/second.f : replaced by the C version
+
+	* src/lapack/lapack_igraph.f
+	* src/lapack/print.c : replaced by the C version
+
+	* src/blas/blas_igraph.f : replaced by the C version
+
 2007-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/arpack.c (igraph_arpack_rssolve) : added

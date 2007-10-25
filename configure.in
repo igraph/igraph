@@ -9,9 +9,6 @@ AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 
 AC_PROG_CC
 AC_PROG_CXX
-AC_PROG_F77
-FFLAGS="-g -O1 -ffloat-store"
-AC_F77_WRAPPERS
 AM_PROG_LEX
 AC_PROG_YACC
 
@@ -141,15 +138,15 @@ if test "x$enable_gmp" != "xno"; then
   ])
 fi
 
-AC_ARG_WITH([blas], [AS_HELP_STRING([--with-blas],
+AC_ARG_WITH([blas], [AS_HELP_STRING([--with-external-blas],
 		                      [Use external BLAS library [default=no]])],
             [internal_blas=no],
 	    [internal_blas=yes])
-AC_ARG_WITH([lapack], [AS_HELP_STRING([--with-lapack],
+AC_ARG_WITH([lapack], [AS_HELP_STRING([--with-external-lapack],
 		                      [Use external LAPACK library [default=no]])],
             [internal_lapack=no],
 	    [internal_lapack=yes])
-AC_ARG_WITH([arpack], [AS_HELP_STRING([--with-arpack],
+AC_ARG_WITH([arpack], [AS_HELP_STRING([--with-external-arpack],
 		                      [Use external ARPACK library [default=no]])],
             [internal_arpack=no],
 	    [internal_arpack=yes])
@@ -161,6 +158,8 @@ if test "$internal_blas" == "no"; then
            AC_CHECK_LIB([blas], [DAXPY], [],
 	      [AC_MSG_RESULT(not found, trying to use -lblas anyway.)]))))
   LDFLAGS="${LDFLAGS} -lblas"
+else
+  AC_DEFINE([INTERNAL_BLAS], [1], [Define to 1 if you use the internal BLAS library])
 fi
 
 if test "$internal_lapack" == "no"; then
@@ -170,6 +169,8 @@ if test "$internal_lapack" == "no"; then
            AC_CHECK_LIB([lapack], [DLARNV], [],
 	      [AC_MSG_RESULT(not found, trying to use -llapack anyway.)]))))
   LDFLAGS="${LDFLAGS} -llapack"
+else
+  AC_DEFINE([INTERNAL_LAPACK], [1], [Define to 1 if you use the internal LAPACK library])
 fi
 
 if test "$internal_arpack" == "no"; then
@@ -179,6 +180,8 @@ if test "$internal_arpack" == "no"; then
            AC_CHECK_LIB([arpack], [DSAUPD], [],
 	      [AC_MSG_RESULT(not found, trying to use -larpack anyway.)]))))
   LDFLAGS="${LDFLAGS} -larpack"
+else
+  AC_DEFINE([INTERNAL_ARPACK], [1], [Define to 1 if you use the internal ARPACK library])
 fi
 
 AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
