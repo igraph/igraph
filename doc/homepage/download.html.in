@@ -1,0 +1,85 @@
+<h2>Download</h2>
+
+<p>The latest released version of the <b>igraph</b> library is <b>$VERSION</b>.</p>
+
+<ul class="no-bullet download">
+<li class="download download-c">
+  <span class="name">C library</span>
+  <span class="comment">&mdash; This is what you need if you intend to use
+  <b>igraph</b> in C projects.</span>
+  <ul class="download-links">
+    <li class="download-source">
+      <a href="download/igraph-${VERSION}.tar.gz">Source code</a>
+    </li>
+  </ul>
+</li>
+
+<li class="download download-r">
+  <span class="name">R interface</span>
+  <span class="comment">&mdash; Download this when you prefer using the
+  GNU R Statistical Environment</span>
+  <ul class="download-links">
+    <li class="download-source">
+      <a href="download/igraph_${VERSION}.tar.gz">Source code</a>
+    </li>
+    <li class="download-windows">
+      <a href="download/igraph_${VERSION}.zip">Windows binary</a>
+    </li>
+  </ul>
+</li>
+
+<li class="download download-python">
+  <span class="name">Python extension module</span>
+  <span class="comment">&mdash; Download this if you would like to use
+  <b>igraph</b> as a Python extension module</span>
+  <ul class="download-links">
+    <li class="download-source">
+      <a href="http://pypi.python.org/packages/source/i/igraph/igraph-${VERSION}.tar.gz">Source code</a>
+    </li>
+    <li class="download-windows">
+      <a href="http://pypi.python.org/packages/2.4/i/igraph/igraph-${VERSION}.win32-py2.4.exe">Windows installer for Python 2.4</a>
+    </li>
+    <li class="download-windows">
+      <a href="http://pypi.python.org/packages/2.5/i/igraph/igraph-${VERSION}.win32-py2.5.exe">Windows installer for Python 2.5</a>
+    </li>
+    <li class="download-external">
+      <a href="http://python.org/pypi/igraph">Python Package Index page</a>
+    </li>
+  </ul>
+</li>
+
+<li class="download download-ruby">
+  <span class="name">Ruby gem</span>
+  <span class="comment">&mdash; Interface to the Ruby language, developed by <a href="http://web.kuicr.kyoto-u.ac.jp/~alexg/">Dr. Alex Gutteridge</a>.</span>
+  <ul class="download-links">
+    <li class="download-external">
+      <a href="http://rubyforge.org/projects/igraph">External homepage</a>
+    </li>
+  </ul>
+</li>
+
+</ul>
+
+<h3>Debian Linux packages</h3>
+
+<p><a href="http://debian.org">Debian Linux</a> users may also benefit from
+our Debian package repository. The C interface can be installed and
+automatically updated using the standard Debian package manager. Just add
+the following two lines to <code>/etc/apt/sources.list</code> and install
+the <code>libigraph</code> and <code>libigraph-dev</code> packages:</p>
+
+<pre>
+deb http://cneurocvs.rmki.kfki.hu /packages/binary/
+deb-src htp://cneurocvs.rmki.kfki.hu /packages/source/
+</pre>
+
+<p>The binary packages are built for the <code>i386</code> architecture.
+Source packages should compile on <code>x86_64</code> and <code>amd64</code>
+architectures as well.
+
+<h3>Obtaining the development version</h3>
+
+<p>You can get the latest development version of <b>igraph</b> (including the
+C core and the wrappers for R and Python) with the <code>tla</code> arch
+revision control system from the following URL:
+<code>http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public</code>.</p>

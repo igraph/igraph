@@ -1,0 +1,36 @@
+<h2>Links</h2>
+
+<h3><a href="http://vlado.fmf.uni-lj.si/pub/networks/pajek/">Pajek</a></h3>
+
+<p><a href="http://vlado.fmf.uni-lj.si/pub/networks/pajek/">Pajek</a> is an
+excellent network analysis and visualization software written for Windows
+(but it runs in Wine under Linux as well). It can handle quite large
+(millions of vertices) graphs smoothly. Its main drawbacks are that
+(1) it is interactive, (2) closed source, (3) hard to extend.</p>
+
+<h3><a href="http://www.analytictech.com/ucinet.htm">UCINet</a></h3>
+
+<p><a href="http://www.analytictech.com/ucinet.htm">UCINet</a> is a
+collection of graph analysis software, it also includes
+Pajek. It's intended audience is social scientists, and cannot handle large
+graphs well. It can be used freely for 30 days and it is closed source.</p>
+
+<h3><a href="http://www.boost.org/libs/graph/doc/index.html">The Boost
+Graph Library</a></h3>
+
+<p><a href="http://www.boost.org/libs/graph/doc/index.html">The Boost
+Graph Library</a> is an impressive library written in C++ for manipulating
+graphs. It is quite fast, and can handle moderately large graphs. A good
+choice for anyone who likes programming in C++, but it also has interfaces
+to some higher level languages.</p>
+
+<h3><a href="http://networkx.lanl.gov">NetworkX</a></h3>
+
+<p><a href="http://networkx.lanl.gov">NetworkX</a> is another nice piece of
+software written in Python.</p>
+
+<h3><a href="http://erzuli.ss.uci.edu/R.stuff/">SNA</a></h3>
+
+<p><a href="http://erzuli.ss.uci.edu/R.stuff/">SNA</a> (Social Network
+Analysis) is an extension package to the GNU R system. It is useful for
+small graphs only, as it uses adjacency matrices.</p>

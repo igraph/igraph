@@ -1,0 +1,61 @@
+<h2>Introduction</h2>
+
+<p>This is another library for creating and manipulating graphs. There is
+simply no other graph library out there which can be handle graphs of the
+size the author is confronted with efficiently. Whenever possible
+<b>igraph</b> tries to be also user friendly and portable.</p>
+
+<p><b>igraph</b> started as an additional package to the
+<a href="http://www.r-project.org">GNU R statistical environment</a>,
+and still some functions which are hard to implement in C are
+available only in R (like interactive graphics). Most functions are however
+now written in C and they can be compiled without R as a separate library.
+Still the author highly recommends the R package version, as it is a
+sophisticated, well designed modern system.</p>
+
+<p>The advantage of the C version is that it is portable, can be used with
+other mathematical software (as soon as somebody writes the interfaces to
+it), and for large scale scientific computation in the
+<a href="http://www.cs.wisc.edu/condor/">Condor environment</a> we
+are using here at <a href="http://cneuro.rmki.kfki.hu">KFKI</a>.</p>
+
+<p><b>igraph</b> also features a
+<a href="http://python.org/pypi/igraph">Python interface</a>, and other
+interfaces can be added without too much hassle.</p>
+
+<h2>Features</h2>
+
+<ul>
+<li><b>igraph</b> contains functions for generating regular and random graphs
+according to known algorithms and models in the network theory
+literature.</li>
+
+<li><b>igraph</b> provides routines for manipulating graphs, adding and removing
+edges and vertices.</li>
+
+<li>a set of structural property calculation functions like degree,
+betweenness, etc. are also included.</li>
+
+<li>force based layout generators for small and large graphs</li>
+
+<li><b>igraph</b> iterators provide a simple and efficient way of walking
+through graphs</li>
+
+<li><b>igraph</b> is well documented both for users and developers</li>
+
+<li><b>igraph</b> is open source and distributed under GNU GPL</li>
+</ul>
+
+<h2>Requirements</h2>
+
+<p>For using the <b>igraph</b> C library the only requirement is a fairly recent C
+library. The Python interface requires at least Python 2.4.</p>
+
+<p>For compiling igraph from source you'll need a fairly modern C compiler and
+some standard UNIX tools: <code>sed</code>, <code>touch</code>,
+<code>chmod</code>, etc. GNU Bison is also needed, at least version
+1.35 or newer. Theoretically it is possible to compile <b>igraph</b>
+using the Microsoft Visual C Compiler as well, but we recommend the
+<a href="http://www.cygwin.com">Cygwin</a> or
+<a href="http://www.mingw.org">MinGW</a> environments for compiling
+<b>igraph</b> under Windows.</p>
