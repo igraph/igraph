@@ -1,5 +1,15 @@
 2007-10-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/arpack.c
+	* src/centrality.c (igraph_i_kleinberg, igraph_hub_score)
+	(igraph_authority_score) : moved
+	(igraph_i_kleinber2) : added
+	
+	* src/arpack.c 
+	* src/centrality.c
+	(igraph_i_eigenvector_centrality)
+	(igraph_eigenvector_centrality) : moved 	
+
 	* src/arpack_internal.h : use long int instead of int,
 	don't use 'const' for char*
 	* src/arpack.c
