@@ -1,3 +1,9 @@
+2007-10-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/E/src/rinterface.c.in (R_igraph_warning_handler)
+	(R_igraph_before, R_igraph_before2, R_igraph_after, R_igraph_after2) :
+	proper warnings added
+
 2007-10-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/src/rinterface.c.in (R_SEXP_igraph_arpack_options)
