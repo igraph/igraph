@@ -8,6 +8,12 @@ class GameTests(unittest.TestCase):
         g=Graph.GRG(50, 0.2, True)
         self.failUnless(isinstance(g, Graph))
 
+    def testForestFire(self):
+        g=Graph.Forest_Fire(100, 0.1)
+        self.failUnless(isinstance(g, Graph) and g.is_directed() == False)
+        g=Graph.Forest_Fire(100, 0.1, directed=True)
+        self.failUnless(isinstance(g, Graph) and g.is_directed() == True)
+
     def testRecentDegree(self):
         g=Graph.Recent_Degree(100, 5, 10)
         self.failUnless(isinstance(g, Graph))

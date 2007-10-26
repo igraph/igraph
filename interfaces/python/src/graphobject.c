@@ -1162,6 +1162,43 @@ PyObject *igraphmodule_Graph_Famous(PyTypeObject * type,
 
 
 /** \ingroup python_interface_graph
+ * \brief Generates a graph based on the forest fire model
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_forest_fire_game
+ */
+PyObject *igraphmodule_Graph_Forest_Fire(PyTypeObject * type,
+  PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  long n, ambs=1;
+  double fw_prob, bw_factor=0.0;
+  PyObject *directed = Py_False;
+
+  static char *kwlist[] = {"n", "fw_prob", "bw_factor", "ambs", "directed", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ld|dlO", kwlist,
+                                   &n, &fw_prob, &bw_factor, &ambs, &directed))
+    return NULL;
+
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_forest_fire_game(&self->g, (igraph_integer_t)n,
+		(igraph_real_t)fw_prob, (igraph_real_t)bw_factor,
+		(igraph_integer_t)ambs, (igraph_bool_t)(PyObject_IsTrue(directed)))) {
+      igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
+      return NULL;
+    }
+  }
+
+  return (PyObject *) self;
+}
+
+
+/** \ingroup python_interface_graph
  * \brief Generates a full graph
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_full
@@ -1192,6 +1229,39 @@ PyObject *igraphmodule_Graph_Full(PyTypeObject * type,
     igraphmodule_Graph_init_internal(self);
     if (igraph_full(&self->g, (igraph_integer_t) n,
                     (directed == Py_True), (loops == Py_True))) {
+      igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
+      return NULL;
+    }
+  }
+
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a full citation graph
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_full
+ */
+PyObject *igraphmodule_Graph_Full_Citation(PyTypeObject *type,
+    PyObject *args, PyObject *kwds)
+{
+  igraphmodule_GraphObject *self;
+  long n;
+  PyObject *directed = Py_False;
+
+  char *kwlist[] = { "n", "directed", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O", kwlist, &n, &directed))
+    return NULL;
+
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_full_citation(&self->g, (igraph_integer_t) n,
+		(igraph_bool_t) PyObject_IsTrue(directed))) {
       igraphmodule_handle_igraph_error();
       Py_DECREF(self);
       return NULL;
@@ -6034,6 +6104,37 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
 	 "U{http://cneurocvs.rmki.kfki.hu/igraph/doc/html/igraph-Generators.html}.\n\n"
 	 "@param name: the name of the graph to be generated.\n"
 	},
+
+  /* interface to igraph_forest_fire_game */
+  {"Forest_Fire", (PyCFunction) igraphmodule_Graph_Forest_Fire,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Forest_Fire(n, fw_prob, bw_factor=0.0, ambs=1, directed=False)\n\n"
+   "Generates a graph based on the forest fire model\n\n"
+   "The forest fire model is a growin graph model. In every time step, a new\n"
+   "vertex is added to the graph. The new vertex chooses an ambassador (or\n"
+   "more than one if M{ambs>1}) and starts a simulated forest fire at its\n"
+   "ambassador(s). The fire spreads through the edges. The spreading probability\n"
+   "along an edge is given by M{fw_prob}. The fire may also spread backwards\n"
+   "on an edge by probability M{fw_prob * bw_factor}. When the fire ended, the\n"
+   "newly added vertex connects to the vertices ``burned'' in the previous\n"
+   "fire.\n\n"
+   "@param n: the number of vertices in the graph\n"
+   "@param fw_prob: forward burning probability\n"
+   "@param bw_factor: ratio of backward and forward burning probability\n"
+   "@param ambs: number of ambassadors chosen in each step\n"
+   "@param directed: whether the graph will be directed\n"
+  },
+
+  /* interface to igraph_full_citation */
+  {"Full_Citation", (PyCFunction) igraphmodule_Graph_Full_Citation,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "Full_Citation(n, directed=False)\n\n"
+   "Generates a full citation graph\n\n"
+   "A full citation graph is a graph where the vertices are indexed from 0 to\n"
+   "M{n-1} and vertex M{i} has a directed edge towards all vertices with an\n"
+   "index less than M{i}.\n\n"
+   "@param n: the number of vertices.\n"
+   "@param directed: whether to generate a directed graph.\n"},
 
   /* interface to igraph_full */
   {"Full", (PyCFunction) igraphmodule_Graph_Full,

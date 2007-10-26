@@ -13,6 +13,21 @@ class GeneratorTests(unittest.TestCase):
         el.sort()
         self.failUnless(g.get_edgelist() == [(x, y) for x in range(20) for y in range(20) if x!=y])
 
+    def testFullCitation(self):
+        g=Graph.Full_Citation(20)
+        el=g.get_edgelist()
+        el.sort()
+        self.failUnless(not g.is_directed())
+        self.failUnless(el == [(x, y) for x in xrange(19) for y in xrange(x+1, 20)])
+
+        g=Graph.Full_Citation(20, True)
+        el=g.get_edgelist()
+        el.sort()
+        self.failUnless(g.is_directed())
+        self.failUnless(el == [(x, y) for x in xrange(1, 20) for y in xrange(x)])
+
+        self.assertRaises(InternalError, Graph.Full_Citation, -2)
+
     def testLCF(self):
         g1=Graph.LCF(12, (5, -5), 6)
         g2=Graph.Famous("Franklin")
