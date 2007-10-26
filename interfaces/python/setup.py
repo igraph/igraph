@@ -51,31 +51,37 @@ def detect_igraph_source():
     """Tries to detect the igraph sources and copy it to igraph/ if necessary"""
     if not os.path.isdir('igraph'): os.mkdir('igraph')
     if os.path.isfile(os.path.join('..', '..', 'src', 'igraph.h')):
-	files_to_copy = ['*.c', '*.h', '*.pmt', '*.y']
-	src_files = [os.path.join('..', '..', 'config.h')]
-	for wildcard in files_to_copy:
-	    src_files.extend(glob.glob(os.path.join('..', '..', 'src', wildcard)))
-	for src_file in src_files:
-	    if src_file.endswith("arpack.c"): continue
-	    copy_file(src_file, 'igraph', update=1)
-	
-	return
-	
+        dirs_to_evaluate = ['.', 'f2c', 'blas', 'lapack', 'arpack']
+        files_to_copy = ['*.c', '*.h', '*.pmt', '*.y']
+        src_files = [('.', os.path.join('..', '..', 'config.h'))]
+        for wildcard in files_to_copy:
+            for d in dirs_to_evaluate:
+                l = glob.glob(os.path.join('..', '..', 'src', d, wildcard))
+                src_files.extend([(d, f) for f in l])
+        for d in dirs_to_evaluate:
+            target_dir = os.path.join('igraph', d)
+            if not os.path.isdir(target_dir): os.mkdir(target_dir)
+        for src_dir, src_file in src_files:
+            target_dir = os.path.join('igraph', src_dir)
+            copy_file(src_file, target_dir, update=1)
+    
+    return
+    
 def igraph_version():
     """Returns igraph version number"""
     try:
-	f=open(os.path.join('igraph', 'config.h'))
-	while True:
-	    line=f.readline()
-	    if not line: break
-	    line=line.strip()
-	    if line[0:16] == "#define VERSION ":
-		return line[16:].replace('"', '')
-	    
-	f.close()
-	raise Exception, "Can't detect igraph version number from source code!"
+        f=open(os.path.join('igraph', 'config.h'))
+        while True:
+            line=f.readline()
+            if not line: break
+            line=line.strip()
+            if line[0:16] == "#define VERSION ":
+                return line[16:].replace('"', '')
+            
+        f.close()
+        raise Exception, "Can't detect igraph version number from source code!"
     except:
-	raise Exception, "igraph source code not found"
+        raise Exception, "igraph source code not found"
     
 try:
     detect_igraph_source()
@@ -84,12 +90,16 @@ except:
     print "Consider downloading the C source code of the igraph library and "
     print "put the contents of the src subdirectory and config.h in "
     print "subdirectory called igraph."
+    raise
     exit(1)
 
 module_sources=glob.glob(os.path.join('src', '*.c'))
 sources=glob.glob(os.path.join('igraph', '*.c'))
+sources.extend(glob.glob(os.path.join('igraph', 'f2c', '*.c')))
+sources.extend(glob.glob(os.path.join('igraph', 'blas', '*.c')))
+sources.extend(glob.glob(os.path.join('igraph', 'lapack', '*.c')))
+sources.extend(glob.glob(os.path.join('igraph', 'arpack', '*.c')))
 sources.extend(module_sources)
-
 include_dirs=['igraph', '.']
 library_dirs=[]
 libraries=[]
@@ -132,15 +142,15 @@ setup(name = 'igraph',
       keywords = ['graph', 'network', 'mathematics', 'math', 'graph theory', 'discrete mathematics'],
       classifiers = [
         'Development Status :: 4 - Beta',
-	'Intended Audience :: Developers',
-	'Intended Audience :: Science/Research',
-	'Operating System :: OS Independent',
-	'Programming Language :: C',
-	'Programming Language :: Python',
-	'Topic :: Scientific/Engineering',
-	'Topic :: Scientific/Engineering :: Information Analysis',
-	'Topic :: Scientific/Engineering :: Mathematics',
-	'Topic :: Scientific/Engineering :: Physics',
-	'Topic :: Scientific/Engineering :: Bio-Informatics',
-	'Topic :: Software Development :: Libraries :: Python Modules'
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Operating System :: OS Independent',
+    'Programming Language :: C',
+    'Programming Language :: Python',
+    'Topic :: Scientific/Engineering',
+    'Topic :: Scientific/Engineering :: Information Analysis',
+    'Topic :: Scientific/Engineering :: Mathematics',
+    'Topic :: Scientific/Engineering :: Physics',
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
+    'Topic :: Software Development :: Libraries :: Python Modules'
       ])
