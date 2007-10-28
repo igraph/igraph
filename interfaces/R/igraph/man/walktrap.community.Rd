@@ -56,7 +56,6 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
 }
 \author{Pascal Pons \email{google@for.it} and Gabor Csardi
   \email{csardi@rmki.kfki.hu} for the R and igraph interface}
-}
 \seealso{\code{\link{modularity}} and 
   \code{\link{fastgreedy.community}},
   \code{\link{spinglass.community}},

@@ -96,4 +96,6 @@ igraph/src/%.c: $(top_srcdir)/src/f2c/%.c
 
 igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 	rm -f igraph/R/config.R
+	rm -f igraph/src/config.h
+	touch igraph/src/config.h
 	R CMD build igraph

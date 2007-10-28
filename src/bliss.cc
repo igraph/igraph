@@ -20,6 +20,8 @@
 #include "bliss_kqueue.hh"
 #include "bliss_utils.hh"
 
+#include <cstring>
+
 namespace igraph {
 
 bool verbose = true;
@@ -38,7 +40,7 @@ static void usage(FILE *fp, char *argv0)
 {
   char *program_name;
   
-  program_name = rindex(argv0, '/');
+  program_name = strrchr(argv0, '/');
   
   if(program_name) program_name++;
   else program_name = argv0;

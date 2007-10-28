@@ -20,7 +20,6 @@ clique.number(graph)
     find. \code{NULL} means no limit, ie. it is the same as 0.}
   \item{max}{Numeric constant, upper limit on the size of the cliques to
     find. \code{NULL} means no limit.}
-  }
 }
 \details{
   \code{cliques} find all complete subgraphs in the input graph, obeying

@@ -18,6 +18,9 @@ LIBS=$LIBS_SAVE
 AC_SUBST(HAVE_RINTF)
 AC_SUBST(HAVE_FINITE)
 
+AC_CHECK_HEADER([sys/times.h], 
+      [AC_DEFINE([HAVE_TIMES_H], [1], [Define to 1 if you have the sys/times.h header])])
+
 graphml_support=yes
 AC_ARG_ENABLE(graphml,
               AC_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),

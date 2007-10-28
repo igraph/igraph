@@ -12,6 +12,9 @@ AC_PROG_CXX
 AM_PROG_LEX
 AC_PROG_YACC
 
+AC_CHECK_HEADER([sys/times.h], 
+      [AC_DEFINE([HAVE_TIMES_H], [1], [Define to 1 if you have the sys/times.h header])])
+
 AC_LIBTOOL_WIN32_DLL
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
