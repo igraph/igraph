@@ -25,6 +25,11 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from statistics import Histogram
 from copy import copy, deepcopy
 from StringIO import StringIO
+try:
+    set, frozenset
+except NameError:
+    import sets
+    set, frozenset = sets.Set, sets.ImmutableSet
 
 class Clustering(object):
     """Class representing a clustering of an arbitrary ordered set.
@@ -80,7 +85,7 @@ class Clustering(object):
         """
         return self._len
 
-    def _get_membership(self): return copy(self._membership)
+    def _get_membership(self): return deepcopy(self._membership)
     membership = property(_get_membership, doc = "The membership vector (read only)")
 
     def size(self, idx):
@@ -88,9 +93,7 @@ class Clustering(object):
 
         @param idx: the cluster in which we are interested.
         """
-        if idx<0 or idx>self._len:
-            raise IndexError, "cluster index out of range"
-        return len([1 for x in self._membership if x == idx])
+        return len(self[idx])
 
     def sizes(self, *args):
         """Returns the size of given clusters.
@@ -116,6 +119,74 @@ class Clustering(object):
         """
         return Histogram(bin_width, self.sizes())
 
+
+class OverlappingClustering(Clustering):
+    """Extension of L{Clustering} that allows for overlapping clusters.
+
+    With overlapping clusters, a single vertex can be the member of multiple
+    clusters (or even none of them). Therefore, each item of the membership
+    vector is a list, set or tuple containing the cluster indices for all
+    vertices.
+    
+    Members of an individual cluster can be accessed by the C{[]} operator:
+    
+      >>> cl = Clustering([(0,), (0,), (0,1), (1,), (1,), ()])
+      >>> cl[0]
+      [0, 1, 2]
+      >>> cl[1]
+      [2, 3, 4]
+    
+    The membership vector can be accessed by the C{membership} property:
+
+      >>> cl.membership
+      [frozenset([0]), frozenset([0]), frozenset([0,1]), frozenset([1]), frozenset([1]), frozenset([])]
+
+    The number of clusters can be retrieved by the C{len} function:
+
+      >>> len(cl)
+      2
+    """
+    def __init__(self, membership, params = {}):
+        """Constructor.
+
+        @param membership: the membership list -- that is, the cluster
+          index in which each element of the set belongs to.
+        @param params: additional parameters to be stored in this
+          object's dictionary."""
+        self._membership = map(frozenset, list(membership))
+        self._len = -1
+        for m in self._membership:
+            if len(m) == 0: continue
+            self._len = max(self._len, max(m))
+        self._len += 1
+        self.__dict__.update(params)
+    
+    def __getitem__(self, idx):
+        """Returns the members of the specified cluster.
+
+        @param idx: the index of the cluster
+        @return: the members of the specified cluster as a list
+        @raise: C{IndexError} if the index is out of bounds"""
+        if idx<0 or idx>self._len:
+            raise IndexError, "cluster index out of range"
+        return [i for i,cl in enumerate(self._membership) if idx in cl]
+   
+    def sizes(self, *args):
+        """Returns the size of given clusters.
+
+        @param idxs: the cluster indices in which we are interested. If C{None},
+          defaults to all clusters
+        """
+        idxs = args
+        if len(idxs) == 0: idxs = None
+        counts = [0] * len(self)
+        for members in self._membership:
+            for member in members: counts[member] += 1
+        if idxs is None: return counts
+        result = []
+        for idx in idxs: result.append(counts[idx])
+        return result
+    
 
 class VertexClustering(Clustering):
     """The clustering of the vertex set of a graph.
@@ -199,6 +270,80 @@ class VertexClustering(Clustering):
         ss = self.sizes()
         max_size = max(ss)
         return self.subgraph(ss.index(max_size))
+    
+
+class OverlappingVertexClustering(OverlappingClustering, VertexClustering):
+    """Overlapping clustering of the vertex set of a graph.
+
+    This class extends L{OverlappingClustering} by linking it to a specific
+    L{Graph} object and by optionally storing the modularity score of the
+    clustering.
+
+    Modularity in the case of overlapping communities is defined similarly
+    to the nonoverlapping case, but the statement that ``vertex M{i} and
+    M{j} is in the same community'' (expressed by the Kronecker-delta at
+    the end of the formula in the original paper) is replaced by the
+    statement that ``vertex M{i} and M{j} are both contained by at least
+    one of the communities''.
+
+    @note: since this class is linked to a L{Graph}, destroying the graph by the
+      C{del} operator does not free the memory occupied by the graph if there
+      exists an L{OverlappingVertexClustering} that references the L{Graph}.
+    """
+
+    def __init__(self, graph, membership = None, modularity = None, params = {}):
+        """Creates an overlapping clustering object for a given graph.
+
+        @param graph: the graph that will be associated to the clustering
+        @param membership: the membership list. The length of the list must
+          be equal to the number of vertices in the graph. If C{None}, every
+          vertex is assumed to belong to the same cluster.
+        @param modularity: the modularity score of the clustering. If C{None},
+          it will be calculated.
+        @param params: additional parameters to be stored in this object.
+        """
+        self._graph = graph
+
+        if membership is None:
+            OverlappingClustering.__init__(self, [set(0)]*graph.vcount(), params)
+        else:
+            if len(membership) != graph.vcount():
+                raise ValueError, "membership list is too short"
+            OverlappingClustering.__init__(self, membership, params)
+
+        if modularity is None:
+            self._q = self.recalculate_modularity()
+        else:
+            self._q = modularity
+
+    def recalculate_modularity(self):
+        """Recalculates the stored modularity value.
+
+        This method must be called before querying the modularity score of the
+        clustering through the class member C{modularity} or C{q} if the
+        graph has been modified (edges have been added or removed) since the
+        creation of the L{OverlappingVertexClustering} object.
+        
+        @return: the new modularity score
+        @todo: this is pretty slow now, it should eventually be moved to
+          the C layer.
+        """
+        degrees = self._graph.degree()
+        n = self._graph.vcount()
+        el = set(self._graph.get_edgelist())
+        if not self._graph.is_directed():
+            el2 = set([(v2,v1) for v1,v2 in self._graph.get_edgelist()])
+            el = el.union(el2)
+        ecount = float(len(el))
+        result = 0.0
+        for v1 in xrange(n):
+            for v2 in xrange(n):
+                if len(self._membership[v1].intersection(self._membership[v2]))>0:
+                    if (v1,v2) in el: result += 1.0
+                    result -= degrees[v1]*degrees[v2] / ecount
+
+        self._q = result / ecount
+        return self._q
 
 
 class Dendrogram(Clustering):

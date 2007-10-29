@@ -1,5 +1,10 @@
 import unittest
 from igraph import *
+try:
+    set, frozenset
+except NameError:
+    import sets
+    set, frozenset = sets.Set, sets.ImmutableSet
 
 class DecompositionTests(unittest.TestCase):
     def testKCores(self):
@@ -38,6 +43,28 @@ class ClusteringTests(unittest.TestCase):
     def testClusteringHistogram(self):
         self.failUnless(isinstance(self.cl.size_histogram(), Histogram))
 
+class OverlappingClusteringTests(unittest.TestCase):
+    def setUp(self):
+        self.cl = OverlappingClustering([set([0]), set([0]), set([0]), set([0,1]), set([1]), set([1]), set([1]), set([]), set([3]), set([3,1])])
+
+    def testClusteringIndex(self):
+        self.failUnless(self.cl[0] == [0, 1, 2, 3])
+        self.failUnless(self.cl[1] == [3, 4, 5, 6, 9])
+        self.failUnless(self.cl[2] == [])
+        self.failUnless(self.cl[3] == [8, 9])
+
+    def testClusteringLength(self):
+        self.failUnless(len(self.cl) == 4)
+
+    def testClusteringSizes(self):
+        self.failUnless(self.cl.sizes() == [4, 5, 0, 2])
+        self.failUnless(self.cl.sizes(1, 3, 0) == [5, 2, 4])
+        self.failUnless(self.cl.size(1) == 5)
+        self.failUnless(self.cl.size(2) == 0)
+
+    def testClusteringHistogram(self):
+        self.failUnless(isinstance(self.cl.size_histogram(), Histogram))
+
 
 class CommunityTests(unittest.TestCase):
     def testClauset(self):
@@ -46,6 +73,9 @@ class CommunityTests(unittest.TestCase):
         cl = g.community_fastgreedy()
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
+
+        cl2 = OverlappingVertexClustering(g, [set([x]) for x in cl.membership])
+        self.assertAlmostEqual(cl.q, cl2.q, places=3)
 
     def testEigenvector(self):
         g = Graph.Full(5) + Graph.Full(5)
@@ -60,6 +90,7 @@ class CommunityTests(unittest.TestCase):
 def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
     clustering_suite = unittest.makeSuite(ClusteringTests)
+    overlapping_clustering_suite = unittest.makeSuite(OverlappingClusteringTests)
     community_suite = unittest.makeSuite(CommunityTests)
     return unittest.TestSuite([decomposition_suite, community_suite])
 

@@ -135,6 +135,34 @@ class Graph(core.GraphBase):
         kwds['degree']=_igraph.OUT
         return self.degree(*args, **kwds)
 
+    def biconnected_components(self, return_articulation_points=False):
+        """biconnected_components(return_articulation_points=False)
+
+        Calculates the biconnected components of the graph.
+        
+        @param return_articulation_points: whether to return the articulation
+          points as well
+        @return: an L{OverlappingVertexClustering} object describing the
+          biconnected components and optionally the list of articulation points
+        """
+        if return_articulation_points:
+            trees, aps = GraphBase.biconnected_components(self, True)
+        else:
+            trees = GraphBase.biconnected_components(self, False)
+
+        membership = [set() for _ in xrange(self.vcount())]
+        for idx, tree in enumerate(trees):
+            for e in tree:
+                membership[self.es[e].source].add(idx)
+                membership[self.es[e].target].add(idx)
+        cl = OverlappingVertexClustering(self, membership)
+
+        if return_articulation_points:
+            return cl, aps
+        else:
+            return cl
+    blocks = biconnected_components
+
     def clusters(self, mode=STRONG):
         """clusters(mode=STRONG)
 

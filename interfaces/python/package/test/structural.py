@@ -88,17 +88,15 @@ class BiconnectedComponentTests(unittest.TestCase):
 
     def testBiconnectedComponents(self):
         s = self.g1.biconnected_components()
-        s[0].sort()
-        self.failUnless(len(s) == 1 and len(s[0]) == 9)
+        self.failUnless(len(s) == 1 and s[0]==range(10))
         s, ap = self.g1.biconnected_components(True)
-        self.failUnless(len(s) == 1 and len(s[0]) == 9 and ap == [])
+        self.failUnless(len(s) == 1 and s[0]==range(10))
 
         s = self.g3.biconnected_components()
-        for x in s: x.sort()
-        self.failUnless(len(s) == 2 and len(s[0]) == 2 and len(s[1]) == 3)
+        self.failUnless(len(s) == 2 and s[0]==[2,4,5] and s[1]==[0,1,2,3])
         s, ap = self.g3.biconnected_components(True)
-        self.failUnless(len(s) == 2 and len(s[0]) == 2 and \
-          len(s[1]) == 3 and ap == [2])
+        self.failUnless(len(s) == 2 and s[0]==[2,4,5] and \
+          s[1]==[0,1,2,3] and ap == [2])
 
     def testArticulationPoints(self):
         self.failUnless(self.g1.articulation_points() == [])
