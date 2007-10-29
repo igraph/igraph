@@ -60,6 +60,16 @@ VERTEXSET:
     DEFAULT:
        ALL: V(%I1%)
 
+EDGEWEIGHTS:
+    INCONV: if (is.null(%I%) && "weight" %in% list.edge.attributes(%I1%)) { \
+               %I% <- E(%I1%)$weight \
+            } \
+            if (length(%I%)==1 && is.na(%I%)) { \
+               %I% <- NULL \
+            } else { \
+               %I% <- as.numeric(%I%) \
+            }
+
 NULL:
     CALL:
     HEADER:

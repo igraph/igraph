@@ -44,27 +44,86 @@ int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from
   return 0;
 }
 
+typedef struct igraph_i_eigenvector_centrality_t {
+  const igraph_t *graph;
+  const igraph_adjedgelist_t *adjedgelist;
+  const igraph_vector_t *weights;
+} igraph_i_eigenvector_centrality_t;
+
+int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
+				     long int n, void *extra) {
+
+  igraph_i_eigenvector_centrality_t *data=extra;
+  const igraph_t *graph=data->graph;
+  const igraph_adjedgelist_t *adjedgelist=data->adjedgelist;
+  const igraph_vector_t *weights=data->weights;
+  igraph_vector_t *edges;
+  long int i, j, nlen;
+
+  for (i=0; i<n; i++) {
+    edges=igraph_adjedgelist_get(adjedgelist, i);
+    nlen=igraph_vector_size(edges);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int edge=VECTOR(*edges)[j];
+      long int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      to[i] += w * from[nei];
+    }
+  }
+
+  return 0;
+}
+
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
 				  igraph_real_t *value, igraph_bool_t scale,
+				  const igraph_vector_t *weights,
 				  igraph_arpack_options_t *options) {
-
-  igraph_adjlist_t adjlist;
+  
   igraph_vector_t values;
   igraph_matrix_t vectors;
   
   options->n=igraph_vcount(graph);
 
+  if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid length of weights vector when calculating "
+		 "eigenvector centrality", IGRAPH_EINVAL);
+  }
+
+  if (weights && igraph_is_directed(graph)) {
+    IGRAPH_WARNING("Weighted directed graph in eigenvector centrality");
+  }
+
   IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, 0, 0);
 
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+  if (!weights) {
+    
+    igraph_adjlist_t adjlist;
 
-  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
-				     &adjlist, options, &values, &vectors));
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+    
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
+				       &adjlist, options, &values, &vectors));
 
-  igraph_adjlist_destroy(&adjlist);
-  IGRAPH_FINALLY_CLEAN(1);
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+    
+  } else {
+    
+    igraph_adjedgelist_t adjedgelist;
+    igraph_i_eigenvector_centrality_t data = { graph, &adjedgelist, weights };
+    
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+    
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
+				       &data, options, &values, &vectors));
+    
+    igraph_adjedgelist_destroy(&adjedgelist);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   if (value) {
     *value=VECTOR(values)[0];

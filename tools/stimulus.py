@@ -417,7 +417,13 @@ class RRCodeGenerator(CodeGenerator):
                     res="  " + t['INCONV']
             else:
                 res=""
-            return res.replace("%I%", pname.replace("_", "."))
+            res=res.replace("%I%", pname.replace("_", "."))
+
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    res=res.replace("%I"+str(i+1)+"%", deps[i])
+            return res
 
         inconv=[ do_par(n) for n in params.keys() ]
         inconv=[ i for i in inconv if i != "" ]

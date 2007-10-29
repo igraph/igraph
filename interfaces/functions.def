@@ -412,7 +412,9 @@ igraph_add_edge:
 
 igraph_eigenvector_centrality:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                BOOLEAN scale=True, INOUT ARPACKOPT options=igraph.arpack.default
+                BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        DEPS: weights ON graph
         DEFAULT-R: options=igraph.arpack.default
         NAME-R: evcent
 

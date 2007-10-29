@@ -901,6 +901,7 @@ int igraph_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
 
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
 				  igraph_real_t *value, igraph_bool_t scale,
+				  const igraph_vector_t *weights,
 				  igraph_arpack_options_t *options);
 
 int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
