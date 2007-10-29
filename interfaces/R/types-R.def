@@ -64,10 +64,10 @@ EDGEWEIGHTS:
     INCONV: if (is.null(%I%) && "weight" %in% list.edge.attributes(%I1%)) { \
                %I% <- E(%I1%)$weight \
             } \
-            if (length(%I%)==1 && is.na(%I%)) { \
-               %I% <- NULL \
-            } else { \
+            if (!is.null(%I%) && any(!is.na(%I%))) { \
                %I% <- as.numeric(%I%) \
+            } else { \
+               %I% <- NULL \
             }
 
 NULL:

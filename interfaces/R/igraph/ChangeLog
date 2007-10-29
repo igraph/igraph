@@ -1,7 +1,7 @@
 2007-10-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.common.R (i.parse.plot.params) :
-	check the existance of graphical arguments
+	check the existence of graphical arguments
 
 2007-10-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
