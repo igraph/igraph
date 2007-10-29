@@ -17,7 +17,7 @@
 
 /* Table of constant values */
 
-static integer c__1 = 1;
+/* static integer c__1 = 1; */
 
 /* Subroutine */ int igraphxerbla_(char *srname, integer *info)
 {
@@ -55,7 +55,7 @@ static integer c__1 = 1;
 /*     .. Executable Statements .. */
 
     printf("** On entry to %6s, parameter number %2i had an illegal value\n",
-		srname, *info);
+		srname, (int)*info);
 
 /*     End of XERBLA */
 

@@ -56,7 +56,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->ax=0;
   o->select=0;
   o->iparam[0]=o->ishift; o->iparam[1]=0; o->iparam[2]=o->mxiter; o->iparam[3]=o->nb;
-  o->iparam[4]=0; o->iparam[5]=0; o->iparam[6]=o->mode; o->iparam[7]==0;
+  o->iparam[4]=0; o->iparam[5]=0; o->iparam[6]=o->mode; o->iparam[7]=0;
   o->iparam[8]=0; o->iparam[9]=0; o->iparam[10]=0;
 }
 
@@ -65,7 +65,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_vector_t *values, igraph_matrix_t *vectors) {
   
   igraph_vector_t v, workl, workd, d, resid, ax; /* just in case */
-  long int *select;
+  long int *select=0;
   igraph_bool_t bv=0, bworkl=0, bworkd=0, bd=0, bresid=0, bax=0, bselect=0;
 
   long int ido=0;
@@ -145,7 +145,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   
   if (options->info < 0) {
-    fprintf(stderr, "ARPACK error: %i\n", options->info);
+    fprintf(stderr, "ARPACK error: %i\n", (int) options->info);
     IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
   }
   
@@ -160,7 +160,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 		&options->ierr);
   
   if (options->ierr < 0) {
-    fprintf(stderr, "ARPACK error: %i\n", options->ierr);
+    fprintf(stderr, "ARPACK error: %i\n", (int)options->ierr);
     IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
   }    
 

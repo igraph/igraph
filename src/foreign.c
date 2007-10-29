@@ -672,7 +672,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
   long int ttarget=-1;
   char prob[21];
   char c;      
-  int problem_type;
+  int problem_type=0;
 
 #define PROBLEM_EDGE  1
 #define PROBLEM_MAX   2  

@@ -617,7 +617,7 @@ int FUNCTION(igraph_matrix,add)(TYPE(igraph_matrix) *m1,
   if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
     IGRAPH_ERROR("Cannot add non-conformant matrices", IGRAPH_EINVAL);
   }
-  FUNCTION(igraph_vector,add)(&m1->data, &m2->data);
+  return FUNCTION(igraph_vector,add)(&m1->data, &m2->data);
 }
 
 int FUNCTION(igraph_matrix,sub)(TYPE(igraph_matrix) *m1, 
@@ -625,7 +625,7 @@ int FUNCTION(igraph_matrix,sub)(TYPE(igraph_matrix) *m1,
   if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
     IGRAPH_ERROR("Cannot subtract non-conformant matrices", IGRAPH_EINVAL);
   }
-  FUNCTION(igraph_vector,sub)(&m1->data, &m2->data);
+  return FUNCTION(igraph_vector,sub)(&m1->data, &m2->data);
 }
 
 int FUNCTION(igraph_matrix,mul_elements)(TYPE(igraph_matrix) *m1, 
@@ -633,7 +633,7 @@ int FUNCTION(igraph_matrix,mul_elements)(TYPE(igraph_matrix) *m1,
   if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
     IGRAPH_ERROR("Cannot multiply non-conformant matrices", IGRAPH_EINVAL);
   }
-  FUNCTION(igraph_vector,mul)(&m1->data, &m2->data);
+  return FUNCTION(igraph_vector,mul)(&m1->data, &m2->data);
 }
 
 int FUNCTION(igraph_matrix,div_elements)(TYPE(igraph_matrix) *m1, 
@@ -641,7 +641,7 @@ int FUNCTION(igraph_matrix,div_elements)(TYPE(igraph_matrix) *m1,
   if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
     IGRAPH_ERROR("Cannot divide non-conformant matrices", IGRAPH_EINVAL);
   }
-  FUNCTION(igraph_vector,div)(&m1->data, &m2->data);
+  return FUNCTION(igraph_vector,div)(&m1->data, &m2->data);
 }
 
 igraph_real_t FUNCTION(igraph_matrix,min)(const TYPE(igraph_matrix) *m) {

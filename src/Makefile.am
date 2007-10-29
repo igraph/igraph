@@ -82,8 +82,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
 			     arpack.c centrality.c
 
-libigraph_la_CFLAGS        = 
-libigraph_la_CXXFLAGS	   = 
+libigraph_la_CFLAGS        = -Wall
+libigraph_la_CXXFLAGS	   = -Wall
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
 

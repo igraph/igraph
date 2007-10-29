@@ -504,8 +504,8 @@ static integer c__1 = 1;
     static integer bounds, ishift, msglvl, mxiter;
 
     /* Fortran I/O blocks */
-    static cilist io___21 = { 0, 6, 0, fmt_1000, 0 };
-    static cilist io___22 = { 0, 6, 0, fmt_1100, 0 };
+/*     static cilist io___21 = { 0, 6, 0, fmt_1000, 0 }; */
+/*     static cilist io___22 = { 0, 6, 0, fmt_1100, 0 }; */
 
 
 

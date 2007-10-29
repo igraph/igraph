@@ -692,7 +692,6 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   igraph_dqueue_t tosplit;
   igraph_vector_t x, x2, mymerges;
   igraph_vector_t idx;
-  long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
   long int staken=0;
   igraph_adjlist_t adjlist;
   long int i, j, k, l, m;
@@ -701,10 +700,10 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   
   /* These are for the ARPACK routines */
   long int n=no_of_nodes, nev=1, ncv=4, ldv=n, *select, iparam[11], ipntr[11], ido,
-    lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
-  igraph_real_t sigma, zero=0.0, tol=0;
+    lworkl=ncv*(ncv+8), info, ishfts, mode1, rvec=1, maxit=300;
+  igraph_real_t sigma, tol=0;
   igraph_vector_t v, workl, workd, d, resid, ax;
-  char *bmat="I", *LA="LA", *LM="LM", *all="All", *which=LA;
+  char *bmat="I", *LA="LA", *all="All", *which=LA;
 
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("This method was developed for undirected graphs");
@@ -749,13 +748,9 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
     long int comm=igraph_dqueue_pop_back(&tosplit); /* depth first search */
     long int size=0;
-    igraph_real_t sumsq=0.0;
     igraph_real_t ktx=0.0;
     long int sumdeg=0;
-    igraph_bool_t bfound=0;
-    long int bidx=0;
-    igraph_real_t bval=0.0, bval2=0.0;
-    igraph_real_t mneg=0.0;
+
 
     IGRAPH_ALLOW_INTERRUPTION();
 
@@ -833,7 +828,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     } /* while 1, we have the eigenvalue if no error */
 
     if (info < 0) {
-      fprintf(stderr, "ARPACK error %i\n", info);
+      fprintf(stderr, "ARPACK error %i\n", (int)info);
       IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
     }
     
@@ -845,7 +840,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 		  VECTOR(workl), &lworkl, &info);
     
     if (info < 0) {
-      fprintf(stderr, "ARPACK error %i\n", info);
+      fprintf(stderr, "ARPACK error %i\n", (int)info);
       IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
     }
     
@@ -1030,7 +1025,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   igraph_dqueue_t tosplit;
   igraph_vector_t x, x2;
   igraph_vector_t idx, idx2, mymerges;
-  long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
   long int staken=0;
   igraph_adjlist_t adjlist;
   long int i, j, k, l;
@@ -1039,10 +1033,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
   /* These are for the ARPACK routines */
   long int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
-    lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
-  igraph_real_t sigma, zero=0.0, tol=0;
+    lworkl=ncv*(ncv+8), info, ishfts, mode1, rvec=1, maxit=300;
+  igraph_real_t sigma, tol=0;
   igraph_vector_t v, workl, workd, d, resid, ax;
-  char *bmat="I", *LA="LA", *LM="LM", *all="All", *which=LA;
+  char *bmat="I", *LA="LA", *all="All", *which=LA;
 
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("This method was developed for undirected graphs");
@@ -1087,12 +1081,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   
   while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
     long int comm=igraph_dqueue_pop_back(&tosplit); /* depth first search */
-    igraph_real_t sumsq=0.0;
     igraph_real_t ktx=0.0;
-    igraph_bool_t bfound=0;
-    long int bidx=0;
-    igraph_real_t bval=0.0, bval2=0.0;
-    igraph_real_t mneg=0.0;
     igraph_real_t kig;
     igraph_real_t comm_edges;
     long int size=0;
@@ -1174,7 +1163,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     } /* while 1, we have the eigenvalue if no error */
 
     if (info < 0) {
-      fprintf(stderr, "ARPACK error %i\n", info);
+      fprintf(stderr, "ARPACK error %i\n", (int)info);
       IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
     }
     
@@ -1185,7 +1174,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 		  VECTOR(workl), &lworkl, &info);
     
     if (info < 0) {
-      fprintf(stderr, "ARPACK error %i\n", info);
+      fprintf(stderr, "ARPACK error %i\n", (int)info);
       IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
     }
     
@@ -1345,7 +1334,6 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t x2;
   igraph_vector_t idx, idx2;
-  long int niter=no_of_nodes > 1000 ? no_of_nodes : 1000;
   long int i, j, k;
   long int communities=1;
   igraph_i_lazy_adjlist_t adjlist;
@@ -1354,10 +1342,10 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 
   /* These are for the ARPACK routines */
   long int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
-    lworkl=ncv*(ncv+8), info, ishfts, mode1, nconv, rvec=1, maxit=300;
-  igraph_real_t sigma, zero=0.0, tol=0;
+    lworkl=ncv*(ncv+8), info, ishfts, mode1, rvec=1, maxit=300;
+  igraph_real_t sigma, tol=0;
   igraph_vector_t v, workl, workd, d, resid, ax;
-  char *bmat="I", *LA="LA", *LM="LM", *all="All", *which=LA;  
+  char *bmat="I", *LA="LA", *all="All", *which=LA;  
   
   if (igraph_vector_size(membership) != no_of_nodes) {
     IGRAPH_ERROR("Invalid membership vector length", IGRAPH_EINVAL);
@@ -1393,12 +1381,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 
   {
     long int comm=community;
-    igraph_real_t sumsq=0.0;
     igraph_real_t ktx=0.0;
-    igraph_bool_t bfound=0;
-    long int bidx=0;
-    igraph_real_t bval=0.0, bval2=0.0;
-    igraph_real_t mneg=0.0;
     igraph_real_t kig;
     igraph_real_t comm_edges;
     
@@ -1485,7 +1468,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
       } /* while 1, we have the eigenvalue if no error */
       
       if (info < 0) {
-	fprintf(stderr, "ARPACK error %i\n", info);
+	fprintf(stderr, "ARPACK error %i\n", (int)info);
 	IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
       }
       
@@ -1496,7 +1479,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 		    VECTOR(workl), &lworkl, &info);
       
       if (info < 0) {
-	fprintf(stderr, "ARPACK error %i\n", info);
+	fprintf(stderr, "ARPACK error %i\n", (int)info);
 	IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
       }
       

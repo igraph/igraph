@@ -28,41 +28,41 @@ bool verbose = true;
 FILE *verbstr = stdout;
 
 typedef enum {FORMAT_BIN = 0, FORMAT_ADJ} Format;
-static Format input_format;
+// static Format input_format;
 
-static char *infilename = 0;
+// static char *infilename = 0;
 
-static bool opt_canonize = false;
-static char *opt_output_can_file = 0;
-static unsigned int sh = Graph::sh_fm;
+// static bool opt_canonize = false;
+// static char *opt_output_can_file = 0;
+// static unsigned int sh = Graph::sh_fm;
 
-static void usage(FILE *fp, char *argv0)
-{
-  char *program_name;
+// static void usage(FILE *fp, char *argv0)
+// {
+//   char *program_name;
   
-  program_name = strrchr(argv0, '/');
+//   program_name = strrchr(argv0, '/');
   
-  if(program_name) program_name++;
-  else program_name = argv0;
+//   if(program_name) program_name++;
+//   else program_name = argv0;
   
-  if(!*program_name) program_name = "bliss";
-  fprintf(fp, "bliss, version 0.35, compiled " __DATE__ "\n");
-  fprintf(fp, "Copyright 2003-2006 Tommi Junttila\n");
-  fprintf(fp,
-"%s [<graph file>]\n"
-"\n"
-"  -can        compute canonical form\n"
-"  -ocan=f     compute canonical form and output it in file f\n"
-//"  -v        switch verbose mode on\n"
-"  -sh=x       select splitting heuristics, where x is\n"
-"                f    first non-singleton cell\n"
-"                fl   first largest non-singleton cell\n"
-"                fs   first smallest non-singleton cell\n"
-"                fm   first maximally non-trivially connected non-singleton cell [default]\n"
-"                flm  first largest maximally non-trivially connected non-singleton cell\n"
-"                fsm  first smallest maximally non-trivially connected non-singleton cell\n"
-          ,program_name);
-}
+//   if(!*program_name) program_name = "bliss";
+//   fprintf(fp, "bliss, version 0.35, compiled " __DATE__ "\n");
+//   fprintf(fp, "Copyright 2003-2006 Tommi Junttila\n");
+//   fprintf(fp,
+// "%s [<graph file>]\n"
+// "\n"
+// "  -can        compute canonical form\n"
+// "  -ocan=f     compute canonical form and output it in file f\n"
+// //"  -v        switch verbose mode on\n"
+// "  -sh=x       select splitting heuristics, where x is\n"
+// "                f    first non-singleton cell\n"
+// "                fl   first largest non-singleton cell\n"
+// "                fs   first smallest non-singleton cell\n"
+// "                fm   first maximally non-trivially connected non-singleton cell [default]\n"
+// "                flm  first largest maximally non-trivially connected non-singleton cell\n"
+// "                fsm  first smallest maximally non-trivially connected non-singleton cell\n"
+//           ,program_name);
+// }
 
 
 // static void parse_options(int argc, char ** argv)

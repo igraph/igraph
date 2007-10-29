@@ -72,7 +72,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   
   if (vector) {
     igraph_real_t amax=0;
-    long int which;
+    long int which=0;
     long int i;
     IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
     for (i=0; i<options->n; i++) {
@@ -182,7 +182,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
   if (vector) {
     igraph_real_t amax=0;
-    long int which;
+    long int which=0;
     long int i;
     IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
     for (i=0; i<options->n; i++) {

@@ -535,7 +535,7 @@ int igraph_biconnected_components(const igraph_t *graph,
     rootdfs=0;
     VECTOR(low)[i]=VECTOR(num)[i]=counter++;
     while (!igraph_stack_empty(&path)) {
-      long int n, edge, nei;
+      long int n;
       long int act=igraph_stack_top(&path);
       long int actnext=VECTOR(nextptr)[act];
       

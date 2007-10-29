@@ -175,6 +175,7 @@ int igraph_i_neisets_intersect(const igraph_vector_t *v1,
     } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) i++;
     else j++;
   }
+  return 0;
 }
 
 /**

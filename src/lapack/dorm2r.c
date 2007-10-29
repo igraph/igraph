@@ -186,7 +186,7 @@ static integer c__1 = 1;
 	return 0;
     }
 
-    if (left && ! notran || ! left && notran) {
+    if ( (left && ! notran) || (! left && notran)) {
 	i1 = 1;
 	i2 = *k;
 	i3 = 1;

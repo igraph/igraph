@@ -299,6 +299,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 
     igraph_vector_ptr_t vattr, eattr, gattr;
     long int esize=igraph_vector_ptr_size(&state->e_attrs);
+    const void **tmp;
     r=igraph_vector_ptr_init(&vattr, 
 			     igraph_vector_ptr_size(&state->v_attrs)+1);
     if (r) {
@@ -350,8 +351,8 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
     }
     idrec.name=idstr;
     idrec.type=IGRAPH_ATTRIBUTE_STRING;
-    igraph_trie_getkeys(&state->node_trie, 
-			(const igraph_strvector_t **)(&idrec.value));
+    tmp=&idrec.value;
+    igraph_trie_getkeys(&state->node_trie, (const igraph_strvector_t **)tmp);
     VECTOR(vattr)[i]=&idrec;
 
     for (i=0; i<igraph_vector_ptr_size(&state->e_attrs); i++) {

@@ -17,8 +17,8 @@
 
 /* Table of constant values */
 
-static integer c__1 = 1;
-static integer c__3 = 3;
+/* static integer c__1 = 1; */
+/* static integer c__3 = 3; */
 
 /* ----------------------------------------------------------------------- */
 /*  Routine:    DMOUT */
