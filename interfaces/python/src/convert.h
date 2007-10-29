@@ -44,6 +44,7 @@ int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
 PyObject* igraphmodule_vector_t_pair_to_PyList(igraph_vector_t *v1,
 					       igraph_vector_t *v2);
 PyObject* igraphmodule_vector_t_to_PyList_pairs(igraph_vector_t *v);
+PyObject* igraphmodule_vector_ptr_t_to_PyList(igraph_vector_ptr_t *v, igraphmodule_conv_t type);
 PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
 						 igraphmodule_conv_t type);
 int igraphmodule_PyList_to_matrix_t(PyObject *o, igraph_matrix_t *m);

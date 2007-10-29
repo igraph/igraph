@@ -473,6 +473,34 @@ PyObject* igraphmodule_matrix_t_to_PyList(igraph_matrix_t *m,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts an igraph \c igraph_vector_ptr_t to a Python list of lists
+ * 
+ * \param v the \c igraph_vector_ptr_t containing the vector to be converted
+ * \return the Python list as a \c PyObject*, or \c NULL if an error occurred
+ */
+PyObject* igraphmodule_vector_ptr_t_to_PyList(igraph_vector_ptr_t *v,
+    igraphmodule_conv_t type) {
+  PyObject *list, *item;
+  int n, i;
+   
+  n=igraph_vector_ptr_size(v);
+  if (n<0) return igraphmodule_handle_igraph_error();
+
+  list=PyList_New(n);
+  for (i=0; i<n; i++) {
+    item=igraphmodule_vector_t_to_PyList((igraph_vector_t*)VECTOR(*v)[i], type);
+    if (item == NULL) {
+      Py_DECREF(list);
+      return NULL;
+    }
+    PyList_SET_ITEM(list, i, item);
+  }
+
+  return list;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python list of lists to an \c igraph_matrix_t
  * 
  * \param o the Python object representing the list of lists

@@ -73,7 +73,8 @@ class Graph(core.GraphBase):
     omega = core.GraphBase.clique_number
     alpha = core.GraphBase.independence_number
     shell_index = core.GraphBase.coreness
-
+    cut_vertices = core.GraphBase.articulation_points
+    
     def __init__(self, n=1, edges=None, directed=None, \
         graph_attrs=None, vertex_attrs=None, edge_attrs=None):
         """Constructs a graph from scratch.
