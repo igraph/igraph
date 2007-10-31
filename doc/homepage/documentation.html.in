@@ -1,0 +1,73 @@
+<h2>Documentation</h2>
+
+<p>The latest released version of the <b>igraph</b> library is <b>$VERSION</b>.</p>
+
+<ul class="no-bullet download">
+<li class="download download-c">
+  <span class="name">igraph Reference Manual</span>
+  <span class="comment">&mdash; for those who want to use the C library
+  directly</span>
+  <ul class="download-links">
+    <li class="download-html">
+      <a href="doc/igraph-docs-${VERSION}.tar.gz">HTML bundle</a>
+    </li>
+    <li class="download-pdf">
+      <a href="doc/igraph-docs.pdf">PDF file</a>
+    </li>
+    <li class="download-info">
+      <a href="doc/igraph-docs.info">GNU info document</a>
+    </li>
+    <li class="download-external">
+      <a href="doc/html/index.html">Browse online</a>
+    </li>
+  </ul>
+</li>
+
+<li class="download download-r">
+  <span class="name">R interface</span>
+  <span class="comment">&mdash; for those who use <b>igraph</b> from R.
+  Also included in the R package.</span>
+  <ul class="download-links">
+    <li class="download-pdf">
+      <a href="doc/R/igraph.pdf">PDF file</a>
+    </li>
+    <li class="download-external">
+      <a href="doc/R/00Index.html">Browse online</a>
+    </li>
+  </ul>
+</li>
+
+<li class="download download-python">
+  <span class="name">Python interface</span>
+  <span class="comment">&mdash; for those who use the <b>igraph</b> Python
+  module</span>
+  <ul class="download-links">
+    <li class="download-pdf">
+      <a href="doc/python/igraph.pdf">PDF file</a>
+    </li>
+    <li class="download-external">
+      <a href="doc/python/index.html">Browse online</a>
+    </li>
+  </ul>
+</li>
+
+<li class="download download-doc">
+  <span class="name">Network analysis with igraph</span>
+  <span class="comment">&mdash; under development!</span>
+  <ul class="download-links">
+    <li class="download-external">
+      <a href="/igraphbook">Browse online</a>
+    </li>
+  </ul>
+  
+</li>
+
+</ul>
+
+<p>The original XML DocBook format of the manual for the C core
+can be obtained by <a href="download.html#dev">downloading the
+latest development version</a>.</p>
+
+<p>Documentation for the Python interface is also included in the
+Python docstrings, so you can use <code>pydoc</code> or the built-in Python help facility
+as well.</p>
