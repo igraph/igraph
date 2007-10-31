@@ -1,13 +1,12 @@
-.synopsis, .classsynopsis 
-{
-  background: #eeeeee;
-  border: solid 1px #aaaaaa;
-  padding: 0.5em;
-}
+.author { padding: 0px 30px 0pt; }
+.chapter { padding: 0px 20px 10px; }
+.section { padding: 0px 20px 10px; }
+.index { padding: 0px 20px 10px; }
+.legalnotice { padding: 0px 20px 10px; }
 .programlisting 
 {
   background: #eeeeff;
-  border: solid 1px #aaaaff;
+  border: solid 1px #4444ff;
   padding: 0.5em;
 }
 .variablelist 
@@ -21,18 +20,17 @@
 }
 table.navigation 
 {
-  background: #ffeeee;
-  border: solid 1px #ffaaaa;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+    color: #fff;
+    margin: 0;
+    padding: 7px 0 7px 15px;
+    text-shadow: 0px 1px 2px #000;
+    background: #005fd7 url(header_blue.png) repeat-x;
+    border-bottom: 1px solid #1c477f;
+    font-size: large;
 }
-.navigation a 
+table.navigation a 
 {
-  color: #770000;
-}
-.navigation a:visited 
-{
-  color: #550000;
+  color: #fff;
 }
 .navigation .title 
 {
@@ -55,17 +53,169 @@ div.gallery-spacer
 {
   clear: both;
 }
-a
-{
-  text-decoration: none;
+
+body {
+    font: medium/150% "Lucida Grande", sans-serif;
+    margin: 0; padding: 0px 0px 10px;
+    color: #333; background: #fff;
 }
-a:hover
-{
-  text-decoration: underline;
-  color: #FF0000;
+h1 {
+    color: #fff;
+    margin: 0;
+    padding: 7px 0 7px 15px;
+    text-shadow: 0px 1px 2px #000;
+    background: #005fd7 url(images/header_blue.png) repeat-x;
+    border-bottom: 1px solid #1c477f;
+    font-size: large;
 }
-body
-{
-  margin-left: 10%;
-  margin-right: 10%;
+h2 {
+    font-size: 1.2em;
+}
+h3 {
+    font-size: 1em;
+}
+body.error h1 {
+    background: #d70000;
+    border-bottom: 1px solid #7f0000;
+}
+.main {
+    padding: 7px 15px;
+}
+
+ul.no-bullet {
+  list-style-type: none;
+  padding: 0; margin: 0;
+}
+ul.no-bullet li {
+  padding: 0; margin: 0;
+}
+li.download {
+  line-height: 1em;
+  padding-bottom: 10px !important;
+}
+li.download .name {
+  font-weight: bold;
+  padding-left: 20px;
+}
+li.download .comment {
+  font-size: 0.8em;
+  color: #888;
+}
+li.download-c {
+  background: url(images/icon_c.png) no-repeat 0px 0px;
+}
+li.download-r {
+  background: url(images/icon_r.png) no-repeat 0px 0px;
+}
+li.download-python {
+  background: url(images/icon_python.png) no-repeat 0px 0px;
+}
+li.download-ruby {
+  background: url(images/icon_ruby.png) no-repeat 0px 0px;
+}
+ul.download-links {
+  list-style-type: none;
+  padding: 2px 0 0 20px; margin: 0;
+  font-size: 0.8em;
+}
+ul.download-links li {
+  padding: 0px 10px 0px 0px; margin: 0;
+  display: inline;
+  padding-bottom: 5px !important;
+}
+ul.download-links li.download-source {
+  background: url(images/icon_source.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+ul.download-links li.download-windows {
+  background: url(images/icon_windows.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+ul.download-links li.download-debian {
+  background: url(images/icon_debian.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+ul.download-links li.download-osx {
+  background: url(images/icon_osx.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+ul.download-links li.download-external {
+  background: url(images/icon_links.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+
+a { color: #00f; text-decoration: none }
+a:visited { color: #00c }
+a:hover { color: #00f; text-decoration: underline }
+h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
+h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
+h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
+
+/* Version info */
+#version_info {
+  float: right;
+  font-size: 0.8em;
+  color: #888;
+  padding: 3px 15px 0px 0px;
+}
+
+/* Menu items */
+ul.menu {
+  list-style-type: none;
+  padding: 0; margin: 0;
+}
+ul.menu-upper {
+  list-style-type: none;
+  padding: 0px 0px 0px 15px; margin: 0;
+}
+
+ul.menu li {
+  padding: 0px 0px 10px 20px;
+  margin: 0px;
+}
+ul.menu-upper li {
+  padding: 3px 10px 10px 20px;
+  font-size: 0.8em;
+  margin: 0px;
+  display: inline;
+}
+ul li.item-introduction {
+  background: url(images/icon_introduction.png) no-repeat 0px 3px;
+}
+ul li.item-download {
+  background: url(images/icon_download.png) no-repeat 0px 3px;
+}
+ul li.item-news {
+  background: url(images/icon_news.png) no-repeat 0px 3px;
+}
+ul li.item-documentation {
+  background: url(images/icon_documentation.png) no-repeat 0px 3px;
+}
+ul li.item-screenshots {
+  background: url(images/icon_screenshots.png) no-repeat 0px 3px;
+}
+ul li.item-community {
+  background: url(images/icon_community.png) no-repeat 0px 3px;
+}
+ul li.item-links {
+  background: url(images/icon_links.png) no-repeat 0px 3px;
+}
+ul li.item-license {
+  background: url(images/icon_license.png) no-repeat 0px 3px;
+}
+
+/* Forms */
+label {
+  display: block;
+  float: left;
+  width: 130px;
+  font-weight: bold;
+}
+label.normal {
+  color: #444;
+}
+div.explanation {
+  border-left: 130px solid white;
+  font-size: 0.8em;
+  color: #888;
 }

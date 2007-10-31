@@ -46,6 +46,10 @@ li.download .comment {
   font-size: 0.8em;
   color: #888;
 }
+p.comment {
+  font-size: 0.8em;
+  color: #888;
+}
 li.download-c {
   background: url(images/icon_c.png) no-repeat 0px 0px;
 }
@@ -85,6 +89,10 @@ ul.download-links li.download-debian {
 }
 ul.download-links li.download-osx {
   background: url(images/icon_osx.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+ul.download-links li.download-html {
+  background: url(images/icon_html.png) no-repeat 0px 0px;
   padding-left: 18px;
 }
 ul.download-links li.download-external {
@@ -179,4 +187,9 @@ div.explanation {
   font-size: 0.8em;
   color: #888;
 }
-
+.programlisting 
+{
+  background: #eeeeff;
+  border: solid 1px #4444ff;
+  padding: 0.5em;
+}

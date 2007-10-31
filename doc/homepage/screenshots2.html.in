@@ -1,0 +1,124 @@
+<h2>Screenshots</h2>
+
+<table cellpadding="10"><tr>
+<td><a name="1"/>
+<h3>The Fruchterman-Reingold layout algorithm</h3></td></tr>
+<tr><td valign="top">
+
+<p>The Fruchterman-Reingold is a robust algorithm to generate 
+visually appealing placements for vertices. It works well on unconnected 
+graphs and can be used up to a couple of thousand vertices.</p>
+
+<p>In this example we use the igraph R package, and its Cairo device, 
+as it can produce nice antialiased pictures. If you don't have the
+Cairo package installed, just remove the 
+<code>CairoX11()</code> line from the code.
+</p>
+
+<p>The <code>frgraphs()</code> function is <a href="frgraphs.R">available here.
+</a></p>
+
+<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+library(igraph)
+library(Cairo)
+
+graphs &lt;- frgraphs()
+lay &lt;- lapply(graphs, layout.fruchterman.reingold, niter=3000)
+
+CairoX11()
+# CairoPNG(file="frplots.png")
+par(mai=c(0,0,0,0))
+layout(matrix(1:16, nr=4, byrow=TRUE))
+layout.show(16)
+for (i in seq(along=graphs)) {
+  plot(graphs[[i]], layout=lay[[i]],
+       vertex.label=NA, vertex.size=13, edge.color="black",
+       vertex.color="red")
+}
+# dev.off()
+</pre>
+</td><td><img halign="left" valign="top" src="images/frplots.png"></td><td></tr>
+
+<tr><td>
+<a name="2"/>
+<h3>The <code>tkplot</code> editor of the R package</h3>
+</td></tr>
+<tr><td valign="top">
+<p>The igraph R package features an interactive graph layout editor
+for small graphs. It is a little toy only, but can be useful if you
+want to adjust the layout of small graphs. Here is how we generated 
+this picture:</p>
+<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+library(igraph)
+g &lt;- read.graph("karate.net", format="pajek")
+
+cs &lt;- leading.eigenvector.community.step(g)
+V(g)$color &lt;- ifelse(cs$membership==0, "lightblue", "green")
+
+scale &lt;- function(v, a, b) {
+  v &lt;- v-min(v) ; v &lt;- v/max(v) ; v &lt;- v * (b-a) ; v+a
+}
+
+V(g)$size &lt;- scale(abs(cs$eigenvector), 10, 20)
+E(g)$color &lt;- "grey"
+E(g)[ V(g)[ color=="lightblue" ] %--% V(g)[ color=="green" ] ]$color &lt;- "red"
+
+tkplot(g, layout=layout.kamada.kawai, vertex.label.font=2)
+</pre>
+<p>After hand-tuning the layout, you can obtain the new coordinates
+using the id of the plot, as shown on the window border:</p>
+<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+coords &lt;- tkplot.getcoords(7)
+</pre>
+<p>You can find the <a href="karate.net">karate.net file here.</a></p>
+</td>
+<td valign="top"><img halign="left" valign="top" src="images/tkplot.png">
+</td></tr>
+
+<tr><td>
+<a name="3"/>
+<h3>Transparency with the Cairo R package</h3>
+</td></tr>
+<tr><td valign="top">
+<p>The graphics device from the Cairo R package handles 
+transparency, we use this to plot one graph on top of another.</p>
+<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+library(igraph) ; library(Cairo)
+
+g &lt;- barabasi.game(100, power=0.6, m=10)
+V(g)$name &lt;- seq(vcount(g))-1
+g &lt;- simplify(g)
+l &lt;- layout.fruchterman.reingold(g)
+l &lt;- layout.norm(l, -1,1, -1,1) 
+
+fcs &lt;- fastgreedy.community(simplify(as.undirected(g)))
+Q &lt;- round(max(fcs$modularity), 3)
+fcs &lt;- community.to.membership(g, fcs$merges, steps=which.max(fcs$modularity)-1 )
+
+CairoX11() # or CairoPNG(file="fastgreedy.png")
+
+plot(g, layout=l, vertex.size=3, vertex.label=NA, vertex.color="#ff000033",
+     vertex.frame.color="#ff000033", edge.color="#55555533", edge.arrow.size=0.3,
+     rescale=FALSE, xlim=range(l[,1]), ylim=range(l[,2]),
+     main=paste(sep="", "Fast greedy community detection,\nQ=", Q))
+
+g2 &lt;- subgraph(g, which(fcs$membership==fcs$membership[1])-1)
+l2 &lt;- l[ which(fcs$membership==fcs$membership[1]), ]
+
+plot(g2, layout=l2, vertex.size=3, vertex.label=V(g2)$name,
+     vertex.color="#ff0000", vertex.frame.color="#ff0000", edge.color="#555555",
+     vertex.label.dist=0.5, vertex.label.cex=0.8, vertex.label.font=2,
+     edge.arrow.size=0.3, add=TRUE, rescale=FALSE)
+
+nodes &lt;- which(fcs$membership==fcs$membership[1])-1
+nodes &lt;- paste(collapse=", ", nodes)
+text(0,-1.3, nodes, col="blue")
+
+# dev.off()
+</pre>
+
+</td>
+<td><img halign="left" valign="top" src="images/fastgreedy.png">
+</td></tr>
+
+</table>

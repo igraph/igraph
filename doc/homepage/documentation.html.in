@@ -3,36 +3,27 @@
 <p>The latest released version of the <b>igraph</b> library is <b>$VERSION</b>.</p>
 
 <ul class="no-bullet download">
-<li class="download download-c">
-  <span class="name">igraph Reference Manual</span>
-  <span class="comment">&mdash; for those who want to use the C library
-  directly</span>
-  <ul class="download-links">
-    <li class="download-html">
-      <a href="doc/igraph-docs-${VERSION}.tar.gz">HTML bundle</a>
-    </li>
-    <li class="download-pdf">
-      <a href="doc/igraph-docs.pdf">PDF file</a>
-    </li>
-    <li class="download-info">
-      <a href="doc/igraph-docs.info">GNU info document</a>
-    </li>
-    <li class="download-external">
-      <a href="doc/html/index.html">Browse online</a>
-    </li>
-  </ul>
-</li>
-
 <li class="download download-r">
-  <span class="name">R interface</span>
-  <span class="comment">&mdash; for those who use <b>igraph</b> from R.
-  Also included in the R package.</span>
+  <span class="name">R package</span>
+  <span class="comment">&mdash; for those who use <b>igraph</b> from R.</span>
   <ul class="download-links">
+    <li class="download-external">
+      <a href="doc/R/00Index.html">Browse online</a>
+    </li>
     <li class="download-pdf">
       <a href="doc/R/igraph.pdf">PDF file</a>
     </li>
-    <li class="download-external">
-      <a href="doc/R/00Index.html">Browse online</a>
+    <br/>
+    <li><span class="comment">
+        Note that this documentation is included in the R
+	package. You can use <code>library(help="igraph")</code>
+	as a starting point.</span><br/>
+    </li>
+    <li><span class="comment">Another option is typing
+        <code>help.start()</code>
+	and choosing <i>Packages</i> and then <i>igraph</i>. Both these
+	methods require that the igraph package is installed on your
+	system.</span>
     </li>
   </ul>
 </li>
@@ -42,11 +33,47 @@
   <span class="comment">&mdash; for those who use the <b>igraph</b> Python
   module</span>
   <ul class="download-links">
+    <li class="download-external">
+      <a href="doc/python/index.html">Browse online</a>
+    </li>
     <li class="download-pdf">
       <a href="doc/python/igraph.pdf">PDF file</a>
     </li>
+    <br/>
+    <li><span class="comment">Documentation for the Python interface
+       is also included in the Python docstrings, so you can use
+       <code>pydoc</code> or the built-in Python help facility as well.</span>
+    </li>
+  </ul>
+</li>
+
+<li class="download download-c">
+  <span class="name">igraph Reference Manual</span>
+  <span class="comment">&mdash; for those who want to use the C library
+  directly</span>
+  <ul class="download-links">
     <li class="download-external">
-      <a href="doc/python/index.html">Browse online</a>
+      <a href="doc/html/index.html">Browse online</a>
+    </li>
+    <li class="download-pdf">
+      <a href="doc/igraph-docs.pdf">PDF file</a>
+    </li>
+    <li class="download-html">
+      <a href="doc/igraph-docs-${VERSION}.tar.gz">HTML bundle</a>
+    </li>
+    <li class="download-info">
+      <a href="doc/igraph-docs.info">GNU info document</a>
+    </li>
+    <br/>
+    <li><span class="comment">Note that the GNU info document is 
+        included in the source package of the C library.</span><br/>
+    </li>
+    <li><span class="comment">The original XML DocBook format of the
+        manual can be obtained by downloading the latest igraph
+        development version from <a
+	  href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public">
+	our repository</a>.
+        </span>
     </li>
   </ul>
 </li>
@@ -63,11 +90,3 @@
 </li>
 
 </ul>
-
-<p>The original XML DocBook format of the manual for the C core
-can be obtained by <a href="download.html#dev">downloading the
-latest development version</a>.</p>
-
-<p>Documentation for the Python interface is also included in the
-Python docstrings, so you can use <code>pydoc</code> or the built-in Python help facility
-as well.</p>

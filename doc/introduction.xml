@@ -1,70 +1,76 @@
 <?xml version="1.0"?>
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
-<!ENTITY igraph "<command>igraph</command>">
+<!ENTITY igraph "igraph">
 ]>
 
 <chapter id="igraph-introduction">
 <title>Introduction</title>
 
 <para>
-This is another library for creating and manipulating graphs. There
-is simply no other graph library out there which can be handle
-graphs of the size the author is confronted with
-efficiently. Whenever possible <command>igraph</command> tries to be also user
-friendly and portable.
+This is another library for creating and manipulating graphs.
+You can look at it two ways: first, igraph contains the implementation
+of quite a lot graph algorithms. These include classic graph
+algorithms like graph isomorphism, graph girth and connectivity and
+also the new wave graph algorithms like transitivity, graph motifs and 
+community structure detection. Skim through the table of contents
+or the index of this book to get an impression.</para>
+
+<para>
+Second, igraph provides a platform for the developing and/or
+implementing graph algorithms. It has a quite efficient data structure
+for representing graphs and a number of other data structures like
+flexible vectors, stacks, heaps, queues, adjacency lists to accomplish
+this. In fact these data structures evolved along the
+implementation of the classic and non-classic graph algorithms which
+make up the major part of the igraph library. This way they were fine tuned
+and checked for correctness several times.
 </para>
 
 <para>
-<command>igraph</command> started as an additional package to the GNU R
-statistical environment, and still some functions which are hard to
-implement in C are available only in R (like interactive
-graphics). Most functions are however now written in C and they can
-be compiled without R as a separate library. Still the author
-highly recommends R, as it is a sophisticated, well desinged,
-modern system.
+Our main goal with developing igraph was to create a graph library
+which is efficient on large but not extremely large graphs. More
+precisely, it is assumed that the graph(s) fit into the physical
+memory of the computer. Nowadays this means graphs with
+several million vertices and/or edges. Our definition of efficient is
+that it runs fast, both in theory and (more importantly) in practice.
 </para>
 
 <para>
-The advantage of the C version is that it is portable, can
-be used with other mathematical software (as soon as somebody
-writes the interfaces to it), and can be used for large scale
-scientific computation in the Condor environment we are
-using here at KFKI.
+We believe that one of the big strengths of igraph is that it can be
+embedded into a higher level language or environment. Two such
+embeddings (or interfaces if you look at them the other way)
+are currently being developed by us: igraph as a GNU R
+package and igraph as a Python extension module. A third embedding,
+being developed by another developer is a Ruby extension. Other are
+likely to come. The high level languages as R or Python make it
+possible to do use graph routines with mush greater comfort, without
+actually writing a single line of C code. They have some, usually very
+small, speed penalty compared to the C version, but add ease and much
+flexibility. This manual however covers only the C library. If you 
+want to use Python or GNU R, please see the documentation written
+specifically for these interfaces and come back here only if you're
+interested in some detail which is not covered in those documents.
 </para>
 
 <para>
-<command>igraph</command> also features a Python interface, and other interfaces
-can be added without too much pain.
+We still consider igraph as a child project. It has much room for
+development and we are sure that it will improve a lot in the near
+future. Any feedback we can get from the users is very important for
+us, as most of the time these questions and comments guide us in what
+to add and what to improve.
 </para>
 
-<section><title>Features</title>
-
-<itemizedlist>
-<listitem><para><command>igraph</command> contains functions for generating regular and
-  random graphs according to known algorithms and models in the
-  network theory literature. </para></listitem>
-<listitem><para><command>igraph</command> provides routines for manipulating graphs,
-  adding and removing edges and vertices. </para></listitem>
-<listitem><para>a set of structural property calculation functions like
-  degree, betweenness, etc. are also included. </para></listitem>
-<listitem><para>force based layout generators are included for smaller graphs,
-  another method is expected to be added for large graphs
-  soon.</para></listitem> 
-<listitem><para>a set of conversion functions are also included and will be
-  extended shortly.</para></listitem>
-<listitem><para><command>igraph</command> iterators provide a simple and efficient way
-  of walking through graphs.</para></listitem>
-<listitem><para><command>igraph</command> is well documented both for users and
-  developers.</para></listitem> 
-<listitem><para><command>igraph</command> is open source and distributed under GNU
-  GPL.</para></listitem> 
-</itemizedlist>
-</section>
-
-<section><title><command>igraph</command> is free software</title>
 <para>
-    IGraph library
+igraph is open source and distributed under the terms of the GNU GPL.
+We strongly believe that all the algorithms used in science, let that
+be graph theory or not, should have an efficient open source
+implementation allowing use and modification for anyone.
+</para>
+
+<section><title>&igraph; is free software</title>
+<para>
+    igraph library
 </para><para>
     Copyright (C) 2003, 2004, 2005  Gabor Csardi &lt;csardi@rmki.kfki.hu>
     MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
@@ -85,9 +91,9 @@ can be added without too much pain.
 </para>
 </section>
 
-<section><title>Citing <command>igraph</command></title>
+<section><title>Citing &igraph;</title>
 <para>
-To cite <command>igraph</command> in publications, please use the following
+To cite &igraph; in publications, please use the following
 reference:
 </para><para>
 Gábor Csárdi, Tamás Nepusz: The igraph software package for complex network

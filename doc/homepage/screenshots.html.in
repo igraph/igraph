@@ -1,0 +1,15 @@
+<h2>Screenshots</h2>
+
+<p>Click on the images to see the source code used for generating them.</p>
+
+<table cellpadding="10"><tr><td valign="top">
+<p align="center" class="comment">Fruchterman-Reingold algorithm<br/>
+<a href="screenshots2.html#1"><img width="250" src="images/frplots.png" border="0"></a>
+</p></td><td valign="top">
+<p align="center" class="comment"><code>tkplot</code> in the R package<br/>
+<a href="screenshots2.html#2"><img width="250" src="images/tkplot.png" border="0"></a>
+</td><td valign="top">
+<p align="center" class="comment">Plotting with transparency<br/>
+<a href="screenshots2.html#3"><img width="250" src="images/fastgreedy.png" border="0"></a>
+</td></tr>
+</table>

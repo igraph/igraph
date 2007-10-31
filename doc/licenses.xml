@@ -6,7 +6,7 @@
 ]>
 
 <chapter id="igraph-Licenses">
-<title>Licenses for <command>igraph</command> and this manual</title>
+<title>Licenses for igraph and this manual</title>
 
   <xi:include href="gpl.xml"/>
   <xi:include href="fdl.xml"/>
