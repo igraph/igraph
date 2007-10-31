@@ -37,7 +37,8 @@ int main() {
 
   igraph_arpack_options_init(&options);
   igraph_vector_init(&v, 0);
-  igraph_eigenvector_centrality(&g, &v, &value, /*scale=*/0, &options);
+  igraph_eigenvector_centrality(&g, &v, &value, /*scale=*/0, /*weights=*/0, 
+				&options);
 
   if (options.info != 0) {
     return 1;
