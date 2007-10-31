@@ -31,7 +31,7 @@ void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges, FI
 
   i=igraph_vector_which_max(mod);
   fprintf(f, "Modularity:  %f\n", VECTOR(*mod)[i]);
-  igraph_community_to_membership(g, merges, i, &membership, 0);
+  igraph_community_to_membership(merges, igraph_vcount(g), i, &membership, 0);
   printf("Membership: ");
   for (i=0; i<igraph_vector_size(&membership); i++) {
     printf("%li ", (long int)VECTOR(membership)[i]);

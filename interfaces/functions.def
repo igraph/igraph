@@ -642,6 +642,11 @@ igraph_community_to_membership:
                 OUT VECTOR membership, OUT VECTOR csize
         IGNORE: RR, RC, RNamespace
 
+igraph_le_community_to_membership:
+        PARAMS: MATRIX merges, INTEGER steps, INOUT VECTOR membership, \
+                OUT VECTOR_OR_0 csize
+        NAME-R: community.le.to.membership
+
 igraph_modularity:
         PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity
         IGNORE: RR, RC, RNamespace

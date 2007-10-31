@@ -448,13 +448,13 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
 
-int igraph_community_to_membership(const igraph_t *graph,
-				   const igraph_matrix_t *merges,
+int igraph_community_to_membership(const igraph_matrix_t *merges,
+				   igraph_integer_t nodes,
 				   igraph_integer_t steps,
 				   igraph_vector_t *membership,
 				   igraph_vector_t *csize) {
   
-  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_nodes=nodes;
   long int components=no_of_nodes-steps;
   long int i, found=0;
   igraph_vector_t tmp;
@@ -1545,3 +1545,66 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_le_community_to_membership(const igraph_matrix_t *merges,
+				      igraph_integer_t steps,
+				      igraph_vector_t *membership,
+				      igraph_vector_t *csize) {
+
+  long int no_of_nodes=igraph_vector_size(membership);
+  igraph_vector_t fake_memb;
+  long int components, i;
+
+  if (igraph_matrix_nrow(merges) < steps) {
+    IGRAPH_ERROR("`steps' to big or `merges' matrix too short", IGRAPH_EINVAL);
+  }    
+  
+  components=igraph_vector_max(membership)+1;
+  if (components > no_of_nodes) { 
+    IGRAPH_ERROR("Invalid membership vector, too many components", IGRAPH_EINVAL);
+  }
+  if (steps >= components) {
+    IGRAPH_ERROR("Cannot make `steps' steps from supplied membership vector",
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&fake_memb, components);
+  
+  /* Check membership vector */
+  for (i=0; i<no_of_nodes; i++) {
+    if (VECTOR(*membership)[i] < 0) {
+      IGRAPH_ERROR("Invalid membership vector, negative id", IGRAPH_EINVAL);
+    }
+    VECTOR(fake_memb)[ (long int) VECTOR(*membership)[i] ] += 1;
+  }
+  for (i=0; i<components; i++) {
+    if (VECTOR(fake_memb)[i] == 0) {
+      IGRAPH_ERROR("Invalid membership vector, empty cluster", IGRAPH_EINVAL);
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_community_to_membership(merges, components, steps, 
+					      &fake_memb, 0));
+  
+  /* Ok, now we have the membership of the initial components, 
+     rewrite the original membership vector. */
+
+  if (csize) {
+    IGRAPH_CHECK(igraph_vector_resize(csize, components-steps));
+    igraph_vector_null(csize);
+  }
+
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(*membership)[i] = VECTOR(fake_memb)[ (long int) VECTOR(*membership)[i] ];
+    if (csize) {
+      VECTOR(*csize)[ (long int) VECTOR(*membership)[i] ] += 1;
+    }
+  }
+
+  igraph_vector_destroy(&fake_memb);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;  
+}
+
+  
+				      

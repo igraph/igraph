@@ -1,5 +1,11 @@
 2007-10-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/community.c (igraph_le_community_to_membership) : added
+
+	* src/community.c (igraph_community_to_membership) : different
+	arguments, graph is not needed, only the number of vertices
+	* examples/simple/igraph_community_fastgreedy.c : updated
+
 	* examples/simple/eigenvector_centrality.c : test case corrected
 
 	* src/games.c (igraph_grg_game) : added 'x' and 'y' arguments
