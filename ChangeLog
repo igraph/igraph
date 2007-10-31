@@ -1,3 +1,12 @@
+2007-10-31  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/community.c (igraph_community_leading_eigenvector) : bug 
+	corrected
+
+	* src/community.c (igraph_community_leading_eigenvector)
+	(igraph_community_leading_eigenvector_naive)
+	(igraph_community_leading_eigenvector_step) : stop at negative eigenvalue
+
 2007-10-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/community.c (igraph_le_community_to_membership) : added

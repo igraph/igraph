@@ -860,6 +860,9 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     }
 
     /* Ok, we have the eigenvector */
+
+    /* Non-positive eigenvalue */
+    if (VECTOR(d)[0] <= 0) { continue; }
     
     /* We create an index vector in x2 to renumber the vertices */
     l=0; m=0;
@@ -917,8 +920,6 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
       IGRAPH_CHECK(igraph_dqueue_push(&tosplit, comm));
     }
 
-    /* TODO: do not do any merge if negative */
-    if (VECTOR(d)[0] < 0) { break; } /* Negative eigenvalue */
   }
   
   igraph_Free(select);
@@ -1033,7 +1034,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
   /* These are for the ARPACK routines */
   long int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
-    lworkl=ncv*(ncv+8), info, ishfts, mode1, rvec=1, maxit=300;
+    lworkl=ncv*(ncv+8), info, ishfts, mode1, rvec=1, maxit=3000;
   igraph_real_t sigma, tol=0;
   igraph_vector_t v, workl, workd, d, resid, ax;
   char *bmat="I", *LA="LA", *all="All", *which=LA;
@@ -1081,7 +1082,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   
   while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
     long int comm=igraph_dqueue_pop_back(&tosplit); /* depth first search */
-    igraph_real_t ktx=0.0;
+    igraph_real_t ktx=0.0, ktx2=0.0;
     igraph_real_t kig;
     igraph_real_t comm_edges;
     long int size=0;
@@ -1118,43 +1119,48 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 	long int j, nlen;
 	igraph_real_t *from=VECTOR(workd)+ipntr[0]-1;
 	igraph_real_t *to=VECTOR(workd)+ipntr[1]-1;
-	
+
 	/* Calculate Ax first */
-	comm_edges=0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  nlen=igraph_vector_size(neis);
-	  comm_edges += nlen;
-	  kig=0;
 	  to[j]=0.0;
+	  VECTOR(x2)[j]=0.0;
 	  for (k=0; k<nlen; k++) {
 	    long int nei=VECTOR(*neis)[k];
 	    if (VECTOR(*mymembership)[nei]==comm) {
-	      kig+=1;	      
 	      to[j] += from[ (long int) VECTOR(idx2)[nei] ];
+	      VECTOR(x2)[j] += 1;
 	    }
 	  }
-	  to[j] -= kig * from[j];
 	}
-	
+
 	/* Now calculate k^Tx/2m */
-	ktx=0.0;
+	ktx=0.0; ktx2=0.0;
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
 	  long int degree=igraph_vector_size(neis);
-	  to[j] += degree * comm_edges / no_of_edges * from[j]/2;
 	  ktx += from[j] * degree;
+	  ktx2 += degree;
 	}
-	ktx = ktx / no_of_edges / 2;
+	ktx = ktx / no_of_edges/2.0;
+	ktx2 = ktx2 / no_of_edges/2.0;
 	
 	/* Now calculate Bx */
 	for (j=0; j<size; j++) {
 	  long int oldid=VECTOR(idx)[j];
 	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
-	  long int degree=igraph_vector_size(neis);
-	  to[j] = to[j] - ktx*degree + degree*degree*from[j]/no_of_edges/2;
+	  igraph_real_t degree=igraph_vector_size(neis);
+	  to[j] = to[j] - ktx*degree + degree*degree*from[j]/no_of_edges/2.0;
+	  VECTOR(x2)[j] = VECTOR(x2)[j] - ktx2*degree + 
+	    degree*degree*1.0/no_of_edges/2.0;
+	}
+
+	/* -d_ij summa l in G B_il */
+	for (j=0; j<size; j++) {
+	  to[j] -= VECTOR(x2)[j] * from[j];
 	}
 	
       } else {
@@ -1162,7 +1168,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       }
     } /* while 1, we have the eigenvalue if no error */
 
-    if (info < 0) {
+    if (info != 0) {
       fprintf(stderr, "ARPACK error %i\n", (int)info);
       IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
     }
@@ -1196,6 +1202,9 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
     /* Ok, we have the eigenvector */
 
+    /* If the eigenvalue is not positive then we're done */
+    if (VECTOR(d)[0] <= 0) { continue; }
+
     /* Count the number of vertices in each community after the split */
     l=0;
     for (j=0; j<size; j++) {
@@ -1228,8 +1237,6 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       IGRAPH_CHECK(igraph_dqueue_push(&tosplit, comm));
     }
 
-    /* TODO: do not do any merge if negative */
-    if (VECTOR(d)[0] < 0) { break; }
   }
   
   igraph_Free(select);
@@ -1507,20 +1514,26 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   
   /* Ok, we have the eigenvector */
 
-  /* Rewrite the membership vector, check if there was a split */
-  for (j=0, k=0; j<size; j++) {
-    if (VECTOR(*myeigenvector)[j] <= 0) {
-      long int oldid=VECTOR(idx)[j];
-      VECTOR(*membership)[oldid]=communities;
-      k++;
+  /* Negative eigenvalue? */
+  if (VECTOR(d) <= 0) {
+    if (split) { *split=0; }
+  } else {
+    
+    /* Rewrite the membership vector, check if there was a split */
+    for (j=0, k=0; j<size; j++) {
+      if (VECTOR(*myeigenvector)[j] <= 0) {
+	long int oldid=VECTOR(idx)[j];
+	VECTOR(*membership)[oldid]=communities;
+	k++;
+      }
     }
-  }
-  
-  if (split) {
-    if (k>0) {
-      *split=1;
-    } else {
-      *split=0;
+    
+    if (split) {
+      if (k>0) {
+	*split=1;
+      } else {
+	*split=0;
+      }
     }
   }
 
