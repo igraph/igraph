@@ -223,10 +223,15 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
         PACKAGE="igraph")
 }
 
-grg.game <- function(nodes, radius, torus=FALSE) {
-  .Call("R_igraph_grg_game", as.double(nodes), as.double(radius),
-        as.logical(torus),
-        PACKAGE="igraph")
+grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE) {
+  res <- .Call("R_igraph_grg_game", as.double(nodes), as.double(radius),
+               as.logical(torus), as.logical(coords),
+               PACKAGE="igraph")
+  if (coords) {
+    V(res[[1]])$x <- res[[2]]
+    V(res[[1]])$y <- res[[3]]
+  }
+  res[[1]]
 }
 
 preference.game <- function(nodes, types, type.dist=rep(1, types),

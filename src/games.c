@@ -1432,36 +1432,48 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
  */
 				    
 int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
-		    igraph_real_t radius, igraph_bool_t torus) {
+		    igraph_real_t radius, igraph_bool_t torus,
+		    igraph_vector_t *x, igraph_vector_t *y) {
   
   long int i;
-  igraph_vector_t x, y, edges;
+  igraph_vector_t myx, myy, *xx=&myx, *yy=&myy, edges;
   igraph_real_t r2=radius*radius;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes));
-  IGRAPH_VECTOR_INIT_FINALLY(&x, nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&y, nodes);
+
+  if (x) { 
+    xx=x;
+    IGRAPH_CHECK(igraph_vector_resize(xx, nodes));
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(xx, nodes);
+  }
+  if (y) {
+    yy=y;
+    IGRAPH_CHECK(igraph_vector_resize(yy, nodes));
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(yy, nodes);
+  }
   
   RNG_BEGIN();
   
   for (i=0; i<nodes; i++) {
-    VECTOR(x)[i]=RNG_UNIF01();
-    VECTOR(y)[i]=RNG_UNIF01();
+    VECTOR(*xx)[i]=RNG_UNIF01();
+    VECTOR(*yy)[i]=RNG_UNIF01();
   }
   
   RNG_END();
 
-  igraph_vector_sort(&x);
+  igraph_vector_sort(xx);
 
   if (!torus) {
     for (i=0; i<nodes; i++) {
-      igraph_real_t x1=VECTOR(x)[i];
-      igraph_real_t y1=VECTOR(y)[i];
+      igraph_real_t x1=VECTOR(*xx)[i];
+      igraph_real_t y1=VECTOR(*yy)[i];
       long int j=i+1;
       igraph_real_t dx, dy;
-      while ( j<nodes && (dx=VECTOR(x)[j] - x1) < radius) {
-	dy=VECTOR(y)[j]-y1;
+      while ( j<nodes && (dx=VECTOR(*xx)[j] - x1) < radius) {
+	dy=VECTOR(*yy)[j]-y1;
 	if (dx*dx+dy*dy < r2) {
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
 	  IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
@@ -1471,12 +1483,12 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
     }
   } else { 
     for (i=0; i<nodes; i++) {
-      igraph_real_t x1=VECTOR(x)[i];
-      igraph_real_t y1=VECTOR(y)[i];
+      igraph_real_t x1=VECTOR(*xx)[i];
+      igraph_real_t y1=VECTOR(*yy)[i];
       long int j=i+1;
       igraph_real_t dx, dy;
-      while ( j<nodes && (dx=VECTOR(x)[j] - x1) < radius) {
-	dy=fabs(VECTOR(y)[j]-y1);
+      while ( j<nodes && (dx=VECTOR(*xx)[j] - x1) < radius) {
+	dy=fabs(VECTOR(*yy)[j]-y1);
 	if (dx > 0.5) {
 	  dx=1-dx;
 	}
@@ -1491,9 +1503,9 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
       }
       if (j==nodes) {
 	j=0;      
-	while (j<i && (dx=1-x1+VECTOR(x)[j]) < radius && 
-	       x1-VECTOR(x)[j]>=radius) {
-	  dy=fabs(VECTOR(y)[j]-y1);
+	while (j<i && (dx=1-x1+VECTOR(*xx)[j]) < radius && 
+	       x1-VECTOR(*xx)[j]>=radius) {
+	  dy=fabs(VECTOR(*yy)[j]-y1);
 	  if (dy > 0.5) {
 	    dy=1-dy;
 	  }
@@ -1507,9 +1519,14 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
     }
   }
   
-  igraph_vector_destroy(&y);
-  igraph_vector_destroy(&x);
-  IGRAPH_FINALLY_CLEAN(2);
+  if (!y) {
+    igraph_vector_destroy(yy);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (!x) {
+    igraph_vector_destroy(xx);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   IGRAPH_CHECK(igraph_create(graph, &edges, nodes, IGRAPH_UNDIRECTED));
   igraph_vector_destroy(&edges);

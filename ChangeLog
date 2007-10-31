@@ -1,3 +1,8 @@
+2007-10-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_grg_game) : added 'x' and 'y' arguments
+	* examples/simple/igraph_grg_game.c : updated
+
 2007-10-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_eigenvector_centrality) : add support for

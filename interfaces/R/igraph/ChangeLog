@@ -1,5 +1,8 @@
 2007-10-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/games.R (grg.game) : add 'coords' argument
+	* interfaces/R/src/rinterface.c.in (R_igraph_grg_game) : updated
+
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : 'add' argument added
 
 2007-10-29  Gabor Csardi  <csardi@rmki.kfki.hu>

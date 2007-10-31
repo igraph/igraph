@@ -38,14 +38,14 @@ int main() {
   igraph_real_t r=0.01;
   
   /* Empty graph */
-  igraph_grg_game(&g, 100, 0, 0);
+  igraph_grg_game(&g, 100, 0, 0, 0, 0);
   if (igraph_ecount(&g) != 0) {
     return 1;
   }
   igraph_destroy(&g);
   
   /* Full graph */
-  igraph_grg_game(&g, 10, sqrt(2.0)/2, 1);
+  igraph_grg_game(&g, 10, sqrt(2.0)/2, 1, 0, 0);
   if (igraph_ecount(&g) != igraph_vcount(&g) * (igraph_vcount(&g)-1)/2) {
     return 2;
   }

@@ -4853,19 +4853,31 @@ SEXP R_igraph_es_adj(SEXP graph, SEXP x, SEXP pv, SEXP pmode) {
   return result;
 }
 
-SEXP R_igraph_grg_game(SEXP pn, SEXP pradius, SEXP ptorus) {
+SEXP R_igraph_grg_game(SEXP pn, SEXP pradius, SEXP ptorus, 
+		       SEXP pcoords) {
   
   igraph_t g;
   igraph_integer_t n=REAL(pn)[0];
   igraph_real_t radius=REAL(pradius)[0];
   igraph_bool_t torus=LOGICAL(ptorus)[0];
-  SEXP result;
+  igraph_bool_t coords=LOGICAL(pcoords)[0];
+  igraph_vector_t x, y, *px=0, *py=0;
+  SEXP result, names;
 
   R_igraph_before();
   
-  igraph_grg_game(&g, n, radius, torus);
-  PROTECT(result=R_igraph_to_SEXP(&g));
+  if (coords) {
+    igraph_vector_init(&x, 0);  px=&x;
+    igraph_vector_init(&y, 0);  py=&y;
+  }
+  igraph_grg_game(&g, n, radius, torus, px, py);
+  PROTECT(result=NEW_LIST(3));
+  SET_VECTOR_ELT(result, 0, R_igraph_to_SEXP(&g));
   igraph_destroy(&g);
+  SET_VECTOR_ELT(result, 1, R_igraph_0orvector_to_SEXP(px));
+  if (coords) { igraph_vector_destroy(px); }
+  SET_VECTOR_ELT(result, 2, R_igraph_0orvector_to_SEXP(py));
+  if (coords) { igraph_vector_destroy(py); }
   
   R_igraph_after();
   
