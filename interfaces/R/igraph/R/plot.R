@@ -22,7 +22,7 @@
 
 plot.igraph <- function(x, 
                        # SPECIFIC: #####################################
-                       axes=FALSE, xlab="", ylab="",
+                       axes=FALSE, xlab="", ylab="", add=FALSE,
                        xlim=c(-1,1), ylim=c(-1,1),
                        ...) {
 
@@ -73,8 +73,10 @@ plot.igraph <- function(x,
     xlim <- c(xlim[1]-margin[2]-maxv, xlim[2]+margin[4]+maxv)
     ylim <- c(ylim[1]-margin[1]-maxv, ylim[2]+margin[3]+maxv)
   }
-  plot(0, 0, type="n", xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim,
-       axes=axes, asp=asp)
+  if (!add) {
+    plot(0, 0, type="n", xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim,
+         axes=axes, asp=asp)
+  }
   
   # add the edges
   el <- get.edgelist(graph, names=FALSE)

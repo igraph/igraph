@@ -1,3 +1,7 @@
+2007-10-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : 'add' argument added
+
 2007-10-29  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.common.R (i.parse.plot.params) :
