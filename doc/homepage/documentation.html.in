@@ -13,19 +13,16 @@
     <li class="download-pdf">
       <a href="doc/R/igraph.pdf">PDF file</a>
     </li>
-    <br/>
-    <li><span class="comment">
-        Note that this documentation is included in the R
-	package. You can use <code>library(help="igraph")</code>
-	as a starting point.</span><br/>
-    </li>
-    <li><span class="comment">Another option is typing
-        <code>help.start()</code>
-	and choosing <i>Packages</i> and then <i>igraph</i>. Both these
-	methods require that the igraph package is installed on your
-	system.</span>
-    </li>
   </ul>
+  <div class="comment">
+  <div>Note that this documentation is included in the R
+  package. You can use <code>library(help="igraph")</code>
+  as a starting point.</div>
+  <div>Another option is typing <code>help.start()</code>,
+  choosing <i>Packages</i> and then <i>igraph</i>. Both of these
+  methods require that the igraph package is installed on your
+  system.</div>
+  </div>
 </li>
 
 <li class="download download-python">
@@ -39,12 +36,11 @@
     <li class="download-pdf">
       <a href="doc/python/igraph.pdf">PDF file</a>
     </li>
-    <br/>
-    <li><span class="comment">Documentation for the Python interface
-       is also included in the Python docstrings, so you can use
-       <code>pydoc</code> or the built-in Python help facility as well.</span>
-    </li>
   </ul>
+  <div class="comment">Documentation for the Python interface
+  is also included in the Python docstrings, so you can use
+  <code>pydoc</code> or the built-in Python help facility as well.
+  </div>
 </li>
 
 <li class="download download-c">
@@ -64,23 +60,21 @@
     <li class="download-info">
       <a href="doc/igraph-docs.info">GNU info document</a>
     </li>
-    <br/>
-    <li><span class="comment">Note that the GNU info document is 
-        included in the source package of the C library.</span><br/>
-    </li>
-    <li><span class="comment">The original XML DocBook format of the
-        manual can be obtained by downloading the latest igraph
-        development version from <a
-	  href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public">
-	our repository</a>.
-        </span>
-    </li>
   </ul>
+  <div class="comment">
+  <div>Note that the GNU info document is 
+  included in the source package of the C library.</div>
+  <div>The original XML DocBook format of the
+  manual can be obtained by downloading the latest igraph
+  development version from <a
+  href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public">
+  our repository</a>.</div>
+  </div>
 </li>
 
 <li class="download download-doc">
   <span class="name">Network analysis with igraph</span>
-  <span class="comment">&mdash; under development!</span>
+  <span class="comment">&mdash; tutorial, under development!</span>
   <ul class="download-links">
     <li class="download-external">
       <a href="/igraphbook">Browse online</a>

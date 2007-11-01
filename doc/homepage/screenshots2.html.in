@@ -1,10 +1,12 @@
 <h2>Screenshots</h2>
 
-<table cellpadding="10"><tr>
-<td><a name="1"/>
-<h3>The Fruchterman-Reingold layout algorithm</h3></td></tr>
-<tr><td valign="top">
+<a name="1"></a>
 
+<h3>The Fruchterman-Reingold layout algorithm</h3>
+
+<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/frplots.png"/>
+
+<div style="border-right: 490px solid white">
 <p>The Fruchterman-Reingold is a robust algorithm to generate 
 visually appealing placements for vertices. It works well on unconnected 
 graphs and can be used up to a couple of thousand vertices.</p>
@@ -15,10 +17,10 @@ Cairo package installed, just remove the
 <code>CairoX11()</code> line from the code.
 </p>
 
-<p>The <code>frgraphs()</code> function is <a href="frgraphs.R">available here.
-</a></p>
+<p>The <code>frgraphs()</code> function is <a href="frgraphs.R">available
+here</a>.</p>
 
-<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+<pre class="programlisting condensed">
 library(igraph)
 library(Cairo)
 
@@ -37,18 +39,21 @@ for (i in seq(along=graphs)) {
 }
 # dev.off()
 </pre>
-</td><td><img halign="left" valign="top" src="images/frplots.png"></td><td></tr>
+</div>
 
-<tr><td>
-<a name="2"/>
-<h3>The <code>tkplot</code> editor of the R package</h3>
-</td></tr>
-<tr><td valign="top">
+<hr style="clear:both"/>
+
+<a name="2"></a>
+
+<h3 style="clear:both">The <code>tkplot</code> editor of the R package</h3>
+
+<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/tkplot.png"/>
+<div style="border-right: 490px solid white">
 <p>The igraph R package features an interactive graph layout editor
 for small graphs. It is a little toy only, but can be useful if you
 want to adjust the layout of small graphs. Here is how we generated 
 this picture:</p>
-<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+<pre class="programlisting condensed">
 library(igraph)
 g &lt;- read.graph("karate.net", format="pajek")
 
@@ -70,19 +75,20 @@ using the id of the plot, as shown on the window border:</p>
 <pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
 coords &lt;- tkplot.getcoords(7)
 </pre>
-<p>You can find the <a href="karate.net">karate.net file here.</a></p>
-</td>
-<td valign="top"><img halign="left" valign="top" src="images/tkplot.png">
-</td></tr>
+<p>You can find the <a href="karate.net">karate.net file here</a>.</p>
+</div>
 
-<tr><td>
-<a name="3"/>
-<h3>Transparency with the Cairo R package</h3>
-</td></tr>
-<tr><td valign="top">
+<hr style="clear:both"/>
+
+<a name="3"></a>
+<h3 style="clear:both">Transparency with the Cairo R package</h3>
+
+<img class="float_right" width="497" height="596" alt="Illustration" src="images/screenshots/fastgreedy.png">
+
+<div style="border-right: 500px solid white">
 <p>The graphics device from the Cairo R package handles 
 transparency, we use this to plot one graph on top of another.</p>
-<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+<pre class="programlisting condensed">
 library(igraph) ; library(Cairo)
 
 g &lt;- barabasi.game(100, power=0.6, m=10)
@@ -116,9 +122,103 @@ text(0,-1.3, nodes, col="blue")
 
 # dev.off()
 </pre>
+</div>
 
-</td>
-<td><img halign="left" valign="top" src="images/fastgreedy.png">
-</td></tr>
+<hr style="clear:both"/>
 
-</table>
+<a name="4"></a>
+
+<h3 style="clear:both">Components of an Erd&#x0151;s-R&#x00e9;nyi random graph</h3>
+
+<img class="float_right" width="480" height="480" src="images/screenshots/erdos_renyi_components.png" alt="Illustration"/>
+<div style="border-right: 490px solid white">
+<p>Erd&#x0151;s-R&#x00e9;nyi random graphs have a fixed number of vertices
+(given by the parameter <i>n</i>) and a fixed number of edges (given by
+<i>m</i>) that are placed between pairs of vertices with equal probability.
+When one increases <i>m</i> gradually, small disconnected tree-like
+components will appear, but there exists a threshold <i>m'</i>
+(depending on <i>n</i>) where a giant component appears suddenly.</p>
+<p>In this visualization, we used the Python interface to show an
+Erd&#x0151;s-R&#x00e9;nyi graph near its threshold <i>m'</i>.
+Components are colored with different colors according to their size,
+isolated vertices are colored with light gray.</p>
+
+<pre class="programlisting condensed">
+from igraph import *
+
+g = Graph.Erdos_Renyi(n=300, m=250)
+colors = ["lightgray", "cyan", "magenta", "yellow", "blue", "green", "red"]
+for component in g.components():
+  color = colors[min(6, len(component)-1)]
+  for vidx in component: g.vs[vidx]["color"] = color
+  
+plot(g, layout="fr", vertex_label=None)
+</pre>
+</div>
+
+<hr style="clear:both"/>
+
+<a name="5"></a>
+
+<h3 style="clear:both">Kautz graph and its adjacency matrix</h3>
+
+<img class="float_right" width="480" height="480" src="images/screenshots/kautz.png" alt="Illustration"/>
+<div style="border-right: 490px solid white">
+<p>Kautz graphs are regular graphs used for processor connection patterns
+in high-performance and fault-tolerant computing (see its
+<a href="http://en.wikipedia.org/wiki/Kautz_graph">Wikipedia entry</a>
+for details). <b>igraph</b> is able to generate Kautz graphs (and their
+counterparts, <a href="http://en.wikipedia.org/wiki/De_Bruijn_graph">De
+Bruijn graphs</a>). Here we used the Python interface to visualize a
+Kautz graph with M=3 and N=2 along with its adjacency matrix to decipher
+the inner structure of the graph. The adjacency matrix is shown as an
+inset in the upper right corner with opacity 0.7.</p>
+
+<pre class="programlisting condensed">
+from igraph import *
+
+g = Graph.Kautz(m=3, n=2)
+adj = g.get_adjacency()
+fig = Plot(bbox=(480, 480))
+fig.add(g, layout="fr", vertex_label=None)
+fig.add(adj, bbox=(360, 0, 480, 120), grid_width=0, opacity=0.7)
+fig.show()
+</pre>
+</div>
+
+<hr style="clear:both"/>
+
+<a name="6"></a>
+
+<h3 style="clear:both">Minimum spanning tree of a geometric random graph</h3>
+
+<img class="float_right" width="480" height="480" src="images/screenshots/mst.png" alt="Illustration"/>
+<div style="border-right: 490px solid white">
+<p>The image on the right shows a geometric random graph with 100
+vertices dropped randomly onto the unit squre. Two vertices are
+connected if and only if their distance is less than 0.2. The edge
+weights correspond to the distance of the two endpoints, while the
+widths of the edges are proportional to the closeness of the endpoints
+(the closer they are, the thicker the edge is). Red edges show the
+calculated minimum weight spanning tree of the graph.</p>
+
+<pre class="programlisting condensed">
+from igraph import *
+
+def distance(p1, p2):
+    return ((p1[0]-p2[0]) ** 2 + (p1[1]-p2[1]) ** 2) ** 0.5
+    
+g, xs, ys = Graph.GRG(100, 0.2, return_coordinates=True)
+layout = Layout(zip(xs, ys))
+
+weights = [distance(layout[edge.source], layout[edge.target]) for edge in g.es]
+max_weight = max(weights)
+g.es["width"] = [6 - 5*weight/max_weight for weight in weights]
+mst = g.spanning_tree(weights)
+
+fig = Plot()
+fig.add(g, layout=layout, opacity=0.25, vertex_label=None)
+fig.add(mst, layout=layout, edge_color="red", vertex_label=None)
+fig.show()
+</pre>
+</div>

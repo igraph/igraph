@@ -16,7 +16,7 @@
       <a href="download/igraph_${VERSION}.zip">Windows binary</a>
     </li>
     <li class="download-osx">
-      <a href="download/igraph_${VERSION}.tgz">Mac OSX universal binary</a>
+      <a href="download/igraph_${VERSION}.tgz">Mac OS X universal binary</a>
     </li>
     <li class="download-source">
       <a href="download/igraph_${VERSION}.tar.gz">Source package
@@ -30,14 +30,14 @@
   <span class="comment">&mdash; Download this if you would like to use
   igraph as a Python extension module</span>
   <ul class="download-links">
+    <li class="download-windows">
+      <a href="http://pypi.python.org/packages/2.4/i/igraph/igraph-${VERSION}.win32-py2.4.exe">Windows binary (Python 2.4)</a>
+    </li>
+    <li class="download-windows">
+      <a href="http://pypi.python.org/packages/2.5/i/igraph/igraph-${VERSION}.win32-py2.5.exe">Windows binary (Python 2.5)</a>
+    </li>
     <li class="download-source">
-      <a href="http://pypi.python.org/packages/source/i/igraph/igraph-${VERSION}.tar.gz">Source code</a>
-    </li>
-    <li class="download-windows">
-      <a href="http://pypi.python.org/packages/2.4/i/igraph/igraph-${VERSION}.win32-py2.4.exe">Windows installer for Python 2.4</a>
-    </li>
-    <li class="download-windows">
-      <a href="http://pypi.python.org/packages/2.5/i/igraph/igraph-${VERSION}.win32-py2.5.exe">Windows installer for Python 2.5</a>
+      <a href="http://pypi.python.org/packages/source/i/igraph/igraph-${VERSION}.tar.gz">Source package (for Linux and OS X)</a>
     </li>
     <li class="download-external">
       <a href="http://python.org/pypi/igraph">Python Package Index page</a>

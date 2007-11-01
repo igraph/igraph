@@ -4,6 +4,7 @@ body {
     margin: 0; padding: 0 0 10px;
     color: #333; background: #fff;
 }
+a img { border: 0; }
 h1 {
     color: #fff;
     margin: 0;
@@ -23,8 +24,22 @@ body.error h1 {
     background: #d70000;
     border-bottom: 1px solid #7f0000;
 }
+hr {
+  color: #888; background-color: #888;
+  height: 1px; width: 100%;
+  border: 0;
+}
+code { font-size: 1.2em; }
+img.float_right { float: right }
+img.float_left { float: left }
+pre.condensed { font-size: 0.8em; line-height: 1.5em; }
+
 .main {
     padding: 7px 15px;
+}
+.more {
+    text-align: right;
+    margin-top: -1em;
 }
 
 ul.no-bullet {
@@ -42,13 +57,22 @@ li.download .name {
   font-weight: bold;
   padding-left: 20px;
 }
-li.download .comment {
+li.download span.comment {
   font-size: 0.8em;
   color: #888;
+}
+li.download div.comment {
+  font-size: 0.8em;
+  padding: 4px 0px 0px 20px;
 }
 p.comment {
   font-size: 0.8em;
   color: #888;
+}
+div.image_caption {
+  font-size: 0.8em;
+  color: #888;
+  text-align: center;
 }
 li.download-c {
   background: url(images/icon_c.png) no-repeat 0px 0px;

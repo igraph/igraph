@@ -28,8 +28,8 @@ def process_newsfile(fname):
     news = reg.sub("<h3>\g<title></h3>", news)
     
     # Lists are wrapped in <ul>
-    reg = re.compile(r"^[\s]*\n(?P<lines>(- [^\n]\n)+)[\s]*\n", re.MULTILINE)
-    news = reg.sub("<ul>\g<lines></ul>", news)
+    reg = re.compile(r"^(?P<lines>(^- .*?(?=(^$)|(^- [ ])|(\Z)))+)", re.MULTILINE | re.DOTALL)
+    news = reg.sub("<ul>\n\g<lines>\n</ul>", news)
     
     # List items are wrapped in <li>
     reg = re.compile(r"^- (?P<entry>.*?)(?=(^$)|(^-[ ])|(\Z))", re.MULTILINE | re.DOTALL)
