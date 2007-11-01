@@ -90,7 +90,6 @@ except:
     print "Consider downloading the C source code of the igraph library and "
     print "put the contents of the src subdirectory and config.h in "
     print "subdirectory called igraph."
-    raise
     exit(1)
 
 module_sources=glob.glob(os.path.join('src', '*.c'))

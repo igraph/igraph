@@ -65,16 +65,19 @@ class BoundingBox(object):
         (four items, two for each corner, respectively), four separate numbers
         (X and Y coordinates for each corner) or two separate numbers (width
         and height, the upper left corner is assumed to be at (0,0))"""
+        coords = None
         if len(args) == 1:
             if isinstance(args[0], BoundingBox):
                 coords = args[0].coords
-            else:
+            elif len(args[0]) >= 4:
                 coords = tuple(args[0])[0:4]
+            elif len(args[0]) == 2:
+                coords = (0, 0, args[0][0], args[0][1])
         elif len(args) == 4:
             coords = tuple(args)
         elif len(args) == 2:
             coords = (0, 0, args[0], args[1])
-        else:
+        if coords is None:
             raise ValueError, "invalid coordinate format"
         try:
             coords = tuple(map(float, coords))
@@ -224,6 +227,8 @@ class Plot(object):
 
         if bbox is None:
             bbox = BoundingBox(600, 600)
+        elif isinstance(bbox, tuple) or isinstance(bbox, list):
+            bbox = BoundingBox(bbox)
 
         if palette is None:
             from igraph import config
@@ -306,7 +311,7 @@ class Plot(object):
           was larger than the count of occurrences
         """
         for i, (o, b, _, _, _, _) in enumerate(self._objects):
-            if o == object and (bbox is None or b == bbox):
+            if o is object and (bbox is None or b == bbox):
                 idx -= 1
                 if idx == 0:
                     self._objects[i:(i+1)] = []

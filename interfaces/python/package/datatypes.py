@@ -167,8 +167,8 @@ class Matrix(object):
         dx = float(bbox.width) / self.shape[1]
         dy = float(bbox.height) / self.shape[0]
         if kwds.get("square", True): dx, dy = min(dx, dy), min(dx, dy)
-        ox = (bbox.width - dx*self.shape[1]) / 2.0
-        oy = (bbox.height - dy*self.shape[0]) / 2.0
+        ox = bbox.left + (bbox.width - dx*self.shape[1]) / 2.0
+        oy = bbox.top + (bbox.height - dy*self.shape[0]) / 2.0
 
         # Determine rescaling factors for the palette if needed
         if style == "palette":

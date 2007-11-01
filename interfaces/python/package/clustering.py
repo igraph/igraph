@@ -216,7 +216,7 @@ class VertexClustering(Clustering):
             Clustering.__init__(self, [0]*graph.vcount(), params)
         else:
             if len(membership) != graph.vcount():
-                raise ValueError, "membership list is too short"
+                raise ValueError, "membership list has invalid length"
             Clustering.__init__(self, membership, params)
 
         if modularity is None:
@@ -229,7 +229,7 @@ class VertexClustering(Clustering):
     q = modularity
 
     def _get_graph(self): return self._graph
-    modularity = property(_get_graph, doc = "The graph belonging to this object")
+    graph = property(_get_graph, doc = "The graph belonging to this object")
 
     def recalculate_modularity(self):
         """Recalculates the stored modularity value.
