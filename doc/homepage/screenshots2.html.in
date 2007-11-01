@@ -47,8 +47,8 @@ for (i in seq(along=graphs)) {
 
 <h3 style="clear:both">The <code>tkplot</code> editor of the R package</h3>
 
-<img class="float_right" alt="Illustration" src="images/screenshots/tkplot.png"/>
-<div style="border-right: 490px solid white">
+<img class="float_right" width="462" height="507" alt="Illustration" src="images/screenshots/tkplot.png"/>
+<div style="border-right: 472px solid white">
 <p>The igraph R package features an interactive graph layout editor
 for small graphs. It is a little toy only, but can be useful if you
 want to adjust the layout of small graphs. Here is how we generated 
@@ -85,7 +85,7 @@ coords &lt;- tkplot.getcoords(7)
 
 <img class="float_right" width="497" height="596" alt="Illustration" src="images/screenshots/fastgreedy.png">
 
-<div style="border-right: 500px solid white">
+<div style="border-right: 507px solid white">
 <p>The graphics device from the Cairo R package handles 
 transparency, we use this to plot one graph on top of another.</p>
 <pre class="programlisting condensed">
@@ -229,9 +229,9 @@ fig.show()
 
 <h3>Plotting the diameter</h3>
 
-<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/diameter2.png"/>
+<img class="float_right" width="503" height="506" alt="Illustration" src="images/screenshots/diameter2.png"/>
 
-<div style="border-right: 490px solid white">
+<div style="border-right: 513px solid white">
 <p>This example shows how vertices along a path (the diameter in this case)
 can be selected. We use the igraph R package.</p>
 <pre class="programlisting condensed">
@@ -265,8 +265,8 @@ axis(2, labels=FALSE, tick=TRUE)
 
 <h3>Degree distributions for nonlinear preferential attachment</h3>
 
-<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/degreedist.png">
-<div style="border-right: 490px solid white">
+<img class="float_right" width="500" height="500" alt="Illustration" src="images/screenshots/degreedist.png">
+<div style="border-right: 510px solid white">
 <p>We plot how the (cumulative) in-degree distribution of a graph changes
 if we change the exponent of the preferential attachment process.
 We use the igraph R package.</p>
@@ -298,8 +298,8 @@ legend(1, 1e-5, c(1,powers), col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
 
 <h3>Plotting the dendrogram of a community structure algorithm</h3>
 </td>
-<img class="float_right" alt="Illustration" src="images/screenshots/dendrogram.png">
-<div style="border-right: 500px solid white">
+<img class="float_right" width="500" height="500" alt="Illustration" src="images/screenshots/dendrogram.png">
+<div style="border-right: 510px solid white">
 <p>We use the R package and convert the output of the Walktrap
 community finding algorithm to a dendrogram.</p>
 <pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
