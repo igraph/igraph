@@ -103,6 +103,8 @@ g <- karate
 wt <- walktrap.community(g, modularity=TRUE)
 dend <- as.dendrogram(wt, use.modularity=TRUE)
 #xfig(file="dendrogram.fig")
+#CairoX11()
+#CairoPNG(file="dendrogram.png", width=500, height=500)
 plot(dend, nodePar=list(pch=c(NA, 20)))
 #dev.off()
 
@@ -112,6 +114,8 @@ g <- barabasi.game(100000)
 d <- degree(g, mode="in")
 dd <- degree.distribution(g, mode="in", cumulative=TRUE)
 alpha <- power.law.fit(d, xmin=20)
+# CairoX11()
+# CairoPNG(file="degreedist.png", width=500, height=500)
 plot(dd, log="xy", xlab="degree", ylab="cumulative frequency",
      col=1, main="Nonlinear preferential attachment")
 lines(10:500, 10*(10:500)^(-coef(alpha)+1))
@@ -123,6 +127,6 @@ for (p in seq(powers)) {
   points(dd, col=p+1, pch=p+1)
 }
 
-legend(1, 1e-5, powers, col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
+legend(1, 1e-5, c(1,powers), col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
 
        

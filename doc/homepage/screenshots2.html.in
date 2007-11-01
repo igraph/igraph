@@ -47,7 +47,7 @@ for (i in seq(along=graphs)) {
 
 <h3 style="clear:both">The <code>tkplot</code> editor of the R package</h3>
 
-<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/tkplot.png"/>
+<img class="float_right" alt="Illustration" src="images/screenshots/tkplot.png"/>
 <div style="border-right: 490px solid white">
 <p>The igraph R package features an interactive graph layout editor
 for small graphs. It is a little toy only, but can be useful if you
@@ -222,3 +222,96 @@ fig.add(mst, layout=layout, edge_color="red", vertex_label=None)
 fig.show()
 </pre>
 </div>
+
+<hr style="clear:both"/>
+
+<a name="7"></a>
+
+<h3>Plotting the diameter</h3>
+
+<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/diameter2.png"/>
+
+<div style="border-right: 490px solid white">
+<p>This example shows how vertices along a path (the diameter in this case)
+can be selected. We use the igraph R package.</p>
+<pre class="programlisting condensed">
+library(igraph)
+
+g &lt;- read.graph("karate.net", format="pajek")
+d &lt;- get.diameter(g)
+
+E(g)$color &lt;- "grey"
+E(g)$width &lt;- 1
+E(g, path=d)$color &lt;- "red"
+E(g, path=d)$width &lt;- 2
+V(g)$label.color &lt;- "blue"
+V(g)$color  &lt;- "SkyBlue2"
+V(g)[ d ]$label.color &lt;- "black"
+V(g)[ d ]$color &lt;- "red"
+
+plot(g, layout=layout.fruchterman.reingold, 
+     vertex.label.dist=0, vertex.size=15)
+title(main="Diameter of the Zachary Karate Club network",
+      xlab="created by igraph 0.4")
+axis(1, labels=FALSE, tick=TRUE)
+axis(2, labels=FALSE, tick=TRUE)
+</pre>
+<p>You can find the <a href="karate.net">karate.net file here.</a></p>
+</div>
+
+<hr style="clear:both"/>
+
+<a name="8"></a>
+
+<h3>Degree distributions for nonlinear preferential attachment</h3>
+
+<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/degreedist.png">
+<div style="border-right: 490px solid white">
+<p>We plot how the (cumulative) in-degree distribution of a graph changes
+if we change the exponent of the preferential attachment process.
+We use the igraph R package.</p>
+<pre class="programlisting condensed">
+library(igraph)
+
+g &lt;- barabasi.game(100000)
+d &lt;- degree(g, mode="in")
+dd &lt;- degree.distribution(g, mode="in", cumulative=TRUE)
+alpha &lt;- power.law.fit(d, xmin=20)
+plot(dd, log="xy", xlab="degree", ylab="cumulative frequency",
+     col=1, main="Nonlinear preferential attachment")
+lines(10:500, 10*(10:500)^(-coef(alpha)+1))
+
+powers &lt;- c(0.9, 0.8, 0.7, 0.6)
+for (p in seq(powers)) {
+  g &lt;- barabasi.game(100000, power=powers[p])
+  dd &lt;- degree.distribution(g, mode="in", cumulative=TRUE)
+  points(dd, col=p+1, pch=p+1)
+}
+
+legend(1, 1e-5, c(1,powers), col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
+</pre>
+</div>
+
+<hr style="clear:both"/>
+
+<a name="9"></a>
+
+<h3>Plotting the dendrogram of a community structure algorithm</h3>
+</td>
+<img class="float_right" alt="Illustration" src="images/screenshots/dendrogram.png">
+<div style="border-right: 500px solid white">
+<p>We use the R package and convert the output of the Walktrap
+community finding algorithm to a dendrogram.</p>
+<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+library(igraph)
+g &lt;- read.graph("karate.net", format="pajek")
+
+wt &lt;- walktrap.community(g, modularity=TRUE)
+dend &lt;- as.dendrogram(wt, use.modularity=TRUE)
+plot(dend, nodePar=list(pch=c(NA, 20)))
+
+</pre>
+<p>You can find the <a href="karate.net">karate.net file here.</a></p>
+</div>
+
+
