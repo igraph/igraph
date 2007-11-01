@@ -1282,13 +1282,27 @@ PyObject *igraphmodule_Graph_GRG(PyTypeObject * type,
   igraphmodule_GraphObject *self;
   long n;
   double r;
-  PyObject *torus = Py_False;
+  PyObject *torus = Py_False, *coords = Py_False;
+  igraph_vector_t xs, ys;
+  igraph_bool_t need_coords;
 
-  char *kwlist[] = { "n", "radius", "torus", NULL };
+  char *kwlist[] = { "n", "radius", "torus", "return_coordinates", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ld|O", kwlist,
-                                   &n, &r, &torus))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ld|OO", kwlist,
+                                   &n, &r, &torus, &coords))
     return NULL;
+
+  need_coords = PyObject_IsTrue(coords);
+  if (need_coords) {
+    if (igraph_vector_init(&xs, 0)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    } else if (igraph_vector_init(&ys, 0)) {
+      igraph_vector_destroy(&xs);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  }
 
   self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
   RC_ALLOC("Graph", self);
@@ -1296,13 +1310,35 @@ PyObject *igraphmodule_Graph_GRG(PyTypeObject * type,
   if (self != NULL) {
     igraphmodule_Graph_init_internal(self);
     if (igraph_grg_game(&self->g, (igraph_integer_t) n, (igraph_real_t) r,
-                        PyObject_IsTrue(torus))) {
+                        PyObject_IsTrue(torus),
+                        need_coords ? &xs : 0,
+                        need_coords ? &ys : 0)) {
       igraphmodule_handle_igraph_error();
       Py_DECREF(self);
+      if (need_coords) {
+        igraph_vector_destroy(&xs); igraph_vector_destroy(&ys);
+      }
       return NULL;
     }
   }
 
+  if (need_coords) {
+    PyObject *o_xs, *o_ys;
+    o_xs = igraphmodule_vector_t_to_PyList(&xs, IGRAPHMODULE_TYPE_FLOAT);
+    igraph_vector_destroy(&xs);
+    if (!o_xs) {
+      Py_DECREF(self);
+      igraph_vector_destroy(&ys);
+      return NULL;
+    }
+    o_ys = igraphmodule_vector_t_to_PyList(&ys, IGRAPHMODULE_TYPE_FLOAT);
+    igraph_vector_destroy(&ys);
+    if (!o_ys) {
+      Py_DECREF(self);
+      return NULL;
+    }
+    return Py_BuildValue("NNN", (PyObject*)self, o_xs, o_ys);
+  }
   return (PyObject *) self;
 }
 
@@ -6227,16 +6263,19 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_grg_game */
   {"GRG", (PyCFunction) igraphmodule_Graph_GRG,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "GRG(n, radius, torus=False)\n\n"
-   "Generates a growing random geometric graph.\n\n"
+   "_GRG(n, radius, torus=False, return_coordinates=False)\n\n"
+   "Generates a random geometric graph.\n\n"
    "The algorithm drops the vertices randomly on the 2D unit square and connects\n"
    "them if they are closer to each other than the given radius.\n\n"
    "@param n: The number of vertices in the graph\n"
    "@param radius: The given radius\n"
    "@param torus: This should be C{True} if we want to use a torus instead of a\n"
-   "  square."},
+   "  square.\n"
+   "@param return_coordinates: whether the X and Y coordinates of the\n"
+   "  vertices should be returned. If C{True}, a list for each dimension\n"
+   "  will be returned along with the graph, packed in a tuple.\n"},
 
-  // interface to igraph_growing_random_game
+  /* interface to igraph_growing_random_game */
   {"Growing_Random", (PyCFunction) igraphmodule_Graph_Growing_Random,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
    "Growing_Random(n, m, directed=False, citation=False)\n\n"

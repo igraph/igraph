@@ -3,10 +3,15 @@ from igraph import *
 
 class GameTests(unittest.TestCase):
     def testGRG(self):
-        g=Graph.GRG(50, 0.2)
+        g = Graph.GRG(50, 0.2)
         self.failUnless(isinstance(g, Graph))
-        g=Graph.GRG(50, 0.2, True)
+        g = Graph.GRG(50, 0.2, True)
         self.failUnless(isinstance(g, Graph))
+        g, xs, ys = Graph.GRG(50, 0.2, True, True)
+        self.failUnless(isinstance(g, Graph))
+        self.failUnless(isinstance(xs, list))
+        self.failUnless(isinstance(ys, list))
+        self.failUnless(isinstance(Layout(zip(xs,ys)), Layout))
 
     def testForestFire(self):
         g=Graph.Forest_Fire(100, 0.1)
