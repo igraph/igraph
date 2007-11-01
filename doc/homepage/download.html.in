@@ -115,7 +115,7 @@ deb-src htp://cneurocvs.rmki.kfki.hu /packages/source/
 
 <p>The binary packages are built for the <code>i386</code> architecture.
 Source packages should compile on <code>x86_64</code> and <code>amd64</code>
-architectures as well.
+architectures as well.</p>
 
 <a name="dev"></a><h3>Obtaining the development version</h3>
 

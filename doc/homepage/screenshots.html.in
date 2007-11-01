@@ -8,51 +8,45 @@
 
 <td valign="top">
   <div class="image_caption">Force based layout</div>
-  <a href="screenshots2.html#1"><img src="images/screenshots/frplots-small.png" border="0"></a>
-  </p>
+  <a href="screenshots2.html#1"><img src="images/screenshots/frplots-small.png" alt="Read details"/></a>
 </td>
 <td valign="top">
   <div class="image_caption"><code>tkplot</code> in the R package</div>
-  <a href="screenshots2.html#2"><img src="images/screenshots/tkplot-small.png" border="0"></a>
-  </p>
+  <a href="screenshots2.html#2"><img src="images/screenshots/tkplot-small.png" alt="Read details"/></a>
 </td>
 <td valign="top">
   <div class="image_caption">Plotting with transparency</div>
-  <a href="screenshots2.html#3"><img src="images/screenshots/fastgreedy-small.png" border="0"></a>
-  </p>
+  <a href="screenshots2.html#3"><img src="images/screenshots/fastgreedy-small.png" alt="Read details"/></a>
 </td>
 
 </tr><tr>
 
 <td valign="top">
   <div class="image_caption">Components of an Erd&#x0151;s-R&#x00e9;nyi graph</div>
-  <a href="screenshots2.html#4"><img src="images/screenshots/erdos_renyi_components-small.png" alt=""/></a>
+  <a href="screenshots2.html#4"><img src="images/screenshots/erdos_renyi_components-small.png" alt="Read details"/></a>
 </td>
 <td valign="top">
   <div class="image_caption">Kautz graph with adjacency matrix</div>
-  <a href="screenshots2.html#5"><img src="images/screenshots/kautz-small.png" alt=""/>
+  <a href="screenshots2.html#5"><img src="images/screenshots/kautz-small.png" alt="Read details"/></a>
 </td>
 <td valign="top">
   <div class="image_caption">Minimum spanning tree</div>
-  <a href="screenshots2.html#6"><img src="images/screenshots/mst-small.png" alt=""/>
-</td></tr>
+  <a href="screenshots2.html#6"><img src="images/screenshots/mst-small.png" alt="Read details"/></a>
+</td>
 
 </tr><tr>
 
 <td valign="top">
   <div class="image_caption">Vertex attributes</div>
-  <a href="screenshots2.html#7"><img src="images/screenshots/diameter2-small.png" border="0"></a>
-  </p>
+  <a href="screenshots2.html#7"><img src="images/screenshots/diameter2-small.png" alt="Read details"/></a>
 </td>
 <td valign="top">
   <div class="image_caption">Degree distributions</div>
-  <a href="screenshots2.html#8"><img src="images/screenshots/degreedist-small.png" border="0"></a>
-  </p>
+  <a href="screenshots2.html#8"><img src="images/screenshots/degreedist-small.png" alt="Read details"/></a>
 </td>
 <td valign="top">
   <div class="image_caption">Dendrograms</div>
-  <a href="screenshots2.html#9"><img src="images/screenshots/dendrogram-small.png" border="0"></a>
-  </p>
+  <a href="screenshots2.html#9"><img src="images/screenshots/dendrogram-small.png" alt="Read details"/></a>
 </td>
 
 </tr>

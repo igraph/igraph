@@ -39,7 +39,8 @@ community structure search.</p>
 with millions of vertices and edges. The rule of thumb is that if your graph
 fits into the physical memory then <b>igraph</b> can handle it.</p>
 
-<p><b>igraph</b> can be installed in several forms:
+<p><b>igraph</b> can be installed in several forms:</p>
+
 <ul>
 <li><b>igraph</b> as a <i>C library</i> is useful if you want to use
     it in your C/C++ projects, or want to implement your own network analysis
@@ -58,8 +59,8 @@ fits into the physical memory then <b>igraph</b> can handle it.</p>
     If you like the Ruby language, then this might be the right choice for you.
     </li>
 </ul>
-Every form of <b>igraph</b> contain the same code at the very heart, written in ANSI C.</p>
 
+<p>Every form of <b>igraph</b> contain the same code at the very heart, written in ANSI C.</p>
 
 <p>Please note that the ways of installing <b>igraph</b> depends on which its 
 forms you actually want to use. Eg. for using <b>igraph</b> as an R package,
@@ -73,7 +74,7 @@ href="download.html">download page</a> for details.</p>
 
 <p>Here are some features of <b>igraph</b>, a subset of the functionality,
 see <i>The igraph reference manual</i> under <a
-href="documentation.html">Documentation</a> for more details.
+href="documentation.html">Documentation</a> for more details.</p>
 
 <ul>
 <li><b>igraph</b> contains functions for generating regular and random graphs
@@ -88,7 +89,7 @@ literature.</li>
     etc. are also included.</li>
 <li>Force based layout generators for small and large graphs</li>
 <li>The R package and the Python module can visualize graphs many ways, 
-    in 2D and 3D, interactively or non-interactively.
+    in 2D and 3D, interactively or non-interactively.</li>
 <li><b>igraph</b> provides data types for implementing your own algorithm in 
     C, R, Python or Ruby.</li>
 <li>Community structure detection algorithms using many recently developed

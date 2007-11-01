@@ -83,7 +83,7 @@ coords &lt;- tkplot.getcoords(7)
 <a name="3"></a>
 <h3 style="clear:both">Transparency with the Cairo R package</h3>
 
-<img class="float_right" width="497" height="596" alt="Illustration" src="images/screenshots/fastgreedy.png">
+<img class="float_right" width="497" height="596" alt="Illustration" src="images/screenshots/fastgreedy.png"/>
 
 <div style="border-right: 507px solid white">
 <p>The graphics device from the Cairo R package handles 
@@ -265,7 +265,7 @@ axis(2, labels=FALSE, tick=TRUE)
 
 <h3>Degree distributions for nonlinear preferential attachment</h3>
 
-<img class="float_right" width="500" height="500" alt="Illustration" src="images/screenshots/degreedist.png">
+<img class="float_right" width="500" height="500" alt="Illustration" src="images/screenshots/degreedist.png"/>
 <div style="border-right: 510px solid white">
 <p>We plot how the (cumulative) in-degree distribution of a graph changes
 if we change the exponent of the preferential attachment process.
@@ -297,8 +297,7 @@ legend(1, 1e-5, c(1,powers), col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
 <a name="9"></a>
 
 <h3>Plotting the dendrogram of a community structure algorithm</h3>
-</td>
-<img class="float_right" width="500" height="500" alt="Illustration" src="images/screenshots/dendrogram.png">
+<img class="float_right" width="500" height="500" alt="Illustration" src="images/screenshots/dendrogram.png"/>
 <div style="border-right: 510px solid white">
 <p>We use the R package and convert the output of the Walktrap
 community finding algorithm to a dendrogram.</p>
