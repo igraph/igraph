@@ -7,15 +7,17 @@ and <code>igraph-announce</code>.</p>
 
 <p><code>igraph-help</code> is for general discussion and questions,
 help, suggestions, etc. See
-<a href="http://lists.nongnu.org/mailman/listinfo/igraph-help">its page
-at Savannah</a> for subscription and archives.</p>
+<a href="http://lists.nongnu.org/mailman/listinfo/igraph-help"
+<!-- onClick="javascript:urchinTracker ('/outgoing/mailinglist-help'); " -->
+>its page at Savannah</a> for subscription and archives.</p>
 
 <p><code>igraph-announce</code> is a very low-traffic mailing (about one email per month) list for
 important announcements only, such as a new <b>igraph</b> release for
 example. <code>igraph-announce</code> is a read-only list, you can not
 post any messages to it. See
-<a href="http://lists.nongnu.org/mailman/listinfo/igraph-announce">its
-page at Savannah</a> for subscription and archives.</p>
+<a href="http://lists.nongnu.org/mailman/listinfo/igraph-announce"
+<!-- onClick="javascript:urchinTracker ('/outgoing/mailinglist-announce'); " -->
+>its page at Savannah</a> for subscription and archives.</p>
 
 <h3>Bug reports, questions, comments</h3>
 

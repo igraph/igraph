@@ -217,3 +217,15 @@ div.explanation {
   border: solid 1px #4444ff;
   padding: 0.5em;
 }
+p.news
+{
+  padding: 0px 40px 0px;
+}
+h4.news
+{
+  padding: 0px 40px 0px;
+}
+ul.newslist
+{
+  padding: 0px 60px 0px;
+}

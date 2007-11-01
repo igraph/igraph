@@ -23,21 +23,26 @@ def process_newsfile(fname):
     """Processes the NEWS file and formats its content in HTML"""
     news = open(fname).read()
     
+    # Add some <code> tags
+    reg = re.compile(r"(?P<func>\w*_\w*)")
+    news = reg.sub("<code>\g<func></code>", news)
+
     # Titles are wrapped in <h3>
     reg = re.compile(r"^=====*\n(?P<title>[^\n]*)\n====*\n", re.MULTILINE | re.DOTALL)
-    news = reg.sub("<h3>\g<title></h3>", news)
+    news = reg.sub("</p><h3>\g<title></h3><p class=\"news\">", news)
     
-    # Lists are wrapped in <ul>
-    reg = re.compile(r"^(?P<lines>(^- .*?(?=(^$)|(^- [ ])|(\Z)))+)", re.MULTILINE | re.DOTALL)
-    news = reg.sub("<ul>\n\g<lines>\n</ul>", news)
+    # Lists are wrapped in <ol>
+    reg = re.compile(r"\n(?P<lines>(^\s*\n|^(- |  )[^\n]*\n)+)[\s]*\n(?P<n>[^-])", re.MULTILINE)
+    news = reg.sub("\n</p><ul class=\"newslist\">\n\g<lines></ul>\n<p class=\"news\">\n\g<n>", news)
     
     # List items are wrapped in <li>
-    reg = re.compile(r"^- (?P<entry>.*?)(?=(^$)|(^-[ ])|(\Z))", re.MULTILINE | re.DOTALL)
+    reg = re.compile(r"^- (?P<entry>.*?)(?=(</ul>)|(^$)|(^-[ ])|(\Z))", re.MULTILINE | re.DOTALL)
     news = reg.sub("<li>\g<entry></li>", news)
     
     # Paragraphs are separated by empty lines
     reg = re.compile(r"^[\s]*$", re.MULTILINE)
-    news = reg.sub("<p></p>", news)
+    news = reg.sub("</p><p class=\"news\">", news)
+    news = "<p>" + news + "</p>"
     
     # Replace URLs
     reg = re.compile(r"(?P<url>http://[^\n ]+)")
@@ -45,7 +50,7 @@ def process_newsfile(fname):
     
     # Add subheadings in <h4> tags
     reg = re.compile(r"^(?P<text>.*)\n-------*$", re.MULTILINE)
-    news = reg.sub("<h4>\g<text></h4>", news)
+    news = reg.sub("<h4 class=\"news\">\g<text></h4>", news)
     
     return news
 
