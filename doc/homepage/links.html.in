@@ -2,7 +2,7 @@
 
 <h3><a href="http://vlado.fmf.uni-lj.si/pub/networks/pajek/">Pajek</a></h3>
 
-<p><a href="http://vlado.fmf.uni-lj.si/pub/networks/pajek/">Pajek</a> is an
+<p><a href="http://vlado.fmf.uni-lj.si/pub/networks/pajek/">Pajek</a> is
 excellent network analysis and visualization software written for Windows
 (but it runs in Wine under Linux as well). It can handle quite large
 (millions of vertices) graphs smoothly. Its main drawbacks are that

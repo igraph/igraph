@@ -72,7 +72,7 @@ tkplot(g, layout=layout.kamada.kawai, vertex.label.font=2)
 </pre>
 <p>After hand-tuning the layout, you can obtain the new coordinates
 using the id of the plot, as shown on the window border:</p>
-<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+<pre class="programlisting condensed">
 coords &lt;- tkplot.getcoords(7)
 </pre>
 <p>You can find the <a href="karate.net">karate.net file here</a>.</p>
@@ -301,7 +301,7 @@ legend(1, 1e-5, c(1,powers), col=1:5, pch=1:5, ncol=1, yjust=0, lty=0)
 <div style="border-right: 510px solid white">
 <p>We use the R package and convert the output of the Walktrap
 community finding algorithm to a dendrogram.</p>
-<pre class="programlisting" style="font-size:0.8em;line-height:1.5em">
+<pre class="programlisting condensed">
 library(igraph)
 g &lt;- read.graph("karate.net", format="pajek")
 
@@ -313,4 +313,60 @@ plot(dend, nodePar=list(pch=c(NA, 20)))
 <p>You can find the <a href="karate.net">karate.net file here.</a></p>
 </div>
 
+<hr style="clear:both"/>
 
+<a name="10"></a>
+
+<h3>Creating simple animations</h3>
+</td>
+<img class="float_right" width="480" height="480" alt="Illustration" src="images/screenshots/eb.gif">
+<div style="border-right: 490px solid white">
+<p>We plot the network after each iteration of the Girvan-Newman edge
+betweenness based community structure finding algorithm.
+The edge betweenness values are shown on the left, the top five values 
+are also shown as edge colors. The components are coded with 
+different vertex colors and the modularity score of the actual division is
+on the top.</p>
+<p>You can get the <a href="karate.net">karate.net file from here.</a>
+Download the animation: 
+<a href="images/screenshots/eb.avi">AVI file</a>, 
+<a href="images/screenshots/eb.mng">MNG file.</a>
+</p>
+<pre class="programlisting condensed">
+library(igraph) ;library(Cairo)
+
+g &lt;- read.graph("karate.net", format="pajek")
+l &lt;- layout.kamada.kawai(g, niter=1000)
+ebc &lt;- edge.betweenness.community(g)
+
+colbar &lt;- rainbow(6)
+colbar2 &lt;- c(rainbow(5), rep("black",15))
+
+for (i in 1:20) {
+
+  g2 &lt;- delete.edges(g, ebc$removed.edges[seq(length=i-1)])
+  
+  eb &lt;- edge.betweenness(g2)
+  cl &lt;- clusters(g2)$membership
+  q &lt;- modularity(g, cl)
+
+  E(g2)$color &lt;- "grey"
+  E(g2)[ order(eb, decreasing=TRUE)[1:5]-1 ]$color &lt;- colbar2[1:5]
+
+  E(g2)$width &lt;- 1
+  E(g2)[ color != "grey" ]$width &lt;- 2
+
+  # CairoPNG(sprintf("eb-community-%04d.png", i))
+  plot(g2, layout=l, vertex.size=6, vertex.label=NA,
+       edge.label.color="red", vertex.color=colbar[cl+2],
+       edge.label.font=2)
+  title(main=paste("Q=", round(q,3)), font=2)
+  ty &lt;- seq(1,by=-strheight("1")*1.5, length=20)
+  text(-1.3, ty, adj=c(0,0.5), round(sort(eb, dec=TRUE)[1:20],2), col=colbar2,
+       font=2)
+
+  # dev.off()
+  scan()
+}
+</pre>
+</div>
