@@ -5832,7 +5832,7 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
   igraph_matrix_init(&merges, 0, 0);
   if (PyObject_IsTrue(return_modularities)) {
     igraph_vector_init(&q, 0);
-    if (igraph_community_fastgreedy(&self->g, &merges, &q)) {
+    if (igraph_community_fastgreedy(&self->g, 0, &merges, &q)) {
     igraph_vector_destroy(&q);
       igraph_matrix_destroy(&merges);
     return igraphmodule_handle_igraph_error();

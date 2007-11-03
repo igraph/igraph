@@ -43,22 +43,42 @@ void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges, FI
 
 int main() {
   igraph_t g;
-  igraph_vector_t modularity;
+  igraph_vector_t modularity, weights;
   igraph_matrix_t merges;
   FILE *f;
 
   igraph_vector_init(&modularity,0);
   igraph_matrix_init(&merges,0,0);
-  igraph_small(&g, 5, IGRAPH_UNDIRECTED, 
+  igraph_vector_init(&weights,0);
+
+  /* Simple unweighted graph */
+  igraph_small(&g, 10, IGRAPH_UNDIRECTED, 
 	       0,1,0,2,0,3,0,4, 1,2,1,3,1,4, 2,3,2,4, 3,4,
 	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9,
-         0,5, -1);
-  igraph_community_fastgreedy(&g, &merges, &modularity);
+           0,5, -1);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity);
+  show_results(&g, &modularity, &merges, stdout); 
+
+  /* Same simple graph, with uniform edge weights */
+  igraph_vector_resize(&weights, igraph_ecount(&g));
+  igraph_vector_fill(&weights, 2);
+  igraph_community_fastgreedy(&g, &weights, &merges, &modularity);
+  show_results(&g, &modularity, &merges, stdout); 
+  igraph_destroy(&g);
+
+  /* Simple nonuniform weighted graph, with and without weights */
+  igraph_small(&g, 6, IGRAPH_UNDIRECTED, 
+	       0,1,1,2,2,3,2,4,2,5,3,4,3,5,4,5, -1);
+  igraph_vector_resize(&weights, 8);
+  igraph_vector_fill(&weights, 1);
+  VECTOR(weights)[0] = 10; VECTOR(weights)[1] = 10;
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity);
+  show_results(&g, &modularity, &merges, stdout); 
+  igraph_community_fastgreedy(&g, &weights, &merges, &modularity);
   show_results(&g, &modularity, &merges, stdout); 
   igraph_destroy(&g);
 
   /* Zachary Karate club */
-
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
 	       0,  1,  0,  2,  0,  3,  0,  4,  0,  5,
 	       0,  6,  0,  7,  0,  8,  0, 10,  0, 11,
@@ -77,7 +97,7 @@ int main() {
 	       28, 33, 29, 32, 29, 33, 30, 32, 30, 33,
 	       31, 32, 31, 33, 32, 33,
 	       -1);
-  igraph_community_fastgreedy(&g, &merges, &modularity);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity);
   show_results(&g, &modularity, &merges, stdout); 
   igraph_destroy(&g);
    
@@ -86,7 +106,7 @@ int main() {
 	       0,  1,  0,  2,  0,  3,  1,  2,  1,  3,  2,  3,
 	       4,  5,  4,  6,  4,  7,  5,  6,  5,  7,  6,  7,
 	       -1);
-  igraph_community_fastgreedy(&g, &merges, &modularity);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity);
   show_results(&g, &modularity, &merges, stdout); 
   igraph_destroy(&g);
 
@@ -94,11 +114,12 @@ int main() {
   igraph_small(&g, 20, IGRAPH_UNDIRECTED,
            0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,0,9,
 	   10,11,11,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,10,19,-1);
-  igraph_community_fastgreedy(&g, &merges, &modularity);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity);
   show_results(&g, &modularity, &merges, stdout);
   igraph_destroy(&g);
 
   igraph_vector_destroy(&modularity);
+  igraph_vector_destroy(&weights);
   igraph_matrix_destroy(&merges);
   
   return 0;

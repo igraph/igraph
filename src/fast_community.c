@@ -497,6 +497,7 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  * the number of edges.
  */
 int igraph_community_fastgreedy(const igraph_t *graph,
+  const igraph_vector_t *weights,
   igraph_matrix_t *merges, igraph_vector_t *modularity) {
   long int no_of_edges, no_of_nodes, no_of_joins, total_joins;
   long int i, j, k, n, m, from, to, dummy;
@@ -505,14 +506,14 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
   igraph_i_fastgreedy_community_list communities;
   igraph_vector_t a;
-  igraph_real_t q, maxq, *dq;
+  igraph_real_t q, maxq, *dq, weight_sum;
 
   /*long int join_order[] = { 16,5, 5,6, 6,0, 4,0, 10,0, 26,29, 29,33, 23,33, 27,33, 25,24, 24,31, 12,3, 21,1, 30,8, 8,32, 9,2, 17,1, 11,0, 7,3, 3,2, 13,2, 1,2, 28,31, 31,33, 22,32, 18,32, 20,32, 32,33, 15,33, 14,33, 0,19, 19,2, -1,-1 };*/
   /*long int join_order[] = { 43,42, 42,41, 44,41, 41,36, 35,36, 37,36, 36,29, 38,29, 34,29, 39,29, 33,29, 40,29, 32,29, 14,29, 30,29, 31,29, 6,18, 18,4, 23,4, 21,4, 19,4, 27,4, 20,4, 22,4, 26,4, 25,4, 24,4, 17,4, 0,13, 13,2, 1,2, 11,2, 8,2, 5,2, 3,2, 10,2, 9,2, 7,2, 2,28, 28,15, 12,15, 29,16, 4,15, -1,-1 };*/
 
   no_of_nodes = igraph_vcount(graph);
   no_of_edges = igraph_ecount(graph);
- 
+  
   if (igraph_is_directed(graph)) {
 	IGRAPH_ERROR("fast greedy community detection works for undirected graphs only", IGRAPH_UNIMPLEMENTED);
   }
@@ -526,11 +527,24 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   if (modularity != 0) {
 	IGRAPH_CHECK(igraph_vector_resize(modularity, total_joins+1));
   }
+  if (weights != 0) {
+    if (igraph_vector_size(weights) < igraph_ecount(graph))
+      IGRAPH_ERROR("fast greedy community detection: weight vector too short", IGRAPH_EINVAL);
+      weight_sum = igraph_vector_sum(weights);
+  }
 
   /* Create degree vector */
-  debug("Calculating degrees\n");
   IGRAPH_VECTOR_INIT_FINALLY(&a, no_of_nodes);
-  IGRAPH_CHECK(igraph_degree(graph, &a, igraph_vss_all(), IGRAPH_ALL, 0));
+  if (weights) {
+    debug("Calculating weighted degrees\n");
+    for (i=0; i < no_of_edges; i++) {
+      VECTOR(a)[(long int)IGRAPH_FROM(graph, i)] += VECTOR(*weights)[i];
+      VECTOR(a)[(long int)IGRAPH_TO(graph, i)] += VECTOR(*weights)[i];
+    }
+  } else {
+    debug("Calculating degrees\n");
+    IGRAPH_CHECK(igraph_degree(graph, &a, igraph_vss_all(), IGRAPH_ALL, 0));
+  }
 
   /* Create list of communities */
   debug("Creating community list\n");
@@ -575,7 +589,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   IGRAPH_FINALLY(free, pairs);
   i=j=0;
   while (!IGRAPH_EIT_END(edgeit)) {
-    igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
+    long int eidx = IGRAPH_EIT_GET(edgeit);
+    igraph_edge(graph, eidx, &ffrom, &fto);
     
 	/* Create the pairs themselves */
 	from = (long int)ffrom; to = (long int)fto;
@@ -586,7 +601,11 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	if (from>to) {
 	  dummy=from; from=to; to=dummy;
 	}
-	dq[j]=2*(1.0/(no_of_edges*2.0) - VECTOR(a)[from]*VECTOR(a)[to]/(4.0*no_of_edges*no_of_edges));
+    if (weights) {
+      dq[j]=2*(VECTOR(*weights)[eidx]/(weight_sum*2.0) - VECTOR(a)[from]*VECTOR(a)[to]/(4.0*weight_sum*weight_sum));
+    } else {
+	  dq[j]=2*(1.0/(no_of_edges*2.0) - VECTOR(a)[from]*VECTOR(a)[to]/(4.0*no_of_edges*no_of_edges));
+    }
 	pairs[i].first = from;
 	pairs[i].second = to;
     pairs[i].dq = &dq[j];
@@ -628,7 +647,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 
   /* Calculate proper vector a (see paper) and initial modularity */
   q=0;
-  igraph_vector_scale(&a, 1.0/(2.0*no_of_edges));
+  igraph_vector_scale(&a, 1.0/(2.0 * (weights ? weight_sum : no_of_edges)));
   for (i=0; i<no_of_nodes; i++)
 	q -= VECTOR(a)[i]*VECTOR(a)[i];
   maxq=q;

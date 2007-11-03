@@ -6343,7 +6343,7 @@ SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity) {
     ppmodularity=&modularity;
     igraph_vector_init(&modularity, 0);
   }
-  igraph_community_fastgreedy(&g, ppmerges, ppmodularity);
+  igraph_community_fastgreedy(&g, 0, ppmerges, ppmodularity);
   PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_0ormatrix_to_SEXP(ppmerges));
   if (ppmerges) { igraph_matrix_destroy(ppmerges); }

@@ -634,7 +634,7 @@ igraph_community_eb_get_merges:
         IGNORE: RR, RC, RNamespace
 
 igraph_community_fastgreedy:
-        PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR modularity
+        PARAMS: GRAPH graph, VECTOR_OR_0 weights, OUT MATRIX merges, OUT VECTOR modularity
         IGNORE: RR, RC, RNamespace
 
 igraph_community_to_membership:
