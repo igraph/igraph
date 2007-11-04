@@ -77,6 +77,18 @@ class CommunityTests(unittest.TestCase):
         cl2 = OverlappingVertexClustering(g, [set([x]) for x in cl.membership])
         self.assertAlmostEqual(cl.q, cl2.q, places=3)
 
+        g = Graph.Full(4) + Graph.Full(2)
+        g.add_edges([(3,4)])
+        weights = [1, 1, 1, 1, 1, 1, 10, 10]
+        cl = g.community_fastgreedy(weights)
+        self.failUnless(cl.membership == [0, 0, 0, 1, 1, 1])
+        self.assertAlmostEqual(cl.q, 0.1708, places=3)
+        
+        g.es["weight"] = [3] * g.ecount()
+        cl = g.community_fastgreedy("weight")
+        self.failUnless(cl.membership == [0, 0, 0, 0, 1, 1])
+        self.assertAlmostEqual(cl.q, 0.1796, places=3)
+
     def testEigenvector(self):
         g = Graph.Full(5) + Graph.Full(5)
         g.add_edges([(0, 5)])

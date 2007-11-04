@@ -5819,50 +5819,54 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
 PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "return_q", NULL };
+  static char *kwlist[] = { "weights", "return_q", NULL };
   PyObject *return_modularities = Py_False;
-  PyObject *ms, *qs, *res;
+  PyObject *ms, *qs, *res, *weights = Py_None;
   igraph_matrix_t merges;
-  igraph_vector_t q;
+  igraph_vector_t q, *ws=0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &return_modularities)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &weights, &return_modularities)) {
     return NULL;
   }
+
+  if (igraphmodule_attrib_to_vector_t(weights, self, &ws, ATTRIBUTE_TYPE_EDGE))
+    return NULL;
 
   igraph_matrix_init(&merges, 0, 0);
   if (PyObject_IsTrue(return_modularities)) {
     igraph_vector_init(&q, 0);
-    if (igraph_community_fastgreedy(&self->g, 0, &merges, &q)) {
-    igraph_vector_destroy(&q);
+    if (igraph_community_fastgreedy(&self->g, ws, &merges, &q)) {
+      if (ws) igraph_vector_destroy(ws);
+      igraph_vector_destroy(&q);
       igraph_matrix_destroy(&merges);
-    return igraphmodule_handle_igraph_error();
-  }
-  qs=igraphmodule_vector_t_to_PyList(&q, IGRAPHMODULE_TYPE_FLOAT);
-  igraph_vector_destroy(&q);
-  if (!qs) {
-    igraph_matrix_destroy(&merges);
-    return NULL;
-  }
+      return igraphmodule_handle_igraph_error();
+    }
+    qs=igraphmodule_vector_t_to_PyList(&q, IGRAPHMODULE_TYPE_FLOAT);
+    igraph_vector_destroy(&q);
+    if (ws) igraph_vector_destroy(ws);
+    if (!qs) {
+      igraph_matrix_destroy(&merges);
+      return NULL;
+    }
   } else {
-  if (igraph_community_fastgreedy(&self->g, &merges, 0)) {
-    igraph_matrix_destroy(&merges);
-    return igraphmodule_handle_igraph_error();
-  }
-  qs=Py_None;
-  Py_INCREF(qs);
+    if (igraph_community_fastgreedy(&self->g, ws, &merges, 0)) {
+      if (ws) igraph_vector_destroy(ws);
+      igraph_matrix_destroy(&merges);
+      return igraphmodule_handle_igraph_error();
+    }
+    qs=Py_None;
+    Py_INCREF(qs);
   }
 
   ms=igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
   igraph_matrix_destroy(&merges);
 
   if (ms == NULL) {
-  Py_DECREF(qs);
-  return NULL;
+    Py_DECREF(qs);
+    return NULL;
   }
 
-  res=Py_BuildValue("OO", ms, qs);
-  Py_DECREF(ms);
-  Py_DECREF(qs);
+  res=Py_BuildValue("NN", ms, qs); /* steals references */
 
   return res;
 }
@@ -7553,7 +7557,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"community_fastgreedy",
    (PyCFunction) igraphmodule_Graph_community_fastgreedy,
    METH_VARARGS | METH_KEYWORDS,
-   "community_fastgreedy(return_qs=True)\n\n"
+   "community_fastgreedy(weights=None, return_qs=True)\n\n"
    "Finds the community structure of the graph according to the algorithm of\n"
    "Clauset et al based on the greedy optimization of modularity.\n\n"
    "This is a bottom-up algorithm: initially every vertex belongs to a separate\n"
@@ -7562,6 +7566,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "in modularity.\n\n"
    "@attention: this function is wrapped in a more convenient syntax in the\n"
    "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
+   "@param weights: name of an edge attribute or a list containing\n"
+   "  edge weights\n"
    "@param return_qs: if C{True}, returns the modularity achieved before each\n"
    "  merge during the algorithm, so the first element of the list returned\n"
    "  will be the initial modularity (when every vertex belongs to a separate\n"

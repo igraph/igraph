@@ -559,9 +559,12 @@ class VertexDendrogram(VertexClustering, Dendrogram):
                     recoding[m], v = n, n
                     n += 1
                 membership[idx] = v
-        
+
+        else:
+            maxmod = None
+
         Dendrogram.__init__(self, merges)
-        VertexClustering.__init__(self, graph, membership, None, params)
+        VertexClustering.__init__(self, graph, membership, maxmod, params)
 
 
     def cut(self, n):

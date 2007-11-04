@@ -369,7 +369,46 @@ int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
   if (attr_type != ATTRIBUTE_TYPE_EDGE && attr_type != ATTRIBUTE_TYPE_VERTEX)
     return 1;
   if (o == Py_None) return 0;
-  if (PySequence_Check(o)) {
+  if (PyString_Check(o)) {
+    /* Check whether the attribute exists and is numeric */
+    igraph_attribute_type_t at;
+    igraph_attribute_elemtype_t et;
+    char *name = PyString_AsString(o);
+    et = (attr_type == ATTRIBUTE_TYPE_VERTEX) ?
+      IGRAPH_ATTRIBUTE_VERTEX : IGRAPH_ATTRIBUTE_EDGE;
+    if (igraphmodule_i_attribute_get_type(&self->g, &at, et, name)) {
+      /* exception was set by igraphmodule_i_attribute_get_type */
+      return 1;
+    }
+    if (at != IGRAPH_ATTRIBUTE_NUMERIC) {
+      PyErr_SetString(PyExc_ValueError, "attribute values must be numeric");
+      return 1;
+    }
+    /* Now that the attribute type has been checked, allocate the target
+     * vector */
+    result = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
+    if (result==0) {
+      PyErr_NoMemory();
+      return 1;
+    }
+    igraph_vector_init(result, 1);
+    if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+      if (igraphmodule_i_get_numeric_vertex_attr(&self->g, name,
+          igraph_vss_all(), result)) {
+        /* exception has already been set, so return */
+        free(result);
+        return 1;
+      }
+    } else {
+      if (igraphmodule_i_get_numeric_edge_attr(&self->g, name,
+          igraph_ess_all(IGRAPH_EDGEORDER_ID), result)) {
+        /* exception has already been set, so return */
+        free(result);
+        return 1;
+      }
+    }
+    *vptr = result;
+  } else if (PySequence_Check(o)) {
     result = (igraph_vector_t*)calloc(1, sizeof(igraph_vector_t));
     if (result==0) {
       PyErr_NoMemory();

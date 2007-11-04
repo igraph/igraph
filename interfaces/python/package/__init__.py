@@ -325,7 +325,7 @@ class Graph(core.GraphBase):
 
     # Various clustering algorithms -- mostly wrappers around GraphBase
 
-    def community_fastgreedy(self):
+    def community_fastgreedy(self, weights=None):
         """Community structure based on the greedy optimization of modularity.
 
         This algorithm merges individual nodes into communities in a way that
@@ -335,13 +335,15 @@ class Graph(core.GraphBase):
 
         This algorithm is said to run almost in linear time on sparse graphs.
 
+        @param weights: edge attribute name or a list containing edge
+          weights
         @return: an appropriate L{VertexClustering} object.
 
         @newfield ref: Reference
         @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
           in very large networks. Phys Rev E 70, 066111 (2004).
         """
-        merges, qs = GraphBase.community_fastgreedy(self, True)
+        merges, qs = GraphBase.community_fastgreedy(self, weights, True)
         return VertexDendrogram(self, merges, None, qs)
 
 

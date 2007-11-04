@@ -851,8 +851,10 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
     if (!PyList_Check(o)) IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
     if (!PyList_Size(o))  IGRAPH_ERROR("attribute hash type mismatch", IGRAPH_EINVAL);
     j = PyList_Size(o);
-    for (i=0; i<j && is_numeric; i++)
-      if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
+    for (i=0; i<j && is_numeric; i++) {
+      PyObject *item = PyList_GET_ITEM(o, i);
+      if (item != Py_None && !PyNumber_Check(item)) is_numeric=0;
+    }
   } else if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
   if (is_numeric)
     *type = IGRAPH_ATTRIBUTE_NUMERIC;
@@ -916,8 +918,8 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
   if (igraph_vs_is_all(&vs)) {
     if (igraphmodule_PyObject_to_vector_t(list, &newvalue, 0, 0))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
-    igraph_vector_destroy(value);
-    *value=newvalue;
+    igraph_vector_copy(value, &newvalue);
+    igraph_vector_destroy(&newvalue);
   } else {
     igraph_vit_t it;
     long int i=0;
@@ -995,8 +997,8 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
   if (igraph_es_is_all(&es)) {
     if (igraphmodule_PyObject_to_vector_t(list, &newvalue, 0, 0))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
-    igraph_vector_destroy(value);
-    *value=newvalue;
+    igraph_vector_copy(value, &newvalue);
+    igraph_vector_destroy(&newvalue);
   } else {
     igraph_eit_t it;
     long int i=0;
