@@ -530,7 +530,9 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   if (weights != 0) {
     if (igraph_vector_size(weights) < igraph_ecount(graph))
       IGRAPH_ERROR("fast greedy community detection: weight vector too short", IGRAPH_EINVAL);
-      weight_sum = igraph_vector_sum(weights);
+    if (igraph_vector_any_smaller(weights, 0))
+      IGRAPH_ERROR("weights must be positive", IGRAPH_EINVAL);
+    weight_sum = igraph_vector_sum(weights);
   }
 
   /* Create degree vector */
