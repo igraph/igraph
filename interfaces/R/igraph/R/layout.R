@@ -341,9 +341,16 @@ layout.spring<-function(graph, ..., params=list()) {
   cbind(x,y)
 }
 
-i.layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
+layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
                           zmin=NULL, zmax=NULL) {
 
+  if (!is.matrix(layout)) {
+    stop("`layout' not a matrix")
+  }
+  if (ncol(layout) != 2 && ncol(layout) != 3) {
+    stop("`layout' should have 2 or three columns")
+  }
+  
   if (!is.null(xmin) && !is.null(xmax)) {
     layout[,1] <- .layout.norm.col(layout[,1], xmin, xmax)
   }
@@ -352,7 +359,7 @@ i.layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
     layout[,2] <- .layout.norm.col(layout[,2], ymin, ymax)
   }
   
-  if (!is.null(zmin) && !is.null(zmax)) {
+  if (ncol(layout)==3 && !is.null(zmin) && !is.null(zmax)) {
     layout[,3] <- .layout.norm.col(layout[,3], zmin, zmax)
   }
 

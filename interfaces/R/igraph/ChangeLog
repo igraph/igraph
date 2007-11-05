@@ -1,3 +1,10 @@
+2007-11-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : add 'main' and 'sub'
+	arguments
+
+	* interfaces/R/igraph/R/layout.R (layout.norm) : make it public
+
 2007-10-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/games.R (grg.game) : add 'coords' argument

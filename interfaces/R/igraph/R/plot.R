@@ -23,7 +23,7 @@
 plot.igraph <- function(x, 
                        # SPECIFIC: #####################################
                        axes=FALSE, xlab="", ylab="", add=FALSE,
-                       xlim=c(-1,1), ylim=c(-1,1),
+                       xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
                        ...) {
 
   graph <- x
@@ -69,13 +69,13 @@ plot.igraph <- function(x,
   maxv <- max(vertex.size)
   if (rescale) {
     # norm layout to (-1, 1)
-    layout <- i.layout.norm(layout, -1, 1, -1, 1)
+    layout <- layout.norm(layout, -1, 1, -1, 1)
     xlim <- c(xlim[1]-margin[2]-maxv, xlim[2]+margin[4]+maxv)
     ylim <- c(ylim[1]-margin[1]-maxv, ylim[2]+margin[3]+maxv)
   }
   if (!add) {
     plot(0, 0, type="n", xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim,
-         axes=axes, asp=asp)
+         axes=axes, asp=asp, main=main, sub=sub)
   }
   
   # add the edges
@@ -444,7 +444,7 @@ rglplot.igraph <- function(x, ...) {
   # norm layout to (-1, 1)
   if (ncol(layout)==2) { layout <- cbind(layout, 0) }
   if (rescale) {
-    layout <- i.layout.norm(layout, -1, 1, -1, 1, -1, 1)
+    layout <- layout.norm(layout, -1, 1, -1, 1, -1, 1)
   }
   
   # add the edges, the loops are handled separately
