@@ -1697,12 +1697,15 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
   return 0;
 }
 
-
 /**
  * \ingroup structural
- * \function igraph_pagerank
+ * \function igraph_pagerank_old
  * \brief Calculates the Google PageRank for the specified vertices.
  * 
+ * </para><para>This is an old implementation, 
+ * it is provided for compatibility with igraph versions earlier than 
+ * 0.5. Please use the new implementation \ref igraph_pagerank() in 
+ * new projects.
  * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank
  * of all other vertices, so even if you want to calculate the PageRank for
@@ -1750,7 +1753,7 @@ int igraph_edge_betweenness (const igraph_t *graph, igraph_vector_t *result,
  * Time complexity: TODO.
  */
 
-int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res, 
+int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 
 		    const igraph_vs_t vids, igraph_bool_t directed,
             igraph_integer_t niter, igraph_real_t eps, igraph_real_t damping) {
   long int no_of_nodes=igraph_vcount(graph);
@@ -1817,10 +1820,13 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
   while (niter>0 && maxdiff >= eps) {
     niter--;
     maxdiff=0;
+/*     igraph_real_t sumfrom=0, sum=0; */
 
     /* Calculate the quotient of the actual PageRank value and the
      * outdegree for every node */
+/*     sumfrom=0.0; sum=0.0; */
     for (i=0; i<no_of_nodes; i++) {
+/*       sumfrom += prvec[i]; */
       prvec_scaled[i]=prvec[i]/VECTOR(outdegree)[i];
     }
     
@@ -1838,13 +1844,18 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *res,
       }
       prvec_new[i]*=damping;
       prvec_new[i]+=(1-damping);
+/*       sum += prvec_new[i]; */
+      
+/*     } */
+/*     for (i=0; i<no_of_nodes; i++) { */
+/*       prvec_new[i] /= sum; */
 
       if (prvec_new[i]-prvec[i]>maxdiff) 
 	maxdiff=prvec_new[i]-prvec[i];
       else if (prvec[i]-prvec_new[i]>maxdiff)
 	maxdiff=prvec[i]-prvec_new[i];
     }
-    
+
     /* Swap the vectors */
     prvec_aux=prvec_new;
     prvec_new=prvec;

@@ -1,5 +1,11 @@
 2007-11-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/centrality.c (igraph_pagerank) : added
+
+	* src/structural_properties.c (igraph_pagerank, igraph_pagerank_old) :
+	renamed
+	* examples/simple/igraph_pagerank.c : updated
+
 	* src/cliques.c (igraph_i_maximal_or_largest_cliques_or_indsets) : 
 	give prototype
 

@@ -4541,35 +4541,6 @@ SEXP R_igraph_es_pairs(SEXP graph, SEXP pp, SEXP pdir) {
   return result;
 }
 
-SEXP R_igraph_pagerank(SEXP graph, SEXP pvids, SEXP pdirected, 
-		       SEXP pniter, SEXP peps, SEXP pdamping) {
-  
-  igraph_t g;
-  igraph_vs_t vids;
-  igraph_bool_t directed=LOGICAL(pdirected)[0];
-  igraph_integer_t niter=REAL(pniter)[0];
-  igraph_real_t eps=REAL(peps)[0];
-  igraph_real_t damping=REAL(pdamping)[0];
-  igraph_vector_t res;
-  SEXP result;
-  
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_igraph_vs(pvids, &g, &vids);
-  igraph_vector_init(&res, 0);
-  igraph_pagerank(&g, &res, vids, directed, niter, eps, damping);
-  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
-  igraph_vector_copy_to(&res, REAL(result));
-  igraph_vector_destroy(&res);
-  igraph_vs_destroy(&vids);
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-  
 SEXP R_igraph_reciprocity(SEXP graph, SEXP pignore_loops) {
   
   igraph_t g;

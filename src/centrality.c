@@ -22,6 +22,7 @@
 */
 
 #include "igraph.h"
+#include "memory.h"
 #include <math.h>
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
@@ -275,5 +276,169 @@ int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
 			   igraph_arpack_options_t *options) {
 
   return igraph_i_kleinberg(graph, vector, value, scale, options, 1);
+}
+
+typedef struct igraph_i_pagerank_data_t {
+  const igraph_t *graph;
+  igraph_adjlist_t *adjlist;
+  igraph_real_t damping;
+  igraph_vector_t *outdegree;
+  igraph_vector_t *tmp;
+} igraph_i_pagerank_data_t;
+
+typedef struct igraph_i_pagerank_data2_t {
+  const igraph_t *graph;
+  igraph_adjedgelist_t *adjedgelist;
+  const igraph_vector_t *weights;
+  igraph_real_t damping;
+  igraph_vector_t *outdegree;
+  igraph_vector_t *tmp;
+} igraph_i_pagerank_data2_t;
+
+int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
+		      long int n, void *extra) {
+  
+  igraph_i_pagerank_data_t *data=extra;
+  igraph_adjlist_t *adjlist=data->adjlist;
+  igraph_vector_t *outdegree=data->outdegree;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_vector_t *neis;
+  long int i, j, nlen;
+  igraph_real_t sumfrom=0.0;
+  
+  for (i=0; i<n; i++) {
+    sumfrom += from[i];
+    VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
+  }
+
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(adjlist, i);
+    nlen=igraph_vector_size(neis);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei=VECTOR(*neis)[j];
+      to[i] += VECTOR(*tmp)[nei];
+    }
+    to[i] *= data->damping;
+    to[i] += (1-data->damping) * sumfrom;
+  }  
+  
+  return 0;
+}
+
+int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
+		       long int n, void *extra) {
+  /* TODO */
+  return 0;
+}
+
+int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options) {
+
+  igraph_vector_t values;
+  igraph_matrix_t vectors;
+  igraph_integer_t dirmode;
+  igraph_vector_t outdegree;
+  igraph_vector_t tmp;
+  long int i;
+  
+  options->n = igraph_vcount(graph);
+  
+  if (directed && igraph_is_directed(graph)) {
+    IGRAPH_ERROR("Directed graphs are not supported yet, use 'directed=0'",
+		 IGRAPH_UNIMPLEMENTED);
+  }
+  if (weights && igraph_vector_size(weights) != igraph_ecount(graph))
+  {
+    IGRAPH_ERROR("Invalid length of weights vector when calculating "
+		 "eigenvector centrality", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&vectors, 0, 0);
+
+  if (directed) { dirmode=IGRAPH_IN; } else { dirmode=IGRAPH_ALL; }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&outdegree, options->n);
+  IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
+			     IGRAPH_OUT, /*loops=*/ 0));
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
+
+  /* Avoid division by zero */
+  for (i=0; i<options->n; i++) {
+    if (VECTOR(outdegree)[i]==0) {
+      VECTOR(outdegree)[i]=1;
+    }
+  }
+  
+  if (!weights) {
+    
+    igraph_adjlist_t adjlist;
+    igraph_i_pagerank_data_t data = { graph, &adjlist, damping,
+				      &outdegree, &tmp };
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+    
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_pagerank,
+				       &data, options, 0, &values, &vectors));
+
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+    
+  } else {
+    
+    igraph_adjedgelist_t adjedgelist;
+    igraph_i_pagerank_data2_t data = { graph, &adjedgelist, weights,
+				       damping, &outdegree, &tmp };
+    
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, dirmode));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+    
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_pagerank2,
+				       &data, options, 0, &values, &vectors));
+    
+    igraph_adjedgelist_destroy(&adjedgelist);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&tmp);
+  igraph_vector_destroy(&outdegree);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  if (value) {
+    *value=VECTOR(values)[0];
+  }
+  
+  if (vector) {
+    long int i;
+    igraph_vit_t vit;
+    long int nodes_to_calc;
+
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+    nodes_to_calc=IGRAPH_VIT_SIZE(vit);
+
+    IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
+    for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit);
+	 IGRAPH_VIT_NEXT(vit), i++) {
+      VECTOR(*vector)[i] = MATRIX(vectors, (long int)IGRAPH_VIT_GET(vit), 0);
+    }
+    
+    igraph_vit_destroy(&vit);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (options->info) {
+    IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
+  }
+  
+  igraph_matrix_destroy(&vectors);
+  igraph_vector_destroy(&values);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
 }
 

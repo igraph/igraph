@@ -311,10 +311,20 @@ igraph_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
-igraph_pagerank:
+igraph_pagerank_old:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True, \
                 INTEGER niter=1000, REAL eps=0.001, REAL damping=0.85
-        IGNORE: RR, RC, RNamespace
+        DEPS: vids ON graph
+        NAME-R: page.rank.old
+
+igraph_pagerank:
+        PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
+                VERTEXSET vids=ALL, BOOLEAN directed=False, REAL damping=0.85, \
+                EDGEWEIGHTS weights=NULL, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        DEPS: vids ON graph, weights ON graph
+        DEFAULT-R: options=igraph.arpack.default
+        NAME-R: page.rank
 
 igraph_rewire:
         PARAMS: INOUT GRAPH rewire, INTEGER n, REWIRINGMODE mode=SIMPLE
