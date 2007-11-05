@@ -655,6 +655,13 @@ igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, LONGINT steps=VCOUNT(graph)
         IGNORE: RR, RC, RNamespace
 
+igraph_community_leading_eigenvector_naive:
+        PARAMS: GRAPH graph, OUT MATRIX merges, OUT VECTOR membership, \
+                INTEGER steps=-1, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        DEFAULT-R: options=igraph.arpack.default
+        NAME-R: leading.eigenvector.community.naive
+
 #######################################
 # Conversion
 #######################################

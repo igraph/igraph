@@ -1024,7 +1024,8 @@ int igraph_modularity(const igraph_t *graph,
 int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 					       igraph_matrix_t *merges,
 					       igraph_vector_t *membership,
-					       long int steps);
+					       igraph_integer_t steps,
+					       igraph_arpack_options_t *options);
 int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,

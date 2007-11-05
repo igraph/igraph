@@ -54,6 +54,7 @@ int main() {
   igraph_bool_t split;
   igraph_vector_t x;
   igraph_real_t val;
+  igraph_arpack_options_t options;
   
   /* Zachary Karate club */
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
@@ -79,7 +80,8 @@ int main() {
   igraph_matrix_init(&merges, 0, 0);
   igraph_vector_init(&membership, 0);
   igraph_vector_init(&x, 0);
-  igraph_community_leading_eigenvector_naive(&g, &merges, &membership, 1);
+  igraph_arpack_options_init(&options);
+  igraph_community_leading_eigenvector_naive(&g, &merges, &membership, 1, &options);
 
   print_matrix(&merges);
   print_vector(&membership);

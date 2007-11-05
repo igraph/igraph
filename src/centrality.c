@@ -105,7 +105,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
-				       &adjlist, options, &values, &vectors));
+				       &adjlist, options, 0, &values, &vectors));
 
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
@@ -119,7 +119,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
     
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
-				       &data, options, &values, &vectors));
+				       &data, options, 0, &values, &vectors));
     
     igraph_adjedgelist_destroy(&adjedgelist);
     IGRAPH_FINALLY_CLEAN(1);
@@ -228,7 +228,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   extra.in=inadjlist; extra.out=outadjlist; extra.tmp=&tmp;
 
   IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg2, &extra,
-				     options, &values, &vectors));
+				     options, 0, &values, &vectors));
 
   igraph_adjlist_destroy(&myoutadjlist);
   igraph_adjlist_destroy(&myinadjlist);

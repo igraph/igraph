@@ -6422,7 +6422,7 @@ SEXP R_igraph_modularity(SEXP graph, SEXP pmembership) {
   return result;
 }
 
-SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP psteps, SEXP pnaive) {
+SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP psteps) {
   
   igraph_t g;
   long int steps=REAL(psteps)[0];
@@ -6435,11 +6435,7 @@ SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP psteps, SEXP pnaive
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&merges, 0, 0);
   igraph_vector_init(&membership, 0);
-  if (LOGICAL(pnaive)[0]) {
-    igraph_community_leading_eigenvector_naive(&g, &merges, &membership, steps);
-  } else {
-    igraph_community_leading_eigenvector(&g, &merges, &membership, steps);
-  }
+  igraph_community_leading_eigenvector(&g, &merges, &membership, steps);
   PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&merges));
   igraph_matrix_destroy(&merges);
