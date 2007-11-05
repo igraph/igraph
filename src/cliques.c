@@ -307,6 +307,12 @@ int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
   return igraph_i_cliques(graph, res, min_size, max_size, 0);
 }
 
+int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
+                                        igraph_vector_ptr_t *res,
+                                        igraph_integer_t *clique_number,
+                                        igraph_bool_t keep_only_largest,
+					igraph_bool_t complementer);
+
 /**
  * \function igraph_largest_cliques
  * \brief Finds the largest clique(s) in a graph.

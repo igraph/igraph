@@ -1,5 +1,8 @@
 2007-11-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/cliques.c (igraph_i_maximal_or_largest_cliques_or_indsets) : 
+	give prototype
+
 	* src/community.c (igraph_i_community_leading_eigenvector_naive) : added
 	(igraph_community_leading_eigenvector_naive) : rewritten to call rssolve
 
