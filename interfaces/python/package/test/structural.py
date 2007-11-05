@@ -103,6 +103,19 @@ class BiconnectedComponentTests(unittest.TestCase):
         self.failUnless(self.g2.cut_vertices() == [1,2,3])
         self.failUnless(self.g3.articulation_points() == [2])
 
+
+class CentralityTests(unittest.TestCase):
+    def testEigenvectorCentrality(self):
+        g = Graph.Star(11)
+        cent = g.evcent()
+        self.failUnless(cent.index(max(cent)) == 0)
+        self.assertAlmostEquals(max(cent), 1.0, places=3)
+        cent, ev = g.evcent(scale=False, return_eigenvalue=True)
+        if cent[0]<0: cent = [-x for x in cent]
+        self.failUnless(cent.index(max(cent)) == 0)
+        self.assertAlmostEquals(cent[1]/cent[0], 0.3162, places=3)
+        self.assertAlmostEquals(ev, 3.162, places=3)
+
 class MiscTests(unittest.TestCase):
     def testConstraint(self):
         g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
@@ -132,11 +145,13 @@ def suite():
     degree_suite = unittest.makeSuite(DegreeTests)
     local_transitivity_suite = unittest.makeSuite(LocalTransitivityTests)
     biconnected_suite = unittest.makeSuite(BiconnectedComponentTests)
+    centrality_suite = unittest.makeSuite(CentralityTests)
     misc_suite = unittest.makeSuite(MiscTests)
     return unittest.TestSuite([simple_suite,
                                degree_suite,
                                local_transitivity_suite,
                                biconnected_suite,
+                               centrality_suite,
                                misc_suite])
 
 def test():

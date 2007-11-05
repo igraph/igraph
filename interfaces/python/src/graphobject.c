@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "graphobject.h"
+#include "arpackobject.h"
 #include "vertexseqobject.h"
 #include "edgeseqobject.h"
 #include "bfsiter.h"
@@ -2249,56 +2250,6 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the Google PageRank value of some nodes in the graph.
- * \return the PageRank values
- * \sa igraph_pagerank
- */
-PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject * self,
-                                      PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] =
-    { "vertices", "directed", "niter", "eps", "damping", NULL };
-  PyObject *directed = Py_True;
-  PyObject *vobj = Py_None, *list;
-  long int niter = 1000;        /// @todo maybe it should be selected adaptively based on the number of vertices?
-  double eps = 0.001, damping = 0.85;
-  igraph_vector_t res;
-  igraph_bool_t return_single = 0;
-  igraph_vs_t vs;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOldd", kwlist,
-                                   &vobj, &directed, &niter, &eps, &damping))
-    return NULL;
-
-  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  if (igraph_vector_init(&res, 0)) {
-    igraph_vs_destroy(&vs);
-    return igraphmodule_handle_igraph_error();
-  }
-
-  if (igraph_pagerank(&self->g, &res, vs,
-                      PyObject_IsTrue(directed), niter, eps, damping)) {
-    igraph_vs_destroy(&vs);
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  if (!return_single)
-    list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
-  else
-    list = PyFloat_FromDouble(VECTOR(res)[0]);
-
-  igraph_vector_destroy(&res);
-  igraph_vs_destroy(&vs);
-
-  return list;
-}
-
-/** \ingroup python_interface_graph
  * \brief Calculates the bibliographic coupling of some nodes in a graph.
  * \return the bibliographic coupling values in a matrix
  * \sa igraph_bibcoupling
@@ -2689,6 +2640,67 @@ PyObject *igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the eigenvector centralities of the nodes in the graph
+ * \sa igraph_eigenvector_centrality
+ */
+PyObject *igraphmodule_Graph_eigenvector_centrality(
+  igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] =
+    { "scale", "weights", "arpack_options", "return_eigenvalue", NULL };
+  PyObject *scale_o = Py_True;
+  PyObject *weights_o = Py_None;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  PyObject *return_eigenvalue = Py_False;
+  PyObject *res_o;
+  igraph_bool_t scale;
+  igraph_real_t value;
+  igraph_vector_t *weights=0, res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO!O", kwlist,
+                                   &scale_o, &weights_o,
+                                   &igraphmodule_ARPACKOptionsType,
+                                   &arpack_options, &return_eigenvalue))
+    return NULL;
+
+  scale = PyObject_IsTrue(scale_o);
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+      ATTRIBUTE_TYPE_EDGE)) return NULL;
+
+  if (igraph_vector_init(&res, 0)) {
+    if (weights) igraph_vector_destroy(weights);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraph_eigenvector_centrality(&self->g, &res, &value, scale,
+      weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
+    igraphmodule_handle_igraph_error();
+    if (weights) igraph_vector_destroy(weights);
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+
+  if (weights) igraph_vector_destroy(weights);
+  
+  res_o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT); 
+  igraph_vector_destroy(&res);
+  if (res_o == NULL) return igraphmodule_handle_igraph_error();
+
+  if (PyObject_IsTrue(return_eigenvalue)) {
+    PyObject *ev_o = PyFloat_FromDouble((double)value);
+    if (ev_o == NULL) {
+      Py_DECREF(res_o);
+      return igraphmodule_handle_igraph_error();
+    }
+    return Py_BuildValue("NN", res_o, ev_o);
+  }
+
+  return res_o;
+}
+
+
+/** \ingroup python_interface_graph
  * \brief Calculates the shortest paths from/to a given node in the graph
  * \return a list containing shortest paths from/to the given node
  * \sa igraph_get_shortest_paths
@@ -2862,6 +2874,58 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
 
   return (PyObject *) result;
 }
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the Google PageRank value of some nodes in the graph.
+ * \return the PageRank values
+ * \sa igraph_pagerank
+ */
+PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject * self,
+                                      PyObject * args, PyObject * kwds)
+{
+  char *kwlist[] =
+    { "vertices", "directed", "niter", "eps", "damping", NULL };
+  PyObject *directed = Py_True;
+  PyObject *vobj = Py_None, *list;
+  long int niter = 1000;        /// @todo maybe it should be selected adaptively based on the number of vertices?
+  double eps = 0.001, damping = 0.85;
+  igraph_vector_t res;
+  igraph_bool_t return_single = 0;
+  igraph_vs_t vs;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOldd", kwlist,
+                                   &vobj, &directed, &niter, &eps, &damping))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&res, 0)) {
+    return igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
+  }
+
+  if (igraph_pagerank_old(&self->g, &res, vs,
+                      PyObject_IsTrue(directed), niter, eps, damping)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+  else
+    list = PyFloat_FromDouble(VECTOR(res)[0]);
+
+  igraph_vector_destroy(&res);
+  igraph_vs_destroy(&vs);
+
+  return list;
+}
+
 
 /** \ingroup python_interface_graph
  * \brief Calculates shortest paths in a graph.
@@ -5708,16 +5772,18 @@ PyObject *igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject
  * Newman's leading eigenvector method, naive implementation
  */
 PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
-  static char *kwlist[] = { "n", "return_merges", NULL };
+  static char *kwlist[] = { "n", "return_merges", "arpack_options", NULL };
   long int n=-1;
   PyObject *return_merges = Py_False;
   PyObject *cl, *res, *merges;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
   igraph_vector_t members;
   igraph_matrix_t *mptr = 0;
   igraph_matrix_t m;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
-    &n, &return_merges)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iOO&", kwlist,
+    &n, &return_merges, &igraphmodule_ARPACKOptionsType, &arpack_options)) {
     return NULL;
   }
 
@@ -5729,31 +5795,31 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_Gr
 
   if (n<0) n = igraph_vcount(&self->g); else n -= 1;
 
-  if (igraph_community_leading_eigenvector_naive(&self->g, mptr, &members, n)){
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraph_community_leading_eigenvector_naive(&self->g, mptr, &members, n,
+      igraphmodule_ARPACKOptions_get(arpack_options))){
     if (mptr) igraph_matrix_destroy(mptr);
-  igraph_vector_destroy(&members);
+    igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
   }
 
   cl = igraphmodule_vector_t_to_PyList(&members, IGRAPHMODULE_TYPE_INT);
   igraph_vector_destroy(&members);
   if (cl == 0) {
-  if (mptr) igraph_matrix_destroy(mptr);
-  return 0;
+    if (mptr) igraph_matrix_destroy(mptr);
+    return 0;
   }
 
   if (mptr) {
-  merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
-  igraph_matrix_destroy(mptr);
-  if (merges == 0) return 0;
+    merges=igraphmodule_matrix_t_to_PyList(mptr, IGRAPHMODULE_TYPE_INT);
+    igraph_matrix_destroy(mptr);
+    if (merges == 0) return 0;
   } else {
-  merges=Py_None;
-  Py_INCREF(merges);
+    merges=Py_None;
+    Py_INCREF(merges);
   }
 
-  res=Py_BuildValue("OO", cl, merges);
-  Py_DECREF(merges);
-  Py_DECREF(cl);
+  res=Py_BuildValue("NN", cl, merges);
 
   return res;
 }
@@ -6591,13 +6657,32 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  C{False} and the graph is unconnected, the result is the\n"
    "  number of vertices."},
 
-  // interface to igraph_edge_betweenness
+  /* interface to igraph_edge_betweenness */
   {"edge_betweenness", (PyCFunction) igraphmodule_Graph_edge_betweenness,
    METH_VARARGS | METH_KEYWORDS,
    "edge_betweenness(directed=True)\n\n"
    "Calculates the edge betweennesses in a graph.\n\n"
    "@param directed: whether to consider directed paths.\n"
    "@return: a list with the edge betweennesses of all specified edges.\n"},
+
+  /* interface to igraph_eigenvector_centrality */
+  {"eigenvector_centrality",
+   (PyCFunction) igraphmodule_Graph_eigenvector_centrality,
+   METH_VARARGS | METH_KEYWORDS,
+   "eigenvector_centrality()\n\n"
+   "Calculates the eigenvector centralities of the vertices in a graph.\n\n"
+   "@param scale: whether to normalize the centralities so the largest\n"
+   "  one will always be 1.\n\n"
+   "@param weights: edge weights given as a list or an edge attribute. If\n"
+   "  C{None}, all edges have equal weight.\n"
+   "@param return_eigenvalue: whether to return the actual largest\n"
+   "  eigenvalue along with the centralities\n"
+   "@param arpack_options: an L{ARPACKOptions} object that can be used\n"
+   "  to fine-tune the calculation. The default is stored in the\n"
+   "  module-level variable called C{arpack_options}.\n"
+   "@return: the eigenvector centralities in a list and optionally the\n"
+   "  largest eigenvalue (as a second member of a tuple)"
+  },
 
   // interface to igraph_get_shortest_paths
   {"get_shortest_paths", (PyCFunction) igraphmodule_Graph_get_shortest_paths,

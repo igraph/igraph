@@ -34,6 +34,7 @@
 #include "vertexobject.h"
 #include "edgeseqobject.h"
 #include "edgeobject.h"
+#include "arpackobject.h"
 #include "bfsiter.h"
 #include "config.h"
 
@@ -1113,6 +1114,7 @@ static PyMethodDef igraphmodule_methods[] =
 #endif
 
 extern PyObject* igraphmodule_InternalError;
+extern PyObject* igraphmodule_arpack_options_default;
 
 PyMODINIT_FUNC initcore(void) {
   PyObject* m;
@@ -1136,29 +1138,33 @@ PyMODINIT_FUNC initcore(void) {
   if (PyType_Ready(&igraphmodule_GraphType) < 0) return;
   
   if (PyType_Ready(&igraphmodule_BFSIterType) < 0) return;
-  
-  igraphmodule_InternalError =
-    PyErr_NewException("igraph.core.InternalError", PyExc_Exception, NULL);
 
-  Py_INCREF(igraphmodule_InternalError);
-  
+  if (PyType_Ready(&igraphmodule_ARPACKOptionsType) < 0) return;
+
   m = Py_InitModule3("igraph.core", igraphmodule_methods,
 		     "Low-level Python interface for the igraph library. "
 		     "Should not be used directly.");
-  
-  Py_INCREF(&igraphmodule_GraphType);
   
   PyModule_AddObject(m, "GraphBase", (PyObject*)&igraphmodule_GraphType);
   PyModule_AddObject(m, "BFSIter", (PyObject*)&igraphmodule_BFSIterType);
   /* These types are not necessary to be registered, but I want epydoc to
    * see them so the proper documentation can be generated for them */
+  PyModule_AddObject(m, "ARPACKOptions", (PyObject*)&igraphmodule_ARPACKOptionsType);
   PyModule_AddObject(m, "Edge", (PyObject*)&igraphmodule_EdgeType);
   PyModule_AddObject(m, "EdgeSeq", (PyObject*)&igraphmodule_EdgeSeqType);
   PyModule_AddObject(m, "Vertex", (PyObject*)&igraphmodule_VertexType);
   PyModule_AddObject(m, "VertexSeq", (PyObject*)&igraphmodule_VertexSeqType);
-  
+ 
+  /* Internal error exception type */
+  igraphmodule_InternalError =
+    PyErr_NewException("igraph.core.InternalError", PyExc_Exception, NULL);
   PyModule_AddObject(m, "InternalError", igraphmodule_InternalError);
-  
+
+  /* ARPACK default options variable */
+  igraphmodule_arpack_options_default = igraphmodule_ARPACKOptions_new();
+  PyModule_AddObject(m, "arpack_options", igraphmodule_arpack_options_default);
+
+  /* Useful constants */
   PyModule_AddIntConstant(m, "OUT", IGRAPH_OUT);
   PyModule_AddIntConstant(m, "IN", IGRAPH_IN);
   PyModule_AddIntConstant(m, "ALL", IGRAPH_ALL);
@@ -1182,6 +1188,7 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "ADJ_UPPER", IGRAPH_ADJ_UPPER);
   PyModule_AddIntConstant(m, "ADJ_LOWER", IGRAPH_ADJ_LOWER);
 
+  /* More useful constants */
   PyModule_AddStringConstant(m, "__version__", VERSION);
   PyModule_AddStringConstant(m, "__build_date__", __DATE__);
 
