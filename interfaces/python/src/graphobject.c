@@ -2174,6 +2174,53 @@ PyObject *igraphmodule_Graph_articulation_points(igraphmodule_GraphObject *self)
   return o;
 }
 
+/** \ingroup python_interface_graph
+ * \brief Calculates Kleinberg's authority scores of the nodes in the graph
+ * \sa igraph_authority_score
+ */
+PyObject *igraphmodule_Graph_authority_score(
+  igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] =
+    { "scale", "arpack_options", "return_eigenvalue", NULL };
+  PyObject *scale_o = Py_True;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  PyObject *return_eigenvalue = Py_False;
+  PyObject *res_o;
+  igraph_real_t value;
+  igraph_vector_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO!O", kwlist, &scale_o,
+                                   &igraphmodule_ARPACKOptionsType,
+                                   &arpack_options, &return_eigenvalue))
+    return NULL;
+
+  if (igraph_vector_init(&res, 0)) return igraphmodule_handle_igraph_error();
+
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraph_authority_score(&self->g, &res, &value, PyObject_IsTrue(scale_o),
+      igraphmodule_ARPACKOptions_get(arpack_options))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+
+  res_o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT); 
+  igraph_vector_destroy(&res);
+  if (res_o == NULL) return igraphmodule_handle_igraph_error();
+
+  if (PyObject_IsTrue(return_eigenvalue)) {
+    PyObject *ev_o = PyFloat_FromDouble((double)value);
+    if (ev_o == NULL) {
+      Py_DECREF(res_o);
+      return igraphmodule_handle_igraph_error();
+    }
+    return Py_BuildValue("NN", res_o, ev_o);
+  }
+
+  return res_o;
+}
+
 
 /** \ingroup python_interface_graph
  * \brief Calculates the average path length in a graph.
@@ -2850,6 +2897,54 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
   igraph_vector_ptr_destroy_all(&res);
   return list;
 }
+
+/** \ingroup python_interface_graph
+ * \brief Calculates Kleinberg's hub scores of the nodes in the graph
+ * \sa igraph_hub_score
+ */
+PyObject *igraphmodule_Graph_hub_score(
+  igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] =
+    { "scale", "arpack_options", "return_eigenvalue", NULL };
+  PyObject *scale_o = Py_True;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  PyObject *return_eigenvalue = Py_False;
+  PyObject *res_o;
+  igraph_real_t value;
+  igraph_vector_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO!O", kwlist, &scale_o,
+                                   &igraphmodule_ARPACKOptionsType,
+                                   &arpack_options, &return_eigenvalue))
+    return NULL;
+
+  if (igraph_vector_init(&res, 0)) return igraphmodule_handle_igraph_error();
+
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraph_hub_score(&self->g, &res, &value, PyObject_IsTrue(scale_o),
+      igraphmodule_ARPACKOptions_get(arpack_options))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+
+  res_o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT); 
+  igraph_vector_destroy(&res);
+  if (res_o == NULL) return igraphmodule_handle_igraph_error();
+
+  if (PyObject_IsTrue(return_eigenvalue)) {
+    PyObject *ev_o = PyFloat_FromDouble((double)value);
+    if (ev_o == NULL) {
+      Py_DECREF(res_o);
+      return igraphmodule_handle_igraph_error();
+    }
+    return Py_BuildValue("NN", res_o, ev_o);
+  }
+
+  return res_o;
+}
+
 
 /** \ingroup python_interface_graph
  * \brief Returns the line graph of the graph
@@ -6543,7 +6638,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  a path length equal to the number of vertices is used.\n"
    "@return: the average path length in the graph\n"},
 
-  // interface to igraph_betweenness
+  /* interface to igraph_authority_score */
+  {"authority_score", (PyCFunction)igraphmodule_Graph_hub_score,
+   METH_VARARGS | METH_KEYWORDS,
+   "authority_score(scale=True, arpack_options=None, return_eigenvalue=False)\n\n"
+   "Calculates Kleinberg's authority score for the vertices of the graph\n\n"
+   "@param scale: whether to normalize the scores so that the largest one\n"
+   "  is 1.\n"
+   "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
+   "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
+   "  variable called C{arpack_options} is used.\n"
+   "@param return_eigenvalue: whether to return the largest eigenvalue\n"
+   "@return: the authority scores in a list and optionally the largest eigenvalue\n"
+   "  as a second member of a tuple\n\n"
+   "@see: hub_score()\n"
+  },
+
+  /* interface to igraph_betweenness */
   {"betweenness", (PyCFunction) igraphmodule_Graph_betweenness,
    METH_VARARGS | METH_KEYWORDS,
    "betweenness(vertices=None, directed=True)\n\n"
@@ -6669,7 +6780,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"eigenvector_centrality",
    (PyCFunction) igraphmodule_Graph_eigenvector_centrality,
    METH_VARARGS | METH_KEYWORDS,
-   "eigenvector_centrality()\n\n"
+   "eigenvector_centrality(scale=True, weights=None, return_eigenvalue=False, arpack_options=None)\n\n"
    "Calculates the eigenvector centralities of the vertices in a graph.\n\n"
    "@param scale: whether to normalize the centralities so the largest\n"
    "  one will always be 1.\n\n"
@@ -6678,8 +6789,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param return_eigenvalue: whether to return the actual largest\n"
    "  eigenvalue along with the centralities\n"
    "@param arpack_options: an L{ARPACKOptions} object that can be used\n"
-   "  to fine-tune the calculation. The default is stored in the\n"
-   "  module-level variable called C{arpack_options}.\n"
+   "  to fine-tune the calculation. If it is omitted, the module-level\n"
+   "  variable called C{arpack_options} is used.\n"
    "@return: the eigenvector centralities in a list and optionally the\n"
    "  largest eigenvalue (as a second member of a tuple)"
   },
@@ -6724,7 +6835,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  is true, the shortest circle itself as a list\n"
   },
 
-  // interface to igraph_is_connected
+  /* interface to igraph_hub_score */
+  {"hub_score", (PyCFunction)igraphmodule_Graph_hub_score,
+   METH_VARARGS | METH_KEYWORDS,
+   "hub_score(scale=True, arpack_options=None, return_eigenvalue=False)\n\n"
+   "Calculates Kleinberg's hub score for the vertices of the graph\n\n"
+   "@param scale: whether to normalize the scores so that the largest one\n"
+   "  is 1.\n"
+   "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
+   "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
+   "  variable called C{arpack_options} is used.\n"
+   "@param return_eigenvalue: whether to return the largest eigenvalue\n"
+   "@return: the hub scores in a list and optionally the largest eigenvalue\n"
+   "  as a second member of a tuple\n\n"
+   "@see: authority_score()\n"
+  },
+
+  /* interface to igraph_is_connected */
   {"is_connected", (PyCFunction) igraphmodule_Graph_is_connected,
    METH_VARARGS | METH_KEYWORDS,
    "is_connected(mode=STRONG)\n\n"

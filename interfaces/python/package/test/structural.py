@@ -116,6 +116,20 @@ class CentralityTests(unittest.TestCase):
         self.assertAlmostEquals(cent[1]/cent[0], 0.3162, places=3)
         self.assertAlmostEquals(ev, 3.162, places=3)
 
+    def testAuthorityScore(self):
+        g = Graph.Tree(15, 2, TREE_IN)
+        asc = g.authority_score()
+        self.assertAlmostEquals(max(asc), 1.0, places=3)
+        asc, ev = g.hub_score(scale=False, return_eigenvalue=True)
+        if asc[0]<0: hs = [-x for x in asc]
+
+    def testHubScore(self):
+        g = Graph.Tree(15, 2, TREE_IN)
+        hsc = g.hub_score()
+        self.assertAlmostEquals(max(hsc), 1.0, places=3)
+        hsc, ev = g.hub_score(scale=False, return_eigenvalue=True)
+        if hsc[0]<0: hsc = [-x for x in hsc]
+
 class MiscTests(unittest.TestCase):
     def testConstraint(self):
         g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
