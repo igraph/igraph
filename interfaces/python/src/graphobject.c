@@ -2702,7 +2702,7 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
   PyObject *res_o;
   igraph_bool_t scale;
   igraph_real_t value;
-  igraph_vector_t *weights=0, res;
+  igraph_vector_t weights, res;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO!O", kwlist,
                                    &scale_o, &weights_o,
@@ -2710,25 +2710,30 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
                                    &arpack_options, &return_eigenvalue))
     return NULL;
 
+  if (igraph_vector_init(&weights, 0)) return igraphmodule_handle_igraph_error();
+
   scale = PyObject_IsTrue(scale_o);
-  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
-      ATTRIBUTE_TYPE_EDGE)) return NULL;
+  if (igraphmodule_PyObject_to_attribute_values(weights_o, &weights,
+	  self, ATTRIBUTE_TYPE_EDGE, 1)) {
+	igraph_vector_destroy(&weights);
+	return NULL;
+  }
 
   if (igraph_vector_init(&res, 0)) {
-    if (weights) igraph_vector_destroy(weights);
+    igraph_vector_destroy(&weights);
     return igraphmodule_handle_igraph_error();
   }
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_eigenvector_centrality(&self->g, &res, &value, scale,
-      weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
+      &weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
     igraphmodule_handle_igraph_error();
-    if (weights) igraph_vector_destroy(weights);
+    igraph_vector_destroy(&weights);
     igraph_vector_destroy(&res);
     return NULL;
   }
 
-  if (weights) igraph_vector_destroy(weights);
+  igraph_vector_destroy(&weights);
   
   res_o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT); 
   igraph_vector_destroy(&res);
@@ -3179,47 +3184,39 @@ PyObject *igraphmodule_Graph_similarity_dice(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_spanning_tree(igraphmodule_GraphObject * self,
                                            PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "weights", NULL };
+  static char *kwlist[] = { "weights", NULL };
   igraph_t mst;
   int err;
   igraph_vector_t ws;
   PyObject *weights = NULL;
   igraphmodule_GraphObject *result = NULL;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist,
-                                   &PyList_Type, &weights))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &weights))
     return NULL;
 
-  if (weights && (PyList_Size(weights) < igraph_vcount(&self->g))) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Weight list must have at least |V| elements (|V| = node count in the graph)");
-    return NULL;
-  }
+  if (igraph_vector_init(&ws, 0)) return igraphmodule_handle_igraph_error();
 
-  if (!weights)
+  if (!weights || weights == Py_None)
     err = igraph_minimum_spanning_tree_unweighted(&self->g, &mst);
   else {
-    if (igraphmodule_PyObject_to_vector_t(weights, &ws, 1, 0))
-      return NULL;
+    if (igraphmodule_PyObject_to_attribute_values(weights, &ws, self, ATTRIBUTE_TYPE_EDGE, 1)) {
+	  igraph_vector_destroy(&ws);
+	  return NULL;
+	}
     err = igraph_minimum_spanning_tree_prim(&self->g, &mst, &ws);
+	igraph_vector_destroy(&ws);
   }
 
   if (err) {
     igraphmodule_handle_igraph_error();
-    if (weights)
-      igraph_vector_destroy(&ws);
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
+  result = (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
 
   if (result != NULL)
     result->g = mst;
-
-  if (weights)
-    igraph_vector_destroy(&ws);
 
   return (PyObject *) result;
 }
@@ -3789,9 +3786,9 @@ PyObject
   if (igraph_layout_fruchterman_reingold
       (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
     igraph_matrix_destroy(&m);
-  if (weights) {
-    igraph_vector_destroy(weights); free(weights);
-  }
+    if (weights) {
+      igraph_vector_destroy(weights); free(weights);
+    }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -3846,7 +3843,7 @@ PyObject
   if (igraph_layout_fruchterman_reingold_3d
       (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
     igraph_matrix_destroy(&m);
-  if (weights) {
+    if (weights) {
       igraph_vector_destroy(weights); free(weights);
     }
     igraphmodule_handle_igraph_error();
@@ -5997,27 +5994,29 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
   if (PyObject_IsTrue(return_modularities)) {
     igraph_vector_init(&q, 0);
     if (igraph_community_fastgreedy(&self->g, ws, &merges, &q)) {
-      if (ws) igraph_vector_destroy(ws);
+      if (ws) { igraph_vector_destroy(ws); free(ws); }
       igraph_vector_destroy(&q);
       igraph_matrix_destroy(&merges);
       return igraphmodule_handle_igraph_error();
     }
     qs=igraphmodule_vector_t_to_PyList(&q, IGRAPHMODULE_TYPE_FLOAT);
     igraph_vector_destroy(&q);
-    if (ws) igraph_vector_destroy(ws);
+    if (ws) { igraph_vector_destroy(ws); free(ws); }
     if (!qs) {
       igraph_matrix_destroy(&merges);
       return NULL;
     }
   } else {
     if (igraph_community_fastgreedy(&self->g, ws, &merges, 0)) {
-      if (ws) igraph_vector_destroy(ws);
+      if (ws) { igraph_vector_destroy(ws); free(ws); }
       igraph_matrix_destroy(&merges);
       return igraphmodule_handle_igraph_error();
     }
+    if (ws) { igraph_vector_destroy(ws); free(ws); }
     qs=Py_None;
     Py_INCREF(qs);
   }
+
 
   ms=igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
   igraph_matrix_destroy(&merges);
