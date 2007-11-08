@@ -333,7 +333,25 @@ class TriadCensus(tuple):
         return "TriadCensus((%s))" % ", ".join(map(str, self))
 
     def __str__(self):
-        # TODO
-        return "%d mutual, %d asymmetric, %d null dyads" % self
+        maxidx = len(self)
+        maxcount = max(self)
+        numwidth = len(str(maxcount))
+        captionwidth = max(map(len, self._remap.keys()))
+        colcount = 4
 
+        rowcount = maxidx / colcount
+        if rowcount * colcount < maxidx: rowcount += 1
+
+        invmap = dict((v,k) for k,v in self._remap.iteritems())
+        result, row, idx = [], [], 0
+        for rowidx in xrange(rowcount):
+            for colidx in xrange(colcount):
+                if idx >= maxidx: break 
+                row.append("%-*s: %*d" % (captionwidth, invmap.get(idx, ""),
+                  numwidth, self[idx]))
+                idx += 1
+            result.append(" | ".join(row))
+            row = []
+
+        return "\n".join(result)
 
