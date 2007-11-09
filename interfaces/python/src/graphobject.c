@@ -4824,30 +4824,56 @@ PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
 {
   igraph_bool_t result = 0;
-  PyObject *o;
+  PyObject *o, *return1=Py_False, *return2=Py_False;
   igraphmodule_GraphObject *other;
-  char *kwlist[] = { "other", NULL };
+  igraph_vector_t mapping_12, mapping_21, *map12=0, *map21=0;
+  char *kwlist[] = { "other", "return_mapping_12", "return_mapping_21", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "O!", kwlist, &igraphmodule_GraphType, &o))
+      (args, kwds, "O!|OO", kwlist, &igraphmodule_GraphType, &o, &return1, &return2))
     return NULL;
   other = (igraphmodule_GraphObject *) o;
 
-  if (igraph_vcount(&self->g) == 3 || igraph_vcount(&self->g) == 4) {
-    if (igraph_isomorphic(&self->g, &other->g, &result)) {
-      igraphmodule_handle_igraph_error();
-      return NULL;
-    }
-  } else {
-    if (igraph_isomorphic_vf2(&self->g, &other->g, &result, 0, 0)) {
-      igraphmodule_handle_igraph_error();
-      return NULL;
-    }
+  if (PyObject_IsTrue(return1)) {
+	igraph_vector_init(&mapping_12, 0);
+	map12 = &mapping_12;
+  }
+  if (PyObject_IsTrue(return2)) {
+	igraph_vector_init(&mapping_21, 0);
+	map21 = &mapping_21;
   }
 
-  if (result)
-    Py_RETURN_TRUE;
-  Py_RETURN_FALSE;
+  if (igraph_isomorphic_vf2(&self->g, &other->g, &result, map12, map21)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (!map12 && !map21) {
+    if (result) Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+  } else {
+	PyObject *iso, *m1, *m2;
+	iso = result ? Py_True : Py_False;
+	Py_INCREF(iso);
+	if (map12) {
+	  m1 = igraphmodule_vector_t_to_PyList(map12, IGRAPHMODULE_TYPE_INT);
+	  igraph_vector_destroy(map12);
+	  if (!m1) {
+	    Py_DECREF(iso);
+		if (map21) igraph_vector_destroy(map21);
+		return NULL;
+	  }
+	} else { m1 = Py_None; Py_INCREF(m1); }
+	if (map21) {
+	  m2 = igraphmodule_vector_t_to_PyList(map21, IGRAPHMODULE_TYPE_INT);
+	  igraph_vector_destroy(map21);
+	  if (!m2) {
+	    Py_DECREF(iso); Py_DECREF(m1);
+		return NULL;
+	  }
+	} else { m2 = Py_None; Py_INCREF(m2); }
+	return Py_BuildValue("NNN", iso, m1, m2);
+  }
 }
 
 /** \ingroup python_interface_graph
@@ -7561,10 +7587,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the isomorphy class of the (sub)graph\n\n"},
   {"isomorphic", (PyCFunction) igraphmodule_Graph_isomorphic,
    METH_VARARGS | METH_KEYWORDS,
-   "isomorphic(other)\n\n"
+   "isomorphic(other, return_mapping_12=False, return_mapping_21=False)\n\n"
    "Checks whether the graph is isomorphic with another graph.\n\n"
    "@param other: the other graph with which we want to compare the graph.\n"
-   "@return: C{True} if the graphs are isomorphic, C{False} if not.\n"},
+   "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
+   "  the vertices of the first graph to the second.\n"
+   "@param return_mapping_21: if C{True}, calculates the mapping which maps\n"
+   "  the vertices of the second graph to the first.\n"
+   "@return: if no mapping is calculated, the result is C{True} if the graphs\n"
+   "  are isomorphic, C{False} otherwise. If any or both mappings are\n"
+   "  calculated, the result is a 3-tuple, the first element being the\n"
+   "  above mentioned boolean, the second element being the 1 -> 2 mapping\n"
+   "  and the third element being the 2 -> 1 mapping. If the corresponding\n"
+   "  mapping was not calculated, C{None} is returned in the appropriate\n"
+   "  element of the 3-tuple.\n"},
 
   ////////////////////////
   // ATTRIBUTE HANDLING //
