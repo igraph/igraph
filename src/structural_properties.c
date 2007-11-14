@@ -1820,13 +1820,13 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   while (niter>0 && maxdiff >= eps) {
     niter--;
     maxdiff=0;
-/*     igraph_real_t sumfrom=0, sum=0; */
+     igraph_real_t sumfrom=0, sum=0;
 
     /* Calculate the quotient of the actual PageRank value and the
      * outdegree for every node */
-/*     sumfrom=0.0; sum=0.0; */
+     sumfrom=0.0; sum=0.0;
     for (i=0; i<no_of_nodes; i++) {
-/*       sumfrom += prvec[i]; */
+       sumfrom += prvec[i];
       prvec_scaled[i]=prvec[i]/VECTOR(outdegree)[i];
     }
     
@@ -1844,11 +1844,11 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
       }
       prvec_new[i]*=damping;
       prvec_new[i]+=(1-damping);
-/*       sum += prvec_new[i]; */
+       sum += prvec_new[i];
       
-/*     } */
-/*     for (i=0; i<no_of_nodes; i++) { */
-/*       prvec_new[i] /= sum; */
+     }
+     for (i=0; i<no_of_nodes; i++) {
+       prvec_new[i] /= sum;
 
       if (prvec_new[i]-prvec[i]>maxdiff) 
 	maxdiff=prvec_new[i]-prvec[i];
