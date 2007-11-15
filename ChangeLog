@@ -1,5 +1,8 @@
 2007-11-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/centrality.c (igraph_i_pagerank2, igraph_pagerank) : 
+	weighted page rank added, normalized to 1
+
 	* src/arpack.c (igraph_arpack_rssolve) : fix vector copy bug
 	
 	* src/community.c (igraph_community_leading_eigenvector_naive) : 

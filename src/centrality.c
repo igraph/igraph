@@ -328,7 +328,35 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
 
 int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
 		       long int n, void *extra) {
-  /* TODO */
+
+  igraph_i_pagerank_data2_t *data=extra;
+  const igraph_t *graph=data->graph;
+  igraph_adjedgelist_t *adjedgelist=data->adjedgelist;
+  const igraph_vector_t *weights=data->weights;
+  igraph_vector_t *outdegree=data->outdegree;
+  igraph_vector_t *tmp=data->tmp;
+  long int i, j, nlen;
+  igraph_real_t sumfrom=0.0;
+  igraph_vector_t *neis;
+  
+  for (i=0; i<n; i++) {
+    sumfrom += from[i];
+    VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
+  }
+  
+  for (i=0; i<n; i++) {
+    neis=igraph_adjedgelist_get(adjedgelist, i);
+    nlen=igraph_vector_size(neis);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int edge=VECTOR(*neis)[j];
+      long int nei=IGRAPH_OTHER(graph, edge, i);
+      to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
+    }
+    to[i] *= data->damping;
+    to[i] += (1-data->damping)/n * sumfrom;
+  }
+  
   return 0;
 }
 
@@ -344,6 +372,8 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   igraph_vector_t outdegree;
   igraph_vector_t tmp;
   long int i;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
   
   options->n = igraph_vcount(graph);
   
@@ -363,22 +393,22 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   if (directed) { dirmode=IGRAPH_IN; } else { dirmode=IGRAPH_ALL; }
 
   IGRAPH_VECTOR_INIT_FINALLY(&outdegree, options->n);
-  IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
-			     IGRAPH_OUT, /*loops=*/ 0));
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
 
-  /* Avoid division by zero */
-  for (i=0; i<options->n; i++) {
-    if (VECTOR(outdegree)[i]==0) {
-      VECTOR(outdegree)[i]=1;
-    }
-  }
-  
   if (!weights) {
     
     igraph_adjlist_t adjlist;
     igraph_i_pagerank_data_t data = { graph, &adjlist, damping,
 				      &outdegree, &tmp };
+
+    IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
+			       IGRAPH_OUT, /*loops=*/ 0));
+    /* Avoid division by zero */
+    for (i=0; i<options->n; i++) {
+      if (VECTOR(outdegree)[i]==0) {
+	VECTOR(outdegree)[i]=1;
+      }
+    } 
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -393,10 +423,19 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     
     igraph_adjedgelist_t adjedgelist;
     igraph_i_pagerank_data2_t data = { graph, &adjedgelist, weights,
-				       damping, &outdegree, &tmp };
-    
+				       damping, &outdegree, &tmp };    
+
     IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, dirmode));
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+
+    /* Weighted degree */
+    for (i=0; i<no_of_edges; i++) {
+      long int from=IGRAPH_FROM(graph, i);
+      long int to=IGRAPH_TO(graph, i);
+      igraph_real_t weight=VECTOR(*weights)[i];
+      VECTOR(outdegree)[from] += weight;
+      VECTOR(outdegree)[to]   += weight;
+    }
     
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
 				       &data, options, 0, &values, &vectors));
@@ -417,6 +456,11 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     long int i;
     igraph_vit_t vit;
     long int nodes_to_calc;
+    igraph_real_t sum=0;
+    
+    for (i=0; i<no_of_nodes; i++) { 
+      sum += MATRIX(vectors, i, 0);
+    }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -426,6 +470,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit);
 	 IGRAPH_VIT_NEXT(vit), i++) {
       VECTOR(*vector)[i] = MATRIX(vectors, (long int)IGRAPH_VIT_GET(vit), 0);
+      VECTOR(*vector)[i] /= sum;
     }
     
     igraph_vit_destroy(&vit);
