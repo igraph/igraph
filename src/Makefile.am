@@ -14,7 +14,12 @@ if INTERNAL_LAPACK
 	lapack/dlaev2.c  lapack/dlascl.c  lapack/dlanst.c \
 	lapack/dlaset.c  lapack/xerbla.c \
 	lapack/dlarf.c   lapack/dlasr.c   lapack/dlapy2.c \
-	lapack/dlarfg.c  lapack/dlasrt.c
+	lapack/dlarfg.c  lapack/dlasrt.c  lapack/dlabad.c \
+	lapack/dlanhs.c  lapack/dtrevc.c  lapack/dlanv2.c \
+        lapack/dlaln2.c  lapack/dladiv.c  lapack/dtrsen.c \
+        lapack/dlahqr.c  lapack/dlacon.c  lapack/dtrsyl.c \
+        lapack/dtrexc.c  lapack/dlange.c  lapack/dlaexc.c \
+        lapack/dlasy2.c  lapack/dlarfx.c 
   noinst_LTLIBRARIES  = libdlamch.la
   libdlamch_la_SOURCES = lapack/dlamch.c
   libdlamch_la_CFLAGS = -ffloat-store
@@ -29,6 +34,9 @@ if INTERNAL_ARPACK
          arpack/dsaup2.c arpack/dsaupd.c arpack/dsconv.c arpack/dseigt.c \
          arpack/dsesrt.c arpack/dseupd.c arpack/dsgets.c arpack/dsortr.c \
          arpack/dstats.c arpack/dstqrb.c arpack/dvout.c arpack/ivout.c \
+	 arpack/dnaitr.c arpack/dnapps.c arpack/dnaup2.c arpack/dnaupd.c \
+	 arpack/dnconv.c arpack/dsortc.c arpack/dneigh.c arpack/dngets.c \
+	 arpack/dstatn.c arpack/dlaqrb.c arpack/dneupd.c \
          arpack/second.c
 else
   ARPACK =
@@ -36,13 +44,14 @@ endif
 
 if INTERNAL_BLAS
   BLAS = blas/daxpy.c  blas/ddot.c   blas/dger.c   blas/dscal.c  blas/lsame.c \
-	blas/dcopy.c  blas/dgemv.c  blas/dnrm2.c  blas/dswap.c
+	blas/dcopy.c  blas/dgemv.c  blas/dnrm2.c  blas/dswap.c   blas/drot.c  \
+        blas/idamax.c blas/dtrmm.c  blas/dasum.c
 else
   BLAS =
 endif
 
 F2C = f2c/d_sign.c f2c/etime_.c  f2c/pow_dd.c f2c/pow_di.c f2c/s_cmp.c \
-	f2c/s_copy.c
+	f2c/s_copy.c f2c/d_lg10.c f2c/i_dnnt.c
 
 libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \

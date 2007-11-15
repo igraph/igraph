@@ -776,7 +776,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   igraph_dqueue_push(&tosplit, 0);
 
   /* Memory for ARPACK */
-  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 3, no_of_nodes));
+  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 3, no_of_nodes, 1));
   IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);
   extra.idx=&idx;
   extra.adjlist=&adjlist;

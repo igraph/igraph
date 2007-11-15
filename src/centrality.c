@@ -320,7 +320,7 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
       to[i] += VECTOR(*tmp)[nei];
     }
     to[i] *= data->damping;
-    to[i] += (1-data->damping) * sumfrom;
+    to[i] += (1-data->damping)/n * sumfrom;
   }  
   
   return 0;
@@ -338,7 +338,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options) {
 
-  igraph_vector_t values;
+  igraph_matrix_t values;
   igraph_matrix_t vectors;
   igraph_integer_t dirmode;
   igraph_vector_t outdegree;
@@ -357,7 +357,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		 "eigenvector centrality", IGRAPH_EINVAL);
   }
   
-  IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, 0, 0);
 
   if (directed) { dirmode=IGRAPH_IN; } else { dirmode=IGRAPH_ALL; }
@@ -383,7 +383,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     
-    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_pagerank,
+    IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank,
 				       &data, options, 0, &values, &vectors));
 
     igraph_adjlist_destroy(&adjlist);
@@ -398,7 +398,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, dirmode));
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
     
-    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_pagerank2,
+    IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
 				       &data, options, 0, &values, &vectors));
     
     igraph_adjedgelist_destroy(&adjedgelist);
@@ -410,7 +410,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   IGRAPH_FINALLY_CLEAN(2);
 
   if (value) {
-    *value=VECTOR(values)[0];
+    *value=MATRIX(values, 0, 0);
   }
   
   if (vector) {
@@ -437,7 +437,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   }
   
   igraph_matrix_destroy(&vectors);
-  igraph_vector_destroy(&values);
+  igraph_matrix_destroy(&values);
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }

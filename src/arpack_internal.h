@@ -49,6 +49,18 @@
 #define igraphivout_	ivout_
 #define igraphsecond_	second_
 #define igraphdvout_	dvout_
+#define igraphdnaitr_   dnaitr_
+#define igraphdnapps_   dnapps_
+#define igraphdnaup2_   dnaup2_
+#define igraphdnaupd_   dnaupd_
+#define igraphdnconv_   dnconv_
+#define igraphdlabad_   dlabad_
+#define igraphdlanhs_   dlanhs_
+#define igraphdsortc_   dsort_
+#define igraphdneigh_   dneigh_
+#define igraphdngets_   dngets_
+#define igraphdstatn_   statn_
+#define igraphdlaqrb_   dlaqrb_
 #endif
 
 #ifndef INTERNAL_LAPACK
@@ -77,6 +89,22 @@
 #define igraphdlamc3_	dlamc3_
 #define igraphdlamc4_	dlamc4_
 #define igraphdlamc5_	dlamc5_
+#define igraphdlabad_   dlabad_
+#define igraphdlanhs_   dlanhs_
+#define igraphdtrevc_   dtrevc_
+#define igraphdlanv2_   dlanv2_
+#define igraphdlaln2_   dlaln2_
+#define igraphdladiv_   dladiv_
+#define igraphdtrsen_   dtrsen_
+#define igraphdlahqr_   dlahqr_
+#define igraphdtrsen_   dtrsen_
+#define igraphdlacon_   dlacon_
+#define igraphdtrsyl_   dtrsyl_
+#define igraphdtrexc_   dtrexc_
+#define igraphdlange_   dlange_
+#define igraphdlaexc_   dlaexc_
+#define igraphdlasy2_   dlasy2_
+#define igraphdlarfx_   dlarfx_
 #endif
 
 #ifndef INTERNAL_BLAS
@@ -89,6 +117,10 @@
 #define igraphddot_	ddot_
 #define igraphdnrm2_	dnrm2_
 #define igraphlsame_	lsame_
+#define igraphdrot_     drot_
+#define igraphidamax_   idamax_
+#define igraphdtrmm_    dtrmm_
+#define igraphdasum_    dasum_
 #endif
 
 #if 0				/* internal f2c functions always used */
@@ -98,6 +130,8 @@
 #define igraphpow_di	pow_di
 #define igraphs_cmp	s_cmp
 #define igraphs_copy	s_copy
+#define igraphd_lg10_   d_lg10_
+#define igraphi_dnnt_   i_dnnt_
 #endif
 
 int igraphdsaupd_(long int *ido, char *bmat, long int *n,
@@ -110,6 +144,24 @@ int igraphdsaupd_(long int *ido, char *bmat, long int *n,
 int igraphdseupd_(long int *rvec, char *howmny, long int *select,
 		  igraph_real_t *d, igraph_real_t *z, long int *ldz,
 		  igraph_real_t *sigma, char *bmat, long int *n,
+		  char *which, long int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
+		  long int *ldv, long int *iparam, long int *ipntr, 
+		  igraph_real_t *workd, igraph_real_t *workl,
+		  long int *lworkl, long int *info);
+
+int igraphdnaupd_(long int *ido, char *bmat, long int *n,
+		  char *which, long int *nev, igraph_real_t *tol,
+		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
+		  long int *ldv, long int *iparam, long int *ipntr, 
+		  igraph_real_t *workd, igraph_real_t *workl,
+		  long int *lworkl, long int *info);
+
+int igraphdneupd_(long int *rvec, char *howmny, long int *select,
+		  igraph_real_t *dr, igraph_real_t *di,
+		  igraph_real_t *z, long int *ldz,
+		  igraph_real_t *sigmar, igraph_real_t *sigmai, 
+		  igraph_real_t *workev, char *bmat, long int *n,
 		  char *which, long int *nev, igraph_real_t *tol,
 		  igraph_real_t *resid, long int *ncv, igraph_real_t *v,
 		  long int *ldv, long int *iparam, long int *ipntr, 

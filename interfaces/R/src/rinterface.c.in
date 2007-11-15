@@ -1288,8 +1288,9 @@ int R_SEXP_to_igraph_arpack_options(SEXP in, igraph_arpack_options_t *opt) {
   opt -> nb = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "nb")))[0];
   opt -> mode = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "mode")))[0];
   opt -> start = INTEGER(AS_INTEGER(R_igraph_getListElement(in, "start")))[0];
-  opt -> lworkl = opt -> ncv * (opt->ncv+8);
+  opt -> lworkl = 0;
   opt -> sigma = REAL(AS_NUMERIC(R_igraph_getListElement(in, "sigma")))[0];
+  opt -> sigmai = REAL(AS_NUMERIC(R_igraph_getListElement(in, "sigmai")))[0];
   opt -> info = opt -> start;
 
   opt->iparam[0]=opt->ishift;
@@ -1307,7 +1308,7 @@ SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
   bmat[0]=opt->bmat[0]; bmat[1]='\0';
   which[0]=opt->which[0]; which[1]=opt->which[1]; which[2]='\0';
   
-  PROTECT(result = NEW_LIST(19));
+  PROTECT(result = NEW_LIST(20));
   SET_VECTOR_ELT(result, 0, NEW_CHARACTER(1)); SET_STRING_ELT(VECTOR_ELT(result, 0), 0, mkChar(bmat));
   SET_VECTOR_ELT(result, 1, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 1))[0]=opt->n;
   SET_VECTOR_ELT(result, 2, NEW_CHARACTER(1)); SET_STRING_ELT(VECTOR_ELT(result, 2), 0, mkChar(which));
@@ -1321,15 +1322,16 @@ SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
   SET_VECTOR_ELT(result, 10, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 10))[0]=opt->mode;
   SET_VECTOR_ELT(result, 11, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 11))[0]=opt->start;
   SET_VECTOR_ELT(result, 12, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 12))[0]=opt->sigma;
+  SET_VECTOR_ELT(result, 13, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 13))[0]=opt->sigmai;
 
-  SET_VECTOR_ELT(result, 13, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 13))[0]=opt->info;
-  SET_VECTOR_ELT(result, 14, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 14))[0]=opt->iparam[2];/* mxiter */
-  SET_VECTOR_ELT(result, 15, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 15))[0]=opt->iparam[4];/* nconv */
-  SET_VECTOR_ELT(result, 16, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 16))[0]=opt->iparam[8];/* numop */
-  SET_VECTOR_ELT(result, 17, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 17))[0]=opt->iparam[9];/* numopb */
-  SET_VECTOR_ELT(result, 18, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 18))[0]=opt->iparam[10];/* numreo */
+  SET_VECTOR_ELT(result, 14, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 14))[0]=opt->info;
+  SET_VECTOR_ELT(result, 15, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 15))[0]=opt->iparam[2];/* mxiter */
+  SET_VECTOR_ELT(result, 16, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 16))[0]=opt->iparam[4];/* nconv */
+  SET_VECTOR_ELT(result, 17, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 17))[0]=opt->iparam[8];/* numop */
+  SET_VECTOR_ELT(result, 18, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 18))[0]=opt->iparam[9];/* numopb */
+  SET_VECTOR_ELT(result, 19, NEW_INTEGER(1)); INTEGER(VECTOR_ELT(result, 19))[0]=opt->iparam[10];/* numreo */
   
-  PROTECT(names=NEW_CHARACTER(19));
+  PROTECT(names=NEW_CHARACTER(20));
   SET_STRING_ELT(names, 0, mkChar("bmat"));
   SET_STRING_ELT(names, 1, mkChar("n"));
   SET_STRING_ELT(names, 2, mkChar("which"));
@@ -1343,12 +1345,13 @@ SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
   SET_STRING_ELT(names, 10, mkChar("mode"));
   SET_STRING_ELT(names, 11, mkChar("start"));
   SET_STRING_ELT(names, 12, mkChar("sigma"));
-  SET_STRING_ELT(names, 13, mkChar("info"));
-  SET_STRING_ELT(names, 14, mkChar("iter"));
-  SET_STRING_ELT(names, 15, mkChar("nconv"));
-  SET_STRING_ELT(names, 16, mkChar("numop"));
-  SET_STRING_ELT(names, 17, mkChar("numopb"));
-  SET_STRING_ELT(names, 18, mkChar("numreo"));
+  SET_STRING_ELT(names, 13, mkChar("sigmai"));
+  SET_STRING_ELT(names, 14, mkChar("info"));
+  SET_STRING_ELT(names, 15, mkChar("iter"));
+  SET_STRING_ELT(names, 16, mkChar("nconv"));
+  SET_STRING_ELT(names, 17, mkChar("numop"));
+  SET_STRING_ELT(names, 18, mkChar("numopb"));
+  SET_STRING_ELT(names, 19, mkChar("numreo"));
   SET_NAMES(result, names);
   
   UNPROTECT(2);
