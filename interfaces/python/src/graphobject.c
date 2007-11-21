@@ -2257,15 +2257,16 @@ PyObject *igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *
 PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
                                          PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "directed", NULL };
+  char *kwlist[] = { "vertices", "directed", "cutoff", NULL };
   PyObject *directed = Py_True;
   PyObject *vobj = Py_None, *list;
+  PyObject *cutoff = Py_None;
   igraph_vector_t res;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-                                   &vobj, &directed)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &vobj, &directed, &cutoff)) {
     return NULL;
   }
 
@@ -2279,9 +2280,33 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_betweenness(&self->g, &res, vs, PyObject_IsTrue(directed))) {
+  if (cutoff == Py_None) {
+    if (igraph_betweenness(&self->g, &res, vs, PyObject_IsTrue(directed))) {
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&res);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else if (PyNumber_Check(cutoff)) {
+    PyObject *cutoff_num = PyNumber_Int(cutoff);
+    if (cutoff_num == NULL) {
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&res);
+      return NULL;
+    }
+    if (igraph_betweenness_estimate(&self->g, &res, vs, PyObject_IsTrue(directed),
+        (igraph_integer_t)PyInt_AsLong(cutoff_num))) {
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&res);
+      Py_DECREF(cutoff_num);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    Py_DECREF(cutoff_num);
+  } else {
+    PyErr_SetString(PyExc_TypeError, "cutoff value must be None or integer");
     igraph_vs_destroy(&vs);
-    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&res);
     return NULL;
   }
 
@@ -2400,14 +2425,14 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
 PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "mode", NULL };
-  PyObject *vobj = Py_None, *list = NULL;
+  char *kwlist[] = { "vertices", "mode", "cutoff", NULL };
+  PyObject *vobj = Py_None, *list = NULL, *cutoff = Py_None;
   igraph_vector_t res;
   igraph_neimode_t mode = IGRAPH_ALL;
   int return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Ol", kwlist, &vobj, &mode))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlO", kwlist, &vobj, &mode, &cutoff))
     return NULL;
 
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
@@ -2425,10 +2450,28 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_closeness(&self->g, &res, vs, mode)) {
-    igraph_vs_destroy(&vs);
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (cutoff == Py_None) {
+    if (igraph_closeness(&self->g, &res, vs, mode)) {
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&res);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else if (PyNumber_Check(cutoff)) {
+    PyObject *cutoff_num = PyNumber_Int(cutoff);
+    if (cutoff_num == NULL) {
+      igraph_vs_destroy(&vs); igraph_vector_destroy(&res);
+      return NULL;
+    }
+    if (igraph_closeness_estimate(&self->g, &res, vs, mode,
+        (igraph_integer_t)PyInt_AsLong(cutoff_num))) {
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&res);
+      igraphmodule_handle_igraph_error();
+      Py_DECREF(cutoff_num);
+      return NULL;
+    }
+    Py_DECREF(cutoff_num);
   }
 
   if (!return_single)
@@ -2665,18 +2708,35 @@ PyObject *igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject * self,
                                               PyObject * args,
                                               PyObject * kwds)
 {
-  char *kwlist[] = { "directed", NULL };
+  char *kwlist[] = { "directed", "cutoff", NULL };
   igraph_vector_t res;
-  PyObject *list, *directed = Py_True;
+  PyObject *list, *directed = Py_True, *cutoff = Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O!", kwlist,
-                                   &PyBool_Type, &directed))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+                                   &directed, &cutoff))
     return NULL;
 
   igraph_vector_init(&res, igraph_ecount(&self->g));
 
-  if (igraph_edge_betweenness(&self->g, &res, (directed == Py_True))) {
-    igraphmodule_handle_igraph_error();
+  if (cutoff == Py_None) {
+    if (igraph_edge_betweenness(&self->g, &res, PyObject_IsTrue(directed))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&res);
+      return NULL;
+    }
+  } else if (PyNumber_Check(cutoff)) {
+    PyObject *cutoff_num = PyNumber_Int(cutoff);
+    if (!cutoff_num) { igraph_vector_destroy(&res); return NULL; }
+    if (igraph_edge_betweenness_estimate(&self->g, &res, PyObject_IsTrue(directed),
+        (igraph_integer_t)PyInt_AsLong(cutoff_num))) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&res);
+      Py_DECREF(cutoff_num);
+      return NULL;
+    }
+    Py_DECREF(cutoff_num);
+  } else {
+    PyErr_SetString(PyExc_TypeError, "cutoff value must be None or integer");
     igraph_vector_destroy(&res);
     return NULL;
   }
@@ -6679,16 +6739,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@see: hub_score()\n"
   },
 
-  /* interface to igraph_betweenness */
+  /* interface to igraph_betweenness[_estimate] */
   {"betweenness", (PyCFunction) igraphmodule_Graph_betweenness,
    METH_VARARGS | METH_KEYWORDS,
-   "betweenness(vertices=None, directed=True)\n\n"
-   "Calculates the betweenness of nodes in a graph.\n\n"
+   "betweenness(vertices=None, directed=True, cutoff=None)\n\n"
+   "Calculates or estimates the betweenness of nodes in a graph.\n\n"
    "Keyword arguments:\n"
    "@param vertices: the vertices for which the betweennesses must be returned.\n"
    "  If C{None}, assumes all of the vertices in the graph.\n"
    "@param directed: whether to consider directed paths.\n"
-   "@return: the betweenness of the given nodes in a list\n"},
+   "@param cutoff: if it is an integer, only paths less than or equal to this\n"
+   "  length are considered, effectively resulting in an estimation of the\n"
+   "  betweenness for the given nodes. If C{None}, the exact betweenness is\n"
+   "  returned.\n"
+   "@return: the (possibly estimated) betweenness of the given nodes in a list\n"},
 
   /* interface to biconnected_components */
   {"biconnected_components", (PyCFunction) igraphmodule_Graph_biconnected_components,
@@ -6705,7 +6769,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
-   "closeness(vertices=None, mode=ALL)\n\n"
+   "closeness(vertices=None, mode=ALL, cutoff=None)\n\n"
    "Calculates the closeness centralities of given nodes in a graph.\n\n"
    "The closeness centerality of a vertex measures how easily other\n"
    "vertices can be reached from it (or the other way: how easily it\n"
@@ -6722,6 +6786,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  that the length of the incoming paths, C{OUT} means that the\n"
    "  length of the outgoing paths must be calculated. C{ALL} means\n"
    "  that both of them must be calculated.\n"
+   "@param cutoff: if it is an integer, only paths less than or equal to this\n"
+   "  length are considered, effectively resulting in an estimation of the\n"
+   "  closeness for the given nodes (which is always an underestimation of the\n"
+   "  real closeness, since some vertex pairs will appear as disconnected even\n"
+   "  though they are connected).. If C{None}, the exact closeness is\n"
+   "  returned.\n"
    "@return: the calculated closenesses in a list\n"},
 
   /* interface to igraph_clusters */
@@ -6793,13 +6863,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  C{False} and the graph is unconnected, the result is the\n"
    "  number of vertices."},
 
-  /* interface to igraph_edge_betweenness */
+  /* interface to igraph_edge_betweenness[_estimate] */
   {"edge_betweenness", (PyCFunction) igraphmodule_Graph_edge_betweenness,
    METH_VARARGS | METH_KEYWORDS,
-   "edge_betweenness(directed=True)\n\n"
-   "Calculates the edge betweennesses in a graph.\n\n"
+   "edge_betweenness(directed=True, cutoff=None)\n\n"
+   "Calculates or estimates the edge betweennesses in a graph.\n\n"
    "@param directed: whether to consider directed paths.\n"
-   "@return: a list with the edge betweennesses of all specified edges.\n"},
+   "@param cutoff: if it is an integer, only paths less than or equal to this\n"
+   "  length are considered, effectively resulting in an estimation of the\n"
+   "  betweenness values. If C{None}, the exact betweennesses are\n"
+   "  returned.\n"
+   "@return: a list with the (exact or estimated) edge betweennesses of all\n"
+   "  edges.\n"},
 
   /* interface to igraph_eigenvector_centrality */
   {"eigenvector_centrality",

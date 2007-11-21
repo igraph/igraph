@@ -487,3 +487,638 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   return 0;
 }
 
+/**
+ * \ingroup structural
+ * \function igraph_betweenness
+ * \brief Betweenness centrality of some vertices.
+ * 
+ * </para><para>
+ * The betweenness centrality of a vertex is the number of geodesics
+ * going through it. If there are more than one geodesic between two
+ * vertices, the value of these geodesics are weighted by one over the 
+ * number of geodesics.
+ * \param graph The graph object.
+ * \param res The result of the computation, a vector containing the
+ *        betweenness scores for the specified vertices.
+ * \param vids The vertices of which the betweenness centrality scores
+ *        will be calculated.
+ * \param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \return Error code:
+ *        \c IGRAPH_ENOMEM, not enough memory for
+ *        temporary data. 
+ *        \c IGRAPH_EINVVID, invalid vertex id passed in
+ *        \p vids. 
+ *
+ * Time complexity: O(|V||E|),
+ * |V| and 
+ * |E| are the number of vertices and
+ * edges in the graph. 
+ * Note that the time complexity is independent of the number of
+ * vertices for which the score is calculated.
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
+ *     See \ref igraph_edge_betweenness() for calculating the betweenness score
+ *     of the edges in a graph. See \ref igraph_betweenness_estimate() to
+ *     estimate the betweenness score of the vertices in a graph.
+ */
+int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
+  const igraph_vs_t vids, igraph_bool_t directed) {
+    return igraph_betweenness_estimate(graph, res, vids, directed, -1);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_betweenness_estimate
+ * \brief Estimated betweenness centrality of some vertices.
+ * 
+ * </para><para>
+ * The betweenness centrality of a vertex is the number of geodesics
+ * going through it. If there are more than one geodesic between two
+ * vertices, the value of these geodesics are weighted by one over the 
+ * number of geodesics. When estimating betweenness centrality, igraph
+ * takes into consideration only those paths that are shorter than or
+ * equal to a prescribed length. Note that the estimated centrality
+ * will always be less than the real one.
+ *
+ * \param graph The graph object.
+ * \param res The result of the computation, a vector containing the
+ *        estimated betweenness scores for the specified vertices.
+ * \param vids The vertices of which the betweenness centrality scores
+ *        will be estimated.
+ * \param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        If zero or negative, the exact betweenness will be calculated
+ *        (no upper limit on path lengths).
+ * \return Error code:
+ *        \c IGRAPH_ENOMEM, not enough memory for
+ *        temporary data. 
+ *        \c IGRAPH_EINVVID, invalid vertex id passed in
+ *        \p vids. 
+ *
+ * Time complexity: O(|V||E|),
+ * |V| and 
+ * |E| are the number of vertices and
+ * edges in the graph. 
+ * Note that the time complexity is independent of the number of
+ * vertices for which the score is calculated.
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
+ *     See \ref igraph_edge_betweenness() for calculating the betweenness score
+ *     of the edges in a graph.
+ */
+int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
+			const igraph_vs_t vids, igraph_bool_t directed,
+                        igraph_integer_t cutoff) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  long int *distance;
+  long int *nrgeo;
+  double *tmpscore;
+  igraph_stack_t stack=IGRAPH_STACK_NULL;
+  long int source;
+  long int j, k;
+  igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
+  igraph_integer_t modein, modeout;
+  igraph_vit_t vit;
+
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+  if (directed) 
+    { modeout=IGRAPH_OUT; modein=IGRAPH_IN; } 
+  else 
+    { modeout=modein=IGRAPH_ALL; }
+
+  distance=igraph_Calloc(no_of_nodes, long int);
+  if (distance==0) {
+    IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, distance);
+  nrgeo=igraph_Calloc(no_of_nodes, long int);
+  if (nrgeo==0) {
+    IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, nrgeo);
+  tmpscore=igraph_Calloc(no_of_nodes, double);
+  if (tmpscore==0) {
+    IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, tmpscore);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  igraph_stack_init(&stack, no_of_nodes);
+  IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+    
+  IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
+  igraph_vector_null(res);
+
+  /* here we go */
+  
+  for (source=0; source<no_of_nodes; source++) {
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    memset(distance, 0, no_of_nodes*sizeof(long int));
+    memset(nrgeo, 0, no_of_nodes*sizeof(long int));
+    memset(tmpscore, 0, no_of_nodes*sizeof(double));
+    igraph_stack_clear(&stack); /* it should be empty anyway... */
+    
+    IGRAPH_CHECK(igraph_dqueue_push(&q, source));
+    nrgeo[source]=1;
+    distance[source]=0;
+    
+    while (!igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
+
+      if (cutoff > 0 && distance[actnode] >= cutoff) continue;
+
+      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, modeout));
+      for (j=0; j<igraph_vector_size(&tmp); j++) {
+	long int neighbor=VECTOR(tmp)[j];
+	if (nrgeo[neighbor] != 0) {
+	  /* we've already seen this node, another shortest path? */
+	  if (distance[neighbor]==distance[actnode]+1) {
+	    nrgeo[neighbor]+=nrgeo[actnode];
+	  }
+	} else {
+	  /* we haven't seen this node yet */
+	  nrgeo[neighbor]+=nrgeo[actnode];
+          distance[neighbor]=distance[actnode]+1;
+	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	  IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
+	}
+      }
+    } /* while !igraph_dqueue_empty */
+
+    /* Ok, we've the distance of each node and also the number of
+       shortest paths to them. Now we do an inverse search, starting
+       with the farthest nodes. */
+    while (!igraph_stack_empty(&stack)) {
+      long int actnode=igraph_stack_pop(&stack);      
+      if (distance[actnode]<=1) { continue; } /* skip source node */
+      
+      /* set the temporary score of the friends */
+      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, modein));
+      for (j=0; j<igraph_vector_size(&tmp); j++) {
+	long int neighbor=VECTOR(tmp)[j];
+	if (distance[neighbor]==distance[actnode]-1 &&
+	    nrgeo[neighbor] != 0) {
+	  tmpscore[neighbor] += 
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
+	}
+      }
+    }
+    
+    /* Ok, we've the scores for this source */
+    for (k=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); 
+	 IGRAPH_VIT_NEXT(vit), k++) {
+      long int node=IGRAPH_VIT_GET(vit);
+      VECTOR(*res)[k] += tmpscore[node];
+      tmpscore[node] = 0.0; /* in case a node is in vids multiple times */
+    }
+
+  } /* for source < no_of_nodes */
+
+  /* divide by 2 for undirected graph */
+  if (!directed || !igraph_is_directed(graph)) {
+    for (j=0; j<igraph_vector_size(res); j++) {
+      VECTOR(*res)[j] /= 2.0;
+    }
+  }
+  
+  /* clean  */
+  igraph_Free(distance);
+  igraph_Free(nrgeo);
+  igraph_Free(tmpscore);
+  
+  igraph_dqueue_destroy(&q);
+  igraph_stack_destroy(&stack);
+  igraph_vector_destroy(&tmp);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(7);
+
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_edge_betweenness
+ * \brief Betweenness centrality of the edges.
+ * 
+ * </para><para>
+ * The betweenness centrality of an edge is the number of geodesics
+ * going through it. If there are more than one geodesics between two
+ * vertices, the value of these geodesics are weighted by one over the 
+ * number of geodesics.
+ * \param graph The graph object.
+ * \param result The result of the computation, vector containing the
+ *        betweenness scores for the edges.
+ * \param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \return Error code:
+ *        \c IGRAPH_ENOMEM, not enough memory for
+ *        temporary data. 
+ *
+ * Time complexity: O(|V||E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the graph. 
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
+ *     See \ref igraph_edge_betweenness() for calculating the betweenness score
+ *     of the edges in a graph. See \ref igraph_edge_betweenness_estimate() to
+ *     estimate the betweenness score of the edges in a graph.
+ */
+int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
+                            igraph_bool_t directed) {
+  return igraph_edge_betweenness_estimate(graph, result, directed, -1);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_edge_betweenness_estimate
+ * \brief Estimated betweenness centrality of the edges.
+ * 
+ * </para><para>
+ * The betweenness centrality of an edge is the number of geodesics
+ * going through it. If there are more than one geodesics between two
+ * vertices, the value of these geodesics are weighted by one over the 
+ * number of geodesics. When estimating betweenness centrality, igraph
+ * takes into consideration only those paths that are shorter than or
+ * equal to a prescribed length. Note that the estimated centrality
+ * will always be less than the real one.
+ * \param graph The graph object.
+ * \param result The result of the computation, vector containing the
+ *        betweenness scores for the edges.
+ * \param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        If zero or negative, the exact betweenness will be calculated
+ *        (no upper limit on path lengths).
+ * \return Error code:
+ *        \c IGRAPH_ENOMEM, not enough memory for
+ *        temporary data. 
+ *
+ * Time complexity: O(|V||E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the graph. 
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
+ *     See \ref igraph_betweenness() for calculating the betweenness score
+ *     of the vertices in a graph.
+ */
+int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
+                                     igraph_bool_t directed, igraph_integer_t cutoff) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  long int *distance;
+  long int *nrgeo;
+  double *tmpscore;
+  igraph_stack_t stack=IGRAPH_STACK_NULL;
+  long int source;
+  long int j;
+
+  igraph_adjedgelist_t elist_out, elist_in;
+  igraph_adjedgelist_t *elist_out_p, *elist_in_p;
+  igraph_vector_t *neip;
+  long int neino;
+  long int i;
+  igraph_integer_t modein, modeout;
+
+  directed=directed && igraph_is_directed(graph);
+  if (directed) {
+    modeout=IGRAPH_OUT;
+    modein=IGRAPH_IN;
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_out, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &elist_in, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_in);
+    elist_out_p=&elist_out;
+    elist_in_p=&elist_in;
+  } else {
+    modeout=modein=IGRAPH_ALL;
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph,&elist_out, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &elist_out);
+    elist_out_p=elist_in_p=&elist_out;
+  }
+  
+  distance=igraph_Calloc(no_of_nodes, long int);
+  if (distance==0) {
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, distance);
+  nrgeo=igraph_Calloc(no_of_nodes, long int);
+  if (nrgeo==0) {
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, nrgeo);
+  tmpscore=igraph_Calloc(no_of_nodes, double);
+  if (tmpscore==0) {
+    IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, tmpscore);
+
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_CHECK(igraph_stack_init(&stack, no_of_nodes));
+  IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+
+  IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
+
+  igraph_vector_null(result);
+
+  /* here we go */
+  
+  for (source=0; source<no_of_nodes; source++) {
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    memset(distance, 0, no_of_nodes*sizeof(long int));
+    memset(nrgeo, 0, no_of_nodes*sizeof(long int));
+    memset(tmpscore, 0, no_of_nodes*sizeof(double));
+    igraph_stack_clear(&stack); /* it should be empty anyway... */
+    
+    IGRAPH_CHECK(igraph_dqueue_push(&q, source));
+      
+    nrgeo[source]=1;
+    distance[source]=0;
+    
+    while (!igraph_dqueue_empty(&q)) {
+      long int actnode=igraph_dqueue_pop(&q);
+
+      if (cutoff > 0 && distance[actnode] >= cutoff ) continue;
+
+      neip=igraph_adjedgelist_get(elist_out_p, actnode);
+      neino=igraph_vector_size(neip);
+      for (i=0; i<neino; i++) {
+	igraph_integer_t edge=VECTOR(*neip)[i], from, to;
+	long int neighbor;
+	igraph_edge(graph, edge, &from, &to);
+	neighbor = actnode!=from ? from : to;
+	if (nrgeo[neighbor] != 0) {
+	  /* we've already seen this node, another shortest path? */
+	  if (distance[neighbor]==distance[actnode]+1) {
+	    nrgeo[neighbor]+=nrgeo[actnode];
+	  }
+	} else {
+	  /* we haven't seen this node yet */
+	  nrgeo[neighbor]+=nrgeo[actnode];
+	  distance[neighbor]=distance[actnode]+1;
+	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	  IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
+	}
+      }
+    } /* while !igraph_dqueue_empty */
+    
+    /* Ok, we've the distance of each node and also the number of
+       shortest paths to them. Now we do an inverse search, starting
+       with the farthest nodes. */
+    while (!igraph_stack_empty(&stack)) {
+      long int actnode=igraph_stack_pop(&stack);
+      if (distance[actnode]<1) { continue; } /* skip source node */
+      
+      /* set the temporary score of the friends */
+      neip=igraph_adjedgelist_get(elist_in_p, actnode);
+      neino=igraph_vector_size(neip);
+      for (i=0; i<neino; i++) {
+	igraph_integer_t from, to;
+	long int neighbor;
+	long int edgeno=VECTOR(*neip)[i];
+	igraph_edge(graph, edgeno, &from, &to);
+	neighbor= actnode != from ? from : to;
+	if (distance[neighbor]==distance[actnode]-1 &&
+	    nrgeo[neighbor] != 0) {
+	  tmpscore[neighbor] +=
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
+	  VECTOR(*result)[edgeno] +=
+	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
+	}
+      }
+    }
+    /* Ok, we've the scores for this source */
+  } /* for source <= no_of_nodes */
+  
+  /* clean and return */
+  igraph_Free(distance);
+  igraph_Free(nrgeo);
+  igraph_Free(tmpscore);
+  igraph_dqueue_destroy(&q);
+  igraph_stack_destroy(&stack);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  if (directed) {
+    igraph_adjedgelist_destroy(&elist_out);
+    igraph_adjedgelist_destroy(&elist_in);
+    IGRAPH_FINALLY_CLEAN(2);
+  } else {
+    igraph_adjedgelist_destroy(&elist_out);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  /* divide by 2 for undirected graph */
+  if (!directed || !igraph_is_directed(graph)) {
+    for (j=0; j<igraph_vector_size(result); j++) {
+      VECTOR(*result)[j] /= 2.0;
+    }
+  }
+  
+  return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_closeness
+ * \brief Closeness centrality calculations for some vertices.
+ *
+ * </para><para>
+ * The closeness centrality of a vertex measures how easily other
+ * vertices can be reached from it (or the other way: how easily it
+ * can be reached from the other vertices). It is defined as the
+ * number of the number of vertices minus one divided by the sum of the
+ * lengths of all geodesics from/to the given vertex.
+ *
+ * </para><para>
+ * If the graph is not connected, and there is no path between two
+ * vertices, the number of vertices is used instead the length of the
+ * geodesic. This is always longer than the longest possible geodesic.
+ * 
+ * \param graph The graph object.
+ * \param res The result of the computation, a vector containing the
+ *        closeness centrality scores for the given vertices.
+ * \param vids Vector giving the vertices for which the closeness
+ *        centrality scores will be computed.
+ * \param mode The type of shortest paths to be used for the
+ *        calculation in directed graphs. Possible values: 
+ *        \clist
+ *        \cli IGRAPH_OUT 
+ *          the lengths of the outgoing paths are calculated. 
+ *        \cli IGRAPH_IN 
+ *          the lengths of the incoming paths are calculated. 
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an
+ *          undirected one for the computation.
+ *        \endclist
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           invalid vertex id passed.
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *
+ * Time complexity: O(n|E|),
+ * n is the number 
+ * of vertices for which the calculation is done and
+ * |E| is the number 
+ * of edges in the graph.
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
+ *   See \ref igraph_closeness_estimate() to estimate closeness values.
+ */
+int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
+                     const igraph_vs_t vids, igraph_neimode_t mode) {
+  return igraph_closeness_estimate(graph, res, vids, mode, -1);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_closeness
+ * \brief Closeness centrality estimations for some vertices.
+ *
+ * </para><para>
+ * The closeness centrality of a vertex measures how easily other
+ * vertices can be reached from it (or the other way: how easily it
+ * can be reached from the other vertices). It is defined as the
+ * number of the number of vertices minus one divided by the sum of the
+ * lengths of all geodesics from/to the given vertex. When estimating
+ * closeness centrality, igraph considers paths having a length less than
+ * or equal to a prescribed cutoff value.
+ *
+ * </para><para>
+ * If the graph is not connected, and there is no such path between two
+ * vertices, the number of vertices is used instead the length of the
+ * geodesic. This is always longer than the longest possible geodesic.
+ *
+ * </para><para>
+ * Since the estimation considers vertex pairs with a distance greater than
+ * the given value as disconnected, the resulting estimation will always be
+ * lower than the actual closeness centrality.
+ * 
+ * \param graph The graph object.
+ * \param res The result of the computation, a vector containing the
+ *        closeness centrality scores for the given vertices.
+ * \param vids Vector giving the vertices for which the closeness
+ *        centrality scores will be computed.
+ * \param mode The type of shortest paths to be used for the
+ *        calculation in directed graphs. Possible values: 
+ *        \clist
+ *        \cli IGRAPH_OUT 
+ *          the lengths of the outgoing paths are calculated. 
+ *        \cli IGRAPH_IN 
+ *          the lengths of the incoming paths are calculated. 
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an
+ *          undirected one for the computation.
+ *        \endclist
+ * \param cutoff The maximal length of paths that will be considered.
+ *        If zero or negative, the exact closeness will be calculated
+ *        (no upper limit on path lengths).
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           invalid vertex id passed.
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *
+ * Time complexity: O(n|E|),
+ * n is the number 
+ * of vertices for which the calculation is done and
+ * |E| is the number 
+ * of edges in the graph.
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
+ */
+int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
+		              const igraph_vs_t vids, igraph_neimode_t mode,
+                              igraph_integer_t cutoff) {
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_t already_counted;
+  long int i, j;
+  long int nodes_reached;
+
+  igraph_dqueue_t q;
+  
+  long int nodes_to_calc;
+  igraph_vector_t tmp;
+  igraph_vit_t vit;
+
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+  nodes_to_calc=IGRAPH_VIT_SIZE(vit);
+  
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("calculating closeness", IGRAPH_EINVMODE);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
+  igraph_vector_null(res);
+  
+  for (IGRAPH_VIT_RESET(vit), i=0; 
+       !IGRAPH_VIT_END(vit); 
+       IGRAPH_VIT_NEXT(vit), i++) {
+    IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(vit)));
+    IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+    nodes_reached=1;
+    VECTOR(already_counted)[(long int)IGRAPH_VIT_GET(vit)]=i+1;
+
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    while (!igraph_dqueue_empty(&q)) {
+      long int act=igraph_dqueue_pop(&q);
+      long int actdist=igraph_dqueue_pop(&q);
+      
+      VECTOR(*res)[i] += actdist;
+
+      if (cutoff>0 && actdist>=cutoff) continue;
+
+      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, act, mode));
+      for (j=0; j<igraph_vector_size(&tmp); j++) {
+	long int neighbor=VECTOR(tmp)[j];
+	if (VECTOR(already_counted)[neighbor] == i+1) { continue; }
+	VECTOR(already_counted)[neighbor] = i+1;
+	nodes_reached++;
+	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+      }
+    }
+    VECTOR(*res)[i] += (no_of_nodes * (no_of_nodes-nodes_reached));
+    VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
+  }
+  
+  /* Clean */
+  igraph_dqueue_destroy(&q);
+  igraph_vector_destroy(&tmp);
+  igraph_vector_destroy(&already_counted);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(4);
+  
+  return 0;
+}
+
+

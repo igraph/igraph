@@ -1,3 +1,23 @@
+2007-11-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/centrality.c (igraph_betweenness_estimate, igraph_closeness_estimate)
+    (igraph_edge_betweenness_estimate) : added
+
+    * src/structural_properties.c (igraph_betweenness, igraph_closeness)
+    (igraph_edge_betweenness) : moved to src/centrality.c
+
+    * src/igraph.h : added headers for estimation functions
+
+    * doc/structural.xxml : added documentation for estimation functions
+
+    * examples/simple/igraph_edge_betweenness.c : test cases for estimation added
+
+    * interfaces/python/src/graphobject.c : added cutoff parameter to
+    Graph.betweenness, Graph.closeness and Graph.edge_betweenness
+
+    * interfaces/python/package/test/structural.py : added test cases for
+    estimations
+
 2007-11-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_i_pagerank2, igraph_pagerank) : 

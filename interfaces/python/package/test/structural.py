@@ -105,6 +105,37 @@ class BiconnectedComponentTests(unittest.TestCase):
 
 
 class CentralityTests(unittest.TestCase):
+    def testBetweennessCentrality(self):
+        g = Graph.Star(5)
+        self.failUnless(g.betweenness() == [6., 0., 0., 0., 0.])
+        g = Graph(5, [(0, 1), (0, 2), (0, 3), (1, 4)])
+        self.failUnless(g.betweenness() == [5., 3., 0., 0., 0.])
+        self.failUnless(g.betweenness(cutoff=2) == [3., 1., 0., 0., 0.])
+        self.failUnless(g.betweenness(cutoff=1) == [0., 0., 0., 0., 0.])
+        g = Graph.Lattice([3, 3], circular=False)
+        self.failUnless(g.betweenness(cutoff=2) == [0.5, 2.0, 0.5, 2.0, 4.0, 2.0, 0.5, 2.0, 0.5])
+
+    def testEdgeBetweennessCentrality(self):
+        g = Graph.Star(5)
+        self.failUnless(g.edge_betweenness() == [4., 4., 4., 4.])
+        g = Graph(5, [(0, 1), (0, 2), (0, 3), (1, 4)])
+        self.failUnless(g.edge_betweenness() == [6., 4., 4., 4.])
+        self.failUnless(g.edge_betweenness(cutoff=2) == [4., 3., 3., 2.])
+        self.failUnless(g.edge_betweenness(cutoff=1) == [1., 1., 1., 1.])
+
+    def testClosenessCentrality(self):
+        g = Graph.Star(5)
+        cl = g.closeness()
+        cl2 = [1., 0.57142, 0.57142, 0.57142, 0.57142]
+        for idx in xrange(g.vcount()):
+            self.assertAlmostEqual(cl[idx], cl2[idx], places=3)
+
+        g = Graph.Star(5)
+        cl = g.closeness(cutoff=1)
+        cl2 = [1., 0.25, 0.25, 0.25, 0.25]
+        for idx in xrange(g.vcount()):
+            self.assertAlmostEqual(cl[idx], cl2[idx], places=3)
+
     def testEigenvectorCentrality(self):
         g = Graph.Star(11)
         cent = g.evcent()

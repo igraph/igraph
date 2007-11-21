@@ -28,6 +28,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
   for (i=0; i<igraph_vector_size(v); i++) {
     fprintf(f, "%.5f\n", (double) VECTOR(*v)[i]);
   }
+  fprintf(f, "\n");
 }
 
 int main() {
@@ -54,8 +55,25 @@ int main() {
 	       31, 32, 31, 33, 32, 33,
 	       -1);
   
-  igraph_vector_init(&eb, igraph_vcount(&g));
+  igraph_vector_init(&eb, igraph_ecount(&g));
   igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED);
+  print_vector(&eb, stdout);
+  igraph_vector_destroy(&eb);
+  igraph_destroy(&g);
+
+  igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+    0, 1, 0, 2, 0, 3, 1, 4, -1);
+  igraph_vector_init(&eb, igraph_ecount(&g));
+  igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, 2);
+  print_vector(&eb, stdout);
+  igraph_vector_destroy(&eb);
+  igraph_destroy(&g);
+
+  igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+    0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
+    6, 7, 7, 8, -1);
+  igraph_vector_init(&eb, igraph_ecount(&g));
+  igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, 2);
   print_vector(&eb, stdout);
   igraph_vector_destroy(&eb);
   igraph_destroy(&g);
