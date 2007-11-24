@@ -1,3 +1,10 @@
+2007-11-24  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/iterators.c (igraph_es_vector_copy) : added
+
+    * src/structural_properties.c (igraph_count_multiple) : now handles
+    loop edges properly
+
 2007-11-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_betweenness_estimate, igraph_closeness_estimate)

@@ -860,6 +860,35 @@ int igraph_es_vector(igraph_es_t *es,
 }
 
 /**
+ * \function igraph_es_vector_copy
+ *
+ * This function makes it possible to handle a \type vector_t
+ * permanently as an edge selector. The edge selector creates a
+ * copy of the original vector, so the vector can safely be destroyed
+ * after creating the edge selector. Changing the original vector
+ * will not affect the edge selector. The edge selector is
+ * responsible for deleting the copy made by itself.
+ * 
+ * \param es Pointer to an uninitialized edge selector.
+ * \param v Pointer to a \type igraph_vector_t object.
+ * \return Error code.
+ * 
+ * Time complexity: O(1).
+ */
+
+int igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_t *v) {
+  es->type=IGRAPH_ES_VECTOR;
+  es->data.vecptr=igraph_Calloc(1, igraph_vector_t);
+  if (es->data.vecptr==0) {
+    IGRAPH_ERROR("Cannot create edge selector", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, (igraph_vector_t*)es->data.vecptr);
+  IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)es->data.vecptr, v));
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/**
  * \function igraph_ess_vector
  * \brief Immediate vector view edge selector.
  * 
@@ -1408,6 +1437,7 @@ int igraph_eit_create(const igraph_t *graph,
       IGRAPH_ERROR("Cannot create iterator, invalid edge id", IGRAPH_EINVVID);
     }
     break;
+  case IGRAPH_ES_VECTOR:
   case IGRAPH_ES_VECTORPTR:
     eit->type=IGRAPH_EIT_VECTORPTR;
     eit->pos=0;

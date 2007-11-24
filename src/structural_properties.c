@@ -3404,8 +3404,6 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
  * edge with the same head and tail vertices in the graph.)
  * 
  * </para><para>
- * Note that this function returns true only for the second or more 
- * appereances of the multiple edges.
  * \param graph The input graph.
  * \param res Pointer to a vector, the result will be stored 
  *        here. It will be resized as needed.
@@ -3439,14 +3437,14 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     long int to=IGRAPH_TO(graph, e);
     igraph_vector_t *neis=igraph_i_lazy_adjedgelist_get(&adjlist, from);
     long int j, n=igraph_vector_size(neis);
-    VECTOR(*res)[i]=1;
+    VECTOR(*res)[i] = 0;
     for (j=0; j<n; j++) {
       long int e2=VECTOR(*neis)[j];
       long int to2=IGRAPH_OTHER(graph,e2,from);
-      if (to2==to && e2!=e) {
-	VECTOR(*res)[i] += 1;
-      }
+      if (to2==to) VECTOR(*res)[i] += 1;
     }
+    /* for loop edges, divide the result by two */
+    if (to == from) VECTOR(*res)[i] /= 2;
   }
   
   igraph_i_lazy_adjedgelist_destroy(&adjlist);

@@ -397,6 +397,8 @@ int igraph_es_fromto(igraph_es_t *es,
 int igraph_es_seq(igraph_es_t *es, igraph_integer_t from, igraph_integer_t to);
 igraph_es_t igraph_ess_seq(igraph_integer_t from, igraph_integer_t to);
 
+int igraph_es_vector_copy(igraph_es_t *es, const igraph_vector_t *v);
+
 int igraph_es_pairs(igraph_es_t *es, const igraph_vector_t *v, 
 		    igraph_bool_t directed);
 int igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...);
