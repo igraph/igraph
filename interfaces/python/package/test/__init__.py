@@ -22,6 +22,11 @@ def suite():
     )
     
 def test():
-    runner = unittest.TextTestRunner()
-    runner.run(suite())
+    try:
+        # Support for testoob to have nice colored output
+        import testoob
+        testoob.main(suite())
+    except ImportError:
+        runner = unittest.TextTestRunner()
+        runner.run(suite())
     

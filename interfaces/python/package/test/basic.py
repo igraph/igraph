@@ -13,6 +13,31 @@ class BasicTests(unittest.TestCase):
         g=Graph([(0,1), (0,0), (1,2)])
         self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
+    def testMultiplesLoops(self):
+        g=Graph.Tree(7, 2)
+        g.add_vertices(1)
+        g.add_edges([(0,1), (7,7), (6,6), (6,6), (6,6)])
+        
+        # is_loop
+        self.failUnless(g.is_loop() == [False, False, False, False, \
+            False, False, False, True, True, True, True])
+        self.failUnless(g.is_loop(g.ecount()-2))
+        self.failUnless(g.is_loop(range(6,8)) == [False, True])
+
+        # is_multiple
+        self.failUnless(g.is_multiple() == [False, False, False, False, \
+            False, False, True, False, False, True, True])
+
+        # count_multiple
+        self.failUnless(g.count_multiple() == [2, 1, 1, 1, 1, 1, 2, 1, 3, 3, 3])
+        self.failUnless(g.count_multiple(g.ecount()-1) == 3)
+        self.failUnless(g.count_multiple(range(2,5)) == [1, 1, 1])
+
+        # check if a mutual directed edge pair is reported as multiple
+        g=Graph(2, [(0,1), (1,0)], directed=True)
+        self.failUnless(g.is_multiple() == [False, False])
+
+
     def testPickling(self):
         import pickle
         g=Graph([(0,1), (1,2)])

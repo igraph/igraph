@@ -245,6 +245,31 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts an igraph \c igraph_vector_bool_t to a Python boolean list
+ * 
+ * \param v the \c igraph_vector_bool_t containing the vector to be converted
+ * \return the Python boolean list as a \c PyObject*, or \c NULL if an
+ * error occurred
+ */
+PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v) {
+  PyObject *list, *item;
+  int n, i;
+   
+  n=igraph_vector_bool_size(v);
+  if (n<0) return igraphmodule_handle_igraph_error();
+
+  list=PyList_New(n);
+  for (i=0; i<n; i++) {
+    item = VECTOR(*v)[i] ? Py_True : Py_False;
+    Py_INCREF(item);
+    PyList_SET_ITEM(list, i, item);
+  }
+
+  return list;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an igraph \c igraph_vector_t to a Python integer list
  * 
  * \param v the \c igraph_vector_t containing the vector to be converted
@@ -729,7 +754,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
 
       if (val >= 0) igraph_vector_push_back(&vector, val);
       else {
-    PyErr_SetString(PyExc_TypeError, "integer or long expected");
+        PyErr_SetString(PyExc_TypeError, "integer or long expected");
       }
 
       if (PyErr_Occurred()) break;
@@ -742,6 +767,74 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
       return 1;
     } else {
       igraph_vs_vector_copy(vs, &vector);
+      igraph_vector_destroy(&vector);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
+  return 0;
+}
+
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Tries to interpret a Python object as an edge selector
+ * 
+ * \param o the Python object
+ * \param vs the \c igraph_es_t which will contain the result
+ * \param return_single will be 1 if the selector selected only a single edge,
+ * 0 otherwise
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
+                  igraph_bool_t *return_single) {
+  *return_single=0;
+  if (o==NULL || o == Py_None) {
+    /* Returns a vertex sequence for all edges */
+    igraph_es_all(es, IGRAPH_EDGEORDER_ID);
+  } else if (PyInt_Check(o)) {
+    /* Returns an edge sequence for a single edge ID */
+    igraph_es_1(es, PyInt_AsLong(o));
+    *return_single=1;
+  } else if (PyLong_Check(o)) {
+    /* Returns an edge sequence for a single edge ID */
+    igraph_es_1(es, PyLong_AsLong(o));
+    *return_single=1;
+  } else {
+    /* Returns an edge sequence with the IDs returned by the iterator */
+    PyObject *iterator = PyObject_GetIter(o);
+    PyObject *item;
+    igraph_vector_t vector;
+
+    if (iterator == NULL) {
+      PyErr_SetString(PyExc_TypeError, "integer, long, iterable or None expected");
+      return 1;
+    }
+
+    IGRAPH_CHECK(igraph_vector_init(&vector, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &vector);
+    IGRAPH_CHECK(igraph_vector_reserve(&vector, 20));
+
+    while ((item = PyIter_Next(iterator))) {
+      long val=-1;
+      if (PyInt_Check(item)) val=PyInt_AsLong(item);
+      else if (PyLong_Check(item)) val=PyLong_AsLong(item);
+      Py_DECREF(item);
+
+      if (val >= 0) igraph_vector_push_back(&vector, val);
+      else {
+        PyErr_SetString(PyExc_TypeError, "integer or long expected");
+      }
+
+      if (PyErr_Occurred()) break;
+    }
+    Py_DECREF(iterator);
+
+    if (PyErr_Occurred()) {
+      igraph_vector_destroy(&vector);
+      IGRAPH_FINALLY_CLEAN(1);
+      return 1;
+    } else {
+      igraph_es_vector_copy(es, &vector);
       igraph_vector_destroy(&vector);
       IGRAPH_FINALLY_CLEAN(1);
     }

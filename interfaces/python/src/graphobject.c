@@ -603,6 +603,145 @@ PyObject *igraphmodule_Graph_maxdegree(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Checks whether an edge is a loop edge 
+ * \return a boolean or a list of booleans
+ * \sa igraph_is_loop
+ */
+PyObject *igraphmodule_Graph_is_loop(igraphmodule_GraphObject *self,
+                                     PyObject *args, PyObject *kwds) {
+  PyObject *list = Py_None;
+  igraph_vector_bool_t result;
+  igraph_es_t es;
+  igraph_bool_t return_single = 0;
+
+  static char *kwlist[] = { "edges", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_bool_init(&result, 0)) {
+    igraph_es_destroy(&es);
+    return NULL;
+  }
+
+  if (igraph_is_loop(&self->g, &result, es)) {
+    igraphmodule_handle_igraph_error();
+    igraph_es_destroy(&es);
+    igraph_vector_bool_destroy(&result);
+    return NULL;
+  }
+
+  if (!return_single)
+    list = igraphmodule_vector_bool_t_to_PyList(&result);
+  else {
+    list = (VECTOR(result)[0]) ? Py_True : Py_False;
+    Py_INCREF(list);
+  }
+
+  igraph_vector_bool_destroy(&result);
+  igraph_es_destroy(&es);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Checks whether an edge is a multiple edge 
+ * \return a boolean or a list of booleans
+ * \sa igraph_is_multiple
+ */
+PyObject *igraphmodule_Graph_is_multiple(igraphmodule_GraphObject *self,
+                                         PyObject *args, PyObject *kwds) {
+  PyObject *list = Py_None;
+  igraph_vector_bool_t result;
+  igraph_es_t es;
+  igraph_bool_t return_single = 0;
+
+  static char *kwlist[] = { "edges", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_bool_init(&result, 0)) {
+    igraph_es_destroy(&es);
+    return NULL;
+  }
+
+  if (igraph_is_multiple(&self->g, &result, es)) {
+    igraphmodule_handle_igraph_error();
+    igraph_es_destroy(&es);
+    igraph_vector_bool_destroy(&result);
+    return NULL;
+  }
+
+  if (!return_single)
+    list = igraphmodule_vector_bool_t_to_PyList(&result);
+  else {
+    list = (VECTOR(result)[0]) ? Py_True : Py_False;
+    Py_INCREF(list);
+  }
+
+  igraph_vector_bool_destroy(&result);
+  igraph_es_destroy(&es);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Checks the multiplicity of the edges 
+ * \return the edge multiplicities as a Python list
+ * \sa igraph_count_multiple
+ */
+PyObject *igraphmodule_Graph_count_multiple(igraphmodule_GraphObject *self,
+                                            PyObject *args, PyObject *kwds) {
+  PyObject *list = Py_None;
+  igraph_vector_t result;
+  igraph_es_t es;
+  igraph_bool_t return_single = 0;
+
+  static char *kwlist[] = { "edges", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&result, 0)) {
+    igraph_es_destroy(&es);
+    return NULL;
+  }
+
+  if (igraph_count_multiple(&self->g, &result, es)) {
+    igraphmodule_handle_igraph_error();
+    igraph_es_destroy(&es);
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  else
+    list = PyInt_FromLong(VECTOR(result)[0]);
+
+  igraph_vector_destroy(&result);
+  igraph_es_destroy(&es);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief The neighbors of a given vertex in an \c igraph.Graph
  * This method accepts a single vertex ID as a parameter, and returns the
  * neighbors of the given vertex in the form of an integer list. A
@@ -6298,7 +6437,40 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n" "@param loops: whether self-loops should be counted.\n"},
 
-  // interfaces to igraph_neighbors
+  /* interface to igraph_is_loop */
+  {"is_loop", (PyCFunction) igraphmodule_Graph_is_loop,
+   METH_VARARGS | METH_KEYWORDS,
+   "is_loop(edges=None)\n\n"
+   "Checks whether a specific set of edges contain loop edges\n\n"
+   "@param edges: edge indices which we want to check. If C{None}, all\n"
+   "  edges are checked.\n"
+   "@return: a list of booleans, one for every edge given\n"},
+
+  /* interface to igraph_is_multiple */
+  {"is_multiple", (PyCFunction) igraphmodule_Graph_is_multiple,
+   METH_VARARGS | METH_KEYWORDS,
+   "is_multiple(edges=None)\n\n"
+   "Checks whether an edge is a multiple edge.\n\n"
+   "Also works for a set of edges -- in this case, every edge is checked\n"
+   "one by one. Note that if there are multiple edges going between a\n"
+   "pair of vertices, there is always one of them that is I{not}\n"
+   "reported as multiple (only the others). This allows one to easily\n"
+   "detect the edges that have to be deleted in order to make the graph\n"
+   "free of multiple edges.\n\n"
+   "@param edges: edge indices which we want to check. If C{None}, all\n"
+   "  edges are checked.\n"
+   "@return: a list of booleans, one for every edge given\n"},
+
+  /* interface to igraph_count_multiple */
+  {"count_multiple", (PyCFunction) igraphmodule_Graph_count_multiple,
+   METH_VARARGS | METH_KEYWORDS,
+   "count_multiple(edges=None)\n\n"
+   "Counts the multiplicities of the given edges.\n\n"
+   "@param edges: edge indices for which we want to count their\n"
+   "  multiplicity. If C{None}, all edges are counted.\n"
+   "@return: the multiplicities of the given edges as a list.\n"},
+
+  /* interface to igraph_neighbors */
   {"neighbors", (PyCFunction) igraphmodule_Graph_neighbors,
    METH_VARARGS | METH_KEYWORDS,
    "neighbors(vertex, type=ALL)\n\n"

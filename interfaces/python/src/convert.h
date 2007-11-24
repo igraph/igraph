@@ -37,6 +37,7 @@ typedef enum { IGRAPHMODULE_TYPE_INT=0, IGRAPHMODULE_TYPE_FLOAT }
 igraphmodule_conv_t;
 
 int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs);
+PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v);
 PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v, igraphmodule_conv_t type);
 PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v);
 int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
@@ -52,6 +53,8 @@ PyObject* igraphmodule_strvector_t_to_PyList(igraph_strvector_t *v);
 int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result);
 int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v);
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
+				  igraph_bool_t *return_single);
+int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *vs,
 				  igraph_bool_t *return_single);
 int igraphmodule_PyObject_to_attribute_values(PyObject *o,
 					      igraph_vector_t *v,
