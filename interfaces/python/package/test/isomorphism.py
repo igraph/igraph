@@ -14,6 +14,18 @@ class IsomorphismTests(unittest.TestCase):
         self.failUnless(g1.isomorphic(g2))
         self.failUnless(g2.isomorphic(g1, return_mapping_21=True) == (True, None, [0, 2, 5, 7, 1, 3, 4, 6]))
 
+    def testCountIsomorphisms(self):
+        g = Graph.Full(4)
+        self.failUnless(g.count_automorphisms(), 24)
+        g = Graph(6, [(0,1), (2,3), (4,5), (0,2), (2,4), (1,3), (3,5)])
+        self.failUnless(g.count_automorphisms(), 4)
+
+    def testGetIsomorphisms(self):
+        g = Graph(6, [(0,1), (2,3), (4,5), (0,2), (2,4), (1,3), (3,5)])
+        maps = g.get_automorphisms()
+        expected_maps = [[0,1,2,3,4,5], [1,0,3,2,5,4], [4,5,2,3,0,1], [5,4,3,2,1,0]]
+        self.failUnless(maps, expected_maps)
+
 def suite():
     isomorphism_suite = unittest.makeSuite(IsomorphismTests)
     return unittest.TestSuite([isomorphism_suite])

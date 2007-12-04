@@ -5017,7 +5017,7 @@ PyObject *igraphmodule_Graph_isoclass(igraphmodule_GraphObject * self,
 
 /** \ingroup python_interface_graph
  * \brief Determines whether the graph is isomorphic to another graph
- * \sa igraph_isoclass
+ * \sa igraph_isomorphic_vf2
  */
 PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
@@ -5073,6 +5073,68 @@ PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
 	} else { m2 = Py_None; Py_INCREF(m2); }
 	return Py_BuildValue("NNN", iso, m1, m2);
   }
+}
+
+/** \ingroup python_interface_graph
+ * \brief Counts the number of isomorphisms of two given graphs 
+ * \sa igraph_count_isomorphisms_vf2
+ */
+PyObject *igraphmodule_Graph_count_isomorphisms(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  igraph_integer_t result = 0;
+  PyObject *o = Py_None;
+  igraphmodule_GraphObject *other;
+  static char *kwlist[] = { "other", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords
+      (args, kwds, "|O!", kwlist, &igraphmodule_GraphType, &o))
+    return NULL;
+  if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
+
+  if (igraph_count_isomorphisms_vf2(&self->g, &other->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("i", (long)result);
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns all isomorphisms of two given graphs 
+ * \sa igraph_get_isomorphisms_vf2
+ */
+PyObject *igraphmodule_Graph_get_isomorphisms(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  igraph_vector_ptr_t result;
+  PyObject *o = Py_None;
+  PyObject *res;
+  long int i,n;
+  igraphmodule_GraphObject *other;
+  static char *kwlist[] = { "other", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords
+      (args, kwds, "|O!", kwlist, &igraphmodule_GraphType, &o))
+    return NULL;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
+
+  if (igraph_get_isomorphisms_vf2(&self->g, &other->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_ptr_destroy(&result);
+    return NULL;
+  }
+
+  res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+
+  n=igraph_vector_ptr_size(&result);
+  for (i=0; i<n; i++) igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[i]);
+  igraph_vector_ptr_destroy_all(&result);
+
+  return res;
 }
 
 /** \ingroup python_interface_graph
@@ -7848,6 +7910,22 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  and the third element being the 2 -> 1 mapping. If the corresponding\n"
    "  mapping was not calculated, C{None} is returned in the appropriate\n"
    "  element of the 3-tuple.\n"},
+  {"count_isomorphisms", (PyCFunction) igraphmodule_Graph_count_isomorphisms,
+   METH_VARARGS | METH_KEYWORDS,
+   "count_isomorphisms(other=None)\n\n"
+   "Determines the number of isomorphisms between the graph and another one\n\n"
+   "@param other: the other graph. If C{None}, the number of automorphisms\n"
+   "  will be returned.\n"
+   "@return: the number of isomorphisms between the two given graphs (or the\n"
+   "  number of automorphisms if C{other} is C{None}.\n"},
+  {"get_isomorphisms", (PyCFunction) igraphmodule_Graph_get_isomorphisms,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_isomorphisms(other=None)\n\n"
+   "Returns all isomorphisms between the graph and another one\n\n"
+   "@param other: the other graph. If C{None}, the automorphisms\n"
+   "  will be returned.\n"
+   "@return: a list of lists, each item of the list containing the mapping\n"
+   "  from vertices of the second graph to the vertices of the first one\n"},
 
   ////////////////////////
   // ATTRIBUTE HANDLING //

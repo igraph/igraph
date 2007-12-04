@@ -76,7 +76,7 @@ class Graph(core.GraphBase):
     cut_vertices = core.GraphBase.articulation_points
     blocks = core.GraphBase.biconnected_components
     evcent = core.GraphBase.eigenvector_centrality
-    
+
     def __init__(self, n=1, edges=None, directed=None, \
         graph_attrs=None, vertex_attrs=None, edge_attrs=None):
         """Constructs a graph from scratch.
@@ -324,6 +324,18 @@ class Graph(core.GraphBase):
           218-251. Boston: Houghton Mifflin.
         """
         return TriadCensus(GraphBase.triad_census(self, *args, **kwds))
+
+    # Automorphisms
+    def count_automorphisms(self):
+        """Returns the number of automorphisms of the graph"""
+        return self.count_isomorphisms(self)
+
+    def get_automorphisms(self):
+        """Returns all automorphisms of the graph
+        
+        @return: a list of lists, each item containing a possible mapping
+          of the graph vertices to itself according to the automorphism"""
+        return self.get_isomorphisms(self)
 
     # Various clustering algorithms -- mostly wrappers around GraphBase
 
