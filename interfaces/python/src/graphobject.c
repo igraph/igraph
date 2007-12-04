@@ -5017,6 +5017,10 @@ PyObject *igraphmodule_Graph_isoclass(igraphmodule_GraphObject * self,
 
 /** \ingroup python_interface_graph
  * \brief Determines whether the graph is isomorphic to another graph
+ *
+ * The actual code is almost the same as igraphmodule_Graph_subisomorphic. Be sure
+ * to correct bugs in both interfaces if applicable!
+ *
  * \sa igraph_isomorphic_vf2
  */
 PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
@@ -5077,6 +5081,10 @@ PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
 
 /** \ingroup python_interface_graph
  * \brief Counts the number of isomorphisms of two given graphs 
+ *
+ * The actual code is almost the same as igraphmodule_Graph_count_subisomorphisms.
+ * Make sure you correct bugs in both interfaces if applicable!
+ *
  * \sa igraph_count_isomorphisms_vf2
  */
 PyObject *igraphmodule_Graph_count_isomorphisms(igraphmodule_GraphObject *self,
@@ -5101,6 +5109,10 @@ PyObject *igraphmodule_Graph_count_isomorphisms(igraphmodule_GraphObject *self,
 
 /** \ingroup python_interface_graph
  * \brief Returns all isomorphisms of two given graphs 
+ *
+ * The actual code is almost the same as igraphmodule_Graph_get_subisomorphisms.
+ * Make sure you correct bugs in both interfaces if applicable!
+ *
  * \sa igraph_get_isomorphisms_vf2
  */
 PyObject *igraphmodule_Graph_get_isomorphisms(igraphmodule_GraphObject *self,
@@ -5123,6 +5135,140 @@ PyObject *igraphmodule_Graph_get_isomorphisms(igraphmodule_GraphObject *self,
   if (o == Py_None) other=self; else other=(igraphmodule_GraphObject*)o;
 
   if (igraph_get_isomorphisms_vf2(&self->g, &other->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_ptr_destroy(&result);
+    return NULL;
+  }
+
+  res = igraphmodule_vector_ptr_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+
+  n=igraph_vector_ptr_size(&result);
+  for (i=0; i<n; i++) igraph_vector_destroy((igraph_vector_t*)VECTOR(result)[i]);
+  igraph_vector_ptr_destroy_all(&result);
+
+  return res;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Determines whether a subgraph of the graph is isomorphic to another graph
+ *
+ * The actual code is almost the same as igraphmodule_Graph_isomorphic. Make sure
+ * you correct bugs in both interfaces if applicable!
+ *
+ * \sa igraph_subisomorphic_vf2
+ */
+PyObject *igraphmodule_Graph_subisomorphic(igraphmodule_GraphObject * self,
+                                        PyObject * args, PyObject * kwds)
+{
+  igraph_bool_t result = 0;
+  PyObject *o, *return1=Py_False, *return2=Py_False;
+  igraphmodule_GraphObject *other;
+  igraph_vector_t mapping_12, mapping_21, *map12=0, *map21=0;
+  char *kwlist[] = { "other", "return_mapping_12", "return_mapping_21", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords
+      (args, kwds, "O!|OO", kwlist, &igraphmodule_GraphType, &o, &return1, &return2))
+    return NULL;
+  other = (igraphmodule_GraphObject *) o;
+
+  if (PyObject_IsTrue(return1)) {
+	igraph_vector_init(&mapping_12, 0);
+	map12 = &mapping_12;
+  }
+  if (PyObject_IsTrue(return2)) {
+	igraph_vector_init(&mapping_21, 0);
+	map21 = &mapping_21;
+  }
+
+  if (igraph_subisomorphic_vf2(&self->g, &other->g, &result, map12, map21)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (!map12 && !map21) {
+    if (result) Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+  } else {
+	PyObject *iso, *m1, *m2;
+	iso = result ? Py_True : Py_False;
+	Py_INCREF(iso);
+	if (map12) {
+	  m1 = igraphmodule_vector_t_to_PyList(map12, IGRAPHMODULE_TYPE_INT);
+	  igraph_vector_destroy(map12);
+	  if (!m1) {
+	    Py_DECREF(iso);
+		if (map21) igraph_vector_destroy(map21);
+		return NULL;
+	  }
+	} else { m1 = Py_None; Py_INCREF(m1); }
+	if (map21) {
+	  m2 = igraphmodule_vector_t_to_PyList(map21, IGRAPHMODULE_TYPE_INT);
+	  igraph_vector_destroy(map21);
+	  if (!m2) {
+	    Py_DECREF(iso); Py_DECREF(m1);
+		return NULL;
+	  }
+	} else { m2 = Py_None; Py_INCREF(m2); }
+	return Py_BuildValue("NNN", iso, m1, m2);
+  }
+}
+
+/** \ingroup python_interface_graph
+ * \brief Counts the number of subisomorphisms of two given graphs 
+ *
+ * The actual code is almost the same as igraphmodule_Graph_count_isomorphisms.
+ * Make sure you correct bugs in both interfaces if applicable!
+ *
+ * \sa igraph_count_subisomorphisms_vf2
+ */
+PyObject *igraphmodule_Graph_count_subisomorphisms(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  igraph_integer_t result = 0;
+  PyObject *o;
+  igraphmodule_GraphObject *other;
+  static char *kwlist[] = { "other", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords
+      (args, kwds, "O!", kwlist, &igraphmodule_GraphType, &o))
+    return NULL;
+  other=(igraphmodule_GraphObject*)o;
+
+  if (igraph_count_subisomorphisms_vf2(&self->g, &other->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("i", (long)result);
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns all subisomorphisms of two given graphs 
+ *
+ * The actual code is almost the same as igraphmodule_Graph_get_isomorphisms.
+ * Make sure you correct bugs in both interfaces if applicable!
+ *
+ * \sa igraph_get_isomorphisms_vf2
+ */
+PyObject *igraphmodule_Graph_get_subisomorphisms(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  igraph_vector_ptr_t result;
+  PyObject *o;
+  PyObject *res;
+  long int i,n;
+  igraphmodule_GraphObject *other;
+  static char *kwlist[] = { "other", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords
+      (args, kwds, "O!", kwlist, &igraphmodule_GraphType, &o))
+    return NULL;
+
+  if (igraph_vector_ptr_init(&result, 0)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  other=(igraphmodule_GraphObject*)o;
+
+  if (igraph_get_subisomorphisms_vf2(&self->g, &other->g, &result)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_ptr_destroy(&result);
     return NULL;
@@ -7924,6 +8070,38 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Returns all isomorphisms between the graph and another one\n\n"
    "@param other: the other graph. If C{None}, the automorphisms\n"
    "  will be returned.\n"
+   "@return: a list of lists, each item of the list containing the mapping\n"
+   "  from vertices of the second graph to the vertices of the first one\n"},
+
+  {"subisomorphic", (PyCFunction) igraphmodule_Graph_subisomorphic,
+   METH_VARARGS | METH_KEYWORDS,
+   "subisomorphic(other, return_mapping_12=False, return_mapping_21=False)\n\n"
+   "Checks whether a subgraph of the graph is isomorphic with another graph.\n\n"
+   "@param other: the other graph with which we want to compare the graph.\n"
+   "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
+   "  the vertices of the first graph to the second. The mapping can contain\n"
+   "  -1 if a given node is not mapped.\n"
+   "@param return_mapping_21: if C{True}, calculates the mapping which maps\n"
+   "  the vertices of the second graph to the first. The mapping can contain\n"
+   "  -1 if a given node is not mapped.\n"
+   "@return: if no mapping is calculated, the result is C{True} if the graph\n"
+   "  contains a subgraph that's isomorphic to the given one, C{False}\n"
+   "  otherwise. If any or both mappings are calculated, the result is a\n"
+   "  3-tuple, the first element being the above mentioned boolean, the\n"
+   "  second element being the 1 -> 2 mapping and the third element being\n"
+   "  the 2 -> 1 mapping. If the corresponding mapping was not calculated,\n"
+   "  C{None} is returned in the appropriate element of the 3-tuple.\n"},
+  {"count_subisomorphisms", (PyCFunction) igraphmodule_Graph_count_subisomorphisms,
+   METH_VARARGS | METH_KEYWORDS,
+   "count_subisomorphisms(other)\n\n"
+   "Determines the number of subisomorphisms between the graph and another one\n\n"
+   "@param other: the other graph.\n"
+   "@return: the number of subisomorphisms between the two given graphs\n"},
+  {"get_subisomorphisms", (PyCFunction) igraphmodule_Graph_get_subisomorphisms,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_subisomorphisms(other)\n\n"
+   "Returns all subisomorphisms between the graph and another one\n\n"
+   "@param other: the other graph.\n"
    "@return: a list of lists, each item of the list containing the mapping\n"
    "  from vertices of the second graph to the vertices of the first one\n"},
 
