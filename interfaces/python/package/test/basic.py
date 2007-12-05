@@ -13,6 +13,25 @@ class BasicTests(unittest.TestCase):
         g=Graph([(0,1), (0,0), (1,2)])
         self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
+    def testAdjacency(self):
+        g=Graph(4, [(0,1), (1,2), (2,0), (2,3)], directed=True)
+        self.failUnless(g.neighbors(2) == [0, 1, 3])
+        self.failUnless(g.predecessors(2) == [1])
+        self.failUnless(g.successors(2) == [0, 3])
+        self.failUnless(g.get_adjlist() == [[1], [2], [0,3], []])
+        self.failUnless(g.get_adjlist(IN) == [[2], [0], [1], [2]])
+        self.failUnless(g.get_adjlist(ALL) == [[1,2], [0,2], [0,1,3], [2]])
+        
+    def testEdgeAdjacency(self):
+        g=Graph(4, [(0,1), (1,2), (2,0), (2,3)], directed=True)
+        self.failUnless(g.adjacent(2) == [2, 3])
+        self.failUnless(g.adjacent(2, IN) == [1])
+        self.failUnless(g.adjacent(2, ALL) == [2, 3, 1])
+        self.failUnless(g.get_adjedgelist() == [[0], [1], [2,3], []])
+        self.failUnless(g.get_adjedgelist(IN) == [[2], [0], [1], [3]])
+        self.failUnless(g.get_adjedgelist(ALL) == [[0,2], [1,0], [2,3,1], [3]])
+
+
     def testMultiplesLoops(self):
         g=Graph.Tree(7, 2)
         g.add_vertices(1)

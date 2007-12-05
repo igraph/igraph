@@ -788,6 +788,49 @@ PyObject *igraphmodule_Graph_neighbors(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief The adjacent edges of a given vertex in an \c igraph.Graph
+ * This method accepts a single vertex ID as a parameter, and returns the
+ * IDS of the adjacent edges of the given vertex in the form of an integer list.
+ * A second argument may be passed as well, meaning the type of neighbors to
+ * be returned (\c OUT for successors, \c IN for predecessors or \c ALL
+ * for both of them). This argument is ignored for undirected graphs.
+ * 
+ * \return the adjacency list as a Python list object
+ * \sa igraph_adjacent
+ */
+PyObject *igraphmodule_Graph_adjacent(igraphmodule_GraphObject * self,
+                                       PyObject * args, PyObject * kwds)
+{
+  PyObject *list;
+  int dtype = IGRAPH_OUT;
+  long idx;
+  igraph_vector_t result;
+
+  static char *kwlist[] = { "vertex", "type", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|i", kwlist, &idx, &dtype))
+    return NULL;
+
+  if (dtype != IGRAPH_ALL && dtype != IGRAPH_OUT && dtype != IGRAPH_IN) {
+    PyErr_SetString(PyExc_ValueError,
+                    "type should be either ALL or IN or OUT");
+    return NULL;
+  }
+
+  igraph_vector_init(&result, 1);
+  if (igraph_adjacent(&self->g, &result, idx, (igraph_neimode_t) dtype)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
+  list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief The successors of a given vertex in an \c igraph.Graph
  * This method accepts a single vertex ID as a parameter, and returns the
  * successors of the given vertex in the form of an integer list. It
@@ -6685,7 +6728,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Returns adjacent vertices to a given vertex.\n\n"
    "@param vertex: a vertex ID\n"
    "@param type: whether to return only predecessors (L{OUT}),\n"
-   "  successors (L{OUT}) or both (L{ALL}). Ignored for undirected\n"
+   "  successors (L{IN}) or both (L{ALL}). Ignored for undirected\n"
    "  graphs."},
 
   {"successors", (PyCFunction) igraphmodule_Graph_successors,
@@ -6708,6 +6751,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param v1: the first vertex ID\n"
    "@param v2: the second vertex ID\n"
    "@return: the edge ID of an arbitrary edge between vertices v1 and v2\n"},
+
+  /* interface to igraph_adjacent */
+  {"adjacent", (PyCFunction) igraphmodule_Graph_adjacent,
+   METH_VARARGS | METH_KEYWORDS,
+   "adjacent(vertex, type=OUT)\n\n"
+   "Returns adjacent edges to a given vertex.\n\n"
+   "@param vertex: a vertex ID\n"
+   "@param type: whether to return only predecessors (L{OUT}),\n"
+   "  successors (L{IN}) or both (L{ALL}). Ignored for undirected\n"
+   "  graphs."},
 
   //////////////////////
   // GRAPH GENERATORS //
@@ -7162,9 +7215,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "geodesic.\n\n"
    "@param vertices: the vertices for which the closenesses must\n"
    "  be returned. If C{None}, uses all of the vertices in the graph.\n"
-   "@param mode: must be one of C{IN}, C{OUT} and C{ALL}. C{IN} means\n"
-   "  that the length of the incoming paths, C{OUT} means that the\n"
-   "  length of the outgoing paths must be calculated. C{ALL} means\n"
+   "@param mode: must be one of L{IN}, L{OUT} and L{ALL}. L{IN} means\n"
+   "  that the length of the incoming paths, L{OUT} means that the\n"
+   "  length of the outgoing paths must be calculated. L{ALL} means\n"
    "  that both of them must be calculated.\n"
    "@param cutoff: if it is an integer, only paths less than or equal to this\n"
    "  length are considered, effectively resulting in an estimation of the\n"
@@ -7281,12 +7334,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "get_shortest_paths(v, mode=OUT)\n\n"
    "Calculates the shortest paths from/to a given node in a graph.\n\n"
    "@param v: the source/destination for the calculated paths\n"
-   "@param mode: the directionality of the paths. C{IN} means to\n"
-   "  calculate incoming paths, C{OUT} means to calculate outgoing\n"
-   "  paths, C{ALL} means to calculate both ones.\n"
+   "@param mode: the directionality of the paths. L{IN} means to\n"
+   "  calculate incoming paths, L{OUT} means to calculate outgoing\n"
+   "  paths, L{ALL} means to calculate both ones.\n"
    "@return: at most one shortest path for every node in the graph in a\n"
    "list. For unconnected graphs, some of the list elements will be\n"
-   "empty lists. Note that in case of mode=C{IN}, the nodes in a path\n"
+   "empty lists. Note that in case of mode=L{IN}, the nodes in a path\n"
    "are returned in reversed order!"},
 
   // interface to igraph_get_all_shortest_paths
@@ -7296,11 +7349,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "get_all_shortest_paths(v, mode=OUT)\n\n"
    "Calculates all of the shortest paths from/to a given node in a graph.\n\n"
    "@param v: the source/destination for the calculated paths\n"
-   "@param mode: the directionality of the paths. C{IN} means to calculate\n"
-   "  incoming paths, C{OUT} means to calculate outgoing paths,\n"
-   "  C{ALL} means to calculate both ones.\n"
+   "@param mode: the directionality of the paths. L{IN} means to calculate\n"
+   "  incoming paths, L{OUT} means to calculate outgoing paths,\n"
+   "  L{ALL} means to calculate both ones.\n"
    "@return: all of the shortest path from the given node to every other\n"
-   "reachable node in the graph in a list. Note that in case of mode=C{IN},\n"
+   "reachable node in the graph in a list. Note that in case of mode=L{IN},\n"
    "the nodes in a path are returned in reversed order!"},
 
   /* interface to igraph_girth */
@@ -7416,8 +7469,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param vertices: a list containing the vertex IDs which should be\n"
    "  included in the result.\n"
    "@param mode: the type of shortest paths to be used for the\n"
-   "  calculation in directed graphs. C{OUT} means only outgoing,\n"
-   "  C{IN} means only incoming paths. C{ALL} means to consider\n"
+   "  calculation in directed graphs. L{OUT} means only outgoing,\n"
+   "  L{IN} means only incoming paths. L{ALL} means to consider\n"
    "  the directed graph as an undirected one.\n"
    "@return: the shortest path lengths for given nodes in a matrix\n"},
 
@@ -7449,13 +7502,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "subcomponent(v, mode=ALL)\n\n"
    "Determines the indices of vertices which are in the same component as a given vertex.\n\n"
    "@param v: the index of the vertex used as the source/destination\n"
-   "@param mode: if equals to C{IN}, returns the vertex IDs from\n"
-   "  where the given vertex can be reached. If equals to C{OUT},\n"
+   "@param mode: if equals to L{IN}, returns the vertex IDs from\n"
+   "  where the given vertex can be reached. If equals to L{OUT},\n"
    "  returns the vertex IDs which are reachable from the given\n"
-   "  vertex. If equals to C{ALL}, returns all vertices within the\n"
+   "  vertex. If equals to L{ALL}, returns all vertices within the\n"
    "  same component as the given vertex, ignoring edge directions.\n"
    "  Note that this is not equal to calculating the union of the \n"
-   "  results of C{IN} and C{OUT}.\n"
+   "  results of L{IN} and L{OUT}.\n"
    "@return: the indices of vertices which are in the same component as a given vertex.\n"},
 
   // interface to igraph_subgraph
@@ -7475,9 +7528,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Calculates a possible topological sorting of the graph.\n\n"
    "Returns a partial sorting and issues a warning if the graph is not\n"
    "a directed acyclic graph.\n\n"
-   "@param mode: if C{OUT}, vertices are returned according to the\n"
+   "@param mode: if L{OUT}, vertices are returned according to the\n"
    "  forward topological order -- all vertices come before their\n"
-   "  successors. If C{IN}, all vertices come before their ancestors.\n"
+   "  successors. If L{IN}, all vertices come before their ancestors.\n"
    "@return: a possible topological ordering as a list"},
 
   // interface to igraph_transitivity_undirected
@@ -7530,7 +7583,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
    "  will be considered.\n"
    "@param mode: which neighbors should be considered for directed graphs.\n"
-   "  Can be C{ALL}, C{IN} or C{OUT}, ignored for undirected graphs.\n"
+   "  Can be L{ALL}, L{IN} or L{OUT}, ignored for undirected graphs.\n"
    "@param loops: whether vertices should be considered adjacent to\n"
    "  themselves. Setting this to C{True} assumes a loop edge for all vertices\n"
    "  even if none is present in the graph. Setting this to C{False} may\n"
@@ -7551,7 +7604,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
    "  will be considered.\n"
    "@param mode: which neighbors should be considered for directed graphs.\n"
-   "  Can be C{ALL}, C{IN} or C{OUT}, ignored for undirected graphs.\n"
+   "  Can be L{ALL}, L{IN} or L{OUT}, ignored for undirected graphs.\n"
    "@param loops: whether vertices should be considered adjacent to\n"
    "  themselves. Setting this to C{True} assumes a loop edge for all vertices\n"
    "  even if none is present in the graph. Setting this to C{False} may\n"
@@ -7787,7 +7840,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "bfs(vid, mode=OUT)\n\n"
    "Conducts a breadth first search (BFS) on the graph.\n\n"
    "@param vid: the root vertex ID\n"
-   "@param mode: either C{IN} or C{OUT} or C{ALL}, ignored\n"
+   "@param mode: either L{IN} or L{OUT} or L{ALL}, ignored\n"
    "  for undirected graphs.\n"
    "@return: a tuple with the following items:\n"
    "   - The vertex IDs visited (in order)\n"
@@ -7798,7 +7851,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "bfsiter(vid, mode=OUT, advanced=False)\n\n"
    "Constructs a breadth first search (BFS) iterator of the graph.\n\n"
    "@param vid: the root vertex ID\n"
-   "@param mode: either C{IN} or C{OUT} or C{ALL}.\n"
+   "@param mode: either L{IN} or L{OUT} or L{ALL}.\n"
    "@param advanced: if C{False}, the iterator returns the next\n"
    "  vertex in BFS order in every step. If C{True}, the iterator\n"
    "  returns the distance of the vertex from the root and the\n"

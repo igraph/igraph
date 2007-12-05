@@ -1,3 +1,13 @@
+2007-12-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/graphobject.c
+	(igraphmodule_Graph_adjacent) : added
+	
+	* interfaces/python/package/__init__.py :
+	(Graph.get_adjlist, Graph.get_adjedgelist) : added
+	
+	* interfaces/python/package/test/basic.py : added tests
+
 2007-12-04  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c

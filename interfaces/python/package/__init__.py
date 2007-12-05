@@ -281,6 +281,41 @@ class Graph(core.GraphBase):
         return Matrix(data)
 
 
+    def get_adjlist(self, type=OUT):
+        """get_adjlist(type=OUT)
+
+        Returns the adjacency list representation of the graph.
+
+        The adjacency list representation is a list of lists. Each item of the
+        outer list belongs to a single vertex of the graph. The inner list
+        contains the neighbors of the given vertex.
+
+        @param type: if L{OUT}, returns the successors of the vertex. If
+          L{IN}, returns the predecessors of the vertex. If L{ALL}, both
+          the predecessors and the successors will be returned. Ignored
+          for undirected graphs.
+        """
+        return [self.neighbors(idx, type) for idx in xrange(self.vcount())]
+
+
+    def get_adjedgelist(self, type=OUT):
+        """get_adjedgelist(type=OUT)
+
+        Returns the adjacency edge list representation of the graph.
+
+        The adjacency edge list representation is a list of lists. Each
+        item of the outer list belongs to a single vertex of the graph.
+        The inner list contains the IDs of the adjacent edges of the
+        given vertex.
+
+        @param type: if L{OUT}, returns the successors of the vertex. If
+          L{IN}, returns the predecessors of the vertex. If L{ALL}, both
+          the predecessors and the successors will be returned. Ignored
+          for undirected graphs.
+        """
+        return [self.adjacent(idx, type) for idx in xrange(self.vcount())]
+
+
     def modularity(self, membership):
         """modularity(membership)
 
