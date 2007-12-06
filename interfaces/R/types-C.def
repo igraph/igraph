@@ -25,6 +25,9 @@ INTEGER:
   CTYPE: igraph_integer_t
   INCONV: 
     IN: %C%=REAL(%I%)[0];
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_NUMERIC(1)); \
+         REAL(%I%)[0]=%C%;
 
 INTEGERPTR:
   CTYPE: igraph_integer_t
@@ -64,6 +67,9 @@ BOOLEAN:
   CTYPE: igraph_bool_t
   INCONV:
     IN: %C%=LOGICAL(%I%)[0];
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_LOGICAL(1)); \
+         LOGICAL(%I%)[0]=%C%;
 
 BOOLEANPTR:
   CTYPE: igraph_bool_t

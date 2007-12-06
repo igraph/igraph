@@ -29,12 +29,12 @@ igraph_delete_vertices:
 igraph_vcount:
         PARAMS: GRAPH graph
         NAME-R: vcount
-        RETURN: INTEGERPTR
+        RETURN: INTEGER
 
 igraph_ecount:
         PARAMS: GRAPH graph
         NAME-R: ecount
-        RETURN: INTEGERPTR
+        RETURN: INTEGER
         IGNORE: RR, RC, RNamespace
 
 igraph_neighbors:
@@ -45,7 +45,7 @@ igraph_neighbors:
 igraph_is_directed:
         PARAMS: GRAPH graph
         NAME-R: is.directed
-        RETURN: BOOLEANPTR
+        RETURN: BOOLEAN
         IGNORE: RR, RC, RNamespace
 
 igraph_degree:
