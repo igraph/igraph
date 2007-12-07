@@ -3674,7 +3674,7 @@ PyObject *igraphmodule_Graph_topological_sorting(igraphmodule_GraphObject *
                                                  self, PyObject * args,
                                                  PyObject * kwds)
 {
-  char *kwlist[] = { "mode", NULL };
+  static char *kwlist[] = { "mode", NULL };
   PyObject *list;
   igraph_neimode_t mode = IGRAPH_OUT;
   igraph_vector_t result;
@@ -3691,6 +3691,50 @@ PyObject *igraphmodule_Graph_topological_sorting(igraphmodule_GraphObject *
     igraph_vector_destroy(&result);
     return NULL;
   }
+
+  list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&result);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Counts the motifs of the graph 
+ * \return the number of motifs found for each isomorphism class
+ * \sa igraph_motifs_randesu
+ */
+PyObject *igraphmodule_Graph_motifs_randesu(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  igraph_vector_t result, cut_prob;
+  long size=3;
+  PyObject* cut_prob_list=Py_None;
+  PyObject *list;
+  static char* kwlist[] = {"size", "cut_prob", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist, &size, &cut_prob_list))
+    return NULL;
+
+  if (igraph_vector_init(&result, 1)) {
+    return igraphmodule_handle_igraph_error();
+  }
+  if (cut_prob_list == Py_None) {
+    if (igraph_vector_init(&cut_prob, size)) {
+      return igraphmodule_handle_igraph_error();
+    }
+    igraph_vector_fill(&cut_prob, 0);
+  } else {
+    if (igraphmodule_PyObject_to_vector_t(cut_prob_list, &cut_prob, 1, 0)) {
+      igraph_vector_destroy(&result);
+      return NULL;
+    }
+  }
+  if (igraph_motifs_randesu(&self->g, &result, size, &cut_prob)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    igraph_vector_destroy(&cut_prob);
+    return NULL;
+  }
+  igraph_vector_destroy(&cut_prob);
 
   list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
   igraph_vector_destroy(&result);
@@ -7618,6 +7662,29 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /******************/
   /* MOTIF COUNTING */
   /******************/
+  {"motifs_randesu", (PyCFunction) igraphmodule_Graph_motifs_randesu,
+   METH_VARARGS | METH_KEYWORDS,
+   "motifs_randesu(size=3, cut_prob=None)\n\n"
+   "Counts the number of motifs in the graph\n\n"
+   "Motifs are small subgraphs of a given structure in a graph. It is\n"
+   "argued that the motif profile (ie. the number of different motifs in\n"
+   "the graph) is characteristic for different types of networks and\n"
+   "network function is related to the motifs in the graph.\n\n"
+   "This function is able to find the different motifs of size three\n"
+   "and four (ie. the number of different subgraphs with three and four\n"
+   "vertices) in the network.\n\n"
+   "In a big network the total number of motifs can be very large, so\n"
+   "it takes a lot of time to find all of them. In such cases, a sampling\n"
+   "method can be used. This function is capable of doing sampling via\n"
+   "the I{cut_prob} argument. This argument gives the probability that\n"
+   "a branch of the motif search tree will not be explored.\n\n"
+   "@ref: S. Wernicke and F. Rasche: FANMOD: a tool for fast network\n"
+   "  motif detection, Bioinformatics 22(9), 1152--1153, 2006.\n\n"
+   "@param size: the size of the motifs (3 or 4).\n"
+   "@param cut_prob: the cut probabilities for different levels of the search\n"
+   "  tree. This must be a list of length I{size} or C{None} to find all\n"
+   "  motifs.\n"
+  },
   {"dyad_census", (PyCFunction) igraphmodule_Graph_dyad_census,
    METH_NOARGS,
    "dyad_census()\n\n"
