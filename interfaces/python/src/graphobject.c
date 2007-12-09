@@ -3699,14 +3699,14 @@ PyObject *igraphmodule_Graph_topological_sorting(igraphmodule_GraphObject *
 }
 
 /** \ingroup python_interface_graph
- * \brief Counts the motifs of the graph 
+ * \brief Counts the motifs of the graph sorted by isomorphism classes 
  * \return the number of motifs found for each isomorphism class
  * \sa igraph_motifs_randesu
  */
 PyObject *igraphmodule_Graph_motifs_randesu(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_vector_t result, cut_prob;
-  long size=3;
+  long size=3, i;
   PyObject* cut_prob_list=Py_None;
   PyObject *list;
   static char* kwlist[] = {"size", "cut_prob", NULL};
@@ -3723,7 +3723,7 @@ PyObject *igraphmodule_Graph_motifs_randesu(igraphmodule_GraphObject *self,
     }
     igraph_vector_fill(&cut_prob, 0);
   } else {
-    if (igraphmodule_PyObject_to_vector_t(cut_prob_list, &cut_prob, 1, 0)) {
+    if (igraphmodule_PyObject_float_to_vector_t(cut_prob_list, &cut_prob)) {
       igraph_vector_destroy(&result);
       return NULL;
     }
@@ -3740,6 +3740,104 @@ PyObject *igraphmodule_Graph_motifs_randesu(igraphmodule_GraphObject *self,
   igraph_vector_destroy(&result);
 
   return list;
+}
+
+
+/** \ingroup python_interface_graph
+ * \brief Counts the total number of motifs of the graph
+ * \return the total number of motifs
+ * \sa igraph_motifs_randesu
+ */
+PyObject *igraphmodule_Graph_motifs_randesu_no(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  igraph_vector_t cut_prob;
+  igraph_integer_t result;
+  long size=3, i;
+  PyObject* cut_prob_list=Py_None;
+  PyObject *list;
+  static char* kwlist[] = {"size", "cut_prob", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist, &size, &cut_prob_list))
+    return NULL;
+
+  if (cut_prob_list == Py_None) {
+    if (igraph_vector_init(&cut_prob, size)) {
+      return igraphmodule_handle_igraph_error();
+    }
+    igraph_vector_fill(&cut_prob, 0);
+  } else {
+    if (igraphmodule_PyObject_float_to_vector_t(cut_prob_list, &cut_prob)) {
+      return NULL;
+    }
+  }
+  if (igraph_motifs_randesu_no(&self->g, &result, size, &cut_prob)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&cut_prob);
+    return NULL;
+  }
+  igraph_vector_destroy(&cut_prob);
+
+  return PyInt_FromLong((long)result);
+}
+
+/** \ingroup python_interface_graph
+ * \brief Estimates the total number of motifs of the graph
+ * \return the estimated total number of motifs
+ * \sa igraph_motifs_randesu_estimate
+ */
+PyObject *igraphmodule_Graph_motifs_randesu_estimate(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  igraph_vector_t cut_prob;
+  igraph_integer_t result;
+  long size=3, i;
+  PyObject* cut_prob_list=Py_None;
+  PyObject *list, *sample=Py_None;
+  static char* kwlist[] = {"size", "cut_prob", "sample", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lOO", kwlist,
+      &size, &cut_prob_list, &sample))
+    return NULL;
+
+  if (sample == Py_None) {
+    PyErr_SetString(PyExc_TypeError, "sample size must be given");
+    return NULL;
+  }
+
+  if (cut_prob_list == Py_None) {
+    if (igraph_vector_init(&cut_prob, size)) {
+      return igraphmodule_handle_igraph_error();
+    }
+    igraph_vector_fill(&cut_prob, 0);
+  } else {
+    if (igraphmodule_PyObject_float_to_vector_t(cut_prob_list, &cut_prob)) {
+      return NULL;
+    }
+  }
+
+  if (PyInt_Check(sample)) {
+    /* samples chosen randomly */
+    long ns = PyInt_AsLong(sample);
+    if (igraph_motifs_randesu_estimate(&self->g, &result, size, &cut_prob, ns, 0)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&cut_prob);
+      return NULL;
+    }
+  } else {
+    /* samples given in advance */
+    igraph_vector_t samp;
+    if (igraphmodule_PyObject_to_vector_t(sample, &samp, 1, 0)) {
+      igraph_vector_destroy(&cut_prob);
+      return NULL;
+    }
+    if (igraph_motifs_randesu_estimate(&self->g, &result, size, &cut_prob, 0, &samp)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&cut_prob);
+      return NULL;
+    }
+  }
+  igraph_vector_destroy(&cut_prob);
+
+  return PyInt_FromLong((long)result);
 }
 
 /** \ingroup python_interface_graph
@@ -7684,6 +7782,41 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param cut_prob: the cut probabilities for different levels of the search\n"
    "  tree. This must be a list of length I{size} or C{None} to find all\n"
    "  motifs.\n"
+   "@see: Graph.motifs_randesu_no()\n"
+  },
+  {"motifs_randesu_no", (PyCFunction) igraphmodule_Graph_motifs_randesu_no,
+   METH_VARARGS | METH_KEYWORDS,
+   "motifs_randesu_no(size=3, cut_prob=None)\n\n"
+   "Counts the total number of motifs in the graph\n\n"
+   "Motifs are small subgraphs of a given structure in a graph.\n"
+   "This function counts the total number of motifs in a graph without\n"
+   "assigning isomorphism classes to them.\n\n"
+   "@ref: S. Wernicke and F. Rasche: FANMOD: a tool for fast network\n"
+   "  motif detection, Bioinformatics 22(9), 1152--1153, 2006.\n\n"
+   "@param size: the size of the motifs (3 or 4).\n"
+   "@param cut_prob: the cut probabilities for different levels of the search\n"
+   "  tree. This must be a list of length I{size} or C{None} to find all\n"
+   "  motifs.\n"
+   "@see: Graph.motifs_randesu()\n"
+  },
+  {"motifs_randesu_estimate",
+   (PyCFunction) igraphmodule_Graph_motifs_randesu_estimate,
+   METH_VARARGS | METH_KEYWORDS,
+   "motifs_randesu_estimate(size=3, cut_prob=None, sample)\n\n"
+   "Counts the total number of motifs in the graph\n\n"
+   "Motifs are small subgraphs of a given structure in a graph.\n"
+   "This function estimates the total number of motifs in a graph without\n"
+   "assigning isomorphism classes to them by extrapolating from a random\n"
+   "sample of vertices.\n\n"
+   "@ref: S. Wernicke and F. Rasche: FANMOD: a tool for fast network\n"
+   "  motif detection, Bioinformatics 22(9), 1152--1153, 2006.\n\n"
+   "@param size: the size of the motifs (3 or 4).\n"
+   "@param cut_prob: the cut probabilities for different levels of the search\n"
+   "  tree. This must be a list of length I{size} or C{None} to find all\n"
+   "  motifs.\n"
+   "@param sample: the size of the sample or the vertex IDs of the vertices\n"
+   "  to be used for sampling.\n"
+   "@see: Graph.motifs_randesu()\n"
   },
   {"dyad_census", (PyCFunction) igraphmodule_Graph_dyad_census,
    METH_NOARGS,
