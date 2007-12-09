@@ -24,8 +24,8 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
-__all__ = ["Palette", "GradientPalette", "color_name_to_rgb", "palettes",
-    "known_colors"]
+__all__ = ["Palette", "GradientPalette", "AdvancedGradientPalette", \
+    "color_name_to_rgb", "palettes", "known_colors"]
 
 class Palette(object):
     """Base class of color palettes.
@@ -106,6 +106,12 @@ class GradientPalette(Palette):
     """Base class for gradient palettes
 
     Gradient palettes contain a gradient between two given colors.
+
+    Example:
+    
+      >>> pal = GradientPalette("red", "blue",4)
+      >>> pal.get(2)
+      (0.5, 0., 0.5)
     """
     def __init__(self, color1, color2, n=256):
         """Creates a gradient palette.
@@ -121,6 +127,51 @@ class GradientPalette(Palette):
     def _get(self, v):
         ratio = float(v)/(len(self)-1)
         return tuple([self._color1[x]*(1-ratio)+self._color2[x]*ratio for x in range(3)])
+
+
+class AdvancedGradientPalette(GradientPalette):
+    """Advanced gradient that consists of more than two base colors.
+    
+    Example:
+    
+      >>> pal = AdvancedGradientPalette(["red", "black", "blue"], 8)
+      >>> pal.get(2)
+      (0.5, 0., 0.)
+      >>> pal.get(7)
+      (0., 0., 0.75)
+    """
+
+    def __init__(self, colors, indices=None, n=256):
+        """Creates an advanced gradient palette
+
+        @param colors: the colors in the gradient.
+        @param indices: the color indices belonging to the given colors. If
+          C{None}, the colors are distributed equally
+        @param n: the total number of colors in the palette
+        """
+        Palette.__init__(self, n)
+
+        if indices is None:
+            indices = list(range(len(colors)))
+            d = float(n-1) / (len(indices)-1)
+            for i in xrange(len(colors)): indices[i] *= d
+        elif not hasattr(indices, "__iter__"):
+            indices = map(float, indices)
+        d = zip(*sorted(zip(indices, colors)))
+        self._colors = [color_name_to_rgb(c) for c in d[1]]
+        self._indices = d[0]
+        self._k = len(self._indices)-1
+        self._dists = [self._indices[i+1]-self._indices[i] for i in xrange(self._k)]
+
+    def _get(self, v):
+        # Find where does v belong
+        for i in xrange(self._k):
+            if self._indices[i] <= v and self._indices[i+1] >= v:
+                dist = self._dists[i]
+                ratio = float(v-self._indices[i])/dist
+                return tuple([self._colors[i][x]*(1-ratio)+self._colors[i+1][x]*ratio for x in range(3)])
+        return (0., 0., 0.)
+
 
 def _clamp(value, min, max):
     """Clamps the given value between min and max"""
