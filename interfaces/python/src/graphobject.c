@@ -4243,6 +4243,47 @@ PyObject
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices on a plane according to the layout algorithm in
+ * graphopt 0.4.1
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_graphopt
+ */
+PyObject *igraphmodule_Graph_layout_graphopt(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  static char *kwlist[] =
+    { "niter", "node_charge", "node_mass", "spring_length", "spring_constant",
+      "max_sa_movement", NULL };
+  igraph_matrix_t m;
+  long niter = 500;
+  double node_charge = 0.001, node_mass = 30;
+  long spring_length = 0;
+  double spring_constant = 1, max_sa_movement = 5;
+  PyObject *result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddldd", kwlist,
+                                   &niter, &node_charge, &node_mass,
+                                   &spring_length, &spring_constant,
+                                   &max_sa_movement))
+    return NULL;
+
+  if (igraph_matrix_init(&m, 1, 1)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_layout_graphopt(&self->g, &m, niter, node_charge, node_mass,
+      spring_length, spring_constant, max_sa_movement, 0)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold grid layout algorithm.
  * \return the calculated coordinates as a Python list of lists
  * \sa igraph_layout_grid_fruchterman_reingold
@@ -7944,6 +7985,30 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  repulsion cancels out attraction of adjacent vertices.\n"
    "  C{None} means M{maxiter*maxdelta}.\n"
    "@return: the calculated coordinate triplets in a list."},
+
+  // interface to igraph_layout_graphopt
+  {"layout_graphopt",
+   (PyCFunction) igraphmodule_Graph_layout_graphopt,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_graphopt(niter=500, node_charge=0.001, node_mass=30, spring_length=0, spring_constant=1, max_sa_movement=5)\n\n"
+   "This is a port of the graphopt layout algorithm by Michael Schmuhl.\n"
+   "graphopt version 0.4.1 was rewritten in C and the support for layers\n"
+   "was removed.\n\n"
+   "graphopt uses physical analogies for defining attracting and repelling\n"
+   "forces among the vertices and then the physical system is simulated\n"
+   "until it reaches an equilibrium or the maximal number of iterations is\n"
+   "reached.\n\n"
+   "See U{http://www.schmuhl.org/graphopt/} for the original graphopt.\n\n"
+   "@param niter: the number of iterations to perform. Should be a couple\n"
+   "  of hundred in general.\n\n"
+   "@param node_charge: the charge of the vertices, used to calculate electric\n"
+   "  repulsion.\n"
+   "@param node_mass: the mass of the vertices, used for the spring forces\n"
+   "@param spring_length: the length of the springs\n"
+   "@param spring_constant: the spring constant\n"
+   "@param max_sa_movement: the maximum amount of movement allowed in a single\n"
+   "  step along a single axis.\n"
+  },
 
   // interface to igraph_layout_grid_fruchterman_reingold
   {"layout_grid_fruchterman_reingold",

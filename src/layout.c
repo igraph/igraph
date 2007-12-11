@@ -1640,7 +1640,7 @@ int igraph_i_move_nodes(igraph_matrix_t *pos,
  * </para><para>
  * This is a port of the graphopt layout algorithm by Michael Schmuhl.
  * graphopt version 0.4.1 was rewritten in C and the support for 
- * layers were removed (might be added later) and a code was a bit 
+ * layers was removed (might be added later) and a code was a bit 
  * reorganized to avoid some unneccessary steps is the node charge (see below) 
  * is zero.
  * 
@@ -1652,7 +1652,7 @@ int igraph_i_move_nodes(igraph_matrix_t *pos,
  * 
  * </para><para>
  * See also http://www.schmuhl.org/graphopt/ for the original graphopt.
- * \param graph The inpout graph.
+ * \param graph The input graph.
  * \param res Pointer to an initialized matrix, the result will be stored here
  *    and its initial contents is used the starting point of the simulation
  *    if the \p use_seed argument is true. Note that in this case the 
@@ -1674,7 +1674,7 @@ int igraph_i_move_nodes(igraph_matrix_t *pos,
  * \param spring_constant The spring constant, the original graphopt defaults 
  *    to one.
  * \param max_sa_movement Real constant, it gives the maximum amount of movement 
- *    allowed in a single step along a single axes.
+ *    allowed in a single step along a single axis.
  * \param use_seed Logical scalar, whether to use the positions in \p res as
  *    a starting configuration. See also \p res above.
  * \return Error code.

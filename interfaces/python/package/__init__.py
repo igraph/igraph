@@ -585,6 +585,8 @@ class Graph(core.GraphBase):
           - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-Reingold
             layout (see L{Graph.layout_fruchterman_reingold_3d}).
 
+          - C{graphopt}: the graphopt algorithm (see L{Graph.layout_graphopt})
+
           - C{gfr}, C{grid_fr}, C{grid_fruchterman_reingold}: grid-based
             Fruchterman-Reingold layout
             (see L{Graph.layout_grid_fruchterman_reingold})
