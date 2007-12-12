@@ -82,6 +82,30 @@ class LocalTransitivityTests(unittest.TestCase):
         self.failUnless(trans == [0.667, 1.0])
 
 
+class BiconnectedComponentTests(unittest.TestCase):
+    g1 = Graph.Full(10)
+    g2 = Graph(5, [(0,1),(1,2),(2,3),(3,4)])
+    g3 = Graph(6, [(0,1),(1,2),(2,3),(3,0),(2,4),(2,5),(4,5)])
+
+    def testBiconnectedComponents(self):
+        s = self.g1.biconnected_components()
+        s[0].sort()
+        self.failUnless(len(s) == 1 and len(s[0]) == 9)
+        s, ap = self.g1.biconnected_components(True)
+        self.failUnless(len(s) == 1 and len(s[0]) == 9 and ap == [])
+
+        s = self.g3.biconnected_components()
+        for x in s: x.sort()
+        self.failUnless(len(s) == 2 and len(s[0]) == 2 and len(s[1]) == 3)
+        s, ap = self.g3.biconnected_components(True)
+        self.failUnless(len(s) == 2 and len(s[0]) == 2 and \
+          len(s[1]) == 3 and ap == [2])
+
+    def testArticulationPoints(self):
+        self.failUnless(self.g1.articulation_points() == [])
+        self.failUnless(self.g2.cut_vertices() == [1,2,3])
+        self.failUnless(self.g3.articulation_points() == [2])
+
 class MiscTests(unittest.TestCase):
     def testConstraint(self):
         g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
@@ -99,10 +123,12 @@ def suite():
     simple_suite = unittest.makeSuite(SimplePropertiesTests)
     degree_suite = unittest.makeSuite(DegreeTests)
     local_transitivity_suite = unittest.makeSuite(LocalTransitivityTests)
+    biconnected_suite = unittest.makeSuite(BiconnectedComponentTests)
     misc_suite = unittest.makeSuite(MiscTests)
     return unittest.TestSuite([simple_suite,
                                degree_suite,
                                local_transitivity_suite,
+                               biconnected_suite,
                                misc_suite])
 
 def test():

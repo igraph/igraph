@@ -93,6 +93,7 @@ PyObject* igraphmodule_Graph_Watts_Strogatz(PyTypeObject *type, PyObject *args, 
 
 PyObject* igraphmodule_Graph_is_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_are_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_articulation_points(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);

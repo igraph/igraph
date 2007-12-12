@@ -63,6 +63,7 @@ class Graph(core.GraphBase):
     omega = core.GraphBase.clique_number
     alpha = core.GraphBase.independence_number
     shell_index = core.GraphBase.coreness
+    cut_vertices = core.GraphBase.articulation_points
 
     def indegree(self, *args, **kwds):
         """Returns the in-degrees in a list.

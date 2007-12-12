@@ -1877,6 +1877,32 @@ PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the articulation points of a graph.
+ * \return the list of articulation points in a PyObject
+ * \sa igraph_articulation_points
+ */
+PyObject *igraphmodule_Graph_articulation_points(igraphmodule_GraphObject *self) {
+  igraph_vector_t res;
+  PyObject *o;
+  if (igraph_vector_init(&res, 0)) {
+	igraphmodule_handle_igraph_error();
+	return NULL;
+  }
+
+  if (igraph_articulation_points(&self->g, &res)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+
+  igraph_vector_sort(&res);
+  o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&res);
+  return o;
+}
+
+
+/** \ingroup python_interface_graph
  * \brief Calculates the average path length in a graph.
  * \return the average path length as a PyObject
  * \sa igraph_average_path_length
@@ -2041,6 +2067,59 @@ PyObject *igraphmodule_Graph_bibcoupling(igraphmodule_GraphObject * self,
   igraph_vs_destroy(&vs);
 
   return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the biconnected components of a graph.
+ * \return the list of spanning trees of biconnected components in a PyObject
+ * \sa igraph_biconnected_components
+ */
+PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *self,
+	PyObject *args, PyObject *kwds) {
+  igraph_vector_ptr_t components;
+  igraph_vector_t points;
+  igraph_bool_t return_articulation_points;
+  igraph_integer_t no;
+  PyObject *result, *aps=Py_False;
+  long int i;
+
+  static char* kwlist[] = {"return_articulation_points", NULL};
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &aps)) return NULL;
+  return_articulation_points = PyObject_IsTrue(aps);
+
+  if (igraph_vector_ptr_init(&components, 0)) {
+	igraphmodule_handle_igraph_error();
+	return NULL;
+  }
+  if (return_articulation_points) {
+	if (igraph_vector_init(&points, 0)) {
+	  igraphmodule_handle_igraph_error();
+	  igraph_vector_ptr_destroy(&components);
+	  return NULL;
+	}
+  }
+
+  if (igraph_biconnected_components(&self->g, &no, &components, return_articulation_points ? &points : 0)) {
+    igraphmodule_handle_igraph_error();
+	igraph_vector_ptr_destroy(&components);
+    if (return_articulation_points) igraph_vector_destroy(&points);
+    return NULL;
+  }
+
+  result = igraphmodule_vector_ptr_t_to_PyList(&components, IGRAPHMODULE_TYPE_INT);
+  for (i=0; i<no; i++) igraph_vector_destroy(VECTOR(components)[i]);
+  igraph_vector_ptr_destroy(&components);
+
+  if (return_articulation_points) {
+	PyObject *result2;
+	igraph_vector_sort(&points);
+	result2 = igraphmodule_vector_t_to_PyList(&points, IGRAPHMODULE_TYPE_INT);
+    igraph_vector_destroy(&points);
+	return Py_BuildValue("NN", result, result2); /* references stolen */
+  }
+  
+  return result;
 }
 
 /** \ingroup python_interface_graph
@@ -5773,7 +5852,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: C{True} if there exists an edge from v1 to v2, C{False}\n"
    "  otherwise.\n"},
 
-  // interface to igraph_average_path_length
+  /* interface to igraph_articulation_points */
+  {"articulation_points", (PyCFunction)igraphmodule_Graph_articulation_points,
+   METH_NOARGS,
+   "articulation_points()\n\n"
+   "Returns the list of articulation points in the graph.\n\n"
+   "A vertex is an articulation point if its removal increases the number of\n"
+   "connected components in the graph.\n"
+  },
+
+  /* interface to igraph_average_path_length */
   {"average_path_length",
    (PyCFunction) igraphmodule_Graph_average_path_length,
    METH_VARARGS | METH_KEYWORDS,
@@ -5808,7 +5896,19 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: bibliographic coupling values for all given\n"
    "  vertices in a matrix.\n"},
 
-  // interface to igraph_closeness
+  /* interface to biconnected_components */
+  {"biconnected_components", (PyCFunction) igraphmodule_Graph_biconnected_components,
+   METH_VARARGS | METH_KEYWORDS,
+   "biconnected_components(return_articulation_points=True)\n\n"
+   "Calculates the biconnected components of the graph.\n\n"
+   "@param return_articulation_points: whether to return the articulation\n"
+   "  points as well\n"
+   "@return: a list of lists containing edge indices making up spanning trees\n"
+   "  of the biconnected components (one spanning tree for each component)\n"
+   "  and optionally the list of articulation points"
+  },
+
+  /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
    "closeness(vertices=None, mode=ALL)\n\n"
@@ -5830,7 +5930,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  that both of them must be calculated.\n"
    "@return: the calculated closenesses in a list\n"},
 
-  // interface to igraph_clusters
+  /* interface to igraph_clusters */
   {"clusters", (PyCFunction) igraphmodule_Graph_clusters,
    METH_VARARGS | METH_KEYWORDS,
    "clusters(mode=STRONG)\n\n"
@@ -5841,11 +5941,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param mode: must be either C{STRONG} or C{WEAK}, depending on\n"
    "  the clusters being sought. Optional, defaults to C{STRONG}.\n"
    "@return: the component index for every node in the graph.\n"},
-  {"components", (PyCFunction) igraphmodule_Graph_clusters,
-   METH_VARARGS | METH_KEYWORDS,
-   "components(mode=STRONG)\n\n"
-   "Alias for L{Graph.clusters}.\n\n"
-   "See the documentation of L{Graph.clusters} for details."},
   {"copy", (PyCFunction) igraphmodule_Graph_copy,
    METH_NOARGS,
    "copy()\n\n" "Creates an exact deep copy of the graph."},
