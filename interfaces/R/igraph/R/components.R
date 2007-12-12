@@ -94,3 +94,21 @@ decompose.graph <- function(graph, mode="weak", max.comps=NA,
         PACKAGE="igraph"
         )
 }
+
+biconnected.components <- function(graph) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+
+  # Function call
+  .Call("R_igraph_biconnected_components", graph,
+        PACKAGE="igraph")
+}
+
+articulation.points <- function(graph) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+
+  # Function call
+  .Call("R_igraph_articulation_points", graph,
+        PACKAGE="igraph")
+}

@@ -474,3 +474,139 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   IGRAPH_FINALLY_CLEAN(4);
   return 0;
 }
+
+int igraph_articulation_points(const igraph_t *graph,
+			       igraph_vector_t *res) {
+
+  igraph_integer_t no;
+  return igraph_biconnected_components(graph, &no, 0, res);
+}
+
+int igraph_biconnected_components(const igraph_t *graph,
+				  igraph_integer_t *no,
+				  igraph_vector_ptr_t *components,
+				  igraph_vector_t *articulation_points) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_long_t nextptr;
+  igraph_vector_long_t num, low;
+  igraph_vector_bool_t found;
+  igraph_vector_t *adjedges;
+  igraph_stack_t path;
+  igraph_vector_t edgestack;
+  igraph_i_adjedgelist_t adjedgelist;
+  long int i, counter, rootdfs=0;  
+
+  IGRAPH_CHECK(igraph_vector_long_init(&nextptr, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &nextptr);
+  IGRAPH_CHECK(igraph_vector_long_init(&num, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &num);
+  IGRAPH_CHECK(igraph_vector_long_init(&low, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &low);
+  IGRAPH_CHECK(igraph_vector_bool_init(&found, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &found);
+
+  IGRAPH_CHECK(igraph_stack_init(&path, 100));
+  IGRAPH_FINALLY(igraph_stack_destroy, &path);
+  IGRAPH_VECTOR_INIT_FINALLY(&edgestack, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edgestack, 100));
+
+  IGRAPH_CHECK(igraph_i_adjedgelist_init(graph, &adjedgelist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_i_adjedgelist_destroy, &adjedgelist);
+
+  if (no) {
+    *no=0;
+  }
+  if (components) {
+    igraph_vector_ptr_clear(components);
+  }
+  if (articulation_points) {
+    igraph_vector_clear(articulation_points);
+  }
+
+  for (i=0; i<no_of_nodes; i++) {
+    
+    if (VECTOR(low)[i] != 0) { continue; } /* already visited */
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    IGRAPH_CHECK(igraph_stack_push(&path, i));
+    counter=1; 
+    rootdfs=0;
+    VECTOR(low)[i]=VECTOR(num)[i]=counter++;
+    while (!igraph_stack_empty(&path)) {
+      long int n, edge, nei;
+      long int act=igraph_stack_top(&path);
+      long int actnext=VECTOR(nextptr)[act];
+      
+      adjedges=igraph_i_adjedgelist_get(&adjedgelist, act);
+      n=igraph_vector_size(adjedges);
+      if (actnext < n) {
+	/* Step down (maybe) */
+	long int edge=VECTOR(*adjedges)[actnext];
+	long int nei=IGRAPH_OTHER(graph, edge, act);
+	if (VECTOR(low)[nei] == 0) {
+	  if (act==i) { rootdfs++; }
+	  IGRAPH_CHECK(igraph_vector_push_back(&edgestack, edge));
+	  IGRAPH_CHECK(igraph_stack_push(&path, nei));
+	  VECTOR(low)[nei] = VECTOR(num)[nei]=counter++;
+	} else {
+	  /* Update low value if needed */
+	  if (VECTOR(num)[nei] < VECTOR(low)[act]) {
+	    VECTOR(low)[act]=VECTOR(num)[nei];
+	  }
+	}
+	VECTOR(nextptr)[act] += 1;
+      } else {
+	/* Step up */
+	igraph_stack_pop(&path);
+	if (!igraph_stack_empty(&path)) {
+	  long int prev=igraph_stack_top(&path);
+	  /* Update LOW value if needed */
+	  if (VECTOR(low)[act] < VECTOR(low)[prev]) {
+	    VECTOR(low)[prev] = VECTOR(low)[act];
+	  }
+	  /* Check for articulation point */
+	  if (VECTOR(low)[act] >= VECTOR(num)[prev]) {
+	    if (articulation_points && !VECTOR(found)[prev] 
+		&& prev != i /* the root */) {
+	      IGRAPH_CHECK(igraph_vector_push_back(articulation_points, prev));
+	      VECTOR(found)[prev] = 1;
+	    }
+	    if (no) { *no += 1; }
+	    if (components) {
+	      igraph_vector_t *v=Calloc(1, igraph_vector_t);
+	      IGRAPH_CHECK(igraph_vector_init(v, 0));
+	      while (!igraph_vector_empty(&edgestack)) {
+		long int e=igraph_vector_pop_back(&edgestack);
+		IGRAPH_CHECK(igraph_vector_push_back(v, e));
+		if (IGRAPH_FROM(graph,e)==prev || IGRAPH_TO(graph,e)==prev) {
+		  break;
+		}
+	      }
+	      IGRAPH_CHECK(igraph_vector_ptr_push_back(components, v));
+	    }
+	  }
+	} /* !igraph_stack_empty(&path) */
+      }
+      
+    } /* !igraph_stack_empty(&path) */
+    
+    if (articulation_points && rootdfs >= 2) {
+      IGRAPH_CHECK(igraph_vector_push_back(articulation_points, i));
+    }
+
+  } /* i < no_of_nodes */
+
+  igraph_i_adjedgelist_destroy(&adjedgelist);
+  igraph_vector_destroy(&edgestack);
+  igraph_stack_destroy(&path);
+  igraph_vector_bool_destroy(&found);
+  igraph_vector_long_destroy(&low);
+  igraph_vector_long_destroy(&num);
+  igraph_vector_long_destroy(&nextptr);
+  IGRAPH_FINALLY_CLEAN(7);
+
+  return 0;
+}
+

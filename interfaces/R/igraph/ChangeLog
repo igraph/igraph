@@ -1,3 +1,8 @@
+2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+  
+	* interfaces/R/src/rinterface.c.in (R_igraph_vectorlist_to_SEXP)
+	(R_igraph_vectorlist_destroy) : added
+
 2007-08-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/src/rinterface.c

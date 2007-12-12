@@ -95,7 +95,8 @@ export(subgraph, simplify, degree, degree.distribution, diameter,
        get.all.shortest.paths, get.diameter, farthest.nodes,
        graph.laplacian, constraint, page.rank, reciprocity, rewire,
        graph.density, neighborhood.size, neighborhood, graph.neighborhood,
-       graph.coreness, topological.sort, girth)
+       graph.coreness, topological.sort, girth, biconnected.components,
+       articulation.points)
 
 # plotting
 

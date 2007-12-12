@@ -10,6 +10,11 @@
 	reworked
 	* examples/simple/igraph_erdos_renyi_game.c : better tests added
 
+2007-10-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+  
+	* src/components.c (igraph_articulation_points)
+	(igraph_biconnected_components) : added
+ 
 2007-09-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (erdos_renyi_game_gnp) : three bugs corrected,
