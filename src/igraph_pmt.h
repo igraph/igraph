@@ -63,6 +63,17 @@
 #define ZERO 0
 #define ONE 1
 
+#elif defined(BASE_BOOL)
+#define BASE igraph_bool_t
+#define SHORT bool
+#define ATOMIC igraph_bool_t
+#define MULTIPLICITY 1
+#define IN_FORMAT "%d"
+#define OUT_FORMAT "%d"
+#define ATOMIC_IO int
+#define ZERO 0
+#define ONE 1
+
 #else
 #error unknown BASE_ directive
 #endif
