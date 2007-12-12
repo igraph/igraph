@@ -1,3 +1,9 @@
+2007-10-23  Gabor Csardi  <csardi@rmki.kfki.hu>	
+
+	* src/games.c (igraph_erdos_renyi_game_gnp, igraph_erdos_renyi_game_gnm) :
+	reworked
+	* examples/simple/igraph_erdos_renyi_game.c : better tests added
+
 2007-09-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (erdos_renyi_game_gnp) : three bugs corrected,
