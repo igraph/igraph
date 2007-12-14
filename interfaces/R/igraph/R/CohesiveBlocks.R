@@ -43,24 +43,24 @@
 ## lable.                                           ##
 ######################################################
 
-cohesive.blocks <- function(G, db=NULL,
-                            useDB=(vcount(G)>400 & require(RSQLite)),
+cohesive.blocks <- function(graph, db=NULL,
+                            useDB=(vcount(graph)>400 && require(RSQLite)),
                             cl=NULL, verbose=igraph.par("verbose")) {
 
-    if(useDB & !require(RSQLite)) stop("package `RSQLite` required")
+    if(useDB && !require(RSQLite)) stop("package `RSQLite` required")
     if(!require(digest)) stop("package `digest` required")
-    if(!is.igraph(G)) stop("g must be an igraph object")
+    if(!is.igraph(graph)) stop("`graph' must be an igraph object")
     verbose <- as.logical(verbose)
     
-    Gin <- G
-    G <- simplify(as.undirected2(G))
-    V(G)$cbid <- as.numeric(V(G))
-    infCohesion <- vcount(G)+1 ## for fully connected subcomponents
-    g <- G 
+    Gin <- graph
+    graph <- simplify(as.undirected2(graph))
+    V(graph)$cbid <- as.numeric(V(graph))
+    infCohesion <- vcount(graph)+1 ## for fully connected subcomponents
+    g <- graph
     v <- sort(as.numeric(V(g)))
     
     ## set up database connection and schema
-    if(is.null(db) & useDB){
+    if(is.null(db) && useDB){
         ## initialize the database and define schema
         dbfile <- tempfile("cohesive.blocks", getwd())
         con <- dbConnect(dbDriver("SQLite"), dbname=dbfile)
@@ -97,7 +97,7 @@ cohesive.blocks <- function(G, db=NULL,
         con <- dbConnect(dbDriver("SQLite"), dbname=dbfile)
         maxId <- dbGetQuery(con, "select max(branchId) from branches")
     } else {
-        branchMembership <- data.frame(vertexId=sort(as.numeric(V(G))), branchId=0)
+        branchMembership <- data.frame(vertexId=sort(as.numeric(V(graph))), branchId=0)
         thisHash <- digest(paste(paste(v, collapse=" "), 0))
         branches <- data.frame(branchId=0, membershipHash=thisHash, branchCohesion=-1, maxAncestorCohesion=0, isCohesiveBlock=1)
         subBranches <- data.frame(parentId=NA, childId=NA)
@@ -125,7 +125,7 @@ cohesive.blocks <- function(G, db=NULL,
             maxId <- max(branches$branchId)
         }
         
-        g <- subgraph(G, V(G)[cbid %in% v])
+        g <- subgraph(graph, V(graph)[cbid %in% v])
 
         ## check if trivial or fully connected, else treat normally
         if(vcount(g) < 3){ #trivial
@@ -176,7 +176,7 @@ cohesive.blocks <- function(G, db=NULL,
             ## find k-components
             ## For nastier graphs:
             ## check if cohesion after trimming is greater than k. If so,  kcomp <- list(as.numeric(V(g)))
-            if(vcount(g)>100 & k>1){ ## only try speedup for relatively complicated kComponents() calls
+            if(vcount(g)>100 && k>1){ ## only try speedup for relatively complicated kComponents() calls
                 if(!is.connected(g)){
                     newk <- 0
                 }else if(min(degree(g))==1){
@@ -346,7 +346,7 @@ kCutsets <- function(g, k=NULL, cl=NULL){
         }
     }
     
-    if(k==0 | vcount(g) <=2) return(list(numeric()))
+    if(k==0 || vcount(g) <=2) return(list(numeric()))
     
     if(k==1){ # for 1-connected graphs
         return(articulation.points(g))
@@ -397,7 +397,7 @@ kCutsets <- function(g, k=NULL, cl=NULL){
         res <- unlist(res, recursive=FALSE)
         
         ## and see which are cutsets
-        res <- unique(res[unlist(lapply(res, function(x){length(x)==k & is.cutset(x, g)}))])
+        res <- unique(res[unlist(lapply(res, function(x){length(x)==k && is.cutset(x, g)}))])
     } else {
         Gbar <- parLapply(cl, G, etReduction) #4 (parallel)
         mflow <- unlist(parLapply(cl, 1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
@@ -435,7 +435,7 @@ kCutsets <- function(g, k=NULL, cl=NULL){
         res <- unlist(res, recursive=FALSE)
         
         ## and see which are cutsets
-        res <- unique(res[unlist(parLapply(cl, res, function(x){length(x)==k & is.cutset(x, g)}))])
+        res <- unique(res[unlist(parLapply(cl, res, function(x){length(x)==k && is.cutset(x, g)}))])
     }
     
     return(res)
@@ -717,7 +717,7 @@ kComponents <- function(g, k=NULL, cl=NULL, type="new"){
         for(i in ((1:length(gclusts$csize))-1)){
             theseIDs <- V(gprime)[V(gprime) %in% (which(gclusts$membership==i)-1)]$csid
             thisBlockBig <- list(sort(c(theseIDs, thisCS)))
-            if(!(thisBlockBig %in% theseBlocks) & length(theseIDs)>0){
+            if(!(thisBlockBig %in% theseBlocks) && length(theseIDs)>0){
                 theseBlocks <- c(theseBlocks, thisBlockBig)
             }
         }
@@ -798,32 +798,19 @@ is.cutset <- function(v, g){ ## does removal of `v` disconnect `g`?
 ## - write.pajek.bgraph()                           ##
 ######################################################
 
-## I commented this out,  it does not work because the graph has no cbid
-## vertex attribute. Gabor
-## recalc.cohesion.bgraph <- function(g){
-##     blocks <- g$blocks
-##     block.cohesion <- numeric(length(blocks))
-##     cat("Recalculating cohesion of each block. This can be slow:\n")
-##     for(i in 1:length(blocks)){
-##         cat(" block ", i, ": ", sep="")
-##         thisg <- subgraph(g, V(g)[V(g)$cbid %in% blocks[[i]]])
-##         if(!is.connected(thisg)){
-##             block.cohesion[i] <- 0
-##         }else if(min(degree(thisg))==1){
-##             block.cohesion[i] <- 1
-##         } else {
-##             block.cohesion[i] <- graph.cohesion(thisg)
-##         }
-##         cat(block.cohesion[i], "-cohesive\n", sep="")
-##     }
-##     g$block.cohesion <- block.cohesion
-##     return(g)
-## }
+is.bgraph <- function(graph) {
+  "bgraph" %in% class(graph)
+}
 
-recalc.tree.bgraph <- function(g){
+recalc.tree.bgraph <- function(graph){
+
+    if (!is.bgraph(graph)) {
+      stop("Not a bgraph object")
+    }
+  
     ## make the block-hierarchy tree:
-    blocks <- get.graph.attribute(g,  "blocks")
-    block.cohesion <- get.graph.attribute(g,  "block.cohesion")
+    blocks <- get.graph.attribute(graph,  "blocks")
+    block.cohesion <- get.graph.attribute(graph,  "block.cohesion")
     tree <- graph.empty(n=length(blocks), directed=TRUE)
     block.parents <- rep(0, length(block.cohesion))
     for(i in 1:length(blocks)){
@@ -834,7 +821,7 @@ recalc.tree.bgraph <- function(g){
         this.parent <- 0
         ml <- Inf
         for(j in which(do.contain)){
-            if(length(blocks[[j]])<ml & !(length(blocks[[i]]) == length(blocks[[j]]))){
+            if(length(blocks[[j]])<ml && !(length(blocks[[i]]) == length(blocks[[j]]))){
                 ml <- length(blocks[[j]])
                 this.parent <- j
             }
@@ -847,127 +834,73 @@ recalc.tree.bgraph <- function(g){
         V(tree)$chnodes[i] <- paste(blocks[[i]], collapse=", ")
         V(tree)$cohesion[i] <- block.cohesion[i]
     }
-    g <- set.graph.attribute(g,  "tree",  tree)
-    return(g)
+    graph <- set.graph.attribute(graph, "tree", tree)
+    return(graph)
 }
 
-print.bgraph <- function(g, ...){
+print.bgraph <- function(x, ...){
+
+    if (!is.bgraph(x)) {
+      stop("Not a bgraph object")
+    }
     cat("Graph:\n\n")
-    print.igraph(g, ...)
-    cat("\n\n\nBlock Hierarchy Tree:\n\n")
-    print.igraph(get.graph.attribute(g, "tree"), ...)
+    print.igraph(x, ...)
+    cat("\nBlock Hierarchy Tree:\n\n")
+    print.igraph(get.graph.attribute(x, "tree"), ...)
 }
 
-## plot.l.bgraph <- function(g, vertex.size=5, ...){
-##     layout(matrix(c(1, 1, 2), nrow=1))    
-    
-##     #vfill <- rep(0, vcount(g))
-##     #vbord <- rep(0, vcount(g))
-##     #for(i in 1:vcount(g$tree)){
-##     #    vfill[V(g$tree)$nodes[[i]][[1]]-1] <- i
-##     #    vbord
-##     #}
-##     plot.igraph(g, vertex.size=vertex.size, ...)
+max.cohesion <- function(graph){
 
-##     tree <- get.graph.attribute(g, "tree")
-##     r <- which.min(V(tree)$cohesion)-1
-##     l <- layout.reingold.tilford(tree, root=r)
-##     l[, 2] <- -l[, 2]
-##     plot.igraph(tree, l, labels=V(tree)$cohesion)
-    
-##     layout(1)
-## }
+    if (!is.bgraph(graph)) {
+      stop("Not a bgraph object")
+    }
 
-max.cohesion <- function(g){
-    bc <- get.graph.attribute(g, "block.cohesion")
+    bc <- get.graph.attribute(graph, "block.cohesion")
     bco <- order(bc)
     bc <- bc[bco]
-    b <- get.graph.attribute(g, "blocks")[bco]
-    mc <- numeric(vcount(g))
+    b <- get.graph.attribute(graph, "blocks")[bco]
+    mc <- numeric(vcount(graph))
     for(i in 1:length(bc)){
         mc[b[[i]]+1] <- bc[[i]]
     }
     return(mc)
 }
 
-## add.mds.layout <- function(g, s=.6, d=shortest.paths(g)){
-    
-##     for(b in g$blocks){
-##         d[b+1, b+1] <- d[b+1, b+1]*s
-##     }
-    
-##     clust <- clusters(g)
-##     llist <- list()
-##     llen <- numeric()
-##     glist <- list()
-##     for(i in 1:length(clust$csize)-1){
-##         ind <- clust$membership==i
-        
-##         if(length(which(ind))>=3){
-##             llist[i+1] <- list(cmdscale(d[ind, ind]))
-##         }else if(length(which(ind))==2){
-##             llist[i+1] <- list(d[ind, ind])
-##         } else {
-##             llist[i+1] <- list(matrix(c(0, 0), nrow=1))
-##         }
-        
-##         llen[i+1] <- length(which(ind))
-        
-##         glist[i+1] <- list(subgraph(g, V(g)[ind]))
-##     }
-    
-##     ## merge them all:
-##     lmerged <- layout.merge(glist, llist)
-    
-##     ## now reorder these rows to reflect original graph:
-##     l <- matrix(rep(NA, 2*vcount(g)), ncol=2)
-##     l[order(clust$membership), ] <- lmerged
-##     g$lyt <- l
-##     return(g)
-## }
+layout.svd.bgraph <- function(graph, d=shortest.paths(graph), s=.6) {
 
-## add.svd.layout <- function(g, s=.6, d=shortest.paths(g)){
-    
-##     for(b in g$blocks){
-##         d[b+1, b+1] <- d[b+1, b+1]*s
-##     }
-    
-##     clust <- clusters(g)
-##     llist <- list()
-##     llen <- numeric()
-##     glist <- list()
-##     for(i in 1:length(clust$csize)-1){
-##         ind <- clust$membership==i
-        
-##         if(length(which(ind))>=3){
-##             thisl <- svd(d[ind, ind], 2)[[2]]
-##             thisl[, 1] <- thisl[, 1]/dist(range(thisl[, 1]))
-##             thisl[, 2] <- thisl[, 2]/dist(range(thisl[, 2]))
-##             llist[i+1] <- list(thisl)
-##         }else if(length(which(ind))==2){
-##             llist[i+1] <- list(d[ind, ind])
-##         } else {
-##             llist[i+1] <- list(matrix(c(0, 0), nrow=1))
-##         }
-        
-##         llen[i+1] <- length(which(ind))
-        
-##         glist[i+1] <- list(subgraph(g, V(g)[ind]))
-##     }
-    
-##     ## merge them all:
-##     lmerged <- layout.merge(glist, llist)
-    
-##     ## now reorder these rows to reflect original graph:
-##     l <- matrix(rep(NA, 2*vcount(g)), ncol=2)
-##     l[order(clust$membership), ] <- lmerged
-##     g$lyt <- l
-##     return(g)
-## }
+  if (!is.bgraph(graph)) {
+    stop("Not a bgraph object")
+  }
 
-plot.bgraph <- function(g, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
+  for(b in graph$blocks){
+    d[b+1, b+1] <- d[b+1, b+1]*s
+  }
+
+  layout.svd.igraph(graph, d=d)
+}
+
+layout.mds.bgraph <- function(graph, d=shortest.paths(graph), s=.6) {
+
+  if (!is.bgraph(graph)) {
+    stop("Not a bgraph object")
+  }
+
+  for(b in graph$blocks){
+    d[b+1, b+1] <- d[b+1, b+1]*s
+  }
+
+  layout.mds.igraph(graph, d=d)
+}
+
+plot.bgraph <- function(x, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
+
+    if (!is.bgraph(x)) {
+      stop("Not a bgraph object")
+    }
+  
     layout(matrix(c(1, 1, 2), nrow=1))
-    
+
+    g <- x
     if(is.null(colpal)){
         block.cohesion <- get.graph.attribute(g, "block.cohesion")
         palette(rev(rainbow(max(block.cohesion)+1, end=5/6)))
@@ -1006,11 +939,17 @@ plot.bgraph <- function(g, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
     plot.igraph(tree, layout=l, vertex.color=V(tree)$cohesion+1)
     
     layout(1)
+    invisible(NULL)
 }
 
-plot.kCore.bgraph <- function(g, vertex.size=3, colpal=NULL, emph=NULL,
+plot.kCore.bgraph <- function(graph, vertex.size=3, colpal=NULL, emph=NULL,
                               remove.multiple=TRUE, remove.loops=TRUE, ...){
-    
+
+    if (!is.bgraph(graph)) {
+      stop("Not a bgraph object")
+    }
+
+    g <- graph
     kc <- graph.coreness(simplify(g, remove.multiple, remove.loops))
     
     if(is.null(colpal)){
@@ -1039,7 +978,12 @@ plot.kCore.bgraph <- function(g, vertex.size=3, colpal=NULL, emph=NULL,
 }
 
 ## writes out a series of Pajek files for supplied bgraph object
-write.pajek.bgraph <- function(g, filename, hierarchy=FALSE){ # filename should not include an extension
+write.pajek.bgraph <- function(graph, filename, hierarchy=FALSE){ # filename should not include an extension
+    if (!is.bgraph(graph)) {
+      stop("Not a bgraph object")
+    }
+
+    g <- graph
     ## .net file:
     write.graph(g, file=paste(filename, ".net", sep=""), format="pajek")
     
@@ -1065,7 +1009,12 @@ write.pajek.bgraph <- function(g, filename, hierarchy=FALSE){ # filename should 
 }
 
 ## same as write.pajek.bgraph() but uses k-coreness rather than cohesion for clusters
-write.pajek.kCore.bgraph <- function(g, filename, remove.multiple=TRUE, remove.loops=TRUE){ # filename should not include an extension
+write.pajek.kCore.bgraph <- function(graph, filename, remove.multiple=TRUE, remove.loops=TRUE){ # filename should not include an extension
+    if (!is.bgraph(graph)) {
+      stop("Not a bgraph object")
+    }
+
+    g <- graph
     ## .net file:
     write.graph(g, file=paste(filename, ".net", sep=""), format="pajek")
     
@@ -1073,236 +1022,4 @@ write.pajek.kCore.bgraph <- function(g, filename, remove.multiple=TRUE, remove.l
     kc <- graph.coreness(simplify(g, remove.multiple, remove.loops))
 
     cat(paste("*Vertices", vcount(g)), kc, "\r", sep="\r\n", file=paste(filename, ".clu", sep=""))
-}
-
-piecewise.layout <- function(g, layout=layout.kamada.kawai, ...){
-    
-    clust <- clusters(g)
-    llist <- list()
-    llen <- numeric()
-    glist <- list()
-    for(i in 1:length(clust$csize)-1){
-        ind <- clust$membership==i
-        
-        llist[i+1] <- list(layout(subgraph(g, V(g)[ind]), ...))
-        
-        llen[i+1] <- length(which(ind))
-        
-        glist[i+1] <- list(subgraph(g, V(g)[ind]))
-    }
-    
-    ## merge them all:
-    lmerged <- layout.merge(glist, llist)
-    
-    ## now reorder these rows to reflect original graph:
-    l <- matrix(rep(NA, 2*vcount(g)), ncol=2)
-    l[order(clust$membership), ] <- lmerged
-    return(l)
-}
-
-## Replaces vertex `v` in layout `L` with layout `Lprime`.
-## layouts are matrices three columnts: vid,  x,  y
-expand.layout <- function(L, Lprime, v, pad=.2){
-    ## if Lprime is just one point,  don't bother:
-    if(length(Lprime)==1) return(L)
-
-    ## deal with 1-row matrices
-    if(!is.matrix(L) & length(L)==3) L <- matrix(L, nrow=1)
-    if(!is.matrix(Lprime) & length(Lprime)==3) Lprime <- matrix(Lprime, nrow=1)
-
-    L[, 2] <- L[, 2]-L[which(L[, 1]==v), 2]
-    L[, 3] <- L[, 3]-L[which(L[, 1]==v), 3]
-    rMax <- max(dist(Lprime[, -1]))/2
-    rMean <- mean(dist(Lprime[, -1]))*pad
-    rat <- L[, 2]/L[, 3]
-    b <- (rMax+rMean)/sqrt(1+rat^2)
-    a <- abs(rat*b)
-    
-    ## add or subtract,  depending on the xy
-    xpos <- L[, 2]>=0
-    ypos <- L[, 3]>=0
-    L[!xpos, 2] <- L[!xpos, 2]-a[!xpos]
-    L[ xpos, 2] <- L[ xpos, 2]+a[ xpos]
-    L[!ypos, 3] <- L[!ypos, 3]-b[!ypos]
-    L[ ypos, 3] <- L[ ypos, 3]+b[ ypos]
-    
-    ## center Lprime:
-    Lprime[, 2] <- Lprime[, 2]-mean(Lprime[, 2])
-    Lprime[, 3] <- Lprime[, 3]-mean(Lprime[, 3])
-
-    ## deal with 1-row matrices (again)
-    if(!is.matrix(L) & length(L)==3) L <- matrix(L, nrow=1)
-    if(!is.matrix(Lprime) & length(Lprime)==3) Lprime <- matrix(Lprime, nrow=1)
-    
-    L <- rbind(L[L[, 1]!=v, ], Lprime)
-    L <- L[order(L[, 1]), ]
-    return(L)
-}
-
-
-## wrapper function to recursively layout each block.
-layout.byblock <- function(G, lyt=layout.kamada.kawai, ...){
-    if(!("bgraph" %in% class(G))) stop("Graph not of class 'bgraph'")
-    lyt <- recurse.layout.rblock(G, as.numeric(V(G)), 0, lyt=lyt, ...)
-    return(lyt[, -1])
-}
-
-## recursively layout the blocks
-recurse.layout.rblock <- function(G, v, n, lyt, ...){
-    ## if n is the max cohesion size,  then we should be done:
-    if(n>max(G$block.cohesion)){
-        return(cbind(v, lyt(subgraph(G, v))))
-    }
-    
-    
-    blocks <- G$blocks[G$block.cohesion==n]
-    
-    ## partitionTags is a character vector of the same length as v.
-    ## the elements are concatennations of "TRUE" and "FALSE", 
-    ## indicating the vertex's membership in each of `blocks`.
-    partitionTags <- sapply(V(G)[v], function(x){paste(lapply(blocks, function(y){x %in% y}), collapse=" ")}, simplify=TRUE)
-    partitions <- unique(partitionTags)
-    
-    ## what about none of v being in a cohesive block of size n?
-    ## no problem,  everybody's in "F F F ..." which gets passed on.
-
-
-    
-    ## pick representative vertex from each partition
-    repV <- sapply(partitions, function(p){
-                resample(v[partitionTags==p], 1)
-        })
-    
-    
-    
-    ## get mean max cohesion size for each partition,  and their order
-    meanc <- as.numeric(sapply(partitions, function(p){mean(V(G)[v[partitionTags==p]]$mc)}))
-    expandOrder <- order(meanc)
-    
-    
-    if(length(expandOrder)<=1){
-        res <- recurse.layout.rblock(G, v[partitionTags==partitions[1]], n+1, lyt, ...)
-    } else {
-        firstTime <- TRUE
-        while(length(expandOrder)>0){
-            theseV <- sort(as.numeric(c(v[partitionTags==partitions[expandOrder[1]]], repV[expandOrder[-1]])))
-            thisL <- recurse.layout.rblock(G, theseV, n+1, lyt)
-            if(firstTime){
-                res <- thisL
-                firstTime <- FALSE
-            } else {
-                res <- expand.layout(res, thisL, repV[expandOrder[1]])
-            }
-            expandOrder <- expandOrder[-1]
-        }
-        
-        
-##        ## get the ids of the whole first partition and the reps of the remaining partitions:
-##        theseV <- sort(as.numeric(c(v[partitionTags==partitions[expandOrder[1]]], repV[expandOrder[-1]])))
-##        ## and lay them out
-##        res <- cbind(theseV, lyt(subgraph(G, theseV)))
-##        ## now repeat for the rest,  expanding each previous layout
-##        expandOrder <- expandOrder[-1]
-##        for(i in expandOrder){
-##            ## get the ids for this partition and the reps of the remaining partitions
-##            theseV <- sort(as.numeric(c(v[partitionTags==partitions[i]], repV[expandOrder[-1]])))
-##            thisL <- cbind(theseV, lyt(subgraph(G, theseV)))
-##            res <- expand.layout(res, thisL, repV[i])
-##            expandOrder <- expandOrder[-1]
-##        }
-    }
-    
-#    ## recursively get the layouts for each partition
-#    L <- sapply(partitions, function(p){recurse.layout.rblock(G, v[partitionTags==p], n+1, lyt, ...)}, simplify=FALSE)
-#
-#
-#    ## layout just repV
-#    res <- cbind(repV, lyt(subgraph(G, repV)))
-#
-#    ## get order of expansion
-#    if(length(partitions)>1){
-#        expandOrder <- sample(1:length(partitions), length(partitions))
-#    } else {
-#        expandOrder <- 1
-#    }
-#    
-#    ## expand each in turn:
-#    for(i in expandOrder){
-#        #recover()
-#        
-#        res <- expand.layout(res, L[[i]], repV[[i]])
-#        #if(any(is.na(res))) res <- expand.layout(res, L[[i]], repV[[i]])
-#        if(any(is.na(res))) stop("NA in layout expansion")
-#        
-#        #if(i==expandOrder[1]){
-#        #    res <- matrix(res, ncol=3)
-#        #    res <- cbind(res[, 1], lyt(subgraph(G, res[, 1])))
-#        #}
-#    }
-    
-    
-    
-    return(res)
-    
-    
-}
-
-
-## write Pajek .hie hierarchy files from a bgraph object
-#write.pajek.hierarchy.bgraph(g, file){
-#    ## get the root vertex
-#    r <- as.numeric(V(g$tree)[V(g$tree)$cohesion==min(V(g$tree)$cohesion)])[1]
-#    ## create the file
-#    p <- 0
-#    cat(V(g$tree)[r]$cohesion, 0, p, vcount(g), "\c\r", sep=" ", file=file)
-#    
-#    for(i in 1:length(g$blocks)){
-#        is.child <- rep(FALSE, length(g$blocks))
-#    }
-#    
-#    
-#    
-#    blocks <- g$blocks
-#    block.cohesion <- g$block.cohesion
-#    block.parents <- rep(0, length(block.cohesion))
-#    for(i in 1:length(blocks)){
-#        do.contain <- rep(FALSE, length(blocks))
-#        for(j in 1:length(blocks)){
-#            do.contain[j] <- all(blocks[[i]] %in% blocks[[j]])
-#        }
-#        this.parent <- 0
-#        ml <- Inf
-#        for(j in which(do.contain)){
-#            if(length(blocks[[j]])<ml & !(length(blocks[[i]]) == length(blocks[[j]]))){
-#                ml <- length(blocks[[j]])
-#                this.parent <- j
-#            }
-#        }
-#        if(this.parent>0){
-#            block.parents[i] <- this.parent-1
-#        }
-#    }
-#
-#}
-#
-
-resample <- function(x,  size,  ...)
-  if(length(x) <= 1) { if(!missing(size) && size == 0) x[FALSE] else x
-  } else sample(x,  size,  ...)
-
-dyadAsymmetry <- function(g, nties=2){
-    if(!is.directed(g)) return(0)
-    dg <- as.undirected(g, "each")
-    abdir <- paste(get.edgelist(dg)[, 1], get.edgelist(dg)[, 2])
-    theseDyads <- names(table(abdir)[table(abdir)==2])
-    ab <- paste(get.edgelist(g)[, 1], get.edgelist(g)[, 2])
-    ba <- paste(get.edgelist(g)[, 2], get.edgelist(g)[, 1])
-    edgeind <- (ab %in% theseDyads) | (ba %in% theseDyads)
-    ab <- ab[edgeind]
-    ba <- ba[edgeind]
-    ## so ab and ba are the diads on which there are exactly two edges
-    
-    rec <- length(which(unique(ab) %in% ba))/2
-    nonrec <- length(which(table(ab)>1))
-    
 }
