@@ -116,7 +116,7 @@ g5 <- graph.formula( Alice +---------+ Bob )
 g5
 
 # Special vertex names
-g6 <- graph.formula( "+" -- "-", "*" -- "/", "%%" -- "%/%" )
+g6 <- graph.formula( "+" -- "-", "*" -- "/", "\%\%" -- "\%/\%" )
 g6
 }
 \keyword{graphs}
