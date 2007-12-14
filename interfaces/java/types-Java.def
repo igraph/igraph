@@ -1,0 +1,52 @@
+
+GRAPH:
+    JAVATYPE: Graph
+
+INTEGER:
+    JAVATYPE: long
+
+INTEGERPTR:
+    JAVATYPE: long
+
+INT:
+    JAVATYPE: int
+
+REAL:
+    JAVATYPE: double
+
+REALPTR:
+    JAVATYPE: double
+
+BOOLEAN:
+    JAVATYPE: boolean
+
+BOOLEANPTR:
+    JAVATYPE: boolean
+
+CSTRING:
+    JAVATYPE: String
+
+VECTOR:
+    JAVATYPE: double[]
+
+VECTOR_OR_0:
+    JAVATYPE: double[]
+
+MATRIX:
+    JAVATYPE: double[][]
+
+ATTRIBUTES:
+
+CONNECTEDNESS:
+
+NEIMODE:
+
+VERTEXSET:
+
+EDGEWEIGHTS:
+
+NULL:
+
+VECTORLIST:
+
+ARPACKOPT:

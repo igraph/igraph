@@ -16,6 +16,13 @@ def usage():
     print ' ' * len(sys.argv[0]), "-h --help -v"
 
 ################################################################################
+class StimulusError(Exception):
+    def __init__(self, message):
+        self.message = message
+    def __str__(self):
+        return str(self.message)
+
+################################################################################
 class PLexer:
     def __init__(self, stream):
         self.stream=stream
@@ -702,6 +709,416 @@ class RCCodeGenerator(CodeGenerator):
             return '  R_igraph_after2(verbose);'
         else:
             return '  R_igraph_after();'
+
+################################################################################
+# Java interface, experimental version using JNI (Java Native Interface)
+# TODO: - everything :) This is just a PoC implementation.
+################################################################################
+
+class JavaCodeGenerator(CodeGenerator):
+    """Class containing the common parts of JavaJavaCodeGenerator and
+    JavaCCodeGenerator"""
+    package = "hu.kfki.rmki.cneuro.igraph"
+
+    def __init__(self, func, types):
+        CodeGenerator.__init__(self, func, types)
+
+    def camelcase(s):
+        """Returns a camelCase version of the given string (as used in Java
+        libraries"""
+        parts = s.split("_")
+        result = [parts.pop(0)]
+        for part in parts: result.append(part.capitalize())
+        return "".join(result)
+    camelcase=staticmethod(camelcase)
+
+    def get_function_metadata(self, f, type_param="JAVATYPE"):
+        """Returns metadata for the given function based on the parameters.
+        f is the name of the function. The result is a dict with the following
+        keys:
+
+        - java_modifiers: Java modifiers to be used in the .java file
+        - return_type: return type of the function
+        - name: name of the function
+        - argument_types: list of argument types
+        - self_name: name of the "self" argument
+        - is_static: whether the function is static
+        - is_constructor: whether the function is a constructor
+        """
+        params = self.parse_params(f)
+        is_static, is_constructor = False, False
+
+        # We will collect data related to the current function in a dict
+        data = {}
+        data["name"]=self.func[f].get("NAME-JAVA", \
+          JavaCodeGenerator.camelcase(f[7:]))
+        data["java_modifiers"]=["public"]
+
+        # Check parameter types to determine Java calling semantics
+        types = {"IN": [], "OUT": [], "INOUT": []}
+        for p in params.keys():
+            types[params[p]["mode"]].append(params[p])
+
+        if len(types["OUT"])+len(types["INOUT"]):
+            # If a single one is OUT or INOUT and all others are
+            # INs, then this is our lucky day - the method fits the Java
+            # semantics
+            if len(types["OUT"]) > 0:
+                return_type_name = types["OUT"][0]["type"]
+            else:
+                return_type_name = types["INOUT"][0]["type"]
+        elif len(types["OUT"])+len(types["INOUT"]) == 0 and \
+            self.func[f].has_key("RETURN"):
+            # There are only input parameters and the return type is specified,
+            # this also fits the Java semantics
+            return_type_name = self.func[f]["RETURN"]
+        else:
+            raise StimulusError, "%s: calling convention unsupported yet" % \
+              data["name"]
+
+        # Loop through the input parameters
+        method_arguments = []
+        found_self = False
+        for p in params.keys():
+            if params[p]["mode"] != "IN": continue
+            type_name = params[p]["type"]
+            if not found_self and type_name == "GRAPH":
+                # this will be the 'self' argument
+                found_self = True
+                data["self_name"] = p
+                continue
+            tdesc = self.types.get(type_name, {})
+            if not tdesc.has_key(type_param):
+                raise StimulusError, "%s: unknown input type %s, skipping" % \
+                  (data["name"], type_name)
+            method_arguments.append(" ".join([tdesc[type_param], p]))
+        data["argument_types"] = method_arguments
+
+        if not found_self:
+            # Loop through INOUT arguments if we found no "self" yet
+            for p in params.keys():
+                if params[p]["mode"] == "INOUT" and params[p]["type"] == "GRAPH":
+                    found_self = True
+                    data["self_name"] = p
+                    break
+
+        tdesc = self.types.get(return_type_name, {})
+        if not tdesc.has_key(type_param):
+            raise StimulusError, "%s: unknown return type %s, skipping" % \
+                (data["name"], return_type_name)
+        data["return_type"] = tdesc[type_param]
+
+        if not found_self:
+            data["java_modifiers"].append("static")
+            data["name"] = data["name"][0].upper()+data["name"][1:]
+
+        data["java_modifiers"] = " ".join(data["java_modifiers"])
+        data["is_static"] = not found_self
+        data["is_constructor"] = is_constructor
+
+        return data
+
+
+class JavaJavaCodeGenerator(JavaCodeGenerator):
+    def __init__(self, func, types):
+        JavaCodeGenerator.__init__(self, func, types)
+
+    def generate(self, inputs, output):
+        out=open(output, "w")
+
+        if len(inputs)>1:
+            raise StimulusError, "Java code generator supports only a single input"
+
+        input = open(inputs[0])
+        for line in input:
+            if "%STIMULUS%" not in line:
+                out.write(line)
+                continue
+
+            for f in self.func.keys():
+                if (self.ignore(f)): continue
+                try:
+                    func_metadata = self.get_function_metadata(f)
+                    func_metadata["arguments"] = ", ".join(func_metadata["argument_types"])
+                    out.write("    %(java_modifiers)s native %(return_type)s %(name)s(%(arguments)s);\n" % func_metadata)
+                except StimulusError, e:
+                    out.write("    // %s\n" % str(e))
+
+        out.close()
+      
+
+class JavaCCodeGenerator(JavaCodeGenerator):
+    def __init__(self, func, types):
+        JavaCodeGenerator.__init__(self, func, types)
+
+    def generate_function(self, function, out):
+        # Ignore?
+        if self.ignore(function): return
+
+        try:
+            self.metadata=self.get_function_metadata(function, "CTYPE")
+        except StimulusError, e:
+            out.write("/* %s */\n" % str(e))
+            return
+
+        params=self.parse_params(function)
+        self.deps = self.parse_deps(function)
+
+        # Check types
+        for p in params.keys():
+            tname=params[p]['type']
+            if not tname in self.types.keys():
+                print "W: Unknown type encountered:", tname
+                return
+            params[p].setdefault('mode', 'IN')
+
+        ## Compile the output
+        ## This code generator is quite difficult, so we use different
+        ## functions to generate the approprite chunks and then
+        ## compile them together using a simple template.
+        ## See the documentation of each chunk below.
+        try:
+            res={}
+            res['func']=function
+            res['header']=self.chunk_header(function, params)
+            res['decl']=self.chunk_declaration(function, params)
+            res['before']=self.chunk_before(function, params)
+            res['inconv']=self.chunk_inconv(function, params)
+            res['call']=self.chunk_call(function, params)
+            res['outconv']=self.chunk_outconv(function, params)
+            res['after']=self.chunk_after(function, params)
+        except StimulusError, e:
+            out.write("/* %s */\n" % str(e))
+            return
+
+        # Replace into the template
+        text="""
+/*-------------------------------------------/
+/ %(func)-42s /
+/-------------------------------------------*/
+%(header)s {
+                                        /* Declarations */
+%(decl)s
+
+%(before)s
+                                        /* Convert input */
+%(inconv)s
+                                        /* Call igraph */
+%(call)s
+                                        /* Convert output */
+%(outconv)s
+
+%(after)s
+
+  return result;
+}\n""" % res
+
+        out.write(text)
+        
+    def chunk_header(self, function, params):
+        """The header.
+        
+        The name of the function is the igraph function name minus the
+        igraph_ prefix, camelcased and prefixed with the underscored
+        Java classname: hu_kfki_rmki_cneuro_igraph_Graph_. The arguments
+        are mapped from the JAVATYPE key of the type dict. Static
+        methods also need a 'jclass cls' argument, ordinary methods
+        need 'jobject jobj'. Besides that, the Java environment pointer
+        is also passed.
+        """
+        data = self.get_function_metadata(function, "JAVATYPE")
+        types = []
+
+        data["funcname"] = "Java_%s_Graph_%s" % \
+          (self.package.replace(".", "_"), data["name"])
+
+        if data["is_static"]:
+            data["argument_types"].insert(0, "jclass cls")
+        else:
+            data["argument_types"].insert(0, "jobject "+data["self_name"])
+        data["argument_types"].insert(0, "JNIEnv *env")
+
+        data["types"] = ", ".join(data["argument_types"])
+
+        res="JNIEXPORT %(return_type)s JNICALL %(funcname)s(%(types)s)" % data
+        return res
+
+    def chunk_declaration(self, function, params):
+        """The declaration part of the function body
+        
+        There are a couple of things to declare. First a C type is
+        needed for every argument, these will be supplied in the C
+        igraph call. Then, all 'OUT' arguments need an appropriate variable as
+        well, the result will be stored here. The return type
+        of the C function also needs to be declared, that comes
+        next. The result variable will contain the final result. Finally,
+        if the method is not static but we are returning a new Graph object
+        (e.g. in the case of igraph_linegraph), we need a jclass variable
+        to store the Java class object."""
+        def do_cpar(pname):
+            cname="c_"+pname
+            t=self.types[params[pname]['type']]
+            if 'CDECL' in t:
+                decl="  " + t['CDECL']
+            elif 'CTYPE' in t:
+                decl="  " + t['CTYPE'] + " " + cname + ";"
+            else:
+                decl=""            
+            return decl.replace("%C%", cname).replace("%I%", pname)
+        def do_jpar(pname):
+            jname="j_"+pname
+            t=self.types[params[pname]['type']]
+            if 'JAVADECL' in t:
+                decl="  " + t['JAVADECL']
+            elif 'JAVATYPE' in t:
+                decl="  " + t['JAVATYPE'] + " " + jname + ";"
+            else:
+                decl=""            
+            return decl.replace("%J%", jname).replace("%I%", pname)
+
+        inout=[ do_cpar(n) for n in params.keys() ]
+        out=[ do_jpar(n) for n,p in params.items() if p['mode']=='OUT']
+
+        rt=self.types[self.func[function]['RETURN']]    
+        if 'CDECL' in rt:
+            retdecl="  " + rt['CDECL']
+        elif 'CTYPE' in rt:
+            retdecl="  " + rt['CTYPE'] + " c_result;"
+        else:
+            retdecl=""
+
+        rnames = [n for n,p in params.items() if p['mode'] in ['OUT','INOUT']]
+        jretdecl = ""
+        if len(rnames)>0:
+            n = rnames[0]
+            rtname = params[n]['type']
+        else:
+            rtname = self.func[function]["RETURN"]
+        rt = self.types[rtname]
+        if 'JAVADECL' in rt:
+            jretdecl="  " + rt['JAVADECL']
+        elif 'JAVATYPE' in rt:
+            jretdecl="  " + rt['JAVATYPE'] + " result;"
+
+        decls = inout + out + [retdecl, jretdecl]
+        if not self.metadata["is_static"] and rtname == "GRAPH":
+            self.metadata["need_class_decl"] = True
+            decls.append("  jclass cls = (*env)->GetObjectClass(env, %s);" % self.metadata["self_name"])
+        else:
+            self.metadata["need_class_decl"] = False
+        return "\n".join([i for i in decls if i!=""])
+
+    def chunk_before(self, function, params):
+        """We simply call Java_igraph_before"""
+        return '  Java_igraph_before();'        
+
+    def chunk_inconv(self, function, params):
+        """Input conversions. Not only for types with mode 'IN' and
+        'INOUT', eg. for 'OUT' vector types we need to allocate the
+        required memory here, do all the initializations, etc. Types
+        without INCONV fields are ignored. The usual %C%, %I% is
+        performed at the end.
+        """
+        def do_par(pname):
+            cname="c_"+pname
+            t=self.types[params[pname]['type']]
+            mode=params[pname]['mode']
+            if 'INCONV' in t and mode in t['INCONV']:
+                inconv="  " + t['INCONV'][mode]
+            else:
+                inconv=""
+
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    inconv=inconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
+                
+            return inconv.replace("%C%", cname).replace("%I%", pname)
+
+        inconv=[ do_par(n) for n in params.keys() ]
+        inconv=[ i for i in inconv if i != "" ]
+
+        return "\n".join(inconv)
+
+    def chunk_call(self, function, params):
+        """Every single argument is included, independently of their
+        mode. If a type has a 'CALL' field then that is used after the
+        usual %C% and %I% substitutions, otherwise the standard 'c_'
+        prefixed C argument name is used.
+        """
+        types=[ self.types[params[n]['type']] for n in params.keys() ]
+        call=map( lambda t, n: t.get('CALL', "c_"+n), types, params.keys() )
+        call=map( lambda c, n: c.replace("%C%", "c_"+n).replace("%I%", n),
+                  call, params.keys() )
+        return "  c_result = " + function + "(" + ", ".join(call) + ");\n"
+
+    def chunk_outconv(self, function, params):
+        """The output conversions, this is quite difficult. A function
+        may report its results in two ways: by returning it directly
+        or by setting a variable to which a pointer was passed. igraph
+        usually uses the latter and returns error codes, except for
+        some simple functions like 'igraph_vcount()' which cannot
+        fail.
+
+        First we add the output conversion for all types. This is
+        easy. Note that even 'IN' arguments may have output
+        conversion, eg. this is the place to free memory allocated to
+        them in the 'INCONV' part.
+
+        Then we check how many 'OUT' or 'INOUT' arguments we
+        have. There are three cases. If there is a single such
+        argument then that is already converted and we need to return
+        that. If there is no such argument then the output of the
+        function was returned, so we perform the output conversion for
+        the returned type and this will be the result. The case of
+        more than one 'OUT' and 'INOUT' arguments is not yet supported by
+        the Java interface.
+        """
+        def do_par(pname):
+            cname="c_"+pname
+            jname="j_"+pname
+            t=self.types[params[pname]['type']]
+            mode=params[pname]['mode']
+            if 'OUTCONV' in t and mode in t['OUTCONV']:
+                outconv="  " + t['OUTCONV'][mode]
+            else:
+                outconv=""
+            return outconv.replace("%C%", cname).replace("%I%", jname)
+
+        outconv=[ do_par(n) for n in params.keys() ]
+        outconv=[ o for o in outconv if o != "" ]
+
+        retpars=[ (n,p) for n,p in params.items() if p['mode'] in ['OUT', 'INOUT'] ]
+        if len(retpars)==0:
+            # return the return value of the function
+            rt=self.types[self.func[function]['RETURN']]
+            if 'OUTCONV' in rt:
+                retconv="  " + rt['OUTCONV']['OUT']
+            else:
+                retconv=""
+            retconv=retconv.replace("%C%", "c_result").replace("%I%", "result")
+            if len(retconv)>0: outconv.append(retconv)
+            ret="\n".join(outconv)
+        elif len(retpars)==1:
+            # return the single output value
+            if retpars[0][1]['mode'] == "OUT":
+                # OUT parameter
+                retconv="  result = j_" + retpars[0][0] + ";"
+            else:
+                # INOUT parameter
+                retconv="  result = " + retpars[0][0] + ";"
+            outconv.append(retconv)
+            ret="\n".join(outconv)
+        else:
+            raise StimulusError, "%s: the case of multiple outputs not supported yet" % function
+        
+        return ret
+
+    def chunk_after(self, function, params):
+        """We simply call Java_igraph_after"""
+        return '  Java_igraph_after();'        
+
+
 
 ################################################################################
 # Shell interface, igraph functions directly from the command line

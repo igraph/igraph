@@ -15,3 +15,5 @@ automake --add-missing --copy
 autoconf
 cd interfaces/R && autoconf 
 cd -
+cd interfaces/java && autoconf
+cd -

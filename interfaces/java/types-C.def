@@ -1,0 +1,216 @@
+
+##################################
+# GRAPH
+
+GRAPH:
+  CTYPE: igraph_t*
+  JAVATYPE: jobject
+  INCONV: 
+    IN: if (Java_jobject_to_igraph(env, %I%, &%C%)) return 0;
+    OUT: %C% = (igraph_t*)calloc(1, sizeof(igraph_t));
+    INOUT: if (Java_jobject_to_igraph(env, %I%, &%C%)) return 0;
+  OUTCONV:
+    OUT: %I% = Java_igraph_to_new_jobject(env, %C%, cls);
+    INOUT: /* No conversion needed for INOUT GRAPH */
+
+##################################
+# INTEGER
+
+INTEGER:  
+  CTYPE: igraph_integer_t
+  JAVATYPE: jlong
+  INCONV: 
+    IN: %C% = (igraph_integer_t)%I%;
+  OUTCONV:
+    OUT: %I% = (jlong)%C%;
+
+INTEGERPTR:
+  CTYPE: igraph_integer_t
+  JAVATYPE: jlong
+  CALL: &%C%
+  OUTCONV:
+    OUT: %I% = (jlong)%C%;
+
+INT:
+  CTYPE: int
+  JAVATYPE: jint
+  INCONV:
+    IN: %C% = (int)%I%;
+
+##################################
+# REAL
+
+REAL:
+  CTYPE: igraph_real_t
+  JAVATYPE: jdouble
+  INCONV:
+    IN: %C% = (igraph_real_t)%I%;
+  OUTCONV:
+    OUT: %I% = (jdouble)%C%;
+
+REALPTR:
+  CTYPE: igraph_real_t
+  JAVATYPE: jdouble
+  CALL: &%C%
+  INCONV:
+    INOUT: %C% = (igraph_real_t)%I%;
+  OUTCONV:
+    OUT: %I% = (jdouble)%C%;
+
+##################################
+# BOOLEAN
+
+BOOLEAN:
+  CTYPE: igraph_bool_t
+  JAVATYPE: jboolean
+  INCONV:
+    IN: %C% = (igraph_bool_t)%I%;
+  OUTCONV:
+    OUT: %I% = (%C% ? JNI_TRUE : JNI_FALSE);
+
+BOOLEANPTR:
+  CTYPE: igraph_bool_t
+  JAVATYPE: jboolean
+  CALL: &%C%
+  OUTCONV:
+    OUT: %I% = (%C% ? JNI_TRUE : JNI_FALSE);
+
+##################################
+# ERROR, used as the return type usually
+
+ERROR:
+  CTYPE: int
+
+##################################
+# CONNECTEDNESS
+
+CONNECTEDNESS:
+  CTYPE: igraph_connectedness_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+NEIMODE:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+##################################
+# VECTOR of real values
+
+VECTOR:
+  CTYPE: igraph_vector_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_vector(%I%, &%C%);
+    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
+    INOUT: if (0 != R_SEXP_to_vector_copy(%I%, &%C%)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+    INOUT: PROTECT(%I%=R_igraph_vector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+VECTORLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP(&%C%)); \
+         R_igraph_vectorlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+##################################
+# VECTOR that can be NULL
+# 'OUT' arguments are always returned now, in the 
+# future we should have a boolean R argument for them which
+# defines whether or not we want to return them, but this 
+# requires some stimulus development.
+
+VECTOR_OR_0:
+  CTYPE: igraph_vector_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN: if (!isNull(%I%)) { R_SEXP_to_vector(%I%, &%C%); }
+    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%); \
+         %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_0orvector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+# This is the same, some syntax would be needed to express it
+
+EDGEWEIGHTS:
+  CTYPE: igraph_vector_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN: if (!isNull(%I%)) { R_SEXP_to_vector(%I%, &%C%); }
+    OUT: if (0 != igraph_vector_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%); \
+         %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_0orvector_to_SEXP(&%C%)); \
+         igraph_vector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+##################################
+# MATRIX of real values
+
+MATRIX:
+  CTYPE: igraph_matrix_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_matrix(%I%, &%C%);
+    OUT: if (0 != igraph_matrix_init(&%C%, 0, 0)) { \
+            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_matrix_to_SEXP(&%C%)); \
+         igraph_matrix_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+##################################
+# Some vertices of a graph
+
+VERTEXSET:
+  CTYPE: igraph_vs_t
+  INCONV:
+    IN: R_SEXP_to_igraph_vs(%I%, &%C1%, &%C%);
+  OUTCONV:
+    IN: igraph_vs_destroy(&%C%);
+
+##################################
+# NULL, this is supplied as an argument
+
+NULL:
+  CALL: 0
+  HEADER:
+
+##################################
+# Options to the ARPACK solver
+
+ARPACKOPT:
+  CTYPE: igraph_arpack_options_t
+  CALL: &%C%
+  INCONV:
+    INOUT: R_SEXP_to_igraph_arpack_options(%I%, &%C%);
+  OUTCONV:
+    INOUT: PROTECT(%I%=R_igraph_arpack_options_to_SEXP(&%C%));

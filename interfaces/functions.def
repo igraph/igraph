@@ -210,7 +210,7 @@ igraph_establishment_game:
         IGNORE: RR, RC, RNamespace
 
 igraph_grg_game:
-        PARAMS: OUT GRAPH graph, INTEGER nodes, REAL radius, BOOLEAN torus=False
+        PARAMS: OUT GRAPH graph, INTEGER nodes, REAL radius, BOOLEAN torus=False, VECTOR_OR_0 x, VECTOR_OR_0 y
         IGNORE: RR, RC, RNamespace
 
 igraph_preference_game:

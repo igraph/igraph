@@ -1,0 +1,152 @@
+/* 
+   IGraph library Java interface.
+   Copyright (C) 2007  Tamas Nepusz <ntamas@rmki.kfki.hu>
+   MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
+   
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   02110-1301 USA 
+
+*/
+
+/*
+
+ATTENTION: This is a highly experimental, proof-of-concept Java interface.
+Its main purpose was to convince me that it can be done in finite time :)
+The interface is highly incomplete, at the time of writing even some
+essential functions (e.g. addEdges) are missing. Since I don't use Java
+intensively, chances are that this interface gets finished only if there
+is substantial demand for it and/or someone takes the time to send patches
+or finish it completely.
+
+*/
+#include <jni.h>
+#include <igraph/igraph.h>
+#include <stdlib.h>    /* calloc */
+#include "hu_kfki_rmki_cneuro_igraph_Graph.h"
+
+#define JAVA_PACKAGE_PREFIX "hu/kfki/rmki/cneuro/igraph"
+/************************** STATIC VARIABLES ***************************/
+
+static JavaVM *jvm;
+static jclass igraph_Graph_class;
+static jfieldID igraph_Graph_handle_fid;
+static jmethodID igraph_Graph_constructor_mid;
+
+/*********************** INITIALIZER FUNCTION **************************/
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *this_jvm, void* reserved) {
+  JNIEnv *env;
+  jclass cls;
+  jvm = this_jvm;
+  if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return JNI_ERR;
+  cls = (*env)->FindClass(env, JAVA_PACKAGE_PREFIX "/Graph");
+  if (cls == 0) return JNI_ERR;
+  igraph_Graph_class = (*env)->NewWeakGlobalRef(env, cls);
+  if (igraph_Graph_class == 0) return JNI_ERR;
+  igraph_Graph_handle_fid = (*env)->GetFieldID(env, cls, "handle", "J");
+  if (igraph_Graph_handle_fid == 0) return JNI_ERR;
+  igraph_Graph_constructor_mid = (*env)->GetMethodID(env, cls, "<init>", "(J)V");
+  if (igraph_Graph_constructor_mid == 0) return JNI_ERR;
+  return JNI_VERSION_1_2;
+}
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *this_jvm, void* reserved) {
+  JNIEnv *env;
+  if ((*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2)) return;
+  (*env)->DeleteWeakGlobalRef(env, igraph_Graph_class);
+  igraph_Graph_class = 0;
+}
+
+/************************ AUXILIARY FUNCTIONS **************************/
+
+/*
+ * Returns the environment of the current thread using the cached JVM
+ */
+JNIEnv *JNU_GetEnv() {
+  JNIEnv *env;
+  (*jvm)->GetEnv(jvm, (void**)&env, JNI_VERSION_1_2);
+  return env;
+}
+
+/*
+ * Throws an exception by exception class name
+ * Adapted from http://java.sun.com/docs/books/jni/html/exceptions.html#26050
+ */
+void JNU_ThrowByName(JNIEnv *env, const char *name, const char *msg) {
+  jclass cls = (*env)->FindClass(env, name);
+  if (cls != 0) (*env)->ThrowNew(env, cls, msg);
+  (*env)->DeleteLocalRef(env, cls);
+}
+
+/************************ CONVERSION ROUTINES **************************/
+
+/*
+ * Converts a Java jobject to an igraph_t* if appropriate by casting
+ * its private handle field to an igraph_t*
+ *
+ * @return: 0 if everything was OK, 1 otherwise
+ */
+int Java_jobject_to_igraph(JNIEnv *env, jobject jobj, igraph_t** gptr) {
+  *gptr = (igraph_t*)(*env)->GetIntField(env, jobj, igraph_Graph_handle_fid);
+  return (*gptr == 0 ? 1 : 0);
+}
+
+/*
+ * Converts an igraph_t* to a new Java Graph object
+ * @return: the new Java Graph object or NULL if there was an error
+ */
+jobject Java_igraph_to_new_jobject(JNIEnv *env, igraph_t* gptr, jclass cls) {
+  /* Construct the object */
+  return (*env)->NewObject(env, cls, igraph_Graph_constructor_mid, gptr);
+}
+
+/*
+ * Frees the underlying igraph_t object
+ */
+void Java_hu_kfki_rmki_cneuro_igraph_Graph_destroy(JNIEnv *env, jobject jobj) {
+  igraph_t *g;
+  if (Java_jobject_to_igraph(env, jobj, &g)) return;
+  if (g == 0) return;
+  igraph_destroy(g);
+  free(g);
+}
+
+/********** THINGS TO DO BEFORE ENTERING & AFTER LEAVING C LAYER ***********/
+
+igraph_error_handler_t *Java_igraph_old_error_handler;
+igraph_warning_handler_t *Java_igraph_old_warning_handler;
+
+void Java_igraph_error_handler(const char *reason, const char *file,
+  int line, int igraph_errno) {
+  JNIEnv *env = JNU_GetEnv();
+  char msg[8192];
+  IGRAPH_FINALLY_FREE();
+  snprintf(msg, 8192, "%s, %s at %s:%i", reason, igraph_strerror(igraph_errno),
+    file, line);
+  JNU_ThrowByName(env, JAVA_PACKAGE_PREFIX "/CoreException", msg);
+}
+
+void Java_igraph_before() {
+  Java_igraph_old_error_handler=igraph_set_error_handler(Java_igraph_error_handler);
+  Java_igraph_old_warning_handler=igraph_set_warning_handler(0);
+}
+
+void Java_igraph_after() {
+  igraph_set_error_handler(Java_igraph_old_error_handler);
+  igraph_set_warning_handler(Java_igraph_old_warning_handler);
+}
+
+/*********** THE REST OF THIS FILE IS GENERATED BY stimulus.py *************/
+
