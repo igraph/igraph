@@ -47,9 +47,11 @@ print.igraph <- function(x,
     cat("Graph attributes:\n")
     list <- list.graph.attributes(x)
     sapply(list, function(n) {
-      cat("  ", n, "=", get.graph.attribute(x, n), "\n") })
+      cat("  ", n, "=\n")
+      print(get.graph.attribute(x, n))
+    })
   }
-
+  
   # Vertex attributes
   if (vertex.attributes) {
     cat("Vertex attributes:\n")
@@ -79,7 +81,8 @@ print.igraph <- function(x,
         for (i in ind) {
           cat("  ", i, "  ")
           sapply(list, function(n) {
-            cat(n, "=", get.vertex.attribute(x, n, i), "\t")})
+            cat(n, "=\n")
+            print(get.vertex.attribute(x, n, i), "\t")})
           cat("\n")
         }
       }
@@ -129,7 +132,8 @@ print.igraph <- function(x,
         cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
         if (edge.attributes) {
           sapply(list, function(n) {
-            cat("  ", n, "=", get.edge.attribute(x, n, i), "\t")})
+            cat("  ", n, "=\n")
+            print(get.edge.attribute(x, n, i), "\t")})
         }
         cat("\n")
         i <<- i+1
