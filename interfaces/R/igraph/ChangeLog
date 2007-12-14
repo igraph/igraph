@@ -1,5 +1,8 @@
 2007-12-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/CohesiveBlocks.R (max.cohesion, maxcohesion) : 
+	renamed
+
 	* interface/R/igraph/R/CohesiveBlocks.R (layout.byblock, dyadAsymmetry) :
 	removed
 	(cohesive.blocks, recalc.tree.bgraph, print.bgraph, plot.bgraph) :

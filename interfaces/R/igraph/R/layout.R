@@ -366,10 +366,10 @@ i.layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
   (v-vr[1]) * fac + min
 }
 
-layout.mds <- function(graph, ...)
+layout.mds <- function(graph, d=shortest.paths(graph), ...)
   UseMethod("layout.mds", graph)
 
-layout.mds.igraph <- function(graph, d=shortest.paths(graph)){
+layout.mds.igraph <- function(graph, d=shortest.paths(graph), ...){
     
     if (!is.igraph(graph)) {
       stop("Not a graph object")
@@ -404,10 +404,10 @@ layout.mds.igraph <- function(graph, d=shortest.paths(graph)){
     return(l)
 }
 
-layout.svd <- function(graph, ...)
+layout.svd <- function(graph, d=shortest.paths(graph), ...)
   UseMethod("layout.svd", graph)
 
-layout.svd.igraph <- function(graph, d=shortest.paths(graph)){
+layout.svd.igraph <- function(graph, d=shortest.paths(graph), ...) {
     
     if (!is.igraph(graph)) {
       stop("Not a graph object")

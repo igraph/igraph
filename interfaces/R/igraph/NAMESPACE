@@ -177,8 +177,8 @@ export (graph.empty)
 
 export(cohesive.blocks)
 export(is.bgraph, recalc.tree.bgraph,
-       print.bgraph, plot.bgraph, max.cohesion,
-       plot.kCore.bgraph, write.pajek.bgraph,
+       print.bgraph, plot.bgraph, maxcohesion,
+       plotkCore.bgraph, write.pajek.bgraph,
        write.pajek.kCore.bgraph, piecewise.layout, expand.layout)
 S3method(print, bgraph)
 S3method(plot, bgraph)

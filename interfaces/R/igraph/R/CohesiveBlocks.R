@@ -794,7 +794,7 @@ is.cutset <- function(v, g){ ## does removal of `v` disconnect `g`?
 ## formats. (pretty messy, sorry)                   ##
 ## The most important are:                          ##
 ## - plot.bgraph()                                  ##
-## - max.cohesion()                                 ##
+## - maxcohesion()                                 ##
 ## - write.pajek.bgraph()                           ##
 ######################################################
 
@@ -849,7 +849,7 @@ print.bgraph <- function(x, ...){
     print.igraph(get.graph.attribute(x, "tree"), ...)
 }
 
-max.cohesion <- function(graph){
+maxcohesion <- function(graph){
 
     if (!is.bgraph(graph)) {
       stop("Not a bgraph object")
@@ -866,12 +866,14 @@ max.cohesion <- function(graph){
     return(mc)
 }
 
-layout.svd.bgraph <- function(graph, d=shortest.paths(graph), s=.6) {
+layout.svd.bgraph <- function(graph, d=shortest.paths(graph), ...) {
 
   if (!is.bgraph(graph)) {
     stop("Not a bgraph object")
   }
 
+  if (missing(s)) { s <- 0.6 }
+  
   for(b in graph$blocks){
     d[b+1, b+1] <- d[b+1, b+1]*s
   }
@@ -879,11 +881,13 @@ layout.svd.bgraph <- function(graph, d=shortest.paths(graph), s=.6) {
   layout.svd.igraph(graph, d=d)
 }
 
-layout.mds.bgraph <- function(graph, d=shortest.paths(graph), s=.6) {
+layout.mds.bgraph <- function(graph, d=shortest.paths(graph), ...) {
 
   if (!is.bgraph(graph)) {
     stop("Not a bgraph object")
   }
+
+  if (missing(s)) { s <- 0.6 }
 
   for(b in graph$blocks){
     d[b+1, b+1] <- d[b+1, b+1]*s
@@ -912,7 +916,7 @@ plot.bgraph <- function(x, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
       if("mc" %in% list.vertex.attributes(g)){
         mc <- V(g)$mc
       } else {
-        mc <- max.cohesion(g)
+        mc <- maxcohesion(g)
       }
     }
     
@@ -942,7 +946,7 @@ plot.bgraph <- function(x, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
     invisible(NULL)
 }
 
-plot.kCore.bgraph <- function(graph, vertex.size=3, colpal=NULL, emph=NULL,
+plotkCore.bgraph <- function(graph, vertex.size=3, colpal=NULL, emph=NULL,
                               remove.multiple=TRUE, remove.loops=TRUE, ...){
 
     if (!is.bgraph(graph)) {
@@ -991,7 +995,7 @@ write.pajek.bgraph <- function(graph, filename, hierarchy=FALSE){ # filename sho
     mc <- if("mc" %in% list.vertex.attributes(g)){
         V(g)$mc
     } else {
-        max.cohesion(g)
+        maxcohesion(g)
     }
     cat(paste("*Vertices", vcount(g)), mc, "\r", sep="\r\n", file=paste(filename, ".clu", sep=""))
     
