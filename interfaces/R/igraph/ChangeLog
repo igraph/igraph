@@ -1,6 +1,8 @@
 2007-12-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
-	* interface/R/igraph/R/print.R (print.igraph) : use the 'print' method
+	* interfaces/R/igraph/R/iterators.R ($.igraph, $<-.igraph) : added
+
+	* interfaces/R/igraph/R/print.R (print.igraph) : use the 'print' method
 	of complex attributes
 
 2007-11-15  Gabor Csardi  <csardi@rmki.kfki.hu>

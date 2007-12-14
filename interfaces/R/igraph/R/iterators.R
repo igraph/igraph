@@ -246,6 +246,14 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   value
 }  
 
+"$.igraph" <- function(x, name) {
+  get.graph.attribute(x, name)
+}
+
+"$<-.igraph" <- function(x, name, value) {
+  set.graph.attribute(x, name, value)
+}
+  
 "$.igraph.vs" <- function(x, name) {
   get.vertex.attribute(get("graph", attr(x, "env")), name, x)
 }
