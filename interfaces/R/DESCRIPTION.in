@@ -8,6 +8,6 @@ Description: Routines for simple graphs and network analysis. igraph can
   handle large graphs very well and provides functions for generating random
   and regular graphs, graph visualization, centrality indices and much more.
 Depends: stats
-Suggests: stats4, rgl, tcltk
+Suggests: stats4, rgl, tcltk, RSQLite, digest
 License: GPL version 2 or later (June, 1991)
 URL: http://cneurocvs.rmki.kfki.hu/igraph
