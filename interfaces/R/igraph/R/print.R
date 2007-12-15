@@ -46,31 +46,32 @@ print.igraph <- function(x,
   if (graph.attributes) {
     cat("Graph attributes:\n")
     list <- list.graph.attributes(x)
-    sapply(list, function(n) {
-      cat("  ", n, "=\n")
+    lapply(list, function(n) {
+      cat(sep="", "[[", n, "]]\n")
       print(get.graph.attribute(x, n))
     })
   }
   
   # Vertex attributes
   if (vertex.attributes) {
-    cat("Vertex attributes:\n")
     list <- list.vertex.attributes(x)
     if (length(list) == 0) {
       cat("No vertex attributes\n")
     } else {
+      cat("Vertex attributes:\n")
       mp <- getOption("max.print")
       options(max.print=1000000000)      # no built-in limit, we handle it by hand
       if (vc <= mp) {
         omitted.vertices <- 0
-        ind <- V(x)
+        ind <- as.numeric(V(x))
       } else {
         omitted.vertices <- vc-mp
         ind <- seq(length=mp)-1
       }
       if (vc==0 ||
-          all(sapply(list, function(v) is.numeric(v) |
-                     is.character(v) | is.logical(v)))) {
+          all(sapply(list, function(v) is.numeric(get.vertex.attribute(x, v)) |
+                     is.character(get.vertex.attribute(x, v)) |
+                     is.logical(get.vertex.attribute(x, v))))) {
         ## create a table
         tab <- data.frame(v=paste(sep="", "[", ind, "]"), row.names="v")
         for (i in list) {
@@ -79,11 +80,10 @@ print.igraph <- function(x,
         print(tab)
       } else {
         for (i in ind) {
-          cat("  ", i, "  ")
-          sapply(list, function(n) {
-            cat(n, "=\n")
-            print(get.vertex.attribute(x, n, i), "\t")})
-          cat("\n")
+          cat(sep="", "[[", i, "]]\n")
+          lapply(list, function(n) {
+            cat(sep="", "[[", i, "]][[", n, "]]\n")
+            print(get.vertex.attribute(x, n, i))})
         }
       }
       options(max.print=mp)
@@ -107,6 +107,13 @@ print.igraph <- function(x,
     } else {
       cat("Edges and their attributes:\n")
     }
+    if (names && "name" %in% list.vertex.attributes(x) &&
+        !is.numeric(get.vertex.attribute(x, "name")) &&
+        !is.character(get.vertex.attribute(x, "name")) &&
+        !is.logical(get.vertex.attribute(x, "name"))) {
+      warning("Can't print vertex names, complex `name' vertex attribute")
+      names <- FALSE
+    }
     el <- get.edgelist(x, names=names)
     mp <- getOption("max.print")
     if (mp >= nrow(el)) {
@@ -116,8 +123,9 @@ print.igraph <- function(x,
       el <- el[1:mp,]
     }
     if (ec==0 || 
-        all(sapply(list, function(v) is.numeric(v) |
-                   is.character(v) | is.logical(v)))) {
+        all(sapply(list, function(v) is.numeric(get.edge.attribute(x, v)) |
+                   is.character(get.edge.attribute(x,v)) |
+                   is.logical(get.edge.attribute(x, v))))) {
       ## create a table
       tab <- data.frame(e=paste(sep="", "[", seq(length=nrow(el))-1, "]"), row.names="e")
       if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
@@ -131,9 +139,9 @@ print.igraph <- function(x,
       apply(el, 1, function(v) {
         cat(sep="", "[", i, "] ", v[1], " ", arrow, " ", v[2]);
         if (edge.attributes) {
-          sapply(list, function(n) {
-            cat("  ", n, "=\n")
-            print(get.edge.attribute(x, n, i), "\t")})
+          lapply(list, function(n) {
+            cat(sep="", "\n[[", i, "]][[", n, "]]\n")
+            print(get.edge.attribute(x, n, i))})
         }
         cat("\n")
         i <<- i+1

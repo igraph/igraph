@@ -1,5 +1,8 @@
 2007-12-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/print.R (print.igraph) : better printing of
+	attributes
+
 	* interfaces/R/igraph/R/CohesiveBlocks.R (max.cohesion, maxcohesion) : 
 	renamed
 
