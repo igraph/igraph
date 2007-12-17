@@ -16,12 +16,28 @@ class AttributeTests(unittest.TestCase):
         del g.vs["name"]
         self.assertRaises(KeyError, g.vs.__getitem__, "name")
 
+        g.vs[0]["name"] = "second"
+        g.vs[0]["date"] = "2007-12-17"
+        ans = g.vs[0].attribute_names()
+        ans.sort()
+        self.failUnless(ans == ["date", "name"])
+        attrs = g.vs[0].attributes()
+        self.failUnless(attrs == {"name": "second", "date": "2007-12-17"})
+
     def testEdgeAttributes(self):
         g = Graph.Full(5)
         g.es[0]["name"] = "first"
         self.failUnless(g.es[0]["name"] == "first")
         del g.es["name"]
         self.assertRaises(KeyError, g.es.__getitem__, "name")
+
+        g.es[0]["name"] = "second"
+        g.es[0]["date"] = "2007-12-17"
+        ans = g.es[0].attribute_names()
+        ans.sort()
+        self.failUnless(ans == ["date", "name"])
+        attrs = g.es[0].attributes()
+        self.failUnless(attrs == {"name": "second", "date": "2007-12-17"})
 
     def testMassVertexAttributeAssignment(self):
         g = Graph.Full(5)

@@ -47,6 +47,7 @@ PyObject* igraphmodule_Vertex_New(PyObject *gref, long idx);
 PyObject* igraphmodule_Vertex_str(igraphmodule_VertexObject *self);
 //int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self);
 PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self);
+PyObject* igraphmodule_Vertex_attribute_names(igraphmodule_VertexObject* self);
 /*PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
 					   PyObject* s);
 int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject* k, PyObject* v);*/

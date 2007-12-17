@@ -1,4 +1,6 @@
 /* -*- mode: C -*-  */
+/* vim: set ts=2 sw=2 sts=2 et: */
+
 /* 
    IGraph library.
    Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -61,7 +63,7 @@ PyObject* igraphmodule_Vertex_New(PyObject *gref, long idx) {
  * \brief Support for cyclic garbage collection in Python
  */
 int igraphmodule_Vertex_traverse(igraphmodule_VertexObject *self,
-				    visitproc visit, void *arg) {
+                    visitproc visit, void *arg) {
   int vret;
   
   if (self->gref) {
@@ -99,19 +101,24 @@ void igraphmodule_Vertex_dealloc(igraphmodule_VertexObject* self) {
 }
 
 /** \ingroup python_interface_vertex
- * \brief Formats an \c igraph.Vertex object in a human-consumable format.
+ * \brief Formats an \c igraph.Vertex object to a string
  * 
  * \return the formatted textual representation as a \c PyObject
  */
-PyObject* igraphmodule_Vertex_str(igraphmodule_VertexObject *self)
-{
-  PyObject *s, *o;
-  
+PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
+  PyObject *o, *s, *grepr, *drepr;
+
   o=igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
   
-  s=PyString_FromFormat("Vertex #%ld of: ", self->idx);
-  PyString_Concat(&s, igraphmodule_Graph_str((igraphmodule_GraphObject*)o));
+  grepr=PyObject_Repr(o);
+  if (!grepr) return NULL;
+  drepr=PyObject_Repr(igraphmodule_Vertex_attributes(self));
+  if (!drepr) { Py_DECREF(grepr); return NULL; }
+  s=PyString_FromFormat("igraph.Vertex(%s,%ld,%s)", PyString_AsString(grepr),
+    self->idx, PyString_AsString(drepr));
+  Py_DECREF(grepr);
+  Py_DECREF(drepr);
   return s;
 }
 
@@ -130,7 +137,7 @@ int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
 /** \ingroup python_interface_vertex
  * \brief Returns the list of attribute names
  */
-PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
+PyObject* igraphmodule_Vertex_attribute_names(igraphmodule_VertexObject* self) {
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
@@ -140,19 +147,55 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
 }
 
 /** \ingroup python_interface_vertex
+ * \brief Returns a dict with attribue names and values
+ */
+PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
+  igraphmodule_GraphObject *o;
+  PyObject *names, *dict;
+  long i, n;
+
+  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
+  if (!o) return NULL;
+
+  dict=PyDict_New();
+  if (!dict) return NULL;
+
+  names=igraphmodule_Graph_vertex_attributes(o);
+  if (!names) { Py_DECREF(dict); return NULL; }
+
+  n=PyList_Size(names);
+  for (i=0; i<n; i++) {
+    PyObject *name = PyList_GetItem(names, i);
+    if (name) {
+      PyObject *dictit;
+      dictit = PyDict_GetItem(((PyObject**)o->g.attr)[ATTRHASH_IDX_VERTEX], name);
+      if (dictit) {
+        PyObject *value = PyList_GetItem(dictit, self->idx);
+        if (value) {
+          Py_INCREF(value);
+          PyDict_SetItem(dict, name, value);
+        }
+      }
+    }
+  }
+
+  return dict;
+}
+
+/** \ingroup python_interface_vertex
  * \brief Returns the corresponding value to a given attribute of the vertex
  * \param self the vertex object
  * \param s the attribute name to be queried
  */
 PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
-					   PyObject* s) {
+                       PyObject* s) {
   igraphmodule_GraphObject *o;
   PyObject* result;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return NULL;
   
-  result=PyDict_GetItem(((PyObject**)o->g.attr)[1], s);
+  result=PyDict_GetItem(((PyObject**)o->g.attr)[ATTRHASH_IDX_VERTEX], s);
   if (result) {
     /* result is a list, so get the element with index self->idx */
     if (!PyList_Check(result)) {
@@ -187,9 +230,9 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
 
   if (v==NULL)
     // we are deleting attribute
-    return PyDict_DelItem(((PyObject**)o->g.attr)[1], k);
+    return PyDict_DelItem(((PyObject**)o->g.attr)[ATTRHASH_IDX_VERTEX], k);
   
-  result=PyDict_GetItem(((PyObject**)o->g.attr)[1], k);
+  result=PyDict_GetItem(((PyObject**)o->g.attr)[ATTRHASH_IDX_VERTEX], k);
   if (result) {
     /* result is a list, so set the element with index self->idx */
     if (!PyList_Check(result)) {
@@ -212,20 +255,20 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
     result=PyList_New(n);
     for (i=0; i<n; i++) {
       if (i != self->idx) {
-	Py_INCREF(Py_None);
-	if (PyList_SetItem(result, i, Py_None) == -1) {
-	  Py_DECREF(Py_None);
-	  Py_DECREF(result);
-	  return -1;
-	}
+    Py_INCREF(Py_None);
+    if (PyList_SetItem(result, i, Py_None) == -1) {
+      Py_DECREF(Py_None);
+      Py_DECREF(result);
+      return -1;
+    }
       } else {
-	/* Same game with the reference count here */
-	Py_INCREF(v);
-	if (PyList_SetItem(result, i, v) == -1) {
-	  Py_DECREF(v);
-	  Py_DECREF(result);
-	  return -1;
-	}
+    /* Same game with the reference count here */
+    Py_INCREF(v);
+    if (PyList_SetItem(result, i, v) == -1) {
+      Py_DECREF(v);
+      Py_DECREF(result);
+      return -1;
+    }
       }
     }
     if (PyDict_SetItem(((PyObject**)o->g.attr)[1], k, result) == -1) {
@@ -252,9 +295,14 @@ PyObject* igraphmodule_Vertex_get_index(igraphmodule_VertexObject* self, void* c
  */
 PyMethodDef igraphmodule_Vertex_methods[] = {
   {"attributes", (PyCFunction)igraphmodule_Vertex_attributes,
-      METH_NOARGS,
-      "attributes() -> list\n\n"
-      "Returns the attribute list of the graph's vertices\n"
+    METH_NOARGS,
+    "attributes() -> list\n\n"
+    "Returns a dict of attribute names and values for the vertex\n"
+  },
+  {"attribute_names", (PyCFunction)igraphmodule_Vertex_attribute_names,
+    METH_NOARGS,
+    "attribute_names() -> list\n\n"
+    "Returns the list of vertex attribute names\n"
   },
   {NULL}
 };
@@ -300,13 +348,13 @@ PyTypeObject igraphmodule_VertexType =
   0,                                          // tp_getattr
   0,                                          // tp_setattr
   0,                                          // tp_compare
-  0,                                          // tp_repr
+  (reprfunc)igraphmodule_Vertex_repr,         // tp_repr
   0,                                          // tp_as_number
   0,                                          // tp_as_sequence
   &igraphmodule_Vertex_as_mapping,            // tp_as_mapping
   0,                                          // tp_hash
   0,                                          // tp_call
-  (reprfunc)igraphmodule_Vertex_str,          // tp_str
+  0,                                          // tp_str
   0,                                          // tp_getattro
   0,                                          // tp_setattro
   0,                                          // tp_as_buffer

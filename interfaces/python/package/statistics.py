@@ -156,7 +156,7 @@ class Histogram(object):
 
     def __str__(self):
         """Returns the string representation of the histogram"""
-        if self._min is None or self._max is None: return str()
+        if self._min is None or self._max is None: return "N = 0"
         num_length = max(len("%.3f" % self._min), \
                          len("%.3f" % self._max))
         format_string = "[%%%d.3f, %%%d.3f): %%s" % (num_length, num_length)
