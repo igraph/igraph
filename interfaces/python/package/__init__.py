@@ -1170,8 +1170,8 @@ class Graph(core.GraphBase):
         import warnings
         constructor = self.__class__
         graph_attr_names = self.attributes()
-        vertex_attr_names = self.vs.attributes()
-        edge_attr_names = self.es.attributes()
+        vertex_attr_names = self.vs.attribute_names()
+        edge_attr_names = self.es.attribute_names()
         gattrs, vattrs, eattrs = {}, {}, {}
         for a in graph_attr_names: gattrs[a] = self[a]
         for a in vertex_attr_names: vattrs[a] = self.vs[a]

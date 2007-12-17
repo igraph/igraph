@@ -1,7 +1,7 @@
 import unittest
 from igraph.test import basic, layouts, games, foreign, structural, flow, \
     spectral, attributes, cliques, decomposition, operators, generators, \
-    isomorphism, colortests
+    isomorphism, colortests, vertexseq
 
 def suite():
     return unittest.TestSuite( \
@@ -14,6 +14,7 @@ def suite():
          flow.suite(),
          spectral.suite(),
          attributes.suite(),
+         vertexseq.suite(),
          cliques.suite(),
          decomposition.suite(),
          operators.suite(),

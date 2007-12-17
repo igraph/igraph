@@ -1,4 +1,6 @@
 /* -*- mode: C -*-  */
+/* vim:ts=2 sts=2 sw=2 et: */
+
 /* 
    IGraph library.
    Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -137,7 +139,7 @@ PyObject* igraphmodule_EdgeSeq_sq_item(igraphmodule_EdgeSeqObject* self,
 /** \ingroup python_interface_edgeseq
  * \brief Returns the list of attribute names
  */
-PyObject* igraphmodule_EdgeSeq_attributes(igraphmodule_EdgeSeqObject* self) {
+PyObject* igraphmodule_EdgeSeq_attribute_names(igraphmodule_EdgeSeqObject* self) {
   igraphmodule_GraphObject *o;
   
   o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
@@ -276,9 +278,9 @@ PyObject* igraphmodule_EdgeSeq_set_attribute_values(igraphmodule_EdgeSeqObject *
  * Method table for the \c igraph.EdgeSeq object
  */
 PyMethodDef igraphmodule_EdgeSeq_methods[] = {
-  {"attributes", (PyCFunction)igraphmodule_EdgeSeq_attributes,
+  {"attribute_names", (PyCFunction)igraphmodule_EdgeSeq_attribute_names,
    METH_NOARGS,
-   "attributes() -> list\n\n"
+   "attribute_names() -> list\n\n"
    "Returns the attribute name list of the graph's edges\n"
   },
   {"get_attribute_values", (PyCFunction)igraphmodule_EdgeSeq_get_attribute_values,

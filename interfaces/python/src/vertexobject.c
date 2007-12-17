@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim: set ts=2 sw=2 sts=2 et: */
+/* vim:ts=2 sw=2 sts=2 et: */
 
 /* 
    IGraph library.
@@ -287,6 +287,14 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
  */
 PyObject* igraphmodule_Vertex_get_index(igraphmodule_VertexObject* self, void* closure) {
   return PyInt_FromLong((long)self->idx);
+}
+
+/**
+ * \ingroup python_interface_vertex
+ * Returns the vertex index as an ordinary C long
+ */
+long igraphmodule_Vertex_get_index_long(igraphmodule_VertexObject* self) {
+  return (long)self->idx;
 }
 
 /**

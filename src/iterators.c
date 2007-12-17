@@ -40,7 +40,7 @@
  *
  * <para>While this might sound quite mysterious, it is actually very
  * simple. For example all vertex of graph can be selected by
- * \ref igraph_vs_all(), and the graph indenpendence means that
+ * \ref igraph_vs_all(), and the graph independence means that
  * \ref igraph_vs_all() is not parametrized by a graph object. Ie. 
  * \ref igraph_vs_all() is the \em concept of selecting all vertices
  * of a graph.</para>
@@ -482,6 +482,83 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 } 
+
+/**
+ * \function igraph_vs_type
+ * \brief Returns the type of the vertex selector
+ */
+inline int igraph_vs_type(const igraph_vs_t *vs) { return vs->type; }
+
+/**
+ * \function igraph_vs_size
+ * \brief Returns the size of the vertex selector
+ *
+ * The size of the vertex selector is the number of vertices it will
+ * yield when it is iterated over.
+ *
+ * \param graph the graph over which we will iterate
+ * \param result the result will be returned here
+ */
+int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
+  igraph_integer_t *result) {
+  igraph_vector_t vec;
+  igraph_integer_t n;
+  igraph_bool_t *seen;
+  long i;
+
+  switch (vs->type) {
+    case IGRAPH_VS_NONE:
+      *result = 0; return 0;
+
+    case IGRAPH_VS_1:
+      *result = 0;
+      if (vs->data.vid < igraph_vcount(graph) && vs->data.vid >= 0) *result=1;
+      return 0;
+
+    case IGRAPH_VS_SEQ:
+      *result = vs->data.seq.to - vs->data.seq.from;
+      return 0;
+
+    case IGRAPH_VS_ALL:
+      *result = igraph_vcount(graph); return 0;
+
+    case IGRAPH_VS_ADJ:
+    IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+    IGRAPH_CHECK(igraph_neighbors(graph,&vec,vs->data.adj.vid,vs->data.adj.mode));
+    *result=igraph_vector_size(&vec);
+    igraph_vector_destroy(&vec);
+    IGRAPH_FINALLY_CLEAN(1);
+    return 0;
+    
+    case IGRAPH_VS_NONADJ:
+    IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
+    IGRAPH_CHECK(igraph_neighbors(graph,&vec,vs->data.adj.vid,vs->data.adj.mode));
+    *result=igraph_vcount(graph);
+    seen=igraph_Calloc(*result, igraph_bool_t);
+    if (seen==0) {
+      IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, seen);
+    for (i=0; i<igraph_vector_size(&vec); i++) {
+      if (!seen[(long int)VECTOR(vec)[i]]) {
+        (*result)--;
+	      seen[(long int)VECTOR(vec)[i]] = 1;
+      }
+    }
+    igraph_free(seen);
+    igraph_vector_destroy(&vec);
+    IGRAPH_FINALLY_CLEAN(2);
+    return 0;
+    
+    case IGRAPH_VS_VECTOR:
+    case IGRAPH_VS_VECTORPTR:
+    *result = igraph_vector_size((igraph_vector_t*)vs->data.vecptr);
+    return 0;
+  }
+
+  IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
+    IGRAPH_EINVAL);
+}
 
 /***************************************************/
 
