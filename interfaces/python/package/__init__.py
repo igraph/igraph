@@ -42,17 +42,6 @@ import sys
 from tempfile import mkstemp
 from warnings import warn
 
-def summary(o, f=sys.stdout):
-    """Prints a summary of object o to a given stream
-
-    @param o: the object about which a human-readable summary is requested.
-    @param f: the stream to be used
-    """
-    if hasattr(o, "summary"):
-        print >>f, o.summary()
-    else:
-        print >>f, str(o)
-
 
 class Graph(core.GraphBase):
     """Generic graph.
@@ -373,7 +362,6 @@ class Graph(core.GraphBase):
         return self.get_isomorphisms(self)
 
     # Various clustering algorithms -- mostly wrappers around GraphBase
-
     def community_fastgreedy(self, weights=None):
         """Community structure based on the greedy optimization of modularity.
 
@@ -625,6 +613,8 @@ class Graph(core.GraphBase):
         l=method(self, *args, **kwds)
         if not isinstance(l, Layout): l=Layout(l)
         return l
+
+    # Auxiliary I/O functions
 
     def write_graphmlz(self, f, compresslevel=9):
         """Writes the graph to a zipped GraphML file.
@@ -1033,6 +1023,16 @@ class Graph(core.GraphBase):
         return writer(f, *args, **kwds)
     save = write
 
+    ###########################
+    # Vertex and edge sequence
+    def _get_vs(self): return VertexSeq(self)
+    def _get_es(self): return EdgeSeq(self)
+    vs=property(_get_vs, doc="The vertex sequence of the graph")
+    es=property(_get_es, doc="The edge sequence of the graph")
+
+    ###################
+    # Custom operators
+
     def __iadd__(self, other):
         """In-place addition (disjoint union).
 
@@ -1424,6 +1424,51 @@ class Graph(core.GraphBase):
     # After adjusting something here, don't forget to update the docstring
     # of Graph.layout if necessary!
 
+
+class VertexSeq(core.VertexSeq):
+    """Class representing a sequence of vertices in the graph.
+    
+    This class is most easily accessed by the C{vs} field of the
+    L{Graph} object, which returns an ordered sequence of all vertices in
+    the graph. The vertex sequence can be refined by invoking the
+    L{VertexSeq.select()} method.
+    
+    An alternative way to create a vertex sequence referring to a given
+    graph is to use the constructor directly:
+    
+      >>> g = Graph.Full(3)
+      >>> vs = VertexSeq(g)
+      >>> restricted_vs = VertexSeq(g, [0, 1])
+
+    The individual vertices can be accessed by indexing the vertex sequence
+    object. It can be used as an iterable as well, or even in a list
+    comprehension:
+    
+      >>> g=igraph.Graph.Full(3)
+      >>> for v in g.vs:
+      ...   v["value"] = v.index ** 2
+      ...
+      >>> [v["value"] ** 0.5 for v in g.vs]
+      [0.0, 1.0, 2.0]
+      
+    The vertex set can also be used as a dictionary where the keys are the
+    attribute names. The values corresponding to the keys are the values
+    of the given attribute for every vertex selected by the sequence.
+    
+      >>> g=igraph.Graph.Full(3)
+      >>> for idx, v in enumerate(g.vs):
+      ...   v["weight"] = idx*(idx+1)
+      ...
+      >>> g.vs["weight"]
+      [0, 2, 6]
+      >>> g.vs.select(1,2)["weight"] = [10, 20]
+      >>> g.vs["weight"]
+      [0, 10, 20]
+    """
+    pass
+
+
+
 def read(filename, *args, **kwds):
     """Loads a graph from the given filename.
 
@@ -1446,6 +1491,17 @@ def write(graph, filename, *args, **kwds):
     """
     return graph.write(filename, *args, **kwds)
 save=write
+
+def summary(o, f=sys.stdout):
+    """Prints a summary of object o to a given stream
+
+    @param o: the object about which a human-readable summary is requested.
+    @param f: the stream to be used
+    """
+    if hasattr(o, "summary"):
+        print >>f, o.summary()
+    else:
+        print >>f, str(o)
 
 config = configuration.init()
 

@@ -40,12 +40,18 @@ PyTypeObject igraphmodule_EdgeSeqType;
  * \param g the graph object being referenced
  * \return the allocated PyObject
  */
-PyObject* igraphmodule_EdgeSeq_New(igraphmodule_GraphObject *g) {
+PyObject* igraphmodule_EdgeSeq_new(PyTypeObject *type, PyObject *args,
+    PyObject *kwds) {
+  static char *kwlist[] = { "graph", NULL };
+  PyObject *g;
   igraphmodule_EdgeSeqObject* o;
   
-  o=PyObject_GC_New(igraphmodule_EdgeSeqObject, &igraphmodule_EdgeSeqType);
-  o->gref=PyWeakref_NewRef((PyObject*)g, NULL);
-  //Py_INCREF(g);
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!", kwlist,
+	&igraphmodule_GraphType, &g))
+	  return NULL;
+
+  o=PyObject_GC_New(igraphmodule_EdgeSeqObject, type);
+  o->gref=PyWeakref_NewRef(g, NULL);
   PyObject_GC_Track(o);
   
   RC_ALLOC("EdgeSeq", o);

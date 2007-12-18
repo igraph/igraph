@@ -37,7 +37,8 @@ typedef struct
   PyObject* gref;
 } igraphmodule_EdgeSeqObject;
 
-PyObject* igraphmodule_EdgeSeq_New(igraphmodule_GraphObject *g);
+PyObject* igraphmodule_EdgeSeq_new(PyTypeObject *subtype,
+  PyObject *args, PyObject *kwds);
 int igraphmodule_EdgeSeq_traverse(igraphmodule_EdgeSeqObject *self,
 				  visitproc visit, void *arg);
 int igraphmodule_EdgeSeq_clear(igraphmodule_EdgeSeqObject *self);

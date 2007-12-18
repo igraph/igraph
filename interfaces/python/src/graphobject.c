@@ -46,10 +46,7 @@ PyTypeObject igraphmodule_GraphType;
  */
 void igraphmodule_Graph_init_internal(igraphmodule_GraphObject * self)
 {
-  if (!self)
-    return;
-  self->vseq = NULL;
-  self->eseq = NULL;
+  if (!self) return;
   self->destructor = NULL;
   self->weakreflist = NULL;
   self->g.attr = NULL;
@@ -102,14 +99,6 @@ int igraphmodule_Graph_clear(igraphmodule_GraphObject * self)
   PyObject *tmp;
   PyObject_GC_UnTrack(self);
 
-  tmp = self->vseq;
-  self->vseq = NULL;
-  Py_XDECREF(tmp);
-
-  tmp = self->eseq;
-  self->eseq = NULL;
-  Py_XDECREF(tmp);
-
   tmp = self->destructor;
   self->destructor = NULL;
   Py_XDECREF(tmp);
@@ -151,13 +140,6 @@ int igraphmodule_Graph_traverse(igraphmodule_GraphObject * self,
         return vret;
     }
   }
-
-  // Funny things happen when we traverse the contained VertexSeq or EdgeSeq
-  // object (it results in obviously fake memory leaks)
-  /*if (self->vseq) {
-     vret=visit(self->vseq, arg);
-     if (vret != 0) return vret;
-     } */
 
   return 0;
 }
@@ -208,9 +190,8 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject * self)
  * \sa igraph_create
  */
 int igraphmodule_Graph_init(igraphmodule_GraphObject * self,
-                            PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] = { "n", "edges", "directed", NULL };
+                            PyObject * args, PyObject * kwds) {
+  static char *kwlist[] = { "n", "edges", "directed", NULL };
   int n = 1;
   PyObject *edges = NULL, *dir = Py_False;
   igraph_vector_t edges_vector;
@@ -5586,32 +5567,6 @@ PyObject *igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject * self)
 }
 
 /** \ingroup python_interface_graph
- * \brief Returns the vertex sequence of the graph
- */
-PyObject *igraphmodule_Graph_get_vertices(igraphmodule_GraphObject * self,
-                                          void *closure)
-{
-  if (self->vseq == NULL) {
-    self->vseq = igraphmodule_VertexSeq_New(self);
-  }
-  Py_INCREF(self->vseq);
-  return self->vseq;
-}
-
-/** \ingroup python_interface_graph
- * \brief Returns the edge sequence of the graph
- */
-PyObject *igraphmodule_Graph_get_edges(igraphmodule_GraphObject * self,
-                                       void *closure)
-{
-  if (self->eseq == NULL) {
-    self->eseq = igraphmodule_EdgeSeq_New(self);
-  }
-  Py_INCREF(self->eseq);
-  return self->eseq;
-}
-
-/** \ingroup python_interface_graph
  * \brief Creates the disjoint union of two graphs (operator version)
  */
 PyObject *igraphmodule_Graph_disjoint_union(igraphmodule_GraphObject * self,
@@ -6753,28 +6708,6 @@ PyObject *igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject
  * \brief Member list of the \c igraph.Graph object type
  */
 #define OFF(x) offsetof(igraphmodule_GraphObject, x)
-
-struct PyGetSetDef igraphmodule_Graph_getseters[] = {
-  {"vs", (getter) igraphmodule_Graph_get_vertices, NULL,
-   "The sequence of vertices in the graph.", NULL},
-  {"es", (getter) igraphmodule_Graph_get_edges, NULL,
-   "The sequence of edges in the graph.", NULL},
-  {NULL}
-};
-
-/*
-static PyMemberDef igraphmodule_Graph_members[] = {
-  {"vertices", T_OBJECT, OFF(vseq), RO,
-      "Sequence of vertices in the graph"
-  },
-  {"vs", T_OBJECT, OFF(vseq), RO,
-      "Sequence of vertices in the graph. Alias for 'vertices'."
-  },
-  {"nodes", T_OBJECT, OFF(vseq), RO,
-      "Sequence of vertices in the graph. Alias for 'nodes'."
-  },
-  {NULL}
-};*/
 
 /** \ingroup python_interface
  * \brief Method list of the \c igraph.Graph object type
@@ -8835,7 +8768,7 @@ PyTypeObject igraphmodule_GraphType = {
   0,                            /* tp_iternext */
   igraphmodule_Graph_methods,   /* tp_methods */
   0,                            /* tp_members */
-  igraphmodule_Graph_getseters, /* tp_getset */
+  0,                            /* tp_getset */
   0,                            /* tp_base */
   0,                            /* tp_dict */
   0,                            /* tp_descr_get */

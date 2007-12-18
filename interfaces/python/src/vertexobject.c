@@ -37,7 +37,7 @@ PyTypeObject igraphmodule_VertexType;
 /**
  * \ingroup python_interface_vertex
  * \brief Allocates a new Python vertex object
- * \param gref weak reference of the \c igraph.Graph being referenced by the vertex
+ * \param gref the \c igraph.Graph being referenced by the vertex
  * \param idx the index of the vertex
  * 
  * \warning \c igraph references its vertices by indices, so if
@@ -46,9 +46,9 @@ PyTypeObject igraphmodule_VertexType;
  * changes, your existing vertex objects will point to elsewhere
  * (or they might even get invalidated).
  */
-PyObject* igraphmodule_Vertex_New(PyObject *gref, long idx) {
+PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, long idx) {
   igraphmodule_VertexObject* self;
-  self=PyObject_GC_New(igraphmodule_VertexObject, &igraphmodule_VertexType);
+  self=PyObject_New(igraphmodule_VertexObject, &igraphmodule_VertexType);
   if (self) {
     RC_ALLOC("Vertex", self);
     Py_INCREF(gref);
@@ -56,22 +56,6 @@ PyObject* igraphmodule_Vertex_New(PyObject *gref, long idx) {
     self->idx=idx;
   }
   return (PyObject*)self;
-}
-
-/**
- * \ingroup python_interface_vertex
- * \brief Support for cyclic garbage collection in Python
- */
-int igraphmodule_Vertex_traverse(igraphmodule_VertexObject *self,
-                    visitproc visit, void *arg) {
-  int vret;
-  
-  if (self->gref) {
-    vret=visit((PyObject*)self->gref, arg);
-    if (vret != 0) return vret;
-  }
-  
-  return 0;
 }
 
 /**
@@ -97,7 +81,7 @@ void igraphmodule_Vertex_dealloc(igraphmodule_VertexObject* self) {
 
   RC_DEALLOC("Vertex", self);
 
-  PyObject_GC_Del((PyObject*)self);
+  PyObject_Del((PyObject*)self);
 }
 
 /** \ingroup python_interface_vertex
@@ -106,12 +90,9 @@ void igraphmodule_Vertex_dealloc(igraphmodule_VertexObject* self) {
  * \return the formatted textual representation as a \c PyObject
  */
 PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
-  PyObject *o, *s, *grepr, *drepr;
+  PyObject *s, *grepr, *drepr;
 
-  o=igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-  
-  grepr=PyObject_Repr(o);
+  grepr=PyObject_Repr((PyObject*)self->gref);
   if (!grepr) return NULL;
   drepr=PyObject_Repr(igraphmodule_Vertex_attributes(self));
   if (!drepr) { Py_DECREF(grepr); return NULL; }
@@ -126,9 +107,8 @@ PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
  * \brief Returns the number of vertex attributes
  */
 int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return 0;
   if (!((PyObject**)o->g.attr)[1]) return 0;
   return PyDict_Size(((PyObject**)o->g.attr)[1]);
@@ -138,24 +118,17 @@ int igraphmodule_Vertex_attribute_count(igraphmodule_VertexObject* self) {
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_Vertex_attribute_names(igraphmodule_VertexObject* self) {
-  igraphmodule_GraphObject *o;
-  
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-
-  return igraphmodule_Graph_vertex_attributes(o);
+  if (!self->gref) return NULL;
+  return igraphmodule_Graph_vertex_attributes(self->gref);
 }
 
 /** \ingroup python_interface_vertex
  * \brief Returns a dict with attribue names and values
  */
 PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   PyObject *names, *dict;
   long i, n;
-
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
 
   dict=PyDict_New();
   if (!dict) return NULL;
@@ -189,11 +162,8 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
  */
 PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
                        PyObject* s) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   PyObject* result;
-  
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
   
   result=PyDict_GetItem(((PyObject**)o->g.attr)[ATTRHASH_IDX_VERTEX], s);
   if (result) {
@@ -221,12 +191,11 @@ PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
  * \return 0 if everything's ok, -1 in case of error
  */
 int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject* k, PyObject* v) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o=self->gref;
   PyObject* result;
   int r;
   
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return -1;
+  if (o==0) return -1;
 
   if (v==NULL)
     // we are deleting attribute
@@ -366,7 +335,7 @@ PyTypeObject igraphmodule_VertexType =
   0,                                          // tp_getattro
   0,                                          // tp_setattro
   0,                                          // tp_as_buffer
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, // tp_flags
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   // tp_flags
   "Class representing a single vertex in a graph.\n\n"
   "The vertex is referenced by its index, so if the underlying graph\n"
   "changes, the semantics of the vertex object might change as well\n"

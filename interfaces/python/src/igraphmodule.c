@@ -1119,16 +1119,14 @@ extern PyObject* igraphmodule_arpack_options_default;
 PyMODINIT_FUNC initcore(void) {
   PyObject* m;
   
-  igraphmodule_VertexSeqType.tp_traverse = (traverseproc)igraphmodule_VertexSeq_traverse;
-  igraphmodule_VertexSeqType.tp_clear = (inquiry)igraphmodule_VertexSeq_clear;
   if (PyType_Ready(&igraphmodule_VertexSeqType) < 0) return;
   
-  igraphmodule_VertexType.tp_traverse = (traverseproc)igraphmodule_Vertex_traverse;
   igraphmodule_VertexType.tp_clear = (inquiry)igraphmodule_Vertex_clear;
   if (PyType_Ready(&igraphmodule_VertexType) < 0) return;
   
   igraphmodule_EdgeSeqType.tp_traverse = (traverseproc)igraphmodule_EdgeSeq_traverse;
   igraphmodule_EdgeSeqType.tp_clear = (inquiry)igraphmodule_EdgeSeq_clear;
+  igraphmodule_EdgeSeqType.tp_new = (newfunc)igraphmodule_EdgeSeq_new;
   if (PyType_Ready(&igraphmodule_EdgeSeqType) < 0) return;
   
   igraphmodule_EdgeType.tp_traverse = (traverseproc)igraphmodule_Edge_traverse;
@@ -1147,8 +1145,6 @@ PyMODINIT_FUNC initcore(void) {
   
   PyModule_AddObject(m, "GraphBase", (PyObject*)&igraphmodule_GraphType);
   PyModule_AddObject(m, "BFSIter", (PyObject*)&igraphmodule_BFSIterType);
-  /* These types are not necessary to be registered, but I want epydoc to
-   * see them so the proper documentation can be generated for them */
   PyModule_AddObject(m, "ARPACKOptions", (PyObject*)&igraphmodule_ARPACKOptionsType);
   PyModule_AddObject(m, "Edge", (PyObject*)&igraphmodule_EdgeType);
   PyModule_AddObject(m, "EdgeSeq", (PyObject*)&igraphmodule_EdgeSeqType);

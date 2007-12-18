@@ -34,14 +34,15 @@
 typedef struct
 {
   PyObject_HEAD
-  PyObject* gref;
+  igraphmodule_GraphObject* gref;
   igraph_vs_t vs;
+  PyObject* weakreflist;
 } igraphmodule_VertexSeqObject;
 
-PyObject* igraphmodule_VertexSeq_New(igraphmodule_GraphObject *g);
-int igraphmodule_VertexSeq_traverse(igraphmodule_VertexSeqObject *self,
-					   visitproc visit, void *arg);
-int igraphmodule_VertexSeq_clear(igraphmodule_VertexSeqObject *self);
+PyObject* igraphmodule_VertexSeq_new(PyTypeObject *subtype,
+  PyObject* args, PyObject* kwds);
+int igraphmodule_VertexSeq_init(igraphmodule_VertexSeqObject* self,
+  PyObject* args, PyObject* kwds);
 void igraphmodule_VertexSeq_dealloc(igraphmodule_VertexSeqObject* self);
 
 int igraphmodule_VertexSeq_sq_length(igraphmodule_VertexSeqObject *self);
