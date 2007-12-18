@@ -70,8 +70,23 @@ igraphmodule_VertexSeq_copy(igraphmodule_VertexSeqObject* o) {
 
   copy=(igraphmodule_VertexSeqObject*)PyType_GenericNew(o->ob_type, 0, 0);
   if (copy == NULL) return NULL;
-  
-  copy->vs = o->vs;
+ 
+  if (igraph_vs_type(&o->vs) == IGRAPH_VS_VECTOR) {
+    igraph_vector_t v;
+    if (igraph_vector_copy(&v, o->vs.data.vecptr)) {
+      igraphmodule_handle_igraph_error();
+      return 0;
+    }
+    if (igraph_vs_vector_copy(&copy->vs, &v)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&v);
+      return 0;
+    }
+    igraph_vector_destroy(&v);
+  } else {
+    copy->vs = o->vs;
+  }
+
   copy->gref = o->gref;
   if (o->gref) Py_INCREF(o->gref);
   RC_ALLOC("VertexSeq(copy)", copy);
@@ -135,15 +150,15 @@ int igraphmodule_VertexSeq_init(igraphmodule_VertexSeqObject *self,
  * \brief Deallocates a Python representation of a given vertex sequence object
  */
 void igraphmodule_VertexSeq_dealloc(igraphmodule_VertexSeqObject* self) {
-  /*if (self->weakreflist != NULL)
-    PyObject_ClearWeakRefs((PyObject *) self);*/
+  if (self->weakreflist != NULL)
+    PyObject_ClearWeakRefs((PyObject *) self);
   if (self->gref) {
     igraph_vs_destroy(&self->vs);
     Py_DECREF(self->gref);
     self->gref=0;
   }
+  self->ob_type->tp_free((PyObject*)self);
   RC_DEALLOC("VertexSeq", self);
-  PyObject_Del(self);
 }
 
 /**
@@ -639,27 +654,8 @@ PyMethodDef igraphmodule_VertexSeq_methods[] = {
   },
   {"select", (PyCFunction)igraphmodule_VertexSeq_select,
    METH_VARARGS | METH_KEYWORDS,
-   "select(...) -> VertexSeq\n"
-   "Selects a subset of the vertex sequence based on some criteria\n\n"
-   "The selection criteria can be specified by the positional and the keyword\n"
-   "arguments.\n\n"
-   "  - If the first positional argument is C{None}, an empty sequence is\n"
-   "    returned.\n\n"
-   "  - If the first positional argument is a callable object, the object\n"
-   "    will be called for every vertex in the sequence. If it returns\n"
-   "    C{True}, the vertex will be included, otherwise it will be excluded.\n\n"
-   "  - If the first positional argument is an iterable, it must return\n"
-   "    integers and they will be considered as indices of the current vertex\n"
-   "    set (NOT the vertex set of the graph -- the difference matters when\n"
-   "    one filters a vertex set that has already been filtered by a previous\n"
-   "    invocation of L{VertexSet.select()}. In this case, the indices do not\n"
-   "    refer directly to the vertices of the graph but to the elements of the\n"
-   "    vertex sequence.\n\n"
-   "  - If the first positional argument is an integer, all remaining arguments\n"
-   "    are expected to be integers. They are considered as indices of the\n"
-   "    current vertex set again.\n\n"
-   "\n"
-   "@return: the new, filtered vertex sequence\n"
+   "select(...) -> VertexSeq\n\n"
+   "For internal use only.\n"
   },
   {NULL}
 };

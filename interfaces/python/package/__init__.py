@@ -1465,8 +1465,38 @@ class VertexSeq(core.VertexSeq):
       >>> g.vs["weight"]
       [0, 10, 20]
     """
-    pass
 
+    def select(self, *args, **kwds):
+        """Selects a subset of the vertex sequence based on some criteria
+        
+        The selection criteria can be specified by the positional and the keyword
+        arguments. Positional arguments are always processed before keyword
+        arguments.
+        
+          - If the first positional argument is C{None}, an empty sequence is
+            returned.
+            
+          - If the first positional argument is a callable object, the object
+            will be called for every vertex in the sequence. If it returns
+            C{True}, the vertex will be included, otherwise it will
+            be excluded.
+            
+          - If the first positional argument is an iterable, it must return
+            integers and they will be considered as indices of the current
+            vertex set (NOT the whole vertex set of the graph -- the
+            difference matters when one filters a vertex set that has
+            already been filtered by a previous invocation of
+            L{VertexSet.select()}. In this case, the indices do not refer
+            directly to the vertices of the graph but to the elements of
+            the filtered vertex sequence.
+            
+          - If the first positional argument is an integer, all remaining
+            arguments are expected to be integers. They are considered as
+            indices of the current vertex set again.
+            
+        @return: the new, filtered vertex sequence"""
+        vs = core.VertexSeq.select(self, *args)
+        return vs
 
 
 def read(filename, *args, **kwds):

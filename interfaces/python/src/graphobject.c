@@ -152,9 +152,9 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject * self)
 {
   PyObject *r;
 
-  // Clear weak references
+  /* Clear weak references */
   if (self->weakreflist != NULL)
-    PyObject_ClearWeakRefs((PyObject *) self);
+     PyObject_ClearWeakRefs((PyObject *) self);
 
   igraph_destroy(&self->g);
 
@@ -169,8 +169,7 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject * self)
 
   RC_DEALLOC("Graph", self);
 
-  PyObject_GC_Del((PyObject *) self);
-  // self->ob_type->tp_free((PyObject*)self);
+  self->ob_type->tp_free((PyObject*)self);
 }
 
 /**

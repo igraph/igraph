@@ -502,7 +502,6 @@ inline int igraph_vs_type(const igraph_vs_t *vs) { return vs->type; }
 int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
   igraph_integer_t *result) {
   igraph_vector_t vec;
-  igraph_integer_t n;
   igraph_bool_t *seen;
   long i;
 
