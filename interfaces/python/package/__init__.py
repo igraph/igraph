@@ -39,6 +39,7 @@ import os
 import math
 import gzip
 import sys
+import operator
 from tempfile import mkstemp
 from warnings import warn
 
@@ -1431,8 +1432,9 @@ class VertexSeq(core.VertexSeq):
     This class is most easily accessed by the C{vs} field of the
     L{Graph} object, which returns an ordered sequence of all vertices in
     the graph. The vertex sequence can be refined by invoking the
-    L{VertexSeq.select()} method.
-    
+    L{VertexSeq.select()} method. L{VertexSeq.select()} can also be
+    accessed by simply calling the L{VertexSeq} object.
+
     An alternative way to create a vertex sequence referring to a given
     graph is to use the constructor directly:
     
@@ -1486,18 +1488,88 @@ class VertexSeq(core.VertexSeq):
             vertex set (NOT the whole vertex set of the graph -- the
             difference matters when one filters a vertex set that has
             already been filtered by a previous invocation of
-            L{VertexSet.select()}. In this case, the indices do not refer
+            L{VertexSeq.select()}. In this case, the indices do not refer
             directly to the vertices of the graph but to the elements of
             the filtered vertex sequence.
             
           - If the first positional argument is an integer, all remaining
             arguments are expected to be integers. They are considered as
             indices of the current vertex set again.
-            
+
+        Keyword arguments can be used to filter the vertices based on their
+        attributes. The name of the keyword specifies the name of the attribute
+        and the filtering operator, they should be concatenated by an
+        underscore (C{_}) character. Attribute names can also contain
+        underscores, but operator names don't, so the operator is always the
+        largest trailing substring of the keyword name that does not contain
+        an underscore. Possible operators are:
+
+          - C{eq}: equal to
+
+          - C{ne}: not equal to
+
+          - C{lt}: less than
+          
+          - C{gt}: greater than
+
+          - C{le}: less than or equal to
+
+          - C{ge}: greater than or equal to
+
+          - C{in}: checks if the value of an attribute is in a given list
+
+          - C{notin}: checks if the value of an attribute is not in a given
+            list
+
+        For instance, if you want to filter vertices with a numeric C{age}
+        property larger than 200, you have to write:
+
+          >>> g.vs.select(age_gt=200)
+
+        Similarly, to filter vertices whose C{type} is in a list of predefined
+        types:
+
+          >>> list_of_types = ["HR", "Finance", "Management"]
+          >>> g.vs.select(type_in=list_of_types)
+
+        If the operator is omitted, it defaults to C{eq}. For instance, the
+        following selector selects vertices whose C{cluster} property equals
+        to 2:
+
+          >>> g.vs.select(cluster=2)
+
+        In the case of an unknown operator, it is assumed that the
+        recognized operator is part of the attribute name and the actual
+        operator is C{eq}.
+
         @return: the new, filtered vertex sequence"""
         vs = core.VertexSeq.select(self, *args)
-        return vs
 
+        operators = {
+            "lt": operator.lt, \
+            "gt": operator.gt, \
+            "le": operator.le, \
+            "ge": operator.ge, \
+            "eq": operator.eq, \
+            "ne": operator.ne, \
+            "in": lambda a, b: a in b, \
+            "notin": lambda a, b: a not in b }
+        for keyword, value in kwds.iteritems():
+            if "_" not in keyword: keyword = keyword+"_eq"
+            pos = keyword.rindex("_")
+            attr, op = keyword[0:pos], keyword[pos+1:]
+            try:
+                func = operators[op]
+            except KeyError:
+                # No such operator, assume that it's part of the attribute name
+                attr = "%s_%s" % (attr,op)
+                func = operators["eq"]
+
+            filtered_idxs=[i for i, v in enumerate(vs) if func(v[attr], value)]
+            vs = vs.select(filtered_idxs)
+
+        return vs
+    __call__ = select
 
 def read(filename, *args, **kwds):
     """Loads a graph from the given filename.
