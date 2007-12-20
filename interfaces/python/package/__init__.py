@@ -1565,11 +1565,19 @@ class VertexSeq(core.VertexSeq):
                 attr = "%s_%s" % (attr,op)
                 func = operators["eq"]
 
-            filtered_idxs=[i for i, v in enumerate(vs) if func(v[attr], value)]
+            values = vs[attr]
+            filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
             vs = vs.select(filtered_idxs)
 
         return vs
-    __call__ = select
+
+    def __call__(self, *args, **kwds):
+        """Shorthand notation to select()
+
+        This method simply passes all its arguments to L{VertexSeq.select()}.
+        """
+        return self.select(*args, **kwds)
+
 
 def read(filename, *args, **kwds):
     """Loads a graph from the given filename.

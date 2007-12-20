@@ -242,12 +242,13 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
   PyObject *result=0, *values, *item;
   long int i, n;
 
+  PyErr_Clear();
   values=PyDict_GetItem(((PyObject**)gr->g.attr)[ATTRHASH_IDX_VERTEX], o);
   if (!values) {
     PyErr_SetString(PyExc_KeyError, "Attribute does not exist");
     return NULL;
   } else if (PyErr_Occurred()) return NULL;
-
+  
   switch (igraph_vs_type(&self->vs)) {
     case IGRAPH_VS_NONE:
       n = 0;
@@ -386,10 +387,10 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
     if (list != 0) {
       /* Yes, we have. Modify its items to the items found in values */
       for (i=0; i<n; i++) {
-        item = PyList_GetItem(values, VECTOR(vs)[i]);
-        if (item == 0) continue;
+        item = PyList_GetItem(values, i);
+        if (item == 0) return -1;
         Py_INCREF(item);
-        if (PyList_SetItem(list, i, item)) {
+        if (PyList_SetItem(list, (long)VECTOR(vs)[i], item)) {
           Py_DECREF(item);
           return -1;
         } /* PyList_SetItem stole a reference to the item automatically */ 
@@ -406,10 +407,10 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
         PyList_SET_ITEM(list, i, Py_None);
       }
       for (i=0; i<n; i++) {
-        item = PyList_GET_ITEM(values, (long)VECTOR(vs)[i]);
+        item = PyList_GET_ITEM(values, i);
         if (item == 0) { Py_DECREF(list); return -1; }
         Py_INCREF(item);
-        PyList_SET_ITEM(list, i, item);
+        PyList_SET_ITEM(list, (long)VECTOR(vs)[i], item);
       }
       if (PyDict_SetItem(dict, attrname, list)) {
         Py_DECREF(list);
