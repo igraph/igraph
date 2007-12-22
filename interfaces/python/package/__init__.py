@@ -252,7 +252,7 @@ class Graph(core.GraphBase):
             if type is None: type = GET_ADJACENCY_BOTH
 
         if attribute is None: return Matrix(GraphBase.get_adjacency(self, type))
-        if attribute not in self.es.attributes():
+        if attribute not in self.es.attribute_names():
             raise ValueError, "Attribute does not exist"
         data = [[None] * self.vcount() for _ in xrange(self.vcount())]
 
@@ -1299,7 +1299,7 @@ class Graph(core.GraphBase):
         del vertex_shapes
 
         # Draw the vertex labels
-        if not kwds.has_key("vertex_label") and "label" not in self.vs.attributes():
+        if not kwds.has_key("vertex_label") and "label" not in self.vs.attribute_names():
             vertex_labels = map(str, xrange(self.vcount()))
         elif kwds.has_key("vertex_label") and kwds["vertex_label"] is None:
             vertex_labels = [""] * self.vcount()

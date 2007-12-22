@@ -938,3 +938,10 @@ igraph_revolver_ml_AD_alpha_a_beta:
                 REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, INT agebins=300, \
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.AD.alpha.a.beta
+
+#######################################
+# Other, (yet) undocumented functions
+#######################################
+igraph_convergence_degree:
+        PARAMS: GRAPH graph, OUT VECTOR result
+	IGNORE: RR, RC, RNamespace

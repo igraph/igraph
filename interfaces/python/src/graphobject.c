@@ -954,6 +954,26 @@ PyObject *igraphmodule_Graph_girth(igraphmodule_GraphObject *self,
   return PyInt_FromLong((long)girth);
 }
 
+/**
+ * \ingroup python_interface_graph
+ * \brief Calculates the convergence degree of the edges in a graph 
+ */
+PyObject *igraphmodule_Graph_convergence_degree(igraphmodule_GraphObject *self) {
+  igraph_vector_t result;
+	PyObject *o;
+
+  igraph_vector_init(&result, 0);
+  if (igraph_convergence_degree(&self->g, &result)) {
+	  igraphmodule_handle_igraph_error();
+	  igraph_vector_destroy(&result);
+	  return NULL;
+  }
+
+  o=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&result);
+  return o;
+}
+
 /** \ingroup python_interface_graph
  * \brief Generates a graph from its adjacency matrix
  * \return a reference to the newly generated Python igraph object
@@ -7470,6 +7490,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the length of the shortest circle or (if C{return_shortest_circle})\n"
    "  is true, the shortest circle itself as a list\n"
   },
+
+  /* interface to igraph_convergence_degree */
+	{"convergence_degree", (PyCFunction)igraphmodule_Graph_convergence_degree,
+	 METH_NOARGS,
+	 "convergence_degree()\n\n"
+	 "Undocumented (yet)."
+	},
 
   /* interface to igraph_hub_score */
   {"hub_score", (PyCFunction)igraphmodule_Graph_hub_score,

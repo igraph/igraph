@@ -3788,3 +3788,110 @@ int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to)
   IGRAPH_FINALLY_CLEAN(1);
   return ret;
 }
+
+
+int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result) {
+  long int no_of_nodes = igraph_vcount(graph);
+  long int no_of_edges = igraph_ecount(graph);
+  long int i, j, k, n;
+  long int *geodist, *ins, *outs;
+  igraph_vector_t *eids;
+  igraph_dqueue_t q;
+  igraph_adjedgelist_t adjlist;
+  igraph_bool_t directed = igraph_is_directed(graph);
+
+  IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
+  IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
+  IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
+
+  ins=igraph_Calloc(no_of_edges, long int);
+  if (ins==0) {
+    IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, ins);
+  
+  outs=igraph_Calloc(no_of_edges, long int);
+  if (outs==0) {
+    IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, outs);
+  
+  geodist=igraph_Calloc(no_of_nodes, long int);
+  if (geodist==0) {
+    IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, geodist);
+
+  /* Collect shortest paths originating from/to every node to correctly
+   * determine input field sizes */
+  for (k=0; k<(directed?2:1); k++) {
+    igraph_neimode_t neimode = (k==0)?IGRAPH_OUT:IGRAPH_IN;
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, neimode));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
+    long int *vec = (k==0)?ins:outs;
+    for (i=0; i<no_of_nodes; i++) {
+      igraph_dqueue_clear(&q);
+      memset(geodist, 0, sizeof(long int)*no_of_nodes);
+      geodist[i]=1;
+      IGRAPH_CHECK(igraph_dqueue_push(&q, i));
+      IGRAPH_CHECK(igraph_dqueue_push(&q, 0.0));
+      while (!igraph_dqueue_empty(&q)) {
+        long int actnode=igraph_dqueue_pop(&q);
+        long int actdist=igraph_dqueue_pop(&q);
+        IGRAPH_ALLOW_INTERRUPTION();
+        eids=igraph_adjedgelist_get(&adjlist, actnode);
+        n=igraph_vector_size(eids);
+        for (j=0; j<n; j++) {
+          long int neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
+          if (geodist[neighbor] != 0) {
+            /* we've already seen this node, another shortest path? */
+            if (geodist[neighbor]-1 == actdist+1) {
+              /* Since this edge is in the BFS tree rooted at i, we must
+               * increase either the size of the infield or the outfield */
+              if (!directed) {
+                if (actnode < neighbor)
+                  ins[(long int)VECTOR(*eids)[j]] += 1;
+                else
+                  outs[(long int)VECTOR(*eids)[j]] += 1;
+              } else vec[(long int)VECTOR(*eids)[j]] += 1;
+            } else if (geodist[neighbor]-1 < actdist+1) continue;
+          } else {
+            /* we haven't seen this node yet */
+            IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+            IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+            /* Since this edge is in the BFS tree rooted at i, we must
+             * increase either the size of the infield or the outfield */
+            if (!directed) {
+              if (actnode < neighbor)
+                ins[(long int)VECTOR(*eids)[j]] += 1;
+              else
+                outs[(long int)VECTOR(*eids)[j]] += 1;
+            } else vec[(long int)VECTOR(*eids)[j]] += 1;
+            geodist[neighbor]=actdist+2;
+          }
+        }
+      }
+    }
+
+    igraph_adjedgelist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  IGRAPH_FINALLY_CLEAN(1);
+
+  for (i=0; i<no_of_edges; i++)
+    VECTOR(*result)[i] = (igraph_real_t)(ins[i]-outs[i])/(ins[i]+outs[i]);
+
+  if (!directed) {
+    for (i=0; i<no_of_edges; i++)
+      if (VECTOR(*result)[i] < 0) VECTOR(*result)[i] = -VECTOR(*result)[i];
+  }
+
+  igraph_free(geodist);
+  igraph_free(ins);
+  igraph_free(outs);
+  igraph_dqueue_destroy(&q);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
