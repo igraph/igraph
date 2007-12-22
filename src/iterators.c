@@ -484,6 +484,26 @@ int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs,
 } 
 
 /**
+ * \function igraph_vs_copy
+ * \brief Creates a copy of a vertex iterator
+ * \param src the iterator being copied
+ * \param dest an uninitialized iterator that will contain the copy
+ */
+int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
+  memcpy(dest, src, sizeof(igraph_vs_t));
+  switch (dest->type) {
+    case IGRAPH_VS_VECTOR:
+      dest->data.vecptr = igraph_Calloc(1,igraph_vector_t);
+      if (!dest->data.vecptr)
+        IGRAPH_ERROR("Cannot copy vertex selector", IGRAPH_ENOMEM);
+      IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)dest->data.vecptr,
+        (igraph_vector_t*)src->data.vecptr));
+      break;
+  }
+  return 0;
+}
+
+/**
  * \function igraph_vs_type
  * \brief Returns the type of the vertex selector
  */
@@ -1272,6 +1292,147 @@ int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 } 
+
+/**
+ * \function igraph_es_type
+ * \brief Returns the type of the edge selector
+ */
+inline int igraph_es_type(const igraph_es_t *es) { return es->type; }
+
+int igraph_i_es_pairs_size(const igraph_t *graph, 
+		       const igraph_es_t *es, igraph_integer_t *result);
+int igraph_i_es_path_size(const igraph_t *graph, 
+		       const igraph_es_t *es, igraph_integer_t *result);
+int igraph_i_es_multipairs_size(const igraph_t *graph, 
+		       const igraph_es_t *es, igraph_integer_t *result);
+
+/**
+ * \function igraph_es_size
+ * \brief Returns the size of the edge selector
+ *
+ * The size of the edge selector is the number of vertices it will
+ * yield when it is iterated over.
+ *
+ * \param graph the graph over which we will iterate
+ * \param result the result will be returned here
+ */
+int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
+  igraph_integer_t *result) {
+  igraph_vector_t v;
+
+  switch (es->type) {
+    case IGRAPH_ES_ALL:
+      *result = igraph_ecount(graph);
+      return 0;
+
+    case IGRAPH_ES_ALLFROM:
+      *result = igraph_ecount(graph);
+      return 0;
+
+    case IGRAPH_ES_ALLTO:
+      *result = igraph_ecount(graph);
+      return 0;
+
+    case IGRAPH_ES_ADJ:
+      IGRAPH_VECTOR_INIT_FINALLY(&v, 0);
+      IGRAPH_CHECK(igraph_adjacent(graph, &v,
+				 es->data.adj.vid, es->data.adj.mode));
+      *result = igraph_vector_size(&v);
+      igraph_vector_destroy(&v);
+      IGRAPH_FINALLY_CLEAN(1);
+      return 0;
+
+    case IGRAPH_ES_NONE:
+      *result = 0;
+      return 0;
+
+    case IGRAPH_ES_1:
+      if (es->data.eid < igraph_ecount(graph) && es->data.eid >= 0)
+        *result = 1;
+      else
+        *result = 0;
+      return 0;
+
+    case IGRAPH_ES_VECTOR:
+    case IGRAPH_ES_VECTORPTR:
+      *result = igraph_vector_size((igraph_vector_t*)es->data.vecptr);
+      return 0;
+
+    case IGRAPH_ES_SEQ:
+      *result = es->data.seq.to - es->data.seq.from;
+      return 0;
+
+    case IGRAPH_ES_PAIRS:
+      IGRAPH_CHECK(igraph_i_es_pairs_size(graph, es, result));
+      return 0;
+
+    case IGRAPH_ES_PATH:
+      IGRAPH_CHECK(igraph_i_es_path_size(graph, es, result));
+      return 0;
+
+    case IGRAPH_ES_MULTIPAIRS:
+      IGRAPH_CHECK(igraph_i_es_multipairs_size(graph, es, result));
+      return 0;
+
+	  default:
+      IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
+      IGRAPH_EINVAL);
+  }
+
+  return 0;
+}
+
+int igraph_i_es_pairs_size(const igraph_t *graph, 
+		       const igraph_es_t *es, igraph_integer_t *result) {
+  long int n=igraph_vector_size(es->data.path.ptr);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+
+  if (n % 2 != 0) {
+    IGRAPH_ERROR("Cannot calculate edge selector length from odd number of vertices",
+		 IGRAPH_EINVAL);
+  }
+  if (!igraph_vector_isininterval(es->data.path.ptr, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_EINVVID);
+  }
+
+  *result = n/2;
+  /* Check for the existence of all edges */
+  for (i=0; i<*result; i++) {
+    long int from=VECTOR(*es->data.path.ptr)[2*i];
+    long int to=VECTOR(*es->data.path.ptr)[2*i+1];
+    igraph_integer_t eid;
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode));
+  }
+  
+  return 0;
+}
+
+int igraph_i_es_path_size(const igraph_t *graph, 
+		      const igraph_es_t *es, igraph_integer_t *result) {
+  long int n=igraph_vector_size(es->data.path.ptr);
+  long int no_of_nodes=igraph_vcount(graph);
+  long int i;
+
+  if (!igraph_vector_isininterval(es->data.path.ptr, 0, no_of_nodes-1)) {
+    IGRAPH_ERROR("Cannot calculate selector length", IGRAPH_EINVVID);
+  }
+  
+  if (n<=1) *result=0; else *result=n-1;
+  for (i=0; i<*result; i++) {
+    long int from=VECTOR(*es->data.path.ptr)[i];
+    long int to=VECTOR(*es->data.path.ptr)[i+1];
+    igraph_integer_t eid;
+    IGRAPH_CHECK(igraph_get_eid(graph, &eid, from, to, es->data.path.mode));
+  }
+
+  return 0;
+}
+
+int igraph_i_es_multipairs_size(const igraph_t *graph, 
+		       const igraph_es_t *es, igraph_integer_t *result) {
+  IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_UNIMPLEMENTED);
+}
 
 /**************************************************/
 

@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "memory.h"
 #include <math.h>
+#include <string.h>    /* memset */
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
 				    long int n, void *extra) {

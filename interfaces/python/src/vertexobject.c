@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:ts=2 sw=2 sts=2 et: */
+/* vim: set ts=2 sw=2 sts=2 et: */
 
 /* 
    IGraph library.
@@ -60,7 +60,7 @@ PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, long idx) {
 
 /**
  * \ingroup python_interface_vertex
- * \brief Clears the graph object's subobject (before deallocation)
+ * \brief Clears the vertex's subobject (before deallocation)
  */
 int igraphmodule_Vertex_clear(igraphmodule_VertexObject *self) {
   PyObject *tmp;

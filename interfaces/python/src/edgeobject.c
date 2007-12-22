@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:ts=2 sw=2 sts=2 et: */
+/* vim: set ts=2 sw=2 sts=2 et: */
 
 /* 
    IGraph library.
@@ -46,11 +46,11 @@ PyTypeObject igraphmodule_EdgeType;
  * changes, your existing edge objects will point to elsewhere
  * (or they might even get invalidated).
  */
-PyObject* igraphmodule_Edge_New(PyObject *gref, long idx) {
+PyObject* igraphmodule_Edge_New(igraphmodule_GraphObject *gref, long idx) {
   igraphmodule_EdgeObject* self;
-  self=PyObject_GC_New(igraphmodule_EdgeObject, &igraphmodule_EdgeType);
+  self=PyObject_New(igraphmodule_EdgeObject, &igraphmodule_EdgeType);
   if (self) {
-    /* RC_ALLOC("Edge", self); */
+    RC_ALLOC("Edge", self);
     Py_INCREF(gref);
     self->gref=gref;
     self->idx=idx;
@@ -60,23 +60,7 @@ PyObject* igraphmodule_Edge_New(PyObject *gref, long idx) {
 
 /**
  * \ingroup python_interface_edge
- * \brief Support for cyclic garbage collection in Python
- */
-int igraphmodule_Edge_traverse(igraphmodule_EdgeObject *self,
-                   visitproc visit, void *arg) {
-  int vret;
-  
-  if (self->gref) {
-    vret=visit((PyObject*)self->gref, arg);
-    if (vret != 0) return vret;
-  }
-  
-  return 0;
-}
-
-/**
- * \ingroup python_interface_edge
- * \brief Clears the graph object's subobject (before deallocation)
+ * \brief Clears the edge's subobject (before deallocation)
  */
 int igraphmodule_Edge_clear(igraphmodule_EdgeObject *self) {
   PyObject *tmp;
@@ -95,9 +79,9 @@ int igraphmodule_Edge_clear(igraphmodule_EdgeObject *self) {
 void igraphmodule_Edge_dealloc(igraphmodule_EdgeObject* self) {
   igraphmodule_Edge_clear(self);
 
-  /* RC_DEALLOC("Edge", self); */
+  RC_DEALLOC("Edge", self);
 
-  PyObject_GC_Del((PyObject*)self);
+  PyObject_Del((PyObject*)self);
 }
 
 /** \ingroup python_interface_edge
@@ -106,12 +90,9 @@ void igraphmodule_Edge_dealloc(igraphmodule_EdgeObject* self) {
  * \return the formatted textual representation as a \c PyObject
  */
 PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
-  PyObject *o, *s, *grepr, *drepr;
+  PyObject *s, *grepr, *drepr;
 
-  o=igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-  
-  grepr=PyObject_Repr(o);
+  grepr=PyObject_Repr((PyObject*)self->gref);
   if (!grepr) return NULL;
   drepr=PyObject_Repr(igraphmodule_Edge_attributes(self));
   if (!drepr) { Py_DECREF(grepr); return NULL; }
@@ -126,9 +107,8 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
  * \brief Returns the number of edge attributes
  */
 int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
   if (!o) return 0;
   if (!((PyObject**)o->g.attr)[1]) return 0;
   return PyDict_Size(((PyObject**)o->g.attr)[1]);
@@ -138,24 +118,17 @@ int igraphmodule_Edge_attribute_count(igraphmodule_EdgeObject* self) {
  * \brief Returns the list of attribute names
  */
 PyObject* igraphmodule_Edge_attribute_names(igraphmodule_EdgeObject* self) {
-  igraphmodule_GraphObject *o;
-  
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-
-  return igraphmodule_Graph_edge_attributes(o);
+  if (!self->gref) return NULL;
+  return igraphmodule_Graph_edge_attributes(self->gref);
 }
 
 /** \ingroup python_interface_edge
  * \brief Returns a dict with attribute names and values
  */
 PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   PyObject *names, *dict;
   long i, n;
-
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
 
   dict=PyDict_New();
   if (!dict) return NULL;
@@ -182,6 +155,23 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
   return dict;
 }
 
+/**
+ * \ingroup python_interface_edge
+ * Returns the edge index
+ */
+PyObject* igraphmodule_Edge_get_index(igraphmodule_EdgeObject* self, void* closure) {
+  return PyInt_FromLong((long)self->idx);
+}
+
+/**
+ * \ingroup python_interface_edge
+ * Returns the edge index as an ordinary C long
+ */
+long igraphmodule_Edge_get_index_long(igraphmodule_EdgeObject* self) {
+  return (long)self->idx;
+}
+
+
 /** \ingroup python_interface_edge
  * \brief Returns the corresponding value to a given attribute of the edge
  * \param self the edge object
@@ -189,12 +179,9 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
  */
 PyObject* igraphmodule_Edge_get_attribute(igraphmodule_EdgeObject* self,
                       PyObject* s) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   PyObject* result;
-  
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-  
+
   result=PyDict_GetItem(((PyObject**)o->g.attr)[2], s);
   if (result) {
     /* result is a list, so get the element with index self->idx */
@@ -221,12 +208,11 @@ PyObject* igraphmodule_Edge_get_attribute(igraphmodule_EdgeObject* self,
  * \return 0 if everything's ok, -1 in case of error
  */
 int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, PyObject* v) {
-  igraphmodule_GraphObject *o;
+  igraphmodule_GraphObject *o=self->gref;
   PyObject* result;
   int r;
   
-  o=(igraphmodule_GraphObject*)igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return -1;
+  if (o==0) return -1;
 
   if (v==NULL)
     // we are deleting attribute
@@ -286,13 +272,10 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
  * Returns the source node index of an edge
  */
 PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closure) {
-  PyObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   igraph_integer_t from, to;
   
-  o=igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-  
-  if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
+  if (igraph_edge(&o->g, self->idx, &from, &to)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
   return PyInt_FromLong((long)from);
@@ -303,13 +286,10 @@ PyObject* igraphmodule_Edge_get_from(igraphmodule_EdgeObject* self, void* closur
  * Returns the target node index of an edge
  */
 PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure) {
-  PyObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   igraph_integer_t from, to;
   
-  o=igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-  
-  if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
+  if (igraph_edge(&o->g, self->idx, &from, &to)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
   return PyInt_FromLong((long)to);
@@ -320,13 +300,10 @@ PyObject* igraphmodule_Edge_get_to(igraphmodule_EdgeObject* self, void* closure)
  * Returns the target node index of an edge
  */
 PyObject* igraphmodule_Edge_get_tuple(igraphmodule_EdgeObject* self, void* closure) {
-  PyObject *o;
+  igraphmodule_GraphObject *o = self->gref;
   igraph_integer_t from, to;
   
-  o=igraphmodule_resolve_graph_weakref(self->gref);
-  if (!o) return NULL;
-  
-  if (igraph_edge(&((igraphmodule_GraphObject*)o)->g, self->idx, &from, &to)) {
+  if (igraph_edge(&o->g, self->idx, &from, &to)) {
     igraphmodule_handle_igraph_error(); return NULL;
   }
   return Py_BuildValue("(ii)", (long)from, (long)to);
@@ -363,6 +340,9 @@ PyGetSetDef igraphmodule_Edge_getseters[] = {
   },
   {"tuple", (getter)igraphmodule_Edge_get_tuple, NULL,
       "Source and target node index of this edge as a tuple", NULL
+  },
+  {"index", (getter)igraphmodule_Edge_get_index, NULL,
+      "Index of this edge", NULL,
   },
   {NULL}
 };
@@ -407,7 +387,7 @@ PyTypeObject igraphmodule_EdgeType =
   0,                                          // tp_getattro
   0,                                          // tp_setattro
   0,                                          // tp_as_buffer
-  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, // tp_flags
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   // tp_flags
   "Class representing a single edge in a graph.\n\n"
   "The edge is referenced by its index, so if the underlying graph\n"
   "changes, the semantics of the edge object might change as well\n"

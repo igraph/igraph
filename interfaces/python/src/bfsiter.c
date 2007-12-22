@@ -46,7 +46,7 @@ PyObject* igraphmodule_BFSIter_new(igraphmodule_GraphObject *g, PyObject *root, 
   long int no_of_nodes, r;
   
   o=PyObject_GC_New(igraphmodule_BFSIterObject, &igraphmodule_BFSIterType);
-  o->gref=PyWeakref_NewRef((PyObject*)g, NULL);
+  o->gref=g;
   o->graph=&g->g;
   
   if (!PyInt_Check(root) && !PyObject_IsInstance(root, (PyObject*)&igraphmodule_VertexType)) {
@@ -111,7 +111,7 @@ int igraphmodule_BFSIter_traverse(igraphmodule_BFSIterObject *self,
   RC_TRAVERSE("BFSIter", self);
   
   if (self->gref) {
-    vret=visit(self->gref, arg);
+    vret=visit((PyObject*)self->gref, arg);
     if (vret != 0) return vret;
   }
   
@@ -127,7 +127,7 @@ int igraphmodule_BFSIter_clear(igraphmodule_BFSIterObject *self) {
 
   PyObject_GC_UnTrack(self);
   
-  tmp=self->gref;
+  tmp=(PyObject*)self->gref;
   self->gref=NULL;
   Py_XDECREF(tmp);
 

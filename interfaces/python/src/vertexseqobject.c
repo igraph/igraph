@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:ts=2 sts=2 sw=2 et: */
+/* vim: set ts=2 sts=2 sw=2 et: */
 
 /* 
    IGraph library.
@@ -60,7 +60,7 @@ PyObject* igraphmodule_VertexSeq_new(PyTypeObject *subtype,
 
 /**
  * \ingroup python_interface_vertexseq
- * \brief Copies avertex sequence object
+ * \brief Copies a vertex sequence object
  * \return the copied PyObject
  */
 igraphmodule_VertexSeqObject*
@@ -166,12 +166,14 @@ void igraphmodule_VertexSeq_dealloc(igraphmodule_VertexSeqObject* self) {
  * \brief Returns the length of the sequence
  */
 int igraphmodule_VertexSeq_sq_length(igraphmodule_VertexSeqObject* self) {
-  igraphmodule_GraphObject* o;
   igraph_t *g;
   igraph_integer_t result;
   if (!self->gref) return -1;
   g=&GET_GRAPH(self);
-  if (igraph_vs_size(g, &self->vs, &result)) return -1;
+  if (igraph_vs_size(g, &self->vs, &result)) {
+    igraphmodule_handle_igraph_error();
+    return -1;
+  }
   return (int)result;
 }
 
@@ -202,7 +204,8 @@ PyObject* igraphmodule_VertexSeq_sq_item(igraphmodule_VertexSeqObject* self,
       if (i >= 0 && i < self->vs.data.seq.to - self->vs.data.seq.from)
         idx = (long)(self->vs.data.seq.from + i);
       break;
-    /* TODO: IGRAPH_VS_ADJ, IGRAPH_VS_NONADJ - someday :) */
+    /* TODO: IGRAPH_VS_ADJ, IGRAPH_VS_NONADJ - someday :) They are unused
+       yet in the Python interface */
   }
 
   if (idx < 0) {
@@ -380,6 +383,7 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
     }
     if (n != (long)igraph_vector_size(&vs)) {
       PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of vertices in the vertex set");
+      igraph_vector_destroy(&vs);
       return -1;
     }
     /* Check if we already have attributes with the given name */
@@ -388,10 +392,14 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
       /* Yes, we have. Modify its items to the items found in values */
       for (i=0; i<n; i++) {
         item = PyList_GetItem(values, i);
-        if (item == 0) return -1;
+        if (item == 0) {
+          igraph_vector_destroy(&vs);
+          return -1;
+        }
         Py_INCREF(item);
         if (PyList_SetItem(list, (long)VECTOR(vs)[i], item)) {
           Py_DECREF(item);
+          igraph_vector_destroy(&vs);
           return -1;
         } /* PyList_SetItem stole a reference to the item automatically */ 
       }
@@ -401,17 +409,24 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
        * sequence and copy the rest */
       long n2 = igraph_vcount(&gr->g);
       list = PyList_New(n2);
-      if (list == 0) return -1;
+      if (list == 0) {
+        igraph_vector_destroy(&vs);
+        return -1;
+      }
       for (i=0; i<n2; i++) {
         Py_INCREF(Py_None);
         PyList_SET_ITEM(list, i, Py_None);
       }
       for (i=0; i<n; i++) {
         item = PyList_GET_ITEM(values, i);
-        if (item == 0) { Py_DECREF(list); return -1; }
+        if (item == 0) {
+          igraph_vector_destroy(&vs);
+          Py_DECREF(list); return -1;
+        }
         Py_INCREF(item);
         PyList_SET_ITEM(list, (long)VECTOR(vs)[i], item);
       }
+      igraph_vector_destroy(&vs);
       if (PyDict_SetItem(dict, attrname, list)) {
         Py_DECREF(list);
         return -1;
@@ -627,6 +642,17 @@ PyObject* igraphmodule_VertexSeq_select(igraphmodule_VertexSeqObject *self,
 
 /**
  * \ingroup python_interface_vertexseq
+ * Converts a vertex sequence to an igraph vector containing the corresponding
+ * vertex indices. The vector MUST be initialized and will be resized if needed.
+ * \return 0 if everything was ok, 1 otherwise
+ */
+int igraphmodule_VertexSeq_to_vector_t(igraphmodule_VertexSeqObject *self,
+  igraph_vector_t *v) {
+  return igraph_vs_as_vector(&self->gref->g, self->vs, v);
+}
+
+/**
+ * \ingroup python_interface_vertexseq
  * Method table for the \c igraph.VertexSeq object
  */
 PyMethodDef igraphmodule_VertexSeq_methods[] = {
@@ -722,7 +748,7 @@ PyTypeObject igraphmodule_VertexSeqType =
   0,                                          /* tp_as_buffer */
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
   "Low-level representation of a vertex sequence.\n\n" /* tp_doc */
-  "Don't use it directly, use L{igraph.Graph} instead.\n\n"
+  "Don't use it directly, use L{igraph.VertexSeq} instead.\n\n"
   "@deffield ref: Reference",
   0,                                          /* tp_traverse */
   0,                                          /* tp_clear */

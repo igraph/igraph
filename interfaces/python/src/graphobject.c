@@ -352,26 +352,20 @@ PyObject *igraphmodule_Graph_add_vertices(igraphmodule_GraphObject * self,
  * \sa igraph_delete_vertices
  */
 PyObject *igraphmodule_Graph_delete_vertices(igraphmodule_GraphObject * self,
-                                             PyObject * args, PyObject * kwds)
-{
+                                             PyObject * args, PyObject * kwds) {
   PyObject *list;
-  igraph_vector_t v;
+  igraph_vs_t vs;
 
-  if (!PyArg_ParseTuple(args, "O", &list))
-    return NULL;
-  if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 0)) {
-    // something bad happened during conversion
-    return NULL;
-  }
+  if (!PyArg_ParseTuple(args, "O", &list)) return NULL;
+  if (igraphmodule_PyObject_to_vs_t(list, &vs, 0)) return NULL;
 
-  // do the hard work :)
-  if (igraph_delete_vertices(&self->g, igraph_vss_vector(&v))) {
+  if (igraph_delete_vertices(&self->g, vs)) {
     igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&v);
+    igraph_vs_destroy(&vs);
     return NULL;
   }
 
-  igraph_vector_destroy(&v);
+  igraph_vs_destroy(&vs);
 
   Py_INCREF(self);
 
@@ -502,12 +496,6 @@ PyObject *igraphmodule_Graph_degree(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist,
                                    &list, &dtype, &loops))
     return NULL;
-
-  if (dtype != IGRAPH_ALL && dtype != IGRAPH_OUT && dtype != IGRAPH_IN) {
-    PyErr_SetString(PyExc_ValueError,
-                    "dtype should be either ALL or IN or OUT");
-    return NULL;
-  }
 
   if (igraphmodule_PyObject_to_vs_t(list, &vs, &return_single)) {
     igraphmodule_handle_igraph_error();
@@ -3549,7 +3537,7 @@ PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
   char *kwlist[] = { "vertices", NULL };
-  igraph_vector_t vertices;
+  igraph_vs_t vs;
   igraph_t sg;
   igraphmodule_GraphObject *result;
   PyObject *list;
@@ -3557,12 +3545,12 @@ PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_vector_t(list, &vertices, 1, 0))
+  if (igraphmodule_PyObject_to_vs_t(list, &vs, 0))
     return NULL;
 
-  if (igraph_subgraph(&self->g, &sg, igraph_vss_vector(&vertices))) {
+  if (igraph_subgraph(&self->g, &sg, vs)) {
     igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&vertices);
+    igraph_vs_destroy(&vs);
     return NULL;
   }
 
@@ -3572,7 +3560,7 @@ PyObject *igraphmodule_Graph_subgraph(igraphmodule_GraphObject * self,
   if (result != NULL)
     result->g = sg;
 
-  igraph_vector_destroy(&vertices);
+  igraph_vs_destroy(&vs);
 
   return (PyObject *) result;
 }

@@ -34,17 +34,23 @@
 typedef struct
 {
   PyObject_HEAD
-  PyObject* gref;
+  igraphmodule_GraphObject* gref;
+  igraph_es_t es;
+  PyObject* weakreflist;
 } igraphmodule_EdgeSeqObject;
 
 PyObject* igraphmodule_EdgeSeq_new(PyTypeObject *subtype,
   PyObject *args, PyObject *kwds);
-int igraphmodule_EdgeSeq_traverse(igraphmodule_EdgeSeqObject *self,
-				  visitproc visit, void *arg);
-int igraphmodule_EdgeSeq_clear(igraphmodule_EdgeSeqObject *self);
+igraphmodule_EdgeSeqObject* igraphmodule_EdgeSeq_copy(
+  igraphmodule_EdgeSeqObject *o);
+int igraphmodule_EdgeSeq_init(igraphmodule_EdgeSeqObject *self,
+  PyObject *args, PyObject *kwds);
 void igraphmodule_EdgeSeq_dealloc(igraphmodule_EdgeSeqObject* self);
 
 int igraphmodule_EdgeSeq_sq_length(igraphmodule_EdgeSeqObject *self);
+
+PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self,
+  PyObject *args, PyObject *kwds);
 
 extern PyTypeObject igraphmodule_EdgeSeqType;
 

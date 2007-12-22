@@ -1446,7 +1446,7 @@ class VertexSeq(core.VertexSeq):
     object. It can be used as an iterable as well, or even in a list
     comprehension:
     
-      >>> g=igraph.Graph.Full(3)
+      >>> g=Graph.Full(3)
       >>> for v in g.vs:
       ...   v["value"] = v.index ** 2
       ...
@@ -1457,7 +1457,7 @@ class VertexSeq(core.VertexSeq):
     attribute names. The values corresponding to the keys are the values
     of the given attribute for every vertex selected by the sequence.
     
-      >>> g=igraph.Graph.Full(3)
+      >>> g=Graph.Full(3)
       >>> for idx, v in enumerate(g.vs):
       ...   v["weight"] = idx*(idx+1)
       ...
@@ -1575,6 +1575,163 @@ class VertexSeq(core.VertexSeq):
         """Shorthand notation to select()
 
         This method simply passes all its arguments to L{VertexSeq.select()}.
+        """
+        return self.select(*args, **kwds)
+
+
+class EdgeSeq(core.EdgeSeq):
+    """Class representing a sequence of edges in the graph.
+    
+    This class is most easily accessed by the C{es} field of the
+    L{Graph} object, which returns an ordered sequence of all edges in
+    the graph. The edge sequence can be refined by invoking the
+    L{EdgeSeq.select()} method. L{EdgeSeq.select()} can also be
+    accessed by simply calling the L{EdgeSeq} object.
+
+    An alternative way to create an edge sequence referring to a given
+    graph is to use the constructor directly:
+    
+      >>> g = Graph.Full(3)
+      >>> es = EdgeSeq(g)
+      >>> restricted_es = EdgeSeq(g, [0, 1])
+
+    The individual edges can be accessed by indexing the edge sequence
+    object. It can be used as an iterable as well, or even in a list
+    comprehension:
+    
+      >>> g=Graph.Full(3)
+      >>> for e in g.es:
+      ...   print e.tuple
+      ...
+      (0, 1)
+      (0, 2)
+      (1, 2)
+      >>> [max(e.tuple) for e in g.es]
+      [1, 2, 2]
+      
+    The edge set can also be used as a dictionary where the keys are the
+    attribute names. The values corresponding to the keys are the values
+    of the given attribute of every edge in the graph:
+    
+      >>> g=Graph.Full(3)
+      >>> for idx, e in enumerate(g.es):
+      ...   e["weight"] = idx*(idx+1)
+      ...
+      >>> g.es["weight"]
+      [0, 2, 6]
+      >>> g.es["weight"] = range(3)
+      >>> g.es["weight"]
+      [0, 1, 2]
+    """
+
+    def select(self, *args, **kwds):
+        """Selects a subset of the edge sequence based on some criteria
+        
+        The selection criteria can be specified by the positional and the keyword
+        arguments. Positional arguments are always processed before keyword
+        arguments.
+        
+          - If the first positional argument is C{None}, an empty sequence is
+            returned.
+            
+          - If the first positional argument is a callable object, the object
+            will be called for every edge in the sequence. If it returns
+            C{True}, the edge will be included, otherwise it will
+            be excluded.
+            
+          - If the first positional argument is an iterable, it must return
+            integers and they will be considered as indices of the current
+            edge set (NOT the whole edge set of the graph -- the
+            difference matters when one filters an edge set that has
+            already been filtered by a previous invocation of
+            L{EdgeSeq.select()}. In this case, the indices do not refer
+            directly to the edges of the graph but to the elements of
+            the filtered edge sequence.
+            
+          - If the first positional argument is an integer, all remaining
+            arguments are expected to be integers. They are considered as
+            indices of the current edge set again.
+
+        Keyword arguments can be used to filter the edges based on their
+        attributes. The name of the keyword specifies the name of the attribute
+        and the filtering operator, they should be concatenated by an
+        underscore (C{_}) character. Attribute names can also contain
+        underscores, but operator names don't, so the operator is always the
+        largest trailing substring of the keyword name that does not contain
+        an underscore. Possible operators are:
+
+          - C{eq}: equal to
+
+          - C{ne}: not equal to
+
+          - C{lt}: less than
+          
+          - C{gt}: greater than
+
+          - C{le}: less than or equal to
+
+          - C{ge}: greater than or equal to
+
+          - C{in}: checks if the value of an attribute is in a given list
+
+          - C{notin}: checks if the value of an attribute is not in a given
+            list
+
+        For instance, if you want to filter edges with a numeric C{weight}
+        property larger than 50, you have to write:
+
+          >>> g.es.select(weight_gt=50)
+
+        Similarly, to filter edges whose C{type} is in a list of predefined
+        types:
+
+          >>> list_of_types = ["inhibitory", "excitatory"]
+          >>> g.es.select(type_in=list_of_types)
+
+        If the operator is omitted, it defaults to C{eq}. For instance, the
+        following selector selects edges whose C{type} property is
+        C{intracluster}:
+
+          >>> g.es.select(type="intracluster")
+
+        In the case of an unknown operator, it is assumed that the
+        recognized operator is part of the attribute name and the actual
+        operator is C{eq}.
+
+        @return: the new, filtered edge sequence"""
+        es = core.EdgeSeq.select(self, *args)
+
+        operators = {
+            "lt": operator.lt, \
+            "gt": operator.gt, \
+            "le": operator.le, \
+            "ge": operator.ge, \
+            "eq": operator.eq, \
+            "ne": operator.ne, \
+            "in": lambda a, b: a in b, \
+            "notin": lambda a, b: a not in b }
+        for keyword, value in kwds.iteritems():
+            if "_" not in keyword: keyword = keyword+"_eq"
+            pos = keyword.rindex("_")
+            attr, op = keyword[0:pos], keyword[pos+1:]
+            try:
+                func = operators[op]
+            except KeyError:
+                # No such operator, assume that it's part of the attribute name
+                attr = "%s_%s" % (attr,op)
+                func = operators["eq"]
+
+            values = es[attr]
+            filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
+            es = es.select(filtered_idxs)
+
+        return es
+
+
+    def __call__(self, *args, **kwds):
+        """Shorthand notation to select()
+
+        This method simply passes all its arguments to L{EdgeSeq.select()}.
         """
         return self.select(*args, **kwds)
 

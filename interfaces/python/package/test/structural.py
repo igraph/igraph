@@ -46,6 +46,9 @@ class DegreeTests(unittest.TestCase):
         self.failUnless(self.gdir.degree(type=IN) == [1, 2, 2, 2])
         self.failUnless(self.gdir.degree(type=OUT) == [3, 2, 1, 1])
         self.failUnless(self.gdir.degree(type=ALL) == [4, 4, 3, 3])
+        vs = self.gdir.vs.select(0, 2)
+        self.failUnless(self.gdir.degree(vs, type=ALL) == [4, 3])
+        self.failUnless(self.gdir.degree(self.gdir.vs[1], type=ALL) == 4)
 
     def testMaxDegree(self):
         self.failUnless(self.gfull.maxdegree() == 9)

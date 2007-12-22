@@ -24,6 +24,8 @@
 /************************ Miscellaneous functions *************************/
 
 #include "graphobject.h"
+#include "vertexseqobject.h"
+#include "vertexobject.h"
 #include "convert.h"
 #include "error.h"
 #include "memory.h"
@@ -825,18 +827,28 @@ int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t
  */
 int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
                   igraph_bool_t *return_single) {
-  *return_single=0;
+  if (return_single) *return_single=0;
   if (o==NULL || o == Py_None) {
     /* Returns a vertex sequence for all vertices */
     igraph_vs_all(vs);
   } else if (PyInt_Check(o)) {
     /* Returns a vertex sequence for a single vertex ID */
     igraph_vs_1(vs, PyInt_AsLong(o));
-    *return_single=1;
+    if (return_single) *return_single=1;
   } else if (PyLong_Check(o)) {
     /* Returns a vertex sequence for a single vertex ID */
     igraph_vs_1(vs, PyLong_AsLong(o));
-    *return_single=1;
+    if (return_single) *return_single=1;
+  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexSeqType)) {
+    igraphmodule_VertexSeqObject *vso = (igraphmodule_VertexSeqObject*)o;
+    if (igraph_vs_copy(vs, &vso->vs)) {
+      igraphmodule_handle_igraph_error();
+      return 1;
+    }
+  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_VertexType)) {
+    igraphmodule_VertexObject *vo = (igraphmodule_VertexObject*)o;
+    igraph_vs_1(vs, igraphmodule_Vertex_get_index_long(vo));
+    if (return_single) *return_single=1;
   } else {
     /* Returns a vertex sequence with the IDs returned by the iterator */
     PyObject *iterator = PyObject_GetIter(o);

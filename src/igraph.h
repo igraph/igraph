@@ -222,6 +222,8 @@ void igraph_vs_destroy(igraph_vs_t *vs);
 
 igraph_bool_t igraph_vs_is_all(igraph_vs_t *vs);
 
+int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src);
+
 int igraph_vs_as_vector(const igraph_t *graph, igraph_vs_t vs, 
 			igraph_vector_t *v);
 int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
@@ -419,6 +421,10 @@ igraph_bool_t igraph_es_is_all(igraph_es_t *es);
 
 int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es, 
 			igraph_vector_t *v);
+int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
+  igraph_integer_t *result);
+inline int igraph_es_type(const igraph_es_t *es);
+
 
 /* -------------------------------------------------- */
 /* Edge Iterators                                     */
