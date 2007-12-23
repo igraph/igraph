@@ -38,6 +38,7 @@ int main() {
   igraph_real_t edges1[] = { 0,1, 1,2, 2,2, 2,3, 2,4, 3,4 };
   igraph_vector_t from, to;  
   igraph_es_t it;
+  igraph_integer_t size;
   long int i;
 
   igraph_vector_view(&v, edges1, sizeof(edges1)/sizeof(igraph_real_t));
@@ -54,6 +55,8 @@ int main() {
   igraph_es_fromto(&g, &it, IGRAPH_VS_VECTOR(&g, &from), 
 		   IGRAPH_VS_VECTOR(&g, &to), IGRAPH_DIRECTED);
   igraph_vector_clear(&from); igraph_vector_clear(&to);
+  igraph_es_size(&g, &it, &size);
+  printf("%ld\n", (long)size);
   while (!igraph_es_end(&g, &it)) {
     igraph_vector_push_back(&from, igraph_es_from(&g, &it));
     igraph_vector_push_back(&to, igraph_es_to(&g, &it));

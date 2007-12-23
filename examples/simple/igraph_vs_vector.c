@@ -40,6 +40,7 @@ int main() {
   long int i;
   igraph_vit_t vit;
   igraph_vs_t vs;
+  igraph_integer_t size;
 
   igraph_vector_view(&v, edges, sizeof(edges)/sizeof(igraph_real_t));
   igraph_create(&g, &v, 0, IGRAPH_DIRECTED);
@@ -51,6 +52,7 @@ int main() {
   VECTOR(v2)[4]=2;   VECTOR(v2)[5]=4;
 
   igraph_vit_create(&g, igraph_vss_vector(&v2), &vit);
+
   i=0;
   while (!IGRAPH_VIT_END(vit)) {
     if (IGRAPH_VIT_GET(vit) != VECTOR(v2)[i]) {
@@ -70,6 +72,8 @@ int main() {
 
   igraph_vs_vector_small(&vs, 0, 2, 4, 0, 2, 4, 2, -1);
   igraph_vit_create(&g, vs, &vit);
+  igraph_vs_size(&g, &vs, &size);
+  printf("%li ", (long int) size);
   for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
     printf("%li ", (long int) IGRAPH_VIT_GET(vit));
   }

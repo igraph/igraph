@@ -28,10 +28,13 @@ int main () {
   igraph_t g;
   igraph_vs_t vs;
   igraph_vit_t vit;  
-  
+  igraph_integer_t size;
+
   /* empty graph, all vertices */
   igraph_empty(&g, 10, IGRAPH_DIRECTED);
   igraph_vs_nonadj(&vs, 0, IGRAPH_ALL);
+  igraph_vs_size(&g, &vs, &size);
+  printf("%li ", (long int) size);
   igraph_vit_create(&g, vs, &vit);
   while (!IGRAPH_VIT_END(vit)) {
     printf("%li ", (long int) IGRAPH_VIT_GET(vit));

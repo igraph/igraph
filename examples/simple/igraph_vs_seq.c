@@ -28,10 +28,13 @@ int main() {
   igraph_vs_t vs;
   igraph_vit_t vit;
   igraph_t g;
-  
+  igraph_integer_t size;
+
   igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
   igraph_vs_seq(&vs, 0, 9);
   igraph_vit_create(&g, vs, &vit);
+  igraph_vs_size(&g, &vs, &size);
+  printf("%li", (long int) size);
   
   while (!IGRAPH_VIT_END(vit)) {
     printf(" %li", (long int)IGRAPH_VIT_GET(vit));

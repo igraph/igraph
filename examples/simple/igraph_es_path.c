@@ -30,18 +30,22 @@ int main() {
   igraph_t g;
   igraph_es_t es;
   igraph_eit_t eit;
-  
+  igraph_integer_t size;
+
   /* DIRECTED */
   
   igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 1);
   igraph_es_path_small(&es, IGRAPH_DIRECTED, 0,1,2,3,4,5,6,7,8,9,0,1,2,3, -1);
   igraph_eit_create(&g, es, &eit);
+  igraph_es_size(&g, &es, &size);
   while (!IGRAPH_EIT_END(eit)) {
     long int edge=IGRAPH_EIT_GET(eit);
     igraph_integer_t from, to;
     igraph_edge(&g, edge, &from, &to);
     IGRAPH_EIT_NEXT(eit);
+    size--;
   }
+  if (size != 0) return 1;
 
   igraph_eit_destroy(&eit);
   igraph_es_destroy(&es);

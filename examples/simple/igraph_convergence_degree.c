@@ -26,53 +26,26 @@
 int main() {
   
   igraph_t g;
-  long int i;
-  igraph_integer_t size;
-
-  /* DIRECTED */
+  igraph_vector_t result;
+  long i;
   
-  igraph_star(&g, 10, IGRAPH_STAR_OUT, 0);  
+  igraph_vector_init(&result, 0);
 
-  for (i=0; i<100; i++) {
-    igraph_es_t es;
-    igraph_eit_t it;
-    igraph_es_pairs_small(&es, IGRAPH_DIRECTED, 
-			  0,1,0,2,0,5,0,2,0,3,0,4,0,7,0,9, -1);
-    igraph_eit_create(&g, es, &it);
-    igraph_es_size(&g, &es, &size);
-    IGRAPH_EIT_RESET(it);
-    while (!IGRAPH_EIT_END(it)) {
-      IGRAPH_EIT_GET(it);
-      IGRAPH_EIT_NEXT(it);
-      size--;
-    }
-    if (size != 0) return 1;
-    igraph_eit_destroy(&it);
-    igraph_es_destroy(&es);
-  }
-
+  igraph_small(&g, 7, 0, 0,1,0,2,0,3,1,2,1,3,2,3,3,4,4,5,4,6,5,6, -1);
+  igraph_convergence_degree(&g, &result);
+  for (i=0; i<igraph_ecount(&g); i++)
+    printf("%.4f ", (float)igraph_vector_e(&result, i));
+  printf("\n");
   igraph_destroy(&g);
 
-  /* UNDIRECTED */
-  
-  igraph_star(&g, 10, IGRAPH_STAR_UNDIRECTED, 0);
-  
-  for (i=0; i<100; i++) {
-    igraph_es_t es;
-    igraph_eit_t it;
-    igraph_es_pairs_small(&es, IGRAPH_DIRECTED,
-			  0,1,2,0,5,0,0,2,3,0,0,4,7,0,0,9, -1);
-    igraph_eit_create(&g, es, &it);
-    IGRAPH_EIT_RESET(it);
-    while (!IGRAPH_EIT_END(it)) {
-      IGRAPH_EIT_GET(it);
-      IGRAPH_EIT_NEXT(it);
-    }
-    igraph_eit_destroy(&it);
-    igraph_es_destroy(&es);
-  }
-
+  igraph_small(&g, 6, 1, 1,0,2,0,3,0,4,0,0,5, -1);
+  igraph_convergence_degree(&g, &result);
+  for (i=0; i<igraph_ecount(&g); i++)
+    printf("%.4f ", (float)igraph_vector_e(&result, i));
+  printf("\n");
   igraph_destroy(&g);
 
+  igraph_vector_destroy(&result);
+  
   return 0;
 }
