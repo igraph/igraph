@@ -426,52 +426,25 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
                                           PyObject * args, PyObject * kwds)
 {
   PyObject *list, *by_index = Py_False;
-  igraph_vector_t v;
   igraph_es_t es;
-  static char *kwlist[] = { "edges", "by_index", NULL };
+  static char *kwlist[] = { "edges", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist,
-                                   &list, &by_index))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &list))
     return NULL;
-
-  if (PyObject_IsTrue(by_index)) {
-    if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 0)) {
-      /* something bad happened during conversion, return immediately */
-      return NULL;
-    }
-
-    /* do the hard work :) */
-    if (igraph_es_vector(&es, &v)) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&v);
-      return NULL;
-    }
-  }
-  else {
-    if (igraphmodule_PyObject_to_vector_t(list, &v, 1, 1)) {
-      /* something bad happened during conversion, return immediately */
-      return NULL;
-    }
-
-    /* do the hard work :) */
-    if (igraph_es_pairs(&es, &v, IGRAPH_DIRECTED)) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&v);
-      return NULL;
-    }
+	
+  if (igraphmodule_PyObject_to_es_t(list, &es, 0)) {
+    /* something bad happened during conversion, return immediately */
+    return NULL;
   }
 
   if (igraph_delete_edges(&self->g, es)) {
     igraphmodule_handle_igraph_error();
     igraph_es_destroy(&es);
-    igraph_vector_destroy(&v);
     return NULL;
   }
 
   Py_INCREF(self);
-
   igraph_es_destroy(&es);
-  igraph_vector_destroy(&v);
 
   return (PyObject *) self;
 }

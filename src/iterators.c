@@ -1281,6 +1281,35 @@ igraph_bool_t igraph_es_is_all(igraph_es_t *es) {
   return es->type == IGRAPH_ES_ALL;
 }
 
+/**
+ * \function igraph_es_copy
+ * \brief Creates a copy of an edge iterator
+ * \param src the iterator being copied
+ * \param dest an uninitialized iterator that will contain the copy
+ */
+int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src) {
+  memcpy(dest, src, sizeof(igraph_es_t));
+  switch (dest->type) {
+    case IGRAPH_ES_VECTOR:
+      dest->data.vecptr = igraph_Calloc(1,igraph_vector_t);
+      if (!dest->data.vecptr)
+        IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM);
+      IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)dest->data.vecptr,
+        (igraph_vector_t*)src->data.vecptr));
+      break;
+    case IGRAPH_ES_PATH:
+    case IGRAPH_ES_PAIRS:
+    case IGRAPH_ES_MULTIPAIRS:
+      dest->data.path.ptr = igraph_Calloc(1,igraph_vector_t);
+      if (!dest->data.path.ptr)
+        IGRAPH_ERROR("Cannot copy edge selector", IGRAPH_ENOMEM);
+      IGRAPH_CHECK(igraph_vector_copy((igraph_vector_t*)dest->data.path.ptr,
+        (igraph_vector_t*)src->data.path.ptr));
+      break;
+  }
+  return 0;
+}
+
 int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es, 
 			igraph_vector_t *v) {
   igraph_eit_t eit;

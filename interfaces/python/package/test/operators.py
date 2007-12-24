@@ -76,11 +76,16 @@ class OperatorTests(unittest.TestCase):
                         and g.clusters().membership == [0,0,0,0,0,1,1,1])
 
     def testInPlaceSubtraction(self):
-        g = Graph.Full(7)
+        g = Graph.Full(8)
         orig = g
 
+        # Deleting a vertex by vertex selector
+        g -= 7
+        self.failUnless(g.vcount() == 7 and g.ecount() == 21
+                        and g.clusters().membership == [0,0,0,0,0,0,0])
+
         # Deleting a vertex
-        g -= 6
+        g -= g.vs[6]
         self.failUnless(g.vcount() == 6 and g.ecount() == 15
                         and g.clusters().membership == [0,0,0,0,0,0])
 

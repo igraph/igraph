@@ -26,6 +26,8 @@
 #include "graphobject.h"
 #include "vertexseqobject.h"
 #include "vertexobject.h"
+#include "edgeseqobject.h"
+#include "edgeobject.h"
 #include "convert.h"
 #include "error.h"
 #include "memory.h"
@@ -856,7 +858,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     igraph_vector_t vector;
 
     if (iterator == NULL) {
-      PyErr_SetString(PyExc_TypeError, "integer, long, iterable or None expected");
+      PyErr_SetString(PyExc_TypeError, "integer, long, iterable, Vertex, VertexSeq or None expected");
       return 1;
     }
 
@@ -905,42 +907,68 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
  */
 int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
                   igraph_bool_t *return_single) {
-  *return_single=0;
+  if (return_single) *return_single=0;
   if (o==NULL || o == Py_None) {
     /* Returns a vertex sequence for all edges */
     igraph_es_all(es, IGRAPH_EDGEORDER_ID);
   } else if (PyInt_Check(o)) {
     /* Returns an edge sequence for a single edge ID */
     igraph_es_1(es, PyInt_AsLong(o));
-    *return_single=1;
+    if (return_single) *return_single=1;
   } else if (PyLong_Check(o)) {
     /* Returns an edge sequence for a single edge ID */
     igraph_es_1(es, PyLong_AsLong(o));
-    *return_single=1;
+    if (return_single) *return_single=1;
+  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeSeqType)) {
+    igraphmodule_EdgeSeqObject *eso = (igraphmodule_EdgeSeqObject*)o;
+    if (igraph_es_copy(es, &eso->es)) {
+      igraphmodule_handle_igraph_error();
+      return 1;
+    }
+  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeType)) {
+    igraphmodule_EdgeObject *eo = (igraphmodule_EdgeObject*)o;
+    igraph_es_1(es, igraphmodule_Edge_get_index_long(eo));
+    if (return_single) *return_single=1;
   } else {
     /* Returns an edge sequence with the IDs returned by the iterator */
     PyObject *iterator = PyObject_GetIter(o);
     PyObject *item;
     igraph_vector_t vector;
+	igraph_vector_t tuples;
 
     if (iterator == NULL) {
-      PyErr_SetString(PyExc_TypeError, "integer, long, iterable or None expected");
+      PyErr_SetString(PyExc_TypeError, "integer, long, iterable, Edge, EdgeSeq or None expected");
       return 1;
     }
 
     IGRAPH_CHECK(igraph_vector_init(&vector, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &vector);
-    IGRAPH_CHECK(igraph_vector_reserve(&vector, 20));
+    IGRAPH_CHECK(igraph_vector_init(&tuples, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &tuples);
 
     while ((item = PyIter_Next(iterator))) {
       long val=-1;
       if (PyInt_Check(item)) val=PyInt_AsLong(item);
       else if (PyLong_Check(item)) val=PyLong_AsLong(item);
+	  else if (PyTuple_Check(item) && PyTuple_Size(item) >= 2) {
+		PyObject *o1, *o2;
+		o1=PyTuple_GetItem(item, 0);
+		o2=PyTuple_GetItem(item, 1);
+		if (PyInt_Check(o1) && PyInt_Check(o2)) {
+		  if (igraph_vector_push_back(&tuples, PyInt_AsLong(o1)))
+			PyErr_NoMemory();
+		  else if (igraph_vector_push_back(&tuples, PyInt_AsLong(o2)))
+			PyErr_NoMemory();
+		}
+		val=-2;
+	  }
+
       Py_DECREF(item);
 
-      if (val >= 0) igraph_vector_push_back(&vector, val);
-      else {
-        PyErr_SetString(PyExc_TypeError, "integer or long expected");
+      if (val >= 0) {
+		if (igraph_vector_push_back(&vector, val)) PyErr_NoMemory();
+	  } else if (val == -1) {
+        PyErr_SetString(PyExc_TypeError, "integer, long or integer tuple expected");
       }
 
       if (PyErr_Occurred()) break;
@@ -949,14 +977,27 @@ int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
 
     if (PyErr_Occurred()) {
       igraph_vector_destroy(&vector);
-      IGRAPH_FINALLY_CLEAN(1);
+      igraph_vector_destroy(&tuples);
+      IGRAPH_FINALLY_CLEAN(2);
       return 1;
     } else {
-      igraph_es_vector_copy(es, &vector);
+      if (igraph_vector_size(&vector) > 0 &&
+		  igraph_vector_size(&tuples) == 0)
+		igraph_es_vector_copy(es, &vector);
+	  else if (igraph_vector_size(&tuples) > 0 &&
+		  igraph_vector_size(&vector) == 0)
+		igraph_es_pairs(es, &tuples, 1);
+	  else if (igraph_vector_size(&tuples) == 0 &&
+		  igraph_vector_size(&vector) == 0)
+		igraph_es_none(es);
+	  else
+		PyErr_SetString(PyExc_TypeError, "edge IDs and from-to tuples can not be mixed");
       igraph_vector_destroy(&vector);
-      IGRAPH_FINALLY_CLEAN(1);
+      igraph_vector_destroy(&tuples);
+      IGRAPH_FINALLY_CLEAN(2);
     }
   }
+  if (PyErr_Occurred()) return 1;
   return 0;
 }
 

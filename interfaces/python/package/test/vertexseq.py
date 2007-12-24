@@ -69,8 +69,8 @@ class VertexSeqTests(unittest.TestCase):
         g = Graph.Barabasi(10000)
         g.vs["degree"] = g.degree()
         g.vs["parity"] = [i % 2 for i in xrange(g.vcount())]
-        self.failUnless(len(g.vs(degree_gt=300)) < 10000)
-        self.failUnless(len(g.vs(degree_gt=300, parity=0)) <= 5000)
+        self.failUnless(len(g.vs(degree_gt=30)) < 1000)
+        self.failUnless(len(g.vs(degree_gt=30, parity=0)) <= 500)
 
 
 def suite():

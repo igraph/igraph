@@ -111,6 +111,33 @@ class Graph(core.GraphBase):
             if isinstance(k, int) or isinstance(k, long): k=str(k)
             self.es[k]=v
 
+    def delete_edges(self, *args, **kwds):
+        """Deletes some edges from the graph.
+
+        The set of edges to be deleted is determined by the positional and
+        keyword arguments. If any keyword argument is present, or the
+        first positional argument is callable, an edge
+        sequence is derived by calling L{EdgeSeq.select} with the same
+        positional and keyword arguments. Edges in the derived edge sequence
+        will be removed. Otherwise the first positional argument is considered
+        as follows:
+
+          - C{None} - deletes all edges
+          - a single integer - deletes the edge with the given ID
+          - a list of integers - deletes the edges denoted by the given IDs
+          - a list of 2-tuples - deletes the edges denoted by the given
+            source-target vertex pairs. When multiple edges are present
+            between a given source-target vertex pair, only one is removed.
+        """
+        if len(args) == 0 and len(kwds) == 0:
+            raise ValueError, "expected at least one argument"
+        if len(kwds)>0 or callable(args[0]):
+            es = self.es(*args, **kwds)
+        else:
+            es = args[0]
+        return core.GraphBase.delete_edges(self, es)
+
+
     def indegree(self, *args, **kwds):
         """Returns the in-degrees in a list.
         
@@ -1096,7 +1123,7 @@ class Graph(core.GraphBase):
         if isinstance(other, int):
             return self.delete_vertices(other)
         elif isinstance(other, tuple) and len(other) == 2:
-            return self.delete_edges(other)
+            return self.delete_edges([other])
         elif isinstance(other, list):
             if len(other)>0:
                 if isinstance(other[0], tuple):
@@ -1105,7 +1132,14 @@ class Graph(core.GraphBase):
                     return self.delete_vertices(other)
             else:
                 return self
-
+        elif isinstance(other, core.Vertex):
+            return self.delete_vertices(other)
+        elif isinstance(other, core.VertexSeq):
+            return self.delete_vertices(other)
+        elif isinstance(other, core.Edge):
+            return self.delete_edges(other)
+        elif isinstance(other, core.EdgeSeq):
+            return self.delete_edges(other)
         return NotImplemented
 
 
@@ -1117,7 +1151,7 @@ class Graph(core.GraphBase):
           re-indexed!). If it is a tuple, removes the given edge. If it is
           a graph, takes the difference of the two graphs. Accepts
           lists of integers or lists of tuples as well, but they can't be
-          mixed!
+          mixed! Also accepts L{Edge} and L{EdgeSeq} objects.
         """
         if isinstance(other, int):
             return self.copy().delete_vertices(other)
@@ -1131,6 +1165,14 @@ class Graph(core.GraphBase):
                     return self.copy().delete_vertices(other)
             else:
                 return self.copy()
+        elif isinstance(other, core.Vertex):
+            return self.copy().delete_vertices(other)
+        elif isinstance(other, core.VertexSeq):
+            return self.copy().delete_vertices(other)
+        elif isinstance(other, core.Edge):
+            return self.copy().delete_edges(other)
+        elif isinstance(other, core.EdgeSeq):
+            return self.copy().delete_edges(other)
         elif isinstance(other, Graph):
             return self.difference(other)
 
@@ -1160,9 +1202,17 @@ class Graph(core.GraphBase):
         """Coercion rules.
 
         This method is needed to allow the graph to react to additions
-        with lists, tuples or integers.
+        with lists, tuples, integers, vertices, edges and so on.
         """
         if type(other) in [int, tuple, list]:
+            return self, other
+        if isinstance(other, core.Vertex):
+            return self, other
+        if isinstance(other, core.VertexSeq):
+            return self, other
+        if isinstance(other, core.Edge):
+            return self, other
+        if isinstance(other, core.EdgeSeq):
             return self, other
 
 
