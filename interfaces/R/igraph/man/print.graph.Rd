@@ -1,5 +1,6 @@
 \name{print.igraph}
 \alias{print.igraph}
+\alias{print.bgraph}
 \alias{summary.igraph}
 \title{Print graphs to the terminal}
 \description{These functions attempt to print a graph to the terminal in
@@ -10,6 +11,8 @@
   vertex.attributes=igraph.par("print.vertex.attributes"),
   edge.attributes=igraph.par("print.edge.attributes"),
   names=TRUE,
+  \dots)
+\method{print}{bgraph}(x,
   \dots)
 \method{summary}{igraph}(object, \dots)
 }
@@ -22,7 +25,8 @@
   \item{names}{Logical constant, whether to print symbolic vertex names
     (ie. the \code{name} vertex attribute) or vertex ids.}
   \item{object}{The graph of which the summary will be printed.}
-  \item{\dots}{Ignored.}
+  \item{\dots}{Additional agruments, \code{print.bgraph} passes these to
+  \code{print.igraph}.}
 }
 \details{
   \code{summary.igraph} prints the number of vertices, edges and whether the
@@ -32,8 +36,12 @@
 
   As of igraph 0.4 \code{print.igraph} uses the \code{max.print} option,
   see \code{\link[base]{options}} for details.
+
+  \code{print.bgraph} prints a \code{bgraph} object, a graph together
+  with its cohesive block hierarchy, see
+  \code{\link{cohesive.blocks}} for details.
 }
-\value{Both functions return the graph invisibly.}
+\value{All these functions return the graph invisibly.}
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 %\seealso{}

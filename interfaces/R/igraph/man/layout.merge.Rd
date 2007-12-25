@@ -1,10 +1,12 @@
 \name{layout.merge}
 \alias{layout.merge}
+\alias{piecewise.layout}
 \title{Merging graph layouts}
 \description{Place several graphs on the same layout}
 \usage{
 layout.merge(graphs, layouts, method = "dla",
-       verbose = igraph.par("verbose")) 
+       verbose = igraph.par("verbose"))
+piecewise.layout(graph, layout=layout.kamada.kawai, \dots)
 }
 \arguments{
   \item{graphs}{A list of graph objects.}
@@ -13,9 +15,13 @@ layout.merge(graphs, layouts, method = "dla",
     only \code{dla} is implemented.}
   \item{verbose}{Logical constant, whether to show a progress bar while
     doing the calculation.}
+  \item{graph}{The input graph.}
+  \item{layout}{A function object, the layout function to use.}
+  \item{\dots}{Additional arguments to pass to the \code{layout} layout
+    function.}
 }
 \details{
-  This function takes a list of graphs and a list of coordinates and
+  \code{layout.merge} takes a list of graphs and a list of coordinates and
   places the graphs in a common layout. The method to use is chosen via
   the \code{method} parameter, although right now only the \code{dla}
   method is implemented.
@@ -28,6 +34,11 @@ layout.merge(graphs, layouts, method = "dla",
   circle far away from the center and a random walk is conducted until
   the graph walks into the larger graphs already placed or walks too far
   from the center of the layout.
+
+  The \code{piecewise.layout} function disassembles the graph first into
+  maximal connected components and calls the supplied \code{layout}
+  function for each component separately. Finally it merges the layouts
+  via calling \code{layout.merge}.
 }
 \value{
   A matrix with two columns and as many lines as the total number of

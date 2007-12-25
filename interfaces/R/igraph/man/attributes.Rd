@@ -74,7 +74,11 @@ graph <- remove.edge.attribute(graph, attrname)
   assigned graph attributes are listed with
   \code{list.graph.attributes}.
 
-  Similarly the function for vertex attributes are
+  There is a simpler notation for using graph attributes: the
+  \sQuote{\code{$}} operator. It can be used both to query and set graph
+  attributes, see an example below.
+  
+  The functions for vertex attributes are
   \code{set.vertex.attribute}, \code{get.vertex.attribute},
   \code{remove.vertex.attribute} and \code{list.vertex.attributes} and
   for edge attributes they are \code{set.edge.attribute},
@@ -120,6 +124,9 @@ graph <- remove.edge.attribute(graph, attrname)
 \examples{
 g <- graph.ring(10)
 g <- set.graph.attribute(g, "name", "RING")
+# It is the same as
+g$name <- "RING"
+g$name
 
 g <- set.vertex.attribute(g, "color", value=c("red", "green"))
 get.vertex.attribute(g, "color")
@@ -136,5 +143,7 @@ V(g)$color
 
 E(g)$weight <- runif(ecount(g))
 E(g)$weight
+
+print(g, g=TRUE, v=TRUE, e=TRUE)
 }
 \keyword{graphs}

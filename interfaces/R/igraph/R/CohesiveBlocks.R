@@ -50,7 +50,7 @@ cohesive.blocks <- function(graph, db=NULL,
     if(useDB && !require(RSQLite)) stop("package `RSQLite` required")
     if(!require(digest)) stop("package `digest` required")
     if(!is.igraph(graph)) stop("`graph' must be an igraph object")
-    verbose <- as.logical(verbose)
+    verbose <- as.logical(verbose)    
     
     Gin <- graph
     graph <- simplify(as.undirected2(graph))
@@ -187,10 +187,10 @@ cohesive.blocks <- function(graph, db=NULL,
                 if(newk>k){
                     kcomp <- list(as.numeric(V(g)))
                 } else {
-                    kcomp <- kComponents(g, k, cl)
+                    kcomp <- kComponents(g, k, cl, verbose=verbose)
                 }
             } else { ## otherwise just use kComponents()
-                kcomp <- kComponents(g, k, cl)
+                kcomp <- kComponents(g, k, cl, verbose=verbose)
             }
             
             kcomp <- lapply(kcomp, function(thisV){V(g)[thisV]$cbid})
@@ -306,6 +306,8 @@ cohesive.blocks <- function(graph, db=NULL,
     return(Gin)
 }
 
+structurally.cohesive.blocks <- cohesive.blocks
+
 ######################################################
 ## A small helper function to identify the cohesive ##
 ## parents of a given block inside cohesive.blocks. ##
@@ -332,10 +334,11 @@ find.cohesive.parents <- function(id, blockIds, subBranches){
 ## cutsets of size k in the given graph.            ##
 ######################################################
 
-kCutsets <- function(g, k=NULL, cl=NULL){
+kCutsets <- function(g, k=NULL, cl=NULL, verbose=igraph.par("verbose")){
     if(!is.igraph(g)){
         stop("g must be an igraph object")
     }
+    res <- list()
     if(is.null(k)){
         if(!is.connected(g)){
             k <- 0
@@ -510,69 +513,6 @@ graph.antichains <- function(g, cl=NULL){ ## g must be a directed acyclic graph 
     return(res)
 }
 
-find.all.min.cutsets.2 <- function(g, k=NULL, cl=NULL){
-    ## implements (partly) algorithm from:
-    ## Kanevsky,  Arkady 1990 "On the Number of Minimum Size
-    ## Separating Vertex Sets in a Graph and How to Find
-    ## All of Them"
-    
-    ## `cl` is a cluster from package `snow`
-    
-    #- preliminary setup and checks
-    if (!is.igraph(g)) {
-        stop("Not an igraph object")
-    }
-
-    #- find connectivity if necessary:
-    if(is.null(k)){
-        if(!is.connected(g)){
-            k <- 0
-        }else if(min(degree(g))<=1){
-            k <- 1
-        } else {
-            k <- vertex.connectivity(g)
-        }
-    }
-    
-    if (k==0){
-        #warning("Graph not connected. Minimal cutset is empty.")
-        return(numeric())
-    }
-    res <- list()
-    v <- as.numeric(V(g))
-    
-    if(k==1){ # for 1-connected graphs
-        return(articulation.points(g))
-    } else { # else generic cutset finder
-        #- take a k-set X
-        x <- v[order(degree(g), decreasing=TRUE)][1:k]
-    
-        #- check x for cutsetness
-        if(is.cutset(x, g)){
-            res <- c(res, list(list(x)))
-        }
-    
-        #- for each nonadjacent pair (x, v) in (X, V) with connectivity k, 
-        #- run through the find.these.cutsets algorithm
-        P <- expand.grid(x, v)
-        P <- P[P[[1]] != P[[2]], ]
-        if(is.null(cl)){ ## sequential version
-            for(ind in 1:nrow(P)){
-                res <- c(res, find.these.cutsets(ind, P, g, k))
-            }
-        } else { ## parallel version
-            res <- parLapply(cl, 1:nrow(P), find.these.cutsets, P=P, g=g, k=k)
-        }
-        if(class(res[[1]])=="list") res <- unlist(res, recursive=FALSE)
-        if(length(res)>0){
-            for(i in 1:length(res)){
-                res[[i]] <- sort(res[[i]])
-            }
-        }
-        return(unique(res))
-    }
-}
-
 find.these.cutsets <- function(ind, P, g, k){
     ## retrieve i and j
     i <- as.numeric(P[ind, ][1])
@@ -698,10 +638,10 @@ find.all.min.cutsets <- function(g, k=NULL){
     }
 }
 
-kComponents <- function(g, k=NULL, cl=NULL, type="new"){
+kComponents <- function(g, k=NULL, cl=NULL, type="new", verbose=igraph.par("verbose")){
     if(vcount(g)<1) return(list())
     V(g)$csid <- as.numeric(V(g))
-    cs <- if(type=="old"){find.all.min.cutsets(g, k, cl)} else {kCutsets(g, k, cl)}
+    cs <- if(type=="old"){find.all.min.cutsets(g, k)} else {kCutsets(g, k, cl, verbose=verbose)}
     theseBlocks <- list()
     if(length(cs)==0){## not connected
         cls <- clusters(g)
@@ -746,6 +686,8 @@ etReduction <- function(g){
     return(simplify(G))
 }
 
+# Not actually needed
+
 Phi <- function(g, i, j){
     g.r <- simplify(g)
     phi <- numeric()
@@ -780,10 +722,6 @@ as.undirected2 <- function(g){
         set.vertex.attribute(res, a, value=tempAtt[[a]])
     }
     return(res)
-}
-
-is.cutset <- function(v, g){ ## does removal of `v` disconnect `g`?
-    return(!is.connected(subgraph(g, setdiff(V(g), v))))
 }
 
 ######################################################
@@ -847,6 +785,7 @@ print.bgraph <- function(x, ...){
     print.igraph(x, ...)
     cat("\nBlock Hierarchy Tree:\n\n")
     print.igraph(get.graph.attribute(x, "tree"), ...)
+    invisible(x)
 }
 
 maxcohesion <- function(graph){
@@ -896,7 +835,7 @@ layout.mds.bgraph <- function(graph, d=shortest.paths(graph), ...) {
   layout.mds.igraph(graph, d=d)
 }
 
-plot.bgraph <- function(x, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
+plot.bgraph <- function(x, mc=NULL, vertex.size=5, colpal=NULL, emph=NULL, ...){
 
     if (!is.bgraph(x)) {
       stop("Not a bgraph object")
@@ -946,7 +885,7 @@ plot.bgraph <- function(x, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
     invisible(NULL)
 }
 
-plotkCore.bgraph <- function(graph, vertex.size=3, colpal=NULL, emph=NULL,
+plotkCore.bgraph <- function(graph, vertex.size=5, colpal=NULL, emph=NULL,
                               remove.multiple=TRUE, remove.loops=TRUE, ...){
 
     if (!is.bgraph(graph)) {

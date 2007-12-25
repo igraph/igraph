@@ -85,8 +85,7 @@ export(read.graph, write.graph, graph.graphdb)
 export(layout.random, layout.circle, layout.fruchterman.reingold,
        layout.spring, layout.kamada.kawai, layout.lgl,
        layout.fruchterman.reingold.grid, layout.sphere, layout.merge,
-       layout.reingold.tilford)
-
+       layout.reingold.tilford, piecewise.layout)
 
 # structural properties
 
@@ -175,11 +174,9 @@ export (graph.empty)
 
 # cohesive blocking
 
-export(cohesive.blocks)
-export(is.bgraph, recalc.tree.bgraph,
-       print.bgraph, plot.bgraph, maxcohesion,
-       plotkCore.bgraph, write.pajek.bgraph,
-       write.pajek.kCore.bgraph, piecewise.layout, expand.layout)
+export(cohesive.blocks, structurally.cohesive.blocks)
+export(is.bgraph, print.bgraph, plot.bgraph,
+       write.pajek.bgraph)
 S3method(print, bgraph)
 S3method(plot, bgraph)
 S3method(layout.svd, igraph)

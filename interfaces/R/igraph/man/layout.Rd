@@ -9,6 +9,8 @@
 \alias{layout.spring}
 \alias{layout.reingold.tilford}
 \alias{layout.lgl}
+\alias{layout.mds}
+\alias{layout.svd}
 \title{Generate coordinates for plotting graphs}
 \description{Some simple and not so simple functions determining the
   placement of the vertices for drawing a graph.}
@@ -25,6 +27,8 @@ layout.reingold.tilford(graph, \dots, params)
 layout.fruchterman.reingold.grid(graph, \dots,
       verbose=igraph.par("verbose"), params)
 layout.lgl(graph, \dots, params)
+layout.mds(graph, d=shortest.paths(graph), ...)
+layout.svd(graph, d=shortest.paths(graph), ...)
 }
 \arguments{
   \item{graph}{The graph to place.}
@@ -36,6 +40,8 @@ layout.lgl(graph, \dots, params)
     notation to the \code{params} argument.}
   \item{verbose}{Logial constant, whether to show a progress bar while
     calculating the layout.}
+  \item{d}{The matrix used for multidimansional scaling. By default it
+    is the distance matrix of the graph.}
 }
 \details{
   These functions calculate the coordinates of the vertices for a graph
@@ -145,6 +151,21 @@ layout.lgl(graph, \dots, params)
       layout. The default value is -1 which means that a random vertex
       is selected.}
   }
+
+  \code{layout.mds} uses metric multidimensional scaling for generating
+  the coordinates. This function does not have the usual \code{params}
+  argument. It can just take a single argument, the distance matrix used
+  for multidimensional scaling. This function generates the layout
+  separately for each graph component and then merges them via
+  \code{\link{layout.merge}}. \code{layout.mds} is an \emph{experimental}
+  function currently.
+
+  \code{layout.svd} is a currently \emph{experimental} layout function based on
+  singular value decomposition. It does not have the usual \code{params}
+  argument, but take a single argument, the distance matrix of the
+  graph. This function generates the layout separately for each graph
+  component and then merges them via \code{\link{layout.merge}}.
+
 }
 \value{All these functions return a numeric matrix with at least two
   columns and the same number of lines as the number of vertices.}
