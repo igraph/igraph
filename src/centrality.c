@@ -25,6 +25,7 @@
 #include "memory.h"
 #include <math.h>
 #include <string.h>    /* memset */
+#include <assert.h>
 
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
 				    long int n, void *extra) {
@@ -990,7 +991,7 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
 
 /**
  * \ingroup structural
- * \function igraph_closeness
+ * \function igraph_closeness_estimate
  * \brief Closeness centrality estimations for some vertices.
  *
  * </para><para>
@@ -1108,7 +1109,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
       }
     }
-    VECTOR(*res)[i] += (no_of_nodes * (no_of_nodes-nodes_reached));
+    VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
   }
   
