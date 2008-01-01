@@ -1,4 +1,17 @@
 =========
+igraph 0.4.4
+=========
+
+Released October 3, 2007
+
+This release should work seemlessly with the new R 2.6.0 version.
+Some other bugs were also fixed:
+- A bug was fixed in the Erdos-Renyi graph generator, which sometimes
+  added an extra vertex.
+- MSVC compilation issues were fixed.
+- MinGW compilation fixes.
+
+=========
 igraph 0.4.3
 =========
 
