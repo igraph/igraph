@@ -1825,3 +1825,165 @@ int igraph_revolver_probs_ad(const igraph_t *graph,
   return 0;
 }
 
+int igraph_revolver_probs_de(const igraph_t *graph,
+			     const igraph_matrix_t *kernel,
+			     const igraph_vector_t *cats,
+			     igraph_vector_t *logprobs,
+			     igraph_vector_t *logcited,
+			     igraph_vector_t *logciting) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  long int t;
+  igraph_real_t S=0.0;
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  if (logprobs) {
+    IGRAPH_CHECK(igraph_vector_resize(logprobs, no_of_edges));
+  }
+  if (logcited) {
+    IGRAPH_CHECK(igraph_vector_resize(logcited, no_of_nodes));
+    igraph_vector_null(logcited);
+  }
+  if (logciting) {
+    IGRAPH_CHECK(igraph_vector_resize(logciting, no_of_nodes));
+    igraph_vector_null(logciting);
+  }
+  
+  for (t=0; t<no_of_nodes; t++) {
+    long int n, nneis;
+    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&neis);
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(*cats)[to];
+      long int y=VECTOR(degree)[to];
+      igraph_real_t prob=log( MATRIX(*kernel, x, y) / S );
+      if (logprobs) {
+	VECTOR(*logprobs)[edge] = prob;
+      }
+      if (logcited) {
+	VECTOR(*logcited)[to] += prob;
+      }
+      if (logciting) {
+	VECTOR(*logciting)[t] += prob;
+      }
+    }
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(*cats)[to];
+      long int y=VECTOR(degree)[to];
+      
+      VECTOR(degree)[to] += 1;
+      S += MATRIX(*kernel, x, y+1);
+      S -= MATRIX(*kernel, x, y);
+    }
+    S += MATRIX(*kernel, 0, 0);
+    
+  } /* t < no_of_nodes */
+  
+  igraph_vector_destroy(&neis);
+  igraph_vector_long_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
+int igraph_revolver_probs_ade(const igraph_t *graph,
+			      const igraph_array3_t *kernel,
+			      const igraph_vector_t *cats,
+			      igraph_vector_t *logprobs,
+			      igraph_vector_t *logcited,
+			      igraph_vector_t *logciting) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  long int j, t;
+  igraph_real_t S=0.0;
+  long int agebins=igraph_array3_n(kernel,3);
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  if (logprobs) {
+    IGRAPH_CHECK(igraph_vector_resize(logprobs, no_of_edges));
+  }
+  if (logcited) {
+    IGRAPH_CHECK(igraph_vector_resize(logcited, no_of_nodes));
+    igraph_vector_null(logcited);
+  }
+  if (logciting) {
+    IGRAPH_CHECK(igraph_vector_resize(logciting, no_of_nodes));
+    igraph_vector_null(logciting);
+  }
+  
+  for (t=0; t<no_of_nodes; t++) {
+    long int n, nneis;
+    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&neis);
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(*cats)[to];
+      long int y=VECTOR(degree)[to];
+      long int z=(t-to)/binwidth;
+      igraph_real_t prob=log( ARRAY3(*kernel, x, y, z) / S );
+      if (logprobs) {
+	VECTOR(*logprobs)[edge] = prob;
+      }
+      if (logcited) {
+	VECTOR(*logcited)[to] += prob;
+      }
+      if (logciting) {
+	VECTOR(*logciting)[t] += prob;
+      }
+    }
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(*cats)[to];
+      long int y=VECTOR(degree)[to];
+      long int z=(t-to)/binwidth;
+      
+      VECTOR(degree)[to] += 1;
+      S += ARRAY3(*kernel, x, y+1, z);
+      S -= ARRAY3(*kernel, x, y, z);
+    }
+    
+    for (j=1; t-binwidth*j+1>=0; j++) {
+      long int shnode=t-binwidth*j+1;
+      long int cat=VECTOR(*cats)[shnode];
+      long int deg=VECTOR(degree)[shnode];
+      S += ARRAY3(*kernel, cat, deg, j);
+      S -= ARRAY3(*kernel, cat, deg, j-1);
+    }
+    S += ARRAY3(*kernel, (long int) VECTOR(*cats)[t], 0, 0);
+    
+  } /* t < no_of_nodes */
+
+  igraph_vector_destroy(&neis);
+  igraph_vector_long_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
+
+      
