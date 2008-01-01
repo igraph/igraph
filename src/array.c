@@ -23,57 +23,26 @@
 
 #include "types.h"
 
-int igraph_array3_init(igraph_array3_t *a, long int n1, long int n2, 
-		       long int n3) {
-  int ret;
-  ret=igraph_vector_init(&a->data, n1*n2*n3);
-  a->n1=n1;
-  a->n2=n2;
-  a->n3=n3;
-  a->n1n2=n1*n2;
-  
-  return ret;
-}
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "array.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
 
-void igraph_array3_destroy(igraph_array3_t *a) {
-  igraph_vector_destroy(&a->data);
-}
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "array.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
 
-long int igraph_array3_size(const igraph_array3_t *a) {
-  return (a->n1n2) * (a->n3);
-}
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "array.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
 
-long int igraph_array3_n(const igraph_array3_t *a, long int idx) {
-  switch (idx) {
-  case 1: return a->n1;
-    break;
-  case 2: return a->n2;
-    break;
-  case 3: return a->n3;
-    break;
-  }
-  return 0;
-}
-
-int igraph_array3_resize(igraph_array3_t *a, long int n1, long int n2, 
-			 long int n3) {
-  int ret=igraph_vector_resize(&a->data, n1*n2*n3);
-  a->n1=n1;
-  a->n2=n2;
-  a->n3=n3;
-  a->n1n2=n1*n2;
-  
-  return ret;
-}
-
-void igraph_array3_null(igraph_array3_t *a) {
-  igraph_vector_null(&a->data);
-}
-
-igraph_real_t igraph_array3_sum(const igraph_array3_t *a) {
-  return igraph_vector_sum(&a->data);
-}
-
-void igraph_array3_scale(igraph_array3_t *a, igraph_real_t by) {
-  igraph_vector_scale(&a->data, by);
-}
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "array.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL

@@ -272,26 +272,29 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m);
 /* 3D array                                           */
 /* -------------------------------------------------- */
 
-typedef struct s_array3 {
-  igraph_vector_t data;
-  long int n1, n2, n3, n1n2;
-} igraph_array3_t;
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
+#include "array.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
 
-#define IGRAPH_ARRAY3_INIT_FINALLY(a, n1, n2, n3) \
-  do { IGRAPH_CHECK(igraph_array3_init(a, n1, n2, n3)); \
-  IGRAPH_FINALLY(igraph_array3_destroy, a); } while (0)
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "array.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
 
-#define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
-int igraph_array3_init(igraph_array3_t *a, long int n1, long int n2, 
-		       long int n3);
-void igraph_array3_destroy(igraph_array3_t *a);
-long int igraph_array3_size(const igraph_array3_t *a);
-long int igraph_array3_n(const igraph_array3_t *a, long int idx);
-int igraph_array3_resize(igraph_array3_t *a, long int n1, long int n2, 
-			 long int n3);
-void igraph_array3_null(igraph_array3_t *a);
-igraph_real_t igraph_array3_sum(const igraph_array3_t *a);
-void igraph_array3_scale(igraph_array3_t *a, igraph_real_t by);
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "array.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
+
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "array.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
 
 /* -------------------------------------------------- */
 /* Plain stack                                        */
