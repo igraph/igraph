@@ -1,4 +1,25 @@
 =========
+igraph 0.4.5
+=========
+
+Released January 1, 2008
+
+New:
+- Cohesive block finding in the R interface, thanks to Peter McMahan
+  for contributing his code. See James Moody and Douglas R. White,
+  2003, in Structural Cohesion and Embeddedness: A Hierarchical
+  Conception of Social Groups American Sociological Review 68(1):1-25 
+- Biconnected components and articulation points.
+- R interface: better printing of attributes.
+- R interface: graph attributes can be used via '$'.
+
+New in the C library: 
+- igraph_vector_bool_t data type.
+
+Bug fixed:
+- Erdos-Renyi random graph generators rewritten.
+
+=========
 igraph 0.4.4
 =========
 

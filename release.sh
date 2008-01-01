@@ -21,7 +21,7 @@ jed NEWS
 # make a tar.gz source distribution and upload it to the 
 #       igraph homepage
 make dist || exit 1
-scp igraph-${version}.tar.gz ${repohost}:${repodir}/download || exit 1
+scp igraph-${version}.tar.gz ${repohost}:${repodir}/download/ || exit 1
 
 #################################################
 # make documentation and upload it to the igraph homepage
@@ -105,8 +105,8 @@ cd ../.. && rm -rf debian-package || exit 1
 #################################################
 # make an R source package and upload that too
 
-scp interfaces/R/igraph_${version}.tar.gz ${repohost}:${repodir}/download &&
-scp interfaces/R/igraph_${version}.zip ${repohost}:${repodir}/download ||
+scp interfaces/R/igraph_${version}.tar.gz ${repohost}:${repodir}/download/ &&
+scp interfaces/R/igraph_${version}.zip ${repohost}:${repodir}/download/ ||
 exit 1
 
 #################################################
@@ -115,8 +115,8 @@ exit 1
 cp interfaces/R/igraph_${version}.tar.gz /tmp
 cd /tmp
 tar xzf igraph_${version}.tar.gz
-R CMD check igraph
-scp -rC igraph.Rcheck/igraph/html/* ${repohost}:${repodir}/doc/R/
+R CMD check -l ~/.R/library igraph
+scp -rC ~/.R/library/igraph/html/* ${repohost}:${repodir}/doc/R/
 dvipdf igraph.Rcheck/igraph-manual.dvi
 scp igraph-manual.pdf ${repohost}:${repodir}/doc/R/igraph.pdf
 
