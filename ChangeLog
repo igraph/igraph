@@ -18,6 +18,13 @@
 	
 	* interfaces/python/package/test/isomorphism.py : added tests
 
+2007-11-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_probs_d)
+	(igraph_revolver_probs_ad) : added
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_AD_dpareto_eval) : bug fixed
+
 2007-11-24  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/iterators.c (igraph_es_vector_copy) : added

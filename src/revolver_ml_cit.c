@@ -466,8 +466,8 @@ int igraph_i_revolver_ml_AD_eval(const igraph_vector_t *par,
 	  VECTOR(*grad)[i] -= MATRIX(*m, x, y) / MATRIX(data->A_vect, x, y);
 	  VECTOR(*grad)[i] += VECTOR(data->dS)[i] / S;
 	}
+	no_of_edges++;
       }
-      no_of_edges++;
     }
     
     /* Update S, data->dS */
@@ -533,12 +533,12 @@ igraph_real_t igraph_i_revolver_ml_AD_f(const igraph_vector_t *par,
     IGRAPH_WARNING("Target function evaluated to non-finite value.");
   }
   
-/*   printf("eval ("); */
-/*   for (i=0; i<igraph_vector_size(par); i++) { */
-/*     printf("%f ", VECTOR(*par)[i]); */
-/*   } */
-/*   printf(" ): "); */
-/*   printf("%g\n", data->lastf); */
+  printf("eval (");
+  for (i=0; i<igraph_vector_size(par); i++) {
+    printf("%f ", VECTOR(*par)[i]);
+  }
+  printf(" ): ");
+  printf("%g\n", data->lastf);
   return data->lastf;
 }
 
@@ -553,15 +553,15 @@ void igraph_i_revolver_ml_AD_df(const igraph_vector_t *par,
   }
   
   igraph_vector_update(res, &data->lastgrad);
-/*   printf("derivative ("); */
-/*   for (i=0; i<igraph_vector_size(par); i++) { */
-/*     printf("%f ", VECTOR(*par)[i]); */
-/*   } */
-/*   printf(" ): "); */
-/*   for (i=0; i<igraph_vector_size(res); i++) { */
-/*     printf("%f ", VECTOR(*res)[i]); */
-/*   } */
-/*   printf("\n"); */
+  printf("derivative (");
+  for (i=0; i<igraph_vector_size(par); i++) {
+    printf("%f ", VECTOR(*par)[i]);
+  }
+  printf(" ): ");
+  for (i=0; i<igraph_vector_size(res); i++) {
+    printf("%f ", VECTOR(*res)[i]);
+  }
+  printf("\n");
 }
 
 void igraph_i_revolver_ml_AD_free(igraph_vector_ptr_t *ptr) {
@@ -761,7 +761,6 @@ int igraph_revolver_ml_AD_dpareto_eval(const igraph_t *graph,
 				       const igraph_vector_t *filter) {
   igraph_vector_t res;
   int ret;
-  igraph_real_t Fmin;
   igraph_integer_t fncount, grcount;
   
   IGRAPH_VECTOR_INIT_FINALLY(&res, 5);
@@ -771,7 +770,7 @@ int igraph_revolver_ml_AD_dpareto_eval(const igraph_t *graph,
   VECTOR(res)[3] = parbeta;
   VECTOR(res)[4] = parscale;
   
-  ret=igraph_revolver_ml_AD(graph, &res, &Fmin, 0, 0, 0,
+  ret=igraph_revolver_ml_AD(graph, &res, value, 0, 0, 0,
 			    igraph_i_revolver_ml_AD_dpareto_f,
 			    igraph_i_revolver_ml_AD_dpareto_df,
 			    agebins, filter, &fncount, &grcount, deriv);
@@ -818,8 +817,6 @@ int igraph_revolver_ml_AD_dpareto(const igraph_t *graph,
 }
 
 /*------------------------------------------------------------------*/
-
-/* TODO: delta, logprob, lognull */
 
 int igraph_revolver_ml_d(const igraph_t *graph,
 			 igraph_integer_t niter,
@@ -1291,3 +1288,213 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
   
   return 0;
 }
+
+/* -----------------------------------------------------------*/
+
+int igraph_revolver_probs_d(const igraph_t *graph,
+			    const igraph_vector_t *kernel,
+			    igraph_vector_t *logprobs,
+			    igraph_vector_t *logcited,
+			    igraph_vector_t *logciting,
+			    igraph_bool_t pntk) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  long int t;
+  igraph_real_t S=0.0;
+  igraph_vector_long_t ntk;
+  long int ntksize=igraph_vector_size(kernel);
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  if (pntk) {
+    IGRAPH_CHECK(igraph_vector_long_init(&ntk, ntksize));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &ntk);
+  }
+
+  if (logprobs) {
+    IGRAPH_CHECK(igraph_vector_resize(logprobs, no_of_edges));
+  }
+  if (logciting) {
+    IGRAPH_CHECK(igraph_vector_resize(logciting, no_of_nodes));
+    igraph_vector_null(logciting);
+  }
+  if (logcited) {
+    IGRAPH_CHECK(igraph_vector_resize(logcited, no_of_nodes));
+    igraph_vector_null(logcited);
+  }
+  
+  for (t=0; t<no_of_nodes; t++) {
+    long int n, nneis;
+    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&neis);    
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(degree)[to];
+      igraph_real_t prob;
+      if (pntk) {
+	prob=log( VECTOR(ntk)[x] * VECTOR(*kernel)[x] / S );
+      } else {
+	prob=log( VECTOR(*kernel)[x] / S );
+      }
+      if (logprobs) {	
+	VECTOR(*logprobs)[edge] = prob;
+      }
+      if (logcited) { 
+	VECTOR(*logcited)[to] += prob;
+      }
+      if (logciting) {
+	VECTOR(*logciting)[t] += prob;
+      }
+    }
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(degree)[to];
+      
+      VECTOR(degree)[to] += 1;
+      if (pntk) {
+	VECTOR(ntk)[x+1] += 1;
+	VECTOR(ntk)[x] -= 1;
+      }
+      S += VECTOR(*kernel)[x+1];
+      S -= VECTOR(*kernel)[x];
+    }
+    if (pntk) {
+      VECTOR(ntk)[0] += 1;
+    }
+    S += VECTOR(*kernel)[0];
+    
+  } /* t < no_of_nodes */
+
+  if (pntk) {
+    igraph_vector_long_destroy(&ntk);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&neis);
+  igraph_vector_long_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
+int igraph_revolver_probs_ad(const igraph_t *graph,
+			     const igraph_matrix_t *kernel,
+			     igraph_vector_t *logprobs,
+			     igraph_vector_t *logcited,
+			     igraph_vector_t *logciting, 
+			     igraph_bool_t pntk) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  long int t, j;
+  igraph_real_t S=0.0;
+  long int agebins=igraph_matrix_ncol(kernel);
+  long int binwidth=no_of_nodes/agebins+1;
+  igraph_matrix_long_t ntk;
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  
+  if (pntk) {
+    IGRAPH_CHECK(igraph_matrix_long_init(&ntk, igraph_matrix_nrow(kernel),
+					 igraph_matrix_ncol(kernel)));
+    IGRAPH_FINALLY(igraph_matrix_long_destroy, &ntk);    
+  }
+
+  if (logprobs) {
+    IGRAPH_CHECK(igraph_vector_resize(logprobs, no_of_edges));
+  }
+  if (logcited) {
+    IGRAPH_CHECK(igraph_vector_resize(logcited, no_of_nodes));
+    igraph_vector_null(logcited);
+  }
+  if (logciting) {
+    IGRAPH_CHECK(igraph_vector_resize(logciting, no_of_nodes));
+    igraph_vector_null(logciting);
+  }  
+  
+  for (t=0; t<no_of_nodes; t++) {
+    long int n, nneis;
+    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&neis);
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(degree)[to];
+      long int y=(t-to)/binwidth;
+      igraph_real_t prob;
+      if (pntk) {
+	prob=log( MATRIX(ntk, x, y) * MATRIX(*kernel, x, y) / S );
+      } else {
+	prob=log( MATRIX(*kernel, x, y) / S );
+      }
+      if (logprobs) {
+	VECTOR(*logprobs)[edge] = prob;
+      }
+      if (logcited) {
+	VECTOR(*logcited)[to] += prob;
+      }
+      if (logciting) {
+	VECTOR(*logciting)[t] += prob;
+      }
+    }
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      long int x=VECTOR(degree)[to];
+      long int y=(t-to)/binwidth;
+      
+      VECTOR(degree)[to] += 1;
+      if (pntk) {
+	MATRIX(ntk, x+1, y) += 1;
+	MATRIX(ntk, x, y) -= 1;
+      }
+      S += MATRIX(*kernel, x+1, y);
+      S -= MATRIX(*kernel, x, y);
+    }
+    
+    for (j=1; t-binwidth*j+1>=0; j++) {
+      long int shnode=t-binwidth*j+1;
+      long int deg=VECTOR(degree)[shnode];
+      if (pntk) {
+	MATRIX(ntk, deg, j) += 1;
+	MATRIX(ntk, deg, j-1) -= 1;
+      }
+      S += MATRIX(*kernel, deg, j);
+      S -= MATRIX(*kernel, deg, j-1);
+    }
+    if (pntk) {
+      MATRIX(ntk, 0, 0) += 1;
+    }
+    S += MATRIX(*kernel, 0, 0);
+    
+  } /* t < no_of_nodes */
+
+  if (pntk) {
+    igraph_matrix_long_destroy(&ntk);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_destroy(&neis);
+  igraph_vector_long_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
