@@ -1190,7 +1190,7 @@ int igraph_i_revolver_ml_ADE_eval(const igraph_vector_t *par,
     for (i=0; i<data->maxdegree+1; i++) {
       for (j=0; j<agebins; j++) {
 	long int k;
-	VECTOR(data->par1)[0]=c; 
+	VECTOR(data->par1)[0]=c;
 	VECTOR(data->par1)[1]=i;
 	VECTOR(data->par1)[2]=j;
 	ARRAY3(data->A_vect, c, (i), (j)) = data->A(&data->par1, par, 0);
@@ -1204,7 +1204,7 @@ int igraph_i_revolver_ml_ADE_eval(const igraph_vector_t *par,
   }
 
   for (t=0; t<data->no_of_nodes; t++) {
-    long int n, nneis;
+    long int n, nneis, shnode;
     long int tcat=VECTOR(*data->cats)[t];
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1258,8 +1258,7 @@ int igraph_i_revolver_ml_ADE_eval(const igraph_vector_t *par,
       VECTOR(data->dS)[i] += ARRAY3(*m, tcat, 0, 0);
     }
     /* Aging */
-    for (j=1; t-binwidth*j+1>=0; j++) {
-      long int shnode=t-binwidth*j+1;
+    for (j=1, shnode=t-binwidth+1; shnode>=0; j++, shnode-=binwidth) {
       long int cat=VECTOR(*data->cats)[shnode];
       long int deg=VECTOR(data->degree)[shnode];
 /*       CHECK_VALID(deg, j-1); */
@@ -1580,7 +1579,7 @@ int igraph_revolver_ml_ADE_dpareto_eval(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   return ret;
 }
-  
+
 int igraph_revolver_ml_ADE_dpareto(const igraph_t *graph,
 				   const igraph_vector_t *cats,
 				   igraph_real_t *alpha, igraph_real_t *a,
@@ -1623,6 +1622,157 @@ int igraph_revolver_ml_ADE_dpareto(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   return ret;
 }  
+
+void igraph_i_revolver_ml_ADE_dpareto_evalf_free(igraph_vector_ptr_t *p) {
+  long int i, n=igraph_vector_ptr_size(p);
+  for (i=0; i<n; i++) {
+    igraph_array3_t *A=VECTOR(*p)[i];
+    if (A) { 
+      igraph_array3_destroy(A);
+      igraph_Free(A);
+      VECTOR(*p)[i] = 0;
+    }
+  }
+}
+
+int igraph_revolver_ml_ADE_dpareto_evalf(const igraph_t *graph,
+					 const igraph_vector_t *cats,
+					 const igraph_matrix_t *par,
+					 igraph_vector_t *value,
+					 int agebins, 
+					 const igraph_vector_t *filter) {
+  
+  igraph_vector_t S;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int binwidth=no_of_nodes/agebins+1;
+  long int no_of_edges=0;
+  igraph_vector_long_t degree;
+  igraph_vector_ptr_t A_ptr;
+  igraph_vector_t neis;
+  igraph_integer_t pmaxdegree;
+  long int maxdegree;
+  long int nocats=igraph_vector_max(cats)+1;
+  long int nopar=igraph_matrix_nrow(par);
+  long int c, i, j, t;
+
+  if (filter && igraph_vector_size(filter) != no_of_nodes) {
+    IGRAPH_ERROR("ML ADE dpareto evaf: invalid filter vector size", 
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_maxdegree(graph, &pmaxdegree, igraph_vss_all(), 
+				IGRAPH_IN, /*loops=*/1));
+  maxdegree=pmaxdegree;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&neis, maxdegree));
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+
+  IGRAPH_CHECK(igraph_vector_ptr_init(&A_ptr, nopar));
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &A_ptr);
+  IGRAPH_FINALLY(igraph_i_revolver_ml_ADE_dpareto_evalf_free, &A_ptr);
+  for (i=0; i<nopar; i++) {
+    igraph_array3_t *A=igraph_Calloc(1, igraph_array3_t);
+    igraph_array3_init(A, nocats, maxdegree+1, agebins);
+    VECTOR(A_ptr)[i] = A;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&S, nopar);
+  IGRAPH_CHECK(igraph_vector_resize(value, nopar));
+  igraph_vector_null(value);
+
+  for (t=0; t<nopar; t++) {
+    igraph_real_t alpha=MATRIX(*par,t,0);
+    igraph_real_t a=MATRIX(*par,t,1);
+    igraph_real_t paralpha=MATRIX(*par,t,2);
+    igraph_real_t parbeta=MATRIX(*par,t,3);
+    igraph_real_t parscale=MATRIX(*par,t,4);
+    igraph_array3_t *A=VECTOR(A_ptr)[t];
+    for (c=0; c<nocats; c++) {
+      igraph_real_t cc= c==0 ? 1.0 : MATRIX(*par,t,c+4);
+      for (i=0; i<maxdegree+1; i++) {
+	igraph_real_t p1= i==0 ? a : pow(i, alpha)+a;
+	for (j=0; j<agebins; j++) {
+	  igraph_real_t age=j+1;
+	  ARRAY3(*A, c, i, j) = age < parscale ? 
+	    cc * p1 * pow(age/parscale, parbeta-1) :
+	    cc * p1 * pow(age/parscale, -paralpha-1);
+	}
+      }
+    }
+  }    
+
+  for (t=0; t<no_of_nodes; t++) {
+    long int n, nneis, shnode;
+    long int tcat=VECTOR(*cats)[t];
+    
+    igraph_neighbors(graph, &neis, t, IGRAPH_OUT);
+    nneis=igraph_vector_size(&neis);
+    
+    if (! filter || VECTOR(*filter)[t]) {
+      
+      for (n=0; n<nneis; n++) {
+	long int to=VECTOR(neis)[n];
+	long int x=VECTOR(*cats)[to];
+	long int y=VECTOR(degree)[to];
+	long int z=(t-to)/binwidth;
+	
+	for (i=0; i<nopar; i++) {
+	  igraph_array3_t *A=VECTOR(A_ptr)[i];
+	  VECTOR(*value)[i] -= log(ARRAY3(*A, x, y, z));
+	  VECTOR(*value)[i] += log(VECTOR(S)[i]);
+	}
+	no_of_edges++;
+      }
+    }
+    
+    for (n=0; n<nneis; n++) {
+      long int to=VECTOR(neis)[n];
+      long int x=VECTOR(*cats)[to];
+      long int y=VECTOR(degree)[to];
+      long int z=(t-to)/binwidth;
+      
+      VECTOR(degree)[to] += 1;
+      for (i=0; i<nopar; i++) {
+	igraph_array3_t *A=VECTOR(A_ptr)[i];
+	VECTOR(S)[i] += ARRAY3(*A, x, y+1, z);
+	VECTOR(S)[i] -= ARRAY3(*A, x, y, z);
+      }
+    }
+
+    for (i=0; i<nopar; i++) {
+      igraph_array3_t *A=VECTOR(A_ptr)[i];
+      VECTOR(S)[i] += ARRAY3(*A, tcat, 0, 0);
+    }
+    for (j=1, shnode=t-binwidth+1; shnode>=0; j++, shnode-=binwidth) {
+      long int cat=VECTOR(*cats)[shnode];
+      long int deg=VECTOR(degree)[shnode];
+      for (i=0; i<nopar; i++) {
+	igraph_array3_t *A=VECTOR(A_ptr)[i];
+	VECTOR(S)[i] += ARRAY3(*A, cat, deg, j);
+	VECTOR(S)[i] -= ARRAY3(*A, cat, deg, j-1);
+      }
+    }
+  } /* t < no_of_nodes */
+
+  for (i=0; i<nopar; i++) {
+    VECTOR(*value)[i] /= no_of_edges;
+  }
+
+  igraph_vector_destroy(&S);
+  igraph_i_revolver_ml_ADE_dpareto_evalf_free(&A_ptr);
+  igraph_vector_ptr_destroy(&A_ptr);
+  igraph_vector_long_destroy(&degree);
+  igraph_vector_destroy(&neis);
+  IGRAPH_FINALLY_CLEAN(5);
+  
+  return 0;
+}
+  
+  
+  
+  
 
 /*------------------------------------------------------------------*/
 

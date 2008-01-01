@@ -1,3 +1,7 @@
+2007-12-06  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_ADE_dpareto_evalf) : added
+
 2007-12-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c

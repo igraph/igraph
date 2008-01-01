@@ -2572,6 +2572,13 @@ int igraph_revolver_ml_ADE_dpareto_eval(const igraph_t *graph,
 					int agebins,
 					const igraph_vector_t *filter);
 
+int igraph_revolver_ml_ADE_dpareto_evalf(const igraph_t *graph,
+					 const igraph_vector_t *cats,
+					 const igraph_matrix_t *par,
+					 igraph_vector_t *value,
+					 int agebins, 
+					 const igraph_vector_t *filter);
+
 /* -------------------------------------------------- */
 /* Other, not graph related                           */
 /* -------------------------------------------------- */

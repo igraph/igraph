@@ -944,7 +944,7 @@ igraph_revolver_probs_de:
 igraph_revolver_ml_ade:
         PARAMS: GRAPH graph, INTEGER niter, OUT ARRAY3 kernel, \
                 VECTOR cats, OUT ARRAY3_OR_0 cites, INTEGER agebins=300, \
-                REAL delta=1e-10, VECTOR_OR_0 filter, \
+                REAL delta=1e-10, VECTOR_OR_0 filter=NULL, \
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.ade
         FLAGS: PROGRESS
@@ -970,7 +970,7 @@ igraph_revolver_ml_l:
 igraph_revolver_ml_ad:
         PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
                 OUT MATRIX_OR_0 cites, INTEGER agebins=300, \
-                REAL delta=1e-10, VECTOR_OR_0 filter, \
+                REAL delta=1e-10, VECTOR_OR_0 filter=NULL, \
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.ad
         FLAGS: PROGRESS
@@ -1055,6 +1055,11 @@ igraph_revolver_ml_ADE_dpareto_eval:
                 OUT REALPTR value, OUT VECTOR deriv, INT agebins=300, \
                 VECTOR_OR_0 filter=NULL
         NAME-R: revolver.ml.ADE.dpareto.eval
+
+igraph_revolver_ml_ADE_dpareto_evalf:
+        PARAMS: GRAPH graph, VECTOR cats, MATRIX par, OUT VECTOR value, \
+                INT agebins, VECTOR_OR_0 filter=NULL
+        NAME-R: revolver.ml.ADE.dpareto.evalf
 
 #######################################
 # Other, (yet) undocumented functions
