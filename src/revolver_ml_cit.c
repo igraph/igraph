@@ -69,13 +69,10 @@ int igraph_i_revolver_ml_D_eval(const igraph_vector_t *par,
 
   /* Calculate all possible A and dA values and store them in A_vect &
      dA_vects */
-  for (i=0; i<dim; i++) {
-    VECTOR(data->par1)[i+1] = VECTOR(*par)[i];
-  }
   for (t=0; t<=data->maxdegree; t++) {
     VECTOR(data->par1)[0] = t;
-    VECTOR(data->A_vect)[t] = data->A(&data->par1, 0);
-    data->dA(&data->par1, &data->tmpgrad, 0);
+    VECTOR(data->A_vect)[t] = data->A(&data->par1, par, 0);
+    data->dA(&data->par1, par, &data->tmpgrad, 0);
     for (i=0; i<dim; i++) {
       igraph_vector_t *v=VECTOR(data->dA_vects)[i];
       VECTOR(*v)[t] = VECTOR(data->tmpgrad)[i];
@@ -145,6 +142,7 @@ int igraph_i_revolver_ml_D_eval(const igraph_vector_t *par,
 */
 
 igraph_real_t igraph_i_revolver_ml_D_f(const igraph_vector_t *par,
+				       const igraph_vector_t *garbage,
 				       void* extra) {
 
   igraph_i_revolver_ml_D_data_t *data=extra;
@@ -161,6 +159,7 @@ igraph_real_t igraph_i_revolver_ml_D_f(const igraph_vector_t *par,
 */
 
 void igraph_i_revolver_ml_D_df(const igraph_vector_t *par,
+			       const igraph_vector_t *garbage,
 			       igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_D_data_t *data=extra;
@@ -263,10 +262,11 @@ int igraph_revolver_ml_D(const igraph_t *graph,
    calls the general degree-based optimizer.
 */
 
-igraph_real_t igraph_i_revolver_ml_D_alpha_f(const igraph_vector_t *par, 
+igraph_real_t igraph_i_revolver_ml_D_alpha_f(const igraph_vector_t *var, 
+					     const igraph_vector_t *par,
 					     void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t alpha=VECTOR(*par)[1];
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t alpha=VECTOR(*var)[1];
   if (deg != 0) {
     return pow(deg, alpha) + 1.0;
   } else {
@@ -274,11 +274,12 @@ igraph_real_t igraph_i_revolver_ml_D_alpha_f(const igraph_vector_t *par,
   }
 }
 
-void igraph_i_revolver_ml_D_alpha_df(const igraph_vector_t *par,
+void igraph_i_revolver_ml_D_alpha_df(const igraph_vector_t *var,
+				     const igraph_vector_t *par,
 				     igraph_vector_t *res, 
 				     void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t alpha=VECTOR(*par)[1];
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t alpha=VECTOR(*var)[1];
   if (deg != 0) {
     VECTOR(*res)[0] = log(deg) * pow(deg, alpha);
   } else {
@@ -316,11 +317,12 @@ int igraph_revolver_ml_D_alpha(const igraph_t *graph,
    calls the general degree-based optimizer.
 */
 
-igraph_real_t igraph_i_revolver_ml_D_alpha_a_f(const igraph_vector_t *par,
+igraph_real_t igraph_i_revolver_ml_D_alpha_a_f(const igraph_vector_t *var,
+					       const igraph_vector_t *par,
 					       void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t alpha=VECTOR(*par)[1];
-  igraph_real_t a=VECTOR(*par)[2];
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
   if (deg != 0) {
     return pow(deg, alpha) + a;
   } else {
@@ -328,11 +330,12 @@ igraph_real_t igraph_i_revolver_ml_D_alpha_a_f(const igraph_vector_t *par,
   }  
 }
 
-void igraph_i_revolver_ml_D_alpha_a_df(const igraph_vector_t *par,
+void igraph_i_revolver_ml_D_alpha_a_df(const igraph_vector_t *var,
+				       const igraph_vector_t *par,
 				       igraph_vector_t *res,
 				       void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t alpha=VECTOR(*par)[1];
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t alpha=VECTOR(*par)[0];
   /* a not needed */
   if (deg != 0) {
     VECTOR(*res)[0] = log(deg) * pow(deg, alpha);
@@ -400,8 +403,8 @@ typedef struct igraph_i_revolver_ml_AD_data_t {
   if (!MATRIX(data->A_valid,(X),(Y))) { \
      int i; \
      VECTOR(data->par1)[0]=(X); VECTOR(data->par1)[1]=(Y); \
-     MATRIX(data->A_vect, (X), (Y)) = data->A(&data->par1, 0); \
-     data->dA(&data->par1, &data->tmpgrad, 0); \
+     MATRIX(data->A_vect, (X), (Y)) = data->A(&data->par1, par, 0); \
+     data->dA(&data->par1, 0, &data->tmpgrad, 0); \
      for (i=0; i<dim; i++) { \
        igraph_matrix_t *m=VECTOR(data->dA_vects)[i]; \
        MATRIX(*m, (X), (Y)) = VECTOR(data->tmpgrad)[i]; \
@@ -425,16 +428,12 @@ int igraph_i_revolver_ml_AD_eval(const igraph_vector_t *par,
   igraph_vector_null(grad);
   igraph_matrix_bool_null(&data->A_valid);
 
-  for (i=0; i<dim; i++) {
-    VECTOR(data->par1)[i+2] = VECTOR(*par)[i];
-  }
-
   for (i=0; i<data->maxdegree+1; i++) {
     for (j=0; j<agebins; j++) {
       long int k;
       VECTOR(data->par1)[0]=(i); VECTOR(data->par1)[1]=(j);
-      MATRIX(data->A_vect, (i), (j)) = data->A(&data->par1, 0);
-      data->dA(&data->par1, &data->tmpgrad, 0);
+      MATRIX(data->A_vect, (i), (j)) = data->A(&data->par1, par, 0);
+      data->dA(&data->par1, par, &data->tmpgrad, 0);
       for (k=0; k<dim; k++) {
 	igraph_matrix_t *m=VECTOR(data->dA_vects)[k];
 	MATRIX(*m, (i), (j)) = VECTOR(data->tmpgrad)[k];
@@ -520,6 +519,7 @@ int igraph_i_revolver_ml_AD_eval(const igraph_vector_t *par,
 }
 
 igraph_real_t igraph_i_revolver_ml_AD_f(const igraph_vector_t *par,
+					const igraph_vector_t *garbage,
 					void *extra) {
 
   igraph_i_revolver_ml_AD_data_t *data=extra;
@@ -543,6 +543,7 @@ igraph_real_t igraph_i_revolver_ml_AD_f(const igraph_vector_t *par,
 }
 
 void igraph_i_revolver_ml_AD_df(const igraph_vector_t *par,
+				const igraph_vector_t *garbage,
 				igraph_vector_t *res, void *extra) {
 
   igraph_i_revolver_ml_AD_data_t *data=extra;
@@ -649,24 +650,26 @@ int igraph_revolver_ml_AD(const igraph_t *graph,
   return 0;
 }
 
-igraph_real_t igraph_i_revolver_ml_AD_alpha_a_beta_f(const igraph_vector_t *par,
+igraph_real_t igraph_i_revolver_ml_AD_alpha_a_beta_f(const igraph_vector_t *var,
+						     const igraph_vector_t *par,
 						     void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t age=VECTOR(*par)[1]+1;
-  igraph_real_t alpha=VECTOR(*par)[2];
-  igraph_real_t a=VECTOR(*par)[3];
-  igraph_real_t beta=VECTOR(*par)[4];
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t age=VECTOR(*var)[1]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t beta=VECTOR(*par)[2];
   return (pow(deg, alpha) + a) * pow(age, -beta);
 }
 
-void igraph_i_revolver_ml_AD_alpha_a_beta_df(const igraph_vector_t *par,
-					    igraph_vector_t *res,
-					    void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t age=VECTOR(*par)[1]+1;
-  igraph_real_t alpha=VECTOR(*par)[2];
-  igraph_real_t a=VECTOR(*par)[3];
-  igraph_real_t beta=VECTOR(*par)[4];
+void igraph_i_revolver_ml_AD_alpha_a_beta_df(const igraph_vector_t *var,
+					     const igraph_vector_t *par,
+					     igraph_vector_t *res,
+					     void *extra) {
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t age=VECTOR(*var)[1]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t beta=VECTOR(*par)[2];
   igraph_real_t p1=pow(deg, alpha);
   igraph_real_t p2=pow(age, -beta);
   VECTOR(*res)[0]= deg == 0 ? 0.0 : p2*log(deg)*p1;
@@ -704,15 +707,16 @@ int igraph_revolver_ml_AD_alpha_a_beta(const igraph_t *graph,
   return ret;
 }
 
-igraph_real_t igraph_i_revolver_ml_AD_dpareto_f(const igraph_vector_t *par,
+igraph_real_t igraph_i_revolver_ml_AD_dpareto_f(const igraph_vector_t *var,
+						const igraph_vector_t *par,
 						void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t age=VECTOR(*par)[1]+1;
-  igraph_real_t alpha=VECTOR(*par)[2];
-  igraph_real_t a=VECTOR(*par)[3];
-  igraph_real_t paralpha=VECTOR(*par)[4];
-  igraph_real_t parbeta=VECTOR(*par)[5];
-  igraph_real_t parscale=VECTOR(*par)[6];
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t age=VECTOR(*var)[1]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t paralpha=VECTOR(*par)[2];
+  igraph_real_t parbeta=VECTOR(*par)[3];
+  igraph_real_t parscale=VECTOR(*par)[4];
   
   igraph_real_t res= age < parscale ? 
     (pow(deg,alpha)+a) * pow(age/parscale, parbeta-1) : 
@@ -724,16 +728,17 @@ igraph_real_t igraph_i_revolver_ml_AD_dpareto_f(const igraph_vector_t *par,
   return res;
 }
 
-void igraph_i_revolver_ml_AD_dpareto_df(const igraph_vector_t *par,
+void igraph_i_revolver_ml_AD_dpareto_df(const igraph_vector_t *var,
+					const igraph_vector_t *par,
 					igraph_vector_t *res,
 					void *extra) {
-  igraph_real_t deg=VECTOR(*par)[0];
-  igraph_real_t age=VECTOR(*par)[1]+1;
-  igraph_real_t alpha=VECTOR(*par)[2];
-  igraph_real_t a=VECTOR(*par)[3];
-  igraph_real_t paralpha=VECTOR(*par)[4];
-  igraph_real_t parbeta=VECTOR(*par)[5];
-  igraph_real_t parscale=VECTOR(*par)[6];
+  igraph_real_t deg=VECTOR(*var)[0];
+  igraph_real_t age=VECTOR(*var)[1]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t paralpha=VECTOR(*par)[2];
+  igraph_real_t parbeta=VECTOR(*par)[3];
+  igraph_real_t parscale=VECTOR(*par)[4];
   igraph_real_t exponent= age < parscale ? parbeta : -paralpha;
   igraph_real_t p1=pow(deg, alpha);  
   igraph_real_t p2=pow(age/parscale, exponent-1);

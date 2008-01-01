@@ -56,7 +56,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
   igraph_real_t D1, D2;
 
   if (maxit <= 0) {
-    *Fmin = fminfn(b, ex);
+    *Fmin = fminfn(b, 0, ex);
     *fncount = 1;
     *grcount = 0;
     return 0;
@@ -69,13 +69,13 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
   IGRAPH_VECTOR_INIT_FINALLY(&X, n);
   IGRAPH_VECTOR_INIT_FINALLY(&c, n);
   IGRAPH_MATRIX_INIT_FINALLY(&B, n, n);
-  f = fminfn(b, ex);
+  f = fminfn(b, 0, ex);
   if (!IGRAPH_FINITE(f))
     IGRAPH_ERROR("initial value in 'BFGS' is not finite", IGRAPH_DIVERGED);
   if (trace) printf("initial  value %f \n", f);
   *Fmin = f;
   funcount = gradcount = 1;
-  fmingr(b, &g, ex);
+  fmingr(b, 0, &g, ex);
   iter++;
   ilast = gradcount;
 
@@ -113,7 +113,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
 	    count++;
 	}
 	if (count < n) {
-	  f = fminfn(b, ex);
+	  f = fminfn(b, 0, ex);
 	  funcount++;
 	  accpoint = IGRAPH_FINITE(f) &&
 	    (f <= *Fmin + gradproj * steplength * acctol);
@@ -131,7 +131,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
       }
       if (count < n) {/* making progress */
 	*Fmin = f;
-	fmingr(b, &g, ex);
+	fmingr(b, 0, &g, ex);
 	gradcount++;
 	iter++;
 	D1 = 0.0;

@@ -156,9 +156,11 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 typedef enum { IGRAPH_I_DONT_SIMPLIFY=0,
 	       IGRAPH_I_SIMPLIFY } igraph_i_lazy_adlist_simplify_t;
 
-typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *par, 
+typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
+						const igraph_vector_t *par,
 						void* extra);
-typedef void igraph_vector_function_t(const igraph_vector_t * par, 
+typedef void igraph_vector_function_t(const igraph_vector_t *var, 
+				      const igraph_vector_t *par,
 				      igraph_vector_t* res, void* extra);
 
 /* -------------------------------------------------- */

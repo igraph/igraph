@@ -20,6 +20,9 @@
 
 2007-12-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/igraph.h (igraph_scalar_function_t, igraph_vector_function_t) :
+	use separate arguments for variables and parameters
+
 	* src/revolver_ml_cit.c (igraph_revolver_ml_d, igraph_revolver_ml_de)
 	(igraph_revolver_ml_ade, igraph_revolveR_ml_ad) : filter argument added
 
