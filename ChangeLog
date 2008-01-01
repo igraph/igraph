@@ -68,6 +68,8 @@
 	* src/revolver_ml_cot.c (igraph_revolver_ml_de, igraph_revolver_ml_ade) :
 	added
 
+	* src/array.pmt (igraph_array3_fill, igraph_array3_update) : added
+
 	* src/games.c (igraph_callaway_traits_game, igraph_establisment_game)
 	(igraph_cited_type_game) : bugs fixed
 

@@ -77,3 +77,14 @@ BASE FUNCTION(igraph_array3,sum)(const TYPE(igraph_array3) *a) {
 void FUNCTION(igraph_array3,scale)(TYPE(igraph_array3) *a, BASE by) {
   FUNCTION(igraph_vector,scale)(&a->data, by);
 }
+
+void FUNCTION(igraph_array3,fill)(TYPE(igraph_array3) *a, BASE e) {
+  FUNCTION(igraph_vector,fill)(&a->data, e);
+}
+
+int FUNCTION(igraph_array3,update)(TYPE(igraph_array3) *to, 
+				   const TYPE(igraph_array3) *from) {
+  IGRAPH_CHECK(FUNCTION(igraph_array3,resize)(to, from->n1, from->n2, from->n3));
+  FUNCTION(igraph_vector,update)(&to->data, &from->data);  
+  return 0;
+}

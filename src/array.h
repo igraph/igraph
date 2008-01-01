@@ -46,4 +46,6 @@ int FUNCTION(igraph_array3,resize)(TYPE(igraph_array3) *a, long int n1, long int
 void FUNCTION(igraph_array3,null)(TYPE(igraph_array3) *a);
 BASE FUNCTION(igraph_array3,sum)(const TYPE(igraph_array3) *a);
 void FUNCTION(igraph_array3,scale)(TYPE(igraph_array3) *a, BASE by);
-
+void FUNCTION(igraph_array3,fill)(TYPE(igraph_array3) *a, BASE e);
+int FUNCTION(igraph_array3,update)(TYPE(igraph_array3) *to, 
+				   const TYPE(igraph_array3) *from);
