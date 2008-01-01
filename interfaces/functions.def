@@ -1068,6 +1068,12 @@ igraph_revolver_ml_ADE_dpareto_evalf:
                 INT agebins, VECTOR_OR_0 filter=NULL
         NAME-R: revolver.ml.ADE.dpareto.evalf
 
+igraph_revolver_probs_ADE_dpareto:
+        PARAMS: GRAPH graph, MATRIX par, VECTOR cats, VECTOR gcats, \
+                INT agebins, OUT VECTOR_OR_0 logprobs, \
+                OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+        NAME-R: revolver.probs.ADE.dpareto
+
 #######################################
 # Other, (yet) undocumented functions
 #######################################

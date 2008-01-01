@@ -2533,6 +2533,8 @@ int igraph_revolver_ml_AD_dpareto_eval(const igraph_t *graph,
 				       int agebins,
 				       const igraph_vector_t *filter);
 
+
+
 int igraph_revolver_ml_ADE(const igraph_t *graph,
 			   const igraph_vector_t *cats,
 			   igraph_vector_t *res,
@@ -2544,6 +2546,16 @@ int igraph_revolver_ml_ADE(const igraph_t *graph,
 			   igraph_integer_t *fncount, 
 			   igraph_integer_t *grcount,
 			   igraph_vector_t *lastderiv);
+
+int igraph_revolver_probs_ADE(const igraph_t *graph,
+			      igraph_scalar_function_t *A_fun,
+			      const igraph_matrix_t *par,
+			      const igraph_vector_t *cats,
+			      const igraph_vector_t *gcats,
+			      int agebins,
+			      igraph_vector_t *logprobs,
+			      igraph_vector_t *logcited,
+			      igraph_vector_t *logciting);
 
 int igraph_revolver_ml_ADE_alpha_a_beta(const igraph_t *graph,
 					const igraph_vector_t *cats,
@@ -2586,6 +2598,15 @@ int igraph_revolver_ml_ADE_dpareto_evalf(const igraph_t *graph,
 					 igraph_vector_t *value,
 					 int agebins, 
 					 const igraph_vector_t *filter);
+
+int igraph_revolver_probs_ADE_dpareto(const igraph_t *graph,
+				      const igraph_matrix_t *par,
+				      const igraph_vector_t *cats,
+				      const igraph_vector_t *gcats,
+				      int agebins,
+				      igraph_vector_t *logprobs,
+				      igraph_vector_t *logcited,
+				      igraph_vector_t *logciting);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */

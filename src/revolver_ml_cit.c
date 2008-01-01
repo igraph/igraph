@@ -3395,5 +3395,136 @@ int igraph_revolver_probs_ade(const igraph_t *graph,
   return 0;
 }
 
-
+int igraph_revolver_probs_ADE(const igraph_t *graph,
+			      igraph_scalar_function_t *A_fun,
+			      const igraph_matrix_t *par,
+			      const igraph_vector_t *cats,
+			      const igraph_vector_t *gcats,
+			      int agebins,
+			      igraph_vector_t *logprobs,
+			      igraph_vector_t *logcited,
+			      igraph_vector_t *logciting) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  igraph_vector_t S;
+  igraph_vector_t gpar;
+  igraph_vector_t var;
+  int parlen=igraph_matrix_nrow(par);
+  int no_gcats=igraph_matrix_ncol(par);
+  long int t, i, j;
+  
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&S, no_gcats);
+  IGRAPH_VECTOR_INIT_FINALLY(&var, 3);
+  
+  if (logprobs) {
+    IGRAPH_CHECK(igraph_vector_resize(logprobs, no_of_edges));
+  }
+  if (logcited) {
+    IGRAPH_CHECK(igraph_vector_resize(logcited, no_of_nodes));
+    igraph_vector_null(logcited);
+  }
+  if (logciting) {
+    IGRAPH_CHECK(igraph_vector_resize(logciting, no_of_nodes));
+    igraph_vector_null(logciting);
+  }
+  
+  for (t=0; t<no_of_nodes; t++) {
+    long int n, nneis;
+    long int tcat=VECTOR(*gcats)[t];
+    igraph_vector_view(&gpar, &MATRIX(*par,0,tcat), parlen);
+    IGRAPH_CHECK(igraph_adjacent(graph, &neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&neis);
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      VECTOR(var)[0] = VECTOR(*cats)[to];
+      VECTOR(var)[1] = VECTOR(degree)[to];
+      VECTOR(var)[2] = (t-to)/binwidth;
+      igraph_real_t prob=log( A_fun(&var, &gpar, 0) / VECTOR(S)[tcat] );
+      if (logprobs) {
+	VECTOR(*logprobs)[edge] = prob;
+      } 
+      if (logcited) {
+	VECTOR(*logcited)[to] += prob;
+      }
+      if (logciting) {
+	VECTOR(*logciting)[t] += prob;
+      }
+    }
       
+    for (n=0; n<nneis; n++) {
+      long int edge=VECTOR(neis)[n];
+      long int to=IGRAPH_OTHER(graph, edge, t);
+      VECTOR(var)[0] = VECTOR(*cats)[to];
+      VECTOR(var)[1] = VECTOR(degree)[to];
+      VECTOR(var)[2] = (t-to)/binwidth;
+      
+      VECTOR(degree)[to] += 1;
+      for (i=0; i<no_gcats; i++) {
+	igraph_vector_view(&gpar, &MATRIX(*par,0,i), parlen);
+	VECTOR(S)[i] -= A_fun(&var, &gpar, 0);
+      }
+      VECTOR(var)[1] += 1;
+      for (i=0; i<no_gcats; i++) {
+	igraph_vector_view(&gpar, &MATRIX(*par,0,i), parlen);
+	VECTOR(S)[i] += A_fun(&var, &gpar, 0);
+      }
+    }
+    
+    for (j=1; t-binwidth*j+1>=0; j++) {
+      long int shnode=t-binwidth*j+1;
+      VECTOR(var)[0] = VECTOR(*cats)[shnode];
+      VECTOR(var)[1] = VECTOR(degree)[shnode];
+      VECTOR(var)[2] = j;
+      for (i=0; i<no_gcats; i++) {
+	igraph_vector_view(&gpar, &MATRIX(*par,0,i), parlen);
+	VECTOR(S)[i] += A_fun(&var, &gpar, 0);
+      }
+      VECTOR(var)[2] = j-1;
+      for (i=0; i<no_gcats; i++) {
+	igraph_vector_view(&gpar, &MATRIX(*par,0,i), parlen);
+	VECTOR(S)[i] += A_fun(&var, &gpar, 0);
+      }
+    }
+    VECTOR(var)[0]=VECTOR(*cats)[t];
+    VECTOR(var)[1]=0;
+    VECTOR(var)[2]=0;
+    for (i=0; i<no_gcats; i++) {
+      igraph_vector_view(&gpar, &MATRIX(*par,0,i), parlen);
+      VECTOR(S)[i] += A_fun(&var, &gpar, 0);
+    }
+  
+  } /* t<no_of_nodes */
+  
+  igraph_vector_destroy(&var);
+  igraph_vector_destroy(&S);
+  igraph_vector_destroy(&neis);
+  igraph_vector_long_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(4);
+  return 0;
+}
+ 
+int igraph_revolver_probs_ADE_dpareto(const igraph_t *graph,
+				      const igraph_matrix_t *par,
+				      const igraph_vector_t *cats,
+				      const igraph_vector_t *gcats,
+				      int agebins,
+				      igraph_vector_t *logprobs,
+				      igraph_vector_t *logcited,
+				      igraph_vector_t *logciting) {
+  
+  return igraph_revolver_probs_ADE(graph, igraph_i_revolver_ml_ADE_dpareto_f,
+				   par, cats, gcats, agebins, logprobs, 
+				   logcited, logciting);
+}

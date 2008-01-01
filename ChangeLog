@@ -1,3 +1,8 @@
+2008-01-01  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.v (igraph_revolver_probs_ADE) 
+	(igraph_revolver_probs_ADE_dpareto) : added
+
 2007-12-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_ml_df) : added
