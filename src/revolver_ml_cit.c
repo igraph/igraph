@@ -927,7 +927,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
     
     /* final step, Mk/sum */
     maxdelta=0.0;
-    for (i=0; i<maxdegree; i++) {
+    for (i=0; i<=maxdegree; i++) {
       VECTOR(*tokernel)[i] = VECTOR(*mycites)[i] / VECTOR(*tokernel)[i];      
       if ( (diff=abs(VECTOR(*tokernel)[i] - VECTOR(*fromkernel)[i])) > maxdelta) {
 	maxdelta=diff;
@@ -1251,7 +1251,7 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
     
     /* Mk/sum */
     maxdelta=0.0;
-    for (i=0; i<maxdegree; i++) {
+    for (i=0; i<=maxdegree; i++) {
       for (j=0; j<agebins; j++) {
 	MATRIX(*tokernel, i, j) = MATRIX(*mycites, i, j) / MATRIX(*tokernel, i, j);
 	if ( (diff=abs(MATRIX(*tokernel,i,j) - MATRIX(*fromkernel,i,j))) > maxdelta){
@@ -1288,6 +1288,333 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
   
   return 0;
 }
+
+int igraph_revolver_ml_de(const igraph_t *graph,
+			  igraph_integer_t niter,
+			  igraph_matrix_t *kernel,
+			  const igraph_vector_t *cats,
+			  igraph_matrix_t *cites,
+			  igraph_real_t delta,
+			  igraph_real_t *logprob,
+			  igraph_real_t *logmax) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_integer_t imaxdegree;
+  long int maxdegree, actmaxdegree;
+  long int it, t, i, j;
+  igraph_matrix_long_t ptk;
+  igraph_matrix_t *mycites, vmycites;
+  igraph_vector_t neis;
+  igraph_vector_long_t degree;
+  igraph_real_t S=0, maxdelta, diff;
+  long int no_cats=igraph_vector_max(cats)+1;
+  
+  igraph_matrix_t vmykernel;
+  igraph_matrix_t *kernels[] = { kernel, &vmykernel };
+  long int actkernel=0;
+  igraph_matrix_t *fromkernel=kernels[actkernel],
+    *tokernel=kernels[1-actkernel];
+  
+  IGRAPH_CHECK(igraph_maxdegree(graph, &imaxdegree, igraph_vss_all(),
+				IGRAPH_IN, IGRAPH_LOOPS));
+  maxdegree=imaxdegree;
+  
+  IGRAPH_CHECK(igraph_matrix_long_init(&ptk, no_cats, maxdegree+1));
+  IGRAPH_FINALLY(igraph_matrix_long_destroy, &ptk);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_MATRIX_INIT_FINALLY(&vmykernel, no_cats, maxdegree+1);
+  
+  if (cites) {
+    IGRAPH_CHECK(igraph_matrix_resize(cites, no_cats, maxdegree+1));
+    igraph_matrix_null(cites);
+    mycites=cites;
+  } else {
+    IGRAPH_MATRIX_INIT_FINALLY(&vmycites, no_cats, maxdegree+1);
+    mycites=&vmycites;
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(kernel, no_cats, maxdegree+1));
+  igraph_matrix_fill(kernel, 1);
+  
+  for (it=0; it<niter; it++) {
+    
+    igraph_matrix_null(tokernel);
+    igraph_matrix_long_null(&ptk);
+    igraph_vector_long_null(&degree);
+    S=0.0;
+    actmaxdegree=0;
+    
+    if (logprob) { *logprob=0.0; }
+    if (logmax) { *logmax=0.0; }
+    
+    for (t=0; t<no_of_nodes; t++) {
+      long int n, nneis;
+      long int fromcat=VECTOR(*cats)[t];
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, t, IGRAPH_OUT));
+      nneis=igraph_vector_size(&neis);
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      if (S != 0) {
+	for (i=0; i<no_cats; i++) {
+	  for (j=0; j<=actmaxdegree; j++) {
+	    MATRIX(*tokernel, i, j) += nneis * MATRIX(ptk, i, j) / S;
+	  }
+	}
+      
+	if (logprob || logmax) {
+	  for (n=0; n<nneis; n++) {
+	    long int to=VECTOR(neis)[n];
+	    long int x=VECTOR(*cats)[to];
+	    long int y=VECTOR(degree)[to];
+	    if (logprob) { *logprob += log( MATRIX(*fromkernel,x,y) / S); }
+	    if (logmax) { *logmax += log(1.0/t); }
+	  }
+	}
+      }
+      
+      /* Update ptk for the next time step */
+      for (n=0; n<nneis; n++) {
+	long int to=VECTOR(neis)[n];
+	long int x=VECTOR(*cats)[to];
+	long int y=VECTOR(degree)[to];
+	
+	VECTOR(degree)[to] += 1;
+	if (y==actmaxdegree) { actmaxdegree++; }
+	
+	MATRIX(ptk, x, y+1) += 1;
+	MATRIX(ptk, x, y) -= 1;
+	S += MATRIX(*fromkernel, x, y+1);
+	S -= MATRIX(*fromkernel, x, y);
+	
+	if (it==0) {
+	  MATRIX(*mycites, x, y) += 1;
+	}
+      }
+      
+      MATRIX(ptk, fromcat, 0) += 1;
+      S += MATRIX(*fromkernel, fromcat, 0);
+      
+    } /* t < no_of_nodes */
+  
+    /* Mk/sum */
+    maxdelta=0.0;
+    for (i=0; i<no_cats; i++) {
+      for (j=0; j<=maxdegree; j++) {
+	MATRIX(*tokernel, i, j) = MATRIX(*mycites, i, j) / MATRIX(*tokernel, i, j);
+	if ( (diff=abs(MATRIX(*tokernel,i,j)-MATRIX(*fromkernel,i,j))) > maxdelta) {
+	  maxdelta=diff;
+	}
+      }
+    }
+    if (maxdelta < delta) { break; }
+    
+    /* Switch kernels */
+    actkernel=1-actkernel;
+    fromkernel=kernels[actkernel];
+    tokernel=kernels[1-actkernel];
+    
+    IGRAPH_PROGRESS("ML Revolver de", 100*(it+1)/niter, NULL);
+    
+  } /* it<niter */
+
+  /* switch kernels if needed */
+  if (fromkernel != kernel) {
+    igraph_matrix_update(kernel, fromkernel);
+  }
+  
+  if (!cites) {
+    igraph_matrix_destroy(&vmycites);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  igraph_matrix_destroy(&vmykernel);
+  igraph_vector_long_destroy(&degree);
+  igraph_vector_destroy(&neis);
+  igraph_matrix_long_destroy(&ptk);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}
+
+int igraph_revolver_ml_ade(const igraph_t *graph,
+			   igraph_integer_t niter,
+			   igraph_array3_t *kernel,
+			   const igraph_vector_t *cats,
+			   igraph_array3_t *cites,
+			   igraph_integer_t pagebins,
+			   igraph_real_t delta,
+			   igraph_real_t *logprob,
+			   igraph_real_t *logmax) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_integer_t imaxdegree;
+  long int maxdegree, actmaxdegree;
+  long int it, t, i, j, k;
+  igraph_array3_long_t ptk;
+  igraph_array3_t *mycites, vmycites;
+  igraph_vector_t neis;
+  igraph_vector_long_t degree;
+  igraph_real_t S=0, maxdelta, diff;
+  long int no_cats=igraph_vector_max(cats)+1;
+
+  long int agebins=pagebins;
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  igraph_array3_t vmykernel;
+  igraph_array3_t *kernels[]= { kernel, &vmykernel };
+  long int actkernel=0;
+  igraph_array3_t *fromkernel=kernels[actkernel],
+    *tokernel=kernels[1-actkernel];
+  
+  IGRAPH_CHECK(igraph_maxdegree(graph, &imaxdegree, igraph_vss_all(),
+				IGRAPH_IN, IGRAPH_LOOPS));
+  maxdegree=imaxdegree;
+  
+  IGRAPH_CHECK(igraph_array3_long_init(&ptk, no_cats, maxdegree+1, agebins));
+  IGRAPH_FINALLY(igraph_array3_long_destroy, &ptk);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_CHECK(igraph_array3_init(&vmykernel, no_cats, maxdegree+1, agebins));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &vmykernel);
+  
+  if (cites) {
+    IGRAPH_CHECK(igraph_array3_resize(cites, no_cats, maxdegree+1, agebins));
+    igraph_array3_null(cites);
+    mycites=cites;
+  } else {
+    IGRAPH_CHECK(igraph_array3_init(&vmycites, no_cats, maxdegree+1, agebins));
+    IGRAPH_FINALLY(igraph_array3_destroy, &vmycites);
+    mycites=&vmycites;
+  }
+
+  IGRAPH_CHECK(igraph_array3_resize(kernel, no_cats, maxdegree+1, agebins));
+  igraph_array3_fill(kernel, 1);
+  
+  IGRAPH_PROGRESS("ML Revolver ade", 0, NULL);
+  
+  for (it=0; it<niter; it++) {
+    
+    igraph_array3_null(tokernel);
+    igraph_array3_long_null(&ptk);
+    igraph_vector_long_null(&degree);
+    S=0.0;
+    actmaxdegree=0;
+    
+    if (logprob) { *logprob=0.0; }
+    if (logmax) { *logmax=0.0; }
+
+    for (t=0; t<no_of_nodes; t++) {
+      long int n, nneis;
+      long int tcat=VECTOR(*cats)[t];
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, t, IGRAPH_OUT));
+      nneis=igraph_vector_size(&neis);
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      /* Calculate some terms of the sum for the non-zero classes */
+      if (S != 0) {
+	for (i=0; i<no_cats; i++) {
+	  for (j=0; j<=actmaxdegree; j++) {
+	    for (k=0; k<=t/binwidth; k++) {
+	      ARRAY3(*tokernel, i, j, k) += nneis * ARRAY3(ptk, i, j, k) / S;
+	    }
+	  }
+	}
+	
+	if (logprob || logmax) {
+	  for (n=0; n<nneis; n++) {
+	    long int to=VECTOR(neis)[n];
+	    long int x=VECTOR(*cats)[to];
+	    long int y=VECTOR(degree)[to];
+	    long int z=(t-to)/binwidth;
+	    if (logprob) { *logprob += log( ARRAY3(*fromkernel, x,y,z) / S); }
+	    if (logmax) { *logmax += log(1.0/t); }
+	  }
+	}
+      }
+      
+      /* update ptk for the next time step */
+      for (n=0; n<nneis; n++) {
+	long int to=VECTOR(neis)[n];
+	long int x=VECTOR(*cats)[to];
+	long int y=VECTOR(degree)[to];
+	long int z=(t-to)/binwidth;
+	
+	VECTOR(degree)[to] += 1;
+	if (y==actmaxdegree) { actmaxdegree++; }
+	
+	ARRAY3(ptk, x, y+1, z) += 1;
+	ARRAY3(ptk, x, y, z) -= 1;
+	S += ARRAY3(*fromkernel, x, y+1, z);
+	S -= ARRAY3(*fromkernel, x, y, z);
+	
+	if (it==0) {
+	  ARRAY3(*mycites, x, y, z) += 1;
+	}
+      }
+      /* Aging */
+      for (j=1; t-binwidth*j+1>=0; j++) {
+	long int shnode=t-binwidth*j+1;
+	long int cat=VECTOR(*cats)[shnode];
+	long int deg=VECTOR(degree)[shnode];
+	ARRAY3(ptk, cat, deg, j) += 1;
+	ARRAY3(ptk, cat, deg, j-1) -= 1;
+	S += ARRAY3(*fromkernel, cat, deg, j);
+	S -= ARRAY3(*fromkernel, cat, deg, j-1);
+      }
+      ARRAY3(ptk, tcat, 0, 0) += 1;
+      S += ARRAY3(*fromkernel, tcat, 0, 0);
+      
+    } /* t < no_of_nodes */
+
+    /* Mk/sum */
+    maxdelta=0.0;
+    for (i=0; i<no_cats; i++) {
+      for (j=0; j<=maxdegree; j++) {
+	for (k=0; k<agebins; k++) {
+	  ARRAY3(*tokernel,i,j,k) = ARRAY3(*mycites,i,j,k) / ARRAY3(*tokernel,i,j,k);
+	  if ( (diff=abs(ARRAY3(*tokernel,i,j,k)-ARRAY3(*fromkernel,i,j,k))) > 
+	       maxdelta) {
+	    maxdelta=diff;
+	  }
+	}
+      }
+    }
+    if (maxdelta < delta) { break; }
+    
+    /* Switch kernels */
+    actkernel=1-actkernel;
+    fromkernel=kernels[actkernel];
+    tokernel=kernels[1-actkernel];
+
+    IGRAPH_PROGRESS("ML Revolver d", 100*(it+1)/niter, NULL);
+
+  } /* it<niter */
+
+  /* switch kernels if needed */
+  if (fromkernel != kernel) {
+    igraph_array3_update(kernel, fromkernel);
+  }
+
+  if (!cites) {
+    igraph_array3_destroy(&vmycites);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  igraph_array3_destroy(&vmykernel);
+  igraph_vector_long_destroy(&degree);
+  igraph_vector_destroy(&neis);
+  igraph_array3_long_destroy(&ptk);
+  IGRAPH_FINALLY_CLEAN(4);
+  
+  return 0;
+}	   
 
 /* -----------------------------------------------------------*/
 

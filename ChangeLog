@@ -20,6 +20,9 @@
 
 2007-11-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/revolver_ml_cot.c (igraph_revolver_ml_de, igraph_revolver_ml_ade) :
+	added
+
 	* src/games.c (igraph_callaway_traits_game, igraph_establisment_game)
 	(igraph_cited_type_game) : bugs fixed
 
