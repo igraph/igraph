@@ -190,6 +190,21 @@ MATRIX:
          igraph_matrix_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+MATRIX_OR_0:
+  CTYPE: igraph_matrix_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN: if (!isNull(%I%)) { R_SEXP_to_matrix(%I%, &%C%); }
+    OUT: if (0 != igraph_matrix_init(&%C%, 0, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_matrix_destroy, &%C%); \
+         %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_0ormatrix_to_SEXP(&%C%)); \
+         igraph_matrix_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 ##################################
 # Some vertices of a graph
 

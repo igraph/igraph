@@ -916,8 +916,24 @@ igraph_convex_hull:
 #######################################
 
 igraph_revolver_ml_d:
-        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, OUT VECTOR_OR_0 cites
+        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
+                OUT VECTOR_OR_0 cites, REAL delta=1e-10, OUT REALPTR logprob, \
+                OUT REALPTR logmax
         NAME-R: revolver.ml.d
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_f:
+        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
+                OUT VECTOR_OR_0 cites, REAL delta=1e-10, OUT REALPTR logprob, \
+                OUT REALPTR logmax
+        NAME-R: revolver.ml.f
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_ad:
+        PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
+                OUT MATRIX_OR_0 cites, INTEGER agebins=300, \
+                REAL delta=1e-10, OUT REALPTR logprob, OUT REALPTR logmax
+        NAME-R: revolver.ml.ad
         FLAGS: PROGRESS
 
 igraph_revolver_ml_D_alpha:

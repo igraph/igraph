@@ -23,6 +23,9 @@ VECTOR_OR_0:
 MATRIX:
     INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
 
+MATRIX_OR_0:
+    INVONV: if (!is.null(%I%)) %I% <- structure(as.double(%I%), dim=dim(%I%))
+
 ATTRIBUTES:
 
 CONNECTEDNESS:

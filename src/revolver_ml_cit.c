@@ -753,7 +753,10 @@ int igraph_revolver_ml_AD_dpareto(const igraph_t *graph,
 int igraph_revolver_ml_d(const igraph_t *graph,
 			 igraph_integer_t niter,
 			 igraph_vector_t *kernel,
-			 igraph_vector_t *cites) {
+			 igraph_vector_t *cites,
+			 igraph_real_t delta,
+			 igraph_real_t *logprob,
+			 igraph_real_t *logmax) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_integer_t imaxdegree;
@@ -763,7 +766,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
   igraph_vector_t *mycites, vmycites;
   igraph_vector_t neis;
   igraph_vector_long_t degree;
-  igraph_real_t S=0;
+  igraph_real_t S=0, maxdelta, diff;
 
   igraph_vector_t vmykernel;
   igraph_vector_t *kernels[]={ kernel, &vmykernel };
@@ -796,7 +799,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
   igraph_vector_fill(kernel, 1);
 
   IGRAPH_PROGRESS("ML Revolver d", 0, NULL);
-  
+
   for (it=0; it<niter; it++) {
     
     igraph_vector_null(tokernel);
@@ -805,6 +808,9 @@ int igraph_revolver_ml_d(const igraph_t *graph,
     S=0.0;
     actmaxdegree=0;
 
+    if (logprob) { *logprob=0.0; }
+    if (logmax) { *logmax=0.0; }
+  
     for (t=0; t<no_of_nodes; t++) {
       long int n, nneis;
       IGRAPH_CHECK(igraph_neighbors(graph, &neis, t, IGRAPH_OUT));
@@ -816,6 +822,15 @@ int igraph_revolver_ml_d(const igraph_t *graph,
       if (S != 0) {
 	for (i=0; i<=actmaxdegree; i++) {
 	  VECTOR(*tokernel)[i] += nneis * VECTOR(ptk)[i] / S;
+	}
+      }
+      
+      if (logprob || logmax) {
+	for (n=0; n<nneis; n++) {
+	  long int to=VECTOR(neis)[n];
+	  long int x=VECTOR(degree)[to];
+	  if (logprob) { *logprob += log( VECTOR(*fromkernel)[x] / S ); }
+	  if (logmax) { *logmax += log(1.0/t); }
 	}
       }
       
@@ -835,6 +850,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
 	if (it==0) {
 	  VECTOR(*mycites)[x] += 1;
 	}
+		
       }
       VECTOR(ptk)[0] += 1;
       S += VECTOR(*fromkernel)[0];
@@ -842,9 +858,14 @@ int igraph_revolver_ml_d(const igraph_t *graph,
     } /* t<no_of_nodes  */
     
     /* final step, Mk/sum */
+    maxdelta=0.0;
     for (i=0; i<maxdegree; i++) {
       VECTOR(*tokernel)[i] = VECTOR(*mycites)[i] / VECTOR(*tokernel)[i];      
+      if ( (diff=abs(VECTOR(*tokernel)[i] - VECTOR(*fromkernel)[i])) > maxdelta) {
+	maxdelta=diff;
+      }
     }
+    if (maxdelta < delta) { break; }
     
     /* Switch kernels */
     actkernel=1-actkernel;
@@ -875,3 +896,327 @@ int igraph_revolver_ml_d(const igraph_t *graph,
   return 0;
 }
 			 
+int igraph_revolver_ml_f(const igraph_t *graph,
+			 igraph_integer_t niter,
+			 igraph_vector_t *kernel,
+			 igraph_vector_t *cites,
+			 igraph_real_t delta,
+			 igraph_real_t *logprob,
+			 igraph_real_t *logmax) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int it, t;
+  igraph_vector_long_t ptk;
+  igraph_vector_t *mycites, vmycites;
+  igraph_vector_t *neis, *neis2;
+  igraph_adjlist_t outadjlist, inadjlist;
+  igraph_vector_long_t marked;
+  
+  igraph_vector_t vmykernel;
+  igraph_vector_t *kernels[]={ kernel, &vmykernel };
+  long int actkernel=0;
+  igraph_vector_t *fromkernel=kernels[actkernel], 
+    *tokernel=kernels[1-actkernel];
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&ptk, 2));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &ptk);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &outadjlist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &outadjlist);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &inadjlist, IGRAPH_IN));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &inadjlist);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&vmykernel, 2);
+  IGRAPH_CHECK(igraph_vector_long_init(&marked, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &marked);
+  
+  if (cites) {
+    IGRAPH_CHECK(igraph_vector_resize(cites, 2));
+    igraph_vector_null(cites);
+    mycites=cites;
+  } else { 
+    IGRAPH_VECTOR_INIT_FINALLY(&vmycites, 2);
+    mycites=&vmycites;
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(kernel, 2));
+  igraph_vector_fill(kernel, 1);
+  
+  IGRAPH_PROGRESS("ML revolver f", 0, NULL);
+  
+  for (it=0; it<niter; it++) {
+    
+    igraph_vector_null(tokernel);
+    igraph_vector_long_null(&ptk);
+    igraph_vector_long_null(&marked);
+
+    if (logprob) { *logprob=0.0; }
+    if (logmax) { *logmax=0.0; }
+
+    for (t=0; t<no_of_nodes; t++) {
+      long int nneis, e;
+      neis=igraph_adjlist_get(&outadjlist, t);
+      nneis=igraph_vector_size(neis);
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      VECTOR(ptk)[0]=t;
+      VECTOR(ptk)[1]=0;
+      for (e=0; e<nneis; e++) {
+	long int nneis2, j;
+	long int to=VECTOR(*neis)[e];
+	
+	if (e != 0) {
+	  igraph_real_t S=VECTOR(ptk)[0] * VECTOR(*fromkernel)[0] +
+	    VECTOR(ptk)[1] * VECTOR(*fromkernel)[1];	
+	  VECTOR(*tokernel)[0] += VECTOR(ptk)[0] / S;
+	  VECTOR(*tokernel)[1] += VECTOR(ptk)[1] / S;
+	  
+	  if (it==0) {
+	    if (VECTOR(marked)[to] != t+1) {
+	      VECTOR(*mycites)[0] += 1;
+	    } else {
+	      VECTOR(*mycites)[1] += 1;
+	    }
+	  }
+
+	  if (logprob || logmax) {
+	    long int x= VECTOR(marked)[to] != t+1 ? 0 : 1;
+	    if (logprob) { *logprob += log( VECTOR(*fromkernel)[x] / S ); }
+	    if (logmax) { *logmax += log(1.0/t); }
+	  }
+	} else {
+	  if (logprob || logmax) {
+	    if (logprob) { *logprob += log(1.0/t); }
+	    if (logmax) { *logmax += log(1.0/t); }
+	  }	  
+	}
+
+ 	VECTOR(ptk)[0] -= 1;	/* Won't be cited again */
+	VECTOR(marked)[to]=t+1;
+
+	/* Update ptk, check the neighbors of 'to' */
+	neis2=igraph_adjlist_get(&inadjlist, to);
+	nneis2=igraph_vector_size(neis2);
+	for (j=0; j<nneis2; j++) {
+	  long int nei=VECTOR(*neis2)[j];
+	  if (nei >= t) { break; }
+	  if (VECTOR(marked)[nei] != t+1) {
+	    VECTOR(marked)[nei] = t+1;
+	    VECTOR(ptk)[0] -= 1;
+	    VECTOR(ptk)[1] += 1;
+	  }
+	}
+	neis2=igraph_adjlist_get(&outadjlist, to);
+	nneis2=igraph_vector_size(neis2);
+	for (j=0; j<nneis2; j++) {
+	  long int nei=VECTOR(*neis2)[j];
+	  if (VECTOR(marked)[nei] != t+1) {
+	    VECTOR(marked)[nei] = t+1;
+	    VECTOR(ptk)[0] -= 1;
+	    VECTOR(ptk)[1] += 1;
+	  }
+	}
+	
+      }
+    }
+      
+    /* Mk/sum */
+    VECTOR(*tokernel)[0] = VECTOR(*mycites)[0] / VECTOR(*tokernel)[0];
+    VECTOR(*tokernel)[1] = VECTOR(*mycites)[1] / VECTOR(*tokernel)[1];
+    
+    VECTOR(*tokernel)[1] /= VECTOR(*tokernel)[0];
+    VECTOR(*tokernel)[0] = 1.0;
+    
+    /* Switch kernels */
+    actkernel=1-actkernel;
+    fromkernel=kernels[actkernel];
+    tokernel=kernels[1-actkernel];
+
+    IGRAPH_PROGRESS("ML Revolver d", 100*(it+1)/niter, NULL);
+    
+  } /* it<niter */
+  
+  /* switch kernels if needed */
+  if (fromkernel != kernel) {
+    igraph_vector_clear(kernel);
+    igraph_vector_append(kernel, fromkernel);
+  }
+
+  if (!cites) {
+    igraph_vector_destroy(&vmycites);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  igraph_vector_long_destroy(&marked);
+  igraph_vector_destroy(&vmykernel);
+  igraph_adjlist_destroy(&inadjlist);
+  igraph_adjlist_destroy(&outadjlist);
+  igraph_vector_long_destroy(&ptk);
+  IGRAPH_FINALLY_CLEAN(5);
+  return 0;
+}
+
+int igraph_revolver_ml_ad(const igraph_t *graph,
+			  igraph_integer_t niter,
+			  igraph_matrix_t *kernel,
+			  igraph_matrix_t *cites,
+			  igraph_integer_t pagebins,
+			  igraph_real_t delta,
+			  igraph_real_t *logprob,
+			  igraph_real_t *logmax) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_integer_t imaxdegree;
+  long int maxdegree, actmaxdegree;
+  long int it, t, i, j;
+  igraph_matrix_long_t ptk;
+  igraph_matrix_t *mycites, vmycites;
+  igraph_vector_t neis;
+  igraph_vector_long_t degree;
+  igraph_real_t S=0, maxdelta, diff;
+  long int agebins=pagebins;
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  igraph_matrix_t vmykernel;
+  igraph_matrix_t *kernels[]= { kernel, &vmykernel };
+  long int actkernel=0;
+  igraph_matrix_t *fromkernel=kernels[actkernel],
+    *tokernel=kernels[1-actkernel];
+
+  IGRAPH_CHECK(igraph_maxdegree(graph, &imaxdegree, igraph_vss_all(),
+				IGRAPH_IN, IGRAPH_LOOPS));
+  maxdegree=imaxdegree;
+  
+  IGRAPH_CHECK(igraph_matrix_long_init(&ptk, maxdegree+1, agebins));
+  IGRAPH_FINALLY(igraph_matrix_long_destroy, &ptk);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_long_init(&degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &degree);
+  IGRAPH_CHECK(igraph_matrix_init(&vmykernel, maxdegree+1, agebins));
+  IGRAPH_FINALLY(igraph_matrix_destroy, &vmykernel);
+  
+  if (cites) {
+    IGRAPH_CHECK(igraph_matrix_resize(cites, maxdegree+1, agebins));
+    igraph_matrix_null(cites);
+    mycites=cites;
+  } else {
+    IGRAPH_CHECK(igraph_matrix_init(&vmycites, maxdegree+1, agebins));
+    IGRAPH_FINALLY(igraph_matrix_destroy, &vmycites);
+    mycites=&vmycites;
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(kernel, maxdegree+1, agebins));
+  igraph_matrix_fill(kernel, 1);
+  
+  IGRAPH_PROGRESS("ML Revolver ad", 0, NULL);
+  
+  for (it=0; it<niter; it++) {
+   
+    igraph_matrix_null(tokernel);
+    igraph_matrix_long_null(&ptk);
+    igraph_vector_long_null(&degree);
+    S=0.0;
+    actmaxdegree=0;
+    
+    if (logprob) { *logprob=0.0; }
+    if (logmax) { *logmax=0.0; }
+    
+    for (t=0; t<no_of_nodes; t++) {
+      long int n, nneis;
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, t, IGRAPH_OUT));
+      nneis=igraph_vector_size(&neis);
+      
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      /* Calculate some terms of the sum for the non-zero classes */
+      if (S != 0) {
+	for (i=0; i<=actmaxdegree; i++) {
+	  for (j=0; j<=t/binwidth; j++) {
+	    MATRIX(*tokernel, i, j) += nneis * MATRIX(ptk, i, j) / S;
+	  }
+	}
+      }
+      
+      if (logprob || logmax) {
+	for (n=0; n<nneis; n++) {
+	  long int to=VECTOR(neis)[n];
+	  long int x=VECTOR(degree)[to];
+	  long int y=(t-to)/binwidth;
+	  if (logprob) { *logprob += log( MATRIX(*fromkernel,x,y) / S ); }
+	  if (logmax) { *logmax += log(1.0/t); }
+	}
+      }
+
+      /* Update ptk for the next time step */
+      for (n=0; n<nneis; n++) {
+	long int to=VECTOR(neis)[n];
+	long int x=VECTOR(degree)[to];
+	long int y=(t-to)/binwidth;
+
+	VECTOR(degree)[to] += 1;
+	if (x==actmaxdegree) { actmaxdegree++; }
+	
+	MATRIX(ptk, x+1, y) += 1;
+	MATRIX(ptk, x, y) -= 1;
+	S += MATRIX(*fromkernel, x+1, y);
+	S -= MATRIX(*fromkernel, x, y);
+	
+	if (it==0) {
+	  MATRIX(*mycites, x, y) += 1;
+	}
+      }
+      /* Aging */
+      for (j=1; t-binwidth*j+1>=0; j++) {
+	long int shnode=t-binwidth*j+1;
+	long int deg=VECTOR(degree)[shnode];
+	MATRIX(ptk, deg, j) += 1;
+	MATRIX(ptk, deg, j-1) -= 1;
+	S += MATRIX(*fromkernel, deg, j);
+	S -= MATRIX(*fromkernel, deg, j-1);
+      }
+      MATRIX(ptk, 0, 0) += 1;
+      S += MATRIX(*fromkernel, 0, 0);
+      
+    } /* t < no_of_nodes */
+    
+    /* Mk/sum */
+    maxdelta=0.0;
+    for (i=0; i<maxdegree; i++) {
+      for (j=0; j<agebins; j++) {
+	MATRIX(*tokernel, i, j) = MATRIX(*mycites, i, j) / MATRIX(*tokernel, i, j);
+	if ( (diff=abs(MATRIX(*tokernel,i,j) - MATRIX(*fromkernel,i,j))) > maxdelta){
+	  maxdelta=diff;
+	}
+      }
+    }
+    if (maxdelta < delta) { break; }
+    
+    /* Switch kernels */
+    actkernel=1-actkernel;
+    fromkernel=kernels[actkernel];
+    tokernel=kernels[1-actkernel];
+
+    IGRAPH_PROGRESS("ML Revolver d", 100*(it+1)/niter, NULL);
+
+  } /* it<niter */
+
+  /* switch kernels if needed */
+  if (fromkernel != kernel) {
+    igraph_matrix_update(kernel, fromkernel);
+  }
+
+  if (!cites) {
+    igraph_matrix_destroy(&vmycites);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  igraph_matrix_destroy(&vmykernel);
+  igraph_vector_long_destroy(&degree);
+  igraph_vector_destroy(&neis);
+  igraph_matrix_long_destroy(&ptk);
+  IGRAPH_FINALLY_CLEAN(4);
+  
+  return 0;
+}

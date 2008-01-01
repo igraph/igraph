@@ -47,6 +47,12 @@
 
 2007-11-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/revolver_ml_cit.c (igraph_revolver_ml_f, igraph_revolver_ml_ad) :
+	added
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_d) : delta, logprob,
+	logmax arguments added
+
 	* src/revolver_ml_cit.c (igraph_revolver_ml_AD_dpareto) : added
 	
 	* src/revolver_ml_cit.c (igraph_revolver_ml_D, igraph_revolver_ml_D_alpha)
