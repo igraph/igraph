@@ -1999,7 +1999,7 @@ int igraph_revolver_ml_f(const igraph_t *graph,
       VECTOR(ptk)[1]=0;
       for (e=0; e<nneis; e++) {
 	long int nneis2, j;
-	long int to=VECTOR(*neis)[e];
+	long int to=VECTOR(*neis)[nneis-e-1];
 	
 	if (e != 0) {
 	  igraph_real_t S=VECTOR(ptk)[0] * VECTOR(*fromkernel)[0] +
