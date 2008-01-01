@@ -45,6 +45,14 @@
 	* interfaces/python/package/test/structural.py : added test cases for
 	estimations
 
+2007-11-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_AD_dpareto) : added
+	
+	* src/revolver_ml_cit.c (igraph_revolver_ml_D, igraph_revolver_ml_D_alpha)
+	(igraph_revolver_ml_D_alpha_a, igraph_revolver_ml_AD)
+	(igraph_revolver_ml_AD_alpha_a_beta) : filter argument added
+
 2007-11-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_i_pagerank2, igraph_pagerank) : 

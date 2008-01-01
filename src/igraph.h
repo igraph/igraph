@@ -2362,19 +2362,22 @@ int igraph_revolver_ml_D(const igraph_t *graph,
 			 igraph_real_t abstol, igraph_real_t reltol, int maxit,
 			 igraph_scalar_function_t *A_fun,
 			 igraph_vector_function_t *dA_fun,
+			 const igraph_vector_t *filter,
 			 igraph_integer_t *fncount, igraph_integer_t *grcount);
 
 int igraph_revolver_ml_D_alpha(const igraph_t *graph,
 			       igraph_real_t *alpha, igraph_real_t *Fmin,
 			       igraph_real_t abstol, igraph_real_t reltol, 
-			       int maxit, igraph_integer_t *fncount, 
+			       int maxit, const igraph_vector_t *filter,
+			       igraph_integer_t *fncount, 
 			       igraph_integer_t *grcount);
 
 int igraph_revolver_ml_D_alpha_a(const igraph_t *graph,
 				 igraph_real_t *alpha, igraph_real_t *a,
 				 igraph_real_t *Fmin,
 				 igraph_real_t abstol, igraph_real_t reltol,
-				 int maxit, igraph_integer_t *fncount, 
+				 int maxit, const igraph_vector_t *filter,
+				 igraph_integer_t *fncount, 
 				 igraph_integer_t *grcount);
 
 int igraph_revolver_ml_AD(const igraph_t *graph,
@@ -2383,7 +2386,8 @@ int igraph_revolver_ml_AD(const igraph_t *graph,
 			  igraph_real_t abstol, igraph_real_t reltol, int maxit,
 			  igraph_scalar_function_t *A_fun,
 			  igraph_vector_function_t *dA_fun,
-			  int agebins, igraph_integer_t *fncount, 
+			  int agebins, const igraph_vector_t *filter,
+			  igraph_integer_t *fncount, 
 			  igraph_integer_t *grcount);
 
 int igraph_revolver_ml_AD_alpha_a_beta(const igraph_t *graph,
@@ -2391,6 +2395,7 @@ int igraph_revolver_ml_AD_alpha_a_beta(const igraph_t *graph,
 				       igraph_real_t *beta, igraph_real_t *Fmin,
 				       igraph_real_t abstol, igraph_real_t reltol,
 				       int maxit, int agebins, 
+				       const igraph_vector_t *filter,
 				       igraph_integer_t *fncount,
 				       igraph_integer_t *grcount);
 

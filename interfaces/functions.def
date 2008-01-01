@@ -923,21 +923,37 @@ igraph_revolver_ml_d:
 igraph_revolver_ml_D_alpha:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, OUT REALPTR Fmin, \
                 REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, \
+                VECTOR_OR_0 filter=NULL, \
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.D.alpha
+        FLAGS: PROGRESS
 
 igraph_revolver_ml_D_alpha_a:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
                 OUT REALPTR Fmin, REAL abstol=1e-8, REAL reltol=1e-8, \
-                INT maxit=1000, OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+                INT maxit=1000, VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.D.alpha.a
+        FLAGS: PROGRESS
 
 igraph_revolver_ml_AD_alpha_a_beta:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
                 INOUT REALPTR beta, OUT REALPTR Fmin, \
-                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, INT agebins=300, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, INT agebins=300,\
+                VECTOR_OR_0 filter=NULL, \
                 OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
         NAME-R: revolver.ml.AD.alpha.a.beta
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_AD_dpareto:
+        PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
+                INOUT REALPTR paralpha, INOUT REALPTR parbeta, \
+                INOUT REALPTR parscale, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, INT agebins=300,\
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.AD.dpareto
+        FLAGS: PROGRESS
 
 #######################################
 # Other, (yet) undocumented functions

@@ -18,7 +18,7 @@ VECTOR:
     INCONV: %I% <- as.numeric(%I%)
 
 VECTOR_OR_0:
-    INVONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
+    INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
 
 MATRIX:
     INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
