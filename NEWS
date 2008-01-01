@@ -1,4 +1,28 @@
 =========
+igraph 0.4.3
+=========
+
+Released August 13, 2007
+
+The next one in the sequence of bugfix releases. Thanks to many people
+sending bug reports. Here are the changes:
+- Some memory leaks removed when using attributes from R or Python.
+- GraphML parser: entities and character data in multiple chunks are now handled correctly.
+- A bug corrected in edge betweenness community structure detection,
+  it failed if called many times from the same program/session.
+- Bug corrected in 'adjacent edges' edge iterator.
+- Python interface: edge and vertex attribute deletion bug corrected.
+- Edge betweeness community structure: handle unconnected graphs properly.
+- Fixed bug related to fast greedy community detection in unconnected graphs.
+- Use a different kind of parser (Push) for reading GraphML files. This is almost
+  invisible for users but fixed a nondeterministic bug when reading in GraphML
+  files.
+- R interface: plot now handles properly if called with a vector as the edge.width
+  argument for directed graphs.
+- R interface: bug (typo) corrected for walktrap.community and weighted graphs.
+- Test suite should run correctly on Cygwin now.
+
+=========
 igraph 0.4.2
 =========
 
