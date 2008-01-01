@@ -1,3 +1,8 @@
+2007-12-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/CohesiveBlocks.R : updates, bugfix in kCutsets,
+	cleanup
+
 2007-12-14  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/print.R (print.igraph) : better printing of
