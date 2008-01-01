@@ -935,6 +935,10 @@ igraph_revolver_ml_de:
         NAME-R: revolver.ml.de
         FLAGS: PROGRESS
 
+igraph_revolver_probs_de:
+        PARAMS: GRAPH graph, MATRIX kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
+                OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+
 igraph_revolver_ml_ade:
         PARAMS: GRAPH graph, INTEGER niter, OUT ARRAY3 kernel, \
                 VECTOR cats, OUT ARRAY3_OR_0 cites, INTEGER agebins=300, \
@@ -942,12 +946,21 @@ igraph_revolver_ml_ade:
         NAME-R: revolver.ml.ade
         FLAGS: PROGRESS
 
+igraph_revolver_probs_ade:
+        PARAMS: GRAPH graph, ARRAY3 kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
+                OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+
 igraph_revolver_ml_f:
         PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
                 OUT VECTOR_OR_0 cites, REAL delta=1e-10, OUT REALPTR logprob, \
                 OUT REALPTR logmax
         NAME-R: revolver.ml.f
         FLAGS: PROGRESS
+
+igraph_revolver_ml_l:
+        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
+                OUT VECTOR_OR_0 cites, INTEGER agebins=300, REAL delta=1e-10, \
+                OUT REALPTR logprob, OUT REALPTR logmax
 
 igraph_revolver_ml_ad:
         PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \

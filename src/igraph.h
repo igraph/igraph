@@ -2407,6 +2407,15 @@ int igraph_revolver_ml_f(const igraph_t *graph,
 			 igraph_real_t *logprob,
 			 igraph_real_t *logmax);
 
+int igraph_revolver_ml_l(const igraph_t *graph,
+			 igraph_integer_t niter,
+			 igraph_vector_t *kernel,
+			 igraph_vector_t *cites,
+			 igraph_integer_t pagebins,
+			 igraph_real_t delta,
+			 igraph_real_t *logprob,
+			 igraph_real_t *logmax);
+
 int igraph_revolver_ml_ad(const igraph_t *graph,
 			  igraph_integer_t niter,
 			  igraph_matrix_t *kernel,

@@ -18,6 +18,10 @@
 	
 	* interfaces/python/package/test/isomorphism.py : added tests
 
+2007-11-29  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_l) : added
+
 2007-11-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_probs_de)

@@ -1616,6 +1616,154 @@ int igraph_revolver_ml_ade(const igraph_t *graph,
   return 0;
 }	   
 
+int igraph_revolver_ml_l(const igraph_t *graph,
+			 igraph_integer_t niter,
+			 igraph_vector_t *kernel,
+			 igraph_vector_t *cites,
+			 igraph_integer_t pagebins,
+			 igraph_real_t delta,
+			 igraph_real_t *logprob,
+			 igraph_real_t *logmax) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int agebins=pagebins;
+  long int binwidth=no_of_nodes/agebins+1;
+  
+  long int it, t, i, k;
+  igraph_vector_long_t ptk;
+  igraph_vector_t *mycites, vmycites;
+  igraph_vector_t neis;
+  igraph_real_t S=0, maxdelta, diff;
+  
+  igraph_vector_long_t lastcit;
+  igraph_vector_t vmykernel;
+  igraph_vector_t *kernels[]= { kernel, &vmykernel };
+  long int actkernel=0;
+  igraph_vector_t *fromkernel=kernels[actkernel],
+    *tokernel=kernels[1-actkernel];
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&ptk, agebins+1));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &ptk);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_long_init(&lastcit, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &lastcit);
+  IGRAPH_VECTOR_INIT_FINALLY(&vmykernel, agebins+1);
+  
+  if (cites) {
+    IGRAPH_CHECK(igraph_vector_resize(cites, agebins+1));
+    igraph_vector_null(cites);
+    mycites=cites;
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(&vmycites, agebins+1);
+    mycites=&vmycites;
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(kernel, agebins+1));
+  igraph_vector_fill(kernel, 1);
+  
+  IGRAPH_PROGRESS("ML Revolver l", 0, NULL);
+  
+  for (it=0; it<niter; it++) {
+    
+    igraph_vector_null(tokernel);
+    igraph_vector_long_null(&ptk);
+    S=0.0;
+    
+    if (logprob) { *logprob=0.0; }
+    if (logmax) { *logmax=0.0; }
+    
+    for (t=0; t<no_of_nodes; t++) {
+      long int n, nneis;
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, t, IGRAPH_OUT));
+      nneis=igraph_vector_size(&neis);
+
+      IGRAPH_ALLOW_INTERRUPTION();
+      
+      if (S != 0) {
+	for (i=0; i<agebins+1; i++) {
+	  VECTOR(*tokernel)[i] += nneis * VECTOR(ptk)[i] / S;
+	}
+	
+	if (logprob || logmax) {
+	  for (n=0; n<nneis; n++) {
+	    long int to=VECTOR(neis)[n];
+	    long int x= VECTOR(lastcit)[to] != 0 ? 
+	      t+2-(long int)VECTOR(lastcit)[to]/binwidth : agebins;
+	    if (logprob) { *logprob += log( VECTOR(*fromkernel)[x] / S ); }
+	    if (logmax) { *logmax += log(1.0/t); }
+	  }
+	}
+      }
+      
+      /* Update ptk for the last time step */
+      for (n=0; n<nneis; n++) {
+	long int to=VECTOR(neis)[n];
+	long int x=VECTOR(lastcit)[to] != 0 ?
+	  t+2-(long int)VECTOR(lastcit)[to]/binwidth : agebins;
+	
+	VECTOR(lastcit)[to]=t+2;
+	VECTOR(ptk)[x] += 1;
+	S += VECTOR(*fromkernel)[x];
+      }
+      VECTOR(ptk)[agebins] += 1;
+      S += VECTOR(*fromkernel)[agebins];
+      /* should we move some citations to an older bin? */
+      for (k=1; t+1-binwidth*k+1>=0; k++) {
+	long int shnode=t+1-binwidth*k+1;
+	IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+	nneis=igraph_vector_size(&neis);
+	for (i=0; i<nneis; i++) {
+	  long int cnode=VECTOR(neis)[i];
+	  if (VECTOR(lastcit)[cnode]==shnode+1) {
+	    VECTOR(ptk)[k-1] -= 1;
+	    VECTOR(ptk)[k] += 1;
+	    S -= VECTOR(*fromkernel)[k-1];
+	    S += VECTOR(*fromkernel)[k];
+	  }
+	}
+      }
+      
+    } /* t < no_of_nodes */
+    
+    /* Mk/sum */
+    maxdelta=0.0;
+    for (i=0; i<agebins+1; i++) {
+      VECTOR(*tokernel)[i] = VECTOR(*mycites)[i] / VECTOR(*tokernel)[i];
+      if ( (diff=abs(VECTOR(*tokernel)[i]-VECTOR(*fromkernel)[i])) > maxdelta) {
+	maxdelta=diff;
+      }
+    }
+    if (maxdelta < delta) { break; }
+    
+    /* Switch kernels */
+    actkernel=1-actkernel;
+    fromkernel=kernels[actkernel];
+    tokernel=kernels[1-actkernel];
+    
+    IGRAPH_PROGRESS("ML Revolver l", 100*(it+1)/niter, NULL);
+
+  } /* it < niter */
+  
+  /* Switch kernels if needed */
+  if (fromkernel != kernel) {
+    igraph_vector_update(kernel, fromkernel);
+  }
+  
+  if (!cites) { 
+    igraph_vector_destroy(&vmycites);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  igraph_vector_destroy(&vmykernel);
+  igraph_vector_long_destroy(&lastcit);
+  igraph_vector_destroy(&neis);
+  igraph_vector_long_destroy(&ptk);
+  IGRAPH_FINALLY_CLEAN(4);
+  
+  return 0;
+}
+
 /* -----------------------------------------------------------*/
 
 int igraph_revolver_probs_d(const igraph_t *graph,
