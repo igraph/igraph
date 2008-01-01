@@ -25,6 +25,20 @@
 	* src/structural_properties.c (igraph_count_multiple) : now handles
 	loop edges properly
 
+2007-11-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_AD_dpareto_eval) : added
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_D_alpha_a)
+	(igraph_revolver_ml_AD_alpha_a_beta, igraph_revolver_ml_AD_dpareto) :
+	small memory leaks removed
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_AD) : added 'lastderiv'
+	argument
+	
+	* src/revolver_ml_cit.c (igraph_i_revolver_ml_D_eval)
+	(igraph_i_revolver_ml_AD_eval) : divide by the number of experiments
+
 2007-11-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_betweenness_estimate, igraph_closeness_estimate)

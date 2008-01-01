@@ -971,6 +971,12 @@ igraph_revolver_ml_AD_dpareto:
         NAME-R: revolver.ml.AD.dpareto
         FLAGS: PROGRESS
 
+igraph_revolver_ml_AD_dpareto_eval:
+        PARAMS: GRAPH graph, REAL alpha, REAL a, REAL paralpha, REAL parbeta, \
+                REAL parscale, OUT REALPTR value, OUT VECTOR deriv, \
+                INT agebins=300, VECTOR_OR_0 filter=NULL
+        NAME-R: revolver.ml.AD.dpareto.eval
+
 #######################################
 # Other, (yet) undocumented functions
 #######################################
