@@ -18,6 +18,11 @@
 	
 	* interfaces/python/package/test/isomorphism.py : added tests
 
+2007-11-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/games.c (igraph_callaway_traits_game, igraph_establisment_game)
+	(igraph_cited_type_game) : bugs fixed
+
 2007-11-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_probs_d)

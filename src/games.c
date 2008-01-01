@@ -687,7 +687,7 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
     igraph_real_t uni=RNG_UNIF(0, maxcum);
     long int type;
     igraph_vector_binsearch(&cumdist, uni, &type);
-    VECTOR(nodetypes)[i]=type;
+    VECTOR(nodetypes)[i]=type-1;
   }    
 
   for (i=1; i<nodes; i++) {
@@ -772,7 +772,7 @@ int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_real_t uni=RNG_UNIF(0, maxcum);
     long int type;
     igraph_vector_binsearch(&cumdist, uni, &type);
-    VECTOR(nodetypes)[i]=type;
+    VECTOR(nodetypes)[i]=type-1;
   }
 
   for (i=k; i<nodes; i++) {    
@@ -2123,9 +2123,10 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   for (i=1; i<nodes; i++) {
     for (j=0; j<edges_per_step; j++) {
       long int to;
-      igraph_vector_binsearch(&cumsum, RNG_UNIF(0, sum), &to);
-      igraph_vector_push_back(&edges, i);
-      igraph_vector_push_back(&edges, to);
+      igraph_real_t r=RNG_UNIF(0,sum);
+      igraph_vector_binsearch(&cumsum, r, &to);
+        igraph_vector_push_back(&edges, i);
+      igraph_vector_push_back(&edges, to-1);
     }
     sum+=VECTOR(*pref)[(long int) VECTOR(*types)[i] ];
     igraph_vector_push_back(&cumsum, sum);
