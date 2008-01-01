@@ -231,7 +231,7 @@ int igraph_revolver_ml_D(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_vector_long_destroy, &info.degree);
   IGRAPH_VECTOR_INIT_FINALLY(&info.neis, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&info.dS, dim);
-  IGRAPH_VECTOR_INIT_FINALLY(&info.par1, dim+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.par1, dim);
   IGRAPH_VECTOR_INIT_FINALLY(&info.tmpgrad, dim);
   IGRAPH_VECTOR_INIT_FINALLY(&info.lastparam, dim);
   info.lastf=0.0;
@@ -371,6 +371,329 @@ int igraph_revolver_ml_D_alpha_a(const igraph_t *graph,
   igraph_vector_destroy(&res);
   IGRAPH_FINALLY_CLEAN(1);
   
+  return 0;
+}
+
+/*------------------------------------------------------------------*/
+
+typedef struct igraph_i_revolver_ml_DE_data_t {
+  igraph_scalar_function_t *A;
+  igraph_vector_function_t *dA;  
+  const igraph_t *graph;
+  const igraph_vector_t *cats;
+  long int no_of_nodes;
+  igraph_matrix_t A_vect;	/* Temporary storage */
+  igraph_vector_ptr_t dA_vects;	/* Temporary storage */
+  igraph_integer_t maxdegree;
+  igraph_integer_t nocats;
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  igraph_vector_t dS;		/* Temporary storage */
+  igraph_vector_t par1;		/* More tmp storage */
+  igraph_vector_t tmpgrad;      /* More... */  
+
+  igraph_vector_t lastparam;	/* The parameter values used last time */
+  igraph_real_t lastf;		/* The evaluated function value  */
+  igraph_vector_t lastgrad;	/* The evaluated gradient */
+
+  const igraph_vector_t *filter;
+} igraph_i_revolver_ml_DE_data_t;
+
+int igraph_i_revolver_ml_DE_eval(const igraph_vector_t *par,
+				 igraph_i_revolver_ml_DE_data_t *data) {
+  
+  igraph_real_t sum=0.0;
+  long int t, i, j;
+  int dim=igraph_vector_size(par);
+  igraph_vector_t *grad=&data->lastgrad;
+  igraph_real_t S=0.0;
+  long int no_of_edges=0;
+  
+  /* Init */
+  igraph_vector_long_null(&data->degree);
+  igraph_vector_null(&data->dS);
+  igraph_vector_null(grad);
+
+  for (i=0; i<data->nocats; i++) {
+    for (j=0; j<data->maxdegree+1; j++) {
+      long int k;
+      VECTOR(data->par1)[0]=i; VECTOR(data->par1)[1]=j;
+      MATRIX(data->A_vect, i, j) = data->A(&data->par1, par, 0);
+      data->dA(&data->par1, par, &data->tmpgrad, 0);
+      for (k=0; k<dim; k++) {
+	igraph_matrix_t *m=VECTOR(data->dA_vects)[k];
+	MATRIX(*m, i, j)=VECTOR(data->tmpgrad)[k];
+      }
+    }
+  }
+  
+  for (t=0; t<data->no_of_nodes; t++) {
+    long int n, nneis;
+    long int tcat=VECTOR(*data->cats)[t];
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    IGRAPH_CHECK(igraph_neighbors(data->graph, &data->neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&data->neis);
+
+    if (! data->filter || VECTOR(*data->filter)[t]) {
+
+      /* Update sum(s) */
+      for (n=0; n<nneis; n++) {
+	long int to=VECTOR(data->neis)[n];
+	long int x=VECTOR(*data->cats)[to];
+	long int y=VECTOR(data->degree)[to];
+	
+/* 	CHECK_VALID(x,y); */
+	sum -= log( MATRIX(data->A_vect, x, y) );
+	sum += log( S );
+	for (i=0; i<dim; i++) {
+	  igraph_matrix_t *m=VECTOR(data->dA_vects)[i];
+	  VECTOR(*grad)[i] -= MATRIX(*m, x, y) / MATRIX(data->A_vect, x, y);
+	  VECTOR(*grad)[i] += VECTOR(data->dS)[i] / S;
+	}
+	no_of_edges++;
+      }
+    }
+    
+    /* Update D, data->dS */
+    for (n=0; n<nneis; n++) {
+      long int to=VECTOR(data->neis)[n];
+      long int x=VECTOR(*data->cats)[to];
+      long int y=VECTOR(data->degree)[to];
+      
+      VECTOR(data->degree)[to] += 1;
+      S += MATRIX(data->A_vect, x, y+1);
+      S -= MATRIX(data->A_vect, x, y);
+      for (i=0; i<dim; i++) {
+	igraph_matrix_t *m=VECTOR(data->dA_vects)[i];
+	VECTOR(data->dS)[i] += MATRIX(*m, x, y+1);
+	VECTOR(data->dS)[i] -= MATRIX(*m, x, y);
+      }
+    }
+    /* New vertex */
+    S += MATRIX(data->A_vect, tcat, 0);
+    for (i=0; i<dim; i++) {
+      igraph_matrix_t *m=VECTOR(data->dA_vects)[i];
+      VECTOR(data->dS)[i] += MATRIX(*m, tcat, 0);
+    }
+    
+  }
+  
+  igraph_vector_update(&data->lastparam, par);
+  data->lastf=sum / no_of_edges;
+  for (i=0; i<igraph_vector_size(&data->lastgrad); i++) {
+    VECTOR(data->lastgrad)[i] /= no_of_edges;
+  }
+
+  return 0.0;
+}
+
+igraph_real_t igraph_i_revolver_ml_DE_f(const igraph_vector_t *par,
+					const igraph_vector_t *garbage,
+					void *extra) {
+
+  igraph_i_revolver_ml_DE_data_t *data=extra;
+  long int i;
+  
+  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+    igraph_i_revolver_ml_DE_eval(par, data);
+  }
+
+  if (!igraph_finite(data->lastf)) {
+    IGRAPH_WARNING("Target function evaluated to non-finite value.");
+  }
+  
+  printf("eval (");
+  for (i=0; i<igraph_vector_size(par); i++) {
+    printf("%f ", VECTOR(*par)[i]);
+  }
+  printf(" ): ");
+  printf("%g\n", data->lastf);
+  return data->lastf;
+}
+
+void igraph_i_revolver_ml_DE_df(const igraph_vector_t *par,
+				const igraph_vector_t *garbage,
+				igraph_vector_t *res, void *extra) {
+
+  igraph_i_revolver_ml_DE_data_t *data=extra;
+  long int i;
+  
+  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+    igraph_i_revolver_ml_DE_eval(par, data);
+  }
+  
+  igraph_vector_update(res, &data->lastgrad);
+  printf("derivative (");
+  for (i=0; i<igraph_vector_size(par); i++) {
+    printf("%f ", VECTOR(*par)[i]);
+  }
+  printf(" ): ");
+  for (i=0; i<igraph_vector_size(res); i++) {
+    printf("%f ", VECTOR(*res)[i]);
+  }
+  printf("\n");
+}
+
+void igraph_i_revolver_ml_DE_free(igraph_vector_ptr_t *ptr) {
+  long int i, n=igraph_vector_ptr_size(ptr);
+  for (i=0; i<n; i++) {
+    igraph_matrix_t *v=VECTOR(*ptr)[i];
+    if (v) {
+      igraph_matrix_destroy(v);
+      igraph_free(v);
+    }
+    VECTOR(*ptr)[i]=0;
+  }  
+}
+
+int igraph_revolver_ml_DE(const igraph_t *graph,
+			  const igraph_vector_t *cats,
+			  igraph_vector_t *res,
+			  igraph_real_t *Fmin,
+			  igraph_real_t abstol, igraph_real_t reltol, int maxit,
+			  igraph_scalar_function_t *A_fun,
+			  igraph_vector_function_t *dA_fun,
+			  const igraph_vector_t *filter,
+			  igraph_integer_t *fncount, 
+			  igraph_integer_t *grcount,
+			  igraph_vector_t *lastderiv) {
+  
+  igraph_i_revolver_ml_DE_data_t info;
+  igraph_integer_t maxdegree;
+  long int no_of_nodes=igraph_vcount(graph);
+  int dim=igraph_vector_size(res);
+  int ret, i;
+
+  if (igraph_vector_size(cats) != no_of_nodes) {
+    IGRAPH_ERROR("DE ML Revolver failed, invalid category vector size", 
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
+				IGRAPH_IN, IGRAPH_LOOPS));
+  
+  info.A=A_fun;
+  info.dA=dA_fun;
+  info.graph=graph;
+  info.cats=cats;
+  info.nocats=igraph_vector_max(cats)+1;
+  info.no_of_nodes=no_of_nodes;
+  IGRAPH_MATRIX_INIT_FINALLY(&info.A_vect, info.nocats, maxdegree+1);  
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&info.dA_vects, dim);
+  IGRAPH_FINALLY(igraph_i_revolver_ml_DE_free, &info.dA_vects);
+  for (i=0; i<dim; i++) {
+    igraph_matrix_t *m=igraph_Calloc(1, igraph_matrix_t);
+    if (!m) { IGRAPH_ERROR("Cannot perform ML D revolver", IGRAPH_ENOMEM); }
+    IGRAPH_CHECK(igraph_matrix_init(m, info.nocats, maxdegree+1));
+    VECTOR(info.dA_vects)[i]=m;
+  }
+  info.maxdegree=maxdegree;
+  IGRAPH_CHECK(igraph_vector_long_init(&info.degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &info.degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.dS, dim);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.par1, dim);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.tmpgrad, dim);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.lastparam, dim);
+  info.lastf=0.0;
+  IGRAPH_VECTOR_INIT_FINALLY(&info.lastgrad, dim);  
+  info.filter=filter;
+  
+  igraph_i_revolver_ml_DE_eval(res, &info);
+  ret=igraph_bfgs(res, Fmin, igraph_i_revolver_ml_DE_f,
+		  igraph_i_revolver_ml_DE_df, maxit, 1, abstol, reltol, 1, 
+		  &info, fncount, grcount);
+
+  if (lastderiv) {
+    igraph_vector_update(lastderiv, &info.lastgrad);
+  }
+  
+  igraph_vector_destroy(&info.lastgrad);
+  igraph_vector_destroy(&info.lastparam);
+  igraph_vector_destroy(&info.tmpgrad);
+  igraph_vector_destroy(&info.par1);
+  igraph_vector_destroy(&info.dS);
+  igraph_vector_destroy(&info.neis);
+  igraph_vector_long_destroy(&info.degree);
+  igraph_i_revolver_ml_DE_free(&info.dA_vects);
+  igraph_vector_ptr_destroy(&info.dA_vects);
+  igraph_matrix_destroy(&info.A_vect);
+  IGRAPH_FINALLY_CLEAN(10);
+
+  return 0;
+}
+ 
+igraph_real_t igraph_i_revolver_ml_DE_alpha_a_f(const igraph_vector_t *var,
+						const igraph_vector_t *par,
+						void *extra) {
+  long int cat=VECTOR(*var)[0];
+  igraph_real_t deg=VECTOR(*var)[1];
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t c= cat==0 ? 1.0 : VECTOR(*par)[1+cat];
+  if (deg != 0) {
+    return c * (pow(deg, alpha) + a);
+  } else {
+    return c * a;
+  }
+}
+
+void igraph_i_revolver_ml_DE_alpha_a_df(const igraph_vector_t *var,
+					const igraph_vector_t *par,
+					igraph_vector_t *res,
+					void *extra) {
+  long int cat=VECTOR(*var)[0];
+  igraph_real_t deg=VECTOR(*var)[1];
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t c= cat==0 ? 1.0 : VECTOR(*par)[1+cat];
+  igraph_vector_null(res);
+  if (deg != 0) {
+    igraph_real_t p=pow(deg, alpha);
+    VECTOR(*res)[0] = c * log(deg) * p;
+    VECTOR(*res)[1] = c;
+    VECTOR(*res)[1+cat] = p+a;
+  } else {
+    VECTOR(*res)[0] = 0.0;
+    VECTOR(*res)[1] = c;
+    VECTOR(*res)[1+cat] = a;
+  }
+}
+
+int igraph_revolver_ml_DE_alpha_a(const igraph_t *graph,
+				  const igraph_vector_t *cats,
+				  igraph_real_t *alpha, igraph_real_t *a,
+				  igraph_vector_t *coeffs,
+				  igraph_real_t *Fmin,
+				  igraph_real_t abstol, igraph_real_t reltol,
+				  int maxit, const igraph_vector_t *filter,
+				  igraph_integer_t *fncount,
+				  igraph_integer_t *grcount) {
+  igraph_vector_t res;
+  int ret, i;  
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&res, igraph_vector_size(coeffs)+2);
+  VECTOR(res)[0] = *alpha;
+  VECTOR(res)[1] = *a;
+  for (i=0; i<igraph_vector_size(coeffs); i++) {
+    VECTOR(res)[i+2] = VECTOR(*coeffs)[i];
+  }
+  
+  ret=igraph_revolver_ml_DE(graph, cats, &res, Fmin, abstol, reltol, maxit,
+			    igraph_i_revolver_ml_DE_alpha_a_f,
+			    igraph_i_revolver_ml_DE_alpha_a_df,
+			    filter, fncount, grcount, 0);
+  
+  *alpha=VECTOR(res)[0];
+  *a=VECTOR(res)[1];
+  for (i=0; i<igraph_vector_size(coeffs); i++) {
+    VECTOR(*coeffs)[i]=VECTOR(res)[i+2];
+  }
+  igraph_vector_destroy(&res);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -603,7 +926,7 @@ int igraph_revolver_ml_AD(const igraph_t *graph,
   info.no_of_nodes=no_of_nodes;
   IGRAPH_MATRIX_INIT_FINALLY(&info.A_vect, maxdegree+1, agebins);  
   IGRAPH_VECTOR_PTR_INIT_FINALLY(&info.dA_vects, dim);
-  IGRAPH_FINALLY(igraph_i_revolver_ml_D_free, &info.dA_vects);
+  IGRAPH_FINALLY(igraph_i_revolver_ml_AD_free, &info.dA_vects);
   for (i=0; i<dim; i++) {
     igraph_matrix_t *m=igraph_Calloc(1, igraph_matrix_t);
     if (!m) { IGRAPH_ERROR("Cannot perform ML D revolver", IGRAPH_ENOMEM); }
@@ -617,7 +940,7 @@ int igraph_revolver_ml_AD(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_vector_long_destroy, &info.degree);
   IGRAPH_VECTOR_INIT_FINALLY(&info.neis, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&info.dS, dim);
-  IGRAPH_VECTOR_INIT_FINALLY(&info.par1, dim+2);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.par1, dim);
   IGRAPH_VECTOR_INIT_FINALLY(&info.tmpgrad, dim);
   info.agebins=agebins;
   IGRAPH_VECTOR_INIT_FINALLY(&info.lastparam, dim);
@@ -820,6 +1143,486 @@ int igraph_revolver_ml_AD_dpareto(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   return ret;
 }
+
+/*------------------------------------------------------------------*/
+
+typedef struct igraph_i_revolver_ml_ADE_data_t {
+  igraph_scalar_function_t *A;
+  igraph_vector_function_t *dA;
+  const igraph_t *graph;
+  const igraph_vector_t *cats;
+  long int no_of_nodes;
+  igraph_array3_t A_vect;	/* Temporary storage */
+  igraph_vector_ptr_t dA_vects;	/* Temporary storage */
+  igraph_integer_t maxdegree;
+  igraph_integer_t nocats;
+  igraph_vector_long_t degree;
+  igraph_vector_t neis;
+  igraph_vector_t dS;		/* Temporary storage */
+  igraph_vector_t par1;		/* More tmp storage */
+  igraph_vector_t tmpgrad;      /* More... */
+  int agebins;
+
+  igraph_vector_t lastparam;	/* The parameter values used last time */
+  igraph_real_t lastf;		/* The evaluated function value  */
+  igraph_vector_t lastgrad;	/* The evaluated gradient */
+  
+  const igraph_vector_t *filter;
+} igraph_i_revolver_ml_ADE_data_t;
+
+int igraph_i_revolver_ml_ADE_eval(const igraph_vector_t *par,
+				  igraph_i_revolver_ml_ADE_data_t *data) {
+  igraph_real_t sum=0.;
+  long int t, i, j, c;
+  int dim=igraph_vector_size(par);
+  igraph_vector_t *grad=&data->lastgrad;
+  igraph_real_t S=0.0;
+  long int agebins=data->agebins;
+  long int binwidth=data->no_of_nodes/agebins+1;
+  long int no_of_edges=0;
+  
+  /* Init */
+  igraph_vector_long_null(&data->degree);
+  igraph_vector_null(&data->dS);
+  igraph_vector_null(grad);
+
+  for (c=0; c<data->nocats; c++) {
+    for (i=0; i<data->maxdegree+1; i++) {
+      for (j=0; j<agebins; j++) {
+	long int k;
+	VECTOR(data->par1)[0]=c; 
+	VECTOR(data->par1)[1]=i;
+	VECTOR(data->par1)[2]=j;
+	ARRAY3(data->A_vect, c, (i), (j)) = data->A(&data->par1, par, 0);
+	data->dA(&data->par1, par, &data->tmpgrad, 0);
+	for (k=0; k<dim; k++) {
+	  igraph_array3_t *m=VECTOR(data->dA_vects)[k];
+	  ARRAY3(*m, c, i, j) = VECTOR(data->tmpgrad)[k];
+	}
+      }
+    }
+  }
+
+  for (t=0; t<data->no_of_nodes; t++) {
+    long int n, nneis;
+    long int tcat=VECTOR(*data->cats)[t];
+
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    IGRAPH_CHECK(igraph_neighbors(data->graph, &data->neis, t, IGRAPH_OUT));
+    nneis=igraph_vector_size(&data->neis);
+
+    if (! data->filter || VECTOR(*data->filter)[t]) {
+
+      /* Update sum(s) */
+      for (n=0; n<nneis; n++) {
+	long int to=VECTOR(data->neis)[n];
+	long int x=VECTOR(*data->cats)[to];
+	long int y=VECTOR(data->degree)[to];
+	long int z=(t-to)/binwidth;
+	
+/* 	CHECK_VALID(x,y); */
+	sum -= log( ARRAY3(data->A_vect, x, y, z) );
+	sum += log( S );
+	for (i=0; i<dim; i++) {
+	  igraph_array3_t *m=VECTOR(data->dA_vects)[i];
+	  VECTOR(*grad)[i] -= ARRAY3(*m, x, y, z) / ARRAY3(data->A_vect, x, y, z);
+	  VECTOR(*grad)[i] += VECTOR(data->dS)[i] / S;
+	}
+	no_of_edges++;
+      }
+    }
+    
+    /* Update S, data->dS */
+    for (n=0; n<nneis; n++) {
+      long int to=VECTOR(data->neis)[n];
+      long int x=VECTOR(*data->cats)[to];
+      long int y=VECTOR(data->degree)[to];
+      long int z=(t-to)/binwidth;
+      
+/*       CHECK_VALID(x+1,y);	/\* (x,y) already checked *\/ */
+      VECTOR(data->degree)[to] += 1;
+      S += ARRAY3(data->A_vect, x, y+1, z);
+      S -= ARRAY3(data->A_vect, x, y, z);
+      for (i=0; i<dim; i++) {
+	igraph_array3_t *m=VECTOR(data->dA_vects)[i];
+	VECTOR(data->dS)[i] += ARRAY3(*m, x, y+1, z);
+	VECTOR(data->dS)[i] -= ARRAY3(*m, x, y, z);
+      }
+    }
+    /* New vertex */
+/*     CHECK_VALID(0,0); */
+    S += ARRAY3(data->A_vect, tcat, 0, 0);
+    for (i=0; i<dim; i++) {
+      igraph_array3_t *m=VECTOR(data->dA_vects)[i];
+      VECTOR(data->dS)[i] += ARRAY3(*m, tcat, 0, 0);
+    }
+    /* Aging */
+    for (j=1; t-binwidth*j+1>=0; j++) {
+      long int shnode=t-binwidth*j+1;
+      long int cat=VECTOR(*data->cats)[shnode];
+      long int deg=VECTOR(data->degree)[shnode];
+/*       CHECK_VALID(deg, j-1); */
+/*       CHECK_VALID(deg, j); */
+      S += ARRAY3(data->A_vect, cat, deg, j);
+      S -= ARRAY3(data->A_vect, cat, deg, j-1);
+      for (i=0; i<dim; i++) {
+	igraph_array3_t *m=VECTOR(data->dA_vects)[i];
+	VECTOR(data->dS)[i] += ARRAY3(*m, cat, deg, j);
+	VECTOR(data->dS)[i] -= ARRAY3(*m, cat, deg, j-1);
+      }
+    }
+    
+  }      
+      
+  igraph_vector_update(&data->lastparam, par);
+  data->lastf=sum / no_of_edges;
+  for (i=0; i<igraph_vector_size(&data->lastgrad); i++) {
+    VECTOR(data->lastgrad)[i] /= no_of_edges;
+  }
+
+  return 0.0;
+}
+
+igraph_real_t igraph_i_revolver_ml_ADE_f(const igraph_vector_t *par,
+					 const igraph_vector_t *garbage,
+					 void *extra) {
+
+  igraph_i_revolver_ml_ADE_data_t *data=extra;
+  long int i;
+  
+  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+    igraph_i_revolver_ml_ADE_eval(par, data);
+  }
+
+  if (!igraph_finite(data->lastf)) {
+    IGRAPH_WARNING("Target function evaluated to non-finite value.");
+  }
+  
+  printf("eval (");
+  for (i=0; i<igraph_vector_size(par); i++) {
+    printf("%f ", VECTOR(*par)[i]);
+  }
+  printf(" ): ");
+  printf("%g\n", data->lastf);
+  return data->lastf;
+}
+
+void igraph_i_revolver_ml_ADE_df(const igraph_vector_t *par,
+				 const igraph_vector_t *garbage,
+				 igraph_vector_t *res, void *extra) {
+
+  igraph_i_revolver_ml_ADE_data_t *data=extra;
+  long int i;
+  
+  if (!igraph_vector_is_equal(par, &data->lastparam)) {
+    igraph_i_revolver_ml_ADE_eval(par, data);
+  }
+  
+  igraph_vector_update(res, &data->lastgrad);
+  printf("derivative (");
+  for (i=0; i<igraph_vector_size(par); i++) {
+    printf("%f ", VECTOR(*par)[i]);
+  }
+  printf(" ): ");
+  for (i=0; i<igraph_vector_size(res); i++) {
+    printf("%f ", VECTOR(*res)[i]);
+  }
+  printf("\n");
+}
+
+void igraph_i_revolver_ml_ADE_free(igraph_vector_ptr_t *ptr) {
+  long int i, n=igraph_vector_ptr_size(ptr);
+  for (i=0; i<n; i++) {
+    igraph_array3_t *v=VECTOR(*ptr)[i];
+    if (v) {
+      igraph_array3_destroy(v);
+      igraph_free(v);
+    }
+    VECTOR(*ptr)[i]=0;
+  }  
+}
+
+int igraph_revolver_ml_ADE(const igraph_t *graph,
+			   const igraph_vector_t *cats,
+			   igraph_vector_t *res,
+			   igraph_real_t *Fmin,
+			   igraph_real_t abstol, igraph_real_t reltol, int maxit,
+			   igraph_scalar_function_t *A_fun,
+			   igraph_vector_function_t *dA_fun,
+			   int agebins, const igraph_vector_t *filter,
+			   igraph_integer_t *fncount, 
+			   igraph_integer_t *grcount,
+			   igraph_vector_t *lastderiv) {
+  
+  igraph_i_revolver_ml_ADE_data_t info;
+  igraph_integer_t maxdegree;
+  long int no_of_nodes=igraph_vcount(graph);
+  int dim=igraph_vector_size(res);
+  int ret, i;
+  
+  if (igraph_vector_size(cats) != no_of_nodes) {
+    IGRAPH_ERROR("ADE ML Revolver failed: invalid category vector size", 
+		 IGRAPH_ENOMEM);
+  }
+
+  IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
+				IGRAPH_IN, IGRAPH_LOOPS));
+  
+  info.A=A_fun;
+  info.dA=dA_fun;
+  info.graph=graph;
+  info.no_of_nodes=no_of_nodes;
+  info.cats=cats;
+  info.nocats=igraph_vector_max(cats)+1;
+  IGRAPH_ARRAY3_INIT_FINALLY(&info.A_vect, info.nocats, maxdegree+1, agebins);  
+  IGRAPH_VECTOR_PTR_INIT_FINALLY(&info.dA_vects, dim);
+  IGRAPH_FINALLY(igraph_i_revolver_ml_ADE_free, &info.dA_vects);
+  for (i=0; i<dim; i++) {
+    igraph_array3_t *m=igraph_Calloc(1, igraph_array3_t);
+    if (!m) { IGRAPH_ERROR("Cannot perform ML D revolver", IGRAPH_ENOMEM); }
+    IGRAPH_CHECK(igraph_array3_init(m, info.nocats, maxdegree+1, agebins));
+    VECTOR(info.dA_vects)[i]=m;
+  }
+  info.maxdegree=maxdegree;
+  IGRAPH_CHECK(igraph_vector_long_init(&info.degree, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &info.degree);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.neis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.dS, dim);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.par1, dim);
+  IGRAPH_VECTOR_INIT_FINALLY(&info.tmpgrad, dim);
+  info.agebins=agebins;
+  IGRAPH_VECTOR_INIT_FINALLY(&info.lastparam, dim);
+  info.lastf=0.0;
+  IGRAPH_VECTOR_INIT_FINALLY(&info.lastgrad, dim);  
+  info.filter=filter;
+  
+  igraph_i_revolver_ml_ADE_eval(res, &info);
+  ret=igraph_bfgs(res, Fmin, igraph_i_revolver_ml_ADE_f,
+		  igraph_i_revolver_ml_ADE_df, maxit, 1, abstol, reltol, 1, 
+		  &info, fncount, grcount);
+
+  if (lastderiv) {
+    igraph_vector_update(lastderiv, &info.lastgrad);
+  }
+  
+  igraph_vector_destroy(&info.lastgrad);
+  igraph_vector_destroy(&info.lastparam);
+  igraph_vector_destroy(&info.tmpgrad);
+  igraph_vector_destroy(&info.par1);
+  igraph_vector_destroy(&info.dS);
+  igraph_vector_destroy(&info.neis);
+  igraph_vector_long_destroy(&info.degree);
+  igraph_i_revolver_ml_ADE_free(&info.dA_vects);
+  igraph_vector_ptr_destroy(&info.dA_vects);
+  igraph_array3_destroy(&info.A_vect);
+  IGRAPH_FINALLY_CLEAN(10);
+
+  return 0;
+}
+
+igraph_real_t igraph_i_revolver_ml_ADE_alpha_a_beta_f(const igraph_vector_t *var,
+						      const igraph_vector_t *par,
+						      void *extra) {
+  long int cat=VECTOR(*var)[0];
+  igraph_real_t deg=VECTOR(*var)[1];
+  igraph_real_t age=VECTOR(*var)[2]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t beta=VECTOR(*par)[2];  
+  igraph_real_t c= cat==0 ? 1.0 : VECTOR(*par)[2+cat];
+  return c * (pow(deg, alpha) + a) * pow(age, -beta);
+}
+
+void igraph_i_revolver_ml_ADE_alpha_a_beta_df(const igraph_vector_t *var,
+					      const igraph_vector_t *par,
+					      igraph_vector_t *res,
+					      void *extra) {
+  long int cat=VECTOR(*var)[0];
+  igraph_real_t deg=VECTOR(*var)[1];
+  igraph_real_t age=VECTOR(*var)[2]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t beta=VECTOR(*par)[2];
+  igraph_real_t c= cat==0 ? 1.0 : VECTOR(*par)[2+cat];
+  igraph_real_t p1=pow(deg, alpha);
+  igraph_real_t p2=pow(age, -beta);
+  igraph_vector_null(res);
+  VECTOR(*res)[0]= deg == 0 ? 0.0 : c * p2*log(deg)*p1;
+  VECTOR(*res)[1]= c * p2;
+  VECTOR(*res)[2]= c * -(p1+a)*log(age)*p2;
+  VECTOR(*res)[2+cat] = (p1 + a) * p2;
+}
+
+int igraph_revolver_ml_ADE_alpha_a_beta(const igraph_t *graph,
+					const igraph_vector_t *cats,
+					igraph_real_t *alpha, igraph_real_t *a,
+					igraph_real_t *beta, igraph_vector_t *coeffs,
+					igraph_real_t *Fmin,
+					igraph_real_t abstol, igraph_real_t reltol,
+					int maxit, int agebins, 
+					const igraph_vector_t *filter,
+					igraph_integer_t *fncount,
+					igraph_integer_t *grcount) {
+  igraph_vector_t res;
+  int ret, i;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&res, 3+igraph_vector_size(coeffs));
+  VECTOR(res)[0] = *alpha;
+  VECTOR(res)[1] = *a;
+  VECTOR(res)[2] = *beta;
+  for (i=0; i<igraph_vector_size(coeffs); i++) {
+    VECTOR(res)[i+3] = VECTOR(*coeffs)[i];
+  }
+  
+  ret=igraph_revolver_ml_ADE(graph, cats, &res, Fmin, abstol, reltol, maxit,
+			     igraph_i_revolver_ml_ADE_alpha_a_beta_f,
+			     igraph_i_revolver_ml_ADE_alpha_a_beta_df,
+			     agebins, filter, fncount, grcount, 0);
+  
+  *alpha=VECTOR(res)[0];
+  *a=VECTOR(res)[1];
+  *beta=VECTOR(res)[2];
+  for (i=0; i<igraph_vector_size(coeffs); i++) {
+    VECTOR(*coeffs)[i]=VECTOR(res)[i+3];
+  }
+
+  igraph_vector_destroy(&res);
+  IGRAPH_FINALLY_CLEAN(1);  
+  return ret;
+}
+
+igraph_real_t igraph_i_revolver_ml_ADE_dpareto_f(const igraph_vector_t *var,
+						 const igraph_vector_t *par,
+						 void *extra) {
+  long int cat=VECTOR(*var)[0];
+  igraph_real_t deg=VECTOR(*var)[1];
+  igraph_real_t age=VECTOR(*var)[2]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t paralpha=VECTOR(*par)[2];
+  igraph_real_t parbeta=VECTOR(*par)[3];
+  igraph_real_t parscale=VECTOR(*par)[4];
+  igraph_real_t c= cat==0 ? 1.0 : VECTOR(*par)[4+cat];
+
+  igraph_real_t res= age < parscale ? 
+    c * (pow(deg,alpha)+a) * pow(age/parscale, parbeta-1) : 
+    c * (pow(deg,alpha)+a) * pow(age/parscale, -paralpha-1);
+    
+/*   printf("eval at %f %f, %f %f %f %f %f: %f\n", deg, age, */
+/* 	 alpha, a, paralpha, parbeta, parscale, res); */
+
+  return res;
+}
+
+void igraph_i_revolver_ml_ADE_dpareto_df(const igraph_vector_t *var,
+					 const igraph_vector_t *par,
+					 igraph_vector_t *res,
+					 void *extra) {
+  long int cat=VECTOR(*var)[0];
+  igraph_real_t deg=VECTOR(*var)[1];
+  igraph_real_t age=VECTOR(*var)[2]+1;
+  igraph_real_t alpha=VECTOR(*par)[0];
+  igraph_real_t a=VECTOR(*par)[1];
+  igraph_real_t paralpha=VECTOR(*par)[2];
+  igraph_real_t parbeta=VECTOR(*par)[3];
+  igraph_real_t parscale=VECTOR(*par)[4];
+  igraph_real_t exponent= age < parscale ? parbeta : -paralpha;
+  igraph_real_t p1=pow(deg, alpha);  
+  igraph_real_t p2=pow(age/parscale, exponent-1);
+  igraph_real_t c= cat==0 ? 1.0 : VECTOR(*par)[4+cat];
+  igraph_vector_null(res);
+  VECTOR(*res)[0]= deg == 0 ? 0.0 : c * log(deg)*p1*p2;
+  VECTOR(*res)[1]= c * p2;
+  VECTOR(*res)[2]= age > parscale ? c * (p1+a)*log(age/parscale)*p2 : 0;
+  VECTOR(*res)[3]= age < parscale ? c * (p1+a)*log(age/parscale)*p2 : 0;
+  VECTOR(*res)[4]= c * -(p1+a)*(exponent-1)*pow(age/parscale, exponent-2)*
+    age/parscale/parscale;
+  VECTOR(*res)[4+cat] = (p1+a) * p2;
+/*   printf("deriv at %f %f, %f %f %f %f %f: %f %f %f %f %f\n", deg, age, */
+/* 	 alpha, a, paralpha, parbeta, parscale, */
+/* 	 VECTOR(*res)[0], VECTOR(*res)[1], VECTOR(*res)[2], VECTOR(*res)[3], */
+/* 	 VECTOR(*res)[4]); */
+    
+}
+  
+int igraph_revolver_ml_ADE_dpareto_eval(const igraph_t *graph,
+					const igraph_vector_t *cats,
+					igraph_real_t alpha, igraph_real_t a,
+					igraph_real_t paralpha, 
+					igraph_real_t parbeta,
+					igraph_real_t parscale,
+					const igraph_vector_t *coeffs,
+					igraph_real_t *value,
+					igraph_vector_t *deriv,
+					int agebins,
+					const igraph_vector_t *filter) {
+  igraph_vector_t res;
+  int ret, i;
+  igraph_integer_t fncount, grcount;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&res, 5+igraph_vector_size(coeffs));
+  VECTOR(res)[0] = alpha;
+  VECTOR(res)[1] = a;
+  VECTOR(res)[2] = paralpha;
+  VECTOR(res)[3] = parbeta;
+  VECTOR(res)[4] = parscale;
+  for (i=0; i<igraph_vector_size(coeffs); i++) {
+    VECTOR(res)[5+i] = VECTOR(*coeffs)[i];
+  }
+  
+  ret=igraph_revolver_ml_ADE(graph, cats, &res, value, 0, 0, 0,
+			     igraph_i_revolver_ml_ADE_dpareto_f,
+			     igraph_i_revolver_ml_ADE_dpareto_df,
+			     agebins, filter, &fncount, &grcount, deriv);
+  
+  igraph_vector_destroy(&res);
+  IGRAPH_FINALLY_CLEAN(1);
+  return ret;
+}
+  
+int igraph_revolver_ml_ADE_dpareto(const igraph_t *graph,
+				   const igraph_vector_t *cats,
+				   igraph_real_t *alpha, igraph_real_t *a,
+				   igraph_real_t *paralpha, igraph_real_t *parbeta,
+				   igraph_real_t *parscale, igraph_vector_t *coeffs,
+				   igraph_real_t *Fmin,
+				   igraph_real_t abstol, igraph_real_t reltol,
+				   int maxit, int agebins, 
+				   const igraph_vector_t *filter,
+				   igraph_integer_t *fncount,
+				   igraph_integer_t *grcount) {
+  igraph_vector_t res;
+  int ret, i;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&res, 5+igraph_vector_size(coeffs));
+  VECTOR(res)[0] = *alpha;
+  VECTOR(res)[1] = *a;
+  VECTOR(res)[2] = *paralpha;
+  VECTOR(res)[3] = *parbeta;
+  VECTOR(res)[4] = *parscale;
+  for (i=0; i<igraph_vector_size(coeffs); i++) {
+    VECTOR(res)[5+i] = VECTOR(*coeffs)[i];
+  }
+  
+  ret=igraph_revolver_ml_ADE(graph, cats, &res, Fmin, abstol, reltol, maxit,
+			     igraph_i_revolver_ml_ADE_dpareto_f,
+			     igraph_i_revolver_ml_ADE_dpareto_df,
+			     agebins, filter, fncount, grcount, 0);
+  
+  *alpha=VECTOR(res)[0];
+  *a=VECTOR(res)[1];
+  *paralpha=VECTOR(res)[2];
+  *parbeta=VECTOR(res)[3];
+  *parscale=VECTOR(res)[4];
+  for (i=0; i<igraph_vector_size(coeffs); i++) {
+    VECTOR(*coeffs)[i] = VECTOR(res)[5+i];
+  }
+
+  igraph_vector_destroy(&res);
+  IGRAPH_FINALLY_CLEAN(1);
+  return ret;
+}  
 
 /*------------------------------------------------------------------*/
 

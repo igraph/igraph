@@ -2462,6 +2462,28 @@ int igraph_revolver_ml_D_alpha_a(const igraph_t *graph,
 				 igraph_integer_t *fncount, 
 				 igraph_integer_t *grcount);
 
+int igraph_revolver_ml_DE(const igraph_t *graph,
+			  const igraph_vector_t *cats,
+			  igraph_vector_t *res,
+			  igraph_real_t *Fmin,
+			  igraph_real_t abstol, igraph_real_t reltol, int maxit,
+			  igraph_scalar_function_t *A_fun,
+			  igraph_vector_function_t *dA_fun,
+			  const igraph_vector_t *filter,
+			  igraph_integer_t *fncount, 
+			  igraph_integer_t *grcount,
+			  igraph_vector_t *lastderiv);
+
+int igraph_revolver_ml_DE_alpha_a(const igraph_t *graph,
+				  const igraph_vector_t *cats,
+				  igraph_real_t *alpha, igraph_real_t *a,
+				  igraph_vector_t *coeffs,
+				  igraph_real_t *Fmin,
+				  igraph_real_t abstol, igraph_real_t reltol,
+				  int maxit, const igraph_vector_t *filter,
+				  igraph_integer_t *fncount,
+				  igraph_integer_t *grcount);
+
 int igraph_revolver_ml_AD(const igraph_t *graph,
 			  igraph_vector_t *res,
 			  igraph_real_t *Fmin,
@@ -2502,6 +2524,53 @@ int igraph_revolver_ml_AD_dpareto_eval(const igraph_t *graph,
 				       igraph_vector_t *deriv,
 				       int agebins,
 				       const igraph_vector_t *filter);
+
+int igraph_revolver_ml_ADE(const igraph_t *graph,
+			   const igraph_vector_t *cats,
+			   igraph_vector_t *res,
+			   igraph_real_t *Fmin,
+			   igraph_real_t abstol, igraph_real_t reltol, int maxit,
+			   igraph_scalar_function_t *A_fun,
+			   igraph_vector_function_t *dA_fun,
+			   int agebins, const igraph_vector_t *filter,
+			   igraph_integer_t *fncount, 
+			   igraph_integer_t *grcount,
+			   igraph_vector_t *lastderiv);
+
+int igraph_revolver_ml_ADE_alpha_a_beta(const igraph_t *graph,
+					const igraph_vector_t *cats,
+					igraph_real_t *alpha, igraph_real_t *a,
+					igraph_real_t *beta, igraph_vector_t *coeffs,
+					igraph_real_t *Fmin,
+					igraph_real_t abstol, igraph_real_t reltol,
+					int maxit, int agebins, 
+					const igraph_vector_t *filter,
+					igraph_integer_t *fncount,
+					igraph_integer_t *grcount);
+
+int igraph_revolver_ml_ADE_dpareto(const igraph_t *graph,
+				   const igraph_vector_t *cats,
+				   igraph_real_t *alpha, igraph_real_t *a,
+				   igraph_real_t *paralpha, igraph_real_t *parbeta,
+				   igraph_real_t *parscale, igraph_vector_t *coeffs,
+				   igraph_real_t *Fmin,
+				   igraph_real_t abstol, igraph_real_t reltol,
+				   int maxit, int agebins, 
+				   const igraph_vector_t *filter,
+				   igraph_integer_t *fncount,
+				   igraph_integer_t *grcount);
+
+int igraph_revolver_ml_ADE_dpareto_eval(const igraph_t *graph,
+					const igraph_vector_t *cats,
+					igraph_real_t alpha, igraph_real_t a,
+					igraph_real_t paralpha, 
+					igraph_real_t parbeta,
+					igraph_real_t parscale,
+					const igraph_vector_t *coeffs,
+					igraph_real_t *value,
+					igraph_vector_t *deriv,
+					int agebins,
+					const igraph_vector_t *filter);
 
 /* -------------------------------------------------- */
 /* Other, not graph related                           */

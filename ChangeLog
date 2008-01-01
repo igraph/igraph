@@ -18,6 +18,13 @@
 	
 	* interfaces/python/package/test/isomorphism.py : added tests
 
+2007-12-04  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_DE)
+	(igraph_revolver_ml_DE_alpha_a, igraph_revolver_ml_ADE_
+	(igraph_revolver_ml_ADE_alpha_a_beta, igraph_revolver_ml_ADE_dpareto)
+	(igraph_revolver_ml_ADE_dpareto_eval) : added
+
 2007-12-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph.h (igraph_scalar_function_t, igraph_vector_function_t) :

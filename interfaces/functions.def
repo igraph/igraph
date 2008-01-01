@@ -997,6 +997,14 @@ igraph_revolver_ml_D_alpha_a:
         NAME-R: revolver.ml.D.alpha.a
         FLAGS: PROGRESS
 
+igraph_revolver_ml_DE_alpha_a:
+        PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
+                INOUT REALPTR a, INOUT VECTOR coeffs, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, \
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.DE.alpha.a
+
 igraph_revolver_ml_AD_alpha_a_beta:
         PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
                 INOUT REALPTR beta, OUT REALPTR Fmin, \
@@ -1021,6 +1029,32 @@ igraph_revolver_ml_AD_dpareto_eval:
                 REAL parscale, OUT REALPTR value, OUT VECTOR deriv, \
                 INT agebins=300, VECTOR_OR_0 filter=NULL
         NAME-R: revolver.ml.AD.dpareto.eval
+
+igraph_revolver_ml_ADE_alpha_a_beta:
+        PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
+                INOUT REALPTR a, INOUT REALPTR beta, INOUT VECTOR coeffs, \
+                OUT REALPTR Fmin, REAL abstol=1e-8, REAL reltol=1e-8, \
+                INT maxit=1000, INT agebins=300, \
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.ADE.alpha.a.beta
+
+igraph_revolver_ml_ADE_dpareto:
+        PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
+                INOUT REALPTR a, INOUT REALPTR paralpha, \
+                INOUT REALPTR parbeta, INOUT REALPTR parscale, \
+                INOUT VECTOR coeffs, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, \
+                INT agebins=300, VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.ADE.dpareto
+
+igraph_revolver_ml_ADE_dpareto_eval:
+        PARAMS: GRAPH graph, VECTOR cats, REAL alpha, REAL a, REAL paralpha, \
+                REAL parbeta, REAL parscale, VECTOR coeffs, \
+                OUT REALPTR value, OUT VECTOR deriv, INT agebins=300, \
+                VECTOR_OR_0 filter=NULL
+        NAME-R: revolver.ml.ADE.dpareto.eval
 
 #######################################
 # Other, (yet) undocumented functions
