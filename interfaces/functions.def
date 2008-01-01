@@ -917,8 +917,8 @@ igraph_convex_hull:
 
 igraph_revolver_ml_d:
         PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
-                OUT VECTOR_OR_0 cites, REAL delta=1e-10, OUT REALPTR logprob, \
-                OUT REALPTR logmax
+                OUT VECTOR_OR_0 cites, REAL delta=1e-10, VECTOR_OR_0 filter=NULL, \
+                OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.d
         FLAGS: PROGRESS
 
@@ -931,6 +931,7 @@ igraph_revolver_probs_d:
 igraph_revolver_ml_de:
         PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
                 VECTOR cats, OUT MATRIX_OR_0 cites, REAL delta=1e-10, \
+                VECTOR_OR_0 filter=NULL, \
                 OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.de
         FLAGS: PROGRESS
@@ -938,17 +939,20 @@ igraph_revolver_ml_de:
 igraph_revolver_probs_de:
         PARAMS: GRAPH graph, MATRIX kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
                 OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+        NAME-R: revolver.probs.de
 
 igraph_revolver_ml_ade:
         PARAMS: GRAPH graph, INTEGER niter, OUT ARRAY3 kernel, \
                 VECTOR cats, OUT ARRAY3_OR_0 cites, INTEGER agebins=300, \
-                REAL delta=1e-10, OUT REALPTR logprob, OUT REALPTR logmax
+                REAL delta=1e-10, VECTOR_OR_0 filter, \
+                OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.ade
         FLAGS: PROGRESS
 
 igraph_revolver_probs_ade:
         PARAMS: GRAPH graph, ARRAY3 kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
                 OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+        NAME-R: revolver.probs.ade
 
 igraph_revolver_ml_f:
         PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
@@ -961,11 +965,13 @@ igraph_revolver_ml_l:
         PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
                 OUT VECTOR_OR_0 cites, INTEGER agebins=300, REAL delta=1e-10, \
                 OUT REALPTR logprob, OUT REALPTR logmax
+        NAME-R: revolver.ml.l
 
 igraph_revolver_ml_ad:
         PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
                 OUT MATRIX_OR_0 cites, INTEGER agebins=300, \
-                REAL delta=1e-10, OUT REALPTR logprob, OUT REALPTR logmax
+                REAL delta=1e-10, VECTOR_OR_0 filter, \
+                OUT REALPTR logprob, OUT REALPTR logmax
         NAME-R: revolver.ml.ad
         FLAGS: PROGRESS
 

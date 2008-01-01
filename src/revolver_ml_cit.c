@@ -823,6 +823,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
 			 igraph_vector_t *kernel,
 			 igraph_vector_t *cites,
 			 igraph_real_t delta,
+			 const igraph_vector_t *filter,
 			 igraph_real_t *logprob,
 			 igraph_real_t *logmax) {
   
@@ -841,6 +842,10 @@ int igraph_revolver_ml_d(const igraph_t *graph,
   long int actkernel=0;
   igraph_vector_t *fromkernel=kernels[actkernel], 
     *tokernel=kernels[1-actkernel];
+
+  if (filter && igraph_vector_size(filter) != no_of_nodes) { 
+    IGRAPH_ERROR("ML d evolver: invalid filter vector size", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &imaxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -886,19 +891,25 @@ int igraph_revolver_ml_d(const igraph_t *graph,
 
       IGRAPH_ALLOW_INTERRUPTION();      
 
-      /* Calculate some terms of the sum for the non-zero classes */
-      if (S != 0) {
-	for (i=0; i<=actmaxdegree; i++) {
-	  VECTOR(*tokernel)[i] += nneis * VECTOR(ptk)[i] / S;
-	}
-      }
-      
-      if (logprob || logmax) {
-	for (n=0; n<nneis; n++) {
-	  long int to=VECTOR(neis)[n];
-	  long int x=VECTOR(degree)[to];
-	  if (logprob) { *logprob += log( VECTOR(*fromkernel)[x] / S ); }
-	  if (logmax) { *logmax += log(1.0/t); }
+      if (!filter || VECTOR(*filter)[t] != 0) {
+	/* Calculate some terms of the sum for the non-zero classes */
+	if (S != 0) {
+	  for (i=0; i<=actmaxdegree; i++) {
+	    VECTOR(*tokernel)[i] += nneis * VECTOR(ptk)[i] / S;
+	  }
+	  
+	  if (logprob || logmax || it==0) {
+	    for (n=0; n<nneis; n++) {
+	      long int to=VECTOR(neis)[n];
+	      long int x=VECTOR(degree)[to];
+	      if (logprob) { *logprob += log( VECTOR(*fromkernel)[x] / S ); }
+	      if (logmax) { *logmax += log(1.0/t); }
+	      
+	      if (it==0) {
+		VECTOR(*mycites)[x] += 1;
+	      }
+	    }
+	  }
 	}
       }
       
@@ -914,11 +925,7 @@ int igraph_revolver_ml_d(const igraph_t *graph,
 	VECTOR(ptk)[x] -= 1;
 	S += VECTOR(*fromkernel)[x+1];
 	S -= VECTOR(*fromkernel)[x];
-      
-	if (it==0) {
-	  VECTOR(*mycites)[x] += 1;
-	}
-		
+      		
       }
       VECTOR(ptk)[0] += 1;
       S += VECTOR(*fromkernel)[0];
@@ -928,9 +935,11 @@ int igraph_revolver_ml_d(const igraph_t *graph,
     /* final step, Mk/sum */
     maxdelta=0.0;
     for (i=0; i<=maxdegree; i++) {
-      VECTOR(*tokernel)[i] = VECTOR(*mycites)[i] / VECTOR(*tokernel)[i];      
-      if ( (diff=abs(VECTOR(*tokernel)[i] - VECTOR(*fromkernel)[i])) > maxdelta) {
-	maxdelta=diff;
+      if (VECTOR(*tokernel)[i] != 0) {
+	VECTOR(*tokernel)[i] = VECTOR(*mycites)[i] / VECTOR(*tokernel)[i];      
+	if ( (diff=abs(VECTOR(*tokernel)[i] - VECTOR(*fromkernel)[i])) > maxdelta) {
+	  maxdelta=diff;
+	}
       }
     }
     if (maxdelta < delta) { break; }
@@ -1131,6 +1140,7 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
 			  igraph_matrix_t *cites,
 			  igraph_integer_t pagebins,
 			  igraph_real_t delta,
+			  const igraph_vector_t *filter,
 			  igraph_real_t *logprob,
 			  igraph_real_t *logmax) {
   
@@ -1151,6 +1161,10 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
   long int actkernel=0;
   igraph_matrix_t *fromkernel=kernels[actkernel],
     *tokernel=kernels[1-actkernel];
+
+  if (filter && igraph_vector_size(filter) != no_of_nodes) {
+    IGRAPH_ERROR("ML ad revolver: invalid filter vector size", IGRAPH_EINVAL);
+  }
 
   IGRAPH_CHECK(igraph_maxdegree(graph, &imaxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -1198,22 +1212,28 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
       
       IGRAPH_ALLOW_INTERRUPTION();
       
-      /* Calculate some terms of the sum for the non-zero classes */
-      if (S != 0) {
-	for (i=0; i<=actmaxdegree; i++) {
-	  for (j=0; j<=t/binwidth; j++) {
-	    MATRIX(*tokernel, i, j) += nneis * MATRIX(ptk, i, j) / S;
+      if (!filter || VECTOR(*filter)[t] != 0) {
+      
+	/* Calculate some terms of the sum for the non-zero classes */
+	if (S != 0) {
+	  for (i=0; i<=actmaxdegree; i++) {
+	    for (j=0; j<=t/binwidth; j++) {
+	      MATRIX(*tokernel, i, j) += nneis * MATRIX(ptk, i, j) / S;
+	    }
 	  }
 	}
-      }
-      
-      if (logprob || logmax) {
-	for (n=0; n<nneis; n++) {
-	  long int to=VECTOR(neis)[n];
-	  long int x=VECTOR(degree)[to];
-	  long int y=(t-to)/binwidth;
-	  if (logprob) { *logprob += log( MATRIX(*fromkernel,x,y) / S ); }
-	  if (logmax) { *logmax += log(1.0/t); }
+	
+	if (logprob || logmax || it==0) {
+	  for (n=0; n<nneis; n++) {
+	    long int to=VECTOR(neis)[n];
+	    long int x=VECTOR(degree)[to];
+	    long int y=(t-to)/binwidth;
+	    if (logprob) { *logprob += log( MATRIX(*fromkernel,x,y) / S ); }
+	    if (logmax) { *logmax += log(1.0/t); }
+	    if (it==0) {
+	      MATRIX(*mycites, x, y) += 1;
+	    }
+	  }
 	}
       }
 
@@ -1231,9 +1251,6 @@ int igraph_revolver_ml_ad(const igraph_t *graph,
 	S += MATRIX(*fromkernel, x+1, y);
 	S -= MATRIX(*fromkernel, x, y);
 	
-	if (it==0) {
-	  MATRIX(*mycites, x, y) += 1;
-	}
       }
       /* Aging */
       for (j=1; t-binwidth*j+1>=0; j++) {
@@ -1295,6 +1312,7 @@ int igraph_revolver_ml_de(const igraph_t *graph,
 			  const igraph_vector_t *cats,
 			  igraph_matrix_t *cites,
 			  igraph_real_t delta,
+			  const igraph_vector_t *filter,
 			  igraph_real_t *logprob,
 			  igraph_real_t *logmax) {
 
@@ -1314,6 +1332,10 @@ int igraph_revolver_ml_de(const igraph_t *graph,
   long int actkernel=0;
   igraph_matrix_t *fromkernel=kernels[actkernel],
     *tokernel=kernels[1-actkernel];
+
+  if (filter && igraph_vector_size(filter) != no_of_nodes) {
+    IGRAPH_ERROR("ML de evolver failed", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &imaxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -1357,25 +1379,32 @@ int igraph_revolver_ml_de(const igraph_t *graph,
       nneis=igraph_vector_size(&neis);
       
       IGRAPH_ALLOW_INTERRUPTION();
+
+      if (!filter || VECTOR(*filter)[t] != 0) {
       
-      if (S != 0) {
-	for (i=0; i<no_cats; i++) {
-	  for (j=0; j<=actmaxdegree; j++) {
-	    MATRIX(*tokernel, i, j) += nneis * MATRIX(ptk, i, j) / S;
+	if (S != 0) {
+	  for (i=0; i<no_cats; i++) {
+	    for (j=0; j<=actmaxdegree; j++) {
+	      MATRIX(*tokernel, i, j) += nneis * MATRIX(ptk, i, j) / S;
+	    }
+	  }
+	  
+	  if (logprob || logmax || it==0) {
+	    for (n=0; n<nneis; n++) {
+	      long int to=VECTOR(neis)[n];
+	      long int x=VECTOR(*cats)[to];
+	      long int y=VECTOR(degree)[to];
+	      if (logprob) { *logprob += log( MATRIX(*fromkernel,x,y) / S); }
+	      if (logmax) { *logmax += log(1.0/t); }
+	      if (it==0) {
+		MATRIX(*mycites, x, y) += 1;
+	      }
+	    }
 	  }
 	}
-      
-	if (logprob || logmax) {
-	  for (n=0; n<nneis; n++) {
-	    long int to=VECTOR(neis)[n];
-	    long int x=VECTOR(*cats)[to];
-	    long int y=VECTOR(degree)[to];
-	    if (logprob) { *logprob += log( MATRIX(*fromkernel,x,y) / S); }
-	    if (logmax) { *logmax += log(1.0/t); }
-	  }
-	}
+
       }
-      
+	
       /* Update ptk for the next time step */
       for (n=0; n<nneis; n++) {
 	long int to=VECTOR(neis)[n];
@@ -1390,9 +1419,6 @@ int igraph_revolver_ml_de(const igraph_t *graph,
 	S += MATRIX(*fromkernel, x, y+1);
 	S -= MATRIX(*fromkernel, x, y);
 	
-	if (it==0) {
-	  MATRIX(*mycites, x, y) += 1;
-	}
       }
       
       MATRIX(ptk, fromcat, 0) += 1;
@@ -1404,9 +1430,11 @@ int igraph_revolver_ml_de(const igraph_t *graph,
     maxdelta=0.0;
     for (i=0; i<no_cats; i++) {
       for (j=0; j<=maxdegree; j++) {
-	MATRIX(*tokernel, i, j) = MATRIX(*mycites, i, j) / MATRIX(*tokernel, i, j);
-	if ( (diff=abs(MATRIX(*tokernel,i,j)-MATRIX(*fromkernel,i,j))) > maxdelta) {
-	  maxdelta=diff;
+	if (MATRIX(*tokernel, i, j) != 0) {
+	  MATRIX(*tokernel, i, j) = MATRIX(*mycites, i, j) / MATRIX(*tokernel, i, j);
+	  if ( (diff=abs(MATRIX(*tokernel,i,j)-MATRIX(*fromkernel,i,j))) > maxdelta) {
+	    maxdelta=diff;
+	  }
 	}
       }
     }
@@ -1447,6 +1475,7 @@ int igraph_revolver_ml_ade(const igraph_t *graph,
 			   igraph_array3_t *cites,
 			   igraph_integer_t pagebins,
 			   igraph_real_t delta,
+			   const igraph_vector_t *filter,
 			   igraph_real_t *logprob,
 			   igraph_real_t *logmax) {
   
@@ -1469,6 +1498,10 @@ int igraph_revolver_ml_ade(const igraph_t *graph,
   long int actkernel=0;
   igraph_array3_t *fromkernel=kernels[actkernel],
     *tokernel=kernels[1-actkernel];
+
+  if (filter && igraph_vector_size(filter) != no_of_nodes) {
+    IGRAPH_ERROR("ML ade revolver: invalid filter vector size", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &imaxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -1516,25 +1549,31 @@ int igraph_revolver_ml_ade(const igraph_t *graph,
       nneis=igraph_vector_size(&neis);
       
       IGRAPH_ALLOW_INTERRUPTION();
-      
-      /* Calculate some terms of the sum for the non-zero classes */
-      if (S != 0) {
-	for (i=0; i<no_cats; i++) {
-	  for (j=0; j<=actmaxdegree; j++) {
-	    for (k=0; k<=t/binwidth; k++) {
-	      ARRAY3(*tokernel, i, j, k) += nneis * ARRAY3(ptk, i, j, k) / S;
+
+      if (!filter || VECTOR(*filter)[t] != 0) {
+	
+	/* Calculate some terms of the sum for the non-zero classes */
+	if (S != 0) {
+	  for (i=0; i<no_cats; i++) {
+	    for (j=0; j<=actmaxdegree; j++) {
+	      for (k=0; k<=t/binwidth; k++) {
+		ARRAY3(*tokernel, i, j, k) += nneis * ARRAY3(ptk, i, j, k) / S;
+	      }
 	    }
 	  }
-	}
-	
-	if (logprob || logmax) {
-	  for (n=0; n<nneis; n++) {
-	    long int to=VECTOR(neis)[n];
-	    long int x=VECTOR(*cats)[to];
-	    long int y=VECTOR(degree)[to];
-	    long int z=(t-to)/binwidth;
-	    if (logprob) { *logprob += log( ARRAY3(*fromkernel, x,y,z) / S); }
-	    if (logmax) { *logmax += log(1.0/t); }
+	  
+	  if (logprob || logmax || it==0) {
+	    for (n=0; n<nneis; n++) {
+	      long int to=VECTOR(neis)[n];
+	      long int x=VECTOR(*cats)[to];
+	      long int y=VECTOR(degree)[to];
+	      long int z=(t-to)/binwidth;
+	      if (logprob) { *logprob += log( ARRAY3(*fromkernel, x,y,z) / S); }
+	      if (logmax) { *logmax += log(1.0/t); }
+	      if (it==0) {
+		ARRAY3(*mycites, x, y, z) += 1;
+	      }
+	    }
 	  }
 	}
       }
@@ -1554,9 +1593,6 @@ int igraph_revolver_ml_ade(const igraph_t *graph,
 	S += ARRAY3(*fromkernel, x, y+1, z);
 	S -= ARRAY3(*fromkernel, x, y, z);
 	
-	if (it==0) {
-	  ARRAY3(*mycites, x, y, z) += 1;
-	}
       }
       /* Aging */
       for (j=1; t-binwidth*j+1>=0; j++) {
