@@ -1,3 +1,10 @@
+2007-12-12  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_df) : added
+
+	* src/revolver_ml_cit.c (igraph_revolver_ml_f) : use random order of 
+	edges 
+
 2007-12-08  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.c (igraph_revolver_ml_f) : always check edges 
