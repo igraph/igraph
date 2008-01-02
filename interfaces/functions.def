@@ -454,7 +454,7 @@ igraph_laplacian:
 
 igraph_clusters:
         PARAMS: GRAPH graph, OUT VECTOR membership, OUT VECTOR csize, \
-	        OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
+                OUT INTEGERPTR no, CONNECTEDNESS mode=WEAK
         NAME-R: clusters
 
 igraph_is_connected:
@@ -985,7 +985,7 @@ igraph_revolver_ml_ad:
 igraph_revolver_probs_ad:
         PARAMS: GRAPH graph, MATRIX kernel, OUT VECTOR_OR_0 probs, \
                 OUT VECTOR_OR_0 citedprobs, OUT VECTOR_OR_0 citingprobs, \
-		BOOLEAN ntk=False
+                BOOLEAN ntk=False
         NAME-R: revolver.probs.ad
 
 igraph_revolver_ml_D_alpha:
@@ -1079,4 +1079,4 @@ igraph_revolver_probs_ADE_dpareto:
 #######################################
 igraph_convergence_degree:
         PARAMS: GRAPH graph, OUT VECTOR result
-	IGNORE: RR, RC, RNamespace
+        IGNORE: RR, RC, RNamespace
