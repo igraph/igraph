@@ -124,7 +124,12 @@ description = """This module extends Python with a Graph class which is capable
 of handling arbitrary directed and undirected graphs with thousands of nodes and
 millions of edges. Since the module makes use of the open source igraph library
 written in almost 100% pure C, it is blazing fast and outperforms most other
-pure Python-based graph packages around."""
+pure Python-based graph packages around.
+
+Windows installer versions need libxml2 and iconv, both installable from the
+following URL:
+    
+http://www.zlatkovic.com/pub/libxml/"""
 
 setup(name = 'igraph',
       version = igraph_version(),

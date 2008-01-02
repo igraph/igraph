@@ -1046,7 +1046,8 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
 
 int igraph_modularity(const igraph_t *graph, 
 		      const igraph_vector_t *membership,
-		      igraph_real_t *modularity);
+		      igraph_real_t *modularity,
+              const igraph_vector_t *weights);
 
 int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 					       igraph_matrix_t *merges,

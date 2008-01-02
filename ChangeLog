@@ -1,3 +1,13 @@
+2008-01-03  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/community.c (igraph_modularity) : added weights argument
+
+    * interfaces/python/src/graphobject.c : adjusted Graph.modularity to
+    support weights
+
+    * interfaces/R/src/rinterface.c.in : added null weight argument to
+    igraph_modularity call
+
 2008-01-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/revolver_ml_cit.v (igraph_revolver_probs_ADE) 

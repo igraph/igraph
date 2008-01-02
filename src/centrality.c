@@ -621,7 +621,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   /* here we go */
   
   for (source=0; source<no_of_nodes; source++) {
-    
+    IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
 
     memset(distance, 0, no_of_nodes*sizeof(long int));
@@ -637,7 +637,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       long int actnode=igraph_dqueue_pop(&q);
 
       if (cutoff > 0 && distance[actnode] >= cutoff) continue;
-
+       
       IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, modeout));
       for (j=0; j<igraph_vector_size(&tmp); j++) {
 	long int neighbor=VECTOR(tmp)[j];

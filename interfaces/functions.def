@@ -658,7 +658,8 @@ igraph_le_community_to_membership:
         NAME-R: community.le.to.membership
 
 igraph_modularity:
-        PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity
+        PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity, \
+                IN VECTOR_OR_0 weights
         IGNORE: RR, RC, RNamespace
 
 igraph_community_leading_eigenvector:

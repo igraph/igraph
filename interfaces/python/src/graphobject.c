@@ -6405,14 +6405,30 @@ PyObject *igraphmodule_Graph_coreness(igraphmodule_GraphObject * self,
 /**
  * Modularity calculation
  */
-PyObject *igraphmodule_Graph_modularity(igraphmodule_GraphObject *self, PyObject *o) {
+PyObject *igraphmodule_Graph_modularity(igraphmodule_GraphObject *self,
+  PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = {"membership", "weights", 0};
   igraph_vector_t membership;
+  igraph_vector_t *weights=0;
   igraph_real_t modularity;
-  if (igraphmodule_PyObject_to_vector_t(o, &membership, 1, 0)) return NULL;
-  if (igraph_modularity(&self->g, &membership, &modularity)) {
-  igraph_vector_destroy(&membership);
-  return NULL;
+  int i;
+  PyObject *mvec, *wvec=Py_None;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &mvec, &wvec))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vector_t(mvec, &membership, 1, 0)) return NULL;
+  if (igraphmodule_attrib_to_vector_t(wvec, self, &weights, ATTRIBUTE_TYPE_EDGE)){
+    igraph_vector_destroy(&membership);
+    return NULL;
   }
+  if (igraph_modularity(&self->g, &membership, &modularity, weights)) {
+    igraph_vector_destroy(&membership);
+    if (weights) igraph_vector_destroy(weights);
+    return NULL;
+  }
+  igraph_vector_destroy(&membership);
+  if (weights) igraph_vector_destroy(weights);
   return Py_BuildValue("d", (double)modularity);
 }
 
@@ -8505,8 +8521,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* COMMUNITIES AND DECOMPOSITION */
   /*********************************/
   {"modularity", (PyCFunction) igraphmodule_Graph_modularity,
-   METH_O,
-   "modularity(membership)\n\n"
+   METH_VARARGS | METH_KEYWORDS,
+   "modularity(membership, weights=None)\n\n"
    "Calculates the modularity of the graph with respect to some vertex types.\n\n"
    "The modularity of a graph w.r.t. some division measures how good the\n"
    "division is, or how separated are the different vertex types from each\n"
@@ -8516,11 +8532,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "M{kj} is the degree of node M{j}, and M{Ci} and C{cj} are the types of\n"
    "the two vertices (M{i} and M{j}). M{delta(x,y)} is one iff M{x=y}, 0\n"
    "otherwise.\n\n"
+   "If edge weights are given, the definition of modularity is modified as\n"
+   "follows: M{Aij} becomes the weight of the corresponding edge, M{ki}\n"
+   "is the total weight of edges adjacent to vertex M{i}, M{kj} is the\n"
+   "total weight of edges adjacent to vertex M{j} and M{m} is the total\n"
+   "edge weight in the graph.\n\n"
    "@attention: method overridden in L{Graph} to allow L{VertexClustering}\n"
    "  objects as a parameter. This method is not strictly necessary, since\n"
    "  the L{VertexClustering} class provides a variable called C{modularity}.\n"
    "@param membership: the membership vector, e.g. the vertex type index for\n"
    "  each vertex.\n"
+   "@param weights: optional edge weights or C{None} if all edges are weighed\n"
+   "  equally.\n"
    "@return: the modularity score. Score larger than 0.3 usually indicates\n"
    "  strong community structure.\n"
    "@newfield ref: Reference\n"

@@ -31,6 +31,19 @@ class SimplePropertiesTests(unittest.TestCase):
         self.failUnless(self.tree.transitivity_undirected() == 0.0)
         self.failUnless(self.g.transitivity_undirected() == 0.75)
 
+    def testModularity(self):
+        g = Graph.Full(5)+Graph.Full(5)
+        g.add_edges([(0,5)])
+        cl = [0]*5+[1]*5
+        self.assertAlmostEquals(g.modularity(cl), 0.4523, places=3)
+        ws = [1]*21
+        self.assertAlmostEquals(g.modularity(cl, ws), 0.4523, places=3)
+        ws = [2]*21
+        self.assertAlmostEquals(g.modularity(cl, ws), 0.4523, places=3)
+        ws = [2]*10+[1]*11
+        self.assertAlmostEquals(g.modularity(cl, ws), 0.4157, places=3)
+        self.assertRaises(InternalError, g.modularity, cl, ws[0:20])
+
 class DegreeTests(unittest.TestCase):
     gfull  = Graph.Full(10)
     gempty = Graph(10)

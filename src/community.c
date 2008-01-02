@@ -537,10 +537,17 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * different vertex types from each other. It defined as 
  * Q=1/(2m) * sum(Aij-ki*kj/(2m)delta(ci,cj),i,j), here `m' is the
  * number of edges, `Aij' is the element of the `A' adjacency matrix
- * in row `i' and column `j', `ki' is the degree of `'i', `kj' is the
+ * in row `i' and column `j', `ki' is the degree of `i', `kj' is the
  * degree of `j', `ci' is the type (or component) of `i', `cj' that of
  * `j', the sum goes over all `i' and `j' pairs of vertices, and
  * `delta(x,y)' is one if x=y and zero otherwise.
+ *
+ * </para><para>
+ * Modularity on weighted graphs is also meaningful. When taking edge
+ * weights into account, `Aij' becomes the weight of the corresponding
+ * edge (or 0 if there is no edge), `ki' is the total weight of edges
+ * adjacent to vertex `i', `kj' is the total weight of edges adjacent
+ * to vertex `j' and `m' is the total weight of all edges.
  * 
  * </para><para>
  * See also MEJ Newman and M Girvan: Finding and evaluating community
@@ -550,6 +557,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  *     vertex, ie. the component to which it belongs.
  * \param modularity Pointer to a real number, the result will be
  *     stored here.
+ * \param weights Weight vector or NULL if no weights are specified.
  * \return Error code.
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
@@ -558,33 +566,49 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
 
 int igraph_modularity(const igraph_t *graph, 
 		      const igraph_vector_t *membership,
-		      igraph_real_t *modularity) {
+		      igraph_real_t *modularity,
+			  const igraph_vector_t *weights) {
   
   igraph_vector_t e, a;
   long int types=igraph_vector_max(membership)+1;
   long int no_of_edges=igraph_ecount(graph);
   long int i;
+  igraph_integer_t from, to, m;
+  long int c1, c2;
   
   IGRAPH_VECTOR_INIT_FINALLY(&e, types);
   IGRAPH_VECTOR_INIT_FINALLY(&a, types);
   
-  for (i=0; i<no_of_edges; i++) {
-    igraph_integer_t from, to;
-    long int c1, c2;
-    igraph_edge(graph, i, &from, &to);
-    c1=VECTOR(*membership)[(long int)from];
-    c2=VECTOR(*membership)[(long int)to];
-    if (c1==c2) {
-      VECTOR(e)[c1] += 2;
+  if (weights) {
+    if (igraph_vector_size(weights) < no_of_edges)
+      IGRAPH_ERROR("cannot calculate modularity, weight vector too short",
+        IGRAPH_EINVAL);
+    m=igraph_vector_sum(weights);
+    for (i=0; i<no_of_edges; i++) {
+      igraph_real_t w=VECTOR(*weights)[i];
+      igraph_edge(graph, i, &from, &to);
+      c1=VECTOR(*membership)[(long int)from];
+      c2=VECTOR(*membership)[(long int)to];
+      if (c1==c2) VECTOR(e)[c1] += 2*w;
+      VECTOR(a)[c1] += w;
+      VECTOR(a)[c2] += w;
     }
-    VECTOR(a)[c1]+=1;
-    VECTOR(a)[c2]+=1;
+  } else {
+    m=no_of_edges;
+    for (i=0; i<no_of_edges; i++) {
+      igraph_edge(graph, i, &from, &to);
+      c1=VECTOR(*membership)[(long int)from];
+      c2=VECTOR(*membership)[(long int)to];
+      if (c1==c2) VECTOR(e)[c1] += 2;
+      VECTOR(a)[c1] += 1;
+      VECTOR(a)[c2] += 1;
+    }
   }
 
   *modularity=0.0;
   for (i=0; i<types; i++) {
-    igraph_real_t tmp=VECTOR(a)[i]/2/no_of_edges;
-    *modularity += VECTOR(e)[i]/2/no_of_edges;
+    igraph_real_t tmp=VECTOR(a)[i]/2/m;
+    *modularity += VECTOR(e)[i]/2/m;
     *modularity -= tmp*tmp;
   }
   

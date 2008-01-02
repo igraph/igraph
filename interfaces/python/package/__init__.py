@@ -333,8 +333,8 @@ class Graph(core.GraphBase):
         return [self.adjacent(idx, type) for idx in xrange(self.vcount())]
 
 
-    def modularity(self, membership):
-        """modularity(membership)
+    def modularity(self, membership, weights=None):
+        """modularity(membership, weights=None)
 
         Calculates the modularity score of the graph with respect to a given
         clustering.
@@ -347,8 +347,16 @@ class Graph(core.GraphBase):
         M{kj} is the degree of node M{j}, and M{Ci} and C{cj} are the types of
         the two vertices (M{i} and M{j}). M{delta(x,y)} is one iff M{x=y}, 0
         otherwise.
-
+        
+        If edge weights are given, the definition of modularity is modified as
+        follows: M{Aij} becomes the weight of the corresponding edge, M{ki}
+        is the total weight of edges adjacent to vertex M{i}, M{kj} is the
+        total weight of edges adjacent to vertex M{j} and M{m} is the total
+        edge weight in the graph.
+        
         @param membership: a membership list or a L{VertexClustering} object
+        @param weights: optional edge weights or C{None} if all edges are weighed
+          equally. Attribute names are also allowed.
         @return: the modularity score
         
         @newfield ref: Reference
@@ -358,9 +366,9 @@ class Graph(core.GraphBase):
         if isinstance(membership, VertexClustering):
             if membership.graph != self:
                 raise ValueError, "clustering object belongs to a different graph"
-            return GraphBase.modularity(self, membership.membership)
+            return GraphBase.modularity(self, membership.membership, weights)
         else:
-            return GraphBase.modularity(self, membership)
+            return GraphBase.modularity(self, membership, weights)
 
     
     def triad_census(self, *args, **kwds):
@@ -1449,6 +1457,7 @@ class Graph(core.GraphBase):
         "fr_3d": "layout_fruchterman_reingold_3d",
         "fruchterman_reingold_3d": "layout_fruchterman_reingold_3d",
         "gfr": "layout_grid_fruchterman_reingold",
+        "graphopt": "layout_graphopt",
         "grid_fr": "layout_grid_fruchterman_reingold",
         "grid_fruchterman_reingold": "layout_grid_fruchterman_reingold",
         "kk": "layout_kamada_kawai",

@@ -6386,7 +6386,7 @@ SEXP R_igraph_modularity(SEXP graph, SEXP pmembership) {
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_vector(pmembership, &membership);
-  igraph_modularity(&g, &membership, &res);
+  igraph_modularity(&g, &membership, &res, 0);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   
