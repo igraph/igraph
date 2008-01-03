@@ -393,12 +393,3 @@ as.dendrogram.igraph.eigenc <- function(object, hang=-1,
   class(z) <- "dendrogram"
   z
 }  
-
-modularity <- function(graph, membership) {
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-
-  .Call("R_igraph_modularity", graph, as.numeric(membership),
-        PACKAGE="igraph")
-}

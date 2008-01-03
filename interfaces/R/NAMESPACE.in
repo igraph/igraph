@@ -60,7 +60,7 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
 # community structure
 
 export(edge.betweenness.community,
-       modularity, spinglass.community, walktrap.community,
+       spinglass.community, walktrap.community,
        edge.betweenness.community.merges, fastgreedy.community,
        community.to.membership, leading.eigenvector.community,
        leading.eigenvector.community.step)
