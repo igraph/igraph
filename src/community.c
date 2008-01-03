@@ -32,8 +32,7 @@
 
 /**
  * \function igraph_community_eb_get_merges
- * \brief Calculating the merges, ie. the dendrogram for an edge betweenness
- * community structure
+ * \brief Calculating the merges, ie. the dendrogram for an edge betweenness community structure
  * 
  * </para><para> 
  * This function is handy if you have a sequence of edge which are
@@ -153,6 +152,7 @@ long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
 
 /**
  * \function igraph_community_edge_betweenness
+ * \brief Community findinf based on edge betweenness
  * 
  * Community structure detection based on the betweenness of the edges
  * in the network. The algorithm was invented by M. Girvan and
@@ -402,7 +402,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
 /**
  * \function igraph_community_to_membership 
- * Create membership vector from community structure dendrogram
+ * \brief Create membership vector from community structure dendrogram
  * 
  * This function creates a membership vector from a community
  * structure dendrogram. A membership vector contains for each vertex
@@ -529,8 +529,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
 
 /**
  * \function igraph_modularity
- * \brief Calculate the modularity of a graph with respect to some
- * vertex types
+ * \brief Calculate the modularity of a graph with respect to some vertex types
  * 
  * The modularity of a graph with respect to some division (or vertex
  * types) measures how good the division is, or how separated are the 
@@ -727,6 +726,7 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector_naive
+ * \brief Leading eigenvector community finding (naive version).
  * 
  * A naive implementation of Newman's eigenvector community structure
  * detection. This function splits the network into two components 
@@ -951,6 +951,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector
+ * \brief Leading eigenvector community finding (proper version).
  * 
  * Newman's leading eigenvector method for detecting community
  * structure. This is the proper implementation of the recursive,
@@ -1267,6 +1268,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector_step
+ * \brief Leading eigenvector community finding (make one step).
  * 
  * Do one split according to Mark Newman's leading eigenvector
  * community detection method. See MEJ Newman: Finding community

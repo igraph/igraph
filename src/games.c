@@ -627,9 +627,9 @@ int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_callaway_traits_game
+ * \brief Simulate a growing network with vertex types.
  * 
  * </para><para>
- * This function simulates a growing network with vertex types.
  * The different types of vertices prefer to connect other types of
  * vertices with a given probability.</para><para>
  * 
@@ -717,8 +717,7 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
 
 /**
  * \function igraph_establishment_game
- * \brief Generates a graph with a simple growing model with vertex
- * types 
+ * \brief Generates a graph with a simple growing model with vertex types.
  * 
  * </para><para>
  * The simulation goes like this: a single vertex is added at each
@@ -935,8 +934,7 @@ int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_recent_degree_game
- * \brief Stochastic graph generator based on the number of adjacent
- * edges a node has gained recently
+ * \brief Stochastic graph generator based on the number of adjacent edges a node has gained recently
  * 
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of vertices in the graph, this is the same as
@@ -1239,8 +1237,7 @@ int igraph_barabasi_aging_game(igraph_t *graph,
 
 /** 
  * \function igraph_recent_degree_aging_game
- * \brief Preferential attachment based on the number of edges gained
- * recently, with aging of vertices
+ * \brief Preferential attachment based on the number of edges gained recently, with aging of vertices
  * 
  * </para><para>
  * This game is very similar to \ref igraph_barabasi_aging_game(),
@@ -1920,6 +1917,7 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
 
 /**
  * \function igraph_lastcit_game
+ * \brief Simulate citation network, based on time passed since the last citation.
  * 
  * This is a quite special stochastic graph generator, it models an
  * evolving graph. In each time step a single vertex is added to the 
@@ -2066,6 +2064,7 @@ int igraph_lastcit_game(igraph_t *graph,
 
 /**
  * \function igraph_cited_type_game
+ * \brief Simulate a citation based on vertex types.
  * 
  * Function to create a network based on some vertex categories. This
  * function creates a citation network, in each step a single vertex
@@ -2159,6 +2158,7 @@ void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct
 
 /**
  * \function igraph_citing_cited_type_game
+ * \brief Simulate a citation network based on vertex types.
  *
  * This game is similar to \ref igraph_cited_type_game() but here the
  * category of the citing vertex is also considered. 

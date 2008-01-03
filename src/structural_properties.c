@@ -930,8 +930,7 @@ void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
 
 /**
  * \function igraph_get_all_shortest_paths
- * \brief Finds all shortest paths (geodesics) from a vertex to all
- * other vertices 
+ * \brief Finds all shortest paths (geodesics) from a vertex to all other vertices 
  * 
  * \param graph The graph object.
  * \param res Pointer to an initialized pointer vector, the result
@@ -2191,8 +2190,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 
 /**
  * \function igraph_transitivity_local_undirected
- * \brief Calculates the local transitivity (clustering coefficient)
- * of a graph
+ * \brief Calculates the local transitivity (clustering coefficient) of a graph
  * 
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the local transitivity, this

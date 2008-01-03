@@ -125,8 +125,9 @@ igraph_trie_t *igraph_ncol_trie=0;
 /**
  * \ingroup loadsave
  * \function igraph_read_graph_ncol
- * \brief Reads a <code>.ncol</code> file used by LGL, also
- * useful for creating graphs from \quote named\endquote (and
+ * \brief Reads a <code>.ncol</code> file used by LGL.
+ *
+ * Also useful for creating graphs from \quote named\endquote (and
  * optionally weighted) edge lists. 
  * 
  * </para><para>
@@ -615,6 +616,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
 /**
  * \function igraph_read_graph_dimacs
+ * \brief Read a graph in DIMACS format.
  * 
  * This function reads the DIMACS file format, more specifically the 
  * version for network flow problems, see the files at
@@ -843,7 +845,7 @@ int igraph_i_read_graph_graphdb_getword(FILE *instream) {
 
 /**
  * \function igraph_read_graph_graphdb
- * Read a graph in the binary graph database format.
+ * \brief Read a graph in the binary graph database format.
  * 
  * This is a binary format, used in the graph database
  * for isomorphism testing (http://amalfi.dis.unina.it/graph/)
@@ -2168,6 +2170,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 
 /**
  * \function igraph_write_graph_dimacs
+ * \brief Write a graph in DIMACS format.
  * 
  * This function writes a graph to an output stream in DIMACS format,
  * describing a maximum flow problem.

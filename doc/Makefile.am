@@ -7,10 +7,11 @@ SRCDIR=$(top_srcdir)/src
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
-	      operators.xml flows.xml community.xml cliques.xml
+	      operators.xml flows.xml community.xml cliques.xml \
+	      sparsematrix.xml stack.xml dqueue.xml heap.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
-	 tutorial.xml licenses.xml
+	 tutorial.xml licenses.xml pmt.xml
 
 DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/%,$(DOCFIX))
 
@@ -38,8 +39,11 @@ vector.xml: vector.xxml $(SRCDIR)/types.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_
 error.xml: error.xxml $(SRCDIR)/error.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/error.h
 
-matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt $(SRCDIR)/spmatrix.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt $(SRCDIR)/spmatrix.c
+matrix.xml: matrix.xxml $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/matrix.pmt
+
+sparsematrix.xml: sparsematrix.xxml $(SRCDIR)/types.h $(SRCDIR)/spmatrix.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/types.h $(SRCDIR)/spmatrix.c
 
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
@@ -53,11 +57,13 @@ generators.xml: generators.xxml $(SRCDIR)/structure_generators.c $(SRCDIR)/games
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c \
 		$(SRCDIR)/cocitation.c $(SRCDIR)/components.c \
-		$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c
+		$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
+		$(SRCDIR)/centrality.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/conversion.c \
 	$(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c $(SRCDIR)/components.c \
-	$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c
+	$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
+	$(SRCDIR)/centrality.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(SRCDIR)/igraph.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
@@ -95,6 +101,15 @@ community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(
 cliques.xml: cliques.xxml $(SRCDIR)/cliques.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c
 
+stack.xml: stack.xxml
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/stack.pmt
+
+dqueue.xml: dqueue.xxml
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/dqueue.pmt
+
+heap.xml: heap.xxml
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/heap.pmt
+
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
@@ -104,7 +119,7 @@ igraph-docs.info: igraph-docs.xml $(DOCFIX2) igraph-docs.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	db2x_xsltproc --xinclude -s texi igraph-docs.xml -o igraph-docs.txml \
 	&& db2x_texixml igraph-docs.txml \
-	&& makeinfo --no-split igraph-docs.texi \
+	&& makeinfo --no-split --number-sections igraph-docs.texi \
 	&& patch -p2 <igraph-docs.info.diff
 
 igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)

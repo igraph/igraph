@@ -68,6 +68,7 @@
 
 /**
  * \function igraph_vs_all
+ * \brief Vertex set, all vertices of a graph.
  * 
  * \param vs Pointer to an uninitialized \type igraph_vs_t object.
  * \return Error code.
@@ -87,6 +88,7 @@ int igraph_vs_all(igraph_vs_t *vs) {
 
 /**
  * \function igraph_vss_all
+ * \brief All vertices of a graph (immediate version).
  *
  * Immediate vertex selector for all vertices in a graph. It can
  * be used conveniently when some vertex property (eg. betweenness,
@@ -106,6 +108,7 @@ igraph_vs_t igraph_vss_all(void) {
 
 /**
  * \function igraph_vs_adj
+ * \brief Adjacent vertices of a vertex.
  * 
  * All neighboring vertices of a given vertex are selected by this
  * selector. The \c mode argument controls the type of the neighboring 
@@ -138,6 +141,7 @@ int igraph_vs_adj(igraph_vs_t *vs,
 
 /**
  * \function igraph_vs_nonadj
+ * \brief Non-adjacent vertices of a vertex
  * 
  * All non-neighboring vertices of a given vertex. The \p mode
  * argument controls the type of neighboring vertics \em not to
@@ -169,6 +173,7 @@ int igraph_vs_nonadj(igraph_vs_t *vs, igraph_integer_t vid,
 
 /** 
  * \function igraph_vs_none
+ * \brief Empty vertex set.
  * 
  * Creates an empty vertex selector. 
  *
@@ -186,6 +191,7 @@ int igraph_vs_none(igraph_vs_t *vs) {
 
 /**
  * \function igraph_vss_none
+ * \brief Empty vertex set (immediate version).
  *
  * The immediate version of the empty vertex selector.
  * 
@@ -203,6 +209,7 @@ igraph_vs_t igraph_vss_none(void) {
 
 /**
  * \function igraph_vs_1
+ * \brief Vertex set with a single vertex.
  * 
  * This vertex selector selects a single vertex.
  *
@@ -222,6 +229,7 @@ int igraph_vs_1(igraph_vs_t *vs, igraph_integer_t vid) {
 
 /**
  * \function igraph_vss_1
+ * \brief Vertex set with a single vertex (immediate version)
  * 
  * The immediate version of the single-vertex selector.
  * 
@@ -241,6 +249,7 @@ igraph_vs_t igraph_vss_1(igraph_integer_t vid) {
 
 /**
  * \function igraph_vs_vector
+ * \brief Vertex set based on a vector.
  * 
  * This function makes it possible to handle a \type vector_t
  * temporarily as a vertex selector. The vertex selector should be
@@ -267,6 +276,7 @@ int igraph_vs_vector(igraph_vs_t *vs,
 
 /**
  * \function igraph_vss_vector
+ * \brief Vertex set based on a vector (immediate version).
  * 
  * This is the immediate version of \ref igraph_vs_vector. 
  * 
@@ -287,6 +297,7 @@ igraph_vs_t igraph_vss_vector(const igraph_vector_t *v) {
 
 /**
  * \function igraph_vs_vector_small
+ * \brief Create a vertex set by giving its elements.
  *
  * This function can be used to create a vertex selector with a couple
  * of vertices. Do not forget to include a <code>-1</code> after the
@@ -341,6 +352,7 @@ int igraph_vs_vector_small(igraph_vs_t *vs, ...) {
 
 /**
  * \function igraph_vs_vector_copy
+ * \brief Vertex set based on a vector, with copying.
  * 
  * This function makes it possible to handle a \type vector_t
  * permanently as a vertex selector. The vertex selector creates a
@@ -371,6 +383,7 @@ int igraph_vs_vector_copy(igraph_vs_t *vs,
 
 /**
  * \function igraph_vs_seq
+ * \brief Vertex set, an interval of vertices.
  * 
  * Creates a vertex selector containing all vertices with vertex id
  * equal to or bigger than \c from and equal to or smaller than \c
@@ -397,6 +410,7 @@ int igraph_vs_seq(igraph_vs_t *vs,
 
 /**
  * \function igraph_vss_seq
+ * \brief An interval of vertices (immediate version).
  * 
  * The immediate version of \ref igraph_vs_seq().
  * 
@@ -420,6 +434,7 @@ igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to) {
 
 /**
  * \function igraph_vs_destroy
+ * \brief Destroy a vertex set.
  * 
  * This function should be called for all vertex selectors when they
  * are not needed. The memory allocated for the vertex selector will
@@ -453,6 +468,7 @@ void igraph_vs_destroy(igraph_vs_t *vs) {
 
 /**
  * \function igraph_vs_is_all
+ * \brief Check whether all vertices are included.
  * 
  * This function checks whether the vertex selector object was created
  * by \ref igraph_vs_all() of \ref igraph_vss_all(). Note that the
@@ -776,6 +792,7 @@ int igraph_vit_as_vector(const igraph_vit_t *vit, igraph_vector_t *v) {
 
 /**
  * \function igraph_es_all
+ * \brief Edge set, all edges.
  *
  * \param es Pointer to an uninitialized edge selector object.
  * \param order Constant giving the order in which the edges will be
@@ -815,6 +832,7 @@ int igraph_es_all(igraph_es_t *es,
 
 /**
  * \function igraph_ess_all
+ * \brief Edge set, all edges (immediate version)
  * 
  * The immediate version of the all-vertices selector.
  * 
@@ -957,6 +975,8 @@ int igraph_es_vector(igraph_es_t *es,
 
 /**
  * \function igraph_es_vector_copy
+ * \brief Edge set, based on a vector, with copying.
+ * 
  *
  * This function makes it possible to handle a \type vector_t
  * permanently as an edge selector. The edge selector creates a

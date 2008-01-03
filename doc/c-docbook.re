@@ -39,6 +39,7 @@ REPLACE ----- function object, extract its signature --------------------------
 (?P<before>\A.*?)                # head of the comment
 \\function\s+                    # \function keyword
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+)) # the keyword, remove igraph_ prefix
+[\s]*(?P<brief>[^\n]*?)\n        # brief description
 (?P<after>.*?)\*\/               # tail of the comment
 \s*
 (?P<def>.*?\))                   # function head
@@ -48,7 +49,7 @@ REPLACE ----- function object, extract its signature --------------------------
 WITH --------------------------------------------------------------------------
 
 <section id="\g<name>">
-<title>\g<name></title>
+<title><function>\g<name></function> &mdash; \g<brief></title>
 <indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <informalexample><programlisting>
@@ -149,13 +150,14 @@ REPLACE ----- variables -------------------------------------------------------
 (?P<before>\A.*?)                 # head of the comment
 \\var\s+                          # \var keyword + argument
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
+[\s]*(?P<brief>[^\n]*?)\n         # brief description
 (?P<after>.*?)\*\/                # tail of the comment
 \s*(?P<def>[^;]*;)                # the definition of the variable
 .*\Z                              # and the remainder
 
 WITH --------------------------------------------------------------------------
 
-<section id="\g<name>"><title>\g<name></title>
+<section id="\g<name>"><title><function>\g<name></function> &mdash; \g<brief></title>
 <indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
@@ -171,6 +173,7 @@ REPLACE ----- \define ---------------------------------------------------------
 (?P<before>\A.*?)                 # head of the comment
 \\define\s+                       # \define command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
+[\s]*(?P<brief>[^\n]*?)\n         # brief description
 (?P<after>.*?)\*\/                # tail of the comment
 \s*                               # whitespace
 (?P<def>\#define\s+[\w0-9,()]+)           # macro
@@ -178,7 +181,7 @@ REPLACE ----- \define ---------------------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section id="\g<name>"><title>\g<name></title>
+<section id="\g<name>"><title><function>\g<name></function> &mdash; \g<brief></title>
 <indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
@@ -233,6 +236,7 @@ REPLACE ----- an enumeration typedef ------------------------------------------
 (?P<before>\A.*?)                 # head of the comment
 \\typedef\s+                      # \typedef command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
+[\s]*(?P<brief>[^\n]*?)\n         # brief description
 (?P<after>.*?)                    # tail of the comment
  \*\/\s*                          # closing the comment
 (?P<def>typedef\s*enum\s*\{       # typedef enum
@@ -241,7 +245,7 @@ REPLACE ----- an enumeration typedef ------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section id="\g<name>"><title>\g<name></title>
+<section id="\g<name>"><title><function>\g<name></function> &mdash; \g<brief></title>
 <indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
@@ -365,6 +369,7 @@ REPLACE ----- \typedef function -----------------------------------------------
 (?P<before>.*?)                   # comment head
 \\typedef\s+                      # \typedef command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>\w+))
+[\s]*(?P<brief>[^\n]*?)\n         # brief description
 (?P<after>.*?)                    # comment tail
 \*\/                              # end of comment block
 \s*
@@ -373,7 +378,7 @@ REPLACE ----- \typedef function -----------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section id="\g<name>"><title>\g<name></title>
+<section id="\g<name>"><title><function>\g<name></function> &mdash; \g<brief></title>
 <indexterm><primary>\g<tail></primary></indexterm>
 <para><programlisting>
 \g<src>

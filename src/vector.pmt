@@ -35,7 +35,7 @@
  * \section about_igraph_vector_t_objects About \type igraph_vector_t objects
  * 
  * <para>The \type igraph_vector_t data type is a simple and efficient
- * interface to arrays containing real numbers. It is something
+ * interface to arrays containing numbers. It is something
  * similar as (but much simpler than) the \type vector template
  * in the C++ standard library.</para>
  *
@@ -50,9 +50,15 @@
  * shrink, the current implementation does not free a single bit of
  * memory.</para>
  * 
- * <para>The position of the elements in a \type igraph_vector_t
- * object is numbered from zero, as this is the usual C
- * standard.</para> 
+ * <para>The elements in an \type igraph_vector_t
+ * object are indexed from zero, we follow the usual C convention
+ * here.</para>
+ * 
+ * <para>The elements of a vector always occupy a single block of
+ * memory, the starting address of this memory block can be queried
+ * with the \ref VECTOR macro. This way, vector objects can be used
+ * with standard mathematical libraries, like the GNU Scientific
+ * Library.</para>
  */
 
 /**
@@ -65,10 +71,7 @@
  * number of \type igraph_vector_t constructors, for your
  * convenience. \ref igraph_vector_init() is the basic constructor, it
  * creates a vector of the given length, filled with zeros.
- * \ref igraph_vector_init_real(), \ref igraph_vector_init_real_end(), \ref
- * igraph_vector_init_int() and \ref igraph_vector_init_int_end() are convenience
- * constructors, these create a vector with the elements given as
- * their parameters. \ref igraph_vector_copy() creates a new identical copy
+ * \ref igraph_vector_copy() creates a new identical copy
  * of an already existing and initialized vector. \ref
  * igraph_vector_init_copy() creates a vector by copying a regular C array. 
  * \ref igraph_vector_init_seq() creates a vector containing a regular
@@ -629,6 +632,17 @@ void FUNCTION(igraph_vector,null)      (TYPE(igraph_vector)* v) {
 	}
 }
 
+/**
+ * \function igraph_vector_fill
+ * \brief Fill a vector with a constant element
+ * 
+ * Sets each element of the vector to the supplied constant.
+ * \param vector The vector to work on.
+ * \param e The element to fill with.
+ * 
+ * Time complexity: O(n), the size of the vector.
+ */
+
 void FUNCTION(igraph_vector,fill)      (TYPE(igraph_vector)* v, BASE e) {
   BASE *ptr;
   assert(v != NULL);
@@ -819,6 +833,17 @@ long int FUNCTION(igraph_vector,which_max)(const TYPE(igraph_vector)* v) {
   return which;
 }
 
+/**
+ * \function igraph_vector_min
+ * \brief Smallest element of a vector.
+ * 
+ * The vector must be non-empty.
+ * \param v The input vector.
+ * \return The smallest element of \p v.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
+
 BASE FUNCTION(igraph_vector,min)(const TYPE(igraph_vector)* v) {
   BASE min;
   BASE *ptr;
@@ -834,6 +859,19 @@ BASE FUNCTION(igraph_vector,min)(const TYPE(igraph_vector)* v) {
   }
   return min;
 }
+
+/**
+ * \function igraph_vector_which_min
+ * \brief Index of the smallest element.
+ * 
+ * The vector must be non-empty.
+ * If the smallest element is not unique, then the index of the first
+ * is returned.
+ * \param v The input vector.
+ * \return Index of the smallest element.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
 
 long int FUNCTION(igraph_vector,which_min)(const TYPE(igraph_vector)* v) {
   long int which=-1;
@@ -1281,6 +1319,26 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v,
   return VECTOR(*v)[left]==what;
 }
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_binsearch2
+ * \brief Binary search, without returning the index.
+ * 
+ * </para><para>
+ * It is assumed that the vector is sorted. If the specified element
+ * (\p what) is not in the vector, then the
+ * position of where it should be inserted (to keep the vector sorted)
+ * is returned.
+ * \param v The \type igraph_vector_t object.
+ * \param what The element to search for.
+ * \return Positive integer (true) if \p what is
+ *   found in the vector, zero (false) otherwise.
+ * 
+ * Time complexity: O(log(n)),
+ * n is the number of elements in
+ * \p v.
+ */
+
 igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v, 
 						 BASE what) {
   long int left=0;
@@ -1321,12 +1379,37 @@ void FUNCTION(igraph_vector,scale)(TYPE(igraph_vector) *v, BASE by) {
   }
 }
 
+/**
+ * \function igraph_vector_add_constant
+ * \brief Add a constant to the vector.
+ * 
+ * \p plus is added to every element of \p v. Note that overflow
+ * might happen.
+ * \param v The input vector.
+ * \param plus The constant to add.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
+
 void FUNCTION(igraph_vector,add_constant)(TYPE(igraph_vector) *v, BASE plus) {
   long int i, n=FUNCTION(igraph_vector,size)(v);
   for (i=0; i<n; i++) {
     VECTOR(*v)[i] += plus;
   }
 }
+
+/** 
+ * \function igraph_vector_contains
+ * \brief Linear search in a vector.
+ * 
+ * Check whether the supplied element is included in the vector, by
+ * linear search.
+ * \param v The input vector.
+ * \param e The element to look for.
+ * \return \c TRUE if the element is found and \c FALSE otherwise.
+ * 
+ * Time complexity: O(n), the length of the vector.
+ */
 
 igraph_bool_t FUNCTION(igraph_vector,contains)(const TYPE(igraph_vector) *v, 
 					       BASE e) {
@@ -1339,6 +1422,26 @@ igraph_bool_t FUNCTION(igraph_vector,contains)(const TYPE(igraph_vector) *v,
   }
   return 0;
 }
+
+/**
+ * \function igraph_vector_search
+ * \brief Search from a given position
+ *
+ * The supplied element \p what is searched in vector \p v, starting
+ * from element index \p from. If found then the index of the first
+ * instance (after \p from) is stored in \p pos.
+ * \param v The input vector.
+ * \param from The index to start searching from. No range checking is
+ *     performed. 
+ * \param what The element to find.
+ * \param pos If not \c NULL then the index of the found element is
+ *    stored here.
+ * \return Boolean, \c TRUE if the element was found, \c FALSE
+ *   otherwise.
+ * 
+ * Time complexity: O(m), the number of elements to search, the length
+ * of the vector minus the \p from argument.
+ */
 
 igraph_bool_t FUNCTION(igraph_vector,search)(const TYPE(igraph_vector) *v, 
 					     long int from, BASE what, 
@@ -1358,6 +1461,11 @@ igraph_bool_t FUNCTION(igraph_vector,search)(const TYPE(igraph_vector) *v,
   }
 }
 
+/**
+ * \function igraph_vector_filter_smaller
+ * \ingroup internal
+ */
+
 int FUNCTION(igraph_vector,filter_smaller)(TYPE(igraph_vector) *v, 
 					   BASE elem) {
   long int i=0, n=FUNCTION(igraph_vector,size)(v);
@@ -1375,6 +1483,18 @@ int FUNCTION(igraph_vector,filter_smaller)(TYPE(igraph_vector) *v,
   return 0;
 }
 
+/**
+ * \function igraph_vector_append
+ * \brief Append a vector to another one.
+ * 
+ * The target vector will be resized (except \p from is empty).
+ * \param to The vector to append to.
+ * \param from The vector to append, it is kept unchanged.
+ * \return Error code.
+ *
+ * Time complexity: O(n), the number of elements in the new vector.
+ */
+
 int FUNCTION(igraph_vector,append)(TYPE(igraph_vector) *to, 
 				   const TYPE(igraph_vector) *from) {
   long int tosize, fromsize;
@@ -1389,6 +1509,10 @@ int FUNCTION(igraph_vector,append)(TYPE(igraph_vector) *to,
   return 0;
 }
 
+/**
+ * \function igraph_vector_get_interval
+ */
+
 int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v, 
 					 TYPE(igraph_vector) *res,
 					 long int from, long int to) {
@@ -1396,6 +1520,21 @@ int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v,
   memcpy(res->stor_begin, v->stor_begin+from, (to-from)*sizeof(igraph_real_t));
   return 0;
 }
+
+/**
+ * \function igraph_vector_maxdifference
+ * \brief The largest element of \p m1 - \p m2
+ *
+ * The maximum the elementwise performed difference is returned.
+ * Both vectors must be non-empty, but they not need to have the same
+ * length, the extra elements in the longer vector are ignored.
+ * \param m1 The first vector.
+ * \param m2 The second vector.
+ * \return The maximum of the difference of \p m1 and \p m2.
+ *
+ * Time complexity: O(n), the number of elements in the shorter
+ * vector.
+ */
 
 BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
 					   const TYPE(igraph_vector) *m2) {
@@ -1415,6 +1554,20 @@ BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
   return diff;
 }
 
+/**
+ * \function igraph_vector_update
+ * \brief Update a vector from another one.
+ * 
+ * After this operation the contents of \p to will be exactly the same
+ * \p from. \p to will be resized if it was originally shorter or
+ * longer than \p from.
+ * \param to The vector to update.
+ * \param from The vector to update from.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of elements in \p from.
+ */
+
 int FUNCTION(igraph_vector,update)(TYPE(igraph_vector) *to, 
 				   const TYPE(igraph_vector) *from) {
   long int n=FUNCTION(igraph_vector,size)(from);
@@ -1422,6 +1575,19 @@ int FUNCTION(igraph_vector,update)(TYPE(igraph_vector) *to,
   memcpy(to->stor_begin, from->stor_begin, sizeof(BASE)*n);
   return 0;
 }
+
+/**
+ * \function igraph_vector_swap
+ * \brief Swap elements of two vectors.
+ * 
+ * The two vectors must have the same length, otherwise an error
+ * happens.
+ * \param v1 The first vector.
+ * \param v2 The second vector.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
 
 int FUNCTION(igraph_vector,swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
   
@@ -1441,6 +1607,20 @@ int FUNCTION(igraph_vector,swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v
   return 0;
 }
 
+/**
+ * \function igraph_vector_swap_elements
+ * \brief Swap two elements in a vector.
+ * 
+ * Note that currently no range checking if performed.
+ * \param v The input vector.
+ * \param i Index of the first element.
+ * \param j index of the second element. (Might be the same the
+ * first.)
+ * \return Error code, currently always \c IGRAPH_SUCCESS.
+ * 
+ * Time complexity: O(1).
+ */
+
 int FUNCTION(igraph_vector,swap_elements)(TYPE(igraph_vector) *v,
 					  long int i, long int j) {
   BASE tmp=VECTOR(*v)[i];
@@ -1449,6 +1629,18 @@ int FUNCTION(igraph_vector,swap_elements)(TYPE(igraph_vector) *v,
   
   return 0;
 }
+
+/**
+ * \function igraph_vector_reverse
+ * \brief Reverse the elements of a vector.
+ * 
+ * The first element will be last, the last element will be
+ * first, etc.
+ * \param v The input vector.
+ * \return Error code, currently always \c IGRAPH_SUCCESS.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
 
 int FUNCTION(igraph_vector,reverse)(TYPE(igraph_vector) *v) {
   
@@ -1462,6 +1654,19 @@ int FUNCTION(igraph_vector,reverse)(TYPE(igraph_vector) *v) {
   }
   return 0;
 }
+
+/**
+ * \function igraph_vector_add
+ * \brief Add two vectors.
+ * 
+ * Add the elements of \p v2 to \p v1, the result is stored in \p
+ * v1. The two vectors must have the same length.
+ * \param v1 The first vector, the result will be stored here.
+ * \param v2 The second vector, its contents will be unchanged. 
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
 
 int FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v1, 
 				const TYPE(igraph_vector) *v2) {
@@ -1481,6 +1686,20 @@ int FUNCTION(igraph_vector,add)(TYPE(igraph_vector) *v1,
   return 0;
 }
 
+/**
+ * \function igraph_vector_sub
+ * \brief Subtract a vector from another one.
+ * 
+ * Substract the elements of \p v2 from \p v1, the result is stored in
+ * \p v1. The two vectors must have the same length.
+ * \param v1 The first vector, to subtract from. The result is stored
+ *    here.
+ * \param v2 The vector to subtract, it will be unchanged.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
 int FUNCTION(igraph_vector,sub)(TYPE(igraph_vector) *v1, 
 				const TYPE(igraph_vector) *v2) {
   
@@ -1498,6 +1717,19 @@ int FUNCTION(igraph_vector,sub)(TYPE(igraph_vector) *v1,
   
   return 0;
 }
+
+/**
+ * \function igraph_vector_mul
+ * \brief Multiply two vectors.
+ * 
+ * \p v1 will be multiplied by \p v2, elementwise. The two vectors
+ * must have the same length.
+ * \param v1 The first vector, the result will be stored here.
+ * \param v2 The second vector, it is left unchanged.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
 
 int FUNCTION(igraph_vector,mul)(TYPE(igraph_vector) *v1, 
 				const TYPE(igraph_vector) *v2) {
@@ -1517,6 +1749,21 @@ int FUNCTION(igraph_vector,mul)(TYPE(igraph_vector) *v1,
   return 0;
 }
 
+/**
+ * \function igraph_vector_div
+ * \brief Divide a vector by another one.
+ * 
+ * \p v1 is divided by \p v2, elementwise. They must have the same length. If the
+ * base type of the vector can generate divide by zero errors then
+ * please make sure that \p v2 contains no zero if you want to avoid
+ * trouble.
+ * \param v1 The dividend. The result is also stored here.
+ * \param v2 The divisor, it is left unchanged.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the length of the vectors.
+ */
+
 int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1, 
 				const TYPE(igraph_vector) *v2) {
   
@@ -1535,6 +1782,22 @@ int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1,
   return 0;
 }
 
+/**
+ * \function igraph_vector_minmax
+ * \brief Minimum and maximum elements of a vector.
+ * 
+ * Handy if you want to have both the smallest and largest element of
+ * a vector. The vector is only traversed once. The vector must by non-empty.
+ * \param v The input vector. It must contain at least one element.
+ * \param min Pointer to a base type variable, the minimum is stored
+ *     here.
+ * \param max Pointer to a base type variable, the maximum is stored
+ *     here.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
+
 int FUNCTION(igraph_vector,minmax)(const TYPE(igraph_vector) *v,
 				   BASE *min, BASE *max) {
   long int n=FUNCTION(igraph_vector,size)(v);
@@ -1550,6 +1813,23 @@ int FUNCTION(igraph_vector,minmax)(const TYPE(igraph_vector) *v,
   }
   return 0;
 }
+
+/**
+ * \function igraph_vector_which_minmax
+ * \brief Index of the minimum and maximum elements
+ * 
+ * Handy if you need the indices of the smallest and largest
+ * elements. The vector is traversed only once. The vector must to
+ * non-empty.
+ * \param v The input vector. It must contain at least one element.
+ * \param which_min The index of the minimum element will be stored
+ *   here.
+ * \param which_max The index of the maximum element will be stored
+ *   here.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
 
 int FUNCTION(igraph_vector,which_minmax)(const TYPE(igraph_vector) *v,
 					 long int *which_min, long int *which_max) {
@@ -1571,6 +1851,18 @@ int FUNCTION(igraph_vector,which_minmax)(const TYPE(igraph_vector) *v,
   }
   return 0;
 }
+
+/**
+ * \function igraph_vector_isnull
+ * \brief Are all elements zero?
+ * 
+ * Checks whether all elements of a vector are zero.
+ * \param v The input vector
+ * \return Boolean, \c TRUE if the vector contains only zeros, \c
+ *    FALSE otherwise.
+ * 
+ * Time complexity: O(n), the number of elements.
+ */
 
 igraph_bool_t FUNCTION(igraph_vector,isnull)(const TYPE(igraph_vector) *v) {
 

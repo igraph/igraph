@@ -97,7 +97,7 @@ int igraph_disjoint_union(igraph_t *res, const igraph_t *left,
 
 /**
  * \function igraph_disjoint_union_many
- * The disjint union of many graphs.
+ * \brief The disjint union of many graphs.
  *
  * </para><para>
  * First the vertices in the graphs will be relabed with new vertex

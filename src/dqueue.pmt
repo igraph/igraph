@@ -31,10 +31,15 @@
 
 /**
  * \ingroup dqueue
- * \brief Initializes a double ended queue (constructor).
- *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * \function igraph_dqueue_init
+ * \brief Initialize a double ended queue (deque).
+ * 
+ * The queue will be always empty.
+ * \param q Pointer to an uninitialized deque.
+ * \param size How many elements to allocate memory for. 
+ * \return Error code.
+ * 
+ * Time complexity: O(\p size).
  */
 
 int FUNCTION(igraph_dqueue,init) (TYPE(igraph_dqueue)* q, long int size) {
@@ -53,7 +58,12 @@ int FUNCTION(igraph_dqueue,init) (TYPE(igraph_dqueue)* q, long int size) {
 
 /**
  * \ingroup dqueue
- * \brief Destroys a double ended queue.
+ * \function igraph_dqueue_destroy
+ * \brief Destroy a double ended queue.
+ * 
+ * \param q The queue to destroy
+ * 
+ * Time complexity: O(1).
  */
 
 void FUNCTION(igraph_dqueue,destroy) (TYPE(igraph_dqueue)* q) {
@@ -66,7 +76,14 @@ void FUNCTION(igraph_dqueue,destroy) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Decides whether the queue is empty.
+ * \function igraph_dqueue_empty
+ * \brief Decide whether the queue is empty.
+ * 
+ * \param q The queue.
+ * \return Boolean, \c TRUE if \p q contains at least one element, \c
+ * FALSE otherwise.
+ * 
+ * Time complexity: O(1).
  */
 
 igraph_bool_t FUNCTION(igraph_dqueue,empty) (TYPE(igraph_dqueue)* q) {
@@ -77,7 +94,12 @@ igraph_bool_t FUNCTION(igraph_dqueue,empty) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Removes all elements from the queue.
+ * \function igraph_dqueue_clear
+ * \brief Remove all elements from the queue.
+ * 
+ * \param q The queue
+ * 
+ * Time complexity: O(1).
  */
 
 void FUNCTION(igraph_dqueue,clear)   (TYPE(igraph_dqueue)* q) {
@@ -89,10 +111,15 @@ void FUNCTION(igraph_dqueue,clear)   (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Checks whether the queue is full.
+ * \function igraph_dqueue_full
+ * \brief Check whether the queue is full.
  *
  * If a queue is full the next igraph_dqueue_push() operation will allocate
  * more memory.
+ * \param q The queue.
+ * \return \c TRUE if \p q is full, \c FALSE otherwise.
+ * 
+ * Time complecity: O(1).
  */
 
 igraph_bool_t FUNCTION(igraph_dqueue,full) (TYPE(igraph_dqueue)* q) {
@@ -103,7 +130,13 @@ igraph_bool_t FUNCTION(igraph_dqueue,full) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Returns the number of elements in the queue.
+ * \function igraph_dqueue_size
+ * \brief Number of elements in the queue.
+ * 
+ * \param q The queue.
+ * \return Integer, the number of elements currently in the queue.
+ * 
+ * Time complexity: O(1).
  */
 
 long int FUNCTION(igraph_dqueue,size) (TYPE(igraph_dqueue)* q) {
@@ -120,7 +153,14 @@ long int FUNCTION(igraph_dqueue,size) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Returns the element at the head of the queue.
+ * \function igraph_dqueue_head
+ * \brief Head of the queue.
+ * 
+ * The queue must contain at least one element.
+ * \param q The queue.
+ * \return The first element in the queue.
+ * 
+ * Time complexity: O(1).
  */
 
 BASE FUNCTION(igraph_dqueue,head) (TYPE(igraph_dqueue)* q) {
@@ -131,7 +171,14 @@ BASE FUNCTION(igraph_dqueue,head) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Returns the element at the tail of the queue.
+ * \function igraph_dqueue_back
+ * \brief Tail of the queue.
+ * 
+ * The queue must contain at least one element.
+ * \param q The queue.
+ * \return The last element in the queue.
+ * 
+ * Time complexity: O(1).
  */
 
 BASE FUNCTION(igraph_dqueue,back) (TYPE(igraph_dqueue)* q) {
@@ -142,7 +189,15 @@ BASE FUNCTION(igraph_dqueue,back) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Returns and removes the element at the head of the queue.
+ * \function igraph_dqueue_pop
+ * \brief Remove the head.
+ * 
+ * Removes and returns the first element in the queue. The queue must
+ * be non-empty.
+ * \param q The input queue.
+ * \return The first element in the queue.
+ * 
+ * Time complexity: O(1).
  */
 
 BASE FUNCTION(igraph_dqueue,pop) (TYPE(igraph_dqueue)* q) {
@@ -162,7 +217,15 @@ BASE FUNCTION(igraph_dqueue,pop) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Returns and removes the element at the tail of the queue.
+ * \function igraph_dqueue_pop_back
+ * \brief Remove the tail
+ *
+ * Removes and returns the last element in the queue. The queue must
+ * be non-empty.
+ * \param q The queue.
+ * \return The last element in the queue.
+ * 
+ * Time complexity: O(1).
  */
 
 BASE FUNCTION(igraph_dqueue,pop_back) (TYPE(igraph_dqueue)* q) {
@@ -185,10 +248,19 @@ BASE FUNCTION(igraph_dqueue,pop_back) (TYPE(igraph_dqueue)* q) {
 
 /**
  * \ingroup dqueue
- * \brief Appends an element to the back of the queue.
+ * \function igraph_dqueue_push
+ * \brief Appends an element.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * Append an element to the end of the queue.
+ * \param q The queue.
+ * \param elem The element to append.
+ * \return Error code.
+ *
+ * Time complexity: O(1) if no memory allocation is needed, O(n), the
+ * number of elements in the queue otherwise. But not that by
+ * allocating always twice as much memory as the current size of the
+ * queue we ensure that n push operations can always be done in at
+ * most O(n) time. (Assuming memory allocation is at most linear.)
  */
 
 int FUNCTION(igraph_dqueue,push) (TYPE(igraph_dqueue)* q, BASE elem) {

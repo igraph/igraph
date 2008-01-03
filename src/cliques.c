@@ -277,7 +277,7 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 /**
  * \function igraph_cliques
- * Find all or some cliques in a graph
+ * \brief Find all or some cliques in a graph
  *
  * </para><para>
  * Cliques are fully connected subgraphs of a graph.
@@ -342,7 +342,7 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
 
 /**
  * \function igraph_independent_vertex_sets
- * Find all independent vertex sets in a graph
+ * \brief Find all independent vertex sets in a graph
  *
  * </para><para>
  * A vertex set is considered independent if there are no edges between

@@ -924,7 +924,6 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 
 /**
  * \function igraph_isomorphic_function_vf2
- * 
  * TODO
  */
   
@@ -1397,7 +1396,6 @@ igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
 
 /**
  * \function igraph_count_isomorphisms_vf2
- * 
  * TODO
  */
 
@@ -1442,7 +1440,6 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
 
 /** 
  * \function igraph_get_isomorphisms_vf2
- * 
  * TODO
  */
  
@@ -1463,7 +1460,6 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 
 /**
  * \function igraph_subisomorphic_function_vf2
- * 
  * TODO
  */
 
@@ -1865,7 +1861,6 @@ igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
 
 /**
  * \function igraph_subisomorphic_vf2
- * 
  * TODO
  */
 
@@ -1894,7 +1889,6 @@ igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
   
 /**
  * \function igraph_count_subisomorphisms_vf2
- * 
  * TODO
  */
 
@@ -1939,7 +1933,6 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
 
 /** 
  * \function igraph_get_subisomorphisms_vf2
- * 
  * TODO
  */
  

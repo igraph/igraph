@@ -32,10 +32,15 @@
 
 /**
  * \ingroup stack
- * \brief Initializes a stack (constructor).
- *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * \function igraph_stack_init
+ * \brief Initializes a stack.
+ * 
+ * The initialized stack is always empty.
+ * \param s Pointer to an uninitialized stack.
+ * \param size The number of elements to allocate memory for.
+ * \return Error code.
+ * 
+ * Time complexity: O(\p size).
  */
 
 int FUNCTION(igraph_stack,init)       (TYPE(igraph_stack)* s, long int size) {
@@ -54,7 +59,15 @@ int FUNCTION(igraph_stack,init)       (TYPE(igraph_stack)* s, long int size) {
 
 /**
  * \ingroup stack
+ * \function igraph_stack_destroy
  * \brief Destroys a stack object.
+ * 
+ * Deallocate the memory used for a stack.
+ * It is possible to reinitialize a destroyed stack again by 
+ * \ref igraph_stack_init().
+ * \param s The stack to destroy.
+ * 
+ * Time complexity: O(1).
  */
 
 void FUNCTION(igraph_stack,destroy)    (TYPE(igraph_stack)* s) {
@@ -67,10 +80,18 @@ void FUNCTION(igraph_stack,destroy)    (TYPE(igraph_stack)* s) {
 
 /**
  * \ingroup stack
- * \brief Reserves memory for a stack object.
+ * \function igraph_stack_reserve
+ * \brief Reserve memory.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * Reverse memory for future use. The actual size of the stack is
+ * unchanged.
+ * \param s The stack object.
+ * \param size The number of elements to reserve memory for. If it is
+ *     not bigger than the current size then nothing happens.
+ * \return Error code.
+ * 
+ * Time complexity: should be around O(n), the new allocated size of
+ * the stack.
  */
 
 int FUNCTION(igraph_stack,reserve)    (TYPE(igraph_stack)* s, long int size) {
@@ -94,7 +115,14 @@ int FUNCTION(igraph_stack,reserve)    (TYPE(igraph_stack)* s, long int size) {
 
 /**
  * \ingroup stack
+ * \function igraph_stack_empty
  * \brief Decides whether a stack object is empty.
+ * 
+ * \param s The stack object.
+ * \return Boolean, \c TRUE if the stack is empty, \c FALSE
+ * otherwise.
+ * 
+ * Time complexity: O(1).
  */
 
 igraph_bool_t FUNCTION(igraph_stack,empty)      (TYPE(igraph_stack)* s) {
@@ -106,7 +134,13 @@ igraph_bool_t FUNCTION(igraph_stack,empty)      (TYPE(igraph_stack)* s) {
 
 /**
  * \ingroup stack
+ * \function igraph_stack_size
  * \brief Returns the number of elements in a stack.
+ * 
+ * \param s The stack object.
+ * \return The number of elements in the stack.
+ * 
+ * Time complexity: O(1).
  */
 
 long int FUNCTION(igraph_stack,size)       (TYPE(igraph_stack)* s) {
@@ -117,7 +151,12 @@ long int FUNCTION(igraph_stack,size)       (TYPE(igraph_stack)* s) {
 
 /**
  * \ingroup stack
+ * \function igraph_stack_clear
  * \brief Removes all elements from a stack.
+ * 
+ * \param s The stack object.
+ * 
+ * Time complexity: O(1).
  */
 
 void FUNCTION(igraph_stack,clear)      (TYPE(igraph_stack)* s) {
@@ -128,10 +167,17 @@ void FUNCTION(igraph_stack,clear)      (TYPE(igraph_stack)* s) {
 
 /**
  * \ingroup stack
+ * \function igraph_stack_push
  * \brief Places an element on the top of a stack.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * The capacity of the stack is increased, if needed.
+ * \param s The stack object.
+ * \param elem The element to push.
+ * \return Error code.
+ * 
+ * Time complexity: O(1) is no reallocation is needed, O(n)
+ * otherwise, but it is ensured that n push operations are performed
+ * in O(n) time.
  */
 
 int FUNCTION(igraph_stack,push)(TYPE(igraph_stack)* s, BASE elem) {
@@ -166,7 +212,15 @@ int FUNCTION(igraph_stack,push)(TYPE(igraph_stack)* s, BASE elem) {
 
 /**
  * \ingroup stack
+ * \function igraph_stack_pop
  * \brief Removes and returns an element from the top of a stack.
+ * 
+ * The stack must contain at least one element, call \ref
+ * igraph_stack_empty() to make sure of this.
+ * \param s The stack object.
+ * \return The removed top element.
+ * 
+ * Time complexity: O(1).
  */
 
 BASE FUNCTION(igraph_stack,pop)        (TYPE(igraph_stack)* s) {
@@ -183,7 +237,15 @@ BASE FUNCTION(igraph_stack,pop)        (TYPE(igraph_stack)* s) {
 
 /**
  * \ingroup stack
- * \brief Returns an element from the top of a stack.
+ * \function igraph_stack_top
+ * \brief Query top element.
+ * 
+ * Returns the top element of the stack, without removing it. 
+ * The stack must be non-empty.
+ * \param s The stack.
+ * \return The top element.
+ * 
+ * Time complexity: O(1).
  */
 
 BASE FUNCTION(igraph_stack,top)        (const TYPE(igraph_stack)* s) {

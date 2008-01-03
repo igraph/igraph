@@ -336,8 +336,7 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
 
 /**
  * \function igraph_spmatrix_add_col_values
- *
- * Adds the values of a column to another column.
+ * \brief Adds the values of a column to another column.
  *
  * \param to The index of the column to be added to
  * \param from The index of the column to be added
@@ -554,8 +553,7 @@ int igraph_spmatrix_add_rows(igraph_spmatrix_t *m, long int n) {
 
 /**
  * \function igraph_spmatrix_clear_row
- *
- * Clears a row in the matrix (sets all of its elements to zero)
+ * \brief Clears a row in the matrix (sets all of its elements to zero)
  * \param m The matrix.
  * \param row The index of the row to be cleared.
  *
@@ -639,8 +637,7 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
 
 /**
  * \function igraph_spmatrix_clear_col
- *
- * Clears a column in the matrix (sets all of its elements to zero)
+ * \brief Clears a column in the matrix (sets all of its elements to zero)
  * \param m The matrix.
  * \param col The index of the column to be cleared.
  * \return Error code. The current implementation always succeeds.
@@ -663,8 +660,7 @@ int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
 
 /**
  * \function igraph_spmatrix_scale
- * 
- * Multiplies each element of the sparse matrix by a constant.
+ * \brief Multiplies each element of the sparse matrix by a constant.
  * \param m The matrix.
  * \param by The constant.
  * 
@@ -678,8 +674,7 @@ void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
 
 /**
  * \function igraph_spmatrix_colsums
- *
- * Calculates the column sums of the matrix.
+ * \brief Calculates the column sums of the matrix.
  * \param m The matrix.
  * \param res An initialized \c igraph_vector_t, the result will be stored here.
  *   The vector will be resized as needed.
@@ -702,8 +697,7 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
 
 /**
  * \function igraph_spmatrix_max_nonzero
- *
- * Returns the maximum nonzero element of a matrix.
+ * \brief Returns the maximum nonzero element of a matrix.
  * If the matrix is empty, zero is returned.
  *
  * \param m the matrix object.
@@ -741,8 +735,7 @@ igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
 
 /**
  * \function igraph_spmatrix_max
- *
- * Returns the maximum element of a matrix.
+ * \brief Returns the maximum element of a matrix.
  * If the matrix is empty, zero is returned.
  *
  * \param m the matrix object.

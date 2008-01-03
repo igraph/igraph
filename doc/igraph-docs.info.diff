@@ -6,7 +6,7 @@
  
 +INFO-DIR-SECTION Development
  START-INFO-DIR-ENTRY
--* Igraph Reference Manual: .    ???
+-* igraph Reference Manual: .    ???
 +* Igraph Reference Manual: (igraph-docs.info).    A library for graphs
  END-INFO-DIR-ENTRY
  

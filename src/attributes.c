@@ -218,6 +218,8 @@ igraph_attribute_table_t *igraph_i_attribute_table=0;
 
 /**
  * \function igraph_i_set_attribute_table
+ * \brief Attach an attribute table.
+ * 
  * This function attaches attribute handling code to the igraph library.
  * \param table Pointer to an \ref igraph_attribute_table_t object
  *    containing the functions for attribute manipulation. Supply \c

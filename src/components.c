@@ -35,8 +35,7 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 /**
  * \ingroup structural
  * \function igraph_clusters
- * \brief Calculates the (weakly or strongly) connected components in
- * a graph. 
+ * \brief Calculates the (weakly or strongly) connected components in a graph. 
  *
  * \param graph The graph object to analyze.
  * \param membership First half of the result will be stored here. For
@@ -359,6 +358,7 @@ void igraph_i_decompose_free(igraph_vector_ptr_t *complist) {
 
 /**
  * \function igraph_decompose
+ * \brief Decompose a graph into connected components.
  * 
  * Create separate graph for each component of a graph. Note that the
  * vertex ids in the new graphs will be different than in the original 

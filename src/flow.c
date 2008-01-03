@@ -635,7 +635,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
 
 /** 
  * \function igraph_mincut
- * Calculates the minimum cut in a graph.
+ * \brief Calculates the minimum cut in a graph.
  * 
  * This function calculates the minimum cut in a graph. Right now it
  * is implemented only for undirected graphs, in which case it uses
@@ -915,7 +915,7 @@ int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
 
 /**
  * \function igraph_st_vertex_connectivity
- * The vertex connectivity of a pair of vertices
+ * \brief The vertex connectivity of a pair of vertices
  * 
  * </para><para>The vertex connectivity of two vertices (\c source and
  * \c target) is the minimum number of vertices that have to be

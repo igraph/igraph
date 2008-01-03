@@ -284,6 +284,7 @@ typedef struct igraph_vit_t {
 
 /**
  * \define IGRAPH_VIT_NEXT
+ * \brief Next vertex.
  * 
  * Steps the iterator to the next vertex. Only call this function if
  * \ref IGRAPH_VIT_END() returns false.
@@ -294,6 +295,7 @@ typedef struct igraph_vit_t {
 #define IGRAPH_VIT_NEXT(vit)  (++((vit).pos))
 /**
  * \define IGRAPH_VIT_END
+ * \brief Are we at the end?
  * 
  * Checks whether there are more vertices to step to.
  * \param vit The vertex iterator to check.
@@ -305,6 +307,7 @@ typedef struct igraph_vit_t {
 #define IGRAPH_VIT_END(vit)   ((vit).pos >= (vit).end)
 /**
  * \define IGRAPH_VIT_SIZE
+ * \brief Size of a vertex iterator.
  * 
  * Gives the number of vertices in a vertex iterator.
  * \param vit The vertex iterator.
@@ -315,6 +318,7 @@ typedef struct igraph_vit_t {
 #define IGRAPH_VIT_SIZE(vit)  ((vit).end - (vit).start)
 /**
  * \define IGRAPH_VIT_RESET
+ * \brief Reset a vertex iterator.
  * 
  * Resets a vertex iterator. After calling this macro the iterator
  * will point to the first vertex.
@@ -325,6 +329,7 @@ typedef struct igraph_vit_t {
 #define IGRAPH_VIT_RESET(vit) ((vit).pos = (vit).start)
 /**
  * \define IGRAPH_VIT_GET
+ * \brief Query the current position.
  * 
  * Gives the vertex id of the current vertex poited to by the
  * iterator. 
@@ -458,6 +463,7 @@ typedef struct igraph_eit_t {
 
 /**
  * \define IGRAPH_EIT_NEXT
+ * \brief Next edge.
  * 
  * Steps the iterator to the next edge. Call this function only if
  * \ref IGRAPH_EIT_END() returns false.
@@ -468,6 +474,7 @@ typedef struct igraph_eit_t {
 #define IGRAPH_EIT_NEXT(eit) (++((eit).pos))
 /**
  * \define IGRAPH_EIT_END
+ * \brief Are we at the end?
  * 
  * Checks whether there are more edges to step to.
  * \param wit The edge iterator to check.
@@ -479,6 +486,7 @@ typedef struct igraph_eit_t {
 #define IGRAPH_EIT_END(eit)   ((eit).pos >= (eit).end)
 /**
  * \define IGRAPH_EIT_SIZE
+ * \brief Number of edges in the iterator.
  * 
  * Gives the number of edges in an edge iterator.
  * \param eit The edge iterator.
@@ -489,6 +497,7 @@ typedef struct igraph_eit_t {
 #define IGRAPH_EIT_SIZE(eit)  ((eit).end - (eit).start)
 /**
  * \define IGRAPH_EIT_RESET
+ * \brief Reset an edge iterator.
  * 
  * Resets an ege iterator. After calling this macro the iterator will
  * point to the first edge.
@@ -499,6 +508,7 @@ typedef struct igraph_eit_t {
 #define IGRAPH_EIT_RESET(eit) ((eit).pos = (eit).start)
 /**
  * \define IGRAPH_EIT_GET
+ * \brief Query an edge iterator.
  * 
  * Gives the edge id of the current edge pointed to by an iterator.
  * \param eit The edge iterator.

@@ -46,15 +46,20 @@
 
   <xi:include href="tutorial.xml"/>
 
+  <xi:include href="basicigraph.xml"/>
+
   <xi:include href="error.xml"/>
 
   <chapter>
-    <title>Vectors and matrices</title>
+    <title>Data structure library: vector, matrix, other data types</title>
+    <xi:include href="pmt.xml"/>
     <xi:include href="vector.xml"/>
     <xi:include href="matrix.xml"/>
+    <xi:include href="sparsematrix.xml"/>
+    <xi:include href="stack.xml"/>
+    <xi:include href="dqueue.xml"/>
+    <xi:include href="heap.xml"/>
   </chapter>
-
-  <xi:include href="basicigraph.xml"/>
 
   <xi:include href="generators.xml"/>
 

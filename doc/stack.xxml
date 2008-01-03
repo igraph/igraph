@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Stacks">
+<title>Stacks</title>
+
+<!-- doxrox-include igraph_stack_init -->
+<!-- doxrox-include igraph_stack_destroy -->
+<!-- doxrox-include igraph_stack_reserve -->
+<!-- doxrox-include igraph_stack_empty -->
+<!-- doxrox-include igraph_stack_size -->
+<!-- doxrox-include igraph_stack_clear -->
+<!-- doxrox-include igraph_stack_push -->
+<!-- doxrox-include igraph_stack_pop -->
+<!-- doxrox-include igraph_stack_top -->
+
+</section>

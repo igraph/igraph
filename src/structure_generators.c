@@ -286,8 +286,7 @@ int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
 /**
  * \ingroup generators
  * \function igraph_star
- * \brief Creates a \em star graph, every vertex connects only to
- * the center.
+ * \brief Creates a \em star graph, every vertex connects only to the center.
  *
  * \param graph Pointer to an uninitialized graph object, this will
  *        be the result.
@@ -537,8 +536,7 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
 /**
  * \ingroup generators
  * \function igraph_tree
- * \brief Creates a tree in which almost all vertices have the same
- * number of children.
+ * \brief Creates a tree in which almost all vertices have the same number of children.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n Integer, the number of vertices in the graph.
@@ -614,8 +612,7 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
 /**
  * \ingroup generators
  * \function igraph_full
- * \brief Creates a full graph (directed or undirected, with or
- * without loops). 
+ * \brief Creates a full graph (directed or undirected, with or without loops). 
  * 
  * </para><para>
  * In a full graph every possible edge is present, every vertex is
@@ -697,6 +694,7 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
 
 /**
  * \function igraph_full_citation
+ * TODO
  */
 
 int igraph_full_citation(igraph_t *graph, igraph_integer_t n, 

@@ -202,6 +202,7 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_error_handler_t
+ * \brief Type of error handler functions.
  * 
  * This is the type of the error handler functions.
  * \param reason Textual description of the error.
@@ -216,6 +217,7 @@ typedef void igraph_error_handler_t (const char * reason, const char * file,
 
 /**
  * \var igraph_error_handler_abort
+ * \brief Abort program in case of error.
  *
  * The default error handler, prints an error message and aborts the
  * program. 
@@ -225,6 +227,7 @@ extern igraph_error_handler_t igraph_error_handler_abort;
 
 /**
  * \var igraph_error_handler_ignore
+ * \brief Ignore errors.
  *
  * This error handler frees the temporarily allocated memory and returns
  * with the error code. 
@@ -234,6 +237,7 @@ extern igraph_error_handler_t igraph_error_handler_ignore;
 
 /**
  * \var igraph_error_handler_printignore
+ * \brief Print and ignore errors.
  * 
  * Frees temporarily allocated memory, prints an error message to the
  * standard error and returns with the error code. 
@@ -243,6 +247,7 @@ extern igraph_error_handler_t igraph_error_handler_printignore;
 
 /**
  * \function igraph_set_error_handler
+ * \brief Set a new error handler.
  *
  * Installs a new error handler. If called with 0, it installs the
  * default error handler (which is currently
@@ -258,6 +263,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
 
 /**
  * \typedef igraph_error_type_t
+ * \brief Error code type.
  * These are the possible valued returned by \a igraph functions.
  * Note that these are interesting only if you defined an error handler
  * with \ref igraph_set_error_handler(). Otherwise the program is aborted 
@@ -305,6 +311,7 @@ typedef enum {
 
 /**
  * \define IGRAPH_ERROR
+ * \brief Trigger an error.
  * 
  * \a igraph functions usually use this macro when they notice and error.
  * It calls
@@ -330,6 +337,7 @@ typedef enum {
 
 /**
  * \function igraph_error
+ * \brief Trigger an error.
  *
  * \a igraph functions usually call this fuction (most often via the 
  * \ref IGRAPH_ERROR macro) if they notice an error.
@@ -349,6 +357,7 @@ int igraph_error(const char *reason, const char *file, int line,
 
 /**
  * \function igraph_strerror
+ * \brief Textual description of an error.
  * 
  * This is a simple utility function, it gives a short general textual
  * description for an \a igraph error code.
@@ -381,6 +390,7 @@ void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
 
 /**
  * \function IGRAPH_FINALLY_CLEAN
+ * \brief Signal clean deallocation of objects.
  * 
  * Removes the specified number of objects from the stack of
  * temporarily allocated objects. Most often this is called just
@@ -393,6 +403,7 @@ void IGRAPH_FINALLY_CLEAN(int num);
 
 /**
  * \function IGRAPH_FINALLY_FREE
+ * \brief Deallocate all registered objects.
  *
  * Calls the destroy function for all objects in the stack of
  * temporarily allocated objects. This is usually called only from an
@@ -406,6 +417,7 @@ void IGRAPH_FINALLY_FREE(void);
 
 /**
  * \define IGRAPH_FINALLY
+ * \brief Register an object for deallocation.
  * \param func The address of the function which is normally called to
  *   destroy the object.
  * \param ptr Pointer to the object itself.
@@ -421,6 +433,7 @@ void IGRAPH_FINALLY_FREE(void);
 
 /**
  * \define IGRAPH_CHECK
+ * \brief Check the return value of a function call.
  *
  * \param a An expression, usually a function call.
  * 

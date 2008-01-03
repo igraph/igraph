@@ -362,6 +362,11 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
+/**
+ * \function igraph_pagerank
+ * \brief Page Rank scores
+ */
+
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 

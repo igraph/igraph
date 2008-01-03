@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Heaps">
+<title>Maximum and minimum heaps</title>
+
+<!-- doxrox-include igraph_heap_init -->
+<!-- doxrox-include igraph_heap_init_array -->
+<!-- doxrox-include igraph_heap_destroy -->
+<!-- doxrox-include igraph_heap_empty -->
+<!-- doxrox-include igraph_heap_push -->
+<!-- doxrox-include igraph_heap_top -->
+<!-- doxrox-include igraph_heap_delete_top -->
+<!-- doxrox-include igraph_heap_size -->
+<!-- doxrox-include igraph_heap_reserve -->
+
+</section>

@@ -14,15 +14,15 @@
 <section>
 <!-- doxrox-include igraph_vector_constructors_and_destructors -->
 <!-- doxrox-include igraph_vector_init -->
-<!-- doxrox-include igraph_vector_init_seq -->
 <!-- doxrox-include igraph_vector_init_copy -->
-<!-- doxrox-include igraph_vector_view -->
-<!-- doxrox-include igraph_vector_init_real -->
-<!-- doxrox-include igraph_vector_init_real_end -->
-<!-- doxrox-include igraph_vector_init_int -->
-<!-- doxrox-include igraph_vector_init_int_end -->
+<!-- doxrox-include igraph_vector_init_seq -->
 <!-- doxrox-include igraph_vector_copy -->
 <!-- doxrox-include igraph_vector_destroy -->
+</section>
+
+<section><title>Initializing elements</title>
+<!-- doxrox-include igraph_vector_null -->
+<!-- doxrox-include igraph_vector_fill -->
 </section>
 
 <section>
@@ -34,42 +34,70 @@
 <!-- doxrox-include igraph_vector_tail -->
 </section>
 
-<section><title>Query properties of vectors</title>
-<!-- doxrox-include igraph_vector_empty -->
-<!-- doxrox-include igraph_vector_size -->
-<!-- doxrox-include igraph_vector_max -->
-<!-- doxrox-include igraph_vector_which_max -->
-<!-- doxrox-include igraph_vector_sum -->
-<!-- doxrox-include igraph_vector_prod -->
-<!-- doxrox-include igraph_vector_is_equal -->
-<!-- doxrox-include igraph_vector_binsearch -->
-<!-- doxrox-include igraph_vector_isininterval -->
-<!-- doxrox-include igraph_vector_any_smaller -->
+<section><title>Vector views</title>
+<!-- doxrox-include igraph_vector_view -->
+</section>
+
+<section><title>Copying vectors</title>
+<!-- doxrox-include igraph_vector_copy_to -->
+<!-- doxrox-include igraph_vector_update -->
+<!-- doxrox-include igraph_vector_append -->
+<!-- doxrox-include igraph_vector_swap -->
+</section>
+
+<section><title>Exchanging elements</title>
+<!-- doxrox-include igraph_vector_swap_elements -->
+<!-- doxrox-include igraph_vector_reverse -->
 </section>
 
 <section><title>Vector operations</title>
-<!-- doxrox-include igraph_vector_clear -->
-<!-- doxrox-include igraph_vector_null -->
-<!-- doxrox-include igraph_vector_push_back -->
-<!-- doxrox-include igraph_vector_pop_back -->
+<!-- doxrox-include igraph_vector_add_constant -->
 <!-- doxrox-include igraph_vector_scale -->
-<!-- doxrox-include igraph_vector_sort -->
-<!-- doxrox-include igraph_vector_remove_section -->
-<!-- doxrox-include igraph_vector_remove -->
-<!-- doxrox-include igraph_vector_copy_to -->
+<!-- doxrox-include igraph_vector_add -->
+<!-- doxrox-include igraph_vector_sub -->
+<!-- doxrox-include igraph_vector_mul -->
+<!-- doxrox-include igraph_vector_div -->
 </section>
 
-<section><title>Memory management of <type>igraph_vector_t</type> objects</title>
+<section><title>Finding minimum and maximum</title>
+<!-- doxrox-include igraph_vector_min -->
+<!-- doxrox-include igraph_vector_max -->
+<!-- doxrox-include igraph_vector_which_min -->
+<!-- doxrox-include igraph_vector_which_max -->
+<!-- doxrox-include igraph_vector_minmax -->
+<!-- doxrox-include igraph_vector_which_minmax -->
+</section>
+
+<section><title>Vector properties</title>
+<!-- doxrox-include igraph_vector_empty -->
+<!-- doxrox-include igraph_vector_size -->
+<!-- doxrox-include igraph_vector_sum -->
+<!-- doxrox-include igraph_vector_prod -->
+<!-- doxrox-include igraph_vector_isininterval -->
+<!-- doxrox-include igraph_vector_is_equal -->
+<!-- doxrox-include igraph_vector_maxdifference -->
+</section>
+
+<section><title>Searching for elements</title>
+<!-- doxrox-include igraph_vector_contains -->
+<!-- doxrox-include igraph_vector_search -->
+<!-- doxrox-include igraph_vector_binsearch -->
+<!-- doxrox-include igraph_vector_binsearch2 -->
+</section>
+
+<section><title>Resizing operations</title>
+<!-- doxrox-include igraph_vector_clear -->
 <!-- doxrox-include igraph_vector_reserve -->
 <!-- doxrox-include igraph_vector_resize -->
+<!-- doxrox-include igraph_vector_push_back -->
+<!-- doxrox-include igraph_vector_pop_back -->
+<!-- doxrox-include igraph_vector_insert -->
+<!-- doxrox-include igraph_vector_remove -->
+<!-- doxrox-include igraph_vector_remove_section -->
 </section>
 
-<section><title>Fuctions for internal use only</title>
-<!-- doxrox-include igraph_vector_order  -->
-<!-- doxrox-include igraph_vector_sort_cmp  -->
-<!-- doxrox-include igraph_vector_move_interval -->
-<!-- doxrox-include igraph_vector_permdelete -->
-<!-- doxrox-include igraph_vector_remove_negidx -->
+<section><title>Sorting</title>
+<!-- doxrox-include igraph_vector_sort -->
 </section>
 
 <section>

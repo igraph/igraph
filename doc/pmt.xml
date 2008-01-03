@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-PMT">
+<title>About template types</title>
+<para>
+Some of the container types listed in this section are defined for
+many base types. This is similar to templates in C++ and generics in
+Ada, but it is implemented via precompiler macros since the C language
+cannot handle it. Here is the list of template types and the all base
+types they currently support:
+<glosslist>
+
+<glossentry><glossterm>vector</glossterm><glossdef><para>
+  Vector is currently defined for <type>igraph_real_t</type>,
+  <type>long int</type> (long), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool). The default is
+  <type>igraph_real_t</type>.
+</para></glossdef></glossentry>
+
+<glossentry><glossterm>matrix</glossterm><glossdef><para>
+  Matrix is currently defined for <type>igraph_real_t</type>,
+  <type>long int</type> (long), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool). The default is
+  <type>igraph_real_t</type>.
+</para></glossdef></glossentry>
+
+<glossentry><glossterm>array3</glossterm><glossdef><para>
+  Array3 is currently defined for <type>igraph_real_t</type>,
+  <type>long int</type> (long), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool). The default is
+  <type>igraph_real_t</type>.
+</para></glossdef></glossentry>
+
+<glossentry><glossterm>stack</glossterm><glossdef><para>
+  Stack is currently defined for <type>igraph_real_t</type>,
+  <type>long int</type> (long), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool). The default is
+  <type>igraph_real_t</type>.
+</para></glossdef></glossentry>
+
+<glossentry><glossterm>double-ended queue</glossterm><glossdef><para>
+  Dqueue is currently defined for <type>igraph_real_t</type>,
+  <type>long int</type> (long), <type>char</type> (char),
+  <type>igraph_bool_t</type> (bool). The default is
+  <type>igraph_real_t</type>.
+</para></glossdef></glossentry>
+
+<glossentry><glossterm>heap</glossterm><glossdef><para>
+  Heap is currently defined for <type>igraph_real_t</type>,
+  <type>long int</type> (long), <type>char</type> (char).
+  In addition both maximum and minimum heaps are available.
+  The default is the <type>igraph_real_t</type> maximum heap.
+</para></glossdef></glossentry>
+</glosslist>
+</para>
+
+<para>
+The name of the base element (in parens) is added to the function
+names, except for te default type.
+</para>
+
+<para>
+Some examples: 
+<itemizedlist>
+
+<listitem><para>
+  <type>igraph_vector_t</type> is a vector of
+  <type>igraph_real_t</type> elements. Its functions are
+  <function>igraph_vector_init</function>,
+  <function>igraph_vector_destroy</function>,
+  <function>igraph_vector_sort</function>, etc.
+</para></listitem>
+
+<listitem><para>
+  <type>igraph_vector_bool_t</type> is a vector of
+  <type>igraph_bool_t</type> elements, initialize it with
+  <function>igraph_vector_bool_init</function>, destroy it with
+  <function>igraph_vector_bool_destroy</function>, etc.
+</para></listitem>
+
+<listitem><para>
+  <type>igraph_heap_t</type> is a maximum heap with
+  <type>igraph_real_t</type> elements. The corresponding functions are
+  <function>igraph_heap_init</function>,
+  <function>igraph_heap_pop</function>, etc.
+</para></listitem>
+
+<listitem><para>
+  <type>igraph_heap_min_t</type> is a minimum heap with
+  <type>igraph_real_t</type> elements. The corresponding functions are
+  called <function>igraph_heap_min_init</function>,
+  <function>igraph_heap_min_pop</function>, etc. 
+</para></listitem>
+
+<listitem><para>
+  <type>igraph_heap_long_t</type> is a maximum heap with <type>long
+  int</type> elements. Its function have the
+  <function>igraph_heap_long_</function> prefix.
+</para></listitem>
+
+<listitem><para>
+  <type>igraph_heap_min_long_t</type> is a minimum heap containing
+  <type>long int</type> elements. Its functions have the 
+  <function>igraph_heap_min_long_</function> prefix.
+</para></listitem>
+
+</itemizedlist>
+</para>
+
+<para>
+Note that the <link linkend="VECTOR">VECTOR</link> and the <link
+linkend="MATRIX">MATRIX</link> macros can be used on <emphasis>all</emphasis>
+vector and matrix types. 
+</para>
+
+</section>

@@ -115,8 +115,7 @@ int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res) {
 /**
  * \ingroup layout
  * \function igraph_layout_circle
- * \brief Places the vertices uniformly on a circle, in the order of
- * vertex ids.
+ * \brief Places the vertices uniformly on a circle, in the order of vertex ids.
  * 
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized graph object. This will
@@ -204,8 +203,7 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 /**
  * \ingroup layout
  * \function igraph_layout_fruchterman_reingold
- * \brief Places the vertices on a plane according to the
- * Fruchterman-Reingold algorithm.
+ * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  *
  * </para><para>
  * This is a force-directed layout, see Fruchterman, T.M.J. and
@@ -342,7 +340,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 
 /**
  * \function igraph_layout_fruchterman_reingold_3d
- * \brief This is the 3D version of the force based
+ * \brief 3D Fruchterman-Reingold algorithm.
+ * 
+ * This is the 3D version of the force based
  * Fruchterman-Reingold layout (see \ref
  * igraph_layout_fruchterman_reingold for the 2D version
  *
@@ -499,8 +499,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 /**
  * \ingroup layout
  * \function igraph_layout_kamada_kawai
- * \brief Places the vertices on a plane according the Kamada-Kawai
- * algorithm. 
+ * \brief Places the vertices on a plane according the Kamada-Kawai algorithm. 
  *
  * </para><para>
  * This is a force directed layout, see  Kamada, T. and Kawai, S.: An
@@ -598,8 +597,9 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 
 /**
  * \function igraph_layout_kamada_kawai_3d
- * \brief 3D version of the force based Kamada-Kawai layout, the pair
- * of the \ref igraph_layout_kamada_kawai 2D layout generator
+ * \brief 3D version of the force based Kamada-Kawai layout.
+ *
+ * The pair of the \ref igraph_layout_kamada_kawai 2D layout generator
  * 
  * </para><para>
  * This function was ported from the SNA R package.
@@ -1635,7 +1635,7 @@ int igraph_i_move_nodes(igraph_matrix_t *pos,
 
 /**
  * \function igraph_layout_graphopt
- * Optimizes vertex layout via the graphopt algorithm.
+ * \brief Optimizes vertex layout via the graphopt algorithm.
  * 
  * </para><para>
  * This is a port of the graphopt layout algorithm by Michael Schmuhl.

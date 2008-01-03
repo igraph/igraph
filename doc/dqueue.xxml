@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Dqueues">
+<title>Double-ended queues</title>
+
+<!-- doxrox-include igraph_dqueue_init -->
+<!-- doxrox-include igraph_dqueue_destroy -->
+<!-- doxrox-include igraph_dqueue_empty -->
+<!-- doxrox-include igraph_dqueue_full -->
+<!-- doxrox-include igraph_dqueue_clear -->
+<!-- doxrox-include igraph_dqueue_size -->
+<!-- doxrox-include igraph_dqueue_head -->
+<!-- doxrox-include igraph_dqueue_back -->
+<!-- doxrox-include igraph_dqueue_pop -->
+<!-- doxrox-include igraph_dqueue_pop_back -->
+<!-- doxrox-include igraph_dqueue_push -->
+
+</section>
