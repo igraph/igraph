@@ -538,8 +538,7 @@ int FUNCTION(igraph_vector,insert)(TYPE(igraph_vector) *v, long int pos,
 
 /**
  * \ingroup vector
- * \section igraph_vector_accessing_elements Accessing elements of a
- * \type igraph_vector_t.
+ * \section igraph_vector_accessing_elements Accessing elements
  * 
  * <para>The simplest way to access an element of a vector is to use the
  * \ref VECTOR macro. This macro can be used both for querying and setting

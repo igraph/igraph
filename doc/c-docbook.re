@@ -32,7 +32,7 @@ BASE
 
 WITH 
 
-igraph_real_t 
+igraph_real_t
 
 REPLACE ----- function object, extract its signature --------------------------
 

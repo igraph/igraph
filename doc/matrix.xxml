@@ -18,32 +18,91 @@
 <!-- doxrox-include igraph_matrix_destroy -->
 </section>
 
-<section>
-<!-- doxrox-include igraph_matrix_accessing_elements -->
-<!-- doxrox-include MATRIX -->
+<section><title>Initializing elements</title>
+<!-- doxrox-include igraph_matrix_null -->
+<!-- doxrox-include igraph_matrix_fill -->
+</section>
+
+<section><title>Copying matrices</title>
+<!-- doxrox-include igraph_matrix_copy_to -->
+<!-- doxrox-include igraph_matrix_update -->
+<!-- doxrox-include igraph_matrix_swap -->
 </section>
 
 <section>
-<title>Matrix query operations</title>
-<!-- doxrox-include igraph_matrix_size -->
-<!-- doxrox-include igraph_matrix_nrow -->
-<!-- doxrox-include igraph_matrix_ncol -->
-<!-- doxrox-include igraph_matrix_max -->
+<!-- doxrox-include igraph_matrix_accessing_elements -->
+<!-- doxrox-include MATRIX -->
+<!-- doxrox-include igraph_matrix_e -->
+<!-- doxrox-include igraph_matrix_e_ptr -->
+<!-- doxrox-include igraph_matrix_set --> 
+</section>
+
+<section><title>Operations on rows and columns</title>
+<!--doxrox-include igraph_matrix_get_row -->
+<!--doxrox-include igraph_matrix_get_col -->
+<!--doxrox-include igraph_matrix_set_row -->
+<!--doxrox-include igraph_matrix_set_col -->
+<!--doxrox-include igraph_matrix_swap_rows -->
+<!--doxrox-include igraph_matrix_swap_cols -->
+<!--doxrox-include igraph_matrix_select_rows -->
+<!--doxrox-include igraph_matrix_select_cols -->
 </section>
 
 <section>
 <title>Matrix operations</title>
+<!-- doxrox-include igraph_matrix_add_constant -->
 <!-- doxrox-include igraph_matrix_scale -->
-<!-- doxrox-include igraph_matrix_add_rows -->
-<!-- doxrox-include igraph_matrix_add_cols -->
-<!-- doxrox-include igraph_matrix_resize -->
-<!-- doxrox-include igraph_matrix_remove_col -->
+<!-- doxrox-include igraph_matrix_add -->
+<!-- doxrox-include igraph_matrix_sub -->
+<!-- doxrox-include igraph_matrix_mul_elements -->
+<!-- doxrox-include igraph_matrix_div_elements -->
+<!-- doxrox-include igraph_matrix_sum -->
+<!-- doxrox-include igraph_matrix_prod -->
+<!-- doxrox-include igraph_matrix_rowsum -->
+<!-- doxrox-include igraph_matrix_colsum -->
+<!-- doxrox-include igraph_matrix_transpose -->
 </section>
 
 <section>
-<title>Functions for internal use only</title>
-<!-- doxrox-include igraph_matrix_permdelete_rows -->
-<!-- doxrox-include igraph_matrix_delete_rows_neg -->
+<title>Combining matrices</title>
+<!-- doxrox-include igraph_matrix_rbind -->
+<!-- doxrox-include igraph_matrix_cbind -->
+</section>
+
+<section>
+<title>Finding minimum and maximum</title>
+<!-- doxrox-include igraph_matrix_min -->
+<!-- doxrox-include igraph_matrix_max -->
+<!-- doxrox-include igraph_matrix_which_min -->
+<!-- doxrox-include igraph_matrix_which_max -->
+<!-- doxrox-include igraph_matrix_minmax -->
+<!-- doxrox-include igraph_matrix_which_minmax -->
+</section>
+
+<section>
+<title>Matrix properties</title>
+<!-- doxrox-include igraph_matrix_empty -->
+<!-- doxrox-include igraph_matrix_isnull -->
+<!-- doxrox-include igraph_matrix_size -->
+<!-- doxrox-include igraph_matrix_nrow -->
+<!-- doxrox-include igraph_matrix_ncol -->
+<!-- doxrox-include igraph_matrix_is_symmetric -->
+<!-- doxrox-include igraph_matrix_is_equal -->
+<!-- doxrox-include igraph_matrix_maxdifference -->
+</section>
+
+<section><title>Searching for elements</title>
+<!-- doxrox-include igraph_matrix_contains -->
+<!-- doxrox-include igraph_matrix_search -->
+</section>
+
+<section>
+<title>Resizing operations</title>
+<!-- doxrox-include igraph_matrix_resize -->
+<!-- doxrox-include igraph_matrix_add_rows -->
+<!-- doxrox-include igraph_matrix_add_cols -->
+<!-- doxrox-include igraph_matrix_remove_row -->
+<!-- doxrox-include igraph_matrix_remove_col -->
 </section>
 
 </section>
