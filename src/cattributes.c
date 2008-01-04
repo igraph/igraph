@@ -976,7 +976,6 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
  * 
  * Time complexity: O(Ag), the number of graph attributes.
  */
- */
 const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
   
   igraph_i_cattributes_t *attr=graph->attr;
