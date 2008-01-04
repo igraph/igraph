@@ -25,27 +25,6 @@
 #include "memory.h"
 #include "igraph.h"
 
-/**
- * \section about_attributes
- * 
- * <para>Attributes are numbers or strings (or basically any data
- * structure) associated with the vertices or edges of a graph, or
- * with the graph itself. Eg. you may associate symbolic names with
- * vertices or numeric weights with the edges of a graph. </para>
- * 
- * <para>Attribute handling has been largely changed in \a igraph
- * 0.2. From now on it is possible to attach an attribute handling
- * interface to \a igraph. This is simply a table of functions, of
- * type \ref igraph_attribute_table_t. This functions are invoked to
- * notify the attribute handling code about the structural changes in
- * a graph. See the documentation of this type for details.</para>
- *
- * <para>By default there is no attribute interface attached to \a igraph,
- * to attach one, call \ref igraph_i_set_attribute_table with your new
- * table. </para>
- *
- */
-
 int igraph_i_attribute_init(igraph_t *graph, void *attr) {
   graph->attr=0;
   if (igraph_i_attribute_table) {

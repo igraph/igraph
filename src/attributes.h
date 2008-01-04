@@ -42,6 +42,60 @@ __BEGIN_DECLS
 /* Attributes                                         */
 /* -------------------------------------------------- */
 
+/**
+ * \section about_attributes
+ * 
+ * <para>Attributes are numbers or strings (or basically any kind
+ * of data) associated with the vertices or edges of a graph, or
+ * with the graph itself. Eg. you may label vertices with symbolic names
+ * or attach numeric weights to the edges of a graph. </para>
+ * 
+ * <para>igraph attributes are designed to be flexible and extensible. 
+ * In igraph attributes are implemented via an interface abstraction:
+ * any type implementing the functions in the interface, can be used
+ * for storing vertex, edge and graph attributes. This means that
+ * different attribute implementations can be used together with
+ * igraph. This is reasonable: if igraph is used from Python attributes can be
+ * of any Python type, from GNU R all R types are allowed. There is an
+ * experimental attribute implementation to be used when programming
+ * in C, but by default it is currently turned off.</para>
+ * 
+ * <para>First we briefly look over how attribute handlers can be
+ * implemented. This is not something a used does every day. It is
+ * rather typically the job of the high level interface writers. (But
+ * it is possible to write an interface without implementing
+ * attributes.) Then we show the experimental C attribute handler.</para>
+ */
+
+/**
+ * \section about_attribute_table
+ * <para>It is possible to attach an attribute handling
+ * interface to \a igraph. This is simply a table of functions, of
+ * type \ref igraph_attribute_table_t. These functions are invoked to
+ * notify the attribute handling code about the structural changes in
+ * a graph. See the documentation of this type for details.</para>
+ *
+ * <para>By default there is no attribute interface attached to \a igraph,
+ * to attach one, call \ref igraph_i_set_attribute_table with your new
+ * table. </para>
+ *
+ */
+
+/**
+ * \typedef igraph_attribute_type_t
+ * The possible types of the attributes. 
+ * 
+ * Note that this is only the
+ * type communicated by the attribute interface towards igraph
+ * functions. Eg. in the GNU R attribute handler, it is safe to say
+ * that all complex R object attributes are strings, as long as this
+ * interface is able to serialize them into strings.
+ * \enumval IGRAPH_ATTRIBUTE_NUMERIC TODO
+ * \enumval IGRAPH_ATTRIBUTE_STRING TODO
+ * \enumval IGRAPH_ATTRIBUTE_R_OBJECT TODO
+ * \enumval IGRAPH_ATTRIBUTE_PY_OBJECT TODO
+ * 
+ */
 typedef enum { IGRAPH_ATTRIBUTE_DEFAULT=0,
 	       IGRAPH_ATTRIBUTE_NUMERIC=1, 
 	       IGRAPH_ATTRIBUTE_STRING=2,
@@ -96,6 +150,32 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
  *    the new ones. Its length is the same as the number of edges in the new 
  *    graph, and for each edge it gives the id of the old edge (the edge in
  *    the old graph).
+ * \member get_info Query the attributes of a graph, the names and
+ *    types should be returned.
+ * \member has_attr Check whether a graph has the named
+ *    graph/vertex/edge attribute.
+ * \member gettype Query the type of a graph/vertex/edge attribute.
+ * \member get_numeric_graph_attr Query a numeric graph attribute. The
+ *    value should be placed as the first element of the \p value
+ *    vector.
+ * \member get_string_graph_attr Query a string graph attribute. The 
+ *    value should be placed as the first element of the \p value
+ *    string vector.
+ * \member get_numeric_vertex_attr Query a numeric vertex attribute,
+ *    for the vertices included in \p vs.
+ * \member get_string_vertex_attr Query a string vertex attribute, 
+ *    for the vertices included in \p vs.
+ * \member get_numeric_edge_attr Query a numeric edge attribute, for
+ *    the edges included in \p es.
+ * \member get_string_edge_attr Query a string edge attribute, for the 
+ *    edge included in \p es.
+ *
+ * Note that the <function>get_*_*_attr</function> are allowed to
+ * convert the attributes to numeric or string. E.g. if a vertex attribute
+ * is a GNU R complex data type, then
+ * <function>get_string_vertex_attribute</function> may serialize it
+ * into a string, but this probably makes sense only if
+ * <function>add_vertices</function> is able to deserialize it.
  */
 
 typedef struct igraph_attribute_table_t {
@@ -261,31 +341,123 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name);
 void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 				  igraph_bool_t v, igraph_bool_t e);
 
-#define GAN(graph, n) (igraph_cattribute_GAN((graph), (n)))
-#define GAS(graph, n) (igraph_cattribute_GAS((graph), (n)))
-#define VAN(graph, n, v) (igraph_cattribute_VAN((graph), (n), (v)))
-#define VAS(graph, n, v) (igraph_cattribute_VAS((graph), (n), (v)))
-#define EAN(graph, n, e) (igraph_cattribute_EAN((graph), (n), (e)))
-#define EAS(graph, n, e) (igraph_cattribute_EAS((graph), (n), (e)))
+/**
+ * \define GAN
+ * TODO
+ */
+#define GAN(graph,n) (igraph_cattribute_GAN((graph), (n)))
+/**
+ * \define GAS
+ * TODO
+ */
+#define GAS(graph,n) (igraph_cattribute_GAS((graph), (n)))
+/**
+ * \define VAN
+ * TODO
+ */
+#define VAN(graph,n,v) (igraph_cattribute_VAN((graph), (n), (v)))
+/**
+ * \define VAS
+ * TODO
+ */
+#define VAS(graph,n,v) (igraph_cattribute_VAS((graph), (n), (v)))
+/**
+ * \define EAN
+ * TODO
+ */
+#define EAN(graph,n,e) (igraph_cattribute_EAN((graph), (n), (e)))
+/**
+ * \define EAS
+ * TODO
+ */
+#define EAS(graph,n,e) (igraph_cattribute_EAS((graph), (n), (e)))
 
-#define SETGAN(graph, n, value) (igraph_cattribute_GAN_set((graph),(n),(value)))
-#define SETGAS(graph, n, value) (igraph_cattribute_GAS_set((graph),(n),(value)))
-#define SETVAN(graph, n, vid, value) (igraph_cattribute_VAN_set((graph),(n),(vid),(value)))
-#define SETVAS(graph, n, vid, value) (igraph_cattribute_VAS_set((graph),(n),(vid),(value)))
-#define SETEAN(graph, n, eid, value) (igraph_cattribute_EAN_set((graph),(n),(eid),(value)))
-#define SETEAS(graph, n, eid, value) (igraph_cattribute_EAS_set((graph),(n),(eid),(value)))
+/**
+ * \define SETGAN
+ * TODO
+ */
+#define SETGAN(graph,n,value) (igraph_cattribute_GAN_set((graph),(n),(value)))
+/**
+ * \define SETGAS
+ * TODO
+ */
+#define SETGAS(graph,n,value) (igraph_cattribute_GAS_set((graph),(n),(value)))
+/**
+ * \define SETVAN
+ * TODO
+ */
+#define SETVAN(graph,n,vid,value) (igraph_cattribute_VAN_set((graph),(n),(vid),(value)))
+/**
+ * \define SETVAS
+ * TODO
+ */
+#define SETVAS(graph,n,vid,value) (igraph_cattribute_VAS_set((graph),(n),(vid),(value)))
+/**
+ * \define SETEAN
+ * TODO
+ */
+#define SETEAN(graph,n,eid,value) (igraph_cattribute_EAN_set((graph),(n),(eid),(value)))
+/**
+ * \define SETEAS
+ * TODO
+ */
+#define SETEAS(graph,n,eid,value) (igraph_cattribute_EAS_set((graph),(n),(eid),(value)))
 
+/**
+ * \define SETVANV
+ * TODO
+ */
 #define SETVANV(graph,n,v) (igraph_cattribute_VAN_setv((graph),(n),(v)))
+/**
+ * \define SETVASV
+ * TODO
+ */
 #define SETVASV(graph,n,v) (igraph_cattribute_VAS_setv((graph),(n),(v)))
+/**
+ * \define SETEANV
+ * TODO
+ */
 #define SETEANV(graph,n,v) (igraph_cattribute_EAN_setv((graph),(n),(v)))
+/**
+ * \define SETEASV
+ * TODO
+ */
 #define SETEASV(graph,n,v) (igraph_cattribute_EAS_setv((graph),(n),(v)))
 
-#define DELGA(graph, n) (igraph_cattribute_remove_g((graph),(n)))
-#define DELVA(graph, n) (igraph_cattribute_remove_v((graph),(n)))
-#define DELEA(graph, n) (igraph_cattribute_remove_e((graph),(n)))
+/**
+ * \define DELGA
+ * TODO
+ */
+#define DELGA(graph,n) (igraph_cattribute_remove_g((graph),(n)))
+/**
+ * \define DELVA
+ * TODO
+ */
+#define DELVA(graph,n) (igraph_cattribute_remove_v((graph),(n)))
+/**
+ * \define DELEA
+ * TODO
+ */
+#define DELEA(graph,n) (igraph_cattribute_remove_e((graph),(n)))
+/**
+ * \define DELGAS
+ * TODO
+ */
 #define DELGAS(graph) (igraph_cattribute_remove_all((graph),1,0,0))
+/**
+ * \define DELVAS
+ * TODO
+ */
 #define DELVAS(graph) (igraph_cattribute_remove_all((graph),0,1,0))
+/**
+ * \define DELEAS
+ * TODO
+ */
 #define DELEAS(graph) (igraph_cattribute_remove_all((graph),0,0,1))
+/**
+ * \define DELALL
+ * TODO
+*/
 #define DELALL(graph) (igraph_cattribute_remove_all((graph),1,1,1))
 
 __END_DECLS

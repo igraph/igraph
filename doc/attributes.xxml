@@ -7,11 +7,75 @@
 <chapter id="igraph-Attributes">
 <title>Graph, Vertex and Edge Attributes</title>
 
+<!-- doxrox-include about_attributes -->
+
 <section>
 <title>The Attribute Handler Interface</title>
-<!-- doxrox-include about_attributes -->
+<!-- doxrox-include about_attribute_table -->
 <!-- doxrox-include igraph_attribute_table_t -->
 <!-- doxrox-include igraph_i_set_attribute_table -->
+<!-- doxrox-include igraph_attribute_type_t -->
+</section>
+
+<section>
+<title>Accessing attributes from C</title>
+
+<!-- doxrox-include cattributes -->
+
+<section><title>Query attributes</title>
+<!-- doxrox-include igraph_cattribute_list -->
+<!-- doxrox-include igraph_cattribute_GAN -->
+<!-- doxrox-include GAN -->
+<!-- doxrox-include igraph_cattribute_GAS -->
+<!-- doxrox-include GAS -->
+<!-- doxrox-include igraph_cattribute_VAN -->
+<!-- doxrox-include VAN -->
+<!-- doxrox-include igraph_cattribute_VAS -->
+<!-- doxrox-include VAS -->
+<!-- doxrox-include igraph_cattribute_EAN -->
+<!-- doxrox-include EAN -->
+<!-- doxrox-include igraph_cattribute_EAS -->
+<!-- doxrox-include EAS -->
+</section>
+
+<section>
+<title>Set attributes</title>
+<!-- doxrox-include igraph_cattribute_GAN_set -->
+<!-- doxrox-include SETGAN -->
+<!-- doxrox-include igraph_cattribute_GAS_set -->
+<!-- doxrox-include SETGAS -->
+<!-- doxrox-include igraph_cattribute_VAN_set -->
+<!-- doxrox-include SETVAN -->
+<!-- doxrox-include igraph_cattribute_VAS_set -->
+<!-- doxrox-include SETVAS -->
+<!-- doxrox-include igraph_cattribute_EAN_set -->
+<!-- doxrox-include SETEAN -->
+<!-- doxrox-include igraph_cattribute_EAS_set -->
+<!-- doxrox-include SETEAS -->
+<!-- doxrox-include igraph_cattribute_VAN_setv -->
+<!-- doxrox-include SETVANV -->
+<!-- doxrox-include igraph_cattribute_VAS_setv -->
+<!-- doxrox-include SETVASV -->
+<!-- doxrox-include igraph_cattribute_EAN_setv -->
+<!-- doxrox-include SETEANV -->
+<!-- doxrox-include igraph_cattribute_EAS_setv -->
+<!-- doxrox-include SETEASV -->
+</section>
+
+<section><title>Remove attributes</title>
+<!-- doxrox-include igraph_cattribute_remove_g -->
+<!-- doxrox-include DELGA -->
+<!-- doxrox-include igraph_cattribute_remove_v -->
+<!-- doxrox-include DELVA -->
+<!-- doxrox-include igraph_cattribute_remove_e -->
+<!-- doxrox-include DELEA -->
+<!-- doxrox-include igraph_cattribute_remove_all -->
+<!-- doxrox-include DELGAS -->
+<!-- doxrox-include DELVAS -->
+<!-- doxrox-include DELEAS -->
+<!-- doxrox-include DELALL -->
+</section>
+
 </section>
 
 </chapter>

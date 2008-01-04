@@ -69,9 +69,9 @@ iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(SRCDIR)/igraph.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
 	$(SRCDIR)/igraph.h
 
-attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(SRCDIR)/attributes.h
+attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(SRCDIR)/attributes.h $(SRCDIR)/cattributes.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c \
-	$(SRCDIR)/attributes.h
+	$(SRCDIR)/attributes.h $(SRCDIR)/cattributes.c
 
 layout.xml: layout.xxml $(SRCDIR)/layout.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c

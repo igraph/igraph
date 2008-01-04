@@ -897,6 +897,49 @@ igraph_attribute_table_t igraph_cattribute_table={
 
 /* -------------------------------------- */
 
+/**
+ * \section cattributes
+ * <para>There is an experimental attribute handler that can be used
+ * from C code. In this section we show how this works. This attribute
+ * handler is by default not attached (the default is no attribute
+ * handler), so we first need to attach it: 
+ * <programlisting>
+ * igraph_i_set_attribute_table(&amp;igraph_cattribute_table);
+ * </programlisting>
+ * </para>
+ * <para>Now the attribute functions are available. Please note that
+ * the attribute handler must be attached before you call any other
+ * igraph functions, otherwise you might end up with graphs without
+ * attributes and an active attribute handler, which might cause
+ * unexpected program behaviour. The rule is that you attach the
+ * attribute handler in the beginning of your
+ * <function>main()</function> and never touch it again. (Detaching
+ * the attribute handler might lead to memory leaks.)</para>
+ * 
+ * <para>It is not currently possible to have attribute handlers on a
+ * per-graph basis. All graphs in an application must be managed with
+ * the same attribute handler. (Including the default case when there
+ * is no attribute handler at all.</para>
+ * 
+ * <para>The C attribute handler supports attaching real numbers and
+ * character strings as attributes. No vectors are allowed, ie. every
+ * vertex might have an attribute called <code>name</code>, but it is
+ * not possible to have a <code>coords</code> graph (or other)
+ * attribute which is a vector of numbers.</para>
+ */
+
+/**
+ * \function igraph_cattribute_GAN
+ * Query a numeric graph attribute.
+ * 
+ * Returns the value of the given numeric graph attribute.
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute to query.
+ * \return The value of the attribute.
+ *
+ * Time complexity: O(Ag), the number of graph attributes.
+ */
 igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
 
   igraph_i_cattributes_t *attr=graph->attr;
@@ -916,6 +959,20 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
   return VECTOR(*num)[0];
 }
 
+/**
+ * \function igraph_cattribute_GAS
+ * Query a string graph attribute.
+ * 
+ * Returns a <type>const</type> pointer to the string graph attribute
+ * specified in \p name.
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute to query.
+ * \return The value of the attribute.
+ *
+ * Time complexity: O(Ag), the number of graph attributes.
+ */
+ */
 const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
   
   igraph_i_cattributes_t *attr=graph->attr;
@@ -935,6 +992,18 @@ const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
   return STR(*str, 0);  
 }
 
+/**
+ * \function igraph_cattribute_VAN
+ * Query a numeric vertex attribute.
+ * 
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param vid The id of the queried vertex.
+ * \return The value of the attribute.
+ * 
+ * Time complexity: O(Av), the number of vertex attributes.
+ */
 igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
 				      igraph_integer_t vid) {
   igraph_i_cattributes_t *attr=graph->attr;
@@ -954,6 +1023,18 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
   return VECTOR(*num)[(long int)vid];
 }
 
+/**
+ * \function igraph_cattribute_VAS
+ * Query a string vertex attribute.
+ * 
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param vid The id of the queried vertex.
+ * \return The value of the attribute.
+ *
+ * Time complexity: O(Av), the number of vertex attributes.
+ */
 const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
 				    igraph_integer_t vid) {
   igraph_i_cattributes_t *attr=graph->attr;
@@ -973,6 +1054,18 @@ const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
   return STR(*str, (long int)vid);  
 }
 
+/**
+ * \function igraph_cattribute_EAN
+ * Query a numeric edge attribute.
+ * 
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param eid The id of the queried edge.
+ * \return The value of the attribute.
+ *
+ * Time complexity: O(Ae), the number of edge attributes.
+ */
 igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
 				      igraph_integer_t eid) {  
   igraph_i_cattributes_t *attr=graph->attr;
@@ -992,6 +1085,18 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
   return VECTOR(*num)[(long int)eid];
 }
 
+/**
+ * \function igraph_cattribute_EAS
+ * Query a string edge attribute.
+ * 
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param eid The id of the queried edge.
+ * \return The value of the attribute.
+ *
+ * Time complexity: O(Ae), the number of edge attributes.
+ */
 const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 				    igraph_integer_t eid) {
   igraph_i_cattributes_t *attr=graph->attr;
@@ -1011,6 +1116,26 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
   return STR(*str, (long int)eid);  
 }
 
+/**
+ * \function igraph_cattribute_list
+ * List all attributes
+ * 
+ * See \ref igraph_attribute_type_t for the various attribute types.
+ * \param graph The input graph.
+ * \param gnames String vector, the names of the graph attributes.
+ * \param gtypes Numeric vector, the types of the graph attributes.
+ * \param vnames String vector, the names of the vertex attributes.
+ * \param vtypes Numeric vector, the types of the vertex attributes.
+ * \param enames String vector, the names of the edge attributes.
+ * \param etypes Numeric vector, the types of the edge attributes.
+ * \return Error code.
+ * 
+ * Naturally, the string vector with the attribute names and the
+ * numeric vector with the attribute types are in the right order,
+ * i.e. the first name corresponds to the first type, etc.
+ * 
+ * Time complexity: O(Ag+Av+Ae), the number of all attributes.
+ */
 int igraph_cattribute_list(const igraph_t *graph,
 			   igraph_strvector_t *gnames, igraph_vector_t *gtypes,
 			   igraph_strvector_t *vnames, igraph_vector_t *vtypes,
@@ -1019,6 +1144,10 @@ int igraph_cattribute_list(const igraph_t *graph,
 				      enames, etypes);
 }
 
+/**
+ * \function igraph_cattribute_GAN_set
+ * TODO
+ */
 int igraph_cattribute_GAN_set(igraph_t *graph, const char *name, 
 			      igraph_real_t value) {
 
@@ -1063,6 +1192,10 @@ int igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_GAS_set
+ * TODO
+ */
 int igraph_cattribute_GAS_set(igraph_t *graph, const char *name, 
 			      const char *value) {
 
@@ -1107,6 +1240,10 @@ int igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_VAN_set
+ * TODO
+ */
 int igraph_cattribute_VAN_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t vid, igraph_real_t value) {
   
@@ -1152,6 +1289,10 @@ int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_VAS_set
+ * TODO
+ */
 int igraph_cattribute_VAS_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t vid, const char *value) {
   
@@ -1196,6 +1337,10 @@ int igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_EAN_set
+ * TODO
+ */
 int igraph_cattribute_EAN_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t eid, igraph_real_t value) {
   
@@ -1241,6 +1386,10 @@ int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_EAS_set
+ * TODO
+ */
 int igraph_cattribute_EAS_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t eid, const char *value) {
 
@@ -1284,6 +1433,11 @@ int igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
 
   return 0;
 }
+
+/**
+ * \function igraph_cattribute_VAN_setv
+ * TODO
+ */
 
 int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name, 
 			       const igraph_vector_t *v) {
@@ -1335,6 +1489,10 @@ int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_VAS_setv
+ * TODO
+ */
 int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
 			       const igraph_strvector_t *sv) {
   
@@ -1386,6 +1544,10 @@ int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_EAN_setv
+ * TODO
+ */
 int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name, 
 			       const igraph_vector_t *v) {
 
@@ -1437,6 +1599,10 @@ int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
   return 0;
 }
 
+/**
+ * \function igraph_cattribute_EAS_setv
+ * TODO
+ */
 int igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
 			       const igraph_strvector_t *sv) {
 
@@ -1502,6 +1668,10 @@ void igraph_i_cattribute_free_rec(igraph_i_attribute_record_t *rec) {
   igraph_Free(rec);
 }
 
+/**
+ * \function igraph_cattribute_remove_g
+ * TODO
+ */
 void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
 
   igraph_i_cattributes_t *attr=graph->attr;
@@ -1517,6 +1687,10 @@ void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
   }  
 }
 
+/**
+ * \function igraph_cattribute_remove_v
+ * TODO
+ */
 void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
 
   igraph_i_cattributes_t *attr=graph->attr;
@@ -1532,6 +1706,10 @@ void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
   }  
 }
 
+/**
+ * \function igraph_cattribute_remove_e
+ * TODO
+ */
 void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
 
   igraph_i_cattributes_t *attr=graph->attr;
@@ -1547,6 +1725,10 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
   }  
 }
 
+/**
+ * \function igraph_cattribute_remove_all
+ * TODO
+ */
 void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 				  igraph_bool_t v, igraph_bool_t e) {
 
