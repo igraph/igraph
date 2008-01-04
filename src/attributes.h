@@ -89,11 +89,16 @@ __BEGIN_DECLS
  * type communicated by the attribute interface towards igraph
  * functions. Eg. in the GNU R attribute handler, it is safe to say
  * that all complex R object attributes are strings, as long as this
- * interface is able to serialize them into strings.
- * \enumval IGRAPH_ATTRIBUTE_NUMERIC TODO
- * \enumval IGRAPH_ATTRIBUTE_STRING TODO
- * \enumval IGRAPH_ATTRIBUTE_R_OBJECT TODO
- * \enumval IGRAPH_ATTRIBUTE_PY_OBJECT TODO
+ * interface is able to serialize them into strings. See also \ref
+ * igraph_attribute_table_t.
+ * \enumval IGRAPH_ATTRIBUTE_DEFAULT Currently not used for anything.
+ * \enumval IGRAPH_ATTRIBUTE_NUMERIC Numeric attribute.
+ * \enumval IGRAPH_ATTRIBUTE_STRING Attribute that can be converted to
+ *   a string.
+ * \enumval IGRAPH_ATTRIBUTE_R_OBJECT An R object. This is usually
+ *   ignored by the igraph functions.
+ * \enumval IGRAPH_ATTRIBUTE_PY_OBJECT A Python objcet. Usually
+ *   ignored by the igraph functions.
  * 
  */
 typedef enum { IGRAPH_ATTRIBUTE_DEFAULT=0,
@@ -343,121 +348,242 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 
 /**
  * \define GAN
- * TODO
+ * Query a numeric graph attribute.
+ * 
+ * This is shorthand for \ref igraph_cattribute_GAN().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \return The value of the attribute.
  */
 #define GAN(graph,n) (igraph_cattribute_GAN((graph), (n)))
 /**
  * \define GAS
- * TODO
+ * Query a string graph attribute.
+ * 
+ * This is shorthand for \ref igraph_cattribute_GAS().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \return The value of the attribute.
  */
 #define GAS(graph,n) (igraph_cattribute_GAS((graph), (n)))
 /**
  * \define VAN
- * TODO
+ * Query a numeric vertex attribute.
+ * 
+ * This is shorthand for \ref igraph_cattribute_VAN().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v The id of the vertex.
+ * \return The value of the attribute.
  */
 #define VAN(graph,n,v) (igraph_cattribute_VAN((graph), (n), (v)))
 /**
  * \define VAS
- * TODO
+ * Query a string vertex attribute.
+ * 
+ * This is shorthand for \ref igraph_cattribute_VAS().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v The id of the vertex.
+ * \return The value of the attribute.
  */
 #define VAS(graph,n,v) (igraph_cattribute_VAS((graph), (n), (v)))
 /**
  * \define EAN
- * TODO
+ * Query a numeric edge attribute.
+ * 
+ * This is shorthand for \ref igraph_cattribute_EAN().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param e The id of the edge.
+ * \return The value of the attribute.
  */
 #define EAN(graph,n,e) (igraph_cattribute_EAN((graph), (n), (e)))
 /**
  * \define EAS
- * TODO
+ * Query a string edge attribute.
+ * 
+ * This is shorthand for \ref igraph_cattribute_EAS().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param e The id of the edge.
+ * \return The value of the attribute.
  */
 #define EAS(graph,n,e) (igraph_cattribute_EAS((graph), (n), (e)))
 
 /**
  * \define SETGAN
- * TODO
+ * Set a numeric graph attribute
+ * 
+ * This is a shorthand for \ref igraph_cattribute_GAN_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param value The new value of the attribute.
+ * \return Error code.
  */
 #define SETGAN(graph,n,value) (igraph_cattribute_GAN_set((graph),(n),(value)))
 /**
  * \define SETGAS
- * TODO
+ * Set a string graph attribute
+ * 
+ * This is a shorthand for \ref igraph_cattribute_GAS_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param value The new value of the attribute.
+ * \return Error code.
  */
 #define SETGAS(graph,n,value) (igraph_cattribute_GAS_set((graph),(n),(value)))
 /**
  * \define SETVAN
- * TODO
+ * Set a numeric vertex attribute
+ * 
+ * This is a shorthand for \ref igraph_cattribute_VAN_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vid Ids of the vertices to set.
+ * \param value The new value of the attribute.
+ * \return Error code.
  */
 #define SETVAN(graph,n,vid,value) (igraph_cattribute_VAN_set((graph),(n),(vid),(value)))
 /**
  * \define SETVAS
- * TODO
+ * Set a string vertex attribute
+ * 
+ * This is a shorthand for \ref igraph_cattribute_VAS_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vid Ids of the vertices to set.
+ * \param value The new value of the attribute.
+ * \return Error code.
  */
 #define SETVAS(graph,n,vid,value) (igraph_cattribute_VAS_set((graph),(n),(vid),(value)))
 /**
  * \define SETEAN
- * TODO
+ * Set a numeric edge attribute
+ * 
+ * This is a shorthand for \ref igraph_cattribute_EAN_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param eid Ids of the edges to set.
+ * \param value The new value of the attribute.
+ * \return Error code.
  */
 #define SETEAN(graph,n,eid,value) (igraph_cattribute_EAN_set((graph),(n),(eid),(value)))
 /**
  * \define SETEAS
- * TODO
+ * Set a string edge attribute
+ * 
+ * This is a shorthand for \ref igraph_cattribute_EAS_set().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param eid Ids of the edges to set.
+ * \param value The new value of the attribute.
+ * \return Error code.
  */
 #define SETEAS(graph,n,eid,value) (igraph_cattribute_EAS_set((graph),(n),(eid),(value)))
 
 /**
  * \define SETVANV
- * TODO
+ *  Set a numeric vertex attribute for all vertices
+ * 
+ * This is a shorthand for \ref igraph_cattribute_VAN_setv().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v Vector containing the new values of the attributes.
+ * \return Error code.
  */
 #define SETVANV(graph,n,v) (igraph_cattribute_VAN_setv((graph),(n),(v)))
 /**
  * \define SETVASV
- * TODO
+ *  Set a string vertex attribute for all vertices
+ * 
+ * This is a shorthand for \ref igraph_cattribute_VAS_setv().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v Vector containing the new values of the attributes.
+ * \return Error code.
  */
 #define SETVASV(graph,n,v) (igraph_cattribute_VAS_setv((graph),(n),(v)))
 /**
  * \define SETEANV
- * TODO
+ *  Set a numeric edge attribute for all vertices
+ * 
+ * This is a shorthand for \ref igraph_cattribute_EAN_setv().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v Vector containing the new values of the attributes.
  */
 #define SETEANV(graph,n,v) (igraph_cattribute_EAN_setv((graph),(n),(v)))
 /**
  * \define SETEASV
- * TODO
+ *  Set a string edge attribute for all vertices
+ * 
+ * This is a shorthand for \ref igraph_cattribute_EAS_setv().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param v Vector containing the new values of the attributes.
  */
 #define SETEASV(graph,n,v) (igraph_cattribute_EAS_setv((graph),(n),(v)))
 
 /**
  * \define DELGA
- * TODO
+ * Remove a graph attribute.
+ * 
+ * A shorthand for \ref igraph_cattribute_remove_g().
+ * \param graph The graph.
+ * \param n The name of the attribute to remove.
  */
 #define DELGA(graph,n) (igraph_cattribute_remove_g((graph),(n)))
 /**
  * \define DELVA
- * TODO
+ * Remove a vertex attribute.
+ * 
+ * A shorthand for \ref igraph_cattribute_remove_v().
+ * \param graph The graph.
+ * \param n The name of the attribute to remove.
  */
 #define DELVA(graph,n) (igraph_cattribute_remove_v((graph),(n)))
 /**
  * \define DELEA
- * TODO
+ * Remove an edge attribute.
+ * 
+ * A shorthand for \ref igraph_cattribute_remove_e().
+ * \param graph The graph.
+ * \param n The name of the attribute to remove.
  */
 #define DELEA(graph,n) (igraph_cattribute_remove_e((graph),(n)))
 /**
  * \define DELGAS
- * TODO
+ * Remove all graph attributes.
+ * 
+ * Calls \ref igraph_cattribute_remove_all(). 
+ * \param graph The graph.
  */
 #define DELGAS(graph) (igraph_cattribute_remove_all((graph),1,0,0))
 /**
  * \define DELVAS
- * TODO
+ * Remove all vertex attributes.
+ * 
+ * Calls \ref igraph_cattribute_remove_all(). 
+ * \param graph The graph.
  */
 #define DELVAS(graph) (igraph_cattribute_remove_all((graph),0,1,0))
 /**
  * \define DELEAS
- * TODO
+ * Remove all edge attributes.
+ * 
+ * Calls \ref igraph_cattribute_remove_all(). 
+ * \param graph The graph.
  */
 #define DELEAS(graph) (igraph_cattribute_remove_all((graph),0,0,1))
 /**
  * \define DELALL
- * TODO
-*/
+ * Remove all attributes.
+ * 
+ * All graph, vertex and edges attributes will be removed.
+ * Calls \ref igraph_cattribute_remove_all(). 
+ * \param graph The graph.
+ */
 #define DELALL(graph) (igraph_cattribute_remove_all((graph),1,1,1))
 
 __END_DECLS

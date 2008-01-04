@@ -465,7 +465,20 @@ typedef struct s_igraph_strvector {
   long int len;
 } igraph_strvector_t;
 
-#define STR(sv, i) ((const char *)((sv).data[(i)]))
+/**
+ * \define STR
+ * Indexing string vectors
+ * 
+ * This is a macro which allows to query the elements of a string vector in 
+ * simpler way than \ref igraph_strvector_get(). Note this macro cannot be 
+ * used to set an element, for that use \ref igraph_strvector_set().
+ * \param sv The string vector
+ * \param i The the index of the element.
+ * \return The element at position \p i.
+ * 
+ * Time complexity: O(1).
+ */
+#define STR(sv,i) ((const char *)((sv).data[(i)]))
 
 #define IGRAPH_STRVECTOR_NULL { 0,0 }
 #define IGRAPH_STRVECTOR_INIT_FINALLY(v, size) \

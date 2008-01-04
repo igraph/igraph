@@ -31,11 +31,28 @@
 #include <stdlib.h>
 
 /**
+ * \section igraph_strvector_t 
+ * <para>The <type>igraph_strvector_t</type> type is a vector of strings. 
+ * The current implementation is very simple and not too efficient. It
+ * works fine for not too many strings, e.g. the list of attribute
+ * names is returned in a string vector by \ref
+ * igraph_cattribute_list(). Do not expect great performace from this
+ * type.</para>
+ */
+
+/**
  * \ingroup strvector
- * \brief Initializes a string vector (constructor).
+ * \function igraph_strvector_init
+ * \brief Initialize
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * Reserves memory for the string vector, a string vector must be
+ * first initialized before calling other functions on it.
+ * All elements of the string vector are set to the empty string.
+ * \param sv Pointer to an initialized string vector.
+ * \param len The (initial) length of the string vector.
+ * \return Error code.
+ * 
+ * Time complexity: O(\p len).
  */
 
 int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
@@ -59,7 +76,15 @@ int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
 
 /**
  * \ingroup strvector
- * \brief Frees memory allocated for a string vector.
+ * \function igraph_strvector_destroy
+ * \brief Free allocated memory
+ * 
+ * Destroy a string vector. It may be reinitialized with \ref
+ * igraph_strvector_init() later.
+ * \param sv The string vector.
+ * 
+ * Time complexity: O(l), the total length of the strings, maybe less
+ * depending on the memory manager.
  */
 
 void igraph_strvector_destroy(igraph_strvector_t *sv) {
@@ -77,7 +102,17 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
 
 /**
  * \ingroup strvector
- * \brief Returns an element of a string vector.
+ * \function igraph_strvector_get
+ * \brief Indexing
+ * 
+ * Query an element of a string vector. See also the \ref STR macro
+ * for an easier way.
+ * \param sv The input string vector.
+ * \param idx The index of the element to query. 
+ * \param Pointer to a <type>char*</type>, the address of the string
+ *   is stored here.
+ *
+ * Time complexity: O(1).
  */
 
 void igraph_strvector_get(const igraph_strvector_t *sv, long int idx, 
@@ -90,10 +125,18 @@ void igraph_strvector_get(const igraph_strvector_t *sv, long int idx,
 
 /**
  * \ingroup strvector
- * \brief Sets an element of a string vector.
+ * \function igraph_strvector_set
+ * \brief Set an element
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * The provided \p value is copied into the \p idx position in the
+ * string vector.
+ * \param sv The string vector.
+ * \param idx The position to set.
+ * \param value The new value.
+ * \return Error code.
+ * 
+ * Time complexity: O(l), the length of the new string. Maybe more,
+ * depending on the memory management, if reallocation is needed.
  */
 
 int igraph_strvector_set(igraph_strvector_t *sv, long int idx, 
@@ -117,6 +160,22 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
   return 0;
 }
 
+/**
+ * \ingroup strvector
+ * \function igraph_strvector_set2
+ * \brief Sets an element
+ *
+ * This is almost the same as \ref igraph_strvector_set, but the new
+ * value is not a zero terminated string, but its length is given.
+ * \param sv The string vector.
+ * \param idx The position to set.
+ * \param value The new value.
+ * \param len The length of the new value.
+ * \return Error code.
+ * 
+ * Time complexity: O(l), the length of the new string. Maybe more,
+ * depending on the memory management, if reallocation is needed.
+ */
 int igraph_strvector_set2(igraph_strvector_t *sv, long int idx, 
 			  const char *value, int len) {
   assert(sv != 0);
@@ -141,6 +200,7 @@ int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_remove_section
  * \brief Removes a section from a string vector.
  * \todo repair realloc
  */
@@ -173,7 +233,14 @@ void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_remove
  * \brief Removes a single element from a string vector.
+ * 
+ * The string will be one shorter.
+ * \param The string vector.
+ * \param elem The index of the element to remove.
+ * 
+ * Time complexity: O(n), the length of the string.
  */
 
 void igraph_strvector_remove(igraph_strvector_t *v, long int elem) {
@@ -184,6 +251,7 @@ void igraph_strvector_remove(igraph_strvector_t *v, long int elem) {
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_move_interval
  * \brief Copies an interval of a string vector.
  */
 
@@ -208,11 +276,15 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
 
 /**
  * \ingroup strvector
- * \brief Copies a string vector (constructor).
+ * \function igraph_strvector_copy
+ * \brief Initialization by copying.
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
- * \todo why does the assert fail
+ * Initializes a string vector by copying another string vector.
+ * \param to Pointer to an uninitialized string vector.
+ * \param from The other string vector, to be copied.
+ * \return Error code.
+ * 
+ * Time complexity: O(l), the total length of the strings in \p from.
  */
 
 int igraph_strvector_copy(igraph_strvector_t *to, 
@@ -240,6 +312,19 @@ int igraph_strvector_copy(igraph_strvector_t *to,
   return 0;
 }
 
+/**
+ * \function igraph_strvector_append
+ * Concatenate two string vectors.
+ * 
+ * \param to The first string vector, the result is stored here.
+ * \param from The second string vector, it is kep unchanged.
+ * \return Error code.
+ * 
+ * Time complexity: O(n+l2), n is the number of strings in the new
+ * string vector, l2 is the total length of strings in the \p from
+ * string vector.
+ */
+
 int igraph_strvector_append(igraph_strvector_t *to,
 			    const igraph_strvector_t *from) {
   long int len1=igraph_strvector_size(to), len2=igraph_strvector_size(from);
@@ -263,6 +348,17 @@ int igraph_strvector_append(igraph_strvector_t *to,
   return 0;
 } 
 
+/**
+ * \function igraph_strvector_clear
+ * Remove all elements
+ * 
+ * After this operation the string vector will be empty.
+ * \param sv The string vector.
+ * 
+ * Time complexity: O(l), the total length of strings, maybe less,
+ * depending on the memory manager.
+ */
+
 void igraph_strvector_clear(igraph_strvector_t *sv) {
   long int i, n=igraph_strvector_size(sv);
   char **tmp;
@@ -280,10 +376,18 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
 
 /**
  * \ingroup strvector
- * \brief Resizes a string vector.
+ * \function igraph_strvector_resize
+ * \brief Resize
  *
- * @return Error code:
- *         - <b>IGRAPH_ENOMEM</b>: out of memory
+ * If the new size is bigger then empty strings are added, if it is
+ * smaller then the unneeded elements are removed.
+ * \param v The string vector.
+ * \param newsize The new size.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of strings if the vector is made
+ * bigger, O(l), the total length of the deleted strings if it is made
+ * smaller, maybe less, depending on memory management.
  */
 
 int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
@@ -343,8 +447,13 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_size
  * \brief Gives the size of a string vector.
- * \todo repair assert
+ * 
+ * \param sv The string vector.
+ * \return The length of the string vector.
+ * 
+ * Time complexity: O(1).
  */
 
 long int igraph_strvector_size(const igraph_strvector_t *sv) {
@@ -355,7 +464,15 @@ long int igraph_strvector_size(const igraph_strvector_t *sv) {
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_add
  * \brief Adds an element to the back of a string vector.
+ * 
+ * \param v The string vector. 
+ * \param value The string to add, it will be copied.
+ * \return Error code.
+ * 
+ * Time complexity: O(n+l), n is the total number of strings, l is the
+ * length of the new string.
  */
 
 int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
@@ -380,6 +497,7 @@ int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_permdelete
  * \brief Removes elements from a string vector (for internal use)
  */
 
@@ -407,6 +525,7 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *i
 
 /**
  * \ingroup strvector
+ * \function igraph_strvector_remove_negidx
  * \brief Removes elements from a string vector (for internal use)
  */
 

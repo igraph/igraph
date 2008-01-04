@@ -8,7 +8,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
-	      sparsematrix.xml stack.xml dqueue.xml heap.xml
+	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -101,14 +101,17 @@ community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(
 cliques.xml: cliques.xxml $(SRCDIR)/cliques.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c
 
-stack.xml: stack.xxml
+stack.xml: stack.xxml $(SRCDIR)/stack.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/stack.pmt
 
-dqueue.xml: dqueue.xxml
+dqueue.xml: dqueue.xxml $(SRCDIR)/dqueue.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/dqueue.pmt
 
-heap.xml: heap.xxml
+heap.xml: heap.xxml $(SRCDIR)/heap.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/heap.pmt
+
+strvector.xml: strvector.xxml $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

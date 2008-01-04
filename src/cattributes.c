@@ -938,6 +938,8 @@ igraph_attribute_table_t igraph_cattribute_table={
  * \param name The name of the attribute to query.
  * \return The value of the attribute.
  *
+ * \sa \ref GAN for a simpler interface.
+ * 
  * Time complexity: O(Ag), the number of graph attributes.
  */
 igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
@@ -970,6 +972,8 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
  * \param name The name of the attribute to query.
  * \return The value of the attribute.
  *
+ * \sa \ref GAS for a simpler interface.
+ * 
  * Time complexity: O(Ag), the number of graph attributes.
  */
  */
@@ -1002,6 +1006,8 @@ const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
  * \param vid The id of the queried vertex.
  * \return The value of the attribute.
  * 
+ * \sa \ref VAN macro for a simpler interface.
+ * 
  * Time complexity: O(Av), the number of vertex attributes.
  */
 igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
@@ -1032,6 +1038,8 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
  * \param name The name of the attribute.
  * \param vid The id of the queried vertex.
  * \return The value of the attribute.
+ * 
+ * \sa The macro \ref VAS for a simpler interface.
  *
  * Time complexity: O(Av), the number of vertex attributes.
  */
@@ -1063,6 +1071,8 @@ const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
  * \param name The name of the attribute.
  * \param eid The id of the queried edge.
  * \return The value of the attribute.
+ * 
+ * \sa \ref EAN for an easier interface.
  *
  * Time complexity: O(Ae), the number of edge attributes.
  */
@@ -1095,6 +1105,8 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
  * \param eid The id of the queried edge.
  * \return The value of the attribute.
  *
+ * \se \ref EAS if you want to type less.
+ * 
  * Time complexity: O(Ae), the number of edge attributes.
  */
 const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
@@ -1146,7 +1158,17 @@ int igraph_cattribute_list(const igraph_t *graph,
 
 /**
  * \function igraph_cattribute_GAN_set
- * TODO
+ * Set a numeric graph attribute
+ * 
+ * \param graph The graph.
+ * \param name Name of the graph attribute. If there is no such
+ *   attribute yet, then it will be added.
+ * \param value The (new) value of the graph attribute.
+ * \return Error code.
+ * 
+ * \se \ref SETGAN if you want to type less.
+ * 
+ * Time complexity: O(1).
  */
 int igraph_cattribute_GAN_set(igraph_t *graph, const char *name, 
 			      igraph_real_t value) {
@@ -1194,7 +1216,18 @@ int igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_GAS_set
- * TODO
+ * Set a string graph attribute.
+ * 
+ * \param graph The graph.
+ * \param name Name of the graph attribute. If there is no such
+ *   attribute yet, then it will be added.
+ * \param value The (new) value of the graph attribute. It will be
+ *   copied. 
+ * \return Error code.
+ * 
+ * \se \ref SETGAS if you want to type less.
+ * 
+ * Time complexity: O(1).
  */
 int igraph_cattribute_GAS_set(igraph_t *graph, const char *name, 
 			      const char *value) {
@@ -1242,7 +1275,21 @@ int igraph_cattribute_GAS_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAN_set
- * TODO
+ * Set a numeric vertex attribute
+ * 
+ * The attribute will be added if not present already. If present it
+ * will be overwritten. The same \p value is set for all vertices
+ * included in \p vid.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param vid Vertices for which to set the attribute.
+ * \param value The (new) value of the attribute.
+ * \return Error code.
+ * 
+ * \sa \ref SETVAN for a simpler way.
+ * 
+ * Time complexity: O(n), the number of vertices if the attribute is
+ * new, O(|vid|) otherwise.
  */
 int igraph_cattribute_VAN_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t vid, igraph_real_t value) {
@@ -1291,7 +1338,22 @@ int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAS_set
- * TODO
+ * Set a string vertex attribute
+ * 
+ * The attribute will be added if not present already. If present it
+ * will be overwritten. The same \p value is set for all vertices
+ * included in \p vid.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param vid Vertices for which to set the attribute.
+ * \param value The (new) value of the attribute.
+ * \return Error code.
+ * 
+ * \sa \ref SETVAS for a simpler way.
+ * 
+ * Time complexity: O(n*l), n is the number of vertices, l is the
+ * length of the string to set. If the attribute if not new then only
+ * O(|vid|*l).
  */
 int igraph_cattribute_VAS_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t vid, const char *value) {
@@ -1339,7 +1401,21 @@ int igraph_cattribute_VAS_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAN_set
- * TODO
+ * Set a numeric edge attribute
+ * 
+ * The attribute will be added if not present already. If present it
+ * will be overwritten. The same \p value is set for all edges
+ * included in \p vid.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param eid Edges for which to set the attribute.
+ * \param value The (new) value of the attribute.
+ * \return Error code.
+ * 
+ * \sa \ref SETEAN for a simpler way.
+ * 
+ * Time complexity: O(e), the number of edges if the attribute is
+ * new, O(|eid|) otherwise.
  */
 int igraph_cattribute_EAN_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t eid, igraph_real_t value) {
@@ -1388,7 +1464,22 @@ int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAS_set
- * TODO
+ * Set a string edge attribute
+ * 
+ * The attribute will be added if not present already. If present it
+ * will be overwritten. The same \p value is set for all edges
+ * included in \p vid.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param eid Edges for which to set the attribute.
+ * \param value The (new) value of the attribute.
+ * \return Error code.
+ * 
+ * \sa \ref SETEAS for a simpler way.
+ * 
+ * Time complexity: O(e*l), n is the number of edges, l is the
+ * length of the string to set. If the attribute if not new then only
+ * O(|eid|*l).
  */
 int igraph_cattribute_EAS_set(igraph_t *graph, const char *name, 
 			      igraph_integer_t eid, const char *value) {
@@ -1436,7 +1527,18 @@ int igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAN_setv
- * TODO
+ * Set a numeric vertex attribute for all vertices.
+ * 
+ * The attribute will be added if not present yet.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param v The new attribute values. The length of this vector must
+ *   match the number of vertices.
+ * \return Error code.
+ * 
+ * \sa \ref SETVANV for a simpler way.
+ * 
+ * Time complexity: O(n), the number of vertices.
  */
 
 int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name, 
@@ -1491,7 +1593,19 @@ int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_VAS_setv
- * TODO
+ * Set a string vertex attribute for all vertices.
+ * 
+ * The attribute will be added if not present yet.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param sv String vector, the new attribute values. The length of this vector must
+ *   match the number of vertices.
+ * \return Error code.
+ * 
+ * \sa \ref SETVASV for a simpler way.
+ * 
+ * Time complexity: O(n+l), n is the number of vertices, l is the
+ * total length of the strings.
  */
 int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
 			       const igraph_strvector_t *sv) {
@@ -1546,7 +1660,18 @@ int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAN_setv
- * TODO
+ * Set a numeric edge attribute for all vertices.
+ * 
+ * The attribute will be added if not present yet.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param v The new attribute values. The length of this vector must
+ *   match the number of edges.
+ * \return Error code.
+ * 
+ * \sa \ref SETEANV for a simpler way.
+ * 
+ * Time complexity: O(e), the number of edges.
  */
 int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name, 
 			       const igraph_vector_t *v) {
@@ -1601,7 +1726,19 @@ int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAS_setv
- * TODO
+ * Set a string edge attribute for all vertices.
+ * 
+ * The attribute will be added if not present yet.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param sv String vector, the new attribute values. The length of this vector must
+ *   match the number of edges.
+ * \return Error code.
+ * 
+ * \sa \ref SETEASV for a simpler way.
+ * 
+ * Time complexity: O(e+l), e is the number of edges, l is the
+ * total length of the strings.
  */
 int igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
 			       const igraph_strvector_t *sv) {
@@ -1670,7 +1807,13 @@ void igraph_i_cattribute_free_rec(igraph_i_attribute_record_t *rec) {
 
 /**
  * \function igraph_cattribute_remove_g
- * TODO
+ * Remove a graph attribute
+ * 
+ * \param graph The graph object.
+ * \param name Name of the graph attribute to remove.
+ * 
+ * \sa \ref DELGA for a simpler way.
+ * 
  */
 void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
 
@@ -1689,7 +1832,13 @@ void igraph_cattribute_remove_g(igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_remove_v
- * TODO
+ * Remove a vertex attribute
+ * 
+ * \param graph The graph object.
+ * \param name Name of the vertex attribute to remove.
+ * 
+ * \sa \ref DELVA for a simpler way.
+ * 
  */
 void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
 
@@ -1708,7 +1857,13 @@ void igraph_cattribute_remove_v(igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_remove_e
- * TODO
+ * Remove an edge attribute
+ * 
+ * \param graph The graph object.
+ * \param name Name of the edge attribute to remove.
+ * 
+ * \sa \ref DELEA for a simpler way.
+ * 
  */
 void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
 
@@ -1727,7 +1882,15 @@ void igraph_cattribute_remove_e(igraph_t *graph, const char *name) {
 
 /**
  * \function igraph_cattribute_remove_all
- * TODO
+ * Remove all graph/vertex/edge attributes
+ * 
+ * \param graph The graph object.
+ * \param g Boolean, whether to remove graph attributes.
+ * \param v Boolean, whether to remove vertex attributes.
+ * \param e Boolean, whether to remove edge attributes.
+ * 
+ * \sa \ref DELGAS, \ref DELVAS, \ref DELEAS, \ref DELALL for simpler
+ * ways.
  */
 void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 				  igraph_bool_t v, igraph_bool_t e) {

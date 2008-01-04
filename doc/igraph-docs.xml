@@ -59,6 +59,7 @@
     <xi:include href="stack.xml"/>
     <xi:include href="dqueue.xml"/>
     <xi:include href="heap.xml"/>
+    <xi:include href="strvector.xml"/>
   </chapter>
 
   <xi:include href="generators.xml"/>
