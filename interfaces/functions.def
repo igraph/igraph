@@ -943,7 +943,7 @@ igraph_get_subisomorphisms_vf2:
         IGNORE: RR, RC, RNamespace
 
 igraph_canonical_permutation:
-        PARAMS: GRAPH graph, OUT VECTOR labeling
+        PARAMS: GRAPH graph, OUT VECTOR labeling, BLISSSH sh="f", OUT BLISSINFO info
         NAME-R: canonical.permutation
 
 igraph_permute_vertices:
@@ -952,7 +952,12 @@ igraph_permute_vertices:
 
 igraph_isomorphic_bliss:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
-                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21, \
+                BLISSSH sh1="f", BLISSSH sh2="f", OUT BLISSINFO info1, \
+                OUT BLISSINFO info2
+
+igraph_automorphisms:
+        PARAMS: GRAPH graph, BLISSSH sh="f", OUT BLISSINFO info
 
 #######################################
 # Other, not graph related

@@ -1,3 +1,7 @@
+2008-01-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/src/rinterface.c.in (R_igraph_bliss_info_to_SEXP) : added
+
 2007-12-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/CohesiveBlocks.R : updates, bugfix in kCutsets,

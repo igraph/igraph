@@ -25,12 +25,23 @@
 #include <cstring>
 
 using namespace igraph;
-int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling) {
+int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling,
+				 igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
   Graph *g = Graph::from_igraph(graph);
   Stats stats;
   const unsigned int N=g->get_nof_vertices();
+  unsigned int gsh;
 
-  g->set_splitting_heuristics(Graph::sh_fm);
+  switch (sh) { 
+  case IGRAPH_BLISS_F:    gsh= Graph::sh_f;   break;
+  case IGRAPH_BLISS_FL:   gsh= Graph::sh_fl;  break;
+  case IGRAPH_BLISS_FS:   gsh= Graph::sh_fs;  break;
+  case IGRAPH_BLISS_FM:   gsh= Graph::sh_fm;  break;
+  case IGRAPH_BLISS_FLM:  gsh= Graph::sh_flm; break;
+  case IGRAPH_BLISS_FSM:  gsh= Graph::sh_fsm; break;
+  }
+
+  g->set_splitting_heuristics(gsh);
   const unsigned int *cl = g->canonical_form(stats);
   IGRAPH_CHECK(igraph_vector_resize(labeling, N));
   for (unsigned int i=0; i<N; i++) {
@@ -38,6 +49,46 @@ int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labelin
   }
   delete g;
 
+  if (info) { 
+    info->nof_nodes      = stats.nof_nodes;
+    info->nof_leaf_nodes = stats.nof_leaf_nodes;
+    info->nof_bad_nodes  = stats.nof_bad_nodes;
+    info->nof_canupdates = stats.nof_canupdates;
+    info->max_level      = stats.max_level;
+    stats.group_size.tostring(&info->group_size);
+  }
+  
+  return 0;
+}
+
+int igraph_automorphisms(const igraph_t *graph,
+			 igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+  
+  Graph *g = Graph::from_igraph(graph);
+  Stats stats;
+  unsigned int gsh;
+
+  switch (sh) { 
+  case IGRAPH_BLISS_F:    gsh= Graph::sh_f;   break;
+  case IGRAPH_BLISS_FL:   gsh= Graph::sh_fl;  break;
+  case IGRAPH_BLISS_FS:   gsh= Graph::sh_fs;  break;
+  case IGRAPH_BLISS_FM:   gsh= Graph::sh_fm;  break;
+  case IGRAPH_BLISS_FLM:  gsh= Graph::sh_flm; break;
+  case IGRAPH_BLISS_FSM:  gsh= Graph::sh_fsm; break;
+  }
+
+  g->set_splitting_heuristics(gsh);
+  g->find_automorphisms(stats);
+
+  if (info) { 
+    info->nof_nodes      = stats.nof_nodes;
+    info->nof_leaf_nodes = stats.nof_leaf_nodes;
+    info->nof_bad_nodes  = stats.nof_bad_nodes;
+    info->nof_canupdates = stats.nof_canupdates;
+    info->max_level      = stats.max_level;
+    stats.group_size.tostring(&info->group_size);
+  }
+  
   return 0;
 }
 

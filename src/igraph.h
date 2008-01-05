@@ -1172,12 +1172,30 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
 				   const igraph_t *graph2,
 				   igraph_vector_ptr_t *maps);
 
-int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling);
+typedef struct igraph_bliss_info_t {
+  unsigned long nof_nodes;
+  unsigned long nof_leaf_nodes;
+  unsigned long nof_bad_nodes;
+  unsigned long nof_canupdates;
+  unsigned long max_level;
+  char *group_size;
+} igraph_bliss_info_t;
+
+typedef enum { IGRAPH_BLISS_F=0, IGRAPH_BLISS_FL, 
+	       IGRAPH_BLISS_FS, IGRAPH_BLISS_FM, 
+	       IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM } igraph_bliss_sh_t;
+
+int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling, 
+				 igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
 			    const igraph_vector_t *permutation);
-int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2, 
+int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 			    igraph_bool_t *iso, igraph_vector_t *map12, 
-			    igraph_vector_t *map21);
+			    igraph_vector_t *map21,
+			    igraph_bliss_sh_t sh1, igraph_bliss_sh_t sh2, 
+			    igraph_bliss_info_t *info1, igraph_bliss_info_t *info2);
+int igraph_automorphisms(const igraph_t *graph,
+			 igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 
 /* -------------------------------------------------- */
 /* Graph motifs                                       */

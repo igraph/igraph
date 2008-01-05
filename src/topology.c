@@ -1988,7 +1988,9 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
 
 int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2, 
 			    igraph_bool_t *iso, igraph_vector_t *map12, 
-			    igraph_vector_t *map21) {
+			    igraph_vector_t *map21,
+			    igraph_bliss_sh_t sh1, igraph_bliss_sh_t sh2,
+			    igraph_bliss_info_t *info1, igraph_bliss_info_t *info2) {
   
   long int no_of_nodes=igraph_vcount(graph1);
   long int no_of_edges=igraph_ecount(graph1);
@@ -2020,8 +2022,8 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
   IGRAPH_VECTOR_INIT_FINALLY(&perm1, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&perm2, no_of_nodes);
   
-  IGRAPH_CHECK(igraph_canonical_permutation(graph1, &perm1));
-  IGRAPH_CHECK(igraph_canonical_permutation(graph2, &perm2));
+  IGRAPH_CHECK(igraph_canonical_permutation(graph1, &perm1, sh1, info1));
+  IGRAPH_CHECK(igraph_canonical_permutation(graph2, &perm2, sh2, info2));
 
   IGRAPH_CHECK(igraph_vector_resize(mymap12, no_of_nodes));
     

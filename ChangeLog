@@ -1,10 +1,17 @@
 2008-01-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/bliss.cc (igraph_canonical_permutation) : 'sh' and 'info'
+	arguments added
+	(igraph_automorphisms) : use 'info' instead if 'no', 'sh' added
+	* src/bliss_bignum.hh (Bignum::tostring) : added
+	* src/topology.c (igraph_isomorphic_bliss) : 'sh1', 'sh2', 
+	'info1', 'info2' arguments added
+
 	* src/topology.c (igraph_isomorphic_bliss) : added
 
 	* src/topology.c (igraph_permute_vertices) : added
 
-	* src/blicc.cc (igraph_canonical_permutation) : added
+	* src/bliss.cc (igraph_canonical_permutation) : added
 
 2008-01-03  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 

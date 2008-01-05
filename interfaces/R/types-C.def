@@ -97,6 +97,11 @@ NEIMODE:
   INCONV:
     IN: %C%=REAL(%I%)[0];
 
+BLISSSH:
+  CTYPE: igraph_bliss_sh_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
 ##################################
 # VECTOR of real values
 
@@ -269,3 +274,28 @@ ARPACKOPT:
     INOUT: R_SEXP_to_igraph_arpack_options(%I%, &%C%);
   OUTCONV:
     INOUT: PROTECT(%I%=R_igraph_arpack_options_to_SEXP(&%C%));
+
+BLISSINFO:
+  CTYPE: igraph_bliss_info_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_bliss_info_to_SEXP(&%C%)); \
+         if (%C%.group_size) { free(%C%.group_size); }
+
+##################################
+# String vector
+
+STRVECTOR:
+  CTYPE: igraph_strvector_t
+  CALL: &%C%
+  INCONV:
+    IN: R_igraph_SEXP_to_strvector(%I%, &%C%);
+    OUT: if (0 != igraph_strvector_init(&%C%, 0)) { \
+            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_strvector_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_strvector_to_SEXP(&%C%)); \
+         igraph_strvector_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+   

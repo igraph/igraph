@@ -88,3 +88,11 @@ VECTORLIST:
 ARPACKOPT:
     INCONV:
       INOUT: %I%.tmp <- igraph.arpack.default; %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
+
+STRVECTOR:
+
+BLISSSH:
+    INCONV: %I% <- as.numeric(pmatch(tolower(%I%), c("f","fl","fs","fm","flm","fsm"))) ; \
+            if (is.na(%I%)) { stop("invalid `%I%' argument, see docs") }
+
+BLISSINFO:

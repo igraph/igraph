@@ -1358,6 +1358,35 @@ SEXP R_igraph_arpack_options_to_SEXP(igraph_arpack_options_t *opt) {
   return result;  
 }
 
+SEXP R_igraph_bliss_info_to_SEXP(igraph_bliss_info_t *info) {
+  SEXP result, names;
+  
+  PROTECT(result=NEW_LIST(6));
+  SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 0))[0]=info->nof_nodes;
+  SET_VECTOR_ELT(result, 1, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 1))[0]=info->nof_leaf_nodes;
+  SET_VECTOR_ELT(result, 2, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 2))[0]=info->nof_bad_nodes;
+  SET_VECTOR_ELT(result, 3, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 3))[0]=info->nof_canupdates;
+  SET_VECTOR_ELT(result, 4, NEW_NUMERIC(1)); REAL(VECTOR_ELT(result, 4))[0]=info->max_level;
+  if (info->group_size) {
+    SET_VECTOR_ELT(result, 5, NEW_CHARACTER(1));
+    SET_STRING_ELT(VECTOR_ELT(result, 5), 0, mkChar(info->group_size));
+  } else {
+    SET_VECTOR_ELT(result, 5, R_NilValue);
+  }
+  
+  PROTECT(names=NEW_CHARACTER(6));
+  SET_STRING_ELT(names, 0, mkChar("nof_nodes"));
+  SET_STRING_ELT(names, 1, mkChar("nof_leaf_nodes"));
+  SET_STRING_ELT(names, 2, mkChar("nof_bad_nodes"));
+  SET_STRING_ELT(names, 3, mkChar("nof_canupdates"));
+  SET_STRING_ELT(names, 4, mkChar("max_level"));
+  SET_STRING_ELT(names, 5, mkChar("group_size"));
+  SET_NAMES(result, names);
+
+  UNPROTECT(2);
+  return result;
+}
+
 /*******************************************************************/
 
 SEXP R_igraph_add_edges(SEXP graph, SEXP edges) {
