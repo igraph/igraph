@@ -897,6 +897,60 @@ igraph_coreness:
         IGNORE: RR, RC, RNamespace
 
 #######################################
+# Graph isomorphism
+#######################################
+
+igraph_isoclass:
+        PARAMS: GRAPH graph, OUT INT isoclass
+        IGNORE: RR, RC, RNamespace
+
+igraph_isomorphic:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso
+        IGNORE: RR, RC, RNamespace
+
+igraph_isoclass_subgraph:
+        PARAMS: GRAPH graph, VECTOR vids, OUT INT isoclass
+        IGNORE: RR, RC, RNamespace
+
+igraph_isoclass_create:
+        PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed   
+        IGNORE: RR, RC, RNamespace
+
+igraph_isomorphic_vf2:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso, \
+                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+        IGNORE: RR, RC, RNamespace
+
+igraph_count_isomorphisms_vf2:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT INTEGER count
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_isomorphisms_vf2:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT VECTORLIST maps
+        IGNORE: RR, RC, RNamespace
+
+igraph_subisomorphic_vf2:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso, \
+                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+        IGNORE: RR, RC, RNamespace
+
+igraph_count_subisomorphisms_vf2:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT INTEGER count
+        IGNORE: RR, RC, RNamespace
+
+igraph_get_subisomorphisms_vf2:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT VECTORLIST maps
+        IGNORE: RR, RC, RNamespace
+
+igraph_canonical_permutation:
+        PARAMS: GRAPH graph, OUT VECTOR labeling
+        NAME-R: canonical.permutation
+
+igraph_permute_vertices:
+        PARAMS: GRAPH graph, OUT GRAPH res, VECTOR permutation
+        NAME-R: permute.vertices
+
+#######################################
 # Other, not graph related
 #######################################
 

@@ -1172,6 +1172,10 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
 				   const igraph_t *graph2,
 				   igraph_vector_ptr_t *maps);
 
+int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling);
+int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
+			    const igraph_vector_t *permutation);
+
 /* -------------------------------------------------- */
 /* Graph motifs                                       */
 /* -------------------------------------------------- */

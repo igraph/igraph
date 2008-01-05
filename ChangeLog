@@ -1,12 +1,18 @@
+2008-01-05  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/topology.c (igraph_permute_vertices) : added
+
+	* src/blicc.cc (igraph_canonical_permutation) : added
+
 2008-01-03  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/community.c (igraph_modularity) : added weights argument
 
-    * interfaces/python/src/graphobject.c : adjusted Graph.modularity to
-    support weights
+	* interfaces/python/src/graphobject.c : adjusted Graph.modularity to
+	support weights
 
-    * interfaces/R/src/rinterface.c.in : added null weight argument to
-    igraph_modularity call
+	* interfaces/R/src/rinterface.c.in : added null weight argument to
+	igraph_modularity call
 
 2008-01-01  Gabor Csardi  <csardi@rmki.kfki.hu>
 

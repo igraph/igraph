@@ -20,11 +20,30 @@
 #include "bliss_kqueue.hh"
 #include "bliss_utils.hh"
 
+#include "types.h"
+
 #include <cstring>
+
+using namespace igraph;
+int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling) {
+  Graph *g = Graph::from_igraph(graph);
+  Stats stats;
+  const unsigned int N=g->get_nof_vertices();
+
+  g->set_splitting_heuristics(Graph::sh_fm);
+  const unsigned int *cl = g->canonical_form(stats);
+  IGRAPH_CHECK(igraph_vector_resize(labeling, N));
+  for (unsigned int i=0; i<N; i++) {
+    VECTOR(*labeling)[i] = cl[i];
+  }
+  delete g;
+
+  return 0;
+}
 
 namespace igraph {
 
-bool verbose = true;
+bool verbose = false;
 FILE *verbstr = stdout;
 
 typedef enum {FORMAT_BIN = 0, FORMAT_ADJ} Format;
@@ -112,7 +131,7 @@ typedef enum {FORMAT_BIN = 0, FORMAT_ADJ} Format;
 // 	}
 //       }
 //     }
-// }
+// }			    
 
 }
 

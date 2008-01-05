@@ -32,6 +32,8 @@ namespace igraph {
 #include "bliss_bignum.hh"
 #include "bliss_eqrefhash.hh"
 
+#include "igraph.h"
+
 namespace igraph {
 
 typedef struct t_Stats
@@ -211,6 +213,7 @@ public:
   static const unsigned int sh_flm = 5;
 
   static Graph *read_dimacs(FILE *);
+  static Graph *from_igraph(const igraph_t *graph);
   void print_dimacs(FILE *);
 
   void to_dot(FILE *fp);

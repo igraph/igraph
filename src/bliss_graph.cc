@@ -481,7 +481,7 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 
   const unsigned int N = get_nof_vertices();
 
-  const bool write_automorphisms = 1;
+  const bool write_automorphisms = 0;
 
   unsigned int all_same_level = UINT_MAX;
 
@@ -783,13 +783,15 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	     */
 	    if(index == cell->length && all_same_level == p.level+1)
 	      all_same_level = p.level;
-	    fprintf(stdout,
-		    "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
-		    p.level,
-		    first_path_orbits.nof_orbits(),
-		    index, cell->length,
-		    all_same_level);
-	    fflush(stdout);
+	    if (verbose) {
+	      fprintf(stdout,
+		      "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
+		      p.level,
+		      first_path_orbits.nof_orbits(),
+		      index, cell->length,
+		      all_same_level);
+	      fflush(stdout);
+	    }
 	  }
 	  /* Backtrack to the previous level */
 	  p.level--;
@@ -1574,6 +1576,20 @@ Graph *Graph::read_dimacs(FILE *fp)
 
 }
 
+Graph *Graph::from_igraph(const igraph_t *graph) {
+  
+  unsigned int nof_vertices= (unsigned int)igraph_vcount(graph);
+  unsigned int nof_edges= (unsigned int)igraph_ecount(graph);
+  Graph *g=new Graph(nof_vertices);
+//   for (unsigned int i=0; i<nof_vertices; i++) {
+//     g->change_label(i, i);
+//   }
+  for (unsigned int i=0; i<nof_edges; i++) {
+    g->add_edge((unsigned int)IGRAPH_FROM(graph, i), 
+		(unsigned int)IGRAPH_TO(graph, i));
+  }  
+  return g;
+}
 
 void Graph::print_dimacs(FILE *fp)
 {

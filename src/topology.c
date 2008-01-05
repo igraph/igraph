@@ -1949,3 +1949,34 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_permute_vertices
+ * TODO
+ */
+
+int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
+			    const igraph_vector_t *permutation) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t edges;
+  long int i, p=0;
+  
+  if (igraph_vector_size(permutation) != no_of_nodes) {
+    IGRAPH_ERROR("Permute vertices: invalid permutation vector size", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+
+  for (i=0; i<no_of_edges; i++) {
+    VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_FROM(graph, i) ];
+    VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_TO(graph, i) ];
+  }
+  
+  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, igraph_is_directed(graph)));
+
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
