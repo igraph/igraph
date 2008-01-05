@@ -1,5 +1,7 @@
 2008-01-05  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/topology.c (igraph_isomorphic_bliss) : added
+
 	* src/topology.c (igraph_permute_vertices) : added
 
 	* src/blicc.cc (igraph_canonical_permutation) : added

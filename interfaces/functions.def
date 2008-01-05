@@ -905,7 +905,7 @@ igraph_isoclass:
         IGNORE: RR, RC, RNamespace
 
 igraph_isomorphic:
-        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
         IGNORE: RR, RC, RNamespace
 
 igraph_isoclass_subgraph:
@@ -917,7 +917,7 @@ igraph_isoclass_create:
         IGNORE: RR, RC, RNamespace
 
 igraph_isomorphic_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso, \
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
                 OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
         IGNORE: RR, RC, RNamespace
 
@@ -930,7 +930,7 @@ igraph_get_isomorphisms_vf2:
         IGNORE: RR, RC, RNamespace
 
 igraph_subisomorphic_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEAN iso, \
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
                 OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
         IGNORE: RR, RC, RNamespace
 
@@ -949,6 +949,10 @@ igraph_canonical_permutation:
 igraph_permute_vertices:
         PARAMS: GRAPH graph, OUT GRAPH res, VECTOR permutation
         NAME-R: permute.vertices
+
+igraph_isomorphic_bliss:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
+                OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
 
 #######################################
 # Other, not graph related

@@ -1980,3 +1980,135 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_isomorphic_bliss
+ * TODO
+ */
+
+int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2, 
+			    igraph_bool_t *iso, igraph_vector_t *map12, 
+			    igraph_vector_t *map21) {
+  
+  long int no_of_nodes=igraph_vcount(graph1);
+  long int no_of_edges=igraph_ecount(graph1);
+  igraph_vector_t perm1, perm2;
+  igraph_vector_t vmap12, *mymap12=&vmap12;  
+  igraph_vector_t from, to, index;
+  igraph_vector_t from2, to2, index2;
+  long int i, j;
+  
+  *iso=0;
+  if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
+    IGRAPH_ERROR("Cannot compare directed and undirected graphs",
+		 IGRAPH_EINVAL);
+  }
+
+  if (no_of_nodes != igraph_vcount(graph2) ||
+      no_of_edges != igraph_ecount(graph2)) {
+    if (map12) { igraph_vector_clear(map12); }
+    if (map21) { igraph_vector_clear(map21); }
+    return 0;
+  }
+
+  if (map12) {
+    mymap12=map12;
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(mymap12, 0);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&perm1, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&perm2, no_of_nodes);
+  
+  IGRAPH_CHECK(igraph_canonical_permutation(graph1, &perm1));
+  IGRAPH_CHECK(igraph_canonical_permutation(graph2, &perm2));
+
+  IGRAPH_CHECK(igraph_vector_resize(mymap12, no_of_nodes));
+    
+  /* The inverse of perm2 is produced in mymap12 */
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(*mymap12)[ (long int)VECTOR(perm2)[i] ] = i;
+  }
+  /* Now we produce perm2^{-1} o perm1 in perm2 */
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(perm2)[i] = VECTOR(*mymap12)[ (long int) VECTOR(perm1)[i] ];
+  }
+  /* Copy it to mymap12 */
+  igraph_vector_update(mymap12, &perm2);
+  
+  igraph_vector_destroy(&perm1);
+  igraph_vector_destroy(&perm2);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  /* Check isomorphism, we apply the permutation in mymap12 to graph1
+     and should get graph2 */
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&from, no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&to, no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&from2, no_of_edges*2);
+  IGRAPH_VECTOR_INIT_FINALLY(&to2, no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&index2, no_of_edges);  
+  
+  for (i=0; i<no_of_edges; i++) {
+    VECTOR(from)[i] = VECTOR(*mymap12)[ (long int) IGRAPH_FROM(graph1, i) ];
+    VECTOR(to)[i]   = VECTOR(*mymap12)[ (long int) IGRAPH_TO  (graph1, i) ];
+    if (VECTOR(from)[i] < VECTOR(to)[i]) {
+      igraph_real_t tmp=VECTOR(from)[i];
+      VECTOR(from)[i] = VECTOR(to)[i];
+      VECTOR(to)[i] = tmp;
+    }
+  }
+  igraph_vector_order(&from, &to, &index, no_of_nodes);
+  
+  igraph_get_edgelist(graph2, &from2, /*bycol=*/ 1);
+  for (i=0, j=no_of_edges; i<no_of_edges; i++, j++) {
+    VECTOR(to2)[i] = VECTOR(from2)[j];
+    if (VECTOR(from2)[i] < VECTOR(to2)[i]) {
+      igraph_real_t tmp=VECTOR(from2)[i];
+      VECTOR(from2)[i] = VECTOR(to2)[i];
+      VECTOR(to2)[i] = tmp;
+    }
+  }
+  igraph_vector_resize(&from2, no_of_edges);
+  igraph_vector_order(&from2, &to2, &index2, no_of_nodes);
+  
+  *iso=1;
+  for (i=0; i<no_of_edges; i++) {
+    long int i1=VECTOR(index)[i];
+    long int i2=VECTOR(index2)[i];
+    if (VECTOR(from)[i1] != VECTOR(from2)[i2] ||
+	VECTOR(to)[i1] != VECTOR(to2)[i2]) {
+      *iso=0;
+      break;
+    }
+  }
+  
+  igraph_vector_destroy(&index2);
+  igraph_vector_destroy(&to2);
+  igraph_vector_destroy(&from2);
+  igraph_vector_destroy(&index);
+  igraph_vector_destroy(&to);
+  igraph_vector_destroy(&from);
+  IGRAPH_FINALLY_CLEAN(6);
+  
+  if (*iso) {
+    /* The inverse of mymap12 */
+    if (map21) {
+      IGRAPH_CHECK(igraph_vector_resize(map21, no_of_nodes));
+      for (i=0; i<no_of_nodes; i++) {
+	VECTOR(*map21)[ (long int) VECTOR(*mymap12)[i] ] = i;
+      }
+    }
+  } else {
+    if (map12) { igraph_vector_clear(map12); }
+    if (map21) { igraph_vector_clear(map21); }
+  }
+  
+  if (!map12) {
+    igraph_vector_destroy(mymap12);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
