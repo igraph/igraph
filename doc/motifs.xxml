@@ -7,27 +7,17 @@
 <chapter id="igraph-Motifs">
 <title>Graph Motifs, Dyad Census and Triad Census</title>
 
-<section><title>Introduction</title>
 <para>
 This section deals with functions which find small induced subgraphs in a
 graph. These were first defined for subgraphs of two and three vertices 
-by TODO, and named dyad census and triad census.
+by Holland and Leinhardt, and named dyad census and triad census.
 </para>
-</section>
 
-<section><title>Dyad census</title>
 <!-- doxrox-include igraph_dyad_census -->
-</section>
-
-<section><title>Triad census</title>
 <!-- doxrox-include igraph_triad_census -->
-</section>
 
-<section><title>Counting the motifs in a graph</title>
+<section><title>Graph motifs</title>
 <!-- doxrox-include igraph_motifs_randesu -->
-</section>
-
-<section><title>Estimating the number of motifs in a graph</title>
 <!-- doxrox-include igraph_motifs_randesu_no -->
 <!-- doxrox-include igraph_motifs_randesu_estimate -->
 </section>

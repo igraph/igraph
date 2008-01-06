@@ -28,7 +28,7 @@ int main() {
   igraph_t g;
   igraph_vector_t edges;
   igraph_vector_t vids;
-  int class;
+  igraph_integer_t class;
   
   igraph_vector_init_int_end(&edges, -1, 
 			     0,1, 1,3, 1,4, 1,6, 3,1,
@@ -40,22 +40,22 @@ int main() {
   
   igraph_vector_init_int_end(&vids, -1, 1,4,6, -1);
   igraph_isoclass_subgraph(&g, &vids, &class);
-  printf("class: %i\n", class);
+  printf("class: %i\n", (int)class);
   igraph_vector_destroy(&vids);
 
   igraph_vector_init_int_end(&vids, -1, 0,1,3, -1);
   igraph_isoclass_subgraph(&g, &vids, &class);
-  printf("class: %i\n", class);
+  printf("class: %i\n", (int)class);
   igraph_vector_destroy(&vids);
 
   igraph_vector_init_int_end(&vids, -1, 7,8,9, -1);
   igraph_isoclass_subgraph(&g, &vids, &class);
-  printf("class: %i\n", class);
+  printf("class: %i\n", (int)class);
   igraph_vector_destroy(&vids);
 
   igraph_vector_init_int_end(&vids, -1, 0,2,5, -1);
   igraph_isoclass_subgraph(&g, &vids, &class);
-  printf("class: %i\n", class);
+  printf("class: %i\n", (int)class);
   igraph_vector_destroy(&vids);
   
   igraph_destroy(&g);

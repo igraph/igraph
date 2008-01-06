@@ -83,8 +83,8 @@ foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/other.c $(SRCDIR)/random.c
 
-isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c 
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c
+isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(SRCDIR)/igraph.h $(SRCDIR)/bliss.cc
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(SRCDIR)/igraph.h $(SRCDIR)/bliss.cc
 
 motifs.xml: motifs.xxml $(SRCDIR)/motifs.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/motifs.c

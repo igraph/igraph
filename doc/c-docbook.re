@@ -303,6 +303,7 @@ REPLACE ----- \struct ---------------------------------------------------------
 (?P<before>\A.*?)                 # head of the comment
 \\struct\s+                       # \struct command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>[\w_]+))
+[\s]*(?P<brief>[^\n]*?)\n        # brief description
 (?P<after>.*?)                    # tail of the command
 \*\/\s*                           # closing the comment
 (?P<def>typedef \s*struct\s*\w+\s*\{
@@ -311,7 +312,7 @@ REPLACE ----- \struct ---------------------------------------------------------
 
 WITH --------------------------------------------------------------------------
 
-<section id="\g<name>"><title>\g<name></title>
+<section id="\g<name>"><title><function>\g<name></function> &mdash; \g<brief></title>
 <indexterm><primary>\g<tail></primary></indexterm>
 <para>
 <programlisting>
@@ -373,8 +374,8 @@ REPLACE ----- \typedef function -----------------------------------------------
 (?P<after>.*?)                    # comment tail
 \*\/                              # end of comment block
 \s*
-(?P<src>typedef\s+[^\(]+\(        # the typedef definition
- .*?\);)                          # parameters
+(?P<src>typedef\s+[^;]*;)        # the typedef definition
+.*\Z
 
 WITH --------------------------------------------------------------------------
 

@@ -623,8 +623,37 @@ unsigned int igraph_i_classedges_4[] = { 2,3, 1,3, 0,3, 3,2, 1,2, 0,2,
 unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
 
 /**
+ * \section about_graph_isomorphism
+ * 
+ * <para>igraph provides four set of functions to deal with graph
+ * isomorphism problems.</para>
+ * 
+ * <para>The \ref igraph_isomorphic() and \ref igraph_subisomorphic()
+ * functions make up the first set (in addition with the \ref
+ * igraph_permute_vertices() function). These functions choose the
+ * algorithm which is best for the supplied input graph. (The choice is
+ * not very sophisticated though, see their documentation for
+ * details.)</para>
+ * 
+ * <para>The VF2 graph (and subgraph) isomorphism algorithm is implemented in
+ * igraph, these functions are the second set. See \ref
+ * igraph_isomorphic_vf2() and \ref igraph_subisomorphic_vf2() for
+ * starters.</para>
+ * 
+ * <para>Functions for the BLISS algorithm constitute the third set, 
+ * see \ref igraph_isomorphic_bliss(). This implementation only works
+ * for undirected graphs.</para>
+ * 
+ * <para>Finally, the isomorphism classes of all graphs with three and
+ * four vertices are precomputed and stored in igraph, so for these
+ * small graphs there is a very simple fast way to decide isomorphism.
+ * See \ref igraph_isomorphic_34().
+ * </para>
+ */
+
+/**
  * \function igraph_isoclass
- * \brief Determine the isomorphism class of a graph
+ * \brief Determine the isomorphism class of a graph with 3 or 4 vertices
  * 
  * </para><para>
  * All graphs with a given number of vertices belong to a number of
@@ -657,7 +686,7 @@ unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
  * Time complexity: O(|E|), the number of edges in the graph.
  */
 
-int igraph_isoclass(const igraph_t *graph, int *isoclass) {
+int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
   long int e;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -712,7 +741,25 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
  * graph theory problem of determining whether, given two graphs G1
  * and G2, it is possible to permute (or relabel) the vertices of one
  * graph so that it is equal to the other. Such a permutation is
- * called a graph isomorphism.
+ * called a graph isomorphism.</para>
+ * 
+ * <para>This function decides which graph isomorphism algorithm to be
+ * used based on the input graphs. Right now it does the following:
+ * \olist
+ * \oli If one graph is directed and the other undirected then an
+ *    error is triggered.
+ * \oli If the two graphs does not have the same number of vertices
+ *    and edges it returns with \c FALSE.
+ * \oli Otherwise, if the graphs have three or four vertices then an O(1)
+ *    algorithm is used with precomputed data.
+ * \oli Otherwise, if the graphs are directed then VF2 is used, see
+ *    \ref igraph_isomorphic_vf2().
+ * \oli Otherwise BLISS is used, see \ref igraph_isomorphic_bliss().
+ * \endolist 
+ * </para>
+ * 
+ * <para> Please call the VF2 and BLISS functions directly if you need
+ * something more sophisticated, e.g. you need the isomorphic mapping.
  * 
  * \param graph1 The first graph.
  * \param graph2 The second graph.
@@ -722,24 +769,52 @@ int igraph_isoclass(const igraph_t *graph, int *isoclass) {
  * \sa \ref igraph_isoclass(), \ref igraph_isoclass_subgraph(),
  * \ref igraph_isoclass_create().
  * 
- * Time complexity: O(|E|), the number of edges in the
- * graphs. (If they don't have the same number edges they're trivially
- * non-isomorphic and this is recognized in O(1) time.)
+ * Time complexity: exponential.
  */
 
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
 		      igraph_bool_t *iso) {
-  int class1, class2;  
   
-  if (igraph_vcount(graph1) != igraph_vcount(graph2) ||
-      igraph_ecount(graph1) != igraph_ecount(graph2)) {
-    *iso=0;
-  } else { 
-    IGRAPH_CHECK(igraph_isoclass(graph1, &class1));
-    IGRAPH_CHECK(igraph_isoclass(graph2, &class2));
-    *iso= (class1 == class2);
-  }
+  long int nodes1=igraph_vcount(graph1), nodes2=igraph_vcount(graph2);
+  long int edges1=igraph_ecount(graph1), edges2=igraph_ecount(graph2);
+  igraph_bool_t dir1=igraph_is_directed(graph1), dir2=igraph_is_directed(graph2);
 
+  if (dir1 != dir2) {
+    IGRAPH_ERROR("Cannot compare directed and undirected graphs", IGRAPH_EINVAL);
+  } else if (nodes1 != nodes2 || edges1 != edges2) { 
+    *iso=0;
+  } else if (nodes1==3 || nodes1==4) {
+  } else if (dir1) {
+    igraph_isomorphic_vf2(graph1, graph2, iso, 0, 0);
+  } else {
+    igraph_isomorphic_bliss(graph1, graph2, iso, 0, 0, /*sh1=*/0, /*sh2=*/0, 0, 0);
+  }
+				
+  return 0;
+}
+
+/**
+ * \function igraph_isomorphic_34
+ * Graph isomorphism for 3-4 vertices
+ * 
+ * This function uses precomputed indices to decide isomorphism
+ * problems for graphs with only 3 or 4 vertices.
+ * \param graph1 The first input graph.
+ * \param graph2 The second input graph. Must have the same
+ *   directedness as \p graph1.
+ * \param iso Pointer to a boolean, the result is stored here. 
+ * \return Error code.
+ *
+ * Time complexity: O(1).
+ */
+
+int igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2, 
+			 igraph_bool_t *iso) {
+
+  igraph_integer_t class1, class2;  
+  IGRAPH_CHECK(igraph_isoclass(graph1, &class1));
+  IGRAPH_CHECK(igraph_isoclass(graph2, &class2));
+  *iso= (class1 == class2);
   return 0;
 }
 
@@ -764,7 +839,7 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
  */
 
 int igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
-			     int *isoclass) {
+			     igraph_integer_t *isoclass) {
   int nodes=igraph_vector_size(vids);
   igraph_bool_t directed=igraph_is_directed(graph);
   igraph_vector_t neis;
@@ -924,7 +999,36 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 
 /**
  * \function igraph_isomorphic_function_vf2
- * TODO
+ * The generic VF2 interface
+ * 
+ * </para><para>
+ * This function is an implementation of the VF2 isomorphism algorithm, 
+ * see P. Foggia, C. Sansone, M. Vento, An Improved algorithm for
+ * matching large graphs, Proc. of the 3rd IAPR-TC-15 International
+ * Workshop on Graph-based Representations, Italy, 2001.</para>
+ * 
+ * <para>For using it you need to define a calback function of type
+ * \ref igraph_isohandler_t. This function will be called whenever VF2
+ * finds an isomorphism between the two graphs. The mapping between
+ * the two graphs will be also provided to this function. If the
+ * callback returns a nonzero value then the search is continued,
+ * otherwise it stops.
+ * \param graph1 The first input graph.
+ * \param graph2 The second input graph.
+ * \param map12 Pointer to an initialized vector or \c NULL. If not \c
+ *   NULL and the supplied graphs are isomorphic then the permutation
+ *   taking \p graph1 to \p graph is stored here. If not \c NULL and the
+ *   graphs are not isomorphic then a zero-length vector is returned.
+ * \param map21 This is the same as \p map12, but for the permutation
+ *   taking \p graph2 to \p graph1.
+ * \param function The callback function to be called if an
+ *   isomorphism is found. See also \ref igraph_isohandler_t.
+ * \param arg An extra argument to pass to \p function. E.g. if \p
+ *   function needs to store the isomorphisms found, then \p arg may
+ *   point to a container for them.
+ * \return Error code.
+ * 
+ * Time complexity: exponential.
  */
   
 int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2, 
@@ -1335,22 +1439,18 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
 
 /**
  * \function igraph_isomorphic_vf2
- * \brief Decides whether two graphs are isomorphic.
+ * \brief Isomorphism via VF2
  * 
  * </para><para>
- * This function is an implementation of the VF2 isomorphism algorithm, 
- * see P. Foggia, C. Sansone, M. Vento, An Improved algorithm for
- * matching large graphs, Proc. of the 3rd IAPR-TC-15 International
- * Workshop on Graph-based Representations, Italy, 2001.
- * 
- * </para><para> In the future the general \ref igraph_isomorphic()
- * function should be responsible for calling this function.
+ * This function performs the VF2 algorithm via calling \ref
+ * igraph_isomorphic_function_vf2().
  * 
  * </para><para> Note that this function cannot be used for
- * deciding subgraph isomorphism.
- * \param graph1 The first graph, it should be connected.
- * \param graph2 The second graph, it should be connected and should
- *    have the same number of vertices and edges as \p graph1.
+ * deciding subgraph isomorphism, use \ref igraph_subisomorphic_vf2()
+ * for that.
+ * \param graph1 The first graph, may be directed or undirected.
+ * \param graph2 The second graph. It must have the same directedness
+ *    as \p graph1, otherwise an error is reported.
  * \param iso Pointer to a logical constant, the result of the
  *    algorithm will be placed here.
  * \param map12 Pointer to an initialized vector or a NULL pointer. If not 
@@ -1364,9 +1464,8 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  * \return Error code.
  * 
  * \sa \ref igraph_subisomorphic_vf2(),
- * \ref igraph_count_subisomorphisms_vf2(), 
- * \ref igraph_get_subisomorphisms_vf2(),
- * \ref igraph_subisomorphic_function_vf2(). 
+ * \ref igraph_count_isomorphisms_vf2(), 
+ * \ref igraph_get_isomorphisms_vf2(),
  * 
  * Time complexity: exponential, what did you expect?
  */
@@ -1396,7 +1495,18 @@ igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
 
 /**
  * \function igraph_count_isomorphisms_vf2
- * TODO
+ * Number of isomorphisms via VF2
+ * 
+ * This function counts the number of isomorphic mappings between two
+ * graphs. It uses the generic \ref igraph_isomorphic_function_vf2()
+ * function. 
+ * \param graph1 The first input graph, may be directed or undirected.
+ * \param graph2 The second input graph, it must have the same
+ *   directedness as \p graph1, or an error will be reported.
+ * \param count Point to an integer, the result will be stored here.
+ * \return Error code.
+ * 
+ * Time complexity: exponential.
  */
 
 int igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
@@ -1440,7 +1550,27 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
 
 /** 
  * \function igraph_get_isomorphisms_vf2
- * TODO
+ * Collect the isomorphic mappings
+ * 
+ * This function finds all the isomorphic mappings between two
+ * graphs. It uses the \ref igraph_isomorphic_function_vf2()
+ * function. Call the function with the same graph as \p graph1 and \p
+ * graph2 to get automorphisms.
+ * \param graph1 The first input graph, may be directed or undirected.
+ * \param graph2 The second input graph, it must have the same
+ *   directedness as \p graph1, or an error will be reported.
+ * \param maps Pointer vector. On return it is empty if the input graphs
+ *   are no isomorphic. Otherwise it contains pointers to
+ *   <type>igraph_vector_t</type> objects, each vector is an
+ *   isomorphic mapping of \p graph2 to \p graph1. Please note that
+ *   you need to 1) Destroy the vectors via \ref
+ *   igraph_vector_destroy(), 2) free them via
+ *   <function>free()</function> and then 3) call \ref
+ *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
+ *   memory when \p maps is no longer needed.
+ * \return Error code.
+ * 
+ * Time complexity: exponential.
  */
  
 int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
@@ -1459,8 +1589,58 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 
 
 /**
+ * \function igraph_subisomorphic
+ * Decide subgraph isomorphism
+ * 
+ * Check whether \p graph2 is isomorphic to a subgraph of \p graph1.
+ * Currently this function just calls \ref igraph_subisomorphic_vf2()
+ * for all graphs.
+ * \param graph1 The first input graph, may be directed or
+ *   undirected. This is supposed to be the bigger graph.
+ * \param graph2 The second input graph, it must have the same
+ *   directedness as \p graph2, or an error is triggered. This is
+ *   supposed to be the smaller graph.
+ * \param iso Pointer to a boolean, the result is stored here.
+ * \return Error code.
+ *
+ * Time complexity: exponential. 
+ */
+
+int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
+			 igraph_bool_t *iso) {
+
+  return igraph_subisomorphic_vf2(graph1, graph2, iso, 0, 0);
+}
+
+/**
  * \function igraph_subisomorphic_function_vf2
- * TODO
+ * Generic VF2 function for subgraph isomorphism problems
+ * 
+ * This function is the pair of \ref igraph_isomorphic_function_vf2(),
+ * for subgraph isomorphism problems. It searches for subgraphs of \p
+ * graph1 which are isomorphic to \p graph2. When it founds an
+ * isomorphic mapping it calls the supplied callback \p function.
+ * The mapping (and its inverse) and the additional \p arg argument
+ * are supplied to the callback.
+ * \param graph1 The first input graph, may be directed or
+ *    undirected. This is supposed to be the larger graph.
+ * \param graph2 The second input graph, it must have the same
+ *    directedness as \p graph1. This is supposed to be the smaller
+ *    graph.
+ * \param map12 Pointer to a vector or \c NULL. If not \c NULL, then an
+ *    isomorphic mapping from \p graph1 to \p graph2 is stored here.
+ * \param map21 Pointer to a vector ot \c NULL. If not \c NULL, then
+ *    an isomorphic mapping from \p graph2 to \p graph1 is stored
+ *    here.
+ * \param function A pointer to a function of type \ref
+ *   igraph_isohandler_t. This will be called whenever a subgraph
+ *   isomorphism is found. If the function returns with a non-zero value
+ *   then the search is continued, otherwise it stops and the function
+ *   returns. 
+ * \param arg Extra argument to supply to the callback \p function.
+ * \return Error code.
+ * 
+ * Time complexity: exponential.
  */
 
 int igraph_subisomorphic_function_vf2(const igraph_t *graph1, 
@@ -1861,7 +2041,25 @@ igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
 
 /**
  * \function igraph_subisomorphic_vf2
- * TODO
+ * Decide subgraph isomorphism using VF2
+ * 
+ * Decides whether a subgraph of \p graph1 is isomorphic to \p
+ * graph2. It uses \ref igraph_subisomorphic_function_vf2().
+ * \param graph1 The first input graph, may be directed or
+ *    undirected. This is supposed to be the larger graph.
+ * \param graph2 The second input graph, it must have the same
+ *    directedness as \p graph1. This is supposed to be the smaller
+ *    graph.
+ * \param iso Pointer to a boolean. The result of the decision problem
+ *    is stored here.
+ * \param map12 Pointer to a vector or \c NULL. If not \c NULL, then an
+ *    isomorphic mapping from \p graph1 to \p graph2 is stored here.
+ * \param map21 Pointer to a vector ot \c NULL. If not \c NULL, then
+ *    an isomorphic mapping from \p graph2 to \p graph1 is stored
+ *    here.
+ * \return Error code.
+ * 
+ * Time complexity: exponential.
  */
 
 int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
@@ -1889,7 +2087,21 @@ igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
   
 /**
  * \function igraph_count_subisomorphisms_vf2
- * TODO
+ * Number of subgraph isomorphisms using VF2
+ * 
+ * Count the number of isomorphisms between subgraphs of \p graph1 and
+ * \p graph2. This function uses \ref
+ * igraph_subisomorphic_function_vf2().
+ * \param graph1 The first input graph, may be directed or
+ *    undirected. This is supposed to be the larger graph.
+ * \param graph2 The second input graph, it must have the same
+ *    directedness as \p graph1. This is supposed to be the smaller
+ *    graph.
+ * \param count Pointer to an integer. The number of subgraph
+ *    isomorphisms is stored here.
+ * \return Error code.
+ * 
+ * Time complexity: exponential.
  */
 
 int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
@@ -1933,7 +2145,27 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
 
 /** 
  * \function igraph_get_subisomorphisms_vf2
- * TODO
+ * Return all subgraph isomorphic mappings
+ * 
+ * This function collects all isomorphic mappings of \p graph2 to a
+ * subgraph of \p graph1. It uses the \ref
+ * igraph_subisomorphic_function_vf2() function.
+ * \param graph1 The first input graph, may be directed or
+ *    undirected. This is supposed to be the larger graph.
+ * \param graph2 The second input graph, it must have the same
+ *    directedness as \p graph1. This is supposed to be the smaller
+ *    graph.
+ * \param maps Pointer vector. On return it contains pointers to
+ *   <type>igraph_vector_t</type> objects, each vector is an
+ *   isomorphic mapping of \p graph2 to a subgraph of \p graph1. Please note that
+ *   you need to 1) Destroy the vectors via \ref
+ *   igraph_vector_destroy(), 2) free them via
+ *   <function>free()</function> and then 3) call \ref
+ *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
+ *   memory when \p maps is no longer needed.
+ * \return Error code.
+ * 
+ * Time complexity: exponential.
  */
  
 int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
@@ -1952,7 +2184,23 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
 
 /**
  * \function igraph_permute_vertices
- * TODO
+ * Permute the vertices
+ * 
+ * This function creates a new graph from the input graph by permuting
+ * its vertices according to the specified mapping. Call this function
+ * with the output of \ref igraph_canonical_permutation() to create
+ * the canonical form of a graph.
+ * \param graph The input graph.
+ * \param res Pointer to an uninitialized graph object. The new graph
+ *    is created here.
+ * \param permutation The permutation to apply. Vertex 0 is mapped to
+ *    the first element of the vector, vertex 1 to the second,
+ * etc. Note that it is not checked that the vector contains every
+ *    element only once, and no range checking is performed either.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in terms of the number of
+ * vertices and edges.
  */
 
 int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
@@ -1983,7 +2231,37 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
 
 /**
  * \function igraph_isomorphic_bliss
- * TODO
+ * Graph isomorphism via BLISS
+ * 
+ * This function uses the BLISS graph isomorphism algorithm, a
+ * successor of the famous NAUTY algorithm and implementation. BLISS
+ * is open source and licensed according to the GNU GPL. See 
+ * http://www.tcs.hut.fi/Software/bliss/index.html for
+ * details. Currently the 0.35 version of BLISS is included in igraph.
+ * \param graph1 The first input graph, it is assumed to be
+ *   undirected, directed graphs are treated as undirected too.
+ *   The algorithm eliminates multiple edges from the graph first.
+ * \param graph2 The second input graph, it is assumed to be
+ *   undirected, directed graphs are treated as undirected too.
+ *   The algorithm eliminates multiple edges from the graph first.
+ * \param iso Pointer to a boolean, the result is stored here.
+ * \param map12 A vector or \c NULL pointer. If not \c NULL then an
+ *   isomorphic mapping from \p graph1 to \p graph2 is stored here.
+ *   If the input graphs are not isomorphic then this vector is
+ *   cleared, i.e. it will have length zero.
+ * \param map21 Similar to \p map12, but for the mapping from \p
+ *   graph2 to \p graph1. 
+ * \param sh1 Splitting heuristics to be used for the first graph. See
+ *   \ref igraph_bliss_sh_t.
+ * \param sh2 Splitting heuristics to be used for the second
+ *   graph. See \ref igraph_bliss_sh_t.
+ * \param info1 If not \c NULL, information about the canonization of
+ *    the first input graph is stored here. See \ref igraph_bliss_info_t
+ *    for details.
+ * \param info2 Same as \p info1, but for the second graph.
+ * \return Error code.
+ * 
+ * Time complexity: exponential, but in practice it is quite fast.
  */
 
 int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2, 

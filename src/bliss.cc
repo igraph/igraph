@@ -25,6 +25,28 @@
 #include <cstring>
 
 using namespace igraph;
+
+/**
+ * \function igraph_canonical_permutation
+ * Canonical permutation using BLISS
+ * 
+ * This function computes the canonical permutation which transforms
+ * the graph into a canonical form by using the BLISS algorithm.
+ * 
+ * \param graph The input graph, it is treated as undirected and the
+ *    multiple edges are ignored.
+ * \param labeling Pointer to a vector, the result is stored here. The
+ *    permutation takes vertex 0 to the first element of the vector,
+ *    vertex 1 to the second, etc. The vector will be resized as
+ *    needed.
+ * \param sh The split heuristics to be used in BLISS. See \ref
+ *    igraph_bliss_sh_t.
+ * \param info If not \c NULL then information on BLISS internals is
+ *    stored here. See \ref igraph_bliss_info_t.
+ * \return Error code.
+ * 
+ * Time complexity: exponential, in practice it is fast for many graphs.
+ */
 int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling,
 				 igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
   Graph *g = Graph::from_igraph(graph);
@@ -61,6 +83,27 @@ int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labelin
   return 0;
 }
 
+/**
+ * \function igraph_automorphisms
+ * Number of automorphisms using BLISS
+ * 
+ * The number of automorphisms of a graph is computed using BLISS. The
+ * result is returned as part of the \p info structure, in tag \c
+ * group_size. It is returned as a string, as it can be very high even
+ * for relatively small graphs. If the GNU MP library is used then
+ * this number is exact, otherwise a <type>long double</type> is used
+ * and it is only approximate. See also \ref igraph_bliss_info_t.
+ * 
+ * \param graph The input graph, it is treated as undirected and the
+ *    multiple edges are ignored.
+ * \param sh The split heuristics to be used in BLISS. See \ref
+ *    igraph_bliss_sh_t.
+ * \param info The result is stored here, in particular in the \c
+ *    group_size tag of \p info.
+ * \return Error code.
+ * 
+ * Time complexity: exponential, in practice it is fast for many graphs.
+ */
 int igraph_automorphisms(const igraph_t *graph,
 			 igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
   

@@ -223,10 +223,11 @@ def parsestring(strinput, regexlist, docchunks):
     chunks=chunks[1:]
     # apply all rules to the chunks
     for ch in chunks:
+        ch=ch.split("/*")[0]
         actch=ch
         name=""
         for reg in regexlist:
-            matched=reg[0].search(actch)
+            matched=reg[0].match(actch)
             if name=="" and matched != None:
                 try:
                     name=matched.group('name')

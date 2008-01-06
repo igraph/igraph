@@ -901,49 +901,43 @@ igraph_coreness:
 #######################################
 
 igraph_isoclass:
-        PARAMS: GRAPH graph, OUT INT isoclass
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph, OUT INTEGERPTR isoclass
 
 igraph_isomorphic:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
-        IGNORE: RR, RC, RNamespace
 
 igraph_isoclass_subgraph:
-        PARAMS: GRAPH graph, VECTOR vids, OUT INT isoclass
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph, VECTOR vids, OUT INTEGERPTR isoclass
 
 igraph_isoclass_create:
         PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed   
-        IGNORE: RR, RC, RNamespace
+        NAME-R: graph.isocreate
 
 igraph_isomorphic_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
                 OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
-        IGNORE: RR, RC, RNamespace
 
 igraph_count_isomorphisms_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, OUT INTEGER count
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT INTEGERPTR count
 
 igraph_get_isomorphisms_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT VECTORLIST maps
-        IGNORE: RR, RC, RNamespace
 
 igraph_subisomorphic_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
                 OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
-        IGNORE: RR, RC, RNamespace
 
 igraph_count_subisomorphisms_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, OUT INTEGER count
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT INTEGERPTR count
 
 igraph_get_subisomorphisms_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT VECTORLIST maps
-        IGNORE: RR, RC, RNamespace
+
+igraph_isomorphic_34:
+        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
 
 igraph_canonical_permutation:
-        PARAMS: GRAPH graph, OUT VECTOR labeling, BLISSSH sh="f", OUT BLISSINFO info
+        PARAMS: GRAPH graph, OUT VECTOR labeling, BLISSSH sh="fm", OUT BLISSINFO info
         NAME-R: canonical.permutation
 
 igraph_permute_vertices:
@@ -953,11 +947,11 @@ igraph_permute_vertices:
 igraph_isomorphic_bliss:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
                 OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21, \
-                BLISSSH sh1="f", BLISSSH sh2="f", OUT BLISSINFO info1, \
+                BLISSSH sh1="fm", BLISSSH sh2="fm", OUT BLISSINFO info1, \
                 OUT BLISSINFO info2
 
 igraph_automorphisms:
-        PARAMS: GRAPH graph, BLISSSH sh="f", OUT BLISSINFO info
+        PARAMS: GRAPH graph, BLISSSH sh="fm", OUT BLISSINFO info
 
 #######################################
 # Other, not graph related

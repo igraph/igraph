@@ -1219,8 +1219,7 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 
 /**
  * \function igraph_edge_disjoint_paths
- * \brief The maximum number of edge-disjoint paths between two
- * vertices. 
+ * \brief The maximum number of edge-disjoint paths between two vertices. 
  * 
  * </para><para> A set of paths between two vertices is called
  * edge-disjoint if they do not share any edges. The maximum number of
@@ -1275,8 +1274,7 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 
 /**
  * \function igraph_vertex_disjoint_paths
- * \brief Maximum number of vertex-disjoint paths between two
- * vertices.
+ * \brief Maximum number of vertex-disjoint paths between two vertices.
  * 
  * </para><para> A set of paths between two vertices is called
  * vertex-disjoint if they share no vertices. The calculation is
@@ -1362,8 +1360,7 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 
 /**
  * \function igraph_adhesion
- * \brief Graph adhesion, this is (almost) the same as edge
- * connectivity.
+ * \brief Graph adhesion, this is (almost) the same as edge connectivity.
  * 
  * </para><para> This quantity is defined by White and Harary in
  * The cohesiveness of blocks in social networks: node connectivity and
@@ -1396,8 +1393,7 @@ int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
 
 /**
  * \function igraph_cohesion
- * \brief Graph cohesion, this is the same as vertex
- * connectivity. 
+ * \brief Graph cohesion, this is the same as vertex connectivity. 
  * 
  * </para><para> This quantity was defined by White and Harary in <quote>The
  * cohesiveness of blocks in social networks: node connectivity and
