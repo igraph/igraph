@@ -2740,7 +2740,20 @@ void igraph_adjlist_sort(igraph_adjlist_t *al);
 int igraph_adjlist_simplify(igraph_adjlist_t *al);
 /* igraph_vector_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
-#define igraph_adjlist_get(al, no) (&(al)->adjs[(long int)(no)])
+/**
+ * \define igraph_adjlist_get
+ * Query a vector in an adjlist
+ * 
+ * Returns a pointer to an <type>igraph_vector_t</type> object from an
+ * adjacency list. The vector can be modified as desired. 
+ * \param al The adjacency list object.
+ * \param no The vertex of which the vertex of adjacent vertices are
+ *   returned.
+ * \return Pointer to the <type>igraph_vector_t</type> object.
+ * 
+ * Time complexity: O(1).
+ */
+#define igraph_adjlist_get(al,no) (&(al)->adjs[(long int)(no)])
 
 typedef struct igraph_adjedgelist_t {
   igraph_integer_t length;
@@ -2751,7 +2764,20 @@ int igraph_adjedgelist_init(const igraph_t *graph,
 			    igraph_adjedgelist_t *eal, 
 			    igraph_neimode_t mode);
 void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael);
-#define igraph_adjedgelist_get(ael, no) (&(ael)->adjs[(long int)(no)])
+/**
+ * \define igraph_adjedgelist_get
+ * Query a vector in an adjedgelist
+ *
+ * Returns a pointer to an <type>igraph_vector_t</type> object from an
+ * adjacency list containing edge ids. The vector can be modified,
+ * resized, etc. as desired. 
+ * \param graph ael The edge adjacency list.
+ * \param no The vertex of which the adjacent edges are returned.
+ * \return Pointer to an <type>igraph_vector_t</type> object.
+ * 
+ * Time complexity: O(1).
+ */
+#define igraph_adjedgelist_get(ael,no) (&(ael)->adjs[(long int)(no)])
 
 /* -------------------------------------------------- */
 /* For internal use only, should move to other header */
@@ -2772,7 +2798,11 @@ int igraph_i_lazy_adjlist_init(const igraph_t *graph,
 void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al);
 /* igraph_vector_t *igraph_i_lazy_adjlist_get(igraph_i_lazy_adjlist_t *al, */
 /* 					   igraph_integer_t no); */
-#define igraph_i_lazy_adjlist_get(al, no) \
+/**
+ * \define igraph_i_lazy_adjlist_get
+ * TODO
+ */
+#define igraph_i_lazy_adjlist_get(al,no) \
   ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
    (igraph_i_lazy_adjlist_get_real(al, no)))
 igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,

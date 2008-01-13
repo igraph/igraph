@@ -60,6 +60,7 @@
     <xi:include href="dqueue.xml"/>
     <xi:include href="heap.xml"/>
     <xi:include href="strvector.xml"/>
+    <xi:include href="adjlist.xml"/>
   </chapter>
 
   <xi:include href="generators.xml"/>

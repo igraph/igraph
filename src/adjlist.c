@@ -26,6 +26,65 @@
 
 #include <string.h>   /* memset */
 
+/**
+ * \section about_adjlists
+ * <para>Sometimes it is easier to work with a graph which is in
+ * adjacency list format: a list of vectors; each vector contains the
+ * neighbor vertices or adjacent edges of a given vertex. Typically,
+ * this representation is good if we need to iterate over the neigbors
+ * of all vertices many times. E.g. when finding the shortest paths
+ * between every pairs of vertices or calculating closeness centrality
+ * for all the vertices.</para>
+ * 
+ * <para>The <type>igraph_adjlist_t</type> stores the adjacency lists
+ * of a graph. After creation it is independent of the original graph,
+ * it can be modified freely with the usual vector operations, the
+ * graph is not affected. E.g. the adjacency list can be used to
+ * rewire the edges of a graph efficiently. If one used the
+ * straightforward \ref igraph_delete_edges() and \ref
+ * igraph_add_edges() combination for this that needs O(|V|+|E|) time
+ * for every single deletion and insertion operation, it is thus very
+ * slow if many edges are rewired. Extracting the graph into an
+ * adjacency list, do all the rewiring operations on the vectors of
+ * the adjacency list and then creating a new graph needs (depending
+ * on how exactly the rewiring is done) typically O(|V|+|E|) time for
+ * the whole rewiring process.</para>
+ * 
+ * <para>Lazy adjacency lists are a bit different. When creating a
+ * lazy adjacency list, the neighbors of the vertices are not queried,
+ * only some memory is allocated for the vectors. When \ref
+ * igraph_i_lazy_adjlist_get() is called for vertex v the first time,
+ * the neighbors of v are queried and stored in a vector of the
+ * adjacency list, so they don't need to be queried again. Lazy
+ * adjacency lists are handy if you have an at least linear operation
+ * (because initialization is generally linear in terms of number of
+ * vertices), but you don't know how many vertices you will visit
+ * during the computation.
+ * </para>
+ * 
+ */
+
+/**
+ * \function igraph_adjlist_init
+ * Initialize an adjacency list of vertices
+ * 
+ * Create a list of vectors containing the neighbors of all vertices
+ * in a graph. The adjacency list is independent of the graph after
+ * creation, e.g. the graph can be destroyed and modified, the
+ * adjacency list contains the state of the graph at the time of its
+ * initialization. 
+ * \param graph The input graph. 
+ * \param al Pointer to an uninitialized <type>igraph_adjlist_t</type> object.
+ * \param mode Constant specifying whether outgoing
+ *   (<code>IGRAPH_OUT</code>), incoming (<code>IGRAPH_IN</code>),
+ *   or both (<code>IGRAPH_ALL</code>) types of neighbors to include
+ *   in the adjacency list. It is ignored for undirected networks.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
 int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
 			  igraph_neimode_t mode) {
   long int i;
@@ -52,6 +111,27 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_adjlist_init_complementer
+ * Adjacency lists for the complementer graph
+ * 
+ * This function creates adjacency lists for the complementer 
+ * of the input graph. In the complementer graph all edges are present
+ * which are not present in the original graph. Multiple edges in the
+ * input graph are ignored.
+ * \param graph The input graph.
+ * \param al Pointer to a not yet initialized adjacency list.
+ * \param mode Constant specifying whether outgoing
+ *   (<code>IGRAPH_OUT</code>), incoming (<code>IGRAPH_IN</code>),
+ *   or both (<code>IGRAPH_ALL</code>) types of neighbors (in the
+ *   complementer graph) to include in the adjacency list. It is
+ *   ignored for undirected networks.
+ * \param loops Whether to consider loop edges.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|^2+|E|), quadratic in the number of vertices.
+ */
 
 int igraph_adjlist_init_complementer(const igraph_t *graph,
 				       igraph_adjlist_t *al, 
@@ -110,6 +190,16 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_adjlist_destroy
+ * Deallocate memory
+ * 
+ * Free all memory allocated for an adjacency list. 
+ * \param al The adjacency list to destroy.
+ * 
+ * Time complexity: depends on memory management.
+ */
+
 void igraph_adjlist_destroy(igraph_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
@@ -122,11 +212,34 @@ void igraph_adjlist_destroy(igraph_adjlist_t *al) {
 /*   return &al->adjs[(long int)no]; */
 /* } */
 
+/**
+ * \function igraph_adjlist_sort
+ * Sort each vector in an adjacency list.
+ * 
+ * Sorts every vector of the adjacency list.
+ * \param al The adjacency list.
+ * 
+ * Time complexity: O(n log n), n is the total number of elements in
+ * the adjacency list.
+ */
+
 void igraph_adjlist_sort(igraph_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++)
     igraph_vector_sort(&al->adjs[i]);
 }
+
+/**
+ * \function igraph_adjlist_simplify
+ * Simplify
+ * 
+ * Simplify an adjacency list, ie. remove loop and multiple edges.
+ * \param al The adjacency list.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of edges and
+ * vertices.
+ */
 
 int igraph_adjlist_simplify(igraph_adjlist_t *al) {
   long int i;
@@ -155,6 +268,27 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al) {
   return 0;
 }
 
+/**
+ * \function igraph_adjedgelist_init
+ * Initialize an adjacency list of edges
+ * 
+ * Create a list of vectors containing the adjacent edges for all
+ * vertices. The adjacency list is independent of the graph after
+ * creation, subsequent changes of the graph object do not update the
+ * adjacency list, and changes to the adjacency list do no update the
+ * graph.
+ * \param graph The input graph.
+ * \param ael Pointer to an uninitialized adjcency list.
+ * \param mode Constant specifying whether incoming edges
+ *   (<code>IGRAPH_IN</code>), outgoing edges (<code>IGRAPH_OUT</code>) or
+ *   both (<code>IGRAPH_ALL</code>) to include in the adjacency lists
+ *   of directed graphs. It is ignored for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+
 int igraph_adjedgelist_init(const igraph_t *graph, 
 			      igraph_adjedgelist_t *ael, 
 			      igraph_neimode_t mode) {
@@ -182,6 +316,16 @@ int igraph_adjedgelist_init(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_adjedgelist_destroy
+ * Destroy
+ * 
+ * Free all memory allocated for an adjacency list.
+ * \param eal The adjcency list to destroy.
+ * 
+ * Time complexity: depends on memory management.
+ */
 
 void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael) {
   long int i;

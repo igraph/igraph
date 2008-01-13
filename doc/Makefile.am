@@ -8,7 +8,8 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      structural.xml iterators.xml attributes.xml layout.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
-	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml
+	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
+	      adjlist.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -112,6 +113,9 @@ heap.xml: heap.xxml $(SRCDIR)/heap.pmt
 
 strvector.xml: strvector.xxml $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
+
+adjlist.xml: adjlist.xxml $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
