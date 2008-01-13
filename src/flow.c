@@ -99,7 +99,7 @@ int igraph_i_maxflow_value_undirected(const igraph_t *graph,
  * (L. R. Ford Jr. and D. R. Fulkerson. Maximal flow through a
  * network. Canadian J. Math., 8:399-404, 1956.) the maximum flow
  * between two vertices is the same as the 
- * minimum between them (also called the minimum s-t cut). So the \ref
+ * minimum cut between them (also called the minimum s-t cut). So \ref
  * igraph_st_mincut_value() gives the same result in all cases as \c
  * igraph_maxflow_value().</para>
  * 

@@ -339,7 +339,26 @@ void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael) {
 
 /**
  * \function igraph_lazy_adjlist_init
- * TODO
+ * Constructor
+ *
+ * Create a lazy adjacency list for vertices. This function only
+ * allocates some memory for storing the vectors of an adjacency list,
+ * but the neighbor vertices are not queried, only at the \ref
+ * igraph_lazy_adjlist_get() calls. 
+ * \param graph The input graph.
+ * \param al Pointer to an uninitialized adjacency list object.
+ * \param mode Constant, it gives whether incoming edges
+ *   (<code>IGRAPH_IN</code>), outgoing edges
+ *   (<code>IGRPAH_OUT</code>) or both types of edges
+ *   (<code>IGRAPH_ALL</code>) are considered. It is ignored for
+ *   undirected graphs.
+ * \param simplify Constant, it gives whether to simplify the vectors
+ *   in the adjacency list (<code>IGRAPH_SIMPLIFY</code>) ot not
+ *   (<code>IGRAPH_DONT_SIMPLIFY</code>).
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|), the number of vertices, possibly, but
+ * depends on the underlying memory management too.
  */
 
 int igraph_lazy_adjlist_init(const igraph_t *graph,
@@ -366,7 +385,12 @@ int igraph_lazy_adjlist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_adjlist_destroy
- * TODO
+ * Deallocate memory
+ * 
+ * Free all allocated memory for a lazy adjacency list.
+ * \param al The adjacency list to deallocate.
+ * 
+ * Time complexity: depends on the memory management.
  */
 
 void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
@@ -418,7 +442,23 @@ igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 
 /**
  * \function igraph_lazy_adjedgelist_init
- * TODO
+ * Constructor
+ * 
+ * Create a lazy adjacency list for edges. This function only
+ * allocates some memory for storing the vectors of an adjacency list,
+ * but the adjacent edges are not queried, only when \ref
+ * igraph_lazy_adjedgelist_get() is called.
+ * \param graph The input graph.
+ * \param al Pointer to an uninitialized adjacency list.
+ * \param mode Constant, it gives whether incoming edges
+ *   (<code>IGRAPH_IN</code>), outgoing edges
+ *   (<code>IGRPAH_OUT</code>) or both types of edges
+ *   (<code>IGRAPH_ALL</code>) are considered. It is ignored for
+ *   undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|), the number of vertices, possibly. But it
+ * also depends on the underlying memory management too.
  */
 
 int igraph_lazy_adjedgelist_init(const igraph_t *graph,
@@ -446,7 +486,12 @@ int igraph_lazy_adjedgelist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_adjedgelist_destroy
- * TODO
+ * Deallocate memory
+ * 
+ * Free all allocated memory for a lazy edge adjacency list.
+ * \param al The adjacency list to deallocate.
+ * 
+ * Time complexity: depends on memory management.
  */
 
 void igraph_lazy_adjedgelist_destroy(igraph_lazy_adjedgelist_t *al) {

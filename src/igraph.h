@@ -2800,7 +2800,19 @@ void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 /* 					   igraph_integer_t no); */
 /**
  * \define igraph_lazy_adjlist_get
- * TODO
+ * Query neighbor vertices
+ * 
+ * If the function is called for the first time for a vertex then the
+ * result is stored in the adjacency list and no further query
+ * operations are needed when the neighbors of the same vertex are
+ * queried again.
+ * \param al The lazy adjacency list.
+ * \param no The vertex id to query.
+ * \return Pointer to a vector. It is allowed to modify it and
+ *   modification does not affect the original graph.
+ * 
+ * Time complexity: O(d), the number of neighbor vertices for the
+ * first time, O(1) for subsequent calls.
  */
 #define igraph_lazy_adjlist_get(al,no) \
   ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
@@ -2814,7 +2826,19 @@ int igraph_lazy_adjedgelist_init(const igraph_t *graph,
 void igraph_lazy_adjedgelist_destroy(igraph_lazy_adjedgelist_t *al);
 /**
  * \define igraph_lazy_adjedgelist_get
- * TODO
+ * Query adjacent edges
+ * 
+ * If the function is called for the first time for a vertex, then the
+ * result is stored in the adjacency list and no further query
+ * operations are needed when the adjacent edges of the same vertex are
+ * queried again.
+ * \param al The lazy adjacency list object.
+ * \param no The vertex id to query.
+ * \return Pointer to a vector. It is allowed to modify it and
+ *   modification does not affect the original graph.
+ * 
+ * Time complexity: O(d), the number of adjacent edges for the first
+ * time, O(1) for subsequent calls with the same \p no argument.
  */
 #define igraph_lazy_adjedgelist_get(al,no) \
   ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
