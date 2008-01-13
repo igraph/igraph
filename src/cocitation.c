@@ -227,7 +227,7 @@ int igraph_i_neisets_intersect(const igraph_vector_t *v1,
  */
 int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
     const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
-  igraph_i_lazy_adjlist_t al;
+  igraph_lazy_adjlist_t al;
   igraph_vit_t vit, vit2;
   long int i, j, k;
   long int len_union, len_intersection;
@@ -238,15 +238,15 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit2));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit2);
 
-  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &al, mode, IGRAPH_I_SIMPLIFY));
-  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &al);
+  IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, mode, IGRAPH_SIMPLIFY));
+  IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
 
   IGRAPH_CHECK(igraph_matrix_resize(res, IGRAPH_VIT_SIZE(vit), IGRAPH_VIT_SIZE(vit)));
 
   if (loops) {
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
       i=IGRAPH_VIT_GET(vit);
-      v1=igraph_i_lazy_adjlist_get(&al, i);
+      v1=igraph_lazy_adjlist_get(&al, i);
       if (!igraph_vector_binsearch(v1, i, &k)) igraph_vector_insert(v1, k, i);
     }
   }
@@ -257,8 +257,8 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
     for (IGRAPH_VIT_RESET(vit2), j=0;
       !IGRAPH_VIT_END(vit2); IGRAPH_VIT_NEXT(vit2), j++) {
       if (j <= i) continue;
-      v1=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
-      v2=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
+      v1=igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
+      v2=igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
       igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
       if (len_union > 0)
         MATRIX(*res, i, j) = ((igraph_real_t)len_intersection)/len_union;
@@ -268,7 +268,7 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
     }
   }
 
-  igraph_i_lazy_adjlist_destroy(&al);
+  igraph_lazy_adjlist_destroy(&al);
   igraph_vit_destroy(&vit);
   igraph_vit_destroy(&vit2);
   IGRAPH_FINALLY_CLEAN(3);
@@ -325,7 +325,7 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
  */
 int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
     const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
-  igraph_i_lazy_adjlist_t al;
+  igraph_lazy_adjlist_t al;
   igraph_vit_t vit, vit2;
   long int i, j, k;
   long int len_union, len_intersection;
@@ -336,15 +336,15 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit2));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit2);
 
-  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &al, mode, IGRAPH_I_SIMPLIFY));
-  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &al);
+  IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &al, mode, IGRAPH_SIMPLIFY));
+  IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &al);
 
   IGRAPH_CHECK(igraph_matrix_resize(res, IGRAPH_VIT_SIZE(vit), IGRAPH_VIT_SIZE(vit)));
 
   if (loops) {
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
       i=IGRAPH_VIT_GET(vit);
-      v1=igraph_i_lazy_adjlist_get(&al, i);
+      v1=igraph_lazy_adjlist_get(&al, i);
       if (!igraph_vector_binsearch(v1, i, &k)) igraph_vector_insert(v1, k, i);
     }
   }
@@ -355,8 +355,8 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
     for (IGRAPH_VIT_RESET(vit2), j=0;
       !IGRAPH_VIT_END(vit2); IGRAPH_VIT_NEXT(vit2), j++) {
       if (j <= i) continue;
-      v1=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
-      v2=igraph_i_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
+      v1=igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit));
+      v2=igraph_lazy_adjlist_get(&al, IGRAPH_VIT_GET(vit2));
       igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
       len_union += len_intersection;
       if (len_union > 0)
@@ -367,7 +367,7 @@ int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
     }
   }
 
-  igraph_i_lazy_adjlist_destroy(&al);
+  igraph_lazy_adjlist_destroy(&al);
   igraph_vit_destroy(&vit);
   igraph_vit_destroy(&vit2);
   IGRAPH_FINALLY_CLEAN(3);

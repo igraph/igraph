@@ -1319,7 +1319,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   igraph_vector_t idx, idx2;
   long int i, j, k;
   long int communities=1;
-  igraph_i_lazy_adjlist_t adjlist;
+  igraph_lazy_adjlist_t adjlist;
   long int size=0;
   igraph_vector_t veigenvector, *myeigenvector=eigenvector;
 
@@ -1345,9 +1345,9 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   
   IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&idx2, no_of_nodes);
-  IGRAPH_CHECK(igraph_i_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, 
-					  IGRAPH_I_DONT_SIMPLIFY));  
-  IGRAPH_FINALLY(igraph_i_lazy_adjlist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL, 
+					  IGRAPH_DONT_SIMPLIFY));  
+  IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
 
   /* Allocate ARPACK structures */
   IGRAPH_VECTOR_INIT_FINALLY(&v, ldv*ncv);
@@ -1411,7 +1411,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 	  comm_edges=0;
 	  for (j=0; j<size; j++) {
 	    long int oldid=VECTOR(idx)[j];
-	    igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	    igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, oldid);
 	    nlen=igraph_vector_size(neis);
 	    comm_edges += nlen;
 	    kig=0;
@@ -1430,7 +1430,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 	  ktx=0.0;
 	  for (j=0; j<size; j++) {
 	    long int oldid=VECTOR(idx)[j];
-	    igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	    igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, oldid);
 	    long int degree=igraph_vector_size(neis);
 	    to[j] += degree * comm_edges / no_of_edges * from[j]/2;
 	    ktx += from[j] * degree;
@@ -1440,7 +1440,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 	  /* Now calculate Bx */
 	  for (j=0; j<size; j++) {
 	    long int oldid=VECTOR(idx)[j];
-	    igraph_vector_t *neis=igraph_i_lazy_adjlist_get(&adjlist, oldid);
+	    igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, oldid);
 	    long int degree=igraph_vector_size(neis);
 	    to[j] = to[j] - ktx*degree + degree*degree*from[j]/no_of_edges/2;
 	  }
@@ -1522,7 +1522,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   igraph_vector_destroy(&v);
   IGRAPH_FINALLY_CLEAN(7);  
   
-  igraph_i_lazy_adjlist_destroy(&adjlist);
+  igraph_lazy_adjlist_destroy(&adjlist);
   igraph_vector_destroy(&idx2);
   igraph_vector_destroy(&idx);
   IGRAPH_FINALLY_CLEAN(3);

@@ -53,7 +53,7 @@
  * <para>Lazy adjacency lists are a bit different. When creating a
  * lazy adjacency list, the neighbors of the vertices are not queried,
  * only some memory is allocated for the vectors. When \ref
- * igraph_i_lazy_adjlist_get() is called for vertex v the first time,
+ * igraph_lazy_adjlist_get() is called for vertex v the first time,
  * the neighbors of v are queried and stored in a vector of the
  * adjacency list, so they don't need to be queried again. Lazy
  * adjacency lists are handy if you have an at least linear operation
@@ -337,10 +337,15 @@ void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael) {
   igraph_Free(ael->adjs);
 }
 
-int igraph_i_lazy_adjlist_init(const igraph_t *graph,
-			       igraph_i_lazy_adjlist_t *al,
+/**
+ * \function igraph_lazy_adjlist_init
+ * TODO
+ */
+
+int igraph_lazy_adjlist_init(const igraph_t *graph,
+			       igraph_lazy_adjlist_t *al,
 			       igraph_neimode_t mode,
-			       igraph_i_lazy_adlist_simplify_t simplify) {
+			       igraph_lazy_adlist_simplify_t simplify) {
   if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Cannor create adjlist view", IGRAPH_EINVMODE);
   }
@@ -359,7 +364,12 @@ int igraph_i_lazy_adjlist_init(const igraph_t *graph,
   return 0;
 }
 
-void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al) {
+/**
+ * \function igraph_lazy_adjlist_destroy
+ * TODO
+ */
+
+void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
   long int i, n=al->length;
   for (i=0; i<n; i++) {
     if (al->adjs[i] != 0) {
@@ -370,7 +380,7 @@ void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al) {
   igraph_Free(al->adjs);
 }
 
-igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
+igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 						igraph_integer_t pno) {
   long int no=pno;
   int ret;
@@ -389,7 +399,7 @@ igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
       igraph_error("", __FILE__, __LINE__, ret);
     }
 
-    if (al->simplify == IGRAPH_I_SIMPLIFY) {
+    if (al->simplify == IGRAPH_SIMPLIFY) {
       igraph_vector_t *v=al->adjs[no];
       long int i, p=0, n=igraph_vector_size(v);
       for (i=0; i<n; i++) {
@@ -406,8 +416,13 @@ igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
   return al->adjs[no];
 }
 
-int igraph_i_lazy_adjedgelist_init(const igraph_t *graph,
-				   igraph_i_lazy_adjedgelist_t *al,
+/**
+ * \function igraph_lazy_adjedgelist_init
+ * TODO
+ */
+
+int igraph_lazy_adjedgelist_init(const igraph_t *graph,
+				   igraph_lazy_adjedgelist_t *al,
 				   igraph_neimode_t mode) {
 
   if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
@@ -429,7 +444,12 @@ int igraph_i_lazy_adjedgelist_init(const igraph_t *graph,
   
 }
 
-void igraph_i_lazy_adjedgelist_destroy(igraph_i_lazy_adjedgelist_t *al) {
+/**
+ * \function igraph_lazy_adjedgelist_destroy
+ * TODO
+ */
+
+void igraph_lazy_adjedgelist_destroy(igraph_lazy_adjedgelist_t *al) {
   long int i, n=al->length;
   for (i=0; i<n; i++) {
     if (al->adjs[i] != 0) {
@@ -440,7 +460,7 @@ void igraph_i_lazy_adjedgelist_destroy(igraph_i_lazy_adjedgelist_t *al) {
   igraph_Free(al->adjs);
 }
 
-igraph_vector_t *igraph_i_lazy_adjedgelist_get_real(igraph_i_lazy_adjedgelist_t *al,
+igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *al,
 						    igraph_integer_t pno) {
   long int no=pno;
   int ret;

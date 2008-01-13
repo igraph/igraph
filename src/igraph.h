@@ -153,8 +153,8 @@ typedef enum { IGRAPH_VCONN_NEI_ERROR=0,
 typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 	       IGRAPH_SPINCOMM_UPDATE_CONFIG } igraph_spincomm_update_t; 
 
-typedef enum { IGRAPH_I_DONT_SIMPLIFY=0,
-	       IGRAPH_I_SIMPLIFY } igraph_i_lazy_adlist_simplify_t;
+typedef enum { IGRAPH_DONT_SIMPLIFY=0,
+	       IGRAPH_SIMPLIFY } igraph_lazy_adlist_simplify_t;
 
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
@@ -2304,12 +2304,12 @@ int igraph_revolver_error2_air(const igraph_t *graph,
 			       igraph_real_t *lognull);
 
 /* Should be moved to to types.h? */
-typedef struct igraph_i_lazy_adjedgelist_t {
+typedef struct igraph_lazy_adjedgelist_t {
   const igraph_t *graph;
   igraph_integer_t length;
   igraph_vector_t **adjs;
   igraph_neimode_t mode;
-} igraph_i_lazy_adjedgelist_t;
+} igraph_lazy_adjedgelist_t;
 
 /* Non-citation networks */
 
@@ -2327,7 +2327,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
 			const igraph_matrix_t *debug,
 			igraph_vector_ptr_t *debugres);
 int igraph_revolver_mes_d_d(const igraph_t *graph, 
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *kernel,
 			    igraph_matrix_t *sd,
 			    igraph_matrix_t *norm,
@@ -2342,7 +2342,7 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 			    igraph_integer_t pno_of_events,
 			    igraph_integer_t pmaxdegree);
 int igraph_revolver_st_d_d(const igraph_t *graph,
-			   igraph_i_lazy_adjedgelist_t *adjlist,
+			   igraph_lazy_adjedgelist_t *adjlist,
 			   igraph_vector_t *st,
 			   const igraph_matrix_t *kernel,
 			   const igraph_vector_t *vtime,
@@ -2351,7 +2351,7 @@ int igraph_revolver_st_d_d(const igraph_t *graph,
 			   const igraph_vector_t *etimeidx,
 			   igraph_integer_t pno_of_events);
 int igraph_revolver_exp_d_d(const igraph_t *graph,
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *expected,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
@@ -2362,7 +2362,7 @@ int igraph_revolver_exp_d_d(const igraph_t *graph,
 			    igraph_integer_t pno_of_events,
 			    igraph_integer_t pmaxdegree);
 int igraph_revolver_error_d_d(const igraph_t *graph,
-			      igraph_i_lazy_adjedgelist_t *adjlist,
+			      igraph_lazy_adjedgelist_t *adjlist,
 			      const igraph_matrix_t *kernel,
 			      const igraph_vector_t *st,
 			      const igraph_vector_t *vtime,
@@ -2390,7 +2390,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
 			const igraph_matrix_t *debug,
 			igraph_vector_ptr_t *debugres);
 int igraph_revolver_mes_p_p(const igraph_t *graph,
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *kernel,
 			    igraph_matrix_t *sd,
 			    igraph_matrix_t *norm,
@@ -2407,7 +2407,7 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
 			    const igraph_vector_t *eventsizes,
 			    igraph_integer_t pmaxpapers);
 int igraph_revolver_st_p_p(const igraph_t *graph,
-			   igraph_i_lazy_adjedgelist_t *adjlist,
+			   igraph_lazy_adjedgelist_t *adjlist,
 			   igraph_vector_t *st,
 			   const igraph_matrix_t *kernel,
 			   const igraph_vector_t *vtime,
@@ -2419,7 +2419,7 @@ int igraph_revolver_st_p_p(const igraph_t *graph,
 			   const igraph_vector_t *eventsizes,
 			   igraph_integer_t pmaxpapers);
 int igraph_revolver_exp_p_p(const igraph_t *graph,
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *expected,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
@@ -2432,7 +2432,7 @@ int igraph_revolver_exp_p_p(const igraph_t *graph,
 			    const igraph_vector_t *eventsizes,
 			    igraph_integer_t pmaxpapers);
 int igraph_revolver_error_p_p(const igraph_t *graph,
-			      igraph_i_lazy_adjedgelist_t *adjlist,
+			      igraph_lazy_adjedgelist_t *adjlist,
 			      const igraph_matrix_t *kernel,
 			      const igraph_vector_t *st,
 			      const igraph_vector_t *vtime,
@@ -2783,39 +2783,43 @@ void igraph_adjedgelist_destroy(igraph_adjedgelist_t *ael);
 /* For internal use only, should move to other header */
 /* -------------------------------------------------- */
 
-typedef struct igraph_i_lazy_adjlist_t {
+typedef struct igraph_lazy_adjlist_t {
   const igraph_t *graph;
   igraph_integer_t length;
   igraph_vector_t **adjs;
   igraph_neimode_t mode;
-  igraph_i_lazy_adlist_simplify_t simplify;
-} igraph_i_lazy_adjlist_t;
+  igraph_lazy_adlist_simplify_t simplify;
+} igraph_lazy_adjlist_t;
 
-int igraph_i_lazy_adjlist_init(const igraph_t *graph,
-			       igraph_i_lazy_adjlist_t *al,
+int igraph_lazy_adjlist_init(const igraph_t *graph,
+			       igraph_lazy_adjlist_t *al,
 			       igraph_neimode_t mode,
-			       igraph_i_lazy_adlist_simplify_t simplify);
-void igraph_i_lazy_adjlist_destroy(igraph_i_lazy_adjlist_t *al);
-/* igraph_vector_t *igraph_i_lazy_adjlist_get(igraph_i_lazy_adjlist_t *al, */
+			       igraph_lazy_adlist_simplify_t simplify);
+void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
+/* igraph_vector_t *igraph_lazy_adjlist_get(igraph_lazy_adjlist_t *al, */
 /* 					   igraph_integer_t no); */
 /**
- * \define igraph_i_lazy_adjlist_get
+ * \define igraph_lazy_adjlist_get
  * TODO
  */
-#define igraph_i_lazy_adjlist_get(al,no) \
+#define igraph_lazy_adjlist_get(al,no) \
   ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
-   (igraph_i_lazy_adjlist_get_real(al, no)))
-igraph_vector_t *igraph_i_lazy_adjlist_get_real(igraph_i_lazy_adjlist_t *al,
+   (igraph_lazy_adjlist_get_real(al, no)))
+igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 						igraph_integer_t no);
 
-int igraph_i_lazy_adjedgelist_init(const igraph_t *graph,
-				   igraph_i_lazy_adjedgelist_t *al,
+int igraph_lazy_adjedgelist_init(const igraph_t *graph,
+				   igraph_lazy_adjedgelist_t *al,
 				   igraph_neimode_t mode);
-void igraph_i_lazy_adjedgelist_destroy(igraph_i_lazy_adjedgelist_t *al);
-#define igraph_i_lazy_adjedgelist_get(al, no) \
+void igraph_lazy_adjedgelist_destroy(igraph_lazy_adjedgelist_t *al);
+/**
+ * \define igraph_lazy_adjedgelist_get
+ * TODO
+ */
+#define igraph_lazy_adjedgelist_get(al,no) \
   ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
-   (igraph_i_lazy_adjedgelist_get_real(al, no)))
-igraph_vector_t *igraph_i_lazy_adjedgelist_get_real(igraph_i_lazy_adjedgelist_t *al,
+   (igraph_lazy_adjedgelist_get_real(al, no)))
+igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *al,
 						    igraph_integer_t no);
 
 extern unsigned int igraph_i_isoclass_3[];

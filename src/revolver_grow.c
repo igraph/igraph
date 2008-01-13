@@ -52,7 +52,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
   long int i;
   igraph_integer_t maxdegree;
   igraph_vector_t vtimeidx, etimeidx;
-  igraph_i_lazy_adjedgelist_t adjlist;
+  igraph_lazy_adjedgelist_t adjlist;
 
   if (igraph_vector_size(vtime) != igraph_vcount(graph)) {
     IGRAPH_ERROR("Invalid vtime length", IGRAPH_EINVAL);
@@ -78,8 +78,8 @@ int igraph_revolver_d_d(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_order1(vtime, &vtimeidx, no_of_events));
   IGRAPH_CHECK(igraph_vector_order1(etime, &etimeidx, no_of_events));
   
-  IGRAPH_CHECK(igraph_i_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
 
   IGRAPH_PROGRESS("Revolver d-d", 0, NULL);
   for (i=0; i<niter; i++) {
@@ -142,7 +142,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
     IGRAPH_PROGRESS("Revolver d-d", 100.0*(i+1)/niter, NULL);
   }
 
-  igraph_i_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_adjedgelist_destroy(&adjlist);
   igraph_vector_destroy(&etimeidx);
   igraph_vector_destroy(&vtimeidx);
   igraph_vector_destroy(&st);
@@ -170,7 +170,7 @@ int igraph_revolver_d_d(const igraph_t *graph,
 /* } */
 
 int igraph_revolver_mes_d_d(const igraph_t *graph, 
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *kernel,
 			    igraph_matrix_t *sd,
 			    igraph_matrix_t *norm,
@@ -303,7 +303,7 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
       long int yidx=VECTOR(degree)[to];
       long int n;
 
-      adjedges=igraph_i_lazy_adjedgelist_get(adjlist, from);
+      adjedges=igraph_lazy_adjedgelist_get(adjlist, from);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
 	long int edge=VECTOR(*adjedges)[i];
@@ -324,7 +324,7 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 	  }
 	}
       }
-      adjedges=igraph_i_lazy_adjedgelist_get(adjlist, to);
+      adjedges=igraph_lazy_adjedgelist_get(adjlist, to);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
 	long int edge=VECTOR(*adjedges)[i];
@@ -461,7 +461,7 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 #undef NTKK
 
 int igraph_revolver_st_d_d(const igraph_t *graph,
-			   igraph_i_lazy_adjedgelist_t *adjlist,
+			   igraph_lazy_adjedgelist_t *adjlist,
 			   igraph_vector_t *st,
 			   const igraph_matrix_t *kernel,
 			   const igraph_vector_t *vtime,
@@ -540,7 +540,7 @@ int igraph_revolver_st_d_d(const igraph_t *graph,
       VECTOR(ntk)[xidx+1]++;
       VECTOR(ntk)[yidx+1]++;
       
-      adjedges=igraph_i_lazy_adjedgelist_get(adjlist, from);
+      adjedges=igraph_lazy_adjedgelist_get(adjlist, from);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
 	long int edge=VECTOR(*adjedges)[i];
@@ -551,7 +551,7 @@ int igraph_revolver_st_d_d(const igraph_t *graph,
 	  inc -= MATRIX(*kernel, xidx+1, deg);
 	}
       }
-      adjedges=igraph_i_lazy_adjedgelist_get(adjlist, to);
+      adjedges=igraph_lazy_adjedgelist_get(adjlist, to);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
 	long int edge=VECTOR(*adjedges)[i];
@@ -582,7 +582,7 @@ int igraph_revolver_st_d_d(const igraph_t *graph,
 }
 
 int igraph_revolver_exp_d_d(const igraph_t *graph,
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *expected,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
@@ -597,7 +597,7 @@ int igraph_revolver_exp_d_d(const igraph_t *graph,
 }
 
 int igraph_revolver_error_d_d(const igraph_t *graph,
-			      igraph_i_lazy_adjedgelist_t *adjlist,
+			      igraph_lazy_adjedgelist_t *adjlist,
 			      const igraph_matrix_t *kernel,
 			      const igraph_vector_t *st,
 			      const igraph_vector_t *vtime,
@@ -701,7 +701,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
   long int i;
   igraph_integer_t maxpapers=0;
   igraph_vector_t vtimeidx, etimeidx;
-  igraph_i_lazy_adjedgelist_t adjlist;
+  igraph_lazy_adjedgelist_t adjlist;
   igraph_vector_long_t papers;
   
   if (igraph_vector_size(vtime) != igraph_vcount(graph)) {
@@ -735,8 +735,8 @@ int igraph_revolver_p_p(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_order1(vtime, &vtimeidx, no_of_events));
   IGRAPH_CHECK(igraph_vector_order1(etime, &etimeidx, no_of_events));
   
-  IGRAPH_CHECK(igraph_i_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
-  IGRAPH_FINALLY(igraph_i_lazy_adjedgelist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
 
   IGRAPH_PROGRESS("Revolver p-p", 0, NULL);
   for (i=0; i<niter; i++) {
@@ -804,7 +804,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
     IGRAPH_PROGRESS("Revolver p-p", 100.0*(i+1)/niter, NULL);
   }
 
-  igraph_i_lazy_adjedgelist_destroy(&adjlist);
+  igraph_lazy_adjedgelist_destroy(&adjlist);
   igraph_vector_destroy(&etimeidx);
   igraph_vector_destroy(&vtimeidx);
   igraph_vector_destroy(&st);
@@ -817,7 +817,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
    ((xidx)==(yidx) ? (VECTOR(ntk)[(xidx)]*(VECTOR(ntk)[(xidx)]-1))/2-MATRIX(ntkk,(xidx),(yidx)) : VECTOR(ntk)[(xidx)]*VECTOR(ntk)[(yidx)]-MATRIX(ntkk,(xidx),(yidx)))
 
 int igraph_revolver_mes_p_p(const igraph_t *graph,
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *kernel,
 			    igraph_matrix_t *sd,
 			    igraph_matrix_t *norm,
@@ -949,7 +949,7 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
       long int pap=VECTOR(papers)[aut];
       long int j, n;
 
-      adjedges=igraph_i_lazy_adjedgelist_get(adjlist, aut);
+      adjedges=igraph_lazy_adjedgelist_get(adjlist, aut);
       n=igraph_vector_size(adjedges);
       for (j=0; j<n; j++) {
 	long int edge=VECTOR(*adjedges)[j];
@@ -1071,7 +1071,7 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
 #undef NTKK
 
 int igraph_revolver_st_p_p(const igraph_t *graph,
-			   igraph_i_lazy_adjedgelist_t *adjlist,
+			   igraph_lazy_adjedgelist_t *adjlist,
 			   igraph_vector_t *st,
 			   const igraph_matrix_t *kernel,
 			   const igraph_vector_t *vtime,
@@ -1145,7 +1145,7 @@ int igraph_revolver_st_p_p(const igraph_t *graph,
       VECTOR(ntk)[pap]--;
       VECTOR(ntk)[pap+1]++;
 
-      adjedges=igraph_i_lazy_adjedgelist_get(adjlist, aut);
+      adjedges=igraph_lazy_adjedgelist_get(adjlist, aut);
       n=igraph_vector_size(adjedges);
       for (j=0; j<n; j++) {
 	long int edge=VECTOR(*adjedges)[j];
@@ -1184,7 +1184,7 @@ int igraph_revolver_st_p_p(const igraph_t *graph,
 }
 
 int igraph_revolver_exp_p_p(const igraph_t *graph,
-			    igraph_i_lazy_adjedgelist_t *adjlist,
+			    igraph_lazy_adjedgelist_t *adjlist,
 			    igraph_matrix_t *expected,
 			    const igraph_matrix_t *kernel,
 			    const igraph_vector_t *st,
@@ -1202,7 +1202,7 @@ int igraph_revolver_exp_p_p(const igraph_t *graph,
 }
 
 int igraph_revolver_error_p_p(const igraph_t *graph,
-			      igraph_i_lazy_adjedgelist_t *adjlist,
+			      igraph_lazy_adjedgelist_t *adjlist,
 			      const igraph_matrix_t *kernel,
 			      const igraph_vector_t *st,
 			      const igraph_vector_t *vtime,

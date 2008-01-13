@@ -25,7 +25,15 @@
 </section>
 
 <section><title>Lazy adjacency list for vertices</title>
-<!-- doxrox-include igraph_i_lazy_adjlist_get -->
+<!-- doxrox-include igraph_lazy_adjlist_init -->
+<!-- doxrox-include igraph_lazy_adjlist_destroy -->
+<!-- doxrox-include igraph_lazy_adjlist_get -->
+</section>
+
+<section><title>Lazy adjacency list for edges</title>
+<!-- doxrox-include igraph_lazy_adjedgelist_init -->
+<!-- doxrox-include igraph_lazy_adjedgelist_destroy -->
+<!-- doxrox-include igraph_lazy_adjedgelist_get -->
 </section>
 
 </section>
