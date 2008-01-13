@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Adjlists">
+<title>Adjacency lists</title>
+
+<!-- doxrox-include about_adjlists -->
+
+<section><title>Adjacent vertices</title>
+<!-- doxrox-include igraph_adjlist_init -->
+<!-- doxrox-include igraph_adjlist_init_complementer -->
+<!-- doxrox-include igraph_adjlist_destroy -->
+<!-- doxrox-include igraph_adjlist_get -->
+<!-- doxrox-include igraph_adjlist_sort -->
+<!-- doxrox-include igraph_adjlist_simplify -->
+</section>
+
+<section><title>Adjacent edges</title>
+<!-- doxrox-include igraph_adjedgelist_init -->
+<!-- doxrox-include igraph_adjedgelist_destroy -->
+<!-- doxrox-include igraph_adjedgelist_get -->
+</section>
+
+<section><title>Lazy adjacency list for vertices</title>
+<!-- doxrox-include igraph_i_lazy_adjlist_get -->
+</section>
+
+</section>
