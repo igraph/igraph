@@ -726,14 +726,20 @@ def collect_attributes(n, name, alt_name, kwds, vs, config, default, transform=N
         if not result:
             result = attrs
         else:
+            if isinstance(result, str): result = [result] * n
+            try:
+                len(result)
+            except TypeError:
+                result = [result] * n
             result = [result[idx] or attrs[idx] for idx in xrange(len(result))]
 
+    if isinstance(result, str): result = [result] * n
     try:
         m = len(result)
     except TypeError:
         result = [result] * n
 
-    if not hasattr(result, "extend"): result = [result]
+    if not hasattr(result, "extend"): result = list(result)
     m = len(result)
     while len(result) < n:
         if len(result) <= n/2:
