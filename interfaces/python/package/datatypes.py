@@ -354,4 +354,3 @@ class TriadCensus(tuple):
             row = []
 
         return "\n".join(result)
-

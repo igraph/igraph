@@ -1,3 +1,4 @@
+# vim:ts=4:sw=4:sts=4:et
 """
 IGraph library.
 
@@ -42,7 +43,6 @@ import sys
 import operator
 from tempfile import mkstemp
 from warnings import warn
-
 
 class Graph(core.GraphBase):
     """Generic graph.
@@ -754,7 +754,7 @@ class Graph(core.GraphBase):
     def write_svg(self, fname, layout, width = None, height = None, \
                   labels = "label", colors = "color", shapes = "shape", \
                   vertex_size = 10, edge_colors = "color", \
-		  font_size = 16, *args, **kwds):
+                  font_size = 16, *args, **kwds):
         """Saves the graph as an SVG (Scalable Vector Graphics) file
         
         @param fname: the name of the file
@@ -777,10 +777,10 @@ class Graph(core.GraphBase):
           the shapes as integers. Shape 0 means hidden (nothing is drawn),
           shape 1 is a circle, shape 2 is a rectangle.
         @param vertex_size: vertex size in pixels
-	@param edge_colors: the edge colors. Either it is the name
-	  of an edge attribute to use, or a list explicitly specifying
-	  the colors. A color can be anything acceptable in an SVG
-	  file.
+        @param edge_colors: the edge colors. Either it is the name
+          of an edge attribute to use, or a list explicitly specifying
+          the colors. A color can be anything acceptable in an SVG
+          file.
         @param font_size: font size. If it is a string, it is written into
           the SVG file as-is (so you can specify anything which is valid
           as the value of the C{font-size} style). If it is a number, it
@@ -821,13 +821,12 @@ class Graph(core.GraphBase):
                 shapes = self.vs.get_attribute_values(shapes)
             except KeyError:
                 shapes = [1]*self.vcount()
-        
-	if isinstance(edge_colors, str):
-	    try:
-		edge_colors = self.es.get_attribute_values(edge_colors)
-	    except KeyError:
-		edge_colors = ["black" for x in xrange(self.ecount())]
-		
+        if isinstance(edge_colors, str):
+            try:
+                edge_colors = self.es.get_attribute_values(edge_colors)
+            except KeyError:
+                edge_colors = ["black" for x in xrange(self.ecount())]
+
         if not isinstance(font_size, str):
             font_size = "%spx" % str(font_size)
         else:
@@ -855,8 +854,8 @@ class Graph(core.GraphBase):
         layout=[[(row[0]-halfsizes[0])*ratios[0], \
                  (row[1]-halfsizes[1])*ratios[1]] \
                 for row in layout]
-		
-	directed=self.is_directed()
+                
+        directed=self.is_directed()
 
         print >>f, "<?xml version=\"1.0\" standalone=\"no\"?>"
         print >>f, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
@@ -874,7 +873,7 @@ class Graph(core.GraphBase):
         print >>f, "#vertices circle { stroke: black; stroke-width: 1 }"
         print >>f, "#vertices rect { stroke: black; stroke-width: 1 }"
         print >>f, "#vertices text { text-anchor: middle; font-size: %s; font-family: sans-serif; font-weight: normal }" % font_size
-	print >>f, "#edges line { stroke-width: 1 }"
+        print >>f, "#edges line { stroke-width: 1 }"
         print >>f, "    ]]>"
         print >>f, "  </style>"
         print >>f, "</defs>"
@@ -893,14 +892,15 @@ class Graph(core.GraphBase):
             angle = math.atan2(y2-y1, x2-x1)
             x2 = x2 - vertex_size*math.cos(angle)
             y2 = y2 - vertex_size*math.sin(angle)
-	    if directed:
-		# Dirty hack because the SVG specification: markers do not inherit stroke colors
-		print >>f, "    <g transform=\"translate(%.4f,%.4f)\" fill=\"%s\" stroke=\"%s\">" % (x2, y2, edge_colors[eidx], edge_colors[eidx]) 
-		print >>f, "      <line x1=\"%.4f\" y1=\"%.4f\" x2=\"0\" y2=\"0\"/>" % (x1-x2, y1-y2)
-		print >>f, "      <use x=\"0\" y=\"0\" xlink:href=\"#Triangle\" transform=\"rotate(%.4f)\"/>" % (180+angle*180/math.pi,)
-		print >>f, "    </g>\n"
-	    else:
-		print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\" style=\"stroke: %s\"/>" % (x1, y1, x2, y2, edge_colors[eidx])
+            if directed:
+                # Dirty hack because of the SVG specification:
+                # markers do not inherit stroke colors
+                print >>f, "    <g transform=\"translate(%.4f,%.4f)\" fill=\"%s\" stroke=\"%s\">" % (x2, y2, edge_colors[eidx], edge_colors[eidx]) 
+                print >>f, "      <line x1=\"%.4f\" y1=\"%.4f\" x2=\"0\" y2=\"0\"/>" % (x1-x2, y1-y2)
+                print >>f, "      <use x=\"0\" y=\"0\" xlink:href=\"#Triangle\" transform=\"rotate(%.4f)\"/>" % (180+angle*180/math.pi,)
+                print >>f, "    </g>\n"
+            else:
+                print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\" style=\"stroke: %s\"/>" % (x1, y1, x2, y2, edge_colors[eidx])
 
         print >>f, "  </g>"
         print >>f
@@ -1830,4 +1830,3 @@ def summary(o, f=sys.stdout):
         print >>f, str(o)
 
 config = configuration.init()
-
