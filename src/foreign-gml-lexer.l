@@ -67,7 +67,7 @@ whitespace  [ \r\n\t]
 
 \"[^\"]*\"                                      { return STRING; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
-[a-zA-Z][a-zA-Z0-9]*    { return KEYWORD; }
+[a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
 \[                      { return LISTOPEN; }
 \]                      { return LISTCLOSE; }
 [\n\r|\r\n|\r]          { igraph_gml_mylineno++; }
