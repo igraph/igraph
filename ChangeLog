@@ -1,3 +1,10 @@
+2008-01-16  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_read_graph_gml) : GML graphs are now
+	considered directed iff they contain a graph attribute
+	called 'directed' with value 1 (conforms with the tech
+	report but contradicts the draft specification)
+
 2008-01-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/community.c (igraph_community_leading_eigenvector_naive) : 

@@ -1106,7 +1106,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   /* Is is directed? */
   i=igraph_gml_tree_find(gtree, "directed", 0);
   if (i>=0 && igraph_gml_tree_type(gtree, i)==IGRAPH_I_GML_TREE_INTEGER) {
-    if (igraph_gml_tree_get_integer(gtree, i) == 0) {
+    if (igraph_gml_tree_get_integer(gtree, i) == 1) {
       directed=IGRAPH_DIRECTED;
     }
   }
