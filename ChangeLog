@@ -1,3 +1,10 @@
+2008-01-15  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/community.c (igraph_community_leading_eigenvector_naive) : 
+	no real changes, just cosmetics
+	* src/arpack.c (igraph_arpack_rssolve) : query eigenvector if 
+	storage option is given
+
 2008-01-13  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph.h (igraph_i_lazy_adjlist_t, igraph_lazy_adjlist_t)

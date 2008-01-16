@@ -687,9 +687,9 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
   long int j, k, nlen, size=n;
   igraph_vector_t *idx=data->idx;
   igraph_adjlist_t *adjlist=data->adjlist;
-  igraph_real_t sumdeg, ktx;
-  
-  /* Calculate Ax first */
+  igraph_real_t ktx, ktx2;
+
+ /* Calculate Ax first */
   for (j=0; j<size; j++) {
     long int oldid=VECTOR(*idx)[j];
     igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
@@ -702,24 +702,24 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
   }
   
   /* Now calculate k^Tx/2m */
-  ktx=0.0; sumdeg=0;
+  ktx=0.0; ktx2=0;
   for (j=0; j<size; j++) {
     long int oldid=VECTOR(*idx)[j];
     igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
     long int degree=igraph_vector_size(neis);
-    sumdeg += degree;
+    ktx2 += degree;
     ktx += from[j] * degree;
   }
-  ktx = ktx / sumdeg;	/* every edge has been counted twice */
+  ktx = ktx/ ktx2; 
   
   /* Now calculate Bx */
   for (j=0; j<size; j++) {
     long int oldid=VECTOR(*idx)[j];
     igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
     long int degree=igraph_vector_size(neis);
-    to[j] = to[j] - ktx*degree + degree*degree*from[j]/sumdeg;
+    to[j] = to[j] - ktx*degree + degree*degree*from[j]/ktx2;
   }
-  
+
   return 0;
 }
 
@@ -826,6 +826,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
       continue;			/* nothing to do */
     }
 
+    options->start=0;
     options->n=size;
     options->ncv=3;
     if (options->ncv > options->n) { options->ncv=options->n; }
@@ -835,7 +836,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 				       &extra, options, &storage, 0, 0));
 
     /* just to have the always the same result, we multiply by -1
-       if the first element is not positive  */
+       if the first (nonzero) element is not positive  */
     for (i=0; i<size; i++) {
       if (storage.v[i] != 0) { break; }
     }
@@ -848,6 +849,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     /* Ok, we have the eigenvector */
 
     /* Non-positive eigenvalue */
+/*     printf("%f\n", storage.d[0]); */
     if (storage.d[0] <= 0) { continue; }
     
     /* We create an index vector in workd to renumber the vertices */
@@ -1178,6 +1180,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     /* Ok, we have the eigenvector */
 
     /* If the eigenvalue is not positive then we're done */
+/*     printf("%f\n", VECTOR(d)[0]); */
     if (VECTOR(d)[0] <= 0) { continue; }
 
     /* Count the number of vertices in each community after the split */

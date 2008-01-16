@@ -121,7 +121,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   long int *select;
 
   long int ido=0;
-  long int rvec= vectors ? 1 : 0;	/* calculate eigenvectors? */
+  long int rvec= vectors || storage ? 1 : 0;	/* calculate eigenvectors? */
   char *all="All";
   
   /* Brush up options if needed */
@@ -215,7 +215,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 /*     fprintf(stderr, "ARPACK error: %i\n", (int)options->ierr); */
     IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
   }    
-
+  
   /* Save the result */
   
   if (values) {
@@ -225,7 +225,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
       VECTOR(*values)[i] = d[i];
     }
   }
-  
+
   if (vectors) {
     long int i, j, ptr=0;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
