@@ -4,6 +4,13 @@
 	considered directed iff they contain a graph attribute
 	called 'directed' with value 1 (conforms with the tech
 	report but contradicts the draft specification)
+	
+	* src/centrality.c (igraph_closeness_estimate,
+	igraph_betweenness_estimate) : adjacency list views are
+	used from now on
+	
+	* src/structural_properties.c (igraph_shortest_paths) :
+	adjacency lists views are used from now on
 
 2008-01-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 

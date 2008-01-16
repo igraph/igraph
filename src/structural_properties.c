@@ -91,7 +91,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
   IGRAPH_FINALLY(igraph_free, already_added);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   
-  igraph_adjlist_init(graph, &allneis, dirmode);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, dirmode));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
   
   for (i=0; i<no_of_nodes; i++) {
@@ -108,9 +108,9 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
       long int actnode=igraph_dqueue_pop(&q);
       long int actdist=igraph_dqueue_pop(&q);
       if (actdist>res) { 
-	res=actdist; 
-	from=i;
-	to=actnode;
+        res=actdist; 
+        from=i;
+        to=actnode;
       }
       
       neis=igraph_adjlist_get(&allneis, actnode);
@@ -679,28 +679,30 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_from;
   long int *already_counted;
-  
+  igraph_adjlist_t adjlist;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  igraph_vector_t *neis;
 
   long int i, j;
-  igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
   igraph_vit_t fromvit;
-
-  IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
-  IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
-
-  no_of_from=IGRAPH_VIT_SIZE(fromvit);
 
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
   }
+
+  IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
+  no_of_from=IGRAPH_VIT_SIZE(fromvit);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, mode));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
   already_counted=igraph_Calloc(no_of_nodes, long int);
   if (already_counted==0) {
     IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(free, already_counted);
-  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_nodes));
@@ -721,32 +723,33 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
       long int actdist=igraph_dqueue_pop(&q);
       MATRIX(*res, i, act)=actdist;
       
-      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, act, mode));
-      for (j=0; j<igraph_vector_size(&tmp); j++) {
-	long int neighbor=VECTOR(tmp)[j];
-	if (already_counted[neighbor] == i+1) { continue; }
-	already_counted[neighbor] = i+1;
-	reached++;
-	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-	IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+      neis = igraph_adjlist_get(&adjlist, act);
+      for (j=0; j<igraph_vector_size(neis); j++) {
+        long int neighbor=VECTOR(*neis)[j];
+        if (already_counted[neighbor] == i+1) { continue; }
+        already_counted[neighbor] = i+1;
+        reached++;
+        IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+        IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
       }
     }
+
     /* Plus the unreachable nodes */
     j=0;
     while (reached < no_of_nodes) {
       if (MATRIX(*res, i, j) == 0 && j != IGRAPH_VIT_GET(fromvit)) {
-	MATRIX(*res, i, j)=no_of_nodes;
-	reached++;
+        MATRIX(*res, i, j)=no_of_nodes;
+        reached++;
       }
       j++;
     }
   }
 
   /* Clean */
-  igraph_vector_destroy(&tmp);
   igraph_Free(already_counted);
   igraph_dqueue_destroy(&q);
   igraph_vit_destroy(&fromvit);
+  igraph_adjlist_destroy(&adjlist);
   IGRAPH_FINALLY_CLEAN(4);
 
   return 0;

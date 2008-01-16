@@ -587,18 +587,33 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
   long int j, k;
-  igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
   igraph_integer_t modein, modeout;
   igraph_vit_t vit;
+  igraph_vector_t *neis;
+
+  igraph_adjlist_t adjlist_out, adjlist_in;
+  igraph_adjlist_t *adjlist_out_p, *adjlist_in_p;
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-  if (directed) 
-    { modeout=IGRAPH_OUT; modein=IGRAPH_IN; } 
-  else 
-    { modeout=modein=IGRAPH_ALL; }
-
+  directed=directed && igraph_is_directed(graph);
+  if (directed) {
+    modeout=IGRAPH_OUT;
+    modein=IGRAPH_IN;
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_in);
+    adjlist_out_p=&adjlist_out;
+    adjlist_in_p=&adjlist_in;
+  } else {
+    modeout=modein=IGRAPH_ALL;
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
+    adjlist_out_p=adjlist_in_p=&adjlist_out;
+  }
+  
   distance=igraph_Calloc(no_of_nodes, long int);
   if (distance==0) {
     IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
@@ -615,7 +630,6 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   }
   IGRAPH_FINALLY(igraph_free, tmpscore);
 
-  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   igraph_stack_init(&stack, no_of_nodes);
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
@@ -643,21 +657,21 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
       if (cutoff > 0 && distance[actnode] >= cutoff) continue;
        
-      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, modeout));
-      for (j=0; j<igraph_vector_size(&tmp); j++) {
-	long int neighbor=VECTOR(tmp)[j];
-	if (nrgeo[neighbor] != 0) {
-	  /* we've already seen this node, another shortest path? */
-	  if (distance[neighbor]==distance[actnode]+1) {
-	    nrgeo[neighbor]+=nrgeo[actnode];
-	  }
-	} else {
-	  /* we haven't seen this node yet */
-	  nrgeo[neighbor]+=nrgeo[actnode];
-          distance[neighbor]=distance[actnode]+1;
-	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-	  IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
-	}
+      neis = igraph_adjlist_get(adjlist_out_p, actnode);
+      for (j=0; j<igraph_vector_size(neis); j++) {
+        long int neighbor=VECTOR(*neis)[j];
+        if (nrgeo[neighbor] != 0) {
+	      /* we've already seen this node, another shortest path? */
+	      if (distance[neighbor]==distance[actnode]+1) {
+	        nrgeo[neighbor]+=nrgeo[actnode];
+	      }
+	    } else {
+	      /* we haven't seen this node yet */
+	      nrgeo[neighbor]+=nrgeo[actnode];
+              distance[neighbor]=distance[actnode]+1;
+	      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	      IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
+	    }
       }
     } /* while !igraph_dqueue_empty */
 
@@ -669,14 +683,13 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       if (distance[actnode]<=1) { continue; } /* skip source node */
       
       /* set the temporary score of the friends */
-      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, actnode, modein));
-      for (j=0; j<igraph_vector_size(&tmp); j++) {
-	long int neighbor=VECTOR(tmp)[j];
-	if (distance[neighbor]==distance[actnode]-1 &&
-	    nrgeo[neighbor] != 0) {
-	  tmpscore[neighbor] += 
-	    (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
-	}
+      neis = igraph_adjlist_get(adjlist_in_p, actnode);
+      for (j=0; j<igraph_vector_size(neis); j++) {
+        long int neighbor=VECTOR(*neis)[j];
+	    if (distance[neighbor]==distance[actnode]-1 && nrgeo[neighbor] != 0) {
+	      tmpscore[neighbor] += 
+	        (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
+	    }
       }
     }
     
@@ -691,7 +704,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   } /* for source < no_of_nodes */
 
   /* divide by 2 for undirected graph */
-  if (!directed || !igraph_is_directed(graph)) {
+  if (!directed) {
     for (j=0; j<igraph_vector_size(res); j++) {
       VECTOR(*res)[j] /= 2.0;
     }
@@ -704,9 +717,17 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   
   igraph_dqueue_destroy(&q);
   igraph_stack_destroy(&stack);
-  igraph_vector_destroy(&tmp);
   igraph_vit_destroy(&vit);
-  IGRAPH_FINALLY_CLEAN(7);
+  IGRAPH_FINALLY_CLEAN(6);
+
+  if (directed) {
+    igraph_adjlist_destroy(&adjlist_out);
+    igraph_adjlist_destroy(&adjlist_in);
+    IGRAPH_FINALLY_CLEAN(2);
+  } else {
+    igraph_adjlist_destroy(&adjlist_out);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return 0;
 }
@@ -1059,14 +1080,14 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 		              const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_integer_t cutoff) {
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_vector_t already_counted;
+  igraph_vector_t already_counted, *neis;
   long int i, j;
   long int nodes_reached;
+  igraph_adjlist_t allneis;
 
   igraph_dqueue_t q;
   
   long int nodes_to_calc;
-  igraph_vector_t tmp;
   igraph_vit_t vit;
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -1080,8 +1101,10 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
   igraph_vector_null(res);
@@ -1094,6 +1117,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
     nodes_reached=1;
     VECTOR(already_counted)[(long int)IGRAPH_VIT_GET(vit)]=i+1;
 
+    IGRAPH_PROGRESS("Closeness: ", 100.0*i/no_of_nodes, NULL);
     IGRAPH_ALLOW_INTERRUPTION();
     
     while (!igraph_dqueue_empty(&q)) {
@@ -1104,25 +1128,27 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
       if (cutoff>0 && actdist>=cutoff) continue;
 
-      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, act, mode));
-      for (j=0; j<igraph_vector_size(&tmp); j++) {
-	long int neighbor=VECTOR(tmp)[j];
-	if (VECTOR(already_counted)[neighbor] == i+1) { continue; }
-	VECTOR(already_counted)[neighbor] = i+1;
-	nodes_reached++;
-	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-	IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
+      neis=igraph_adjlist_get(&allneis, act);
+      for (j=0; j<igraph_vector_size(neis); j++) {
+        long int neighbor=VECTOR(*neis)[j];
+        if (VECTOR(already_counted)[neighbor] == i+1) { continue; }
+        VECTOR(already_counted)[neighbor] = i+1;
+        nodes_reached++;
+        IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+        IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
       }
     }
     VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
   }
-  
+
+  IGRAPH_PROGRESS("Closeness: ", 100.0, NULL);
+
   /* Clean */
   igraph_dqueue_destroy(&q);
-  igraph_vector_destroy(&tmp);
   igraph_vector_destroy(&already_counted);
   igraph_vit_destroy(&vit);
+  igraph_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(4);
   
   return 0;
