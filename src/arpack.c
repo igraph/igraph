@@ -40,7 +40,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->ncv=3;
   o->ldv=o->n;			/* will be updated to (real) n */
   o->ishift=1;
-  o->mxiter=300;
+  o->mxiter=3000;
   o->nb=1;
   o->mode=1;
   o->start=0;

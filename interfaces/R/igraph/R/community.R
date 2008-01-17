@@ -287,19 +287,6 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
         PACKAGE="igraph")
 }
 
-leading.eigenvector.community <- function(graph, steps=vcount(graph)) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object!")
-  }
-
-  res <- .Call("R_igraph_community_leading_eigenvector", graph, as.numeric(steps),
-               PACKAGE="igraph")
-
-  class(res) <- "igraph.eigenc"
-  res
-}
-
 leading.eigenvector.community.step <- function(graph, fromhere=NULL,
                                                membership=rep(0, vcount(graph)),
                                                community=0,

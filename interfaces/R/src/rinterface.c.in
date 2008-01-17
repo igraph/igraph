@@ -6127,36 +6127,6 @@ SEXP R_igraph_community_to_membership(SEXP graph, SEXP pmerges,
   return result;
 }
 
-SEXP R_igraph_community_leading_eigenvector(SEXP graph, SEXP psteps) {
-  
-  igraph_t g;
-  long int steps=REAL(psteps)[0];
-  igraph_matrix_t merges;
-  igraph_vector_t membership;
-  SEXP result, names;
-  
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  igraph_matrix_init(&merges, 0, 0);
-  igraph_vector_init(&membership, 0);
-  igraph_community_leading_eigenvector(&g, &merges, &membership, steps);
-  PROTECT(result=NEW_LIST(2));
-  SET_VECTOR_ELT(result, 0, R_igraph_matrix_to_SEXP(&merges));
-  igraph_matrix_destroy(&merges);
-  SET_VECTOR_ELT(result, 1, R_igraph_vector_to_SEXP(&membership));
-  igraph_vector_destroy(&membership);
-  PROTECT(names=NEW_CHARACTER(2));
-  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("merges"));
-  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("membership"));
-  SET_NAMES(result, names);
-  
-  R_igraph_after();
-  
-  UNPROTECT(2);
-  return result;
-} 
-
 SEXP R_igraph_community_leading_eigenvector_step(SEXP graph, 
 						 SEXP pmembership,
 						 SEXP pcommunity,

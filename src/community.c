@@ -747,6 +747,8 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
  * \param steps The number of splits to do, if possible. Supply the
  *    number of vertices in the network here to perform as many steps 
  *    as possible.
+ * \param options The options for ARPACK. \c n and \c ncv is always
+ *    overwritten.
  * \return Error code.
  * 
  * \sa \ref igraph_community_leading_eigenvector() for the proper way, 
@@ -950,6 +952,76 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
   return 0;
 }
 
+typedef struct igraph_i_community_leading_eigenvector_data_t {
+  igraph_vector_t *idx;
+  igraph_vector_t *idx2;
+  igraph_adjlist_t *adjlist;
+  igraph_vector_t *tmp;
+  long int no_of_edges;
+  igraph_vector_t *mymembership;
+  long int comm;
+} igraph_i_community_leading_eigenvector_data_t;
+
+int igraph_i_community_leading_eigenvector(igraph_real_t *to,
+					   const igraph_real_t *from,
+					   long int n, void *extra) {
+  
+  igraph_i_community_leading_eigenvector_data_t *data=extra;
+  long int j, k, nlen, size=n;
+  igraph_vector_t *idx=data->idx;
+  igraph_vector_t *idx2=data->idx2;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_adjlist_t *adjlist=data->adjlist;
+  igraph_real_t ktx, ktx2;
+  long int no_of_edges=data->no_of_edges;
+  igraph_vector_t *mymembership=data->mymembership;
+  long int comm=data->comm;
+  
+  for (j=0; j<size; j++) {
+    long int oldid=VECTOR(*idx)[j];
+    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
+    nlen=igraph_vector_size(neis);
+    to[j]=0.0;
+    VECTOR(*tmp)[j]=0.0;
+    for (k=0; k<nlen; k++) {
+      long int nei=VECTOR(*neis)[k];
+      if (VECTOR(*mymembership)[nei]==comm) {
+	to[j] += from[ (long int) VECTOR(*idx2)[nei] ];
+	VECTOR(*tmp)[j] += 1;
+      }
+    }
+  }
+  
+  /* Now calculate k^Tx/2m */
+  ktx=0.0; ktx2=0.0;
+  for (j=0; j<size; j++) {
+    long int oldid=VECTOR(*idx)[j];
+    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
+    long int degree=igraph_vector_size(neis);
+    ktx += from[j] * degree;
+    ktx2 += degree;
+  }
+  ktx = ktx / no_of_edges/2.0;
+  ktx2 = ktx2 / no_of_edges/2.0;
+  
+  /* Now calculate Bx */
+  for (j=0; j<size; j++) {
+    long int oldid=VECTOR(*idx)[j];
+    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
+    igraph_real_t degree=igraph_vector_size(neis);
+    to[j] = to[j] - ktx*degree + degree*degree*from[j]/no_of_edges/2.0;
+    VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2*degree + 
+      degree*degree*1.0/no_of_edges/2.0;
+  }
+  
+  /* -d_ij summa l in G B_il */
+  for (j=0; j<size; j++) {
+    to[j] -= VECTOR(*tmp)[j] * from[j];
+  }
+
+  return 0;
+}
+
 /**
  * \ingroup communities
  * \function igraph_community_leading_eigenvector
@@ -984,6 +1056,8 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
  *    underlying community structure and no further steps can be
  *    done. If you wany as many steps as possible then supply the 
  *    number of vertices in the network here.
+ * \param options The options for ARPACK. \c n and \c ncv is always
+ *    overwritten.
  * \return Error code.
  * 
  * \sa \ref igraph_community_walktrap() and \ref
@@ -998,30 +1072,30 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 int igraph_community_leading_eigenvector(const igraph_t *graph,
 					 igraph_matrix_t *merges,
 					 igraph_vector_t *membership,
-					 long int steps) {
-  
+					 igraph_integer_t steps,
+					 igraph_arpack_options_t *options) {
+
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_dqueue_t tosplit;
-  igraph_vector_t x, x2;
   igraph_vector_t idx, idx2, mymerges;
+  igraph_vector_t tmp;
   long int staken=0;
   igraph_adjlist_t adjlist;
   long int i, j, k, l;
   long int communities=1;
   igraph_vector_t vmembership, *mymembership=membership;
-
-  /* These are for the ARPACK routines */
-  long int n=no_of_nodes, nev=1, ncv=3, ldv=n, *select, iparam[11], ipntr[11], ido,
-    lworkl=ncv*(ncv+8), info, ishfts, mode1, rvec=1, maxit=3000;
-  igraph_real_t sigma, tol=0;
-  igraph_vector_t v, workl, workd, d, resid, ax;
-  char *bmat="I", *LA="LA", *all="All", *which=LA;
-
+  igraph_i_community_leading_eigenvector_data_t extra;
+  igraph_arpack_storage_t storage;
+  
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("This method was developed for undirected graphs");
   }
-
+  
+  if (steps < 0 || steps > no_of_nodes-1) {
+    steps=no_of_nodes-1;
+  }
+  
   if (steps > no_of_nodes-1) {
     steps=no_of_nodes-1;
   }
@@ -1030,13 +1104,13 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     mymembership=&vmembership;
     IGRAPH_VECTOR_INIT_FINALLY(mymembership, 0);
   }
-
+  
   IGRAPH_VECTOR_INIT_FINALLY(&mymerges, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&mymerges, steps*2));
+
   IGRAPH_VECTOR_INIT_FINALLY(&idx, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&idx2, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&x, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&x2, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmp, no_of_nodes);
   IGRAPH_DQUEUE_INIT_FINALLY(&tosplit, 100);
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -1044,24 +1118,20 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(mymembership, no_of_nodes));
   igraph_vector_null(mymembership);  
 
-  /* Allocate ARPACK structures */
-  IGRAPH_VECTOR_INIT_FINALLY(&v, ldv*ncv);
-  IGRAPH_VECTOR_INIT_FINALLY(&workl, lworkl);
-  IGRAPH_VECTOR_INIT_FINALLY(&workd, 3*n);
-  IGRAPH_VECTOR_INIT_FINALLY(&d, ncv*2);
-  IGRAPH_VECTOR_INIT_FINALLY(&resid, n);
-  IGRAPH_VECTOR_INIT_FINALLY(&ax, n);
-  select= igraph_Calloc(ncv, long int);
-  if (!select) {
-    IGRAPH_ERROR("Cannot calculate eigenvector community", IGRAPH_ENOMEM);
-  }
-  IGRAPH_FINALLY(igraph_free, select);
-
   igraph_dqueue_push(&tosplit, 0);
-  
+
+  /* Memory for ARPACK */
+  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 3, no_of_nodes, 1));
+  IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);
+  extra.idx=&idx;
+  extra.idx2=&idx2;
+  extra.tmp=&tmp;
+  extra.adjlist=&adjlist;
+  extra.no_of_edges=no_of_edges;
+  extra.mymembership=mymembership;
+
   while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
     long int comm=igraph_dqueue_pop_back(&tosplit); /* depth first search */
-    igraph_real_t ktx=0.0, ktx2=0.0;
     long int size=0;
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -1074,119 +1144,43 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     staken++;
-
-    /* Set up ARPACK solver */
-    info=0; ido=0; ishfts=1; mode1=1;
-    iparam[0]=ishfts;
-    iparam[2]=maxit;
-    iparam[6]=mode1;
-    n=size; ldv=n;
-    if (n<3) { ncv=n; } else { ncv=3; }
-    lworkl=ncv*(ncv+8);
-    
-    while (1) {
-      
-      igraphdsaupd_(&ido, bmat, &n, which, &nev, &tol, VECTOR(resid),
-		    &ncv, VECTOR(v), &ldv, iparam, ipntr,
-		    VECTOR(workd), VECTOR(workl),
-		    &lworkl, &info);
-      
-      if (ido==-1 || ido==1) {
-	
-	long int j, nlen;
-	igraph_real_t *from=VECTOR(workd)+ipntr[0]-1;
-	igraph_real_t *to=VECTOR(workd)+ipntr[1]-1;
-
-	/* Calculate Ax first */
-	for (j=0; j<size; j++) {
-	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
-	  nlen=igraph_vector_size(neis);
-	  to[j]=0.0;
-	  VECTOR(x2)[j]=0.0;
-	  for (k=0; k<nlen; k++) {
-	    long int nei=VECTOR(*neis)[k];
-	    if (VECTOR(*mymembership)[nei]==comm) {
-	      to[j] += from[ (long int) VECTOR(idx2)[nei] ];
-	      VECTOR(x2)[j] += 1;
-	    }
-	  }
-	}
-
-	/* Now calculate k^Tx/2m */
-	ktx=0.0; ktx2=0.0;
-	for (j=0; j<size; j++) {
-	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
-	  long int degree=igraph_vector_size(neis);
-	  ktx += from[j] * degree;
-	  ktx2 += degree;
-	}
-	ktx = ktx / no_of_edges/2.0;
-	ktx2 = ktx2 / no_of_edges/2.0;
-	
-	/* Now calculate Bx */
-	for (j=0; j<size; j++) {
-	  long int oldid=VECTOR(idx)[j];
-	  igraph_vector_t *neis=igraph_adjlist_get(&adjlist, oldid);
-	  igraph_real_t degree=igraph_vector_size(neis);
-	  to[j] = to[j] - ktx*degree + degree*degree*from[j]/no_of_edges/2.0;
-	  VECTOR(x2)[j] = VECTOR(x2)[j] - ktx2*degree + 
-	    degree*degree*1.0/no_of_edges/2.0;
-	}
-
-	/* -d_ij summa l in G B_il */
-	for (j=0; j<size; j++) {
-	  to[j] -= VECTOR(x2)[j] * from[j];
-	}
-	
-      } else {
-	break;
-      }
-    } /* while 1, we have the eigenvalue if no error */
-
-    if (info != 0) {
-      fprintf(stderr, "ARPACK error %i\n", (int)info);
-      IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    if (size==1) {
+      continue;
     }
     
-    /* Get eigenvector */
-    igraphdseupd_(&rvec, all, select, VECTOR(d), VECTOR(v), &ldv,
-		  &sigma, bmat, &n, which, &nev, &tol, VECTOR(resid),
-		  &ncv, VECTOR(v), &ldv, iparam, ipntr, VECTOR(workd),
-		  VECTOR(workl), &lworkl, &info);
+    options->start=0;
+    options->n=size;
+    options->ncv=3;
+    if (options->ncv > options->n) { options->ncv=options->n; }
+    extra.comm=comm;
     
-    if (info < 0) {
-      fprintf(stderr, "ARPACK error %i\n", (int)info);
-      IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
-    }
+    /* Call ARPACK solver */
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector,
+				       &extra, options, &storage, 0, 0));
     
-    for (i=0; i<n; i++) {
-      VECTOR(x)[i]=VECTOR(v)[i];
-    }
-
     /* just to have the always the same result, we multiply by -1
-       if the first element is not positive
-    */
+       if the first (nonzero) element is not positive  */
     for (i=0; i<size; i++) {
-      if (VECTOR(x)[i] != 0) { break; }
+      if (storage.v[i] != 0) { break; }
     }
-    if (VECTOR(x)[i]<0) {
+    if (storage.v[i]<0) {
       for (; i<size; i++) {
-	VECTOR(x)[i] = -VECTOR(x)[i];
+	storage.v[i] = - storage.v[i];
       }
     }
 
     /* Ok, we have the eigenvector */
 
-    /* If the eigenvalue is not positive then we're done */
-/*     printf("%f\n", VECTOR(d)[0]); */
-    if (VECTOR(d)[0] <= 0) { continue; }
+    /* Non-positive eigenvalue */
+/*     printf("%f\n", storage.d[0]); */
+/*     for (j=0; j<size; j++) { printf("%g ", storage.v[j]); }  */
+/*     printf("\n"); */
+    if (storage.d[0] <= 0) { continue; }
 
     /* Count the number of vertices in each community after the split */
     l=0;
     for (j=0; j<size; j++) {
-      if (VECTOR(x)[j] <= 0) {
+      if (storage.v[j] <= 0) {
 	l++;
       }
     }
@@ -1197,7 +1191,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     
     /* Rewrite the mymembership vector */
     for (j=0; j<size; j++) {
-      if (VECTOR(x)[j] <= 0) {
+      if (storage.v[j] <= 0) {
 	long int oldid=VECTOR(idx)[j];
 	VECTOR(*mymembership)[oldid]=communities-1;
       }
@@ -1214,25 +1208,16 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     if (size-l > 1) {
       IGRAPH_CHECK(igraph_dqueue_push(&tosplit, comm));
     }
-
+    
   }
   
-  igraph_Free(select);
-  igraph_vector_destroy(&ax);
-  igraph_vector_destroy(&resid);
-  igraph_vector_destroy(&d);
-  igraph_vector_destroy(&workd);
-  igraph_vector_destroy(&workl);
-  igraph_vector_destroy(&v);
-  IGRAPH_FINALLY_CLEAN(7);  
-
+  igraph_arpack_storage_destroy(&storage);
   igraph_adjlist_destroy(&adjlist);
   igraph_dqueue_destroy(&tosplit);
-  igraph_vector_destroy(&x2);
-  igraph_vector_destroy(&x);
+  igraph_vector_destroy(&tmp);
   igraph_vector_destroy(&idx2);
   IGRAPH_FINALLY_CLEAN(5);
-  
+
   /* reform the mymerges vector */
   if (merges) {
     igraph_vector_null(&idx);
@@ -1255,7 +1240,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       j++;
     }      
   }
-
+  
   igraph_vector_destroy(&idx);
   igraph_vector_destroy(&mymerges);
   IGRAPH_FINALLY_CLEAN(2);
@@ -1264,7 +1249,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     igraph_vector_destroy(mymembership);
     IGRAPH_FINALLY_CLEAN(1);
   }
-
+  
   return 0;
 }
 

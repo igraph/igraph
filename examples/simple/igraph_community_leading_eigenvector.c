@@ -86,7 +86,7 @@ int main() {
   print_matrix(&merges);
   print_vector(&membership);
 
-  igraph_community_leading_eigenvector(&g, &merges, &membership, 1);
+  igraph_community_leading_eigenvector(&g, &merges, &membership, 1, &options);
 
   print_matrix(&merges);
   print_vector(&membership);
@@ -101,7 +101,8 @@ int main() {
   printf("\n");
 
   /* Make all the steps */
-  igraph_community_leading_eigenvector(&g, &merges, &membership, igraph_vcount(&g));
+  igraph_community_leading_eigenvector(&g, &merges, &membership, igraph_vcount(&g),
+				       &options);
 
   print_matrix(&merges);
   print_vector(&membership);
