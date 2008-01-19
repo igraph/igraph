@@ -440,6 +440,20 @@ igraph_authority_score:
         DEFAULT-R: options=igraph.arpack.default
         NAME-R: authority.score
 
+igraph_arpack_rssolve:
+        PARAMS: ARPFUNC fun, EXTRA extra, INOUT ARPACKOPTS options=igraph.arpack.default, \
+                NULL storage, OUT VECTOR_OR_0 values, \
+                OUT MATRIX_OR_0 vectors
+        DEFAULT-R: options=igraph.arpack.default
+        IGNORE: RR, RC, RNamespace
+
+igraph_arpack_rnsolve:
+        PARAMS: ARPFUNC fun, EXTRA extra, INOUT ARPACKOPTS options=igraph.arpack.default, \
+                NULL storage, OUT VECTOR_OR_0 values, \
+                OUT MATRIX_OR_0 vectors
+        DEFAULT-R: options=igraph.arpack.default
+        IGNORE: RR, RC, RNamespace
+
 #######################################
 # Spectral properties
 #######################################
