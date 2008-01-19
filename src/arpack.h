@@ -52,6 +52,7 @@ typedef struct igraph_arpack_options_t {
   long int info;		/* What happened, see docs */
   long int ierr;		/* What happened  in the dseupd call */
   long int noiter;		/* The number of iterations taken */
+  long int nconv;
   long int numop;		/* Number of OP*x operations */
   long int numopb;		/* Number of B*x operations if BMAT='G' */
   long int numreo;		/* Number of steps of re-orthogonalizations */

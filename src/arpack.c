@@ -218,6 +218,12 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   
   /* Save the result */
   
+  options->noiter=options->iparam[2];
+  options->nconv=options->iparam[4];
+  options->numop=options->iparam[8];
+  options->numopb=options->iparam[9];
+  options->numreo=options->iparam[10];
+  
   if (values) {
     long int i;
     IGRAPH_CHECK(igraph_vector_resize(values, options->nev));
@@ -361,6 +367,12 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   /* Save the result */
   
+  options->noiter=options->iparam[2];
+  options->nconv=options->iparam[4];
+  options->numop=options->iparam[8];
+  options->numopb=options->iparam[9];
+  options->numreo=options->iparam[10];
+
   if (values) {
     long int i;
     IGRAPH_CHECK(igraph_matrix_resize(values, options->nev, 2));

@@ -837,6 +837,10 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector_naive,
 				       &extra, options, &storage, 0, 0));
 
+    if (options->noiter > options->mxiter) {
+      IGRAPH_WARNING("Maximum number of ARPACK iterations reached");
+    }
+
     /* just to have the always the same result, we multiply by -1
        if the first (nonzero) element is not positive  */
     for (i=0; i<size; i++) {
@@ -1158,6 +1162,10 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector,
 				       &extra, options, &storage, 0, 0));
     
+    if (options->noiter > options->mxiter) {
+      IGRAPH_WARNING("Maximum number of ARPACK iterations reached");
+    }
+
     /* just to have the always the same result, we multiply by -1
        if the first (nonzero) element is not positive  */
     for (i=0; i<size; i++) {
