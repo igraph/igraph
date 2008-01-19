@@ -1,5 +1,8 @@
 2008-01-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/motifs.c (igraph_motifs_randesu, igraph_motifs_randesu_estimate)
+	(igraph_motifs_randesu_no) : bug fixes
+
 	* src/community.c (igraph_community_leading_eigenvector_step) : rewritten
 	* examples/simple/igraph_community_leading_eigenvector.c : updated
 

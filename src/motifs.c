@@ -154,6 +154,8 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
   IGRAPH_CHECK(igraph_stack_init(&stack, 0));
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
 
+  RNG_BEGIN();
+
   for (father=0; father<no_of_nodes; father++) {
     long int level;
 
@@ -180,9 +182,9 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
     /* init S */
     igraph_stack_clear(&stack);
 
-    while (level != 1 || !igraph_vector_empty(&adjverts)) {
+    while (level > 1 || !igraph_vector_empty(&adjverts)) {
       igraph_real_t cp=VECTOR(*cut_prob)[level];
-      
+
       if (level==size-1) {
 	s=igraph_vector_size(&adjverts)/2;
 	for (i=0; i<s; i++) {
@@ -279,6 +281,8 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
 
   } /* for father */
 
+  RNG_END();
+
   igraph_Free(added);
   igraph_Free(subg);
   igraph_vector_destroy(&vids);
@@ -374,6 +378,8 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 
   *est=0;
 
+  RNG_BEGIN();
+
   for (sam=0; sam<sample_size; sam++) {
     long int father=VECTOR(*sample)[sam];
     long int level, s;
@@ -401,7 +407,7 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
     /* init S */
     igraph_stack_clear(&stack);
 
-    while (level != 1 || !igraph_vector_empty(&adjverts)) {
+    while (level > 1 || !igraph_vector_empty(&adjverts)) {
       igraph_real_t cp=VECTOR(*cut_prob)[level];
       
       if (level==size-1) {
@@ -473,6 +479,8 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
 
   } /* for father */
 
+  RNG_END();
+
   (*est) *= ((double)no_of_nodes/sample_size);
   (*est) /= size;
 
@@ -543,6 +551,8 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 
   *no=0;
 
+  RNG_BEGIN();
+
   for (father=0; father<no_of_nodes; father++) {
     long int level, s;
 
@@ -569,7 +579,7 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
     /* init S */
     igraph_stack_clear(&stack);
 
-    while (level != 1 || !igraph_vector_empty(&adjverts)) {
+    while (level > 1 || !igraph_vector_empty(&adjverts)) {
       igraph_real_t cp=VECTOR(*cut_prob)[level];
       
       if (level==size-1) {
@@ -640,6 +650,8 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
     }
 
   } /* for father */
+
+  RNG_END();
 
   *no /= size;
 
