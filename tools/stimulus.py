@@ -458,7 +458,7 @@ class RRCodeGenerator(CodeGenerator):
             return call
               
         out.write("  # Function call\n")
-        out.write("  .Call(\"R_" + function + "\", ")
+        out.write("  res <- .Call(\"R_" + function + "\", ")
         call=[ do_par(n) for n,p in params.items() if p['mode'] in ['IN', 'INOUT'] ]
         call=[ c for c in call if c != "" ]
         if 'PROGRESS' in self.func[function]['FLAGS']:
@@ -466,7 +466,11 @@ class RRCodeGenerator(CodeGenerator):
         out.write(", ".join(call))
         out.write(",\n        PACKAGE=\"igraph\")\n")
 
-        out.write("}\n\n")
+        ## Set the class if requested
+        if 'CLASS-R' in self.func[function].keys():
+            myclass=self.func[function]['CLASS-R']
+            out.write("  class(res) <- \"" + myclass + "\"\n")
+        out.write("  res\n}\n\n")
 
 class RCCodeGenerator(CodeGenerator):
     def __init__(self, func, types):

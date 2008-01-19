@@ -667,6 +667,7 @@ igraph_community_leading_eigenvector:
                 INTEGER steps=-1, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         DEFAULT-R: options=igraph_arpack.default
+        CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community
 
 igraph_community_leading_eigenvector_naive:
@@ -674,6 +675,7 @@ igraph_community_leading_eigenvector_naive:
                 INTEGER steps=-1, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         DEFAULT-R: options=igraph.arpack.default
+        CLASS-R: igraph.eigenc
         NAME-R: leading.eigenvector.community.naive
 
 #######################################
