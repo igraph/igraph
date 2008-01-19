@@ -1,5 +1,8 @@
 2008-01-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/plot.R (plot.igraph)
+	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 'frame' added
+
 	* interfaces/R/igraph/R/centrality.R (arpack) : added
 	* interfaces/R/src/rinterface.c.in (R_igraph_arpack) : added
 

@@ -61,6 +61,7 @@ plot.igraph <- function(x,
   margin <- rep(margin, length=4)
   rescale            <- params("plot", "rescale")
   asp                <- params("plot", "asp")
+  frame              <- params("plot", "frame")
 
   # the new style parameters can't do this yet
   arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
@@ -75,7 +76,7 @@ plot.igraph <- function(x,
   }
   if (!add) {
     plot(0, 0, type="n", xlab=xlab, ylab=ylab, xlim=xlim, ylim=ylim,
-         axes=axes, asp=asp, main=main, sub=sub)
+         axes=axes, frame=frame, asp=asp, main=main, sub=sub)
   }
   
   # add the edges

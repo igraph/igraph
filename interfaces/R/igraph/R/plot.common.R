@@ -270,4 +270,5 @@ i.default.values <- list(vertex=list(color="SkyBlue2",
                          plot=list(layout=layout.random,
                            margin=c(0,0,0,0),
                            rescale=TRUE,
-                           asp=1))
+                           asp=1,
+                           frame=FALSE))

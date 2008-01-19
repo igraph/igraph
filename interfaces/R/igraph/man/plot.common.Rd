@@ -326,12 +326,17 @@
 
       Defaults to \code{TRUE}, the layout will be rescaled.
     }
-    \item{asp}{A numberic constant, it gives the \code{asp} parameter
+    \item{asp}{A numeric constant, it gives the \code{asp} parameter
       for \code{\link{plot}}, the aspect ratio. Supply 0 here if you
       don't want to give an aspect ratio. It is ignored by \code{tkplot}
       and \code{rglplot}.
 
       Defaults to 1.
+    }
+    \item{frame}{Boolean, whether to plot a frame around the graph. It
+      is ignored by \code{tkplot} and \code{rglplot}.
+
+      Defaults to \code{FALSE}.
     }
   }
 }
@@ -343,7 +348,7 @@
 
 # plotting a simple ring graph, all default parameters, except the layout
 g <- graph.ring(10)
-g <- set.graph.attribute(g, "layout", layout.circle)
+g$layout <- layout.circle
 plot(g)
 tkplot(g)
 rglplot(g)
