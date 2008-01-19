@@ -290,7 +290,7 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
 leading.eigenvector.community.step <- function(graph, fromhere=NULL,
                                                membership=rep(0, vcount(graph)),
                                                community=0,
-                                               eigenvector=TRUE) {
+                                               options=igraph.arpack.default) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object!")
@@ -301,10 +301,14 @@ leading.eigenvector.community.step <- function(graph, fromhere=NULL,
     }
     membership <- fromhere[["membership"]]
   }
-  
+
+  options.tmp <- igraph.arpack.default
+  options.tmp[names(options)] <- options
+  options <- options.tmp
+
   res <- .Call("R_igraph_community_leading_eigenvector_step",
                graph, as.numeric(membership), as.numeric(community),
-               as.logical(eigenvector),
+               options,
                PACKAGE="igraph")
   class(res) <- "igraph.eigencstep"
   res

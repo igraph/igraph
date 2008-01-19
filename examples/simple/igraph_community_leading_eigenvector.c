@@ -93,7 +93,7 @@ int main() {
 
   igraph_vector_null(&membership);
   igraph_community_leading_eigenvector_step(&g, &membership, 0, &split,
-					    &x, &val);
+					    &x, &val, &options, 0);
 
   print_vector(&membership);
   print_vector(&x);
@@ -110,7 +110,7 @@ int main() {
   /* Try to make one more step from here, should fail */
   for (i=0; i<igraph_matrix_nrow(&merges)+1; i++) {
     igraph_community_leading_eigenvector_step(&g, &membership,
-					      i, &split, &x, &val);
+					      i, &split, &x, &val, &options, 0);
     if (split) {
       printf("Impossible, community %li splitted.\n", i);
       return 1;

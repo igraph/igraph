@@ -1075,7 +1075,9 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 					      igraph_integer_t community,
 					      igraph_bool_t *split,
 					      igraph_vector_t *eigenvector,
-					      igraph_real_t *eigenvalue);
+					      igraph_real_t *eigenvalue, 
+					      igraph_arpack_options_t *options,
+					      igraph_arpack_storage_t *storage);
 
 /* -------------------------------------------------- */
 /* Conversion                                         */
