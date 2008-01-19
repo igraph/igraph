@@ -47,7 +47,7 @@ int main() {
   igraph_create(&g, &v, 0, 1);
 
   igraph_vector_init(&res, 0);
-  igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 1000, 0.001, 0.85);
+  igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 1000, 0.001, 0.85, 0);
   print_vector(&res, stdout);
   igraph_vector_destroy(&res);
   igraph_vector_destroy(&v);
@@ -72,24 +72,24 @@ int main() {
   igraph_create(&g, &v, 0, 1);
 
   igraph_vector_init(&res, 0);
-  igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, 0.0001, 0.85);
+  igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, 0.0001, 0.85, 0);
   print_vector(&res, stdout);
   igraph_vector_destroy(&res);
   igraph_vector_destroy(&v);
   
   /* Errors */
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, -1, 0.0001, 0.85);
+  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, -1, 0.0001, 0.85, 0);
   if (ret != IGRAPH_EINVAL) {
     return 1;
   }
   
-  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, -1, 0.85);
+  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, -1, 0.85, 0);
   if (ret != IGRAPH_EINVAL) {
     return 2;
   }
   
-  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, 0.0001, 1.2);
+  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, 0.0001, 1.2, 0);
   if (ret != IGRAPH_EINVAL) {
     return 3;
   }

@@ -313,7 +313,7 @@ igraph_edge_betweenness:
 
 igraph_pagerank_old:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True, \
-                INTEGER niter=1000, REAL eps=0.001, REAL damping=0.85
+                INTEGER niter=1000, REAL eps=0.001, REAL damping=0.85, BOOLEAN old=False
         DEPS: vids ON graph
         NAME-R: page.rank.old
 

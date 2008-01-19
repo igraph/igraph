@@ -1268,6 +1268,9 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  *        if the difference of PageRank values between iterations change
  *        less than this value for every node
  * \param damping The damping factor ("d" in the original paper)
+ * \param old Boolean, whether to use the < igraph 0.5 way to 
+ *        calculate page rank. Not recommended for new applications,
+ *        only included for compatibility.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
@@ -1278,8 +1281,9 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  */
 
 int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 
-		    const igraph_vs_t vids, igraph_bool_t directed,
-            igraph_integer_t niter, igraph_real_t eps, igraph_real_t damping) {
+			const igraph_vs_t vids, igraph_bool_t directed,
+			igraph_integer_t niter, igraph_real_t eps, 
+			igraph_real_t damping, igraph_bool_t old) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n, nodes_to_calc;
   igraph_real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
@@ -1372,7 +1376,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
       
      }
      for (i=0; i<no_of_nodes; i++) {
-       prvec_new[i] /= sum;
+       if (!old) { prvec_new[i] /= sum; }
 
       if (prvec_new[i]-prvec[i]>maxdiff) 
 	maxdiff=prvec_new[i]-prvec[i];

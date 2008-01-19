@@ -1,5 +1,9 @@
 2008-01-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_pagerank_old) : 'old' argument
+	added
+	* examples/simple/igraph_pagerank.c : updated
+
 	* src/community.c (igraph_community_leading_eigenvector_naive)
 	(igraph_community_leading_eigenvector) : warning if mxiter iterations
 	reached

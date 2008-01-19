@@ -755,8 +755,9 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
 int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed, igraph_integer_t cutoff);
 int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 
-		    const igraph_vs_t vids, igraph_bool_t directed,
-			igraph_integer_t niter, igraph_real_t eps, igraph_real_t damping);
+			const igraph_vs_t vids, igraph_bool_t directed,
+			igraph_integer_t niter, igraph_real_t eps, 
+			igraph_real_t damping, igraph_bool_t old);
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
