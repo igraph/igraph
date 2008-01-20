@@ -285,6 +285,12 @@ igraph_closeness:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
 
+igraph_closeness_estimate:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                NEIMODE mode=OUT, INTEGER cutoff
+        DEPS: vids ON graph
+        NAME-R: closeness.estimate
+
 igraph_shortest_paths:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
@@ -307,9 +313,20 @@ igraph_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
 
+igraph_betweenness_estimate:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                BOOLEAN directed=True, INTEGER cutoff
+        DEPS: vids ON graph
+        NAME-R: betweenness.estimate
+
 igraph_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
+
+igraph_edge_betweenness_estimate:
+        PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True, \
+                INTEGER cutoff
+        NAME-R: edge.betweenness.estimate
 
 igraph_pagerank_old:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True, \
