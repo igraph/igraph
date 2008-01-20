@@ -142,6 +142,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
 read.graph.edgelist <- function(file, n=0,
                                 directed=TRUE, ...) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_edgelist", file,
         as.numeric(n), as.logical(directed),
         PACKAGE="igraph")
@@ -150,6 +151,7 @@ read.graph.edgelist <- function(file, n=0,
 write.graph.edgelist <- function(graph, file, 
                                  ...) {
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_edgelist", graph, file,
         PACKAGE="igraph")
 }
@@ -161,6 +163,7 @@ write.graph.edgelist <- function(graph, file,
 read.graph.ncol <- function(file, predef=character(0), names=TRUE,
                            weights=TRUE, directed=FALSE, ...) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_ncol", file, as.character(predef),
         as.logical(names), as.logical(weights), as.logical(directed),
         PACKAGE="igraph")
@@ -173,6 +176,7 @@ write.graph.ncol <- function(graph, file,
   if (length(names)==0 || ! names %in% list.vertex.attributes(graph)) { names <- NULL }
   if (length(weights)==0 || ! weights %in% list.edge.attributes(graph)) { weights <- NULL }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_ncol", graph, file,
         names, weights,
         PACKAGE="igraph")
@@ -181,6 +185,7 @@ write.graph.ncol <- function(graph, file,
 read.graph.lgl <- function(file, names=TRUE,
                            weights=TRUE, ...) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_lgl", file,
         as.logical(names), as.logical(weights),
         PACKAGE="igraph")
@@ -194,6 +199,7 @@ write.graph.lgl <- function(graph, file,
   if (length(names)==0 || ! names %in% list.vertex.attributes(graph)) { names <- NULL }
   if (length(weights)==0 || ! weights %in% list.edge.attributes(graph)) { weights <- NULL }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_lgl", graph, file,
         names, weights, as.logical(isolates),
         PACKAGE="igraph")
@@ -201,12 +207,14 @@ write.graph.lgl <- function(graph, file,
 
 read.graph.pajek <- function(file, ...) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_pajek", file,
         PACKAGE="igraph")
 }
 
 write.graph.pajek <- function(graph, file, ...) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_pajek", graph, file,
         PACKAGE="igraph")
 }
@@ -243,6 +251,7 @@ write.graph.dimacs <- function(graph, file,
     capacity <- E(graph)$capacity
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_dimacs", graph, file, as.numeric(source),
         as.numeric(target), as.numeric(capacity),
         PACKAGE="igraph")
@@ -254,12 +263,14 @@ write.graph.dimacs <- function(graph, file,
 
 read.graph.graphml <- function(file, index=0, ...) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_graphml", file, as.numeric(index),
         PACKAGE="igraph")
 }
 
 write.graph.graphml <- function(graph, file, ...) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_graphml", graph, file,
         PACKAGE="igraph")
 }
@@ -269,6 +280,7 @@ write.graph.graphml <- function(graph, file, ...) {
 ################################################################
 
 read.graph.gml <- function(file, ...) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_gml", file,
         PACKAGE="igraph")
 }
@@ -280,6 +292,7 @@ write.graph.gml <- function(graph, file, id=NULL, creator=NULL, ...) {
   if (!is.null(creator)) {
     creator <- as.character(creator)
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_gml", graph, file, id, creator,
         PACKAGE="igraph")
 }
@@ -289,6 +302,7 @@ write.graph.gml <- function(graph, file, id=NULL, creator=NULL, ...) {
 ################################################################
 
 write.graph.dot <- function(graph, file, ...) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_dot", graph, file,
         PACKAGE="igraph")
 }
@@ -356,6 +370,7 @@ graph.graphdb <- function(url=NULL,
 }
 
 read.graph.graphdb <- function(file, directed=TRUE, ...) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_graphdb", file, as.logical(directed),
         PACKAGE="igraph")
 }

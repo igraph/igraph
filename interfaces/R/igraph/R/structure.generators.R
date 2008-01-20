@@ -21,6 +21,7 @@
 ###################################################################
 
 graph <- function( edges, n=max(edges)+1, directed=TRUE ) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_create", as.numeric(edges), as.numeric(n),
         as.logical(directed),
         PACKAGE="igraph")
@@ -168,6 +169,7 @@ graph.adjacency <- function( adjmatrix, mode="directed", weighted=NULL ) {
     adjmatrix <- as.numeric(adjmatrix)
     attributes(adjmatrix) <- attrs
     
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),
           PACKAGE="igraph")
   }
@@ -179,12 +181,14 @@ graph.star <- function(n, mode="in", center=0 ) {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=0, "in"=1, "undirected"=2)
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_star", as.numeric(n), as.numeric(mode),
         as.numeric(center),
         PACKAGE="igraph")
 }
 
 graph.full <- function(n, directed=FALSE, loops=FALSE) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_full", as.numeric(n), as.logical(directed),
         as.logical(loops),
         PACKAGE="igraph")
@@ -244,6 +248,7 @@ graph.lattice <- function(dimvector=NULL,length=NULL, dim=NULL, nei=1,
     dimvector <- rep(length, dim)
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_lattice", as.numeric(dimvector), as.numeric(nei),
         as.logical(directed), as.logical(mutual),
         as.logical(circular),
@@ -251,6 +256,7 @@ graph.lattice <- function(dimvector=NULL,length=NULL, dim=NULL, nei=1,
 }
 
 graph.ring <- function(n, directed=FALSE, mutual=FALSE, circular=TRUE) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_ring", as.numeric(n), as.logical(directed),
         as.logical(mutual), as.logical(circular),
         PACKAGE="igraph")
@@ -265,6 +271,7 @@ graph.tree <- function(n, children=2, mode="out") {
     mode <- switch(mode, "out"=0, "in"=1, "undirected"=2);
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_tree", as.numeric(n), as.numeric(children),
         as.numeric(mode),
         PACKAGE="igraph")
@@ -276,6 +283,7 @@ graph.tree <- function(n, children=2, mode="out") {
 
 graph.atlas <- function(n) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_atlas", as.numeric(n),
         PACKAGE="igraph")
 }
@@ -349,6 +357,7 @@ graph.edgelist <- function(el, directed=TRUE) {
 
 graph.extended.chordal.ring <- function(n, w) {
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_extended_chordal_ring", as.numeric(n),
         as.matrix(w),
         PACKAGE="igraph")
@@ -360,6 +369,7 @@ line.graph <- function(graph) {
     stop("Not a graph object")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_line_graph", graph,
         PACKAGE="igraph")
 }
@@ -367,18 +377,21 @@ line.graph <- function(graph) {
   
 graph.de.bruijn <- function(m, n) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_de_bruijn", as.numeric(m), as.numeric(n),
         PACKAGE="igraph")
 }
 
 graph.kautz <- function(m, n) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_kautz", as.numeric(m), as.numeric(n),
         PACKAGE="igraph")
 }
 
 graph.famous <- function(name) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_famous", as.character(name),
         PACKAGE="igraph")
 }

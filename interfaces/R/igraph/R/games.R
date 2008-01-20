@@ -76,6 +76,7 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
     out.seq <- numeric()
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (!is.null(time.window)) {
     .Call("R_igraph_recent_degree_game", n, power, time.window, m, out.seq,
           out.pref, as.numeric(zero.appeal), directed,
@@ -98,6 +99,7 @@ erdos.renyi.game <- function(n, p.or.m, type="gnp",
     type <- switch(type, "gnp"=0, "gnm"=1)
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_erdos_renyi_game", as.numeric(n), as.numeric(type),
         as.numeric(p.or.m), as.logical(directed), as.logical(loops),
         PACKAGE="igraph")
@@ -112,12 +114,14 @@ degree.sequence.game <- function(out.deg, in.deg=numeric(0),
     method <- switch(method, "simple"=0)
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_degree_sequence_game", as.numeric(out.deg),
         as.numeric(in.deg), as.numeric(method),
         PACKAGE="igraph")
 }
 
 growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_growing_random_game", as.numeric(n), as.numeric(m),
         as.logical(directed), as.logical(citation),
         PACKAGE="igraph")
@@ -182,6 +186,7 @@ aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
     out.seq <- numeric()
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(time.window)) {
     .Call("R_igraph_barabasi_aging_game", as.numeric(n),
           as.numeric(pa.exp), as.numeric(aging.exp),
@@ -206,6 +211,7 @@ callaway.traits.game <- function(nodes, types, edge.per.step=1,
                                 pref.matrix=matrix(1, types, types),
                                 directed=FALSE) {
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_callaway_traits_game", as.double(nodes),
         as.double(types), as.double(edge.per.step),
         as.double(type.dist), matrix(as.double(pref.matrix), types, types),
@@ -216,6 +222,7 @@ callaway.traits.game <- function(nodes, types, edge.per.step=1,
 establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
                                pref.matrix=matrix(1, types, types),
                                directed=FALSE) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_establishment_game", as.double(nodes),
         as.double(types), as.double(k), as.double(type.dist),
         matrix(as.double(pref.matrix), types, types),
@@ -224,6 +231,7 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
 }
 
 grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_grg_game", as.double(nodes), as.double(radius),
                as.logical(torus), as.logical(coords),
                PACKAGE="igraph")
@@ -242,6 +250,7 @@ preference.game <- function(nodes, types, type.dist=rep(1, types),
     stop("Invalid size for preference matrix")
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_preference_game", as.double(nodes), as.double(types),
         as.double(type.dist), matrix(as.double(pref.matrix), types, types),
         as.logical(directed), as.logical(loops),
@@ -260,6 +269,7 @@ asymmetric.preference.game <- function(nodes, types,
     stop("Invalid size for type distribution matrix")
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_asymmetric_preference_game",
         as.double(nodes), as.double(types),
         matrix(as.double(type.dist.matrix), types, types),
@@ -276,6 +286,7 @@ connect.neighborhood <- function(graph, order, mode="all") {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_connect_neighborhood", graph, as.numeric(order),
         as.numeric(mode),
         PACKAGE="igraph")
@@ -285,11 +296,13 @@ rewire.edges <- function(graph, prob) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_rewire_edges", graph, as.numeric(prob),
         PACKAGE="igraph")
 }
 
 watts.strogatz.game <- function(dim, size, nei, p) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_watts_strogatz_game", as.numeric(dim), as.numeric(size),
         as.numeric(nei), as.numeric(p),
         PACKAGE="igraph")
@@ -297,6 +310,7 @@ watts.strogatz.game <- function(dim, size, nei, p) {
 
 lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
                          directed=TRUE) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_lastcit_game", as.numeric(n), as.numeric(edges), as.numeric(agebins),
         as.numeric(pref), as.logical(directed),
         PACKAGE="igraph")
@@ -305,6 +319,7 @@ lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
 cited.type.game <- function(n, edges=1, types=rep(0, n),
                             pref=rep(1, length(types)),
                             directed=TRUE, attr=TRUE) {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_cited_type_game", as.numeric(n), as.numeric(edges),
                as.numeric(types), as.numeric(pref), as.logical(directed),
                PACKAGE="igraph")
@@ -318,6 +333,7 @@ citing.cited.type.game <- function(n, edges=1, types=rep(0, n),
                                    pref=matrix(1, nr=length(types), nc=length(types)),
                                    directed=TRUE, attr=TRUE) {
   pref <- structure(as.numeric(pref), dim=dim(pref))
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_citing_cited_type_game", as.numeric(n),
                as.numeric(types), pref, as.numeric(edges),
                as.logical(directed),

@@ -37,6 +37,7 @@ add.edges <- function(graph, edges, ..., attr=list()) {
   }
   
   edges.orig <- ecount(graph)  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   graph <- .Call("R_igraph_add_edges", graph, as.numeric(edges),
                  PACKAGE="igraph")
   edges.new <- ecount(graph)
@@ -66,6 +67,7 @@ add.vertices <- function(graph, nv, ..., attr=list()) {
   }
 
   vertices.orig <- vcount(graph)  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   graph <- .Call("R_igraph_add_vertices", graph, as.numeric(nv),
                  PACKAGE="igraph")
   vertices.new <- vcount(graph)
@@ -86,6 +88,7 @@ delete.edges <- function(graph, edges) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_delete_edges", graph, as.igraph.es(edges),
         PACKAGE="igraph")
 }
@@ -94,6 +97,7 @@ delete.vertices <- function(graph, v) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_delete_vertices", graph, as.igraph.vs(v),
         PACKAGE="igraph")
 }
@@ -106,6 +110,7 @@ ecount <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_ecount", graph,
         PACKAGE="igraph")
 }
@@ -117,6 +122,7 @@ neighbors <- function(graph, v, mode=1) {
   if (is.character(mode)) {
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighbors", graph, as.numeric(v),
         as.numeric(mode),
         PACKAGE="igraph")
@@ -126,6 +132,7 @@ is.directed <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_is_directed", graph,
         PACKAGE="igraph")
 }
@@ -134,6 +141,7 @@ get.edges <- function(graph, es) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_edges", graph, as.igraph.es(es),
                PACKAGE="igraph")
   matrix(res, nc=2, byrow=TRUE)

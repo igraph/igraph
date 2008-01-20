@@ -25,6 +25,7 @@ cocitation <- function(graph, v=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_cocitation", graph, as.igraph.vs(v),
         PACKAGE="igraph")
 }
@@ -33,6 +34,7 @@ bibcoupling <- function(graph, v=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_bibcoupling", graph, as.igraph.vs(v),
         PACKAGE="igraph")
 }

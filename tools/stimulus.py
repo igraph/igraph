@@ -457,6 +457,7 @@ class RRCodeGenerator(CodeGenerator):
                     call=""
             return call
               
+        out.write("  on.exit( .Call(\"R_igraph_finalizer\", PACKAGE=\"igraph\") )\n")
         out.write("  # Function call\n")
         out.write("  res <- .Call(\"R_" + function + "\", ")
         call=[ do_par(n) for n,p in params.items() if p['mode'] in ['IN', 'INOUT'] ]

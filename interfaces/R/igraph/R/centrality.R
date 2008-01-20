@@ -31,6 +31,7 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
   options.tmp[ names(options) ] <- options
   options <- options.tmp
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_arpack", func, extra, options, env, sym,
         PACKAGE="igraph")
 

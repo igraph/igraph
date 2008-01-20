@@ -34,6 +34,7 @@ graph.maxflow <- function(graph, source, target, capacity=NULL) {
   }
   capacity <- as.numeric(capacity)
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_maxflow", graph, as.numeric(source), as.numeric(target),
         capacity,
         PACKAGE="igraph")
@@ -59,6 +60,7 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
   capacity <- as.numeric(capacity)
 
   value.only <- as.logical(value.only)
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(target) && is.null(source)) {
     if (value.only) {
       .Call("R_igraph_mincut_value", graph, capacity,
@@ -81,9 +83,11 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
   }
 
   if (is.null(source) && is.null(target)) {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_vertex_connectivity", graph, as.logical(checks),
           PACKAGE="igraph")
   } else if (!is.null(source) && !is.null(target)) {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_st_vertex_connectivity", graph, as.numeric(source),
           as.numeric(target),
           PACKAGE="igraph")
@@ -99,9 +103,11 @@ edge.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
   }
 
   if (is.null(source) && is.null(target)) {    
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_edge_connectivity", graph, as.logical(checks),
           PACKAGE="igraph")
   } else if (!is.null(source) && !is.null(target)) {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_st_edge_connectivity", graph,
           as.numeric(source), as.numeric(target),
           PACKAGE="igraph")
@@ -116,6 +122,7 @@ edge.disjoint.paths <- function(graph, source, target) {
     stop("Not a graph object")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_edge_disjoint_paths", graph,
         as.numeric(source), as.numeric(target),
         PACKAGE="igraph")
@@ -127,6 +134,7 @@ vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
     stop("Not a graph object")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_vertex_disjoint_paths", graph, as.numeric(source),
         as.numeric(target),
         PACKAGE="igraph")
@@ -138,6 +146,7 @@ graph.adhesion <- function(graph, checks=TRUE) {
     stop("Not a graph object")
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_adhesion", graph, as.logical(checks),
         PACKAGE="igraph")
 }
@@ -148,6 +157,7 @@ graph.cohesion <- function(graph, checks=TRUE) {
     stop("Not a graph object")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_cohesion", graph, as.logical(checks),
         PACKAGE="igraph")
 }

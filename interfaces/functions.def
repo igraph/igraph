@@ -940,7 +940,7 @@ igraph_isoclass_subgraph:
         PARAMS: GRAPH graph, VECTOR vids, OUT INTEGERPTR isoclass
 
 igraph_isoclass_create:
-        PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed   
+        PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed=True
         NAME-R: graph.isocreate
 
 igraph_isomorphic_vf2:

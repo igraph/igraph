@@ -45,6 +45,7 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
     update.rule <- switch(update.rule, "simple"=0, "random"=0, "config"=1)
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(vertex)) {    
     .Call("R_igraph_spinglass_community", graph, weights,
           as.numeric(spins), as.logical(parupdate), as.numeric(start.temp),
@@ -69,6 +70,7 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4, merges=T
     weights <- as.numeric(weights)
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_walktrap_community", graph, weights, as.numeric(steps),
         as.logical(merges), as.logical(modularity),
         PACKAGE="igraph")
@@ -166,6 +168,7 @@ edge.betweenness.community <- function(graph, directed=TRUE,
     stop("Not a graph object!")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_community_edge_betweenness", graph, as.logical(directed),
                as.logical(edge.betweenness),
                as.logical(merges), as.logical(bridges),
@@ -183,6 +186,7 @@ edge.betweenness.community.merges <- function(graph, edges) {
     stop("Not a graph object!")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_community_eb_get_merges", graph, as.numeric(edges),
         PACKAGE="igraph")
 }
@@ -268,6 +272,7 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE) {
     stop("Not a graph object")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
         as.logical(modularity), 
         PACKAGE="igraph")
@@ -282,6 +287,7 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
   merges <- as.matrix(merges)
   merges <- structure(as.numeric(merges), dim=dim(merges))
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_community_to_membership", graph, merges, as.numeric(steps),
         as.logical(membership), as.logical(csize),
         PACKAGE="igraph")
@@ -306,6 +312,7 @@ leading.eigenvector.community.step <- function(graph, fromhere=NULL,
   options.tmp[names(options)] <- options
   options <- options.tmp
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_community_leading_eigenvector_step",
                graph, as.numeric(membership), as.numeric(community),
                options,

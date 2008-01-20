@@ -31,6 +31,7 @@ no.clusters <- function(graph, mode="weak") {
   if (is.character(mode)) {
     mode <- switch(mode, "weak"=1, "strong"=2)
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_no_clusters", graph, as.numeric(mode),
         PACKAGE="igraph")
 }
@@ -63,6 +64,7 @@ is.connected <- function(graph, mode="weak") {
   if (is.character(mode)) {
     mode <- switch(mode, "weak"=1, "strong"=2)
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_is_connected", graph, as.numeric(mode),
         PACKAGE="igraph")
 }
@@ -78,6 +80,7 @@ decompose.graph <- function(graph, mode="weak", max.comps=NA,
   if (is.na(max.comps)) {
     max.comps=-1
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_decompose", graph, as.numeric(mode),
         as.numeric(max.comps), as.numeric(min.vertices),
         PACKAGE="igraph"

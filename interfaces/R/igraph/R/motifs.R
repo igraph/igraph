@@ -31,6 +31,7 @@ graph.motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
                   rep(cut.prob[-length(cut.prob)], length(cut.prob)-1))
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_motifs_randesu", graph, as.numeric(size),
         as.numeric(cut.prob),
         PACKAGE="igraph")
@@ -47,6 +48,7 @@ graph.motifs.no <- function(graph, size=3, cut.prob=rep(0, size)) {
                   rep(cut.prob[-length(cut.prob)], length(cut.prob)-1))
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_motifs_randesu_no", graph, as.numeric(size),
         as.numeric(cut.prob),
         PACKAGE="igraph")
@@ -64,6 +66,7 @@ graph.motifs.est <- function(graph, size=3, cut.prob=rep(0, size),
                   rep(cut.prob[-length(cut.prob)], length(cut.prob)-1))
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_motifs_randesu_estimate", graph, as.numeric(size),
         as.numeric(cut.prob), as.numeric(sample.size), as.numeric(sample),
         PACKAGE="igraph")

@@ -36,6 +36,7 @@ minimum.spanning.tree <- function(graph, weights=NULL,
   }
   
   if (algorithm=="unweighted") {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_minimum_spanning_tree_unweighted", graph,
           PACKAGE="igraph")
   } else if (algorithm=="prim") {
@@ -44,6 +45,7 @@ minimum.spanning.tree <- function(graph, weights=NULL,
     } else if (is.null(weights)) {
       weights <- E(graph)$weight
     }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     .Call("R_igraph_minimum_spanning_tree_prim", graph, as.numeric(weights),
           PACKAGE="igraph")    
   } else {

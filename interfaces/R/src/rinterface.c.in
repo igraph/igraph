@@ -956,6 +956,11 @@ static R_INLINE void R_igraph_after2(SEXP verbose) {
   }
 }
 
+SEXP R_igraph_finalizer() {
+  IGRAPH_FINALLY_FREE();
+  return R_NilValue;
+}
+
 /******************************************************
  * functions to convert igraph objects to SEXP
  *****************************************************/

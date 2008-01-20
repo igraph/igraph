@@ -29,6 +29,7 @@ graph.disjoint.union <- function(...) {
     stop("Not a graph object")
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_disjoint_union", graphs,
         PACKAGE="igraph")
 }
@@ -46,6 +47,7 @@ graph.union <- function(...) {
     stop("Not a graph object")
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_union", graphs,
         PACKAGE="igraph")
 }
@@ -63,6 +65,7 @@ graph.intersection <- function(...) {
     stop("Not a graph object")
   }
 
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_intersection", graphs,
         PACKAGE="igraph")
 }
@@ -77,6 +80,7 @@ graph.difference <- function(big, small) {
     stop("argument is not a graph")
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_difference", big, small,
         PACKAGE="igraph")
 }
@@ -90,6 +94,7 @@ graph.complementer <- function(graph, loops=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_complementer", graph, as.logical(loops),
         PACKAGE="igraph")
 }
@@ -99,6 +104,7 @@ graph.compose <- function(g1, g2) {
   if (!is.igraph(g1) || !is.igraph(g2)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_compose", g1, g2,
         PACKAGE="igraph")
 }

@@ -30,6 +30,7 @@ get.adjacency <- function(graph, type="both", attr=NULL, names=TRUE,
   }
   
   if (is.null(attr)) {    
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_get_adjacency", graph, as.numeric(type),
                  PACKAGE="igraph")
     if (binary) {
@@ -83,6 +84,7 @@ get.edgelist <- function(graph, names=TRUE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- matrix(.Call("R_igraph_get_edgelist", graph, TRUE,
                       PACKAGE="igraph"), nc=2)
   if (names && "name" %in% list.vertex.attributes(graph)) {
@@ -101,6 +103,7 @@ as.directed <- function(graph, mode="mutual") {
     mode <- switch(mode, "arbitrary"=0, "mutual"=1)
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_to_directed", graph, as.numeric(mode),
         PACKAGE="igraph")
 }
@@ -114,6 +117,7 @@ as.undirected <- function(graph, mode="collapse") {
     mode <- switch(mode, "each"=0, "collapse"=1)
   }
   
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_to_undirected", graph, as.numeric(mode),
         PACKAGE="igraph")  
 }
@@ -124,6 +128,7 @@ get.adjlist <- function(graph, mode="all") {
   }
 
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_adjlist", graph, mode,
         PACKAGE="igraph")
 }
@@ -134,6 +139,7 @@ get.adjedgelist <- function(graph, mode="all") {
   }
 
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_adjedgelist", graph, mode,
         PACKAGE="igraph")
 }
