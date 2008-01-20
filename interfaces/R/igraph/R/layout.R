@@ -85,11 +85,15 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
   } else {
     params$weights <- as.numeric(params$weights)
   }
-
+  if (!is.null(params$start)) {
+    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
+  }
+  
   .Call(fn, graph,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
-        as.double(params$repulserad), params$weights, as.logical(verbose),
+        as.double(params$repulserad), params$weights, params$start,
+        as.logical(verbose),
         PACKAGE="igraph")
 }
 
@@ -111,13 +115,15 @@ layout.fruchterman.reingold.grid <- function(graph, ...,
   if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
   if (is.null(params$cellsize))  { params$cellsize   <-
                                      (sqrt(sqrt(params$area))) }
+  if (!is.null(params$start)) {
+    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
+  }
   
   .Call("R_igraph_layout_fruchterman_reingold_grid", graph,
-        as.numeric(params$seed),
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), as.double(params$cellsize),
-        as.logical(!is.null(params$seed)),
+        params$start,
         as.logical(verbose),
         PACKAGE="igraph")
 }
@@ -149,10 +155,42 @@ layout.kamada.kawai<-function(graph, ..., dim=2, verbose=igraph.par("verbose"),
   if (is.null(params$initemp))    { params$initemp <- 10   }
   if (is.null(params$coolexp))    { params$coolexp <- 0.99 }
   if (is.null(params$kkconst))    { params$kkconst <- vc^2 }
+  if (!is.null(params$start)) {
+    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
+  }
   .Call(fn, graph,
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
-        as.double(params$sigma), as.logical(verbose),
+        as.double(params$sigma), params$start, as.logical(verbose),
+        PACKAGE="igraph")
+}
+
+layout.graphopt <- function(graph, ..., verbose=igraph.par("verbose"),
+                            params=list()) {
+  
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (length(params)==0) {
+    params <- list(...)
+  }
+
+  vc <- vcount(graph)
+  if (is.null(params$niter))            { params$niter           <- 500   }
+  if (is.null(params$charge))           { params$charge          <- 0.001 }
+  if (is.null(params$mass))             { params$mass            <- 30    }
+  if (is.null(params$spring.length))    { params$spring.length   <- 0     }
+  if (is.null(params$spring.constant))  { params$spring.constant <- 1     }
+  if (is.null(params$max.sa.movement))  { params$max.sa.movement <- 5     }
+  if (!is.null(params$start)) {
+    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
+  }
+
+  .Call("R_igraph_layout_graphopt", graph,
+        as.double(params$niter), as.double(params$charge),
+        as.double(params$mass), as.double(params$spring.length),
+        as.double(params$spring.constant), params$max.sa.movement,
+        params$start, as.logical(verbose),
         PACKAGE="igraph")
 }
 

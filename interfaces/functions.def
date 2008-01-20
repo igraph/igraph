@@ -543,7 +543,7 @@ igraph_layout_fruchterman_reingold:
                 VECTOR_OR_0 weight
         NAME-R: layout.fruchterman.reingold
         FLAGS: PROGRESS
-        IGNORE: RR
+        IGNORE: RR, RC
 
 igraph_layout_grid_fruchterman_reingold:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
@@ -596,6 +596,7 @@ igraph_layout_graphopt:
                 REAL max_sa_movement=5, NULL use_seed
         NAME-R: layout.graphopt
         FLAGS: PROGRESS
+        IGNORE: RR, RC
 
 igraph_layout_merge_dla:
         PARAMS: GRAPHLIST graphs, MATRIXLIST coords, OUT MATRIX res

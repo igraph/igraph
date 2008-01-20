@@ -1977,6 +1977,7 @@ SEXP R_igraph_recent_degree_game(SEXP pn, SEXP ppower, SEXP pwindow,
   
 SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp, 
 				  SEXP pcoolexp, SEXP pkkconst, SEXP psigma, 
+				  SEXP start,
 				  SEXP verbose) {
   
   igraph_t g;
@@ -1991,9 +1992,13 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
   R_igraph_before2(verbose, "KK layout");
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_matrix_init(&res, 0, 0);
+  if (isNull(start)) {
+    igraph_matrix_init(&res, 0, 0);
+  } else {
+    R_SEXP_to_igraph_matrix_copy(start, &res);
+  }
   igraph_layout_kamada_kawai(&g, &res, niter, sigma, 
-			     initemp, coolexp, kkconst);
+			     initemp, coolexp, kkconst, !isNull(start));
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
@@ -2005,7 +2010,7 @@ SEXP R_igraph_layout_kamada_kawai(SEXP graph, SEXP pniter, SEXP pinitemp,
 
 SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
 				     SEXP pcoolexp, SEXP pkkconst, 
-				     SEXP psigma, SEXP verbose) {
+				     SEXP psigma, SEXP start, SEXP verbose) {
   igraph_t g;
   igraph_integer_t niter=REAL(pniter)[0];
   igraph_real_t initemp=REAL(pinitemp)[0];
@@ -2018,9 +2023,13 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   R_igraph_before2(verbose, "3D KK layout");
   
   R_SEXP_to_igraph(graph, &g);
-  igraph_matrix_init(&res, 0, 0);
+  if (isNull(start)) {
+    igraph_matrix_init(&res, 0, 0);
+  } else {
+    R_SEXP_to_igraph_matrix_copy(start, &res);
+  }
   igraph_layout_kamada_kawai_3d(&g, &res, niter, sigma, 
-				initemp, coolexp, kkconst);
+				initemp, coolexp, kkconst, !isNull(start));
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   
@@ -2030,6 +2039,38 @@ SEXP R_igraph_layout_kamada_kawai_3d(SEXP graph, SEXP pniter, SEXP pinitemp,
   return result;
 }
 
+SEXP R_igraph_layout_graphopt(SEXP graph, SEXP pniter, SEXP pcharge,
+			      SEXP pmass, SEXP pspring_length, 
+			      SEXP pspring_constant, SEXP pmax_sa_movement,
+			      SEXP start, SEXP verbose) {
+  igraph_t g;
+  igraph_integer_t niter=REAL(pniter)[0];
+  igraph_real_t charge=REAL(pcharge)[0];
+  igraph_real_t mass=REAL(pmass)[0];
+  igraph_real_t spring_length=REAL(pspring_length)[0];
+  igraph_real_t spring_constant=REAL(pspring_constant)[0];
+  igraph_real_t max_sa_movement=REAL(pmax_sa_movement)[0];
+  igraph_matrix_t res;
+  SEXP result;
+  
+  R_igraph_before2(verbose, "Graphopt layout");
+  
+  R_SEXP_to_igraph(graph, &g);
+  if (isNull(start)) {
+    igraph_matrix_init(&res, 0, 0);
+  } else {
+    R_SEXP_to_igraph_matrix_copy(start, &res);
+  }
+  igraph_layout_graphopt(&g, &res, niter, charge, mass, spring_length,
+			 spring_constant, max_sa_movement, !isNull(start));
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+  
+  R_igraph_after2(verbose);
+  
+  UNPROTECT(1);
+  return result;
+}
 
 SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
 			 SEXP parea, SEXP pcoolexp, SEXP prepulserad,
@@ -2061,11 +2102,11 @@ SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
   return result;
 }  
 
-SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph, SEXP mat,
+SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph,
 					       SEXP pniter,
 					       SEXP pmaxdelta, SEXP parea,
 					       SEXP pcoolexp, SEXP prepulserad,
-					       SEXP pcellsize, SEXP puseseed,
+					       SEXP pcellsize, SEXP start,
 					       SEXP verbose) {
 
   igraph_t g;
@@ -2076,14 +2117,14 @@ SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph, SEXP mat,
   igraph_real_t coolexp=REAL(pcoolexp)[0];
   igraph_real_t repulserad=REAL(prepulserad)[0];
   igraph_real_t cellsize=REAL(pcellsize)[0];
-  igraph_bool_t use_seed=LOGICAL(puseseed)[0];
+  igraph_bool_t use_seed=!isNull(start);
   SEXP result;
   
   R_igraph_before2(verbose, "Grid-FR layout");
 
   R_SEXP_to_igraph(graph, &g);
   if (use_seed) {
-    R_SEXP_to_igraph_matrix_copy(mat, &res);
+    R_SEXP_to_igraph_matrix_copy(start, &res);
   } else {
     igraph_matrix_init(&res, 0, 0);
   }
@@ -3342,6 +3383,42 @@ SEXP R_igraph_simplify(SEXP graph, SEXP pmultiple, SEXP ploops) {
   igraph_destroy(&g);
   
   R_igraph_after();
+  
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP pniter, 
+					  SEXP pmaxdelta, SEXP parea,
+					  SEXP pcoolexp, SEXP prepulserad,
+					  SEXP pweights, SEXP start,
+					  SEXP verbose) {
+  igraph_t g;
+  igraph_integer_t niter=REAL(pniter)[0];
+  igraph_real_t maxdelta=REAL(pmaxdelta)[0];
+  igraph_real_t area=REAL(parea)[0];
+  igraph_real_t coolexp=REAL(pcoolexp)[0];
+  igraph_real_t repulserad=REAL(prepulserad)[0];
+  igraph_vector_t weights, *ppweights=0;
+  igraph_matrix_t res;
+  SEXP result;
+  
+  R_igraph_before2(verbose, "3D FR layout");
+  
+  R_SEXP_to_igraph(graph, &g);
+  if (!isNull(pweights)) { R_SEXP_to_vector(pweights, &weights);ppweights=&weights; }
+  if (isNull(start)) {
+    igraph_matrix_init(&res, 0, 0);
+  } else {
+    R_SEXP_to_igraph_matrix_copy(start, &res);
+  }
+  igraph_layout_fruchterman_reingold(&g, &res, niter, maxdelta, area, 
+				     coolexp, repulserad, !isNull(start),
+				     ppweights);
+  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
+  igraph_matrix_destroy(&res);
+  
+  R_igraph_after2(verbose);
   
   UNPROTECT(1);
   return result;

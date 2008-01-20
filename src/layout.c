@@ -515,6 +515,9 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
  * \param initemp Sets the initial temperature for the annealing.
  * \param coolexp The cooling exponent of the annealing.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
+ * \param use_seed Boolean, whether to use the values cupplied in the \p res 
+ *     argument as the initial configuration. If zero then a random initial 
+ *     configuration is used.
  * \return Error code.
  * 
  * Time complexity: O(|V|^2) for each
@@ -525,7 +528,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       igraph_integer_t niter, igraph_real_t sigma, 
 			       igraph_real_t initemp, igraph_real_t coolexp,
-			       igraph_real_t kkconst) {
+			       igraph_real_t kkconst, igraph_bool_t use_seed) {
 
   igraph_real_t temp, candx, candy;
   igraph_real_t dpot, odis, ndis, osqd, nsqd;
@@ -543,10 +546,12 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_MATRIX_INIT_FINALLY(&elen, n, n);
   IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(), 
 				     IGRAPH_ALL));
-  for (i=0; i<n; i++) {
-    MATRIX(elen, i, i) = sqrt(n);
-    MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
-    MATRIX(*res, i, 1) = RNG_NORMAL(0, n/4.0);
+  if (!use_seed) {
+    for (i=0; i<n; i++) {
+      MATRIX(elen, i, i) = sqrt(n);
+      MATRIX(*res, i, 0) = RNG_NORMAL(0, n/4.0);
+      MATRIX(*res, i, 1) = RNG_NORMAL(0, n/4.0);
+    }
   }
   
   /*Perform the annealing loop*/
@@ -612,6 +617,9 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  * \param initemp Sets the initial temperature for the annealing.
  * \param coolexp The cooling exponent of the annealing.
  * \param kkconst The Kamada-Kawai vertex attraction constant.
+ * \param use_seed Boolean, whether to use the values cupplied in the \p res 
+ *     argument as the initial configuration. If zero then a random initial 
+ *     configuration is used.
  * \return Error code.
  * 
  * Added in version 0.2.</para><para>
@@ -624,7 +632,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  igraph_integer_t niter, igraph_real_t sigma, 
 				  igraph_real_t initemp, igraph_real_t coolexp, 
-				  igraph_real_t kkconst) {
+				  igraph_real_t kkconst, igraph_bool_t use_seed) {
   igraph_real_t temp, candx, candy, candz;
   igraph_real_t dpot, odis, ndis, osqd, nsqd;
   long int i,j,k;
@@ -638,6 +646,15 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(), 
 				     IGRAPH_ALL));
   
+  if (!use_seed) {
+    for (i=0; i<no_of_nodes; i++) {
+      MATRIX(elen, i, i) = sqrt(no_of_nodes);
+      MATRIX(*res, i, 0) = RNG_NORMAL(0, no_of_nodes/4.0);
+      MATRIX(*res, i, 1) = RNG_NORMAL(0, no_of_nodes/4.0);
+      MATRIX(*res, i, 2) = RNG_NORMAL(0, no_of_nodes/4.0);
+    }
+  }
+
   temp=initemp;
   for(i=0;i<niter;i++){
     if (i%10 == 0)

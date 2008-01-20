@@ -887,7 +887,7 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 			       igraph_integer_t niter, igraph_real_t sigma, 
 			       igraph_real_t initemp, igraph_real_t coolexp,
-			       igraph_real_t kkconst);
+			       igraph_real_t kkconst, igraph_bool_t use_seed);
 int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 			  igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
 			  igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
@@ -912,7 +912,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  igraph_integer_t niter, igraph_real_t sigma, 
 				  igraph_real_t initemp, igraph_real_t coolexp, 
-				  igraph_real_t kkconst);
+				  igraph_real_t kkconst, igraph_bool_t use_seed);
 
 int igraph_layout_graphopt(const igraph_t *graph, 
 			   igraph_matrix_t *res, igraph_integer_t niter,
