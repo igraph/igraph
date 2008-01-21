@@ -52,7 +52,7 @@ def detect_igraph_source():
     if not os.path.isdir('igraph'): os.mkdir('igraph')
     if os.path.isfile(os.path.join('..', '..', 'src', 'igraph.h')):
         dirs_to_evaluate = ['.', 'f2c', 'blas', 'lapack', 'arpack']
-        files_to_copy = ['*.c', '*.h', '*.pmt', '*.y']
+        files_to_copy = ['*.c', '*.h', '*.pmt', '*.y', '*.cc', '*.hh']
         src_files = [('.', os.path.join('..', '..', 'config.h'))]
         for wildcard in files_to_copy:
             for d in dirs_to_evaluate:
@@ -94,6 +94,7 @@ except:
 
 module_sources=glob.glob(os.path.join('src', '*.c'))
 sources=glob.glob(os.path.join('igraph', '*.c'))
+sources.extend(glob.glob(os.path.join('igraph', '*.cc')))
 sources.extend(glob.glob(os.path.join('igraph', 'f2c', '*.c')))
 sources.extend(glob.glob(os.path.join('igraph', 'blas', '*.c')))
 sources.extend(glob.glob(os.path.join('igraph', 'lapack', '*.c')))

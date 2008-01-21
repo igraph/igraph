@@ -69,10 +69,10 @@ PyObject* igraphmodule_ARPACKOptions_getattr(
   PyObject *result = NULL;
 
   if (strcmp(attrname, "bmat") == 0) {
-    char buf[2] = { self->params.bmat[0], 0 };
+    char buf[2] = { self->params_out.bmat[0], 0 };
     result=PyString_FromString(buf);
   } else if (strcmp(attrname, "n") == 0) {
-    result=PyInt_FromLong(self->params.n);
+    result=PyInt_FromLong(self->params_out.n);
   } else if (strcmp(attrname, "which") == 0) {
     char buf[3] = { self->params.which[0], self->params.which[1], 0 };
     result=PyString_FromString(buf);
@@ -182,7 +182,7 @@ igraph_arpack_options_t *igraphmodule_ARPACKOptions_get(
   self->params_out.iparam[2] = self->params.mxiter;
   self->params_out.iparam[3] = self->params.nb;
   self->params_out.iparam[6] = self->params.mode;
-  self->params_out.lworkl = self->params.ncv * (self->params.ncv+8);
+  self->params_out.lworkl = 0;
   self->params_out.info = self->params.start;
 
   return &self->params_out;

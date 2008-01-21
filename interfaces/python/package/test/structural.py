@@ -152,6 +152,12 @@ class CentralityTests(unittest.TestCase):
         for idx in xrange(g.vcount()):
             self.assertAlmostEqual(cl[idx], cl2[idx], places=3)
 
+    def testPageRank(self):
+        g = Graph.Star(11)
+        cent = g.pagerank()
+        self.failUnless(cent.index(max(cent)) == 0)
+        self.assertAlmostEquals(max(cent), 0.4668, places=3)
+
     def testEigenvectorCentrality(self):
         g = Graph.Star(11)
         cent = g.evcent()

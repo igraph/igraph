@@ -2335,7 +2335,7 @@ PyObject *igraphmodule_Graph_authority_score(
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO!O", kwlist, &scale_o,
                                    &igraphmodule_ARPACKOptionsType,
-                                   &arpack_options, &return_eigenvalue))
+                                   &arpack_options_o, &return_eigenvalue))
     return NULL;
 
   if (igraph_vector_init(&res, 0)) return igraphmodule_handle_igraph_error();
@@ -2677,10 +2677,10 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
   PyObject *vids_obj = Py_None, *weight_obj = Py_None, *list;
   igraph_vector_t result, weights;
   igraph_vs_t vids;
-  igraph_bool_t return_single = 0, weight_obj_was_created = 0;
+  igraph_bool_t return_single = 0;
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "|OO", kwlist, &vids_obj, weight_obj))
+      (args, kwds, "|OO", kwlist, &vids_obj, &weight_obj))
     return NULL;
 
   if (igraph_vector_init(&result, 0)) {
@@ -2688,13 +2688,17 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
     return NULL;
   }
 
+  if (igraph_vector_init(&weights, 0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    return NULL;
+  }
+
   if (igraphmodule_PyObject_to_attribute_values(weight_obj, &weights,
                                                 self, ATTRHASH_IDX_EDGE,
                                                 1.0)) {
     igraph_vector_destroy(&result);
-    if (weight_obj_was_created) {
-      Py_DECREF(weight_obj);
-    }
+    igraph_vector_destroy(&weights);
     return NULL;
   }
 
@@ -3179,25 +3183,26 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
 }
 
 /** \ingroup python_interface_graph
- * \brief Calculates the Google PageRank value of some nodes in the graph.
+ * \brief Calculates the Google PageRank value of some nodes in the graph
+ *   (old algorithm, for compatibility)
  * \return the PageRank values
- * \sa igraph_pagerank
+ * \sa igraph_pagerank_old
  */
-PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject * self,
-                                      PyObject * args, PyObject * kwds)
+PyObject *igraphmodule_Graph_pagerank_old(igraphmodule_GraphObject *self,
+                                          PyObject *args, PyObject *kwds)
 {
-  char *kwlist[] =
-    { "vertices", "directed", "niter", "eps", "damping", NULL };
+  static char *kwlist[] =
+    { "vertices", "directed", "niter", "eps", "damping", "old", NULL };
   PyObject *directed = Py_True;
-  PyObject *vobj = Py_None, *list;
-  long int niter = 1000;        /// @todo maybe it should be selected adaptively based on the number of vertices?
+  PyObject *vobj = Py_None, *list, *old = Py_False;
+  long int niter = 1000;
   double eps = 0.001, damping = 0.85;
   igraph_vector_t res;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOldd", kwlist,
-                                   &vobj, &directed, &niter, &eps, &damping))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOldd", kwlist, &vobj,
+                                   &directed, &niter, &eps, &damping, &old))
     return NULL;
 
   if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
@@ -3206,12 +3211,13 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject * self,
   }
 
   if (igraph_vector_init(&res, 0)) {
-    return igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
   }
 
   if (igraph_pagerank_old(&self->g, &res, vs,
-                      PyObject_IsTrue(directed), niter, eps, damping)) {
+                      PyObject_IsTrue(directed), niter, eps, damping,
+                      PyObject_IsTrue(old))) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
     igraph_vector_destroy(&res);
@@ -3225,6 +3231,80 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject * self,
 
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
+
+  return list;
+}
+
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the Google PageRank value of some nodes in the graph.
+ * \return the PageRank values
+ * \sa igraph_pagerank
+ */
+PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
+                                      PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] =
+    { "vertices", "directed", "damping", "weights", "arpack_options", NULL };
+  PyObject *directed = Py_True;
+  PyObject *vobj = Py_None, *wobj = Py_None;
+  PyObject *list;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  double damping = 0.85;
+  igraph_vector_t res;
+  igraph_vector_t weights;
+  igraph_bool_t return_single = 0;
+  igraph_vs_t vs;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOO!", kwlist, &vobj,
+                                   &directed, &damping, &wobj,
+                                   &igraphmodule_ARPACKOptionsType,
+                                   &arpack_options_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_init(&weights, 0)) {
+    igraph_vs_destroy(&vs);
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_attribute_values(wobj, &weights,
+                                                self, ATTRHASH_IDX_EDGE,
+                                                1.0)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&weights);
+    return NULL;
+  }
+
+  if (igraph_vector_init(&res, 0)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&weights);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraph_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
+      damping, 0, igraphmodule_ARPACKOptions_get(arpack_options))) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&weights);
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+  else
+    list = PyFloat_FromDouble(VECTOR(res)[0]);
+
+  igraph_vector_destroy(&res);
+  igraph_vs_destroy(&vs);
+  igraph_vector_destroy(&weights);
 
   return list;
 }
@@ -4034,7 +4114,7 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
   }
 
   if (igraph_layout_kamada_kawai
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst)) {
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, 0)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -4078,7 +4158,7 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *
   }
 
   if (igraph_layout_kamada_kawai_3d
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst)) {
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, 0)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -5158,7 +5238,8 @@ PyObject *igraphmodule_Graph_write_graphml(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_isoclass(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  int isoclass = 0, n;
+  int n;
+  igraph_integer_t isoclass = 0;
   PyObject *vids = 0;
   char *kwlist[] = { "vertices", NULL };
 
@@ -5166,13 +5247,8 @@ PyObject *igraphmodule_Graph_isoclass(igraphmodule_GraphObject * self,
       (args, kwds, "|O!", kwlist, &PyList_Type, &vids))
     return NULL;
 
-  if (vids) {
-    /* vertex list was passed, check its length */
-    n = PyList_Size(vids);
-  }
-  else {
-    n = igraph_vcount(&self->g);
-  }
+  if (vids) n = PyList_Size(vids);
+  else n = igraph_vcount(&self->g);
 
   if (n < 3 || n > 4) {
     PyErr_SetString(PyExc_ValueError,
@@ -5203,15 +5279,116 @@ PyObject *igraphmodule_Graph_isoclass(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Determines whether the graph is isomorphic to another graph
+ * \brief Determines whether the graph is isomorphic to another graph.
  *
- * The actual code is almost the same as igraphmodule_Graph_subisomorphic. Be sure
- * to correct bugs in both interfaces if applicable!
- *
- * \sa igraph_isomorphic_vf2
+ * \sa igraph_isomorphic
  */
 PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
+{
+  igraph_bool_t result = 0;
+  PyObject *o;
+  igraphmodule_GraphObject *other;
+  static char *kwlist[] = { "other", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!", kwlist,
+      &igraphmodule_GraphType, &o))
+    return NULL;
+  other = (igraphmodule_GraphObject *) o;
+
+  if (igraph_isomorphic(&self->g, &other->g, &result)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (result) Py_RETURN_TRUE;
+  Py_RETURN_FALSE;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Determines whether the graph is isomorphic to another graph,
+ *   using the BLISS isomorphism algorithm
+ *
+ * The actual code is almost the same as igraphmodule_Graph_isomorphic_vf2.
+ * Be sure to correct bugs in both interfaces if applicable!
+ *
+ * \sa igraph_isomorphic_bliss
+ */
+PyObject *igraphmodule_Graph_isomorphic_bliss(igraphmodule_GraphObject * self,
+                                              PyObject * args, PyObject * kwds)
+{
+  igraph_bool_t result = 0;
+  PyObject *o, *return1=Py_False, *return2=Py_False, *sho1=Py_None, *sho2=Py_None;
+  igraphmodule_GraphObject *other;
+  igraph_vector_t mapping_12, mapping_21, *map12=0, *map21=0;
+  igraph_bliss_sh_t sh1=IGRAPH_BLISS_FM, sh2=IGRAPH_BLISS_FM;
+
+  static char *kwlist[] = { "other", "return_mapping_12",
+    "return_mapping_21", "sh1", "sh2", NULL };
+  /* TODO: convert igraph_bliss_info_t when needed */
+  if (!PyArg_ParseTupleAndKeywords
+      (args, kwds, "O!|OOOO", kwlist, &igraphmodule_GraphType, &o,
+       &return1, &return2, &sho1, &sho2))
+    return NULL;
+  if (igraphmodule_PyObject_to_bliss_sh_t(sho1, &sh1)) return NULL;
+  if (igraphmodule_PyObject_to_bliss_sh_t(sho2, &sh2)) return NULL;
+  other = (igraphmodule_GraphObject *) o;
+
+  if (PyObject_IsTrue(return1)) {
+	igraph_vector_init(&mapping_12, 0);
+	map12 = &mapping_12;
+  }
+  if (PyObject_IsTrue(return2)) {
+	igraph_vector_init(&mapping_21, 0);
+	map21 = &mapping_21;
+  }
+
+  if (igraph_isomorphic_bliss(&self->g, &other->g, &result, map12, map21,
+      sh1, sh2, 0, 0)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (!map12 && !map21) {
+    if (result) Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+  } else {
+	PyObject *iso, *m1, *m2;
+	iso = result ? Py_True : Py_False;
+	Py_INCREF(iso);
+	if (map12) {
+	  m1 = igraphmodule_vector_t_to_PyList(map12, IGRAPHMODULE_TYPE_INT);
+	  igraph_vector_destroy(map12);
+	  if (!m1) {
+	    Py_DECREF(iso);
+		if (map21) igraph_vector_destroy(map21);
+		return NULL;
+	  }
+	} else { m1 = Py_None; Py_INCREF(m1); }
+	if (map21) {
+	  m2 = igraphmodule_vector_t_to_PyList(map21, IGRAPHMODULE_TYPE_INT);
+	  igraph_vector_destroy(map21);
+	  if (!m2) {
+	    Py_DECREF(iso); Py_DECREF(m1);
+		return NULL;
+	  }
+	} else { m2 = Py_None; Py_INCREF(m2); }
+	return Py_BuildValue("NNN", iso, m1, m2);
+  }
+}
+
+
+/** \ingroup python_interface_graph
+ * \brief Determines whether the graph is isomorphic to another graph,
+ *   using the VF2 isomorphism algorithm
+ *
+ * The actual code is almost the same as igraphmodule_Graph_subisomorphic.
+ * Be sure to correct bugs in both interfaces if applicable!
+ *
+ * \sa igraph_isomorphic_vf2
+ */
+PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
+                                            PyObject * args, PyObject * kwds)
 {
   igraph_bool_t result = 0;
   PyObject *o, *return1=Py_False, *return2=Py_False;
@@ -5274,7 +5451,7 @@ PyObject *igraphmodule_Graph_isomorphic(igraphmodule_GraphObject * self,
  *
  * \sa igraph_count_isomorphisms_vf2
  */
-PyObject *igraphmodule_Graph_count_isomorphisms(igraphmodule_GraphObject *self,
+PyObject *igraphmodule_Graph_count_isomorphisms_vf2(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_integer_t result = 0;
   PyObject *o = Py_None;
@@ -5302,7 +5479,7 @@ PyObject *igraphmodule_Graph_count_isomorphisms(igraphmodule_GraphObject *self,
  *
  * \sa igraph_get_isomorphisms_vf2
  */
-PyObject *igraphmodule_Graph_get_isomorphisms(igraphmodule_GraphObject *self,
+PyObject *igraphmodule_Graph_get_isomorphisms_vf2(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_vector_ptr_t result;
   PyObject *o = Py_None;
@@ -5344,7 +5521,7 @@ PyObject *igraphmodule_Graph_get_isomorphisms(igraphmodule_GraphObject *self,
  *
  * \sa igraph_subisomorphic_vf2
  */
-PyObject *igraphmodule_Graph_subisomorphic(igraphmodule_GraphObject * self,
+PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
 {
   igraph_bool_t result = 0;
@@ -5408,7 +5585,7 @@ PyObject *igraphmodule_Graph_subisomorphic(igraphmodule_GraphObject * self,
  *
  * \sa igraph_count_subisomorphisms_vf2
  */
-PyObject *igraphmodule_Graph_count_subisomorphisms(igraphmodule_GraphObject *self,
+PyObject *igraphmodule_Graph_count_subisomorphisms_vf2(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_integer_t result = 0;
   PyObject *o;
@@ -5436,7 +5613,7 @@ PyObject *igraphmodule_Graph_count_subisomorphisms(igraphmodule_GraphObject *sel
  *
  * \sa igraph_get_isomorphisms_vf2
  */
-PyObject *igraphmodule_Graph_get_subisomorphisms(igraphmodule_GraphObject *self,
+PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_vector_ptr_t result;
   PyObject *o;
@@ -6531,16 +6708,18 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_Gr
  * The code is almost exactly the same as igraphmodule_Graph_community_leading_eigenvector_naive
  */
 PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
-  static char *kwlist[] = { "n", "return_merges", NULL };
+  static char *kwlist[] = { "n", "return_merges", "arpack_options", NULL };
   long int n=-1;
   PyObject *return_merges = Py_False;
   PyObject *cl, *res, *merges;
   igraph_vector_t members;
   igraph_matrix_t *mptr = 0;
   igraph_matrix_t m;
+  igraphmodule_ARPACKOptionsObject *arpack_options;
+  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
-    &n, &return_merges)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iOO!", kwlist,
+    &n, &return_merges, &igraphmodule_ARPACKOptionsType, &arpack_options_o)) {
     return NULL;
   }
 
@@ -6552,7 +6731,9 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
 
   if (n<0) n = igraph_vcount(&self->g); else n -= 1;
 
-  if (igraph_community_leading_eigenvector(&self->g, mptr, &members, n)){
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraph_community_leading_eigenvector(&self->g, mptr, &members, n,
+      igraphmodule_ARPACKOptions_get(arpack_options))){
     if (mptr) igraph_matrix_destroy(mptr);
   igraph_vector_destroy(&members);
     return igraphmodule_handle_igraph_error();
@@ -7542,11 +7723,37 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  out-degrees, L{IN} IN for in-degrees or L{ALL} for the sum of\n"
    "  them).\n" "@param loops: whether self-loops should be counted.\n"},
 
-  // interface to igraph_pagerank
+  /* interface to igraph_pagerank */
   {"pagerank", (PyCFunction) igraphmodule_Graph_pagerank,
    METH_VARARGS | METH_KEYWORDS,
+   "pagerank(vertices=None, directed=True, damping=0.85, weights=None, "
+   "arpack_options=None)\n\n"
+   "Calculates the Google PageRank values of a graph.\n"
+   "@param vertices: the indices of the vertices being queried.\n"
+   "  C{None} means all of the vertices.\n"
+   "@param directed: whether to consider directed paths.\n"
+   "@param damping: the damping factor.\n"
+   "  M{1-damping} is the PageRank value for nodes with no\n"
+   "  incoming links.\n"
+   "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
+   "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
+   "  variable called C{arpack_options} is used.\n"
+   "@return: a list with the Google PageRank values of the specified\n"
+   "  vertices.\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: Sergey Brin and Larry Page: I{The Anatomy of a Large-Scale\n"
+   "  Hypertextual Web Search Engine}. Proceedings of the 7th\n"
+   "  World-Wide Web Conference, Brisbane, Australia, April 1998.\n"},
+
+  /* interface to igraph_pagerank_old */
+  {"pagerank_old", (PyCFunction) igraphmodule_Graph_pagerank_old,
+   METH_VARARGS | METH_KEYWORDS,
    "pagerank(vertices=None, directed=True, niter=1000, eps=0.001, damping=0.85)\n\n"
-   "Calculates the Google PageRank values of a graph.\n\n"
+   "Calculates the Google PageRank values of a graph according to the\n"
+   "old PageRank function found in igraph < 0.5.\n\n"
+   "This functions is deprecated and for compatibility purposes only.\n\n"
+   "@deprecated: the new PageRank function uses the more precise and efficient\n"
+   "  ARPACK-based implementation\n\n"
    "@param vertices: the indices of the vertices being queried.\n"
    "  C{None} means all of the vertices.\n"
    "@param directed: whether to consider directed paths.\n"
@@ -8296,8 +8503,57 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the isomorphy class of the (sub)graph\n\n"},
   {"isomorphic", (PyCFunction) igraphmodule_Graph_isomorphic,
    METH_VARARGS | METH_KEYWORDS,
-   "isomorphic(other, return_mapping_12=False, return_mapping_21=False)\n\n"
+   "isomorphic(other)\n\n"
    "Checks whether the graph is isomorphic with another graph.\n\n"
+   "The algorithm being used is selected using a simple heuristic:\n\n"
+   "  - If one graph is directed and the other undirected, an exception\n"
+   "    is thrown.\n\n"
+   "  - If the two graphs does not have the same number of vertices and\n"
+   "    edges, it returns with C{False}\n\n"
+   "  - If the graphs have three or four vertices, then an O(1) algorithm\n"
+   "    is used with precomputed data.\n\n"
+   "  - Otherwise if the graphs are directed, then the VF2 isomorphism\n"
+   "    algorithm is used (see L{Graph.isomorphic_vf2}).\n\n"
+   "  - Otherwise the BLISS isomorphism algorithm is used, see\n"
+   "    L{igraph_isomorphic_bliss}.\n\n"
+   "@return: C{True} if the graphs are isomorphic, C{False} otherwise.\n"
+  },
+  {"isomorphic_bliss", (PyCFunction) igraphmodule_Graph_isomorphic_bliss,
+   METH_VARARGS | METH_KEYWORDS,
+   "isomorphic_bliss(other, return_mapping_12=False, return_mapping_21=False,\n"
+   "  sh1=\"fm\", sh2=\"fm\")\n\n"
+   "Checks whether the graph is isomorphic with another graph, using the\n"
+   "BLISS isomorphism algorithm.\n\n"
+   "@param other: the other graph with which we want to compare the graph.\n"
+   "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
+   "  the vertices of the first graph to the second.\n"
+   "@param return_mapping_21: if C{True}, calculates the mapping which maps\n"
+   "  the vertices of the second graph to the first.\n"
+   "@param sh1: splitting heuristics for the first graph as a\n"
+   "  case-insensitive string, with the following possible values:\n\n"
+   "    - C{\"f\"}: first non-singleton cell\n\n"
+   "    - C{\"fl\"}: first largest non-singleton cell\n\n"
+   "    - C{\"fs\"}: first smallest non-singleton cell\n\n"
+   "    - C{\"fm\"}: first maximally non-trivially connected non-singleton\n"
+   "      cell\n\n"
+   "    - C{\"flm\"}: largest maximally non-trivially connected\n"
+   "      non-singleton cell\n\n"
+   "    - C{\"fsm\"}: smallest maximally non-trivially connected\n"
+   "      non-singleton cell\n\n"
+   "@param sh2: splitting heuristics to be used for the second graph.\n"
+   "  Accepted values are as above.\n"
+   "@return: if no mapping is calculated, the result is C{True} if the graphs\n"
+   "  are isomorphic, C{False} otherwise. If any or both mappings are\n"
+   "  calculated, the result is a 3-tuple, the first element being the\n"
+   "  above mentioned boolean, the second element being the 1 -> 2 mapping\n"
+   "  and the third element being the 2 -> 1 mapping. If the corresponding\n"
+   "  mapping was not calculated, C{None} is returned in the appropriate\n"
+   "  element of the 3-tuple.\n"},
+  {"isomorphic_vf2", (PyCFunction) igraphmodule_Graph_isomorphic_vf2,
+   METH_VARARGS | METH_KEYWORDS,
+   "isomorphic_vf2(other, return_mapping_12=False, return_mapping_21=False)\n\n"
+   "Checks whether the graph is isomorphic with another graph, using the\n"
+   "VF2 isomorphism algorithm.\n\n"
    "@param other: the other graph with which we want to compare the graph.\n"
    "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
    "  the vertices of the first graph to the second.\n"
@@ -8310,26 +8566,27 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  and the third element being the 2 -> 1 mapping. If the corresponding\n"
    "  mapping was not calculated, C{None} is returned in the appropriate\n"
    "  element of the 3-tuple.\n"},
-  {"count_isomorphisms", (PyCFunction) igraphmodule_Graph_count_isomorphisms,
+  {"count_isomorphisms_vf2",
+   (PyCFunction) igraphmodule_Graph_count_isomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "count_isomorphisms(other=None)\n\n"
+   "count_isomorphisms_vf2(other=None)\n\n"
    "Determines the number of isomorphisms between the graph and another one\n\n"
    "@param other: the other graph. If C{None}, the number of automorphisms\n"
    "  will be returned.\n"
    "@return: the number of isomorphisms between the two given graphs (or the\n"
    "  number of automorphisms if C{other} is C{None}.\n"},
-  {"get_isomorphisms", (PyCFunction) igraphmodule_Graph_get_isomorphisms,
+  {"get_isomorphisms_vf2", (PyCFunction) igraphmodule_Graph_get_isomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "get_isomorphisms(other=None)\n\n"
+   "get_isomorphisms_vf2(other=None)\n\n"
    "Returns all isomorphisms between the graph and another one\n\n"
    "@param other: the other graph. If C{None}, the automorphisms\n"
    "  will be returned.\n"
    "@return: a list of lists, each item of the list containing the mapping\n"
    "  from vertices of the second graph to the vertices of the first one\n"},
 
-  {"subisomorphic", (PyCFunction) igraphmodule_Graph_subisomorphic,
+  {"subisomorphic_vf2", (PyCFunction) igraphmodule_Graph_subisomorphic_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "subisomorphic(other, return_mapping_12=False, return_mapping_21=False)\n\n"
+   "subisomorphic_vf2(other, return_mapping_12=False, return_mapping_21=False)\n\n"
    "Checks whether a subgraph of the graph is isomorphic with another graph.\n\n"
    "@param other: the other graph with which we want to compare the graph.\n"
    "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
@@ -8345,15 +8602,17 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  second element being the 1 -> 2 mapping and the third element being\n"
    "  the 2 -> 1 mapping. If the corresponding mapping was not calculated,\n"
    "  C{None} is returned in the appropriate element of the 3-tuple.\n"},
-  {"count_subisomorphisms", (PyCFunction) igraphmodule_Graph_count_subisomorphisms,
+  {"count_subisomorphisms_vf2",
+   (PyCFunction) igraphmodule_Graph_count_subisomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "count_subisomorphisms(other)\n\n"
+   "count_subisomorphisms_vf2(other)\n\n"
    "Determines the number of subisomorphisms between the graph and another one\n\n"
    "@param other: the other graph.\n"
    "@return: the number of subisomorphisms between the two given graphs\n"},
-  {"get_subisomorphisms", (PyCFunction) igraphmodule_Graph_get_subisomorphisms,
+  {"get_subisomorphisms_vf2",
+   (PyCFunction) igraphmodule_Graph_get_subisomorphisms_vf2,
    METH_VARARGS | METH_KEYWORDS,
-   "get_subisomorphisms(other)\n\n"
+   "get_subisomorphisms_vf2(other)\n\n"
    "Returns all subisomorphisms between the graph and another one\n\n"
    "@param other: the other graph.\n"
    "@return: a list of lists, each item of the list containing the mapping\n"

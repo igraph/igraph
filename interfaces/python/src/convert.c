@@ -34,6 +34,64 @@
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to a corresponding igraph enum.
+ *
+ * The numeric value is returned as an integer that must be converted
+ * explicitly to the corresponding igraph enum type. This is to allow one
+ * to use the same common conversion routine for multiple enum types.
+ *
+ * \param o a Python object to be converted
+ * \param translation the translation table between strings and the
+ *   enum values. Strings are treated as case-insensitive. The last
+ *   entry of the table must contain NULL values.
+ * \param result the result is returned here. The default value must be
+ *   passed in before calling this function, since this value is
+ *   returned untouched if the given Python object is Py_None.
+ * \return 0 if everything is OK, 1 otherwise. An appropriate exception
+ *   is raised in this case.
+ */
+int igraphmodule_PyObject_to_enum(PyObject *o,
+  igraphmodule_enum_translation_table_entry_t* table,
+  int *result) {
+    char* s;
+    
+    if (o==Py_None) return 0;
+    if (PyInt_Check(o)) return (int)PyInt_AsLong(o);
+    if (PyLong_Check(o)) return (int)PyLong_AsLong(o);
+    if (!PyString_Check(o)) {
+        PyErr_SetString(PyExc_TypeError, "int, long or string expected");
+        return -1;
+    }
+    s=PyString_AsString(o);
+    while (table->name != 0) {
+        if (strcasecmp(s, table->name) == 0) { *result = table->value; return 0; }
+        table++;
+    }
+    PyErr_SetObject(PyExc_ValueError, o);
+    return -1;
+}
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_bliss_sh_t
+ */
+int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o,
+  igraph_bliss_sh_t *result) {
+  static igraphmodule_enum_translation_table_entry_t bliss_sh_tt[] = {
+        {"f", IGRAPH_BLISS_F},
+        {"fl", IGRAPH_BLISS_FL},
+        {"fs", IGRAPH_BLISS_FS},
+        {"fm", IGRAPH_BLISS_FM},
+        {"flm", IGRAPH_BLISS_FLM},
+        {"fsm", IGRAPH_BLISS_FSM},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, bliss_sh_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_vector_t
  * The incoming \c igraph_vector_t should be uninitialized. Raises suitable
  * Python exceptions when needed.

@@ -134,7 +134,7 @@ class AdvancedGradientPalette(GradientPalette):
     
     Example:
     
-      >>> pal = AdvancedGradientPalette(["red", "black", "blue"], 8)
+      >>> pal = AdvancedGradientPalette(["red", "black", "blue"], n=8)
       >>> pal.get(2)
       (0.5, 0., 0.)
       >>> pal.get(7)

@@ -1157,18 +1157,24 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "OUT", IGRAPH_OUT);
   PyModule_AddIntConstant(m, "IN", IGRAPH_IN);
   PyModule_AddIntConstant(m, "ALL", IGRAPH_ALL);
+
   PyModule_AddIntConstant(m, "STAR_OUT", IGRAPH_STAR_OUT);
   PyModule_AddIntConstant(m, "STAR_IN", IGRAPH_STAR_IN);
   PyModule_AddIntConstant(m, "STAR_UNDIRECTED", IGRAPH_STAR_UNDIRECTED);
+
   PyModule_AddIntConstant(m, "TREE_OUT", IGRAPH_TREE_OUT);
   PyModule_AddIntConstant(m, "TREE_IN", IGRAPH_TREE_IN);
   PyModule_AddIntConstant(m, "TREE_UNDIRECTED", IGRAPH_TREE_UNDIRECTED);
+
   PyModule_AddIntConstant(m, "STRONG", IGRAPH_STRONG);
   PyModule_AddIntConstant(m, "WEAK", IGRAPH_WEAK);
+
   PyModule_AddIntConstant(m, "GET_ADJACENCY_UPPER", IGRAPH_GET_ADJACENCY_UPPER);
   PyModule_AddIntConstant(m, "GET_ADJACENCY_LOWER", IGRAPH_GET_ADJACENCY_LOWER);
   PyModule_AddIntConstant(m, "GET_ADJACENCY_BOTH", IGRAPH_GET_ADJACENCY_BOTH);
+
   PyModule_AddIntConstant(m, "REWIRING_SIMPLE", IGRAPH_REWIRING_SIMPLE);
+
   PyModule_AddIntConstant(m, "ADJ_DIRECTED", IGRAPH_ADJ_DIRECTED);
   PyModule_AddIntConstant(m, "ADJ_UNDIRECTED", IGRAPH_ADJ_UNDIRECTED);
   PyModule_AddIntConstant(m, "ADJ_MAX", IGRAPH_ADJ_MAX);
@@ -1176,6 +1182,13 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "ADJ_PLUS", IGRAPH_ADJ_PLUS);
   PyModule_AddIntConstant(m, "ADJ_UPPER", IGRAPH_ADJ_UPPER);
   PyModule_AddIntConstant(m, "ADJ_LOWER", IGRAPH_ADJ_LOWER);
+
+  PyModule_AddIntConstant(m, "BLISS_F", IGRAPH_BLISS_F);
+  PyModule_AddIntConstant(m, "BLISS_FL", IGRAPH_BLISS_FL);
+  PyModule_AddIntConstant(m, "BLISS_FS", IGRAPH_BLISS_FS);
+  PyModule_AddIntConstant(m, "BLISS_FM", IGRAPH_BLISS_FM);
+  PyModule_AddIntConstant(m, "BLISS_FLM", IGRAPH_BLISS_FLM);
+  PyModule_AddIntConstant(m, "BLISS_FSM", IGRAPH_BLISS_FSM);
 
   /* More useful constants */
   PyModule_AddStringConstant(m, "__version__", VERSION);
