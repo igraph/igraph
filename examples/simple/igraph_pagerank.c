@@ -35,6 +35,7 @@ int main() {
 
   igraph_t g;
   igraph_vector_t v, res;
+  igraph_arpack_options_t arpack_options;
   int ret;
 
   /* Test graphs taken from http://www.iprcom.com/papers/pagerank/ */
@@ -76,7 +77,21 @@ int main() {
   print_vector(&res, stdout);
   igraph_vector_destroy(&res);
   igraph_vector_destroy(&v);
-  
+  igraph_destroy(&g);
+   
+  /* New PageRank */
+  igraph_star(&g, 11, IGRAPH_STAR_UNDIRECTED, 0);
+  igraph_vector_init(&res, 0);
+  igraph_arpack_options_init(&arpack_options);
+  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  print_vector(&res, stdout);
+  /* Check twice more for consistency */
+  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  print_vector(&res, stdout);
+  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  print_vector(&res, stdout);
+  igraph_vector_destroy(&res);
+
   /* Errors */
   igraph_set_error_handler(igraph_error_handler_ignore);
   ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, -1, 0.0001, 0.85, 0);
