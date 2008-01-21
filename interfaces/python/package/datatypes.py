@@ -3,11 +3,12 @@
 class Matrix(object):
     """Simple matrix data type.
 
-    Of course there are much more advanced matrix data types for Python (for instance,
-    the C{ndarray} data type of Numeric Python) and this implementation does not want
-    to compete with them. The only role of this data type is to provide a convenient
-    interface for the matrices returned by the C{Graph} object (for instance, allow
-    indexing with tuples in the case of adjacency matrices and so on).
+    Of course there are much more advanced matrix data types for Python (for
+    instance, the C{ndarray} data type of Numeric Python) and this implementation
+    does not want to compete with them. The only role of this data type is to
+    provide a convenient interface for the matrices returned by the C{Graph}
+    object (for instance, allow indexing with tuples in the case of adjacency
+    matrices and so on).
     """
 
     def __init__(self, data=None):
@@ -41,10 +42,10 @@ class Matrix(object):
     def __getitem__(self, i):
         """Returns a single item, a row or a column of the matrix
 
-        @param i: if a single integer, returns the M{i}th row as a list. If a slice,
-          returns the corresponding rows as another L{Matrix} object. If a 2-tuple,
-          the first element of the tuple is used to select a row and the second is
-          used to select a column.
+        @param i: if a single integer, returns the M{i}th row as a list. If a
+          slice, returns the corresponding rows as another L{Matrix} object. If
+          a 2-tuple, the first element of the tuple is used to select a row and
+          the second is used to select a column.
         """
         if isinstance(i, int):
             return list(self._data[i])
@@ -72,10 +73,10 @@ class Matrix(object):
     def __setitem__(self, i, value):
         """Sets a single item, a row or a column of the matrix
 
-        @param i: if a single integer, returns the M{i}th row as a list. If a slice,
-          returns the corresponding rows as another L{Matrix} object. If a 2-tuple,
-          the first element of the tuple is used to select a row and the second is
-          used to select a column.
+        @param i: if a single integer, sets the M{i}th row as a list. If a
+          slice, sets the corresponding rows from another L{Matrix} object.
+          If a 2-tuple, the first element of the tuple is used to select a row
+          and the second is used to select a column.
         @param value: the new value
         """
         if isinstance(i, int):
@@ -115,7 +116,7 @@ class Matrix(object):
 
 
     def __repr__(self):
-        return "Matrix([%s])" % "\n ".join(["[%s]" % (", ".join(map(repr, row))) for row in self])
+        return "Matrix([\n %s])" % ",\n ".join(["[%s]" % (", ".join(map(repr, row))) for row in self])
 
     def __str__(self):
         return "[%s]" % "\n ".join(["[%s]" % (", ".join(map(str, row))) for row in self])
@@ -156,31 +157,88 @@ class Matrix(object):
 
           - C{border_width}: line width of the border shown around the matrix.
             If zero or negative, the border is turned off. Default is C{1}.
+
+          - C{row_names}: the names of the rows
+
+          - C{col_names}: the names of the columns.
+
+        If only the row names or the column names are given and the matrix
+        is square-shaped, the same names are used for both column and row
+        names.
         """
         import colors
-        grid_width = float(kwds.get("grid_width", 1.))
+        gw = float(kwds.get("grid_width", 1.))
         border_width = float(kwds.get("border_width", 1.))
         style = kwds.get("style", "boolean")
         if style not in ("boolean", "palette"): raise ValueError, "invalid style"
+        row_names = kwds.get("row_names", None)
+        col_names = kwds.get("col_names", row_names)
+        if row_names is None and col_names is not None: row_names=col_names
+        if row_names is not None:
+            row_names=list(row_names)[0:self._nrow]
+            if len(row_names) < self._nrow:
+                row_names.extend([""]*(self._nrow-len(row_names)))
+        if col_names is not None:
+            col_names=list(col_names)[0:self._ncol]
+            if len(col_names) < self._ncol:
+                col_names.extend([""]*(self._ncol-len(col_names)))
+        
+        # Calculate text extents if needed
+        if row_names is not None or col_names is not None:
+            _, _, font_height, _, _ = context.font_extents()
+            te = context.text_extents
+            space_width = te(" ")[4]
+            max_row_name_width = max([te(s)[4] for s in row_names])+space_width
+            max_col_name_width = max([te(s)[4] for s in col_names])+space_width
+        else:
+            max_row_name_width, max_col_name_width = 0, 0
 
         # Calculate sizes
-        dx = float(bbox.width) / self.shape[1]
-        dy = float(bbox.height) / self.shape[0]
+        grid_width = float(bbox.width)-max_row_name_width
+        grid_height = float(bbox.height)-max_col_name_width
+        dx = grid_width / self.shape[1]
+        dy = grid_height / self.shape[0]
         if kwds.get("square", True): dx, dy = min(dx, dy), min(dx, dy)
-        ox = bbox.left + (bbox.width - dx*self.shape[1]) / 2.0
-        oy = bbox.top + (bbox.height - dy*self.shape[0]) / 2.0
+        grid_width, grid_height = dx*self.shape[1], dy*self.shape[0]
+        ox = bbox.left + (bbox.width - grid_width - max_row_name_width) / 2.0
+        oy = bbox.top + (bbox.height - grid_height - max_col_name_width) / 2.0
+        ox += max_row_name_width
+        oy += max_col_name_width
 
         # Determine rescaling factors for the palette if needed
         if style == "palette":
-            mi = self.min()
-            ma = self.max()
+            mi, ma = self.min(), self.max()
             color_offset = mi
             color_ratio = (len(palette)-1) / float(ma-mi)
 
         # Validate grid width
-        if dx < 3*grid_width or dy < 3*grid_width: grid_width = 0.
-        if grid_width>0: context.set_line_width(grid_width)
+        if dx < 3*gw or dy < 3*gw: gw = 0.
+        if gw>0: context.set_line_width(gw)
 
+        # Draw row names (if any)
+        context.set_source_rgb(0., 0., 0.)
+        if row_names is not None:
+            x, y = ox, oy 
+            for heading in row_names:
+                _, _, _, h, xa, _ = context.text_extents(heading)
+                context.move_to(x-xa-space_width, y + (dy+h)/2.)
+                context.show_text(heading)
+                y += dy
+
+        # Draw column names (if any) - TODO
+        if col_names is not None:
+            context.save()
+            context.translate(ox, oy)
+            context.rotate(-1.5707963285)   # pi/2
+            x, y = 0., 0.
+            for heading in col_names:
+                _, _, _, h, _, _ = context.text_extents(heading)
+                context.move_to(x+space_width, y + (dx+h)/2.)
+                context.show_text(heading)
+                y += dx
+            context.restore()
+
+        # Draw matrix
         x, y = ox, oy
         for row in self:
             for item in row:

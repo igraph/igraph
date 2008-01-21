@@ -337,10 +337,14 @@ class Plot(object):
             if plotter is None:
                 warn("%s does not support plotting" % obj)
             else:
-                ctx.push_group()
+                if opacity < 1.0: ctx.push_group()
+                else: ctx.save()
                 plotter(ctx, bbox, palette, *args, **kwds)
-                ctx.pop_group_to_source()
-                ctx.paint_with_alpha(opacity)
+                if opacity < 1.0:
+                    ctx.pop_group_to_source()
+                    ctx.paint_with_alpha(opacity)
+                else:
+                    ctx.restore()
 
         self._is_dirty = False
 
