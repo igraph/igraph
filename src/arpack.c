@@ -403,7 +403,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     igraph_Free(workd);
     igraph_Free(workl);
     igraph_Free(v);
-    IGRAPH_FINALLY_CLEAN(8);
+    IGRAPH_FINALLY_CLEAN(9);
   }
   return 0;  
 }

@@ -391,7 +391,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   if (weights && igraph_vector_size(weights) != igraph_ecount(graph))
   {
     IGRAPH_ERROR("Invalid length of weights vector when calculating "
-		 "eigenvector centrality", IGRAPH_EINVAL);
+		 "PageRank scores", IGRAPH_EINVAL);
   }
   
   IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
