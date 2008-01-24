@@ -3,6 +3,12 @@
 	* interfaces/python/src/graphobject.c : corrected some type
 	mismatches that caused erroneous behaviour on 64 bit
 	architectures
+	
+	* interfaces/python/src/graphobject.c : added interface to
+	igraphmodule_Graph_permute_vertices
+	
+	* interfaces/python/package/test/isomorphism.py : added
+	test case
 
 2008-01-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 

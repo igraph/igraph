@@ -42,6 +42,20 @@ class IsomorphismTests(unittest.TestCase):
         self.failUnless(g.count_subisomorphisms_vf2(g2) == 4*4*2)
         self.failUnless(g2.count_subisomorphisms_vf2(g) == 0)
 
+    def testPermuteVertices(self):
+        g1 = Graph(8, [(0, 4), (0, 5), (0, 6), \
+                       (1, 4), (1, 5), (1, 7), \
+                       (2, 4), (2, 6), (2, 7), \
+                       (3, 5), (3, 6), (3, 7)])
+        g2 = Graph(8, [(0, 1), (0, 3), (0, 4), \
+                       (2, 3), (2, 1), (2, 6), \
+                       (5, 1), (5, 4), (5, 6), \
+                       (7, 3), (7, 6), (7, 4)])
+        _, _, mapping = g1.isomorphic_vf2(g2, return_mapping_21=True)
+        g3 = g2.permute_vertices(mapping)
+        self.failUnless(g3.vcount() == g2.vcount() and g3.ecount() == g2.ecount())
+        self.failUnless(set(g3.get_edgelist()) == set(g1.get_edgelist()))
+
 def suite():
     isomorphism_suite = unittest.makeSuite(IsomorphismTests)
     return unittest.TestSuite([isomorphism_suite])

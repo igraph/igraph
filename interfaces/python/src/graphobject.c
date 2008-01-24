@@ -3310,6 +3310,39 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Permutes the vertices of the graph 
+ * \return the new graph as a new igraph object
+ * \sa igraph_permute_vertices
+ */
+PyObject *igraphmodule_Graph_permute_vertices(igraphmodule_GraphObject *self,
+                                              PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "permutation", NULL };
+  igraph_t pg;
+  igraph_vector_t perm;
+  igraphmodule_GraphObject *result;
+  PyObject *list;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!", kwlist, &PyList_Type, &list))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vector_t(list, &perm, 1, 0)) return NULL;
+
+  if (igraph_permute_vertices(&self->g, &pg, &perm)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&perm);
+    return NULL;
+  }
+
+  igraph_vector_destroy(&perm);
+  result =
+    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
+  RC_ALLOC("Graph", result);
+  if (result != NULL) result->g = pg;
+
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates shortest paths in a graph.
  * \return the shortest path lengths for the given vertices
  * \sa igraph_shortest_paths
@@ -7769,7 +7802,19 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  Hypertextual Web Search Engine}. Proceedings of the 7th\n"
    "  World-Wide Web Conference, Brisbane, Australia, April 1998.\n"},
 
-  // interface to igraph_reciprocity
+  /* interface to igraph_permute_vertices */
+  {"permute_vertices", (PyCFunction) igraphmodule_Graph_permute_vertices,
+   METH_VARARGS | METH_KEYWORDS,
+   "permute_vertices(permutation)\n\n"
+   "Permutes the vertices of the graph according to the given permutation\n"
+   "and returns the new graph.\n\n"
+   "Vertex M{k} of the original graph will become vertex M{permutation[k]}\n"
+   "in the new graph. No validity checks are performed on the permutation\n"
+   "vector.\n\n"
+   "@return: the new graph\n"
+  },
+
+  /* interface to igraph_reciprocity */
   {"reciprocity", (PyCFunction) igraphmodule_Graph_reciprocity,
    METH_VARARGS | METH_KEYWORDS,
    "reciprocity()\n\n" "@return: the reciprocity of the graph."},
