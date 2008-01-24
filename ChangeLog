@@ -1,3 +1,9 @@
+2008-01-24  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/graphobject.c : corrected some type
+ 	mismatches that caused erroneous behaviour on 64 bit
+	architectures
+
 2007-12-12  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/igraph_pmt.h

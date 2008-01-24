@@ -210,11 +210,11 @@ int igraphmodule_Graph_init(igraphmodule_GraphObject * self,
                             PyObject * args, PyObject * kwds)
 {
   char *kwlist[] = { "n", "edges", "directed", NULL };
-  int n = 1;
+  long n = 1;
   PyObject *edges = NULL, *dir = Py_False;
   igraph_vector_t edges_vector;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO!O!", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO!O!", kwlist,
                                    &n, &PyList_Type, &edges,
                                    &PyBool_Type, &dir))
     return -1;
@@ -704,13 +704,13 @@ PyObject *igraphmodule_Graph_get_eid(igraphmodule_GraphObject * self,
   long v1, v2;
   igraph_integer_t result;
   PyObject *directed = Py_False;
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|O", kwlist, &v1, &v2,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist, &v1, &v2,
                                    &directed))
     return NULL;
   if (igraph_get_eid(&self->g, &result, v1, v2, PyObject_IsTrue(directed)))
     return igraphmodule_handle_igraph_error();
 
-  return Py_BuildValue("i", (long)result);
+  return Py_BuildValue("l", (long)result);
 }
 
 /** \ingroup python_interface_graph
@@ -1756,7 +1756,7 @@ PyObject *igraphmodule_Graph_Isoclass(PyTypeObject * type,
 
   char *kwlist[] = { "n", "class", "directed", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|O", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
                                    &n, &isoclass, &directed))
     return NULL;
 
@@ -3523,7 +3523,6 @@ PyObject *igraphmodule_Graph_to_undirected(igraphmodule_GraphObject * self,
   Py_RETURN_NONE;
 }
 
-
 /** \ingroup python_interface_graph
  * \function igraphmodule_Graph_to_directed
  * \brief Converts an undirected graph to a directed one.
@@ -3837,7 +3836,7 @@ PyObject *igraphmodule_Graph_Read_GraphML(PyTypeObject * type,
 
   char *kwlist[] = { "f", "index", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|i", kwlist, &fname, &index))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s|l", kwlist, &fname, &index))
     return NULL;
 
   f = fopen(fname, "r");
@@ -4640,12 +4639,12 @@ PyObject *igraphmodule_Graph_bfs(igraphmodule_GraphObject * self,
   char *kwlist[] = { "vid", "mode", NULL };
   long vid;
   PyObject *l1, *l2, *l3, *result;
-  igraph_neimode_t mode = IGRAPH_OUT;
+  int mode = IGRAPH_OUT;
   igraph_vector_t vids;
   igraph_vector_t layers;
   igraph_vector_t parents;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "i|i", kwlist, &vid, &mode))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|i", kwlist, &vid, &mode))
     return NULL;
   if (vid < 0 || vid > igraph_vcount(&self->g)) {
     PyErr_SetString(PyExc_ValueError, "invalid vertex id");
@@ -4662,7 +4661,7 @@ PyObject *igraphmodule_Graph_bfs(igraphmodule_GraphObject * self,
     PyErr_SetString(PyExc_MemoryError, "not enough memory");
   }
   if (igraph_bfs
-      (&self->g, (igraph_integer_t) vid, mode, &vids, &layers, &parents)) {
+      (&self->g, (igraph_integer_t) vid, (igraph_neimode_t) mode, &vids, &layers, &parents)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -4709,7 +4708,7 @@ PyObject *igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject * self,
   long vid1 = -1, vid2 = -1;
   igraph_integer_t v1, v2;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ii|O", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
                                    &vid1, &vid2, &capacity_object))
     return NULL;
 
@@ -4744,7 +4743,7 @@ PyObject *igraphmodule_Graph_mincut_value(igraphmodule_GraphObject * self,
   long vid1 = -1, vid2 = -1;
   long n;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iiO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|llO", kwlist,
                                    &vid1, &vid2, &capacity_object))
     return NULL;
 
@@ -4819,7 +4818,7 @@ PyObject *igraphmodule_Graph_cliques(igraphmodule_GraphObject * self,
   long int i, j, n;
   igraph_vector_ptr_t result;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ii", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ll", kwlist,
                                    &min_size, &max_size))
     return NULL;
 
@@ -4974,7 +4973,7 @@ PyObject *igraphmodule_Graph_independent_vertex_sets(igraphmodule_GraphObject
   long int i, j, n;
   igraph_vector_ptr_t result;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ii", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ll", kwlist,
                                    &min_size, &max_size))
     return NULL;
 
@@ -5137,7 +5136,7 @@ PyObject *igraphmodule_Graph_coreness(igraphmodule_GraphObject * self,
   igraph_vector_t result;
   PyObject *o;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|i", kwlist, &mode))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &mode))
     return NULL;
 
   if (igraph_vector_init(&result, igraph_vcount(&self->g)))
@@ -5222,7 +5221,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_Gr
   igraph_matrix_t *mptr = 0;
   igraph_matrix_t m;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist,
 	  &n, &return_merges)) {
     return NULL;
   }
@@ -5277,7 +5276,7 @@ PyObject *igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObj
   igraph_matrix_t *mptr = 0;
   igraph_matrix_t m;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|iO", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist,
 	  &n, &return_merges)) {
     return NULL;
   }
