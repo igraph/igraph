@@ -297,7 +297,7 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
 	  Py_DECREF(attrs[0]);
 	  Py_DECREF(attrs[1]);
 	  Py_DECREF(attrs[2]);
-	  igraph_Free(graph->attr);
+	  free(graph->attr); graph->attr = 0;
 	  IGRAPH_ERROR("failed to add attributes to graph attribute hash",
 		       IGRAPH_FAILURE);
 	}
