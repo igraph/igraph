@@ -20,6 +20,48 @@ class Matrix(object):
         self._data = []
         self.data = data
 
+    def Fill(klass, value, *args):
+        """Creates a matrix filled with the given value
+
+        @param value: the value to be used
+        @keyword shape: the shape of the matrix. Can be a single integer,
+          two integers or a tuple. If a single integer is
+          given here, the matrix is assumed to be square-shaped.
+        """
+        if len(args) < 1: raise TypeError, "expected an integer or a tuple"
+        if len(args) == 1:
+            if hasattr(args[0], "__len__"):
+                h, w = map(int, args[0][0:2])
+            else:
+                h, w = int(args[0]), int(args[0])
+        else: h, w = map(int, args[0:2])
+        mtrx = [[value]*w for _ in xrange(h)]
+        return klass(mtrx)
+    Fill=classmethod(Fill)
+
+    def Zero(klass, *args):
+        """Creates a matrix filled with zeros.
+
+        @keyword shape: the shape of the matrix. Can be a single integer,
+          two integers or a tuple. If a single integer is
+          given here, the matrix is assumed to be square-shaped.
+        """
+        result = klass.Fill(0, *args)
+        return result
+    Zero=classmethod(Zero)
+
+    def Identity(klass, *args):
+        """Creates an identity matrix.
+
+        @keyword shape: the shape of the matrix. Can be a single integer,
+          two integers or a tuple. If a single integer is
+          given here, the matrix is assumed to be square-shaped.
+        """
+        result=klass.Fill(0, *args)
+        for i in xrange(min(*result.shape)): result._data[i][i] = 1
+        return result
+    Identity=classmethod(Identity)
+
     def _set_data(self, data=None):
         """Sets the data stored in the matrix"""
         if data is not None:
@@ -162,6 +204,21 @@ class Matrix(object):
 
           - C{col_names}: the names of the columns.
 
+          - C{values}: values to be displayed in the cells. If C{None} or
+            C{False}, no values are displayed. If C{True}, the values come
+            from the matrix being plotted. If it is another matrix, the
+            values of that matrix are shown in the cells. In this case,
+            the shape of the value matrix must match the shape of the
+            matrix being plotted.
+
+          - C{value_format}: a format string that specifies how the values
+            should be plotted. Example: C{"%#.2f"} for floating-point numbers
+            with always exactly two digits after the decimal point. See
+            the Python documentation of the C{%} operator for details on
+            the format string. If the format string is not given, it defaults
+            to C{"%s"} and an implicit conversion to strings is performed
+            on the elements of the value matrix.
+
         If only the row names or the column names are given and the matrix
         is square-shaped, the same names are used for both column and row
         names.
@@ -170,9 +227,13 @@ class Matrix(object):
         gw = float(kwds.get("grid_width", 1.))
         border_width = float(kwds.get("border_width", 1.))
         style = kwds.get("style", "boolean")
-        if style not in ("boolean", "palette"): raise ValueError, "invalid style"
         row_names = kwds.get("row_names", None)
         col_names = kwds.get("col_names", row_names)
+        values = kwds.get("values", None)
+        value_format = kwds.get("value_format", None)
+
+        # Validations
+        if style not in ("boolean", "palette"): raise ValueError, "invalid style"
         if row_names is None and col_names is not None: row_names=col_names
         if row_names is not None:
             row_names=list(row_names)[0:self._nrow]
@@ -182,10 +243,18 @@ class Matrix(object):
             col_names=list(col_names)[0:self._ncol]
             if len(col_names) < self._ncol:
                 col_names.extend([""]*(self._ncol-len(col_names)))
-        
+        if values == False: values=None
+        if values == True: values=self
+        if isinstance(values, list): values=Matrix(list)
+        if values is not None and not isinstance(values, Matrix):
+            raise TypeError, "values must be None, False, True or a matrix"
+        if values is not None and values.shape != self.shape:
+            raise ValueError, "values must be a matrix of size %s" % str(self.shape)
+
+        _, _, font_height, _, _ = context.font_extents()
+
         # Calculate text extents if needed
         if row_names is not None or col_names is not None:
-            _, _, font_height, _, _ = context.font_extents()
             te = context.text_extents
             space_width = te(" ")[4]
             max_row_name_width = max([te(s)[4] for s in row_names])+space_width
@@ -225,7 +294,7 @@ class Matrix(object):
                 context.show_text(heading)
                 y += dy
 
-        # Draw column names (if any) - TODO
+        # Draw column names (if any)
         if col_names is not None:
             context.save()
             context.translate(ox, oy)
@@ -264,6 +333,21 @@ class Matrix(object):
                 x += dx
             x, y = ox, y+dy
 
+        # Draw cell values
+        if values is not None:
+            x, y = ox, oy
+            context.set_source_rgb(0., 0., 0.)
+            for row in values.data:
+                for item in row:
+                    if value_format is not None: s = value_format % item
+                    else: s = str(item)
+                    th, tw = context.text_extents(s)[3:5]
+                    context.move_to(x+(dx-tw)/2., y+(dy+th)/2.)
+                    context.show_text(s)
+                    x += dx
+                x, y = ox, y+dy
+
+        # Draw borders
         if border_width > 0:
             context.set_line_width(border_width)
             context.set_source_rgb(0., 0., 0.)

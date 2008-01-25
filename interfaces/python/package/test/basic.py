@@ -105,6 +105,16 @@ class DatatypeTests(unittest.TestCase):
         self.failUnless(m.min(1) == [1,4,7])
         self.failUnless(m.max(1) == [3,6,9])
 
+        # Special constructors
+        m=Matrix.Fill(2, (3,3))
+        self.failUnless(m.min() == 2 and m.max() == 2 and m.shape == (3,3))
+        m=Matrix.Zero(5, 4)
+        self.failUnless(m.min() == 0 and m.max() == 0 and m.shape == (5,4))
+        m=Matrix.Identity(3)
+        self.failUnless(m.data == [[1,0,0], [0,1,0], [0,0,1]])
+        m=Matrix.Identity(3, 2)
+        self.failUnless(m.data == [[1,0], [0,1], [0,0]])
+
 
 def suite():
     basic_suite = unittest.makeSuite(BasicTests)
