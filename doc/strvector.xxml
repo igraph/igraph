@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<section id="igraph-Strvector">
+<title>String vectors</title>
+
+<!-- doxrox-include igraph_strvector_t -->
+<!-- doxrox-include igraph_strvector_init -->
+<!-- doxrox-include igraph_strvector_copy -->
+<!-- doxrox-include igraph_strvector_destroy -->
+<!-- doxrox-include STR -->
+<!-- doxrox-include igraph_strvector_get -->
+<!-- doxrox-include igraph_strvector_set -->
+<!-- doxrox-include igraph_strvector_set2 -->
+<!-- doxrox-include igraph_strvector_remove -->
+<!-- doxrox-include igraph_strvector_append -->
+<!-- doxrox-include igraph_strvector_clear -->
+<!-- doxrox-include igraph_strvector_resize -->
+<!-- doxrox-include igraph_strvector_size -->
+<!-- doxrox-include igraph_strvector_add -->
+
+</section>
