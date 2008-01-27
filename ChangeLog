@@ -1,3 +1,8 @@
+2008-01-28  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/graphobject.c : added interface to walktrap
+	community detection
+
 2008-01-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 	
 	* src/centrality.c (igraph_eigenvector_centrality)

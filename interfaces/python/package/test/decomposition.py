@@ -99,6 +99,14 @@ class CommunityTests(unittest.TestCase):
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
 
+    def testWalktrap(self):
+        g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)
+        g += [(0,5), (5,10), (10, 0)]
+        cl = g.community_walktrap()
+        self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
+        cl = g.community_walktrap(steps=3)
+        self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1,2,2,2,2,2])
+        
 def suite():
     decomposition_suite = unittest.makeSuite(DecompositionTests)
     clustering_suite = unittest.makeSuite(ClusteringTests)

@@ -510,7 +510,30 @@ class Graph(core.GraphBase):
         d = VertexDendrogram(self, GraphBase.community_edge_betweenness(self, directed));
         if clusters is not None: d.cut(clusters)
         return d
-    
+
+    def community_walktrap(self, weights=None, steps=4):
+        """Community detection algorithm of Latapy & Pons, based on random walks.
+        
+        The basic idea of the algorithm is that short random walks tend to stay
+        in the same community. The result of the clustering will be represented
+        as a dendrogram.
+        
+        @param weights: name of an edge attribute or a list containing
+          edge weights
+        @param steps: length of random walks to perform
+        
+        @return: a L{VertexDendrogram} object, initially cut at the maximum
+          modularity.
+          
+        @newfield ref: Reference
+        @ref: Pascal Pons, Matthieu Latapy: Computing communities in large networks
+          using random walks, U{http://arxiv.org/abs/physics/0512106}.
+        """
+        merges, qs = GraphBase.community_walktrap(self, weights, steps, True)
+        d = VertexDendrogram(self, merges, modularity=qs)
+        return d
+
+
     def edge_betweenness_clustering(self, clusters = None, steps = None):
         """Newman's edge betweenness clustering.
 

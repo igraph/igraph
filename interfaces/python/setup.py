@@ -52,7 +52,7 @@ def detect_igraph_source():
     if not os.path.isdir('igraph'): os.mkdir('igraph')
     if os.path.isfile(os.path.join('..', '..', 'src', 'igraph.h')):
         dirs_to_evaluate = ['.', 'f2c', 'blas', 'lapack', 'arpack']
-        files_to_copy = ['*.c', '*.h', '*.pmt', '*.y', '*.cc', '*.hh']
+        files_to_copy = ['*.c', '*.h', '*.pmt', '*.y', '*.cc', '*.hh', '*.cpp']
         src_files = [('.', os.path.join('..', '..', 'config.h'))]
         for wildcard in files_to_copy:
             for d in dirs_to_evaluate:
@@ -95,6 +95,7 @@ except:
 module_sources=glob.glob(os.path.join('src', '*.c'))
 sources=glob.glob(os.path.join('igraph', '*.c'))
 sources.extend(glob.glob(os.path.join('igraph', '*.cc')))
+sources.extend(glob.glob(os.path.join('igraph', '*.cpp')))
 sources.extend(glob.glob(os.path.join('igraph', 'f2c', '*.c')))
 sources.extend(glob.glob(os.path.join('igraph', 'blas', '*.c')))
 sources.extend(glob.glob(os.path.join('igraph', 'lapack', '*.c')))
@@ -132,7 +133,7 @@ following URL:
     
 http://www.zlatkovic.com/pub/libxml/"""
 
-setup(name = 'igraph',
+setup(name = 'python-igraph',
       version = igraph_version(),
       description = 'High performance graph data structures and algorithms',
       long_description = description,
@@ -147,15 +148,15 @@ setup(name = 'igraph',
       keywords = ['graph', 'network', 'mathematics', 'math', 'graph theory', 'discrete mathematics'],
       classifiers = [
         'Development Status :: 4 - Beta',
-    'Intended Audience :: Developers',
-    'Intended Audience :: Science/Research',
-    'Operating System :: OS Independent',
-    'Programming Language :: C',
-    'Programming Language :: Python',
-    'Topic :: Scientific/Engineering',
-    'Topic :: Scientific/Engineering :: Information Analysis',
-    'Topic :: Scientific/Engineering :: Mathematics',
-    'Topic :: Scientific/Engineering :: Physics',
-    'Topic :: Scientific/Engineering :: Bio-Informatics',
-    'Topic :: Software Development :: Libraries :: Python Modules'
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'Operating System :: OS Independent',
+        'Programming Language :: C',
+        'Programming Language :: Python',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+        'Topic :: Scientific/Engineering :: Mathematics',
+        'Topic :: Scientific/Engineering :: Physics',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
+        'Topic :: Software Development :: Libraries :: Python Modules'
       ])

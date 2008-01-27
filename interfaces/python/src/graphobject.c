@@ -6854,6 +6854,67 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
   return res;
 }
 
+
+/**
+ * Walktrap community detection of Latapy & Pons
+ */
+PyObject *igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject * self,
+  PyObject * args, PyObject * kwds) {
+  static char *kwlist[] = { "weights", "steps", "return_q", NULL };
+  PyObject *return_q = Py_False;
+  PyObject *ms, *qs, *res, *weights = Py_None;
+  igraph_matrix_t merges;
+  int steps=4;
+  igraph_vector_t q, *ws=0;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist, &weights,
+      &steps, &return_q))
+    return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights, self, &ws, ATTRIBUTE_TYPE_EDGE))
+    return NULL;
+
+  igraph_matrix_init(&merges, 0, 0);
+  if (PyObject_IsTrue(return_q)) {
+    igraph_vector_init(&q, 0);
+    if (igraph_community_walktrap(&self->g, ws, steps, &merges, &q)) {
+      if (ws) { igraph_vector_destroy(ws); free(ws); }
+      igraph_vector_destroy(&q);
+      igraph_matrix_destroy(&merges);
+      return igraphmodule_handle_igraph_error();
+    }
+    qs=igraphmodule_vector_t_to_PyList(&q, IGRAPHMODULE_TYPE_FLOAT);
+    igraph_vector_destroy(&q);
+    if (ws) { igraph_vector_destroy(ws); free(ws); }
+    if (!qs) {
+      igraph_matrix_destroy(&merges);
+      return NULL;
+    }
+  } else {
+    if (igraph_community_walktrap(&self->g, ws, steps, &merges, 0)) {
+      if (ws) { igraph_vector_destroy(ws); free(ws); }
+      igraph_matrix_destroy(&merges);
+      return igraphmodule_handle_igraph_error();
+    }
+    if (ws) { igraph_vector_destroy(ws); free(ws); }
+    qs=Py_None;
+    Py_INCREF(qs);
+  }
+
+
+  ms=igraphmodule_matrix_t_to_PyList(&merges, IGRAPHMODULE_TYPE_INT);
+  igraph_matrix_destroy(&merges);
+
+  if (ms == NULL) {
+    Py_DECREF(qs);
+    return NULL;
+  }
+
+  res=Py_BuildValue("NN", ms, qs); /* steals references */
+
+  return res;
+}
+
 /* }}} */
 
 /* {{{ SPECIAL METHODS */
@@ -8871,7 +8932,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"community_fastgreedy",
    (PyCFunction) igraphmodule_Graph_community_fastgreedy,
    METH_VARARGS | METH_KEYWORDS,
-   "community_fastgreedy(weights=None, return_qs=True)\n\n"
+   "community_fastgreedy(weights=None, return_q=True)\n\n"
    "Finds the community structure of the graph according to the algorithm of\n"
    "Clauset et al based on the greedy optimization of modularity.\n\n"
    "This is a bottom-up algorithm: initially every vertex belongs to a separate\n"
@@ -8882,13 +8943,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
    "@param weights: name of an edge attribute or a list containing\n"
    "  edge weights\n"
-   "@param return_qs: if C{True}, returns the modularity achieved before each\n"
+   "@param return_q: if C{True}, returns the modularity achieved before each\n"
    "  merge during the algorithm, so the first element of the list returned\n"
    "  will be the initial modularity (when every vertex belongs to a separate\n"
    "  community), the second one is the modularity after the first join and so on.\n"
    "@return: a tuple with the following elements:\n"
    "  1. The list of merges\n"
-   "  2. The modularity scores before each merge if C{return_qs} is C{True}, or\n"
+   "  2. The modularity scores before each merge if C{return_q} is C{True}, or\n"
    "     C{None} otherwise\n"
    "\n"
    "@newfield ref: Reference\n"
@@ -8971,6 +9032,31 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   "  of these elements can be equal to C{None} based on the C{return_*}\n"
   "  arguments."
   },
+  {"community_walktrap",
+   (PyCFunction) igraphmodule_Graph_community_walktrap,
+   METH_VARARGS | METH_KEYWORDS,
+   "community_walktrap(weights=None, steps=None, return_q=True)\n\n"
+   "Finds the community structure of the graph according to the random walk\n"
+   "method of Latapy & Pons.\n\n"
+   "The basic idea of the algorithm is that short random walks tend to stay\n"
+   "in the same community. The method provides a dendrogram.\n\n"
+   "@attention: this function is wrapped in a more convenient syntax in the\n"
+   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
+   "@param weights: name of an edge attribute or a list containing\n"
+   "  edge weights\n"
+   "@param return_q: if C{True}, returns the modularities achieved in each step\n"
+   "  of the algorithm as a list.\n"
+   "@return: a tuple with the following elements:\n"
+   "  1. The list of merges\n"
+   "  2. The modularity scores if C{return_q} is C{True}, or\n"
+   "     C{None} otherwise\n"
+   "\n"
+   "@newfield ref: Reference\n"
+   "@ref: Pascal Pons, Matthieu Latapy: Computing communities in large networks\n"
+   "  using random walks, U{http://arxiv.org/abs/physics/0512106}.\n"
+   "@see: modularity()\n"
+  },
+
   /**********************/
   /* INTERNAL FUNCTIONS */
   /**********************/
