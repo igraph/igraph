@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include "random.h"
 #include <math.h>
 #include <string.h>    /* memset */
 #include <assert.h>
@@ -85,8 +86,11 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   
   igraph_vector_t values;
   igraph_matrix_t vectors;
+  igraph_vector_t degree;
+  long int i;
   
   options->n=igraph_vcount(graph);
+  options->start=1;		/* no random start vector */
 
   if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid length of weights vector when calculating "
@@ -98,8 +102,21 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
-  IGRAPH_MATRIX_INIT_FINALLY(&vectors, 0, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
 
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, options->n);
+  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
+			     IGRAPH_ALL, /*loops=*/ 0));
+  for (i=0; i<options->n; i++) {
+    if (VECTOR(degree)[i]) {
+      MATRIX(vectors, i, 0) = VECTOR(degree)[i];
+    } else {
+      MATRIX(vectors, i, 0) = 1.0;
+    }
+  }
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(1);
+  
   if (!weights) {
     
     igraph_adjlist_t adjlist;
@@ -204,11 +221,13 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   igraph_vector_t values;
   igraph_matrix_t vectors;
   igraph_i_kleinberg_data_t extra;
+  long int i;
   
   options->n=igraph_vcount(graph);
+  options->start=1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
-  IGRAPH_MATRIX_INIT_FINALLY(&vectors, 0, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
   
   if (inout==0) {
@@ -228,6 +247,15 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
 
+  IGRAPH_CHECK(igraph_degree(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0));
+  for (i=0; i<options->n; i++) {
+    if (VECTOR(tmp)[i] != 0) { 
+      MATRIX(vectors, i, 0) = VECTOR(tmp)[i];
+    } else {
+      MATRIX(vectors, i, 0) = 1.0;
+    }
+  }
+	
   extra.in=inadjlist; extra.out=outadjlist; extra.tmp=&tmp;
 
   IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg2, &extra,
@@ -307,12 +335,12 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   igraph_vector_t *neis;
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
-  
+
   for (i=0; i<n; i++) {
     sumfrom += from[i];
     VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
   }
-
+  
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
     nlen=igraph_vector_size(neis);
@@ -323,8 +351,8 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
     }
     to[i] *= data->damping;
     to[i] += (1-data->damping)/n * sumfrom;
-  }  
-  
+  }
+
   return 0;
 }
 
@@ -381,8 +409,12 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   long int i;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  
+
   options->n = igraph_vcount(graph);
+  options->nev = 1;
+  options->ncv = 3;
+  options->which[0]='L'; options->which[1]='M';
+  options->start=1;		/* no random start vector */
   
   if (directed && igraph_is_directed(graph)) {
     IGRAPH_ERROR("Directed graphs are not supported yet, use 'directed=0'",
@@ -395,12 +427,14 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   }
   
   IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
-  IGRAPH_MATRIX_INIT_FINALLY(&vectors, 0, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
 
   if (directed) { dirmode=IGRAPH_IN; } else { dirmode=IGRAPH_ALL; }
 
   IGRAPH_VECTOR_INIT_FINALLY(&outdegree, options->n);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
+
+  RNG_BEGIN();
 
   if (!weights) {
     
@@ -415,6 +449,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
       if (VECTOR(outdegree)[i]==0) {
 	VECTOR(outdegree)[i]=1;
       }
+      MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
     } 
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, dirmode));
@@ -450,6 +485,8 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
     igraph_adjedgelist_destroy(&adjedgelist);
     IGRAPH_FINALLY_CLEAN(1);
   }
+
+  RNG_END();
 
   igraph_vector_destroy(&tmp);
   igraph_vector_destroy(&outdegree);

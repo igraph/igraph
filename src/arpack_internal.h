@@ -56,11 +56,16 @@
 #define igraphdnconv_   dnconv_
 #define igraphdlabad_   dlabad_
 #define igraphdlanhs_   dlanhs_
-#define igraphdsortc_   dsort_
+#define igraphdsortc_   dsortc_
 #define igraphdneigh_   dneigh_
 #define igraphdngets_   dngets_
-#define igraphdstatn_   statn_
+#define igraphdstatn_   dstatn_
 #define igraphdlaqrb_   dlaqrb_
+
+#define igraphdsaupd_   dsaupd_
+#define igraphdseupd_   dseupd_
+#define igraphdnaupd_   dnaupd_
+#define igraphdneupd_   dneupd_
 #endif
 
 #ifndef INTERNAL_LAPACK

@@ -22,6 +22,7 @@
 */
 
 #include <igraph.h>
+#include <unistd.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;
@@ -90,7 +91,6 @@ int main() {
   print_vector(&res, stdout);
   igraph_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, 0, &arpack_options);
   print_vector(&res, stdout);
-  igraph_vector_destroy(&res);
 
   /* Errors */
   igraph_set_error_handler(igraph_error_handler_ignore);
@@ -109,6 +109,7 @@ int main() {
     return 3;
   }
   
+  igraph_vector_destroy(&res);
   igraph_destroy(&g);
   return 0;
 }

@@ -1,3 +1,19 @@
+2008-01-27  Gabor Csardi  <csardi@rmki.kfki.hu>
+	
+	* src/centrality.c (igraph_eigenvector_centrality)
+	(igraph_i_kleinberg, igraph_pagerank) : use fix starting vector, based 
+	on vertex degree
+	
+	* src/arpack_internal.h : corrections when external libraries are used
+	
+	* src/arpack.c (igraph_arpack_rssolve, igraph_arpack_rnsolve) : 
+	make it possible to supply a start vector in the first column of 'vectors'
+	
+	* src/arpack.c (igraph_arpack_rssolve, igraph_arpack_rnsolve) : 
+	keep the options argument constant (except if there is an error)
+
+	* examples/simple/igraph_pagerank.c : small bug fixed
+
 2008-01-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/foreign-gml-lexer.l
