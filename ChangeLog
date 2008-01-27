@@ -1,3 +1,12 @@
+2008-01-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign-gml-lexer.l
+	* src/foreign-lgl-lexer.l
+	* src/foreign-pajek-lexer.l
+	* src/foreign-ncol-lexer.l : make sure we recognize all line endings,
+	\n, \r, \n\r, \r\n
+	* examples/simple/lineendings.c : added
+
 2008-01-24  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c : corrected some type

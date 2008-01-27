@@ -64,7 +64,8 @@ word [^ \t\r\n]
 %%
 
 [ \t]*          { }
-%[^\n]*\n      { }
+%[^\n]*\n[\r]*  { }
+%[^\n]*\r[\n]*  { }
 \*[Nn][Ee][Tt][Ww][Oo][Rr][Kk]         { return NETWORKLINE; }
 \*[Vv][Ee][Rr][Tt][Ii][Cc][Ee][Ss]     { return VERTICESLINE; }
 \*[Aa][Rr][Cc][Ss]                     { return ARCSLINE; }
@@ -72,7 +73,7 @@ word [^ \t\r\n]
 \*[Aa][Rr][Cc][Ss][Ll][Ii][Ss][Tt]     { return ARCSLISTLINE; }
 \*[Ee][Dd][Gg][Ee][Ss][Ll][Ii][Ss][Tt] { return EDGESLISTLINE; }
 \*[Mm][Aa][Tt][Rr][Ii][Xx]             { return MATRIXLINE; }
-\n\r|\r\n|\n      { igraph_pajek_mylineno++; igraph_pajek_mode=0; return NEWLINE; }
+\n\r|\r\n|\n|\r   { igraph_pajek_mylineno++; igraph_pajek_mode=0; return NEWLINE; }
 \"[^\"]*\"        { return QSTR; }
 \([^\)]*\)        { return PSTR; }
 \-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { 

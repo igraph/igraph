@@ -67,3 +67,10 @@ AT_KEYWORDS([igraph_write_graph_dot foreign DOT GraphViz])
 AT_COMPILE_CHECK([simple/dot.c], [simple/dot.out], [simple/karate.gml])
 AT_CLEANUP
 
+AT_SETUP([Different line endings:])
+AT_KEYWORDS([igraph_read_graph_pajek igraph_write_graph_pajek 
+	foreign line ending lineending])
+AT_COMPILE_CHECK([simple/lineendings.c], [simple/lineendings.out],
+	[{simple/pajek1.net,simple/pajek2.net,simple/pajek3.net,simple/pajek4.net}])
+AT_CLEANUP
+

@@ -65,7 +65,7 @@ alnum [^ \t\n]
 [ \t]*               { }
 
  /* ---------------------------------------------------newline------*/
-\n                   { igraph_ncol_mylineno++; return NEWLINE; }
+\n\r|\r\n|\n|\r      { igraph_ncol_mylineno++; return NEWLINE; }
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }

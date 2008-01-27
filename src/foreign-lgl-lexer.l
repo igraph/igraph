@@ -68,7 +68,7 @@ alnum [^ \t\n#]
 [ \t]*               { }
 
  /* ---------------------------------------------------newline------*/
-\n                   { igraph_lgl_mylineno++; return NEWLINE; }
+\n\r|\r\n|\n|\r      { igraph_lgl_mylineno++; return NEWLINE; }
 
  /* ----------------------------------------------alphanumeric------*/
 {alnum}+             { return ALNUM; }

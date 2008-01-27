@@ -70,7 +70,7 @@ whitespace  [ \r\n\t]
 [a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
 \[                      { return LISTOPEN; }
 \]                      { return LISTCLOSE; }
-[\n\r|\r\n|\r]          { igraph_gml_mylineno++; }
+\n\r|\r\n|\r|\n         { igraph_gml_mylineno++; }
 {whitespace}            { /* other whitespace ignored */ }
 
 <<EOF>>                 { 
