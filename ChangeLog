@@ -3,6 +3,8 @@
 	* interfaces/python/src/graphobject.c : added interface to walktrap
 	community detection, added Graph.get_diameter() and
 	Graph.farthest_points()
+	
+	* src/walktrap.cpp : added error handling for isolated vertices
 
 2008-01-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 	

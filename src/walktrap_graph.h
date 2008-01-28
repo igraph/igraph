@@ -90,7 +90,7 @@ public:
   ~Graph();			// destructor
   char** index;			// to keep the real name of the vertices
 
-  void convert_from_igraph(const igraph_t * igraph, 
+  int convert_from_igraph(const igraph_t * igraph, 
 			   const igraph_vector_t *weights);
 };
 

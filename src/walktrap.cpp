@@ -76,6 +76,11 @@ using namespace std;
  * see http://www.liafa.jussieu.fr/~pons/index.php?item=prog&amp;item2=walktrap&amp;lang=en
  * I'm grateful to Matthieu Latapy and Pascal Pons for providing this 
  * source code.
+ *
+ * </para><para>
+ * Note that the graph must not contain isolated vertices in order to
+ * use this method.
+ *
  * \param graph The input graph.
  * \param weights Numeric vector giving the weights of the edges. 
  *     If it is a NULL pointer then all edges will have equal
@@ -115,7 +120,8 @@ int igraph_community_walktrap(const igraph_t *graph,
   long max_memory=-1;
   
   Graph* G = new Graph;
-  G->convert_from_igraph(graph, weights);
+  if (G->convert_from_igraph(graph, weights))
+      IGRAPH_ERROR("isolated vertex found in graph", IGRAPH_EINVAL);
   
   if (merges) {
     IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes-1, 2));

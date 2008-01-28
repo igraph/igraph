@@ -109,7 +109,7 @@ void Edge_list::add(int v1, int v2, float w) {
   size++;
 }
 
-void Graph::convert_from_igraph(const igraph_t *graph, 
+int Graph::convert_from_igraph(const igraph_t *graph, 
 				const igraph_vector_t *weights) {
   Graph &G=*this;  
   
@@ -144,8 +144,8 @@ void Graph::convert_from_igraph(const igraph_t *graph,
 
   for(int i = 0; i < G.nb_vertices; i++) {
     if(G.vertices[i].degree == 0) {
-      cerr << "error : degree of vertex " << i << " is 0" << endl;
-      exit(0);
+      delete[] G.vertices;
+      return IGRAPH_EINVAL;
     }
     G.vertices[i].edges = new Edge[G.vertices[i].degree + 1];
     G.vertices[i].edges[0].neighbor = i;
@@ -176,7 +176,8 @@ void Graph::convert_from_igraph(const igraph_t *graph,
     }
     G.vertices[i].degree = a+1;
   }
-    
+
+  return 0;
 }
 
 long Graph::memory() {
