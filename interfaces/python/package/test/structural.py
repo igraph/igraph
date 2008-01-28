@@ -7,7 +7,7 @@ class SimplePropertiesTests(unittest.TestCase):
     gempty = Graph(10)
     g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
     gdir = Graph(4, [(0, 1), (0, 2), (1, 2), (2, 1), (0, 3), (1, 3), (3, 0)], directed=True)
-    tree = Graph.Tree(10, 3)
+    tree = Graph.Tree(14, 3)
 
     def testDensity(self):
         self.failUnless(self.gfull.density() == 1.0)
@@ -16,7 +16,7 @@ class SimplePropertiesTests(unittest.TestCase):
         self.failUnless(self.g.density(True) == 5.0/8.0)
         self.failUnless(self.gdir.density() == 7.0/12.0)
         self.failUnless(self.gdir.density(True) == 7.0/16.0)
-        self.failUnless(self.tree.density() == 0.2)
+        self.assertAlmostEquals(self.tree.density(), 1/7., places=5)
         
     def testDiameter(self):
         self.failUnless(self.gfull.diameter() == 1)
@@ -24,7 +24,14 @@ class SimplePropertiesTests(unittest.TestCase):
         self.failUnless(self.g.diameter() == 2)
         self.failUnless(self.gdir.diameter(False) == 2)
         self.failUnless(self.gdir.diameter() == 3)
-        self.failUnless(self.tree.diameter() == 4)
+        self.failUnless(self.tree.diameter() == 5)
+        
+        s, t, d = self.tree.farthest_points()
+        self.failUnless((s == 13 or t == 13) and d == 5)
+        self.failUnless(self.gempty.farthest_points(unconn=False) == (None, None, 10))
+        
+        d = self.tree.get_diameter()
+        self.failUnless(d[0] == 13 or d[-1] == 13)
         
     def testTransitivity(self):
         self.failUnless(self.gfull.transitivity_undirected() == 1.0)

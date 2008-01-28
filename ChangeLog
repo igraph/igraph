@@ -1,7 +1,8 @@
 2008-01-28  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c : added interface to walktrap
-	community detection
+	community detection, added Graph.get_diameter() and
+	Graph.farthest_points()
 
 2008-01-27  Gabor Csardi  <csardi@rmki.kfki.hu>
 	

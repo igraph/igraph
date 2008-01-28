@@ -894,6 +894,61 @@ PyObject *igraphmodule_Graph_diameter(igraphmodule_GraphObject * self,
   return PyInt_FromLong((long)i);
 }
 
+/** \ingroup python_interface_graph
+ * \brief Returns a path of the actual diameter of the graph
+ * \sa igraph_diameter
+ */
+PyObject *igraphmodule_Graph_get_diameter(igraphmodule_GraphObject * self,
+                                      PyObject * args, PyObject * kwds)
+{
+  PyObject *dir = Py_True, *vcount_if_unconnected = Py_True, *result;
+  igraph_vector_t res;
+
+  static char *kwlist[] = { "directed", "unconn", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+                                   &dir, &vcount_if_unconnected))
+    return NULL;
+
+  igraph_vector_init(&res, 0);
+  if (igraph_diameter(&self->g, 0, 0, 0, &res, PyObject_IsTrue(dir),
+                      PyObject_IsTrue(vcount_if_unconnected))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  result = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&res);
+  return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Returns the farthest points and their distances in the graph
+ * \sa igraph_distance
+ */
+PyObject *igraphmodule_Graph_farthest_points(igraphmodule_GraphObject * self,
+                                      PyObject * args, PyObject * kwds)
+{
+  PyObject *dir = Py_True, *vcount_if_unconnected = Py_True;
+  igraph_vector_t res;
+  igraph_integer_t from, to, len;
+
+  static char *kwlist[] = { "directed", "unconn", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+                                   &dir, &vcount_if_unconnected))
+    return NULL;
+
+  if (igraph_diameter(&self->g, &len, &from, &to, 0, PyObject_IsTrue(dir),
+                      PyObject_IsTrue(vcount_if_unconnected))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (from >= 0) return Py_BuildValue("(lll)", (long)from, (long)to, (long)len);
+  return Py_BuildValue("(OOl)", Py_None, Py_None, (long)len);
+}
+
 /**
  * \ingroup python_interface_graph
  * \brief Calculates the girth of an \c igraph.Graph
@@ -7671,7 +7726,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  assumes that there can't be any loops.\n"
    "@return: the reciprocity of the graph."},
 
-  // interface to igraph_diameter
+  /* interfaces to igraph_diameter */
   {"diameter", (PyCFunction) igraphmodule_Graph_diameter,
    METH_VARARGS | METH_KEYWORDS,
    "diameter(directed=True, unconn=True)\n\n"
@@ -7680,7 +7735,34 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param unconn: if C{True} and the graph is unconnected, the\n"
    "  longest geodesic within a component will be returned. If\n"
    "  C{False} and the graph is unconnected, the result is the\n"
-   "  number of vertices."},
+   "  number of vertices.\n"
+   "@return: the diameter"},
+  {"get_diameter", (PyCFunction) igraphmodule_Graph_get_diameter,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_diameter(directed=True, unconn=True)\n\n"
+   "Returns a path with the actual diameter of the graph.\n\n"
+   "If there are many shortest paths with the length of the diameter,\n"
+   "it returns the first one it founds.\n\n"
+   "@param directed: whether to consider directed paths.\n"
+   "@param unconn: if C{True} and the graph is unconnected, the\n"
+   "  longest geodesic within a component will be returned. If\n"
+   "  C{False} and the graph is unconnected, the result is the\n"
+   "  number of vertices.\n"
+   "@return: the vertices in the path in order."},
+  {"farthest_points", (PyCFunction) igraphmodule_Graph_farthest_points,
+   METH_VARARGS | METH_KEYWORDS,
+   "get_diameter(directed=True, unconn=True)\n\n"
+   "Returns two vertex IDs whose distance equals the actual diameter of the graph.\n\n"
+   "If there are many shortest paths with the length of the diameter,\n"
+   "it returns the first one it founds.\n\n"
+   "@param directed: whether to consider directed paths.\n"
+   "@param unconn: if C{True} and the graph is unconnected, the\n"
+   "  longest geodesic within a component will be returned. If\n"
+   "  C{False} and the graph is unconnected, the result contains the\n"
+   "  number of vertices.\n"
+   "@return: a triplet containing the two vertex IDs and their distance.\n"
+   "  The IDs are C{None} if the graph is unconnected and C{unconn}\n"
+   "  is C{False}."},
 
   /* interface to igraph_edge_betweenness[_estimate] */
   {"edge_betweenness", (PyCFunction) igraphmodule_Graph_edge_betweenness,

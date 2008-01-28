@@ -1426,7 +1426,7 @@ class Graph(core.GraphBase):
         output.append("%d nodes, %d edges, %sdirected" % \
             (self.vcount(), self.ecount(), ["un", ""][self.is_directed()]))
         output.append("")
-        output.append("Number of components: %d" % (len(self.clusters())+1))
+        output.append("Number of components: %d" % len(self.clusters()))
         output.append("Diameter: %d" % self.diameter(unconn=True))
         output.append("Density: %.4f" % self.density())
         # output.append("Transitivity: %.4f" % self.transitivity())
