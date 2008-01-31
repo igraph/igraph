@@ -132,6 +132,7 @@ int igraph_community_walktrap(const igraph_t *graph,
   Communities C(G, length, max_memory, merges, modularity);
   
   while (!C.H->is_empty()) {
+    IGRAPH_ALLOW_INTERRUPTION();
     C.merge_nearest_communities();
   }
   
