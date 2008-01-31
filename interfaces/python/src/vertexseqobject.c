@@ -305,7 +305,7 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
 PyObject* igraphmodule_VertexSeq_get_attribute_values_mapping(igraphmodule_VertexSeqObject *self, PyObject *o) {
   /* Handle integer indices according to the sequence protocol */
   if (PyInt_Check(o)) return igraphmodule_VertexSeq_sq_item(self, PyInt_AsLong(o));
-  if (PyTuple_Check(o)) {
+  if (PyTuple_Check(o) || PyList_Check(o)) {
     /* Return a restricted VertexSeq */
     return igraphmodule_VertexSeq_select(self, o, NULL);
   }
@@ -653,6 +653,16 @@ int igraphmodule_VertexSeq_to_vector_t(igraphmodule_VertexSeqObject *self,
 
 /**
  * \ingroup python_interface_vertexseq
+ * Returns the graph where the vertex sequence belongs
+ */
+PyObject* igraphmodule_VertexSeq_get_graph(igraphmodule_VertexSeqObject* self,
+  void* closure) {
+  Py_INCREF(self->gref);
+  return (PyObject*)self->gref;
+}
+
+/**
+ * \ingroup python_interface_vertexseq
  * Method table for the \c igraph.VertexSeq object
  */
 PyMethodDef igraphmodule_VertexSeq_methods[] = {
@@ -720,6 +730,17 @@ static PyMappingMethods igraphmodule_VertexSeq_as_mapping = {
   (objobjargproc) igraphmodule_VertexSeq_set_attribute_values_mapping,
 };
 
+/**
+ * \ingroup python_interface_vertexseq
+ * Getter/setter table for the \c igraph.VertexSeq object
+ */
+PyGetSetDef igraphmodule_VertexSeq_getseters[] = {
+  {"graph", (getter)igraphmodule_VertexSeq_get_graph, NULL,
+      "The graph the vertex sequence belongs to", NULL,
+  },
+  {NULL}
+};
+
 /** \ingroup python_interface_vertexseq
  * Python type object referencing the methods Python calls when it performs various operations on
  * a vertex sequence of a graph
@@ -758,7 +779,7 @@ PyTypeObject igraphmodule_VertexSeqType =
   0,                                          /* tp_iternext */
   igraphmodule_VertexSeq_methods,             /* tp_methods */
   0,                                          /* tp_members */
-  0,                                          /* tp_getset */
+  igraphmodule_VertexSeq_getseters,           /* tp_getset */
   0,                                          /* tp_base */
   0,                                          /* tp_dict */
   0,                                          /* tp_descr_get */

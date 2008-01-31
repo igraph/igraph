@@ -13,6 +13,7 @@ class VertexSeqTests(unittest.TestCase):
         self.failUnless(len(VertexSeq(self.g, [1,2,3])) == 3)
         self.assertRaises(ValueError, VertexSeq, self.g, 12)
         self.assertRaises(ValueError, VertexSeq, self.g, [12])
+        self.failUnless(self.g.vs.graph == self.g)
 
     def testPartialAttributeAssignment(self):
         only_even = self.g.vs.select(lambda v: (v.index % 2 == 0))
@@ -69,8 +70,11 @@ class VertexSeqTests(unittest.TestCase):
         g = Graph.Barabasi(10000)
         g.vs["degree"] = g.degree()
         g.vs["parity"] = [i % 2 for i in xrange(g.vcount())]
-        self.failUnless(len(g.vs(degree_gt=30)) < 1000)
+        l = len(g.vs(degree_gt=30))
+        self.failUnless(l < 1000)
         self.failUnless(len(g.vs(degree_gt=30, parity=0)) <= 500)
+        del g.vs["degree"]
+        self.failUnless(len(g.vs(_degree_gt=30)) == l)
 
 
 def suite():

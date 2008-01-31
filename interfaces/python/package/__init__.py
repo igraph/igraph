@@ -1307,8 +1307,11 @@ class Graph(core.GraphBase):
         layout = kwds.get("layout", None)
         if isinstance(layout, Layout):
             layout = Layout(layout.coords)
-        else:
+        elif isinstance(layout, str):
             layout = self.layout(layout)
+        else:
+            layout = Layout(layout)
+
         sl, st, sr, sb = layout.bounding_box()
         sw, sh = sr-sl, sb-st
         if sw == 0: sw=1
@@ -1624,6 +1627,33 @@ class VertexSeq(core.VertexSeq):
         recognized operator is part of the attribute name and the actual
         operator is C{eq}.
 
+        Attribute names inferred from keyword arguments are treated specially
+        if they start with an underscore (C{_}). These are not real attributes
+        but refer to specific properties of the vertices, e.g., its degree.
+        The rule is as follows: if an attribute name starts with an underscore,
+        the rest of the name is interpreted as a method of the L{Graph} object.
+        This method is called with the vertex sequence as its first argument
+        (all others left at default values) and vertices are filtered
+        according to the value returned by the method. For instance, if you
+        want to exclude isolated vertices:
+
+          >>> non_isolated = g.vs.select(_degree_gt=0)
+
+        For properties that take a long time to be computed (e.g., betweenness
+        centrality for large graphs), it is advised to calculate the values
+        in advance and store it in a graph attribute. The same applies when
+        you are selecting based on the same property more than once in the
+        same C{select()} call to avoid calculating it twice unnecessarily.
+        For instance, the following would calculate betweenness centralities
+        twice:
+
+          >>> g.vs.select(_betweenness_gt=10, _betweenness_lt=30)
+
+        It is advised to use this instead:
+
+          >>> g.vs["bs"] = g.betwenness()
+          >>> g.vs.select(bs_gt=10, bs_lt=30)
+
         @return: the new, filtered vertex sequence"""
         vs = core.VertexSeq.select(self, *args)
 
@@ -1637,7 +1667,7 @@ class VertexSeq(core.VertexSeq):
             "in": lambda a, b: a in b, \
             "notin": lambda a, b: a not in b }
         for keyword, value in kwds.iteritems():
-            if "_" not in keyword: keyword = keyword+"_eq"
+            if "_" not in keyword or keyword.rindex("_") == 0: keyword = keyword+"_eq"
             pos = keyword.rindex("_")
             attr, op = keyword[0:pos], keyword[pos+1:]
             try:
@@ -1647,7 +1677,11 @@ class VertexSeq(core.VertexSeq):
                 attr = "%s_%s" % (attr,op)
                 func = operators["eq"]
 
-            values = vs[attr]
+            if attr[0] == '_':
+                # Method call, not an attribute
+                values = getattr(vs.graph, attr[1:])(vs) 
+            else:
+                values = vs[attr]
             filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
             vs = vs.select(filtered_idxs)
 
@@ -1780,6 +1814,33 @@ class EdgeSeq(core.EdgeSeq):
         recognized operator is part of the attribute name and the actual
         operator is C{eq}.
 
+        Attribute names inferred from keyword arguments are treated specially
+        if they start with an underscore (C{_}). These are not real attributes
+        but refer to specific properties of the edges, e.g., their centrality.
+        The rule is as follows: if an attribute name starts with an underscore,
+        the rest of the name is interpreted as a method of the L{Graph} object.
+        This method is called with the edge sequence as its first argument
+        (all others left at default values) and edges are filtered
+        according to the value returned by the method. For instance, if you
+        want to exclude edges with a betweenness centrality less than 2:
+
+          >>> excl = g.es.select(_edge_betweenness_ge = 2)
+
+        For properties that take a long time to be computed (e.g., betweenness
+        centrality for large graphs), it is advised to calculate the values
+        in advance and store it in a graph attribute. The same applies when
+        you are selecting based on the same property more than once in the
+        same C{select()} call to avoid calculating it twice unnecessarily.
+        For instance, the following would calculate betweenness centralities
+        twice:
+
+          >>> g.es.select(_edge_betweenness_gt=10, _edge_betweenness_lt=30)
+
+        It is advised to use this instead:
+
+          >>> g.es["bs"] = g.edge_betwenness()
+          >>> g.es.select(bs_gt=10, bs_lt=30)
+
         @return: the new, filtered edge sequence"""
         es = core.EdgeSeq.select(self, *args)
 
@@ -1793,7 +1854,7 @@ class EdgeSeq(core.EdgeSeq):
             "in": lambda a, b: a in b, \
             "notin": lambda a, b: a not in b }
         for keyword, value in kwds.iteritems():
-            if "_" not in keyword: keyword = keyword+"_eq"
+            if "_" not in keyword or keyword.rindex("_") == 0: keyword = keyword+"_eq"
             pos = keyword.rindex("_")
             attr, op = keyword[0:pos], keyword[pos+1:]
             try:
@@ -1803,7 +1864,11 @@ class EdgeSeq(core.EdgeSeq):
                 attr = "%s_%s" % (attr,op)
                 func = operators["eq"]
 
-            values = es[attr]
+            if attr[0] == '_':
+                # Method call, not an attribute
+                values = getattr(es.graph, attr[1:])(es) 
+            else:
+                values = es[attr]
             filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
             es = es.select(filtered_idxs)
 

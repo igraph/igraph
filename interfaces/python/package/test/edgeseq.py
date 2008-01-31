@@ -13,6 +13,7 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(len(EdgeSeq(self.g, [1,2,3])) == 3)
         self.assertRaises(ValueError, EdgeSeq, self.g, 112)
         self.assertRaises(ValueError, EdgeSeq, self.g, [112])
+        self.failUnless(self.g.es.graph == self.g)
 
     def testPartialAttributeAssignment(self):
         only_even = self.g.es.select(lambda e: (e.index % 2 == 0))

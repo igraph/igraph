@@ -52,6 +52,8 @@ PyObject* igraphmodule_VertexSeq_select(igraphmodule_VertexSeqObject *self,
 
 int igraphmodule_VertexSeq_to_vector_t(igraphmodule_VertexSeqObject *self,
   igraph_vector_t *v);
+PyObject* igraphmodule_VertexSeq_get_graph(igraphmodule_VertexSeqObject *self,
+  void* closure);
 
 extern PyTypeObject igraphmodule_VertexSeqType;
 

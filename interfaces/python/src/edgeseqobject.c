@@ -312,7 +312,7 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* 
 PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeqObject *self, PyObject *o) {
   /* Handle integer indices according to the sequence protocol */
   if (PyInt_Check(o)) return igraphmodule_EdgeSeq_sq_item(self, PyInt_AsLong(o));
-  if (PyTuple_Check(o)) {
+  if (PyTuple_Check(o) || PyList_Check(o)) {
     /* Return a restricted EdgeSeq */
     return igraphmodule_EdgeSeq_select(self, o, NULL);
   }
@@ -705,6 +705,27 @@ static PyMappingMethods igraphmodule_EdgeSeq_as_mapping = {
     (objobjargproc) igraphmodule_EdgeSeq_set_attribute_values_mapping,
 };
 
+/**
+ * \ingroup python_interface_edgeseq
+ * Returns the graph where the edge sequence belongs
+ */
+PyObject* igraphmodule_EdgeSeq_get_graph(igraphmodule_EdgeSeqObject* self,
+  void* closure) {
+  Py_INCREF(self->gref);
+  return (PyObject*)self->gref;
+}
+
+/**
+ * \ingroup python_interface_edgeseq
+ * Getter/setter table for the \c igraph.EdgeSeq object
+ */
+PyGetSetDef igraphmodule_EdgeSeq_getseters[] = {
+  {"graph", (getter)igraphmodule_EdgeSeq_get_graph, NULL,
+      "The graph the edge sequence belongs to", NULL,
+  },
+  {NULL}
+};
+
 /** \ingroup python_interface_edgeseq
  * Python type object referencing the methods Python calls when it performs various operations on
  * an edge sequence of a graph
@@ -743,7 +764,7 @@ PyTypeObject igraphmodule_EdgeSeqType =
   0,                                          /* tp_iternext */
   igraphmodule_EdgeSeq_methods,               /* tp_methods */
   0,                                          /* tp_members */
-  0,                                          /* tp_getset */
+  igraphmodule_EdgeSeq_getseters,             /* tp_getset */
   0,                                          /* tp_base */
   0,                                          /* tp_dict */
   0,                                          /* tp_descr_get */
