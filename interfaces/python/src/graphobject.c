@@ -4465,24 +4465,28 @@ NULL };
 PyObject *igraphmodule_Graph_layout_lgl(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] =
-    { "maxiter", "maxdelta", "area", "coolexp", "repulserad", "cellsize",
-"proot", NULL };
+  static char *kwlist[] =
+    { "maxiter", "maxdelta", "area", "coolexp", "repulserad", "cellsize", "root",
+    NULL };
   igraph_matrix_t m;
   PyObject *result;
-  long maxiter = 500, proot = -1;
+  long maxiter = 150, proot = -1;
   double maxdelta, area, coolexp, repulserad, cellsize;
 
   maxdelta = igraph_vcount(&self->g);
-  area = maxdelta * maxdelta;
+  area = -1;
   coolexp = 1.5;
-  repulserad = area * maxdelta;
-  cellsize = 1.0;               // TODO: reasonable default should be set
+  repulserad = -1;
+  cellsize = -1;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddddl", kwlist,
                                    &maxiter, &maxdelta, &area, &coolexp,
                                    &repulserad, &cellsize, &proot))
     return NULL;
+
+  if (area <= 0) area = igraph_vcount(&self->g)*igraph_vcount(&self->g);
+  if (repulserad <= 0) repulserad = area*igraph_vcount(&self->g);
+  if (cellsize <= 0) cellsize = sqrt(sqrt(area));
 
   if (igraph_matrix_init(&m, 1, 1)) {
     igraphmodule_handle_igraph_error();
@@ -8367,21 +8371,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_layout_lgl
   {"layout_lgl", (PyCFunction) igraphmodule_Graph_layout_lgl,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_lgl(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, cellsize=1.0, proot=None)\n\n"
+   "layout_lgl(maxiter=150, maxdelta=-1, area=-1, coolexp=1.5, repulserad=-1, cellsize=-1, root=-1)\n\n"
    "Places the vertices on a 2D plane according to the Large Graph Layout.\n\n"
    "@param maxiter: the number of iterations to perform.\n"
    "@param maxdelta: the maximum distance to move a vertex in\n"
-   "  an iteration. C{None} means the number of vertices.\n"
+   "  an iteration. If negative, defaults to the number of vertices.\n"
    "@param area: the area of the square on which the vertices\n"
-   "  will be placed. C{None} means the square of M{maxdelta}.\n"
+   "  will be placed. If negative, defaults to the number of vertices\n"
+   "  squared.\n"
    "@param coolexp: the cooling exponent of the simulated annealing.\n"
    "@param repulserad: determines the radius at which vertex-vertex\n"
    "  repulsion cancels out attraction of adjacent vertices.\n"
-   "  C{None} means M{maxiter*maxdelta}.\n"
-   "@param cellsize: the size of the grid cells.\n"
-   "@param proot: the root vertex, this is placed first, its neighbors\n"
+   "  If negative, defaults to M{area} times the number of vertices.\n"
+   "@param cellsize: the size of the grid cells. When calculating the\n"
+   "  repulsion forces, only vertices in the same or neighboring\n"
+   "  grid cells are taken into account. Defaults to the fourth\n"
+   "  root of M{area}.\n"
+   "@param root: the root vertex, this is placed first, its neighbors\n"
    "  in the first iteration, second neighbors in the second,\n"
-   "  etc. C{None} means a random vertex.\n"
+   "  etc. A negative number means a random vertex.\n"
    "@return: the calculated coordinate pairs in a list."},
 
   /* interface to igraph_layout_reingold_tilford */

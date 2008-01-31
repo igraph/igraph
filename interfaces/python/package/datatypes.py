@@ -324,7 +324,7 @@ class Matrix(object):
                     if cidx < 0: cidx = 0
                     context.set_source_rgb(*palette.get(cidx))
                 context.rectangle(x, y, dx, dy)
-                if grid_width>0:
+                if gw>0:
                     context.fill_preserve()
                     context.set_source_rgb(0.5, 0.5, 0.5)
                     context.stroke()
