@@ -73,9 +73,10 @@ with four (new) graph attributes:
 \code{is.bgraph} returns a logical scalar.
 }
 \references{
-A. Kanevsky and V. Ramachandran. Improved algorithms for graph
-four-connectivity. \emph{J. Comput. Syst. Sci.}, 42(3):288--306, 1991. 
-
+  C. Patvardhan, V. C. Prasad, V. Prem Pyara. Vertex Cutsets of
+  Undirected Graphs. \emph{IEEE Transactions on Reliability},
+  44(2):347--353, June, 1995.
+  
 J. Moody and D. R. White. Structural cohesion and embeddedness: A
 hierarchical concept of social groups. \emph{American Sociological
   Review}, 68(1):103--127, Feb 2003. 
