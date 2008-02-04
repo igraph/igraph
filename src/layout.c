@@ -920,6 +920,10 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
       igraph_real_t t=maxdelta*pow((maxit-it)/(double)maxit, coolexp);
       long int vid, nei;
 
+	  IGRAPH_PROGRESS("Large graph layout",
+	    100.0*((actlayer-1.0)/(no_of_layers-1.0)+((float)it)/(maxit*(no_of_layers-1.0))),
+		0);
+
       /* init */
       igraph_vector_null(&forcex);
       igraph_vector_null(&forcey);
@@ -988,6 +992,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
     }
   }
 
+  IGRAPH_PROGRESS("Large graph layout", 100.0, 0);
   igraph_destroy(&mst);
   igraph_vector_destroy(&vids);
   igraph_vector_destroy(&layers);
