@@ -1,19 +1,23 @@
 \name{closeness}
 \alias{closeness}
+\alias{closeness.estimate}
 \title{Closeness centrality of vertices}
 \description{Cloness centrality measures how many steps is required
   to access every other vertex from a given vertex.}
 \usage{
 closeness(graph, v=V(graph), mode = "all")
+closeness.estimate(graph, vids=V(graph), mode = "out", cutoff)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
-  \item{v}{The vertices for which closeness will be calculated.}
+  \item{v,vids}{The vertices for which closeness will be calculated.}
   \item{mode}{Character string, defined the types of the paths used for
     measuring the distance in directed graphs. \dQuote{in} measures the
     paths \emph{to} a vertex, \dQuote{out} measures paths \emph{from} a
     vertex, \emph{all} uses undirected paths. This argument is ignored
     for undirected graphs.}
+  \item{cutoff}{The maximum path length to consider when calculating the
+    betweenness. If zero or negative then there is no such limit.}
 }
 \details{The closeness centrality of a vertex is defined by the inverse
   of the average length of the shortest paths to/from all the other
@@ -24,6 +28,12 @@ closeness(graph, v=V(graph), mode = "all")
   If there is no (directed) path between vertex \eqn{v}{\code{v}} and
   \eqn{i}{\code{i}} then the total number of vertices is used in the
   formula instead of the path length.
+
+  \code{closeness.estimate} only considers paths of length
+  \code{cutoff} or smaller, this can be run for larger graphs, as the
+  running time is not quadratic (if \code{cutoff} is small). If
+  \code{cutoff} is zero or negative then the function calculates the
+  exact closeness scores.  
 }
 \value{Numeric vector with the closeness values of all the vertices in
   \code{v}.} 

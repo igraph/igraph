@@ -4,7 +4,7 @@
 \description{Generate a random graph based on the distance of random
   point on a unit square}
 \usage{
-grg.game(nodes, radius, torus=FALSE)
+grg.game(nodes, radius, torus=FALSE, coords=FALSE)
 }
 \arguments{
   \item{nodes}{The number of vertices in the graph.}
@@ -12,6 +12,9 @@ grg.game(nodes, radius, torus=FALSE)
     by an edge.}
   \item{torus}{Logical constant, whether to use a torus instead of a
     square.}
+  \item{coords}{Logical scalar, whether to add the positions of the
+    vertices as vertex attributes called \sQuote{\code{x}} and
+    \sQuote{\code{y}}.}
 }
 \details{
   First a number of points are dropped on a unit square, these points
@@ -21,7 +24,8 @@ grg.game(nodes, radius, torus=FALSE)
   \code{TRUE} then a unit area torus is used instead of a square.
 }
 \value{
-  A graph object.
+  A graph object. If \code{coords} is \code{TRUE} then with vertex
+  attributes \sQuote{\code{x}} and \sQuote{\code{y}}.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}, first version was

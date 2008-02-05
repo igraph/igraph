@@ -1,3 +1,4 @@
+\encoding{utf8}
 \name{graph.famous}
 \alias{graph.famous}
 \title{Creating named graphs}
@@ -61,7 +62,7 @@ graph.famous(name)
       vertices and 8 edges.}
     \item{Icosahedral, Icosahedron}{A Platonic solid with 12
       vertices and 30 edges.}
-    \item{Krackhardt_Kite}{A social network with 10 vertices and 18 edges.
+    \item{Krackhardt\_Kite}{A social network with 10 vertices and 18 edges.
       Krackhardt, D. Assessing the Political Landscape:
       Structure, Cognition, and Power in Organizations.
       Admin. Sci. Quart. 35, 342-369, 1990.}

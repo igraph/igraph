@@ -43,8 +43,8 @@ fastgreedy.community(graph, merges=TRUE, modularity=TRUE)
   A Clauset, MEJ Newman, C Moore: Finding community structure in very
   large networks, http://www.arxiv.org/abs/cond-mat/0408187
 }
-\author{Aaron Clauset \email{google@for.it} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R and igraph interface
+\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
+  \email{csardi@rmki.kfki.hu} for the R interface.
 }
 \seealso{ \code{\link{walktrap.community}},
   \code{\link{spinglass.community}},

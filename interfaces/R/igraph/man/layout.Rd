@@ -11,6 +11,8 @@
 \alias{layout.lgl}
 \alias{layout.mds}
 \alias{layout.svd}
+\alias{layout.graphopt}
+\alias{layout.norm}
 \title{Generate coordinates for plotting graphs}
 \description{Some simple and not so simple functions determining the
   placement of the vertices for drawing a graph.}
@@ -27,8 +29,11 @@ layout.reingold.tilford(graph, \dots, params)
 layout.fruchterman.reingold.grid(graph, \dots,
       verbose=igraph.par("verbose"), params)
 layout.lgl(graph, \dots, params)
+layout.graphopt(graph, ..., verbose = igraph.par("verbose"), params = list())
 layout.mds(graph, d=shortest.paths(graph), ...)
 layout.svd(graph, d=shortest.paths(graph), ...)
+layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
+      zmin = NULL, zmax = NULL)
 }
 \arguments{
   \item{graph}{The graph to place.}
@@ -42,6 +47,17 @@ layout.svd(graph, d=shortest.paths(graph), ...)
     calculating the layout.}
   \item{d}{The matrix used for multidimansional scaling. By default it
     is the distance matrix of the graph.}
+  \item{layout}{A matrix with two or three columns, the layout to
+    normalize.}
+  \item{xmin,xmax}{The limits for the first coordinate, if one of them
+    or both are \code{NULL} then no normalization is performed along
+    this direction.}
+  \item{ymin,ymax}{The limits for the second coordinate, if one of them
+    or both are \code{NULL} then no normalization is performed along
+    this direction.}
+  \item{zmin,zmax}{The limits for the third coordinate, if one of them
+    or both are \code{NULL} then no normalization is performed along
+    this direction.}  
 }
 \details{
   These functions calculate the coordinates of the vertices for a graph
@@ -155,6 +171,44 @@ layout.svd(graph, d=shortest.paths(graph), ...)
       is selected.}
   }
 
+  \code{layout.graphopt} is a port of the graphopt layout algorithm by
+  Michael Schmuhl. graphopt version 0.4.1 was rewritten in C and the
+  support for layers was removed (might be added later) and a code was a
+  bit reorganized to avoid some unneccessary steps is the node charge
+  (see below) is zero.
+
+  graphopt uses physical analogies for defining attracting and repelling 
+  forces among the vertices and then the physical system is simulated 
+  until it reaches an equilibrium. (There is no simulated annealing or 
+  anything like that, so a stable fixed point is not guaranteed.)
+  
+  See also \url{http://www.schmuhl.org/graphopt/} for the original
+  graphopt.
+
+  Parameters and default values:
+  \itemize{
+    \item{niter}{Integer scalar, the number of iterations to perform.
+      Should be a couple of hundred in general. If you have a large graph 
+      then you might want to only do a few iterations and then check the 
+      result. If it is not good enough you can feed it in again in 
+      the \code{start} argument. The default value is 500.
+    }
+    \item{charge}{The charge of the vertices, used to calculate electric
+      repulsion. The default is 0.001.}
+    \item{mass}{The mass of the vertices, used for the spring
+      forces. The default is 30.}
+    \item{spring.length}{The length of the springs, an integer
+      number. The default value is zero.}
+    \item{spring.constant}{The spring constant, the default value is one.}
+    \item{max.sa.movement}{Real constant, it gives the maximum amount of
+      movement allowed in a single step along a single axis. The default
+      value is 5.}
+    \item{start}{If given, then it should be a matrix with two columns
+      and one line for each vertex. This matrix will be used as starting
+      positions for the algorithm. If not given, then a random starting
+      matrix is used.}
+  }
+  
   \code{layout.mds} uses metric multidimensional scaling for generating
   the coordinates. This function does not have the usual \code{params}
   argument. It can just take a single argument, the distance matrix used
@@ -169,6 +223,8 @@ layout.svd(graph, d=shortest.paths(graph), ...)
   graph. This function generates the layout separately for each graph
   component and then merges them via \code{\link{layout.merge}}.
 
+  \code{layout.norm} normalizes a layout, it linearly transforms each
+  coordinate separately to fit into the given limits.
 }
 \value{All these functions return a numeric matrix with at least two
   columns and the same number of lines as the number of vertices.}

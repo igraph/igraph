@@ -786,7 +786,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
  * \brief Triad census, as defined by Davis and Leinhardt
  * 
  * </para><para>
- * Calculating the triad census means classifying every triples of
+ * Calculating the triad census means classifying every triple of
  * vertices in a directed graph. A triple can be in one of 16 states:
  * \clist
  * \cli 003 

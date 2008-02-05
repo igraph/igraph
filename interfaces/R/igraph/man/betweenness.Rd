@@ -1,6 +1,8 @@
 \name{betweenness}
 \alias{betweenness}
 \alias{edge.betweenness}
+\alias{betweenness.estimate}
+\alias{edge.betweenness.estimate}
 \title{Vertex and edge betweenness centrality}
 \description{The vertex and edge betweenness are (roughly) defined by
   the number of geodesics (shortest paths) going through a vertex or an
@@ -9,6 +11,8 @@
 \usage{
 betweenness(graph, v=V(graph), directed = TRUE)
 edge.betweenness(graph, e=E(graph), directed = TRUE)
+betweenness.estimate(graph, vids = V(graph), directed = TRUE, cutoff)
+edge.betweenness.estimate(graph, directed = TRUE, cutoff)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -18,6 +22,10 @@ edge.betweenness(graph, e=E(graph), directed = TRUE)
     calculated.}
   \item{directed}{Logical, whether directed paths should be considered
     while determining the shortest paths.}
+  \item{vids}{The vertices for which the vertex betweenness estimation
+    will be calculated.}
+  \item{cutoff}{The maximum path length to consider when calculating the
+    betweenness. If zero or negative then there is no such limit.}
 }
 \details{The vertex betweenness of vertex \eqn{v}{\code{v}} is defined
   by
@@ -27,6 +35,20 @@ edge.betweenness(graph, e=E(graph), directed = TRUE)
   The edge betweenness of edge \eqn{e}{\code{e}} is defined by
 
   \deqn{\sum_{i\ne j} g{iej}/g_{ij}}{sum( g_iej / g_ij, i!=j)}.
+
+  \code{betweenness} calculates vertex betweenness,
+  \code{edge.betweenness} calculates edge.betweenness.
+
+  \code{betweenness.estimate} only considers paths of length
+  \code{cutoff} or smaller, this can be run for larger graphs, as the
+  running time is not quadratic (if \code{cutoff} is small). If
+  \code{cutoff} is zero or negative then the function calculates the
+  exact betweenness scores.
+
+  \code{edge.betweenness.estimate} is similar, but for edges.
+
+  For calculating the betweenness a similar algorithm to the one
+  proposed by Brandes (see References) is used.
 }
 \value{A numeric vector with the betweenness score for each vertex in
   \code{v} for \code{betweenness}.
@@ -34,8 +56,10 @@ edge.betweenness(graph, e=E(graph), directed = TRUE)
   A numeric vector with the edge betweenness score for each edge in
   \code{e} for \code{edge.betweenness}.
 
-  For calculating the betweenness a similar algorithm to the one
-  proposed by Brandes is used.
+  \code{betweenness.estimate} returns the estimated betweenness scores
+  for vertices in \code{vids}, \code{edge.betweenness.estimate}
+  the estimated edge betweenness score for \emph{all} edges; both in
+  a numeric vector.
 }
 \note{\code{edge.betweenness} might give false values for graphs with
   multiple edges.}

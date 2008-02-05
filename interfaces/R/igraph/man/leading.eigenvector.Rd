@@ -1,21 +1,32 @@
 \name{leading.eigenvector.community}
 \alias{leading.eigenvector.community}
 \alias{leading.eigenvector.community.step}
+\alias{leading.eigenvector.community.naive}
+\alias{community.le.to.membership}
 \title{Community structure detecting based on the leading eigenvector
   of the community matrix}
 \description{These functions try to find densely connected subgraphs in
   a graph by calculating the leading non-negative eigenvector of the
   modularity matrix of the graph.}
 \usage{
-leading.eigenvector.community(graph, steps = vcount(graph), naive = FALSE)
+leading.eigenvector.community(graph, steps = -1,
+       options = igraph.arpack.default)
+leading.eigenvector.community.naive(graph, steps = -1,
+       options = igraph.arpack.default)
 leading.eigenvector.community.step (graph, fromhere = NULL,
-    membership = rep(0, vcount(graph)), community = 0, eigenvector = TRUE)
+    membership = rep(0, vcount(graph)), community = 0,
+    options=igraph.arpack.default)
+community.le.to.membership(merges, steps, membership) 
 }
 \arguments{
   \item{graph}{The input graph. Should be undirected as the method needs
     a symmetric matrix.}
   \item{steps}{The number of steps to take, this is actually the number
-    of tries to make a step. It is not a particularly useful parameter.}
+    of tries to make a step. It is not a particularly useful parameter.
+
+    For \code{community.le.to.membership} the number of merges to
+    produce from the supplied \code{membership} vector.
+  }
   \item{naive}{Logical constant, it defines how the algorithm tries to
     find more divisions after the first division was made. If
     \code{TRUE} then it simply considers both communities as separate
@@ -32,11 +43,16 @@ leading.eigenvector.community.step (graph, fromhere = NULL,
     number between 0 and the total number of communities at this level
     minus one. By default we start with a single community containing
     all vertices. This argument is ignored if \code{fromhere} is not
-    \code{NULL}.}
+    \code{NULL}.
+
+    For \code{community.le.to.memberhip} the starting community
+    structure on which \code{steps} merges are performed.
+  }
   \item{community}{The id of the community which the algorithm will try
     to split.}
-  \item{eigenvector}{Logical constant, whether to include the eigenvector
-    of the modularity matrix in the result.}
+  \item{options}{A named list to override some ARPACK options.}
+  \item{merges}{The merge matrix, possible from the result of
+    \code{leading.eigenvector.community}.}
 }
 \details{
   The functions documented in these section implement the 
@@ -63,10 +79,28 @@ leading.eigenvector.community.step (graph, fromhere = NULL,
   has no underlying comuunity structure.
   Check Newman's paper to understand why this is a good method for
   detecting community structure.
+
+  \code{leading.eigenvector.community} is the proper implementation of
+  the proposed algorithm. \code{leading.eigenvector.community.naive} is
+  considered worse, in this implementation a community found after a
+  division is considered as a separate graph for further divisions.
+  \code{leading.eigenvector.community.step} is the proper
+  implementation, but makes only one step, by trying to split the
+  specified community.
+
+  From igraph 0.5 these functions use ARPACK to calculate the
+  eigenvectors. See \code{\link{arpack}} for details.
+
+  \code{community.le.to.memberhip} creates a membership vector from the
+  result of \code{leading.eigenvector.community} or
+  \code{leading.eigenvector.community.naive}. It takes \code{membership}
+  and permformes \code{steps} merges, according to the supplied
+  \code{merges} matrix.
 }
 \value{
-  \code{leading.eigenvector.community} returns a named list with the
-  following members:
+  \code{leading.eigenvector.community} and
+  \code{leading.eigenvector.community.naive} return a named list with
+  the following members:
   \itemize{
     \item{membership}{The membership vector at the end of the algorithm,
       when no more splits are possible.}
@@ -76,6 +110,9 @@ leading.eigenvector.community.step (graph, fromhere = NULL,
       first merge and it creates community \sQuote{\code{N}}, \code{N}
       is the number of initial communities in the graph, the second line
       creates community \code{N+1}, etc.
+    }
+    \item{options}{Information about the underlying ARPACK computation,
+      see \code{\link{arpack}} for details.
     }
   }
 
@@ -91,6 +128,18 @@ leading.eigenvector.community.step (graph, fromhere = NULL,
       \code{NULL} if the \code{eigenvector} argument was \code{FALSE}.}
     \item{eigenvalue}{The largest positive eigenvalue of the modularity
       matrix.}
+    \item{options}{Information about the underlying ARPACK computation,
+      see \code{\link{arpack}} for details.
+    }
+  }
+
+  \code{community.le.to.membership} returns a named list with two
+  components:
+  \itemize{
+    \item{membership}{A membership vector, a numerical vector
+      indication which vertex belongs to which community. The
+      communities are always numbered from zero.}
+    \item{csize}{A numeric vector giving the sizes of the communities.}
   }
 }
 \references{

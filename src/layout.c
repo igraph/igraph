@@ -1686,7 +1686,7 @@ int igraph_i_move_nodes(igraph_matrix_t *pos,
  *    Should be a couple of hundred in general. If you have a large graph 
  *    then you might want to only do a few iterations and then check the 
  *    result. If it is not good enough you can feed it in again in 
- *    the \p res argument.
+ *    the \p res argument. The original graphopt default if 500.
  * \param node_charge The charge of the vertices, used to calculate electric
  *    repulsion. The original graphopt default is 0.001.
  * \param node_mass The mass of the vertices, used for the spring forces.
@@ -1696,7 +1696,8 @@ int igraph_i_move_nodes(igraph_matrix_t *pos,
  * \param spring_constant The spring constant, the original graphopt defaults 
  *    to one.
  * \param max_sa_movement Real constant, it gives the maximum amount of movement 
- *    allowed in a single step along a single axis.
+ *    allowed in a single step along a single axis. The original graphopt 
+ *    default is 5.
  * \param use_seed Logical scalar, whether to use the positions in \p res as
  *    a starting configuration. See also \p res above.
  * \return Error code.

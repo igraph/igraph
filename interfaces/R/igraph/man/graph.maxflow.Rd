@@ -6,7 +6,8 @@
   maximal flow between two vertices is calculated.}
 \usage{
 graph.maxflow(graph, source, target, capacity=NULL)
-graph.mincut(graph, source=NULL, target=NULL, capacity=NULL)
+graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
+       value.only = TRUE)
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -15,6 +16,11 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL)
   \item{capacity}{Vector giving the capacity of the edges. If this is
     \code{NULL} (the default) then the \code{capacity} edge attribute is
     used.}
+  \item{value.only}{Logical scalar, if \code{TRUE} only the minumum cut
+    value is returned, if \code{FALSE} the edges in the cut and a the
+    two (or more) partitions are also returned. This currently only
+    works for undirected graphs.
+  }
 }
 \details{
   \code{graph.maxflow} calculates the maximum flow between two vertices
@@ -48,8 +54,27 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL)
   \code{graph.mincut} can be invoked without giving the \code{source}
   and \code{target} arguments and then minimum of all possible minimum
   cuts is calculated.
+
+  Starting from version 0.5 igraph can return the edges in the minimum
+  cut for undirected graphs.
 }
-\value{A numeric constant, the maximum flow, or the minimum cut.}
+\value{
+  A numeric constant, the maximum flow, or the minimum cut, except if
+  \code{value.only=FALSE} for \code{graph.mincut}. In this case a named
+  list with components:
+  \itemize{
+    \item{value}{Numeric scalar, the cut value.}
+    \item{cut}{Numeric vector, the edges in the cut.}
+    \item{partition1}{The vertices in the first partition after the cut
+      edges are removed. Note that these vertices might be actually in
+      different components (after the cut edges are removed), as the
+      graph may fall apart into more than two components.}
+    \item{partition2}{The vertices in the second partition after the cut
+      edges are removed. Note that these vertices might be actually in
+      different components (after the cut edges are removed), as the
+      graph may fall apart into more than two components.}
+  }
+}
 \references{
   A. V. Goldberg and R. E. Tarjan: ``A New Approach to the Maximum Flow
   Problem'' Journal of the ACM 35:921-940, 1988.  
@@ -58,5 +83,8 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL)
 \seealso{\code{\link{shortest.paths}}, \code{\link{edge.connectivity}},
   \code{\link{vertex.connectivity}}}
 \examples{
+g <- graph.ring(100)
+graph.mincut(g, capacity=rep(1,vcount(g)))
+graph.mincut(g, value.only=FALSE, capacity=rep(1,vcount(g)))
 }
 \keyword{graphs}

@@ -7,6 +7,7 @@
 \alias{graph.ring}
 \alias{graph.tree}
 \alias{graph.full}
+\alias{graph.full.citation}
 \alias{graph.atlas}
 \alias{graph.edgelist}
 \alias{graph.data.frame}
@@ -31,6 +32,7 @@ graph.lattice(length, dim, nei = 1, directed = FALSE, mutual = FALSE,
 graph.ring(n, directed = FALSE, mutual = FALSE, circular=TRUE)
 graph.tree(n, children = 2, mode="out")
 graph.full(n, directed = FALSE, loops = FALSE)
+graph.full.citation(n, directed = TRUE)
 graph.atlas(n)
 graph.edgelist(el, directed=TRUE)
 graph.data.frame(d, directed=TRUE)
@@ -142,6 +144,10 @@ graph.extended.chordal.ring(n, w)
 
   \code{graph.full} simply creates full graphs.
 
+  \code{graph.full.citation} creates a full citation graph. This is a
+  directed graph, where every i->j edge is present if and only if j<i.
+  If \code{directed=FALSE} then the graph is just a full graph.
+  
   \code{graph.atlas} creates graphs from the book An Atlas of Graphs by
   Roland C. Read and Robin J. Wilson. The atlas contains all undirected
   graphs with up to seven vertices, numbered from 0 up to 1252. The
@@ -201,12 +207,13 @@ g7 <- graph.lattice(length=5, dim=3)
 g8 <- graph.ring(10)
 g9 <- graph.tree(10, 2)
 g10 <- graph.full(5, loops=TRUE)
-g11 <- graph.atlas(sample(0:1252, 1))
+g11 <- graph.full.citation(10)
+g12 <- graph.atlas(sample(0:1252, 1))
 el <- matrix( c("foo", "bar", "bar", "foobar"), nc=2, byrow=TRUE)
-g12 <- graph.edgelist(el)
+g13 <- graph.edgelist(el)
 d <- as.data.frame(el)
 d$weight <- 1:2
-g13 <- graph.data.frame(d)
-g14 <- graph.extended.chordal.ring(15, matrix(c(3,12,4,7,8,11), nr=2))
+g14 <- graph.data.frame(d)
+g15 <- graph.extended.chordal.ring(15, matrix(c(3,12,4,7,8,11), nr=2))
 }
 \keyword{graphs}

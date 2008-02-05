@@ -3,6 +3,7 @@
 \alias{get.shortest.paths}
 \alias{get.all.shortest.paths}
 \alias{average.path.length}
+\alias{path.length.hist}
 \title{Shortest (directed or undirected) paths between vertices}
 \description{\code{shortest.paths} calculates the length of all the
   shortest paths from or to the vertices in the
@@ -13,6 +14,7 @@ shortest.paths(graph, v=V(graph), mode = "all")
 get.shortest.paths(graph, from, to=V(graph), mode = "all")
 get.all.shortest.paths(graph, from, to = V(graph), mode = "all") 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
+path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose")) 
 }
 \arguments{
   \item{graph}{The graph to work on.}
@@ -38,6 +40,8 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
     FALSE the length of the missing paths are counted having length
     \code{vcount(graph)}, one longer than the longest possible geodesic
     in the network.}
+  \item{verbose}{Logical scalar, whether to draw a progress meter while
+    the calculation is running.}
 }
 \details{The shortest paths (also called geodesics) are calculated by
   using breath-first search in the graph. Right now edge weights are not
@@ -53,6 +57,11 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
 
   \code{get.all.shortest.paths} calculates all shortest paths from a
   vertex to other vertices given in the \code{to} argument.
+
+  \code{path.length.hist} calculates a histogram, by calculating the
+  shortest path length between each pair of vertices. For directed
+  graphs both directions are considered, so every pair of vertices
+  appears twice in the histogram.
 }
 \value{
   For \code{shortest.paths} a numeric matrix with \code{vcount(graph)}
@@ -74,6 +83,13 @@ average.path.length(graph, directed=TRUE, unconnected=TRUE)
   consecutive elements of the list.
   
   For \code{average.path.length} a single number is returned.
+
+  \code{path.length.hist} returns a named list with two entries:
+  \code{res} is a numeric vector, the histogram of distances,
+  \code{unconnected} is a numeric scalar, the number of pairs for which
+  the first vertex is not reachable from the second. The sum of the two
+  entries is always \eqn{n(n-1)} for directed graphs and \eqn{n(n-1)/2}
+  for undirected graphs.
 }
 \references{ West, D.B. (1996). \emph{Introduction to Graph Theory.} Upper
   Saddle River, N.J.: Prentice Hall. }

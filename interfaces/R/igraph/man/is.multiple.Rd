@@ -28,6 +28,10 @@ count.multiple(graph, eids=E(graph))
   See the examples for getting rid of multiple edges while keeping their
   original multiplicity as an edge attribute.
 }
+\value{
+  \code{is.loop} and \code{is.multiple} return a logical
+  vector. \code{count.multiple} returns a numeric vector.
+}
 %\references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{simplify}} to eliminate loop and multiple edges.}
@@ -54,3 +58,4 @@ g <- simplify(g)
 any(is.multiple(g))
 E(g)$weight
 }
+\keyword{graphs}
