@@ -1,4 +1,4 @@
-\encoding{utf8}
+\encoding{UTF-8}
 \name{graph.famous}
 \alias{graph.famous}
 \title{Creating named graphs}
