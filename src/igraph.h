@@ -426,6 +426,8 @@ void igraph_es_destroy(igraph_es_t *es);
 
 igraph_bool_t igraph_es_is_all(igraph_es_t *es);
 
+int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src);
+
 int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es, 
 			igraph_vector_t *v);
 int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
