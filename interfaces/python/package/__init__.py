@@ -667,7 +667,7 @@ class Graph(core.GraphBase):
         if callable(layout):
             method = layout
         else:
-            method = getattr(self.__class__, self._layout_mapping[layout])
+            method = getattr(self.__class__, self._layout_mapping[layout.lower()])
         if not callable(method): raise ValueError, "layout method must be callable"
         l=method(self, *args, **kwds)
         if not isinstance(l, Layout): l=Layout(l)
