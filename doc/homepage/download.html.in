@@ -40,22 +40,28 @@
   igraph as a Python extension module</span>
   <ul class="download-links">
     <li class="download-windows">
-<!--       <a href="http://pypi.python.org/packages/2.4/i/igraph/igraph-${VERSION}.win32-py2.4.exe" -->
+<!--       <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe" -->
 <!--          onClick="javascript:urchinTracker ('/downloads/pywin24'); "> -->
 <!--          Windows installer for Python 2.4</a>  -->
-      <a href="http://pypi.python.org/packages/2.4/i/igraph/igraph-${VERSION}.win32-py2.4.exe">Windows binary (Python 2.4)</a>
+      <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe">Windows binary (Python 2.4)</a>
     </li>
     <li class="download-windows">
-<!--       <a href="http://pypi.python.org/packages/2.5/i/igraph/igraph-${VERSION}.win32-py2.4.exe" -->
+<!--       <a href="http://pypi.python.org/packages/2.5/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe" -->
 <!--          onClick="javascript:urchinTracker ('/downloads/pywin25'); "> -->
 <!--          Windows installer for Python 2.5</a>  -->
-      <a href="http://pypi.python.org/packages/2.5/i/igraph/igraph-${VERSION}.win32-py2.5.exe">Windows binary (Python 2.5)</a>
+      <a href="http://pypi.python.org/packages/2.5/i/igraph/python_igraph-${VERSION}.win32-py2.5.exe">Windows binary (Python 2.5)</a>
+    </li>
+    <li class="download-osx">
+<!--       <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}-py2.4-macosx10.5.mpkg" -->
+<!--          onClick="javascript:urchinTracker ('/downloads/pymacosx105'); "> -->
+<!--          OS X Leopard installer (Python 2.4)</a>  -->
+      <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}-py2.4-macosx10.5.mpkg">OS X Leopard binary (Python 2.4)</a>
     </li>
     <li class="download-source">
-<!--       <a href="http://pypi.python.org/packages/source/i/igraph/igraph-${VERSION}.tar.gz" -->
+<!--       <a href="http://pypi.python.org/packages/source/i/igraph/python_igraph-${VERSION}.tar.gz" -->
 <!--          onClick="javascript:urchinTracker ('/downloads/pysource'); "> -->
 <!--          Source code</a>  -->
-      <a href="http://pypi.python.org/packages/source/i/igraph/igraph-${VERSION}.tar.gz">Source package (for Linux and OS X)</a>
+      <a href="http://pypi.python.org/packages/source/i/igraph/python_igraph-${VERSION}.tar.gz">Source package</a>
     </li>
     <li class="download-external">
 <!--       <a href="http://python.org/pypi/igraph" -->
@@ -116,6 +122,12 @@ deb-src htp://cneurocvs.rmki.kfki.hu /packages/source/
 <p>The binary packages are built for the <code>i386</code> architecture.
 Source packages should compile on <code>x86_64</code> and <code>amd64</code>
 architectures as well.</p>
+
+<h3>Fedora Project packages</h3>
+
+<p><a href="http://www.fedoraproject.org">Fedora</a> users can find
+packages to their system <a href="https://admin.fedoraproject.org/pkgdb/packages/name/igraph">here</a>. Many thanks to Neal Becker for building and maintaining
+these packages!</p>
 
 <a name="dev"></a><h3>Obtaining the development version</h3>
 

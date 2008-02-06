@@ -144,17 +144,19 @@ literature.</li>
     <p>For installing the <i>Python extension module</i>, you'll
     need Python version 2.4 or later. Binary versions of the module
     are available for Python 2.4 and Python 2.5 on the Windows platform,
-    so you don't have to compile anything in this case. If you are using
-    Linux or Mac OS X, you'll have to compile the extension by yourself.
+    so you don't have to compile anything in this case. OS X Leopard
+	users can download an installer as well. If you are using
+    Linux or Mac OS X Tiger, you'll have to compile the extension by yourself.
     Compilation requires a recent C compiler (e.g. <code>gcc</code>, which
     is usually available as a separate package in Linux and as part of
     <a href="http://developer.apple.com/tools/xcode/">XCode</a> on Mac
-    OS X. You'll also need the <a href="http://xmlsoft.org"><code>libxml2</code>
-    library</a>. Right now the Python version of <b>igraph</b> does not
-    contain C++ code.</p>
+    OS X. You'll also need the compiled form of the <b>igraph</b> C
+	core, as the Python interface will link to that during compilation.</p>
     <p>If you have the <a href="http://peak.telecommunity.com/DevCenter/EasyInstall">EasyInstall</a>
     Python script installed, you can simply type <code>easy_install igraph</code>
-    to download, compile and install <b>igraph</b> as a Python Egg.</p>
+    to download, compile and install <b>igraph</b> as a Python Egg. This
+	method assumes that you installed the C core somewhere in the
+	default include and library path of your system.</p>
 
 <h3>The Ruby extension</h3>
     <p>For installing the <i>Ruby extension</i> please consult 
