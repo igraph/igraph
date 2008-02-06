@@ -36,7 +36,7 @@
 #include "edgeobject.h"
 #include "arpackobject.h"
 #include "bfsiter.h"
-#include "config.h"
+//#include "config.h"
 
 /**
  * \defgroup python_interface Python module implementation
@@ -1191,7 +1191,7 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "BLISS_FSM", IGRAPH_BLISS_FSM);
 
   /* More useful constants */
-  PyModule_AddStringConstant(m, "__version__", VERSION);
+  PyModule_AddStringConstant(m, "__version__", "0.5");
   PyModule_AddStringConstant(m, "__build_date__", __DATE__);
 
   /* initialize error, progress, warning and interruption handler */

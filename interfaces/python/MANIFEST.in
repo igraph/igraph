@@ -1,9 +1,4 @@
 include src/*.h
-include igraph/*.hc
-include igraph/*.pmt
-include igraph/*.h
-include igraph/*.hh
-include igraph/*.cpp
 include test.py
 include MANIFEST.in
 include LICENSE

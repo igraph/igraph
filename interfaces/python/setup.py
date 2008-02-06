@@ -8,8 +8,12 @@ from distutils.file_util import copy_file
 from sys import version, exit
 import glob
 import os.path
-from os import popen, mkdir
+from os import popen3, mkdir
 from shutil import copy2
+
+LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include/igraph', '/usr/local/include/igraph']
+LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
+LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 
 LIBXML2_FALLBACK_INCLUDE_DIRS = ['/usr/include/libxml2']
 LIBXML2_FALLBACK_LIBRARIES = ['xml2', 'iconv']
@@ -21,29 +25,31 @@ if version < '2.3':
     
 def get_output(command):
     """Returns the output of a command returning a single line of output"""
-    f=popen(command)
-    line=f.readline().strip()
-    exit_code=f.close()
+    to_child, from_child, err_child = popen3(command)
+    to_child.close()
+    err_child.close()
+    line=from_child.readline().strip()
+    exit_code=from_child.close()
     return line, exit_code
     
-def detect_libxml2_include_dirs(default = LIBXML2_FALLBACK_INCLUDE_DIRS):
-    """Tries to detect the libxml2 include directory"""
-    line, exit_code = get_output("xml2-config --cflags")
-    if exit_code>0: return default
+def detect_igraph_include_dirs(default = LIBIGRAPH_FALLBACK_INCLUDE_DIRS):
+    """Tries to detect the igraph include directory"""
+    line, exit_code = get_output("pkg-config igraph --cflags")
+    if exit_code>0 or len(line) == 0: return default
     opts=line.split()
     return [opt[2:] for opt in opts if opt[0:2]=="-I"]
 
-def detect_libxml2_libraries(default = LIBXML2_FALLBACK_LIBRARIES):
-    """Tries to detect the libraries that libxml2 uses"""
-    line, exit_code = get_output("xml2-config --libs")
-    if exit_code>0: return default
+def detect_igraph_libraries(default = LIBIGRAPH_FALLBACK_LIBRARIES):
+    """Tries to detect the libraries that igraph uses"""
+    line, exit_code = get_output("pkg-config igraph --libs")
+    if exit_code>0 or len(line) == 0: return default
     opts=line.split()
     return [opt[2:] for opt in opts if opt[0:2]=="-l"]
     
-def detect_libxml2_library_dirs(default = LIBXML2_FALLBACK_LIBRARY_DIRS):
-    """Tries to detect the libxml2 library directory"""
-    line, exit_code = get_output("xml2-config --libs")
-    if exit_code>0: return default
+def detect_igraph_library_dirs(default = LIBIGRAPH_FALLBACK_LIBRARY_DIRS):
+    """Tries to detect the igraph library directory"""
+    line, exit_code = get_output("pkg-config igraph --libs")
+    if exit_code>0 or len(line) == 0: return default
     opts=line.split()
     return [opt[2:] for opt in opts if opt[0:2]=="-L"]
 
@@ -67,74 +73,49 @@ def detect_igraph_source():
     
     return
     
-def igraph_version():
-    """Returns igraph version number"""
-    try:
-        f=open(os.path.join('igraph', 'config.h'))
-        while True:
-            line=f.readline()
-            if not line: break
-            line=line.strip()
-            if line[0:16] == "#define VERSION ":
-                return line[16:].replace('"', '')
-            
-        f.close()
-        raise Exception, "Can't detect igraph version number from source code!"
-    except:
-        raise Exception, "igraph source code not found"
-    
-try:
-    detect_igraph_source()
-except:
-    print "An error happened while trying to find igraph source!"
-    print "Consider downloading the C source code of the igraph library and "
-    print "put the contents of the src subdirectory and config.h in "
-    print "subdirectory called igraph."
-    exit(1)
-
-module_sources=glob.glob(os.path.join('src', '*.c'))
-sources=glob.glob(os.path.join('igraph', '*.c'))
-sources.extend(glob.glob(os.path.join('igraph', '*.cc')))
-sources.extend(glob.glob(os.path.join('igraph', '*.cpp')))
-sources.extend(glob.glob(os.path.join('igraph', 'f2c', '*.c')))
-sources.extend(glob.glob(os.path.join('igraph', 'blas', '*.c')))
-sources.extend(glob.glob(os.path.join('igraph', 'lapack', '*.c')))
-sources.extend(glob.glob(os.path.join('igraph', 'arpack', '*.c')))
-sources.extend(module_sources)
-include_dirs=['igraph', '.']
+sources=glob.glob(os.path.join('src', '*.c'))
+include_dirs=[]
 library_dirs=[]
 libraries=[]
 
-line, exit_code = get_output("xml2-config --version")
+line, exit_code = get_output("pkg-config igraph")
 if exit_code>0:
-    print "An error happened while trying to get libxml2 compilation options!"
-    print "Maybe you don't have libxml2 installed?"
-    print "Falling back to reasonable defaults."
-    print "If the compilation fails, please edit the LIBXML2_FALLBACK_* variables"
-    print "in setup.py to point to the correct directories and libraries."
+    print "Using default include and library paths for compilation"
+    print "If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*"
+    print "variables in setup.py to point to the correct directories"
+    print "and libraries where the C core of igraph is installed"
     print
+    
+include_dirs.extend(detect_igraph_include_dirs())
+library_dirs.extend(detect_igraph_library_dirs())
+libraries.extend(detect_igraph_libraries())
 
-include_dirs.extend(detect_libxml2_include_dirs())
-library_dirs.extend(detect_libxml2_library_dirs())
-libraries.extend(detect_libxml2_libraries())
+print "Include path:", " ".join(include_dirs)
+print "Library path:", " ".join(library_dirs)
 
 igraph_extension = Extension('igraph.core', sources, \
   library_dirs=library_dirs, libraries=libraries, \
   include_dirs=include_dirs)
        
-description = """This module extends Python with a Graph class which is capable
-of handling arbitrary directed and undirected graphs with thousands of nodes and
-millions of edges. Since the module makes use of the open source igraph library
-written in almost 100% pure C, it is blazing fast and outperforms most other
-pure Python-based graph packages around.
+description = """Python interface to the igraph high performance graph
+library, primarily aimed at complex network research and analysis.
 
-Windows installer versions need libxml2 and iconv, both installable from the
-following URL:
+Windows installer versions need libxml2 and iconv, both installable from
+the following URL:
     
-http://www.zlatkovic.com/pub/libxml/"""
+http://www.zlatkovic.com/pub/libxml/
+
+**WARNING**: previous releases of this library included the source
+code of the C core of igraph as well. From 0.5, the source of the C
+core has to be downloaded, built and installed separately before
+building the Python interface from scratch. See the original igraph
+homepage for instructions on how to build the C core:
+    
+http://cneurocvs.rmki.kfki.hu/igraph/
+"""
 
 setup(name = 'python-igraph',
-      version = igraph_version(),
+      version = '0.5',
       description = 'High performance graph data structures and algorithms',
       long_description = description,
       license = 'GNU General Public License (GPL)',
