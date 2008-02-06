@@ -48,7 +48,7 @@ extern PyObject* igraphmodule_arpack_options_default;
 
 void igraphmodule_ARPACKOptions_dealloc(igraphmodule_ARPACKOptionsObject* self);
 
-PyObject* igraphmodule_ARPACKOptions_new();
+PyObject* igraphmodule_ARPACKOptions_new(void);
 PyObject* igraphmodule_ARPACKOptions_str(igraphmodule_ARPACKOptionsObject *self);
 #define igraphmodule_ARPACKOptions_CheckExact(ob) ((ob)->ob_type == &igraphmodule_ARPACKOptionsType)
 igraph_arpack_options_t *igraphmodule_ARPACKOptions_get(igraphmodule_ARPACKOptionsObject *self);

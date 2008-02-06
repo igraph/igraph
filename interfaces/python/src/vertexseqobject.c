@@ -27,6 +27,7 @@
 #include "vertexobject.h"
 #include "common.h"
 #include "convert.h"
+#include "error.h"
 
 #define GET_GRAPH(obj) (((igraphmodule_GraphObject*)obj->gref)->g)
 
@@ -66,7 +67,6 @@ PyObject* igraphmodule_VertexSeq_new(PyTypeObject *subtype,
 igraphmodule_VertexSeqObject*
 igraphmodule_VertexSeq_copy(igraphmodule_VertexSeqObject* o) {
   igraphmodule_VertexSeqObject *copy;
-  PyObject *g;
 
   copy=(igraphmodule_VertexSeqObject*)PyType_GenericNew(o->ob_type, 0, 0);
   if (copy == NULL) return NULL;

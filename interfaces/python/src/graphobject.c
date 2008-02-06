@@ -425,7 +425,7 @@ PyObject *igraphmodule_Graph_add_edges(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
                                           PyObject * args, PyObject * kwds)
 {
-  PyObject *list, *by_index = Py_False;
+  PyObject *list;
   igraph_es_t es;
   static char *kwlist[] = { "edges", NULL };
 
@@ -930,7 +930,6 @@ PyObject *igraphmodule_Graph_farthest_points(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
   PyObject *dir = Py_True, *vcount_if_unconnected = Py_True;
-  igraph_vector_t res;
   igraph_integer_t from, to, len;
 
   static char *kwlist[] = { "directed", "unconn", NULL };
@@ -1766,7 +1765,7 @@ PyObject *igraphmodule_Graph_Preference(PyTypeObject * type,
                                         PyObject * args, PyObject * kwds)
 {
   igraphmodule_GraphObject *self;
-  long i, n, types;
+  long n, types;
   PyObject *type_dist, *pref_matrix;
   PyObject *directed = Py_False;
   PyObject *loops = Py_False;
@@ -2835,7 +2834,7 @@ PyObject *igraphmodule_Graph_decompose(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  // We have to create a separate Python igraph object for every graph returned
+  /* We have to create a Python igraph object for every graph returned */
   n = igraph_vector_ptr_size(&components);
   list = PyList_New(n);
   for (i = 0; i < n; i++) {
@@ -2846,11 +2845,11 @@ PyObject *igraphmodule_Graph_decompose(igraphmodule_GraphObject * self,
     igraphmodule_Graph_init_internal(o);
     o->g = *g;
     PyList_SET_ITEM(list, i, (PyObject *) o);
-    // reference has been transferred by PyList_SET_ITEM, no need to Py_DECREF
-    //
-    // we mustn't call igraph_destroy here, because it would free the vertices
-    // and the edges as well, but we need them in o->g. So just call free
-    igraph_free(g);
+    /* reference has been transferred by PyList_SET_ITEM, no need to DECREF
+     *
+     * we mustn't call igraph_destroy here, because it would free the vertices
+     * and the edges as well, but we need them in o->g. So just call free */
+    free(g);
   }
 
   igraph_vector_ptr_destroy(&components);
@@ -3834,7 +3833,7 @@ PyObject *igraphmodule_Graph_topological_sorting(igraphmodule_GraphObject *
 PyObject *igraphmodule_Graph_motifs_randesu(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_vector_t result, cut_prob;
-  long size=3, i;
+  long size=3;
   PyObject* cut_prob_list=Py_None;
   PyObject *list;
   static char* kwlist[] = {"size", "cut_prob", NULL};
@@ -3880,9 +3879,8 @@ PyObject *igraphmodule_Graph_motifs_randesu_no(igraphmodule_GraphObject *self,
   PyObject *args, PyObject *kwds) {
   igraph_vector_t cut_prob;
   igraph_integer_t result;
-  long size=3, i;
+  long size=3;
   PyObject* cut_prob_list=Py_None;
-  PyObject *list;
   static char* kwlist[] = {"size", "cut_prob", NULL};
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist, &size, &cut_prob_list))
@@ -3917,9 +3915,9 @@ PyObject *igraphmodule_Graph_motifs_randesu_estimate(igraphmodule_GraphObject *s
   PyObject *args, PyObject *kwds) {
   igraph_vector_t cut_prob;
   igraph_integer_t result;
-  long size=3, i;
+  long size=3;
   PyObject* cut_prob_list=Py_None;
-  PyObject *list, *sample=Py_None;
+  PyObject *sample=Py_None;
   static char* kwlist[] = {"size", "cut_prob", "sample", NULL};
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lOO", kwlist,
@@ -6679,7 +6677,6 @@ PyObject *igraphmodule_Graph_modularity(igraphmodule_GraphObject *self,
   igraph_vector_t membership;
   igraph_vector_t *weights=0;
   igraph_real_t modularity;
-  int i;
   PyObject *mvec, *wvec=Py_None;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &mvec, &wvec))
@@ -7106,17 +7103,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_delete_edges
   {"delete_edges", (PyCFunction) igraphmodule_Graph_delete_edges,
    METH_VARARGS | METH_KEYWORDS,
-   "delete_edges(es, by_index=False)\n\n"
+   "delete_edges(es)\n\n"
    "Removes edges from the graph.\n\n"
    "All vertices will be kept, even if they lose all their edges.\n"
    "Nonexistent edges will be silently ignored.\n\n"
-   "@param es: the list of edges to be removed.\n"
-   "@param by_index: determines how edges are identified. If C{by_index} is\n"
-   "  C{False}, every edge is represented with a tuple, containing the\n"
-   "  vertex IDs of the two endpoints. Vertices are enumerated from zero.\n"
-   "  It is allowed to provide a single pair instead of a list consisting\n"
-   "  of only one pair. If C{by_index} is C{True}, edges are identified by\n"
-   "  their IDs starting from zero.\n" "@return: the same graph object\n"},
+   "@param es: the list of edges to be removed. Edges are identifed by\n"
+   "  edge IDs. L{EdgeSeq} objects are also accepted here.\n"
+   "@return: the same graph object\n"},
 
   // interface to igraph_degree
   {"degree", (PyCFunction) igraphmodule_Graph_degree,

@@ -26,6 +26,8 @@
 #include "edgeseqobject.h"
 #include "edgeobject.h"
 #include "common.h"
+#include "convert.h"
+#include "error.h"
 
 #define GET_GRAPH(obj) (((igraphmodule_GraphObject*)obj->gref)->g)
 
@@ -66,7 +68,6 @@ PyObject* igraphmodule_EdgeSeq_new(PyTypeObject *subtype,
 igraphmodule_EdgeSeqObject*
 igraphmodule_EdgeSeq_copy(igraphmodule_EdgeSeqObject* o) {
   igraphmodule_EdgeSeqObject *copy;
-  PyObject *g;
 
   copy=(igraphmodule_EdgeSeqObject*)PyType_GenericNew(o->ob_type, 0, 0);
   if (copy == NULL) return NULL;
@@ -249,7 +250,7 @@ PyObject* igraphmodule_EdgeSeq_attribute_count(igraphmodule_EdgeSeqObject* self)
  */
 PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* self, PyObject* o) {
   igraphmodule_GraphObject *gr = self->gref;
-  PyObject *result, *values, *item;
+  PyObject *result=0, *values, *item;
   long int i, n;
 
   PyErr_Clear();

@@ -318,7 +318,7 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
  */
 int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) {
   PyObject *item;
-  igraph_real_t value;
+  igraph_real_t value=0;
   int i, j, k, ok;
 
   if (PyString_Check(list) || PyUnicode_Check(list)) {
