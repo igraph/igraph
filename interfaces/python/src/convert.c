@@ -737,39 +737,52 @@ PyObject* igraphmodule_vector_ptr_t_to_PyList(igraph_vector_ptr_t *v,
  * 
  * \param o the Python object representing the list of lists
  * \param m the address of an uninitialized \c igraph_matrix_t
- * \return 0 if everything was OK, 1 otherwise
+ * \return 0 if everything was OK, 1 otherwise. Sets appropriate exceptions.
  */
 int igraphmodule_PyList_to_matrix_t(PyObject* o, igraph_matrix_t *m) {
   int nr, nc, n, i, j;
   PyObject *row, *item;
-  
+  int was_warned=0;
+
   /* calculate the matrix dimensions */
-  if (!PyList_Check(o)) return 1;
-  nr = PyList_Size(o);
+  if (!PySequence_Check(o) || PyString_Check(o)) {
+    PyErr_SetString(PyExc_TypeError, "matrix expected (list of sequences)");
+    return 1;
+  }
+
+  nr = PySequence_Size(o);
   nc = 0;
   for (i=0; i<nr; i++) {
-    row=PyList_GetItem(o, i);
-    if (!PyList_Check(row)) return 1;
-    n=PyList_Size(row);
+    row=PySequence_GetItem(o, i);
+    if (!PySequence_Check(row)) {
+      Py_DECREF(row);
+      PyErr_SetString(PyExc_TypeError, "matrix expected (list of sequences)");
+      return 1;
+    }
+    n=PySequence_Size(row);
+    Py_DECREF(row);
     if (n>nc) nc=n;
   }
   
   igraph_matrix_init(m, nr, nc);
   for (i=0; i<nr; i++) {
-    row=PyList_GetItem(o, i);
-    n=PyList_Size(row);
+    row=PySequence_GetItem(o, i);
+    n=PySequence_Size(row);
     for (j=0; j<n; j++) {
-      item=PyList_GetItem(row, j);
+      item=PySequence_GetItem(row, j);
       if (PyInt_Check(item)) {
-    MATRIX(*m, i, j) = (igraph_real_t)PyInt_AsLong(item);
+        MATRIX(*m, i, j) = (igraph_real_t)PyInt_AsLong(item);
       } else if (PyLong_Check(item)) {
-    MATRIX(*m, i, j) = (igraph_real_t)PyLong_AsLong(item);
+        MATRIX(*m, i, j) = (igraph_real_t)PyLong_AsLong(item);
       } else if (PyFloat_Check(item)) {
-    MATRIX(*m, i, j) = (igraph_real_t)PyFloat_AsDouble(item);
-      } else {
-    /* warning? */
+        MATRIX(*m, i, j) = (igraph_real_t)PyFloat_AsDouble(item);
+      } else if (!was_warned) {
+        PyErr_Warn(PyExc_Warning, "non-numeric value in matrix ignored");
+        was_warned=1;
       }
+      Py_DECREF(item);
     }
+    Py_DECREF(row);
   }
 
   return 0;

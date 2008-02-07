@@ -155,7 +155,7 @@ PyObject* igraphmodule_set_progress_handler(PyObject* self, PyObject* args) {
 
 
 PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwds) {
-  char* kwlist[] = {"vs", "coords", NULL};
+  static char* kwlist[] = {"vs", "coords", NULL};
   PyObject *vs, *o, *o1=0, *o2=0, *coords = Py_False;
   igraph_matrix_t mtrx;
   igraph_vector_t result;
@@ -174,25 +174,25 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
     o=PyList_GetItem(vs, i);
     if (PyList_Check(o)) {
       if (PyList_Size(o) >= 2) {
-	o1=PyList_GetItem(o, 0);
-	o2=PyList_GetItem(o, 1);
-	if (PyList_Size(o) > 2)
-	  PyErr_Warn(PyExc_Warning, "vertex with more than 2 coordinates found, considering only the first 2");
+        o1=PyList_GetItem(o, 0);
+        o2=PyList_GetItem(o, 1);
+        if (PyList_Size(o) > 2)
+          PyErr_Warn(PyExc_Warning, "vertex with more than 2 coordinates found, considering only the first 2");
       } else {
-	PyErr_SetString(PyExc_TypeError, "vertex with less than 2 coordinates found");
-	igraph_matrix_destroy(&mtrx);
-	return NULL;
+        PyErr_SetString(PyExc_TypeError, "vertex with less than 2 coordinates found");
+        igraph_matrix_destroy(&mtrx);
+	    return NULL;
       }
     } else if (PyTuple_Check(o)) {
       if (PyTuple_Size(o) >= 2) {
-	o1=PyTuple_GetItem(o, 0);
-	o2=PyTuple_GetItem(o, 1);
-	if (PyTuple_Size(o) > 2)
-	  PyErr_Warn(PyExc_Warning, "vertex with more than 2 coordinates found, considering only the first 2");
-      } else {
-	PyErr_SetString(PyExc_TypeError, "vertex with less than 2 coordinates found");
-	igraph_matrix_destroy(&mtrx);
-	return NULL;
+	    o1=PyTuple_GetItem(o, 0);
+	    o2=PyTuple_GetItem(o, 1);
+	    if (PyTuple_Size(o) > 2)
+	      PyErr_Warn(PyExc_Warning, "vertex with more than 2 coordinates found, considering only the first 2");
+       } else {
+	      PyErr_SetString(PyExc_TypeError, "vertex with less than 2 coordinates found");
+	    igraph_matrix_destroy(&mtrx);
+	    return NULL;
       }
     }
     
@@ -251,6 +251,40 @@ PyObject* igraphmodule_convex_hull(PyObject* self, PyObject* args, PyObject* kwd
   return o;
 }
 
+
+PyObject* igraphmodule_community_to_membership(PyObject *self,
+  PyObject *args, PyObject *kwds) {
+  static char* kwlist[] = { "merges", "nodes", "steps", "return_csize", NULL };
+  PyObject *merges_o, *return_csize = Py_False, *result_o;
+  igraph_matrix_t merges;
+  igraph_vector_t result, csize, *csize_p = 0;
+  long int nodes, steps;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!ll|O", kwlist,
+      &PyList_Type, &merges_o, &nodes, &steps, &return_csize)) return NULL;
+
+  if (igraphmodule_PyList_to_matrix_t(merges_o, &merges)) return NULL;
+
+  if (igraph_vector_init(&result, nodes)) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&merges);
+    return NULL;
+  }
+
+  if (igraph_community_to_membership(&merges, nodes, steps, &result, csize_p)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    if (csize_p) igraph_vector_destroy(csize_p);
+    igraph_matrix_destroy(&merges);
+    return NULL;
+  }
+  igraph_matrix_destroy(&merges);
+
+  result_o = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&result);
+
+  return result_o;
+}
 
 /* Attribute handlers for the Python interface */
 
@@ -1087,6 +1121,10 @@ static igraph_attribute_table_t igraphmodule_i_attribute_table = {
  */
 static PyMethodDef igraphmodule_methods[] = 
 {
+  {"community_to_membership", (PyCFunction)igraphmodule_community_to_membership,
+    METH_VARARGS | METH_KEYWORDS,
+    "community_to_membership(merges, nodes, steps, return_csize=False)\n\n"
+  },
   {"convex_hull", (PyCFunction)igraphmodule_convex_hull, METH_VARARGS,
       "convex_hull(vs, coords=False)\n\n"
       "Calculates the convex hull of a given point set.\n\n"

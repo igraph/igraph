@@ -25,6 +25,7 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 from statistics import Histogram
 from copy import copy, deepcopy
 from StringIO import StringIO
+from igraph import community_to_membership
 try:
     set, frozenset
 except NameError:
@@ -508,57 +509,22 @@ class VertexDendrogram(VertexClustering, Dendrogram):
             communities = range(graph.vcount())
             modularity = []
             n = graph.vcount()
-            modularity.append(graph.modularity(ms))
-            for c1, c2 in merges:
-                try:
-                    cidx1 = communities[c1]
-                    cidx2 = communities[c2]
-                except IndexError:
-                    raise ValueError, "invalid merge matrix, referencing nonexisting community"
-                if cidx1 == -1 or cidx2 == -1:
-                    raise ValueError, "invalid merge matrix, referencing already joined community"
-                for idx, m in enumerate(ms):
-                    if m == cidx2: ms[idx] = cidx1
-                communities.append(communities[c1])
-                communities[c1] = -1
-                communities[c2] = -1
+            for step in xrange(min(n-1, len(merges))):
+                ms = community_to_membership(merges, graph.vcount(), maxidx)
                 modularity.append(graph.modularity(ms))
 
         if membership is None:
             maxmod = max(modularity)
             maxidx = modularity.index(maxmod)
-            membership = range(graph.vcount())
-            communities = range(graph.vcount())
-            midx = 0
-            while maxidx>0:
-                maxidx -= 1
-                c1, c2 = merges[midx]
-                midx += 1
-                try:
-                    cidx1 = communities[c1]
-                    cidx2 = communities[c2]
-                except IndexError:
-                    raise ValueError, "invalid merge matrix, referencing nonexisting community"
-
-                if cidx1 == -1 or cidx2 == -1:
-                    raise ValueError, "invalid merge matrix, referencing already joined community"
-
-                for idx, m in enumerate(membership):
-                    if m == cidx2: membership[idx] = cidx1
-
-                communities.append(communities[c1])
-                communities[c1] = -1
-                communities[c2] = -1
-
-            recoding = {}
-            n=0
+            membership = community_to_membership(merges, graph.vcount(), maxidx)
+            
+            recoding, n = {}, 0
             for idx, m in enumerate(membership):
                 try:
-                    v = recoding[m]
+                    membership[idx] = recoding[m]
                 except KeyError:
-                    recoding[m], v = n, n
+                    recoding[m], membership[idx] = n, n
                     n += 1
-                membership[idx] = v
 
         else:
             maxmod = None
@@ -576,29 +542,8 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         @return: the membership vector
         """
         num_elts = self._graph.vcount()
-        membership = range(self._graph.vcount())
-        communities = range(self._graph.vcount())
-        midx = 0
-        while num_elts>n:
-            num_elts -= 1
-            c1, c2 = self._merges[midx]
-            midx += 1
-            try:
-                cidx1 = communities[c1]
-                cidx2 = communities[c2]
-            except IndexError:
-                raise ValueError, "invalid merge matrix, referencing nonexisting community in row %d" % idx
-
-            if cidx1 == -1 or cidx2 == -1:
-                raise ValueError, "invalid merge matrix, referencing already joined community in row %d" % idx
-
-            for idx, m in enumerate(membership):
-                if m == cidx2: membership[idx] = cidx1
-
-            communities.append(communities[c1])
-            communities[c1] = -1
-            communities[c2] = -1
-
+        membership = community_to_membership(self._merges, num_elts, num_elts-n)
+        
         recoding = {}
         n=0
         for idx, m in enumerate(membership):
@@ -610,5 +555,5 @@ class VertexDendrogram(VertexClustering, Dendrogram):
             membership[idx] = v
  
         self._membership = membership
-        self._len = max(membership) - min(membership) + 1
+        self._len = max(membership) - 1
         return copy(membership)
