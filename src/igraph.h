@@ -820,7 +820,8 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
 int igraph_girth(const igraph_t *graph, igraph_integer_t *girth, 
 		 igraph_vector_t *circle);
 int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
-int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result);
+int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
+         igraph_vector_t *ins, igraph_vector_t *outs);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */

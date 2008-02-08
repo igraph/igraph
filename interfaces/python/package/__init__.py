@@ -92,6 +92,7 @@ class Graph(core.GraphBase):
             directed = edges
             edges = n
             n = 1
+            print "HERE"
         edges = edges or []
         directed = directed or False
         graph_attrs = graph_attrs or {}
@@ -143,7 +144,7 @@ class Graph(core.GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['degree']=_igraph.IN
+        kwds['type']=IN
         return self.degree(*args, **kwds)
 
     def outdegree(self, *args, **kwds):
@@ -151,7 +152,7 @@ class Graph(core.GraphBase):
         
         See L{degree} for possible arguments.
         """
-        kwds['degree']=_igraph.OUT
+        kwds['type']=OUT
         return self.degree(*args, **kwds)
 
     def biconnected_components(self, return_articulation_points=False):

@@ -3795,32 +3795,39 @@ int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to)
 }
 
 
-int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result) {
+int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
+  igraph_vector_t *ins, igraph_vector_t *outs) {
   long int no_of_nodes = igraph_vcount(graph);
   long int no_of_edges = igraph_ecount(graph);
   long int i, j, k, n;
-  long int *geodist, *ins, *outs;
-  igraph_vector_t *eids;
+  long int *geodist;
+  igraph_vector_t *eids, *ins_p, *outs_p, ins_v, outs_v;
   igraph_dqueue_t q;
   igraph_adjedgelist_t adjlist;
   igraph_bool_t directed = igraph_is_directed(graph);
 
-  IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
+  if (result != 0) IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
   IGRAPH_CHECK(igraph_dqueue_init(&q, 100));
   IGRAPH_FINALLY(igraph_dqueue_destroy, &q);
 
-  ins=igraph_Calloc(no_of_edges, long int);
-  if (ins==0) {
-    IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
+  if (ins == 0) {
+	ins_p = &ins_v;
+	IGRAPH_VECTOR_INIT_FINALLY(ins_p, no_of_edges);
+  } else {
+	ins_p = ins;
+	IGRAPH_CHECK(igraph_vector_resize(ins_p, no_of_edges));
+	igraph_vector_null(ins_p);
   }
-  IGRAPH_FINALLY(igraph_free, ins);
-  
-  outs=igraph_Calloc(no_of_edges, long int);
-  if (outs==0) {
-    IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
+
+  if (outs == 0) {
+	outs_p = &outs_v;
+	IGRAPH_VECTOR_INIT_FINALLY(outs_p, no_of_edges);
+  } else {
+	outs_p = outs;
+	IGRAPH_CHECK(igraph_vector_resize(outs_p, no_of_edges));
+	igraph_vector_null(outs_p);
   }
-  IGRAPH_FINALLY(igraph_free, outs);
-  
+
   geodist=igraph_Calloc(no_of_nodes, long int);
   if (geodist==0) {
     IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
@@ -3833,7 +3840,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result) {
     igraph_neimode_t neimode = (k==0)?IGRAPH_OUT:IGRAPH_IN;
     IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, neimode));
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
-    long int *vec = (k==0)?ins:outs;
+    igraph_real_t *vec = (k==0)?VECTOR(*ins_p):VECTOR(*outs_p);
     for (i=0; i<no_of_nodes; i++) {
       igraph_dqueue_clear(&q);
       memset(geodist, 0, sizeof(long int)*no_of_nodes);
@@ -3855,9 +3862,9 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result) {
                * increase either the size of the infield or the outfield */
               if (!directed) {
                 if (actnode < neighbor)
-                  ins[(long int)VECTOR(*eids)[j]] += 1;
+                  VECTOR(*ins_p)[(long int)VECTOR(*eids)[j]] += 1;
                 else
-                  outs[(long int)VECTOR(*eids)[j]] += 1;
+                  VECTOR(*outs_p)[(long int)VECTOR(*eids)[j]] += 1;
               } else vec[(long int)VECTOR(*eids)[j]] += 1;
             } else if (geodist[neighbor]-1 < actdist+1) continue;
           } else {
@@ -3868,9 +3875,9 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result) {
              * increase either the size of the infield or the outfield */
             if (!directed) {
               if (actnode < neighbor)
-                ins[(long int)VECTOR(*eids)[j]] += 1;
+                VECTOR(*ins_p)[(long int)VECTOR(*eids)[j]] += 1;
               else
-                outs[(long int)VECTOR(*eids)[j]] += 1;
+                VECTOR(*outs_p)[(long int)VECTOR(*eids)[j]] += 1;
             } else vec[(long int)VECTOR(*eids)[j]] += 1;
             geodist[neighbor]=actdist+2;
           }
@@ -3881,21 +3888,29 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result) {
     igraph_adjedgelist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  IGRAPH_FINALLY_CLEAN(1);
 
-  for (i=0; i<no_of_edges; i++)
-    VECTOR(*result)[i] = (igraph_real_t)(ins[i]-outs[i])/(ins[i]+outs[i]);
+  if (result != 0) {
+	for (i=0; i<no_of_edges; i++)
+      VECTOR(*result)[i] = (VECTOR(*ins_p)[i]-VECTOR(*outs_p)[i]) / 
+	    (VECTOR(*ins_p)[i]+VECTOR(*outs_p)[i]);
+	if (!directed) {
+	  for (i=0; i<no_of_edges; i++)
+		if (VECTOR(*result)[i] < 0) VECTOR(*result)[i] = -VECTOR(*result)[i];
+	}
+  }
 
-  if (!directed) {
-    for (i=0; i<no_of_edges; i++)
-      if (VECTOR(*result)[i] < 0) VECTOR(*result)[i] = -VECTOR(*result)[i];
+  if (ins == 0) {
+	igraph_vector_destroy(ins_p);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (outs == 0) {
+	igraph_vector_destroy(outs_p);
+    IGRAPH_FINALLY_CLEAN(1);
   }
 
   igraph_free(geodist);
-  igraph_free(ins);
-  igraph_free(outs);
   igraph_dqueue_destroy(&q);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }

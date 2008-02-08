@@ -900,7 +900,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   /* here we go */
   
   for (source=0; source<no_of_nodes; source++) {
-
+    IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
 
     memset(distance, 0, no_of_nodes*sizeof(long int));
@@ -967,7 +967,8 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     }
     /* Ok, we've the scores for this source */
   } /* for source <= no_of_nodes */
-  
+  IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0, 0);
+
   /* clean and return */
   igraph_Free(distance);
   igraph_Free(nrgeo);

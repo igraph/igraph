@@ -428,10 +428,10 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
  * If if \p merges is not a complete dendrogram, it is possible to
  * take \p steps steps if \p steps is not bigger than the number 
  * lines in \p merges.
- * \param graph The input graph.
  * \param merges The two-column matrix containing the merge
  *    operations. See \ref igraph_community_walktrap() for the
  *    detailed syntax.
+ * \param nodes The number of leaf nodes in the dendrogram
  * \param steps Integer constant, the number of steps to take.
  * \param membership Pointer to an initialied vector, the membership
  *    results will be stored here, if not NULL. The vector will be

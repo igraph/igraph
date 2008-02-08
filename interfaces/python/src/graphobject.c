@@ -944,8 +944,8 @@ PyObject *igraphmodule_Graph_farthest_points(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (from >= 0) return Py_BuildValue("(lll)", (long)from, (long)to, (long)len);
-  return Py_BuildValue("(OOl)", Py_None, Py_None, (long)len);
+  if (from >= 0) return Py_BuildValue("lll", (long)from, (long)to, (long)len);
+  return Py_BuildValue("OOl", Py_None, Py_None, (long)len);
 }
 
 /**
@@ -956,9 +956,7 @@ PyObject *igraphmodule_Graph_girth(igraphmodule_GraphObject *self,
                                    PyObject *args, PyObject *kwds)
 {
   PyObject *sc = Py_False;
-  static char *kwlist[] = {
-  "return_shortest_circle", NULL
-  };
+  static char *kwlist[] = { "return_shortest_circle", NULL };
   igraph_integer_t girth;
   igraph_vector_t vids;
 
@@ -967,16 +965,16 @@ PyObject *igraphmodule_Graph_girth(igraphmodule_GraphObject *self,
 
   igraph_vector_init(&vids, 0);
   if (igraph_girth(&self->g, &girth, &vids)) {
-  igraphmodule_handle_igraph_error();
-  igraph_vector_destroy(&vids);
-  return NULL;
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&vids);
+    return NULL;
   }
 
   if (PyObject_IsTrue(sc)) {
-  PyObject* o;
-  o=igraphmodule_vector_t_to_PyList(&vids, IGRAPHMODULE_TYPE_INT);
-  igraph_vector_destroy(&vids);
-  return o;
+    PyObject* o;
+    o=igraphmodule_vector_t_to_PyList(&vids, IGRAPHMODULE_TYPE_INT);
+    igraph_vector_destroy(&vids);
+    return o;
   }
   return PyInt_FromLong((long)girth);
 }
@@ -990,15 +988,39 @@ PyObject *igraphmodule_Graph_convergence_degree(igraphmodule_GraphObject *self) 
 	PyObject *o;
 
   igraph_vector_init(&result, 0);
-  if (igraph_convergence_degree(&self->g, &result)) {
-	  igraphmodule_handle_igraph_error();
-	  igraph_vector_destroy(&result);
-	  return NULL;
+  if (igraph_convergence_degree(&self->g, &result, 0, 0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&result);
+    return NULL;
   }
 
   o=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
   igraph_vector_destroy(&result);
   return o;
+}
+
+/**
+ * \ingroup python_interface_graph
+ * \brief Calculates the sizes of the convergence fields in a graph 
+ */
+PyObject *igraphmodule_Graph_convergence_field_size(igraphmodule_GraphObject *self) {
+  igraph_vector_t ins, outs;
+  PyObject *o1, *o2;
+
+  igraph_vector_init(&ins, 0);
+  igraph_vector_init(&outs, 0);
+  if (igraph_convergence_degree(&self->g, 0, &ins, &outs)) {
+	igraphmodule_handle_igraph_error();
+	igraph_vector_destroy(&ins);
+	igraph_vector_destroy(&outs);
+	return NULL;
+  }
+
+  o1=igraphmodule_vector_t_to_PyList(&ins, IGRAPHMODULE_TYPE_INT);
+  o2=igraphmodule_vector_t_to_PyList(&outs, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&ins);
+  igraph_vector_destroy(&outs);
+  return Py_BuildValue("NN", o1, o2);
 }
 
 /** \ingroup python_interface_graph
@@ -1007,8 +1029,7 @@ PyObject *igraphmodule_Graph_convergence_degree(igraphmodule_GraphObject *self) 
  * \sa igraph_adjacency
  */
 PyObject *igraphmodule_Graph_Adjacency(PyTypeObject * type,
-                                       PyObject * args, PyObject * kwds)
-{
+                                       PyObject * args, PyObject * kwds) {
   igraphmodule_GraphObject *self;
   igraph_matrix_t m;
   PyObject *matrix;
@@ -7834,11 +7855,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   },
 
   /* interface to igraph_convergence_degree */
-	{"convergence_degree", (PyCFunction)igraphmodule_Graph_convergence_degree,
-	 METH_NOARGS,
-	 "convergence_degree()\n\n"
-	 "Undocumented (yet)."
-	},
+  {"convergence_degree", (PyCFunction)igraphmodule_Graph_convergence_degree,
+    METH_NOARGS,
+    "convergence_degree()\n\n"
+	"Undocumented (yet)."
+  },
+
+  /* interface to igraph_convergence_field_size */
+  {"convergence_field_size", (PyCFunction)igraphmodule_Graph_convergence_field_size,
+    METH_NOARGS,
+    "convergence_field_size()\n\n"
+	"Undocumented (yet)."
+  },
 
   /* interface to igraph_hub_score */
   {"hub_score", (PyCFunction)igraphmodule_Graph_hub_score,

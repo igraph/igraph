@@ -533,7 +533,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     if (igraph_vector_any_smaller(weights, 0))
       IGRAPH_ERROR("weights must be positive", IGRAPH_EINVAL);
     weight_sum = igraph_vector_sum(weights);
-  }
+  } else weight_sum = no_of_edges;
 
   /* Create degree vector */
   IGRAPH_VECTOR_INIT_FINALLY(&a, no_of_nodes);
