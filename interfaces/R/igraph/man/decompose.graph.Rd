@@ -3,7 +3,8 @@
 \title{Decompose a graph into components}
 \description{Creates a separate graph for each component of a graph.}
 \usage{
-decompose.graph(graph, mode = "weak", max.comps = NA, min.vertices = 0) 
+decompose.graph(graph, mode = c("weak", "strong"),
+       max.comps = NA, min.vertices = 0) 
 }
 \arguments{
   \item{graph}{The original graph.}

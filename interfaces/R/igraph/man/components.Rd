@@ -5,7 +5,7 @@
   opposite: all vertices from which a given vertex is reachable via a
   directed path.}
 \usage{
-subcomponent(graph, v, mode = "all")
+subcomponent(graph, v, mode = c("all", "out", "in"))
 }
 \arguments{
   \item{graph}{The graph to analyze.}

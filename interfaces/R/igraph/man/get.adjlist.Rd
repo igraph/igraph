@@ -6,8 +6,8 @@
   edges or for neighboring vertices
 }
 \usage{
-get.adjlist(graph, mode = "all")
-get.adjedgelist(graph, mode = "all")
+get.adjlist(graph, mode = c("all", "out", "in", "total"))
+get.adjedgelist(graph, mode = c("all", "out", "in", "total"))
 }
 \arguments{
   \item{graph}{The input graph.}

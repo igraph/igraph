@@ -27,7 +27,8 @@
 spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
                                 parupdate=FALSE, start.temp=1,
                                 stop.temp=0.01, cool.fact=0.99,
-                                update.rule="config", gamma=1.0) {
+                                update.rule=c("config", "random", "simple"),
+                                gamma=1.0) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -41,9 +42,8 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
     }
   }
 
-  if (is.character(update.rule)) {
-    update.rule <- switch(update.rule, "simple"=0, "random"=0, "config"=1)
-  }
+  update.rule <- igraph.match.arg(update.rule)
+  update.rule <- switch(update.rule, "simple"=0, "random"=0, "config"=1)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (is.null(vertex)) {    

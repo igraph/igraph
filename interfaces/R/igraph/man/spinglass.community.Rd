@@ -6,14 +6,15 @@
 \synopsis{
 spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
                     parupdate=FALSE, start.temp=1, stop.temp=0.01,
-                    cool.fact=0.99, update.rule="config", gamma=1)
+                    cool.fact=0.99, update.rule=c("config", "random",
+                    "simple"), gamma=1)
 }
 \usage{
 spinglass.community(graph, weights=NULL, spins=25, parupdate=FALSE,
                     start.temp=1, stop.temp=0.1, cool.fact=0.99,
-                    update.rule="config", gamma=1)
+                    update.rule=c("config", "random", "simple"), gamma=1)
 spinglass.community(graph, weights=NULL, vertex, spins=25,
-                    update.rule="config", gamma=1)
+                    update.rule=c("config", "random", "simple"), gamma=1)
 }
 \arguments{
   \item{graph}{The input graph, can be directed but the direction of the

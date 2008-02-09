@@ -7,8 +7,10 @@
   their connection patterns.
 }
 \usage{
-similarity.jaccard(graph, vids = V(graph), mode = "all", loops = FALSE)
-similarity.dice(graph, vids = V(graph), mode = "all", loops = FALSE)
+similarity.jaccard(graph, vids = V(graph), mode = c("all", "out", "in",
+      "total"), loops = FALSE) 
+similarity.dice(graph, vids = V(graph), mode = c("all", "out", "in",
+      "total"), loops = FALSE)
 }
 \arguments{
   \item{graph}{The input graph.}

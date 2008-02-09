@@ -8,10 +8,10 @@
   limit from another fixed vertex, these are called the neighborhood of
   the vertex.}
 \usage{
-neighborhood.size(graph, order, nodes=V(graph), mode="all")
-neighborhood(graph, order, nodes=V(graph), mode="all")
-graph.neighborhood(graph, order, nodes=V(graph), mode="all")
-connect.neighborhood(graph, order, mode="all")
+neighborhood.size(graph, order, nodes=V(graph), mode=c("all", "out", "in"))
+neighborhood(graph, order, nodes=V(graph), mode=c("all", "out", "in"))
+graph.neighborhood(graph, order, nodes=V(graph), mode=c("all", "out", "in"))
+connect.neighborhood(graph, order, mode=c("all", "out", "in", "total"))
 }
 \arguments{
   \item{graph}{The input graph.}

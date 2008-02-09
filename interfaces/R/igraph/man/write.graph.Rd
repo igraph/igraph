@@ -5,7 +5,8 @@
   graphs to foreign file formats, however not many formats are
   implemented right now.}
 \usage{
-write.graph(graph, file, format="edgelist", \dots)
+write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
+       "lgl", "graphml", "dimacs", "gml", "dot"), \dots)
 }
 \arguments{
   \item{graph}{The graph to export.}

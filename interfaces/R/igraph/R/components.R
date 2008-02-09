@@ -24,13 +24,13 @@
 # Connected components, subgraphs, kinda
 ###################################################################
 
-no.clusters <- function(graph, mode="weak") {
+no.clusters <- function(graph, mode=c("weak", "strong")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.character(mode)) {
-    mode <- switch(mode, "weak"=1, "strong"=2)
-  }
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "weak"=1, "strong"=2)
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_no_clusters", graph, as.numeric(mode),
         PACKAGE="igraph")
@@ -57,26 +57,26 @@ cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
   res
 }
 
-is.connected <- function(graph, mode="weak") {
+is.connected <- function(graph, mode=c("weak", "strong")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.character(mode)) {
-    mode <- switch(mode, "weak"=1, "strong"=2)
-  }
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "weak"=1, "strong"=2)
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_is_connected", graph, as.numeric(mode),
         PACKAGE="igraph")
 }
 
-decompose.graph <- function(graph, mode="weak", max.comps=NA,
+decompose.graph <- function(graph, mode=c("weak", "strong"), max.comps=NA,
                       min.vertices=0) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.character(mode)) {
-    mode <- switch(mode, "weak"=1, "strong"=2)
-  }
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "weak"=1, "strong"=2)
+
   if (is.na(max.comps)) {
     max.comps=-1
   }

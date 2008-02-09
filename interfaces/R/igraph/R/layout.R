@@ -267,7 +267,9 @@ layout.merge <- function(graphs, layouts, method="dla",
 
 # FROM SNA 0.5
 
-symmetrize.mat <- function(mats,rule="weak"){
+symmetrize.mat <- function(mats,rule=c("weak", "strong", "lower", "upper")){
+   rule <- igraph.match.arg(rule)
+   
    #Build the input data structures
    if(length(dim(mats))>2){
       m<-dim(mats)[1]

@@ -35,21 +35,17 @@ ARRAY3_OR_0:
 ATTRIBUTES:
 
 CONNECTEDNESS:
-    INCONV: %I% <- as.numeric(pmatch(tolower(%I%), c("weak", "strong"))) ; \
-            if (is.na(%I%)) { stop("invalid `%I%' argument, see docs") }
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "weak"=1, "strong"=2)
     DEFAULT:
-       WEAK: "weak"
+       WEAK: c("weak", "strong")
 
 NEIMODE:
-    INCONV: %I% <- as.numeric(pmatch(tolower(%I%), c("out", "in", "all", "total")));\
-            if (is.na(%I%)) { stop("invalid `%I%' argument, see docs") } \
-            if (%I%==4) { %I% <- 3 } \
-            %I% <- as.numeric(%I%)
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "out"=1, "in"=2, "all"=3, "total"=3)
     DEFAULT:
-       ALL: "all"
-       TOTAL: "total"
-       OUT: "out"
-       IN: "in"
+       ALL: c("all", "out", "in", "total")
+       TOTAL: c("total", "out", "in", "all")
+       OUT: c("out", "in", "all", "total")
+       IN: c("in", "out", "all", "total")
 
 INTEGERPTR:
     INCONV:
@@ -92,7 +88,6 @@ ARPACKOPT:
 STRVECTOR:
 
 BLISSSH:
-    INCONV: %I% <- as.numeric(pmatch(tolower(%I%), c("f","fl","fs","fm","flm","fsm"))) ; \
-            if (is.na(%I%)) { stop("invalid `%I%' argument, see docs") }
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "f"=0, "fl"=1, "fs"=2, "fm"=3, "flm"=4, "fsm"=5)
 
 BLISSINFO:

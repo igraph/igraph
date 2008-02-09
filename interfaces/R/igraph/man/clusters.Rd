@@ -6,9 +6,9 @@
 \title{Connected components of a graph}
 \description{}
 \usage{
-is.connected(graph, mode="weak")
-clusters(graph, mode="weak")
-no.clusters(graph, mode="weak")
+is.connected(graph, mode=c("weak", "strong"))
+clusters(graph, mode=c("weak", "strong"))
+no.clusters(graph, mode=c("weak", "strong"))
 cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
 }
 \arguments{

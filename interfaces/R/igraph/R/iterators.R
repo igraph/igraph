@@ -89,12 +89,12 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   } else {
     # language expression, we also do attribute based indexing
     graph <- get("graph", attr(x, "env"))
-    nei <- function(v, mode=3) {
+    nei <- function(v, mode=c("all", "in", "out", "total")) {
       ## TRUE iff the vertex is a neighbor (any type)
       ## of at least one vertex in v
-      if (is.character(mode)) {
-        mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-      }
+      mode <- igraph.match.arg(mode)
+      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+
       if (is.logical(v)) {
         v <- which(v)
       }
@@ -104,10 +104,10 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                    PACKAGE="igraph")
       tmp[as.numeric(x)+1]
     }
-    innei <- function(v, mode=2) {
+    innei <- function(v, mode=c("in", "all", "out", "total")) {
       nei(v, mode)
     }
-    outnei <- function(v, mode=1) {
+    outnei <- function(v, mode=c("out", "all", "in", "total")) {
       nei(v, mode)
     }
     adj <- function(e) {

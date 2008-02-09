@@ -7,7 +7,7 @@
   edges. 
 }
 \usage{
-topological.sort(graph, mode="out")
+topological.sort(graph, mode=c("out", "all", "in"))
 }
 \arguments{
   \item{graph}{The input graph, should be directed}

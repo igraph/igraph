@@ -156,7 +156,7 @@ graph.extended.chordal.ring(n, w)
 %\references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{graph.adjacency}} to create graphs from adjacency
-  matrices, \code{\link{graph.formule}} for a handy way to create small
+  matrices, \code{\link{graph.formula}} for a handy way to create small
   graphs.
 }
 \examples{

@@ -5,8 +5,9 @@
 \description{Cloness centrality measures how many steps is required
   to access every other vertex from a given vertex.}
 \usage{
-closeness(graph, v=V(graph), mode = "all")
-closeness.estimate(graph, vids=V(graph), mode = "out", cutoff)
+closeness(graph, v=V(graph), mode = c("all", "out", "in"))
+closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
+       "total"), cutoff) 
 }
 \arguments{
   \item{graph}{The graph to analyze.}

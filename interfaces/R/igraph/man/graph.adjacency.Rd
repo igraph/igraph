@@ -4,7 +4,8 @@
 \description{\code{graph.adjacency} is a flexible function for creating
   \code{igraph} graphs from adjacency matrices.}
 \usage{
-graph.adjacency(adjmatrix, mode="directed", weighted=NULL, diag=TRUE)
+graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
+        "min", "upper", "lower", "plus"), weighted=NULL, diag=TRUE)
 }
 \arguments{
   \item{adjmatrix}{A square adjacency matrix.}
@@ -89,7 +90,7 @@ graph.adjacency(adjmatrix, mode="directed", weighted=NULL, diag=TRUE)
   An igraph graph object.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\link{graph.constructors} and \code{\link{graph.formula}} for
+\seealso{\link{graph} and \code{\link{graph.formula}} for
   other ways to create graphs.
 }
 \examples{

@@ -66,7 +66,8 @@ write.graph.fromraw <- function(buffer, file) {
   invisible(NULL)
 }
 
-read.graph <- function(file, format="edgelist", ...) {
+read.graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
+                               "graphml", "dimacs", "graphdb", "gml"), ...) {
 
   if (igraph.i.have.fmemopen) {
     file <- read.graph.toraw(file)
@@ -78,8 +79,7 @@ read.graph <- function(file, format="edgelist", ...) {
     }
   }
 
-  format <- tolower(format)
-  
+  format <- igraph.match.arg(format)
   res <- switch(format,
                 "pajek"=read.graph.pajek(file, ...),
                 "ncol"=read.graph.ncol(file, ...),
@@ -94,7 +94,8 @@ read.graph <- function(file, format="edgelist", ...) {
   res
 }
 
-write.graph <- function(graph, file, format="edgelist", ...) {
+write.graph <- function(graph, file, format=c("edgelist", "pajek", "ncol", "lgl",
+                                       "graphml", "dimacs", "gml", "dot"), ...) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -109,8 +110,7 @@ write.graph <- function(graph, file, format="edgelist", ...) {
     }
   }
   
-  format <- tolower(format)
-
+  format <- igraph.match.arg(format)
   res <- switch(format,
                 "pajek"=write.graph.pajek(graph, file, ...),
                 "edgelist"=write.graph.edgelist(graph, file, ...),

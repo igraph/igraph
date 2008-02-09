@@ -20,14 +20,14 @@
 #
 ###################################################################
 
-get.adjacency <- function(graph, type="both", attr=NULL, names=TRUE,
+get.adjacency <- function(graph, type=c("both", "upper", "lower"),
+                          attr=NULL, names=TRUE,
                           binary=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.character(type)) {
-    type <- switch(type, "upper"=0, "lower"=1, "both"=2)
-  }
+  type <- igraph.match.arg(type)
+  type <- switch(type, "upper"=0, "lower"=1, "both"=2)
   
   if (is.null(attr)) {    
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -94,50 +94,50 @@ get.edgelist <- function(graph, names=TRUE) {
   res
 }
 
-as.directed <- function(graph, mode="mutual") {
+as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
-  if (is.character(mode)) {
-    mode <- switch(mode, "arbitrary"=0, "mutual"=1)
-  }
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "arbitrary"=0, "mutual"=1)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_to_directed", graph, as.numeric(mode),
         PACKAGE="igraph")
 }
 
-as.undirected <- function(graph, mode="collapse") {
+as.undirected <- function(graph, mode=c("collapse", "each")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
-  if (is.character(mode)) {
-    mode <- switch(mode, "each"=0, "collapse"=1)
-  }
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "each"=0, "collapse"=1)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_to_undirected", graph, as.numeric(mode),
         PACKAGE="igraph")  
 }
 
-get.adjlist <- function(graph, mode="all") {
+get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
+  mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_adjlist", graph, mode,
         PACKAGE="igraph")
 }
 
-get.adjedgelist <- function(graph, mode="all") {
+get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
 
+  mode <- igraph.match.arg(mode)
   mode <- as.numeric(switch(mode, "out"=1, "in"=2, "all"=3, "total"=3))
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_get_adjedgelist", graph, mode,

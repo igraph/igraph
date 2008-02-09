@@ -5,7 +5,7 @@
   vertex has at least degree k. The coreness of a vertex is k if it
   belongs to the k-core but not to the (k+1)-core.}
 \usage{
-graph.coreness(graph, mode="all")
+graph.coreness(graph, mode=c("all", "out", "in"))
 }
 \arguments{
   \item{graph}{The input graph, it can be directed or undirected}

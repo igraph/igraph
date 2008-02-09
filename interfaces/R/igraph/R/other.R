@@ -43,3 +43,16 @@ igraph.sample <- function(low, high, length) {
         as.numeric(length),
         PACKAGE="igraph")
 }
+
+igraph.match.arg <- function(arg, choices, several.ok=FALSE) {
+  if (missing(choices)) {
+    formal.args <- formals(sys.function(sys.parent()))
+    choices <- eval(formal.args[[deparse(substitute(arg))]])
+  }
+
+  arg <- tolower(arg)
+  choices <- tolower(choices)
+
+  match.arg(arg=arg, choices=choices, several.ok=several.ok)
+}
+

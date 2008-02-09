@@ -6,8 +6,8 @@
   directed, \code{as.undirected} is the opposite, it converts a directed
   graph to undirected.}
 \usage{
-as.directed(graph, mode = "mutual") 
-as.undirected(graph, mode = "collapse") 
+as.directed(graph, mode = c("mutual", "arbitrary")) 
+as.undirected(graph, mode = c("collapse", "each")) 
 }
 \arguments{
   \item{graph}{The graph to convert.}

@@ -115,9 +115,12 @@ graph.formula <- function(...) {
   res  
 }
 
-graph.adjacency <- function(adjmatrix, mode="directed",
+graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
+                                         "min", "upper", "lower", "plus"),
                             weighted=NULL, diag=TRUE ) {
 
+  mode <- igraph.match.arg(mode)
+  
   if (!diag) { diag(adjmatrix) <- 0 }
   
   if (!is.null(weighted)) {
@@ -201,11 +204,11 @@ graph.adjacency <- function(adjmatrix, mode="directed",
 }
   
 
-graph.star <- function(n, mode="in", center=0 ) {
+graph.star <- function(n, mode=c("in", "out", "undirected"), center=0 ) {
 
-  if (is.character(mode)) {
-    mode <- switch(mode, "out"=0, "in"=1, "undirected"=2)
-  }
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "out"=0, "in"=1, "undirected"=2)
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_star", as.numeric(n), as.numeric(mode),
         as.numeric(center),
@@ -291,10 +294,10 @@ graph.ring <- function(n, directed=FALSE, mutual=FALSE, circular=TRUE) {
 # Trees, regular
 ###################################################################
 
-graph.tree <- function(n, children=2, mode="out") {
-  if (is.character(mode)) {
-    mode <- switch(mode, "out"=0, "in"=1, "undirected"=2);
-  }
+graph.tree <- function(n, children=2, mode=c("out", "in", "undirected")) {
+
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "out"=0, "in"=1, "undirected"=2);
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_tree", as.numeric(n), as.numeric(children),

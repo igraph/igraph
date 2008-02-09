@@ -93,11 +93,10 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
 
 barabasi.game <- ba.game
 
-erdos.renyi.game <- function(n, p.or.m, type="gnp",
+erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
                              directed=FALSE, loops=FALSE, ...) {
-  if (is.character(type)) {
-    type <- switch(type, "gnp"=0, "gnm"=1)
-  }
+  type <- igraph.match.arg(type)
+  type <- switch(type, "gnp"=0, "gnm"=1)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_erdos_renyi_game", as.numeric(n), as.numeric(type),
@@ -110,9 +109,8 @@ random.graph.game <- erdos.renyi.game
 degree.sequence.game <- function(out.deg, in.deg=numeric(0),
                                  method="simple", ...) {
 
-  if (is.character(method)) {
-    method <- switch(method, "simple"=0)
-  }
+  method <- igraph.match.arg(method)
+  method <- switch(method, "simple"=0)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_degree_sequence_game", as.numeric(out.deg),
@@ -278,13 +276,12 @@ asymmetric.preference.game <- function(nodes, types,
         PACKAGE="igraph")
 }
 
-connect.neighborhood <- function(graph, order, mode="all") {
+connect.neighborhood <- function(graph, order, mode=c("all", "out", "in", "total")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.character(mode)) {
-    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-  }
+  mode <- igraph.match.arg(mode)
+  mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_connect_neighborhood", graph, as.numeric(order),

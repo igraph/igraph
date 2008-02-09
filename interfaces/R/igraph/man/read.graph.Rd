@@ -9,7 +9,8 @@
   various representations from a file, or from a http
   connection. Currently some simple formats are supported.}
 \usage{
-read.graph(file, format = "edgelist", \dots)
+read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
+        "graphml", "dimacs", "graphdb", "gml"), \dots)
 }
 \arguments{
   \item{file}{The connection to read from. This can be a local file, or
