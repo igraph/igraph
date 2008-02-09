@@ -1,3 +1,9 @@
+2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) 
+	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 
+	simple vertex shape support added
+
 2008-01-19  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/layout.R (layout.fruchterman.reingold)

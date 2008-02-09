@@ -112,7 +112,13 @@
       formats are allowed as for the fill color.
 
       By default it is \dQuote{black}.
-    }    
+    }
+    \item{shape}{The shape of the vertex, currently only
+      \dQuote{\code{circle}} and \dQuote{\code{square}} is supported,
+      and only by the \code{\link{plot.igraph}} command.
+
+      By default vertices are drawn as circles.
+    }
     \item{label}{The vertex labels. They will be converted to
       character. Specify \code{NA} to omit vertex labels.
 
