@@ -1,5 +1,9 @@
 2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/arpack.c (igraph_arpack_dssolve, igraph_arpack_dnsolve)
+	* src/error.h (igraph_error_type_t)
+	* src/error.c (igraph_i_error_strings) : better ARPACK error codes
+
 	* src/flow.c (igraph_i_maxflow_value_undirected)
 	(igraph_maxflow_value, igraph_i_mincut_undirected) : allow capacity
 	vector to be NULL

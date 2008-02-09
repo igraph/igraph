@@ -31,6 +31,87 @@
 
 /* The ARPACK example file dssimp.f is used as a template */
 
+int igraph_i_arpack_err_dsaupd(long int error) {
+  switch (error) {
+  case -1:      return IGRAPH_ARPACK_NPOS;
+  case -2:      return IGRAPH_ARPACK_NEVNPOS;
+  case -3:      return IGRAPH_ARPACK_NCVSMALL;
+  case -4:      return IGRAPH_ARPACK_NONPOSI;
+  case -5:      return IGRAPH_ARPACK_WHICHINV;
+  case -6:      return IGRAPH_ARPACK_BMATINV;
+  case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+  case -8:      return IGRAPH_ARPACK_TRIDERR;
+  case -9:      return IGRAPH_ARPACK_ZEROSTART;
+  case -10:     return IGRAPH_ARPACK_MODEINV;
+  case -11:     return IGRAPH_ARPACK_MODEBMAT;
+  case -12:     return IGRAPH_ARPACK_ISHIFT;
+  case -13:     return IGRAPH_ARPACK_NEVBE;
+  case -9999:   return IGRAPH_ARPACK_NOFACT;
+  default:      return IGRAPH_ARPACK_UNKNOWN;
+  }
+}
+
+int igraph_i_arpack_err_dseupd(long int error) {
+  switch (error) {
+  case -1:      return IGRAPH_ARPACK_NPOS;
+  case -2:      return IGRAPH_ARPACK_NEVNPOS;
+  case -3:      return IGRAPH_ARPACK_NCVSMALL;
+  case -5:      return IGRAPH_ARPACK_WHICHINV;
+  case -6:      return IGRAPH_ARPACK_BMATINV;
+  case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+  case -8:      return IGRAPH_ARPACK_TRIDERR;
+  case -9:      return IGRAPH_ARPACK_ZEROSTART;
+  case -10:     return IGRAPH_ARPACK_MODEINV;
+  case -11:     return IGRAPH_ARPACK_MODEBMAT;
+  case -12:     return IGRAPH_ARPACK_NEVBE;
+  case -14:     return IGRAPH_ARPACK_FAILED;
+  case -15:     return IGRAPH_ARPACK_HOWMNY;
+  case -16:     return IGRAPH_ARPACK_HOWMNYS;
+  case -17:     return IGRAPH_ARPACK_EVDIFF;
+  default:      return IGRAPH_ARPACK_UNKNOWN;
+  }
+  
+}
+
+int igraph_i_arpack_err_dnaupd(long int error) {
+  switch (error) {
+  case -1:      return IGRAPH_ARPACK_NPOS;
+  case -2:      return IGRAPH_ARPACK_NEVNPOS;
+  case -3:      return IGRAPH_ARPACK_NCVSMALL;
+  case -4:      return IGRAPH_ARPACK_NONPOSI;
+  case -5:      return IGRAPH_ARPACK_WHICHINV;
+  case -6:      return IGRAPH_ARPACK_BMATINV;
+  case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+  case -8:      return IGRAPH_ARPACK_TRIDERR;
+  case -9:      return IGRAPH_ARPACK_ZEROSTART;
+  case -10:     return IGRAPH_ARPACK_MODEINV;
+  case -11:     return IGRAPH_ARPACK_MODEBMAT;
+  case -12:     return IGRAPH_ARPACK_ISHIFT;
+  case -9999:   return IGRAPH_ARPACK_NOFACT;
+  default:      return IGRAPH_ARPACK_UNKNOWN;
+  }  
+}
+
+int igraph_i_arpack_err_dneupd(long int error) {
+  switch (error) {
+  case -1:      return IGRAPH_ARPACK_NPOS;
+  case -2:      return IGRAPH_ARPACK_NEVNPOS;
+  case -3:      return IGRAPH_ARPACK_NCVSMALL;
+  case -5:      return IGRAPH_ARPACK_WHICHINV;
+  case -6:      return IGRAPH_ARPACK_BMATINV;
+  case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+  case -8:      return IGRAPH_ARPACK_SHUR;
+  case -9:      return IGRAPH_ARPACK_LAPACK;
+  case -10:     return IGRAPH_ARPACK_MODEINV;
+  case -11:     return IGRAPH_ARPACK_MODEBMAT;
+  case -12:     return IGRAPH_ARPACK_HOWMNYS;
+  case -13:     return IGRAPH_ARPACK_HOWMNY;
+  case -14:     return IGRAPH_ARPACK_FAILED;
+  case -15:     return IGRAPH_ARPACK_EVDIFF;
+  default:      return IGRAPH_ARPACK_UNKNOWN;
+  }    
+}
+
 void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->bmat[0]='I';
   o->n=0;			/* needs to be updated! */
@@ -202,7 +283,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
       igraph_real_t *to=workd+options->ipntr[1]-1;
       if (fun(to, from, options->n, extra) != 0) {
 	IGRAPH_ERROR("Arpack error while evaluating matrix-vector product",
-		     IGRAPH_FAILURE);
+		     IGRAPH_ARPACK_PROD);
       }
       
     } else {
@@ -211,8 +292,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   
   if (options->info < 0) {
-    fprintf(stderr, "ARPACK error: %i\n", (int) options->info);
-    IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
   
   igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
@@ -223,8 +303,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 		&options->ierr);
   
   if (options->ierr < 0) {
-/*     fprintf(stderr, "ARPACK error: %i\n", (int)options->ierr); */
-    IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
   }    
   
   /* Save the result */
@@ -365,7 +444,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
       igraph_real_t *to=workd+options->ipntr[1]-1;
       if (fun(to, from, options->n, extra) != 0) {
 	IGRAPH_ERROR("Arpack error while evaluating matrix-vector product",
-		     IGRAPH_FAILURE);
+		     IGRAPH_ARPACK_PROD);
       }      
       
     } else {
@@ -374,8 +453,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   if (options->info < 0) {
-    fprintf(stderr, "ARPACK error: %i\n", (int) options->info);
-    IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dnaupd(options->info));
   }
 
   options->ierr=0;
@@ -387,8 +465,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 		&options->ierr);
 
   if (options->ierr < 0) {
-/*     fprintf(stderr, "ARPACK error: %i\n", (int)options->ierr); */
-    IGRAPH_ERROR("ARPACK error", IGRAPH_FAILURE);
+    IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dneupd(options->info));
   }    
 
   /* Save the result */

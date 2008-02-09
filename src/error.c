@@ -29,21 +29,44 @@
 
 static igraph_error_handler_t *igraph_i_error_handler=0;
 
-static char *igraph_i_error_strings[]={ "No error",            /* 0 */
-					"Failed",              /* 1 */
-					"Out of memory",       /* 2 */
-					"Parse error",         /* 3 */
-					"Invalid value",       /* 4 */
-					"Already exists",      /* 5 */
-					"Invalid edge vector", /* 6 */
-					"Invalid vertex id",   /* 7 */
-					"Non-square matrix",   /* 8 */
-					"Invalid mode",        /* 9 */
-					"File operation error",/* 10 */
-					"Unfold infinite iterator", /* 11 */
-                                        "Unimplemented function call", /* 12 */
-                                        "Interrupted",         /* 13 */
-					"Numeric procedure did not converge",/* 14 */
+static char *igraph_i_error_strings[]=
+  { /*  0 */ "No error",
+    /*  1 */ "Failed",
+    /*  2 */ "Out of memory",
+    /*  3 */ "Parse error",
+    /*  4 */ "Invalid value",
+    /*  5 */ "Already exists",
+    /*  6 */ "Invalid edge vector",
+    /*  7 */ "Invalid vertex id",
+    /*  8 */ "Non-square matrix",
+    /*  9 */ "Invalid mode",
+    /* 10 */ "File operation error",
+    /* 11 */ "Unfold infinite iterator",
+    /* 12 */ "Unimplemented function call",
+    /* 13 */ "Interrupted",
+    /* 14 */ "Numeric procedure did not converge",
+    /* 15 */ "Matrix-vector product failed",
+    /* 16 */ "N must be positive", 
+    /* 17 */ "NEV must be positive",
+    /* 18 */ "NCV must be bigger",
+    /* 19 */ "Maximum number of iterations should be positive",
+    /* 20 */ "Invalid WHICH parameter",
+    /* 21 */ "Invalid BMAT parameter",
+    /* 22 */ "WORKL is too small",
+    /* 23 */ "LAPACK error in tridiagonal eigenvalue calculation",
+    /* 24 */ "Starting vector is zero",
+    /* 25 */ "MODE is invalid",
+    /* 26 */ "MODE and BMAT are not compatible",
+    /* 27 */ "ISHIFT must be 0 or 1",
+    /* 28 */ "NEV and WHICH='BE' are incompatible",
+    /* 29 */ "Could not build an Arnoldi factorization",
+    /* 30 */ "No eigenvalues to sufficient accuracy",
+    /* 31 */ "HOWMNY is invalid",
+    /* 32 */ "HOWMNY='S' is not implemented",
+    /* 33 */ "Different number of converged Ritz values",
+    /* 34 */ "Error from calculation of a real Schur form",
+    /* 35 */ "LAPACK (dtrevc) error for calculating eigenvectors",
+    /* 36 */ "Unkown ARPACK error"
 };
 
 const char* igraph_strerror(const int igraph_errno) {

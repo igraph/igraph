@@ -306,14 +306,36 @@ typedef enum {
   IGRAPH_EFILE         = 10,
   IGRAPH_UNIMPLEMENTED = 12,
   IGRAPH_INTERRUPTED   = 13,
-  IGRAPH_DIVERGED      = 14
+  IGRAPH_DIVERGED      = 14,
+  IGRAPH_ARPACK_PROD      = 15,	/* matrix-vector product failed */
+  IGRAPH_ARPACK_NPOS      = 16,	/* dsaupd -1  dseupd -1  dnaupd -1  dneupd -1  */
+  IGRAPH_ARPACK_NEVNPOS   = 17, /* dsaupd -2  dseupd -2  dnaupd -2  dneupd -2  */
+  IGRAPH_ARPACK_NCVSMALL  = 18,	/* dsaupd -3  dseupd -3  dnaupd -3  dneupd -3  */
+  IGRAPH_ARPACK_NONPOSI   = 19, /* dsaupd -4             dnaupd -4             */
+  IGRAPH_ARPACK_WHICHINV  = 20,	/* dsaupd -5  dseupd -5  dnaupd -5  dneupd -5  */
+  IGRAPH_ARPACK_BMATINV   = 21,	/* dsaupd -6  dseupd -6  dnaupd -6  dneupd -6  */
+  IGRAPH_ARPACK_WORKLSMALL= 22,	/* dsaupd -7  dseupd -7  dnaupd -7  dneupd -7  */
+  IGRAPH_ARPACK_TRIDERR   = 23,	/* dsaupd -8  dseupd -8  dnaupd -8             */
+  IGRAPH_ARPACK_ZEROSTART = 24,	/* dsaupd -9  dseupd -9  dnaupd -9             */
+  IGRAPH_ARPACK_MODEINV   = 25,	/* dsaupd -10 dseupd -10 dnaupd -10 dneupd -10 */
+  IGRAPH_ARPACK_MODEBMAT  = 26,	/* dsaupd -11 dseupd -11 dnaupd -11 dneupd -11 */
+  IGRAPH_ARPACK_ISHIFT    = 27,	/* dsaupd -12            dnaupd -12            */
+  IGRAPH_ARPACK_NEVBE     = 28,	/* dsaupd -13 dseupd -12                       */
+  IGRAPH_ARPACK_NOFACT    = 29,	/* dsaupd -9999          dnaupd -9999          */
+  IGRAPH_ARPACK_FAILED    = 30, /*            dseupd -14            dneupd -14 */
+  IGRAPH_ARPACK_HOWMNY    = 31,	/*            dseupd -15            dneupd -13 */
+  IGRAPH_ARPACK_HOWMNYS   = 32,	/*            dseupd -16            dneupd -12 */
+  IGRAPH_ARPACK_EVDIFF    = 33, /*            dseupd -17            dneupd -15 */
+  IGRAPH_ARPACK_SHUR      = 34, /*                                  dneupd -8  */
+  IGRAPH_ARPACK_LAPACK    = 35,	/*                                  dneupd -9  */
+  IGRAPH_ARPACK_UNKNOWN   = 36
 } igraph_error_type_t;
 
 /**
  * \define IGRAPH_ERROR
  * \brief Trigger an error.
  * 
- * \a igraph functions usually use this macro when they notice and error.
+ * \a igraph functions usually use this macro when they notice an error.
  * It calls
  * \ref igraph_error() with the proper parameters and if that returns 
  * the macro returns the "calling" function as well, with the error
