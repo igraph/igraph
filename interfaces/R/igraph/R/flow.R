@@ -28,11 +28,11 @@ graph.maxflow <- function(graph, source, target, capacity=NULL) {
   if (is.null(capacity)) {
     if ("capacity" %in% list.edge.attributes(graph)) {
       capacity <- E(graph)$capacity
-    } else {
-      stop("capacity argument is not given and no `capacity' attribute")
     }
   }
-  capacity <- as.numeric(capacity)
+  if (!is.null(capacity)) {
+    capacity <- as.numeric(capacity)
+  }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_maxflow", graph, as.numeric(source), as.numeric(target),
@@ -49,15 +49,15 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
   if (is.null(capacity)) {
     if ("capacity" %in% list.edge.attributes(graph)) {
       capacity <- E(graph)$capacity
-    } else {
-      stop("capacity argument is not given and no `capacity' attribute")
     }
   }
   if (is.null(source) && !is.null(target) ||
       is.null(target) && !is.null(source)) {
     stop("Please give both source and target oe neither")
   }
-  capacity <- as.numeric(capacity)
+  if (!is.null(capacity)) {
+    capacity <- as.numeric(capacity)
+  }
 
   value.only <- as.logical(value.only)
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )

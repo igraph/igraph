@@ -53,7 +53,7 @@ int igraph_i_maxflow_value_undirected(const igraph_t *graph,
     VECTOR(edges)[no_of_edges*2+i*2] = VECTOR(edges)[i*2+1];
     VECTOR(edges)[no_of_edges*2+i*2+1] = VECTOR(edges)[i*2];
     VECTOR(newcapacity)[i] = VECTOR(newcapacity)[no_of_edges+i] = 
-      VECTOR(*capacity)[i];
+      capacity ? VECTOR(*capacity)[i] : 1.0;
   }
   
   IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_DIRECTED));
@@ -109,7 +109,8 @@ int igraph_i_maxflow_value_undirected(const igraph_t *graph,
  * \param value Pointer to a real number, the result will be placed here.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
- * \param capacity Vector containing the capacity of the edges.
+ * \param capacity Vector containing the capacity of the edges. If NULL, then
+ *        every edge is considered to have capacity 1.0.
  * \return Error code.
  * 
  * Time complexity: O(|V|^3). In practice it is much faster, but i
@@ -146,7 +147,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
     return 0;
   }
 
-  if (igraph_vector_size(capacity) != no_of_orig_edges) {
+  if (capacity && igraph_vector_size(capacity) != no_of_orig_edges) {
     IGRAPH_ERROR("Invalid capacity vector", IGRAPH_EINVAL);
   }
   if (source<0 || source>=no_of_nodes || target<0 || target>=no_of_nodes) {
@@ -177,7 +178,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
     VECTOR(to)[pos2]   = VECTOR(edges)[i];
     VECTOR(rev)[pos] = pos2;
     VECTOR(rev)[pos2] = pos;
-    VECTOR(rescap)[pos] = VECTOR(*capacity)[i/2];
+    VECTOR(rescap)[pos] = capacity ? VECTOR(*capacity)[i/2] : 1.0;
     VECTOR(rescap)[pos2] = 0.0;
   }  
  
@@ -350,7 +351,8 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
  * \param target The id of the target vertex.
  * \param capacity Pointer to the capacity vector, it should contain
  *        non-negative numbers and its length should be the same the
- *        the number of edges in the graph.
+ *        the number of edges in the graph. It can be a null pointer, then
+ *        every edge has unit capacity.
  * \return Error code.
  * 
  * Time complexity: O(|V|^3), see also the discussion for \ref
@@ -396,7 +398,7 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
 /*     VECTOR(edges)[no_of_edges*2+i*2] = VECTOR(edges)[i*2+1]; */
 /*     VECTOR(edges)[no_of_edges*2+i*2+1] = VECTOR(edges)[i*2]; */
 /*     VECTOR(newcapacity)[i] = VECTOR(newcapacity)[no_of_edges+i] =  */
-/* l      VECTOR(*capacity)[i]; */
+/*       capacity ? VECTOR(*capacity)[i] : 1.0 ; */
 /*   } */
   
 /*   IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_DIRECTED)); */
@@ -433,7 +435,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
   igraph_bool_t calc_cut=partition || partition2 || cut;
   long int act_step=0, mincut_step=0;
   
-  if (igraph_vector_size(capacity) != no_of_edges) {
+  if (capacity && igraph_vector_size(capacity) != no_of_edges) {
     IGRAPH_ERROR("Invalid capacity vector size", IGRAPH_EINVAL);
   }
 
@@ -469,7 +471,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       for (i=0; i<n; i++) {
 	igraph_integer_t edge=VECTOR(*edges)[i];
 	igraph_integer_t to=VECTOR(*neis)[i];
-	igraph_real_t weight=VECTOR(*capacity)[(long int)edge];
+	igraph_real_t weight=capacity ? VECTOR(*capacity)[(long int)edge] : 1.0;
 	igraph_i_cutheap_update(&heap, to, weight);
       }
             
@@ -666,7 +668,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
  *    in the cut will be stored here. This argument is ignored if it
  *    is a NULL pointer.
  * \param capacity A numeric vector giving the capacities of the
- *    edges. 
+ *    edges. If a null pointer then all edges have unit capacity.
  * \return Error code.
  * 
  * \sa \ref igraph_mincut_value(), a simpler interface for calculating
@@ -729,7 +731,7 @@ int igraph_i_mincut_value_undirected(const igraph_t *graph,
  *    here.
  * \param capacity Pointer to the capacity vector, it should contain
  *    the same number of non-negative numbers as the number of edges in
- *    the graph.
+ *    the graph. If a null pointer then all edges will have unit capacity.
  * \return Error code.
  *
  * \sa \ref igraph_mincut(), \ref igraph_maxflow_value(), \ref
@@ -783,7 +785,6 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_vector_t edges;
-  igraph_vector_t capacity;
   igraph_t newgraph;
   long int i;
   igraph_bool_t conn1;
@@ -848,17 +849,11 @@ int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
   no_of_nodes=igraph_vcount(&newgraph);
   no_of_edges=igraph_ecount(&newgraph);
   
-  IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
-  for (i=0; i<no_of_edges; i++) {
-    VECTOR(capacity)[i] = 1.0;
-  }
-  
   IGRAPH_CHECK(igraph_maxflow_value(&newgraph, res, 
-				    source, target, &capacity));
+				    source, target, 0));
   
-  igraph_vector_destroy(&capacity);
   igraph_destroy(&newgraph);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
 }
@@ -1136,7 +1131,6 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 				igraph_integer_t target) {
   
   long int no_of_edges=igraph_ecount(graph);
-  igraph_vector_t capacity;
   igraph_real_t flow;
   long int i;
 
@@ -1144,16 +1138,9 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
     IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
   }
 
-  IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
-  for (i=0; i<no_of_edges; i++) {
-    VECTOR(capacity)[i]=1.0;
-  }
-  
-  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, &capacity));
+  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0));
   *res = flow;
 
-  igraph_vector_destroy(&capacity);
-  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
 
@@ -1193,7 +1180,6 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			     igraph_bool_t checks) {
   
   long int no_of_edges=igraph_ecount(graph);
-  igraph_vector_t capacity;
   long int i;
   igraph_bool_t ret;
   
@@ -1203,15 +1189,7 @@ int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
   }  
 
   if (!ret) {
-    IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
-    for (i=0; i<no_of_edges; i++) {
-      VECTOR(capacity)[i]=1.0;
-    }
-    
-    IGRAPH_CHECK(igraph_mincut_value(graph, res, &capacity));
-    
-    igraph_vector_destroy(&capacity);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_CHECK(igraph_mincut_value(graph, res, 0));
   }
 
   return 0;
@@ -1248,7 +1226,6 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_integer_t target) {
 
   long int no_of_edges=igraph_ecount(graph);
-  igraph_vector_t capacity;
   igraph_real_t flow;
   long int i;
 
@@ -1256,19 +1233,10 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
     IGRAPH_ERROR("Not implemented for source=target", IGRAPH_UNIMPLEMENTED);
   }
 
+  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0));
 
-  IGRAPH_VECTOR_INIT_FINALLY(&capacity, no_of_edges);
-  for (i=0; i<no_of_edges; i++) {
-    VECTOR(capacity)[i]=1.0;
-  }
-  
-  IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target,
-				    &capacity));
   *res = flow;
   
-  igraph_vector_destroy(&capacity);
-  IGRAPH_FINALLY_CLEAN(1);
-
   return 0;
 }
 

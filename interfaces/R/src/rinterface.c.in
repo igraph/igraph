@@ -4937,15 +4937,18 @@ SEXP R_igraph_maxflow(SEXP graph, SEXP psource, SEXP ptarget,
 
   igraph_t g;
   igraph_integer_t source=REAL(psource)[0], target=REAL(ptarget)[0];
-  igraph_vector_t capacity;
+  igraph_vector_t capacity, *ppcapacity=0;
   igraph_real_t value;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_vector(pcapacity, &capacity);
-  igraph_maxflow_value(&g, &value, source, target, &capacity);
+  if (!isNull(pcapacity)) {
+    R_SEXP_to_vector(pcapacity, &capacity);
+    ppcapacity=&capacity;
+  }
+  igraph_maxflow_value(&g, &value, source, target, ppcapacity);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=value;
@@ -5060,7 +5063,7 @@ SEXP R_igraph_write_graph_dimacs(SEXP graph, SEXP file,
 SEXP R_igraph_mincut(SEXP graph, SEXP pcapacity) {
 
   igraph_t g;
-  igraph_vector_t capacity;
+  igraph_vector_t capacity, *ppcapacity=0;
   igraph_integer_t value;
   igraph_vector_t partition;
   igraph_vector_t partition2;
@@ -5074,10 +5077,13 @@ SEXP R_igraph_mincut(SEXP graph, SEXP pcapacity) {
   igraph_vector_init(&partition2, 0);
 
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_vector(pcapacity, &capacity);
+  if (!isNull(pcapacity)) {
+    R_SEXP_to_vector(pcapacity, &capacity);
+    ppcapacity=&capacity;
+  }
 
   igraph_mincut(&g, &value, &partition,
-		&partition2, &cut, &capacity);
+		&partition2, &cut, ppcapacity);
 
   PROTECT(result=NEW_LIST(4));
   PROTECT(names=NEW_CHARACTER(4));
@@ -5104,15 +5110,18 @@ SEXP R_igraph_mincut(SEXP graph, SEXP pcapacity) {
 SEXP R_igraph_mincut_value(SEXP graph, SEXP pcapacity) {
   
   igraph_t g;
-  igraph_vector_t capacity;
+  igraph_vector_t capacity, *ppcapacity=0;
   igraph_integer_t res;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_vector(pcapacity, &capacity);
-  igraph_mincut_value(&g, &res, &capacity);
+  if (!isNull(pcapacity)) {
+    R_SEXP_to_vector(pcapacity, &capacity);
+    ppcapacity=&capacity;
+  }
+  igraph_mincut_value(&g, &res, ppcapacity);
   
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
@@ -5208,15 +5217,18 @@ SEXP R_igraph_st_mincut_value(SEXP graph, SEXP psource, SEXP ptarget,
   igraph_t g;
   igraph_integer_t source=REAL(psource)[0];
   igraph_integer_t target=REAL(ptarget)[0];
-  igraph_vector_t capacity;
+  igraph_vector_t capacity, *ppcapacity=0;
   igraph_real_t res;
   SEXP result;
 
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
-  R_SEXP_to_vector(pcapacity, &capacity);
-  igraph_st_mincut_value(&g, &res, source, target, &capacity);
+  if (!isNull(pcapacity)) {
+    R_SEXP_to_vector(pcapacity, &capacity);
+    ppcapacity=&capacity;
+  }
+  igraph_st_mincut_value(&g, &res, source, target, ppcapacity);
   PROTECT(result=NEW_NUMERIC(1));
   REAL(result)[0]=res;
   

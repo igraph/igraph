@@ -1,5 +1,11 @@
 2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/flow.R (graph.maxflow, graph.mincut) : allow
+	capacity to be NULL
+	* interfaces/R/src/rinterface.c.in (R_igraph_maxflow)
+	(R_igraph_mincut, R_igraph_mincut_value, R_igraph_st_mincut_value) : 
+	updated
+
 	* interfaces/R/igraph/R/structure.generators.R (graph.adjacency) : 
 	rewritten, better if 'weighted'!=NULL, 'diag' argument added
 

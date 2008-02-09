@@ -885,21 +885,21 @@ igraph_compose:
 
 igraph_maxflow_value:
         PARAMS: GRAPH graph, OUT REALPTR value, INTEGER source, INTEGER target, \
-                VECTOR capacity
+                VECTOR_OR_0 capacity
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut_value:
-        PARAMS: GRAPH graph, OUT REALPTR res, VECTOR capacity
+        PARAMS: GRAPH graph, OUT REALPTR res, VECTOR_OR_0 capacity
         IGNORE: RR, RC, RNamespace
 
 igraph_st_mincut_value:
         PARAMS: GRAPH graph, OUT REALPTR res, INTEGER source, INTEGER target, \
-                VECTOR capacity
+                VECTOR_OR_0 capacity
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut:
         PARAMS: GRAPH graph, OUT INTEGERPTR value, OUT VECTOR partition, \
-                OUT VECTOR partition2, OUT VECTOR cut, VECTOR capacity
+                OUT VECTOR partition2, OUT VECTOR cut, VECTOR_OR_0 capacity
         IGNORE: RR, RC, RNamespace
 
 igraph_st_vertex_connectivity:

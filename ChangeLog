@@ -1,3 +1,9 @@
+2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/flow.c (igraph_i_maxflow_value_undirected)
+	(igraph_maxflow_value, igraph_i_mincut_undirected) : allow capacity
+	vector to be NULL
+
 2008-02-04  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/layout.c (igraph_layout_lgl) : added progress meter
