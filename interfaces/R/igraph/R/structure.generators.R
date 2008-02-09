@@ -115,15 +115,11 @@ graph.formula <- function(...) {
   res  
 }
 
-graph.adjacency <- function( adjmatrix, mode="directed", weighted=NULL ) {
-  mode <- switch(mode,
-                 "directed"=0,
-                 "undirected"=1,
-                 "max"=1,
-                 "upper"=2,
-                 "lower"=3,
-                 "min"=4,
-                 "plus"=5)
+graph.adjacency <- function(adjmatrix, mode="directed",
+                            weighted=NULL, diag=TRUE ) {
+
+  if (!diag) { diag(adjmatrix) <- 0 }
+  
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
       weighted <- "weight"
@@ -135,8 +131,29 @@ graph.adjacency <- function( adjmatrix, mode="directed", weighted=NULL ) {
     if (nrow(adjmatrix) != ncol(adjmatrix)) {
       stop("not a square matrix")
     }
+
+    if (mode == "undirected") {
+      if (!all(adjmatrix == t(adjmatrix))) {
+        stop("Please supply a symmetric matrix if you want to create a weighted graph with mode=UNDIRECTED.")
+      }
+      adjmatrix[lower.tri(adjmatrix, diag=TRUE)] <- 0
+    } else if (mode=="max") {
+      adjmatrix <- pmax(adjmatrix, t(adjmatrix))
+      adjmatrix[lower.tri(adjmatrix, diag=TRUE)] <- 0
+    } else if (mode=="upper") {
+      adjmatrix[lower.tri(adjmatrix, diag=TRUE)] <- 0
+    } else if (mode=="lower") {
+      adjmatrix[upper.tri(adjmatrix, diag=TRUE)] <- 0
+    } else if (mode=="min") {
+      adjmatrix <- pmin(adjmatrix, t(adjmatrix))
+      adjmatrix[lower.tri(adjmatrix, diag=TRUE)] <- 0
+    } else if (mode=="plus") {
+      adjmatrix <- adjmatrix + t(adjmatrix)
+      adjmatrix[lower.tri(adjmatrix, diag=TRUE)] <- 0
+      diag(adjmatrix) <- diag(adjmatrix) / 2
+    }
     
-    no.edges <- sum(adjmatrix > 0)
+    no.edges <- sum(adjmatrix != 0)
     edges <- numeric(2*no.edges)
     weight <- numeric(no.edges)
     ptr <- 1
@@ -163,7 +180,15 @@ graph.adjacency <- function( adjmatrix, mode="directed", weighted=NULL ) {
     }
     
   } else {
-  
+    mode <- switch(mode,
+                   "directed"=0,
+                   "undirected"=1,
+                   "max"=1,
+                   "upper"=2,
+                   "lower"=3,
+                   "min"=4,
+                   "plus"=5)
+    
     adjmatrix <- as.matrix(adjmatrix)
     attrs <- attributes(adjmatrix)
     adjmatrix <- as.numeric(adjmatrix)

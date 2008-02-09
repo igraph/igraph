@@ -1,5 +1,8 @@
 2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* interfaces/R/igraph/R/structure.generators.R (graph.adjacency) : 
+	rewritten, better if 'weighted'!=NULL, 'diag' argument added
+
 	* interfaces/R/igraph/R/plot.R (plot.igraph) 
 	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 
 	simple vertex shape support added

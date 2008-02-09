@@ -1,7 +1,6 @@
 \name{graph.constructors}
 \alias{graph.empty}
 \alias{graph}
-\alias{graph.adjacency}
 \alias{graph.star}
 \alias{graph.lattice}
 \alias{graph.ring}
@@ -23,7 +22,6 @@ graph.lattice(dimvector = NULL, length = NULL, dim = NULL, nei = 1,
 \usage{
 graph.empty(n=0, directed=TRUE)
 graph(edges, n=max(edges)+1, directed=TRUE)
-graph.adjacency(adjmatrix, mode="directed", weighted=NULL)
 graph.star(n, mode = "in", center = 0)
 graph.lattice(dimvector, nei = 1, directed = FALSE, mutual = FALSE, 
               circular = FALSE)
@@ -42,7 +40,6 @@ graph.extended.chordal.ring(n, w)
   \item{edges}{Numeric vector defining the edges, the first edge points
     from the first element to the second, the second edge from the third
   to the fourth, etc.}
-  \item{adjmatrix}{A square adjacency matrix.}
   \item{directed}{Logical, if TRUE a directed graph will be
     created. Note that for while most constructors the default is TRUE,
     for \code{graph.lattice} and \code{graph.ring} it is FALSE. For
@@ -59,29 +56,6 @@ graph.extended.chordal.ring(n, w)
     create. 
   }
   \item{mode}{
-    For \code{graph.adjacency} the possible values of this argument are
-    \itemize{
-      \item{\code{directed}}{the graph will be directed and a matrix
-	element gives the number of edges between two vertex.}
-      \item{\code{undirected}}{this is the same as \code{max}, for
-	convenience.} 
-      \item{\code{max}}{ undirected graph will be created and the number
-	of edges between vertex \code{i} and \code{j} is
-	\code{max(A(i,j), A(j,i))}.} 
-      \item{\code{upper}}{undirected graph will be created, only the
-	upper right triangle (including the diagonal) is used for the
-	number of edges.}
-      \item{\code{lower}}{undirected graph will be created, only the
-	lower left triangle (including the diagonal) is used for
-	creating the edges.}
-      \item{\code{min}}{undirected graph will be created with
-	\code{min(A(i,j), A(j,i))} edges between vertex \code{i} and
-	\code{j}.}
-      \item{\code{plus}}{ undirected graph will be created with
-	\code{A(i,j)+A(j,i)} edges between vertex \code{i} and
-	\code{j}.}  
-    }
-
     For \code{graph.star} it defines the direction of the
     edges, \code{in}: the edges point \emph{to} the center, \code{out}:
     the edges point \emph{from} the center, \code{undirected}: the edges
@@ -93,14 +67,6 @@ graph.extended.chordal.ring(n, w)
     to their parents, while \code{undirected} creates an undirected
     graph. 
   }
-  \item{weighted}{This argument specifies whether to create a weighted
-    graph from an adjacency matrix. If it is \code{NULL} then an
-    unweighted graph is created and the elements of the adjacency matrix
-    gives the number of edges between the vertices. If it is a character
-    constant then for every non-zero matrix entry an edge is created and
-    the value of the entry is added as an edge attribute named by the
-    \code{weighted} argument. If it is \code{TRUE} then the name of the
-    edge attribute will be \code{weight}.}
   \item{center}{For \code{graph.star} the center vertex of the graph, by
     default the first vertex.}
   \item{dimvector}{A vector giving the size of the lattice in each
@@ -129,8 +95,6 @@ graph.extended.chordal.ring(n, w)
 
   \code{graph} creates a graph with the given edges.
 
-  \code{graph.adjacency} creates a graph from an adjacency matrix.
-
   \code{graph.star} creates a star graph, in this every single vertex is
   connected to the center vertex and nobody else.
 
@@ -153,13 +117,13 @@ graph.extended.chordal.ring(n, w)
   graphs with up to seven vertices, numbered from 0 up to 1252. The
   graphs are listed: 
   \enumerate{
-    \item{}{in increasing order of number of nodes;}
-    \item{}{for a fixed number of nodes, in increasing order of the number
-      of edges;}
-    \item{}{for fixed numbers of nodes and edges, in increasing order of
-      the degree sequence, for example 111223 < 112222;}
-    \item{}{for fixed degree sequence, in increasing number of
-      automorphisms.}
+    \item in increasing order of number of nodes;
+    \item for a fixed number of nodes, in increasing order of the number
+      of edges;
+    \item for fixed numbers of nodes and edges, in increasing order of
+      the degree sequence, for example 111223 < 112222;
+    \item for fixed degree sequence, in increasing number of
+      automorphisms.
   }
 
   \code{graph.edgelist} creates a graph from an edge list. Its argument
@@ -191,16 +155,13 @@ graph.extended.chordal.ring(n, w)
 \value{Every function documented here returns a \code{graph} object.}
 %\references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-%\seealso{}
+\seealso{\code{\link{graph.adjacency}} to create graphs from adjacency
+  matrices, \code{\link{graph.formule}} for a handy way to create small
+  graphs.
+}
 \examples{
 g1 <- graph.empty()
 g2 <- graph( c(1,2,2,3,3,4,5,6), directed=FALSE )
-adjm <- matrix(sample(0:1, 100, replace=TRUE, prob=c(0.9,0.1)), nc=10)
-g3 <- graph.adjacency( adjm )
-adjm <- matrix(sample(0:5, 100, replace=TRUE,
-                      prob=c(0.9,0.02,0.02,0.02,0.02,0.02)), nc=10)
-g4 <- graph.adjacency(adjm, weighted=TRUE)
-E(g4)$weight
 g5 <- graph.star(10, mode="out")
 g6 <- graph.lattice(c(5,5,5))
 g7 <- graph.lattice(length=5, dim=3)
