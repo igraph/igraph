@@ -22,6 +22,7 @@
 <!-- doxrox-include igraph_community_leading_eigenvector -->
 <!-- doxrox-include igraph_community_leading_eigenvector_naive -->
 <!-- doxrox-include igraph_community_leading_eigenvector_step -->
+<!-- doxrox-include igraph_le_community_to_membership -->
 </section>
 
 <section><title>Walktrap: community structure based on random walks</title>

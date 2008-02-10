@@ -18,6 +18,7 @@
 <!-- doxrox-include igraph_get_shortest_paths -->
 <!-- doxrox-include igraph_get_all_shortest_paths -->
 <!-- doxrox-include igraph_average_path_length -->
+<!-- doxrox-include igraph_path_length_hist -->
 <!-- doxrox-include igraph_diameter -->
 <!-- doxrox-include igraph_girth -->
 </section>
@@ -44,6 +45,9 @@
 <!-- doxrox-include igraph_pagerank_old -->
 <!-- doxrox-include igraph_constraint -->
 <!-- doxrox-include igraph_maxdegree -->
+<!-- doxrox-include igraph_eigenvector_centrality -->
+<!-- doxrox-include igraph_hub_score -->
+<!-- doxrox-include igraph_authority_score -->
 </section>
 
 <section><title>Estimating Centrality Measures</title>

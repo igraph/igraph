@@ -115,6 +115,21 @@ int igraph_i_arpack_err_dneupd(long int error) {
 /**
  * \function igraph_arpack_options_init
  * Initialize ARPACK options
+ * 
+ * Initializes ARPACK options, set them to default values. 
+ * You can always pass the initialized \ref igraph_arpack_options_t 
+ * object to built-in igraph functions without any modification. The
+ * built-in igraph functions modify the options to perform their
+ * calculation, e.g. \ref igraph_pagerank() always searches for the
+ * eigenvalue with the largest magnitude, regardless of the supplied
+ * value.
+ * </para><para>
+ * If you want to implement your own function involving eigenvalue
+ * calculation using ARPACK, however, you will likely need to set up
+ * the fields for yourself.
+ * \param o The \ref igraph_arpack_options_t object to initialize.
+ * 
+ * Time complexity: O(1).
  */
 
 void igraph_arpack_options_init(igraph_arpack_options_t *o) {
@@ -143,6 +158,27 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
 /**
  * \function igraph_arpack_storage_init
  * Initialize ARPACK storage
+ * 
+ * You only need this function if you want to run multiple eigenvalue
+ * calculations using ARPACK, and want to spare the memory
+ * allocation/deallocation between each two runs. Otherwise it is safe 
+ * to supply a null pointer as the \c storage argument of both \ref
+ * igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() to make
+ * memory allocated and deallocated automatically.
+ * 
+ * </para><para>Don't forget to call the \ref
+ * igraph_arpack_storage_destroy() function on the storage object if
+ * you don't need it any more.
+ * \param s The \ref igraph_arpack_storage_t object to initialize.
+ * \param maxn The maximum order of the matrices.
+ * \param maxncv The maximum NCV parameter intended to use.
+ * \param maxldv The maximum LDV parameter intended to use.
+ * \param symm Whether symmetric or non-symmetric problems will be
+ *    solved using this \ref igraph_arpack_storage_t. (You cannot use
+ *    the same storage both with symmetric and non-symmetric solvers.)
+ * \return Error code.
+ * 
+ * Time complexity: O(maxncv*(maxldv+maxn)).
  */
 
 int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
@@ -187,6 +223,11 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
 /**
  * \function igraph_arpack_storage_destroy
  * Deallocate ARPACK storage
+ * 
+ * \param s The \ref igraph_arpack_storage_t object for which the
+ *    memory will be deallocated.
+ * 
+ * Time complexity: operating system dependent.
  */
 
 void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
@@ -210,6 +251,29 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
 /**
  * \function igraph_arpack_rssolve
  * \brief ARPACK solver for symmetric matrices
+ * 
+ * This is the ARPACK solver for symmetric matrices. Please use 
+ * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
+ * \param fun Pointer to an \ref igraph_arpack_function_t object, 
+ *     the function that performs the matrix-vector multiplication.
+ * \param extra An extra argument to be passed to \c fun.
+ * \param options An \ref igraph_arpack_options_t object.
+ * \param storage An \ref igraph_arpack_storage_t object, or a null
+ *     pointer. In the latter case memory allocation and deallocation
+ *     is performed automatically.
+ * \param values If not a null pointer, then it should be a pointer to an
+ *     initialized vector. The eigenvalues will be stored here. The
+ *     vector will be resized as needed.
+ * \param vectors If not a null pointer, then it must be a pointer to
+ *     an initialized matrix. The eigenvectors will be stored in the
+ *     columns of the matrix. The matrix will be resized as needed.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the matrix-vector
+ * multiplication. Usually a small number of iterations is enough, so
+ * if the matrix is sparse and the matrix-vector multiplication can be
+ * done in O(n) time (the number of vertices), then the eigenvalues
+ * are found in O(n) time as well.
  */
 
 int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
@@ -374,6 +438,33 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 /**
  * \function igraph_arpack_rnsolve
  * \brief ARPACK solver for non-symmetric matrices
+ * 
+ * Please always consider calling \ref igraph_arpack_rssolve() if your
+ * matrix is symmetric, it is much faster.
+ * \ref igraph_arpack_rnsolve() for non-symmetric matrices.
+ * \param fun Pointer to an \ref igraph_arpack_function_t object, 
+ *     the function that performs the matrix-vector multiplication.
+ * \param extra An extra argument to be passed to \c fun.
+ * \param options An \ref igraph_arpack_options_t object.
+ * \param storage An \ref igraph_arpack_storage_t object, or a null
+ *     pointer. In the latter case memory allocation and deallocation
+ *     is performed automatically.
+ * \param values If not a null pointer, then it should be a pointer to an
+ *     initialized matrix. The (possibly complex) eigenvalues will be
+ *     stored here. The matrix will have two columns, the first column
+ *     contains the real, the second the imaginary parts of the
+ *     eigenvalues.
+ *     The matrix will be resized as needed.
+ * \param vectors If not a null pointer, then it must be a pointer to
+ *     an initialized matrix. The eigenvectors will be stored in the
+ *     columns of the matrix. The matrix will be resized as needed.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the matrix-vector
+ * multiplication. Usually a small number of iterations is enough, so
+ * if the matrix is sparse and the matrix-vector multiplication can be
+ * done in O(n) time (the number of vertices), then the eigenvalues
+ * are found in O(n) time as well.
  */
 
 int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,

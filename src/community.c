@@ -1506,6 +1506,28 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_le_community_to_membership
+ * Vertex membership from the leading eigenvector community structure
+ * 
+ * This function creates a membership vector from the
+ * result of \ref igraph_community_leading_eigenvector() or
+ * \ref igraph_community_leading_eigenvector_naive(). It takes \c membership
+ * and permformes \c steps merges, according to the supplied
+ * \c merges matrix.
+ * \param merges The matrix defining the merges to make. 
+ *     This is usually from the output of the leading eigenvector community
+ *     structure detection routines.
+ * \param steps The number of steps to make according to \c merges.
+ * \param membership Initially the starting membership vector, 
+ *     on output the resulting membership vector, after performing \c steps merges.
+ * \param csize Optionally the sizes of the commmunities is stored here, 
+ *     if this is not a null pointer, but an initialized vector.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|), the number of vertices.
+ */
+
 int igraph_le_community_to_membership(const igraph_matrix_t *merges,
 				      igraph_integer_t steps,
 				      igraph_vector_t *membership,

@@ -694,7 +694,20 @@ int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igr
 
 /**
  * \function igraph_full_citation
- * TODO
+ * Creates a full citation graph
+ * 
+ * This is a directed graph, where every <code>i->j</code> edge is
+ * present if and only if <code>j&lt;i</code>.
+ * If the \c directed argument is zero then an undirected graph is
+ * created, and it is just a full graph. 
+ * \param graph Pointer to an uninitialized graph object, the result
+ *    is stored here.
+ * \param n The number of vertices.
+ * \param directed Whether to created a directed graph. If zero an
+ *    undirected graph is created.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|^2), as we have many edges.
  */
 
 int igraph_full_citation(igraph_t *graph, igraph_integer_t n, 

@@ -79,6 +79,39 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
   return 0;
 }
 
+/**
+ * \function igraph_eigenvector_centrality
+ * Eigenvector centrality of the verices
+ * 
+ * Eigenvector centrality is a measure of the importance of a node in a
+ * network. It assigns relative scores to all nodes in the network based
+ * on the principle that connections to high-scoring nodes contribute
+ * more to the score of the node in question than equal connections to
+ * low-scoring nodes.
+ * \param graph The input graph. It might be directed, but it will be
+ *     treated as undirected anyway. 
+ * \param vector Pointer to an initialized vector, it will be resized
+ *     as needed. The result of the computation is stored here. It can
+ *     be a null pointer, then it is ignored.
+ * \param value If not a null pointer, then the eigenvalue
+ *     corresponding to the found eigenvector is stored here.
+ * \param scale If not zero then the result will be scaled, such that
+ *     the absolute value of the maximum centrality is one.
+ * \param weights A null pointer (=no edge weights), or a vector
+ *     giving the weights of the edges.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the
+ *    <code>n</code> (number of vertices) parameter and 
+ *    it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the input graph, usually it is O(|V|),
+ * the number of vertices.
+ * 
+ * \sa \ref igraph_pagerank for a modification of eigenvector centrality.
+ */
+
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
 				  igraph_real_t *value, igraph_bool_t scale,
 				  const igraph_vector_t *weights,
@@ -294,12 +327,84 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   return 0;
 }
 
+/**
+ * \function igraph_hub_score
+ * Kleinberg's hub scores
+ * 
+ * The hub scores of the vertices are defined as the principal
+ * eigenvector of <code>A*A^T</code>, where <code>A</code> is the adjacency
+ * matrix of the graph, <code>A^T</code> is its transposed.
+ * </para><para> 
+ * See the following reference on the meaning of this score:
+ * J. Kleinberg. Authoritative sources in a hyperlinked
+ * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
+ * Algorithms, \eme 1998. Extended version in \emb Journal of the
+ * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
+ * 1997.
+ * \param graph The input graph. Can be directed and undirected.
+ * \param vector Pointer to an initialized vector, the result is
+ *    stored here. If a null pointer then it is ignored.
+ * \param value If not a null pointer then the eigenvalue
+ *    corresponding to the calculated eigenvector is stored here.
+ * \param scale If not zero then the result will be scaled, such that
+ *     the absolute value of the maximum centrality is one.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the
+ *    <code>n</code> (number of vertices) parameter and 
+ *    it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the input graph, usually it is O(|V|),
+ * the number of vertices.
+ * 
+ * \sa \ref igraph_authority_score() for the companion measure, \ref
+ * igraph_pagerank(), \ref igraph_eigenvector_centrality() for similar
+ * measures.
+ */
+
 int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
 		     igraph_real_t *value, igraph_bool_t scale,
 		     igraph_arpack_options_t *options) {
 
   return igraph_i_kleinberg(graph, vector, value, scale, options, 0);
 }
+
+/**
+ * \function igraph_authority_score
+ * Kleinerg's authority scores
+ * 
+ * The authority scores of the vertices are defined as the principal
+ * eigenvector of <code>A^T*A</code>, where <code>A</code> is the adjacency
+ * matrix of the graph, <code>A^T</code> is its transposed.
+ * </para><para> 
+ * See the following reference on the meaning of this score:
+ * J. Kleinberg. Authoritative sources in a hyperlinked
+ * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
+ * Algorithms, \eme 1998. Extended version in \emb Journal of the
+ * ACM \eme 46(1999). Also appears as IBM Research Report RJ 10076, May
+ * 1997.
+ * \param graph The input graph. Can be directed and undirected.
+ * \param vector Pointer to an initialized vector, the result is
+ *    stored here. If a null pointer then it is ignored.
+ * \param value If not a null pointer then the eigenvalue
+ *    corresponding to the calculated eigenvector is stored here.
+ * \param scale If not zero then the result will be scaled, such that
+ *     the absolute value of the maximum centrality is one.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the
+ *    <code>n</code> (number of vertices) parameter and 
+ *    it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code.
+ * 
+ * Time complexity: depends on the input graph, usually it is O(|V|),
+ * the number of vertices.
+ * 
+ * \sa \ref igraph_hub_score() for the companion measure, \ref
+ * igraph_pagerank(), \ref igraph_eigenvector_centrality() for similar
+ * measures.
+ */
 			    
 int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
 			   igraph_real_t *value, igraph_bool_t scale,

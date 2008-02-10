@@ -263,6 +263,33 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_path_length_hist
+ * Create a histogram of all shortest path lenghts
+ * 
+ * This function calculates a histogram, by calculating the
+ * shortest path length between each pair of vertices. For directed
+ * graphs both directions might be considered and then every pair of vertices
+ * appears twice in the histogram.
+ * \param graph The input graph.
+ * \param res Pointer to an initialized vector, the result is stored
+ *     here. The first (i.e. zeroth) element contains the number of
+ *     shortest paths of length 1, etc. The supplied vector is resized
+ *     as needed.
+ * \param unconnected Pointer to a real number, the number of
+ *     pairs for which the second vertex is not reachable from the
+ *     first is stored here.
+ * \param directed Whether to consider directed paths in a directed
+ *     graph (if not zero). This argument is ignored for undirected
+ *     graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V||E|), the number of vertices times the number
+ * of edges.
+ * 
+ * \sa \ref igraph_average_path_length() and \ref igraph_shortest_paths()
+ */
+
 int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
 			    igraph_real_t *unconnected, igraph_bool_t directed) {
 
