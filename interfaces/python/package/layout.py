@@ -6,6 +6,7 @@ This package contains the implementation of the L{Layout} object.
 
 from copy import copy
 from igraph.statistics import RunningMean
+import math
 
 __license__ = """
 Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
@@ -103,6 +104,39 @@ class Layout(object):
     dim = property(_get_dim, "the number of dimensions")
     def _get_coords(self): return [copy(row) for row in self._coords]
     coords = property(_get_coords, "the coordinates as a list of lists")
+
+    def append(self, value):
+        """Appends a new point to the layout"""
+        if len(value) < self._dim:
+            raise ValueError, "appended item must have %d elements" % self._dim
+        self._coords.append(map(float, value[0:self._dim]))
+
+    def mirror(self, dim):
+        """Mirrors the layout along the given dimension(s)
+
+        @param dim: the list of dimensions or a single dimension
+        """
+        if isinstance(dim, int): dim = [dim]
+        else: dim = map(int, dim)
+
+        _n = self._dim
+        vec = [1]*_n
+        for d in dim: vec[d] *= -1
+
+        self._coords = [[row[i]*vec[i] for i in xrange(_n)] for row in self._coords]
+
+
+    def rotate(self, degree, dim1=0, dim2=1):
+        """Rotates the layout by the given degrees along the plane defined by
+        the given two dimensions"""
+        ca, sa = math.cos(degree * math.pi / 180.), math.sin(degree * math.pi / 180.)
+        
+        for idx, row in enumerate(self._coords): 
+            new_row = list(row)
+            new_row[dim1] = ca*row[dim1] - sa*row[dim2]
+            new_row[dim2] = sa*row[dim1] + ca*row[dim2]
+            self._coords[idx] = new_row
+
 
     def scale(self, *args, **kwds):
         """Scales the layout.

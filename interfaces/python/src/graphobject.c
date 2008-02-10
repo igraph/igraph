@@ -3276,7 +3276,7 @@ PyObject *igraphmodule_Graph_pagerank_old(igraphmodule_GraphObject *self,
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOldd", kwlist, &vobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOlddO", kwlist, &vobj,
                                    &directed, &niter, &eps, &damping, &old))
     return NULL;
 
@@ -7948,7 +7948,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_pagerank_old */
   {"pagerank_old", (PyCFunction) igraphmodule_Graph_pagerank_old,
    METH_VARARGS | METH_KEYWORDS,
-   "pagerank(vertices=None, directed=True, niter=1000, eps=0.001, damping=0.85)\n\n"
+   "pagerank_old(vertices=None, directed=True, niter=1000, eps=0.001, damping=0.85)\n\n"
    "Calculates the Google PageRank values of a graph according to the\n"
    "old PageRank function found in igraph < 0.5.\n\n"
    "This functions is deprecated and for compatibility purposes only.\n\n"

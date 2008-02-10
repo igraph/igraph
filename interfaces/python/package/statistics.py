@@ -264,3 +264,53 @@ class RunningMean(object):
     def __long__(self): return long(self._mean)
     def __complex__(self): return complex(self._mean)
 
+
+def power_law_fit(x, xmin=None, method="discrete_approx"):
+    """Fitting a power-law distribution to empirical data
+
+    @param x: the data to fit, a list containing integer values
+    @param xmin: the lower bound for fitting the power-law. If C{None}, the
+      smallest x value is used. This argument makes it possible to fit
+      only the tail of the distribution.
+    @param method: the fitting method to use. The following methods are
+      implemented so far:
+
+        - C{continuous}, C{hill}: exact maximum likelihood estimation
+          when the input data comes from a continuous scale. This is
+          known as the Hill estimator. The statistical error of
+          this estimator is M{(alpha-1) / sqrt(n)}, where alpha is the
+          estimated exponent and M{n} is the number of data points above
+          M{xmin}. The estimator is known to exhibit a small finite
+          sample-size bias of order M{O(n^-1)}, which is small when
+          M{n > 100}.
+
+        - C{discrete_approx}: approximation of the maximum likelihood
+          estimation in discrete case (see Clauset et al among the
+          references). This is said to produce quite results provided
+          M{xmin} >= 6 (approx.).
+
+    @return: the estimated power-law exponent
+      
+    @ref: MEJ Newman: Power laws, Pareto distributions and Zipf's law.
+      Contemporary Physics 46, 323-351 (2005)
+    @ref: A Clauset, CR Shalizi, MEJ Newman: Power-law distributions
+      in empirical data. E-print (2007). arXiv:0706.1062"""
+    x0 = float(min(x))
+    if xmin is not None: x0 = float(max(xmin, x0))
+    s = 0.0
+    x = [x1 for x1 in x if x1>=xmin]
+
+    method = method.lower()
+
+    if method == "continuous" or method == "hill":
+        for x1 in x: s += math.log(x1/x0)
+        if s == 0: raise ValueError, "lower bound too high"
+        return 1.0+len(x)/s
+    elif method == "discrete_approx":
+        x0 -= 0.5
+        for x1 in x: s += math.log(x1/x0)
+        if s == 0: raise ValueError, "lower bound too high"
+        return 1.0+len(x)/s
+
+    raise ValueError, "unknown method: %s" % method
+

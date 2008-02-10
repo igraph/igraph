@@ -482,6 +482,149 @@ class Dendrogram(Clustering):
 
         return out.getvalue()
 
+    def _item_box_size(self, context, horiz, idx):
+        """Calculates the amount of space needed for drawing an individual vertex
+        at the bottom of the dendrogram."""
+        xb, yb, w, h, xa, ya = context.text_extents(self._names[idx])
+        if horiz: return (xa, h)
+        return (h, xa)
+
+    def _plot_item(self, context, horiz, idx, x, y):
+        xb, yb, w, h, xa, ya = context.text_extents(self._names[idx])
+        if horiz:
+            context.move_to(x, y+h)
+            context.show_text(self._names[idx])
+        else:
+            context.save()
+            context.translate(x, y)
+            context.rotate(-1.5707963285)    # pi/2
+            context.move_to(0, h)
+            context.show_text(self._names[idx])
+            context.restore()
+
+    def __plot__(self, context, bbox, palette, *args, **kwds):
+        """Draws the dendrogram on the given Cairo context
+
+        Supported keyword arguments are:
+
+          - C{orientation}: the orientation of the dendrogram. Must be one of
+            the following values: C{left-right}, C{bottom-top}, C{right-left}
+            or C{top-bottom}. Individual elements are always placed at the
+            former edge and merges are performed towards the latter edge.
+            Possible aliases: C{horizontal} = C{left-right},
+            C{vertical} = C{bottom-top}, C{lr} = C{left-right},
+            C{rl} = C{right-left}, C{tb} = C{top-bottom}, C{bt} = C{bottom-top}.
+            The default is C{left-right}.
+
+        """
+        from igraph.layout import Layout
+
+        if not hasattr(self, "_names"): self._names = map(str, xrange(self._n))
+
+        orientation = kwds.get("orientation", "lr")
+        
+        orientation_aliases = {
+            "lr": "left-right", "rl": "right-left",
+            "tb": "top-bottom", "bt": "bottom-top",
+            "horizontal": "left-right", "horiz": "left-right", "h": "left-right",
+            "vertical": "bottom-top", "vert": "bottom-top", "v": "bottom-top"
+        }
+        orientation = orientation_aliases.get(orientation, orientation)
+        if orientation not in ("left-right", "right-left", "top-bottom", "bottom-top"):
+            raise ValueError, "unknown orientation: %s" % orientation
+        horiz = orientation in ("left-right", "right-left")
+
+        # Calculate space needed for individual items at the bottom of the dendrogram
+        item_boxes = [self._item_box_size(context, horiz, idx) \
+          for idx in xrange(self._n)]
+
+        # Calculate coordinates
+        w, h = bbox.width, bbox.height
+        lo = Layout([(0,0)]*self._n, dim=2)
+        inorder = self._traverse_inorder()
+        if not horiz:
+            x, y = 0, 0
+            for idx, element in enumerate(inorder):
+                lo[element] = (x + item_boxes[element][0]/2., 0)
+                x += item_boxes[element][0]
+
+            for c1, c2 in self._merges:
+                y += 1
+                lo.append(((lo[c1][0]+lo[c2][0])/2., y))
+
+            # Mirror or rotate the layout if necessary
+            if orientation == "bottom-top": lo.mirror(1)
+        else:
+            x, y = 0, 0
+            for idx, element in enumerate(inorder):
+                lo[element] = (0, y + item_boxes[element][1]/2.)
+                y += item_boxes[element][1]
+
+            for c1, c2 in self._merges:
+                x += 1
+                lo.append((x, (lo[c1][1]+lo[c2][1])/2.))
+
+            # Mirror or rotate the layout if necessary
+            if orientation == "right-left": lo.mirror(0)
+        
+        # Rescale layout to the bounding box
+        maxw, maxh = max([e[0] for e in item_boxes]), max([e[1] for e in item_boxes])
+        # w, h: width and height of the area containing the dendrogram tree without
+        # the items. dx, dy: displacement of the dendrogram tree
+        w, h, dx, dy = float(bbox.width), float(bbox.height), 0, 0
+        if horiz:
+            w -= maxw
+            if orientation == "left-right": dx = maxw
+        else:
+            h -= maxh
+            if orientation == "top-bottom": dy = maxh
+        sl, st, sr, sb = lo.bounding_box()
+        sw, sh = max(sr-sl, 1), max(sb-st, 1)
+        rx, ry = w/sw, h/sh
+        lo.scale(rx, ry)
+        lo.translate(dx-sl*rx+bbox.coords[0], dy-st*ry+bbox.coords[1])
+
+        context.set_source_rgb(0.,0.,0.)
+        context.set_line_width(1)
+        
+        # Draw items
+        if horiz:
+            sgn = -1
+            if orientation == "right-left": sgn = 0
+            for idx in xrange(self._n):
+                x = lo[idx][0] + sgn * item_boxes[idx][0]
+                y = lo[idx][1] - item_boxes[idx][1]/2.
+                self._plot_item(context, horiz, idx, x, y)
+        else:
+            sgn = 0
+            if orientation == "bottom-top": sgn = 1
+            for idx in xrange(self._n):
+                x = lo[idx][0] - item_boxes[idx][0]/2.
+                y = lo[idx][1] + sgn * item_boxes[idx][1]
+                self._plot_item(context, horiz, idx, x, y)
+
+        # Draw dendrogram lines
+        if not horiz:
+            for idx, (c1, c2) in enumerate(self._merges):
+                x0, y0 = lo[c1]
+                x1, y1 = lo[c2]
+                x2, y2 = lo[idx + self._n]
+                context.move_to(x0, y0)
+                context.line_to(x0, y2)
+                context.line_to(x1, y2)
+                context.line_to(x1, y1)
+                context.stroke()
+        else:
+            for idx, (c1, c2) in enumerate(self._merges):
+                x0, y0 = lo[c1]
+                x1, y1 = lo[c2]
+                x2, y2 = lo[idx + self._n]
+                context.move_to(x0, y0)
+                context.line_to(x2, y0)
+                context.line_to(x2, y1)
+                context.line_to(x1, y1)
+                context.stroke()
+
     def _get_merges(self): return copy(self._merges)
     merges = property(_get_merges, doc = "The performed merges in matrix format")
 
@@ -532,7 +675,6 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         Dendrogram.__init__(self, merges)
         VertexClustering.__init__(self, graph, membership, maxmod, params)
 
-
     def cut(self, n):
         """Cuts the dendrogram at a given level.
 
@@ -557,3 +699,24 @@ class VertexDendrogram(VertexClustering, Dendrogram):
         self._membership = membership
         self._len = max(membership) - 1
         return copy(membership)
+
+    def __plot__(self, context, bbox, palette, *args, **kwds):
+        """Draws the vertex dendrogram on the given Cairo context
+
+        See L{Dendrogram.__plot__} for the list of supported keyword arguments."""
+        from igraph.drawing import collect_attributes
+        from igraph import config
+
+        if not kwds.has_key("vertex_label") and \
+            "label" not in self._graph.vs.attribute_names():
+            self._names = map(str, xrange(self._graph.vcount()))
+        elif kwds.get("vertex_label", []) is None:
+            self._names = map(str, xrange(self._graph.vcount()))
+        else:
+            self._names = collect_attributes(self._graph.vcount(), \
+                "vertex_label", "label", kwds, self._graph.vs, config, None)
+
+        result = Dendrogram.__plot__(self, context, bbox, palette, *args, **kwds)
+        del self._names
+        return result
+

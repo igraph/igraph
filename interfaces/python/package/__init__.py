@@ -92,7 +92,6 @@ class Graph(core.GraphBase):
             directed = edges
             edges = n
             n = 1
-            print "HERE"
         edges = edges or []
         directed = directed or False
         graph_attrs = graph_attrs or {}
@@ -1308,15 +1307,13 @@ class Graph(core.GraphBase):
         layout = kwds.get("layout", None)
         if isinstance(layout, Layout):
             layout = Layout(layout.coords)
-        elif isinstance(layout, str):
+        elif isinstance(layout, str) or layout is None:
             layout = self.layout(layout)
         else:
             layout = Layout(layout)
 
         sl, st, sr, sb = layout.bounding_box()
-        sw, sh = sr-sl, sb-st
-        if sw == 0: sw=1
-        if sh == 0: sh=1
+        sw, sh = max(sr-sl, 1), max(sb-st, 1)
         rx, ry = float(bbox.width-max_vertex_size-margin[1]-margin[3])/sw, \
           float(bbox.height-max_vertex_size-margin[0]-margin[2])/sh
         layout.scale(rx, ry)
