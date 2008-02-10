@@ -392,7 +392,69 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
 
 /**
  * \function igraph_pagerank
- * \brief Page Rank scores
+ * \brief Calculates the Google PageRank for the specified vertices.
+ * 
+ * This is the new PageRank implementation, based on the ARPACK
+ * library. The old, power-method based implementation can be used as
+ * well, it is kept under the name \ref igraph_pagerank_old().
+ * 
+ * </para><para>
+ * Please note that the PageRank of a given vertex depends on the PageRank
+ * of all other vertices, so even if you want to calculate the PageRank for
+ * only some of the vertices, all of them must be calculated. Requesting
+ * the PageRank for only some of the vertices does not result in any
+ * performance increase at all.
+ * </para>
+ * <para>
+ * Since the calculation is an iterative
+ * process, the algorithm is stopped after a given count of iterations
+ * or if the PageRank value differences between iterations are less than
+ * a predefined value.
+ * </para>
+ * 
+ * <para>
+ * For the explanation of the PageRank algorithm, see the following
+ * webpage:
+ * http://www-db.stanford.edu/~backrub/google.html, or the
+ * following reference:
+ * </para>
+ * 
+ * <para>
+ * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
+ * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
+ * Brisbane, Australia, April 1998.
+ * </para>
+ * <para>
+ * \param graph The graph object.
+ * \param vector Pointer to an initialized vector, the result is
+ *    stored here. It is resized as needed.
+ * \param value Pointer to a real variable, the eigenvalue
+ *    corresponding to the PageRank vector is stored here. It should
+ *    be always exactly one.
+ * \param vids The vertex ids for which the PageRank is returned.
+ * \param directed Boolean, whether to consider the directedness of
+ *    the edges. This is ignored for undirected graphs.
+ * \param damping The damping factor ("d" in the original paper)
+ * \param weights Optional edge weights, it is either a null pointer,
+ *    then the edges are not weighted, or a vector of the same length
+ *    as the number of edges.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the
+ *    <code>n</code> (number of vertices), <code>nev</code> (1),
+ *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and
+ *    it always starts the calculation from a non-random vector
+ *    calculated based on the degree of the vertices.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data. 
+ *         \c IGRAPH_EINVVID, invalid vertex id in
+ *         \p vids. 
+ * 
+ * Time complexity: TODO.
+ * 
+ * \sa \ref igraph_pagerank_old() for the old implementation, 
+ * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
+ * the underlying machinery.
  */
 
 int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,

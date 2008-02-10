@@ -40,6 +40,63 @@ void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
   }
 }
 
+/**
+ * \function igraph_forest_fire_game
+ * \brief Generates a network according to the \quote forest fire game \endquote
+ * 
+ * The forest fire model intends to reproduce the following network
+ * characteristics, observed in real networks:
+ * \ilist
+ * \ili Heavy-tailed in-degree distribution. 
+ * \ili Heavy-tailed out-degree distribution.
+ * \ili Communities.
+ * \ili Densification power-law. The network is densifying in time,
+ *      according to a power-law rule.
+ * \ili Shrinking diameter. The diameter of the network decreases in
+ *      time.
+ * \endilist
+ * 
+ * </para><para>
+ * The network is generated in the following way. One vertex is added at
+ * a time. This vertex connects to (cites) <code>ambs</code> vertices already
+ * present in the network, chosen uniformly random. Now, for each cited
+ * vertex <code>v</code> we do the following procedure:
+ * \olist
+ * \oli We generate two random number, <code>x</code> and <code>y</code>, that are
+ *   geometrically distributed with means <code>p/(1-p)</code> and
+ *   <code>rp(1-rp)</code>. (<code>p</code> is <code>fw_prob</code>, <code>r</code> is
+ *   <code>bw_factor</code>.) The new vertex cites <code>x</code> outgoing neighbors
+ *   and <code>y</code> incoming neighbors of <code>v</code>, from those which are
+ *   not yet cited by the new vertex. If there are less than <code>x</code> or
+ *   <code>y</code> such vertices available then we cite all of them.
+ * \oli The same procedure is applied to all the newly cited
+ *   vertices.
+ * \endolist
+ * </para><para>
+ * See also:
+ * Jure Leskovec, Jon Kleinberg and Christos Faloutsos. Graphs over time:
+ * densification laws, shrinking diameters and possible explanations.
+ * \emb KDD '05: Proceeding of the eleventh ACM SIGKDD international
+ * conference on Knowledge discovery in data mining \eme, 177--187, 2005.
+ * </para><para>
+ * Note however, that the version of the model in the published paper is incorrect
+ * in the sense that it cannot generate the kind of graphs the authors
+ * claim. A corrected version is available from
+ * http://www.cs.cmu.edu/~jure/pubs/powergrowth-tkdd.pdf, our
+ * implementation is based on this.
+ * 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param nodes The number of vertices in the graph.
+ * \param fw_prob The forward burning probability.
+ * \param bw_factor The backward burning ratio. The backward burning
+      probability is calculated as <code>bw.factor*fw.prob</code>.
+ * \param pambs The number of ambassador vertices.
+ * \param directed Whether to create a directed graph.
+ * \return Error code.
+ * 
+ * Time complexity: TODO.
+ */
+
 int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 			    igraph_real_t fw_prob, igraph_real_t bw_factor,
 			    igraph_integer_t pambs, igraph_bool_t directed) {

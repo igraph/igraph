@@ -35,6 +35,7 @@ doxhead='\/\*\*'
 # global variables
 #################
 verbose=False
+cutit=False
 
 #########################################################################
 # The main function
@@ -42,11 +43,11 @@ verbose=False
 
 def main():
 
-    global verbose
+    global verbose, cutit
     
     # get command line arguments
     try:
-        optlist, args = getopt.getopt(sys.argv[1:], 't:e:o:hv', ['help'])
+        optlist, args = getopt.getopt(sys.argv[1:], 't:e:o:hvc', ['help'])
     except getopt.GetoptError:
         # print help information and exit:
         usage()
@@ -68,6 +69,8 @@ def main():
             outputfile = a
         if o == "-v":
             verbose = True
+        if o == "-c":
+            cutit = True
         
     if templatefile == "" or regexfile == "" or outputfile == "":
         print("Error, some special file is not given")
@@ -218,12 +221,14 @@ def readregexappend(lines, actreplace, actwith, acttype):
 # parse an input file string
 #################
 def parsestring(strinput, regexlist, docchunks):
+    global cutit
     # split the file
     chunks=re.split(doxhead, strinput)
     chunks=chunks[1:]
     # apply all rules to the chunks
     for ch in chunks:
-        ch=ch.split("/*")[0]
+        if cutit:
+            ch=ch.split("/*")[0]
         actch=ch
         name=""
         for reg in regexlist:

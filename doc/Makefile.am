@@ -9,7 +9,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
-	      adjlist.xml
+	      adjlist.xml arpack.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -50,10 +50,10 @@ basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/str
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 
 generators.xml: generators.xxml $(SRCDIR)/structure_generators.c $(SRCDIR)/games.c \
-		$(SRCDIR)/atlas.c $(SRCDIR)/structural_properties.c
+		$(SRCDIR)/atlas.c $(SRCDIR)/structural_properties.c $(SRCDIR)/forestfire.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structure_generators.c $(SRCDIR)/games.c $(SRCDIR)/atlas.c \
-	$(SRCDIR)/structural_properties.c
+	$(SRCDIR)/structural_properties.c $(SRCDIR)/forestfire.c
 
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c \
@@ -67,7 +67,7 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(SRCDIR)/centrality.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(SRCDIR)/igraph.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
+	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
 	$(SRCDIR)/igraph.h
 
 attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(SRCDIR)/attributes.h $(SRCDIR)/cattributes.c
@@ -85,7 +85,7 @@ nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/other.c $(SRCDIR)/random.c
 
 isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(SRCDIR)/igraph.h $(SRCDIR)/bliss.cc
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(SRCDIR)/igraph.h $(SRCDIR)/bliss.cc
+	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(SRCDIR)/igraph.h $(SRCDIR)/bliss.cc
 
 motifs.xml: motifs.xxml $(SRCDIR)/motifs.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/motifs.c
@@ -115,7 +115,10 @@ strvector.xml: strvector.xxml $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_strvector.c $(SRCDIR)/types.h
 
 adjlist.xml: adjlist.xxml $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
+	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
+
+arpack.xml: arpack.xxml $(SRCDIR)/arpack.h $(SRCDIR)/arpack.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/arpack.h $(SRCDIR)/arpack.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

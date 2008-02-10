@@ -112,6 +112,11 @@ int igraph_i_arpack_err_dneupd(long int error) {
   }    
 }
 
+/**
+ * \function igraph_arpack_options_init
+ * Initialize ARPACK options
+ */
+
 void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->bmat[0]='I';
   o->n=0;			/* needs to be updated! */
@@ -134,6 +139,11 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->iparam[4]=0; o->iparam[5]=0; o->iparam[6]=o->mode; o->iparam[7]=0;
   o->iparam[8]=0; o->iparam[9]=0; o->iparam[10]=0;
 }
+
+/**
+ * \function igraph_arpack_storage_init
+ * Initialize ARPACK storage
+ */
 
 int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
 			       long int maxncv, long int maxldv, 
@@ -174,6 +184,11 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
   return 0;
 }
 
+/**
+ * \function igraph_arpack_storage_destroy
+ * Deallocate ARPACK storage
+ */
+
 void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
   
   if (s->di) { 
@@ -191,6 +206,11 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
   igraph_Free(s->workd);
   igraph_Free(s->v);
 }
+
+/**
+ * \function igraph_arpack_rssolve
+ * \brief ARPACK solver for symmetric matrices
+ */
 
 int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_arpack_options_t *options, 
@@ -350,6 +370,11 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   return 0;
 }
+
+/**
+ * \function igraph_arpack_rnsolve
+ * \brief ARPACK solver for non-symmetric matrices
+ */
 
 int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_arpack_options_t *options,

@@ -303,7 +303,7 @@ REPLACE ----- \struct ---------------------------------------------------------
 (?P<before>\A.*?)                 # head of the comment
 \\struct\s+                       # \struct command
 (?P<name>(?P<pre>(igraph_)|(IGRAPH_)|())(?P<tail>[\w_]+))
-[\s]*(?P<brief>[^\n]*?)\n        # brief description
+[\s]*(?P<brief>[^\n]*?)(?=\n)     # brief description
 (?P<after>.*?)                    # tail of the command
 \*\/\s*                           # closing the comment
 (?P<def>typedef \s*struct\s*\w+\s*\{
@@ -324,32 +324,24 @@ WITH --------------------------------------------------------------------------
 </para>
 </section>
 
-REPLACE ----- structure member descriptions, head -----------------------------
+REPLACE ----- structure member descriptions, one block ------------------------
 
-(?P<before>\A.*?)               # head of the comment
-\\member\b                      # first \member commant
+^[\s]*\n
+(?P<before2>.*?)                # empty line+text
+(?P<members>\\member\b.*?)      # member commands
+(?=                             # this marks the end of the \member text
+ (\\return\b)|(\\sa\b)|         # it is either a \return or \sa or
+ (^[\s]*\n)|                    # (at least) one empty line or
+ (\*\/))                        # the end of the comment
 
 WITH --------------------------------------------------------------------------
 
-\g<before></para>
-<formalpara><title>Values:</title><para>
-<variablelist role="params">
-\member
-
-REPLACE ----- structure member descriptions, tail -----------------------------
-
-\\member\b                        # the last \member command
-(?P<paramtext>.*?)                # the text of the \member command
-(?P<endmark>                      # this marks the end of the \member text
- (\\return\b)|(\\sa\b)|           # it is either a \return or \sa or
- (\n\s*?\n)|                      # (at least) one empty line or
- (\*\/))                          # the end of the comment
-(?P<after>.*?\Z)                  # remaining part
-
-WITH
-
-\member\g<paramtext></variablelist></para></formalpara><para>
-\g<endmark>\g<after>
+</para>
+<para>\g<before2></para>
+<formalpara><title>Values:</title>
+<para><variablelist role="params">
+\g<members>
+</variablelist></para></formalpara><para>
 
 REPLACE ----- structure member descriptions -----------------------------------
 
@@ -363,7 +355,7 @@ WITH --------------------------------------------------------------------------
 
   <varlistentry><term><constant>\g<paramname></constant>:</term>
   <listitem><para>
-  \g<paramtext></para></listitem></varlistentry>  
+  \g<paramtext></para></listitem></varlistentry>
 
 REPLACE ----- \typedef function -----------------------------------------------
 
@@ -538,6 +530,33 @@ REPLACE ----- \endolist -------------------------------------------------------
 WITH
 
 </orderedlist>
+
+REPLACE ----- \ilist ----------------------------------------------------------
+
+\\ilist\b
+
+WITH
+
+<itemizedlist>
+
+REPLACE ----- \ili ------------------------------------------------------------
+
+\\ili\s+(?P<text>.*?)
+(?=(\\ili)|(\\endilist))
+
+WITH
+
+<listitem><para>
+\g<text>
+</para></listitem>
+
+REPLACE ----- \endilist -------------------------------------------------------
+
+\\endilist\b
+
+WITH
+
+</itemizedlist>
 
 REPLACE ----- doxygen \c command is for <constant> ----------------------------
 

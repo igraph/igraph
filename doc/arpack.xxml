@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Arpack">
+<title>Using ARPACK for igraph graphs</title>
+
+<section>
+<!-- doxrox-include about_arpack -->
+</section>
+
+<section><title>Data structures</title>
+<!-- doxrox-include igraph_arpack_options_t -->
+<!-- doxrox-include igraph_arpack_storage_t -->
+<!-- doxrox-include igraph_arpack_function_t -->
+<!-- doxrox-include igraph_arpack_options_init -->
+<!-- doxrox-include igraph_arpack_storage_init -->
+<!-- doxrox-include igraph_arpack_storage_destroy -->
+</section>
+
+<section><title>ARPACK solvers</title>
+<!-- doxrox-include igraph_arpack_rssolve -->
+<!-- doxrox-include igraph_arpack_rnsolve -->
+</section>
+
+</chapter>

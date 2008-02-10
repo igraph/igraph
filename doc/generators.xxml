@@ -38,6 +38,7 @@
 <!-- doxrox-include igraph_watts_strogatz_game -->
 <!-- doxrox-include igraph_rewire_edges -->
 <!-- doxrox-include igraph_degree_sequence_game -->
+<!-- doxrox-include igraph_forest_fire_game -->
 <!-- doxrox-include igraph_rewire -->
 <!-- doxrox-include igraph_growing_random_game -->
 <!-- doxrox-include igraph_callaway_traits_game -->

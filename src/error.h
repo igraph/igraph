@@ -290,6 +290,28 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
  * \enumval IGRAPH_DIVERGED A numeric algorithm failed to converge.
+ * \enumval IGRAPH_ARPACK_PROD Matrix-vector product failed.
+ * \enumval IGRAPH_ARPACK_NPOS N must be positive.
+ * \enumval IGRAPH_ARPACK_NEVNPOS NEV must be positive.
+ * \enumval IGRAPH_ARPACK_NCVSMALL NCV must be bigger.
+ * \enumval IGRAPH_ARPACK_NONPOSI Maximum number of iterations should be positive.
+ * \enumval IGRAPH_ARPACK_WHICHINV Invalid WHICH parameter.
+ * \enumval IGRAPH_ARPACK_BMATINV Invalid BMAT parameter.
+ * \enumval IGRAPH_ARPACK_WORKLSMALL WORKL is too small.
+ * \enumval IGRAPH_ARPACK_TRIDERR LAPACK error in tridiagonal eigenvalue calculation.
+ * \enumval IGRAPH_ARPACK_ZEROSTART Starting vector is zero.
+ * \enumval IGRAPH_ARPACK_MODEINV MODE is invalid.
+ * \enumval IGRAPH_ARPACK_MODEBMAT MODE and BMAT are not compatible.
+ * \enumval IGRAPH_ARPACK_ISHIFT ISHIFT must be 0 or 1.
+ * \enumval IGRAPH_ARPACK_NEVBE NEV and WHICH='BE' are incompatible.
+ * \enumval IGRAPH_ARPACK_NOFACT Could not build an Arnoldi factorization.
+ * \enumval IGRAPH_ARPACK_FAILED No eigenvalues to sufficient accuracy.
+ * \enumval IGRAPH_ARPACK_HOWMNY HOWMNY is invalid.
+ * \enumval IGRAPH_ARPACK_HOWMNYS HOWMNY='S' is not implemented.
+ * \enumval IGRAPH_ARPACK_EVDIFF Different number of converged Ritz values.
+ * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
+ * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
+ * \enumval IGRAPH_ARPACK_UNKNOWN Unkown ARPACK error.
  */
 
 typedef enum {
@@ -307,27 +329,27 @@ typedef enum {
   IGRAPH_UNIMPLEMENTED = 12,
   IGRAPH_INTERRUPTED   = 13,
   IGRAPH_DIVERGED      = 14,
-  IGRAPH_ARPACK_PROD      = 15,	/* matrix-vector product failed */
-  IGRAPH_ARPACK_NPOS      = 16,	/* dsaupd -1  dseupd -1  dnaupd -1  dneupd -1  */
-  IGRAPH_ARPACK_NEVNPOS   = 17, /* dsaupd -2  dseupd -2  dnaupd -2  dneupd -2  */
-  IGRAPH_ARPACK_NCVSMALL  = 18,	/* dsaupd -3  dseupd -3  dnaupd -3  dneupd -3  */
-  IGRAPH_ARPACK_NONPOSI   = 19, /* dsaupd -4             dnaupd -4             */
-  IGRAPH_ARPACK_WHICHINV  = 20,	/* dsaupd -5  dseupd -5  dnaupd -5  dneupd -5  */
-  IGRAPH_ARPACK_BMATINV   = 21,	/* dsaupd -6  dseupd -6  dnaupd -6  dneupd -6  */
-  IGRAPH_ARPACK_WORKLSMALL= 22,	/* dsaupd -7  dseupd -7  dnaupd -7  dneupd -7  */
-  IGRAPH_ARPACK_TRIDERR   = 23,	/* dsaupd -8  dseupd -8  dnaupd -8             */
-  IGRAPH_ARPACK_ZEROSTART = 24,	/* dsaupd -9  dseupd -9  dnaupd -9             */
-  IGRAPH_ARPACK_MODEINV   = 25,	/* dsaupd -10 dseupd -10 dnaupd -10 dneupd -10 */
-  IGRAPH_ARPACK_MODEBMAT  = 26,	/* dsaupd -11 dseupd -11 dnaupd -11 dneupd -11 */
-  IGRAPH_ARPACK_ISHIFT    = 27,	/* dsaupd -12            dnaupd -12            */
-  IGRAPH_ARPACK_NEVBE     = 28,	/* dsaupd -13 dseupd -12                       */
-  IGRAPH_ARPACK_NOFACT    = 29,	/* dsaupd -9999          dnaupd -9999          */
-  IGRAPH_ARPACK_FAILED    = 30, /*            dseupd -14            dneupd -14 */
-  IGRAPH_ARPACK_HOWMNY    = 31,	/*            dseupd -15            dneupd -13 */
-  IGRAPH_ARPACK_HOWMNYS   = 32,	/*            dseupd -16            dneupd -12 */
-  IGRAPH_ARPACK_EVDIFF    = 33, /*            dseupd -17            dneupd -15 */
-  IGRAPH_ARPACK_SHUR      = 34, /*                                  dneupd -8  */
-  IGRAPH_ARPACK_LAPACK    = 35,	/*                                  dneupd -9  */
+  IGRAPH_ARPACK_PROD      = 15,
+  IGRAPH_ARPACK_NPOS      = 16,
+  IGRAPH_ARPACK_NEVNPOS   = 17,
+  IGRAPH_ARPACK_NCVSMALL  = 18,
+  IGRAPH_ARPACK_NONPOSI   = 19,
+  IGRAPH_ARPACK_WHICHINV  = 20,
+  IGRAPH_ARPACK_BMATINV   = 21,
+  IGRAPH_ARPACK_WORKLSMALL= 22,
+  IGRAPH_ARPACK_TRIDERR   = 23,
+  IGRAPH_ARPACK_ZEROSTART = 24,
+  IGRAPH_ARPACK_MODEINV   = 25,
+  IGRAPH_ARPACK_MODEBMAT  = 26,
+  IGRAPH_ARPACK_ISHIFT    = 27,
+  IGRAPH_ARPACK_NEVBE     = 28,
+  IGRAPH_ARPACK_NOFACT    = 29,
+  IGRAPH_ARPACK_FAILED    = 30,
+  IGRAPH_ARPACK_HOWMNY    = 31,
+  IGRAPH_ARPACK_HOWMNYS   = 32,
+  IGRAPH_ARPACK_EVDIFF    = 33,
+  IGRAPH_ARPACK_SHUR      = 34,
+  IGRAPH_ARPACK_LAPACK    = 35,
   IGRAPH_ARPACK_UNKNOWN   = 36
 } igraph_error_type_t;
 

@@ -119,6 +119,7 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
 
 /**
  * \struct igraph_attribute_table_t
+ * \brief Table of functions to perform operations on attributes
  * 
  * This type collects the functions defining an attribute handler.
  * It has the following members:
@@ -195,17 +196,14 @@ typedef struct igraph_attribute_table_t {
 		   igraph_vector_ptr_t *attr);
   void (*delete_edges)(igraph_t *graph, const igraph_vector_t *idx);
   int (*permute_edges)(igraph_t *graph, const igraph_vector_t *idx);
-
   int (*get_info)(const igraph_t *graph,
 		  igraph_strvector_t *gnames, igraph_vector_t *gtypes,
 		  igraph_strvector_t *vnames, igraph_vector_t *vtypes,
 		  igraph_strvector_t *enames, igraph_vector_t *etypes);
-
   igraph_bool_t (*has_attr)(const igraph_t *graph, igraph_attribute_elemtype_t type,
 			    const char *name);
   int (*gettype)(const igraph_t *graph, igraph_attribute_type_t *type,
 		 igraph_attribute_elemtype_t elemtype, const char *name);
-
   int (*get_numeric_graph_attr)(const igraph_t *graph, const char *name,
 				igraph_vector_t *value);
   int (*get_string_graph_attr)(const igraph_t *graph, const char *name,

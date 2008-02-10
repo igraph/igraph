@@ -41,6 +41,7 @@
 <!-- doxrox-include igraph_betweenness -->
 <!-- doxrox-include igraph_edge_betweenness -->
 <!-- doxrox-include igraph_pagerank -->
+<!-- doxrox-include igraph_pagerank_old -->
 <!-- doxrox-include igraph_constraint -->
 <!-- doxrox-include igraph_maxdegree -->
 </section>

@@ -1268,16 +1268,23 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  *        if the difference of PageRank values between iterations change
  *        less than this value for every node
  * \param damping The damping factor ("d" in the original paper)
- * \param old Boolean, whether to use the < igraph 0.5 way to 
+ * \param old Boolean, whether to use the pre-igraph 0.5 way to 
  *        calculate page rank. Not recommended for new applications,
- *        only included for compatibility.
+ *        only included for compatibility. If this is non-zero then the damping 
+ *        factor is not divided by the number of vertices before adding it 
+ *        to the weighted page rank scores to calculate the 
+ *        new scores. I.e. the formula in the original PageRank paper is used.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
  *         \c IGRAPH_EINVVID, invalid vertex id in
  *         \p vids. 
  * 
- * Time complexity: TODO.
+ * Time complexity: O(|V|+|E|) per iteration. A handful iterations
+ * should be enough. Note that if the old-style dumping is used then 
+ * the iteration might not converge at all.
+ * 
+ * \sa \ref igraph_pagerank() for the new implementation.
  */
 
 int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 

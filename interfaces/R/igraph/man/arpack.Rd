@@ -157,33 +157,10 @@ arpack(func, extra = NULL, sym = FALSE, options = igraph.arpack.default,
 	  \item{3}{No shifts could be applied during a cycle of the
 	    Implicitly restarted Arnoldi iteration. One possibility
 	    is to increase the size of \code{ncv} relative to \code{nev}.}
-	  \item{-1}{\code{n} must be positive.}
-	  \item{-2}{\code{nev} must be positive.}
-	  \item{-3}{\code{ncv-nev >= 2} and less than or equal to
-	    \code{n} is required.}
-	  \item{-4}{The maximum number of Arnoldi update iteration must
-	    be greater than zero.}
-	  \item{-5}{\code{which} must be one of \sQuote{\code{LM}},
-	    \sQuote{\code{SM}}, \sQuote{\code{LA}}, \sQuote{\code{SA}}
-	    or \sQuote{\code{BE}} for symmetric matrices. It must be one
-	    of \sQuote{\code{LM}}, \sQuote{\code{SM}},
-	    \sQuote{\code{LR}}, \sQuote{\code{SR}}, \sQuote{\code{LI}}
-	    or \sQuote{\code{SI}} for non-symmetric matrices.}
-	  \item{-6}{\code{bmat} must be one of \sQuote{\code{I}} or
-	    \sQuote{\code{G}}. }
-	  \item{-7}{Length of private work array is not
-	    sufficient. (This indicates in internal error in igraph and
-	    normally should not happen.)}
-	  \item{-8}{Error return from LAPACK eigenvalue calculation.}
-	  \item{-9}{Starting vector is zero. (Should not happen
-	    currently.)}
-	  \item{-10}{\code{mode} should be between 1 and 5 for symmetric
-	    matrices and between 1 and 4 for non-symmetric matrices.}
-	  \item{-11}{\code{mode==1} and \code{bmat=G} are incompatible.}
-	  \item{-12}{\code{ishift} must be either zero or one.}
-	  \item{-13}{\code{nev} and \code{which=BE} are incompatible.}
-	  \item{-9999}{Could not build an Arnoldi factorization.}
 	}
+
+	ARPACK can return more error conditions than these, but they are
+	converted to regular igraph errors.
       }
       \item{iter}{Number of Arnoldi iterations taken.}
       \item{nconv}{Number of \dQuote{converged} Ritz values. This
