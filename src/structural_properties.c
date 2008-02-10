@@ -1273,7 +1273,9 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  *        only included for compatibility. If this is non-zero then the damping 
  *        factor is not divided by the number of vertices before adding it 
  *        to the weighted page rank scores to calculate the 
- *        new scores. I.e. the formula in the original PageRank paper is used.
+ *        new scores. I.e. the formula in the original PageRank paper
+ *        is used. Furthermore, if this is non-zero then the PageRank
+ *        vector is renormalized after each iteration.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data. 
@@ -1378,8 +1380,12 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
 	prvec_new[i]+=prvec_scaled[neighbor];
       }
       prvec_new[i]*=damping;
-      prvec_new[i]+=(1-damping);
-       sum += prvec_new[i];
+      if (!old) {
+	prvec_new[i]+=(1-damping)/no_of_nodes;
+      } else {
+	prvec_new[i]+=(1-damping);
+      }
+      sum += prvec_new[i];
       
      }
      for (i=0; i<no_of_nodes; i++) {

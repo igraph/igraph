@@ -1,3 +1,9 @@
+2008-02-10  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/centrality.c (igraph_pagerank) : bugs fixed, handle directed graphs
+
+	* src/structureal_properties.c (igraph_pagerank_old) : bug fixed
+
 2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/arpack.c (igraph_arpack_dssolve, igraph_arpack_dnsolve)

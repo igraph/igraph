@@ -477,11 +477,9 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   options->ncv = 3;
   options->which[0]='L'; options->which[1]='M';
   options->start=1;		/* no random start vector */
-  
-  if (directed && igraph_is_directed(graph)) {
-    IGRAPH_ERROR("Directed graphs are not supported yet, use 'directed=0'",
-		 IGRAPH_UNIMPLEMENTED);
-  }
+
+  directed <- directed && igraph_is_directed(graph);
+
   if (weights && igraph_vector_size(weights) != igraph_ecount(graph))
   {
     IGRAPH_ERROR("Invalid length of weights vector when calculating "
@@ -505,7 +503,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 				      &outdegree, &tmp };
 
     IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
-			       IGRAPH_OUT, /*loops=*/ 0));
+			       directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
     /* Avoid division by zero */
     for (i=0; i<options->n; i++) {
       if (VECTOR(outdegree)[i]==0) {
@@ -538,8 +536,17 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
       long int to=IGRAPH_TO(graph, i);
       igraph_real_t weight=VECTOR(*weights)[i];
       VECTOR(outdegree)[from] += weight;
-      VECTOR(outdegree)[to]   += weight;
+      if (!directed) { 
+	VECTOR(outdegree)[to]   += weight;
+      }
     }
+    /* Avoid division by zero */
+    for (i=0; i<options->n; i++) {
+      if (VECTOR(outdegree)[i]==0) {
+	VECTOR(outdegree)[i]=1;
+      }
+      MATRIX(vectors, i, 0) = VECTOR(outdegree)[i];
+    }     
     
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
 				       &data, options, 0, &values, &vectors));

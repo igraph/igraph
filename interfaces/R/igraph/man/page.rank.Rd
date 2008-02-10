@@ -55,6 +55,8 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   argument is \code{TRUE} then \eqn{(1-d)} is added, just like in the
   PageRank paper; \eqn{d} is the damping factor, and \eqn{n} is the
   total number of vertices.
+  A further difference is that the old implementation does not
+  renormalize the page rank vector after each iteration.
   Note that the \code{old=FALSE} method is not stable,
   is does not necessarily converge to a fixed point. It should be
   avoided for new code, it is only included for compatibility with old
