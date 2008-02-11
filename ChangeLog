@@ -1,3 +1,7 @@
+2008-02-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_path_length_hist) : bug fixed
+
 2008-02-10  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_pagerank) : bugs fixed, handle directed graphs

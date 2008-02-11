@@ -359,7 +359,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
 
   /* count every pair only once for an undirected graph */
   if (!directed || !igraph_is_directed(graph)) {
-    for (i=1; i<ressize; i++) {
+    for (i=0; i<ressize; i++) {
       VECTOR(*res)[i] /= 2;
     }
   }
