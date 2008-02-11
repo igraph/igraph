@@ -323,7 +323,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
     VECTOR(already_added)[i]=i+1;
     
-    igraph_progress("Path-hist: ", 100.0*i/no_of_nodes, NULL);
+    IGRAPH_PROGRESS("Path-hist: ", 100.0*i/no_of_nodes, NULL);
 
     IGRAPH_ALLOW_INTERRUPTION();
     
