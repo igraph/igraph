@@ -88,17 +88,19 @@ class Histogram(object):
     sd = property(_get_sd, doc="Standard deviation of the elements")
     var = property(_get_var, doc="Variance of the elements")
 
-    def add(self, num):
+    def add(self, num, repeat=1):
         """Adds a single number to the histogram.
         
-        @param num: the number to be added"""
+        @param num: the number to be added
+        @param repeat: number of repeated additions
+        """
         num = float(num)
         bin = self._get_bin(num, True)
-        self._bins[bin] += 1
-        self._n += 1
+        self._bins[bin] += repeat 
+        self._n += repeat
         delta = num - self._mean
-        self._mean += (delta / self._n)
-        self._s += delta * (num - self._mean)
+        self._mean += (repeat*delta / self._n)
+        self._s += (repeat*delta) * (num - self._mean)
         if self._n > 1:
             self._sd = (self._s / (self._n-1)) ** 0.5
 
@@ -208,18 +210,19 @@ class RunningMean(object):
             self._s = 0.0
             self._sd = 0.0
         
-    def add(self, value):
-        """RunningMean.add(value)
+    def add(self, value, repeat=1):
+        """RunningMean.add(value,repeat=1)
         
         Adds the given value to the elements from which we calculate
         the mean and the standard deviation.
 
         @param value: the element to be added
+        @param repeat: number of repeated additions
         @return: the new mean and standard deviation as a tuple"""
         self._n += 1
         delta = value - self._mean
-        self._mean = self._mean + delta / self._n
-        self._s = self._s + delta * (value - self._mean)
+        self._mean += (repeat*delta / self._n)
+        self._s += (repeat*delta) * (value - self._mean)
         if self._n > 1:
             self._sd = (self._s / (self._n-1)) ** 0.5
         return self._mean, self._sd

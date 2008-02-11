@@ -370,7 +370,25 @@ class Graph(core.GraphBase):
         else:
             return GraphBase.modularity(self, membership, weights)
 
-    
+    def path_length_hist(self, directed=True):
+        """path_length_hist(directed=True)
+
+        Returns the path length histogram of the graph
+
+        @param directed: whether to consider directed paths. Ignored for
+          undirected graphs.
+        @return: a L{Histogram} object. The object will also have an
+          C{unconnected} attribute that stores the number of unconnected
+          vertex pairs (where the second vertex can not be reached from
+          the first one). The latter one will be of type long (and not
+          a simple integer), since this can be I{very} large.
+        """
+        data, unconn = GraphBase.path_length_hist(self, directed)
+        hist = Histogram(bin_width=1)
+        for i, n in enumerate(data): hist.add(i+1, n)
+        hist.unconnected = long(unconn)
+        return hist
+
     def triad_census(self, *args, **kwds):
         """triad_census()
 
@@ -532,50 +550,6 @@ class Graph(core.GraphBase):
         merges, qs = GraphBase.community_walktrap(self, weights, steps, True)
         d = VertexDendrogram(self, merges, modularity=qs)
         return d
-
-
-    def edge_betweenness_clustering(self, clusters = None, steps = None):
-        """Newman's edge betweenness clustering.
-
-        Iterative removal of edges with the largest edge betweenness until
-        the given number of steps is reached or until the graph is decomposed
-        to the given number of clusters. Edge betweennesses are recalculated
-        after every run.
-
-        @param clusters: the desired number of clusters.
-        @param steps: the number of steps to take.
-
-        @return: an appropriate L{VertexClustering} object.
-
-        @newfield ref: Reference
-        @ref: Girvan, M and Newman, MEJ: Community structure in social and
-          biological networks. Proc. Natl. Acad. Sci. USA 99, 7821-7826 (2002)
-        """
-        warn("Graph.edge_betweenness_clustering is deprecated and will be removed soon. Use Graph.community_edge_betweenness instead", DeprecationWarning)
-        g = self.copy()
-        number_of_steps = 0
-
-        directed = g.is_directed()
-
-        while True:
-            if clusters is not None:
-                cl = g.clusters()
-                if max(cl)+1 >= clusters: break
-
-            if steps is not None:
-                if number_of_steps > steps: break
-
-            ebs = g.edge_betweenness(directed)
-
-            if len(ebs) == 0: break
-
-            eb_max = max(ebs)
-            eb_max_index = ebs.index(eb_max)
-
-            g.delete_edges(eb_max_index, by_index=True)
-            number_of_steps += 1
-
-        return VertexClustering(self, g.clusters()) 
 
 
     def k_core(self, *args):

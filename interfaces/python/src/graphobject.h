@@ -116,6 +116,7 @@ PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, 
 PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_maxdegree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_path_length_hist(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_reciprocity(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_rewire(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);

@@ -3385,6 +3385,33 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the path length histogram of the graph
+ * \sa igraph_path_length_hist
+ */
+PyObject *igraphmodule_Graph_path_length_hist(igraphmodule_GraphObject *self,
+                                              PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "directed", NULL };
+  PyObject *directed = Py_True, *result;
+  igraph_real_t unconn;
+  igraph_vector_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &directed))
+	return NULL;
+
+  if (igraph_vector_init(&res, 0))
+	return igraphmodule_handle_igraph_error();
+
+  if (igraph_path_length_hist(&self->g, &res, &unconn, PyObject_IsTrue(directed))) {
+	igraph_vector_destroy(&res);
+	return igraphmodule_handle_igraph_error();
+  }
+  
+  result=igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&res);
+  return Py_BuildValue("Nd", result, (double)unconn);
+}
+
+/** \ingroup python_interface_graph
  * \brief Permutes the vertices of the graph 
  * \return the new graph as a new igraph object
  * \sa igraph_permute_vertices
@@ -7969,6 +7996,20 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: Sergey Brin and Larry Page: I{The Anatomy of a Large-Scale\n"
    "  Hypertextual Web Search Engine}. Proceedings of the 7th\n"
    "  World-Wide Web Conference, Brisbane, Australia, April 1998.\n"},
+
+  /* interface to igraph_path_length_hist */
+  {"path_length_hist", (PyCFunction) igraphmodule_Graph_path_length_hist,
+   METH_VARARGS | METH_KEYWORDS,
+   "path_length_hist(directed=True)\n\n"
+   "Calculates the path length histogram of the graph\n"
+   "@attention: this function is wrapped in a more convenient syntax in the\n"
+   "  derived class L{Graph}. It is advised to use that instead of this version.\n\n"
+   "@param directed: whether to consider directed paths\n"
+   "@return: a tuple. The first item of the tuple is a list of path lengths,\n"
+   "  the M{i}th element of the list contains the number of paths with length\n"
+   "  M{i+1}. The second item contains the number of unconnected vertex pairs\n"
+   "  as a float (since it might not fit into an integer)\n"
+  },
 
   /* interface to igraph_permute_vertices */
   {"permute_vertices", (PyCFunction) igraphmodule_Graph_permute_vertices,

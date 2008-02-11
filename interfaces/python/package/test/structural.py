@@ -190,6 +190,7 @@ class CentralityTests(unittest.TestCase):
         hsc, ev = g.hub_score(scale=False, return_eigenvalue=True)
         if hsc[0]<0: hsc = [-x for x in hsc]
 
+
 class MiscTests(unittest.TestCase):
     def testConstraint(self):
         g = Graph(4, [(0, 1), (0, 2), (1, 2), (0, 3), (1, 3)])
@@ -214,18 +215,31 @@ class MiscTests(unittest.TestCase):
         self.failUnless(el == [(0, 2), (0, 4)])
 
 
+class PathTests(unittest.TestCase):
+    def testPathLengthHist(self):
+        g = Graph.Tree(15, 2)
+        h = g.path_length_hist()
+        self.failUnless(h.unconnected == 0L)
+        self.failUnless([(int(l),x) for l,_,x in h.bins()] == \
+          [(1,14),(2,19),(3,20),(4,20),(5,16),(6,16)])
+        g = Graph.Barabasi(100, directed=True)
+        h = g.path_length_hist()
+        self.failUnless(h.unconnected == sum(range(100)))
+
 def suite():
     simple_suite = unittest.makeSuite(SimplePropertiesTests)
     degree_suite = unittest.makeSuite(DegreeTests)
     local_transitivity_suite = unittest.makeSuite(LocalTransitivityTests)
     biconnected_suite = unittest.makeSuite(BiconnectedComponentTests)
     centrality_suite = unittest.makeSuite(CentralityTests)
+    path_suite = unittest.makeSuite(PathTests)
     misc_suite = unittest.makeSuite(MiscTests)
     return unittest.TestSuite([simple_suite,
                                degree_suite,
                                local_transitivity_suite,
                                biconnected_suite,
                                centrality_suite,
+                               path_suite,
                                misc_suite])
 
 def test():
