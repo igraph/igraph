@@ -32,8 +32,22 @@ Bugs corrected in the R interface
 New in the Python interface
 ---------------------------
 
-TODO
-
+- Added shell interface: igraph can now be invoked by calling the script called
+  igraph from the command line. The script launches the Python interpreter and
+  automatically imports igraph functions into the main namespace
+- Pickling (serialization) support for Graph objects
+- Plotting functionality based on the Cairo graphics library (so you need to
+  install python-cairo if you want to use it). Currently the following
+  objects can be plotted: graphs, adjacency matrices and dendrograms. Some
+  crude support for plotting histograms is also implemented. Plots can be
+  saved in PNG, SVG and PDF formats.
+- Unified Graph.layout method for accessing layout algorithms
+- Added interfaces to walktrap community detection and the BLISS isomorphism
+  algorithm
+- Added dyad and triad census functionality and motif counting
+- VertexSeq and EdgeSeq objects can now be restricted to subsets of the
+  whole network (e.g., you can select vertices/edges based on attributes,
+  degree, centrality and so on)
 
 New in the C library
 --------------------
