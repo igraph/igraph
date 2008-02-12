@@ -8,7 +8,7 @@
 \usage{
 cohesive.blocks(graph, db=NULL,
                 useDB=(vcount(graph)>400 && require(RSQLite)),
-                cl=NULL, verbose=igraph.par("verbose"))
+                verbose=igraph.par("verbose"))
 is.bgraph(graph)
 }
 \arguments{
@@ -19,8 +19,6 @@ is.bgraph(graph)
       instead of internal R datastructures (see details). By default an
       SQLite database is used if the graph has more than 400 vertices
       and the \code{RSQLite} package is installed.} 
-    \item{cl}{An optional cluster object from the \code{snow} package,
-      for parallel computation. Ignored if \code{NULL}.} 
     \item{verbose}{Level of console output. Supply \code{TRUE} here to
       follow the progress of the computation.}
 }
@@ -42,12 +40,6 @@ the \code{useDB} argument. If \code{useDB} is \code{TRUE}, then either a
 temporary SQLite database is created, or the \code{RSQLite} connection
 specified in \code{db} is used. In either case the package
 \code{RSQLite} will be required. 
-
-In addition, for large graphs the function can run quite slowly. It is a
-highly parallelizable algorithm, however, and providing a cluster object
-from the \code{snow} package will utilize a simplistic but effective
-parallelization. Use of parallelization has minimal effect for smaller
-graphs.
 
 \code{structurally.cohesive.blocks} is an alias to
 \code{cohesive.blocks}.

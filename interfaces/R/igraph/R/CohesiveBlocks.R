@@ -27,15 +27,6 @@
 ######################################################
 
 ######################################################
-####          A note on parallelization           ####
-######################################################
-## Many of these functions have an optional argument##
-## `cl`. If used, this should be a cluster object   ##
-## from the package "snow". I used "Rmpi" to use    ##
-## this functionality.                              ##
-######################################################
-
-######################################################
 ## Main cohesive blocking function. Feed it a graph ##
 ## of class igraph and it returns an object of      ##
 ## class bgraph. Definitely requires digest, and    ##
@@ -45,7 +36,7 @@
 
 cohesive.blocks <- function(graph, db=NULL,
                             useDB=(vcount(graph)>400 && require(RSQLite)),
-                            cl=NULL, verbose=igraph.par("verbose")) {
+                            verbose=igraph.par("verbose")) {
 
     if(useDB && !require(RSQLite)) stop("package `RSQLite` required")
     if(!require(digest)) stop("package `digest` required")
@@ -187,10 +178,10 @@ cohesive.blocks <- function(graph, db=NULL,
                 if(newk>k){
                     kcomp <- list(as.numeric(V(g)))
                 } else {
-                    kcomp <- kComponents(g, k, cl, verbose=verbose)
+                    kcomp <- kComponents(g, k, verbose=verbose)
                 }
             } else { ## otherwise just use kComponents()
-                kcomp <- kComponents(g, k, cl, verbose=verbose)
+                kcomp <- kComponents(g, k, verbose=verbose)
             }
             
             kcomp <- lapply(kcomp, function(thisV){V(g)[thisV]$cbid})
@@ -413,10 +404,10 @@ find.all.min.cutsets <- function(g, k=NULL){
     }
 }
 
-kComponents <- function(g, k=NULL, cl=NULL, type="new", verbose=igraph.par("verbose")){
+kComponents <- function(g, k=NULL, type="new", verbose=igraph.par("verbose")){
     if(vcount(g)<1) return(list())
     V(g)$csid <- as.numeric(V(g))
-    cs <- if(type=="old"){find.all.min.cutsets(g, k)} else {kCutsets2(g, k, cl, verbose=verbose)}
+    cs <- if(type=="old"){find.all.min.cutsets(g, k)} else {kCutsets2(g, k, verbose=verbose)}
     theseBlocks <- list()
     if(length(cs)==0){## not connected
         cls <- clusters(g)
@@ -725,7 +716,7 @@ write.pajek.kCore.bgraph <- function(graph, filename, remove.multiple=TRUE, remo
     cat(paste("*Vertices", vcount(g)), kc, "\r", sep="\r\n", file=paste(filename, ".clu", sep=""))
 }
 
-kCutsets2 <- function(g, k=NULL, cl=NULL, verbose=igraph.par("verbose")){
+kCutsets2 <- function(g, k=NULL, verbose=igraph.par("verbose")){
   if(!is.igraph(g)){
     stop("g must be an igraph object")
   }
