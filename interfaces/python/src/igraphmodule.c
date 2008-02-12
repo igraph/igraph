@@ -293,7 +293,7 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
   long int i, n;
   
   attrs=(PyObject**)calloc(3, sizeof(PyObject*));
-  /* printf("Created attribute table at %p\n", attrs); */
+  /*printf("Created attribute table at %p\n", attrs);*/
   if (!attrs)
     IGRAPH_ERROR("not enough memory to allocate attribute hashes", IGRAPH_ENOMEM);
   

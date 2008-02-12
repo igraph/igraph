@@ -49,7 +49,6 @@ void igraphmodule_Graph_init_internal(igraphmodule_GraphObject * self)
   if (!self) return;
   self->destructor = NULL;
   self->weakreflist = NULL;
-  self->g.attr = NULL;
 }
 
 /**
@@ -3250,9 +3249,10 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
   result =
     (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
   RC_ALLOC("Graph", result);
-  if (result != NULL)
-    result->g = lg;
-  igraphmodule_Graph_init_internal(result);
+  if (result != NULL) {
+	result->g = lg;
+	igraphmodule_Graph_init_internal(result);
+  }
 
   return (PyObject *) result;
 }

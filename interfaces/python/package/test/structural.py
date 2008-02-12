@@ -222,9 +222,9 @@ class PathTests(unittest.TestCase):
         self.failUnless(h.unconnected == 0L)
         self.failUnless([(int(l),x) for l,_,x in h.bins()] == \
           [(1,14),(2,19),(3,20),(4,20),(5,16),(6,16)])
-        g = Graph.Barabasi(100, directed=True)
+        g = Graph.Full(5)+Graph.Full(4)
         h = g.path_length_hist()
-        self.failUnless(h.unconnected == sum(range(100)))
+        self.failUnless(h.unconnected == 40)
 
 def suite():
     simple_suite = unittest.makeSuite(SimplePropertiesTests)
