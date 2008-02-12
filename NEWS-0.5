@@ -2,15 +2,15 @@
 New in the R interface
 ----------------------
 
-- The 'rescale' plot parameter added, 'asp' is a graphical parameter
-  as well, just like 'frame'
-- graph.formula added
-- Handle graph attributes properly, from R
+- The 'rescale', 'asp' and 'frame' graphical parameters were added
+- Create graphs from a formula notation (graph.formula)
+- Handle graph attributes properly
 - Calculate the actual minimum cut for undirected graphs
-- get.adjlist and get.adjedgelist added
+- Adjacency lists, get.adjlist and get.adjedgelist added
 - Eigenvector centrality computation is much faster now
 - Proper R warnings, instead of writing the warning to the terminal
-- R checks graphical parameters now, the unknown ones are not just ignored
+- R checks graphical parameters now, the unknown ones are not just
+  ignored, but an error message is given  
 - plot.igraph has an 'add' argument now to compose plots with multiple
   graphs
 - plot.igraph supports the 'main' and 'sub' arguments
@@ -22,6 +22,52 @@ New in the R interface
 - graph.adjacency rewritten when creating weighted graphs
 - We use match.arg whenever possible. This means that character scalar 
   options can be abbreviated and they are always case insensitive
+
+- VF2 graph isomorphism routines can check subgraph isomorphism now,
+  and they are able to return matching(s)
+- The BLISS graph isomorphism algorithm is included in igraph now. See
+  canonical.permutation, graph.isomorphic.bliss
+- We use ARPACK for eigenvalue/eigenvector calculation. This means that the
+  following functions were rewritten: page.rank,
+  leading.eigenvector.community.*, evcent. New functions based on
+  ARPACK: hub.score, authority.score, arpack.
+- Edge weights for Fruchterman-Reingold layout (layout.fruchterman.reingold).
+- Line graph calculation (line.graph)
+- Kautz and de Bruijn graph generators (graph.kautz, graph.de.bruijn)
+- Support for writing graphs in DOT format
+- Jaccard and Dice similarity coefficients added (similarity.jaccard,
+  similarity.dice)
+- Counting the multiplicity of edges (count.multiple)
+- The graphopt layout algorithm was added, layout.graphopt
+- Generation of "famous" graphs (graph.famous).
+- Create graphs from LCF notation (graph.cf).
+- Dyad census and triad cencus functions (dyad.census, triad.census)
+- Cheking for simple graphs (is.simple)
+- Create full citation networks (graph.full.citation)
+- Create a histogram of path lengths (path.length.hist)
+- Forest fire model added (forest.fire.game)
+- DIMACS reader can handle different file types now
+- Biconnected components and articulation points (biconnected.components,
+  articulation.points)
+- Kleinberg's hub and authority scores (hub.score, authority.score)
+- as.undirected handles attributes now
+- Geometric random graph generator (grg.game) can return the
+  coordinates of the vertices
+- Function added to convert leading eigenvector community structure result to
+  a membership vector (community.le.to.membership)
+- Weighted fast greedy community detection
+- Weighted page rank calculation
+- Functions for estimating closeness, betweenness, edge betweenness by 
+  introducing a cutoff for path lengths (closeness.estimate,
+  betweenness.estimate, edge.betweenness.estimate)
+- Weighted modularity calculation
+- Function for permuting vertices (permute.vertices)
+- Betweenness ans closeness calculations are speeded up
+- read.graph can handle all possible line terminators now (\r, \n, \r\n, \n\r)
+- Error handling was rewritten for walktrap community detection,
+  the calculation can be interrupted now
+- The maxflow/mincut functions allow to supply NULL pointer for edge
+  capacities, implying unit capacities for all edges
 
 Bugs corrected in the R interface
 ---------------------------------

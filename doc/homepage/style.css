@@ -20,6 +20,9 @@ h2 {
 h3 {
     font-size: 1em;
 }
+h4 {
+    font-size: 0.8em;
+}
 body.error h1 {
     background: #d70000;
     border-bottom: 1px solid #7f0000;
