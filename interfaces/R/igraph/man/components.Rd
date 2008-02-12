@@ -1,5 +1,6 @@
 \name{components}
 \alias{subcomponent}
+\concept{Subcomponent}
 \title{In- or out- component of a vertex}
 \description{Finds all vertices reachable from a given vertex, or the
   opposite: all vertices from which a given vertex is reachable via a

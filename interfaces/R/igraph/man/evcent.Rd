@@ -1,5 +1,6 @@
 \name{evcent}
 \alias{evcent}
+\concept{Eigenvector centrality}
 \title{Find Eigenvector Centrality Scores of Network Positions}
 \description{
   \code{evcent} takes a graph (\code{graph}) and returns the

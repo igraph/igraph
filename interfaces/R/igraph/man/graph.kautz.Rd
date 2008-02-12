@@ -1,5 +1,6 @@
 \name{graph.kautz}
 \alias{graph.kautz}
+\concept{Kautz graph}
 \title{Kautz graphs}
 \description{Kautz graphs are labeled graphs representing the
   overlap of strings. }

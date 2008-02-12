@@ -1,5 +1,7 @@
 \name{canonical.permutation}
 \alias{canonical.permutation}
+\concept{Canonical permutation}
+\concept{BLISS}
 \title{Canonical permutation of a graph}
 \description{The canonical permutation brings every isomorphic graphs
   into the same (labeled) graphs.}

@@ -1,6 +1,8 @@
 \name{conversion}
 \alias{get.adjacency}
 \alias{get.edgelist}
+\concept{Edge list}
+\concept{Adjacency list}
 \title{Convert a graph to an adjacency matrix or an edge list}
 \description{Sometimes it is useful to have a standard representation of
   a graph, like an adjacency matrix or an edge list.}

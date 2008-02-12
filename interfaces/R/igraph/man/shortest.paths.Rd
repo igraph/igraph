@@ -4,6 +4,8 @@
 \alias{get.all.shortest.paths}
 \alias{average.path.length}
 \alias{path.length.hist}
+\concept{Shortest path}
+\concept{Geodesic}
 \title{Shortest (directed or undirected) paths between vertices}
 \description{\code{shortest.paths} calculates the length of all the
   shortest paths from or to the vertices in the

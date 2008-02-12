@@ -1,5 +1,6 @@
 \name{topological.sort}
 \alias{topological.sort}
+\concept{Topological sort}
 \title{Topological sorting of vertices in a graph}
 \description{
   A topological sorting of a directed acyclic graph is a linear ordering

@@ -2,6 +2,7 @@
 \alias{diameter}
 \alias{get.diameter}
 \alias{farthest.nodes}
+\concept{Diameter}
 \title{Diameter of a graph}
 \description{The diameter of a graph is the length of the longest
   geodesic.}

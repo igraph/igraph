@@ -1,5 +1,6 @@
 \name{line.graph}
 \alias{line.graph}
+\concept{Line graph}
 \title{Line graph of a graph}
 \description{This function calculates the line graph of another graph.}
 \usage{

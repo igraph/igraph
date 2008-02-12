@@ -3,6 +3,9 @@
 \alias{largest.cliques}
 \alias{maximal.cliques}
 \alias{clique.number}
+\concept{Clique}
+\concept{Maximal clique}
+\concept{Largest clique}
 \title{The functions find cliques, ie. complete subgraphs in a graph}
 \description{These functions find all, the largest or all the maximal
   cliques in an undirected graph. The size of the largest clique can

@@ -11,6 +11,12 @@
 \alias{graph.edgelist}
 \alias{graph.data.frame}
 \alias{graph.extended.chordal.ring}
+\concept{Tree}
+\concept{Lattice}
+\concept{Star graph}
+\concept{Graph Atlas}
+\concept{Empty graph}
+\concept{Full graph}
 \title{Various methods for creating graphs}
 \description{These method can create various (mostly regular) graphs:
   empty graphs, graphs with the given edges, graphs from adjacency

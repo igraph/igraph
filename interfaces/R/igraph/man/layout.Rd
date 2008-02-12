@@ -13,6 +13,7 @@
 \alias{layout.svd}
 \alias{layout.graphopt}
 \alias{layout.norm}
+\concept{Graph layout}
 \title{Generate coordinates for plotting graphs}
 \description{Some simple and not so simple functions determining the
   placement of the vertices for drawing a graph.}

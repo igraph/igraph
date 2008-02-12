@@ -3,6 +3,8 @@
 \alias{edge.betweenness}
 \alias{betweenness.estimate}
 \alias{edge.betweenness.estimate}
+\concept{Betweenness centrality}
+\concept{Edge betweenness}
 \title{Vertex and edge betweenness centrality}
 \description{The vertex and edge betweenness are (roughly) defined by
   the number of geodesics (shortest paths) going through a vertex or an

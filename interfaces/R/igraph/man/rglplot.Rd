@@ -1,6 +1,7 @@
 \name{rglplot}
 \alias{rglplot}
 \alias{rglplot.igraph}
+\concept{Visualization}
 \title{3D plotting of graphs with OpenGL}
 \description{Using the \code{rgl} package, \code{rglplot} plots a graph
   in 3D. The plot can be zoomed, rotated, shifted, etc. but the

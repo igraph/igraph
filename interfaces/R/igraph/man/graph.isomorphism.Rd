@@ -11,6 +11,10 @@
 \alias{graph.isomorphic.34}
 \alias{graph.isomorphic.bliss}
 \alias{graph.subisomorphic.vf2}
+\concept{Graph isomorphism}
+\concept{Subgraph isomorphism}
+\concept{VF2 algorithm}
+\concept{BLISS algorithm}
 \title{Graph Isomorphism}
 \description{These functions deal with graph isomorphism.}
 \usage{

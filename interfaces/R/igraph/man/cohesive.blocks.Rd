@@ -2,6 +2,7 @@
 \alias{cohesive.blocks}
 \alias{structurally.cohesive.blocks}
 \alias{is.bgraph}
+\concept{Structurally cohesive blocks}
 \title{Calculate Cohesive Blocks}
 \description{Calculates cohesive blocks for objects of class \code{igraph}.}
 \usage{

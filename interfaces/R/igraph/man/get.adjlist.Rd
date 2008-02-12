@@ -1,6 +1,7 @@
-\name{kleinberg}
+\name{get.adjlist}
 \alias{get.adjlist}
 \alias{get.adjedgelist}
+\concept{Adjacency list}
 \title{Adjacency lists}
 \description{Create adjacency lists from a graph, either for adjacent
   edges or for neighboring vertices

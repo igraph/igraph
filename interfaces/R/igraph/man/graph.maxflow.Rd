@@ -1,6 +1,8 @@
 \name{graph.maxflow}
 \alias{graph.maxflow}
 \alias{graph.mincut}
+\concept{Maximum flow}
+\concept{Minimum cut}
 \title{Maximum flow in a network}
 \description{In a graph where each edge has a given flow capacity the
   maximal flow between two vertices is calculated.}

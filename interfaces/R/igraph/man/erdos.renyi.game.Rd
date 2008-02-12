@@ -1,6 +1,8 @@
 \name{erdos.renyi.game}
 \alias{erdos.renyi.game}
 \alias{random.graph.game}
+\concept{Random graph model}
+\concept{Erdos-Renyi graph}
 \title{Generate random graphs according to the Erdos-Renyi model}
 \description{This model is very simple, every possible edge is created
   with the same constant probability. }

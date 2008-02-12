@@ -1,5 +1,6 @@
 \name{power.law.fit}
 \alias{power.law.fit}
+\concept{Power-law}
 \title{Fitting a power-law distribution function to discrete data}
 \description{\code{power.law.fit} fits a power-law distribution to a
   data set.}

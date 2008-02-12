@@ -1,5 +1,7 @@
 \name{decompose.graph}
 \alias{decompose.graph}
+\concept{Graph decomposition}
+\concept{Graph component}
 \title{Decompose a graph into components}
 \description{Creates a separate graph for each component of a graph.}
 \usage{

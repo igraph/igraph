@@ -1,5 +1,6 @@
 \name{minimum.spanning.tree}
 \alias{minimum.spanning.tree}
+\concept{Minimum spanning tree}
 \title{Minimum spanning tree}
 \description{A subgraph of a connected graph is a \emph{minimum spanning tree}
   if it is tree, and the sum of its edge weights are the minimal among

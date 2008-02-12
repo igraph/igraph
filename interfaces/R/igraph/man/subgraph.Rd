@@ -1,5 +1,6 @@
 \name{subgraph}
 \alias{subgraph}
+\concept{Subgraph}
 \title{Subgraph of a graph}
 \description{\code{subgraph} creates a subgraph of a graph, containing
   only the specified vertices and all the edges among them.}

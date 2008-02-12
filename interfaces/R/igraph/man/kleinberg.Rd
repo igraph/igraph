@@ -1,6 +1,7 @@
 \name{kleinberg}
 \alias{authority.score}
 \alias{hub.score}
+\concept{Hub and authority score}
 \title{Kleinberg's centrality scores.}
 \description{Kleinberg's hub and authority scores.}
 \usage{

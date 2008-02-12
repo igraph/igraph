@@ -1,5 +1,8 @@
 \name{spinglass.community}
 \alias{spinglass.community}
+\concept{Statistical mechanics}
+\concept{Spin-glass}
+\concept{Community structure}
 \title{Finding communities in graphs based on statistical meachanics}
 \description{This function tries to find communities in graphs via
   a spin-glass model and simulated annealing.}

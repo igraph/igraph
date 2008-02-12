@@ -1,6 +1,7 @@
 \name{simplify}
 \alias{simplify}
 \alias{is.simple}
+\concept{Simple graph}
 \title{Simple graphs}
 \description{Simple graphs are graphs which do not contain loop and
   multiple edges.}

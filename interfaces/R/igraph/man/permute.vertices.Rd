@@ -1,5 +1,6 @@
 \name{permute.vertices}
 \alias{permute.vertices}
+\concept{Permutation}
 \title{Permute the vertices of a graph}
 \description{Create a new graph, by permuting vertex ids.}
 \usage{

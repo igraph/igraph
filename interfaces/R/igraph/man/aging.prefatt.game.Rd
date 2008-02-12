@@ -2,6 +2,9 @@
 \alias{aging.prefatt.game}
 \alias{aging.barabasi.game}
 \alias{aging.ba.game}
+\concept{Preferential attachment}
+\concept{Aging of vertices}
+\concept{Random graph model}
 \title{Generate an evolving random graph with preferential attachment
   and aging}
 \description{This function creates a random graph by simulating its

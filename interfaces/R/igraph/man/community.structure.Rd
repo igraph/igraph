@@ -1,6 +1,7 @@
 \name{communities}
 \alias{communities}
 \alias{community.to.membership}
+\concept{Community structure}
 \title{Common functions supporting community detection algorithms}
 \description{
   \code{community.to.membership} takes a merge matrix, a typical result

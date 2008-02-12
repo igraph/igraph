@@ -1,5 +1,6 @@
 \name{biconnected.components}
 \alias{biconnected.components}
+\concept{Biconnected component}
 \title{Biconnected components}
 \description{Finding the biconnected components of a graph}
 \usage{

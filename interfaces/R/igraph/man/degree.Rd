@@ -1,5 +1,7 @@
 \name{degree}
 \alias{degree}
+\concept{Vertex degree}
+\concept{Degree distribution}
 \alias{degree.distribution}
 \title{Degree and degree distribution of the vertices}
 \description{The degree of a vertex is its most basic structural

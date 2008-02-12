@@ -1,6 +1,7 @@
 \name{page.rank}
 \alias{page.rank}
 \alias{page.rank.old}
+\concept{Page rank}
 \title{The Page Rank algorithm}
 \description{ Calculates the Google PageRank for the specified
   vertices.}

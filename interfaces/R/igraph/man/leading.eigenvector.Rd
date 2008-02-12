@@ -3,6 +3,7 @@
 \alias{leading.eigenvector.community.step}
 \alias{leading.eigenvector.community.naive}
 \alias{community.le.to.membership}
+\concept{Community structure}
 \title{Community structure detecting based on the leading eigenvector
   of the community matrix}
 \description{These functions try to find densely connected subgraphs in

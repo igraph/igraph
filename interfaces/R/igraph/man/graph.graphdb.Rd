@@ -1,5 +1,6 @@
 \name{graph.graphdb}
 \alias{graph.graphdb}
+\concept{Graph database}
 \title{Load a graph from the graph database for testing graph
   isomorphism.}
 \description{This function downloads a graph from a database created for

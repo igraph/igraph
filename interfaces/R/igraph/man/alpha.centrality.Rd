@@ -1,5 +1,6 @@
 \name{alpha.centrality}
 \alias{alpha.centrality}
+\concept{Alpha centrality}
 \title{Find Bonacich alpha centrality scores of network positions}
 \description{\code{alpha.centrality} calculates the alpha centrality of
   some (or all) vertices in a graph.

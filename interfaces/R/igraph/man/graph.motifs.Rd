@@ -2,6 +2,7 @@
 \alias{graph.motifs}
 \alias{graph.motifs.no}
 \alias{graph.motifs.est}
+\concept{Graph motif}
 \title{Graph motifs}
 \description{Graph motifs are small subgraphs with a well-defined
   strucure. These functions search a graph for various motifs.}

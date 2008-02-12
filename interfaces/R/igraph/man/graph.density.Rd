@@ -1,5 +1,6 @@
 \name{graph.density}
 \alias{graph.density}
+\concept{Graph density}
 \title{Graph density}
 \description{The density of a graph is the ratio of the number of edges
   and the number of possible edges.}

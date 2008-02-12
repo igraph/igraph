@@ -1,5 +1,6 @@
 \name{Drawing graphs}
 \alias{igraph.plotting}
+\concept{Visualization}
 \title{Drawing graphs}
 \description{The common bits of the three plotting functions
   \code{plot.igraph}, \code{tkplot} and \code{rglplot} are discussed in

@@ -1,5 +1,6 @@
 \name{bonpow}
 \alias{bonpow}
+\concept{Bonacich Power centrality}
 %- Also NEED an `\alias' for EACH other topic documented here.
 \title{ Find Bonacich Power Centrality Scores of Network Positions }
 \description{

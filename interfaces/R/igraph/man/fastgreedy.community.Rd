@@ -1,5 +1,7 @@
 \name{fastgreedy.community}
 \alias{fastgreedy.community}
+\concept{Community structure}
+\concept{Fast greedy community detection}
 \title{Community structure via greedy optimization of modularity}
 \description{
   This function tries to find dense subgraph, also called communities in

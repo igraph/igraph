@@ -1,5 +1,6 @@
 \name{articulation.points}
 \alias{articulation.points}
+\concept{Articulation point}
 \title{Articulation points of a graph}
 \description{Articuation points or cut vertices are vertices whose
   removal increases the number of connected components in a graph.}

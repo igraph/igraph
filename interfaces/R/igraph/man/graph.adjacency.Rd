@@ -1,5 +1,6 @@
 \name{graph.adjacency}
 \alias{graph.adjacency}
+\concept{Adjacency matrix}
 \title{Create graphs from adjacency matrices}
 \description{\code{graph.adjacency} is a flexible function for creating
   \code{igraph} graphs from adjacency matrices.}

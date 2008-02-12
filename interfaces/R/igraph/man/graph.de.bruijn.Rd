@@ -1,5 +1,6 @@
 \name{graph.de.bruijn}
 \alias{graph.de.bruijn}
+\concept{De Bruijn graph}
 \title{De Bruijn graphs.}
 \description{De Bruijn graphs are labeled graphs representing the
   overlap of strings. }

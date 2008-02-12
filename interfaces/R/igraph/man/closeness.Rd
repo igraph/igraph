@@ -1,6 +1,7 @@
 \name{closeness}
 \alias{closeness}
 \alias{closeness.estimate}
+\concept{Closeness centrality}
 \title{Closeness centrality of vertices}
 \description{Cloness centrality measures how many steps is required
   to access every other vertex from a given vertex.}

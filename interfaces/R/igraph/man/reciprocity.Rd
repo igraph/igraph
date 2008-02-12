@@ -1,5 +1,6 @@
 \name{reciprocity}
 \alias{reciprocity}
+\concept{Reciprocity}
 \title{Reciprocity of graphs}
 \description{Calculates the reciprocity of a directed graph.}
 \usage{

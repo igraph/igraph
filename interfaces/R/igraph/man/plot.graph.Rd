@@ -1,5 +1,6 @@
 \name{plot.igraph}
 \alias{plot.igraph}
+\concept{Visualization}
 \title{Plotting of graphs}
 \description{\code{plot.graph} is able to plot graphs to any R
   device. It is the non-interactive companion of the \code{tkplot}

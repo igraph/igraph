@@ -2,6 +2,9 @@
 \alias{arpack}
 \alias{arpack-options}
 \alias{igraph.arpack.default}
+\concept{Eigenvalues}
+\concept{Eigenvectors}
+\concept{ARPACK}
 \title{ARPACK eigenvector calculation}
 \description{Interface to the ARPACK library for calculating
   eigenvectors of sparse matrices}

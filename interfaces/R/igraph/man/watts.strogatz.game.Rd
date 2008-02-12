@@ -1,5 +1,7 @@
 \name{watts.strogatz.game}
 \alias{watts.strogatz.game}
+\concept{Small-world model}
+\concept{Watts-strogatz model}
 \title{The Watts-Strogatz small-world model}
 \description{Generate a graph according to the Watts-Strogatz network
   model.}

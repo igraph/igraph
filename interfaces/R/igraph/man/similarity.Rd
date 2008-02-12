@@ -1,6 +1,7 @@
 \name{similarity}
 \alias{similarity.jaccard}
 \alias{similarity.dice}
+\concept{Vertex similarity}
 \title{Similarity measures of two vertices}
 \description{
   These functions calculates similarity scores for vertices based on

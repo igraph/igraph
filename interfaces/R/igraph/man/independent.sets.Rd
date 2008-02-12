@@ -3,6 +3,7 @@
 \alias{largest.independent.vertex.sets}
 \alias{maximal.independent.vertex.sets}
 \alias{independence.number}
+\concept{Independent vertex set}
 \title{Independent vertex sets}
 \description{A vertex set is called independent if there no edges
   between any two vertices in it. These functions find independent

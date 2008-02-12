@@ -1,5 +1,7 @@
 \name{degree.sequence.game}
 \alias{degree.sequence.game}
+\concept{Degree sequence}
+\concept{Configuration model}
 \title{Generate random graphs with a given degree sequence}
 \description{It is often useful to create a graph with given vertex
   degrees. This is exactly what \code{degree.sequence.game} does.}

@@ -1,5 +1,6 @@
 \name{growing.random.game}
 \alias{growing.random.game}
+\concept{Random graph model}
 \title{Growing random graph generation}
 \description{This function creates a random graph by simulating its
   stochastic evolution.}

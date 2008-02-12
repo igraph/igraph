@@ -1,5 +1,7 @@
 \name{forest.fire.game}
 \alias{forest.fire.game}
+\concept{Random graph model}
+\concept{Forest fire model}
 \title{Forest Fire Network Model}
 \description{This is a growing network model, which resembles of how the
   forest fire spreads by igniting trees close by.}

@@ -1,5 +1,6 @@
 \name{grg.game}
 \alias{grg.game}
+\concept{Geometric random graph}
 \title{Geometric random graphs}
 \description{Generate a random graph based on the distance of random
   point on a unit square}

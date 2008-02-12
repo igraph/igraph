@@ -1,5 +1,6 @@
 \name{graph.laplacian}
 \alias{graph.laplacian}
+\concept{Graph Laplacian}
 \title{Graph Laplacian}
 \description{The Laplacian of a graph.}
 \usage{

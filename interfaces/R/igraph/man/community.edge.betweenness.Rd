@@ -1,6 +1,8 @@
 \name{edge.betweenness.community}
 \alias{edge.betweenness.community}
 \alias{edge.betweenness.community.merges}
+\concept{Edge betweenness}
+\concept{Community structure}
 \title{Community structure detection based on edge betweenness}
 \description{Many networks consist of modules which are densely
   connected themselves but sparsely connected to other modules.}

@@ -1,5 +1,6 @@
 \name{graph.lcf}
 \alias{graph.lcf}
+\concept{LCF notation}
 \title{Creating a graph from LCF notation}
 \description{LCF is short for Lederberg-Coxeter-Frucht, it is a concise notation for
   3-regular Hamiltonian graphs. It constists of three parameters, the

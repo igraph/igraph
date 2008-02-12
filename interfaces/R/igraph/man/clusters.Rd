@@ -3,6 +3,8 @@
 \alias{clusters}
 \alias{is.connected}
 \alias{cluster.distribution}
+\concept{Connectedness}
+\concept{Graph component}
 \title{Connected components of a graph}
 \description{}
 \usage{

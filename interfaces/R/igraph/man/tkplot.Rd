@@ -8,6 +8,7 @@
 \alias{tkplot.getcoords}
 \alias{tkplot.center}
 \alias{tkplot.rotate}
+\concept{Visualization}
 \title{Interactive plotting of graphs}
 \description{\code{tkplot} and its companion functions serve as an
   interactive graph drawing facility. Not all parameters of the plot can

@@ -1,6 +1,8 @@
 \name{barabasi.game}
 \alias{barabasi.game}
 \alias{ba.game}
+\concept{Preferential attachment model}
+\concept{Random graph model}
 \title{Generate scale-free graphs according to the Barabasi-Albert
   model}
 \description{The BA-model is a very simple stochastic algorithm for

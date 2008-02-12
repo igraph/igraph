@@ -1,5 +1,7 @@
 \name{walktrap.community}
 \alias{walktrap.community}
+\concept{Random walk}
+\concept{Community structure}
 \title{Community strucure via short random walks}
 \description{This function tries to find densely connected subgraphs,
   also called communities in a graph via random walks. The idea is that

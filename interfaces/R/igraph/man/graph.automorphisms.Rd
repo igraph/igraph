@@ -1,5 +1,6 @@
 \name{graph.automorphisms}
 \alias{graph.automorphisms}
+\concept{Graph automorphism}
 \title{Number of automorphisms}
 \description{Calculate the number of automorphisms of a graph,
   i.e. the number of isomorphisms to itself.}

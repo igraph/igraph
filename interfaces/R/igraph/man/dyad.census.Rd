@@ -1,5 +1,6 @@
 \name{dyad.census}
 \alias{dyad.census}
+\concept{Dyad census}
 \title{Dyad census of a graph}
 \description{Classify dyads in a directed graphs. The relationship
   between each pair of vertices is measured. It can be in three states:

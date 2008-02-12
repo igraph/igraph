@@ -1,5 +1,6 @@
 \name{triad.census}
 \alias{triad.census}
+\concept{Triad census}
 \title{Triad census, subgraphs with three vertices}
 \description{This function counts the different subgraphs of three
   vertices in a graph.}

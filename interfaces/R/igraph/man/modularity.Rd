@@ -1,5 +1,6 @@
 \name{modularity}
 \alias{modularity}
+\concept{Modularity}
 \title{Modularity of a community structure of a graph}
 \description{This function calculates how modular is a given division of a
   graph into subgraphs.

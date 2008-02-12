@@ -1,5 +1,6 @@
 \name{graph.coreness}
 \alias{graph.coreness}
+\concept{K-core}
 \title{K-core decomposition of graphs}
 \description{The k-core of graph is a maximal subgraph in which each
   vertex has at least degree k. The coreness of a vertex is k if it

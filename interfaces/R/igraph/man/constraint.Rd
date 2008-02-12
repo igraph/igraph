@@ -1,5 +1,6 @@
 \name{constraint}
 \alias{constraint}
+\concept{Burt's constraint}
 \title{Burt's constraint}
 \description{Given a graph, \code{constraint} calculates Burt's constraint for
   each vertex.

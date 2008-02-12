@@ -1,5 +1,6 @@
 \name{girth}
 \alias{girth}
+\concept{Girth}
 \title{Girth of a graph}
 \description{The girth of a graph is the length of the shortest circle
   in it.}

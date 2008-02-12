@@ -1,6 +1,8 @@
 \name{as.directed}
 \alias{as.directed}
 \alias{as.undirected}
+\concept{Directed graph}
+\concept{Undirected graph}
 \title{Convert between directed and undirected graphs}
 \description{\code{as.directed} converts an undirected graph to
   directed, \code{as.undirected} is the opposite, it converts a directed

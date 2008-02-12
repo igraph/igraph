@@ -2,6 +2,9 @@
 \alias{vertex.connectivity}
 \alias{vertex.disjoint.paths}
 \alias{graph.cohesion}
+\concept{Vertex connectivity}
+\concept{Vertex-disjoint paths}
+\concept{Graph cohesion}
 \title{Vertex connectivity.}
 \description{The vertex connectivity of a graph or two vertices, this is
   recently also called group cohesion.}

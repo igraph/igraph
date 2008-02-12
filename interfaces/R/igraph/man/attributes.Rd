@@ -12,6 +12,7 @@
 \alias{get.edge.attribute}
 \alias{remove.edge.attribute}
 \alias{list.edge.attributes}
+\concept{Vertex/edge/graph attributes}
 \title{Graph, vertex and edge attributes}
 \description{Attributes are associated values belonging to a graph,
   vertices or edges. These can represent some property, like data

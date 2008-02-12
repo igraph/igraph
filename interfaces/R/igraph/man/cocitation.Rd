@@ -1,6 +1,8 @@
 \name{cocitation}
 \alias{cocitation}
 \alias{bibcoupling}
+\concept{Cocication}
+\concept{Bibliographic coupling}
 \title{Cocitation coupling}
 \description{Two vertices are cocited if there is another vertex citing
   both of them. \code{cocitation} siply counts how many types two vertices

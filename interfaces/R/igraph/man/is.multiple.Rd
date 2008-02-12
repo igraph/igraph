@@ -2,6 +2,7 @@
 \alias{is.loop}
 \alias{is.multiple}
 \alias{count.multiple}
+\concept{Simple graph}
 \title{Find the multiple or loop edges in a graph}
 \description{A loop edge is an edge from a vertex to itself. An edge is
   a multiple edge if it has exactly the same head and tail vertices as

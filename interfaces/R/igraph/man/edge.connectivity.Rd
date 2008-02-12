@@ -2,6 +2,9 @@
 \alias{edge.connectivity}
 \alias{edge.disjoint.paths}
 \alias{graph.adhesion}
+\concept{Edge connectivity}
+\concept{Edge-disjoint paths}
+\concept{Graph adhesion}
 \title{Edge connectivity.}
 \description{The edge connectivity of a graph or two vertices, this is
   recently also called group adhesion.}
