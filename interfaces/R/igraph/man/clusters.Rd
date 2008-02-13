@@ -6,7 +6,9 @@
 \concept{Connectedness}
 \concept{Graph component}
 \title{Connected components of a graph}
-\description{}
+\description{Calculate the maximal (weakly or strongly) 
+  connected components of a graph
+}
 \usage{
 is.connected(graph, mode=c("weak", "strong"))
 clusters(graph, mode=c("weak", "strong"))
