@@ -74,7 +74,7 @@ class Clustering(object):
 
         @param idx: the index of the cluster
         @return: the members of the specified cluster as a list
-        @raise: C{IndexError} if the index is out of bounds"""
+        @raise IndexError: if the index is out of bounds"""
         if idx<0 or idx>=self._len:
             raise IndexError, "cluster index out of range"
         return [i for i,e in enumerate(self._membership) if e==idx]
@@ -167,7 +167,7 @@ class OverlappingClustering(Clustering):
 
         @param idx: the index of the cluster
         @return: the members of the specified cluster as a list
-        @raise: C{IndexError} if the index is out of bounds"""
+        @raise IndexError: if the index is out of bounds"""
         if idx<0 or idx>=self._len:
             raise IndexError, "cluster index out of range"
         return [i for i,cl in enumerate(self._membership) if idx in cl]

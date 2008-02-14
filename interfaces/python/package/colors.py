@@ -74,7 +74,7 @@ class Palette(object):
 
         @param v: the color to be retrieved. If it is an integer, it is
           passed to L{Palette._get} to be translated to an RGB triplet.
-          Otherwise it is passed to L{color_to_rgb} to determine the
+          Otherwise it is passed to L{color_name_to_rgb()} to determine the
           RGB values.
 
         @return: the color as an RGB triplet"""

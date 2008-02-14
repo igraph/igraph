@@ -93,10 +93,10 @@ class Configuration(object):
     referring to them in program code, don't forget to add the section name,
     expect in the case of section C{general}.
 
-      General settings
-      ----------------
+    General settings
+    ----------------
 
-      These settings are all stored in section C{general}.
+    These settings are all stored in section C{general}.
 
         - B{shells}: the list of preferred Python shells to be used with the
           command-line C{igraph} script. The shells in the list are tried one
@@ -108,11 +108,11 @@ class Configuration(object):
         - B{verbose}: whether L{igraph} should talk more than really necessary.
           For instance, if set to C{True}, some functions display progress bars.
 
-      Application settings
-      --------------------
+    Application settings
+    --------------------
 
-      These settings specify the external applications that are possibly
-      used by C{igraph}. They are all stored in section C{apps}.
+    These settings specify the external applications that are possibly
+    used by C{igraph}. They are all stored in section C{apps}.
 
         - B{image_viewer}: image viewer application. If set to an empty string,
           it will be determined automatically from the platform C{igraph} runs
@@ -121,11 +121,11 @@ class Configuration(object):
           C{gthumb}, C{kuickview} and so on (see the source code for the full
           list). On Windows, it defaults to the system's built-in image viewer.
 
-      Plotting settings
-      -----------------
+    Plotting settings
+    -----------------
 
-      These settings specify the default values used by plotting functions.
-      They are all stored in section C{plotting}.
+    These settings specify the default values used by plotting functions.
+    They are all stored in section C{plotting}.
 
         - B{layout}: default graph layout algorithm to be used.
         - B{palette}: default palette to be used for converting integer

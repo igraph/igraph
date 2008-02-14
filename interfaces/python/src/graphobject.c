@@ -8213,6 +8213,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "method can be used. This function is capable of doing sampling via\n"
    "the I{cut_prob} argument. This argument gives the probability that\n"
    "a branch of the motif search tree will not be explored.\n\n"
+   "@newfield ref: Reference\n"
    "@ref: S. Wernicke and F. Rasche: FANMOD: a tool for fast network\n"
    "  motif detection, Bioinformatics 22(9), 1152--1153, 2006.\n\n"
    "@param size: the size of the motifs (3 or 4).\n"
@@ -8228,6 +8229,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Motifs are small subgraphs of a given structure in a graph.\n"
    "This function counts the total number of motifs in a graph without\n"
    "assigning isomorphism classes to them.\n\n"
+   "@newfield ref: Reference\n"
    "@ref: S. Wernicke and F. Rasche: FANMOD: a tool for fast network\n"
    "  motif detection, Bioinformatics 22(9), 1152--1153, 2006.\n\n"
    "@param size: the size of the motifs (3 or 4).\n"
@@ -8245,6 +8247,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "This function estimates the total number of motifs in a graph without\n"
    "assigning isomorphism classes to them by extrapolating from a random\n"
    "sample of vertices.\n\n"
+   "@newfield ref: Reference\n"
    "@ref: S. Wernicke and F. Rasche: FANMOD: a tool for fast network\n"
    "  motif detection, Bioinformatics 22(9), 1152--1153, 2006.\n\n"
    "@param size: the size of the motifs (3 or 4).\n"
@@ -8772,7 +8775,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  - Otherwise if the graphs are directed, then the VF2 isomorphism\n"
    "    algorithm is used (see L{Graph.isomorphic_vf2}).\n\n"
    "  - Otherwise the BLISS isomorphism algorithm is used, see\n"
-   "    L{igraph_isomorphic_bliss}.\n\n"
+   "    L{Graph.isomorphic_bliss}.\n\n"
    "@return: C{True} if the graphs are isomorphic, C{False} otherwise.\n"
   },
   {"isomorphic_bliss", (PyCFunction) igraphmodule_Graph_isomorphic_bliss,

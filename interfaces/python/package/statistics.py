@@ -293,7 +293,8 @@ def power_law_fit(x, xmin=None, method="discrete_approx"):
           M{xmin} >= 6 (approx.).
 
     @return: the estimated power-law exponent
-      
+    
+    @newfield ref: Reference
     @ref: MEJ Newman: Power laws, Pareto distributions and Zipf's law.
       Contemporary Physics 46, 323-351 (2005)
     @ref: A Clauset, CR Shalizi, MEJ Newman: Power-law distributions

@@ -35,9 +35,7 @@ class Layout(object):
 
     A layout is practically a list of coordinates in an n-dimensional
     space. This class is generic in the sense that it can store coordinates
-    in any n-dimensional space, but the layout methods return either a
-    L{Layout2D} or L{Layout3D} object to make it easier for the graph drawing
-    routines to decide whether they can make use of the layout or not.
+    in any n-dimensional space.
 
     Layout objects are not associated directly with a graph. This is deliberate:
     there were times when I worked with almost identical copies of the same

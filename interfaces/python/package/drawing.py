@@ -508,7 +508,7 @@ class CircleDrawer(ShapeDrawer):
 
         Height is ignored, it is the width that determines the diameter of the circle.
 
-        @see ShapeDrawer.draw_path"""
+        @see: ShapeDrawer.draw_path"""
         ctx.arc(cx, cy, w/2., 0, 2*math.pi)
     draw_path=staticmethod(draw_path)
 
