@@ -13,22 +13,18 @@
         please try this before downloading from here.</span><br/>
     </li>
     <li class="download-windows">
-<!--       <a href="download/igraph_${VERSION}.zip" -->
-<!--          onClick="javascript:urchinTracker ('/downloads/rwindowsbinary'); "> -->
-<!--          Windows binary</a>  -->
-      <a href="download/igraph_${VERSION}.zip">Windows binary</a>
+       <a href="download/igraph_${VERSION}.zip"
+          onClick="javascript:urchinTracker ('/downloads/rwindowsbinary'); ">
+          Windows binary</a> 
     </li>
     <li class="download-osx">
-<!--       <a href="download/igraph_${VERSION}.tgz" -->
-<!--          onClick="javascript:urchinTracker ('/downloads/rosxbinary'); "> -->
-<!--          Mac OSX universal binary</a>  -->
-      <a href="download/igraph_${VERSION}.tgz">Mac OS X universal binary</a>
+       <a href="download/igraph_${VERSION}.tgz"
+          onClick="javascript:urchinTracker ('/downloads/rosxbinary'); "> 
+          Mac OSX universal binary</a>
     </li>
     <li class="download-source">
-<!--       <a href="download/igraph_${VERSION}.tar.gz" -->
-<!--       onClick="javascript:urchinTracker ('/downloads/rsource'); ">  -->
-<!--         Source package (for Linux and similar)</a><br/> -->
-      <a href="download/igraph_${VERSION}.tar.gz">
+       <a href="download/igraph_${VERSION}.tar.gz"
+       onClick="javascript:urchinTracker ('/downloads/rsource'); "> 
         Source package (for Linux and similar)</a><br/>
     </li>
   </ul>
@@ -40,34 +36,29 @@
   igraph as a Python extension module</span>
   <ul class="download-links">
     <li class="download-windows">
-<!--       <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe" -->
-<!--          onClick="javascript:urchinTracker ('/downloads/pywin24'); "> -->
-<!--          Windows installer for Python 2.4</a>  -->
-      <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe">Windows binary (Python 2.4)</a>
+       <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe" 
+          onClick="javascript:urchinTracker ('/downloads/pywin24'); "> 
+          Windows installer for Python 2.4</a> 
     </li>
     <li class="download-windows">
-<!--       <a href="http://pypi.python.org/packages/2.5/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe" -->
-<!--          onClick="javascript:urchinTracker ('/downloads/pywin25'); "> -->
-<!--          Windows installer for Python 2.5</a>  -->
-      <a href="http://pypi.python.org/packages/2.5/i/igraph/python_igraph-${VERSION}.win32-py2.5.exe">Windows binary (Python 2.5)</a>
+       <a href="http://pypi.python.org/packages/2.5/i/igraph/python_igraph-${VERSION}.win32-py2.4.exe" 
+          onClick="javascript:urchinTracker ('/downloads/pywin25'); "> 
+          Windows installer for Python 2.5</a> 
     </li>
     <li class="download-osx">
-<!--       <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}-py2.4-macosx10.5.mpkg" -->
-<!--          onClick="javascript:urchinTracker ('/downloads/pymacosx105'); "> -->
-<!--          OS X Leopard installer (Python 2.4)</a>  -->
-      <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}-py2.4-macosx10.5.mpkg">OS X Leopard binary (Python 2.4)</a>
+       <a href="http://pypi.python.org/packages/2.4/i/igraph/python_igraph-${VERSION}-py2.4-macosx10.5.mpkg" 
+          onClick="javascript:urchinTracker ('/downloads/pymacosx105'); "> 
+          OS X Leopard installer (Python 2.4)</a> 
     </li>
     <li class="download-source">
-<!--       <a href="http://pypi.python.org/packages/source/i/igraph/python_igraph-${VERSION}.tar.gz" -->
-<!--          onClick="javascript:urchinTracker ('/downloads/pysource'); "> -->
-<!--          Source code</a>  -->
-      <a href="http://pypi.python.org/packages/source/i/igraph/python_igraph-${VERSION}.tar.gz">Source package</a>
+       <a href="http://pypi.python.org/packages/source/i/igraph/python_igraph-${VERSION}.tar.gz"
+          onClick="javascript:urchinTracker ('/downloads/pysource'); ">
+          Source code</a>  
     </li>
     <li class="download-external">
-<!--       <a href="http://python.org/pypi/igraph" -->
-<!--          onClick="javascript:urchinTracker ('/outgoing/pythoncheeseshop'); "> -->
-<!--          Python Package Index page</a>  -->
-      <a href="http://python.org/pypi/igraph">Python Package Index page</a>
+       <a href="http://python.org/pypi/igraph" 
+          onClick="javascript:urchinTracker ('/outgoing/pythoncheeseshop'); "> 
+          Python Package Index page</a>  
     </li>
   </ul>
 </li>
@@ -75,18 +66,15 @@
 <li class="download download-ruby">
   <span class="name">Ruby gem</span>
   <span class="comment">&mdash; Interface to the Ruby language, developed by 
-<!--   <a href="http://web.kuicr.kyoto-u.ac.jp/~alexg/"  -->
-<!--      onClick="javascript:urchinTracker ('/outgoing/alex'); "> -->
-<!--      Dr. Alex Gutteridge</a>. -->
-  <a href="http://web.kuicr.kyoto-u.ac.jp/~alexg/">
-     Dr. Alex Gutteridge</a>.
+   <a href="http://web.kuicr.kyoto-u.ac.jp/~alexg/" 
+      onClick="javascript:urchinTracker ('/outgoing/alex'); "> 
+      Dr. Alex Gutteridge</a>. 
   </span>
   <ul class="download-links">
     <li class="download-external">
-<!--       <a href="http://rubyforge.org/projects/igraph" -->
-<!--          onClick="javascript:urchinTracker ('/outgoing/rubyforge'); "> -->
-<!-- 	 External homepage</a> -->
-      <a href="http://rubyforge.org/projects/igraph">External homepage</a>
+       <a href="http://rubyforge.org/projects/igraph" 
+          onClick="javascript:urchinTracker ('/outgoing/rubyforge'); "> 
+ 	 External homepage</a> 
     </li>
   </ul>
 </li>
@@ -97,9 +85,8 @@
   igraph in C projects.</span>
   <ul class="download-links">
     <li class="download-source">
-<!--       <a onClick="javascript:urchinTracker ('/downloads/library'); " -->
-<!-- 	 href="download/igraph-${VERSION}.tar.gz">Source code</a> -->
-      <a href="download/igraph-${VERSION}.tar.gz">Source code</a>
+       <a onClick="javascript:urchinTracker ('/downloads/library'); " 
+ 	 href="download/igraph-${VERSION}.tar.gz">Source code</a>
     </li>
   </ul>
 </li>
@@ -134,8 +121,8 @@ these packages!</p>
 <p>You can get the latest development version of igraph (including the
 C core and the wrappers for R and Python) with the <code>tla</code> arch
 revision control system from the following URL:
-<!-- <a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public" -->
-<!--    onClick="javascript:urchinTracker ('/archrepo'); "> -->
+ <a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public"
+    onClick="javascript:urchinTracker ('/archrepo'); "> 
 <a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public">
 <code>http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public</code>.</a>
 </p>

@@ -1,9 +1,17 @@
 <h2>igraph 0.5 Release Notes</h2>
 
 <p class="news">
-There are a lot of improvements and corrections in this version. Here
-is a list of major changes, with links to the relevant sections of the 
-documentation.
+There are a lot of improvements and corrections in this version. 
+We would like to thank all the people who sent comments, bug reports,
+patches, or just questions. Without their contribution igraph would be 
+definitely much less and worse than it is now. Please keep sending your 
+comments and ideas!
+</p>
+
+<p class="news">
+Here is a list of major changes, with links to the relevant sections of the 
+documentation. See the <a href="news.html">news page</a> for the complete
+list.
 </p>
 
 <h3><img src="images/icon_c.png"/> igraph as a platform</h3>
@@ -13,7 +21,7 @@ We took some step towards turning igraph to an efficient platform for
 implementing graph algorithms. In particular, we have a set of 
 <a href="doc-0.5/html/ch06.html">utility types</a> that support general
 scientific computing and working with graphs: vectors, matrices,
-stacks, queues, heaps, adjacency lists.
+stacks, queues, heaps, adjacency lists, etc.
 </p>
 
 <h3><img src="images/icon_c.png"/>
@@ -24,12 +32,12 @@ stacks, queues, heaps, adjacency lists.
 <p class="news">
 igraph includes the BLISS graph isomorphism algorithm and
 implementation now. This and the improved VF2 implementation, which
-can calculate subgraph isomorphism now, make igraph support the
+can now calculate subgraph isomorphism, make igraph support the
 bleeding edge of graph isomorphism algorithms. Many thanks to the
 authors of BLISS. See the details in the 
 <a href="doc-0.5/html/igraph-Isomorphism.html">Reference Manual</a>, in
 the <a href="doc-0.5/R/graph.isomorphism.html">R documentation</a> or in the
-<a href="/doc-0.5/python/igraph.GraphBase-class.html#isomorphic">Python
+<a href="doc-0.5/python/igraph.GraphBase-class.html#isomorphic">Python
 documentation.</a>
 </p>
 
@@ -43,7 +51,7 @@ ARPACK is a library for solving large scale sparse eigenvalue
 problems. In igraph it is very handy, as many centrality problems are
 in fact eigenvalue problems: Kleinberg's hub and authority scores, 
 PageRank, the leading eigenvector community detection algorithm are
-some examples. Many Thanks to the authors of ARPACK and James Fowler,
+some examples. Many thanks to the authors of ARPACK and James Fowler,
 who suggested to include it in igraph. 
 </p>
 
@@ -87,20 +95,21 @@ main namespace.
     Create famous graphs easily</h4>
 
 <p class="news">
-Some classic graphs can be created by using their name now. This is
+Some classic graphs can be created by giving their name. This is
 very handy if one needs a test graph quickly. See 
-<a href=""><code>igraph_famous</code></a> (C), 
-<a href=""><code>graph.famous()</code></a> (R) or 
-<a href=""></a> (Python).
+<a href="doc-0.5/html/igraph_famous.html"><code>igraph_famous</code></a> (C), 
+<a href="doc-0.5/R/graph.famous.html"><code>graph.famous()</code></a> (R) or 
+<a href=""></a> (Python). (The idea is based on Combinatorica, 
+a Mathematica extension.)
 </p>
 
 <h4><img src="images/icon_r.png"/> Create graphs using formulas in R</h4>
 
 <p class="news">
-The function 
+The new 
 <a href="doc-0.5/R/graph.formula.html"><code>graph.formula()</code></a>
-provide a simple, concise way to create some small graphs. Numerous
-examples are included in the 
+function provides a simple, concise way to create (small) graphs.
+Numerous examples are included in the 
 <a href="doc-0.5/R/graph.formula.html">manual page.</a>
 </p>
 
@@ -111,12 +120,16 @@ examples are included in the
 
 <p class="news">
 Many functions were updated to handle weighted graphs: fast greedy
-community detection (<a href="">C</a>, <a href="">R</a>, <a
-href="">Python</a>), Page Rank (<a href="">C</a>, <a href="">R</a>, <a
+community detection (<a href="doc-0.5/html/igraph_community_fastgreedy.html">C</a>, 
+<a href="doc-0.5/R/fastgreedy.community.html">R</a>, <a
+href="">Python</a>), Page Rank (<a href="doc-0.5/html/igraph_pagerank.html">C</a>, 
+<a href="doc-0.5/R/page.rank.html">R</a>, <a
 href="">Python</a>), 
-modularity calculation (<a href="">C</a>, <a href="">R</a>, <a
+modularity calculation (<a href="doc-0.5/html/igraph_modularity.html">C</a>, 
+<a href="doc-0.5/R/modularity.html">R</a>, <a
 href="">Python</a>), the Fruchterman-Reingold layout algorithm (<a
-href="">C</a>, <a href="">R</a>,
+href="doc-0.5/html/igraph_layout_fruchterman_reingold.html">C</a>, 
+<a href="doc-0.5/R/layout.html">R</a>,
 <a href="">Python</a>). 
 </p>
 
@@ -128,12 +141,16 @@ href="">C</a>, <a href="">R</a>,
 <p class="news">
 Some functions were added and improved to handle non-simple graphs
 (i.e. graphs with loop and/or multiple edges) better: testing that a
-graph is simple (<a href="">C</a>, <a href="">R</a>, <a
-href="">Python</a>), testing loop edges (<a href="">C</a>, <a
-href="">R</a>, <a href="">Python</a>), 
-testing multiple edges (<a href="">C</a>, <a href="">R</a>, <a
-href="">Python</a>) and couting the multiplicity of 
-edges (<a href="">C</a>, <a href="">R</a>, <a href="">Python</a>).
+graph is simple (<a href="doc-0.5/html/igraph_is_simple.html">C</a>, 
+<a href="doc-0.5/R/simplify.html">R</a>, <a
+href="">Python</a>), testing for loop edges (<a
+href="doc-0.5/html/igraph_is_loop.html">C</a>, <a
+href="doc-0.5/R/is.multiple.html">R</a>, <a href="">Python</a>), 
+testing for multiple edges (<a href="doc-0.5/html/igraph_is_multiple.html">C</a>, <a
+href="doc-0.5/R/is.multiple.html">R</a>, <a
+href="">Python</a>) and counting the multiplicity of 
+edges (<a href="doc-0.5/html/igraph_count_multiple.html">C</a>, 
+<a href="doc-0.5/R/is.multiple.html">R</a>, <a href="">Python</a>).
 </p>
 
 <h4><img src="images/icon_python.png"/> Pickling support in Python</h4>
@@ -149,7 +166,8 @@ igraph Graph objects can be serialized (pickled) in Python.
 
 <p class="news">
 This is a nice force-based layout algorithm. See the documentation of
-details (<a href="">C</a>, <a href="">R</a>, <a href="">Python</a>).
+details (<a href="doc-0.5/html/igraph_layout_graphopt.html">C</a>, 
+<a href="doc-0.5/R/layout.html">R</a>, <a href="">Python</a>).
 </p>
 
 <h4><img src="images/icon_c.png"/>
@@ -159,7 +177,9 @@ details (<a href="">C</a>, <a href="">R</a>, <a href="">Python</a>).
 
 <p class="news">
 igraph can now write graphs to files in the DOT format, used by
-GraphViz. See documentation: <a href="">C</a>, <a href="">R</a>, <a
+GraphViz. See documentation: <a
+href="doc-0.5/html/igraph_write_graph_dot.html">C</a>, 
+<a href="doc-0.5/R/write.graph.html">R</a>, <a
 href="">Python</a>.
 </p>
 
@@ -170,8 +190,10 @@ href="">Python</a>.
 
 <p class="news">
 Classic social network analysis tools for classifying the dyads (<a
-href="">C</a>, <a href="">R</a>, <a href="">Python</a>) and triads (<a
-href="">C</a>, <a href="">R</a>, <a href="">Python</a>) of a network.
+href="doc-0.5/html/igraph_dyad_census.html">C</a>, 
+<a href="doc-0.5/R/dyad.census.html">R</a>, <a href="">Python</a>) and triads (<a
+href="doc-0.5/html/igraph_triad_census.html">C</a>, 
+<a href="doc-0.5/R/triad.census.html">R</a>, <a href="">Python</a>) of a network.
 </p>
 
 <h4><img src="images/icon_c.png"/>
@@ -181,8 +203,11 @@ href="">C</a>, <a href="">R</a>, <a href="">Python</a>) of a network.
 
 <p class="news">
 igraph is now able to calculate biconnected components (<a
-href="">C</a>, <a href="">R</a>, <a href="">Python</a>) 
-and articulation points (<a href="">C</a>, <a href="">R</a>, <a
+href="doc-0.5/html/igraph_biconnected_components.html">C</a>, 
+<a href="doc-0.5/R/biconnected.components.html">R</a>, <a href="">Python</a>) 
+and articulation points (<a
+href="doc-0.5/html/igraph_articulation_points.html">C</a>, 
+<a href="doc-0.5/R/articulation.points.html">R</a>, <a
 href="">Python</a>).
 </p>
 
@@ -192,19 +217,20 @@ href="">Python</a>).
 parameters: <code>frame</code>, <code>asp</code>, <code>rescale</code>
 and <code>shape</code> for different vertex shapes, right now only
 circles and squares are supported. 
-<a href=""><code>plot.igraph</code></a> has as
+<a href="doc-0.5/R/plot.graph.html"><code>plot.igraph</code></a> has as
 argument (<code>add</code>) to plot many graphs on the same plot,
 maybe on top of each other. It also supports the <code>main</code> and
-<code>sub</code> arguments now. <a href="">See more here.</a>
+<code>sub</code> arguments now. <a href="doc-0.5/R/plot.common.html">See more here.</a>
 </p>
 
 <h4><img src="images/icon_r.png"/> Always free memory in R after an interrupted calculation</h4>
 
 <p class="news">
-In previous igraph version, when a calculation was interrupted in R
-running on MS Windows platforms, the allocated memory was not always
-deallocated, but leaked away. igraph 0.5 correctly deallocates all 
-memory on all platforms.
+In previous versions of the igraph R package the allocated memory
+was not freed if the computation was interrupted. This surely affected 
+MS Windows platforms, maybe also OSX. (Not Linux.) igraph 0.5
+correctly deallocates all memory on all platforms after an
+interruption.
 </p>
 
 <h4><img src="images/icon_c.png"/>
@@ -216,9 +242,12 @@ memory on all platforms.
 These measures can be quickly estimated by specifying an upper bound
 for path lengths to be considered. This is useful for larger graphs,
 for which the calculation takes a long time. See documentation for
-closeness (<a href="">C</a>, <a href="">R</a>, <a href="">Python</a>),
-betweenness (<a href="">C</a>, <a href="">R</a>, <a href="">Python</a>) and edge
-betweenness (<a href="">C</a>, <a href="">R</a>, <a href="">Python</a>).
+closeness (<a href="doc-0.5/html/igraph_closeness_estimate.html">C</a>, 
+<a href="doc-0.5/R/closeness.html">R</a>, <a href="">Python</a>),
+betweenness (<a href="doc-0.5/html/igraph_betweenness_estimate.html">C</a>, 
+<a href="doc-0.5/R/betweenness.html">R</a>, <a href="">Python</a>) and edge
+betweenness (<a href="doc-0.5/html/igraph_edge_betweenness_estimate.html">C</a>, 
+<a href="doc-0.5/R/betweenness.html">R</a>, <a href="">Python</a>).
 </p>
 
 <h4><img src="images/icon_c.png"/>
@@ -228,8 +257,12 @@ betweenness (<a href="">C</a>, <a href="">R</a>, <a href="">Python</a>).
 
 <p class="news">
 Two vertex similarity measures based on the number of common neighbors
-are introduced, the Jarrard (<a href="">C</a>, <a href="">R</a>, <a
-href="">Python</a>) and the Dice (<a href="">C</a>, <a href="">R</a>,
+are introduced, the Jaccard (<a
+href="doc-0.5/html/igraph_similarity_jaccard">C</a>, 
+<a href="doc-0.5/R/similarity.html">R</a>, <a
+href="">Python</a>) and the Dice (<a
+href="doc-0.5/html/igraph_similarity_dice.html">C</a>, 
+<a href="doc-0.5/R/similarity.html">R</a>,
 <a href="">Python</a>) similarities.
 </p>
 
@@ -246,6 +279,7 @@ warnings.
 
 <p class="news">
 An experimental C attribute interface was added. This allows using
-graph/vertex/edge attributes when programming from C. <a href="">See
+graph/vertex/edge attributes when programming from C. <a
+href="doc-0.5/html/ch09s02.html">See
 more here.</a>
 </p>

@@ -8,14 +8,14 @@
   <span class="comment">&mdash; for those who use igraph from R.</span>
   <ul class="download-links">
     <li class="download-external">
-<!--       <a href="doc/R/00Index.html" -->
-<!--          onClick="javascript:urchinTracker ('/docs/rhtml'); "> -->
+       <a href="doc/R/00Index.html"
+          onClick="javascript:urchinTracker ('/docs/rhtml'); ">
       <a href="doc/R/00Index.html">
 	 Browse online</a>
     </li>
     <li class="download-pdf">
-<!--       <a href="doc/R/igraph.pdf" -->
-<!--          onClick="javascript:urchinTracker ('/docs/rpdf'); "> -->
+       <a href="doc/R/igraph.pdf" 
+          onClick="javascript:urchinTracker ('/docs/rpdf'); "> 
       <a href="doc/R/igraph.pdf">
          PDF file</a>
     </li>
@@ -37,14 +37,14 @@
   module</span>
   <ul class="download-links">
     <li class="download-external">
-<!--       <a href="doc/python/index.html" -->
-<!--          onClick="javascript:urchinTracker ('/docs/pythonhtml'); "> -->
+       <a href="doc/python/index.html"
+          onClick="javascript:urchinTracker ('/docs/pythonhtml'); "> 
       <a href="doc/python/index.html">
          Browse online</a>
     </li>
     <li class="download-pdf">
-<!--       <a href="doc/python/igraph.pdf" -->
-<!--          onClick="javascript:urchinTracker ('/docs/pythonpdf'); "> -->
+       <a href="doc/python/igraph.pdf" 
+          onClick="javascript:urchinTracker ('/docs/pythonpdf'); "> 
       <a href="doc/python/igraph.pdf">PDF file</a>
     </li>
   </ul>
@@ -63,22 +63,19 @@
       <a href="doc/html/index.html">Browse online</a>
     </li>
     <li class="download-pdf">
-<!--       <a href="doc/igraph-docs.pdf" -->
-<!--          onClick="javascript:urchinTracker ('/docs/pdf'); "> -->
-<!-- 	 PDF file</a> -->
-      <a href="doc/igraph-docs.pdf">PDF file</a>
+       <a href="doc/igraph-docs.pdf" 
+          onClick="javascript:urchinTracker ('/docs/pdf'); "> 
+ 	 PDF file</a>
     </li>
     <li class="download-html">
-<!--       <a href="doc/igraph-docs-${VERSION}.tar.gz" -->
-<!--          onClick="javascript:urchinTracker ('/docs/htmlbundle'); "> -->
-<!-- 	 HTML bundle</a> -->
-      <a href="doc/igraph-docs-${VERSION}.tar.gz">HTML bundle</a>
+       <a href="doc/igraph-docs-${VERSION}.tar.gz" 
+          onClick="javascript:urchinTracker ('/docs/htmlbundle'); "> 
+ 	 HTML bundle</a> 
     </li>
     <li class="download-info">
-<!--       <a href="doc/igraph-docs-${VERSION}.tar.gz" -->
-<!--          onClick="javascript:urchinTracker ('/docs/info'); "> -->
-<!-- 	 GNU info document</a> -->
-      <a href="doc/igraph-docs.info">GNU info document</a>
+       <a href="doc/igraph-docs.info"
+          onClick="javascript:urchinTracker ('/docs/info'); "> 
+ 	 GNU info document</a>
     </li>
   </ul>
   <div class="comment">
@@ -87,9 +84,8 @@
   <div>The original XML DocBook format of the
   manual can be obtained by downloading the latest igraph
   development version from
-<!-- <a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public" > -->
-<!--    onClick="javascript:urchinTracker ('/archrepo'); "> -->
-	<a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public">
+ <a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public"
+    onClick="javascript:urchinTracker ('/archrepo'); ">
   our repository</a>.</div>
   </div>
 </li>

@@ -475,12 +475,64 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   return 0;
 }
 
+/** 
+ * \function igraph_articulation_points
+ * Find the articulation points in a graph.
+ * 
+ * A vertex is an articulation point if its removal increases 
+ * the number of connected components in the graph.
+ * \param graph The input graph.
+ * \param res Pointer to an initialized vector, the 
+ *    articulation points will be stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
+ * 
+ * \sa \ref igraph_biconnected_components(), \ref igraph_clusters()
+ */
+
 int igraph_articulation_points(const igraph_t *graph,
 			       igraph_vector_t *res) {
 
   igraph_integer_t no;
   return igraph_biconnected_components(graph, &no, 0, res);
 }
+
+/**
+ * \function igraph_biconnected_components
+ * Calculate biconnected components
+ * 
+ * A graph is biconnected if the removal of any single vertex (and
+ * its adjacent edges) does not disconnect it.
+ * 
+ * </para><para>
+ * A biconnected component of a graph is a maximal biconnected
+ * subgraph of it. The biconnected components of a graph can be given
+ * by the partition of its edges: every edge is a member of exactly
+ * one biconnected component. Note that this is not true for
+ * vertices: the same vertex can be part of many biconnected
+ * components.
+ * \param graph The input graph
+ * \param no The number of biconnected components will be stored here.
+ * \param components If not a NULL points, then the found components
+ *     are stored here, in a list of vectors. Every vector in the list
+ *     is a biconnected component, represented by its edges. More precisely, 
+ *     a spanning tree of the biconnected component is returned.
+ *     Note you'll have to 
+ *     destroy each vector first by calling \ref igraph_vector_destroy()
+ *     and then <code>free()</code> on it, plus you need to call 
+ *     \ref igraph_vector_ptr_destroy() on the list to regain all 
+ *     allocated memory.
+ * \param articulation_points If not a NULL pointer, then the 
+ *     articulation points of the graph are stored in this vector.
+ *     A vertex is an articulation point if its removal increases the 
+ *     number of (weakly) connected components in the graph.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
+ * 
+ * \sa \ref igraph_articulation_points(), \ref igraph_clusters().
+ */
 
 int igraph_biconnected_components(const igraph_t *graph,
 				  igraph_integer_t *no,
