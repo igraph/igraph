@@ -62,6 +62,8 @@ binary-arch: build install
 	dh_movefiles -plibigraph-dev    \
 	    usr/include/igraph/igraph.h \
 	    usr/include/igraph/types.h  \
+		usr/include/igraph/arpack.h \
+		usr/include/igraph/array.h  \
 	    usr/include/igraph/attributes.h  \
 	    usr/include/igraph/dqueue.h  \
 	    usr/include/igraph/error.h  \
