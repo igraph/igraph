@@ -131,7 +131,7 @@ class Graph(core.GraphBase):
         """
         if len(args) == 0 and len(kwds) == 0:
             raise ValueError, "expected at least one argument"
-        if len(kwds)>0 or callable(args[0]):
+        if len(kwds)>0 or (callable(args[0]) and not isinstance(args[0], core.EdgeSeq)):
             es = self.es(*args, **kwds)
         else:
             es = args[0]
