@@ -2269,6 +2269,7 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     size=IGRAPH_VIT_SIZE(vit);
     igraph_vit_destroy(&vit);
+	IGRAPH_FINALLY_CLEAN(1);
     if (size < 100) {
       return igraph_transitivity_local_undirected1(graph, res, vids);
     } else {

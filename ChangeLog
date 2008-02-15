@@ -1,3 +1,7 @@
+2008-02-15  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_transitiviy_local) : bug fixed
+
 2008-02-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_path_length_hist) : bug fixed
