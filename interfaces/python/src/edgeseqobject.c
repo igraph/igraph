@@ -578,7 +578,7 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self,
       
       iter = PyObject_GetIter(item);
       if (iter == 0) {
-        PyErr_SetString(PyExc_TypeError, "invalid vertex filter among positional arguments");
+        PyErr_SetString(PyExc_TypeError, "invalid edge filter among positional arguments");
         Py_DECREF(result);
         return 0;
       }
