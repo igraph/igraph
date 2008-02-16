@@ -270,6 +270,11 @@ PyObject* igraphmodule_community_to_membership(PyObject *self,
     return NULL;
   }
 
+  if (PyObject_IsTrue(return_csize)) {
+	igraph_vector_init(&csize, 0);
+	csize_p = &csize;
+  }
+
   if (igraph_community_to_membership(&merges, nodes, steps, &result, csize_p)) {
     igraphmodule_handle_igraph_error();
     igraph_vector_destroy(&result);
@@ -281,6 +286,14 @@ PyObject* igraphmodule_community_to_membership(PyObject *self,
 
   result_o = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
   igraph_vector_destroy(&result);
+
+  if (csize_p) {
+	PyObject* csize_o = igraphmodule_vector_t_to_PyList(csize_p, IGRAPHMODULE_TYPE_INT);
+	igraph_vector_destroy(csize_p);
+	if (csize_o) return Py_BuildValue("NN", result_o, csize_o);
+	Py_DECREF(result_o);
+	return NULL;
+  }
 
   return result_o;
 }

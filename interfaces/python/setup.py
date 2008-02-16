@@ -99,19 +99,6 @@ igraph_extension = Extension('igraph.core', sources, \
        
 description = """Python interface to the igraph high performance graph
 library, primarily aimed at complex network research and analysis.
-
-Windows installer versions need libxml2 and iconv, both installable from
-the following URL:
-    
-http://www.zlatkovic.com/pub/libxml/
-
-**WARNING**: previous releases of this library included the source
-code of the C core of igraph as well. From 0.5, the source of the C
-core has to be downloaded, built and installed separately before
-building the Python interface from scratch. See the original igraph
-homepage for instructions on how to build the C core:
-    
-http://cneurocvs.rmki.kfki.hu/igraph/
 """
 
 setup(name = 'python-igraph',
