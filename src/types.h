@@ -400,7 +400,7 @@ int igraph_indheap_init_array     (igraph_indheap_t *t, igraph_real_t* data, lon
 void igraph_indheap_destroy        (igraph_indheap_t* h);
 igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h);
 int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem);
-int igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem);
+int igraph_indheap_push_with_index(igraph_indheap_t* h, long int idx, igraph_real_t elem);
 int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem);
 igraph_real_t igraph_indheap_max       (igraph_indheap_t* h);
 igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h);

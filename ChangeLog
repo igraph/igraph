@@ -1,3 +1,8 @@
+2008-02-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/heap.c (igraph_indheap_push_index, igraph_indheap_push_with_index) 
+	: renamed, it was inconsistent here and in the header
+
 2008-02-15  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_transitiviy_local) : bug fixed

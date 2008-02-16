@@ -160,7 +160,7 @@ int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
  * \brief Adds an element to an indexed heap with a given index.
  */
 
-int igraph_indheap_push_index(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
+int igraph_indheap_push_with_index(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
   assert(h != 0);
   assert(h->stor_begin != 0);
 	
