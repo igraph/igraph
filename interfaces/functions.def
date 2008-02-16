@@ -305,6 +305,11 @@ igraph_get_all_shortest_paths:
                 INTEGER from, VERTEXSET to, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
 
+igraph_shortest_paths_dijkstra:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
+                EDGEWEIGHTS weights, NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
 igraph_subcomponent: 
         PARAMS: GRAPH graph, OUT VECTOR res, REAL vid, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace

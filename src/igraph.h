@@ -745,6 +745,12 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
 				  igraph_vector_t *nrgeo,
 				  igraph_integer_t from, const igraph_vs_t to, 
 				  igraph_neimode_t mode);
+int igraph_shortest_paths_dijkstra(const igraph_t *graph,
+				   igraph_matrix_t *res,
+				   const igraph_vs_t from,
+				   const igraph_vector_t *weights, 
+				   igraph_neimode_t mode);
+
 int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 
 			igraph_neimode_t mode);	
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res, 

@@ -1847,20 +1847,26 @@ SEXP R_igraph_growing_random_game(SEXP pn, SEXP pm, SEXP pdirected,
   return result;  
 }
 
-SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode) {
+SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode, SEXP weights) {
   
   igraph_t g;
   igraph_vs_t vs;
   igraph_integer_t mode=REAL(pmode)[0];
   igraph_matrix_t res;
+  igraph_vector_t w, *pw=&w;
   SEXP result;
   
   R_igraph_before();
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
-  igraph_matrix_init(&res, 0, 0);
-  igraph_shortest_paths(&g, &res, vs, mode);
+  if (isNull(weights)) {
+    pw=0;
+  } else {
+    R_SEXP_to_vector(weights, &w);
+  }
+  igraph_matrix_init(&res, 0, 0);  
+  igraph_shortest_paths_dijkstra(&g, &res, vs, pw, mode);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   igraph_vs_destroy(&vs);

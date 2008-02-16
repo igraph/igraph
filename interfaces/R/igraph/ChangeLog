@@ -1,3 +1,10 @@
+2008-02-16  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structural.properties.R (shortest.paths)
+	* interfaces/R/src/rinterface.c.in (R_igraph_shortest_paths):
+	weights added, we always call the weighted version, there is a 
+	fallback in that anyway
+
 2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/flow.R (graph.maxflow, graph.mincut) : allow
