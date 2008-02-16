@@ -221,7 +221,7 @@ class Plot(object):
         self._filename=None
         self._surface_was_created=not isinstance(target, cairo.Surface)
         self._tmpfile=False
-        self._tmpfile_obj=None
+        self._tmpfile_name=None
         self._filename=None
         self._bgcolor=None
 
@@ -349,14 +349,15 @@ class Plot(object):
         self._is_dirty = False
 
     def _create_tmpfile(self):
-        from tempfile import NamedTemporaryFile
-        self._tmpfile_obj=NamedTemporaryFile(prefix="igraph", suffix=".png")
-        return self._tmpfile_obj
+        from tempfile import mkstemp
+        handle, self._tmpfile_name = mkstemp(prefix="igraph", suffix=".png")
+        os.close(handle)
+        return self._tmpfile_name
 
     def _close_tmpfile(self):
-        if self._tmpfile_obj:
-            self._tmpfile_obj.close()
-            self._tmpfile_obj=None
+        if self._tmpfile_name:
+            os.unlink(self._tmpfile_name)
+            self._tmpfile_name = None
 
     def save(self, fname=None):
         """Saves the plot.
@@ -367,7 +368,7 @@ class Plot(object):
         if self._is_dirty: self.redraw()
         if isinstance(self._surface, cairo.ImageSurface):
             if self._tmpfile: self._create_tmpfile()
-            fname = fname or self._filename or self._tmpfile_obj.name
+            fname = fname or self._filename or self._tmpfile_name
             if fname is None:
                 raise ValueError, "no file name is known for the surface and none given"
             result = self._surface.write_to_png(fname)
@@ -393,7 +394,7 @@ class Plot(object):
             if self._is_dirty: self.redraw(ctx)
 
         self._create_tmpfile()
-        sur.write_to_png(self._tmpfile_obj.name)
+        sur.write_to_png(self._tmpfile_name)
         from igraph import config # Can only be imported here
         imgviewer = config["apps.image_viewer"]
         if not imgviewer:
@@ -401,7 +402,7 @@ class Plot(object):
             # should only happen on unknown platforms.
             raise NotImplementedError, "showing plots is not implemented on this platform: %s" % platform.system()
         else:
-            os.system("%s %s" % (imgviewer, self._tmpfile_obj.name))
+            os.system("%s %s" % (imgviewer, self._tmpfile_name))
             if platform.system() == "Darwin":
                 # On Mac OS X, launched applications are likely to
                 # fork and give control back to Python immediately.
