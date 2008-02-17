@@ -247,6 +247,7 @@ i.get.arrow.mode <- function(graph, arrow.mode=NULL) {
 
 i.default.values <- list(vertex=list(color="SkyBlue2",
                            size=15,
+                           size2=15,
                            label=i.get.labels,
                            label.degree=-pi/4,
                            label.color="darkblue",
