@@ -25,6 +25,7 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "bliss_timer.hh"
 #include "bliss_graph.hh"
 #include "bliss_partition.hh"
+#include <limits.h>		// INT_MAX, etc
 
 namespace igraph {
 

@@ -29,6 +29,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <cstring>		// strlen
 #include "walktrap_graph.h"
 
 using namespace std;
