@@ -5,19 +5,16 @@ except ImportError:
     from distutils.core import setup
 from distutils.core import Extension
 from distutils.file_util import copy_file
+from distutils.util import get_platform
 from sys import version, exit
-import glob
 import os.path
+import glob
 from os import popen3, mkdir
 from shutil import copy2
 
 LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include/igraph', '/usr/local/include/igraph']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
-
-LIBXML2_FALLBACK_INCLUDE_DIRS = ['/usr/include/libxml2']
-LIBXML2_FALLBACK_LIBRARIES = ['xml2', 'iconv']
-LIBXML2_FALLBACK_LIBRARY_DIRS = []
 
 if version < '2.3':
     print "This module requires Python >= 2.3"
@@ -53,26 +50,6 @@ def detect_igraph_library_dirs(default = LIBIGRAPH_FALLBACK_LIBRARY_DIRS):
     opts=line.split()
     return [opt[2:] for opt in opts if opt[0:2]=="-L"]
 
-def detect_igraph_source():
-    """Tries to detect the igraph sources and copy it to igraph/ if necessary"""
-    if not os.path.isdir('igraph'): os.mkdir('igraph')
-    if os.path.isfile(os.path.join('..', '..', 'src', 'igraph.h')):
-        dirs_to_evaluate = ['.', 'f2c', 'blas', 'lapack', 'arpack']
-        files_to_copy = ['*.c', '*.h', '*.pmt', '*.y', '*.cc', '*.hh', '*.cpp']
-        src_files = [('.', os.path.join('..', '..', 'config.h'))]
-        for wildcard in files_to_copy:
-            for d in dirs_to_evaluate:
-                l = glob.glob(os.path.join('..', '..', 'src', d, wildcard))
-                src_files.extend([(d, f) for f in l])
-        for d in dirs_to_evaluate:
-            target_dir = os.path.join('igraph', d)
-            if not os.path.isdir(target_dir): os.mkdir(target_dir)
-        for src_dir, src_file in src_files:
-            target_dir = os.path.join('igraph', src_dir)
-            copy_file(src_file, target_dir, update=1)
-    
-    return
-    
 sources=glob.glob(os.path.join('src', '*.c'))
 include_dirs=[]
 library_dirs=[]
@@ -100,10 +77,27 @@ igraph_extension = Extension('igraph.core', sources, \
 description = """Python interface to the igraph high performance graph
 library, primarily aimed at complex network research and analysis.
 
-Graph plotting functionality is provided by the Cairo library,
-so make sure you install the Python bindings of Cairo if you
-want to generate plots. See: http://cairographics.org/pycairo
+Graph plotting functionality is provided by the Cairo library, so make
+sure you install the Python bindings of Cairo if you want to generate
+publication-quality graph plots.
+See the `Cairo homepage <http://cairographics.org/pycairo>`_ for details.
+
+From release 0.5, the C core of the igraph library is **not** included
+in the Python distribution - you must compile and install the C core
+separately. Windows installers already contain a compiled igraph DLL,
+so they should work out of the box. Linux users should refer to the
+`igraph homepage <http://cneurocvs.rmki.kfki.hu/igraph>`_ for
+compilation instructions (but check your distribution first, maybe
+there are pre-compiled packages available). OS X Leopard users may
+benefit from the meta-package available on the igraph homepage.
 """
+
+plat = get_platform()
+data_files = []
+if "macosx" in plat:
+    data_files = [('/usr/lib', ['/usr/local/lib/libigraph.dylib', \
+                                '/usr/local/lib/libigraph.0.dylib', \
+                                '/usr/local/lib/libigraph.0.0.0.dylib'])]
 
 setup(name = 'python-igraph',
       version = '0.5',
@@ -116,6 +110,7 @@ setup(name = 'python-igraph',
       package_dir = {'igraph': 'package'},
       packages = ['igraph', 'igraph.test', 'igraph.app'],
       scripts = ['scripts/igraph'],
+      data_files = data_files,
       platforms = 'ALL',
       keywords = ['graph', 'network', 'mathematics', 'math', 'graph theory', 'discrete mathematics'],
       classifiers = [
