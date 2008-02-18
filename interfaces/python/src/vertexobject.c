@@ -291,7 +291,7 @@ PyMethodDef igraphmodule_Vertex_methods[] = {
  */
 PyMappingMethods igraphmodule_Vertex_as_mapping = {
   // returns the number of vertex attributes
-  (inquiry)igraphmodule_Vertex_attribute_count,
+  (lenfunc)igraphmodule_Vertex_attribute_count,
   // returns an attribute by name
   (binaryfunc)igraphmodule_Vertex_get_attribute,
   // sets an attribute by name

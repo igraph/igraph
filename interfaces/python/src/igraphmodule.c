@@ -376,7 +376,8 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
   igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea) {
   PyObject **fromattrs, **toattrs, *key, *value, *newval, *o=NULL;
   igraph_bool_t copy_attrs[3] = { ga, va, ea };
-  int i, j, pos;
+  int i, j;
+  Py_ssize_t pos = 0;
  
   /* printf("Copying attribute table\n"); */
   if (from->attr) {
@@ -422,10 +423,10 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
 static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr) {
   /* Extend the end of every value in the vertex hash with nv pieces of None */
   PyObject *key, *value, *dict;
-  int pos=0;
   long int i, j, k, l;
   igraph_i_attribute_record_t *attr_rec;
   igraph_bool_t *added_attrs=0;
+  Py_ssize_t pos = 0;
 
   if (!graph->attr) return IGRAPH_SUCCESS;
   if (nv<=0) return IGRAPH_SUCCESS;
@@ -550,7 +551,7 @@ static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
 						     const igraph_vector_t *vidx) {
   long int n, i, ndeleted=0;
   PyObject *key, *value, *dict, *o;
-  int pos=0;
+  Py_ssize_t pos=0;
   
   /* Reindexing vertices */
   dict=((PyObject**)graph->attr)[1];
@@ -599,7 +600,7 @@ static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
 static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vector_t *edges, igraph_vector_ptr_t *attr) {
   /* Extend the end of every value in the edge hash with ne pieces of None */
   PyObject *key, *value, *dict;
-  int pos=0;
+  Py_ssize_t pos=0;
   long int i, j, k, l, ne;
   igraph_bool_t *added_attrs=0;
   igraph_i_attribute_record_t *attr_rec;
@@ -730,7 +731,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
 static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_vector_t *idx) {
   long int n, i, ndeleted=0;
   PyObject *key, *value, *dict, *o;
-  int pos=0;
+  Py_ssize_t pos=0;
   
   dict=((PyObject**)graph->attr)[2];
   if (!PyDict_Check(dict)) return;
@@ -777,7 +778,7 @@ static int igraphmodule_i_attribute_permute_edges(igraph_t *graph,
 						  const igraph_vector_t *idx) { 
   long int n, i;
   PyObject *key, *value, *dict, *newdict, *newlist, *o;
-  int pos=0;
+  Py_ssize_t pos=0;
 
   dict=((PyObject**)graph->attr)[2];
   if (!PyDict_Check(dict)) return 1;
@@ -1241,7 +1242,7 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "BLISS_FSM", IGRAPH_BLISS_FSM);
 
   /* More useful constants */
-  PyModule_AddStringConstant(m, "__version__", "0.5");
+  PyModule_AddStringConstant(m, "__version__", "0.6");
   PyModule_AddStringConstant(m, "__build_date__", __DATE__);
 
   /* initialize error, progress, warning and interruption handler */

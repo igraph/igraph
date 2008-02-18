@@ -354,7 +354,7 @@ PyGetSetDef igraphmodule_Edge_getseters[] = {
  */
 PyMappingMethods igraphmodule_Edge_as_mapping = {
   // returns the number of edge attributes
-  (inquiry)igraphmodule_Edge_attribute_count,
+  (lenfunc)igraphmodule_Edge_attribute_count,
   // returns an attribute by name
   (binaryfunc)igraphmodule_Edge_get_attribute,
   // sets an attribute by name

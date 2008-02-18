@@ -99,6 +99,10 @@ igraph_extension = Extension('igraph.core', sources, \
        
 description = """Python interface to the igraph high performance graph
 library, primarily aimed at complex network research and analysis.
+
+Graph plotting functionality is provided by the Cairo library,
+so make sure you install the Python bindings of Cairo if you
+want to generate plots. See: http://cairographics.org/pycairo
 """
 
 setup(name = 'python-igraph',

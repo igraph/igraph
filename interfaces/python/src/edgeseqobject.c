@@ -186,7 +186,7 @@ int igraphmodule_EdgeSeq_sq_length(igraphmodule_EdgeSeqObject* self) {
  * \brief Returns the item at the given index in the sequence
  */
 PyObject* igraphmodule_EdgeSeq_sq_item(igraphmodule_EdgeSeqObject* self,
-                       int i) {
+                       Py_ssize_t i) {
   igraph_t *g;
   long idx = -1;
   
@@ -680,10 +680,10 @@ PyMethodDef igraphmodule_EdgeSeq_methods[] = {
  * edges by indices)
  */
 static PySequenceMethods igraphmodule_EdgeSeq_as_sequence = {
-  (inquiry)igraphmodule_EdgeSeq_sq_length,
+  (lenfunc)igraphmodule_EdgeSeq_sq_length,
   0,               /* sq_concat */
   0,               /* sq_repeat */
-  (intargfunc)igraphmodule_EdgeSeq_sq_item, /* sq_item */
+  (ssizeargfunc)igraphmodule_EdgeSeq_sq_item, /* sq_item */
   0,                                          /* sq_slice */
   0,                                          /* sq_ass_item */
   0,                                          /* sq_ass_slice */
@@ -699,7 +699,7 @@ static PySequenceMethods igraphmodule_EdgeSeq_as_sequence = {
  */
 static PyMappingMethods igraphmodule_EdgeSeq_as_mapping = {
     /* returns the number of edge attributes */
-    (inquiry) 0,
+    (lenfunc) 0,
     /* returns the values of an attribute by name */
     (binaryfunc) igraphmodule_EdgeSeq_get_attribute_values_mapping,
     /* sets the values of an attribute by name */
