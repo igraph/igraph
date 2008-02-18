@@ -294,7 +294,7 @@ PyTypeObject igraphmodule_ARPACKOptionsType = {
   0,                                          /* tp_dictoffset */
   0,                                          /* tp_init */
   0,                                          /* tp_alloc */
-  igraphmodule_ARPACKOptions_new,             /* tp_new */
+  (newfunc)igraphmodule_ARPACKOptions_new,    /* tp_new */
   0,                                          /* tp_free */
 };
 
