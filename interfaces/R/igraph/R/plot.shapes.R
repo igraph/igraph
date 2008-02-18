@@ -31,6 +31,8 @@
   ## clipping mode
   
   if (mode=="clip") {
+    if (length(coords)==0) { return (coords) }     
+
     vertex.size <- 1/200 * params("vertex", "size")
 
     if (end=="from") {
@@ -106,6 +108,8 @@
   ## clipping mode
 
   if (mode=="clip") {
+    if (length(coords)==0) { return (coords) }     
+
     vertex.size <- 1/200 * params("vertex", "size")
 
     square.shift <- function(x0, y0, x1, y1, vsize) {
@@ -194,6 +198,8 @@
   ## clipping mode
 
   if (mode=="clip") {
+    if (length(coords)==0) { return (coords) }     
+
     vertex.size <- 1/200 * params("vertex", "size")
     
     square.shift <- function(x0, y0, x1, y1, vsize) {
@@ -259,6 +265,8 @@
   ## clipping mode
 
   if (mode=="clip") {
+    if (length(coords)==0) { return (coords) }     
+
     vertex.size <- 1/200 * params("vertex", "size")
     vertex.size2 <- 1/200 * params("vertex", "size2")
 
@@ -364,6 +372,8 @@
   ## clipping mode
 
   if (mode=="clip") {
+    if (length(coords)==0) { return (coords) }     
+
     vertex.size <- 1/200 * params("vertex", "size")
     vertex.size2 <- 1/200 * params("vertex", "size2")
     
@@ -439,6 +449,8 @@
   ## clipping mode
 
   if (mode=="clip") {
+    if (length(coords)==0) { return (coords) }     
+
     vertex.size <- 1/200 * params("vertex", "size")
     vertex.size2 <- 1/200 * params("vertex", "size2")
     
