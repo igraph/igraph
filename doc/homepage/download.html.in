@@ -46,9 +46,9 @@
           Windows installer for Python 2.5</a> 
     </li>
     <li class="download-osx">
-       <a href="http://pypi.python.org/packages/2.4/p/python-igraph/python-igraph-${VERSION}-py2.4-macosx10.5.mpkg" 
+       <a href="download/python_igraph-${VERSION}-py2.5-macosx10.5.dmg" 
           onClick="javascript:urchinTracker ('/downloads/pymacosx105'); "> 
-          OS X Leopard installer (Python 2.4)</a> 
+          OS X Leopard installer (Python 2.5)</a> 
     </li>
     <li class="download-source">
        <a href="http://pypi.python.org/packages/source/p/python-igraph/python-igraph-${VERSION}.tar.gz"
