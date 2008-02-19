@@ -53,6 +53,7 @@ clean:
 	  $$python setup.py clean; \
 	done
 	rm -f build-stamp configure-stamp
+	rm -rf build
 	dh_clean
 
 install: build
@@ -93,8 +94,8 @@ binary-arch: build install
 	dh_compress
 	dh_fixperms
 	dh_makeshlibs
-	dh_shlibdeps -L libigraph -l debian/libigraph/usr/lib
-	dh_python
+	dh_shlibdeps
+#	dh_python
 	dh_pycentral
 	dh_gencontrol
 	dh_installdeb
