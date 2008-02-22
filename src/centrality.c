@@ -583,7 +583,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
   options->which[0]='L'; options->which[1]='M';
   options->start=1;		/* no random start vector */
 
-  directed <- directed && igraph_is_directed(graph);
+  directed = directed && igraph_is_directed(graph);
 
   if (weights && igraph_vector_size(weights) != igraph_ecount(graph))
   {
