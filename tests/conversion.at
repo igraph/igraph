@@ -26,3 +26,8 @@ AT_KEYWORDS([igraph_to_undirected directedness undirected directed])
 AT_COMPILE_CHECK([simple/igraph_to_undirected.c], 
 	         [simple/igraph_to_undirected.out])
 AT_CLEANUP
+
+AT_SETUP([Graphs from adjacency list (igraph_adjlist):])
+AT_KEYWORDS([igraph_adjlist adjacency list adjlist])
+AT_COMPILE_CHECK([simple/adjlist.c])
+AT_CLEANUP

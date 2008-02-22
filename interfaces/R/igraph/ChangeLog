@@ -1,3 +1,9 @@
+2008-02-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/conversion.R (igraph.from.graphNEL)
+	(igraph.to.graphNEL)
+	* interfaces/R/src/rinterface.c.in (R_SEXP_to_igraph_adjlist) : added
+
 2008-02-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.shapes.R : handle graphs which contain 

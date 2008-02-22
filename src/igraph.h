@@ -2744,6 +2744,7 @@ typedef struct igraph_adjlist_t {
 
 int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
 			  igraph_neimode_t mode);
+igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al); 
 int igraph_adjlist_init_complementer(const igraph_t *graph,
 				     igraph_adjlist_t *al, 
 				     igraph_neimode_t mode,
@@ -2767,6 +2768,9 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al);
  * Time complexity: O(1).
  */
 #define igraph_adjlist_get(al,no) (&(al)->adjs[(long int)(no)])
+
+int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
+		   igraph_bool_t directed, igraph_bool_t duplicate);
 
 typedef struct igraph_adjedgelist_t {
   igraph_integer_t length;

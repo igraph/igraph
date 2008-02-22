@@ -146,6 +146,11 @@ igraph_lcf_vector:
         PARAMS: OUT GRAPH graph, INTEGER n, VECTOR shifts, INTEGER repeats=1
         NAME-R: graph.lcf
 
+igraph_adjlist:
+        PARAMS: OUT GRAPH graph, ADJLIST adjlist, BOOLEAN directed=True, \
+                BOOLEAN duplicate=True
+        NAME-R: graph.adjlist
+
 #######################################
 # Constructors, games
 #######################################

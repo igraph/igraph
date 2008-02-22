@@ -139,6 +139,14 @@ VECTORLIST:
          R_igraph_vectorlist_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+ADJLIST:
+  CTYPE: igraph_adjlist_t
+  CALL: &%C%
+  INCONV:
+    IN:  if (0 != R_SEXP_to_igraph_adjlist(%I%, &%C%)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         }
+
 ##################################
 # VECTOR that can be NULL
 # 'OUT' arguments are always returned now, in the 
