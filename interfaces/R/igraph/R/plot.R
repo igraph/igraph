@@ -235,8 +235,10 @@ plot.igraph <- function(x,
                       h.lty=1, sh.lty=el, open=FALSE, size=arrow.size)
       }
     }
-    x <- (x0+x1)/2
-    y <- (y0+y1)/2
+    phi <- atan2(y1-y0, x1-x0)
+    r <- sqrt( (x1-x0)^2 + (y1-y0)^2 )
+    x <- x0 + 2/3*r*cos(phi)
+    y <- y0 + 2/3*r*sin(phi)
     text(x, y, labels=edge.labels, col=edge.label.color, family=edge.label.family,
          font=edge.label.font, cex=edge.label.cex)
   }
