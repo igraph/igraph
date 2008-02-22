@@ -1,3 +1,8 @@
+2008-02-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : plot edge labels
+	at one third of the edge to allow better plotting of mutual edges
+
 2008-02-09  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/flow.R (graph.maxflow, graph.mincut) : allow
