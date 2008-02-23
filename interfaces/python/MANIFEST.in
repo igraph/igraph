@@ -2,4 +2,9 @@ include src/*.h
 include test.py
 include MANIFEST.in
 include LICENSE
+include debian/changelog
+include debian/control
+include debian/rules
+include debian/prepare
+include scripts/mkdoc.sh
 

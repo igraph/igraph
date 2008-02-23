@@ -96,10 +96,12 @@
 <h3>Debian Linux packages</h3>
 
 <p><a href="http://debian.org">Debian Linux</a> users may also benefit from
-our Debian package repository. The <i>igraph C library</i> can be installed and
-automatically updated using the standard Debian package manager. Just add
-the following two lines to <code>/etc/apt/sources.list</code> and install
-the <code>libigraph</code> and <code>libigraph-dev</code> packages:</p>
+our Debian package repository. The <i>igraph C library</i> and its Python
+interface can be installed and automatically updated using the standard
+Debian package manager. Just add the following two lines to
+<code>/etc/apt/sources.list</code> and install
+the <code>libigraph</code>, <code>libigraph-dev</code> and
+<code>python-igraph</code> packages:</p>
 
 <pre class="programlisting">
 deb http://cneurocvs.rmki.kfki.hu /packages/binary/

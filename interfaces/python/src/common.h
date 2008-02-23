@@ -50,6 +50,13 @@
 #define Py_RETURN_NONE { Py_INCREF(Py_None); return Py_None; }
 #endif
 
+/* Compatibility stuff for Python 2.4 */
+#if (PY_MAJOR_VERSION <= 2) & (PY_MINOR_VERSION <= 4)
+#define lenfunc inquiry
+#define ssizeargfunc intargfunc
+#define ssizessizeargfunc intintargfunc
+#define Py_ssize_t int
+#endif
 
 #define ATTRHASH_IDX_GRAPH 0
 #define ATTRHASH_IDX_VERTEX 1
