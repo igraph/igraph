@@ -590,11 +590,11 @@ igraph_layout_lgl:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_reingold_tilford:
-        PARAMS: GRAPH graph, OUT MATRIX res, LONGINT root=0
+        PARAMS: GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT, VECTOR roots
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_reingold_tilford_circular:
-        PARAMS: GRAPH graph, OUT MATRIX res, LONGINT root=0
+        PARAMS: GRAPH graph, OUT MATRIX res, NEIMODE mode=OUT, VECTOR roots
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_random_3d:

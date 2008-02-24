@@ -238,11 +238,16 @@ layout.reingold.tilford <- function(graph, ..., params=list()) {
     params <- list(...)
   }
 
-  if (is.null(params$root))          { params$root       <- 0     }
-  if (is.null(params$circular))      { params$circular   <- FALSE }
+  if (is.null(params$root))          { params$root       <- numeric()  }
+  if (is.null(params$circular))      { params$circular   <- FALSE      }
+  if (is.null(params$rootlevel))     { params$rootlevel  <- numeric()  }
+  if (is.null(params$mode))          { params$mode       <- "out"      }
+  params$mode <- tolower(params$mode)
+  params$mode <- switch(params$mode, "out"=1, "in"=2, "all"=3, "total"=3)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_layout_reingold_tilford", graph, as.double(params$root),
+        as.double(params$mode), as.double(params$rootlevel),
         as.logical(params$circular),
         PACKAGE="igraph")
 }

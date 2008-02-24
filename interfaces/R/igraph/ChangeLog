@@ -1,3 +1,9 @@
+2008-02-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/layout.R (layout.reingold.tilford)
+	* interfaces/R/src/rinterface.c.in (R_igraph_layout_reingold_tilford) :
+	'root' can be a vector now, 'mode' & 'rootlevel' parameter added
+ 
 2008-02-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : plot edge labels

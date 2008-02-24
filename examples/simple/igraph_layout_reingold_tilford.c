@@ -34,7 +34,7 @@ int main() {
   f=fopen("igraph_layout_reingold_tilford.in", "r");
   igraph_read_graph_edgelist(&g, f, 0, 1);
   igraph_matrix_init(&coords, 0, 0);
-  igraph_layout_reingold_tilford(&g, &coords, 0); 
+  igraph_layout_reingold_tilford(&g, &coords, IGRAPH_IN, 0, 0); 
   
   /*n=igraph_vcount(&g);
   for (i=0; i<n; i++) {

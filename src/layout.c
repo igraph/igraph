@@ -1173,57 +1173,20 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
                                                  igraph_matrix_t *res, long int node,
 												 long int vcount, igraph_real_t xpos);
 
-/**
- * \function igraph_layout_reingold_tilford
- * \brief Reingold-Tilford layout for tree graphs
- * 
- * </para><para>
- * Arranges the nodes in a tree where the given node is used as the root.
- * The tree is directed downwards and the parents are centered above its
- * children. For the exact algorithm, see:
- * 
- * </para><para>
- * Reingold, E and Tilford, J: Tidier drawing of trees.
- * IEEE Trans. Softw. Eng., SE-7(2):223--228, 1981
- *
- * </para><para>
- * If the given graph is not a tree, a breadth-first search is executed
- * first to obtain a possible spanning tree.
- * 
- * \param graph The graph object. 
- * \param res The result, the coordinates in a matrix. The parameter
- *   should point to an initialized matrix object and will be resized.
- * \param root The index of the root vertex.
- * \return Error code.
- *
- * Added in version 0.2.
- * 
- * </para><para>
- * TODO: decompose and merge for not fully connected graphs
- * TODO: possible speedup could be achieved if we use a table for storing
- * the children of each node in the tree. (Now the implementation uses a
- * single array containing the parent of each node and a node's children
- * are determined by looking for other nodes that have this node as parent)
- * 
- * \sa \ref igraph_layout_reingold_tilford_circular().
- */
-int igraph_layout_reingold_tilford(const igraph_t *graph, 
-				   igraph_matrix_t *res, long int root) {
+int igraph_i_layout_reingold_tilford(const igraph_t *graph, 
+				     igraph_matrix_t *res, igraph_neimode_t mode, 
+				     long int root) {
   long int no_of_nodes=igraph_vcount(graph);
   long int i, n, j;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_adjlist_t allneis;
   igraph_vector_t *neis;
   struct igraph_i_reingold_tilford_vertex *vdata;
-  
-  if (root<0 || root>=no_of_nodes) {
-    IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
-  }
-  
+    
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
   
   vdata=igraph_Calloc(no_of_nodes, struct igraph_i_reingold_tilford_vertex);
@@ -1401,6 +1364,268 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
   return 0;
 }
 
+/**
+ * \function igraph_layout_reingold_tilford
+ * \brief Reingold-Tilford layout for tree graphs
+ * 
+ * </para><para>
+ * Arranges the nodes in a tree where the given node is used as the root.
+ * The tree is directed downwards and the parents are centered above its
+ * children. For the exact algorithm, see:
+ * 
+ * </para><para>
+ * Reingold, E and Tilford, J: Tidier drawing of trees.
+ * IEEE Trans. Softw. Eng., SE-7(2):223--228, 1981
+ *
+ * </para><para>
+ * If the given graph is not a tree, a breadth-first search is executed
+ * first to obtain a possible spanning tree.
+ * 
+ * \param graph The graph object. 
+ * \param res The result, the coordinates in a matrix. The parameter
+ *   should point to an initialized matrix object and will be resized.
+ * \param mode Specifies which edges to consider when building the tree.
+ *   If it is \c IGRAPH_OUT then only the outgoing, if it is \c IGRAPH_IN
+ *   then only the incoming edges of a parent are considered. If it is 
+ *   \c IGRAPH_ALL then all edges are used (this was the behavior in 
+ *   igraph 0.5 and before). This parameter also influences how the root 
+ *   vertices are calculated, if they are not given. See the \p roots parameter.
+ * \param roots The index of the root vertex or root vertices. 
+ *   If this is a non-empty vector then the supplied vertex ids are used 
+ *   as the roots of the trees (or a single tree if the graph is connected).
+ *   If it is a null pointer of a pointer to an empty vector, then the root
+ *   vertices are automatically calculated based on topological sorting,
+ *   performed with the opposite mode than the \p mode argument.
+ *   After the vertices have been sorted, one is selected from each component.
+ * \param rootlevel This argument can be useful when drawing forests which are 
+ *   not trees (i.e. they are unconnected and have tree components). It specifies 
+ *   the level of the root vertices for every tree in the forest. It is only
+ *   considered if not a null pointer and the \p roots argument is also given 
+ *   (and it is not a null pointer of an empty vector).
+ * \return Error code.
+ *
+ * Added in version 0.2.
+ * 
+ * </para><para>
+ * TODO: possible speedup could be achieved if we use a table for storing
+ * the children of each node in the tree. (Now the implementation uses a
+ * single array containing the parent of each node and a node's children
+ * are determined by looking for other nodes that have this node as parent)
+ * 
+ * \sa \ref igraph_layout_reingold_tilford_circular().
+ */
+
+int igraph_layout_reingold_tilford(const igraph_t *graph,
+				   igraph_matrix_t *res, 
+				   igraph_neimode_t mode,
+				   const igraph_vector_t *roots,
+				   const igraph_vector_t *rootlevel) {
+
+  long int no_of_nodes_orig=igraph_vcount(graph);
+  long int no_of_nodes=no_of_nodes_orig;
+  long int real_root;
+  igraph_t extended;
+  const igraph_t *pextended=graph;
+  igraph_vector_t newedges;
+  igraph_vector_t myroots;
+  const igraph_vector_t *proots=roots;
+  igraph_neimode_t mode2;
+  
+  if (!igraph_is_directed(graph)) {
+    mode=IGRAPH_ALL;
+  }
+  if (mode==IGRAPH_IN) {
+    mode2=IGRAPH_OUT;
+  } else if (mode==IGRAPH_OUT) {
+    mode2=IGRAPH_IN;
+  } else {
+    mode2=mode;
+  }
+
+  if ( (!roots || igraph_vector_size(roots)==0) && 
+       rootlevel && igraph_vector_size(rootlevel) != 0 ) {
+    IGRAPH_WARNING("Reingold-Tilford layout: 'rootlevel' ignored");
+  }
+
+  /* ----------------------------------------------------------------------- */
+  /* If root vertices are not given, then do a topological sort and take 
+     the last element from every component */
+
+  if (!roots || igraph_vector_size(roots)==0) {
+    
+    igraph_vector_t order, membership;
+    igraph_integer_t no_comps;
+    long int i, noseen=0;
+    IGRAPH_VECTOR_INIT_FINALLY(&myroots, 0);
+
+    if (mode != IGRAPH_ALL) {
+      IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+      IGRAPH_CHECK(igraph_topological_sorting(graph, &order, mode2));
+    } else {
+      IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, no_of_nodes-1));
+      IGRAPH_FINALLY(igraph_vector_destroy, &order);
+    }
+    
+    IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
+    IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0, 
+				 &no_comps, IGRAPH_WEAK));
+    
+    IGRAPH_CHECK(igraph_vector_resize(&myroots, no_comps));
+    igraph_vector_null(&myroots);
+    proots=&myroots;
+    for (i=no_of_nodes-1; noseen < no_comps && i>=0; i--) {
+      long int v=VECTOR(order)[i];
+      long int mem=VECTOR(membership)[v];
+      if (VECTOR(myroots)[mem]==0) {
+	noseen += 1;
+	VECTOR(myroots)[mem]=v+1;
+      }
+    }
+
+    for (i=0; i<no_comps; i++) {
+      VECTOR(myroots)[i] -= 1;
+    }
+
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&order);
+    IGRAPH_FINALLY_CLEAN(2);
+
+  } else if (rootlevel && igraph_vector_size(rootlevel) > 0 &&
+	     igraph_vector_size(roots) > 1) {
+
+  /* ----------------------------------------------------------------------- */
+  /* Many roots were given to us, check 'rootlevel' */
+
+    long int plus_levels=0;
+    long int i;
+    
+    if (igraph_vector_size(roots) != igraph_vector_size(rootlevel)) {
+      IGRAPH_ERROR("Reingold-Tilford: 'roots' and 'rootlevel' lengths differ",
+		   IGRAPH_EINVAL);
+    }
+
+    /* check if there is one which is not zero */
+    for (i=0; i<igraph_vector_size(roots); i++) {
+      plus_levels += VECTOR(*rootlevel)[i];
+    }
+
+    /* make copy of graph, add vertices/edges */
+    if (plus_levels != 0) {
+      igraph_vector_t newedges;
+      long int edgeptr=0;
+
+      pextended=&extended;
+      IGRAPH_CHECK(igraph_copy(&extended, graph));
+      IGRAPH_FINALLY(igraph_destroy, &extended);
+      IGRAPH_CHECK(igraph_add_vertices(&extended, plus_levels, 0));
+
+      IGRAPH_VECTOR_INIT_FINALLY(&newedges, plus_levels*2);
+
+      for (i=0; i<igraph_vector_size(roots); i++) {
+	long int rl=VECTOR(*rootlevel)[i];
+	long int rn=VECTOR(*roots)[i];
+	long int j;
+
+	if (rl==0) { continue; }
+
+	VECTOR(newedges)[edgeptr++] = no_of_nodes;
+	VECTOR(newedges)[edgeptr++] = rn;
+	
+	for (j=0; j<rl-1; j++) {
+	  VECTOR(newedges)[edgeptr++] = no_of_nodes+1;
+	  VECTOR(newedges)[edgeptr++] = no_of_nodes;
+	  no_of_nodes++;
+	}
+
+	VECTOR(*roots)[i]=no_of_nodes++;
+      }
+      
+      /* Opposite direction if mode=="in" */
+      if (mode==IGRAPH_IN) {
+	for (i=0; i<igraph_vector_size(&newedges); i+=2) {
+	  igraph_real_t tmp=VECTOR(newedges)[i];
+	  VECTOR(newedges)[i] = VECTOR(newedges)[i+1];
+	  VECTOR(newedges)[i+1] = tmp;
+	}
+      }
+
+      IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
+      igraph_vector_destroy(&newedges);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
+  
+  /* ----------------------------------------------------------------------- */
+  /* Ok, we have the root vertices now. 
+     Possibly we need to add some edges to make the graph connected. */
+
+  if (igraph_vector_size(proots)==1) {
+    real_root=VECTOR(*proots)[0];
+    if (real_root<0 || real_root>=no_of_nodes) {
+      IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
+    }
+  } else {
+    long int no_of_newedges=igraph_vector_size(proots);
+    long int i;
+    real_root=no_of_nodes;
+    
+    /* Make copy if needed */
+    if (pextended == graph) {
+      pextended=&extended;
+      IGRAPH_CHECK(igraph_copy(&extended, graph));
+      IGRAPH_FINALLY(igraph_destroy, &extended);
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&newedges, no_of_newedges*2);
+    IGRAPH_CHECK(igraph_add_vertices(&extended, 1, 0));
+    for (i=0; i<no_of_newedges; i++) {
+      VECTOR(newedges)[2*i] = no_of_nodes;
+      VECTOR(newedges)[2*i+1] = VECTOR(*proots)[i];
+    }
+    IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
+    
+    no_of_nodes++;
+    igraph_vector_destroy(&newedges);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  /* ----------------------------------------------------------------------- */
+  /* Layout */
+
+  IGRAPH_CHECK(igraph_i_layout_reingold_tilford(pextended, res, mode, real_root));
+  
+  /* Remove the new vertices from the layout */
+  if (no_of_nodes != no_of_nodes_orig) {
+    if (no_of_nodes-1 == no_of_nodes_orig) {
+      IGRAPH_CHECK(igraph_matrix_remove_row(res, no_of_nodes_orig));
+    } else {
+      igraph_matrix_t tmp;
+      long int i;
+      IGRAPH_MATRIX_INIT_FINALLY(&tmp, no_of_nodes_orig, 2);
+      for (i=0; i<no_of_nodes_orig; i++) {
+	MATRIX(tmp, i, 0) = MATRIX(*res, i, 0);
+	MATRIX(tmp, i, 1) = MATRIX(*res, i, 1);
+      }
+      IGRAPH_CHECK(igraph_matrix_update(res, &tmp));
+      igraph_matrix_destroy(&tmp);
+      IGRAPH_FINALLY_CLEAN(1);
+    }
+  }
+  
+  if (pextended != graph) {
+    igraph_destroy(&extended);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  /* Remove the roots vector if it was created by us */
+  if (proots != roots) {
+    igraph_vector_destroy(&myroots);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
 /** 
  * \function igraph_layout_reingold_tilford_circular
  * \brief Circular Reingold-Tilford layout for trees
@@ -1419,14 +1644,17 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
  */
 
 int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
-					    igraph_matrix_t *res, long int root) {
+					    igraph_matrix_t *res,
+					    igraph_neimode_t mode,
+					    const igraph_vector_t *roots,
+					    const igraph_vector_t *rootlevel) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int i;
   igraph_real_t pi2=2*M_PI*(no_of_nodes-1.0)/no_of_nodes;
   igraph_real_t mm=0;
 
-  IGRAPH_CHECK(igraph_layout_reingold_tilford(graph, res, root));
+  IGRAPH_CHECK(igraph_layout_reingold_tilford(graph, res, mode, roots, rootlevel));
   
   for (i=0; i<no_of_nodes; i++) {
     if (MATRIX(*res, i, 0) > mm) {

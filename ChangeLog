@@ -1,3 +1,10 @@
+2008-02-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/layout.c (igraph_layout_reingold_tilford)
+	(igraph_layout_reingold_tilford_circular) : 'mode' and 'rootlevel' 
+	 arguments added, 'roots' (instead of 'root') is a vector now.
+	 This allows better handling of unconnected graphs.
+
 2008-02-22  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_pagerank) : fixed issue #77
