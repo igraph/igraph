@@ -2791,7 +2791,7 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_INT);
+  list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
   igraph_vs_destroy(&vids);
   igraph_vector_destroy(&result);
   igraph_vector_destroy(&weights);
