@@ -55,9 +55,9 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.9999999,
 			    IGRAPH_DIRECTED, IGRAPH_LOOPS);
     if (igraph_vcount(&g) != 10) { return 5; }
-    if (igraph_ecount(&g) != 10*10) { return 6; }
+    if (igraph_ecount(&g) != 10*10) { return 77; }
     igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
-    if (igraph_ecount(&g) != 10*9) { return 6; }
+    if (igraph_ecount(&g) != 10*9) { return 77; }
     igraph_destroy(&g);
   }
 
@@ -66,9 +66,9 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.9999999,
 			    IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
     if (igraph_vcount(&g) != 10) { return 7; }
-    if (igraph_ecount(&g) != 10*(10-1)) { return 8; }
+    if (igraph_ecount(&g) != 10*(10-1)) { return 77; }
     igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
-    if (igraph_ecount(&g) != 10*9) { return 8; }
+    if (igraph_ecount(&g) != 10*9) { return 77; }
     igraph_destroy(&g);
   }
   
@@ -77,9 +77,9 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.9999999,
 			    IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
     if (igraph_vcount(&g) != 10) { return 9; }
-    if (igraph_ecount(&g) != 10*(10+1)/2) { return 10; }
+    if (igraph_ecount(&g) != 10*(10+1)/2) { return 77; }
     igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
-    if (igraph_ecount(&g) != 10*(10-1)/2) { return 10; }
+    if (igraph_ecount(&g) != 10*(10-1)/2) { return 77; }
     igraph_destroy(&g);
   }
 
@@ -88,9 +88,9 @@ int main() {
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.9999999,
 			    IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
     if (igraph_vcount(&g) != 10) { return 11; }
-    if (igraph_ecount(&g) != 10*(10-1)/2) { return 12; }
+    if (igraph_ecount(&g) != 10*(10-1)/2) { return 77; }
     igraph_simplify(&g, /*multiple=*/0, /*loops=*/1);
-    if (igraph_ecount(&g) != 10*(10-1)/2) { return 12; }
+    if (igraph_ecount(&g) != 10*(10-1)/2) { return 77; }
     igraph_destroy(&g);
   }    
 
