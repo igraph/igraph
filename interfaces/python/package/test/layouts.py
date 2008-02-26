@@ -1,5 +1,5 @@
 import unittest
-from igraph import Layout
+from igraph import Graph, Layout
 
 class LayoutTests(unittest.TestCase):
     def testConstructor(self):
@@ -91,10 +91,25 @@ class LayoutTests(unittest.TestCase):
         self.assertRaises(TypeError, layout.center, p=6)
 
 
-        
+
+class LayoutAlgorithmTests(unittest.TestCase):
+    def testReingoldTilford(self):
+        g = Graph.Barabasi(100)
+        lo = g.layout("rt")
+        ys = [coord[1] for coord in lo]
+        root = ys.index(0.0)
+        self.assertEqual(ys, g.shortest_paths(root)[0])
+        g = Graph.Barabasi(100) + Graph.Barabasi(50)
+        lo = g.layout("rt", root=[0, 100])
+        self.assertEqual(lo[100][1]-lo[0][1], 0)
+        lo = g.layout("rt", root=[0, 100], rootlevel = [2, 10])
+        self.assertEqual(lo[100][1]-lo[0][1], 8)
+
+
 def suite():
     layout_suite = unittest.makeSuite(LayoutTests)
-    return unittest.TestSuite([layout_suite])
+    layout_algorithm_suite = unittest.makeSuite(LayoutAlgorithmTests)
+    return unittest.TestSuite([layout_suite, layout_algorithm_suite])
 
 def test():
     runner = unittest.TextTestRunner()

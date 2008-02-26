@@ -4561,24 +4561,48 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford(igraphmodule_GraphObject
                                                      * self, PyObject * args,
                                                      PyObject * kwds)
 {
-  char *kwlist[] = { "root", NULL };
+  static char *kwlist[] = { "mode", "root", "rootlevel", NULL };
   igraph_matrix_t m;
-  long int root = 0;
+  igraph_vector_t roots, *roots_p = 0;
+  igraph_vector_t rootlevels, *rootlevels_p = 0;
+  PyObject *roots_o=Py_None, *rootlevels_o=Py_None, *mode_o=Py_None;
+  igraph_neimode_t mode = IGRAPH_ALL;
   PyObject *result;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &root))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+    &mode_o, &roots_o, &rootlevels_o))
     return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+
+  if (roots_o != Py_None) {
+    roots_p = &roots;
+    if (igraphmodule_PyObject_to_vector_t(roots_o, roots_p, 1, 0)) return 0;
+  }
+  if (rootlevels_o != Py_None) {
+    rootlevels_p = &rootlevels;
+    if (igraphmodule_PyObject_to_vector_t(rootlevels_o, rootlevels_p, 1, 0)) {
+      if (roots_p) igraph_vector_destroy(roots_p);
+      return 0;
+    }
+  }
 
   if (igraph_matrix_init(&m, 1, 1)) {
+    if (roots_p) igraph_vector_destroy(roots_p);
+    if (rootlevels_p) igraph_vector_destroy(rootlevels_p);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraph_layout_reingold_tilford(&self->g, &m, root)) {
+  if (igraph_layout_reingold_tilford(&self->g, &m, mode, roots_p, rootlevels_p)) {
     igraph_matrix_destroy(&m);
+    if (roots_p) igraph_vector_destroy(roots_p);
+    if (rootlevels_p) igraph_vector_destroy(rootlevels_p);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
+  if (roots_p) igraph_vector_destroy(roots_p);
+  if (rootlevels_p) igraph_vector_destroy(rootlevels_p);
 
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
@@ -4594,24 +4618,49 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford(igraphmodule_GraphObject
 PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
   igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "root", NULL };
+  static char *kwlist[] = { "mode", "root", "rootlevel", NULL };
   igraph_matrix_t m;
-  long int root = 0;
+  igraph_vector_t roots, *roots_p = 0;
+  igraph_vector_t rootlevels, *rootlevels_p = 0;
+  PyObject *roots_o=Py_None, *rootlevels_o=Py_None, *mode_o=Py_None;
+  igraph_neimode_t mode = IGRAPH_ALL;
   PyObject *result;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &root))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+    &mode_o, &roots_o, &rootlevels_o))
     return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+
+  if (roots_o != Py_None) {
+    roots_p = &roots;
+    if (igraphmodule_PyObject_to_vector_t(roots_o, roots_p, 1, 0)) return 0;
+  }
+  if (rootlevels_o != Py_None) {
+    rootlevels_p = &rootlevels;
+    if (igraphmodule_PyObject_to_vector_t(rootlevels_o, rootlevels_p, 1, 0)) {
+      if (roots_p) igraph_vector_destroy(roots_p);
+      return 0;
+    }
+  }
 
   if (igraph_matrix_init(&m, 1, 1)) {
+    if (roots_p) igraph_vector_destroy(roots_p);
+    if (rootlevels_p) igraph_vector_destroy(rootlevels_p);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraph_layout_reingold_tilford_circular(&self->g, &m, root)) {
+  if (igraph_layout_reingold_tilford_circular(&self->g, &m, mode, roots_p,
+      rootlevels_p)) {
     igraph_matrix_destroy(&m);
+    if (roots_p) igraph_vector_destroy(roots_p);
+    if (rootlevels_p) igraph_vector_destroy(rootlevels_p);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
+  if (roots_p) igraph_vector_destroy(roots_p);
+  if (rootlevels_p) igraph_vector_destroy(rootlevels_p);
 
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
@@ -8461,10 +8510,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_reingold_tilford",
    (PyCFunction) igraphmodule_Graph_layout_reingold_tilford,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_reingold_tilford(root)\n"
+   "layout_reingold_tilford(mode=\"all\", root=None, rootlevel=None)\n"
    "Places the vertices on a 2D plane according to the Reingold-Tilford\n"
    "layout algorithm.\n\n"
-   "@param root: the root of the tree.\n"
+   "This is a tree layout. If the given graph is not a tree, a breadth-first\n"
+   "search is executed first to obtain a possible spanning tree.\n\n"
+   "@param mode: specifies which edges to consider when builing the tree.\n"
+   "  If it is C{OUT} then only the outgoing, if it is C{IN} then only the\n"
+   "  incoming edges of a parent are considered. If it is C{ALL} then all\n"
+   "  edges are used (this was the behaviour in igraph 0.5 and before.\n"
+   "  This parameter also influences how the root vertices are calculated\n"
+   "  if they are not given. See the I{root} parameter.\n"
+   "@param root: the index of the root vertex or root vertices.\n"
+   "  if this is a non-empty vector then the supplied vertex IDs are\n"
+   "  used as the roots of the trees (or a single tree if the graph is\n"
+   "  connected. If this is C{None} or an empty list, the root vertices\n"
+   "  are automatically calculated based on topological sorting,\n"
+   "  performed with the opposite of the I{mode} argument.\n"
+   "@param rootlevel: this argument is useful when drawing forests which are\n"
+   "  not trees. It specifies the level of the root vertices for every tree\n"
+   "  in the forest.\n"
    "@return: the calculated coordinate pairs in a list.\n\n"
    "@see: layout_reingold_tilford_circular\n"
    "@newfield ref: Reference\n"
@@ -8475,11 +8540,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_reingold_tilford_circular",
    (PyCFunction) igraphmodule_Graph_layout_reingold_tilford_circular,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_reingold_tilford_circular(root)\n"
+   "layout_reingold_tilford_circular(mode=\"all\", root=None, rootlevel=None)\n"
    "Circular Reingold-Tilford layout for trees.\n\n"
    "This layout is similar to the Reingold-Tilford layout, but the vertices\n"
    "are placed in a circular way, with the root vertex in the center.\n\n"
-   "@param root: the root of the tree.\n"
+   "See L{layout_reingold_tilford} for the explanation of the parameters.\n\n"
    "@return: the calculated coordinate pairs in a list.\n\n"
    "@see: layout_reingold_tilford\n"
    "@newfield ref: Reference\n"
