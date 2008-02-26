@@ -256,7 +256,7 @@ class Graph(core.GraphBase):
 
         return result
 
-    def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None):
+    def get_adjacency(self, type=GET_ADJACENCY_BOTH, attribute=None, default=None):
         """Returns the adjacency matrix of a graph.
 
         @param type: either C{GET_ADJACENCY_LOWER} (uses the lower
@@ -265,11 +265,13 @@ class Graph(core.GraphBase):
           (uses both parts). Ignored for directed graphs.
         @param attribute: if C{None}, returns the ordinary adjacency
           matrix. When the name of a valid edge attribute is given
-          here, the matrix returned will contain C{None} at the places
-          where there is no edge or the value of the given attribute
-          where there is an edge. Multiple edges are not supported,
-          the value written in the matrix in this case will be
-          unpredictable.
+          here, the matrix returned will contain the default value 
+          at the places where there is no edge or the value of the
+          given attribute where there is an edge. Multiple edges are
+          not supported, the value written in the matrix in this case
+          will be unpredictable.
+        @param default: the default value written to the cells in the
+          case of adjacency matrices with attributes.
         @return: the adjacency matrix as a L{Matrix}.
         """
         if type != GET_ADJACENCY_LOWER and type != GET_ADJACENCY_UPPER and \
@@ -281,7 +283,7 @@ class Graph(core.GraphBase):
         if attribute is None: return Matrix(GraphBase.get_adjacency(self, type))
         if attribute not in self.es.attribute_names():
             raise ValueError, "Attribute does not exist"
-        data = [[None] * self.vcount() for _ in xrange(self.vcount())]
+        data = [[default] * self.vcount() for _ in xrange(self.vcount())]
 
         if not self.is_directed():
             if type == GET_ADJACENCY_BOTH:
@@ -648,6 +650,62 @@ class Graph(core.GraphBase):
         return l
 
     # Auxiliary I/O functions
+
+    def write_adjacency(self, f, sep=" ", eol="\n", *args, **kwds):
+        """Writes the adjacency matrix of the graph to the given file
+
+        @param f: the name of the file to be written.
+        @param sep: the string that separates the matrix elements in a row
+        @param eol: the string that separates the rows of the matrix. Please
+          note that igraph is able to read back the written adjacency matrix
+          if and only if this is a single newline character
+
+        All the remaining arguments are passed intact to L{Graph.get_adjacency}.
+        """
+        if not isinstance(f, file): f = file(f, "w")
+        matrix = self.get_adjacency(*args, **kwds)
+        for row in matrix:
+            f.write(sep.join(map(str, row)))
+            f.write(eol)
+        f.close()
+
+    def Read_Adjacency(klass, f, sep=None, comment_char = "#", attribute=None,
+        *args, **kwds):
+        """Constructs a graph based on an adjacency matrix from the given file
+
+        @param f: the name of the file to be read or a file object
+        @param sep: the string that separates the matrix elements in a row.
+          C{None} means an arbitrary sequence of whitespace characters.
+        @param comment_char: lines starting with this string are treated
+          as comments.
+        @param attribute: an edge attribute name where the edge weights are
+          stored in the case of a weighted adjacency matrix. If C{None},
+          no weights are stored.
+        Additional positional and keyword arguments are passed intact to
+        L{Graph.Adjacency}.
+
+        @return: the created graph"""
+        if not isinstance(f, file): f = file(f)
+        matrix, ri, weights = [], 0, {} 
+        for line in f:
+            line = line.strip()
+            if len(line) == 0: continue
+            if line.startswith(comment_char): continue
+            row = map(float, line.split(sep))
+            row2 = [int(element != 0) for element in row]
+            matrix.append(row2)
+            if attribute is not None:
+                for ci in xrange(len(row2)):
+                    if row2[ci]: weights[ri,ci] = row[ci]
+            ri += 1
+
+        f.close()
+        graph=klass.Adjacency(matrix, *args, **kwds)
+        if attribute is not None:
+            weight_list = [weights[e] for e in graph.get_edgelist()]
+            graph.es[attribute] = weight_list
+        return graph
+    Read_Adjacency=classmethod(Read_Adjacency)
 
     def write_graphmlz(self, f, compresslevel=9):
         """Writes the graph to a zipped GraphML file.

@@ -37,6 +37,32 @@ a 3 4 5
         os.unlink(tmpfname)
 
 
+    def testAdjacency(self):
+        tmpf, tmpfname = tempfile.mkstemp()
+        os.close(tmpf)
+        tmpf = open(tmpfname, "w")
+        print >>tmpf, """# Test comment line
+0 1 1 0 0 0
+1 0 1 0 0 0
+1 1 0 0 0 0
+0 0 0 0 2 2
+0 0 0 2 0 2
+0 0 0 2 2 0
+"""
+        tmpf.close()
+        g = Graph.Read_Adjacency(tmpfname)
+        self.failUnless(isinstance(g, Graph))
+        self.failUnless(g.vcount() == 6 and g.ecount() == 12 and
+            g.is_directed() and "weight" not in g.edge_attributes())
+        g = Graph.Read_Adjacency(tmpfname, attribute="weight")
+        self.failUnless(isinstance(g, Graph))
+        self.failUnless(g.vcount() == 6 and g.ecount() == 12 and
+            g.is_directed() and g.es["weight"] == [1,1,1,1,1,1,2,2,2,2,2,2])
+
+        g.write_adjacency(tmpfname)
+        os.unlink(tmpfname)
+
+
 def suite():
     foreign_suite = unittest.makeSuite(ForeignTests)
     return unittest.TestSuite([foreign_suite])
