@@ -3439,19 +3439,21 @@ PyObject *igraphmodule_Graph_permute_vertices(igraphmodule_GraphObject *self,
 /** \ingroup python_interface_graph
  * \brief Calculates shortest paths in a graph.
  * \return the shortest path lengths for the given vertices
- * \sa igraph_shortest_paths
+ * \sa igraph_shortest_paths, igraph_shortest_paths_dijkstra
  */
 PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
                                             PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "mode", NULL };
-  PyObject *vobj = NULL, *list = NULL, *mode_o = Py_None;
+  char *kwlist[] = { "vertices", "weights", "mode", NULL };
+  PyObject *vobj = NULL, *list = NULL, *mode_o = Py_None, *weights_o = Py_None;
   igraph_matrix_t res;
+  igraph_vector_t *weights=0;
   igraph_neimode_t mode = IGRAPH_OUT;
   int return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &vobj, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj, &weights_o,
+                                   &mode_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return 0;
@@ -3459,21 +3461,34 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
     igraphmodule_handle_igraph_error();
     return NULL;
   }
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+      ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vs_destroy(&vs);
+    return NULL;
+  }
 
   if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
+    if (weights) igraph_vector_destroy(weights);
     igraph_vs_destroy(&vs);
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_shortest_paths(&self->g, &res, vs, mode)) {
+  if (igraph_shortest_paths_dijkstra(&self->g, &res, vs, weights, mode)) {
+    if (weights) igraph_vector_destroy(weights);
     igraph_matrix_destroy(&res);
     igraph_vs_destroy(&vs);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
+  if (weights) igraph_vector_destroy(weights);
+
   /* TODO Return a single list instead of a matrix if only one vertex was given */
-  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  if (weights) {
+    list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+  } else {
+    list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+  }
 
   igraph_matrix_destroy(&res);
   igraph_vs_destroy(&vs);
@@ -8066,20 +8081,26 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param mode: the rewiring algorithm to use. As for now, only\n"
    "  C{REWIRING_SIMPLE} is supported.\n" "@return: the modified graph.\n"},
 
-  // interface to igraph_shortest_paths
+  /* interface to igraph_shortest_paths */
   {"shortest_paths", (PyCFunction) igraphmodule_Graph_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "shortest_paths(vertices, mode=OUT)\n\n"
+   "shortest_paths(vertices, weights=None, mode=OUT)\n\n"
    "Calculates shortest path lengths for given nodes in a graph.\n\n"
    "@param vertices: a list containing the vertex IDs which should be\n"
    "  included in the result.\n"
+   "@param weights: a list containing the edge weights. It can also be\n"
+   "  an attribute name (edge weights are retrieved from the given\n"
+   "  attribute) or C{None} (all edges have equal weight). Edge\n"
+   "  weights must be non-negative for the algorithm to work\n"
+   "  (since weighted shortest path calculation is based on Dijkstra's\n"
+   "  algorithm)\n"
    "@param mode: the type of shortest paths to be used for the\n"
    "  calculation in directed graphs. L{OUT} means only outgoing,\n"
    "  L{IN} means only incoming paths. L{ALL} means to consider\n"
    "  the directed graph as an undirected one.\n"
    "@return: the shortest path lengths for given nodes in a matrix\n"},
 
-  // interface to igraph_simplify
+  /* interface to igraph_simplify */
   {"simplify", (PyCFunction) igraphmodule_Graph_simplify,
    METH_VARARGS | METH_KEYWORDS,
    "simplify(multiple=True, loops=True)\n\n"

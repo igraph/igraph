@@ -216,6 +216,28 @@ class MiscTests(unittest.TestCase):
 
 
 class PathTests(unittest.TestCase):
+    def testShortestPaths(self):
+        g = Graph(10, [(0,1), (0,2), (0,3), (1,2), (1,4), (1,5), (2,3), (2,6), \
+            (3,2), (3,6), (4,5), (4,7), (5,6), (5,8), (5,9), (7,5), (7,8), \
+            (8,9), (5,2), (2,1)], directed=True)
+        ws = [0,2,1,0,5,2,1,1,0,2,2,8,1,1,3,1,1,4,2,1]
+        g.es["weight"] = ws
+        inf = float('inf')
+        expected = [
+          [0, 0, 0, 1, 5, 2, 1, 13, 3, 5],
+          [inf, 0, 0, 1, 5, 2, 1, 13, 3, 5],
+          [inf, 1, 0, 1, 6, 3, 1, 14, 4, 6],
+          [inf, 1, 0, 0, 6, 3, 1, 14, 4, 6],
+          [inf, 5, 4, 5, 0, 2, 3, 8, 3, 5],
+          [inf, 3, 2, 3, 8, 0, 1, 16, 1, 3],
+          [inf, inf, inf, inf, inf, inf, 0, inf, inf, inf],
+          [inf, 4, 3, 4, 9, 1, 2, 0, 1, 4],
+          [inf, inf, inf, inf, inf, inf, inf, inf, 0, 4],
+          [inf, inf, inf, inf, inf, inf, inf, inf, inf, 0]
+        ]
+        self.failUnless(g.shortest_paths(weights=ws) == expected)
+        self.failUnless(g.shortest_paths(weights="weight") == expected)
+
     def testPathLengthHist(self):
         g = Graph.Tree(15, 2)
         h = g.path_length_hist()

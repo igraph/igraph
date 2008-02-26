@@ -67,6 +67,9 @@ class Graph(core.GraphBase):
     blocks = core.GraphBase.biconnected_components
     evcent = core.GraphBase.eigenvector_centrality
 
+    # Compatibility aliases
+    shortest_paths_dijkstra = core.GraphBase.shortest_paths
+
     def __init__(self, n=1, edges=None, directed=None, \
         graph_attrs=None, vertex_attrs=None, edge_attrs=None):
         """Constructs a graph from scratch.
