@@ -62,10 +62,10 @@ int main() {
 /*   printf("\n"); */
 
   if (igraph_vector_size(&csize) != 2) {
-    return 1;
+    return 77;
   }
   if (VECTOR(csize)[0] != 5) {
-    return 2;
+    return 77;
   }
 
   igraph_destroy(&g);
