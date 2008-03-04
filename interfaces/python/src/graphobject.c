@@ -1798,28 +1798,10 @@ NULL };
                                    &attribute_key, &directed, &loops))
     return NULL;
 
-  if (n <= 0) {
-    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
-    return NULL;
-  }
   types = PyList_Size(type_dist);
 
-  if (igraphmodule_PyList_to_matrix_t(pref_matrix, &pm)) {
-    PyErr_SetString(PyExc_TypeError,
-                    "Error while converting preference matrix");
-    return NULL;
-  }
-
-  if (igraph_matrix_nrow(&pm) != igraph_matrix_ncol(&pm) ||
-      igraph_matrix_nrow(&pm) != types) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Preference matrix must have exactly the same rows and columns as the number of types");
-    igraph_matrix_destroy(&pm);
-    return NULL;
-  }
-  if (igraphmodule_PyObject_to_vector_t(type_dist, &td, 1, 0)) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Error while converting type distribution vector");
+  if (igraphmodule_PyList_to_matrix_t(pref_matrix, &pm)) return NULL;
+  if (igraphmodule_PyObject_float_to_vector_t(type_dist, &td)) {
     igraph_matrix_destroy(&pm);
     return NULL;
   }
@@ -1911,28 +1893,9 @@ PyObject *igraphmodule_Graph_Asymmetric_Preference(PyTypeObject * type,
                                    &attribute_key, &loops))
     return NULL;
 
-  if (n <= 0) {
-    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
-    return NULL;
-  }
   types = PyList_Size(type_dist_matrix);
-
-  if (igraphmodule_PyList_to_matrix_t(pref_matrix, &pm)) {
-    PyErr_SetString(PyExc_TypeError,
-                    "Error while converting preference matrix");
-    return NULL;
-  }
-
-  if (igraph_matrix_nrow(&pm) != igraph_matrix_ncol(&pm) ||
-      igraph_matrix_nrow(&pm) != types) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Preference matrix must have exactly the same rows and columns as the number of types");
-    igraph_matrix_destroy(&pm);
-    return NULL;
-  }
+  if (igraphmodule_PyList_to_matrix_t(pref_matrix, &pm)) return NULL;
   if (igraphmodule_PyList_to_matrix_t(type_dist_matrix, &td)) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Error while converting type distribution matrix");
     igraph_matrix_destroy(&pm);
     return NULL;
   }
@@ -7636,8 +7599,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_watts_strogatz_game */
   {"Watts_Strogatz", (PyCFunction) igraphmodule_Graph_Watts_Strogatz,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Watts_Strogatz(dim, nei, p)\n\n"
-   "@param dim: list with the dimensions of the lattice\n"
+   "Watts_Strogatz(dim, size, nei=1, p)\n\n"
+   "@param dim: the dimension of the lattice\n"
+   "@param size: the size of the lattice along all dimensions\n"
    "@param nei: value giving the distance (number of steps) within which\n"
    "   two vertices will be connected. Not implemented yet, should be 1.\n"
    "@param p: rewiring probability\n\n"
