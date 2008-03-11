@@ -1,3 +1,9 @@
+2008-03-11  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/cattributes.c (igraph_i_cattribute_get_string_vertex_attr)
+	(igraph_i_cattribute_get_string_edge_attr)
+	(igraph_i_cattribute_EAS_set) : bugs corrected
+
 2008-02-24  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/layout.c (igraph_layout_reingold_tilford)
