@@ -1874,3 +1874,43 @@ igraph_bool_t FUNCTION(igraph_vector,isnull)(const TYPE(igraph_vector) *v) {
   
   return i==n;
 }
+
+/**
+ * \function igraph_vector_intersect_sorted
+ * \brief Calculates the intersection of two sorted vectors
+ *
+ * The elements that are contained in both vectors are stored in the result
+ * vector. All three vectors must be initialized.
+ *
+ * \param v1 the first vector
+ * \param v2 the second vector
+ * \param result the result vector
+ * \param keep_multiplicity whether to preserve the multiplicity of the
+ *   elements. If \c FALSE, all elements in the resulting vector will be
+ *   unique
+ */
+int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
+    const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result,
+    igraph_bool_t keep_multiplicity) {
+  long int i, j, k, i0, j0;
+  i0 = FUNCTION(igraph_vector,size)(v1);
+  j0 = FUNCTION(igraph_vector,size)(v2);
+  i = j = 0;
+  FUNCTION(igraph_vector,clear)(result);
+  while (i < i0 && j < j0) {
+    BASE element;
+    if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
+      element = VECTOR(*v1)[i]; k=0;
+      while (i < i0 && VECTOR(*v1)[i] == element) { i++; k++; }
+      while (j < j0 && VECTOR(*v2)[j] == element) { j++; k++; }
+      if (!keep_multiplicity) k=1;
+      while (k>0) {
+        FUNCTION(igraph_vector,push_back)(result, element);
+        k--;
+      }
+    } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) i++;
+    else j++;
+  }
+
+  return 0;
+}

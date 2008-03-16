@@ -46,6 +46,11 @@ AT_KEYWORDS([growing random game igraph_growing_random_game])
 AT_COMPILE_CHECK([simple/igraph_growing_random_game.c])
 AT_CLEANUP
 
+AT_SETUP([Preference model (igraph_preference_game):])
+AT_KEYWORDS([preference game igraph_preference_game igraph_asymmetric_preference_game])
+AT_COMPILE_CHECK([simple/igraph_preference_game.c])
+AT_CLEANUP
+
 AT_SETUP([From adjacency matrix (igraph_adjacency):])
 AT_KEYWORDS([adjacency matrix igraph_adjacency])
 AT_COMPILE_CHECK([simple/igraph_adjacency.c])

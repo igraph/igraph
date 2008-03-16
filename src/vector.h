@@ -218,3 +218,7 @@ int FUNCTION(igraph_vector,filter_smaller)(TYPE(igraph_vector) *v, BASE elem);
 int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v, 
 					 TYPE(igraph_vector) *res,
 					 long int from, long int to);
+int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
+  const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result,
+  igraph_bool_t keep_multiplicity);
+
