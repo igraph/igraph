@@ -145,6 +145,10 @@ void IGRAPH_FINALLY_FREE(void) {
   igraph_i_finally_stack[0].all=0;
 }
 
+inline int IGRAPH_FINALLY_STACK_SIZE(void) {
+  return igraph_i_finally_stack[0].all;
+}
+
 static igraph_warning_handler_t *igraph_i_warning_handler=0;
 
 void igraph_warning_handler_print (const char *reason, const char *file,

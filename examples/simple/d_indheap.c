@@ -93,6 +93,8 @@ int main() {
   }
   printf("\n");
   igraph_d_indheap_destroy(&h);
+
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 5;
   
   return 0;
 }

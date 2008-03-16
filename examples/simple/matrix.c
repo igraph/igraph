@@ -167,5 +167,7 @@ int main() {
   print_matrix(&m, stdout);
   igraph_matrix_destroy(&m);
 
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 10;
+
   return 0;
 }

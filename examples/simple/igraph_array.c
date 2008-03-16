@@ -77,6 +77,8 @@ int main() {
   print_array(&a,stdout);
   print_vector(&a.data, stdout);
   igraph_array3_destroy(&a);
+  
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 2;
 
   return 0;
 }

@@ -460,6 +460,32 @@ void IGRAPH_FINALLY_CLEAN(int num);
 void IGRAPH_FINALLY_FREE(void);
 
 /**
+ * \function IGRAPH_FINALLY_STACK_SIZE
+ * \brief Returns the number of registered objects.
+ *
+ * Returns the number of objects in the stack of temporarily allocated
+ * objects. This function is handy if you write an own igraph routine and
+ * you want to make sure it handles errors properly. A properly written
+ * igraph routine should not leave pointers to temporarily allocated objects
+ * in the finally stack, because otherwise an \ref IGRAPH_FINALLY_FREE call
+ * in another igraph function would result in freeing these objects as well
+ * (and this is really hard to debug, since the error will be not in that
+ * function that shows erroneous behaviour). Therefore, it is advised to
+ * write your own test cases and examine \ref IGRAPH_FINALLY_STACK_SIZE
+ * before and after your test cases - the numbers should be equal.
+ */
+int IGRAPH_FINALLY_STACK_SIZE(void);
+
+/**
+ * \define IGRAPH_FINALLY_STACK_EMPTY
+ * \brief Returns true if there are no registered objects, false otherwise.
+ *
+ * This is just a shorthand notation for checking that
+ * \ref IGRAPH_FINALLY_STACK_SIZE is zero.
+ */
+#define IGRAPH_FINALLY_STACK_EMPTY (IGRAPH_FINALLY_STACK_SIZE() == 0)
+
+/**
  * \define IGRAPH_FINALLY
  * \brief Register an object for deallocation.
  * \param func The address of the function which is normally called to

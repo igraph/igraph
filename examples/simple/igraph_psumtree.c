@@ -189,7 +189,8 @@ int main() {
 
   igraph_vector_destroy(&vec);
   igraph_psumtree_destroy(&tree);
-  
+
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 13;
   
   return 0;
 }

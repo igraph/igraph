@@ -76,6 +76,8 @@ int main() {
     return 2;
   }
   igraph_set_destroy(&set);
+  
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 5;
 
   return 0;
 }

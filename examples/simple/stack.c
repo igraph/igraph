@@ -86,5 +86,7 @@ int main() {
   
   igraph_stack_destroy(&st);
 
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 9;
+
   return 0;
 }

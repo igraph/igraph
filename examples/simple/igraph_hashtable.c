@@ -124,7 +124,7 @@ int main() {
   
   igraph_hashtable_destroy(&ht);
   
-
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 1;
 
   return 0;
 }
