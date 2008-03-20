@@ -395,7 +395,7 @@ extern int igraph_i_pajek_eof;
 long int igraph_pajek_mylineno;
 igraph_vector_t *igraph_pajek_vector=0;
 igraph_bool_t igraph_pajek_directed;
-long int igraph_pajek_vcount=0;
+long int igraph_pajek_vcount;
 long int igraph_pajek_actfrom, igraph_pajek_actto;
 int igraph_pajek_mode=0;	/* 0 - general, 1 - vertex, 2 - edge */
 igraph_trie_t *igraph_i_pajek_vertex_attribute_names;
@@ -540,7 +540,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   igraph_pajek_yyin=instream;
 
   igraph_pajek_mode=0;
-  igraph_pajek_vcount=0;
+  igraph_pajek_vcount=-1;
   igraph_i_pajek_vertexid=0;
   igraph_i_pajek_vertex_attribute_names=&vattrnames;
   igraph_i_pajek_vertex_attributes=&vattrs;
@@ -551,6 +551,8 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   igraph_i_pajek_eof=0;
 
   igraph_pajek_yyparse();
+  if (igraph_pajek_vcount < 0)
+    IGRAPH_ERROR("invalid vertex count in Pajek file", IGRAPH_EINVAL);
 
   for (i=0; i<igraph_vector_ptr_size(&eattrs); i++) {
     igraph_i_attribute_record_t *rec=VECTOR(eattrs)[i];
