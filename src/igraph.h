@@ -829,6 +829,10 @@ int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to)
 int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
          igraph_vector_t *ins, igraph_vector_t *outs);
 
+int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
+		       igraph_neimode_t mode, const igraph_vector_t *roots,
+		       igraph_vector_t *vertex_index);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */

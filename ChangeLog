@@ -1,5 +1,7 @@
 2008-03-23  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_unfold_tree) : added
+
 	* src/layout.c (igraph_layout_fruchterman_reingold) :
 	'miny' and 'maxy' arguments added
 

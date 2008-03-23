@@ -481,6 +481,11 @@ igraph_arpack_rnsolve:
         DEFAULT-R: options=igraph.arpack.default
         IGNORE: RR, RC, RNamespace
 
+igraph_unfold_tree:
+        PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots, \
+                OUT VECTOR_OR_0 vertex_index
+        NAME-R: unfold.tree
+
 #######################################
 # Spectral properties
 #######################################
