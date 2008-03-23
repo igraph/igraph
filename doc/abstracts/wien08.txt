@@ -1,0 +1,24 @@
+
+Practical statistical network analysis
+
+The igraph R package provides a platform for developing
+graph algorithms. As many (classic and recent) algorithms are
+already included in igraph, it is also handy in
+exploratory network analyis. igraph has a very simple and
+fast graph representation, this allows handling of huge
+graphs, with millions of vertices and edges.
+
+In this lecture, I first introduce igraph's data model, together
+with the basic concepts of graph theory. Then, I will show some
+examples for
+ - centrality measures,
+ - community structure detection algorithms,
+ - cohesive blocks,
+and how they can be calculated with igraph.
+Several examples will be shown for
+ - creating and importing graphs from collected data or from
+   other formats,
+ - graph visualization,
+ - rapid prototyping of graph algorithms.
+
+Basic calculus, statistics and R knowledge is expected.
