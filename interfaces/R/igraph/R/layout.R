@@ -92,12 +92,19 @@ layout.fruchterman.reingold <- function(graph, ..., dim=2,
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
+  if (!is.null(params$miny)) {
+    params$miny <- as.double(params$miny)
+  }
+  if (!is.null(params$maxy)) {
+    params$maxy <- as.double(params$maxy)
+  }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call(fn, graph,
         as.double(params$niter), as.double(params$maxdelta),
         as.double(params$area), as.double(params$coolexp),
         as.double(params$repulserad), params$weights, params$start,
+        params$miny, params$maxy,
         as.logical(verbose),
         PACKAGE="igraph")
 }
@@ -161,14 +168,21 @@ layout.kamada.kawai<-function(graph, ..., dim=2, verbose=igraph.par("verbose"),
   if (is.null(params$initemp))    { params$initemp <- 10   }
   if (is.null(params$coolexp))    { params$coolexp <- 0.99 }
   if (is.null(params$kkconst))    { params$kkconst <- vc^2 }
+  if (is.null(params$fixz))       { params$fixz    <- FALSE}
   if (!is.null(params$start)) {
     params$start <- structure(as.numeric(params$start), dim=dim(params$start))
   }
+
+  if (params$fixz && dim==2) {
+    warning("`fixz' works for 3D only, ignored.")
+  }
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call(fn, graph,
         as.double(params$niter), as.double(params$initemp),
         as.double(params$coolexp), as.double(params$kkconst),
-        as.double(params$sigma), params$start, as.logical(verbose),
+        as.double(params$sigma), params$start, as.logical(params$fixz),
+        as.logical(verbose),
         PACKAGE="igraph")
 }
 

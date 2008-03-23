@@ -228,6 +228,11 @@ int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
  * \param weight Pointer to a vector containing edge weights, 
  *        the attraction along the edges will be multiplied by these. 
  *        It will be ignored if it is a null-pointer.
+ * \param miny Pointer to a vector, or a \c NULL pointer. If not a 
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote y \endquote coordinate for every vertex.
+ * \param maxy Same as \p miny, but the maximum \quote y \endquote 
+ *        coordinates.
  * \return Error code.
  * 
  * Time complexity: O(|V|^2) in each
@@ -239,7 +244,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
 				       igraph_integer_t niter, igraph_real_t maxdelta,
 				       igraph_real_t area, igraph_real_t coolexp, 
 				       igraph_real_t repulserad, igraph_bool_t use_seed,
-				       const igraph_vector_t *weight) {
+				       const igraph_vector_t *weight, 
+				       const igraph_vector_t *miny,
+				       const igraph_vector_t *maxy) {
   igraph_real_t frk,t,ded,xd,yd;
   igraph_real_t rf,af;
   long int i,j,k;
@@ -252,6 +259,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
   if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
+
+  /* TODO: check miny & maxy if present */
   
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
   if (!use_seed) {
@@ -326,6 +335,11 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *r
       }
       MATRIX(*res, j, 0)+=MATRIX(dxdy, j, 0); /* Update positions */
       MATRIX(*res, j, 1)+=MATRIX(dxdy, j, 1);
+      if (miny && MATRIX(*res, j, 1) < VECTOR(*miny)[j]) {
+	MATRIX(*res, j, 1) = VECTOR(*miny)[j];
+      } else if (maxy && MATRIX(*res, j, 1) > VECTOR(*maxy)[j]) {
+	MATRIX(*res, j, 1) = VECTOR(*maxy)[j];
+      }
     }
   }
 
@@ -620,6 +634,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  * \param use_seed Boolean, whether to use the values cupplied in the \p res 
  *     argument as the initial configuration. If zero then a random initial 
  *     configuration is used.
+ * \param fixz Logical, whether to fix the third coordinate of the input 
+ *     matrix.
  * \return Error code.
  * 
  * Added in version 0.2.</para><para>
@@ -632,7 +648,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 				  igraph_integer_t niter, igraph_real_t sigma, 
 				  igraph_real_t initemp, igraph_real_t coolexp, 
-				  igraph_real_t kkconst, igraph_bool_t use_seed) {
+				  igraph_real_t kkconst, igraph_bool_t use_seed,
+				  igraph_bool_t fixz) {
   igraph_real_t temp, candx, candy, candz;
   igraph_real_t dpot, odis, ndis, osqd, nsqd;
   long int i,j,k;
@@ -689,7 +706,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
       if(log(RNG_UNIF(0.0,1.0))<dpot/temp){
         MATRIX(*res, j, 0)=candx;
         MATRIX(*res, j, 1)=candy;
-        MATRIX(*res, j, 2)=candz;
+        if (!fixz) { MATRIX(*res, j, 2)=candz; }
       }
     }
     /*Cool the system*/
