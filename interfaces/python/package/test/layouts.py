@@ -93,6 +93,15 @@ class LayoutTests(unittest.TestCase):
 
 
 class LayoutAlgorithmTests(unittest.TestCase):
+    def testFruchtermanReingold(self):
+        g = Graph.Barabasi(100)
+        lo = g.layout("fr")
+        self.failUnless(isinstance(lo, Layout))
+        lo = g.layout("fr", miny=range(100))
+        self.failUnless(isinstance(lo, Layout))
+        lo = g.layout("fr", miny=range(100), maxy=range(100))
+        self.failUnless(isinstance(lo, Layout))
+
     def testReingoldTilford(self):
         g = Graph.Barabasi(100)
         lo = g.layout("rt")

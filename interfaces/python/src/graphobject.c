@@ -4248,7 +4248,7 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *
   }
 
   if (igraph_layout_kamada_kawai_3d
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, 0)) {
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, 0, 0)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -4270,21 +4270,24 @@ PyObject
                                                   PyObject * kwds)
 {
   static char *kwlist[] =
-    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL };
+    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
+      "miny", "maxy", NULL };
   igraph_matrix_t m;
   igraph_vector_t *weights=0;
+  igraph_vector_t *miny_p=0, *maxy_p=0;
+  igraph_vector_t miny, maxy;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad;
-  PyObject *result, *wobj=Py_None;
+  PyObject *result, *wobj=Py_None, *miny_o=Py_None, *maxy_o=Py_None;
 
   maxdelta = igraph_vcount(&self->g);
   area = maxdelta * maxdelta;
   coolexp = 1.5;
   repulserad = area * maxdelta;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oldddd", kwlist, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddOO", kwlist, &wobj,
                                    &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad))
+                                   &repulserad, &miny_o, &maxy_o))
     return NULL;
 
   if (igraph_matrix_init(&m, 1, 1)) {
@@ -4298,21 +4301,40 @@ PyObject
     igraphmodule_handle_igraph_error();
     return NULL;
   }
+  /* Convert minimum and maximum y values */
+  if (miny_o != Py_None) {
+    if (igraphmodule_PyObject_float_to_vector_t(miny_o, &miny)) {
+      igraph_matrix_destroy(&m);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    } else miny_p = &miny;
+  }
+  if (maxy_o != Py_None) {
+    if (igraphmodule_PyObject_float_to_vector_t(maxy_o, &maxy)) {
+      igraph_matrix_destroy(&m);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    } else maxy_p = &maxy;
+  }
+
   if (igraph_layout_fruchterman_reingold
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights,
+      miny_p, maxy_p)) {
     igraph_matrix_destroy(&m);
-    if (weights) {
-      igraph_vector_destroy(weights); free(weights);
-    }
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    if (miny_p) { igraph_vector_destroy(miny_p); }
+    if (maxy_p) { igraph_vector_destroy(maxy_p); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
+  if (miny_p) { igraph_vector_destroy(miny_p); }
+  if (maxy_p) { igraph_vector_destroy(maxy_p); }
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
-  if (weights) {
-    igraph_vector_destroy(weights); free(weights);
-  }
   return (PyObject *) result;
 }
 
@@ -8356,7 +8378,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta)\n\n"
+   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, miny=None, maxy=None)\n\n"
    "Places the vertices on a 2D plane according to the Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
@@ -8372,6 +8394,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param repulserad: determines the radius at which vertex-vertex\n"
    "  repulsion cancels out attraction of adjacent vertices.\n"
    "  C{None} means M{maxiter*maxdelta}.\n"
+   "@param miny: if not C{None}, it must be a vector with exactly as many\n"
+   "  elements as there are vertices in the graph. Each element is a\n"
+   "  minimum constraint on the Y value of the vertex in the layout.\n"
+   "@param maxy: similar to I{miny}, but with maximum constraints\n"
    "@return: the calculated coordinate pairs in a list."},
 
   // interface to igraph_layout_fruchterman_reingold_3d
