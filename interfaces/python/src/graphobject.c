@@ -733,22 +733,17 @@ PyObject *igraphmodule_Graph_neighbors(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_adjacent(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  PyObject *list;
-  int dtype = IGRAPH_OUT;
+  PyObject *list, *dtype_o = Py_None;
+  igraph_neimode_t dtype = IGRAPH_OUT;
   long idx;
   igraph_vector_t result;
 
   static char *kwlist[] = { "vertex", "type", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|i", kwlist, &idx, &dtype))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O", kwlist, &idx, &dtype_o))
     return NULL;
 
-  if (dtype != IGRAPH_ALL && dtype != IGRAPH_OUT && dtype != IGRAPH_IN) {
-    PyErr_SetString(PyExc_ValueError,
-                    "type should be either ALL or IN or OUT");
-    return NULL;
-  }
-
+  if (igraphmodule_PyObject_to_neimode_t(dtype_o, &dtype)) return NULL;
   igraph_vector_init(&result, 1);
   if (igraph_adjacent(&self->g, &result, idx, (igraph_neimode_t) dtype)) {
     igraphmodule_handle_igraph_error();
@@ -778,7 +773,7 @@ PyObject *igraphmodule_Graph_successors(igraphmodule_GraphObject * self,
   long idx;
   igraph_vector_t result;
 
-  char *kwlist[] = { "vertex", NULL };
+  static char *kwlist[] = { "vertex", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l", kwlist, &idx))
     return NULL;
@@ -812,7 +807,7 @@ PyObject *igraphmodule_Graph_predecessors(igraphmodule_GraphObject * self,
   long idx;
   igraph_vector_t result;
 
-  char *kwlist[] = { "vertex", NULL };
+  static char *kwlist[] = { "vertex", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "l", kwlist, &idx))
     return NULL;
@@ -3467,26 +3462,18 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_similarity_jaccard(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds) {
   static char *kwlist[] = { "vertices", "mode", "loops", NULL };
-  PyObject *vobj = NULL, *list = NULL, *loops = Py_True;
+  PyObject *vobj = NULL, *list = NULL, *loops = Py_True, *mode_o = Py_None;
   igraph_matrix_t res;
-  int mode = IGRAPH_ALL;
+  igraph_neimode_t mode = IGRAPH_ALL;
   int return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist, &vobj,
-	&mode, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj,
+	&mode_o, &loops))
     return NULL;
 
-  if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
-    PyErr_SetString(PyExc_ValueError,
-                    "mode should be either ALL or IN or OUT");
-    return NULL;
-  }
-
-  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) return NULL; 
 
   if (igraph_matrix_init(&res, 0, 0)) {
     igraph_vs_destroy(&vs);
@@ -3517,26 +3504,18 @@ PyObject *igraphmodule_Graph_similarity_jaccard(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_similarity_dice(igraphmodule_GraphObject * self,
   PyObject * args, PyObject * kwds) {
   static char *kwlist[] = { "vertices", "mode", "loops", NULL };
-  PyObject *vobj = NULL, *list = NULL, *loops = Py_True;
+  PyObject *vobj = NULL, *list = NULL, *loops = Py_True, *mode_o = Py_None;
   igraph_matrix_t res;
-  int mode = IGRAPH_ALL;
+  igraph_neimode_t mode = IGRAPH_ALL;
   int return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiO", kwlist, &vobj,
-	&mode, &loops))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj,
+	&mode_o, &loops))
     return NULL;
 
-  if (mode != IGRAPH_ALL && mode != IGRAPH_OUT && mode != IGRAPH_IN) {
-    PyErr_SetString(PyExc_ValueError,
-                    "mode should be either ALL or IN or OUT");
-    return NULL;
-  }
-
-  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) return NULL;
 
   if (igraph_matrix_init(&res, 0, 0)) {
     igraph_vs_destroy(&vs);
@@ -3637,7 +3616,7 @@ PyObject *igraphmodule_Graph_simplify(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_subcomponent(igraphmodule_GraphObject * self,
                                           PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "v", "mode", NULL };
+  static char *kwlist[] = { "v", "mode", NULL };
   igraph_vector_t res;
   igraph_neimode_t mode = IGRAPH_ALL;
   long from0;
@@ -6712,12 +6691,14 @@ PyObject *igraphmodule_Graph_coreness(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
   static char *kwlist[] = { "mode", NULL };
-  long mode = (long)IGRAPH_ALL;
+  igraph_neimode_t mode = IGRAPH_ALL;
   igraph_vector_t result;
-  PyObject *o;
+  PyObject *o, *mode_o = Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &mode))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &mode_o))
     return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
 
   if (igraph_vector_init(&result, igraph_vcount(&self->g)))
     return igraphmodule_handle_igraph_error();
