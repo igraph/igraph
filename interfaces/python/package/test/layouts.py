@@ -91,6 +91,21 @@ class LayoutTests(unittest.TestCase):
         self.assertRaises(TypeError, layout.center, p=6)
 
 
+    def testToPolar(self):
+        import math
+        layout = Layout([(0, 0), (-1, 1), (0, 1), (1, 1)])
+        layout.to_radial(min_angle = 180, max_angle = 0, max_radius = 2)
+        exp = [[0., 0.], [-2., 0.], [0., 2.], [2, 0.]]
+        for idx in xrange(4):
+            self.assertAlmostEqual(layout.coords[idx][0], exp[idx][0], places=3)
+            self.assertAlmostEqual(layout.coords[idx][1], exp[idx][1], places=3)
+
+    def testTransform(self):
+        def tr(coord, dx, dy): return coord[0]+dx, coord[1]+dy
+        layout = Layout([(1, 2), (3, 4)])
+        layout.transform(tr, 2, -1)
+        self.assertEqual(layout.coords, [[3, 1], [5, 3]])
+
 
 class LayoutAlgorithmTests(unittest.TestCase):
     def testFruchtermanReingold(self):
