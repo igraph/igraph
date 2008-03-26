@@ -4273,9 +4273,7 @@ PyObject
     { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
       "miny", "maxy", NULL };
   igraph_matrix_t m;
-  igraph_vector_t *weights=0;
-  igraph_vector_t *miny_p=0, *maxy_p=0;
-  igraph_vector_t miny, maxy;
+  igraph_vector_t *weights=0, *miny=0, *maxy=0;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad;
   PyObject *result, *wobj=Py_None, *miny_o=Py_None, *maxy_o=Py_None;
@@ -4302,36 +4300,33 @@ PyObject
     return NULL;
   }
   /* Convert minimum and maximum y values */
-  if (miny_o != Py_None) {
-    if (igraphmodule_PyObject_float_to_vector_t(miny_o, &miny)) {
-      igraph_matrix_destroy(&m);
-      if (weights) { igraph_vector_destroy(weights); free(weights); }
-      igraphmodule_handle_igraph_error();
-      return NULL;
-    } else miny_p = &miny;
-  }
-  if (maxy_o != Py_None) {
-    if (igraphmodule_PyObject_float_to_vector_t(maxy_o, &maxy)) {
-      igraph_matrix_destroy(&m);
-      if (weights) { igraph_vector_destroy(weights); free(weights); }
-      igraphmodule_handle_igraph_error();
-      return NULL;
-    } else maxy_p = &maxy;
-  }
-
-  if (igraph_layout_fruchterman_reingold
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights,
-      miny_p, maxy_p)) {
+  if (igraphmodule_attrib_to_vector_t(miny_o, self, &miny, ATTRIBUTE_TYPE_EDGE)) {
     igraph_matrix_destroy(&m);
     if (weights) { igraph_vector_destroy(weights); free(weights); }
-    if (miny_p) { igraph_vector_destroy(miny_p); }
-    if (maxy_p) { igraph_vector_destroy(maxy_p); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (igraphmodule_attrib_to_vector_t(maxy_o, self, &maxy, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    if (miny) { igraph_vector_destroy(miny); free(miny); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (miny_p) { igraph_vector_destroy(miny_p); }
-  if (maxy_p) { igraph_vector_destroy(maxy_p); }
+  if (igraph_layout_fruchterman_reingold
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights,
+      miny, maxy)) {
+    igraph_matrix_destroy(&m);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    if (miny) { igraph_vector_destroy(miny); free(miny); }
+    if (maxy) { igraph_vector_destroy(maxy); free(maxy); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (miny) { igraph_vector_destroy(miny); free(miny); }
+  if (maxy) { igraph_vector_destroy(maxy); free(maxy); }
   if (weights) { igraph_vector_destroy(weights); free(weights); }
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);

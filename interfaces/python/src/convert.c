@@ -629,7 +629,7 @@ int igraphmodule_attrib_to_vector_t(PyObject *o, igraphmodule_GraphObject *self,
       PyErr_NoMemory();
       return 1;
     }
-    if (igraphmodule_PyObject_to_vector_t(o, result, 0, 0)) {
+    if (igraphmodule_PyObject_float_to_vector_t(o, result)) {
       free(result);
       return 1;
     }
