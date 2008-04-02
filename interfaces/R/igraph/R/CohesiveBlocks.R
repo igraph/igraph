@@ -670,34 +670,55 @@ plotkCore.bgraph <- function(graph, vertex.size=5, colpal=NULL, emph=NULL,
 }
 
 ## writes out a series of Pajek files for supplied bgraph object
-write.pajek.bgraph <- function(graph, filename, hierarchy=FALSE){ # filename should not include an extension
-    if (!is.bgraph(graph)) {
-      stop("Not a bgraph object")
+## filename should not include an extension
+write.pajek.bgraph <- function(graph, filename, hierarchy=FALSE){
+  if (!is.bgraph(graph)) {
+    stop("Not a bgraph object")
+  }
+  
+  g <- graph
+  ## .net file:
+  write.graph(g, file=paste(filename, ".net", sep=""), format="pajek")
+  
+  ## .clu with max cohesions
+  mc <- if("mc" %in% list.vertex.attributes(g)){
+    V(g)$mc
+  } else {
+    maxcohesion(g)
+  }
+  cat(paste("*Vertices", vcount(g)), mc, sep="\n",
+      file=paste(filename, ".clu", sep=""))
+  
+  ## .clu for each block giving binary membership (toggled with blockfiles argument)
+  if(hierarchy){
+    for(i in 1:length(g$blocks)){
+      thisblock <- rep(0, vcount(g))
+      thisblock[g$blocks[[i]]+1] <- 1
+      cat(paste("*Vertices", vcount(g)), thisblock, sep="\n",
+          file=paste(filename, "_block", i, "(", g
+            $block.cohesion[i], ").clu", sep=""))
     }
+    V(g$tree)$id <- as.numeric(V(g$tree))+1
+    write.graph(g$tree, file=paste(filename, "_blocktree.net",
+                          sep=""), format="pajek")
+  }
+}
 
-    g <- graph
-    ## .net file:
-    write.graph(g, file=paste(filename, ".net", sep=""), format="pajek")
-    
-    ## .clu with max cohesions
-    mc <- if("mc" %in% list.vertex.attributes(g)){
-        V(g)$mc
-    } else {
-        maxcohesion(g)
-    }
-    cat(paste("*Vertices", vcount(g)), mc, "\r", sep="\r\n", file=paste(filename, ".clu", sep=""))
-    
-    ## .clu for each block giving binary membership (toggled with blockfiles argument)
-    if(hierarchy){
-        for(i in 1:length(g$blocks)){
-            thisblock <- rep(0, vcount(g))
-            thisblock[g$blocks[[i]]+1] <- 1
-            cat(paste("*Vertices", vcount(g)), thisblock, "\r", sep="\r\n", 
-                file=paste(filename, "_block", i, "(", g$block.cohesion[i], ").clu", sep=""))
-        }
-        V(g$tree)$id <- as.numeric(V(g$tree))+1
-        write.graph(g$tree, file=paste(filename, "_blocktree.net", sep=""), format="pajek")
-    }
+maxcohesion <- function(graph){
+
+  if (!is.bgraph(graph)) {
+    stop("Not a bgraph object")
+  }
+  
+  bc <- get.graph.attribute(graph, "block.cohesion")
+  bco <- order(bc)
+  bc <- bc[bco]
+  b <- get.graph.attribute(graph, "blocks")[bco]
+  mc <- numeric(vcount(graph))
+  for(i in 1:length(bc)){
+    mc[b[[i]]+1] <- bc[[i]]
+  }
+  return(mc)
 }
 
 ## same as write.pajek.bgraph() but uses k-coreness rather than cohesion for clusters
