@@ -6,7 +6,8 @@
   \code{igraph} graphs from adjacency matrices.}
 \usage{
 graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
-        "min", "upper", "lower", "plus"), weighted=NULL, diag=TRUE)
+        "min", "upper", "lower", "plus"), weighted=NULL, diag=TRUE,
+        add.colnames=NULL, add.rownames=NA)
 }
 \arguments{
   \item{adjmatrix}{A square adjacency matrix.}
@@ -31,11 +32,26 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
     matrix in the calculation. If this is \code{FALSE} then the diagonal
     is zero-d out first.
   }
+  \item{add.colnames}{Character scalar, whether to add the column names as
+    vertex attributes. If it is \sQuote{\code{NULL}} (the default)
+    then, if present, column names are added as vertex attribute
+    \sQuote{name}. If \sQuote{\code{NA}} then they will not be added.
+    If a character constant, then it gives the name of the vertex
+    attribute to add.}
+  \item{add.rownames}{Character scalar, whether to add the row names as
+    vertex attributes. Possible values the same as the previous
+    argument. By default row names are not added. If
+    \sQuote{\code{add.rownames}} and \sQuote{\code{add.colnames}} specify the
+    same vertex attribute, then the former is ignored. }
 }
 \details{
   \code{graph.adjacency} creates a graph from an adjacency matrix.
-  It operates in two main modes, depending on the \code{weighted}
-  argument.
+
+  The order of the vertices are preserved, i.e. the vertex corresponding
+  to the first row will be vertex #0 in the graph, etc.
+
+  \code{graph.adjacency} operates in two main modes, depending on the
+  \code{weighted} argument.
 
   If this argument is \code{NULL} then an unweighted graph is
   created and an element of the adjacency matrix gives the number
@@ -128,5 +144,11 @@ all(nzs((d2(adjm+t(adjm)))[lower.tri(adjm)]) == sort(E(g8)$weight))
 g9 <- graph.adjacency(adjm, weighted=TRUE, mode="plus", diag=FALSE)
 d0 <- function(x) { diag(x) <- 0 }
 all(nzs((d0(adjm+t(adjm)))[lower.tri(adjm)]) == sort(E(g9)$weight))
+
+## row/column names
+rownames(adjm) <- sample(letters, nrow(adjm))
+colnames(adjm) <- seq(ncol(adjm))
+g10 <- graph.adjacency(adjm, weighted=TRUE, add.rownames="code")
+summary(g10)
 }
 \keyword{graphs}

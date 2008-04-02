@@ -187,6 +187,9 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
  * \function igraph_adjacency
  * \brief Creates a graph object from an adjacency matrix.
  * 
+ * The order of the vertices in the matrix is preserved, i.e. the vertex 
+ * corresponding to the first row/column will be vertex with id 0, the 
+ * next row is for vertex 1, etc.
  * \param graph Pointer to an uninitialized graph object.
  * \param adjmatrix The adjacency matrix. How it is interpreted
  *        depends on the \p mode argument.
