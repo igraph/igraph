@@ -313,9 +313,16 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* 
 PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeqObject *self, PyObject *o) {
   /* Handle integer indices according to the sequence protocol */
   if (PyInt_Check(o)) return igraphmodule_EdgeSeq_sq_item(self, PyInt_AsLong(o));
-  if (PyTuple_Check(o) || PyList_Check(o)) {
-    /* Return a restricted EdgeSeq */
+  if (PyTuple_Check(o)) {
     return igraphmodule_EdgeSeq_select(self, o, NULL);
+  } else if (PyList_Check(o)) {
+    /* Return a restricted EdgeSeq */
+    PyObject *t = PyList_AsTuple(o);
+    PyObject *result;
+    if (!t) return NULL;
+    result = igraphmodule_EdgeSeq_select(self, t, NULL);
+    Py_DECREF(t);
+    return result;
   }
   return igraphmodule_EdgeSeq_get_attribute_values(self, o);
 }
