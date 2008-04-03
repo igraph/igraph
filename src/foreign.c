@@ -2065,7 +2065,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
 
       /* string parameters */
       for (j=0; j<igraph_vector_size(&vx_stra); j++) {
-	int idx=VECTOR(vx_numa)[j];
+	int idx=VECTOR(vx_stra)[j];
 	char *s;
 	igraph_i_attribute_get_string_vertex_attr(graph, vstrnames[idx],
 						  igraph_vss_1(i), &strv);

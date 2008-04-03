@@ -1,3 +1,7 @@
+2008-04-03  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/foreign.c (igraph_write_graph_pajek) : fixed issue #105
+
 2008-03-25  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_write_graph_gml) : directed graphs
