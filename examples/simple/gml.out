@@ -82,7 +82,7 @@ Creator "igraph version 0.5 test suite"
 Version 1
 graph
 [
-  directed 1
+  directed 0
   node
   [
     id 0

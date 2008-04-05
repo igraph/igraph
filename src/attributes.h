@@ -61,7 +61,7 @@ __BEGIN_DECLS
  * in C, but by default it is currently turned off.</para>
  * 
  * <para>First we briefly look over how attribute handlers can be
- * implemented. This is not something a used does every day. It is
+ * implemented. This is not something a user does every day. It is
  * rather typically the job of the high level interface writers. (But
  * it is possible to write an interface without implementing
  * attributes.) Then we show the experimental C attribute handler.</para>
@@ -97,7 +97,7 @@ __BEGIN_DECLS
  *   a string.
  * \enumval IGRAPH_ATTRIBUTE_R_OBJECT An R object. This is usually
  *   ignored by the igraph functions.
- * \enumval IGRAPH_ATTRIBUTE_PY_OBJECT A Python objcet. Usually
+ * \enumval IGRAPH_ATTRIBUTE_PY_OBJECT A Python object. Usually
  *   ignored by the igraph functions.
  * 
  */

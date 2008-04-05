@@ -2,7 +2,7 @@ Creator "igraph version 0.5 "
 Version 1
 graph
 [
-  directed 1
+  directed 0
   name "Petersen's graph"
   vertices 10
   edges 15
