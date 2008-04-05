@@ -11,6 +11,7 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(len(EdgeSeq(self.g)) == 45)
         self.failUnless(len(EdgeSeq(self.g, 2)) == 1)
         self.failUnless(len(EdgeSeq(self.g, [1,2,3])) == 3)
+        self.failUnless(EdgeSeq(self.g, [1,2,3]).indices == [1,2,3])
         self.assertRaises(ValueError, EdgeSeq, self.g, 112)
         self.assertRaises(ValueError, EdgeSeq, self.g, [112])
         self.failUnless(self.g.es.graph == self.g)
@@ -77,6 +78,12 @@ class EdgeSeqTests(unittest.TestCase):
         g.es["parity"] = [i % 2 for i in xrange(g.ecount())]
         self.failUnless(len(g.es(betweenness_gt=10)) < 2000)
         self.failUnless(len(g.es(betweenness_gt=10, parity=0)) < 2000)
+
+    def testGraphMethodProxying(self):
+        g = Graph.Barabasi(100)
+        es = g.es(1,3,5,7,9)
+        ebs = g.edge_betweenness()
+        self.failUnless([ebs[i] for i in [1,3,5,7,9]] == es.edge_betweenness())
 
 
 def suite():
