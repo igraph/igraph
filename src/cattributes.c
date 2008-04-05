@@ -333,6 +333,9 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
     }
   }  
   
+  igraph_vector_destroy(&news);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -527,7 +530,10 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 	break;
       }
     }
-  }  
+  }
+
+  igraph_vector_destroy(&news);
+  IGRAPH_FINALLY_CLEAN(1);
    
   return 0;
 }
