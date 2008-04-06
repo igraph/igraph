@@ -294,8 +294,8 @@ int igraph_i_weighted_adjacency_directed(igraph_matrix_t *adjmatrix,
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<no_of_nodes; j++) {
-      long int M=MATRIX(*adjmatrix, i, j);
-      if (M == 0) continue;
+      igraph_real_t M=MATRIX(*adjmatrix, i, j);
+      if (M == 0.0) continue;
       IGRAPH_CHECK(igraph_vector_push_back(edges, i));
       IGRAPH_CHECK(igraph_vector_push_back(edges, j));
       IGRAPH_CHECK(igraph_vector_push_back(weights, M));
@@ -313,8 +313,8 @@ int igraph_i_weighted_adjacency_plus(igraph_matrix_t *adjmatrix,
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int M=MATRIX(*adjmatrix, i, j) + MATRIX(*adjmatrix, j, i);
-      if (M == 0) continue;
+      igraph_real_t M=MATRIX(*adjmatrix, i, j) + MATRIX(*adjmatrix, j, i);
+      if (M == 0.0) continue;
       if (i == j) M /= 2;
       IGRAPH_CHECK(igraph_vector_push_back(edges, i));
       IGRAPH_CHECK(igraph_vector_push_back(edges, j));
@@ -333,10 +333,10 @@ int igraph_i_weighted_adjacency_max(igraph_matrix_t *adjmatrix,
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int M1=MATRIX(*adjmatrix, i, j);
-      long int M2=MATRIX(*adjmatrix, j, i);
+      igraph_real_t M1=MATRIX(*adjmatrix, i, j);
+      igraph_real_t M2=MATRIX(*adjmatrix, j, i);
       if (M1<M2) { M1=M2; }
-      if (M1 == 0) continue;
+      if (M1 == 0.0) continue;
       IGRAPH_CHECK(igraph_vector_push_back(edges, i));
       IGRAPH_CHECK(igraph_vector_push_back(edges, j));
       IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
@@ -353,8 +353,8 @@ int igraph_i_weighted_adjacency_upper(igraph_matrix_t *adjmatrix,
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int M=MATRIX(*adjmatrix, i, j);
-      if (M == 0) continue;
+      igraph_real_t M=MATRIX(*adjmatrix, i, j);
+      if (M == 0.0) continue;
       IGRAPH_CHECK(igraph_vector_push_back(edges, i));
       IGRAPH_CHECK(igraph_vector_push_back(edges, j));
       IGRAPH_CHECK(igraph_vector_push_back(weights, M));
@@ -371,8 +371,8 @@ int igraph_i_weighted_adjacency_lower(igraph_matrix_t *adjmatrix,
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<=i; j++) {
-      long int M=MATRIX(*adjmatrix, i, j);
-      if (M == 0) continue;
+      igraph_real_t M=MATRIX(*adjmatrix, i, j);
+      if (M == 0.0) continue;
       IGRAPH_CHECK(igraph_vector_push_back(edges, i));
       IGRAPH_CHECK(igraph_vector_push_back(edges, j));
       IGRAPH_CHECK(igraph_vector_push_back(weights, M));
@@ -389,10 +389,10 @@ int igraph_i_weighted_adjacency_min(igraph_matrix_t *adjmatrix,
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int M1=MATRIX(*adjmatrix, i, j);
-      long int M2=MATRIX(*adjmatrix, j, i);
+      igraph_real_t M1=MATRIX(*adjmatrix, i, j);
+      igraph_real_t M2=MATRIX(*adjmatrix, j, i);
       if (M1>M2) { M1=M2; }
-      if (M1 == 0) continue;
+      if (M1 == 0.0) continue;
       IGRAPH_CHECK(igraph_vector_push_back(edges, i));
       IGRAPH_CHECK(igraph_vector_push_back(edges, j));
       IGRAPH_CHECK(igraph_vector_push_back(weights, M1));
