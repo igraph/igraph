@@ -3,6 +3,8 @@
 	* src/structure_generators.c (igraph_weighted_adjacency) : now
 	handles fractional edge weights correctly
 	
+	* src/layout.c (igraph_reingold_tilford) : fixed issue #100
+	
 2008-04-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_weighted_adjacency) : added
