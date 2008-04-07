@@ -683,7 +683,8 @@ class Graph(core.GraphBase):
           as comments.
         @param attribute: an edge attribute name where the edge weights are
           stored in the case of a weighted adjacency matrix. If C{None},
-          no weights are stored.
+          no weights are stored, values larger than 1 are considered as
+          edge multiplicities.
         Additional positional and keyword arguments are passed intact to
         L{Graph.Adjacency}.
 
@@ -695,18 +696,17 @@ class Graph(core.GraphBase):
             if len(line) == 0: continue
             if line.startswith(comment_char): continue
             row = map(float, line.split(sep))
-            row2 = [int(element != 0) for element in row]
-            matrix.append(row2)
-            if attribute is not None:
-                for ci in xrange(len(row2)):
-                    if row2[ci]: weights[ri,ci] = row[ci]
+            matrix.append(row)
             ri += 1
 
         f.close()
-        graph=klass.Adjacency(matrix, *args, **kwds)
-        if attribute is not None:
-            weight_list = [weights[e] for e in graph.get_edgelist()]
-            graph.es[attribute] = weight_list
+
+        if attribute is None:
+            graph=klass.Adjacency(matrix, *args, **kwds)
+        else:
+            kwds["attr"] = attribute
+            graph=klass.Weighted_Adjacency(matrix, *args, **kwds)
+
         return graph
     Read_Adjacency=classmethod(Read_Adjacency)
 

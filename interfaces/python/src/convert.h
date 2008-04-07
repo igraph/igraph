@@ -45,6 +45,7 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
   igraphmodule_enum_translation_table_entry_t *table, int *result);
 int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o, igraph_bliss_sh_t *result);
 int igraphmodule_PyObject_to_neimode_t(PyObject *o, igraph_neimode_t *result);
+int igraphmodule_PyObject_to_adjacency_t(PyObject *o, igraph_adjacency_t *result);
 
 int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs);
 int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v);

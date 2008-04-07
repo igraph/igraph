@@ -48,6 +48,17 @@ class GeneratorTests(unittest.TestCase):
         # This is not a proper test, but should spot most errors
         self.failUnless(g.is_directed() and deg_in==[2]*8 and deg_out==[2]*8)
 
+    def testWeightedAdjacency(self):
+        mat = [[0, 1, 2, 0], [2, 0, 0, 0], [0, 0, 2.5, 0], [0, 1, 0, 0]]
+        g = Graph.Weighted_Adjacency(mat, attr="w0")
+        el = g.get_edgelist()
+        self.failUnless(el == [(0,1), (0,2), (1,0), (2,2), (3,1)])
+        self.failUnless(g.es["w0"] == [1, 2, 2, 2.5, 1])
+        g = Graph.Weighted_Adjacency(mat, mode="plus")
+        el = g.get_edgelist()
+        self.failUnless(el == [(0,1), (0,2), (1,3), (2,2)])
+        self.failUnless(g.es["weight"] == [3, 2, 1, 2.5])
+
         
 def suite():
     generator_suite = unittest.makeSuite(GeneratorTests)

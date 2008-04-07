@@ -1018,14 +1018,15 @@ PyObject *igraphmodule_Graph_Adjacency(PyTypeObject * type,
                                        PyObject * args, PyObject * kwds) {
   igraphmodule_GraphObject *self;
   igraph_matrix_t m;
-  PyObject *matrix;
+  PyObject *matrix, *mode_o = Py_None;
   igraph_adjacency_t mode = IGRAPH_ADJ_DIRECTED;
 
   char *kwlist[] = { "matrix", "mode", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|i", kwlist,
-                                   &PyList_Type, &matrix, &mode))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O", kwlist,
+                                   &PyList_Type, &matrix, &mode_o))
     return NULL;
+  if (igraphmodule_PyObject_to_adjacency_t(mode_o, &mode)) return NULL;
 
   if (igraphmodule_PyList_to_matrix_t(matrix, &m)) {
     PyErr_SetString(PyExc_TypeError,
@@ -2249,6 +2250,57 @@ PyObject *igraphmodule_Graph_Watts_Strogatz(PyTypeObject * type,
       return NULL;
     }
   }
+
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a graph from its weighted adjacency matrix
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_weighted_adjacency
+ */
+PyObject *igraphmodule_Graph_Weighted_Adjacency(PyTypeObject * type,
+                                       PyObject * args, PyObject * kwds) {
+  igraphmodule_GraphObject *self;
+  igraph_matrix_t m;
+  PyObject *matrix, *mode_o = Py_None, *attr_o = Py_None, *s = 0;
+  char* attr = "weight";
+  igraph_adjacency_t mode = IGRAPH_ADJ_DIRECTED;
+
+  char *kwlist[] = { "matrix", "mode", "attr", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|OO", kwlist,
+                                   &PyList_Type, &matrix, &mode_o, &attr_o))
+    return NULL;
+  if (igraphmodule_PyObject_to_adjacency_t(mode_o, &mode)) return NULL;
+  if (attr_o != Py_None) {
+    s = PyObject_Str(attr_o);
+    if (s) {
+      attr = PyString_AsString(s);
+    } else return NULL;
+  }
+
+  if (igraphmodule_PyList_to_matrix_t(matrix, &m)) {
+    PyErr_SetString(PyExc_TypeError,
+                    "Error while converting adjacency matrix");
+    return NULL;
+  }
+
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_weighted_adjacency(&self->g, &m, mode, attr)) {
+      igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
+      igraph_matrix_destroy(&m);
+      return NULL;
+    }
+  }
+
+  igraph_matrix_destroy(&m);
+  if (s) { Py_DECREF(s); }
 
   return (PyObject *) self;
 }
@@ -7282,7 +7334,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // GRAPH GENERATORS //
   //////////////////////
 
-  // interface to igraph_adjacency
+  /* interface to igraph_adjacency */
   {"Adjacency", (PyCFunction) igraphmodule_Graph_Adjacency,
    METH_CLASS | METH_VARARGS | METH_KEYWORDS,
    "Adjacency(matrix, mode=ADJ_DIRECTED)\n\n"
@@ -7300,7 +7352,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  - C{ADJ_UPPER} - undirected graph with the upper right triangle of\n"
    "    the matrix (including the diagonal)\n"
    "  - C{ADJ_LOWER} - undirected graph with the lower left triangle of\n"
-   "    the matrix (including the diagonal)\n"},
+   "    the matrix (including the diagonal)\n"
+   "\n"
+   "  These values can also be given as strings without the C{ADJ} prefix.\n"
+   },
 
   /* interface to igraph_asymmetric_preference_game */
   {"Asymmetric_Preference",
@@ -7635,6 +7690,30 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@newfield ref: Reference\n"
    "@ref: Duncan J Watts and Steven H Strogatz: I{Collective dynamics of\n"
    "  small world networks}, Nature 393, 440-442, 1998\n"},
+
+  /* interface to igraph_weighted_adjacency */
+  {"Weighted_Adjacency", (PyCFunction) igraphmodule_Graph_Weighted_Adjacency,
+   METH_CLASS | METH_VARARGS | METH_KEYWORDS,
+   "Weighted_Adjacency(matrix, mode=ADJ_DIRECTED, attr=\"weight\")\n\n"
+   "Generates a graph from its adjacency matrix.\n\n"
+   "@param matrix: the adjacency matrix\n"
+   "@param mode: the mode to be used. Possible values are:\n"
+   "\n"
+   "  - C{ADJ_DIRECTED} - the graph will be directed and a matrix\n"
+   "    element gives the number of edges between two vertex.\n"
+   "  - C{ADJ_UNDIRECTED} - alias to C{ADJ_MAX} for convenience.\n"
+   "  - C{ADJ_MAX}   - undirected graph will be created and the number of\n"
+   "    edges between vertex M{i} and M{j} is M{max(A(i,j), A(j,i))}\n"
+   "  - C{ADJ_MIN}   - like C{ADJ_MAX}, but with M{min(A(i,j), A(j,i))}\n"
+   "  - C{ADJ_PLUS}  - like C{ADJ_MAX}, but with M{A(i,j) + A(j,i)}\n"
+   "  - C{ADJ_UPPER} - undirected graph with the upper right triangle of\n"
+   "    the matrix (including the diagonal)\n"
+   "  - C{ADJ_LOWER} - undirected graph with the lower left triangle of\n"
+   "    the matrix (including the diagonal)\n"
+   "\n"
+   "  These values can also be given as strings without the C{ADJ} prefix.\n"
+   "@param attr: the name of the edge attribute that stores the edge\n"
+   "  weights."},
 
   /////////////////////////////////////
   // STRUCTURAL PROPERTIES OF GRAPHS //
