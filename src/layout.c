@@ -1175,13 +1175,15 @@ int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph,
 
 /* Internal structure for Reingold-Tilford layout */
 struct igraph_i_reingold_tilford_vertex {
-  int parent;        /* Parent node index */
-  int level;         /* Level of the node */
+  long int parent;        /* Parent node index */
+  long int level;         /* Level of the node */
   igraph_real_t offset;     /* X offset from parent node */
-  int left_contour;  /* Next left node of the contour
+  long int left_contour;  /* Next left node of the contour
 		      of the subtree rooted at this node */
-  int right_contour; /* Next right node of the contour
+  long int right_contour; /* Next right node of the contour
 		      of the subtree rooted at this node */
+  igraph_real_t offset_follow_lc;  /* X offset when following the left contour */
+  igraph_real_t offset_follow_rc;  /* X offset when following the right contour */
 };
 
 int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
@@ -1218,6 +1220,8 @@ int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     vdata[i].offset=0.0;
     vdata[i].left_contour=-1;
     vdata[i].right_contour=-1;
+    vdata[i].offset_follow_lc=0.0;
+    vdata[i].offset_follow_rc=0.0;
   }
   vdata[root].parent=root;
   vdata[root].level=0;
@@ -1276,7 +1280,7 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
 
 int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
                                                long int node, long int vcount) {
-  long int i, j, childcount, leftroot, leftrootidx;
+  long int i, j, childcount, leftroot, leftrootidx, leftleftroot;
   igraph_real_t avg;
   
   /* printf("Starting visiting node %d\n", node); */
@@ -1302,87 +1306,93 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
    * as close to each other as possible. leftroot stores the root of the
    * rightmost subtree of the already placed subtrees - its right contour
    * will be checked against the left contour of the next subtree */
-  leftroot=leftrootidx=-1;
+  leftleftroot=leftroot=leftrootidx=-1;
   avg=0.0;
-  /* printf("Visited node %d and arranged its subtrees\n", node); */
+  /*printf("Visited node %d and arranged its subtrees\n", node);*/
   for (i=0, j=0; i<vcount; i++) {
     if (i == node) continue;
     if (vdata[i].parent == node) {
-      /* printf("  Placing child %d on level %d\n", i, vdata[i].level); */
+      /*printf("  Placing child %d on level %d\n", i, vdata[i].level);*/
       if (leftroot >= 0) {
-	/* Now we will follow the right contour of leftroot and the
-	 * left contour of the subtree rooted at i */
-	long lnode, rnode;
-	igraph_real_t loffset, roffset, minsep, rootsep;
-	lnode = leftroot; rnode = i;
-	minsep = 1;
-	rootsep = vdata[leftroot].offset + minsep;
-	loffset = 0; roffset = minsep;
-	/* printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n",
-	 lnode, rnode, loffset, roffset, rootsep); */
-	while ((lnode >= 0) && (rnode >= 0)) {
-	  /* Step to the next level on the left contour */
-	  if (vdata[lnode].right_contour >= 0) {
-	    lnode = vdata[lnode].right_contour;
-	    loffset += vdata[lnode].offset;
-	  } else if (vdata[lnode].left_contour >= 0) {
-	    lnode = vdata[lnode].left_contour;
-	    loffset += vdata[lnode].offset;
-	  } else if (vdata[rnode].left_contour >= 0) {
-        /* Left subtree ended, but the contour continues on the left
-         * contour of the right subtree one level deeper */
-        lnode = vdata[rnode].left_contour;
-        loffset += vdata[lnode].offset;
-      } else { 
-        /* Left subtree ended, the contour continues on the right contour
-         * of the right subtree (but where is the left contour at this part???) */
-        lnode = vdata[rnode].right_contour;
-        if (lnode >= 0) loffset += vdata[lnode].offset;
-      }
-	  /* Step to the next level on the right contour */
-	  if (vdata[rnode].left_contour >= 0) {
-	    rnode = vdata[rnode].left_contour;
-	    roffset += vdata[rnode].offset;
-	  } else if (vdata[rnode].right_contour >= 0) {
-	    rnode = vdata[rnode].right_contour;
-	    roffset += vdata[rnode].offset;
-	  } else {
-	    /* Right subtree ended. If the left subtree is deeper, the
-	     * left contour will continue on the left subtree. We can
-	     * use only lnode here, since it has already been advanced
-	     * to the next level in the previous if statement */
-	    vdata[rnode].left_contour = lnode;
-	    vdata[rnode].right_contour = lnode;
-	    rnode = -1;
-	    /* printf("      Right subtree ended, continuing its contours to %d\n", vdata[rnode].left_contour); */
-	  }
-	  /* printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n", 
-	   lnode, rnode, loffset, roffset, rootsep); */
-	  
-	  /* Push subtrees away if necessary */
-	  if ((lnode >= 0) && (rnode >= 0) && (roffset - loffset < minsep)) {
-	    /* printf("    Pushing right subtree away by %lf\n", minsep-roffset+loffset); */
-	    rootsep += minsep-roffset+loffset;
-	    roffset = loffset+minsep;
-	  }
-	}
-	/* printf("  Offset of subtree with root node %d will be %lf\n", i, rootsep); */
-	vdata[i].offset = rootsep;
-	vdata[node].right_contour=i;
-	avg = (avg*j)/(j+1) + rootsep/(j+1);
-	leftrootidx=j;
-	leftroot=i;
+        /* Now we will follow the right contour of leftroot and the
+         * left contour of the subtree rooted at i */
+        long lnode, rnode;
+        igraph_real_t loffset, roffset, minsep, rootsep;
+        lnode = leftroot; rnode = i;
+        minsep = 1;
+        rootsep = vdata[leftroot].offset + minsep;
+        loffset = 0; roffset = minsep;
+        /*printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n",
+               lnode, rnode, loffset, roffset, rootsep);*/
+        while ((lnode >= 0) && (rnode >= 0)) {
+          /* Step to the next level on the right contour of the left subtree */
+          if (vdata[lnode].right_contour >= 0) {
+            loffset += vdata[lnode].offset_follow_rc;
+            lnode = vdata[lnode].right_contour;
+          } else {
+            /* Left subtree ended there. The right contour of the left subtree
+             * will continue to the next step on the right subtree. */
+            if (vdata[rnode].left_contour >= 0) {
+              /*printf("      Left subtree ended, continuing left subtree's left and right contour on right subtree (node %ld)\n", vdata[rnode].left_contour);*/
+              vdata[lnode].left_contour = vdata[rnode].left_contour;
+              vdata[lnode].right_contour = vdata[rnode].left_contour;
+              vdata[lnode].offset_follow_lc = vdata[lnode].offset_follow_rc =
+                (roffset-loffset)+vdata[rnode].offset_follow_lc;
+              /*printf("      vdata[lnode].offset_follow_* = %.4f\n", vdata[lnode].offset_follow_lc);*/
+            }
+            lnode = -1;
+          }
+          /* Step to the next level on the left contour of the right subtree */
+          if (vdata[rnode].left_contour >= 0) {
+            roffset += vdata[rnode].offset_follow_lc;
+            rnode = vdata[rnode].left_contour;
+          } else {
+            /* Right subtree ended here. The left contour of the right
+             * subtree will continue to the next step on the left subtree.
+             * Note that lnode has already been advanced here */
+            if (lnode >= 0) {
+              /*printf("      Right subtree ended, continuing right subtree's left and right contour on left subtree (node %ld)\n", lnode);*/
+              vdata[rnode].left_contour = lnode;
+              vdata[rnode].right_contour = lnode;
+              vdata[rnode].offset_follow_lc = vdata[rnode].offset_follow_rc =
+                (loffset-roffset);  /* loffset has also been increased earlier */
+              /*printf("      vdata[rnode].offset_follow_* = %.4f\n", vdata[rnode].offset_follow_lc);*/
+            }
+            rnode = -1;
+          }
+          /*printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n", 
+                 lnode, rnode, loffset, roffset, rootsep);*/
+      
+          /* Push subtrees away if necessary */
+          if ((lnode >= 0) && (rnode >= 0) && (roffset - loffset < minsep)) {
+            /*printf("    Pushing right subtree away by %lf\n", minsep-roffset+loffset);*/
+            rootsep += minsep-roffset+loffset;
+            roffset = loffset+minsep;
+          }
+        }
+
+        /*printf("  Offset of subtree with root node %d will be %lf\n", i, rootsep);*/
+        vdata[i].offset = rootsep;
+        vdata[node].right_contour = i;
+        vdata[node].offset_follow_rc = rootsep;
+        avg = (avg*j)/(j+1) + rootsep/(j+1);
+        leftrootidx=j;
+        leftroot=i;
       } else {
-	leftrootidx=j;
-	leftroot=i;
-	vdata[node].left_contour=i;
-	avg = vdata[i].offset;
+        leftrootidx=j;
+        leftroot=i;
+        vdata[node].left_contour=i;
+        vdata[node].right_contour=i;
+        vdata[node].offset_follow_lc = 0.0;
+        vdata[node].offset_follow_rc = 0.0;
+        avg = vdata[i].offset; 
       }
       j++;
     }
   }
-  /* printf("Shifting node to be centered above children. Shift amount: %lf\n", avg); */
-  vdata[node].offset += avg;
+  /*printf("Shifting node to be centered above children. Shift amount: %lf\n", avg);*/
+  vdata[node].offset_follow_lc -= avg;
+  vdata[node].offset_follow_rc -= avg;
   for (i=0, j=0; i<vcount; i++) {
     if (i == node) continue;
     if (vdata[i].parent == node) vdata[i].offset -= avg;
