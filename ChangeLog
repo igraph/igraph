@@ -2,6 +2,8 @@
 
 	* src/layout.c (igraph_reingold_tilford) :
 	really fixed issue #100 :)
+	* src/layout.c (igraph_reingold_tilford_circular) :
+	fixed documentation and the handling of negative X coords
 	
 2008-04-07  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 

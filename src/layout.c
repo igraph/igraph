@@ -1674,7 +1674,27 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
  * \param graph The graph object.
  * \param res The result, the coordinates in a matrix. The parameter
  *   should point to an initialized matrix object and will be resized.
- * \param root The index of the root vertex.
+ * \param mode Specifies which edges to consider when building the tree.
+ *   If it is \c IGRAPH_OUT then only the outgoing, if it is \c IGRAPH_IN
+ *   then only the incoming edges of a parent are considered. If it is 
+ *   \c IGRAPH_ALL then all edges are used (this was the behavior in 
+ *   igraph 0.5 and before). This parameter also influences how the root 
+ *   vertices are calculated, if they are not given. See the \p roots parameter.
+ * \param roots The index of the root vertex or root vertices. 
+ *   If this is a non-empty vector then the supplied vertex ids are used 
+ *   as the roots of the trees (or a single tree if the graph is connected).
+ *   If it is a null pointer of a pointer to an empty vector, then the root
+ *   vertices are automatically calculated based on topological sorting,
+ *   performed with the opposite mode than the \p mode argument.
+ *   After the vertices have been sorted, one is selected from each component.
+ * \param rootlevel This argument can be useful when drawing forests which are 
+ *   not trees (i.e. they are unconnected and have tree components). It specifies 
+ *   the level of the root vertices for every tree in the forest. It is only
+ *   considered if not a null pointer and the \p roots argument is also given 
+ *   (and it is not a null pointer of an empty vector). Note that if you supply
+ *   a null pointer here and the graph has multiple components, all of the root
+ *   vertices will be mapped to the origin of the coordinate system, which does
+ *   not really make sense.
  * \return Error code.
  *
  * \sa \ref igraph_layout_reingold_tilford().
