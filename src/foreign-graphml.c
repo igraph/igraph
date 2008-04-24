@@ -395,6 +395,21 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
 	VECTOR(state->g_attrs)[i];
       igraph_i_attribute_record_t *rec=&graphmlrec->record;
+      if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+	igraph_vector_t *vec=(igraph_vector_t*)rec->value;
+	long int origsize=igraph_vector_size(vec);
+	igraph_vector_resize(vec, 1);
+	for (l=origsize; l<1; l++) {
+	  VECTOR(*vec)[l]=IGRAPH_NAN;
+	}
+      } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+	igraph_strvector_t *strvec=(igraph_strvector_t*)rec->value;
+	long int origsize=igraph_strvector_size(strvec);
+	igraph_strvector_resize(strvec, 1);
+	for (l=origsize; l<1; l++) {
+	  igraph_strvector_set(strvec, l, "");
+	}
+      }
       VECTOR(gattr)[i]=rec;
     }
     
