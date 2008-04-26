@@ -835,6 +835,8 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 		       igraph_neimode_t mode, const igraph_vector_t *roots,
 		       igraph_vector_t *vertex_index);
 
+int igraph_is_mutual(igraph_t *graph, igraph_es_t es, igraph_vector_bool_t *res);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */

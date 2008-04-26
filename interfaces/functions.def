@@ -486,6 +486,11 @@ igraph_unfold_tree:
                 OUT VECTOR_OR_0 vertex_index
         NAME-R: unfold.tree
 
+igraph_is_mutual:
+        PARAMS: GRAPH graph, EDGESET es=ALL, OUT VECTOR_BOOL res
+        DEPS: es ON graph
+        NAME-R: is.mutual
+
 #######################################
 # Spectral properties
 #######################################

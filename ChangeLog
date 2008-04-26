@@ -1,3 +1,7 @@
+2008-04-25  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_is_mutual) : added
+
 2008-04-24  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/foreign-graphml.c : fixed bug when a graph attribute was
