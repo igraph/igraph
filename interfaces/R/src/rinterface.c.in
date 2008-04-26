@@ -6176,15 +6176,21 @@ SEXP R_igraph_community_eb_get_merges(SEXP graph,
   return result;
 }
 
-SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity) {
+SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity, 
+				   SEXP pweights) {
   
   igraph_t g;
   igraph_matrix_t merges, *ppmerges=0;
   igraph_vector_t modularity, *ppmodularity=0;
+  igraph_vector_t weights, *ppweights=0;
   SEXP result, names;
   
   R_igraph_before();
   
+  if (!isNull(pweights)) {
+    ppweights=&weights;
+    R_SEXP_to_vector(pweights, ppweights);
+  }        
   R_SEXP_to_igraph(graph, &g);
   if (LOGICAL(pmerges)[0]) {
     ppmerges=&merges;
@@ -6194,7 +6200,7 @@ SEXP R_igraph_community_fastgreedy(SEXP graph, SEXP pmerges, SEXP pmodularity) {
     ppmodularity=&modularity;
     igraph_vector_init(&modularity, 0);
   }
-  igraph_community_fastgreedy(&g, 0, ppmerges, ppmodularity);
+  igraph_community_fastgreedy(&g, ppweights, ppmerges, ppmodularity);
   PROTECT(result=NEW_LIST(2));
   SET_VECTOR_ELT(result, 0, R_igraph_0ormatrix_to_SEXP(ppmerges));
   if (ppmerges) { igraph_matrix_destroy(ppmerges); }
