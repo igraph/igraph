@@ -3637,6 +3637,48 @@ PyObject *igraphmodule_Graph_similarity_dice(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the inverse log-weighted similarities of some nodes in
+ * a graph.
+ * \return the similarity scores in a matrix
+ * \sa igraph_similarity_inverse_log_weighted
+ */
+PyObject *igraphmodule_Graph_similarity_inverse_log_weighted(
+  igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds) {
+  static char *kwlist[] = { "vertices", "mode", NULL };
+  PyObject *vobj = NULL, *list = NULL, *mode_o = Py_None;
+  igraph_matrix_t res;
+  igraph_neimode_t mode = IGRAPH_ALL;
+  int return_single = 0;
+  igraph_vs_t vs;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &vobj, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) return NULL; 
+
+  if (igraph_matrix_init(&res, 0, 0)) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_similarity_inverse_log_weighted(&self->g,&res,vs,mode)) {
+    igraph_matrix_destroy(&res);
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
+
+  igraph_matrix_destroy(&res);
+  igraph_vs_destroy(&vs);
+
+  return list;
+}
+
+
+/** \ingroup python_interface_graph
  * \brief Calculates a spanning tree for a graph
  * \return a list containing the edge betweenness for every edge
  * \sa igraph_minimum_spanning_tree_unweighted
@@ -8351,6 +8393,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  result in strange results: nonadjacent edges may have larger\n"
    "  similarities compared to the case when an edge is added between them --\n"
    "  however, this might be exactly the result you want to get.\n"
+   "@return: the pairwise similarity coefficients for the vertices specified,\n"
+   "  in the form of a matrix (list of lists).\n"
+  },
+  /* interface to igraph_similarity_inverse_log_weighted */
+  {"similarity_inverse_log_weighted",
+    (PyCFunction) igraphmodule_Graph_similarity_inverse_log_weighted,
+   METH_VARARGS | METH_KEYWORDS,
+   "similarity_inverse_log_weighted(vertices=None, mode=IGRAPH_ALL)\n\n"
+   "Inverse log-weighted similarity coefficient of vertices.\n\n"
+   "Each vertex is assigned a weight which is 1 / log(degree). The\n"
+   "log-weighted similarity of two vertices is the sum of the weights\n"
+   "of their common neighbors.\n\n"
+   "@param vertices: the vertices to be analysed. If C{None}, all vertices\n"
+   "  will be considered.\n"
+   "@param mode: which neighbors should be considered for directed graphs.\n"
+   "  Can be L{ALL}, L{IN} or L{OUT}, ignored for undirected graphs.\n"
+   "  L{IN} means that the weights are determined by the out-degrees, L{OUT}\n"
+   "  means that the weights are determined by the in-degrees.\n"
    "@return: the pairwise similarity coefficients for the vertices specified,\n"
    "  in the form of a matrix (list of lists).\n"
   },

@@ -989,6 +989,9 @@ int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
               const igraph_vs_t vids, igraph_neimode_t mode,
 			  igraph_bool_t loops);
+int igraph_similarity_inverse_log_weighted(const igraph_t *graph,
+              igraph_matrix_t *res, const igraph_vs_t vids,
+              igraph_neimode_t mode);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */

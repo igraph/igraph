@@ -64,6 +64,7 @@
 <!-- doxrox-include igraph_cocitation -->
 <!-- doxrox-include igraph_similarity_jaccard -->
 <!-- doxrox-include igraph_similarity_dice -->
+<!-- doxrox-include igraph_similarity_inverse_log_weighted -->
 </section>
 
 <section><title>Spanning Tree</title>

@@ -59,6 +59,15 @@ int main() {
   
   igraph_similarity_dice(&g, &m, igraph_vss_all(), IGRAPH_ALL, 1);
   print_matrix(&m, stdout);
+
+  igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_ALL);
+  print_matrix(&m, stdout);
+  
+  igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_OUT);
+  print_matrix(&m, stdout);
+  
+  igraph_similarity_inverse_log_weighted(&g, &m, igraph_vss_all(), IGRAPH_IN);
+  print_matrix(&m, stdout);
   
   igraph_matrix_destroy(&m);
   igraph_destroy(&g);

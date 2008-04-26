@@ -23,10 +23,11 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include <math.h>
 
 int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res, 
-			   igraph_vs_t vids, 
-			   igraph_neimode_t mode);
+                           igraph_vs_t vids, igraph_neimode_t mode,
+                           igraph_vector_t *weights);
 
 /**
  * \ingroup structural
@@ -35,7 +36,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  * 
  * </para><para>
  * Two vertices are cocited if there is another vertex citing both of
- * them. \ref igraph_cocitation() simply counts how many types two vertices are
+ * them. \ref igraph_cocitation() simply counts how many times two vertices are
  * cocited.
  * The cocitation score for each given vertex and all other vertices
  * in the graph will be calculated.
@@ -58,8 +59,8 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res, 
-		      const igraph_vs_t vids) {
-  return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT);
+                      const igraph_vs_t vids) {
+  return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT, 0);
 }
 
 /**
@@ -92,13 +93,91 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  */
 
 int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res, 
-		       const igraph_vs_t vids) {
-  return igraph_cocitation_real(graph, res, vids, IGRAPH_IN);
+                       const igraph_vs_t vids) {
+  return igraph_cocitation_real(graph, res, vids, IGRAPH_IN, 0);
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_similarity_inverse_log_weighted
+ * \brief Vertex similarity based on the inverse logarithm of vertex degrees. 
+ * 
+ * </para><para>
+ * The inverse log-weighted similarity of two vertices is the number of
+ * their common neighbors, weighted by the inverse logarithm of their degrees.
+ * It is based on the assumption that two vertices should be considered
+ * more similar if they share a low-degree common neighbor, since high-degree
+ * common neighbors are more likely to appear even by pure chance.
+ *
+ * </para><para>
+ * Isolated vertices will have zero similarity to any other vertex.
+ * Self-similarities are not calculated.
+ *
+ * </para><para>
+ * See the following paper for more details: Lada A. Adamic and Eytan Adar:
+ * Friends and neighbors on the Web. Social Networks, 25(3):211-230, 2003.
+ *
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a matrix, the result of the calculation will
+ *        be stored here. The number of its rows is the same as the
+ *        number of vertex ids in \p vids, the number of
+ *        columns is the number of vertices in the graph.
+ * \param vids The vertex ids of the vertices for which the
+ *        calculation will be done.
+ * \param mode The type of neighbors to be used for the calculation in
+ *        directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the outgoing edges will be considered for each node. Nodes
+ *          will be weighted according to their in-degree.
+ *        \cli IGRAPH_IN
+ *          the incoming edges will be considered for each node. Nodes
+ *          will be weighted according to their out-degree.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an undirected one for the
+ *          computation. Every node is weighted according to its undirected
+ *          degree.
+ *        \endclist
+ * \return Error code:
+ *         \c IGRAPH_EINVVID: invalid vertex id.
+ * 
+ * Time complexity: O(|V|d^2),
+ * |V| is the number of vertices in
+ * the graph, d is the (maximum)
+ * degree of the vertices in the graph.
+ */
+
+int igraph_similarity_inverse_log_weighted(const igraph_t *graph,
+  igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
+  igraph_vector_t weights;
+  igraph_neimode_t mode0;
+  long int i, no_of_nodes;
+
+  switch (mode) {
+    case IGRAPH_OUT: mode0 = IGRAPH_IN; break;
+    case IGRAPH_IN: mode0 = IGRAPH_OUT; break;
+    default: mode0 = IGRAPH_ALL;
+  }
+
+  no_of_nodes = igraph_vcount(graph);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&weights, no_of_nodes);
+  IGRAPH_CHECK(igraph_degree(graph, &weights, igraph_vss_all(), mode0, 1));
+  for (i=0; i < no_of_nodes; i++) {
+    if (VECTOR(weights)[i] > 1)
+      VECTOR(weights)[i] = 1.0 / log(VECTOR(weights)[i]);
+  }
+
+  IGRAPH_CHECK(igraph_cocitation_real(graph, res, vids, mode0, &weights));
+  igraph_vector_destroy(&weights);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
 }
 
 int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res, 
-			   igraph_vs_t vids,
-			   igraph_neimode_t mode) {
+                           igraph_vs_t vids,
+                           igraph_neimode_t mode,
+                           igraph_vector_t *weights) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int from, i, j;
@@ -114,7 +193,7 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
   if (calc==0) {
     IGRAPH_ERROR("cannot calculate cocitation/bibcoupling", IGRAPH_ENOMEM);
   }  
-  IGRAPH_FINALLY(free, calc); 	/* TODO: hack */
+  IGRAPH_FINALLY(free, calc);   /* TODO: hack */
 
   for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
     calc[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
@@ -127,16 +206,20 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
   /* The result */
   
   for (from=0; from<no_of_nodes; from++) {
+    igraph_real_t weight = 1;
+
     IGRAPH_ALLOW_INTERRUPTION();
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, from, mode));
+    if (weights) weight = VECTOR(*weights)[from];
+
     for (i=0; i < igraph_vector_size(&neis)-1; i++) {
       if (calc[ (long int)VECTOR(neis)[i] ]) {
-	for (j=i+1; j<igraph_vector_size(&neis); j++) {
-	  MATRIX(tmpres, (long int)VECTOR(neis)[i], 
-		 (long int)VECTOR(neis)[j]) += 1;
-	  MATRIX(tmpres, (long int)VECTOR(neis)[j], 
-		 (long int)VECTOR(neis)[i]) += 1;
-	}
+        for (j=i+1; j<igraph_vector_size(&neis); j++) {
+          MATRIX(tmpres, (long int)VECTOR(neis)[i], 
+                 (long int)VECTOR(neis)[j]) += weight;
+          MATRIX(tmpres, (long int)VECTOR(neis)[j], 
+                 (long int)VECTOR(neis)[i]) += weight;
+        }
       }
     }
   }
