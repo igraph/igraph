@@ -663,7 +663,7 @@ PyObject *igraphmodule_Graph_is_mutual(igraphmodule_GraphObject *self,
     return NULL;
   }
 
-  if (igraph_is_mutual(&self->g, es, &result)) {
+  if (igraph_is_mutual(&self->g, &result, es)) {
     igraphmodule_handle_igraph_error();
     igraph_es_destroy(&es);
     igraph_vector_bool_destroy(&result);
