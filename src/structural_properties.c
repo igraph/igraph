@@ -4044,7 +4044,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
        IGRAPH_VIT_NEXT(fromvit), i++) {
 
     long int source=IGRAPH_VIT_GET(fromvit);
-    MATRIX(*res, source, source) = 1.0;	/* zero distance */
+    MATRIX(*res, i, source) = 1.0;	/* zero distance */
     igraph_indheap_push_with_index(&Q, source, 0);
     
     while (!igraph_indheap_empty(&Q)) {

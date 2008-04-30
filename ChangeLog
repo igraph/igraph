@@ -1,5 +1,8 @@
 2008-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_shortest_paths_dijkstra) :
+	bug corrected
+
 	* src/type_indexedegelist.c (igraph_empty_attrs) :
 	check that number of vertices is finite
 
