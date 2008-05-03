@@ -55,6 +55,7 @@ plot.igraph <- function(x,
   edge.label.cex     <- params("edge", "label.cex")
   edge.label.color   <- params("edge", "label.color")
   arrow.size         <- params("edge", "arrow.size")[1]
+  arrow.width        <- params("edge", "arrow.width")[1]
   
   layout             <- params("plot", "layout")
   margin             <- params("plot", "margin")
@@ -140,23 +141,23 @@ plot.igraph <- function(x,
       sapply(dt, function(t) point.on.cubic.bezier(cp, t))
     }
     
-    plot.bezier <- function(cp, points, color, width, arr, lty, arrow.size) {
+    plot.bezier <- function(cp, points, color, width, arr, lty, arrow.size, arr.w) {
       p <- compute.bezier( cp, points )
       polygon(p[1,], p[2,], border=color, lwd=width, lty=lty)
       if (arr==1 || arr==3) {
         igraph.Arrows(p[1,ncol(p)-1], p[2,ncol(p)-1], p[1,ncol(p)], p[2,ncol(p)],
                       sh.col=color, h.col=color, size=arrow.size,
-                      sh.lwd=width, h.lwd=width, open=FALSE, code=2)
+                      sh.lwd=width, h.lwd=width, open=FALSE, code=2, width=arr.w)
       }
       if (arr==2 || arr==3) {
         igraph.Arrows(p[1,2], p[2,2], p[1,1], p[2,1],
                       sh.col=color, h.col=color, size=arrow.size,
-                      sh.lwd=width, h.lwd=width, open=FALSE, code=2)
+                      sh.lwd=width, h.lwd=width, open=FALSE, code=2, width=arr.w)
       }
     }
     
     loop <- function(x0, y0, cx=x0, cy=y0, color, angle=0, label=NA,
-                     width=1, arr=2, lty=1, arrow.size=arrow.size) {
+                     width=1, arr=2, lty=1, arrow.size=arrow.size, arr.w=arr.w) {
 
       rad <- angle/180*pi
       center <- c(cx,cy)
@@ -170,7 +171,7 @@ plot.igraph <- function(x,
       cp[,1] <- cx+r*cos(phi)
       cp[,2] <- cy+r*sin(phi)
 
-      plot.bezier(cp, 50, color, width, arr=arr, lty=lty, arrow.size=arrow.size)
+      plot.bezier(cp, 50, color, width, arr=arr, lty=lty, arrow.size=arrow.size, arr.w=arr.w)
 
       if (!is.na(label)) {
         lx <- x0+.3
@@ -206,7 +207,7 @@ plot.igraph <- function(x,
     yy0 <- layout[loops.v,2] + sin(la/180*pi) * vs
     mapply(loop, xx0, yy0,
            color=ec, angle=la, label=loop.labels, lty=lty,
-           width=ew, arr=arr, arrow.size=asize)
+           width=ew, arr=arr, arrow.size=asize, arr.w=arrow.width)
   }
 
   ################################################################
@@ -220,7 +221,7 @@ plot.igraph <- function(x,
     if (length(unique(arrow.mode))==1) {
       igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
                     sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode,
-                    sh.lty=edge.lty, h.lty=1, size=arrow.size)
+                    sh.lty=edge.lty, h.lty=1, size=arrow.size, width=arrow.width)
     } else {
       ## different kinds of arrows drawn separately as 'arrows' cannot
       ## handle a vector as the 'code' argument
@@ -232,7 +233,7 @@ plot.igraph <- function(x,
         el <- edge.lty   ; if (length(el)>1) { el <- el[valid] }
         igraph.Arrows(x0[valid], y0[valid], x1[valid], y1[valid],
                       code=code, sh.col=ec, h.col=ec, sh.lwd=ew, h.lwd=1,
-                      h.lty=1, sh.lty=el, open=FALSE, size=arrow.size)
+                      h.lty=1, sh.lty=el, open=FALSE, size=arrow.size, width=arrow.width)
       }
     }
     phi <- atan2(y1-y0, x1-x0)
@@ -553,6 +554,7 @@ function (x1, y1, x2, y2,
   ## Version: 2005-10-17
 {
   cin <- size * par("cin")[2]
+  width <- width * (1.2/4/cin)
   uin <- if (is.R()) 
     1/xyinch()
   else par("uin")
