@@ -3972,9 +3972,10 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
  *    from a single source, in the order of vertex ids.
  *    Unreachable vertices has distance \c IGRAPH_INFINITY.
  * \param from The source vertices.
- * \param weights The edge weights. They must be all no-negative for
- *    Dijkstra's algorithm to work. The results are undefined if some
- *    of these are negative. If this is a null pointer, then the
+ * \param weights The edge weights. They must be all non-negative for
+ *    Dijkstra's algorithm to work. An error code is returned if there
+ *    is a negative edge weight in the weight vector. If this is a null
+ *    pointer, then the
  *    unweighted version, \ref igraph_shortest_paths() is called.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
@@ -3986,7 +3987,9 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
  * vertices, |E| the number of edges and s the number of sources.
  * 
  * \sa \ref igraph_shortest_paths() for a (slightly) faster unweighted
- * version.
+ * version or \ref igraph_shortest_paths_bellman_ford() for a weighted
+ * variant that works in the presence of negative edge weights (but no
+ * negative loops).
  */
 
 int igraph_shortest_paths_dijkstra(const igraph_t *graph,
@@ -4026,6 +4029,9 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
+  if (igraph_vector_min(weights) < 0) {
+    IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  }
 
   IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
   IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
@@ -4054,7 +4060,6 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
       /* Now check all neighbors of 'minnei' for a shorter path */
       igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
       long int nlen=igraph_vector_size(neis);
-      long int j;
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
@@ -4090,10 +4095,139 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
       }
     }
   }
-  
+
   return 0;
 }
 
+/**
+ * \function igraph_shortest_paths_bellman_ford
+ * Weighted shortest paths from some sources allowing negative weights
+ * 
+ * This function is the Bellman-Ford algorithm to find the weighted 
+ * shortest paths to all vertices from a single source. (It is run 
+ * independently for the given sources.). If there are no negative
+ * weights, you are better off with \ref igraph_shortest_paths_dijsktra() .
+ * 
+ * \param graph The input graph, can be directed.
+ * \param res The result, a matrix. Each row contains the distances
+ *    from a single source, in the order of vertex ids.
+ *    Unreachable vertices has distance \c IGRAPH_INFINITY.
+ * \param from The source vertices.
+ * \param weights The edge weights. There mustn't be any closed loop in
+ *    the graph that has a negative total weight (since this would allow
+ *    us to decrease the weight of any path containing at least a single
+ *    vertex of this loop infinitely). If this is a null pointer, then the
+ *    unweighted version, \ref igraph_shortest_paths() is called.
+ * \param mode For directed graphs; whether to follow paths along edge
+ *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
+ *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored 
+ *    for undirected graphs.
+ * \return Error code.
+ * 
+ * Time complexity: O(s*|E|*|V|), where |V| is the number of
+ * vertices, |E| the number of edges and s the number of sources.
+ * 
+ * \sa \ref igraph_shortest_paths() for a faster unweighted version
+ * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
+ * edge weights.
+ */
+
+int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+				       igraph_matrix_t *res,
+				       const igraph_vs_t from,
+				       const igraph_vector_t *weights, 
+				       igraph_neimode_t mode) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_lazy_adjedgelist_t adjlist;
+  long int i,j,k;
+  long int no_of_from;
+  igraph_dqueue_t Q; 
+  igraph_vector_t clean_vertices;
+  igraph_vector_t num_queued;
+  igraph_vit_t fromvit;
+
+  /*
+     - speedup: a vertex is marked clean if its distance from the source
+       did not change during the last phase. Neighbors of a clean vertex
+       are not relaxed again, since it would mean no change in the
+       shortest path values. Dirty vertices are queued. Negative loops can
+       be detected by checking whether a vertex has been queued at least
+       n times.
+  */
+  if (!weights) {
+    return igraph_shortest_paths(graph, res, from, mode);
+  }
+  
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
+  no_of_from=IGRAPH_VIT_SIZE(fromvit);
+  
+  IGRAPH_DQUEUE_INIT_FINALLY(&Q, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&clean_vertices, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&num_queued, no_of_nodes);
+  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
+  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_nodes));
+  igraph_matrix_fill(res, IGRAPH_INFINITY);
+
+  for (IGRAPH_VIT_RESET(fromvit), i=0; 
+       !IGRAPH_VIT_END(fromvit);
+       IGRAPH_VIT_NEXT(fromvit), i++) {
+    long int source=IGRAPH_VIT_GET(fromvit);
+
+    MATRIX(*res, i, source) = 0;
+    igraph_vector_null(&clean_vertices);
+    igraph_vector_null(&num_queued);
+
+    /* Fill the queue with vertices to be checked */
+    for (j=0; j<no_of_nodes; j++) IGRAPH_CHECK(igraph_dqueue_push(&Q, j));
+
+    while (!igraph_dqueue_empty(&Q)) {
+      igraph_vector_t *neis;
+      long int nlen;
+
+      j = igraph_dqueue_pop(&Q);
+      VECTOR(clean_vertices)[j] = 1;
+      VECTOR(num_queued)[j] += 1;
+      if (VECTOR(num_queued)[j] > no_of_nodes)
+        IGRAPH_ERROR("cannot run Bellman-Ford algorithm", IGRAPH_ENEGLOOP);
+
+      /* If we cannot get to j in finite time yet, there is no need to relax
+       * its edges */
+      if (!IGRAPH_FINITE(MATRIX(*res,i,j))) continue;
+
+      neis = igraph_lazy_adjedgelist_get(&adjlist, j);
+      nlen = igraph_vector_size(neis);
+
+      for (k=0; k<nlen; k++) {
+        long int nei = VECTOR(*neis)[k];
+        long int target = IGRAPH_OTHER(graph, nei, j);
+        if (MATRIX(*res, i, target) > MATRIX(*res, i, j) + VECTOR(*weights)[nei]) {
+          /* relax the edge */
+          MATRIX(*res, i, target) = MATRIX(*res, i, j) + VECTOR(*weights)[nei];
+          if (VECTOR(clean_vertices)[target]) {
+            VECTOR(clean_vertices)[target] = 0;
+            IGRAPH_CHECK(igraph_dqueue_push(&Q, target));
+          }
+        }
+      }
+    }
+  }
+
+  igraph_vit_destroy(&fromvit);
+  igraph_dqueue_destroy(&Q);
+  igraph_vector_destroy(&clean_vertices);
+  igraph_lazy_adjedgelist_destroy(&adjlist);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}
 
 int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 		       igraph_neimode_t mode, const igraph_vector_t *roots,

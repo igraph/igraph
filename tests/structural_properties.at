@@ -47,9 +47,14 @@ AT_COMPILE_CHECK([simple/igraph_get_shortest_paths.c],
 		 [simple/igraph_get_shortest_paths.out])
 AT_CLEANUP
 
-AT_SETUP([Weigted shortest paths (Dijkstra): ])
+AT_SETUP([Weighted shortest paths (Dijkstra): ])
 AT_KEYWORDS([igraph_shortest_paths_dijkstra Dijkstra shortest paths geodesic])
 AT_COMPILE_CHECK([simple/dijkstra.c], [simple/dijkstra.out])
+AT_CLEANUP
+
+AT_SETUP([Weighted shortest paths (Bellman-Ford): ])
+AT_KEYWORDS([igraph_shortest_paths_bellman_ford Bellman-Ford shortest paths geodesic])
+AT_COMPILE_CHECK([simple/bellman_ford.c], [simple/bellman_ford.out])
 AT_CLEANUP
 
 AT_SETUP([Edge betweenness (igraph_edge_betweenness): ])

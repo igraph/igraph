@@ -312,6 +312,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_ARPACK_SHUR Error from calculation of a real Schur form.
  * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
  * \enumval IGRAPH_ARPACK_UNKNOWN Unkown ARPACK error.
+ * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
  */
 
 typedef enum {
@@ -350,7 +351,8 @@ typedef enum {
   IGRAPH_ARPACK_EVDIFF    = 33,
   IGRAPH_ARPACK_SHUR      = 34,
   IGRAPH_ARPACK_LAPACK    = 35,
-  IGRAPH_ARPACK_UNKNOWN   = 36
+  IGRAPH_ARPACK_UNKNOWN   = 36,
+  IGRAPH_ENEGLOOP         = 37
 } igraph_error_type_t;
 
 /**
