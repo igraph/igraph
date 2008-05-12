@@ -121,6 +121,7 @@ long int igraph_ncol_mylineno;
 igraph_vector_t *igraph_ncol_vector=0;
 igraph_vector_t *igraph_ncol_weights=0;
 igraph_trie_t *igraph_ncol_trie=0;
+extern char *igraph_i_ncol_errmsg;
 
 /**
  * \ingroup loadsave
@@ -219,8 +220,15 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_ncol_yyin=instream;
   igraph_ncol_mylineno=1;
   igraph_i_ncol_eof=0;
+  igraph_i_ncol_errmsg=0;
 
-  igraph_ncol_yyparse();
+  if (igraph_ncol_yyparse()) {
+    if (igraph_i_ncol_errmsg) {
+      IGRAPH_ERROR(igraph_i_ncol_errmsg, IGRAPH_PARSEERROR);
+    } else {
+      IGRAPH_ERROR("Cannot read NCOL file", IGRAPH_PARSEERROR);
+    }
+  }
 
   if (predefnames != 0 && 
       igraph_trie_size(&trie) != no_predefined) {
@@ -271,6 +279,7 @@ long int igraph_lgl_mylineno;
 igraph_vector_t *igraph_lgl_vector=0;
 igraph_vector_t *igraph_lgl_weights=0;
 igraph_trie_t *igraph_lgl_trie=0;
+extern char *igraph_i_lgl_errmsg;
 
 /**
  * \ingroup loadsave
@@ -342,9 +351,16 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_lgl_yyin=instream;
   igraph_lgl_mylineno=1;
   igraph_i_lgl_eof=0;
+  igraph_i_lgl_errmsg=0;
 
-  igraph_lgl_yyparse();
-  
+  if (igraph_lgl_yyparse()) {
+    if (igraph_i_lgl_errmsg) {
+      IGRAPH_ERROR(igraph_i_lgl_errmsg, IGRAPH_PARSEERROR);
+    } else {
+      IGRAPH_ERROR("Cannot read LGL file", IGRAPH_PARSEERROR);
+    }
+  }
+
   IGRAPH_CHECK(igraph_empty(graph, 0, IGRAPH_UNDIRECTED));
   IGRAPH_FINALLY(igraph_destroy, graph);
 
@@ -405,6 +421,7 @@ igraph_vector_ptr_t *igraph_i_pajek_edge_attributes;
 long int igraph_i_pajek_vertexid=0;
 long int igraph_i_pajek_actvertex=0;
 long int igraph_i_pajek_actedge=0;
+extern char *igraph_i_pajek_errmsg;
 
 /* int vector_print(igraph_vector_t *v) { */
 /*   long int i, size=igraph_vector_size(v); */
@@ -549,8 +566,16 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   igraph_i_pajek_actedge=0;
   igraph_pajek_mylineno=1;
   igraph_i_pajek_eof=0;
+  igraph_i_pajek_errmsg=0;
 
-  igraph_pajek_yyparse();
+  if (igraph_pajek_yyparse()) {
+    if (igraph_i_pajek_errmsg) {
+      IGRAPH_ERROR(igraph_i_pajek_errmsg, IGRAPH_PARSEERROR);
+    } else {
+      IGRAPH_ERROR("Cannot read Pajek file", IGRAPH_PARSEERROR);
+    }
+  }
+
   if (igraph_pajek_vcount < 0)
     IGRAPH_ERROR("invalid vertex count in Pajek file", IGRAPH_EINVAL);
 
@@ -1062,7 +1087,8 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
   igraph_gml_yyin=instream;
   igraph_gml_mylineno=1;
   igraph_gml_eof=0;
-  
+  igraph_i_gml_errmsg=0;
+
   i=igraph_gml_yyparse();
   if (i != 0) {
     if (igraph_i_gml_errmsg) {

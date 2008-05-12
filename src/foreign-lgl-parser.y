@@ -49,6 +49,7 @@ extern int igraph_lgl_yylex(void);
 extern long int igraph_lgl_mylineno;
 extern char *igraph_lgl_yytext;
 extern int igraph_lgl_yyleng;
+char *igraph_i_lgl_errmsg=0;
 int igraph_lgl_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
@@ -114,11 +115,13 @@ weight : ALNUM  { $$=igraph_lgl_get_number(igraph_lgl_yytext,
 
 int igraph_lgl_yyerror (char *s)
 {
-  char str[200];  
+  static char str[300];  
   igraph_i_lgl_reset_scanner();
-  snprintf(str, sizeof(str), "Parse error in LGL file, line %li", 
-	   igraph_lgl_mylineno);
-  IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
+
+  snprintf(str, sizeof(str), "Parse error in LGL file, line %li (%s)", 
+	   (long)igraph_lgl_mylineno, s);
+  igraph_i_lgl_errmsg=str;
+  return 0;
 }
 
 igraph_real_t igraph_lgl_get_number(const char *str, long int length) {

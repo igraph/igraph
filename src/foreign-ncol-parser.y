@@ -50,6 +50,7 @@ extern int igraph_ncol_yylex(void);
 extern long int igraph_ncol_mylineno;
 extern char *igraph_ncol_yytext;
 extern int igraph_ncol_yyleng;
+char *igraph_i_ncol_errmsg=0;
 int igraph_ncol_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
@@ -106,11 +107,12 @@ weight : ALNUM  { $$=igraph_ncol_get_number(igraph_ncol_yytext,
 
 int igraph_ncol_yyerror (char *s)
 {
-  char str[200];  
+  static char str[300];  
   igraph_i_ncol_reset_scanner();
-  snprintf(str, sizeof(str), "Parse error in .ncol file, line %li", 
-	   igraph_ncol_mylineno);
-  IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
+  snprintf(str, sizeof(str), "Parse error in NCOL file, line %li (%s)", 
+	   (long)igraph_ncol_mylineno, s);
+  igraph_i_ncol_errmsg=str;
+  return 0;
 }
 
 igraph_real_t igraph_ncol_get_number(const char *str, long int length) {

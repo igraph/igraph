@@ -48,5 +48,16 @@ int main() {
   igraph_write_graph_ncol(&g, stdout, 0, 0);
   igraph_destroy(&g);
 
+  /* Erroneous LGL file (empty vertex name) */
+  input=fopen("igraph_read_graph_lgl-3.lgl", "r");
+  if (!input) {
+    return 3;
+  }
+  igraph_set_error_handler(igraph_error_handler_ignore);
+  if (igraph_read_graph_lgl(&g, input, 0, 0) != IGRAPH_PARSEERROR) {
+    return 4;
+  }
+  fclose(input);
+
   return 0;
 }

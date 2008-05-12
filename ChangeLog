@@ -1,3 +1,9 @@
+2008-05-12  Tamas Nepusz  <ntamas@rmki.kfki.hu> :
+	* src/foreign.c (igraph_read_graph_{ncol,lgl,pajek}) :
+	proper error handling
+
+	* examples/simple/igraph_read_graph_lgl : added test case
+	
 2008-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_shortest_paths_dijkstra) :
