@@ -25,14 +25,41 @@ igraph.arpack.default <- list(bmat="I", n=0, which="XX", nev=1, tol=0.0,
                               mode=1, start=0, sigma=0.0, sigmai=0.0)
 
 arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
-                   env=parent.frame()) {
-
+                   env=parent.frame(), complex=!sym) {
+  
   options.tmp <- igraph.arpack.default
   options.tmp[ names(options) ] <- options
   options <- options.tmp
 
+  if (sym && complex) {
+    complex <- FALSE
+    warning("Symmetric matrix, setting `complex' to FALSE")
+  }
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_arpack", func, extra, options, env, sym,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_arpack", func, extra, options, env, sym,
+               PACKAGE="igraph")
 
+  if (complex) {
+    rew <- arpack.unpack.complex(res$vectors, res$values, res$options$nev)
+    res$vectors <- rew$vectors
+    res$values <- rew$values
+
+    res$values <- apply(res$values, 1, function(x) x[1]+x[2]*1i)
+    dim(res$vectors) <- c(nrow(res$vectors)*2, ncol(res$vectors)/2)
+    res$vectors <- apply(res$vectors, 2, function(x) {
+      l <- length(x)/2
+      x[1:l] + x[(l+1):length(x)]*1i
+    })
+  } else {
+    if (is.matrix(res$values)) {
+      if (!all(res$values[,2]==0)) {
+        warning("Dropping imaginary parts of eigenvalues")
+      }
+      res$values <- res$values[,1]
+    }
+    res$vectors <- res$vectors[,1:length(res$values)]
+  }
+  
+  res
 }

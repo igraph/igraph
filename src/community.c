@@ -831,6 +831,7 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
     options->start=0;
     options->n=size;
     options->ncv=3;
+    options->which[0]='L'; options->which[1]='A';
     if (options->ncv > options->n) { options->ncv=options->n; }
     
     /* Call ARPACK solver */
@@ -1155,6 +1156,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     options->start=0;
     options->n=size;
     options->ncv=3;
+    options->which[0]='L'; options->which[1]='A';
     if (options->ncv > options->n) { options->ncv=options->n; }
     extra.comm=comm;
     
@@ -1438,6 +1440,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
     options->start=0;
     options->n=size;
     options->ncv=3;
+    options->which[0]='L'; options->which[1]='A';
     if (options->ncv > options->n) { options->ncv=options->n; }
 
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_community_leading_eigenvector_step,

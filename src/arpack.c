@@ -28,6 +28,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 /* The ARPACK example file dssimp.f is used as a template */
 
@@ -296,7 +297,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   /* Brush up options if needed */
   if (options->ldv == 0) { options->ldv=options->n; }
   if (options->lworkl == 0) { options->lworkl=options->ncv*(options->ncv+8); }
-  if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='A'; }
+  if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
   
   if (storage) {
     /* Storage provided */
@@ -398,11 +399,6 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
 
-  options->ldv=origldv;
-  options->lworkl=origlworkl;
-  options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
-  options->tol=origtol;
-  
   if (values) {
     long int i;
     IGRAPH_CHECK(igraph_vector_resize(values, options->nev));
@@ -420,7 +416,12 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
       }
     }
   }
-  
+
+  options->ldv=origldv;
+  options->lworkl=origlworkl;
+  options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
+  options->tol=origtol;
+    
   /* Clean up if needed */
   if (free_them) {
     igraph_Free(select);
@@ -480,7 +481,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   long int rvec= vectors || storage ? 1 : 0;
   char *all="All";
   
-  long int origldv=options->ldv, origlworkl=options->lworkl;
+  long int origldv=options->ldv, origlworkl=options->lworkl, 
+    orignev=options->nev;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
   
@@ -523,8 +525,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     v=igraph_Calloc(options->ldv * options->ncv, igraph_real_t); CHECKMEM(v);
     workl=igraph_Calloc(options->lworkl, igraph_real_t); CHECKMEM(workl);
     workd=igraph_Calloc(3*options->n, igraph_real_t); CHECKMEM(workd);
-    dr=igraph_Calloc(options->nev+1, igraph_real_t); CHECKMEM(dr);
-    di=igraph_Calloc(options->nev+1, igraph_real_t); CHECKMEM(di);
+    dr=igraph_Calloc(2*options->nev+1, igraph_real_t); CHECKMEM(dr);
+    di=igraph_Calloc(2*options->nev+1, igraph_real_t); CHECKMEM(di);
     resid=igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
     select=igraph_Calloc(options->ncv, long int); CHECKMEM(select);
     workev=igraph_Calloc(3*options->ncv, igraph_real_t); CHECKMEM(workev);
@@ -592,15 +594,10 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
 
-  options->ldv=origldv;
-  options->lworkl=origlworkl;
-  options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
-  options->tol=origtol;
-
   if (values) {
     long int i;
     IGRAPH_CHECK(igraph_matrix_resize(values, options->nev, 2));
-    for (i=0; i<options->iparam[4]; i++) {
+    for (i=0; i<options->nev; i++) {
       MATRIX(*values, i, 0) = dr[i];
       MATRIX(*values, i, 1) = di[i];
     }
@@ -608,13 +605,19 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   if (vectors) {
     long int i, j, ptr=0;
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev+1));
-    for (j=0; j<options->nev+1; j++) {	
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
+    for (j=0; j<options->nev; j++) {	
       for (i=0; i<options->n; i++) {
 	MATRIX(*vectors, i, j) = v[ptr++];
       }
     }
   }
+
+  options->ldv=origldv;
+  options->lworkl=origlworkl;
+  options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
+  options->tol=origtol;
+  options->nev=orignev;
   
   /* Clean up if needed */
   if (free_them) {
@@ -629,4 +632,107 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     IGRAPH_FINALLY_CLEAN(8);
   }
   return 0;  
+}
+
+/**
+ * \function igraph_arpack_unpack_complex
+ * \brief Make the result of the non-symmetric ARPACK solver more readable
+ * 
+ * This function works on the output of \ref igraph_arpack_rnsolve and 
+ * brushes it up a bit: it only keeps \p nev eigenvalues/vectors and 
+ * every eigenvector is stored in two columns of the \p vectors
+ * matrix.
+ * 
+ * </para><para>
+ * The output of the non-symmetric ARPACK solver is somewhat hard to
+ * parse, as real eigenvectors occupy only one column in the matrix,
+ * and the complex conjugate eigenvectors are not stored at all
+ * (usually). The other problem is that the solver might return more
+ * eigenvalues than requested. The common use of this function is to
+ * call it directly after \ref igraph_arpack_rnsolve with its \p
+ * vectors and \p values argument and \c options->nev as \p nev.
+ * \param vectors The eigenvector matrix, as returned by \ref
+ *   igraph_arpack_rnsolve. It will be resized, typically it will be
+ *   larger. 
+ * \param values The eigenvalue matrix, as returned by \ref
+ *   igraph_arpack_rnsolve. It will be resized, typically extra,
+ *   unneeded rows (=eigenvalues) will be removed.
+ * \param nev The number of eigenvalues/vectors to keep. Can be less
+ *   or equal than the number originally requested from ARPACK.
+ * \return Error code.
+ * 
+ * Time complexity: linear in the number of elements in the \p vectors
+ * matrix. 
+ */
+
+int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values, 
+				 long int nev) {
+
+  long int origcol=igraph_matrix_ncol(vectors);
+  long int nodes=igraph_matrix_nrow(vectors);
+  long int no_evs=igraph_matrix_nrow(values);
+  long int i, j, k;
+  size_t colsize=nodes * sizeof(igraph_real_t);
+
+  /* Error checks */
+  if (nev < 0) {
+    IGRAPH_ERROR("`nev' cannot be negative", IGRAPH_EINVAL);
+  }
+  if (nev > no_evs) {
+    IGRAPH_ERROR("`nev' too large, we don't have that many in `values'", 
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_matrix_resize(vectors, nodes, nev * 2));
+  for (i=nev; i<igraph_matrix_nrow(values); i++) {
+    IGRAPH_CHECK(igraph_matrix_remove_row(values, i));
+  }
+  
+  /* Calculate where to start copying */
+  for (i=0, j=0; i<nev; i++) {
+    if (MATRIX(*values,i,1) == 0) { /* TODO: == 0.0 ???? */
+      /* real */
+      j++;
+    } else {
+      /* complex */
+      if (MATRIX(*values,i,1) > 0) { j+=2; }
+    }
+  }
+  j--;
+
+  if (j>=origcol) {
+    IGRAPH_WARNING("Too few columns in `vectors', ARPACK results are likely wrong");
+  }
+
+  /* We copy the j-th eigenvector to the (k-1)-th and k-th column */
+  k=nev*2-1;
+
+  for (i=nev-1; i>=0; i--) {
+    if (MATRIX(*values,i,1)==0) {
+
+      /* real */
+      memset( &MATRIX(*vectors,0,k), 0, colsize);
+      memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j), colsize);
+      k-=2;
+      j-=1;
+    } else {
+      /* complex */
+      memcpy( &MATRIX(*vectors,0,k), &MATRIX(*vectors,0,j), colsize);
+      memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j-1), colsize);
+
+      /* if negative Im part, then we need the conjugate */
+      if (MATRIX(*values,i,1) < 0) { 
+	long int l;
+	for (l=0; l<nodes; l++) {
+	  MATRIX(*vectors,l,k) = - MATRIX(*vectors,l,k);
+	}
+      } else { 
+	j-=2;
+      }
+	      
+      k-=2;
+    }
+  }
+
+  return 0;
 }

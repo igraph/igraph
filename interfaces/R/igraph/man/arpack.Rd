@@ -2,6 +2,7 @@
 \alias{arpack}
 \alias{arpack-options}
 \alias{igraph.arpack.default}
+\alias{arpack.unpack.complex}
 \concept{Eigenvalues}
 \concept{Eigenvectors}
 \concept{ARPACK}
@@ -10,7 +11,8 @@
   eigenvectors of sparse matrices}
 \usage{
 arpack(func, extra = NULL, sym = FALSE, options = igraph.arpack.default, 
-    env = parent.frame())
+    env = parent.frame(), complex=!sym)
+arpack.unpack.complex
 }
 \arguments{
   \item{func}{The function to perform the matrix-vector
@@ -26,6 +28,13 @@ arpack(func, extra = NULL, sym = FALSE, options = igraph.arpack.default,
   \item{options}{Options to ARPACK, a named list to overwrite some of
     the default option values. See details below.}
   \item{env}{The environment in which \code{func} will be evaluated.}
+  \item{complex}{Whether to convert the eigenvectors returned by ARPACK
+    into R complex vectors. By default this is not done for symmetric
+    problems (these only have real eigenvectors/values), but only
+    non-symmetric ones. If you have a non-symmetric problem, but you're
+    sure that the results will be real, then supply \code{FALSE} here.
+    The conversion is done by calling \code{arpack.unpack.complex}.
+  }
 }
 \details{
   ARPACK is a library for solving large scale eigenvalue problems.
@@ -175,13 +184,19 @@ arpack(func, extra = NULL, sym = FALSE, options = igraph.arpack.default,
     }
   }
   Please see the ARPACK documentation for additional details.
+
+  \code{arpack.unpack.complex} is a (semi-)internal function that
+  converts the output of the non-symmetric ARPACK solver to a more
+  readable format. It is called internally by \code{arpack}.
   
 }
 \value{
   A named list with the following members:
   \itemize{
     \item{values}{Numeric vector, the desired eigenvalues.}
-    \item{vectors}{Numeric matrix, the desired eigenvectors as columns.}
+    \item{vectors}{Numeric matrix, the desired eigenvectors as
+      columns. If \code{complex=TRUE} (the default for non-symmetric
+      problems), then the matrix is complex.}
     \item{options}{A named list with the supplied \code{options} and
       some information about the performed calculation, including an
       ARPACK exit code. See the details above.

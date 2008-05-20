@@ -23,6 +23,7 @@
 <section><title>ARPACK solvers</title>
 <!-- doxrox-include igraph_arpack_rssolve -->
 <!-- doxrox-include igraph_arpack_rnsolve -->
+<!-- doxrox-include igraph_arpack_unpack_complex -->
 </section>
 
 </chapter>
