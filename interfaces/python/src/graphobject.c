@@ -6531,6 +6531,85 @@ PyObject *igraphmodule_Graph_mincut_value(igraphmodule_GraphObject * self,
   return Py_BuildValue("d", (double)result);
 }
 
+/** \ingroup python_interface_graph
+ * \brief Calculates a minimum cut in an undirected graph
+ */
+PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
+                                    PyObject * args, PyObject * kwds)
+{
+  static char *kwlist[] = { "capacity", NULL };
+  PyObject *capacity_object = Py_None, *cut_o, *part_o, *part2_o, *result;
+  igraph_vector_t capacity_vector;
+  igraph_real_t value;
+  igraph_vector_t partition, partition2, cut;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist,
+                                   &capacity_object))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_attribute_values(capacity_object,
+                                                &capacity_vector,
+                                                self, ATTRHASH_IDX_EDGE, 1.0))
+    return igraphmodule_handle_igraph_error();
+
+  if (igraph_vector_init(&partition, 0)) {
+    igraph_vector_destroy(&capacity_vector);
+	return igraphmodule_handle_igraph_error();
+  }
+  if (igraph_vector_init(&partition2, 0)) {
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&capacity_vector);
+	return igraphmodule_handle_igraph_error();
+  }
+  if (igraph_vector_init(&cut, 0)) {
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&partition2);
+    igraph_vector_destroy(&capacity_vector);
+	return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_mincut(&self->g, &value, &partition, &partition2,
+      &cut, &capacity_vector)) {
+    igraph_vector_destroy(&cut);
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&partition2);
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vector_destroy(&capacity_vector);
+
+  cut_o=igraphmodule_vector_t_to_PyList(&cut, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&cut);
+  if (!cut_o) {
+    igraph_vector_destroy(&partition);
+    igraph_vector_destroy(&partition2);
+	return 0;
+  }
+
+  part_o=igraphmodule_vector_t_to_PyList(&partition, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&partition);
+  if (!part_o) {
+    Py_DECREF(cut_o);
+    igraph_vector_destroy(&partition2);
+    return 0;
+  }
+
+  part2_o=igraphmodule_vector_t_to_PyList(&partition2, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&partition2);
+  if (!part2_o) {
+    Py_DECREF(part_o);
+	Py_DECREF(cut_o);
+    return 0;
+  }
+
+  result = Py_BuildValue("dOOO", (double)value, cut_o, part_o, part2_o);
+  Py_DECREF(cut_o);
+  Py_DECREF(part_o);
+  Py_DECREF(part2_o);
+  return result;
+}
+
 
 /* {{{ CLIQUES AND INDEPENDENT SETS */
 
@@ -9220,6 +9299,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  attribute name or C{None}. In the latter case, every edge will have the\n"
    "  same capacity.\n"
    "@return: the value of the minimum cut between the given vertices\n"},
+
+  {"mincut", (PyCFunction) igraphmodule_Graph_mincut,
+   METH_VARARGS | METH_KEYWORDS,
+   "mincut(capacity=None)\n\n"
+   "Calculates the minimum cut in a graph.\n\n"
+   "Right now it is implemented only for undirected graphs, in which\n"
+   "case it uses the Stoer-Wagner algorithm, as described in the\n"
+   "reference given below.\n\n"
+   "The minimum cut is the minimum set of edges which needs to be removed\n"
+   "to disconnect the graph. The minimum is calculated using the weights\n"
+   "(capacities) of the edges, so the cut with the minimum total capacity\n"
+   "is calculated.\n"
+   "@return: the value of the minimum cut, the IDs of vertices in the\n"
+   "  first and second partition, and the IDs of edges in the cut,\n"
+   "  packed in a 4-tuple\n\n"
+   "@newfield ref: Reference\n"
+   "@ref: M. Stoer, F. Wagner: A simple min-cut algorithm. Journal of\n"
+   "  the ACM 44(4):585-591, 1997.\n"
+   },
 
   /********************************/
   /* CLIQUES AND INDEPENDENT SETS */
