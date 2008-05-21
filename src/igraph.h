@@ -1364,7 +1364,7 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
 			   const igraph_vector_t *capacity);
 
 int igraph_mincut(const igraph_t *graph,
-		  igraph_integer_t *value,
+		  igraph_real_t *value,
 		  igraph_vector_t *partition,
 		  igraph_vector_t *partition2,
 		  igraph_vector_t *cut,

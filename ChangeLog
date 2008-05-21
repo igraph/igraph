@@ -1,3 +1,14 @@
+2008-05-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/flow.c (igraph_mincut) : type of `value` should be
+	igraph_real_t and not igraph_integer_t
+	
+	* interfaces/functions.def : corrected type of `value` in
+	igraph_mincut
+
+	* interfaces/R/src/rinterface.c.in : corrected type of
+	`value` in igraph_mincut
+	
 2008-05-20  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/arpack.c (igraph_arpack_unpack_complex) : added
