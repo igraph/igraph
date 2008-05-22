@@ -1,3 +1,8 @@
+2008-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexedegelist.c (igraph_empty_attrs) :
+	check that number of vertices is finite
+
 2008-04-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/games.c (igraph_erdos_renyi_game_gnm) : bug corrected,
