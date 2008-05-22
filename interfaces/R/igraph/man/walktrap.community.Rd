@@ -30,7 +30,7 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
   http://arxiv.org/abs/physics/0512106
 }
 \value{
-  A named list with two members:
+  A named list with three members:
   \itemize{
     \item{merges}{ The merges performed by the
       algorithm will be stored here. Each merge is a
@@ -44,7 +44,7 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
       vertices in the graph) numbered from zero to \c n-1. The first
       merge created community \c n, the second community \c n+1, etc.
     }
-    \item{membership}{ Numeric vector, the modularity score of the
+    \item{modularity}{ Numeric vector, the modularity score of the
       current community structure after each merge operation. 
     }
     \item{labels}{The labels of the vertices in the graph. The
