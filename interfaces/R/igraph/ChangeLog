@@ -1,3 +1,9 @@
+2008-05-03  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph)
+	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 
+	'arrow.width' edge option added
+
 2008-04-26  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/community.R (fastgreedy.community) :
