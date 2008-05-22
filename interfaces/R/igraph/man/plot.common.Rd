@@ -115,8 +115,11 @@
       By default it is \dQuote{black}.
     }
     \item{shape}{The shape of the vertex, currently only
-      \dQuote{\code{circle}} and \dQuote{\code{square}} is supported,
-      and only by the \code{\link{plot.igraph}} command.
+      \dQuote{\code{circle}}, \dQuote{\code{square}} and
+      \dQuote{\code{none}} are supported,
+      and only by the \code{\link{plot.igraph}}
+      command. \dQuote{\code{none}} does not draw the vertices at all,
+      although vertex label are plotted (if given).
 
       By default vertices are drawn as circles.
     }

@@ -31,11 +31,10 @@ plot.igraph <- function(x,
     stop("Not a graph object")
   }
 
-  # Visual parameters
+  ################################################################
+  ## Visual parameters
   params <- i.parse.plot.params(graph, list(...))
-  vertex.color       <- params("vertex", "color")
-  vertex.frame.color <- params("vertex", "frame.color")
-  vertex.size        <- (1/200) * params("vertex", "size")
+  vertex.size        <- 1/200 * params("vertex", "size")
   label.family       <- params("vertex", "label.family")
   label.font         <- params("vertex", "label.font")
   label.cex          <- params("vertex", "label.cex")
@@ -44,9 +43,6 @@ plot.igraph <- function(x,
   label.dist         <- params("vertex", "label.dist")
   labels             <- params("vertex", "label")
   shape              <- params("vertex", "shape")
-  if (! all(shape %in% c("circle", "square"))) {
-    stop("Unknown vertex shape")
-  }
 
   edge.color         <- params("edge", "color")
   edge.width         <- params("edge", "width")
@@ -70,7 +66,8 @@ plot.igraph <- function(x,
   # the new style parameters can't do this yet
   arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
 
-  # create the plot
+  ################################################################
+  ## create the plot
   maxv <- max(vertex.size)
   if (rescale) {
     # norm layout to (-1, 1)
@@ -83,82 +80,45 @@ plot.igraph <- function(x,
          axes=axes, frame=frame, asp=asp, main=main, sub=sub)
   }
   
-  # add the edges
+  ################################################################
+  ## calculate position of arrow-heads
   el <- get.edgelist(graph, names=FALSE)
   loops.v <- el[,1] [ el[,1] == el[,2] ] + 1
   loops.e <- which(el[,1] == el[,2])
   nonloops.e <- which(el[,1] != el[,2])
   loop.labels <- edge.labels[el[,1] == el[,2]]
   edge.labels <- edge.labels[el[,1] != el[,2]]
-  el <- el[el[,1] != el[,2],]
-  dim(el) <- c(length(el)/2, 2)
-  x0 <- layout[,1][el[,1]+1]
-  y0 <- layout[,2][el[,1]+1]
-  x1 <- layout[,1][el[,2]+1]
-  y1 <- layout[,2][el[,2]+1]
+  el <- el[el[,1] != el[,2],,drop=FALSE]
 
-  square.shift <- function(x0, y0, x1, y1, vsize) {
-    m <- (y0-y1)/(x0-x1)
-    l <- list(c( (-vsize+m*x1)/m , y1-vsize ),
-              c( x1-vsize , y1-vsize*m ),
-              c( (vsize+m*x1)/m , y1+vsize ),
-              c( x1+vsize , y1+vsize*m ) )
-    l <- unique(l)
-    l <- l[ sapply(l, function(p)
-                   x1-vsize <= p[1] & p[1] <= x1+vsize &
-                   y1-vsize <= p[2] & p[2] <= y1+vsize) ]
-    l [[ which.min(sapply(l, function(p) (p[1]-x0)^2 + (p[2]-y0)^2)) ]]
+  edge.coords <- matrix(0, nrow=nrow(el), ncol=4)
+  edge.coords[,1] <- layout[,1][ el[,1]+1 ]
+  edge.coords[,2] <- layout[,2][ el[,1]+1 ]
+  edge.coords[,3] <- layout[,1][ el[,2]+1 ]
+  edge.coords[,4] <- layout[,2][ el[,2]+1 ]
+  if ( length(unique(shape)) == 1) {
+    ## same vertex shape for all vertices
+    ec <- .igraph.shapes[[ shape[1] ]](edge.coords, el, mode="clip",
+                                       params=params, end="both")
+  } else {
+    ## different vertex shapes, do it by "endpoint"
+    shape <- rep(shape, length=vcount(graph))
+    ec <- edge.coords
+    ec[,1:2] <- t(sapply(seq(length=nrow(el)), function(x) {
+      .igraph.shapes[[ shape[el[x,1]+1] ]](edge.coords[x,,drop=FALSE],
+                                           el[x,,drop=FALSE],
+                                           mode="clip", params=params, end="from")
+    }))
+    ec[,3:4] <- t(sapply(seq(length=nrow(el)), function(x) {
+      .igraph.shapes[[ shape[el[x,2]+1] ]](edge.coords[x,,drop=FALSE],
+                                           el[x,,drop=FALSE],
+                                           mode="clip", params=params, end="to")
+    }))
   }
   
-  # we do this for undirected graphs also because some
-  # graphics drivers do not handle 'depth' properly (or at all)
-  if (length(vertex.size)!=1) {
-    vsize.from <- vertex.size[el[,1]+1]
-    vsize.to   <- vertex.size[el[,2]+1]
-  } else {
-    vsize.from <- vsize.to <- vertex.size
-  }
-  if (all(shape=="circle")) {
-    phi <- atan2(y1-y0, x1-x0)
-    r <- sqrt( (x1-x0)^2 + (y1-y0)^2 )
-    x1 <- x0 + (r-vsize.to)*cos(phi)
-    y1 <- y0 + (r-vsize.to)*sin(phi)
-    x0 <- x0 + vsize.from*cos(phi)
-    y0 <- y0 + vsize.from*sin(phi)
-  } else if (all(shape=="square")) {
-    for (i in seq(along=x0)) {
-      sq.shift <- square.shift(x0[i], y0[i], x1[i], y1[i], vsize.to)
-      sq.shift2 <- square.shift(x1[i], y1[i], x0[i], y0[i], vsize.from)
-      x1[i] <- sq.shift[[1]] ; y1[i] <- sq.shift[[2]]
-      x0[i] <- sq.shift2[[1]] ; y0[i] <- sq.shift2[[2]]
-    }
-  } else {
-    vsize.from <- rep(vsize.from, length=length(x0))
-    vsize.to <- rep(vsize.to, length=length(x0))
-    for (i in seq(along=x0)) {
-      if (shape[el[i,2]+1]=="circle") {
-        phi <- atan2(y1[i]-y0[i], x1[i]-x0[i])
-        r <- sqrt( (x1[i]-x0[i])^2 + (y1[i]-y0[i])^2 )
-        x1[i] <- x0[i] + (r-vsize.to[i])*cos(phi)
-        y1[i] <- y0[i] + (r-vsize.to[i])*sin(phi)
-      } else if (shape[el[i,2]+1]=="square") {
-        sq.shift <- square.shift(x0[i], y0[i], x1[i], y1[i], vsize.to[el[i,2]+1])
-        x1[i] <- sq.shift[[1]] ; y1[i] <- sq.shift[[2]]
-      }
-      if (shape[el[i,1]+1]=="circle") {
-        phi <- atan2(y1[i]-y0[i], x1[i]-x0[i])
-        r <- sqrt( (x1[i]-x0[i])^2 + (y1[i]-y0[i])^2 )
-        x0[i] <- x0[i] + vsize.from[i]*cos(phi)
-        y0[i] <- y0[i] + vsize.from[i]*sin(phi)
-      } else if (shape[el[i,1]+1]=="square") {
-        sq.shift <- square.shift(x1[i], y1[i], x0[i], y0[i], vsize.from[el[i,1]+1])
-        x0[i] <- sq.shift[[1]] ; y0[i] <- sq.shift[[2]]
-      }      
-    }
-  }
-  rm (el)
-  
-  # add the loop edges
+  x0 <- ec[,1] ; y0 <- ec[,2] ; x1 <- ec[,3] ; y1 <- ec[,4]
+
+  ################################################################
+  ## add the loop edges
   if (length(loops.e) > 0) {
     ec <- edge.color
     if (length(ec)>1) { ec <- ec[loops.e] }
@@ -248,7 +208,9 @@ plot.igraph <- function(x,
            color=ec, angle=la, label=loop.labels, lty=lty,
            width=ew, arr=arr, arrow.size=asize)
   }
-  
+
+  ################################################################
+  ## non-loop edges
   if (length(x0) != 0) {
     if (length(edge.color)>1) { edge.color <- edge.color[nonloops.e] }
     if (length(edge.width)>1) { edge.width <- edge.width[nonloops.e] }
@@ -260,7 +222,7 @@ plot.igraph <- function(x,
                     sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode,
                     sh.lty=edge.lty, h.lty=1, size=arrow.size)
     } else {
-      ## different kinds of arrow drawn separately as 'arrows' cannot
+      ## different kinds of arrows drawn separately as 'arrows' cannot
       ## handle a vector as the 'code' argument
       for (code in 0:3) {
         valid <- arrow.mode==code
@@ -283,32 +245,18 @@ plot.igraph <- function(x,
   
   rm(x0, y0, x1, y1)
   
+  ################################################################
   # add the vertices
-  if (length(vertex.size)==1) { vertex.size <- rep(vertex.size, nrow(layout)) }
-  if ( all(shape=="circle") ) {
-    symbols(x=layout[,1], y=layout[,2], bg=vertex.color, fg=vertex.frame.color,
-            circles=vertex.size, add=TRUE, inches=FALSE)
-  } else if ( all(shape=="square") ) {
-    symbols(x=layout[,1], y=layout[,2], bg=vertex.color, fg=vertex.frame.color,
-            squares=2*vertex.size, add=TRUE, inches=FALSE)
+  if (length(unique(shape)) == 1) {
+    .igraph.shapes[[ shape[1] ]](layout, mode="plot", params=params)
   } else {
-    if (length(vertex.color)==1) { vertex.color <- rep(vertex.color, nrow(layout)) }
-    if (length(vertex.frame.color)==1) {
-      vertex.frame.color <- rep(vertex.frame.color, nrow(layout))
-    }
-    for (i in seq(along=shape)) {
-      if (shape[i]=="circle") {
-        symbols(x=layout[i,1], y=layout[i,2], bg=vertex.color[i],
-                fg=vertex.frame.color[i], circles=vertex.size[i],
-                add=TRUE, inches=FALSE)
-      } else if (shape[i]=="square") {
-        symbols(x=layout[i,1], y=layout[i,2], bg=vertex.color[i],
-                fg=vertex.frame.color[i], squares=2*vertex.size[i],
-                add=TRUE, inches=FALSE)        
-      }         
-    }
+    sapply(seq(length=vcount(g)), function(v) {
+      .igraph.shapes[[ shape[v] ]](layout[v,,drop=FALSE], v=v-1,
+                                   mode="plot", params=params)
+    })
   }
-
+      
+  ################################################################
   # add the labels
   par(xpd=TRUE)
   x <- layout[,1]+label.dist*cos(-label.degree)* 
