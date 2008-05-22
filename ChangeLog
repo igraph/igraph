@@ -1,5 +1,11 @@
 2008-04-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/structural_properties.c (igraph_is_mutual) : 
+	changed order of arguments to be consistent with is_loop
+	and is_multiple
+	* interfaces/python/src/graphobject.c 
+	(igraphmodule_Graph_is_mutual) : updated
+
 	* src/vector.pmt (igraph_vector_binsearch2) :
 	repair bug when vector is empty
 

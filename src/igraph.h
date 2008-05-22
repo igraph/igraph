@@ -838,7 +838,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 		     igraph_bool_t normalized);
 
-int igraph_is_mutual(igraph_t *graph, igraph_es_t es, igraph_vector_bool_t *res);
+int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
 
 /* -------------------------------------------------- */
 /* Components                                         */

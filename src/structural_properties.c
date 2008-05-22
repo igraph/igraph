@@ -4094,7 +4094,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   return 0;
 }
 
-int igraph_is_mutual(igraph_t *graph, igraph_es_t es, igraph_vector_bool_t *res) {
+int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
 
   igraph_eit_t eit;
   igraph_lazy_adjlist_t adjlist;
