@@ -784,6 +784,7 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
   } else if (nodes1 != nodes2 || edges1 != edges2) { 
     *iso=0;
   } else if (nodes1==3 || nodes1==4) {
+	igraph_isomorphic_34(graph1, graph2, iso);
   } else if (dir1) {
     igraph_isomorphic_vf2(graph1, graph2, iso, 0, 0);
   } else {
