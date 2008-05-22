@@ -22,6 +22,7 @@
 */
 
 #include <igraph.h>
+#include <stdlib.h>
 
 int print_vector(igraph_vector_t *v) {
   long int i, n=igraph_vector_size(v);
