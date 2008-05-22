@@ -1,3 +1,8 @@
+2008-04-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/cattributes.c (igraph_i_cattribute_add_{edges,vertices}) :
+	fixed a memory leak
+	
 2008-03-25  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/foreign.c (igraph_write_graph_gml) : directed graphs
