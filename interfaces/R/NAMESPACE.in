@@ -71,7 +71,8 @@ S3method("as.dendrogram", igraph.eigenc)
 # conversion
 
 export(get.adjacency, get.edgelist, as.directed, as.undirected,
-       get.adjlist, get.adjedgelist)
+       get.adjlist, get.adjedgelist, igraph.from.graphNEL, 
+       igraph.to.graphNEL)
 
 # fitting, other
 

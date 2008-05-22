@@ -144,3 +144,52 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
         PACKAGE="igraph")
 }
 
+igraph.from.graphNEL <- function(graphNEL) {
+
+  require(graph)
+
+  if (!is(graphNEL, "graphNEL")) {
+    stop("Not a graphNEL graph")
+  }
+  
+  al <- lapply(edgeL(graphNEL), "[[", "edges")
+  al <- lapply(al, function(x) x-1)
+  g <- graph.adjlist(al, directed= edgemode(graphNEL)=="directed")
+  V(g)$name <- nodes(graphNEL)
+  g 
+}
+
+igraph.to.graphNEL <- function(graph) {
+
+  if (!is.igraph(graph)) {
+    stop("Not an igraph graph")
+  }
+  
+  require(graph)
+
+  if ("name" %in% list.vertex.attributes(graph) &&
+      is.character(V(graph)$name)) {
+    name <- V(graph)$name
+  } else {
+    name <- as.character(seq(vcount(graph))-1)    
+  }
+
+  edgemode <- if (is.directed(graph)) "directed" else "undirected"  
+
+  if ("weight" %in% list.edge.attributes(graph) &&
+      is.numeric(E(graph)$weight)) {
+    al <- get.adjedgelist(graph, "out")
+    for (i in seq(along=al)) {
+      edges <- get.edges(graph, al[[i]])
+      edges <- ifelse( edges[,2]==i-1, edges[,1], edges[,2])
+      weights <- E(graph)$weight[al[[i]]+1]
+      al[[i]] <- list(edges=edges+1, weights=weights)
+    }
+  } else {
+    al <- get.adjlist(graph, "out")
+    al <- lapply(al, function(x) list(edges=x+1))
+  }  
+    
+  names(al) <- name
+  new("graphNEL", nodes=name, edgeL=al, edgemode=edgemode)
+}

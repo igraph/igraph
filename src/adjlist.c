@@ -208,6 +208,20 @@ void igraph_adjlist_destroy(igraph_adjlist_t *al) {
   igraph_Free(al->adjs);
 }
 
+/**
+ * \function igraph_adjlist_size
+ * Number of vertices in an adjacency list.
+ * 
+ * \param al The adjacency list.
+ * \return The number of elements.
+ * 
+ * Time complexity: O(1).
+ */
+
+igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
+  return al->length;
+}
+
 /* igraph_vector_t *igraph_adjlist_get(igraph_adjlist_t *al, igraph_integer_t no) { */
 /*   return &al->adjs[(long int)no]; */
 /* } */

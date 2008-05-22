@@ -53,6 +53,7 @@ int R_SEXP_to_igraph(SEXP graph, igraph_t *res);
 int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res);
 int R_SEXP_to_igraph_vs(SEXP rit, igraph_t *graph, igraph_vs_t *it);
 int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
+int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 
 /* get the list element named str, or return NULL */
 /* from the R Manual */
@@ -1137,6 +1138,19 @@ void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr) {
     igraph_free(v);
   }
   igraph_vector_ptr_destroy(ptr);
+}
+
+int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr) {
+  long int length=GET_LENGTH(vectorlist);
+  long int i;
+
+  ptr->length=length;
+  ptr->adjs = (igraph_vector_t*) R_alloc(length, sizeof(igraph_vector_t));
+  for (i=0; i<length; i++) {
+    SEXP vec=VECTOR_ELT(vectorlist, i);
+    igraph_vector_view(&ptr->adjs[i], REAL(vec), GET_LENGTH(vec));
+  }
+  return 0;
 }
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv) {

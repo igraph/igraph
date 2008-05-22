@@ -91,3 +91,6 @@ BLISSSH:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "f"=0, "fl"=1, "fs"=2, "fm"=3, "flm"=4, "fsm"=5)
 
 BLISSINFO:
+
+ADJLIST:
+    INCONV: %I% <- lapply(%I%, as.numeric)
