@@ -2374,7 +2374,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
   }      
 
   /* directedness */
-  CHECK(fprintf(outstream, "  directed %i\n", igraph_is_directed(graph) ? 0 : 1));
+  CHECK(fprintf(outstream, "  directed %i\n", igraph_is_directed(graph) ? 1 : 0));
 
   /* Graph attributes first */
   for (i=0; i<igraph_vector_size(&gtypes); i++) {
