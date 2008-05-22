@@ -1339,16 +1339,26 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
 	rootsep = vdata[leftroot].offset + minsep;
 	loffset = 0; roffset = minsep;
 	/* printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n",
-	 lnode, rnode, loffset, roffset, rootsep);*/
+	 lnode, rnode, loffset, roffset, rootsep); */
 	while ((lnode >= 0) && (rnode >= 0)) {
 	  /* Step to the next level on the left contour */
 	  if (vdata[lnode].right_contour >= 0) {
 	    lnode = vdata[lnode].right_contour;
 	    loffset += vdata[lnode].offset;
-	  } else {
+	  } else if (vdata[lnode].left_contour >= 0) {
 	    lnode = vdata[lnode].left_contour;
-	    if (lnode >= 0) loffset += vdata[lnode].offset;
-	  }
+	    loffset += vdata[lnode].offset;
+	  } else if (vdata[rnode].left_contour >= 0) {
+        /* Left subtree ended, but the contour continues on the left
+         * contour of the right subtree one level deeper */
+        lnode = vdata[rnode].left_contour;
+        loffset += vdata[lnode].offset;
+      } else { 
+        /* Left subtree ended, the contour continues on the right contour
+         * of the right subtree (but where is the left contour at this part???) */
+        lnode = vdata[rnode].right_contour;
+        if (lnode >= 0) loffset += vdata[lnode].offset;
+      }
 	  /* Step to the next level on the right contour */
 	  if (vdata[rnode].left_contour >= 0) {
 	    rnode = vdata[rnode].left_contour;
@@ -1367,7 +1377,7 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
 	    /* printf("      Right subtree ended, continuing its contours to %d\n", vdata[rnode].left_contour); */
 	  }
 	  /* printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n", 
-	   lnode, rnode, loffset, roffset, rootsep);*/
+	   lnode, rnode, loffset, roffset, rootsep); */
 	  
 	  /* Push subtrees away if necessary */
 	  if ((lnode >= 0) && (rnode >= 0) && (roffset - loffset < minsep)) {
