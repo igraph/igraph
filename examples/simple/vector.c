@@ -37,6 +37,7 @@ int main() {
   igraph_vector_t v, v2, v3;
   int i;
   igraph_real_t *ptr;
+  long int pos;
 
   /* simple init */
   igraph_vector_init(&v, 0);
@@ -240,6 +241,18 @@ int main() {
     }
   }
   igraph_vector_destroy(&v);
+
+  /* Binsearch in empty vector */
+  igraph_vector_init(&v, 0);
+  if (igraph_vector_binsearch2(&v, 0)) {
+    return 16;
+  }
+  if (igraph_vector_binsearch(&v, 1, &pos)) {
+    return 17;
+  }
+  if (pos != 0) {
+    return 18;
+  }
 
   /* igraph_vector_init_real */
   igraph_vector_init_real(&v, 10, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0);

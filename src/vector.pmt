@@ -1343,6 +1343,10 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch2)(const TYPE(igraph_vector) *v,
   long int left=0;
   long int right=v->end - v->stor_begin-1;
 
+  if (right<0) {
+    return 0;
+  }
+
   while (left < right-1) {
     long int middle=(left+right)/2;
     if (VECTOR(*v)[middle] > what) {

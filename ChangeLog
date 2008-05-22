@@ -1,3 +1,8 @@
+2008-04-28  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/vector.pmt (igraph_vector_binsearch2) :
+	repair bug when vector is empty
+
 2008-04-28  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/topology.c (igraph_isomorphic) : bugfix, closes issue #117
