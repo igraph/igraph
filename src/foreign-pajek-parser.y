@@ -55,6 +55,7 @@ extern int igraph_pajek_yylex(void);
 extern int igraph_pajek_mylineno;
 extern char *igraph_pajek_yytext;
 extern int igraph_pajek_yyleng;
+char *igraph_i_pajek_errmsg;
 int igraph_pajek_yyerror(char *s);
 int igraph_i_pajek_add_string_vertex_attribute(const char *name, 
 					       const char *value,
@@ -475,11 +476,12 @@ word: ALNUM { $$.str=igraph_pajek_yytext; $$.len=igraph_pajek_yyleng; }
 
 int igraph_pajek_yyerror(char *s)
 {
-  char str[200];  
+  static char str[300];  
   igraph_i_pajek_reset_scanner();
-  snprintf(str, sizeof(str), "Parse error in pajek file, line %li", 
-	   (long)igraph_pajek_mylineno);
-  IGRAPH_ERROR(str, IGRAPH_PARSEERROR);
+  snprintf(str, sizeof(str), "Parse error in Pajek file, line %li (%s)", 
+	   (long)igraph_pajek_mylineno, s);
+  igraph_i_pajek_errmsg = &str;
+  return 0;
 }
 
 igraph_real_t igraph_pajek_get_number(const char *str, long int length) {
