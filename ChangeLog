@@ -1,3 +1,8 @@
+2008-04-09  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* src/layout.c (igraph_reingold_tilford) :
+	really fixed issue #100 :)
+	
 2008-04-07  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/structure_generators.c (igraph_weighted_adjacency) : now
