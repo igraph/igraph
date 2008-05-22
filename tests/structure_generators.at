@@ -51,6 +51,11 @@ AT_KEYWORDS([adjacency matrix igraph_adjacency])
 AT_COMPILE_CHECK([simple/igraph_adjacency.c])
 AT_CLEANUP
 
+AT_SETUP([From weighted adjacency matrix (igraph_weighted_adjacency):])
+AT_KEYWORDS([weighted adjacency matrix igraph_weighted_adjacency])
+AT_COMPILE_CHECK([simple/igraph_weighted_adjacency.c], [simple/igraph_weighted_adjacency.out])
+AT_CLEANUP
+
 AT_SETUP([Star graph (igraph_star):])
 AT_KEYWORDS([star igraph_star])
 AT_COMPILE_CHECK([simple/igraph_star.c])

@@ -27,7 +27,7 @@ AT_COMPILE_CHECK([simple/cattributes.c], [simple/cattributes.out],
 	         [simple/LINKS.NET])
 AT_CLEANUP
 
-AT_SETUP([Writing an attributed graph in GraphML:])
-AT_KEYWORDS([graphml GraphML attributes])
+AT_SETUP([Writing an attributed graph in GML and GraphML:])
+AT_KEYWORDS([gml GML graphml GraphML attributes])
 AT_COMPILE_CHECK([simple/cattributes2.c], [simple/cattributes2.out])
 AT_CLEANUP
