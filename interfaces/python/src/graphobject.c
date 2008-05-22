@@ -637,6 +637,53 @@ PyObject *igraphmodule_Graph_is_multiple(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Checks whether an edge is mutual 
+ * \return a boolean or a list of booleans
+ * \sa igraph_is_mutual
+ */
+PyObject *igraphmodule_Graph_is_mutual(igraphmodule_GraphObject *self,
+                                       PyObject *args, PyObject *kwds) {
+  PyObject *list = Py_None;
+  igraph_vector_bool_t result;
+  igraph_es_t es;
+  igraph_bool_t return_single = 0;
+
+  static char *kwlist[] = { "edges", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (igraph_vector_bool_init(&result, 0)) {
+    igraph_es_destroy(&es);
+    return NULL;
+  }
+
+  if (igraph_is_mutual(&self->g, es, &result)) {
+    igraphmodule_handle_igraph_error();
+    igraph_es_destroy(&es);
+    igraph_vector_bool_destroy(&result);
+    return NULL;
+  }
+
+  if (!return_single)
+    list = igraphmodule_vector_bool_t_to_PyList(&result);
+  else {
+    list = (VECTOR(result)[0]) ? Py_True : Py_False;
+    Py_INCREF(list);
+  }
+
+  igraph_vector_bool_destroy(&result);
+  igraph_es_destroy(&es);
+
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief Checks the multiplicity of the edges 
  * \return the edge multiplicities as a Python list
  * \sa igraph_count_multiple
@@ -7194,6 +7241,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "reported as multiple (only the others). This allows one to easily\n"
    "detect the edges that have to be deleted in order to make the graph\n"
    "free of multiple edges.\n\n"
+   "@param edges: edge indices which we want to check. If C{None}, all\n"
+   "  edges are checked.\n"
+   "@return: a list of booleans, one for every edge given\n"},
+
+  /* interface to igraph_is_mutual */
+  {"is_mutual", (PyCFunction) igraphmodule_Graph_is_mutual,
+   METH_VARARGS | METH_KEYWORDS,
+   "is_mutual(edges=None)\n\n"
+   "Checks whether an edge has an opposite pair.\n\n"
+   "Also works for a set of edges -- in this case, every edge is checked\n"
+   "one by one. The result will be a list of booleans (or a single boolean\n"
+   "if only an edge index is supplied), every boolean corresponding to an\n"
+   "edge in the edge set supplied. C{True} is returned for a given edge\n"
+   "M{a} --> M{b} if there exists another edge M{b} --> M{a} in the\n"
+   "original graph (not the given edge set!). All edges in an undirected\n"
+   "graph are mutual. In case there are multiple edges between M{a}\n"
+   "and M{b}, it is enough to have at least one edge in either direction\n"
+   "to report all edges between them as mutual, so the multiplicity\n"
+   "of edges do not matter.\n\n"
    "@param edges: edge indices which we want to check. If C{None}, all\n"
    "  edges are checked.\n"
    "@return: a list of booleans, one for every edge given\n"},
