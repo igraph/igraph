@@ -12,7 +12,8 @@
   network. \code{get.shortest.paths} calculates one shortest path (the
   path itself, and not just its length) from or to the given vertex.}
 \usage{
-shortest.paths(graph, v=V(graph), mode = c("all", "out", "in"))
+shortest.paths(graph, v=V(graph), mode = c("all", "out", "in"),
+      weights = NULL)
 get.shortest.paths(graph, from, to=V(graph), mode = c("all", "out", "in"))
 get.all.shortest.paths(graph, from, to = V(graph), mode = c("all", "out", "in")) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
@@ -29,6 +30,10 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
     default, then the corresponding undirected graph will be used,
     ie. not directed paths are searched. This argument is ignored for
     undirected graphs.}
+  \item{weights}{Possibly a numeric vector giving edge weights. If this
+    is \code{NULL} and the graph has a \code{weight} edge attribute,
+    then the attribute is used. If this is \code{NA} then no weights are
+    used (even if the graph has a \code{weight} attribute).}
   \item{from}{Numeric constant, the vertex from or to the shortest paths
     will be calculated. Note that right now this is not a vector of
     vertex ids, but only a single vertex.}
@@ -68,7 +73,7 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
 \value{
   For \code{shortest.paths} a numeric matrix with \code{vcount(graph)}
   columns and \code{length(v)} rows. The shortest path length from a vertex to
-  itself is always zero.
+  itself is always zero. For unreachable vertices \code{Inf} is included.
 
   For \code{get.shortest.paths} a list of length
   \code{vcount(graph)}. List element \code{i} contains the vertex ids on
@@ -103,5 +108,12 @@ shortest.paths(g)
 get.shortest.paths(g, 5)
 get.all.shortest.paths(g, 0, 5:7)
 average.path.length(g)
+## Weighted shortest paths
+el <- matrix(nc=3, byrow=TRUE,
+             c(0,1,0, 0,2,2, 0,3,1, 1,2,0, 1,4,5, 1,5,2, 2,1,1, 2,3,1,
+               2,6,1, 3,2,0, 3,6,2, 4,5,2, 4,7,8, 5,2,2, 5,6,1, 5,8,1,
+               5,9,3, 7,5,1, 7,8,1, 8,9,4) )
+g2 <- add.edges(graph.empty(10), t(el[,1:2]), weight=el[,3])
+shortest.paths(g2, mode="out")
 }
 \keyword{graphs}

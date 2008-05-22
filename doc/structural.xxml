@@ -15,6 +15,7 @@
 
 <section><title>Shortest Path Related Functions</title>
 <!-- doxrox-include igraph_shortest_paths -->
+<!-- doxrox-include igraph_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_get_shortest_paths -->
 <!-- doxrox-include igraph_get_all_shortest_paths -->
 <!-- doxrox-include igraph_average_path_length -->
