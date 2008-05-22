@@ -1,5 +1,8 @@
 2008-04-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/games.c (igraph_erdos_renyi_game_gnm) : bug corrected,
+	no multiedges are generated now
+
 	* src/random.c (igraph_random_sample_alga)
 	(igraph_random_sample) : bugs corrected
 
