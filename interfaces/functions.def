@@ -917,7 +917,7 @@ igraph_st_mincut_value:
         IGNORE: RR, RC, RNamespace
 
 igraph_mincut:
-        PARAMS: GRAPH graph, OUT INTEGERPTR value, OUT VECTOR partition, \
+        PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR partition, \
                 OUT VECTOR partition2, OUT VECTOR cut, VECTOR_OR_0 capacity
         IGNORE: RR, RC, RNamespace
 

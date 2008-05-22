@@ -5084,7 +5084,7 @@ SEXP R_igraph_mincut(SEXP graph, SEXP pcapacity) {
 
   igraph_t g;
   igraph_vector_t capacity, *ppcapacity=0;
-  igraph_integer_t value;
+  igraph_real_t value;
   igraph_vector_t partition;
   igraph_vector_t partition2;
   igraph_vector_t cut;
