@@ -3,6 +3,11 @@
 	* interfaces/R/igraph/R/plot.R (plot.igraph) : plot edge labels
 	at one third of the edge to allow better plotting of mutual edges
 
+2008-02-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.shapes.R : handle graphs which contain 
+	no edges at all
+
 2008-02-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.shapes.R
