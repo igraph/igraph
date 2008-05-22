@@ -117,7 +117,8 @@ graph.formula <- function(...) {
 
 graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
                                          "min", "upper", "lower", "plus"),
-                            weighted=NULL, diag=TRUE ) {
+                            weighted=NULL, diag=TRUE,
+                            add.colnames=NULL, add.rownames=NA) {
 
   mode <- igraph.match.arg(mode)
   
@@ -198,9 +199,51 @@ graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
     attributes(adjmatrix) <- attrs
     
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),
-          PACKAGE="igraph")
+    res <- .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),
+                 PACKAGE="igraph")
   }
+
+  ## Add columns and row names as attributes
+  if (is.null(add.colnames)) {
+    if (!is.null(colnames(adjmatrix))) {
+      add.colnames <- "name"
+    } else {
+      add.colnames <- NA
+    }
+  } else if (!is.na(add.colnames)) {
+    if (is.null(colnames(adjmatrix))) {
+      warning("No column names to add")
+      add.colnames <- NA
+    }
+  }
+  
+  if (is.null(add.rownames)) {
+    if (!is.null(rownames(adjmatrix))) {
+      add.rownames <- "name"
+    } else {
+      add.colnames <- NA
+    }
+  } else if (!is.na(add.rownames)) {
+    if (is.null(rownames(adjmatrix))) {
+      warning("No row names to add")
+      add.rownames <- NA
+    }
+  }
+
+  if (!is.na(add.rownames) && !is.na(add.colnames) &&
+      add.rownames == add.colnames ) {
+    warning("Same attribute for columns and rows, row names are ignored")
+    add.rownames <- NA
+  }
+
+  if (!is.na(add.colnames)) {
+    res <- set.vertex.attribute(res, add.colnames, value=colnames(adjmatrix))
+  }
+  if (!is.na(add.rownames)) {
+    res <- set.vertex.attribute(res, add.rownames, value=rownames(adjmatrix))
+  }
+
+  res
 }
   
 
