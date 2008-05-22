@@ -481,6 +481,10 @@ igraph_arpack_rnsolve:
         DEFAULT-R: options=igraph.arpack.default
         IGNORE: RR, RC, RNamespace
 
+igraph_arpack_unpack_complex:
+        PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev
+        NAME-R: arpack.unpack.complex
+
 #######################################
 # Spectral properties
 #######################################

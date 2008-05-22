@@ -316,4 +316,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_arpack_storage_t *storage,
 			  igraph_matrix_t *values, igraph_matrix_t *vectors);
 
+int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values, 
+				 long int nev);
+
 #endif

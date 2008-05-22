@@ -219,8 +219,15 @@ MATRIX:
             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \
          IGRAPH_FINALLY(igraph_matrix_destroy, &%C%);
+    INOUT: if (0 != R_SEXP_to_igraph_matrix_copy(%I%, &%C%)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_matrix_destroy, &%C%);
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_matrix_to_SEXP(&%C%)); \
+         igraph_matrix_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+    INOUT: PROTECT(%I%=R_igraph_matrix_to_SEXP(&%C%)); \
          igraph_matrix_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 

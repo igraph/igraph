@@ -1,3 +1,8 @@
+2008-05-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/centrality.R (arpack) : 
+	convert result of the non-symmetric solver to a better format
+
 2008-05-03  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/plot.R (plot.igraph)
