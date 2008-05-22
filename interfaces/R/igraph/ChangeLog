@@ -1,3 +1,10 @@
+2008-04-26  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/community.R (fastgreedy.community) :
+	added 'weights' argument
+	* interfaces/R/src/rinterface.c.in (R_igraph_community_fastgreedy) :
+	updated
+
 2008-04-02  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.adjacency) :
