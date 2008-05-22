@@ -1,5 +1,11 @@
 2008-04-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
+	* src/structure_generators.c (igraph_weighted_adjacency) : added
+	
+	* examples/simple/igraph_weighted_adjacency.{c,out} : added
+	
+2008-04-05  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
 	* src/cattributes.c (igraph_i_cattribute_add_{edges,vertices}) :
 	fixed a memory leak
 	
