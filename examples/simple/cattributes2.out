@@ -9,132 +9,157 @@ graph
   node
   [
     id 1
+    name "foo"
   ]
   node
   [
     id 2
+    name "foobar"
   ]
   node
   [
     id 3
+    name ""
   ]
   node
   [
     id 4
+    name ""
   ]
   node
   [
     id 5
+    name ""
   ]
   node
   [
     id 6
+    name ""
   ]
   node
   [
     id 7
+    name ""
   ]
   node
   [
     id 8
+    name ""
   ]
   node
   [
     id 9
+    name ""
   ]
   node
   [
     id 10
+    name ""
   ]
   edge
   [
     source 2
     target 1
     id 1
+    name "FOO"
   ]
   edge
   [
     source 5
     target 1
     id 2
+    name "FOOBAR"
   ]
   edge
   [
     source 6
     target 1
     id 3
+    name ""
   ]
   edge
   [
     source 3
     target 2
     id 4
+    name ""
   ]
   edge
   [
     source 7
     target 2
     id 5
+    name ""
   ]
   edge
   [
     source 4
     target 3
     id 6
+    name ""
   ]
   edge
   [
     source 8
     target 3
     id 7
+    name ""
   ]
   edge
   [
     source 5
     target 4
     id 8
+    name ""
   ]
   edge
   [
     source 9
     target 4
     id 9
+    name ""
   ]
   edge
   [
     source 10
     target 5
     id 10
+    name ""
   ]
   edge
   [
     source 8
     target 6
     id 11
+    name ""
   ]
   edge
   [
     source 9
     target 6
     id 12
+    name ""
   ]
   edge
   [
     source 9
     target 7
     id 13
+    name ""
   ]
   edge
   [
     source 10
     target 7
     id 14
+    name ""
   ]
   edge
   [
     source 10
     target 8
     id 15
+    name ""
   ]
 ]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -147,85 +172,112 @@ graph
   <key id="vertices" for="graph" attr.name="vertices" attr.type="double"/>
   <key id="edges" for="graph" attr.name="edges" attr.type="double"/>
   <key id="id" for="node" attr.name="id" attr.type="double"/>
+  <key id="name" for="node" attr.name="name" attr.type="string"/>
   <key id="id" for="edge" attr.name="id" attr.type="double"/>
+  <key id="name" for="edge" attr.name="name" attr.type="string"/>
   <graph id="G" edgedefault="undirected">
     <data key="name">Petersen&apos;s graph</data>
     <data key="vertices">10</data>
     <data key="edges">15</data>
     <node id="n0">
       <data key="id">1</data>
+      <data key="name">foo</data>
     </node>
     <node id="n1">
       <data key="id">2</data>
+      <data key="name">foobar</data>
     </node>
     <node id="n2">
       <data key="id">3</data>
+      <data key="name"></data>
     </node>
     <node id="n3">
       <data key="id">4</data>
+      <data key="name"></data>
     </node>
     <node id="n4">
       <data key="id">5</data>
+      <data key="name"></data>
     </node>
     <node id="n5">
       <data key="id">6</data>
+      <data key="name"></data>
     </node>
     <node id="n6">
       <data key="id">7</data>
+      <data key="name"></data>
     </node>
     <node id="n7">
       <data key="id">8</data>
+      <data key="name"></data>
     </node>
     <node id="n8">
       <data key="id">9</data>
+      <data key="name"></data>
     </node>
     <node id="n9">
       <data key="id">10</data>
+      <data key="name"></data>
     </node>
     <edge source="n0" target="n1">
       <data key="id">1</data>
+      <data key="name">FOO</data>
     </edge>
     <edge source="n0" target="n4">
       <data key="id">2</data>
+      <data key="name">FOOBAR</data>
     </edge>
     <edge source="n0" target="n5">
       <data key="id">3</data>
+      <data key="name"></data>
     </edge>
     <edge source="n1" target="n2">
       <data key="id">4</data>
+      <data key="name"></data>
     </edge>
     <edge source="n1" target="n6">
       <data key="id">5</data>
+      <data key="name"></data>
     </edge>
     <edge source="n2" target="n3">
       <data key="id">6</data>
+      <data key="name"></data>
     </edge>
     <edge source="n2" target="n7">
       <data key="id">7</data>
+      <data key="name"></data>
     </edge>
     <edge source="n3" target="n4">
       <data key="id">8</data>
+      <data key="name"></data>
     </edge>
     <edge source="n3" target="n8">
       <data key="id">9</data>
+      <data key="name"></data>
     </edge>
     <edge source="n4" target="n9">
       <data key="id">10</data>
+      <data key="name"></data>
     </edge>
     <edge source="n5" target="n7">
       <data key="id">11</data>
+      <data key="name"></data>
     </edge>
     <edge source="n5" target="n8">
       <data key="id">12</data>
+      <data key="name"></data>
     </edge>
     <edge source="n6" target="n8">
       <data key="id">13</data>
+      <data key="name"></data>
     </edge>
     <edge source="n6" target="n9">
       <data key="id">14</data>
+      <data key="name"></data>
     </edge>
     <edge source="n7" target="n9">
       <data key="id">15</data>
+      <data key="name"></data>
     </edge>
   </graph>
 </graphml>

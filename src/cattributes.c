@@ -793,7 +793,7 @@ int igraph_i_cattribute_get_string_vertex_attr(const igraph_t *graph,
       long int v=IGRAPH_VIT_GET(it);
       char *s;
       igraph_strvector_get(str, v, &s);
-      IGRAPH_CHECK(igraph_strvector_set(str, i, s));
+      IGRAPH_CHECK(igraph_strvector_set(value, i, s));
     }
     igraph_vit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
@@ -869,7 +869,7 @@ int igraph_i_cattribute_get_string_edge_attr(const igraph_t *graph,
       long int e=IGRAPH_EIT_GET(it);
       char *s;
       igraph_strvector_get(str, e, &s);
-      IGRAPH_CHECK(igraph_strvector_set(str, i, s));
+      IGRAPH_CHECK(igraph_strvector_set(value, i, s));
     }
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1500,21 +1500,21 @@ int igraph_cattribute_EAS_set(igraph_t *graph, const char *name,
     igraph_i_attribute_record_t *rec=igraph_Calloc(1, igraph_i_attribute_record_t);
     igraph_strvector_t *str;
     if (!rec) {
-      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, rec);
     rec->name=strdup(name);
     if (!rec->name) {
-      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, (char*)rec->name);
     rec->type=IGRAPH_ATTRIBUTE_STRING;
     str=igraph_Calloc(1, igraph_strvector_t);
     if (!str) {
-      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, str);
-    IGRAPH_STRVECTOR_INIT_FINALLY(str, igraph_vcount(graph));
+    IGRAPH_STRVECTOR_INIT_FINALLY(str, igraph_ecount(graph));
     IGRAPH_CHECK(igraph_strvector_set(str, eid, value));
     rec->value=str;
     IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));

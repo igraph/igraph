@@ -203,7 +203,7 @@ int main() {
     return 16;
   }
   
-  /* Set vector attributes */
+  /* Set vertex attributes */
   SETVAN(&g, "y", 0, -1);
   SETVAN(&g, "y", 1, 2.1);
   if (VAN(&g, "y", 0) != -1 || 
