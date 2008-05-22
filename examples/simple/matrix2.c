@@ -310,5 +310,7 @@ int main() {
   igraph_matrix_destroy(&m2);
   igraph_matrix_destroy(&m);
 
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 10;
+
   return 0;
 }

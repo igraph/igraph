@@ -90,6 +90,8 @@ int main() {
     printf("%d: %s\n", i, str);
   }
   igraph_trie_destroy(&trie);
+
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 1;
   
   return 0;
 }

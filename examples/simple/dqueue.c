@@ -93,5 +93,7 @@ int main() {
   }
   igraph_dqueue_destroy(&q);
 
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 12;
+
   return 0;
 }

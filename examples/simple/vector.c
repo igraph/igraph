@@ -314,7 +314,9 @@ int main() {
     }
   }
   igraph_vector_destroy(&v);
-  
+
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 16;
+
   return 0;
 }
   

@@ -235,5 +235,7 @@ int main() {
 
   igraph_vector_ptr_destroy(&v2);
    
+  if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 24;
+
   return 0;
 }

@@ -183,6 +183,8 @@ int main() {
   igraph_strvector_set(&sv1, 4, "five");
   strvector_print(&sv1);
   igraph_strvector_destroy(&sv1);
+
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 4;
   
   return 0;
 }
