@@ -489,6 +489,11 @@ igraph_laplacian:
         PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False
         IGNORE: RR, RC, RNamespace
 
+igraph_is_mutual:
+        PARAMS: GRAPH graph, EDGESET es=ALL, OUT VECTOR_BOOL res
+        DEPS: es ON graph
+        NAME-R: is.mutual
+
 #######################################
 # Components
 #######################################

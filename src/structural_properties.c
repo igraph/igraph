@@ -3995,7 +3995,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode) {
 
-  /* Implementation details. This is the basi Dijkstra algorithm, 
+  /* Implementation details. This is the basic Dijkstra algorithm, 
      with a binary heap. The heap is indexed, i.e. it stores not only
      the distances, but also which vertex they belong to. The other
      mapping, i.e. getting the distance for a vertex is not in the
@@ -4091,5 +4091,51 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     }
   }
   
+  return 0;
+}
+
+int igraph_is_mutual(igraph_t *graph, igraph_es_t es, igraph_vector_bool_t *res) {
+
+  igraph_eit_t eit;
+  igraph_lazy_adjlist_t adjlist;
+  long int i;
+  
+  /* How many edges do we have? */
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+  IGRAPH_CHECK(igraph_vector_bool_resize(res, IGRAPH_EIT_SIZE(eit)));
+
+  /* An undirected graph has mutual edges by definition,
+     res is already properly resized */
+  if (! igraph_is_directed(graph)) {
+    igraph_vector_bool_fill(res, 1);
+    igraph_eit_destroy(&eit);
+    IGRAPH_FINALLY_CLEAN(1);
+    return 0;
+  }
+
+  IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_OUT, IGRAPH_DONT_SIMPLIFY));
+  IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+  
+  for (i=0; ! IGRAPH_EIT_END(eit); i++, IGRAPH_EIT_NEXT(eit)) {
+    long int edge=IGRAPH_EIT_GET(eit);
+    long int from=IGRAPH_FROM(graph, edge);
+    long int to=IGRAPH_TO(graph, edge);
+    
+    /* Check whether there is a to->from edge, search for from in the
+       out-list of to. We don't search an empty vector, because
+       vector_binsearch seems to have a bug with this. */
+    igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, to);
+    if (igraph_vector_empty(neis)) {
+      VECTOR(*res)[i]=0;
+    } else {
+      VECTOR(*res)[i]=igraph_vector_binsearch2(neis, from);
+    }
+  }
+
+  igraph_lazy_adjlist_destroy(&adjlist);
+  igraph_eit_destroy(&eit);
+  IGRAPH_FINALLY_CLEAN(2);
+
   return 0;
 }

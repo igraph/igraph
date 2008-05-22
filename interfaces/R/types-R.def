@@ -20,6 +20,9 @@ VECTOR:
 VECTOR_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.numeric(%I%)
 
+VECTOR_BOOL:
+    INCONV: %I% <- as.logical(%I%)
+
 MATRIX:
     INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
 
@@ -64,6 +67,11 @@ VERTEXSET:
     INCONV: %I% <- as.igraph.vs(%I%)
     DEFAULT:
        ALL: V(%I1%)
+
+EDGESET:
+    INCONV: %I% <- as.igraph.es(%I%)
+    DEFAULT:
+       ALL: E(%I1%)
 
 EDGEWEIGHTS:
     INCONV: if (is.null(%I%) && "weight" %in% list.edge.attributes(%I1%)) { \
