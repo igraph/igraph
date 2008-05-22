@@ -3,6 +3,14 @@
 	* interfaces/python/src/graphobject.c
 	(igraphmodule_Graph_is_mutual) : added
 
+	* src/cocitation.c (igraph_similarity_inverse_log_weighted) : added
+
+	* examples/simple/igraph_similarity.* : added test case for
+	inverse log-weighted similarity
+
+	* interfaces/python/src/graphobject.c
+	(igraphmodule_Graph_similarity_inverse_log_weighted) : added
+
 2008-04-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/structural_properties.c (igraph_is_mutual) : added
