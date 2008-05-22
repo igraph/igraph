@@ -1,5 +1,8 @@
 2008-04-28  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/random.c (igraph_random_sample_alga)
+	(igraph_random_sample) : bugs corrected
+
 	* src/structural_properties.c (igraph_is_mutual) : 
 	changed order of arguments to be consistent with is_loop
 	and is_multiple

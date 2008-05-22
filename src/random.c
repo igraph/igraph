@@ -90,9 +90,12 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
   igraph_real_t Nreal=N;
   igraph_real_t S=0;
   igraph_real_t V, quot;
+  
+  l=l-1;
 
   while (n>=2) {
     V=RNG_UNIF01();
+    S=1;
     quot=top/Nreal;
     while (quot>V) {
       S+=1;
@@ -102,11 +105,11 @@ int igraph_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_i
     }
     l+=S;
     igraph_vector_push_back(res, l);	/* allocated */
-    Nreal=-1.0+Nreal; n=-1+n; S=1;
+    Nreal=-1.0+Nreal; n=-1+n;
   }
   
-  S=floor(rint(Nreal)*RNG_UNIF01())+1;
-  l+=S;
+  S=floor(round(Nreal)*RNG_UNIF01());
+  l+=S+1;
   igraph_vector_push_back(res, l);	/* allocated */
   
   return 0;
@@ -169,6 +172,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
       while(1) {
 	X=Nreal*(-Vprime+1.0);
 	S=floor(X);
+	if (S==0) { S=1; }
 	if (S <qu1) { break; }
 	Vprime = exp(log(RNG_UNIF01())*ninv);
       }
@@ -199,7 +203,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_integer_t l, igraph_intege
       }
       Vprime=exp(log(RNG_UNIF01())*ninv);
     }
-    
+        
     l+=S;
     igraph_vector_push_back(res, l);	/* allocated */
     N=-S+(-1+N);   Nreal=negSreal+(-1.0+Nreal);
