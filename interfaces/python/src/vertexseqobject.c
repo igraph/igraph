@@ -305,9 +305,17 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
 PyObject* igraphmodule_VertexSeq_get_attribute_values_mapping(igraphmodule_VertexSeqObject *self, PyObject *o) {
   /* Handle integer indices according to the sequence protocol */
   if (PyInt_Check(o)) return igraphmodule_VertexSeq_sq_item(self, PyInt_AsLong(o));
-  if (PyTuple_Check(o) || PyList_Check(o)) {
+  if (PyTuple_Check(o)) {
     /* Return a restricted VertexSeq */
     return igraphmodule_VertexSeq_select(self, o, NULL);
+  } else if (PyList_Check(o)) {
+    /* Return a restricted VertexSeq */
+    PyObject *t = PyList_AsTuple(o);
+    PyObject *result;
+    if (!t) return NULL;
+    result = igraphmodule_VertexSeq_select(self, t, NULL);
+    Py_DECREF(t);
+    return result;
   }
   return igraphmodule_VertexSeq_get_attribute_values(self, o);
 }
