@@ -34,7 +34,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 
 int main() {
   
-  igraph_vector_t v1, v2;
+  igraph_vector_t v1, v2, v3;
   igraph_real_t min, max;
   long int imin, imax;
   int i;
@@ -99,7 +99,20 @@ int main() {
   }
 
   igraph_vector_destroy(&v1);
-  
+
+  igraph_vector_init_int(&v1, 10, 3, 5, 6, 6, 6, 7, 8, 8, 9, 10);
+  igraph_vector_init_int(&v2, 10, 1, 3, 3, 6, 6, 9, 12, 15, 17, 20);
+  igraph_vector_init(&v3, 0);
+
+  igraph_vector_intersect_sorted(&v1, &v2, &v3, 0);
+  print_vector(&v3, stdout);
+  igraph_vector_intersect_sorted(&v1, &v2, &v3, 1);
+  print_vector(&v3, stdout);
+
+  igraph_vector_destroy(&v1);
+  igraph_vector_destroy(&v2);
+  igraph_vector_destroy(&v3);
+
   if (IGRAPH_FINALLY_STACK_SIZE() != 0) return 3; 
 
   return 0;
