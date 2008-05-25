@@ -105,7 +105,7 @@ the <code>libigraph</code>, <code>libigraph-dev</code> and
 
 <pre class="programlisting">
 deb http://cneurocvs.rmki.kfki.hu /packages/binary/
-deb-src htp://cneurocvs.rmki.kfki.hu /packages/source/
+deb-src http://cneurocvs.rmki.kfki.hu /packages/source/
 </pre>
 
 <p>The binary packages are built for the <code>i386</code> architecture.
