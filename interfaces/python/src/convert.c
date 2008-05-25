@@ -55,9 +55,9 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
   int *result) {
     char* s;
     
-    if (o==Py_None) return 0;
-    if (PyInt_Check(o)) return (int)PyInt_AsLong(o);
-    if (PyLong_Check(o)) return (int)PyLong_AsLong(o);
+    if (o == 0 || o==Py_None) return 0;
+    if (PyInt_Check(o)) { *result = (int)PyInt_AsLong(o); return 0; }
+    if (PyLong_Check(o)) { *result = (int)PyLong_AsLong(o); return 0; }
     if (!PyString_Check(o)) {
         PyErr_SetString(PyExc_TypeError, "int, long or string expected");
         return -1;
