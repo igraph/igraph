@@ -194,6 +194,64 @@ class Layout(object):
             self._coords[idx] = [row[d]+v[d] for d in xrange(self._dim)]
 
 
+    def to_radial(self, min_angle = 100, max_angle = 80, \
+        min_radius=0.0, max_radius=1.0):
+        """Converts a planar layout to a radial one
+
+        This method applies only to 2D layouts. The X coordinate of the
+        layout is transformed to an angle, with min(x) corresponding to
+        the parameter called I{min_angle} and max(y) corresponding to
+        I{max_angle}. Angles are given in degrees, zero degree corresponds
+        to the direction pointing upwards. The Y coordinate is
+        interpreted as a radius, with min(y) belonging to the minimum and
+        max(y) to the maximum radius given in the arguments.
+
+        This is not a fully generic polar coordinate transformation, but
+        it is fairly useful in creating radial tree layouts from ordinary
+        top-down ones (that's why the Y coordinate belongs to the radius).
+        It can also be used in conjunction with the Fruchterman-Reingold
+        layout algorithm via its I{miny} and I{maxy} parameters (see
+        L{Graph.layout_fruchterman_reingold}) to produce radial layouts
+        where the radius belongs to some property of the vertices.
+
+        @param min_angle: the angle corresponding to the minimum X value
+        @param max_angle: the angle corresponding to the maximum X value
+        @param min_radius: the radius corresponding to the minimum Y value
+        @param max_radius: the radius corresponding to the maximum Y value
+        """
+        bbox = self.bounding_box()
+        if len(bbox) != 4: raise TypeError, "implemented only for 2D layouts"
+
+        while min_angle > max_angle: max_angle += 360
+        while min_angle > 360:
+            min_angle -= 360
+            max_angle -= 360
+        while min_angle < 0:
+            min_angle += 360
+            max_angle += 360
+
+        minx, miny, maxx, maxy = bbox
+        rx = (max_angle - min_angle) / (maxx-minx)
+        rx *= math.pi / 180.
+        min_angle *= math.pi / 180.
+        ry = (max_radius - min_radius) / (maxy-miny)
+        for idx, (x, y) in enumerate(self._coords):
+            alpha, r = (x-minx) * rx + min_angle, (y-miny) * ry + min_radius
+            self._coords[idx] = math.cos(alpha)*r, -math.sin(alpha)*r
+
+
+    def transform(self, function, *args, **kwds):
+        """Performs an arbitrary transformation on the layout
+
+        @param function: a function which receives the coordinates as a
+          tuple and returns the transformed tuple.
+
+        Additional positional and keyword arguments are passed intact to
+        the defined function"""
+        self._coords = [list(function(tuple(row), *args, **kwds)) \
+            for row in self._coords]
+
+
     def centroid(self):
         """Returns the centroid of the layout.
 
