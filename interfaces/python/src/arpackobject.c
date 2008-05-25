@@ -124,49 +124,28 @@ int igraphmodule_ARPACKOptions_setattr(
     PyErr_SetString(PyExc_TypeError, "attribute can not be deleted");
     return -1;
   }
-  /*if (strcmp(attrname, "bmat") == 0) {
-    if (PyString_Check(value)) {
-      char* s = PyString_AsString(value);
-      if (s[0] == 'I' || s[0] == 'G') self->params.bmat[0] = s[0];
-      else {
-        PyErr_SetString(PyExc_ValueError, "bmat must be either 'I' or 'G'");
-        return -1;
-      }
-    } else {
-      PyErr_SetString(PyExc_TypeError, "string expected");
-      return -1;
-    }
-  } else if (strcmp(attrname, "n") == 0) {
+  if (strcmp(attrname, "maxiter") == 0) {
     if (PyInt_Check(value)) {
       long int n=PyInt_AsLong(value);
-      if (n>0) self->params.n=n;
+      if (n>0) self->params.mxiter=n;
       else {
-        PyErr_SetString(PyExc_ValueError, "n must be positive");
+        PyErr_SetString(PyExc_ValueError, "maxiter must be positive");
         return -1;
       }
     } else {
       PyErr_SetString(PyExc_ValueError, "integer expected");
       return -1;
     }
-  } else if (strcmp(attrname, "which") == 0) {
-  } else if (strcmp(attrname, "nev") == 0) {
-  } else*/ if (strcmp(attrname, "tol") == 0) {
-  } /*else if (strcmp(attrname, "ncv") == 0) {
-  } else if (strcmp(attrname, "ldv") == 0) {
-  } else if (strcmp(attrname, "ishift") == 0) {
-  }*/ else if (strcmp(attrname, "maxiter") == 0) {
-  } /*else if (strcmp(attrname, "nb") == 0) {
-  } else if (strcmp(attrname, "mode") == 0) {
-  }*/ else if (strcmp(attrname, "start") == 0) {
-  } /*else if (strcmp(attrname, "lworkl") == 0) {
-  } else if (strcmp(attrname, "sigma") == 0) {
-  } else if (strcmp(attrname, "info") == 0) {
-  } else if (strcmp(attrname, "ierr") == 0) {
-  } else if (strcmp(attrname, "noiter") == 0) {
-  } else if (strcmp(attrname, "numop") == 0) {
-  } else if (strcmp(attrname, "numopb") == 0) {
-  } else if (strcmp(attrname, "numreo") == 0) {
-  }*/ else {
+  } else if (strcmp(attrname, "tol") == 0) {
+    if (PyInt_Check(value)) {
+      self->params.tol = (igraph_real_t) PyInt_AsLong(value);
+    } else if (PyFloat_Check(value)) {
+      self->params.tol = (igraph_real_t) PyFloat_AsDouble(value);
+    } else {
+      PyErr_SetString(PyExc_ValueError, "integer or float expected");
+      return -1;
+    }
+  } else {
     PyErr_SetString(PyExc_AttributeError, attrname);
     return -1;
   }
