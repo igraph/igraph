@@ -396,7 +396,7 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
       return -1;
     }
     if (n != (long)igraph_vector_size(&es)) {
-      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of edges in the edge set");
+      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of edges in the edge sequence");
       igraph_vector_destroy(&es);
       return -1;
     }
@@ -725,11 +725,39 @@ PyObject* igraphmodule_EdgeSeq_get_graph(igraphmodule_EdgeSeqObject* self,
 
 /**
  * \ingroup python_interface_edgeseq
+ * Returns the indices of the edges in this edge sequence 
+ */
+PyObject* igraphmodule_EdgeSeq_get_indices(igraphmodule_EdgeSeqObject* self,
+  void* closure) {
+  igraphmodule_GraphObject *gr = self->gref;
+  igraph_vector_t es;
+  PyObject *result;
+
+  if (igraph_vector_init(&es, 0)) {
+    igraphmodule_handle_igraph_error();
+    return 0;
+  } 
+  if (igraph_es_as_vector(&gr->g, self->es, &es)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&es);
+    return 0;
+  }
+
+  result = igraphmodule_vector_t_to_PyList(&es, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&es);
+
+  return result;
+}
+
+/**
+ * \ingroup python_interface_edgeseq
  * Getter/setter table for the \c igraph.EdgeSeq object
  */
 PyGetSetDef igraphmodule_EdgeSeq_getseters[] = {
   {"graph", (getter)igraphmodule_EdgeSeq_get_graph, NULL,
-      "The graph the edge sequence belongs to", NULL,
+      "The graph the edge sequence belongs to", NULL},
+  {"indices", (getter)igraphmodule_EdgeSeq_get_indices, NULL,
+      "The edge indices in this edge sequence", NULL,
   },
   {NULL}
 };

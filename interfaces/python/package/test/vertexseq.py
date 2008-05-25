@@ -11,6 +11,7 @@ class VertexSeqTests(unittest.TestCase):
         self.failUnless(len(VertexSeq(self.g)) == 10)
         self.failUnless(len(VertexSeq(self.g, 2)) == 1)
         self.failUnless(len(VertexSeq(self.g, [1,2,3])) == 3)
+        self.failUnless(VertexSeq(self.g, [1,2,3]).indices == [1,2,3])
         self.assertRaises(ValueError, VertexSeq, self.g, 12)
         self.assertRaises(ValueError, VertexSeq, self.g, [12])
         self.failUnless(self.g.vs.graph == self.g)
@@ -76,6 +77,11 @@ class VertexSeqTests(unittest.TestCase):
         del g.vs["degree"]
         self.failUnless(len(g.vs(_degree_gt=30)) == l)
 
+    def testGraphMethodProxying(self):
+        g = Graph.Barabasi(100)
+        vs = g.vs(1,3,5,7,9)
+        self.failUnless(vs.degree() == g.degree(vs))
+        self.failUnless(g.degree(vs) == g.degree(vs.indices))
 
 def suite():
     vs_suite = unittest.makeSuite(VertexSeqTests)

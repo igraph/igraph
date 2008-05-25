@@ -390,7 +390,7 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
       return -1;
     }
     if (n != (long)igraph_vector_size(&vs)) {
-      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of vertices in the vertex set");
+      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of vertices in the vertex sequence");
       igraph_vector_destroy(&vs);
       return -1;
     }
@@ -671,6 +671,32 @@ PyObject* igraphmodule_VertexSeq_get_graph(igraphmodule_VertexSeqObject* self,
 
 /**
  * \ingroup python_interface_vertexseq
+ * Returns the indices of the vertices in this vertex sequence 
+ */
+PyObject* igraphmodule_VertexSeq_get_indices(igraphmodule_VertexSeqObject* self,
+  void* closure) {
+  igraphmodule_GraphObject *gr = self->gref;
+  igraph_vector_t vs;
+  PyObject *result;
+
+  if (igraph_vector_init(&vs, 0)) {
+    igraphmodule_handle_igraph_error();
+    return 0;
+  } 
+  if (igraph_vs_as_vector(&gr->g, self->vs, &vs)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_destroy(&vs);
+    return 0;
+  }
+
+  result = igraphmodule_vector_t_to_PyList(&vs, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&vs);
+
+  return result;
+}
+
+/**
+ * \ingroup python_interface_vertexseq
  * Method table for the \c igraph.VertexSeq object
  */
 PyMethodDef igraphmodule_VertexSeq_methods[] = {
@@ -745,6 +771,9 @@ static PyMappingMethods igraphmodule_VertexSeq_as_mapping = {
 PyGetSetDef igraphmodule_VertexSeq_getseters[] = {
   {"graph", (getter)igraphmodule_VertexSeq_get_graph, NULL,
       "The graph the vertex sequence belongs to", NULL,
+  },
+  {"indices", (getter)igraphmodule_VertexSeq_get_indices, NULL,
+      "The vertex indices in this vertex sequence", NULL,
   },
   {NULL}
 };

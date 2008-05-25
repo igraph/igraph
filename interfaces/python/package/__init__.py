@@ -1543,6 +1543,7 @@ class Graph(core.GraphBase):
     # After adjusting something here, don't forget to update the docstring
     # of Graph.layout if necessary!
 
+##############################################################
 
 class VertexSeq(core.VertexSeq):
     """Class representing a sequence of vertices in the graph.
@@ -1584,6 +1585,16 @@ class VertexSeq(core.VertexSeq):
       >>> g.vs.select(1,2)["weight"] = [10, 20]
       >>> g.vs["weight"]
       [0, 10, 20]
+
+    Some methods of the vertex sequences are simply proxy methods to the
+    corresponding methods in the L{Graph} object. One such example is
+    L{VertexSeq.degree()}:
+
+      >>> g=Graph.Tree(7, 2)
+      >>> g.vs.degree()
+      [2, 3, 3, 1, 1, 1, 1]
+      >>> g.vs.degree() == g.degree()
+      True
     """
 
     def select(self, *args, **kwds):
@@ -1727,6 +1738,7 @@ class VertexSeq(core.VertexSeq):
         """
         return self.select(*args, **kwds)
 
+##############################################################
 
 class EdgeSeq(core.EdgeSeq):
     """Class representing a sequence of edges in the graph.
@@ -1758,7 +1770,7 @@ class EdgeSeq(core.EdgeSeq):
       >>> [max(e.tuple) for e in g.es]
       [1, 2, 2]
       
-    The edge set can also be used as a dictionary where the keys are the
+    The edge sequence can also be used as a dictionary where the keys are the
     attribute names. The values corresponding to the keys are the values
     of the given attribute of every edge in the graph:
     
@@ -1771,6 +1783,16 @@ class EdgeSeq(core.EdgeSeq):
       >>> g.es["weight"] = range(3)
       >>> g.es["weight"]
       [0, 1, 2]
+
+    Some methods of the edge sequences are simply proxy methods to the
+    corresponding methods in the L{Graph} object. One such example is
+    L{EdgeSeq.is_multiple()}:
+
+      >>> g=Graph(3, [(0,1), (1,0), (1,2)])
+      >>> g.es.is_multiple()
+      [False, True, False]
+      >>> g.es.is_multiple() == g.is_multiple()
+      True
     """
 
     def select(self, *args, **kwds):
@@ -1915,6 +1937,65 @@ class EdgeSeq(core.EdgeSeq):
         """
         return self.select(*args, **kwds)
 
+##############################################################
+# Additional methods of VertexSeq and EdgeSeq that call Graph methods
+
+def _graphmethod(func=None, name=None):
+    """Auxiliary decorator
+    
+    This decorator allows some methods of L{VertexSeq} and L{EdgeSeq} to
+    call their respective counterparts in L{Graph} to avoid code duplication.
+
+    @param func: the function being decorated. This function will be
+      called on the results of the original L{Graph} method.
+      If C{None}, defaults to the identity function.
+    @param name: the name of the corresponding method in L{Graph}. If
+      C{None}, it defaults to the name of the decorated function.
+    @return: the decorated function
+    """
+    if name is None: name = func.__name__
+    method = getattr(Graph, name)
+
+    if callable(func):
+        def decorated(*args, **kwds):
+            self = args[0].graph
+            return func(args[0], method(self, *args, **kwds))
+    else:
+        def decorated(*args, **kwds):
+            self = args[0].graph
+            return method(self, *args, **kwds)
+
+    decorated.__name__ = name
+    decorated.__doc__ = """Proxy method to L{Graph.%(name)s()}
+
+This method calls the C{%(name)s()} method of the L{Graph} class
+restricted to this sequence, and returns the result.
+
+@see: Graph.%(name)s() for details.
+""" % { "name": name }
+
+    return decorated
+
+def _add_proxy_methods():
+    decorated_methods = {}
+    decorated_methods[VertexSeq] = \
+        ["degree", "betweenness", "bibcoupling", "closeness", "cocitation",
+        "constraint", "eccentricity", "get_shortest_paths", "maxdegree",
+        "pagerank", "shortest_paths", "similarity_dice", "similarity_jaccard",
+        "subgraph", "indegree", "outdegree", "isoclass"]
+    decorated_methods[EdgeSeq] = \
+        ["count_multiple", "is_loop", "is_multiple"]
+
+    for klass, methods in decorated_methods.iteritems():
+        for method in methods:
+            setattr(klass, method, _graphmethod(None, method))
+
+    setattr(EdgeSeq, "edge_betweenness", _graphmethod( \
+      lambda self, result: [result[i] for i in self.indices], "edge_betweenness"))
+
+_add_proxy_methods()
+
+##############################################################
 
 def read(filename, *args, **kwds):
     """Loads a graph from the given filename.

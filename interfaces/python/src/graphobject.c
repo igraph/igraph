@@ -7170,7 +7170,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"is_simple", (PyCFunction) igraphmodule_Graph_is_simple,
    METH_NOARGS,
    "is_simple()\n\n"
-   "Checks whether the graph is simple (no loop or multiple edges)."
+   "Checks whether the graph is simple (no loop or multiple edges).\n\n"
    "@return: C{True} if it is simple, C{False} otherwise.\n"
    "@rtype: boolean"},
 
@@ -8214,7 +8214,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /***********************/
 
   /* interface to igraph_bibcoupling */
-  {"cocitation", (PyCFunction) igraphmodule_Graph_bibcoupling,
+  {"bibcoupling", (PyCFunction) igraphmodule_Graph_bibcoupling,
    METH_VARARGS | METH_KEYWORDS,
    "bibcoupling(vertices=None)\n\n"
    "Calculates bibliographic coupling scores for given vertices in a graph.\n\n"
