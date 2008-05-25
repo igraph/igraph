@@ -5361,6 +5361,36 @@ PyObject *igraphmodule_Graph_write_lgl(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Writes the graph as a Pajek .net file
+ * \return none
+ * \sa igraph_write_graph_pajek
+ */
+PyObject *igraphmodule_Graph_write_pajek(igraphmodule_GraphObject * self,
+  PyObject * args, PyObject * kwds) {
+  char *fname = NULL;
+  FILE *f;
+  static char *kwlist[] = { "f", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
+    return NULL;
+
+  f = fopen(fname, "w");
+  if (!f) {
+    PyErr_SetString(PyExc_IOError, strerror(errno));
+    return NULL;
+  }
+
+  if (igraph_write_graph_pajek(&self->g, f)) {
+    igraphmodule_handle_igraph_error();
+    fclose(f);
+    return NULL;
+  }
+  fclose(f);
+
+  Py_RETURN_NONE;
+}
+
+/** \ingroup python_interface_graph
  * \brief Writes the graph to a GraphML file
  * \return none
  * \sa igraph_write_graph_graphml
@@ -5371,9 +5401,7 @@ PyObject *igraphmodule_Graph_write_graphml(igraphmodule_GraphObject * self,
   char *fname = NULL;
   FILE *f;
 
-  char *kwlist[] = {
-    "f", NULL
-  };
+  static char *kwlist[] = { "f", NULL };
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "s", kwlist, &fname))
     return NULL;
@@ -8810,6 +8838,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  of the vertices. If you don't want to store weights,\n"
    "  supply C{None} here.\n"
    "@param isolates: whether to include isolated vertices in the output.\n"},
+  /* interface to igraph_write_graph_pajek */
+  {"write_pajek", (PyCFunction) igraphmodule_Graph_write_pajek,
+   METH_VARARGS | METH_KEYWORDS,
+   "write_pajek(f)\n\n"
+   "Writes the graph in Pajek format to the given file.\n\n"
+   "@param f: the name of the file to be written\n"
+   },
   // interface to igraph_write_graph_edgelist
   {"write_graphml", (PyCFunction) igraphmodule_Graph_write_graphml,
    METH_VARARGS | METH_KEYWORDS,
