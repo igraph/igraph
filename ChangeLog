@@ -28,6 +28,9 @@
 	proper error handling
 
 	* examples/simple/igraph_read_graph_lgl : added test case
+
+	* interfaces/python/package/drawing.py : triangle-shaped vertices
+	now supported
 	
 2008-04-30  Gabor Csardi  <csardi@rmki.kfki.hu>
 

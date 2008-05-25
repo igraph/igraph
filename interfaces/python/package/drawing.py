@@ -520,6 +520,40 @@ class CircleDrawer(ShapeDrawer):
     intersection_point=staticmethod(intersection_point)
 
 
+class UpTriangleDrawer(ShapeDrawer):
+    """Static class which draws upright triangles"""
+    def draw_path(ctx, cx, cy, w, h=None):
+        """Draws an upright triangle on the Cairo context without stroking or filling."""
+        h = h or w
+        ctx.move_to(cx-w/2., cy+h/2.)
+        ctx.line_to(cx, cy-h/2.)
+        ctx.line_to(cx+w/2., cy+h/2.)
+        ctx.line_to(cx-w/2., cy+h/2.)
+    draw_path=staticmethod(draw_path)
+
+    def intersection_point(cx, cy, sx, sy, w, h=None):
+        # TODO: finish it properly
+        h = h or w
+        return cx, cy
+    intersection_point=staticmethod(intersection_point)
+
+class DownTriangleDrawer(ShapeDrawer):
+    """Static class which draws triangles pointing down"""
+    def draw_path(ctx, cx, cy, w, h=None):
+        """Draws a triangle on the Cairo context without stroking or filling."""
+        h = h or w
+        ctx.move_to(cx-w/2., cy-h/2.)
+        ctx.line_to(cx, cy+h/2.)
+        ctx.line_to(cx+w/2., cy-h/2.)
+        ctx.line_to(cx-w/2., cy-h/2.)
+    draw_path=staticmethod(draw_path)
+
+    def intersection_point(cx, cy, sx, sy, w, h=None):
+        # TODO: finish it properly
+        h = h or w
+        return cx, cy
+    intersection_point=staticmethod(intersection_point)
+
 def draw_shape_path(shape, ctx, cx, cy, w, h=None):
     """Draws a path of a shape on the given Cairo context.
 
@@ -551,6 +585,14 @@ known_shapes = {
     "": NullDrawer,
     "empty": NullDrawer,
     "hidden": NullDrawer,
+
+    "triangle": UpTriangleDrawer,
+    "triangle-up": UpTriangleDrawer,
+    "arrow-up": UpTriangleDrawer,
+    "up-arrow": UpTriangleDrawer,
+    "triangle-down": DownTriangleDrawer,
+    "arrow-down": DownTriangleDrawer,
+    "down-arrow": DownTriangleDrawer,
 }
 
 #####################################################################
