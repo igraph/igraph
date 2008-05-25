@@ -496,3 +496,88 @@ class TriadCensus(tuple):
             row = []
 
         return "\n".join(result)
+
+
+class Cut(object):
+    """A cut of a given graph.
+
+    This is a simple class used to represent cuts returned by
+    L{Graph.mincut}. It has the following attributes:
+
+      - C{graph} - the graph on which this cut is defined
+
+      - C{value} - the value (capacity) of the cut
+
+      - C{partition} - vertex IDs in the parts created
+        after removing edges in the cut
+
+      - C{cut} - edge IDs in the cut
+
+      - C{es} - an edge selector restricted to the edges
+        in the cut.
+
+    Attributes are not read only, but you should consider them
+    as being read only. Unexpected behaviour may occur if you
+    mess with them.
+    
+    You can use indexing on this object to obtain L{VertexSeq}
+    objects of the partitions. 
+
+    This class is usually not instantiated directly, everything
+    is taken care of by L{Graph.mincut}.
+
+    Examples:
+
+      >>> g = Graph.Ring(20)
+      >>> mc = g.mincut()
+      >>> print mc.value
+      2
+      >>> print min(map(len, mc))
+      1
+      >>> mc.es["color"] = ["red"] * len(mc.es)
+    """
+
+    __slots__ = ["_graph", "_value", "_partition", "_cut"]
+
+    def __init__(self, graph, value, cut, partition, partition2):
+        """Initializes the cut.
+
+        This should not be called directly, everything is
+        taken care of by L{Graph.mincut}.
+        """
+        self._graph = graph
+        self._value = float(value)
+        self._partition = (partition, partition2)
+        self._cut = cut
+
+    def __repr__(self):
+        return "%s(%s,%s,%s,%s,%s)" % \
+          (self.__class__.__name__, repr(self._graph), \
+           self._value, repr(self._cut), \
+           repr(self._partition[0]), repr(self._partition[1]))
+
+    def __str__(self):
+        return "Graph cut (%d edges, %d vs %d vertices, value=%.4f)" % \
+          (len(self._cut), len(self._partition[0]), len(self._partition[1]), \
+          self._value)
+
+    def __len__(self): return 2
+
+    def __getitem__(self, idx):
+        if idx >= 2: raise IndexError, "a cut has only two partitions"
+        return self.graph.vs.select(self._partition[idx])
+
+    def _get_es(self): return self._graph.es.select(self.cut)
+    def _get_graph(self): return self._graph
+    def _get_partition(self): return self._partition
+    def _get_cut(self): return self._cut
+    def _get_value(self): return self._value
+
+    es = property(_get_es, doc="Returns an edge selector restricted to the cut")
+    graph = property(_get_graph, doc="The graph over which this cut is defined")
+    partition = property(_get_partition,
+      doc="Vertex IDs partitioned according to the cut")
+    cut = property(_get_cut, doc="Edge IDs in the cut")
+    value = property(_get_value, doc="Sum of edge capacities in the cut")
+
+

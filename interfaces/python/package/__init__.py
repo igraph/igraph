@@ -338,6 +338,17 @@ class Graph(core.GraphBase):
         return [self.adjacent(idx, type) for idx in xrange(self.vcount())]
 
 
+    def mincut(self, capacity=None):
+        """mincut(capacity=None)
+
+        Returns a minimum cut in an undirected graph.
+
+        @param capacity: the edge capacities (weights). If C{None}, all
+          edges have equal weight.
+        @return: a L{Cut} object describing the minimum cut
+        """
+        return Cut(self, *GraphBase.mincut(self, capacity))
+
     def modularity(self, membership, weights=None):
         """modularity(membership, weights=None)
 

@@ -27,6 +27,21 @@ class MaxFlowTests(unittest.TestCase):
         self.failUnless(self.g.mincut_value(source=0) == 2)
         self.failUnless(self.g.mincut_value(target=2) == 2)
 
+    def testMinCut(self):
+        mc = self.g.mincut()
+        self.failUnless(isinstance(mc, Cut))
+        self.failUnless(mc.value == 2)
+        self.failUnless(set(mc.partition[0]).union(mc.partition[1]) == \
+          set(range(self.g.vcount())))
+        self.failUnless(isinstance(str(mc), str))
+        self.failUnless(isinstance(repr(mc), str))
+        self.failUnless(isinstance(mc.es, EdgeSeq))
+        self.failUnless(len(mc.es) == 2)
+        mc = self.g.mincut(self.capacities)
+        self.failUnless(mc.value == 4)
+        self.assertRaises(KeyError, self.g.mincut, "unknown")
+
+
 def suite():
     flow_suite = unittest.makeSuite(MaxFlowTests)
     return unittest.TestSuite([flow_suite])
