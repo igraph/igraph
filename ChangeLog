@@ -3,6 +3,12 @@
 	* src/fast_community.c (igraph_community_fastgreedy) :
 	check that the graph is simple
 
+2008-05-22  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/foreign-lgl-lexer.l
+	* src/foreign-ncol-lexer.l : make these work with any EOL 
+	encoding
+
 2008-05-21  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/flow.c (igraph_mincut) : type of `value` should be
