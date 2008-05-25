@@ -190,6 +190,10 @@ class CentralityTests(unittest.TestCase):
         hsc, ev = g.hub_score(scale=False, return_eigenvalue=True)
         if hsc[0]<0: hsc = [-x for x in hsc]
 
+    def testCoreness(self):
+        g = Graph.Full(4) + Graph(4) + [(0,4), (1,5), (2,6), (3,7)]
+        self.assertEquals(g.coreness("A"), [3,3,3,3,1,1,1,1])
+
 
 class MiscTests(unittest.TestCase):
     def testConstraint(self):
