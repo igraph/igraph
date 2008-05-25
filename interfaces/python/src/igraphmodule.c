@@ -964,7 +964,7 @@ int igraphmodule_i_get_numeric_vertex_attr(const igraph_t *graph,
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
   if (igraph_vs_is_all(&vs)) {
-    if (igraphmodule_PyObject_to_vector_t(list, &newvalue, 0, 0))
+    if (igraphmodule_PyObject_float_to_vector_t(list, &newvalue))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
     igraph_vector_copy(value, &newvalue);
     igraph_vector_destroy(&newvalue);
@@ -1043,7 +1043,7 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
   if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
 
   if (igraph_es_is_all(&es)) {
-    if (igraphmodule_PyObject_to_vector_t(list, &newvalue, 0, 0))
+    if (igraphmodule_PyObject_float_to_vector_t(list, &newvalue))
       IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
     igraph_vector_copy(value, &newvalue);
     igraph_vector_destroy(&newvalue);
@@ -1057,9 +1057,9 @@ int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
       long int v=IGRAPH_EIT_GET(it);
       o = PyList_GetItem(list, v);
       if (o != Py_None) {
-	result = PyNumber_Float(o);
-	VECTOR(*value)[i] = PyFloat_AsDouble(result);
-	Py_XDECREF(result);
+        result = PyNumber_Float(o);
+        VECTOR(*value)[i] = PyFloat_AsDouble(result);
+        Py_XDECREF(result);
       } else VECTOR(*value)[i] = IGRAPH_NAN;
       IGRAPH_EIT_NEXT(it);
       i++;
