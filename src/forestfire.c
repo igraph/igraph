@@ -167,11 +167,11 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 	IGRAPH_CHECK(igraph_vector_push_back(inneis+nei, actnode));  \
       }
   
-  igraph_progress("Forest fire: ", 0.0, NULL);
+  IGRAPH_PROGRESS("Forest fire: ", 0.0, NULL);
   
   for (actnode=1; actnode < no_of_nodes; actnode++) {
 
-    igraph_progress("Forest fire: ", 100.0*actnode/no_of_nodes, NULL);
+    IGRAPH_PROGRESS("Forest fire: ", 100.0*actnode/no_of_nodes, NULL);
 
     IGRAPH_ALLOW_INTERRUPTION();    
     
@@ -241,7 +241,7 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
   RNG_END();
 
-  igraph_progress("Forest fire: ", 100.0, NULL);
+  IGRAPH_PROGRESS("Forest fire: ", 100.0, NULL);
   
   igraph_dqueue_destroy(&neiq);
   igraph_vector_long_destroy(&visited);
