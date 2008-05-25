@@ -363,26 +363,55 @@ graph.atlas <- function(n) {
 # Create a graph from a data frame
 ###################################################################
 
-graph.data.frame <- function(d, directed=TRUE) {
+graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
 
   if (ncol(d) < 2) {
     stop("the data frame should contain at least two columns")
   }
 
-  # assign vertex ids
   names <- unique( c(as.character(d[,1]), as.character(d[,2])) )
+  if (!is.null(vertices)) {
+    names2 <- names
+    vertices <- as.data.frame(vertices)
+    if (ncol(vertices) < 1) {
+      stop("Vertex data frame contains no rows")
+    }
+    names <- as.character(vertices[,1])
+    if (any(duplicated(names))) {
+      stop("Duplicate vertex names")
+    }
+    if (any(! names2 %in% names)) {
+      stop("Some vertex names in edge list are not listed in vertex data frame")
+    }
+  }
   ids <- seq(along=names)-1
   names(ids) <- names
-
+    
   # create graph
   g <- graph.empty(n=0, directed=directed)
-  g <- add.vertices(g, length(ids), name=names)
 
+  # vertex attributes
+  attrs <- list(name=names)
+  if (!is.null(vertices)) {
+    if (ncol(vertices) > 1) {
+      for (i in 2:ncol(d)) {
+        newval <- vertices[,i]
+        if (class(newval) == "factor") {
+          newval <- as.character(newval)
+        }
+        attrs[[ names(vertices)[i] ]] <- newval
+      }
+    }
+  }
+
+  # add vertices
+  g <- add.vertices(g, length(ids), attr=attrs)
+    
   # create edge list
   from <- as.character(d[,1])
   to <- as.character(d[,2])
   edges <- t(matrix(c(ids[from], ids[to]), nc=2))
-
+  
   # edge attributes
   attrs <- list()
   if (ncol(d) > 2) {
@@ -394,7 +423,7 @@ graph.data.frame <- function(d, directed=TRUE) {
       attrs[[ names(d)[i] ]] <- newval
     }
   }
-  
+
   # add the edges
   g <- add.edges(g, edges, attr=attrs)
   g
