@@ -653,7 +653,7 @@ class VertexDendrogram(VertexClustering, Dendrogram):
             modularity = []
             n = graph.vcount()
             for step in xrange(min(n-1, len(merges))):
-                ms = community_to_membership(merges, graph.vcount(), maxidx)
+                ms = community_to_membership(merges, graph.vcount(), step)
                 modularity.append(graph.modularity(ms))
 
         if membership is None:
