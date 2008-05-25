@@ -1,4 +1,3 @@
-
 /* -*- mode: C -*-  */
 /* 
    IGraph R library.
@@ -1551,7 +1550,8 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
  * \param types The number of vertex types.
  * \param type_dist Vector giving the distribution of vertex types.
  * \param pref_matrix Matrix giving the connection probabilities for
- *   different vertex types.
+ *   different vertex types. This should be symmetric if the requested
+ *   graph is undirected.
  * \param node_type_vec A vector where the individual generated vertex types
  *   will be stored. If NULL, the vertex types won't be saved.
  * \param directed Logical, whether to generate a directed graph. If undirected
@@ -1614,6 +1614,8 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);
 
   for (i=0; i<nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    IGRAPH_PROGRESS("preference game", (i*100.0/nodes), 0);
     for (j=(directed?0:i); j<nodes; j++) {
       long type1, type2;
 
@@ -1623,11 +1625,12 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
       type2=(long)VECTOR(*nodetypes)[j];
 
       if (RNG_UNIF01() < (igraph_real_t)MATRIX(*pref_matrix, type1, type2)) {
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
       }
     }
   }
+  IGRAPH_PROGRESS("preference game", 100.0, 0);
   
   RNG_END();
   
@@ -1738,6 +1741,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
   IGRAPH_FINALLY_CLEAN(1);
 
   for (i=0; i<nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+    IGRAPH_PROGRESS("asymmetric preference game", (i*100.0/nodes), 0);
     for (j=0; j<nodes; j++) {
       long type1, type2;
 
@@ -1747,12 +1752,13 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
       type2=(long)VECTOR(*nodetypes_in)[j];
 
       if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
-	IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
+        IGRAPH_CHECK(igraph_vector_push_back(&edges, j));
       }
     }
   }
-  
+  IGRAPH_PROGRESS("asymmetric preference game", 100.0, 0);
+
   RNG_END();
   
   if (node_type_out_vec == 0) {
