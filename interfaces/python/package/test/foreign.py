@@ -52,7 +52,7 @@ a 3 4 5
         tmpf.close()
         g = Graph.Read_Adjacency(tmpfname)
         self.failUnless(isinstance(g, Graph))
-        self.failUnless(g.vcount() == 6 and g.ecount() == 12 and
+        self.failUnless(g.vcount() == 6 and g.ecount() == 18 and
             g.is_directed() and "weight" not in g.edge_attributes())
         g = Graph.Read_Adjacency(tmpfname, attribute="weight")
         self.failUnless(isinstance(g, Graph))

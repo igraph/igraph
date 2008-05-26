@@ -84,6 +84,26 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_adjacency_t
+ */
+int igraphmodule_PyObject_to_adjacency_t(PyObject *o,
+  igraph_adjacency_t *result) {
+  static igraphmodule_enum_translation_table_entry_t adjacency_tt[] = {
+        {"directed", IGRAPH_ADJ_DIRECTED},
+        {"undirected", IGRAPH_ADJ_UNDIRECTED},
+        {"upper", IGRAPH_ADJ_UPPER},
+        {"lower", IGRAPH_ADJ_LOWER},
+        {"minimum", IGRAPH_ADJ_MIN},
+        {"maximum", IGRAPH_ADJ_MAX},
+        {"plus", IGRAPH_ADJ_PLUS},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, adjacency_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_bliss_sh_t
  */
 int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o,
