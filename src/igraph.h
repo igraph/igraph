@@ -752,6 +752,11 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 				   const igraph_vs_t from,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode);
+int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+				   igraph_matrix_t *res,
+				   const igraph_vs_t from,
+				   const igraph_vector_t *weights, 
+				   igraph_neimode_t mode);
 
 int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 
 			igraph_neimode_t mode);	
