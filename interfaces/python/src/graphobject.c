@@ -3496,7 +3496,8 @@ PyObject *igraphmodule_Graph_permute_vertices(igraphmodule_GraphObject *self,
 /** \ingroup python_interface_graph
  * \brief Calculates shortest paths in a graph.
  * \return the shortest path lengths for the given vertices
- * \sa igraph_shortest_paths, igraph_shortest_paths_dijkstra
+ * \sa igraph_shortest_paths, igraph_shortest_paths_dijkstra,
+ *     igraph_shortest_paths_bellman_ford
  */
 PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
                                             PyObject * args, PyObject * kwds)
@@ -3506,7 +3507,7 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
   igraph_matrix_t res;
   igraph_vector_t *weights=0;
   igraph_neimode_t mode = IGRAPH_OUT;
-  int return_single = 0;
+  int return_single = 0, e = 0;
   igraph_vs_t vs;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj, &weights_o,
@@ -3530,7 +3531,12 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_shortest_paths_dijkstra(&self->g, &res, vs, weights, mode)) {
+  if (weights && igraph_vector_min(weights) < 0)
+    e = igraph_shortest_paths_bellman_ford(&self->g, &res, vs, weights, mode);
+  else
+    e = igraph_shortest_paths_dijkstra(&self->g, &res, vs, weights, mode);
+
+  if (e) {
     if (weights) igraph_vector_destroy(weights);
     igraph_matrix_destroy(&res);
     igraph_vs_destroy(&vs);
