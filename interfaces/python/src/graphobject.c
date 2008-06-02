@@ -3532,7 +3532,7 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
   }
 
   if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
-    if (weights) igraph_vector_destroy(weights);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_vs_destroy(&vs);
     return igraphmodule_handle_igraph_error();
   }
@@ -6999,11 +6999,11 @@ PyObject *igraphmodule_Graph_modularity(igraphmodule_GraphObject *self,
   }
   if (igraph_modularity(&self->g, &membership, &modularity, weights)) {
     igraph_vector_destroy(&membership);
-    if (weights) igraph_vector_destroy(weights);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
   igraph_vector_destroy(&membership);
-  if (weights) igraph_vector_destroy(weights);
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
   return Py_BuildValue("d", (double)modularity);
 }
 
