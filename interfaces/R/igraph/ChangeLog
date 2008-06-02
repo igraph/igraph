@@ -1,3 +1,8 @@
+2008-06-02  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/rinterface.c.in (R_igraph_shortest_path) :
+	call Bellman-Ford method if there is a negative weight
+
 2008-05-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R

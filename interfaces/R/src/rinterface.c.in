@@ -1868,6 +1868,7 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode, SEXP weights) {
   igraph_integer_t mode=REAL(pmode)[0];
   igraph_matrix_t res;
   igraph_vector_t w, *pw=&w;
+  igraph_bool_t negw=0;
   SEXP result;
   
   R_igraph_before();
@@ -1878,9 +1879,14 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode, SEXP weights) {
     pw=0;
   } else {
     R_SEXP_to_vector(weights, &w);
+    negw = igraph_vector_min(&w) < 0;
   }
-  igraph_matrix_init(&res, 0, 0);  
-  igraph_shortest_paths_dijkstra(&g, &res, vs, pw, mode);
+  igraph_matrix_init(&res, 0, 0);
+  if (negw) {
+    igraph_shortest_paths_bellman_ford(&g, &res, vs, pw, mode);
+  } else {
+    igraph_shortest_paths_dijkstra(&g, &res, vs, pw, mode);
+  }
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   igraph_vs_destroy(&vs);
