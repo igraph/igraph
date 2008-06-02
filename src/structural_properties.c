@@ -4100,6 +4100,205 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 }
 
 /**
+ * \ingroup structural
+ * \function igraph_get_shortest_paths_dijkstra
+ * \brief Calculates the weighted shortest paths from/to one vertex.
+ * 
+ * </para><para>
+ * If there is more than one path with the smallest weight between two vertices, this
+ * function gives only one of them. 
+ * \param graph The graph object.
+ * \param res The result, this is a pointer vector, each element points 
+ *        to a vector
+ *        object. These should be initialized before passing them to
+ *        the function, which will properly clear and/or resize them
+ *        and fill the ids of the vertices along the geodesics from/to
+ *        the vertices.
+ * \param from The id of the vertex from/to which the geodesics are
+ *        calculated. 
+ * \param to Vertex sequence with the ids of the vertices to/from which the 
+ *        shortest paths will be calculated. A vertex might be given multiple
+ *        times.
+ * \param weights a vector holding the edge weights. All weights must be
+ *        positive.
+ * \param mode The type of shortest paths to be use for the
+ *        calculation in directed graphs. Possible values: 
+ *        \clist
+ *        \cli IGRAPH_OUT 
+ *          the outgoing paths are calculated. 
+ *        \cli IGRAPH_IN 
+ *          the incoming paths are calculated. 
+ *        \cli IGRAPH_ALL 
+ *          the directed graph is considered as an
+ *          undirected one for the computation.
+ *        \endclist
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM 
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           \p from is invalid vertex id, or the length of \p to is 
+ *           not the same as the length of \p res.
+ *        \cli IGRAPH_EINVMODE 
+ *           invalid mode argument.
+ *        \endclist
+ * 
+ * Time complexity: O(|E|log|E|+|V|), where |V| is the number of
+ * vertices and |E| is the number of edges
+ * 
+ * \sa \ref igraph_shortest_paths_dijkstra() if you only need the path length but
+ * not the paths themselves, \ref igraph_get_shortest_paths() if all edge
+ * weights are equal. 
+ */
+int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
+                                       igraph_vector_ptr_t *res,
+									   igraph_integer_t from,
+									   igraph_vs_t to,
+									   const igraph_vector_t *weights,
+									   igraph_neimode_t mode) {
+  /* Implementation details. This is the basic Dijkstra algorithm, 
+     with a binary heap. The heap is indexed, i.e. it stores not only
+     the distances, but also which vertex they belong to. The other
+     mapping, i.e. getting the distance for a vertex is not in the
+     heap (that would by the double-indexed heap), but in the result
+     matrix.
+
+     Dirty tricks:
+     - the opposite of the distance is stored in the heap, as it is a
+       maximum heap and we need a minimum heap.
+     - we don't use IGRAPH_INFINITY in the distance vector during the
+       computation, as IGRAPH_FINITE() might involve a function call 
+       and we want to spare that. So we store distance+1.0 instead of 
+       distance, and zero denotes infinity.
+	 - `parents' assigns the predecessors of all vertices in the
+	   shortest path tree to the vertices. In this implementation, the
+	   vertex ID + 1 is stored, zero means unreachable vertices, -1
+	   means unreachable vertices that occur among the target vertices
+  */
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vit_t vit;
+  igraph_indheap_t Q;
+  igraph_lazy_adjedgelist_t adjlist;
+  igraph_vector_t dists;
+  long int *parents;
+  long int i,to_reach,reached=0;
+    
+  if (!weights) {
+    return igraph_get_shortest_paths(graph, res, from, to, mode);
+  }
+  
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_min(weights) < 0) {
+    IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+  if (IGRAPH_VIT_SIZE(vit) != igraph_vector_ptr_size(res)) {
+    IGRAPH_ERROR("Size of `res' and `to' should match", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
+  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&dists, no_of_nodes);
+
+  parents = igraph_Calloc(no_of_nodes, long int);
+  if (parents == 0) IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+  IGRAPH_FINALLY(igraph_free, parents);
+
+  /* Mark the vertices we need to reach */
+  to_reach=IGRAPH_VIT_SIZE(vit);
+  for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
+    if (parents[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
+      parents[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
+    } else {
+      to_reach--;		/* this node was given multiple times */
+    }
+  }
+
+  VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
+  parents[(long int)from] = from+1;
+  igraph_indheap_push_with_index(&Q, from, 0);
+    
+  while (!igraph_indheap_empty(&Q) && reached < to_reach) {
+    long int minnei=igraph_indheap_max_index(&Q);
+    igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    /* Now check all neighbors of 'minnei' for a shorter path */
+    igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+    long int nlen=igraph_vector_size(neis);
+    for (i=0; i<nlen; i++) {
+      long int edge=VECTOR(*neis)[i];
+      long int to=IGRAPH_OTHER(graph, edge, minnei);
+      igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
+      igraph_real_t curdist=VECTOR(dists)[to];
+      if (curdist==0) {
+        /* This is the first non-infinite distance */
+        VECTOR(dists)[to] = altdist+1.0;
+		if (parents[to] < 0) reached++;
+		parents[to] = minnei+1;
+        IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+      } else if (altdist < curdist-1) {
+	    /* This is a shorter path */
+        VECTOR(dists)[to] = altdist+1.0;
+		if (parents[to] < 0) reached++;
+		parents[to] = minnei+1;
+        IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+      }
+    }
+  } /* !igraph_indheap_empty(&Q) */
+
+  if (reached < to_reach) {
+    IGRAPH_WARNING("Couldn't reach some vertices");
+  }
+
+  /* Reconstruct the shortest paths based on vertex IDs */
+  for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    long int node=IGRAPH_VIT_GET(vit);
+    igraph_vector_t *vec=VECTOR(*res)[i];
+    igraph_vector_clear(vec);
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    if (parents[node]>0) {
+      long int size=0;
+	  long int act=node;
+      while (parents[act] != act+1) {
+        size++;
+        act=parents[act]-1;
+      }
+      size++;
+      IGRAPH_CHECK(igraph_vector_resize(vec, size));
+      VECTOR(*vec)[--size]=node;
+      act=node;
+      while (parents[act] != act+1) {
+        VECTOR(*vec)[--size]=parents[act]-1;
+        act=parents[act]-1;
+      }
+    }
+  }
+  
+  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_indheap_destroy(&Q);
+  igraph_vector_destroy(&dists);
+  igraph_Free(parents);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(5);
+  
+  return 0;
+}
+
+/**
  * \function igraph_shortest_paths_bellman_ford
  * Weighted shortest paths from some sources allowing negative weights
  * 
