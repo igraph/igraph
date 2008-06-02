@@ -4172,8 +4172,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
        distance, and zero denotes infinity.
 	 - `parents' assigns the predecessors of all vertices in the
 	   shortest path tree to the vertices. In this implementation, the
-	   vertex ID + 1 is stored, zero means unreachable vertices, -1
-	   means unreachable vertices that occur among the target vertices
+	   vertex ID + 1 is stored, zero means unreachable vertices.
   */
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -4183,7 +4182,8 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   igraph_lazy_adjedgelist_t adjlist;
   igraph_vector_t dists;
   long int *parents;
-  long int i,to_reach,reached=0;
+  igraph_bool_t *is_target;
+  long int i,to_reach;
     
   if (!weights) {
     return igraph_get_shortest_paths(graph, res, from, to, mode);
@@ -4213,26 +4213,35 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   parents = igraph_Calloc(no_of_nodes, long int);
   if (parents == 0) IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
   IGRAPH_FINALLY(igraph_free, parents);
+  is_target = igraph_Calloc(no_of_nodes, igraph_bool_t);
+  if (is_target == 0) IGRAPH_ERROR("Can't calculate shortest paths", IGRAPH_ENOMEM);
+  IGRAPH_FINALLY(igraph_free, is_target);
 
   /* Mark the vertices we need to reach */
   to_reach=IGRAPH_VIT_SIZE(vit);
   for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-    if (parents[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
-      parents[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
+    if (!is_target[ (long int) IGRAPH_VIT_GET(vit) ]) {
+      is_target[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
     } else {
       to_reach--;		/* this node was given multiple times */
     }
   }
 
   VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
+  if (is_target[(long int)from]) to_reach--;
   parents[(long int)from] = from+1;
   igraph_indheap_push_with_index(&Q, from, 0);
     
-  while (!igraph_indheap_empty(&Q) && reached < to_reach) {
+  while (!igraph_indheap_empty(&Q) && to_reach > 0) {
     long int minnei=igraph_indheap_max_index(&Q);
     igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
 
     IGRAPH_ALLOW_INTERRUPTION();
+
+    if (is_target[minnei]) {
+      is_target[minnei] = 0;
+	  to_reach--;
+	}
 
     /* Now check all neighbors of 'minnei' for a shorter path */
     igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
@@ -4245,22 +4254,18 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
       if (curdist==0) {
         /* This is the first non-infinite distance */
         VECTOR(dists)[to] = altdist+1.0;
-		if (parents[to] < 0) reached++;
-		parents[to] = minnei+1;
+        parents[to] = minnei+1;
         IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
       } else if (altdist < curdist-1) {
 	    /* This is a shorter path */
         VECTOR(dists)[to] = altdist+1.0;
-		if (parents[to] < 0) reached++;
-		parents[to] = minnei+1;
+        parents[to] = minnei+1;
         IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
       }
     }
   } /* !igraph_indheap_empty(&Q) */
 
-  if (reached < to_reach) {
-    IGRAPH_WARNING("Couldn't reach some vertices");
-  }
+  if (to_reach > 0) IGRAPH_WARNING("Couldn't reach some vertices");
 
   /* Reconstruct the shortest paths based on vertex IDs */
   for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
