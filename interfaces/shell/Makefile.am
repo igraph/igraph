@@ -1,18 +1,17 @@
 bin_PROGRAMS = igraph
 
-interface.c: interface.c.in ../functions.def types.def ../../tools/stimulus.py
-	../../tools/stimulus.py \
-	  -f ../functions.def \
+STIMULUS = $(top_srcdir)/tools/stimulus.py
+FUNCTIONS_DEF = $(top_srcdir)/interfaces/functions.def
+
+interface.c: interface.c.in types.def $(STIMULUS) $(FUNCTIONS_DEF)
+	$(STIMULUS) -f $(FUNCTIONS_DEF) \
 	  -i interface.c.in \
 	  -o interface.c \
 	  -t types.def \
           -l Shell
 
-funcs.txt: interface.c.in ../functions.def ../../tools/stimulus.py
-	../../tools/stimulus.py \
-	-f ../functions.def \
-	-o funcs.txt \
-	-l ShellLn
+funcs.txt: interface.c.in $(STIMULUS) $(FUNCTIONS_DEF)
+	$(STIMULUS) -f $(FUNCTIONS_DEF) -o funcs.txt -l ShellLn
 
 igraph_CPPFLAGS = -I $(top_srcdir)/include/
 igraph_CFLAGS = -Wall -O2
