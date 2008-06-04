@@ -3029,7 +3029,7 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
   PyObject *res_o;
   igraph_bool_t scale;
   igraph_real_t value;
-  igraph_vector_t weights, res;
+  igraph_vector_t *weights=0, res;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO!O", kwlist,
                                    &scale_o, &weights_o,
@@ -3037,30 +3037,25 @@ PyObject *igraphmodule_Graph_eigenvector_centrality(
                                    &arpack_options, &return_eigenvalue))
     return NULL;
 
-  if (igraph_vector_init(&weights, 0)) return igraphmodule_handle_igraph_error();
-
   scale = PyObject_IsTrue(scale_o);
-  if (igraphmodule_PyObject_to_attribute_values(weights_o, &weights,
-	  self, ATTRIBUTE_TYPE_EDGE, 1)) {
-	igraph_vector_destroy(&weights);
-	return NULL;
-  }
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
 
   if (igraph_vector_init(&res, 0)) {
-    igraph_vector_destroy(&weights);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     return igraphmodule_handle_igraph_error();
   }
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_eigenvector_centrality(&self->g, &res, &value, scale,
-      &weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
+      weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
     igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&weights);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_vector_destroy(&res);
     return NULL;
   }
 
-  igraph_vector_destroy(&weights);
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
   
   res_o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT); 
   igraph_vector_destroy(&res);

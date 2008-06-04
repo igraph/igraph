@@ -150,6 +150,12 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
   
+  options->n = igraph_vcount(graph);
+  options->nev = 1;
+  options->ncv = 3;
+  options->which[0]='L'; options->which[1]='A';
+  options->start=1;		/* no random start vector */
+
   if (!weights) {
     
     igraph_adjlist_t adjlist;
