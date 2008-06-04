@@ -7947,7 +7947,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the average path length in the graph\n"},
 
   /* interface to igraph_authority_score */
-  {"authority_score", (PyCFunction)igraphmodule_Graph_hub_score,
+  {"authority_score", (PyCFunction)igraphmodule_Graph_authority_score,
    METH_VARARGS | METH_KEYWORDS,
    "authority_score(scale=True, arpack_options=None, return_eigenvalue=False)\n\n"
    "Calculates Kleinberg's authority score for the vertices of the graph\n\n"
