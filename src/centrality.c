@@ -297,6 +297,12 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 	
   extra.in=inadjlist; extra.out=outadjlist; extra.tmp=&tmp;
 
+  options->n = igraph_vcount(graph);
+  options->nev = 1;
+  options->ncv = 3;
+  options->which[0]='L'; options->which[1]='M';
+  options->start=1;		/* no random start vector */
+
   IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg2, &extra,
 				     options, 0, &values, &vectors));
 
