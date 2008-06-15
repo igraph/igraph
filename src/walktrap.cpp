@@ -128,6 +128,7 @@ int igraph_community_walktrap(const igraph_t *graph,
   }
   if (modularity) {
     IGRAPH_CHECK(igraph_vector_resize(modularity, no_of_nodes));
+	igraph_vector_null(modularity);
   }
   Communities C(G, length, max_memory, merges, modularity);
   
