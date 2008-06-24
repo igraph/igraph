@@ -1295,6 +1295,11 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v,
   long int left=0;
   long int right=FUNCTION(igraph_vector,size)(v)-1;
 
+  if (right < 0) {
+    if (pos != 0) *pos=0;
+	return 0;
+  }
+
   while (left < right-1) {
     long int middle=(left+right)/2;
     if (VECTOR(*v)[middle] > what) {
