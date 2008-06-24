@@ -394,7 +394,7 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
   attrs <- list(name=names)
   if (!is.null(vertices)) {
     if (ncol(vertices) > 1) {
-      for (i in 2:ncol(d)) {
+      for (i in 2:ncol(vertices)) {
         newval <- vertices[,i]
         if (class(newval) == "factor") {
           newval <- as.character(newval)
