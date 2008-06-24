@@ -20,12 +20,13 @@
 #
 ###################################################################
 
-get.adjacency <- function(graph, type=c("both", "upper", "lower"),
-                          attr=NULL, names=TRUE,
-                          binary=FALSE) {
+get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
+                                attr=NULL, names=TRUE,
+                                binary=FALSE) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  
   type <- igraph.match.arg(type)
   type <- switch(type, "upper"=0, "lower"=1, "both"=2)
   
@@ -77,7 +78,72 @@ get.adjacency <- function(graph, type=c("both", "upper", "lower"),
     colnames(res) <- rownames(res) <- V(graph)$name
   }
   
+  res  
+}
+
+get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
+                                 attr=NULL, names=TRUE,
+                                 binary=FALSE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  require(Matrix)
+  
+  type <- igraph.match.arg(type)
+  type <- switch(type, "upper"=0, "lower"=1, "both"=2)
+
+  vc <- vcount(graph)
+  
+  el <- get.edgelist(graph)
+  if (!is.null(attr)) {
+    attr <- as.character(attr)
+    if (!attr %in% list.edge.attributes(graph)) {
+      stop("no such edge attribute")
+    }
+    value <- get.edge.attribute(graph, name=attr)
+  } else {
+    value <- rep(1, nrow(el))
+  }
+
+  if (is.directed(graph)) {
+    res <- spMatrix(vc, vc, i=el[,1]+1, j=el[,2]+1, x=value)
+  } else {
+    if (type==0) {
+      ## upper
+      res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2])+1,
+                      j=pmax(el[,1],el[,2])+1, x=value)
+    } else if (type==1) {
+      ## lower
+      res <- spMatrix(vc, vc, i=pmax(el[,1],el[,2])+1,
+                      j=pmin(el[,1],el[,2])+1, x=value)
+    } else if (type==2) {
+      ## both
+      pn <- pmin(el[,1],el[,2])+1
+      px <- pmax(el[,1],el[,2])+1
+      res <- spMatrix(vc, vc, i=c(pn,px), j=c(px,pn), x=rep(value,2))
+    }
+  }
+
+  if (names && "name" %in% list.vertex.attributes(graph)) {
+    colnames(res) <- rownames(res) <- V(graph)$name
+  }
+
   res
+}
+
+get.adjacency <- function(graph, type=c("both", "upper", "lower"),
+                          attr=NULL, names=TRUE,
+                          binary=FALSE, sparse=FALSE) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (!sparse) {
+    get.adjacency.dense(graph, type=type, attr=attr, names=names, binary=binary)
+  } else {
+    get.adjacency.sparse(graph, type=type, attr=attr, names=names, binary=binary)
+  }  
 }
 
 get.edgelist <- function(graph, names=TRUE) {
