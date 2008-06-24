@@ -170,6 +170,7 @@ class CentralityTests(unittest.TestCase):
         cent = g.evcent()
         self.failUnless(cent.index(max(cent)) == 0)
         self.assertAlmostEquals(max(cent), 1.0, places=3)
+        self.failUnless(min(cent) >= 0)
         cent, ev = g.evcent(scale=False, return_eigenvalue=True)
         if cent[0]<0: cent = [-x for x in cent]
         self.failUnless(cent.index(max(cent)) == 0)
