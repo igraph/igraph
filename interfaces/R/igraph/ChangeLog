@@ -1,3 +1,11 @@
+2008-06-24  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/structure.generators.R (graph.adjacency) :
+	'sparse' option added
+
+	* interfaces/R/igraph/R/structure.generators.R (graph.adjacency) :
+	several bugs corrected
+	
 2008-06-21  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/conversion.R (get.adjacency) : 'sparse' 

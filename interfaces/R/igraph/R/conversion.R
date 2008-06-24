@@ -91,7 +91,6 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   require(Matrix)
   
   type <- igraph.match.arg(type)
-  type <- switch(type, "upper"=0, "lower"=1, "both"=2)
 
   vc <- vcount(graph)
   
@@ -109,15 +108,15 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   if (is.directed(graph)) {
     res <- spMatrix(vc, vc, i=el[,1]+1, j=el[,2]+1, x=value)
   } else {
-    if (type==0) {
+    if (type=="upper") {
       ## upper
       res <- spMatrix(vc, vc, i=pmin(el[,1],el[,2])+1,
                       j=pmax(el[,1],el[,2])+1, x=value)
-    } else if (type==1) {
+    } else if (type=="lower") {
       ## lower
       res <- spMatrix(vc, vc, i=pmax(el[,1],el[,2])+1,
                       j=pmin(el[,1],el[,2])+1, x=value)
-    } else if (type==2) {
+    } else if (type=="both") {
       ## both
       pn <- pmin(el[,1],el[,2])+1
       px <- pmax(el[,1],el[,2])+1
