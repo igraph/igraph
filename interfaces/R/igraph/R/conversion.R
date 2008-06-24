@@ -144,7 +144,8 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
         PACKAGE="igraph")
 }
 
-igraph.from.graphNEL <- function(graphNEL) {
+igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
+                                 unlist.attrs=TRUE) {
 
   require(graph)
 
@@ -155,7 +156,38 @@ igraph.from.graphNEL <- function(graphNEL) {
   al <- lapply(edgeL(graphNEL), "[[", "edges")
   al <- lapply(al, function(x) x-1)
   g <- graph.adjlist(al, directed= edgemode(graphNEL)=="directed")
-  V(g)$name <- nodes(graphNEL)
+  if (name) {
+    V(g)$name <- nodes(graphNEL)
+  }
+
+  ## Graph attributes
+  g.n <- names(graphNEL@graphData)
+  g.n <- g.n [ g.n != "edgemode" ]
+  for (n in g.n) {
+    g <- set.graph.attribute(g, n, graphNEL@graphData[[n]])
+  }
+  
+  ## Vertex attributes
+  v.n <- names(nodeDataDefaults(graphNEL))
+  for (n in v.n) {
+    val <- unname(nodeData(graphNEL, attr=n))
+    if (unlist.attrs && all(sapply(val, length)==1)) { val <- unlist(val) }
+    g <- set.vertex.attribute(g, n, value=val)
+  }
+
+  ## Edge attributes
+  e.n <- names(edgeDataDefaults(graphNEL))
+  if (!weight) { e.n <- e.n [ e.n != "weight" ] }
+  if (length(e.n) > 0) {
+    el <- get.edgelist(g)
+    el <- paste(sep="|", el[,1], el[,2])
+    for (n in e.n) {
+      val <- unname(edgeData(graphNEL, attr=n)[el])
+      if (unlist.attrs && all(sapply(val, length)==1)) { val <- unlist(val) }
+      g <- set.edge.attribute(g, n, value=val)
+    }
+  }
+  
   g 
 }
 
@@ -189,7 +221,48 @@ igraph.to.graphNEL <- function(graph) {
     al <- get.adjlist(graph, "out")
     al <- lapply(al, function(x) list(edges=x+1))
   }  
-    
+  
   names(al) <- name
-  new("graphNEL", nodes=name, edgeL=al, edgemode=edgemode)
+  res <- new("graphNEL", nodes=name, edgeL=al, edgemode=edgemode)
+
+  ## Add graph attributes (other than 'directed')
+  ## Are this "officially" supported at all?
+
+  g.n <- list.graph.attributes(graph)
+  if ("directed" %in% g.n) {
+    warning("Cannot add graph attribute `directed'")
+    g.n <- g.n[ g.n != "directed" ]
+  }
+  for (n in g.n) {
+    res@graphData[[n]] <- get.graph.attribute(graph, n)
+  }
+
+  ## Add vertex attributes (other than 'name', that is already
+  ## added as vertex names)
+  
+  v.n <- list.vertex.attributes(graph)
+  v.n <- v.n[ v.n != "name" ]
+  for (n in v.n) {
+    nodeDataDefaults(res, attr=n) <- NA
+    nodeData(res, attr=n) <- get.vertex.attribute(graph, n)
+  }
+
+  ## Add edge attributes (other than 'weight')
+  
+  e.n <- list.edge.attributes(graph)
+  e.n <- e.n[ e.n != "weight" ]
+  if (length(e.n) > 0) {
+    el <- get.edgelist(graph)
+    el <- paste(sep="|", el[,1], el[,2])
+    for (n in e.n) {
+      edgeDataDefaults(res, attr=n) <- NA
+      res@edgeData@data[el] <- mapply(function(x,y) {
+        xx <- c(x,y); names(xx)[length(xx)] <- n; xx },
+                                      res@edgeData@data[el],
+                                      get.edge.attribute(graph, n),
+                                      SIMPLIFY=FALSE)
+    }
+  }
+  
+  res
 }

@@ -1,3 +1,8 @@
+2008-06-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/conversion.R (igraph.from.graphNEL)
+	(igraph.to.graphNEL) : add support for attributes
+
 2008-06-15  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structure.generators.R (graph.data.frame) :
