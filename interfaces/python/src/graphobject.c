@@ -3083,51 +3083,57 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
                                                 self, PyObject * args,
                                                 PyObject * kwds)
 {
-  char *kwlist[] = { "v", "mode", NULL };
-  igraph_vector_t *res;
+  static char *kwlist[] = { "v", "weights", "mode", NULL };
+  igraph_vector_t *res, *weights=0;
   igraph_neimode_t mode = IGRAPH_OUT;
   long from0, i, j;
   igraph_integer_t from;
-  PyObject *list, *item, *mode_o=Py_None;
+  PyObject *list, *item, *mode_o=Py_None, *weights_o=Py_None;
   long int no_of_nodes = igraph_vcount(&self->g);
   igraph_vector_ptr_t ptrvec;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O", kwlist, &from0, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|OO", kwlist, &from0, &weights_o,
+	                               &mode_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
+  
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+      ATTRIBUTE_TYPE_EDGE)) return NULL; 
   
   from = (igraph_integer_t) from0;
   res = (igraph_vector_t *) calloc(no_of_nodes, sizeof(igraph_vector_t));
   if (!res) {
     PyErr_SetString(PyExc_MemoryError, "");
+	if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
   if (igraph_vector_ptr_init(&ptrvec, no_of_nodes)) {
     PyErr_SetString(PyExc_MemoryError, "");
+	if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
   for (i = 0; i < no_of_nodes; i++) {
     VECTOR(ptrvec)[i] = &res[i];
-    igraph_vector_init(&res[i], 5);
+    igraph_vector_init(&res[i], 0);
   }
 
-  if (igraph_get_shortest_paths(&self->g, &ptrvec, from,
-                                igraph_vss_all(), mode)) {
+  if (igraph_get_shortest_paths_dijkstra(&self->g, &ptrvec, from, igraph_vss_all(),
+	                                     weights, mode)) {
     igraphmodule_handle_igraph_error();
-    for (j = 0; j < no_of_nodes; j++)
-      igraph_vector_destroy(&res[j]);
+    for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
+	if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
   list = PyList_New(no_of_nodes);
   if (!list) {
-    for (j = 0; j < no_of_nodes; j++)
-      igraph_vector_destroy(&res[j]);
+    for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
+	if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
@@ -3135,23 +3141,23 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
     item = igraphmodule_vector_t_to_PyList(&res[i], IGRAPHMODULE_TYPE_INT);
     if (!item) {
       Py_DECREF(list);
-      for (j = 0; j < no_of_nodes; j++)
-        igraph_vector_destroy(&res[j]);
+      for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
       free(res);
+	  if (weights) { igraph_vector_destroy(weights); free(weights); }
       return NULL;
     }
     if (PyList_SetItem(list, i, item)) {
       Py_DECREF(list);
-      for (j = 0; j < no_of_nodes; j++)
-        igraph_vector_destroy(&res[j]);
+      for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
       free(res);
+	  if (weights) { igraph_vector_destroy(weights); free(weights); }
       return NULL;
     }
   }
 
-  for (j = 0; j < no_of_nodes; j++)
-    igraph_vector_destroy(&res[j]);
+  for (j = 0; j < no_of_nodes; j++) igraph_vector_destroy(&res[j]);
   free(res);
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
   igraph_vector_ptr_destroy(&ptrvec);
   return list;
 }
@@ -8076,9 +8082,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_get_shortest_paths
   {"get_shortest_paths", (PyCFunction) igraphmodule_Graph_get_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "get_shortest_paths(v, mode=OUT)\n\n"
+   "get_shortest_paths(v, weights=None, mode=OUT)\n\n"
    "Calculates the shortest paths from/to a given node in a graph.\n\n"
    "@param v: the source/destination for the calculated paths\n"
+   "@param weights: edge weights in a list or the name of an edge attribute\n"
+   "  holding edge weights. If C{None}, all edges are assumed to have\n"
+   "  equal weight.\n"
    "@param mode: the directionality of the paths. L{IN} means to\n"
    "  calculate incoming paths, L{OUT} means to calculate outgoing\n"
    "  paths, L{ALL} means to calculate both ones.\n"
