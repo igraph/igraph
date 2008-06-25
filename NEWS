@@ -64,7 +64,7 @@ Bugs corrected in the R interface
   is simple.
 - The LGL and NCOL parsers were corrected to work with all 
   kinds of end-of-line encodings.
-- Hub & authority score calculations initialize ARPACK parameters now.x
+- Hub & authority score calculations initialize ARPACK parameters now.
 - Fixed a bug in the Walktrap community detection routine, when applied 
   to unconnected graphs.
 

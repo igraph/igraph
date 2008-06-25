@@ -471,7 +471,9 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  * structure in mega-scale social networks,
  * http://www.arxiv.org/abs/cs.CY/0702048v1 have also been implemented.
  *
- * \param graph The input graph.
+ * \param graph The input graph. It must be a simple graph, i.e. a graph 
+ *    without multiple and without loop edges. This is checked and an
+ *    error message is given for non-simple graphs.
  * \param merges Pointer to an initialized matrix or NULL, the result of the
  *    computation is stored here. The matrix has two columns and each
  *    merge corresponds to one merge, the ids of the two merged
