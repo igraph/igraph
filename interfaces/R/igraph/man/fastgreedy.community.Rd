@@ -8,13 +8,20 @@
   graphs via directly optimizing a modularity score.
 }
 \usage{
-fastgreedy.community(graph, merges=TRUE, modularity=TRUE)
+fastgreedy.community(graph, merges=TRUE, modularity=TRUE,
+      weights=E(graph)$weight)
 }
 \arguments{
   \item{graph}{The input graph}
   \item{merges}{Logical scalar, whether to return the merge matrix.}
   \item{modularity}{Logcal scalar, whether to return a vector containing
-    the modularity after each merge.}  
+    the modularity after each merge.}
+  \item{weights}{If not \code{NULL}, then a numeric vector of edge
+    weights. The length must match the number of edges in the graph.
+    By default the \sQuote{\code{weight}} edge attribute is used as
+    weights. If it is not present, then all edges are considered to have
+    the same weight.
+  }
 }
 \details{
  This function implements the fast greedy modularity optimization

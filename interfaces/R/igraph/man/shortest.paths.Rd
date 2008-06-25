@@ -51,8 +51,11 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
     the calculation is running.}
 }
 \details{The shortest paths (also called geodesics) are calculated by
-  using breath-first search in the graph. Right now edge weights are not
-  used, ie. every edge weight is one.
+  using breath-first search in the graph. If no edge weights were
+  specified, then a breadth-first search is used to calculate the
+  shortest paths. If edge weigths are given and all of them are
+  non-zero, then Dijkstra's algorithm is used. Otherwise the
+  Bellman-Ford algorithm is used.
 
   Note that \code{shortest.paths} is able to calculate the path length
   from or to many vertices at the same time, but
@@ -60,7 +63,7 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
   change in the future.
 
   Also note that \code{get.shortest.paths} gives only one shortest path,
-  however more than one might exists between two vertices.
+  however, more than one might exist between two vertices.
 
   \code{get.all.shortest.paths} calculates all shortest paths from a
   vertex to other vertices given in the \code{to} argument.
