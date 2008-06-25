@@ -4296,7 +4296,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   igraph_lazy_adjedgelist_destroy(&adjlist);
   igraph_indheap_destroy(&Q);
   igraph_vector_destroy(&dists);
-  igraph_vector_destroy(&is_target);
+  igraph_Free(&is_target);
   igraph_Free(parents);
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(6);
