@@ -70,6 +70,8 @@ int main() {
   igraph_vector_ptr_destroy(&vecs);
   igraph_vs_destroy(&vs);
   igraph_destroy(&g);
-  
+
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 1;
+
   return 0;
 }

@@ -94,5 +94,7 @@ int main() {
   igraph_matrix_destroy(&res);
   igraph_destroy(&g);
 
+  if (!IGRAPH_FINALLY_STACK_EMPTY) return 1;
+
   return 0;
 }
