@@ -3,6 +3,10 @@
 	* src/igraph.h (igraph_shortest_paths_bellman_ford) :
 	added missing header
 
+	* interfaces/python/src/graphobject.c :
+	modified Graph.shortest_paths to call the Bellman-Ford algorithm
+	instead of Dijkstra
+
 2008-05-25  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/fast_community.c (igraph_community_fastgreedy) :
