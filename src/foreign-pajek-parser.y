@@ -480,7 +480,7 @@ int igraph_pajek_yyerror(char *s)
   igraph_i_pajek_reset_scanner();
   snprintf(str, sizeof(str), "Parse error in Pajek file, line %li (%s)", 
 	   (long)igraph_pajek_mylineno, s);
-  igraph_i_pajek_errmsg = &str;
+  igraph_i_pajek_errmsg = str;
   return 0;
 }
 
