@@ -204,7 +204,7 @@ int igraph_community_spinglass(const igraph_t *graph,
   runs=0;
   changes=1;
 
-  while (changes>0 && (kT/stoptemp>1.0 || zeroT && runs<150)) {
+  while (changes>0 && (kT/stoptemp>1.0 || (zeroT && runs<150))) {
 
     IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
     
