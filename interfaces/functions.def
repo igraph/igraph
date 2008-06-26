@@ -673,6 +673,11 @@ igraph_similarity_dice:
         DEPS: vids ON graph
         NAME-R: similarity.dice
 
+igraph_similarity_inverse_log_weighted:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET vids=ALL, NEIMODE mode=ALL
+        DEPS: vids ON graph
+        NAME-R: similarity.invlogweighted
+
 #######################################
 # Community structure
 #######################################
