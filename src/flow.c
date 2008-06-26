@@ -28,6 +28,111 @@
 #include <limits.h>
 #include <stdio.h>
 
+/*
+ * Some general remarks about the functions in this file.
+ *
+ * The following measures can be calculated:
+ * ( 1) s-t maximum flow value, directed graph
+ * ( 2) s-t maximum flow value, undirected graph
+ * ( 3) s-t maximum flow, directed graph
+ * ( 4) s-t maximum flow, undirected graph
+ * ( 5) s-t minimum cut value, directed graph
+ * ( 6) s-t minimum cut value, undirected graph
+ * ( 7) minimum cut value, directed graph
+ * ( 8) minimum cut value, undirected graph
+ * ( 9) s-t minimum cut, directed graph
+ * (10) s-t minimum cut, undirected graph
+ * (11) minimum cut, directed graph
+ * (12) minimum cut, undirected graph
+ * (13) s-t edge connectivity, directed graph
+ * (14) s-t edge connectivity, undirected graph
+ * (15) edge connectivity, directed graph
+ * (16) edge connectivity, undirected graph
+ * (17) s-t vertex connectivity, directed graph
+ * (18) s-t vertex connectivity, undireced graph
+ * (19) vertex connectivity, directed graph
+ * (20) vertex connectivity, undireced graph
+ * (21) s-t number of edge disjoint paths, directed graph
+ * (22) s-t number of edge disjoint paths, undirected graph
+ * (23) s-t number of vertex disjoint paths, directed graph
+ * (24) s-t number of vertex disjoint paths, undirected graph
+ * (25) graph adhesion, directed graph
+ * (26) graph adhesion, undirected graph
+ * (27) graph cohesion, directed graph
+ * (28) graph cohesion, undirected graph
+ * 
+ * This is how they are calculated:
+ * ( 1) igraph_maxflow_value, it does a push-relabel algorithm
+ * ( 2) igraph_maxflow_value,
+ *      it transforms the graph into a directed graph, including two
+ *      mutual edges instead of every undirected edge 
+ *      (igraph_i_maxflow_value_undirected), then
+ *      igraph_maxflow_value is called again with the directed
+ *      graph.
+ * ( 3) NOT IMPLEMENTED
+ * ( 4) NOT IMPLEMENTED
+ * ( 5) igraph_st_mincut_value, we just call igraph_maxflow_value
+ * ( 6) igraph_st_mincut_value, we just call igraph_maxflow_value
+ * ( 7) igraph_mincut_value, we call igraph_maxflow_value (|V|-1)*2
+ *      times, from vertex 0 to all other vertices and from all other
+ *      vertices to vertex 0
+ * ( 8) We call igraph_i_mincut_value_undirected, that calls 
+ *      igraph_i_mincut_undirected with partition=partition2=cut=NULL
+ *      The Stoer-Wagner algorithm is used.
+ * ( 9) NOT IMPLEMENTED
+ * (10) NOT IMPLEMENTED
+ * (11) NOT IMPLEMENTED, igraph_mincut gives an error message
+ * (12) igraph_mincut, igraph_i_mincut_undirected is called, 
+ *      this is the Stoer-Wagner algorithm
+ * (13) We just call igraph_maxflow_value, back to (1)
+ * (14) We just call igraph_maxflow_value, back to (2)
+ * (15) We just call igraph_mincut_value (possibly after some basic
+ *      checks). Back to (7)
+ * (16) We just call igraph_mincut_value (possibly after some basic
+ *      checks). Back to (8).
+ * (17) We call igraph_i_st_vertex_connectivity_directed.
+ *      That creates a new graph with 2*|V| vertices and smartly chosen
+ *      edges, so that the s-t edge connectivity of this graph is the
+ *      same as the s-t vertex connectivity of the original graph.
+ *      So finally it calls igraph_maxflow_value, go to (1)
+ * (18) We call igraph_i_st_vertex_connectivity_undirected.
+ *      We convert the graph to a directed one,
+ *      IGRAPH_TO_DIRECTED_MUTUAL method. Then we call 
+ *      igraph_i_st_vertex_connectivity_directed, see (17).
+ * (19) We call igraph_i_vertex_connectivity_directed.
+ *      That calls igraph_st_vertex_connectivity for all pairs of
+ *      vertices. Back to (17).
+ * (20) We call igraph_i_vertex_connectivity_undirected.
+ *      That converts the graph into a directed one
+ *      (IGRAPH_TO_DIRECTED_MUTUAL) and calls the directed version,
+ *      igraph_i_vertex_connectivity_directed, see (19).
+ * (21) igraph_edge_disjoint_paths, we just call igraph_maxflow_value, (1).
+ * (22) igraph_edge_disjoint_paths, we just call igraph_maxflow_value, (2).
+ * (23) igraph_vertex_disjoint_paths, if there is a connection between
+ *      the two vertices, then we remove that (or all of them if there
+ *      are many), as this could mess up vertex connectivity
+ *      calculation. The we call
+ *      igraph_i_st_vertex_connectivity_directed, see (19).
+ * (24) igraph_vertex_disjoint_paths, if there is a connection between
+ *      the two vertices, then we remove that (or all of them if there
+ *      are many), as this could mess up vertex connectivity
+ *      calculation. The we call
+ *      igraph_i_st_vertex_connectivity_undirected, see (20).
+ * (25) We just call igraph_edge_connectivity, see (15). 
+ * (26) We just call igraph_edge_connectivity, see (16).
+ * (27) We just call igraph_vertex_connectivity, see (19).
+ * (28) We just call igraph_vertex_connectivity, see (20).
+
+/*
+ * This is an internal function that calculates the maximum flow value
+ * on undirected graphs, either for an s-t vertex pair or for the
+ * graph (i.e. all vertex pairs). 
+ * 
+ * It does it by converting the undirected graph to a corresponding
+ * directed graph, including reciprocal directed edges instead of each
+ * undirected edge.
+ */
+
 int igraph_i_maxflow_value_undirected(const igraph_t *graph, 
 				      igraph_real_t *value,
 				      igraph_integer_t source, 
@@ -413,6 +518,13 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
   
 /*   return 0; */
 /* } */
+
+/*
+ * This is the Stoer-Wagner algorithm, it works for calcuating the
+ * minimum cut for undirected graphs, for the whole graph. 
+ * I.e. this is basically the edge-connectivity of the graph. 
+ * It can also calculate the cut itself, not just the cut value.
+ */
 
 int igraph_i_mincut_undirected(const igraph_t *graph, 
 			       igraph_integer_t *res,
@@ -1305,6 +1417,9 @@ int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
     igraph_es_destroy(&es);
     igraph_vector_destroy(&v);
   }
+
+  /* These do nothing if the two vertices are connected, 
+     so it is safe to call them. */
 
   if (igraph_is_directed(graph)) {
     IGRAPH_CHECK(igraph_i_st_vertex_connectivity_directed(graph, res,
