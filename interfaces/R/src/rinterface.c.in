@@ -3067,7 +3067,7 @@ SEXP R_igraph_measure_dynamics_citingcat_citedcat_st(SEXP graph,
 }
 
 SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto, 
-				 SEXP pmode, SEXP pno) {
+				 SEXP pmode, SEXP pno, SEXP weights) {
 
   igraph_t g;
   igraph_integer_t from=REAL(pfrom)[0];
@@ -3076,6 +3076,7 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
   igraph_vector_t *vects;
   long int i;
   igraph_vector_ptr_t ptrvec;
+  igraph_vector_t w, *pw=&w;
   SEXP result;
   
   long int no=REAL(pno)[0];
@@ -3091,7 +3092,12 @@ SEXP R_igraph_get_shortest_paths(SEXP graph, SEXP pfrom, SEXP pto,
     igraph_vector_init(&vects[i], 0);
     VECTOR(ptrvec)[i]=&vects[i];
   }
-  igraph_get_shortest_paths(&g, &ptrvec, from, to, mode);
+  if (isNull(weights)) {
+    pw=0;
+  } else {
+    R_SEXP_to_vector(weights, &w);
+  }
+  igraph_get_shortest_paths_dijkstra(&g, &ptrvec, from, to, pw, mode);
   PROTECT(result=NEW_LIST(no));
   for (i=0; i<no; i++) {
     SET_VECTOR_ELT(result, i, NEW_NUMERIC(igraph_vector_size(&vects[i])));
