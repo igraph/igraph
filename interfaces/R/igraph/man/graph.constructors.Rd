@@ -1,4 +1,5 @@
 \name{graph.constructors}
+\alias{graph.constructors}
 \alias{graph.empty}
 \alias{graph}
 \alias{graph.star}
@@ -9,7 +10,6 @@
 \alias{graph.full.citation}
 \alias{graph.atlas}
 \alias{graph.edgelist}
-\alias{graph.data.frame}
 \alias{graph.extended.chordal.ring}
 \concept{Tree}
 \concept{Lattice}
@@ -39,7 +39,6 @@ graph.full(n, directed = FALSE, loops = FALSE)
 graph.full.citation(n, directed = TRUE)
 graph.atlas(n)
 graph.edgelist(el, directed=TRUE)
-graph.data.frame(d, directed=TRUE)
 graph.extended.chordal.ring(n, w)
 }
 \arguments{
@@ -91,7 +90,6 @@ graph.extended.chordal.ring(n, w)
   \item{graph}{An object.}
   \item{el}{An edge list, a two column matrix, character or numeric. See
     details below.}
-  \item{d}{A data frame object, this will be converted to a graph.}
   \item{w}{A matrix which specifies the extended chordal ring. See
     details below.}
 }
@@ -139,11 +137,6 @@ graph.extended.chordal.ring(n, w)
   names and a vertex id will be assigned to each name, and also a
   \code{name} vertex attribute will be added.
   
-  \code{graph.data.frame} creates a graph from a data frame. The data
-  frame should have at least two columns. The first two columns will be
-  used as a symbolic edge list and the other columns will be added as
-  edge attributes.
-
   \code{graph.extended.chordal.ring} creates an extended chordal ring.
   An extended chordal ring is regular graph, each node has the same
   degree. It can be obtained from a simple ring by adding some extra
@@ -163,7 +156,8 @@ graph.extended.chordal.ring(n, w)
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{graph.adjacency}} to create graphs from adjacency
   matrices, \code{\link{graph.formula}} for a handy way to create small
-  graphs.
+  graphs, \code{\link{graph.data.frame}} for an easy way to create
+  graphs with many edge/vertex attributes.
 }
 \examples{
 g1 <- graph.empty()
@@ -178,9 +172,6 @@ g11 <- graph.full.citation(10)
 g12 <- graph.atlas(sample(0:1252, 1))
 el <- matrix( c("foo", "bar", "bar", "foobar"), nc=2, byrow=TRUE)
 g13 <- graph.edgelist(el)
-d <- as.data.frame(el)
-d$weight <- 1:2
-g14 <- graph.data.frame(d)
 g15 <- graph.extended.chordal.ring(15, matrix(c(3,12,4,7,8,11), nr=2))
 }
 \keyword{graphs}

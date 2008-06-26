@@ -1,6 +1,7 @@
 \name{graph.adjacency}
 \alias{graph.adjacency}
 \concept{Adjacency matrix}
+\concept{Sparse matrix}
 \title{Create graphs from adjacency matrices}
 \description{\code{graph.adjacency} is a flexible function for creating
   \code{igraph} graphs from adjacency matrices.}
@@ -10,7 +11,8 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
         add.colnames=NULL, add.rownames=NA)
 }
 \arguments{
-  \item{adjmatrix}{A square adjacency matrix.}
+  \item{adjmatrix}{A square adjacency matrix. From igraph version 0.5.1
+    this can be a sparse matrix created with the \code{Matrix} package.}
   \item{mode}{
     Character scalar, specifies how igraph should interpret the supplied
     matrix. See also the \code{weighted} argument, the interpretation
@@ -48,7 +50,7 @@ graph.adjacency(adjmatrix, mode=c("directed", "undirected", "max",
   \code{graph.adjacency} creates a graph from an adjacency matrix.
 
   The order of the vertices are preserved, i.e. the vertex corresponding
-  to the first row will be vertex #0 in the graph, etc.
+  to the first row will be vertex 0 in the graph, etc.
 
   \code{graph.adjacency} operates in two main modes, depending on the
   \code{weighted} argument.

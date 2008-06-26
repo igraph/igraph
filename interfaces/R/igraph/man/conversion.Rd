@@ -8,7 +8,7 @@
   a graph, like an adjacency matrix or an edge list.}
 \usage{
 get.adjacency(graph, type=c("both", "upper", "lower"),
-       attr=NULL, names=TRUE, binary=FALSE)
+       attr=NULL, names=TRUE, binary=FALSE, sparse=FALSE)
 get.edgelist(graph, names=TRUE)
 }
 \arguments{
@@ -37,10 +37,16 @@ get.edgelist(graph, names=TRUE)
   }
   \item{binary}{Logical, whether to return a binary matrix. This argument
     is ignored if \code{attr} is not \code{NULL}.}
+  \item{sparse}{Logical scalar, whether to create a sparse matrix. The
+    \sQuote{\code{Matrix}} package must be installed for creating sparse
+    matrices.}
 }
 \details{
-  \code{get.adjacency} returns the adjacency matrix of a graph.
-
+  \code{get.adjacency} returns the adjacency matrix of a graph, a
+  regular \R matrix if \code{sparse} is \code{FALSE}, or a sparse
+  matrix, as defined in the \sQuote{\code{Matrix}} package, if
+  \code{sparse} if \code{TRUE}.
+  
   \code{get.edgelist} returns the list of edges in a graph.  
 }
 \value{

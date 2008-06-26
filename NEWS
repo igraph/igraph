@@ -25,7 +25,7 @@ New in the R interface
 - graph.adjacency adds column/row names as 'name' attribute.
 - Weighted shortest paths using Dijkstra's or the Belmann-Ford 
   algorithm.
-- Shortest path function(s) return 'INF' for unreachable vertices.
+- Shortest path functions return 'Inf' for unreachable vertices.
 - New function 'is.mutual' to find mutual edges in a directed graph.
 - Added inverse log-weighted similarity measure (a.k.a. Adamic/Adar
   similarity).
@@ -74,7 +74,7 @@ New in the C layer
 - Some stochastic test results are ignored (for spinglass community
   detection, some Erdos-Renyi generator tests)
 - Weighted shortest paths, Dijkstra's algorithm.
-* The unweigthed shortest path routine returns INF for unreachable 
+- The unweigthed shortest path routine returns 'Inf' for unreachable
   vertices.
 - New function, igraph_adjlist can create igraph graphs from 
   adjacency lists.

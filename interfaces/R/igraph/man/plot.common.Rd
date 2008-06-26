@@ -98,6 +98,14 @@
 
       The default value is 15. This is big enough to place short labels
       on vertices.}
+    \item{size2}{The \dQuote{other} size of the vertex, for some vertex
+      shapes. For the various rectangle shapes this gives the height of
+      the vertices, whereas \code{size} gives the width. It is ignored
+      by shapes for which the size can be specified with a single
+      number.
+
+      The default is 15.
+    }
     \item{color}{The fill color of the vertex. If it is numeric then
       the current palette is used, see
       \code{\link[grDevices]{palette}}. If it is a character vector then
@@ -114,12 +122,16 @@
 
       By default it is \dQuote{black}.
     }
-    \item{shape}{The shape of the vertex, currently only
-      \dQuote{\code{circle}}, \dQuote{\code{square}} and
+    \item{shape}{The shape of the vertex, currently
+      \dQuote{\code{circle}}, \dQuote{\code{square}},
+      \dQuote{\code{csquare}}, \dQuote{\code{rectangle}},
+      \dQuote{\code{crectangle}}, \dQuote{\code{vrectangle}} and
       \dQuote{\code{none}} are supported,
       and only by the \code{\link{plot.igraph}}
       command. \dQuote{\code{none}} does not draw the vertices at all,
-      although vertex label are plotted (if given).
+      although vertex label are plotted (if given). See
+      \code{\link{igraph.vertex.shapes}} for details about vertex
+      shapes.
 
       By default vertices are drawn as circles.
     }
