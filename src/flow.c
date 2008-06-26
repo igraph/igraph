@@ -1129,10 +1129,7 @@ int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
 int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 				igraph_integer_t source, 
 				igraph_integer_t target) {
-  
-  long int no_of_edges=igraph_ecount(graph);
   igraph_real_t flow;
-  long int i;
 
   if (source == target) {
     IGRAPH_ERROR("source and target vertices are the same", IGRAPH_EINVAL);
@@ -1179,8 +1176,6 @@ int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			     igraph_bool_t checks) {
   
-  long int no_of_edges=igraph_ecount(graph);
-  long int i;
   igraph_bool_t ret;
   
   /* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
@@ -1225,9 +1220,7 @@ int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_integer_t source, 
 			       igraph_integer_t target) {
 
-  long int no_of_edges=igraph_ecount(graph);
   igraph_real_t flow;
-  long int i;
 
   if (source == target) {
     IGRAPH_ERROR("Not implemented for source=target", IGRAPH_UNIMPLEMENTED);

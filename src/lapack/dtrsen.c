@@ -316,7 +316,7 @@ static integer c_n1 = -1;
 	*info = -4;
     } else if (*ldt < max(1,*n)) {
 	*info = -6;
-    } else if (*ldq < 1 || wantq && *ldq < *n) {
+    } else if (*ldq < 1 || (wantq && *ldq < *n)) {
 	*info = -8;
     } else {
 

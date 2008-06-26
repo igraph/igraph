@@ -52,7 +52,7 @@ int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labelin
   Graph *g = Graph::from_igraph(graph);
   Stats stats;
   const unsigned int N=g->get_nof_vertices();
-  unsigned int gsh;
+  unsigned int gsh=Graph::sh_flm;
 
   switch (sh) { 
   case IGRAPH_BLISS_F:    gsh= Graph::sh_f;   break;
@@ -109,7 +109,7 @@ int igraph_automorphisms(const igraph_t *graph,
   
   Graph *g = Graph::from_igraph(graph);
   Stats stats;
-  unsigned int gsh;
+  unsigned int gsh=Graph::sh_flm;
 
   switch (sh) { 
   case IGRAPH_BLISS_F:    gsh= Graph::sh_f;   break;

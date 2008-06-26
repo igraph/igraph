@@ -145,7 +145,7 @@ static integer c__2 = 2;
 	*info = -2;
     } else if (*ldt < max(1,*n)) {
 	*info = -4;
-    } else if (*ldq < 1 || wantq && *ldq < max(1,*n)) {
+    } else if (*ldq < 1 || (wantq && *ldq < max(1,*n))) {
 	*info = -6;
     } else if (*ifst < 1 || *ifst > *n) {
 	*info = -7;
