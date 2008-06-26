@@ -4152,10 +4152,10 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  */
 int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        igraph_vector_ptr_t *res,
-									   igraph_integer_t from,
-									   igraph_vs_t to,
-									   const igraph_vector_t *weights,
-									   igraph_neimode_t mode) {
+				       igraph_integer_t from,
+				       igraph_vs_t to,
+				       const igraph_vector_t *weights,
+				       igraph_neimode_t mode) {
   /* Implementation details. This is the basic Dijkstra algorithm, 
      with a binary heap. The heap is indexed, i.e. it stores not only
      the distances, but also which vertex they belong to. The other
@@ -4170,9 +4170,9 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
        computation, as IGRAPH_FINITE() might involve a function call 
        and we want to spare that. So we store distance+1.0 instead of 
        distance, and zero denotes infinity.
-	 - `parents' assigns the predecessors of all vertices in the
-	   shortest path tree to the vertices. In this implementation, the
-	   vertex ID + 1 is stored, zero means unreachable vertices.
+     - `parents' assigns the predecessors of all vertices in the
+       shortest path tree to the vertices. In this implementation, the
+       vertex ID + 1 is stored, zero means unreachable vertices.
   */
   
   long int no_of_nodes=igraph_vcount(graph);
@@ -4311,7 +4311,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  * This function is the Bellman-Ford algorithm to find the weighted 
  * shortest paths to all vertices from a single source. (It is run 
  * independently for the given sources.). If there are no negative
- * weights, you are better off with \ref igraph_shortest_paths_dijsktra() .
+ * weights, you are better off with \ref igraph_shortest_paths_dijkstra() .
  * 
  * \param graph The input graph, can be directed.
  * \param res The result, a matrix. Each row contains the distances
@@ -4534,6 +4534,34 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   
   return 0;
 }
+
+/**
+ * \function igraph_is_mutual
+ * Check whether the edges of a directed graph are mutual
+ * 
+ * An (A,B) edge is mutual if the graph contains the (B,A) edge, too.
+ * </para>
+ * 
+ * <para>An undirected graph only has mutual edges, by definition.
+ * </para>
+ * 
+ * <para>Edge multiplicity is not considered here, e.g. if there are two 
+ * (A,B) edges and one (B,A) edge, then all three are considered to be
+ * mutual.
+ * 
+ * \param graph The input graph.
+ * \param res Pointer to an initialized vector, the result is stored
+ *        here.
+ * \param es The sequence of edges to check. Supply
+ *        <code>igraph_ess_all()</code> for all edges, see \ref
+ *        igraph_ess_all().
+ * \return Error code.
+ * 
+ * Time complexity: O(n log(d)), n is the number of edges supplied, d
+ * is the maximum in-degree of the vertices that are targets of the
+ * supplied edges. An upper limit of the time complexity is O(n log(|E|)),
+ * |E| is the number of edges in the graph.
+ */
 
 int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es) {
 

@@ -18,6 +18,7 @@
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_shortest_paths_bellman_ford -->
 <!-- doxrox-include igraph_get_shortest_paths -->
+<!-- doxrox-include igraph_get_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_get_all_shortest_paths -->
 <!-- doxrox-include igraph_average_path_length -->
 <!-- doxrox-include igraph_path_length_hist -->
@@ -111,6 +112,7 @@
 <section><title>Other Operations</title>
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_reciprocity -->
+<!-- doxrox-include igraph_is_mutual -->
 <!-- doxrox-include igraph_get_adjacency -->	
 <!-- doxrox-include igraph_get_edgelist -->	
 </section>

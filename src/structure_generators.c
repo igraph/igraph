@@ -236,10 +236,8 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
  * \return Error code,
  *         \c IGRAPH_NONSQUARE: non-square matrix.
  * 
- * Time complexity: O(|V||V|+|E|),
- * |V| and 
- * |E| are number of vertices and
- * edges in the graph. 
+ * Time complexity: O(|V||V|),
+ * |V| is the number of vertices in the graph.
  */
 
 int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
@@ -460,10 +458,8 @@ int igraph_i_weighted_adjacency_min(igraph_matrix_t *adjmatrix,
  * \return Error code,
  *         \c IGRAPH_NONSQUARE: non-square matrix.
  * 
- * Time complexity: O(|V||V|+|E|),
- * |V| and 
- * |E| are number of vertices and
- * edges in the graph. 
+ * Time complexity: O(|V||V|),
+ * |V| is the number of vertices in the graph.a
  */
 
 int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
@@ -2032,7 +2028,27 @@ int igraph_famous(igraph_t *graph, const char *name) {
  * \function igraph_adjlist
  * Create a graph from an adjacency list
  * 
- * TODO
+ * An adjacency list is list of vectors, containing the neighbors 
+ * of all vertices. For operations that involve many changes of the
+ * graph structure, it is recommended that you convert the graph into
+ * and adjacency list via \ref igraph_adjlist_init(), perform the
+ * modifications (these are cheap for an adjacency list) and then
+ * recreate the igraph graph via this function.
+ * 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param adjlist The adjacency list.
+ * \param directed Logical, whether or not to create a directed graph.
+ * \param duplicate Logical, for undirected graphs this specified
+ *        whether each edge is included twice, in the vectors of 
+ *        both adjacenct vertices. If this is false (0), then it is
+ *        assumed that every edge is included only once. This argument 
+ *        is ignored for directed graphs.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_adjlist_init() for the opposite operation.
+ *
+ * Time complexity: O(|V|+|E|).
+ * 
  */
 
 int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
