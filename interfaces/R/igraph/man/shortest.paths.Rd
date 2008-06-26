@@ -14,7 +14,8 @@
 \usage{
 shortest.paths(graph, v=V(graph), mode = c("all", "out", "in"),
       weights = NULL)
-get.shortest.paths(graph, from, to=V(graph), mode = c("all", "out", "in"))
+get.shortest.paths(graph, from, to=V(graph), mode = c("all", "out",
+      "in"), weights = NULL)
 get.all.shortest.paths(graph, from, to = V(graph), mode = c("all", "out", "in")) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
 path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose")) 
@@ -55,7 +56,11 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
   specified, then a breadth-first search is used to calculate the
   shortest paths. If edge weigths are given and all of them are
   non-zero, then Dijkstra's algorithm is used. Otherwise the
-  Bellman-Ford algorithm is used.
+  Bellman-Ford algorithm is used for \code{shortest.paths}.
+
+  Please do NOT call \code{get.shortest.paths} and
+  \code{get.all.shortest.paths} with negative edge weights, it will not
+  work, these functions do not use the Belmann-Ford algotithm.
 
   Note that \code{shortest.paths} is able to calculate the path length
   from or to many vertices at the same time, but
