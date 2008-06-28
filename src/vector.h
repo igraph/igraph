@@ -208,6 +208,8 @@ int FUNCTION(igraph_vector,init_int_end)(TYPE(igraph_vector)*v, int endmark, ...
 
 int FUNCTION(igraph_vector,move_interval)(TYPE(igraph_vector) *v, 
 					  long int begin, long int end, long int to);
+int FUNCTION(igraph_vector,move_interval2)(TYPE(igraph_vector) *v, 
+					  long int begin, long int end, long int to);
 void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v, 
 					const igraph_vector_t *index, 
 					long int nremove);

@@ -1133,6 +1133,17 @@ int FUNCTION(igraph_vector,move_interval)(TYPE(igraph_vector) *v,
   return 0;
 }
 
+int FUNCTION(igraph_vector,move_interval2)(TYPE(igraph_vector) *v, 
+					  long int begin, long int end, 
+					  long int to) {
+  assert(v != NULL);
+  assert(v->stor_begin != NULL);
+  memmove(v->stor_begin+to, v->stor_begin+begin, 
+	 sizeof(BASE)*(end-begin));
+
+  return 0;
+}
+
 /**
  * \ingroup vector
  * \function igraph_vector_permdelete
@@ -1320,7 +1331,12 @@ igraph_bool_t FUNCTION(igraph_vector,binsearch)(const TYPE(igraph_vector) *v,
   if (pos != 0) {
     *pos=left;
   }
-  return VECTOR(*v)[left]==what;
+  
+  if (left < FUNCTION(igraph_vector,size)(v)) {
+    return VECTOR(*v)[left]==what;
+  } else { 
+    return 0;
+  }
 }
 
 /**
