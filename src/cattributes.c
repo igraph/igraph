@@ -94,6 +94,10 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
       igraph_free(rec);
     }
   }
+  igraph_vector_ptr_destroy(&attr->gal);
+  igraph_vector_ptr_destroy(&attr->val);
+  igraph_vector_ptr_destroy(&attr->eal);
+  igraph_free(graph->attr);
   graph->attr=0;
 }
 
