@@ -523,7 +523,7 @@ int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src) {
  * \function igraph_vs_type
  * \brief Returns the type of the vertex selector
  */
-inline int igraph_vs_type(const igraph_vs_t *vs) { return vs->type; }
+int igraph_vs_type(const igraph_vs_t *vs) { return vs->type; }
 
 /**
  * \function igraph_vs_size
@@ -1346,7 +1346,7 @@ int igraph_es_as_vector(const igraph_t *graph, igraph_es_t es,
  * \function igraph_es_type
  * \brief Returns the type of the edge selector
  */
-inline int igraph_es_type(const igraph_es_t *es) { return es->type; }
+int igraph_es_type(const igraph_es_t *es) { return es->type; }
 
 int igraph_i_es_pairs_size(const igraph_t *graph, 
 		       const igraph_es_t *es, igraph_integer_t *result);
