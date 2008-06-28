@@ -253,6 +253,7 @@ int main() {
   if (pos != 0) {
     return 18;
   }
+  igraph_vector_destroy(&v);
 
   /* igraph_vector_init_real */
   igraph_vector_init_real(&v, 10, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0);

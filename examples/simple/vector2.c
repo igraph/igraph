@@ -99,6 +99,7 @@ int main() {
   }
 
   igraph_vector_destroy(&v1);
+  igraph_vector_destroy(&v2);
 
   igraph_vector_init_int(&v1, 10, 3, 5, 6, 6, 6, 7, 8, 8, 9, 10);
   igraph_vector_init_int(&v2, 10, 1, 3, 3, 6, 6, 9, 12, 15, 17, 20);
