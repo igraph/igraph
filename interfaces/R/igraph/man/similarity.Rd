@@ -13,7 +13,7 @@ similarity.jaccard(graph, vids = V(graph), mode = c("all", "out", "in",
       "total"), loops = FALSE) 
 similarity.dice(graph, vids = V(graph), mode = c("all", "out", "in",
       "total"), loops = FALSE)
-similarity.invlogweighted((graph, vids = V(graph),
+similarity.invlogweighted(graph, vids = V(graph),
        mode = c("all", "out", "in", "total"))
 }
 \arguments{
