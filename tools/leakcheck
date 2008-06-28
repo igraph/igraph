@@ -80,7 +80,7 @@ rm -rf valgrind-logs/*
 
 cd examples/simple
 
-SKIPS="igraph_layout_merge.c"
+SKIPS="igraph_layout_merge.c igraph_es_adj.c igraph_es_fromto.c"
 for i in *.c; do
   current=$i
   OK=1
@@ -95,7 +95,7 @@ for i in *.c; do
     if [ -x a.out ]; then
       echo -n "compiled... "
       LOG=../../valgrind-logs/`basename ${current} .c`.log
-      LD_LIBRARY_PATH=../../src/.libs valgrind --tool=memcheck --error-exitcode=63 --leak-check=yes --log-file-exactly=${LOG} ./a.out >/dev/null
+      LD_LIBRARY_PATH=../../src/.libs valgrind --tool=memcheck --error-exitcode=63 --leak-check=yes --log-file=${LOG} ./a.out >/dev/null
       ERRCODE=$?
       if [ $ERRCODE -eq 63 ]; then
         echo "executed, memory access problems found!"
