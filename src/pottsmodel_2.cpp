@@ -51,7 +51,7 @@
 #include "random.h"
 
 //#################################################################################################
-PottsModel::PottsModel(network *n, unsigned int qvalue, int m)
+PottsModel::PottsModel(network *n, unsigned int qvalue, int m) : acceptance(0)
 {
   DLList_Iter<NNode*> iter;
   NNode *n_cur;
@@ -93,11 +93,17 @@ PottsModel::PottsModel(network *n, unsigned int qvalue, int m)
 //########################################################
 PottsModel::~PottsModel()
 {
+  /* The DLItem destructor does not delete its item currently, 
+     because of some bad design. As a workaround, we delete them here
+     by hand */
+  new_spins->delete_items();
+  previous_spins->delete_items();
   delete new_spins;
   delete previous_spins;
-  delete Qa;
-  delete weights;
-  delete color_field;
+  delete [] Qa;
+  delete [] weights;
+  delete [] color_field;
+  delete [] neighbours;
   return;
 }
 //#####################################################
@@ -931,7 +937,9 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
   if (!found) {
 //      printf("%s not found found. Aborting.\n",nodename);
 //      fprintf(file,"%s not found found. Aborting.\n",nodename);
-     return -1;
+    delete to_do;
+    delete community;
+    return -1;
   }
   //#############################
   // initialize the to_do list and community with the neighbours of start node
@@ -1138,7 +1146,10 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
   }
 //   printf("%d nodes in community around %s\n",community->Size(),start_node->Get_Name());
 //   fclose(file);
-  return community->Size();
+  unsigned int size=community->Size();
+  delete to_do;  
+  delete community;
+  return size;
 }
 
 //################################################################################################

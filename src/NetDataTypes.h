@@ -91,6 +91,8 @@ class DLItem
       DLItem(L_DATA i, unsigned long ind);
       DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_DATA> *n); 
       ~DLItem();
+      public:
+      void del() { delete item; }
 };
 
 template <class L_DATA >
@@ -116,6 +118,7 @@ class DLList
     int Enqueue(L_DATA);
     L_DATA Dequeue(void);
     unsigned long Is_In_List(L_DATA);
+    void delete_items();
 };
 
 template <class L_DATA>
@@ -367,7 +370,7 @@ template <class DATA> HugeArray<DATA>::~HugeArray(void)
  for (unsigned int i=0; i<=highest_field_index; i++)
  {
    data=fields[i];
-   delete(data);
+   delete [] data;
  }
 }
 
@@ -448,7 +451,7 @@ DLItem<L_DATA>::DLItem(L_DATA i, unsigned long ind, DLItem<L_DATA> *p, DLItem<L_
 template <class L_DATA>
 DLItem<L_DATA>::~DLItem()
 {
-//  delete item;      //eigentlich muessten wir pruefen, ob item ueberhaupt ein Pointer ist...
+ //delete item;      //eigentlich muessten wir pruefen, ob item ueberhaupt ein Pointer ist...
  //previous=NULL;
  //next=NULL;
 }
@@ -486,6 +489,20 @@ DLList<L_DATA>::~DLList()
     number_of_items=0;
   //  printf("Liste Zerstoert!\n");
 }
+
+template <class L_DATA>
+void DLList<L_DATA>::delete_items() {
+  DLItem<L_DATA> *cur, *next;
+  cur=this->head;
+  while (cur)
+    {
+      next=cur->next;
+      cur->del();
+      cur=next;
+    }
+  this->number_of_items=0;
+}  
+
 //privates Insert
 template <class L_DATA>
 DLItem<L_DATA> *DLList<L_DATA>::pInsert(L_DATA data, DLItem<L_DATA> *pos)
@@ -608,15 +625,16 @@ DL_Indexed_List<L_DATA>::DL_Indexed_List(void) : DLList<L_DATA>()
 template <class L_DATA>
 DL_Indexed_List<L_DATA>::~DL_Indexed_List()
 {
-  DLItem<L_DATA> *cur, *next;
-  cur=this->head;
-  while (cur)
-    {
-      next=cur->next;
-      delete(cur);
-      cur=next;
-    }
-    this->number_of_items=0;
+  /* This is already done by the DLList destructor */
+/*   DLItem<L_DATA> *cur, *next; */
+/*   cur=this->head; */
+/*   while (cur) */
+/*     { */
+/*       next=cur->next; */
+/*       delete(cur); */
+/*       cur=next; */
+/*     } */
+/*     this->number_of_items=0; */
   //  printf("Liste Zerstoert!\n");
 }
 

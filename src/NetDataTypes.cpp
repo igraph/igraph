@@ -79,7 +79,7 @@ NNode::~NNode()
   Disconnect_From_All();
   delete neighbours;
   delete n_links;
-  delete state_history;
+  delete [] state_history;
   neighbours=NULL;
   n_links=NULL;
   state_history=NULL;

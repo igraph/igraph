@@ -28,6 +28,9 @@ int main() {
   igraph_real_t  modularity, temperature;
   igraph_vector_t membership, csize;
   long int i;
+  igraph_real_t cohesion, adhesion;
+  igraph_integer_t inner_links;
+  igraph_integer_t outer_links;
   
   igraph_small(&g, 5, IGRAPH_UNDIRECTED, 
 	       0,1,0,2,0,3,0,4, 1,2,1,3,1,4, 2,3,2,4, 3,4,
@@ -68,9 +71,23 @@ int main() {
     return 77;
   }
 
+  /* Try to call this as well, we don't check the results currently.... */
+  
+  igraph_community_spinglass_single(&g, 
+				    /*weights=  */ 0,
+				    /*vertex=   */ 0,
+				    /*community=*/ &membership,
+				    /*cohesion= */ &cohesion,
+				    /*adhesion= */ &adhesion,
+				    /*inner_links= */ &inner_links,
+				    /*outer_links= */ &outer_links,
+				    /*spins=       */ 2,
+				    /*update_rule= */ IGRAPH_SPINCOMM_UPDATE_CONFIG,
+				    /*gamma=       */ 1.0);
+  
   igraph_destroy(&g);
   igraph_vector_destroy(&membership);
-  igraph_vector_destroy(&csize);
+  igraph_vector_destroy(&csize);  
   
   return 0;
 }
