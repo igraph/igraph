@@ -68,6 +68,16 @@ AbstractGraph::~AbstractGraph()
     free(best_path_automorphism); best_path_automorphism = 0; }
   //if(certificate) {
   //  free(certificate); certificate = 0; }
+  while(!long_prune_fixed.empty())
+    {
+      delete long_prune_fixed.back();
+      long_prune_fixed.pop_back();
+    }
+  while(!long_prune_mcrs.empty())
+    {
+      delete long_prune_mcrs.back();
+      long_prune_mcrs.pop_back();
+    }
 }
 
 
