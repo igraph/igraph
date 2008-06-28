@@ -614,6 +614,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
       igraph_strvector_destroy(strvec);
       igraph_Free(strvec);
     }
+    igraph_free( (char*)(rec->name));
     igraph_Free(rec);
   }
 
@@ -628,6 +629,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
       igraph_strvector_destroy(strvec);
       igraph_Free(strvec);
     }
+    igraph_free( (char*)(rec->name));
     igraph_Free(rec);
   }
 
@@ -2417,7 +2419,8 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
       igraph_strvector_get(&strv, 0, &s);
       CHECK(fprintf(outstream, "  %s \"%s\"\n", newname, s));
       igraph_Free(newname);
-    } else { 
+    } else {
+      igraph_Free(newname);
       IGRAPH_WARNING("A non-numeric, non-string graph attribute ignored");
     }
   } 
@@ -2447,8 +2450,8 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 							       &strv));
 	igraph_strvector_get(&strv, 0, &s);
 	CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
-	igraph_Free(newname);
       }
+      igraph_Free(newname);
     }
     CHECK(fprintf(outstream, "  ]\n"));
   }
@@ -2484,8 +2487,8 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
 							     &strv));
 	igraph_strvector_get(&strv, 0, &s);
 	CHECK(fprintf(outstream, "    %s \"%s\"\n", newname, s));
-	igraph_Free(newname);
       }
+      igraph_Free(newname);
     }
     CHECK(fprintf(outstream, "  ]\n"));
   }
