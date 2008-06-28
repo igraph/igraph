@@ -325,6 +325,13 @@ int main() {
   }
 
   /* Destroy */
+  igraph_vector_destroy(&gtypes);
+  igraph_vector_destroy(&vtypes);
+  igraph_vector_destroy(&etypes);  
+  igraph_strvector_destroy(&gnames);
+  igraph_strvector_destroy(&vnames);
+  igraph_strvector_destroy(&enames);
+
   igraph_destroy(&g);
 
   return 0;
