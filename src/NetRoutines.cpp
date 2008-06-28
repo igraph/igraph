@@ -63,7 +63,8 @@ int igraph_i_read_network(const igraph_t *graph,
   igraph_vector_t edgelist;
   long int no_of_edges=(long int)igraph_ecount(graph);
   long int ii;
-  char *empty=new char[0];
+  char *empty=new char[1];
+  empty[0]='\0';
   
   IGRAPH_VECTOR_INIT_FINALLY(&edgelist, no_of_edges*2);
   IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, 0 /* rowwise */));
