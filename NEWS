@@ -67,6 +67,8 @@ Bugs corrected in the R interface
 - Hub & authority score calculations initialize ARPACK parameters now.
 - Fixed a bug in the Walktrap community detection routine, when applied 
   to unconnected graphs.
+- Several small memory leaks were removed, and a big one from the Spinglass
+  community structure detection function
 
 New in the C layer
 ------------------
@@ -88,6 +90,8 @@ New in the C layer
 - The Bellman-Ford shortest path algorithm was added.
 - Added weighted variant of igraph_get_shortest_paths, based on
   Dijkstra's algorithm.
+- Several small memory leaks were removed, and a big one from the Spinglass
+  community structure detection function
 
 Bugs corrected in the C layer
 -----------------------------
