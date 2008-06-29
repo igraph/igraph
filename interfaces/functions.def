@@ -639,6 +639,14 @@ igraph_layout_graphopt:
         FLAGS: PROGRESS
         IGNORE: RR, RC
 
+igraph_layout_drl:
+        PARAMS: GRAPH graph, INOUT MATRIX res, BOOLEAN use_seed=False, \
+                DRL_OPTIONS options=igraph.drl.default, VECTOR_OR_0 weights=NULL, \
+                VECTOR_BOOL_OR_0 fixed=NULL
+        DEFAULT-R: options=igraph.drl.default
+        NAME-R: layout.drl
+        IGNORE: RR
+
 igraph_layout_merge_dla:
         PARAMS: GRAPHLIST graphs, MATRIXLIST coords, OUT MATRIX res
         IGNORE: RR, RC, RNamespace

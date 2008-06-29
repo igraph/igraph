@@ -88,7 +88,8 @@ export(layout.random, layout.circle,
        layout.spring, layout.kamada.kawai, layout.lgl,
        layout.fruchterman.reingold.grid, layout.sphere, layout.merge,
        layout.reingold.tilford, layout.norm, piecewise.layout)
-
+export(igraph.drl.default, igraph.drl.coarsen, igraph.drl.coarsest,
+       igraph.drl.refine, igraph.drl.final)
 
 # structural properties
 

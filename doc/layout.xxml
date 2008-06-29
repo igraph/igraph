@@ -7,11 +7,17 @@
 <chapter id="igraph-Layout">
 <title>Generating Layouts for Graph Drawing</title>
 
-<section><title>2D Layouts</title>
+<section><title>2D layout generators</title>
 <!-- doxrox-include about_layouts -->
 <!-- doxrox-include igraph_layout_random -->
 <!-- doxrox-include igraph_layout_circle -->
 <!-- doxrox-include igraph_layout_graphopt -->
+<section><title>The DrL layout generator</title>
+<!-- doxrox-include igraph_layout_drl_options_t -->
+<!-- doxrox-include igraph_layout_drl_default_t -->
+<!-- doxrox-include igraph_layout_drl_options_init -->
+<!-- doxrox-include igraph_layout_drl -->
+</section>
 <!-- doxrox-include igraph_layout_fruchterman_reingold -->
 <!-- doxrox-include igraph_layout_kamada_kawai -->
 <!-- doxrox-include igraph_layout_reingold_tilford -->
@@ -20,7 +26,7 @@
 <!-- doxrox-include igraph_layout_lgl -->
 </section>
 
-<section><title>3D Layouts</title>
+<section><title>3D layout generators</title>
 <!-- doxrox-include igraph_layout_random_3d -->
 <!-- doxrox-include igraph_layout_sphere -->
 <!-- doxrox-include igraph_layout_fruchterman_reingold_3d -->

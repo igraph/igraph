@@ -89,7 +89,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     bliss_kqueue.hh bliss_utils.hh bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
 			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
-			     arpack.c centrality.c
+			     arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
+                             drl_graph.cpp DensityGrid.cpp
 
 libigraph_la_CFLAGS        = -Wall
 libigraph_la_CXXFLAGS	   = -Wall
