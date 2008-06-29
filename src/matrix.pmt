@@ -238,7 +238,6 @@ int FUNCTION(igraph_matrix,add_cols)(TYPE(igraph_matrix) *m, long int n) {
  * resized, matrix.
  */
 
-#include <stdio.h>
 int FUNCTION(igraph_matrix,add_rows)(TYPE(igraph_matrix) *m, long int n) {
   long int i;
   FUNCTION(igraph_vector,resize)(&m->data, (m->ncol)*(m->nrow+n));
