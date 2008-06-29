@@ -12,7 +12,7 @@
 \usage{
 arpack(func, extra = NULL, sym = FALSE, options = igraph.arpack.default, 
     env = parent.frame(), complex=!sym)
-arpack.unpack.complex
+arpack.unpack.complex(vectors, values, nev)
 }
 \arguments{
   \item{func}{The function to perform the matrix-vector
@@ -35,6 +35,11 @@ arpack.unpack.complex
     sure that the results will be real, then supply \code{FALSE} here.
     The conversion is done by calling \code{arpack.unpack.complex}.
   }
+  \item{vectors}{Eigenvectors, as returned by ARPACK.}
+  \item{values}{Eigenvalues, as returned by ARPACK}
+  \item{nev}{The number of eigenvectors/values to extract. This can be
+    less than or equal to the number of eigenvalues requested in the
+    original ARPACK call.}
 }
 \details{
   ARPACK is a library for solving large scale eigenvalue problems.
