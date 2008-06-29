@@ -4,7 +4,8 @@
 #include <string>
 #include <deque>
 #include <iostream>
-#include <math.h>
+#include <cmath>
+#include <cstdlib>
 
 using namespace std;
 
