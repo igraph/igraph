@@ -226,6 +226,10 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 
   \code{layout.norm} normalizes a layout, it linearly transforms each
   coordinate separately to fit into the given limits.
+
+  \code{layout.drl} is another force-driven layout generator, it is
+  suitable for quite large graphs. See \code{\link{layout.drl}} for
+  details.
 }
 \value{All these functions return a numeric matrix with at least two
   columns and the same number of lines as the number of vertices.}
@@ -241,7 +245,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   \emph{IEEE Trans. on Softw. Eng.}, SE-7(2):223--228.
 }
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
-\seealso{\code{\link{plot.igraph}}, \code{\link{tkplot}}}
+\seealso{\code{\link{layout.drl}}, \code{\link{plot.igraph}}, \code{\link{tkplot}}}
 \examples{
 g <- graph.ring(10)
 layout.random(g)

@@ -23,6 +23,9 @@ VECTOR_OR_0:
 VECTOR_BOOL:
     INCONV: %I% <- as.logical(%I%)
 
+VECTOR_BOOL_OR_0:
+    INCONV: if (!is.null(%I%)) %I% <- as.logical(%I%)
+
 MATRIX:
     INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
 
@@ -92,6 +95,10 @@ VECTORLIST:
 ARPACKOPT:
     INCONV:
       INOUT: %I%.tmp <- igraph.arpack.default; %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
+
+DRL_OPTIONS:
+    INCONV:
+      IN: %I%.tmp <- igraph.drl.default; %I%.tmp [names(%I%)] <- %I%; %I% <- %I%.tmp
 
 STRVECTOR:
 

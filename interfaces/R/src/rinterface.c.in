@@ -37,6 +37,7 @@ int igraph_free(void *p);
 
 SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v);
 SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v);
+SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v);
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
 SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
@@ -54,6 +55,7 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res);
 int R_SEXP_to_igraph_vs(SEXP rit, igraph_t *graph, igraph_vs_t *it);
 int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
+int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
 
 /* get the list element named str, or return NULL */
 /* from the R Manual */
@@ -1004,6 +1006,17 @@ SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
   return result;
 }
 
+SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v) {
+  SEXP result;
+  if (v) {
+    PROTECT(result=R_igraph_vector_bool_to_SEXP(v));
+  } else {
+    PROTECT(result=R_NilValue);
+  }
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m) {
 
   SEXP result, dim; 
@@ -1185,6 +1198,13 @@ int R_SEXP_to_vector_copy(SEXP sv, igraph_vector_t *v) {
   return igraph_vector_init_copy(v, REAL(sv), GET_LENGTH(sv));  
 }
 
+int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v) {
+  v->stor_begin=LOGICAL(sv);
+  v->stor_end=v->stor_begin+GET_LENGTH(sv);
+  v->end=v->stor_end;
+  return 0;
+}
+
 int R_SEXP_to_matrix(SEXP pakl, igraph_matrix_t *akl) {
   R_SEXP_to_vector(pakl, &akl->data);
   akl->nrow=INTEGER(GET_DIM(pakl))[0];
@@ -1286,6 +1306,36 @@ int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it) {
   igraph_vector_t *tmpv=(igraph_vector_t*)R_alloc(1,sizeof(igraph_vector_t));
   igraph_es_vector(it, igraph_vector_view(tmpv, REAL(rit),
 					  GET_LENGTH(rit)));
+  return 0;
+}
+
+int R_SEXP_to_igraph_layout_drl_options(SEXP in, igraph_layout_drl_options_t *opt) {
+  opt->edge_cut = REAL(AS_NUMERIC(R_igraph_getListElement(in, "edge.cut")))[0];
+  opt->init_iterations   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "init.iterations")))[0];
+  opt->init_temperature  = REAL(AS_NUMERIC(R_igraph_getListElement(in, "init.temperature")))[0];
+  opt->init_attraction   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "init.attraction")))[0];
+  opt->init_damping_mult = REAL(AS_NUMERIC(R_igraph_getListElement(in, "init.damping.mult")))[0];
+  opt->liquid_iterations   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "liquid.iterations")))[0];
+  opt->liquid_temperature  = REAL(AS_NUMERIC(R_igraph_getListElement(in, "liquid.temperature")))[0];
+  opt->liquid_attraction   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "liquid.attraction")))[0];
+  opt->liquid_damping_mult = REAL(AS_NUMERIC(R_igraph_getListElement(in, "liquid.damping.mult")))[0];
+  opt->expansion_iterations   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "expansion.iterations")))[0];
+  opt->expansion_temperature  = REAL(AS_NUMERIC(R_igraph_getListElement(in, "expansion.temperature")))[0];
+  opt->expansion_attraction   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "expansion.attraction")))[0];
+  opt->expansion_damping_mult = REAL(AS_NUMERIC(R_igraph_getListElement(in, "expansion.damping.mult")))[0];
+  opt->cooldown_iterations   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "cooldown.iterations")))[0];
+  opt->cooldown_temperature  = REAL(AS_NUMERIC(R_igraph_getListElement(in, "cooldown.temperature")))[0];
+  opt->cooldown_attraction   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "cooldown.attraction")))[0];
+  opt->cooldown_damping_mult = REAL(AS_NUMERIC(R_igraph_getListElement(in, "cooldown.damping.mult")))[0];
+  opt->crunch_iterations   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "crunch.iterations")))[0];
+  opt->crunch_temperature  = REAL(AS_NUMERIC(R_igraph_getListElement(in, "crunch.temperature")))[0];
+  opt->crunch_attraction   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "crunch.attraction")))[0];
+  opt->crunch_damping_mult = REAL(AS_NUMERIC(R_igraph_getListElement(in, "crunch.damping.mult")))[0];
+  opt->simmer_iterations   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "simmer.iterations")))[0];
+  opt->simmer_temperature  = REAL(AS_NUMERIC(R_igraph_getListElement(in, "simmer.temperature")))[0];
+  opt->simmer_attraction   = REAL(AS_NUMERIC(R_igraph_getListElement(in, "simmer.attraction")))[0];
+  opt->simmer_damping_mult = REAL(AS_NUMERIC(R_igraph_getListElement(in, "simmer.damping.mult")))[0];
+
   return 0;
 }
 

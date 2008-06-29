@@ -74,8 +74,8 @@ attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(SRCDIR)/attributes.h $(
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c \
 	$(SRCDIR)/attributes.h $(SRCDIR)/cattributes.c
 
-layout.xml: layout.xxml $(SRCDIR)/layout.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c
+layout.xml: layout.xxml $(SRCDIR)/layout.c $(SRCDIR)/igraph.h $(SRCDIR)/drl_layout.cpp
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c $(SRCDIR)/igraph.h $(SRCDIR)/drl_layout.cpp
 
 foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c \
