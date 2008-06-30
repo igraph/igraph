@@ -759,7 +759,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
     if (ridx != 0) *ridx = VECTOR(m->ridx)[maxidx];
     if (cidx != 0) {
       igraph_vector_binsearch(&m->cidx, maxidx, &i);
-      while (VECTOR(m->cidx)[i+1] == VECTOR(m->cidx)[i]) i++;
+      while (i < m->ncol-1 && VECTOR(m->cidx)[i+1] == VECTOR(m->cidx)[i]) i++;
       *cidx = (igraph_real_t)i;
     }
     return res;
