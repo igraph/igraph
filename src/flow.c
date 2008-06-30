@@ -122,6 +122,7 @@
  * (26) We just call igraph_edge_connectivity, see (16).
  * (27) We just call igraph_vertex_connectivity, see (19).
  * (28) We just call igraph_vertex_connectivity, see (20).
+ */
 
 /*
  * This is an internal function that calculates the maximum flow value

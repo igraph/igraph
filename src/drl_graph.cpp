@@ -4,7 +4,9 @@
 #include <fstream>
 #include <map>
 #include <vector>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
+#include <cstring>
 
 using namespace std;
 
