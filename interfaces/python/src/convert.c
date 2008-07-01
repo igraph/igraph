@@ -84,6 +84,22 @@ int igraphmodule_PyObject_to_enum(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_neimode_t
+ */
+int igraphmodule_PyObject_to_neimode_t(PyObject *o,
+  igraph_neimode_t *result) {
+  static igraphmodule_enum_translation_table_entry_t neimode_tt[] = {
+        {"in", IGRAPH_IN},
+        {"out", IGRAPH_OUT},
+        {"all", IGRAPH_ALL},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, neimode_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_adjacency_t
  */
 int igraphmodule_PyObject_to_adjacency_t(PyObject *o,
