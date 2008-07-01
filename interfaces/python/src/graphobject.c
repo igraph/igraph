@@ -102,13 +102,6 @@ int igraphmodule_Graph_clear(igraphmodule_GraphObject * self)
   self->destructor = NULL;
   Py_XDECREF(tmp);
 
-  /*
-     for (i=0; i<3; i++) {
-     tmp=self->attrs[i];
-     self->attrs[i]=NULL;
-     Py_XDECREF(tmp);
-     }
-   */
   return 0;
 }
 
@@ -4307,12 +4300,13 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
                                                  self, PyObject * args,
                                                  PyObject * kwds)
 {
-  char *kwlist[] =
-    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", NULL };
+  static char *kwlist[] =
+    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", NULL };
   igraph_matrix_t m;
+  igraph_bool_t use_seed=0;
   long niter = 1000;
   double sigma, initemp, coolexp, kkconst;
-  PyObject *result;
+  PyObject *result, *seed_o=Py_None;
 
   sigma = igraph_vcount(&self->g);
   kkconst = sigma * sigma;
@@ -4320,18 +4314,23 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
   initemp = 10.0;
   coolexp = 0.99;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddO", kwlist,
                                    &niter, &sigma, &initemp, &coolexp,
-                                   &kkconst))
+                                   &kkconst, &seed_o))
     return NULL;
 
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    use_seed=1;
+	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
   }
 
   if (igraph_layout_kamada_kawai
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, 0)) {
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -4351,12 +4350,13 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *
                                                     self, PyObject * args,
                                                     PyObject * kwds)
 {
-  char *kwlist[] =
-    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", NULL };
+  static char *kwlist[] =
+    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", NULL };
   igraph_matrix_t m;
+  igraph_bool_t use_seed = 0;
   long niter = 1000;
   double sigma, initemp, coolexp, kkconst;
-  PyObject *result;
+  PyObject *result, *seed_o = Py_None;
 
   sigma = igraph_vcount(&self->g);
   kkconst = sigma * sigma;
@@ -4364,18 +4364,23 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *
   initemp = 10.0;
   coolexp = 0.99;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddd", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddO", kwlist,
                                    &niter, &sigma, &initemp, &coolexp,
-                                   &kkconst))
+                                   &kkconst, &seed_o))
     return NULL;
 
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    use_seed=1;
+    if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
   }
 
   if (igraph_layout_kamada_kawai_3d
-      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, 0)) {
+      (&self->g, &m, niter, sigma, initemp, coolexp, kkconst, use_seed)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -4397,26 +4402,33 @@ PyObject
                                                   PyObject * kwds)
 {
   static char *kwlist[] =
-    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL };
+    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
+	  "seed", NULL };
   igraph_matrix_t m;
+  igraph_bool_t use_seed=0;
   igraph_vector_t *weights=0;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad;
-  PyObject *result, *wobj=Py_None;
+  PyObject *result, *wobj=Py_None, *seed_o=Py_None;
 
   maxdelta = igraph_vcount(&self->g);
   area = maxdelta * maxdelta;
   coolexp = 1.5;
   repulserad = area * maxdelta;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oldddd", kwlist, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddO", kwlist, &wobj,
                                    &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad))
+                                   &repulserad, &seed_o))
     return NULL;
 
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return 0;
+    use_seed=1;
   }
 
   /* Convert the weight parameter to a vector */
@@ -4426,7 +4438,8 @@ PyObject
     return NULL;
   }
   if (igraph_layout_fruchterman_reingold
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed,
+       weights)) {
     igraph_matrix_destroy(&m);
     if (weights) {
       igraph_vector_destroy(weights); free(weights);
@@ -4454,11 +4467,13 @@ PyObject
                                                      PyObject * kwds)
 {
   static char *kwlist[] =
-    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad", NULL };
+    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
+	  "seed", NULL };
   igraph_matrix_t m;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad;
-  PyObject *result, *wobj=Py_None;
+  igraph_bool_t use_seed = 0;
+  PyObject *result, *seed_o=Py_None, *wobj=Py_None;
   igraph_vector_t *weights;
 
   maxdelta = igraph_vcount(&self->g);
@@ -4466,14 +4481,19 @@ PyObject
   coolexp = 1.5;
   repulserad = area * maxdelta;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Oldddd", kwlist, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddO", kwlist, &wobj,
                                    &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad))
+                                   &repulserad, &seed_o))
     return NULL;
 
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    use_seed=1;
+	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
   }
 
   /* Convert the weight parameter to a vector */
@@ -4483,7 +4503,7 @@ PyObject
     return NULL;
   }
   if (igraph_layout_fruchterman_reingold_3d
-      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, 0, weights)) {
+      (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, use_seed, weights)) {
     igraph_matrix_destroy(&m);
     if (weights) {
       igraph_vector_destroy(weights); free(weights);
@@ -4550,33 +4570,39 @@ PyObject
   *igraphmodule_Graph_layout_grid_fruchterman_reingold
   (igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] =
+  static char *kwlist[] =
     { "maxiter", "maxdelta", "area", "coolexp", "repulserad", "cellsize",
-NULL };
+	  "seed", NULL };
   igraph_matrix_t m;
   long niter = 500;
   double maxdelta, area, coolexp, repulserad, cellsize;
-  PyObject *result;
+  PyObject *result, *seed_o = Py_None;
+  igraph_bool_t use_seed=0;
 
   maxdelta = igraph_vcount(&self->g);
   area = maxdelta * maxdelta;
   coolexp = 1.5;
-  repulserad = area * maxdelta;
-  cellsize = 1.0;               // TODO: reasonable default
+  repulserad = area * igraph_vcount(&self->g); 
+  cellsize = sqrt(sqrt(area));
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddd", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ldddddO", kwlist,
                                    &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad, &cellsize))
+                                   &repulserad, &cellsize, &seed_o))
     return NULL;
 
-  if (igraph_matrix_init(&m, 1, 1)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    use_seed=1;
+	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
   }
 
   if (igraph_layout_grid_fruchterman_reingold
       (&self->g, &m, niter, maxdelta, area, coolexp, repulserad, cellsize,
-       0)) {
+       use_seed)) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
@@ -8574,7 +8600,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_kamada_kawai",
    (PyCFunction) igraphmodule_Graph_layout_kamada_kawai,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None)\n\n"
+   "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None, seed=None)\n\n"
    "Places the vertices on a plane according to the Kamada-Kawai algorithm.\n\n"
    "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
    "An Algorithm for Drawing General Undirected Graphs.\n"
@@ -8586,13 +8612,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param coolexp: cooling exponent of the simulated annealing.\n"
    "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
    "  C{None} means the square of the number of vertices.\n"
+   "@param seed: if C{None}, uses a random starting layout for the\n"
+   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
+   "  as the starting position.\n"
    "@return: the calculated coordinate pairs in a list."},
 
   // interface to igraph_layout_kamada_kawai_3d
   {"layout_kamada_kawai_3d",
    (PyCFunction) igraphmodule_Graph_layout_kamada_kawai_3d,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_kamada_kawai_3d(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None)\n\n"
+   "layout_kamada_kawai_3d(maxiter=1000, sigma=None, initemp=10, coolexp=0.99, kkconst=None, seed=None)\n\n"
    "Places the vertices in the 3D space according to the Kamada-Kawai algorithm.\n\n"
    "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
    "An Algorithm for Drawing General Undirected Graphs.\n"
@@ -8604,13 +8633,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param coolexp: cooling exponent of the simulated annealing.\n"
    "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
    "  C{None} means the square of the number of vertices.\n"
+   "@param seed: if C{None}, uses a random starting layout for the\n"
+   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
+   "  as the starting position.\n"
    "@return: the calculated coordinate triplets in a list."},
 
   // interface to igraph_layout_fruchterman_reingold
   {"layout_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta)\n\n"
+   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, seed=None)\n\n"
    "Places the vertices on a 2D plane according to the Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
@@ -8626,13 +8658,16 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param repulserad: determines the radius at which vertex-vertex\n"
    "  repulsion cancels out attraction of adjacent vertices.\n"
    "  C{None} means M{maxiter*maxdelta}.\n"
+   "@param seed: if C{None}, uses a random starting layout for the\n"
+   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
+   "  as the starting position.\n"
    "@return: the calculated coordinate pairs in a list."},
 
   // interface to igraph_layout_fruchterman_reingold_3d
   {"layout_fruchterman_reingold_3d",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold_3d,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold_3d(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta)\n\n"
+   "layout_fruchterman_reingold_3d(weights=None, maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, seed=None)\n\n"
    "Places the vertices in the 3D space according to the Fruchterman-Reingold grid algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
@@ -8648,6 +8683,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param repulserad: determines the radius at which vertex-vertex\n"
    "  repulsion cancels out attraction of adjacent vertices.\n"
    "  C{None} means M{maxiter*maxdelta}.\n"
+   "@param seed: if C{None}, uses a random starting layout for the\n"
+   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
+   "  as the starting position.\n"
    "@return: the calculated coordinate triplets in a list."},
 
   // interface to igraph_layout_graphopt
