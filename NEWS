@@ -70,6 +70,83 @@ Bugs corrected in the R interface
 - Several small memory leaks were removed, and a big one from the Spinglass
   community structure detection function
 
+New in the Python interface
+---------------------------
+
+- Methods parameters accepting igraph.IN, igraph.OUT and igraph.ALL
+  constants now also accept these as strings ("in", "out" and "all").
+  Prefix matches also allowed as long as the prefix match is unique.
+- Graph.shortest_paths() now supports edge weights (Dijkstra's and
+  Bellman-Ford algorithm implemented)
+- Graph.get_shortest_paths() also supports edge weights
+  (only Dijkstra's algorithm yet)
+- Added Graph.is_mutual() to find mutual edges in a directed graph.
+- Added inverse log-weighted similarity measure (a.k.a. Adamic/Adar
+  similarity).
+- preference.game and asymmetric.preference.game were 
+  rewritten, they are O(|V|+|E|) now, instead of O(|V|^2).
+- ARPACK options can now be modified from the Python interface
+  (thanks to Kurt Jacobson)
+- Layout.to_radial() added -- now you can create a top-down tree
+  layout by the Reingold-Tilford algorithm and then turn it to a
+  radial tree layout
+- Added Graph.write_pajek() to save graphs in Pajek format
+- Some vertex and edge related methods can now also be accessed via
+  the methods of VertexSeq and EdgeSeq, restricted to the current
+  vertex/edge sequence of course
+- Visualisations now support triangle shaped vertices
+- Added Graph.mincut()
+- Added Graph.Weighted_Adjacency() to create graphs from weighted
+  adjacency matrices
+- Kamada-Kawai and Fruchterman-Reingold layouts now accept initial
+  vertex positions
+- Graph.Preference() and Graph.Asymmetric_Preference() were 
+  rewritten, they are O(|V|+|E|) now, instead of O(|V|^2).
+
+Bugs corrected in the Python interface
+--------------------------------------
+
+- Graph.constraint() now properly returns floats instead of integers
+  (thanks to Eytan Bakshy)
+- Graphs given by adjacency matrices are now finally loaded and saved
+  properly
+- Graph.Preference() now accepts floats in type distributions
+- A small bug in Graph.community_edge_betweenness() corrected
+- Some bugs in numeric attribute handling resolved
+- VertexSeq and EdgeSeq objects can now be subsetted by lists and
+  tuples as well
+- Fixed a bug when dealing with extremely small layout sizes
+- Eigenvector centality now always return positive values
+- Graph.authority_score() now really returns the authority scores
+  instead of the hub scores (blame copypasting)
+- Pajek reader bug corrected, used to segfault if '*Vertices' 
+  was missing.
+- Directedness is handled correctly when writing GML files.
+  (But note that 'correct' conflicts the standard here.)
+- Corrected a bug when calculating weighted, directed PageRank on an 
+  undirected graph. (Which does not make sense anyway.)
+- Several bugs were fixed in the Reingold-Tilford layout to avoid 
+  edge crossings.
+- A bug was fixed in the GraphML reader, when the value of a graph
+  attribute was not specified.
+- Fixed a bug in the graph isomorphism routine for small (3-4 vertices)
+  graphs.
+- Corrected the random sampling implementation (igraph_random_sample),
+  now it always generates unique numbers. This affects the 
+  Gnm Erdos-Renyi generator, it always generates simple graphs now.
+- The LGL, NCOL and Pajek graph readers handle errors properly now.
+- The non-symmetric ARPACK solver returns results in a consistent form
+  now.
+- The fast greedy community detection routine now checks that the graph
+  is simple.
+- The LGL and NCOL parsers were corrected to work with all 
+  kinds of end-of-line encodings.
+- Hub & authority score calculations initialize ARPACK parameters now.
+- Fixed a bug in the Walktrap community detection routine, when applied 
+  to unconnected graphs.
+- Several small memory leaks were removed, and a big one from the Spinglass
+  community structure detection function
+
 New in the C layer
 ------------------
 
