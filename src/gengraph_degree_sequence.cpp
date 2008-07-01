@@ -9,7 +9,6 @@
 #include <math.h>
 #include <assert.h>
 #include <vector>
-#include <ext/hash_map>
 
 using namespace __gnu_cxx;
 using namespace std;

@@ -427,7 +427,7 @@ int graph_molloy_hash::optimal_window() {
   // on cherche autour
   double span = 2.0;
   int try_again = 4;
-  while(span>1.05 & optimal_T <= 5*a) {
+  while(span>1.05 && optimal_T <= 5*a) {
     if(VERBOSE()>=VERBOSE_LOTS)
       fprintf(stderr,"\rBest T [cost]: %d [%f]",optimal_T,min_cost);
     int T_low  = int(double(optimal_T)/span);
