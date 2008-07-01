@@ -90,7 +90,12 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
 			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
 			     arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
-                             drl_graph.cpp DensityGrid.cpp
+                             drl_graph.cpp DensityGrid.cpp \
+			     gengraph_box_list.cpp gengraph_degree_sequence.cpp \
+			     gengraph_graph_molloy_hash.cpp \
+			     gengraph_graph_molloy_optimized.cpp \
+			     gengraph_mr-connected.cpp gengraph_powerlaw.cpp \
+			     gengraph_random.cpp
 
 libigraph_la_CFLAGS        = -Wall
 libigraph_la_CXXFLAGS	   = -Wall

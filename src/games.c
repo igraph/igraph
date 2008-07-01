@@ -499,6 +499,11 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
   return 0;
 }
 
+/* This is in gengraph_mr-connected.cpp */
+
+int igraph_degree_sequence_game_vl(igraph_t *graph,
+				   const igraph_vector_t *out_seq,
+				   const igraph_vector_t *in_seq);
 /**
  * \ingroup generators
  * \function igraph_degree_sequence_game
@@ -520,6 +525,13 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
  *        generate both loop (self) edges and multiple edges.
  *        For directed graphs, the algorithm is basically the same,
  *        but two separate bags are used for the in- and out-degrees. 
+ *        \c IGRAPH_DEGSEQ_VL is a much more sophisticated generator, 
+ *        that can sample undirected, connected simple graphs uniformly. 
+ *        It uses Monte-Carlo methods to randomize the graphs. 
+ *        This generator should be favoured if undirected and connected 
+ *        graphs are to be generated. igraph uses the original implementation 
+ *        Fabien Viger; see http://www-rp.lip6.fr/~latapy/FV/generation.html
+ *        and the paper cited on it for the details of the algorithm.
  * \return Error code: 
  *          \c IGRAPH_ENOMEM: there is not enough
  *           memory to perform the operation.
@@ -545,6 +557,8 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
 
   if (method==IGRAPH_DEGSEQ_SIMPLE) {
     retval=igraph_degree_sequence_game_simple(graph, out_deg, in_deg);
+  } else if (method==IGRAPH_DEGSEQ_VL) {
+    retval=igraph_degree_sequence_game_vl(graph, out_deg, in_deg);
   } else {
     IGRAPH_ERROR("Invalid degree sequence game method", IGRAPH_EINVAL);
   }
