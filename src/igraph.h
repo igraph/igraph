@@ -126,7 +126,8 @@ typedef enum { IGRAPH_GET_ADJACENCY_UPPER=0,
 	       IGRAPH_GET_ADJACENCY_LOWER,
 	       IGRAPH_GET_ADJACENCY_BOTH } igraph_get_adjacency_t;
 
-typedef enum { IGRAPH_DEGSEQ_SIMPLE=0 } igraph_degseq_t;
+typedef enum { IGRAPH_DEGSEQ_SIMPLE=0,
+	       IGRAPH_DEGSEQ_VL } igraph_degseq_t;
 
 typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
 	       IGRAPH_FILEFORMAT_NCOL,
