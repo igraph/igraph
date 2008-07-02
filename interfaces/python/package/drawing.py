@@ -225,6 +225,10 @@ class Plot(object):
         self._filename=None
         self._bgcolor=None
 
+        # Several Windows-specific hacks will be used from now on, thanks
+        # to Dale Hunscher for debugging and fixing all that stuff
+        self._windows_hacks=("Windows" in platform.platform())
+
         if bbox is None:
             bbox = BoundingBox(600, 600)
         elif isinstance(bbox, tuple) or isinstance(bbox, list):
@@ -403,8 +407,8 @@ class Plot(object):
             raise NotImplementedError, "showing plots is not implemented on this platform: %s" % platform.system()
         else:
             os.system("%s %s" % (imgviewer, self._tmpfile_name))
-            if platform.system() == "Darwin":
-                # On Mac OS X, launched applications are likely to
+            if platform.system() == "Darwin" or self._windows_hacks:
+                # On Mac OS X and Windows, launched applications are likely to
                 # fork and give control back to Python immediately.
                 # Chances are that the temporary image file gets removed
                 # before the image viewer has a chance to open it, so
