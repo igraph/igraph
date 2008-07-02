@@ -3007,6 +3007,42 @@ PyObject *igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the edge connectivity of the graph
+ * \return the edge connectivity
+ * \sa igraph_edge_connectivity, igraph_st_edge_connectivity
+ */
+PyObject *igraphmodule_Graph_edge_connectivity(igraphmodule_GraphObject *self,
+        PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "source", "target", "checks", NULL };
+  PyObject *checks = Py_True;
+  long source = -1, target = -1, result;
+  igraph_integer_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|llO", kwlist,
+      &source, &target, &checks))
+    return NULL;
+
+  if (source < 0 && target < 0) {
+    if (igraph_edge_connectivity(&self->g, &res, PyObject_IsTrue(checks))) {
+      igraphmodule_handle_igraph_error();
+	  return NULL;
+    }
+  } else if (source >= 0 && target >= 0) {
+    if (igraph_st_edge_connectivity(&self->g, &res, source, target)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+	PyErr_SetString(PyExc_ValueError, "if source or target is given, the other one must also be specified");
+	return NULL;
+  }
+
+  result = res;
+
+  return Py_BuildValue("l", result);
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the eigenvector centralities of the nodes in the graph
  * \sa igraph_eigenvector_centrality
  */
@@ -3948,6 +3984,45 @@ PyObject *igraphmodule_Graph_topological_sorting(igraphmodule_GraphObject *
   igraph_vector_destroy(&result);
 
   return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the vertex connectivity of the graph
+ * \return the vertex connectivity
+ * \sa igraph_vertex_connectivity, igraph_st_vertex_connectivity
+ */
+PyObject *igraphmodule_Graph_vertex_connectivity(igraphmodule_GraphObject *self,
+        PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "source", "target", "checks", "neighbors", NULL };
+  PyObject *checks = Py_True, *neis = Py_None;
+  long source = -1, target = -1, result;
+  igraph_integer_t res;
+  igraph_vconn_nei_t neighbors = IGRAPH_VCONN_NEI_ERROR;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|llOO", kwlist,
+      &source, &target, &checks, &neis))
+    return NULL;
+
+  if (source < 0 && target < 0) {
+    if (igraph_vertex_connectivity(&self->g, &res, PyObject_IsTrue(checks))) {
+      igraphmodule_handle_igraph_error();
+	  return NULL;
+    }
+  } else if (source >= 0 && target >= 0) {
+    if (igraphmodule_PyObject_to_vconn_nei_t(neis, &neighbors)) return NULL;
+    if (igraph_st_vertex_connectivity(&self->g, &res, source, target, neighbors)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+	PyErr_SetString(PyExc_ValueError, "if source or target is given, the other one must also be specified");
+	return NULL;
+  }
+
+  if (res == IGRAPH_INFINITY) return Py_BuildValue("d", (double)res);
+  
+  result = res;
+  return Py_BuildValue("l", result);
 }
 
 /** \ingroup python_interface_graph
@@ -8152,6 +8227,31 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: a list with the (exact or estimated) edge betweennesses of all\n"
    "  edges.\n"},
 
+  /* interface to igraph_[st_]edge_connectivity */
+  {"edge_connectivity", (PyCFunction) igraphmodule_Graph_edge_connectivity,
+   METH_VARARGS | METH_KEYWORDS,
+   "edge_connectivity(source=-1, target=-1, checks=True)\n\n"
+   "Calculates the edge connectivity of the graph or between some vertices.\n\n"
+   "The edge connectivity between two given vertices is the number of edges\n"
+   "that have to be removed in order to disconnect the two vertices into two\n"
+   "separate components. This is also the number of edge disjoint directed\n"
+   "paths between the vertices. The edge connectivity of the graph is the minimal\n"
+   "edge connectivity over all vertex pairs.\n\n"
+   "This method calculates the edge connectivity of a given vertex pair if both\n"
+   "the source and target vertices are given. If none of them is given (or they\n"
+   "are both negative), the overall edge connectivity is returned.\n\n"
+   "@param source: the source vertex involved in the calculation.\n"
+   "@param target: the target vertex involved in the calculation.\n"
+   "@param checks: if the whole graph connectivity is calculated and this is\n"
+   "  C{True}, igraph performs some basic checks before calculation. If the\n"
+   "  graph is not strongly connected, then the connectivity is obviously\n"
+   "  zero. If the minimum degree is one, then the connectivity is\n"
+   "  also one. These simple checks are much faster than checking the entire\n"
+   "  graph, therefore it is advised to set this to C{True}. The parameter\n"
+   "  is ignored if the connectivity between two given vertices is computed.\n"
+   "@return: the edge connectivity\n"
+  },
+
   /* interface to igraph_eigenvector_centrality */
   {"eigenvector_centrality",
    (PyCFunction) igraphmodule_Graph_eigenvector_centrality,
@@ -8468,6 +8568,35 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param vertices: a list containing the vertex IDs which should be\n"
    "  included in the result. C{None} means all of the vertices.\n"
    "@return: the transitivities for the given vertices in a list\n"},
+
+  /* interface to igraph_[st_]vertex_connectivity */
+  {"vertex_connectivity", (PyCFunction) igraphmodule_Graph_vertex_connectivity,
+   METH_VARARGS | METH_KEYWORDS,
+   "vertex_connectivity(source=-1, target=-1, checks=True, neighbors=\"error\")\n\n"
+   "Calculates the vertex connectivity of the graph or between some vertices.\n\n"
+   "The vertex connectivity between two given vertices is the number of vertices\n"
+   "that have to be removed in order to disconnect the two vertices into two\n"
+   "separate components. This is also the number of vertex disjoint directed\n"
+   "paths between the vertices (apart from the source and target vertices of\n"
+   "course). The vertex connectivity of the graph is the minimal vertex\n"
+   "connectivity over all vertex pairs.\n\n"
+   "This method calculates the vertex connectivity of a given vertex pair if both\n"
+   "the source and target vertices are given. If none of them is given (or they\n"
+   "are both negative), the overall vertex connectivity is returned.\n\n"
+   "@param source: the source vertex involved in the calculation.\n"
+   "@param target: the target vertex involved in the calculation.\n"
+   "@param checks: if the whole graph connectivity is calculated and this is\n"
+   "  C{True}, igraph performs some basic checks before calculation. If the\n"
+   "  graph is not strongly connected, then the connectivity is obviously\n"
+   "  zero. If the minimum degree is one, then the connectivity is\n"
+   "  also one. These simple checks are much faster than checking the entire\n"
+   "  graph, therefore it is advised to set this to C{True}. The parameter\n"
+   "  is ignored if the connectivity between two given vertices is computed.\n"
+   "@param neighbors: tells igraph what to do when the two vertices are\n"
+   "  connected. C{\"error\"} raises an exception, C{\"infinity\"} returns\n"
+   "  infinity, C{\"ignore\"} ignores the edge.\n"
+   "@return: the vertex connectivity\n"
+  },
 
   /***********************/
   /* SIMILARITY MEASURES */
@@ -8786,7 +8915,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_grid_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_grid_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_grid_fruchterman_reingold(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, cellsize=1.0)\n\n"
+   "layout_grid_fruchterman_reingold(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, cellsize=1.0, seed=None)\n\n"
    "Places the vertices on a 2D plane according to the Fruchterman-Reingold grid algorithm.\n\n"
    "This is a modified version of a force directed layout, see\n"
    "Fruchterman, T. M. J. and Reingold, E. M.:\n"
@@ -8804,6 +8933,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  repulsion cancels out attraction of adjacent vertices.\n"
    "  C{None} means M{maxiter*maxdelta}.\n"
    "@param cellsize: the size of the grid cells.\n"
+   "@param seed: if C{None}, uses a random starting layout for the\n"
+   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
+   "  as the starting position.\n"
    "@return: the calculated coordinate pairs in a list."},
 
   // interface to igraph_layout_lgl

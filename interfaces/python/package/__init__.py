@@ -66,6 +66,10 @@ class Graph(core.GraphBase):
     cut_vertices = core.GraphBase.articulation_points
     blocks = core.GraphBase.biconnected_components
     evcent = core.GraphBase.eigenvector_centrality
+    vertex_disjoint_paths = core.GraphBase.vertex_connectivity
+    edge_disjoint_paths = core.GraphBase.edge_connectivity
+    cohesion = core.GraphBase.vertex_connectivity
+    adhesion = core.GraphBase.edge_connectivity
 
     # Compatibility aliases
     shortest_paths_dijkstra = core.GraphBase.shortest_paths
