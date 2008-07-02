@@ -46,7 +46,7 @@ def get_platform_image_viewer():
                 full_path = os.path.join(path, choice)
                 if os.path.isfile(full_path): return full_path
         return ""
-    elif plat == "Windows":
+    elif plat == "Windows" or plat == "Microsoft":    # Thanks to Dale Hunscher
         # Use the built-in Windows image viewer, if available
         return "start"
     else:
