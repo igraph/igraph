@@ -11,6 +11,7 @@
 using namespace std;
 
 #include "drl_graph.h"
+#include "random.h"
 #ifdef MUSE_MPI
   #include <mpi.h>
 #endif
@@ -798,7 +799,8 @@ void graph::update_nodes ( )
 
 		  // advance random sequence according to myid
 		  for ( int j = 0; j < 2*myid; j++ )
-		    rand();
+		    RNG_UNIF01();
+		    // rand();
 
 		  // calculate node energy possibilities
 		  if ( !(positions[i].fixed && real_fixed) )
@@ -806,7 +808,8 @@ void graph::update_nodes ( )
 
 		  // advance random sequence for next iteration
 		  for ( unsigned int j = 2*myid; j < 2*(node_indices.size()-1); j++ )
-		    rand();
+		    RNG_UNIF01();
+		    // rand();
 
 		}
 		else
@@ -814,7 +817,8 @@ void graph::update_nodes ( )
 		  // advance random sequence according to use by
 		  // the other processors
 		  for ( unsigned int j = 0; j < 2*(node_indices.size()); j++ )
-		    rand();
+		    RNG_UNIF01();
+		    //rand();
 		}
 		
 		// check if anything was actually updated (e.g. everything was fixed)
@@ -913,8 +917,8 @@ void graph::update_node_pos ( int node_ind,
 		*/
 
 		// Do random method (RAND_MAX is C++ maximum random number)
-		updated_pos[1][0] = updated_pos[0][0] + (.5 - rand()/(float)RAND_MAX) * jump_length;
-		updated_pos[1][1] = updated_pos[0][1] + (.5 - rand()/(float)RAND_MAX) * jump_length;
+		updated_pos[1][0] = updated_pos[0][0] + (.5 - RNG_UNIF01()) * jump_length;
+		updated_pos[1][1] = updated_pos[0][1] + (.5 - RNG_UNIF01()) * jump_length;
 		
 		// compute node energy for random position
 		positions[node_ind].x = updated_pos[1][0];
