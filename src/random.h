@@ -60,6 +60,7 @@ double  Rf_rbinom(double, double);
 #define RNG_UNIF01()      (unif_rand())
 #define RNG_GEOM(p)       (rgeom(p))
 #define RNG_BINOM(n,p)    (rbinom((n),(p)))
+#define RNG_INT31()       ((long)(unif_rand()*0x7FFFFFFFL))
 
 #else
 
@@ -76,6 +77,8 @@ extern int igraph_rng_inited;
 #define RNG_UNIF01()      (RNG_UNIF(0,1))
 #define RNG_GEOM(p)       (igraph_rgeom(p))
 #define RNG_BINOM(n,p)    (igraph_rbinom((n),(p)))
+/* #define RNG_INT31()       ((long)(RNG_UNIF01()*0x7FFFFFFF)) */
+#define RNG_INT31()       (rand())
 
 #endif
 
