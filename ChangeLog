@@ -1,3 +1,8 @@
+2008-07-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
+
+	* interfaces/python/src/graphobject.c : added interface to
+	igraph_[st_]{vertex,edge}_connectivity
+	
 2008-06-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* src/igraph.h (igraph_get_shortest_paths_dijkstra) :

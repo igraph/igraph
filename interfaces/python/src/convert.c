@@ -120,6 +120,22 @@ int igraphmodule_PyObject_to_adjacency_t(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_vconn_nei_t
+ */
+int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o,
+  igraph_vconn_nei_t *result) {
+  static igraphmodule_enum_translation_table_entry_t vconn_nei_tt[] = {
+        {"error", IGRAPH_VCONN_NEI_ERROR},
+        {"infinity", IGRAPH_VCONN_NEI_INFINITY},
+        {"ignore", IGRAPH_VCONN_NEI_IGNORE},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, vconn_nei_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_bliss_sh_t
  */
 int igraphmodule_PyObject_to_bliss_sh_t(PyObject *o,
