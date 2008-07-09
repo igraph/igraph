@@ -74,36 +74,40 @@ class Graph(core.GraphBase):
     # Compatibility aliases
     shortest_paths_dijkstra = core.GraphBase.shortest_paths
 
-    def __init__(self, n=1, edges=None, directed=None, \
-        graph_attrs=None, vertex_attrs=None, edge_attrs=None):
-        """Constructs a graph from scratch.
+    def __init__(self, *args, **kwds):
+        """__init__(n=None, edges=None, directed=None, graph_attrs=None, vertex_attrs=None, edge_attrs=None)
+        
+        Constructs a graph from scratch.
 
-        @param n: the number of vertices. Can be omitted.
-        @param edges: the edge list where every list item is a pair of integers.
+        @keyword n: the number of vertices. Can be omitted.
+        @keyword edges: the edge list where every list item is a pair of integers.
           If any of the integers is larger than M{n-1}, the number of vertices
           is adjusted accordingly.
-        @param directed: whether the graph should be directed
-        @param graph_attrs: the attributes of the graph as a dictionary.
-        @param vertex_attrs: the attributes of the vertices as a dictionary.
+        @keyword directed: whether the graph should be directed
+        @keyword graph_attrs: the attributes of the graph as a dictionary.
+        @keyword vertex_attrs: the attributes of the vertices as a dictionary.
           Every dictionary value must be an iterable with exactly M{n} items.
-        @param edge_attrs: the attributes of the edges as a dictionary. Every
+        @keyword edge_attrs: the attributes of the edges as a dictionary. Every
           dictionary value must be an iterable with exactly M{m} items where
           M{m} is the number of edges.
         """
-        # Check if n is a list. If so, that means that the number of vertices
-        # were omitted, so we should shift the whole parameter list with 1.
-        if isinstance(n, list) or isinstance(n, tuple):
-            edge_attrs = vertex_attrs
-            vertex_attrs = graph_attrs
-            graph_attrs = directed
-            directed = edges
-            edges = n
-            n = 1
-        edges = edges or []
-        directed = directed or False
-        graph_attrs = graph_attrs or {}
-        vertex_attrs = vertex_attrs or {}
-        edge_attrs = edge_attrs or {}
+        # Set up default values for the parameters. This should match the order in *args
+        kwd_order = ["n", "edges", "directed", "graph_attrs", "vertex_attrs", "edge_attrs"]
+        params = [1, [], False, {}, {}, {}]
+        # If the first argument is a list, assume that the number of vertices were omitted
+        args = list(args)
+        if len(args) > 0:
+            if isinstance(args[0], list) or isinstance(args[0], tuple):
+                args.insert(0, params[0])
+        # Override default parameters from args
+        params[:len(args)] = args
+        # Override default parameters from keywords
+        for idx, k in enumerate(kwd_order):
+            if k in kwds: params[idx] = kwds[k]
+        # Now, translate the params list to argument names
+        n, edges, directed, graph_attrs, vertex_attrs, edge_attrs = params
+
+        # Initialize the graph
         core.GraphBase.__init__(self, n, edges, directed)
         # Set the graph attributes
         for k, v in graph_attrs.iteritems():
