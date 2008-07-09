@@ -2230,6 +2230,29 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
   return 0;
 }
 
+/** 
+ * \section about_bliss 
+ * 
+ * <para>
+ * BLISS is a successor of the famous NAUTY algorithm and
+ * implementation. While using the same ideas in general, with better
+ * heuristics and data structure BLISS outperforms NAUTY on most
+ * graphs.
+ * </para>
+ * 
+ * <para>
+ * BLISS was developed and implemented by Tommi Junttila and Petteri Kaski at 
+ * Helsinki University of Technology, Finland. See Tommi Juntilla's 
+ * homepage at http://www.tcs.hut.fi/~tjunttil/ and the publication at 
+ * http://www.siam.org/proceedings/alenex/2007/alx07_013junttilat.pdf
+ * for more information.
+ * </para>
+ * 
+ * <para>
+ * BLISS version 0.35 is included in igraph.
+ * </para>
+ */
+
 /**
  * \function igraph_isomorphic_bliss
  * Graph isomorphism via BLISS

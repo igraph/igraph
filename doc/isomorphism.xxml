@@ -15,6 +15,7 @@
 </section>
 
 <section><title>The BLISS algorithm</title>
+<!-- doxrox-include about_bliss -->
 <!-- doxrox-include igraph_bliss_sh_t -->
 <!-- doxrox-include igraph_bliss_info_t -->
 <!-- doxrox-include igraph_canonical_permutation -->
