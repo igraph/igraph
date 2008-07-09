@@ -359,9 +359,9 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
     if (list != 0) {
       /* Yes, we have. Modify its items to the items found in values */
       for (i=0; i<n; i++) {
-        item = PyList_GetItem(values, i);
+        item = PySequence_GetItem(values, i);
         if (item == 0) return -1;
-        Py_INCREF(item);
+        /* No need to Py_INCREF(item), PySequence_GetItem returns a new reference */
         if (PyList_SetItem(list, i, item)) {
           Py_DECREF(item);
           return -1;
@@ -373,10 +373,11 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
       list = PyList_New(n);
       if (list == 0) return -1;
       for (i=0; i<n; i++) {
-        item = PyList_GET_ITEM(values, i);
+        item = PySequence_GetItem(values, i);
         if (item == 0) { Py_DECREF(list); return -1; }
-        Py_INCREF(item);
+        /* No need to Py_INCREF(item), PySequence_GetItem returns a new reference */
         PyList_SET_ITEM(list, i, item);
+        /* PyList_SET_ITEM stole a reference to the item automatically */
       }
       if (PyDict_SetItem(dict, attrname, list)) {
         Py_DECREF(list);
@@ -405,9 +406,9 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
     if (list != 0) {
       /* Yes, we have. Modify its items to the items found in values */
       for (i=0; i<n; i++) {
-        item = PyList_GetItem(values, i);
+        item = PySequence_GetItem(values, i);
         if (item == 0) { igraph_vector_destroy(&es); return -1; }
-        Py_INCREF(item);
+        /* No need to Py_INCREF(item), PySequence_GetItem returns a new reference */
         if (PyList_SetItem(list, (long)VECTOR(es)[i], item)) {
           Py_DECREF(item);
           igraph_vector_destroy(&es);
@@ -426,13 +427,14 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
         PyList_SET_ITEM(list, i, Py_None);
       }
       for (i=0; i<n; i++) {
-        item = PyList_GET_ITEM(values, i);
+        item = PySequence_GetItem(values, i);
         if (item == 0) {
           igraph_vector_destroy(&es);
           Py_DECREF(list); return -1;
         }
-        Py_INCREF(item);
+        /* No need to Py_INCREF(item), PySequence_GetItem returns a new reference */
         PyList_SET_ITEM(list, (long)VECTOR(es)[i], item);
+        /* PyList_SET_ITEM stole a reference to the item automatically */
       }
       igraph_vector_destroy(&es);
       if (PyDict_SetItem(dict, attrname, list)) {
