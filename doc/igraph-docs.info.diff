@@ -1,12 +1,12 @@
---- igraph-0.3.3.orig/doc/igraph-docs.info
-+++ igraph-0.3.3/doc/igraph-docs.info
-@@ -1,8 +1,9 @@
- This is igraph-docs.info, produced by makeinfo version 4.8 from
- igraph-docs.texi.
+--- igraph-docs.info	2008-07-11 07:10:31.000000000 -0500
++++ igraph-docs.info.orig	2008-07-11 07:13:28.000000000 -0500
+@@ -1,8 +1,8 @@
+ This is igraph_reference_manual.info, produced by makeinfo version 4.11 from igraph-docs.texi.
  
 +INFO-DIR-SECTION Development
  START-INFO-DIR-ENTRY
--* igraph Reference Manual: .    ???
+-* igraph Reference Manual: (igraph_reference_manual).
+-                                                  [MISSING TEXT]
 +* Igraph Reference Manual: (igraph-docs.info).    A library for graphs
  END-INFO-DIR-ENTRY
  
