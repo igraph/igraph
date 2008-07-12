@@ -1,6 +1,35 @@
 #ifndef RNG_H
 #define RNG_H
 
+#include "random.h"
+#include <iostream>
+using namespace std;
+
+namespace KW_RNG {
+
+typedef signed int  sint;
+typedef unsigned int uint;
+typedef signed long  slong;
+typedef unsigned long ulong;
+
+class RNG
+{
+public:
+  RNG() { }
+  RNG(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) { };
+  ~RNG() { }
+
+  void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) { }
+  long rand_int31() { return RNG_INT31(); }
+  double rand_halfopen01()   // (0,1]
+  { return RNG_UNIF01(); }
+  int binomial(double pp, int n) { return RNG_BINOM(n,pp); }
+};
+
+} // namespace KW_RNG
+
+/* This was the original RNG, but now we use the igraph version */
+
 // __________________________________________________________________________
 // random.h   - a Random Number Generator Class
 // random.cpp - contains the non-inline class methods
@@ -34,129 +63,124 @@
 // Some of this code is unlikely to work correctly as is on 64 bit
 // machines.
 
-#include <cstdlib>
-#include <ctime>
-#ifdef _WIN32
-#include <process.h>
-#define getpid _getpid
-#else
-#include <unistd.h>
-#endif
+// #include <cstdlib>
+// #include <ctime>
+// #ifdef _WIN32
+// #include <process.h>
+// #define getpid _getpid
+// #else
+// #include <unistd.h>
+// #endif
 
-//#ifdef _WIN32
-  static const double PI   =  3.1415926535897932;
-  static const double AD_l =  0.6931471805599453;
-  static const double AD_a =  5.7133631526454228;
-  static const double AD_b =  3.4142135623730950;
-  static const double AD_c = -1.6734053240284925;
-  static const double AD_p =  0.9802581434685472;
-  static const double AD_A =  5.6005707569738080;
-  static const double AD_B =  3.3468106480569850;
-  static const double AD_H =  0.0026106723602095;
-  static const double AD_D =  0.0857864376269050;
-//#endif //_WIN32
+// //#ifdef _WIN32
+//   static const double PI   =  3.1415926535897932;
+//   static const double AD_l =  0.6931471805599453;
+//   static const double AD_a =  5.7133631526454228;
+//   static const double AD_b =  3.4142135623730950;
+//   static const double AD_c = -1.6734053240284925;
+//   static const double AD_p =  0.9802581434685472;
+//   static const double AD_A =  5.6005707569738080;
+//   static const double AD_B =  3.3468106480569850;
+//   static const double AD_H =  0.0026106723602095;
+//   static const double AD_D =  0.0857864376269050;
+// //#endif //_WIN32
 
-namespace KW_RNG {
+// namespace KW_RNG {
 
-typedef signed int  sint;
-typedef unsigned int uint;
-typedef signed long  slong;
-typedef unsigned long ulong;
+// class RNG
+// {
+// private:
+//   ulong z, w, jsr, jcong; // Seeds
 
-class RNG
-{
-private:
-  ulong z, w, jsr, jcong; // Seeds
+//   ulong kn[128], ke[256];
+//   double wn[128],fn[128], we[256],fe[256];
 
-  ulong kn[128], ke[256];
-  double wn[128],fn[128], we[256],fe[256];
+// /*
+// #ifndef _WIN32
+//   static const double PI   =  3.1415926535897932;
+//   static const double AD_l =  0.6931471805599453;
+//   static const double AD_a =  5.7133631526454228;
+//   static const double AD_b =  3.4142135623730950;
+//   static const double AD_c = -1.6734053240284925;
+//   static const double AD_p =  0.9802581434685472;
+//   static const double AD_A =  5.6005707569738080;
+//   static const double AD_B =  3.3468106480569850;
+//   static const double AD_H =  0.0026106723602095;
+//   static const double AD_D =  0.0857864376269050;
+// #endif //_WIN32
+// */
 
-/*
-#ifndef _WIN32
-  static const double PI   =  3.1415926535897932;
-  static const double AD_l =  0.6931471805599453;
-  static const double AD_a =  5.7133631526454228;
-  static const double AD_b =  3.4142135623730950;
-  static const double AD_c = -1.6734053240284925;
-  static const double AD_p =  0.9802581434685472;
-  static const double AD_A =  5.6005707569738080;
-  static const double AD_B =  3.3468106480569850;
-  static const double AD_H =  0.0026106723602095;
-  static const double AD_D =  0.0857864376269050;
-#endif //_WIN32
-*/
-
-public:
-  RNG() { init(); zigset(); }
-  RNG(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) :
-    z(z_), w(w_), jsr(jsr_), jcong(jcong_) { zigset(); }
-  ~RNG() { }
+// public:
+//   RNG() { init(); zigset(); }
+//   RNG(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) :
+//     z(z_), w(w_), jsr(jsr_), jcong(jcong_) { zigset(); }
+//   ~RNG() { }
 
 
-  inline ulong znew() 
-    { return (z = 36969 * (z & 65535) + (z >> 16)); }
-  inline ulong wnew() 
-    { return (w = 18000 * (w & 65535) + (w >> 16)); }
-  inline ulong MWC()  
-    { return (((znew() & 65535) << 16) + wnew()); }
-  inline ulong SHR3()
-    { jsr ^= ((jsr & 32767) << 17); jsr ^= (jsr >> 13); return (jsr ^= ((jsr << 5) & 0xFFFFFFFF)); }
-  inline ulong CONG() 
-    { return (jcong = (69069 * jcong + 1234567) & 0xFFFFFFFF); }
-  inline double RNOR() {
-    slong h = rand_int32();
-    ulong i = h & 127;
-    return (((ulong) abs((sint) h) < kn[i]) ? h * wn[i] : nfix(h, i));
-  }
-  inline double REXP() {
-    ulong j = rand_int32();
-    ulong i = j & 255;
-    return ((j < ke[i]) ? j * we[i] : efix(j, i));
-  }
+//   inline ulong znew() 
+//     { return (z = 36969 * (z & 65535) + (z >> 16)); }
+//   inline ulong wnew() 
+//     { return (w = 18000 * (w & 65535) + (w >> 16)); }
+//   inline ulong MWC()  
+//     { return (((znew() & 65535) << 16) + wnew()); }
+//   inline ulong SHR3()
+//     { jsr ^= ((jsr & 32767) << 17); jsr ^= (jsr >> 13); return (jsr ^= ((jsr << 5) & 0xFFFFFFFF)); }
+//   inline ulong CONG() 
+//     { return (jcong = (69069 * jcong + 1234567) & 0xFFFFFFFF); }
+//   inline double RNOR() {
+//     slong h = rand_int32();
+//     ulong i = h & 127;
+//     return (((ulong) abs((sint) h) < kn[i]) ? h * wn[i] : nfix(h, i));
+//   }
+//   inline double REXP() {
+//     ulong j = rand_int32();
+//     ulong i = j & 255;
+//     return ((j < ke[i]) ? j * we[i] : efix(j, i));
+//   }
 
-  double nfix(slong h, ulong i);
-  double efix(ulong j, ulong i);
-  void zigset();
+//   double nfix(slong h, ulong i);
+//   double efix(ulong j, ulong i);
+//   void zigset();
 
-  inline void init()
-    { ulong yo = time(0) + getpid();
-      z = w = jsr = jcong = yo; }
-  inline void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ )
-    { z = z_; w = w_; jsr = jsr_; jcong = jcong_; }
+//   inline void init()
+//     { ulong yo = time(0) + getpid();
+//       z = w = jsr = jcong = yo; }
+//   inline void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ )
+//     { z = z_; w = w_; jsr = jsr_; jcong = jcong_; }
 
-  inline ulong rand_int32()         // [0,2^32-1]
-    { return ((MWC() ^ CONG()) + SHR3()) & 0xFFFFFFFF; }
-  inline long rand_int31()          // [0,2^31-1]
-    { return long(rand_int32() >> 1);}
-  inline double rand_closed01()     // [0,1]
-    { return ((double) rand_int32() / 4294967295.0); }
-  inline double rand_open01()       // (0,1)
-    { return (((double) rand_int32() + 0.5) / 4294967296.0); }
-  inline double rand_halfclosed01() // [0,1)
-    { return ((double) rand_int32() / 4294967296.0); }
-  inline double rand_halfopen01()   // (0,1]
-    { return (((double) rand_int32() + 0.5) / 4294967295.5); }
+//   inline ulong rand_int32()         // [0,2^32-1]
+//     { return ((MWC() ^ CONG()) + SHR3()) & 0xFFFFFFFF; }
+//   inline long rand_int31()          // [0,2^31-1]
+//     { return long(rand_int32() >> 1);}
+//   inline double rand_closed01()     // [0,1]
+//     { return ((double) rand_int32() / 4294967295.0); }
+//   inline double rand_open01()       // (0,1)
+//     { return (((double) rand_int32() + 0.5) / 4294967296.0); }
+//   inline double rand_halfclosed01() // [0,1)
+//     { return ((double) rand_int32() / 4294967296.0); }
+//   inline double rand_halfopen01()   // (0,1]
+//     { return (((double) rand_int32() + 0.5) / 4294967295.5); }
 
-  // Continuous Distributions
-  inline double uniform(double x = 0.0, double y = 1.0)
-    { return rand_closed01() * (y - x) + x; }
-  inline double normal(double mu = 0.0, double sd = 1.0)
-    { return RNOR() * sd + mu; }
-  inline double exponential(double lambda = 1)
-    { return REXP() / lambda; }
-  double gamma(double shape = 1, double scale = 1);
-  double chi_square(double df)
-    { return gamma(df / 2.0, 0.5); }
-  double beta(double a1, double a2)
-    { double x1 = gamma(a1, 1); return (x1 / (x1 + gamma(a2, 1))); }
+//   // Continuous Distributions
+//   inline double uniform(double x = 0.0, double y = 1.0)
+//     { return rand_closed01() * (y - x) + x; }
+//   inline double normal(double mu = 0.0, double sd = 1.0)
+//     { return RNOR() * sd + mu; }
+//   inline double exponential(double lambda = 1)
+//     { return REXP() / lambda; }
+//   double gamma(double shape = 1, double scale = 1);
+//   double chi_square(double df)
+//     { return gamma(df / 2.0, 0.5); }
+//   double beta(double a1, double a2)
+//     { double x1 = gamma(a1, 1); return (x1 / (x1 + gamma(a2, 1))); }
 
-  // Discrete Distributions
-  double poisson(double lambda);
-  int binomial(double pp, int n);
+//   // Discrete Distributions
+//   double poisson(double lambda);
+//   int binomial(double pp, int n);
 
-}; // class RNG
+// }; // class RNG
 
-} // namespace
+// } // namespace
 
 #endif // RNG_H
 
