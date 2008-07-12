@@ -174,6 +174,26 @@ namespace drl {
 } // namespace drl
 
 /**
+ * \section about_drl
+ * 
+ * <para>
+ * DrL is a sophisticated layout generator developed and implemented by 
+ * Shawn Martin et al., see http://www.cs.sandia.gov/~smartin/software.html 
+ * for details. Only a subset of the complete DrL functionality is 
+ * included in igraph, parallel runs and recursive, multi-level
+ * layouting is not supported.
+ * </para>
+ * 
+ * <para>
+ * The parameters of the layout are stored in an \ref
+ * igraph_layout_drl_options_t structure, this can be initialized by
+ * calling the function \ref igraph_layout_drl_options_init(). 
+ * The fields of this structure can then be adjusted by hand if needed.
+ * The layout is calculated by an \ref igraph_layout_drl() call.
+ * </para>
+ */
+
+/**
  * \function igraph_layout_drl_options_init
  * Initialize parameters for the DrL layout generator
  * 
