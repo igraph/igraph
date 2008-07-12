@@ -2,7 +2,7 @@
 igraph 0.5.1
 ============
 
-Released June 27, 2008
+Released July 14, 2008
 
 See also the release notes at 
 http://cneurocvs.rmki.kfki.hu/igraph/relnotes-0.5.1.html
@@ -10,6 +10,9 @@ http://cneurocvs.rmki.kfki.hu/igraph/relnotes-0.5.1.html
 New in the R interface
 ----------------------
 
+- A new layout generator called DrL.
+- Uniform sampling of random connected undirected graphs with a 
+  given degree sequence.
 - Edge labels are plotted at 1/3 of the edge, this is better if 
   the graph has mutual edges.
 - Initial and experimental vertex shape support in 'plot'.
@@ -73,6 +76,9 @@ Bugs corrected in the R interface
 New in the Python interface
 ---------------------------
 
+- A new layout generator called DrL.
+- Uniform sampling of random connected undirected graphs with a 
+  given degree sequence.
 - Methods parameters accepting igraph.IN, igraph.OUT and igraph.ALL
   constants now also accept these as strings ("in", "out" and "all").
   Prefix matches also allowed as long as the prefix match is unique.
@@ -150,6 +156,9 @@ Bugs corrected in the Python interface
 New in the C layer
 ------------------
 
+- A new layout generator called DrL.
+- Uniform sampling of random connected undirected graphs with a 
+  given degree sequence.
 - Some stochastic test results are ignored (for spinglass community
   detection, some Erdos-Renyi generator tests)
 - Weighted shortest paths, Dijkstra's algorithm.

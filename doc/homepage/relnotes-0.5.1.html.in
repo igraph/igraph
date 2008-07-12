@@ -1,0 +1,94 @@
+<h2>igraph 0.5.1 Release Notes</h2>
+
+<p class="news">
+igraph 0.5.1 is a bugfix release, but it actually contains many 
+important new things as well. Here is a brief summary about each of 
+them. See the <a href="news.html">news page</a> for the complete
+list of changes.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+    <img src="images/icon_r.png"/>
+    <img src="images/icon_python.png"/>
+    The DrL layout generator was added</h3>
+
+<p class="news">
+This is a sophisticated and efficient layout generator written by 
+Shawn Martin and colleagues. See more in the 
+<a href="doc-0.5.1/R/layout.drl.html">R manual</a>, in the 
+<a href="">Python documentation</a>
+or in the <a href="doc-0.5.1/html/ch14s01s04.html">C library reference
+manual.</a>
+</p>
+
+<h3><img src="images/icon_c.png"/>
+    <img src="images/icon_r.png"/>
+    <img src="images/icon_python.png"/>
+    Uniform sampling of random graphs with given degree sequence</h3>
+
+<p class="news">
+A nice random graph generator that conditions on the degree of vertices 
+was added. It can generate undirected connected graphs.
+The algorithm and the implementation was done by Fabien Viger and Matthieu Latapy.
+See more in the 
+<a href="doc-0.5.1/R/degree.sequence.game.html">R manual</a>, 
+in the <a href="">Python documentation</a> or in the 
+<a href="doc-0.5.1/html/igraph_degree_sequence_game.html">C library
+reference manual.</a>
+</p>
+
+<h3><img src="images/icon_r.png"/> Conversions</h3>
+
+<p class="news">
+igraph includes some functions to convert graphs to and from 
+<code>graphNEL</code> objects as defined in the graph package
+(<code><a href="doc-0.5.1/R/graphNEL.html">igraph.to.graphNEL</a></code>, 
+<code><a href="doc-0.5.1/R/graphNEL.html">igraph.from.graphNEL</a></code>) and 
+sparse matrices using the Matrix package 
+(<code><a href="doc-0.5.1/R/conversion.html">get.adjacency</a></code>, 
+<code><a href="doc-0.5.1/R/graph.adjacency.html">graph.adjacency</a></code>, 
+see the <code>sparse</code> argument).
+</p>
+
+<h3><img src="images/icon_r.png"/> New graph constructors</h3>
+
+<p class="news">
+A new function was added to create graphs from adjacency lists
+(<code><a href="doc-0.5.1/R/graph.adjlist.html">graph.adjlist</a></code>), 
+and <code><a href="doc-0.5.1/R/graph.data.frame.html">graph.data.frame</a></code>
+has an argument call <code>vertices</code>, this allows easy
+construction of graphs with vertex and edge meta data.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+    <img src="images/icon_r.png"/>
+    <img src="images/icon_python.png"/>
+    Weighted shortest path algorithms</h3>
+
+<p class="news">
+Both the Dijkstra and the Belmann-Ford algorithms were added. 
+See more in the 
+<a href="doc-0.5.1/R/shortest.paths.html">R documentation</a>, the
+<a href="doc-0.5.1/python/igraph.GraphBase-class.html#shortest_paths">Python manual</a> or in the 
+<a href="doc-0.5.1/html/ch10s02.html">C library reference manual.</a>
+</p>
+
+<h3><img src="images/icon_c.png"/>
+    <img src="images/icon_r.png"/>
+    <img src="images/icon_python.png"/>
+    Function to test edge reciprocity</h3>
+
+<p class="news">
+Mutuality can be tested for each edge now. See more in the 
+<a href="doc-0.5.1/R/is.mutual.html">R documentation</a>, in the 
+<a href="">Python manual</a>, or in the 
+<a href="doc-0.5.1/html/igraph_is_mutual.html">C reference manual.</a>
+</p>
+
+<h3><img src="images/icon_r.png"> Vertex shapes</h3>
+
+<p class="news">
+The R interface now supports different vertex shapes when plotting. 
+See more in the <a href="doc-0.5.1/R/igraph.vertex.shapes.html">R documentation.</a>
+<p>
+
