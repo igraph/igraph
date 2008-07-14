@@ -327,12 +327,14 @@ igraph_subcomponent:
 igraph_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, BOOLEAN directed=True
         IGNORE: RR, RC, RNamespace
+        FLAGS: PROGRESS
 
 igraph_betweenness_estimate:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
                 BOOLEAN directed=True, INTEGER cutoff
         DEPS: vids ON graph
         NAME-R: betweenness.estimate
+        FLAGS: PROGRESS
 
 igraph_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True
