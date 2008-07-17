@@ -768,10 +768,12 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 
 			igraph_neimode_t mode);	
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res, 
-                       const igraph_vs_t vids, igraph_bool_t directed);
+                       const igraph_vs_t vids, igraph_bool_t directed,
+		       const igraph_vector_t *weights);
 int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 			        const igraph_vs_t vids, igraph_bool_t directed,
-                                igraph_integer_t cutoff);
+                                igraph_integer_t cutoff, 
+				const igraph_vector_t *weights);
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed);
 int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,

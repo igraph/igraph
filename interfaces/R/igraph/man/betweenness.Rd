@@ -11,10 +11,11 @@
   edge. 
 }
 \usage{
-betweenness(graph, v=V(graph), directed = TRUE, verbose = igraph.par("verbose"))
+betweenness(graph, v=V(graph), directed = TRUE, weights = NULL,
+     verbose = igraph.par("verbose"))
 edge.betweenness(graph, e=E(graph), directed = TRUE)
 betweenness.estimate(graph, vids = V(graph), directed = TRUE, cutoff,
-     verbose = igraph.par("verbose"))
+     weights = NULL, verbose = igraph.par("verbose"))
 edge.betweenness.estimate(graph, directed = TRUE, cutoff)
 }
 \arguments{
@@ -25,6 +26,9 @@ edge.betweenness.estimate(graph, directed = TRUE, cutoff)
     calculated.}
   \item{directed}{Logical, whether directed paths should be considered
     while determining the shortest paths.}
+  \item{weights}{Optional positive weight vector for calculating
+    weighted betweenness. If the graph has a \code{weight} edge
+    attribute, then this is used by default.}
   \item{verbose}{Logical, whether to show a progress bar.}
   \item{vids}{The vertices for which the vertex betweenness estimation
     will be calculated.}

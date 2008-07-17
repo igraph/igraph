@@ -1,3 +1,8 @@
+2008-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/centrality.c (igraph_betweenness, igraph_betweenness_estimate)
+	(igraph_betweenness_estimate_weighted) : added weights
+
 2008-07-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c : added interface to

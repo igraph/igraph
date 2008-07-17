@@ -245,14 +245,23 @@ simplify <- function(graph, remove.multiple=TRUE,
 ##   res
 }
 
-betweenness <- function(graph, v=V(graph), directed=TRUE, verbose=igraph.par("verbose")) {
+betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
+                        verbose=igraph.par("verbose")) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_betweenness", graph, as.igraph.vs(v),
-        as.logical(directed), as.logical(verbose),
+        as.logical(directed), weights, as.logical(verbose),
         PACKAGE="igraph")
 }
 

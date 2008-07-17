@@ -1792,12 +1792,14 @@ SEXP R_igraph_subcomponent(SEXP graph, SEXP pvertex, SEXP pmode) {
   return result;
 }
 
-SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected, SEXP verbose) {
+SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected, 
+			  SEXP weights, SEXP verbose) {
   
   igraph_t g;
   igraph_vs_t vs;
   igraph_bool_t directed=LOGICAL(pdirected)[0];
   igraph_vector_t res;
+  igraph_vector_t v_weights, *pweights=0;
   SEXP result;
   
   R_igraph_before2(verbose, "Betweenness");
@@ -1805,7 +1807,10 @@ SEXP R_igraph_betweenness(SEXP graph, SEXP pvids, SEXP pdirected, SEXP verbose) 
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
   igraph_vector_init(&res, 0);
-  igraph_betweenness(&g, &res, vs, directed);
+  if (!isNull(weights)) { 
+    pweights=&v_weights; R_SEXP_to_vector(weights, &v_weights);
+  }
+  igraph_betweenness(&g, &res, vs, directed, pweights);
   
   PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
   igraph_vector_copy_to(&res, REAL(result));
