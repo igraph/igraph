@@ -1,5 +1,8 @@
 2008-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/type_indexededgelist.c (igraph_get_eid) : speeded up by using 
+	binary search
+
 	* src/centrality.c (igraph_betweenness, igraph_betweenness_estimate)
 	(igraph_betweenness_estimate_weighted) : added weights
 
