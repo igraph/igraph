@@ -2172,27 +2172,25 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
 {
   igraphmodule_GraphObject *self;
   igraph_vector_t outseq, inseq;
-  PyObject *outdeg = NULL, *indeg = NULL;
+  igraph_degseq_t meth = IGRAPH_DEGSEQ_SIMPLE;
+  PyObject *outdeg = NULL, *indeg = NULL, *method = NULL;
 
-  char *kwlist[] = { "out", "in", NULL };
+  static char *kwlist[] = { "out", "in", "method", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!", kwlist,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!O", kwlist,
                                    &PyList_Type, &outdeg,
-                                   &PyList_Type, &indeg))
+                                   &PyList_Type, &indeg,
+								   &method))
     return NULL;
 
-  if (igraphmodule_PyObject_to_vector_t(outdeg, &outseq, 1, 0)) {
-    // something bad happened during conversion
-    return NULL;
-  }
+  if (igraphmodule_PyObject_to_degseq_t(method, &meth)) return NULL;
+  if (igraphmodule_PyObject_to_vector_t(outdeg, &outseq, 1, 0)) return NULL;
   if (indeg) {
     if (igraphmodule_PyObject_to_vector_t(indeg, &inseq, 1, 0)) {
-      // something bad happened during conversion
       igraph_vector_destroy(&outseq);
       return NULL;
     }
-  }
-  else {
+  } else {
     igraph_vector_init(&inseq, 0);
   }
 
@@ -2201,8 +2199,7 @@ PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
 
   if (self != NULL) {
     igraphmodule_Graph_init_internal(self);
-    if (igraph_degree_sequence_game(&self->g, &outseq, &inseq,
-                                    IGRAPH_DEGSEQ_SIMPLE)) {
+    if (igraph_degree_sequence_game(&self->g, &outseq, &inseq, meth)) {
       igraphmodule_handle_igraph_error();
       igraph_vector_destroy(&outseq);
       igraph_vector_destroy(&inseq);
@@ -7951,17 +7948,30 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  this is the case, also its orientation. Must be one of\n"
    "  C{TREE_IN}, C{TREE_OUT} and C{TREE_UNDIRECTED}.\n"},
 
-  // interface to igraph_degree_sequence_game
+  /* interface to igraph_degree_sequence_game */
   {"Degree_Sequence", (PyCFunction) igraphmodule_Graph_Degree_Sequence,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Degree_Sequence(out, in=None)\n\n"
+   "Degree_Sequence(out, in=None, method=\"simple\")\n\n"
    "Generates a graph with a given degree sequence.\n\n"
    "@param out: the out-degree sequence for a directed graph. If the\n"
    "  in-degree sequence is omitted, the generated graph\n"
    "  will be undirected, so this will be the in-degree\n"
    "  sequence as well\n"
    "@param in: the in-degree sequence for a directed graph.\n"
-   "   If omitted, the generated graph will be undirected.\n"},
+   "  If omitted, the generated graph will be undirected.\n"
+   "@param method: the generation method to be used. One of the following:\n"
+   "  \n"
+   "    - C{\"simple\"} -- simple generator that sometimes generates\n"
+   "      loop edges and multiple edges. The generated graph is not\n"
+   "      guaranteed to be connected.\n"
+   "    - C{\"vl\"} -- a more sophisticated generator that can sample\n"
+   "      undirected, connected simple graphs uniformly. It uses\n"
+   "      Monte-Carlo methods to randomize the graphs.\n"
+   "      This generator should be favoured if undirected and connected\n"
+   "      graphs are to be generated. igraph uses the original\n"
+   "      implementation of Fabien Viger; see the following URL and\n"
+   "      the paper cited on it for the details of the algorithm:\n"
+   "      U{http://www-rp.lip6.fr/~latapy/FV/generation.html}.\n"},
 
   // interface to igraph_isoclass_create
   {"Isoclass", (PyCFunction) igraphmodule_Graph_Isoclass,
