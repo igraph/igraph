@@ -4472,48 +4472,71 @@ PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
           PyObject *args, PyObject *kwds)
 {
   static char *kwlist[] =
-    { "weights", "fixed", "seed", "options", NULL };
+    { "weights", "seed", "fixed", "options", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
   igraph_vector_t *weights=0;
+  igraph_vector_bool_t *fixed=0;
   igraph_layout_drl_options_t options;
   PyObject *result;
   PyObject *wobj=Py_None, *fixed_o=Py_None, *seed_o=Py_None, *options_o=Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist, &wobj,
-                                   &wobj, &fixed_o, &seed_o, &options_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
+                                   &wobj, &seed_o, &fixed_o, &options_o))
 	  return NULL;
+
+  if (igraphmodule_PyObject_to_drl_options_t(options_o, &options))
+    return NULL;
 
   if (igraph_layout_drl_options_init(&options, IGRAPH_LAYOUT_DRL_DEFAULT)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
+  if (fixed_o != 0 && fixed_o != Py_None) {
+    fixed = (igraph_vector_bool_t*)malloc(sizeof(igraph_vector_bool_t));
+    if (!fixed) {
+	  PyErr_NoMemory();
+	  return NULL;
+	}
+	if (igraphmodule_PyObject_to_vector_bool_t(fixed_o, fixed)) {
+	  free(fixed);
+	  return NULL;
+	}
+  }
+
   if (seed_o == 0 || seed_o == Py_None) {
     if (igraph_matrix_init(&m, 1, 1)) {
       igraphmodule_handle_igraph_error();
+	  if (fixed) { igraph_vector_bool_destroy(fixed); free(fixed); }
       return NULL;
     }
   } else {
-    if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
+    if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) {
+	  if (fixed) { igraph_vector_bool_destroy(fixed); free(fixed); }
+	  return NULL;
+	}
 	use_seed=1;
   }
 
   /* Convert the weight parameter to a vector */
   if (igraphmodule_attrib_to_vector_t(wobj, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
     igraph_matrix_destroy(&m);
+	if (fixed) { igraph_vector_bool_destroy(fixed); free(fixed); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
   
-  if (igraph_layout_drl(&self->g, &m, use_seed, &options, weights, 0)) {
+  if (igraph_layout_drl(&self->g, &m, use_seed, &options, weights, fixed)) {
     igraph_matrix_destroy(&m);
     if (weights) { igraph_vector_destroy(weights); free(weights); }
+	if (fixed) { igraph_vector_bool_destroy(fixed); free(fixed); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
   if (weights) { igraph_vector_destroy(weights); free(weights); }
+  if (fixed) { igraph_vector_bool_destroy(fixed); free(fixed); }
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
   igraph_matrix_destroy(&m);
   return (PyObject *) result;
@@ -8841,11 +8864,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Places the vertices on a 2D plane according to the DrL layout algorithm.\n\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
-   "@param fixed: currently ignored\n"
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
-   "@param options: currently ignored\n"
+   "@param fixed: if a seed is given, you can specify some vertices to be\n"
+   "  kept fixed at their original position in the seed by passing an\n"
+   "  appropriate list here. The list must have exactly as many items as\n"
+   "  the number of vertices in the graph. Items of the list that evaluate\n"
+   "  to C{True} denote vertices that will not be moved.\n"
+   "@param options: currently you can select from five default preset\n"
+   "  parameterisations: C{default}, C{coarsen} for a coarser layout,\n"
+   "  C{coarsest} for an even coarser layout, C{refine} for refining\n"
+   "  an existing layout and C{final} for finalizing a layout.\n"
    "@return: the calculated coordinate pairs in a list."},
 
   // interface to igraph_layout_fruchterman_reingold

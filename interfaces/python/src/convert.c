@@ -492,6 +492,71 @@ int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) 
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python list of objects to an igraph \c igraph_vector_bool_t
+ * The incoming \c igraph_vector_bool_t should be uninitialized. Raises suitable
+ * Python exceptions when needed.
+ * 
+ * \param list the Python list to be converted
+ * \param v the \c igraph_vector_bool_t containing the result
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_vector_bool_t(PyObject *list,
+    igraph_vector_bool_t *v) {
+  PyObject *item;
+  int i, j, k;
+
+  if (PyString_Check(list) || PyUnicode_Check(list)) {
+    /* It is highly unlikely that a string (although it is a sequence) will
+     * provide us with integers or integer pairs */
+    PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable");
+    return 1;
+  }
+
+  if (!PySequence_Check(list)) {
+    /* try to use an iterator */
+    PyObject *it = PyObject_GetIter(list);
+    if (it) {
+      PyObject *item;
+      igraph_vector_bool_init(v, 0);
+      while ((item = PyIter_Next(it)) != 0) {
+        if (igraph_vector_bool_push_back(v, PyObject_IsTrue(item))) {
+          igraphmodule_handle_igraph_error();
+          igraph_vector_bool_destroy(v);
+          Py_DECREF(item);
+          Py_DECREF(it);
+          return 1;
+        }
+        Py_DECREF(item);
+      }
+      Py_DECREF(it);
+      return 0;
+    } else {
+      PyErr_SetString(PyExc_TypeError, "sequence or iterable expected");
+      return 1;
+    }
+    return 0;
+  }
+
+  j=PySequence_Size(list);
+  igraph_vector_bool_init(v, j);
+  for (i=0, k=0; i<j; i++) {
+    item=PySequence_GetItem(list, i);
+    if (item) {
+      VECTOR(*v)[k]=PyObject_IsTrue(item);
+	  Py_DECREF(item);
+    } else {
+      /* this should not happen, but we return anyway.
+       * an IndexError exception was set by PySequence_GetItem
+       * at this point */
+      igraph_vector_bool_destroy(v);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an igraph \c igraph_vector_bool_t to a Python boolean list
  * 
  * \param v the \c igraph_vector_bool_t containing the vector to be converted
@@ -1219,3 +1284,34 @@ int igraphmodule_PyObject_to_attribute_values(PyObject *o,
 
   return 0;
 }
+
+
+int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
+    igraph_layout_drl_options_t *options) {
+  if (obj == Py_None) {
+	igraph_layout_drl_options_init(options, IGRAPH_LAYOUT_DRL_DEFAULT);
+  } else if (PyString_Check(obj)) {
+    /* We have a string, so we are using a preset */
+	char* s=PyString_AsString(obj);
+	igraph_layout_drl_default_t def=IGRAPH_LAYOUT_DRL_DEFAULT;
+	if (strcmp(s, "default") == 0) def=IGRAPH_LAYOUT_DRL_DEFAULT;
+	else if (strcmp(s, "coarsen") == 0) def=IGRAPH_LAYOUT_DRL_COARSEN;
+	else if (strcmp(s, "coarsest") == 0) def=IGRAPH_LAYOUT_DRL_COARSEST;
+	else if (strcmp(s, "refine") == 0) def=IGRAPH_LAYOUT_DRL_REFINE;
+	else if (strcmp(s, "final") == 0) def=IGRAPH_LAYOUT_DRL_FINAL;
+	else {
+      PyErr_SetString(PyExc_ValueError, "unknown DrL template name. Must be one of: default, coarsen, coarsest, refine, final");
+      return 1;
+	}
+	if (igraph_layout_drl_options_init(options, def)) {
+	  igraphmodule_handle_igraph_error();
+	  return 1;
+	}
+  } else {
+    PyErr_SetString(PyExc_TypeError, "string expected as DrL template name");
+	return 1;
+  }
+
+  return 0;
+}
+
