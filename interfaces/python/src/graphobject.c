@@ -2513,33 +2513,40 @@ PyObject *igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *
 PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
                                          PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "directed", "cutoff", NULL };
+  char *kwlist[] = { "vertices", "directed", "cutoff", "weights", NULL };
   PyObject *directed = Py_True;
   PyObject *vobj = Py_None, *list;
   PyObject *cutoff = Py_None;
-  igraph_vector_t res;
+  PyObject *weights_o = Py_None;
+  igraph_vector_t res, *weights = 0;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
-                                   &vobj, &directed, &cutoff)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
+                                   &vobj, &directed, &cutoff, &weights)) {
     return NULL;
   }
 
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+
   if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
   if (igraph_vector_init(&res, 0)) {
     igraph_vs_destroy(&vs);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     return igraphmodule_handle_igraph_error();
   }
 
   if (cutoff == Py_None) {
-    if (igraph_betweenness(&self->g, &res, vs, PyObject_IsTrue(directed))) {
+    if (igraph_betweenness(&self->g, &res, vs, PyObject_IsTrue(directed), weights)) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
       igraphmodule_handle_igraph_error();
       return NULL;
     }
@@ -2548,12 +2555,14 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
     if (cutoff_num == NULL) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
       return NULL;
     }
     if (igraph_betweenness_estimate(&self->g, &res, vs, PyObject_IsTrue(directed),
-        (igraph_integer_t)PyInt_AsLong(cutoff_num))) {
+        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights)) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
       Py_DECREF(cutoff_num);
       igraphmodule_handle_igraph_error();
       return NULL;
@@ -2563,6 +2572,7 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
     PyErr_SetString(PyExc_TypeError, "cutoff value must be None or integer");
     igraph_vs_destroy(&vs);
     igraph_vector_destroy(&res);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
@@ -2573,6 +2583,7 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
 
   igraph_vector_destroy(&res);
   igraph_vs_destroy(&vs);
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   return list;
 }
@@ -8132,7 +8143,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_betweenness[_estimate] */
   {"betweenness", (PyCFunction) igraphmodule_Graph_betweenness,
    METH_VARARGS | METH_KEYWORDS,
-   "betweenness(vertices=None, directed=True, cutoff=None)\n\n"
+   "betweenness(vertices=None, directed=True, cutoff=None, weights=None)\n\n"
    "Calculates or estimates the betweenness of nodes in a graph.\n\n"
    "Keyword arguments:\n"
    "@param vertices: the vertices for which the betweennesses must be returned.\n"
@@ -8142,6 +8153,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  length are considered, effectively resulting in an estimation of the\n"
    "  betweenness for the given nodes. If C{None}, the exact betweenness is\n"
    "  returned.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@return: the (possibly estimated) betweenness of the given nodes in a list\n"},
 
   /* interface to biconnected_components */
