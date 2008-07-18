@@ -4464,6 +4464,62 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai_3d(igraphmodule_GraphObject *
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices on a plane according to the DrL algorithm.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_drl
+ */
+PyObject* igraphmodule_Graph_layout_drl(igraphmodule_GraphObject *self,
+          PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] =
+    { "weights", "fixed", "seed", "options", NULL };
+  igraph_matrix_t m;
+  igraph_bool_t use_seed=0;
+  igraph_vector_t *weights=0;
+  igraph_layout_drl_options_t options;
+  PyObject *result;
+  PyObject *wobj=Py_None, *fixed_o=Py_None, *seed_o=Py_None, *options_o=Py_None;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist, &wobj,
+                                   &wobj, &fixed_o, &seed_o, &options_o))
+	  return NULL;
+
+  if (igraph_layout_drl_options_init(&options, IGRAPH_LAYOUT_DRL_DEFAULT)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
+	use_seed=1;
+  }
+
+  /* Convert the weight parameter to a vector */
+  if (igraphmodule_attrib_to_vector_t(wobj, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  
+  if (igraph_layout_drl(&self->g, &m, use_seed, &options, weights, 0)) {
+    igraph_matrix_destroy(&m);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
  * \return the calculated coordinates as a Python list of lists
  * \sa igraph_layout_fruchterman_reingold
@@ -8842,6 +8898,21 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
    "@return: the calculated coordinate triplets in a list."},
+
+  /* interface to igraph_layout_drl */
+  {"layout_drl",
+   (PyCFunction) igraphmodule_Graph_layout_drl,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_drl(weights=None, fixed=None, seed=None, options=None)\n\n"
+   "Places the vertices on a 2D plane according to the DrL layout algorithm.\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
+   "@param fixed: currently ignored\n"
+   "@param seed: if C{None}, uses a random starting layout for the\n"
+   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
+   "  as the starting position.\n"
+   "@param options: currently ignored\n"
+   "@return: the calculated coordinate pairs in a list."},
 
   // interface to igraph_layout_fruchterman_reingold
   {"layout_fruchterman_reingold",
