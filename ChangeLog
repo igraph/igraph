@@ -1,3 +1,9 @@
+2008-07-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexededgelist.c (igraph_get_eid) : simplification,
+	in the end the newly defined macros will be used by other
+	functions as well
+
 2008-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_betweenness_estimate_weighted) : 

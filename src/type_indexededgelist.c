@@ -957,6 +957,49 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
   return 0;
 }
 
+/* This is an unsafe macro. Only supply variable names, i.e. no
+   expressions as parameters, otherwise nasty things can happen */
+
+#define BINSEARCH(start,end,value,index,edgelist,N,pos)     \
+  do {                                                      \
+  while ((start) < (end)) {                                 \
+    long int mid=(start)+((end)-(start))/2;                 \
+    long int e=VECTOR((index))[mid];                        \
+    if (VECTOR((edgelist))[e] < (value)) {                  \
+      (start)=mid+1;                                        \
+    } else {                                                \
+      (end)=mid;                                            \
+    }                                                       \
+  }                                                         \
+  if ((start)<(N)) {                                        \
+    long int e=VECTOR((index))[(start)];                    \
+    if (VECTOR((edgelist))[e] == (value)) {                 \
+      *(pos)=e;                                             \
+    }                                                       \
+  } } while(0)
+
+#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid)                     \
+  do {                                                              \
+    long int start=VECTOR(graph->os)[xfrom];                        \
+    long int end=VECTOR(graph->os)[xfrom+1];                        \
+    long int N=end;                                                 \
+    long int start2=VECTOR(graph->is)[xto];                         \
+    long int end2=VECTOR(graph->is)[xto+1];                         \
+    long int N2=end2;                                               \
+    if (end-start<end2-start2) {                                    \
+      BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid);           \
+    } else {                                                        \
+      BINSEARCH(start2,end2,xfrom,graph->ii,graph->from,N2,eid);    \
+    }                                                               \
+  } while (0)
+
+#define FIND_UNDIRECTED_EDGE(graph,from,to,eid)                     \
+  do {                                                              \
+    long int xfrom1= from > to ? from : to;                         \
+    long int xto1= from > to ? to : from;                           \
+    FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid);                      \
+  } while (0)
+
 /**
  * \function igraph_get_eid
  * \brief Get the edge id from the end points of an edge
@@ -993,159 +1036,21 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 
   *eid=-1;
   if (igraph_is_directed(graph)) {
-    long int start, end, start2, end2, N, N2;
 
     /* Directed graph */
-
-    start=VECTOR(graph->os)[from];
-    N=end=VECTOR(graph->os)[from+1];
-    start2=VECTOR(graph->is)[to];
-    N2=end2=VECTOR(graph->is)[to+1];
-
-    if (end-start<end2-start2) {
-
-      while (start < end) {
-	long int mid=start+(end-start)/2;
-	long int e=VECTOR(graph->oi)[mid];
-	if (VECTOR(graph->to)[e] < to) {
-	  start=mid+1;
-	} else {
-	  end=mid;
-	}
-      }
-      if (start<N) { 
-	long int e=VECTOR(graph->oi)[start];
-	if (VECTOR(graph->to)[e] == to) {
-	  *eid=e;
-	}
-      }
-
-    } else {
-      
-      while (start2 < end2) {
-	long int mid=start2+(end2-start2)/2;
-	long int e=VECTOR(graph->ii)[mid];
-	if (VECTOR(graph->from)[e] < from) {
-	  start2=mid+1;
-	} else {
-	  end2=mid;
-	}
-      }
-      if (start2<N2) { 
-	long int e=VECTOR(graph->ii)[start2];
-	if (VECTOR(graph->from)[e] == from) {
-	  *eid=e;
-	}
-      }
-      
-    }
-      
-    /* We also search the other if needed  */
-
+    FIND_DIRECTED_EDGE(graph,from,to,eid);
     if (!directed && *eid < 0) {
-
-      start=VECTOR(graph->os)[to];
-      N=end=VECTOR(graph->os)[to+1];
-      start2=VECTOR(graph->is)[from];
-      N2=end2=VECTOR(graph->is)[from+1];
-      
-      if (end-start<end2-start2) {
-      
-	while (start < end) {
-	  long int mid=start+(end-start)/2;
-	  long int e=VECTOR(graph->oi)[mid];
-	  if (VECTOR(graph->to)[e] < from) {
-	    start=mid+1;
-	  } else {
-	    end=mid;
-	  }
-	}
-	if (start<N) { 
-	  long int e=VECTOR(graph->oi)[start];
-	  if (VECTOR(graph->to)[e] == from) {
-	    *eid=e;
-	  }
-	}
-
-      } else {
-
-	while (start2 < end2) {
-	  long int mid=start2+(end2-start2)/2;
-	  long int e=VECTOR(graph->ii)[mid];
-	  if (VECTOR(graph->from)[e] < to) {
-	    start2=mid+1;
-	  } else {
-	    end2=mid;
-	  }
-	}
-	if (start2<N2) { 
-	  long int e=VECTOR(graph->ii)[start2];
-	  if (VECTOR(graph->from)[e] == to) {
-	    *eid=e;
-	  }
-	}	
-	
-      }
+      FIND_DIRECTED_EDGE(graph,to,from,eid);
     }
     
   } else {
-    long int start1, start2, end1, end2, N1, N2;
-      
+
     /* Undirected graph, they only have one mode */
+    FIND_UNDIRECTED_EDGE(graph,from,to,eid);
 
-    if (from < to) { 
-      long int tmp;
-      tmp=from;
-      from=to;
-      to=tmp;
-    }
-
-    start1=VECTOR(graph->os)[from];
-    N1=end1=VECTOR(graph->os)[from+1];
-    start2=VECTOR(graph->is)[to];
-    N2=end2=VECTOR(graph->is)[to+1];
-    
-    if (end1-start1<end2-start2) {
-
-      while (start1 < end1) {
-	long int mid=start1+(end1-start1)/2;
-	long int e=VECTOR(graph->oi)[mid];
-	if (VECTOR(graph->to)[e] < to) {
-	  start1=mid+1;
-	} else {
-	  end1=mid;
-	}
-      }
-      if (start1<N1) { 
-	long int e=VECTOR(graph->oi)[start1];
-	if (VECTOR(graph->to)[e] == to) {
-	  *eid=e;
-	}
-      }
-
-    } else {
-
-      while (start2 < end2) {
-	long int mid=start2+(end2-start2)/2;
-	long int e=VECTOR(graph->ii)[mid];
-	if (VECTOR(graph->from)[e] < from) {
-	  start2=mid+1;
-	} else {
-	  end2=mid;
-	}
-      }
-      if (start2<N2) { 
-	long int e=VECTOR(graph->ii)[start2];
-	if (VECTOR(graph->from)[e] == from) {
-	  *eid=e;
-	}
-      }      
-      
-    }
-    
   }
 
-  if (*eid < 0) { 
+  if (*eid < 0) {
     IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
   }
   
@@ -1155,11 +1060,13 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 
 int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 		    const igraph_vector_t *pairs, igraph_bool_t directed) {
+
   long int n=igraph_vector_size(pairs);
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_bool_t *seen;
   long int i, j;
+/*   igraph_integer_t eid=-1; */
     
   if (n % 2 != 0) {
     IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
@@ -1194,6 +1101,18 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
       }
     }
+/*       eid=-1; */
+/*       FIND_DIRECTED_EDGE(graph,from,to,&eid); */
+/*       if (!directed && eid < 0) { */
+/* 	FIND_DIRECTED_EDGE(graph,to,from,&eid); */
+/*       } */
+/*       if (eid >= 0) { */
+/* 	VECTOR(*eids)[i]=eid; */
+/* 	seen[(long int)(eid)]=1; */
+/*       } else { */
+/* 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL); */
+/*       } */
+/*     } */
   } else {
     for (i=0; i<n/2; i++) {
       long int from=VECTOR(*pairs)[2*i];
@@ -1223,12 +1142,25 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
       }
     }
+/*       eid=-1; */
+/*       FIND_UNDIRECTED_EDGE(graph,from,to,&eid); */
+/*       if (eid >= 0) { */
+/* 	VECTOR(*eids)[i]=eid; */
+/* 	seen[(long int)(eid)]=1; */
+/*       } else { */
+/* 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL); */
+/*       } */
+/*     } */
   }
   
   igraph_Free(seen);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+#undef BINSEARCH
+#undef FIND_DIRECTED_EDGE
+#undef FIND_UNDIRECTED_EDGE
 
 /**
  * \function igraph_adjacent
