@@ -950,10 +950,11 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   double *tmpscore;
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
-  long int j, k;
+  long int j, k, nneis;
   igraph_integer_t modein, modeout;
-  igraph_vit_t vit;
   igraph_vector_t *neis;
+  igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
+  igraph_vit_t vit;
 
   igraph_adjlist_t adjlist_out, adjlist_in;
   igraph_adjlist_t *adjlist_out_p, *adjlist_in_p;
@@ -963,8 +964,17 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 						cutoff, weights);
   }
 
-  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
-  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  if (!igraph_vs_is_all(&vids)) {
+    /* subset */
+    IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  } else {
+    /* only  */
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    igraph_vector_null(res);
+    tmpres=res;
+  }
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {
@@ -980,7 +990,13 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     modeout=modein=IGRAPH_ALL;
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_out, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_out);
-    adjlist_out_p=adjlist_in_p=&adjlist_out;
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist_in, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist_in);
+    adjlist_out_p=&adjlist_out;
+    adjlist_in_p=&adjlist_in;
+  }
+  for (j=0; j<no_of_nodes; j++) {
+    igraph_vector_clear(igraph_adjlist_get(adjlist_in_p, j));
   }
   
   distance=igraph_Calloc(no_of_nodes, long int);
@@ -1003,82 +1019,61 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_stack_init(&stack, no_of_nodes);
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
     
-  IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
-  igraph_vector_null(res);
-
   /* here we go */
   
   for (source=0; source<no_of_nodes; source++) {
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
 
-    memset(distance, 0, no_of_nodes*sizeof(long int));
-    memset(nrgeo, 0, no_of_nodes*sizeof(long int));
-    memset(tmpscore, 0, no_of_nodes*sizeof(double));
-    igraph_stack_clear(&stack); /* it should be empty anyway... */
-    
     IGRAPH_CHECK(igraph_dqueue_push(&q, source));
     nrgeo[source]=1;
-    distance[source]=0;
+    distance[source]=1;
     
     while (!igraph_dqueue_empty(&q)) {
       long int actnode=igraph_dqueue_pop(&q);
+      IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
-      if (cutoff > 0 && distance[actnode] >= cutoff) continue;
-       
+      if (cutoff >= 0 && distance[actnode] > cutoff) { continue; }
+      
       neis = igraph_adjlist_get(adjlist_out_p, actnode);
-      for (j=0; j<igraph_vector_size(neis); j++) {
+      nneis = igraph_vector_size(neis);
+      for (j=0; j<nneis; j++) {
         long int neighbor=VECTOR(*neis)[j];
-        if (nrgeo[neighbor] != 0) {
-	      /* we've already seen this node, another shortest path? */
-	      if (distance[neighbor]==distance[actnode]+1) {
-	        nrgeo[neighbor]+=nrgeo[actnode];
-	      }
-	    } else {
-	      /* we haven't seen this node yet */
-	      nrgeo[neighbor]+=nrgeo[actnode];
-              distance[neighbor]=distance[actnode]+1;
-	      IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-	      IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
-	    }
+        if (distance[neighbor]==0) {
+	  distance[neighbor]=distance[actnode]+1;
+	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	} 
+	if (distance[neighbor]==distance[actnode]+1) {
+	  igraph_vector_t *v=igraph_adjlist_get(adjlist_in_p, neighbor);
+	  igraph_vector_push_back(v, actnode);
+	  nrgeo[neighbor]+=nrgeo[actnode];
+	}
       }
     } /* while !igraph_dqueue_empty */
-
+    
     /* Ok, we've the distance of each node and also the number of
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
     while (!igraph_stack_empty(&stack)) {
-      long int actnode=igraph_stack_pop(&stack);      
-      if (distance[actnode]<=1) { continue; } /* skip source node */
-      
-      /* set the temporary score of the friends */
+      long int actnode=igraph_stack_pop(&stack);
       neis = igraph_adjlist_get(adjlist_in_p, actnode);
-      for (j=0; j<igraph_vector_size(neis); j++) {
+      nneis = igraph_vector_size(neis);
+      for (j=0; j<nneis; j++) {
         long int neighbor=VECTOR(*neis)[j];
-	    if (distance[neighbor]==distance[actnode]-1 && nrgeo[neighbor] != 0) {
-	      tmpscore[neighbor] += 
-	        (tmpscore[actnode]+1)*nrgeo[neighbor]/nrgeo[actnode];
-	    }
+	tmpscore[neighbor] +=  (tmpscore[actnode]+1)*
+	  ((double)(nrgeo[neighbor]))/nrgeo[actnode];
       }
-    }
-    
-    /* Ok, we've the scores for this source */
-    for (k=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); 
-	 IGRAPH_VIT_NEXT(vit), k++) {
-      long int node=IGRAPH_VIT_GET(vit);
-      VECTOR(*res)[k] += tmpscore[node];
-      tmpscore[node] = 0.0; /* in case a node is in vids multiple times */
+      
+      if (actnode != source) { VECTOR(*tmpres)[actnode] += tmpscore[actnode]; }
+
+      distance[actnode]=0;
+      nrgeo[actnode]=0;
+      tmpscore[actnode]=0;
+      igraph_vector_clear(igraph_adjlist_get(adjlist_in_p, actnode));      
     }
 
   } /* for source < no_of_nodes */
 
-  /* divide by 2 for undirected graph */
-  if (!directed) {
-    for (j=0; j<igraph_vector_size(res); j++) {
-      VECTOR(*res)[j] /= 2.0;
-    }
-  }
-  
   /* clean  */
   igraph_Free(distance);
   igraph_Free(nrgeo);
@@ -1086,17 +1081,34 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   
   igraph_dqueue_destroy(&q);
   igraph_stack_destroy(&stack);
-  igraph_vit_destroy(&vit);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(5);
 
-  if (directed) {
-    igraph_adjlist_destroy(&adjlist_out);
-    igraph_adjlist_destroy(&adjlist_in);
+  /* Keep only the requested vertices */
+  if (!igraph_vs_is_all(&vids)) { 
+    IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
+
+    for (k=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);
+	 IGRAPH_VIT_NEXT(vit), k++) {
+      long int node=IGRAPH_VIT_GET(vit);
+      VECTOR(*res)[k] = VECTOR(*tmpres)[node];
+    }
+
+    igraph_vit_destroy(&vit);
+    igraph_vector_destroy(tmpres);
     IGRAPH_FINALLY_CLEAN(2);
-  } else {
-    igraph_adjlist_destroy(&adjlist_out);
-    IGRAPH_FINALLY_CLEAN(1);
+  }     
+
+  /* divide by 2 for undirected graph */
+  if (!directed) {
+    nneis=igraph_vector_size(res);
+    for (j=0; j<nneis; j++) {
+      VECTOR(*res)[j] /= 2.0;
+    }
   }
+  
+  igraph_adjlist_destroy(&adjlist_out);
+  igraph_adjlist_destroy(&adjlist_in);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }

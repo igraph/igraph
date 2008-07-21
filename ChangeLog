@@ -1,5 +1,9 @@
 2008-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/centrality.c (igraph_betweenness_estimate) : speedup for 
+	cutoff >= 0
+	* examples/simple/igraph_betweenness.c : added
+
 	* src/iterators.c (igraph_vs_is_all, igraph_es_is_all) : make argument const
 
 2008-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
