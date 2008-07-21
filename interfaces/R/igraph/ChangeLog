@@ -1,3 +1,8 @@
+2008-07-21  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph) : corrected a bug 
+	when using multiple vertex shapes
+
 2008-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* interfaces/R/igraph/R/structural.properties.R (betweenness)
