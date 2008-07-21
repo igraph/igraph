@@ -778,6 +778,8 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
   igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
   igraph_vector_t dist, nrgeo, tmpscore;
+  igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
+  igraph_vit_t vit;
   
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
@@ -799,8 +801,13 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&tmpscore, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&nrgeo, no_of_nodes);
 
-  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
-  igraph_vector_null(res);
+  if (igraph_vs_is_all(&vids)) {
+    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    igraph_vector_null(res);
+    tmpres=res;
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
+  }
 
   for (j=0; j<no_of_nodes; j++) {
     igraph_vector_clear(igraph_adjlist_get(&fathers, j));
@@ -865,7 +872,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 	long int f=VECTOR(*fatv)[j];
 	VECTOR(tmpscore)[f] += VECTOR(nrgeo)[f]/VECTOR(nrgeo)[w] * (1+VECTOR(tmpscore)[w]);
       }
-      if (w!=source) { VECTOR(*res)[w] += VECTOR(tmpscore)[w]; }
+      if (w!=source) { VECTOR(*tmpres)[w] += VECTOR(tmpscore)[w]; }
 
       VECTOR(tmpscore)[w]=0;
       VECTOR(dist)[w]=0;
@@ -874,6 +881,22 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
     }
     
   } /* source < no_of_nodes */
+
+  if (!igraph_vs_is_all(&vids)) {
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+    IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
+    
+    for (j=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);
+	 IGRAPH_VIT_NEXT(vit), j++) {
+      long int node=IGRAPH_VIT_GET(vit);
+      VECTOR(*res)[j] = VECTOR(*tmpres)[node];
+    }
+    
+    igraph_vit_destroy(&vit);
+    igraph_vector_destroy(tmpres);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
 
   if (!directed || !igraph_is_directed(graph)) {
     for (j=0; j<no_of_nodes; j++) {
@@ -965,8 +988,6 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   if (!igraph_vs_is_all(&vids)) {
     /* subset */
     IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
-    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
-    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
   } else {
     /* only  */
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
@@ -1083,6 +1104,8 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   /* Keep only the requested vertices */
   if (!igraph_vs_is_all(&vids)) { 
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
 
     for (k=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);

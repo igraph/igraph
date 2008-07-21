@@ -1,6 +1,9 @@
 2008-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/centrality.c (igraph_betweenness_estimate_weighted) : 
+	handle the 'vids' argument properly
+
+	* src/centrality.c (igraph_betweenness_estimate_weighted) : 
 	added support for cutoff
 
 	* src/centrality.c (igraph_betweenness_estimate) : speedup for 
