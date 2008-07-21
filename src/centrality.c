@@ -777,17 +777,13 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_stack_t S;
   igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
   igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
-  igraph_vector_t dist, nrgeo;
+  igraph_vector_t dist, nrgeo, tmpscore;
   
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
   if (igraph_vector_min(weights) <= 0) {
     IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
-  }
-  if (cutoff >= 0 && weights) { 
-    IGRAPH_ERROR("`cutoff' not implemented for weighted betweenness", 
-		 IGRAPH_UNIMPLEMENTED);
   }
 
   IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
@@ -800,20 +796,17 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
   IGRAPH_FINALLY(igraph_stack_destroy, &S);
   IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmpscore, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&nrgeo, no_of_nodes);
 
   IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
   igraph_vector_null(res);
+
+  for (j=0; j<no_of_nodes; j++) {
+    igraph_vector_clear(igraph_adjlist_get(&fathers, j));
+  }
   
   for (source=0; source<no_of_nodes; source++) {
-
-    /* The heap should be empty at this point */
-    for (j=0; j<no_of_nodes; j++) {
-      igraph_vector_clear(igraph_adjlist_get(&fathers, j));
-    }
-    igraph_stack_clear(&S);
-    igraph_vector_null(&dist);
-    igraph_vector_null(&nrgeo);
 
     igraph_indheap_push_with_index(&Q, source, 0);
     VECTOR(dist)[source]=1.0;
@@ -825,10 +818,10 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
       igraph_vector_t *neis;
       long int nlen;
       
-      /* TODO: cutoff here? */
-      
       igraph_stack_push(&S, minnei);
-
+      
+      if (cutoff >=0 && VECTOR(dist)[minnei] >= cutoff+1.0) { continue; }
+      
       /* Now check all neighbors of 'minnei' for a shorter path */
       neis=igraph_adjedgelist_get(&adjlist, minnei);
       nlen=igraph_vector_size(neis);
@@ -864,16 +857,20 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
       
     } /* !igraph_indheap_empty(&Q) */
 
-    igraph_vector_null(&dist);
     while (!igraph_stack_empty(&S)) {
       long int w=igraph_stack_pop(&S);
       igraph_vector_t *fatv=igraph_adjlist_get(&fathers, w);
       long int fatv_len=igraph_vector_size(fatv);
       for (j=0; j<fatv_len; j++) {
 	long int f=VECTOR(*fatv)[j];
-	VECTOR(dist)[f] += VECTOR(nrgeo)[f]/VECTOR(nrgeo)[w] * (1+VECTOR(dist)[w]);
+	VECTOR(tmpscore)[f] += VECTOR(nrgeo)[f]/VECTOR(nrgeo)[w] * (1+VECTOR(tmpscore)[w]);
       }
-      if (w!=source) { VECTOR(*res)[w] += VECTOR(dist)[w]; }
+      if (w!=source) { VECTOR(*res)[w] += VECTOR(tmpscore)[w]; }
+
+      VECTOR(tmpscore)[w]=0;
+      VECTOR(dist)[w]=0;
+      VECTOR(nrgeo)[w]=0;
+      igraph_vector_clear(igraph_adjlist_get(&fathers, w));
     }
     
   } /* source < no_of_nodes */
@@ -885,12 +882,13 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   }
   
   igraph_vector_destroy(&nrgeo);
+  igraph_vector_destroy(&tmpscore);
   igraph_vector_destroy(&dist);
   igraph_stack_destroy(&S);
   igraph_adjlist_destroy(&fathers);
   igraph_adjedgelist_destroy(&adjlist);
   igraph_indheap_destroy(&Q);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(7);
   
   return 0;
 }
@@ -1033,7 +1031,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       long int actnode=igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
-      if (cutoff >= 0 && distance[actnode] > cutoff) { continue; }
+      if (cutoff >= 0 && distance[actnode] >= cutoff+1) { continue; }
       
       neis = igraph_adjlist_get(adjlist_out_p, actnode);
       nneis = igraph_vector_size(neis);
