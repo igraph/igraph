@@ -503,7 +503,7 @@ int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) 
 int igraphmodule_PyObject_to_vector_bool_t(PyObject *list,
     igraph_vector_bool_t *v) {
   PyObject *item;
-  int i, j, k;
+  int i, j;
 
   if (PyString_Check(list) || PyUnicode_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -539,10 +539,10 @@ int igraphmodule_PyObject_to_vector_bool_t(PyObject *list,
 
   j=PySequence_Size(list);
   igraph_vector_bool_init(v, j);
-  for (i=0, k=0; i<j; i++) {
+  for (i=0; i<j; i++) {
     item=PySequence_GetItem(list, i);
     if (item) {
-      VECTOR(*v)[k]=PyObject_IsTrue(item);
+      VECTOR(*v)[i]=PyObject_IsTrue(item);
 	  Py_DECREF(item);
     } else {
       /* this should not happen, but we return anyway.
