@@ -170,6 +170,74 @@ int igraphmodule_PyObject_to_degseq_t(PyObject *o,
 }
 
 /**
+ * \brief Converts a Python object to an igraph \c igraph_integer_t
+ *
+ * Raises suitable Python exceptions when needed.
+ *
+ * \param object the Python object to be converted
+ * \param v the result is returned here
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_integer_t *v) {
+  if (object == NULL) {
+  } else if (PyInt_Check(object)) {
+    long l = PyInt_AS_LONG((PyIntObject*)object);
+    *v=l;
+    return 0;
+  } else if (PyLong_Check(object)) {
+    double d = PyLong_AsDouble(object);
+    *v=d;
+    return 0;
+  } else if (PyNumber_Check(object)) {
+    PyObject *i = PyNumber_Int(object);
+    long l;
+    if (i == NULL) return 1;
+    l = PyInt_AS_LONG((PyIntObject*)i);
+    Py_DECREF(i);
+    *v = l;
+    return 0;
+  }
+  PyErr_BadArgument();
+  return 1;
+}
+
+/**
+ * \brief Converts a Python object to an igraph \c igraph_real_t
+ *
+ * Raises suitable Python exceptions when needed.
+ *
+ * \param object the Python object to be converted
+ * \param v the result is returned here
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v) {
+  if (object == NULL) {
+  } else if (PyInt_Check(object)) {
+    long l = PyInt_AS_LONG((PyIntObject*)object);
+    *v=l;
+    return 0;
+  } else if (PyLong_Check(object)) {
+    double d = PyLong_AsDouble(object);
+    *v=d;
+    return 0;
+  } else if (PyFloat_Check(object)) {
+    double d = PyFloat_AS_DOUBLE((PyFloatObject*)object);
+    *v=d;
+    return 0;
+  } else if (PyNumber_Check(object)) {
+    PyObject *i = PyNumber_Int(object);
+    long l;
+    if (i == NULL) return 1;
+    l = PyInt_AS_LONG((PyIntObject*)i);
+    Py_DECREF(i);
+    *v = l;
+    return 0;
+  }
+  PyErr_BadArgument();
+  return 1;
+}
+
+/**
  * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_vector_t
  * The incoming \c igraph_vector_t should be uninitialized. Raises suitable
@@ -1308,10 +1376,41 @@ int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
 	  return 1;
 	}
   } else {
-    PyErr_SetString(PyExc_TypeError, "string expected as DrL template name");
-	return 1;
-  }
+    igraph_layout_drl_options_init(options, IGRAPH_LAYOUT_DRL_DEFAULT);
+#define CONVERT_DRL_OPTION(OPTION, TYPE) do { \
+      PyObject *o1; \
+      if (PyMapping_Check(obj)) { \
+        o1 = PyMapping_GetItemString(obj, #OPTION); \
+        igraphmodule_PyObject_to_##TYPE##_t(o1, &options->OPTION); \
+        Py_XDECREF(o1); \
+      } \
+      o1 = PyObject_GetAttrString(obj, #OPTION); \
+      igraphmodule_PyObject_to_##TYPE##_t(o1, &options->OPTION); \
+      Py_XDECREF(o1); \
+    } while (0)
+#define CONVERT_DRL_OPTION_BLOCK(NAME) do { \
+	  CONVERT_DRL_OPTION(NAME##_iterations, integer); \
+	  CONVERT_DRL_OPTION(NAME##_temperature, real); \
+	  CONVERT_DRL_OPTION(NAME##_attraction, real); \
+	  CONVERT_DRL_OPTION(NAME##_damping_mult, real); \
+    } while (0)
+	
+    CONVERT_DRL_OPTION(edge_cut, real);
+    CONVERT_DRL_OPTION_BLOCK(init);
+    CONVERT_DRL_OPTION_BLOCK(liquid);
+    CONVERT_DRL_OPTION_BLOCK(expansion);
+    CONVERT_DRL_OPTION_BLOCK(cooldown);
+    CONVERT_DRL_OPTION_BLOCK(crunch);
+    CONVERT_DRL_OPTION_BLOCK(simmer);
 
+#undef CONVERT_DRL_OPTION
+#undef CONVERT_DRL_OPTION_BLOCK
+
+    printf("cooldown_iterations = %.4f\n", options->cooldown_iterations);
+    printf("cooldown_damping_mult = %.4f\n", options->cooldown_damping_mult);
+    PyErr_Clear();
+	return 0;
+  }
   return 0;
 }
 
