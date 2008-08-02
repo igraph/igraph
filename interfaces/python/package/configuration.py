@@ -166,7 +166,7 @@ class Configuration(object):
     def __init__(self, filename=None):
         """Creates a new configuration instance.
 
-        @param fp: file or file pointer to be read. Can be omitted.
+        @param filename: file or file pointer to be read. Can be omitted.
         """
         self._config = SafeConfigParser()
         self._filename = None

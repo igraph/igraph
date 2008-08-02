@@ -238,7 +238,7 @@ class Graph(core.GraphBase):
         """
         return DyadCensus(GraphBase.dyad_census(self, *args, **kwds))
 
-    def eccentricity(self, nodes=None):
+    def eccentricity(self, vertices=None):
         """Calculates eccentricities for vertices with the given indices.
         
         Eccentricity is given as the reciprocal of the greatest distance
@@ -260,10 +260,10 @@ class Graph(core.GraphBase):
         distance_matrix = self.shortest_paths(mode=OUT)
         distance_maxs = map(max, distance_matrix)
         
-        if nodes is None:
+        if vertices is None:
             result = [1.0/x for x in distance_maxs]
         else:
-            result = [1.0/distance_maxs[idx] for idx in nodes]
+            result = [1.0/distance_maxs[idx] for idx in vertices]
 
         return result
 
@@ -678,13 +678,14 @@ class Graph(core.GraphBase):
     def write_adjacency(self, f, sep=" ", eol="\n", *args, **kwds):
         """Writes the adjacency matrix of the graph to the given file
 
+        All the remaining arguments not mentioned here are passed intact
+        to L{Graph.get_adjacency}.
+
         @param f: the name of the file to be written.
         @param sep: the string that separates the matrix elements in a row
         @param eol: the string that separates the rows of the matrix. Please
           note that igraph is able to read back the written adjacency matrix
           if and only if this is a single newline character
-
-        All the remaining arguments are passed intact to L{Graph.get_adjacency}.
         """
         if not isinstance(f, file): f = file(f, "w")
         matrix = self.get_adjacency(*args, **kwds)
@@ -697,6 +698,9 @@ class Graph(core.GraphBase):
         *args, **kwds):
         """Constructs a graph based on an adjacency matrix from the given file
 
+        Additional positional and keyword arguments not mentioned here are
+        passed intact to L{Graph.Adjacency}.
+
         @param f: the name of the file to be read or a file object
         @param sep: the string that separates the matrix elements in a row.
           C{None} means an arbitrary sequence of whitespace characters.
@@ -706,9 +710,6 @@ class Graph(core.GraphBase):
           stored in the case of a weighted adjacency matrix. If C{None},
           no weights are stored, values larger than 1 are considered as
           edge multiplicities.
-        Additional positional and keyword arguments are passed intact to
-        L{Graph.Adjacency}.
-
         @return: the created graph"""
         if not isinstance(f, file): f = file(f)
         matrix, ri, weights = [], 0, {} 
@@ -1326,8 +1327,8 @@ class Graph(core.GraphBase):
         places in the following order of precedence (lower indices override
         higher indices):
 
-          1. Keyword arguments of this function (or of L{Graph.plot} which is
-             passed intact to C{Graph.__plot__}.
+          1. Keyword arguments of this function (or of L{plot()} which is
+             passed intact to C{Graph.__plot__()}.
 
           2. Vertex or edge attributes, specified later in the list of
              keyword arguments.

@@ -99,7 +99,7 @@ class Clustering(object):
     def sizes(self, *args):
         """Returns the size of given clusters.
 
-        @param idxs: the cluster indices in which we are interested. If C{None},
+        @keyword idxs: the cluster indices in which we are interested. If C{None},
           defaults to all clusters
         """
         idxs = args
@@ -175,7 +175,7 @@ class OverlappingClustering(Clustering):
     def sizes(self, *args):
         """Returns the size of given clusters.
 
-        @param idxs: the cluster indices in which we are interested. If C{None},
+        @keyword idxs: the cluster indices in which we are interested. If C{None},
           defaults to all clusters
         """
         idxs = args
