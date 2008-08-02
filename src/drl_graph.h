@@ -89,6 +89,7 @@ private:
 	// online clustering information
 	int real_iterations;    // number of iterations to hold .real input fixed
 	int tot_iterations;
+    int tot_expected_iterations; // for progress bar
 	bool real_fixed;
 };
 
