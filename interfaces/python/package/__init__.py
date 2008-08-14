@@ -238,7 +238,7 @@ class Graph(core.GraphBase):
         """
         return DyadCensus(GraphBase.dyad_census(self, *args, **kwds))
 
-    def eccentricity(self, nodes=None):
+    def eccentricity(self, vertices=None):
         """Calculates eccentricities for vertices with the given indices.
         
         Eccentricity is given as the reciprocal of the greatest distance
@@ -260,10 +260,10 @@ class Graph(core.GraphBase):
         distance_matrix = self.shortest_paths(mode=OUT)
         distance_maxs = map(max, distance_matrix)
         
-        if nodes is None:
+        if vertices is None:
             result = [1.0/x for x in distance_maxs]
         else:
-            result = [1.0/distance_maxs[idx] for idx in nodes]
+            result = [1.0/distance_maxs[idx] for idx in vertices]
 
         return result
 
@@ -678,13 +678,14 @@ class Graph(core.GraphBase):
     def write_adjacency(self, f, sep=" ", eol="\n", *args, **kwds):
         """Writes the adjacency matrix of the graph to the given file
 
+        All the remaining arguments not mentioned here are passed intact
+        to L{Graph.get_adjacency}.
+
         @param f: the name of the file to be written.
         @param sep: the string that separates the matrix elements in a row
         @param eol: the string that separates the rows of the matrix. Please
           note that igraph is able to read back the written adjacency matrix
           if and only if this is a single newline character
-
-        All the remaining arguments are passed intact to L{Graph.get_adjacency}.
         """
         if not isinstance(f, file): f = file(f, "w")
         matrix = self.get_adjacency(*args, **kwds)
@@ -697,6 +698,9 @@ class Graph(core.GraphBase):
         *args, **kwds):
         """Constructs a graph based on an adjacency matrix from the given file
 
+        Additional positional and keyword arguments not mentioned here are
+        passed intact to L{Graph.Adjacency}.
+
         @param f: the name of the file to be read or a file object
         @param sep: the string that separates the matrix elements in a row.
           C{None} means an arbitrary sequence of whitespace characters.
@@ -706,9 +710,6 @@ class Graph(core.GraphBase):
           stored in the case of a weighted adjacency matrix. If C{None},
           no weights are stored, values larger than 1 are considered as
           edge multiplicities.
-        Additional positional and keyword arguments are passed intact to
-        L{Graph.Adjacency}.
-
         @return: the created graph"""
         if not isinstance(f, file): f = file(f)
         matrix, ri, weights = [], 0, {} 
@@ -1321,7 +1322,26 @@ class Graph(core.GraphBase):
 
     def __plot__(self, context, bbox, palette, *args, **kwds):
         """Plots the graph to the given Cairo context in the given bounding box
-        
+       
+        The visual style of vertices and edges can be modified at three
+        places in the following order of precedence (lower indices override
+        higher indices):
+
+          1. Keyword arguments of this function (or of L{plot()} which is
+             passed intact to C{Graph.__plot__()}.
+
+          2. Vertex or edge attributes, specified later in the list of
+             keyword arguments.
+
+          3. igraph-wide plotting defaults (see
+             L{igraph.config.Configuration})
+
+          4. Built-in defaults.
+
+        E.g., if the C{vertex_size} keyword attribute is not present,
+        but there exists a vertex attribute named C{size}, the sizes of
+        the vertices will be specified by that attribute.
+
         Besides the usual self-explanatory plotting parameters (C{context},
         C{bbox}, C{palette}), it accepts the following keyword arguments:
         
@@ -1335,8 +1355,56 @@ class Graph(core.GraphBase):
           - C{margin}: the top, right, bottom, left margins as a 4-tuple.
             If it has less than 4 elements or is a single float, the elements
             will be re-used until the length is at least 4.
-            
-        TODO: vertex, edge parameters
+
+          - C{vertex_size}: size of the vertices. The corresponding vertex
+            attribute is called C{size}. The default is 10. Vertex sizes
+            are measured in the unit of the Cairo context on which igraph
+            is drawing.
+
+          - C{vertex_color}: color of the vertices. The corresponding vertex
+            attribute is C{color}, the default is red.  Colors can be
+            specified either by common X11 color names (see the source
+            code of L{igraph.colors} for a list of known colors), by
+            3-tuples of floats (ranging between 0 and 1 for the R, G and
+            B components), by CSS-style string specifications (C{#rrggbb})
+            or by integer color indices of the specified palette.
+
+          - C{vertex_shape}: shape of the vertices. Alternatively it can
+            be specified by the C{shape} vertex attribute. Possibilities
+            are: C{square}, {circle}, {triangle}, {triangle-down} or
+            C{hidden}. See the source code of L{igraph.drawing} for a
+            list of alternative shape names that are also accepted and
+            mapped to these.
+
+          - C{vertex_label}: labels drawn next to the vertices.
+            The corresponding vertex attribute is C{label}.
+
+          - C{vertex_label_dist}: distance of the midpoint of the vertex
+            label from the center of the corresponding vertex.
+            The corresponding vertex attribute is C{label_dist}.
+
+          - C{vertex_label_color}: color of the label. Corresponding
+            vertex attribute: C{label_color}. See C{vertex_color} for
+            color specification syntax.
+
+          - C{vertex_label_size}: font size of the label, specified
+            in the unit of the Cairo context on which we are drawing.
+            Corresponding vertex attribute: C{label_size}.
+
+          - C{vertex_label_angle}: the direction of the line connecting
+            the midpoint of the vertex with the midpoint of the label.
+            This can be used to position the labels relative to the
+            vertices themselves in conjunction with C{vertex_label_dist}.
+            Corresponding vertex attribute: C{label_angle}. The
+            default is C{-math.pi/4}.
+
+          - C{edge_color}: color of the edges. The corresponding edge
+            attribute is C{color}, the default is red. See C{vertex_color}
+            for color specification syntax.
+
+          - C{edge_width}: width of the edges in the default unit of the
+            Cairo context on which we are drawing. The corresponding
+            edge attribute is C{width}, the default is 1.
         """
         import colors
         import cairo

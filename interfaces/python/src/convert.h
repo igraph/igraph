@@ -49,8 +49,12 @@ int igraphmodule_PyObject_to_neimode_t(PyObject *o, igraph_neimode_t *result);
 int igraphmodule_PyObject_to_adjacency_t(PyObject *o, igraph_adjacency_t *result);
 int igraphmodule_PyObject_to_degseq_t(PyObject *o, igraph_degseq_t *result);
 
+int igraphmodule_PyObject_to_integer_t(PyObject *object, igraph_real_t *v);
+int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v);
+
 int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative, igraph_bool_t pairs);
 int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v);
+int igraphmodule_PyObject_to_vector_bool_t(PyObject *list, igraph_vector_bool_t *v);
 PyObject* igraphmodule_vector_bool_t_to_PyList(igraph_vector_bool_t *v);
 PyObject* igraphmodule_vector_t_to_PyList(igraph_vector_t *v, igraphmodule_conv_t type);
 PyObject* igraphmodule_vector_t_to_PyTuple(igraph_vector_t *v);
@@ -75,4 +79,6 @@ int igraphmodule_PyObject_to_attribute_values(PyObject *o,
 					      igraphmodule_GraphObject* g,
 					      int type,
 					      igraph_real_t def);
+int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
+                  igraph_layout_drl_options_t *options); 
 #endif

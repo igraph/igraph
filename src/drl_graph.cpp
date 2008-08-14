@@ -377,7 +377,12 @@ void graph::init_parms ( int rand_seed, float edge_cut, float real_parm )
 		real_fixed = true;
 	else
 		real_fixed = false;
-		
+
+    // calculate total expected iterations (for progress bar display)
+    tot_expected_iterations = liquid.iterations +
+                              expansion.iterations + cooldown.iterations +
+                              crunch.iterations + simmer.iterations;
+
 	/*
 	// output edge_cutting parms (for debugging)
 	cout << "Processor " << myid << ": "
@@ -547,7 +552,31 @@ int graph::ReCompute( )
 	   << ", min_edges = " << min_edges << ", cut_off_length = " << cut_off_length
 	   << ", fineDensity = " << fineDensity << endl; 
   */
-  	    
+
+  /* igraph progress report */
+  float progress = (tot_iterations * 100.0 / tot_expected_iterations);
+
+  switch (STAGE) {
+    case 0:
+      if (iterations == 0)
+        IGRAPH_PROGRESS("DrL layout (initialization stage)", progress, 0);
+      else
+        IGRAPH_PROGRESS("DrL layout (liquid stage)", progress, 0);
+      break;
+    case 1:
+      IGRAPH_PROGRESS("DrL layout (expansion stage)", progress, 0); break;
+    case 2:
+      IGRAPH_PROGRESS("DrL layout (cooldown and cluster phase)", progress, 0); break;
+    case 3:
+      IGRAPH_PROGRESS("DrL layout (crunch phase)", progress, 0); break;
+    case 5:
+      IGRAPH_PROGRESS("DrL layout (simmer phase)", progress, 0); break;
+    case 6:
+      IGRAPH_PROGRESS("DrL layout (final phase)", 100.0, 0); break;
+    default:
+      IGRAPH_PROGRESS("DrL layout (unknown phase)", 0.0, 0); break;
+  }
+
   /* Compute Energies for individual nodes */
   update_nodes ();
   
@@ -1227,6 +1256,7 @@ void graph::draw_graph ( int int_out, char *coord_file )
 int graph::draw_graph(igraph_matrix_t *res) {
   int count_iter=0;
   while (ReCompute()) {
+    IGRAPH_ALLOW_INTERRUPTION();
     count_iter++;
   }
   long int n=positions.size();

@@ -243,11 +243,12 @@ class Layout(object):
     def transform(self, function, *args, **kwds):
         """Performs an arbitrary transformation on the layout
 
+        Additional positional and keyword arguments are passed intact to
+        the given function.
+
         @param function: a function which receives the coordinates as a
           tuple and returns the transformed tuple.
-
-        Additional positional and keyword arguments are passed intact to
-        the defined function"""
+        """
         self._coords = [list(function(tuple(row), *args, **kwds)) \
             for row in self._coords]
 
