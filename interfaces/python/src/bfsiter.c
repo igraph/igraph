@@ -46,6 +46,7 @@ PyObject* igraphmodule_BFSIter_new(igraphmodule_GraphObject *g, PyObject *root, 
   long int no_of_nodes, r;
   
   o=PyObject_GC_New(igraphmodule_BFSIterObject, &igraphmodule_BFSIterType);
+  Py_INCREF(g);
   o->gref=g;
   o->graph=&g->g;
   
@@ -240,8 +241,8 @@ PyTypeObject igraphmodule_BFSIterType =
   0,                                        // tp_as_buffer
   Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE | Py_TPFLAGS_HAVE_GC, // tp_flags
   "igraph BFS iterator object",             // tp_doc
-  0,                                        // tp_traverse
-  0,                                        // tp_clear
+  (traverseproc) igraphmodule_BFSIter_traverse, /* tp_traverse */
+  (inquiry) igraphmodule_BFSIter_clear,     /* tp_clear */
   0,                                        // tp_richcompare
   0,                                        // tp_weaklistoffset
   (getiterfunc)igraphmodule_BFSIter_iter,   /* tp_iter */
