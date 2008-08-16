@@ -109,6 +109,14 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  vector.pmt walktrap_graph.h walktrap_communities.h \
 		  walktrap_heap.h matrix.h matrix.pmt stack.h stack.pmt \
 		  dqueue.pmt dqueue.h heap.pmt heap.h arpack.h array.pmt \
-		  array.h arpack_internal.h f2c.h
+		  array.h arpack_internal.h f2c.h drl_layout.h \
+		  drl_parse.h drl_graph.h DensityGrid.h drl_Node.h \
+		  gengraph_box_list.h gengraph_header.h \
+		  gengraph_definitions.h gengraph_powerlaw.h \
+		  gengraph_degree_sequence.h gengraph_qsort.h \
+		  gengraph_graph_molloy_hash.h gengraph_random.h \
+		  gengraph_graph_molloy_optimized.h gengraph_vertex_cover.h \
+		  gengraph_hash.h
+		  
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
