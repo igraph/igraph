@@ -1,16 +1,24 @@
 #! /bin/bash
 
-repohost=cneurocvs.rmki.kfki.hu
-repodir=/var/www/igraph-new
-debianrepodir=/var/www/packages
+export repohost=cneurocvs.rmki.kfki.hu
+export repodir=igraph-new
+export debianrepodir=/var/www/packages
 
 # Get current version
 version="`head -1 configure.in | cut -f2 -d, | tr -d ' '`"
 nextversion=`echo $version+0.1 | bc | sed s/^\./0\./` 
 
+# Create directories on the server
+ssh $repohost mkdir -p ${repodir}/download
+ssh $repohost mkdir -p ${repodir}/doc-${version}/{R,html,python}
+ssh $repohost mkdir -p ${repodir}/images/screenshots
+ssh $repohost rm -f ${repodir}/doc
+ssh $repohost ln -s doc-${version} ${repodir}/doc
+
 # Make everything 
 ./configure &&
 make &&
+make check &&
 cd doc && make html && make pdf && make info && cd .. || exit 1
 
 #################################################
@@ -38,7 +46,7 @@ exit 1
 
 cd doc/homepage
 ./generate.py $version
-scp -r * ${repohost}:${repodir}/doc/
+scp -r * ${repohost}:${repodir}/
 cd ../..
 
 #################################################
@@ -71,10 +79,15 @@ cd ../.. && rm -rf debian-package || exit 1
 #################################################
 # make an R source package and upload that too
 
-scp interfaces/R/igraph_${version}.tar.gz ${repohost}:${repodir}/download/ &&
-scp interfaces/R/igraph_${version}.zip ${repohost}:${repodir}/download/ &&
-scp interfaces/R/igraph_${version}.tgz ${repohost}:${repodir}/download/ ||
+cd interfaces/R
+make
+echo Please upload the package to the windows build server...
+
+scp igraph_${version}.tar.gz ${repohost}:${repodir}/download/ &&
+scp igraph_${version}.zip ${repohost}:${repodir}/download/ &&
+scp igraph_${version}.tgz ${repohost}:${repodir}/download/ ||
 exit 1
+cd ../..
 
 #################################################
 # Upload R documentation
