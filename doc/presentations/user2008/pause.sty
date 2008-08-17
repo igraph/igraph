@@ -1,0 +1,185 @@
+%% pause.sty                                      18 Jun 2002
+%%-----------------------------------------------------------
+%% History:
+%% The initial version was created                11 Jun 1999
+%% Updated to allow options                       10 Mar 2000
+%% Restructured after tests                       03 Apr 2000
+%% Added procesing for random builds              07 May 2000
+%% Supply test for new enough pdftex              09 May 2000
+%% No need for pdftex 14 any more                 31 May 2000
+%% Added commands for highligthing etc.           12 Jun 2000
+%% Added options ignore, nomarkers and dvipdfm
+%% runs with vlatex and dvipdfm                   10 Nov 2001
+%% Update comment section                         13 Jun 2002
+%% Make catcodes safe for pdfliteral              18 Jun 2002
+%%
+%%   Because we need a color definition this can be used
+%%   primarily with LaTeX. Thus we can also rely on \@ifnextchar
+%%   and LaTeX option processing.
+%%
+%% insert small colored chunks to mark spots in the pdf file,
+%% where a break should be made during display.
+%% This method needs postprocessing by another program.
+%% But one can preview the formatted text, where stops are indicated
+%% as small colored chunks. These will vanish during postprocessing.
+%%
+%% Take care: because we have to insert pdf comments starting with
+%% the letter '%' the catcode of '%' will be changed temporarily.
+
+%% must define all optional variants to support creating a file
+%% without pdf elements
+
+
+%% Options
+\newif\ifpause@ignore    \pause@ignorefalse
+\newif\ifpause@nomarkers \pause@nomarkersfalse
+\newif\ifpause@dvipdfm   \pause@dvipdfmfalse
+
+\DeclareOption{ignore}{\pause@ignoretrue}
+\DeclareOption{nomarkers}{\pause@nomarkerstrue}
+\DeclareOption{dvipdfm}{\pause@dvipdfmtrue}
+
+\ProcessOptions
+
+
+%% warning if ignore and nomarkers
+\ifpause@ignore
+  \ifpause@nomarkers
+    \message{Warning, options ignore and nomarkers used together}
+  \fi
+\fi
+
+%% We need to make sure that , and : are not active characters while
+%% we read these macro definitions.
+%% Save their current catcode settings now and restore them at the end
+\def\pppp@x#1{\catcode`\noexpand#1=\the\catcode`#1\relax}%
+\xdef\pppp@restoreCatcodes{\relax
+  \pppp@x\:\relax
+  \pppp@x\,\relax
+}
+\catcode`\,=12\relax
+\catcode`\:=12\relax
+
+\def\pauseDissolve{\pause[trans='Dissolve']}
+\def\pauseReplace{\pause[trans='Replace']}
+\def\pauseHBlinds{\pause[trans='Blinds,H']}
+\def\pauseVBlinds{\pause[trans='Blinds,V']}
+\def\pauseHOSplit{\pause[trans='Split,H,O']}
+\def\pauseHISplit{\pause[trans='Split,H,I']}
+\def\pauseVOSplit{\pause[trans='Split,V,O']}
+\def\pauseVISplit{\pause[trans='Split,V,I']}
+\def\pauseOBox{\pause[trans='Box,O']}
+\def\pauseIBox{\pause[trans='Box,I']}
+\def\pauseWipe#1{\pause[trans='Wipe,#1']}
+\def\pauseGlitter#1{\pause[trans='Glitter,#1']}
+\def\pause{\@ifnextchar [{\pppp@pause}{\pppp@pause[]}}
+
+
+
+%% dvipdfm support
+\ifpause@dvipdfm
+  {\catcode`\^^M=12
+  \gdef\pdfliteral#1{\special{pdf: content
+      #1
+  }}}
+
+  \message{Using color settings for dvipdfm}
+
+  \RequirePackage[dvipdfm]{color}
+
+  %% This is for the support of the dvipdfm color philosophy
+  \def\pppp@gettail #1 #2:{#2}
+  \def\pppp@gethead #1 #2:{#1}
+  \def\pppp@tail #1{\expandafter\pppp@gettail #1:}
+  \def\pppp@tailtail #1{\expandafter\pppp@gettail\pppp@gettail #1::}
+  \def\pppp@head #1{\expandafter\pppp@gethead #1:}
+  \def\pppp@removebrackets[#1]{#1}
+
+
+  % maps dvipdfm color arguments to pdf color commands
+  \def\pppp@dvipdfmmap #1{\expandafter\pppp@grayorother#1:}
+  \def\pppp@dvipdfmmapper#1{\csname dvipdfmmapel@#1\endcsname}
+  \def\pppp@dvipdfmmapvalue#1{\expandafter\def\csname dvipdfmmapel@#1\endcsname}
+
+  \def\pppp@grayorother#1#2:{\pppp@dvipdfmmapper{#1}[#1#2]}
+  \def\pppp@rgborcmyk #1 #2 #3 #4 #5 #6:{\pppp@dvipdfmmapper{#6}[#2 #3 #4 #5]}
+
+  % for the latest dvipdfm.def-File
+  \pppp@dvipdfmmapvalue{c}[#1]{\pppp@tail{#1} k \pppp@tail{#1} K}
+  \pppp@dvipdfmmapvalue{r}[#1]{\pppp@tail{#1} rg \pppp@tail{#1} RG}
+  \pppp@dvipdfmmapvalue{g}[#1]{\pppp@tail{#1} g \pppp@tail{#1} G}
+
+  % for dvipdfm.def with bg-error
+  \pppp@dvipdfmmapvalue{b}[#1]{\pppp@tail{#1} g \pppp@tail{#1} G}
+
+  % support of the older format ([...],...)
+  \pppp@dvipdfmmapvalue{0}[#1]{#1 g #1 G}
+  \pppp@dvipdfmmapvalue{1}[#1]{#1 g #1 G}
+  \pppp@dvipdfmmapvalue{[}[#1]{\expandafter\pppp@removebrackets[\expandafter\pppp@rgborcmyk #1 :}
+  \pppp@dvipdfmmapvalue{}[#1]{#1rg #1RG}
+  \pppp@dvipdfmmapvalue{ }[#1]{#1 k #1 K}
+
+  \def\pppp@colortostring #1{\expandafter\pppp@dvipdfmmap\csname\string\color@#1\endcsname}
+\else
+  \RequirePackage{color}
+  \def\pppp@colortostring #1{\csname\string\color@#1\endcsname}
+\fi
+
+
+\definecolor{pp4red}{rgb}{0.9,0.5,0}
+
+%% We need to make sure that our argument parameters do not contain
+%% active characters when we are called. This means we better set the
+%% catcodes for some common delimiters in our arguments. Let's hope
+%% that nobody is going to change the letters and digits, too.
+\gdef\pppp@catcodes{%
+  \catcode`\+12\relax
+  \catcode`\-12\relax
+  \catcode`\:12\relax
+  \catcode`\=12\relax
+  }
+%% now we need a section where % can be written to pdf files.
+%% thus make ! a comment character
+{\catcode`\%=11\catcode`\!=14
+\gdef\pppp@marker#1{!
+     \ifpause@ignore
+       \relax
+     \else
+       \pdfliteral{%pause}!
+       \ifpause@nomarkers
+         \relax
+       \else
+         \color{pp4red}\vrule width 2truemm height 5truemm\hss ! the marker
+       \fi
+       \pdfliteral{%esuap #1}!
+     \fi}
+ \gdef\pppp@pause[#1]{!
+      \ifvmode
+        \vbox to 0pt{\vss\hsize0pt\noindent\hbox to 0pt{\pppp@marker{#1}}}\else!hmode or mmode
+        \null\hbox to 0pt{\pppp@marker{#1}}\null!
+        !\null\hbox to 0pt{\pppp@marker{#1}}\null
+      \fi}
+
+
+ \ifpause@ignore
+   !! define dummies, if \pause should be ignored
+   \gdef\pauselevel#1{\relax}!
+   \gdef\pausecolors#1#2#3{}!
+   \gdef\pausecolorreset{\relax}
+   \gdef\pausebuild{\relax}
+   \gdef\pausehighlight{\relax}
+ \else
+   \gdef\pauselevel{\bgroup\pppp@catcodes\pppp@pauselevel}!
+   \gdef\pppp@pauselevel#1{\pdfliteral{%pauselevel #1}\egroup}!
+   \gdef\pausecolors#1#2#3{!
+     \pdfliteral{%pausecolor \pppp@colortostring{#1}\space \pppp@colortostring{#2}\space \pppp@colortostring{#3}}}!
+   \gdef\pausecolorreset{!
+     \pdfliteral{%pausecolor reset}}!
+   \gdef\pausebuild{!
+     \pdfliteral{%pausecolor appear}}!
+   \gdef\pausehighlight{!
+     \pdfliteral{%pausecolor highlight}}!
+ \fi
+}
+
+\pppp@restoreCatcodes

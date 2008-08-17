@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,14 +13,20 @@
    height="400"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.45"
+   inkscape:version="0.46"
    version="1.0"
    sodipodi:docbase="/home/csardi/works/net/igraph-3/doc/presentations/wien08"
-   sodipodi:docname="igraph.pdf"
-   inkscape:output_extension="org.inkscape.output.pdf"
-   inkscape:dataloss="true">
+   sodipodi:docname="igraph.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <defs
      id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 200 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="400 : 200 : 1"
+       inkscape:persp3d-origin="200 : 133.33333 : 1"
+       id="perspective448" />
     <marker
        inkscape:stockid="Dot_m"
        orient="auto"
@@ -299,16 +305,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="243.64733"
-     inkscape:cy="205.27743"
+     inkscape:cx="156.0166"
+     inkscape:cy="186.51407"
      inkscape:document-units="px"
-     inkscape:current-layer="g4560"
+     inkscape:current-layer="g4252"
      width="400px"
      height="400px"
      inkscape:window-width="1400"
-     inkscape:window-height="1021"
+     inkscape:window-height="996"
      inkscape:window-x="0"
-     inkscape:window-y="0" />
+     inkscape:window-y="0"
+     showgrid="false" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -341,67 +348,75 @@
              clip-path="url(#clip2)">
             <g
                id="g2946"
-               style="opacity:1;fill:#000000">
+               style="opacity:1;fill:#ff0000">
               <use
                  id="use2948"
                  y="24.70282"
                  x="12.53334"
                  xlink:href="#glyph0-0"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2950"
                  y="24.70282"
                  x="20.870865"
                  xlink:href="#glyph0-1"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2952"
                  y="24.70282"
                  x="23.645874"
                  xlink:href="#glyph0-2"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2954"
                  y="24.70282"
                  x="26.420883"
                  xlink:href="#glyph0-3"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2956"
                  y="24.70282"
                  x="32.670914"
                  xlink:href="#glyph0-4"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
             </g>
             <g
                id="g2958"
-               style="opacity:1;fill:#000000">
+               style="opacity:1;fill:#0000ff">
               <use
                  id="use2960"
                  y="41.369492"
                  x="12.53334"
                  xlink:href="#glyph0-5"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
               <use
                  id="use2962"
                  y="41.369492"
                  x="20.870865"
                  xlink:href="#glyph0-6"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
               <use
                  id="use2964"
                  y="41.369492"
                  x="27.820892"
                  xlink:href="#glyph0-7"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
             </g>
             <g
                id="g2966"
@@ -444,42 +459,47 @@
             </g>
             <g
                id="g2978"
-               style="opacity:1;fill:#000000">
+               style="opacity:1;fill:#ff0000">
               <use
                  id="use2980"
                  y="74.70282"
                  x="12.53334"
                  xlink:href="#glyph0-0"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2982"
                  y="74.70282"
                  x="20.870865"
                  xlink:href="#glyph0-1"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2984"
                  y="74.70282"
                  x="23.645874"
                  xlink:href="#glyph0-2"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2986"
                  y="74.70282"
                  x="26.420883"
                  xlink:href="#glyph0-3"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use2988"
                  y="74.70282"
                  x="32.670914"
                  xlink:href="#glyph0-4"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
             </g>
             <g
                id="g2990"
@@ -628,28 +648,31 @@
             </g>
             <g
                id="g3034"
-               style="opacity:1;fill:#000000">
+               style="opacity:1;fill:#0000ff">
               <use
                  id="use3036"
                  y="141.36949"
                  x="12.53334"
                  xlink:href="#glyph0-5"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
               <use
                  id="use3038"
                  y="141.36949"
                  x="20.870865"
                  xlink:href="#glyph0-6"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
               <use
                  id="use3040"
                  y="141.36949"
                  x="27.820892"
                  xlink:href="#glyph0-7"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
             </g>
             <g
                id="g3042"
@@ -731,67 +754,75 @@
             </g>
             <g
                id="g3066"
-               style="opacity:1;fill:#000000">
+               style="opacity:1;fill:#ff0000">
               <use
                  id="use3068"
                  y="191.36949"
                  x="12.53334"
                  xlink:href="#glyph0-0"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3070"
                  y="191.36949"
                  x="20.870865"
                  xlink:href="#glyph0-1"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3072"
                  y="191.36949"
                  x="23.645874"
                  xlink:href="#glyph0-2"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3074"
                  y="191.36949"
                  x="26.420883"
                  xlink:href="#glyph0-3"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3076"
                  y="191.36949"
                  x="32.670914"
                  xlink:href="#glyph0-4"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
             </g>
             <g
                id="g3078"
-               style="opacity:1;fill:#000000">
+               style="opacity:1;fill:#0000ff">
               <use
                  id="use3080"
                  y="208.03615"
                  x="12.53334"
                  xlink:href="#glyph0-5"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
               <use
                  id="use3082"
                  y="208.03615"
                  x="20.870865"
                  xlink:href="#glyph0-6"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
               <use
                  id="use3084"
                  y="208.03615"
                  x="27.820892"
                  xlink:href="#glyph0-7"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#0000ff" />
             </g>
             <g
                id="g3086"
@@ -1085,42 +1116,47 @@
             </g>
             <g
                id="g3174"
-               style="opacity:1;fill:#000000">
+               style="opacity:1;fill:#ff0000">
               <use
                  id="use3176"
                  y="324.70282"
                  x="12.53334"
                  xlink:href="#glyph0-0"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3178"
                  y="324.70282"
                  x="20.870865"
                  xlink:href="#glyph0-1"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3180"
                  y="324.70282"
                  x="23.645874"
                  xlink:href="#glyph0-2"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3182"
                  y="324.70282"
                  x="26.420883"
                  xlink:href="#glyph0-3"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
               <use
                  id="use3184"
                  y="324.70282"
                  x="32.670914"
                  xlink:href="#glyph0-4"
                  width="744.09448"
-                 height="1052.3622" />
+                 height="1052.3622"
+                 style="fill:#ff0000" />
             </g>
             <g
                id="g3186"
@@ -2298,15 +2334,18 @@
                  sodipodi:role="line"
                  id="tspan4296"
                  x="193.91632"
-                 y="199.77205">A</tspan><tspan
+                 y="199.77205"
+                 style="fill:#ff0000">A</tspan><tspan
                  sodipodi:role="line"
                  x="193.91632"
                  y="219.11789"
-                 id="tspan4298">B</tspan><tspan
+                 id="tspan4298"
+                 style="fill:#0000ff">B</tspan><tspan
                  sodipodi:role="line"
                  x="193.91632"
                  y="238.46373"
-                 id="tspan4300">C</tspan><tspan
+                 id="tspan4300"
+                 style="fill:#008000">C</tspan><tspan
                  sodipodi:role="line"
                  x="193.91632"
                  y="257.80957"
@@ -2338,42 +2377,42 @@
           </g>
         </g>
         <path
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:#ff0000;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="M 199.83939,175.54978 L 237.00157,175.54978"
            id="path4328" />
         <path
            id="path4530"
            d="M 252.8724,175.54978 L 290.03458,175.54978"
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#006600;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+           style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
         <path
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#006600;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="M 252.8724,192.72237 L 290.03458,223.53202"
            id="path4532"
            sodipodi:nodetypes="cc" />
         <path
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#006600;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="M 252.8724,209.38989 L 290.03458,340.20464"
            id="path4534"
            sodipodi:nodetypes="cc" />
         <path
            id="path4536"
            d="M 252.8724,225.55233 L 290.03458,473.54478"
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#006600;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            sodipodi:nodetypes="cc" />
         <path
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#006600;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="M 252.8724,242.72492 L 290.03458,192.72237"
            id="path4538"
            sodipodi:nodetypes="cc" />
         <path
            id="path4540"
            d="M 252.8724,258.88736 L 290.03458,290.70717"
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#006600;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            sodipodi:nodetypes="cc" />
         <path
            id="path4542"
-           d="M 199.83939,192.72237 L 237.00157,257.37213"
-           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 199.83939,192.72237 L 237.00157,239.69446"
+           style="fill:#0000ff;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            sodipodi:nodetypes="cc" />
         <path
            id="path4550"
@@ -2728,6 +2767,16 @@
            style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
            d="M 519.10214,345.76048 L 481.93996,508.39504"
            id="path5041" />
+        <path
+           sodipodi:nodetypes="cc"
+           style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#0000ff;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 252.8724,275.55488 L 290.03458,357.37724"
+           id="path3602" />
+        <path
+           sodipodi:nodetypes="cc"
+           style="fill:#008000;fill-opacity:0.75000000000000000;fill-rule:evenodd;stroke:#008000;stroke-width:1.00000011999999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Dot_m);marker-end:url(#TriangleOutM);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 199.83939,208.88481 L 237.00157,290.20209"
+           id="path3604" />
       </g>
     </g>
   </g>
