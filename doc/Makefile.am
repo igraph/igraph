@@ -59,12 +59,12 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c \
 		$(SRCDIR)/cocitation.c $(SRCDIR)/components.c \
 		$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
-		$(SRCDIR)/centrality.c
+		$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/conversion.c \
 	$(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c $(SRCDIR)/components.c \
 	$(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
-	$(SRCDIR)/centrality.c
+	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(SRCDIR)/igraph.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \

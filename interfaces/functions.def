@@ -504,6 +504,10 @@ igraph_is_mutual:
         DEPS: es ON graph
         NAME-R: is.mutual
 
+igraph_maximum_cardinality_search:
+        PARAMS: GRAPH graph, OUT VECTOR res
+        NAME-R: maximum.cardinality.search
+
 #######################################
 # Spectral properties
 #######################################

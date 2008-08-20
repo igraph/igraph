@@ -105,6 +105,10 @@
 <!-- doxrox-include igraph_topological_sorting -->
 </section>
 
+<section><title>Maximum cardinality search</title>
+<!-- doxrox-include igraph_maximum_cardinality_search -->
+</section>
+
 <section><title>Line graphs</title>
 <!-- doxrox-include igraph_linegraph -->
 </section>

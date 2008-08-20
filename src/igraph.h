@@ -851,6 +851,9 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
 int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
 
+int igraph_maximum_cardinality_search(const igraph_t *graph,
+				      igraph_vector_t *res);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
