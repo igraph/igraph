@@ -94,7 +94,7 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
 
   vc <- vcount(graph)
   
-  el <- get.edgelist(graph)
+  el <- get.edgelist(graph, names=FALSE)
   if (!is.null(attr)) {
     attr <- as.character(attr)
     if (!attr %in% list.edge.attributes(graph)) {
