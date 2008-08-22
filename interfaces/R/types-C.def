@@ -18,6 +18,22 @@ GRAPH:
            igraph_destroy(&%C%); \
            IGRAPH_FINALLY_CLEAN(1);
 
+GRAPH_OR_0:
+  CTYPE: igraph_t
+  CALL:  &%C%
+  INCONV: 
+    IN: R_SEXP_to_igraph(%I%, &%C%);
+    INOUT: R_SEXP_to_igraph_copy(%I%, &%C%); \
+           IGRAPH_FINALLY(igraph_destroy, &%C%);
+  OUTCONV:
+    OUT: IGRAPH_FINALLY(igraph_destroy, &%C%); \
+         PROTECT(%I%=R_igraph_to_SEXP(&%C%));  \
+         igraph_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+    INOUT: PROTECT(%I%=R_igraph_to_SEXP(&%C%));  \
+           igraph_destroy(&%C%); \
+           IGRAPH_FINALLY_CLEAN(1);
+
 ##################################
 # INTEGER
 
@@ -72,6 +88,13 @@ BOOLEAN:
          LOGICAL(%I%)[0]=%C%;
 
 BOOLEANPTR:
+  CTYPE: igraph_bool_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=NEW_LOGICAL(1)); \
+         LOGICAL(%I%)[0]=%C%;
+
+BOOLEANPTR_OR_0:
   CTYPE: igraph_bool_t
   CALL: &%C%
   OUTCONV:

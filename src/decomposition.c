@@ -38,9 +38,12 @@
  * 
  * \param graph The input graph. Can be directed, but the direction
  *   of the edges is ignored.
- * \param res Pointer to an initialized vector, the result is stored here. 
+ * \param alpha Pointer to an initialized vector, the result is stored here. 
  *   It will be resized, as needed. Upon return it contains
  *   the rank of the each vertex.
+ * \param alpham1 Pointer to an initialized vector or a \c NULL
+ *   pointer. If not \c NULL, then the inverse of \p alpha is stored
+ *   here.
  * \return Error code.
  * 
  * Time complexity: O(|V|+|E|), linear in terms of the number of
@@ -48,7 +51,8 @@
  */
 
 int igraph_maximum_cardinality_search(const igraph_t *graph,
-				      igraph_vector_t *res) {
+				      igraph_vector_t *alpha,
+				      igraph_vector_t *alpham1) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_long_t size;
@@ -74,7 +78,10 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
   
-  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  IGRAPH_CHECK(igraph_vector_resize(alpha, no_of_nodes));
+  if (alpham1) {
+    IGRAPH_CHECK(igraph_vector_resize(alpham1, no_of_nodes));
+  }
   
   /***********************************************/
   /* for i in [0,n-1] -> set(i) := emptyset rof; */
@@ -123,8 +130,10 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     /* alpha(v) := i; alpham1(i) := v; size(v) := -1 */
     /*************************************************/
 
-    VECTOR(*res)[v]=i-1; 
-/*     VECTOR(alpham1)[i-1]=v;	/\* This is not needed *\/ */
+    VECTOR(*alpha)[v]=i-1; 
+    if (alpham1) { 
+      VECTOR(*alpham1)[i-1]=v;
+    }
     VECTOR(size)[v]=-1;
     
     /********************************************/
@@ -197,5 +206,204 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
   igraph_vector_long_destroy(&size);
   IGRAPH_FINALLY_CLEAN(5);
   
+  return 0;
+}
+
+/**
+ * \function igraph_is_chordal
+ * TODO
+ */
+
+int igraph_is_chordal(const igraph_t *graph,
+		      const igraph_vector_t *alpha,
+		      const igraph_vector_t *alpham1,
+		      igraph_bool_t *chordal,
+		      igraph_vector_t *fill_in,
+		      igraph_t *newgraph) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  const igraph_vector_t *my_alpha=alpha, *my_alpham1=alpham1;
+  igraph_vector_t v_alpha, v_alpham1;
+  igraph_vector_long_t f, index;
+  long int i;
+  igraph_adjlist_t adjlist;
+  igraph_vector_long_t mark;
+  igraph_bool_t calc_edges= fill_in || newgraph;
+  igraph_vector_t *my_fill_in=fill_in, v_fill_in;
+
+  if (!chordal && !calc_edges) {
+    /* Nothing to calculate */
+    return 0;
+  }
+  
+  /*****************/
+  /* local v, w, x */
+  /*****************/
+
+  long int v, w, x;
+
+  if (!alpha && !alpham1) {
+    IGRAPH_VECTOR_INIT_FINALLY(&v_alpha, no_of_nodes);
+    my_alpha=&v_alpha;
+    IGRAPH_VECTOR_INIT_FINALLY(&v_alpham1, no_of_nodes);
+    my_alpham1=&v_alpham1;
+    IGRAPH_CHECK(igraph_maximum_cardinality_search(graph, 
+					    (igraph_vector_t*) my_alpha, 
+					    (igraph_vector_t*) my_alpham1));
+  } else if (alpha && !alpham1) {
+    long int v;
+    IGRAPH_VECTOR_INIT_FINALLY(&v_alpham1, no_of_nodes);
+    my_alpham1=&v_alpham1;
+    for (v=0; v<no_of_nodes; v++) {
+      long int i=VECTOR(*my_alpha)[v];
+      VECTOR(*my_alpham1)[i]=v;
+    }
+  } else if (!alpha && alpham1) { 
+    long int i;
+    IGRAPH_VECTOR_INIT_FINALLY(&v_alpha, no_of_nodes);
+    my_alpha=&v_alpha;
+    for (i=0; i<no_of_nodes; i++) {
+      long int v=VECTOR(*my_alpham1)[i];
+      VECTOR(*my_alpha)[v]=i;
+    }
+  }
+
+  if (!fill_in && newgraph) {
+    IGRAPH_VECTOR_INIT_FINALLY(&v_fill_in, 0);
+    my_fill_in=&v_fill_in;
+  }
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&f, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &f);
+  IGRAPH_CHECK(igraph_vector_long_init(&index, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+  IGRAPH_CHECK(igraph_vector_long_init(&mark, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &mark);
+  if (my_fill_in) { igraph_vector_clear(my_fill_in); }
+
+  if (chordal) { *chordal=1; }
+
+  /*********************/
+  /* for i in [1,n] -> */
+  /*********************/
+
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_vector_t *neis;
+    long int j, len;
+    
+    /**********************************************/
+    /* w := alpham1(i); f(w) := w; index(w) := i; */
+    /**********************************************/
+    
+    w=VECTOR(*my_alpham1)[i]; 
+    VECTOR(f)[w]=w;
+    VECTOR(index)[w]=i;
+   
+    /******************************************/
+    /* for {v,w} in E such that alpha(v)<i -> */
+    /******************************************/
+
+    neis=igraph_adjlist_get(&adjlist, w);
+    len=igraph_vector_size(neis);
+    for (j=0; j<len; j++) {
+      v=VECTOR(*neis)[j];
+      VECTOR(mark)[v] = w+1;
+    }
+    
+    for (j=0; j<len; j++) {
+      v=VECTOR(*neis)[j];
+      if (VECTOR(*my_alpha)[v] >= i) { continue; }
+      
+      /**********/
+      /* x := v */
+      /**********/
+
+      x=v;
+      
+      /********************/
+      /* do index(x)<i -> */
+      /********************/
+      
+      while (VECTOR(index)[x] < i) {
+	
+	/******************/
+	/* index(x) := i; */
+	/******************/
+	
+	VECTOR(index)[x] = i;
+	
+	/**********************************/
+	/* add {x,w} to E union F(alpha); */
+	/**********************************/
+
+	if (VECTOR(mark)[x] != w+1) {
+
+	  if (chordal) {
+	    *chordal=0;
+	  }
+	  
+	  if (my_fill_in) {
+	    IGRAPH_CHECK(igraph_vector_push_back(my_fill_in, x));
+	    IGRAPH_CHECK(igraph_vector_push_back(my_fill_in, w));
+	  }
+	  
+	  if (!calc_edges) { 
+	    /* make sure that we exit from all loops */
+	    i=no_of_nodes;
+	    j=len; 
+	    break; 
+	  }
+	}
+	
+	/*************/
+	/* x := f(x) */
+	/*************/
+	
+	x=VECTOR(f)[x];
+	
+      }	/* while (VECTOR(index)[x] < i) */
+      
+      /*****************************/
+      /* if (f(x)=x -> f(x):=w; fi */
+      /*****************************/
+      
+      if (VECTOR(f)[x] == x) { 
+	VECTOR(f)[x] = w;
+      }
+    }
+  }
+
+  igraph_vector_long_destroy(&mark);
+  igraph_adjlist_destroy(&adjlist);
+  igraph_vector_long_destroy(&index);
+  igraph_vector_long_destroy(&f);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  if (newgraph) {
+    IGRAPH_CHECK(igraph_copy(newgraph, graph));
+    IGRAPH_FINALLY(igraph_destroy, newgraph);
+    IGRAPH_CHECK(igraph_add_edges(newgraph, my_fill_in, 0));
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (!fill_in && newgraph) {
+    igraph_vector_destroy(&v_fill_in);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (!alpha && !alpham1) {
+    igraph_vector_destroy(&v_alpham1);
+    igraph_vector_destroy(&v_alpha);
+    IGRAPH_FINALLY_CLEAN(2);
+  } else if (alpha && !alpham1) {
+    igraph_vector_destroy(&v_alpham1);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else if (!alpha && alpham1) { 
+    igraph_vector_destroy(&v_alpha);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
   return 0;
 }

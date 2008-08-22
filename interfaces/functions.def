@@ -505,8 +505,15 @@ igraph_is_mutual:
         NAME-R: is.mutual
 
 igraph_maximum_cardinality_search:
-        PARAMS: GRAPH graph, OUT VECTOR res
+        PARAMS: GRAPH graph, OUT VECTOR alpha, OUT VECTOR_OR_0 alpham1
         NAME-R: maximum.cardinality.search
+
+igraph_is_chordal:
+        PARAMS: GRAPH graph, VECTOR_OR_0 alpha=NULL, VECTOR_OR_0 alpham1=NULL, \
+                OUT BOOLEANPTR_OR_0 chordal, OUT VECTOR_OR_0 fillin, \
+                OUT GRAPH_OR_0 newgraph
+        NAME-R: is.chordal
+        IGNORE: RR, RC
 
 #######################################
 # Spectral properties

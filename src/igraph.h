@@ -852,7 +852,14 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
 
 int igraph_maximum_cardinality_search(const igraph_t *graph,
-				      igraph_vector_t *res);
+				      igraph_vector_t *alpha,
+				      igraph_vector_t *alpham1);
+int igraph_is_chordal(const igraph_t *graph,
+		      const igraph_vector_t *alpha,
+		      const igraph_vector_t *alpham1,
+		      igraph_bool_t *chordal,
+		      igraph_vector_t *fill_in,
+		      igraph_t *newgraph);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */

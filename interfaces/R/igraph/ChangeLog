@@ -1,6 +1,11 @@
+2008-08-22  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/decomposition.R (is.chordal) : added
+	* interfaces/R/src/rinterface.c.in (R_igraph_is_chordal) : added
+
 2008-08-20  Gabor Csardi  <csardi@szaffi>
 
-	* interface/R/igraph/R/conversion.R (get.adjacency.sparse) : 
+	* interfaces/R/igraph/R/conversion.R (get.adjacency.sparse) : 
 	fixed a bug, when graph.adjacency.sparse is called with 
 	a named graph
 

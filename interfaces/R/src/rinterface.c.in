@@ -6638,6 +6638,72 @@ SEXP R_igraph_arpack(SEXP function, SEXP extra, SEXP options, SEXP rho,
   return result;
 }
 
+SEXP R_igraph_is_chordal(SEXP graph, SEXP alpha, SEXP alpham1, 
+			 SEXP pfillin, SEXP pnewgraph) {
+                                        /* Declarations */
+  igraph_t c_graph;
+  igraph_vector_t c_alpha;
+  igraph_vector_t c_alpham1;
+  igraph_bool_t c_chordal;
+  igraph_vector_t c_fillin;
+  igraph_t c_newgraph;
+  SEXP chordal;
+  SEXP fillin;
+  SEXP newgraph;
+  int c_result;
+  SEXP result, names;
+
+  R_igraph_before();
+                                        /* Convert input */
+  R_SEXP_to_igraph(graph, &c_graph);
+  if (!isNull(alpha)) { R_SEXP_to_vector(alpha, &c_alpha); }
+  if (!isNull(alpham1)) { R_SEXP_to_vector(alpham1, &c_alpham1); }
+  if (LOGICAL(pfillin)[0]) { 
+    if (0 != igraph_vector_init(&c_fillin, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+  }
+  IGRAPH_FINALLY(igraph_vector_destroy, &c_fillin); 
+  c_result=igraph_is_chordal(&c_graph, (isNull(alpha) ? 0 : &c_alpha),
+			     (isNull(alpham1) ? 0 : &c_alpham1), &c_chordal, 
+			     (LOGICAL(pfillin)[0] ? &c_fillin : 0), 
+			     (LOGICAL(pnewgraph)[0] ? &c_newgraph : 0));
+
+                                        /* Convert output */
+  PROTECT(result=NEW_LIST(3));
+  PROTECT(names=NEW_CHARACTER(3));
+  PROTECT(chordal=NEW_LOGICAL(1)); 
+  LOGICAL(chordal)[0]=c_chordal;
+  if (LOGICAL(pfillin)[0]) {
+    PROTECT(fillin=R_igraph_vector_to_SEXP(&c_fillin));
+    igraph_vector_destroy(&c_fillin); 
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    PROTECT(fillin=R_NilValue);
+  }
+  if (LOGICAL(pnewgraph)[0]) { 
+    IGRAPH_FINALLY(igraph_destroy, &c_newgraph); 
+    PROTECT(newgraph=R_igraph_to_SEXP(&c_newgraph));
+    igraph_destroy(&c_newgraph); 
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    PROTECT(newgraph=R_NilValue);
+  }
+  SET_VECTOR_ELT(result, 0, chordal);
+  SET_VECTOR_ELT(result, 1, fillin);
+  SET_VECTOR_ELT(result, 2, newgraph);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("chordal"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("fillin"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("newgraph"));
+  SET_NAMES(result, names);
+  UNPROTECT(4);
+
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return(result);
+}
+
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			SEXP pcites, SEXP pexpected, SEXP perror, SEXP pdebug,
 			SEXP verbose) {
