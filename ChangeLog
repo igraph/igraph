@@ -1,3 +1,7 @@
+2008-09-06  Gabor Csardi  <csardi@szaffi>
+
+	* src/topology.c (igraph_isomorphic_function_vf2) : bug corrected
+
 2008-07-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
 	* interfaces/python/src/graphobject.c : added interface to

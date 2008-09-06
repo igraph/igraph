@@ -1170,7 +1170,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 	cand2=last2;
       } else {
 	i=0;
-	while (cand2<0) {
+	while (cand2<0 && i<no_of_nodes) {
 	  if (VECTOR(*core_2)[i]==0) { 
 	    cand2=i;
 	  }
