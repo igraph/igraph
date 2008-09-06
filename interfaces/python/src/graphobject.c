@@ -1278,9 +1278,8 @@ PyObject *igraphmodule_Graph_Erdos_Renyi(PyTypeObject * type,
       PyErr_SetString(PyExc_ValueError, "p must be between 0 and 1.");
       return NULL;
     }
-  }
-  else {
-    if (m < 0 || m > n * n) {
+  } else {
+    if (m < 0 || ((double)m)/n > n ) {
       // Invalid edge count was given, throw exception
       PyErr_SetString(PyExc_ValueError, "m must be between 0 and n^2.");
       return NULL;
