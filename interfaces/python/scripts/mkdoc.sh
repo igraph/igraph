@@ -30,6 +30,9 @@ if [ $PDF -eq 1 ]; then
   echo "Generating PDF documentation..."
   epydoc --pdf -o pdf --inheritance=listed -v --name="IGraph library" --url="http://cneurocvs.rmki.kfki.hu/igraph" $PACKAGES
 
+  echo "Zipping HTML documentation..."
+  cd html && zip ../python-igraph-docs.zip -r . && cd ..
+
   echo "Moving PDF documentation to the HTML subdirectory..."
   mv pdf/api.pdf html/igraph.pdf
   rm -rf pdf
@@ -37,7 +40,7 @@ fi
 
 if [ $SYNC -eq 1 ]; then
   echo "Syncing documentation to web"
-  rsync --delete -avz html/ root@cneurocvs.rmki.kfki.hu:/var/www/igraph-new/doc/python/
+  rsync --delete -avz html/ ntamas@cneurocvs.rmki.kfki.hu:/var/www/igraph-new/doc/python/
 fi
 
 cd "$PWD"

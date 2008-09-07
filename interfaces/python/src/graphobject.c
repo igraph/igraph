@@ -1278,9 +1278,8 @@ PyObject *igraphmodule_Graph_Erdos_Renyi(PyTypeObject * type,
       PyErr_SetString(PyExc_ValueError, "p must be between 0 and 1.");
       return NULL;
     }
-  }
-  else {
-    if (m < 0 || m > n * n) {
+  } else {
+    if (m < 0 || ((double)m)/n > n ) {
       // Invalid edge count was given, throw exception
       PyErr_SetString(PyExc_ValueError, "m must be between 0 and n^2.");
       return NULL;
@@ -3440,7 +3439,7 @@ PyObject *igraphmodule_Graph_pagerank(igraphmodule_GraphObject *self,
 
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
-      damping, 0, igraphmodule_ARPACKOptions_get(arpack_options))) {
+      damping, &weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
     igraph_vector_destroy(&weights);
@@ -8418,6 +8417,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param damping: the damping factor.\n"
    "  M{1-damping} is the PageRank value for nodes with no\n"
    "  incoming links.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
    "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
    "  variable called C{arpack_options} is used.\n"

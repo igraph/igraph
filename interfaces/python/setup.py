@@ -100,7 +100,7 @@ if "macosx" in plat:
                                 '/usr/local/lib/libigraph.0.0.0.dylib'])]
 
 setup(name = 'python-igraph',
-      version = '0.5',
+      version = '0.5.1',
       description = 'High performance graph data structures and algorithms',
       long_description = description,
       license = 'GNU General Public License (GPL)',
