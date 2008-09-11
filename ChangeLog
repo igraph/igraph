@@ -1,3 +1,8 @@
+2008-09-11  Gabor Csardi  <csardi@szaffi>
+
+	* src/gengraph_mr-connected.cpp (igraph_degree_sequence_game_vl) :
+	check that the sum of degree is even
+
 2008-08-22  Gabor Csardi  <csardi@szaffi>
 
 	* src/decomposition.c (igraph_is_chordal) : added

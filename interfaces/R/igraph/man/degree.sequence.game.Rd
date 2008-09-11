@@ -60,5 +60,19 @@ degree(g2, mode="in")
 g3 <- degree.sequence.game(rep(2,100), method="vl")
 degree(g3)
 is.simple(g3)  # always TRUE
+
+## Exponential degree distribution
+## Note, that we correct the degree sequence if its sum is odd
+degs <- sample(1:100, 100, replace=TRUE, prob=exp(-0.5*(1:100)))
+if (sum(degs) \%\% 2 != 0) { degs[1] <- degs[1] + 1 }
+g4 <- degree.sequence.game(degs, method="vl")
+all(degree(g4) == degs)
+
+## Power-law degree distribution
+## Note, that we correct the degree sequence if its sum is odd
+degs <- sample(1:100, 100, replace=TRUE, prob=(1:100)^-2)
+if (sum(degs) \%\% 2 != 0) { degs[1] <- degs[1] + 1 }
+g5 <- degree.sequence.game(degs, method="vl")
+all(degree(g5) == degs)
 }
 \keyword{graphs}
