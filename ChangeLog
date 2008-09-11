@@ -1,6 +1,56 @@
+2008-09-11  Gabor Csardi  <csardi@szaffi>
+
+	* src/gengraph_mr-connected.cpp (igraph_degree_sequence_game_vl) :
+	check that the sum of degree is even
+
 2008-09-06  Gabor Csardi  <csardi@szaffi>
 
 	* src/topology.c (igraph_isomorphic_function_vf2) : bug corrected
+
+2008-09-11  Gabor Csardi  <csardi@szaffi>
+
+	* src/gengraph_mr-connected.cpp (igraph_degree_sequence_game_vl) :
+	check that the sum of degree is even
+
+2008-08-22  Gabor Csardi  <csardi@szaffi>
+
+	* src/decomposition.c (igraph_is_chordal) : added
+	* src/decomposition.c (igraph_maximum_cardinality_search) : 
+	API update, optionally it calculates the inverse of alpha
+
+2008-08-20  Gabor Csardi  <csardi@szaffi>
+
+	* src/decomposition.c (igraph_maximum_cardinality_search) : added
+
+2008-07-20  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexededgelist.c (igraph_get_eid) : simplification,
+	in the end the newly defined macros will be used by other
+	functions as well
+
+2008-07-18  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/centrality.c (igraph_betweenness_estimate_weighted) : 
+	handle the 'vids' argument properly
+
+	* src/centrality.c (igraph_betweenness_estimate_weighted) : 
+	added support for cutoff
+
+	* src/centrality.c (igraph_betweenness_estimate) : speedup for 
+	cutoff >= 0
+	* examples/simple/igraph_betweenness.c : added
+
+	* src/iterators.c (igraph_vs_is_all, igraph_es_is_all) : make argument const
+
+2008-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/type_indexededgelist.c (igraph_get_eid) : further speedup	
+	
+	* src/type_indexededgelist.c (igraph_get_eid) : speeded up by using 
+	binary search
+
+	* src/centrality.c (igraph_betweenness, igraph_betweenness_estimate)
+	(igraph_betweenness_estimate_weighted) : added weights
 
 2008-07-02  Tamas Nepusz  <ntamas@rmki.kfki.hu>
 
