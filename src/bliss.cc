@@ -135,10 +135,10 @@ int igraph_automorphisms(const igraph_t *graph,
   return 0;
 }
 
-namespace igraph {
+bool bliss_verbose = false;
+FILE *bliss_verbstr = stdout;
 
-bool verbose = false;
-FILE *verbstr = stdout;
+namespace igraph {
 
 typedef enum {FORMAT_BIN = 0, FORMAT_ADJ} Format;
 // static Format input_format;
@@ -183,7 +183,7 @@ typedef enum {FORMAT_BIN = 0, FORMAT_ADJ} Format;
 //   for(int i = 1; i < argc; i++)
 //     {
 //       //if(strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "-verbose") == 0)
-//       //verbose = true;
+//       //bliss_verbose = true;
 //       /*
 //       if(strcmp(argv[i], "-bin") == 0)
 // 	input_format = FORMAT_BIN;

@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "config.h"
+#include "igraph_math.h"
 #include "gml_tree.h"
 #include "memory.h"
 

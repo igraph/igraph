@@ -25,6 +25,7 @@
 #include "memory.h"
 #include "random.h"
 #include "error.h"
+#include "igraph_math.h"
 
 #include <assert.h>
 #include <string.h> 		/* memcpy & co. */

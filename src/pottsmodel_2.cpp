@@ -48,6 +48,8 @@
 #include "pottsmodel_2.h"
 #include "NetRoutines.h"
 
+using namespace std;
+
 #include "random.h"
 
 //#################################################################################################
@@ -1219,18 +1221,18 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 	    n=nodes[spin];
 	    lin=inner_links[spin];
 	    lout=outer_links[spin];
-	    a1=N*log(N)-n*log(n)*(N-n)*log(N-n);
+	    a1=N*log((double)N)-n*log((double)n)*(N-n)*log((double)N-n);
 	    if ((lin==long(n*(n-1)*0.5+0.5)) || (n==1)) a2=0.0;
-	    else a2=(n*(n-1)*0.5    )*log(n*(n-1)*0.5    )-(n*(n-1)*0.5    )-
-		   (n*(n-1)*0.5-lin)*log(n*(n-1)*0.5-lin)+(n*(n-1)*0.5-lin)-
-		   lin*log(lin            )+lin;
+	    else a2=(n*(n-1)*0.5    )*log((double)n*(n-1)*0.5    )-(n*(n-1)*0.5    )-
+		   (n*(n-1)*0.5-lin)*log((double)n*(n-1)*0.5-lin)+(n*(n-1)*0.5-lin)-
+		   lin*log((double)lin            )+lin;
 	    
 	    if ((lout==n*(N-n)) || n==N) a3=0.0;
-	    else a3=(n*(N-n)     )*log(n*(N-n)     )-(n*(N-n))-
-		   (n*(N-n)-lout)*log(n*(N-n)-lout)+(n*(N-n)-lout)-
-		   lout*log(lout        )+lout;
-	    p1=(lin+lout)*log(p);
-	    p2=(0.5*n*(n-1)-lin + n*(N-n)-lout)*log(1.0-p);
+	    else a3=(n*(N-n)     )*log((double)n*(N-n)     )-(n*(N-n))-
+		   (n*(N-n)-lout)*log((double)n*(N-n)-lout)+(n*(N-n)-lout)-
+		   lout*log((double)lout        )+lout;
+	    p1=(lin+lout)*log((double)p);
+	    p2=(0.5*n*(n-1)-lin + n*(N-n)-lout)*log((double)1.0-p);
 	    log_num_exp=a1+a2+a3+p1+p2;
 	    //       fprintf(file,"%d\t%d\t%d\t%d\t%f\t%f\t%f\n",spin,nodes[spin], inner_links[spin], outer_links[spin], p_in, p_out,log_num_exp);
 	    IGRAPH_CHECK(igraph_vector_push_back(csize, nodes[spin]));

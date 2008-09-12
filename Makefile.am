@@ -26,7 +26,7 @@ MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make doc will always call doxygen rule
 ## and deb will generate Debian packages
-.PHONY: dox deb debcvs framework
+.PHONY: dox deb debcvs framework msvc
 
 dox:
 	doxygen Doxyfile
@@ -53,5 +53,15 @@ test: all
 		  $$i/test.sh; \
 	 	fi; \
 	done
+
+msvc:
+	rm -rf $(top_builddir)/igraph.msvc
+	mkdir $(top_builddir)/igraph.msvc
+	cp -r include $(top_builddir)/igraph.msvc/
+	cp -r src $(top_builddir)/igraph.msvc/
+	rm -rf $(top_builddir)/igraph.msvc/src/config.h
+	cp -r msvc/include $(top_builddir)/igraph.msvc/winclude
+	mkdir $(top_builddir)/igraph.msvc/winlib
+	cp msvc/igraph.{sln,vcproj} $(top_builddir)/igraph.msvc/
 
 CLEANFILES=

@@ -22,6 +22,7 @@
 */
 
 #include "igraph.h"
+#include "igraph_math.h"
 #include "memory.h"
 #include "random.h"
 
@@ -3881,9 +3882,10 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
    * determine input field sizes */
   for (k=0; k<(directed?2:1); k++) {
     igraph_neimode_t neimode = (k==0)?IGRAPH_OUT:IGRAPH_IN;
+    igraph_real_t *vec;
     IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, neimode));
     IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
-    igraph_real_t *vec = (k==0)?VECTOR(*ins_p):VECTOR(*outs_p);
+    vec = (k==0)?VECTOR(*ins_p):VECTOR(*outs_p);
     for (i=0; i<no_of_nodes; i++) {
       igraph_dqueue_clear(&q);
       memset(geodist, 0, sizeof(long int)*no_of_nodes);
@@ -4233,8 +4235,9 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   igraph_indheap_push_with_index(&Q, from, 0);
     
   while (!igraph_indheap_empty(&Q) && to_reach > 0) {
-    long int minnei=igraph_indheap_max_index(&Q);
+    long int nlen, minnei=igraph_indheap_max_index(&Q);
     igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+    igraph_vector_t *neis;
 
     IGRAPH_ALLOW_INTERRUPTION();
 
@@ -4244,8 +4247,8 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 	}
 
     /* Now check all neighbors of 'minnei' for a shorter path */
-    igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
-    long int nlen=igraph_vector_size(neis);
+    neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+    nlen=igraph_vector_size(neis);
     for (i=0; i<nlen; i++) {
       long int edge=VECTOR(*neis)[i];
       long int to=IGRAPH_OTHER(graph, edge, minnei);
