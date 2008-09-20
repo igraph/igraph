@@ -23,6 +23,7 @@
 
 #include "types.h"
 #include "memory.h"
+#include "config.h"
 #include <string.h>
 
 int igraph_hashtable_init(igraph_hashtable_t *ht) {

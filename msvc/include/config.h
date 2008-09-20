@@ -122,18 +122,4 @@
    `char[]'. */
 #define YYTEXT_POINTER 1
 
-#ifdef _MSC_VER
-#  pragma warning (disable:4244)
-
-#  ifndef vsprintf
-#    define vsnprintf(a, b, c, d) _vsnprintf((a), (b), (c), (d))
-#  endif
-
-#  define isnan(x) _isnan(x)
-#  define inline __inline
-#  define strcasecmp strcmpi
-#ifndef snprintf
-#  define snprintf igraph_i_snprintf
-#endif
-#endif
-
+#pragma warning (disable:4244)

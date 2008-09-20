@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "memory.h"
 #include "random.h"
+#include "config.h"
 
 
 void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {

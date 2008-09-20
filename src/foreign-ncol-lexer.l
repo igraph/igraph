@@ -44,6 +44,7 @@
 
 */
 
+#include "config.h"
 #include <stdlib.h>
 #include "foreign-ncol-parser.h"
 extern long int igraph_ncol_mylineno;

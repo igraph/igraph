@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include "config.h"
 
 /**
  * \function igraph_coreness 

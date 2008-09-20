@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include <math.h>
 #include <float.h>
+#include "config.h"
 #include "igraph_math.h"
 
 int igraph_finite(double x)
@@ -58,8 +59,9 @@ double igraph_log2(const double a) {
 long double igraph_logbl(long double x) {
   long double res;
 
-  asm ("fxtract\n\t"
-       "fstp	%%st" : "=t" (res) : "0" (x));
+  /*  asm ("fxtract\n\t"
+      "fstp	%%st" : "=t" (res) : "0" (x)); */
+  /* TODO */
   return res;
 }
 

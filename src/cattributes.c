@@ -24,6 +24,7 @@
 #include "attributes.h"
 #include "memory.h"
 #include "igraph.h"
+#include "config.h"
 
 #include <string.h>
 

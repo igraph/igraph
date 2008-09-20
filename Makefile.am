@@ -54,11 +54,12 @@ test: all
 	 	fi; \
 	done
 
-msvc:
+msvc: all
 	rm -rf $(top_builddir)/igraph.msvc
 	mkdir $(top_builddir)/igraph.msvc
 	cp -r include $(top_builddir)/igraph.msvc/
 	cp -r src $(top_builddir)/igraph.msvc/
+	rm -rf $(top_builddir)/igraph.msvc/src/{.deps,.libs}
 	rm -rf $(top_builddir)/igraph.msvc/src/config.h
 	cp -r msvc/include $(top_builddir)/igraph.msvc/winclude
 	mkdir $(top_builddir)/igraph.msvc/winlib

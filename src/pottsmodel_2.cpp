@@ -41,16 +41,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
 #include "pottsmodel_2.h"
 #include "NetRoutines.h"
 
 using namespace std;
 
 #include "random.h"
+#include "config.h"
 
 //#################################################################################################
 PottsModel::PottsModel(network *n, unsigned int qvalue, int m) : acceptance(0)

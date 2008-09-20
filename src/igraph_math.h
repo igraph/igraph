@@ -60,6 +60,9 @@ double igraph_fmin(double a, double b);
 #ifndef HAVE_FMIN
 #define fmin(a,b) igraph_fmin((a),(b))
 #endif
+#ifndef HAVE_SNPRINTF
+#define snprintf igraph_i_snprintf
+#endif
 
 #ifndef M_PI
 #  define M_PI 3.14159265358979323846

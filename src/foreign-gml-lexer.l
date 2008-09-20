@@ -44,6 +44,7 @@
 
 */
 
+#include "config.h"
 #include <stdlib.h>
 #include "foreign-gml-parser.h"
 extern long int igraph_gml_mylineno;

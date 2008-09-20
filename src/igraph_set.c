@@ -24,6 +24,7 @@
 #include "types.h"
 #include "memory.h"
 #include "error.h"
+#include "config.h"
 
 #include <assert.h>
 #include <string.h>     /* memmove */

@@ -24,7 +24,9 @@
 #include "igraph.h"
 #include "random.h"
 #include "memory.h"
+#include "config.h"
 #include <math.h>
+#include "igraph_math.h"
 
 int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
 			      igraph_real_t *r);

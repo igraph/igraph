@@ -55,6 +55,7 @@ int igraph_ncol_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
 #include "error.h"
+#include "config.h"
 extern igraph_vector_t *igraph_ncol_vector;
 extern igraph_vector_t *igraph_ncol_weights;
 extern igraph_trie_t *igraph_ncol_trie;

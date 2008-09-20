@@ -22,6 +22,7 @@
 */
 
 #include "memory.h"
+#include "config.h"
 
 int igraph_free(void *p) {
   igraph_Free(p);

@@ -25,6 +25,7 @@
 #include "memory.h"
 #include "random.h"
 #include "error.h"
+#include "config.h"
 #include "igraph_math.h"
 
 #include <assert.h>

@@ -25,6 +25,7 @@
 #include "igraph_math.h"
 #include "memory.h"
 #include "random.h"
+#include "config.h"
 
 #include <string.h>
 #include <limits.h>
@@ -1385,9 +1386,9 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
    * copying from prvec_new to prvec at the end of every iteration,
    * the pointers are swapped after every iteration */
   while (niter>0 && maxdiff >= eps) {
+    igraph_real_t sumfrom=0, sum=0;
     niter--;
     maxdiff=0;
-     igraph_real_t sumfrom=0, sum=0;
 
     /* Calculate the quotient of the actual PageRank value and the
      * outdegree for every node */

@@ -50,6 +50,7 @@
 #include "memory.h"
 #include "error.h"
 #include "attributes.h"
+#include "config.h"
 #include <math.h>
 extern int igraph_pajek_yylex(void);
 extern int igraph_pajek_mylineno;

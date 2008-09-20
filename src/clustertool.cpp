@@ -57,6 +57,7 @@
 #include "igraph.h"
 #include "error.h"
 #include "random.h"
+#include "igraph_math.h"
 
 /**
  * \function igraph_community_spinglass

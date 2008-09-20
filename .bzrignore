@@ -69,3 +69,8 @@
 ./src/foreign-*-lexer.c
 ./src/foreign-*-parser.c
 ./src/foreign-*-parser.h
+./igraph.msvc
+./tests/package.m4
+./tests/testsuite
+./tests/testsuite.dir
+./tests/testsuite.log

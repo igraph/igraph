@@ -26,6 +26,7 @@
 #include "config.h"
 
 #include <math.h>
+#include "igraph_math.h"
 
 int igraph_rng_inited = 0;
 

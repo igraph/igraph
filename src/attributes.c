@@ -24,6 +24,7 @@
 #include "attributes.h"
 #include "memory.h"
 #include "igraph.h"
+#include "config.h"
 
 int igraph_i_attribute_init(igraph_t *graph, void *attr) {
   graph->attr=0;

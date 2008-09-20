@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "random.h"
 #include "memory.h"
+#include "config.h"
 
 #include <math.h>
 

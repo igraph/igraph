@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "types.h"
 #include "memory.h"
+#include "config.h"
 #include <math.h>
 #include <stdarg.h>
 

@@ -20,7 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\winclude&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\src&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\include&quot;"
+				AdditionalIncludeDirectories="winclude;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\winclude&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\src&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\include&quot;"
 				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;HAVE_LIBXML=1"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -72,7 +72,7 @@
 			CharacterSet="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\winclude&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\src&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\include&quot;"
+				AdditionalIncludeDirectories="winclude;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\winclude&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\src&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\include&quot;"
 				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;HAVE_LIBXML=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"

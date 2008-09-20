@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "memory.h"
 #include "random.h"
+#include "config.h"
 
 typedef struct igraph_i_forest_fire_data_t {
   igraph_vector_t *inneis;

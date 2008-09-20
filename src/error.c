@@ -22,6 +22,7 @@
 */
 
 #include "igraph.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -146,7 +147,7 @@ void IGRAPH_FINALLY_FREE(void) {
   igraph_i_finally_stack[0].all=0;
 }
 
-inline int IGRAPH_FINALLY_STACK_SIZE(void) {
+int IGRAPH_FINALLY_STACK_SIZE(void) {
   return igraph_i_finally_stack[0].all;
 }
 

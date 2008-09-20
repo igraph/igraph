@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "memory.h"
 #include "random.h"
+#include "config.h"
 
 #include <string.h>
 #include <stdarg.h>
