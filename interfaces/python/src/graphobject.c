@@ -2436,29 +2436,35 @@ PyObject *igraphmodule_Graph_articulation_points(igraphmodule_GraphObject *self)
 PyObject *igraphmodule_Graph_authority_score(
   igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
   static char *kwlist[] =
-    { "scale", "arpack_options", "return_eigenvalue", NULL };
-  PyObject *scale_o = Py_True;
+    { "weights", "scale", "arpack_options", "return_eigenvalue", NULL };
+  PyObject *scale_o = Py_True, *weights_o = Py_None;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
   igraphmodule_ARPACKOptionsObject *arpack_options;
   PyObject *return_eigenvalue = Py_False;
   PyObject *res_o;
   igraph_real_t value;
-  igraph_vector_t res;
+  igraph_vector_t res, *weights = 0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO!O", kwlist, &scale_o,
-                                   &igraphmodule_ARPACKOptionsType,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO!O", kwlist, &weights_o,
+	                               &scale_o, &igraphmodule_ARPACKOptionsType,
                                    &arpack_options_o, &return_eigenvalue))
     return NULL;
 
   if (igraph_vector_init(&res, 0)) return igraphmodule_handle_igraph_error();
 
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_authority_score(&self->g, &res, &value, PyObject_IsTrue(scale_o),
-      igraphmodule_ARPACKOptions_get(arpack_options))) {
+      weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
     igraphmodule_handle_igraph_error();
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_vector_destroy(&res);
     return NULL;
   }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   res_o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT); 
   igraph_vector_destroy(&res);
@@ -3277,29 +3283,35 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
 PyObject *igraphmodule_Graph_hub_score(
   igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
   static char *kwlist[] =
-    { "scale", "arpack_options", "return_eigenvalue", NULL };
-  PyObject *scale_o = Py_True;
+    { "weights", "scale", "arpack_options", "return_eigenvalue", NULL };
+  PyObject *scale_o = Py_True, *weights_o = Py_None;
   PyObject *arpack_options_o = igraphmodule_arpack_options_default;
   igraphmodule_ARPACKOptionsObject *arpack_options;
   PyObject *return_eigenvalue = Py_False;
   PyObject *res_o;
   igraph_real_t value;
-  igraph_vector_t res;
+  igraph_vector_t res, *weights = 0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO!O", kwlist, &scale_o,
-                                   &igraphmodule_ARPACKOptionsType,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO!O", kwlist, &weights_o,
+                                   &scale_o, &igraphmodule_ARPACKOptionsType,
                                    &arpack_options, &return_eigenvalue))
     return NULL;
 
   if (igraph_vector_init(&res, 0)) return igraphmodule_handle_igraph_error();
 
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
+
   arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (igraph_hub_score(&self->g, &res, &value, PyObject_IsTrue(scale_o),
-      igraphmodule_ARPACKOptions_get(arpack_options))) {
+      weights, igraphmodule_ARPACKOptions_get(arpack_options))) {
     igraphmodule_handle_igraph_error();
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_vector_destroy(&res);
     return NULL;
   }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   res_o = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT); 
   igraph_vector_destroy(&res);
@@ -8149,8 +8161,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_authority_score */
   {"authority_score", (PyCFunction)igraphmodule_Graph_authority_score,
    METH_VARARGS | METH_KEYWORDS,
-   "authority_score(scale=True, arpack_options=None, return_eigenvalue=False)\n\n"
+   "authority_score(weights=None, scale=True, arpack_options=None, return_eigenvalue=False)\n\n"
    "Calculates Kleinberg's authority score for the vertices of the graph\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@param scale: whether to normalize the scores so that the largest one\n"
    "  is 1.\n"
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
@@ -8432,8 +8446,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_hub_score */
   {"hub_score", (PyCFunction)igraphmodule_Graph_hub_score,
    METH_VARARGS | METH_KEYWORDS,
-   "hub_score(scale=True, arpack_options=None, return_eigenvalue=False)\n\n"
+   "hub_score(weights=None, scale=True, arpack_options=None, return_eigenvalue=False)\n\n"
    "Calculates Kleinberg's hub score for the vertices of the graph\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@param scale: whether to normalize the scores so that the largest one\n"
    "  is 1.\n"
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
