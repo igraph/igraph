@@ -377,6 +377,7 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
         Py_DECREF(list);
         return -1;
       }
+      Py_DECREF(list);    /* PyDict_SetItem increased the refcount */
     }
   } else {
     /* We are working with a subset of the graph. Convert the sequence to a
@@ -441,6 +442,7 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
         Py_DECREF(list);
         return -1;
       }
+      Py_DECREF(list);    /* PyDict_SetItem increased the refcount */
     }
   }
 
@@ -546,7 +548,7 @@ PyObject* igraphmodule_VertexSeq_select(igraphmodule_VertexSeqObject *self,
         igraphmodule_handle_igraph_error();
         return 0;
       }
-      if (igraph_vs_as_vector(&gr->g, result->vs, &v2)) {
+      if (igraph_vs_as_vector(&gr->g, self->vs, &v2)) {
         igraph_vector_destroy(&v);
         igraph_vector_destroy(&v2);
         igraphmodule_handle_igraph_error();
@@ -603,7 +605,7 @@ PyObject* igraphmodule_VertexSeq_select(igraphmodule_VertexSeqObject *self,
         igraphmodule_handle_igraph_error();
         return 0;
       }
-      if (igraph_vs_as_vector(&gr->g, result->vs, &v2)) {
+      if (igraph_vs_as_vector(&gr->g, self->vs, &v2)) {
         Py_DECREF(iter);
         igraph_vector_destroy(&v);
         igraph_vector_destroy(&v2);

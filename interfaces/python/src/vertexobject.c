@@ -145,7 +145,7 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
       if (dictit) {
         PyObject *value = PyList_GetItem(dictit, self->idx);
         if (value) {
-          Py_INCREF(value);
+          /* No need to Py_INCREF, PyDict_SetItem will do that */
           PyDict_SetItem(dict, name, value);
         }
       }
@@ -244,6 +244,7 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
       Py_DECREF(result);
       return -1;
     }
+    Py_DECREF(result);   /* compensating for PyDict_SetItem */
     return 0;
   }
   

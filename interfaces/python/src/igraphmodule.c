@@ -1,4 +1,4 @@
-/* -*- mode: C -*-  */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
    Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -306,12 +306,12 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
   long int i, n;
   
   attrs=(PyObject**)calloc(3, sizeof(PyObject*));
-  /*printf("Created attribute table at %p\n", attrs);*/
   if (!attrs)
     IGRAPH_ERROR("not enough memory to allocate attribute hashes", IGRAPH_ENOMEM);
   
   for (i=0; i<3; i++) {
     attrs[i] = PyDict_New();
+    RC_ALLOC("dict", attrs[i]);
   }
   graph->attr=(void*)attrs;
 
@@ -325,30 +325,30 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
       attr_rec = VECTOR(*attr)[i];
       switch (attr_rec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
-	value=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[0]);
-	break;
+        value=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[0]);
+        break;
       case IGRAPH_ATTRIBUTE_STRING:
-	igraph_strvector_get((igraph_strvector_t*)attr_rec->value, 0, &s);
-	if (s == 0) value=PyString_FromString("");
-	else value=PyString_FromString(s);
-	break;
+        igraph_strvector_get((igraph_strvector_t*)attr_rec->value, 0, &s);
+        if (s == 0) value=PyString_FromString("");
+        else value=PyString_FromString(s);
+        break;
       default:
-	IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
-	value=0;
-	break;
+        IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+        value=0;
+        break;
       }
       if (value) {
-	if (PyDict_SetItemString(dict, attr_rec->name, value)) {
-	  Py_DECREF(value);
-	  Py_DECREF(attrs[0]);
-	  Py_DECREF(attrs[1]);
-	  Py_DECREF(attrs[2]);
-	  free(graph->attr); graph->attr = 0;
-	  IGRAPH_ERROR("failed to add attributes to graph attribute hash",
-		       IGRAPH_FAILURE);
-	}
-	Py_DECREF(value);
-	value=0;
+        if (PyDict_SetItemString(dict, attr_rec->name, value)) {
+          Py_DECREF(value);
+          Py_DECREF(attrs[0]);
+          Py_DECREF(attrs[1]);
+          Py_DECREF(attrs[2]);
+          free(graph->attr); graph->attr = 0;
+          IGRAPH_ERROR("failed to add attributes to graph attribute hash",
+                       IGRAPH_FAILURE);
+        }
+        Py_DECREF(value);
+        value=0;
       }
     }
   }
@@ -379,7 +379,6 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
   int i, j;
   Py_ssize_t pos = 0;
  
-  /* printf("Copying attribute table\n"); */
   if (from->attr) {
     fromattrs=(PyObject**)from->attr;
     /* what to do with the original value of toattrs? */
@@ -387,6 +386,7 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
     for (i=0; i<3; i++) {
       if (!copy_attrs[i]) {
         toattrs[i] = PyDict_New();
+        RC_ALLOC("dict (copying, empty)", toattrs[i]);
         continue;
       }
 
@@ -397,6 +397,7 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
       }
       
       toattrs[i]=PyDict_New();
+      RC_ALLOC("dict (copying)", toattrs[i]);
       
       pos=0;
       while (PyDict_Next(fromattrs[i], &pos, &key, &value)) {
@@ -413,6 +414,7 @@ static int igraphmodule_i_attribute_copy(igraph_t *to, const igraph_t *from,
           Py_INCREF(newval);
         }
         PyDict_SetItem(toattrs[i], key, newval);
+        Py_DECREF(newval); /* compensate for PyDict_SetItem */
       }
     }
   }
@@ -433,7 +435,7 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
 
   if (attr) {
     added_attrs = (igraph_bool_t*)calloc((size_t)igraph_vector_ptr_size(attr),
-					 sizeof(igraph_bool_t));
+                                         sizeof(igraph_bool_t));
     if (!added_attrs)
       IGRAPH_ERROR("can't add vertex attributes", IGRAPH_ENOMEM);
     IGRAPH_FINALLY(free, added_attrs);
@@ -453,44 +455,44 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
     if (attr) {
       j=igraph_vector_ptr_size(attr);
       for (i=0; i<j; i++) {
-	attr_rec=VECTOR(*attr)[i];
-	if (!strcmp(attr_rec->name, PyString_AS_STRING(key))) {
-	  added_attrs[i]=1;
-	  break;
-	}
-	attr_rec=0;
+        attr_rec=VECTOR(*attr)[i];
+        if (!strcmp(attr_rec->name, PyString_AS_STRING(key))) {
+          added_attrs[i]=1;
+          break;
+        }
+        attr_rec=0;
       }
     }
     /* If we have specific values for the given attribute, attr_rec contains
      * the appropriate vector. If not, it is null. */
     if (attr_rec) {
       for (i=0; i<nv; i++) {
-	char *s;
-	PyObject *o;
-	switch (attr_rec->type) {
-	case IGRAPH_ATTRIBUTE_NUMERIC:
-	  o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
-	  break;
-	case IGRAPH_ATTRIBUTE_STRING:
-	  igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
-	  o=PyString_FromString(s);
-	  break;
-	default:
-	  IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
-	  o=0;
-	  break;
-	}
-	if (o) {
-	  if (PyList_Append(value, o) == -1)
-	    IGRAPH_ERROR("can't extend a vertex attribute hash member", IGRAPH_FAILURE);
-	  else Py_DECREF(o);
-	}
+        char *s;
+        PyObject *o;
+        switch (attr_rec->type) {
+        case IGRAPH_ATTRIBUTE_NUMERIC:
+          o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
+          break;
+        case IGRAPH_ATTRIBUTE_STRING:
+          igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
+          o=PyString_FromString(s);
+          break;
+        default:
+          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          o=0;
+          break;
+        }
+        if (o) {
+          if (PyList_Append(value, o) == -1)
+            IGRAPH_ERROR("can't extend a vertex attribute hash member", IGRAPH_FAILURE);
+          else Py_DECREF(o);
+        }
       }
     } else {
       for (i=0; i<nv; i++) {
-	if (PyList_Append(value, Py_None) == -1) {
-	  IGRAPH_ERROR("can't extend a vertex attribute hash member", IGRAPH_FAILURE);
-	}
+        if (PyList_Append(value, Py_None) == -1) {
+          IGRAPH_ERROR("can't extend a vertex attribute hash member", IGRAPH_FAILURE);
+        }
       }
     }
   }
@@ -507,34 +509,35 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
 
       value=PyList_New(j + nv);
       if (!value) {
-	IGRAPH_ERROR("can't add attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("can't add attributes", IGRAPH_ENOMEM);
       }
 
       for (i=0; i<j; i++) {
-	Py_INCREF(Py_None);
-	PyList_SET_ITEM(value, i, Py_None);
+        Py_INCREF(Py_None);
+        PyList_SET_ITEM(value, i, Py_None);
       }
 
       for (i=0; i<nv; i++) {
-	char *s;
-	PyObject *o;
-	switch (attr_rec->type) {
-	case IGRAPH_ATTRIBUTE_NUMERIC:
-	  o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
-	  break;
-	case IGRAPH_ATTRIBUTE_STRING:
-	  igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
-	  o=PyString_FromString(s);
-	  break;
-	default:
-	  IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
-	  o=0;
-	  break;
-	}
-	if (o) PyList_SET_ITEM(value, i+j, o);
+        char *s;
+        PyObject *o;
+        switch (attr_rec->type) {
+        case IGRAPH_ATTRIBUTE_NUMERIC:
+          o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
+          break;
+        case IGRAPH_ATTRIBUTE_STRING:
+          igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
+          o=PyString_FromString(s);
+          break;
+        default:
+          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          o=0;
+          break;
+        }
+        if (o) PyList_SET_ITEM(value, i+j, o);
       }
 
       PyDict_SetItemString(dict, attr_rec->name, value);
+      Py_DECREF(value);   /* compensate for PyDict_SetItemString */
     }
     free(added_attrs);
     IGRAPH_FINALLY_CLEAN(1);
@@ -547,8 +550,8 @@ static void igraphmodule_i_attribute_delete_edges(igraph_t *graph, const igraph_
 
 /* Deleting vertices */
 static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
-						     const igraph_vector_t *eidx,
-						     const igraph_vector_t *vidx) {
+                                         const igraph_vector_t *eidx,
+                                         const igraph_vector_t *vidx) {
   long int n, i, ndeleted=0;
   PyObject *key, *value, *dict, *o;
   Py_ssize_t pos=0;
@@ -572,11 +575,11 @@ static void igraphmodule_i_attribute_delete_vertices(igraph_t *graph,
       /* Move the element from index i to VECTOR(*idx)[i]-1 */
       o=PyList_GetItem(value, i);
       if (!o) {
-	/* IndexError is already set, clear it and return */
-	PyErr_Clear();
-	return;
+        /* IndexError is already set, clear it and return */
+        PyErr_Clear();
+        return;
       }
-      Py_INCREF(o);
+      Py_INCREF(o);   /* take ownership, since PyList_SetItem will steal it */
       PyList_SetItem(value, VECTOR(*vidx)[i]-1, o);
     }
   }
@@ -611,7 +614,7 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
   
   if (attr) {
     added_attrs = (igraph_bool_t*)calloc((size_t)igraph_vector_ptr_size(attr),
-					 sizeof(igraph_bool_t));
+                                         sizeof(igraph_bool_t));
     if (!added_attrs)
       IGRAPH_ERROR("can't add vertex attributes", IGRAPH_ENOMEM);
     IGRAPH_FINALLY(free, added_attrs);
@@ -631,44 +634,44 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
     if (attr) {
       j=igraph_vector_ptr_size(attr);
       for (i=0; i<j; i++) {
-	attr_rec=VECTOR(*attr)[i];
-	if (!strcmp(attr_rec->name, PyString_AS_STRING(key))) {
-	  added_attrs[i]=1;
-	  break;
-	}
-	attr_rec=0;
+        attr_rec=VECTOR(*attr)[i];
+        if (!strcmp(attr_rec->name, PyString_AS_STRING(key))) {
+          added_attrs[i]=1;
+          break;
+        }
+        attr_rec=0;
       }
     }
     /* If we have specific values for the given attribute, attr_rec contains
      * the appropriate vector. If not, it is null. */
     if (attr_rec) {
       for (i=0; i<ne; i++) {
-	char *s;
-	PyObject *o;
-	switch (attr_rec->type) {
-	case IGRAPH_ATTRIBUTE_NUMERIC:
-	  o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
-	  break;
-	case IGRAPH_ATTRIBUTE_STRING:
-	  igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
-	  o=PyString_FromString(s);
-	  break;
-	default:
-	  IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
-	  o=0;
-	  break;
-	}
-	if (o) {
-	  if (PyList_Append(value, o) == -1)
-	    IGRAPH_ERROR("can't extend an edge attribute hash member", IGRAPH_FAILURE);
-	  else Py_DECREF(o);
-	}
+        char *s;
+        PyObject *o;
+        switch (attr_rec->type) {
+        case IGRAPH_ATTRIBUTE_NUMERIC:
+          o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
+          break;
+        case IGRAPH_ATTRIBUTE_STRING:
+          igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
+          o=PyString_FromString(s);
+          break;
+        default:
+          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          o=0;
+          break;
+        }
+        if (o) {
+          if (PyList_Append(value, o) == -1)
+            IGRAPH_ERROR("can't extend an edge attribute hash member", IGRAPH_FAILURE);
+          else Py_DECREF(o);
+        }
       }
     } else {
       for (i=0; i<ne; i++) {
-	if (PyList_Append(value, Py_None) == -1) {
-	  IGRAPH_ERROR("can't extend an edge attribute hash member", IGRAPH_FAILURE);
-	}
+        if (PyList_Append(value, Py_None) == -1) {
+          IGRAPH_ERROR("can't extend an edge attribute hash member", IGRAPH_FAILURE);
+        }
       }
     }
   }
@@ -691,34 +694,35 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
 
       value=PyList_New(j+ne);
       if (!value) {
-	IGRAPH_ERROR("can't add attributes", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("can't add attributes", IGRAPH_ENOMEM);
       }
 
       for (i=0; i<j; i++) {
-	Py_INCREF(Py_None);
-	PyList_SET_ITEM(value, i, Py_None);
+        Py_INCREF(Py_None);
+        PyList_SET_ITEM(value, i, Py_None);
       }
 
       for (i=0; i<ne; i++) {
-	char *s;
-	PyObject *o;
-	switch (attr_rec->type) {
-	case IGRAPH_ATTRIBUTE_NUMERIC:
-	  o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
-	  break;
-	case IGRAPH_ATTRIBUTE_STRING:
-	  igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
-	  o=PyString_FromString(s);
-	  break;
-	default:
-	  IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
-	  o=0;
-	  break;
-	}
-	if (o) PyList_SET_ITEM(value, i+j, o);
+        char *s;
+        PyObject *o;
+        switch (attr_rec->type) {
+        case IGRAPH_ATTRIBUTE_NUMERIC:
+          o=PyFloat_FromDouble((double)VECTOR(*(igraph_vector_t*)attr_rec->value)[i]);
+          break;
+        case IGRAPH_ATTRIBUTE_STRING:
+          igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
+          o=PyString_FromString(s);
+          break;
+        default:
+          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          o=0;
+          break;
+        }
+        if (o) PyList_SET_ITEM(value, i+j, o);
       }
 
       PyDict_SetItemString(dict, attr_rec->name, value);
+      Py_DECREF(value);   /* compensate for PyDict_SetItemString */
     }
     free(added_attrs);
     IGRAPH_FINALLY_CLEAN(1);

@@ -6203,10 +6203,8 @@ int igraphmodule_Graph_set_attribute(igraphmodule_GraphObject * self,
   if (v == NULL)
     return PyDict_DelItem(((PyObject **) self->g.attr)[ATTRHASH_IDX_GRAPH],
                           k);
-  Py_INCREF(v);
   if (PyDict_SetItem(((PyObject **) self->g.attr)[ATTRHASH_IDX_GRAPH], k, v)
       == -1) {
-    Py_DECREF(v);
     return -1;
   }
   return 0;
