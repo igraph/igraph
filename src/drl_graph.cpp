@@ -257,6 +257,7 @@ void graph::scan_int ( char *filename )
 
 // read in .parms file, if present
 
+/*
 void graph::read_parms ( char *parms_file )
 {
 
@@ -336,6 +337,7 @@ void graph::read_parms ( char *parms_file )
 		  }
 
 }
+*/
 
 // init_parms -- this subroutine initializes the edge_cut variables
 // used in the original VxOrd starting with the edge_cut parameter.
@@ -1160,6 +1162,7 @@ void graph::write_coord( const char *file_name )
 // write_sim -- outputs .edges file, takes as input .coord filename,
 // with .coord extension
 
+/*
 void graph::write_sim ( const char *file_name )
 {
 
@@ -1201,6 +1204,7 @@ void graph::write_sim ( const char *file_name )
   simOUT.close();
 
 }
+*/
 
 // get_tot_energy adds up the energy for each node to give an estimate of the
 // quality of the minimization.

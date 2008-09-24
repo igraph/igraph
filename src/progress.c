@@ -22,6 +22,7 @@
 */
 
 #include "igraph.h"
+#include "config.h"
 
 static igraph_progress_handler_t *igraph_i_progress_handler=0;
 

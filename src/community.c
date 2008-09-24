@@ -26,6 +26,7 @@
 #include "random.h"
 #include "arpack.h"
 #include "arpack_internal.h"
+#include "config.h"
 
 #include <string.h>
 #include <math.h>

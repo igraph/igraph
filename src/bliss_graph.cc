@@ -27,6 +27,9 @@ Copyright (C) 2003-2006 Tommi Junttila
 #include "bliss_partition.hh"
 #include <limits.h>		// INT_MAX, etc
 
+extern bool bliss_verbose;
+extern FILE *bliss_verbstr;
+
 namespace igraph {
 
 static const bool should_not_happen = false;
@@ -487,9 +490,6 @@ typedef struct t_path_info {
 
 void AbstractGraph::search(const bool canonical, Stats &stats)
 {
-  extern bool verbose;
-  extern FILE *verbstr;
-
   const unsigned int N = get_nof_vertices();
 
   const bool write_automorphisms = 0;
@@ -566,10 +566,10 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 #endif
 
   t1.stop();
-  if(verbose) {
-    fprintf(verbstr, "Initial partition computed in %.2fs\n",
+  if(bliss_verbose) {
+    fprintf(bliss_verbstr, "Initial partition computed in %.2fs\n",
 	    t1.get_duration());
-    fflush(verbstr);
+    fflush(bliss_verbstr);
   }
   
   /*
@@ -794,7 +794,7 @@ void AbstractGraph::search(const bool canonical, Stats &stats)
 	     */
 	    if(index == cell->length && all_same_level == p.level+1)
 	      all_same_level = p.level;
-	    if (verbose) {
+	    if (bliss_verbose) {
 	      fprintf(stdout,
 		      "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
 		      p.level,
@@ -1469,9 +1469,6 @@ void Graph::change_label(const unsigned int vertex,
 
 Graph *Graph::read_dimacs(FILE *fp)
 {
-  extern bool verbose;
-  extern FILE *verbstr;
-
   Graph *g = 0;
   unsigned int nof_vertices, nof_edges;
   unsigned int line_num = 1;
@@ -1513,10 +1510,10 @@ Graph *Graph::read_dimacs(FILE *fp)
     goto error_exit;
   }
 #endif
-  if(verbose) {
-    fprintf(verbstr, "Instance has %d vertices and %d edges\n",
+  if(bliss_verbose) {
+    fprintf(bliss_verbstr, "Instance has %d vertices and %d edges\n",
             nof_vertices, nof_edges);
-    fflush(verbstr);
+    fflush(bliss_verbstr);
   }
 
   g = new Graph(nof_vertices);
@@ -1524,9 +1521,9 @@ Graph *Graph::read_dimacs(FILE *fp)
   //
   // Read vertex labels
   //
-  if(verbose) {
-    fprintf(verbstr, "Reading vertex labels...\n");
-    fflush(verbstr); }
+  if(bliss_verbose) {
+    fprintf(bliss_verbstr, "Reading vertex labels...\n");
+    fflush(bliss_verbstr); }
   while(1) {
     c = getc(fp);
     if(c != 'n') {
@@ -1548,16 +1545,16 @@ Graph *Graph::read_dimacs(FILE *fp)
     line_num++;
     g->change_label(vertex - 1, label);
   }
-  if(verbose) {
-    fprintf(verbstr, "Done\n");
-    fflush(verbstr); }
+  if(bliss_verbose) {
+    fprintf(bliss_verbstr, "Done\n");
+    fflush(bliss_verbstr); }
 
   //
   // Read edges
   //
-  if(verbose) {
-    fprintf(verbstr, "Reading edges...\n");
-    fflush(verbstr); }
+  if(bliss_verbose) {
+    fprintf(bliss_verbstr, "Reading edges...\n");
+    fflush(bliss_verbstr); }
   for(unsigned i = 0; i < nof_edges; i++) {
     unsigned int from, to;
     if(fscanf(fp, "e %u %u\n", &from, &to) != 2) {
@@ -1573,9 +1570,9 @@ Graph *Graph::read_dimacs(FILE *fp)
     line_num++;
     g->add_edge(from - 1, to - 1);
   }
-  if(verbose) {
-    fprintf(verbstr, "Done\n");
-    fflush(verbstr);
+  if(bliss_verbose) {
+    fprintf(bliss_verbstr, "Done\n");
+    fflush(bliss_verbstr);
   }
 
   return g;

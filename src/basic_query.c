@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "types.h"
+#include "config.h"
 
 /**
  * \ingroup structural

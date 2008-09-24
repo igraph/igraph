@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "memory.h"
+#include "config.h"
 #include <math.h>
 
 int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res, 

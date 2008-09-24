@@ -23,6 +23,7 @@
 
 #include "igraph.h"
 #include "config.h"
+#include "igraph_math.h"
 
 #include <ctype.h>		/* isspace */
 #include <math.h>               /* isnan */

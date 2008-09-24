@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <vector>
 
-using namespace __gnu_cxx;
+// using namespace __gnu_cxx;
 using namespace std;
 
 namespace gengraph {

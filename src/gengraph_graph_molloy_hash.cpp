@@ -9,6 +9,9 @@
 #include "gengraph_degree_sequence.h"
 #include "gengraph_graph_molloy_hash.h"
 
+#include "config.h"
+#include "igraph_math.h"
+
 namespace gengraph {
 
 //_________________________________________________________________________

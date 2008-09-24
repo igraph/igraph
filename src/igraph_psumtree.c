@@ -23,6 +23,7 @@
 
 #include "types.h"
 #include "error.h"
+#include "config.h"
 
 #include <math.h>
 #include <stdio.h>

@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include "error.h"
 #include "memory.h"
+#include "config.h"
 
 #include <limits.h>
 #include <stdio.h>

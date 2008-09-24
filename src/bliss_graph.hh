@@ -174,7 +174,7 @@ class Graph : public AbstractGraph
   static unsigned int label_invariant(Graph *g, unsigned int v);
   static unsigned int degree_invariant(Graph *g, unsigned int v);
 
-  bool refine_according_to_invariant(unsigned int (*inv)(Graph * const g,
+  bool refine_according_to_invariant(unsigned int (*inv)(Graph * g,
 							 unsigned int v));
 
   /*

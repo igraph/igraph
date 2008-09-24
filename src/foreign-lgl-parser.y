@@ -54,6 +54,7 @@ int igraph_lgl_yyerror(char *s);
 #include "types.h" 
 #include "memory.h"
 #include "error.h"
+#include "config.h"
 extern igraph_vector_t *igraph_lgl_vector;
 extern igraph_vector_t *igraph_lgl_weights;
 extern igraph_trie_t *igraph_lgl_trie;
