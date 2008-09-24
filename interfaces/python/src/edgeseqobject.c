@@ -383,6 +383,7 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
         Py_DECREF(list);
         return -1;
       }
+      Py_DECREF(list);   /* compensating for PyDict_SetItem */
     }
   } else {
     /* We are working with a subset of the graph. Convert the sequence to a
@@ -441,6 +442,7 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
         Py_DECREF(list);
         return -1;
       }
+      Py_DECREF(list);   /* compensating for PyDict_SetItem */
     }
   }
   return 0;
@@ -546,7 +548,7 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self,
         igraphmodule_handle_igraph_error();
         return 0;
       }
-      if (igraph_es_as_vector(&gr->g, result->es, &v2)) {
+      if (igraph_es_as_vector(&gr->g, self->es, &v2)) {
         igraph_vector_destroy(&v);
         igraph_vector_destroy(&v2);
         igraphmodule_handle_igraph_error();
@@ -603,7 +605,7 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self,
         igraphmodule_handle_igraph_error();
         return 0;
       }
-      if (igraph_es_as_vector(&gr->g, result->es, &v2)) {
+      if (igraph_es_as_vector(&gr->g, self->es, &v2)) {
         Py_DECREF(iter);
         igraph_vector_destroy(&v);
         igraph_vector_destroy(&v2);

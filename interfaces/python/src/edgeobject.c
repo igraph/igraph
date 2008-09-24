@@ -145,7 +145,7 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
       if (dictit) {
         PyObject *value = PyList_GetItem(dictit, self->idx);
         if (value) {
-          Py_INCREF(value);
+          /* no need to Py_INCREF, PyDict_SetItem will do that */
           PyDict_SetItem(dict, name, value);
         }
       }
@@ -261,6 +261,7 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
       Py_DECREF(result); /* TODO: is it needed here? maybe not! */
       return -1;
     }
+    Py_DECREF(result); /* compensating for PyDict_SetItem */
     return 0;
   }
   

@@ -212,18 +212,30 @@ int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector
   return 0;
 }
 
+/* struct for the unweighted variant of the HITS algorithm */
 typedef struct igraph_i_kleinberg_data_t {
   igraph_adjlist_t *in;
   igraph_adjlist_t *out;
   igraph_vector_t *tmp;
 } igraph_i_kleinberg_data_t;
 
-int igraph_i_kleinberg2(igraph_real_t *to, const igraph_real_t *from,
-			long int n, void *extra) {
+/* struct for the weighted variant of the HITS algorithm */
+typedef struct igraph_i_kleinberg_data2_t {
+  const igraph_t *graph;
+  igraph_adjedgelist_t *in;
+  igraph_adjedgelist_t *out;
+  igraph_vector_t *tmp;
+  const igraph_vector_t *weights;
+} igraph_i_kleinberg_data2_t;
 
-  igraph_adjlist_t *in = ((igraph_i_kleinberg_data_t*)extra)->in;
-  igraph_adjlist_t *out = ((igraph_i_kleinberg_data_t*)extra)->out;
-  igraph_vector_t *tmp = ((igraph_i_kleinberg_data_t*)extra)->tmp;
+/* ARPACK auxiliary routine for the unweighted HITS algorithm */
+int igraph_i_kleinberg_unweighted(igraph_real_t *to,
+                                  const igraph_real_t *from,
+                                  long int n, void *extra) {
+  igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
+  igraph_adjlist_t *in = data->in;
+  igraph_adjlist_t *out = data->out;
+  igraph_vector_t *tmp = data->tmp;
   igraph_vector_t *neis;
   long int i, j, nlen;
   
@@ -250,20 +262,63 @@ int igraph_i_kleinberg2(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
+/* ARPACK auxiliary routine for the weighted HITS algorithm */
+int igraph_i_kleinberg_weighted(igraph_real_t *to,
+                                const igraph_real_t *from,
+                                long int n, void *extra) {
+
+  igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
+  igraph_adjedgelist_t *in = data->in; 
+  igraph_adjedgelist_t *out = data->out; 
+  igraph_vector_t *tmp = data->tmp;
+  const igraph_vector_t *weights = data->weights; 
+  const igraph_t *g = data->graph;
+  igraph_vector_t *neis;
+  long int i, j, nlen;
+  
+  for (i=0; i<n; i++) {
+    neis=igraph_adjedgelist_get(in, i);
+    nlen=igraph_vector_size(neis);
+    VECTOR(*tmp)[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei_edge = VECTOR(*neis)[j];
+      long int nei=IGRAPH_OTHER(g, nei_edge, i);
+      VECTOR(*tmp)[i] += from[nei] * VECTOR(*weights)[nei_edge];
+    }
+  }
+  
+  for (i=0; i<n; i++) {
+    neis=igraph_adjedgelist_get(out, i);
+    nlen=igraph_vector_size(neis);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei_edge=VECTOR(*neis)[j];
+      long int nei=IGRAPH_OTHER(g, nei_edge, i);
+      to[i] += VECTOR(*tmp)[nei] * VECTOR(*weights)[nei_edge];
+    }
+  }      
+  
+  return 0;
+}
+
 int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 		       igraph_real_t *value, igraph_bool_t scale,
+			   const igraph_vector_t *weights,
 		       igraph_arpack_options_t *options, int inout) {
   
   igraph_adjlist_t myinadjlist, myoutadjlist;
+  igraph_adjedgelist_t myinadjedgelist, myoutadjedgelist;
   igraph_adjlist_t *inadjlist, *outadjlist;
+  igraph_adjedgelist_t *inadjedgelist, *outadjedgelist;
   igraph_vector_t tmp;
   igraph_vector_t values;
   igraph_matrix_t vectors;
   igraph_i_kleinberg_data_t extra;
+  igraph_i_kleinberg_data2_t extra2;
   long int i;
   
   options->n=igraph_vcount(graph);
-  options->start=1;
+  options->start=1;     /* no random start vector */
   
   IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
@@ -272,19 +327,30 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   if (inout==0) {
     inadjlist=&myinadjlist; 
     outadjlist=&myoutadjlist;
+    inadjedgelist=&myinadjedgelist;
+    outadjedgelist=&myoutadjedgelist;
   } else if (inout==1) {
     inadjlist=&myoutadjlist;
     outadjlist=&myinadjlist;
+    inadjedgelist=&myoutadjedgelist;
+    outadjedgelist=&myinadjedgelist;
   } else {
     /* This should not happen */
     IGRAPH_ERROR("Invalid 'inout' argument, plese do not call "
 		 "this funtion directly", IGRAPH_FAILURE);
   }
 
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN));
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &myinadjlist);
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT));
-  IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
+  if (weights == 0) {
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &myinadjlist, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &myinadjlist);
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &myoutadjlist, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &myoutadjlist);
+  } else {
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &myinadjedgelist, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &myinadjedgelist);
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &myoutadjedgelist, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &myoutadjedgelist);
+  }
 
   IGRAPH_CHECK(igraph_degree(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0));
   for (i=0; i<options->n; i++) {
@@ -296,20 +362,29 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   }
 	
   extra.in=inadjlist; extra.out=outadjlist; extra.tmp=&tmp;
+  extra2.in=inadjedgelist; extra2.out=outadjedgelist; extra2.tmp=&tmp;
+  extra2.graph=graph; extra2.weights=weights;
 
-  options->n = igraph_vcount(graph);
   options->nev = 1;
   options->ncv = 3;
   options->which[0]='L'; options->which[1]='M';
-  options->start=1;		/* no random start vector */
 
-  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg2, &extra,
-				     options, 0, &values, &vectors));
+  if (weights == 0) {
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,
+                                       options, 0, &values, &vectors));
+    igraph_adjlist_destroy(&myoutadjlist);
+    igraph_adjlist_destroy(&myinadjlist);
+	IGRAPH_FINALLY_CLEAN(2);
+  } else {
+    IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_weighted, &extra2,
+                                       options, 0, &values, &vectors));
+    igraph_adjedgelist_destroy(&myoutadjedgelist);
+    igraph_adjedgelist_destroy(&myinadjedgelist);
+	IGRAPH_FINALLY_CLEAN(2);
+  }
 
-  igraph_adjlist_destroy(&myoutadjlist);
-  igraph_adjlist_destroy(&myinadjlist);
   igraph_vector_destroy(&tmp);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(1);
 
   if (value) { 
     *value = VECTOR(values)[0];
@@ -327,6 +402,11 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
       if (tmp>amax) { amax=tmp; which=i; }
     }
     if (scale && amax!=0) { igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); }
+
+    /* Correction for numeric inaccuracies (eliminating -0.0) */
+    for (i=0; i<options->n; i++) {
+      if (VECTOR(*vector)[i] <= 0) VECTOR(*vector)[i] = 0;
+    }
   }
   
   if (options->info) {
@@ -360,6 +440,8 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
  *    corresponding to the calculated eigenvector is stored here.
  * \param scale If not zero then the result will be scaled, such that
  *     the absolute value of the maximum centrality is one.
+ * \param weights A null pointer (=no edge weights), or a vector
+ *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices) parameter and 
@@ -377,9 +459,10 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
 int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
 		     igraph_real_t *value, igraph_bool_t scale,
+			 const igraph_vector_t *weights,
 		     igraph_arpack_options_t *options) {
 
-  return igraph_i_kleinberg(graph, vector, value, scale, options, 0);
+  return igraph_i_kleinberg(graph, vector, value, scale, weights, options, 0);
 }
 
 /**
@@ -403,6 +486,8 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  *    corresponding to the calculated eigenvector is stored here.
  * \param scale If not zero then the result will be scaled, such that
  *     the absolute value of the maximum centrality is one.
+ * \param weights A null pointer (=no edge weights), or a vector
+ *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices) parameter and 
@@ -420,9 +505,10 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
 			    
 int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
 			   igraph_real_t *value, igraph_bool_t scale,
+			   const igraph_vector_t *weights,
 			   igraph_arpack_options_t *options) {
 
-  return igraph_i_kleinberg(graph, vector, value, scale, options, 1);
+  return igraph_i_kleinberg(graph, vector, value, scale, weights, options, 1);
 }
 
 typedef struct igraph_i_pagerank_data_t {
