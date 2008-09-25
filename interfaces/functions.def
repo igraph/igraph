@@ -466,14 +466,18 @@ igraph_eigenvector_centrality:
 
 igraph_hub_score:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                BOOLEAN scale=True, INOUT ARPACKOPT options=igraph.arpack.default
+                BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
+                INOUT ARPACKOPT options=igraph.arpack.default
         DEFAULT-R: options=igraph.arpack.default
+        DEPS: weights ON graph
         NAME-R: hub.score
 
 igraph_authority_score:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                BOOLEAN scale=True, INOUT ARPACKOPT options=igraph.arpack.default
+                BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
+                INOUT ARPACKOPT options=igraph.arpack.default
         DEFAULT-R: options=igraph.arpack.default
+        DEPS: weights ON graph
         NAME-R: authority.score
 
 igraph_arpack_rssolve:

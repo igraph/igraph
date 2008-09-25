@@ -5,14 +5,17 @@
 \title{Kleinberg's centrality scores.}
 \description{Kleinberg's hub and authority scores.}
 \usage{
-authority.score (graph, scale = TRUE, options = igraph.arpack.default) 
-hub.score (graph, scale = TRUE, options = igraph.arpack.default) 
+authority.score (graph, scale = TRUE, weights=NULL, options = igraph.arpack.default) 
+hub.score (graph, scale = TRUE, weights=NULL, options = igraph.arpack.default) 
 }
 \arguments{
   \item{graph}{The input graph.}
   \item{scale}{Logical scalar, whether to scale the result to have a
     maximum score of one. If no scaling is used then the result vector
     has unit length in the Euclidean norm.}
+  \item{weights}{Optional positive weight vector for calculating
+    weighted scores. If the graph has a \code{weight} edge
+    attribute, then this is used by default.}
   \item{options}{A named list, to override some ARPACK options. See
     \code{\link{arpack}} for details.}
 }
