@@ -1,16 +1,91 @@
+/* src/config.h.in.  Generated from configure.in by autoheader.  */
 
-#ifndef R_IGRAPH_CONFIG_H
-#define R_IGRAPH_CONFIG_H
+/* Define to 1 if you have the `expm1' function. */
+#undef HAVE_EXPM1
 
-#define HAVE_FMEMOPEN @HAVE_FMEMOPEN@
-#define HAVE_OPEN_MEMSTREAM @HAVE_OPEN_MEMSTREAM@
+/* Define to 1 if you have the `finite' function. */
+#undef HAVE_FINITE
 
-#define HAVE_LIBXML @HAVE_LIBXML@
+/* Define to 1 if you have the `fmemopen' function. */
+#undef HAVE_FMEMOPEN
 
-#define HAVE_RINTF @HAVE_RINTF@
+/* Define to 1 if you have the `fmin' function. */
+#undef HAVE_FMIN
 
-#define HAVE_FINITE @HAVE_FINITE@
+/* Define to 1 if you have the GMP library */
+#undef HAVE_GMP
 
-#define HAVE_GMP @HAVE_GMP@
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
 
-#endif
+/* Define to 1 if you have the libxml2 libraries installed */
+#undef HAVE_LIBXML
+
+/* Define to 1 if you have the `log1p' function. */
+#undef HAVE_LOG1P
+
+/* Define to 1 if you have the `log2' function. */
+#undef HAVE_LOG2
+
+/* Define to 1 if you have the `logbl' function. */
+#undef HAVE_LOGBL
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `open_memstream' function. */
+#undef HAVE_OPEN_MEMSTREAM
+
+/* Define to 1 if you have the `rint' function. */
+#undef HAVE_RINT
+
+/* Define to 1 if you have the `rintf' function. */
+#undef HAVE_RINTF
+
+/* Define to 1 if you have the `round' function. */
+#undef HAVE_ROUND
+
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the sys/times.h header */
+#undef HAVE_TIMES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS

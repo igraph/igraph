@@ -68,7 +68,7 @@ static double rint (double x)
 #endif
 #endif
 
-#if HAVE_RINTF != 1
+#ifndef HAVE_RINTF
 static float rintf (float x)
 {
    return ( (x<(float)0.) ? -(float)floor(-x+.5) : (float)floor(x+.5) );

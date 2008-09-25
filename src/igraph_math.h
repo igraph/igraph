@@ -25,6 +25,7 @@
 #define IGRAPH_MATH_H
 
 #include "config.h"
+#include <math.h>
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
@@ -42,7 +43,6 @@ __BEGIN_DECLS
  * Compiler-related hacks, mostly because of Microsoft Visual C++
  */
 double igraph_i_fdiv(const double a, const double b);
-int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 
 double igraph_log2(const double a);
 long double igraph_logbl(long double a);
@@ -61,6 +61,7 @@ double igraph_fmin(double a, double b);
 #define fmin(a,b) igraph_fmin((a),(b))
 #endif
 #ifndef HAVE_SNPRINTF
+int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 #define snprintf igraph_i_snprintf
 #endif
 

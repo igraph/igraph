@@ -1,5 +1,6 @@
 AC_INIT(igraph, @VERSION@, csardi@rmki.kfki.hu)
 AC_CONFIG_SRCDIR(src/rinterface.c)
+AC_CONFIG_HEADERS(src/config.h)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -12,19 +13,8 @@ AC_SUBST(HAVE_OPEN_MEMSTREAM)
 
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([rintf], [HAVE_RINTF=1], [HAVE_RINTF=0])
-AC_CHECK_FUNCS([finite], [HAVE_FINITE=1], [HAVE_FINITE=0])
-AC_CHECK_FUNCS([expm1], [HAVE_EXPM1=1], [HAVE_EMPM1=0])
-AC_CHECK_FUNCS([rint], [HAVE_RINT=1], [HAVE_RINT=0])
-AC_CHECK_FUNCS([log2], [HAVE_LOG2=1], [HAVE_LOG2=0])
-AC_CHECK_FUNCS([logbl], [HAVE_LOGBL=1], [HAVE_LOGBL=0])
-AC_CHECK_FUNCS([snprintf], [HAVE_SNPRINTF=1], [HAVE_SNPRINTF=0])
-AC_CHECK_FUNCS([log1p], [HAVE_LOG1P=1], [HAVE_LOG1P=0])
-AC_CHECK_FUNCS([round], [HAVE_ROUND=1], [HAVE_ROUND=0])
-AC_CHECK_FUNCS([fmin], [HAVE_FMIN=1], [HAVE_FMIN=0])
+AC_CHECK_FUNCS([rintf finite expm1 rint log2 logbl snprintf log1p round fmin])
 LIBS=$LIBS_SAVE
-AC_SUBST(HAVE_RINTF)
-AC_SUBST(HAVE_FINITE)
 
 AC_CHECK_HEADER([sys/times.h], 
       [AC_DEFINE([HAVE_TIMES_H], [1], [Define to 1 if you have the sys/times.h header])])
@@ -83,6 +73,6 @@ fi
 AC_SUBST(HAVE_GMP)
 AC_SUBST(GMP_LIBS)
 
-AC_CONFIG_FILES([src/config.h R/config.R src/Makevars])
+AC_CONFIG_FILES([R/config.R src/Makevars])
 
 AC_OUTPUT

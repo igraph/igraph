@@ -13,7 +13,7 @@ $LIBTOOLIZE --force --copy
 autoheader
 automake --add-missing --copy
 autoconf
-cd interfaces/R && autoconf 
+cd interfaces/R && autoheader && autoconf
 cd -
 cd interfaces/java && autoconf
 cd -

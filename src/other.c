@@ -252,7 +252,7 @@ double igraph_i_fdiv(const double a, const double b)
    return a / b;
 }
 
-#ifdef _MSC_VER
+#ifndef HAVE_SNPRINTF
 /**
  * Internal function, replacement for snprintf
  * Used only in case of the Microsoft Visual C compiler which does not
@@ -275,3 +275,4 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
 }
 
 #endif
+

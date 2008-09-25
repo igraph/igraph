@@ -23,10 +23,10 @@
 
 #include "igraph.h"
 #include "config.h"
+#include <math.h>               /* isnan */
 #include "igraph_math.h"
 
 #include <ctype.h>		/* isspace */
-#include <math.h>               /* isnan */
 #include <string.h>
 #include "memory.h"
 #include <stdarg.h> 		/* va_start & co */
