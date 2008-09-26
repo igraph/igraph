@@ -1,3 +1,12 @@
+2008-09-26  Gabor Csardi  <csardi@szaffi>
+
+	* src/basic_query.c (are_connected) : speeded up by using 
+	the new igraph_get_eid2
+
+	* src/type_indexededgelist.c (igraph_get_eid2) : added, 
+	the same as igraph_get_eid, but does not fail if the edge
+	is not in the graph; instead it returns a negative value in eid
+
 2008-09-11  Gabor Csardi  <csardi@szaffi>
 
 	* src/gengraph_mr-connected.cpp (igraph_degree_sequence_game_vl) :

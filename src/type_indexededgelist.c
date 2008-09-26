@@ -1058,6 +1058,36 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
   return IGRAPH_SUCCESS;  
 }
 
+int igraph_get_eid2(const igraph_t *graph, igraph_integer_t *eid,
+		   igraph_integer_t pfrom, igraph_integer_t pto,
+		   igraph_bool_t directed) {
+
+  long int from=pfrom, to=pto;
+  long int nov=igraph_vcount(graph);
+
+  if (from < 0 || to < 0 || from > nov-1 || to > nov-1) {
+    IGRAPH_ERROR("cannot get edge id", IGRAPH_EINVVID);
+  }
+
+  *eid=-1;
+  if (igraph_is_directed(graph)) {
+
+    /* Directed graph */
+    FIND_DIRECTED_EDGE(graph,from,to,eid);
+    if (!directed && *eid < 0) {
+      FIND_DIRECTED_EDGE(graph,to,from,eid);
+    }
+    
+  } else {
+
+    /* Undirected graph, they only have one mode */
+    FIND_UNDIRECTED_EDGE(graph,from,to,eid);
+
+  }
+
+  return IGRAPH_SUCCESS;  
+}
+
 
 int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
 		    const igraph_vector_t *pairs, igraph_bool_t directed) {
