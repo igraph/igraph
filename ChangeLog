@@ -1,6 +1,6 @@
 2008-09-26  Gabor Csardi  <csardi@szaffi>
 
-	* src/basic_query.c (are_connected) : speeded up by using 
+	* src/basic_query.c (igraph_are_connected) : speeded up by using 
 	the new igraph_get_eid2
 
 	* src/type_indexededgelist.c (igraph_get_eid2) : added, 
