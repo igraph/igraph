@@ -1,5 +1,8 @@
 2008-09-26  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/igraph/R/CohesiveBlocks.R (cohesive.blocks) : 
+	add 'cutsetAlgorithm' argument
+
 	* interfaces/R/igraph/R/flow.R (igraph.mincut) : report error 
 	if (unimplemented) s-t minimum cut is requested
 

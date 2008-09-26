@@ -36,12 +36,14 @@
 
 cohesive.blocks <- function(graph, db=NULL,
                             useDB=(vcount(graph)>400 && require(RSQLite)),
+                            cutsetAlgorithm=c("patvardhan", "kanevsky"),
                             verbose=igraph.par("verbose")) {
 
+    cutsetAlgorithm <- igraph.match.arg(cutsetAlgorithm)
     if(useDB && !require(RSQLite)) stop("package `RSQLite` required")
     if(!require(digest)) stop("package `digest` required")
     if(!is.igraph(graph)) stop("`graph' must be an igraph object")
-    verbose <- as.logical(verbose)    
+    verbose <- as.logical(verbose)
     
     Gin <- graph
     graph <- simplify(as.undirected2(graph))
@@ -178,10 +180,10 @@ cohesive.blocks <- function(graph, db=NULL,
                 if(newk>k){
                     kcomp <- list(as.numeric(V(g)))
                 } else {
-                    kcomp <- kComponents(g, k, verbose=verbose)
+                    kcomp <- kComponents(g, k, cutsetAlgorithm=cutsetAlgorithm, verbose=verbose)
                 }
             } else { ## otherwise just use kComponents()
-                kcomp <- kComponents(g, k, verbose=verbose)
+                kcomp <- kComponents(g, k, cutsetAlgorithm=cutsetAlgorithm, verbose=verbose)
             }
             
             kcomp <- lapply(kcomp, function(thisV){V(g)[thisV]$cbid})
@@ -404,10 +406,10 @@ find.all.min.cutsets <- function(g, k=NULL){
     }
 }
 
-kComponents <- function(g, k=NULL, type="new", verbose=igraph.par("verbose")){
+kComponents <- function(g, k=NULL, cutsetAlgorithm, verbose=igraph.par("verbose")){
     if(vcount(g)<1) return(list())
     V(g)$csid <- as.numeric(V(g))
-    cs <- if(type=="old"){find.all.min.cutsets(g, k)} else {kCutsets2(g, k, verbose=verbose)}
+    cs <- if(cutsetAlgorithm=="kanevsky"){find.all.min.cutsets(g, k)} else {kCutsets2(g, k, verbose=verbose)}
     theseBlocks <- list()
     if(length(cs)==0){## not connected
         cls <- clusters(g)
