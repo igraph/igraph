@@ -53,7 +53,7 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
   }
   if (is.null(source) && !is.null(target) ||
       is.null(target) && !is.null(source)) {
-    stop("Please give both source and target oe neither")
+    stop("Please give both source and target or neither")
   }
   if (!is.null(capacity)) {
     capacity <- as.numeric(capacity)
@@ -70,9 +70,13 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
             PACKAGE="igraph")
     }
   } else {
-    .Call("R_igraph_st_mincut_value", graph, as.numeric(source),
-          as.numeric(target), capacity,
-          PACKAGE="igraph")
+    if (value.only) {
+      .Call("R_igraph_st_mincut_value", graph, as.numeric(source),
+            as.numeric(target), capacity,
+            PACKAGE="igraph")
+    } else {
+      stop("Calculating minimum s-t cuts is not implemented yet")
+    }
   }
 }
 
