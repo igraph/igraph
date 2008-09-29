@@ -76,6 +76,6 @@ AT_CLEANUP
 
 AT_SETUP([Query many edge ids (igraph_get_eids): ])
 AT_KEYWORDS([igraph_get_eids edge id])
-AT_COMPILE_CHECK([simple/igraph_get_eids.c])
+AT_COMPILE_CHECK([simple/igraph_get_eids.c], [simple/igraph_get_eids.out])
 AT_CLEANUP
 
