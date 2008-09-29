@@ -34,7 +34,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 int main() {
   
   igraph_t g;
-  igraph_vector_t bet;
+  igraph_vector_t bet, bet2, weights;
 
   /*******************************************************/
 
@@ -65,18 +65,33 @@ int main() {
   
   igraph_vector_init(&bet, 0);
   
-  igraph_betweenness_estimate(/* graph=     */ &g, 
+  igraph_betweenness_estimate(/* graph=     */ &g,
 			      /* res=       */ &bet,
 			      /* vids=      */ igraph_vss_all(),
 			      /* directed = */ 0,
 			      /* cutoff=    */ 3,
 			      /* weights=   */ 0);
 
-/*   print_vector(&bet, stdout); */
-  igraph_vector_destroy(&bet);
-  igraph_destroy(&g);
+  igraph_vector_init(&bet2, 0);
+  igraph_vector_init(&weights, igraph_ecount(&g));
+  igraph_vector_fill(&weights, 1.0);
+  
+  igraph_betweenness_estimate(/* graph=     */ &g, 
+			      /* res=       */ &bet2,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ 3,
+			      /* weights=   */ &weights);
 
-  /*******************************************************/  
+  if (!igraph_vector_is_equal(&bet, &bet2)) {
+    printf("gebasz"); 
+    return 1;
+  }
+
+  igraph_vector_destroy(&bet);
+  igraph_vector_destroy(&bet2);
+  igraph_vector_destroy(&weights);
+  igraph_destroy(&g);
   
   return 0;
 }
