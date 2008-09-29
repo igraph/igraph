@@ -1562,6 +1562,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
   for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     
     long int source=IGRAPH_VIT_GET(vit);
+    igraph_indheap_clear(&Q);
     igraph_indheap_push_with_index(&Q, source, 0);
     VECTOR(which)[source]=i+1;
     VECTOR(dist)[source]=0.0;
@@ -1574,6 +1575,8 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
       /* Now check all neighbors of minnei for a shorter path */
       igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
       long int nlen=igraph_vector_size(neis);
+
+      if (cutoff>0 && mindist>=cutoff) break;      
       
       VECTOR(*res)[i] += mindist;
       nodes_reached++;
@@ -1718,6 +1721,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   for (IGRAPH_VIT_RESET(vit), i=0; 
        !IGRAPH_VIT_END(vit); 
        IGRAPH_VIT_NEXT(vit), i++) {
+    igraph_dqueue_clear(&q);
     IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(vit)));
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
     nodes_reached=1;
@@ -1730,9 +1734,9 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
       long int act=igraph_dqueue_pop(&q);
       long int actdist=igraph_dqueue_pop(&q);
       
-      VECTOR(*res)[i] += actdist;
+      if (cutoff>0 && actdist>=cutoff) break;
 
-      if (cutoff>0 && actdist>=cutoff) continue;
+      VECTOR(*res)[i] += actdist;
 
       neis=igraph_adjlist_get(&allneis, act);
       for (j=0; j<igraph_vector_size(neis); j++) {
