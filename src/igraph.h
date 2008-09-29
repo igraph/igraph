@@ -737,10 +737,12 @@ int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
 int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 				      const igraph_vector_t *weights);
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res, 
-		     const igraph_vs_t vids, igraph_neimode_t mode);
+		     const igraph_vs_t vids, igraph_neimode_t mode,
+		     const igraph_vector_t *weights);
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
-                              igraph_integer_t cutoff);
+                              igraph_integer_t cutoff,
+			      const igraph_vector_t *weights);
 int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
 			  const igraph_vs_t from, igraph_neimode_t mode);
 int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,

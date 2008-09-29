@@ -6,9 +6,9 @@
 \description{Cloness centrality measures how many steps is required
   to access every other vertex from a given vertex.}
 \usage{
-closeness(graph, v=V(graph), mode = c("all", "out", "in"))
+closeness(graph, v=V(graph), mode = c("all", "out", "in"), weights = NULL)
 closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
-       "total"), cutoff) 
+       "total"), cutoff, weights = NULL) 
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -20,6 +20,9 @@ closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
     for undirected graphs.}
   \item{cutoff}{The maximum path length to consider when calculating the
     betweenness. If zero or negative then there is no such limit.}
+  \item{weights}{Optional positive weight vector for calculating
+    weighted closeness. If the graph has a \code{weight} edge
+    attribute, then this is used by default.}
 }
 \details{The closeness centrality of a vertex is defined by the inverse
   of the average length of the shortest paths to/from all the other

@@ -99,19 +99,6 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
   res
 }
 
-closeness <- function(graph, v=V(graph), mode=c("all", "out", "in")) {
-  
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "out"=1, "in"=2, "all"=3)
-  
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_closeness", graph, as.igraph.vs(v), as.numeric(mode),
-        PACKAGE="igraph")
-}
-
 shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
                            weights=NULL) {
 

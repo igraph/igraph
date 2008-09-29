@@ -1482,6 +1482,9 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  *          the directed graph is considered as an
  *          undirected one for the computation.
  *        \endclist
+ * \param weights An optional vector containing edge weights for
+ *        weighted closeness. Supply a null pointer here for
+ *        traditional, unweighted closeness.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -1502,8 +1505,111 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  *   See \ref igraph_closeness_estimate() to estimate closeness values.
  */
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
-                     const igraph_vs_t vids, igraph_neimode_t mode) {
-  return igraph_closeness_estimate(graph, res, vids, mode, -1);
+                     const igraph_vs_t vids, igraph_neimode_t mode, 
+		     const igraph_vector_t *weights) {
+  return igraph_closeness_estimate(graph, res, vids, mode, -1, weights);
+}
+
+int igraph_closeness_estimate_weighted(const igraph_t *graph, 
+				       igraph_vector_t *res, 
+				       const igraph_vs_t vids, 
+				       igraph_neimode_t mode,
+				       igraph_integer_t cutoff,
+				       const igraph_vector_t *weights) {
+
+  /* See igraph_shortest_paths_dijkstra() for the implementation 
+     details and the dirty tricks. */
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  
+  igraph_indheap_t Q;
+  igraph_vit_t vit;
+  long int nodes_to_calc;
+  
+  igraph_lazy_adjedgelist_t adjlist;
+  long int i, j;
+  
+  igraph_vector_t dist;
+  igraph_vector_long_t which;
+  long int nodes_reached;
+  
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
+  
+  if (igraph_vector_min(weights) < 0) {
+    IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  
+  nodes_to_calc=IGRAPH_VIT_SIZE(vit);
+  
+  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
+  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
+  IGRAPH_CHECK(igraph_vector_long_init(&which, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &which);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
+  igraph_vector_null(res);
+
+  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    
+    long int source=IGRAPH_VIT_GET(vit);
+    igraph_indheap_push_with_index(&Q, source, 0);
+    VECTOR(which)[source]=i+1;
+    VECTOR(dist)[source]=0.0;
+    nodes_reached=0;
+    
+    while (!igraph_indheap_empty(&Q)) {
+      long int minnei=igraph_indheap_max_index(&Q);
+      igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+      
+      /* Now check all neighbors of minnei for a shorter path */
+      igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+      long int nlen=igraph_vector_size(neis);
+      
+      VECTOR(*res)[i] += mindist;
+      nodes_reached++;
+      
+      for (j=0; j<nlen; j++) {
+	long int edge=VECTOR(*neis)[j];
+	long int to=IGRAPH_OTHER(graph, edge, minnei);
+	igraph_real_t altdist=mindist+VECTOR(*weights)[edge];
+	igraph_real_t curdist=VECTOR(dist)[to];
+	if (VECTOR(which)[to] != i+1) {
+	  /* First non-infinite distance */
+	  VECTOR(which)[to]=i+1;
+	  VECTOR(dist)[to]=altdist;
+	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+	} else if (altdist < curdist) {
+	  /* This is a shorter path */
+	  VECTOR(dist)[to]=altdist;
+	  IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+	}
+      }
+
+    } /* !igraph_indheap_empty(&Q) */
+
+    VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
+    VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
+
+  } /* !IGRAPH_VIT_END(vit) */
+
+  igraph_vector_long_destroy(&which);
+  igraph_vector_destroy(&dist);
+  igraph_lazy_adjedgelist_destroy(&adjlist);
+  igraph_indheap_destroy(&Q);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  return 0;
 }
 
 /**
@@ -1549,6 +1655,9 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
  * \param cutoff The maximal length of paths that will be considered.
  *        If zero or negative, the exact closeness will be calculated
  *        (no upper limit on path lengths).
+ * \param weights An optional vector containing edge weights for
+ *        weighted closeness. Supply a null pointer here for
+ *        traditional, unweighted closeness.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -1569,7 +1678,8 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
  */
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
-                              igraph_integer_t cutoff) {
+                              igraph_integer_t cutoff,
+			      const igraph_vector_t *weights) {
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t already_counted, *neis;
   long int i, j;
@@ -1580,6 +1690,11 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   
   long int nodes_to_calc;
   igraph_vit_t vit;
+
+  if (weights) { 
+    return igraph_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
+					      weights);
+  }
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
