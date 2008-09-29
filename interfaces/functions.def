@@ -524,8 +524,9 @@ igraph_is_chordal:
 #######################################
 
 igraph_laplacian:
-        PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False, \
+                EDGEWEIGHTS weights=NULL
+        DEPS: weights ON graph
 
 #######################################
 # Components

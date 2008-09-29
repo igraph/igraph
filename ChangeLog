@@ -1,5 +1,8 @@
 2008-09-29  Gabor Csardi  <csardi@szaffi>
 
+	* src/spectral_properties.c (igraph_laplacian) : added 'weights' 
+	argument
+
 	* src/type_indexededgelist.c (igraph_get_eids) : rewritten to
 	use binary search. In practice it is faster only if we search 
 	for adjacent edges of high-degree vertices frequently

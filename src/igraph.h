@@ -869,7 +869,8 @@ int igraph_is_chordal(const igraph_t *graph,
 /* -------------------------------------------------- */
 
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-		     igraph_bool_t normalized);
+		     igraph_bool_t normalized, 
+		     const igraph_vector_t *weights);
 
 /* -------------------------------------------------- */
 /* Components                                         */
