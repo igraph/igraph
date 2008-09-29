@@ -294,7 +294,7 @@ igraph_closeness:
 
 igraph_closeness_estimate:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
-                NEIMODE mode=OUT, INTEGER cutoff, EDGEWEIGHTS weights=NULL
+                NEIMODE mode=OUT, REAL cutoff, EDGEWEIGHTS weights=NULL
         DEPS: vids ON graph, weights ON graph
         NAME-R: closeness.estimate
 
@@ -335,7 +335,7 @@ igraph_betweenness:
 
 igraph_betweenness_estimate:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
-                BOOLEAN directed=True, INTEGER cutoff, EDGEWEIGHTS weights=NULL
+                BOOLEAN directed=True, REAL cutoff, EDGEWEIGHTS weights=NULL
         DEPS: vids ON graph, weights ON graph
         NAME-R: betweenness.estimate
         FLAGS: PROGRESS
@@ -346,7 +346,7 @@ igraph_edge_betweenness:
 
 igraph_edge_betweenness_estimate:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True, \
-                INTEGER cutoff
+                REAL cutoff
         NAME-R: edge.betweenness.estimate
 
 igraph_pagerank_old:

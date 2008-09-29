@@ -852,7 +852,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 					 igraph_vector_t *res, 
 					 const igraph_vs_t vids, 
 					 igraph_bool_t directed,
-					 igraph_integer_t cutoff, 
+					 igraph_real_t cutoff, 
 					 const igraph_vector_t *weights) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -1049,7 +1049,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
  */
 int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 			const igraph_vs_t vids, igraph_bool_t directed,
-                        igraph_integer_t cutoff, const igraph_vector_t *weights) {
+                        igraph_real_t cutoff, const igraph_vector_t *weights) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
@@ -1290,7 +1290,7 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  *     of the vertices in a graph.
  */
 int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-                                     igraph_bool_t directed, igraph_integer_t cutoff) {
+                                     igraph_bool_t directed, igraph_real_t cutoff) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
@@ -1514,7 +1514,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
 				       igraph_vector_t *res, 
 				       const igraph_vs_t vids, 
 				       igraph_neimode_t mode,
-				       igraph_integer_t cutoff,
+				       igraph_real_t cutoff,
 				       const igraph_vector_t *weights) {
 
   /* See igraph_shortest_paths_dijkstra() for the implementation 
@@ -1678,7 +1678,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
  */
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
-                              igraph_integer_t cutoff,
+                              igraph_real_t cutoff,
 			      const igraph_vector_t *weights) {
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t already_counted, *neis;

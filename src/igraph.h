@@ -741,7 +741,7 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
 		     const igraph_vector_t *weights);
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
-                              igraph_integer_t cutoff,
+                              igraph_real_t cutoff,
 			      const igraph_vector_t *weights);
 int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
 			  const igraph_vs_t from, igraph_neimode_t mode);
@@ -777,12 +777,12 @@ int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
 		       const igraph_vector_t *weights);
 int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 			        const igraph_vs_t vids, igraph_bool_t directed,
-                                igraph_integer_t cutoff, 
+                                igraph_real_t cutoff, 
 				const igraph_vector_t *weights);
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed);
 int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-                            igraph_bool_t directed, igraph_integer_t cutoff);
+                            igraph_bool_t directed, igraph_real_t cutoff);
 int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 
 			const igraph_vs_t vids, igraph_bool_t directed,
 			igraph_integer_t niter, igraph_real_t eps, 
