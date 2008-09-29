@@ -65,6 +65,11 @@ int igraph_indheap_init           (igraph_indheap_t* h, long int alloc_size) {
  return 0;  
 }
 
+int igraph_indheap_clear(igraph_indheap_t *h) {
+  h->end=h->stor_begin;
+  return 0;
+}
+
 /**
  * \ingroup indheap
  * \brief Initializes and build an indexed heap from a C array (constructor).
