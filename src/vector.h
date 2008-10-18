@@ -197,6 +197,14 @@ void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v);
 
+/*-----------*/
+/* Indexing  */ 
+/*-----------*/
+
+int FUNCTION(igraph_vector,index)(const TYPE(igraph_vector) *v,
+				  TYPE(igraph_vector) *newv,
+				  const igraph_vector_t *idx);
+				  
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */
 /* ----------------------------------------------------------------------------*/

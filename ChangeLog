@@ -1,6 +1,10 @@
+2008-10-18  Gabor Csardi  <csardi@szaffi>
+
+	* src/vector.pmt (igraph_vector_index) : added
+
 2008-10-17  Gabor Csardi  <csardi@szaffi>
 
-	* src/igraph_strvector.c (graph_strvector_index) : added	
+	* src/igraph_strvector.c (igraph_strvector_index) : added	
 
 2008-10-01  Gabor Csardi  <csardi@szaffi>
 

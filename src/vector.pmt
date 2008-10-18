@@ -1939,3 +1939,18 @@ int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
 
   return 0;
 }
+
+int FUNCTION(igraph_vector,index)(const TYPE(igraph_vector) *v,
+				  TYPE(igraph_vector) *newv,
+				  const igraph_vector_t *idx) {
+  
+  long int i, newlen=igraph_vector_size(idx);
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(newv, newlen));
+  
+  for (i=0; i<newlen; i++) {
+    long int j=VECTOR(*idx)[i];
+    VECTOR(*newv)[i] = VECTOR(*v)[j];
+  }
+  
+  return 0;
+}
