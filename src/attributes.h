@@ -136,20 +136,14 @@ typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
  *    graph, before adding the vertices themselves.
  *    The number of vertices to add is supplied as an
  *    argument. Expected to return an error code. 
- * \member delete_vertices Called when vertices are deleted from the
- *    graph. Two additional parameters are supplied, the first is a
- *    recoding vector for edge ids, the second is one for the vertex
- *    ids. The edge recoding vector gives for each edge its id in the
- *    new graph. It contains one number for each edge (in the original
- *    graph): zero means that the edge has been deleted, otherwise the
- *    new id plus one is included. The vertex recoding vector contains
- *    the same for vertices.
+ * \member permute_vertices Typically called when a new graph is * \member permute_vertices Typically called when a new graph is
+ *    created based on an existing one, e.g. if vertices are removed
+ *    from a graph. The supplied index vector defines which old vertex
+ *    a new vertex corresponds to. Its length must be the same as the
+ *    number of vertices in the new graph.
  * \member add_edges Called when new edges have been added. The number
  *    of new edges are supplied as well. It is expected to return an
  *    error code.
- * \member delete_edges Called when edges were deleted. The edge
- *    recoding vector is supplied, in the same form as for the \c
- *    delete_vertices function.
  * \member permute_edges Typically called when a new graph is created and 
  *    some of the new edges should carry the attributes of some of the
  *    old edges. The idx vector shows the mapping between the old edges and 
@@ -190,11 +184,9 @@ typedef struct igraph_attribute_table_t {
   int (*copy)(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
 	      igraph_bool_t va, igraph_bool_t ea);
   int (*add_vertices)(igraph_t *graph, long int nv, igraph_vector_ptr_t *attr);
-  void (*delete_vertices)(igraph_t *graph, const igraph_vector_t *eidx,
-			  const igraph_vector_t *vidx);
+  int (*permute_vertices)(igraph_t *graph, const igraph_vector_t *idx);
   int (*add_edges)(igraph_t *graph, const igraph_vector_t *edges, 
 		   igraph_vector_ptr_t *attr);
-  void (*delete_edges)(igraph_t *graph, const igraph_vector_t *idx);
   int (*permute_edges)(igraph_t *graph, const igraph_vector_t *idx);
   int (*get_info)(const igraph_t *graph,
 		  igraph_strvector_t *gnames, igraph_vector_t *gtypes,
@@ -229,8 +221,6 @@ igraph_i_set_attribute_table(igraph_attribute_table_t * table);
 
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
-#define IGRAPH_I_ATTRIBUTE_DELETE_VERTICES(graph, eidx, vidx) \
-        do {if ((graph)->attr) igraph_i_attribute_delete_vertices((graph),(eidx),(vidx));} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
         int igraph_i_ret=0; \
         if ((from)->attr) { \
@@ -248,13 +238,10 @@ void igraph_i_attribute_destroy(igraph_t *graph);
 int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, 
 			    igraph_bool_t ga, igraph_bool_t va, igraph_bool_t ea);
 int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr);
-void igraph_i_attribute_delete_vertices(igraph_t *graph, 
-					const igraph_vector_t *eidx,
-					const igraph_vector_t *vidx);
+int igraph_i_attribute_permute_vertices(igraph_t *graph, 
+					const igraph_vector_t *idx);
 int igraph_i_attribute_add_edges(igraph_t *graph, 
 				 const igraph_vector_t *edges, void *attr);
-void igraph_i_attribute_delete_edges(igraph_t *graph, 
-				     const igraph_vector_t *idx);
 int igraph_i_attribute_permute_edges(igraph_t *graph, 
 				     const igraph_vector_t *idx);
 

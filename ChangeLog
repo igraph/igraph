@@ -1,5 +1,19 @@
 2008-10-18  Gabor Csardi  <csardi@szaffi>
 
+	* src/attributes.h (igraph_i_attribute_table) : 
+	use permute_vertices instead of delete_vertices, 
+	permute_edges instead of delete_edges
+	* src/attributes.c (igraph_i_attribute_delete_vertices)
+	(igraph_i_attribute_permute_vertices) 
+	(igraph_i_attribute_delete_edges) : delete_ versions removed,
+	use permute_ instead
+	* src/cattributes.c (igraph_i_cattribute_delete_vertices)
+	(igraph_i_cattribute_delete_edges) : removed
+	(igraph_i_cattribute_permute_vertices)
+	(igraph_i_cattribute_permute_edges) : added
+	* src/type_indexededgelist.c (igraph_delete_vertices)
+	(igraph_delete_edges) : update for the new attribute handler
+
 	* src/vector.pmt (igraph_vector_index) : added
 
 2008-10-17  Gabor Csardi  <csardi@szaffi>
