@@ -511,6 +511,8 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *i
 				 long int nremove);
 void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t *neg,
 				    long int nremove);
+int igraph_strvector_index(const igraph_strvector_t *v, igraph_strvector_t *newv,
+			   const igraph_vector_t *idx);
   
 /**
  * Trie data type
