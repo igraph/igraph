@@ -42,6 +42,7 @@ __BEGIN_DECLS
 
 #include "error.h"
 #include <stddef.h>
+#include <math.h>
 
 typedef double igraph_integer_t;
 typedef double igraph_real_t;
@@ -723,6 +724,7 @@ igraph_bool_t igraph_set_contains (igraph_set_t* set, igraph_integer_t e);
 igraph_bool_t igraph_set_iterate (igraph_set_t* set, long int* state,
 				  igraph_integer_t* element);
 
+double igraph_i_fdiv(double, double);
 #if defined(INFINITY)
 #  define IGRAPH_INFINITY INFINITY
 #  define IGRAPH_POSINFINITY INFINITY
