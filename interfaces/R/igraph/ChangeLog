@@ -1,6 +1,11 @@
+2008-10-23  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/src/rinterface.c.in 
+	(R_igraph_attribute_permute_vertices) : updated to 'newgraph' argument
+
 2008-10-19  Gabor Csardi  <csardi@szaffi>
 
-	* interface/R/src/rinterface.c.in (R_igraph_attribute_delete_vertices)
+	* interfaces/R/src/rinterface.c.in (R_igraph_attribute_delete_vertices)
 	(R_igraph_attribute_delete_edges) : removed
 	(R_igraph_attribute_permute_vertices)
 	(R_igraph_attribute_permute_edges): added
