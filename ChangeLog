@@ -1,5 +1,7 @@
 2008-10-23  Gabor Csardi  <csardi@szaffi>
 
+	* src/operators.c (igraph_complementer) : handle attributes
+
 	* src/conversion.c (igraph_to_directed) : corrected attribute 
 	handling bug
 

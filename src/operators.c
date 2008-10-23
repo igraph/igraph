@@ -834,9 +834,11 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
   }
   
   IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, 
-			     igraph_is_directed(graph)));
+			     igraph_is_directed(graph)));  
   igraph_vector_destroy(&edges);
   igraph_vector_destroy(&neis);
+  IGRAPH_I_ATTRIBUTE_DESTROY(res);
+  IGRAPH_I_ATTRIBUTE_COPY(res, graph, /*graph=*/1, /*vertex=*/1, /*edge=*/0);
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }

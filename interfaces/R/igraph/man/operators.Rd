@@ -62,9 +62,10 @@ x \%u\% y
   that edge (a,c) is included in the first graph and (c,b) is included
   in the second graph.
 
-  These functions do not handle vertex and edge attributes, the new
-  graph will have no attributes at all. Yes, this is considered to be a
-  bug, so will likely change in the near future.
+  \code{graph.complementer} keeps graph and vertex attriubutes, edge
+  attributes are lost. The other functions do not handle vertex and edge
+  attributes, the new graph will have no attributes at all. Yes, this is
+  considered to be a bug, so will likely change in the near future.
 }
 \value{
 A new graph object.
