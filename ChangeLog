@@ -1,5 +1,8 @@
 2008-10-23  Gabor Csardi  <csardi@szaffi>
 
+	* src/cattributes.c (igraph_i_cattribute_permute_vertices) : 
+	handle the 'graph'=='newgraph' case
+
 	* src/attributes.h (igraph_i_attribute_table) :
 	* src/attributes.c (igraph_i_attribute_permute_edges) : 
 	added 'newgraph' argument, change semantics
