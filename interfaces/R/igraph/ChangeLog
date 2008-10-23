@@ -1,5 +1,9 @@
 2008-10-23  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/src/rinterface.c.in
+	(R_igraph_attribute_permute_vertices)
+	(R_igraph_attribute_permute_edges) : updated to new semantics
+
 	* interfaces/R/src/rinterface.c.in 
 	(R_igraph_attribute_permute_vertices) : updated to 'newgraph' argument
 
