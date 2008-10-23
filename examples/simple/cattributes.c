@@ -180,14 +180,14 @@ int main() {
   igraph_cattribute_list(&g, &gnames, 0,0,0,0,0);
   if (igraph_strvector_size(&gnames) != 0) {
     return 14;
-  }  
+  }
 
   /* Delete vertex attributes */
   DELVA(&g, "x");
   DELVA(&g, "shape");
   DELVA(&g, "xfact");
   DELVA(&g, "yfact");
-  igraph_cattribute_list(&g, 0,0, &vnames, 0,0,0);  
+  igraph_cattribute_list(&g, 0,0, &vnames, 0,0,0);
   if (igraph_strvector_size(&vnames) != 2) {
     return 15;
   }
@@ -196,7 +196,7 @@ int main() {
   igraph_cattribute_list(&g, 0,0,0,0,&enames,0);
   i=igraph_strvector_size(&enames);
   DELEA(&g, "hook1");
-  DELEA(&g, "hook2"); 
+  DELEA(&g, "hook2");
   DELEA(&g, "label");
   igraph_cattribute_list(&g, 0,0,0,0,&enames,0);
   if (igraph_strvector_size(&enames) != i-3) {
@@ -206,7 +206,7 @@ int main() {
   /* Set vertex attributes */
   SETVAN(&g, "y", 0, -1);
   SETVAN(&g, "y", 1, 2.1);
-  if (VAN(&g, "y", 0) != -1 || 
+  if (VAN(&g, "y", 0) != -1 ||
       VAN(&g, "y", 1) != 2.1) {
     return 17;
   }
@@ -229,14 +229,14 @@ int main() {
   if (strcmp(EAS(&g, "color", 2), "RED") ||
       strcmp(EAS(&g, "color", 0), "Blue")) {
     return 20;
-  }      
+  }
 
   /* Set vector attributes as vector */
   igraph_vector_init(&y, igraph_vcount(&g));
   igraph_vector_fill(&y, 1.23);
   SETVANV(&g, "y", &y);
   igraph_vector_destroy(&y);
-  for (i=0; i<igraph_vcount(&g); i++) {    
+  for (i=0; i<igraph_vcount(&g); i++) {
     if (VAN(&g, "y", i) != 1.23) {
       return 21;
     }
@@ -248,7 +248,7 @@ int main() {
     if (VAN(&g, "foobar", i) != i) {
       return 22;
     }
-  }  
+  }
   
   igraph_strvector_init(&id, igraph_vcount(&g));
   for (i=0; i<igraph_vcount(&g); i++) {
@@ -271,14 +271,14 @@ int main() {
   for (i=0; i<igraph_vcount(&g); i++) {
     printf("%s ", VAS(&g, "id", i));
   }
-  printf("\n");  
+  printf("\n");
   
   /* Set edge attributes as vector */
   igraph_vector_init(&y, igraph_ecount(&g));
   igraph_vector_fill(&y, 12.3);
   SETEANV(&g, "weight", &y);
   igraph_vector_destroy(&y);
-  for (i=0; i<igraph_ecount(&g); i++) {    
+  for (i=0; i<igraph_ecount(&g); i++) {
     if (EAN(&g, "weight", i) != 12.3) {
       return 23;
     }
@@ -290,7 +290,7 @@ int main() {
     if (VAN(&g, "foobar", i) != i) {
       return 24;
     }
-  }  
+  }
   
   igraph_strvector_init(&id, igraph_ecount(&g));
   for (i=0; i<igraph_ecount(&g); i++) {
@@ -313,7 +313,7 @@ int main() {
   for (i=0; i<igraph_ecount(&g); i++) {
     printf("%s ", EAS(&g, "color", i));
   }
-  printf("\n");    
+  printf("\n");
 
   /* Delete all remaining attributes */
   DELALL(&g);
@@ -327,7 +327,7 @@ int main() {
   /* Destroy */
   igraph_vector_destroy(&gtypes);
   igraph_vector_destroy(&vtypes);
-  igraph_vector_destroy(&etypes);  
+  igraph_vector_destroy(&etypes);
   igraph_strvector_destroy(&gnames);
   igraph_strvector_destroy(&vnames);
   igraph_strvector_destroy(&enames);

@@ -63,7 +63,9 @@ int igraph_i_attribute_permute_vertices(const igraph_t *graph,
 					const igraph_vector_t *idx) {
   
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->permute_vertices(graph, newgraph, idx);
+    return igraph_i_attribute_table->permute_vertices(graph, newgraph, idx);
+  } else {
+    return 0;
   }
 }
   
@@ -77,10 +79,11 @@ int igraph_i_attribute_add_edges(igraph_t *graph,
   }
 }
   
-int igraph_i_attribute_permute_edges(igraph_t *graph, 
-				      const igraph_vector_t *idx) {
+int igraph_i_attribute_permute_edges(const igraph_t *graph, 
+				     igraph_t *newgraph,
+				     const igraph_vector_t *idx) {
   if (igraph_i_attribute_table) {
-    return igraph_i_attribute_table->permute_edges(graph, idx);
+    return igraph_i_attribute_table->permute_edges(graph, newgraph, idx);
   } else {
     return 0;
   }

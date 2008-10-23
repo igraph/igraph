@@ -353,8 +353,8 @@ int igraph_to_directed(igraph_t *graph,
 			       IGRAPH_DIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
-    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
-    IGRAPH_CHECK(igraph_i_attribute_permute_edges(&newgraph, &index));
+    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,/*edges=*/0);
+    IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph, &index));
     
     igraph_vector_destroy(&index);
     igraph_vector_destroy(&edges);
