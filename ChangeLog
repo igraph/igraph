@@ -1,3 +1,13 @@
+2008-10-23  Gabor Csardi  <csardi@szaffi>
+
+	* src/attributes.h (igraph_i_attribute_table) :
+	* src/attributes.c (igraph_i_attribute_permute_vertices) : 
+	add 'newgraph' argument, change semantics
+	* src/cattributes.c (igraph_i_cattribute_permute_vertices) : updated
+	* src/type_indexededgelist.c (igraph_delete_vertices) : updated
+
+	* src/error.h : added new error code
+
 2008-10-18  Gabor Csardi  <csardi@szaffi>
 
 	* src/attributes.h (igraph_i_attribute_table) : 

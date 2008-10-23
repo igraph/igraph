@@ -58,11 +58,12 @@ int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr) {
   }
 }
 
-int igraph_i_attribute_permute_vertices(igraph_t *graph, 
-					 const igraph_vector_t *idx) {
+int igraph_i_attribute_permute_vertices(const igraph_t *graph, 
+					igraph_t *newgraph,
+					const igraph_vector_t *idx) {
   
   if (igraph_i_attribute_table) {
-    igraph_i_attribute_table->permute_vertices(graph, idx);
+    igraph_i_attribute_table->permute_vertices(graph, newgraph, idx);
   }
 }
   

@@ -313,6 +313,9 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_ARPACK_LAPACK LAPACK (dtrevc) error for calculating eigenvectors.
  * \enumval IGRAPH_ARPACK_UNKNOWN Unkown ARPACK error.
  * \enumval IGRAPH_ENEGLOOP Negative loop detected while calculating shortest paths.
+ * \enumval IGRAPH_EATTRIBUTES Attribute handler error. The user is not 
+ *   expected to find this; it is signalled if some igraph function is
+ *   not using the attribute handler interface properly.
  */
 
 typedef enum {
@@ -352,7 +355,8 @@ typedef enum {
   IGRAPH_ARPACK_SHUR      = 34,
   IGRAPH_ARPACK_LAPACK    = 35,
   IGRAPH_ARPACK_UNKNOWN   = 36,
-  IGRAPH_ENEGLOOP         = 37
+  IGRAPH_ENEGLOOP         = 37,
+  IGRAPH_EATTRIBUTES      = 38
 } igraph_error_type_t;
 
 /**
