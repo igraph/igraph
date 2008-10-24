@@ -1,3 +1,8 @@
+2008-10-24  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/src/rinterface.c.in (R_igraph_shortest_paths) :
+	call Johnson's algorithm, if appropriate
+
 2008-09-29  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/structural.properties.R (graph.laplacian)

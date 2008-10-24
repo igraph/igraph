@@ -4439,6 +4439,126 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_shortest_paths_johnson
+ * 
+ */
+
+int igraph_shortest_paths_johnson(const igraph_t *graph,
+				  igraph_matrix_t *res,
+				  const igraph_vs_t from,
+				  const igraph_vector_t *weights) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_t newgraph;
+  igraph_vector_t edges, newweights;
+  igraph_matrix_t bfres;
+  long int i, ptr;
+  long int nr, nc;
+  igraph_vit_t fromvit;
+
+  /* If no weights, then we can just run the unweighted version */
+  if (!weights) {
+    return igraph_shortest_paths(graph, res, from, IGRAPH_OUT);
+  }
+  
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+  }
+  
+  /* If no negative weights, then we can run Dijkstra's algorithm */
+  if (igraph_vector_min(weights) >= 0) {
+    return igraph_shortest_paths_dijkstra(graph, res, from, weights, IGRAPH_OUT);
+  }
+  
+  if (!igraph_is_directed(graph)) {
+    IGRAPH_ERROR("Johnson's shortest path: undirected graph and negative weight",
+		 IGRAPH_EINVAL);
+  }
+  
+  /* ------------------------------------------------------------ */
+  /* -------------------- Otherwise proceed --------------------- */
+
+  IGRAPH_MATRIX_INIT_FINALLY(&bfres, 0, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&newweights, 0);
+
+  IGRAPH_CHECK(igraph_empty(&newgraph, no_of_nodes+1, 
+			    igraph_is_directed(graph)));
+  IGRAPH_FINALLY(igraph_destroy, &newgraph);
+			    
+  /* Add a new node to the graph, plus edges from it to all the others. */
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2 + no_of_nodes*2);
+  igraph_get_edgelist(graph, &edges, /*bycol=*/ 0);
+  igraph_vector_resize(&edges, no_of_edges * 2 + no_of_nodes * 2);
+    for (i=0, ptr=no_of_edges*2; i<no_of_nodes; i++) {
+      VECTOR(edges)[ptr++] = no_of_nodes;
+      VECTOR(edges)[ptr++] = i;
+  }    
+  IGRAPH_CHECK(igraph_add_edges(&newgraph, &edges, 0));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  IGRAPH_CHECK(igraph_vector_reserve(&newweights, no_of_edges+no_of_nodes));
+  igraph_vector_update(&newweights, weights);
+  igraph_vector_resize(&newweights, no_of_edges+no_of_nodes);
+  for (i=no_of_edges; i<no_of_edges+no_of_nodes; i++) {
+    VECTOR(newweights)[i] = 0;
+  }
+  
+  /* Run Bellmann-Ford algorithm on the new graph, starting from the 
+     new vertex.  */
+  
+  IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(&newgraph,
+						   &bfres,
+						   igraph_vss_1(no_of_nodes),
+						   &newweights,
+						   IGRAPH_OUT));
+
+  igraph_destroy(&newgraph);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Now the edges of the original graph are reweighted, using the
+     values from the BF algorithm. Instead of w(u,v) we will have 
+     w(u,v) + h(u) - h(v) */
+  
+  igraph_vector_resize(&newweights, no_of_edges);
+  for (i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    VECTOR(newweights)[i] += MATRIX(bfres, 0, from) - MATRIX(bfres, 0, to);
+  }
+  
+  /* Run Dijkstra's algorithm on the new weights */
+  IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, res, from, &newweights,
+					      IGRAPH_OUT));
+  
+  igraph_vector_destroy(&newweights);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Reweight the shortest paths */
+  nr=igraph_matrix_nrow(res);
+  nc=igraph_matrix_ncol(res);
+
+  IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
+
+  for (i=0; i<nr; i++, IGRAPH_VIT_NEXT(fromvit)) {
+    long int v1=IGRAPH_VIT_GET(fromvit);
+    long int v2;
+    for (v2=0; v2<nc; v2++) {
+      igraph_real_t sub=MATRIX(bfres, 0, v1) - MATRIX(bfres, 0, v2);
+      MATRIX(*res, i, v2) -= sub;
+    }
+  }
+
+  igraph_vit_destroy(&fromvit);
+  igraph_matrix_destroy(&bfres);
+  IGRAPH_FINALLY_CLEAN(2);
+    
+  return 0;
+}
+
 int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 		       igraph_neimode_t mode, const igraph_vector_t *roots,
 		       igraph_vector_t *vertex_index) {
