@@ -29,6 +29,7 @@ int main() {
   igraph_vector_t v;
 
   /* Subtract from itself */
+  printf("subtract itself\n");
   igraph_vector_init_int_end(&v, -1, 0,1,1,2,2,1,4,5, -1);
   igraph_create(&orig, &v, 0, IGRAPH_DIRECTED);
   igraph_vector_destroy(&v);
@@ -44,6 +45,7 @@ int main() {
   igraph_destroy(&diff);
 
   /* Same for undirected graph */
+  printf("subtract itself, undirected\n");
   igraph_vector_init_int_end(&v, -1, 0,1,1,2,2,1,4,5, -1);
   igraph_create(&orig, &v, 0, IGRAPH_UNDIRECTED);
   igraph_vector_destroy(&v);
@@ -64,11 +66,12 @@ int main() {
   igraph_destroy(&diff);
   
   /* Subtract the empty graph */
+  printf("subtract empty\n");
   igraph_vector_init_int_end(&v, -1, 0,1,1,2,2,1,4,5, -1);
   igraph_create(&orig, &v, 0, IGRAPH_DIRECTED);
   igraph_vector_destroy(&v);
 
-  igraph_empty(&sub, 0, IGRAPH_DIRECTED); 
+  igraph_empty(&sub, 3, IGRAPH_DIRECTED);
   igraph_difference(&diff, &orig, &sub);
   igraph_write_graph_edgelist(&diff, stdout);
   if (igraph_ecount(&diff) != igraph_ecount(&orig) ||
@@ -81,6 +84,7 @@ int main() {
   igraph_destroy(&diff);
 
   /* A `real' example */
+  printf("real example\n");
   igraph_vector_init_int_end(&v, -1, 0,1,1,2,2,1,4,5,8,9, -1);
   igraph_create(&orig, &v, 0, IGRAPH_DIRECTED);
   igraph_vector_destroy(&v);
@@ -97,14 +101,15 @@ int main() {
   igraph_destroy(&sub);  
 
   /* undirected version */
-  igraph_vector_init_int_end(&v, -1, 0,1,1,2,2,1,4,5,8,9, -1);
+  printf("real example, undirected\n");
+  igraph_vector_init_int_end(&v, -1, 0,1,1,2,2,1,4,5,8,9,8,10,8,13,8,11,8,12, -1);
   igraph_create(&orig, &v, 0, IGRAPH_UNDIRECTED);
   igraph_vector_destroy(&v);
 
-  igraph_vector_init_int_end(&v, -1, 0,1,5,4,2,1,6,7, -1);
+  igraph_vector_init_int_end(&v, -1, 0,1,5,4,2,1,6,7,8,10,8,13, -1);
   igraph_create(&sub, &v, 0, IGRAPH_UNDIRECTED);
   igraph_vector_destroy(&v);
-  
+
   igraph_difference(&diff, &orig, &sub);
   igraph_write_graph_edgelist(&diff, stdout);
 
