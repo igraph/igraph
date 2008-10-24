@@ -100,14 +100,19 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
 }
 
 shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
-                           weights=NULL) {
+                           weights=NULL,
+                           algorithm=c("automatic", "unweighted", "dijkstra",
+                             "bellman-ford", "johnson")) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "out"=1, "in"=2, "all"=3)
-
+  mode <- switch(mode, "out"=1, "in"=2, "all"=3)  
+  algorithm <- igraph.match.arg(algorithm)
+  algorithm <- switch(algorithm, "automatic"=0, "unweighted"=1,
+                      "dijkstra"=2, "bellman-ford"=3, "johnson"=4)
+  
   if (is.null(weights)) {
     if ("weight" %in% list.edge.attributes(graph)) {
       weights <- as.numeric(E(graph)$weight)
@@ -120,9 +125,14 @@ shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
     }
   }
 
+  if (! is.null(weights) && algorithm==1) {
+    weights <- NULL
+    warning("Unweighted algorithm chosen, weights ignored")
+  }
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_shortest_paths", graph, as.igraph.vs(v),
-        as.numeric(mode), weights,
+        as.numeric(mode), weights, as.numeric(algorithm),
         PACKAGE="igraph")
 }
 
