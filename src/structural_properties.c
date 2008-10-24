@@ -4441,7 +4441,36 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 
 /**
  * \function igraph_shortest_paths_johnson
+ * Calculate shortest paths from some sources using Johnson's algorithm
  * 
+ * See Wikipedia at http://en.wikipedia.org/wiki/Johnson's_algorithm
+ * for Johnson's algorithm. This algorithm works even if the graph
+ * contains negative edge weights, and it is worth using it if we
+ * calculate the shortest paths from many sources. 
+ * 
+ * </para><para> If no edge weights are supplied, then the unweighted
+ * version, \ref igraph_shortest_paths() is called. 
+ * 
+ * </para><para> If all the supplied edge weights are non-negative,
+ * then Dijkstra's algorithm is used by calling 
+ * \ref igraph_shortest_paths_dijkstra().
+ * 
+ * \param graph The input graph, typically it is directed.
+ * \param res Pointer to an initialized matrix, the result will be
+ *   stored here, one line for each source vertex.
+ * \param from The source vertices.
+ * \param weights Optional edge weights. If it is a null-pointer, then
+ *   the unweighted breadth-first search based \ref
+ *   igraph_shortest_path() will be called.
+ * \return Error code.
+ * 
+ * Time complexity: O(s|V|log|V|+|V||E|), |V| and |E| are the number
+ * of vertices and edges, s is the number of source vertices.
+ * 
+ * \sa \ref igraph_shortest_paths() for a faster unweighted version
+ * or \ref igraph_shortest_paths_dijkstra() if you do not have negative
+ * edge weights, \ref igraph_shortest_paths_bellman_ford() if you only
+ * need to calculate shortest paths from a couple of sources.
  */
 
 int igraph_shortest_paths_johnson(const igraph_t *graph,
