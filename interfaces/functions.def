@@ -527,6 +527,11 @@ igraph_avg_nearest_neighbor_degree:
         DEPS: vids ON graph
         NAME-R: graph.knn
 
+igraph_strength:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                NEIMODE mode=ALL, BOOLEAN loops=True, EDGEWEIGHTS weights=NULL
+        DEPS: vids ON graph, weights ON graph
+
 #######################################
 # Spectral properties
 #######################################

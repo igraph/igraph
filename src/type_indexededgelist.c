@@ -827,6 +827,9 @@ igraph_bool_t igraph_is_directed(const igraph_t *graph) {
  * otherwise. v is the number
  * vertices for which the degree will be calculated, and
  * d is their (average) degree. 
+ *
+ * \sa \ref igraph_strength() for the version that takes into account
+ * edge weigths.
  */
 int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
 		  const igraph_vs_t vids, 
