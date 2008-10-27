@@ -523,8 +523,8 @@ igraph_is_chordal:
 
 igraph_avg_nearest_neighbor_degree:
         PARAMS: GRAPH graph, VERTEXSET vids=ALL, OUT VECTOR_OR_0 knn, \
-                OUT VECTOR_OR_0 knnk
-        DEPS: vids ON graph
+                OUT VECTOR_OR_0 knnk, EDGEWEIGHTS weights=NULL
+        DEPS: vids ON graph, weights ON graph
         NAME-R: graph.knn
 
 igraph_strength:

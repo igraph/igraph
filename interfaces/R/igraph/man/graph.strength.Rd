@@ -14,11 +14,10 @@ graph.strength (graph, vids = V(graph), mode = c("all", "out", "in", "total"),
     in-degree or \dQuote{all} for the sum of the two. For undirected
     graphs this argument is ignored.}
   \item{loops}{Logical; whether the loop edges are also counted.}
-  \item{weights}{Optional positive weight vector for calculating
-    weighted closeness. If the graph has a \code{weight} edge
+  \item{weights}{Weight vector. If the graph has a \code{weight} edge
     attribute, then this is used by default. If the graph does not have
     a \code{weight} edge attribute and this argument is \code{NULL},
-    then a warning is given and \link{\code{degree}} is called.}
+    then a warning is given and \code{\link{degree}} is called.}
 }
 % \details{}
 \value{
@@ -30,7 +29,7 @@ graph.strength (graph, vids = V(graph), mode = c("all", "out", "in", "total"),
   Proc. Natl. Acad. Sci. USA 101, 3747 (2004)
 }
 \author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
-\seealso{\link{\code{degree}} for the unweighted version.}
+\seealso{\code{\link{degree}} for the unweighted version.}
 \examples{
 g <- graph.star(10)
 E(g)$weight <- seq(ecount(g))
