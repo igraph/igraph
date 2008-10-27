@@ -1,5 +1,7 @@
 2008-10-27  Gabor Csardi  <csardi@szaffi>
 
+	* src/structure_generators.c (igraph_full_bipartite) : bug fixed
+
 	* src/structure_generators.c (igraph_full_bipartite) : added
 
 	* src/structural_properties.c (igraph_transitivity_barrat) : added

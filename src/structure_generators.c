@@ -2175,7 +2175,7 @@ int igraph_full_bipartite(igraph_t *graph,
     no_of_edges=nn1 * nn2 * 2;
   }
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
 
   if (!directed || mode==IGRAPH_OUT) {
 
