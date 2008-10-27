@@ -820,6 +820,10 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 					  const igraph_vs_t vids);
 int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
 					    igraph_real_t *res);
+int igraph_transitivity_barrat(const igraph_t *graph,
+			       igraph_vector_t *res,
+			       const igraph_vs_t vids,
+			       const igraph_vector_t *weights);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops);
 

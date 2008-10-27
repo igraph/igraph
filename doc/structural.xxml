@@ -80,6 +80,7 @@
 <!-- doxrox-include igraph_transitivity_undirected -->
 <!-- doxrox-include igraph_transitivity_local_undirected -->
 <!-- doxrox-include igraph_transitivity_avglocal_undirected -->
+<!-- doxrox-include igraph_transitivity_barrat -->
 </section>
 
 <section><title>Directedness conversion</title>

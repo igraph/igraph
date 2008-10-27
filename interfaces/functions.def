@@ -398,6 +398,12 @@ igraph_transitivity_avglocal_undirected:
         PARAMS: GRAPH graph, OUT REALPTR res
         IGNORE: RR, RC, RNamespace
 
+igraph_transitivity_barrat:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                EDGEWEIGHTS weights=NULL
+        DEPENDS: weights ON graph
+        IGNORE: RR, RC, RNamespace
+
 igraph_reciprocity:
         PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN ignore_loops=True
         IGNORE: RR, RC, RNamespace

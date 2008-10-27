@@ -278,8 +278,9 @@ edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
 
 transitivity <- function(graph, type=c("undirected", "global", "globalundirected",
                                   "localundirected", "local", "average",
-                                  "localaverage", "localaverageundirected"),
-                         vids=NULL) {
+                                  "localaverage", "localaverageundirected",
+                                  "barrat", "weighted"),
+                         vids=NULL, weights=NULL) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -287,8 +288,18 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
   type <- igraph.match.arg(type)
   type <- switch(type, "undirected"=0, "global"=0, "globalundirected"=0,
                  "localundirected"=1, "local"=1, "average"=2,
-                 "localaverage"=2, "localaverageundirected"=2)
-  
+                 "localaverage"=2, "localaverageundirected"=2, "barrat"=3,
+                 "weighted"=3)
+
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
+  }
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (type==0) {
     .Call("R_igraph_transitivity_undirected", graph,
@@ -305,6 +316,15 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
   } else if (type==2) {
     .Call("R_igraph_transitivity_avglocal_undirected", graph,
           PACKAGE="igraph")
+  } else if (type==3) {
+    vids <- as.igraph.vs(vids)
+    if (is.null(weights)) {
+      .Call("R_igraph_transitivity_local_undirected", graph, as.numeric(vids),
+            PACKAGE="igraph")
+    } else { 
+      .Call("R_igraph_transitivity_barrat", graph, as.numeric(vids), weights,
+            PACKAGE="igraph")
+    }
   }
 }
 

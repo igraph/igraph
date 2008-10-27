@@ -2389,6 +2389,248 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   return 0;
 }
 
+int igraph_transitivity_barrat1(const igraph_t *graph,
+				igraph_vector_t *res,
+				const igraph_vs_t vids,
+				const igraph_vector_t *weights) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vit_t vit;
+  long int nodes_to_calc;
+  igraph_vector_t *adj1, *adj2;
+  igraph_vector_long_t neis;
+  igraph_vector_t actw;
+  igraph_lazy_adjedgelist_t adjacent;
+  long int i;
+  igraph_vector_t strength;
+  
+  if (!weights) {
+    IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
+    return igraph_transitivity_local_undirected(graph, res, vids);
+  }
+  
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  nodes_to_calc=IGRAPH_VIT_SIZE(vit);
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&neis, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &neis);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&actw, no_of_nodes);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&strength, 0);  
+  IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(), IGRAPH_ALL,
+			       IGRAPH_LOOPS, weights));  
+  
+  igraph_lazy_adjedgelist_init(graph, &adjacent, IGRAPH_ALL);
+  IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjacent);  
+
+  IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
+  
+  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    long int node=IGRAPH_VIT_GET(vit);
+    long int adjlen1, adjlen2, j, k;
+    igraph_real_t triples, triangles;
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    adj1=igraph_lazy_adjedgelist_get(&adjacent, node);
+    adjlen1=igraph_vector_size(adj1);
+    /* Mark the neighbors of the node */
+    for (j=0; j<adjlen1; j++) {
+      long int edge=VECTOR(*adj1)[j];
+      long int nei=IGRAPH_OTHER(graph, edge, node);
+      VECTOR(neis)[nei] = i+1;
+      VECTOR(actw)[nei] = VECTOR(*weights)[edge];
+    }
+    triples = VECTOR(strength)[node] * (adjlen1-1);
+    triangles = 0.0;
+    
+    for (j=0; j<adjlen1; j++) {
+      long int edge1=VECTOR(*adj1)[j];
+      igraph_real_t weight1=VECTOR(*weights)[edge1];
+      long int v=IGRAPH_OTHER(graph, edge1, node);
+      adj2=igraph_lazy_adjedgelist_get(&adjacent, v);
+      adjlen2=igraph_vector_size(adj2);
+      for (k=0; k<adjlen2; k++) {
+	long int edge2=VECTOR(*adj2)[k];
+	long int v2=IGRAPH_OTHER(graph, edge2, v);
+	if (VECTOR(neis)[v2] == i+1) {
+	  triangles += (VECTOR(actw)[v2] + weight1) / 2.0;
+	}
+      }
+    }
+    VECTOR(*res)[i] = triangles/triples;
+  }
+
+  igraph_lazy_adjedgelist_destroy(&adjacent);
+  igraph_vector_destroy(&strength);
+  igraph_vector_destroy(&actw);
+  igraph_vector_long_destroy(&neis);
+  igraph_vit_destroy(&vit);
+  IGRAPH_FINALLY_CLEAN(5);
+  
+  return 0;    
+}
+
+int igraph_transitivity_barrat4(const igraph_t *graph,
+				igraph_vector_t *res,
+				const igraph_vs_t vids,
+				const igraph_vector_t *weights) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t order, degree, rank;
+  long int maxdegree;
+  igraph_adjedgelist_t adjacent;
+  igraph_vector_long_t neis;
+  igraph_vector_t *adj1, *adj2;
+  igraph_vector_t actw;
+  long int i, nn;
+  
+  if (!weights) { 
+    IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
+    return igraph_transitivity_local_undirected(graph, res, vids);
+  }
+  
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  
+  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
+			     IGRAPH_LOOPS));
+  maxdegree=igraph_vector_max(&degree)+1;
+  IGRAPH_CHECK(igraph_vector_order1(&degree, &order, maxdegree));
+
+  IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
+			       IGRAPH_LOOPS, weights));
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&rank, no_of_nodes);
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(rank)[ (long int)VECTOR(order)[i] ] = no_of_nodes-i-1;
+  }
+  
+  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjacent, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjacent);
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&neis, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &neis);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&actw, no_of_nodes);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  igraph_vector_null(res);
+  
+  for (nn=no_of_nodes-1; nn>=0; nn--) {
+    long int adjlen1, adjlen2, i;
+    igraph_real_t triples;
+    long int node=VECTOR(order)[nn];
+    
+    IGRAPH_ALLOW_INTERRUPTION();
+    
+    adj1=igraph_adjedgelist_get(&adjacent, node);
+    adjlen1=igraph_vector_size(adj1);
+    triples = VECTOR(degree)[node] * (adjlen1-1) / 2.0;
+    /* Mark the neighbors of the node */
+    for (i=0; i<adjlen1; i++) {
+      long int edge=VECTOR(*adj1)[i];
+      long int nei=IGRAPH_OTHER(graph, edge, node);
+      VECTOR(neis)[nei] = node+1;
+      VECTOR(actw)[nei] = VECTOR(*weights)[edge];
+    }
+    
+    for (i=0; i<adjlen1; i++) {
+      long int edge1=VECTOR(*adj1)[i];
+      igraph_real_t weight1=VECTOR(*weights)[edge1];
+      long int nei=IGRAPH_OTHER(graph, edge1, node);
+      long int j;
+      if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
+	adj2=igraph_adjedgelist_get(&adjacent, nei);
+	adjlen2=igraph_vector_size(adj2);
+	for (j=0; j<adjlen2; j++) {
+	  long int edge2=VECTOR(*adj2)[j];
+	  igraph_real_t weight2=VECTOR(*weights)[edge2];
+	  long int nei2=IGRAPH_OTHER(graph, edge2, nei);
+	  if (VECTOR(rank)[nei2] < VECTOR(rank)[nei]) {
+	    continue;
+	  }
+	  if (VECTOR(neis)[nei2] == node+1) {
+	    VECTOR(*res)[nei2] += (VECTOR(actw)[nei2] + weight2) / 2.0;
+	    VECTOR(*res)[nei] += (weight1 + weight2) / 2.0;
+	    VECTOR(*res)[node] += (VECTOR(actw)[nei2] + weight1) / 2.0;
+	  }
+	}
+      }
+    }
+    VECTOR(*res)[node] /= triples;
+  }
+
+  igraph_vector_destroy(&actw);
+  igraph_vector_long_destroy(&neis);
+  igraph_adjedgelist_destroy(&adjacent);
+  igraph_vector_destroy(&rank);
+  igraph_vector_destroy(&degree);
+  igraph_vector_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(6);
+
+  return 0;
+}
+
+/**
+ * \function igraph_transitivity_barrat
+ * Weighted transitivity, as defined by A. Barrat.
+ *
+ * This is a local transitivity, i.e. a vertex-level index. For a
+ * given vertex \c i, from all triangles in which it participates we
+ * consider the weight of the edges adjacent to \c i. The transitivity
+ * is the sum of these weights divided by twice the strength of the
+ * vertex (see \ref igraph_strength()) and the degree of the vertex
+ * minus one. See   Alain Barrat, Marc Barthelemy, Romualdo
+ * Pastor-Satorras, Alessandro Vespignani: The architecture of complex
+ * weighted networks, Proc. Natl. Acad. Sci. USA 101, 3747 (2004) at 
+ * http://arxiv.org/abs/cond-mat/0311416 for the exact formula.
+ * 
+ * \param graph The input graph, edge directions are ignored for
+ *   directed graphs. Note that the function does NOT work for
+ *   non-simple graphs.
+ * \param res Pointer to an initialized vector, the result will be
+ *   stored here. It will be resized as needed.
+ * \param vids The vertices for which the calculation is performed.
+ * \param weights Edge weights. If this is a null pointer, then a
+ *   warning is given and \ref igraph_transitivity_local_undirected()
+ *   is called.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|*d^2), |V| is the number of vertices in 
+ * the graph, d is the average node degree. 
+ * 
+ * \sa \ref igraph_transitivity_undirected(), \ref
+ * igraph_transitivity_local_undirected() and \ref
+ * igraph_transitivity_avglocal_undirected() for other kinds of
+ * (non-weighted) transitivity.
+ */
+
+int igraph_transitivity_barrat(const igraph_t *graph,
+			       igraph_vector_t *res,
+			       const igraph_vs_t vids,
+			       const igraph_vector_t *weights) {
+  if (igraph_vs_is_all((igraph_vs_t*)&vids)) {
+    return igraph_transitivity_barrat4(graph, res, vids, weights);
+  } else {
+    return igraph_transitivity_barrat1(graph, res, vids, weights);
+  }
+  
+  return 0;
+}
+
 /**
  * \ingroup structural
  * \function igraph_reciprocity
