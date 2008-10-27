@@ -646,3 +646,17 @@ graph.famous <- function(name) {
   .Call("R_igraph_famous", as.character(name),
         PACKAGE="igraph")
 }
+
+graph.full.bipartite <- function(n1, n2, directed=FALSE,
+                                 mode=c("all", "out", "in")) {
+
+  n1 <- as.numeric(n1)
+  n2 <- as.numeric(n2)
+  directed <- as.logical(directed)
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)  
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  res <- .Call("R_igraph_full_bipartite", n1, n2, as.logical(directed), mode,
+               PACKAGE="igraph")
+  set.vertex.attribute(res$graph, "type", value=res$types)
+}

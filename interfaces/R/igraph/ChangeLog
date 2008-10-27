@@ -1,5 +1,8 @@
 2008-10-27  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.full.bipartite) : added
+
 	* interfaces/R/igraph/R/structural.properties.R	(transitivity) :
 	* interfaces/R/src/rinterface.c.in (R_igraph_transitivity_barrat) :
 	weighted transitivity calculation added
