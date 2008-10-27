@@ -1,3 +1,8 @@
+2008-10-27  Gabor Csardi  <csardi@szaffi>
+
+	* src/structural_properties.c 
+	(igraph_avg_nearest_neighbor_degree) : added
+
 2008-10-24  Gabor Csardi  <csardi@szaffi>
 
 	* src/structural_properties.c (igraph_shortest_paths_johnson) : added

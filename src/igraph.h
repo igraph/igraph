@@ -869,6 +869,10 @@ int igraph_is_chordal(const igraph_t *graph,
 		      igraph_bool_t *chordal,
 		      igraph_vector_t *fill_in,
 		      igraph_t *newgraph);
+int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
+				       igraph_vs_t vids,
+				       igraph_vector_t *knn,
+				       igraph_vector_t *knnk);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
