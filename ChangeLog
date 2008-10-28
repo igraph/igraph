@@ -1,3 +1,7 @@
+2008-10-28  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_bipartite_projection) : added
+
 2008-10-27  Gabor Csardi  <csardi@szaffi>
 
 	* src/structure_generators.c (igraph_full_bipartite) : bug fixed
