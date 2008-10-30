@@ -4703,7 +4703,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \param from The source vertices.
  * \param weights Optional edge weights. If it is a null-pointer, then
  *   the unweighted breadth-first search based \ref
- *   igraph_shortest_path() will be called.
+ *   igraph_shortest_paths() will be called.
  * \return Error code.
  * 
  * Time complexity: O(s|V|log|V|+|V||E|), |V| and |E| are the number
@@ -5096,7 +5096,7 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
 }
 
 /**
- * \function igraph_avg_nearest_neigbor_degree
+ * \function igraph_avg_nearest_neighbor_degree
  * Average nearest neighbor degree
  *
  * Calculates the average degree of the neighbors for each vertex, and
