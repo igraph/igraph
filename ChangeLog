@@ -1,5 +1,8 @@
 2008-10-30  Gabor Csardi  <csardi@szaffi>
 
+	* src/structure_generators.c (igraph_full_bipartite) :
+	* src/bipartite.c (igraph_full_bipartite) : moved
+
 	* src/bipartite.c (igraph_bipartite_projection) : rewritten
 	* examples/simple/igraph_bipartite_projection.c : added
 
