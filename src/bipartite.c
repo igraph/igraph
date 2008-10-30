@@ -24,6 +24,29 @@
 #include "igraph.h"
 #include "attributes.h"
 
+/**
+ * \section about_bipartite Bipartite networks in igraph
+ *
+ * <para>
+ * A bipartite network contains two kinds of vertices and connections
+ * are only possible between two vertices of different kind. There are
+ * many natural examples, e.g. movies and actors as vertices and a
+ * movie is connected to all participating actors, etc.
+ * 
+ * </para><para>
+ * igraph does not have direct support for bipartite networks, at
+ * least not at the C language level. In other words the igraph_t
+ * structure does not contain information about the vertex types. 
+ * The C functions for bipartite networks usually have an additional
+ * input argument to graph, called \c types, a boolean vector giving
+ * the vertex types.
+ * 
+ * </para><para>
+ * Most functions creating bipartite networks are able to create this
+ * extra vector, you just need to supply an initialized boolean vector
+ * to them.</para>
+ */
+
 int igraph_i_bipartite_projection(const igraph_t *graph,
 				  const igraph_vector_bool_t *types,
 				  igraph_t *proj,
@@ -103,7 +126,21 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
  * \function igraph_bipartite_projection
  * Create one or both projections of a bipartite (two-mode) network
  * 
- * TODO
+ * Creates one or both projections of a bipartite graph. 
+ * \param graph The bipartite input graph. Directedness of the edges
+ *   is ignored.
+ * \param types Boolean vector giving the vertex types of the graph.
+ * \param proj1 Pointer to an uninitialized graph object, the first
+ *   projection will be created here. It a null pointer, then it is
+ *   ignored, see also the \p probe1 argument.
+ * \param proj2 Pointer to an uninitialized graph object, the second
+ *   projection is created here, if it is not a null pointer. See also
+ *   the \p probe1 argument.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
+ * is the number of edges, d is the average (total) degree of the
+ * graphs.
  */
 
 int igraph_bipartite_projection(const igraph_t *graph, 

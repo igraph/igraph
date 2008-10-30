@@ -88,6 +88,8 @@
   <xi:include href="operators.xml"/>
   
   <xi:include href="arpack.xml"/>
+  
+  <xi:include href="bipartite.xml"/>
 
   <xi:include href="nongraph.xml"/>  
 
