@@ -2214,6 +2214,7 @@ int igraph_full_bipartite(igraph_t *graph,
 
   if (types) {
     IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
+    igraph_vector_bool_null(types);
     for (i=nn1; i<no_of_nodes; i++) {
       VECTOR(*types)[i] = 1;
     }
