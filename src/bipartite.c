@@ -300,4 +300,77 @@ int igraph_full_bipartite(igraph_t *graph,
   
   return 0;
 }
+
+/**
+ * \function igraph_create_bipartite
+ * Create a bipartite graph
+ * 
+ * This is a simple wrapper function to create a bipartite graph. It
+ * does a little more than \ref igraph_create(), e.g. it checks that
+ * the graph is indeed bipartite with respect to the given \p types
+ * vector. If there is an edge connecting two vertices of the same
+ * kind, then an error is reported.
+ * \param graph Pointer to an uninitlized graph object, the result is
+ *   created here.
+ * \param types Boolean vector giving the vertex types. The length of
+ *   the vector defines the number of vertices in the graph.
+ * \param edges Vector giving the edges of the graph. The highest
+ *   vertex id in this vector must be smaller than the length of the
+ *   \p types vector.
+ * \param directed Boolean scalar, whether to create a directed
+ *   graph.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
+ 
+int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
+			    const igraph_vector_t *edges, 
+			    igraph_bool_t directed) {
+
+  long int no_of_nodes=igraph_vector_bool_size(types);
+  long int no_of_edges=igraph_vector_size(edges);
+  igraph_real_t min_edge=0, max_edge=0;
+  igraph_bool_t min_type=0, max_type=0;
+  long int i;
+
+  if (no_of_edges % 2 != 0) {
+    IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
+  }
+  no_of_edges /= 2;
+  
+  if (no_of_edges != 0) {
+    igraph_vector_minmax(edges, &min_edge, &max_edge);
+  }
+  if (min_edge < 0 || max_edge >= no_of_nodes) {
+    IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
+  }
+
+  /* Check types vector */
+  if (no_of_nodes != 0) {
+    igraph_vector_bool_minmax(types, &min_type, &max_type);
+    if (min_type < 0 || max_type > 1) {
+      IGRAPH_WARNING("Non-binary type vector when creating a bipartite graph");
+    }
+  }
+
+  /* Check bipartiteness */
+  for (i=0; i<no_of_edges*2; i+=2) {
+    long int from=VECTOR(*edges)[i];
+    long int to=VECTOR(*edges)[i+1];
+    long int t1=VECTOR(*types)[from];
+    long int t2=VECTOR(*types)[to];
+    if ( (t1 && t2) || (!t1 && !t2) ) {
+      IGRAPH_ERROR("Invalid edges, not a bipartite graph", IGRAPH_EINVAL);
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, directed));
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  IGRAPH_CHECK(igraph_add_edges(graph, edges, 0));
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
   

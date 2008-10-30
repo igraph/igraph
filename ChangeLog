@@ -1,3 +1,8 @@
+2008-10-31  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_create_bipartite) : added
+	* examples/simple/igraph_bipartite_create.c : added
+
 2008-10-30  Gabor Csardi  <csardi@szaffi>
 
 	* src/structure_generators.c (igraph_full_bipartite) :

@@ -660,3 +660,16 @@ graph.full.bipartite <- function(n1, n2, directed=FALSE,
                PACKAGE="igraph")
   set.vertex.attribute(res$graph, "type", value=res$types)
 }
+
+graph.bipartite <- function(types, edges, directed=FALSE) {
+
+  types <- as.logical(types)
+  edges <- as.numeric(edges)
+  directed <- as.logical(directed)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGES="igraph") )
+  res <- .Call("R_igraph_create_bipartite", types, edges, directed,
+               PACKAGE="igraph")
+  set.vertex.attribute(res, "type", value=types)
+}
+

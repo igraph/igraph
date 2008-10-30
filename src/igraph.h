@@ -891,6 +891,10 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 /* Bipartite networks                                 */
 /* -------------------------------------------------- */
 
+int igraph_create_bipartite(igraph_t *g, const igraph_vector_bool_t *types,
+			    const igraph_vector_t *edges, 
+			    igraph_bool_t directed);
+
 int igraph_bipartite_projection(const igraph_t *graph, 
 				const igraph_vector_bool_t *types,
 				igraph_t *proj1,
