@@ -673,3 +673,37 @@ graph.bipartite <- function(types, edges, directed=FALSE) {
   set.vertex.attribute(res, "type", value=types)
 }
 
+graph.incidence <- function(incidence,
+                            mode=c("all", "out", "in", "total"),
+                            multiple=FALSE, add.colnames=NULL,
+                            add.names=NULL) {
+  # Argument checks
+  mode(incidence) <- "double"
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
+  multiple <- as.logical(multiple)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_incidence", incidence, mode, multiple,
+        PACKAGE="igraph")
+  res <- set.vertex.attribute(res$graph, "type", value=res$types)
+
+  if (is.null(add.names)) {
+    if (!is.null(rownames(incidence)) && !is.null(colnames(incidence))) {
+      add.names <- "name"
+    } else {
+      add.names <- NA
+    }
+  } else if (!is.na(add.names)) {
+    if (is.null(rownames(incidence)) || is.null(colnames(incidence))) {
+      warning("Cannot add row- and column names, at least one of them is missing")
+      add.names <- NA
+    }
+  }
+  if (!is.na(add.names)) {
+    res <- set.vertex.attribute(res, add.names,
+                                value=c(rownames(incidence), colnames(incidence)))
+  }
+  res
+}
+

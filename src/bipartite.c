@@ -374,3 +374,82 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
   return 0;
 }
   
+/**
+ * \function igraph_incidence
+ */
+
+int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
+		     const igraph_matrix_t *incidence, 
+		     igraph_neimode_t mode, igraph_bool_t multiple) {
+  
+  long int n1=igraph_matrix_nrow(incidence);
+  long int n2=igraph_matrix_ncol(incidence);
+  long int no_of_nodes=n1+n2;
+  igraph_vector_t edges;
+  long int i, j, k;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
+  if (multiple) { 
+
+    for (i=0; i<n1; i++) {
+      for (j=0; j<n2; j++) { 
+	long int elem=MATRIX(*incidence, i, j);
+	long int from, to;
+	
+	if (!elem) { continue; }
+	
+	if (mode == IGRAPH_IN) {
+	  from=n1+j;
+	  to=i;
+	} else {
+	  from=i;
+	  to=n1+j;
+	}
+	
+	for (k=0; k<elem; k++) {
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	}
+      }
+    }
+
+  } else {
+    
+    for (i=0; i<n1; i++) {
+      for (j=0; j<n2; j++) { 
+	long int from, to;
+	
+	if (MATRIX(*incidence, i, j) != 0) {
+	  if (mode == IGRAPH_IN) {
+	    from=n1+j;
+	    to=i;
+	  } else {
+	    from=i;
+	    to=n1+j;
+	  }
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	}
+      }
+    }
+    
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 
+			     /*directed=*/ mode != IGRAPH_ALL));
+  igraph_vector_destroy(&edges); 
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  
+  if (types) {
+    IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
+    igraph_vector_bool_null(types);
+    for (i=n1; i<no_of_nodes; i++) {
+      VECTOR(*types)[i] = 1;
+    }
+  }
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}

@@ -559,6 +559,11 @@ igraph_create_bipartite:
         NAME-R: graph.bipartite
         IGNORE: RR
 
+igraph_incidence:
+        PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL types, MATRIX incidence, \
+                NEIMODE mode=ALL, BOOLEAN multiple=False
+        IGNORE: RR
+
 #######################################
 # Spectral properties
 #######################################

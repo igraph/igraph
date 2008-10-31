@@ -901,6 +901,10 @@ int igraph_bipartite_projection(const igraph_t *graph,
 				igraph_t *proj2,
 				igraph_integer_t probe1);
 
+int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
+		     const igraph_matrix_t *incidence, 
+		     igraph_neimode_t mode, igraph_bool_t multiple);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
