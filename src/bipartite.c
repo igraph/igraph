@@ -376,10 +376,49 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
   
 /**
  * \function igraph_incidence
+ * Create a bipartite graph from an incidence matrix
+ *
+ * A bipartite (or two-mode) graph contains two types of vertices and
+ * edges always connect vertices of different types. An incidence
+ * matrix is an nxm matrix, n and m are the number of vertices of the
+ * two types, respectively. Nonzero elements in the matrix denote
+ * edges between the two corresponding vertices.
+ * 
+ * </para><para>
+ * Note that this function can operate in two modes, depending on the
+ * \p multiple argument. If it is FALSE (i.e. 0), then a single edge is
+ * created for every non-zero element in the incidence matrix. If \p
+ * multiple is TRUE (i.e. 1), then the matrix elements are rounded up
+ * to the closest non-negative integer to get the number of edges to
+ * create between a pair of vertices.
+ * 
+ * </para><para>
+ * This function does not create multiple edges if \p multiple is
+ * FALSE, but might create some if it is TRUE.
+ * 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param types Pointer to an initialized boolean vector, or a null
+ *   pointer. If not a null pointer, then the vertex types are stored
+ *   here. It is resized as needed.
+ * \param incidence The incidence matrix.
+ * \param directed Gives whether to create an undirected or a directed
+ *   graph.
+ * \param mode Specifies the direction of the edges in a directed
+ *   graph. If \c IGRAPH_OUT, then edges point from vertices
+ *   of the first kind (corresponding to rows) to vertices of the 
+ *   second kind (corresponding to columns); if \c
+ *   IGRAPH_IN, then the opposite direction is realized; if \c
+ *   IGRAPH_ALL, then mutual edges will be created.
+ * \param multiple How to interpret the incidence matrix elements. See
+ *   details below.
+ * \return Error code.
+ * 
+ * Time complexity: O(n*m), the size of the incidence matrix.
  */
 
 int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 		     const igraph_matrix_t *incidence, 
+		     igraph_bool_t directed,
 		     igraph_neimode_t mode, igraph_bool_t multiple) {
   
   long int n1=igraph_matrix_nrow(incidence);
@@ -407,10 +446,19 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 	  to=n1+j;
 	}
 	
-	for (k=0; k<elem; k++) {
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
-	}
+	if (mode != IGRAPH_ALL || !directed) {
+	  for (k=0; k<elem; k++) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	  }
+	} else {
+	  for (k=0; k<elem; k++) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	  }
+	}	  
       }
     }
 
@@ -428,16 +476,22 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 	    from=i;
 	    to=n1+j;
 	  }
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
-	  IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	  if (mode != IGRAPH_ALL || !directed) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	  } else {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	  }	    
 	}
       }
     }
     
   }
   
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 
-			     /*directed=*/ mode != IGRAPH_ALL));
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
   igraph_vector_destroy(&edges); 
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_FINALLY(igraph_destroy, graph);

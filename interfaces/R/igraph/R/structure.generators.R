@@ -673,18 +673,18 @@ graph.bipartite <- function(types, edges, directed=FALSE) {
   set.vertex.attribute(res, "type", value=types)
 }
 
-graph.incidence <- function(incidence,
-                            mode=c("all", "out", "in", "total"),
-                            multiple=FALSE, add.colnames=NULL,
-                            add.names=NULL) {
+graph.incidence <- function(incidence, directed=FALSE,
+                            mode=c("all", "out", "in", "total"), 
+                            multiple=FALSE, add.names=NULL) {
   # Argument checks
   mode(incidence) <- "double"
+  directed <- as.logical(directed)
   mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
   multiple <- as.logical(multiple)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_incidence", incidence, mode, multiple,
+  res <- .Call("R_igraph_incidence", incidence, mode, directed, multiple,
         PACKAGE="igraph")
   res <- set.vertex.attribute(res$graph, "type", value=res$types)
 

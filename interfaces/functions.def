@@ -561,7 +561,8 @@ igraph_create_bipartite:
 
 igraph_incidence:
         PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL types, MATRIX incidence, \
-                NEIMODE mode=ALL, BOOLEAN multiple=False
+                BOOLEAN directed=False, NEIMODE mode=ALL, \
+                BOOLEAN multiple=False
         IGNORE: RR
 
 #######################################

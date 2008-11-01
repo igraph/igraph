@@ -1,6 +1,10 @@
 2008-11-01  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : 'directed' argument added, remove unnneded 
+	'add.colnames' attribute
+
+	* interfaces/R/igraph/R/structure.generators.R
 	(graph.incidence) : added
 
 2008-10-31  Gabor Csardi  <csardi@szaffi>
