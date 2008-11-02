@@ -10,7 +10,8 @@ graph.incidence(incidence, directed = FALSE, mode = c("all", "out",
     "in", "total"), multiple = FALSE, weighted = NULL, add.names = NULL)
 }
 \arguments{
-  \item{incidence}{The input incidence matrix.}
+  \item{incidence}{The input incidence matrix. It can also be a sparse
+    matrix from the \code{Matrix} package.}
   \item{directed}{Logical scalar, whether to create a directed graph.}
   \item{mode}{A character constant, defines the direction of the edges
     in directed graphs, ignored for undirected graphs. If

@@ -673,16 +673,58 @@ graph.bipartite <- function(types, edges, directed=FALSE) {
   set.vertex.attribute(res, "type", value=types)
 }
 
-graph.incidence <- function(incidence, directed=FALSE,
-                            mode=c("all", "out", "in", "total"), 
-                            multiple=FALSE, weighted=NULL,
-                            add.names=NULL) {
-  # Argument checks
-  mode(incidence) <- "double"
-  directed <- as.logical(directed)
-  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
-  multiple <- as.logical(multiple)
+graph.incidence.sparse <- function(incidence, directed, mode, multiple,
+                                   weighted) {
+  require(Matrix)
 
+  n1 <- nrow(incidence)
+  n2 <- ncol(incidence)
+  el <- selectMethod("summary", signature=c(object="sparseMatrix"))(incidence)
+  ## el <- summary(incidence)
+  el[,2] <- el[,2] + n1
+  el[,c(1,2)] <- el[,c(1,2)] - 1
+
+  if (!is.null(weighted)) {
+
+    if (is.logical(weighted) && weighted) {
+      weighted <- "weight"
+    }
+    if (!is.character(weighted)) {
+      stop("invalid value supplied for `weighted' argument, please see docs.")
+    }
+
+    if (!directed || mode==1) {
+      ## nothing do to
+    } else if (mode==2) {
+      el[,1:2] <- el[,c(2,1)]
+    } else if (mode==3) {
+      el <- rbind(el, el[,c(2,1,3)])
+    }
+
+    res <- graph.empty(n=n1+n2, directed=directed)
+    weight <- list(el[,3])
+    names(weight) <- weighted
+    res <- add.edges(res, edges=t(as.matrix(el[,1:2])), attr=weight)
+
+  } else {
+
+    if (multiple) {
+      el[,3] <- ceiling(el[,3])
+      el[,3][ el[,3] < 0 ] <- 0
+    } else {
+      el[,3] <- el[,3] != 0
+    }
+
+    edges <- unlist(apply(el, 1, function(x) rep(unname(x[1:2]), x[3])))
+    res <- graph(n=n1+n2, edges, directed=directed)
+  } 
+    
+  set.vertex.attribute(res, "type", value=c(rep(FALSE, n1), rep(TRUE, n2)))
+}
+
+graph.incidence.dense <- function(incidence, directed, mode, multiple,
+                                  weighted) {
+  
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
       weighted <- "weight"
@@ -731,12 +773,34 @@ graph.incidence <- function(incidence, directed=FALSE,
     
   } else {
 
+    mode(incidence) <- "double"
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     ## Function call
     res <- .Call("R_igraph_incidence", incidence, mode, directed, multiple,
                  PACKAGE="igraph")
     res <- set.vertex.attribute(res$graph, "type", value=res$types)
 
+  }
+
+  res
+}
+
+graph.incidence <- function(incidence, directed=FALSE,
+                            mode=c("all", "out", "in", "total"), 
+                            multiple=FALSE, weighted=NULL,
+                            add.names=NULL) {
+  # Argument checks
+  directed <- as.logical(directed)
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
+  multiple <- as.logical(multiple)
+
+  if (is(incidence, "Matrix")) {
+    res <- graph.incidence.sparse(incidence, directed=directed,
+                                  mode=mode, multiple=multiple,
+                                  weighted=weighted)
+  } else {
+    res <- graph.incidence.dense(indicende, directed=directed, mode=mode,
+                                 multiple=multiple, weighted=weigted)
   }
 
   ## Add names
