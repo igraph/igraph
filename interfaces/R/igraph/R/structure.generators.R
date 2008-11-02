@@ -675,19 +675,71 @@ graph.bipartite <- function(types, edges, directed=FALSE) {
 
 graph.incidence <- function(incidence, directed=FALSE,
                             mode=c("all", "out", "in", "total"), 
-                            multiple=FALSE, add.names=NULL) {
+                            multiple=FALSE, weighted=NULL,
+                            add.names=NULL) {
   # Argument checks
   mode(incidence) <- "double"
   directed <- as.logical(directed)
   mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
   multiple <- as.logical(multiple)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  # Function call
-  res <- .Call("R_igraph_incidence", incidence, mode, directed, multiple,
-        PACKAGE="igraph")
-  res <- set.vertex.attribute(res$graph, "type", value=res$types)
+  if (!is.null(weighted)) {
+    if (is.logical(weighted) && weighted) {
+      weighted <- "weight"
+    }
+    if (!is.character(weighted)) {
+      stop("invalid value supplied for `weighted' argument, please see docs.")
+    }
 
+    n1 <- nrow(incidence)
+    n2 <- ncol(incidence)
+    no.edges <- sum(incidence != 0)
+    if (directed && mode==3) { no.edges <- no.edges * 2 }
+    edges <- numeric(2*no.edges)
+    weight <- numeric(no.edges)
+    ptr <- 1
+    for (i in seq_len(nrow(incidence))) {
+      for (j in seq_len(ncol(incidence))) {
+        if (incidence[i,j] != 0) {
+          if (!directed || mode==1) {
+            edges[2*ptr-1] <- i-1
+            edges[2*ptr] <- n1+j-1
+            weight[ptr] <- incidence[i,j]
+            ptr <- ptr + 1
+          } else if (mode==2) {
+            edges[2*ptr-1] <- n1+j-1
+            edges[2*ptr] <- i-1
+            weight[ptr] <- incidence[i,j]
+            ptr <- ptr + 1
+          } else if (mode==3) {
+            edges[2*ptr-1] <- i-1
+            edges[2*ptr] <- n1+j-1
+            weight[ptr] <- incidence[i,j]
+            ptr <- ptr + 1
+            edges[2*ptr-1] <- n1+j-1
+            edges[2*ptr] <- i-1
+          }
+        }
+      }
+    }
+    res <- graph.empty(n=n1+n2, directed=directed)
+    weight <- list(weight)
+    names(weight) <- weighted
+    res <- add.edges(res, edges, attr=weight)
+    res <- set.vertex.attribute(res, "type",
+                                value=c(rep(FALSE, n1), rep(TRUE, n2)))
+    
+  } else {
+
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    ## Function call
+    res <- .Call("R_igraph_incidence", incidence, mode, directed, multiple,
+                 PACKAGE="igraph")
+    res <- set.vertex.attribute(res$graph, "type", value=res$types)
+
+  }
+
+  ## Add names
   if (is.null(add.names)) {
     if (!is.null(rownames(incidence)) && !is.null(colnames(incidence))) {
       add.names <- "name"

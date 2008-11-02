@@ -7,7 +7,7 @@
   from an incidence matrix.}
 \usage{
 graph.incidence(incidence, directed = FALSE, mode = c("all", "out", 
-    "in", "total"), multiple = FALSE, add.names = NULL)
+    "in", "total"), multiple = FALSE, weighted = NULL, add.names = NULL)
 }
 \arguments{
   \item{incidence}{The input incidence matrix.}
@@ -22,6 +22,16 @@ graph.incidence(incidence, directed = FALSE, mode = c("all", "out",
     created. }
   \item{multiple}{Logical scalar, specifies how to interpret the matrix
     elements. See details below.}
+  \item{weighted}{This argument specifies whether to create a weighted
+    graph from the incidence matrix. If it is \code{NULL} then an
+    unweighted graph is created and the \code{multiple} argument is used
+    to determine the edges of the graph. If it is a character
+    constant then for every non-zero matrix entry an edge is created and
+    the value of the entry is added as an edge attribute named by the
+    \code{weighted} argument. If it is \code{TRUE} then a weighted graph
+    is created and the name of the edge attribute will be
+    \sQuote{\code{weight}}.
+  }
   \item{add.names}{A character constant, \code{NA} or
     \code{NULL}. \code{graph.incidence} can add the row and column names
     of the incidence matrix as vertex attributes. If this argument is

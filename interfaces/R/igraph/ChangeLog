@@ -1,3 +1,8 @@
+2008-11-02  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igrap/R/structure.generators.R
+	(graph.incidence) : added 'weighted' argument
+
 2008-11-01  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/structure.generators.R
