@@ -566,7 +566,8 @@ igraph_incidence:
         IGNORE: RR
 
 igraph_get_incidence:
-        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res, \
+                OUT VECTOR_OR_0 row_ids, OUT VECTOR_OR_0 col_ids
         DEPS: types ON graph
         NAME-R: get.incidence
         IGNORE: RR

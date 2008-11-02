@@ -518,6 +518,8 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  *   here. An element of the matrix gives the number of edges
  *   (irrespectively of their direction) between the two corresponding
  *   vertices. 
+ * \param row_ids TODO
+ * \param col_ids TODO
  * \return Error code.
  * 
  * Time complexity: O(n*m), n and m are number of vertices of the two
@@ -528,11 +530,15 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
 int igraph_get_incidence(const igraph_t *graph,
 			 const igraph_vector_bool_t *types,
-			 igraph_matrix_t *res) {
+			 igraph_matrix_t *res,
+			 igraph_vector_t *row_ids,
+			 igraph_vector_t *col_ids) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   long int n1=0, n2=0, i;
+  igraph_vector_t perm;
+  long int p1, p2;
 
   if (igraph_vector_bool_size(types) != no_of_nodes) {
     IGRAPH_ERROR("Invalid vertex type vector for bipartite graph", 
@@ -543,19 +549,51 @@ int igraph_get_incidence(const igraph_t *graph,
     n1 += VECTOR(*types)[i] == 0 ? 1 : 0;
   }
   n2 = no_of_nodes-n1;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&perm, no_of_nodes);
+  
+  for (i=0, p1=0, p2=n1; i<no_of_nodes; i++) {
+    VECTOR(perm)[i] = VECTOR(*types)[i] ? p2++ : p1++;
+  }
   
   IGRAPH_CHECK(igraph_matrix_resize(res, n1, n2));
   igraph_matrix_null(res);
   for (i=0; i<no_of_edges; i++) {
     long int from=IGRAPH_FROM(graph, i);
     long int to=IGRAPH_TO(graph, i);
+    long int from2=VECTOR(perm)[from];
+    long int to2=VECTOR(perm)[to];
     if (! VECTOR(*types)[from]) {
-      MATRIX(*res, from, to-n1) += 1;
+      MATRIX(*res, from2, to2-n1) += 1;
     } else {
-      MATRIX(*res, to, from-n1) += 1;
+      MATRIX(*res, to2, from2-n1) += 1;
     }
   }
-  
+
+  if (row_ids) { 
+    IGRAPH_CHECK(igraph_vector_resize(row_ids, n1));
+  }
+  if (col_ids) {
+    IGRAPH_CHECK(igraph_vector_resize(col_ids, n2));
+  }
+  if (row_ids || col_ids) {
+    for (i=0; i<no_of_nodes; i++) {
+      if (! VECTOR(*types)[i]) {
+	if (row_ids) {
+	  long int i2=VECTOR(perm)[i];
+	  VECTOR(*row_ids)[i2] = i;
+	}
+      } else {
+	if (col_ids) {
+	  long int i2=VECTOR(perm)[i];
+	  VECTOR(*col_ids)[i2-n1] = i;
+	}
+      }
+    }
+  }
+
+  igraph_vector_destroy(&perm);
+  IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
     

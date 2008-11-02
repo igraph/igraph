@@ -907,7 +907,9 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
 
 int igraph_get_incidence(const igraph_t *graph,
 			 const igraph_vector_bool_t *types,
-			 igraph_matrix_t *res);
+			 igraph_matrix_t *res,
+			 igraph_vector_t *row_ids,
+			 igraph_vector_t *col_ids);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
