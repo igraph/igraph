@@ -332,18 +332,24 @@ igraph.to.graphNEL <- function(graph) {
   res
 }
 
-get.incidence.dense <- function(graph, types) {
+get.incidence.dense <- function(graph, types, names) {
     
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
   res <- .Call("R_igraph_get_incidence", graph, types,
         PACKAGE="igraph")
-  rownames(res$res) <- res$row_ids
-  colnames(res$res) <- res$col_ids
+
+  if (names && "name" %in% list.vertex.attributes(graph)) {
+    rownames(res$res) <- V(graph)$name[ res$row_ids+1 ]
+    colnames(res$res) <- V(graph)$name[ res$col_ids+1 ]
+  } else {
+    rownames(res$res) <- res$row_ids
+    colnames(res$res) <- res$col_ids
+  }
   res$res
 }
 
-get.incidence.sparse <- function(graph, types) {
+get.incidence.sparse <- function(graph, types, names) {
 
   vc <- vcount(graph)
   if (length(types) != vc) {
@@ -373,12 +379,18 @@ get.incidence.sparse <- function(graph, types) {
   value <- rep(1, nrow(el))
 
   res <- spMatrix(n1, n2, i=el[,1], j=el[,2], x=value)
-  rownames(res) <- which(!types)-1
-  colnames(res) <- which(types)-1
+
+  if (names && "name" %in% list.vertex.attributes(graph)) {
+    rownames(res) <- V(graph)$name[which(!types)]
+    colnames(res) <- V(graph)$name[which(types)]
+  } else {
+    rownames(res) <- which(!types)-1
+    colnames(res) <- which(types)-1
+  }
   res
 }
 
-get.incidence <- function(graph, types=NULL, sparse=FALSE) {
+get.incidence <- function(graph, types=NULL, names=TRUE, sparse=FALSE) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
@@ -390,10 +402,13 @@ get.incidence <- function(graph, types=NULL, sparse=FALSE) {
     stop("Not a bipartite graph, supply `types' argument") 
   }
 
+  names <- as.logical(names)
+  sparse <- as.logical(sparse)
+  
   if (sparse) {
-    get.incidence.sparse(graph, types=types)
+    get.incidence.sparse(graph, types=types, names=names)
   } else {
-    get.incidence.dense(graph, types=types)
+    get.incidence.dense(graph, types=types, names=names)
   }
 }
 

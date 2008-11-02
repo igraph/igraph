@@ -8,7 +8,7 @@
 of a bipartite network. The incidence matrix is an n times m matrix, n
 and m are the number of vertices of the two kinds.x}
 \usage{
-get.incidence(graph, types=NULL, sparse=FALSE)
+get.incidence(graph, types=NULL, names=TRUE, sparse=FALSE)
 }
 \arguments{
   \item{graph}{The input graph. The direction of the edges is ignored in
@@ -16,6 +16,11 @@ get.incidence(graph, types=NULL, sparse=FALSE)
   \item{types}{An optional vertex type vector to use instead of the
     \sQuote{\code{type}} vertex attribute. You must supply this argument
     if the graph has no \sQuote{\code{type}} vertex attribute.}
+  \item{names}{Logical scalar, if \code{TRUE} and the vertices in the
+    graph are named (i.e. the graph has a vertex attribute called
+    \sQuote{\code{name}}), then vertex names will be added to the result
+    as row and column names. Otherwise the ids of the vertices are used
+    as row and column names.}
   \item{sparse}{Logical scalar, if it is \code{TRUE} then a sparse
     matrix is created, you will need the \code{Matrix} package for this.}
 }
