@@ -518,8 +518,13 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  *   here. An element of the matrix gives the number of edges
  *   (irrespectively of their direction) between the two corresponding
  *   vertices. 
- * \param row_ids TODO
- * \param col_ids TODO
+ * \param row_ids Pointer to an initialized vector or a null
+ *   pointer. If not a null pointer, then the vertex ids (in the
+ *   graph) corresponding to the rows of the result matrix are stored
+ *   here.
+ * \param col_ids Pointer to an initialized vector or a null
+ *   pointer. If not a null pointer, then the vertex ids corresponding
+ *   to the columns of the result matrix are stored here.
  * \return Error code.
  * 
  * Time complexity: O(n*m), n and m are number of vertices of the two

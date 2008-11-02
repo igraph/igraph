@@ -12,7 +12,7 @@ bipartite.projection (graph, types=NULL, probe1=-1)
     are ignored during the computation.}
   \item{types}{An optional vertex type vector to use instead of the
     \sQuote{\code{type}} vertex attribute. You must supply this argument
-    if the graph has no \sQoute{code{type}} vertex attribute.}
+    if the graph has no \sQuote{\code{type}} vertex attribute.}
   \item{probe1}{This argument can be used to specify the order of the
     projections in the resulting list. If given and non-negative, then
     it is considered as a vertex id; the projection containing the
@@ -31,7 +31,7 @@ bipartite.projection (graph, types=NULL, probe1=-1)
   A list of two undirected graphs. See details above.
 }
 % \references{}
-\author{ Gabor Csardi <csardi@rmki.kfki.hu> }
+\author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
 % \seealso{}
 \examples{
 ## Projection of a full bipartite graph is a full graph
