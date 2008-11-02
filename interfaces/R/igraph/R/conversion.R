@@ -331,3 +331,23 @@ igraph.to.graphNEL <- function(graph) {
   
   res
 }
+
+get.incidence <- function(graph, types=NULL, sparse=FALSE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
+  types <- V(graph)$type 
+  } 
+  if (!is.null(types)) { 
+  types <- as.logical(types) 
+  } else { 
+  stop("Not a bipartite graph, supply `types' argument") 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_get_incidence", graph, types,
+        PACKAGE="igraph")
+  res
+}
+

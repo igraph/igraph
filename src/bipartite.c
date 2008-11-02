@@ -507,3 +507,55 @@ int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/** 
+ * \function igraph_get_incidence
+ * Convert a bipartite graph into an incidence matrix
+ * 
+ * \param graph The input graph, edge directions are ignored.
+ * \param types Boolean vector containing the vertex types.
+ * \param res Pointer to an initialized matrix, the result is stored
+ *   here. An element of the matrix gives the number of edges
+ *   (irrespectively of their direction) between the two corresponding
+ *   vertices. 
+ * \return Error code.
+ * 
+ * Time complexity: O(n*m), n and m are number of vertices of the two
+ * different kind.
+ * 
+ * \sa \ref igraph_incidence() for the opposite operation.
+ */
+
+int igraph_get_incidence(const igraph_t *graph,
+			 const igraph_vector_bool_t *types,
+			 igraph_matrix_t *res) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int n1=0, n2=0, i;
+
+  if (igraph_vector_bool_size(types) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid vertex type vector for bipartite graph", 
+		 IGRAPH_EINVAL);
+  }
+  
+  for (i=0; i<no_of_nodes; i++) {
+    n1 += VECTOR(*types)[i] == 0 ? 1 : 0;
+  }
+  n2 = no_of_nodes-n1;
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, n1, n2));
+  igraph_matrix_null(res);
+  for (i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    if (! VECTOR(*types)[from]) {
+      MATRIX(*res, from, to-n1) += 1;
+    } else {
+      MATRIX(*res, to, from-n1) += 1;
+    }
+  }
+  
+  return 0;
+}
+    

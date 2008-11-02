@@ -1,5 +1,7 @@
 2008-11-02  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : added
+
 	* interfaces/R/igraph/R/structure.generators.R
 	(graph.incidence) : added sparse graph support
 

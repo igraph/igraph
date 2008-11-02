@@ -565,6 +565,12 @@ igraph_incidence:
                 BOOLEAN multiple=False
         IGNORE: RR
 
+igraph_get_incidence:
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res
+        DEPS: types ON graph
+        NAME-R: get.incidence
+        IGNORE: RR
+
 #######################################
 # Spectral properties
 #######################################

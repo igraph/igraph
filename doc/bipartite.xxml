@@ -13,8 +13,12 @@
 
 <section><title>Create two-mode networks</title>
 <!-- doxrox-include igraph_create_bipartite -->
-<!-- doxrox-include igraph_incidence -->
 <!-- doxrox-include igraph_full_bipartite -->
+</section>
+
+<section><title>Incidence matrices</title>
+<!-- doxrox-include igraph_incidence -->
+<!-- doxrox-include igraph_get_incidence -->
 </section>
 
 <section><title>Project a two-mode graphs</title>
