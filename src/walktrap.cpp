@@ -84,7 +84,7 @@ using namespace std;
  * \param graph The input graph.
  * \param weights Numeric vector giving the weights of the edges. 
  *     If it is a NULL pointer then all edges will have equal
- *     weights. 
+ *     weights. The weights are expected to be positive.
  * \param steps Integer constant, the length of the random walks.
  * \param merges Pointer to a matrix, the merges performed by the
  *     algorithm will be stored here (if not NULL). Each merge is a
