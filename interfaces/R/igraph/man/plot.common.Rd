@@ -295,8 +295,7 @@
       
       The default value is \code{FALSE}.
       
-      This parameter is currently supported only by
-      \code{\link{plot.igraph}}. }
+      This parameter is currently ignored by \code{\link{rglplot}}.}
     \item{arrow.mode}{This parameter can be used to specify for which
       edges should arrows be drawn. If this parameter is given by the
       user (in either of the three ways) then it specifies which edges
