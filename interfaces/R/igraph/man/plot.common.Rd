@@ -281,6 +281,22 @@
       corresponding vertex parameter for details.}
     \item{label.color}{The color of the edge labels, see the
       \code{color} vertex parameters on how to specify colors. }
+    \item{curved}{Specifies whether to draw curved edges, or not. This
+      can be a logical or a numeric vector or scalar.
+
+      First the vector is replicated to have the same length as the
+      number of edges in the graph. Then it is interpreted for each edge
+      separately. A numeric value specifies the curvature of the edge;
+      zero curvature means straight edges, negative values means the
+      edge bends clockwise, positive values the opposite. \code{TRUE}
+      means curvature 0.5, \code{FALSE} means curvature zero.
+
+      This parameter is ignored for loop edges.
+      
+      The default value is \code{FALSE}.
+      
+      This parameter is currently supported only by
+      \code{\link{plot.igraph}}. }
     \item{arrow.mode}{This parameter can be used to specify for which
       edges should arrows be drawn. If this parameter is given by the
       user (in either of the three ways) then it specifies which edges
