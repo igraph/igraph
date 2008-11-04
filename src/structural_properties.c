@@ -4294,7 +4294,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  igraph_indheap_t Q;
+  igraph_2wheap_t Q;
   igraph_vit_t fromvit;
   long int no_of_from;
   igraph_lazy_adjedgelist_t adjlist;
@@ -4315,8 +4315,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_vit_destroy, &fromvit);
   no_of_from=IGRAPH_VIT_SIZE(fromvit);
   
-  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
-  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
   IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
 
@@ -4329,11 +4329,11 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 
     long int source=IGRAPH_VIT_GET(fromvit);
     MATRIX(*res, i, source) = 1.0;	/* zero distance */
-    igraph_indheap_push_with_index(&Q, source, 0);
+    igraph_2wheap_push_with_index(&Q, source, 0);
     
-    while (!igraph_indheap_empty(&Q)) {
-      long int minnei=igraph_indheap_max_index(&Q);
-      igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+    while (!igraph_2wheap_empty(&Q)) {
+      long int minnei=igraph_2wheap_max_index(&Q);
+      igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
 
       /* Now check all neighbors of 'minnei' for a shorter path */
       igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
@@ -4346,20 +4346,20 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 	if (curdist==0) {
 	  /* This is the first non-infinite distance */
 	  MATRIX(*res, i, to) = altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (altdist < curdist-1) {
 	  /* This is a shorter path */
 	  MATRIX(*res, i, to) = altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	}
       }
       
-    } /* !igraph_indheap_empty(&Q) */
+    } /* !igraph_2wheap_empty(&Q) */
 
   } /* !IGRAPH_VIT_END(fromvit) */
   
   igraph_lazy_adjedgelist_destroy(&adjlist);
-  igraph_indheap_destroy(&Q);
+  igraph_2wheap_destroy(&Q);
   igraph_vit_destroy(&fromvit);
   IGRAPH_FINALLY_CLEAN(3);
   
