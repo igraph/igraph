@@ -4456,7 +4456,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_vit_t vit;
-  igraph_indheap_t Q;
+  igraph_2wheap_t Q;
   igraph_lazy_adjedgelist_t adjlist;
   igraph_vector_t dists;
   long int *parents;
@@ -4481,8 +4481,8 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_ERROR("Size of `res' and `to' should match", IGRAPH_EINVAL);
   }
 
-  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
-  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
   IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
 
@@ -4508,11 +4508,11 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   VECTOR(dists)[(long int)from] = 1.0;	/* zero distance */
   if (is_target[(long int)from]) to_reach--;
   parents[(long int)from] = from+1;
-  igraph_indheap_push_with_index(&Q, from, 0);
+  igraph_2wheap_push_with_index(&Q, from, 0);
     
-  while (!igraph_indheap_empty(&Q) && to_reach > 0) {
-    long int nlen, minnei=igraph_indheap_max_index(&Q);
-    igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+  while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
+    long int nlen, minnei=igraph_2wheap_max_index(&Q);
+    igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
     igraph_vector_t *neis;
 
     IGRAPH_ALLOW_INTERRUPTION();
@@ -4534,15 +4534,15 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         /* This is the first non-infinite distance */
         VECTOR(dists)[to] = altdist+1.0;
         parents[to] = minnei+1;
-        IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+        IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
       } else if (altdist < curdist-1) {
 	    /* This is a shorter path */
         VECTOR(dists)[to] = altdist+1.0;
         parents[to] = minnei+1;
-        IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+        IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
       }
     }
-  } /* !igraph_indheap_empty(&Q) */
+  } /* !igraph_2wheap_empty(&Q) */
 
   if (to_reach > 0) IGRAPH_WARNING("Couldn't reach some vertices");
 
@@ -4573,7 +4573,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   }
   
   igraph_lazy_adjedgelist_destroy(&adjlist);
-  igraph_indheap_destroy(&Q);
+  igraph_2wheap_destroy(&Q);
   igraph_vector_destroy(&dists);
   igraph_Free(is_target);
   igraph_Free(parents);

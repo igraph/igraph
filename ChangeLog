@@ -1,5 +1,8 @@
 2008-11-04  Gabor Csardi  <csardi@szaffi>
 
+	* src/structural_properties.c (igraph_get_shortest_paths_dijkstra) :
+	use the two-wat heap
+
 	* src/structural_properties.c (igraph_shortest_paths_dijkstra) : 
 	use the two-way heap
 
