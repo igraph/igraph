@@ -1890,11 +1890,12 @@ SEXP R_igraph_growing_random_game(SEXP pn, SEXP pm, SEXP pdirected,
   return result;  
 }
 
-SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode, SEXP weights, 
+SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pto,
+			     SEXP pmode, SEXP weights, 
 			     SEXP palgo) {
   
   igraph_t g;
-  igraph_vs_t vs;
+  igraph_vs_t vs, to;
   igraph_integer_t mode=REAL(pmode)[0];
   long int algo=REAL(palgo)[0];
   igraph_matrix_t res;
@@ -1906,6 +1907,7 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode, SEXP weights,
   
   R_SEXP_to_igraph(graph, &g);
   R_SEXP_to_igraph_vs(pvids, &g, &vs);
+  R_SEXP_to_igraph_vs(pto, &g, &to);
   if (isNull(weights)) {
     pw=0;
   } else {
@@ -1916,25 +1918,25 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode, SEXP weights,
   switch (algo) {
   case 0: 			/* automatic */
     if (negw && mode==IGRAPH_OUT && GET_LENGTH(pvids)>100) {
-      igraph_shortest_paths_johnson(&g, &res, vs, pw);
+      igraph_shortest_paths_johnson(&g, &res, vs, to, pw);
     } else if (negw) {
-      igraph_shortest_paths_bellman_ford(&g, &res, vs, pw, mode);
+      igraph_shortest_paths_bellman_ford(&g, &res, vs, to, pw, mode);
     } else {
       /* This one chooses 'unweighted' if there are no weights */
-      igraph_shortest_paths_dijkstra(&g, &res, vs, pw, mode);
+      igraph_shortest_paths_dijkstra(&g, &res, vs, to, pw, mode);
     }
     break;
   case 1:			/* unweighted */
-    igraph_shortest_paths(&g, &res, vs, mode);
+    igraph_shortest_paths(&g, &res, vs, to, mode);
     break;
   case 2:			/* dijkstra */
-    igraph_shortest_paths_dijkstra(&g, &res, vs, pw, mode);
+    igraph_shortest_paths_dijkstra(&g, &res, vs, to, pw, mode);
     break;
   case 3:			/* bellman-ford */
-    igraph_shortest_paths_bellman_ford(&g, &res, vs, pw, mode);
+    igraph_shortest_paths_bellman_ford(&g, &res, vs, to, pw, mode);
     break;
   case 4:			/* johnson */
-    igraph_shortest_paths_johnson(&g, &res, vs, pw);
+    igraph_shortest_paths_johnson(&g, &res, vs, to, pw);
     break;
   }
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));

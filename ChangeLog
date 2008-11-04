@@ -1,3 +1,15 @@
+2008-11-04  Gabor Csardi  <csardi@szaffi>
+
+	* src/structural_properties.c (igraph_shortest_paths) : 
+	'to' argument added
+	(igraph_shortest_paths_dijkstra, igraph_shortest_paths_bellman_ford)
+	(igraph_shortest_paths_johnson) :
+	'to' argument added, but not implemented yet!
+	* src/layout.c (igraph_layout_kamada_kawai)
+	(igraph_layout_kamada_kawai_3d) : updated
+	* examples/simple/dijkstra.c : updated
+	* examples/simple/bellman_ford.c : updated
+
 2008-11-02  Gabor Csardi  <csardi@szaffi>
 
 	* src/bipartite.c (igraph_get_incidence) : rewritten, previous 

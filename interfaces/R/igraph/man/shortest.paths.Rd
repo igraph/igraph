@@ -12,7 +12,8 @@
   network. \code{get.shortest.paths} calculates one shortest path (the
   path itself, and not just its length) from or to the given vertex.}
 \usage{
-shortest.paths(graph, v=V(graph), mode = c("all", "out", "in"),
+shortest.paths(graph, v=V(graph), to=V(graph),
+      mode = c("all", "out", "in"),
       weights = NULL, algorithm = c("automatic", "unweighted",
                                     "dijkstra", "bellman-ford",
                                     "johnson"))
@@ -24,8 +25,11 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
 }
 \arguments{
   \item{graph}{The graph to work on.}
-  \item{v}{Numeric vector, the vertices from or to which the shortest
+  \item{v}{Numeric vector, the vertices from which the shortest
     paths will be calculated.}
+  \item{to}{Numeric vector, the vertices to which the shortest paths
+    will be calculated. By default it includes all vertices. Note that
+    every vertex must be included here at most once.}
   \item{mode}{Character constant, gives whether the shortest paths to or
     from the given vertices should be calculated for directed graphs. If
     \code{out} then the shortest paths \emph{from} the vertex, if

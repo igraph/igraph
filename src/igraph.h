@@ -749,7 +749,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
                               igraph_real_t cutoff,
 			      const igraph_vector_t *weights);
 int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
-			  const igraph_vs_t from, igraph_neimode_t mode);
+			  const igraph_vs_t from, const igraph_vs_t to, 
+			  igraph_neimode_t mode);
 int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
 			      igraph_integer_t from, const igraph_vs_t to, 
 			      igraph_neimode_t mode);
@@ -761,11 +762,13 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
 int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 				   igraph_matrix_t *res,
 				   const igraph_vs_t from,
+				   const igraph_vs_t to,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode);
 int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 				   igraph_matrix_t *res,
 				   const igraph_vs_t from,
+				   const igraph_vs_t to,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode);
 int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
@@ -777,6 +780,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 int igraph_shortest_paths_johnson(const igraph_t *graph,
 				  igraph_matrix_t *res,
 				  const igraph_vs_t from,
+				  const igraph_vs_t to,
 				  const igraph_vector_t *weights);
 
 int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 

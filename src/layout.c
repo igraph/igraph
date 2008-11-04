@@ -560,7 +560,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
 
   IGRAPH_CHECK(igraph_matrix_resize(res, n, 2));
   IGRAPH_MATRIX_INIT_FINALLY(&elen, n, n);
-  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(), 
+  IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(),
+				     igraph_vss_all(),
 				     IGRAPH_ALL));
   if (!use_seed) {
     for (i=0; i<n; i++) {
@@ -663,6 +664,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
   IGRAPH_MATRIX_INIT_FINALLY(&elen,  no_of_nodes, no_of_nodes);
   IGRAPH_CHECK(igraph_shortest_paths(graph, &elen, igraph_vss_all(), 
+				     igraph_vss_all(),
 				     IGRAPH_ALL));
   
   if (!use_seed) {

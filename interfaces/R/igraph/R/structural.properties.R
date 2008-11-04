@@ -99,7 +99,8 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
   res
 }
 
-shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
+shortest.paths <- function(graph, v=V(graph), to=V(graph),
+                           mode=c("all", "out", "in"),
                            weights=NULL,
                            algorithm=c("automatic", "unweighted", "dijkstra",
                              "bellman-ford", "johnson")) {
@@ -132,7 +133,7 @@ shortest.paths <- function(graph, v=V(graph), mode=c("all", "out", "in"),
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_shortest_paths", graph, as.igraph.vs(v),
-        as.numeric(mode), weights, as.numeric(algorithm),
+        as.igraph.vs(to), as.numeric(mode), weights, as.numeric(algorithm),
         PACKAGE="igraph")
 }
 

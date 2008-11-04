@@ -304,7 +304,8 @@ igraph_closeness_estimate:
         NAME-R: closeness.estimate
 
 igraph_shortest_paths:
-        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, NEIMODE mode=OUT
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
+                VERTEXSET to=ALL, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths:
@@ -319,12 +320,17 @@ igraph_get_all_shortest_paths:
 
 igraph_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
-                EDGEWEIGHTS weights, NEIMODE mode=OUT
+                VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
 
 igraph_shortest_paths_bellman_ford:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
-                EDGEWEIGHTS weights, NEIMODE mode=OUT
+                VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_shortest_paths_johnson:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
+                VERTEXSET to=ALL, EDGEWEIGHTS weights
         IGNORE: RR, RC, RNamespace
 
 igraph_subcomponent: 

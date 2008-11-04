@@ -672,6 +672,9 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
  *        unreachable vertices IGRAPH_INFINITY is returned.
  * \param from Vector of the vertex ids for which the path length
  *        calculations are done.
+ * \param to Vector of the vertex ids to which the path length 
+ *        calculations are done. It is not allowed to have duplicated
+ *        vertex ids here.
  * \param mode The type of shortest paths to be use for the
  *        calculation in directed graphs. Possible values: 
  *        \clist
@@ -705,17 +708,21 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
  */
 
 int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
-			  const igraph_vs_t from, igraph_neimode_t mode) {
+			  const igraph_vs_t from, const igraph_vs_t to,
+			  igraph_neimode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_from;
+  long int no_of_from, no_of_to;
   long int *already_counted;
   igraph_adjlist_t adjlist;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_vector_t *neis;
+  igraph_bool_t all_to;
 
   long int i, j;
-  igraph_vit_t fromvit;
+  igraph_vit_t fromvit, tovit;
+  igraph_real_t my_infinity=IGRAPH_INFINITY;
+  igraph_vector_t index;
 
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
@@ -736,13 +743,30 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_FINALLY(free, already_counted);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_nodes));
-  igraph_matrix_null(res);
+  if ( (all_to=igraph_vs_is_all(&to)) ) {
+    no_of_to=no_of_nodes;
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_nodes);
+    IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
+    no_of_to=IGRAPH_VIT_SIZE(tovit);
+    for (i=0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
+      long int v=IGRAPH_VIT_GET(tovit);
+      if (VECTOR(index)[v]) {
+	IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed", 
+		     IGRAPH_EINVAL);
+      }
+      VECTOR(index)[v] = ++i;
+    }
+  }
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
+  igraph_matrix_fill(res, my_infinity);
 
   for (IGRAPH_VIT_RESET(fromvit), i=0; 
        !IGRAPH_VIT_END(fromvit); 
        IGRAPH_VIT_NEXT(fromvit), i++) {
-    long int reached=1;
+    long int reached=0;
     IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(fromvit)));
     IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
     already_counted[ (long int) IGRAPH_VIT_GET(fromvit) ] = i+1;
@@ -752,31 +776,38 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     while (!igraph_dqueue_empty(&q)) {
       long int act=igraph_dqueue_pop(&q);
       long int actdist=igraph_dqueue_pop(&q);
-      MATRIX(*res, i, act)=actdist;
+
+      if (all_to) {
+	MATRIX(*res, i, act)=actdist;
+      } else {
+	if (VECTOR(index)[act]) {
+	  MATRIX(*res, i, (long int)(VECTOR(index)[act]-1)) = actdist;
+	  reached++;
+	  if (reached==no_of_to) {
+	    igraph_dqueue_clear(&q);
+	    break;
+	  }
+	}
+      }
       
       neis = igraph_adjlist_get(&adjlist, act);
       for (j=0; j<igraph_vector_size(neis); j++) {
         long int neighbor=VECTOR(*neis)[j];
         if (already_counted[neighbor] == i+1) { continue; }
         already_counted[neighbor] = i+1;
-        reached++;
         IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
         IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
       }
     }
-
-    /* Plus the unreachable nodes */
-    j=0;
-    while (reached < no_of_nodes) {
-      if (MATRIX(*res, i, j) == 0 && j != IGRAPH_VIT_GET(fromvit)) {
-        MATRIX(*res, i, j)=IGRAPH_INFINITY;
-        reached++;
-      }
-      j++;
-    }
   }
 
   /* Clean */
+  if (!all_to) {
+    igraph_vit_destroy(&tovit);
+    igraph_vector_destroy(&index);
+    IGRAPH_FINALLY_CLEAN(2);
+  }
+
   igraph_Free(already_counted);
   igraph_dqueue_destroy(&q);
   igraph_vit_destroy(&fromvit);
@@ -4217,6 +4248,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
  *    from a single source, in the order of vertex ids.
  *    Unreachable vertices has distance \c IGRAPH_INFINITY.
  * \param from The source vertices.
+ * \param to The target vertices.
  * \param weights The edge weights. They must be all non-negative for
  *    Dijkstra's algorithm to work. An error code is returned if there
  *    is a negative edge weight in the weight vector. If this is a null
@@ -4240,6 +4272,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
 int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 				   igraph_matrix_t *res,
 				   const igraph_vs_t from,
+				   const igraph_vs_t to,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode) {
 
@@ -4268,7 +4301,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   long int i,j;
     
   if (!weights) {
-    return igraph_shortest_paths(graph, res, from, mode);
+    return igraph_shortest_paths(graph, res, from, to, mode);
   }
   
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -4586,6 +4619,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 				       igraph_matrix_t *res,
 				       const igraph_vs_t from,
+				       const igraph_vs_t to,
 				       const igraph_vector_t *weights, 
 				       igraph_neimode_t mode) {
   long int no_of_nodes=igraph_vcount(graph);
@@ -4607,7 +4641,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
        n times.
   */
   if (!weights) {
-    return igraph_shortest_paths(graph, res, from, mode);
+    return igraph_shortest_paths(graph, res, from, to, mode);
   }
   
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -4718,6 +4752,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 int igraph_shortest_paths_johnson(const igraph_t *graph,
 				  igraph_matrix_t *res,
 				  const igraph_vs_t from,
+				  const igraph_vs_t to,
 				  const igraph_vector_t *weights) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -4731,7 +4766,7 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
 
   /* If no weights, then we can just run the unweighted version */
   if (!weights) {
-    return igraph_shortest_paths(graph, res, from, IGRAPH_OUT);
+    return igraph_shortest_paths(graph, res, from, to, IGRAPH_OUT);
   }
   
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -4740,7 +4775,8 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
   
   /* If no negative weights, then we can run Dijkstra's algorithm */
   if (igraph_vector_min(weights) >= 0) {
-    return igraph_shortest_paths_dijkstra(graph, res, from, weights, IGRAPH_OUT);
+    return igraph_shortest_paths_dijkstra(graph, res, from, to,
+					  weights, IGRAPH_OUT);
   }
   
   if (!igraph_is_directed(graph)) {
@@ -4781,10 +4817,11 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
      new vertex.  */
   
   IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(&newgraph,
-						   &bfres,
-						   igraph_vss_1(no_of_nodes),
-						   &newweights,
-						   IGRAPH_OUT));
+						  &bfres,
+						  igraph_vss_1(no_of_nodes),
+						  igraph_vss_all(),
+						  &newweights,
+						  IGRAPH_OUT));
 
   igraph_destroy(&newgraph);
   IGRAPH_FINALLY_CLEAN(1);
@@ -4801,7 +4838,8 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
   }
   
   /* Run Dijkstra's algorithm on the new weights */
-  IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, res, from, &newweights,
+  IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, res, from, 
+					      to, &newweights,
 					      IGRAPH_OUT));
   
   igraph_vector_destroy(&newweights);
