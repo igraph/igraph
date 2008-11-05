@@ -854,8 +854,8 @@ static inline void igraph_i_2wheap_switch(igraph_2wheap_t *h,
     tmp1=VECTOR(h->index)[e1];
     tmp2=VECTOR(h->index)[e2];
     
-    VECTOR(h->index2)[tmp1]=e2+1;
-    VECTOR(h->index2)[tmp2]=e1+1;
+    VECTOR(h->index2)[tmp1]=e2+2;
+    VECTOR(h->index2)[tmp2]=e1+2;
 
     VECTOR(h->index)[e1]=tmp2;
     VECTOR(h->index)[e2]=tmp1;
@@ -933,7 +933,7 @@ int igraph_2wheap_push_with_index(igraph_2wheap_t *h,
   long int size=igraph_vector_size(&h->data);
   IGRAPH_CHECK(igraph_vector_push_back(&h->data, elem));
   IGRAPH_CHECK(igraph_vector_long_push_back(&h->index, idx));
-  VECTOR(h->index2)[idx] = size+1;
+  VECTOR(h->index2)[idx] = size+2;
   
   /* maintain heap */
   igraph_i_2wheap_shift_up(h, size);
@@ -960,8 +960,12 @@ igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, long int idx) {
   return VECTOR(h->index2)[idx] != 0;
 }
 
+igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, long int idx) {
+  return VECTOR(h->index2)[idx] > 1;
+}
+
 igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, long int idx) {
-  long int i=VECTOR(h->index2)[idx]-1;
+  long int i=VECTOR(h->index2)[idx]-2;
   return VECTOR(h->data)[i];
 }
 
@@ -978,6 +982,18 @@ igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h) {
   return tmp;
 }
 
+igraph_bool_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h) {
+  
+  igraph_real_t tmp=VECTOR(h->data)[0];
+  long int tmpidx=VECTOR(h->index)[0];
+  igraph_i_2wheap_switch(h, 0, igraph_2wheap_size(h)-1);
+  igraph_vector_pop_back(&h->data);
+  igraph_vector_long_pop_back(&h->index);
+  VECTOR(h->index2)[tmpidx] = 1;
+  igraph_i_2wheap_sink(h, 0);
+
+  return tmp;
+}
 
 igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx) {
 
@@ -995,7 +1011,7 @@ igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx) 
 
 int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem) {
   
-  long int pos=VECTOR(h->index2)[idx]-1;
+  long int pos=VECTOR(h->index2)[idx]-2;
   VECTOR(h->data)[pos] = elem;
   igraph_i_2wheap_sink(h, pos);
   igraph_i_2wheap_shift_up(h, pos);
