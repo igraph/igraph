@@ -1,5 +1,8 @@
 2008-11-05  Gabor Csardi  <csardi@szaffi>
 
+	* src/structural_properties.c (igraph_shortest_paths_dijkstra) : 
+	added support for 'to' argument
+
 	* src/heap.c (igraph_2wheap_deactivate_max) 
 	(igraph_2wheap_has_active) : added, elements can
 	be inactive now

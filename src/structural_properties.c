@@ -4278,10 +4278,10 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 
   /* Implementation details. This is the basic Dijkstra algorithm, 
      with a binary heap. The heap is indexed, i.e. it stores not only
-     the distances, but also which vertex they belong to. The other
-     mapping, i.e. getting the distance for a vertex is not in the
-     heap (that would by the double-indexed heap), but in the result
-     matrix.
+     the distances, but also which vertex they belong to.
+
+     From now on we use a 2-way heap, so the distances can be queried
+     directly from the heap.
 
      Dirty tricks:
      - the opposite of the distance is stored in the heap, as it is a
@@ -4295,11 +4295,14 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_2wheap_t Q;
-  igraph_vit_t fromvit;
-  long int no_of_from;
+  igraph_vit_t fromvit, tovit;
+  long int no_of_from, no_of_to;
   igraph_lazy_adjedgelist_t adjlist;
   long int i,j;
-    
+  igraph_real_t my_infinity=IGRAPH_INFINITY;
+  igraph_bool_t all_to;
+  igraph_vector_t index;
+
   if (!weights) {
     return igraph_shortest_paths(graph, res, from, to, mode);
   }
@@ -4320,20 +4323,51 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
   IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
 
-  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_nodes));
-  igraph_matrix_null(res);
+  if ( (all_to=igraph_vs_is_all(&to)) ) {
+    no_of_to=no_of_nodes;
+  } else {
+    IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_nodes);
+    IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
+    no_of_to=IGRAPH_VIT_SIZE(tovit);
+    for (i=0; !IGRAPH_VIT_END(tovit); IGRAPH_VIT_NEXT(tovit)) {
+      long int v=IGRAPH_VIT_GET(tovit);
+      if (VECTOR(index)[v]) {
+	IGRAPH_ERROR("Duplicate vertices in `to', this is not allowed", 
+		     IGRAPH_EINVAL);
+      }
+      VECTOR(index)[v] = ++i;
+    }
+  }
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
+  igraph_matrix_fill(res, my_infinity);
 
   for (IGRAPH_VIT_RESET(fromvit), i=0; 
        !IGRAPH_VIT_END(fromvit);
        IGRAPH_VIT_NEXT(fromvit), i++) {
-
+    
+    long int reached=0;
     long int source=IGRAPH_VIT_GET(fromvit);
-    MATRIX(*res, i, source) = 1.0;	/* zero distance */
-    igraph_2wheap_push_with_index(&Q, source, 0);
+    igraph_2wheap_clear(&Q);
+    igraph_2wheap_push_with_index(&Q, source, -1.0);
     
     while (!igraph_2wheap_empty(&Q)) {
       long int minnei=igraph_2wheap_max_index(&Q);
-      igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
+      igraph_real_t mindist=-igraph_2wheap_deactivate_max(&Q);
+
+      if (all_to) {
+	MATRIX(*res, i, minnei)=mindist-1.0;
+      } else {
+	if (VECTOR(index)[minnei]) {
+	  MATRIX(*res, i, (long int)(VECTOR(index)[minnei]-1)) = mindist-1.0;
+	  reached++;
+	  if (reached==no_of_to) {
+	    igraph_2wheap_clear(&Q);
+	    break;
+	  }
+	}
+      }
 
       /* Now check all neighbors of 'minnei' for a shorter path */
       igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
@@ -4342,14 +4376,13 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 	long int edge=VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
-	igraph_real_t curdist=MATRIX(*res, i, to);
-	if (curdist==0) {
+	igraph_bool_t has=igraph_2wheap_has_elem(&Q, to);
+	igraph_real_t curdist= has ? -igraph_2wheap_get(&Q, to) : 0.0;	
+	if (!has) {
 	  /* This is the first non-infinite distance */
-	  MATRIX(*res, i, to) = altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
-	} else if (altdist < curdist-1) {
+	} else if (altdist < curdist) {
 	  /* This is a shorter path */
-	  MATRIX(*res, i, to) = altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	}
       }
@@ -4357,23 +4390,18 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     } /* !igraph_2wheap_empty(&Q) */
 
   } /* !IGRAPH_VIT_END(fromvit) */
+
+  if (!all_to) {
+    igraph_vit_destroy(&tovit);
+    igraph_vector_destroy(&index);
+    IGRAPH_FINALLY_CLEAN(2);
+  }  
   
   igraph_lazy_adjedgelist_destroy(&adjlist);
   igraph_2wheap_destroy(&Q);
   igraph_vit_destroy(&fromvit);
   IGRAPH_FINALLY_CLEAN(3);
   
-  /* Rewrite the result matrix */
-  for (i=0; i<no_of_from; i++) {
-    for (j=0; j<no_of_nodes; j++) {
-      if (MATRIX(*res, i, j) == 0) {
-	MATRIX(*res, i, j) = IGRAPH_INFINITY;
-      } else {
-	MATRIX(*res, i, j) -= 1.0;
-      }
-    }
-  }
-
   return 0;
 }
 
