@@ -1,3 +1,8 @@
+2008-11-07  Gabor Csardi  <csardi@szaffi>
+
+	* src/structural_properties.c 
+	(igraph_shortest_paths_bellman_ford) : implement 'to' argument
+
 2008-11-05  Gabor Csardi  <csardi@szaffi>
 
 	* src/structural_properties.c (igraph_shortest_paths_dijkstra) : 

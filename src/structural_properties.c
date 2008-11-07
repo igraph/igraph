@@ -4654,11 +4654,14 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_lazy_adjedgelist_t adjlist;
   long int i,j,k;
-  long int no_of_from;
+  long int no_of_from, no_of_to;
   igraph_dqueue_t Q; 
   igraph_vector_t clean_vertices;
   igraph_vector_t num_queued;
-  igraph_vit_t fromvit;
+  igraph_vit_t fromvit, tovit;
+  igraph_real_t my_infinity=IGRAPH_INFINITY;
+  igraph_bool_t all_to;
+  igraph_vector_t dist;
 
   /*
      - speedup: a vertex is marked clean if its distance from the source
@@ -4686,15 +4689,24 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
   IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
   IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
 
-  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_nodes));
-  igraph_matrix_fill(res, IGRAPH_INFINITY);
+  if ( (all_to=igraph_vs_is_all(&to)) ) {
+    no_of_to=no_of_nodes;
+  } else {
+    IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &tovit);
+    no_of_to=IGRAPH_VIT_SIZE(tovit);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
+  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_from, no_of_to));
 
   for (IGRAPH_VIT_RESET(fromvit), i=0; 
        !IGRAPH_VIT_END(fromvit);
        IGRAPH_VIT_NEXT(fromvit), i++) {
     long int source=IGRAPH_VIT_GET(fromvit);
 
-    MATRIX(*res, i, source) = 0;
+    igraph_vector_fill(&dist, my_infinity);
+    VECTOR(dist)[source] = 0;
     igraph_vector_null(&clean_vertices);
     igraph_vector_null(&num_queued);
 
@@ -4721,14 +4733,25 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
       for (k=0; k<nlen; k++) {
         long int nei = VECTOR(*neis)[k];
         long int target = IGRAPH_OTHER(graph, nei, j);
-        if (MATRIX(*res, i, target) > MATRIX(*res, i, j) + VECTOR(*weights)[nei]) {
+        if (VECTOR(dist)[target] > VECTOR(dist)[j] + VECTOR(*weights)[nei]) {
           /* relax the edge */
-          MATRIX(*res, i, target) = MATRIX(*res, i, j) + VECTOR(*weights)[nei];
+	  VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
           if (VECTOR(clean_vertices)[target]) {
             VECTOR(clean_vertices)[target] = 0;
             IGRAPH_CHECK(igraph_dqueue_push(&Q, target));
           }
         }
+      }
+    }
+
+    /* Copy it to the result */
+    if (all_to) {
+      igraph_matrix_set_row(res, &dist, i);
+    } else {
+      for (IGRAPH_VIT_RESET(tovit), j=0; !IGRAPH_VIT_END(tovit); 
+	   IGRAPH_VIT_NEXT(tovit), j++) {
+	long int v=IGRAPH_VIT_GET(tovit);
+	MATRIX(*res, i, j) = VECTOR(dist)[v];
       }
     }
   }
