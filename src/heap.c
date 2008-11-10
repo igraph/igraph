@@ -982,7 +982,7 @@ igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h) {
   return tmp;
 }
 
-igraph_bool_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h) {
+igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h) {
   
   igraph_real_t tmp=VECTOR(h->data)[0];
   long int tmpidx=VECTOR(h->index)[0];

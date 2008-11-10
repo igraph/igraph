@@ -1,3 +1,7 @@
+2008-11-10  Gabor Csardi  <csardi@szaffi>
+
+	* src/heap.c (igraph_2wheap_deactivate_max) : bug corrected
+
 2008-11-07  Gabor Csardi  <csardi@szaffi>
 
 	* src/structural_properties.c 
