@@ -4248,7 +4248,8 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
  *    from a single source, in the order of vertex ids.
  *    Unreachable vertices has distance \c IGRAPH_INFINITY.
  * \param from The source vertices.
- * \param to The target vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *    vertex twice or more.
  * \param weights The edge weights. They must be all non-negative for
  *    Dijkstra's algorithm to work. An error code is returned if there
  *    is a negative edge weight in the weight vector. If this is a null
@@ -4786,6 +4787,8 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
  * \param res Pointer to an initialized matrix, the result will be
  *   stored here, one line for each source vertex.
  * \param from The source vertices.
+ * \param to The target vertices. It is not allowed to include a
+ *   vertex twice or more.
  * \param weights Optional edge weights. If it is a null-pointer, then
  *   the unweighted breadth-first search based \ref
  *   igraph_shortest_paths() will be called.

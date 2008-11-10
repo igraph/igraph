@@ -29,7 +29,8 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
     paths will be calculated.}
   \item{to}{Numeric vector, the vertices to which the shortest paths
     will be calculated. By default it includes all vertices. Note that
-    every vertex must be included here at most once.}
+    for \code{shortest.paths} every vertex must be included here at most
+    once. (This is not required for \code{get.shortest.paths}.}
   \item{mode}{Character constant, gives whether the shortest paths to or
     from the given vertices should be calculated for directed graphs. If
     \code{out} then the shortest paths \emph{from} the vertex, if
