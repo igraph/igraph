@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set ts=8 sw=2 sts=2 et: */
 /* 
    IGraph library.
    Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -95,7 +96,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	igraph_real_t weight=VECTOR(*weights)[edge];
 	if (from != to) {
 	  MATRIX(*res, from, to) = 
-	    -1.0 / sqrt(VECTOR(degree)[from]);
+	    -weight / sqrt(VECTOR(degree)[from]);
 	}
 	IGRAPH_EIT_NEXT(edgeit);
       }
@@ -151,7 +152,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	igraph_real_t weight=VECTOR(*weights)[edge];
 	if (from != to) {
 	  MATRIX(*res, from, to) = MATRIX(*res, to, from) = 
-	    -1.0 / sqrt(VECTOR(degree)[from] * VECTOR(degree)[to]);
+	    -weight / sqrt(VECTOR(degree)[from] * VECTOR(degree)[to]);
 	}
 	IGRAPH_EIT_NEXT(edgeit);
       }
