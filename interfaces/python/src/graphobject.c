@@ -1,4 +1,4 @@
-/* -*- mode: C -*-  */
+/* vim:set ts=4 sw=2 sts=2 et:  */
 /* 
    IGraph library.
    Copyright (C) 2006  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -2528,7 +2528,7 @@ PyObject *igraphmodule_Graph_betweenness(igraphmodule_GraphObject * self,
   igraph_vs_t vs;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
-                                   &vobj, &directed, &cutoff, &weights)) {
+                                   &vobj, &directed, &cutoff, &weights_o)) {
     return NULL;
   }
 
@@ -2697,15 +2697,16 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
 PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "vertices", "mode", "cutoff", NULL };
-  PyObject *vobj = Py_None, *list = NULL, *cutoff = Py_None, *mode_o = Py_None;
-  igraph_vector_t res;
+  static char *kwlist[] = { "vertices", "mode", "cutoff", "weights", NULL };
+  PyObject *vobj = Py_None, *list = NULL, *cutoff = Py_None,
+           *mode_o = Py_None, *weights_o = Py_None;
+  igraph_vector_t res, *weights = 0;
   igraph_neimode_t mode = IGRAPH_ALL;
   int return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj,
-      &mode_o, &cutoff))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist, &vobj,
+      &mode_o, &cutoff, &weights_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
@@ -2719,10 +2720,18 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
   }
 
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vs_destroy(&vs);
+    igraph_vector_destroy(&res);
+    return NULL;
+  }
+
   if (cutoff == Py_None) {
-    if (igraph_closeness(&self->g, &res, vs, mode)) {
+    if (igraph_closeness(&self->g, &res, vs, mode, weights)) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
       igraphmodule_handle_igraph_error();
       return NULL;
     }
@@ -2733,15 +2742,18 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
       return NULL;
     }
     if (igraph_closeness_estimate(&self->g, &res, vs, mode,
-        (igraph_integer_t)PyInt_AsLong(cutoff_num))) {
+        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights)) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
       igraphmodule_handle_igraph_error();
       Py_DECREF(cutoff_num);
       return NULL;
     }
     Py_DECREF(cutoff_num);
   }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   if (!return_single)
     list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
@@ -5015,25 +5027,35 @@ PyObject *igraphmodule_Graph_get_adjacency(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_laplacian(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "normalized", NULL };
+  static char *kwlist[] = { "weights", "normalized", NULL };
   igraph_matrix_t m;
   PyObject *result;
+  PyObject *weights_o = Py_None;
   PyObject *normalized = Py_False;
+  igraph_vector_t *weights = 0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &normalized))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
+        &weights_o, &normalized))
     return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
 
   if (igraph_matrix_init
       (&m, igraph_vcount(&self->g), igraph_vcount(&self->g))) {
     igraphmodule_handle_igraph_error();
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     return NULL;
   }
 
-  if (igraph_laplacian(&self->g, &m, PyObject_IsTrue(normalized))) {
+  if (igraph_laplacian(&self->g, &m, PyObject_IsTrue(normalized), weights)) {
     igraphmodule_handle_igraph_error();
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
     igraph_matrix_destroy(&m);
     return NULL;
   }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   if (PyObject_IsTrue(normalized)) {
     result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
@@ -8206,7 +8228,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
-   "closeness(vertices=None, mode=ALL, cutoff=None)\n\n"
+   "closeness(vertices=None, mode=ALL, cutoff=None, weights=None)\n\n"
    "Calculates the closeness centralities of given nodes in a graph.\n\n"
    "The closeness centerality of a vertex measures how easily other\n"
    "vertices can be reached from it (or the other way: how easily it\n"
@@ -8229,6 +8251,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  real closeness, since some vertex pairs will appear as disconnected even\n"
    "  though they are connected).. If C{None}, the exact closeness is\n"
    "  returned.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@return: the calculated closenesses in a list\n"},
 
   /* interface to igraph_clusters */
@@ -9262,7 +9286,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_laplacian */
   {"laplacian", (PyCFunction) igraphmodule_Graph_laplacian,
    METH_VARARGS | METH_KEYWORDS,
-   "laplacian(normalized=False)\n\n"
+   "laplacian(weights=None, normalized=False)\n\n"
    "Returns the Laplacian matrix of a graph.\n\n"
    "The Laplacian matrix is similar to the adjacency matrix, but the edges\n"
    "are denoted with -1 and the diagonal contains the node degrees.\n\n"
@@ -9272,6 +9296,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Multiple edges and self-loops are silently ignored. Although it is\n"
    "possible to calculate the Laplacian matrix of a directed graph, it does\n"
    "not make much sense.\n\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name. When edge weights are used, the degree\n"
+   "  of a node is considered to be the weight of its adjacent edges.\n"
    "@param normalized: whether to return the normalized Laplacian matrix.\n"
    "@return: the Laplacian matrix.\n"},
 
