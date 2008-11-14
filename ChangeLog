@@ -1,3 +1,100 @@
+2008-11-10  Gabor Csardi  <csardi@szaffi>
+
+	* src/structural_properties.c (igraph_shortest_path_johnson) : 
+	added support for 'to' argument
+
+	* src/heap.c (igraph_2wheap_deactivate_max) : bug corrected
+
+2008-11-07  Gabor Csardi  <csardi@szaffi>
+
+	* src/structural_properties.c 
+	(igraph_shortest_paths_bellman_ford) : implement 'to' argument
+
+2008-11-05  Gabor Csardi  <csardi@szaffi>
+
+	* src/structural_properties.c (igraph_shortest_paths_dijkstra) : 
+	added support for 'to' argument
+
+	* src/heap.c (igraph_2wheap_deactivate_max) 
+	(igraph_2wheap_has_active) : added, elements can
+	be inactive now
+
+2008-11-04  Gabor Csardi  <csardi@szaffi>
+
+	* src/centrality.c (igraph_closeness_estimate_weighted) : 
+	use the two-way heap
+
+	* src/centrality.c (igraph_betweenness_estimate_weighted) : 
+	use the two-way heap
+
+	* src/structural_properties.c (igraph_get_shortest_paths_dijkstra) :
+	use the two-way heap
+
+	* src/structural_properties.c (igraph_shortest_paths_dijkstra) : 
+	use the two-way heap
+
+	* src/heap.c (igraph_2wheap_t) : added
+	* examples/simple/2wheap.c : added
+
+	* src/structural_properties.c (igraph_shortest_paths) : 
+	'to' argument added
+	(igraph_shortest_paths_dijkstra, igraph_shortest_paths_bellman_ford)
+	(igraph_shortest_paths_johnson) :
+	'to' argument added, but not implemented yet!
+	* src/layout.c (igraph_layout_kamada_kawai)
+	(igraph_layout_kamada_kawai_3d) : updated
+	* examples/simple/dijkstra.c : updated
+	* examples/simple/bellman_ford.c : updated
+
+2008-11-02  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_get_incidence) : rewritten, previous 
+	implementation was incorrect
+
+	* src/bipartite.c (igraph_get_incidence) : added
+
+2008-11-01  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_incidence) : 'directed' argument added
+
+	* src/bipartite.c (igraph_incidence) : added
+
+2008-10-31  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_create_bipartite) : added
+	* examples/simple/igraph_bipartite_create.c : added
+
+2008-10-30  Gabor Csardi  <csardi@szaffi>
+
+	* src/structure_generators.c (igraph_full_bipartite) :
+	* src/bipartite.c (igraph_full_bipartite) : moved
+
+	* src/bipartite.c (igraph_bipartite_projection) : rewritten
+	* examples/simple/igraph_bipartite_projection.c : added
+
+	* src/structure_generators.c (igraph_full_bipartite) : bug fixed,
+	types vector was not set up correctly
+
+2008-10-28  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_bipartite_projection) : added
+
+2008-10-27  Gabor Csardi  <csardi@szaffi>
+
+	* src/structure_generators.c (igraph_full_bipartite) : bug fixed
+
+	* src/structure_generators.c (igraph_full_bipartite) : added
+
+	* src/structural_properties.c (igraph_transitivity_barrat) : added
+
+	* src/structural_properties.c
+	(igraph_avg_nearest_neighbor_degree) : 'weights' argument added
+
+	* src/structural_properties.c (igraph_strength) : added
+
+	* src/structural_properties.c 
+	(igraph_avg_nearest_neighbor_degree) : added
+
 2008-10-24  Gabor Csardi  <csardi@szaffi>
 
 	* src/structural_properties.c (igraph_shortest_paths_johnson) : added

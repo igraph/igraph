@@ -51,6 +51,7 @@
 <!-- doxrox-include igraph_pagerank_old -->
 <!-- doxrox-include igraph_constraint -->
 <!-- doxrox-include igraph_maxdegree -->
+<!-- doxrox-include igraph_strength -->
 <!-- doxrox-include igraph_eigenvector_centrality -->
 <!-- doxrox-include igraph_hub_score -->
 <!-- doxrox-include igraph_authority_score -->
@@ -79,6 +80,7 @@
 <!-- doxrox-include igraph_transitivity_undirected -->
 <!-- doxrox-include igraph_transitivity_local_undirected -->
 <!-- doxrox-include igraph_transitivity_avglocal_undirected -->
+<!-- doxrox-include igraph_transitivity_barrat -->
 </section>
 
 <section><title>Directedness conversion</title>
@@ -118,6 +120,7 @@
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_is_mutual -->
+<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
 <!-- doxrox-include igraph_get_adjacency -->	
 <!-- doxrox-include igraph_get_edgelist -->	
 </section>

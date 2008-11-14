@@ -95,7 +95,7 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     gengraph_graph_molloy_hash.cpp \
 			     gengraph_graph_molloy_optimized.cpp \
 			     gengraph_mr-connected.cpp gengraph_powerlaw.cpp \
-			     gengraph_random.cpp decomposition.c
+			     gengraph_random.cpp decomposition.c bipartite.c
 
 libigraph_la_CFLAGS        = -Wall
 libigraph_la_CXXFLAGS	   = -Wall

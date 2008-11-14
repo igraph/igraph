@@ -106,3 +106,7 @@ AT_KEYWORDS([set igraph_set_t])
 AT_COMPILE_CHECK([simple/igraph_set.c], [simple/igraph_set.out])
 AT_CLEANUP
 
+AT_SETUP([2-way heap (igraph_2wheap_t): ])
+AT_KEYWORDS([heap two-way 2-way igraph_2wheap_t])
+AT_COMPILE_CHECK([simple/2wheap.c])
+AT_CLEANUP

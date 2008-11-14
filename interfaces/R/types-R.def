@@ -91,6 +91,16 @@ EDGEWEIGHTS:
                %I% <- NULL \
             }
 
+BIPARTITE_TYPES:
+    INCONV: if (is.null(%I%) && "type" %in% list.vertex.attributes(%I1%)) { \
+               %I% <- V(%I1%)$type \
+	    } \
+            if (!is.null(%I%)) { \
+               %I% <- as.logical(%I%) \
+            } else { \
+               stop("Not a bipartite graph, supply `types' argument") \
+            }
+
 NULL:
     CALL:
     HEADER:

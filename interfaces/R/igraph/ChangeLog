@@ -1,3 +1,61 @@
+2008-11-04  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/structural.properties.R (shortest.paths) : 
+	* interfaces/R/src/rinterface.c.in (R_igraph_shortest_paths) :
+	'to' argument added
+
+2008-11-03  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/tkplot.R :
+	added support for curved edges
+
+	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 
+	added 'curved' edge parameter
+	* interfaces/R/igraph/R/plot.R (plot.igraph, igraph.Arrows) : 
+	added support for curved edges
+
+2008-11-02  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : added
+	support for attributes
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : added
+	support for vertex names
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : updated,
+	sparse matrix support was added
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : added
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : added sparse graph support
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : added 'weighted' argument
+
+2008-11-01  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : 'directed' argument added, remove unnneded 
+	'add.colnames' attribute
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : added
+
+2008-10-31  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.bipartite) : added
+
+2008-10-27  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.full.bipartite) : added
+
+	* interfaces/R/igraph/R/structural.properties.R	(transitivity) :
+	* interfaces/R/src/rinterface.c.in (R_igraph_transitivity_barrat) :
+	weighted transitivity calculation added
+
 2008-10-24  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/print.R (print.igraph) : quote symbolic

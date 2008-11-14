@@ -456,6 +456,40 @@ void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, long int elem);
 void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, long int head);
 void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, long int e1, long int e2);
 
+/* -------------------------------------------------- */
+/* Two-way indexed heap                               */
+/* -------------------------------------------------- */
+
+/* This is a smart indexed heap. In addition to the "normal" indexed heap
+   it allows to access every element through its index in O(1) time. 
+   In other words, for this heap the _modify operation is O(1), the 
+   normal heap does this in O(n) time.... */
+
+typedef struct igraph_2wheap_t {
+  long int size;
+  igraph_vector_t data;
+  igraph_vector_long_t index;
+  igraph_vector_long_t index2;
+} igraph_2wheap_t;
+
+int igraph_2wheap_init(igraph_2wheap_t *h, long int size);
+void igraph_2wheap_destroy(igraph_2wheap_t *h);
+int igraph_2wheap_clear(igraph_2wheap_t *h);
+int igraph_2wheap_push_with_index(igraph_2wheap_t *h, 
+				  long int idx, igraph_real_t elem);
+igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h);
+long int igraph_2wheap_size(const igraph_2wheap_t *h);
+long int igraph_2wheap_max_size(const igraph_2wheap_t *h);
+igraph_real_t igraph_2wheap_max(const igraph_2wheap_t *h);
+long int igraph_2wheap_max_index(const igraph_2wheap_t *h);
+igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h);
+igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, long int idx);
+igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, long int idx);
+igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, long int idx);
+igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h);
+igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx);
+int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem);
+
 /**
  * Vector of strings
  * \ingroup internal

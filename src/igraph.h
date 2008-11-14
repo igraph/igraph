@@ -593,6 +593,11 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
 int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 int igraph_full_citation(igraph_t *graph, igraph_integer_t n, 
 			 igraph_bool_t directed);
+int igraph_full_bipartite(igraph_t *graph, 
+			  igraph_vector_bool_t *types,
+			  igraph_integer_t n1, igraph_integer_t n2,
+			  igraph_bool_t directed, 
+			  igraph_neimode_t mode);
 int igraph_atlas(igraph_t *graph, int number);
 int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
 				 const igraph_matrix_t *W);
@@ -744,7 +749,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
                               igraph_real_t cutoff,
 			      const igraph_vector_t *weights);
 int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
-			  const igraph_vs_t from, igraph_neimode_t mode);
+			  const igraph_vs_t from, const igraph_vs_t to, 
+			  igraph_neimode_t mode);
 int igraph_get_shortest_paths(const igraph_t *graph, igraph_vector_ptr_t *res,
 			      igraph_integer_t from, const igraph_vs_t to, 
 			      igraph_neimode_t mode);
@@ -756,11 +762,13 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
 int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 				   igraph_matrix_t *res,
 				   const igraph_vs_t from,
+				   const igraph_vs_t to,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode);
 int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 				   igraph_matrix_t *res,
 				   const igraph_vs_t from,
+				   const igraph_vs_t to,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode);
 int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
@@ -772,6 +780,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 int igraph_shortest_paths_johnson(const igraph_t *graph,
 				  igraph_matrix_t *res,
 				  const igraph_vs_t from,
+				  const igraph_vs_t to,
 				  const igraph_vector_t *weights);
 
 int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 
@@ -820,6 +829,10 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 					  const igraph_vs_t vids);
 int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
 					    igraph_real_t *res);
+int igraph_transitivity_barrat(const igraph_t *graph,
+			       igraph_vector_t *res,
+			       const igraph_vs_t vids,
+			       const igraph_vector_t *weights);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops);
 
@@ -869,6 +882,38 @@ int igraph_is_chordal(const igraph_t *graph,
 		      igraph_bool_t *chordal,
 		      igraph_vector_t *fill_in,
 		      igraph_t *newgraph);
+int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
+				       igraph_vs_t vids,
+				       igraph_vector_t *knn,
+				       igraph_vector_t *knnk, 
+				       const igraph_vector_t *weights);
+int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
+		    const igraph_vs_t vids, igraph_neimode_t mode,
+		    igraph_bool_t loops, const igraph_vector_t *weights);
+
+/* -------------------------------------------------- */
+/* Bipartite networks                                 */
+/* -------------------------------------------------- */
+
+int igraph_create_bipartite(igraph_t *g, const igraph_vector_bool_t *types,
+			    const igraph_vector_t *edges, 
+			    igraph_bool_t directed);
+
+int igraph_bipartite_projection(const igraph_t *graph, 
+				const igraph_vector_bool_t *types,
+				igraph_t *proj1,
+				igraph_t *proj2,
+				igraph_integer_t probe1);
+
+int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
+		     const igraph_matrix_t *incidence,  igraph_bool_t directed,
+		     igraph_neimode_t mode, igraph_bool_t multiple);
+
+int igraph_get_incidence(const igraph_t *graph,
+			 const igraph_vector_bool_t *types,
+			 igraph_matrix_t *res,
+			 igraph_vector_t *row_ids,
+			 igraph_vector_t *col_ids);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */

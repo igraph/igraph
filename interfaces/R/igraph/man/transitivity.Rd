@@ -9,7 +9,8 @@
 \usage{
 transitivity(graph, type=c("undirected", "global", "globalundirected",
        "localundirected", "local", "average", "localaverage",
-       "localaverageundirected"), vids=NULL)
+       "localaverageundirected", "barrat", "weighted"), vids=NULL,
+       weights=NULL)
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -30,6 +31,9 @@ transitivity(graph, type=c("undirected", "global", "globalundirected",
       \item{\code{undirected}}{This is the same as \code{global}.}
       \item{\code{globalundirected}}{This is the same as \code{global}.}
       \item{\code{localundirected}}{This is the same as \code{local}.}
+      \item{\code{barrat}}{The weighted transitivity as defined
+	A. Barrat. See details below.}
+      \item{\code{weighted}}{The same as \code{barrat}.}
     }
   }
   \item{vids}{The vertex ids for the local transitivity will be
@@ -39,7 +43,30 @@ transitivity(graph, type=c("undirected", "global", "globalundirected",
     \code{V(graph)}.
   }
 }
-%\details{}
+\details{
+   Note that there are essentially two classes of transitivity measures,
+   one is a vertex-level, the other a graph level property.
+
+   There are several generalizations of transitivity to weighted graphs,
+   here we use the definition by A. Barrat, this is a local vertex-level
+   quantity, its formula is
+
+   \deqn{C_i^w=\frac{1}{s_i(k_i-1)}\sum_{j,h}\frac{w_{ij}+w_{ih}}{2}a_{ij}a_{ih}a_{jh}}{
+     weighted C_i = 1/s_i 1/(k_i-1) sum( (w_ij+w_ih)/2 a_ij a_ih a_jh, j, h)}
+
+   \eqn{s_i}{s_i} is the strength of vertex \eqn{i}{i}, see
+   \code{\link{graph.strength}}, \eqn{a_{ij}}{a_ij} are elements of the
+   adjacency matrix, \eqn{k_i}{k_i} is the vertex degree,
+   \eqn{w_{ij}}{w_ij} are the weights.
+   
+   This formula gives back the normal not-weighted local transitivity if
+   all the edge weights are the same.
+
+   The \code{barrat} type of transitivity does not work for graphs with
+   multiple and/or loop edges. If you want to calculate it for a
+   directed graph, call \code{\link{as.undirected}} with the
+   \code{collapse} mode first.
+}
 \value{
   For \sQuote{\code{global}} a single number, or \code{NaN} if there are no
   connected triples in the graph.
@@ -48,8 +75,13 @@ transitivity(graph, type=c("undirected", "global", "globalundirected",
   each vertex in \sQuote{\code{vids}}.
 }
 \references{ Wasserman, S., and Faust, K. (1994). \emph{Social Network
-  Analysis: Methods and Applications.} Cambridge: Cambridge University
-  Press. }
+    Analysis: Methods and Applications.} Cambridge: Cambridge University
+  Press.
+
+  Alain Barrat, Marc Barthelemy, Romualdo Pastor-Satorras, Alessandro
+  Vespignani: The architecture of complex weighted networks,
+  Proc. Natl. Acad. Sci. USA 101, 3747 (2004)
+}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 % \seealso{}
 \examples{
@@ -57,5 +89,19 @@ g <- graph.ring(10)
 transitivity(g)
 g2 <- erdos.renyi.game(1000, 10/1000)
 transitivity(g2)   # this is about 10/1000
+
+# Weighted version, the figure from the Barrat paper
+gw <- graph.formula(A-B:C:D:E, B-C:D, C-D)
+E(gw)$weight <- 1
+E(gw)[ V(gw)[name == "A"] \%--\% V(gw)[name == "E" ] ]$weight <- 5
+transitivity(gw, vids=V(gw)[name=="A"], type="weighted")
+
+# Weighted reduces to "local" if weights are the same
+gw2 <- erdos.renyi.game(1000, 10/1000)
+E(gw2)$weight <- 1
+all(transitivity(gw2, type="local") == transitivity(gw2, type="weighted"))
+all( transitivity(gw2, vids=2:vcount(g)-1, type="local") ==
+     transitivity(gw2, vids=2:vcount(g)-1, type="weighted") )
 }
 \keyword{graphs}
+

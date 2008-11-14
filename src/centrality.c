@@ -857,7 +857,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-  igraph_indheap_t Q;
+  igraph_2wheap_t Q;
   igraph_adjedgelist_t adjlist;
   igraph_adjlist_t fathers;
   long int source, j;
@@ -875,8 +875,8 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
   }
 
-  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
-  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjlist, mode));  
   IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjlist);
   IGRAPH_CHECK(igraph_adjlist_init(graph, &fathers, omode));
@@ -902,13 +902,13 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   
   for (source=0; source<no_of_nodes; source++) {
 
-    igraph_indheap_push_with_index(&Q, source, 0);
+    igraph_2wheap_push_with_index(&Q, source, 0);
     VECTOR(dist)[source]=1.0;
     VECTOR(nrgeo)[source]=1;
     
-    while (!igraph_indheap_empty(&Q)) {
-      long int minnei=igraph_indheap_max_index(&Q);
-      igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+    while (!igraph_2wheap_empty(&Q)) {
+      long int minnei=igraph_2wheap_max_index(&Q);
+      igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
       igraph_vector_t *neis;
       long int nlen;
       
@@ -932,7 +932,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
 	  VECTOR(dist)[to]=altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (altdist < curdist-1) {
 	  /* This is a shorter path */
 	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
@@ -941,7 +941,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
 	  VECTOR(dist)[to]=altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	} else if (altdist == curdist-1) {
 	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
 	  igraph_vector_push_back(v, minnei);
@@ -949,7 +949,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
 	}
       }
       
-    } /* !igraph_indheap_empty(&Q) */
+    } /* !igraph_2wheap_empty(&Q) */
 
     while (!igraph_stack_empty(&S)) {
       long int w=igraph_stack_pop(&S);
@@ -997,7 +997,7 @@ int igraph_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_stack_destroy(&S);
   igraph_adjlist_destroy(&fathers);
   igraph_adjedgelist_destroy(&adjlist);
-  igraph_indheap_destroy(&Q);
+  igraph_2wheap_destroy(&Q);
   IGRAPH_FINALLY_CLEAN(7);
   
   return 0;
@@ -1523,7 +1523,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   
-  igraph_indheap_t Q;
+  igraph_2wheap_t Q;
   igraph_vit_t vit;
   long int nodes_to_calc;
   
@@ -1547,8 +1547,8 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
   
   nodes_to_calc=IGRAPH_VIT_SIZE(vit);
   
-  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
-  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, mode));
   IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
 
@@ -1562,15 +1562,15 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
   for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     
     long int source=IGRAPH_VIT_GET(vit);
-    igraph_indheap_clear(&Q);
-    igraph_indheap_push_with_index(&Q, source, 0);
+    igraph_2wheap_clear(&Q);
+    igraph_2wheap_push_with_index(&Q, source, 0);
     VECTOR(which)[source]=i+1;
     VECTOR(dist)[source]=0.0;
     nodes_reached=0;
     
-    while (!igraph_indheap_empty(&Q)) {
-      long int minnei=igraph_indheap_max_index(&Q);
-      igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+    while (!igraph_2wheap_empty(&Q)) {
+      long int minnei=igraph_2wheap_max_index(&Q);
+      igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
       
       /* Now check all neighbors of minnei for a shorter path */
       igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
@@ -1590,15 +1590,15 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
 	  /* First non-infinite distance */
 	  VECTOR(which)[to]=i+1;
 	  VECTOR(dist)[to]=altdist;
-	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (altdist < curdist) {
 	  /* This is a shorter path */
 	  VECTOR(dist)[to]=altdist;
-	  IGRAPH_CHECK(igraph_indheap_modify(&Q, to, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	}
       }
 
-    } /* !igraph_indheap_empty(&Q) */
+    } /* !igraph_2wheap_empty(&Q) */
 
     VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
@@ -1608,7 +1608,7 @@ int igraph_closeness_estimate_weighted(const igraph_t *graph,
   igraph_vector_long_destroy(&which);
   igraph_vector_destroy(&dist);
   igraph_lazy_adjedgelist_destroy(&adjlist);
-  igraph_indheap_destroy(&Q);
+  igraph_2wheap_destroy(&Q);
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(5);
 

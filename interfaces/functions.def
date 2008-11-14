@@ -151,6 +151,11 @@ igraph_adjlist:
                 BOOLEAN duplicate=True
         NAME-R: graph.adjlist
 
+igraph_full_bipartite:
+        PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, INTEGER n1, \
+                INTEGER n2, BOOLEAN directed=False, NEIMODE mode=ALL
+        IGNORE: RR
+
 #######################################
 # Constructors, games
 #######################################
@@ -299,7 +304,8 @@ igraph_closeness_estimate:
         NAME-R: closeness.estimate
 
 igraph_shortest_paths:
-        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, NEIMODE mode=OUT
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
+                VERTEXSET to=ALL, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths:
@@ -314,12 +320,17 @@ igraph_get_all_shortest_paths:
 
 igraph_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
-                EDGEWEIGHTS weights, NEIMODE mode=OUT
+                VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
         IGNORE: RR, RC, RNamespace
 
 igraph_shortest_paths_bellman_ford:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
-                EDGEWEIGHTS weights, NEIMODE mode=OUT
+                VERTEXSET to=ALL, EDGEWEIGHTS weights, NEIMODE mode=OUT
+        IGNORE: RR, RC, RNamespace
+
+igraph_shortest_paths_johnson:
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
+                VERTEXSET to=ALL, EDGEWEIGHTS weights
         IGNORE: RR, RC, RNamespace
 
 igraph_subcomponent: 
@@ -396,6 +407,12 @@ igraph_transitivity_local_undirected:
 
 igraph_transitivity_avglocal_undirected:
         PARAMS: GRAPH graph, OUT REALPTR res
+        IGNORE: RR, RC, RNamespace
+
+igraph_transitivity_barrat:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                EDGEWEIGHTS weights=NULL
+        DEPENDS: weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_reciprocity:
@@ -520,6 +537,46 @@ igraph_is_chordal:
                 OUT GRAPH_OR_0 newgraph
         NAME-R: is.chordal
         IGNORE: RR, RC
+
+igraph_avg_nearest_neighbor_degree:
+        PARAMS: GRAPH graph, VERTEXSET vids=ALL, OUT VECTOR_OR_0 knn, \
+                OUT VECTOR_OR_0 knnk, EDGEWEIGHTS weights=NULL
+        DEPS: vids ON graph, weights ON graph
+        NAME-R: graph.knn
+
+igraph_strength:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
+                NEIMODE mode=ALL, BOOLEAN loops=True, EDGEWEIGHTS weights=NULL
+        DEPS: vids ON graph, weights ON graph
+
+#######################################
+# Bipartite graphs
+#######################################
+
+igraph_bipartite_projection:
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, \
+                OUT GRAPH proj1, OUT GRAPH proj2, INTEGER probe1=-1
+        DEPS: types ON graph
+        NAME-R: bipartite.projection
+
+igraph_create_bipartite:
+        PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \
+                VECTOR edges, BOOLEAN directed=False
+        NAME-R: graph.bipartite
+        IGNORE: RR
+
+igraph_incidence:
+        PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL types, MATRIX incidence, \
+                BOOLEAN directed=False, NEIMODE mode=ALL, \
+                BOOLEAN multiple=False
+        IGNORE: RR
+
+igraph_get_incidence:
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res, \
+                OUT VECTOR_OR_0 row_ids, OUT VECTOR_OR_0 col_ids
+        DEPS: types ON graph
+        NAME-R: get.incidence
+        IGNORE: RR
 
 #######################################
 # Spectral properties

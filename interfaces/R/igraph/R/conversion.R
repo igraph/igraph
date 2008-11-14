@@ -331,3 +331,131 @@ igraph.to.graphNEL <- function(graph) {
   
   res
 }
+
+get.incidence.dense <- function(graph, types, names, attr) {
+
+  if (is.null(attr)) {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    ## Function call
+    res <- .Call("R_igraph_get_incidence", graph, types,
+                 PACKAGE="igraph")
+
+    if (names && "name" %in% list.vertex.attributes(graph)) {
+      rownames(res$res) <- V(graph)$name[ res$row_ids+1 ]
+      colnames(res$res) <- V(graph)$name[ res$col_ids+1 ]
+    } else {
+      rownames(res$res) <- res$row_ids
+      colnames(res$res) <- res$col_ids
+    }
+    res$res
+    
+  } else {
+
+    attr <- as.character(attr)
+    if (!attr %in% list.edge.attributes(graph)) {
+      stop("no such edge attribute")
+    }
+
+    vc <- vcount(graph)
+    n1 <- sum(!types)
+    n2 <- vc-n1    
+    res <- matrix(0, n1, n2)
+
+    recode <- numeric(vc)
+    recode[!types] <- seq_len(n1)
+    recode[types]  <- seq_len(n2)
+    
+    for (i in seq(length=ecount(graph))-1) {
+      eo <- get.edge(graph, i)
+      e <- recode[eo+1]
+      if (!types[eo[1]+1]) {
+        res[ e[1], e[2] ] <- get.edge.attribute(graph, attr, i)
+      } else{
+        res[ e[2], e[1] ] <- get.edge.attribute(graph, attr, i)
+      }
+    }
+
+    if (names && "name" %in% list.vertex.attributes(graph)) {
+      rownames(res) <- V(g)$name[ which(!types) ]
+      colnames(res) <- V(g)$name[ which( types) ]
+    } else {
+      rownames(res) <- which(!types)-1
+      colnames(res) <- which(types)
+    }
+
+    res
+  }
+}
+
+get.incidence.sparse <- function(graph, types, names, attr) {
+
+  vc <- vcount(graph)
+  if (length(types) != vc) {
+    stop("Invalid types vector")
+  }
+  
+  require(Matrix)
+  el <- get.edgelist(graph, names=FALSE)
+  if (any(types[el[,1]+1] == types[el[,2]+1])) {
+    stop("Invalid types vector, not a bipartite graph")
+  }
+
+  n1 <- sum(!types)
+  n2 <- vc-n1
+
+  recode <- numeric(vc)
+  recode[!types] <- seq_len(n1)
+  recode[types]  <- seq_len(n2) + n1
+
+  el[,1] <- recode[el[,1]+1]
+  el[,2] <- recode[el[,2]+1]
+
+  change <- el[,1] > n1
+  el[change,] <- el[change,2:1]
+  el[,2] <- el[,2]-n1
+
+  if (!is.null(attr)) {
+    attr <- as.character(attr)
+    if (!attr %in% list.edge.attributes(graph)) {
+      stop("no such edge attribute")
+    }
+    value <- get.edge.attribute(graph, name=attr)
+  } else { 
+    value <- rep(1, nrow(el))
+  }
+
+  res <- spMatrix(n1, n2, i=el[,1], j=el[,2], x=value)
+
+  if (names && "name" %in% list.vertex.attributes(graph)) {
+    rownames(res) <- V(graph)$name[which(!types)]
+    colnames(res) <- V(graph)$name[which(types)]
+  } else {
+    rownames(res) <- which(!types)-1
+    colnames(res) <- which(types)-1
+  }
+  res
+}
+
+get.incidence <- function(graph, types=NULL, attr=NULL,
+                          names=TRUE, sparse=FALSE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
+    types <- V(graph)$type 
+  } 
+  if (!is.null(types)) { 
+    types <- as.logical(types) 
+  } else { 
+    stop("Not a bipartite graph, supply `types' argument") 
+  }
+  
+  names <- as.logical(names)
+  sparse <- as.logical(sparse)
+  
+  if (sparse) {
+    get.incidence.sparse(graph, types=types, names=names, attr=attr)
+  } else {
+    get.incidence.dense(graph, types=types, names=names, attr=attr)
+  }
+}
+

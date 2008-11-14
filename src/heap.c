@@ -833,3 +833,188 @@ int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
 	     
   return 0;
 }
+
+/* -------------------------------------------------- */
+/* Two-way indexed heap                               */
+/* -------------------------------------------------- */
+
+/* This is a smart indexed heap. In addition to the "normal" indexed heap
+   it allows to access every element through its index in O(1) time. 
+   In other words, for this heap the _modify operation is O(1), the 
+   normal heap does this in O(n) time.... */
+
+static inline void igraph_i_2wheap_switch(igraph_2wheap_t *h,
+					  long int e1, long int e2) {
+  if (e1 != e2) {
+    long int tmp1, tmp2;
+    igraph_real_t tmp3=VECTOR(h->data)[e1];
+    VECTOR(h->data)[e1]=VECTOR(h->data)[e2];
+    VECTOR(h->data)[e2]=tmp3;
+
+    tmp1=VECTOR(h->index)[e1];
+    tmp2=VECTOR(h->index)[e2];
+    
+    VECTOR(h->index2)[tmp1]=e2+2;
+    VECTOR(h->index2)[tmp2]=e1+2;
+
+    VECTOR(h->index)[e1]=tmp2;
+    VECTOR(h->index)[e2]=tmp1;
+  }
+}
+
+static inline void igraph_i_2wheap_shift_up(igraph_2wheap_t *h, 
+					    long int elem) {
+  if (elem==0 || VECTOR(h->data)[elem] < VECTOR(h->data)[PARENT(elem)]) {
+    /* at the top */
+  } else {
+    igraph_i_2wheap_switch(h, elem, PARENT(elem));
+    igraph_i_2wheap_shift_up(h, PARENT(elem));
+  }
+}
+
+static inline void igraph_i_2wheap_sink(igraph_2wheap_t *h,
+					long int head) {
+  long int size=igraph_2wheap_size(h);
+  if (LEFTCHILD(head) >= size) {
+    /* no subtrees */
+  } else if (RIGHTCHILD(head) == size ||
+	     VECTOR(h->data)[LEFTCHILD(head)]>=VECTOR(h->data)[RIGHTCHILD(head)]) {
+    /* sink to the left if needed */
+    if (VECTOR(h->data)[head] < VECTOR(h->data)[LEFTCHILD(head)]) {
+      igraph_i_2wheap_switch(h, head, LEFTCHILD(head));
+      igraph_i_2wheap_sink(h, LEFTCHILD(head));
+    }
+  } else {
+    /* sink to the right */
+    if (VECTOR(h->data)[head] < VECTOR(h->data)[RIGHTCHILD(head)]) {
+      igraph_i_2wheap_switch(h, head, RIGHTCHILD(head));
+      igraph_i_2wheap_sink(h, RIGHTCHILD(head));
+    }
+  }
+}
+
+/* ------------------ */
+/* These are public   */
+/* ------------------ */
+
+int igraph_2wheap_init(igraph_2wheap_t *h, long int size) {
+  h->size=size;
+  /* We start with the biggest */
+  IGRAPH_CHECK(igraph_vector_long_init(&h->index2, size));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &h->index2);
+  IGRAPH_VECTOR_INIT_FINALLY(&h->data, 0);
+  IGRAPH_CHECK(igraph_vector_long_init(&h->index, 0));
+/* IGRAPH_FINALLY(igraph_vector_long_destroy, &h->index); */
+  
+  IGRAPH_FINALLY_CLEAN(2);
+  return 0;
+}
+
+void igraph_2wheap_destroy(igraph_2wheap_t *h) {
+  igraph_vector_destroy(&h->data);
+  igraph_vector_long_destroy(&h->index);
+  igraph_vector_long_destroy(&h->index2);
+}
+
+int igraph_2wheap_clear(igraph_2wheap_t *h) {
+  igraph_vector_clear(&h->data);
+  igraph_vector_long_clear(&h->index);
+  igraph_vector_long_null(&h->index2);
+  return 0;
+}
+
+igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h) {
+  return igraph_vector_empty(&h->data);
+}
+
+int igraph_2wheap_push_with_index(igraph_2wheap_t *h, 
+				  long int idx, igraph_real_t elem) {
+
+  long int size=igraph_vector_size(&h->data);
+  IGRAPH_CHECK(igraph_vector_push_back(&h->data, elem));
+  IGRAPH_CHECK(igraph_vector_long_push_back(&h->index, idx));
+  VECTOR(h->index2)[idx] = size+2;
+  
+  /* maintain heap */
+  igraph_i_2wheap_shift_up(h, size);
+  return 0;
+}
+
+long int igraph_2wheap_size(const igraph_2wheap_t *h) {
+  return igraph_vector_size(&h->data);
+}
+
+long int igraph_2wheap_max_size(const igraph_2wheap_t *h) {
+  return h->size;
+}
+
+igraph_real_t igraph_2wheap_max(const igraph_2wheap_t *h) {
+  return VECTOR(h->data)[0];
+}
+
+long int igraph_2wheap_max_index(const igraph_2wheap_t *h) {
+  return VECTOR(h->index)[0];
+}
+
+igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, long int idx) {
+  return VECTOR(h->index2)[idx] != 0;
+}
+
+igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, long int idx) {
+  return VECTOR(h->index2)[idx] > 1;
+}
+
+igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, long int idx) {
+  long int i=VECTOR(h->index2)[idx]-2;
+  return VECTOR(h->data)[i];
+}
+
+igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h) {
+  
+  igraph_real_t tmp=VECTOR(h->data)[0];
+  long int tmpidx=VECTOR(h->index)[0];
+  igraph_i_2wheap_switch(h, 0, igraph_2wheap_size(h)-1);
+  igraph_vector_pop_back(&h->data);
+  igraph_vector_long_pop_back(&h->index);
+  VECTOR(h->index2)[tmpidx] = 0;
+  igraph_i_2wheap_sink(h, 0);
+  
+  return tmp;
+}
+
+igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h) {
+  
+  igraph_real_t tmp=VECTOR(h->data)[0];
+  long int tmpidx=VECTOR(h->index)[0];
+  igraph_i_2wheap_switch(h, 0, igraph_2wheap_size(h)-1);
+  igraph_vector_pop_back(&h->data);
+  igraph_vector_long_pop_back(&h->index);
+  VECTOR(h->index2)[tmpidx] = 1;
+  igraph_i_2wheap_sink(h, 0);
+
+  return tmp;
+}
+
+igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx) {
+
+  igraph_real_t tmp=VECTOR(h->data)[0];
+  long int tmpidx=VECTOR(h->index)[0];
+  igraph_i_2wheap_switch(h, 0, igraph_2wheap_size(h)-1);
+  igraph_vector_pop_back(&h->data);
+  igraph_vector_long_pop_back(&h->index);
+  VECTOR(h->index2)[tmpidx] = 0;
+  igraph_i_2wheap_sink(h, 0);
+  
+  if (idx) { *idx=tmpidx; }
+  return tmp;
+}
+
+int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem) {
+  
+  long int pos=VECTOR(h->index2)[idx]-2;
+  VECTOR(h->data)[pos] = elem;
+  igraph_i_2wheap_sink(h, pos);
+  igraph_i_2wheap_shift_up(h, pos);
+  
+  return 0;
+}

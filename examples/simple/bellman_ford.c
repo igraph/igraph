@@ -60,7 +60,8 @@ int main() {
 		     sizeof(weights_data_0)/sizeof(igraph_real_t));
   
   igraph_matrix_init(&res, 0, 0);
-  igraph_shortest_paths_bellman_ford(&g, &res, igraph_vss_all(), &weights, IGRAPH_OUT);
+  igraph_shortest_paths_bellman_ford(&g, &res, igraph_vss_all(), igraph_vss_all(),
+				     &weights, IGRAPH_OUT);
   print_matrix(&res);
   
   igraph_matrix_destroy(&res);
@@ -78,7 +79,8 @@ int main() {
 		     sizeof(weights_data_1)/sizeof(igraph_real_t));
   
   igraph_matrix_init(&res, 0, 0);
-  igraph_shortest_paths_bellman_ford(&g, &res, igraph_vss_all(), &weights, IGRAPH_OUT);
+  igraph_shortest_paths_bellman_ford(&g, &res, igraph_vss_all(), 
+				     igraph_vss_all(), &weights, IGRAPH_OUT);
   print_matrix(&res);
   
   /***************************************/
@@ -88,6 +90,7 @@ int main() {
   igraph_vector_view(&weights, weights_data_2, 
 		     sizeof(weights_data_2)/sizeof(igraph_real_t));
   if (igraph_shortest_paths_bellman_ford(&g, &res, igraph_vss_all(),
+					 igraph_vss_all(),
                                          &weights, IGRAPH_OUT) != IGRAPH_ENEGLOOP)
     return 1;
   

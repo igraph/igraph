@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Bipartite">
+<title>Bipartite, i.e. two-mode graphs</title>
+
+<section>
+<!-- doxrox-include about_bipartite -->
+</section>
+
+<section><title>Create two-mode networks</title>
+<!-- doxrox-include igraph_create_bipartite -->
+<!-- doxrox-include igraph_full_bipartite -->
+</section>
+
+<section><title>Incidence matrices</title>
+<!-- doxrox-include igraph_incidence -->
+<!-- doxrox-include igraph_get_incidence -->
+</section>
+
+<section><title>Project a two-mode graphs</title>
+<!-- doxrox-include igraph_bipartite_projection -->
+</section>
+
+</chapter>
