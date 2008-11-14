@@ -25,4 +25,8 @@
 <!-- doxrox-include igraph_bipartite_projection -->
 </section>
 
+<section><title>Other operations on bipartite graphs</title>
+<!-- docrox-include igraph_is_bipartite -->
+</section>
+
 </chapter>

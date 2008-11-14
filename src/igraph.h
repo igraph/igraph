@@ -915,6 +915,10 @@ int igraph_get_incidence(const igraph_t *graph,
 			 igraph_vector_t *row_ids,
 			 igraph_vector_t *col_ids);
 
+int igraph_is_bipartite(const igraph_t *graph,
+			igraph_bool_t *res,
+			igraph_vector_bool_t *type);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
