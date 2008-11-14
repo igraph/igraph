@@ -434,6 +434,8 @@ class Dendrogram(Clustering):
 
     def summary(self):
         """Draws the dendrogram of the hierarchical clustering in a string"""
+        from array import array
+
         out = StringIO()
         print >>out, str(self)
         if self._n == 0: return out.getvalue()
@@ -457,7 +459,7 @@ class Dendrogram(Clustering):
         midx = 0
         max_community_idx = self._n
         while midx < self._nmerges:
-            s = [" "]*width
+            s = array("c", " "*width)
             for p in positions:
                 if p >= 0: s[p] = "|"
             for i in xrange(level_distance-1): print >>out, "".join(s) # Print the lines
@@ -472,7 +474,7 @@ class Dendrogram(Clustering):
                 positions[v1] = -1
                 positions[v2] = -1
                 positions.append((p1+p2)/2)
-                s[p1:(p2+1)] = "+%s+" % ("-" * (p2-p1-1))
+                s[p1:(p2+1)] = array("c", "+%s+" % ("-" * (p2-p1-1)))
                 cidx_incr += 1
             
             max_community_idx += cidx_incr
