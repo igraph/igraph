@@ -38,6 +38,11 @@ class SimplePropertiesTests(unittest.TestCase):
         self.failUnless(self.tree.transitivity_undirected() == 0.0)
         self.failUnless(self.g.transitivity_undirected() == 0.75)
 
+    def testAvgLocalTransitivity(self):
+        self.failUnless(self.gfull.transitivity_avglocal_undirected() == 1.0)
+        self.failUnless(self.tree.transitivity_avglocal_undirected() == 0.0)
+        self.assertAlmostEqual(self.g.transitivity_avglocal_undirected(), 5/6., places=4)
+
     def testModularity(self):
         g = Graph.Full(5)+Graph.Full(5)
         g.add_edges([(0,5)])
