@@ -32,73 +32,57 @@
 #ifndef SCG_HEADERS_H
 #define SCG_HEADERS_H
 
-#define R_COMPIL
+#include "igraph.h"
+#include "memory.h"
 
-#ifdef R_COMPIL
-	#include <R.h>
-	#define CALLOC calloc
-	#define FREE free
-	/*This does not work. Standard memory allocation used instead
-	#define CALLOC(n,t) (t *) R_chk_calloc( (size_t) (n), sizeof(t) )
-	#define FREE(p) (R_chk_free( (void *)(p) ), (p) = NULL)*/
-	#define INT int
-	#define UINT unsigned int
-	#define REAL double
-	#define FIRST_GROUP_NB 1
+#ifdef USING_R
+#  define FIRST_GROUP_NB 1
 #else
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <float.h> //for LDBL_MAX in kmeans.c
-	#define CALLOC calloc
-	#define FREE free
-	#define INT long int
-	#define UINT unsigned long int
-	#define REAL double
-	#define FIRST_GROUP_NB 0
+#  define FIRST_GROUP_NB 0
 #endif
 
 struct ind_val{
-	UINT ind;
-	REAL val;
+	unsigned int ind;
+	igraph_real_t val;
 };
 #define INDVAL struct ind_val
 int compare_ind_val(const void *a, const void *b);
 
 struct groups{
-	UINT ind;
-	UINT n;
-	UINT* gr;
+	unsigned int ind;
+	unsigned int n;
+	unsigned int* gr;
 };
 #define GROUPS struct groups
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_approximate_methods.c---
 ---------------------------------------------------*/	
-void breaks_computation(const REAL *v,const UINT n, REAL *breaks,
-						const UINT nb,const UINT method);
-INT intervals_plus_kmeans(const REAL *v, UINT *gr, const UINT n,
-							const UINT n_interv, const UINT maxiter);						
-void intervals_method(const REAL *v, UINT *gr, const UINT n, const UINT n_interv);
+int breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
+			const unsigned int nb,const unsigned int method);
+int intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
+			  const unsigned int n_interv, const unsigned int maxiter);						
+void intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv);
 /*-------------------------------------------------
 ------------DEFINED IN scg_optimal_method.c--------
 ---------------------------------------------------*/	
-void cost_matrix(REAL *Cv, const INDVAL *vs, const UINT n, const UINT matrix, const REAL *ps);
-REAL optimal_partition(const REAL *v, UINT *gr,const UINT n,
-						const UINT nt,const UINT matrix, const REAL *p);
+void cost_matrix(igraph_real_t *Cv, const INDVAL *vs, const unsigned int n, const unsigned int matrix, const igraph_real_t *ps);
+igraph_real_t optimal_partition(const igraph_real_t *v, unsigned int *gr,const unsigned int n,
+				const unsigned int nt,const unsigned int matrix, const igraph_real_t *p);
 /*-------------------------------------------------
 ------------DEFINED IN scg_grouping.c--------------
 ---------------------------------------------------*/							
-void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev,
-			const UINT matrix, const REAL *p, const UINT algo, const UINT maxiter);
+int grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
+	     const unsigned int matrix, const igraph_real_t *p, const unsigned int algo, const unsigned int maxiter);
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
-INT kmeans_Lloyd(const REAL *x, const UINT n, const UINT p, REAL *cen,
-						const UINT k, INT *cl, const UINT maxiter);					
+int kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned int p, igraph_real_t *cen,
+		 const unsigned int k, int *cl, const unsigned int maxiter);					
 /*-------------------------------------------------
 ------------DEFINED IN scg_exact_scg.c-------------
 ---------------------------------------------------*/
-void exact_coarse_graining(const REAL *v, UINT *gr, const UINT n);				
+void exact_coarse_graining(const igraph_real_t *v, unsigned int *gr, const unsigned int n);				
 /*-------------------------------------------------
 ------------DEFINED IN scg_utils.c-----------------
 ---------------------------------------------------*/	
@@ -106,37 +90,27 @@ int compare_groups(const void *a,const void *b);
 int compare_real(const void *a, const void *b);
 int compare_int(const void *a, const void *b);
 
-REAL *real_sym_matrix(const UINT size);
+igraph_real_t *real_sym_matrix(const unsigned int size);
 #define real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
 #define real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
-#define free_real_sym_matrix(S) FREE(S)
+#define free_real_sym_matrix(S) igraph_Free(S)
 
-REAL **real_matrix(const UINT nrow, const UINT ncol);
-void free_real_matrix(REAL **M,const UINT nrow);
+igraph_real_t **real_matrix(const unsigned int nrow, const unsigned int ncol);
+void free_real_matrix(igraph_real_t **M,const unsigned int nrow);
 
-UINT **uint_matrix(const UINT nrow, const UINT ncol);
-void free_uint_matrix(UINT **M, const UINT nrow);
+unsigned int **uint_matrix(const unsigned int nrow, const unsigned int ncol);
+void free_uint_matrix(unsigned int **M, const unsigned int nrow);
 
-REAL *real_vector(const UINT n);
-REAL min_real_vector(const REAL *v, const UINT n);
-REAL max_real_vector(const REAL *v, const UINT n);
+igraph_real_t *real_vector(const unsigned int n);
+igraph_real_t min_real_vector(const igraph_real_t *v, const unsigned int n);
+igraph_real_t max_real_vector(const igraph_real_t *v, const unsigned int n);
 //for unity
-#define free_real_vector(v) FREE(v)
+#define free_real_vector(v) igraph_Free(v)
 
-UINT *uint_vector(const UINT n);
-UINT min_uint_vector(const UINT *v, const UINT n);
-UINT max_uint_vector(const UINT *v, const UINT n);
+unsigned int *uint_vector(const unsigned int n);
+unsigned int min_uint_vector(const unsigned int *v, const unsigned int n);
+unsigned int max_uint_vector(const unsigned int *v, const unsigned int n);
 //for unity
-#define free_uint_vector(v) FREE(v)
-
-#ifndef R_COMPIL
-	void error(const char error_text[]);
-	void warning(const char error_text[]);
-#endif
-
-#ifdef R_COMPIL
-	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, int *nev,
-						int *nmatrix, int *nalgo, double *p,int *maxiter);
-#endif
+#define free_uint_vector(v) igraph_Free(v)
 
 #endif

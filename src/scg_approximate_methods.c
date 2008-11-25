@@ -43,14 +43,14 @@
 
 #include "scg_headers.h"
 
-INT intervals_plus_kmeans(const REAL *v, UINT *gr, const UINT n,
-							const UINT n_interv, const UINT maxiter)
+int intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
+			  const unsigned int n_interv, const unsigned int maxiter)
 {
-	UINT i;
-	INT converge;
-	REAL *centers = real_vector(n_interv);
+	unsigned int i;
+	int converge;
+	igraph_real_t *centers = real_vector(n_interv);
 	breaks_computation(v,n,centers,n_interv,2);
-	converge = kmeans_Lloyd(v, n, 1, centers, n_interv, (INT*) gr,maxiter);
+	converge = kmeans_Lloyd(v, n, 1, centers, n_interv, (int*) gr,maxiter);
 	
 	/*renumber the groups*/
 	for(i=0; i<n; i++) gr[i] = gr[i]-1 + FIRST_GROUP_NB;
@@ -60,13 +60,13 @@ INT intervals_plus_kmeans(const REAL *v, UINT *gr, const UINT n,
 	return converge;
 }
 										
-void intervals_method(const REAL *v, UINT *gr, const UINT n, const UINT n_interv)
+void intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv)
 {
-	UINT i, lo, hi, new;
-	const UINT lft = 1;
-	const UINT include_border = 1;
+	unsigned int i, lo, hi, new;
+	const unsigned int lft = 1;
+	const unsigned int include_border = 1;
 			
-	REAL *breaks = real_vector(n_interv+1);
+	igraph_real_t *breaks = real_vector(n_interv+1);
 	
 	breaks_computation(v, n, breaks, n_interv+1, 1);
 
@@ -89,38 +89,41 @@ void intervals_method(const REAL *v, UINT *gr, const UINT n, const UINT n_interv
 	free_real_vector(breaks);
 }
 
-void breaks_computation(const REAL *v,const UINT n, REAL *breaks,
-						const UINT nb,const UINT method)
+int breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
+						const unsigned int nb,const unsigned int method)
 {
-	UINT i;
-	REAL eps, vmin,vmax;
+	unsigned int i;
+	igraph_real_t eps, vmin,vmax;
 	vmin = min_real_vector(v,n);
 	vmax = max_real_vector(v,n);
 	
 	if(vmax==vmin)
-		error("There is only one (repeated) value in argument 'v'\
-				of bin_size_computation()");
+	  IGRAPH_ERROR("There is only one (repeated) value in argument 'v' "
+		       "of bin_size_computation()", IGRAPH_EINVAL);
 	if(nb<2)
-		error("'nb' in bin_size_computation() must be >= 2");
+	  IGRAPH_ERROR("'nb' in bin_size_computation() must be >= 2", 
+		       IGRAPH_EINVAL);
 			
 	switch(method)
 	{	//constant bins for fixed-size intervals method
 		case 1:
-			eps = (vmax-vmin)/(REAL)(nb-1);
+			eps = (vmax-vmin)/(igraph_real_t)(nb-1);
 			breaks[0] = vmin;
 			for(i=1; i<nb-1; i++) breaks[i]=breaks[i-1]+eps;
 			breaks[nb-1] = vmax;
 		break;
 		//equidistant centers for kmeans
 		case 2:
-			eps = (vmax-vmin)/(REAL)nb;
+			eps = (vmax-vmin)/(igraph_real_t)nb;
 			breaks[0] = vmin + eps/2.;
 			for(i=1; i<nb; i++) breaks[i] = breaks[i-1]+eps;
 		break;
 		//TODO: implement logarithmic binning for power-law-like distributions
 		
 		default:
-			error("Choose a method to compute the breaks in breaks_computation():\
-					1-constant bins (intervals method),2-equidistant centers");
+		  IGRAPH_ERROR("Choose a method to compute the breaks in breaks_computation(): "
+			       "1-constant bins (intervals method),2-equidistant centers", 
+			       IGRAPH_EINVAL);
 	}
+	return 0;
 }

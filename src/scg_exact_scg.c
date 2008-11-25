@@ -31,10 +31,10 @@
 
 #include "scg_headers.h"
 
-void exact_coarse_graining(const REAL *v, UINT *gr, const UINT n)
+void exact_coarse_graining(const igraph_real_t *v, unsigned int *gr, const unsigned int n)
 {
-	UINT i,gr_nb;
-	INDVAL *w = (INDVAL*) CALLOC(n, INDVAL);
+	unsigned int i,gr_nb;
+	INDVAL *w = (INDVAL*) igraph_Calloc(n, INDVAL);
 	
 	for(i=0; i<n; i++){
 		w[i].val = v[i];
@@ -49,7 +49,7 @@ void exact_coarse_graining(const REAL *v, UINT *gr, const UINT n)
 		if(w[i].val != w[i-1].val)gr_nb++;
 			gr[w[i].ind] = gr_nb;
 	}
-	FREE(w);
+	igraph_Free(w);
 }
 		
 

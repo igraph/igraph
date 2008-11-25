@@ -1,5 +1,5 @@
 /*
- *  SCGlib : A C library for the spectral coarse graining of matrices
+ *  Scglib : A C library for the spectral coarse graining of matrices
  *	as described in the paper: Shrinking Matrices while preserving their
  *	eigenpairs with Application to the Spectral Coarse Graining of Graphs.
  *	Preprint available at <http://people.epfl.ch/david.morton>
@@ -53,13 +53,14 @@
  */
 
 #include "scg_headers.h"
+#include "error.h"
 
-void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev,
-			const UINT matrix, const REAL *p, const UINT algo, const UINT maxiter)
+int grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
+			const unsigned int matrix, const igraph_real_t *p, const unsigned int algo, const unsigned int maxiter)
 {
-	UINT i,j;
-	UINT **gr_mat = uint_matrix(nev,n);
-	UINT **gr_mat_t = uint_matrix(n,nev);
+	unsigned int i,j;
+	unsigned int **gr_mat = uint_matrix(nev,n);
+	unsigned int **gr_mat_t = uint_matrix(n,nev);
 	
 	switch (algo)
 	{
@@ -71,7 +72,7 @@ void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev,
 		case 2:
 			for(i=0; i<nev; i++){
 				if(!intervals_plus_kmeans(v[i], gr_mat[i], n, nt[i], maxiter))
-					warning("kmeans did not converge");
+				  IGRAPH_WARNING("kmeans did not converge");
 			}
 			break;
 			
@@ -88,8 +89,9 @@ void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev,
 		default:
 			free_uint_matrix(gr_mat, nev);
 			free_uint_matrix(gr_mat_t, n);
-			error("Choose a grouping method: 1-Optimal, 2-Fixed_size intervals+kmeans\
-					3-Fixed_size intervals, 4-Exact coarse graining");
+			IGRAPH_ERROR("Choose a grouping method: 1-Optimal, 2-Fixed_size intervals+kmeans, "
+				     "3-Fixed_size intervals, 4-Exact coarse graining", 
+				     IGRAPH_EINVAL);
 	}
 	
 	//If only one vector copy the groups and jump out
@@ -100,7 +102,7 @@ void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev,
 		free_uint_matrix(gr_mat, nev);
 		free_uint_matrix(gr_mat_t, n);
 		
-		return;
+		return 0;
 	}
 	
 	//Otherwise works out the final groups as decribed in section 5.4.2
@@ -111,7 +113,7 @@ void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev,
 	free_uint_matrix(gr_mat, nev);
 	
 		//Then computes the final groups. Use qsort for speed
-	GROUPS *g = (GROUPS*)CALLOC(n, sizeof(GROUPS));
+	GROUPS *g = (GROUPS*)igraph_Calloc(n, GROUPS);
 	for(i=0; i<n; i++){
 		g[i].ind = i;
 		g[i].n = nev;
@@ -119,14 +121,16 @@ void grouping(REAL **v, UINT *gr, const UINT n, const UINT *nt, const UINT nev,
 	}
 		
 	qsort(g, n, sizeof(GROUPS), compare_groups);
-	UINT gr_nb = FIRST_GROUP_NB;
+	unsigned int gr_nb = FIRST_GROUP_NB;
 	gr[g[0].ind] = gr_nb;
 	for(i=1; i<n; i++){
 		if(compare_groups(&g[i], &g[i-1]) != 0) gr_nb++;
 		gr[g[i].ind] = gr_nb;
 	}
-	FREE(g);
+	igraph_Free(g);
 	free_uint_matrix(gr_mat_t,n);
+	
+	return 0;
 }
 
 

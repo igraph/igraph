@@ -37,14 +37,14 @@
  
 #include "scg_headers.h"
 
-REAL optimal_partition(const REAL *v, UINT *gr,const UINT n,const UINT nt, 
-										const UINT matrix, const REAL *p)
+igraph_real_t optimal_partition(const igraph_real_t *v, unsigned int *gr,const unsigned int n,const unsigned int nt, 
+										const unsigned int matrix, const igraph_real_t *p)
 {
 	/*-----------------------------------------------
 	-----Sorts v and counts non-ties-----------------
 	-----------------------------------------------*/
-	UINT i, non_ties;
-	INDVAL *vs = (INDVAL*)CALLOC(n, sizeof(INDVAL));
+	unsigned int i, non_ties;
+	INDVAL *vs = (INDVAL*) igraph_Calloc(n, INDVAL);
 	
 	for(i=0; i<n; i++){
 		vs[i].val = v[i];
@@ -58,13 +58,14 @@ REAL optimal_partition(const REAL *v, UINT *gr,const UINT n,const UINT nt,
 		if(vs[i].val != vs[i-1].val) non_ties++;
 
 	if(nt >= non_ties){
-		FREE(vs);
-		error("when the optimal method is chosen, values in 'nt' must "//
-				"be smaller than the number of unique values in 'v'");
+		igraph_Free(vs);
+		IGRAPH_ERROR("when the optimal method is chosen, values in 'nt' must "
+			     "be smaller than the number of unique values in 'v'", 
+			     IGRAPH_EINVAL);
 	}
 	
 	//if stochastic SCG orders p
-	REAL *ps = NULL;
+	igraph_real_t *ps = NULL;
 	if(matrix==3){
 		ps = real_vector(n);
 		for(i=0; i<n; i++)
@@ -73,21 +74,21 @@ REAL optimal_partition(const REAL *v, UINT *gr,const UINT n,const UINT nt,
 	/*------------------------------------------------
 	------Computes Cv, the matrix of costs------------
 	------------------------------------------------*/
-	REAL *Cv = real_sym_matrix(n);
+	igraph_real_t *Cv = real_sym_matrix(n);
 	cost_matrix(Cv, vs, n, matrix, ps);
 	if(matrix==3)
 		free_real_vector(ps);
 	/*-------------------------------------------------
 	-------Fills up matrices F and Q-------------------
 	-------------------------------------------------*/					
-	UINT q;
+	unsigned int q;
 	int j;
 	/*here j also is a counter but the use of unsigned variables
 	is to be proscribed in "for(unsigned int j=...;j>=0;j--)",
 	for such loops never ends!*/
-	REAL **F = real_matrix(nt,n);
-	UINT **Q = uint_matrix(nt,n);
-	REAL temp;
+	igraph_real_t **F = real_matrix(nt,n);
+	unsigned int **Q = uint_matrix(nt,n);
+	igraph_real_t temp;
 						
 	for(i=0; i<n; i++) Q[0][i]++;
 	for(i=0; i<nt; i++) Q[i][i]=i+1;
@@ -112,10 +113,10 @@ REAL optimal_partition(const REAL *v, UINT *gr,const UINT n,const UINT nt,
 	/*--------------------------------------------------
 	-------Back-tracks through Q to work out the groups-
 	--------------------------------------------------*/
-	UINT l;
-	UINT part_ind = nt;
-	UINT col = n-1;
-	REAL sumOfSquares;
+	unsigned int l;
+	unsigned int part_ind = nt;
+	unsigned int col = n-1;
+	igraph_real_t sumOfSquares;
 
 	for(j=nt-1; j>=0; j--){
 		for(i=Q[j][col]-1; i<=col; i++)
@@ -141,18 +142,18 @@ REAL optimal_partition(const REAL *v, UINT *gr,const UINT n,const UINT nt,
 
 	free_uint_matrix(Q,nt);
 	free_real_matrix(F,nt);
-	FREE(vs);
+	igraph_Free(vs);
 
 	return sumOfSquares;
 }
 
-void cost_matrix(REAL*Cv, const INDVAL *vs, const UINT n, const UINT matrix, const REAL *ps)
+void cost_matrix(igraph_real_t*Cv, const INDVAL *vs, const unsigned int n, const unsigned int matrix, const igraph_real_t *ps)
 {
 	//if symmetric of Laplacian SCG -> same Cv
 	if(matrix==1 || matrix==2){
-		UINT i,j;
-		REAL *w  = real_vector(n+1);
-		REAL *w2 = real_vector(n+1);
+		unsigned int i,j;
+		igraph_real_t *w  = real_vector(n+1);
+		igraph_real_t *w2 = real_vector(n+1);
 	
 		w[1] = vs[0].val;
 		w2[1] = vs[0].val*vs[0].val;
@@ -172,8 +173,8 @@ void cost_matrix(REAL*Cv, const INDVAL *vs, const UINT n, const UINT matrix, con
 	//if stochastic
 	//TODO: optimize it to O(n^2) instead of O(n^3) (as above)
 	if(matrix==3){
-		UINT i,j,k;
-		REAL t1,t2;
+		unsigned int i,j,k;
+		igraph_real_t t1,t2;
 		for(i=0; i<n; i++){
 			for(j=i+1; j<n; j++){
 				t1 = t2 = 0;
