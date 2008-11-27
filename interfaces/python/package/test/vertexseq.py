@@ -67,6 +67,14 @@ class VertexSeqTests(unittest.TestCase):
         self.failUnless(len(subset) == 3)
         self.failUnless(subset["test"] == [5,6,7])
 
+    def testSliceFiltering(self):
+        subset = self.g.vs.select(slice(5, 8))
+        self.failUnless(len(subset) == 3)
+        self.failUnless(subset["test"] == [5,6,7])
+        subset = self.g.vs[5:16:2]
+        self.failUnless(len(subset) == 3)
+        self.failUnless(subset["test"] == [5,7,9])
+
     def testKeywordFiltering(self):
         g = Graph.Barabasi(10000)
         g.vs["degree"] = g.degree()

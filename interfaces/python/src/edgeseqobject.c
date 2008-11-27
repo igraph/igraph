@@ -315,13 +315,17 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeq
   if (PyInt_Check(o)) return igraphmodule_EdgeSeq_sq_item(self, PyInt_AsLong(o));
   if (PyTuple_Check(o)) {
     return igraphmodule_EdgeSeq_select(self, o, NULL);
-  } else if (PyList_Check(o)) {
+  } else if (PySlice_Check(o) || PyList_Check(o)) {
     /* Return a restricted EdgeSeq */
-    PyObject *t = PyList_AsTuple(o);
-    PyObject *result;
-    if (!t) return NULL;
-    result = igraphmodule_EdgeSeq_select(self, t, NULL);
-    Py_DECREF(t);
+    PyObject *result, *args;
+    if (PySlice_Check(o)) {
+      args = Py_BuildValue("(O)", o);
+    } else {
+      args = PyList_AsTuple(o);
+    }
+    if (!args) return NULL;
+    result = igraphmodule_EdgeSeq_select(self, args, NULL);
+    Py_DECREF(args);
     return result;
   }
   return igraphmodule_EdgeSeq_get_attribute_values(self, o);
@@ -350,7 +354,7 @@ int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject
 
   if (igraph_es_type(&self->es) == IGRAPH_ES_ALL) {
     if (n != (long)igraph_ecount(&gr->g)) {
-      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of edges in the graph");
+      PyErr_SetString(PyExc_ValueError, "value list length must be equal to the number of edges in the edge sequence");
       return -1;
     }
 
@@ -587,29 +591,59 @@ PyObject* igraphmodule_EdgeSeq_select(igraphmodule_EdgeSeqObject *self,
       PyObject *iter, *item2;
       igraph_vector_t v, v2;
       
-      iter = PyObject_GetIter(item);
-      if (iter == 0) {
-        PyErr_SetString(PyExc_TypeError, "invalid edge filter among positional arguments");
-        Py_DECREF(result);
-        return 0;
-      }
       /* Allocate stuff */
       if (igraph_vector_init(&v, 0)) {
-        Py_DECREF(iter);
         igraphmodule_handle_igraph_error();
         return 0;
       }
       if (igraph_vector_init(&v2, 0)) {
-        Py_DECREF(iter);
         igraph_vector_destroy(&v);
         igraphmodule_handle_igraph_error();
         return 0;
       }
       if (igraph_es_as_vector(&gr->g, self->es, &v2)) {
-        Py_DECREF(iter);
         igraph_vector_destroy(&v);
         igraph_vector_destroy(&v2);
         igraphmodule_handle_igraph_error();
+        return 0;
+      }
+
+      /* Create an appropriate iterator */
+      if (PySlice_Check(item)) {
+        /* Create an iterator from the slice (which is not iterable by default )*/
+        Py_ssize_t start, stop, step, sl;
+        PyObject* range;
+        igraph_bool_t ok;
+
+        ok = (PySlice_GetIndicesEx((PySliceObject*)item, igraph_vector_size(&v2),
+              &start, &stop, &step, &sl) == 0);
+        if (ok) {
+          range = PyObject_CallFunction((PyObject*)&PyRange_Type, "lll", start, stop, step);
+          ok = (range != 0);
+        }
+        if (ok) {
+          iter = PyObject_GetIter(range);
+          Py_DECREF(range);
+          ok = (iter != 0);
+        }
+        if (!ok) {
+          igraph_vector_destroy(&v);
+          igraph_vector_destroy(&v2);
+          PyErr_SetString(PyExc_TypeError, "error while converting slice to iterator");
+          Py_DECREF(result);
+          return 0;
+        }
+      } else {
+        /* Simply create the iterator corresponding to the object */
+        iter = PyObject_GetIter(item);
+      }
+
+      /* Did we manage to get an iterator? */
+      if (iter == 0) {
+        igraph_vector_destroy(&v);
+        igraph_vector_destroy(&v2);
+        PyErr_SetString(PyExc_TypeError, "invalid edge filter among positional arguments");
+        Py_DECREF(result);
         return 0;
       }
       /* Do the iteration */
