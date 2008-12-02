@@ -162,32 +162,6 @@ igraph_real_t igraph_max_real_vector(const igraph_real_t *v,const unsigned int n
 		return temp;
 }
 
-/* allocate a unsigned int vector of size n*/
-unsigned int *igraph_uint_vector(const unsigned int n) 
-{ 
-	unsigned int *v;
-	v = (unsigned int *) igraph_Calloc(n, unsigned int);
-	if (!v) IGRAPH_ERROR("allocation failure in uint_vector()", 
-			     IGRAPH_EINVAL); 
-	return v;
-}
-unsigned int igraph_min_uint_vector(const unsigned int *v, const unsigned int n)
-{
-	unsigned int i;
-	unsigned int temp = v[0];
-	for(i=1; i<n; i++)
-		if( v[i] < temp) temp=v[i];
-	return temp;
-}
-unsigned int igraph_max_uint_vector(const unsigned int *v, const unsigned int n)
-{
-	unsigned int i;
-	unsigned int temp = v[0];
-	for(i=1; i<n; i++)
-		if( v[i] > temp) temp=v[i];
-	return temp;
-}
-
 /* #ifdef R_COMPIL */
 /* 	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, */
 /* 					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter) */

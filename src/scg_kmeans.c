@@ -40,7 +40,8 @@ int igraph_i_scg_kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, cons
     unsigned int iter, i, j, c, it, inew = 0;
     igraph_real_t best, dd, tmp;
     unsigned int updated;
-    unsigned int *nc = igraph_uint_vector(k);
+    igraph_vector_long_t nc;
+    igraph_vector_long_init(&nc, k);
 
     for(i = 0; i < n; i++) cl[i] = -1;
     for(iter = 0; iter < maxiter; iter++) {
@@ -67,15 +68,15 @@ int igraph_i_scg_kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, cons
 		if(!updated) break;
 	//update each centre
 		for(j = 0; j < k*p; j++) cen[j] = 0.0;
-		for(j = 0; j < k; j++) nc[j] = 0;
+		for(j = 0; j < k; j++) VECTOR(nc)[j] = 0;
 		for(i = 0; i < n; i++) {
 			it = cl[i] - 1;
-			nc[it]++;
+			VECTOR(nc)[it]++;
 			for(c = 0; c < p; c++) cen[it+c*k] += x[i+c*n];
 			}
-		for(j = 0; j < k*p; j++) cen[j] /= nc[j % k];
+		for(j = 0; j < k*p; j++) cen[j] /= VECTOR(nc)[j % k];
 	}
-	igraph_free_uint_vector(nc);
+        igraph_vector_long_destroy(&nc);
 	//returns 1 if converged else -1
 	if(iter<maxiter-1)
 		return 1;

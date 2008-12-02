@@ -69,11 +69,6 @@ void igraph_i_scg_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs
 igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, unsigned int *gr,const unsigned int n,
 					     const unsigned int nt,const unsigned int matrix, const igraph_real_t *p);
 /*-------------------------------------------------
-------------DEFINED IN scg_grouping.c--------------
----------------------------------------------------*/							
-int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
-			const unsigned int matrix, const igraph_real_t *p, const unsigned int algo, const unsigned int maxiter);
-/*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
 int igraph_i_scg_kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned int p, igraph_real_t *cen,
@@ -105,11 +100,5 @@ igraph_real_t igraph_min_real_vector(const igraph_real_t *v, const unsigned int 
 igraph_real_t igraph_max_real_vector(const igraph_real_t *v, const unsigned int n);
 //for unity
 #define igraph_free_real_vector(v) igraph_Free(v)
-
-unsigned int *igraph_uint_vector(const unsigned int n);
-unsigned int igraph_min_uint_vector(const unsigned int *v, const unsigned int n);
-unsigned int igraph_max_uint_vector(const unsigned int *v, const unsigned int n);
-//for unity
-#define igraph_free_uint_vector(v) igraph_Free(v)
 
 #endif

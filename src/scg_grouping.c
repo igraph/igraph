@@ -55,7 +55,7 @@
 #include "scg_headers.h"
 #include "error.h"
 
-int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr, 
+int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr, 
 			const unsigned int n, const unsigned int *nt, 
 			const unsigned int nev,
 			const unsigned int matrix, const igraph_real_t *p, 
@@ -100,7 +100,7 @@ int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr,
 	//If only one vector copy the groups and jump out
  	if(nev==1){
 		for(i=0; i<n; i++)
-			gr[i] = gr_mat[0][i];
+		  VECTOR(*gr)[i] = gr_mat[0][i];
 			
 		igraph_free_uint_matrix(gr_mat, nev);
 		igraph_free_uint_matrix(gr_mat_t, n);
@@ -125,10 +125,10 @@ int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr,
 		
 	qsort(g, n, sizeof(igraph_i_scg_groups_t), igraph_i_scg_compare_groups);
 	unsigned int gr_nb = FIRST_GROUP_NB;
-	gr[g[0].ind] = gr_nb;
+	VECTOR(*gr)[g[0].ind] = gr_nb;
 	for(i=1; i<n; i++){
 		if(igraph_i_scg_compare_groups(&g[i], &g[i-1]) != 0) gr_nb++;
-		gr[g[i].ind] = gr_nb;
+		VECTOR(*gr)[g[i].ind] = gr_nb;
 	}
 	igraph_Free(g);
 	igraph_free_uint_matrix(gr_mat_t,n);

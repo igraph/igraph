@@ -39,7 +39,6 @@
 #include <stdlib.h>
 
 igraph_real_t **igraph_real_matrix(const unsigned int nrow, const unsigned int ncol);
-unsigned int *igraph_uint_vector(const unsigned int n);
 
 #define RDN (rand() % 10000 + 1)/10000.
 
@@ -53,7 +52,8 @@ int main (unsigned int argc, const char * argv[]) {
 	unsigned int matrix = 1;
 	
 	igraph_real_t **v = igraph_real_matrix(nev,n);
-	unsigned int *gr = igraph_uint_vector(n);
+	igraph_vector_t gr;
+	igraph_vector_init(&gr, n);
 	igraph_real_t *p; //unused. If matrix=3 provide a probability vector here 
 	
 	srand(10);
@@ -68,15 +68,15 @@ int main (unsigned int argc, const char * argv[]) {
 	unsigned int algo;
 	unsigned int maxiter = 100; //ignored when algo not equal to 2
 	for(algo=1; algo<=4; algo++){
-		igraph_scg_grouping(v, gr, n, nt, nev, matrix, p, algo, maxiter);
-		printf("\nAlgo %i, %i groups:", algo, igraph_max_uint_vector(gr,n)+1);
+		igraph_scg_grouping(v, &gr, n, nt, nev, matrix, p, algo, maxiter);
+		printf("\nAlgo %i, %i groups:", algo, (int)igraph_vector_max(&gr)+1);
 		for(i=0; i<n; i++)
-			printf(" %i", gr[i]);
+		  printf(" %i", (int)VECTOR(gr)[i]);
 		printf("\n");
 	}
 	printf("\n");
 				
-	free(gr);
+	igraph_vector_destroy(&gr);
 	igraph_free_real_matrix(v,nev);
 	//free_real_vector(p);
 	return 0;
