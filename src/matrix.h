@@ -87,6 +87,9 @@ int FUNCTION(igraph_matrix,select_cols)(const TYPE(igraph_matrix) *m,
 					TYPE(igraph_matrix) *res, 
 					const igraph_vector_t *cols);
 
+int FUNCTION(igraph_matrix,view_col)(const TYPE(igraph_matrix) *m, 
+				     TYPE(igraph_vector) *res, long int index);
+
 /*-----------------------------*/
 /* Exchanging rows and columns */
 /*-----------------------------*/

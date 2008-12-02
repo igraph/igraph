@@ -417,7 +417,7 @@ int FUNCTION(igraph_matrix,select_rows)(const TYPE(igraph_matrix) *m,
  * \param m The input matrix.
  * \param res The result will we stored in this vector. It should be
  *   initialized and will be resized as needed.
- * \param index The index of the solumn to select.
+ * \param index The index of the column to select.
  * \return Error code.
  * 
  * Time complexity: O(n), the number of rows in the matrix.
@@ -433,6 +433,35 @@ int FUNCTION(igraph_matrix,get_col)(const TYPE(igraph_matrix) *m,
   }
   IGRAPH_CHECK(FUNCTION(igraph_vector,get_interval)(&m->data, res, 
 						    nrow*index, nrow*(index+1)));
+  return 0;
+}
+
+/**
+ * \function igraph_matrix_view_col
+ * \brief Create a vector view from a column of a matrix
+ * 
+ * Please note that destroying the matrix invalidates the vector view. 
+ * You should never use the view if the matrix was already destroyed. 
+ * The view is just like another vector view, you can write the matrix 
+ * through it and you must not destroy it.
+ * \param m The input matrix.
+ * \param res Pointer to an uninitialized vector, the view is created here.
+ * \param index The index of the column to select.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), the number of rows in the matrix.
+ */
+
+int FUNCTION(igraph_matrix,view_col)(const TYPE(igraph_matrix) *m, 
+				    TYPE(igraph_vector) *res,
+				    long int index) {
+  long int nrow=FUNCTION(igraph_matrix,nrow)(m);
+
+  if (index>=m->ncol) {
+    IGRAPH_ERROR("Index out of range for viewing matrix column", IGRAPH_EINVAL);
+  }
+  FUNCTION(igraph_vector,view)(res, VECTOR(m->data)+nrow*index, nrow);
+
   return 0;
 }
 
