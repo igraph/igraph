@@ -72,16 +72,6 @@ int igraph_i_scg_compare_int(const void *a, const void *b)
 	return (arg1 -arg2);
 }
 
-/* allocate a igraph_real_t symmetrix matrix with dimension size x size in vector format*/ 
-igraph_real_t *igraph_real_sym_matrix(const unsigned int size) 
-{ 
-	igraph_real_t *S;
-	S = (igraph_real_t *) igraph_Calloc(size*(size+1)/2,igraph_real_t); 
-	if (!S) IGRAPH_ERROR("allocation failure in real_sym_matrix()", 
-			    IGRAPH_EINVAL); 
-	return S;
-}
-
 /* #ifdef R_COMPIL */
 /* 	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, */
 /* 					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter) */

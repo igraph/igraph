@@ -78,8 +78,9 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	/*------------------------------------------------
 	------Computes Cv, the matrix of costs------------
 	------------------------------------------------*/
-	igraph_real_t *Cv = igraph_real_sym_matrix(n);
-	igraph_i_scg_cost_matrix(Cv, vs, n, matrix, &ps);
+	igraph_matrix_t Cv;
+	igraph_matrix_init(&Cv, n, n);
+	igraph_i_scg_cost_matrix(&Cv, vs, n, matrix, &ps);
 	if(matrix==3)
 	  igraph_vector_destroy(&ps);
 	/*-------------------------------------------------
@@ -100,22 +101,22 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	for(i=0; i<nt; i++) MATRIX(Q, i, i)=i+1;
 	
 	for(i=0; i<n; i++)
-	  MATRIX(F,i,0) = igraph_real_sym_mat_get(Cv,0,i);
+	  MATRIX(F,i,0) = MATRIX(Cv,0,i);
 		
 	for(i=1; i<nt; i++)
 		for(j=i+1; j<n; j++){
-		  MATRIX(F, j, i) = MATRIX(F,i-1,i-1) + igraph_real_sym_mat_get(Cv,i,j);
+		  MATRIX(F, j, i) = MATRIX(F,i-1,i-1) + MATRIX(Cv,i,j);
 			MATRIX(Q,j,i) = 2;
 		
 			for(q=i-1; q<=j-1; q++){
-			        temp = MATRIX(F,q,i-1) + igraph_real_sym_mat_get(Cv,q+1,j);
+			        temp = MATRIX(F,q,i-1) + MATRIX(Cv,q+1,j);
 				if(temp<MATRIX(F,j,i)){
 				        MATRIX(F,j,i) = temp;
 					MATRIX(Q,j,i) = q+2;
 				}
 			}
 		}
-	igraph_free_real_sym_matrix(Cv);
+	igraph_matrix_destroy(&Cv);
 	/*--------------------------------------------------
 	-------Back-tracks through Q to work out the groups-
 	--------------------------------------------------*/
@@ -151,7 +152,7 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	return sumOfSquares;
 }
 
-void igraph_i_scg_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs, const unsigned int n, const unsigned int matrix, const igraph_vector_t *ps)
+void igraph_i_scg_cost_matrix(igraph_matrix_t *Cv, const igraph_i_scg_indval_t *vs, const unsigned int n, const unsigned int matrix, const igraph_vector_t *ps)
 {
 	//if symmetric of Laplacian SCG -> same Cv
 	if(matrix==1 || matrix==2){
@@ -169,9 +170,11 @@ void igraph_i_scg_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
 		}
 	
 		for(i=0; i<n; i++)
-		  for(j=i+1; j<n; j++)
-		    igraph_real_sym_mat_set(Cv,i,j,
-					    (VECTOR(w2)[j+1]-VECTOR(w2)[i])-(VECTOR(w)[j+1]-VECTOR(w)[i])*(VECTOR(w)[j+1]-VECTOR(w)[i])/(j-i+1) );
+		  for(j=i+1; j<n; j++) {
+		    igraph_real_t val=(VECTOR(w2)[j+1]-VECTOR(w2)[i])-(VECTOR(w)[j+1]-VECTOR(w)[i])*(VECTOR(w)[j+1]-VECTOR(w)[i])/(j-i+1);
+		    MATRIX(*Cv,i,j)=MATRIX(*Cv,j,i)=val;
+		  }
+					    
 		igraph_vector_destroy(&w);
 		igraph_vector_destroy(&w2);
 	}
@@ -191,7 +194,7 @@ void igraph_i_scg_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
 				t2 = 0;
 				for(k=i; k<j; k++)
 				  t2 += (vs[k].val-t1)*(vs[k].val-t1);
-				igraph_real_sym_mat_set(Cv,i,j,t2);
+				MATRIX(*Cv,i,j)=MATRIX(*Cv,j,i)=t2;
 			}
 		}
 	}

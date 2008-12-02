@@ -74,7 +74,7 @@ void igraph_i_scg_intervals_method(const igraph_vector_t *v,
 /*-------------------------------------------------
 ------------DEFINED IN scg_optimal_method.c--------
 ---------------------------------------------------*/	
-void igraph_i_scg_cost_matrix(igraph_real_t *Cv, 
+void igraph_i_scg_cost_matrix(igraph_matrix_t *Cv, 
 			      const igraph_i_scg_indval_t *vs, 
 			      const unsigned int n, const unsigned int matrix, 
 			      const igraph_vector_t *ps);
@@ -103,10 +103,5 @@ void igraph_i_scg_exact_coarse_graining(const igraph_vector_t *v,
 int igraph_i_scg_compare_groups(const void *a,const void *b);
 int igraph_i_scg_compare_real(const void *a, const void *b);
 int igraph_i_scg_compare_int(const void *a, const void *b);
-
-igraph_real_t *igraph_real_sym_matrix(const unsigned int size);
-#define igraph_real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
-#define igraph_real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
-#define igraph_free_real_sym_matrix(S) igraph_Free(S)
 
 #endif
