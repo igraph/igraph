@@ -56,51 +56,91 @@
 #include "error.h"
 
 int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr, 
-			const unsigned int n, const unsigned int *nt, 
-			const unsigned int nev,
-			const unsigned int matrix, const igraph_real_t *p, 
-			const unsigned int algo, const unsigned int maxiter)
+			const igraph_vector_t *nt, igraph_scg_matrix_t matrix, 
+			const igraph_vector_t *p, igraph_scg_algorithm_t algo, 
+			const unsigned int maxiter)
 {
-  unsigned int i,j,gr_nb;
+        long int n=igraph_matrix_nrow(v);
+	long int nev=igraph_matrix_ncol(v);
+	long int nnt=igraph_vector_size(nt);
+	unsigned int i,j,gr_nb;
 	igraph_matrix_long_t gr_mat, gr_mat_t;
 	igraph_i_scg_groups_t *g;
+	igraph_vector_t *mynt=(igraph_vector_t*)nt, mynt_v;
+
+	/******* Error checking *********/
+
+	if (n<1 || nev<1 || n<=nev) {
+	  IGRAPH_ERROR("Invalid `eigenvector' matrix size", IGRAPH_EINVAL);
+	}
+
+	if (nnt != nev && nnt != 1) {
+	  IGRAPH_ERROR("Invalid group sizes in `nt'", IGRAPH_EINVAL);
+	}
+	
+	if (igraph_vector_max(nt) >= n || 
+	    igraph_vector_min(nt) <= 1) {
+	  IGRAPH_ERROR("All group sizes in `nt' must be larger than 1 "
+		       "and smaller than `n'", IGRAPH_EINVAL);
+	}
+
+	if (matrix==IGRAPH_SCG_MATRIX_STOCHASTIC && 
+	    algo==IGRAPH_SCG_ALG_OPTIMUM) {
+	  if (!p) { 
+	    IGRAPH_ERROR("You have to supply `p', the stationaty "
+			 "distribution of the Markov chain for the "
+			 "optimum algorithm", IGRAPH_EINVAL);
+	  }
+	  if (igraph_vector_size(p) != n) {
+	    IGRAPH_ERROR("Invalid `p' length, see docs.", IGRAPH_EINVAL);
+	  }
+	}
+
+	/**********************************/
+
+	if (nnt==1) {
+	  mynt=&mynt_v;
+	  igraph_vector_init(mynt, nev);
+	  igraph_vector_fill(mynt, VECTOR(*nt)[0]);
+	}
+
 	igraph_matrix_long_init(&gr_mat, n, nev);
 	igraph_matrix_long_init(&gr_mat_t, nev, n);
 	
 	switch (algo)
 	{
-		case 1:
+		case IGRAPH_SCG_ALG_OPTIMUM:
 		  for(i=0; i<nev; i++) {
 		    igraph_vector_t myv;
 		    igraph_vector_long_t mygr;
 		    igraph_matrix_view_col(v, &myv, i);
 		    igraph_matrix_long_view_col(&gr_mat, &mygr, i);
-		    igraph_i_scg_optimal_partition(&myv, &mygr, n, nt[i], matrix, p);
+		    igraph_i_scg_optimal_partition(&myv, &mygr, n, VECTOR(*mynt)[i], matrix, p);
 		  }
 			break;
 			
-		case 2:
+		case IGRAPH_SCG_ALG_INTERV_KM:
 			for(i=0; i<nev; i++){
 			  igraph_vector_t myv;
 			  igraph_vector_long_t mygr;
 			  igraph_matrix_view_col(v, &myv, i);
 			  igraph_matrix_long_view_col(&gr_mat, &mygr, i);
-			  if(!igraph_i_scg_intervals_plus_kmeans(&myv, &mygr, n, nt[i], maxiter))
+			  if(!igraph_i_scg_intervals_plus_kmeans(&myv, &mygr, n, VECTOR(*mynt)[i], maxiter))
 			    IGRAPH_WARNING("kmeans did not converge");
 			}
 			break;
 			
-		case 3:
+		case IGRAPH_SCG_ALG_INTERV:
 		  for(i=0; i<nev; i++) {
 		    igraph_vector_t myv;
 		    igraph_vector_long_t mygr;
 		    igraph_matrix_view_col(v, &myv, i);
 		    igraph_matrix_long_view_col(&gr_mat, &mygr, i);
-		      igraph_i_scg_intervals_method(&myv, &mygr, n, nt[i]);
+		    igraph_i_scg_intervals_method(&myv, &mygr, n, VECTOR(*mynt)[i]);
 		  }
 		  break;
 			
-		case 4:
+		case IGRAPH_SCG_ALG_EXACT:
 		  for(i=0; i<nev; i++) {
 		    igraph_vector_t myv;
 		    igraph_vector_long_t mygr;
@@ -153,6 +193,10 @@ int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr,
 	}
 	igraph_Free(g);
 	igraph_matrix_long_destroy(&gr_mat);
+	
+	if (mynt != nt) {
+	  igraph_vector_destroy(mynt);
+	}
 	
 	return 0;
 }

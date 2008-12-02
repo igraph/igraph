@@ -41,8 +41,8 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 					     igraph_vector_long_t *gr,
 					     const unsigned int n,
 					     const unsigned int nt, 
-					     const unsigned int matrix, 
-					     const igraph_real_t *p)
+					     igraph_scg_matrix_t matrix, 
+					     const igraph_vector_t *p)
 {
 	/*-----------------------------------------------
 	-----Sorts v and counts non-ties-----------------
@@ -88,7 +88,7 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	if(matrix==3){
 	  igraph_vector_init(&ps, n);
 	  for(i=0; i<n; i++)
-	    VECTOR(ps)[i] = p[vs[i].ind];
+	    VECTOR(ps)[i] = VECTOR(*p)[vs[i].ind];
 	}
 	/*------------------------------------------------
 	------Computes Cv, the matrix of costs------------

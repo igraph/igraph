@@ -44,20 +44,21 @@ int main (unsigned int argc, const char * argv[]) {
 	
 	unsigned int n = 30;
 	unsigned int nev = 3;
-	unsigned int nt[] = {3,3,2};
+	igraph_vector_t nt; 
+	igraph_real_t ntv[] = {3,3,2};
 	//Type of SCG according to section 6 of the above reference
 	//1:Symmetric (sec. 6.1); 2:Laplacian (sec. 6.2); 3:Stochastic (sec. 6.3)
-	unsigned int matrix = 1;
+	unsigned int matrix = IGRAPH_SCG_MATRIX_SYMMETRIC;
 	
 	igraph_matrix_t v;
 	igraph_vector_t gr;
-	igraph_real_t *p; //unused. If matrix=3 provide a probability vector here 
 
 	unsigned int i,j;
 
 	unsigned int algo;
 	unsigned int maxiter = 100; //ignored when algo not equal to 2
 
+	igraph_vector_view(&nt, ntv, sizeof(ntv)/sizeof(igraph_real_t));
 	igraph_vector_init(&gr, n);
 	igraph_matrix_init(&v, n, nev);
 	
@@ -70,7 +71,7 @@ int main (unsigned int argc, const char * argv[]) {
 	//1:Optimal method (sec. 5.3.1); 2:Intervals+k-means (sec. 5.3.3);
 	//3:Intervals (sec. 5.3.2); 4:Exact SCG (sec. 5.4.1--last paragraph)
 	for(algo=1; algo<=4; algo++){
-		igraph_scg_grouping(&v, &gr, n, nt, nev, matrix, p, algo, maxiter);
+	        igraph_scg_grouping(&v, &gr, &nt, matrix, /*p=*/ 0, algo, maxiter);
 		printf("\nAlgo %i, %i groups:", algo, (int)igraph_vector_max(&gr)+1);
 		for(i=0; i<n; i++)
 		  printf(" %li", (long int)VECTOR(gr)[i]);

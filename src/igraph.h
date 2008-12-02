@@ -157,10 +157,10 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 typedef enum { IGRAPH_DONT_SIMPLIFY=0,
 	       IGRAPH_SIMPLIFY } igraph_lazy_adlist_simplify_t;
 
-typedef enum { IGRAPH_SCG_MATRIX_SYMMETRIC=0,
+typedef enum { IGRAPH_SCG_MATRIX_SYMMETRIC=1,
                IGRAPH_SCG_MATRIX_LAPLACIAN,
                IGRAPH_SCG_MATRIX_STOCHASTIC } igraph_scg_matrix_t;
-typedef enum { IGRAPH_SCG_ALG_OPTIMUM=0,
+typedef enum { IGRAPH_SCG_ALG_OPTIMUM=1,
                IGRAPH_SCG_ALG_INTERV_KM,
                IGRAPH_SCG_ALG_INTERV,
                IGRAPH_SCG_ALG_EXACT } igraph_scg_algorithm_t;
@@ -1647,10 +1647,9 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix, igraph_integer_t ev,
 		      /* igraph_?_t *c_markovp, */);
 
 int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr, 
-			const unsigned int n, const unsigned int *nt, 
-			const unsigned int nev,
-			const unsigned int matrix, const igraph_real_t *p, 
-			const unsigned int algo, const unsigned int maxiter);
+			const igraph_vector_t *nt, igraph_scg_matrix_t matrix, 
+			const igraph_vector_t *p, igraph_scg_algorithm_t algo,
+			const unsigned int maxiter);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */

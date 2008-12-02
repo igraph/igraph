@@ -83,7 +83,7 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 					     const unsigned int n,
 					     const unsigned int nt,
 					     const unsigned int matrix, 
-					     const igraph_real_t *p);
+					     const igraph_vector_t *p);
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
