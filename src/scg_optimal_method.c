@@ -37,8 +37,8 @@
  
 #include "scg_headers.h"
 
-igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, 
-					     unsigned int *gr,
+igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v, 
+					     igraph_vector_long_t *gr,
 					     const unsigned int n,
 					     const unsigned int nt, 
 					     const unsigned int matrix, 
@@ -51,7 +51,7 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v,
 	igraph_i_scg_indval_t *vs = (igraph_i_scg_indval_t*) igraph_Calloc(n, igraph_i_scg_indval_t);
 	
 	for(i=0; i<n; i++){
-		vs[i].val = v[i];
+	        vs[i].val = VECTOR(*v)[i];
 		vs[i].ind = i;
 	}
 
@@ -91,11 +91,12 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v,
 	is to be proscribed in "for(unsigned int j=...;j>=0;j--)",
 	for such loops never ends!*/
 	igraph_real_t **F = igraph_real_matrix(nt,n);
-	unsigned int **Q = igraph_uint_matrix(nt,n);
+	igraph_matrix_long_t Q;
 	igraph_real_t temp;
+	igraph_matrix_long_init(&Q, n, nt);
 						
-	for(i=0; i<n; i++) Q[0][i]++;
-	for(i=0; i<nt; i++) Q[i][i]=i+1;
+	for(i=0; i<n; i++) MATRIX(Q, i, 0)++;
+	for(i=0; i<nt; i++) MATRIX(Q, i, i)=i+1;
 	
 	for(i=0; i<n; i++)
 		F[0][i] = igraph_real_sym_mat_get(Cv,0,i);
@@ -103,13 +104,13 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v,
 	for(i=1; i<nt; i++)
 		for(j=i+1; j<n; j++){
 			F[i][j] = F[i-1][i-1] + igraph_real_sym_mat_get(Cv,i,j);
-			Q[i][j] = 2;
+			MATRIX(Q,j,i) = 2;
 		
 			for(q=i-1; q<=j-1; q++){
 				temp = F[i-1][q] + igraph_real_sym_mat_get(Cv,q+1,j);
 				if(temp<F[i][j]){
 					F[i][j] = temp;
-					Q[i][j] = q+2;
+					MATRIX(Q,j,i) = q+2;
 				}
 			}
 		}
@@ -123,28 +124,26 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v,
 	igraph_real_t sumOfSquares;
 
 	for(j=nt-1; j>=0; j--){
-		for(i=Q[j][col]-1; i<=col; i++)
-			gr[vs[i].ind] = part_ind-1 + FIRST_GROUP_NB;
-		if(Q[j][col] != 2){
-			col = Q[j][col]-2;
-			part_ind -= 1;
-		}
-		else{
-			if(j>1){
-				for(l=0; l<=(j-1); l++)
-					gr[vs[l].ind] = l + FIRST_GROUP_NB;
-				break;
-			}
-			else{
-				col = Q[j][col]-2;
-				part_ind -= 1;
-			}
-		}
+	  for(i=MATRIX(Q,col,j)-1; i<=col; i++)
+	    VECTOR(*gr)[vs[i].ind] = part_ind-1 + FIRST_GROUP_NB;
+	  if(MATRIX(Q,col,j) != 2){
+	    col = MATRIX(Q,col,j)-2;
+	    part_ind -= 1;
+	  } else{
+	    if(j>1){
+	      for(l=0; l<=(j-1); l++)
+		VECTOR(*gr)[vs[l].ind] = l + FIRST_GROUP_NB;
+	      break;
+	    } else{
+	      col = MATRIX(Q,col,j)-2;
+	      part_ind -= 1;
+	    }
+	  }
 	}
 	
 	sumOfSquares = F[nt-1][n-1];  
 
-	igraph_free_uint_matrix(Q,nt);
+	igraph_matrix_long_destroy(&Q);
 	igraph_free_real_matrix(F,nt);
 	igraph_Free(vs);
 

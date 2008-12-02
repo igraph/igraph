@@ -35,7 +35,7 @@
 #include <float.h>
 
 int igraph_i_scg_kmeans_Lloyd(const igraph_vector_t *x, const unsigned int n, const unsigned int p, igraph_vector_t *cen,
-			      const unsigned int k, int *cl, const unsigned int maxiter)
+			      const unsigned int k, igraph_vector_long_t *cl, const unsigned int maxiter)
 {
     unsigned int iter, i, j, c, it, inew = 0;
     igraph_real_t best, dd, tmp;
@@ -43,7 +43,7 @@ int igraph_i_scg_kmeans_Lloyd(const igraph_vector_t *x, const unsigned int n, co
     igraph_vector_long_t nc;
     igraph_vector_long_init(&nc, k);
 
-    for(i = 0; i < n; i++) cl[i] = -1;
+    for(i = 0; i < n; i++) VECTOR(*cl)[i] = -1;
     for(iter = 0; iter < maxiter; iter++) {
 		updated = 0;
 		for(i = 0; i < n; i++) {
@@ -60,9 +60,9 @@ int igraph_i_scg_kmeans_Lloyd(const igraph_vector_t *x, const unsigned int n, co
 					inew = j+1;
 				}
 			}
-			if(cl[i] != inew) {
+			if(VECTOR(*cl)[i] != inew) {
 				updated = 1;
-				cl[i] = inew;
+				VECTOR(*cl)[i] = inew;
 			}
 		}
 		if(!updated) break;
@@ -70,7 +70,7 @@ int igraph_i_scg_kmeans_Lloyd(const igraph_vector_t *x, const unsigned int n, co
 		for(j = 0; j < k*p; j++) VECTOR(*cen)[j] = 0.0;
 		for(j = 0; j < k; j++) VECTOR(nc)[j] = 0;
 		for(i = 0; i < n; i++) {
-			it = cl[i] - 1;
+		        it = VECTOR(*cl)[i] - 1;
 			VECTOR(nc)[it]++;
 			for(c = 0; c < p; c++) VECTOR(*cen)[it+c*k] += VECTOR(*x)[i+c*n];
 			}

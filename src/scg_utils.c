@@ -109,32 +109,6 @@ void igraph_free_real_matrix(igraph_real_t **M,const unsigned int nrow)
 	igraph_Free(M);
 }
 
-/* allocate an unsigned int matrix with dimension nrow x ncol*/
-unsigned int **igraph_uint_matrix(const unsigned int nrow, const unsigned int ncol) 
-{ 
-	unsigned int i;
-	unsigned int **M; 
-	M = (unsigned int **) igraph_Calloc(nrow, unsigned int*);
-	if (!M) 
-	  IGRAPH_ERROR("row allocation failure in uint_matrix()",
-		       IGRAPH_EINVAL); 
-	for(i=0;i<nrow;i++){
-	  M[i] = (unsigned int *) igraph_Calloc(ncol, unsigned int); 
-	  if(!M[i]) IGRAPH_ERROR("column allocation failure in uint_matrix()", 
-				 IGRAPH_EINVAL);
-	}
-	for(i=0;i<nrow;i++)
-		M[i] = (unsigned int *) igraph_Calloc(ncol, unsigned int);
-	return M; 
-}
-void igraph_free_uint_matrix(unsigned int **M, const unsigned int nrow)
-{
-	unsigned int i;
-	for(i=0; i<nrow; i++)
-		igraph_Free(M[i]);
-	igraph_Free(M);
-}
-
 /* #ifdef R_COMPIL */
 /* 	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, */
 /* 					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter) */

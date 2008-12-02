@@ -31,23 +31,25 @@
 
 #include "scg_headers.h"
 
-void igraph_i_scg_exact_coarse_graining(const igraph_real_t *v, unsigned int *gr, const unsigned int n)
+void igraph_i_scg_exact_coarse_graining(const igraph_vector_t *v, 
+					igraph_vector_long_t *gr, 
+					const unsigned int n)
 {
 	unsigned int i,gr_nb;
 	igraph_i_scg_indval_t *w = (igraph_i_scg_indval_t*) igraph_Calloc(n, igraph_i_scg_indval_t);
 	
 	for(i=0; i<n; i++){
-		w[i].val = v[i];
+	        w[i].val = VECTOR(*v)[i];
 		w[i].ind = i;
 	}
 
 	qsort(w, n, sizeof(igraph_i_scg_indval_t), igraph_i_scg_compare_ind_val);
 	
 	gr_nb = 0;
-	gr[w[0].ind] = gr_nb;
+	VECTOR(*gr)[w[0].ind] = gr_nb;
 	for(i=1; i<n; i++){
 		if(w[i].val != w[i-1].val)gr_nb++;
-			gr[w[i].ind] = gr_nb;
+		VECTOR(*gr)[w[i].ind] = gr_nb;
 	}
 	igraph_Free(w);
 }

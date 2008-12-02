@@ -51,7 +51,7 @@ int igraph_i_scg_compare_ind_val(const void *a, const void *b);
 typedef struct groups {
 	unsigned int ind;
 	unsigned int n;
-	unsigned int* gr;
+        long* gr;
 } igraph_i_scg_groups_t;
 
 /*-------------------------------------------------
@@ -63,11 +63,12 @@ int igraph_i_scg_breaks_computation(const igraph_vector_t *v,
 				    const unsigned int nb,
 				    const unsigned int method);
 int igraph_i_scg_intervals_plus_kmeans(const igraph_vector_t *v, 
-				       unsigned int *gr, 
+				       igraph_vector_long_t *gr, 
 				       const unsigned int n,
 				       const unsigned int n_interv, 
 				       const unsigned int maxiter);
-void igraph_i_scg_intervals_method(const igraph_vector_t *v, unsigned int *gr, 
+void igraph_i_scg_intervals_method(const igraph_vector_t *v, 
+				   igraph_vector_long_t *gr,
 				   const unsigned int n, 
 				   const unsigned int n_interv);
 /*-------------------------------------------------
@@ -77,8 +78,8 @@ void igraph_i_scg_cost_matrix(igraph_real_t *Cv,
 			      const igraph_i_scg_indval_t *vs, 
 			      const unsigned int n, const unsigned int matrix, 
 			      const igraph_vector_t *ps);
-igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, 
-					     unsigned int *gr,
+igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v, 
+					     igraph_vector_long_t *gr,
 					     const unsigned int n,
 					     const unsigned int nt,
 					     const unsigned int matrix, 
@@ -88,13 +89,13 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v,
 ---------------------------------------------------*/
 int igraph_i_scg_kmeans_Lloyd(const igraph_vector_t *x, const unsigned int n, 
 			      const unsigned int p, igraph_vector_t *cen,
-			      const unsigned int k, int *cl, 
+			      const unsigned int k, igraph_vector_long_t *cl, 
 			      const unsigned int maxiter);
 /*-------------------------------------------------
 ------------DEFINED IN scg_exact_scg.c-------------
 ---------------------------------------------------*/
-void igraph_i_scg_exact_coarse_graining(const igraph_real_t *v, 
-					unsigned int *gr,
+void igraph_i_scg_exact_coarse_graining(const igraph_vector_t *v, 
+					igraph_vector_long_t *gr,
 					const unsigned int n);
 /*-------------------------------------------------
 ------------DEFINED IN scg_utils.c-----------------
@@ -110,8 +111,5 @@ igraph_real_t *igraph_real_sym_matrix(const unsigned int size);
 
 igraph_real_t **igraph_real_matrix(const unsigned int nrow, const unsigned int ncol);
 void igraph_free_real_matrix(igraph_real_t **M,const unsigned int nrow);
-
-unsigned int **igraph_uint_matrix(const unsigned int nrow, const unsigned int ncol);
-void igraph_free_uint_matrix(unsigned int **M, const unsigned int nrow);
 
 #endif

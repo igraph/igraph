@@ -71,7 +71,7 @@ int main (unsigned int argc, const char * argv[]) {
 		igraph_scg_grouping(v, &gr, n, nt, nev, matrix, p, algo, maxiter);
 		printf("\nAlgo %i, %i groups:", algo, (int)igraph_vector_max(&gr)+1);
 		for(i=0; i<n; i++)
-		  printf(" %i", (int)VECTOR(gr)[i]);
+		  printf(" %li", (long int)VECTOR(gr)[i]);
 		printf("\n");
 	}
 	printf("\n");

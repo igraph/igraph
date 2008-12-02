@@ -43,25 +43,31 @@
 
 #include "scg_headers.h"
 
-int igraph_i_scg_intervals_plus_kmeans(const igraph_vector_t *v, unsigned int *gr, const unsigned int n,
-				       const unsigned int n_interv, const unsigned int maxiter)
+int igraph_i_scg_intervals_plus_kmeans(const igraph_vector_t *v, 
+				       igraph_vector_long_t *gr,
+				       const unsigned int n,
+				       const unsigned int n_interv,
+				       const unsigned int maxiter)
 {
 	unsigned int i;
 	int converge;
 	igraph_vector_t centers;
 	igraph_vector_init(&centers, n_interv);
 	igraph_i_scg_breaks_computation(v,n,&centers,n_interv,2);
-	converge = igraph_i_scg_kmeans_Lloyd(v, n, 1, &centers, n_interv, (int*) gr,maxiter);
+	converge = igraph_i_scg_kmeans_Lloyd(v, n, 1, &centers, n_interv, gr, maxiter);
 	
 	/*renumber the groups*/
-	for(i=0; i<n; i++) gr[i] = gr[i]-1 + FIRST_GROUP_NB;
+	for(i=0; i<n; i++) VECTOR(*gr)[i] = VECTOR(*gr)[i]-1 + FIRST_GROUP_NB;
 
 	igraph_vector_destroy(&centers);
 
 	return converge;
 }
 										
-void igraph_i_scg_intervals_method(const igraph_vector_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv)
+void igraph_i_scg_intervals_method(const igraph_vector_t *v, 
+				   igraph_vector_long_t *gr, 
+				   const unsigned int n, 
+				   const unsigned int n_interv)
 {
 	unsigned int i, lo, hi, new;
 	const unsigned int lft = 1;
@@ -85,7 +91,7 @@ void igraph_i_scg_intervals_method(const igraph_vector_t *v, unsigned int *gr, c
 		    	else
 				hi = new;
 			}
-		gr[i] = lo + FIRST_GROUP_NB;
+			VECTOR(*gr)[i] = lo + FIRST_GROUP_NB;
 	    }
 	}
     igraph_vector_destroy(&breaks);
