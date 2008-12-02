@@ -1620,7 +1620,7 @@ int igraph_eigen_rs(const igraph_matrix_t *A,
 /* -------------------------------------------------- */
 
 int igraph_scg(const igraph_t *graph, igraph_integer_t ev,
-	       igraph_scg_matrix_t matrix, 
+	       igraph_scg_matrix_t matrix_type, 
 	       igraph_scg_algorithm_t algo,
 	       igraph_scg_norm_t norm,
 	       igraph_scg_direction_t direction,
@@ -1633,11 +1633,24 @@ int igraph_scg(const igraph_t *graph, igraph_integer_t ev,
 	       /* igraph_?_t *epairs, */
 	       /* igraph_?_t *c_markovp, */);
 
-int igraph_scg_matrix();
+int igraph_scg_matrix(const igraph_matrix_t *matrix, igraph_integer_t ev,
+		      igraph_scg_algorithm_t algo,
+		      igraph_scg_norm_t norm,
+		      igraph_scg_direction_t direction,
+		      const igraph_matrix_t *evec,
+		      const igraph_vector_t *markovp,
+		      const igraph_vector_t *group,
+		      /* igraph_bool_t use_arpack, */
+		      igraph_integer_t maxiter
+		      /* igraph_?_t *semproj, */
+		      /* igraph_?_t *epairs, */
+		      /* igraph_?_t *c_markovp, */);
 
-int igraph_scg_grouping();
-
-
+int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr, 
+			const unsigned int n, const unsigned int *nt, 
+			const unsigned int nev,
+			const unsigned int matrix, const igraph_real_t *p, 
+			const unsigned int algo, const unsigned int maxiter);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */

@@ -55,8 +55,11 @@
 #include "scg_headers.h"
 #include "error.h"
 
-int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
-			const unsigned int matrix, const igraph_real_t *p, const unsigned int algo, const unsigned int maxiter)
+int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr, 
+			const unsigned int n, const unsigned int *nt, 
+			const unsigned int nev,
+			const unsigned int matrix, const igraph_real_t *p, 
+			const unsigned int algo, const unsigned int maxiter)
 {
 	unsigned int i,j;
 	unsigned int **gr_mat = igraph_uint_matrix(nev,n);
