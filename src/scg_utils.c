@@ -30,10 +30,10 @@
  #include "scg_headers.h"
 
 /*to be used with qsort and struct ind_val arrays */  
-int compare_ind_val(const void *a, const void *b)
+int igraph_i_scg_compare_ind_val(const void *a, const void *b)
 {
-	INDVAL *arg1 = (INDVAL *) a;
-	INDVAL *arg2 = (INDVAL *) b;
+	igraph_i_scg_indval_t *arg1 = (igraph_i_scg_indval_t *) a;
+	igraph_i_scg_indval_t *arg2 = (igraph_i_scg_indval_t *) b;
 	
 	if( arg1->val < arg2->val ) return -1;
 	else if( arg1->val == arg2->val ) return 0;
@@ -41,10 +41,10 @@ int compare_ind_val(const void *a, const void *b)
 }
 
 /*to be used with qsort and struct groups*/  
-int compare_groups(const void *a,const void *b)
+int igraph_i_scg_compare_groups(const void *a,const void *b)
 {
-		GROUPS *arg1 = (GROUPS *) a;
-		GROUPS *arg2 = (GROUPS *) b;
+		igraph_i_scg_groups_t *arg1 = (igraph_i_scg_groups_t *) a;
+		igraph_i_scg_groups_t *arg2 = (igraph_i_scg_groups_t *) b;
 		unsigned int i;
 		for(i=0; i<arg1->n; i++){
 			if(arg1->gr[i]>arg2->gr[i]) return 1;
@@ -54,7 +54,7 @@ int compare_groups(const void *a,const void *b)
 }
 
 /*to be used with qsort and real_vectors */  
-int compare_real(const void *a, const void *b)
+int igraph_i_scg_compare_real(const void *a, const void *b)
 {
 	igraph_real_t arg1 = * (igraph_real_t *) a;
 	igraph_real_t arg2 = * (igraph_real_t *) b;
@@ -65,7 +65,7 @@ int compare_real(const void *a, const void *b)
 }
 
 /*to be used with qsort and integer vectors */ 
-int compare_int(const void *a, const void *b)
+int igraph_i_scg_compare_int(const void *a, const void *b)
 {
 	int arg1 = * (int *) a;
 	int arg2 = * (int *) b;
@@ -73,7 +73,7 @@ int compare_int(const void *a, const void *b)
 }
 
 /* allocate a igraph_real_t symmetrix matrix with dimension size x size in vector format*/ 
-igraph_real_t *real_sym_matrix(const unsigned int size) 
+igraph_real_t *igraph_real_sym_matrix(const unsigned int size) 
 { 
 	igraph_real_t *S;
 	S = (igraph_real_t *) igraph_Calloc(size*(size+1)/2,igraph_real_t); 
@@ -83,7 +83,7 @@ igraph_real_t *real_sym_matrix(const unsigned int size)
 }
 
 /* allocate a igraph_real_t matrix with dimension nrow x ncol*/ 
-igraph_real_t **real_matrix(const unsigned int nrow, const unsigned int ncol) 
+igraph_real_t **igraph_real_matrix(const unsigned int nrow, const unsigned int ncol) 
 { 
 	unsigned int i;
 	igraph_real_t **M; 
@@ -101,7 +101,7 @@ igraph_real_t **real_matrix(const unsigned int nrow, const unsigned int ncol)
 	  M[i] = (igraph_real_t *) igraph_Calloc(ncol,igraph_real_t);
 	return M; 
 }
-void free_real_matrix(igraph_real_t **M,const unsigned int nrow)
+void igraph_free_real_matrix(igraph_real_t **M,const unsigned int nrow)
 {
 	int i;
 	for(i=0; i<nrow; i++)
@@ -110,7 +110,7 @@ void free_real_matrix(igraph_real_t **M,const unsigned int nrow)
 }
 
 /* allocate an unsigned int matrix with dimension nrow x ncol*/
-unsigned int **uint_matrix(const unsigned int nrow, const unsigned int ncol) 
+unsigned int **igraph_uint_matrix(const unsigned int nrow, const unsigned int ncol) 
 { 
 	unsigned int i;
 	unsigned int **M; 
@@ -127,7 +127,7 @@ unsigned int **uint_matrix(const unsigned int nrow, const unsigned int ncol)
 		M[i] = (unsigned int *) igraph_Calloc(ncol, unsigned int);
 	return M; 
 }
-void free_uint_matrix(unsigned int **M, const unsigned int nrow)
+void igraph_free_uint_matrix(unsigned int **M, const unsigned int nrow)
 {
 	unsigned int i;
 	for(i=0; i<nrow; i++)
@@ -136,7 +136,7 @@ void free_uint_matrix(unsigned int **M, const unsigned int nrow)
 }
 
 /* allocate a igraph_real_t vector of size n*/ 
-igraph_real_t *real_vector(const unsigned int n)
+igraph_real_t *igraph_real_vector(const unsigned int n)
 { 
 	igraph_real_t *v;
 	v = (igraph_real_t *) igraph_Calloc(n, igraph_real_t); 
@@ -145,7 +145,7 @@ igraph_real_t *real_vector(const unsigned int n)
 		       IGRAPH_EINVAL);
 	return v;
 }
-igraph_real_t min_real_vector(const igraph_real_t *v,const unsigned int n)
+igraph_real_t igraph_min_real_vector(const igraph_real_t *v,const unsigned int n)
 {
 	unsigned int i;
 	igraph_real_t temp = v[0];
@@ -153,7 +153,7 @@ igraph_real_t min_real_vector(const igraph_real_t *v,const unsigned int n)
 		if( v[i] < temp) temp=v[i];
 	return temp;
 }
-igraph_real_t max_real_vector(const igraph_real_t *v,const unsigned int n)
+igraph_real_t igraph_max_real_vector(const igraph_real_t *v,const unsigned int n)
 {
 		unsigned int i;
 		igraph_real_t temp = v[0];
@@ -163,7 +163,7 @@ igraph_real_t max_real_vector(const igraph_real_t *v,const unsigned int n)
 }
 
 /* allocate a unsigned int vector of size n*/
-unsigned int *uint_vector(const unsigned int n) 
+unsigned int *igraph_uint_vector(const unsigned int n) 
 { 
 	unsigned int *v;
 	v = (unsigned int *) igraph_Calloc(n, unsigned int);
@@ -171,7 +171,7 @@ unsigned int *uint_vector(const unsigned int n)
 			     IGRAPH_EINVAL); 
 	return v;
 }
-unsigned int min_uint_vector(const unsigned int *v, const unsigned int n)
+unsigned int igraph_min_uint_vector(const unsigned int *v, const unsigned int n)
 {
 	unsigned int i;
 	unsigned int temp = v[0];
@@ -179,7 +179,7 @@ unsigned int min_uint_vector(const unsigned int *v, const unsigned int n)
 		if( v[i] < temp) temp=v[i];
 	return temp;
 }
-unsigned int max_uint_vector(const unsigned int *v, const unsigned int n)
+unsigned int igraph_max_uint_vector(const unsigned int *v, const unsigned int n)
 {
 	unsigned int i;
 	unsigned int temp = v[0];
@@ -188,19 +188,19 @@ unsigned int max_uint_vector(const unsigned int *v, const unsigned int n)
 	return temp;
 }
 
-#ifdef R_COMPIL
-	void scg_r_wrapper(double *v, int *gr, int *n, int *nt,
-					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter)
-	{
-		unsigned int i;
-		igraph_real_t **M = (igraph_real_t**) igraph_Calloc((unsigned int)*nev, igraph_real_t* ); 
-		if(!M) 
-		  IGRAPH_ERROR("row allocation failure in real_matrix()", 
-			       IGRAPH_EINVAL); 
-		for(i=0;i<*nev;i++) M[i] = &v[(*n) * i];
+/* #ifdef R_COMPIL */
+/* 	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, */
+/* 					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter) */
+/* 	{ */
+/* 		unsigned int i; */
+/* 		igraph_real_t **M = (igraph_real_t**) igraph_Calloc((unsigned int)*nev, igraph_real_t* );  */
+/* 		if(!M)  */
+/* 		  IGRAPH_ERROR("row allocation failure in real_matrix()",  */
+/* 			       IGRAPH_EINVAL);  */
+/* 		for(i=0;i<*nev;i++) M[i] = &v[(*n) * i]; */
 
-		grouping(M,(unsigned int*)gr,(unsigned int)*n,(unsigned int*)nt,(unsigned int)*nev,
-				(unsigned int)*nmatrix, (igraph_real_t*)p,(unsigned int)*nalgo,(unsigned int)*maxiter);
-		igraph_Free(M);
-	}
-#endif
+/* 		grouping(M,(unsigned int*)gr,(unsigned int)*n,(unsigned int*)nt,(unsigned int)*nev, */
+/* 				(unsigned int)*nmatrix, (igraph_real_t*)p,(unsigned int)*nalgo,(unsigned int)*maxiter); */
+/* 		igraph_Free(M); */
+/* 	} */
+/* #endif */

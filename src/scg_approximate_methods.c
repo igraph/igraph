@@ -43,32 +43,32 @@
 
 #include "scg_headers.h"
 
-int intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
-			  const unsigned int n_interv, const unsigned int maxiter)
+int igraph_i_scg_intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
+				       const unsigned int n_interv, const unsigned int maxiter)
 {
 	unsigned int i;
 	int converge;
-	igraph_real_t *centers = real_vector(n_interv);
-	breaks_computation(v,n,centers,n_interv,2);
-	converge = kmeans_Lloyd(v, n, 1, centers, n_interv, (int*) gr,maxiter);
+	igraph_real_t *centers = igraph_real_vector(n_interv);
+	igraph_i_scg_breaks_computation(v,n,centers,n_interv,2);
+	converge = igraph_i_scg_kmeans_Lloyd(v, n, 1, centers, n_interv, (int*) gr,maxiter);
 	
 	/*renumber the groups*/
 	for(i=0; i<n; i++) gr[i] = gr[i]-1 + FIRST_GROUP_NB;
 
-	free_real_vector(centers);
+	igraph_free_real_vector(centers);
 
 	return converge;
 }
 										
-void intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv)
+void igraph_i_scg_intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv)
 {
 	unsigned int i, lo, hi, new;
 	const unsigned int lft = 1;
 	const unsigned int include_border = 1;
 			
-	igraph_real_t *breaks = real_vector(n_interv+1);
+	igraph_real_t *breaks = igraph_real_vector(n_interv+1);
 	
-	breaks_computation(v, n, breaks, n_interv+1, 1);
+	igraph_i_scg_breaks_computation(v, n, breaks, n_interv+1, 1);
 
     for(i = 0; i < n; i++) {
 	    lo = 0;
@@ -86,16 +86,16 @@ void intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned i
 		gr[i] = lo + FIRST_GROUP_NB;
 	    }
 	}
-	free_real_vector(breaks);
+	igraph_free_real_vector(breaks);
 }
 
-int breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
+int igraph_i_scg_breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
 						const unsigned int nb,const unsigned int method)
 {
 	unsigned int i;
 	igraph_real_t eps, vmin,vmax;
-	vmin = min_real_vector(v,n);
-	vmax = max_real_vector(v,n);
+	vmin = igraph_min_real_vector(v,n);
+	vmax = igraph_max_real_vector(v,n);
 	
 	if(vmax==vmin)
 	  IGRAPH_ERROR("There is only one (repeated) value in argument 'v' "

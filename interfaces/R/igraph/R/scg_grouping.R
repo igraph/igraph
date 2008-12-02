@@ -1,6 +1,6 @@
 
 "grouping" <- function(V, nt, matrix = c("symmetric","laplacian","stochastic"),
-							algo = c("optimum","interv_km","interv","exact_scg"), p=NULL, maxiter=100)
+                       algo = c("optimum","interv_km","interv","exact_scg"), p=NULL, maxiter=100)
 {
 	V <- as.matrix(V,mode = "numeric")
 	n <- nrow(V)

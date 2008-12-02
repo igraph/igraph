@@ -157,6 +157,19 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 typedef enum { IGRAPH_DONT_SIMPLIFY=0,
 	       IGRAPH_SIMPLIFY } igraph_lazy_adlist_simplify_t;
 
+typedef enum { IGRAPH_SCG_MATRIX_SYMMETRIC=0,
+               IGRAPH_SCG_MATRIX_LAPLACIAN,
+               IGRAPH_SCG_MATRIX_STOCHASTIC } igraph_scg_matrix_t;
+typedef enum { IGRAPH_SCG_ALG_OPTIMUM=0,
+               IGRAPH_SCG_ALG_INTERV_KM,
+               IGRAPH_SCG_ALG_INTERV,
+               IGRAPH_SCG_ALG_EXACT } igraph_scg_algorithm_t;
+typedef enum { IGRAPH_SCG_NORM_ROW=0,
+               IGRAPH_SCG_NORM_COL } igraph_scg_norm_t;
+typedef enum { IGRAPH_SCG_DIR_DEFAULT=0, 
+               IGRAPH_SCG_DIR_RIGHT, 
+               IGRAPH_SCG_DIR_LEFT } igraph_scg_direction_t;
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);
@@ -1601,6 +1614,30 @@ int igraph_eigen_tqlrat(igraph_vector_t *D,
 int igraph_eigen_rs(const igraph_matrix_t *A,
 		    igraph_vector_t *values,
 		    igraph_matrix_t *vectors);
+
+/* -------------------------------------------------- */
+/* Spectral coarse graining                           */ 
+/* -------------------------------------------------- */
+
+int igraph_scg(const igraph_t *graph, igraph_integer_t ev,
+	       igraph_scg_matrix_t matrix, 
+	       igraph_scg_algorithm_t algo,
+	       igraph_scg_norm_t norm,
+	       igraph_scg_direction_t direction,
+	       const igraph_matrix_t *evec,
+	       const igraph_vector_t *markovp,
+	       const igraph_vector_t *group,
+	       /* igraph_bool_t use_arpack, */
+	       igraph_integer_t maxiter
+	       /* igraph_?_t *semproj, */
+	       /* igraph_?_t *epairs, */
+	       /* igraph_?_t *c_markovp, */);
+
+int igraph_scg_matrix();
+
+int igraph_scg_grouping();
+
+
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */

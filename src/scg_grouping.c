@@ -55,40 +55,40 @@
 #include "scg_headers.h"
 #include "error.h"
 
-int grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
+int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
 			const unsigned int matrix, const igraph_real_t *p, const unsigned int algo, const unsigned int maxiter)
 {
 	unsigned int i,j;
-	unsigned int **gr_mat = uint_matrix(nev,n);
-	unsigned int **gr_mat_t = uint_matrix(n,nev);
+	unsigned int **gr_mat = igraph_uint_matrix(nev,n);
+	unsigned int **gr_mat_t = igraph_uint_matrix(n,nev);
 	
 	switch (algo)
 	{
 		case 1:
 			for(i=0; i<nev; i++)
-				optimal_partition(v[i], gr_mat[i], n, nt[i], matrix, p);              
+				igraph_i_scg_optimal_partition(v[i], gr_mat[i], n, nt[i], matrix, p);              
 			break;
 			
 		case 2:
 			for(i=0; i<nev; i++){
-				if(!intervals_plus_kmeans(v[i], gr_mat[i], n, nt[i], maxiter))
+				if(!igraph_i_scg_intervals_plus_kmeans(v[i], gr_mat[i], n, nt[i], maxiter))
 				  IGRAPH_WARNING("kmeans did not converge");
 			}
 			break;
 			
 		case 3:
 			for(i=0; i<nev; i++)
-				intervals_method(v[i], gr_mat[i], n, nt[i]);
+				igraph_i_scg_intervals_method(v[i], gr_mat[i], n, nt[i]);
 			break;
 			
 		case 4:
 			for(i=0; i<nev; i++)
-				exact_coarse_graining(v[i],gr_mat[i],n);
+				igraph_i_scg_exact_coarse_graining(v[i],gr_mat[i],n);
 			break;	
 	 
 		default:
-			free_uint_matrix(gr_mat, nev);
-			free_uint_matrix(gr_mat_t, n);
+			igraph_free_uint_matrix(gr_mat, nev);
+			igraph_free_uint_matrix(gr_mat_t, n);
 			IGRAPH_ERROR("Choose a grouping method: 1-Optimal, 2-Fixed_size intervals+kmeans, "
 				     "3-Fixed_size intervals, 4-Exact coarse graining", 
 				     IGRAPH_EINVAL);
@@ -99,8 +99,8 @@ int grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const un
 		for(i=0; i<n; i++)
 			gr[i] = gr_mat[0][i];
 			
-		free_uint_matrix(gr_mat, nev);
-		free_uint_matrix(gr_mat_t, n);
+		igraph_free_uint_matrix(gr_mat, nev);
+		igraph_free_uint_matrix(gr_mat_t, n);
 		
 		return 0;
 	}
@@ -110,25 +110,25 @@ int grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const un
 	for(i=0; i<n; i++)
 		for(j=0; j<nev; j++)
 			gr_mat_t[i][j] = gr_mat[j][i];
-	free_uint_matrix(gr_mat, nev);
+	igraph_free_uint_matrix(gr_mat, nev);
 	
 		//Then computes the final groups. Use qsort for speed
-	GROUPS *g = (GROUPS*)igraph_Calloc(n, GROUPS);
+	igraph_i_scg_groups_t *g = (igraph_i_scg_groups_t*)igraph_Calloc(n, igraph_i_scg_groups_t);
 	for(i=0; i<n; i++){
 		g[i].ind = i;
 		g[i].n = nev;
 		g[i].gr = gr_mat_t[i];
 	}
 		
-	qsort(g, n, sizeof(GROUPS), compare_groups);
+	qsort(g, n, sizeof(igraph_i_scg_groups_t), igraph_i_scg_compare_groups);
 	unsigned int gr_nb = FIRST_GROUP_NB;
 	gr[g[0].ind] = gr_nb;
 	for(i=1; i<n; i++){
-		if(compare_groups(&g[i], &g[i-1]) != 0) gr_nb++;
+		if(igraph_i_scg_compare_groups(&g[i], &g[i-1]) != 0) gr_nb++;
 		gr[g[i].ind] = gr_nb;
 	}
 	igraph_Free(g);
-	free_uint_matrix(gr_mat_t,n);
+	igraph_free_uint_matrix(gr_mat_t,n);
 	
 	return 0;
 }

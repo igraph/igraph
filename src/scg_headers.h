@@ -41,76 +41,75 @@
 #  define FIRST_GROUP_NB 0
 #endif
 
-struct ind_val{
+typedef struct ind_val {
 	unsigned int ind;
 	igraph_real_t val;
-};
-#define INDVAL struct ind_val
-int compare_ind_val(const void *a, const void *b);
+} igraph_i_scg_indval_t;
 
-struct groups{
+int igraph_i_scg_compare_ind_val(const void *a, const void *b);
+
+typedef struct groups {
 	unsigned int ind;
 	unsigned int n;
 	unsigned int* gr;
-};
-#define GROUPS struct groups
+} igraph_i_scg_groups_t;
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_approximate_methods.c---
 ---------------------------------------------------*/	
-int breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
-			const unsigned int nb,const unsigned int method);
-int intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
+int igraph_i_scg_breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
+				    const unsigned int nb,const unsigned int method);
+int igraph_i_scg_intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
 			  const unsigned int n_interv, const unsigned int maxiter);						
-void intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv);
+void igraph_i_scg_intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv);
 /*-------------------------------------------------
 ------------DEFINED IN scg_optimal_method.c--------
 ---------------------------------------------------*/	
-void cost_matrix(igraph_real_t *Cv, const INDVAL *vs, const unsigned int n, const unsigned int matrix, const igraph_real_t *ps);
-igraph_real_t optimal_partition(const igraph_real_t *v, unsigned int *gr,const unsigned int n,
-				const unsigned int nt,const unsigned int matrix, const igraph_real_t *p);
+void igraph_i_scg_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs, const unsigned int n, const unsigned int matrix, const igraph_real_t *ps);
+igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, unsigned int *gr,const unsigned int n,
+					     const unsigned int nt,const unsigned int matrix, const igraph_real_t *p);
 /*-------------------------------------------------
 ------------DEFINED IN scg_grouping.c--------------
 ---------------------------------------------------*/							
-int grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
-	     const unsigned int matrix, const igraph_real_t *p, const unsigned int algo, const unsigned int maxiter);
+int igraph_scg_grouping(igraph_real_t **v, unsigned int *gr, const unsigned int n, const unsigned int *nt, const unsigned int nev,
+			const unsigned int matrix, const igraph_real_t *p, const unsigned int algo, const unsigned int maxiter);
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
-int kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned int p, igraph_real_t *cen,
-		 const unsigned int k, int *cl, const unsigned int maxiter);					
+int igraph_i_scg_kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned int p, igraph_real_t *cen,
+			      const unsigned int k, int *cl, const unsigned int maxiter);					
 /*-------------------------------------------------
 ------------DEFINED IN scg_exact_scg.c-------------
 ---------------------------------------------------*/
-void exact_coarse_graining(const igraph_real_t *v, unsigned int *gr, const unsigned int n);				
+void igraph_i_scg_exact_coarse_graining(const igraph_real_t *v, unsigned int *gr, const unsigned int n);				
 /*-------------------------------------------------
 ------------DEFINED IN scg_utils.c-----------------
 ---------------------------------------------------*/	
-int compare_groups(const void *a,const void *b);
-int compare_real(const void *a, const void *b);
-int compare_int(const void *a, const void *b);
+int igraph_i_scg_compare_groups(const void *a,const void *b);
+int igraph_i_scg_compare_real(const void *a, const void *b);
+int igraph_i_scg_compare_int(const void *a, const void *b);
 
-igraph_real_t *real_sym_matrix(const unsigned int size);
-#define real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
-#define real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
-#define free_real_sym_matrix(S) igraph_Free(S)
+igraph_real_t *igraph_real_sym_matrix(const unsigned int size);
+#define igraph_real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
+#define igraph_real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
+#define igraph_free_real_sym_matrix(S) igraph_Free(S)
 
-igraph_real_t **real_matrix(const unsigned int nrow, const unsigned int ncol);
-void free_real_matrix(igraph_real_t **M,const unsigned int nrow);
+igraph_real_t **igraph_real_matrix(const unsigned int nrow, const unsigned int ncol);
+void igraph_free_real_matrix(igraph_real_t **M,const unsigned int nrow);
 
-unsigned int **uint_matrix(const unsigned int nrow, const unsigned int ncol);
-void free_uint_matrix(unsigned int **M, const unsigned int nrow);
+unsigned int **igraph_uint_matrix(const unsigned int nrow, const unsigned int ncol);
+void igraph_free_uint_matrix(unsigned int **M, const unsigned int nrow);
 
-igraph_real_t *real_vector(const unsigned int n);
-igraph_real_t min_real_vector(const igraph_real_t *v, const unsigned int n);
-igraph_real_t max_real_vector(const igraph_real_t *v, const unsigned int n);
+igraph_real_t *igraph_real_vector(const unsigned int n);
+igraph_real_t igraph_min_real_vector(const igraph_real_t *v, const unsigned int n);
+igraph_real_t igraph_max_real_vector(const igraph_real_t *v, const unsigned int n);
 //for unity
-#define free_real_vector(v) igraph_Free(v)
+#define igraph_free_real_vector(v) igraph_Free(v)
 
-unsigned int *uint_vector(const unsigned int n);
-unsigned int min_uint_vector(const unsigned int *v, const unsigned int n);
-unsigned int max_uint_vector(const unsigned int *v, const unsigned int n);
+unsigned int *igraph_uint_vector(const unsigned int n);
+unsigned int igraph_min_uint_vector(const unsigned int *v, const unsigned int n);
+unsigned int igraph_max_uint_vector(const unsigned int *v, const unsigned int n);
 //for unity
-#define free_uint_vector(v) igraph_Free(v)
+#define igraph_free_uint_vector(v) igraph_Free(v)
 
 #endif

@@ -34,13 +34,13 @@
 #include "scg_headers.h"
 #include <float.h>
 
-int kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned int p, igraph_real_t *cen,
-		 const unsigned int k, int *cl, const unsigned int maxiter)
+int igraph_i_scg_kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned int p, igraph_real_t *cen,
+			      const unsigned int k, int *cl, const unsigned int maxiter)
 {
     unsigned int iter, i, j, c, it, inew = 0;
     igraph_real_t best, dd, tmp;
     unsigned int updated;
-    unsigned int *nc = uint_vector(k);
+    unsigned int *nc = igraph_uint_vector(k);
 
     for(i = 0; i < n; i++) cl[i] = -1;
     for(iter = 0; iter < maxiter; iter++) {
@@ -75,7 +75,7 @@ int kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned in
 			}
 		for(j = 0; j < k*p; j++) cen[j] /= nc[j % k];
 	}
-	free_uint_vector(nc);
+	igraph_free_uint_vector(nc);
 	//returns 1 if converged else -1
 	if(iter<maxiter-1)
 		return 1;
