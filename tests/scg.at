@@ -25,5 +25,5 @@ AT_BANNER([[Spectral coarse graining.]])
 
 AT_SETUP([Grouping (igraph_scg_grouping): ])
 AT_KEYWORDS([spectral coarse graining scg grouping])
-AT_COMPILE_CHECK([simple/scg.c])
+AT_COMPILE_CHECK([simple/scg.c], [simple/scg.out])
 AT_CLEANUP
