@@ -109,7 +109,4 @@ igraph_real_t *igraph_real_sym_matrix(const unsigned int size);
 #define igraph_real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
 #define igraph_free_real_sym_matrix(S) igraph_Free(S)
 
-igraph_real_t **igraph_real_matrix(const unsigned int nrow, const unsigned int ncol);
-void igraph_free_real_matrix(igraph_real_t **M,const unsigned int nrow);
-
 #endif

@@ -1646,7 +1646,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix, igraph_integer_t ev,
 		      /* igraph_?_t *epairs, */
 		      /* igraph_?_t *c_markovp, */);
 
-int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr, 
+int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr, 
 			const unsigned int n, const unsigned int *nt, 
 			const unsigned int nev,
 			const unsigned int matrix, const igraph_real_t *p, 

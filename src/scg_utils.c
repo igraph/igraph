@@ -82,33 +82,6 @@ igraph_real_t *igraph_real_sym_matrix(const unsigned int size)
 	return S;
 }
 
-/* allocate a igraph_real_t matrix with dimension nrow x ncol*/ 
-igraph_real_t **igraph_real_matrix(const unsigned int nrow, const unsigned int ncol) 
-{ 
-	unsigned int i;
-	igraph_real_t **M; 
-	//allocate pointers to rows
-	M = (igraph_real_t **) igraph_Calloc(nrow,igraph_real_t*);
-	if (!M) 
-	  IGRAPH_ERROR("row allocation failure in real_matrix()", IGRAPH_EINVAL); 
-	for(i=0;i<nrow;i++){
-	  M[i] = (igraph_real_t *) igraph_Calloc(ncol,igraph_real_t); 
-	  if(!M[i])
-	    IGRAPH_ERROR("column allocation failure in real_matrix()", 
-			 IGRAPH_EINVAL);
-	}
-	for(i=0;i<nrow;i++)
-	  M[i] = (igraph_real_t *) igraph_Calloc(ncol,igraph_real_t);
-	return M; 
-}
-void igraph_free_real_matrix(igraph_real_t **M,const unsigned int nrow)
-{
-	int i;
-	for(i=0; i<nrow; i++)
-		igraph_Free(M[i]);
-	igraph_Free(M);
-}
-
 /* #ifdef R_COMPIL */
 /* 	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, */
 /* 					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter) */

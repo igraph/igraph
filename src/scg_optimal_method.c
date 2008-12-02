@@ -90,26 +90,27 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	/*here j also is a counter but the use of unsigned variables
 	is to be proscribed in "for(unsigned int j=...;j>=0;j--)",
 	for such loops never ends!*/
-	igraph_real_t **F = igraph_real_matrix(nt,n);
+	igraph_matrix_t F;
 	igraph_matrix_long_t Q;
 	igraph_real_t temp;
+	igraph_matrix_init(&F, n, nt);
 	igraph_matrix_long_init(&Q, n, nt);
 						
 	for(i=0; i<n; i++) MATRIX(Q, i, 0)++;
 	for(i=0; i<nt; i++) MATRIX(Q, i, i)=i+1;
 	
 	for(i=0; i<n; i++)
-		F[0][i] = igraph_real_sym_mat_get(Cv,0,i);
+	  MATRIX(F,i,0) = igraph_real_sym_mat_get(Cv,0,i);
 		
 	for(i=1; i<nt; i++)
 		for(j=i+1; j<n; j++){
-			F[i][j] = F[i-1][i-1] + igraph_real_sym_mat_get(Cv,i,j);
+		  MATRIX(F, j, i) = MATRIX(F,i-1,i-1) + igraph_real_sym_mat_get(Cv,i,j);
 			MATRIX(Q,j,i) = 2;
 		
 			for(q=i-1; q<=j-1; q++){
-				temp = F[i-1][q] + igraph_real_sym_mat_get(Cv,q+1,j);
-				if(temp<F[i][j]){
-					F[i][j] = temp;
+			        temp = MATRIX(F,q,i-1) + igraph_real_sym_mat_get(Cv,q+1,j);
+				if(temp<MATRIX(F,j,i)){
+				        MATRIX(F,j,i) = temp;
 					MATRIX(Q,j,i) = q+2;
 				}
 			}
@@ -141,10 +142,10 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	  }
 	}
 	
-	sumOfSquares = F[nt-1][n-1];  
+	sumOfSquares = MATRIX(F,n-1,nt-1);
 
 	igraph_matrix_long_destroy(&Q);
-	igraph_free_real_matrix(F,nt);
+	igraph_matrix_destroy(&F);
 	igraph_Free(vs);
 
 	return sumOfSquares;

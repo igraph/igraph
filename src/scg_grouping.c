@@ -55,7 +55,7 @@
 #include "scg_headers.h"
 #include "error.h"
 
-int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr, 
+int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr, 
 			const unsigned int n, const unsigned int *nt, 
 			const unsigned int nev,
 			const unsigned int matrix, const igraph_real_t *p, 
@@ -72,7 +72,7 @@ int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr,
 		  for(i=0; i<nev; i++) {
 		    igraph_vector_t myv;
 		    igraph_vector_long_t mygr;
-		    igraph_vector_view(&myv, v[i], n);
+		    igraph_matrix_view_col(v, &myv, i);
 		    igraph_matrix_long_view_col(&gr_mat, &mygr, i);
 		    igraph_i_scg_optimal_partition(&myv, &mygr, n, nt[i], matrix, p);
 		  }
@@ -82,7 +82,7 @@ int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr,
 			for(i=0; i<nev; i++){
 			  igraph_vector_t myv;
 			  igraph_vector_long_t mygr;
-			  igraph_vector_view(&myv, v[i], n);
+			  igraph_matrix_view_col(v, &myv, i);
 			  igraph_matrix_long_view_col(&gr_mat, &mygr, i);
 			  if(!igraph_i_scg_intervals_plus_kmeans(&myv, &mygr, n, nt[i], maxiter))
 			    IGRAPH_WARNING("kmeans did not converge");
@@ -93,7 +93,7 @@ int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr,
 		  for(i=0; i<nev; i++) {
 		    igraph_vector_t myv;
 		    igraph_vector_long_t mygr;
-		    igraph_vector_view(&myv, v[i], n);
+		    igraph_matrix_view_col(v, &myv, i);
 		    igraph_matrix_long_view_col(&gr_mat, &mygr, i);
 		      igraph_i_scg_intervals_method(&myv, &mygr, n, nt[i]);
 		  }
@@ -103,7 +103,7 @@ int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr,
 		  for(i=0; i<nev; i++) {
 		    igraph_vector_t myv;
 		    igraph_vector_long_t mygr;
-		    igraph_vector_view(&myv, v[i], n);
+		    igraph_matrix_view_col(v, &myv, i);
 		    igraph_matrix_long_view_col(&gr_mat, &mygr, i);
 		    igraph_i_scg_exact_coarse_graining(&myv,&mygr,n);
 		  }
