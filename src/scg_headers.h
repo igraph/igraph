@@ -57,26 +57,45 @@ typedef struct groups {
 /*-------------------------------------------------
 ------------DEFINED IN scg_approximate_methods.c---
 ---------------------------------------------------*/	
-int igraph_i_scg_breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
-				    const unsigned int nb,const unsigned int method);
-int igraph_i_scg_intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
-			  const unsigned int n_interv, const unsigned int maxiter);						
-void igraph_i_scg_intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv);
+int igraph_i_scg_breaks_computation(const igraph_vector_t *v,
+				    const unsigned int n, 
+				    igraph_vector_t *breaks,
+				    const unsigned int nb,
+				    const unsigned int method);
+int igraph_i_scg_intervals_plus_kmeans(const igraph_vector_t *v, 
+				       unsigned int *gr, 
+				       const unsigned int n,
+				       const unsigned int n_interv, 
+				       const unsigned int maxiter);
+void igraph_i_scg_intervals_method(const igraph_vector_t *v, unsigned int *gr, 
+				   const unsigned int n, 
+				   const unsigned int n_interv);
 /*-------------------------------------------------
 ------------DEFINED IN scg_optimal_method.c--------
 ---------------------------------------------------*/	
-void igraph_i_scg_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs, const unsigned int n, const unsigned int matrix, const igraph_real_t *ps);
-igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, unsigned int *gr,const unsigned int n,
-					     const unsigned int nt,const unsigned int matrix, const igraph_real_t *p);
+void igraph_i_scg_cost_matrix(igraph_real_t *Cv, 
+			      const igraph_i_scg_indval_t *vs, 
+			      const unsigned int n, const unsigned int matrix, 
+			      const igraph_vector_t *ps);
+igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, 
+					     unsigned int *gr,
+					     const unsigned int n,
+					     const unsigned int nt,
+					     const unsigned int matrix, 
+					     const igraph_real_t *p);
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
-int igraph_i_scg_kmeans_Lloyd(const igraph_real_t *x, const unsigned int n, const unsigned int p, igraph_real_t *cen,
-			      const unsigned int k, int *cl, const unsigned int maxiter);					
+int igraph_i_scg_kmeans_Lloyd(const igraph_vector_t *x, const unsigned int n, 
+			      const unsigned int p, igraph_vector_t *cen,
+			      const unsigned int k, int *cl, 
+			      const unsigned int maxiter);
 /*-------------------------------------------------
 ------------DEFINED IN scg_exact_scg.c-------------
 ---------------------------------------------------*/
-void igraph_i_scg_exact_coarse_graining(const igraph_real_t *v, unsigned int *gr, const unsigned int n);				
+void igraph_i_scg_exact_coarse_graining(const igraph_real_t *v, 
+					unsigned int *gr,
+					const unsigned int n);
 /*-------------------------------------------------
 ------------DEFINED IN scg_utils.c-----------------
 ---------------------------------------------------*/	
@@ -94,11 +113,5 @@ void igraph_free_real_matrix(igraph_real_t **M,const unsigned int nrow);
 
 unsigned int **igraph_uint_matrix(const unsigned int nrow, const unsigned int ncol);
 void igraph_free_uint_matrix(unsigned int **M, const unsigned int nrow);
-
-igraph_real_t *igraph_real_vector(const unsigned int n);
-igraph_real_t igraph_min_real_vector(const igraph_real_t *v, const unsigned int n);
-igraph_real_t igraph_max_real_vector(const igraph_real_t *v, const unsigned int n);
-//for unity
-#define igraph_free_real_vector(v) igraph_Free(v)
 
 #endif

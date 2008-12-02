@@ -37,8 +37,12 @@
  
 #include "scg_headers.h"
 
-igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, unsigned int *gr,const unsigned int n,const unsigned int nt, 
-										const unsigned int matrix, const igraph_real_t *p)
+igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, 
+					     unsigned int *gr,
+					     const unsigned int n,
+					     const unsigned int nt, 
+					     const unsigned int matrix, 
+					     const igraph_real_t *p)
 {
 	/*-----------------------------------------------
 	-----Sorts v and counts non-ties-----------------
@@ -65,19 +69,19 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, unsigned in
 	}
 	
 	//if stochastic SCG orders p
-	igraph_real_t *ps = NULL;
+	igraph_vector_t ps;
 	if(matrix==3){
-		ps = igraph_real_vector(n);
-		for(i=0; i<n; i++)
-			ps[i] = p[vs[i].ind];
+	  igraph_vector_init(&ps, n);
+	  for(i=0; i<n; i++)
+	    VECTOR(ps)[i] = p[vs[i].ind];
 	}
 	/*------------------------------------------------
 	------Computes Cv, the matrix of costs------------
 	------------------------------------------------*/
 	igraph_real_t *Cv = igraph_real_sym_matrix(n);
-	igraph_i_scg_cost_matrix(Cv, vs, n, matrix, ps);
+	igraph_i_scg_cost_matrix(Cv, vs, n, matrix, &ps);
 	if(matrix==3)
-		igraph_free_real_vector(ps);
+	  igraph_vector_destroy(&ps);
 	/*-------------------------------------------------
 	-------Fills up matrices F and Q-------------------
 	-------------------------------------------------*/					
@@ -147,28 +151,29 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_real_t *v, unsigned in
 	return sumOfSquares;
 }
 
-void igraph_i_scg_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs, const unsigned int n, const unsigned int matrix, const igraph_real_t *ps)
+void igraph_i_scg_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs, const unsigned int n, const unsigned int matrix, const igraph_vector_t *ps)
 {
 	//if symmetric of Laplacian SCG -> same Cv
 	if(matrix==1 || matrix==2){
 		unsigned int i,j;
-		igraph_real_t *w  = igraph_real_vector(n+1);
-		igraph_real_t *w2 = igraph_real_vector(n+1);
+		igraph_vector_t w, w2;
+		igraph_vector_init(&w, n+1);
+		igraph_vector_init(&w2, n+1);
 	
-		w[1] = vs[0].val;
-		w2[1] = vs[0].val*vs[0].val;
+		VECTOR(w)[1] = vs[0].val;
+		VECTOR(w2)[1] = vs[0].val*vs[0].val;
 	
 		for(i=2; i<=n; i++){
-			w[i] = w[i-1] + vs[i-1].val;
-			w2[i] = w2[i-1] + vs[i-1].val*vs[i-1].val;
+		  VECTOR(w)[i] = VECTOR(w)[i-1] + vs[i-1].val;
+		  VECTOR(w2)[i] = VECTOR(w2)[i-1] + vs[i-1].val*vs[i-1].val;
 		}
 	
 		for(i=0; i<n; i++)
-			for(j=i+1; j<n; j++)
-				igraph_real_sym_mat_set(Cv,i,j,
-							(w2[j+1]-w2[i])-(w[j+1]-w[i])*(w[j+1]-w[i])/(j-i+1) );		
-		igraph_free_real_vector(w);
-		igraph_free_real_vector(w2);
+		  for(j=i+1; j<n; j++)
+		    igraph_real_sym_mat_set(Cv,i,j,
+					    (VECTOR(w2)[j+1]-VECTOR(w2)[i])-(VECTOR(w)[j+1]-VECTOR(w)[i])*(VECTOR(w)[j+1]-VECTOR(w)[i])/(j-i+1) );
+		igraph_vector_destroy(&w);
+		igraph_vector_destroy(&w2);
 	}
 	//if stochastic
 	//TODO: optimize it to O(n^2) instead of O(n^3) (as above)
@@ -179,13 +184,13 @@ void igraph_i_scg_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
 			for(j=i+1; j<n; j++){
 				t1 = t2 = 0;
 				for(k=i; k<j; k++){
-					t1 += ps[k];
-					t2 += ps[k]*vs[k].val;
+				        t1 += VECTOR(*ps)[k];
+					t2 += VECTOR(*ps)[k]*vs[k].val;
 				}
 				t1 = t2/t1;
 				t2 = 0;
 				for(k=i; k<j; k++)
-					t2 += (vs[k].val-t1)*(vs[k].val-t1);
+				  t2 += (vs[k].val-t1)*(vs[k].val-t1);
 				igraph_real_sym_mat_set(Cv,i,j,t2);
 			}
 		}

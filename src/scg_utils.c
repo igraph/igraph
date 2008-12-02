@@ -135,33 +135,6 @@ void igraph_free_uint_matrix(unsigned int **M, const unsigned int nrow)
 	igraph_Free(M);
 }
 
-/* allocate a igraph_real_t vector of size n*/ 
-igraph_real_t *igraph_real_vector(const unsigned int n)
-{ 
-	igraph_real_t *v;
-	v = (igraph_real_t *) igraph_Calloc(n, igraph_real_t); 
-	if (!v) 
-	  IGRAPH_ERROR("allocation failure in real_vector()", 
-		       IGRAPH_EINVAL);
-	return v;
-}
-igraph_real_t igraph_min_real_vector(const igraph_real_t *v,const unsigned int n)
-{
-	unsigned int i;
-	igraph_real_t temp = v[0];
-	for(i=1; i<n; i++)
-		if( v[i] < temp) temp=v[i];
-	return temp;
-}
-igraph_real_t igraph_max_real_vector(const igraph_real_t *v,const unsigned int n)
-{
-		unsigned int i;
-		igraph_real_t temp = v[0];
-		for(i=1; i<n; i++)
-			if( v[i] > temp) temp=v[i];
-		return temp;
-}
-
 /* #ifdef R_COMPIL */
 /* 	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, */
 /* 					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter) */

@@ -74,15 +74,20 @@ int igraph_scg_grouping(igraph_real_t **v, igraph_vector_t *gr,
 			
 		case 2:
 			for(i=0; i<nev; i++){
-				if(!igraph_i_scg_intervals_plus_kmeans(v[i], gr_mat[i], n, nt[i], maxiter))
-				  IGRAPH_WARNING("kmeans did not converge");
+			  igraph_vector_t myv;
+			  igraph_vector_view(&myv, v[i], n);
+			  if(!igraph_i_scg_intervals_plus_kmeans(&myv, gr_mat[i], n, nt[i], maxiter))
+			    IGRAPH_WARNING("kmeans did not converge");
 			}
 			break;
 			
 		case 3:
-			for(i=0; i<nev; i++)
-				igraph_i_scg_intervals_method(v[i], gr_mat[i], n, nt[i]);
-			break;
+		  for(i=0; i<nev; i++) {
+		    igraph_vector_t myv;
+		    igraph_vector_view(&myv, v[i], n);
+		      igraph_i_scg_intervals_method(&myv, gr_mat[i], n, nt[i]);
+		  }
+		  break;
 			
 		case 4:
 			for(i=0; i<nev; i++)

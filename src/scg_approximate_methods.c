@@ -43,42 +43,44 @@
 
 #include "scg_headers.h"
 
-int igraph_i_scg_intervals_plus_kmeans(const igraph_real_t *v, unsigned int *gr, const unsigned int n,
+int igraph_i_scg_intervals_plus_kmeans(const igraph_vector_t *v, unsigned int *gr, const unsigned int n,
 				       const unsigned int n_interv, const unsigned int maxiter)
 {
 	unsigned int i;
 	int converge;
-	igraph_real_t *centers = igraph_real_vector(n_interv);
-	igraph_i_scg_breaks_computation(v,n,centers,n_interv,2);
-	converge = igraph_i_scg_kmeans_Lloyd(v, n, 1, centers, n_interv, (int*) gr,maxiter);
+	igraph_vector_t centers;
+	igraph_vector_init(&centers, n_interv);
+	igraph_i_scg_breaks_computation(v,n,&centers,n_interv,2);
+	converge = igraph_i_scg_kmeans_Lloyd(v, n, 1, &centers, n_interv, (int*) gr,maxiter);
 	
 	/*renumber the groups*/
 	for(i=0; i<n; i++) gr[i] = gr[i]-1 + FIRST_GROUP_NB;
 
-	igraph_free_real_vector(centers);
+	igraph_vector_destroy(&centers);
 
 	return converge;
 }
 										
-void igraph_i_scg_intervals_method(const igraph_real_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv)
+void igraph_i_scg_intervals_method(const igraph_vector_t *v, unsigned int *gr, const unsigned int n, const unsigned int n_interv)
 {
 	unsigned int i, lo, hi, new;
 	const unsigned int lft = 1;
 	const unsigned int include_border = 1;
 			
-	igraph_real_t *breaks = igraph_real_vector(n_interv+1);
+	igraph_vector_t breaks;
+	igraph_vector_init(&breaks, n_interv+1);
 	
-	igraph_i_scg_breaks_computation(v, n, breaks, n_interv+1, 1);
+	igraph_i_scg_breaks_computation(v, n, &breaks, n_interv+1, 1);
 
-    for(i = 0; i < n; i++) {
+	for(i = 0; i < n; i++) {
 	    lo = 0;
 	    hi = n_interv;
-	    if(v[i] <  breaks[lo] || breaks[hi] < v[i] ||
-	       (v[i] == breaks[lft ? hi : lo] && !include_border)) ;
+	    if(VECTOR(*v)[i] <  VECTOR(breaks)[lo] || VECTOR(breaks)[hi] < VECTOR(*v)[i] ||
+	       (VECTOR(*v)[i] == VECTOR(breaks)[lft ? hi : lo] && !include_border)) ;
 	    else {
 			while(hi - lo >= 2) {
-		    	new = (hi + lo)/2;
-		    	if(v[i] > breaks[new] || (lft && v[i] == breaks[new]))
+			  new = (hi + lo)/2;
+			  if(VECTOR(*v)[i] > VECTOR(breaks)[new] || (lft && VECTOR(*v)[i] == VECTOR(breaks)[new]))
 				lo = new;
 		    	else
 				hi = new;
@@ -86,16 +88,19 @@ void igraph_i_scg_intervals_method(const igraph_real_t *v, unsigned int *gr, con
 		gr[i] = lo + FIRST_GROUP_NB;
 	    }
 	}
-	igraph_free_real_vector(breaks);
+    igraph_vector_destroy(&breaks);
 }
 
-int igraph_i_scg_breaks_computation(const igraph_real_t *v,const unsigned int n, igraph_real_t *breaks,
-						const unsigned int nb,const unsigned int method)
+int igraph_i_scg_breaks_computation(const igraph_vector_t *v,
+				    const unsigned int n, 
+				    igraph_vector_t *breaks,
+				    const unsigned int nb,
+				    const unsigned int method)
 {
 	unsigned int i;
 	igraph_real_t eps, vmin,vmax;
-	vmin = igraph_min_real_vector(v,n);
-	vmax = igraph_max_real_vector(v,n);
+	vmin = igraph_vector_min(v);
+	vmax = igraph_vector_max(v);
 	
 	if(vmax==vmin)
 	  IGRAPH_ERROR("There is only one (repeated) value in argument 'v' "
@@ -108,15 +113,15 @@ int igraph_i_scg_breaks_computation(const igraph_real_t *v,const unsigned int n,
 	{	//constant bins for fixed-size intervals method
 		case 1:
 			eps = (vmax-vmin)/(igraph_real_t)(nb-1);
-			breaks[0] = vmin;
-			for(i=1; i<nb-1; i++) breaks[i]=breaks[i-1]+eps;
-			breaks[nb-1] = vmax;
+			VECTOR(*breaks)[0] = vmin;
+			for(i=1; i<nb-1; i++) VECTOR(*breaks)[i]=VECTOR(*breaks)[i-1]+eps;
+			VECTOR(*breaks)[nb-1] = vmax;
 		break;
 		//equidistant centers for kmeans
 		case 2:
 			eps = (vmax-vmin)/(igraph_real_t)nb;
-			breaks[0] = vmin + eps/2.;
-			for(i=1; i<nb; i++) breaks[i] = breaks[i-1]+eps;
+			VECTOR(*breaks)[0] = vmin + eps/2.;
+			for(i=1; i<nb; i++) VECTOR(*breaks)[i] = VECTOR(*breaks)[i-1]+eps;
 		break;
 		//TODO: implement logarithmic binning for power-law-like distributions
 		
