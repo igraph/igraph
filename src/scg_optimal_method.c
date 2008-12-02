@@ -49,7 +49,23 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	-----------------------------------------------*/
 	unsigned int i, non_ties;
 	igraph_i_scg_indval_t *vs = (igraph_i_scg_indval_t*) igraph_Calloc(n, igraph_i_scg_indval_t);
+
+	igraph_vector_t ps;
+
+	igraph_matrix_t Cv;
+
+	unsigned int q;
+	int j;
+
+	igraph_matrix_t F;
+	igraph_matrix_long_t Q;
+	igraph_real_t temp;
 	
+	unsigned int l;
+	unsigned int part_ind = nt;
+	unsigned int col = n-1;
+	igraph_real_t sumOfSquares;
+
 	for(i=0; i<n; i++){
 	        vs[i].val = VECTOR(*v)[i];
 		vs[i].ind = i;
@@ -69,7 +85,6 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	}
 	
 	//if stochastic SCG orders p
-	igraph_vector_t ps;
 	if(matrix==3){
 	  igraph_vector_init(&ps, n);
 	  for(i=0; i<n; i++)
@@ -78,7 +93,6 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	/*------------------------------------------------
 	------Computes Cv, the matrix of costs------------
 	------------------------------------------------*/
-	igraph_matrix_t Cv;
 	igraph_matrix_init(&Cv, n, n);
 	igraph_i_scg_cost_matrix(&Cv, vs, n, matrix, &ps);
 	if(matrix==3)
@@ -86,14 +100,9 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	/*-------------------------------------------------
 	-------Fills up matrices F and Q-------------------
 	-------------------------------------------------*/					
-	unsigned int q;
-	int j;
 	/*here j also is a counter but the use of unsigned variables
 	is to be proscribed in "for(unsigned int j=...;j>=0;j--)",
 	for such loops never ends!*/
-	igraph_matrix_t F;
-	igraph_matrix_long_t Q;
-	igraph_real_t temp;
 	igraph_matrix_init(&F, n, nt);
 	igraph_matrix_long_init(&Q, n, nt);
 						
@@ -120,10 +129,6 @@ igraph_real_t igraph_i_scg_optimal_partition(const igraph_vector_t *v,
 	/*--------------------------------------------------
 	-------Back-tracks through Q to work out the groups-
 	--------------------------------------------------*/
-	unsigned int l;
-	unsigned int part_ind = nt;
-	unsigned int col = n-1;
-	igraph_real_t sumOfSquares;
 
 	for(j=nt-1; j>=0; j--){
 	  for(i=MATRIX(Q,col,j)-1; i<=col; i++)

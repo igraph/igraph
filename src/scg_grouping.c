@@ -61,8 +61,9 @@ int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr,
 			const unsigned int matrix, const igraph_real_t *p, 
 			const unsigned int algo, const unsigned int maxiter)
 {
-	unsigned int i,j;
+  unsigned int i,j,gr_nb;
 	igraph_matrix_long_t gr_mat, gr_mat_t;
+	igraph_i_scg_groups_t *g;
 	igraph_matrix_long_init(&gr_mat, n, nev);
 	igraph_matrix_long_init(&gr_mat_t, nev, n);
 	
@@ -136,7 +137,7 @@ int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr,
 	igraph_matrix_long_destroy(&gr_mat);
 	
 		//Then computes the final groups. Use qsort for speed
-	igraph_i_scg_groups_t *g = (igraph_i_scg_groups_t*)igraph_Calloc(n, igraph_i_scg_groups_t);
+	g = (igraph_i_scg_groups_t*)igraph_Calloc(n, igraph_i_scg_groups_t);
 	for(i=0; i<n; i++){
 		g[i].ind = i;
 		g[i].n = nev;		
@@ -144,7 +145,7 @@ int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr,
 	}
 		
 	qsort(g, n, sizeof(igraph_i_scg_groups_t), igraph_i_scg_compare_groups);
-	unsigned int gr_nb = FIRST_GROUP_NB;
+	gr_nb = FIRST_GROUP_NB;
 	VECTOR(*gr)[g[0].ind] = gr_nb;
 	for(i=1; i<n; i++){
 		if(igraph_i_scg_compare_groups(&g[i], &g[i-1]) != 0) gr_nb++;
