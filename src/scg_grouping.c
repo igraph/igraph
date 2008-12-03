@@ -55,10 +55,10 @@
 #include "scg_headers.h"
 #include "error.h"
 
-int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr, 
+int igraph_scg_grouping(const igraph_matrix_t *v, igraph_vector_t *gr, 
 			const igraph_vector_t *nt, igraph_scg_matrix_t matrix, 
 			const igraph_vector_t *p, igraph_scg_algorithm_t algo, 
-			const unsigned int maxiter)
+			igraph_integer_t maxiter)
 {
         long int n=igraph_matrix_nrow(v);
 	long int nev=igraph_matrix_ncol(v);
@@ -157,6 +157,8 @@ int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr,
 			       "3-Fixed_size intervals, 4-Exact coarse graining", 
 			       IGRAPH_EINVAL);
 	}
+
+	igraph_vector_resize(gr, n);
 	
 	//If only one vector copy the groups and jump out
  	if(nev==1){

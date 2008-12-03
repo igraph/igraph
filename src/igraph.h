@@ -1646,10 +1646,10 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix, igraph_integer_t ev,
 		      /* igraph_?_t *epairs, */
 		      /* igraph_?_t *c_markovp, */);
 
-int igraph_scg_grouping(igraph_matrix_t *v, igraph_vector_t *gr, 
+int igraph_scg_grouping(const igraph_matrix_t *v, igraph_vector_t *gr, 
 			const igraph_vector_t *nt, igraph_scg_matrix_t matrix, 
 			const igraph_vector_t *p, igraph_scg_algorithm_t algo,
-			const unsigned int maxiter);
+			igraph_integer_t maxiter);
 
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */

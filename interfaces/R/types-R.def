@@ -43,6 +43,26 @@ ARRAY3_OR_0:
 
 ATTRIBUTES:
 
+SCG_MATRIX:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "symmetric"=1, "laplacian"=2, "stochastic="=3)
+    DEFAULT:
+       SYMMETRIC: c("symmetric", "laplacian", "stochastic")
+
+SCG_ALGO:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "optimum"=1, "interv_km"=2, "interv"=3, "exact"=4)
+    DEFAULT:
+       OPTIMUM: c("optimum", "interv_km", "interv", "exact")
+
+SCG_NORM:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "row"=0, "col"=1)
+    DEFAULT:
+      ROW: c("row", "col")
+
+SCG_DIRECTION: 
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "default"=0, "right"=1, "left"=2)
+    DEFAULT:
+      DEFAULT: c("default", "right", "left")
+
 CONNECTEDNESS:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "weak"=1, "strong"=2)
     DEFAULT:

@@ -1127,6 +1127,31 @@ igraph_automorphisms:
         PARAMS: GRAPH graph, BLISSSH sh="fm", OUT BLISSINFO info
 
 #######################################
+# Spectral Coarse Graining
+#######################################
+
+igraph_scg_grouping:
+        PARAMS: MATRIX V, OUT VECTOR gr, VECTOR nt, \
+                SCG_MATRIX matrix=SYMMETRIC, \
+                VECTOR_OR_0 p=NULL, SCG_ALGO algo=OPTIMUM, INTEGER maxiter=100
+        NAME-R: scg.grouping
+
+igraph_scg:
+        PARAMS: GRAPH graph, INTEGER ev, SCG_MATRIX matrix_type, \
+	        SCG_ALGO algo, SCG_NORM norm, SCG_DIRECTION direction, \
+                MATRIX_OR_0 evec, VECTOR_OR_0 markovp, \
+                VECTOR_OR_0 group, INTEGER maxiter
+        NAME-R: scg
+
+igraph_scg_matrix:
+        PARAMS: MATRIX matrix, INTEGER ev, \
+	        SCG_ALGO algo, SCG_NORM norm, SCG_DIRECTION direction, \
+                MATRIX_OR_0 evec, VECTOR_OR_0 markovp, \
+                VECTOR_OR_0 group, INTEGER maxiter
+        NAME-R: scg.matrix
+
+
+#######################################
 # Other, not graph related
 #######################################
 

@@ -125,6 +125,26 @@ BLISSSH:
   INCONV:
     IN: %C%=REAL(%I%)[0];
 
+SCG_MATRIX:
+  CTYPE: igraph_scg_matrix_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+SCG_ALGO:
+  CTYPE: igraph_scg_algorithm_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+SCG_DIRECTION:
+  CTYPE: igraph_scg_direction_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+SCG_NORM:
+  CTYPE: igraph_scg_norm_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
 ##################################
 # VECTOR of real values
 
