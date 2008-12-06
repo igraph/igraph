@@ -117,6 +117,10 @@ int FUNCTION(igraph_matrix,div_elements)(TYPE(igraph_matrix) *m1,
 void FUNCTION(igraph_matrix,scale)(TYPE(igraph_matrix) *m, BASE by);
 void FUNCTION(igraph_matrix,add_constant)(TYPE(igraph_matrix) *m, BASE plus);
 
+int FUNCTION(igraph_matrix,vector_prod)(const TYPE(igraph_matrix) *m,
+                                        const TYPE(igraph_vector) *v,
+                                        TYPE(igraph_vector) *res);
+
 /*-----------------------------*/
 /* Finding minimum and maximum */
 /*-----------------------------*/

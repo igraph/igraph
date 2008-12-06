@@ -915,6 +915,41 @@ void FUNCTION(igraph_matrix,add_constant)(TYPE(igraph_matrix) *m, BASE plus) {
 }
 
 /**
+ * \function igraph_matrix_vector_prod
+ * Matrix-vector multiplication
+ *
+ * \param m The input matrix
+ * \param v The input vector
+ * \param res Pointer to an initialized vector, the result is stored here.
+ * \return Error code.
+ *
+ * Time complexity: O(mn), the number of elements in the matrix
+ */
+
+int FUNCTION(igraph_matrix,vector_prod)(const TYPE(igraph_matrix) *m,
+                                        const TYPE(igraph_vector) *v,
+                                        TYPE(igraph_vector) *res) {
+  long int nrow=FUNCTION(igraph_matrix,nrow);
+  long int ncol=FUNCTION(igraph_matrix,ncol);
+  long int vlen=FUNCTION(igraph_vector,size);
+  long int i,j;
+  BASE sum;
+  if (ncol != vlen) {
+    IGRAPH_ERROR("Matrix and vector sizes don't match", IGRAPH_EINVAL);
+  }
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(res, vlen));
+  for (i=0; i<nrow; i++) {
+    sum=0;
+    for (j=0; j<ncol; j++) {
+      sum += MATRIX(*m,i,j) * VECTOR(*v)[j];
+    }
+    VECTOR(*res)[i] = sum;
+  }
+
+  return 0;
+}
+
+/**
  * \function igraph_matrix_add
  * Add two matrices.
  * 
