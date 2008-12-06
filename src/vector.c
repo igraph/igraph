@@ -48,7 +48,7 @@
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
-int igraph_vector_order2(igraph_vector_t *v) {
+int igraph_i_vector_order2(igraph_vector_t *v) {
 
   igraph_indheap_t heap;
   
@@ -68,7 +68,7 @@ int igraph_vector_order2(igraph_vector_t *v) {
 
 /**
  * \ingroup vector
- * \function igraph_vector_order
+ * \function igraph_i_vector_order
  * \brief Calculate the order of the elements in a vector.
  *
  * </para><para>
@@ -85,7 +85,7 @@ int igraph_vector_order2(igraph_vector_t *v) {
  * Time complexity: O()
  */
 
-int igraph_vector_order(const igraph_vector_t* v, 
+int igraph_i_vector_order(const igraph_vector_t* v, 
 			const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t nodes) {
   long int edges=igraph_vector_size(v);
@@ -151,7 +151,7 @@ int igraph_vector_order(const igraph_vector_t* v,
   return 0;
 }
 
-int igraph_vector_order1(const igraph_vector_t* v,
+int igraph_i_vector_order1(const igraph_vector_t* v,
 			 igraph_vector_t* res, igraph_real_t nodes) {
   long int edges=igraph_vector_size(v);
   igraph_vector_t ptr;
@@ -192,7 +192,7 @@ int igraph_vector_order1(const igraph_vector_t* v,
   return 0;
 }
 
-int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
+int igraph_i_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
 		       long int nodes) {
   
   igraph_vector_t rad;

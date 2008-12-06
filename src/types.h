@@ -109,12 +109,12 @@ typedef int    igraph_bool_t;
 #undef BASE_BOOL
 
 /* These are for internal use only */
-int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
+int igraph_i_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t maxval);
-int igraph_vector_order1(const igraph_vector_t* v, 
+int igraph_i_vector_order1(const igraph_vector_t* v, 
 			 igraph_vector_t* res, igraph_real_t maxval);
-int igraph_vector_order2(igraph_vector_t *v);
-int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
+int igraph_i_vector_order2(igraph_vector_t *v);
+int igraph_i_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
 		       long int nodes);
 
 /* -------------------------------------------------- */
