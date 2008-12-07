@@ -1,4 +1,6 @@
 
+## TODO: make these properly
+
 "adjacencyMatrix" <- function(X,sparse = TRUE,...)
 {
 	if(!sparse) return(get.adjacency(X,sparse = sparse,...))

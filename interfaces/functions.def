@@ -1131,25 +1131,38 @@ igraph_automorphisms:
 #######################################
 
 igraph_scg_grouping:
-        PARAMS: MATRIX V, OUT VECTOR gr, VECTOR nt, \
+        PARAMS: MATRIX V, OUT VECTOR group, VECTOR nt, \
                 SCG_MATRIX matrix=SYMMETRIC, \
                 VECTOR_OR_0 p=NULL, SCG_ALGO algo=OPTIMUM, INTEGER maxiter=100
         NAME-R: scg.grouping
 
 igraph_scg:
-        PARAMS: GRAPH graph, INTEGER ev, SCG_MATRIX matrix_type, \
-	        SCG_ALGO algo, SCG_NORM norm, SCG_DIRECTION direction, \
+        PARAMS: GRAPH graph, OUT GRAPH_OR_0 res_graph, \
+                OUT MATRIX_OR_0 res_matrix, OUT MATRIX_OR_0 L, \
+                OUT MATRIX_OR_0 R, VECTOR ev, VECTOR nt, \
+                SCG_MATRIX matrix_type, \
+	        SCG_ALGO algo, SCG_NORM norm_type, SCG_DIRECTION direction, \
                 MATRIX_OR_0 evec, VECTOR_OR_0 markovp, \
-                VECTOR_OR_0 group, INTEGER maxiter
+                INOUT VECTOR_OR_0 group, BOOLEAN recalculate_group, \
+                BOOLEAN use_arpack, INTEGER maxiter
         NAME-R: scg
 
 igraph_scg_matrix:
-        PARAMS: MATRIX matrix, INTEGER ev, \
-	        SCG_ALGO algo, SCG_NORM norm, SCG_DIRECTION direction, \
+        PARAMS: MATRIX matrix, OUT GRAPH_OR_0 res_graph, \
+                OUT MATRIX_OR_0 res_matrix, OUT MATRIX_OR_0 L, \
+                OUT MATRIX_OR_0 R, VECTOR ev, VECTOR nt, \
+                SCG_MATRIX matrix_type, \
+	        SCG_ALGO algo, SCG_NORM norm_type, SCG_DIRECTION direction, \
                 MATRIX_OR_0 evec, VECTOR_OR_0 markovp, \
-                VECTOR_OR_0 group, INTEGER maxiter
+                INOUT VECTOR_OR_0 group, BOOLEAN recalculate_group, \
+                BOOLEAN use_arpack, INTEGER maxiter
         NAME-R: scg.matrix
 
+igraph_scg_semi_projectors:
+        PARAMS: VECTOR group, OUT MATRIX L, OUT MATRIX R, \
+                SCG_MATRIX matrix_type, SCG_NORM norm_type, \
+                VECTOR_OR_0 markovp
+        NAME-R: scg.semi.projectors
 
 #######################################
 # Other, not graph related
