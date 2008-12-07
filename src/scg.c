@@ -29,6 +29,8 @@ typedef struct {
   igraph_matrix_t *mat;
 } igraph_i_scg_t;
 
+/* Simple matrix-vector multiplication for ARPACK */
+
 int igraph_i_scg(igraph_real_t *to, const igraph_real_t *from,
 		 long int n, void *extra) {
 
@@ -63,20 +65,38 @@ int igraph_scg(const igraph_t *graph,
 	       igraph_vector_t *group,
 	       igraph_bool_t recalculate_group,
 	       igraph_bool_t use_arpack,
-	       igraph_integer_t maxiter
-	       /* igraph_?_t *semproj, */
-	       /* igraph_?_t *epairs, */
-	       /* igraph_?_t *c_markovp, */) {
+	       igraph_integer_t maxiter) {
   
-  
+  /* TODO */
   
   return 0;
 }
 
+/* We have to take the columns specified by ev1, but from the 
+   matrix in which the columns are reordeded according to order */
+
 int igraph_i_scg_reorder_arpack(igraph_matrix_t *vectors, 
 				const igraph_vector_long_t *order, 
 				const igraph_vector_t *ev1) {
-  /* TODO */
+
+  igraph_matrix_t tmpmat;
+  long int nrow=igraph_matrix_nrow(vectors);
+  long int newncol=igraph_vector_size(ev1);
+  long int i, j;
+  
+  IGRAPH_MATRIX_INIT_FINALLY(&tmpmat, nrow, newncol);
+  for (i=0; i<newncol; i++) {
+    long int col=VECTOR(*order)[ (long int) VECTOR(*ev1)[i] ];
+    for (j=0; j<nrow; j++) {
+      MATRIX(tmpmat, j, i) = MATRIX(*vectors, j, col);
+    }
+  }
+
+  /* Not really nice, but should be good in most (every?) cases */
+  igraph_matrix_destroy(vectors);
+  *vectors=tmpmat;
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -97,10 +117,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 		      igraph_vector_t *group,
 		      igraph_bool_t recalculate_group,
 		      igraph_bool_t use_arpack,
-		      igraph_integer_t maxiter
-		      /* igraph_?_t *semproj, */
-		      /* igraph_?_t *epairs, */
-		      /* igraph_?_t *c_markovp, */) {
+		      igraph_integer_t maxiter) {
 
   long int n=igraph_matrix_nrow(matrix);
   long int nnt=igraph_vector_size(nt);
