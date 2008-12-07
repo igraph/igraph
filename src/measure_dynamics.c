@@ -1495,8 +1495,8 @@ int igraph_measure_dynamics_d_d(const igraph_t *graph,
   }
   
   /* Create lookup vectors for nodes and edges */
-  IGRAPH_CHECK(igraph_vector_order1(ntime, &ntimeidx, events));
-  IGRAPH_CHECK(igraph_vector_order1(etime, &etimeidx, events));
+  IGRAPH_CHECK(igraph_i_vector_order1(ntime, &ntimeidx, events));
+  IGRAPH_CHECK(igraph_i_vector_order1(etime, &etimeidx, events));
 
   for (timestep=0; timestep<events; timestep++) {
 
@@ -1705,8 +1705,8 @@ int igraph_measure_dynamics_d_d_st(const igraph_t *graph,        /* input */
   VECTOR(*st)[0]=0;
   
   /* Create lookup vectors */
-  IGRAPH_CHECK(igraph_vector_order1(ntime, &ntimeidx, events));
-  IGRAPH_CHECK(igraph_vector_order1(etime, &etimeidx, events));
+  IGRAPH_CHECK(igraph_i_vector_order1(ntime, &ntimeidx, events));
+  IGRAPH_CHECK(igraph_i_vector_order1(etime, &etimeidx, events));
 
   for (timestep=0; timestep<events; timestep++) {
 

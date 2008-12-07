@@ -274,7 +274,7 @@ int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
   
   /* Create the basic data structure */
   IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
-  IGRAPH_CHECK(igraph_vector_rank(&edges, &rank, no_of_nodes));
+  IGRAPH_CHECK(igraph_i_vector_rank(&edges, &rank, no_of_nodes));
   
   for (i=0; i<no_of_edges; i+=2) {
     long int pos=VECTOR(rank)[i];

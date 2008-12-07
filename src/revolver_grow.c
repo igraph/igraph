@@ -76,8 +76,8 @@ int igraph_revolver_d_d(const igraph_t *graph,
   
   IGRAPH_VECTOR_INIT_FINALLY(&vtimeidx, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&etimeidx, 0);
-  IGRAPH_CHECK(igraph_vector_order1(vtime, &vtimeidx, no_of_events));
-  IGRAPH_CHECK(igraph_vector_order1(etime, &etimeidx, no_of_events));
+  IGRAPH_CHECK(igraph_i_vector_order1(vtime, &vtimeidx, no_of_events));
+  IGRAPH_CHECK(igraph_i_vector_order1(etime, &etimeidx, no_of_events));
   
   IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);
@@ -733,8 +733,8 @@ int igraph_revolver_p_p(const igraph_t *graph,
   
   IGRAPH_VECTOR_INIT_FINALLY(&vtimeidx, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&etimeidx, 0);
-  IGRAPH_CHECK(igraph_vector_order1(vtime, &vtimeidx, no_of_events));
-  IGRAPH_CHECK(igraph_vector_order1(etime, &etimeidx, no_of_events));
+  IGRAPH_CHECK(igraph_i_vector_order1(vtime, &vtimeidx, no_of_events));
+  IGRAPH_CHECK(igraph_i_vector_order1(etime, &etimeidx, no_of_events));
   
   IGRAPH_CHECK(igraph_lazy_adjedgelist_init(graph, &adjlist, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_lazy_adjedgelist_destroy, &adjlist);

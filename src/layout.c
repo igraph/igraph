@@ -2168,7 +2168,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
 			      igraph_vector_e_ptr(&nr, i));
     
   }
-  igraph_vector_order2(&sizes);	/* largest first */
+  igraph_i_vector_order2(&sizes);	/* largest first */
 
   /* 0. create grid */
   minx=miny=-sqrt(5*area);
