@@ -26,11 +26,15 @@
  * \ingroup types
  */
 
+#ifndef BASE_LONG
+
 typedef struct TYPE(igraph_vector) {
   BASE* stor_begin;
   BASE* stor_end;
   BASE* end;
 } TYPE(igraph_vector);
+
+#endif
 
 #ifndef IGRAPH_VECTOR_NULL
 #define IGRAPH_VECTOR_NULL { 0,0,0 }
@@ -196,6 +200,9 @@ void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v,
 /*-----------*/
 
 void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v);
+int FUNCTION(igraph_vector,sort_order)(TYPE(igraph_vector) *v,
+				       igraph_vector_long_t *res,
+				       igraph_bool_t reverse);
 
 /* ----------------------------------------------------------------------------*/
 /* For internal use only, may be removed, rewritten ... */

@@ -84,6 +84,12 @@ typedef int    igraph_bool_t;
 /* Flexible vector                                    */
 /* -------------------------------------------------- */
 
+typedef struct igraph_vector_long_t {
+  long int* stor_begin;
+  long int* stor_end;
+  long int* end;
+} igraph_vector_long_t;
+
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
 #include "vector.h"
