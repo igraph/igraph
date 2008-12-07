@@ -71,20 +71,3 @@ int igraph_i_scg_compare_int(const void *a, const void *b)
 	int arg2 = * (int *) b;
 	return (arg1 -arg2);
 }
-
-/* #ifdef R_COMPIL */
-/* 	void scg_r_wrapper(double *v, int *gr, int *n, int *nt, */
-/* 					int *nev, int *nmatrix, int *nalgo, double *p, int *maxiter) */
-/* 	{ */
-/* 		unsigned int i; */
-/* 		igraph_real_t **M = (igraph_real_t**) igraph_Calloc((unsigned int)*nev, igraph_real_t* );  */
-/* 		if(!M)  */
-/* 		  IGRAPH_ERROR("row allocation failure in real_matrix()",  */
-/* 			       IGRAPH_EINVAL);  */
-/* 		for(i=0;i<*nev;i++) M[i] = &v[(*n) * i]; */
-
-/* 		grouping(M,(unsigned int*)gr,(unsigned int)*n,(unsigned int*)nt,(unsigned int)*nev, */
-/* 				(unsigned int)*nmatrix, (igraph_real_t*)p,(unsigned int)*nalgo,(unsigned int)*maxiter); */
-/* 		igraph_Free(M); */
-/* 	} */
-/* #endif */

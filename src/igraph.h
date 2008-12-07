@@ -1619,28 +1619,39 @@ int igraph_eigen_rs(const igraph_matrix_t *A,
 /* Spectral coarse graining                           */ 
 /* -------------------------------------------------- */
 
-int igraph_scg(const igraph_t *graph, igraph_integer_t ev,
+int igraph_scg(const igraph_t *graph, 
+	       igraph_t *res_graph,
+	       igraph_matrix_t *res_matrix,
+	       const igraph_vector_t *ev,
+	       const igraph_vector_t *nt,
 	       igraph_scg_matrix_t matrix_type, 
 	       igraph_scg_algorithm_t algo,
 	       igraph_scg_norm_t norm,
 	       igraph_scg_direction_t direction,
 	       const igraph_matrix_t *evec,
 	       const igraph_vector_t *markovp,
-	       const igraph_vector_t *group,
-	       /* igraph_bool_t use_arpack, */
+	       igraph_vector_t *group,
+	       igraph_bool_t recalculate_group,
+	       igraph_bool_t use_arpack,
 	       igraph_integer_t maxiter
 	       /* igraph_?_t *semproj, */
 	       /* igraph_?_t *epairs, */
 	       /* igraph_?_t *c_markovp, */);
 
-int igraph_scg_matrix(const igraph_matrix_t *matrix, igraph_integer_t ev,
+int igraph_scg_matrix(const igraph_matrix_t *matrix, 
+		      igraph_t *res_graph,
+		      igraph_matrix_t *res_matrix,
+		      const igraph_vector_t *ev,
+		      const igraph_vector_t *nt,
+		      igraph_scg_matrix_t matrix_type,
 		      igraph_scg_algorithm_t algo,
 		      igraph_scg_norm_t norm,
 		      igraph_scg_direction_t direction,
 		      const igraph_matrix_t *evec,
 		      const igraph_vector_t *markovp,
-		      const igraph_vector_t *group,
-		      /* igraph_bool_t use_arpack, */
+		      igraph_vector_t *group,
+		      igraph_bool_t recalculate_group,
+		      igraph_bool_t use_arpack,
 		      igraph_integer_t maxiter
 		      /* igraph_?_t *semproj, */
 		      /* igraph_?_t *epairs, */

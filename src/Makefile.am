@@ -53,7 +53,8 @@ endif
 F2C = f2c/d_sign.c f2c/etime_.c  f2c/pow_dd.c f2c/pow_di.c f2c/s_cmp.c \
 	f2c/s_copy.c f2c/d_lg10.c f2c/i_dnnt.c
 
-libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
+libigraph_la_SOURCES       = scg.c \
+			     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
 			     measure_dynamics.c type_indexededgelist.c \
