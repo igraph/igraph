@@ -50,6 +50,8 @@ int igraph_i_scg(igraph_real_t *to, const igraph_real_t *from,
 int igraph_scg(const igraph_t *graph, 
 	       igraph_t *res_graph,
 	       igraph_matrix_t *res_matrix,
+	       igraph_matrix_t *L, 
+	       igraph_matrix_t *R,
 	       const igraph_vector_t *ev,
 	       const igraph_vector_t *nt,
 	       igraph_scg_matrix_t matrix_type, 
@@ -82,11 +84,13 @@ int igraph_i_scg_reorder_arpack(igraph_matrix_t *vectors,
 int igraph_scg_matrix(const igraph_matrix_t *matrix, 
 		      igraph_t *res_graph,
 		      igraph_matrix_t *res_matrix,
+		      igraph_matrix_t *L, 
+		      igraph_matrix_t *R,
 		      const igraph_vector_t *ev,
 		      const igraph_vector_t *nt,
 		      igraph_scg_matrix_t matrix_type,
 		      igraph_scg_algorithm_t algo,
-		      igraph_scg_norm_t norm,
+		      igraph_scg_norm_t norm_type,
 		      igraph_scg_direction_t direction,
 		      const igraph_matrix_t *evec,
 		      const igraph_vector_t *markovp,
@@ -109,6 +113,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   igraph_matrix_t values2, vectors;
 
   igraph_vector_t *mygroup=group, mygroup_v;
+  igraph_matrix_t *myL, myL_v, *myR, myR_v;
   
   /************** Check arguments ***********/
   
@@ -158,7 +163,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   isTransposedX = isTransposedX || 
     (direction==IGRAPH_SCG_DIR_DEFAULT && 
      (matrix_type==IGRAPH_SCG_MATRIX_LAPLACIAN || 
-      matrix_type==IGRAPH_SCG_MATRIX_STOCHASTIC) && norm==IGRAPH_SCG_NORM_COL);
+      matrix_type==IGRAPH_SCG_MATRIX_STOCHASTIC) && norm_type==IGRAPH_SCG_NORM_COL);
   if (isTransposedX) {
     X=&Xm;
     IGRAPH_CHECK(igraph_matrix_copy(X, matrix));
@@ -238,7 +243,9 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 
 	if (igraph_vector_size(&ev2)>0) {
 	  igraph_arpack_options_init(&arpack_opts);
-	  
+
+	  /* TODO */
+
 	}
 
       } else {			/* ! use_arpack */
@@ -271,14 +278,37 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   }
 
   /* ------perform the coarse graining------------------- */
-  
-  /* TODO */
+
+  if (!L) {
+    myL=&myL_v;
+    IGRAPH_MATRIX_INIT_FINALLY(myL, 0, 0);
+  }
+  if (!R) {
+    myR=&myR_v;
+    IGRAPH_MATRIX_INIT_FINALLY(myR, 0, 0); 
+  }
+  IGRAPH_CHECK(igraph_scg_semi_projectors(group, myL, myR, matrix_type, 
+					  norm_type, markovp));
 
   /* ------computes a coarse-grained matrix-------------- */
+
+  /* TODO */
+
+  /* ------computes a coarse-grained graph-------------- */
   
   /* TODO */
   
   /*****************************************************************/
+
+  if (!R) {
+    igraph_matrix_destroy(myR);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  if (!L) {
+    igraph_matrix_destroy(myL);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   if (!group) {
     igraph_vector_destroy(mygroup);
