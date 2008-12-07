@@ -1662,6 +1662,13 @@ int igraph_scg_grouping(const igraph_matrix_t *v, igraph_vector_t *gr,
 			const igraph_vector_t *p, igraph_scg_algorithm_t algo,
 			igraph_integer_t maxiter);
 
+int igraph_scg_semi_projectors(const igraph_vector_t *gr,
+			       igraph_matrix_t *L,
+			       igraph_matrix_t *R,
+			       igraph_scg_matrix_t matrix_type,
+			       igraph_scg_norm_t norm_type, 
+			       const igraph_vector_t *markovp);
+
 /* -------------------------------------------------- */
 /* Dynamics measurement                               */
 /* -------------------------------------------------- */

@@ -23,6 +23,8 @@
 
 #include "igraph.h"
 
+#include <math.h>
+
 typedef struct {
   igraph_matrix_t *mat;
 } igraph_i_scg_t;
@@ -296,3 +298,131 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   return 0;
 }
 
+int igraph_i_scg_freq(const igraph_vector_t *v,
+		      igraph_vector_t *freq,
+		      long int max) {
+  
+  long int i, n=igraph_vector_size(v);
+  IGRAPH_CHECK(igraph_vector_resize(freq, max+1));
+  for (i=0; i<n; i++) {
+    long int j=VECTOR(*v)[i];
+    VECTOR(*freq)[j] += 1;
+  }
+
+  return 0;
+}
+
+int igraph_i_scg_sum(const igraph_vector_t *group, 
+		     const igraph_vector_t *p, 
+		     igraph_vector_t *sum, 
+		     long int max) {
+  
+  long int i, n=igraph_vector_size(p); /* same as size(group) */
+  IGRAPH_CHECK(igraph_vector_resize(sum, max+1));
+  igraph_vector_null(sum);
+  for (i=0; i<n; i++) {
+    long int idx=VECTOR(*group)[i];
+    VECTOR(*sum)[idx] += VECTOR(*p)[i];
+  }
+
+  return 0;
+}
+
+int igraph_scg_semi_projectors(const igraph_vector_t *group,
+			       igraph_matrix_t *L,
+			       igraph_matrix_t *R,
+			       igraph_scg_matrix_t matrix_type,
+			       igraph_scg_norm_t norm_type, 
+			       const igraph_vector_t *markovp) {
+
+  long int n=igraph_vector_size(group);
+  long int m=igraph_vector_max(group);
+  long int i, j;
+  igraph_vector_t freq, sum, myp;
+  igraph_matrix_t *tonorm;
+
+  if (matrix_type == IGRAPH_SCG_MATRIX_STOCHASTIC && 
+      (!markovp || igraph_vector_size(markovp) != n)) {
+    IGRAPH_ERROR("no stationary probabibities (markovp) and stochastic "
+		 "matrix", IGRAPH_EINVAL);
+  }  
+  
+  IGRAPH_CHECK(igraph_matrix_resize(L, m, n));
+  IGRAPH_CHECK(igraph_matrix_resize(R, m, n));
+  igraph_matrix_null(L);
+  
+  for (i=0; i<n; i++) {
+    long int j=VECTOR(*group)[i];
+    MATRIX(*L, i, j) = 1;
+  }
+  
+  switch(matrix_type) {
+
+  case IGRAPH_SCG_MATRIX_SYMMETRIC:
+
+    IGRAPH_VECTOR_INIT_FINALLY(&freq, m+1);
+    IGRAPH_CHECK(igraph_i_scg_freq(group, &freq, m));
+
+    for (i=0; i<m; i++) {
+      igraph_real_t div=sqrt(VECTOR(freq)[i+1]);
+      for (j=0; j<n; j++) {
+	MATRIX(*L, i, j) /= div;
+      }
+    }
+
+    igraph_vector_destroy(&freq);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_CHECK(igraph_matrix_update(R, L));
+
+    break;
+
+  case IGRAPH_SCG_MATRIX_LAPLACIAN:
+
+    tonorm = norm_type == IGRAPH_SCG_NORM_ROW ? L : R;
+
+    IGRAPH_CHECK(igraph_matrix_update(R, L));
+    
+    IGRAPH_VECTOR_INIT_FINALLY(&freq, m+1);
+    IGRAPH_CHECK(igraph_i_scg_freq(group, &freq, m));
+        
+    for (i=0; i<m; i++) {
+      igraph_real_t div=VECTOR(freq)[i+1];
+      for (j=0; j<n; j++) {
+	MATRIX(*tonorm, i, j) /= div;
+      }
+    }
+
+    igraph_vector_destroy(&freq);
+    IGRAPH_FINALLY_CLEAN(1);
+    break;
+
+  case IGRAPH_SCG_MATRIX_STOCHASTIC:
+    
+    tonorm = norm_type == IGRAPH_SCG_NORM_ROW ? L : R;
+    
+    IGRAPH_CHECK(igraph_matrix_update(R, L));
+
+    IGRAPH_VECTOR_INIT_FINALLY(&myp, n);
+    IGRAPH_VECTOR_INIT_FINALLY(&sum, m+1);
+    IGRAPH_CHECK(igraph_i_scg_sum(group, markovp, &sum, m));
+    for (i=0; i<m; i++) {
+      VECTOR(myp)[i] = VECTOR(*markovp)[i] / VECTOR(sum)[i+1];
+    }
+    
+    for (i=0; i<n; i++) {
+      igraph_real_t mul=VECTOR(myp)[i];
+      for (j=0; j<m; j++) {
+	MATRIX(*tonorm, j, i) *= mul;
+      }
+    }
+
+    igraph_vector_destroy(&sum);
+    igraph_vector_destroy(&myp);
+    IGRAPH_FINALLY_CLEAN(2);
+    break;
+    
+  }
+  
+  return 0;
+}
