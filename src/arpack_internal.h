@@ -126,6 +126,7 @@
 #define igraphidamax_   idamax_
 #define igraphdtrmm_    dtrmm_
 #define igraphdasum_    dasum_
+#define igraphdgemm_	dgemm_
 #endif
 
 #if 0				/* internal f2c functions always used */
@@ -172,5 +173,5 @@ int igraphdneupd_(long int *rvec, char *howmny, long int *select,
 		  long int *ldv, long int *iparam, long int *ipntr, 
 		  igraph_real_t *workd, igraph_real_t *workl,
 		  long int *lworkl, long int *info);
-
+  
 #endif

@@ -45,7 +45,7 @@ endif
 if INTERNAL_BLAS
   BLAS = blas/daxpy.c  blas/ddot.c   blas/dger.c   blas/dscal.c  blas/lsame.c \
 	blas/dcopy.c  blas/dgemv.c  blas/dnrm2.c  blas/dswap.c   blas/drot.c  \
-        blas/idamax.c blas/dtrmm.c  blas/dasum.c
+        blas/idamax.c blas/dtrmm.c  blas/dasum.c  blas/dgemm.c
 else
   BLAS =
 endif

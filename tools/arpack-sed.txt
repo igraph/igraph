@@ -51,6 +51,7 @@ s/dgemv_/igraphdgemv_/g
 s/ddot_/igraphddot_/g
 s/dnrm2_/igraphdnrm2_/g
 s/lsame_/igraphlsame_/g
+s/dgemm_/igraphdgemm_/g
 
 s/d_sign/igraphd_sign/g
 s/etime_/igraphetime_/g

@@ -171,6 +171,20 @@ int igraph_i_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
  */
 #define MATRIX(m,i,j) ((m).data.stor_begin[(m).nrow*(j)+(i)])
 
+/*-------------------------*/
+/* Product of two matrices */
+/*-------------------------*/
+
+int igraph_matrix_mprod(const igraph_matrix_t *m1,
+			const igraph_matrix_t *m2,
+			igraph_matrix_t *res);
+int igraph_matrix_crossprod(const igraph_matrix_t *m1,
+			    const igraph_matrix_t *m2,
+			    igraph_matrix_t *res);
+int igraph_matrix_tcrossprod(const igraph_matrix_t *m1,
+			     const igraph_matrix_t *m2,
+			     igraph_matrix_t *res);
+
 /* -------------------------------------------------- */
 /* Flexible vector, storing pointers                  */
 /* -------------------------------------------------- */
