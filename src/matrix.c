@@ -80,6 +80,11 @@ int igraph_matrix_dgemm(const igraph_matrix_t *m1,
   long int ldb=nrow2;
   long int ldc=m;
 
+  if (m1==res || m2==res) {
+    IGRAPH_ERROR("The input and output matrices must be different",
+		 IGRAPH_EINVAL);
+  }
+
   if (k != k2) {
     IGRAPH_ERROR("Invalid matrix sizes for multiplication", IGRAPH_EINVAL);
   }
