@@ -929,9 +929,9 @@ void FUNCTION(igraph_matrix,add_constant)(TYPE(igraph_matrix) *m, BASE plus) {
 int FUNCTION(igraph_matrix,vector_prod)(const TYPE(igraph_matrix) *m,
                                         const TYPE(igraph_vector) *v,
                                         TYPE(igraph_vector) *res) {
-  long int nrow=FUNCTION(igraph_matrix,nrow);
-  long int ncol=FUNCTION(igraph_matrix,ncol);
-  long int vlen=FUNCTION(igraph_vector,size);
+  long int nrow=FUNCTION(igraph_matrix,nrow)(m);
+  long int ncol=FUNCTION(igraph_matrix,ncol)(m);
+  long int vlen=FUNCTION(igraph_vector,size)(res);
   long int i,j;
   BASE sum;
   if (ncol != vlen) {
