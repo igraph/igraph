@@ -1638,7 +1638,6 @@ int igraph_scg(const igraph_t *graph,
 	       igraph_integer_t maxiter);
 
 int igraph_scg_matrix(const igraph_matrix_t *matrix, 
-		      igraph_t *res_graph,
 		      igraph_matrix_t *res_matrix,
 		      igraph_matrix_t *L, 
 		      igraph_matrix_t *R,

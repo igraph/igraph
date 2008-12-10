@@ -102,7 +102,6 @@ int igraph_i_scg_reorder_arpack(igraph_matrix_t *vectors,
 
 
 int igraph_scg_matrix(const igraph_matrix_t *matrix, 
-		      igraph_t *res_graph,
 		      igraph_matrix_t *res_matrix,
 		      igraph_matrix_t *L, 
 		      igraph_matrix_t *R,
@@ -309,12 +308,17 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 
   /* ------computes a coarse-grained matrix-------------- */
 
-  /* TODO */
+  if (res_matrix) {
+    
+    igraph_matrix_t tmp;
+    IGRAPH_MATRIX_INIT_FINALLY(&tmp, 0, 0);
+    IGRAPH_CHECK(igraph_matrix_tcrossprod(X, myR, &tmp));
+    IGRAPH_CHECK(igraph_matrix_mprod(myL, &tmp, res_matrix));
+    igraph_matrix_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
 
-  /* ------computes a coarse-grained graph-------------- */
-  
-  /* TODO */
-  
+  } /* res_matrix */
+
   /*****************************************************************/
 
   if (!R) {

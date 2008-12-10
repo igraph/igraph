@@ -1149,7 +1149,7 @@ igraph_scg:
         NAME-R: scg
 
 igraph_scg_matrix:
-        PARAMS: MATRIX matrix, OUT GRAPH_OR_0 res_graph, \
+        PARAMS: MATRIX matrix, \
                 OUT MATRIX_OR_0 res_matrix, OUT MATRIX_OR_0 L, \
                 OUT MATRIX_OR_0 R, VECTOR ev, VECTOR nt, \
                 SCG_MATRIX matrix_type=SYMMETRIC, \
