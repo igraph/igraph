@@ -46,7 +46,7 @@ igraph_real_t igraph_complex_arg(igraph_complex_t cmplx) {
 igraph_complex_t igraph_complex_conj(igraph_complex_t cmplx) {
   igraph_complex_t ret;
   REALPART(ret)=REALPART(cmplx);
-  IMAGPART(ret)=IMAGPART(cmplx);
+  IMAGPART(ret)=-IMAGPART(cmplx);
   return ret;
 }
 
