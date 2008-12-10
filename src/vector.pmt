@@ -685,7 +685,7 @@ BASE FUNCTION(igraph_vector,tail)(const TYPE(igraph_vector) *v) {
  */
 
 BASE FUNCTION(igraph_vector,pop_back)(TYPE(igraph_vector)* v) {
-  igraph_real_t tmp;
+  BASE tmp;
   assert(v!=NULL);
   assert(v->stor_begin != NULL);
   assert(v->end != v->stor_begin);

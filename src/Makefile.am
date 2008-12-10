@@ -99,7 +99,7 @@ libigraph_la_SOURCES       = scg.c \
 			     gengraph_random.cpp decomposition.c bipartite.c \
 			     scg_approximate_methods.c scg_exact_scg.c \
 			     scg_grouping.c scg_kmeans.c scg_optimal_method.c \
-			     scg_utils.c scg_headers.h
+			     scg_utils.c scg_headers.h igraph_complex.c
 
 libigraph_la_CFLAGS        = -Wall
 libigraph_la_CXXFLAGS	   = -Wall
@@ -113,7 +113,7 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  vector.pmt walktrap_graph.h walktrap_communities.h \
 		  walktrap_heap.h matrix.h matrix.pmt stack.h stack.pmt \
 		  dqueue.pmt dqueue.h heap.pmt heap.h arpack.h array.pmt \
-		  array.h arpack_internal.h f2c.h igraph_math.h
+		  array.h arpack_internal.h f2c.h igraph_math.h igraph_complex.h
 
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
