@@ -80,6 +80,69 @@ igraph_complex_t igraph_complex_div(igraph_complex_t lhs, igraph_complex_t rhs) 
   return ret;
 }
 
+int igraph_vector_complex_real(const igraph_vector_complex_t *cv, 
+			       igraph_vector_t *res){
+
+  long int i, n=igraph_vector_complex_size(cv);
+  IGRAPH_CHECK(igraph_vector_resize(res, n));
+  for (i=0; i<n; i++) {
+    VECTOR(*res)[i] = REALPART(VECTOR(*cv)[i]);
+  }
+  
+  return 0;
+}
+
+int igraph_vector_complex_imag(const igraph_vector_complex_t *cv, 
+			       igraph_vector_t *res){
+
+  long int i, n=igraph_vector_complex_size(cv);
+  IGRAPH_CHECK(igraph_vector_resize(res, n));
+  for (i=0; i<n; i++) {
+    VECTOR(*res)[i] = IMAGPART(VECTOR(*cv)[i]);
+  }
+  
+  return 0;
+}
+
+
+int igraph_vector_complex_mod(const igraph_vector_complex_t *cv, 
+			      igraph_vector_t *res){
+  
+  long int i, n=igraph_vector_complex_size(cv);
+  IGRAPH_CHECK(igraph_vector_resize(res, n));
+  for (i=0; i<n; i++) {
+    VECTOR(*res)[i] = igraph_complex_mod(VECTOR(*cv)[i]);
+  }
+
+  return 0;
+}
+
+
+int igraph_vector_complex_arg(const igraph_vector_complex_t *cv, 
+			      igraph_vector_t *res){
+
+  long int i, n=igraph_vector_complex_size(cv);
+  IGRAPH_CHECK(igraph_vector_resize(res, n));
+  for (i=0; i<n; i++) {
+    VECTOR(*res)[i] = igraph_complex_arg(VECTOR(*cv)[i]);
+  }
+
+  return 0;
+}
+
+
+int igraph_vector_complex_conj(const igraph_vector_complex_t *cv, 
+			       igraph_vector_complex_t *res){
+  long int i, n=igraph_vector_complex_size(cv);
+  IGRAPH_CHECK(igraph_vector_complex_update(res, cv));
+  for (i=0; i<n; i++) {
+    IMAGPART(VECTOR(*res)[i]) = -IMAGPART(VECTOR(*res)[i]);
+  }
+
+  return 0;
+}
+
+
 int igraph_vector_complex_init(igraph_vector_complex_t* v, long int size) {
   long int alloc_size= size > 0 ? size : 1;
   if (size < 0) { size=0; }

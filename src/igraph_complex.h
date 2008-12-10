@@ -61,6 +61,12 @@ typedef struct igraph_vector_complex_t {
 
 /* Note the VECTOR() still works for this!!! */
 
+int igraph_vector_complex_real(const igraph_vector_complex_t *cv, igraph_vector_t *res);
+int igraph_vector_complex_imag(const igraph_vector_complex_t *cv, igraph_vector_t *res);
+int igraph_vector_complex_mod(const igraph_vector_complex_t *cv, igraph_vector_t *res);
+int igraph_vector_complex_arg(const igraph_vector_complex_t *cv, igraph_vector_t *res);
+int igraph_vector_complex_conj(const igraph_vector_complex_t *cv, igraph_vector_complex_t *res);
+
 int igraph_vector_complex_init(igraph_vector_complex_t* v, long int size);
 int igraph_vector_complex_copy(igraph_vector_complex_t *to, 
 			       const igraph_vector_complex_t *from);
