@@ -76,3 +76,5 @@
 ./tests/testsuite
 ./tests/testsuite.dir
 ./tests/testsuite.log
+interfaces/python/doc/build/doctrees
+interfaces/python/doc/build/html
