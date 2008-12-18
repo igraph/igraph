@@ -100,6 +100,34 @@ int igraph_i_scg_reorder_arpack(igraph_matrix_t *vectors,
   return 0;
 }
 
+/* This is the same, but for the complex case, 
+   we work on pairs of columns */
+
+int igraph_i_scg_reorder_complex_arpack(igraph_matrix_t *vectors, 
+					const igraph_vector_long_t *order,
+					const igraph_vector_t *ev1) {
+  
+  igraph_matrix_t tmpmat;
+  long int nrow=igraph_matrix_nrow(vectors);
+  long int newncol=igraph_vector_size(ev1)*2;
+  long int i, j, p;
+  
+  IGRAPH_MATRIX_INIT_FINALLY(&tmpmat, nrow, newncol);
+  for (i=0, p=0; i<newncol; i++, p+=2) {
+    long int col=VECTOR(*order)[ (long int) VECTOR(*ev1)[i] ];
+    for (j=0; j<nrow; j++) {
+      MATRIX(tmpmat, j, p) = MATRIX(*vectors, j, 2*col);
+      MATRIX(tmpmat, j, p+1) = MATRIX(*vectors, j, 2*col+1);
+    }
+  }
+  
+  /* Not really nice, but should be good in most (every?) cases */
+  igraph_matrix_destroy(vectors);
+  *vectors=tmpmat;
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
 
 int igraph_scg_matrix(const igraph_matrix_t *matrix, 
 		      igraph_matrix_t *res_matrix,
@@ -126,7 +154,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   igraph_matrix_t *X=(igraph_matrix_t*)matrix, Xm;
 
   igraph_vector_t values;
-  igraph_matrix_t values2, *myevec=evec, my_evec_v;
+  igraph_matrix_t values2, *myevec=(igraph_matrix_t*) evec, my_evec_v;
 
   igraph_vector_t *mygroup=group, mygroup_v;
   igraph_matrix_t *myL=L, myL_v, *myR=R, myR_v;
@@ -228,6 +256,10 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 	  IGRAPH_MATRIX_INIT_FINALLY(&values2, 0, 0);
 	}
 
+	/*****************************/
+	/* Beginning of the spectrum */
+	/*****************************/
+
 	if (igraph_vector_size(&ev1)>0) {
 	  igraph_arpack_options_init(&arpack_opts);
 	  arpack_opts.n=n;
@@ -246,6 +278,9 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 	    igraph_vector_long_destroy(&order);
 	    IGRAPH_FINALLY_CLEAN(1);
 	  } else {
+	    long int i;
+	    igraph_vector_t mod;
+	    igraph_vector_long_t order;
 	    arpack_opts.which[0]='L'; arpack_opts.which[1]='M';
 	    arpack_opts.ncv=2*igraph_vector_max(&ev1)+2;
 	    igraph_arpack_rnsolve(igraph_i_scg, &extra, 
@@ -253,12 +288,26 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 				  &values2, myevec);
 	    igraph_arpack_unpack_complex(myevec, &values2,
 					 igraph_vector_max(&ev1));
-	    
-	    /* TODO: finish non-symmetric case */
+
+	    IGRAPH_VECTOR_INIT_FINALLY(&mod, n);
+	    for (i=0; i<n; i++) { 
+	      igraph_real_t rr = MATRIX(values2, i, 0);
+	      igraph_real_t ii = MATRIX(values2, i, 1);	      
+	      VECTOR(mod)[i] = rr * rr + ii * ii;
+	    }
+	    IGRAPH_CHECK(igraph_vector_long_init(&order, n));
+	    IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
+	    igraph_vector_sort_order(&mod, &order, /*reverse=*/ 1);
+	    igraph_i_scg_reorder_complex_arpack(myevec, &order, &ev1);
+	    igraph_vector_long_destroy(&order);
+	    igraph_vector_destroy(&mod);
+	    IGRAPH_FINALLY_CLEAN(2);
 	  }
-	  
-	  
 	}
+
+	/*****************************/
+	/* End of the spectrum */
+	/*****************************/
 
 	if (igraph_vector_size(&ev2)>0) {
 	  igraph_arpack_options_init(&arpack_opts);
@@ -279,6 +328,9 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 	    igraph_vector_long_destroy(&order);
 	    IGRAPH_FINALLY_CLEAN(1);
 	  } else {
+	    long int i;
+	    igraph_vector_t mod;
+	    igraph_vector_long_t order;
 	    arpack_opts.which[0]='S'; arpack_opts.which[1]='M';
 	    arpack_opts.ncv=2*(n-igraph_vector_min(&ev2)+1)+2;
 	    if (arpack_opts.ncv>n) { arpack_opts.ncv=n; }
@@ -287,11 +339,26 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 				  &values2, myevec);
 	    igraph_arpack_unpack_complex(myevec, &values2, 
 					 n-igraph_vector_min(&ev2)+1);
-
-	    /* TODO: finish non-symmetric case */
+	    
+	    IGRAPH_VECTOR_INIT_FINALLY(&mod, n);
+	    for (i=0; i<n; i++) { 
+	      igraph_real_t rr = MATRIX(values2, i, 0);
+	      igraph_real_t ii = MATRIX(values2, i, 1);	      
+	      VECTOR(mod)[i] = rr * rr + ii * ii;
+	    }
+	    IGRAPH_CHECK(igraph_vector_long_init(&order, n));
+	    IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
+	    igraph_vector_sort_order(&mod, &order, /*reverse=*/ 0);
+	    igraph_i_scg_reorder_complex_arpack(myevec, &order, &ev1);
+	    igraph_vector_long_destroy(&order);
+	    igraph_vector_destroy(&mod);
+	    IGRAPH_FINALLY_CLEAN(2);
 
 	  }
 	} /* size(&ev2)>0  */
+
+	/* TODO: make things work if we have eigenvalues from both
+	   ends of the spectrum */
 
 	if (sym) {
 	  igraph_vector_destroy(&values);
