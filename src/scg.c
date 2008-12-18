@@ -126,10 +126,10 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   igraph_matrix_t *X=(igraph_matrix_t*)matrix, Xm;
 
   igraph_vector_t values;
-  igraph_matrix_t values2, vectors;
+  igraph_matrix_t values2, *myevec=evec, my_evec_v;
 
   igraph_vector_t *mygroup=group, mygroup_v;
-  igraph_matrix_t *myL, myL_v, *myR, myR_v;
+  igraph_matrix_t *myL=L, myL_v, *myR=R, myR_v;
   
   /************** Check arguments ***********/
   
@@ -167,7 +167,8 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 		 IGRAPH_EINVAL);
   }
 
-  if (group && igraph_vector_size(group) != n) {
+  if (group && igraph_vector_size(group) != n && 
+      igraph_vector_size(group) != 0) {
     IGRAPH_ERROR("`group' must be either NULL or of length `n'", IGRAPH_EINVAL);
   }
   
@@ -196,11 +197,12 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   
   /**************** Compute eigenpairs if not supplied *************/
   
-  if (!group) {
+  if (!group || igraph_vector_size(group)==0) {
 
     if (!evec) {
       
-      IGRAPH_MATRIX_INIT_FINALLY(&vectors, 0, 0);
+      myevec=&my_evec_v;
+      IGRAPH_MATRIX_INIT_FINALLY(myevec, 0, 0);
       
       if (use_arpack) {
 	igraph_vector_t ev1, ev2;
@@ -213,13 +215,13 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 	IGRAPH_VECTOR_INIT_FINALLY(&ev2, 0);
 	for (i=0; i<nev; i++) {
 	  long int actev=VECTOR(*ev)[i];
-	    if (actev > n/2) {
-	      IGRAPH_CHECK(igraph_vector_push_back(&ev1, actev));
-	    } else {
-	      IGRAPH_CHECK(igraph_vector_push_back(&ev2, actev));
-	    }
+	  if (actev <= n/2) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&ev1, actev));
+	  } else {
+	    IGRAPH_CHECK(igraph_vector_push_back(&ev2, actev));
+	  }
 	}
-
+	
 	if (sym) {
 	  IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
 	} else { 
@@ -236,10 +238,11 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 	    arpack_opts.ncv=2*igraph_vector_max(&ev1)+1;
 	    igraph_arpack_rssolve(igraph_i_scg, &extra,
 				  &arpack_opts, /*storage=*/ 0, 
-				  &values, &vectors);
+				  &values, myevec);
 	    IGRAPH_CHECK(igraph_vector_long_init(&order, n));
+	    IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
 	    igraph_vector_sort_order(&values, &order, /*reverse=*/ 1);
-	    igraph_i_scg_reorder_arpack(&vectors, &order, &ev1);
+	    igraph_i_scg_reorder_arpack(myevec, &order, &ev1);
 	    igraph_vector_long_destroy(&order);
 	    IGRAPH_FINALLY_CLEAN(1);
 	  } else {
@@ -247,11 +250,11 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 	    arpack_opts.ncv=2*igraph_vector_max(&ev1)+2;
 	    igraph_arpack_rnsolve(igraph_i_scg, &extra, 
 				  &arpack_opts, /*storage=*/ 0,
-				  &values2, &vectors);
-	    igraph_arpack_unpack_complex(&vectors, &values2,
+				  &values2, myevec);
+	    igraph_arpack_unpack_complex(myevec, &values2,
 					 igraph_vector_max(&ev1));
 	    
-	    /* TODO */
+	    /* TODO: finish non-symmetric case */
 	  }
 	  
 	  
@@ -259,10 +262,48 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 
 	if (igraph_vector_size(&ev2)>0) {
 	  igraph_arpack_options_init(&arpack_opts);
+	  arpack_opts.n=n;
+	  arpack_opts.nev=n-igraph_vector_min(&ev2)+1;
+	  if (sym) {
+	    igraph_vector_long_t order;
+	    arpack_opts.which[0]='S'; arpack_opts.which[1]='A';
+	    arpack_opts.ncv=2*(n-igraph_vector_min(&ev2)+1)+1;
+	    if (arpack_opts.ncv>n) { arpack_opts.ncv=n; }
+	    igraph_arpack_rssolve(igraph_i_scg, &extra,
+				  &arpack_opts, /*storage=*/ 0,
+				  &values, myevec);
+	    IGRAPH_CHECK(igraph_vector_long_init(&order, n));
+	    IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
+	    igraph_vector_sort_order(&values, &order, /*reverse=*/ 0);
+	    igraph_i_scg_reorder_arpack(myevec, &order, &ev2);
+	    igraph_vector_long_destroy(&order);
+	    IGRAPH_FINALLY_CLEAN(1);
+	  } else {
+	    arpack_opts.which[0]='S'; arpack_opts.which[1]='M';
+	    arpack_opts.ncv=2*(n-igraph_vector_min(&ev2)+1)+2;
+	    if (arpack_opts.ncv>n) { arpack_opts.ncv=n; }
+	    igraph_arpack_rnsolve(igraph_i_scg, &extra, 
+				  &arpack_opts, /*storage=*/ 0,
+				  &values2, myevec);
+	    igraph_arpack_unpack_complex(myevec, &values2, 
+					 n-igraph_vector_min(&ev2)+1);
 
-	  /* TODO */
+	    /* TODO: finish non-symmetric case */
 
+	  }
+	} /* size(&ev2)>0  */
+
+	if (sym) {
+	  igraph_vector_destroy(&values);
+	  IGRAPH_FINALLY_CLEAN(1);
+	} else { 
+	  igraph_matrix_destroy(&values2);
+	  IGRAPH_FINALLY_CLEAN(1);
 	}
+
+	igraph_vector_destroy(&ev2);
+	igraph_vector_destroy(&ev1);
+	IGRAPH_FINALLY_CLEAN(2);
 
       } else {			/* ! use_arpack */
 	IGRAPH_ERROR("Currently only arpack is implemented", 
@@ -289,7 +330,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
   }
   
   if (recalculate_group) {
-    igraph_scg_grouping(&vectors, group, mynt, matrix_type, markovp, 
+    igraph_scg_grouping(myevec, mygroup, mynt, matrix_type, markovp, 
 			algo, maxiter);
   }
 
@@ -303,7 +344,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
     myR=&myR_v;
     IGRAPH_MATRIX_INIT_FINALLY(myR, 0, 0); 
   }
-  IGRAPH_CHECK(igraph_scg_semi_projectors(group, myL, myR, matrix_type, 
+  IGRAPH_CHECK(igraph_scg_semi_projectors(mygroup, myL, myR, matrix_type, 
 					  norm_type, markovp));
 
   /* ------computes a coarse-grained matrix-------------- */
@@ -333,6 +374,11 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 
   if (!group) {
     igraph_vector_destroy(mygroup);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  if (!evec) {
+    igraph_matrix_destroy(myevec);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
