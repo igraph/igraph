@@ -55,7 +55,7 @@ cohesive.blocks <- function(graph, db=NULL,
     ## set up database connection and schema
     if(is.null(db) && useDB){
         ## initialize the database and define schema
-        dbfile <- tempfile("cohesive.blocks", getwd())
+        dbfile <- tempfile("cohesive.blocks")
         con <- dbConnect(dbDriver("SQLite"), dbname=dbfile)
         ## branchMembership
         dbSendQuery(con, "create table branchMembership (vertexId integer, branchId integer)")
