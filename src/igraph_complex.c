@@ -177,6 +177,25 @@ void igraph_vector_complex_destroy(igraph_vector_complex_t* v) {
 }
 
 
+int igraph_vector_complex_init_realimag(igraph_vector_complex_t *v,
+					const igraph_vector_t *real,
+					const igraph_vector_t *imag) {
+  long int i, n=igraph_vector_size(real);
+  if (igraph_vector_size(imag) != n) {
+    IGRAPH_ERROR("Real and imag vector sizes don't match, "
+		 "cannot create complex vector", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_complex_init(v, n));
+  for (i=0; i<n; i++) {
+    REALPART(VECTOR(*v)[i]) = VECTOR(*real)[i];
+    IMAGPART(VECTOR(*v)[i]) = VECTOR(*imag)[i];
+  }
+  
+  return 0;
+}
+
+
 igraph_complex_t igraph_vector_complex_e(const igraph_vector_complex_t* v, long int pos) {
   return * (v->stor_begin + pos);
 }

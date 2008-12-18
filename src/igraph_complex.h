@@ -72,6 +72,10 @@ int igraph_vector_complex_copy(igraph_vector_complex_t *to,
 			       const igraph_vector_complex_t *from);
 void igraph_vector_complex_destroy(igraph_vector_complex_t* v);
 
+int igraph_vector_complex_init_realimag(igraph_vector_complex_t *v,
+					const igraph_vector_t *real,
+					const igraph_vector_t *imag);
+
 igraph_complex_t igraph_vector_complex_e(const igraph_vector_complex_t* v, long int pos);
 igraph_complex_t* igraph_vector_complex_e_ptr(const igraph_vector_complex_t* v, long int pos);
 void igraph_vector_complex_set(igraph_vector_complex_t* v, long int pos, igraph_complex_t value);
