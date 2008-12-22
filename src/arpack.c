@@ -882,3 +882,117 @@ int igraph_arpack_eigen_symmetric(const igraph_matrix_t *matrix,
 
   return 0;
 }
+
+int igraph_arpack_eigen(const igraph_matrix_t *matrix,
+			const igraph_vector_long_t *which,
+			igraph_matrix_t *evals,
+			igraph_matrix_t *evecs,
+			igraph_arpack_options_t *options) {
+
+  igraph_vector_long_t which_small, which_large;
+  long int nev=igraph_vector_long_size(which);
+  long int mdim=igraph_matrix_nrow(matrix);
+  long int wmin, wmax;
+  long int nlarge, nsmall;
+  long int i;
+
+  igraph_vector_long_t order;
+  igraph_vector_t mod;
+  
+  /* TODO: make evals and evecs optional */
+  
+  igraph_matrix_t myevals_v, *myevals=&myevals_v;
+  igraph_matrix_t myevecs_v, *myevecs=&myevecs_v;
+
+  if (mdim != igraph_matrix_ncol(matrix)) {
+    IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
+  }
+
+  igraph_vector_long_minmax(which, &wmin, &wmax);
+  if (wmin < 1 || wmax > mdim) {
+    IGRAPH_ERROR("Invalid eigenvectors, must be between 1 and n", 
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&which_small, 0));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &which_small);
+  IGRAPH_CHECK(igraph_vector_long_init(&which_large, 0));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &which_large);
+  
+  for (i=0; i<nev; i++) {
+    long int ev=VECTOR(*which)[i];
+    if (ev <= mdim/2) { 
+      IGRAPH_CHECK(igraph_vector_long_push_back(&which_large, ev)); 
+    } else {
+      IGRAPH_CHECK(igraph_vector_long_push_back(&which_small, ev));
+    }
+  }
+  nlarge=igraph_vector_long_size(&which_large);
+  nsmall=igraph_vector_long_size(&which_small);  
+
+  IGRAPH_MATRIX_INIT_FINALLY(&myevals_v, 0, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&myevecs_v, 0, 0);  
+
+  IGRAPH_CHECK(igraph_matrix_resize(evals, nev, 2));
+  IGRAPH_CHECK(igraph_matrix_resize(evecs, mdim, 2*nev));
+  igraph_matrix_null(evals);
+  igraph_matrix_null(evecs);
+  
+  /* Beginning of the spectrum */
+
+  if (nlarge > 0) {
+    long int last_large=igraph_vector_long_max(&which_large);    
+    options->n=mdim;
+    options->which[0]='L'; options->which[1]='M';
+    options->nev=last_large;
+    options->ncv=2*last_large+1;
+    if (options->ncv > mdim) { options->ncv=mdim; }
+    igraph_arpack_rnsolve(igraph_i_arpack_eigen, (void*) matrix,
+			  options, /*storage=*/ 0, myevals, myevecs);
+    IGRAPH_CHECK(igraph_arpack_unpack_complex(myevecs, myevals, last_large));
+
+    IGRAPH_CHECK(igraph_vector_long_init(&order, 0));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
+    IGRAPH_VECTOR_INIT_FINALLY(&mod, last_large);
+    for (i=0; i<last_large; i++) {
+      igraph_real_t rp=MATRIX(*myevals, i, 0);
+      igraph_real_t ip=MATRIX(*myevals, i, 1);
+      VECTOR(mod)[i] = rp * rp + ip * ip;
+    }
+    IGRAPH_CHECK(igraph_vector_sort_order(&mod, &order, /*reverse=*/ 0));
+    igraph_vector_destroy(&mod);
+    IGRAPH_FINALLY_CLEAN(1);
+    
+    /* Save results */
+    for (i=0; i<nev; i++) {
+      long int j, pos, ev=VECTOR(*which)[i];
+      if (ev > mdim/2) { continue; }
+      pos=VECTOR(order)[ev-1];
+      MATRIX(*evals, i, 0) = MATRIX(*myevals, pos, 0);
+      MATRIX(*evals, i, 1) = MATRIX(*myevals, pos, 1);
+
+      for (j=0; j<mdim; j++) {
+	MATRIX(*evecs, j, 2*i) = MATRIX(*myevecs, j, 2*pos);
+	MATRIX(*evecs, j, 2*i+1) = MATRIX(*myevecs, j, 2*pos+1);
+      }
+    }    
+
+    igraph_vector_long_destroy(&order);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  /* End of the spectrum */
+
+  /* TODO */
+  
+  igraph_matrix_destroy(myevecs);
+  IGRAPH_FINALLY_CLEAN(1);
+  igraph_matrix_destroy(myevals);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  igraph_vector_long_destroy(&which_large);
+  igraph_vector_long_destroy(&which_small);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}

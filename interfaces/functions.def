@@ -517,10 +517,15 @@ igraph_arpack_unpack_complex:
         PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev
         NAME-R: arpack.unpack.complex
 
+igraph_arpack_eigen:
+        PARAMS: MATRIX matrix, VECTOR_LONG which, OUT MATRIX evals, \
+                OUT MATRIX evecs, INOUT ARPACKOPT options=igraph.arpack.default
+        NAME-R: arpack.eigen
+
 igraph_arpack_eigen_symmetric:
         PARAMS: MATRIX matrix, VECTOR_LONG which, OUT MATRIX evals, \
                 OUT MATRIX evecs, INOUT ARPACKOPT options=igraph.arpack.default
-        NAME-R: arpack.symmetric
+        NAME-R: arpack.eigen.symmetric
 
 igraph_unfold_tree:
         PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots, \
