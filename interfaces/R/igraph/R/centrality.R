@@ -58,7 +58,7 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
       }
       res$values <- res$values[,1]
     }
-    res$vectors <- res$vectors[,1:length(res$values)]
+    res$vectors <- res$vectors[,1:length(res$values),drop=FALSE]
   }
   
   res
