@@ -1155,13 +1155,15 @@ igraph_scg:
 
 igraph_scg_matrix:
         PARAMS: MATRIX matrix, \
+                VECTOR_LONG ev, VECTOR nt, \
                 OUT MATRIX_OR_0 res_matrix, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, VECTOR ev, VECTOR nt, \
+                OUT MATRIX_OR_0 R, OUT MATRIX_OR_0 evals, \
+                INOUT MATRIX_OR_0 evec, BOOLEAN recalculate_epairs=True, \
+                INOUT VECTOR_OR_0 group=NULL, BOOLEAN recalculate_group=True, \
                 SCG_MATRIX matrix_type=SYMMETRIC, \
 	        SCG_ALGO algo=OPTIMUM, SCG_NORM norm_type=ROW, \
                 SCG_DIRECTION direction=DEFAULT, \
-                MATRIX_OR_0 evec=NULL, VECTOR_OR_0 markovp=NULL, \
-                INOUT VECTOR_OR_0 group=NULL, BOOLEAN recalculate_group=True, \
+                INOUT MATRIX_OR_0 evec=NULL, VECTOR_OR_0 markovp=NULL, \
                 BOOLEAN use_arpack=True, INTEGER maxiter=100
         NAME-R: scg.matrix
 
