@@ -29,6 +29,9 @@ VECTOR_BOOL:
 VECTOR_BOOL_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.logical(%I%)
 
+VECTOR_LONG:
+    INCONV: %I% <- as.integer(%I%)
+
 MATRIX:
     INCONV: %I% <- structure(as.double(%I%), dim=dim(%I%))
 

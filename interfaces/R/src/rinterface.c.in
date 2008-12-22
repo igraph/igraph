@@ -43,6 +43,7 @@ SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
 SEXP R_igraph_vectorlist_to_SEXP(const igraph_vector_ptr_t *ptr);
 void R_igraph_vectorlist_destroy(igraph_vector_ptr_t *ptr);
+SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
@@ -56,6 +57,8 @@ int R_SEXP_to_igraph_vs(SEXP rit, igraph_t *graph, igraph_vs_t *it);
 int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
+int R_SEXP_to_vector_long(SEXP sv, igraph_vector_long_t *v);
+int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v);
 
 /* get the list element named str, or return NULL */
 /* from the R Manual */
@@ -988,6 +991,15 @@ SEXP R_igraph_0orvector_to_SEXP(igraph_vector_t *v) {
   return result;
 }
 
+SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v) {
+  SEXP result;
+  
+  PROTECT(result=NEW_INTEGER(igraph_vector_long_size(v)));
+  igraph_vector_long_copy_to(v, (long int*)INTEGER(result));
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
   SEXP result;
   long int n=igraph_vector_bool_size(v);
@@ -1196,6 +1208,18 @@ int R_SEXP_to_vector(SEXP sv, igraph_vector_t *v) {
 
 int R_SEXP_to_vector_copy(SEXP sv, igraph_vector_t *v) {
   return igraph_vector_init_copy(v, REAL(sv), GET_LENGTH(sv));  
+}
+
+int R_SEXP_to_vector_long(SEXP sv, igraph_vector_long_t *v) {
+  v->stor_begin=(long int*)INTEGER(sv);
+  v->stor_end=v->stor_begin+GET_LENGTH(sv);
+  v->end=v->stor_end;
+  return 0;
+}
+
+int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v) {
+  return igraph_vector_long_init_copy(v, (long int*)INTEGER(sv),
+				      GET_LENGTH(sv));  
 }
 
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v) {

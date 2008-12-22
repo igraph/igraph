@@ -169,6 +169,27 @@ VECTOR:
          igraph_vector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VECTOR_LONG:
+  CTYPE: igraph_vector_long_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_vector_long(%I%, &%C%);
+    OUT: if (0 != igraph_vector_long_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_long_destroy, &%C%);
+    INOUT: if (0 != R_SEXP_to_vector_long_copy(%I%, &%C%)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_long_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vector_long_to_SEXP(&%C%)); \
+         igraph_vector_long_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+    INOUT: PROTECT(%I%=R_igraph_vector_long_to_SEXP(&%C%)); \
+         igraph_vector_long_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 VECTOR_BOOL:
   CTYPE: igraph_vector_bool_t
   CALL: &%C%
