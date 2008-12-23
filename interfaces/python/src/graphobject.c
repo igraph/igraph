@@ -875,7 +875,7 @@ PyObject *igraphmodule_Graph_get_eid(igraphmodule_GraphObject * self,
   static char *kwlist[] = { "v1", "v2", "directed", NULL };
   long v1, v2;
   igraph_integer_t result;
-  PyObject *directed = Py_False;
+  PyObject *directed = Py_True;
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist, &v1, &v2,
                                    &directed))
     return NULL;
