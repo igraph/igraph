@@ -1,34 +1,29 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphidamax.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-integer igraphidamax_(integer *n, doublereal *dx, integer *incx)
+integer igraphidamax_(n, dx, incx)
+integer *n;
+doublereal *dx;
+integer *incx;
 {
     /* System generated locals */
     integer ret_val, i__1;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__, ix;
     static doublereal dmax__;
+    static integer i__, ix;
 
 
 /*     finds the index of element having max. absolute value. */
 /*     jack dongarra, linpack, 3/11/78. */
-/*     modified 3/93 to return if incx .le. 0. */
-/*     modified 12/3/93, array(1) declarations changed to array(*) */
+/*     modified to correct problem with negative increment, 8/21/90. */
 
 
     /* Parameter adjustments */
@@ -36,7 +31,7 @@ integer igraphidamax_(integer *n, doublereal *dx, integer *incx)
 
     /* Function Body */
     ret_val = 0;
-    if (*n < 1 || *incx <= 0) {
+    if (*n < 1) {
 	return ret_val;
     }
     ret_val = 1;
@@ -50,7 +45,10 @@ integer igraphidamax_(integer *n, doublereal *dx, integer *incx)
 /*        code for increment not equal to 1 */
 
     ix = 1;
-    dmax__ = abs(dx[1]);
+    if (*incx < 0) {
+	ix = (-(*n) + 1) * *incx + 1;
+    }
+    dmax__ = (d__1 = dx[ix], abs(d__1));
     ix += *incx;
     i__1 = *n;
     for (i__ = 2; i__ <= i__1; ++i__) {
@@ -80,5 +78,5 @@ L30:
 	;
     }
     return ret_val;
-} /* idamax_ */
+} /* igraphidamax_ */
 

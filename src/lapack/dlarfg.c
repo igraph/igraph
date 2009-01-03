@@ -1,41 +1,37 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlarfg.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdlarfg_(integer *n, doublereal *alpha, doublereal *x, 
-	integer *incx, doublereal *tau)
+/* Subroutine */ int igraphdlarfg_(n, alpha, x, incx, tau)
+integer *n;
+doublereal *alpha, *x;
+integer *incx;
+doublereal *tau;
 {
     /* System generated locals */
     integer i__1;
     doublereal d__1;
 
     /* Builtin functions */
-    double igraphd_sign(doublereal *, doublereal *);
+    double igraphd_sign();
 
     /* Local variables */
-    static integer j, knt;
     static doublereal beta;
-    extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
-	    integer *);
+    extern doublereal igraphdnrm2_();
+    static integer j;
+    extern /* Subroutine */ int igraphdscal_();
     static doublereal xnorm;
-    extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
+    extern doublereal igraphdlapy2_(), igraphdlamch_();
     static doublereal safmin, rsafmn;
+    static integer knt;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     September 30, 1994 */
@@ -126,7 +122,7 @@
 
 	d__1 = igraphdlapy2_(alpha, &xnorm);
 	beta = -igraphd_sign(&d__1, alpha);
-	safmin = igraphdlamch_("S") / igraphdlamch_("E");
+	safmin = igraphdlamch_("S", (ftnlen)1) / igraphdlamch_("E", (ftnlen)1);
 	if (abs(beta) < safmin) {
 
 /*           XNORM, BETA may be inaccurate; scale X and recompute them */

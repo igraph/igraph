@@ -1,13 +1,6 @@
-/* igraphdstatn.f -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdstatn.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -43,7 +36,7 @@ static struct {
 /* \SCCS Information: @(#) */
 /* FILE: statn.F   SID: 2.4   DATE OF SID: 4/20/96   RELEASE: 2 */
 
-/* Subroutine */ int igraphdstatn_(void)
+/* Subroutine */ int igraphdstatn_()
 {
 
 /*     %--------------------------------% */
@@ -69,23 +62,23 @@ static struct {
     timing_1.nitref = 0;
     timing_1.nrstrt = 0;
 
-    timing_1.tnaupd = 0.f;
-    timing_1.tnaup2 = 0.f;
-    timing_1.tnaitr = 0.f;
-    timing_1.tneigh = 0.f;
-    timing_1.tngets = 0.f;
-    timing_1.tnapps = 0.f;
-    timing_1.tnconv = 0.f;
-    timing_1.titref = 0.f;
-    timing_1.tgetv0 = 0.f;
-    timing_1.trvec = 0.f;
+    timing_1.tnaupd = (float)0.;
+    timing_1.tnaup2 = (float)0.;
+    timing_1.tnaitr = (float)0.;
+    timing_1.tneigh = (float)0.;
+    timing_1.tngets = (float)0.;
+    timing_1.tnapps = (float)0.;
+    timing_1.tnconv = (float)0.;
+    timing_1.titref = (float)0.;
+    timing_1.tgetv0 = (float)0.;
+    timing_1.trvec = (float)0.;
 
 /*     %----------------------------------------------------% */
 /*     | User time including reverse communication overhead | */
 /*     %----------------------------------------------------% */
 
-    timing_1.tmvopx = 0.f;
-    timing_1.tmvbx = 0.f;
+    timing_1.tmvopx = (float)0.;
+    timing_1.tmvbx = (float)0.;
 
     return 0;
 

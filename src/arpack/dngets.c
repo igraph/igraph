@@ -1,13 +1,6 @@
-/* igraphdngets.f -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdngets.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -133,24 +126,26 @@ static integer c__1 = 1;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdngets_(integer *ishift, char *which, integer *kev, 
-	integer *np, doublereal *ritzr, doublereal *ritzi, doublereal *bounds,
-	 doublereal *shiftr, doublereal *shifti)
+/* Subroutine */ int igraphdngets_(ishift, which, kev, np, ritzr, ritzi, bounds, 
+	shiftr, shifti, which_len)
+integer *ishift;
+char *which;
+integer *kev, *np;
+doublereal *ritzr, *ritzi, *bounds, *shiftr, *shifti;
+ftnlen which_len;
 {
     /* System generated locals */
     integer i__1;
 
     /* Builtin functions */
-    integer igraphs_cmp(char *, char *, ftnlen, ftnlen);
+    integer igraphs_cmp();
 
     /* Local variables */
+    extern /* Subroutine */ int igraphdvout_();
     static real t0, t1;
-    extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
-	    integer *, char *), igraphivout_(integer *, integer *, integer *
-	    , integer *, char *), igraphsecond_(real *);
+    extern /* Subroutine */ int igraphivout_(), igraphsecond_();
     static integer msglvl;
-    extern /* Subroutine */ int igraphdsortc_(char *, logical *, integer *, 
-	    doublereal *, doublereal *, doublereal *);
+    extern /* Subroutine */ int igraphdsortc_();
 
 
 /*     %----------------------------------------------------% */
@@ -235,26 +230,33 @@ static integer c__1 = 1;
 
     if (igraphs_cmp(which, "LM", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *kev + *np;
-	igraphdsortc_("LR", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1]);
+	igraphdsortc_("LR", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1], (
+		ftnlen)2);
     } else if (igraphs_cmp(which, "SM", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *kev + *np;
-	igraphdsortc_("SR", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1]);
+	igraphdsortc_("SR", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1], (
+		ftnlen)2);
     } else if (igraphs_cmp(which, "LR", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *kev + *np;
-	igraphdsortc_("LM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1]);
+	igraphdsortc_("LM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1], (
+		ftnlen)2);
     } else if (igraphs_cmp(which, "SR", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *kev + *np;
-	igraphdsortc_("SM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1]);
+	igraphdsortc_("SM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1], (
+		ftnlen)2);
     } else if (igraphs_cmp(which, "LI", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *kev + *np;
-	igraphdsortc_("LM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1]);
+	igraphdsortc_("LM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1], (
+		ftnlen)2);
     } else if (igraphs_cmp(which, "SI", (ftnlen)2, (ftnlen)2) == 0) {
 	i__1 = *kev + *np;
-	igraphdsortc_("SM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1]);
+	igraphdsortc_("SM", &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1], (
+		ftnlen)2);
     }
 
     i__1 = *kev + *np;
-    igraphdsortc_(which, &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1]);
+    igraphdsortc_(which, &c_true, &i__1, &ritzr[1], &ritzi[1], &bounds[1], (ftnlen)
+	    2);
 
 /*     %-------------------------------------------------------% */
 /*     | Increase KEV by one if the ( ritzr(np),ritzi(np) )    | */
@@ -280,24 +282,27 @@ static integer c__1 = 1;
 /*        | Be careful and use 'SR' since we want to sort BOUNDS! | */
 /*        %-------------------------------------------------------% */
 
-	igraphdsortc_("SR", &c_true, np, &bounds[1], &ritzr[1], &ritzi[1]);
+	igraphdsortc_("SR", &c_true, np, &bounds[1], &ritzr[1], &ritzi[1], (ftnlen)
+		2);
     }
 
     igraphsecond_(&t1);
     timing_1.tngets += t1 - t0;
 
     if (msglvl > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, kev, &debug_1.ndigit, "_ngets: KEV is");
-	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_ngets: NP is");
+	igraphivout_(&debug_1.logfil, &c__1, kev, &debug_1.ndigit, "_ngets: KEV is",
+		 (ftnlen)14);
+	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_ngets: NP is", (
+		ftnlen)13);
 	i__1 = *kev + *np;
-	igraphdvout_(&debug_1.logfil, &i__1, &ritzr[1], &debug_1.ndigit, "_ngets: "
-		"Eigenvalues of current H matrix -- real part");
+	igraphdvout_(&debug_1.logfil, &i__1, &ritzr[1], &debug_1.ndigit, "_ngets: \
+Eigenvalues of current H matrix -- real part", (ftnlen)52);
 	i__1 = *kev + *np;
-	igraphdvout_(&debug_1.logfil, &i__1, &ritzi[1], &debug_1.ndigit, "_ngets: "
-		"Eigenvalues of current H matrix -- imag part");
+	igraphdvout_(&debug_1.logfil, &i__1, &ritzi[1], &debug_1.ndigit, "_ngets: \
+Eigenvalues of current H matrix -- imag part", (ftnlen)52);
 	i__1 = *kev + *np;
-	igraphdvout_(&debug_1.logfil, &i__1, &bounds[1], &debug_1.ndigit, "_ngets:"
-		" Ritz estimates of the current KEV+NP Ritz values");
+	igraphdvout_(&debug_1.logfil, &i__1, &bounds[1], &debug_1.ndigit, "_ngets:\
+ Ritz estimates of the current KEV+NP Ritz values", (ftnlen)56);
     }
 
     return 0;

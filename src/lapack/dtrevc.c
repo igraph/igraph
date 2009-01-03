@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdtrevc.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -18,15 +11,26 @@
 
 static logical c_false = FALSE_;
 static integer c__1 = 1;
-static doublereal c_b22 = 1.;
-static doublereal c_b25 = 0.;
+static doublereal c_b23 = 1.;
+static doublereal c_b26 = 0.;
 static integer c__2 = 2;
 static logical c_true = TRUE_;
 
-/* Subroutine */ int igraphdtrevc_(char *side, char *howmny, logical *select, 
-	integer *n, doublereal *t, integer *ldt, doublereal *vl, integer *
-	ldvl, doublereal *vr, integer *ldvr, integer *mm, integer *m, 
-	doublereal *work, integer *info)
+/* Subroutine */ int igraphdtrevc_(side, howmny, select, n, t, ldt, vl, ldvl, vr, 
+	ldvr, mm, m, work, info, side_len, howmny_len)
+char *side, *howmny;
+logical *select;
+integer *n;
+doublereal *t;
+integer *ldt;
+doublereal *vl;
+integer *ldvl;
+doublereal *vr;
+integer *ldvr, *mm, *m;
+doublereal *work;
+integer *info;
+ftnlen side_len;
+ftnlen howmny_len;
 {
     /* System generated locals */
     integer t_dim1, t_offset, vl_dim1, vl_offset, vr_dim1, vr_offset, i__1, 
@@ -34,55 +38,47 @@ static logical c_true = TRUE_;
     doublereal d__1, d__2, d__3, d__4;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
-    static integer i__, j, k;
-    static doublereal x[4]	/* was [2][2] */;
-    static integer j1, j2, n2, ii, ki, ip, is;
-    static doublereal wi, wr, rec, ulp, beta, emax;
+    static doublereal beta, emax;
     static logical pair;
-    extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
+    extern doublereal igraphddot_();
     static logical allv;
     static integer ierr;
     static doublereal unfl, ovfl, smin;
     static logical over;
     static doublereal vmax;
-    static integer jnxt;
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
-	    integer *);
-    static doublereal scale;
-    extern logical igraphlsame_(char *, char *);
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *);
+    static integer jnxt, i__, j, k;
+    extern /* Subroutine */ int igraphdscal_();
+    static doublereal scale, x[4]	/* was [2][2] */;
+    extern logical igraphlsame_();
+    extern /* Subroutine */ int igraphdgemv_();
     static doublereal remax;
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *);
+    extern /* Subroutine */ int igraphdcopy_();
     static logical leftv, bothv;
-    extern /* Subroutine */ int igraphdaxpy_(integer *, doublereal *, doublereal *, 
-	    integer *, doublereal *, integer *);
+    extern /* Subroutine */ int igraphdaxpy_();
     static doublereal vcrit;
     static logical somev;
+    static integer j1, j2, n2;
     static doublereal xnorm;
-    extern /* Subroutine */ int igraphdlaln2_(logical *, integer *, integer *, 
-	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
-	     doublereal *, doublereal *, integer *, doublereal *, doublereal *
-	    , doublereal *, integer *, doublereal *, doublereal *, integer *),
-	     igraphdlabad_(doublereal *, doublereal *);
-    extern doublereal igraphdlamch_(char *);
-    extern integer igraphidamax_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphdlaln2_(), igraphdlabad_();
+    static integer ii, ki;
+    extern doublereal igraphdlamch_();
+    static integer ip, is;
+    static doublereal wi;
+    extern integer igraphidamax_();
+    static doublereal wr;
+    extern /* Subroutine */ int igraphxerbla_();
     static doublereal bignum;
     static logical rightv;
-    static doublereal smlnum;
+    static doublereal smlnum, rec, ulp;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
+/*  -- LAPACK routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*     September 30, 1994 */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -116,6 +112,7 @@ static logical c_true = TRUE_;
 /*  diagonal block is a complex conjugate pair of eigenvalues and */
 /*  eigenvectors; only one eigenvector of the pair is computed, namely */
 /*  the one corresponding to the eigenvalue with positive imaginary part. */
+
 
 /*  Arguments */
 /*  ========= */
@@ -159,15 +156,6 @@ static logical c_true = TRUE_;
 /*          of Schur vectors returned by DHSEQR). */
 /*          On exit, if SIDE = 'L' or 'B', VL contains: */
 /*          if HOWMNY = 'A', the matrix Y of left eigenvectors of T; */
-/*                           VL has the same quasi-lower triangular form */
-/*                           as T'. If T(i,i) is a real eigenvalue, then */
-/*                           the i-th column VL(i) of VL  is its */
-/*                           corresponding eigenvector. If T(i:i+1,i:i+1) */
-/*                           is a 2-by-2 block whose eigenvalues are */
-/*                           complex-conjugate eigenvalues of T, then */
-/*                           VL(i)+sqrt(-1)*VL(i+1) is the complex */
-/*                           eigenvector corresponding to the eigenvalue */
-/*                           with positive real part. */
 /*          if HOWMNY = 'B', the matrix Q*Y; */
 /*          if HOWMNY = 'S', the left eigenvectors of T specified by */
 /*                           SELECT, stored consecutively in the columns */
@@ -188,15 +176,6 @@ static logical c_true = TRUE_;
 /*          of Schur vectors returned by DHSEQR). */
 /*          On exit, if SIDE = 'R' or 'B', VR contains: */
 /*          if HOWMNY = 'A', the matrix X of right eigenvectors of T; */
-/*                           VR has the same quasi-upper triangular form */
-/*                           as T. If T(i,i) is a real eigenvalue, then */
-/*                           the i-th column VR(i) of VR  is its */
-/*                           corresponding eigenvector. If T(i:i+1,i:i+1) */
-/*                           is a 2-by-2 block whose eigenvalues are */
-/*                           complex-conjugate eigenvalues of T, then */
-/*                           VR(i)+sqrt(-1)*VR(i+1) is the complex */
-/*                           eigenvector corresponding to the eigenvalue */
-/*                           with positive real part. */
 /*          if HOWMNY = 'B', the matrix Q*X; */
 /*          if HOWMNY = 'S', the right eigenvectors of T specified by */
 /*                           SELECT, stored consecutively in the columns */
@@ -259,24 +238,25 @@ static logical c_true = TRUE_;
     /* Parameter adjustments */
     --select;
     t_dim1 = *ldt;
-    t_offset = 1 + t_dim1;
+    t_offset = 1 + t_dim1 * 1;
     t -= t_offset;
     vl_dim1 = *ldvl;
-    vl_offset = 1 + vl_dim1;
+    vl_offset = 1 + vl_dim1 * 1;
     vl -= vl_offset;
     vr_dim1 = *ldvr;
-    vr_offset = 1 + vr_dim1;
+    vr_offset = 1 + vr_dim1 * 1;
     vr -= vr_offset;
     --work;
 
     /* Function Body */
-    bothv = igraphlsame_(side, "B");
-    rightv = igraphlsame_(side, "R") || bothv;
-    leftv = igraphlsame_(side, "L") || bothv;
+    bothv = igraphlsame_(side, "B", (ftnlen)1, (ftnlen)1);
+    rightv = igraphlsame_(side, "R", (ftnlen)1, (ftnlen)1) || bothv;
+    leftv = igraphlsame_(side, "L", (ftnlen)1, (ftnlen)1) || bothv;
 
-    allv = igraphlsame_(howmny, "A");
-    over = igraphlsame_(howmny, "B");
-    somev = igraphlsame_(howmny, "S");
+    allv = igraphlsame_(howmny, "A", (ftnlen)1, (ftnlen)1);
+    over = igraphlsame_(howmny, "B", (ftnlen)1, (ftnlen)1) || igraphlsame_(howmny, "O", (
+	    ftnlen)1, (ftnlen)1);
+    somev = igraphlsame_(howmny, "S", (ftnlen)1, (ftnlen)1);
 
     *info = 0;
     if (! rightv && ! leftv) {
@@ -287,9 +267,9 @@ static logical c_true = TRUE_;
 	*info = -4;
     } else if (*ldt < max(1,*n)) {
 	*info = -6;
-    } else if (*ldvl < 1 || (leftv && *ldvl < *n)) {
+    } else if (*ldvl < 1 || leftv && *ldvl < *n) {
 	*info = -8;
-    } else if (*ldvr < 1 || (rightv && *ldvr < *n)) {
+    } else if (*ldvr < 1 || rightv && *ldvr < *n) {
 	*info = -10;
     } else {
 
@@ -336,7 +316,7 @@ static logical c_true = TRUE_;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DTREVC", &i__1);
+	igraphxerbla_("DTREVC", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -348,10 +328,10 @@ static logical c_true = TRUE_;
 
 /*     Set the constants to control overflow. */
 
-    unfl = igraphdlamch_("Safe minimum");
+    unfl = igraphdlamch_("Safe minimum", (ftnlen)12);
     ovfl = 1. / unfl;
     igraphdlabad_(&unfl, &ovfl);
-    ulp = igraphdlamch_("Precision");
+    ulp = igraphdlamch_("Precision", (ftnlen)9);
     smlnum = unfl * (*n / ulp);
     bignum = (1. - ulp) / smlnum;
 
@@ -457,9 +437,9 @@ L40:
 
 /*                    1-by-1 diagonal block */
 
-			igraphdlaln2_(&c_false, &c__1, &c__1, &smin, &c_b22, &t[j + 
-				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
-				n], n, &wr, &c_b25, x, &c__2, &scale, &xnorm, 
+			igraphdlaln2_(&c_false, &c__1, &c__1, &smin, &c_b23, &t[j + 
+				j * t_dim1], ldt, &c_b23, &c_b23, &work[j + *
+				n], n, &wr, &c_b26, x, &c__2, &scale, &xnorm, 
 				&ierr);
 
 /*                    Scale X(1,1) to avoid overflow when updating */
@@ -490,9 +470,9 @@ L40:
 
 /*                    2-by-2 diagonal block */
 
-			igraphdlaln2_(&c_false, &c__2, &c__1, &smin, &c_b22, &t[j - 
-				1 + (j - 1) * t_dim1], ldt, &c_b22, &c_b22, &
-				work[j - 1 + *n], n, &wr, &c_b25, x, &c__2, &
+			igraphdlaln2_(&c_false, &c__2, &c__1, &smin, &c_b23, &t[j - 
+				1 + (j - 1) * t_dim1], ldt, &c_b23, &c_b23, &
+				work[j - 1 + *n], n, &wr, &c_b26, x, &c__2, &
 				scale, &xnorm, &ierr);
 
 /*                    Scale X(1,1) and X(2,1) to avoid overflow when */
@@ -550,9 +530,9 @@ L60:
 		} else {
 		    if (ki > 1) {
 			i__1 = ki - 1;
-			igraphdgemv_("N", n, &i__1, &c_b22, &vr[vr_offset], ldvr, &
+			igraphdgemv_("N", n, &i__1, &c_b23, &vr[vr_offset], ldvr, &
 				work[*n + 1], &c__1, &work[ki + *n], &vr[ki * 
-				vr_dim1 + 1], &c__1);
+				vr_dim1 + 1], &c__1, (ftnlen)1);
 		    }
 
 		    ii = igraphidamax_(n, &vr[ki * vr_dim1 + 1], &c__1);
@@ -611,8 +591,8 @@ L60:
 
 /*                    1-by-1 diagonal block */
 
-			igraphdlaln2_(&c_false, &c__1, &c__2, &smin, &c_b22, &t[j + 
-				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
+			igraphdlaln2_(&c_false, &c__1, &c__2, &smin, &c_b23, &t[j + 
+				j * t_dim1], ldt, &c_b23, &c_b23, &work[j + *
 				n], n, &wr, &wi, x, &c__2, &scale, &xnorm, &
 				ierr);
 
@@ -651,8 +631,8 @@ L60:
 
 /*                    2-by-2 diagonal block */
 
-			igraphdlaln2_(&c_false, &c__2, &c__2, &smin, &c_b22, &t[j - 
-				1 + (j - 1) * t_dim1], ldt, &c_b22, &c_b22, &
+			igraphdlaln2_(&c_false, &c__2, &c__2, &smin, &c_b23, &t[j - 
+				1 + (j - 1) * t_dim1], ldt, &c_b23, &c_b23, &
 				work[j - 1 + *n], n, &wr, &wi, x, &c__2, &
 				scale, &xnorm, &ierr);
 
@@ -741,13 +721,13 @@ L90:
 
 		    if (ki > 2) {
 			i__1 = ki - 2;
-			igraphdgemv_("N", n, &i__1, &c_b22, &vr[vr_offset], ldvr, &
+			igraphdgemv_("N", n, &i__1, &c_b23, &vr[vr_offset], ldvr, &
 				work[*n + 1], &c__1, &work[ki - 1 + *n], &vr[(
-				ki - 1) * vr_dim1 + 1], &c__1);
+				ki - 1) * vr_dim1 + 1], &c__1, (ftnlen)1);
 			i__1 = ki - 2;
-			igraphdgemv_("N", n, &i__1, &c_b22, &vr[vr_offset], ldvr, &
+			igraphdgemv_("N", n, &i__1, &c_b23, &vr[vr_offset], ldvr, &
 				work[n2 + 1], &c__1, &work[ki + n2], &vr[ki * 
-				vr_dim1 + 1], &c__1);
+				vr_dim1 + 1], &c__1, (ftnlen)1);
 		    } else {
 			igraphdscal_(n, &work[ki - 1 + *n], &vr[(ki - 1) * vr_dim1 
 				+ 1], &c__1);
@@ -882,9 +862,9 @@ L150:
 
 /*                    Solve (T(J,J)-WR)'*X = WORK */
 
-			igraphdlaln2_(&c_false, &c__1, &c__1, &smin, &c_b22, &t[j + 
-				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
-				n], n, &wr, &c_b25, x, &c__2, &scale, &xnorm, 
+			igraphdlaln2_(&c_false, &c__1, &c__1, &smin, &c_b23, &t[j + 
+				j * t_dim1], ldt, &c_b23, &c_b23, &work[j + *
+				n], n, &wr, &c_b26, x, &c__2, &scale, &xnorm, 
 				&ierr);
 
 /*                    Scale if necessary */
@@ -929,9 +909,9 @@ L150:
 /*                      [T(J,J)-WR   T(J,J+1)     ]'* X = SCALE*( WORK1 ) */
 /*                      [T(J+1,J)    T(J+1,J+1)-WR]             ( WORK2 ) */
 
-			igraphdlaln2_(&c_true, &c__2, &c__1, &smin, &c_b22, &t[j + 
-				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
-				n], n, &wr, &c_b25, x, &c__2, &scale, &xnorm, 
+			igraphdlaln2_(&c_true, &c__2, &c__1, &smin, &c_b23, &t[j + 
+				j * t_dim1], ldt, &c_b23, &c_b23, &work[j + *
+				n], n, &wr, &c_b26, x, &c__2, &scale, &xnorm, 
 				&ierr);
 
 /*                    Scale if necessary */
@@ -979,9 +959,10 @@ L170:
 
 		    if (ki < *n) {
 			i__2 = *n - ki;
-			igraphdgemv_("N", n, &i__2, &c_b22, &vl[(ki + 1) * vl_dim1 
+			igraphdgemv_("N", n, &i__2, &c_b23, &vl[(ki + 1) * vl_dim1 
 				+ 1], ldvl, &work[ki + 1 + *n], &c__1, &work[
-				ki + *n], &vl[ki * vl_dim1 + 1], &c__1);
+				ki + *n], &vl[ki * vl_dim1 + 1], &c__1, (
+				ftnlen)1);
 		    }
 
 		    ii = igraphidamax_(n, &vl[ki * vl_dim1 + 1], &c__1);
@@ -1068,8 +1049,8 @@ L170:
 /*                    Solve (T(J,J)-(WR-i*WI))*(X11+i*X12)= WK+I*WK2 */
 
 			d__1 = -wi;
-			igraphdlaln2_(&c_false, &c__1, &c__2, &smin, &c_b22, &t[j + 
-				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
+			igraphdlaln2_(&c_false, &c__1, &c__2, &smin, &c_b23, &t[j + 
+				j * t_dim1], ldt, &c_b23, &c_b23, &work[j + *
 				n], n, &wr, &d__1, x, &c__2, &scale, &xnorm, &
 				ierr);
 
@@ -1131,8 +1112,8 @@ L170:
 /*                      ([T(j+1,j) T(j+1,j+1)]             ) */
 
 			d__1 = -wi;
-			igraphdlaln2_(&c_true, &c__2, &c__2, &smin, &c_b22, &t[j + 
-				j * t_dim1], ldt, &c_b22, &c_b22, &work[j + *
+			igraphdlaln2_(&c_true, &c__2, &c__2, &smin, &c_b23, &t[j + 
+				j * t_dim1], ldt, &c_b23, &c_b23, &work[j + *
 				n], n, &wr, &d__1, x, &c__2, &scale, &xnorm, &
 				ierr);
 
@@ -1197,14 +1178,15 @@ L200:
 		} else {
 		    if (ki < *n - 1) {
 			i__2 = *n - ki - 1;
-			igraphdgemv_("N", n, &i__2, &c_b22, &vl[(ki + 2) * vl_dim1 
+			igraphdgemv_("N", n, &i__2, &c_b23, &vl[(ki + 2) * vl_dim1 
 				+ 1], ldvl, &work[ki + 2 + *n], &c__1, &work[
-				ki + *n], &vl[ki * vl_dim1 + 1], &c__1);
+				ki + *n], &vl[ki * vl_dim1 + 1], &c__1, (
+				ftnlen)1);
 			i__2 = *n - ki - 1;
-			igraphdgemv_("N", n, &i__2, &c_b22, &vl[(ki + 2) * vl_dim1 
+			igraphdgemv_("N", n, &i__2, &c_b23, &vl[(ki + 2) * vl_dim1 
 				+ 1], ldvl, &work[ki + 2 + n2], &c__1, &work[
 				ki + 1 + n2], &vl[(ki + 1) * vl_dim1 + 1], &
-				c__1);
+				c__1, (ftnlen)1);
 		    } else {
 			igraphdscal_(n, &work[ki + *n], &vl[ki * vl_dim1 + 1], &
 				c__1);

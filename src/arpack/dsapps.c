@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dsapps.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -154,10 +147,10 @@ static doublereal c_b20 = -1.;
 /*     Houston, Texas */
 
 /* \Revision history: */
-/*     12/16/93: Version ' 2.4' */
+/*     12/16/93: Version ' 2.1' */
 
 /* \SCCS Information: @(#) */
-/* FILE: sapps.F   SID: 2.6   DATE OF SID: 3/28/97   RELEASE: 2 */
+/* FILE: sapps.F   SID: 2.5   DATE OF SID: 4/19/96   RELEASE: 2 */
 
 /* \Remarks */
 /*  1. In this version, each shift is applied to all the subblocks of */
@@ -171,10 +164,16 @@ static doublereal c_b20 = -1.;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdsapps_(integer *n, integer *kev, integer *np, 
-	doublereal *shift, doublereal *v, integer *ldv, doublereal *h__, 
-	integer *ldh, doublereal *resid, doublereal *q, integer *ldq, 
-	doublereal *workd)
+/* Subroutine */ int igraphdsapps_(n, kev, np, shift, v, ldv, h__, ldh, resid, q, 
+	ldq, workd)
+integer *n, *kev, *np;
+doublereal *shift, *v;
+integer *ldv;
+doublereal *h__;
+integer *ldh;
+doublereal *resid, *q;
+integer *ldq;
+doublereal *workd;
 {
     /* Initialized data */
 
@@ -186,31 +185,22 @@ static doublereal c_b20 = -1.;
     doublereal d__1, d__2;
 
     /* Local variables */
+    static integer iend, itop;
     static doublereal c__, f, g;
     static integer i__, j;
-    static doublereal r__, s, a1, a2, a3, a4;
+    static doublereal r__, s;
+    extern /* Subroutine */ int igraphdscal_(), igraphdgemv_(), igraphdcopy_();
+    static doublereal a1, a2, a3, a4;
+    extern /* Subroutine */ int igraphdaxpy_(), igraphdvout_();
     static real t0, t1;
+    extern /* Subroutine */ int igraphivout_();
     static integer jj;
-    static doublereal big;
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, 
-	    doublereal *, integer *), igraphdgemv_(char *, integer *, integer 
-	    *, doublereal *, doublereal *, integer *, doublereal *, integer *,
-	     doublereal *, doublereal *, integer *), igraphdcopy_(
-	    integer *, doublereal *, integer *, doublereal *, integer *), 
-	    igraphdaxpy_(integer *, doublereal *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdvout_(integer *, integer *, 
-	    doublereal *, integer *, char *), igraphivout_(integer *, 
-	    integer *, integer *, integer *, char *);
-    static integer iend, itop;
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdlacpy_(char *, 
-	    integer *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *), igraphdlartg_(doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *), igraphdlaset_(char *, 
-	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
-	    integer *);
+    extern doublereal igraphdlamch_();
+    extern /* Subroutine */ int igraphsecond_();
     static doublereal epsmch;
     static integer istart, kplusp, msglvl;
+    extern /* Subroutine */ int igraphdlacpy_(), igraphdlartg_(), igraphdlaset_();
+    static doublereal big;
 
 
 /*     %----------------------------------------------------% */
@@ -278,13 +268,13 @@ static doublereal c_b20 = -1.;
     --resid;
     --shift;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
 
     /* Function Body */
@@ -294,7 +284,7 @@ static doublereal c_b20 = -1.;
 /*     %-----------------------% */
 
     if (first) {
-	epsmch = igraphdlamch_("Epsilon-Machine");
+	epsmch = igraphdlamch_("Epsilon-Machine", (ftnlen)15);
 	first = FALSE_;
     }
     itop = 1;
@@ -314,7 +304,8 @@ static doublereal c_b20 = -1.;
 /*     | kplusp used to accumulate the rotations.     | */
 /*     %----------------------------------------------% */
 
-    igraphdlaset_("All", &kplusp, &kplusp, &c_b4, &c_b5, &q[q_offset], ldq);
+    igraphdlaset_("All", &kplusp, &kplusp, &c_b4, &c_b5, &q[q_offset], ldq, (ftnlen)
+	    3);
 
 /*     %----------------------------------------------% */
 /*     | Quick return if there are no shifts to apply | */
@@ -357,14 +348,15 @@ L20:
 		    i__ + 1 + (h_dim1 << 1)], abs(d__2));
 	    if (h__[i__ + 1 + h_dim1] <= epsmch * big) {
 		if (msglvl > 0) {
-		    igraphivout_(&debug_1.logfil, &c__1, &i__, &
-			    debug_1.ndigit, "_sapps: deflation at row/column"
-			    " no.");
-		    igraphivout_(&debug_1.logfil, &c__1, &jj, &debug_1.ndigit,
-			     "_sapps: occured before shift number.");
-		    igraphdvout_(&debug_1.logfil, &c__1, &h__[i__ + 1 + 
-			    h_dim1], &debug_1.ndigit, "_sapps: the correspon"
-			    "ding off diagonal element");
+		    igraphivout_(&debug_1.logfil, &c__1, &i__, &debug_1.ndigit, 
+			    "_sapps: deflation at row/column no.", (ftnlen)35)
+			    ;
+		    igraphivout_(&debug_1.logfil, &c__1, &jj, &debug_1.ndigit, 
+			    "_sapps: occured before shift number.", (ftnlen)
+			    36);
+		    igraphdvout_(&debug_1.logfil, &c__1, &h__[i__ + 1 + h_dim1], &
+			    debug_1.ndigit, "_sapps: the corresponding off d\
+iagonal element", (ftnlen)46);
 		}
 		h__[i__ + 1 + h_dim1] = 0.;
 		iend = i__;
@@ -487,7 +479,7 @@ L40:
 /*               %----------------------------------------------------% */
 
 /* Computing MIN */
-		i__4 = i__ + jj;
+		i__4 = j + jj;
 		i__3 = min(i__4,kplusp);
 		for (j = 1; j <= i__3; ++j) {
 		    a1 = c__ * q[j + i__ * q_dim1] + s * q[j + (i__ + 1) * 
@@ -563,11 +555,11 @@ L90:
 		+ 1 + (h_dim1 << 1)], abs(d__2));
 	if (h__[i__ + 1 + h_dim1] <= epsmch * big) {
 	    if (msglvl > 0) {
-		igraphivout_(&debug_1.logfil, &c__1, &i__, &debug_1.ndigit, 
-			"_sapps: deflation at row/column no.");
+		igraphivout_(&debug_1.logfil, &c__1, &i__, &debug_1.ndigit, "_sapp\
+s: deflation at row/column no.", (ftnlen)35);
 		igraphdvout_(&debug_1.logfil, &c__1, &h__[i__ + 1 + h_dim1], &
-			debug_1.ndigit, "_sapps: the corresponding off diago"
-			"nal element");
+			debug_1.ndigit, "_sapps: the corresponding off diago\
+nal element", (ftnlen)46);
 	    }
 	    h__[i__ + 1 + h_dim1] = 0.;
 	}
@@ -581,9 +573,8 @@ L90:
 /*     %-------------------------------------------------% */
 
     if (h__[*kev + 1 + h_dim1] > 0.) {
-	igraphdgemv_("N", n, &kplusp, &c_b5, &v[v_offset], ldv, &q[(*kev + 1) 
-		* q_dim1 + 1], &c__1, &c_b4, &workd[*n + 1], &c__1)
-		;
+	igraphdgemv_("N", n, &kplusp, &c_b5, &v[v_offset], ldv, &q[(*kev + 1) * 
+		q_dim1 + 1], &c__1, &c_b4, &workd[*n + 1], &c__1, (ftnlen)1);
     }
 
 /*     %-------------------------------------------------------% */
@@ -596,11 +587,10 @@ L90:
     i__1 = *kev;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = kplusp - i__ + 1;
-	igraphdgemv_("N", n, &i__2, &c_b5, &v[v_offset], ldv, &q[(*kev - i__ 
-		+ 1) * q_dim1 + 1], &c__1, &c_b4, &workd[1], &c__1)
-		;
-	igraphdcopy_(n, &workd[1], &c__1, &v[(kplusp - i__ + 1) * v_dim1 + 1],
-		 &c__1);
+	igraphdgemv_("N", n, &i__2, &c_b5, &v[v_offset], ldv, &q[(*kev - i__ + 1) * 
+		q_dim1 + 1], &c__1, &c_b4, &workd[1], &c__1, (ftnlen)1);
+	igraphdcopy_(n, &workd[1], &c__1, &v[(kplusp - i__ + 1) * v_dim1 + 1], &
+		c__1);
 /* L130: */
     }
 
@@ -608,8 +598,8 @@ L90:
 /*     |  Move v(:,kplusp-kev+1:kplusp) into v(:,1:kev). | */
 /*     %-------------------------------------------------% */
 
-    igraphdlacpy_("All", n, kev, &v[(*np + 1) * v_dim1 + 1], ldv, &v[v_offset]
-	    , ldv);
+    igraphdlacpy_("All", n, kev, &v[(*np + 1) * v_dim1 + 1], ldv, &v[v_offset], ldv,
+	     (ftnlen)3);
 
 /*     %--------------------------------------------% */
 /*     | Copy the (kev+1)-st column of (V*Q) in the | */
@@ -617,8 +607,7 @@ L90:
 /*     %--------------------------------------------% */
 
     if (h__[*kev + 1 + h_dim1] > 0.) {
-	igraphdcopy_(n, &workd[*n + 1], &c__1, &v[(*kev + 1) * v_dim1 + 1], &
-		c__1);
+	igraphdcopy_(n, &workd[*n + 1], &c__1, &v[(*kev + 1) * v_dim1 + 1], &c__1);
     }
 
 /*     %-------------------------------------% */
@@ -631,25 +620,25 @@ L90:
 
     igraphdscal_(n, &q[kplusp + *kev * q_dim1], &resid[1], &c__1);
     if (h__[*kev + 1 + h_dim1] > 0.) {
-	igraphdaxpy_(n, &h__[*kev + 1 + h_dim1], &v[(*kev + 1) * v_dim1 + 1], 
-		&c__1, &resid[1], &c__1);
+	igraphdaxpy_(n, &h__[*kev + 1 + h_dim1], &v[(*kev + 1) * v_dim1 + 1], &c__1,
+		 &resid[1], &c__1);
     }
 
     if (msglvl > 1) {
 	igraphdvout_(&debug_1.logfil, &c__1, &q[kplusp + *kev * q_dim1], &
-		debug_1.ndigit, "_sapps: sigmak of the updated residual vect"
-		"or");
+		debug_1.ndigit, "_sapps: sigmak of the updated residual vect\
+or", (ftnlen)45);
 	igraphdvout_(&debug_1.logfil, &c__1, &h__[*kev + 1 + h_dim1], &
 		debug_1.ndigit, "_sapps: betak of the updated residual vector"
-		);
-	igraphdvout_(&debug_1.logfil, kev, &h__[(h_dim1 << 1) + 1], &
-		debug_1.ndigit, "_sapps: updated main diagonal of H for next"
-		" iteration");
+		, (ftnlen)44);
+	igraphdvout_(&debug_1.logfil, kev, &h__[(h_dim1 << 1) + 1], &debug_1.ndigit,
+		 "_sapps: updated main diagonal of H for next iteration", (
+		ftnlen)53);
 	if (*kev > 1) {
 	    i__1 = *kev - 1;
-	    igraphdvout_(&debug_1.logfil, &i__1, &h__[h_dim1 + 2], &
-		    debug_1.ndigit, "_sapps: updated sub diagonal of H for n"
-		    "ext iteration");
+	    igraphdvout_(&debug_1.logfil, &i__1, &h__[h_dim1 + 2], &debug_1.ndigit, 
+		    "_sapps: updated sub diagonal of H for next iteration", (
+		    ftnlen)52);
 	}
     }
 

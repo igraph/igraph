@@ -1,35 +1,35 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlasr.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdlasr_(char *side, char *pivot, char *direct, integer *m,
-	 integer *n, doublereal *c__, doublereal *s, doublereal *a, integer *
-	lda)
+/* Subroutine */ int igraphdlasr_(side, pivot, direct, m, n, c__, s, a, lda, 
+	side_len, pivot_len, direct_len)
+char *side, *pivot, *direct;
+integer *m, *n;
+doublereal *c__, *s, *a;
+integer *lda;
+ftnlen side_len;
+ftnlen pivot_len;
+ftnlen direct_len;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, info;
+    static integer info;
     static doublereal temp;
-    extern logical igraphlsame_(char *, char *);
+    static integer i__, j;
+    extern logical igraphlsame_();
     static doublereal ctemp, stemp;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_();
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -147,18 +147,20 @@
     --c__;
     --s;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
     info = 0;
-    if (! (igraphlsame_(side, "L") || igraphlsame_(side, "R"))) {
+    if (! (igraphlsame_(side, "L", (ftnlen)1, (ftnlen)1) || igraphlsame_(side, "R", (
+	    ftnlen)1, (ftnlen)1))) {
 	info = 1;
-    } else if (! (igraphlsame_(pivot, "V") || igraphlsame_(pivot, 
-	    "T") || igraphlsame_(pivot, "B"))) {
+    } else if (! (igraphlsame_(pivot, "V", (ftnlen)1, (ftnlen)1) || igraphlsame_(pivot, 
+	    "T", (ftnlen)1, (ftnlen)1) || igraphlsame_(pivot, "B", (ftnlen)1, (
+	    ftnlen)1))) {
 	info = 2;
-    } else if (! (igraphlsame_(direct, "F") || igraphlsame_(direct, 
-	    "B"))) {
+    } else if (! (igraphlsame_(direct, "F", (ftnlen)1, (ftnlen)1) || igraphlsame_(direct, 
+	    "B", (ftnlen)1, (ftnlen)1))) {
 	info = 3;
     } else if (*m < 0) {
 	info = 4;
@@ -168,7 +170,7 @@
 	info = 9;
     }
     if (info != 0) {
-	igraphxerbla_("DLASR ", &info);
+	igraphxerbla_("DLASR ", &info, (ftnlen)6);
 	return 0;
     }
 
@@ -177,12 +179,12 @@
     if (*m == 0 || *n == 0) {
 	return 0;
     }
-    if (igraphlsame_(side, "L")) {
+    if (igraphlsame_(side, "L", (ftnlen)1, (ftnlen)1)) {
 
 /*        Form  P * A */
 
-	if (igraphlsame_(pivot, "V")) {
-	    if (igraphlsame_(direct, "F")) {
+	if (igraphlsame_(pivot, "V", (ftnlen)1, (ftnlen)1)) {
+	    if (igraphlsame_(direct, "F", (ftnlen)1, (ftnlen)1)) {
 		i__1 = *m - 1;
 		for (j = 1; j <= i__1; ++j) {
 		    ctemp = c__[j];
@@ -200,7 +202,7 @@
 		    }
 /* L20: */
 		}
-	    } else if (igraphlsame_(direct, "B")) {
+	    } else if (igraphlsame_(direct, "B", (ftnlen)1, (ftnlen)1)) {
 		for (j = *m - 1; j >= 1; --j) {
 		    ctemp = c__[j];
 		    stemp = s[j];
@@ -218,8 +220,8 @@
 /* L40: */
 		}
 	    }
-	} else if (igraphlsame_(pivot, "T")) {
-	    if (igraphlsame_(direct, "F")) {
+	} else if (igraphlsame_(pivot, "T", (ftnlen)1, (ftnlen)1)) {
+	    if (igraphlsame_(direct, "F", (ftnlen)1, (ftnlen)1)) {
 		i__1 = *m;
 		for (j = 2; j <= i__1; ++j) {
 		    ctemp = c__[j - 1];
@@ -237,7 +239,7 @@
 		    }
 /* L60: */
 		}
-	    } else if (igraphlsame_(direct, "B")) {
+	    } else if (igraphlsame_(direct, "B", (ftnlen)1, (ftnlen)1)) {
 		for (j = *m; j >= 2; --j) {
 		    ctemp = c__[j - 1];
 		    stemp = s[j - 1];
@@ -255,8 +257,8 @@
 /* L80: */
 		}
 	    }
-	} else if (igraphlsame_(pivot, "B")) {
-	    if (igraphlsame_(direct, "F")) {
+	} else if (igraphlsame_(pivot, "B", (ftnlen)1, (ftnlen)1)) {
+	    if (igraphlsame_(direct, "F", (ftnlen)1, (ftnlen)1)) {
 		i__1 = *m - 1;
 		for (j = 1; j <= i__1; ++j) {
 		    ctemp = c__[j];
@@ -274,7 +276,7 @@
 		    }
 /* L100: */
 		}
-	    } else if (igraphlsame_(direct, "B")) {
+	    } else if (igraphlsame_(direct, "B", (ftnlen)1, (ftnlen)1)) {
 		for (j = *m - 1; j >= 1; --j) {
 		    ctemp = c__[j];
 		    stemp = s[j];
@@ -293,12 +295,12 @@
 		}
 	    }
 	}
-    } else if (igraphlsame_(side, "R")) {
+    } else if (igraphlsame_(side, "R", (ftnlen)1, (ftnlen)1)) {
 
 /*        Form A * P' */
 
-	if (igraphlsame_(pivot, "V")) {
-	    if (igraphlsame_(direct, "F")) {
+	if (igraphlsame_(pivot, "V", (ftnlen)1, (ftnlen)1)) {
+	    if (igraphlsame_(direct, "F", (ftnlen)1, (ftnlen)1)) {
 		i__1 = *n - 1;
 		for (j = 1; j <= i__1; ++j) {
 		    ctemp = c__[j];
@@ -316,7 +318,7 @@
 		    }
 /* L140: */
 		}
-	    } else if (igraphlsame_(direct, "B")) {
+	    } else if (igraphlsame_(direct, "B", (ftnlen)1, (ftnlen)1)) {
 		for (j = *n - 1; j >= 1; --j) {
 		    ctemp = c__[j];
 		    stemp = s[j];
@@ -334,8 +336,8 @@
 /* L160: */
 		}
 	    }
-	} else if (igraphlsame_(pivot, "T")) {
-	    if (igraphlsame_(direct, "F")) {
+	} else if (igraphlsame_(pivot, "T", (ftnlen)1, (ftnlen)1)) {
+	    if (igraphlsame_(direct, "F", (ftnlen)1, (ftnlen)1)) {
 		i__1 = *n;
 		for (j = 2; j <= i__1; ++j) {
 		    ctemp = c__[j - 1];
@@ -353,7 +355,7 @@
 		    }
 /* L180: */
 		}
-	    } else if (igraphlsame_(direct, "B")) {
+	    } else if (igraphlsame_(direct, "B", (ftnlen)1, (ftnlen)1)) {
 		for (j = *n; j >= 2; --j) {
 		    ctemp = c__[j - 1];
 		    stemp = s[j - 1];
@@ -371,8 +373,8 @@
 /* L200: */
 		}
 	    }
-	} else if (igraphlsame_(pivot, "B")) {
-	    if (igraphlsame_(direct, "F")) {
+	} else if (igraphlsame_(pivot, "B", (ftnlen)1, (ftnlen)1)) {
+	    if (igraphlsame_(direct, "F", (ftnlen)1, (ftnlen)1)) {
 		i__1 = *n - 1;
 		for (j = 1; j <= i__1; ++j) {
 		    ctemp = c__[j];
@@ -390,7 +392,7 @@
 		    }
 /* L220: */
 		}
-	    } else if (igraphlsame_(direct, "B")) {
+	    } else if (igraphlsame_(direct, "B", (ftnlen)1, (ftnlen)1)) {
 		for (j = *n - 1; j >= 1; --j) {
 		    ctemp = c__[j];
 		    stemp = s[j];

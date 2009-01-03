@@ -1,20 +1,16 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* lsame.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-logical igraphlsame_(char *ca, char *cb)
+logical igraphlsame_(ca, cb, ca_len, cb_len)
+char *ca, *cb;
+ftnlen ca_len;
+ftnlen cb_len;
 {
     /* System generated locals */
     logical ret_val;
@@ -23,7 +19,7 @@ logical igraphlsame_(char *ca, char *cb)
     static integer inta, intb, zcode;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     September 30, 1994 */
@@ -88,12 +84,12 @@ logical igraphlsame_(char *ca, char *cb)
 /*        EBCDIC is assumed - ZCODE is the EBCDIC code of either lower or */
 /*        upper case 'Z'. */
 
-	if ( (inta >= 129 && inta <= 137) || (inta >= 145 && inta <= 153) || 
-	     (inta >= 162 && inta <= 169) ) {
+	if (inta >= 129 && inta <= 137 || inta >= 145 && inta <= 153 || inta 
+		>= 162 && inta <= 169) {
 	    inta += 64;
 	}
-	if ( (intb >= 129 && intb <= 137) || (intb >= 145 && intb <= 153) || 
-	     (intb >= 162 && intb <= 169) ) {
+	if (intb >= 129 && intb <= 137 || intb >= 145 && intb <= 153 || intb 
+		>= 162 && intb <= 169) {
 	    intb += 64;
 	}
 

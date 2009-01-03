@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlanv2.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,28 +9,27 @@
 
 /* Table of constant values */
 
-static doublereal c_b4 = 1.;
+static doublereal c_b3 = 1.;
 
-/* Subroutine */ int igraphdlanv2_(doublereal *a, doublereal *b, doublereal *c__, 
-	doublereal *d__, doublereal *rt1r, doublereal *rt1i, doublereal *rt2r,
-	 doublereal *rt2i, doublereal *cs, doublereal *sn)
+/* Subroutine */ int igraphdlanv2_(a, b, c__, d__, rt1r, rt1i, rt2r, rt2i, cs, sn)
+doublereal *a, *b, *c__, *d__, *rt1r, *rt1i, *rt2r, *rt2i, *cs, *sn;
 {
     /* System generated locals */
-    doublereal d__1, d__2;
+    doublereal d__1;
 
     /* Builtin functions */
-    double igraphd_sign(doublereal *, doublereal *), sqrt(doublereal);
+    double igraphd_sign(), sqrt();
 
     /* Local variables */
-    static doublereal p, z__, aa, bb, cc, dd, cs1, sn1, sab, sac, eps, tau, 
-	    temp, scale, bcmax, bcmis, sigma;
-    extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
+    static doublereal temp, p, sigma;
+    extern doublereal igraphdlapy2_();
+    static doublereal aa, bb, cc, dd, cs1, sn1, sab, sac, tau;
 
 
-/*  -- LAPACK driver routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*     September 30, 1994 */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -72,19 +64,12 @@ static doublereal c_b4 = 1.;
 /*  RT2R    (output) DOUBLE PRECISION */
 /*  RT2I    (output) DOUBLE PRECISION */
 /*          The real and imaginary parts of the eigenvalues. If the */
+/*          eigenvalues are both real, abs(RT1R) >= abs(RT2R); if the */
 /*          eigenvalues are a complex conjugate pair, RT1I > 0. */
 
 /*  CS      (output) DOUBLE PRECISION */
 /*  SN      (output) DOUBLE PRECISION */
 /*          Parameters of the rotation matrix. */
-
-/*  Further Details */
-/*  =============== */
-
-/*  Modified by V. Sima, Research Institute for Informatics, Bucharest, */
-/*  Romania, to reduce the risk of cancellation errors, */
-/*  when computing real eigenvalues, and to ensure, if possible, that */
-/*  abs(RT1R) >= abs(RT2R). */
 
 /*  ===================================================================== */
 
@@ -98,10 +83,12 @@ static doublereal c_b4 = 1.;
 /*     .. */
 /*     .. Executable Statements .. */
 
-    eps = igraphdlamch_("P");
+/*     Initialize CS and SN */
+
+    *cs = 1.;
+    *sn = 0.;
+
     if (*c__ == 0.) {
-	*cs = 1.;
-	*sn = 0.;
 	goto L10;
 
     } else if (*b == 0.) {
@@ -116,105 +103,74 @@ static doublereal c_b4 = 1.;
 	*b = -(*c__);
 	*c__ = 0.;
 	goto L10;
-    } else if (*a - *d__ == 0. && igraphd_sign(&c_b4, b) != igraphd_sign(&c_b4, c__)) {
-	*cs = 1.;
-	*sn = 0.;
+    } else if (*a - *d__ == 0. && igraphd_sign(&c_b3, b) != igraphd_sign(&c_b3, c__)) {
 	goto L10;
     } else {
 
+/*        Make diagonal elements equal */
+
 	temp = *a - *d__;
 	p = temp * .5;
-/* Computing MAX */
-	d__1 = abs(*b), d__2 = abs(*c__);
-	bcmax = max(d__1,d__2);
-/* Computing MIN */
-	d__1 = abs(*b), d__2 = abs(*c__);
-	bcmis = min(d__1,d__2) * igraphd_sign(&c_b4, b) * igraphd_sign(&c_b4, c__);
-/* Computing MAX */
-	d__1 = abs(p);
-	scale = max(d__1,bcmax);
-	z__ = p / scale * p + bcmax / scale * bcmis;
+	sigma = *b + *c__;
+	tau = igraphdlapy2_(&sigma, &temp);
+	cs1 = sqrt((abs(sigma) / tau + 1.) * .5);
+	sn1 = -(p / (tau * cs1)) * igraphd_sign(&c_b3, &sigma);
 
-/*        If Z is of the order of the machine accuracy, postpone the */
-/*        decision on the nature of eigenvalues */
+/*        Compute [ AA  BB ] = [ A  B ] [ CS1 -SN1 ] */
+/*                [ CC  DD ]   [ C  D ] [ SN1  CS1 ] */
 
-	if (z__ >= eps * 4.) {
+	aa = *a * cs1 + *b * sn1;
+	bb = -(*a) * sn1 + *b * cs1;
+	cc = *c__ * cs1 + *d__ * sn1;
+	dd = -(*c__) * sn1 + *d__ * cs1;
 
-/*           Real eigenvalues. Compute A and D. */
+/*        Compute [ A  B ] = [ CS1  SN1 ] [ AA  BB ] */
+/*                [ C  D ]   [-SN1  CS1 ] [ CC  DD ] */
 
-	    d__1 = sqrt(scale) * sqrt(z__);
-	    z__ = p + igraphd_sign(&d__1, &p);
-	    *a = *d__ + z__;
-	    *d__ -= bcmax / z__ * bcmis;
+	*a = aa * cs1 + cc * sn1;
+	*b = bb * cs1 + dd * sn1;
+	*c__ = -aa * sn1 + cc * cs1;
+	*d__ = -bb * sn1 + dd * cs1;
 
-/*           Compute B and the rotation matrix */
+/*        Accumulate transformation */
 
-	    tau = igraphdlapy2_(c__, &z__);
-	    *cs = z__ / tau;
-	    *sn = *c__ / tau;
-	    *b -= *c__;
-	    *c__ = 0.;
-	} else {
+	temp = *cs * cs1 - *sn * sn1;
+	*sn = *cs * sn1 + *sn * cs1;
+	*cs = temp;
 
-/*           Complex eigenvalues, or real (almost) equal eigenvalues. */
-/*           Make diagonal elements equal. */
+	temp = (*a + *d__) * .5;
+	*a = temp;
+	*d__ = temp;
 
-	    sigma = *b + *c__;
-	    tau = igraphdlapy2_(&sigma, &temp);
-	    *cs = sqrt((abs(sigma) / tau + 1.) * .5);
-	    *sn = -(p / (tau * *cs)) * igraphd_sign(&c_b4, &sigma);
+	if (*c__ != 0.) {
+	    if (*b != 0.) {
+		if (igraphd_sign(&c_b3, b) == igraphd_sign(&c_b3, c__)) {
 
-/*           Compute [ AA  BB ] = [ A  B ] [ CS -SN ] */
-/*                   [ CC  DD ]   [ C  D ] [ SN  CS ] */
+/*                 Real eigenvalues: reduce to upper triangular form */
 
-	    aa = *a * *cs + *b * *sn;
-	    bb = -(*a) * *sn + *b * *cs;
-	    cc = *c__ * *cs + *d__ * *sn;
-	    dd = -(*c__) * *sn + *d__ * *cs;
-
-/*           Compute [ A  B ] = [ CS  SN ] [ AA  BB ] */
-/*                   [ C  D ]   [-SN  CS ] [ CC  DD ] */
-
-	    *a = aa * *cs + cc * *sn;
-	    *b = bb * *cs + dd * *sn;
-	    *c__ = -aa * *sn + cc * *cs;
-	    *d__ = -bb * *sn + dd * *cs;
-
-	    temp = (*a + *d__) * .5;
-	    *a = temp;
-	    *d__ = temp;
-
-	    if (*c__ != 0.) {
-		if (*b != 0.) {
-		    if (igraphd_sign(&c_b4, b) == igraphd_sign(&c_b4, c__)) {
-
-/*                    Real eigenvalues: reduce to upper triangular form */
-
-			sab = sqrt((abs(*b)));
-			sac = sqrt((abs(*c__)));
-			d__1 = sab * sac;
-			p = igraphd_sign(&d__1, c__);
-			tau = 1. / sqrt((d__1 = *b + *c__, abs(d__1)));
-			*a = temp + p;
-			*d__ = temp - p;
-			*b -= *c__;
-			*c__ = 0.;
-			cs1 = sab * tau;
-			sn1 = sac * tau;
-			temp = *cs * cs1 - *sn * sn1;
-			*sn = *cs * sn1 + *sn * cs1;
-			*cs = temp;
-		    }
-		} else {
-		    *b = -(*c__);
+		    sab = sqrt((abs(*b)));
+		    sac = sqrt((abs(*c__)));
+		    d__1 = sab * sac;
+		    p = igraphd_sign(&d__1, c__);
+		    tau = 1. / sqrt((d__1 = *b + *c__, abs(d__1)));
+		    *a = temp + p;
+		    *d__ = temp - p;
+		    *b -= *c__;
 		    *c__ = 0.;
-		    temp = *cs;
-		    *cs = -(*sn);
-		    *sn = temp;
+		    cs1 = sab * tau;
+		    sn1 = sac * tau;
+		    temp = *cs * cs1 - *sn * sn1;
+		    *sn = *cs * sn1 + *sn * cs1;
+		    *cs = temp;
 		}
+	    } else {
+		*b = -(*c__);
+		*c__ = 0.;
+		temp = *cs;
+		*cs = -(*sn);
+		*sn = temp;
 	    }
 	}
-
     }
 
 L10:

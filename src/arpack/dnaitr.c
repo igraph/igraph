@@ -1,13 +1,6 @@
-/* igraphdnaitr.f -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdnaitr.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -180,10 +173,10 @@ static integer c__2 = 2;
 /*     second  ARPACK utility routine for timing. */
 /*     dmout   ARPACK utility routine that prints matrices */
 /*     dvout   ARPACK utility routine that prints vectors. */
-/*     dlabad  LAPACK routine that computes machine constants. */
+/*     igraphdlabad  LAPACK routine that computes machine constants. */
 /*     dlamch  LAPACK routine that determines machine constants. */
 /*     dlascl  LAPACK routine for careful scaling of a matrix. */
-/*     dlanhs  LAPACK routine that computes various norms of a matrix. */
+/*     igraphdlanhs  LAPACK routine that computes various norms of a matrix. */
 /*     dgemv   Level 2 BLAS routine for matrix vector multiplication. */
 /*     daxpy   Level 1 BLAS that computes a vector triad. */
 /*     dscal   Level 1 BLAS that scales a vector. */
@@ -251,10 +244,18 @@ static integer c__2 = 2;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdnaitr_(integer *ido, char *bmat, integer *n, integer *k,
-	 integer *np, integer *nb, doublereal *resid, doublereal *rnorm, 
-	doublereal *v, integer *ldv, doublereal *h__, integer *ldh, integer *
-	ipntr, doublereal *workd, integer *info)
+/* Subroutine */ int igraphdnaitr_(ido, bmat, n, k, np, nb, resid, rnorm, v, ldv, 
+	h__, ldh, ipntr, workd, info, bmat_len)
+integer *ido;
+char *bmat;
+integer *n, *k, *np, *nb;
+doublereal *resid, *rnorm, *v;
+integer *ldv;
+doublereal *h__;
+integer *ldh, *ipntr;
+doublereal *workd;
+integer *info;
+ftnlen bmat_len;
 {
     /* Initialized data */
 
@@ -265,52 +266,37 @@ static integer c__2 = 2;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
-    static integer i__, j;
-    static real t0, t1, t2, t3, t4, t5;
-    static integer jj, ipj, irj, ivj;
-    static doublereal ulp, tst1;
-    extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
+    extern doublereal igraphddot_();
     static integer ierr, iter;
     static doublereal unfl, ovfl;
     static integer itry;
-    extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
+    extern doublereal igraphdnrm2_();
     static doublereal temp1;
     static logical orth1, orth2, step3, step4;
+    static integer i__, j;
     static doublereal betaj;
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
-	    integer *), igraphdgemv_(char *, integer *, integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, integer *);
+    extern /* Subroutine */ int igraphdscal_(), igraphdgemv_();
     static integer infol;
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdaxpy_(integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *), igraphdmout_(integer 
-	    *, integer *, integer *, doublereal *, integer *, integer *, char 
-	    *);
+    extern /* Subroutine */ int igraphdcopy_(), igraphdaxpy_(), igraphdmout_();
     static doublereal xtemp[2];
-    extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
-	    integer *, char *);
+    extern /* Subroutine */ int igraphdvout_();
     static doublereal wnorm;
-    extern /* Subroutine */ int igraphivout_(integer *, integer *, integer *, 
-	    integer *, char *), igraphdgetv0_(integer *, char *, integer *, 
-	    logical *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *
-	    ), igraphdlabad_(doublereal *, doublereal *);
+    static real t0, t1, t2, t3, t4, t5;
+    extern /* Subroutine */ int igraphivout_(), igraphdgetv0_(), igraphdlabad_();
     static doublereal rnorm1;
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
-	    integer *, integer *);
-    extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
-	    doublereal *);
-    extern /* Subroutine */ int igraphsecond_(real *);
+    static integer jj;
+    extern doublereal igraphdlamch_();
+    extern /* Subroutine */ int igraphdlascl_();
+    extern doublereal igraphdlanhs_();
+    extern /* Subroutine */ int igraphsecond_();
     static logical rstart;
     static integer msglvl;
     static doublereal smlnum;
+    static integer ipj, irj, ivj;
+    static doublereal ulp, tst1;
 
 
 /*     %----------------------------------------------------% */
@@ -381,10 +367,10 @@ static integer c__2 = 2;
     --workd;
     --resid;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     --ipntr;
 
@@ -401,13 +387,13 @@ static integer c__2 = 2;
 /*        | the splitting and deflation criterion.  | */
 /*        | If norm(H) <= sqrt(OVFL),               | */
 /*        | overflow should not occur.              | */
-/*        | REFERENCE: LAPACK subroutine dlahqr     | */
+/*        | REFERENCE: LAPACK subroutine igraphdlahqr     | */
 /*        %-----------------------------------------% */
 
-	unfl = igraphdlamch_("safe minimum");
+	unfl = igraphdlamch_("safe minimum", (ftnlen)12);
 	ovfl = 1. / unfl;
 	igraphdlabad_(&unfl, &ovfl);
-	ulp = igraphdlamch_("precision");
+	ulp = igraphdlamch_("precision", (ftnlen)9);
 	smlnum = unfl * (*n / ulp);
 	first = FALSE_;
     }
@@ -480,10 +466,10 @@ static integer c__2 = 2;
 L1000:
 
     if (msglvl > 1) {
-	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_naitr: generat"
-		"ing Arnoldi vector number");
-	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_naitr: B-no"
-		"rm of the current residual is");
+	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_naitr: generat\
+ing Arnoldi vector number", (ftnlen)40);
+	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_naitr: B-no\
+rm of the current residual is", (ftnlen)41);
     }
 
 /*        %---------------------------------------------------% */
@@ -504,8 +490,8 @@ L1000:
 /*           %---------------------------------------------------% */
 
     if (msglvl > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_naitr: ****** "
-		"RESTART AT STEP ******");
+	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_naitr: ****** \
+RESTART AT STEP ******", (ftnlen)37);
     }
 
 /*           %---------------------------------------------% */
@@ -528,7 +514,7 @@ L30:
 /*           %--------------------------------------% */
 
     igraphdgetv0_(ido, bmat, &itry, &c_false, n, &j, &v[v_offset], ldv, &resid[1], 
-	    rnorm, &ipntr[1], &workd[1], &ierr);
+	    rnorm, &ipntr[1], &workd[1], &ierr, (ftnlen)1);
     if (*ido != 99) {
 	goto L9000;
     }
@@ -573,9 +559,9 @@ L40:
 /*            %-----------------------------------------% */
 
 	igraphdlascl_("General", &i__, &i__, rnorm, &c_b25, n, &c__1, &v[j * v_dim1 
-		+ 1], n, &infol);
+		+ 1], n, &infol, (ftnlen)7);
 	igraphdlascl_("General", &i__, &i__, rnorm, &c_b25, n, &c__1, &workd[ipj], 
-		n, &infol);
+		n, &infol, (ftnlen)7);
     }
 
 /*        %------------------------------------------------------% */
@@ -678,7 +664,7 @@ L60:
 /*        %------------------------------------------% */
 
     igraphdgemv_("T", n, &j, &c_b25, &v[v_offset], ldv, &workd[ipj], &c__1, &c_b47, 
-	    &h__[j * h_dim1 + 1], &c__1);
+	    &h__[j * h_dim1 + 1], &c__1, (ftnlen)1);
 
 /*        %--------------------------------------% */
 /*        | Orthogonalize r_{j} against V_{j}.   | */
@@ -686,7 +672,7 @@ L60:
 /*        %--------------------------------------% */
 
     igraphdgemv_("N", n, &j, &c_b50, &v[v_offset], ldv, &h__[j * h_dim1 + 1], &c__1,
-	     &c_b25, &resid[1], &c__1);
+	     &c_b25, &resid[1], &c__1, (ftnlen)1);
 
     if (j > 1) {
 	h__[j + (j - 1) * h_dim1] = betaj;
@@ -755,7 +741,7 @@ L70:
 /*        | than or equal to 0.717.                                   | */
 /*        %-----------------------------------------------------------% */
 
-    if (*rnorm > wnorm * .717f) {
+    if (*rnorm > wnorm * (float).717) {
 	goto L100;
     }
     iter = 0;
@@ -773,10 +759,10 @@ L80:
     if (msglvl > 2) {
 	xtemp[0] = wnorm;
 	xtemp[1] = *rnorm;
-	igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, "_naitr: re-o"
-		"rthonalization; wnorm and rnorm are");
+	igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, "_naitr: re-o\
+rthonalization; wnorm and rnorm are", (ftnlen)47);
 	igraphdvout_(&debug_1.logfil, &j, &h__[j * h_dim1 + 1], &debug_1.ndigit, 
-		"_naitr: j-th column of H");
+		"_naitr: j-th column of H", (ftnlen)24);
     }
 
 /*        %----------------------------------------------------% */
@@ -785,7 +771,7 @@ L80:
 /*        %----------------------------------------------------% */
 
     igraphdgemv_("T", n, &j, &c_b25, &v[v_offset], ldv, &workd[ipj], &c__1, &c_b47, 
-	    &workd[irj], &c__1);
+	    &workd[irj], &c__1, (ftnlen)1);
 
 /*        %---------------------------------------------% */
 /*        | Compute the correction to the residual:     | */
@@ -795,7 +781,7 @@ L80:
 /*        %---------------------------------------------% */
 
     igraphdgemv_("N", n, &j, &c_b50, &v[v_offset], ldv, &workd[irj], &c__1, &c_b25, 
-	    &resid[1], &c__1);
+	    &resid[1], &c__1, (ftnlen)1);
     igraphdaxpy_(&j, &c_b25, &workd[irj], &c__1, &h__[j * h_dim1 + 1], &c__1);
 
     orth2 = TRUE_;
@@ -839,13 +825,13 @@ L90:
     }
 
     if (msglvl > 0 && iter > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_naitr: Iterati"
-		"ve refinement for Arnoldi residual");
+	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_naitr: Iterati\
+ve refinement for Arnoldi residual", (ftnlen)49);
 	if (msglvl > 2) {
 	    xtemp[0] = *rnorm;
 	    xtemp[1] = rnorm1;
-	    igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, "_naitr: "
-		    "iterative refinement ; rnorm and rnorm1 are");
+	    igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, "_naitr: \
+iterative refinement ; rnorm and rnorm1 are", (ftnlen)51);
 	}
     }
 
@@ -854,7 +840,7 @@ L90:
 /*        | step of re-orthogonalization.           | */
 /*        %-----------------------------------------% */
 
-    if (rnorm1 > *rnorm * .717f) {
+    if (rnorm1 > *rnorm * (float).717) {
 
 /*           %---------------------------------------% */
 /*           | No need for further refinement.       | */
@@ -923,14 +909,15 @@ L100:
 /*              %--------------------------------------------% */
 /*              | Check for splitting and deflation.         | */
 /*              | Use a standard test as in the QR algorithm | */
-/*              | REFERENCE: LAPACK subroutine dlahqr        | */
+/*              | REFERENCE: LAPACK subroutine igraphdlahqr        | */
 /*              %--------------------------------------------% */
 
 	    tst1 = (d__1 = h__[i__ + i__ * h_dim1], abs(d__1)) + (d__2 = h__[
 		    i__ + 1 + (i__ + 1) * h_dim1], abs(d__2));
 	    if (tst1 == 0.) {
 		i__2 = *k + *np;
-		tst1 = igraphdlanhs_("1", &i__2, &h__[h_offset], ldh, &workd[*n + 1]);
+		tst1 = igraphdlanhs_("1", &i__2, &h__[h_offset], ldh, &workd[*n + 1]
+			, (ftnlen)1);
 	    }
 /* Computing MAX */
 	    d__2 = ulp * tst1;
@@ -945,8 +932,8 @@ L100:
 	    i__1 = *k + *np;
 	    i__2 = *k + *np;
 	    igraphdmout_(&debug_1.logfil, &i__1, &i__2, &h__[h_offset], ldh, &
-		    debug_1.ndigit, "_naitr: Final upper Hessenberg matrix H"
-		    " of order K+NP");
+		    debug_1.ndigit, "_naitr: Final upper Hessenberg matrix H\
+ of order K+NP", (ftnlen)53);
 	}
 
 	goto L9000;

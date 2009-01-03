@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdtrsen.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -18,51 +11,54 @@
 
 static integer c_n1 = -1;
 
-/* Subroutine */ int igraphdtrsen_(char *job, char *compq, logical *select, integer 
-	*n, doublereal *t, integer *ldt, doublereal *q, integer *ldq, 
-	doublereal *wr, doublereal *wi, integer *m, doublereal *s, doublereal 
-	*sep, doublereal *work, integer *lwork, integer *iwork, integer *
-	liwork, integer *info)
+/* Subroutine */ int igraphdtrsen_(job, compq, select, n, t, ldt, q, ldq, wr, wi, m,
+	 s, sep, work, lwork, iwork, liwork, info, job_len, compq_len)
+char *job, *compq;
+logical *select;
+integer *n;
+doublereal *t;
+integer *ldt;
+doublereal *q;
+integer *ldq;
+doublereal *wr, *wi;
+integer *m;
+doublereal *s, *sep, *work;
+integer *lwork, *iwork, *liwork, *info;
+ftnlen job_len;
+ftnlen compq_len;
 {
     /* System generated locals */
-    integer q_dim1, q_offset, t_dim1, t_offset, i__1, i__2;
+    integer q_dim1, q_offset, t_dim1, t_offset, i__1;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
-    static integer k, n1, n2, kk, nn, ks;
-    static doublereal est;
     static integer kase;
     static logical pair;
     static integer ierr;
     static logical swap;
+    static integer k;
     static doublereal scale;
-    extern logical igraphlsame_(char *, char *);
-    static integer lwmin;
+    extern logical igraphlsame_();
     static logical wantq, wants;
     static doublereal rnorm;
-    extern doublereal igraphdlange_(char *, integer *, integer *, doublereal *, 
-	    integer *, doublereal *);
-    extern /* Subroutine */ int igraphdlacon_(integer *, doublereal *, doublereal *,
-	     integer *, doublereal *, integer *), igraphdlacpy_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *), igraphxerbla_(char *, integer *);
+    static integer n1, n2, kk;
+    extern doublereal igraphdlange_();
+    static integer nn, ks;
+    extern /* Subroutine */ int igraphdlacon_(), igraphdlacpy_(), igraphxerbla_();
     static logical wantbh;
-    extern /* Subroutine */ int igraphdtrexc_(char *, integer *, doublereal *, 
-	    integer *, doublereal *, integer *, integer *, integer *, 
-	    doublereal *, integer *);
-    static integer liwmin;
-    static logical wantsp, lquery;
-    extern /* Subroutine */ int igraphdtrsyl_(char *, char *, integer *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *);
+    extern /* Subroutine */ int igraphdtrexc_();
+    static logical wantsp;
+    extern /* Subroutine */ int igraphdtrsyl_();
+    static doublereal est;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
+/*  -- LAPACK routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*     September 30, 1994 */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -163,19 +159,13 @@ static integer c_n1 = -1;
 /*          M = 0 or N, SEP = norm(T). */
 /*          If JOB = 'N' or 'E', SEP is not referenced. */
 
-/*  WORK    (workspace/output) DOUBLE PRECISION array, dimension (LWORK) */
-/*          On exit, if INFO = 0, WORK(1) returns the optimal LWORK. */
+/*  WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK) */
 
 /*  LWORK   (input) INTEGER */
 /*          The dimension of the array WORK. */
 /*          If JOB = 'N', LWORK >= max(1,N); */
 /*          if JOB = 'E', LWORK >= M*(N-M); */
 /*          if JOB = 'V' or 'B', LWORK >= 2*M*(N-M). */
-
-/*          If LWORK = -1, then a workspace query is assumed; the routine */
-/*          only calculates the optimal size of the WORK array, returns */
-/*          this value as the first entry of the WORK array, and no error */
-/*          message related to LWORK is issued by XERBLA. */
 
 /*  IWORK   (workspace) INTEGER array, dimension (LIWORK) */
 /*          IF JOB = 'N' or 'E', IWORK is not referenced. */
@@ -184,11 +174,6 @@ static integer c_n1 = -1;
 /*          The dimension of the array IWORK. */
 /*          If JOB = 'N' or 'E', LIWORK >= 1; */
 /*          if JOB = 'V' or 'B', LIWORK >= M*(N-M). */
-
-/*          If LIWORK = -1, then a workspace query is assumed; the */
-/*          routine only calculates the optimal size of the IWORK array, */
-/*          returns this value as the first entry of the IWORK array, and */
-/*          no error message related to LIWORK is issued by XERBLA. */
 
 /*  INFO    (output) INTEGER */
 /*          = 0: successful exit */
@@ -290,10 +275,10 @@ static integer c_n1 = -1;
     /* Parameter adjustments */
     --select;
     t_dim1 = *ldt;
-    t_offset = 1 + t_dim1;
+    t_offset = 1 + t_dim1 * 1;
     t -= t_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --wr;
     --wi;
@@ -301,22 +286,21 @@ static integer c_n1 = -1;
     --iwork;
 
     /* Function Body */
-    wantbh = igraphlsame_(job, "B");
-    wants = igraphlsame_(job, "E") || wantbh;
-    wantsp = igraphlsame_(job, "V") || wantbh;
-    wantq = igraphlsame_(compq, "V");
+    wantbh = igraphlsame_(job, "B", (ftnlen)1, (ftnlen)1);
+    wants = igraphlsame_(job, "E", (ftnlen)1, (ftnlen)1) || wantbh;
+    wantsp = igraphlsame_(job, "V", (ftnlen)1, (ftnlen)1) || wantbh;
+    wantq = igraphlsame_(compq, "V", (ftnlen)1, (ftnlen)1);
 
     *info = 0;
-    lquery = *lwork == -1;
-    if (! igraphlsame_(job, "N") && ! wants && ! wantsp) {
+    if (! igraphlsame_(job, "N", (ftnlen)1, (ftnlen)1) && ! wants && ! wantsp) {
 	*info = -1;
-    } else if (! igraphlsame_(compq, "N") && ! wantq) {
+    } else if (! igraphlsame_(compq, "N", (ftnlen)1, (ftnlen)1) && ! wantq) {
 	*info = -2;
     } else if (*n < 0) {
 	*info = -4;
     } else if (*ldt < max(1,*n)) {
 	*info = -6;
-    } else if (*ldq < 1 || (wantq && *ldq < *n)) {
+    } else if (*ldq < 1 || wantq && *ldq < *n) {
 	*info = -8;
     } else {
 
@@ -354,36 +338,16 @@ static integer c_n1 = -1;
 	n2 = *n - *m;
 	nn = n1 * n2;
 
-	if (wantsp) {
-/* Computing MAX */
-	    i__1 = 1, i__2 = nn << 1;
-	    lwmin = max(i__1,i__2);
-	    liwmin = max(1,nn);
-	} else if (igraphlsame_(job, "N")) {
-	    lwmin = max(1,*n);
-	    liwmin = 1;
-	} else if (igraphlsame_(job, "E")) {
-	    lwmin = max(1,nn);
-	    liwmin = 1;
-	}
-
-	if (*lwork < lwmin && ! lquery) {
+	if (*lwork < 1 || wants && ! wantsp && *lwork < nn || wantsp && *
+		lwork < nn << 1) {
 	    *info = -15;
-	} else if (*liwork < liwmin && ! lquery) {
+	} else if (*liwork < 1 || wantsp && *liwork < nn) {
 	    *info = -17;
 	}
     }
-
-    if (*info == 0) {
-	work[1] = (doublereal) lwmin;
-	iwork[1] = liwmin;
-    }
-
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DTRSEN", &i__1);
-	return 0;
-    } else if (lquery) {
+	igraphxerbla_("DTRSEN", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -394,7 +358,7 @@ static integer c_n1 = -1;
 	    *s = 1.;
 	}
 	if (wantsp) {
-	    *sep = igraphdlange_("1", n, n, &t[t_offset], ldt, &work[1]);
+	    *sep = igraphdlange_("1", n, n, &t[t_offset], ldt, &work[1], (ftnlen)1);
 	}
 	goto L40;
     }
@@ -424,7 +388,7 @@ static integer c_n1 = -1;
 		kk = k;
 		if (k != ks) {
 		    igraphdtrexc_(compq, n, &t[t_offset], ldt, &q[q_offset], ldq, &
-			    kk, &ks, &work[1], &ierr);
+			    kk, &ks, &work[1], &ierr, (ftnlen)1);
 		}
 		if (ierr == 1 || ierr == 2) {
 
@@ -453,14 +417,16 @@ static integer c_n1 = -1;
 
 /*           T11*R - R*T22 = scale*T12 */
 
-	igraphdlacpy_("F", &n1, &n2, &t[(n1 + 1) * t_dim1 + 1], ldt, &work[1], &n1);
+	igraphdlacpy_("F", &n1, &n2, &t[(n1 + 1) * t_dim1 + 1], ldt, &work[1], &n1, 
+		(ftnlen)1);
 	igraphdtrsyl_("N", "N", &c_n1, &n1, &n2, &t[t_offset], ldt, &t[n1 + 1 + (n1 
-		+ 1) * t_dim1], ldt, &work[1], &n1, &scale, &ierr);
+		+ 1) * t_dim1], ldt, &work[1], &n1, &scale, &ierr, (ftnlen)1, 
+		(ftnlen)1);
 
 /*        Estimate the reciprocal of the condition number of the cluster */
 /*        of eigenvalues. */
 
-	rnorm = igraphdlange_("F", &n1, &n2, &work[1], &n1, &work[1]);
+	rnorm = igraphdlange_("F", &n1, &n2, &work[1], &n1, &work[1], (ftnlen)1);
 	if (rnorm == 0.) {
 	    *s = 1.;
 	} else {
@@ -483,14 +449,14 @@ L30:
 
 		igraphdtrsyl_("N", "N", &c_n1, &n1, &n2, &t[t_offset], ldt, &t[n1 + 
 			1 + (n1 + 1) * t_dim1], ldt, &work[1], &n1, &scale, &
-			ierr);
+			ierr, (ftnlen)1, (ftnlen)1);
 	    } else {
 
 /*              Solve  T11'*R - R*T22' = scale*X. */
 
 		igraphdtrsyl_("T", "T", &c_n1, &n1, &n2, &t[t_offset], ldt, &t[n1 + 
 			1 + (n1 + 1) * t_dim1], ldt, &work[1], &n1, &scale, &
-			ierr);
+			ierr, (ftnlen)1, (ftnlen)1);
 	    }
 	    goto L30;
 	}
@@ -517,10 +483,6 @@ L40:
 	}
 /* L60: */
     }
-
-    work[1] = (doublereal) lwmin;
-    iwork[1] = liwmin;
-
     return 0;
 
 /*     End of DTRSEN */

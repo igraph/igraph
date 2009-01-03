@@ -59,6 +59,7 @@ s/pow_dd/igraphpow_dd/g
 s/pow_di/igraphpow_di/g
 s/s_cmp/igraphs_cmp/g
 s/s_copy/igraphs_copy/g
+s/r_imag/igraphr_imag/g
 
 s/dnaitr/igraphdnaitr/g
 s/dnapps/igraphdnapps/g

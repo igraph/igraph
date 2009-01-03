@@ -1,13 +1,6 @@
-/* igraphdneigh.f -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdneigh.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -92,7 +85,7 @@ static doublereal c_b20 = 0.;
 /*          of H and also in the calculation of the eigenvectors of H. */
 
 /*  IERR    Integer.  (OUTPUT) */
-/*          Error exit flag from dlaqrb or dtrevc. */
+/*          Error exit flag from igraphdlaqrb or igraphdtrevc. */
 
 /* \EndDoc */
 
@@ -104,14 +97,14 @@ static doublereal c_b20 = 0.;
 /*     xxxxxx  real */
 
 /* \Routines called: */
-/*     dlaqrb  ARPACK routine to compute the real Schur form of an */
+/*     igraphdlaqrb  ARPACK routine to compute the real Schur form of an */
 /*             upper Hessenberg matrix and last row of the Schur vectors. */
 /*     second  ARPACK utility routine for timing. */
 /*     dmout   ARPACK utility routine that prints matrices */
 /*     dvout   ARPACK utility routine that prints vectors. */
 /*     dlacpy  LAPACK matrix copy routine. */
 /*     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully. */
-/*     dtrevc  LAPACK routine to compute the eigenvectors of a matrix */
+/*     igraphdtrevc  LAPACK routine to compute the eigenvectors of a matrix */
 /*             in upper quasi-triangular form */
 /*     dgemv   Level 2 BLAS routine for matrix vector multiplication. */
 /*     dcopy   Level 1 BLAS that copies one vector to another . */
@@ -140,39 +133,35 @@ static doublereal c_b20 = 0.;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdneigh_(doublereal *rnorm, integer *n, doublereal *h__, 
-	integer *ldh, doublereal *ritzr, doublereal *ritzi, doublereal *
-	bounds, doublereal *q, integer *ldq, doublereal *workl, integer *ierr)
+/* Subroutine */ int igraphdneigh_(rnorm, n, h__, ldh, ritzr, ritzi, bounds, q, ldq,
+	 workl, ierr)
+doublereal *rnorm;
+integer *n;
+doublereal *h__;
+integer *ldh;
+doublereal *ritzr, *ritzi, *bounds, *q;
+integer *ldq;
+doublereal *workl;
+integer *ierr;
 {
     /* System generated locals */
     integer h_dim1, h_offset, q_dim1, q_offset, i__1;
     doublereal d__1, d__2;
 
     /* Local variables */
+    static doublereal temp;
+    extern doublereal igraphdnrm2_();
     static integer i__;
-    static real t0, t1;
-    static doublereal vl[1], temp;
-    extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
-	    integer *);
+    extern /* Subroutine */ int igraphdscal_();
     static integer iconj;
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *), igraphdmout_(integer *, 
-	    integer *, integer *, doublereal *, integer *, integer *, char *
-	    ), igraphdvout_(integer *, integer *, doublereal *, integer *, 
-	    char *);
-    extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    extern /* Subroutine */ int igraphdlaqrb_(logical *, integer *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
-	    doublereal *, integer *), igraphsecond_(real *);
+    extern /* Subroutine */ int igraphdgemv_(), igraphdmout_(), igraphdvout_();
+    static real t0, t1;
+    extern doublereal igraphdlapy2_();
+    static doublereal vl[1];
+    extern /* Subroutine */ int igraphdlaqrb_(), igraphsecond_();
     static logical select[1];
     static integer msglvl;
-    extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *), 
-	    igraphdtrevc_(char *, char *, logical *, integer *, doublereal *, 
-	    integer *, doublereal *, integer *, doublereal *, integer *, 
-	    integer *, integer *, doublereal *, integer *);
+    extern /* Subroutine */ int igraphdlacpy_(), igraphdtrevc_();
 
 
 /*     %----------------------------------------------------% */
@@ -246,10 +235,10 @@ static doublereal c_b20 = 0.;
     --ritzi;
     --ritzr;
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
 
     /* Function Body */
@@ -258,18 +247,18 @@ static doublereal c_b20 = 0.;
 
     if (msglvl > 2) {
 	igraphdmout_(&debug_1.logfil, n, n, &h__[h_offset], ldh, &debug_1.ndigit, 
-		"_neigh: Entering upper Hessenberg matrix H ");
+		"_neigh: Entering upper Hessenberg matrix H ", (ftnlen)43);
     }
 
 /*     %-----------------------------------------------------------% */
 /*     | 1. Compute the eigenvalues, the last components of the    | */
 /*     |    corresponding Schur vectors and the full Schur form T  | */
 /*     |    of the current upper Hessenberg matrix H.              | */
-/*     | dlaqrb returns the full Schur form of H in WORKL(1:N**2)  | */
+/*     | igraphdlaqrb returns the full Schur form of H in WORKL(1:N**2)  | */
 /*     | and the last components of the Schur vectors in BOUNDS.   | */
 /*     %-----------------------------------------------------------% */
 
-    igraphdlacpy_("All", n, n, &h__[h_offset], ldh, &workl[1], n);
+    igraphdlacpy_("All", n, n, &h__[h_offset], ldh, &workl[1], n, (ftnlen)3);
     igraphdlaqrb_(&c_true, n, &c__1, n, &workl[1], n, &ritzr[1], &ritzi[1], &bounds[
 	    1], ierr);
     if (*ierr != 0) {
@@ -277,8 +266,8 @@ static doublereal c_b20 = 0.;
     }
 
     if (msglvl > 1) {
-	igraphdvout_(&debug_1.logfil, n, &bounds[1], &debug_1.ndigit, "_neigh: las"
-		"t row of the Schur matrix for H");
+	igraphdvout_(&debug_1.logfil, n, &bounds[1], &debug_1.ndigit, "_neigh: las\
+t row of the Schur matrix for H", (ftnlen)42);
     }
 
 /*     %-----------------------------------------------------------% */
@@ -292,7 +281,7 @@ static doublereal c_b20 = 0.;
 /*     %-----------------------------------------------------------% */
 
     igraphdtrevc_("R", "A", select, n, &workl[1], n, vl, n, &q[q_offset], ldq, n, n,
-	     &workl[*n * *n + 1], ierr);
+	     &workl[*n * *n + 1], ierr, (ftnlen)1, (ftnlen)1);
 
     if (*ierr != 0) {
 	goto L9000;
@@ -301,7 +290,7 @@ static doublereal c_b20 = 0.;
 /*     %------------------------------------------------% */
 /*     | Scale the returning eigenvectors so that their | */
 /*     | euclidean norms are all one. LAPACK subroutine | */
-/*     | dtrevc returns each eigenvector normalized so  | */
+/*     | igraphdtrevc returns each eigenvector normalized so  | */
 /*     | that the element of largest magnitude has      | */
 /*     | magnitude 1; here the magnitude of a complex   | */
 /*     | number (x,y) is taken to be |x| + |y|.         | */
@@ -346,11 +335,11 @@ static doublereal c_b20 = 0.;
     }
 
     igraphdgemv_("T", n, n, &c_b18, &q[q_offset], ldq, &bounds[1], &c__1, &c_b20, &
-	    workl[1], &c__1);
+	    workl[1], &c__1, (ftnlen)1);
 
     if (msglvl > 1) {
-	igraphdvout_(&debug_1.logfil, n, &workl[1], &debug_1.ndigit, "_neigh: Last"
-		" row of the eigenvector matrix for H");
+	igraphdvout_(&debug_1.logfil, n, &workl[1], &debug_1.ndigit, "_neigh: Last\
+ row of the eigenvector matrix for H", (ftnlen)48);
     }
 
 /*     %----------------------------% */
@@ -389,12 +378,12 @@ static doublereal c_b20 = 0.;
     }
 
     if (msglvl > 2) {
-	igraphdvout_(&debug_1.logfil, n, &ritzr[1], &debug_1.ndigit, "_neigh: Real"
-		" part of the eigenvalues of H");
-	igraphdvout_(&debug_1.logfil, n, &ritzi[1], &debug_1.ndigit, "_neigh: Imag"
-		"inary part of the eigenvalues of H");
-	igraphdvout_(&debug_1.logfil, n, &bounds[1], &debug_1.ndigit, "_neigh: Rit"
-		"z estimates for the eigenvalues of H");
+	igraphdvout_(&debug_1.logfil, n, &ritzr[1], &debug_1.ndigit, "_neigh: Real\
+ part of the eigenvalues of H", (ftnlen)41);
+	igraphdvout_(&debug_1.logfil, n, &ritzi[1], &debug_1.ndigit, "_neigh: Imag\
+inary part of the eigenvalues of H", (ftnlen)46);
+	igraphdvout_(&debug_1.logfil, n, &bounds[1], &debug_1.ndigit, "_neigh: Rit\
+z estimates for the eigenvalues of H", (ftnlen)47);
     }
 
     igraphsecond_(&t1);

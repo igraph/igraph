@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dsgets.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -131,28 +124,27 @@ static integer c__1 = 1;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdsgets_(integer *ishift, char *which, integer *kev,
-	 integer *np, doublereal *ritz, doublereal *bounds, doublereal *
-	shifts)
+/* Subroutine */ int igraphdsgets_(ishift, which, kev, np, ritz, bounds, shifts, 
+	which_len)
+integer *ishift;
+char *which;
+integer *kev, *np;
+doublereal *ritz, *bounds, *shifts;
+ftnlen which_len;
 {
     /* System generated locals */
     integer i__1;
 
     /* Builtin functions */
-    integer igraphs_cmp(char *, char *, ftnlen, ftnlen);
+    integer igraphs_cmp();
 
     /* Local variables */
-    static real t0, t1;
-    extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer 
-	    *, doublereal *, integer *), igraphdcopy_(integer *, doublereal *,
-	     integer *, doublereal *, integer *), igraphdvout_(integer *, 
-	    integer *, doublereal *, integer *, char *), igraphivout_(
-	    integer *, integer *, integer *, integer *, char *), 
-	    igraphsecond_(real *);
     static integer kevd2;
-    extern /* Subroutine */ int igraphdsortr_(char *, logical *, integer *, 
-	    doublereal *, doublereal *);
+    extern /* Subroutine */ int igraphdswap_(), igraphdcopy_(), igraphdvout_();
+    static real t0, t1;
+    extern /* Subroutine */ int igraphivout_(), igraphsecond_();
     static integer msglvl;
+    extern /* Subroutine */ int igraphdsortr_();
 
 
 /*     %----------------------------------------------------% */
@@ -235,15 +227,14 @@ static integer c__1 = 1;
 /*        %-----------------------------------------------------% */
 
 	i__1 = *kev + *np;
-	igraphdsortr_("LA", &c_true, &i__1, &ritz[1], &bounds[1]);
+	igraphdsortr_("LA", &c_true, &i__1, &ritz[1], &bounds[1], (ftnlen)2);
 	kevd2 = *kev / 2;
 	if (*kev > 1) {
 	    i__1 = min(kevd2,*np);
-	    igraphdswap_(&i__1, &ritz[1], &c__1, &ritz[max(kevd2,*np) + 1], &
-		    c__1);
+	    igraphdswap_(&i__1, &ritz[1], &c__1, &ritz[max(kevd2,*np) + 1], &c__1);
 	    i__1 = min(kevd2,*np);
-	    igraphdswap_(&i__1, &bounds[1], &c__1, &bounds[max(kevd2,*np) + 1]
-		    , &c__1);
+	    igraphdswap_(&i__1, &bounds[1], &c__1, &bounds[max(kevd2,*np) + 1], &
+		    c__1);
 	}
 
     } else {
@@ -257,7 +248,7 @@ static integer c__1 = 1;
 /*        %----------------------------------------------------% */
 
 	i__1 = *kev + *np;
-	igraphdsortr_(which, &c_true, &i__1, &ritz[1], &bounds[1]);
+	igraphdsortr_(which, &c_true, &i__1, &ritz[1], &bounds[1], (ftnlen)2);
     }
 
     if (*ishift == 1 && *np > 0) {
@@ -270,7 +261,7 @@ static integer c__1 = 1;
 /*        | are applied in subroutine dsapps.                     | */
 /*        %-------------------------------------------------------% */
 
-	igraphdsortr_("SM", &c_true, np, &bounds[1], &ritz[1]);
+	igraphdsortr_("SM", &c_true, np, &bounds[1], &ritz[1], (ftnlen)2);
 	igraphdcopy_(np, &ritz[1], &c__1, &shifts[1], &c__1);
     }
 
@@ -278,16 +269,16 @@ static integer c__1 = 1;
     timing_1.tsgets += t1 - t0;
 
     if (msglvl > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, kev, &debug_1.ndigit, "_sgets: "
-		"KEV is");
-	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_sgets: N"
-		"P is");
+	igraphivout_(&debug_1.logfil, &c__1, kev, &debug_1.ndigit, "_sgets: KEV is",
+		 (ftnlen)14);
+	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_sgets: NP is", (
+		ftnlen)13);
 	i__1 = *kev + *np;
-	igraphdvout_(&debug_1.logfil, &i__1, &ritz[1], &debug_1.ndigit, "_sg"
-		"ets: Eigenvalues of current H matrix");
+	igraphdvout_(&debug_1.logfil, &i__1, &ritz[1], &debug_1.ndigit, "_sgets: E\
+igenvalues of current H matrix", (ftnlen)39);
 	i__1 = *kev + *np;
-	igraphdvout_(&debug_1.logfil, &i__1, &bounds[1], &debug_1.ndigit, 
-		"_sgets: Associated Ritz estimates");
+	igraphdvout_(&debug_1.logfil, &i__1, &bounds[1], &debug_1.ndigit, "_sgets:\
+ Associated Ritz estimates", (ftnlen)33);
     }
 
     return 0;

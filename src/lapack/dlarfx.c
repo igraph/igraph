@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlarfx.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -20,27 +13,28 @@ static doublereal c_b14 = 1.;
 static integer c__1 = 1;
 static doublereal c_b16 = 0.;
 
-/* Subroutine */ int igraphdlarfx_(char *side, integer *m, integer *n, doublereal *
-	v, doublereal *tau, doublereal *c__, integer *ldc, doublereal *work)
+/* Subroutine */ int igraphdlarfx_(side, m, n, v, tau, c__, ldc, work, side_len)
+char *side;
+integer *m, *n;
+doublereal *v, *tau, *c__;
+integer *ldc;
+doublereal *work;
+ftnlen side_len;
 {
     /* System generated locals */
     integer c_dim1, c_offset, i__1;
     doublereal d__1;
 
     /* Local variables */
+    extern /* Subroutine */ int igraphdger_();
     static integer j;
+    extern logical igraphlsame_();
+    extern /* Subroutine */ int igraphdgemv_();
     static doublereal t1, t2, t3, t4, t5, t6, t7, t8, t9, v1, v2, v3, v4, v5, 
 	    v6, v7, v8, v9, t10, v10, sum;
-    extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
-    extern logical igraphlsame_(char *, char *);
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -113,7 +107,7 @@ static doublereal c_b16 = 0.;
     /* Parameter adjustments */
     --v;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1;
+    c_offset = 1 + c_dim1 * 1;
     c__ -= c_offset;
     --work;
 
@@ -121,11 +115,11 @@ static doublereal c_b16 = 0.;
     if (*tau == 0.) {
 	return 0;
     }
-    if (igraphlsame_(side, "L")) {
+    if (igraphlsame_(side, "L", (ftnlen)1, (ftnlen)1)) {
 
 /*        Form  H * C, where H has order m. */
 
-	switch (*m) {
+	switch ((int)*m) {
 	    case 1:  goto L10;
 	    case 2:  goto L30;
 	    case 3:  goto L50;
@@ -143,7 +137,7 @@ static doublereal c_b16 = 0.;
 /*        w := C'*v */
 
 	igraphdgemv_("Transpose", m, n, &c_b14, &c__[c_offset], ldc, &v[1], &c__1, &
-		c_b16, &work[1], &c__1);
+		c_b16, &work[1], &c__1, (ftnlen)9);
 
 /*        C := C - tau * v * w' */
 
@@ -438,7 +432,7 @@ L190:
 
 /*        Form  C * H, where H has order n. */
 
-	switch (*n) {
+	switch ((int)*n) {
 	    case 1:  goto L210;
 	    case 2:  goto L230;
 	    case 3:  goto L250;
@@ -456,7 +450,7 @@ L190:
 /*        w := C * v */
 
 	igraphdgemv_("No transpose", m, n, &c_b14, &c__[c_offset], ldc, &v[1], &
-		c__1, &c_b16, &work[1], &c__1);
+		c__1, &c_b16, &work[1], &c__1, (ftnlen)12);
 
 /*        C := C - tau * w * v' */
 

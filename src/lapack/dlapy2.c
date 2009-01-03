@@ -1,32 +1,26 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlapy2.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-doublereal igraphdlapy2_(doublereal *x, doublereal *y)
+doublereal igraphdlapy2_(x, y)
+doublereal *x, *y;
 {
     /* System generated locals */
     doublereal ret_val, d__1;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
-    static doublereal w, z__, xabs, yabs;
+    static doublereal xabs, yabs, w, z__;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */

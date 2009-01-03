@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dsaup2.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -215,18 +208,34 @@ static integer c__2 = 2;
 /*     xx/xx/95: Version ' 2.4'.  (R.B. Lehoucq) */
 
 /* \SCCS Information: @(#) */
-/* FILE: saup2.F   SID: 2.7   DATE OF SID: 5/19/98   RELEASE: 2 */
+/* FILE: saup2.F   SID: 2.6   DATE OF SID: 8/16/96   RELEASE: 2 */
 
 /* \EndLib */
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdsaup2_(integer *ido, char *bmat, integer *n, char 
-	*which, integer *nev, integer *np, doublereal *tol, doublereal *resid,
-	 integer *mode, integer *iupd, integer *ishift, integer *mxiter, 
-	doublereal *v, integer *ldv, doublereal *h__, integer *ldh, 
-	doublereal *ritz, doublereal *bounds, doublereal *q, integer *ldq, 
-	doublereal *workl, integer *ipntr, doublereal *workd, integer *info)
+/* Subroutine */ int igraphdsaup2_(ido, bmat, n, which, nev, np, tol, resid, mode, 
+	iupd, ishift, mxiter, v, ldv, h__, ldh, ritz, bounds, q, ldq, workl, 
+	ipntr, workd, info, bmat_len, which_len)
+integer *ido;
+char *bmat;
+integer *n;
+char *which;
+integer *nev, *np;
+doublereal *tol, *resid;
+integer *mode, *iupd, *ishift, *mxiter;
+doublereal *v;
+integer *ldv;
+doublereal *h__;
+integer *ldh;
+doublereal *ritz, *bounds, *q;
+integer *ldq;
+doublereal *workl;
+integer *ipntr;
+doublereal *workd;
+integer *info;
+ftnlen bmat_len;
+ftnlen which_len;
 {
     /* System generated locals */
     integer h_dim1, h_offset, q_dim1, q_offset, v_dim1, v_offset, i__1, i__2, 
@@ -234,59 +243,38 @@ static integer c__2 = 2;
     doublereal d__1, d__2, d__3;
 
     /* Builtin functions */
-    double igraphpow_dd(doublereal *, doublereal *);
-    integer igraphs_cmp(char *, char *, ftnlen, ftnlen);
-    /* Subroutine */ int igraphs_copy(char *, char *, ftnlen, ftnlen);
-    double sqrt(doublereal);
+    double igraphpow_dd();
+    integer igraphs_cmp();
+    /* Subroutine */ int igraphs_copy();
+    double sqrt();
 
     /* Local variables */
-    static integer j;
-    static real t0, t1, t2, t3;
-    static integer kp[3];
-    extern doublereal igraphddot_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *);
-    static integer np0;
-    extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer 
-	    *, doublereal *, integer *);
-    static integer nev0;
-    extern /* Subroutine */ int igraphdswap_(integer *, doublereal *, integer 
-	    *, doublereal *, integer *), igraphdvout_(integer *, integer *, 
-	    doublereal *, integer *, char *), igraphivout_(integer *, 
-	    integer *, integer *, integer *, char *), igraphdgetv0_(
-	    integer *, char *, integer *, logical *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
-	    doublereal *, integer *);
+    extern doublereal igraphddot_();
     static doublereal eps23;
     static integer ierr, iter;
     static doublereal temp;
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdseigt_(
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, doublereal *, integer *);
     static integer nevd2;
-    extern /* Subroutine */ int igraphdsaitr_(integer *, char *, integer *, 
-	    integer *, integer *, integer *, doublereal *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *, integer *, 
-	    doublereal *, integer *), igraphdsgets_(integer *, char *,
-	     integer *, integer *, doublereal *, doublereal *, doublereal *), igraphdsapps_(integer *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *);
+    extern doublereal igraphdnrm2_();
     static logical getv0;
-    extern /* Subroutine */ int igraphdsconv_(integer *, doublereal *, 
-	    doublereal *, doublereal *, integer *);
-    static integer nevm2;
-    extern /* Subroutine */ int igraphdsortr_(char *, logical *, integer *, 
-	    doublereal *, doublereal *);
+    static integer nevm2, j;
     static logical cnorm;
+    extern /* Subroutine */ int igraphdcopy_(), igraphdswap_();
     static integer nconv;
     static logical initv;
     static doublereal rnorm;
-    static integer nevbef;
+    extern /* Subroutine */ int igraphdvout_();
+    static real t0, t1, t2, t3;
+    extern /* Subroutine */ int igraphivout_(), igraphdgetv0_();
+    extern doublereal igraphdlamch_();
+    static integer kp[3], nevbef;
+    extern /* Subroutine */ int igraphsecond_();
     static logical update;
     static char wprime[2];
     static logical ushift;
-    static integer kplusp, msglvl, nptemp;
+    static integer kplusp, msglvl, np0, nptemp;
+    extern /* Subroutine */ int igraphdsaitr_(), igraphdsconv_(), igraphdseigt_(), igraphdsgets_(), 
+	    igraphdsapps_(), igraphdsortr_();
+    static integer nev0;
 
 
 /*     %----------------------------------------------------% */
@@ -355,13 +343,13 @@ static integer c__2 = 2;
     --bounds;
     --ritz;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --ipntr;
 
@@ -380,7 +368,7 @@ static integer c__2 = 2;
 /*        | Set machine dependent constant. | */
 /*        %---------------------------------% */
 
-	eps23 = igraphdlamch_("Epsilon-Machine");
+	eps23 = igraphdlamch_("Epsilon-Machine", (ftnlen)15);
 	eps23 = igraphpow_dd(&eps23, &c_b3);
 
 /*        %-------------------------------------% */
@@ -435,8 +423,8 @@ static integer c__2 = 2;
 /* L10: */
 
     if (getv0) {
-	igraphdgetv0_(ido, bmat, &c__1, &initv, n, &c__1, &v[v_offset], ldv, &
-		resid[1], &rnorm, &ipntr[1], &workd[1], info);
+	igraphdgetv0_(ido, bmat, &c__1, &initv, n, &c__1, &v[v_offset], ldv, &resid[
+		1], &rnorm, &ipntr[1], &workd[1], info, (ftnlen)1);
 
 	if (*ido != 99) {
 	    goto L9000;
@@ -484,8 +472,8 @@ static integer c__2 = 2;
 /*     | Compute the first NEV steps of the Lanczos factorization | */
 /*     %----------------------------------------------------------% */
 
-    igraphdsaitr_(ido, bmat, n, &c__0, &nev0, mode, &resid[1], &rnorm, &v[
-	    v_offset], ldv, &h__[h_offset], ldh, &ipntr[1], &workd[1], info);
+    igraphdsaitr_(ido, bmat, n, &c__0, &nev0, mode, &resid[1], &rnorm, &v[v_offset],
+	     ldv, &h__[h_offset], ldh, &ipntr[1], &workd[1], info, (ftnlen)1);
 
 /*     %---------------------------------------------------% */
 /*     | ido .ne. 99 implies use of reverse communication  | */
@@ -523,14 +511,14 @@ L1000:
     ++iter;
 
     if (msglvl > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, &iter, &debug_1.ndigit, "_saup2"
-		": **** Start of major iteration number ****");
+	igraphivout_(&debug_1.logfil, &c__1, &iter, &debug_1.ndigit, "_saup2: ****\
+ Start of major iteration number ****", (ftnlen)49);
     }
     if (msglvl > 1) {
-	igraphivout_(&debug_1.logfil, &c__1, nev, &debug_1.ndigit, "_saup2: "
-		"The length of the current Lanczos factorization");
-	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_saup2: E"
-		"xtend the Lanczos factorization by");
+	igraphivout_(&debug_1.logfil, &c__1, nev, &debug_1.ndigit, "_saup2: The le\
+ngth of the current Lanczos factorization", (ftnlen)55);
+	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_saup2: Extend \
+the Lanczos factorization by", (ftnlen)43);
     }
 
 /*        %------------------------------------------------------------% */
@@ -541,9 +529,8 @@ L1000:
 L20:
     update = TRUE_;
 
-    igraphdsaitr_(ido, bmat, n, nev, np, mode, &resid[1], &rnorm, &v[v_offset]
-	    , ldv, &h__[h_offset], ldh, &ipntr[1], &workd[1], info)
-	    ;
+    igraphdsaitr_(ido, bmat, n, nev, np, mode, &resid[1], &rnorm, &v[v_offset], ldv,
+	     &h__[h_offset], ldh, &ipntr[1], &workd[1], info, (ftnlen)1);
 
 /*        %---------------------------------------------------% */
 /*        | ido .ne. 99 implies use of reverse communication  | */
@@ -570,8 +557,8 @@ L20:
     update = FALSE_;
 
     if (msglvl > 1) {
-	igraphdvout_(&debug_1.logfil, &c__1, &rnorm, &debug_1.ndigit, "_saup"
-		"2: Current B-norm of residual for factorization");
+	igraphdvout_(&debug_1.logfil, &c__1, &rnorm, &debug_1.ndigit, "_saup2: Cur\
+rent B-norm of residual for factorization", (ftnlen)52);
     }
 
 /*        %--------------------------------------------------------% */
@@ -579,8 +566,8 @@ L20:
 /*        | of the current symmetric tridiagonal matrix.           | */
 /*        %--------------------------------------------------------% */
 
-    igraphdseigt_(&rnorm, &kplusp, &h__[h_offset], ldh, &ritz[1], &bounds[1], 
-	    &workl[1], &ierr);
+    igraphdseigt_(&rnorm, &kplusp, &h__[h_offset], ldh, &ritz[1], &bounds[1], &
+	    workl[1], &ierr);
 
     if (ierr != 0) {
 	*info = -8;
@@ -593,8 +580,7 @@ L20:
 /*        %----------------------------------------------------% */
 
     igraphdcopy_(&kplusp, &ritz[1], &c__1, &workl[kplusp + 1], &c__1);
-    igraphdcopy_(&kplusp, &bounds[1], &c__1, &workl[(kplusp << 1) + 1], &c__1)
-	    ;
+    igraphdcopy_(&kplusp, &bounds[1], &c__1, &workl[(kplusp << 1) + 1], &c__1);
 
 /*        %---------------------------------------------------% */
 /*        | Select the wanted Ritz values and their bounds    | */
@@ -608,7 +594,8 @@ L20:
 
     *nev = nev0;
     *np = np0;
-    igraphdsgets_(ishift, which, nev, np, &ritz[1], &bounds[1], &workl[1]);
+    igraphdsgets_(ishift, which, nev, np, &ritz[1], &bounds[1], &workl[1], (ftnlen)
+	    2);
 
 /*        %-------------------% */
 /*        | Convergence test. | */
@@ -621,12 +608,12 @@ L20:
 	kp[0] = *nev;
 	kp[1] = *np;
 	kp[2] = nconv;
-	igraphivout_(&debug_1.logfil, &c__3, kp, &debug_1.ndigit, "_saup2: N"
-		"EV, NP, NCONV are");
-	igraphdvout_(&debug_1.logfil, &kplusp, &ritz[1], &debug_1.ndigit, 
-		"_saup2: The eigenvalues of H");
-	igraphdvout_(&debug_1.logfil, &kplusp, &bounds[1], &debug_1.ndigit, 
-		"_saup2: Ritz estimates of the current NCV Ritz values");
+	igraphivout_(&debug_1.logfil, &c__3, kp, &debug_1.ndigit, "_saup2: NEV, NP\
+, NCONV are", (ftnlen)26);
+	igraphdvout_(&debug_1.logfil, &kplusp, &ritz[1], &debug_1.ndigit, "_saup2:\
+ The eigenvalues of H", (ftnlen)28);
+	igraphdvout_(&debug_1.logfil, &kplusp, &bounds[1], &debug_1.ndigit, "_saup\
+2: Ritz estimates of the current NCV Ritz values", (ftnlen)53);
     }
 
 /*        %---------------------------------------------------------% */
@@ -671,20 +658,21 @@ L20:
 /*              %-----------------------------------------------------% */
 
 	    igraphs_copy(wprime, "SA", (ftnlen)2, (ftnlen)2);
-	    igraphdsortr_(wprime, &c_true, &kplusp, &ritz[1], &bounds[1]);
-	    nevd2 = nev0 / 2;
-	    nevm2 = nev0 - nevd2;
+	    igraphdsortr_(wprime, &c_true, &kplusp, &ritz[1], &bounds[1], (ftnlen)2)
+		    ;
+	    nevd2 = *nev / 2;
+	    nevm2 = *nev - nevd2;
 	    if (*nev > 1) {
 		i__1 = min(nevd2,*np);
 /* Computing MAX */
 		i__2 = kplusp - nevd2 + 1, i__3 = kplusp - *np + 1;
-		igraphdswap_(&i__1, &ritz[nevm2 + 1], &c__1, &ritz[max(i__2,
-			i__3)], &c__1);
+		igraphdswap_(&i__1, &ritz[nevm2 + 1], &c__1, &ritz[max(i__2,i__3)], 
+			&c__1);
 		i__1 = min(nevd2,*np);
 /* Computing MAX */
-		i__2 = kplusp - nevd2 + 1, i__3 = kplusp - *np + 1;
-		igraphdswap_(&i__1, &bounds[nevm2 + 1], &c__1, &bounds[max(
-			i__2,i__3)], &c__1);
+		i__2 = kplusp - nevd2 + 1, i__3 = kplusp - *np;
+		igraphdswap_(&i__1, &bounds[nevm2 + 1], &c__1, &bounds[max(i__2,
+			i__3) + 1], &c__1);
 	    }
 
 	} else {
@@ -711,7 +699,8 @@ L20:
 		igraphs_copy(wprime, "LA", (ftnlen)2, (ftnlen)2);
 	    }
 
-	    igraphdsortr_(wprime, &c_true, &kplusp, &ritz[1], &bounds[1]);
+	    igraphdsortr_(wprime, &c_true, &kplusp, &ritz[1], &bounds[1], (ftnlen)2)
+		    ;
 
 	}
 
@@ -737,8 +726,7 @@ L20:
 /*           %----------------------------------------------------% */
 
 	igraphs_copy(wprime, "LA", (ftnlen)2, (ftnlen)2);
-	igraphdsortr_(wprime, &c_true, &nev0, &bounds[1], &ritz[1])
-		;
+	igraphdsortr_(wprime, &c_true, &nev0, &bounds[1], &ritz[1], (ftnlen)2);
 
 /*           %----------------------------------------------% */
 /*           | Scale the Ritz estimate back to its original | */
@@ -770,7 +758,7 @@ L20:
 /*              %------------------------------------------------% */
 
 	    igraphs_copy(wprime, "LA", (ftnlen)2, (ftnlen)2);
-	    igraphdsortr_(wprime, &c_true, &nconv, &ritz[1], &bounds[1]);
+	    igraphdsortr_(wprime, &c_true, &nconv, &ritz[1], &bounds[1], (ftnlen)2);
 
 	} else {
 
@@ -780,7 +768,7 @@ L20:
 /*              | "threshold" value appears at the front of    | */
 /*              | ritz.                                        | */
 /*              %----------------------------------------------% */
-	    igraphdsortr_(which, &c_true, &nconv, &ritz[1], &bounds[1]);
+	    igraphdsortr_(which, &c_true, &nconv, &ritz[1], &bounds[1], (ftnlen)2);
 
 	}
 
@@ -792,10 +780,10 @@ L20:
 	h__[h_dim1 + 1] = rnorm;
 
 	if (msglvl > 1) {
-	    igraphdvout_(&debug_1.logfil, &kplusp, &ritz[1], &debug_1.ndigit, 
-		    "_saup2: Sorted Ritz values.");
-	    igraphdvout_(&debug_1.logfil, &kplusp, &bounds[1], &
-		    debug_1.ndigit, "_saup2: Sorted ritz estimates.");
+	    igraphdvout_(&debug_1.logfil, &kplusp, &ritz[1], &debug_1.ndigit, "_sa\
+up2: Sorted Ritz values.", (ftnlen)27);
+	    igraphdvout_(&debug_1.logfil, &kplusp, &bounds[1], &debug_1.ndigit, 
+		    "_saup2: Sorted ritz estimates.", (ftnlen)30);
 	}
 
 /*           %------------------------------------% */
@@ -842,25 +830,25 @@ L20:
 /*           %---------------------------------------% */
 
 	if (nevbef < *nev) {
-	    igraphdsgets_(ishift, which, nev, np, &ritz[1], &bounds[1], &
-		    workl[1]);
+	    igraphdsgets_(ishift, which, nev, np, &ritz[1], &bounds[1], &workl[1], (
+		    ftnlen)2);
 	}
 
     }
 
     if (msglvl > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, &nconv, &debug_1.ndigit, "_saup"
-		"2: no. of \"converged\" Ritz values at this iter.");
+	igraphivout_(&debug_1.logfil, &c__1, &nconv, &debug_1.ndigit, "_saup2: no.\
+ of \"converged\" Ritz values at this iter.", (ftnlen)52);
 	if (msglvl > 1) {
 	    kp[0] = *nev;
 	    kp[1] = *np;
-	    igraphivout_(&debug_1.logfil, &c__2, kp, &debug_1.ndigit, "_saup"
-		    "2: NEV and NP are");
-	    igraphdvout_(&debug_1.logfil, nev, &ritz[*np + 1], &
-		    debug_1.ndigit, "_saup2: \"wanted\" Ritz values.");
-	    igraphdvout_(&debug_1.logfil, nev, &bounds[*np + 1], &
-		    debug_1.ndigit, "_saup2: Ritz estimates of the \"wante"
-		    "d\" values ");
+	    igraphivout_(&debug_1.logfil, &c__2, kp, &debug_1.ndigit, "_saup2: NEV\
+ and NP are", (ftnlen)22);
+	    igraphdvout_(&debug_1.logfil, nev, &ritz[*np + 1], &debug_1.ndigit, 
+		    "_saup2: \"wanted\" Ritz values.", (ftnlen)29);
+	    igraphdvout_(&debug_1.logfil, nev, &bounds[*np + 1], &debug_1.ndigit, 
+		    "_saup2: Ritz estimates of the \"wanted\" values ", (
+		    ftnlen)46);
 	}
     }
 
@@ -899,13 +887,13 @@ L50:
     }
 
     if (msglvl > 2) {
-	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_saup2: T"
-		"he number of shifts to apply ");
-	igraphdvout_(&debug_1.logfil, np, &workl[1], &debug_1.ndigit, "_saup"
-		"2: shifts selected");
+	igraphivout_(&debug_1.logfil, &c__1, np, &debug_1.ndigit, "_saup2: The num\
+ber of shifts to apply ", (ftnlen)38);
+	igraphdvout_(&debug_1.logfil, np, &workl[1], &debug_1.ndigit, "_saup2: shi\
+fts selected", (ftnlen)23);
 	if (*ishift == 1) {
-	    igraphdvout_(&debug_1.logfil, np, &bounds[1], &debug_1.ndigit, 
-		    "_saup2: corresponding Ritz estimates");
+	    igraphdvout_(&debug_1.logfil, np, &bounds[1], &debug_1.ndigit, "_saup2\
+: corresponding Ritz estimates", (ftnlen)36);
 	}
     }
 
@@ -917,8 +905,8 @@ L50:
 /*        | factorization of length NEV.                            | */
 /*        %---------------------------------------------------------% */
 
-    igraphdsapps_(n, nev, np, &ritz[1], &v[v_offset], ldv, &h__[h_offset], 
-	    ldh, &resid[1], &q[q_offset], ldq, &workd[1]);
+    igraphdsapps_(n, nev, np, &ritz[1], &v[v_offset], ldv, &h__[h_offset], ldh, &
+	    resid[1], &q[q_offset], ldq, &workd[1]);
 
 /*        %---------------------------------------------% */
 /*        | Compute the B-norm of the updated residual. | */
@@ -966,14 +954,13 @@ L100:
 /* L130: */
 
     if (msglvl > 2) {
-	igraphdvout_(&debug_1.logfil, &c__1, &rnorm, &debug_1.ndigit, "_saup"
-		"2: B-norm of residual for NEV factorization");
-	igraphdvout_(&debug_1.logfil, nev, &h__[(h_dim1 << 1) + 1], &
-		debug_1.ndigit, "_saup2: main diagonal of compressed H matrix"
-		);
+	igraphdvout_(&debug_1.logfil, &c__1, &rnorm, &debug_1.ndigit, "_saup2: B-n\
+orm of residual for NEV factorization", (ftnlen)48);
+	igraphdvout_(&debug_1.logfil, nev, &h__[(h_dim1 << 1) + 1], &debug_1.ndigit,
+		 "_saup2: main diagonal of compressed H matrix", (ftnlen)44);
 	i__1 = *nev - 1;
-	igraphdvout_(&debug_1.logfil, &i__1, &h__[h_dim1 + 2], &
-		debug_1.ndigit, "_saup2: subdiagonal of compressed H matrix");
+	igraphdvout_(&debug_1.logfil, &i__1, &h__[h_dim1 + 2], &debug_1.ndigit, 
+		"_saup2: subdiagonal of compressed H matrix", (ftnlen)42);
     }
 
     goto L1000;

@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlasy2.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -21,10 +14,20 @@ static integer c__1 = 1;
 static integer c__16 = 16;
 static integer c__0 = 0;
 
-/* Subroutine */ int igraphdlasy2_(logical *ltranl, logical *ltranr, integer *isgn, 
-	integer *n1, integer *n2, doublereal *tl, integer *ldtl, doublereal *
-	tr, integer *ldtr, doublereal *b, integer *ldb, doublereal *scale, 
-	doublereal *x, integer *ldx, doublereal *xnorm, integer *info)
+/* Subroutine */ int igraphdlasy2_(ltranl, ltranr, isgn, n1, n2, tl, ldtl, tr, ldtr,
+	 b, ldb, scale, x, ldx, xnorm, info)
+logical *ltranl, *ltranr;
+integer *isgn, *n1, *n2;
+doublereal *tl;
+integer *ldtl;
+doublereal *tr;
+integer *ldtr;
+doublereal *b;
+integer *ldb;
+doublereal *scale, *x;
+integer *ldx;
+doublereal *xnorm;
+integer *info;
 {
     /* Initialized data */
 
@@ -40,27 +43,24 @@ static integer c__0 = 0;
     doublereal d__1, d__2, d__3, d__4, d__5, d__6, d__7, d__8;
 
     /* Local variables */
-    static integer i__, j, k;
-    static doublereal x2[2], l21, u11, u12;
-    static integer ip, jp;
-    static doublereal u22, t16[16]	/* was [4][4] */, gam, bet, eps, sgn, 
-	    tmp[4], tau1, btmp[4], smin;
+    static doublereal btmp[4], smin;
     static integer ipiv;
     static doublereal temp;
     static integer jpiv[4];
     static doublereal xmax;
-    static integer ipsv, jpsv;
+    static integer ipsv, jpsv, i__, j, k;
     static logical bswap;
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdswap_(integer *, doublereal *, integer 
-	    *, doublereal *, integer *);
+    extern /* Subroutine */ int igraphdcopy_(), igraphdswap_();
     static logical xswap;
-    extern doublereal igraphdlamch_(char *);
-    extern integer igraphidamax_(integer *, doublereal *, integer *);
-    static doublereal smlnum;
+    static doublereal x2[2], l21, u11, u12;
+    static integer ip, jp;
+    static doublereal u22, t16[16]	/* was [4][4] */;
+    extern doublereal igraphdlamch_();
+    extern integer igraphidamax_();
+    static doublereal smlnum, gam, bet, eps, sgn, tmp[4], tau1;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -162,16 +162,16 @@ static integer c__0 = 0;
 /*     .. Data statements .. */
     /* Parameter adjustments */
     tl_dim1 = *ldtl;
-    tl_offset = 1 + tl_dim1;
+    tl_offset = 1 + tl_dim1 * 1;
     tl -= tl_offset;
     tr_dim1 = *ldtr;
-    tr_offset = 1 + tr_dim1;
+    tr_offset = 1 + tr_dim1 * 1;
     tr -= tr_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
 
     /* Function Body */
@@ -190,12 +190,12 @@ static integer c__0 = 0;
 
 /*     Set constants to control overflow */
 
-    eps = igraphdlamch_("P");
-    smlnum = igraphdlamch_("S") / eps;
+    eps = igraphdlamch_("P", (ftnlen)1);
+    smlnum = igraphdlamch_("S", (ftnlen)1) / eps;
     sgn = (doublereal) (*isgn);
 
     k = *n1 + *n1 + *n2 - 2;
-    switch (k) {
+    switch ((int)k) {
 	case 1:  goto L10;
 	case 2:  goto L20;
 	case 3:  goto L30;

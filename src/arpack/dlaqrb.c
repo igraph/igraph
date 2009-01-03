@@ -1,13 +1,6 @@
-/* igraphdlaqrb.f -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlaqrb.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -28,7 +21,7 @@ static integer c__1 = 1;
 /*  Hessenberg submatrix in rows and columns ILO to IHI.  Only the */
 /*  last component of the Schur vectors are computed. */
 
-/*  This is mostly a modification of the LAPACK routine dlahqr. */
+/*  This is mostly a modification of the LAPACK routine igraphdlahqr. */
 
 /* \Usage: */
 /*  call igraphdlaqrb */
@@ -98,11 +91,11 @@ static integer c__1 = 1;
 /*     igraphdlabad  LAPACK routine that computes machine constants. */
 /*     dlamch  LAPACK routine that determines machine constants. */
 /*     igraphdlanhs  LAPACK routine that computes various norms of a matrix. */
-/*     dlanv2  LAPACK routine that computes the Schur factorization of */
+/*     igraphdlanv2  LAPACK routine that computes the Schur factorization of */
 /*             2 by 2 nonsymmetric matrix in standard form. */
 /*     dlarfg  LAPACK Householder reflection construction routine. */
 /*     dcopy   Level 1 BLAS that copies one vector to another. */
-/*     drot    Level 1 BLAS that applies a rotation to a 2 by 2 matrix. */
+/*     igraphdrot    Level 1 BLAS that applies a rotation to a 2 by 2 matrix. */
 
 /* \Author */
 /*     Danny Sorensen               Phuong Vu */
@@ -114,7 +107,7 @@ static integer c__1 = 1;
 
 /* \Revision history: */
 /*     xx/xx/92: Version ' 2.4' */
-/*               Modified from the LAPACK routine dlahqr so that only the */
+/*               Modified from the LAPACK routine igraphdlahqr so that only the */
 /*               last component of the Schur vectors are computed. */
 
 /* \SCCS Information: @(#) */
@@ -127,40 +120,39 @@ static integer c__1 = 1;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdlaqrb_(logical *wantt, integer *n, integer *ilo, 
-	integer *ihi, doublereal *h__, integer *ldh, doublereal *wr, 
-	doublereal *wi, doublereal *z__, integer *info)
+/* Subroutine */ int igraphdlaqrb_(wantt, n, ilo, ihi, h__, ldh, wr, wi, z__, info)
+logical *wantt;
+integer *n, *ilo, *ihi;
+doublereal *h__;
+integer *ldh;
+doublereal *wr, *wi, *z__;
+integer *info;
 {
     /* System generated locals */
     integer h_dim1, h_offset, i__1, i__2, i__3, i__4;
     doublereal d__1, d__2;
 
     /* Local variables */
+    static doublereal h43h34, unfl, ovfl;
+    extern /* Subroutine */ int igraphdrot_();
+    static doublereal work[1];
     static integer i__, j, k, l, m;
     static doublereal s, v[3];
+    extern /* Subroutine */ int igraphdcopy_();
     static integer i1, i2;
-    static doublereal t1, t2, t3, v1, v2, v3, h00, h10, h11, h12, h21, h22, 
-	    h33, h44;
+    static doublereal t1, t2, t3, v1, v2, v3;
+    extern /* Subroutine */ int igraphdlanv2_(), igraphdlabad_();
+    static doublereal h00, h10, h11, h12, h21, h22, h33, h44;
     static integer nh;
     static doublereal cs;
+    extern doublereal igraphdlamch_();
+    extern /* Subroutine */ int igraphdlarfg_();
     static integer nr;
-    static doublereal sn, h33s, h44s;
+    static doublereal sn;
+    extern doublereal igraphdlanhs_();
+    static doublereal smlnum, h33s, h44s;
     static integer itn, its;
-    static doublereal ulp, sum, tst1, h43h34, unfl, ovfl;
-    extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *);
-    static doublereal work[1];
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdlanv2_(doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlabad_(
-	    doublereal *, doublereal *);
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
-	     integer *, doublereal *);
-    extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
-	    doublereal *);
-    static doublereal smlnum;
+    static doublereal ulp, sum, tst1;
 
 
 /*     %------------------% */
@@ -199,7 +191,7 @@ static integer c__1 = 1;
 
     /* Parameter adjustments */
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     --wr;
     --wi;
@@ -240,10 +232,10 @@ static integer c__1 = 1;
 /*     | If norm(H) <= sqrt(OVFL), overflow should not occur.        | */
 /*     %-------------------------------------------------------------% */
 
-    unfl = igraphdlamch_("safe minimum");
+    unfl = igraphdlamch_("safe minimum", (ftnlen)12);
     ovfl = 1. / unfl;
     igraphdlabad_(&unfl, &ovfl);
-    ulp = igraphdlamch_("precision");
+    ulp = igraphdlamch_("precision", (ftnlen)9);
     smlnum = unfl * (nh / ulp);
 
 /*     %---------------------------------------------------------------% */
@@ -308,7 +300,8 @@ L10:
 		     h__[k + k * h_dim1], abs(d__2));
 	    if (tst1 == 0.) {
 		i__3 = i__ - l + 1;
-		tst1 = igraphdlanhs_("1", &i__3, &h__[l + l * h_dim1], ldh, work);
+		tst1 = igraphdlanhs_("1", &i__3, &h__[l + l * h_dim1], ldh, work, (
+			ftnlen)1);
 	    }
 /* Computing MAX */
 	    d__2 = ulp * tst1;

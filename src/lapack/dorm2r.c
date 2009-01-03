@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dorm2r.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -18,26 +11,34 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int igraphdorm2r_(char *side, char *trans, integer *m, integer *n, 
-	integer *k, doublereal *a, integer *lda, doublereal *tau, doublereal *
-	c__, integer *ldc, doublereal *work, integer *info)
+/* Subroutine */ int igraphdorm2r_(side, trans, m, n, k, a, lda, tau, c__, ldc, 
+	work, info, side_len, trans_len)
+char *side, *trans;
+integer *m, *n, *k;
+doublereal *a;
+integer *lda;
+doublereal *tau, *c__;
+integer *ldc;
+doublereal *work;
+integer *info;
+ftnlen side_len;
+ftnlen trans_len;
 {
     /* System generated locals */
     integer a_dim1, a_offset, c_dim1, c_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, i1, i2, i3, ic, jc, mi, ni, nq;
-    static doublereal aii;
     static logical left;
-    extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
-	    doublereal *);
-    extern logical igraphlsame_(char *, char *);
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    static integer i__;
+    extern /* Subroutine */ int igraphdlarf_();
+    extern logical igraphlsame_();
+    static integer i1, i2, i3, ic, jc, mi, ni, nq;
+    extern /* Subroutine */ int igraphxerbla_();
     static logical notran;
+    static doublereal aii;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
+/*  -- LAPACK routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -139,18 +140,18 @@ static integer c__1 = 1;
 
     /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1;
+    c_offset = 1 + c_dim1 * 1;
     c__ -= c_offset;
     --work;
 
     /* Function Body */
     *info = 0;
-    left = igraphlsame_(side, "L");
-    notran = igraphlsame_(trans, "N");
+    left = igraphlsame_(side, "L", (ftnlen)1, (ftnlen)1);
+    notran = igraphlsame_(trans, "N", (ftnlen)1, (ftnlen)1);
 
 /*     NQ is the order of Q */
 
@@ -159,9 +160,9 @@ static integer c__1 = 1;
     } else {
 	nq = *n;
     }
-    if (! left && ! igraphlsame_(side, "R")) {
+    if (! left && ! igraphlsame_(side, "R", (ftnlen)1, (ftnlen)1)) {
 	*info = -1;
-    } else if (! notran && ! igraphlsame_(trans, "T")) {
+    } else if (! notran && ! igraphlsame_(trans, "T", (ftnlen)1, (ftnlen)1)) {
 	*info = -2;
     } else if (*m < 0) {
 	*info = -3;
@@ -176,7 +177,7 @@ static integer c__1 = 1;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DORM2R", &i__1);
+	igraphxerbla_("DORM2R", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -186,7 +187,7 @@ static integer c__1 = 1;
 	return 0;
     }
 
-    if ( (left && ! notran) || (! left && notran)) {
+    if (left && ! notran || ! left && notran) {
 	i1 = 1;
 	i2 = *k;
 	i3 = 1;
@@ -226,7 +227,7 @@ static integer c__1 = 1;
 	aii = a[i__ + i__ * a_dim1];
 	a[i__ + i__ * a_dim1] = 1.;
 	igraphdlarf_(side, &mi, &ni, &a[i__ + i__ * a_dim1], &c__1, &tau[i__], &c__[
-		ic + jc * c_dim1], ldc, &work[1]);
+		ic + jc * c_dim1], ldc, &work[1], (ftnlen)1);
 	a[i__ + i__ * a_dim1] = aii;
 /* L10: */
     }

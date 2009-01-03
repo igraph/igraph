@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdtrsyl.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -23,9 +16,20 @@ static doublereal c_b26 = 1.;
 static doublereal c_b30 = 0.;
 static logical c_true = TRUE_;
 
-/* Subroutine */ int igraphdtrsyl_(char *trana, char *tranb, integer *isgn, integer 
-	*m, integer *n, doublereal *a, integer *lda, doublereal *b, integer *
-	ldb, doublereal *c__, integer *ldc, doublereal *scale, integer *info)
+/* Subroutine */ int igraphdtrsyl_(trana, tranb, isgn, m, n, a, lda, b, ldb, c__, 
+	ldc, scale, info, trana_len, tranb_len)
+char *trana, *tranb;
+integer *isgn, *m, *n;
+doublereal *a;
+integer *lda;
+doublereal *b;
+integer *ldb;
+doublereal *c__;
+integer *ldc;
+doublereal *scale;
+integer *info;
+ftnlen trana_len;
+ftnlen tranb_len;
 {
     /* System generated locals */
     integer a_dim1, a_offset, b_dim1, b_offset, c_dim1, c_offset, i__1, i__2, 
@@ -33,38 +37,28 @@ static logical c_true = TRUE_;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static integer j, k, l;
-    static doublereal x[4]	/* was [2][2] */;
-    static integer k1, k2, l1, l2;
-    static doublereal a11, db, da11, vec[4]	/* was [2][2] */, dum[1], eps,
-	     sgn;
-    extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
+    extern doublereal igraphddot_();
     static integer ierr;
     static doublereal smin, suml, sumr;
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
-	    integer *);
-    extern logical igraphlsame_(char *, char *);
-    static integer knext, lnext;
+    static integer j, k, l;
+    extern /* Subroutine */ int igraphdscal_();
+    static doublereal x[4]	/* was [2][2] */;
+    extern logical igraphlsame_();
+    static integer knext, lnext, k1, k2, l1, l2;
     static doublereal xnorm;
-    extern /* Subroutine */ int igraphdlaln2_(logical *, integer *, integer *, 
-	    doublereal *, doublereal *, doublereal *, integer *, doublereal *,
-	     doublereal *, doublereal *, integer *, doublereal *, doublereal *
-	    , doublereal *, integer *, doublereal *, doublereal *, integer *),
-	     igraphdlasy2_(logical *, logical *, integer *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, integer *, doublereal *, 
-	    integer *), igraphdlabad_(doublereal *, doublereal *);
-    extern doublereal igraphdlamch_(char *), igraphdlange_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *);
+    extern /* Subroutine */ int igraphdlaln2_(), igraphdlasy2_();
+    static doublereal a11, db;
+    extern /* Subroutine */ int igraphdlabad_();
+    extern doublereal igraphdlamch_(), igraphdlange_();
     static doublereal scaloc;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    extern /* Subroutine */ int igraphxerbla_();
     static doublereal bignum;
     static logical notrna, notrnb;
-    static doublereal smlnum;
+    static doublereal smlnum, da11, vec[4]	/* was [2][2] */, dum[1], eps,
+	     sgn;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
+/*  -- LAPACK routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     March 31, 1993 */
@@ -169,25 +163,25 @@ static logical c_true = TRUE_;
 
     /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1;
+    c_offset = 1 + c_dim1 * 1;
     c__ -= c_offset;
 
     /* Function Body */
-    notrna = igraphlsame_(trana, "N");
-    notrnb = igraphlsame_(tranb, "N");
+    notrna = igraphlsame_(trana, "N", (ftnlen)1, (ftnlen)1);
+    notrnb = igraphlsame_(tranb, "N", (ftnlen)1, (ftnlen)1);
 
     *info = 0;
-    if (! notrna && ! igraphlsame_(trana, "T") && ! igraphlsame_(
-	    trana, "C")) {
+    if (! notrna && ! igraphlsame_(trana, "T", (ftnlen)1, (ftnlen)1) && ! igraphlsame_(
+	    trana, "C", (ftnlen)1, (ftnlen)1)) {
 	*info = -1;
-    } else if (! notrnb && ! igraphlsame_(tranb, "T") && ! 
-	    igraphlsame_(tranb, "C")) {
+    } else if (! notrnb && ! igraphlsame_(tranb, "T", (ftnlen)1, (ftnlen)1) && ! 
+	    igraphlsame_(tranb, "C", (ftnlen)1, (ftnlen)1)) {
 	*info = -2;
     } else if (*isgn != 1 && *isgn != -1) {
 	*info = -3;
@@ -204,7 +198,7 @@ static logical c_true = TRUE_;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DTRSYL", &i__1);
+	igraphxerbla_("DTRSYL", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -216,16 +210,17 @@ static logical c_true = TRUE_;
 
 /*     Set constants to control overflow */
 
-    eps = igraphdlamch_("P");
-    smlnum = igraphdlamch_("S");
+    eps = igraphdlamch_("P", (ftnlen)1);
+    smlnum = igraphdlamch_("S", (ftnlen)1);
     bignum = 1. / smlnum;
     igraphdlabad_(&smlnum, &bignum);
     smlnum = smlnum * (doublereal) (*m * *n) / eps;
     bignum = 1. / smlnum;
 
 /* Computing MAX */
-    d__1 = smlnum, d__2 = eps * igraphdlange_("M", m, m, &a[a_offset], lda, dum), d__1 = max(d__1,d__2), d__2 = eps * igraphdlange_("M", n, n, 
-	    &b[b_offset], ldb, dum);
+    d__1 = smlnum, d__2 = eps * igraphdlange_("M", m, m, &a[a_offset], lda, dum, (
+	    ftnlen)1), d__1 = max(d__1,d__2), d__2 = eps * igraphdlange_("M", n, n, 
+	    &b[b_offset], ldb, dum, (ftnlen)1);
     smin = max(d__1,d__2);
 
     *scale = 1.;

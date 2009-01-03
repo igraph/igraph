@@ -1,21 +1,18 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* daxpy.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdaxpy_(integer *n, doublereal *da, doublereal *dx, 
-	integer *incx, doublereal *dy, integer *incy)
+/* Subroutine */ int igraphdaxpy_(n, da, dx, incx, dy, incy)
+integer *n;
+doublereal *da, *dx;
+integer *incx;
+doublereal *dy;
+integer *incy;
 {
     /* System generated locals */
     integer i__1;
@@ -27,7 +24,6 @@
 /*     constant times a vector plus a vector. */
 /*     uses unrolled loops for increments equal to one. */
 /*     jack dongarra, linpack, 3/11/78. */
-/*     modified 12/3/93, array(1) declarations changed to array(*) */
 
 
     /* Parameter adjustments */

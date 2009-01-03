@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlanst.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -18,25 +11,29 @@
 
 static integer c__1 = 1;
 
-doublereal igraphdlanst_(char *norm, integer *n, doublereal *d__, doublereal *e)
+doublereal igraphdlanst_(norm, n, d__, e, norm_len)
+char *norm;
+integer *n;
+doublereal *d__, *e;
+ftnlen norm_len;
 {
     /* System generated locals */
     integer i__1;
     doublereal ret_val, d__1, d__2, d__3, d__4, d__5;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
     static integer i__;
-    static doublereal sum, scale;
-    extern logical igraphlsame_(char *, char *);
+    static doublereal scale;
+    extern logical igraphlsame_();
     static doublereal anorm;
-    extern /* Subroutine */ int igraphdlassq_(integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *);
+    extern /* Subroutine */ int igraphdlassq_();
+    static doublereal sum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -109,7 +106,7 @@ doublereal igraphdlanst_(char *norm, integer *n, doublereal *d__, doublereal *e)
     /* Function Body */
     if (*n <= 0) {
 	anorm = 0.;
-    } else if (igraphlsame_(norm, "M")) {
+    } else if (igraphlsame_(norm, "M", (ftnlen)1, (ftnlen)1)) {
 
 /*        Find max(abs(A(i,j))). */
 
@@ -124,8 +121,8 @@ doublereal igraphdlanst_(char *norm, integer *n, doublereal *d__, doublereal *e)
 	    anorm = max(d__2,d__3);
 /* L10: */
 	}
-    } else if (igraphlsame_(norm, "O") || *(unsigned char *)
-	    norm == '1' || igraphlsame_(norm, "I")) {
+    } else if (igraphlsame_(norm, "O", (ftnlen)1, (ftnlen)1) || *(unsigned char *)
+	    norm == '1' || igraphlsame_(norm, "I", (ftnlen)1, (ftnlen)1)) {
 
 /*        Find norm1(A). */
 
@@ -145,7 +142,8 @@ doublereal igraphdlanst_(char *norm, integer *n, doublereal *d__, doublereal *e)
 /* L20: */
 	    }
 	}
-    } else if (igraphlsame_(norm, "F") || igraphlsame_(norm, "E")) {
+    } else if (igraphlsame_(norm, "F", (ftnlen)1, (ftnlen)1) || igraphlsame_(norm, "E", (
+	    ftnlen)1, (ftnlen)1)) {
 
 /*        Find normF(A). */
 

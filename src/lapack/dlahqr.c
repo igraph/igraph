@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlahqr.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -18,52 +11,49 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int igraphdlahqr_(logical *wantt, logical *wantz, integer *n, 
-	integer *ilo, integer *ihi, doublereal *h__, integer *ldh, doublereal 
-	*wr, doublereal *wi, integer *iloz, integer *ihiz, doublereal *z__, 
-	integer *ldz, integer *info)
+/* Subroutine */ int igraphdlahqr_(wantt, wantz, n, ilo, ihi, h__, ldh, wr, wi, 
+	iloz, ihiz, z__, ldz, info)
+logical *wantt, *wantz;
+integer *n, *ilo, *ihi;
+doublereal *h__;
+integer *ldh;
+doublereal *wr, *wi;
+integer *iloz, *ihiz;
+doublereal *z__;
+integer *ldz, *info;
 {
     /* System generated locals */
     integer h_dim1, h_offset, z_dim1, z_offset, i__1, i__2, i__3, i__4;
     doublereal d__1, d__2;
 
-    /* Builtin functions */
-    double sqrt(doublereal), igraphd_sign(doublereal *, doublereal *);
-
     /* Local variables */
+    static doublereal h43h34, unfl, ovfl;
+    extern /* Subroutine */ int igraphdrot_();
+    static doublereal work[1];
     static integer i__, j, k, l, m;
     static doublereal s, v[3];
+    extern /* Subroutine */ int igraphdcopy_();
     static integer i1, i2;
-    static doublereal t1, t2, t3, v1, v2, v3, h00, h10, h11, h12, h21, h22, 
-	    h33, h44;
+    static doublereal t1, t2, t3, v1, v2, v3;
+    extern /* Subroutine */ int igraphdlanv2_(), igraphdlabad_();
+    static doublereal h00, h10, h11, h12, h21, h22, h33, h44;
     static integer nh;
     static doublereal cs;
+    extern doublereal igraphdlamch_();
+    extern /* Subroutine */ int igraphdlarfg_();
     static integer nr;
     static doublereal sn;
     static integer nz;
-    static doublereal ave, h33s, h44s;
+    extern doublereal igraphdlanhs_();
+    static doublereal smlnum, h33s, h44s;
     static integer itn, its;
-    static doublereal ulp, sum, tst1, h43h34, disc, unfl, ovfl;
-    extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *);
-    static doublereal work[1];
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdlanv2_(doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlabad_(
-	    doublereal *, doublereal *);
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
-	     integer *, doublereal *);
-    extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
-	    doublereal *);
-    static doublereal smlnum;
+    static doublereal ulp, sum, tst1;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*     October 31, 1992 */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -146,12 +136,6 @@ static integer c__1 = 1;
 /*               elements i+1:ihi of WR and WI contain those eigenvalues */
 /*               which have been successfully computed. */
 
-/*  Further Details */
-/*  =============== */
-
-/*  2-96 Based on modifications by */
-/*     David Day, Sandia National Laboratory, USA */
-
 /*  ===================================================================== */
 
 /*     .. Parameters .. */
@@ -170,12 +154,12 @@ static integer c__1 = 1;
 
     /* Parameter adjustments */
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     --wr;
     --wi;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1;
+    z_offset = 1 + z_dim1 * 1;
     z__ -= z_offset;
 
     /* Function Body */
@@ -198,10 +182,10 @@ static integer c__1 = 1;
 /*     Set machine-dependent constants for the stopping criterion. */
 /*     If norm(H) <= sqrt(OVFL), overflow should not occur. */
 
-    unfl = igraphdlamch_("Safe minimum");
+    unfl = igraphdlamch_("Safe minimum", (ftnlen)12);
     ovfl = 1. / unfl;
     igraphdlabad_(&unfl, &ovfl);
-    ulp = igraphdlamch_("Precision");
+    ulp = igraphdlamch_("Precision", (ftnlen)9);
     smlnum = unfl * (nh / ulp);
 
 /*     I1 and I2 are the indices of the first row and last column of H */
@@ -245,7 +229,8 @@ L10:
 		     h__[k + k * h_dim1], abs(d__2));
 	    if (tst1 == 0.) {
 		i__3 = i__ - l + 1;
-		tst1 = igraphdlanhs_("1", &i__3, &h__[l + l * h_dim1], ldh, work);
+		tst1 = igraphdlanhs_("1", &i__3, &h__[l + l * h_dim1], ldh, work, (
+			ftnlen)1);
 	    }
 /* Computing MAX */
 	    d__2 = ulp * tst1;
@@ -285,43 +270,24 @@ L30:
 
 	    s = (d__1 = h__[i__ + (i__ - 1) * h_dim1], abs(d__1)) + (d__2 = 
 		    h__[i__ - 1 + (i__ - 2) * h_dim1], abs(d__2));
-	    h44 = s * .75 + h__[i__ + i__ * h_dim1];
+	    h44 = s * .75;
 	    h33 = h44;
 	    h43h34 = s * -.4375 * s;
 	} else {
 
-/*           Prepare to use Francis' double shift */
-/*           (i.e. 2nd degree generalized Rayleigh quotient) */
+/*           Prepare to use Wilkinson's double shift */
 
 	    h44 = h__[i__ + i__ * h_dim1];
 	    h33 = h__[i__ - 1 + (i__ - 1) * h_dim1];
 	    h43h34 = h__[i__ + (i__ - 1) * h_dim1] * h__[i__ - 1 + i__ * 
 		    h_dim1];
-	    s = h__[i__ - 1 + (i__ - 2) * h_dim1] * h__[i__ - 1 + (i__ - 2) * 
-		    h_dim1];
-	    disc = (h33 - h44) * .5;
-	    disc = disc * disc + h43h34;
-	    if (disc > 0.) {
-
-/*              Real roots: use Wilkinson's shift twice */
-
-		disc = sqrt(disc);
-		ave = (h33 + h44) * .5;
-		if (abs(h33) - abs(h44) > 0.) {
-		    h33 = h33 * h44 - h43h34;
-		    h44 = h33 / (igraphd_sign(&disc, &ave) + ave);
-		} else {
-		    h44 = igraphd_sign(&disc, &ave) + ave;
-		}
-		h33 = h44;
-		h43h34 = 0.;
-	    }
 	}
 
 /*        Look for two consecutive small subdiagonal elements. */
 
 	i__2 = l;
 	for (m = i__ - 2; m >= i__2; --m) {
+
 /*           Determine the effect of starting the double-shift QR */
 /*           iteration at row M, and see if this would make H(M,M-1) */
 /*           negligible. */

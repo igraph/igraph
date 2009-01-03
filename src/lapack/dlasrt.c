@@ -1,40 +1,34 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlasrt.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdlasrt_(char *id, integer *n, doublereal *d__, integer *
-	info)
+/* Subroutine */ int igraphdlasrt_(id, n, d__, info, id_len)
+char *id;
+integer *n;
+doublereal *d__;
+integer *info;
+ftnlen id_len;
 {
     /* System generated locals */
     integer i__1, i__2;
 
     /* Local variables */
-    static integer i__, j;
-    static doublereal d1, d2, d3;
-    static integer dir;
-    static doublereal tmp;
-    static integer endd;
-    extern logical igraphlsame_(char *, char *);
+    static integer endd, i__, j;
+    extern logical igraphlsame_();
     static integer stack[64]	/* was [2][32] */;
-    static doublereal dmnmx;
+    static doublereal dmnmx, d1, d2, d3;
     static integer start;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
-    static integer stkpnt;
+    extern /* Subroutine */ int igraphxerbla_();
+    static integer stkpnt, dir;
+    static doublereal tmp;
 
 
-/*  -- LAPACK routine (version 3.0) -- */
+/*  -- LAPACK routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     September 30, 1994 */
@@ -95,9 +89,9 @@
     /* Function Body */
     *info = 0;
     dir = -1;
-    if (igraphlsame_(id, "D")) {
+    if (igraphlsame_(id, "D", (ftnlen)1, (ftnlen)1)) {
 	dir = 0;
-    } else if (igraphlsame_(id, "I")) {
+    } else if (igraphlsame_(id, "I", (ftnlen)1, (ftnlen)1)) {
 	dir = 1;
     }
     if (dir == -1) {
@@ -107,7 +101,7 @@
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DLASRT", &i__1);
+	igraphxerbla_("DLASRT", &i__1, (ftnlen)6);
 	return 0;
     }
 

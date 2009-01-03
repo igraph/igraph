@@ -1,24 +1,24 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlaln2.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdlaln2_(logical *ltrans, integer *na, integer *nw, 
-	doublereal *smin, doublereal *ca, doublereal *a, integer *lda, 
-	doublereal *d1, doublereal *d2, doublereal *b, integer *ldb, 
-	doublereal *wr, doublereal *wi, doublereal *x, integer *ldx, 
-	doublereal *scale, doublereal *xnorm, integer *info)
+/* Subroutine */ int igraphdlaln2_(ltrans, na, nw, smin, ca, a, lda, d1, d2, b, ldb,
+	 wr, wi, x, ldx, scale, xnorm, info)
+logical *ltrans;
+integer *na, *nw;
+doublereal *smin, *ca, *a;
+integer *lda;
+doublereal *d1, *d2, *b;
+integer *ldb;
+doublereal *wr, *wi, *x;
+integer *ldx;
+doublereal *scale, *xnorm;
+integer *info;
 {
     /* Initialized data */
 
@@ -33,24 +33,23 @@
     static doublereal equiv_0[4], equiv_1[4];
 
     /* Local variables */
+    static doublereal bbnd, cmax, ui11r, ui12s, temp, ur11r, ur12s;
     static integer j;
+    static doublereal u22abs;
+    static integer icmax;
+    static doublereal bnorm, cnorm, smini;
 #define ci (equiv_0)
 #define cr (equiv_1)
-    static doublereal bi1, bi2, br1, br2, xi1, xi2, xr1, xr2, ci21, ci22, 
-	    cr21, cr22, li21, csi, ui11, lr21, ui12, ui22;
+    extern doublereal igraphdlamch_();
+    extern /* Subroutine */ int igraphdladiv_();
+    static doublereal bignum, bi1, bi2, br1, br2, smlnum, xi1, xi2, xr1, xr2, 
+	    ci21, ci22, cr21, cr22, li21, csi, ui11, lr21, ui12, ui22;
 #define civ (equiv_0)
     static doublereal csr, ur11, ur12, ur22;
 #define crv (equiv_1)
-    static doublereal bbnd, cmax, ui11r, ui12s, temp, ur11r, ur12s, u22abs;
-    static integer icmax;
-    static doublereal bnorm, cnorm, smini;
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphdladiv_(doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *);
-    static doublereal bignum, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -193,13 +192,13 @@
 /*     .. Data statements .. */
     /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     b_dim1 = *ldb;
-    b_offset = 1 + b_dim1;
+    b_offset = 1 + b_dim1 * 1;
     b -= b_offset;
     x_dim1 = *ldx;
-    x_offset = 1 + x_dim1;
+    x_offset = 1 + x_dim1 * 1;
     x -= x_offset;
 
     /* Function Body */
@@ -208,7 +207,7 @@
 
 /*     Compute BIGNUM */
 
-    smlnum = 2. * igraphdlamch_("Safe minimum");
+    smlnum = 2. * igraphdlamch_("Safe minimum", (ftnlen)12);
     bignum = 1. / smlnum;
     smini = max(*smin,smlnum);
 

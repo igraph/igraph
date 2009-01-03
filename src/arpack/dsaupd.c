@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dsaupd.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -52,19 +45,19 @@ static integer c__1 = 1;
 /*  with respect to a real positive semi-definite symmetric matrix B, */
 /*  i.e. */
 
-/*       B*OP = (OP`)*B. */
+/*       B*OP = (OP')*B. */
 
 /*  Another way to express this condition is */
 
-/*       < x,OPy > = < OPx,y >  where < z,w > = z`Bw  . */
+/*       < x,OPy > = < OPx,y >  where < z,w > = z'Bw  . */
 
 /*  In the standard eigenproblem B is the identity matrix. */
-/*  ( A` denotes transpose of A) */
+/*  ( A' denotes transpose of A) */
 
 /*  The computed approximate eigenvalues are called Ritz values and */
 /*  the corresponding approximate eigenvectors are called Ritz vectors. */
 
-/*  dsaupd  is usually called iteratively to solve one of the */
+/*  dsaupd is usually called iteratively to solve one of the */
 /*  following problems: */
 
 /*  Mode 1:  A*x = lambda*x, A symmetric */
@@ -107,11 +100,11 @@ static integer c__1 = 1;
 /* \Arguments */
 /*  IDO     Integer.  (INPUT/OUTPUT) */
 /*          Reverse communication flag.  IDO must be zero on the first */
-/*          call to dsaupd .  IDO will be set internally to */
+/*          call to dsaupd.  IDO will be set internally to */
 /*          indicate the type of operation to be performed.  Control is */
 /*          then given back to the calling routine which has the */
 /*          responsibility to carry out the requested operation and call */
-/*          dsaupd  with the result.  The operand is given in */
+/*          dsaupd with the result.  The operand is given in */
 /*          WORKD(IPNTR(1)), the result must be put in WORKD(IPNTR(2)). */
 /*          (If Mode = 2 see remark 5 below) */
 /*          ------------------------------------------------------------- */
@@ -160,14 +153,14 @@ static integer c__1 = 1;
 /*  NEV     Integer.  (INPUT) */
 /*          Number of eigenvalues of OP to be computed. 0 < NEV < N. */
 
-/*  TOL     Double precision  scalar.  (INPUT) */
+/*  TOL     Double precision scalar.  (INPUT) */
 /*          Stopping criterion: the relative accuracy of the Ritz value */
 /*          is considered acceptable if BOUNDS(I) .LE. TOL*ABS(RITZ(I)). */
 /*          If TOL .LE. 0. is passed a default is set: */
-/*          DEFAULT = DLAMCH ('EPS')  (machine precision as computed */
-/*                    by the LAPACK auxiliary subroutine DLAMCH ). */
+/*          DEFAULT = DLAMCH('EPS')  (machine precision as computed */
+/*                    by the LAPACK auxiliary subroutine DLAMCH). */
 
-/*  RESID   Double precision  array of length N.  (INPUT/OUTPUT) */
+/*  RESID   Double precision array of length N.  (INPUT/OUTPUT) */
 /*          On INPUT: */
 /*          If INFO .EQ. 0, a random initial residual vector is used. */
 /*          If INFO .NE. 0, RESID contains the initial residual vector, */
@@ -184,7 +177,7 @@ static integer c__1 = 1;
 /*          Most of the cost in generating each Lanczos vector is in the */
 /*          matrix-vector product OP*x. (See remark 4 below). */
 
-/*  V       Double precision  N by NCV array.  (OUTPUT) */
+/*  V       Double precision N by NCV array.  (OUTPUT) */
 /*          The NCV columns of V contain the Lanczos basis vectors. */
 
 /*  LDV     Integer.  (INPUT) */
@@ -227,12 +220,12 @@ static integer c__1 = 1;
 
 /*          IPARAM(7) = MODE */
 /*          On INPUT determines what type of eigenproblem is being solved. */
-/*          Must be 1,2,3,4,5; See under \Description of dsaupd  for the */
+/*          Must be 1,2,3,4,5; See under \Description of dsaupd for the */
 /*          five modes available. */
 
 /*          IPARAM(8) = NP */
 /*          When ido = 3 and the user provides shifts through reverse */
-/*          communication (IPARAM(1)=0), dsaupd  returns NP, the number */
+/*          communication (IPARAM(1)=0), dsaupd returns NP, the number */
 /*          of shifts the user is to provide. 0 < NP <=NCV-NEV. See Remark */
 /*          6 below. */
 
@@ -257,23 +250,23 @@ static integer c__1 = 1;
 /*                    with the Ritz values located in RITZ in WORKL. */
 /*          IPNTR(11): pointer to the NP shifts in WORKL. See Remark 6 below. */
 
-/*          Note: IPNTR(8:10) is only referenced by dseupd . See Remark 2. */
+/*          Note: IPNTR(8:10) is only referenced by dseupd. See Remark 2. */
 /*          IPNTR(8): pointer to the NCV RITZ values of the original system. */
 /*          IPNTR(9): pointer to the NCV corresponding error bounds. */
 /*          IPNTR(10): pointer to the NCV by NCV matrix of eigenvectors */
 /*                     of the tridiagonal matrix T. Only referenced by */
-/*                     dseupd  if RVEC = .TRUE. See Remarks. */
+/*                     dseupd if RVEC = .TRUE. See Remarks. */
 /*          ------------------------------------------------------------- */
 
-/*  WORKD   Double precision  work array of length 3*N.  (REVERSE COMMUNICATION) */
+/*  WORKD   Double precision work array of length 3*N.  (REVERSE COMMUNICATION) */
 /*          Distributed array to be used in the basic Arnoldi iteration */
 /*          for reverse communication.  The user should not use WORKD */
 /*          as temporary workspace during the iteration. Upon termination */
 /*          WORKD(1:N) contains B*RESID(1:N). If the Ritz vectors are desired */
-/*          subroutine dseupd  uses this output. */
+/*          subroutine dseupd uses this output. */
 /*          See Data Distribution Note below. */
 
-/*  WORKL   Double precision  work array of length LWORKL.  (OUTPUT/WORKSPACE) */
+/*  WORKL   Double precision work array of length LWORKL.  (OUTPUT/WORKSPACE) */
 /*          Private (replicated) array on each PE or array allocated on */
 /*          the front end.  See Data Distribution Note below. */
 
@@ -304,7 +297,7 @@ static integer c__1 = 1;
 /*          = -6: BMAT must be one of 'I' or 'G'. */
 /*          = -7: Length of private work array WORKL is not sufficient. */
 /*          = -8: Error return from trid. eigenvalue calculation; */
-/*                Informatinal error from LAPACK routine dsteqr . */
+/*                Informatinal error from LAPACK routine dsteqr. */
 /*          = -9: Starting vector is zero. */
 /*          = -10: IPARAM(7) must be 1,2,3,4,5. */
 /*          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatable. */
@@ -322,19 +315,19 @@ static integer c__1 = 1;
 /*     eigenvalues of OP.  The selection of WHICH should be made */
 /*     with this in mind when Mode = 3,4,5.  After convergence, */
 /*     approximate eigenvalues of the original problem may be obtained */
-/*     with the ARPACK subroutine dseupd . */
+/*     with the ARPACK subroutine dseupd. */
 
 /*  2. If the Ritz vectors corresponding to the converged Ritz values */
-/*     are needed, the user must call dseupd  immediately following completion */
-/*     of dsaupd . This is new starting with version 2.1 of ARPACK. */
+/*     are needed, the user must call dseupd immediately following completion */
+/*     of dsaupd. This is new starting with version 2.1 of ARPACK. */
 
-/*  3. If M can be factored into a Cholesky factorization M = LL` */
+/*  3. If M can be factored into a Cholesky factorization M = LL' */
 /*     then Mode = 2 should not be selected.  Instead one should use */
-/*     Mode = 1 with  OP = inv(L)*A*inv(L`).  Appropriate triangular */
-/*     linear systems should be solved with L and L` rather */
+/*     Mode = 1 with  OP = inv(L)*A*inv(L').  Appropriate triangular */
+/*     linear systems should be solved with L and L' rather */
 /*     than computing inverses.  After convergence, an approximate */
 /*     eigenvector z of the original problem is recovered by solving */
-/*     L`z = x  where x is a Ritz vector of OP. */
+/*     L'z = x  where x is a Ritz vector of OP. */
 
 /*  4. At present there is no a-priori analysis to guide the selection */
 /*     of NCV relative to NEV.  The only formal requrement is that NCV > NEV. */
@@ -415,14 +408,14 @@ static integer c__1 = 1;
 /*     Transformations in a k-Step Arnoldi Method". In Preparation. */
 
 /* \Routines called: */
-/*     dsaup2   ARPACK routine that implements the Implicitly Restarted */
+/*     dsaup2  ARPACK routine that implements the Implicitly Restarted */
 /*             Arnoldi Iteration. */
-/*     dstats   ARPACK routine that initialize timing and other statistics */
+/*     dstats  ARPACK routine that initialize timing and other statistics */
 /*             variables. */
 /*     ivout   ARPACK utility routine that prints integers. */
 /*     second  ARPACK utility routine for timing. */
-/*     dvout    ARPACK utility routine that prints vectors. */
-/*     dlamch   LAPACK routine that determines machine constants. */
+/*     dvout   ARPACK utility routine that prints vectors. */
+/*     dlamch  LAPACK routine that determines machine constants. */
 
 /* \Authors */
 /*     Danny Sorensen               Phuong Vu */
@@ -436,7 +429,7 @@ static integer c__1 = 1;
 /*     12/15/93: Version ' 2.4' */
 
 /* \SCCS Information: @(#) */
-/* FILE: saupd.F   SID: 2.8   DATE OF SID: 04/10/01   RELEASE: 2 */
+/* FILE: saupd.F   SID: 2.7   DATE OF SID: 8/27/96   RELEASE: 2 */
 
 /* \Remarks */
 /*     1. None */
@@ -445,67 +438,65 @@ static integer c__1 = 1;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdsaupd_(integer *ido, char *bmat, integer *n, char 
-	*which, integer *nev, doublereal *tol, doublereal *resid, integer *
-	ncv, doublereal *v, integer *ldv, integer *iparam, integer *ipntr, 
-	doublereal *workd, doublereal *workl, integer *lworkl, integer *info)
+/* Subroutine */ int igraphdsaupd_(ido, bmat, n, which, nev, tol, resid, ncv, v, 
+	ldv, iparam, ipntr, workd, workl, lworkl, info)
+integer *ido;
+char *bmat;
+integer *n;
+char *which;
+integer *nev;
+doublereal *tol, *resid;
+integer *ncv;
+doublereal *v;
+integer *ldv, *iparam, *ipntr;
+doublereal *workd, *workl;
+integer *lworkl, *info;
 {
     /* Format strings */
-/*     static char fmt_1000[] = "(//,5x,\002===================================" */
-/* 	    "=======\002,/5x,\002= Symmetric implicit Arnoldi update code " */
-/* 	    "=\002,/5x,\002= Version Number:\002,\002 2.4\002,19x,\002 =\002," */
-/* 	    "/5x,\002= Version Date:  \002,\002 07/31/96\002,14x,\002 =\002,/" */
-/* 	    "5x,\002==========================================\002,/5x,\002= " */
-/* 	    "Summary of timing statistics           =\002,/5x,\002===========" */
-/* 	    "===============================\002,//)"; */
-/*     static char fmt_1100[] = "(5x,\002Total number update iterations        " */
-/* 	    "     = \002,i5,/5x,\002Total number of OP*x operations          " */
-/* 	    "  = \002,i5,/5x,\002Total number of B*x operations             = " */
-/* 	    "\002,i5,/5x,\002Total number of reorthogonalization steps  = " */
-/* 	    "\002,i5,/5x,\002Total number of iterative refinement steps = " */
-/* 	    "\002,i5,/5x,\002Total number of restart steps              = " */
-/* 	    "\002,i5,/5x,\002Total time in user OP*x operation          = " */
-/* 	    "\002,f12.6,/5x,\002Total time in user B*x operation           =" */
-/* 	    " \002,f12.6,/5x,\002Total time in Arnoldi update routine       = " */
-/* 	    "\002,f12.6,/5x,\002Total time in saup2 routine                =" */
-/* 	    " \002,f12.6,/5x,\002Total time in basic Arnoldi iteration loop = " */
-/* 	    "\002,f12.6,/5x,\002Total time in reorthogonalization phase    =" */
-/* 	    " \002,f12.6,/5x,\002Total time in (re)start vector generation  = " */
-/* 	    "\002,f12.6,/5x,\002Total time in trid eigenvalue subproblem   =" */
-/* 	    " \002,f12.6,/5x,\002Total time in getting the shifts           = " */
-/* 	    "\002,f12.6,/5x,\002Total time in applying the shifts          =" */
-/* 	    " \002,f12.6,/5x,\002Total time in convergence testing          = " */
-/* 	    "\002,f12.6)"; */
+    static char fmt_1000[] = "(//,5x,\002===================================\
+=======\002,/5x,\002= Symmetric implicit Arnoldi update code =\002,/5x,\002=\
+ Version Number:\002,\002 2.4\002,19x,\002 =\002,/5x,\002= Version Date: \
+ \002,\002 07/31/96\002,14x,\002 =\002,/5x,\002=============================\
+=============\002,/5x,\002= Summary of timing statistics           =\002,/5x,\
+\002==========================================\002,//)";
+    static char fmt_1100[] = "(5x,\002Total number update iterations        \
+     = \002,i5,/5x,\002Total number of OP*x operations            = \002,i5,\
+/5x,\002Total number of B*x operations             = \002,i5,/5x,\002Total n\
+umber of reorthogonalization steps  = \002,i5,/5x,\002Total number of iterat\
+ive refinement steps = \002,i5,/5x,\002Total number of restart steps        \
+      = \002,i5,/5x,\002Total time in user OP*x operation          = \002,f1\
+2.6,/5x,\002Total time in user B*x operation           = \002,f12.6,/5x,\002\
+Total time in Arnoldi update routine       = \002,f12.6,/5x,\002Total time i\
+n saup2 routine                = \002,f12.6,/5x,\002Total time in basic Arno\
+ldi iteration loop = \002,f12.6,/5x,\002Total time in reorthogonalization ph\
+ase    = \002,f12.6,/5x,\002Total time in (re)start vector generation  = \
+\002,f12.6,/5x,\002Total time in trid eigenvalue subproblem   = \002,f12.6,/\
+5x,\002Total time in getting the shifts           = \002,f12.6,/5x,\002Total\
+ time in applying the shifts          = \002,f12.6,/5x,\002Total time in con\
+vergence testing          = \002,f12.6)";
 
     /* System generated locals */
     integer v_dim1, v_offset, i__1, i__2;
 
     /* Builtin functions */
-    integer igraphs_cmp(char *, char *, ftnlen, ftnlen)/* , s_wsfe(cilist *), e_wsfe( */
-/* 	    void), do_fio(integer *, char *, ftnlen) */;
+    integer igraphs_cmp()/* , s_wsfe(), e_wsfe(), do_fio() */;
 
     /* Local variables */
-    static integer j;
+    static integer mode, ierr, iupd, next, ritz, j;
+    extern /* Subroutine */ int igraphdvout_();
     static real t0, t1;
-    static integer nb, ih, iq, np, iw, ldh, ldq, nev0;
-    extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal 
-	    *, integer *, char *), igraphivout_(integer *, integer *, 
-	    integer *, integer *, char *);
-    static integer mode;
-    extern /* Subroutine */ int igraphdsaup2_(integer *, char *, integer *, 
-	    char *, integer *, integer *, doublereal *, doublereal *, integer 
-	    *, integer *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,
-	     integer *, doublereal *, integer *, doublereal *, integer *);
-    static integer ierr, iupd, next;
-    extern doublereal igraphdlamch_(char *);
-    static integer ritz;
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdstats_(void);
+    extern /* Subroutine */ int igraphivout_(), igraphdsaup2_();
+    static integer nb, ih;
+    extern doublereal igraphdlamch_();
+    static integer iq, np, iw;
+    extern /* Subroutine */ int igraphsecond_();
     static integer bounds, ishift, msglvl, mxiter;
+    extern /* Subroutine */ int igraphdstats_();
+    static integer ldh, ldq, nev0;
 
     /* Fortran I/O blocks */
-/*     static cilist io___21 = { 0, 6, 0, fmt_1000, 0 }; */
-/*     static cilist io___22 = { 0, 6, 0, fmt_1100, 0 }; */
+    static cilist io___21 = { 0, 6, 0, fmt_1000, 0 };
+    static cilist io___22 = { 0, 6, 0, fmt_1100, 0 };
 
 
 
@@ -567,7 +558,7 @@ static integer c__1 = 1;
     --workd;
     --resid;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --iparam;
     --ipntr;
@@ -588,8 +579,7 @@ static integer c__1 = 1;
 	ierr = 0;
 	ishift = iparam[1];
 	mxiter = iparam[3];
-/*         nb     = iparam(4) */
-	nb = 1;
+	nb = iparam[4];
 
 /*        %--------------------------------------------% */
 /*        | Revision 2 performs only implicit restart. | */
@@ -665,7 +655,7 @@ static integer c__1 = 1;
 	    nb = 1;
 	}
 	if (*tol <= 0.) {
-	    *tol = igraphdlamch_("EpsMach");
+	    *tol = igraphdlamch_("EpsMach", (ftnlen)7);
 	}
 
 /*        %----------------------------------------------% */
@@ -724,10 +714,10 @@ static integer c__1 = 1;
 /*     | Carry out the Implicitly restarted Lanczos Iteration. | */
 /*     %-------------------------------------------------------% */
 
-    igraphdsaup2_(ido, bmat, n, which, &nev0, &np, tol, &resid[1], &mode, &
-	    iupd, &ishift, &mxiter, &v[v_offset], ldv, &workl[ih], &ldh, &
-	    workl[ritz], &workl[bounds], &workl[iq], &ldq, &workl[iw], &ipntr[
-	    1], &workd[1], info);
+    igraphdsaup2_(ido, bmat, n, which, &nev0, &np, tol, &resid[1], &mode, &iupd, &
+	    ishift, &mxiter, &v[v_offset], ldv, &workl[ih], &ldh, &workl[ritz]
+	    , &workl[bounds], &workl[iq], &ldq, &workl[iw], &ipntr[1], &workd[
+	    1], info, (ftnlen)1, (ftnlen)2);
 
 /*     %--------------------------------------------------% */
 /*     | ido .ne. 99 implies use of reverse communication | */
@@ -749,7 +739,7 @@ static integer c__1 = 1;
 
 /*     %------------------------------------% */
 /*     | Exit if there was an informational | */
-/*     | error within dsaup2 .               | */
+/*     | error within dsaup2.               | */
 /*     %------------------------------------% */
 
     if (*info < 0) {
@@ -760,14 +750,14 @@ static integer c__1 = 1;
     }
 
     if (msglvl > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, &mxiter, &debug_1.ndigit, "_sau"
-		"pd: number of update iterations taken");
-	igraphivout_(&debug_1.logfil, &c__1, &np, &debug_1.ndigit, "_saupd: "
-		"number of \"converged\" Ritz values");
-	igraphdvout_(&debug_1.logfil, &np, &workl[ritz], &debug_1.ndigit, 
-		"_saupd: final Ritz values");
-	igraphdvout_(&debug_1.logfil, &np, &workl[bounds], &debug_1.ndigit, 
-		"_saupd: corresponding error bounds");
+	igraphivout_(&debug_1.logfil, &c__1, &mxiter, &debug_1.ndigit, "_saupd: nu\
+mber of update iterations taken", (ftnlen)41);
+	igraphivout_(&debug_1.logfil, &c__1, &np, &debug_1.ndigit, "_saupd: number\
+ of \"converged\" Ritz values", (ftnlen)41);
+	igraphdvout_(&debug_1.logfil, &np, &workl[ritz], &debug_1.ndigit, "_saupd:\
+ final Ritz values", (ftnlen)25);
+	igraphdvout_(&debug_1.logfil, &np, &workl[bounds], &debug_1.ndigit, "_saup\
+d: corresponding error bounds", (ftnlen)34);
     }
 
     igraphsecond_(&t1);
@@ -807,7 +797,7 @@ L9000:
     return 0;
 
 /*     %---------------% */
-/*     | End of dsaupd  | */
+/*     | End of dsaupd | */
 /*     %---------------% */
 
 } /* igraphdsaupd_ */

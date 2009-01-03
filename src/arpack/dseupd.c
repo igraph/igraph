@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dseupd.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -38,8 +31,9 @@ static struct {
 
 static doublereal c_b21 = .66666666666666663;
 static integer c__1 = 1;
+static integer c__2 = 2;
 static logical c_true = TRUE_;
-static doublereal c_b110 = 1.;
+static doublereal c_b119 = 1.;
 
 /* \BeginDoc */
 
@@ -63,15 +57,15 @@ static doublereal c_b110 = 1.;
 /*  supplied). */
 
 /*  These quantities are obtained from the Lanczos factorization computed */
-/*  by DSAUPD  for the linear operator OP prescribed by the MODE selection */
-/*  (see IPARAM(7) in DSAUPD  documentation.)  DSAUPD  must be called before */
+/*  by DSAUPD for the linear operator OP prescribed by the MODE selection */
+/*  (see IPARAM(7) in DSAUPD documentation.)  DSAUPD must be called before */
 /*  this routine is called. These approximate eigenvalues and vectors are */
 /*  commonly called Ritz values and Ritz vectors respectively.  They are */
 /*  referred to as such in the comments that follow.   The computed orthonormal */
 /*  basis for the invariant subspace corresponding to these Ritz values is */
 /*  referred to as a Lanczos basis. */
 
-/*  See documentation in the header of the subroutine DSAUPD  for a definition */
+/*  See documentation in the header of the subroutine DSAUPD for a definition */
 /*  of OP as well as other terms and the relation of computed Ritz values */
 /*  and vectors of OP with respect to the given problem  A*z = lambda*B*z. */
 
@@ -101,68 +95,67 @@ static doublereal c_b110 = 1.;
 /*          = 'S': compute some of the Ritz vectors, specified */
 /*                 by the logical array SELECT. */
 
-/*  SELECT  Logical array of dimension NCV.  (INPUT/WORKSPACE) */
+/*  SELECT  Logical array of dimension NEV.  (INPUT) */
 /*          If HOWMNY = 'S', SELECT specifies the Ritz vectors to be */
 /*          computed. To select the Ritz vector corresponding to a */
 /*          Ritz value D(j), SELECT(j) must be set to .TRUE.. */
-/*          If HOWMNY = 'A' , SELECT is used as a workspace for */
-/*          reordering the Ritz values. */
+/*          If HOWMNY = 'A' , SELECT is not referenced. */
 
-/*  D       Double precision  array of dimension NEV.  (OUTPUT) */
+/*  D       Double precision array of dimension NEV.  (OUTPUT) */
 /*          On exit, D contains the Ritz value approximations to the */
 /*          eigenvalues of A*z = lambda*B*z. The values are returned */
 /*          in ascending order. If IPARAM(7) = 3,4,5 then D represents */
-/*          the Ritz values of OP computed by dsaupd  transformed to */
+/*          the Ritz values of OP computed by dsaupd transformed to */
 /*          those of the original eigensystem A*z = lambda*B*z. If */
 /*          IPARAM(7) = 1,2 then the Ritz values of OP are the same */
 /*          as the those of A*z = lambda*B*z. */
 
-/*  Z       Double precision  N by NEV array if HOWMNY = 'A'.  (OUTPUT) */
+/*  Z       Double precision N by NEV array if HOWMNY = 'A'.  (OUTPUT) */
 /*          On exit, Z contains the B-orthonormal Ritz vectors of the */
 /*          eigensystem A*z = lambda*B*z corresponding to the Ritz */
 /*          value approximations. */
 /*          If  RVEC = .FALSE. then Z is not referenced. */
 /*          NOTE: The array Z may be set equal to first NEV columns of the */
-/*          Arnoldi/Lanczos basis array V computed by DSAUPD . */
+/*          Arnoldi/Lanczos basis array V computed by DSAUPD. */
 
 /*  LDZ     Integer.  (INPUT) */
 /*          The leading dimension of the array Z.  If Ritz vectors are */
 /*          desired, then  LDZ .ge.  max( 1, N ).  In any case,  LDZ .ge. 1. */
 
-/*  SIGMA   Double precision   (INPUT) */
+/*  SIGMA   Double precision  (INPUT) */
 /*          If IPARAM(7) = 3,4,5 represents the shift. Not referenced if */
 /*          IPARAM(7) = 1 or 2. */
 
 
 /*  **** The remaining arguments MUST be the same as for the   **** */
-/*  **** call to DSAUPD  that was just completed.               **** */
+/*  **** call to DNAUPD that was just completed.               **** */
 
 /*  NOTE: The remaining arguments */
 
 /*           BMAT, N, WHICH, NEV, TOL, RESID, NCV, V, LDV, IPARAM, IPNTR, */
 /*           WORKD, WORKL, LWORKL, INFO */
 
-/*         must be passed directly to DSEUPD  following the last call */
-/*         to DSAUPD .  These arguments MUST NOT BE MODIFIED between */
-/*         the the last call to DSAUPD  and the call to DSEUPD . */
+/*         must be passed directly to DSEUPD following the last call */
+/*         to DSAUPD.  These arguments MUST NOT BE MODIFIED between */
+/*         the the last call to DSAUPD and the call to DSEUPD. */
 
 /*  Two of these parameters (WORKL, INFO) are also output parameters: */
 
-/*  WORKL   Double precision  work array of length LWORKL.  (OUTPUT/WORKSPACE) */
+/*  WORKL   Double precision work array of length LWORKL.  (OUTPUT/WORKSPACE) */
 /*          WORKL(1:4*ncv) contains information obtained in */
-/*          dsaupd .  They are not changed by dseupd . */
+/*          dsaupd.  They are not changed by dseupd. */
 /*          WORKL(4*ncv+1:ncv*ncv+8*ncv) holds the */
 /*          untransformed Ritz values, the computed error estimates, */
 /*          and the associated eigenvector matrix of H. */
 
 /*          Note: IPNTR(8:10) contains the pointer into WORKL for addresses */
-/*          of the above information computed by dseupd . */
+/*          of the above information computed by dseupd. */
 /*          ------------------------------------------------------------- */
 /*          IPNTR(8): pointer to the NCV RITZ values of the original system. */
 /*          IPNTR(9): pointer to the NCV corresponding error bounds. */
 /*          IPNTR(10): pointer to the NCV by NCV matrix of eigenvectors */
 /*                     of the tridiagonal matrix T. Only referenced by */
-/*                     dseupd  if RVEC = .TRUE. See Remarks. */
+/*                     dseupd if RVEC = .TRUE. See Remarks. */
 /*          ------------------------------------------------------------- */
 
 /*  INFO    Integer.  (OUTPUT) */
@@ -175,20 +168,15 @@ static doublereal c_b110 = 1.;
 /*          = -6: BMAT must be one of 'I' or 'G'. */
 /*          = -7: Length of private work WORKL array is not sufficient. */
 /*          = -8: Error return from trid. eigenvalue calculation; */
-/*                Information error from LAPACK routine dsteqr . */
+/*                Information error from LAPACK routine dsteqr. */
 /*          = -9: Starting vector is zero. */
 /*          = -10: IPARAM(7) must be 1,2,3,4,5. */
 /*          = -11: IPARAM(7) = 1 and BMAT = 'G' are incompatible. */
 /*          = -12: NEV and WHICH = 'BE' are incompatible. */
-/*          = -14: DSAUPD  did not find any eigenvalues to sufficient */
+/*          = -14: DSAUPD did not find any eigenvalues to sufficient */
 /*                 accuracy. */
 /*          = -15: HOWMNY must be one of 'A' or 'S' if RVEC = .true. */
 /*          = -16: HOWMNY = 'S' not yet implemented */
-/*          = -17: DSEUPD  got a different count of the number of converged */
-/*                 Ritz values than DSAUPD  got.  This indicates the user */
-/*                 probably made an error in passing data from DSAUPD  to */
-/*                 DSEUPD  or that the data was modified before entering */
-/*                 DSEUPD . */
 
 /* \BeginLib */
 
@@ -221,24 +209,24 @@ static doublereal c_b110 = 1.;
 /*     stage for the user who wants to incorporate it. */
 
 /* \Routines called: */
-/*     dsesrt   ARPACK routine that sorts an array X, and applies the */
+/*     dsesrt  ARPACK routine that sorts an array X, and applies the */
 /*             corresponding permutation to a matrix A. */
-/*     dsortr   dsortr   ARPACK sorting routine. */
+/*     dsortr  dsortr  ARPACK sorting routine. */
 /*     ivout   ARPACK utility routine that prints integers. */
-/*     dvout    ARPACK utility routine that prints vectors. */
-/*     dgeqr2   LAPACK routine that computes the QR factorization of */
+/*     dvout   ARPACK utility routine that prints vectors. */
+/*     dgeqr2  LAPACK routine that computes the QR factorization of */
 /*             a matrix. */
-/*     dlacpy   LAPACK matrix copy routine. */
-/*     dlamch   LAPACK routine that determines machine constants. */
-/*     dorm2r   LAPACK routine that applies an orthogonal matrix in */
+/*     dlacpy  LAPACK matrix copy routine. */
+/*     dlamch  LAPACK routine that determines machine constants. */
+/*     dorm2r  LAPACK routine that applies an orthogonal matrix in */
 /*             factored form. */
-/*     dsteqr   LAPACK routine that computes eigenvalues and eigenvectors */
+/*     dsteqr  LAPACK routine that computes eigenvalues and eigenvectors */
 /*             of a tridiagonal matrix. */
-/*     dger     Level 2 BLAS rank one update to a matrix. */
-/*     dcopy    Level 1 BLAS that copies one vector to another . */
-/*     dnrm2    Level 1 BLAS that computes the norm of a vector. */
-/*     dscal    Level 1 BLAS that scales a vector. */
-/*     dswap    Level 1 BLAS that swaps the contents of two vectors. */
+/*     dger    Level 2 BLAS rank one update to a matrix. */
+/*     dcopy   Level 1 BLAS that copies one vector to another . */
+/*     dnrm2   Level 1 BLAS that computes the norm of a vector. */
+/*     dscal   Level 1 BLAS that scales a vector. */
+/*     dswap   Level 1 BLAS that swaps the contents of two vectors. */
 /* \Authors */
 /*     Danny Sorensen               Phuong Vu */
 /*     Richard Lehoucq              CRPC / Rice University */
@@ -252,66 +240,69 @@ static doublereal c_b110 = 1.;
 /*     12/15/93: Version ' 2.1' */
 
 /* \SCCS Information: @(#) */
-/* FILE: seupd.F   SID: 2.11   DATE OF SID: 04/10/01   RELEASE: 2 */
+/* FILE: seupd.F   SID: 2.7   DATE OF SID: 8/27/96   RELEASE: 2 */
 
 /* \EndLib */
 
 /* ----------------------------------------------------------------------- */
-/* Subroutine */ int igraphdseupd_(logical *rvec, char *howmny, logical *
-	select, doublereal *d__, doublereal *z__, integer *ldz, doublereal *
-	sigma, char *bmat, integer *n, char *which, integer *nev, doublereal *
-	tol, doublereal *resid, integer *ncv, doublereal *v, integer *ldv, 
-	integer *iparam, integer *ipntr, doublereal *workd, doublereal *workl,
-	 integer *lworkl, integer *info)
+/* Subroutine */ int igraphdseupd_(rvec, howmny, select, d__, z__, ldz, sigma, bmat,
+	 n, which, nev, tol, resid, ncv, v, ldv, iparam, ipntr, workd, workl, 
+	lworkl, info)
+logical *rvec;
+char *howmny;
+logical *select;
+doublereal *d__, *z__;
+integer *ldz;
+doublereal *sigma;
+char *bmat;
+integer *n;
+char *which;
+integer *nev;
+doublereal *tol, *resid;
+integer *ncv;
+doublereal *v;
+integer *ldv, *iparam, *ipntr;
+doublereal *workd, *workl;
+integer *lworkl, *info;
 {
     /* System generated locals */
     integer v_dim1, v_offset, z_dim1, z_offset, i__1;
     doublereal d__1, d__2, d__3;
 
     /* Builtin functions */
-    integer igraphs_cmp(char *, char *, ftnlen, ftnlen);
-    /* Subroutine */ int igraphs_copy(char *, char *, ftnlen, ftnlen);
-    double igraphpow_dd(doublereal *, doublereal *);
+    integer igraphs_cmp();
+    /* Subroutine */ int igraphs_copy();
+    double igraphpow_dd();
 
     /* Local variables */
-    static integer j, k, ih, jj, iq, np, iw;
-    extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *
-	    , doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
-    static integer ibd, ihb, ihd, ldh;
-    extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    static integer ldq, irz;
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, 
-	    doublereal *, integer *), igraphdcopy_(integer *, doublereal *, 
-	    integer *, doublereal *, integer *), igraphdvout_(integer *, 
-	    integer *, doublereal *, integer *, char *), igraphivout_(
-	    integer *, integer *, integer *, integer *, char *), 
-	    igraphdgeqr2_(integer *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *);
+    extern /* Subroutine */ int igraphdger_();
     static integer mode;
     static doublereal eps23;
-    extern /* Subroutine */ int igraphdorm2r_(char *, char *, integer *, 
-	    integer *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *);
     static integer ierr;
     static doublereal temp;
     static integer next;
     static char type__[6];
-    extern doublereal igraphdlamch_(char *);
     static integer ritz;
-    extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *), 
-	    igraphdsgets_(integer *, char *, integer *, integer *, doublereal 
-	    *, doublereal *, doublereal *);
-    static doublereal temp1;
-    extern /* Subroutine */ int igraphdsteqr_(char *, integer *, doublereal *,
-	     doublereal *, doublereal *, integer *, doublereal *, integer *), igraphdsesrt_(char *, logical *, integer *, doublereal *,
-	     integer *, doublereal *, integer *), igraphdsortr_(char *
-	    , logical *, integer *, doublereal *, doublereal *);
+    extern doublereal igraphdnrm2_();
+    static integer j, k;
+    extern /* Subroutine */ int igraphdscal_();
     static logical reord;
+    extern /* Subroutine */ int igraphdcopy_();
     static integer nconv;
-    static doublereal rnorm, bnorm2;
-    static integer bounds, msglvl, ishift, numcnv, leftptr, rghtptr;
+    static doublereal rnorm;
+    extern /* Subroutine */ int igraphdvout_(), igraphivout_(), igraphdgeqr2_();
+    static doublereal bnorm2;
+    extern /* Subroutine */ int igraphdorm2r_();
+    static doublereal thres1, thres2;
+    static integer ih;
+    extern doublereal igraphdlamch_();
+    static integer iq, iw;
+    static doublereal kv[2];
+    static integer bounds, msglvl, ktrord;
+    extern /* Subroutine */ int igraphdlacpy_(), igraphdsesrt_(), igraphdsteqr_(), igraphdsortr_();
+    static integer ibd, ihb, ihd, ldh, ilg, ldq, ism, irz;
+    static doublereal tempbnd;
+    static integer leftptr, rghtptr;
 
 
 /*     %----------------------------------------------------% */
@@ -354,6 +345,11 @@ static doublereal c_b110 = 1.;
 /*     %---------------% */
 
 
+/*     %--------------% */
+/*     | Local Arrays | */
+/*     %--------------% */
+
+
 /*     %----------------------% */
 /*     | External Subroutines | */
 /*     %----------------------% */
@@ -381,12 +377,12 @@ static doublereal c_b110 = 1.;
     --workd;
     --resid;
     z_dim1 = *ldz;
-    z_offset = 1 + z_dim1;
+    z_offset = 1 + z_dim1 * 1;
     z__ -= z_offset;
     --d__;
     --select;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --iparam;
     --ipntr;
@@ -477,18 +473,18 @@ static doublereal c_b110 = 1.;
 /*     | workl(1:2*ncv) := generated tridiagonal matrix H      | */
 /*     |       The subdiagonal is stored in workl(2:ncv).      | */
 /*     |       The dead spot is workl(1) but upon exiting      | */
-/*     |       dsaupd  stores the B-norm of the last residual   | */
+/*     |       dsaupd stores the B-norm of the last residual   | */
 /*     |       vector in workl(1). We use this !!!             | */
 /*     | workl(2*ncv+1:2*ncv+ncv) := ritz values               | */
 /*     |       The wanted values are in the first NCONV spots. | */
 /*     | workl(3*ncv+1:3*ncv+ncv) := computed Ritz estimates   | */
 /*     |       The wanted values are in the first NCONV spots. | */
-/*     | NOTE: workl(1:4*ncv) is set by dsaupd  and is not      | */
-/*     |       modified by dseupd .                             | */
+/*     | NOTE: workl(1:4*ncv) is set by dsaupd and is not      | */
+/*     |       modified by dseupd.                             | */
 /*     %-------------------------------------------------------% */
 
 /*     %-------------------------------------------------------% */
-/*     | The following is used and set by dseupd .              | */
+/*     | The following is used and set by dseupd.              | */
 /*     | workl(4*ncv+1:4*ncv+ncv) := used as workspace during  | */
 /*     |       computation of the eigenvectors of H. Stores    | */
 /*     |       the diagonal of H. Upon EXIT contains the NCV   | */
@@ -504,10 +500,10 @@ static doublereal c_b110 = 1.;
 /*     |       workl(3*ncv+1:4*ncv).                           | */
 /*     | workl(6*ncv+1:6*ncv+ncv*ncv) := orthogonal Q that is  | */
 /*     |       the eigenvector matrix for H as returned by     | */
-/*     |       dsteqr . Not referenced if RVEC = .False.        | */
+/*     |       dsteqr. Not referenced if RVEC = .False.        | */
 /*     |       Ordering follows that of workl(4*ncv+1:5*ncv)   | */
 /*     | workl(6*ncv+ncv*ncv+1:6*ncv+ncv*ncv+2*ncv) :=         | */
-/*     |       Workspace. Needed by dsteqr  and by dseupd .      | */
+/*     |       Workspace. Needed by dsteqr and by dseupd.      | */
 /*     | GRAND total of NCV*(NCV+8) locations.                 | */
 /*     %-------------------------------------------------------% */
 
@@ -543,13 +539,13 @@ static doublereal c_b110 = 1.;
 /*     | Set machine dependent constant. | */
 /*     %---------------------------------% */
 
-    eps23 = igraphdlamch_("Epsilon-Machine");
+    eps23 = igraphdlamch_("Epsilon-Machine", (ftnlen)15);
     eps23 = igraphpow_dd(&eps23, &c_b21);
 
 /*     %---------------------------------------% */
 /*     | RNORM is B-norm of the RESID(1:N).    | */
 /*     | BNORM2 is the 2 norm of B*RESID(1:N). | */
-/*     | Upon exit of dsaupd  WORKD(1:N) has    | */
+/*     | Upon exit of dsaupd WORKD(1:N) has    | */
 /*     | B*RESID(1:N).                         | */
 /*     %---------------------------------------% */
 
@@ -560,92 +556,158 @@ static doublereal c_b110 = 1.;
 	bnorm2 = igraphdnrm2_(n, &workd[1], &c__1);
     }
 
-    if (msglvl > 2) {
-	igraphdvout_(&debug_1.logfil, ncv, &workl[irz], &debug_1.ndigit, 
-		"_seupd: Ritz values passed in from _SAUPD.");
-	igraphdvout_(&debug_1.logfil, ncv, &workl[ibd], &debug_1.ndigit, 
-		"_seupd: Ritz estimates passed in from _SAUPD.");
-    }
-
     if (*rvec) {
 
+/*        %------------------------------------------------% */
+/*        | Get the converged Ritz value on the boundary.  | */
+/*        | This value will be used to dermine whether we  | */
+/*        | need to reorder the eigenvalues and            | */
+/*        | eigenvectors comupted by _steqr, and is        | */
+/*        | referred to as the "threshold" value.          | */
+/*        |                                                | */
+/*        | A Ritz value gamma is said to be a wanted      | */
+/*        | one, if                                        | */
+/*        | abs(gamma) .ge. threshold, when WHICH = 'LM';  | */
+/*        | abs(gamma) .le. threshold, when WHICH = 'SM';  | */
+/*        | gamma      .ge. threshold, when WHICH = 'LA';  | */
+/*        | gamma      .le. threshold, when WHICH = 'SA';  | */
+/*        | gamma .le. thres1 .or. gamma .ge. thres2       | */
+/*        |                            when WHICH = 'BE';  | */
+/*        |                                                | */
+/*        | Note: converged Ritz values and associated     | */
+/*        | Ritz estimates have been placed in the first   | */
+/*        | NCONV locations in workl(ritz) and             | */
+/*        | workl(bounds) respectively. They have been     | */
+/*        | sorted (in _saup2) according to the WHICH      | */
+/*        | selection criterion. (Except in the case       | */
+/*        | WHICH = 'BE', they are sorted in an increasing | */
+/*        | order.)                                        | */
+/*        %------------------------------------------------% */
+
+	if (igraphs_cmp(which, "LM", (ftnlen)2, (ftnlen)2) == 0 || igraphs_cmp(which, 
+		"SM", (ftnlen)2, (ftnlen)2) == 0 || igraphs_cmp(which, "LA", (
+		ftnlen)2, (ftnlen)2) == 0 || igraphs_cmp(which, "SA", (ftnlen)2, (
+		ftnlen)2) == 0) {
+
+	    thres1 = workl[ritz];
+
+	    if (msglvl > 2) {
+		igraphdvout_(&debug_1.logfil, &c__1, &thres1, &debug_1.ndigit, 
+			"_seupd: Threshold eigenvalue used for re-ordering", (
+			ftnlen)49);
+	    }
+
+	} else if (igraphs_cmp(which, "BE", (ftnlen)2, (ftnlen)2) == 0) {
+
+/*            %------------------------------------------------% */
+/*            | Ritz values returned from _saup2 have been     | */
+/*            | sorted in increasing order.  Thus two          | */
+/*            | "threshold" values (one for the small end, one | */
+/*            | for the large end) are in the middle.          | */
+/*            %------------------------------------------------% */
+
+	    ism = max(*nev,nconv) / 2;
+	    ilg = ism + 1;
+	    thres1 = workl[ism];
+	    thres2 = workl[ilg];
+
+	    if (msglvl > 2) {
+		kv[0] = thres1;
+		kv[1] = thres2;
+		igraphdvout_(&debug_1.logfil, &c__2, kv, &debug_1.ndigit, "_seupd:\
+ Threshold eigenvalues used for re-ordering", (ftnlen)50);
+	    }
+
+	}
+
+/*        %----------------------------------------------------------% */
+/*        | Check to see if all converged Ritz values appear within  | */
+/*        | the first NCONV diagonal elements returned from _seigt.  | */
+/*        | This is done in the following way:                       | */
+/*        |                                                          | */
+/*        | 1) For each Ritz value obtained from _seigt, compare it  | */
+/*        |    with the threshold Ritz value computed above to       | */
+/*        |    determine whether it is a wanted one.                 | */
+/*        |                                                          | */
+/*        | 2) If it is wanted, then check the corresponding Ritz    | */
+/*        |    estimate to see if it has converged.  If it has, set  | */
+/*        |    correponding entry in the logical array SELECT to     | */
+/*        |    .TRUE..                                               | */
+/*        |                                                          | */
+/*        | If SELECT(j) = .TRUE. and j > NCONV, then there is a     | */
+/*        | converged Ritz value that does not appear at the top of  | */
+/*        | the diagonal matrix computed by _seigt in _saup2.        | */
+/*        | Reordering is needed.                                    | */
+/*        %----------------------------------------------------------% */
+
 	reord = FALSE_;
-
-/*        %---------------------------------------------------% */
-/*        | Use the temporary bounds array to store indices   | */
-/*        | These will be used to mark the select array later | */
-/*        %---------------------------------------------------% */
-
-	i__1 = *ncv;
-	for (j = 1; j <= i__1; ++j) {
-	    workl[bounds + j - 1] = (doublereal) j;
-	    select[j] = FALSE_;
-/* L10: */
-	}
-
-/*        %-------------------------------------% */
-/*        | Select the wanted Ritz values.      | */
-/*        | Sort the Ritz values so that the    | */
-/*        | wanted ones appear at the tailing   | */
-/*        | NEV positions of workl(irr) and     | */
-/*        | workl(iri).  Move the corresponding | */
-/*        | error estimates in workl(bound)     | */
-/*        | accordingly.                        | */
-/*        %-------------------------------------% */
-
-	np = *ncv - *nev;
-	ishift = 0;
-	igraphdsgets_(&ishift, which, nev, &np, &workl[irz], &workl[bounds], &
-		workl[1]);
-
-	if (msglvl > 2) {
-	    igraphdvout_(&debug_1.logfil, ncv, &workl[irz], &debug_1.ndigit, 
-		    "_seupd: Ritz values after calling _SGETS.");
-	    igraphdvout_(&debug_1.logfil, ncv, &workl[bounds], &
-		    debug_1.ndigit, "_seupd: Ritz value indices after callin"
-		    "g _SGETS.");
-	}
-
-/*        %-----------------------------------------------------% */
-/*        | Record indices of the converged wanted Ritz values  | */
-/*        | Mark the select array for possible reordering       | */
-/*        %-----------------------------------------------------% */
-
-	numcnv = 0;
-	i__1 = *ncv;
-	for (j = 1; j <= i__1; ++j) {
+	ktrord = 0;
+	i__1 = *ncv - 1;
+	for (j = 0; j <= i__1; ++j) {
+	    select[j + 1] = FALSE_;
+	    if (igraphs_cmp(which, "LM", (ftnlen)2, (ftnlen)2) == 0) {
+		if ((d__1 = workl[irz + j], abs(d__1)) >= abs(thres1)) {
 /* Computing MAX */
-	    d__2 = eps23, d__3 = (d__1 = workl[irz + *ncv - j], abs(d__1));
-	    temp1 = max(d__2,d__3);
-	    jj = (integer) workl[bounds + *ncv - j];
-	    if (numcnv < nconv && workl[ibd + jj - 1] <= *tol * temp1) {
-		select[jj] = TRUE_;
-		++numcnv;
-		if (jj > *nev) {
-		    reord = TRUE_;
+		    d__2 = eps23, d__3 = (d__1 = workl[irz + j], abs(d__1));
+		    tempbnd = max(d__2,d__3);
+		    if (workl[ibd + j] <= *tol * tempbnd) {
+			select[j + 1] = TRUE_;
+		    }
+		}
+	    } else if (igraphs_cmp(which, "SM", (ftnlen)2, (ftnlen)2) == 0) {
+		if ((d__1 = workl[irz + j], abs(d__1)) <= abs(thres1)) {
+/* Computing MAX */
+		    d__2 = eps23, d__3 = (d__1 = workl[irz + j], abs(d__1));
+		    tempbnd = max(d__2,d__3);
+		    if (workl[ibd + j] <= *tol * tempbnd) {
+			select[j + 1] = TRUE_;
+		    }
+		}
+	    } else if (igraphs_cmp(which, "LA", (ftnlen)2, (ftnlen)2) == 0) {
+		if (workl[irz + j] >= thres1) {
+/* Computing MAX */
+		    d__2 = eps23, d__3 = (d__1 = workl[irz + j], abs(d__1));
+		    tempbnd = max(d__2,d__3);
+		    if (workl[ibd + j] <= *tol * tempbnd) {
+			select[j + 1] = TRUE_;
+		    }
+		}
+	    } else if (igraphs_cmp(which, "SA", (ftnlen)2, (ftnlen)2) == 0) {
+		if (workl[irz + j] <= thres1) {
+/* Computing MAX */
+		    d__2 = eps23, d__3 = (d__1 = workl[irz + j], abs(d__1));
+		    tempbnd = max(d__2,d__3);
+		    if (workl[ibd + j] <= *tol * tempbnd) {
+			select[j + 1] = TRUE_;
+		    }
+		}
+	    } else if (igraphs_cmp(which, "BE", (ftnlen)2, (ftnlen)2) == 0) {
+		if (workl[irz + j] <= thres1 || workl[irz + j] >= thres2) {
+/* Computing MAX */
+		    d__2 = eps23, d__3 = (d__1 = workl[irz + j], abs(d__1));
+		    tempbnd = max(d__2,d__3);
+		    if (workl[ibd + j] <= *tol * tempbnd) {
+			select[j + 1] = TRUE_;
+		    }
 		}
 	    }
-/* L11: */
+	    if (j + 1 > nconv) {
+		reord = select[j + 1] || reord;
+	    }
+	    if (select[j + 1]) {
+		++ktrord;
+	    }
+/* L10: */
 	}
-
-/*        %-----------------------------------------------------------% */
-/*        | Check the count (numcnv) of converged Ritz values with    | */
-/*        | the number (nconv) reported by _saupd.  If these two      | */
-/*        | are different then there has probably been an error       | */
-/*        | caused by incorrect passing of the _saupd data.           | */
-/*        %-----------------------------------------------------------% */
+/*        %-------------------------------------------% */
+/*        | If KTRORD .ne. NCONV, something is wrong. | */
+/*        %-------------------------------------------% */
 
 	if (msglvl > 2) {
-	    igraphivout_(&debug_1.logfil, &c__1, &numcnv, &debug_1.ndigit, 
-		    "_seupd: Number of specified eigenvalues");
-	    igraphivout_(&debug_1.logfil, &c__1, &nconv, &debug_1.ndigit, 
-		    "_seupd: Number of \"converged\" eigenvalues")
-		    ;
-	}
-
-	if (numcnv != nconv) {
-	    *info = -17;
-	    goto L9000;
+	    igraphivout_(&debug_1.logfil, &c__1, &ktrord, &debug_1.ndigit, "_seupd\
+: Number of specified eigenvalues", (ftnlen)39);
+	    igraphivout_(&debug_1.logfil, &c__1, &nconv, &debug_1.ndigit, "_seupd:\
+ Number of \"converged\" eigenvalues", (ftnlen)41);
 	}
 
 /*        %-----------------------------------------------------------% */
@@ -658,8 +720,8 @@ static doublereal c_b110 = 1.;
 	igraphdcopy_(&i__1, &workl[ih + 1], &c__1, &workl[ihb], &c__1);
 	igraphdcopy_(ncv, &workl[ih + ldh], &c__1, &workl[ihd], &c__1);
 
-	igraphdsteqr_("Identity", ncv, &workl[ihd], &workl[ihb], &workl[iq], &
-		ldq, &workl[iw], &ierr);
+	igraphdsteqr_("Identity", ncv, &workl[ihd], &workl[ihb], &workl[iq], &ldq, &
+		workl[iw], &ierr, (ftnlen)8);
 
 	if (ierr != 0) {
 	    *info = -8;
@@ -668,10 +730,10 @@ static doublereal c_b110 = 1.;
 
 	if (msglvl > 1) {
 	    igraphdcopy_(ncv, &workl[iq + *ncv - 1], &ldq, &workl[iw], &c__1);
-	    igraphdvout_(&debug_1.logfil, ncv, &workl[ihd], &debug_1.ndigit, 
-		    "_seupd: NCV Ritz values of the final H matrix");
-	    igraphdvout_(&debug_1.logfil, ncv, &workl[iw], &debug_1.ndigit, 
-		    "_seupd: last row of the eigenvector matrix for H");
+	    igraphdvout_(&debug_1.logfil, ncv, &workl[ihd], &debug_1.ndigit, "_seu\
+pd: NCV Ritz values of the final H matrix", (ftnlen)45);
+	    igraphdvout_(&debug_1.logfil, ncv, &workl[iw], &debug_1.ndigit, "_seup\
+d: last row of the eigenvector matrix for H", (ftnlen)48);
 	}
 
 	if (reord) {
@@ -724,12 +786,12 @@ L20:
 		temp = workl[ihd + leftptr - 1];
 		workl[ihd + leftptr - 1] = workl[ihd + rghtptr - 1];
 		workl[ihd + rghtptr - 1] = temp;
-		igraphdcopy_(ncv, &workl[iq + *ncv * (leftptr - 1)], &c__1, &
-			workl[iw], &c__1);
-		igraphdcopy_(ncv, &workl[iq + *ncv * (rghtptr - 1)], &c__1, &
-			workl[iq + *ncv * (leftptr - 1)], &c__1);
-		igraphdcopy_(ncv, &workl[iw], &c__1, &workl[iq + *ncv * (
-			rghtptr - 1)], &c__1);
+		igraphdcopy_(ncv, &workl[iq + *ncv * (leftptr - 1)], &c__1, &workl[
+			iw], &c__1);
+		igraphdcopy_(ncv, &workl[iq + *ncv * (rghtptr - 1)], &c__1, &workl[
+			iq + *ncv * (leftptr - 1)], &c__1);
+		igraphdcopy_(ncv, &workl[iw], &c__1, &workl[iq + *ncv * (rghtptr - 
+			1)], &c__1);
 		++leftptr;
 		--rghtptr;
 
@@ -744,8 +806,8 @@ L30:
 	}
 
 	if (msglvl > 2) {
-	    igraphdvout_(&debug_1.logfil, ncv, &workl[ihd], &debug_1.ndigit, 
-		    "_seupd: The eigenvalues of H--reordered");
+	    igraphdvout_(&debug_1.logfil, ncv, &workl[ihd], &debug_1.ndigit, "_seu\
+pd: The eigenvalues of H--reordered", (ftnlen)39);
 	}
 
 /*        %----------------------------------------% */
@@ -779,7 +841,8 @@ L30:
 /*        %---------------------------------------------------------% */
 
 	if (*rvec) {
- 	    igraphdsesrt_("LA", rvec, &nconv, &d__[1], ncv, &workl[iq], &ldq);
+	    igraphdsesrt_("LA", rvec, &nconv, &d__[1], ncv, &workl[iq], &ldq, (
+		    ftnlen)2);
 	} else {
 	    igraphdcopy_(ncv, &workl[bounds], &c__1, &workl[ihb], &c__1);
 	}
@@ -795,7 +858,7 @@ L30:
 /*        |             lambda = sigma * theta / ( theta - 1 )          | */
 /*        |    For TYPE = 'CAYLEY' the transformation is                | */
 /*        |             lambda = sigma * (theta + 1) / (theta - 1 )     | */
-/*        |    where the theta are the Ritz values returned by dsaupd .  | */
+/*        |    where the theta are the Ritz values returned by dsaupd.  | */
 /*        | NOTES:                                                      | */
 /*        | *The Ritz vectors are not affected by the transformation.   | */
 /*        |  They are only reordered.                                   | */
@@ -828,26 +891,27 @@ L30:
 /*        | *  Store the wanted NCONV lambda values into D.             | */
 /*        | *  Sort the NCONV wanted lambda in WORKL(IHD:IHD+NCONV-1)   | */
 /*        |    into ascending order and apply sort to the NCONV theta   | */
-/*        |    values in the transformed system. We will need this to   | */
+/*        |    values in the transformed system. We'll need this to     | */
 /*        |    compute Ritz estimates in the original system.           | */
-/*        | *  Finally sort the lambda`s into ascending order and apply | */
-/*        |    to Ritz vectors if wanted. Else just sort lambda`s into  | */
+/*        | *  Finally sort the lambda's into ascending order and apply | */
+/*        |    to Ritz vectors if wanted. Else just sort lambda's into  | */
 /*        |    ascending order.                                         | */
 /*        | NOTES:                                                      | */
 /*        | *workl(iw:iw+ncv-1) contain the theta ordered so that they  | */
-/*        |  match the ordering of the lambda. We`ll use them again for | */
+/*        |  match the ordering of the lambda. We'll use them again for | */
 /*        |  Ritz vector purification.                                  | */
 /*        %-------------------------------------------------------------% */
 
 	igraphdcopy_(&nconv, &workl[ihd], &c__1, &d__[1], &c__1);
-	igraphdsortr_("LA", &c_true, &nconv, &workl[ihd], &workl[iw]);
+	igraphdsortr_("LA", &c_true, &nconv, &workl[ihd], &workl[iw], (ftnlen)2);
 	if (*rvec) {
-	    igraphdsesrt_("LA", rvec, &nconv, &d__[1], ncv, &workl[iq], &ldq);
+	    igraphdsesrt_("LA", rvec, &nconv, &d__[1], ncv, &workl[iq], &ldq, (
+		    ftnlen)2);
 	} else {
 	    igraphdcopy_(ncv, &workl[bounds], &c__1, &workl[ihb], &c__1);
 	    d__1 = bnorm2 / rnorm;
 	    igraphdscal_(ncv, &d__1, &workl[ihb], &c__1);
-	    igraphdsortr_("LA", &c_true, &nconv, &d__[1], &workl[ihb]);
+	    igraphdsortr_("LA", &c_true, &nconv, &d__[1], &workl[ihb], (ftnlen)2);
 	}
 
     }
@@ -866,8 +930,9 @@ L30:
 /*        | columns of workl(iq,ldq).                                | */
 /*        %----------------------------------------------------------% */
 
-	igraphdgeqr2_(ncv, &nconv, &workl[iq], &ldq, &workl[iw + *ncv], &
-		workl[ihb], &ierr);
+	igraphdgeqr2_(ncv, &nconv, &workl[iq], &ldq, &workl[iw + *ncv], &workl[ihb],
+		 &ierr);
+
 
 /*        %--------------------------------------------------------% */
 /*        | * Postmultiply V by Q.                                 | */
@@ -877,16 +942,16 @@ L30:
 /*        | the Ritz values in workl(ihd).                         | */
 /*        %--------------------------------------------------------% */
 
-	igraphdorm2r_("Right", "Notranspose", n, ncv, &nconv, &workl[iq], &
-		ldq, &workl[iw + *ncv], &v[v_offset], ldv, &workd[*n + 1], &
-		ierr);
-	igraphdlacpy_("All", n, &nconv, &v[v_offset], ldv, &z__[z_offset], 
-		ldz);
+	igraphdorm2r_("Right", "Notranspose", n, ncv, &nconv, &workl[iq], &ldq, &
+		workl[iw + *ncv], &v[v_offset], ldv, &workd[*n + 1], &ierr, (
+		ftnlen)5, (ftnlen)11);
+	igraphdlacpy_("All", n, &nconv, &v[v_offset], ldv, &z__[z_offset], ldz, (
+		ftnlen)3);
 
 /*        %-----------------------------------------------------% */
 /*        | In order to compute the Ritz estimates for the Ritz | */
 /*        | values in both systems, need the last row of the    | */
-/*        | eigenvector matrix. Remember, it`s in factored form | */
+/*        | eigenvector matrix. Remember, it's in factored form | */
 /*        %-----------------------------------------------------% */
 
 	i__1 = *ncv - 1;
@@ -895,8 +960,9 @@ L30:
 /* L65: */
 	}
 	workl[ihb + *ncv - 1] = 1.;
-	igraphdorm2r_("Left", "Transpose", ncv, &c__1, &nconv, &workl[iq], &
-		ldq, &workl[iw + *ncv], &workl[ihb], ncv, &temp, &ierr);
+	igraphdorm2r_("Left", "Transpose", ncv, &c__1, &nconv, &workl[iq], &ldq, &
+		workl[iw + *ncv], &workl[ihb], ncv, &temp, &ierr, (ftnlen)4, (
+		ftnlen)9);
 
     } else if (*rvec && *(unsigned char *)howmny == 'S') {
 
@@ -920,7 +986,7 @@ L30:
 /*        |    If RVEC = .true. then compute Ritz estimates | */
 /*        |               of the theta.                     | */
 /*        |    If RVEC = .false. then copy Ritz estimates   | */
-/*        |              as computed by dsaupd .             | */
+/*        |              as computed by dsaupd.             | */
 /*        | *  Determine Ritz estimates of the lambda.      | */
 /*        %-------------------------------------------------% */
 
@@ -961,15 +1027,15 @@ L30:
     }
 
     if (igraphs_cmp(type__, "REGULR", (ftnlen)6, (ftnlen)6) != 0 && msglvl > 1) {
-	igraphdvout_(&debug_1.logfil, &nconv, &d__[1], &debug_1.ndigit, "_se"
-		"upd: Untransformed converged Ritz values");
-	igraphdvout_(&debug_1.logfil, &nconv, &workl[ihb], &debug_1.ndigit, 
-		"_seupd: Ritz estimates of the untransformed Ritz values");
+	igraphdvout_(&debug_1.logfil, &nconv, &d__[1], &debug_1.ndigit, "_seupd: U\
+ntransformed converged Ritz values", (ftnlen)43);
+	igraphdvout_(&debug_1.logfil, &nconv, &workl[ihb], &debug_1.ndigit, "_seup\
+d: Ritz estimates of the untransformed Ritz values", (ftnlen)55);
     } else if (msglvl > 1) {
-	igraphdvout_(&debug_1.logfil, &nconv, &d__[1], &debug_1.ndigit, "_se"
-		"upd: Converged Ritz values");
-	igraphdvout_(&debug_1.logfil, &nconv, &workl[ihb], &debug_1.ndigit, 
-		"_seupd: Associated Ritz estimates");
+	igraphdvout_(&debug_1.logfil, &nconv, &d__[1], &debug_1.ndigit, "_seupd: C\
+onverged Ritz values", (ftnlen)29);
+	igraphdvout_(&debug_1.logfil, &nconv, &workl[ihb], &debug_1.ndigit, "_seup\
+d: Associated Ritz estimates", (ftnlen)33);
     }
 
 /*     %-------------------------------------------------% */
@@ -999,8 +1065,8 @@ L30:
     }
 
     if (igraphs_cmp(type__, "REGULR", (ftnlen)6, (ftnlen)6) != 0) {
-	igraphdger_(n, &nconv, &c_b110, &resid[1], &c__1, &workl[iw], &c__1, &
-		z__[z_offset], ldz);
+	igraphdger_(n, &nconv, &c_b119, &resid[1], &c__1, &workl[iw], &c__1, &z__[
+		z_offset], ldz);
     }
 
 L9000:

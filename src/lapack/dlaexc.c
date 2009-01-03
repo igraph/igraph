@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlaexc.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -23,46 +16,43 @@ static integer c_n1 = -1;
 static integer c__2 = 2;
 static integer c__3 = 3;
 
-/* Subroutine */ int igraphdlaexc_(logical *wantq, integer *n, doublereal *t, 
-	integer *ldt, doublereal *q, integer *ldq, integer *j1, integer *n1, 
-	integer *n2, doublereal *work, integer *info)
+/* Subroutine */ int igraphdlaexc_(wantq, n, t, ldt, q, ldq, j1, n1, n2, work, info)
+logical *wantq;
+integer *n;
+doublereal *t;
+integer *ldt;
+doublereal *q;
+integer *ldq, *j1, *n1, *n2;
+doublereal *work;
+integer *info;
 {
     /* System generated locals */
     integer q_dim1, q_offset, t_dim1, t_offset, i__1;
     doublereal d__1, d__2, d__3;
 
     /* Local variables */
-    static doublereal d__[16]	/* was [4][4] */;
-    static integer k;
-    static doublereal u[3], x[4]	/* was [2][2] */;
-    static integer j2, j3, j4;
-    static doublereal u1[3], u2[3];
-    static integer nd;
-    static doublereal cs, t11, t22, t33, sn, wi1, wi2, wr1, wr2, eps, tau, 
-	    tau1, tau2;
     static integer ierr;
     static doublereal temp;
-    extern /* Subroutine */ int igraphdrot_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *);
-    static doublereal scale, dnorm, xnorm;
-    extern /* Subroutine */ int igraphdlanv2_(doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *), igraphdlasy2_(
-	    logical *, logical *, integer *, integer *, integer *, doublereal 
-	    *, integer *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    extern doublereal igraphdlamch_(char *), igraphdlange_(char *, integer *, 
-	    integer *, doublereal *, integer *, doublereal *);
-    extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
-	     integer *, doublereal *), igraphdlacpy_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *), 
-	    igraphdlartg_(doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *), igraphdlarfx_(char *, integer *, integer *, doublereal *,
-	     doublereal *, doublereal *, integer *, doublereal *);
-    static doublereal thresh, smlnum;
+    extern /* Subroutine */ int igraphdrot_();
+    static doublereal d__[16]	/* was [4][4] */;
+    static integer k;
+    static doublereal u[3], scale, x[4]	/* was [2][2] */, dnorm;
+    static integer j2, j3, j4;
+    static doublereal xnorm, u1[3], u2[3];
+    extern /* Subroutine */ int igraphdlanv2_(), igraphdlasy2_();
+    static integer nd;
+    static doublereal cs, t11, t22;
+    extern doublereal igraphdlamch_();
+    static doublereal t33;
+    extern doublereal igraphdlange_();
+    extern /* Subroutine */ int igraphdlarfg_();
+    static doublereal sn;
+    extern /* Subroutine */ int igraphdlacpy_(), igraphdlartg_(), igraphdlarfx_();
+    static doublereal thresh, smlnum, wi1, wi2, wr1, wr2, eps, tau, tau1, 
+	    tau2;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -146,10 +136,10 @@ static integer c__3 = 3;
 
     /* Parameter adjustments */
     t_dim1 = *ldt;
-    t_offset = 1 + t_dim1;
+    t_offset = 1 + t_dim1 * 1;
     t -= t_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
     --work;
 
@@ -211,14 +201,15 @@ static integer c__3 = 3;
 /*        and compute its norm. */
 
 	nd = *n1 + *n2;
-	igraphdlacpy_("Full", &nd, &nd, &t[*j1 + *j1 * t_dim1], ldt, d__, &c__4);
-	dnorm = igraphdlange_("Max", &nd, &nd, d__, &c__4, &work[1]);
+	igraphdlacpy_("Full", &nd, &nd, &t[*j1 + *j1 * t_dim1], ldt, d__, &c__4, (
+		ftnlen)4);
+	dnorm = igraphdlange_("Max", &nd, &nd, d__, &c__4, &work[1], (ftnlen)3);
 
 /*        Compute machine-dependent threshold for test for accepting */
 /*        swap. */
 
-	eps = igraphdlamch_("P");
-	smlnum = igraphdlamch_("S") / eps;
+	eps = igraphdlamch_("P", (ftnlen)1);
+	smlnum = igraphdlamch_("S", (ftnlen)1) / eps;
 /* Computing MAX */
 	d__1 = eps * 10. * dnorm;
 	thresh = max(d__1,smlnum);
@@ -226,13 +217,13 @@ static integer c__3 = 3;
 /*        Solve T11*X - X*T22 = scale*T12 for X. */
 
 	igraphdlasy2_(&c_false, &c_false, &c_n1, n1, n2, d__, &c__4, &d__[*n1 + 1 + 
-		((*n1 + 1) << 2) - 5], &c__4, &d__[((*n1 + 1) << 2) - 4], &c__4, &
+		(*n1 + 1 << 2) - 5], &c__4, &d__[(*n1 + 1 << 2) - 4], &c__4, &
 		scale, x, &c__2, &xnorm, &ierr);
 
 /*        Swap the adjacent diagonal blocks. */
 
 	k = *n1 + *n1 + *n2 - 3;
-	switch (k) {
+	switch ((int)k) {
 	    case 1:  goto L10;
 	    case 2:  goto L20;
 	    case 3:  goto L30;
@@ -253,8 +244,8 @@ L10:
 
 /*        Perform swap provisionally on diagonal block in D. */
 
-	igraphdlarfx_("L", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
-	igraphdlarfx_("R", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
+	igraphdlarfx_("L", &c__3, &c__3, u, &tau, d__, &c__4, &work[1], (ftnlen)1);
+	igraphdlarfx_("R", &c__3, &c__3, u, &tau, d__, &c__4, &work[1], (ftnlen)1);
 
 /*        Test whether to reject swap. */
 
@@ -269,8 +260,9 @@ L10:
 
 	i__1 = *n - *j1 + 1;
 	igraphdlarfx_("L", &c__3, &i__1, u, &tau, &t[*j1 + *j1 * t_dim1], ldt, &
-		work[1]);
-	igraphdlarfx_("R", &j2, &c__3, u, &tau, &t[*j1 * t_dim1 + 1], ldt, &work[1]);
+		work[1], (ftnlen)1);
+	igraphdlarfx_("R", &j2, &c__3, u, &tau, &t[*j1 * t_dim1 + 1], ldt, &work[1],
+		 (ftnlen)1);
 
 	t[j3 + *j1 * t_dim1] = 0.;
 	t[j3 + j2 * t_dim1] = 0.;
@@ -281,7 +273,7 @@ L10:
 /*           Accumulate transformation in the matrix Q. */
 
 	    igraphdlarfx_("R", n, &c__3, u, &tau, &q[*j1 * q_dim1 + 1], ldq, &work[
-		    1]);
+		    1], (ftnlen)1);
 	}
 	goto L40;
 
@@ -302,8 +294,8 @@ L20:
 
 /*        Perform swap provisionally on diagonal block in D. */
 
-	igraphdlarfx_("L", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
-	igraphdlarfx_("R", &c__3, &c__3, u, &tau, d__, &c__4, &work[1]);
+	igraphdlarfx_("L", &c__3, &c__3, u, &tau, d__, &c__4, &work[1], (ftnlen)1);
+	igraphdlarfx_("R", &c__3, &c__3, u, &tau, d__, &c__4, &work[1], (ftnlen)1);
 
 /*        Test whether to reject swap. */
 
@@ -316,10 +308,11 @@ L20:
 
 /*        Accept swap: apply transformation to the entire matrix T. */
 
-	igraphdlarfx_("R", &j3, &c__3, u, &tau, &t[*j1 * t_dim1 + 1], ldt, &work[1]);
+	igraphdlarfx_("R", &j3, &c__3, u, &tau, &t[*j1 * t_dim1 + 1], ldt, &work[1],
+		 (ftnlen)1);
 	i__1 = *n - *j1;
 	igraphdlarfx_("L", &c__3, &i__1, u, &tau, &t[*j1 + j2 * t_dim1], ldt, &work[
-		1]);
+		1], (ftnlen)1);
 
 	t[*j1 + *j1 * t_dim1] = t33;
 	t[j2 + *j1 * t_dim1] = 0.;
@@ -330,7 +323,7 @@ L20:
 /*           Accumulate transformation in the matrix Q. */
 
 	    igraphdlarfx_("R", n, &c__3, u, &tau, &q[*j1 * q_dim1 + 1], ldq, &work[
-		    1]);
+		    1], (ftnlen)1);
 	}
 	goto L40;
 
@@ -359,12 +352,14 @@ L30:
 
 /*        Perform swap provisionally on diagonal block in D. */
 
-	igraphdlarfx_("L", &c__3, &c__4, u1, &tau1, d__, &c__4, &work[1])
+	igraphdlarfx_("L", &c__3, &c__4, u1, &tau1, d__, &c__4, &work[1], (ftnlen)1)
 		;
-	igraphdlarfx_("R", &c__4, &c__3, u1, &tau1, d__, &c__4, &work[1])
+	igraphdlarfx_("R", &c__4, &c__3, u1, &tau1, d__, &c__4, &work[1], (ftnlen)1)
 		;
-	igraphdlarfx_("L", &c__3, &c__4, u2, &tau2, &d__[1], &c__4, &work[1]);
-	igraphdlarfx_("R", &c__4, &c__3, u2, &tau2, &d__[4], &c__4, &work[1]);
+	igraphdlarfx_("L", &c__3, &c__4, u2, &tau2, &d__[1], &c__4, &work[1], (
+		ftnlen)1);
+	igraphdlarfx_("R", &c__4, &c__3, u2, &tau2, &d__[4], &c__4, &work[1], (
+		ftnlen)1);
 
 /*        Test whether to reject swap. */
 
@@ -379,14 +374,14 @@ L30:
 
 	i__1 = *n - *j1 + 1;
 	igraphdlarfx_("L", &c__3, &i__1, u1, &tau1, &t[*j1 + *j1 * t_dim1], ldt, &
-		work[1]);
+		work[1], (ftnlen)1);
 	igraphdlarfx_("R", &j4, &c__3, u1, &tau1, &t[*j1 * t_dim1 + 1], ldt, &work[
-		1]);
+		1], (ftnlen)1);
 	i__1 = *n - *j1 + 1;
 	igraphdlarfx_("L", &c__3, &i__1, u2, &tau2, &t[j2 + *j1 * t_dim1], ldt, &
-		work[1]);
+		work[1], (ftnlen)1);
 	igraphdlarfx_("R", &j4, &c__3, u2, &tau2, &t[j2 * t_dim1 + 1], ldt, &work[1]
-		);
+		, (ftnlen)1);
 
 	t[j3 + *j1 * t_dim1] = 0.;
 	t[j3 + j2 * t_dim1] = 0.;
@@ -398,9 +393,9 @@ L30:
 /*           Accumulate transformation in the matrix Q. */
 
 	    igraphdlarfx_("R", n, &c__3, u1, &tau1, &q[*j1 * q_dim1 + 1], ldq, &
-		    work[1]);
+		    work[1], (ftnlen)1);
 	    igraphdlarfx_("R", n, &c__3, u2, &tau2, &q[j2 * q_dim1 + 1], ldq, &work[
-		    1]);
+		    1], (ftnlen)1);
 	}
 
 L40:

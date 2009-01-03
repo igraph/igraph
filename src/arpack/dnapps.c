@@ -1,13 +1,6 @@
-/* igraphdnapps.f -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdnapps.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -143,10 +136,10 @@ static doublereal c_b43 = -1.;
 /*     second  ARPACK utility routine for timing. */
 /*     dmout   ARPACK utility routine that prints matrices. */
 /*     dvout   ARPACK utility routine that prints vectors. */
-/*     dlabad  LAPACK routine that computes machine constants. */
+/*     igraphdlabad  LAPACK routine that computes machine constants. */
 /*     dlacpy  LAPACK matrix copy routine. */
 /*     dlamch  LAPACK routine that determines machine constants. */
-/*     dlanhs  LAPACK routine that computes various norms of a matrix. */
+/*     igraphdlanhs  LAPACK routine that computes various norms of a matrix. */
 /*     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully. */
 /*     dlarf   LAPACK routine that applies Householder reflection to */
 /*             a matrix. */
@@ -167,15 +160,15 @@ static doublereal c_b43 = -1.;
 /*     Houston, Texas */
 
 /* \Revision history: */
-/*     xx/xx/92: Version ' 2.4' */
+/*     xx/xx/92: Version ' 2.1' */
 
 /* \SCCS Information: @(#) */
-/* FILE: napps.F   SID: 2.4   DATE OF SID: 3/28/97   RELEASE: 2 */
+/* FILE: napps.F   SID: 2.3   DATE OF SID: 4/20/96   RELEASE: 2 */
 
 /* \Remarks */
 /*  1. In this version, each shift is applied to all the sublocks of */
 /*     the Hessenberg matrix H and not just to the submatrix that it */
-/*     comes from. Deflation as in LAPACK routine dlahqr (QR algorithm */
+/*     comes from. Deflation as in LAPACK routine igraphdlahqr (QR algorithm */
 /*     for upper Hessenberg matrices ) is used. */
 /*     The subdiagonals of H are enforced to be non-negative. */
 
@@ -183,10 +176,16 @@ static doublereal c_b43 = -1.;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdnapps_(integer *n, integer *kev, integer *np, 
-	doublereal *shiftr, doublereal *shifti, doublereal *v, integer *ldv, 
-	doublereal *h__, integer *ldh, doublereal *resid, doublereal *q, 
-	integer *ldq, doublereal *workl, doublereal *workd)
+/* Subroutine */ int igraphdnapps_(n, kev, np, shiftr, shifti, v, ldv, h__, ldh, 
+	resid, q, ldq, workl, workd)
+integer *n, *kev, *np;
+doublereal *shiftr, *shifti, *v;
+integer *ldv;
+doublereal *h__;
+integer *ldh;
+doublereal *resid, *q;
+integer *ldq;
+doublereal *workl, *workd;
 {
     /* Initialized data */
 
@@ -198,44 +197,31 @@ static doublereal c_b43 = -1.;
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal c__, f, g;
+    static integer iend;
+    static doublereal unfl, ovfl, c__, f, g;
     static integer i__, j;
     static doublereal r__, s, t, u[3];
-    static real t0, t1;
-    static doublereal h11, h12, h21, h22, h32;
-    static integer jj, ir, nr;
-    static doublereal tau, ulp, tst1;
-    static integer iend;
-    static doublereal unfl, ovfl;
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
-	    integer *), igraphdlarf_(char *, integer *, integer *, doublereal *, 
-	    integer *, doublereal *, doublereal *, integer *, doublereal *);
+    extern /* Subroutine */ int igraphdscal_(), igraphdlarf_();
     static logical cconj;
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *), igraphdcopy_(integer *, 
-	    doublereal *, integer *, doublereal *, integer *), igraphdaxpy_(integer 
-	    *, doublereal *, doublereal *, integer *, doublereal *, integer *)
-	    , igraphdmout_(integer *, integer *, integer *, doublereal *, integer *,
-	     integer *, char *), igraphdvout_(integer *, integer *, 
-	    doublereal *, integer *, char *), igraphivout_(integer *, 
-	    integer *, integer *, integer *, char *);
-    extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    extern /* Subroutine */ int igraphdlabad_(doublereal *, doublereal *);
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphdlarfg_(integer *, doublereal *, doublereal *,
-	     integer *, doublereal *);
+    extern /* Subroutine */ int igraphdgemv_(), igraphdcopy_(), igraphdaxpy_(), igraphdmout_(), 
+	    igraphdvout_();
+    static real t0, t1;
+    extern /* Subroutine */ int igraphivout_();
+    extern doublereal igraphdlapy2_();
+    extern /* Subroutine */ int igraphdlabad_();
+    static doublereal h11, h12, h21, h22, h32;
+    static integer jj;
+    extern doublereal igraphdlamch_();
+    static integer ir;
+    extern /* Subroutine */ int igraphdlarfg_();
+    static integer nr;
     static doublereal sigmai;
-    extern /* Subroutine */ int igraphsecond_(real *);
+    extern /* Subroutine */ int igraphsecond_();
     static integer istart, kplusp, msglvl;
     static doublereal sigmar, smlnum;
-    extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, integer *), 
-	    igraphdlaset_(char *, integer *, integer *, doublereal *, doublereal *, 
-	    doublereal *, integer *), igraphdlartg_(doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *);
-    extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
-	    doublereal *);
+    extern /* Subroutine */ int igraphdlacpy_(), igraphdlaset_(), igraphdlartg_();
+    extern doublereal igraphdlanhs_();
+    static doublereal tau, ulp, tst1;
 
 
 /*     %----------------------------------------------------% */
@@ -304,13 +290,13 @@ static doublereal c_b43 = -1.;
     --shifti;
     --shiftr;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     q_dim1 = *ldq;
-    q_offset = 1 + q_dim1;
+    q_offset = 1 + q_dim1 * 1;
     q -= q_offset;
 
     /* Function Body */
@@ -325,13 +311,13 @@ static doublereal c_b43 = -1.;
 /*        | Set machine-dependent constants for the       | */
 /*        | stopping criterion. If norm(H) <= sqrt(OVFL), | */
 /*        | overflow should not occur.                    | */
-/*        | REFERENCE: LAPACK subroutine dlahqr           | */
+/*        | REFERENCE: LAPACK subroutine igraphdlahqr           | */
 /*        %-----------------------------------------------% */
 
-	unfl = igraphdlamch_("safe minimum");
+	unfl = igraphdlamch_("safe minimum", (ftnlen)12);
 	ovfl = 1. / unfl;
 	igraphdlabad_(&unfl, &ovfl);
-	ulp = igraphdlamch_("precision");
+	ulp = igraphdlamch_("precision", (ftnlen)9);
 	smlnum = unfl * (*n / ulp);
 	first = FALSE_;
     }
@@ -350,7 +336,8 @@ static doublereal c_b43 = -1.;
 /*     | the rotations and reflections              | */
 /*     %--------------------------------------------% */
 
-    igraphdlaset_("All", &kplusp, &kplusp, &c_b5, &c_b6, &q[q_offset], ldq);
+    igraphdlaset_("All", &kplusp, &kplusp, &c_b5, &c_b6, &q[q_offset], ldq, (ftnlen)
+	    3);
 
 /*     %----------------------------------------------% */
 /*     | Quick return if there are no shifts to apply | */
@@ -373,12 +360,12 @@ static doublereal c_b43 = -1.;
 	sigmai = shifti[jj];
 
 	if (msglvl > 2) {
-	    igraphivout_(&debug_1.logfil, &c__1, &jj, &debug_1.ndigit, "_napps: sh"
-		    "ift number.");
-	    igraphdvout_(&debug_1.logfil, &c__1, &sigmar, &debug_1.ndigit, "_napps"
-		    ": The real part of the shift ");
-	    igraphdvout_(&debug_1.logfil, &c__1, &sigmai, &debug_1.ndigit, "_napps"
-		    ": The imaginary part of the shift ");
+	    igraphivout_(&debug_1.logfil, &c__1, &jj, &debug_1.ndigit, "_napps: sh\
+ift number.", (ftnlen)21);
+	    igraphdvout_(&debug_1.logfil, &c__1, &sigmar, &debug_1.ndigit, "_napps\
+: The real part of the shift ", (ftnlen)35);
+	    igraphdvout_(&debug_1.logfil, &c__1, &sigmai, &debug_1.ndigit, "_napps\
+: The imaginary part of the shift ", (ftnlen)40);
 	}
 
 /*        %-------------------------------------------------% */
@@ -435,14 +422,15 @@ L20:
 /*           %----------------------------------------% */
 /*           | Check for splitting and deflation. Use | */
 /*           | a standard test as in the QR algorithm | */
-/*           | REFERENCE: LAPACK subroutine dlahqr    | */
+/*           | REFERENCE: LAPACK subroutine igraphdlahqr    | */
 /*           %----------------------------------------% */
 
 	    tst1 = (d__1 = h__[i__ + i__ * h_dim1], abs(d__1)) + (d__2 = h__[
 		    i__ + 1 + (i__ + 1) * h_dim1], abs(d__2));
 	    if (tst1 == 0.) {
 		i__3 = kplusp - jj + 1;
-		tst1 = igraphdlanhs_("1", &i__3, &h__[h_offset], ldh, &workl[1]);
+		tst1 = igraphdlanhs_("1", &i__3, &h__[h_offset], ldh, &workl[1], (
+			ftnlen)1);
 	    }
 /* Computing MAX */
 	    d__2 = ulp * tst1;
@@ -450,12 +438,14 @@ L20:
 		    smlnum)) {
 		if (msglvl > 0) {
 		    igraphivout_(&debug_1.logfil, &c__1, &i__, &debug_1.ndigit, 
-			    "_napps: matrix splitting at row/column no.");
+			    "_napps: matrix splitting at row/column no.", (
+			    ftnlen)42);
 		    igraphivout_(&debug_1.logfil, &c__1, &jj, &debug_1.ndigit, 
-			    "_napps: matrix splitting with shift number.");
+			    "_napps: matrix splitting with shift number.", (
+			    ftnlen)43);
 		    igraphdvout_(&debug_1.logfil, &c__1, &h__[i__ + 1 + i__ * 
-			    h_dim1], &debug_1.ndigit, "_napps: off diagonal "
-			    "element.");
+			    h_dim1], &debug_1.ndigit, "_napps: off diagonal \
+element.", (ftnlen)29);
 		}
 		iend = i__;
 		h__[i__ + 1 + i__ * h_dim1] = 0.;
@@ -467,10 +457,10 @@ L20:
 L40:
 
 	if (msglvl > 2) {
-	    igraphivout_(&debug_1.logfil, &c__1, &istart, &debug_1.ndigit, "_napps"
-		    ": Start of current block ");
-	    igraphivout_(&debug_1.logfil, &c__1, &iend, &debug_1.ndigit, "_napps: "
-		    "End of current block ");
+	    igraphivout_(&debug_1.logfil, &c__1, &istart, &debug_1.ndigit, "_napps\
+: Start of current block ", (ftnlen)31);
+	    igraphivout_(&debug_1.logfil, &c__1, &iend, &debug_1.ndigit, "_napps: \
+End of current block ", (ftnlen)29);
 	}
 
 /*        %------------------------------------------------% */
@@ -561,7 +551,7 @@ L40:
 /*              %----------------------------------------------------% */
 
 /* Computing MIN */
-		i__4 = i__ + jj;
+		i__4 = j + jj;
 		i__3 = min(i__4,kplusp);
 		for (j = 1; j <= i__3; ++j) {
 		    t = c__ * q[j + i__ * q_dim1] + s * q[j + (i__ + 1) * 
@@ -601,7 +591,7 @@ L40:
 /*           | Compute 1st column of (H - shift*I)*(H - conj(shift)*I) | */
 /*           %---------------------------------------------------------% */
 
-	    s = sigmar * 2.f;
+	    s = sigmar * (float)2.;
 	    t = igraphdlapy2_(&sigmar, &sigmai);
 	    u[0] = (h11 * (h11 - s) + t * t) / h21 + h12;
 	    u[1] = h11 + h22 - s;
@@ -636,7 +626,7 @@ L40:
 
 		i__3 = kplusp - i__ + 1;
 		igraphdlarf_("Left", &nr, &i__3, u, &c__1, &tau, &h__[i__ + i__ * 
-			h_dim1], ldh, &workl[1]);
+			h_dim1], ldh, &workl[1], (ftnlen)4);
 
 /*              %---------------------------------------% */
 /*              | Apply the reflector to the right of H | */
@@ -646,14 +636,14 @@ L40:
 		i__3 = i__ + 3;
 		ir = min(i__3,iend);
 		igraphdlarf_("Right", &ir, &nr, u, &c__1, &tau, &h__[i__ * h_dim1 + 
-			1], ldh, &workl[1]);
+			1], ldh, &workl[1], (ftnlen)5);
 
 /*              %-----------------------------------------------------% */
 /*              | Accumulate the reflector in the matrix Q;  Q <- Q*G | */
 /*              %-----------------------------------------------------% */
 
 		igraphdlarf_("Right", &kplusp, &nr, u, &c__1, &tau, &q[i__ * q_dim1 
-			+ 1], ldq, &workl[1]);
+			+ 1], ldq, &workl[1], (ftnlen)5);
 
 /*              %----------------------------% */
 /*              | Prepare for next reflector | */
@@ -724,13 +714,14 @@ L110:
 /*        %--------------------------------------------% */
 /*        | Final check for splitting and deflation.   | */
 /*        | Use a standard test as in the QR algorithm | */
-/*        | REFERENCE: LAPACK subroutine dlahqr        | */
+/*        | REFERENCE: LAPACK subroutine igraphdlahqr        | */
 /*        %--------------------------------------------% */
 
 	tst1 = (d__1 = h__[i__ + i__ * h_dim1], abs(d__1)) + (d__2 = h__[i__ 
 		+ 1 + (i__ + 1) * h_dim1], abs(d__2));
 	if (tst1 == 0.) {
-	    tst1 = igraphdlanhs_("1", kev, &h__[h_offset], ldh, &workl[1]);
+	    tst1 = igraphdlanhs_("1", kev, &h__[h_offset], ldh, &workl[1], (ftnlen)
+		    1);
 	}
 /* Computing MAX */
 	d__1 = ulp * tst1;
@@ -750,7 +741,7 @@ L110:
 
     if (h__[*kev + 1 + *kev * h_dim1] > 0.) {
 	igraphdgemv_("N", n, &kplusp, &c_b6, &v[v_offset], ldv, &q[(*kev + 1) * 
-		q_dim1 + 1], &c__1, &c_b5, &workd[*n + 1], &c__1);
+		q_dim1 + 1], &c__1, &c_b5, &workd[*n + 1], &c__1, (ftnlen)1);
     }
 
 /*     %----------------------------------------------------------% */
@@ -762,7 +753,7 @@ L110:
     for (i__ = 1; i__ <= i__1; ++i__) {
 	i__2 = kplusp - i__ + 1;
 	igraphdgemv_("N", n, &i__2, &c_b6, &v[v_offset], ldv, &q[(*kev - i__ + 1) * 
-		q_dim1 + 1], &c__1, &c_b5, &workd[1], &c__1);
+		q_dim1 + 1], &c__1, &c_b5, &workd[1], &c__1, (ftnlen)1);
 	igraphdcopy_(n, &workd[1], &c__1, &v[(kplusp - i__ + 1) * v_dim1 + 1], &
 		c__1);
 /* L140: */
@@ -773,7 +764,7 @@ L110:
 /*     %-------------------------------------------------% */
 
     igraphdlacpy_("A", n, kev, &v[(kplusp - *kev + 1) * v_dim1 + 1], ldv, &v[
-	    v_offset], ldv);
+	    v_offset], ldv, (ftnlen)1);
 
 /*     %--------------------------------------------------------------% */
 /*     | Copy the (kev+1)-st column of (V*Q) in the appropriate place | */
@@ -799,15 +790,17 @@ L110:
 
     if (msglvl > 1) {
 	igraphdvout_(&debug_1.logfil, &c__1, &q[kplusp + *kev * q_dim1], &
-		debug_1.ndigit, "_napps: sigmak = (e_{kev+p}^T*Q)*e_{kev}");
+		debug_1.ndigit, "_napps: sigmak = (e_{kev+p}^T*Q)*e_{kev}", (
+		ftnlen)40);
 	igraphdvout_(&debug_1.logfil, &c__1, &h__[*kev + 1 + *kev * h_dim1], &
-		debug_1.ndigit, "_napps: betak = e_{kev+1}^T*H*e_{kev}");
-	igraphivout_(&debug_1.logfil, &c__1, kev, &debug_1.ndigit, "_napps: Order "
-		"of the final Hessenberg matrix ");
+		debug_1.ndigit, "_napps: betak = e_{kev+1}^T*H*e_{kev}", (
+		ftnlen)37);
+	igraphivout_(&debug_1.logfil, &c__1, kev, &debug_1.ndigit, "_napps: Order \
+of the final Hessenberg matrix ", (ftnlen)45);
 	if (msglvl > 2) {
 	    igraphdmout_(&debug_1.logfil, kev, kev, &h__[h_offset], ldh, &
-		    debug_1.ndigit, "_napps: updated Hessenberg matrix H for"
-		    " next iteration");
+		    debug_1.ndigit, "_napps: updated Hessenberg matrix H for\
+ next iteration", (ftnlen)54);
 	}
 
     }

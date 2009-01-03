@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlarf.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -20,25 +13,28 @@ static doublereal c_b4 = 1.;
 static doublereal c_b5 = 0.;
 static integer c__1 = 1;
 
-/* Subroutine */ int igraphdlarf_(char *side, integer *m, integer *n, doublereal *v,
-	 integer *incv, doublereal *tau, doublereal *c__, integer *ldc, 
-	doublereal *work)
+/* Subroutine */ int igraphdlarf_(side, m, n, v, incv, tau, c__, ldc, work, 
+	side_len)
+char *side;
+integer *m, *n;
+doublereal *v;
+integer *incv;
+doublereal *tau, *c__;
+integer *ldc;
+doublereal *work;
+ftnlen side_len;
 {
     /* System generated locals */
     integer c_dim1, c_offset;
     doublereal d__1;
 
     /* Local variables */
-    extern /* Subroutine */ int igraphdger_(integer *, integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
-	    integer *);
-    extern logical igraphlsame_(char *, char *);
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *);
+    extern /* Subroutine */ int igraphdger_();
+    extern logical igraphlsame_();
+    extern /* Subroutine */ int igraphdgemv_();
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -110,12 +106,12 @@ static integer c__1 = 1;
     /* Parameter adjustments */
     --v;
     c_dim1 = *ldc;
-    c_offset = 1 + c_dim1;
+    c_offset = 1 + c_dim1 * 1;
     c__ -= c_offset;
     --work;
 
     /* Function Body */
-    if (igraphlsame_(side, "L")) {
+    if (igraphlsame_(side, "L", (ftnlen)1, (ftnlen)1)) {
 
 /*        Form  H * C */
 
@@ -124,7 +120,7 @@ static integer c__1 = 1;
 /*           w := C' * v */
 
 	    igraphdgemv_("Transpose", m, n, &c_b4, &c__[c_offset], ldc, &v[1], incv,
-		     &c_b5, &work[1], &c__1);
+		     &c_b5, &work[1], &c__1, (ftnlen)9);
 
 /*           C := C - v * w' */
 
@@ -141,7 +137,7 @@ static integer c__1 = 1;
 /*           w := C * v */
 
 	    igraphdgemv_("No transpose", m, n, &c_b4, &c__[c_offset], ldc, &v[1], 
-		    incv, &c_b5, &work[1], &c__1);
+		    incv, &c_b5, &work[1], &c__1, (ftnlen)12);
 
 /*           C := C - w * v' */
 

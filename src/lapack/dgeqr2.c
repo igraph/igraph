@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dgeqr2.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -18,22 +11,23 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int igraphdgeqr2_(integer *m, integer *n, doublereal *a, integer *
-	lda, doublereal *tau, doublereal *work, integer *info)
+/* Subroutine */ int igraphdgeqr2_(m, n, a, lda, tau, work, info)
+integer *m, *n;
+doublereal *a;
+integer *lda;
+doublereal *tau, *work;
+integer *info;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
 
     /* Local variables */
     static integer i__, k;
+    extern /* Subroutine */ int igraphdlarf_(), igraphdlarfg_(), igraphxerbla_();
     static doublereal aii;
-    extern /* Subroutine */ int igraphdlarf_(char *, integer *, integer *, 
-	    doublereal *, integer *, doublereal *, doublereal *, integer *, 
-	    doublereal *), igraphdlarfg_(integer *, doublereal *, 
-	    doublereal *, integer *, doublereal *), igraphxerbla_(char *, integer *);
 
 
-/*  -- LAPACK routine (version 3.0) -- */
+/*  -- LAPACK routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -110,7 +104,7 @@ static integer c__1 = 1;
 
     /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --tau;
     --work;
@@ -126,7 +120,7 @@ static integer c__1 = 1;
     }
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DGEQR2", &i__1);
+	igraphxerbla_("DGEQR2", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -151,7 +145,8 @@ static integer c__1 = 1;
 	    i__2 = *m - i__ + 1;
 	    i__3 = *n - i__;
 	    igraphdlarf_("Left", &i__2, &i__3, &a[i__ + i__ * a_dim1], &c__1, &tau[
-		    i__], &a[i__ + (i__ + 1) * a_dim1], lda, &work[1]);
+		    i__], &a[i__ + (i__ + 1) * a_dim1], lda, &work[1], (
+		    ftnlen)4);
 	    a[i__ + i__ * a_dim1] = aii;
 	}
 /* L10: */

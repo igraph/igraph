@@ -1,21 +1,20 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlamch.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
-#include <stdio.h>
 
-doublereal igraphdlamch_(char *cmach)
+/* Table of constant values */
+
+static integer c__1 = 1;
+static doublereal c_b32 = 0.;
+
+doublereal igraphdlamch_(cmach, cmach_len)
+char *cmach;
+ftnlen cmach_len;
 {
     /* Initialized data */
 
@@ -26,24 +25,23 @@ doublereal igraphdlamch_(char *cmach)
     doublereal ret_val;
 
     /* Builtin functions */
-    double igraphpow_di(doublereal *, integer *);
+    double igraphpow_di();
 
     /* Local variables */
-    static doublereal t;
-    static integer it;
-    static doublereal rnd, eps, base;
+    static doublereal base;
     static integer beta;
     static doublereal emin, prec, emax;
     static integer imin, imax;
     static logical lrnd;
-    static doublereal rmin, rmax, rmach;
-    extern logical igraphlsame_(char *, char *);
+    static doublereal rmin, rmax, t, rmach;
+    extern logical igraphlsame_();
     static doublereal small, sfmin;
-    extern /* Subroutine */ int igraphdlamc2_(integer *, integer *, logical *, 
-	    doublereal *, integer *, doublereal *, integer *, doublereal *);
+    extern /* Subroutine */ int igraphdlamc2_();
+    static integer it;
+    static doublereal rnd, eps;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -129,25 +127,25 @@ doublereal igraphdlamch_(char *cmach)
 	}
     }
 
-    if (igraphlsame_(cmach, "E")) {
+    if (igraphlsame_(cmach, "E", (ftnlen)1, (ftnlen)1)) {
 	rmach = eps;
-    } else if (igraphlsame_(cmach, "S")) {
+    } else if (igraphlsame_(cmach, "S", (ftnlen)1, (ftnlen)1)) {
 	rmach = sfmin;
-    } else if (igraphlsame_(cmach, "B")) {
+    } else if (igraphlsame_(cmach, "B", (ftnlen)1, (ftnlen)1)) {
 	rmach = base;
-    } else if (igraphlsame_(cmach, "P")) {
+    } else if (igraphlsame_(cmach, "P", (ftnlen)1, (ftnlen)1)) {
 	rmach = prec;
-    } else if (igraphlsame_(cmach, "N")) {
+    } else if (igraphlsame_(cmach, "N", (ftnlen)1, (ftnlen)1)) {
 	rmach = t;
-    } else if (igraphlsame_(cmach, "R")) {
+    } else if (igraphlsame_(cmach, "R", (ftnlen)1, (ftnlen)1)) {
 	rmach = rnd;
-    } else if (igraphlsame_(cmach, "M")) {
+    } else if (igraphlsame_(cmach, "M", (ftnlen)1, (ftnlen)1)) {
 	rmach = emin;
-    } else if (igraphlsame_(cmach, "U")) {
+    } else if (igraphlsame_(cmach, "U", (ftnlen)1, (ftnlen)1)) {
 	rmach = rmin;
-    } else if (igraphlsame_(cmach, "L")) {
+    } else if (igraphlsame_(cmach, "L", (ftnlen)1, (ftnlen)1)) {
 	rmach = emax;
-    } else if (igraphlsame_(cmach, "O")) {
+    } else if (igraphlsame_(cmach, "O", (ftnlen)1, (ftnlen)1)) {
 	rmach = rmax;
     }
 
@@ -158,24 +156,12 @@ doublereal igraphdlamch_(char *cmach)
 
 } /* igraphdlamch_ */
 
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
-*/
-
-#include "f2c.h"
 
 /* *********************************************************************** */
 
-/* Subroutine */ int igraphdlamc1_(integer *beta, integer *t, logical *rnd, logical 
-	*ieee1)
+/* Subroutine */ int igraphdlamc1_(beta, t, rnd, ieee1)
+integer *beta, *t;
+logical *rnd, *ieee1;
 {
     /* Initialized data */
 
@@ -185,17 +171,18 @@ doublereal igraphdlamch_(char *cmach)
     doublereal d__1, d__2;
 
     /* Local variables */
-    static doublereal a, b, c__, f, t1, t2;
-    static integer lt;
-    static doublereal one, qtr;
     static logical lrnd;
+    static doublereal a, b, c__, f;
     static integer lbeta;
     static doublereal savec;
-    extern doublereal igraphdlamc3_(doublereal *, doublereal *);
+    extern doublereal igraphdlamc3_();
     static logical lieee1;
+    static doublereal t1, t2;
+    static integer lt;
+    static doublereal one, qtr;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -379,68 +366,62 @@ L30:
 
 } /* igraphdlamc1_ */
 
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
-*/
-
-#include "f2c.h"
-
-/* Table of constant values */
-
-static integer c__1 = 1;
 
 /* *********************************************************************** */
 
-/* Subroutine */ int igraphdlamc2_(integer *beta, integer *t, logical *rnd, 
-	doublereal *eps, integer *emin, doublereal *rmin, integer *emax, 
-	doublereal *rmax)
+/* Subroutine */ int igraphdlamc2_(beta, t, rnd, eps, emin, rmin, emax, rmax)
+integer *beta, *t;
+logical *rnd;
+doublereal *eps;
+integer *emin;
+doublereal *rmin;
+integer *emax;
+doublereal *rmax;
 {
     /* Initialized data */
 
     static logical first = TRUE_;
     static logical iwarn = FALSE_;
 
+    /* Format strings */
+    static char fmt_9999[] = "(//\002 WARNING. The value EMIN may be incorre\
+ct:-\002,\002  EMIN = \002,i8,/\002 If, after inspection, the value EMIN loo\
+ks\002,\002 acceptable please comment out \002,/\002 the IF block as marked \
+within the code of routine\002,\002 DLAMC2,\002,/\002 otherwise supply EMIN \
+explicitly.\002,/)";
+
     /* System generated locals */
     integer i__1;
     doublereal d__1, d__2, d__3, d__4, d__5;
 
     /* Builtin functions */
-    double igraphpow_di(doublereal *, integer *);
+    double igraphpow_di();
+    integer s_wsfe(), do_fio(), e_wsfe();
 
     /* Local variables */
-    static doublereal a, b, c__;
-    static integer i__, lt;
-    static doublereal one, two;
     static logical ieee;
     static doublereal half;
     static logical lrnd;
-    static doublereal leps, zero;
-    static integer lbeta;
+    static doublereal leps, zero, a, b, c__;
+    static integer i__, lbeta;
     static doublereal rbase;
     static integer lemin, lemax, gnmin;
     static doublereal small;
     static integer gpmin;
     static doublereal third, lrmin, lrmax, sixth;
-    extern /* Subroutine */ int igraphdlamc1_(integer *, integer *, logical *, 
-	    logical *);
-    extern doublereal igraphdlamc3_(doublereal *, doublereal *);
+    extern /* Subroutine */ int igraphdlamc1_();
+    extern doublereal igraphdlamc3_();
     static logical lieee1;
-    extern /* Subroutine */ int igraphdlamc4_(integer *, doublereal *, integer *), 
-	    igraphdlamc5_(integer *, integer *, integer *, logical *, integer *, 
-	    doublereal *);
-    static integer ngnmin, ngpmin;
+    extern /* Subroutine */ int igraphdlamc4_(), igraphdlamc5_();
+    static integer lt, ngnmin, ngpmin;
+    static doublereal one, two;
+
+    /* Fortran I/O blocks */
+    static cilist io___58 = { 0, 6, 0, fmt_9999, 0 };
 
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -652,12 +633,9 @@ L10:
 /* Comment out this if block if EMIN is ok */
 	if (iwarn) {
 	    first = TRUE_;
-	    printf("\n\n WARNING. The value EMIN may be incorrect:- ");
-	    printf("EMIN = %8i\n",lemin);
-	    printf("If, after inspection, the value EMIN looks acceptable");
-            printf("please comment out \n the IF block as marked within the"); 
-            printf("code of routine DLAMC2, \n otherwise supply EMIN"); 
-            printf("explicitly.\n");
+/* 	    s_wsfe(&io___58); */
+/* 	    do_fio(&c__1, (char *)&lemin, (ftnlen)sizeof(integer)); */
+/* 	    e_wsfe(); */
 	}
 /* ** */
 
@@ -701,29 +679,17 @@ L10:
 
 } /* igraphdlamc2_ */
 
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
-*/
-
-#include "f2c.h"
 
 /* *********************************************************************** */
 
-doublereal igraphdlamc3_(doublereal *a, doublereal *b)
+doublereal igraphdlamc3_(a, b)
+doublereal *a, *b;
 {
     /* System generated locals */
     doublereal ret_val;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -756,36 +722,27 @@ doublereal igraphdlamc3_(doublereal *a, doublereal *b)
 
 } /* igraphdlamc3_ */
 
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
-*/
-
-#include "f2c.h"
 
 /* *********************************************************************** */
 
-/* Subroutine */ int igraphdlamc4_(integer *emin, doublereal *start, integer *base)
+/* Subroutine */ int igraphdlamc4_(emin, start, base)
+integer *emin;
+doublereal *start;
+integer *base;
 {
     /* System generated locals */
     integer i__1;
     doublereal d__1;
 
     /* Local variables */
-    static doublereal a;
+    static doublereal zero, a;
     static integer i__;
-    static doublereal b1, b2, c1, c2, d1, d2, one, zero, rbase;
-    extern doublereal igraphdlamc3_(doublereal *, doublereal *);
+    static doublereal rbase, b1, b2, c1, c2, d1, d2;
+    extern doublereal igraphdlamc3_();
+    static doublereal one;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -867,45 +824,31 @@ L10:
 
 } /* igraphdlamc4_ */
 
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
-*/
-
-#include "f2c.h"
-
-/* Table of constant values */
-
-static doublereal c_b5 = 0.;
 
 /* *********************************************************************** */
 
-/* Subroutine */ int igraphdlamc5_(integer *beta, integer *p, integer *emin, 
-	logical *ieee, integer *emax, doublereal *rmax)
+/* Subroutine */ int igraphdlamc5_(beta, p, emin, ieee, emax, rmax)
+integer *beta, *p, *emin;
+logical *ieee;
+integer *emax;
+doublereal *rmax;
 {
     /* System generated locals */
     integer i__1;
     doublereal d__1;
 
     /* Local variables */
-    static integer i__;
-    static doublereal y, z__;
-    static integer try__, lexp;
+    static integer lexp;
     static doublereal oldy;
-    static integer uexp, nbits;
-    extern doublereal igraphdlamc3_(doublereal *, doublereal *);
+    static integer uexp, i__;
+    static doublereal y, z__;
+    static integer nbits;
+    extern doublereal igraphdlamc3_();
     static doublereal recbas;
-    static integer exbits, expsum;
+    static integer exbits, expsum, try__;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -1049,7 +992,7 @@ L10:
     i__1 = *emax;
     for (i__ = 1; i__ <= i__1; ++i__) {
 	d__1 = y * *beta;
-	y = igraphdlamc3_(&d__1, &c_b5);
+	y = igraphdlamc3_(&d__1, &c_b32);
 /* L30: */
     }
 

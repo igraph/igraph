@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlacon.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -19,30 +12,33 @@
 static integer c__1 = 1;
 static doublereal c_b11 = 1.;
 
-/* Subroutine */ int igraphdlacon_(integer *n, doublereal *v, doublereal *x, 
-	integer *isgn, doublereal *est, integer *kase)
+/* Subroutine */ int igraphdlacon_(n, v, x, isgn, est, kase)
+integer *n;
+doublereal *v, *x;
+integer *isgn;
+doublereal *est;
+integer *kase;
 {
     /* System generated locals */
     integer i__1;
     doublereal d__1;
 
     /* Builtin functions */
-    double igraphd_sign(doublereal *, doublereal *);
-    integer igraphi_dnnt(doublereal *);
+    double igraphd_sign();
+    integer igraphi_dnnt();
 
     /* Local variables */
-    static integer i__, j, iter;
+    static integer iter;
     static doublereal temp;
-    static integer jump;
-    extern doublereal igraphdasum_(integer *, doublereal *, integer *);
+    static integer jump, i__, j;
+    extern doublereal igraphdasum_();
     static integer jlast;
-    extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *);
-    extern integer igraphidamax_(integer *, doublereal *, integer *);
+    extern /* Subroutine */ int igraphdcopy_();
+    extern integer igraphidamax_();
     static doublereal altsgn, estold;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -129,7 +125,7 @@ static doublereal c_b11 = 1.;
 	return 0;
     }
 
-    switch (jump) {
+    switch ((int)jump) {
 	case 1:  goto L20;
 	case 2:  goto L40;
 	case 3:  goto L70;

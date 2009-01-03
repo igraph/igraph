@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdlange.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -18,26 +11,31 @@
 
 static integer c__1 = 1;
 
-doublereal igraphdlange_(char *norm, integer *m, integer *n, doublereal *a, integer 
-	*lda, doublereal *work)
+doublereal igraphdlange_(norm, m, n, a, lda, work, norm_len)
+char *norm;
+integer *m, *n;
+doublereal *a;
+integer *lda;
+doublereal *work;
+ftnlen norm_len;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
     doublereal ret_val, d__1, d__2, d__3;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
     static integer i__, j;
-    static doublereal sum, scale;
-    extern logical igraphlsame_(char *, char *);
+    static doublereal scale;
+    extern logical igraphlsame_();
     static doublereal value;
-    extern /* Subroutine */ int igraphdlassq_(integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *);
+    extern /* Subroutine */ int igraphdlassq_();
+    static doublereal sum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -113,14 +111,14 @@ doublereal igraphdlange_(char *norm, integer *m, integer *n, doublereal *a, inte
 
     /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
     --work;
 
     /* Function Body */
     if (min(*m,*n) == 0) {
 	value = 0.;
-    } else if (igraphlsame_(norm, "M")) {
+    } else if (igraphlsame_(norm, "M", (ftnlen)1, (ftnlen)1)) {
 
 /*        Find max(abs(A(i,j))). */
 
@@ -136,7 +134,7 @@ doublereal igraphdlange_(char *norm, integer *m, integer *n, doublereal *a, inte
 	    }
 /* L20: */
 	}
-    } else if (igraphlsame_(norm, "O") || *(unsigned char *)
+    } else if (igraphlsame_(norm, "O", (ftnlen)1, (ftnlen)1) || *(unsigned char *)
 	    norm == '1') {
 
 /*        Find norm1(A). */
@@ -153,7 +151,7 @@ doublereal igraphdlange_(char *norm, integer *m, integer *n, doublereal *a, inte
 	    value = max(value,sum);
 /* L40: */
 	}
-    } else if (igraphlsame_(norm, "I")) {
+    } else if (igraphlsame_(norm, "I", (ftnlen)1, (ftnlen)1)) {
 
 /*        Find normI(A). */
 
@@ -179,7 +177,8 @@ doublereal igraphdlange_(char *norm, integer *m, integer *n, doublereal *a, inte
 	    value = max(d__1,d__2);
 /* L80: */
 	}
-    } else if (igraphlsame_(norm, "F") || igraphlsame_(norm, "E")) {
+    } else if (igraphlsame_(norm, "F", (ftnlen)1, (ftnlen)1) || igraphlsame_(norm, "E", (
+	    ftnlen)1, (ftnlen)1)) {
 
 /*        Find normF(A). */
 

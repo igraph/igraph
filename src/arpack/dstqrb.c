@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dstqrb.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -124,52 +117,45 @@ static doublereal c_b31 = 1.;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdstqrb_(integer *n, doublereal *d__, doublereal *e,
-	 doublereal *z__, doublereal *work, integer *info)
+/* Subroutine */ int igraphdstqrb_(n, d__, e, z__, work, info)
+integer *n;
+doublereal *d__, *e, *z__, *work;
+integer *info;
 {
     /* System generated locals */
     integer i__1, i__2;
     doublereal d__1, d__2;
 
     /* Builtin functions */
-    double sqrt(doublereal), igraphd_sign(doublereal *, doublereal *);
+    double sqrt(), igraphd_sign();
 
     /* Local variables */
+    static integer lend, jtot;
+    extern /* Subroutine */ int igraphdlae2_();
     static doublereal b, c__, f, g;
     static integer i__, j, k, l, m;
     static doublereal p, r__, s;
-    static integer l1, ii, mm, lm1, mm1, nm1;
-    static doublereal rt1, rt2;
-    extern /* Subroutine */ int igraphdlae2_(doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *);
-    static doublereal eps;
-    static integer lsv;
-    static doublereal tst;
-    extern /* Subroutine */ int igraphdlasr_(char *, char *, char *, integer *
-	    , integer *, doublereal *, doublereal *, doublereal *, integer *);
-    static doublereal eps2;
-    extern /* Subroutine */ int igraphdlaev2_(doublereal *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *);
-    static integer lend;
-    extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    static integer jtot;
-    extern doublereal igraphdlamch_(char *);
-    extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
-	    integer *, integer *), igraphdlartg_(doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *);
-    extern doublereal igraphdlanst_(char *, integer *, doublereal *, 
-	    doublereal *);
-    extern /* Subroutine */ int igraphdlasrt_(char *, integer *, doublereal *,
-	     integer *);
+    extern /* Subroutine */ int igraphdlasr_();
     static doublereal anorm;
-    static integer lendm1, lendp1, iscale;
-    static doublereal safmin, safmax;
-    static integer lendsv;
-    static doublereal ssfmin;
-    static integer nmaxit, icompz;
-    static doublereal ssfmax;
+    static integer l1;
+    extern /* Subroutine */ int igraphdlaev2_();
+    static integer lendm1, lendp1;
+    extern doublereal igraphdlapy2_();
+    static integer ii;
+    extern doublereal igraphdlamch_();
+    static integer mm, iscale;
+    extern /* Subroutine */ int igraphdlascl_();
+    static doublereal safmin;
+    extern /* Subroutine */ int igraphdlartg_();
+    static doublereal safmax;
+    extern doublereal igraphdlanst_();
+    extern /* Subroutine */ int igraphdlasrt_();
+    static integer lendsv, nmaxit, icompz;
+    static doublereal ssfmax, ssfmin;
+    static integer lm1, mm1, nm1;
+    static doublereal rt1, rt2, eps;
+    static integer lsv;
+    static doublereal tst, eps2;
 
 
 /*     %------------------% */
@@ -247,11 +233,11 @@ static doublereal c_b31 = 1.;
 
 /*     determine the unit roundoff and over/underflow thresholds. */
 
-    eps = igraphdlamch_("e");
+    eps = igraphdlamch_("e", (ftnlen)1);
 /* Computing 2nd power */
     d__1 = eps;
     eps2 = d__1 * d__1;
-    safmin = igraphdlamch_("s");
+    safmin = igraphdlamch_("s", (ftnlen)1);
     safmax = 1. / safmin;
     ssfmax = sqrt(safmax) / 3.;
     ssfmin = sqrt(safmin) / eps2;
@@ -321,7 +307,7 @@ L30:
 /*     scale submatrix in rows and columns l to lend */
 
     i__1 = lend - l + 1;
-    anorm = igraphdlanst_("i", &i__1, &d__[l], &e[l]);
+    anorm = igraphdlanst_("i", &i__1, &d__[l], &e[l], (ftnlen)1);
     iscale = 0;
     if (anorm == 0.) {
 	goto L10;
@@ -329,19 +315,19 @@ L30:
     if (anorm > ssfmax) {
 	iscale = 1;
 	i__1 = lend - l + 1;
-	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmax, &i__1, &c__1, &d__[
-		l], n, info);
+	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmax, &i__1, &c__1, &d__[l], n, 
+		info, (ftnlen)1);
 	i__1 = lend - l;
-	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmax, &i__1, &c__1, &e[l],
-		 n, info);
+	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmax, &i__1, &c__1, &e[l], n, 
+		info, (ftnlen)1);
     } else if (anorm < ssfmin) {
 	iscale = 2;
 	i__1 = lend - l + 1;
-	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmin, &i__1, &c__1, &d__[
-		l], n, info);
+	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmin, &i__1, &c__1, &d__[l], n, 
+		info, (ftnlen)1);
 	i__1 = lend - l;
-	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmin, &i__1, &c__1, &e[l],
-		 n, info);
+	igraphdlascl_("g", &c__0, &c__0, &anorm, &ssfmin, &i__1, &c__1, &e[l], n, 
+		info, (ftnlen)1);
     }
 
 /*     choose between ql and qr iteration */
@@ -389,8 +375,7 @@ L60:
 
 	if (m == l + 1) {
 	    if (icompz > 0) {
-		igraphdlaev2_(&d__[l], &e[l], &d__[l + 1], &rt1, &rt2, &c__, &
-			s);
+		igraphdlaev2_(&d__[l], &e[l], &d__[l + 1], &rt1, &rt2, &c__, &s);
 		work[l] = c__;
 		work[*n - 1 + l] = s;
 /* $$$               call dlasr( 'r', 'v', 'b', n, 2, work( l ), */
@@ -466,8 +451,8 @@ L60:
 
 /*             *** New starting with version 2.5 *** */
 
-	    igraphdlasr_("r", "v", "b", &c__1, &mm, &work[l], &work[*n - 1 + 
-		    l], &z__[l], &c__1);
+	    igraphdlasr_("r", "v", "b", &c__1, &mm, &work[l], &work[*n - 1 + l], &
+		    z__[l], &c__1, (ftnlen)1, (ftnlen)1, (ftnlen)1);
 /*             ************************************* */
 	}
 
@@ -524,8 +509,8 @@ L110:
 
 	if (m == l - 1) {
 	    if (icompz > 0) {
-		igraphdlaev2_(&d__[l - 1], &e[l - 1], &d__[l], &rt1, &rt2, &
-			c__, &s);
+		igraphdlaev2_(&d__[l - 1], &e[l - 1], &d__[l], &rt1, &rt2, &c__, &s)
+			;
 /* $$$               work( m ) = c */
 /* $$$               work( n-1+m ) = s */
 /* $$$               call dlasr( 'r', 'v', 'f', n, 2, work( m ), */
@@ -601,8 +586,8 @@ L110:
 
 /*           *** New starting with version 2.5 *** */
 
-	    igraphdlasr_("r", "v", "f", &c__1, &mm, &work[m], &work[*n - 1 + 
-		    m], &z__[m], &c__1);
+	    igraphdlasr_("r", "v", "f", &c__1, &mm, &work[m], &work[*n - 1 + m], &
+		    z__[m], &c__1, (ftnlen)1, (ftnlen)1, (ftnlen)1);
 /*           ************************************* */
 	}
 
@@ -628,18 +613,18 @@ L130:
 L140:
     if (iscale == 1) {
 	i__1 = lendsv - lsv + 1;
-	igraphdlascl_("g", &c__0, &c__0, &ssfmax, &anorm, &i__1, &c__1, &d__[
-		lsv], n, info);
+	igraphdlascl_("g", &c__0, &c__0, &ssfmax, &anorm, &i__1, &c__1, &d__[lsv], 
+		n, info, (ftnlen)1);
 	i__1 = lendsv - lsv;
-	igraphdlascl_("g", &c__0, &c__0, &ssfmax, &anorm, &i__1, &c__1, &e[
-		lsv], n, info);
+	igraphdlascl_("g", &c__0, &c__0, &ssfmax, &anorm, &i__1, &c__1, &e[lsv], n, 
+		info, (ftnlen)1);
     } else if (iscale == 2) {
 	i__1 = lendsv - lsv + 1;
-	igraphdlascl_("g", &c__0, &c__0, &ssfmin, &anorm, &i__1, &c__1, &d__[
-		lsv], n, info);
+	igraphdlascl_("g", &c__0, &c__0, &ssfmin, &anorm, &i__1, &c__1, &d__[lsv], 
+		n, info, (ftnlen)1);
 	i__1 = lendsv - lsv;
-	igraphdlascl_("g", &c__0, &c__0, &ssfmin, &anorm, &i__1, &c__1, &e[
-		lsv], n, info);
+	igraphdlascl_("g", &c__0, &c__0, &ssfmin, &anorm, &i__1, &c__1, &e[lsv], n, 
+		info, (ftnlen)1);
     }
 
 /*     check for no convergence to an eigenvalue after a total */
@@ -664,7 +649,7 @@ L160:
 
 /*        use quick sort */
 
-	igraphdlasrt_("i", n, &d__[1], info);
+	igraphdlasrt_("i", n, &d__[1], info, (ftnlen)1);
 
     } else {
 

@@ -596,8 +596,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   if (values) {
     long int i;
-    IGRAPH_CHECK(igraph_matrix_resize(values, options->nev, 2));
-    for (i=0; i<options->nev; i++) {
+    IGRAPH_CHECK(igraph_matrix_resize(values, options->ncv, 2));
+    for (i=0; i<options->ncv; i++) {
       MATRIX(*values, i, 0) = dr[i];
       MATRIX(*values, i, 1) = di[i];
     }
@@ -682,6 +682,13 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
     IGRAPH_ERROR("`nev' too large, we don't have that many in `values'", 
 		 IGRAPH_EINVAL);
   }
+
+  for (i=0; i<igraph_matrix_nrow(values); i++) {
+    for (j=0; j<igraph_matrix_ncol(values); j++) {
+      printf(" %g", MATRIX(*values, i, j));
+    } 
+    printf("\n");
+  }  
 
   IGRAPH_CHECK(igraph_matrix_resize(vectors, nodes, nev * 2));
   for (i=nev; i<igraph_matrix_nrow(values); i++) {
@@ -945,7 +952,7 @@ int igraph_arpack_eigen(const igraph_matrix_t *matrix,
     options->n=mdim;
     options->which[0]='L'; options->which[1]='M';
     options->nev=last_large;
-    options->ncv=2*last_large+1;
+    options->ncv=2*last_large+2;
     if (options->ncv > mdim) { options->ncv=mdim; }
     igraph_arpack_rnsolve(igraph_i_arpack_eigen, (void*) matrix,
 			  options, /*storage=*/ 0, myevals, myevecs);

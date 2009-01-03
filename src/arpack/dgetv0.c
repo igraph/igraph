@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dgetv0.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -153,16 +146,26 @@ static doublereal c_b29 = -1.;
 /*     Houston, Texas */
 
 /* \SCCS Information: @(#) */
-/* FILE: getv0.F   SID: 2.7   DATE OF SID: 04/07/99   RELEASE: 2 */
+/* FILE: getv0.F   SID: 2.6   DATE OF SID: 8/27/96   RELEASE: 2 */
 
 /* \EndLib */
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdgetv0_(integer *ido, char *bmat, integer *itry, 
-	logical *initv, integer *n, integer *j, doublereal *v, integer *ldv, 
-	doublereal *resid, doublereal *rnorm, integer *ipntr, doublereal *
-	workd, integer *ierr)
+/* Subroutine */ int igraphdgetv0_(ido, bmat, itry, initv, n, j, v, ldv, resid, 
+	rnorm, ipntr, workd, ierr, bmat_len)
+integer *ido;
+char *bmat;
+integer *itry;
+logical *initv;
+integer *n, *j;
+doublereal *v;
+integer *ldv;
+doublereal *resid, *rnorm;
+integer *ipntr;
+doublereal *workd;
+integer *ierr;
+ftnlen bmat_len;
 {
     /* Initialized data */
 
@@ -172,28 +175,25 @@ static doublereal c_b29 = -1.;
     integer v_dim1, v_offset, i__1;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
-    static real t0, t1, t2, t3;
-    static integer jj;
-    extern doublereal igraphddot_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdnrm2_(integer *, doublereal *, 
-	    integer *);
-    extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *), igraphdcopy_(
-	    integer *, doublereal *, integer *, doublereal *, integer *), 
-	    igraphdvout_(integer *, integer *, doublereal *, integer *, char *
-	    );
+    extern doublereal igraphddot_();
     static integer iter;
     static logical orth;
-    extern /* Subroutine */ int igraphsecond_(real *), igraphdlarnv_(integer *
-	    , integer *, integer *, doublereal *);
-    static integer iseed[4], idist;
+    extern doublereal igraphdnrm2_();
+    static integer iseed[4];
+    extern /* Subroutine */ int igraphdgemv_();
+    static integer idist;
+    extern /* Subroutine */ int igraphdcopy_();
     static logical first;
+    extern /* Subroutine */ int igraphdvout_();
+    static real t0, t1, t2, t3;
     static doublereal rnorm0;
+    static integer jj;
+    extern /* Subroutine */ int igraphsecond_();
     static integer msglvl;
+    extern /* Subroutine */ int igraphdlarnv_();
 
 
 /*     %----------------------------------------------------% */
@@ -259,7 +259,7 @@ static doublereal c_b29 = -1.;
     --workd;
     --resid;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     --ipntr;
 
@@ -407,11 +407,11 @@ L20:
 L30:
 
     i__1 = *j - 1;
-    igraphdgemv_("T", n, &i__1, &c_b24, &v[v_offset], ldv, &workd[1], &c__1, &
-	    c_b26, &workd[*n + 1], &c__1);
+    igraphdgemv_("T", n, &i__1, &c_b24, &v[v_offset], ldv, &workd[1], &c__1, &c_b26,
+	     &workd[*n + 1], &c__1, (ftnlen)1);
     i__1 = *j - 1;
-    igraphdgemv_("N", n, &i__1, &c_b29, &v[v_offset], ldv, &workd[*n + 1], &
-	    c__1, &c_b24, &resid[1], &c__1);
+    igraphdgemv_("N", n, &i__1, &c_b29, &v[v_offset], ldv, &workd[*n + 1], &c__1, &
+	    c_b24, &resid[1], &c__1, (ftnlen)1);
 
 /*     %----------------------------------------------------------% */
 /*     | Compute the B-norm of the orthogonalized starting vector | */
@@ -448,18 +448,18 @@ L40:
 /*     %--------------------------------------% */
 
     if (msglvl > 2) {
-	igraphdvout_(&debug_1.logfil, &c__1, &rnorm0, &debug_1.ndigit, "_get"
-		"v0: re-orthonalization ; rnorm0 is");
-	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_getv0"
-		": re-orthonalization ; rnorm is");
+	igraphdvout_(&debug_1.logfil, &c__1, &rnorm0, &debug_1.ndigit, "_getv0: re\
+-orthonalization ; rnorm0 is", (ftnlen)38);
+	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_getv0: re-o\
+rthonalization ; rnorm is", (ftnlen)37);
     }
 
-    if (*rnorm > rnorm0 * .717f) {
+    if (*rnorm > rnorm0 * (float).717) {
 	goto L50;
     }
 
     ++iter;
-    if (iter <= 5) {
+    if (iter <= 1) {
 
 /*        %-----------------------------------% */
 /*        | Perform iterative refinement step | */
@@ -485,12 +485,12 @@ L40:
 L50:
 
     if (msglvl > 0) {
-	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_getv0"
-		": B-norm of initial / restarted starting vector");
+	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_getv0: B-no\
+rm of initial / restarted starting vector", (ftnlen)53);
     }
-    if (msglvl > 3) {
-	igraphdvout_(&debug_1.logfil, n, &resid[1], &debug_1.ndigit, "_getv0"
-		": initial / restarted starting vector");
+    if (msglvl > 2) {
+	igraphdvout_(&debug_1.logfil, n, &resid[1], &debug_1.ndigit, "_getv0: init\
+ial / restarted starting vector", (ftnlen)43);
     }
     *ido = 99;
 

@@ -1,35 +1,31 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlassq.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdlassq_(integer *n, doublereal *x, integer *incx, 
-	doublereal *scale, doublereal *sumsq)
+/* Subroutine */ int igraphdlassq_(n, x, incx, scale, sumsq)
+integer *n;
+doublereal *x;
+integer *incx;
+doublereal *scale, *sumsq;
 {
     /* System generated locals */
     integer i__1, i__2;
     doublereal d__1;
 
     /* Local variables */
-    static integer ix;
     static doublereal absxi;
+    static integer ix;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
-/*     June 30, 1999 */
+/*     October 31, 1992 */
 
 /*     .. Scalar Arguments .. */
 /*     .. */
@@ -59,7 +55,7 @@
 /*  N       (input) INTEGER */
 /*          The number of elements to be used from the vector X. */
 
-/*  X       (input) DOUBLE PRECISION array, dimension (N) */
+/*  X       (input) DOUBLE PRECISION */
 /*          The vector for which a scaled sum of squares is computed. */
 /*             x( i )  = X( 1 + ( i - 1 )*INCX ), 1 <= i <= n. */
 

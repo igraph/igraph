@@ -1,13 +1,6 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dsaitr.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
@@ -16,7 +9,7 @@
 
 /* Common Block Declarations */
 
-static struct {
+struct {
     integer logfil, ndigit, mgetv0, msaupd, msaup2, msaitr, mseigt, msapps, 
 	    msgets, mseupd, mnaupd, mnaup2, mnaitr, mneigh, mnapps, mngets, 
 	    mneupd, mcaupd, mcaup2, mcaitr, mceigh, mcapps, mcgets, mceupd;
@@ -24,7 +17,7 @@ static struct {
 
 #define debug_1 debug_
 
-static struct {
+struct {
     integer nopx, nbx, nrorth, nitref, nrstrt;
     real tsaupd, tsaup2, tsaitr, tseigt, tsgets, tsapps, tsconv, tnaupd, 
 	    tnaup2, tnaitr, tneigh, tngets, tnapps, tnconv, tcaupd, tcaup2, 
@@ -246,10 +239,18 @@ static integer c__2 = 2;
 
 /* ----------------------------------------------------------------------- */
 
-/* Subroutine */ int igraphdsaitr_(integer *ido, char *bmat, integer *n, 
-	integer *k, integer *np, integer *mode, doublereal *resid, doublereal 
-	*rnorm, doublereal *v, integer *ldv, doublereal *h__, integer *ldh, 
-	integer *ipntr, doublereal *workd, integer *info)
+/* Subroutine */ int igraphdsaitr_(ido, bmat, n, k, np, mode, resid, rnorm, v, ldv, 
+	h__, ldh, ipntr, workd, info, bmat_len)
+integer *ido;
+char *bmat;
+integer *n, *k, *np, *mode;
+doublereal *resid, *rnorm, *v;
+integer *ldv;
+doublereal *h__;
+integer *ldh, *ipntr;
+doublereal *workd;
+integer *info;
+ftnlen bmat_len;
 {
     /* Initialized data */
 
@@ -259,38 +260,30 @@ static integer c__2 = 2;
     integer h_dim1, h_offset, v_dim1, v_offset, i__1;
 
     /* Builtin functions */
-    double sqrt(doublereal);
+    double sqrt();
 
     /* Local variables */
-    static integer i__, j;
-    static real t0, t1, t2, t3, t4, t5;
-    static integer jj;
-    extern doublereal igraphddot_(integer *, doublereal *, integer *, 
-	    doublereal *, integer *), igraphdnrm2_(integer *, doublereal *, 
-	    integer *);
-    static integer ipj, irj, ivj;
-    extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, 
-	    doublereal *, integer *), igraphdgemv_(char *, integer *, integer 
-	    *, doublereal *, doublereal *, integer *, doublereal *, integer *,
-	     doublereal *, doublereal *, integer *), igraphdcopy_(
-	    integer *, doublereal *, integer *, doublereal *, integer *), 
-	    igraphdvout_(integer *, integer *, doublereal *, integer *, char *
-	    ), igraphivout_(integer *, integer *, integer *, integer *
-	    , char *), igraphdgetv0_(integer *, char *, integer *, 
-	    logical *, integer *, integer *, doublereal *, integer *, 
-	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    static integer ierr, iter;
-    extern doublereal igraphdlamch_(char *);
-    static integer itry;
-    extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
-	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
-	    integer *, integer *), igraphsecond_(real *);
+    extern doublereal igraphddot_();
+    static integer ierr, iter, itry;
+    extern doublereal igraphdnrm2_();
     static doublereal temp1;
     static logical orth1, orth2, step3, step4;
+    static integer i__, j;
+    extern /* Subroutine */ int igraphdscal_(), igraphdgemv_();
     static integer infol;
-    static doublereal xtemp[2], wnorm, rnorm1, safmin;
+    extern /* Subroutine */ int igraphdcopy_();
+    static doublereal xtemp[2];
+    extern /* Subroutine */ int igraphdvout_();
+    static doublereal wnorm;
+    static real t0, t1, t2, t3, t4, t5;
+    extern /* Subroutine */ int igraphivout_(), igraphdgetv0_();
+    static doublereal rnorm1;
+    static integer jj;
+    extern doublereal igraphdlamch_();
+    extern /* Subroutine */ int igraphdlascl_(), igraphsecond_();
+    static doublereal safmin;
     static logical rstart;
-    static integer msglvl;
+    static integer msglvl, ipj, irj, ivj;
 
 
 /*     %----------------------------------------------------% */
@@ -356,10 +349,10 @@ static integer c__2 = 2;
     --workd;
     --resid;
     v_dim1 = *ldv;
-    v_offset = 1 + v_dim1;
+    v_offset = 1 + v_dim1 * 1;
     v -= v_offset;
     h_dim1 = *ldh;
-    h_offset = 1 + h_dim1;
+    h_offset = 1 + h_dim1 * 1;
     h__ -= h_offset;
     --ipntr;
 
@@ -377,7 +370,7 @@ static integer c__2 = 2;
 /*        | that 1/sfmin does not overflow | */
 /*        %--------------------------------% */
 
-	safmin = igraphdlamch_("safmin");
+	safmin = igraphdlamch_("safmin", (ftnlen)6);
     }
 
     if (*ido == 0) {
@@ -461,10 +454,10 @@ static integer c__2 = 2;
 L1000:
 
     if (msglvl > 2) {
-	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_saitr: g"
-		"enerating Arnoldi vector no.");
-	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_saitr"
-		": B-norm of the current residual =");
+	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_saitr: generat\
+ing Arnoldi vector no.", (ftnlen)37);
+	igraphdvout_(&debug_1.logfil, &c__1, rnorm, &debug_1.ndigit, "_saitr: B-no\
+rm of the current residual =", (ftnlen)40);
     }
 
 /*        %---------------------------------------------------------% */
@@ -483,8 +476,8 @@ L1000:
 /*           %---------------------------------------------------% */
 
     if (msglvl > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_saitr: *"
-		"***** restart at step ******");
+	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_saitr: ****** \
+restart at step ******", (ftnlen)37);
     }
 
 /*           %---------------------------------------------% */
@@ -505,8 +498,8 @@ L30:
 /*           | RSTART = .true. flow returns here.   | */
 /*           %--------------------------------------% */
 
-    igraphdgetv0_(ido, bmat, &itry, &c_false, n, &j, &v[v_offset], ldv, &
-	    resid[1], rnorm, &ipntr[1], &workd[1], &ierr);
+    igraphdgetv0_(ido, bmat, &itry, &c_false, n, &j, &v[v_offset], ldv, &resid[1], 
+	    rnorm, &ipntr[1], &workd[1], &ierr, (ftnlen)1);
     if (*ido != 99) {
 	goto L9000;
     }
@@ -550,10 +543,10 @@ L40:
 /*            | use LAPACK routine SLASCL               | */
 /*            %-----------------------------------------% */
 
-	igraphdlascl_("General", &i__, &i__, rnorm, &c_b24, n, &c__1, &v[j * 
-		v_dim1 + 1], n, &infol);
-	igraphdlascl_("General", &i__, &i__, rnorm, &c_b24, n, &c__1, &workd[
-		ipj], n, &infol);
+	igraphdlascl_("General", &i__, &i__, rnorm, &c_b24, n, &c__1, &v[j * v_dim1 
+		+ 1], n, &infol, (ftnlen)7);
+	igraphdlascl_("General", &i__, &i__, rnorm, &c_b24, n, &c__1, &workd[ipj], 
+		n, &infol, (ftnlen)7);
     }
 
 /*        %------------------------------------------------------% */
@@ -672,11 +665,11 @@ L65:
 /*        %------------------------------------------% */
 
     if (*mode != 2) {
-	igraphdgemv_("T", n, &j, &c_b24, &v[v_offset], ldv, &workd[ipj], &
-		c__1, &c_b49, &workd[irj], &c__1);
+	igraphdgemv_("T", n, &j, &c_b24, &v[v_offset], ldv, &workd[ipj], &c__1, &
+		c_b49, &workd[irj], &c__1, (ftnlen)1);
     } else if (*mode == 2) {
-	igraphdgemv_("T", n, &j, &c_b24, &v[v_offset], ldv, &workd[ivj], &
-		c__1, &c_b49, &workd[irj], &c__1);
+	igraphdgemv_("T", n, &j, &c_b24, &v[v_offset], ldv, &workd[ivj], &c__1, &
+		c_b49, &workd[irj], &c__1, (ftnlen)1);
     }
 
 /*        %--------------------------------------% */
@@ -684,8 +677,8 @@ L65:
 /*        | RESID contains OP*v_{j}. See STEP 3. | */
 /*        %--------------------------------------% */
 
-    igraphdgemv_("N", n, &j, &c_b57, &v[v_offset], ldv, &workd[irj], &c__1, &
-	    c_b24, &resid[1], &c__1);
+    igraphdgemv_("N", n, &j, &c_b57, &v[v_offset], ldv, &workd[irj], &c__1, &c_b24, 
+	    &resid[1], &c__1, (ftnlen)1);
 
 /*        %--------------------------------------% */
 /*        | Extend H to have j rows and columns. | */
@@ -758,7 +751,7 @@ L70:
 /*        | to enforce ||v(:,1:j)^T * r_{j}|| .le. eps * || r_{j} ||  | */
 /*        %-----------------------------------------------------------% */
 
-    if (*rnorm > wnorm * .717f) {
+    if (*rnorm > wnorm * (float).717) {
 	goto L100;
     }
     ++timing_1.nrorth;
@@ -775,8 +768,8 @@ L80:
     if (msglvl > 2) {
 	xtemp[0] = wnorm;
 	xtemp[1] = *rnorm;
-	igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, "_saitr"
-		": re-orthonalization ; wnorm and rnorm are");
+	igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, "_saitr: re-o\
+rthonalization ; wnorm and rnorm are", (ftnlen)48);
     }
 
 /*        %----------------------------------------------------% */
@@ -784,8 +777,8 @@ L80:
 /*        | WORKD(IRJ:IRJ+J-1) = v(:,1:J)'*WORKD(IPJ:IPJ+N-1). | */
 /*        %----------------------------------------------------% */
 
-    igraphdgemv_("T", n, &j, &c_b24, &v[v_offset], ldv, &workd[ipj], &c__1, &
-	    c_b49, &workd[irj], &c__1);
+    igraphdgemv_("T", n, &j, &c_b24, &v[v_offset], ldv, &workd[ipj], &c__1, &c_b49, 
+	    &workd[irj], &c__1, (ftnlen)1);
 
 /*        %----------------------------------------------% */
 /*        | Compute the correction to the residual:      | */
@@ -795,8 +788,8 @@ L80:
 /*        | H(j,j) is updated.                           | */
 /*        %----------------------------------------------% */
 
-    igraphdgemv_("N", n, &j, &c_b57, &v[v_offset], ldv, &workd[irj], &c__1, &
-	    c_b24, &resid[1], &c__1);
+    igraphdgemv_("N", n, &j, &c_b57, &v[v_offset], ldv, &workd[irj], &c__1, &c_b24, 
+	    &resid[1], &c__1, (ftnlen)1);
 
     if (j == 1 || rstart) {
 	h__[j + h_dim1] = 0.;
@@ -844,13 +837,13 @@ L90:
     }
 
     if (msglvl > 0 && iter > 0) {
-	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_saitr: I"
-		"terative refinement for Arnoldi residual");
+	igraphivout_(&debug_1.logfil, &c__1, &j, &debug_1.ndigit, "_saitr: Iterati\
+ve refinement for Arnoldi residual", (ftnlen)49);
 	if (msglvl > 2) {
 	    xtemp[0] = *rnorm;
 	    xtemp[1] = rnorm1;
-	    igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, 
-		    "_saitr: iterative refinement ; rnorm and rnorm1 are");
+	    igraphdvout_(&debug_1.logfil, &c__2, xtemp, &debug_1.ndigit, "_saitr: \
+iterative refinement ; rnorm and rnorm1 are", (ftnlen)51);
 	}
     }
 
@@ -859,7 +852,7 @@ L90:
 /*        | step of re-orthogonalization.           | */
 /*        %-----------------------------------------% */
 
-    if (rnorm1 > *rnorm * .717f) {
+    if (rnorm1 > *rnorm * (float).717) {
 
 /*           %--------------------------------% */
 /*           | No need for further refinement | */
@@ -935,13 +928,13 @@ L100:
 	if (msglvl > 1) {
 	    i__1 = *k + *np;
 	    igraphdvout_(&debug_1.logfil, &i__1, &h__[(h_dim1 << 1) + 1], &
-		    debug_1.ndigit, "_saitr: main diagonal of matrix H of st"
-		    "ep K+NP.");
+		    debug_1.ndigit, "_saitr: main diagonal of matrix H of st\
+ep K+NP.", (ftnlen)47);
 	    if (*k + *np > 1) {
 		i__1 = *k + *np - 1;
 		igraphdvout_(&debug_1.logfil, &i__1, &h__[h_dim1 + 2], &
-			debug_1.ndigit, "_saitr: sub diagonal of matrix H of"
-			" step K+NP.");
+			debug_1.ndigit, "_saitr: sub diagonal of matrix H of\
+ step K+NP.", (ftnlen)46);
 	    }
 	}
 

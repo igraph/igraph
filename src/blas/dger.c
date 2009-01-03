@@ -1,30 +1,29 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dger.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdger_(integer *m, integer *n, doublereal *alpha, 
-	doublereal *x, integer *incx, doublereal *y, integer *incy, 
-	doublereal *a, integer *lda)
+/* Subroutine */ int igraphdger_(m, n, alpha, x, incx, y, incy, a, lda)
+integer *m, *n;
+doublereal *alpha, *x;
+integer *incx;
+doublereal *y;
+integer *incy;
+doublereal *a;
+integer *lda;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
 
     /* Local variables */
-    static integer i__, j, ix, jy, kx, info;
+    static integer info;
     static doublereal temp;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
+    static integer i__, j, ix, jy, kx;
+    extern /* Subroutine */ int igraphxerbla_();
 
 /*     .. Scalar Arguments .. */
 /*     .. Array Arguments .. */
@@ -113,7 +112,7 @@
     --x;
     --y;
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
@@ -130,7 +129,7 @@
 	info = 9;
     }
     if (info != 0) {
-	igraphxerbla_("DGER  ", &info);
+	igraphxerbla_("DGER  ", &info, (ftnlen)6);
 	return 0;
     }
 

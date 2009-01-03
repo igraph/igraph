@@ -1,41 +1,39 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlascl.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdlascl_(char *type__, integer *kl, integer *ku, 
-	doublereal *cfrom, doublereal *cto, integer *m, integer *n, 
-	doublereal *a, integer *lda, integer *info)
+/* Subroutine */ int igraphdlascl_(type__, kl, ku, cfrom, cto, m, n, a, lda, info, 
+	type_len)
+char *type__;
+integer *kl, *ku;
+doublereal *cfrom, *cto;
+integer *m, *n;
+doublereal *a;
+integer *lda, *info;
+ftnlen type_len;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3, i__4, i__5;
 
     /* Local variables */
-    static integer i__, j, k1, k2, k3, k4;
-    static doublereal mul, cto1;
     static logical done;
     static doublereal ctoc;
-    extern logical igraphlsame_(char *, char *);
-    static integer itype;
+    static integer i__, j;
+    extern logical igraphlsame_();
+    static integer itype, k1, k2, k3, k4;
     static doublereal cfrom1;
-    extern doublereal igraphdlamch_(char *);
+    extern doublereal igraphdlamch_();
     static doublereal cfromc;
-    extern /* Subroutine */ int igraphxerbla_(char *, integer *);
-    static doublereal bignum, smlnum;
+    extern /* Subroutine */ int igraphxerbla_();
+    static doublereal bignum, smlnum, mul, cto1;
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     February 29, 1992 */
@@ -122,25 +120,25 @@
 
     /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
     *info = 0;
 
-    if (igraphlsame_(type__, "G")) {
+    if (igraphlsame_(type__, "G", (ftnlen)1, (ftnlen)1)) {
 	itype = 0;
-    } else if (igraphlsame_(type__, "L")) {
+    } else if (igraphlsame_(type__, "L", (ftnlen)1, (ftnlen)1)) {
 	itype = 1;
-    } else if (igraphlsame_(type__, "U")) {
+    } else if (igraphlsame_(type__, "U", (ftnlen)1, (ftnlen)1)) {
 	itype = 2;
-    } else if (igraphlsame_(type__, "H")) {
+    } else if (igraphlsame_(type__, "H", (ftnlen)1, (ftnlen)1)) {
 	itype = 3;
-    } else if (igraphlsame_(type__, "B")) {
+    } else if (igraphlsame_(type__, "B", (ftnlen)1, (ftnlen)1)) {
 	itype = 4;
-    } else if (igraphlsame_(type__, "Q")) {
+    } else if (igraphlsame_(type__, "Q", (ftnlen)1, (ftnlen)1)) {
 	itype = 5;
-    } else if (igraphlsame_(type__, "Z")) {
+    } else if (igraphlsame_(type__, "Z", (ftnlen)1, (ftnlen)1)) {
 	itype = 6;
     } else {
 	itype = -1;
@@ -152,7 +150,7 @@
 	*info = -4;
     } else if (*m < 0) {
 	*info = -6;
-    } else if (*n < 0 || (itype == 4 && *n != *m) || (itype == 5 && *n != *m)) {
+    } else if (*n < 0 || itype == 4 && *n != *m || itype == 5 && *n != *m) {
 	*info = -7;
     } else if (itype <= 3 && *lda < max(1,*m)) {
 	*info = -9;
@@ -164,11 +162,11 @@
 	} else /* if(complicated condition) */ {
 /* Computing MAX */
 	    i__1 = *n - 1;
-	    if (*ku < 0 || *ku > max(i__1,0) || ((itype == 4 || itype == 5) && 
-						 *kl != *ku)) {
+	    if (*ku < 0 || *ku > max(i__1,0) || (itype == 4 || itype == 5) && 
+		    *kl != *ku) {
 		*info = -3;
-	    } else if ((itype == 4 && *lda < *kl + 1) || (itype == 5 && *lda < *
-		       ku + 1) || (itype == 6 && *lda < (*kl << 1) + *ku + 1)) {
+	    } else if (itype == 4 && *lda < *kl + 1 || itype == 5 && *lda < *
+		    ku + 1 || itype == 6 && *lda < (*kl << 1) + *ku + 1) {
 		*info = -9;
 	    }
 	}
@@ -176,7 +174,7 @@
 
     if (*info != 0) {
 	i__1 = -(*info);
-	igraphxerbla_("DLASCL", &i__1);
+	igraphxerbla_("DLASCL", &i__1, (ftnlen)6);
 	return 0;
     }
 
@@ -188,7 +186,7 @@
 
 /*     Get machine parameters */
 
-    smlnum = igraphdlamch_("S");
+    smlnum = igraphdlamch_("S", (ftnlen)1);
     bignum = 1. / smlnum;
 
     cfromc = *cfrom;

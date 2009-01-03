@@ -1,31 +1,28 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* dlaset.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdlaset_(char *uplo, integer *m, integer *n, doublereal *
-	alpha, doublereal *beta, doublereal *a, integer *lda)
+/* Subroutine */ int igraphdlaset_(uplo, m, n, alpha, beta, a, lda, uplo_len)
+char *uplo;
+integer *m, *n;
+doublereal *alpha, *beta, *a;
+integer *lda;
+ftnlen uplo_len;
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2, i__3;
 
     /* Local variables */
     static integer i__, j;
-    extern logical igraphlsame_(char *, char *);
+    extern logical igraphlsame_();
 
 
-/*  -- LAPACK auxiliary routine (version 3.0) -- */
+/*  -- LAPACK auxiliary routine (version 2.0) -- */
 /*     Univ. of Tennessee, Univ. of California Berkeley, NAG Ltd., */
 /*     Courant Institute, Argonne National Lab, and Rice University */
 /*     October 31, 1992 */
@@ -88,11 +85,11 @@
 
     /* Parameter adjustments */
     a_dim1 = *lda;
-    a_offset = 1 + a_dim1;
+    a_offset = 1 + a_dim1 * 1;
     a -= a_offset;
 
     /* Function Body */
-    if (igraphlsame_(uplo, "U")) {
+    if (igraphlsame_(uplo, "U", (ftnlen)1, (ftnlen)1)) {
 
 /*        Set the strictly upper triangular or trapezoidal part of the */
 /*        array to ALPHA. */
@@ -109,7 +106,7 @@
 /* L20: */
 	}
 
-    } else if (igraphlsame_(uplo, "L")) {
+    } else if (igraphlsame_(uplo, "L", (ftnlen)1, (ftnlen)1)) {
 
 /*        Set the strictly lower triangular or trapezoidal part of the */
 /*        array to ALPHA. */

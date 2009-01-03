@@ -1,33 +1,31 @@
-/*  -- translated by f2c (version 20050501).
-   You must link the resulting object file with libf2c:
-	on Microsoft Windows system, link with libf2c.lib;
-	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
-	or, if you install libf2c.a in a standard place, with -lf2c -lm
-	-- in that order, at the end of the command line, as in
-		cc *.o -lf2c -lm
-	Source for libf2c is in /netlib/f2c/libf2c.zip, e.g.,
-
-		http://www.netlib.org/f2c/libf2c.zip
+/* igraphdrot.f -- translated by f2c (version 19991025).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
 */
 
 #include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
 
-/* Subroutine */ int igraphdrot_(integer *n, doublereal *dx, integer *incx, 
-	doublereal *dy, integer *incy, doublereal *c__, doublereal *s)
+/* Subroutine */ int igraphdrot_(n, dx, incx, dy, incy, c__, s)
+integer *n;
+doublereal *dx;
+integer *incx;
+doublereal *dy;
+integer *incy;
+doublereal *c__, *s;
 {
     /* System generated locals */
     integer i__1;
 
     /* Local variables */
-    static integer i__, ix, iy;
+    static integer i__;
     static doublereal dtemp;
+    static integer ix, iy;
 
 
 /*     applies a plane rotation. */
 /*     jack dongarra, linpack, 3/11/78. */
-/*     modified 12/3/93, array(1) declarations changed to array(*) */
 
 
     /* Parameter adjustments */
@@ -75,5 +73,5 @@ L20:
 /* L30: */
     }
     return 0;
-} /* drot_ */
+} /* igraphdrot_ */
 
