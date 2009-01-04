@@ -1,3 +1,11 @@
+2009-01-04  Gabor Csardi  <csardi@szaffi>
+
+	* src/arpack.c (igraph_arpack_unpack_complex) : rewritten to 
+	sort according to modulus of eigenvalues
+
+	* src/arpack.c (igraph_arpack_rnsolve) : return orignev+1 
+	columns in the eigenvector matrix	
+
 2008-11-14  Gabor Csardi  <csardi@szaffi>
 
 	* src/bipartite.c (igraph_is_bipartite) : added

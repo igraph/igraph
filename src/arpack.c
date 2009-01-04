@@ -594,10 +594,15 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   options->numopb=options->iparam[9];
   options->numreo=options->iparam[10];
 
+  if (options->nconv < options->nev) {
+    IGRAPH_ERROR("ARPACK error, could not calculate all eigenvectors", 
+		 IGRAPH_ARPACK_UNKNOWN);
+  }
+
   if (values) {
     long int i;
-    IGRAPH_CHECK(igraph_matrix_resize(values, options->ncv, 2));
-    for (i=0; i<options->ncv; i++) {
+    IGRAPH_CHECK(igraph_matrix_resize(values, orignev+1, 2));
+    for (i=0; i<orignev+1; i++) {
       MATRIX(*values, i, 0) = dr[i];
       MATRIX(*values, i, 1) = di[i];
     }
@@ -605,8 +610,8 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   if (vectors) {
     long int i, j, ptr=0;
-    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, options->nev));
-    for (j=0; j<options->nev; j++) {	
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, options->n, orignev+1));
+    for (j=0; j<orignev+1; j++) {	
       for (i=0; i<options->n; i++) {
 	MATRIX(*vectors, i, j) = v[ptr++];
       }
@@ -668,78 +673,125 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values, 
 				 long int nev) {
 
-  long int origcol=igraph_matrix_ncol(vectors);
-  long int nodes=igraph_matrix_nrow(vectors);
-  long int no_evs=igraph_matrix_nrow(values);
-  long int i, j, k;
-  size_t colsize=nodes * sizeof(igraph_real_t);
+  long int n=igraph_matrix_nrow(vectors);
+  long int veccol=igraph_matrix_ncol(vectors);
+  long int i, j;
+  igraph_vector_t mod;
+  igraph_vector_long_t order;
+  igraph_matrix_t newvectors;
+  igraph_matrix_t newvalues;
+  igraph_vector_long_t index;
+  long int colsize=n*sizeof(igraph_real_t);
 
-  /* Error checks */
-  if (nev < 0) {
-    IGRAPH_ERROR("`nev' cannot be negative", IGRAPH_EINVAL);
+  if (nev <0) {
+    IGRAPH_ERROR("`nev' must be non-negative", IGRAPH_EINVAL);
   }
-  if (nev > no_evs) {
-    IGRAPH_ERROR("`nev' too large, we don't have that many in `values'", 
-		 IGRAPH_EINVAL);
+  if (nev > veccol) {
+    printf("%li\n", veccol);
+    IGRAPH_ERROR("`nev' too big", IGRAPH_EINVAL);
+  }
+  if (igraph_matrix_ncol(values) != 2) {
+    IGRAPH_ERROR("'values' must have two columns", IGRAPH_EINVAL);
+  }
+  if (igraph_matrix_nrow(values) != veccol) {
+    IGRAPH_ERROR("`vectors' and `values' don't match, maybe "
+		 "they are not from the same ARPACK call?", IGRAPH_EINVAL);
   }
 
-  for (i=0; i<igraph_matrix_nrow(values); i++) {
-    for (j=0; j<igraph_matrix_ncol(values); j++) {
-      printf(" %g", MATRIX(*values, i, j));
-    } 
-    printf("\n");
-  }  
-
-  IGRAPH_CHECK(igraph_matrix_resize(vectors, nodes, nev * 2));
-  for (i=nev; i<igraph_matrix_nrow(values); i++) {
-    IGRAPH_CHECK(igraph_matrix_remove_row(values, i));
+  /* Special case */
+  if (nev==0) {
+    IGRAPH_CHECK(igraph_matrix_resize(vectors, n, 0));
+    IGRAPH_CHECK(igraph_matrix_resize(values, 0, 2));
+    return 0;
   }
   
-  /* Calculate where to start copying */
-  for (i=0, j=0; i<nev; i++) {
-    if (MATRIX(*values,i,1) == 0) { /* TODO: == 0.0 ???? */
-      /* real */
-      j++;
-    } else {
-      /* complex */
-      if (MATRIX(*values,i,1) > 0) { j+=2; }
+  /* We need to order the eigenvalues, according to their modulus. */
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&order, 0));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
+  IGRAPH_VECTOR_INIT_FINALLY(&mod, veccol);
+  for (i=0; i<veccol; i++) {
+    igraph_real_t rp=MATRIX(*values, i, 0);
+    igraph_real_t ip=MATRIX(*values, i, 1);
+    VECTOR(mod)[i] = rp*rp + ip*ip;
+  }
+  IGRAPH_CHECK(igraph_vector_sort_order(&mod, &order, /*reverse=*/ 0));
+  igraph_vector_destroy(&mod);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  /* In case of conjugates, the one with the positive imaginary part
+     comes first. */
+  
+  for (i=0; i<veccol-1; i++) {
+    long int oi=VECTOR(order)[i];
+    long int oip1=VECTOR(order)[i+1];
+    igraph_real_t ri=MATRIX(*values, oi, 0);
+    igraph_real_t ii=MATRIX(*values, oi, 1);
+    igraph_real_t rip1=MATRIX(*values, oip1, 0);
+    igraph_real_t iip1=MATRIX(*values, oip1, 1);
+    if (ri==rip1 && ii==-iip1 && ii < 0) {
+      /* Switch them */
+      VECTOR(order)[i]=oip1;
+      VECTOR(order)[i+1]=oi;
     }
   }
-  j--;
 
-  if (j>=origcol) {
-    IGRAPH_WARNING("Too few columns in `vectors', ARPACK results are likely wrong");
+  /* Create an index vector that points to the columns where the
+     eigenvectors of the given eigenvalue begin. For complex
+     conjugates, both pointers point to the same place. */
+
+  IGRAPH_CHECK(igraph_vector_long_init(&index, veccol));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
+  for (i=0, j=0; i<veccol; i++) {
+    igraph_real_t ip=MATRIX(*values, i, 1);
+    VECTOR(index)[i]=j;
+    if (ip==0) {
+      j++; 
+    } else if (ip > 0) {
+      /* nothing to do */
+    } else {
+      j+=2;
+    }
   }
 
-  /* We copy the j-th eigenvector to the (k-1)-th and k-th column */
-  k=nev*2-1;
+  IGRAPH_MATRIX_INIT_FINALLY(&newvalues, nev, 2);
+  IGRAPH_MATRIX_INIT_FINALLY(&newvectors, n, nev*2);
 
-  for (i=nev-1; i>=0; i--) {
-    if (MATRIX(*values,i,1)==0) {
+  for (i=0; i<nev; i++) {
+    long int idx=VECTOR(order)[i];
+    igraph_real_t rp = MATRIX(*values, idx, 0);
+    igraph_real_t ip = MATRIX(*values, idx, 1);
+    long int colidx=VECTOR(index)[idx];
 
-      /* real */
-      memset( &MATRIX(*vectors,0,k), 0, colsize);
-      memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j), colsize);
-      k-=2;
-      j-=1;
-    } else {
-      /* complex */
-      memcpy( &MATRIX(*vectors,0,k), &MATRIX(*vectors,0,j), colsize);
-      memcpy( &MATRIX(*vectors,0,k-1), &MATRIX(*vectors,0,j-1), colsize);
+    MATRIX(newvalues, i, 0) = rp;
+    MATRIX(newvalues, i, 1) = ip;
 
-      /* if negative Im part, then we need the conjugate */
-      if (MATRIX(*values,i,1) < 0) { 
-	long int l;
-	for (l=0; l<nodes; l++) {
-	  MATRIX(*vectors,l,k) = - MATRIX(*vectors,l,k);
-	}
-      } else { 
-	j-=2;
+    if (ip==0) {
+      /* real eigenvalue */
+      memcpy(igraph_matrix_e_ptr(&newvectors, 0, 2*i), 
+	     igraph_matrix_e_ptr(vectors, 0, colidx), colsize);
+    } else if (ip>0) {
+      /* complex eigenvalue, positive imaginary part */
+      memcpy(igraph_matrix_e_ptr(&newvectors, 0, 2*i), 
+	     igraph_matrix_e_ptr(vectors, 0, colidx), colsize*2);      
+    } else { 
+      /* complex eigenvalue, negative imaginary part */
+      memcpy(igraph_matrix_e_ptr(&newvectors, 0, 2*i), 
+	     igraph_matrix_e_ptr(vectors, 0, colidx), colsize*2);      
+      for (j=0; j<n; j++) {
+	MATRIX(newvectors, j, 2*i+1) *= (-1);
       }
-	      
-      k-=2;
     }
   }
+
+  IGRAPH_CHECK(igraph_matrix_update(values, &newvalues));
+  IGRAPH_CHECK(igraph_matrix_update(vectors, &newvectors));
+  
+  igraph_matrix_destroy(&newvectors);
+  igraph_matrix_destroy(&newvalues);  
+  igraph_vector_long_destroy(&index);
+  igraph_vector_long_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(4);
 
   return 0;
 }
@@ -903,9 +955,6 @@ int igraph_arpack_eigen(const igraph_matrix_t *matrix,
   long int nlarge, nsmall;
   long int i;
 
-  igraph_vector_long_t order;
-  igraph_vector_t mod;
-  
   /* TODO: make evals and evecs optional */
   
   igraph_matrix_t myevals_v, *myevals=&myevals_v;
@@ -958,34 +1007,18 @@ int igraph_arpack_eigen(const igraph_matrix_t *matrix,
 			  options, /*storage=*/ 0, myevals, myevecs);
     IGRAPH_CHECK(igraph_arpack_unpack_complex(myevecs, myevals, last_large));
 
-    IGRAPH_CHECK(igraph_vector_long_init(&order, 0));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
-    IGRAPH_VECTOR_INIT_FINALLY(&mod, last_large);
-    for (i=0; i<last_large; i++) {
-      igraph_real_t rp=MATRIX(*myevals, i, 0);
-      igraph_real_t ip=MATRIX(*myevals, i, 1);
-      VECTOR(mod)[i] = rp * rp + ip * ip;
-    }
-    IGRAPH_CHECK(igraph_vector_sort_order(&mod, &order, /*reverse=*/ 0));
-    igraph_vector_destroy(&mod);
-    IGRAPH_FINALLY_CLEAN(1);
-    
     /* Save results */
     for (i=0; i<nev; i++) {
-      long int j, pos, ev=VECTOR(*which)[i];
+      long int j, ev=VECTOR(*which)[i]-1;
       if (ev > mdim/2) { continue; }
-      pos=VECTOR(order)[ev-1];
-      MATRIX(*evals, i, 0) = MATRIX(*myevals, pos, 0);
-      MATRIX(*evals, i, 1) = MATRIX(*myevals, pos, 1);
+      MATRIX(*evals, i, 0) = MATRIX(*myevals, ev, 0);
+      MATRIX(*evals, i, 1) = MATRIX(*myevals, ev, 1);
 
       for (j=0; j<mdim; j++) {
-	MATRIX(*evecs, j, 2*i) = MATRIX(*myevecs, j, 2*pos);
-	MATRIX(*evecs, j, 2*i+1) = MATRIX(*myevecs, j, 2*pos+1);
+	MATRIX(*evecs, j, 2*i) = MATRIX(*myevecs, j, 2*ev);
+	MATRIX(*evecs, j, 2*i+1) = MATRIX(*myevecs, j, 2*ev+1);
       }
     }    
-
-    igraph_vector_long_destroy(&order);
-    IGRAPH_FINALLY_CLEAN(1);
   }
 
   /* End of the spectrum */
