@@ -317,7 +317,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_matrix_t *values, igraph_matrix_t *vectors);
 
 int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values, 
-				 long int nev);
+				 long int nev, igraph_bool_t reverse);
 
 int igraph_arpack_eigen_symmetric(const igraph_matrix_t *matrix,
 				  const igraph_vector_long_t *which,

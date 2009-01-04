@@ -1,5 +1,21 @@
 2009-01-04  Gabor Csardi  <csardi@szaffi>
 
+	* src/arpack.c (igrpah_arpack_eigen) : end of the spectrum is
+	finally implemented
+
+	* src/arpack.c (igraph_arpack_eigen) : calculate more eigenvectors
+	than needed, to be on the safe side
+
+	* src/arpack.c (igraph_arpack_rnsolve) : make 'v' bigger, why 
+	is this needed?
+
+	* src/arpack.c (igraph_arpack_rnsolve) : return 'nconv' eigenvalues 
+	and orignev+1 columns for eigenvectors
+	(igraph_arpack_unpack_complex) : update accordingly
+
+	* src/arpack.c (igraph_arpack_unpack_complex) : 'reverse' argument
+	added
+
 	* src/arpack.c (igraph_arpack_unpack_complex) : rewritten to 
 	sort according to modulus of eigenvalues
 

@@ -514,7 +514,8 @@ igraph_arpack_rnsolve:
         IGNORE: RR, RC, RNamespace
 
 igraph_arpack_unpack_complex:
-        PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev
+        PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev, \
+                BOOLEAN reverse=False
         NAME-R: arpack.unpack.complex
 
 igraph_arpack_eigen:
