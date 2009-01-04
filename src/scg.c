@@ -209,7 +209,8 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
 	  igraph_arpack_eigen_symmetric(matrix, ev, evals, myevec, 
 					&arpack_opts);
 	} else {
-	  /* TODO */
+	  igraph_arpack_eigen(matrix, ev, evals, myevec, 
+			      &arpack_opts);
 	}
 	
       } else {			/* ! use_arpack */
@@ -256,7 +257,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
     myR=&myR_v;
     IGRAPH_MATRIX_INIT_FINALLY(myR, 0, 0); 
   }
-  IGRAPH_CHECK(igraph_scg_semi_projectors(mygroup, myL, myR, matrix_type, 
+  IGRAPH_CHECK(igraph_scg_semi_projectors(mygroup, myL, myR, matrix_type,
 					  norm_type, markovp));
 
   /* ------computes a coarse-grained matrix-------------- */
@@ -392,19 +393,16 @@ int igraph_scg_semi_projectors(const igraph_vector_t *group,
       MATRIX(*L, j, i) = 1;
     }
   
-    tonorm = norm_type == IGRAPH_SCG_NORM_ROW ? L : R;
-
     IGRAPH_CHECK(igraph_matrix_update(R, L));
     
     IGRAPH_VECTOR_INIT_FINALLY(&freq, m+1);
     IGRAPH_CHECK(igraph_i_scg_freq(group, &freq, m));
         
+    tonorm = norm_type == IGRAPH_SCG_NORM_ROW ? L : R;
     for (i=0; i<n; i++) {
       long int j=VECTOR(*group)[i]-1;
       igraph_real_t div=VECTOR(freq)[j+1];
-      for (j=0; j<n; j++) {
-	MATRIX(*tonorm, j, i) /= div;
-      }
+      MATRIX(*tonorm, j, i) /= div;
     }
 
     igraph_vector_destroy(&freq);
@@ -418,8 +416,6 @@ int igraph_scg_semi_projectors(const igraph_vector_t *group,
       MATRIX(*L, j, i) = 1;
     }
   
-    tonorm = norm_type == IGRAPH_SCG_NORM_ROW ? L : R;
-    
     IGRAPH_CHECK(igraph_matrix_update(R, L));
 
     IGRAPH_VECTOR_INIT_FINALLY(&myp, n);
@@ -429,11 +425,10 @@ int igraph_scg_semi_projectors(const igraph_vector_t *group,
       VECTOR(myp)[i] = VECTOR(*markovp)[i] / VECTOR(sum)[i+1];
     }
     
+    tonorm = norm_type == IGRAPH_SCG_NORM_ROW ? L : R;
     for (i=0; i<n; i++) {
       igraph_real_t mul=VECTOR(myp)[i];
-      for (j=0; j<m; j++) {
-	MATRIX(*tonorm, j, i) *= mul;
-      }
+      MATRIX(*tonorm, j, i) *= mul;
     }
 
     igraph_vector_destroy(&sum);

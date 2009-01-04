@@ -1,4 +1,37 @@
 
+scg.matrix <- function(matrix, ev, nt, evec=NULL,
+                       recalculate.epairs=TRUE, group=NULL,
+                       recalculate.group=TRUE,
+                       matrix.type=c("symmetric", "laplacian", "stochastic"),
+                       algo=c("optimum", "interv_km", "interv", "exact"),
+                       norm.type=c("row", "col"),
+                       direction=c("default", "right", "left"),
+                       markovp=NULL, use.arpack=TRUE, maxiter=100) {
+  # Argument checks
+  mode(matrix) <- "double"
+  ev <- as.integer(ev)
+  nt <- as.numeric(nt)
+  if (!is.null(evec)) mode(evec) <- "double"
+  recalculate.epairs <- as.logical(recalculate.epairs)
+  if (!is.null(group)) group <- as.numeric(group)
+  recalculate.group <- as.logical(recalculate.group)
+  matrix.type <- switch(igraph.match.arg(matrix.type), "symmetric"=1, "laplacian"=2, "stochastic="=3)
+  algo <- switch(igraph.match.arg(algo), "optimum"=1, "interv_km"=2, "interv"=3, "exact"=4)
+  norm.type <- switch(igraph.match.arg(norm.type), "row"=0, "col"=1)
+  direction <- switch(igraph.match.arg(direction), "default"=0, "right"=1, "left"=2)
+  if (!is.null(markovp)) markovp <- as.numeric(markovp)
+  use.arpack <- as.logical(use.arpack)
+  maxiter <- as.numeric(maxiter)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_scg_matrix", matrix, ev, nt, evec,
+               recalculate.epairs, group, recalculate.group, matrix.type,
+               algo, norm.type, direction, markovp, use.arpack, maxiter,
+               PACKAGE="igraph")
+  res
+}
+
 ## "scg" <- function(X, ev, nt, matrix=c("symmetric","laplacian","stochastic"),
 ## 						algo=c("optimum","interv_km","interv","exact_scg"),
 ## 						norm="row", sparse="TRUE", 						direction=c("default","left","right"), evec=NULL, p=NULL,

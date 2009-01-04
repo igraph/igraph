@@ -1,5 +1,10 @@
 2009-01-04  Gabor Csardi  <csardi@szaffi>
 
+	* src/scg.c (igraph_scg_semi_projectors) : bugs corrected for 
+	the non-symmetric case
+
+	* src/scg.c (igraph_scg_matrix) : support non-symmetric matrices
+
 	* src/arpack.c (igrpah_arpack_eigen) : end of the spectrum is
 	finally implemented
 

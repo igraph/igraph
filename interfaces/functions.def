@@ -1146,6 +1146,7 @@ igraph_scg_grouping:
                 SCG_MATRIX matrix_type=SYMMETRIC, \
                 VECTOR_OR_0 p=NULL, SCG_ALGO algo=OPTIMUM, INTEGER maxiter=100
         NAME-R: scg.grouping
+        IGNORE: RR, RC, RNamespace
 
 igraph_scg:
         PARAMS: GRAPH graph, OUT GRAPH_OR_0 res_graph, \
@@ -1158,26 +1159,29 @@ igraph_scg:
                 INOUT VECTOR_OR_0 group=NULL, BOOLEAN recalculate_group=True, \
                 BOOLEAN use_arpack=True, INTEGER maxiter=100
         NAME-R: scg
+        IGNORE: RR, RC, RNamespace
 
 igraph_scg_matrix:
         PARAMS: MATRIX matrix, \
                 VECTOR_LONG ev, VECTOR nt, \
                 OUT MATRIX_OR_0 res_matrix, OUT MATRIX_OR_0 L, \
                 OUT MATRIX_OR_0 R, OUT MATRIX_OR_0 evals, \
-                INOUT MATRIX_OR_0 evec, BOOLEAN recalculate_epairs=True, \
+                INOUT MATRIX_OR_0 evec=NULL, BOOLEAN recalculate_epairs=True, \
                 INOUT VECTOR_OR_0 group=NULL, BOOLEAN recalculate_group=True, \
                 SCG_MATRIX matrix_type=SYMMETRIC, \
 	        SCG_ALGO algo=OPTIMUM, SCG_NORM norm_type=ROW, \
                 SCG_DIRECTION direction=DEFAULT, \
-                INOUT MATRIX_OR_0 evec=NULL, VECTOR_OR_0 markovp=NULL, \
+                VECTOR_OR_0 markovp=NULL, \
                 BOOLEAN use_arpack=True, INTEGER maxiter=100
         NAME-R: scg.matrix
+        IGNORE: RR, RC
 
 igraph_scg_semi_projectors:
         PARAMS: VECTOR group, OUT MATRIX L, OUT MATRIX R, \
                 SCG_MATRIX matrix_type=SYMMETRIC, SCG_NORM norm_type=ROW, \
                 VECTOR_OR_0 markovp=NULL
         NAME-R: scg.semi.projectors
+        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Other, not graph related

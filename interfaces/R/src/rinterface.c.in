@@ -8422,6 +8422,146 @@ SEXP R_igraph_revolver_p_p(SEXP graph, SEXP pniter, SEXP pvtime, SEXP petime,
   UNPROTECT(2);
   return result;
 }		   
+
+SEXP R_igraph_scg_matrix(SEXP matrix, SEXP ev, SEXP nt, 
+			 SEXP evec, SEXP recalculate_epairs, 
+			 SEXP group, SEXP recalculate_group, 
+			 SEXP matrix_type, SEXP algo, SEXP norm_type, 
+			 SEXP direction, SEXP markovp, SEXP use_arpack, 
+			 SEXP maxiter) {
+                                        /* Declarations */
+  igraph_matrix_t c_matrix;
+  igraph_vector_long_t c_ev;
+  igraph_vector_t c_nt;
+  igraph_matrix_t c_res_matrix;
+  igraph_matrix_t c_L;
+  igraph_matrix_t c_R;
+  igraph_matrix_t c_evals;
+  igraph_matrix_t c_evec;
+  igraph_bool_t c_recalculate_epairs;
+  igraph_vector_t c_group;
+  igraph_bool_t c_recalculate_group;
+  igraph_scg_matrix_t c_matrix_type;
+  igraph_scg_algorithm_t c_algo;
+  igraph_scg_norm_t c_norm_type;
+  igraph_scg_direction_t c_direction;
+  igraph_vector_t c_markovp;
+  igraph_bool_t c_use_arpack;
+  igraph_integer_t c_maxiter;
+  SEXP res_matrix;
+  SEXP L;
+  SEXP R;
+  SEXP evals;
+  int c_result;
+  SEXP result, names;
+
+  R_igraph_before();
+                                        /* Convert input */
+  R_SEXP_to_matrix(matrix, &c_matrix);
+  R_SEXP_to_vector_long(ev, &c_ev);
+  R_SEXP_to_vector(nt, &c_nt);
+  if (0 != igraph_matrix_init(&c_res_matrix, 0, 0)) { 
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(igraph_matrix_destroy, &c_res_matrix); 
+  res_matrix=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  if (0 != igraph_matrix_init(&c_L, 0, 0)) { 
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(igraph_matrix_destroy, &c_L);
+  L=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  if (0 != igraph_matrix_init(&c_R, 0, 0)) { 
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(igraph_matrix_destroy, &c_R); 
+  R=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  if (0 != igraph_matrix_init(&c_evals, 0, 0)) { 
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+  } 
+  IGRAPH_FINALLY(igraph_matrix_destroy, &c_evals); 
+  evals=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  if (!isNull(evec)) { 
+    R_SEXP_to_igraph_matrix_copy(evec, &c_evec); 
+  } else { 
+    if (0 != igraph_matrix_init(&c_evec, 0, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+  }
+  IGRAPH_FINALLY(igraph_matrix_destroy, &c_evec); 
+  evec=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  c_recalculate_epairs=LOGICAL(recalculate_epairs)[0];
+  if (!isNull(group)) { 
+    R_SEXP_to_vector_copy(group, &c_group); 
+  } else { 
+    if (0 != igraph_vector_init(&c_group, 0)) { 
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); 
+    } 
+  } 
+  IGRAPH_FINALLY(igraph_vector_destroy, &c_group); 
+  group=NEW_NUMERIC(0); /* hack to have a non-NULL value */
+  c_recalculate_group=LOGICAL(recalculate_group)[0];
+  c_matrix_type=REAL(matrix_type)[0];
+  c_algo=REAL(algo)[0];
+  c_norm_type=REAL(norm_type)[0];
+  c_direction=REAL(direction)[0];
+  if (!isNull(markovp)) { R_SEXP_to_vector(markovp, &c_markovp); }
+  c_use_arpack=LOGICAL(use_arpack)[0];
+  c_maxiter=REAL(maxiter)[0];
+                                        /* Call igraph */
+  c_result=igraph_scg_matrix(&c_matrix, &c_ev, &c_nt, 
+			     (isNull(res_matrix) ? 0 : &c_res_matrix), 
+			     (isNull(L) ? 0 : &c_L), 
+			     (isNull(R) ? 0 : &c_R), 
+			     (isNull(evals) ? 0 : &c_evals), 
+			     (isNull(evec) ? 0 : &c_evec), 
+			     c_recalculate_epairs, 
+			     (isNull(group) ? 0 : &c_group), 
+			     c_recalculate_group, 
+			     c_matrix_type, c_algo, c_norm_type, c_direction, 
+			     (isNull(markovp) ? 0 : &c_markovp), c_use_arpack,
+			     c_maxiter);
+
+                                        /* Convert output */
+  PROTECT(result=NEW_LIST(6));
+  PROTECT(names=NEW_CHARACTER(6));
+  PROTECT(res_matrix=R_igraph_0ormatrix_to_SEXP(&c_res_matrix)); 
+  igraph_matrix_destroy(&c_res_matrix); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(L=R_igraph_0ormatrix_to_SEXP(&c_L)); 
+  igraph_matrix_destroy(&c_L);
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(R=R_igraph_0ormatrix_to_SEXP(&c_R)); 
+  igraph_matrix_destroy(&c_R); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(evals=R_igraph_0ormatrix_to_SEXP(&c_evals)); 
+  igraph_matrix_destroy(&c_evals); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(evec=R_igraph_0ormatrix_to_SEXP(&c_evec)); 
+  igraph_matrix_destroy(&c_evec); 
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(group=R_igraph_0orvector_to_SEXP(&c_group)); 
+  igraph_vector_destroy(&c_group); 
+  IGRAPH_FINALLY_CLEAN(1);
+  SET_VECTOR_ELT(result, 0, res_matrix);
+  SET_VECTOR_ELT(result, 1, L);
+  SET_VECTOR_ELT(result, 2, R);
+  SET_VECTOR_ELT(result, 3, evals);
+  SET_VECTOR_ELT(result, 4, evec);
+  SET_VECTOR_ELT(result, 5, group);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("res_matrix"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("L"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("R"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("evals"));
+  SET_STRING_ELT(names, 4, CREATE_STRING_VECTOR("evec"));
+  SET_STRING_ELT(names, 5, CREATE_STRING_VECTOR("group"));
+  SET_NAMES(result, names);
+  UNPROTECT(7);
+
+  R_igraph_after();
+
+  UNPROTECT(1);
+  return(result);
+}
 			 
 /***********************************************/
 /* THE REST IS GENERATED BY inger.py           */
