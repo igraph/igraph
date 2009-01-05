@@ -42,6 +42,7 @@ __BEGIN_DECLS
 
 #include "error.h"
 #include <stddef.h>
+#include <math.h>
 
 typedef double igraph_integer_t;
 typedef double igraph_real_t;

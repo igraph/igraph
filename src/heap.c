@@ -840,7 +840,7 @@ int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
 
 /* This is a smart indexed heap. In addition to the "normal" indexed heap
    it allows to access every element through its index in O(1) time. 
-   In other words, for this heap the _modify operation is O(1), the 
+   In other words, for this heap the indexing operation is O(1), the 
    normal heap does this in O(n) time.... */
 
 static inline void igraph_i_2wheap_switch(igraph_2wheap_t *h,
