@@ -838,6 +838,13 @@ int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
 /* Two-way indexed heap                               */
 /* -------------------------------------------------- */
 
+#undef PARENT
+#undef LEFTCHILD
+#undef RIGHTCHILD
+#define PARENT(x)     (((x)+1)/2-1)
+#define LEFTCHILD(x)  (((x)+1)*2-1)
+#define RIGHTCHILD(x) (((x)+1)*2)
+
 /* This is a smart indexed heap. In addition to the "normal" indexed heap
    it allows to access every element through its index in O(1) time. 
    In other words, for this heap the indexing operation is O(1), the 
@@ -930,6 +937,8 @@ igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h) {
 int igraph_2wheap_push_with_index(igraph_2wheap_t *h, 
 				  long int idx, igraph_real_t elem) {
 
+/*   printf("-> %.2g [%li]\n", elem, idx); */
+
   long int size=igraph_vector_size(&h->data);
   IGRAPH_CHECK(igraph_vector_push_back(&h->data, elem));
   IGRAPH_CHECK(igraph_vector_long_push_back(&h->index, idx));
@@ -978,6 +987,8 @@ igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h) {
   igraph_vector_long_pop_back(&h->index);
   VECTOR(h->index2)[tmpidx] = 0;
   igraph_i_2wheap_sink(h, 0);
+
+/*   printf("<-max %.2g\n", tmp); */
   
   return tmp;
 }
@@ -1012,9 +1023,38 @@ igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx) 
 int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem) {
   
   long int pos=VECTOR(h->index2)[idx]-2;
+
+/*   printf("-- %.2g -> %.2g\n", VECTOR(h->data)[pos], elem); */
+  
   VECTOR(h->data)[pos] = elem;
   igraph_i_2wheap_sink(h, pos);
   igraph_i_2wheap_shift_up(h, pos);
   
+  return 0;
+}
+
+/* Check that the heap is in a consistent state */
+
+int igraph_2wheap_check(igraph_2wheap_t *h) {
+  long int size=igraph_2wheap_size(h);
+  long int i;
+  igraph_bool_t error=0;
+
+  /* Check the heap property */
+  for (i=0; i<size; i++) {
+    if (LEFTCHILD(i) >= size) { break; }
+    if (VECTOR(h->data)[LEFTCHILD(i)] < VECTOR(h->data)[i]) {
+      error=1; break;
+    }
+    if (RIGHTCHILD(i) >= size) { break; }
+    if (VECTOR(h->data)[RIGHTCHILD(i)] < VECTOR(h->data)[i]) { 
+      error=1; break;
+    }
+  }
+  
+  if (error) { 
+    IGRAPH_ERROR("Inconsistent heap", IGRAPH_EINTERNAL);
+  }
+
   return 0;
 }

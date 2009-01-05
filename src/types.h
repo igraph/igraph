@@ -490,6 +490,7 @@ igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, long int idx);
 igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h);
 igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, long int *idx);
 int igraph_2wheap_modify(igraph_2wheap_t *h, long int idx, igraph_real_t elem);
+int igraph_2wheap_check(igraph_2wheap_t *h);
 
 /**
  * Vector of strings
