@@ -34,7 +34,23 @@ void print_vector(igraph_vector_t *v, FILE *f) {
 int main() {
   
   igraph_t g;
-  igraph_vector_t bet, bet2, weights;
+  igraph_vector_t bet, bet2, weights, edges;
+  
+  igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8, 
+			      4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8, 
+			      6, 9, 7, 20, 9, 10, 9, 20, 10, 19, 
+			      11, 12, 11, 20, 12, 15, 13, 15, 
+			      14, 18, 14, 16, 14, 17, 15, 16, 17, 18 };
+  
+  igraph_real_t nontriv_weights[] = { 0.5249, 1, 0.1934, 0.6274, 0.5249, 
+				      0.0029, 0.3831, 0.05, 0.6274, 0.3831, 
+				      0.5249, 0.0587, 0.0579, 0.0562, 0.0562, 
+				      0.1934, 0.6274, 0.6274, 0.6274, 0.0418, 
+				      0.6274, 0.3511, 0.3511, 0.1486, 1, 1, 
+				      0.0711, 0.2409 };
+
+  igraph_real_t nontriv_res[] = { 20, 0, 0, 0, 0, 19, 80, 85, 32, 0, 10, 
+				  75, 70, 0, 36, 81, 60, 0, 19, 19, 86 };
 
   /*******************************************************/
 
@@ -76,7 +92,7 @@ int main() {
   igraph_vector_init(&weights, igraph_ecount(&g));
   igraph_vector_fill(&weights, 1.0);
   
-  igraph_betweenness_estimate(/* graph=     */ &g, 
+  igraph_betweenness_estimate(/* graph=     */ &g,
 			      /* res=       */ &bet2,
 			      /* vids=      */ igraph_vss_all(),
 			      /* directed = */ 0,
@@ -84,7 +100,6 @@ int main() {
 			      /* weights=   */ &weights);
 
   if (!igraph_vector_is_equal(&bet, &bet2)) {
-    printf("gebasz"); 
     return 1;
   }
 
@@ -92,7 +107,27 @@ int main() {
   igraph_vector_destroy(&bet2);
   igraph_vector_destroy(&weights);
   igraph_destroy(&g);
+
+  /* Non-trivial weighted graph */
+  igraph_vector_view(&edges, nontriv, sizeof(nontriv)/sizeof(igraph_real_t));
+  igraph_create(&g, &edges, 0, /* directed= */ 0);
+  igraph_vector_view(&weights, nontriv_weights, 
+		     sizeof(nontriv_weights)/sizeof(igraph_real_t));
+  igraph_vector_init(&bet, 0);
+
+  igraph_betweenness(/*graph=*/ &g, /*res=*/ &bet, /*vids=*/ igraph_vss_all(), 
+		     /*directed=*/0, /*weights=*/ &weights);
+
+  igraph_vector_view(&bet2, nontriv_res, 
+		     sizeof(nontriv_res)/sizeof(igraph_real_t));
+
+  if (!igraph_vector_is_equal(&bet, &bet2)) {
+    return 2;
+  }
   
+  igraph_vector_destroy(&bet);
+  igraph_destroy(&g);
+
   return 0;
 }
 
