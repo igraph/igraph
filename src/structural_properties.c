@@ -4736,7 +4736,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
         long int target = IGRAPH_OTHER(graph, nei, j);
         if (VECTOR(dist)[target] > VECTOR(dist)[j] + VECTOR(*weights)[nei]) {
           /* relax the edge */
-	  VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
+          VECTOR(dist)[target] = VECTOR(dist)[j] + VECTOR(*weights)[nei];
           if (VECTOR(clean_vertices)[target]) {
             VECTOR(clean_vertices)[target] = 0;
             IGRAPH_CHECK(igraph_dqueue_push(&Q, target));
@@ -4750,19 +4750,20 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
       igraph_matrix_set_row(res, &dist, i);
     } else {
       for (IGRAPH_VIT_RESET(tovit), j=0; !IGRAPH_VIT_END(tovit); 
-	   IGRAPH_VIT_NEXT(tovit), j++) {
-	long int v=IGRAPH_VIT_GET(tovit);
-	MATRIX(*res, i, j) = VECTOR(dist)[v];
+           IGRAPH_VIT_NEXT(tovit), j++) {
+        long int v=IGRAPH_VIT_GET(tovit);
+        MATRIX(*res, i, j) = VECTOR(dist)[v];
       }
     }
   }
 
+  igraph_vector_destroy(&dist);
   igraph_vit_destroy(&fromvit);
   igraph_dqueue_destroy(&Q);
   igraph_vector_destroy(&clean_vertices);
   igraph_vector_destroy(&num_queued);
   igraph_lazy_adjedgelist_destroy(&adjlist);
-  IGRAPH_FINALLY_CLEAN(5);
+  IGRAPH_FINALLY_CLEAN(6);
 
   return 0;
 }

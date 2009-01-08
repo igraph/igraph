@@ -74,7 +74,7 @@ int main() {
   
   igraph_vector_minmax(&v1, &min, &max);
   igraph_vector_which_minmax(&v1, &imin, &imax);
-  printf("%g %g %i %i\n", min, max, imin, imax);
+  printf("%g %g %li %li\n", min, max, imin, imax);
   
   igraph_vector_destroy(&v1);
   igraph_vector_destroy(&v2);
@@ -85,10 +85,10 @@ int main() {
 
   igraph_vector_minmax(&v1, &min, &max);
   igraph_vector_which_minmax(&v1, &imin, &imax);
-  printf("%g %g %i %i\n", min, max, imin, imax);
+  printf("%g %g %li %li\n", min, max, imin, imax);
   igraph_vector_minmax(&v2, &min, &max);
   igraph_vector_which_minmax(&v2, &imin, &imax);
-  printf("%g %g %i %i\n", min, max, imin, imax);
+  printf("%g %g %li %li\n", min, max, imin, imax);
   
   if (igraph_vector_isnull(&v1)) {
     return 1;

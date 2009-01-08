@@ -95,7 +95,7 @@ for i in *.c; do
     if [ -x a.out ]; then
       echo -n "compiled... "
       LOG=../../valgrind-logs/`basename ${current} .c`.log
-      LD_LIBRARY_PATH=../../src/.libs valgrind --tool=memcheck --error-exitcode=63 --leak-check=yes --log-file=${LOG} ./a.out >/dev/null
+      LD_LIBRARY_PATH=../../src/.libs valgrind --tool=memcheck --error-exitcode=63 --leak-check=yes --show-reachable=yes --log-file=${LOG} ./a.out >/dev/null
       ERRCODE=$?
       if [ $ERRCODE -eq 63 ]; then
         echo "executed, memory access problems found!"
