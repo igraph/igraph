@@ -4377,8 +4377,9 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 	long int edge=VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
+	igraph_bool_t active=igraph_2wheap_has_active(&Q, to);
 	igraph_bool_t has=igraph_2wheap_has_elem(&Q, to);
-	igraph_real_t curdist= has ? -igraph_2wheap_get(&Q, to) : 0.0;	
+	igraph_real_t curdist= active ? -igraph_2wheap_get(&Q, to) : 0.0;
 	if (!has) {
 	  /* This is the first non-infinite distance */
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
