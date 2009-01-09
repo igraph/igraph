@@ -1,3 +1,8 @@
+2009-01-09  Gabor Csardi  <csardi@szaffi>
+
+	* src/heap.c (igraph_2wheap_check) : correct checking, this is 
+	not a minimum heap, but a maximum...
+
 2008-11-14  Gabor Csardi  <csardi@szaffi>
 
 	* src/bipartite.c (igraph_is_bipartite) : added

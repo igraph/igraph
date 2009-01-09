@@ -1043,11 +1043,11 @@ int igraph_2wheap_check(igraph_2wheap_t *h) {
   /* Check the heap property */
   for (i=0; i<size; i++) {
     if (LEFTCHILD(i) >= size) { break; }
-    if (VECTOR(h->data)[LEFTCHILD(i)] < VECTOR(h->data)[i]) {
+    if (VECTOR(h->data)[LEFTCHILD(i)] > VECTOR(h->data)[i]) {
       error=1; break;
     }
     if (RIGHTCHILD(i) >= size) { break; }
-    if (VECTOR(h->data)[RIGHTCHILD(i)] < VECTOR(h->data)[i]) { 
+    if (VECTOR(h->data)[RIGHTCHILD(i)] > VECTOR(h->data)[i]) { 
       error=1; break;
     }
   }
