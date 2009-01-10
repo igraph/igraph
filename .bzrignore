@@ -44,6 +44,7 @@
 ./interfaces/R/igraph/src/*.cc
 ./interfaces/R/igraph/src/*.h
 ./interfaces/R/igraph/src/*.hh
+./interfaces/R/igraph/src/*.f
 *.lo
 ./interfaces/R/igraph/src/*.pmt
 *.la

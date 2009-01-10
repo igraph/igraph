@@ -21,7 +21,7 @@
 ###################################################################
 
 .onLoad <- function(dir, package) {
-  library.dynam("igraph", package, dir, local=FALSE);
+  library.dynam("igraph", package, dir, local=TRUE);
 
   ########################
   # Set default parameters

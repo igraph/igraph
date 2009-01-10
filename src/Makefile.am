@@ -7,51 +7,46 @@ AM_YFLAGS = -d
 
 lib_LTLIBRARIES         = libigraph.la
 
-if INTERNAL_LAPACK
-  LAPACK = lapack/dgeqr2.c  lapack/dlarnv.c  lapack/dlassq.c \
-	lapack/dlacpy.c  lapack/dlartg.c  lapack/dorm2r.c \
-	lapack/dlae2.c   lapack/dlaruv.c  lapack/dsteqr.c \
-	lapack/dlaev2.c  lapack/dlascl.c  lapack/dlanst.c \
-	lapack/dlaset.c  lapack/xerbla.c \
-	lapack/dlarf.c   lapack/dlasr.c   lapack/dlapy2.c \
-	lapack/dlarfg.c  lapack/dlasrt.c  lapack/dlabad.c \
-	lapack/dlanhs.c  lapack/dtrevc.c  lapack/dlanv2.c \
-        lapack/dlaln2.c  lapack/dladiv.c  lapack/dtrsen.c \
-        lapack/dlahqr.c  lapack/dlacon.c  lapack/dtrsyl.c \
-        lapack/dtrexc.c  lapack/dlange.c  lapack/dlaexc.c \
-        lapack/dlasy2.c  lapack/dlarfx.c 
-  noinst_LTLIBRARIES  = libdlamch.la
-  libdlamch_la_SOURCES = lapack/dlamch.c
-  libdlamch_la_CFLAGS = -ffloat-store
-  LAPACK_DLAMCH = libdlamch.la
-else 
-  LAPACK = lapack/xerbla.c
-  LAPACK_DLAMCH = 
-endif
-
 if INTERNAL_ARPACK
-  ARPACK = arpack/dgetv0.c arpack/dmout.c arpack/dsaitr.c arpack/dsapps.c \
-         arpack/dsaup2.c arpack/dsaupd.c arpack/dsconv.c arpack/dseigt.c \
-         arpack/dsesrt.c arpack/dseupd.c arpack/dsgets.c arpack/dsortr.c \
-         arpack/dstats.c arpack/dstqrb.c arpack/dvout.c arpack/ivout.c \
-	 arpack/dnaitr.c arpack/dnapps.c arpack/dnaup2.c arpack/dnaupd.c \
-	 arpack/dnconv.c arpack/dsortc.c arpack/dneigh.c arpack/dngets.c \
-	 arpack/dstatn.c arpack/dlaqrb.c arpack/dneupd.c \
-         arpack/second.c
+  ARPACK = arpack/dgetv0.f arpack/dmout.f arpack/dsaitr.f arpack/dsapps.f \
+         arpack/dsaup2.f arpack/dsaupd.f arpack/dsconv.f arpack/dseigt.f \
+         arpack/dsesrt.f arpack/dseupd.f arpack/dsgets.f arpack/dsortr.f \
+         arpack/dstats.f arpack/dstqrb.f arpack/dvout.f arpack/ivout.f \
+	 arpack/dnaitr.f arpack/dnapps.f arpack/dnaup2.f arpack/dnaupd.f \
+	 arpack/dnconv.f arpack/dsortc.f arpack/dneigh.f arpack/dngets.f \
+	 arpack/dstatn.f arpack/dlaqrb.f arpack/dneupd.f \
+         arpack/second.f \
+	 arpack/dgeqr2.f  arpack/dlarnv.f  arpack/dlassq.f \
+	 arpack/dlacpy.f  arpack/dlartg.f  arpack/dorm2r.f \
+	 arpack/dlae2.f   arpack/dlaruv.f  arpack/dsteqr.f \
+	 arpack/dlaev2.f  arpack/dlascl.f  arpack/dlanst.f \
+	 arpack/dlaset.f  arpack/xerbla.f \
+	 arpack/dlarf.f   arpack/dlasr.f   arpack/dlapy2.f \
+	 arpack/dlarfg.f  arpack/dlasrt.f  arpack/dlabad.f \
+	 arpack/dlanhs.f  arpack/dtrevc.f  arpack/dlanv2.f \
+         arpack/dlaln2.f  arpack/dladiv.f  arpack/dtrsen.f \
+         arpack/dlahqr.f  arpack/dlacon.f  arpack/dtrsyl.f \
+         arpack/dtrexc.f  arpack/dlange.f  arpack/dlaexc.f \
+         arpack/dlasy2.f  arpack/dlarfx.f \
+	 arpack/daxpy.f  arpack/ddot.f   arpack/dger.f   \
+	 arpack/dscal.f  arpack/lsame.f  arpack/dcopy.f  \
+	 arpack/dgemv.f  arpack/dnrm2.f  arpack/dswap.f  \
+	 arpack/drot.f   arpack/idamax.f arpack/dtrmm.f  \
+	 arpack/dasum.f
+  noinst_LTLIBRARIES  = libdlamch.la
+  libdlamch_la_SOURCES = arpack/dlamch.f
+  libdlamch_la_FFLAGS = -ffloat-store
+  ARPACKLAPACK_DLAMCH = libdlamch.la
 else
-  ARPACK =
+  ARPACK = arpack/xerbla.f
+  ARPACKLAPACK_DLAMCH =
 endif
 
-if INTERNAL_BLAS
-  BLAS = blas/daxpy.c  blas/ddot.c   blas/dger.c   blas/dscal.c  blas/lsame.c \
-	blas/dcopy.c  blas/dgemv.c  blas/dnrm2.c  blas/dswap.c   blas/drot.c  \
-        blas/idamax.c blas/dtrmm.c  blas/dasum.c  blas/dgemm.c
+if INTERNAL_LAPACK
+  LAPACK = lapack/ldgemm.f lapack/llsame.f lapack/lxerbla.f
 else
-  BLAS =
+  LAPACK = 
 endif
-
-F2C = f2c/d_sign.c f2c/etime_.c  f2c/pow_dd.c f2c/pow_di.c f2c/s_cmp.c \
-	f2c/s_copy.c f2c/d_lg10.c f2c/i_dnnt.c
 
 libigraph_la_SOURCES       = scg.c \
 			     basic_query.c games.c cocitation.c iterators.c \
@@ -89,7 +84,7 @@ libigraph_la_SOURCES       = scg.c \
 			     bliss_heap.hh bliss_utils.cc \
 			     bliss_kqueue.hh bliss_utils.hh bliss.cc \
 			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
-			     forestfire.c $(ARPACK) $(BLAS) $(LAPACK) $(F2C) \
+			     forestfire.c $(ARPACK) $(LAPACK) \
 			     arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
                              drl_graph.cpp DensityGrid.cpp \
 			     gengraph_box_list.cpp gengraph_degree_sequence.cpp \
@@ -103,8 +98,9 @@ libigraph_la_SOURCES       = scg.c \
 
 libigraph_la_CFLAGS        = -Wall
 libigraph_la_CXXFLAGS	   = -Wall
+libigraph_la_FFLAGS        = -ffixed-line-length-132
 libigraph_la_LDFLAGS       = -no-undefined
-libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(LAPACK_DLAMCH)
+libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(FLIBS) $(ARPACKLAPACK_DLAMCH)
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \

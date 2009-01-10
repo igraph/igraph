@@ -356,7 +356,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
   /* Ok, we have everything */
   while (1) {
-    igraphdsaupd_(&ido, options->bmat, &options->n, options->which,
+    igrapharpackdsaupd_(&ido, options->bmat, &options->n, options->which,
 		  &options->nev, &options->tol, 
 		  resid, &options->ncv, v, &options->ldv,
 		  options->iparam, options->ipntr,
@@ -380,7 +380,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
   
-  igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
+  igrapharpackdseupd_(&rvec, all, select, d, v, &options->ldv,
 		&options->sigma, options->bmat, &options->n,
 		options->which, &options->nev, &options->tol,
 		resid, &options->ncv, v, &options->ldv, options->iparam,
@@ -551,7 +551,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   /* Ok, we have everything */
   while (1) {
     
-    igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
+    igrapharpackdnaupd_(&ido, options->bmat, &options->n, options->which,
 		  &options->nev, &options->tol,
 		  resid, &options->ncv, v, &options->ldv,
 		  options->iparam, options->ipntr,
@@ -575,7 +575,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   options->ierr=0;
-  igraphdneupd_(&rvec, all, select, dr, di, v, &options->ldv,
+  igrapharpackdneupd_(&rvec, all, select, dr, di, v, &options->ldv,
 		&options->sigma, &options->sigmai, workev, options->bmat,
 		&options->n, options->which, &options->nev, &options->tol,
 		resid, &options->ncv, v, &options->ldv, options->iparam,
@@ -709,7 +709,16 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
     IGRAPH_CHECK(igraph_matrix_resize(values, 0, 2));
     return 0;
   }
-  
+
+  /* There might be some "zero eigenvalues", we remove these */
+  while (nconv > 0) {
+    if (MATRIX(*values, nconv-1, 0) != 0 ||
+	MATRIX(*values, nconv-1, 1) != 0) {
+      break;
+    }
+    nconv--;
+  }
+
   /* We need to order the eigenvalues, according to their modulus. */
   
   IGRAPH_CHECK(igraph_vector_long_init(&order, 0));

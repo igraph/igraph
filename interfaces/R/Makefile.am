@@ -58,19 +58,22 @@ SRCFILES_ORIGPLACE = $(wildcard $(top_srcdir)/src/*.c) \
 	$(wildcard $(top_srcdir)/src/*.pmt) \
 	$(YFILES:.y=.c) $(YFILES:.y=.h) $(LFILES:.l=.c)
 
-SRCFILES_ORIGPLACE2 = 	$(wildcard $(top_srcdir)/src/arpack/*.c)
+SRCFILES_ORIGPLACE2 = 	$(wildcard $(top_srcdir)/src/arpack/*.f)
 
-SRCFILES_ORIGPLACE3 = 	$(wildcard $(top_srcdir)/src/lapack/*.c)
+SRCFILES_ORIGPLACE3 = 	# $(wildcard $(top_srcdir)/src/lapack/*.f)
 
-SRCFILES_ORIGPLACE4 = 	$(wildcard $(top_srcdir)/src/blas/*.c)
+SRCFILES_ORIGPLACE4 = 	# $(wildcard $(top_srcdir)/src/blas/*.f)
 
-SRCFILES_ORIGPLACE5 = 	$(wildcard $(top_srcdir)/src/f2c/*.c)
+SRCFILES_ORIGPLACE5 = 	# $(wildcard $(top_srcdir)/src/f2c/*.f)
+
+SRCFILES_ORIGPLACE6 = 	$(wildcard $(top_srcdir)/src/arpack/*.h)
 
 SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/src/arpack/%,igraph/src/%,$(SRCFILES_ORIGPLACE2)) \
 	$(patsubst $(top_srcdir)/src/lapack/%,igraph/src/%,$(SRCFILES_ORIGPLACE3)) \
 	$(patsubst $(top_srcdir)/src/blas/%,igraph/src/%,$(SRCFILES_ORIGPLACE4)) \
-	$(patsubst $(top_srcdir)/src/f2c/%,igraph/src/%,$(SRCFILES_ORIGPLACE5))
+	$(patsubst $(top_srcdir)/src/f2c/%,igraph/src/%,$(SRCFILES_ORIGPLACE5)) \
+	$(patsubst $(top_srcdir)/src/arpack/%,igraph/src/%,$(SRCFILES_ORIGPLACE6))
 
 igraph/src/%.c: $(top_srcdir)/src/%.c
 	cp $(top_srcdir)/src/$(@F) $@
@@ -85,13 +88,15 @@ igraph/src/%.pmt: $(top_srcdir)/src/%.pmt
 igraph/src/%.h: $(top_srcdir)/src/%.h
 	cp $(top_srcdir)/src/$(@F) $@
 
-igraph/src/%.c: $(top_srcdir)/src/arpack/%.c
+igraph/src/%.f: $(top_srcdir)/src/arpack/%.f
 	cp $(top_srcdir)/src/arpack/$(@F) igraph/src/$(@F)
-igraph/src/%.c: $(top_srcdir)/src/lapack/%.c
+igraph/src/%.h: $(top_srcdir)/src/arpack/%.h
+	cp $(top_srcdir)/src/arpack/$(@F) igraph/src/$(@F)
+igraph/src/%.f: $(top_srcdir)/src/lapack/%.f
 	cp $(top_srcdir)/src/lapack/$(@F) igraph/src/$(@F)
-igraph/src/%.c: $(top_srcdir)/src/blas/%.c
+igraph/src/%.f: $(top_srcdir)/src/blas/%.f
 	cp $(top_srcdir)/src/blas/$(@F) igraph/src/$(@F)
-igraph/src/%.c: $(top_srcdir)/src/f2c/%.c
+igraph/src/%.f: $(top_srcdir)/src/f2c/%.f
 	cp $(top_srcdir)/src/f2c/$(@F) igraph/src/$(@F)
 
 igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)

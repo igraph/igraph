@@ -9,8 +9,10 @@ AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 
 AC_PROG_CC
 AC_PROG_CXX
+AC_PROG_F77
 AM_PROG_LEX
 AC_PROG_YACC
+AC_F77_LIBRARY_LDFLAGS
 
 AC_CHECK_HEADER([sys/times.h], 
       [AC_DEFINE([HAVE_TIMES_H], [1], [Define to 1 if you have the sys/times.h header])])
