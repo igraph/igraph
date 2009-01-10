@@ -41,6 +41,11 @@ AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix2.c], [simple/matrix2.out])
 AT_CLEANUP
 
+AT_SETUP([Matrix-vector products: ])
+AT_KEYWORDS([matrix matrix_t matrix vector product])
+AT_COMPILE_CHECK([simple/matrix_vector.c], [simple/matrix_vector.out])
+AT_CLEANUP
+
 AT_SETUP([Matrix-matrix products: ])
 AT_KEYWORDS([matrix matrix_t matrix product])
 AT_COMPILE_CHECK([simple/matrix_products.c], [simple/matrix_products.out])

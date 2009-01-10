@@ -914,6 +914,9 @@ void FUNCTION(igraph_matrix,add_constant)(TYPE(igraph_matrix) *m, BASE plus) {
   FUNCTION(igraph_vector,add_constant)(&m->data, plus);
 }
 
+/* The real version is separately defined, as it calls BLAS */
+#ifndef BASE_IGRAPH_REAL
+
 /**
  * \function igraph_matrix_vector_prod
  * Matrix-vector multiplication
@@ -948,6 +951,8 @@ int FUNCTION(igraph_matrix,vector_prod)(const TYPE(igraph_matrix) *m,
 
   return 0;
 }
+
+#endif
 
 /**
  * \function igraph_matrix_add

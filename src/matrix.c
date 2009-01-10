@@ -54,8 +54,51 @@
 #include "config.h"
 
 #ifndef INTERNAL_BLAS
+#define igraphdgemv_    dgemv_
 #define igraphdgemm_	dgemm_
 #endif
+
+void igraphdgemv_(char *trans, long int *m, long int *n, igraph_real_t *alpha, 
+	    igraph_real_t *a, long int *lda, igraph_real_t *x, long int *incx, 
+	    igraph_real_t *beta, igraph_real_t *y, long int *incy);
+
+int igraph_matrix_dgemv(const igraph_matrix_t *m,
+			const igraph_vector_t *v,
+			igraph_vector_t *res,
+			igraph_real_t alpha,
+			igraph_real_t beta,
+			igraph_bool_t transpose_m) {
+  
+  long int nrow=igraph_matrix_nrow(m);
+  long int ncol=igraph_matrix_ncol(m);
+  long int vlen=igraph_vector_size(v);
+  long int one=1;
+  char t = transpose_m ? 't' : 'n';
+  long int input_len  = transpose_m ? nrow : ncol;
+  long int output_len = transpose_m ? ncol : nrow;
+  
+  if (vlen != input_len) {
+    IGRAPH_ERROR("Matrix and vector sizes are incompatible", IGRAPH_EINVAL);
+  }
+  
+  if (beta != 0 && igraph_vector_size(res) != output_len) {
+    IGRAPH_ERROR("Non-zero beta and bad `res' vector size, possible mistake",
+		 IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, output_len));
+  
+  igraphdgemv_(&t, &nrow, &ncol, &alpha, &MATRIX(*m,0,0), 
+	       &nrow, VECTOR(*v), &one, &beta, VECTOR(*res), &one);
+  
+  return 0;
+}
+
+int igraph_matrix_vector_prod(const igraph_matrix_t *m,
+			      const igraph_vector_t *v,
+			      igraph_vector_t *res) {
+  return igraph_matrix_dgemv(m, v, res, 1.0, 0.0, /*transpose=*/ 0);
+}
 
 void igraphdgemm_(char *transa, char *transb, long int *m, long int *n,
 	    long int *k, igraph_real_t *alpha, igraph_real_t *a, 
