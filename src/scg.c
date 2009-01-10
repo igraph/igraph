@@ -205,14 +205,7 @@ int igraph_scg_matrix(const igraph_matrix_t *matrix,
       if (use_arpack) {
 	igraph_arpack_options_t arpack_opts;
 	igraph_arpack_options_init(&arpack_opts);
-	if (sym) {
-	  igraph_arpack_eigen_symmetric_matrix(matrix, ev, evals, myevec, 
-					       &arpack_opts);
-	} else {
-	  igraph_arpack_eigen_matrix(matrix, ev, evals, myevec, 
-				     &arpack_opts);
-	}
-	
+	igraph_arpack_eigen_matrix(matrix, sym, ev, evals, myevec, &arpack_opts);
       } else {			/* ! use_arpack */
 	IGRAPH_ERROR("Currently only arpack is implemented", 
 		     IGRAPH_UNIMPLEMENTED);

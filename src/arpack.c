@@ -831,13 +831,13 @@ int igraph_i_arpack_eigen_matrix(igraph_real_t *to,
 /**
  */
 
-int igraph_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
-				  long int mdim,
-				  void *extra,
-				  const igraph_vector_long_t *which,
-				  igraph_matrix_t *evals,
-				  igraph_matrix_t *evecs,
-				  igraph_arpack_options_t *options) {
+int igraph_i_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
+				    long int mdim,
+				    void *extra,
+				    const igraph_vector_long_t *which,
+				    igraph_matrix_t *evals,
+				    igraph_matrix_t *evecs,
+				    igraph_arpack_options_t *options) {
   
   igraph_vector_long_t which_small, which_large;
   long int nev=igraph_vector_long_size(which);
@@ -960,30 +960,13 @@ int igraph_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
 /**
  */
 
-int igraph_arpack_eigen_symmetric_matrix(const igraph_matrix_t *matrix,
-					 const igraph_vector_long_t *which,
-					 igraph_matrix_t *evals,
-					 igraph_matrix_t *evecs,
-					 igraph_arpack_options_t *options) {
-
-  long int nrow=igraph_matrix_nrow(matrix);
-  
-  if (nrow != igraph_matrix_ncol(matrix)) {
-    IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
-  }
-  
-  return igraph_arpack_eigen_symmetric(igraph_i_arpack_eigen_matrix,
-				       nrow, (void*) matrix, 
-				       which, evals, evecs, options);  
-}
-
-int igraph_arpack_eigen(igraph_arpack_function_t *fun,
-			long int mdim,
-			void *extra,
-			const igraph_vector_long_t *which,
-			igraph_matrix_t *evals,
-			igraph_matrix_t *evecs,
-			igraph_arpack_options_t *options) {
+int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
+			  long int mdim,
+			  void *extra,
+			  const igraph_vector_long_t *which,
+			  igraph_matrix_t *evals,
+			  igraph_matrix_t *evecs,
+			  igraph_arpack_options_t *options) {
 
   igraph_vector_long_t which_small, which_large;
   long int nev=igraph_vector_long_size(which);
@@ -1099,19 +1082,43 @@ int igraph_arpack_eigen(igraph_arpack_function_t *fun,
   return 0;
 }
 
+int igraph_arpack_eigen(igraph_bool_t symmetric,
+			igraph_arpack_function_t *fun,
+			long int mdim,
+			void *extra,
+			const igraph_vector_long_t *which,
+			igraph_matrix_t *evals,
+			igraph_matrix_t *evecs,
+			igraph_arpack_options_t *options) {
+
+  if (symmetric) {
+    return igraph_i_arpack_eigen_symmetric(fun, mdim, extra, which, 
+					   evals, evecs, options);
+  } else {
+    return igraph_i_arpack_eigen(fun, mdim, extra, which,
+				 evals, evecs, options);
+  }
+}
+
 int igraph_arpack_eigen_matrix(const igraph_matrix_t *matrix,
+			       igraph_matrix_symmetric_t symmetric,
 			       const igraph_vector_long_t *which,
 			       igraph_matrix_t *evals,
 			       igraph_matrix_t *evecs,
 			       igraph_arpack_options_t *options) {
 
   long int nrow=igraph_matrix_nrow(matrix);
+  igraph_bool_t sym;
   
   if (nrow != igraph_matrix_ncol(matrix)) {
     IGRAPH_ERROR("Non-square matrix for ARPACK", IGRAPH_NONSQUARE);
   }
+
+  sym = symmetric==IGRAPH_MATRIX_SYMMETRIC ||
+    (symmetric==IGRAPH_MATRIX_CHECKSYMMETRIC && 
+     igraph_matrix_is_symmetric(matrix));
   
-  return igraph_arpack_eigen(igraph_i_arpack_eigen_matrix,
+  return igraph_arpack_eigen(sym, igraph_i_arpack_eigen_matrix,
 			     nrow, (void*) matrix, 
 			     which, evals, evecs, options);  
 }
