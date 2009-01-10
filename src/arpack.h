@@ -319,16 +319,32 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values, 
 				 long int nev, igraph_bool_t reverse);
 
-int igraph_arpack_eigen_symmetric(const igraph_matrix_t *matrix,
+int igraph_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
+				  long int mdim,
+				  void *extra,
 				  const igraph_vector_long_t *which,
 				  igraph_matrix_t *evals,
 				  igraph_matrix_t *evecs,
 				  igraph_arpack_options_t *options);
 
-int igraph_arpack_eigen(const igraph_matrix_t *matrix,
+int igraph_arpack_eigen_symmetric_matrix(const igraph_matrix_t *matrix,
+					 const igraph_vector_long_t *which,
+					 igraph_matrix_t *evals,
+					 igraph_matrix_t *evecs,
+					 igraph_arpack_options_t *options);
+
+int igraph_arpack_eigen(igraph_arpack_function_t *fun,
+			long int mdim,
+			void *extra,
 			const igraph_vector_long_t *which,
 			igraph_matrix_t *evals,
 			igraph_matrix_t *evecs,
 			igraph_arpack_options_t *options);
+
+int igraph_arpack_eigen_matrix(const igraph_matrix_t *matrix,
+			       const igraph_vector_long_t *which,
+			       igraph_matrix_t *evals,
+			       igraph_matrix_t *evecs,
+			       igraph_arpack_options_t *options);
 
 #endif
