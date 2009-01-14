@@ -520,13 +520,13 @@ igraph_arpack_unpack_complex:
 
 igraph_arpack_eigen_matrix:
         PARAMS: MATRIX matrix, BOOLEAN symmetric, VECTOR_LONG which, \
-                OUT MATRIX evals, OUT MATRIX evecs, \
+                OUT MATRIX values, OUT MATRIX vectors, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         NAME-R: arpack.matrix
 
 igraph_arpack_eigen_graph:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, VECTOR_LONG which, \
-                OUT MATRIX evals, OUT MATRIX evecs, \
+                OUT MATRIX values, OUT MATRIX vectors, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         DEPS: weights ON graph
         NAME-R: arpack.graph

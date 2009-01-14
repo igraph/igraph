@@ -324,8 +324,8 @@ int igraph_arpack_eigen(igraph_bool_t symmetric,
 			long int mdim,
 			void *extra,
 			const igraph_vector_long_t *which,
-			igraph_matrix_t *evals,
-			igraph_matrix_t *evecs,
+			igraph_matrix_t *values,
+			igraph_matrix_t *vectors,
 			igraph_arpack_options_t *options);
 
 typedef enum { IGRAPH_MATRIX_CHECKSYMMETRIC=0,
@@ -335,8 +335,8 @@ typedef enum { IGRAPH_MATRIX_CHECKSYMMETRIC=0,
 int igraph_arpack_eigen_matrix(const igraph_matrix_t *matrix,
 			       igraph_matrix_symmetric_t symmetric,
 			       const igraph_vector_long_t *which,
-			       igraph_matrix_t *evals,
-			       igraph_matrix_t *evecs,
+			       igraph_matrix_t *values,
+			       igraph_matrix_t *vectors,
 			       igraph_arpack_options_t *options);
 
 #endif

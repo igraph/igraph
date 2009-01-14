@@ -821,8 +821,8 @@ int igraph_i_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
 				    long int mdim,
 				    void *extra,
 				    const igraph_vector_long_t *which,
-				    igraph_matrix_t *evals,
-				    igraph_matrix_t *evecs,
+				    igraph_matrix_t *values,
+				    igraph_matrix_t *vectors,
 				    igraph_arpack_options_t *options) {
   
   igraph_vector_long_t which_small, which_large;
@@ -833,10 +833,10 @@ int igraph_i_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
 
   igraph_vector_long_t order;
 
-  /* TODO: make evals and evecs optional */
+  /* TODO: make values and vectors optional */
   
-  igraph_vector_t myevals_v, *myevals=&myevals_v;
-  igraph_matrix_t myevecs_v, *myevecs=&myevecs_v;
+  igraph_vector_t myvalues_v, *myvalues=&myvalues_v;
+  igraph_matrix_t myvectors_v, *myvectors=&myvectors_v;
 
   igraph_vector_long_minmax(which, &wmin, &wmax);
   if (wmin < 1 || wmax > mdim) {
@@ -860,13 +860,13 @@ int igraph_i_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
   nlarge=igraph_vector_long_size(&which_large);
   nsmall=igraph_vector_long_size(&which_small);  
 
-  IGRAPH_VECTOR_INIT_FINALLY(&myevals_v, 0);
-  IGRAPH_MATRIX_INIT_FINALLY(&myevecs_v, 0, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&myvalues_v, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&myvectors_v, 0, 0);
 
-  IGRAPH_CHECK(igraph_matrix_resize(evals, nev, 1));
-  IGRAPH_CHECK(igraph_matrix_resize(evecs, mdim, nev));
-  igraph_matrix_null(evals);
-  igraph_matrix_null(evecs);
+  IGRAPH_CHECK(igraph_matrix_resize(values, nev, 1));
+  IGRAPH_CHECK(igraph_matrix_resize(vectors, mdim, nev));
+  igraph_matrix_null(values);
+  igraph_matrix_null(vectors);
 
   /* Beginning of the spectrum */
 
@@ -878,20 +878,20 @@ int igraph_i_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
     options->ncv=2*last_large+1;
     if (options->ncv > mdim) { options->ncv=mdim; }
     igraph_arpack_rssolve(fun, extra,
-			  options, /*storage=*/ 0, myevals, myevecs);
+			  options, /*storage=*/ 0, myvalues, myvectors);
     IGRAPH_CHECK(igraph_vector_long_init(&order, 0));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
-    IGRAPH_CHECK(igraph_vector_sort_order(myevals, &order, /*reverse=*/ 0));
+    IGRAPH_CHECK(igraph_vector_sort_order(myvalues, &order, /*reverse=*/ 0));
     
     /* Save results */
     for (i=0; i<nev; i++) {
       long int j, pos, ev=VECTOR(*which)[i];
       if (ev > mdim/2) { continue; }
       pos=VECTOR(order)[ev-1];
-      MATRIX(*evals, i, 0) = VECTOR(*myevals)[ev-1];
+      MATRIX(*values, i, 0) = VECTOR(*myvalues)[ev-1];
 
       for (j=0; j<mdim; j++) {
-	MATRIX(*evecs, j, i) = MATRIX(*myevecs, j, pos);
+	MATRIX(*vectors, j, i) = MATRIX(*myvectors, j, pos);
       }
     }    
 
@@ -910,20 +910,20 @@ int igraph_i_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
     options->ncv=2*options->nev+1;
     if (options->ncv > mdim) { options->ncv=mdim; }
     igraph_arpack_rssolve(fun, extra,
-			  options, /*storage=*/ 0, myevals, myevecs);
+			  options, /*storage=*/ 0, myvalues, myvectors);
     IGRAPH_CHECK(igraph_vector_long_init(&order, 0));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &order);
-    IGRAPH_CHECK(igraph_vector_sort_order(myevals, &order, /*reverse=*/ 1));
+    IGRAPH_CHECK(igraph_vector_sort_order(myvalues, &order, /*reverse=*/ 1));
     
     /* Save results */
     for (i=0; i<nev; i++) {
       long int j, pos, ev=VECTOR(*which)[i];
       if (ev <= mdim/2) { continue; }
       pos=VECTOR(order)[mdim-ev];
-      MATRIX(*evals, i, 0) = VECTOR(*myevals)[mdim-ev];
+      MATRIX(*values, i, 0) = VECTOR(*myvalues)[mdim-ev];
       
       for (j=0; j<mdim; j++) {
-	MATRIX(*evecs, j, i) = MATRIX(*myevecs, j, pos);
+	MATRIX(*vectors, j, i) = MATRIX(*myvectors, j, pos);
       }
     }
     
@@ -931,9 +931,9 @@ int igraph_i_arpack_eigen_symmetric(igraph_arpack_function_t *fun,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  igraph_matrix_destroy(myevecs);
+  igraph_matrix_destroy(myvectors);
   IGRAPH_FINALLY_CLEAN(1);
-  igraph_vector_destroy(myevals);
+  igraph_vector_destroy(myvalues);
   IGRAPH_FINALLY_CLEAN(1);
 
   igraph_vector_long_destroy(&which_large);
@@ -950,8 +950,8 @@ int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
 			  long int mdim,
 			  void *extra,
 			  const igraph_vector_long_t *which,
-			  igraph_matrix_t *evals,
-			  igraph_matrix_t *evecs,
+			  igraph_matrix_t *values,
+			  igraph_matrix_t *vectors,
 			  igraph_arpack_options_t *options) {
 
   igraph_vector_long_t which_small, which_large;
@@ -960,10 +960,10 @@ int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
   long int nlarge, nsmall;
   long int i;
 
-  /* TODO: make evals and evecs optional */
+  /* TODO: make values and vectors optional */
   
-  igraph_matrix_t myevals_v, *myevals=&myevals_v;
-  igraph_matrix_t myevecs_v, *myevecs=&myevecs_v;
+  igraph_matrix_t myvalues_v, *myvalues=&myvalues_v;
+  igraph_matrix_t myvectors_v, *myvectors=&myvectors_v;
 
   igraph_vector_long_minmax(which, &wmin, &wmax);
   if (wmin < 1 || wmax > mdim) {
@@ -987,13 +987,13 @@ int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
   nlarge=igraph_vector_long_size(&which_large);
   nsmall=igraph_vector_long_size(&which_small);  
 
-  IGRAPH_MATRIX_INIT_FINALLY(&myevals_v, 0, 0);
-  IGRAPH_MATRIX_INIT_FINALLY(&myevecs_v, 0, 0);  
+  IGRAPH_MATRIX_INIT_FINALLY(&myvalues_v, 0, 0);
+  IGRAPH_MATRIX_INIT_FINALLY(&myvectors_v, 0, 0);  
 
-  IGRAPH_CHECK(igraph_matrix_resize(evals, nev, 2));
-  IGRAPH_CHECK(igraph_matrix_resize(evecs, mdim, 2*nev));
-  igraph_matrix_null(evals);
-  igraph_matrix_null(evecs);
+  IGRAPH_CHECK(igraph_matrix_resize(values, nev, 2));
+  IGRAPH_CHECK(igraph_matrix_resize(vectors, mdim, 2*nev));
+  igraph_matrix_null(values);
+  igraph_matrix_null(vectors);
   
   /* Beginning of the spectrum */
 
@@ -1006,8 +1006,8 @@ int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
     if (options->ncv < 4) { options->ncv=4; }
     if (options->ncv > mdim) { options->ncv=mdim; }
     igraph_arpack_rnsolve(fun, extra,
-			  options, /*storage=*/ 0, myevals, myevecs);
-    IGRAPH_CHECK(igraph_arpack_unpack_complex(myevecs, myevals, last_large, 
+			  options, /*storage=*/ 0, myvalues, myvectors);
+    IGRAPH_CHECK(igraph_arpack_unpack_complex(myvectors, myvalues, last_large, 
 					      /*reverse=*/ 0));
 
     /* Save results */
@@ -1015,12 +1015,12 @@ int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
       long int j, ev=VECTOR(*which)[i];
       if (ev > mdim/2) { continue; }
       ev--;
-      MATRIX(*evals, i, 0) = MATRIX(*myevals, ev, 0);
-      MATRIX(*evals, i, 1) = MATRIX(*myevals, ev, 1);
+      MATRIX(*values, i, 0) = MATRIX(*myvalues, ev, 0);
+      MATRIX(*values, i, 1) = MATRIX(*myvalues, ev, 1);
 
       for (j=0; j<mdim; j++) {
-	MATRIX(*evecs, j, 2*i) = MATRIX(*myevecs, j, 2*ev);
-	MATRIX(*evecs, j, 2*i+1) = MATRIX(*myevecs, j, 2*ev+1);
+	MATRIX(*vectors, j, 2*i) = MATRIX(*myvectors, j, 2*ev);
+	MATRIX(*vectors, j, 2*i+1) = MATRIX(*myvectors, j, 2*ev+1);
       }
     }    
   }
@@ -1036,8 +1036,8 @@ int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
     if (options->ncv < 4) { options->ncv=4; }
     if (options->ncv > mdim) { options->ncv=mdim; }
     igraph_arpack_rnsolve(fun, extra, 
-			  options, /*storage=*/ 0, myevals, myevecs);
-    IGRAPH_CHECK(igraph_arpack_unpack_complex(myevecs, myevals,
+			  options, /*storage=*/ 0, myvalues, myvectors);
+    IGRAPH_CHECK(igraph_arpack_unpack_complex(myvectors, myvalues,
 					      mdim-last_small+1, 
 					      /*reverse=*/ 1));
     
@@ -1046,19 +1046,19 @@ int igraph_i_arpack_eigen(igraph_arpack_function_t *fun,
       long int j, ev=VECTOR(*which)[i];
       if (ev <= mdim/2) { continue; }
       ev=mdim-ev;
-      MATRIX(*evals, i, 0) = MATRIX(*myevals, ev, 0);
-      MATRIX(*evals, i, 1) = MATRIX(*myevals, ev, 1);
+      MATRIX(*values, i, 0) = MATRIX(*myvalues, ev, 0);
+      MATRIX(*values, i, 1) = MATRIX(*myvalues, ev, 1);
       
       for (j=0; j<mdim; j++) {
-	MATRIX(*evecs, j, 2*i) = MATRIX(*myevecs, j, 2*ev);
-	MATRIX(*evecs, j, 2*i+1) = MATRIX(*myevecs, j, 2*ev+1);
+	MATRIX(*vectors, j, 2*i) = MATRIX(*myvectors, j, 2*ev);
+	MATRIX(*vectors, j, 2*i+1) = MATRIX(*myvectors, j, 2*ev+1);
       }
     }
   }
   
-  igraph_matrix_destroy(myevecs);
+  igraph_matrix_destroy(myvectors);
   IGRAPH_FINALLY_CLEAN(1);
-  igraph_matrix_destroy(myevals);
+  igraph_matrix_destroy(myvalues);
   IGRAPH_FINALLY_CLEAN(1);
 
   igraph_vector_long_destroy(&which_large);
@@ -1073,16 +1073,16 @@ int igraph_arpack_eigen(igraph_bool_t symmetric,
 			long int mdim,
 			void *extra,
 			const igraph_vector_long_t *which,
-			igraph_matrix_t *evals,
-			igraph_matrix_t *evecs,
+			igraph_matrix_t *values,
+			igraph_matrix_t *vectors,
 			igraph_arpack_options_t *options) {
 
   if (symmetric) {
     return igraph_i_arpack_eigen_symmetric(fun, mdim, extra, which, 
-					   evals, evecs, options);
+					   values, vectors, options);
   } else {
     return igraph_i_arpack_eigen(fun, mdim, extra, which,
-				 evals, evecs, options);
+				 values, vectors, options);
   }
 }
 
@@ -1103,8 +1103,8 @@ int igraph_i_arpack_eigen_matrix(igraph_real_t *to,
 int igraph_arpack_eigen_matrix(const igraph_matrix_t *matrix,
 			       igraph_matrix_symmetric_t symmetric,
 			       const igraph_vector_long_t *which,
-			       igraph_matrix_t *evals,
-			       igraph_matrix_t *evecs,
+			       igraph_matrix_t *values,
+			       igraph_matrix_t *vectors,
 			       igraph_arpack_options_t *options) {
 
   long int nrow=igraph_matrix_nrow(matrix);
@@ -1120,7 +1120,7 @@ int igraph_arpack_eigen_matrix(const igraph_matrix_t *matrix,
   
   return igraph_arpack_eigen(sym, igraph_i_arpack_eigen_matrix,
 			     nrow, (void*) matrix, 
-			     which, evals, evecs, options);  
+			     which, values, vectors, options);  
 }
 
 typedef struct igraph_i_arpack_eigen_graph_data_t {
@@ -1181,8 +1181,8 @@ int igraph_i_arpack_eigen_graph_weighted(igraph_real_t *to,
 int igraph_arpack_eigen_graph(const igraph_t *graph,
 			      const igraph_vector_t *weights,
 			      const igraph_vector_long_t *which,
-			      igraph_matrix_t *evals,
-			      igraph_matrix_t *evecs,
+			      igraph_matrix_t *values,
+			      igraph_matrix_t *vectors,
 			      igraph_arpack_options_t *options) {
   
   igraph_i_arpack_eigen_graph_data_t extra;
@@ -1208,7 +1208,7 @@ int igraph_arpack_eigen_graph(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_arpack_eigen(sym, igraph_i_arpack_eigen_graph_weighted,
 				     no_of_nodes, (void*) &extra,
-				     which, evals, evecs, options));
+				     which, values, vectors, options));
 
     igraph_adjedgelist_destroy(&adjedgelist);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1225,7 +1225,7 @@ int igraph_arpack_eigen_graph(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_arpack_eigen(sym, igraph_i_arpack_eigen_graph,
 				     no_of_nodes, (void*) &extra,
-				     which, evals, evecs, options));
+				     which, values, vectors, options));
     
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
