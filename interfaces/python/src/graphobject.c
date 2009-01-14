@@ -3593,9 +3593,9 @@ PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
   }
 
   if (weights && igraph_vector_min(weights) < 0)
-    e = igraph_shortest_paths_bellman_ford(&self->g, &res, vs, weights, mode);
+    e = igraph_shortest_paths_bellman_ford(&self->g, &res, vs, igraph_vss_all(), weights, mode);
   else
-    e = igraph_shortest_paths_dijkstra(&self->g, &res, vs, weights, mode);
+    e = igraph_shortest_paths_dijkstra(&self->g, &res, vs, igraph_vss_all(), weights, mode);
 
   if (e) {
     if (weights) igraph_vector_destroy(weights);
