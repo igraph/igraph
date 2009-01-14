@@ -1616,6 +1616,17 @@ int igraph_eigen_rs(const igraph_matrix_t *A,
 		    igraph_matrix_t *vectors);
 
 /* -------------------------------------------------- */
+/* ARPACK                                             */
+/* -------------------------------------------------- */
+
+int igraph_arpack_eigen_graph(const igraph_t *graph,
+			      const igraph_vector_t *weights,
+			      const igraph_vector_long_t *which,
+			      igraph_matrix_t *evals,
+			      igraph_matrix_t *evecs,
+			      igraph_arpack_options_t *options);
+
+/* -------------------------------------------------- */
 /* Spectral coarse graining                           */ 
 /* -------------------------------------------------- */
 

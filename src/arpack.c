@@ -814,20 +814,6 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
   return 0;
 }
 
-int igraph_i_arpack_eigen_matrix(igraph_real_t *to, 
-				 const igraph_real_t *from,
-				 long int n, void *extra) {
-  
-  igraph_matrix_t *mat=extra;
-  igraph_vector_t vfrom, vto;
-  
-  igraph_vector_view(&vfrom, from, n);
-  igraph_vector_view(&vto, to, n);
-  
-  igraph_matrix_vector_prod(mat, &vfrom, &vto);
-  return 0;
-} 
-
 /**
  */
 
@@ -1100,6 +1086,20 @@ int igraph_arpack_eigen(igraph_bool_t symmetric,
   }
 }
 
+int igraph_i_arpack_eigen_matrix(igraph_real_t *to, 
+				 const igraph_real_t *from,
+				 long int n, void *extra) {
+  
+  igraph_matrix_t *mat=extra;
+  igraph_vector_t vfrom, vto;
+  
+  igraph_vector_view(&vfrom, from, n);
+  igraph_vector_view(&vto, to, n);
+  
+  igraph_matrix_vector_prod(mat, &vfrom, &vto);
+  return 0;
+} 
+
 int igraph_arpack_eigen_matrix(const igraph_matrix_t *matrix,
 			       igraph_matrix_symmetric_t symmetric,
 			       const igraph_vector_long_t *which,
@@ -1122,3 +1122,116 @@ int igraph_arpack_eigen_matrix(const igraph_matrix_t *matrix,
 			     nrow, (void*) matrix, 
 			     which, evals, evecs, options);  
 }
+
+typedef struct igraph_i_arpack_eigen_graph_data_t {
+  const igraph_t *graph;
+  const igraph_adjlist_t *adjlist;
+  const igraph_adjedgelist_t *adjedgelist;
+  const igraph_vector_t *weights;
+} igraph_i_arpack_eigen_graph_data_t;
+
+int igraph_i_arpack_eigen_graph(igraph_real_t *to,
+				const igraph_real_t *from,
+				long int n, void *extra) {
+  
+  const igraph_i_arpack_eigen_graph_data_t *extra2=extra;
+  const igraph_adjlist_t *adjlist=extra2->adjlist;
+  igraph_vector_t *neis;
+  long int i, j, nlen;
+  
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(adjlist, i);
+    nlen=igraph_vector_size(neis);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei=VECTOR(*neis)[j];
+      to[i] += from[nei];
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_arpack_eigen_graph_weighted(igraph_real_t *to,
+					 const igraph_real_t *from,
+					 long int n, void *extra) {
+
+  const igraph_i_arpack_eigen_graph_data_t *extra2=extra;
+  const igraph_t *graph=extra2->graph;
+  const igraph_adjedgelist_t *adjedgelist=extra2->adjedgelist;
+  const igraph_vector_t *weights=extra2->weights;
+  igraph_vector_t *adj;
+  long int i, j, nlen;
+  
+  for (i=0; i<n; i++) {
+    adj=igraph_adjedgelist_get(adjedgelist, i);
+    nlen=igraph_vector_size(adj);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int edge=VECTOR(*adj)[i];
+      long int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      to[i] += w*from[nei];
+    }
+  }
+  
+  return 0;
+}
+
+int igraph_arpack_eigen_graph(const igraph_t *graph,
+			      const igraph_vector_t *weights,
+			      const igraph_vector_long_t *which,
+			      igraph_matrix_t *evals,
+			      igraph_matrix_t *evecs,
+			      igraph_arpack_options_t *options) {
+  
+  igraph_i_arpack_eigen_graph_data_t extra;
+  igraph_adjlist_t adjlist;
+  igraph_adjedgelist_t adjedgelist;
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_bool_t sym= !igraph_is_directed(graph);
+  
+  if (weights) {
+
+    if (igraph_vector_size(weights) != no_of_edges) {
+      IGRAPH_ERROR("Invalid `weight vector size", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+
+    extra.graph=graph;
+    extra.adjlist=0;
+    extra.adjedgelist=&adjedgelist;
+    extra.weights=weights;
+
+    IGRAPH_CHECK(igraph_arpack_eigen(sym, igraph_i_arpack_eigen_graph_weighted,
+				     no_of_nodes, (void*) &extra,
+				     which, evals, evecs, options));
+
+    igraph_adjedgelist_destroy(&adjedgelist);
+    IGRAPH_FINALLY_CLEAN(1);
+
+  } else {
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+    extra.graph=graph;
+    extra.adjlist=&adjlist;
+    extra.adjedgelist=0;
+    extra.weights=0;
+
+    IGRAPH_CHECK(igraph_arpack_eigen(sym, igraph_i_arpack_eigen_graph,
+				     no_of_nodes, (void*) &extra,
+				     which, evals, evecs, options));
+    
+    igraph_adjlist_destroy(&adjlist);
+    IGRAPH_FINALLY_CLEAN(1);
+    
+  }
+      
+  return 0;
+}
+

@@ -60,7 +60,7 @@ SRCFILES_ORIGPLACE = $(wildcard $(top_srcdir)/src/*.c) \
 
 SRCFILES_ORIGPLACE2 = 	$(wildcard $(top_srcdir)/src/arpack/*.f)
 
-SRCFILES_ORIGPLACE3 = 	# $(wildcard $(top_srcdir)/src/lapack/*.f)
+SRCFILES_ORIGPLACE3 = 	$(wildcard $(top_srcdir)/src/lapack/*.f)
 
 SRCFILES_ORIGPLACE4 = 	# $(wildcard $(top_srcdir)/src/blas/*.f)
 

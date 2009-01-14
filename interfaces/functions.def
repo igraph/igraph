@@ -518,15 +518,18 @@ igraph_arpack_unpack_complex:
                 BOOLEAN reverse=False
         NAME-R: arpack.unpack.complex
 
-igraph_arpack_eigen:
-        PARAMS: MATRIX matrix, VECTOR_LONG which, OUT MATRIX evals, \
-                OUT MATRIX evecs, INOUT ARPACKOPT options=igraph.arpack.default
-        NAME-R: arpack.eigen
+igraph_arpack_eigen_matrix:
+        PARAMS: MATRIX matrix, BOOLEAN symmetric, VECTOR_LONG which, \
+                OUT MATRIX evals, OUT MATRIX evecs, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        NAME-R: arpack.matrix
 
-igraph_arpack_eigen_symmetric:
-        PARAMS: MATRIX matrix, VECTOR_LONG which, OUT MATRIX evals, \
-                OUT MATRIX evecs, INOUT ARPACKOPT options=igraph.arpack.default
-        NAME-R: arpack.eigen.symmetric
+igraph_arpack_eigen_graph:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, VECTOR_LONG which, \
+                OUT MATRIX evals, OUT MATRIX evecs, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        DEPS: weights ON graph
+        NAME-R: arpack.graph
 
 igraph_unfold_tree:
         PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots, \
