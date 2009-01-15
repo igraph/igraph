@@ -3563,59 +3563,67 @@ PyObject *igraphmodule_Graph_permute_vertices(igraphmodule_GraphObject *self,
 PyObject *igraphmodule_Graph_shortest_paths(igraphmodule_GraphObject * self,
                                             PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "weights", "mode", NULL };
-  PyObject *vobj = NULL, *list = NULL, *mode_o = Py_None, *weights_o = Py_None;
+  static char *kwlist[] = { "source", "target", "weights", "mode", NULL };
+  PyObject *from_o = NULL, *to_o = NULL, *mode_o = NULL, *weights_o = Py_None;
+  PyObject *list = NULL;
   igraph_matrix_t res;
   igraph_vector_t *weights=0;
   igraph_neimode_t mode = IGRAPH_OUT;
-  int return_single = 0, e = 0;
-  igraph_vs_t vs;
+  int return_single_from = 0, return_single_to = 0, e = 0;
+  igraph_vs_t from_vs, to_vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &vobj, &weights_o,
-                                   &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist,
+        &from_o, &to_o, &weights_o, &mode_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return 0;
-  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
+  if (igraphmodule_PyObject_to_vs_t(from_o, &from_vs, &return_single_from)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (igraphmodule_PyObject_to_vs_t(to_o, &to_vs, &return_single_to)) {
+    igraph_vs_destroy(&from_vs);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
       ATTRIBUTE_TYPE_EDGE)) {
-    igraph_vs_destroy(&vs);
+    igraph_vs_destroy(&from_vs);
+    igraph_vs_destroy(&to_vs);
     return NULL;
   }
 
   if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
     if (weights) { igraph_vector_destroy(weights); free(weights); }
-    igraph_vs_destroy(&vs);
+    igraph_vs_destroy(&from_vs);
+    igraph_vs_destroy(&to_vs);
     return igraphmodule_handle_igraph_error();
   }
 
   if (weights && igraph_vector_min(weights) < 0)
-    e = igraph_shortest_paths_bellman_ford(&self->g, &res, vs, igraph_vss_all(), weights, mode);
+    e = igraph_shortest_paths_bellman_ford(&self->g, &res, from_vs, to_vs, weights, mode);
   else
-    e = igraph_shortest_paths_dijkstra(&self->g, &res, vs, igraph_vss_all(), weights, mode);
+    e = igraph_shortest_paths_dijkstra(&self->g, &res, from_vs, to_vs, weights, mode);
 
   if (e) {
     if (weights) igraph_vector_destroy(weights);
     igraph_matrix_destroy(&res);
-    igraph_vs_destroy(&vs);
+    igraph_vs_destroy(&from_vs);
+    igraph_vs_destroy(&to_vs);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (weights) igraph_vector_destroy(weights);
-
-  /* TODO Return a single list instead of a matrix if only one vertex was given */
   if (weights) {
+    igraph_vector_destroy(weights);
     list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
   } else {
     list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
   }
 
   igraph_matrix_destroy(&res);
-  igraph_vs_destroy(&vs);
+  igraph_vs_destroy(&from_vs);
+  igraph_vs_destroy(&to_vs);
 
   return list;
 }
@@ -8639,10 +8647,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_shortest_paths */
   {"shortest_paths", (PyCFunction) igraphmodule_Graph_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "shortest_paths(vertices, weights=None, mode=OUT)\n\n"
+   "shortest_paths(source=None, target=None, weights=None, mode=OUT)\n\n"
    "Calculates shortest path lengths for given nodes in a graph.\n\n"
-   "@param vertices: a list containing the vertex IDs which should be\n"
-   "  included in the result.\n"
+   "@param source: a list containing the source vertex IDs which should be\n"
+   "  included in the result. If C{None}, all vertices will be considered.\n"
+   "@param target: a list containing the target vertex IDs which should be\n"
+   "  included in the result. If C{None}, all vertices will be considered.\n"
    "@param weights: a list containing the edge weights. It can also be\n"
    "  an attribute name (edge weights are retrieved from the given\n"
    "  attribute) or C{None} (all edges have equal weight). Edge\n"

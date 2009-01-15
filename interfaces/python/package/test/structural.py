@@ -247,6 +247,8 @@ class PathTests(unittest.TestCase):
         ]
         self.failUnless(g.shortest_paths(weights=ws) == expected)
         self.failUnless(g.shortest_paths(weights="weight") == expected)
+        self.failUnless(g.shortest_paths(weights="weight", target=[2,3]) ==
+                [row[2:4] for row in expected])
 
     def testPathLengthHist(self):
         g = Graph.Tree(15, 2)
