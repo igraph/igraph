@@ -1,5 +1,8 @@
 2009-01-16  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/igraph/R/structure.generators.R 
+	(graph.incidence) : fixed some typo bugs
+
 	* interfaces/R/igraph/R/foreign.R (read.graph.edgelist)
 	(write.graph.edgelist, read.graph.ncol, write.graph.ncol)
 	(read.graph.lgl, write.graph.lgl, read.graph.pajek)
