@@ -232,8 +232,14 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
  *    igraph_maximum_cardinality_search() (on the same graph) or a null
  *    pointer.
  * \param chordal Pointer to a boolean, the result is stored here.
- * \param fill_in 
- * \param newgraph
+ * \param fill_in Pointer to an initialized vector, or a null
+ *    pointer. If not a null pointer, then the fill-in of the graph is
+ *    stored here. The fill-in is the set of edges that are needed to
+ *    make the graph chordal. The vector is resized as needed.
+ * \param newgraph Pointer to an uninitialized graph, or a null
+ *   pointer. If not a null pointer, then a new triangulated graph is
+ *   created here. This essentially means adding the fill-in edges to 
+ *   the original graph.
  * \return Error code.
  * 
  * Time complexity: O(n).
