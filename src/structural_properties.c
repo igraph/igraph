@@ -4938,6 +4938,32 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_unfold_tree
+ * Unfolding a graph into a tree, by possibly multiplicating its vertices
+ *
+ * A graph is converted into a tree (or forest, if it is unconnected),
+ * by performing a breadth-first search on it, and replicating
+ * vertices that were found a second, third, etc. time. 
+ * \param graph The input graph, it can be either directed or
+ *   undirected.
+ * \param tree Pointer to an uninitialized graph object, the result is
+ *   stored here.
+ * \param mode For directed graphs; whether to follow paths along edge
+ *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
+ *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored 
+ *    for undirected graphs.
+ * \param roots A numeric vector giving the root vertex, or vertices
+ *   (if the graph is not connected), to start from.
+ * \param vertex_index Pointer to an initialized vector, or a null
+ *   pointer. If not a null pointer, then a mapping from the vertices
+ *   in the new graph to the ones in the original is created here.
+ * \return Error code.
+ * 
+ * Time complexity: O(n+m), linear in the number vertices and edges.
+ * 
+ */
+
 int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 		       igraph_neimode_t mode, const igraph_vector_t *roots,
 		       igraph_vector_t *vertex_index) {
