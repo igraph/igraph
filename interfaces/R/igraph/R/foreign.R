@@ -142,15 +142,20 @@ write.graph <- function(graph, file, format=c("edgelist", "pajek", "ncol", "lgl"
 read.graph.edgelist <- function(file, n=0,
                                 directed=TRUE, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (edgelist format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_edgelist", file,
         as.numeric(n), as.logical(directed),
         PACKAGE="igraph")
 }
 
-write.graph.edgelist <- function(graph, file, 
-                                 ...) {
+write.graph.edgelist <- function(graph, file, ...) {
   
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (edgelist format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_edgelist", graph, file,
         PACKAGE="igraph")
@@ -163,6 +168,9 @@ write.graph.edgelist <- function(graph, file,
 read.graph.ncol <- function(file, predef=character(0), names=TRUE,
                            weights=TRUE, directed=FALSE, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (NCOL format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_ncol", file, as.character(predef),
         as.logical(names), as.logical(weights), as.logical(directed),
@@ -171,6 +179,9 @@ read.graph.ncol <- function(file, predef=character(0), names=TRUE,
 
 write.graph.ncol <- function(graph, file, 
                              names="name", weights="weight", ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (NCOL format)")
+  }
   names <- as.character(names)
   weights <- as.character(weights)
   if (length(names)==0 || ! names %in% list.vertex.attributes(graph)) { names <- NULL }
@@ -185,6 +196,9 @@ write.graph.ncol <- function(graph, file,
 read.graph.lgl <- function(file, names=TRUE,
                            weights=TRUE, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (LGL format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_lgl", file,
         as.logical(names), as.logical(weights),
@@ -194,6 +208,9 @@ read.graph.lgl <- function(file, names=TRUE,
 write.graph.lgl <- function(graph, file, 
                             names="name", weights="weight",
                             isolates=FALSE, ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (LGL format)")
+  }
   names <- as.character(names)
   weights <- as.character(weights)
   if (length(names)==0 || ! names %in% list.vertex.attributes(graph)) { names <- NULL }
@@ -207,6 +224,9 @@ write.graph.lgl <- function(graph, file,
 
 read.graph.pajek <- function(file, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (Pajek format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_pajek", file,
         PACKAGE="igraph")
@@ -214,6 +234,9 @@ read.graph.pajek <- function(file, ...) {
 
 write.graph.pajek <- function(graph, file, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (Pajek format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_pajek", graph, file,
         PACKAGE="igraph")
@@ -221,6 +244,9 @@ write.graph.pajek <- function(graph, file, ...) {
 
 read.graph.dimacs <- function(file, directed=TRUE, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (DIMACS format)")
+  }
   res <- .Call("R_igraph_read_graph_dimacs", file, as.logical(directed),
                PACKAGE="igraph")
   if (res[[1]][1] == "max") {
@@ -239,8 +265,11 @@ read.graph.dimacs <- function(file, directed=TRUE, ...) {
 }
 
 write.graph.dimacs <- function(graph, file,
-                               source=NULL, target=NULL, capacity=NULL) {
+                               source=NULL, target=NULL, capacity=NULL, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (DIMACS format)")
+  }
   if (is.null(source)) {
     source <- get.graph.attribute(graph, "source")
   }
@@ -263,6 +292,9 @@ write.graph.dimacs <- function(graph, file,
 
 read.graph.graphml <- function(file, index=0, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (GraphML format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_graphml", file, as.numeric(index),
         PACKAGE="igraph")
@@ -270,6 +302,9 @@ read.graph.graphml <- function(file, index=0, ...) {
 
 write.graph.graphml <- function(graph, file, ...) {
 
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (GraphML format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_graphml", graph, file,
         PACKAGE="igraph")
@@ -280,12 +315,18 @@ write.graph.graphml <- function(graph, file, ...) {
 ################################################################
 
 read.graph.gml <- function(file, ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (GML format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_gml", file,
         PACKAGE="igraph")
 }
 
 write.graph.gml <- function(graph, file, id=NULL, creator=NULL, ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (GML format)")
+  }
   if (!is.null(id)) {
     id <- as.numeric(id)
   }
@@ -302,6 +343,9 @@ write.graph.gml <- function(graph, file, id=NULL, creator=NULL, ...) {
 ################################################################
 
 write.graph.dot <- function(graph, file, ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to write.graph (DOT format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_write_graph_dot", graph, file,
         PACKAGE="igraph")
@@ -370,6 +414,9 @@ graph.graphdb <- function(url=NULL,
 }
 
 read.graph.graphdb <- function(file, directed=TRUE, ...) {
+  if (length(list(...))>0) {
+    stop("Unknown arguments to read.graph (GraphDB format)")
+  }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_read_graph_graphdb", file, as.logical(directed),
         PACKAGE="igraph")

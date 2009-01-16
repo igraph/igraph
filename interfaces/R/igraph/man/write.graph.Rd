@@ -23,7 +23,8 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
 \details{
   The \code{edgelist} format is a simple text file, with one edge in a
   line, the two vertex ids separated by a space character. The file is
-  sorted by the first and the second column.
+  sorted by the first and the second column. This format has no
+  additional arguments.
 
   The Pajek format is a text file, see \code{\link{read.graph}} for
   details. Appropriate vertex and edge attributes are also written to

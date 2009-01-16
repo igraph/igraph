@@ -1,3 +1,13 @@
+2009-01-16  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/foreign.R (read.graph.edgelist)
+	(write.graph.edgelist, read.graph.ncol, write.graph.ncol)
+	(read.graph.lgl, write.graph.lgl, read.graph.pajek)
+	(write.graph.pajek, read.graph.dimacs, write.graph.dimacs)
+	(read.graph.graphml, write.graph.graphml, read.graph.gml)
+	(write.graph.gml, write.graph.dot, read.graph.graphdb) : 
+	give error message for unknown arguments, so far these were ignored
+
 2008-11-14  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/plot.R (igraph.Arrows) : handle 
