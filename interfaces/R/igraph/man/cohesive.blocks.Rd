@@ -55,18 +55,16 @@ object.
 \value{
 \code{cohesive.blocks} returns a graph of class \code{c(bgraph,igraph)},
 with four (new) graph attributes:
-\itemize{
-  \item{blocks}{A list with one element for each cohesive block found. The
-    elements are numeric vectors listing the indices of the nodes within
-    that block.} 
-  \item{block.cohesion}{A numeric vector with length equal to the number
-    of cohesive blocks found, listing the cohesion of those blocks.} 
-  \item{tree}{The hierarchical tree of the cohesive blocks. Each node of
-    this graph represents a cohesive block, and directed edges represent
-    inclusion as proper subset.} 
-  \item{data}{A list containing supplementary data from the
-    calculation.}
-}
+\item{blocks}{A list with one element for each cohesive block found. The
+  elements are numeric vectors listing the indices of the nodes within
+  that block.} 
+\item{block.cohesion}{A numeric vector with length equal to the number
+  of cohesive blocks found, listing the cohesion of those blocks.} 
+\item{tree}{The hierarchical tree of the cohesive blocks. Each node of
+  this graph represents a cohesive block, and directed edges represent
+  inclusion as proper subset.} 
+\item{data}{A list containing supplementary data from the
+  calculation.}
 
 \code{is.bgraph} returns a logical scalar.
 }
