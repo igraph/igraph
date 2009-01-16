@@ -30,13 +30,13 @@ is.bgraph(graph)
 \details{
 Cohesive blocking is a method of determining hierarchical subsets of
 graph vertices based on their structural cohesion (or vertex
-connectivity). For a given graph $G$, a subset of its vertices $S\subset
-V(G)$ is said to be maximally $k$-cohesive if there is no superset of
-$S$ with vertex connectivity greater than or equal to $k$. Cohesive
-blocking is a process through which, given a $k$-cohesive set of
-vertices, maximally $l$-cohesive subsets are recursively identified with
-$l>k$. Thus a hiearchy of vertex subsets is found, whith the entire
-graph $G$ at its root. 
+connectivity). For a given graph \eqn{G}, a subset of its vertices \eqn{S\subset
+V(G)} is said to be maximally \eqn{k}-cohesive if there is no superset of
+\eqn{S} with vertex connectivity greater than or equal to \eqn{k}. Cohesive
+blocking is a process through which, given a \eqn{k}-cohesive set of
+vertices, maximally \eqn{l}-cohesive subsets are recursively identified with
+\eqn{l>k}. Thus a hiearchy of vertex subsets is found, whith the entire
+graph \eqn{G} at its root. 
 
 For certain larger graphs this algorithm can be quite memory-intensive
 due to the number of vertex subsets that are examined. In these cases it
