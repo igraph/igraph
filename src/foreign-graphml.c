@@ -293,6 +293,7 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
   int r;
   igraph_i_attribute_record_t idrec, eidrec;
   const char *idstr="id";
+  igraph_bool_t already_has_vertex_id=0, already_has_edge_id=0;
 
   if (!state->successful) return;
 
@@ -331,6 +332,13 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
 	VECTOR(state->v_attrs)[i];
       igraph_i_attribute_record_t *rec=&graphmlrec->record;
+
+      /* Check that the name of the vertex attribute is not 'id'.
+	 If it is then we cannot the complimentary 'id' attribute. */
+      if (! strcmp(rec->name, idstr)) {
+	already_has_vertex_id=1;
+      }
+
       if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_vector_t *vec=(igraph_vector_t*)rec->value;
 	long int origsize=igraph_vector_size(vec);
@@ -350,16 +358,27 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       }
       VECTOR(vattr)[i]=rec;
     }
-    idrec.name=idstr;
-    idrec.type=IGRAPH_ATTRIBUTE_STRING;
-    tmp=&idrec.value;
-    igraph_trie_getkeys(&state->node_trie, (const igraph_strvector_t **)tmp);
-    VECTOR(vattr)[i]=&idrec;
+    if (!already_has_vertex_id) {
+      idrec.name=idstr;
+      idrec.type=IGRAPH_ATTRIBUTE_STRING;
+      tmp=&idrec.value;
+      igraph_trie_getkeys(&state->node_trie, (const igraph_strvector_t **)tmp);
+      VECTOR(vattr)[i]=&idrec;
+    } else {
+      igraph_vector_ptr_pop_back(&vattr);
+      IGRAPH_WARNING("Could not add vertex ids, "
+		     "there is already an 'id' vertex attribute");
+    }
 
     for (i=0; i<igraph_vector_ptr_size(&state->e_attrs); i++) {
       igraph_i_graphml_attribute_record_t *graphmlrec=
 	VECTOR(state->e_attrs)[i];
       igraph_i_attribute_record_t *rec=&graphmlrec->record;
+
+      if (! strcmp(rec->name, idstr)) {
+	already_has_edge_id=1;
+      }
+
       if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_vector_t *vec=(igraph_vector_t*)rec->value;
 	long int origsize=igraph_vector_size(vec);
@@ -380,16 +399,22 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       VECTOR(eattr)[i]=rec;
     }
     if (igraph_strvector_size(&state->edgeids) != 0) {
-      long int origsize=igraph_strvector_size(&state->edgeids);
-      eidrec.name=idstr;
-      eidrec.type=IGRAPH_ATTRIBUTE_STRING;
-      igraph_strvector_resize(&state->edgeids, 
-			      igraph_vector_size(&state->edgelist)/2);
-      for (; origsize < igraph_strvector_size(&state->edgeids); origsize++) {
-	igraph_strvector_set(&state->edgeids, origsize, "");
+      if (!already_has_edge_id) {
+	long int origsize=igraph_strvector_size(&state->edgeids);
+	eidrec.name=idstr;
+	eidrec.type=IGRAPH_ATTRIBUTE_STRING;
+	igraph_strvector_resize(&state->edgeids, 
+				igraph_vector_size(&state->edgelist)/2);
+	for (; origsize < igraph_strvector_size(&state->edgeids); origsize++) {
+	  igraph_strvector_set(&state->edgeids, origsize, "");
+	}
+	eidrec.value=&state->edgeids;
+	VECTOR(eattr)[(long int)igraph_vector_ptr_size(&eattr)-1]=&eidrec;
+      } else {
+	igraph_vector_ptr_pop_back(&eattr);
+	IGRAPH_WARNING("Could not add edge ids, "
+		       "there is already an 'id' edge attribute");
       }
-      eidrec.value=&state->edgeids;
-      VECTOR(eattr)[(long int)igraph_vector_ptr_size(&eattr)-1]=&eidrec;
     }
 
     for (i=0; i<igraph_vector_ptr_size(&state->g_attrs); i++) {
