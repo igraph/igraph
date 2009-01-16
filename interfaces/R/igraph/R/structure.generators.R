@@ -667,7 +667,7 @@ graph.bipartite <- function(types, edges, directed=FALSE) {
   edges <- as.numeric(edges)
   directed <- as.logical(directed)
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGES="igraph") )
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_create_bipartite", types, edges, directed,
                PACKAGE="igraph")
   set.vertex.attribute(res, "type", value=types)

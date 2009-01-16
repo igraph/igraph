@@ -1,5 +1,8 @@
 2009-01-16  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/igraph/R/structure.generators.R (graph.bipartite) : 
+	fixed a typo bug in .Call, 'PACKAGE' was mistyped
+
 	* interfaces/R/igraph/R/conversion.R (get.incidence.dense) : 
 	fixed a 'g' instead of 'graph' bug
 
