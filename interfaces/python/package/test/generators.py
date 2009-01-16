@@ -7,6 +7,55 @@ class GeneratorTests(unittest.TestCase):
         self.failUnless(g.vcount() == 46 and g.ecount() == 69)
         self.assertRaises(InternalError, Graph.Famous, "unknown")
 
+    def testFormula(self):
+        tests = [
+            (None, [], []),
+            ("", [""], []),
+            ("A", ["A"], []),
+            ("A-B", ["A", "B"], [(0, 1)]),
+            ("A --- B", ["A", "B"], [(0, 1)]),
+            ("A--B, C--D, E--F, G--H, I, J, K",
+                ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K"],
+                [(0,1), (2,3), (4,5), (6,7)]
+            ),
+            ("A:B:C:D -- A:B:C:D",
+                ["A", "B", "C", "D"],
+                [(0,0), (0,1), (0,2), (0,3), (0,1), (1,1), (1,2), (1,3),
+                 (0,2), (1,2), (2,2), (2,3), (0,3), (1,3), (2,3), (3,3)]
+            ),
+            ("A -> B -> C", ["A", "B", "C"], [(0,1), (1,2)]),
+            ("A <- B -> C", ["A", "B", "C"], [(1,0), (1,2)]),
+            ("A <- B -- C", ["A", "B", "C"], [(1,0)]),
+            ("A <-> B <---> C <> D", ["A", "B", "C", "D"],
+                [(0,1), (1,0), (1,2), (2,1), (2,3), (3,2)]),
+            ("'this is' <- 'a silly' -> 'graph here'",
+                ["this is", "a silly", "graph here"], [(1,0), (1,2)]),
+            ("Alice-Bob-Cecil-Alice, Daniel-Cecil-Eugene, Cecil-Gordon",
+                ["Alice", "Bob", "Cecil", "Daniel", "Eugene", "Gordon"],
+                [(0,1),(1,2),(0,2),(2,3),(2,4),(2,5)]
+            ),
+            ("Alice-Bob:Cecil:Daniel, Cecil:Daniel-Eugene:Gordon",
+                ["Alice", "Bob", "Cecil", "Daniel", "Eugene", "Gordon"],
+                [(0,1),(0,2),(0,3),(2,4),(2,5),(3,4),(3,5)]
+            ),
+            ("Alice <-> Bob --> Cecil <-- Daniel, Eugene --> Gordon:Helen",
+                ["Alice", "Bob", "Cecil", "Daniel", "Eugene", "Gordon", "Helen"],
+                [(0,1),(1,0),(1,2),(3,2),(4,5),(4,6)]
+            ),
+            ("Alice -- Bob -- Daniel, Cecil:Gordon, Helen",
+                ["Alice", "Bob", "Daniel", "Cecil", "Gordon", "Helen"],
+                [(0,1),(1,2)]
+            ),
+            ('"+" -- "-", "*" -- "/", "%%" -- "%/%"',
+                ["+", "-", "*", "/", "%%", "%/%"],
+                [(0,1),(2,3),(4,5)]
+            )
+        ]
+        for formula, names, edges in tests:
+            g = Graph.Formula(formula)
+            self.assertEquals(g.vs["name"], names)
+            self.assertEquals(g.get_edgelist(), edges)
+
     def testFull(self):
         g=Graph.Full(20, directed=True)
         el=g.get_edgelist()
