@@ -102,46 +102,40 @@ community.le.to.membership(merges, steps, membership)
   \code{leading.eigenvector.community} and
   \code{leading.eigenvector.community.naive} return a named list with
   the following members:
-  \itemize{
-    \item{membership}{The membership vector at the end of the algorithm,
-      when no more splits are possible.}
-    \item{merges}{The merges matrix starting from the state described by
-      the \code{membership} member. This is a two-column matrix and each
-      line describes a merge of two communities, the first line is the
-      first merge and it creates community \sQuote{\code{N}}, \code{N}
-      is the number of initial communities in the graph, the second line
-      creates community \code{N+1}, etc.
-    }
-    \item{options}{Information about the underlying ARPACK computation,
-      see \code{\link{arpack}} for details.
-    }
+  \item{membership}{The membership vector at the end of the algorithm,
+    when no more splits are possible.}
+  \item{merges}{The merges matrix starting from the state described by
+    the \code{membership} member. This is a two-column matrix and each
+    line describes a merge of two communities, the first line is the
+    first merge and it creates community \sQuote{\code{N}}, \code{N}
+    is the number of initial communities in the graph, the second line
+    creates community \code{N+1}, etc.
+  }
+  \item{options}{Information about the underlying ARPACK computation,
+    see \code{\link{arpack}} for details.
   }
 
   \code{leading.eigenvector.community.step} returns a named list with
   the following members:
-  \itemize{
-    \item{membership}{The new membership vector after the split. If no
-      split was done then this is the same as the input membership
-      vector.}
-    \item{split}{Logical scalar, if \code{TRUE} that means that the
-      community was successfully splitted.}
-    \item{eigenvector}{The eigenvector of the community matrix, or
-      \code{NULL} if the \code{eigenvector} argument was \code{FALSE}.}
-    \item{eigenvalue}{The largest positive eigenvalue of the modularity
-      matrix.}
-    \item{options}{Information about the underlying ARPACK computation,
-      see \code{\link{arpack}} for details.
-    }
+  \item{membership}{The new membership vector after the split. If no
+    split was done then this is the same as the input membership
+    vector.}
+  \item{split}{Logical scalar, if \code{TRUE} that means that the
+    community was successfully splitted.}
+  \item{eigenvector}{The eigenvector of the community matrix, or
+    \code{NULL} if the \code{eigenvector} argument was \code{FALSE}.}
+  \item{eigenvalue}{The largest positive eigenvalue of the modularity
+    matrix.}
+  \item{options}{Information about the underlying ARPACK computation,
+    see \code{\link{arpack}} for details.
   }
 
   \code{community.le.to.membership} returns a named list with two
   components:
-  \itemize{
-    \item{membership}{A membership vector, a numerical vector
-      indication which vertex belongs to which community. The
-      communities are always numbered from zero.}
-    \item{csize}{A numeric vector giving the sizes of the communities.}
-  }
+  \item{membership}{A membership vector, a numerical vector
+    indication which vertex belongs to which community. The
+    communities are always numbered from zero.}
+  \item{csize}{A numeric vector giving the sizes of the communities.}
 }
 \references{
   MEJ Newman: Finding community structure using the eigenvectors of

@@ -38,23 +38,21 @@ canonical.permutation(graph, sh="fm")
 }
 \value{
   A list with the following members:
-  \itemize{
-    \item{labeling}{The canonical parmutation which takes the input
-      graph into canonical form. A numeric vector, the first element is
-      the new label of vertex 0, the second element for vertex 1, etc. }
-    \item{info}{Some information about the BLISS computation. A named
-      list with the following members:
-      \itemize{
-	\item{nof\_nodes}{The number of nodes in the search tree.}
-	\item{nof\_leaf\_nodes}{The number of leaf nodes in the search
-	  tree.}
-	\item{nof\_bad\_nodes}{Number of bad nodes.}
-	\item{nof\_canupdates}{Number of canrep updates.}
-	\item{max\_level}{Maximum level.}
-	\item{group\_size}{The size of the automorphism group of the
-	  input graph, as a string. This number is exact if igraph was
-	  compiled with the GMP library, and approximate otherwise.}
-      }
+  \item{labeling}{The canonical parmutation which takes the input
+    graph into canonical form. A numeric vector, the first element is
+    the new label of vertex 0, the second element for vertex 1, etc. }
+  \item{info}{Some information about the BLISS computation. A named
+    list with the following members:
+    \itemize{
+      \item{nof\_nodes}{The number of nodes in the search tree.}
+      \item{nof\_leaf\_nodes}{The number of leaf nodes in the search
+	tree.}
+      \item{nof\_bad\_nodes}{Number of bad nodes.}
+      \item{nof\_canupdates}{Number of canrep updates.}
+      \item{max\_level}{Maximum level.}
+      \item{group\_size}{The size of the automorphism group of the
+	input graph, as a string. This number is exact if igraph was
+	compiled with the GMP library, and approximate otherwise.}
     }
   }
 }

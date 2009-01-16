@@ -72,29 +72,25 @@ spinglass.community(graph, weights=NULL, vertex, spins=25,
 \value{
   If the \code{vertex} argument is not given, ie. the first form is used
   then a named list is returned with the following slots:
-  \itemize{
-    \item{membership}{Integer vector giving the communities found. The
-      communities have ids starting from zero and for each graph vertex
-      ids community id is given in this vector.}
-    \item{csize}{The sizes of the communities in the order of their ids.}
-    \item{modularity}{The modularity score of the result, as defined by
-      Newman and Girvan, see references.}
-    \item{temperature}{The temperature of the system when the algorithm
-      terminated.}
-  }
+  \item{membership}{Integer vector giving the communities found. The
+    communities have ids starting from zero and for each graph vertex
+    ids community id is given in this vector.}
+  \item{csize}{The sizes of the communities in the order of their ids.}
+  \item{modularity}{The modularity score of the result, as defined by
+    Newman and Girvan, see references.}
+  \item{temperature}{The temperature of the system when the algorithm
+    terminated.}
 
   If the \code{vertex} argument is present, ie. the second form is used
   then a named list is returned with the following components:
-  \itemize{
-    \item{community}{Numeric vector giving the ids of the vertices in
-      the same community as \code{vertex}.}
-    \item{cohesion}{The cohesion score of the result, see references.}
-    \item{adhesion}{The adhesion score of the result, see references.}
-    \item{inner.links}{The number of edges within the community of
-      \code{vertex}.}
-    \item{outer.links}{The number of edges between the community of
-      \code{vertex} and the rest of the graph. }
-  }
+  \item{community}{Numeric vector giving the ids of the vertices in
+    the same community as \code{vertex}.}
+  \item{cohesion}{The cohesion score of the result, see references.}
+  \item{adhesion}{The adhesion score of the result, see references.}
+  \item{inner.links}{The number of edges within the community of
+    \code{vertex}.}
+  \item{outer.links}{The number of edges between the community of
+    \code{vertex} and the rest of the graph. }
 }
 \references{
   J. Reichardt and S. Bornholdt: Statistical Mechanics of Community

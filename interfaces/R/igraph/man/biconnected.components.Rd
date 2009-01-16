@@ -22,16 +22,14 @@ biconnected.components(graph)
 }
 \value{
   A named list with three components:
-  \itemize{
-    \item{no}{Numeric scalar, an integer giving the number of
-      biconnected components in the graph.}
-    \item{components}{The components themselves, a list of numeric
-      vectors. Each vector is a set of edge ids giving the edges in a
-      biconnected component.}
-    \item{articulation_points}{The articulation points of the graph. See
-      \code{\link{articulation.points}}.}
-  }
-
+  \item{no}{Numeric scalar, an integer giving the number of
+    biconnected components in the graph.}
+  \item{components}{The components themselves, a list of numeric
+    vectors. Each vector is a set of edge ids giving the edges in a
+    biconnected component.}
+  \item{articulation_points}{The articulation points of the graph. See
+    \code{\link{articulation.points}}.}
+  
   See examples below on how to extract the vertex ids of the biconnected
   components from the result.
 }

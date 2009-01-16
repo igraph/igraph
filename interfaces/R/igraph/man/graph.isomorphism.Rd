@@ -123,32 +123,28 @@ graph.isocreate(size, number, directed=TRUE)
   \code{FALSE} otherwise.
 
   \code{graph.isomorphic.bliss} returns a named list with elements:
-  \itemize{
-    \item{iso}{A logical scalar, whether the two graphs are isomorphic.}
-    \item{map12}{A numeric vector, an mapping from \code{graph1} to
-      \code{graph2} if \code{iso} is \code{TRUE}, an empty numeric
-      vector otherwise.}
-    \item{map21}{A numeric vector, an mapping from \code{graph2} to
-      \code{graph1} if \code{iso} is \code{TRUE}, an empty numeric
-      vector otherwise.}
-    \item{info1}{Some information about the canonical form calculation
-      for \code{graph1}. A named list, see the return value of
-      \code{\link{canonical.permutation}} for details. }
-    \item{info2}{Some information about the canonical form calculation
-      for \code{graph2}. A named list, see the return value of
-      \code{\link{canonical.permutation}} for details. }
-  }
+  \item{iso}{A logical scalar, whether the two graphs are isomorphic.}
+  \item{map12}{A numeric vector, an mapping from \code{graph1} to
+    \code{graph2} if \code{iso} is \code{TRUE}, an empty numeric
+    vector otherwise.}
+  \item{map21}{A numeric vector, an mapping from \code{graph2} to
+    \code{graph1} if \code{iso} is \code{TRUE}, an empty numeric
+    vector otherwise.}
+  \item{info1}{Some information about the canonical form calculation
+    for \code{graph1}. A named list, see the return value of
+    \code{\link{canonical.permutation}} for details. }
+  \item{info2}{Some information about the canonical form calculation
+    for \code{graph2}. A named list, see the return value of
+    \code{\link{canonical.permutation}} for details. }
 
   \code{graph.isomorphic.vf2} returns a names list with three elements:
-  \itemize{
-    \item{iso}{A logical scalar, whether the two graphs are isomorphic.}
-    \item{map12}{A numeric vector, an mapping from \code{graph1} to
-      \code{graph2} if \code{iso} is \code{TRUE}, an empty numeric
-      vector otherwise.}
-    \item{map21}{A numeric vector, an mapping from \code{graph2} to
-      \code{graph1} if \code{iso} is \code{TRUE}, an empty numeric
-      vector otherwise.}
-  }
+  \item{iso}{A logical scalar, whether the two graphs are isomorphic.}
+  \item{map12}{A numeric vector, an mapping from \code{graph1} to
+    \code{graph2} if \code{iso} is \code{TRUE}, an empty numeric
+    vector otherwise.}
+  \item{map21}{A numeric vector, an mapping from \code{graph2} to
+    \code{graph1} if \code{iso} is \code{TRUE}, an empty numeric
+    vector otherwise.}
 
   \code{graph.count.isomorphisms.vf2} returns a numeric scalar, an
   integer, the number of isomorphic mappings between the two input
@@ -160,17 +156,15 @@ graph.isocreate(size, number, directed=TRUE)
 
   \code{graph.subisomorphic.vf2} returns a named list with three
   elements:
-  \itemize{
-    \item{iso}{Logical scalar, \code{TRUE} if a subgraph of
-      \code{graph1} is isomorphic to \code{graph2}.}
-    \item{map12}{Numeric vector, empty if \code{iso} is
-      \code{FALSE}. Otherwise a mapping from a subgraph of \code{graph1}
-      to \code{graph2}. -1 denotes the vertices which are not part of
-      the mapping.}
-    \item{map21}{Numeric vector, empty if \code{iso} is
-      \code{FALSE}. Otherwise a mapping from \code{graph2} into
-      \code{graph1}.}
-  }
+  \item{iso}{Logical scalar, \code{TRUE} if a subgraph of
+    \code{graph1} is isomorphic to \code{graph2}.}
+  \item{map12}{Numeric vector, empty if \code{iso} is
+    \code{FALSE}. Otherwise a mapping from a subgraph of \code{graph1}
+    to \code{graph2}. -1 denotes the vertices which are not part of
+    the mapping.}
+  \item{map21}{Numeric vector, empty if \code{iso} is
+    \code{FALSE}. Otherwise a mapping from \code{graph2} into
+    \code{graph1}.}
 
   \code{graph.count.subisomorphisms.vf2} returns a numeric scalar, an
   integer.

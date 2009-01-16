@@ -27,12 +27,10 @@ girth(graph, circle=TRUE)
 }
 \value{
   A named list with two components:
-  \itemize{
-    \item{girth}{Integer constant, the girth of the graph, or 0 if the
-      graph is acyclic.}
-    \item{circle}{Numeric vector with the vertex ids in the shortest
-      circle.}
-  }
+  \item{girth}{Integer constant, the girth of the graph, or 0 if the
+    graph is acyclic.}
+  \item{circle}{Numeric vector with the vertex ids in the shortest
+    circle.}
 }
 \references{
   Alon Itai and Michael Rodeh: Finding a minimum circuit in a graph 

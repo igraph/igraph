@@ -24,10 +24,8 @@ community.to.membership(graph, merges, steps, membership=TRUE, csize=TRUE)
 %\details{}
 \value{
   A named list with two members:
-  \itemize{
-    \item{membership}{The membership vector.}
-    \item{csize}{A numeric vector giving the sizes of the communities.}
-  }
+  \item{membership}{The membership vector.}
+  \item{csize}{A numeric vector giving the sizes of the communities.}
 }
 %\references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}

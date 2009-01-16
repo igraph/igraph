@@ -71,19 +71,18 @@ edge.betweenness.community.merges (graph, edges)
 \value{
   A named list is returned by \code{edge.betweenness.community},
   with the following components:
-  \itemize{
-    \item{removed.edges}{Numeric vector, the edges of the graph, in the
-      order of their removal.}
-    \item{edge.betweenness}{Numeric vector, the edge betweenness value
-      of the removed edges, the order is the same as in
-      \code{removed.edges}.}
-    \item{merges}{Matrix containing the merges (ie. divisions) the
-      algorithm performed, see the \code{merges} argument for the
-      format.}
-    \item{bridges}{Numeric vector, the steps (ie. edge removals) which
-      resulted a split of a component in the graph.} 
-    \item{labels}{The \code{name} argument of the vertices.}
-  }
+  \item{removed.edges}{Numeric vector, the edges of the graph, in the
+    order of their removal.}
+  \item{edge.betweenness}{Numeric vector, the edge betweenness value
+    of the removed edges, the order is the same as in
+    \code{removed.edges}.}
+  \item{merges}{Matrix containing the merges (ie. divisions) the
+    algorithm performed, see the \code{merges} argument for the
+    format.}
+  \item{bridges}{Numeric vector, the steps (ie. edge removals) which
+    resulted a split of a component in the graph.} 
+  \item{labels}{The \code{name} argument of the vertices.}
+
   Note that some components may be missing or \code{NULL} if you do not
   request them, see the parameters.
 
