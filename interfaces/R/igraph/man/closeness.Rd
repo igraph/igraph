@@ -6,13 +6,13 @@
 \description{Cloness centrality measures how many steps is required
   to access every other vertex from a given vertex.}
 \usage{
-closeness(graph, v=V(graph), mode = c("all", "out", "in"), weights = NULL)
+closeness(graph, vids=V(graph), mode = c("out", "in", "all"), weights = NULL)
 closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
        "total"), cutoff, weights = NULL) 
 }
 \arguments{
   \item{graph}{The graph to analyze.}
-  \item{v,vids}{The vertices for which closeness will be calculated.}
+  \item{vids}{The vertices for which closeness will be calculated.}
   \item{mode}{Character string, defined the types of the paths used for
     measuring the distance in directed graphs. \dQuote{in} measures the
     paths \emph{to} a vertex, \dQuote{out} measures paths \emph{from} a

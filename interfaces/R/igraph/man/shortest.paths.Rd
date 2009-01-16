@@ -57,8 +57,6 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
   \item{from}{Numeric constant, the vertex from or to the shortest paths
     will be calculated. Note that right now this is not a vector of
     vertex ids, but only a single vertex.}
-  \item{to}{Numeric vector, only the shortest paths to these vertices
-    will be calculated. Defaults to all vertices.}
   \item{directed}{Whether to consider directed paths in directed graphs,
     this argument is ignored for undirected graphs.}
   \item{unconnected}{What to do if the graph is unconnected (not

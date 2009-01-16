@@ -40,7 +40,12 @@ transitivity(graph, type=c("undirected", "global", "globalundirected",
     calculated. This will be ignored for global transitivity types.
     The default value is \code{NULL}, in this case all vertices are
     considered. It is slightly faster to supply \code{NULL} here than
-    \code{V(graph)}.
+    \code{V(graph)}.    
+  }
+  \item{weights}{Optional weights for weighted transitivity. It is
+    ignored for other transitivity measures. If it is \code{NULL} (the
+    default) and the graph has a \code{weight} edge attribute, then it
+    is used automatically.
   }
 }
 \details{
