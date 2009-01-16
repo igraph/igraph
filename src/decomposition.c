@@ -30,8 +30,7 @@
  * 
  * This function implements the maximum cardinality search algorithm
  * discussed in 
- * 
- * Robert E Tarjan and Mihalis Yannakakis, Simple linear-time
+ * Robert E Tarjan and Mihalis Yannakakis: Simple linear-time
  * algorithms to test chordality of graphs, test acyclicity of
  * hypergraphs, and selectively reduce acyclic hypergraphs.
  * SIAM Journal of Computation 13, 566--579, 1984.
@@ -48,6 +47,8 @@
  * 
  * Time complexity: O(|V|+|E|), linear in terms of the number of
  * vertices and edges.  
+ * 
+ * \sa \ref igraph_is_chordal().
  */
 
 int igraph_maximum_cardinality_search(const igraph_t *graph,
@@ -211,7 +212,33 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
 
 /**
  * \function igraph_is_chordal
- * TODO
+ * Decides whether a graph is chordal
+ * 
+ * A graph is chordal if each of its cycles of four or more nodes
+ * has a chord, which is an edge joining two nodes that are not
+ * adjacent in the cycle. An equivalent definition is that any
+ * chordless cycles have at most three nodes.
+ *
+ * If either \p alpha or \p alpha1 is given, then the other is
+ * calculated by taking simply the inverse. If neighter are given,
+ * then \ref igraph_maximum_cardinality_search() is called to calculate
+ * them.
+ * \param graph The input graph, it might be directed, but edge
+ *    direction is ignored.
+ * \param alpha Either an alpha vector coming from
+ *    \ref igraph_maximum_cardinality_search() (on the same graph), or a
+ *    null pointer. 
+ * \param alpham1 Either an inverse alpha vector coming from \ref
+ *    igraph_maximum_cardinality_search() (on the same graph) or a null
+ *    pointer.
+ * \param chordal Pointer to a boolean, the result is stored here.
+ * \param fill_in 
+ * \param newgraph
+ * \return Error code.
+ * 
+ * Time complexity: O(n).
+ * 
+ * \sa \ref igraph_maximum_cardinality_search().
  */
 
 int igraph_is_chordal(const igraph_t *graph,
