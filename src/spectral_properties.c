@@ -298,3 +298,91 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
+
+int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
+			   igraph_bool_t normalized, 
+			   const igraph_vector_t *weights, 
+			   igraph_vector_t *out_weights) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_vector_t el, degree;
+  igraph_bool_t directed=igraph_is_directed(graph);
+  long int i;
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&el, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&el, no_of_edges*2+no_of_nodes*2));
+  IGRAPH_CHECK(igraph_get_edgelist(graph, &el, /*byrow=*/ 0));
+  
+  if (weights) {
+    /* TODO */
+  } else {
+
+    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
+			       IGRAPH_OUT, IGRAPH_NO_LOOPS));
+
+    if (directed) {
+      IGRAPH_WARNING("Computing Laplacian of a directed graph");
+      if (!normalized) {
+	IGRAPH_CHECK(igraph_vector_resize(out_weights, no_of_edges+no_of_nodes));
+	igraph_vector_fill(out_weights, -1.0);
+	for (i=0; i<no_of_nodes; i++) {
+	  igraph_vector_push_back(&el, i);
+	  igraph_vector_push_back(&el, i);
+	  VECTOR(*out_weights)[no_of_edges+i] = VECTOR(degree)[i];
+	}
+      } else {
+	IGRAPH_CHECK(igraph_vector_reserve(out_weights, no_of_edges+no_of_nodes));
+	igraph_vector_resize(out_weights, no_of_edges);
+	for (i=0; i<no_of_edges; i++) {
+	  long int from=VECTOR(el)[2*i];
+	  VECTOR(*out_weights)[i] = -1.0/sqrt(VECTOR(degree)[from]);
+	}
+	for (i=0; i<no_of_nodes; i++) {
+	  if (VECTOR(degree)[i] != 0) {
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(out_weights, 1.0);
+	  }
+	}
+      }
+    } else {
+      if (!normalized) {
+	IGRAPH_CHECK(igraph_vector_resize(out_weights, no_of_edges+no_of_nodes));
+	igraph_vector_fill(out_weights, -1.0);
+	for (i=0; i<no_of_nodes; i++) {
+	  igraph_vector_push_back(&el, i);
+	  igraph_vector_push_back(&el, i);
+	  VECTOR(*out_weights)[no_of_edges+i] = VECTOR(degree)[i];
+	}
+      } else {	
+	IGRAPH_CHECK(igraph_vector_reserve(out_weights, no_of_edges+no_of_nodes));
+	igraph_vector_resize(out_weights, no_of_edges);
+	for (i=0; i<no_of_edges; i++) {
+	  long int from=VECTOR(el)[2*i];
+	  long int to=VECTOR(el)[2*i+1];
+	  VECTOR(*out_weights)[i] = 
+	    -1.0/sqrt(VECTOR(degree)[from] * VECTOR(degree)[to]);
+	}
+	for (i=0; i<no_of_nodes; i++) {
+	  if (VECTOR(degree)[i] != 0) {
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(out_weights, 1.0);
+	  }
+	}
+      }
+    }
+    
+    igraph_vector_destroy(&degree);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  IGRAPH_CHECK(igraph_create(res, &el, no_of_nodes, directed));
+  
+  igraph_vector_destroy(&el);
+  IGRAPH_FINALLY_CLEAN(1);
+	
+  return 0;
+}

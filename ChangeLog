@@ -1,3 +1,7 @@
+2009-01-24  Gabor Csardi  <csardi@szaffi>
+
+	* src/spectral_properties.c (igraph_laplacian_graph) : added
+
 2009-01-14  Gabor Csardi  <csardi@szaffi>
 
 	* src/arpack.c (igraph_arpack_eigen_graph) : added

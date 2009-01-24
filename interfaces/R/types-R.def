@@ -114,6 +114,9 @@ EDGEWEIGHTS:
                %I% <- NULL \
             }
 
+    OUTCONV: res$`%I1%` <- set.edge.attribute(res$`%I1%`, "weight", value=res$`%I%`) \
+             res$`%I%` <- NULL
+
 BIPARTITE_TYPES:
     INCONV: if (is.null(%I%) && "type" %in% list.vertex.attributes(%I1%)) { \
                %I% <- V(%I1%)$type \

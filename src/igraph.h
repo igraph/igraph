@@ -940,6 +940,11 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 		     igraph_bool_t normalized, 
 		     const igraph_vector_t *weights);
 
+int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
+			   igraph_bool_t normalized, 
+			   const igraph_vector_t *weights, 
+			   igraph_vector_t *out_weights);
+
 /* -------------------------------------------------- */
 /* Components                                         */
 /* -------------------------------------------------- */
