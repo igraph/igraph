@@ -467,6 +467,34 @@ class RRCodeGenerator(CodeGenerator):
         out.write(", ".join(call))
         out.write(",\n        PACKAGE=\"igraph\")\n")
 
+        ## Output conversions
+        out.write("\n  # Output conversions\n")
+        def do_par(pname):
+            t=self.types[params[pname]['type']]
+            m=params[pname]['mode']
+            if m in ['OUT', 'INOUT'] and 'OUTCONV' in t:
+                if m in t['OUTCONV']:
+                    res= "  " + t['OUTCONV'][m]
+                else:
+                    res="  " + t['OUTCONV']
+            else:
+                res=""
+            res=res.replace("%I%", pname)
+
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    res=res.replace("%I"+str(i+1)+"%", deps[i])
+            return res
+
+        outconv=[ do_par(n) for n in params.keys() ]
+        outconv=[ i for i in outconv if i != "" ]
+        out.write("\n".join(outconv)+"\n")
+
+        ## If we have a list with a single member, then 
+        ## return only that single member
+        out.write("\n  if (length(res)==1) res <- res[[1]]\n")
+
         ## Set the class if requested
         if 'CLASS-R' in self.func[function].keys():
             myclass=self.func[function]['CLASS-R']
