@@ -512,7 +512,7 @@ bonpow <- function(graph, nodes=V(graph),
 }
 
 alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
-                             loops=FALSE, exo=1,
+                             loops=FALSE, exo=1, attr=NULL,
                              tol=1e-7) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -521,7 +521,7 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
   exo <- rep(exo, length=vcount(graph))
   exo <- matrix(exo, nc=1)
 
-  d <- t(get.adjacency(graph))
+  d <- t(get.adjacency(graph, attr=attr))
   if (!loops) {
     diag(d) <- 0
   }
