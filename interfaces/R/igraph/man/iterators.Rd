@@ -45,7 +45,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
 
   A vertex sequence is created by \code{V(g)} this selects are vertices
   in increasing vertex id order. A vertex sequence can be indexed by a
-  numberic vector, this way only a subset of all vertices can be
+  numeric vector, and a subset of all vertices can be
   selected.
 
   Vertex sequences provide powerful operations for dealing with vertex
@@ -67,7 +67,8 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
     V(g)$number <- sample(1:100, vcount(g), replace=TRUE)
     V(g)$color <- "grey"
     V(g)[ number < 50 ]$color <- "red"
-    plot(g, layout=layout.circle, vertex.color="a:color")
+    plot(g, layout=layout.circle, vertex.color=V(g)$color,
+         vertex.label=V(g)$number)
   }
 
   There is a similar notation for edges. \code{E(g)} selects all edges
@@ -77,10 +78,41 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
     g <- graph.ring(10)
     E(g)$weight <- runif(ecount(g))
     E(g)$width <- 1
-    E(g)[ weight >= 0.5 ]$width <- 2
-    plot(g, layout=layout.circle, edge.width="a:width", edge.color="black")
+    E(g)[ weight >= 0.5 ]$width <- 3
+    plot(g, layout=layout.circle, edge.width=E(g)$width, edge.color="black")
   }
 
+  It is important to note that, whenever we use iterators to assign new
+  attribute values, the new values are recycled. So in the following
+  example half of the vertices will be black, the other half red, in an
+  alternated way.
+  \preformatted{
+    g <- graph.ring(10)
+    V(g)$color <- c("black", "red")
+    plot(g, layout=layout.circle)
+  }
+
+  For the recycling, the standard R rules apply and a warning is given
+  if the number of items to replace is not a multiple of the replacement
+  length. E.g. the following code gives a warning, because we set the
+  attribute for three vertices, but supply only two values:
+  \preformatted{
+    g <- graph.tree(10)
+    V(g)$color <- "grey"
+    V(g)[0:2]$color <- c("green", "blue")
+  }
+  
+  If a new vertex/edge attribute is created with an assignment, but only
+  a subset of of vertices are specified, then the rest is set to
+  \code{NA} if the new values are in a vector and to \code{NULL} if they
+  are a list. Try the following:
+  \preformatted{
+    V(g)[5]$foo <- "foo"
+    V(g)$foo
+    V(g)[5]$bar <- list(bar="bar")
+    V(g)$bar
+  }
+  
   There are some special functions which are only defined in the
   indexing expressions of vertex and edge sequences. For vertex
   sequences these are: \code{nei}, \code{adj}, \code{from} and
