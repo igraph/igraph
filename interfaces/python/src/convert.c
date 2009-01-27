@@ -120,6 +120,21 @@ int igraphmodule_PyObject_to_adjacency_t(PyObject *o,
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_connectedness_t
+ */
+int igraphmodule_PyObject_to_connectedness_t(PyObject *o,
+  igraph_connectedness_t *result) {
+  static igraphmodule_enum_translation_table_entry_t connectedness_tt[] = {
+        {"weak", IGRAPH_WEAK},
+        {"string", IGRAPH_STRONG},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, connectedness_tt, (int*)result);
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts a Python object to an igraph \c igraph_vconn_nei_t
  */
 int igraphmodule_PyObject_to_vconn_nei_t(PyObject *o,
