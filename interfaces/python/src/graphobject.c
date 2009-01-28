@@ -33,6 +33,10 @@
 
 PyTypeObject igraphmodule_GraphType;
 
+/**********************************************************************
+ * Basic implementation of igraph.Graph                               *
+ **********************************************************************/
+
 /** \defgroup python_interface_graph Graph object
  * \ingroup python_interface */
 
@@ -244,6 +248,33 @@ PyObject *igraphmodule_Graph_str(igraphmodule_GraphObject * self)
                                (long)igraph_ecount(&self->g));
 }
 
+/** \ingroup python_interface_copy
+ * \brief Creates an exact deep copy of the graph
+ * \return the copy of the graph
+ */
+PyObject *igraphmodule_Graph_copy(igraphmodule_GraphObject * self)
+{
+  igraphmodule_GraphObject *result;
+  igraph_t g;
+
+  if (igraph_copy(&g, &self->g)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  result =
+    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
+  igraphmodule_Graph_init_internal(result);
+  result->g = g;
+  RC_ALLOC("Graph", result);
+
+  return (PyObject *) result;
+}
+
+/**********************************************************************
+ * The most basic igraph interface                                    *
+ **********************************************************************/
+
 /** \ingroup python_interface_graph
  * \brief Returns the number of vertices in an \c igraph.Graph object.
  * \return the number of vertices as a \c PyObject
@@ -441,6 +472,10 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
   return (PyObject *) self;
 }
 
+/**********************************************************************
+ * Structural properties                                              *
+ **********************************************************************/
+
 /** \ingroup python_interface_graph
  * \brief The degree of some vertices in an \c igraph.Graph
  * \return the degree list as a Python object
@@ -492,6 +527,29 @@ PyObject *igraphmodule_Graph_degree(igraphmodule_GraphObject * self,
   igraph_vs_destroy(&vs);
 
   return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the graph density
+ * \return the density
+ * \sa igraph_density
+ */
+PyObject *igraphmodule_Graph_density(igraphmodule_GraphObject * self,
+                                     PyObject * args, PyObject * kwds)
+{
+  char *kwlist[] = { "loops", NULL };
+  igraph_real_t result;
+  PyObject *loops = Py_False;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &loops))
+    return NULL;
+
+  if (igraph_density(&self->g, &result, PyObject_IsTrue(loops))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("d", (double)result);
 }
 
 /** \ingroup python_interface_graph
@@ -798,6 +856,29 @@ PyObject *igraphmodule_Graph_adjacent(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the graph reciprocity
+ * \return the reciprocity
+ * \sa igraph_reciprocity
+ */
+PyObject *igraphmodule_Graph_reciprocity(igraphmodule_GraphObject * self,
+                                         PyObject * args, PyObject * kwds)
+{
+  char *kwlist[] = { "ignore_loops", NULL };
+  igraph_real_t result;
+  PyObject *ignore_loops = Py_True;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &ignore_loops))
+    return NULL;
+
+  if (igraph_reciprocity(&self->g, &result, PyObject_IsTrue(ignore_loops))) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  return Py_BuildValue("d", (double)result);
+}
+
+/** \ingroup python_interface_graph
  * \brief The successors of a given vertex in an \c igraph.Graph
  * This method accepts a single vertex ID as a parameter, and returns the
  * successors of the given vertex in the form of an integer list. It
@@ -863,6 +944,69 @@ PyObject *igraphmodule_Graph_predecessors(igraphmodule_GraphObject * self,
   igraph_vector_destroy(&result);
 
   return list;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Decides whether a graph is connected.
+ * \return Py_True if the graph is connected, Py_False otherwise
+ * \sa igraph_is_connected
+ */
+PyObject *igraphmodule_Graph_is_connected(igraphmodule_GraphObject * self,
+                                          PyObject * args, PyObject * kwds)
+{
+  char *kwlist[] = { "mode", NULL };
+  igraph_connectedness_t mode = IGRAPH_STRONG;
+  igraph_bool_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &mode))
+    return NULL;
+
+  if (mode != IGRAPH_STRONG && mode != IGRAPH_WEAK) {
+    PyErr_SetString(PyExc_ValueError, "mode must be either STRONG or WEAK");
+    return NULL;
+  }
+
+  if (igraph_is_connected(&self->g, &res, mode)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+  if (res) {
+    Py_INCREF(Py_True);
+    return Py_True;
+  }
+  else {
+    Py_INCREF(Py_False);
+    return Py_False;
+  }
+}
+
+/** \ingroup python_interface_graph
+ * \brief Decides whether there is an edge from a given vertex to an other one.
+ * \return Py_True if the vertices are directly connected, Py_False otherwise
+ * \sa igraph_are_connected
+ */
+PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
+                                           PyObject * args, PyObject * kwds)
+{
+  char *kwlist[] = { "v1", "v2", NULL };
+  long v1, v2;
+  igraph_bool_t res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &v1, &v2))
+    return NULL;
+
+  if (igraph_are_connected
+      (&self->g, (igraph_integer_t) v1, (igraph_integer_t) v2, &res))
+    return NULL;
+
+  if (res) {
+    Py_INCREF(Py_True);
+    return Py_True;
+  }
+  else {
+    Py_INCREF(Py_False);
+    return Py_False;
+  }
 }
 
 /** \ingroup python_interface_graph
@@ -1049,6 +1193,10 @@ PyObject *igraphmodule_Graph_convergence_field_size(igraphmodule_GraphObject *se
   return Py_BuildValue("NN", o1, o2);
 }
 
+/**********************************************************************
+ * Deterministic and non-deterministic graph generators               *
+ **********************************************************************/
+
 /** \ingroup python_interface_graph
  * \brief Generates a graph from its adjacency matrix
  * \return a reference to the newly generated Python igraph object
@@ -1230,6 +1378,62 @@ PyObject *igraphmodule_Graph_De_Bruijn(PyTypeObject *type, PyObject *args,
   }
 
   return (PyObject*)self;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Generates a random graph with a given degree sequence
+ * This is intended to be a class method in Python, so the first argument
+ * is the type object and not the Python igraph object (because we have
+ * to allocate that in this method).
+ * 
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_degree_sequence_game
+ */
+PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
+                                             PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  igraph_vector_t outseq, inseq;
+  igraph_degseq_t meth = IGRAPH_DEGSEQ_SIMPLE;
+  PyObject *outdeg = NULL, *indeg = NULL, *method = NULL;
+
+  static char *kwlist[] = { "out", "in", "method", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!O", kwlist,
+                                   &PyList_Type, &outdeg,
+                                   &PyList_Type, &indeg,
+								   &method))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_degseq_t(method, &meth)) return NULL;
+  if (igraphmodule_PyObject_to_vector_t(outdeg, &outseq, 1, 0)) return NULL;
+  if (indeg) {
+    if (igraphmodule_PyObject_to_vector_t(indeg, &inseq, 1, 0)) {
+      igraph_vector_destroy(&outseq);
+      return NULL;
+    }
+  } else {
+    igraph_vector_init(&inseq, 0);
+  }
+
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_degree_sequence_game(&self->g, &outseq, &inseq, meth)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vector_destroy(&outseq);
+      igraph_vector_destroy(&inseq);
+      Py_DECREF(self);
+      return NULL;
+    }
+  }
+
+  igraph_vector_destroy(&outseq);
+  igraph_vector_destroy(&inseq);
+
+  return (PyObject *) self;
 }
 
 /** \ingroup python_interface_graph
@@ -1636,38 +1840,30 @@ PyObject *igraphmodule_Graph_Growing_Random(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
- * \brief Generates a star graph
+ * \brief Generates a graph with a given isomorphy class
+ * This is intended to be a class method in Python, so the first argument
+ * is the type object and not the Python igraph object (because we have
+ * to allocate that in this method).
+ * 
  * \return a reference to the newly generated Python igraph object
- * \sa igraph_star
+ * \sa igraph_isoclass_create
  */
-PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
-                                  PyObject * args, PyObject * kwds)
+PyObject *igraphmodule_Graph_Isoclass(PyTypeObject * type,
+                                      PyObject * args, PyObject * kwds)
 {
-  long n, center = 0;
-  igraph_star_mode_t mode = IGRAPH_STAR_UNDIRECTED;
+  long n, isoclass;
+  PyObject *directed = NULL;
   igraphmodule_GraphObject *self;
 
-  char *kwlist[] = { "n", "mode", "center", NULL };
+  char *kwlist[] = { "n", "class", "directed", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|ll", kwlist,
-                                   &n, &mode, &center))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
+                                   &n, &isoclass, &directed))
     return NULL;
 
-  if (n < 0) {
-    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
-    return NULL;
-  }
-
-  if (center >= n || center < 0) {
+  if (n < 3 || n > 4) {
     PyErr_SetString(PyExc_ValueError,
-                    "Central vertex ID should be between 0 and n-1");
-    return NULL;
-  }
-
-  if (mode != IGRAPH_STAR_UNDIRECTED && mode != IGRAPH_STAR_IN &&
-      mode != IGRAPH_STAR_OUT) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Mode should be either STAR_IN, STAR_OUT or STAR_UNDIRECTED.");
+                    "Only graphs with 3 or 4 vertices are supported");
     return NULL;
   }
 
@@ -1676,8 +1872,8 @@ PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
 
   if (self != NULL) {
     igraphmodule_Graph_init_internal(self);
-    if (igraph_star
-        (&self->g, (igraph_integer_t) n, mode, (igraph_integer_t) center)) {
+    if (igraph_isoclass_create
+        (&self->g, n, isoclass, PyObject_IsTrue(directed))) {
       igraphmodule_handle_igraph_error();
       Py_DECREF(self);
       return NULL;
@@ -2112,6 +2308,58 @@ PyObject *igraphmodule_Graph_Ring(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a star graph
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_star
+ */
+PyObject *igraphmodule_Graph_Star(PyTypeObject * type,
+                                  PyObject * args, PyObject * kwds)
+{
+  long n, center = 0;
+  igraph_star_mode_t mode = IGRAPH_STAR_UNDIRECTED;
+  igraphmodule_GraphObject *self;
+
+  char *kwlist[] = { "n", "mode", "center", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|ll", kwlist,
+                                   &n, &mode, &center))
+    return NULL;
+
+  if (n < 0) {
+    PyErr_SetString(PyExc_ValueError, "Number of vertices must be positive.");
+    return NULL;
+  }
+
+  if (center >= n || center < 0) {
+    PyErr_SetString(PyExc_ValueError,
+                    "Central vertex ID should be between 0 and n-1");
+    return NULL;
+  }
+
+  if (mode != IGRAPH_STAR_UNDIRECTED && mode != IGRAPH_STAR_IN &&
+      mode != IGRAPH_STAR_OUT) {
+    PyErr_SetString(PyExc_ValueError,
+                    "Mode should be either STAR_IN, STAR_OUT or STAR_UNDIRECTED.");
+    return NULL;
+  }
+
+  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
+  RC_ALLOC("Graph", self);
+
+  if (self != NULL) {
+    igraphmodule_Graph_init_internal(self);
+    if (igraph_star
+        (&self->g, (igraph_integer_t) n, mode, (igraph_integer_t) center)) {
+      igraphmodule_handle_igraph_error();
+      Py_DECREF(self);
+      return NULL;
+    }
+  }
+
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a tree graph where almost all vertices have an equal number of children
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_tree
@@ -2148,106 +2396,6 @@ PyObject *igraphmodule_Graph_Tree(PyTypeObject * type,
     igraphmodule_Graph_init_internal(self);
     if (igraph_tree
         (&self->g, (igraph_integer_t) n, (igraph_integer_t) children, mode)) {
-      igraphmodule_handle_igraph_error();
-      Py_DECREF(self);
-      return NULL;
-    }
-  }
-
-  return (PyObject *) self;
-}
-
-/** \ingroup python_interface_graph
- * \brief Generates a random graph with a given degree sequence
- * This is intended to be a class method in Python, so the first argument
- * is the type object and not the Python igraph object (because we have
- * to allocate that in this method).
- * 
- * \return a reference to the newly generated Python igraph object
- * \sa igraph_degree_sequence_game
- */
-PyObject *igraphmodule_Graph_Degree_Sequence(PyTypeObject * type,
-                                             PyObject * args, PyObject * kwds)
-{
-  igraphmodule_GraphObject *self;
-  igraph_vector_t outseq, inseq;
-  igraph_degseq_t meth = IGRAPH_DEGSEQ_SIMPLE;
-  PyObject *outdeg = NULL, *indeg = NULL, *method = NULL;
-
-  static char *kwlist[] = { "out", "in", "method", NULL };
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!|O!O", kwlist,
-                                   &PyList_Type, &outdeg,
-                                   &PyList_Type, &indeg,
-								   &method))
-    return NULL;
-
-  if (igraphmodule_PyObject_to_degseq_t(method, &meth)) return NULL;
-  if (igraphmodule_PyObject_to_vector_t(outdeg, &outseq, 1, 0)) return NULL;
-  if (indeg) {
-    if (igraphmodule_PyObject_to_vector_t(indeg, &inseq, 1, 0)) {
-      igraph_vector_destroy(&outseq);
-      return NULL;
-    }
-  } else {
-    igraph_vector_init(&inseq, 0);
-  }
-
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_degree_sequence_game(&self->g, &outseq, &inseq, meth)) {
-      igraphmodule_handle_igraph_error();
-      igraph_vector_destroy(&outseq);
-      igraph_vector_destroy(&inseq);
-      Py_DECREF(self);
-      return NULL;
-    }
-  }
-
-  igraph_vector_destroy(&outseq);
-  igraph_vector_destroy(&inseq);
-
-  return (PyObject *) self;
-}
-
-/** \ingroup python_interface_graph
- * \brief Generates a graph with a given isomorphy class
- * This is intended to be a class method in Python, so the first argument
- * is the type object and not the Python igraph object (because we have
- * to allocate that in this method).
- * 
- * \return a reference to the newly generated Python igraph object
- * \sa igraph_isoclass_create
- */
-PyObject *igraphmodule_Graph_Isoclass(PyTypeObject * type,
-                                      PyObject * args, PyObject * kwds)
-{
-  long n, isoclass;
-  PyObject *directed = NULL;
-  igraphmodule_GraphObject *self;
-
-  char *kwlist[] = { "n", "class", "directed", NULL };
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
-                                   &n, &isoclass, &directed))
-    return NULL;
-
-  if (n < 3 || n > 4) {
-    PyErr_SetString(PyExc_ValueError,
-                    "Only graphs with 3 or 4 vertices are supported");
-    return NULL;
-  }
-
-  self = (igraphmodule_GraphObject *) type->tp_alloc(type, 0);
-  RC_ALLOC("Graph", self);
-
-  if (self != NULL) {
-    igraphmodule_Graph_init_internal(self);
-    if (igraph_isoclass_create
-        (&self->g, n, isoclass, PyObject_IsTrue(directed))) {
       igraphmodule_handle_igraph_error();
       Py_DECREF(self);
       return NULL;
@@ -2341,68 +2489,9 @@ PyObject *igraphmodule_Graph_Weighted_Adjacency(PyTypeObject * type,
   return (PyObject *) self;
 }
 
-/** \ingroup python_interface_graph
- * \brief Decides whether a graph is connected.
- * \return Py_True if the graph is connected, Py_False otherwise
- * \sa igraph_is_connected
- */
-PyObject *igraphmodule_Graph_is_connected(igraphmodule_GraphObject * self,
-                                          PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] = { "mode", NULL };
-  igraph_connectedness_t mode = IGRAPH_STRONG;
-  igraph_bool_t res;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &mode))
-    return NULL;
-
-  if (mode != IGRAPH_STRONG && mode != IGRAPH_WEAK) {
-    PyErr_SetString(PyExc_ValueError, "mode must be either STRONG or WEAK");
-    return NULL;
-  }
-
-  if (igraph_is_connected(&self->g, &res, mode)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-  if (res) {
-    Py_INCREF(Py_True);
-    return Py_True;
-  }
-  else {
-    Py_INCREF(Py_False);
-    return Py_False;
-  }
-}
-
-/** \ingroup python_interface_graph
- * \brief Decides whether there is an edge from a given vertex to an other one.
- * \return Py_True if the vertices are directly connected, Py_False otherwise
- * \sa igraph_are_connected
- */
-PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
-                                           PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] = { "v1", "v2", NULL };
-  long v1, v2;
-  igraph_bool_t res;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll", kwlist, &v1, &v2))
-    return NULL;
-
-  if (igraph_are_connected
-      (&self->g, (igraph_integer_t) v1, (igraph_integer_t) v2, &res))
-    return NULL;
-
-  if (res) {
-    Py_INCREF(Py_True);
-    return Py_True;
-  }
-  else {
-    Py_INCREF(Py_False);
-    return Py_False;
-  }
-}
+/**********************************************************************
+ * Advanced structural properties of graphs                           *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Calculates the articulation points of a graph.
@@ -2865,27 +2954,47 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
   return list;
 }
 
-/** \ingroup python_interface_copy
- * \brief Creates an exact deep copy of the graph
- * \return the copy of the graph
+/** \ingroup python_interface_graph
+ * \brief Calculates the cocitation scores of some nodes in a graph.
+ * \return the cocitation scores in a matrix
+ * \sa igraph_cocitation
  */
-PyObject *igraphmodule_Graph_copy(igraphmodule_GraphObject * self)
+PyObject *igraphmodule_Graph_cocitation(igraphmodule_GraphObject * self,
+                                        PyObject * args, PyObject * kwds)
 {
-  igraphmodule_GraphObject *result;
-  igraph_t g;
+  char *kwlist[] = { "vertices", NULL };
+  PyObject *vobj = NULL, *list = NULL;
+  igraph_matrix_t res;
+  int return_single = 0;
+  igraph_vs_t vs;
 
-  if (igraph_copy(&g, &self->g)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  result =
-    (igraphmodule_GraphObject *) self->ob_type->tp_alloc(self->ob_type, 0);
-  igraphmodule_Graph_init_internal(result);
-  result->g = g;
-  RC_ALLOC("Graph", result);
+  if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
+    igraph_vs_destroy(&vs);
+    return igraphmodule_handle_igraph_error();
+  }
 
-  return (PyObject *) result;
+  if (igraph_cocitation(&self->g, &res, vs)) {
+    igraph_matrix_destroy(&res);
+    igraph_vs_destroy(&vs);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  /* TODO: Return a single list instead of a matrix if only one vertex was given */
+  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
+
+  igraph_matrix_destroy(&res);
+  igraph_vs_destroy(&vs);
+
+  return list;
 }
 
 /** \ingroup python_interface_graph
@@ -2939,49 +3048,6 @@ PyObject *igraphmodule_Graph_decompose(igraphmodule_GraphObject * self,
   }
 
   igraph_vector_ptr_destroy(&components);
-
-  return list;
-}
-
-/** \ingroup python_interface_graph
- * \brief Calculates the cocitation scores of some nodes in a graph.
- * \return the cocitation scores in a matrix
- * \sa igraph_cocitation
- */
-PyObject *igraphmodule_Graph_cocitation(igraphmodule_GraphObject * self,
-                                        PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] = { "vertices", NULL };
-  PyObject *vobj = NULL, *list = NULL;
-  igraph_matrix_t res;
-  int return_single = 0;
-  igraph_vs_t vs;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
-    return NULL;
-
-  if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  if (igraph_matrix_init(&res, 1, igraph_vcount(&self->g))) {
-    igraph_vs_destroy(&vs);
-    return igraphmodule_handle_igraph_error();
-  }
-
-  if (igraph_cocitation(&self->g, &res, vs)) {
-    igraph_matrix_destroy(&res);
-    igraph_vs_destroy(&vs);
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  /* TODO: Return a single list instead of a matrix if only one vertex was given */
-  list = igraphmodule_matrix_t_to_PyList(&res, IGRAPHMODULE_TYPE_INT);
-
-  igraph_matrix_destroy(&res);
-  igraph_vs_destroy(&vs);
 
   return list;
 }
@@ -3557,6 +3623,35 @@ PyObject *igraphmodule_Graph_permute_vertices(igraphmodule_GraphObject *self,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Rewires a graph while preserving degree distribution
+ * \return the rewired graph
+ * \sa igraph_rewire
+ */
+PyObject *igraphmodule_Graph_rewire(igraphmodule_GraphObject * self,
+                                    PyObject * args, PyObject * kwds)
+{
+  char *kwlist[] = { "n", "mode", NULL };
+  long n = 1000;
+  igraph_rewiring_t mode = IGRAPH_REWIRING_SIMPLE;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ll", kwlist, &n, &mode))
+    return NULL;
+
+  if (mode != IGRAPH_REWIRING_SIMPLE) {
+    PyErr_SetString(PyExc_ValueError, "mode must be REWIRING_SIMPLE");
+    return NULL;
+  }
+
+  if (igraph_rewire(&self->g, n, mode)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  Py_INCREF(self);
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates shortest paths in a graph.
  * \return the shortest path lengths for the given vertices
  * \sa igraph_shortest_paths, igraph_shortest_paths_dijkstra,
@@ -3861,35 +3956,6 @@ PyObject *igraphmodule_Graph_subcomponent(igraphmodule_GraphObject * self,
 }
 
 /** \ingroup python_interface_graph
- * \brief Rewires a graph while preserving degree distribution
- * \return the rewired graph
- * \sa igraph_rewire
- */
-PyObject *igraphmodule_Graph_rewire(igraphmodule_GraphObject * self,
-                                    PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] = { "n", "mode", NULL };
-  long n = 1000;
-  igraph_rewiring_t mode = IGRAPH_REWIRING_SIMPLE;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ll", kwlist, &n, &mode))
-    return NULL;
-
-  if (mode != IGRAPH_REWIRING_SIMPLE) {
-    PyErr_SetString(PyExc_ValueError, "mode must be REWIRING_SIMPLE");
-    return NULL;
-  }
-
-  if (igraph_rewire(&self->g, n, mode)) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  Py_INCREF(self);
-  return (PyObject *) self;
-}
-
-/** \ingroup python_interface_graph
  * \brief Returns a subgraph of the graph based on the given vertices
  * \return the subgraph as a new igraph object
  * \sa igraph_subgraph
@@ -4086,6 +4152,27 @@ PyObject *igraphmodule_Graph_vertex_connectivity(igraphmodule_GraphObject *self,
   return Py_BuildValue("l", result);
 }
 
+/**********************************************************************
+ * Motifs, dyad and triad census                                      *
+ **********************************************************************/
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the dyad census of the graph
+ * \return the dyad census as a 3-tuple
+ * \sa igraph_dyad_census
+ */
+PyObject *igraphmodule_Graph_dyad_census(igraphmodule_GraphObject *self) {
+  igraph_integer_t mut, asym, nul;
+  PyObject *list;
+
+  if (igraph_dyad_census(&self->g, &mut, &asym, &nul)) {
+    return igraphmodule_handle_igraph_error();
+  }
+
+  list = Py_BuildValue("lll", (long)mut, (long)asym, (long)nul);
+  return list;
+}
+
 /** \ingroup python_interface_graph
  * \brief Counts the motifs of the graph sorted by isomorphism classes 
  * \return the number of motifs found for each isomorphism class
@@ -4251,68 +4338,9 @@ PyObject *igraphmodule_Graph_triad_census(igraphmodule_GraphObject *self) {
   return list;
 }
 
-/** \ingroup python_interface_graph
- * \brief Calculates the dyad census of the graph
- * \return the dyad census as a 3-tuple
- * \sa igraph_dyad_census
- */
-PyObject *igraphmodule_Graph_dyad_census(igraphmodule_GraphObject *self) {
-  igraph_integer_t mut, asym, nul;
-  PyObject *list;
-
-  if (igraph_dyad_census(&self->g, &mut, &asym, &nul)) {
-    return igraphmodule_handle_igraph_error();
-  }
-
-  list = Py_BuildValue("lll", (long)mut, (long)asym, (long)nul);
-  return list;
-}
-
-/** \ingroup python_interface_graph
- * \brief Calculates the graph reciprocity
- * \return the reciprocity
- * \sa igraph_reciprocity
- */
-PyObject *igraphmodule_Graph_reciprocity(igraphmodule_GraphObject * self,
-                                         PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] = { "ignore_loops", NULL };
-  igraph_real_t result;
-  PyObject *ignore_loops = Py_True;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &ignore_loops))
-    return NULL;
-
-  if (igraph_reciprocity(&self->g, &result, PyObject_IsTrue(ignore_loops))) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  return Py_BuildValue("d", (double)result);
-}
-
-/** \ingroup python_interface_graph
- * \brief Calculates the graph density
- * \return the density
- * \sa igraph_density
- */
-PyObject *igraphmodule_Graph_density(igraphmodule_GraphObject * self,
-                                     PyObject * args, PyObject * kwds)
-{
-  char *kwlist[] = { "loops", NULL };
-  igraph_real_t result;
-  PyObject *loops = Py_False;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &loops))
-    return NULL;
-
-  if (igraph_density(&self->g, &result, PyObject_IsTrue(loops))) {
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  return Py_BuildValue("d", (double)result);
-}
+/**********************************************************************
+ * Graph layout algorithms                                            *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Places the vertices of a graph uniformly on a circle.
@@ -5009,6 +5037,10 @@ PyObject *igraphmodule_Graph_layout_reingold_tilford_circular(
   return (PyObject *) result;
 }
 
+/**********************************************************************
+ * Conversion between various graph representations                   *
+ **********************************************************************/
+
 /** \ingroup python_interface_graph
  * \brief Returns the adjacency matrix of a graph.
  * \return the adjacency matrix as a Python list of lists
@@ -5169,6 +5201,10 @@ PyObject *igraphmodule_Graph_to_directed(igraphmodule_GraphObject * self,
   }
   Py_RETURN_NONE;
 }
+
+/**********************************************************************
+ * Reading/writing foreing graph formats                              *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Reads a DIMACS file and creates a graph from it.
@@ -5797,6 +5833,10 @@ PyObject *igraphmodule_Graph_write_graphml(igraphmodule_GraphObject * self,
   Py_RETURN_NONE;
 }
 
+/**********************************************************************
+ * Routines related to graph isomorphism                              *
+ **********************************************************************/
+
 /** \ingroup python_interface_graph
  * \brief Calculates the isomorphy class of a graph or its subgraph
  * \sa igraph_isoclass, igraph_isoclass_subgraph
@@ -6213,6 +6253,10 @@ PyObject *igraphmodule_Graph_get_subisomorphisms_vf2(igraphmodule_GraphObject *s
   return res;
 }
 
+/**********************************************************************
+ * Graph attribute handling                                           *
+ **********************************************************************/
+
 /** \ingroup python_interface_graph
  * \brief Returns the number of graph attributes
  */
@@ -6286,6 +6330,10 @@ PyObject *igraphmodule_Graph_edge_attributes(igraphmodule_GraphObject * self)
 {
   return PyDict_Keys(((PyObject **) self->g.attr)[ATTRHASH_IDX_EDGE]);
 }
+
+/**********************************************************************
+ * Graph operations (union, intersection etc)                         *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Creates the disjoint union of two graphs (operator version)
@@ -6616,6 +6664,10 @@ PyObject *igraphmodule_Graph_compose(igraphmodule_GraphObject * self,
   return (PyObject *) result;
 }
 
+/**********************************************************************
+ * Graph traversal algorithms                                         *
+ **********************************************************************/
+
 /** \ingroup python_interface_graph
  * \brief Conducts a breadth first search (BFS) on the graph
  */
@@ -6678,6 +6730,10 @@ PyObject *igraphmodule_Graph_bfsiter(igraphmodule_GraphObject * self,
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
   return igraphmodule_BFSIter_new(self, root, mode, PyObject_IsTrue(adv));
 }
+
+/**********************************************************************
+ * Maximum flows and minimum cuts                                     *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Calculates the value of the maximum flow in the graph
@@ -6867,7 +6923,9 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
 }
 
 
-/* {{{ CLIQUES AND INDEPENDENT SETS */
+/**********************************************************************
+ * Cliques and independent sets                                       *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Find all or some cliques in a graph
@@ -7183,9 +7241,9 @@ PyObject *igraphmodule_Graph_independence_number(igraphmodule_GraphObject *
   return result;
 }
 
-/* }}} */
-
-/* {{{ K-CORES */
+/**********************************************************************
+ * K-core decomposition                                               *
+ **********************************************************************/
 
 /** \ingroup python_interface_graph
  * \brief Returns the corenesses of the graph vertices
@@ -7218,9 +7276,9 @@ PyObject *igraphmodule_Graph_coreness(igraphmodule_GraphObject * self,
   return o;
 }
 
-/* }}} */
-
-/* {{{ COMMUNITY STRUCTURE */
+/**********************************************************************
+ * Community structure detection and related routines                 *
+ **********************************************************************/
 
 /**
  * Modularity calculation
@@ -7527,9 +7585,9 @@ PyObject *igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject * self,
 
 /* }}} */
 
-/* {{{ SPECIAL METHODS */
-
-/* }}} */
+/**********************************************************************
+ * Special internal methods that you won't need to mess around with   *
+ **********************************************************************/
 
 /** \defgroup python_interface_internal Internal functions
  * \ingroup python_interface */
