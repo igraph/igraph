@@ -90,6 +90,7 @@
 
 <section><title>Spectral properties</title>
 <!-- doxrox-include igraph_laplacian -->
+<!-- doxrox-include igraph_laplacian_graph -->
 </section>
 
 <section><title>Non-simple graphs: multiple and loop edges</title>

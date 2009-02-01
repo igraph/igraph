@@ -185,6 +185,14 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  * -1/sqrt(d[i]d[j]) if there is an edge from i to j.
  * 
  * </para><para>
+ * If the graph is weighted (i.e. the \p weights argument is not a
+ * null pointer), then all weights must be non-negative.
+ * 
+ * </para><para>
+ * The function is supposed to work with non-simple graphs, although
+ * this is not extensively tested.
+ *
+ * </para><para>
  * The first version of this function was written by Vincent Matossian.
  * \param graph Pointer to the graph to convert.
  * \param res Pointer to an initialized matrix object, it will be
@@ -198,6 +206,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  * Time complexity: O(|V||V|),
  * |V| is the 
  * number of vertices in the graph.
+ * 
+ * \sa \ref igraph_laplacian_graph(), which does the same calculation,
+ * but returns the result in an igraph graph, so it might be more
+ * suitable for large (and sparse) graphs.
  */
 
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
@@ -299,6 +311,44 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   return 0;
 }
 
+/**
+ * \function igraph_laplacian_graph
+ * Calculate graph Laplacian and store it in an igraph graph
+ * 
+ * See \ref igraph_laplacian() for more information about the graph
+ * Laplacian. 
+ * 
+ * </para><para> 
+ * Note that the current implementation does not work properly for
+ * non-simple graphs, but the function does not check the input graph
+ * in this respect.
+ * 
+ * </para><para>
+ * Just like in the case of \ref igraph_laplacian(), negative weights
+ * are not allowed if the graph is weighted.
+ * 
+ * \param graph The input graph. A warning is given if it is directed,
+ *    since there is no widely accepted definition for the Laplacian
+ *    of a directed graph.
+ * \param res Pointer to an uninitialized graph object, the result
+ *    graph will be created here.
+ * \param normalized Logical, whether to calculate normalized
+ *    Laplacian.
+ * \param weights An optional weight vector for weighted graphs, or a
+ *    null pointer if the graph is not weighted. Note that all weights
+ *    must be non-negative.
+ * \param out_weights Pointer to an initialized vector, the weights of
+ *    the Laplacian graph are store here. It will be resized as
+ *    needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices plus
+ * edges.
+ * 
+ * \sa \ref igraph_laplacian(), that performs the same calculation,
+ * but returns the result in a matrix.
+ */
+
 int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 			   igraph_bool_t normalized, 
 			   const igraph_vector_t *weights, 
@@ -315,16 +365,134 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
   IGRAPH_CHECK(igraph_get_edgelist(graph, &el, /*byrow=*/ 0));
   
   if (weights) {
-    /* TODO */
+    /* Weighted */
+    
+    if (igraph_vector_size(weights) != no_of_edges) {
+      IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(),
+				 IGRAPH_OUT, IGRAPH_NO_LOOPS, weights));
+    
+    if (directed) {
+
+      /* Weighted, directed */
+
+      IGRAPH_WARNING("Laplacian of a directed graph");
+
+      if (!normalized) {
+	
+	/* Weighted, directed, not normalized */
+	
+	IGRAPH_CHECK(igraph_vector_resize(out_weights, no_of_edges+no_of_nodes));
+	for (i=0; i<no_of_edges; i++) {
+	  igraph_real_t weight=VECTOR(*weights)[i];
+	  if (weight < 0) { 
+	    IGRAPH_ERROR("Negative weights are not allowed for calculating "
+			 "the graph Laplacian", IGRAPH_EINVAL);
+	  }
+	  VECTOR(*out_weights)[i] = -weight;
+	}
+	for (i=0; i<no_of_nodes; i++) {
+	  igraph_vector_push_back(&el, i);
+	  igraph_vector_push_back(&el, i);
+	  VECTOR(*out_weights)[no_of_edges+i] = VECTOR(degree)[i];
+	}
+	
+      } else {
+
+	/* Weighted, directed, normalized */
+
+	IGRAPH_CHECK(igraph_vector_reserve(out_weights, no_of_edges+no_of_nodes));
+	igraph_vector_resize(out_weights, no_of_edges);
+	for (i=0; i<no_of_edges; i++) {
+	  long int from=VECTOR(el)[2*i];
+	  long int to=VECTOR(el)[2*i+1];
+	  igraph_real_t weight=VECTOR(*weights)[i];
+	  if (weight < 0) { 
+	    IGRAPH_ERROR("Negative weights are not allowed for calculating "
+			 "the graph Laplacian", IGRAPH_EINVAL);
+	  }
+	  VECTOR(*out_weights)[i] = -weight/sqrt(VECTOR(degree)[from]);
+	}
+	for (i=0; i<no_of_nodes; i++) {
+	  if (VECTOR(degree)[i] != 0) {
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(out_weights, 1.0);
+	  }
+	}
+
+      }
+
+    } else {
+
+      /* Weighted, undirected */
+
+      if (!normalized) {
+	
+	/* Weighted, undirected, not normalized */
+	
+	IGRAPH_CHECK(igraph_vector_resize(out_weights, no_of_edges+no_of_nodes));
+	for (i=0; i<no_of_edges; i++) {
+	  igraph_real_t weight=VECTOR(*weights)[i];
+	  if (weight < 0) { 
+	    IGRAPH_ERROR("Negative weights are not allowed for calculating "
+			 "the graph Laplacian", IGRAPH_EINVAL);
+	  }
+	  VECTOR(*out_weights)[i] = -weight;
+	}
+	for (i=0; i<no_of_nodes; i++) {
+	  igraph_vector_push_back(&el, i);
+	  igraph_vector_push_back(&el, i);
+	  VECTOR(*out_weights)[no_of_edges+i] = VECTOR(degree)[i];
+	}
+	
+      } else {
+
+	/* Weighted, undirected, normalized */
+	
+	IGRAPH_CHECK(igraph_vector_reserve(out_weights, no_of_edges+no_of_nodes));
+	igraph_vector_resize(out_weights, no_of_edges);
+	for (i=0; i<no_of_edges; i++) {
+	  long int from=VECTOR(el)[2*i];
+	  long int to=VECTOR(el)[2*i+1];
+	  igraph_real_t weight=VECTOR(*weights)[i];
+	  if (weight < 0) { 
+	    IGRAPH_ERROR("Negative weights are not allowed for calculating "
+			 "the graph Laplacian", IGRAPH_EINVAL);
+	  }
+	  VECTOR(*out_weights)[i] = 
+	    -weight/sqrt(VECTOR(degree)[from] * VECTOR(degree)[to]);
+	}
+	for (i=0; i<no_of_nodes; i++) {
+	  if (VECTOR(degree)[i] != 0) {
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(&el, i);
+	    igraph_vector_push_back(out_weights, 1.0);
+	  }
+	}
+      }
+    }
+    
   } else {
+
+    /* Not weighted */
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
 			       IGRAPH_OUT, IGRAPH_NO_LOOPS));
 
     if (directed) {
+      
+      /* Not weighted, directed */
+      
       IGRAPH_WARNING("Computing Laplacian of a directed graph");
       if (!normalized) {
+
+	/* Not weighted, directed, not normalized */
+      
 	IGRAPH_CHECK(igraph_vector_resize(out_weights, no_of_edges+no_of_nodes));
 	igraph_vector_fill(out_weights, -1.0);
 	for (i=0; i<no_of_nodes; i++) {
@@ -333,6 +501,9 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 	  VECTOR(*out_weights)[no_of_edges+i] = VECTOR(degree)[i];
 	}
       } else {
+
+	/* Not weighted, directed, normalized */
+
 	IGRAPH_CHECK(igraph_vector_reserve(out_weights, no_of_edges+no_of_nodes));
 	igraph_vector_resize(out_weights, no_of_edges);
 	for (i=0; i<no_of_edges; i++) {
@@ -348,7 +519,13 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 	}
       }
     } else {
+
+      /* Not weighted, undirected */
+
       if (!normalized) {
+
+	/* Not weighted, undirected, not normalized */
+
 	IGRAPH_CHECK(igraph_vector_resize(out_weights, no_of_edges+no_of_nodes));
 	igraph_vector_fill(out_weights, -1.0);
 	for (i=0; i<no_of_nodes; i++) {
@@ -357,6 +534,9 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 	  VECTOR(*out_weights)[no_of_edges+i] = VECTOR(degree)[i];
 	}
       } else {	
+
+	/* Not weighted, undirected, normalized */
+
 	IGRAPH_CHECK(igraph_vector_reserve(out_weights, no_of_edges+no_of_nodes));
 	igraph_vector_resize(out_weights, no_of_edges);
 	for (i=0; i<no_of_edges; i++) {
