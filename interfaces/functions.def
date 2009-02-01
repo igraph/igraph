@@ -602,12 +602,13 @@ igraph_is_bipartite:
 
 igraph_laplacian:
         PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN normalized=False, \
-                EDGEWEIGHTS weights=NULL
+                LAPLACIAN_DIR dir=ROW, EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
 
 igraph_laplacian_graph:
         PARAMS: GRAPH graph, OUT GRAPH res, BOOLEAN normalized=False, \
-                EDGEWEIGHTS weights=NULL, OUT EDGEWEIGHTS out_weights
+                LAPLACIAN_DIR dir=ROW, EDGEWEIGHTS weights=NULL, \
+                OUT EDGEWEIGHTS out_weights
         DEPS: weights ON graph, out_weights ON res
 
 #######################################

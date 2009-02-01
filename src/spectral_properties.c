@@ -28,6 +28,7 @@
 
 int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 				igraph_bool_t normalized, 
+				igraph_laplacian_direction_t dir,
 				const igraph_vector_t *weights) {
   
   igraph_eit_t edgeit;
@@ -52,6 +53,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   if (directed) {
     IGRAPH_WARNING("Computing (weighted) Laplacian of a directed graph");
 
+    if (dir != IGRAPH_LAPLACIAN_ROW && dir != IGRAPH_LAPLACIAN_COL) {
+      IGRAPH_ERROR("Invalid direction for Laplacian", IGRAPH_EINVAL);
+    }    
+
     if (!normalized) {
 
       while (!IGRAPH_EIT_END(edgeit)) {
@@ -64,8 +69,9 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 		       "graph Laplacian", IGRAPH_EINVAL);
 	}
 	if (from != to) {
+	  long int wh= dir==IGRAPH_LAPLACIAN_ROW ? from : to;
 	  MATRIX(*res, from, to) -= weight;
-	  VECTOR(degree)[from] += weight;
+	  VECTOR(degree)[wh] += weight;
 	}
 	IGRAPH_EIT_NEXT(edgeit);
       }
@@ -87,7 +93,8 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 		       "graph Laplacian", IGRAPH_EINVAL);
 	}
 	if (from != to) {
-	  VECTOR(degree)[from] += weight;
+	  long int wh= dir==IGRAPH_LAPLACIAN_ROW ? from : to;
+	  VECTOR(degree)[wh] += weight;
 	}
 	IGRAPH_EIT_NEXT(edgeit);
       }
@@ -102,9 +109,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	long int from=IGRAPH_FROM(graph, edge);
 	long int to  =IGRAPH_TO  (graph, edge);
 	igraph_real_t weight=VECTOR(*weights)[edge];
+	long int wh= dir==IGRAPH_LAPLACIAN_ROW ? from : to;
 	if (from != to) {
 	  MATRIX(*res, from, to) = 
-	    -weight / sqrt(VECTOR(degree)[from]);
+	    -weight / sqrt(VECTOR(degree)[wh]);
 	}
 	IGRAPH_EIT_NEXT(edgeit);
       }
@@ -214,6 +222,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  * \param res Pointer to an initialized matrix object, it will be
  *        resized if needed.
  * \param normalized Whether to create a normalized Laplacian matrix.
+ * \param dir Constant, it gives whether to use out degree/strength
+ *        (\c IGRAPH_LAPLACIAN_ROW) or in degree/strength (\c
+ *        IGRAPH_LAPLACIAN_COL) when calculating the Laplacian of a
+ *        directed graph. It is ignored for undirected graphs.
  * \param weights An optional vector containing edge weights, to calculate 
  *        the weighted Laplacian matrix. Set it to a null pointer to 
  *        calculate the unweighted Laplacian.
@@ -230,18 +242,19 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
 int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 		     igraph_bool_t normalized, 
+		     igraph_laplacian_direction_t dir,
 		     const igraph_vector_t *weights) {
   
   igraph_eit_t edgeit;
   long int no_of_nodes=igraph_vcount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
-  long int from, to;
+  long int from, to, wh;
   igraph_integer_t ffrom, fto;
   igraph_vector_t degree;  
   int i;
 
   if (weights) { 
-    return igraph_i_weighted_laplacian(graph, res, normalized, weights);
+    return igraph_i_weighted_laplacian(graph, res, normalized, dir, weights);
   }
 
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
@@ -251,11 +264,19 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
   
-  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
-			     IGRAPH_OUT, IGRAPH_NO_LOOPS));
-  
   if(directed){
+    igraph_neimode_t mode;
+
     IGRAPH_WARNING("Computing Laplacian of a directed graph");
+    
+    if (dir != IGRAPH_LAPLACIAN_ROW && dir != IGRAPH_LAPLACIAN_COL) {
+      IGRAPH_ERROR("Invalid direction for Laplacian", IGRAPH_EINVAL);
+    }
+    
+    mode = dir == IGRAPH_LAPLACIAN_ROW ? IGRAPH_OUT : IGRAPH_IN;
+
+    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+			       mode, IGRAPH_NO_LOOPS));
   
     if (!normalized) {
       for(i=0;i<no_of_nodes;i++)
@@ -279,8 +300,9 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
 	from=ffrom; to=fto;
 	if (from != to) {
+	  wh= dir == IGRAPH_LAPLACIAN_ROW ? from : to;
 	  MATRIX(*res, from, to) = 
-	    -1.0 / sqrt(VECTOR(degree)[from]);
+	    -1.0 / sqrt(VECTOR(degree)[wh]);
 	}
 	IGRAPH_EIT_NEXT(edgeit);
       }
@@ -288,6 +310,9 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
   } else {
 
+    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+			       IGRAPH_OUT, IGRAPH_NO_LOOPS));
+  
     if (!normalized) {
       for(i=0;i<no_of_nodes;i++) {
 	MATRIX(*res, i, i) = VECTOR(degree)[i];
@@ -350,6 +375,10 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
  *    graph will be created here.
  * \param normalized Logical, whether to calculate normalized
  *    Laplacian.
+ * \param dir Constant, it gives whether to use out degree/strength
+ *        (\c IGRAPH_LAPLACIAN_ROW) or in degree/strength (\c
+ *        IGRAPH_LAPLACIAN_COL) when calculating the Laplacian of a
+ *        directed graph. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted graphs, or a
  *    null pointer if the graph is not weighted. Note that all weights
  *    must be non-negative.
@@ -367,6 +396,7 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
 int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 			   igraph_bool_t normalized, 
+			   igraph_laplacian_direction_t dir,
 			   const igraph_vector_t *weights, 
 			   igraph_vector_t *out_weights) {
   
@@ -388,15 +418,23 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(),
-				 IGRAPH_OUT, IGRAPH_NO_LOOPS, weights));
     
     if (directed) {
 
       /* Weighted, directed */
-
+      
+      igraph_neimode_t mode;
       IGRAPH_WARNING("Laplacian of a directed graph");
 
+      if (dir != IGRAPH_LAPLACIAN_ROW && dir != IGRAPH_LAPLACIAN_COL) {
+	IGRAPH_ERROR("Invalid direction for Laplacian", IGRAPH_EINVAL);
+      }
+      
+      mode = dir == IGRAPH_LAPLACIAN_ROW ? IGRAPH_OUT : IGRAPH_IN;
+
+      IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(),
+				   mode, IGRAPH_NO_LOOPS, weights));
+      
       if (!normalized) {
 	
 	/* Weighted, directed, not normalized */
@@ -426,11 +464,12 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 	  long int from=VECTOR(el)[2*i];
 	  long int to=VECTOR(el)[2*i+1];
 	  igraph_real_t weight=VECTOR(*weights)[i];
+	  long int wh= dir==IGRAPH_LAPLACIAN_ROW ? from : to;
 	  if (weight < 0) { 
 	    IGRAPH_ERROR("Negative weights are not allowed for calculating "
 			 "the graph Laplacian", IGRAPH_EINVAL);
 	  }
-	  VECTOR(*out_weights)[i] = -weight/sqrt(VECTOR(degree)[from]);
+	  VECTOR(*out_weights)[i] = -weight/sqrt(VECTOR(degree)[wh]);
 	}
 	for (i=0; i<no_of_nodes; i++) {
 	  if (VECTOR(degree)[i] != 0) {
@@ -445,6 +484,9 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
     } else {
 
       /* Weighted, undirected */
+
+      IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(),
+				   IGRAPH_OUT, IGRAPH_NO_LOOPS, weights));
 
       if (!normalized) {
 	
@@ -497,14 +539,20 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
     /* Not weighted */
 
     IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
-			       IGRAPH_OUT, IGRAPH_NO_LOOPS));
 
     if (directed) {
       
       /* Not weighted, directed */
       
+      igraph_neimode_t mode;
       IGRAPH_WARNING("Computing Laplacian of a directed graph");
+      if (dir != IGRAPH_LAPLACIAN_ROW && dir != IGRAPH_LAPLACIAN_COL) {
+	IGRAPH_ERROR("Invalid direction for Laplacian", IGRAPH_EINVAL);
+      }
+      mode = dir == IGRAPH_LAPLACIAN_ROW ? IGRAPH_OUT : IGRAPH_IN;
+      IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+				 mode, IGRAPH_NO_LOOPS));
+
       if (!normalized) {
 
 	/* Not weighted, directed, not normalized */
@@ -523,8 +571,9 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 	IGRAPH_CHECK(igraph_vector_reserve(out_weights, no_of_edges+no_of_nodes));
 	igraph_vector_resize(out_weights, no_of_edges);
 	for (i=0; i<no_of_edges; i++) {
-	  long int from=VECTOR(el)[2*i];
-	  VECTOR(*out_weights)[i] = -1.0/sqrt(VECTOR(degree)[from]);
+	  long int idx= dir==IGRAPH_LAPLACIAN_ROW ? 2*i : 2*i+1;
+	  long int wh=VECTOR(el)[idx];
+	  VECTOR(*out_weights)[i] = -1.0/sqrt(VECTOR(degree)[wh]);
 	}
 	for (i=0; i<no_of_nodes; i++) {
 	  if (VECTOR(degree)[i] != 0) {
@@ -537,6 +586,9 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
     } else {
 
       /* Not weighted, undirected */
+
+      IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
+				 IGRAPH_OUT, IGRAPH_NO_LOOPS));
 
       if (!normalized) {
 

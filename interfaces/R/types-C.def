@@ -145,6 +145,11 @@ SCG_NORM:
   INCONV:
     IN: %C%=REAL(%I%)[0];
 
+LAPLACIAN_DIR:
+  CTYPE: igraph_laplacian_direction_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
 ##################################
 # VECTOR of real values
 
