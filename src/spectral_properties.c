@@ -634,3 +634,87 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 	
   return 0;
 }
+
+/**
+ * \function igraph_stochastic_graph
+ * Stochastic matrix of a graph, in the form of another graph
+ * 
+ * This function calculates the stochastic matrix of a graph,
+ * but instead of returing it as a matrix it creates another graph
+ * with the appropriate weights, that corresponds to the stochastic
+ * matrix.
+ *
+ * </para><para>
+ * The stochastic matrix of a graph is a row-wise or column-wise
+ * normalized adjacency matrix, i.e. the sum each row or column of it
+ * is one.
+ * 
+ * \param graph The input graph, it can be directed or undirected.
+ * \param res Pointer to an uninitialized graph, the result is stored
+ *   here.
+ * \param dir Whether to normalize rows (\c IGRAPH_STOCHASTIC_ROW) or
+ *   columns (\c IGRAPH_STOCHASTIC_COL) in the matrix. For undirected
+ *   graphs the two give the same result, since the adjacency matrix
+ *   is symmetric in this case.
+ * \param weights Optionally a vector with the edge weights, or a null
+ *   pointer if the graph is not weighted.
+ * \param out_weights Pointer to an initialized vector, the edge
+ *   weights of the result matrix are stored here. It will be resized
+ *   as needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ * 
+ */
+
+int igraph_stochastic_graph(const igraph_t *graph, igraph_t *res,
+			    igraph_stochastic_direction_t dir, 
+			    const igraph_vector_t *weights,
+			    igraph_vector_t *out_weights) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_bool_t directed=igraph_is_directed(graph);
+  igraph_vector_t degree;
+  igraph_neimode_t mode;
+  long int i;
+  
+  IGRAPH_CHECK(igraph_copy(res, graph));
+  IGRAPH_FINALLY(igraph_destroy, res);
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+  
+  if (!directed) {
+    mode=IGRAPH_OUT;
+  } else {
+    if (dir != IGRAPH_STOCHASTIC_ROW && dir != IGRAPH_STOCHASTIC_COL) {
+      IGRAPH_ERROR("Invalid value for direction while createing "
+		   "stochastic graph", IGRAPH_EINVAL);
+    }
+    mode=dir==IGRAPH_STOCHASTIC_ROW ? IGRAPH_OUT : IGRAPH_IN;
+  }
+  
+  if (weights) {
+    IGRAPH_CHECK(igraph_strength(graph, &degree, igraph_vss_all(),
+				 mode, IGRAPH_LOOPS, weights));
+  } else {
+    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+			       mode, IGRAPH_LOOPS));
+  }
+  
+  IGRAPH_CHECK(igraph_vector_resize(out_weights, no_of_edges));
+  
+  for(i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    long int wh= dir == IGRAPH_STOCHASTIC_ROW ? from : to;
+    igraph_real_t weight = weights ? VECTOR(*weights)[i] : 1.0;
+    VECTOR(*out_weights)[i] = weight / VECTOR(degree)[wh];
+  }
+  
+  igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}

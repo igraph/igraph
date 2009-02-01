@@ -173,6 +173,9 @@ typedef enum { IGRAPH_SCG_DIR_DEFAULT=0,
 typedef enum { IGRAPH_LAPLACIAN_ROW=0,
 	       IGRAPH_LAPLACIAN_COL } igraph_laplacian_direction_t;
 
+typedef enum { IGRAPH_STOCHASTIC_ROW=0, 
+	       IGRAPH_STOCHASTIC_COL } igraph_stochastic_direction_t;
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);
@@ -949,6 +952,11 @@ int igraph_laplacian_graph(const igraph_t *graph, igraph_t *res,
 			   igraph_laplacian_direction_t dir,
 			   const igraph_vector_t *weights, 
 			   igraph_vector_t *out_weights);
+
+int igraph_stochastic_graph(const igraph_t *graph, igraph_t *res,
+			    igraph_stochastic_direction_t dir, 
+			    const igraph_vector_t *weights,
+			    igraph_vector_t *out_weights);
 
 /* -------------------------------------------------- */
 /* Components                                         */

@@ -150,6 +150,11 @@ LAPLACIAN_DIR:
   INCONV:
     IN: %C%=REAL(%I%)[0];
 
+STOCHASTIC_DIR:
+  CTYPE: igraph_stochastic_direction_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
 ##################################
 # VECTOR of real values
 

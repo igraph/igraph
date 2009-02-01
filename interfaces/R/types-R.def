@@ -71,6 +71,11 @@ LAPLACIAN_DIR:
     DEFAULT: 
       ROW: c("row", "col")
 
+STOCHASTIC_DIR:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "row"=0, "col"=1)
+    DEFAULT: 
+      ROW: c("row", "col")
+
 CONNECTEDNESS:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "weak"=1, "strong"=2)
     DEFAULT:
