@@ -1,5 +1,8 @@
 2009-02-01  Gabor Csardi  <csardi@szaffi>
 
+	* src/spectral_properties.c (igraph_laplacian) : check for
+	negative weights
+
 	* src/spectral_properties.c (igraph_laplacian_graph) : added all
 	missing versions and C docs
 

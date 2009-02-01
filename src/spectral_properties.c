@@ -59,6 +59,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	long int from=IGRAPH_FROM(graph, edge);
 	long int to  =IGRAPH_TO  (graph, edge);
 	igraph_real_t weight=VECTOR(*weights)[edge];
+	if (weight < 0) { 
+	  IGRAPH_ERROR("Negative weights are not allowed when calculating "
+		       "graph Laplacian", IGRAPH_EINVAL);
+	}
 	if (from != to) {
 	  MATRIX(*res, from, to) -= weight;
 	  VECTOR(degree)[from] += weight;
@@ -78,6 +82,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	long int from=IGRAPH_FROM(graph, edge);
 	long int to  =IGRAPH_TO  (graph, edge);
 	igraph_real_t weight=VECTOR(*weights)[edge];
+	if (weight < 0) { 
+	  IGRAPH_ERROR("Negative weights are not allowed when calculating "
+		       "graph Laplacian", IGRAPH_EINVAL);
+	}
 	if (from != to) {
 	  VECTOR(degree)[from] += weight;
 	}
@@ -112,6 +120,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	long int from=IGRAPH_FROM(graph, edge);
 	long int to  =IGRAPH_TO  (graph, edge);
 	igraph_real_t weight=VECTOR(*weights)[edge];
+	if (weight < 0) { 
+	  IGRAPH_ERROR("Negative weights are not allowed when calculating "
+		       "graph Laplacian", IGRAPH_EINVAL);
+	}
 	if (from != to) {
 	  MATRIX(*res, from, to) -= weight;
 	  MATRIX(*res, to, from) -= weight;
@@ -133,6 +145,10 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 	long int from=IGRAPH_FROM(graph, edge);
 	long int to  =IGRAPH_TO  (graph, edge);
 	igraph_real_t weight=VECTOR(*weights)[edge];
+	if (weight < 0) { 
+	  IGRAPH_ERROR("Negative weights are not allowed when calculating "
+		       "graph Laplacian", IGRAPH_EINVAL);
+	}
 	if (from != to) {
 	  VECTOR(degree)[from] += weight;
 	  VECTOR(degree)[to] += weight;
