@@ -368,7 +368,7 @@ igraph_pagerank_old:
 
 igraph_pagerank:
         PARAMS: GRAPH graph, OUT VECTOR vector, OUT REALPTR value, \
-                VERTEXSET vids=ALL, BOOLEAN directed=False, REAL damping=0.85, \
+                VERTEXSET vids=ALL, BOOLEAN directed=True, REAL damping=0.85, \
                 EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         DEPS: vids ON graph, weights ON graph
