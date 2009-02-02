@@ -25,7 +25,9 @@ power.law.fit(x, xmin = NULL, start = 2, \dots)
   The additional arguments are passed to the mle function, so it is
   possible to change the optimization method and/or its parameters.
 }
-\value{A numeric constant giving the power-law exponent.}
+\value{An object with class \sQuote{\code{mle}}. It can be used to
+  calculate confidence intervals and log-likelihood. See
+  \code{\link{mle-class}} for details.}
 \references{Power laws, Pareto distributions and Zipf's law,
   M. E. J. Newman, \emph{Contemporary Physics}, in press.}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
