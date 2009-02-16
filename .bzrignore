@@ -78,3 +78,6 @@
 ./tests/testsuite.log
 interfaces/python/doc/build/doctrees
 interfaces/python/doc/build/html
+interfaces/python/build
+interfaces/python/dist
+interfaces/python/python_igraph.egg-info
