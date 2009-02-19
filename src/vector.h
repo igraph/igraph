@@ -117,6 +117,7 @@ int FUNCTION(igraph_vector,swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v
 int FUNCTION(igraph_vector,swap_elements)(TYPE(igraph_vector) *v,
 					  long int i, long int j);
 int FUNCTION(igraph_vector,reverse)(TYPE(igraph_vector) *v);
+int FUNCTION(igraph_vector,shuffle)(TYPE(igraph_vector) *v);
 
 /*-----------------------*/
 /* Vector operations     */

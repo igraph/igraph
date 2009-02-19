@@ -23,6 +23,7 @@
 
 #include "memory.h"
 #include "error.h"
+#include "random.h"
 
 #include <assert.h>
 #include <string.h> 		/* memcpy & co. */
@@ -1680,6 +1681,43 @@ int FUNCTION(igraph_vector,reverse)(TYPE(igraph_vector) *v) {
 }
 
 /**
+ * \ingroup vector
+ * \function igraph_vector_shuffle
+ * \brief Shuffles a vector in-place using the Fisher-Yates method
+ * 
+ * </para><para>
+ * The Fisher-Yates shuffle ensures that every implementation is
+ * equally probable when using a proper randomness source. Of course
+ * this does not apply to pseudo-random generators as the cycle of
+ * these generators is less than the number of possible permutations
+ * of the vector if the vector is long enough.
+ * \param v The vector object.
+ * \return Error code, currently always \c IGRAPH_SUCCESS.
+ *
+ * Time complexity: O(n),
+ * n is the number of elements in the
+ * vector. 
+ */
+
+int FUNCTION(igraph_vector,shuffle)(TYPE(igraph_vector) *v) {
+  long int n = FUNCTION(igraph_vector,size)(v);
+  long int k;
+  BASE dummy;
+
+  RNG_BEGIN();
+  while (n > 1) {
+    k = RNG_INTEGER(0, n-1);
+    n--;
+    dummy = VECTOR(*v)[n];
+    VECTOR(*v)[n] = VECTOR(*v)[k];
+    VECTOR(*v)[k] = dummy;
+  }
+  RNG_END();
+
+  return IGRAPH_SUCCESS;
+}
+
+/**
  * \function igraph_vector_add
  * \brief Add two vectors.
  * 
@@ -1939,3 +1977,4 @@ int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
 
   return 0;
 }
+

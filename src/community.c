@@ -1,4 +1,5 @@
 /* -*- mode: C -*-  */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /* 
    IGraph library.
    Copyright (C) 2007  Gabor Csardi <csardi@rmki.kfki.hu>
@@ -1598,5 +1599,230 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
   return 0;  
 }
 
-  
-				      
+/**
+ * \function igraph_community_label_propagation
+ * \ingroup communities
+ * \brief Community detection based on label propagation
+ *
+ * This function implements the community detection method described in:
+ * Raghavan, U.N. and Albert, R. and Kumara, S.: Near linear time algorithm
+ * to detect community structures in large-scale networks. Phys Rev E
+ * 76, 036106. (2007). This version extends the original method by
+ * the ability to take edge weights into consideration and also
+ * by allowing some labels to be fixed.
+ * 
+ * \param graph The input graph, should be undirected to make sense.
+ * \param membership The membership vector, the result is returned here.
+ *    For each vertex it gives the ID of its community (label).
+ * \param weights The weight vector, it should contain a positive
+ *    weight for all the edges.
+ * \param initial The initial state. If NULL, every vertex will have
+ *   a different label at the beginning. Otherwise it must be a vector
+ *   with an entry for each vertex. Non-negative values denote different
+ *   labels, negative entries denote vertices without labels.
+ * \param fixed Boolean vector denoting which labels are fixed. Of course
+ *   this makes sense only if you provided an initial state, otherwise
+ *   this element will be ignored. Also note that vertices without labels
+ *   cannot be fixed.
+ * \return Error code.
+ * 
+ * Time complexity: O(m+n)
+ */
+int igraph_community_label_propagation(const igraph_t *graph,
+                                       igraph_vector_t *membership,
+                                       const igraph_vector_t *weights,
+                                       const igraph_vector_t *initial,
+                                       igraph_vector_bool_t *fixed) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int no_of_not_fixed_nodes=no_of_nodes;
+  long int i, j, k;
+  igraph_adjlist_t al;
+  igraph_adjedgelist_t ael;
+  igraph_bool_t running = 1;
+
+  igraph_vector_t label_counters, dominant_labels, node_order;
+
+  /* The implementation uses a trick to avoid negative array indexing:
+   * elements of the membership vector are increased by 1 at the start
+   * of the algorithm; this to allow us to denote unlabeled vertices
+   * (if any) by zeroes. The membership vector is shifted back in the end
+   */
+
+  /* Do some initial checks */
+  if (fixed && igraph_vector_bool_size(fixed) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid fixed labeling vector length", IGRAPH_EINVAL);
+  }
+  if (weights) {
+    if (igraph_vector_size(weights) != no_of_edges) {
+      IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+    } else if (igraph_vector_min(weights) < 0) {
+      IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
+    }
+  }
+  if (fixed && !initial) {
+    IGRAPH_WARNING("Ignoring fixed vertices as no initial labeling given");
+  }
+
+  IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+
+  if (initial) {
+    if (igraph_vector_size(initial) != no_of_nodes) {
+      IGRAPH_ERROR("Invalid initial labeling vector length", IGRAPH_EINVAL);
+    }
+    /* Check if the labels used are valid, initialize membership vector */
+    for (i=0; i<no_of_nodes; i++) {
+      if (VECTOR(*initial)[i] < -1) {
+        VECTOR(*membership)[i] = 0;
+      } else {
+        VECTOR(*membership)[i] = VECTOR(*initial)[i] + 1;
+      }
+      if (VECTOR(*fixed)[i]) {
+        if (VECTOR(*membership)[i] == 0) {
+          IGRAPH_WARNING("Fixed nodes cannot be unlabeled, ignoring them");
+          VECTOR(*fixed)[i] = 0;
+        } else {
+          no_of_not_fixed_nodes--;
+        }
+      }
+    }
+    if (igraph_vector_max(membership) > no_of_nodes) {
+      IGRAPH_ERROR("elements of the initial labeling vector must be between 0 and |V|-1", IGRAPH_EINVAL);
+    }
+  } else {
+    for (i=0; i<no_of_nodes; i++) {
+      VECTOR(*membership)[i] = i;
+    }
+  }
+
+  /* Create an adjacency (edge) list representation for efficiency.
+   * For the unweighted case, the adjacency list is enough. For the
+   * weighted case, we need the adjacency edge list */
+  if (weights) {
+    IGRAPH_CHECK(igraph_adjedgelist_init(graph, &ael, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjedgelist_destroy, &ael);
+  } else {
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+  }
+
+  /* Create storage space for counting distinct labels and dominant ones */
+  IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes+1);
+  IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, 2));
+
+  RNG_BEGIN();
+
+  /* Initialize node ordering vector with only the not fixed nodes */
+  if (fixed) {
+    IGRAPH_VECTOR_INIT_FINALLY(&node_order, no_of_not_fixed_nodes);
+    for (i=0, j=0; i<no_of_nodes; i++) {
+      if (!VECTOR(*fixed)[i]) {
+        VECTOR(node_order)[j] = i;
+        j++;
+      }
+    }
+  } else {
+    IGRAPH_CHECK(igraph_vector_init_seq(&node_order, 0, no_of_nodes-1));
+    IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
+  }
+
+  running = 1;
+  while (running) {
+    long int v1, num_neis, max_count;
+    igraph_vector_t *neis;
+
+    running = 0;
+
+    /* Shuffle the node ordering vector */
+    IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+    /* In the prescribed order, loop over the vertices and reassign labels */
+    for (i=0; i<no_of_not_fixed_nodes; i++) {
+      v1 = VECTOR(node_order)[i];
+
+      /* Count the weights corresponding to different labels */
+      igraph_vector_null(&label_counters);
+      if (weights) {
+        neis = igraph_adjedgelist_get(&ael, v1);
+        num_neis = igraph_vector_size(neis);
+        for (j=0; j<num_neis; j++) {
+          k = VECTOR(*membership)[(long)IGRAPH_OTHER(graph, VECTOR(*neis)[j], v1)];
+          if (k == 0) continue;   /* skip if it has no label yet */
+          VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*neis)[j]];
+        }
+      } else {
+        neis = igraph_adjlist_get(&al, v1);
+        num_neis = igraph_vector_size(neis);
+        for (j=0; j<num_neis; j++) {
+          k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+          if (k == 0) continue;   /* skip if it has no label yet */
+          VECTOR(label_counters)[k]++;
+        }
+      }
+
+      /* Find the dominant label(s). Theoretically we could do it
+       * just by checking label_counters with igraph_vector_max,
+       * but this is faster if the current vertex has significantly
+       * less neighbours than the total number of possible labels */
+      max_count = 0;
+      for (j=0; j<num_neis; j++) {
+        k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+        if (max_count < VECTOR(label_counters)[k]) {
+          max_count = VECTOR(label_counters)[k];
+          igraph_vector_resize(&dominant_labels, 1);
+          VECTOR(dominant_labels)[0] = k;
+        } else if (max_count == VECTOR(label_counters)[k]) {
+          igraph_vector_push_back(&dominant_labels, k);
+        }
+      }
+
+      if (igraph_vector_size(&dominant_labels) > 0) {
+        /* Select randomly from the dominant labels */
+        k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels)-1); 
+        k = VECTOR(dominant_labels)[k];
+        /* Check if the _current_ label of the node is also dominant */
+        if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]]!=max_count) {
+          /* Nope, we need at least one more iteration */
+          running = 1;
+        }
+        VECTOR(*membership)[v1] = k;
+      }
+    }
+  }
+
+  RNG_END();
+
+  /* Shift back the membership vector, permute labels in increasing order */
+  /* We recycle label_counters here :) */
+  igraph_vector_fill(&label_counters, -1);
+  j = 0;
+  for (i=0; i<no_of_nodes; i++) {
+    k = (long)VECTOR(*membership)[i]-1;
+    if (k >= 0) {
+      if (VECTOR(label_counters)[k] == -1) {
+        /* We have seen this label for the first time */
+        VECTOR(label_counters)[k] = j;
+        k = j;
+        j++;
+      } else {
+        k = VECTOR(label_counters)[k];
+      }
+    } else {
+      /* This is an unlabeled vertex */
+    }
+    VECTOR(*membership)[i] = k;
+  }
+
+  if (weights)
+    igraph_adjedgelist_destroy(&ael);
+  else
+    igraph_adjlist_destroy(&al);
+
+  igraph_vector_destroy(&node_order);
+  igraph_vector_destroy(&label_counters);
+  igraph_vector_destroy(&dominant_labels);
+  IGRAPH_FINALLY_CLEAN(4);
+
+  return 0;
+}
+

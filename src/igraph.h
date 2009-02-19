@@ -1284,6 +1284,11 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
 					      igraph_real_t *eigenvalue, 
 					      igraph_arpack_options_t *options,
 					      igraph_arpack_storage_t *storage);
+int igraph_community_label_propagation(const igraph_t *graph,
+                                       igraph_vector_t *membership,
+                                       const igraph_vector_t *weights,
+                                       const igraph_vector_t *initial,
+                                       igraph_vector_bool_t *fixed);
 
 /* -------------------------------------------------- */
 /* Conversion                                         */
