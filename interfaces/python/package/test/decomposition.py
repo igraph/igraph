@@ -99,6 +99,20 @@ class CommunityTests(unittest.TestCase):
         self.failUnless(cl.membership == [0,0,0,0,0,1,1,1,1,1])
         self.assertAlmostEqual(cl.q, 0.4523, places=3)
 
+    def testLabelPropagation(self):
+        # Nothing to test there really, since the algorithm
+        # is pretty nondeterministic. We just do a quick smoke
+        # test.
+        g = Graph.GRG(100, 0.2)
+        cl = g.community_label_propagation()
+        g = Graph([(0,1),(1,2),(2,3)])
+        g.es["weight"] = [2, 1, 2]
+        g.vs["initial"] = [0, -1, -1, 1]
+        cl = g.community_label_propagation("weight", "initial", [1,0,0,1])
+        self.failUnless(cl.membership == [0, 0, 1, 1])
+        cl = g.community_label_propagation(initial="initial", fixed=[1,0,0,1])
+        self.failUnless(cl.membership == [0, 0, 1, 1] or cl.membership == [0, 0, 0, 0])
+
     def testWalktrap(self):
         g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)
         g += [(0,5), (5,10), (10, 0)]

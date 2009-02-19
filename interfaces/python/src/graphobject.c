@@ -7583,6 +7583,58 @@ PyObject *igraphmodule_Graph_community_fastgreedy(igraphmodule_GraphObject * sel
   return res;
 }
 
+/**
+ * The label propagation algorithm of Raghavan et al
+ */
+PyObject *igraphmodule_Graph_community_label_propagation(
+    igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] = { "weights", "initial", "fixed", NULL };
+  PyObject *weights_o = Py_None, *initial_o = Py_None, *fixed_o = Py_None;
+  PyObject *result;
+  igraph_vector_t membership, *ws = 0, *initial = 0;
+  igraph_vector_bool_t fixed;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist, &weights_o, &initial_o, &fixed_o)) {
+    return NULL;
+  }
+
+  if (fixed_o != Py_None) {
+    if (igraphmodule_PyObject_to_vector_bool_t(fixed_o, &fixed))
+      return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &ws, ATTRIBUTE_TYPE_EDGE)) {
+    if (fixed_o != Py_None) igraph_vector_bool_destroy(&fixed);
+    return NULL;
+  }
+
+  if (igraphmodule_attrib_to_vector_t(initial_o, self, &initial, ATTRIBUTE_TYPE_VERTEX)){
+    if (fixed_o != Py_None) igraph_vector_bool_destroy(&fixed);
+    if (ws) { igraph_vector_destroy(ws); free(ws); }
+    return NULL;
+  }
+
+  igraph_vector_init(&membership, igraph_vcount(&self->g));
+  if (igraph_community_label_propagation(&self->g, &membership,
+        ws, initial, (fixed_o != Py_None ? &fixed : 0))) {
+    if (fixed_o != Py_None) igraph_vector_bool_destroy(&fixed);
+    if (ws) { igraph_vector_destroy(ws); free(ws); }
+    if (initial) { igraph_vector_destroy(initial); free(initial); }
+    igraph_vector_destroy(&membership);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (fixed_o != Py_None) igraph_vector_bool_destroy(&fixed);
+  if (ws) { igraph_vector_destroy(ws); free(ws); }
+  if (initial) { igraph_vector_destroy(initial); free(initial); }
+
+  result=igraphmodule_vector_t_to_PyList(&membership, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&membership);
+
+  return result;
+}
+
 
 /**
  * Walktrap community detection of Latapy & Pons
@@ -10044,6 +10096,40 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@ref: A. Clauset, M. E. J. Newman and C. Moore: I{Finding community\n"
    "  structure in very large networks.} Phys Rev E 70, 066111 (2004).\n"
    "@see: modularity()\n"
+  },
+  {"community_label_propagation",
+   (PyCFunction) igraphmodule_Graph_community_label_propagation,
+   METH_VARARGS | METH_KEYWORDS,
+   "community_label_propagation(weights=None, initial=None, fixed=None)\n\n"
+   "Finds the community structure of the graph according to the label\n"
+   "propagation method of Raghavan et al.\n\n"
+   "Initially, each vertex is assigned a different label. After that,\n"
+   "each vertex chooses the dominant label in its neighbourhood in each\n"
+   "iteration. Ties are broken randomly and the order in which the\n"
+   "vertices are updated is randomized before every iteration. The algorithm\n"
+   "ends when vertices reach a consensus.\n\n"
+   "Note that since ties are broken randomly, there is no guarantee that\n"
+   "the algorithm returns the same community structure after each run.\n"
+   "In fact, they frequently differ. See the paper of Raghavan et al\n"
+   "on how to come up with an aggregated community structure.\n\n"
+   "@param weights: name of an edge attribute or a list containing\n"
+   "  edge weights\n"
+   "@param initial: name of a vertex attribute or a list containing\n"
+   "  the initial vertex labels. Labels are identified by integers from\n"
+   "  zero to M{n-1} where M{n} is the number of vertices. Negative\n"
+   "  numbers may also be present in this vector, they represent unlabeled\n"
+   "  vertices.\n"
+   "@param fixed: a list of booleans for each vertex. C{True} corresponds\n"
+   "  to vertices whose labeling should not change during the algorithm.\n"
+   "  It only makes sense if initial labels are also given. Unlabeled\n"
+   "  vertices cannot be fixed. Note that vertex attribute names are not\n"
+   "  accepted here.\n"
+   "@return: the resulting membership vector\n"
+   "\n"
+   "@newfield ref: Reference\n"
+   "@ref: Raghavan, U.N. and Albert, R. and Kumara, S. Near linear\n"
+   "  time algorithm to detect community structures in large-scale\n"
+   "  networks. Phys Rev E 76:036106, 2007. U{http://arxiv.org/abs/0709.2938}.\n"
   },
   {"community_leading_eigenvector_naive", (PyCFunction) igraphmodule_Graph_community_leading_eigenvector_naive,
    METH_VARARGS | METH_KEYWORDS,
