@@ -4357,6 +4357,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     while (!igraph_2wheap_empty(&Q)) {
       long int minnei=igraph_2wheap_max_index(&Q);
       igraph_real_t mindist=-igraph_2wheap_deactivate_max(&Q);
+      igraph_vector_t *neis;
+      long int nlen;
 
       if (all_to) {
 	MATRIX(*res, i, minnei)=mindist-1.0;
@@ -4372,8 +4374,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
       }
 
       /* Now check all neighbors of 'minnei' for a shorter path */
-      igraph_vector_t *neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
-      long int nlen=igraph_vector_size(neis);
+      neis=igraph_lazy_adjedgelist_get(&adjlist, minnei);
+      nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
