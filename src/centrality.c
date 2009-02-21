@@ -1221,6 +1221,155 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
+int igraph_edge_betweenness_estimate_weighted(const igraph_t *graph, 
+					      igraph_vector_t *result,
+					      igraph_bool_t directed, 
+					      igraph_real_t cutoff,
+					      const igraph_vector_t *weights) {
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  igraph_2wheap_t Q;
+  igraph_adjedgelist_t adjedgelist;
+  igraph_adjedgelist_t fathers;
+  igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
+  igraph_integer_t omode= directed ? IGRAPH_IN : IGRAPH_ALL;
+  igraph_vector_t distance, tmpscore;
+  igraph_vector_long_t nrgeo;
+  long int source, j;
+  igraph_stack_t S;
+
+  if (igraph_vector_size(weights) != no_of_edges) {
+    IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_min(weights) < 0) {
+    IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &adjedgelist, mode));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+  IGRAPH_CHECK(igraph_adjedgelist_init(graph, &fathers, omode));
+  IGRAPH_FINALLY(igraph_adjedgelist_destroy, &adjedgelist);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmpscore, no_of_nodes);
+  IGRAPH_CHECK(igraph_vector_long_init(&nrgeo, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &nrgeo);
+
+  IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_stack_init(&S, no_of_nodes));
+  IGRAPH_FINALLY(igraph_stack_destroy, &S);
+
+  IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
+  igraph_vector_null(result);
+
+  for (source=0; source<no_of_nodes; source++) {
+    IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0*source/no_of_nodes, 0);
+    IGRAPH_ALLOW_INTERRUPTION();
+
+/*     printf("source: %li\n", source); */
+    
+    igraph_vector_null(&distance);
+    igraph_vector_null(&tmpscore);
+    igraph_vector_long_null(&nrgeo);
+    
+    igraph_2wheap_push_with_index(&Q, source, 0);
+    VECTOR(distance)[source]=1.0;
+    VECTOR(nrgeo)[source]=1;
+    
+    while (!igraph_2wheap_empty(&Q)) {
+      long int minnei=igraph_2wheap_max_index(&Q);
+      igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
+      igraph_vector_t *neis;
+      long int nlen;
+
+/*       printf("SP to %li is final, dist: %g, nrgeo: %li\n", minnei, */
+/* 	     VECTOR(distance)[minnei]-1.0, VECTOR(nrgeo)[minnei]); */
+      
+      igraph_stack_push(&S, minnei);
+
+      if (cutoff >=0 && VECTOR(distance)[minnei] >= cutoff+1.0) { continue; }
+
+      neis=igraph_adjedgelist_get(&adjedgelist, minnei);
+      nlen=igraph_vector_size(neis);
+      for (j=0; j<nlen; j++) {
+	long int edge=VECTOR(*neis)[j];
+	long int to=IGRAPH_OTHER(graph, edge, minnei);
+	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
+	igraph_real_t curdist=VECTOR(distance)[to];
+	
+	if (curdist==0) {
+	  /* This is the first finite distance to 'to' */
+	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
+/* 	  printf("Found first path to %li (from %li)\n", to, minnei); */
+	  igraph_vector_resize(v,1);
+	  VECTOR(*v)[0]=edge;
+	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
+	  VECTOR(distance)[to]=altdist+1.0;
+	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+	} else if (altdist < curdist-1) {
+	  /* This is a shorter path */
+	  igraph_vector_t *v =igraph_adjlist_get(&fathers, to);
+/* 	  printf("Found a shorter path to %li (from %li)\n", to, minnei); */
+	  igraph_vector_resize(v,1);
+	  VECTOR(*v)[0]=edge;
+	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
+	  VECTOR(distance)[to] = altdist+1.0;
+	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+	} else if (altdist == curdist-1) {
+	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
+/* 	  printf("Found a second SP to %li (from %li)\n", to, minnei); */
+	  igraph_vector_push_back(v, edge);
+	  VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
+	}
+      }
+	  
+    } /* igraph_2wheap_empty(&Q) */
+
+    while (!igraph_stack_empty(&S)) {
+      long int w=igraph_stack_pop(&S);
+      igraph_vector_t *fatv=igraph_adjedgelist_get(&fathers, w);
+      long int fatv_len=igraph_vector_size(fatv);
+/*       printf("Popping %li.\n", w); */
+      for (j=0; j<fatv_len; j++) {
+	long int fedge=VECTOR(*fatv)[j];
+	long int neighbor=IGRAPH_OTHER(graph, fedge, w);
+	VECTOR(tmpscore)[neighbor] += ((double)VECTOR(nrgeo)[neighbor]) /
+	  VECTOR(nrgeo)[w] * (1.0+VECTOR(tmpscore)[w]);
+/* 	printf("Scoring %li (edge %li)\n", neighbor, fedge); */
+	VECTOR(*result)[fedge] += 
+	  ((VECTOR(tmpscore)[w]+1) * VECTOR(nrgeo)[neighbor]) / 
+	  VECTOR(nrgeo)[w];
+      }
+      
+      VECTOR(tmpscore)[w]=0;
+      VECTOR(distance)[w]=0;
+      VECTOR(nrgeo)[w]=0;
+      igraph_vector_clear(igraph_adjedgelist_get(&fathers, w));
+    }
+    
+  } /* source < no_of_nodes */
+
+  if (!directed || !igraph_is_directed(graph)) {
+    for (j=0; j<no_of_edges; j++) {
+      VECTOR(*result)[j] /= 2.0;
+    }
+  }
+
+  igraph_stack_destroy(&S);
+  igraph_2wheap_destroy(&Q);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  igraph_adjedgelist_destroy(&adjedgelist);
+  igraph_adjedgelist_destroy(&fathers);  
+  igraph_vector_destroy(&distance);
+  igraph_vector_destroy(&tmpscore);
+  igraph_vector_long_destroy(&nrgeo);
+  IGRAPH_FINALLY_CLEAN(5);
+  
+  return 0;
+}
+
 /**
  * \ingroup structural
  * \function igraph_edge_betweenness
@@ -1236,6 +1385,9 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
  *        betweenness scores for the edges.
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
+ * \param weights An optional weight vector for weighted edge
+ *        betweenness. Supply a null pointer here for the unweighted
+ *        version. 
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data. 
@@ -1251,8 +1403,10 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
  *     estimate the betweenness score of the edges in a graph.
  */
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
-                            igraph_bool_t directed) {
-  return igraph_edge_betweenness_estimate(graph, result, directed, -1);
+                            igraph_bool_t directed, 
+			    const igraph_vector_t *weights) {
+  return igraph_edge_betweenness_estimate(graph, result, directed, -1, 
+					  weights);
 }
 
 /**
@@ -1276,6 +1430,9 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \param cutoff The maximal length of paths that will be considered.
  *        If zero or negative, the exact betweenness will be calculated
  *        (no upper limit on path lengths).
+ * \param weights An optional weight vector for weighted
+ *        betweenness. Supply a null pointer here for unweighted
+ *        betweenness.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data. 
@@ -1290,7 +1447,8 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  *     of the vertices in a graph.
  */
 int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-                                     igraph_bool_t directed, igraph_real_t cutoff) {
+                                     igraph_bool_t directed, igraph_real_t cutoff,
+				     const igraph_vector_t *weights) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
@@ -1307,6 +1465,11 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   long int neino;
   long int i;
   igraph_integer_t modein, modeout;
+
+  if (weights) { 
+    return igraph_edge_betweenness_estimate_weighted(graph, result, 
+						     directed, cutoff, weights);
+  }
 
   directed=directed && igraph_is_directed(graph);
   if (directed) {

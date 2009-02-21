@@ -271,7 +271,7 @@ typedef struct igraph_vit_t {
  * ...
  * igraph_vs_adj(&amp;vs, 0, IGRAPH_ALL);
  * igraph_vit_create(&amp;graph, vs, &amp;vit);
- * while (!IGRAPH_VIT_END(VIT)) {
+ * while (!IGRAPH_VIT_END(vit)) {
  *   printf(" %li", (long int) IGRAPH_VIT_GET(vit));
  *   IGRAPH_VIT_NEXT(vit);
  * }
@@ -793,9 +793,11 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
                                 igraph_real_t cutoff, 
 				const igraph_vector_t *weights);
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
-                            igraph_bool_t directed);
+                            igraph_bool_t directed, 
+			    const igraph_vector_t *weigths);
 int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-                            igraph_bool_t directed, igraph_real_t cutoff);
+				     igraph_bool_t directed, igraph_real_t cutoff,
+				     const igraph_vector_t *weights);
 int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 
 			const igraph_vs_t vids, igraph_bool_t directed,
 			igraph_integer_t niter, igraph_real_t eps, 

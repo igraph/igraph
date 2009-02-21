@@ -95,7 +95,7 @@ export(igraph.drl.default, igraph.drl.coarsen, igraph.drl.coarsest,
 
 export(subgraph, simplify, degree, degree.distribution, diameter,
        subcomponent, betweenness, bibcoupling, cocitation,
-       shortest.paths, minimum.spanning.tree, edge.betweenness,
+       shortest.paths, minimum.spanning.tree,
        get.shortest.paths, average.path.length, transitivity,
        get.all.shortest.paths, get.diameter, farthest.nodes,
        constraint, page.rank, reciprocity, rewire,

@@ -263,20 +263,6 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
         PACKAGE="igraph")
 }
 
-edge.betweenness <- function(graph, e=E(graph), directed=TRUE) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  e <- as.numeric(e)
-  if (any( e<0 | e >=ecount(graph))) {
-    stop("Invalid edge id")
-  }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_edge_betweenness", graph, as.logical(directed),
-        PACKAGE="igraph")[ as.numeric(e)+1 ]  
-}
-
 transitivity <- function(graph, type=c("undirected", "global", "globalundirected",
                                   "localundirected", "local", "average",
                                   "localaverage", "localaverageundirected",
