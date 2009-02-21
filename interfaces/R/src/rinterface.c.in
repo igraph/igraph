@@ -2266,28 +2266,6 @@ SEXP R_igraph_minimum_spanning_tree_prim(SEXP graph, SEXP pweights) {
   return result;
 }
 
-SEXP R_igraph_edge_betweenness(SEXP graph, SEXP pdirected) {
-  
-  igraph_t g;
-  igraph_vector_t res;
-  igraph_bool_t directed=LOGICAL(pdirected)[0];
-  SEXP result;
-
-  R_igraph_before();
-  
-  R_SEXP_to_igraph(graph, &g);
-  igraph_vector_init(&res, 0);
-  igraph_edge_betweenness(&g, &res, directed);
-  PROTECT(result=NEW_NUMERIC(igraph_vector_size(&res)));
-  igraph_vector_copy_to(&res, REAL(result));
-  igraph_vector_destroy(&res);
-  
-  R_igraph_after();
-  
-  UNPROTECT(1);
-  return result;
-}
-
 SEXP R_igraph_measure_dynamics_id(SEXP graph,
 				  SEXP pst, SEXP pmaxind, SEXP psd,
 				  SEXP pno, SEXP pcites, SEXP pdebug, 
