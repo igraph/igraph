@@ -3064,29 +3064,38 @@ PyObject *igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject * self,
                                               PyObject * args,
                                               PyObject * kwds)
 {
-  char *kwlist[] = { "directed", "cutoff", NULL };
-  igraph_vector_t res;
+  static char *kwlist[] = { "directed", "cutoff", "weights", NULL };
+  igraph_vector_t res, *weights = 0;
   PyObject *list, *directed = Py_True, *cutoff = Py_None;
+  PyObject *weights_o = Py_None;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist,
-                                   &directed, &cutoff))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOO", kwlist,
+                                   &directed, &cutoff, &weights_o))
     return NULL;
+
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) return NULL;
 
   igraph_vector_init(&res, igraph_ecount(&self->g));
 
   if (cutoff == Py_None) {
-    if (igraph_edge_betweenness(&self->g, &res, PyObject_IsTrue(directed))) {
+    if (igraph_edge_betweenness(&self->g, &res, PyObject_IsTrue(directed), weights)) {
       igraphmodule_handle_igraph_error();
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
       igraph_vector_destroy(&res);
       return NULL;
     }
   } else if (PyNumber_Check(cutoff)) {
     PyObject *cutoff_num = PyNumber_Int(cutoff);
-    if (!cutoff_num) { igraph_vector_destroy(&res); return NULL; }
+    if (!cutoff_num) {
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
+      igraph_vector_destroy(&res); return NULL;
+    }
     if (igraph_edge_betweenness_estimate(&self->g, &res, PyObject_IsTrue(directed),
-        (igraph_integer_t)PyInt_AsLong(cutoff_num))) {
+        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights)) {
       igraphmodule_handle_igraph_error();
       igraph_vector_destroy(&res);
+      if (weights) { igraph_vector_destroy(weights); free(weights); }
       Py_DECREF(cutoff_num);
       return NULL;
     }
@@ -3096,6 +3105,8 @@ PyObject *igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject * self,
     igraph_vector_destroy(&res);
     return NULL;
   }
+
+  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   list = igraphmodule_vector_t_to_PyList(&res, IGRAPHMODULE_TYPE_FLOAT);
   igraph_vector_destroy(&res);
@@ -8557,13 +8568,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_edge_betweenness[_estimate] */
   {"edge_betweenness", (PyCFunction) igraphmodule_Graph_edge_betweenness,
    METH_VARARGS | METH_KEYWORDS,
-   "edge_betweenness(directed=True, cutoff=None)\n\n"
+   "edge_betweenness(directed=True, cutoff=None, weights=None)\n\n"
    "Calculates or estimates the edge betweennesses in a graph.\n\n"
    "@param directed: whether to consider directed paths.\n"
    "@param cutoff: if it is an integer, only paths less than or equal to this\n"
    "  length are considered, effectively resulting in an estimation of the\n"
    "  betweenness values. If C{None}, the exact betweennesses are\n"
    "  returned.\n"
+   "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
+   "  even an edge attribute name.\n"
    "@return: a list with the (exact or estimated) edge betweennesses of all\n"
    "  edges.\n"},
 

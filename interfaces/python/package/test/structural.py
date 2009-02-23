@@ -150,6 +150,10 @@ class CentralityTests(unittest.TestCase):
         self.failUnless(g.edge_betweenness() == [6., 4., 4., 4.])
         self.failUnless(g.edge_betweenness(cutoff=2) == [4., 3., 3., 2.])
         self.failUnless(g.edge_betweenness(cutoff=1) == [1., 1., 1., 1.])
+        g = Graph.Ring(5)
+        self.failUnless(g.edge_betweenness() == [3., 3., 3., 3., 3.])
+        self.failUnless(g.edge_betweenness(weights=[4, 1, 1, 1, 1]) == \
+                [0.5, 3.5, 5.5, 5.5, 3.5])
 
     def testClosenessCentrality(self):
         g = Graph.Star(5)
