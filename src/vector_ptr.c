@@ -269,7 +269,7 @@ void *igraph_vector_ptr_pop_back (igraph_vector_ptr_t *v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);
 	assert(v->stor_begin != v->end);
-	*tmp=*(v->end);
+	tmp=*(v->end);
 	v->end -= 1;
 	  
 	return 0;
