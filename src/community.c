@@ -1686,8 +1686,13 @@ int igraph_community_label_propagation(const igraph_t *graph,
         }
       }
     }
-    if (igraph_vector_max(membership) > no_of_nodes) {
+
+    i = igraph_vector_max(membership);
+    if (i > no_of_nodes) {
       IGRAPH_ERROR("elements of the initial labeling vector must be between 0 and |V|-1", IGRAPH_EINVAL);
+    }
+    if (i <= 0) {
+      IGRAPH_ERROR("at least one vertex must be labeled in the initial labeling", IGRAPH_EINVAL);
     }
   } else {
     for (i=0; i<no_of_nodes; i++) {
