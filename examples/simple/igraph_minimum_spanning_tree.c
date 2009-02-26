@@ -49,7 +49,7 @@ int main() {
 	       -1);
   
   igraph_vector_init(&eb, igraph_ecount(&g));
-  igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED);
+  igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
   for (i=0; i<igraph_vector_size(&eb); i++) {
     VECTOR(eb)[i] = -VECTOR(eb)[i];
   }
