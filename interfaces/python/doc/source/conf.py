@@ -35,8 +35,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = 'python-igraph'
-copyright = '2008, Tam\xe1s Nepusz, G\xe1bor Cs\xe1rdi'
+project   = 'python-igraph'
+copyright = u'2008, Tam\xe1s Nepusz, G\xe1bor Cs\xe1rdi'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -57,7 +57,7 @@ today_fmt = '%B %d, %Y'
 
 # List of directories, relative to source directories, that shouldn't be searched
 # for source files.
-#exclude_dirs = []
+exclude_dirs = ['include']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None
