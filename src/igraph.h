@@ -271,7 +271,7 @@ typedef struct igraph_vit_t {
  * ...
  * igraph_vs_adj(&amp;vs, 0, IGRAPH_ALL);
  * igraph_vit_create(&amp;graph, vs, &amp;vit);
- * while (!IGRAPH_VIT_END(VIT)) {
+ * while (!IGRAPH_VIT_END(vit)) {
  *   printf(" %li", (long int) IGRAPH_VIT_GET(vit));
  *   IGRAPH_VIT_NEXT(vit);
  * }
