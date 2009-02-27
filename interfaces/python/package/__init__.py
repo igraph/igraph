@@ -2,11 +2,11 @@
 """
 IGraph library.
 
-@undocumented: test
+@undocumented: igraph.formula, igraph.test
 """
 
 __license__ = """
-Copyright (C) 2006-2007  Gabor Csardi <csardi@rmki.kfki.hu>,
+Copyright (C) 2006-2009  Gabor Csardi <csardi@rmki.kfki.hu>,
 Tamas Nepusz <ntamas@rmki.kfki.hu>
 
 MTA RMKI, Konkoly-Thege Miklos st. 29-33, Budapest 1121, Hungary
@@ -27,14 +27,15 @@ Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
-from core import *
-from core import __version__, __build_date__
-from clustering import *
-from layout import *
-from drawing import *
-from colors import *
-from datatypes import *
-from configuration import Configuration
+from igraph.core import *
+from igraph.core import __version__, __build_date__
+from igraph.clustering import *
+from igraph.configuration import Configuration
+from igraph.colors import *
+from igraph.drawing import *
+from igraph.datatypes import *
+from igraph.formula import *
+from igraph.layout import *
 
 import os
 import math
@@ -698,6 +699,7 @@ class Graph(core.GraphBase):
             f.write(eol)
         f.close()
 
+    @classmethod
     def Read_Adjacency(klass, f, sep=None, comment_char = "#", attribute=None,
         *args, **kwds):
         """Constructs a graph based on an adjacency matrix from the given file
@@ -734,7 +736,6 @@ class Graph(core.GraphBase):
             graph=klass.Weighted_Adjacency(matrix, *args, **kwds)
 
         return graph
-    Read_Adjacency=classmethod(Read_Adjacency)
 
     def write_graphmlz(self, f, compresslevel=9):
         """Writes the graph to a zipped GraphML file.
@@ -765,6 +766,7 @@ class Graph(core.GraphBase):
         finally:
             if tmpfilename is not None: os.unlink(tmpfilename)
 
+    @classmethod
     def Read_GraphMLz(cls, f, *params, **kwds):
         """Read_GraphMLz(f, directed=True, index=0)
 
@@ -789,7 +791,6 @@ class Graph(core.GraphBase):
         finally:
             if tmpfilename is not None: os.unlink(tmpfilename)
         return result
-    Read_GraphMLz = classmethod(Read_GraphMLz)
 
 
     def write_pickle(self, fname=None, version=-1):
@@ -811,7 +812,7 @@ class Graph(core.GraphBase):
         if file_was_opened: fname.close()
         return result
 
-
+    @classmethod
     def Read_Pickle(klass, fname=None):
         """Reads a graph from Python pickled format
 
@@ -833,7 +834,6 @@ class Graph(core.GraphBase):
         if not isinstance(result, klass):
             raise TypeError, "unpickled object is not a %s" % klass.__name__
         return result
-    Read_Pickle = classmethod(Read_Pickle)
 
     def write_svg(self, fname, layout, width = None, height = None, \
                   labels = "label", colors = "color", shapes = "shape", \
@@ -1017,6 +1017,7 @@ class Graph(core.GraphBase):
         f.close()
 
 
+    @classmethod
     def _identify_format(klass, filename):
         """_identify_format(filename)
 
@@ -1072,9 +1073,8 @@ class Graph(core.GraphBase):
                     return None
             else:
                 return "adjacency"
-    _identify_format = classmethod(_identify_format)
-    
-    
+
+    @classmethod
     def Read(klass, f, format=None, *args, **kwds):
         """Unified reading function for graphs.
 
@@ -1104,7 +1104,6 @@ class Graph(core.GraphBase):
             raise IOError, "no reader method for file format: %s" % str(format)
         reader = getattr(klass, reader)
         return reader(f, *args, **kwds)
-    Read = classmethod(Read)
     Load = Read
 
     
@@ -1142,6 +1141,10 @@ class Graph(core.GraphBase):
         writer = getattr(self, writer)
         return writer(f, *args, **kwds)
     save = write
+
+    #################################
+    # Constructor for graph formulae
+    Formula=classmethod(Formula)
 
     ###########################
     # Vertex and edge sequence
