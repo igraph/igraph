@@ -151,6 +151,11 @@ igraph_adjlist:
                 BOOLEAN duplicate=True
         NAME-R: graph.adjlist
 
+igraph_full_bipartite:
+        PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, INTEGER n1, \
+                INTEGER n2, BOOLEAN directed=False, NEIMODE mode=ALL
+        IGNORE: RR
+
 #######################################
 # Constructors, games
 #######################################

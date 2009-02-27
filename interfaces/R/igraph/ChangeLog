@@ -1,3 +1,8 @@
+2008-10-27  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.full.bipartite) : added
+
 2008-10-24  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/print.R (print.igraph) : quote symbolic
