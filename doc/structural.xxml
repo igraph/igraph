@@ -51,6 +51,7 @@
 <!-- doxrox-include igraph_pagerank_old -->
 <!-- doxrox-include igraph_constraint -->
 <!-- doxrox-include igraph_maxdegree -->
+<!-- doxrox-include igraph_strength -->
 <!-- doxrox-include igraph_eigenvector_centrality -->
 <!-- doxrox-include igraph_hub_score -->
 <!-- doxrox-include igraph_authority_score -->
