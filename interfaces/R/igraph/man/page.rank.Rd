@@ -6,7 +6,7 @@
 \description{ Calculates the Google PageRank for the specified
   vertices.}
 \usage{
-page.rank (graph, vids = V(graph), directed = FALSE, damping = 0.85, 
+page.rank (graph, vids = V(graph), directed = TRUE, damping = 0.85, 
     weights = NULL, options = igraph.arpack.default) 
 page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000, 
     eps = 0.001, damping = 0.85, old = FALSE) 
