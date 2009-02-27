@@ -1,3 +1,8 @@
+2008-10-31  Gabor Csardi  <csardi@szaffi>
+
+	* interface/R/igraph/R/structure.generators.R
+	(graph.bipartite) : added
+
 2008-10-27  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/structure.generators.R

@@ -28,7 +28,7 @@ graph.full.bipartite (n1, n2, directed = FALSE, mode = c("all", "out", "in"))
   An igraph graph, with the \sQuote{\code{type}} vertex attribute set.
 }
 % \references{}
-\author{Gabor Csardi <csardi@rmki.kfki.hu>}
+\author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \seealso{\code{\link{graph.full}} for creating one-mode full graphs}
 \examples{
 g <- graph.full.bipartite(2, 3)

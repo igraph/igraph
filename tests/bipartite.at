@@ -21,6 +21,12 @@
 
 AT_BANNER([[Bipartite graphs]])
 
+AT_SETUP([Create bipartite graphs (igraph_create_bipartite):])
+AT_KEYWORDS([bipartite two mode igraph_create_bipartite])
+AT_COMPILE_CHECK([simple/igraph_bipartite_create.c],
+                 [simple/igraph_bipartite_create.out])
+AT_CLEANUP
+
 AT_SETUP([Projection of bipartite graphs (igraph_bipartite_projection):])
 AT_KEYWORDS([bipartite two mode projection igraph_bipartite_projection])
 AT_COMPILE_CHECK([simple/igraph_bipartite_projection.c])

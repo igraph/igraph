@@ -531,6 +531,12 @@ igraph_bipartite_projection:
         DEPS: types ON graph
         NAME-R: bipartite.projection
 
+igraph_create_bipartite:
+        PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \
+                VECTOR edges, BOOLEAN directed=False
+        NAME-R: graph.bipartite
+        IGNORE: RR
+
 #######################################
 # Components
 #######################################
