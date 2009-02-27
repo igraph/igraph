@@ -654,6 +654,10 @@ class Graph(core.GraphBase):
           - C{rt}, C{tree}, C{reingold_tilford}: Reingold-Tilford tree
             layout (see L{Graph.layout_reingold_tilford})
 
+          - C{rt_circular}, C{reingold_tilford_circular}: circular
+            Reingold-Tilford tree layout
+            (see L{Graph.layout_reingold_tilford_circular})
+
           - C{sphere}, C{spherical}, C{circle_3d}, C{circular_3d}: spherical
             layout (see L{Graph.layout_sphere})
 
