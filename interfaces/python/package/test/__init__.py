@@ -32,4 +32,6 @@ def test():
     except ImportError:
         runner = unittest.TextTestRunner()
         runner.run(suite())
-    
+
+if __name__ == "__main__": test()
+

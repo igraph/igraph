@@ -72,6 +72,14 @@ class EdgeSeqTests(unittest.TestCase):
         self.failUnless(len(subset) == 3)
         self.failUnless(subset["test"] == [5,6,7])
 
+    def testSliceFiltering(self):
+        subset = self.g.es.select(slice(5, 8))
+        self.failUnless(len(subset) == 3)
+        self.failUnless(subset["test"] == [5,6,7])
+        subset = self.g.es[40:56:2]
+        self.failUnless(len(subset) == 3)
+        self.failUnless(subset["test"] == [40,42,44])
+
     def testKeywordFiltering(self):
         g = Graph.Barabasi(1000, 2)
         g.es["betweenness"] = g.edge_betweenness()
