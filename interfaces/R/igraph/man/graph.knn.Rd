@@ -4,7 +4,7 @@
 \description{Calculate the average nearest neighbor degree of the given
   vertices and the same quantity in the function of vertex degree}
 \usage{
-graph.knn(graph, vids=V(graph))
+graph.knn(graph, vids=V(graph), weights=NULL)
 }
 \arguments{
   \item{graph}{The input graph. It can be directed, but it will be
@@ -14,6 +14,11 @@ graph.knn(graph, vids=V(graph))
     vertices are given here, then both \sQuote{\code{knn}} and
     \sQuote{\code{knnk}} will be calculated based on the given vertices
     only.}
+  \item{weights}{Weight vector. If the graph has a \code{weight} edge
+    attribute, then this is used by default. If this argument is given,
+    then vertex strength (see \code{\link{graph.strength}}) is used
+    instead of vertex degree. But note that \code{knnk} is still given
+    in the function of the normal vertex degree. }
 }
 \details{
   Note that for zero degree vertices the answer in \sQuote{\code{knn}}
@@ -31,6 +36,11 @@ graph.knn(graph, vids=V(graph))
     }
   }
 }
+\references{
+  Alain Barrat, Marc Barthelemy, Romualdo Pastor-Satorras, Alessandro
+  Vespignani: The architecture of complex weighted networks,
+  Proc. Natl. Acad. Sci. USA 101, 3747 (2004)
+}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
 \examples{
 # Some trivial ones
@@ -46,5 +56,10 @@ graph.knn(g3)
 # A random graph
 g4 <- random.graph.game(1000, p=5/1000)
 graph.knn(g4)
+
+# A weighted graph
+g5 <- graph.star(10)
+E(g5)$weight <- seq(ecount(g5))
+graph.knn(g5)
 }
 \keyword{graphs}

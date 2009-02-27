@@ -853,7 +853,8 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
 int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 				       igraph_vs_t vids,
 				       igraph_vector_t *knn,
-				       igraph_vector_t *knnk);
+				       igraph_vector_t *knnk, 
+				       const igraph_vector_t *weights);
 int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 		    const igraph_vs_t vids, igraph_neimode_t mode,
 		    igraph_bool_t loops, const igraph_vector_t *weights);

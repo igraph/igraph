@@ -4663,6 +4663,97 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
   return 0;
 }
 
+int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
+						  igraph_vs_t vids,
+						  igraph_vector_t *knn,
+						  igraph_vector_t *knnk, 
+						  const igraph_vector_t *weights) {
+
+  long int no_of_nodes = igraph_vcount(graph);
+  igraph_vector_t neis;
+  long int i, j, no_vids;
+  igraph_vit_t vit;
+  igraph_vector_t my_knn_v, *my_knn=knn;
+  igraph_vector_t deg;
+  long int maxdeg;
+  igraph_integer_t maxdeg2;
+  igraph_vector_t deghist;
+  igraph_real_t mynan=IGRAPH_NAN;
+
+  if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector size", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+  no_vids=IGRAPH_VIT_SIZE(vit);
+  
+  if (!knn) {
+    IGRAPH_VECTOR_INIT_FINALLY(&my_knn_v, no_vids);
+    my_knn=&my_knn_v;
+  } else {
+    IGRAPH_CHECK(igraph_vector_resize(knn, no_vids));
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
+  IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(),
+			       /*mode=*/ IGRAPH_ALL, /*loops=*/ 1, weights));
+  IGRAPH_CHECK(igraph_maxdegree(graph, &maxdeg2, igraph_vss_all(), 
+				/*mode=*/ IGRAPH_ALL, /*loops=*/ 1));
+  maxdeg=maxdeg2;
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, maxdeg);
+  igraph_vector_resize(&neis, 0);
+
+  if (knnk) {
+    IGRAPH_CHECK(igraph_vector_resize(knnk, maxdeg));
+    igraph_vector_null(knnk);
+    IGRAPH_VECTOR_INIT_FINALLY(&deghist, maxdeg);
+  }
+
+  for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
+    igraph_real_t sum=0.0;
+    long int v=IGRAPH_VIT_GET(vit);
+    long int nv;
+    igraph_real_t str=VECTOR(deg)[v];
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
+    nv=igraph_vector_size(&neis);
+    for (j=0; j<nv; j++) { 
+      long int nei=VECTOR(neis)[j];
+      sum += VECTOR(deg)[nei];
+    }
+    if (str != 0.0) {
+      VECTOR(*my_knn)[i] = sum / str;
+    } else {
+      VECTOR(*my_knn)[i] = mynan;
+    }
+    if (knnk && nv != 0) {
+      VECTOR(*knnk)[nv-1] += VECTOR(*my_knn)[i];
+      VECTOR(deghist)[nv-1] += 1;
+    }
+  }
+
+  if (knnk) {
+    for (i=0; i<maxdeg; i++) {
+      igraph_real_t dh=VECTOR(deghist)[i];
+      if (dh != 0) {
+	VECTOR(*knnk)[i] /= VECTOR(deghist)[i];
+      } else {
+	VECTOR(*knnk)[i] = mynan;
+      }
+    }
+    
+    igraph_vector_destroy(&deghist);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  if (!knn) {
+    igraph_vector_destroy(&my_knn_v);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  
+  return 0;
+}
+
 /**
  * \function igraph_avg_nearest_neigbor_degree
  * Average nearest neighbor degree
@@ -4685,6 +4776,10 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
  *   here. The first (zeroth) element is for degree one vertices,
  *   etc. Supply a NULL pointer here if you don't want to calculate
  *   this.
+ * \param weights Optional edge weights. Supply a null pointer here
+ *   for the non-weighted version. If this is not a null pointer, then
+ *   the strength of the vertices is used instead of the normal vertex
+ *   degree, see \ref igraph_strength().
  * \return Error code.
  * 
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -4694,7 +4789,8 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
 int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
 				       igraph_vs_t vids,
 				       igraph_vector_t *knn,
-				       igraph_vector_t *knnk) {
+				       igraph_vector_t *knnk, 
+				       const igraph_vector_t *weights) {
 
   long int no_of_nodes = igraph_vcount(graph);
   igraph_vector_t neis;
@@ -4704,6 +4800,12 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
   igraph_vector_t deg;
   long int maxdeg;
   igraph_vector_t deghist;
+  igraph_real_t mynan=IGRAPH_NAN;
+
+  if (weights) { 
+    return igraph_i_avg_nearest_neighbor_degree_weighted(graph, vids, knn, knnk,
+							 weights);
+  }
   
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -4741,9 +4843,9 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
     if (nv != 0) {
       VECTOR(*my_knn)[i] = sum / nv;
     } else {
-      VECTOR(*my_knn)[i] = IGRAPH_NAN;
+      VECTOR(*my_knn)[i] = mynan;
     }
-    if (knnk) {
+    if (knnk && nv != 0) {
       VECTOR(*knnk)[nv-1] += VECTOR(*my_knn)[i];
       VECTOR(deghist)[nv-1] += 1;
     }
@@ -4755,7 +4857,7 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
       if (dh != 0) {
 	VECTOR(*knnk)[i] /= VECTOR(deghist)[i];
       } else {
-	VECTOR(*knnk)[i] = IGRAPH_NAN;
+	VECTOR(*knnk)[i] = mynan;
       }
     }
     igraph_vector_destroy(&deghist);
