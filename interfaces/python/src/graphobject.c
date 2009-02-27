@@ -2751,14 +2751,16 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_clusters(igraphmodule_GraphObject * self,
                                       PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "mode", NULL };
+  static char *kwlist[] = { "mode", NULL };
   igraph_connectedness_t mode = IGRAPH_STRONG;
   igraph_vector_t res1, res2;
   igraph_integer_t no;
-  PyObject *list;
+  PyObject *list, *mode_o;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &mode))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &mode_o))
     return NULL;
+
+  if (igraphmodule_PyObject_to_connectedness_t(mode_o, &mode)) return NULL;
 
   if (mode != IGRAPH_STRONG && mode != IGRAPH_WEAK) {
     PyErr_SetString(PyExc_ValueError, "mode must be either STRONG or WEAK");
