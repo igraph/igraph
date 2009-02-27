@@ -451,7 +451,10 @@ int igraph_i_maximal_independent_vertex_sets_backtrack(const igraph_t *graph,
           IGRAPH_CHECK(igraph_vector_ptr_push_back(res, vec));
         } else if (size == clqdata->largest_set_size) {
           IGRAPH_CHECK(igraph_vector_ptr_push_back(res, vec));
-        }
+        } else {
+		  igraph_vector_destroy(vec);
+		  free(vec);
+		}
       }
       IGRAPH_FINALLY_CLEAN(1);
     } else {
