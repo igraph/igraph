@@ -66,11 +66,13 @@ set.vertex.attribute <- function(graph, name, index=V(graph), value) {
     stop("Not a graph object")
   }
   name <- as.character(name)
+  vc <- vcount(graph)
+##   if (length(index) %% length(value)) {
+##     warning("number of items to replace is not a multiple of replacement length")
+##   }
+##   value <- rep(value, length.out=length(index))
   graph[[9]][[3]][[name]][index+1] <- value
-  if (length(graph[[9]][[3]][[name]]) != vcount(graph)) {
-    graph[[9]][[3]][[name]] <-
-      rep(graph[[9]][[3]][[name]], length.out=vcount(graph))
-  }
+  length(graph[[9]][[3]][[name]]) <- vc
   graph
 }
 
@@ -91,11 +93,13 @@ set.edge.attribute <- function(graph, name, index=E(graph), value) {
     stop("Not a graph object")
   }
   name <- as.character(name)
+  ec <- ecount(graph)
+##   if (length(index) %% length(value)) {
+##     warning("number of items to replace is not a multiple of replacement length")
+##   }
+##   value <- rep(value, length.out=length(index))
   graph[[9]][[4]][[name]][index+1] <- value
-  if (length(graph[[9]][[4]][[name]]) != ecount(graph)) {
-    graph[[9]][[4]][[name]] <-
-      rep(graph[[9]][[4]][[name]], length.out=ecount(graph))
-  }
+  length(graph[[9]][[4]][[name]]) <- ec
   graph
 }
 
