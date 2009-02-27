@@ -475,6 +475,9 @@ int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
  * \param graph The input graph. It must be a simple graph, i.e. a graph 
  *    without multiple and without loop edges. This is checked and an
  *    error message is given for non-simple graphs.
+ * \param weights Potentially a numeric vector containing edge
+ *    weights. Supply a null pointer here for unweighted graphs. The
+ *    weights are expected to be non-negative.
  * \param merges Pointer to an initialized matrix or NULL, the result of the
  *    computation is stored here. The matrix has two columns and each
  *    merge corresponds to one merge, the ids of the two merged
