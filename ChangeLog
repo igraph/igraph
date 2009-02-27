@@ -1,5 +1,8 @@
 2008-10-30  Gabor Csardi  <csardi@szaffi>
 
+	* src/bipartite.c (igraph_bipartite_projection) : rewritten
+	* examples/simple/igraph_bipartite_projection.c : added
+
 	* src/structure_generators.c (igraph_full_bipartite) : bug fixed,
 	types vector was not set up correctly
 

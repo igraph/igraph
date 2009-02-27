@@ -865,6 +865,16 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
 		    igraph_bool_t loops, const igraph_vector_t *weights);
 
 /* -------------------------------------------------- */
+/* Bipartite networks                                 */
+/* -------------------------------------------------- */
+
+int igraph_bipartite_projection(const igraph_t *graph, 
+				const igraph_vector_bool_t *types,
+				igraph_t *proj1,
+				igraph_t *proj2,
+				igraph_integer_t probe1);
+
+/* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
 

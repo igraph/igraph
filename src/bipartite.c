@@ -30,10 +30,13 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
 				  int which) {
   
   long int no_of_nodes=igraph_vcount(graph);
-  long int i, remaining_nodes=0;
+  long int i, j, k, remaining_nodes=0;
   igraph_vector_t vertex_perm, vertex_index;
   igraph_vector_t edges;
-  igraph_vector_t neis;
+  igraph_adjlist_t adjlist;
+  igraph_vector_t *neis1, *neis2;
+  long int neilen1, neilen2;
+  igraph_vector_long_t added;
 
   if (which < 0) { return 0; }
   
@@ -41,7 +44,10 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_reserve(&vertex_perm, no_of_nodes));
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&vertex_index, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
   
   for (i=0; i<no_of_nodes; i++) {
     if (VECTOR(*types)[i] == which) {
@@ -49,32 +55,32 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
       igraph_vector_push_back(&vertex_perm, i);
     }
   }
-  
+
   for (i=0; i<no_of_nodes; i++) {
-    if (VECTOR(*types)[i] != which) {
-      long int j, k, n;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_ALL));
-      n=igraph_vector_size(&neis);
-      for (j=0; j<n; j++) {
-	long int from=VECTOR(neis)[j];
-	long int from2=VECTOR(vertex_index)[from]-1;
-	if (j>0 && from == VECTOR(neis)[j-1]) {
-	  continue;
-	}
-	for (k=j+1; k<n; k++) {
-	  long int to=VECTOR(neis)[k];
-	  long int to2=VECTOR(vertex_index)[to]-1;
-	  if (from != to) {
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from2));
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to2));
-	  }
+    if (VECTOR(*types)[i] == which) {
+      long int new_i=VECTOR(vertex_index)[i]-1;
+      neis1=igraph_adjlist_get(&adjlist, i);
+      neilen1=igraph_vector_size(neis1);
+      for (j=0; j<neilen1; j++) {
+	long int nei=VECTOR(*neis1)[j];
+	neis2=igraph_adjlist_get(&adjlist, nei);
+	neilen2=igraph_vector_size(neis2);
+	for (k=0; k<neilen2; k++) {
+	  long int nei2=VECTOR(*neis2)[k], new_nei2;
+	  if (nei2 <= i) { continue; }
+	  if (VECTOR(added)[nei2] == i+1) { continue; }
+	  VECTOR(added)[nei2] = i+1;
+	  new_nei2=VECTOR(vertex_index)[nei2]-1;
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, new_i));
+	  IGRAPH_CHECK(igraph_vector_push_back(&edges, new_nei2));
 	}
       }
     }
   }
-  
+
+  igraph_adjlist_destroy(&adjlist);
+  igraph_vector_long_destroy(&added);
   igraph_vector_destroy(&vertex_index);
-  igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(2);
   
   IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes, 
@@ -135,7 +141,7 @@ int igraph_bipartite_projection(const igraph_t *graph,
     t1 = proj1 ? 0 : -1;
     t2 = proj2 ? 1 : -1;
   }
-  
+
   IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj1, t1));
   IGRAPH_FINALLY(igraph_destroy, proj1);
   IGRAPH_CHECK(igraph_i_bipartite_projection(graph, types, proj2, t2));
