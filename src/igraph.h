@@ -593,6 +593,11 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
 int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 int igraph_full_citation(igraph_t *graph, igraph_integer_t n, 
 			 igraph_bool_t directed);
+int igraph_full_bipartite(igraph_t *graph, 
+			  igraph_vector_bool_t *types,
+			  igraph_integer_t n1, igraph_integer_t n2,
+			  igraph_bool_t directed, 
+			  igraph_neimode_t mode);
 int igraph_atlas(igraph_t *graph, int number);
 int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
 				 const igraph_matrix_t *W);

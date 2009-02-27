@@ -21,6 +21,7 @@
 <!-- doxrox-include igraph_tree -->
 <!-- doxrox-include igraph_full -->
 <!-- doxrox-include igraph_full_citation -->
+<!-- doxrox-include igraph_full_bipartite -->
 <!-- doxrox-include igraph_famous -->
 <!-- doxrox-include igraph_lcf -->
 <!-- doxrox-include igraph_lcf_vector -->
