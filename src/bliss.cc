@@ -131,6 +131,7 @@ int igraph_automorphisms(const igraph_t *graph,
     info->max_level      = stats.max_level;
     stats.group_size.tostring(&info->group_size);
   }
+  delete g;
   
   return 0;
 }

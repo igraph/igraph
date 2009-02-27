@@ -1,3 +1,7 @@
+2008-10-01  Gabor Csardi  <csardi@szaffi>
+
+	* src/blicc.cc (igraph_automorphisms) : fixed a memory leak
+
 2008-09-29  Gabor Csardi  <csardi@szaffi>
 
 	* src/type_indexededgelist.c (igraph_get_eids) : rewritten to
