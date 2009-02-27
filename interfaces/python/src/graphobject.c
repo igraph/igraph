@@ -3915,6 +3915,26 @@ PyObject *igraphmodule_Graph_transitivity_undirected(igraphmodule_GraphObject
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates the average of vertex transitivities over the graph
+ * \sa igraph_transitivity_avglocal_undirected
+ */
+PyObject *igraphmodule_Graph_transitivity_avglocal_undirected(igraphmodule_GraphObject
+                                                              * self, PyObject * args,
+                                                              PyObject * kwds)
+{
+  igraph_real_t res;
+  PyObject *r;
+
+  if (igraph_transitivity_avglocal_undirected(&self->g, &res)) {
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  r = Py_BuildValue("d", (double)(res));
+  return r;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates the local transitivity of given vertices
  * \return the transitivities in a list
  * \sa igraph_transitivity_local_undirected
@@ -8595,7 +8615,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "transitivity_undirected()\n\n"
    "Calculates the transitivity (clustering coefficient) of the graph.\n\n"
-   "@return: the transitivity\n"},
+   "@return: the transitivity\n"
+   "@see: L{transitivity_local_undirected()}, L{transitivity_avglocal_undirected()}\n"
+  },
 
   // interface to igraph_transitivity_local_undirected
   {"transitivity_local_undirected",
@@ -8605,7 +8627,18 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "Calculates the local transitivity of given vertices in the graph.\n\n"
    "@param vertices: a list containing the vertex IDs which should be\n"
    "  included in the result. C{None} means all of the vertices.\n"
-   "@return: the transitivities for the given vertices in a list\n"},
+   "@return: the transitivities for the given vertices in a list\n"
+   "@see: L{transitivity_undirected()}, L{transitivity_avglocal_undirected()}\n"
+  },
+
+  /* interface to igraph_transitivity_avglocal_undirected */
+  {"transitivity_avglocal_undirected",
+   (PyCFunction) igraphmodule_Graph_transitivity_avglocal_undirected,
+   METH_VARARGS | METH_KEYWORDS,
+   "transitivity_avglocal_undirected()\n\n"
+   "Calculates the average of the vertex transitivities of the graph.\n\n"
+   "@see: L{transitivity_undirected()}, L{transitivity_local_undirected()}\n"
+  },
 
   /* interface to igraph_[st_]vertex_connectivity */
   {"vertex_connectivity", (PyCFunction) igraphmodule_Graph_vertex_connectivity,
