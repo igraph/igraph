@@ -1,3 +1,12 @@
+2009-01-16  Gabor Csardi  <csardi@szaffi>
+
+	* src/foreign-graphml.c
+	(igraph_i_graphml_sax_handler_end_document) : check whether 
+	we already have an 'id' vertex or edge attribute, give a warning 
+	if we cannot add the intrinsic 'id' attribute(s) because of this
+
+	* src/vector_ptr.c (igraph_vector_ptr_pop_back) : added
+
 2008-11-14  Gabor Csardi  <csardi@szaffi>
 
 	* src/bipartite.c (igraph_is_bipartite) : added
