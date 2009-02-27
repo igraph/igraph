@@ -748,8 +748,8 @@ int igraph_i_community_leading_eigenvector_naive(igraph_real_t *to,
  * \param steps The number of splits to do, if possible. Supply the
  *    number of vertices in the network here to perform as many steps 
  *    as possible.
- * \param options The options for ARPACK. \c n and \c ncv is always
- *    overwritten.
+ * \param options The options for ARPACK. \c n is always
+ *    overwritten. \c ncv is set to at least 3.
  * \return Error code.
  * 
  * \sa \ref igraph_community_leading_eigenvector() for the proper way, 
@@ -802,8 +802,11 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 
   igraph_dqueue_push(&tosplit, 0);
 
+  if (options->ncv<3) { options->ncv=3; }
+
   /* Memory for ARPACK */
-  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 3, no_of_nodes, 1));
+  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, options->ncv, 
+					  no_of_nodes, 1));
   IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);
   extra.idx=&idx;
   extra.adjlist=&adjlist;
@@ -831,8 +834,8 @@ int igraph_community_leading_eigenvector_naive(const igraph_t *graph,
 
     options->start=0;
     options->n=size;
-    options->ncv=3;
     options->which[0]='L'; options->which[1]='A';
+    if (options->ncv<3) { options->ncv=3; }
     if (options->ncv > options->n) { options->ncv=options->n; }
     
     /* Call ARPACK solver */
@@ -1062,8 +1065,8 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
  *    underlying community structure and no further steps can be
  *    done. If you wany as many steps as possible then supply the 
  *    number of vertices in the network here.
- * \param options The options for ARPACK. \c n and \c ncv is always
- *    overwritten.
+ * \param options The options for ARPACK. \c n is always
+ *    overwritten. \c ncv is set to at least 3.
  * \return Error code.
  * 
  * \sa \ref igraph_community_walktrap() and \ref
@@ -1126,8 +1129,11 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
   igraph_dqueue_push(&tosplit, 0);
 
+  if (options->ncv<3) { options->ncv=3; }
+
   /* Memory for ARPACK */
-  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 3, no_of_nodes, 1));
+  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, options->ncv, 
+					  no_of_nodes, 1));
   IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);
   extra.idx=&idx;
   extra.idx2=&idx2;
@@ -1156,8 +1162,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     
     options->start=0;
     options->n=size;
-    options->ncv=3;
     options->which[0]='L'; options->which[1]='A';
+    if (options->ncv < 3) { options->ncv=3; }
     if (options->ncv > options->n) { options->ncv=options->n; }
     extra.comm=comm;
     
@@ -1440,7 +1446,7 @@ int igraph_community_leading_eigenvector_step(const igraph_t *graph,
    
     options->start=0;
     options->n=size;
-    options->ncv=3;
+    if (options->ncv < 3) { options->ncv=3; }
     options->which[0]='L'; options->which[1]='A';
     if (options->ncv > options->n) { options->ncv=options->n; }
 
