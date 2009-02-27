@@ -223,7 +223,7 @@ igraph_vs_t igraph_vss_seq(igraph_integer_t from, igraph_integer_t to);
 
 void igraph_vs_destroy(igraph_vs_t *vs);
 
-igraph_bool_t igraph_vs_is_all(igraph_vs_t *vs);
+igraph_bool_t igraph_vs_is_all(const igraph_vs_t *vs);
 
 int igraph_vs_copy(igraph_vs_t* dest, const igraph_vs_t* src);
 
@@ -425,7 +425,7 @@ int igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...);
 
 void igraph_es_destroy(igraph_es_t *es);
 
-igraph_bool_t igraph_es_is_all(igraph_es_t *es);
+igraph_bool_t igraph_es_is_all(const igraph_es_t *es);
 
 int igraph_es_copy(igraph_es_t* dest, const igraph_es_t* src);
 
