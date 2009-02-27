@@ -537,6 +537,19 @@ igraph_create_bipartite:
         NAME-R: graph.bipartite
         IGNORE: RR
 
+igraph_incidence:
+        PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL types, MATRIX incidence, \
+                BOOLEAN directed=False, NEIMODE mode=ALL, \
+                BOOLEAN multiple=False
+        IGNORE: RR
+
+igraph_get_incidence:
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, OUT MATRIX res, \
+                OUT VECTOR_OR_0 row_ids, OUT VECTOR_OR_0 col_ids
+        DEPS: types ON graph
+        NAME-R: get.incidence
+        IGNORE: RR
+
 #######################################
 # Components
 #######################################

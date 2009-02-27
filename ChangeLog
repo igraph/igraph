@@ -1,3 +1,16 @@
+2008-11-02  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_get_incidence) : rewritten, previous 
+	implementation was incorrect
+
+	* src/bipartite.c (igraph_get_incidence) : added
+
+2008-11-01  Gabor Csardi  <csardi@szaffi>
+
+	* src/bipartite.c (igraph_incidence) : 'directed' argument added
+
+	* src/bipartite.c (igraph_incidence) : added
+
 2008-10-31  Gabor Csardi  <csardi@szaffi>
 
 	* src/bipartite.c (igraph_create_bipartite) : added

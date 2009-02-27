@@ -374,3 +374,231 @@ int igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
   return 0;
 }
   
+/**
+ * \function igraph_incidence
+ * Create a bipartite graph from an incidence matrix
+ *
+ * A bipartite (or two-mode) graph contains two types of vertices and
+ * edges always connect vertices of different types. An incidence
+ * matrix is an nxm matrix, n and m are the number of vertices of the
+ * two types, respectively. Nonzero elements in the matrix denote
+ * edges between the two corresponding vertices.
+ * 
+ * </para><para>
+ * Note that this function can operate in two modes, depending on the
+ * \p multiple argument. If it is FALSE (i.e. 0), then a single edge is
+ * created for every non-zero element in the incidence matrix. If \p
+ * multiple is TRUE (i.e. 1), then the matrix elements are rounded up
+ * to the closest non-negative integer to get the number of edges to
+ * create between a pair of vertices.
+ * 
+ * </para><para>
+ * This function does not create multiple edges if \p multiple is
+ * FALSE, but might create some if it is TRUE.
+ * 
+ * \param graph Pointer to an uninitialized graph object.
+ * \param types Pointer to an initialized boolean vector, or a null
+ *   pointer. If not a null pointer, then the vertex types are stored
+ *   here. It is resized as needed.
+ * \param incidence The incidence matrix.
+ * \param directed Gives whether to create an undirected or a directed
+ *   graph.
+ * \param mode Specifies the direction of the edges in a directed
+ *   graph. If \c IGRAPH_OUT, then edges point from vertices
+ *   of the first kind (corresponding to rows) to vertices of the 
+ *   second kind (corresponding to columns); if \c
+ *   IGRAPH_IN, then the opposite direction is realized; if \c
+ *   IGRAPH_ALL, then mutual edges will be created.
+ * \param multiple How to interpret the incidence matrix elements. See
+ *   details below.
+ * \return Error code.
+ * 
+ * Time complexity: O(n*m), the size of the incidence matrix.
+ */
+
+int igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
+		     const igraph_matrix_t *incidence, 
+		     igraph_bool_t directed,
+		     igraph_neimode_t mode, igraph_bool_t multiple) {
+  
+  long int n1=igraph_matrix_nrow(incidence);
+  long int n2=igraph_matrix_ncol(incidence);
+  long int no_of_nodes=n1+n2;
+  igraph_vector_t edges;
+  long int i, j, k;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+
+  if (multiple) { 
+
+    for (i=0; i<n1; i++) {
+      for (j=0; j<n2; j++) { 
+	long int elem=MATRIX(*incidence, i, j);
+	long int from, to;
+	
+	if (!elem) { continue; }
+	
+	if (mode == IGRAPH_IN) {
+	  from=n1+j;
+	  to=i;
+	} else {
+	  from=i;
+	  to=n1+j;
+	}
+	
+	if (mode != IGRAPH_ALL || !directed) {
+	  for (k=0; k<elem; k++) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	  }
+	} else {
+	  for (k=0; k<elem; k++) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	  }
+	}	  
+      }
+    }
+
+  } else {
+    
+    for (i=0; i<n1; i++) {
+      for (j=0; j<n2; j++) { 
+	long int from, to;
+	
+	if (MATRIX(*incidence, i, j) != 0) {
+	  if (mode == IGRAPH_IN) {
+	    from=n1+j;
+	    to=i;
+	  } else {
+	    from=i;
+	    to=n1+j;
+	  }
+	  if (mode != IGRAPH_ALL || !directed) {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	  } else {
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
+	    IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
+	  }	    
+	}
+      }
+    }
+    
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges); 
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  
+  if (types) {
+    IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
+    igraph_vector_bool_null(types);
+    for (i=n1; i<no_of_nodes; i++) {
+      VECTOR(*types)[i] = 1;
+    }
+  }
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+
+/** 
+ * \function igraph_get_incidence
+ * Convert a bipartite graph into an incidence matrix
+ * 
+ * \param graph The input graph, edge directions are ignored.
+ * \param types Boolean vector containing the vertex types.
+ * \param res Pointer to an initialized matrix, the result is stored
+ *   here. An element of the matrix gives the number of edges
+ *   (irrespectively of their direction) between the two corresponding
+ *   vertices. 
+ * \param row_ids Pointer to an initialized vector or a null
+ *   pointer. If not a null pointer, then the vertex ids (in the
+ *   graph) corresponding to the rows of the result matrix are stored
+ *   here.
+ * \param col_ids Pointer to an initialized vector or a null
+ *   pointer. If not a null pointer, then the vertex ids corresponding
+ *   to the columns of the result matrix are stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(n*m), n and m are number of vertices of the two
+ * different kind.
+ * 
+ * \sa \ref igraph_incidence() for the opposite operation.
+ */
+
+int igraph_get_incidence(const igraph_t *graph,
+			 const igraph_vector_bool_t *types,
+			 igraph_matrix_t *res,
+			 igraph_vector_t *row_ids,
+			 igraph_vector_t *col_ids) {
+  
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  long int n1=0, n2=0, i;
+  igraph_vector_t perm;
+  long int p1, p2;
+
+  if (igraph_vector_bool_size(types) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid vertex type vector for bipartite graph", 
+		 IGRAPH_EINVAL);
+  }
+  
+  for (i=0; i<no_of_nodes; i++) {
+    n1 += VECTOR(*types)[i] == 0 ? 1 : 0;
+  }
+  n2 = no_of_nodes-n1;
+
+  IGRAPH_VECTOR_INIT_FINALLY(&perm, no_of_nodes);
+  
+  for (i=0, p1=0, p2=n1; i<no_of_nodes; i++) {
+    VECTOR(perm)[i] = VECTOR(*types)[i] ? p2++ : p1++;
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, n1, n2));
+  igraph_matrix_null(res);
+  for (i=0; i<no_of_edges; i++) {
+    long int from=IGRAPH_FROM(graph, i);
+    long int to=IGRAPH_TO(graph, i);
+    long int from2=VECTOR(perm)[from];
+    long int to2=VECTOR(perm)[to];
+    if (! VECTOR(*types)[from]) {
+      MATRIX(*res, from2, to2-n1) += 1;
+    } else {
+      MATRIX(*res, to2, from2-n1) += 1;
+    }
+  }
+
+  if (row_ids) { 
+    IGRAPH_CHECK(igraph_vector_resize(row_ids, n1));
+  }
+  if (col_ids) {
+    IGRAPH_CHECK(igraph_vector_resize(col_ids, n2));
+  }
+  if (row_ids || col_ids) {
+    for (i=0; i<no_of_nodes; i++) {
+      if (! VECTOR(*types)[i]) {
+	if (row_ids) {
+	  long int i2=VECTOR(perm)[i];
+	  VECTOR(*row_ids)[i2] = i;
+	}
+      } else {
+	if (col_ids) {
+	  long int i2=VECTOR(perm)[i];
+	  VECTOR(*col_ids)[i2-n1] = i;
+	}
+      }
+    }
+  }
+
+  igraph_vector_destroy(&perm);
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
+}
+    

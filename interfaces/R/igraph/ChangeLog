@@ -1,6 +1,34 @@
+2008-11-02  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : added
+	support for attributes
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : added
+	support for vertex names
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : updated,
+	sparse matrix support was added
+
+	* interfaces/R/igraph/R/conversion.R (get.incidence) : added
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : added sparse graph support
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : added 'weighted' argument
+
+2008-11-01  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : 'directed' argument added, remove unnneded 
+	'add.colnames' attribute
+
+	* interfaces/R/igraph/R/structure.generators.R
+	(graph.incidence) : added
+
 2008-10-31  Gabor Csardi  <csardi@szaffi>
 
-	* interface/R/igraph/R/structure.generators.R
+	* interfaces/R/igraph/R/structure.generators.R
 	(graph.bipartite) : added
 
 2008-10-27  Gabor Csardi  <csardi@szaffi>
