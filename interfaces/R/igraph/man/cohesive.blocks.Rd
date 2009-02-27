@@ -8,6 +8,7 @@
 \usage{
 cohesive.blocks(graph, db=NULL,
                 useDB=(vcount(graph)>400 && require(RSQLite)),
+                cutsetAlgorithm= c("patvardhan", "kanevsky"),
                 verbose=igraph.par("verbose"))
 is.bgraph(graph)
 }
@@ -18,7 +19,11 @@ is.bgraph(graph)
     \item{useDB}{Logical. Whether to use an external SQLite database
       instead of internal R datastructures (see details). By default an
       SQLite database is used if the graph has more than 400 vertices
-      and the \code{RSQLite} package is installed.} 
+      and the \code{RSQLite} package is installed.}
+    \item{cutsetAlgorithm}{The algorithm to use for calculating the
+      cutsets. The default \sQuote{\code{patvardhan}} works well for
+      most graphs, but on some graphs \sQuote{\code{kanevsky}} is
+      actually faster.}
     \item{verbose}{Level of console output. Supply \code{TRUE} here to
       follow the progress of the computation.}
 }
@@ -69,10 +74,15 @@ with four (new) graph attributes:
   C. Patvardhan, V. C. Prasad, V. Prem Pyara. Vertex Cutsets of
   Undirected Graphs. \emph{IEEE Transactions on Reliability},
   44(2):347--353, June, 1995.
+
+  A. Kanevsky. On the number of minimum size separating vertex sets
+  in a graph and how to find all of them
+  \emph{Proceedings of the first annual ACM-SIAM symposium on Discrete algorithms}
+  San Francisco, California, United States. 411--421, 1990.
   
-J. Moody and D. R. White. Structural cohesion and embeddedness: A
-hierarchical concept of social groups. \emph{American Sociological
-  Review}, 68(1):103--127, Feb 2003. 
+  J. Moody and D. R. White. Structural cohesion and embeddedness: A
+  hierarchical concept of social groups. \emph{American Sociological
+    Review}, 68(1):103--127, Feb 2003. 
 }
 \author{Peter McMahan \email{peter.mcmahan@gmail.com}}
 \seealso{\code{\link{graph.cohesion}}, \code{\link{plot.bgraph}} for
@@ -102,6 +112,12 @@ plot(gBlocks, vertex.size=7, layout=layout.kamada.kawai)
 ## Save the results as Pajek ".net" and ".clu" files:
 \dontrun{
 write.pajek.bgraph(gBlocks,file="gBlocks")
+}
+
+## An example that works better with the "kanevsky" cutset algorithm
+\dontrun{
+g <- read.graph(file="http://intersci.ss.uci.edu/wiki/Vlado/SanJuanSur.net", format="pajek")
+gBlocks <- cohesive.blocks(g, cutsetAlgorithm="kanevsky")
 }
 }
 \keyword{graphs}
