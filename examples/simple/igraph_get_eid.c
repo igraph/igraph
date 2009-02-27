@@ -63,7 +63,7 @@ int main() {
     igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED);
     VECTOR(hist)[ (long int) eid ] += 1;
     igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED);
-    VECTOR(hist)[ (long int) eid ] += 1;    
+    VECTOR(hist)[ (long int) eid ] += 1;
   }
   print_vector(&hist, stdout);
   
@@ -85,3 +85,64 @@ int main() {
 
   return 0;
 }
+
+/* Stress test */
+
+/* int main() { */
+
+/*   igraph_t g; */
+/*   long int i, n; */
+/*   igraph_integer_t from, to, eid; */
+
+/*   igraph_barabasi_game(&g, 200, 100, 0, 0, 1); */
+/*   n=igraph_ecount(&g); */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_edge(&g, i, &from, &to); */
+/*     igraph_get_eid(&g, &eid, from, to, 1); */
+/*     igraph_get_eid(&g, &eid, to, from, 0); */
+/*   } */
+/*   igraph_destroy(&g); */
+
+/*   igraph_barabasi_game(&g, 200, 100, 0, 0, 0); */
+/*   n=igraph_ecount(&g); */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_edge(&g, i, &from, &to); */
+/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*   } */
+/*   igraph_destroy(&g); */
+
+/*   igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, */
+/* 			  200, 1/2, 0, 0); */
+/*   n=igraph_ecount(&g); */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_edge(&g, i, &from, &to); */
+/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*   } */
+/*   igraph_destroy(&g); */
+
+/*   igraph_full(&g, 500, 0, 0); */
+/*   n=igraph_ecount(&g); */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_edge(&g, i, &from, &to); */
+/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*   } */
+/*   igraph_destroy(&g); */
+  
+/*   igraph_star(&g, 20000, IGRAPH_STAR_OUT, 0); */
+/*   n=igraph_ecount(&g); */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_edge(&g, i, &from, &to); */
+/*     igraph_get_eid(&g, &eid, from, to, 1); */
+/*   } */
+/*   igraph_destroy(&g); */
+
+/*   igraph_star(&g, 20000, IGRAPH_STAR_IN, 0); */
+/*   n=igraph_ecount(&g); */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_edge(&g, i, &from, &to); */
+/*     igraph_get_eid(&g, &eid, from, to, 1); */
+/*   } */
+/*   igraph_destroy(&g); */
+    
+/*   return 0; */
+/* } */
