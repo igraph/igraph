@@ -494,7 +494,7 @@ bonpow <- function(graph, nodes=V(graph),
 }
 
 alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
-                             loops=FALSE, exo=1, attr=NULL,
+                             loops=FALSE, exo=1, weights=NULL,
                              tol=1e-7) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -502,6 +502,21 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
 
   exo <- rep(exo, length=vcount(graph))
   exo <- matrix(exo, nc=1)
+
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    ## weights == NULL and there is a "weight" edge attribute
+    attr <- "weight"
+  } else if (is.null(weights)) {
+    ## weights == NULL, but there is no "weight" edge attribute
+    attr <- NULL
+  } else if (any(!is.na(weights))) {
+    ## weights != NULL and weights != rep(NA, x)
+    graph <- set.edge.attribute(graph, "weight", value=as.numeric(weights))
+    attr <- "weight"
+  } else {
+    ## weights != NULL, but weights == rep(NA, x)
+    attr <- NULL
+  }
 
   d <- t(get.adjacency(graph, attr=attr))
   if (!loops) {
