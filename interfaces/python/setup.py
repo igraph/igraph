@@ -104,13 +104,17 @@ setup(name = 'python-igraph',
       description = 'High performance graph data structures and algorithms',
       long_description = description,
       license = 'GNU General Public License (GPL)',
+
       author = 'Tamas Nepusz',
       author_email = 'ntamas@rmki.kfki.hu',
+
       ext_modules = [igraph_extension],
       package_dir = {'igraph': 'package'},
       packages = ['igraph', 'igraph.test', 'igraph.app'],
       scripts = ['scripts/igraph'],
       data_files = data_files,
+      test_suite = "igraph.test.suite",
+
       platforms = 'ALL',
       keywords = ['graph', 'network', 'mathematics', 'math', 'graph theory', 'discrete mathematics'],
       classifiers = [
@@ -126,4 +130,5 @@ setup(name = 'python-igraph',
         'Topic :: Scientific/Engineering :: Physics',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'Topic :: Software Development :: Libraries :: Python Modules'
-      ])
+      ]
+)
