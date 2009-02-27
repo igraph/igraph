@@ -1147,7 +1147,6 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
   }
 
   if (*eid < 0) { 
-    printf("directed: %i, %li - %li\n", (int)directed, from, to);
     IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
   }
   
