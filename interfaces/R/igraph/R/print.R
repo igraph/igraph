@@ -29,6 +29,7 @@ print.igraph <- function(x,
                          vertex.attributes=igraph.par("print.vertex.attributes"),
                          edge.attributes=igraph.par("print.edge.attributes"),
                          names=TRUE,
+                         quote.names=TRUE,
                          ...) {
   
   if (!is.igraph(x)) {
@@ -107,6 +108,9 @@ print.igraph <- function(x,
     } else {
       cat("Edges and their attributes:\n")
     }
+    if (names && ! "name" %in% list.vertex.attributes(x)) {
+      names <- FALSE
+    }
     if (names && "name" %in% list.vertex.attributes(x) &&
         !is.numeric(get.vertex.attribute(x, "name")) &&
         !is.character(get.vertex.attribute(x, "name")) &&
@@ -115,6 +119,7 @@ print.igraph <- function(x,
       names <- FALSE
     }
     el <- get.edgelist(x, names=names)
+    if (names && quote.names) { el[] <- paste(sep="", "'", el, "'") }
     mp <- getOption("max.print")
     if (mp >= nrow(el)) {
       omitted.edges <- 0

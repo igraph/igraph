@@ -10,7 +10,7 @@
   graph.attributes=igraph.par("print.graph.attributes"),
   vertex.attributes=igraph.par("print.vertex.attributes"),
   edge.attributes=igraph.par("print.edge.attributes"),
-  names=TRUE,
+  names=TRUE, quote.names=TRUE,
   \dots)
 \method{print}{bgraph}(x,
   \dots)
@@ -24,6 +24,7 @@
     attributes.}
   \item{names}{Logical constant, whether to print symbolic vertex names
     (ie. the \code{name} vertex attribute) or vertex ids.}
+  \item{quote.names}{Logical scalar, whether to quote symbolic vertex names.}
   \item{object}{The graph of which the summary will be printed.}
   \item{\dots}{Additional agruments, \code{print.bgraph} passes these to
   \code{print.igraph}.}
