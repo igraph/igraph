@@ -94,29 +94,32 @@ int main() {
 /*   long int i, n; */
 /*   igraph_integer_t from, to, eid; */
 
-/*   igraph_barabasi_game(&g, 200, 100, 0, 0, 1); */
+/*   igraph_barabasi_game(&g, 10000, 100, 0, 0, 1); */
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
 /*     igraph_get_eid(&g, &eid, from, to, 1); */
 /*     igraph_get_eid(&g, &eid, to, from, 0); */
+/*     igraph_get_eid(&g, &eid, from, to, 0); */
 /*   } */
 /*   igraph_destroy(&g); */
 
-/*   igraph_barabasi_game(&g, 200, 100, 0, 0, 0); */
+/*   igraph_barabasi_game(&g, 10000, 100, 0, 0, 0); */
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
 /*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*     igraph_get_eid(&g, &eid, to, from, 0); */
 /*   } */
 /*   igraph_destroy(&g); */
 
 /*   igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, */
-/* 			  200, 1/2, 0, 0); */
+/* 			  2000, 100.0/2000, 0, 0); */
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
 /*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*     igraph_get_eid(&g, &eid, to, from, 0); */
 /*   } */
 /*   igraph_destroy(&g); */
 
@@ -132,7 +135,7 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 1); */
+/*     igraph_get_eid(&g, &eid, from, to, 0); */
 /*   } */
 /*   igraph_destroy(&g); */
 
@@ -140,7 +143,16 @@ int main() {
 /*   n=igraph_ecount(&g); */
 /*   for (i=0; i<n; i++) { */
 /*     igraph_edge(&g, i, &from, &to); */
-/*     igraph_get_eid(&g, &eid, from, to, 1); */
+/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*   } */
+/*   igraph_destroy(&g); */
+
+/*   igraph_star(&g, 2000000, IGRAPH_STAR_UNDIRECTED, 1999999); */
+/*   n=igraph_ecount(&g); */
+/*   for (i=0; i<n; i++) { */
+/*     igraph_edge(&g, i, &from, &to); */
+/*     igraph_get_eid(&g, &eid, from, to, 0); */
+/*     igraph_get_eid(&g, &eid, to, from, 0); */
 /*   } */
 /*   igraph_destroy(&g); */
     

@@ -44,6 +44,8 @@
 
 2008-07-17  Gabor Csardi  <csardi@rmki.kfki.hu>
 
+	* src/type_indexededgelist.c (igraph_get_eid) : further speedup	
+	
 	* src/type_indexededgelist.c (igraph_get_eid) : speeded up by using 
 	binary search
 
