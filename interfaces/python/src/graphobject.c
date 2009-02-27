@@ -1134,7 +1134,7 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
 {
   igraphmodule_GraphObject *self;
   long n, m = 1;
-  float power = 0.0, zero_appeal = 0.0;
+  float power = 1.0, zero_appeal = 1.0;
   igraph_vector_t outseq;
   PyObject *m_obj = 0, *outpref = Py_False, *directed = Py_False;
 
@@ -1152,8 +1152,8 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
   }
 
   if (m_obj == 0) {
-  igraph_vector_init(&outseq, 0);
-  m = 1;
+    igraph_vector_init(&outseq, 0);
+    m = 1;
   } else if (m_obj != 0) {
     /* let's check whether we have a constant out-degree or a list */
     if (PyInt_Check(m_obj)) {
@@ -1172,7 +1172,7 @@ PyObject *igraphmodule_Graph_Barabasi(PyTypeObject * type,
 
   if (self != NULL) {
     igraphmodule_Graph_init_internal(self);
-    if (power == 0.0) {
+    if (power == 1.0 && zero_appeal == 1.0) {
       /* linear model */
       if (igraph_barabasi_game(&self->g, (igraph_integer_t) n,
                                (igraph_integer_t) m,
@@ -7733,7 +7733,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   // interface to igraph_barabasi_game
   {"Barabasi", (PyCFunction) igraphmodule_Graph_Barabasi,
    METH_VARARGS | METH_CLASS | METH_KEYWORDS,
-   "Barabasi(n, m, outpref=False, directed=False, power=1)\n\n"
+   "Barabasi(n, m, outpref=False, directed=False, power=1, zero_appeal=1)\n\n"
    "Generates a graph based on the Barabasi-Albert model.\n\n"
    "@param n: the number of vertices\n"
    "@param m: either the number of outgoing edges generated for\n"
@@ -7746,7 +7746,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  directed (default: C{False}).\n"
    "@param power: the power constant of the nonlinear model.\n"
    "  It can be omitted, and in this case the usual linear model\n"
-   "  will be used.\n\n"
+   "  will be used.\n"
+   "@param zero_appeal: the attractivity of vertices with degree\n"
+   "  zero.\n\n"
    "@newfield ref: Reference\n"
    "@ref: Barabasi, A-L and Albert, R. 1999. Emergence of scaling\n"
    "  in random networks. Science, 286 509-512."},
