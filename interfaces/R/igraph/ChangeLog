@@ -1,3 +1,8 @@
+2008-09-26  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/flow.R (igraph.mincut) : report error 
+	if (unimplemented) s-t minimum cut is requested
+
 2008-08-20  Gabor Csardi  <csardi@szaffi>
 
 	* interface/R/igraph/R/conversion.R (get.adjacency.sparse) : 
