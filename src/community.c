@@ -1729,7 +1729,8 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
   running = 1;
   while (running) {
-    long int v1, num_neis, max_count;
+    long int v1, num_neis;
+    igraph_real_t max_count;
     igraph_vector_t *neis;
 
     running = 0;
@@ -1742,6 +1743,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
       /* Count the weights corresponding to different labels */
       igraph_vector_null(&label_counters);
+      max_count = 0.0;
       if (weights) {
         neis = igraph_adjedgelist_get(&ael, v1);
         num_neis = igraph_vector_size(neis);
@@ -1749,6 +1751,13 @@ int igraph_community_label_propagation(const igraph_t *graph,
           k = VECTOR(*membership)[(long)IGRAPH_OTHER(graph, VECTOR(*neis)[j], v1)];
           if (k == 0) continue;   /* skip if it has no label yet */
           VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*neis)[j]];
+          if (max_count < VECTOR(label_counters)[k]) {
+            max_count = VECTOR(label_counters)[k];
+            igraph_vector_resize(&dominant_labels, 1);
+            VECTOR(dominant_labels)[0] = k;
+          } else if (max_count == VECTOR(label_counters)[k]) {
+            igraph_vector_push_back(&dominant_labels, k);
+          }
         }
       } else {
         neis = igraph_adjlist_get(&al, v1);
@@ -1757,22 +1766,13 @@ int igraph_community_label_propagation(const igraph_t *graph,
           k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
           if (k == 0) continue;   /* skip if it has no label yet */
           VECTOR(label_counters)[k]++;
-        }
-      }
-
-      /* Find the dominant label(s). Theoretically we could do it
-       * just by checking label_counters with igraph_vector_max,
-       * but this is faster if the current vertex has significantly
-       * less neighbours than the total number of possible labels */
-      max_count = 0;
-      for (j=0; j<num_neis; j++) {
-        k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
-        if (max_count < VECTOR(label_counters)[k]) {
-          max_count = VECTOR(label_counters)[k];
-          igraph_vector_resize(&dominant_labels, 1);
-          VECTOR(dominant_labels)[0] = k;
-        } else if (max_count == VECTOR(label_counters)[k]) {
-          igraph_vector_push_back(&dominant_labels, k);
+          if (max_count < VECTOR(label_counters)[k]) {
+            max_count = VECTOR(label_counters)[k];
+            igraph_vector_resize(&dominant_labels, 1);
+            VECTOR(dominant_labels)[0] = k;
+          } else if (max_count == VECTOR(label_counters)[k]) {
+            igraph_vector_push_back(&dominant_labels, k);
+          }
         }
       }
 
