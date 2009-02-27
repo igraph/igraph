@@ -269,7 +269,7 @@ igraph_real_t igraph_i_revolver_ml_D_alpha_f(const igraph_vector_t *var,
 					     const igraph_vector_t *par,
 					     void *extra) {
   igraph_real_t deg=VECTOR(*var)[0];
-  igraph_real_t alpha=VECTOR(*var)[1];
+  igraph_real_t alpha=VECTOR(*par)[0];
   if (deg != 0) {
     return pow(deg, alpha) + 1.0;
   } else {
@@ -282,7 +282,7 @@ void igraph_i_revolver_ml_D_alpha_df(const igraph_vector_t *var,
 				     igraph_vector_t *res, 
 				     void *extra) {
   igraph_real_t deg=VECTOR(*var)[0];
-  igraph_real_t alpha=VECTOR(*var)[1];
+  igraph_real_t alpha=VECTOR(*par)[0];
   if (deg != 0) {
     VECTOR(*res)[0] = log(deg) * pow(deg, alpha);
   } else {
