@@ -523,6 +523,45 @@ class Graph(core.GraphBase):
             return VertexDendrogram(self, merges, cl)
 
 
+    def community_label_propagation(self, weights = None, initial = None, fixed = None):
+        """community_label_propagation(weights=None, initial=None, fixed=None)
+
+        Finds the community structure of the graph according to the label
+        propagation method of Raghavan et al.
+        Initially, each vertex is assigned a different label. After that,
+        each vertex chooses the dominant label in its neighbourhood in each
+        iteration. Ties are broken randomly and the order in which the
+        vertices are updated is randomized before every iteration. The
+        algorithm ends when vertices reach a consensus.
+        Note that since ties are broken randomly, there is no guarantee that
+        the algorithm returns the same community structure after each run.
+        In fact, they frequently differ. See the paper of Raghavan et al
+        on how to come up with an aggregated community structure.
+        @param weights: name of an edge attribute or a list containing
+          edge weights
+        @param initial: name of a vertex attribute or a list containing
+          the initial vertex labels. Labels are identified by integers from
+          zero to M{n-1} where M{n} is the number of vertices. Negative
+          numbers may also be present in this vector, they represent unlabeled
+          vertices.
+        @param fixed: a list of booleans for each vertex. C{True} corresponds
+          to vertices whose labeling should not change during the algorithm.
+          It only makes sense if initial labels are also given. Unlabeled
+          vertices cannot be fixed.
+        @return: the resulting membership vector
+
+        @newfield ref: Reference
+        @ref: Raghavan, U.N. and Albert, R. and Kumara, S. Near linear
+          time algorithm to detect community structures in large-scale
+          networks. Phys Rev E 76:036106, 2007.
+          U{http://arxiv.org/abs/0709.2938}.
+        """
+        if isinstance(fixed, (str, unicode)):
+            fixed = [bool(o) for o in g.vs[fixed]]
+        cl = GraphBase.community_label_propagation(self, weights, initial, fixed)
+        return VertexClustering(self, cl)
+
+
     def community_edge_betweenness(self, clusters = None, directed = True):
         """Community structure based on the betweenness of the edges in the network.
 
