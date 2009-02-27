@@ -251,8 +251,8 @@ plot.igraph <- function(x,
   if (length(unique(shape)) == 1) {
     .igraph.shapes[[ shape[1] ]](layout, mode="plot", params=params)
   } else {
-    sapply(seq(length=vcount(g)), function(v) {
-      .igraph.shapes[[ shape[v] ]](layout[v,,drop=FALSE], v=v-1,
+    sapply(seq(length=vcount(graph)), function(x) {
+      .igraph.shapes[[ shape[x] ]](layout[x,,drop=FALSE], v=x-1,
                                    mode="plot", params=params)
     })
   }
