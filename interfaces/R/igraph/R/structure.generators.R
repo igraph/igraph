@@ -799,8 +799,8 @@ graph.incidence <- function(incidence, directed=FALSE,
                                   mode=mode, multiple=multiple,
                                   weighted=weighted)
   } else {
-    res <- graph.incidence.dense(indicende, directed=directed, mode=mode,
-                                 multiple=multiple, weighted=weigted)
+    res <- graph.incidence.dense(incidence, directed=directed, mode=mode,
+                                 multiple=multiple, weighted=weighted)
   }
 
   ## Add names

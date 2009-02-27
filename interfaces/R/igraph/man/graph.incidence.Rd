@@ -65,7 +65,7 @@ graph.incidence(incidence, directed = FALSE, mode = c("all", "out",
 \seealso{\code{\link{graph.bipartite}} for another way to create
   bipartite graphs}
 \examples{
-inc <- matrix(sample(0:1, 15, repl=TRUE), 5, 3)
+inc <- matrix(sample(0:1, 15, repl=TRUE), 3, 5)
 colnames(inc) <- letters[1:5]
 rownames(inc) <- LETTERS[1:3]
 graph.incidence(inc)
