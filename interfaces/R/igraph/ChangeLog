@@ -1,3 +1,9 @@
+2009-02-26  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/plot.R (plot.igraph)
+	* interfaces/R/igraph/R/plot.common.R (igraph.check.shapes) : 
+	Better error message for unknown vertex shapes
+
 2009-02-02  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/structural.properties.R

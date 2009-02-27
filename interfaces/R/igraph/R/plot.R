@@ -42,7 +42,7 @@ plot.igraph <- function(x,
   label.color        <- params("vertex", "label.color")
   label.dist         <- params("vertex", "label.dist")
   labels             <- params("vertex", "label")
-  shape              <- params("vertex", "shape")
+  shape              <- igraph.check.shapes(params("vertex", "shape"))
 
   edge.color         <- params("edge", "color")
   edge.width         <- params("edge", "width")
