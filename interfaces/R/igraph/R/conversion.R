@@ -376,8 +376,8 @@ get.incidence.dense <- function(graph, types, names, attr) {
     }
 
     if (names && "name" %in% list.vertex.attributes(graph)) {
-      rownames(res) <- V(g)$name[ which(!types) ]
-      colnames(res) <- V(g)$name[ which( types) ]
+      rownames(res) <- V(graph)$name[ which(!types) ]
+      colnames(res) <- V(graph)$name[ which( types) ]
     } else {
       rownames(res) <- which(!types)-1
       colnames(res) <- which(types)
