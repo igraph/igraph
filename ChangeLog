@@ -1,3 +1,8 @@
+2009-01-25  Gabor Csardi  <csardi@szaffi>
+
+	* src/strucural_properties.c (igraph_path_length_hist) : 
+	fixed a bug, 'unconnected' was wrong for undirected graphs
+
 2009-01-16  Gabor Csardi  <csardi@szaffi>
 
 	* src/foreign-graphml.c

@@ -364,6 +364,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
     for (i=0; i<ressize; i++) {
       VECTOR(*res)[i] /= 2;
     }
+    *unconnected /= 2;
   }
 
   igraph_vector_long_destroy(&already_added);
