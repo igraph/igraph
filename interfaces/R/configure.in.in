@@ -1,5 +1,6 @@
 AC_INIT(igraph, @VERSION@, csardi@rmki.kfki.hu)
 AC_CONFIG_SRCDIR(src/rinterface.c)
+AC_CONFIG_HEADERS(src/config.h)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -83,6 +84,6 @@ fi
 AC_SUBST(HAVE_GMP)
 AC_SUBST(GMP_LIBS)
 
-AC_CONFIG_FILES([src/config.h R/config.R src/Makevars])
+AC_CONFIG_FILES([R/config.R src/Makevars])
 
 AC_OUTPUT
