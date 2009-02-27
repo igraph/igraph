@@ -10,11 +10,16 @@ if test -z "$LIB_ZLIB" ; then
   exit 1
 fi
 
-#if test -z "$LIB_ICONV" ; then  
+#if test -z "$LIB_ICONV" ; then
 #  echo "Please define LIB_ICONV"
 #  exit 1
 #fi
 
-mkdir $DPKG/libs
-cp $LIB_ZLIB/bin/zlib1.dll $DPKG/libs
-cp $LIB_XML/bin/libxml2.dll $DPKG/libs
+if test -z "$R_PACKAGE_DIR" ; then
+   R_PACKAGE_DIR=${DPKG}
+fi
+
+mkdir ${R_PACKAGE_DIR}/libs
+cp $LIB_ZLIB/bin/zlib1.dll ${R_PACKAGE_DIR}/libs
+cp $LIB_XML/bin/libxml2.dll ${R_PACKAGE_DIR}/libs
+
