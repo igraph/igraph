@@ -1,5 +1,8 @@
 2008-11-03  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/igraph/R/tkplot.R :
+	added support for curved edges
+
 	* interfaces/R/igraph/R/plot.common.R (i.default.values) : 
 	added 'curved' edge parameter
 	* interfaces/R/igraph/R/plot.R (plot.igraph, igraph.Arrows) : 
