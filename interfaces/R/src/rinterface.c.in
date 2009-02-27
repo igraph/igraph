@@ -1932,7 +1932,9 @@ SEXP R_igraph_shortest_paths(SEXP graph, SEXP pvids, SEXP pmode, SEXP weights) {
     negw = igraph_vector_min(&w) < 0;
   }
   igraph_matrix_init(&res, 0, 0);
-  if (negw) {
+  if (negw && mode==IGRAPH_OUT && GET_LENGTH(pvids)>100) {
+    igraph_shortest_paths_johnson(&g, &res, vs, pw);
+  } else if (negw) {
     igraph_shortest_paths_bellman_ford(&g, &res, vs, pw, mode);
   } else {
     igraph_shortest_paths_dijkstra(&g, &res, vs, pw, mode);
