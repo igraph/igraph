@@ -197,15 +197,13 @@ arpack.unpack.complex(vectors, values, nev)
 }
 \value{
   A named list with the following members:
-  \itemize{
-    \item{values}{Numeric vector, the desired eigenvalues.}
-    \item{vectors}{Numeric matrix, the desired eigenvectors as
-      columns. If \code{complex=TRUE} (the default for non-symmetric
-      problems), then the matrix is complex.}
-    \item{options}{A named list with the supplied \code{options} and
-      some information about the performed calculation, including an
-      ARPACK exit code. See the details above.
-    }
+  \item{values}{Numeric vector, the desired eigenvalues.}
+  \item{vectors}{Numeric matrix, the desired eigenvectors as
+    columns. If \code{complex=TRUE} (the default for non-symmetric
+    problems), then the matrix is complex.}
+  \item{options}{A named list with the supplied \code{options} and
+    some information about the performed calculation, including an
+    ARPACK exit code. See the details above.
   }
 }
 \references{

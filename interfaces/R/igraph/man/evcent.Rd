@@ -46,13 +46,11 @@ computation, see \code{\link{arpack}} for more about ARPACK in igraph.
 }
 \value{
   A named list with components:
-  \itemize{
-    \item{vector}{A vector containing the centrality scores.}
-    \item{value}{The eigenvalue corresponding to the calculated
-      eigenvector, i.e. the centrality scores.}
-    \item{options}{A named list, information about the underlying ARPACK
-      computation. See \code{\link{arpack}} for the details.
-    }
+  \item{vector}{A vector containing the centrality scores.}
+  \item{value}{The eigenvalue corresponding to the calculated
+    eigenvector, i.e. the centrality scores.}
+  \item{options}{A named list, information about the underlying ARPACK
+    computation. See \code{\link{arpack}} for the details.
   }
 }
 \references{ Bonacich, P.  (1987).  Power and Centrality: A Family of

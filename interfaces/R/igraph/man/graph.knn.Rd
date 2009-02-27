@@ -27,13 +27,11 @@ graph.knn(graph, vids=V(graph), weights=NULL)
 }
 \value{
   A list with two members:
-  \itemize{
-    \item{knn}{A numeric vector giving the average nearest neighbor
-      degree for all vertices in \code{vids}.}
-    \item{knnk}{A numeric vector, its length is the maximum (total)
-      vertex degree in the graph. The first element is the
-      average nearest neighbor degree of vertices with degree one, etc.
-    }
+  \item{knn}{A numeric vector giving the average nearest neighbor
+    degree for all vertices in \code{vids}.}
+  \item{knnk}{A numeric vector, its length is the maximum (total)
+    vertex degree in the graph. The first element is the
+    average nearest neighbor degree of vertices with degree one, etc.
   }
 }
 \references{

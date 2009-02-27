@@ -64,18 +64,16 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   A numeric constant, the maximum flow, or the minimum cut, except if
   \code{value.only=FALSE} for \code{graph.mincut}. In this case a named
   list with components:
-  \itemize{
-    \item{value}{Numeric scalar, the cut value.}
-    \item{cut}{Numeric vector, the edges in the cut.}
-    \item{partition1}{The vertices in the first partition after the cut
-      edges are removed. Note that these vertices might be actually in
-      different components (after the cut edges are removed), as the
-      graph may fall apart into more than two components.}
-    \item{partition2}{The vertices in the second partition after the cut
-      edges are removed. Note that these vertices might be actually in
-      different components (after the cut edges are removed), as the
-      graph may fall apart into more than two components.}
-  }
+  \item{value}{Numeric scalar, the cut value.}
+  \item{cut}{Numeric vector, the edges in the cut.}
+  \item{partition1}{The vertices in the first partition after the cut
+    edges are removed. Note that these vertices might be actually in
+    different components (after the cut edges are removed), as the
+    graph may fall apart into more than two components.}
+  \item{partition2}{The vertices in the second partition after the cut
+    edges are removed. Note that these vertices might be actually in
+    different components (after the cut edges are removed), as the
+    graph may fall apart into more than two components.}
 }
 \references{
   A. V. Goldberg and R. E. Tarjan: ``A New Approach to the Maximum Flow

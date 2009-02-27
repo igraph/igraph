@@ -32,20 +32,18 @@ fastgreedy.community(graph, merges=TRUE, modularity=TRUE,
 }
 \value{
   A named list with the following members:
-  \itemize{
-    \item{merges}{A matrix with two column, this represents a dendogram
-      and contains all the merges the algorithm performed. Each line is
-      one merge and it is given by the ids of the two communities
-      merged. The community ids are integer numbers starting from zero
-      and the communities between zero and the number of vertices
-      (\code{N}) minus one belong to individual vertices. The first line
-      of the matrix gives the first merge, this merge creates community
-      \code{N}, the number of vertices, the second merge creates
-      community \code{N+1}, etc.
-    }
-    \item{modularity}{A numeric vector containing the modularity value 
-      of the community structure after performing every merge.
-    }
+  \item{merges}{A matrix with two column, this represents a dendogram
+    and contains all the merges the algorithm performed. Each line is
+    one merge and it is given by the ids of the two communities
+    merged. The community ids are integer numbers starting from zero
+    and the communities between zero and the number of vertices
+    (\code{N}) minus one belong to individual vertices. The first line
+    of the matrix gives the first merge, this merge creates community
+    \code{N}, the number of vertices, the second merge creates
+    community \code{N+1}, etc.
+  }
+  \item{modularity}{A numeric vector containing the modularity value 
+    of the community structure after performing every merge.
   }
 }
 \references{

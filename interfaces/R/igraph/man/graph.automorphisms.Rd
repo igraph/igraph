@@ -29,17 +29,15 @@ graph.automorphisms(graph, sh="fm")
 }
 \value{
   A named list with the following members:
-  \itemize{
-    \item{group_size}{The size of the automorphism group of the
-      input graph, as a string. This number is exact if igraph was
-      compiled with the GMP library, and approximate otherwise.}
-    \item{nof_nodes}{The number of nodes in the search tree.}
-    \item{nof_leaf_nodes}{The number of leaf nodes in the search
-      tree.}
-    \item{nof_bad_nodes}{Number of bad nodes.}
-    \item{nof_canupdates}{Number of canrep updates.}
-    \item{max_level}{Maximum level.}
-  }
+  \item{group_size}{The size of the automorphism group of the
+    input graph, as a string. This number is exact if igraph was
+    compiled with the GMP library, and approximate otherwise.}
+  \item{nof_nodes}{The number of nodes in the search tree.}
+  \item{nof_leaf_nodes}{The number of leaf nodes in the search
+    tree.}
+  \item{nof_bad_nodes}{Number of bad nodes.}
+  \item{nof_canupdates}{Number of canrep updates.}
+  \item{max_level}{Maximum level.}
 }
 \references{
   Tommi Junttila and Petteri Kaski: Engineering an Efficient Canonical

@@ -30,15 +30,13 @@ is.bipartite(graph)
 }
 \value{
   A named list with two elements:
-  \itemize{
-    \item{res}{A logical scalar, \code{TRUE} if the can be bipartite,
-      \code{FALSE} otherwise.}
-    \item{type}{A possibly vertex type mapping, a logical vector. If no
-      such mapping exists, then an empty vector.}
-  }
+  \item{res}{A logical scalar, \code{TRUE} if the can be bipartite,
+    \code{FALSE} otherwise.}
+  \item{type}{A possibly vertex type mapping, a logical vector. If no
+    such mapping exists, then an empty vector.}
 }
 % e
-\references{}
+% \references{}
 \author{ Gabor Csardi \email{csardi@rmki.kfki.hu} }
 % \seealso{}
 \examples{

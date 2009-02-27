@@ -75,13 +75,11 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
 }
 \value{
   For \code{page.rank} a named list with entries:
-  \itemize{
-    \item{vector}{A numeric vector with the PageRank scores.}
-    \item{value}{The eigenvalue corresponding to the eigenvector with
-      the page rank scores. It should be always exactly one.}
-    \item{options}{Some information about the underlying ARPACK
-      calculation. See \code{\link{arpack}} for details.}
-  }
+  \item{vector}{A numeric vector with the PageRank scores.}
+  \item{value}{The eigenvalue corresponding to the eigenvector with
+    the page rank scores. It should be always exactly one.}
+  \item{options}{Some information about the underlying ARPACK
+    calculation. See \code{\link{arpack}} for details.}
   
   For \code{page.rank.old} a numeric vector of Page Rank scores.
 }

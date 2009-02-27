@@ -13,11 +13,9 @@ dyad.census(graph)
 }
 %\details{}
 \value{A named numeric vector with three elements:
-  \itemize{
-    \item{mut}{The number of pairs with mutual connections.}
-    \item{asym}{The number of pairs with non-mutual connections.}
-    \item{null}{The number of pairs with no connection between them.}
-  }
+  \item{mut}{The number of pairs with mutual connections.}
+  \item{asym}{The number of pairs with non-mutual connections.}
+  \item{null}{The number of pairs with no connection between them.}
 }
 \references{
   Holland, P.W. and Leinhardt, S. A Method for Detecting

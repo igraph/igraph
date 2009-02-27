@@ -30,14 +30,12 @@ hub.score (graph, scale = TRUE, options = igraph.arpack.default)
 }
 \value{
   A named list with members:
-  \itemize{
-    \item{vector}{The authority/hub scores of the vertices.}
-    \item{value}{The corresponding eigenvalue of the calculated
-      principal eigenvector.}
-    \item{options}{Some information about the ARPACK computation, it has
-      the same members as the \code{options} member returned by
-      \code{\link{arpack}}, see that for documentation.}
-  }
+  \item{vector}{The authority/hub scores of the vertices.}
+  \item{value}{The corresponding eigenvalue of the calculated
+    principal eigenvector.}
+  \item{options}{Some information about the ARPACK computation, it has
+    the same members as the \code{options} member returned by
+    \code{\link{arpack}}, see that for documentation.}
 }
 \references{
   J. Kleinberg. Authoritative sources in a hyperlinked
