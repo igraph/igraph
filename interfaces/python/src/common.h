@@ -28,11 +28,17 @@
 
 #ifdef RC_DEBUG
 #define RC_ALLOC(T, P) fprintf(stderr, "[ alloc ] " T " @ %p\n", P)
+#define RC_DECREF(T, P) fprintf(stderr, "[ ref - ] " T " @ %p (was: %d)\n", P, (int)P->ob_refcnt);
+#define RC_INCREF(T, P) fprintf(stderr, "[ ref + ] " T " @ %p (was: %d)\n", P, (int)P->ob_refcnt);
+#define RC_PRINT(P) fprintf(stderr, "[refcntr] %s @ %p = %d\n", ((PyTypeObject*)P->ob_type)->tp_name, P, (int)P->ob_refcnt);
 #define RC_DEALLOC(T, P) fprintf(stderr, "[dealloc] " T " @ %p\n", P);
 #define RC_TRAVERSE(T, P)
 //#define RC_TRAVERSE(T, P) fprintf(stderr, "[ travr ] " T " @ %p\n", P);
 #else
 #define RC_ALLOC(T, P)
+#define RC_DECREF(T, P)
+#define RC_INCREF(T, P)
+#define RC_PRINT(P)
 #define RC_DEALLOC(T, P)
 #define RC_TRAVERSE(T, P)
 #endif
