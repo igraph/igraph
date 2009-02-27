@@ -4409,7 +4409,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 
       /* If we cannot get to j in finite time yet, there is no need to relax
        * its edges */
-      if (!IGRAPH_FINITE(MATRIX(*res,i,j))) continue;
+      if (!IGRAPH_FINITE(VECTOR(dist)[j])) continue;
 
       neis = igraph_lazy_adjedgelist_get(&adjlist, j);
       nlen = igraph_vector_size(neis);
