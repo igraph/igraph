@@ -187,7 +187,117 @@ int igraph_bipartite_projection(const igraph_t *graph,
   return 0;
 }
   
+
+/** 
+ * \function igraph_full_bipartite
+ * Create a full bipartite network
+ * 
+ * A bipartite network contains two kinds of vertices and connections
+ * are only possible between two vertices of different kind. There are
+ * many natural examples, e.g. movies and actors as vertices and a
+ * movie is connected to all participating actors, etc.
+ * 
+ * </para><para>
+ * igraph does not have direct support for bipartite networks, at
+ * least not at the C language level. In other words the igraph_t
+ * structure does not contain information about the vertex types. 
+ * The C functions for bipartite networks usually have an additional
+ * input argument to graph, called \c types, a boolean vector giving
+ * the vertex types.
+ * 
+ * </para><para>
+ * Most functions creating bipartite networks are able to create this
+ * extra vector, you just need to supply an initialized boolean vector
+ * to them.
+ * 
+ * \param graph Pointer to an igraph_t object, the graph will be
+ *   created here.
+ * \param types Pointer to a boolean vector. If not a null pointer,
+ *   then the vertex types will be stored here.
+ * \param n1 Integer, the number of vertices of the first kind.
+ * \param n2 Integer, the number of vertices of the second kind.
+ * \param directed Boolean, whether to create a directed graph.
+ * \param mode A constant that gives the type of connections for
+ *   directed graphs. If \c IGRAPH_OUT, then edges point from vertices
+ *   of the first kind to vertices of the second kind; if \c
+ *   IGRAPH_IN, then the opposite direction is realized; if \c
+ *   IGRAPH_ALL, then mutual edges will be created.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ * 
+ * \sa \ref igraph_full() for non-bipartite full graphs.
+ */
+
+int igraph_full_bipartite(igraph_t *graph, 
+			  igraph_vector_bool_t *types,
+			  igraph_integer_t n1, igraph_integer_t n2,
+			  igraph_bool_t directed, 
+			  igraph_neimode_t mode) {
   
+  long int nn1=n1, nn2=n2;
+  long int no_of_nodes=nn1+nn2;
+  igraph_vector_t edges;
+  long int no_of_edges;
+  long int ptr=0;
+  long int i, j;
   
-      
+  if (!directed) {
+    no_of_edges=nn1 * nn2;
+  } else if (mode==IGRAPH_OUT || mode==IGRAPH_IN) {
+    no_of_edges=nn1 * nn2;
+  } else { /* mode==IGRAPH_ALL */
+    no_of_edges=nn1 * nn2 * 2;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges*2);
+
+  if (!directed || mode==IGRAPH_OUT) {
+
+    for (i=0; i<nn1; i++) {
+      for (j=0; j<nn2; j++) {
+	VECTOR(edges)[ptr++]=i;
+	VECTOR(edges)[ptr++]=nn1+j;
+      }
+    }
     
+  } else if (mode==IGRAPH_IN) {
+
+    for (i=0; i<nn1; i++) {
+      for (j=0; j<nn2; j++) {
+	VECTOR(edges)[ptr++]=nn1+j;
+	VECTOR(edges)[ptr++]=i;
+      }
+    }
+    
+  } else {
+    
+    for (i=0; i<nn1; i++) {
+      for (j=0; j<nn2; j++) {
+	VECTOR(edges)[ptr++]=i;
+	VECTOR(edges)[ptr++]=nn1+j;
+	VECTOR(edges)[ptr++]=nn1+j;
+	VECTOR(edges)[ptr++]=i;
+      }
+    }
+  }
+  
+  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_destroy, graph);
+
+  if (types) {
+    IGRAPH_CHECK(igraph_vector_bool_resize(types, no_of_nodes));
+    igraph_vector_bool_null(types);
+    for (i=nn1; i<no_of_nodes; i++) {
+      VECTOR(*types)[i] = 1;
+    }
+  }
+  
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+  
