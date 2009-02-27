@@ -4429,12 +4429,13 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     }
   }
 
+  igraph_vector_destroy(&dist);
   igraph_vit_destroy(&fromvit);
   igraph_dqueue_destroy(&Q);
   igraph_vector_destroy(&clean_vertices);
   igraph_vector_destroy(&num_queued);
   igraph_lazy_adjedgelist_destroy(&adjlist);
-  IGRAPH_FINALLY_CLEAN(5);
+  IGRAPH_FINALLY_CLEAN(6);
 
   return 0;
 }
