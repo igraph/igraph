@@ -362,4 +362,12 @@ STRVECTOR:
     OUT: PROTECT(%I%=R_igraph_strvector_to_SEXP(&%C%)); \
          igraph_strvector_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
-   
+
+##################################
+# Vertex types in a bipartite graph
+
+BIPARTITE_TYPES:
+  CTYPE: igraph_vector_bool_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN: if (!isNull(%I%)) { R_SEXP_to_vector_bool(%I%, &%C%); }

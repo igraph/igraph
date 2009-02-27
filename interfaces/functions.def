@@ -522,6 +522,16 @@ igraph_strength:
         DEPS: vids ON graph, weights ON graph
 
 #######################################
+# Bipartite graphs
+#######################################
+
+igraph_bipartite_projection:
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, \
+                OUT GRAPH proj1, OUT GRAPH proj2, INTEGER probe1=-1
+        DEPS: types ON graph
+        NAME-R: bipartite.projection
+
+#######################################
 # Components
 #######################################
 
