@@ -1,5 +1,9 @@
 2008-10-24  Gabor Csardi  <csardi@szaffi>
 
+	* interfaces/R/igraph/R/structural.properties.R (shortest.paths)
+	* interfaces/R/src/rinterface.c.in (R_igraph_shortest_paths) :
+	make it possible to choose shortest path algorithm by hand
+	
 	* interfaces/R/src/rinterface.c.in (R_igraph_shortest_paths) :
 	call Johnson's algorithm, if appropriate
 

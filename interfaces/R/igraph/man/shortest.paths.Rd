@@ -13,7 +13,9 @@
   path itself, and not just its length) from or to the given vertex.}
 \usage{
 shortest.paths(graph, v=V(graph), mode = c("all", "out", "in"),
-      weights = NULL)
+      weights = NULL, algorithm = c("automatic", "unweighted",
+                                    "dijkstra", "bellman-ford",
+                                    "johnson"))
 get.shortest.paths(graph, from, to=V(graph), mode = c("all", "out",
       "in"), weights = NULL)
 get.all.shortest.paths(graph, from, to = V(graph), mode = c("all", "out", "in")) 
@@ -35,6 +37,18 @@ path.length.hist (graph, directed = TRUE, verbose = igraph.par("verbose"))
     is \code{NULL} and the graph has a \code{weight} edge attribute,
     then the attribute is used. If this is \code{NA} then no weights are
     used (even if the graph has a \code{weight} attribute).}
+  \item{algorithm}{Which algorithm to use for the calculation. By
+    default igraph tries to select the fastest suitable algorithm. If
+    there are no weights, then an unweighted breadth-first search is used,
+    otherwise if all weights are positive, then Dijkstra's algorithm is
+    used. If there are negative weights and we do the calculation for
+    more than 100 sources, then Johnson's algorithm is used. Otherwise
+    the Bellman-Ford algorithm is used. You can override igraph's choice
+    by explicitly giving this parameter. Note that the igraph C core
+    might still override your choice in obvious cases, i.e. if there are
+    no edge weights, then the unweighted algorithm will be used,
+    regardless of this argument.
+  }
   \item{from}{Numeric constant, the vertex from or to the shortest paths
     will be calculated. Note that right now this is not a vector of
     vertex ids, but only a single vertex.}
