@@ -56,6 +56,7 @@ plot.igraph <- function(x,
   edge.label.color   <- params("edge", "label.color")
   arrow.size         <- params("edge", "arrow.size")[1]
   arrow.width        <- params("edge", "arrow.width")[1]
+  curved             <- params("edge", "curved")
   
   layout             <- params("plot", "layout")
   margin             <- params("plot", "margin")
@@ -221,10 +222,12 @@ plot.igraph <- function(x,
     if (length(unique(arrow.mode))==1) {
       igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
                     sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode,
-                    sh.lty=edge.lty, h.lty=1, size=arrow.size, width=arrow.width)
+                    sh.lty=edge.lty, h.lty=1, size=arrow.size,
+                    width=arrow.width, curved=curved)
     } else {
       ## different kinds of arrows drawn separately as 'arrows' cannot
       ## handle a vector as the 'code' argument
+      curved <- rep(curved, length=ecount(graph))[nonloops.e]
       for (code in 0:3) {
         valid <- arrow.mode==code
         if (!any(valid)) { next }
@@ -233,7 +236,8 @@ plot.igraph <- function(x,
         el <- edge.lty   ; if (length(el)>1) { el <- el[valid] }
         igraph.Arrows(x0[valid], y0[valid], x1[valid], y1[valid],
                       code=code, sh.col=ec, h.col=ec, sh.lwd=ew, h.lwd=1,
-                      h.lty=1, sh.lty=el, open=FALSE, size=arrow.size, width=arrow.width)
+                      h.lty=1, sh.lty=el, open=FALSE, size=arrow.size,
+                      width=arrow.width, curved=curved[valid])
       }
     }
     phi <- atan2(y1-y0, x1-x0)
@@ -549,7 +553,8 @@ function (x1, y1, x2, y2,
                     h.col=sh.col,
                     h.col.bo=sh.col,
                     h.lwd=sh.lwd,
-                    h.lty=sh.lty)
+                    h.lty=sh.lty,
+                    curved=FALSE)
   ## Author: Andreas Ruckstuhl, refined by Rene Locher
   ## Version: 2005-10-17
 {
@@ -565,16 +570,57 @@ function (x1, y1, x2, y2,
   y.arr <- c(-rev(wx2 + delta), wx2 + delta)
   deg.arr <- c(atan2(y.arr, x.arr), NA)
   r.arr <- c(sqrt(x.arr^2 + y.arr^2), NA)
+
+  ## backup
+  bx1 <- x1 ; bx2 <- x2 ; by1 <- y1 ; by2 <- y2
   
-  ## forward arrowhead
-  theta <- atan2((y2 - y1) * uin[2], (x2 - x1) * uin[1])
+  ## shaft
   lx <- length(x1)
-  Rep <- rep(length(deg.arr), lx)
-  p.x2 <- rep(x2, Rep)
-  p.y2 <- rep(y2, Rep)
-  ttheta <- rep(theta, Rep) + rep(deg.arr, lx)
-  r.arr <- rep(r.arr, lx)  
-  if (code %in% c(2,3)) {
+  theta <- atan2((y2 - y1) * uin[2], (x2 - x1) * uin[1])
+  r.seg <- rep(cin*sh.adj, lx)
+  th.seg <- theta + rep(atan2(0, -cin), lx)
+  if (is.logical(curved) && all(!curved)) {
+    segments(x1, y1, x2+r.seg*cos(th.seg)/uin[1], y2+r.seg*sin(th.seg)/uin[2], 
+             lwd=sh.lwd, col=sh.col, lty=sh.lty)
+  } else {
+    if (is.numeric(curved)) {
+      lambda <- curved
+    } else {
+      lambda <- as.logical(curved) * 0.5
+    }
+    c.x1 <- x1
+    c.y1 <- y1
+    c.x2 <- x2+r.seg*cos(th.seg)/uin[1]
+    c.y2 <- y2+r.seg*sin(th.seg)/uin[2]
+
+    midx <- (x1+x2)/2
+    midy <- (y1+y2)/2  
+    spx <- midx - lambda * 1/2 * (c.y2-c.y1)
+    spy <- midy + lambda * 1/2 * (c.x2-c.x1)
+    sh.col <- rep(sh.col, length=length(c.x1))
+    for (i in seq_len(length(c.x1))) {
+      spl <- xspline(x=c(c.x1[i],spx[i],c.x2[i]),
+                     y=c(c.y1[i],spy[i],c.y2[i]), shape=1, draw=FALSE)
+      lines(spl, lwd=sh.lwd, col=sh.col[i], lty=sh.lty)
+      if (code %in% c(2,3)) {
+        x1[i] <- spl$x[3*length(spl$x)/4]
+        y1[i] <- spl$y[3*length(spl$y)/4]
+      }
+      if (code %in% c(1,3)) {
+        x2[i] <- spl$x[length(spl$x)/4]
+        y2[i] <- spl$y[length(spl$y)/4]
+      }
+    }
+  }
+
+  ## forward arrowhead
+  if (code %in% c(2,3)) {    
+    theta <- atan2((by2 - y1) * uin[2], (bx2 - x1) * uin[1])
+    Rep <- rep(length(deg.arr), lx)
+    p.x2 <- rep(bx2, Rep)
+    p.y2 <- rep(by2, Rep)
+    ttheta <- rep(theta, Rep) + rep(deg.arr, lx)
+    r.arr <- rep(r.arr, lx)  
     if(open) lines((p.x2 + r.arr * cos(ttheta)/uin[1]),
                    (p.y2 + r.arr*sin(ttheta)/uin[2]), 
                    lwd=h.lwd, col = h.col.bo, lty=h.lty) else
@@ -582,15 +628,10 @@ function (x1, y1, x2, y2,
             col = h.col, lwd=h.lwd,
             border=h.col.bo, lty=h.lty)
   }
-  
-  ## shaft
-  r.seg <- rep(cin*sh.adj, lx)
-  th.seg <- theta + rep(atan2(0, -cin), lx)
-  segments(x1, y1, x2+r.seg*cos(th.seg)/uin[1], y2+r.seg*sin(th.seg)/uin[2], 
-           lwd=sh.lwd, col=sh.col, lty=sh.lty)
-
+    
   ## backward arrow head
   if (code %in% c(1,3)) {
+    x1 <- bx1; y1 <- by1
     tmp <- x1 ; x1 <- x2 ; x2 <- tmp
     tmp <- y1 ; y1 <- y2 ; y2 <- tmp
     theta <- atan2((y2 - y1) * uin[2], (x2 - x1) * uin[1])
