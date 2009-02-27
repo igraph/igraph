@@ -3,11 +3,12 @@
 \alias{igraph-package}
 \alias{igraph}
 \title{The igraph package}
+\description{igraph is a library for network analysis.}
 \section{Introduction}{
-  The main goals of the igraph library is an open source is
+  The main goals of the igraph library is 
   to provide a set of data types and functions for 1) pain-free
   implementation of graph algorithms, 2) fast handling of large graphs,
-  with millions of vertices and edges, 3) allow rapid prototyping via
+  with millions of vertices and edges, 3) allowing rapid prototyping via
   high level languages like R.
 }
 \section{Creating graphs}{
