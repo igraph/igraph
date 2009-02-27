@@ -1,3 +1,10 @@
+2008-11-14  Gabor Csardi  <csardi@szaffi>
+
+	* interfaces/R/igraph/R/plot.R (igraph.Arrows) : handle 
+	different edge line types and width for curved edges
+	* interfaces/R/igraph/R/tkplot.R: curve the edges the same 
+	direction as plot
+
 2008-11-03  Gabor Csardi  <csardi@szaffi>
 
 	* interfaces/R/igraph/R/tkplot.R :

@@ -790,8 +790,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
       smooth <- TRUE
       midx <- (from.c[1]+to.c[1])/2
       midy <- (from.c[2]+to.c[2])/2        
-      spx <- midx - curved * 1/2 * (to.c[2]-from.c[2])
-      spy <- midy + curved * 1/2 * (to.c[1]-from.c[1])
+      spx <- midx - curved * 1/2 * (from.c[2]-to.c[2])
+      spy <- midy + curved * 1/2 * (from.c[1]-to.c[1])
       coords <- c(from.c[1], from.c[2], spx, spy, to.c[1], to.c[2])
     } else {
       smooth <- FALSE
@@ -878,8 +878,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
     } else {
       midx <- (from.c[1]+to.c[1])/2
       midy <- (from.c[2]+to.c[2])/2        
-      spx <- midx - curved * 1/2 * (to.c[2]-from.c[2])
-      spy <- midy + curved * 1/2 * (to.c[1]-from.c[1])
+      spx <- midx - curved * 1/2 * (from.c[2]-to.c[2])
+      spy <- midy + curved * 1/2 * (from.c[1]-to.c[1])
       tkcoords(tkp$canvas, itemid, from.c[1], from.c[2], spx, spy,
                to.c[1], to.c[2])
     }

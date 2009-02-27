@@ -598,10 +598,12 @@ function (x1, y1, x2, y2,
     spx <- midx - lambda * 1/2 * (c.y2-c.y1)
     spy <- midy + lambda * 1/2 * (c.x2-c.x1)
     sh.col <- rep(sh.col, length=length(c.x1))
+    sh.lty <- rep(sh.lty, length=length(c.x1))
+    sh.lwd <- rep(sh.lwd, length=length(c.x1))
     for (i in seq_len(length(c.x1))) {
       spl <- xspline(x=c(c.x1[i],spx[i],c.x2[i]),
                      y=c(c.y1[i],spy[i],c.y2[i]), shape=1, draw=FALSE)
-      lines(spl, lwd=sh.lwd, col=sh.col[i], lty=sh.lty)
+      lines(spl, lwd=sh.lwd[i], col=sh.col[i], lty=sh.lty[i])
       if (code %in% c(2,3)) {
         x1[i] <- spl$x[3*length(spl$x)/4]
         y1[i] <- spl$y[3*length(spl$y)/4]
