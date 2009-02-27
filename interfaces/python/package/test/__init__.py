@@ -1,7 +1,7 @@
 import unittest
 from igraph.test import basic, layouts, games, foreign, structural, flow, \
     spectral, attributes, cliques, decomposition, operators, generators, \
-    isomorphism, colortests, vertexseq, edgeseq, iterators
+    isomorphism, colortests, vertexseq, edgeseq, iterators, bipartite
 
 def suite():
     return unittest.TestSuite( \
@@ -21,6 +21,7 @@ def suite():
          operators.suite(),
          isomorphism.suite(),
          iterators.suite(),
+         bipartite.suite(),
          colortests.suite()] \
     )
     
@@ -30,7 +31,7 @@ def test():
         import testoob
         testoob.main(suite())
     except ImportError:
-        runner = unittest.TextTestRunner()
+        runner = unittest.TextTestRunner(verbosity=2)
         runner.run(suite())
 
 if __name__ == "__main__": test()

@@ -616,6 +616,7 @@ PyObject *igraphmodule_Graph_is_loop(igraphmodule_GraphObject *self,
   }
 
   if (igraph_vector_bool_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
     igraph_es_destroy(&es);
     return NULL;
   }
@@ -663,6 +664,7 @@ PyObject *igraphmodule_Graph_is_multiple(igraphmodule_GraphObject *self,
   }
 
   if (igraph_vector_bool_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
     igraph_es_destroy(&es);
     return NULL;
   }
@@ -710,6 +712,7 @@ PyObject *igraphmodule_Graph_is_mutual(igraphmodule_GraphObject *self,
   }
 
   if (igraph_vector_bool_init(&result, 0)) {
+    igraphmodule_handle_igraph_error();
     igraph_es_destroy(&es);
     return NULL;
   }
@@ -4119,6 +4122,64 @@ PyObject *igraphmodule_Graph_vertex_connectivity(igraphmodule_GraphObject *self,
   
   result = res;
   return Py_BuildValue("l", result);
+}
+
+/**********************************************************************
+ * Bipartite graphs                                                   *
+ **********************************************************************/
+
+/** \ingroup python_interface_graph
+ * \brief Checks whether a graph is bipartite
+ * \return a boolean or a (boolean, list of booleans) pair
+ * \sa igraph_is_bipartite
+ */
+PyObject *igraphmodule_Graph_is_bipartite(igraphmodule_GraphObject *self,
+                                          PyObject *args, PyObject *kwds) {
+  PyObject *types_o, *return_types_o = Py_False;
+  igraph_vector_bool_t types;
+  igraph_bool_t return_types = 0, result;
+
+  static char *kwlist[] = { "return_types", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &return_types_o))
+    return NULL;
+  return_types = PyObject_IsTrue(return_types_o);
+
+  if (return_types) {
+    if (igraph_vector_bool_init(&types, igraph_vcount(&self->g))) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    if (igraph_is_bipartite(&self->g, &result, &types)) {
+      igraph_vector_bool_destroy(&types);
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    if (result) {
+      types_o = igraphmodule_vector_bool_t_to_PyList(&types);
+      if (!types_o) {
+        igraph_vector_bool_destroy(&types);
+        return NULL;
+      }
+      igraph_vector_bool_destroy(&types);
+      // reference to types_o will be stolen by Py_BuildValue
+      return Py_BuildValue("ON", Py_True, types_o);
+    } else {
+      return Py_BuildValue("OO", Py_False, Py_None);
+    }
+  } else {
+    if (igraph_is_bipartite(&self->g, &result, 0)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+
+    if (result)
+      Py_RETURN_TRUE;
+    else
+      Py_RETURN_FALSE;
+  }
 }
 
 /**********************************************************************
@@ -8460,6 +8521,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@return: the hub scores in a list and optionally the largest eigenvalue\n"
    "  as a second member of a tuple\n\n"
    "@see: authority_score()\n"
+  },
+
+  /* interface to igraph_is_bipartite */
+  {"is_bipartite", (PyCFunction) igraphmodule_Graph_is_bipartite,
+   METH_VARARGS | METH_KEYWORDS,
+   "is_bipartite(return_types=False)\n\n"
+   "Decides whether the graph is bipartite or not.\n\n"
+   "Vertices of a bipartite graph can be partitioned into two groups A\n"
+   "and B in a way that all edges go between the two groups.\n\n"
+   "@param return_types: if C{False}, the method will simply\n"
+   "  return C{True} or C{False} depending on whether the graph is\n"
+   "  bipartite or not. If C{True}, the actual group assignments\n"
+   "  are also returned as a list of boolean values. (Note that\n"
+   "  the group assignment is not unique, especially if the graph\n"
+   "  consists of multiple components, since the assignments of\n"
+   "  components are independent from each other).\n"
+   "@return: C{True} if the graph is bipartite, C{False} if not.\n"
+   "  If C{return_types} is C{True}, the group assignment is also\n"
+   "  returned.\n"
   },
 
   /* interface to igraph_is_connected */

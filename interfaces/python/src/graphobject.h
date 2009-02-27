@@ -209,6 +209,8 @@ PyObject* igraphmodule_Graph_community_clauset(igraphmodule_GraphObject* self, P
 PyObject* igraphmodule_Graph_community_edge_betweenness(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_modularity(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 
+PyObject *igraphmodule_Graph_is_bipartite(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+
 PyObject* igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph___register_destructor__(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
