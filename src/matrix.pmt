@@ -1192,7 +1192,7 @@ int FUNCTION(igraph_matrix,rowsum)(const TYPE(igraph_matrix) *m,
 
 /**
  * \function igraph_matrix_colsum
- * Columnise sum
+ * Columnwise sum
  * 
  * Calculate the sum of the elements in each column.
  * \param m The input matrix.
