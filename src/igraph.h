@@ -850,6 +850,11 @@ int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to)
 int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
          igraph_vector_t *ins, igraph_vector_t *outs);
 
+int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
+				       igraph_vs_t vids,
+				       igraph_vector_t *knn,
+				       igraph_vector_t *knnk);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */

@@ -114,6 +114,7 @@
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_reciprocity -->
 <!-- doxrox-include igraph_is_mutual -->
+<!-- doxrox-include igraph_avg_nearest_neighbor_degree -->
 <!-- doxrox-include igraph_get_adjacency -->	
 <!-- doxrox-include igraph_get_edgelist -->	
 </section>

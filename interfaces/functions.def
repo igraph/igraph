@@ -505,6 +505,12 @@ igraph_is_mutual:
         DEPS: es ON graph
         NAME-R: is.mutual
 
+igraph_avg_nearest_neighbor_degree:
+        PARAMS: GRAPH graph, VERTEXSET vids=ALL, OUT VECTOR_OR_0 knn, \
+                OUT VECTOR_OR_0 knnk
+        DEPS: vids ON graph
+        NAME-R: graph.knn
+
 #######################################
 # Components
 #######################################
