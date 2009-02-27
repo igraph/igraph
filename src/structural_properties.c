@@ -4412,7 +4412,7 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 
       /* If we cannot get to j in finite time yet, there is no need to relax
        * its edges */
-      if (!IGRAPH_FINITE(VECTOR(dist)[j])) continue;
+      if (!IGRAPH_FINITE(MATRIX(*res, i, j))) continue;
 
       neis = igraph_lazy_adjedgelist_get(&adjlist, j);
       nlen = igraph_vector_size(neis);
@@ -4432,13 +4432,12 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     }
   }
 
-  igraph_vector_destroy(&dist);
   igraph_vit_destroy(&fromvit);
   igraph_dqueue_destroy(&Q);
   igraph_vector_destroy(&clean_vertices);
   igraph_vector_destroy(&num_queued);
   igraph_lazy_adjedgelist_destroy(&adjlist);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(5);
 
   return 0;
 }
