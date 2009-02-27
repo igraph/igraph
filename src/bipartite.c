@@ -601,4 +601,106 @@ int igraph_get_incidence(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+/**
+ * \function igraph_is_bipartite
+ * Check whether a graph is bipartite
+ *
+ * </para><para>
+ * This function simply checks whether a graph \emph{could} be
+ * bipartite. It tries to find a mapping that gives a possible division
+ * of the vertices into two classes, such that no two vertices of the
+ * same class are connected by an edge.
+ * 
+ * </para><para>
+ * The existence of such a mapping is equivalent of having no circuits of
+ * odd length in the graph. A graph with loop edges cannot bipartite.
+ * 
+ * </para><para>
+ * Note that the mapping is not necessarily unique, e.g. if the graph has
+ * at least two components, then the vertices in the separate components
+ * can be mapped independently.
+ * 
+ * \param graph The input graph.
+ * \param res Pointer to a boolean, the result is stored here.
+ * \param type Pointer to an initialized boolean vector, or a null
+ *   pointer. If not a null pointer and a mapping was found, then it
+ *   is stored here. If not a null pointer, but no mapping was found,
+ *   the contents of this vector is invalid.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and
+ * edges.
+ */
     
+int igraph_is_bipartite(const igraph_t *graph,
+			igraph_bool_t *res,
+			igraph_vector_bool_t *type) {
+  
+  /* We basically do a breadth first search and label the
+     vertices along the way. We stop as soon as we can find a
+     contradiction. 
+  
+     In the 'seen' vector 0 means 'not seen yet', 1 means type 1, 
+     2 means type 2.
+  */
+
+  long int no_of_nodes=igraph_vcount(graph);
+  igraph_vector_char_t seen;
+  igraph_dqueue_t Q;
+  igraph_vector_t neis;
+  igraph_bool_t bi=1;
+  long int i;
+  
+  IGRAPH_CHECK(igraph_vector_char_init(&seen, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_char_destroy, &seen);
+  IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+
+  for (i=0; bi && i<no_of_nodes; i++) {
+    
+    if (VECTOR(seen)[i]) { continue; }
+    
+    IGRAPH_CHECK(igraph_dqueue_push(&Q, i));
+    VECTOR(seen)[i]=1;
+    
+    while (bi && !igraph_dqueue_empty(&Q)) {
+      long int n, j, actnode=igraph_dqueue_pop(&Q);
+      char acttype=VECTOR(seen)[actnode];
+      
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, actnode, IGRAPH_ALL));
+      n=igraph_vector_size(&neis);
+      for (j=0; j<n; j++) {
+	long int nei=VECTOR(neis)[j];
+	if (VECTOR(seen)[nei]) {
+	  long int neitype=VECTOR(seen)[nei];
+	  if (neitype == acttype) { 
+	    bi=0; 
+	    break;
+	  }
+	} else {
+	  VECTOR(seen)[nei] = 3 - acttype;
+	  IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+	}
+      }
+    }
+  }
+
+  igraph_vector_destroy(&neis);
+  igraph_dqueue_destroy(&Q);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  if (res) { *res=bi; }
+  
+  if (type && bi) { 
+    IGRAPH_CHECK(igraph_vector_bool_resize(type, no_of_nodes));
+    for (i=0; i<no_of_nodes; i++) {
+      VECTOR(*type)[i] = VECTOR(seen)[i] - 1;
+    }
+  }
+
+  igraph_vector_char_destroy(&seen);
+  IGRAPH_FINALLY_CLEAN(1);
+    
+  return 0;
+}

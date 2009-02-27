@@ -550,6 +550,10 @@ igraph_get_incidence:
         NAME-R: get.incidence
         IGNORE: RR
 
+igraph_is_bipartite:
+        PARAMS: GRAPH graph, OUT BOOLEANPTR res, OUT VECTOR_BOOL_OR_0 type
+        NAME-R: is.bipartite
+
 #######################################
 # Components
 #######################################
