@@ -40,34 +40,22 @@
  * The function is of course symmetric for undirected graphs.
  *
  * </para><para>
- * Time complexity: O(d),
- * d is the
- * out-degree of \p v1.
+ * Time complexity: O( min(log(d1), log(d2)) ),
+ * d1 is the (out-)degree of \p v1 and d2 is the (in-)degree of \p v2.
  */
 int igraph_are_connected(const igraph_t *graph, 
 			 igraph_integer_t v1, igraph_integer_t v2,
 			 igraph_bool_t *res) {
-  igraph_vs_t vs;
-  igraph_vit_t it;
+
   long int nov=igraph_vcount(graph);
+  igraph_integer_t eid=-1;
 
   if (v1 < 0 || v2 < 0 || v1 > nov-1 || v2 > nov-1) {
     IGRAPH_ERROR("are connected", IGRAPH_EINVVID);
   }
 
-  IGRAPH_CHECK(igraph_vs_adj(&vs, v1, IGRAPH_OUT));
-  IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
-  IGRAPH_FINALLY(igraph_vit_destroy, &it);
-  
-  *res=0;
-  IGRAPH_VIT_RESET(it);
-  while (!*res && !IGRAPH_VIT_END(it)) {
-    *res= (IGRAPH_VIT_GET(it) == v2);
-    IGRAPH_VIT_NEXT(it);
-  }
-  
-  igraph_vit_destroy(&it);
-  IGRAPH_FINALLY_CLEAN(1);
-  
+  igraph_get_eid2(graph, &eid, v1, v2, /*directed=*/1);
+  *res = (eid >= 0);
+
   return IGRAPH_SUCCESS;
 }
