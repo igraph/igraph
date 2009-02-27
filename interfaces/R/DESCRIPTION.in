@@ -1,9 +1,9 @@
 Package: igraph
 Version: @VERSION@
-Date: Feb 14, 2008
+Date: Feb 27, 2009
 Title:  Routines for simple graphs, network analysis.
-Author: Gabor Csardi <csardi@rmki.kfki.hu>
-Maintainer: Gabor Csardi <csardi@rmki.kfki.hu>
+Author: Gabor Csardi <Gabor.Csardi@unil.ch>
+Maintainer: Gabor Csardi <Gabor.Csardi@unil.ch>
 Description: Routines for simple graphs and network analysis. igraph can
   handle large graphs very well and provides functions for generating random
   and regular graphs, graph visualization, centrality indices and much more.
