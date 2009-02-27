@@ -58,7 +58,10 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
   For \code{no.clusters} an integer constant is returned.
   
   For \code{cluster.distribution} a numeric vector with the relative
-  frequencies. The length of the vector is the number of components.
+  frequencies. The length of the vector is the size of the largest
+  component plus one. Note that (for currently unknown reasons) the
+  first element of the vector is the number of clusters of size zero, so
+  this is always zero.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi@rmki.kfki.hu}}
