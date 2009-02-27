@@ -962,6 +962,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * \function igraph_get_eid
  * \brief Get the edge id from the end points of an edge
  * 
+ * For undirected graphs \c from and \c to are exchangable.
  * \param graph The graph object.
  * \param eid Pointer to an integer, the edge id will be stored here.
  * \param from The starting point of the edge.
@@ -971,7 +972,11 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
  * \return Error code. 
  * \sa \ref igraph_edge() for the opposite operation.
  * 
- * For undirected graphs \c from and \c to are exchangable.
+ * Time complexity: O(log (d)), where d is smaller of the out-degree 
+ * of from and in-degree of to if \p directed is true. If \p directed 
+ * is false, then it is O(log(d)+log(d2)), where d is the same as before and 
+ * d2 is the minimum of the out-degree of to and the in-degree of from.
+ * 
  * 
  * Added in version 0.2.</para><para>
  */
@@ -982,7 +987,6 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 
   long int from=pfrom, to=pto;
   long int nov=igraph_vcount(graph);
-  long int start, end, N;
 
   if (from < 0 || to < 0 || from > nov-1 || to > nov-1) {
     IGRAPH_ERROR("cannot get edge id", IGRAPH_EINVVID);
@@ -990,39 +994,21 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
 
   *eid=-1;
   if (igraph_is_directed(graph)) {
+    long int start, end, start2, end2, N, N2;
 
     /* Directed graph */
 
-    /* TODO: search from the other size if the in-degree of 'to' smaller */
-    
     start=VECTOR(graph->os)[from];
     N=end=VECTOR(graph->os)[from+1];
-    while (start < end) {
-      long int mid=start+(end-start)/2;
-      long int e=VECTOR(graph->oi)[mid];
-      if (VECTOR(graph->to)[e] < to) {
-	  start=mid+1;
-      } else {
-	end=mid;
-      }
-    }
-    if (start<N) { 
-      long int e=VECTOR(graph->oi)[start];
-      if (VECTOR(graph->to)[e] == to) {
-	*eid=e;
-      }
-    }
+    start2=VECTOR(graph->is)[to];
+    N2=end2=VECTOR(graph->is)[to+1];
 
-    /* We also search the other if needed  */
+    if (end-start<end2-start2) {
 
-    if (!directed && *eid < 0) {
-
-      start=VECTOR(graph->os)[to];
-      N=end=VECTOR(graph->os)[to+1];
       while (start < end) {
 	long int mid=start+(end-start)/2;
 	long int e=VECTOR(graph->oi)[mid];
-	if (VECTOR(graph->to)[e] < from) {
+	if (VECTOR(graph->to)[e] < to) {
 	  start=mid+1;
 	} else {
 	  end=mid;
@@ -1030,16 +1016,83 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
       }
       if (start<N) { 
 	long int e=VECTOR(graph->oi)[start];
-	if (VECTOR(graph->to)[e] == from) {
+	if (VECTOR(graph->to)[e] == to) {
 	  *eid=e;
 	}
+      }
+
+    } else {
+      
+      while (start2 < end2) {
+	long int mid=start2+(end2-start2)/2;
+	long int e=VECTOR(graph->ii)[mid];
+	if (VECTOR(graph->from)[e] < from) {
+	  start2=mid+1;
+	} else {
+	  end2=mid;
+	}
+      }
+      if (start2<N2) { 
+	long int e=VECTOR(graph->ii)[start2];
+	if (VECTOR(graph->from)[e] == from) {
+	  *eid=e;
+	}
+      }
+      
+    }
+      
+    /* We also search the other if needed  */
+
+    if (!directed && *eid < 0) {
+
+      start=VECTOR(graph->os)[to];
+      N=end=VECTOR(graph->os)[to+1];
+      start2=VECTOR(graph->is)[from];
+      N2=end2=VECTOR(graph->is)[from+1];
+      
+      if (end-start<end2-start2) {
+      
+	while (start < end) {
+	  long int mid=start+(end-start)/2;
+	  long int e=VECTOR(graph->oi)[mid];
+	  if (VECTOR(graph->to)[e] < from) {
+	    start=mid+1;
+	  } else {
+	    end=mid;
+	  }
+	}
+	if (start<N) { 
+	  long int e=VECTOR(graph->oi)[start];
+	  if (VECTOR(graph->to)[e] == from) {
+	    *eid=e;
+	  }
+	}
+
+      } else {
+
+	while (start2 < end2) {
+	  long int mid=start2+(end2-start2)/2;
+	  long int e=VECTOR(graph->ii)[mid];
+	  if (VECTOR(graph->from)[e] < to) {
+	    start2=mid+1;
+	  } else {
+	    end2=mid;
+	  }
+	}
+	if (start2<N2) { 
+	  long int e=VECTOR(graph->ii)[start2];
+	  if (VECTOR(graph->from)[e] == to) {
+	    *eid=e;
+	  }
+	}	
+	
       }
     }
     
   } else {
-    
+    long int start1, start2, end1, end2, N1, N2;
+      
     /* Undirected graph, they only have one mode */
-    /* TODO: search from the other direction if that's quicker */
 
     if (from < to) { 
       long int tmp;
@@ -1048,27 +1101,53 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
       to=tmp;
     }
 
-    start=VECTOR(graph->os)[from];
-    N=end=VECTOR(graph->os)[from+1];
-    while (start < end) {
-      long int mid=start+(end-start)/2;
-      long int e=VECTOR(graph->oi)[mid];
-      if (VECTOR(graph->to)[e] < to) {
-	  start=mid+1;
-      } else {
-	end=mid;
+    start1=VECTOR(graph->os)[from];
+    N1=end1=VECTOR(graph->os)[from+1];
+    start2=VECTOR(graph->is)[to];
+    N2=end2=VECTOR(graph->is)[to+1];
+    
+    if (end1-start1<end2-start2) {
+
+      while (start1 < end1) {
+	long int mid=start1+(end1-start1)/2;
+	long int e=VECTOR(graph->oi)[mid];
+	if (VECTOR(graph->to)[e] < to) {
+	  start1=mid+1;
+	} else {
+	  end1=mid;
+	}
       }
-    }
-    if (start<N) { 
-      long int e=VECTOR(graph->oi)[start];
-      if (VECTOR(graph->to)[e] == to) {
-	*eid=e;
+      if (start1<N1) { 
+	long int e=VECTOR(graph->oi)[start1];
+	if (VECTOR(graph->to)[e] == to) {
+	  *eid=e;
+	}
       }
+
+    } else {
+
+      while (start2 < end2) {
+	long int mid=start2+(end2-start2)/2;
+	long int e=VECTOR(graph->ii)[mid];
+	if (VECTOR(graph->from)[e] < from) {
+	  start2=mid+1;
+	} else {
+	  end2=mid;
+	}
+      }
+      if (start2<N2) { 
+	long int e=VECTOR(graph->ii)[start2];
+	if (VECTOR(graph->from)[e] == from) {
+	  *eid=e;
+	}
+      }      
+      
     }
     
   }
 
   if (*eid < 0) { 
+    printf("directed: %i, %li - %li\n", (int)directed, from, to);
     IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
   }
   
