@@ -34,7 +34,14 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       the edges. There is no need to have newline characters between the
       edges, a simple space will also do.
       
-      There are no additional arguments for this format.
+      Additional arguments:
+      \itemize{
+	\item{n}{The number of vertices in the graph. If it is smaller
+	  than or equal to the largest integer in the file, then it is
+	  ignored; so it is safe to set it to zero (the default).}
+	\item{directed}{Logical scalar, whether to create a directed
+	  graph. The default value is \code{TRUE}.}
+      }
     }
     \item{pajek}{
       Pajek it a popular network analysis program for Windows. (See the
@@ -184,6 +191,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
       
       Please contact us if you cannot live with these
       limitations of the GML parser.
+
+      There are not additional argument for this format.
     }
     \item{ncol}{
       This format is used by the Large Graph Layout program
@@ -208,6 +217,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	\item{weights}{Logical constant, whether to add the weights of
 	  the edges as edge attribute \sQuote{weight}.
 	}
+	\item{directed}{Logical constant, whether to create a directed
+	  graph. The default is undirected.} 
       }
     }
     \item{lgl}{The \code{lgl} format is used by the Large Graph Layout
