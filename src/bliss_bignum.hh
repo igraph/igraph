@@ -20,10 +20,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <cmath>
 #include "bliss_defs.hh"
 #include "igraph_math.h"
 
-#include <math.h>
 #include "memory.h"
 #include "error.h"
 
