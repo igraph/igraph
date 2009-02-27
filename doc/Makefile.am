@@ -9,7 +9,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
-	      adjlist.xml arpack.xml
+	      adjlist.xml arpack.xml bipartite.xml
 
 DOCFIX = fdl.xml gpl.xml igraph-docs.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -119,6 +119,9 @@ adjlist.xml: adjlist.xxml $(SRCDIR)/adjlist.c $(SRCDIR)/igraph.h
 
 arpack.xml: arpack.xxml $(SRCDIR)/arpack.h $(SRCDIR)/arpack.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/arpack.h $(SRCDIR)/arpack.c
+
+bipartite.xml: bipartite.xxml $(SRCDIR)/bipartite.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/bipartite.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
