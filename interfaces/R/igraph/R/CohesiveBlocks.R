@@ -36,10 +36,9 @@
 
 cohesive.blocks <- function(graph, db=NULL,
                             useDB=(vcount(graph)>400 && require(RSQLite)),
-                            cutsetAlgorithm=c("patvardhan", "kanevsky"),
+                            cutsetHeuristic=TRUE,
                             verbose=igraph.par("verbose")) {
 
-    cutsetAlgorithm <- igraph.match.arg(cutsetAlgorithm)
     if(useDB && !require(RSQLite)) stop("package `RSQLite` required")
     if(!require(digest)) stop("package `digest` required")
     if(!is.igraph(graph)) stop("`graph' must be an igraph object")
@@ -183,7 +182,7 @@ cohesive.blocks <- function(graph, db=NULL,
                     kcomp <- kComponents(g, k, cutsetAlgorithm=cutsetAlgorithm, verbose=verbose)
                 }
             } else { ## otherwise just use kComponents()
-                kcomp <- kComponents(g, k, cutsetAlgorithm=cutsetAlgorithm, verbose=verbose)
+                kcomp <- kComponents(g, k, cutsetHeuristic, verbose=verbose)
             }
             
             kcomp <- lapply(kcomp, function(thisV){V(g)[thisV]$cbid})
@@ -406,10 +405,10 @@ find.all.min.cutsets <- function(g, k=NULL){
     }
 }
 
-kComponents <- function(g, k=NULL, cutsetAlgorithm, verbose=igraph.par("verbose")){
+kComponents <- function(g, k=NULL, useHeuristic=TRUE, verbose=igraph.par("verbose")){
     if(vcount(g)<1) return(list())
     V(g)$csid <- as.numeric(V(g))
-    cs <- if(cutsetAlgorithm=="kanevsky"){find.all.min.cutsets(g, k)} else {kCutsets2(g, k, verbose=verbose)}
+    cs <- if(useHeuristic){find.all.min.cutsets(g, k)} else {kCutsets(g, k)}
     theseBlocks <- list()
     if(length(cs)==0){## not connected
         cls <- clusters(g)
@@ -435,6 +434,23 @@ kComponents <- function(g, k=NULL, cutsetAlgorithm, verbose=igraph.par("verbose"
 
 is.cutset <- function(v, g){ ## does removal of `v` disconnect `g`?
     return(!is.connected(subgraph(g, setdiff(V(g), v))))
+}
+
+etReduction <- function(g){
+    G <- graph.empty(vcount(g)*2, directed=TRUE)
+    
+    el1 <- el2 <- get.edgelist(g)
+    el1[, 1] <- el1[, 1] + vcount(g)
+    el1 <- as.numeric(t(el1)) ## u' -> v'' edges (external)
+    el2[, 2] <- el2[, 2] + vcount(g)
+    el2 <- el2[, 2:1]
+    el2 <- as.numeric(t(el2)) ## v' -> u'' edges (external)
+    el3 <- as.numeric(rbind(0:(vcount(g)-1), vcount(g):(2*vcount(g)-1))) ## v' -> v'' edges (internal)
+    
+    G <- add.edges(G, c(el1, el2), capacity=Inf) ## (external)
+    G <- add.edges(G, el3, capacity=1) ## (internal)
+    
+    return(simplify(G))
 }
 
 # Not actually needed
@@ -556,14 +572,12 @@ maxcohesion <- function(graph){
     return(mc)
 }
 
-layout.svd.bgraph <- function(graph, d=shortest.paths(graph), ...) {
+layout.svd.bgraph <- function(graph, d=shortest.paths(graph), s=.6, ...) {
 
   if (!is.bgraph(graph)) {
     stop("Not a bgraph object")
   }
 
-  if (missing(s)) { s <- 0.6 }
-  
   for(b in graph$blocks){
     d[b+1, b+1] <- d[b+1, b+1]*s
   }
@@ -571,13 +585,11 @@ layout.svd.bgraph <- function(graph, d=shortest.paths(graph), ...) {
   layout.svd.igraph(graph, d=d)
 }
 
-layout.mds.bgraph <- function(graph, d=shortest.paths(graph), ...) {
+layout.mds.bgraph <- function(graph, d=shortest.paths(graph), s=.6, ...) {
 
   if (!is.bgraph(graph)) {
     stop("Not a bgraph object")
   }
-
-  if (missing(s)) { s <- 0.6 }
 
   for(b in graph$blocks){
     d[b+1, b+1] <- d[b+1, b+1]*s
@@ -586,7 +598,7 @@ layout.mds.bgraph <- function(graph, d=shortest.paths(graph), ...) {
   layout.mds.igraph(graph, d=d)
 }
 
-plot.bgraph <- function(x, mc=NULL, vertex.size=5, colpal=NULL, emph=NULL, ...){
+plot.bgraph <- function(x, mc=NULL, vertex.size=3, colpal=NULL, emph=NULL, ...){
 
     if (!is.bgraph(x)) {
       stop("Not a bgraph object")
@@ -636,7 +648,7 @@ plot.bgraph <- function(x, mc=NULL, vertex.size=5, colpal=NULL, emph=NULL, ...){
     invisible(NULL)
 }
 
-plotkCore.bgraph <- function(graph, vertex.size=5, colpal=NULL, emph=NULL,
+plotkCore.bgraph <- function(graph, vertex.size=3, colpal=NULL, emph=NULL,
                               remove.multiple=TRUE, remove.loops=TRUE, ...){
 
     if (!is.bgraph(graph)) {
@@ -688,7 +700,7 @@ write.pajek.bgraph <- function(graph, filename, hierarchy=FALSE){
   } else {
     maxcohesion(g)
   }
-  cat(paste("*Vertices", vcount(g)), mc, sep="\n",
+  cat(paste("*Vertices", vcount(g)), mc, "\r", sep="\r\n",
       file=paste(filename, ".clu", sep=""))
   
   ## .clu for each block giving binary membership (toggled with blockfiles argument)
@@ -696,7 +708,7 @@ write.pajek.bgraph <- function(graph, filename, hierarchy=FALSE){
     for(i in 1:length(g$blocks)){
       thisblock <- rep(0, vcount(g))
       thisblock[g$blocks[[i]]+1] <- 1
-      cat(paste("*Vertices", vcount(g)), thisblock, sep="\n",
+      cat(paste("*Vertices", vcount(g)), thisblock, "\r", sep="\r\n",
           file=paste(filename, "_block", i, "(", g
             $block.cohesion[i], ").clu", sep=""))
     }
@@ -739,404 +751,184 @@ write.pajek.kCore.bgraph <- function(graph, filename, remove.multiple=TRUE, remo
     cat(paste("*Vertices", vcount(g)), kc, "\r", sep="\r\n", file=paste(filename, ".clu", sep=""))
 }
 
-kCutsets2 <- function(g, k=NULL, verbose=igraph.par("verbose")){
-  if(!is.igraph(g)){
-    stop("g must be an igraph object")
-  }
-  
-  if(is.directed(g)) g <- as.undirected(g)
-  res <- list()
-  if(is.null(k)){
-    if(!is.connected(g)){
-      k <- 0
-    }else if(min(degree(g))<=1){
-      k <- 1
-    } else {
-      k <- vertex.connectivity(g)
-    }
-  }
-  
-  ## quick and simple cases
-  if(k==0 || vcount(g) <=2) return(list(numeric()))
-  
-  if(k==1){ # for 1-connected graphs
-    return(as.list(articulation.points(g)))
-  }
-  
-  ## begin algorithm
-  v <- as.numeric(V(g))
-  K <- v[order(degree(g), decreasing=TRUE)][1:k] #2a
-  if(is.cutset(K, g)) res <- c(res, list(K))
-  for(i in K){
-    for(j in setdiff(v,K)){
-      if(!(j %in% unlist(neighborhood(g,1,i))) && vertex.connectivity(g,i,j)==k){
-        if(verbose) cat(i,j,";")
-        minCutSets <- findAllMinimalCutsetsST(g,i,j)
-        res <- c(res,minCutSets[lapply(minCutSets,length)==k])
-      }
-    }
-  }
-  if(verbose) cat("\n")
-  return(unique(lapply(res,sort)))
-}
-
-kCutsets <- kCutsets2
-
-findAllMinimalCutsetsST <- function(g,s,t){
-  findAllMinimalCutsetsST.recurse(g,s,t,t,list())
-}
-
-findAllMinimalCutsetsST.recurse <- function(g,Vs,T,t,res){
-  ## Direct implementation of Algorithm from Patvardhan et al (1995)
-  ## 1. Vx set of all vertices adjacent to S but not in S
-  Vx <- setdiff(unique(unlist(neighborhood(g,1,Vs))),Vs)
-  ## 2. If t is in Vx, stop
-  if(t %in% Vx) return(res)
-  ## 3. get component of G-Vx containing T
-  Vt <- unlist(neighborhood(delete.edges(g,E(g)[from(Vx)]),vcount(g),t))
-  ## 4. Create Z subset of Vx not adjacent to Vt
-  Z <- setdiff(Vx,unlist(neighborhood(g,1,Vt)))
-  ## 5. If Z intersects T then stop
-  if(any(T %in% Z)) return(res)
-  ## 6. Grow Vs
-  Vs <- union(Vs,Z)
-  ## 7. Create  Vc
-  Vc <- setdiff(Vx,Z)
-  ## 8. Output Vc
-  res <- c(res,list(Vc))
-  ## 9. Create Tprime
-  Tprime <- numeric()
-  ## 10. Begin loop
-  for (v in setdiff(Vc, Tprime)) {
-    ## 11. Remove some v in Vc but not in Tprime
-    ## already have it
-    ## 12. Recurse
-    res <- findAllMinimalCutsetsST.recurse(g,c(Vs,v),c(T,Tprime),t,res)
-    ## 13. Grow Tprime
-    Tprime <- c(Tprime,v)
-  }
-  res
-}
-
-## kCutsets3 <- function(g, k=NULL, cl=NULL, verbose=igraph.par("verbose")) {
-##   if (!is.igraph(g)) {
-##     stop("g must be an igraph object")
-##   }
-##   if (is.null(k)) {
-##     if (!is.connected(g)) {
-##       k <- 0
-##     } else if (min(degree(g))<=1) {
-##       k <- 1
-##     } else {
-##       k <- vertex.connectivity(g)
-##     }
-##   }
-
-##   if (k==0 || vcount(g)<=2) { return(list()) }
-
-##   if (k==1) {
-##     return(as.list(articulation.points(g)))
-##   }
-
-##   ## Minimal st-cutsets for every pairs of vertices
-##   cutsets <- list()
-##   for (s in 0:(vcount(g)-2)) {
-##     for (t in (s+1):(vcount(g)-1)) {
-##       cutsets <- c(cutsets, kCutsets3.generate(g, s, t, t))
-##     }
-##   }
-
-##   cutsets <- cutsets[ sapply(cutsets, length)==k ]
-##   cutsets <- lapply(cutsets, sort)
-##   cutsets <- unique(cutsets)
-
-##   cutsets
-## }
-
-## kCutsets3.generate <- function(g, Vs, T, t, res=list()) {
-  
-##   ## 1. Vx set of all vertices adjacent to S but not in S
-##   Vx <- setdiff(unique(unlist(neighborhood(g, 1, Vs))), Vs)
-
-##   ## 2. If t in Vx, stop
-##   if (t %in% Vx) return(res)
-
-##   ## 3. Connected component, starting from t, minus Vs and Vx
-##   Vt <- unlist(neighborhood( delete.edges(g, E(g)[from(c(Vx, Vs))]), vcount(g), t ))
-  
-##   ## 4. Z <- all elements of Vx, which are not connected to Vt
-##   Z <- setdiff(Vx, unlist(neighborhood(g, 1, Vt)))
-
-##   ## 5. If Z intersection T is not empty, then over
-##   if (any(T %in% Z)) return(res)
-
-##   ## 6. Vs <- Vs union Z
-##   Vs <- union(Vs, Z)
-
-##   ## 7. Vc <- Vx - Z
-##   Vc <- setdiff(Vx, Z)
-
-##   ## 8. Output Vc
-##   res <- c(res, list(Vc))
-
-##   ## 9. T' <- emptyset
-##   Tprime <- numeric()
-
-##   ## 10. While Vc-T is not empty
-##   for (v in setdiff(Vc, T)) {
-
-##     ## 11. Choose v, v in Vc, v not in T
-##     ## we already have it
-
-##     ## 12. Generate (Vs+{v}, T+Tprime)
-##     res <- kCutsets3.generate(g, c(Vs,v), c(T,Tprime), t, res)
-
-##     ## 13. Tprime <- Tprime + {v}
-##     Tprime <- c(Tprime, v)
-    
-##   }
-##   return(res)
-## }
-
 ######################################################
 ## kCutsets uses Kanevsy's algorithm to find all    ##
 ## cutsets of size k in the given graph.            ##
 ######################################################
 
-## kCutsets <- function(g, k=NULL, cl=NULL, verbose=igraph.par("verbose")){
-##     if(!is.igraph(g)){
-##         stop("g must be an igraph object")
-##     }
-##     res <- list()
-##     if(is.null(k)){
-##         if(!is.connected(g)){
-##             k <- 0
-##         }else if(min(degree(g))<=1){
-##             k <- 1
-##         } else {
-##             k <- vertex.connectivity(g)
-##         }
-##     }
+kCutsets <- function(g, k=NULL, cl=NULL){
+    if(!is.igraph(g)){
+        stop("g must be an igraph object")
+    }
+    if(is.null(k)){
+        if(!is.connected(g)){
+            k <- 0
+        }else if(min(degree(g))<=1){
+            k <- 1
+        } else {
+            k <- vertex.connectivity(g)
+        }
+    }
     
-##     if(k==0 || vcount(g) <=2) return(list(numeric()))
+    if(k==0 || vcount(g) <=2) return(list(numeric()))
     
-##     if(k==1){ # for 1-connected graphs
-##         return(articulation.points(g))
-##     }
+    if(k==1){ # for 1-connected graphs
+        return(articulation.points(g))
+    }
     
-##     #############
-##     ## begin Kanevsky's (parallel) algorithm:
-##     #############
-##     v <- as.numeric(V(g))
+    #############
+    ## begin Kanevsky's (parallel) algorithm:
+    #############
+    v <- as.numeric(V(g))
     
-##     K <- v[order(degree(g), decreasing=TRUE)][1:k] #2a
-##     if(is.cutset(K, g)) res <- c(res, list(K))
+    K <- v[order(degree(g), decreasing=TRUE)][1:k] #2a
+    if(is.cutset(K, g)) res <- c(res, list(K))
     
-##     P <- expand.grid(K, v) #2b
+    P <- expand.grid(K, v) #2b
     
-##     G <- list(g) #3
-##     for(i in 2:nrow(P)){
-##         G[[i]] <- add.edges(g, as.numeric(t(P[1:(i-1), ])))
-##     }
+    G <- list(g) #3
+    for(i in 2:nrow(P)){
+        G[[i]] <- add.edges(g, as.numeric(t(P[1:(i-1), ])))
+    }
     
-##     if(is.null(cl)){ 
-##         Gbar <- lapply(G, etReduction) #4 (sequential)
-##         mflow <- unlist(lapply(1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
+    if(is.null(cl)){ 
+        Gbar <- lapply(G, etReduction) #4 (sequential)
+        mflow <- unlist(lapply(1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
         
-##         Gbar <- Gbar[mflow==k] #5 (sequential)
-##         P <- P[mflow==k, ]
+        Gbar <- Gbar[mflow==k] #5 (sequential)
+        P <- P[mflow==k, ]
         
-##         if(nrow(P)<1) return(list())
-##         GbarRes <- lapply(1:nrow(P), function(i){graph.residual(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}) #6 (sequential)
-##         comp <- lapply(GbarRes, clusters, mode="strong")
-##         L <- lapply(1:length(comp), function(i){graph.shrink(GbarRes[[i]], comp=comp[[i]])})
+        if(nrow(P)<1) return(list())
+        GbarRes <- lapply(1:nrow(P), function(i){graph.residual(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}) #6 (sequential)
+        comp <- lapply(GbarRes, clusters, mode="strong")
+        L <- lapply(1:length(comp), function(i){graph.shrink(GbarRes[[i]], comp=comp[[i]])})
         
-##         L <- lapply(L, graph.antichains, cl=cl) #7 (sequential)
+        L <- lapply(L, graph.antichains, cl=cl) #7 (sequential)
         
-##         ## convert antichains in L to vertex sets in g
-##         res <- lapply(1:length(L), 
-##             function(i){
-##                 gc()
-##                 l <- L[[i]]
-##                 cmp <- comp[[i]]
-##                 thisres <- list()
-##                 for(cn in l){
-##                     thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
-##                 }
-##                 return(thisres)
-##             }
-##         )
-##         res <- unlist(res, recursive=FALSE)
+        ## convert antichains in L to vertex sets in g
+        res <- lapply(1:length(L), 
+            function(i){
+                gc()
+                l <- L[[i]]
+                cmp <- comp[[i]]
+                thisres <- list()
+                for(cn in l){
+                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
+                }
+                return(thisres)
+            }
+        )
+        res <- unlist(res, recursive=FALSE)
         
-##         ## and see which are cutsets
-##         res <- unique(res[unlist(lapply(res, function(x){length(x)==k && is.cutset(x, g)}))])
-##     } else {
-##         Gbar <- parLapply(cl, G, etReduction) #4 (parallel)
-##         mflow <- unlist(parLapply(cl, 1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
+        ## and see which are cutsets
+        res <- unique(res[unlist(lapply(res, function(x){length(x)==k && is.cutset(x, g)}))])
+    } else {
+        Gbar <- parLapply(cl, G, etReduction) #4 (parallel)
+        mflow <- unlist(parLapply(cl, 1:nrow(P), function(i){graph.maxflow(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}))
         
-##         Gbar <- Gbar[mflow==k] #5 (parallel)
-##         P <- P[mflow==k, ]
+        Gbar <- Gbar[mflow==k] #5 (parallel)
+        P <- P[mflow==k, ]
         
-##         if(nrow(P)<1) return(list())
-##         GbarRes <- parLapply(cl, 1:nrow(P), function(i){graph.residual(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}) #6 (parallel)
-##         comp <- parLapply(cl, GbarRes, clusters, mode="strong")
-##         L <- parLapply(cl, 1:length(comp), function(i){graph.shrink(GbarRes[[i]], comp=comp[[i]])})
+        if(nrow(P)<1) return(list())
+        GbarRes <- parLapply(cl, 1:nrow(P), function(i){graph.residual(Gbar[[i]], P[i, 1]+vcount(g), P[i, 2])}) #6 (parallel)
+        comp <- parLapply(cl, GbarRes, clusters, mode="strong")
+        L <- parLapply(cl, 1:length(comp), function(i){graph.shrink(GbarRes[[i]], comp=comp[[i]])})
         
-##         tryL <- try(parLapply(cl, L, graph.antichains, cl=NULL), silent=TRUE) #7 (parallel)
-##         if(class(tryL)=="try-error"){ ## not sure why I need this,  but Moody-White example was crashing with parLapply here
-##             warning(paste("Parallel execution on MPI failed with message: ", tryL, " Defaulted to sequential execution", sep=""))
-##             L <- lapply(L, graph.antichains, cl=NULL)
-##             if (verbose) cat("*")
-##         } else {
-##             L <- tryL
-##         }
+        tryL <- try(parLapply(cl, L, graph.antichains, cl=NULL), silent=TRUE) #7 (parallel)
+        if(class(tryL)=="try-error"){ ## not sure why I need this,  but Moody-White example was crashing with parLapply here
+            warning(paste("Parallel execution on MPI failed with message: ", tryL, " Defaulted to sequential execution", sep=""))
+            L <- lapply(L, graph.antichains, cl=NULL)
+            if (verbose) cat("*")
+        } else {
+            L <- tryL
+        }
         
-##         ## convert antichains in L to vertex sets in g
-##         res <- parLapply(cl, 1:length(L), 
-##             function(i){
-##               gc()
-##               l <- L[[i]]
-##                 cmp <- comp[[i]]
-##                 thisres <- list()
-##                 for(cn in l){
-##                     thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
-##                 }
-##                 return(thisres)
-##             }
-##         )
-##         res <- unlist(res, recursive=FALSE)
+        ## convert antichains in L to vertex sets in g
+        res <- parLapply(cl, 1:length(L), 
+            function(i){
+              gc()
+              l <- L[[i]]
+                cmp <- comp[[i]]
+                thisres <- list()
+                for(cn in l){
+                    thisres <- unique(c(thisres, list(unique(sort((which(cmp$membership %in% cn)-1) %% vcount(g))))))
+                }
+                return(thisres)
+            }
+        )
+        res <- unlist(res, recursive=FALSE)
         
-##         ## and see which are cutsets
-##         res <- unique(res[unlist(parLapply(cl, res, function(x){length(x)==k && is.cutset(x, g)}))])
-##     }
+        ## and see which are cutsets
+        res <- unique(res[unlist(parLapply(cl, res, function(x){length(x)==k && is.cutset(x, g)}))])
+    }
     
-##     return(res)
-## }
+    return(res)
+}
 
+graph.residual <- function(g, i, j){ ## NOT GENERIC: deletes edges once they get to nonpositive capacity
+    gc()
+    if(!("capacity" %in% list.edge.attributes(g))) E(g)$capacity <- 1
+    g.r <- simplify(g)
+    done <- FALSE
+    while(!done){
+        p <- get.shortest.paths(g.r, i, j, mode="out")[[1]]
+        if(length(p)<1) done <- TRUE
+        E(g.r, path=p)$capacity <- E(g.r, path=p)$capacity - 1 
+        g.r <- delete.edges(g.r, E(g.r)[capacity<=0])
+        if(vertex.disjoint.paths(g.r, i, j)==0) done <- TRUE
+    }
+    return(g.r)
+}
 
-## graph.residual <- function(g, i, j){ ## NOT GENERIC: deletes edges once they get to nonpositive capacity
-##     gc()
-##     if(!("capacity" %in% list.edge.attributes(g))) E(g)$capacity <- 1
-##     g.r <- simplify(g)
-##     done <- FALSE
-##     while(!done){
-##         p <- get.shortest.paths(g.r, i, j, mode="out")[[1]]
-##         if(length(p)<1) done <- TRUE
-##         E(g.r, path=p)$capacity <- E(g.r, path=p)$capacity - 1 
-##         g.r <- delete.edges(g.r, E(g.r)[capacity<=0])
-##         if(vertex.disjoint.paths(g.r, i, j)==0) done <- TRUE
-##     }
-##     return(g.r)
-## }
+graph.shrink <- function(g, comp=clusters(g, mode="strong"), remove.multiple=TRUE, remove.loops=TRUE){
+    gc()
+    res <- graph.empty(length(comp$csize), directed=TRUE)
+    el <- get.edgelist(g)
+    el.comp <- rbind(comp$membership[el[, 1]+1], comp$membership[el[, 2]+1])
+    res <- add.edges(res, el.comp)
+    res <- simplify(res, remove.multiple=remove.multiple, remove.loops=remove.loops)
+    return(res)
+}
 
-## graph.shrink <- function(g, comp=clusters(g, mode="strong"), remove.multiple=TRUE, remove.loops=TRUE){
-##     gc()
-##     res <- graph.empty(length(comp$csize), directed=TRUE)
-##     el <- get.edgelist(g)
-##     el.comp <- rbind(comp$membership[el[, 1]+1], comp$membership[el[, 2]+1])
-##     res <- add.edges(res, el.comp)
-##     res <- simplify(res, remove.multiple=remove.multiple, remove.loops=remove.loops)
-##     return(res)
-## }
-
-## graph.antichains <- function(g, cl=NULL){ ## g must be a directed acyclic graph Ñ not checked!
-##     ## add edges from every vertex to each of its descendants
-##     gc()
-##     for(i in as.numeric(V(g))){
-##         el <- unlist(neighborhood(g, vcount(g), i, "out"))
-##         el <- el[el != i]
-##         if(length(el)>0){
-##             el <- as.numeric(rbind(i, el))
-##             g <- add.edges(g, el)
-##         }
-##     }
+graph.antichains <- function(g, cl=NULL){ ## g must be a directed acyclic graph Ñ not checked!
+    ## add edges from every vertex to each of its descendants
+    gc()
+    for(i in as.numeric(V(g))){
+        el <- unlist(neighborhood(g, vcount(g), i, "out"))
+        el <- el[el != i]
+        if(length(el)>0){
+            el <- as.numeric(rbind(i, el))
+            g <- add.edges(g, el)
+        }
+    }
     
-##     ## make into an adjacency matrix
-##     adj <- get.adjacency(simplify(as.undirected(g)))
+    ## make into an adjacency matrix
+    adj <- get.adjacency(simplify(as.undirected(g)))
     
-##     ## iterate through combinations of antichains to look for new antichains:
-##     res <- as.list(as.numeric(V(g)))
-##     acount <- 0
-##     while(length(res) != acount){
-##         acount <- length(res)
-##         if(is.null(cl)){
-##             newchains <- combn(1:acount, 2, 
-##                 function(x){
-##                     thisChain <- unique(unlist(res[x]))
-##                     if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
-##                     return(NA)
-##                 }, simplify=FALSE)
-##         } else {
-##             cn <- combn(1:acount, 2)
-##             newchains <- parLapply(cl, cn, 
-##                 function(x){
-##                     thisChain <- unique(unlist(res[x]))
-##                     if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
-##                     return(NA)
-##                 }, simplify=FALSE)
-##         }
-##         newchains <- newchains[!is.na(newchains)]
-##         res <- unique(c(res, newchains))
-##     }
+    ## iterate through combinations of antichains to look for new antichains:
+    res <- as.list(as.numeric(V(g)))
+    acount <- 0
+    while(length(res) != acount){
+        acount <- length(res)
+        if(is.null(cl)){
+            newchains <- combn(1:acount, 2, 
+                function(x){
+                    thisChain <- unique(unlist(res[x]))
+                    if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
+                    return(NA)
+                }, simplify=FALSE)
+        } else {
+            cn <- combn(1:acount, 2)
+            newchains <- parLapply(cl, cn, 
+                function(x){
+                    thisChain <- unique(unlist(res[x]))
+                    if(all(adj[thisChain+1, thisChain+1]==0)) return(sort(thisChain))
+                    return(NA)
+                }, simplify=FALSE)
+        }
+        newchains <- newchains[!is.na(newchains)]
+        res <- unique(c(res, newchains))
+    }
     
-##     return(res)
-## }
-
-## find.these.cutsets <- function(ind, P, g, k){
-##     ## retrieve i and j
-##     i <- as.numeric(P[ind, ][1])
-##     j <- as.numeric(P[ind, ][2])
-    
-##     ## only look if i and j are not neighbors
-##     if(j %in% neighborhood(g, 1, i)) return(list())
-    
-##     ## initialize result list
-##     res <- list()
-    
-##     ## add searched pairs to edges
-##     if(ind>1){
-##         g <- add.edges(g, as.numeric(t(P[1:(ind-1), ])))
-##     }
-        
-##     ## get a max flow f between i and j:
-##     g.r <- simplify(g)
-##     phi <- numeric()
-##     done <- FALSE
-##     while(!done){
-##         p <- get.shortest.paths(g.r, i, j, mode="out")[[1]]
-##         if(length(p)<1) done <- TRUE
-##         phi <- c(phi, p)
-##         e <- E(g.r, path=p)
-##         g.r <- delete.edges(g.r, e)
-##         if(vertex.disjoint.paths(g.r, i, j)==0) done <- TRUE
-##     }
-##     phi <- phi[phi!=i]
-##     phi <- phi[phi!=j]
-    
-##     ## try every k-set of vertices in f
-##     ## and add the cutsets to result set
-##     if(length(phi)>0){
-##         ksets <- combn(phi, k, function(x){if(is.cutset(x, g)){sort(x)} else {NA}}, simplify=FALSE)
-##         res <- c(res, ksets[!is.na(ksets)])
-##     }
-    
-##     return(res)
-## }
-
-## etReduction <- function(g){
-##     G <- graph.empty(vcount(g)*2, directed=TRUE)
-    
-##     el1 <- el2 <- get.edgelist(g)
-##     el1[, 1] <- el1[, 1] + vcount(g)
-##     el1 <- as.numeric(t(el1)) ## u' -> v'' edges (external)
-##     el2[, 2] <- el2[, 2] + vcount(g)
-##     el2 <- el2[, 2:1]
-##     el2 <- as.numeric(t(el2)) ## v' -> u'' edges (external)
-##     el3 <- as.numeric(rbind(0:(vcount(g)-1), vcount(g):(2*vcount(g)-1))) ## v' -> v'' edges (internal)
-    
-##     G <- add.edges(G, c(el1, el2), capacity=Inf) ## (external)
-##     G <- add.edges(G, el3, capacity=1) ## (internal)
-    
-##     return(simplify(G))
-## }
-
+    return(res)
+}
