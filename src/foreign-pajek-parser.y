@@ -51,6 +51,7 @@
 #include "error.h"
 #include "attributes.h"
 #include "config.h"
+#include "igraph_math.h"
 #include <math.h>
 extern int igraph_pajek_yylex(void);
 extern int igraph_pajek_mylineno;
