@@ -15,10 +15,12 @@ h1 {
     font-size: large;
 }
 h2 {
-    font-size: 1.2em;
+    font-size: 1.5em;
+    text-indent: -40px;
 }
 h3 {
     font-size: 1em;
+    text-indent: -20px;
 }
 h4 {
     font-size: 0.8em;
@@ -37,8 +39,17 @@ img.float_right { float: right }
 img.float_left { float: left }
 pre.condensed { font-size: 0.8em; line-height: 1.5em; }
 
-.main {
+.igraphlogo {
+    float: left;
+    padding: 10px;
+}
+
+div.main {
     padding: 7px 15px;
+    max-width:900px;
+    align: center;
+    margin-left: 220px;
+    margin-right: auto;
 }
 .more {
     text-align: right;
@@ -214,6 +225,9 @@ ul li.item-screenshots {
 }
 ul li.item-community {
   background: url(images/icon_community.png) no-repeat 0px 3px;
+}
+ul li.item-bug {
+  background: url(images/icon_bug.png) no-repeat 0px 3px;
 }
 ul li.item-links {
   background: url(images/icon_links.png) no-repeat 0px 3px;

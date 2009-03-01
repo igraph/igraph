@@ -1,6 +1,5 @@
 <h2>Introduction</h2>
 
-<img align="right" src="images/screenshots/fastgreedy.png" alt=""/>
 <p><b>igraph</b> is a free software package for creating and manipulating undirected and 
 directed graphs. It includes implementations for classic graph theory
 problems like minimum spanning trees and network flow, and also
