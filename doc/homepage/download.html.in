@@ -135,10 +135,6 @@ these packages!</p>
 <a name="dev"></a><h3>Obtaining the development version</h3>
 
 <p>You can get the latest development version of igraph (including the
-C core and the wrappers for R and Python) with the <code>tla</code> arch
-revision control system from the following URL:
- <a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public"
-    onClick="javascript:urchinTracker ('/archrepo'); "> 
-<a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public">
-<code>http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public</code>.</a>
+C core and the wrappers for R and Python)
+  from <a href="https://launchpad.net/igraph">Launchpad</a>.
 </p>
