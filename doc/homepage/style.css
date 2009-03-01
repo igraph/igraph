@@ -92,6 +92,9 @@ li.download-ruby {
 li.download-doc {
   background: url(images/icon_documentation.png) no-repeat 0px 0px;
 }
+li.download-wiki {
+  background: url(images/icon_wiki.png) no-repeat 0px 0px;
+}
 ul.download-links {
   list-style-type: none;
   padding: 2px 0 0 20px; margin: 0;
@@ -124,6 +127,10 @@ ul.download-links li.download-html {
 }
 ul.download-links li.download-external {
   background: url(images/icon_links.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+ul.download-links li.download-wiki {
+  background: url(images/icon_wiki.png) no-repeat 0px 0px;
   padding-left: 18px;
 }
 ul.download-links li.download-pdf {
@@ -191,6 +198,9 @@ ul li.item-news {
 }
 ul li.item-documentation {
   background: url(images/icon_documentation.png) no-repeat 0px 3px;
+}
+ul li.item-wiki {
+  background: url(images/icon_wiki.png) no-repeat 0px 3px;
 }
 ul li.item-screenshots {
   background: url(images/icon_screenshots.png) no-repeat 0px 3px;
