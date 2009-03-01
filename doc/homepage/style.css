@@ -149,8 +149,14 @@ h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
 /* Version info */
 #version_info {
   float: right;
+  clear: right;
   font-size: 0.8em;
   color: #888;
+  padding: 3px 15px 0px 0px;
+}
+
+#sourceforge_logo {
+  float: right;
   padding: 3px 15px 0px 0px;
 }
 
