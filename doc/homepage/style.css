@@ -116,7 +116,6 @@ ul.download-links {
 }
 ul.download-links li {
   padding: 0px 10px 0px 0px; margin: 0;
-  display: inline;
   padding-bottom: 5px !important;
 }
 ul.download-links li.download-source {

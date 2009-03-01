@@ -25,7 +25,7 @@
     <li class="download-source">
        <a href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph_${VERSION}.tar.gz"
        onClick="javascript:urchinTracker ('/downloads/rsource'); "> 
-        Source package (for Linux and similar)</a><br/>
+        Source package (for Linux and similar)</a>
     </li>
   </ul>
 </li>
@@ -58,7 +58,7 @@
     <li class="download-external">
        <a href="http://python.org/pypi/python-igraph" 
           onClick="javascript:urchinTracker ('/outgoing/pythoncheeseshop'); "> 
-          Python Package Index page</a><br/>
+          Python Package Index page</a>
     </li>
   </ul>
 </li>
@@ -74,7 +74,7 @@
     <li class="download-external">
        <a href="http://rubyforge.org/projects/igraph" 
           onClick="javascript:urchinTracker ('/outgoing/rubyforge'); "> 
- 	 External homepage</a><br/>
+ 	 External homepage</a>
     </li>
   </ul>
 </li>
@@ -86,19 +86,19 @@
   <ul class="download-links">
     <li class="download-source">
        <a onClick="javascript:urchinTracker ('/downloads/library'); " 
- 	 href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-${VERSION}.tar.gz">Source code</a><br/>
+ 	 href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-${VERSION}.tar.gz">Source code</a>
     </li>
   </ul>
 </li>
 
 <li class="download download-sf">
-  <span class="name">Browse released files</span>
+  <span class="name">Browse all igraph releases</span>
   <span class="comment">&mdash; All file releases at
   SourceForge</span>
   <ul class="download-links">
     <li class="download-external">
        <a onClick="javascript:urchinTracker ('/downloads/sourceforge'); " 
- 	 href="https://sourceforge.net/project/showfiles.php?group_id=160289">Go to SourceForge</a><br/>
+ 	 href="https://sourceforge.net/project/showfiles.php?group_id=160289">Go to SourceForge</a>
     </li>
   </ul>
 </li>
