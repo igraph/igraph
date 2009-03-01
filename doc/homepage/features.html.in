@@ -1,0 +1,34 @@
+<h2>Features</h2>
+
+<p>Here are some features of <b>igraph</b>, a subset of the functionality,
+see <i>The igraph reference manual</i> under <a
+href="documentation.html">Documentation</a> for more details.</p>
+
+<ul>
+<li><b>igraph</b> contains functions for generating regular and random graphs
+according to many algorithms and models from the network theory
+literature.</li>
+<li><b>igraph</b> provides routines for manipulating graphs, adding and removing
+    edges and vertices.</li>
+<li>You can assign numeric or textual attribute to the vertices or edges 
+    of the graph, like edge weights or textual vertex ids.</li>
+<li>A rich set of functions calculating various structural properties,
+    eg. betweenness, PageRank, k-cores, network motifs, 
+    etc. are also included.</li>
+<li>Force based layout generators for small and large graphs</li>
+<li>The R package and the Python module can visualize graphs many ways, 
+    in 2D and 3D, interactively or non-interactively.</li>
+<li><b>igraph</b> provides data types for implementing your own algorithm in 
+    C, R, Python or Ruby.</li>
+<li>Community structure detection algorithms using many recently developed
+    heuristics.</li>
+<li><b>igraph</b> can read and write many file formats, e.g., GraphML, GML or Pajek.
+    </li>
+<li><b>igraph</b> contains efficient functions for deciding graph isomorphism and
+    subgraph isomorphism</li>
+<li>It also contains an implementation of the push/relabel algorithm
+     for calculating maximum network flow, and this way minimum cuts,
+     vertex and edge connectivity.</li>
+<li><b>igraph</b> is well documented both for users and developers.</li>
+<li><b>igraph</b> is open source and distributed under GNU GPL.</li>
+</ul>

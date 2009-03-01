@@ -1,173 +1,89 @@
-<h2>Introduction</h2>
+<table class="intro"><tr><td>
+<h2 class="th">Introduction</h2>
+
+<hr/>
 
 <p><b>igraph</b> is a free software package for creating and manipulating undirected and 
 directed graphs. It includes implementations for classic graph theory
 problems like minimum spanning trees and network flow, and also
 implements algorithms for some recent network analysis methods, like 
 community structure search.</p>
-<div class="more"><a href="#introduction2">Read more &raquo;</a></div>
+<div class="more"><a href="introduction.html">Read more &raquo;</a></div>
 
-<h2>Features</h2>
+</td><td>
+<h2 class="th">Features</h2>
+
+<hr/>
 
 <p><b>igraph</b> contains functions for generating regular and random graphs,
 manipulating graphs, assigning attributes to vertices and edges. It can
 calculate various structural properties, includes heuristics for 
 community structure detection, supports many file formats.</p>
-<div class="more"><a href="#features">Read more &raquo;</a></div>
+<div class="more"><a href="features.html">Read more &raquo;</a></div>
 
-<h2>Requirements</h2>
+</td><td>
+<h2 class="th">Requirements</h2>
+
+<hr/>
 
 <p>The software you need for installing <b>igraph</b> depends on
 whether you want to use the C library, the R package or the Python
 extension.</p>
-<div class="more"><a href="#requirements">Read more &raquo;</a></div>
+
+<p>
+Furthermore, it may depend on your platform as well.
+</p>
+<div class="more"><a href="requirements.html">Read more &raquo;</a></div>
+</td></tr></table>
 
 <hr/>
 
-<a name="introduction"></a>
-<h2>Introduction</h2>
+<div class="feed">
+<script src="http://feeds2.feedburner.com/IgraphAnnouncements?format=sigpro"
+	type="text/javascript" ></script><noscript><p>Subscribe to RSS
+    headline updates
+    from: <a href="http://feeds2.feedburner.com/IgraphAnnouncements"></a><br/>Powered
+    by FeedBurner</p> </noscript> 
+<p class="comment">View <a href="https://launchpad.net/igraph/+announcements">more
+    announcements.</a></p>
+</div>
 
-<p><b>igraph</b> is a free software package for creating and manipulating undirected and 
-directed graphs. It includes implementations for classic graph theory
-problems like minimum spanning trees and network flow, and also
-implements algorithms for some recent network analysis methods, like 
-community structure search.</p>
+<div class="feed">
+<script src="http://feeds2.feedburner.com/BugsInIgraph?format=sigpro&nItems=5"
+	type="text/javascript" ></script><noscript><p>Subscribe to RSS
+    headline updates
+    from: <a href="http://feeds2.feedburner.com/BugsInIgraph"></a><br/>Powered
+    by FeedBurner</p> </noscript> 
+<p class="comment">View <a href="https://launchpad.net/igraph/+bugs">more
+    bugs.</a></p>
+</div>
 
-<a name="introduction2"></a>
-<p>The efficient implementation of <b>igraph</b> allows it to handle graphs
-with millions of vertices and edges. The rule of thumb is that if your graph
-fits into the physical memory then <b>igraph</b> can handle it.</p>
+<div class="feed">
+<script src="http://feeds2.feedburner.com/LatestRevisionsForBranchigraph/igraph/06-main?format=sigpro&nItems=5"
+	type="text/javascript" ></script><noscript><p>Subscribe to RSS
+    headline updates
+    from: <a href="http://feeds2.feedburner.com/LatestRevisionsForBranchigraph/igraph/06-main"></a><br/>Powered
+    by FeedBurner</p> </noscript>
+<p class="comment"><a href="https://code.launchpad.net/~igraph/igraph/0.6-main">Browse
+    commits.</a></p>
+</div>
 
-<p><b>igraph</b> can be installed in several forms:</p>
+<div class="feed">
+<script src="http://feeds2.feedburner.com/LatestRevisionsForBranchigraph/igraph/05-main?format=sigpro&nItems=5"
+	type="text/javascript" ></script><noscript><p>Subscribe to RSS
+    headline updates
+    from: <a href="http://feeds2.feedburner.com/LatestRevisionsForBranchigraph/igraph/05-main"></a><br/>Powered
+    by FeedBurner</p> </noscript> 
+<p class="comment"><a href="https://code.launchpad.net/~igraph/igraph/0.5-main">Browse
+    commits.</a></p>
+</div>
 
-<ul>
-<li><b>igraph</b> as a <i>C library</i> is useful if you want to use
-    it in your C/C++ projects, or want to implement your own network analysis
-    or model in C/C++ using the data structures and functions <b>igraph</b> provides.
-    </li>
-<li><b>igraph</b> as an <i>R package</i>. You can use <b>igraph</b> as an extension 
-    package to <a href="http://www.r-project.org">The GNU R project for
-    Statistical Computing.</a> The flexibility of the R language and its 
-    richness in statistical methods add a great deal of productivity to 
-    <b>igraph</b>, with a very small speed penalty.</li>
-<li><b>igraph</b> as a <a href="http://www.python.org">Python</a> extension module.
-    This way you can combine <b>igraph</b> with the huge set of Python functions
-    and modules available, and the ease of the Python language,
-    with a small speed penalty.</li>
-<li><b>igraph</b> as a <a href="http://www.ruby-lang.org">Ruby</a> extension. 
-    If you like the Ruby language, then this might be the right choice for you.
-    </li>
-</ul>
-
-<p>Every form of <b>igraph</b> contain the same code at the very heart, written in ANSI C.</p>
-
-<p>Please note that the ways of installing <b>igraph</b> depends on which its 
-forms you actually want to use. Eg. for using <b>igraph</b> as an R package,
-you don't need to download the C library at all. See the <a
-href="download.html">download page</a> for details.</p>
-
-<hr/>
-
-<a name="features"></a>
-<h2>Features</h2>
-
-<p>Here are some features of <b>igraph</b>, a subset of the functionality,
-see <i>The igraph reference manual</i> under <a
-href="documentation.html">Documentation</a> for more details.</p>
-
-<ul>
-<li><b>igraph</b> contains functions for generating regular and random graphs
-according to many algorithms and models from the network theory
-literature.</li>
-<li><b>igraph</b> provides routines for manipulating graphs, adding and removing
-    edges and vertices.</li>
-<li>You can assign numeric or textual attribute to the vertices or edges 
-    of the graph, like edge weights or textual vertex ids.</li>
-<li>A rich set of functions calculating various structural properties,
-    eg. betweenness, PageRank, k-cores, network motifs, 
-    etc. are also included.</li>
-<li>Force based layout generators for small and large graphs</li>
-<li>The R package and the Python module can visualize graphs many ways, 
-    in 2D and 3D, interactively or non-interactively.</li>
-<li><b>igraph</b> provides data types for implementing your own algorithm in 
-    C, R, Python or Ruby.</li>
-<li>Community structure detection algorithms using many recently developed
-    heuristics.</li>
-<li><b>igraph</b> can read and write many file formats, e.g., GraphML, GML or Pajek.
-    </li>
-<li><b>igraph</b> contains efficient functions for deciding graph isomorphism and
-    subgraph isomorphism</li>
-<li>It also contains an implementation of the push/relabel algorithm
-     for calculating maximum network flow, and this way minimum cuts,
-     vertex and edge connectivity.</li>
-<li><b>igraph</b> is well documented both for users and developers.</li>
-<li><b>igraph</b> is open source and distributed under GNU GPL.</li>
-</ul>
-
-<hr/>
-
-<a name="requirements"></a>
-<h2>Requirements</h2>
-
-<h3>The C library</h3>
-    <p>For using the <i><b>igraph</b> C library</i> only a fairly recent C
-    and C++ library is needed. For supporting the GraphML format
-    you'll need the <a href="http://xmlsoft.org"><code>libxml2</code>
-    library</a>.</p>
-
-    <p>For compiling the <i><b>igraph</b> C library</i> from source you'll
-    need a fairly modern C and C++ compiler and some standard UNIX
-    tools like <code>make</code>, <code>chmod</code>, <code>touch</code>, etc.</p>
-
-    <p>Most often we use the <a href="http://gcc.gnu.org">GNU Compiler
-    Collection</a> for compiling. Theoretically it is possible to compile
-    <b>igraph</b> using the Microsoft Visual C Compiler as well, but we
-    recommend the <a href="http://www.cygwin.com">Cygwin</a> or
-    <a href="http://www.mingw.org">MinGW</a> environments for compiling
-    <b>igraph</b> under Windows.</p>
-
-<h3>The GNU R package</h3>
-    <p>For using the <i><b>igraph</b> R package</i> you obviously need 
-    GNU R, a recent version like 2.6.0 is recommended, since earlier
-    versions contain bugs which affect <b>igraph</b>. If you would like to
-    compile the R package from source (this is the usual way for Linux
-    systems), you'll need a C and C++ compiler and optionally the
-    <a href="http://xmlsoft.org"><code>libxml2</code> library</a>.</p>
-
-    <p>For installing the <i><b>igraph</b> R package</i> on Windows, you 
-    don't need anything else, just GNU R and the binary <b>igraph</b> R
-    package of course</p>
-
-<h3>The Python extension module</h3>
-
-    <p>For installing the <i>Python extension module</i>, you'll
-    need Python version 2.4 or later. Binary versions of the module
-    are available for Python 2.4 and Python 2.5 on the Windows platform,
-    so you don't have to compile anything in this case. OS X Leopard
-	users can download an installer as well. If you are using
-    Linux or Mac OS X Tiger, you'll have to compile the extension by yourself.
-    Compilation requires a recent C compiler (e.g. <code>gcc</code>, which
-    is usually available as a separate package in Linux and as part of
-    <a href="http://developer.apple.com/tools/xcode/">XCode</a> on Mac
-    OS X. You'll also need the compiled form of the <b>igraph</b> C
-	core, as the Python interface will link to that during compilation.</p>
-    <p>If you have the <a href="http://peak.telecommunity.com/DevCenter/EasyInstall">EasyInstall</a>
-    Python script installed, you can simply type <code>easy_install igraph</code>
-    to download, compile and install <b>igraph</b> as a Python Egg. This
-	method assumes that you installed the C core somewhere in the
-	default include and library path of your system.</p>
-
-<h3>The Ruby extension</h3>
-    <p>For installing the <i>Ruby extension</i> please consult 
-    <a href="http://rubyforge.org/projects/igraph/">the homepage of
-    this extension</a>.</p>
-
-<h3>Compiling the development version</h3>
-    <p>For compiling the development version of <b>igraph</b>, you'll need
-    quite a large set of tools: <code>autoconf</code>, <code>automake</code>,
-    GNU <code>bison</code> version 1.35 or newer, GNU <code>make</code>,
-    maybe more. For compiling the documentation you'll need even more tools:
-    Python, Docbook schemas and tools, <code>xmlto</code>, <code>makeinfo</code>,
-    <code>patch</code>, <code>docbook2x</code>, maybe more. We're sure you
-    know how to get these if you want to compile the development version :)</p>
+<div class="feed">
+<script src="http://feeds2.feedburner.com/RecentPageChangesFromSiteigraphaWikidotSite?format=sigpro&nItems=5"
+	type="text/javascript" ></script><noscript><p>Subscribe to RSS
+    headline updates
+    from: <a href="http://feeds2.feedburner.com/RecentPageChangesFromSiteigraphaWikidotSite"></a><br/>Powered
+    by FeedBurner</p> </noscript>
+<p class="comment">See <a href="http://igraph.wikidot.com/system:recent-changes">more changes.</a></p>
+</div>
 
