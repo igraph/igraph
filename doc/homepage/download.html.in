@@ -13,17 +13,17 @@
         please try this before downloading from here.</span><br/>
     </li>
     <li class="download-windows">
-       <a href="download/igraph_${VERSION}.zip"
+       <a href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph_${VERSION}.zip"
           onClick="javascript:urchinTracker ('/downloads/rwindowsbinary'); ">
           Windows binary</a> 
     </li>
     <li class="download-osx">
-       <a href="download/igraph_${VERSION}.tgz"
+       <a href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph_${VERSION}.tgz"
           onClick="javascript:urchinTracker ('/downloads/rosxbinary'); "> 
           Mac OSX universal binary</a>
     </li>
     <li class="download-source">
-       <a href="download/igraph_${VERSION}.tar.gz"
+       <a href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph_${VERSION}.tar.gz"
        onClick="javascript:urchinTracker ('/downloads/rsource'); "> 
         Source package (for Linux and similar)</a><br/>
     </li>
@@ -58,7 +58,7 @@
     <li class="download-external">
        <a href="http://python.org/pypi/python-igraph" 
           onClick="javascript:urchinTracker ('/outgoing/pythoncheeseshop'); "> 
-          Python Package Index page</a>  
+          Python Package Index page</a><br/>
     </li>
   </ul>
 </li>
@@ -74,7 +74,7 @@
     <li class="download-external">
        <a href="http://rubyforge.org/projects/igraph" 
           onClick="javascript:urchinTracker ('/outgoing/rubyforge'); "> 
- 	 External homepage</a> 
+ 	 External homepage</a><br/>
     </li>
   </ul>
 </li>
@@ -86,10 +86,24 @@
   <ul class="download-links">
     <li class="download-source">
        <a onClick="javascript:urchinTracker ('/downloads/library'); " 
- 	 href="download/igraph-${VERSION}.tar.gz">Source code</a>
+ 	 href="http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-${VERSION}.tar.gz">Source code</a><br/>
     </li>
   </ul>
 </li>
+
+<li class="download download-sf">
+  <span class="name">Browse released files</span>
+  <span class="comment">&mdash; All file releases at
+  SourceForge</span>
+  <ul class="download-links">
+    <li class="download-sf">
+       <a onClick="javascript:urchinTracker ('/downloads/sourceforge'); " 
+ 	 href="https://sourceforge.net/project/showfiles.php?group_id=160289">Go to SourceForge</a><br/>
+    </li>
+  </ul>
+</li>
+  
+  
 
 </ul>
 

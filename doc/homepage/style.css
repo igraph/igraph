@@ -80,6 +80,9 @@ div.image_caption {
 li.download-c {
   background: url(images/icon_c.png) no-repeat 0px 0px;
 }
+li.download-sf {
+  background: url(images/icon_sf.png) no-repeat 0px 0px;
+}
 li.download-r {
   background: url(images/icon_r.png) no-repeat 0px 0px;
 }
@@ -107,6 +110,10 @@ ul.download-links li {
 }
 ul.download-links li.download-source {
   background: url(images/icon_source.png) no-repeat 0px 0px;
+  padding-left: 18px;
+}
+ul.download-links li.download-sf {
+  background: url(images/icon_sf.png) no-repeat 0px 0px;
   padding-left: 18px;
 }
 ul.download-links li.download-windows {
