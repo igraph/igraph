@@ -187,7 +187,7 @@ void igraphmodule_Graph_dealloc(igraphmodule_GraphObject * self)
 int igraphmodule_Graph_init(igraphmodule_GraphObject * self,
                             PyObject * args, PyObject * kwds) {
   static char *kwlist[] = { "n", "edges", "directed", NULL };
-  long n = 1;
+  long n = 0;
   PyObject *edges = NULL, *dir = Py_False;
   igraph_vector_t edges_vector;
 

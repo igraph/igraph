@@ -262,7 +262,12 @@ class PathTests(unittest.TestCase):
           [(1,14),(2,19),(3,20),(4,20),(5,16),(6,16)])
         g = Graph.Full(5)+Graph.Full(4)
         h = g.path_length_hist()
+        self.failUnless(h.unconnected == 20)
+        g.to_directed()
+        h = g.path_length_hist()
         self.failUnless(h.unconnected == 40)
+        h = g.path_length_hist(False)
+        self.failUnless(h.unconnected == 20)
 
 def suite():
     simple_suite = unittest.makeSuite(SimplePropertiesTests)
