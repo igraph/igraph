@@ -8,11 +8,14 @@ a img { border: 0; }
 h1 {
     color: #fff;
     margin: 0;
-    padding: 7px 0 7px 15px;
+    height: 40px;
+    line-height: 40px;
     text-shadow: 0px 1px 2px #000;
-    background: #005fd7 url(images/header_blue.png) repeat-x;
+    background: #1872ce url(images/header_blue.png) repeat-x;
+    border-top: 1px solid #1872ce;
     border-bottom: 1px solid #1c477f;
     font-size: large;
+    padding-left: 10px;
 }
 h2 {
     font-size: 1.5em;
