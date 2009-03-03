@@ -5017,7 +5017,9 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   
   if (vertex_index) { 
     long int i;
-    IGRAPH_CHECK(igraph_vector_resize(vertex_index, no_of_edges+1));
+    IGRAPH_CHECK(igraph_vector_resize(vertex_index, 
+				      no_of_nodes > no_of_edges+1 ? 
+				      no_of_nodes : no_of_edges+1));
     for (i=0; i<no_of_nodes; i++) {
       VECTOR(*vertex_index)[i] = i;
     }
