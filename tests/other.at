@@ -25,3 +25,9 @@ AT_SETUP([Convex hull calculation (igraph_convex_hull):])
 AT_KEYWORDS([igraph_convex_hull other])
 AT_COMPILE_CHECK([simple/igraph_convex_hull.c], [simple/igraph_convex_hull.out])
 AT_CLEANUP
+
+AT_SETUP([Random seed:])
+AT_KEYWORDS([RNG seed random])
+AT_COMPILE_CHECK([simple/random_seed.c])
+AT_CLEANUP
+
