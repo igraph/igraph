@@ -111,6 +111,10 @@
 <!-- doxrox-include igraph_linegraph -->
 </section>
 
+<section><title>Unfolding a graph into a tree</title>
+<!-- doxrox-include igraph_unfold_tree -->
+</section>
+
 <section><title>Other Operations</title>
 <!-- doxrox-include igraph_density -->
 <!-- doxrox-include igraph_reciprocity -->
