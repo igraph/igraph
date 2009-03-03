@@ -4962,3 +4962,104 @@ int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
   
   return 0;
 }
+
+int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
+		       igraph_neimode_t mode, const igraph_vector_t *roots,
+		       igraph_vector_t *vertex_index) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_edges=igraph_ecount(graph);
+  
+  igraph_vector_t edges;
+  igraph_vector_bool_t seen_vertices;
+  igraph_vector_bool_t seen_edges;
+
+  igraph_dqueue_t Q;
+  igraph_vector_t neis;
+  
+  long int r, v_ptr=no_of_nodes;
+
+  /* TODO: handle not-connected graphs, multiple root vertices */
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+  IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
+  IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
+  IGRAPH_CHECK(igraph_vector_bool_init(&seen_vertices, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &seen_vertices);
+  IGRAPH_CHECK(igraph_vector_bool_init(&seen_edges, no_of_edges));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, &seen_edges);
+  
+  if (vertex_index) { 
+    long int i;
+    IGRAPH_CHECK(igraph_vector_resize(vertex_index, no_of_edges+1));
+    for (i=0; i<no_of_nodes; i++) {
+      VECTOR(*vertex_index)[i] = i;
+    }
+  }
+
+  for (r=0; r<igraph_vector_size(roots); r++) {
+
+    long int root=VECTOR(*roots)[r];
+    VECTOR(seen_vertices)[root] = 1;
+    igraph_dqueue_push(&Q, root);
+  
+    while (!igraph_dqueue_empty(&Q)) {
+      long int actnode=igraph_dqueue_pop(&Q);
+      long int i, n;
+      
+      IGRAPH_CHECK(igraph_adjacent(graph, &neis, actnode, mode));
+      n=igraph_vector_size(&neis);
+      for (i=0; i<n; i++) {
+
+	long int edge=VECTOR(neis)[i];
+	long int from=IGRAPH_FROM(graph, edge);
+	long int to=IGRAPH_TO(graph, edge);
+	long int nei=IGRAPH_OTHER(graph, edge, actnode);
+
+	if (! VECTOR(seen_edges)[edge]) { 
+	  
+	  VECTOR(seen_edges)[edge] = 1;
+	  
+	  if (! VECTOR(seen_vertices)[nei]) {
+	    
+	    VECTOR(edges)[ edge*2 ] = from;
+	    VECTOR(edges)[ edge*2+1 ] = to;
+	    
+	    VECTOR(seen_vertices)[nei] = 1;
+	    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
+	    
+	  } else {
+	    
+	    if (vertex_index) { 
+	      VECTOR(*vertex_index)[v_ptr] = nei;
+	    }
+	    
+	    if (from==nei) {
+	      VECTOR(edges)[ edge*2 ] = v_ptr++;
+	      VECTOR(edges)[ edge*2+1 ] = to;
+	    } else {
+	      VECTOR(edges)[ edge*2 ] = from;
+	      VECTOR(edges)[ edge*2+1 ] = v_ptr++;
+	    }
+	  }
+	}
+
+      }	/* for i<n */
+      
+    } /* ! igraph_dqueue_empty(&Q) */
+
+  } /* r < igraph_vector_size(roots) */
+
+  igraph_vector_bool_destroy(&seen_vertices);
+  igraph_vector_destroy(&neis);
+  igraph_dqueue_destroy(&Q);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  IGRAPH_CHECK(igraph_create(tree, &edges, no_of_edges+1, 
+			     igraph_is_directed(graph)));
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
+}
+

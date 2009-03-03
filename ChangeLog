@@ -293,6 +293,10 @@
 	* src/foreign.c (igraph_write_graph_gml) : directed graphs
 	are now treated correctly (same as in igraph_read_graph_gml)
 
+2008-03-23  Gabor Csardi  <csardi@rmki.kfki.hu>
+
+	* src/structural_properties.c (igraph_unfold_tree) : added
+
 2008-03-11  Gabor Csardi  <csardi@rmki.kfki.hu>
 
 	* src/cattributes.c (igraph_i_cattribute_get_string_vertex_attr)

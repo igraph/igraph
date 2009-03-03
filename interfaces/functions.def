@@ -497,6 +497,11 @@ igraph_arpack_unpack_complex:
         PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev
         NAME-R: arpack.unpack.complex
 
+igraph_unfold_tree:
+        PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots, \
+                OUT VECTOR_OR_0 vertex_index
+        NAME-R: unfold.tree
+
 #######################################
 # Spectral properties
 #######################################

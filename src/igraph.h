@@ -892,6 +892,10 @@ int igraph_is_bipartite(const igraph_t *graph,
 			igraph_bool_t *res,
 			igraph_vector_bool_t *type);
 
+int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
+		       igraph_neimode_t mode, const igraph_vector_t *roots,
+		       igraph_vector_t *vertex_index);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
