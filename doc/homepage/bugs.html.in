@@ -2,16 +2,13 @@
 
 <h3>Reporting bugs at Launchpad</h3>
 
-<p>We suggest to report igraph bugs on the Launchpad website. This
+<p>We suggest to report igraph bugs on the Launchpad website by
+  clicking on the first button in the menu on the bottom of the page. This
   allows you to follow up on your bug report, e.g. get an email
   notification when it is fixed. Please check the
   <a href="https://bugs.launchpad.net/igraph/+bugs">list of bugs</a>
   before clicking on the button below to report a new bug.
 </p>
-
-<a href="https://bugs.launchpad.net/igraph/+filebug">
-<img src="https://bugs.launchpad.net/+icing/but-sml-reportabug.gif"
-     alt="Report a bug at Launchpad"></a>
 
 <h3>Sending bug reports in email</h3>
 

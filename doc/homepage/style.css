@@ -57,6 +57,7 @@ div.main {
     align: center;
     margin-left: 220px;
     margin-right: auto;
+    margin-bottom: 40px;
 }
 .more {
     text-align: right;
@@ -323,4 +324,79 @@ div.feed span.headline {
 div.feedburnerFeedBlock table {
     table-layout: fixed;
     width: 100%;
+}
+div.quick-menu {
+    float: right;
+    width: 970px;
+    bottom: 0;
+    left: 50%;
+    margin-left: -485px;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-top: 1px solid #0000a0;
+    border-left: 1px solid #0000a0;
+    border-right: 1px solid #0000a0;
+    background: #cacaff;
+    position: fixed;
+    text-align: center;
+}
+div.quick-menu ul {
+  list-style: none;
+  padding: 0; margin: 0px;
+}
+div.quick-menu li {
+  float: left;
+}
+div.quick-menu li span {
+    position: absolute;
+    left: -5000px;
+}
+div.quick-menu ul li a {
+    display: block;
+    width: 160px;
+    height: 28px;
+    text-decoration: none;
+}
+#qm-reportbug {
+    background: url("images/reportbug-real.png");
+}
+#qm-reportbug:hover {
+    background-position: -160px 0;
+}
+#qm-requestfeature {
+    background: url("images/requestfeature-real.png");
+}
+#qm-requestfeature:hover {
+    background-position: -160px 0;
+}
+#qm-listbugs {
+    background: url("images/listbugs-real.png");
+}
+#qm-listbugs:hover {
+    background-position: -160px 0;
+}
+#qm-searcharchive {
+    background: url("images/searcharchive-real.png");
+}
+#qm-searcharchive:hover {
+    background-position: -160px 0;
+}
+#qm-subscribe {
+    background: url("images/subscribe-real.png");
+}
+#qm-subscribe:hover {
+    background-position: -160px 0;
+}
+#qm-browsesource {
+    background: url("images/browsesource-real.png");
+}
+#qm-browsesource:hover {
+    background-position: -160px 0;
+}
+#qm-searchdocs {
+    background: url("images/searchdocs-real.png");
+}
+#qm-searchdocs:hover {
+    background-position: -160px 0;
 }
