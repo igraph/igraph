@@ -59,6 +59,7 @@ void igraph_i_gml_reset_scanner() {
 %option prefix="igraph_gml_yy"
 %option outfile="lex.yy.c"
 %option nounput
+%option noinput
 
 digit       [0-9]
 whitespace  [ \r\n\t]
