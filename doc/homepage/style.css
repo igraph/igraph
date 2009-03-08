@@ -63,6 +63,9 @@ div.main {
     text-align: right;
     margin-top: -1em;
 }
+.back {
+    text-align: left;
+}
 
 ul.no-bullet {
   list-style-type: none;

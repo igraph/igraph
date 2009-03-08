@@ -17,8 +17,9 @@ community structure search.</p>
 
 <p><b>igraph</b> contains functions for generating regular and random graphs,
 manipulating graphs, assigning attributes to vertices and edges. It can
-calculate various structural properties, includes heuristics for 
-community structure detection, supports many file formats.</p>
+calculate various structural properties, graph isomorphism, 
+includes heuristics for community structure detection, supports many
+  file formats. The R and Python interfaces support visualization.</p> 
 <div class="more"><a href="features.html">Read more &raquo;</a></div>
 
 </td><td>
@@ -26,13 +27,16 @@ community structure detection, supports many file formats.</p>
 
 <hr/>
 
-<p>The software you need for installing <b>igraph</b> depends on
-whether you want to use the C library, the R package or the Python
-extension.</p>
+<p>
+igraph runs on most modern machines and operating systems, and it is
+tested on MS Windows, Mac OSX and various Linux versions.
+</p>
 
 <p>
-Furthermore, it may depend on your platform as well.
-</p>
+The software you need for installing <b>igraph</b> depends on
+whether you want to use the C library, the R package or the Python
+extension; and may vary depending on your platform.</p>
+
 <div class="more"><a href="requirements.html">Read more &raquo;</a></div>
 </td></tr></table>
 

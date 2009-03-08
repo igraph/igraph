@@ -38,3 +38,5 @@ fits into the physical memory then <b>igraph</b> can handle it.</p>
 forms you actually want to use. Eg. for using <b>igraph</b> as an R package,
 you don't need to download the C library at all. See the <a
 href="download.html">download page</a> for details.</p>
+
+<div class="back"><a href="index.html">&laquo; Back to main page</a></div>
