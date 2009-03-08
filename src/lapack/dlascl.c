@@ -10,9 +10,9 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlascl_(char *type__, integer *kl, integer *ku, 
 	doublereal *cfrom, doublereal *cto, integer *m, integer *n, 

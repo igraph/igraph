@@ -12,6 +12,45 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="Release"
+			IntermediateDirectory="Release"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			CharacterSet="0">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude"
+				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;HAVE_LIBXML=1"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="TRUE"
+				DebugInformationFormat="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCManagedWrapperGeneratorTool"/>
+			<Tool
+				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+		</Configuration>
+		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
@@ -20,7 +59,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="winclude;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\winclude&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\src&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\include&quot;"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude"
 				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;HAVE_LIBXML=1"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -58,45 +97,6 @@
 				Name="VCXMLDataGeneratorTool"/>
 			<Tool
 				Name="VCWebDeploymentTool"/>
-			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
-			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			CharacterSet="0">
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="winclude;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\winclude&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\src&quot;;&quot;C:\Documents and Settings\Gabor Csardi\My Documents\Visual Studio Projects\igraph.msvc\include&quot;"
-				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;HAVE_LIBXML=1"
-				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="0"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -664,13 +664,7 @@
 				RelativePath=".\src\arpack.h">
 			</File>
 			<File
-				RelativePath=".\include\arpack.h">
-			</File>
-			<File
 				RelativePath=".\src\arpack_internal.h">
-			</File>
-			<File
-				RelativePath=".\include\array.h">
 			</File>
 			<File
 				RelativePath=".\src\array.h">
@@ -684,9 +678,6 @@
 			</File>
 			<File
 				RelativePath=".\src\attributes.h">
-			</File>
-			<File
-				RelativePath=".\include\attributes.h">
 			</File>
 			<File
 				RelativePath=".\src\bliss_bignum.hh"
@@ -739,9 +730,6 @@
 				RelativePath=".\src\DensityGrid.h">
 			</File>
 			<File
-				RelativePath=".\include\dqueue.h">
-			</File>
-			<File
 				RelativePath=".\src\dqueue.h">
 			</File>
 			<File
@@ -762,9 +750,6 @@
 			</File>
 			<File
 				RelativePath=".\src\error.h">
-			</File>
-			<File
-				RelativePath=".\include\error.h">
 			</File>
 			<File
 				RelativePath=".\src\f2c.h">
@@ -818,9 +803,6 @@
 				RelativePath=".\src\gml_tree.h">
 			</File>
 			<File
-				RelativePath=".\include\heap.h">
-			</File>
-			<File
 				RelativePath=".\src\heap.h">
 			</File>
 			<File
@@ -831,28 +813,13 @@
 				RelativePath=".\src\igraph.h">
 			</File>
 			<File
-				RelativePath=".\include\igraph.h">
-			</File>
-			<File
 				RelativePath=".\src\igraph_pmt.h">
-			</File>
-			<File
-				RelativePath=".\include\igraph_pmt.h">
-			</File>
-			<File
-				RelativePath=".\include\igraph_pmt_off.h">
 			</File>
 			<File
 				RelativePath=".\src\igraph_pmt_off.h">
 			</File>
 			<File
-				RelativePath=".\include\interrupt.h">
-			</File>
-			<File
 				RelativePath=".\src\interrupt.h">
-			</File>
-			<File
-				RelativePath=".\include\matrix.h">
 			</File>
 			<File
 				RelativePath=".\src\matrix.h">
@@ -877,17 +844,11 @@
 				RelativePath=".\src\random.h">
 			</File>
 			<File
-				RelativePath=".\include\stack.h">
-			</File>
-			<File
 				RelativePath=".\src\stack.h">
 			</File>
 			<File
 				RelativePath=".\src\stack.pmt"
 				FileType="2">
-			</File>
-			<File
-				RelativePath=".\include\types.h">
 			</File>
 			<File
 				RelativePath=".\src\types.h">
@@ -897,9 +858,6 @@
 			</File>
 			<File
 				RelativePath=".\src\vector.h">
-			</File>
-			<File
-				RelativePath=".\include\vector.h">
 			</File>
 			<File
 				RelativePath=".\src\vector.pmt"
