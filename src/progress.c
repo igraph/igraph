@@ -36,7 +36,7 @@ int igraph_progress(const char *message, igraph_real_t percent, void *data) {
 
 int igraph_progress_handler_stderr(const char *message, igraph_real_t percent,
 				  void* data) {
-  fprintf(stderr, message);
+  fputs(stderr, message);
   fprintf(stderr, "%.1f percent ready\n", (double)percent);
   return 0;
 }
