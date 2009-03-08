@@ -56,7 +56,7 @@ pre.condensed { font-size: 0.8em; line-height: 1.5em; }
 div.main {
     max-width:900px;
     padding-left: 50px;
-    padding-bottom: 100px;
+    padding-bottom: 50px;
     margin-right: 0;
 }
 .more {
@@ -381,4 +381,11 @@ ul.menu-bottom li {
   font-size: 0.8em;
   margin: 0px;
   display: inline;
+}
+div.copyright {
+    border-top: 1px solid #8e8e8e;
+    text-align: center;
+    color: #8e8e8e;
+    padding-top: 10px;
+    padding-bottom: 50px;
 }
