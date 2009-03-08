@@ -6,9 +6,13 @@
 <head>
   <title>The igraph library for complex network research</title>
   <link rel="stylesheet" type="text/css" href="style.css"></link>
+  <link rel="shortcut icon" href="images/igraph3.png" type="image/x-icon" />
+  <!--[if lt IE 7.]>
+      <script defer type="text/javascript" src="pngfix.js"></script>
+  <![endif]-->
 </head>
 
-<body>
+<body id="$PAGENAME">
 
 <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
 </script>
@@ -17,25 +21,67 @@
   urchinTracker();
 </script> 
 
-<h1><a href="index.html">The <b>igraph</b> library</a></h1>
+<div id="sourceforge_logo">
+<a href="http://sourceforge.net/projects/igraph"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=160289&type=12" width="120" height="30" border="0" alt="Get The igraph library at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a>
+</div>
 
-<div id="version_info">Latest version: <b>$VERSION</b><br/>
+<h1><a href="index.html">The <b>igraph</b> library</a>
+</h1>
+
+<ul class="menu-upper">
+  <li class="item-introduction" id="n-index"><a href="index.html">Home</a></li>
+  <li class="item-news" id="n-news"><a href="news.html">News</a></li>
+  <li class="item-download" id="n-download"><a href="download.html">Download</a></li>
+  <li class="item-documentation" id="n-documentation"><a href="documentation.html">Documentation</a></li>
+  <li class="item-wiki"><a href="http://igraph.wikidot.com">Wiki</a></li>
+  <li class="item-screenshots" id="n-screenshots"><a href="screenshots.html">Screenshots</a></li>
+  <li class="item-community" id="n-support"><a href="support.html">Mailing lists</a></li>
+  <li class="item-bug" id="n-bugs"><a href="bugs.html">Bugs</a></li>
+<!--   <li class="item-links" id="n-links"><a href="links.html">Links</a></li> -->
+  <li class="item-license" id="n-license"><a href="license.html">License</a></li>
+</ul>
+
+<div class="igraphlogo">
+<img src="images/igraph2.png" alt="" /><br/>
+Latest version: <b>$VERSION</b><br/>
 <a href="relnotes-$VERSION.html">Release notes</a>
 </div>
 
-<ul class="menu-upper">
-  <li class="item-introduction"><a href="index.html">Introduction</a></li>
-  <li class="item-news"><a href="news.html">News</a></li>
-  <li class="item-download"><a href="download.html">Download</a></li>
-  <li class="item-documentation"><a href="documentation.html">Documentation</a></li>
-  <li class="item-screenshots"><a href="screenshots.html">Screenshots</a></li>
-  <li class="item-community"><a href="support.html">Community</a></li>
-  <li class="item-links"><a href="links.html">Links</a></li>
-  <li class="item-license"><a href="license.html">License</a></li>
-</ul>
-
 <div class="main">
 $CONTENT
+</div>
+
+<div class="quick-menu">
+<ul class="menu-bottom">
+    <li class="item-bug"><a id="qm-reportbug"
+	 href="https://bugs.launchpad.net/igraph/+filebug">
+      <span>Report a bug</span></a></li>
+<!--   <li><a href="https://bugs.launchpad.net/igraph/+filebug"> -->
+<!--       <span>Request a feature</span></a></li> -->
+  <li class="item-bug"><a id="qm-listbugs"
+	 href="https://bugs.launchpad.net/igraph/+bugs">
+      <span>List open bugs</span></a></li>
+  <li class="item-community"><a id="qm-searcharchive"
+	 href="http://lists.gnu.org/archive/html/igraph-help/">
+      <span>Search mailing list</span></a></li>
+  <li class="item-community"><a id="qm-subscribe"
+	 href="http://lists.nongnu.org/mailman/listinfo/igraph-help">
+      <span>Subscribe to mailing list</span></a></li>
+  <li class="item-license"><a id="qm-browsesource"
+	 href="http://bazaar.launchpad.net/~igraph/igraph/0.5-main/files/1139.1.143">
+      <span>Browse source code</span></a></li>
+  <li class="item-documentation"><a id="qm-searchdocs"
+	 href="http://www.google.com/coop/cse?cx=006731217555358536053:yeszjk2wr6q">
+      <span>Search documentation</span></a></li>
+</ul>
+</div>
+
+<div class="copyright">
+    Copyright &copy;
+    2005-2009 <a href="http://igraph.sourceforge.net/">The igraph
+    Project</a>.<br><a href="http://validator.w3.org/check/referer">Optimised</a>
+    for <a href="http://www.w3.org/">standards</a>. Hosted
+    by <a href="http://www.sourceforge.net/">SourceForge</a>. 
 </div>
 
 </body>

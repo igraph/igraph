@@ -1,29 +1,35 @@
-<h2>Getting help</h2>
-
-<h3>Mailing lists</h3>
+<h2>Mailing lists</h2>
 
 <p>There are two <b>igraph</b> mailing lists: <code>igraph-help</code>
-and <code>igraph-announce</code>.</p>
+  and <code>igraph-announce</code>.
+</p>
+
+<h3><code>igraph-help</code></h3>
 
 <p><code>igraph-help</code> is for general discussion and questions,
-help, suggestions, etc. See
-<a href="http://lists.nongnu.org/mailman/listinfo/igraph-help"
-onClick="javascript:urchinTracker ('/outgoing/mailinglist-help'); ">
-its page at Savannah</a> for subscription and archives.</p>
+  help, suggestions, etc. See
+  <a href="http://lists.nongnu.org/mailman/listinfo/igraph-help"
+     onClick="javascript:urchinTracker ('/outgoing/mailinglist-help'); ">
+    its page at Savannah</a> for subscription and archives.
+</p>
 
-<p><code>igraph-announce</code> is a very low-traffic mailing (about one email per month) list for
-important announcements only, such as a new <b>igraph</b> release for
-example. <code>igraph-announce</code> is a read-only list, you can not
-post any messages to it. See
-<a href="http://lists.nongnu.org/mailman/listinfo/igraph-announce"
-onClick="javascript:urchinTracker ('/outgoing/mailinglist-announce'); ">
-its page at Savannah</a> for subscription and archives.</p>
+<h3><code>igraph-announce</code></h3>
 
-<h3>Bug reports, questions, comments</h3>
+<p><code>igraph-announce</code> is a very low-traffic mailing (about
+  two emails per year) list for important announcements only, such as
+  a new <b>igraph</b> release for example. These announcements are
+  also sent to <code>igraph-help</code>, so you don't need to sign up
+  to both mailing lists.
+</p>
 
-<p>Please send questions, comments and bug reports to the
-<a href="mailto:igraph-help@nongnu.org"><code>igraph-help</code>
-mailing list</a> or to <a href="mailto:csardi@rmki.kfki.hu">Gábor
-Csárdi</a>. The mailing list is preferred. In order to receive
-responses to your comments, please consider subscribing to the
-mailing list.</p>
+<p><code>igraph-announce</code> is a read-only list, you can 
+  not post any messages to it.
+</p>
+
+<p>See <a href="http://lists.nongnu.org/mailman/listinfo/igraph-announce"
+	  onClick="javascript:urchinTracker
+	  ('/outgoing/mailinglist-announce'); "> 
+    <code>igraph-announce</code> at Savannah</a> for subscription and
+    archives.
+</p>
+
