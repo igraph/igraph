@@ -39,9 +39,9 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
     individual vertices as singleton communities. In each step a new
     community is created from two other communities and its id will be 
     one larger than the largest community id so far. This means that 
-    before the first merge we have \c n communities (the number of
-    vertices in the graph) numbered from zero to \c n-1. The first
-    merge created community \c n, the second community \c n+1, etc.
+    before the first merge we have \code{n} communities (the number of
+    vertices in the graph) numbered from zero to \code{n-1}. The first
+    merge created community \code{n}, the second community \code{n+1}, etc.
   }
   \item{modularity}{ Numeric vector, the modularity score of the
     current community structure after each merge operation. 
