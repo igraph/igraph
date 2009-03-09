@@ -84,9 +84,9 @@
   <div>The original XML DocBook format of the
   manual can be obtained by downloading the latest igraph
   development version from
- <a href="http://cneurocvs.rmki.kfki.hu/arch/csardi@rmki.kfki.hu--2004-public"
-    onClick="javascript:urchinTracker ('/archrepo'); ">
-  our repository</a>.</div>
+ <a href="https://launchpad.net/igraph"
+    onClick="javascript:urchinTracker ('/launchpad'); ">
+  Launchpad</a>.</div>
   </div>
 </li>
 
@@ -100,5 +100,17 @@
   </ul>
   
 </li>
+
+<li class="download download-wiki">
+  <span class="name">igraph wiki at wikidot (external site)</span>
+  <span class="comment">&mdash; a collaborative effort of the community</span>
+  <ul class="download-links">
+    <li class="download-external">
+      <a href="http://igraph.wikidot.com">Browse online</a>
+    </li>
+  </ul>
+  
+</li>
+
 
 </ul>

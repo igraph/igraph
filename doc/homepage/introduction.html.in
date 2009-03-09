@@ -1,0 +1,42 @@
+<h2>Introduction</h2>
+
+<p><b>igraph</b> is a free software package for creating and manipulating undirected and 
+directed graphs. It includes implementations for classic graph theory
+problems like minimum spanning trees and network flow, and also
+implements algorithms for some recent network analysis methods, like 
+community structure search.</p>
+
+<a name="introduction2"></a>
+<p>The efficient implementation of <b>igraph</b> allows it to handle graphs
+with millions of vertices and edges. The rule of thumb is that if your graph
+fits into the physical memory then <b>igraph</b> can handle it.</p>
+
+<p><b>igraph</b> can be installed in several forms:</p>
+
+<ul>
+<li><b>igraph</b> as a <i>C library</i> is useful if you want to use
+    it in your C/C++ projects, or want to implement your own network analysis
+    or model in C/C++ using the data structures and functions <b>igraph</b> provides.
+    </li>
+<li><b>igraph</b> as an <i>R package</i>. You can use <b>igraph</b> as an extension 
+    package to <a href="http://www.r-project.org">The GNU R project for
+    Statistical Computing.</a> The flexibility of the R language and its 
+    richness in statistical methods add a great deal of productivity to 
+    <b>igraph</b>, with a very small speed penalty.</li>
+<li><b>igraph</b> as a <a href="http://www.python.org">Python</a> extension module.
+    This way you can combine <b>igraph</b> with the huge set of Python functions
+    and modules available, and the ease of the Python language,
+    with a small speed penalty.</li>
+<li><b>igraph</b> as a <a href="http://www.ruby-lang.org">Ruby</a> extension. 
+    If you like the Ruby language, then this might be the right choice for you.
+    </li>
+</ul>
+
+<p>Every form of <b>igraph</b> contain the same code at the very heart, written in ANSI C.</p>
+
+<p>Please note that the ways of installing <b>igraph</b> depends on which its 
+forms you actually want to use. Eg. for using <b>igraph</b> as an R package,
+you don't need to download the C library at all. See the <a
+href="download.html">download page</a> for details.</p>
+
+<div class="back"><a href="index.html">&laquo; Back to main page</a></div>
