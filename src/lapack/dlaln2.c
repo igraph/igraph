@@ -10,9 +10,9 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdlaln2_(logical *ltrans, integer *na, integer *nw, 
 	doublereal *smin, doublereal *ca, doublereal *a, integer *lda, 

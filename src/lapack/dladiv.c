@@ -10,9 +10,9 @@
 		http://www.netlib.org/f2c/libf2c.zip
 */
 
-#include "f2c.h"
 #include "config.h"
 #include "arpack_internal.h"
+#include "f2c.h"
 
 /* Subroutine */ int igraphdladiv_(doublereal *a, doublereal *b, doublereal *c__, 
 	doublereal *d__, doublereal *p, doublereal *q)

@@ -1,5 +1,5 @@
-#include "f2c.h"
 #include "config.h"
+#include "f2c.h"
 
 #define log10e 0.43429448190325182765
 

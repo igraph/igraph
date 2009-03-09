@@ -1,5 +1,5 @@
-#include "f2c.h"
 #include "config.h"
+#include "f2c.h"
 
 #ifdef KR_headers
 double igraphpow_di(ap, bp) doublereal *ap; integer *bp;
