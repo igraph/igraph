@@ -1146,7 +1146,7 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   igraph_bool_t *seen;
-  long int i, j;
+  long int i;
   igraph_integer_t eid=-1;
     
   if (n % 2 != 0) {
