@@ -57,6 +57,7 @@ void igraph_i_ncol_reset_scanner() {
 %option noyywrap
 %option prefix="igraph_ncol_yy"
 %option outfile="lex.yy.c"
+%option nounput
 
 alnum [^ \t\n\r]
 

@@ -57,6 +57,7 @@ void igraph_i_lgl_reset_scanner() {
 %option noyywrap
 %option prefix="igraph_lgl_yy"
 %option outfile="lex.yy.c"
+%option nounput
 
 alnum [^ \t\r\n#]
 
