@@ -59,6 +59,7 @@ void igraph_i_pajek_reset_scanner() {
 %option prefix="igraph_pajek_yy"
 %option outfile="lex.yy.c"
 %option nounput
+%option noinput
 
 digit [0-9]
 word [^ \t\r\n]
