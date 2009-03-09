@@ -56,15 +56,21 @@ double igraph_log2(const double a) {
  * Public domain.
  */
 
+#ifndef HAVE_LOGBL
 long double igraph_logbl(long double x) {
   long double res;
-
-  /*  asm ("fxtract\n\t"
-      "fstp	%%st" : "=t" (res) : "0" (x)); */
-  /* TODO */
+#if defined(_MSC_VER)
+  __asm { fld [x] }
+  __asm { fxtract }
+  __asm { fstp st }
+  __asm { fistp [res] }
+#else
+  __asm__ ("fxtract\n\t"
+	   "fstp	%%st" : "=t" (res) : "0" (x));
+#endif
   return res;
 }
-
+#endif
 
 int igraph_chebyshev_init(const double *dos, int nos, double eta)
 {
