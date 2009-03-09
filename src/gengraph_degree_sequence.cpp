@@ -111,6 +111,7 @@ degree_sequence::degree_sequence(FILE *f, bool DISTRIB) {
     while(fgets(buff, FBUFF_SIZE, f)) {
       line++;
       int d = strtol(buff, &c, 10);
+      long int tmp;
       if(c == buff) { ignored++; first_ignored = line; continue; }
       char *cc;
       int i = strtol(c, &cc, 10);
@@ -119,7 +120,7 @@ degree_sequence::degree_sequence(FILE *f, bool DISTRIB) {
       total += i*d;
       degree.push_back(d);
       n_with_degree.push_back(i);
-      strtol(cc, &c, 10);
+      tmp=strtol(cc, &c, 10);
       if( cc != c) {  syntax++; first_syntax = line; }
     }
     if(VERBOSE()) {
