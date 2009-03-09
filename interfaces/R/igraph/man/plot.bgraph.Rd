@@ -9,7 +9,7 @@
   right. 
 }
 \usage{
-plot.bgraph(x, mc = NULL, vertex.size = 5, colpal = NULL, emph = NULL, ...)
+plot.bgraph(x, mc = NULL, vertex.size = 3, colpal = NULL, emph = NULL, ...)
 }
 \arguments{
   \item{x}{The \code{bgraph} object to be plotted}
