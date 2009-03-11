@@ -13,6 +13,9 @@
 /* Define to 1 if you have the `fmin' function. */
 /* #undef HAVE_FMIN */
 
+/* Define to 1 if you have the `strcasecmp' function. */
+#define HAVE_STRCASECMP 1
+
 /* Define to 1 if you have the GMP library */
 /* #undef HAVE_GMP */
 
@@ -123,3 +126,6 @@
 #define YYTEXT_POINTER 1
 
 #pragma warning (disable:4244)
+
+#define strcasecmp _stricmp
+

@@ -24,7 +24,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdarg.h stdlib.h string.h time.h unistd.h])
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([expm1 rint rintf finite log2 logbl snprintf log1p round, fmin])
+AC_CHECK_FUNCS([expm1 rint rintf finite log2 logbl snprintf log1p round fmin strcasecmp])
 LIBS=$LIBS_SAVE
 
 AC_DEFUN([IGRAPH_WARNING],
