@@ -34,7 +34,7 @@ if (!exists(".tkplot.env")) {
 # Main function
 ###################################################################
 
-tkplot <- function(graph, ...) {
+tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -83,7 +83,8 @@ tkplot <- function(graph, ...) {
 
   # Create window & canvas
   top <- tktoplevel(background="lightgrey")
-  canvas <- tkcanvas(top, relief="raised", width=450, height=450,
+  canvas <- tkcanvas(top, relief="raised",
+                     width=canvas.width, height=canvas.height,
                      borderwidth=2)
   tkpack(canvas, fill="both", expand=1)
 
@@ -220,7 +221,7 @@ tkplot <- function(graph, ...) {
   .tkplot.create.edges(tkp.id)
   .tkplot.create.vertices(tkp.id)
   # we would need an update here
-  tkplot.fit.to.screen(tkp.id, 450, 450)
+  tkplot.fit.to.screen(tkp.id, canvas.width, canvas.height)
 
   # Kill myself if window was closed
   tkbind(top, "<Destroy>", function() tkplot.close(tkp.id, FALSE))
