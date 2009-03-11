@@ -43,6 +43,7 @@ __BEGIN_DECLS
  */
 double igraph_i_fdiv(const double a, const double b);
 int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
+double igraph_i_round(double X);
 
 double igraph_log2(const double a);
 long double igraph_logbl(long double a);
@@ -60,8 +61,8 @@ double igraph_fmin(double a, double b);
 #ifndef HAVE_FMIN
 #define fmin(a,b) igraph_fmin((a),(b))
 #endif
-#ifndef HAVE_SNPRINTF
-#define snprintf igraph_i_snprintf
+#ifndef HAVE_ROUND
+#define round igraph_i_round
 #endif
 
 #ifndef M_PI

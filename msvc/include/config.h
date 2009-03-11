@@ -8,13 +8,16 @@
 /* #undef HAVE_EXPM1 */
 
 /* Define to 1 if you have the `finite' function. */
-/* #undef HAVE_FINITE */
+#define HAVE_FINITE 1
 
 /* Define to 1 if you have the `fmin' function. */
 /* #undef HAVE_FMIN */
 
 /* Define to 1 if you have the `strcasecmp' function. */
 #define HAVE_STRCASECMP 1
+
+/* Define to 1 if you have the `isnan' function. */
+#define HAVE_ISNAN 1
 
 /* Define to 1 if you have the GMP library */
 /* #undef HAVE_GMP */
@@ -32,7 +35,7 @@
 /* #undef HAVE_LIBLAPACK */
 
 /* Define to 1 if you have the libxml2 libraries installed */
-#define HAVE_LIBXML 1
+#define HAVE_LIBXML 0
 
 /* Define to 1 if you have the `log1p' function. */
 /* #undef HAVE_LOG1P */
@@ -56,7 +59,7 @@
 /* #undef HAVE_ROUND */
 
 /* Define to 1 if you have the `snprintf' function. */
-/* #undef HAVE_SNPRINTF */
+#define HAVE_SNPRINTF 1
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #define HAVE_STDARG_H 1
@@ -129,3 +132,8 @@
 
 #define strcasecmp _stricmp
 
+#define isnan _isnan
+#define finite _finite
+#include <float.h>
+
+#define snprintf igraph_i_snprintf

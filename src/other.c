@@ -252,26 +252,3 @@ double igraph_i_fdiv(const double a, const double b)
    return a / b;
 }
 
-#ifdef _MSC_VER
-/**
- * Internal function, replacement for snprintf
- * Used only in case of the Microsoft Visual C compiler which does not
- * provide a proper sprintf implementation.
- * 
- * This implementation differs from the standard in the value returned
- * when the number of characters needed by the output, excluding the
- * terminating '\0' is larger than count
- */
-int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
-    int n;
-    va_list args;
-    if (count > 0) {
-	va_start(args, format);
-        n = _vsnprintf(buffer, count, format, args);
-        buffer[count-1] = 0;
-        va_end(args);
-    } else n=0;
-    return n;
-}
-
-#endif

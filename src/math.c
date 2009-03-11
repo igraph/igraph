@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include <math.h>
 #include <float.h>
+#include <stdarg.h>
 #include "config.h"
 #include "igraph_math.h"
 
@@ -203,3 +204,39 @@ double igraph_fmin(double a, double b) {
     return a;
   }
 }
+
+double igraph_i_round(double X) {
+  
+  /* NaN */
+  if (X != X) { return X; }
+
+  if (X < 0.0) { 
+    return floor(X);
+  }
+
+  return ceil(X);
+}
+
+#ifdef _MSC_VER
+/**
+ * Internal function, replacement for snprintf
+ * Used only in case of the Microsoft Visual C compiler which does not
+ * provide a proper sprintf implementation.
+ * 
+ * This implementation differs from the standard in the value returned
+ * when the number of characters needed by the output, excluding the
+ * terminating '\0' is larger than count
+ */
+int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
+    int n;
+    va_list args;
+    if (count > 0) {
+	va_start(args, format);
+        n = _vsnprintf(buffer, count, format, args);
+        buffer[count-1] = 0;
+        va_end(args);
+    } else n=0;
+    return n;
+}
+
+#endif

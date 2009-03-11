@@ -25,6 +25,7 @@
 #include "memory.h"
 #include "igraph.h"
 #include "config.h"
+#include "igraph_math.h"
 
 #include <string.h>
 
