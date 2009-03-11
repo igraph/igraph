@@ -15,7 +15,7 @@
   be changed interactively right now though, eg. the colors of vertices,
   edges, and also others have to be pre-defined.}
 \usage{
-tkplot(graph, \dots)
+tkplot(graph, canvas.width=450, canvas.height=450, \dots)
 
 tkplot.close(tkp.id, window.close = TRUE) 
 tkplot.off()
@@ -28,6 +28,8 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
 }
 \arguments{
   \item{graph}{The \code{graph} to plot.}
+  \item{canvas.width,canvas.height}{The size of the tkplot
+    drawing area.}
   \item{tkp.id}{The id of the tkplot window to close/reshape/etc.}
   \item{window.close}{Leave this on the default value.}
   \item{width}{The width of the rectangle for generating new
