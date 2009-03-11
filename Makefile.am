@@ -55,14 +55,16 @@ test: all
 	done
 
 msvc: all
-	rm -rf $(top_builddir)/igraph.msvc
-	mkdir $(top_builddir)/igraph.msvc
-	cp -r src $(top_builddir)/igraph.msvc/
-	rm -rf $(top_builddir)/igraph.msvc/src/{.deps,.libs}
-	rm -rf $(top_builddir)/igraph.msvc/src/config.h
-	rm -rf $(top_builddir)/igraph.msvc/src/*.{o,lo}
-	cp -r msvc/include $(top_builddir)/igraph.msvc/winclude
-	mkdir $(top_builddir)/igraph.msvc/winlib
-	cp msvc/igraph.{sln,vcproj} $(top_builddir)/igraph.msvc/
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
+	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
+	cp -r src $(top_builddir)/igraph-$(VERSION)-msvc/
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/{.deps,.libs}
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/config.h
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*.{o,lo}
+	cp -r msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
+	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
+	cp msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
+	rm -rf igraph-$(VERSION)-msvc.zip
+	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc
 
 CLEANFILES=
