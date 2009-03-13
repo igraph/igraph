@@ -60,7 +60,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude"
-				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;IGRAPH_EXPORTS;HAVE_LIBXML=1"
+				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;IGRAPH_EXPORTS"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
