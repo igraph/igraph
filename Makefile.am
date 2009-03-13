@@ -64,7 +64,8 @@ msvc: all
 	cp -r msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
 	cp msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
+	cp -r msvc/igraphtest .
 	rm -rf igraph-$(VERSION)-msvc.zip
-	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc
+	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest
 
 CLEANFILES=
