@@ -157,6 +157,9 @@ typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
 typedef enum { IGRAPH_DONT_SIMPLIFY=0,
 	       IGRAPH_SIMPLIFY } igraph_lazy_adlist_simplify_t;
 
+typedef enum { IGRAPH_TRANSITIVITY_NAN=0,
+               IGRAPH_TRANSITIVITY_ZERO } igraph_transitivity_mode_t;
+
 typedef igraph_real_t  igraph_scalar_function_t(const igraph_vector_t *var, 
 						const igraph_vector_t *par,
 						void* extra);
@@ -816,25 +819,32 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
 			    igraph_real_t *unconnected, igraph_bool_t directed);
 int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops);
 int igraph_transitivity_undirected(const igraph_t *graph, 
-				   igraph_real_t *res);
+				   igraph_real_t *res,
+				   igraph_transitivity_mode_t mode);
 int igraph_transitivity_local_undirected(const igraph_t *graph, 
 					 igraph_vector_t *res,
-					 const igraph_vs_t vids);
+					 const igraph_vs_t vids,
+					 igraph_transitivity_mode_t mode);
 int igraph_transitivity_local_undirected1(const igraph_t *graph, 
 					  igraph_vector_t *res,
-					  const igraph_vs_t vids);
+					  const igraph_vs_t vids,
+					  igraph_transitivity_mode_t mode);
 int igraph_transitivity_local_undirected2(const igraph_t *graph, 
 					  igraph_vector_t *res,
-					  const igraph_vs_t vids);
+					  const igraph_vs_t vids,
+					  igraph_transitivity_mode_t mode);
 int igraph_transitivity_local_undirected4(const igraph_t *graph, 
 					  igraph_vector_t *res,
-					  const igraph_vs_t vids);
+					  const igraph_vs_t vids,
+					  igraph_transitivity_mode_t mode);
 int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
-					    igraph_real_t *res);
+					    igraph_real_t *res,
+					    igraph_transitivity_mode_t mode);
 int igraph_transitivity_barrat(const igraph_t *graph,
 			       igraph_vector_t *res,
 			       const igraph_vs_t vids,
-			       const igraph_vector_t *weights);
+			       const igraph_vector_t *weights,
+			       const igraph_transitivity_mode_t mode);
 int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
 		       igraph_bool_t ignore_loops);
 

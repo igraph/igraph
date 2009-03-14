@@ -31,7 +31,7 @@ int main() {
   /* Trivial cases */
 
   igraph_ring(&g, 100, IGRAPH_UNDIRECTED, 0, 0);
-  igraph_transitivity_undirected(&g, &res);
+  igraph_transitivity_undirected(&g, &res, IGRAPH_TRANSITIVITY_NAN);
   igraph_destroy(&g);
 
   if (res != 0) {
@@ -39,11 +39,25 @@ int main() {
   }
 
   igraph_full(&g, 20, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-  igraph_transitivity_undirected(&g, &res);
+  igraph_transitivity_undirected(&g, &res, IGRAPH_TRANSITIVITY_NAN);
   igraph_destroy(&g);
   
   if (res != 1) {
     return 2;
+  }
+
+  /* Degenerate cases */
+  igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+		  0,  1,  2,  3,  4,  5, -1);
+  igraph_transitivity_undirected(&g, &res, IGRAPH_TRANSITIVITY_NAN);
+  /* res should be NaN here, any comparison must return false */
+  if (res == 0 || res > 0 || res < 0) {
+	return 4;
+  }
+  igraph_transitivity_undirected(&g, &res, IGRAPH_TRANSITIVITY_ZERO);
+  /* res should be zero here */
+  if (res) {
+	return 5;
   }
 
   /* Zachary Karate club */
@@ -67,7 +81,7 @@ int main() {
 	       31, 32, 31, 33, 32, 33,
 	       -1);  
   
-  igraph_transitivity_undirected(&g, &res);
+  igraph_transitivity_undirected(&g, &res, IGRAPH_TRANSITIVITY_NAN);
   igraph_destroy(&g);
   
   if (res != 0.2556818181818181767717) {

@@ -1801,11 +1801,18 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. In case of the average local transitivity
  * this probability if calculated for each vertex and then the average
- * is taken for those vertices which have at least two neighbors. If
- * there are no such vertices then \c NaN is returned. 
+ * is taken. Vertices with less than two neighbors require special treatment,
+ * they will either be left out from the calculation or they will be considered
+ * as having zero transitivity, depending on the \c mode argument.
  * \param graph The input graph, directed graphs are considered as 
  *    undirected ones.
  * \param res Pointer to a real variable, the result will be stored here.
+ * \param mode Defines how to treat vertices with degree less than two.
+ *    \c IGRAPH_TRANSITIVITY_NAN leaves them out from averaging,
+ *    \c IGRAPH_TRANSITIVITY_ZERO includes them with zero transitivity.
+ *    The result will be \c NaN if the mode is \c IGRAPH_TRANSITIVITY_NAN
+ *    and there are no vertices with more than one neighbor.
+ *    
  * \return Error code.
  * 
  * \sa \ref igraph_transitivity_undirected(), \ref
@@ -1816,7 +1823,8 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple, igraph_bool_t loops
  */
 
 int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
-					    igraph_real_t *res) {
+					    igraph_real_t *res,
+					    igraph_transitivity_mode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_real_t sum=0.0;
@@ -1896,6 +1904,8 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     if (triples != 0) {
       sum += VECTOR(triangles)[node] / triples;
       count++;
+    } else if (mode == IGRAPH_TRANSITIVITY_ZERO) {
+      count++;
     }
   }
   
@@ -1912,7 +1922,8 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
   
 int igraph_transitivity_local_undirected1(const igraph_t *graph, 
 					  igraph_vector_t *res,
-					  const igraph_vs_t vids) {
+					  const igraph_vs_t vids,
+					  igraph_transitivity_mode_t mode) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vit_t vit;
@@ -1963,7 +1974,11 @@ int igraph_transitivity_local_undirected1(const igraph_t *graph,
 	}
       }
     }
-    VECTOR(*res)[i] = triangles/triples;
+
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+      VECTOR(*res)[i] = 0.0;
+    else
+      VECTOR(*res)[i] = triangles/triples;
 /*     fprintf(stderr, "%f %f\n", triangles, triples); */
   }
 
@@ -1976,7 +1991,8 @@ int igraph_transitivity_local_undirected1(const igraph_t *graph,
 
 int igraph_transitivity_local_undirected2(const igraph_t *graph, 
 					  igraph_vector_t *res,
-					  const igraph_vs_t vids) {
+					  const igraph_vs_t vids,
+					  igraph_transitivity_mode_t mode) {
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vit_t vit;
@@ -2103,7 +2119,10 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
     igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, node);
     long int deg=igraph_vector_size(neis);
     igraph_real_t triples=(double) deg * (deg-1) / 2;
-    VECTOR(*res)[i] = VECTOR(triangles)[idx] / triples;
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+      VECTOR(*res)[i] = 0.0;
+    else
+      VECTOR(*res)[i] = VECTOR(triangles)[idx] / triples;
 /*     fprintf(stderr, "%f %f\n", VECTOR(triangles)[idx], triples); */
   }
   
@@ -2180,7 +2199,8 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 
 int igraph_transitivity_local_undirected4(const igraph_t *graph,
 					  igraph_vector_t *res,
-					  const igraph_vs_t vids) {
+					  const igraph_vs_t vids,
+					  igraph_transitivity_mode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int node, i, j, nn;
@@ -2258,8 +2278,11 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 	}
       }
     }
-    
-    VECTOR(*res)[node] /= triples;
+
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+      VECTOR(*res)[node] = 0.0;
+    else
+      VECTOR(*res)[node] /= triples;
   }
   
   igraph_free(neis);
@@ -2284,6 +2307,9 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
  *   stored here. It will be resized as needed.
  * \param vids Vertex set, the vertices for which the local
  *   transitivity will be calculated.
+ * \param mode Defines how to treat vertices with degree less than two.
+ *    \c IGRAPH_TRANSITIVITY_NAN returns \c NaN for these vertices,
+ *    \c IGRAPH_TRANSITIVITY_ZERO returns zero.
  * \return Error code.
  * 
  * \sa \ref igraph_transitivity_undirected(), \ref
@@ -2295,9 +2321,10 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 
 int igraph_transitivity_local_undirected(const igraph_t *graph,
 					 igraph_vector_t *res,
-					 const igraph_vs_t vids) {
+					 const igraph_vs_t vids,
+					 igraph_transitivity_mode_t mode) {
   if (igraph_vs_is_all((igraph_vs_t*)&vids)) {
-    return igraph_transitivity_local_undirected4(graph, res, vids);
+    return igraph_transitivity_local_undirected4(graph, res, vids, mode);
   } else {
     igraph_vit_t vit;
     long int size;
@@ -2307,9 +2334,9 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     igraph_vit_destroy(&vit);
 	IGRAPH_FINALLY_CLEAN(1);
     if (size < 100) {
-      return igraph_transitivity_local_undirected1(graph, res, vids);
+      return igraph_transitivity_local_undirected1(graph, res, vids, mode);
     } else {
-      return igraph_transitivity_local_undirected2(graph, res, vids);
+      return igraph_transitivity_local_undirected2(graph, res, vids, mode);
     }
   }
   
@@ -2325,10 +2352,12 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
  * The transitivity measures the probability that two neighbors of a
  * vertex are connected. More precisely this is the ratio of the
  * triangles and connected triples in the graph, the result is a
- * single real number or NaN (0/0) if there are no connected triples
- * in the graph.  Directed graphs are considered as undirected ones.
+ * single real number. Directed graphs are considered as undirected ones.
  * \param graph The graph object.  
  * \param res Pointer to a real variable, the result will be stored here.
+ * \param mode Defines how to treat graphs with no connected triples.
+ *   \c IGRAPH_TRANSITIVITY_NAN returns \c NaN in this case,
+ *   \c IGRAPH_TRANSITIVITY_ZERO returns zero.
  * \return Error code:
  *         \c IGRAPH_ENOMEM: not enough memory for
  *         temporary data. 
@@ -2342,7 +2371,8 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
 
 
 int igraph_transitivity_undirected(const igraph_t *graph,
-				   igraph_real_t *res) {
+				   igraph_real_t *res,
+				   igraph_transitivity_mode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_real_t triples=0, triangles=0;
@@ -2415,8 +2445,11 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   igraph_vector_destroy(&rank);
   igraph_vector_destroy(&order);
   IGRAPH_FINALLY_CLEAN(4);
-  
-  *res = triangles / triples * 2.0;
+
+  if (triples == 0 && mode == IGRAPH_TRANSITIVITY_ZERO)
+    *res = 0;
+  else
+    *res = triangles / triples * 2.0;
   
   return 0;
 }
@@ -2424,7 +2457,8 @@ int igraph_transitivity_undirected(const igraph_t *graph,
 int igraph_transitivity_barrat1(const igraph_t *graph,
 				igraph_vector_t *res,
 				const igraph_vs_t vids,
-				const igraph_vector_t *weights) {
+				const igraph_vector_t *weights,
+				igraph_transitivity_mode_t mode) {
   
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -2439,7 +2473,7 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
   
   if (!weights) {
     IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
-    return igraph_transitivity_local_undirected(graph, res, vids);
+    return igraph_transitivity_local_undirected(graph, res, vids, mode);
   }
   
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -2497,7 +2531,10 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
 	}
       }
     }
-    VECTOR(*res)[i] = triangles/triples;
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+      VECTOR(*res)[i] = 0.0;
+    else
+      VECTOR(*res)[i] = triangles/triples;
   }
 
   igraph_lazy_adjedgelist_destroy(&adjacent);
@@ -2513,7 +2550,8 @@ int igraph_transitivity_barrat1(const igraph_t *graph,
 int igraph_transitivity_barrat4(const igraph_t *graph,
 				igraph_vector_t *res,
 				const igraph_vs_t vids,
-				const igraph_vector_t *weights) {
+				const igraph_vector_t *weights,
+				igraph_transitivity_mode_t mode) {
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -2527,7 +2565,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
   
   if (!weights) { 
     IGRAPH_WARNING("No weights given for Barrat's transitivity, unweighted version is used");
-    return igraph_transitivity_local_undirected(graph, res, vids);
+    return igraph_transitivity_local_undirected(graph, res, vids, mode);
   }
   
   if (igraph_vector_size(weights) != no_of_edges) {
@@ -2602,7 +2640,11 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
 	}
       }
     }
-    VECTOR(*res)[node] /= triples;
+
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+      VECTOR(*res)[node] = 0.0;
+    else
+      VECTOR(*res)[node] /= triples;
   }
 
   igraph_vector_destroy(&actw);
@@ -2639,6 +2681,10 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
  * \param weights Edge weights. If this is a null pointer, then a
  *   warning is given and \ref igraph_transitivity_local_undirected()
  *   is called.
+ * \param mode Defines how to treat vertices with zero strength.
+ *   \c IGRAPH_TRANSITIVITY_NAN says that the transitivity of these
+ *   vertices is \c NaN, \c IGRAPH_TRANSITIVITY_ZERO says it is zero.
+ *
  * \return Error code.
  *
  * Time complexity: O(|V|*d^2), |V| is the number of vertices in 
@@ -2653,11 +2699,12 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
 int igraph_transitivity_barrat(const igraph_t *graph,
 			       igraph_vector_t *res,
 			       const igraph_vs_t vids,
-			       const igraph_vector_t *weights) {
+			       const igraph_vector_t *weights,
+				   igraph_transitivity_mode_t mode) {
   if (igraph_vs_is_all((igraph_vs_t*)&vids)) {
-    return igraph_transitivity_barrat4(graph, res, vids, weights);
+    return igraph_transitivity_barrat4(graph, res, vids, weights, mode);
   } else {
-    return igraph_transitivity_barrat1(graph, res, vids, weights);
+    return igraph_transitivity_barrat1(graph, res, vids, weights, mode);
   }
   
   return 0;
