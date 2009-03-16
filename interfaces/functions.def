@@ -556,6 +556,13 @@ igraph_strength:
 # Bipartite graphs
 #######################################
 
+igraph_bipartite_projection_size:
+        PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, \
+                OUT INTEGERPTR vcount1, OUT INTEGERPTR ecount1, \
+                OUT INTEGERPTR vcount2, OUT INTEGERPTR ecount2
+        DEPS: types ON graph
+        NAME-R: bipartite.projection.size
+
 igraph_bipartite_projection:
         PARAMS: GRAPH graph, BIPARTITE_TYPES types=NULL, \
                 OUT GRAPH proj1, OUT GRAPH proj2, INTEGER probe1=-1
