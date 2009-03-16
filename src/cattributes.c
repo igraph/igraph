@@ -1140,6 +1140,50 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 }
 
 /**
+ * \function igraph_cattribute_VANV
+ */
+
+int igraph_cattribute_VANV(const igraph_t *graph, const char *name, 
+			   igraph_vs_t vids, igraph_vector_t *result) {
+
+  return igraph_i_cattribute_get_numeric_vertex_attr(graph, name, vids, 
+						     result);
+}
+
+/**
+ * \function igraph_cattribute_EANV
+ */
+
+int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
+			   igraph_es_t eids, igraph_vector_t *result) {
+
+  return igraph_i_cattribute_get_numeric_edge_attr(graph, name, eids, 
+						   result);
+}
+
+/**
+ * \function igraph_cattribute_VASV
+ */
+
+int igraph_cattribute_VASV(const igraph_t *graph, const char *name, 
+			   igraph_vs_t vids, igraph_strvector_t *result) {
+
+  return igraph_i_cattribute_get_string_vertex_attr(graph, name, vids, 
+						    result);
+}
+
+/**
+ * \function igraph_cattribute_EASV
+ */
+
+int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
+			   igraph_es_t eids, igraph_strvector_t *result) {
+
+  return igraph_i_cattribute_get_string_edge_attr(graph, name, eids, 
+						   result);
+}
+
+/**
  * \function igraph_cattribute_list
  * List all attributes
  * 
