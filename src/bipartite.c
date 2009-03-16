@@ -49,7 +49,31 @@
 
 /**
  * \function igraph_bipartite_projection_size
+ * Calculate the number of vertices and edges in the bipartite projections
  *
+ * This function calculates the number of vertices and edges in the 
+ * two projections of a bipartite network. This is useful if you have
+ * a big bipartite network and you want to estimate the amount of
+ * memory you would need to calculate the projections themselves.
+ * 
+ * \param graph The input graph.
+ * \param types Boolean vector giving the vertex types of the graph.
+ * \param vcount1 Pointer to an \c igraph_integer_t, the number of
+ *     vertices in the first projection is stored here.
+ * \param ecount1 Pointer to an \c igraph_integer_t, the number of 
+ *     edges in the first projection is stored here.
+ * \param vcount2 Pointer to an \c igraph_integer_t, the number of 
+ *     vertices in the second projection is stored here.
+ * \param ecount2 Pointer to an \c igraph_integer_t, the number of 
+ *     edges in the second projection is stored here.
+ * \return Error code.
+ *
+ * \sa \ref igraph_bipartite_projection() to calculate the actual
+ * projection.
+ *
+ * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
+ * is the number of edges, d is the average (total) degree of the
+ * graphs.
  */
 
 int igraph_bipartite_projection_size(const igraph_t *graph,
@@ -200,6 +224,10 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
  *   projection is created here, if it is not a null pointer. See also
  *   the \p probe1 argument.
  * \return Error code.
+ *
+ * \sa \ref igraph_bipartite_projection_size() to calculate the number
+ * of vertices and edges in the projections, without creating the
+ * projection graphs themselves.
  * 
  * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
  * is the number of edges, d is the average (total) degree of the
