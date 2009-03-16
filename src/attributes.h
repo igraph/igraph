@@ -311,6 +311,15 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
 const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 				    igraph_integer_t eid);
 
+int igraph_cattribute_VANV(const igraph_t *graph, const char *name, 
+			   igraph_vs_t vids, igraph_vector_t *result);
+int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
+			   igraph_es_t eids, igraph_vector_t *result);
+int igraph_cattribute_VASV(const igraph_t *graph, const char *name, 
+			   igraph_vs_t vids, igraph_strvector_t *result);
+int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
+			   igraph_es_t eids, igraph_strvector_t *result);
+
 int igraph_cattribute_list(const igraph_t *graph,
 			   igraph_strvector_t *gnames, igraph_vector_t *gtypes,
 			   igraph_strvector_t *vnames, igraph_vector_t *vtypes,
@@ -387,6 +396,32 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  */
 #define VAS(graph,n,v) (igraph_cattribute_VAS((graph), (n), (v)))
 /**
+ * \define VANV
+ * Query a numeric vertex attribute for all vertices.
+ *
+ * This is a shorthand for \ref igraph_cattribute_VANV().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vec Pointer to an initialized vector, the result is
+ *        stored here. It will be resized, if needed.
+ * \return Error code.
+ */
+#define VANV(graph,n,vec) (igraph_cattribute_VANV((graph),(n), \
+						  igraph_vss_all(), (vec)))
+/**
+ * \define VASV
+ * Query a string vertex attribute for all vertices.
+ *
+ * This is a shorthand for \ref igraph_cattribute_VASV().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vec Pointer to an initialized string vector, the result is
+ *        stored here. It will be resized, if needed.
+ * \return Error code.
+ */
+#define VASV(graph,n,vec) (igraph_cattribute_VASV((graph),(n), \
+						  igraph_vss_all(), (vec)))
+/**
  * \define EAN
  * Query a numeric edge attribute.
  * 
@@ -408,7 +443,33 @@ void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return The value of the attribute.
  */
 #define EAS(graph,n,e) (igraph_cattribute_EAS((graph), (n), (e)))
+/**
+ * \define EANV
+ * Query a numeric edge attribute for all edges.
+ *
+ * This is a shorthand for \ref igraph_cattribute_EANV().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vec Pointer to an initialized vector, the result is
+ *        stored here. It will be resized, if needed.
+ * \return Error code.
+ */
+#define EANV(graph,n,vec) (igraph_cattribute_EANV((graph),(n), \
+						  igraph_ess_all(), (vec)))
 
+/**
+ * \define EASV
+ * Query a string edge attribute for all edges.
+ *
+ * This is a shorthand for \ref igraph_cattribute_EASV().
+ * \param graph The graph.
+ * \param n The name of the attribute.
+ * \param vec Pointer to an initialized string vector, the result is
+ *        stored here. It will be resized, if needed.
+ * \return Error code.
+ */
+#define EASV(graph,n,vec) (igraph_cattribute_EASV((graph),(n), \
+						  igraph_ess_all(), (vec)))
 /**
  * \define SETGAN
  * Set a numeric graph attribute
