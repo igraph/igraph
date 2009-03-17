@@ -22,12 +22,13 @@
 */
 
 #include <igraph.h>
+#include <stdlib.h>
 
 void free_complist(igraph_vector_ptr_t *complist) {
   long int i;
   for (i=0; i<igraph_vector_ptr_size(complist); i++) {
     igraph_destroy(VECTOR(*complist)[i]);
-    igraph_free(VECTOR(*complist)[i]);
+    free(VECTOR(*complist)[i]);
   }
 }
 
