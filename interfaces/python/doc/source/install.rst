@@ -2,6 +2,8 @@
 
 .. Installing igraph
 
+.. _installing-igraph:
+
 ===================
 Installing |igraph|
 ===================
