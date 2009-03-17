@@ -911,6 +911,13 @@ int igraph_create_bipartite(igraph_t *g, const igraph_vector_bool_t *types,
 			    const igraph_vector_t *edges, 
 			    igraph_bool_t directed);
 
+int igraph_bipartite_projection_size(const igraph_t *graph,
+				     const igraph_vector_bool_t *types,
+				     igraph_integer_t *vcount1,
+				     igraph_integer_t *ecount1,
+				     igraph_integer_t *vcount2,
+				     igraph_integer_t *ecount2);
+
 int igraph_bipartite_projection(const igraph_t *graph, 
 				const igraph_vector_bool_t *types,
 				igraph_t *proj1,

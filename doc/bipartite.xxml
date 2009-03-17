@@ -22,6 +22,7 @@
 </section>
 
 <section><title>Project a two-mode graphs</title>
+<!-- doxrox-include igraph_bipartite_projection_size -->
 <!-- doxrox-include igraph_bipartite_projection -->
 </section>
 

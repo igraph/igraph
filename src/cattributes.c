@@ -1140,6 +1140,92 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
 }
 
 /**
+ * \function igraph_cattribute_VANV
+ * Query a numeric vertex attribute for many vertices
+ *
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param vids The vertices to query.
+ * \param result Pointer to an initialized vector, the result is
+ *    stored here. It will be resized, if needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(v), where v is the number of vertices in 'vids'.
+ */
+
+int igraph_cattribute_VANV(const igraph_t *graph, const char *name, 
+			   igraph_vs_t vids, igraph_vector_t *result) {
+
+  return igraph_i_cattribute_get_numeric_vertex_attr(graph, name, vids, 
+						     result);
+}
+
+/**
+ * \function igraph_cattribute_EANV
+ * Query a numeric edge attribute for many edges
+ *
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param eids The edges to query.
+ * \param result Pointer to an initialized vector, the result is 
+ *    stored here. It will be resized, if needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(e), where e is the number of edges in 'eids'.
+ */
+
+int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
+			   igraph_es_t eids, igraph_vector_t *result) {
+
+  return igraph_i_cattribute_get_numeric_edge_attr(graph, name, eids, 
+						   result);
+}
+
+/**
+ * \function igraph_cattribute_VASV
+ * Query a string vertex attribute for many vertices
+ *
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param vids The vertices to query.
+ * \param result Pointer to an initialized string vector, the result
+ *     is stored here. It will be resized, if needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(v), where v is the number of vertices in 'vids'.
+ * (We assume that the string attributes have a bounded length.)
+ */
+
+int igraph_cattribute_VASV(const igraph_t *graph, const char *name, 
+			   igraph_vs_t vids, igraph_strvector_t *result) {
+
+  return igraph_i_cattribute_get_string_vertex_attr(graph, name, vids, 
+						    result);
+}
+
+/**
+ * \function igraph_cattribute_EASV
+ * Query a string edge attribute for many edges
+ *
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param vids The edges to query.
+ * \param result Pointer to an initialized string vector, the result
+ *     is stored here. It will be resized, if needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(e), where e is the number of edges in
+ * 'eids'. (We assume that the string attributes have a bounded length.)
+ */
+
+int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
+			   igraph_es_t eids, igraph_strvector_t *result) {
+
+  return igraph_i_cattribute_get_string_edge_attr(graph, name, eids, 
+						   result);
+}
+
+/**
  * \function igraph_cattribute_list
  * List all attributes
  * 

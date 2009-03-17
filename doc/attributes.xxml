@@ -30,12 +30,20 @@
 <!-- doxrox-include GAS -->
 <!-- doxrox-include igraph_cattribute_VAN -->
 <!-- doxrox-include VAN -->
+<!-- doxrox-include igraph_cattribute_VANV -->
+<!-- doxrox-include VANV -->
 <!-- doxrox-include igraph_cattribute_VAS -->
 <!-- doxrox-include VAS -->
+<!-- doxrox-include igraph_cattribute_VASV -->
+<!-- doxrox-include VASV -->
 <!-- doxrox-include igraph_cattribute_EAN -->
 <!-- doxrox-include EAN -->
+<!-- doxrox-include igraph_cattribute_EANV -->
+<!-- doxrox-include EANV -->
 <!-- doxrox-include igraph_cattribute_EAS -->
 <!-- doxrox-include EAS -->
+<!-- doxrox-include igraph_cattribute_EASV -->
+<!-- doxrox-include EASV -->
 </section>
 
 <section>

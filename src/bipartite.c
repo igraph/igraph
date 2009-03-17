@@ -47,6 +47,93 @@
  * to them.</para>
  */
 
+/**
+ * \function igraph_bipartite_projection_size
+ * Calculate the number of vertices and edges in the bipartite projections
+ *
+ * This function calculates the number of vertices and edges in the 
+ * two projections of a bipartite network. This is useful if you have
+ * a big bipartite network and you want to estimate the amount of
+ * memory you would need to calculate the projections themselves.
+ * 
+ * \param graph The input graph.
+ * \param types Boolean vector giving the vertex types of the graph.
+ * \param vcount1 Pointer to an \c igraph_integer_t, the number of
+ *     vertices in the first projection is stored here.
+ * \param ecount1 Pointer to an \c igraph_integer_t, the number of 
+ *     edges in the first projection is stored here.
+ * \param vcount2 Pointer to an \c igraph_integer_t, the number of 
+ *     vertices in the second projection is stored here.
+ * \param ecount2 Pointer to an \c igraph_integer_t, the number of 
+ *     edges in the second projection is stored here.
+ * \return Error code.
+ *
+ * \sa \ref igraph_bipartite_projection() to calculate the actual
+ * projection.
+ *
+ * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
+ * is the number of edges, d is the average (total) degree of the
+ * graphs.
+ */
+
+int igraph_bipartite_projection_size(const igraph_t *graph,
+				     const igraph_vector_bool_t *types,
+				     igraph_integer_t *vcount1,
+				     igraph_integer_t *ecount1,
+				     igraph_integer_t *vcount2,
+				     igraph_integer_t *ecount2) {
+
+  long int no_of_nodes=igraph_vcount(graph);
+  long int vc1=0, ec1=0, vc2=0, ec2=0;
+  igraph_adjlist_t adjlist;
+  igraph_vector_long_t added;
+  long int i;
+  
+  IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+  for (i=0; i<no_of_nodes; i++) {
+    igraph_vector_t *neis1;
+    long int neilen1, j;
+    long int *ecptr;
+    if (VECTOR(*types)[i]) { 
+      vc2++; 
+      ecptr=&ec2;
+    } else { 
+      vc1++; 
+      ecptr=&ec1;
+    }
+    neis1=igraph_adjlist_get(&adjlist, i);
+    neilen1=igraph_vector_size(neis1);
+    for (j=0; j<neilen1; j++) {
+      long int k, neilen2, nei=VECTOR(*neis1)[j];
+      igraph_vector_t *neis2=igraph_adjlist_get(&adjlist, nei);
+      neilen2=igraph_vector_size(neis2);
+      for (k=0; k<neilen2; k++) {
+	long int nei2=VECTOR(*neis2)[k];
+	if (nei2 <= i) { continue; }
+	if (VECTOR(added)[nei2] == i+1) { continue; }
+	VECTOR(added)[nei2] = i+1;
+	(*ecptr)++;
+      }
+    }
+  }
+
+  *vcount1=vc1;
+  *ecount1=ec1;
+  *vcount2=vc2;
+  *ecount2=ec2;
+
+  igraph_adjlist_destroy(&adjlist);
+  igraph_vector_long_destroy(&added);
+  IGRAPH_FINALLY_CLEAN(2);
+  
+  return 0;
+}
+
 int igraph_i_bipartite_projection(const igraph_t *graph,
 				  const igraph_vector_bool_t *types,
 				  igraph_t *proj,
@@ -137,6 +224,10 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
  *   projection is created here, if it is not a null pointer. See also
  *   the \p probe1 argument.
  * \return Error code.
+ *
+ * \sa \ref igraph_bipartite_projection_size() to calculate the number
+ * of vertices and edges in the projections, without creating the
+ * projection graphs themselves.
  * 
  * Time complexity: O(|V|*d^2+|E|), |V| is the number of vertices, |E|
  * is the number of edges, d is the average (total) degree of the
