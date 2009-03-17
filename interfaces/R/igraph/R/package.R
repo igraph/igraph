@@ -37,7 +37,10 @@
   
 }
 
-.Last.lib <- function(libpath) {
+.onUnload <- function(libpath) {
   library.dynam.unload("igraph", libpath)
 }
 
+.Last.lib <- function(libpath) {
+  igraph::.onUnload(libpath)
+}
