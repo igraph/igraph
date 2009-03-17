@@ -22,6 +22,7 @@
 */
 #include <igraph.h>
 #include <stdio.h>
+#include <unistd.h>		/* unlink */
 
 void custom_warning_handler (const char *reason, const char *file,
 			     int line, int igraph_errno) {
