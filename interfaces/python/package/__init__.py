@@ -1451,6 +1451,14 @@ class Graph(core.GraphBase):
           - C{edge_width}: width of the edges in the default unit of the
             Cairo context on which we are drawing. The corresponding
             edge attribute is C{width}, the default is 1.
+
+          - C{edge_arrow_size}: arrow size of the edges. The
+            corresponding edge attribute is C{arrow_size}, the default
+            is 1.
+
+          - C{edge_arrow_width}: width of the arrowhead on the edge. The
+            corresponding edge attribute is C{arrow_width}, the default
+            is 1.
         """
         import colors
         import cairo
@@ -1498,6 +1506,10 @@ class Graph(core.GraphBase):
             "color", kwds, self.es, config, "black", palette.get)
         edge_widths = drawing.collect_attributes(self.ecount(), "edge_width", \
             "width", kwds, self.es, config, 1, float)
+        edge_arrow_sizes = drawing.collect_attributes(self.ecount(), \
+            "edge_arrow_size", "arrow_size", kwds, self.es, config, 1, float)
+        edge_arrow_widths = drawing.collect_attributes(self.ecount(), \
+            "edge_arrow_width", "arrow_width", kwds, self.es, config, 1, float)
 
         # Draw the edges
         for idx, e in enumerate(self.es):
@@ -1529,10 +1541,12 @@ class Graph(core.GraphBase):
             if directed and src != tgt:
                 # Draw an arrowhead
                 angle = math.atan2(p2[1]-p1[1], p2[0]-p1[0])
-                a1 = (p2[0]-15*math.cos(angle-math.pi/10.),
-                  p2[1]-15*math.sin(angle-math.pi/10.))
-                a2 = (p2[0]-15*math.cos(angle+math.pi/10.),
-                  p2[1]-15*math.sin(angle+math.pi/10.))
+                arrow_size = 15.*edge_arrow_sizes[idx]
+                arrow_width = 10./edge_arrow_widths[idx]
+                a1 = (p2[0]-arrow_size*math.cos(angle-math.pi/arrow_width),
+                  p2[1]-arrow_size*math.sin(angle-math.pi/arrow_width))
+                a2 = (p2[0]-arrow_size*math.cos(angle+math.pi/arrow_width),
+                  p2[1]-arrow_size*math.sin(angle+math.pi/arrow_width))
                 context.move_to(*p2)
                 context.line_to(*a1)
                 context.line_to(*a2)
