@@ -1451,6 +1451,14 @@ class Graph(core.GraphBase):
           - C{edge_width}: width of the edges in the default unit of the
             Cairo context on which we are drawing. The corresponding
             edge attribute is C{width}, the default is 1.
+
+          - C{edge_arrow_size}: arrow size of the edges. The
+            corresponding edge attribute is C{arrow_size}, the default
+            is 1.
+
+          - C{edge_arrow_width}: width of the arrowhead on the edge. The
+            corresponding edge attribute is C{arrow_width}, the default
+            is 1.
         """
         import colors
         import cairo
