@@ -22,7 +22,7 @@ if INTERNAL_LAPACK
         lapack/dlasy2.c  lapack/dlarfx.c 
   noinst_LTLIBRARIES  = libdlamch.la
   libdlamch_la_SOURCES = lapack/dlamch.c
-  libdlamch_la_CFLAGS = -ffloat-store
+  libdlamch_la_CFLAGS = $(FLOATSTORE)
   LAPACK_DLAMCH = libdlamch.la
 else 
   LAPACK = lapack/xerbla.c
