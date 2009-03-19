@@ -99,7 +99,7 @@
   
 }
 
-.igraph.shape.square <- function(coords, el, e, v, mode=c("clip", "plot"),
+.igraph.shape.square <- function(coords, el, e, v=NULL, mode=c("clip", "plot"),
                                  params, end=c("both", "from", "to")) {
   mode=match.arg(mode)
   end =match.arg(end)
