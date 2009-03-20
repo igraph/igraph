@@ -267,7 +267,7 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
                                   "localundirected", "local", "average",
                                   "localaverage", "localaverageundirected",
                                   "barrat", "weighted"),
-                         vids=NULL, weights=NULL) {
+                         vids=NULL, weights=NULL, isolates=c("NaN", "zero")) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -287,30 +287,33 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
     weights <- NULL
   }
 
+  isolates <- igraph.match.arg(isolates)
+  isolates <- as.double(switch(isolates, "nan"=0, "zero"=1))
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (type==0) {
-    .Call("R_igraph_transitivity_undirected", graph,
+    .Call("R_igraph_transitivity_undirected", graph, isolates,
           PACKAGE="igraph")
   } else if (type==1) {
     if (is.null(vids)) {
-      .Call("R_igraph_transitivity_local_undirected_all", graph,
+      .Call("R_igraph_transitivity_local_undirected_all", graph, isolates,
             PACKAGE="igraph")
     } else {
       vids <- as.igraph.vs(vids)
       .Call("R_igraph_transitivity_local_undirected", graph, as.numeric(vids),
-            PACKAGE="igraph")
+            isolates, PACKAGE="igraph")
     }
   } else if (type==2) {
-    .Call("R_igraph_transitivity_avglocal_undirected", graph,
+    .Call("R_igraph_transitivity_avglocal_undirected", graph, isolates,
           PACKAGE="igraph")
   } else if (type==3) {
     vids <- as.igraph.vs(vids)
     if (is.null(weights)) {
       .Call("R_igraph_transitivity_local_undirected", graph, as.numeric(vids),
-            PACKAGE="igraph")
+            isolates, PACKAGE="igraph")
     } else { 
       .Call("R_igraph_transitivity_barrat", graph, as.numeric(vids), weights,
-            PACKAGE="igraph")
+            isolates, PACKAGE="igraph")
     }
   }
 }

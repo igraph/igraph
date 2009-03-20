@@ -10,7 +10,7 @@
 transitivity(graph, type=c("undirected", "global", "globalundirected",
        "localundirected", "local", "average", "localaverage",
        "localaverageundirected", "barrat", "weighted"), vids=NULL,
-       weights=NULL)
+       weights=NULL, isolates=c("NaN", "zero"))
 }
 \arguments{
   \item{graph}{The graph to analyze.}
@@ -46,6 +46,16 @@ transitivity(graph, type=c("undirected", "global", "globalundirected",
     ignored for other transitivity measures. If it is \code{NULL} (the
     default) and the graph has a \code{weight} edge attribute, then it
     is used automatically.
+  }
+  \item{isolates}{Character scalar, defines how to treat vertices with
+    degree zero and one. If it is \sQuote{\code{NaN}} then they local
+    transitivity is reported as \code{NaN} and they are not included in
+    the averaging, for the transitivity types that calculate an
+    average. If there are no vertices with degree
+    two or higher, then the averaging will still result \code{NaN}. If
+    it is \sQuote{\code{zero}}, then we report 0 transitivity for them,
+    and they are included in the averaging, if an average is
+    calculated.
   }
 }
 \details{
