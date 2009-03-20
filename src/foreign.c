@@ -2726,3 +2726,26 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 }
 
 #undef CHECK
+
+FILE *igraph_dl_yyin;
+int igraph_dl_eof;
+long int igraph_dl_mylineno;
+char *igraph_i_dl_errmsg;
+extern igraph_i_dl_mode;
+
+int igraph_read_graph_dl(igraph_t *graph, FILE *instream) {
+  
+  int i;
+
+  igraph_dl_yyin=instream;
+  igraph_dl_mylineno=1;
+  igraph_dl_eof=0;
+  igraph_i_dl_mode=0;
+  
+  i=igraph_dl_yyparse();
+  if (i != 0) {
+    IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
+  }
+  
+  return 0;
+}

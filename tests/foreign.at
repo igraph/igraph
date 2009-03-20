@@ -74,3 +74,8 @@ AT_COMPILE_CHECK([simple/lineendings.c], [simple/lineendings.out],
 	[{simple/pajek1.net,simple/pajek2.net,simple/pajek3.net,simple/pajek4.net}])
 AT_CLEANUP
 
+AT_SETUP([UNICET DL format:])
+AT_KEYWORDS([igraph_read_graph_dl DL UNINET])
+AT_COMPILE_CHECK([simple/igraph_read_graph_dl.c], [],
+        [simple/{edgelist1,edgelist2,edgelist3,fullmatrix1,fullmatrix2,fullmatrix3,fullmatrix4,nodelist1,nodelist2}.dl])
+AT_CLEANUP

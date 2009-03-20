@@ -1,0 +1,9 @@
+DL n=5
+format = nodelist1
+labels:
+george, sally, jim, billy, jane
+data:
+1 2 3
+2 3
+3 1
+4 3 

@@ -1,0 +1,10 @@
+dl n=5
+format = fullmatrix
+labels embedded
+data:
+larry david lin pat russ
+Larry 0 1 1 1 0
+david 1 0 0 0 1
+Lin 1 0 0 1 0
+Pat 1 0 1 0 1
+Russ 0 1 0 1 0
