@@ -1245,6 +1245,9 @@ PyMODINIT_FUNC initcore(void) {
   PyModule_AddIntConstant(m, "BLISS_FLM", IGRAPH_BLISS_FLM);
   PyModule_AddIntConstant(m, "BLISS_FSM", IGRAPH_BLISS_FSM);
 
+  PyModule_AddIntConstant(m, "TRANSITIVITY_NAN", IGRAPH_TRANSITIVITY_NAN);
+  PyModule_AddIntConstant(m, "TRANSITIVITY_ZERO", IGRAPH_TRANSITIVITY_ZERO);
+
   /* More useful constants */
   PyModule_AddStringConstant(m, "__version__", "0.6");
   PyModule_AddStringConstant(m, "__build_date__", __DATE__);

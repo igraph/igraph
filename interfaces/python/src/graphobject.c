@@ -4015,10 +4015,19 @@ PyObject *igraphmodule_Graph_transitivity_undirected(igraphmodule_GraphObject
                                                      * self, PyObject * args,
                                                      PyObject * kwds)
 {
+  static char *kwlist[] = { "mode", NULL };
   igraph_real_t res;
-  PyObject *r;
+  PyObject *r, *mode_o = Py_None;
+  igraph_transitivity_mode_t mode = IGRAPH_TRANSITIVITY_NAN;
 
-  if (igraph_transitivity_undirected(&self->g, &res)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_transitivity_mode_t(mode_o, &mode))
+    return NULL;
+
+
+  if (igraph_transitivity_undirected(&self->g, &res, mode)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -4035,10 +4044,18 @@ PyObject *igraphmodule_Graph_transitivity_avglocal_undirected(igraphmodule_Graph
                                                               * self, PyObject * args,
                                                               PyObject * kwds)
 {
+  static char *kwlist[] = { "mode", NULL };
   igraph_real_t res;
-  PyObject *r;
+  PyObject *r, *mode_o = Py_None;
+  igraph_transitivity_mode_t mode = IGRAPH_TRANSITIVITY_NAN;
 
-  if (igraph_transitivity_avglocal_undirected(&self->g, &res)) {
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_transitivity_mode_t(mode_o, &mode))
+    return NULL;
+
+  if (igraph_transitivity_avglocal_undirected(&self->g, &res, mode)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -4057,13 +4074,17 @@ PyObject
                                                     self, PyObject * args,
                                                     PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", NULL };
-  PyObject *vobj = NULL, *list = NULL;
+  static char *kwlist[] = { "vertices", "mode", NULL };
+  PyObject *vobj = NULL, *mode_o = Py_None, *list = NULL;
   igraph_vector_t result;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
+  igraph_transitivity_mode_t mode = IGRAPH_TRANSITIVITY_NAN;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &vobj))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OO", kwlist, &vobj, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_transitivity_mode_t(mode_o, &mode))
     return NULL;
 
   if (igraphmodule_PyObject_to_vs_t(vobj, &vs, &return_single)) {
@@ -4076,7 +4097,7 @@ PyObject
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_transitivity_local_undirected(&self->g, &result, vs)) {
+  if (igraph_transitivity_local_undirected(&self->g, &result, vs, mode)) {
     igraphmodule_handle_igraph_error();
     igraph_vs_destroy(&vs);
     igraph_vector_destroy(&result);
@@ -8933,8 +8954,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"transitivity_undirected",
    (PyCFunction) igraphmodule_Graph_transitivity_undirected,
    METH_VARARGS | METH_KEYWORDS,
-   "transitivity_undirected()\n\n"
+   "transitivity_undirected(mode=\"nan\")\n\n"
    "Calculates the transitivity (clustering coefficient) of the graph.\n\n"
+   "@param mode: if C{TRANSITIVITY_ZERO} or C{\"zero\"}, the result will\n"
+   "  be zero if the graph does not have any triplets. If C{\"nan\"} or\n"
+   "  C{TRANSITIVITY_NAN}, the result will be C{NaN} (not a number).\n"
    "@return: the transitivity\n"
    "@see: L{transitivity_local_undirected()}, L{transitivity_avglocal_undirected()}\n"
   },
@@ -8943,10 +8967,14 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"transitivity_local_undirected",
    (PyCFunction) igraphmodule_Graph_transitivity_local_undirected,
    METH_VARARGS | METH_KEYWORDS,
-   "transitivity_local_undirected(vertices=None)\n\n"
+   "transitivity_local_undirected(vertices=None, mode=\"nan\")\n\n"
    "Calculates the local transitivity of given vertices in the graph.\n\n"
    "@param vertices: a list containing the vertex IDs which should be\n"
    "  included in the result. C{None} means all of the vertices.\n"
+   "@param mode: defines how to treat vertices with degree less than two.\n"
+   "  If C{TRANSITIVITT_ZERO} or C{\"zero\"}, these vertices will have\n"
+   "  zero transitivity. If C{TRANSITIVITY_NAN} or C{\"nan\"}, these\n"
+   "  vertices will have C{NaN} (not a number) as their transitivity.\n"
    "@return: the transitivities for the given vertices in a list\n"
    "@see: L{transitivity_undirected()}, L{transitivity_avglocal_undirected()}\n"
   },
@@ -8955,8 +8983,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"transitivity_avglocal_undirected",
    (PyCFunction) igraphmodule_Graph_transitivity_avglocal_undirected,
    METH_VARARGS | METH_KEYWORDS,
-   "transitivity_avglocal_undirected()\n\n"
+   "transitivity_avglocal_undirected(mode=\"nan\")\n\n"
    "Calculates the average of the vertex transitivities of the graph.\n\n"
+   "@param mode: defines how to treat vertices with degree less than two.\n"
+   "  If C{TRANSITIVITT_ZERO} or C{\"zero\"}, these vertices will have\n"
+   "  zero transitivity. If C{TRANSITIVITY_NAN} or C{\"nan\"}, these\n"
+   "  vertices will be excluded from the average.\n"
    "@see: L{transitivity_undirected()}, L{transitivity_local_undirected()}\n"
   },
 

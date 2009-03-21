@@ -185,6 +185,22 @@ int igraphmodule_PyObject_to_degseq_t(PyObject *o,
 }
 
 /**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an \c igraph_transitivity_mode_t
+ */
+int igraphmodule_PyObject_to_transitivity_mode_t(PyObject *o,
+  igraph_transitivity_mode_t *result) {
+  static igraphmodule_enum_translation_table_entry_t transitivity_mode_tt[] = {
+        {"zero", IGRAPH_TRANSITIVITY_ZERO},
+        {"0", IGRAPH_TRANSITIVITY_ZERO},
+        {"nan", IGRAPH_TRANSITIVITY_NAN},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, transitivity_mode_tt, (int*)result);
+}
+
+/**
  * \brief Converts a Python object to an igraph \c igraph_integer_t
  *
  * Raises suitable Python exceptions when needed.
