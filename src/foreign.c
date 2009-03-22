@@ -2727,7 +2727,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
 #undef CHECK
 
-FILE *igraph_dl_yyin;
+extern FILE *igraph_dl_yyin;
 int igraph_dl_eof;
 long int igraph_dl_mylineno;
 char *igraph_i_dl_errmsg;
