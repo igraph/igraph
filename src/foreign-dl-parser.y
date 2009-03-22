@@ -49,7 +49,6 @@
 #include "foreign-dl-parser.h"
 #include <stdio.h>
 
-extern FILE *igraph_dl_yyin;
 extern int igraph_dl_eof;
 extern long int igraph_dl_mylineno;
 extern char *igraph_i_dl_errmsg;
@@ -60,7 +59,6 @@ int igraph_dl_yyerror(char *s);
 %output="y.tab.c"
 %name-prefix="igraph_dl_yy"
 %defines
-%token-table
 
 %union {
 }
