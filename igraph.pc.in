@@ -7,4 +7,4 @@ Name: libigraph
 Description: A library for creating and manipulating graphs
 Version: @VERSION@
 Libs: -L${libdir} -ligraph
-Cflags: -I${includedir}/igraph
+Cflags: -I${includedir}
