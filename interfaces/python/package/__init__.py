@@ -453,7 +453,7 @@ class Graph(core.GraphBase):
 
         @param weights: edge attribute name or a list containing edge
           weights
-        @return: an appropriate L{VertexClustering} object.
+        @return: an appropriate L{VertexDendrogram} object.
 
         @newfield ref: Reference
         @ref: A Clauset, MEJ Newman and C Moore: Finding community structure
@@ -478,10 +478,10 @@ class Graph(core.GraphBase):
           won't split a community further if the signs of the leading eigenvector
           are all the same, so the actual number of discovered communities can be
           less than the desired one.
-        @param return_merges: whether the returned L{VertexClustering} object
-          should contain information about the merges performed on the graph.
-        @return: an appropriate L{VertexClustering} object.
-        @param return_merges: whether 
+        @param return_merges: whether the returned object should be a
+          dendrogram instead of a single clustering.
+        @return: an appropriate L{VertexClustering} or L{VertexDendrogram}
+          object.
         
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
@@ -507,10 +507,10 @@ class Graph(core.GraphBase):
           won't split a community further if the signs of the leading eigenvector
           are all the same, so the actual number of discovered communities can be
           less than the desired one.
-        @param return_merges: whether the returned L{VertexClustering} object
-          should contain information about the merges performed on the graph.
-        @return: an appropriate L{VertexClustering} object.
-        @param return_merges: whether 
+        @param return_merges: whether the returned object should be a
+          dendrogram instead of a single clustering.
+        @return: an appropriate L{VertexClustering} or L{VertexDendrogram}
+          object.
         
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
@@ -579,15 +579,8 @@ class Graph(core.GraphBase):
           is cut at the level which maximizes the modularity.
         @param directed: whether the directionality of the edges should be taken
           into account or not.
-        @return: a L{VertexClustering} object. Besides the usual methods and members,
-          this object will have a member called C{merges} which records information
-          used to produce the dendrogram. It is practically a list of tuples where
-          each tuple defines two nodes which will be joined in a step. Node IDs
-          from 0 to M{n-1} (where M{n} is the number of vertices) correspond to
-          the individual vertices, while node IDs up from M{n} correspond to
-          merged communities. M{n} means the community created after the first
-          merge, M{n+1} means the community created after the second merge and
-          so on...
+        @return: a L{VertexDendrogram} object, initally cut at the maximum
+          modularity.
         """
         d = VertexDendrogram(self, GraphBase.community_edge_betweenness(self, directed));
         if clusters is not None: d.cut(clusters)
