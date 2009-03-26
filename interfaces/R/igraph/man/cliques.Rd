@@ -36,7 +36,11 @@ clique.number(graph)
   largest cliques are always maximal, but a maximal clique is not
   neccessarily the largest.
 
-  \code{clique.number} calculates the size of the largest clique(s).  
+  \code{clique.number} calculates the size of the largest clique(s).
+
+  The current implementation of these functions searches
+  for maximal independent vertex sets (see
+  \code{\link{independent.vertex.sets}}) in the complementer graph.
 }
 \value{
   \code{cliques}, \code{largest.cliques} and \code{clique.number} return

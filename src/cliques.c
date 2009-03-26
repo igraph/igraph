@@ -287,6 +287,14 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * If you are only interested in the size of the largest clique in the graph,
  * use \ref igraph_clique_number() instead.
  *
+ * </para><para>The current implementation of this function searches
+ * for maximal independent vertex sets (see \ref
+ * igraph_maximal_independent_vertex_sets()) in the complementer graph
+ * using the algorithm published in: 
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * for generating all the maximal independent sets. SIAM J Computing,
+ * 6:505--517, 1977.
+ *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
  *   here, ie. \c res will contain pointers to \c igraph_vector_t
@@ -326,6 +334,15 @@ int igraph_i_maximal_or_largest_cliques_or_indsets(const igraph_t *graph,
  * Note that this is not neccessarily the same as a maximal clique,
  * ie. the largest cliques are always maximal but a maximal clique is
  * not always largest.
+ *
+ * </para><para>The current implementation of this function searches
+ * for maximal independent vertex sets (see \ref
+ * igraph_maximal_independent_vertex_sets()) in the complementer graph
+ * using the algorithm published in: 
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * for generating all the maximal independent sets. SIAM J Computing,
+ * 6:505--517, 1977.
+ *
  * \param graph The input graph.
  * \param res Pointer to an initialized pointer vector, the result
  *        will be stored here. It will be resized as needed.
@@ -352,6 +369,13 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  * </para><para>
  * If you are interested in the size of the largest independent vertex set,
  * use \ref igraph_independence_number() instead.
+ *
+ * </para><para>
+ * The current implementation was ported to igraph from the Very Nauty Graph
+ * Library by Keith Briggs and uses the algorithm from the paper
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * for generating all the maximal independent sets. SIAM J Computing,
+ * 6:505--517, 1977.
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
@@ -384,6 +408,14 @@ int igraph_independent_vertex_sets(const igraph_t *graph,
  * </para><para>
  * An independent vertex set is largest if there is no other
  * independent vertex set with more vertices in the graph.
+ *
+ * </para><para>
+ * The current implementation was ported to igraph from the Very Nauty Graph
+ * Library by Keith Briggs and uses the algorithm from the paper
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * for generating all the maximal independent sets. SIAM J Computing,
+ * 6:505--517, 1977.
+ *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
  *     here. It will be resized as needed.
@@ -637,6 +669,13 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
  * The independence number of a graph is the cardinality of the largest
  * independent vertex set.
  *
+ * </para><para>
+ * The current implementation was ported to igraph from the Very Nauty Graph
+ * Library by Keith Briggs and uses the algorithm from the paper
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * for generating all the maximal independent sets. SIAM J Computing,
+ * 6:505--517, 1977.
+ *
  * \param graph The input graph.
  * \param no The independence number will be returned to the \c
  *   igraph_integer_t pointed by this variable.
@@ -705,6 +744,13 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
  * </para><para>
  * If you are only interested in the size of the largest clique in the graph,
  * use \ref igraph_clique_number() instead.
+ *
+ * </para><para>
+ * The current implementation was ported to igraph from the Very Nauty Graph
+ * Library by Keith Briggs and uses the algorithm from the paper
+ * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+ * for generating all the maximal independent sets. SIAM J Computing,
+ * 6:505--517, 1977.
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
