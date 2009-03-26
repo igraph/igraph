@@ -1831,7 +1831,7 @@ tkigraph <- function() {
                               gnos), right=FALSE)
 }  
 
-.tkigraph.help <- function(text=.tkigraph.help.main) {
+.tkigraph.help <- function(page="index.html") {
   dialog <- tktoplevel()
   frame <- tkframe(dialog)
   tkgrid(frame)
@@ -1851,19 +1851,16 @@ tkigraph <- function() {
     tkdestroy(dialog); return() }
                   ),"in"=frame, sticky="ew", column=2, row=0, padx=10, pady=10)
 
-  tkinsert(txt, "end", text)
-  .tkigraph.html(txt, txt)
+  tcl("global", "tkigraph_help_root")
+  tcl("set", "tkigraph_help_root",
+      system.file("tkigraph_help", package="igraph"))
+  tcl("source", system.file("html_library.tcl", package="igraph"))
+  tcl("source", system.file("my_html_library.tcl", package="igraph"))
+  tcl("HMinit_win", txt)
+  tcl("render", txt, "index.html")
+  
   tkconfigure(txt, state="disabled")
 }
-
-.tkigraph.html <- function(widget, text) {
-  
-}
-
-.tkigraph.help.main <- "
-<h1>Welcome</h1>
-This is the main help page of TkiGraph.
-"
 
 #####################################################
 # This is from the 'relimp' package by David Firth, thanks
