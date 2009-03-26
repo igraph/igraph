@@ -40,6 +40,9 @@ independence.number(graph)
 
   \code{independece.number} calculate the size of the largest
   independent vertex set(s).
+
+  These functions use the algorithm described by Tsukiyama et al., see
+  reference below.
 }
 \value{
   \code{independent.vertex.sets}, \code{largest.independent.vertex.sets}
@@ -48,9 +51,14 @@ independence.number(graph)
 
   \code{independence.number} returns an integer constant.
 }
-%\references{TODO}
-\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R interface and the manual page. }
+\references{
+  S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
+  for generating all the maximal independent sets. \emph{SIAM J Computing},
+  6:505--517, 1977.
+}
+\author{Tamas Nepusz \email{ntamas@rmki.kfki.hu} ported it from the Very
+  Nauty Graph Library by Keith Briggs \email{google@for.it} and Gabor Csardi
+  \email{csardi@rmki.kfki.hu} wrote the R interface and this manual page. }
 \seealso{\code{\link{cliques}}}
 \examples{
 # A quite dense graph
