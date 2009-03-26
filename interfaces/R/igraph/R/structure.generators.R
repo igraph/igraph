@@ -228,6 +228,11 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
 
   vc <- nrow(adjmatrix)
 
+  ## to remove non-redundancies that can persist in a dgtMatrix
+  if(is(adjmatrix, "dgTMatrix")) {
+    adjmatrix = as(adjmatrix, "CsparseMatrix")
+  }
+  
   if (is.null(weighted) && mode=="undirected") { mode <- "max" }
   
   if (mode == "directed") {
