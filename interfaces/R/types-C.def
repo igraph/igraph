@@ -245,6 +245,21 @@ VECTOR_BOOL_OR_0:
          igraph_vector_bool_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VECTOR_LONG_OR_0:
+  CTYPE: igraph_vector_long_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN: if (!isNull(%I%)) { R_SEXP_to_vector_long(%I%, &%C%); }
+    OUT: if (0 != igraph_vector_long_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_long_destroy, &%C%); \
+         %I%=NEW_INTEGER(0); /* hack to have a non-NULL value */
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_0orvector_long_to_SEXP(&%C%)); \
+         igraph_vector_long_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 ##################################
 # MATRIX of real values
 

@@ -787,7 +787,7 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
   } else if (nodes1==3 || nodes1==4) {
 	igraph_isomorphic_34(graph1, graph2, iso);
   } else if (dir1) {
-    igraph_isomorphic_vf2(graph1, graph2, iso, 0, 0);
+    igraph_isomorphic_vf2(graph1, graph2, 0, 0, iso, 0, 0);
   } else {
     igraph_isomorphic_bliss(graph1, graph2, iso, 0, 0, /*sh1=*/0, /*sh2=*/0, 0, 0);
   }
@@ -1034,6 +1034,8 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
  */
   
 int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+				   const igraph_vector_long_t *color1,
+				   const igraph_vector_long_t *color2,
 				   igraph_vector_t *map12,
 				   igraph_vector_t *map21,
 				   igraph_isohandler_t *function,
@@ -1056,10 +1058,36 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     IGRAPH_ERROR("Cannot compare directed and undirected graphs",
 		 IGRAPH_EINVAL);
   }
+
+  if ( (color1 && !color2) || (!color1 && color2) ) {
+    IGRAPH_WARNING("Only one graph is colored, colors will be ignored");
+    color1=color2=0;
+  }
+
+  if (color1) {
+    if (igraph_vector_long_size(color1) != no_of_nodes ||
+	igraph_vector_long_size(color2) != no_of_nodes) {
+      IGRAPH_ERROR("Invalid color vector length", IGRAPH_EINVAL);
+    }
+  }
   
   if (no_of_nodes != igraph_vcount(graph2) ||
       igraph_ecount(graph1) != igraph_ecount(graph2)) {
     return 0;
+  }
+  
+  /* Check color distribution */
+  if (color1) {
+    igraph_vector_long_t tmp1, tmp2;
+    IGRAPH_CHECK(igraph_vector_long_copy(&tmp1, color1));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp1);
+    IGRAPH_CHECK(igraph_vector_long_copy(&tmp2, color2));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp2);
+    igraph_vector_long_sort(&tmp1);
+    igraph_vector_long_sort(&tmp2);
+    if (!igraph_vector_long_is_equal(&tmp1, &tmp2)) {
+      return 0;
+    }
   }
   
   if (map12) {
@@ -1260,6 +1288,9 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
       outneis_2=igraph_lazy_adjlist_get(&outadj2, cand2);
       if (VECTOR(indeg1)[cand1] != VECTOR(indeg2)[cand2] ||
 	  VECTOR(outdeg1)[cand1] != VECTOR(outdeg2)[cand2]) {
+	end=1;
+      }
+      if (color1 && VECTOR(*color1)[cand1] != VECTOR(*color2)[cand2]) {
 	end=1;
       }
 
@@ -1473,11 +1504,14 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  */
 
 int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+			  const igraph_vector_long_t *color1,
+			  const igraph_vector_long_t *color2,
 			  igraph_bool_t *iso, igraph_vector_t *map12, 
 			  igraph_vector_t *map21) {
 
   *iso=0;
-  IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, map12, map21,
+  IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, 
+					      color1, color2, map12, map21,
 					      (igraph_isohandler_t*)
 					      igraph_i_isomorphic_vf2,
 					      iso));
@@ -1512,10 +1546,13 @@ igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
  */
 
 int igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+				  const igraph_vector_long_t *color1,
+				  const igraph_vector_long_t *color2,
 				  igraph_integer_t *count) {
   
   *count=0;
-  IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, 0, 0,
+  IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, color1, color2, 
+					      0, 0,
 					      (igraph_isohandler_t*)
 					      igraph_i_count_isomorphisms_vf2,
 					      count));
@@ -1577,11 +1614,14 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
  
 int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 				const igraph_t *graph2,
+				const igraph_vector_long_t *color1,
+				const igraph_vector_long_t *color2,
 				igraph_vector_ptr_t *maps) {
   
   igraph_vector_ptr_clear(maps);
   IGRAPH_FINALLY(igraph_i_get_isomorphisms_free, maps);
-  IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, 0, 0,
+  IGRAPH_CHECK(igraph_isomorphic_function_vf2(graph1, graph2, color1, color2, 
+					      0, 0,
 					      (igraph_isohandler_t*)
 					      igraph_i_get_isomorphisms_vf2,
 					      maps));

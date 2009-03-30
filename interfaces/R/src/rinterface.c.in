@@ -37,7 +37,9 @@ int igraph_free(void *p);
 
 SEXP R_igraph_vector_to_SEXP(igraph_vector_t *v);
 SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v);
+SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v);
 SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v);
+SEXP R_igraph_0orvector_long_to_SEXP(igraph_vector_long_t *v);
 SEXP R_igraph_matrix_to_SEXP(igraph_matrix_t *m);
 SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m);
 SEXP R_igraph_to_SEXP(igraph_t *graph);
@@ -56,6 +58,7 @@ int R_SEXP_to_igraph_vs(SEXP rit, igraph_t *graph, igraph_vs_t *it);
 int R_SEXP_to_igraph_es(SEXP rit, igraph_t *graph, igraph_es_t *it);
 int R_SEXP_to_igraph_adjlist(SEXP vectorlist, igraph_adjlist_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
+int R_SEXP_to_vector_long(SEXP sv, igraph_vector_long_t *v);
 
 /* get the list element named str, or return NULL */
 /* from the R Manual */
@@ -1006,10 +1009,39 @@ SEXP R_igraph_vector_bool_to_SEXP(igraph_vector_bool_t *v) {
   return result;
 }
 
+SEXP R_igraph_vector_long_to_SEXP(igraph_vector_long_t *v) {
+  SEXP result;
+  long int n=igraph_vector_long_size(v);
+  
+  PROTECT(result=NEW_INTEGER(n));
+  if (sizeof(long)==sizeof(INTEGER(result)[0])) {
+    igraph_vector_long_copy_to(v, (long int*) INTEGER(result));
+  } else {
+    long int i;
+    for (i=0; i<n; i++) {
+      INTEGER(result)[i] = VECTOR(*v)[i];
+    }
+  }
+  
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_0orvector_bool_to_SEXP(igraph_vector_bool_t *v) {
   SEXP result;
   if (v) {
     PROTECT(result=R_igraph_vector_bool_to_SEXP(v));
+  } else {
+    PROTECT(result=R_NilValue);
+  }
+  UNPROTECT(1);
+  return result;
+}
+
+SEXP R_igraph_0orvector_long_to_SEXP(igraph_vector_long_t *v) {
+  SEXP result;
+  if (v) {
+    PROTECT(result=R_igraph_vector_long_to_SEXP(v));
   } else {
     PROTECT(result=R_NilValue);
   }
@@ -1200,6 +1232,13 @@ int R_SEXP_to_vector_copy(SEXP sv, igraph_vector_t *v) {
 
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v) {
   v->stor_begin=LOGICAL(sv);
+  v->stor_end=v->stor_begin+GET_LENGTH(sv);
+  v->end=v->stor_end;
+  return 0;
+}
+
+int R_SEXP_to_vector_long(SEXP sv, igraph_vector_long_t *v) {
+  v->stor_begin=(long int*) INTEGER(sv);
   v->stor_end=v->stor_begin+GET_LENGTH(sv);
   v->end=v->stor_end;
   return 0;

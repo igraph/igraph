@@ -25,3 +25,8 @@ AT_SETUP([The isomorphism class of a subgraph (igraph_isolass_subgraph)])
 AT_KEYWORDS([isomorph isomorphism class motif])
 AT_COMPILE_CHECK([simple/topology.c], [simple/topology.out])
 AT_CLEANUP
+
+AT_SETUP([The VF2 isomorphism algorithm])
+AT_KEYWORDS([isomorph isomorphic VF2])
+AT_COMPILE_CHECK([simple/igraph_isomorphic_vf2.c])
+AT_CLEANUP
