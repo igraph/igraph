@@ -1651,7 +1651,7 @@ int igraph_get_isomorphisms_vf2(const igraph_t *graph1,
 int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
 			 igraph_bool_t *iso) {
 
-  return igraph_subisomorphic_vf2(graph1, graph2, iso, 0, 0);
+  return igraph_subisomorphic_vf2(graph1, graph2, 0, 0, iso, 0, 0);
 }
 
 /**
@@ -1687,6 +1687,8 @@ int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
 
 int igraph_subisomorphic_function_vf2(const igraph_t *graph1, 
 				      const igraph_t *graph2,
+				      const igraph_vector_long_t *color1,
+				      const igraph_vector_long_t *color2,
 				      igraph_vector_t *map12,
 				      igraph_vector_t *map21,
 				      igraph_isohandler_t *function,
@@ -1714,6 +1716,23 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
   if (no_of_nodes1 < no_of_nodes2 || 
       igraph_ecount(graph1) < igraph_ecount(graph2)) {
     return 0;
+  }
+
+  if ( (color1 && !color2) || (!color1 && color2) ) {
+    IGRAPH_WARNING("Only one graph is colored, colors will be ignored");
+    color1=color2=0;
+  }
+
+  if (color1) {
+    if (igraph_vector_long_size(color1) != no_of_nodes1 ||
+	igraph_vector_long_size(color2) != no_of_nodes2) {
+      IGRAPH_ERROR("Invalid color vector length", IGRAPH_EINVAL);
+    }
+  }
+
+  /* Check color distribution */
+  if (color1) {
+    /* TODO */
   }
 
   if (map12) {
@@ -1916,6 +1935,9 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
 	  VECTOR(outdeg1)[cand1] < VECTOR(outdeg2)[cand2]) {
 	end=1;
       }
+      if (color1 && VECTOR(*color1)[cand1] != VECTOR(*color2)[cand2]) {
+	end=1;
+      }
 
       for (i=0; !end && i<igraph_vector_size(inneis_1); i++) {
 	long int node=VECTOR(*inneis_1)[i];
@@ -2105,11 +2127,15 @@ igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
  */
 
 int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+			     const igraph_vector_long_t *color1,
+			     const igraph_vector_long_t *color2,
 			     igraph_bool_t *iso, igraph_vector_t *map12, 
 			     igraph_vector_t *map21) {
  
   *iso=0;
-  IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, map12, map21,
+  IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, 
+						 color1, color2,
+						 map12, map21,
 						 (igraph_isohandler_t *)
 						 igraph_i_subisomorphic_vf2,
 						 iso));
@@ -2147,10 +2173,13 @@ igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
  */
 
 int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2, 
+				     const igraph_vector_long_t *color1,
+				     const igraph_vector_long_t *color2,
 				     igraph_integer_t *count) {
   
   *count=0;
-  IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, 0, 0,
+  IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, 
+						 color1, color2, 0, 0,
 						 (igraph_isohandler_t*)
 						 igraph_i_count_subisomorphisms_vf2,
 						 count));
@@ -2212,11 +2241,14 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
  
 int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
 				   const igraph_t *graph2,
+				   const igraph_vector_long_t *color1,
+				   const igraph_vector_long_t *color2,
 				   igraph_vector_ptr_t *maps) {
   
   igraph_vector_ptr_clear(maps);
   IGRAPH_FINALLY(igraph_i_get_subisomorphisms_free, maps);
-  IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, 0, 0,
+  IGRAPH_CHECK(igraph_subisomorphic_function_vf2(graph1, graph2, 
+						 color1, color2, 0, 0,
 						 (igraph_isohandler_t*)
 						 igraph_i_get_subisomorphisms_vf2,
 						 maps));

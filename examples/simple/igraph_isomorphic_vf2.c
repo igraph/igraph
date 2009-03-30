@@ -23,9 +23,18 @@
 
 #include <igraph.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 int random_permutation(igraph_vector_t *vec) {
-
+  /* We just do size(vec) * 2 swaps */
+  long int one, two, tmp, i, n=igraph_vector_size(vec);
+  for (i=0; i<2*n; i++) {
+    one= (double)rand() / RAND_MAX * n;
+    two= (double)rand() / RAND_MAX * n;
+    tmp=one; one=two; two=tmp;
+  }
+  return 0;
 }
 
 int main() {
@@ -36,7 +45,9 @@ int main() {
   igraph_bool_t iso;
   igraph_integer_t count;
   long int i;
-  
+
+  srand(time(0));
+
   igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
   igraph_vector_init_seq(&perm, 0, igraph_vcount(&ring1)-1);
   random_permutation(&perm);
@@ -116,6 +127,45 @@ int main() {
   igraph_vector_destroy(&perm);
   igraph_destroy(&ring2);
   igraph_destroy(&ring1);
- 
+
+  /* ---------------------------------------------------------------- */
+  /* SUBGRAPH ISOMORPHISM                                             */
+  /* ---------------------------------------------------------------- */
+
+  igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/0);
+  igraph_ring(&ring2, 80 , /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/0);
+
+  /* One color */
+  igraph_vector_long_init(&color1, igraph_vcount(&ring1));
+  igraph_vector_long_init(&color2, igraph_vcount(&ring2));
+  igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, &count);
+  if (count != 42) {
+    fprintf(stderr, "Count without colors failed, expected %li, got %li.\n",
+	    (long int) 42, (long int) count);
+    return 31;
+  }
+
+  /* Two colors */
+  for (i=0; i<igraph_vector_long_size(&color1); i+=2) {
+    VECTOR(color1)[i]   = 0;
+    VECTOR(color1)[i+1] = 1;
+  }
+  for (i=0; i<igraph_vector_long_size(&color2); i+=2) {  
+    VECTOR(color2)[i]   = 0;
+    VECTOR(color2)[i+1] = 1;
+  }
+  igraph_count_subisomorphisms_vf2(&ring1, &ring2, &color1, &color2, &count);
+  if (count != 21) {
+    fprintf(stderr, "Count without colors failed, expected %li, got %li.\n",
+	    (long int) 21, (long int) count);
+    return 32;
+  }
+
+  igraph_vector_long_destroy(&color1);
+  igraph_vector_long_destroy(&color2);
+
+  igraph_destroy(&ring1);
+  igraph_destroy(&ring2);
+
   return 0;
 }
