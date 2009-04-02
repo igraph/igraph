@@ -111,7 +111,9 @@ class CommunityTests(unittest.TestCase):
         cl = g.community_label_propagation("weight", "initial", [1,0,0,1])
         self.failUnless(cl.membership == [0, 0, 1, 1])
         cl = g.community_label_propagation(initial="initial", fixed=[1,0,0,1])
-        self.failUnless(cl.membership == [0, 0, 1, 1] or cl.membership == [0, 0, 0, 0])
+        self.failUnless(cl.membership == [0, 0, 1, 1] or \
+                        cl.membership == [0, 1, 1, 1] or \
+                        cl.membership == [0, 0, 0, 1])
 
     def testWalktrap(self):
         g = Graph.Full(5) + Graph.Full(5) + Graph.Full(5)
