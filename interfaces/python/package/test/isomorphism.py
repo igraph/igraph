@@ -11,6 +11,8 @@ class IsomorphismTests(unittest.TestCase):
                        (2, 3), (2, 1), (2, 6), \
                        (5, 1), (5, 4), (5, 6), \
                        (7, 3), (7, 6), (7, 4)])
+
+        # Test the isomorphy of g1 and g2
         self.failUnless(g1.isomorphic(g2))
         self.failUnless(g2.isomorphic_vf2(g1, return_mapping_21=True) \
           == (True, None, [0, 2, 5, 7, 1, 3, 4, 6]))
@@ -18,17 +20,43 @@ class IsomorphismTests(unittest.TestCase):
           == (True, None, [0, 2, 5, 7, 1, 3, 4, 6]))
         self.assertRaises(ValueError, g2.isomorphic_bliss, g1, sh2="nonexistent")
 
+        # Test the automorphy of g1
+        self.failUnless(g1.isomorphic())
+        self.failUnless(g1.isomorphic_vf2(return_mapping_21=True) \
+          == (True, None, [0, 1, 2, 3, 4, 5, 6, 7]))
+
+        # Test VF2 with colors
+        self.failUnless(g1.isomorphic_vf2(g2,
+            color1=[0,1,0,1,0,1,0,1],
+            color2=[0,0,1,1,0,0,1,1]))
+        g1.vs["color"] = [0,1,0,1,0,1,0,1]
+        g2.vs["color"] = [0,0,1,1,0,1,1,0]
+        self.failUnless(not g1.isomorphic_vf2(g2, "color", "color"))
+
     def testCountIsomorphisms(self):
         g = Graph.Full(4)
         self.failUnless(g.count_automorphisms_vf2() == 24)
         g = Graph(6, [(0,1), (2,3), (4,5), (0,2), (2,4), (1,3), (3,5)])
         self.failUnless(g.count_automorphisms_vf2() == 4)
 
+        # Some more tests with colors
+        g3 = Graph.Full(4)
+        g3.vs["color"] = [0,1,1,0]
+        self.failUnless(g3.count_isomorphisms_vf2() == 24)
+        self.failUnless(g3.count_isomorphisms_vf2(color1="color", color2="color") == 4)
+        self.failUnless(g3.count_isomorphisms_vf2(color1=[0,1,2,0], color2=(0,1,2,0)) == 2)
+
     def testGetIsomorphisms(self):
         g = Graph(6, [(0,1), (2,3), (4,5), (0,2), (2,4), (1,3), (3,5)])
         maps = g.get_automorphisms_vf2()
         expected_maps = [[0,1,2,3,4,5], [1,0,3,2,5,4], [4,5,2,3,0,1], [5,4,3,2,1,0]]
         self.failUnless(maps == expected_maps)
+
+        g3 = Graph.Full(4)
+        g3.vs["color"] = [0,1,1,0]
+        expected_maps = [[0,1,2,3], [0,2,1,3], [3,1,2,0], [3,2,1,0]]
+        self.failUnless(sorted(g3.get_automorphisms_vf2()), expected_maps)
+
 
     def testSubisomorphic(self):
         g = Graph.Lattice([3,3], circular=False)

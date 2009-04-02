@@ -429,16 +429,16 @@ class Graph(core.GraphBase):
         return TriadCensus(GraphBase.triad_census(self, *args, **kwds))
 
     # Automorphisms
-    def count_automorphisms_vf2(self):
+    def count_automorphisms_vf2(self, color=None):
         """Returns the number of automorphisms of the graph"""
-        return self.count_isomorphisms_vf2(self)
+        return self.count_isomorphisms_vf2(self, color1=color, color2=color)
 
-    def get_automorphisms_vf2(self):
+    def get_automorphisms_vf2(self, color=None):
         """Returns all automorphisms of the graph
         
         @return: a list of lists, each item containing a possible mapping
           of the graph vertices to itself according to the automorphism"""
-        return self.get_isomorphisms_vf2(self)
+        return self.get_isomorphisms_vf2(self, color1=color, color2=color)
 
     # Various clustering algorithms -- mostly wrappers around GraphBase
     def community_fastgreedy(self, weights=None):
