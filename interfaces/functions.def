@@ -401,20 +401,20 @@ igraph_simplify:
         IGNORE: RR, RC, RNamespace
 
 igraph_transitivity_undirected:
-        PARAMS: GRAPH graph, OUT REALPTR res
+        PARAMS: GRAPH graph, OUT REALPTR res, TRANSITIVITYMODE mode=NAN
         IGNORE: RR, RC, RNamespace
 
 igraph_transitivity_local_undirected:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, TRANSITIVITYMODE mode=NAN
         IGNORE: RR, RC, RNamespace
 
 igraph_transitivity_avglocal_undirected:
-        PARAMS: GRAPH graph, OUT REALPTR res
+        PARAMS: GRAPH graph, OUT REALPTR res, TRANSITIVITYMODE mode=NAN
         IGNORE: RR, RC, RNamespace
 
 igraph_transitivity_barrat:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
-                EDGEWEIGHTS weights=NULL
+                EDGEWEIGHTS weights=NULL, TRANSITIVITYMODE mode=NAN
         DEPENDS: weights ON graph
         IGNORE: RR, RC, RNamespace
 

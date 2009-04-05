@@ -81,3 +81,11 @@ interfaces/python/doc/build/html
 interfaces/python/build
 interfaces/python/dist
 interfaces/python/python_igraph.egg-info
+interfaces/java/build
+interfaces/java/config.log
+interfaces/java/config.status
+interfaces/java/manifest
+interfaces/java/Makefile
+interfaces/java/src/Graph.java
+interfaces/java/src/hu_kfki_rmki_cneuro_igraph_Graph.c
+interfaces/java/src/hu_kfki_rmki_cneuro_igraph_Graph.h

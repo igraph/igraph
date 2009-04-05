@@ -1,6 +1,6 @@
 m4_include(config/java.m4)
 
-AC_INIT([igraph-java-wrapper], 0.5, ntamas@rmki.kfki.hu)
+AC_INIT([igraph-java-wrapper], 0.6, ntamas@rmki.kfki.hu)
 AC_CONFIG_SRCDIR(src/hu_kfki_rmki_cneuro_igraph_Graph.c.in)
 
 AC_PROG_CC
