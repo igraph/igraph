@@ -314,12 +314,22 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeq
   /* Handle integer indices according to the sequence protocol */
   if (PyInt_Check(o)) return igraphmodule_EdgeSeq_sq_item(self, PyInt_AsLong(o));
   if (PyTuple_Check(o)) {
+    /* Return a restricted EdgeSeq */
+    if (PyTuple_Size(o) == 0) {
+      PyObject *args, *result;
+      args = Py_BuildValue("(O)", Py_None);
+      result = igraphmodule_EdgeSeq_select(self, args, NULL);
+      Py_DECREF(args);
+      return result;
+    }
     return igraphmodule_EdgeSeq_select(self, o, NULL);
   } else if (PySlice_Check(o) || PyList_Check(o)) {
     /* Return a restricted EdgeSeq */
     PyObject *result, *args;
     if (PySlice_Check(o)) {
       args = Py_BuildValue("(O)", o);
+    } else if (PyList_Size(o) == 0) {
+      args = Py_BuildValue("(O)", Py_None);
     } else {
       args = PyList_AsTuple(o);
     }

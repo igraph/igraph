@@ -39,6 +39,10 @@ class EdgeSeqTests(unittest.TestCase):
         self.assertRaises(IndexError, empty_es.__getitem__, 0)
         self.assertRaises(KeyError, empty_es.__getitem__, "nonexistent")
         self.failUnless(empty_es["test"] == [])
+        empty_es = self.g.es[[]]
+        self.failUnless(len(empty_es) == 0)
+        empty_es = self.g.es[()]
+        self.failUnless(len(empty_es) == 0)
 
     def testCallableFiltering(self):
         only_even = self.g.es.select(lambda e: (e.index % 2 == 0))

@@ -34,6 +34,10 @@ class VertexSeqTests(unittest.TestCase):
         self.assertRaises(IndexError, empty_vs.__getitem__, 0)
         self.assertRaises(KeyError, empty_vs.__getitem__, "nonexistent")
         self.failUnless(empty_vs["test"] == [])
+        empty_vs = self.g.vs[[]]
+        self.failUnless(len(empty_vs) == 0)
+        empty_vs = self.g.vs[()]
+        self.failUnless(len(empty_vs) == 0)
 
     def testCallableFiltering(self):
         only_even = self.g.vs.select(lambda v: (v.index % 2 == 0))
