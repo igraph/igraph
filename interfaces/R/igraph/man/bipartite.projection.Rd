@@ -1,11 +1,12 @@
 \name{bipartite.projection}
 \alias{bipartite.projection}
+\alias{bipartite.projection.size}
 \concept{Bipartite graph}
 \concept{Two-mode network}
 \title{Project a bipartite graph}
 \description{A bipartite graph is projected into two one-mode networks}
 \usage{
-bipartite.projection.size(graph, type=NULL)
+bipartite.projection.size(graph, types=NULL)
 bipartite.projection (graph, types=NULL, probe1=-1)
 }
 \arguments{
