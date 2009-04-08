@@ -6353,7 +6353,7 @@ PyObject *igraphmodule_Graph_subisomorphic_vf2(igraphmodule_GraphObject * self,
     "return_mapping_12", "return_mapping_21", NULL };
 
   if (!PyArg_ParseTupleAndKeywords
-      (args, kwds, "O!|OO", kwlist, &igraphmodule_GraphType, &o, &return1, &return2))
+      (args, kwds, "O!|OOOO", kwlist, &igraphmodule_GraphType, &o, &return1, &return2))
     return NULL;
   other=(igraphmodule_GraphObject*)o;
 
