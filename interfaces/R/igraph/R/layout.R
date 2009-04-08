@@ -546,10 +546,14 @@ layout.drl <- function(graph, use.seed = FALSE,
                        seed=matrix(runif(vcount(graph)*2), nc=2),
                        options=igraph.drl.default,
                        weights=E(graph)$weight,
-                       fixed=NULL) 
+                       fixed=NULL,
+                       dim=2)
 {
     if (!is.igraph(graph)) {
         stop("Not a graph object")
+    }
+    if (dim != 2 && dim != 3) {
+      stop("`dim' must be 2 or 3")
     }
     use.seed <- as.logical(use.seed)
     seed <- as.matrix(seed)
@@ -563,8 +567,13 @@ layout.drl <- function(graph, use.seed = FALSE,
       fixed <- as.logical(fixed)
     }
     on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-    res <- .Call("R_igraph_layout_drl", graph, seed, use.seed, options, 
-                 weights, fixed, PACKAGE = "igraph")
+    if (dim==2) {
+      res <- .Call("R_igraph_layout_drl", graph, seed, use.seed, options, 
+                   weights, fixed, PACKAGE = "igraph")
+    } else {
+      res <- .Call("R_igraph_layout_drl_3d", graph, seed, use.seed, options, 
+                   weights, fixed, PACKAGE = "igraph")
+    }      
     res
 }
 

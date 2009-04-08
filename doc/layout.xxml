@@ -18,6 +18,7 @@
 <!-- doxrox-include igraph_layout_drl_default_t -->
 <!-- doxrox-include igraph_layout_drl_options_init -->
 <!-- doxrox-include igraph_layout_drl -->
+<!-- doxrox-include igraph_layout_drl_3d -->
 </section>
 <!-- doxrox-include igraph_layout_fruchterman_reingold -->
 <!-- doxrox-include igraph_layout_kamada_kawai -->

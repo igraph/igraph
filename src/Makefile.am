@@ -96,6 +96,8 @@ libigraph_la_SOURCES       = basic_query.c games.c cocitation.c iterators.c \
 			     gengraph_graph_molloy_optimized.cpp \
 			     gengraph_mr-connected.cpp gengraph_powerlaw.cpp \
 			     gengraph_random.cpp decomposition.c bipartite.c \
+			     drl_layout_3d.cpp drl_graph_3d.cpp \
+			     DensityGrid_3d.cpp \
 			     foreign-dl-parser.y foreign-dl-lexer.l
 
 libigraph_la_CFLAGS        =
