@@ -1100,6 +1100,12 @@ int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
 		      const igraph_vector_t *weights, 
 		      const igraph_vector_bool_t *fixed);
 
+int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res, 
+			 igraph_bool_t use_seed,
+			 igraph_layout_drl_options_t *options,
+			 const igraph_vector_t *weights,
+			 const igraph_vector_bool_t *fixed);
+
 int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
 			    igraph_vector_ptr_t *coords, 
 			    igraph_matrix_t *res);
