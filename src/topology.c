@@ -1017,6 +1017,13 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
  * otherwise it stops.
  * \param graph1 The first input graph.
  * \param graph2 The second input graph.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param map12 Pointer to an initialized vector or \c NULL. If not \c
  *   NULL and the supplied graphs are isomorphic then the permutation
  *   taking \p graph1 to \p graph is stored here. If not \c NULL and the
@@ -1484,6 +1491,13 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  * \param graph1 The first graph, may be directed or undirected.
  * \param graph2 The second graph. It must have the same directedness
  *    as \p graph1, otherwise an error is reported.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param iso Pointer to a logical constant, the result of the
  *    algorithm will be placed here.
  * \param map12 Pointer to an initialized vector or a NULL pointer. If not 
@@ -1539,6 +1553,13 @@ igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
  * \param graph1 The first input graph, may be directed or undirected.
  * \param graph2 The second input graph, it must have the same
  *   directedness as \p graph1, or an error will be reported.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param count Point to an integer, the result will be stored here.
  * \return Error code.
  * 
@@ -1598,6 +1619,13 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
  * \param graph1 The first input graph, may be directed or undirected.
  * \param graph2 The second input graph, it must have the same
  *   directedness as \p graph1, or an error will be reported.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param maps Pointer vector. On return it is empty if the input graphs
  *   are no isomorphic. Otherwise it contains pointers to
  *   <type>igraph_vector_t</type> objects, each vector is an
@@ -1669,6 +1697,13 @@ int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
  * \param graph2 The second input graph, it must have the same
  *    directedness as \p graph1. This is supposed to be the smaller
  *    graph.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the subgraph isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param map12 Pointer to a vector or \c NULL. If not \c NULL, then an
  *    isomorphic mapping from \p graph1 to \p graph2 is stored here.
  * \param map21 Pointer to a vector ot \c NULL. If not \c NULL, then
@@ -2114,6 +2149,13 @@ igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
  * \param graph2 The second input graph, it must have the same
  *    directedness as \p graph1. This is supposed to be the smaller
  *    graph.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the subgraph isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param iso Pointer to a boolean. The result of the decision problem
  *    is stored here.
  * \param map12 Pointer to a vector or \c NULL. If not \c NULL, then an
@@ -2165,6 +2207,13 @@ igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
  * \param graph2 The second input graph, it must have the same
  *    directedness as \p graph1. This is supposed to be the smaller
  *    graph.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the subgraph isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param count Pointer to an integer. The number of subgraph
  *    isomorphisms is stored here.
  * \return Error code.
@@ -2226,6 +2275,13 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
  * \param graph2 The second input graph, it must have the same
  *    directedness as \p graph1. This is supposed to be the smaller
  *    graph.
+ * \param color1 An optional color vector for the first graph. If
+ *   color vectors are given for both graphs, then the subgraph isomorphism is
+ *   calculated on the colored graphs; i.e. two vertices can match
+ *   only if their color also matches. Supply a null pointer here if
+ *   your graphs are not colored.
+ * \param color2 An optional color vector for the second graph. See
+ *   the previous argument for explanation.
  * \param maps Pointer vector. On return it contains pointers to
  *   <type>igraph_vector_t</type> objects, each vector is an
  *   isomorphic mapping of \p graph2 to a subgraph of \p graph1. Please note that
