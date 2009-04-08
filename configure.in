@@ -51,12 +51,11 @@ AC_MSG_RESULT(no)
 $3)
 CFLAGS="$ac_save_CFLAGS"])
 
-## Solaris cc does not support -ffloat-store, but does not fail, 
-## it only gives a warning. So we use -fstore if both of these tests 
-## succeed (maybe with a warning).
+## Solaris cc does not support -ffloat-store.
 FLOATSTORE=
 IGRAPH_CC_SWITCH([-ffloat-store], [FLOATSTORE="-ffloat-store"], [])
-IGRAPH_CC_SWITCH([-fstore], [FLOATSTORE="-fstore"], [])
+IGRAPH_CC_SWITCH([-fstore], [FLOATSTORE="$FLOATSTORE -fstore"], [])
+AC_SUBST(FLOATSTORE)
 
 AC_ARG_ENABLE(gcc-warnings,
               AC_HELP_STRING([--enable-gcc-warnings],
