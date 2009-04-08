@@ -104,6 +104,18 @@ BIPARTITE_TYPES:
                stop("Not a bipartite graph, supply `types' argument") \
             }
 
+VERTEX_COLOR:
+    INCONV: if (missing(%I%)) { \
+               if ("color" %in% list.vertex.attributes(%I1%)) { \
+                 %I% <- V(%I1%)$color \
+               } else { \
+                 %I% <- NULL \
+               } \
+            } \
+            if (!is.null(%I%)) { \
+               %I% <- as.integer(%I%) \
+            }
+
 NULL:
     CALL:
     HEADER:

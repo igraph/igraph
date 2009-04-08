@@ -1105,30 +1105,36 @@ igraph_isoclass_create:
         NAME-R: graph.isocreate
 
 igraph_isomorphic_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, VECTOR_LONG_OR_0 color1=NULL, \
-                VECTOR_LONG_OR_0 color2=NULL, OUT BOOLEANPTR iso, \
+        PARAMS: GRAPH graph1, GRAPH graph2, VERTEX_COLOR color1, \
+                VERTEX_COLOR color2, OUT BOOLEANPTR iso, \
                 OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+        DEPS: color1 ON graph1, color2 ON graph2
 
 igraph_count_isomorphisms_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, VECTOR_LONG_OR_0 color1=NULL, \
-                VECTOR_LONG_OR_0 color2=NULL, OUT INTEGERPTR count
+        PARAMS: GRAPH graph1, GRAPH graph2, VERTEX_COLOR color1, \
+                VERTEX_COLOR color2, OUT INTEGERPTR count
+        DEPS: color1 ON graph1, color2 ON graph2
 
 igraph_get_isomorphisms_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, VECTOR_LONG_OR_0 color1=NULL, \
-                VECTOR_LONG_OR_0 color2=NULL, OUT VECTORLIST maps
+        PARAMS: GRAPH graph1, GRAPH graph2, VERTEX_COLOR color1, \
+                VERTEX_COLOR color2, OUT VECTORLIST maps
+        DEPS: color1 ON graph1, color2 ON graph2
 
 igraph_subisomorphic_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, VECTOR_LONG_OR_0 color1=NULL, \
-                VECTOR_LONG_OR_0 color2=NULL, OUT BOOLEANPTR iso, \
+        PARAMS: GRAPH graph1, GRAPH graph2, VERTEX_COLOR color1, \
+                VERTEX_COLOR color2, OUT BOOLEANPTR iso, \
                 OUT VECTOR_OR_0 map12, OUT VECTOR_OR_0 map21
+        DEPS: color1 ON graph1, color2 ON graph2
 
 igraph_count_subisomorphisms_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, VECTOR_LONG_OR_0 color1=NULL, \
-                VECTOR_LONG_OR_0 color2=NULL, OUT INTEGERPTR count
+        PARAMS: GRAPH graph1, GRAPH graph2, VERTEX_COLOR color1, \
+                VERTEX_COLOR color2, OUT INTEGERPTR count
+        DEPS: color1 ON graph1, color2 ON graph2
 
 igraph_get_subisomorphisms_vf2:
-        PARAMS: GRAPH graph1, GRAPH graph2, VECTOR_LONG_OR_0 color1=NULL, \
-                VECTOR_LONG_OR_0 color2=NULL, OUT VECTORLIST maps
+        PARAMS: GRAPH graph1, GRAPH graph2, VERTEX_COLOR color1, \
+                VERTEX_COLOR color2, OUT VECTORLIST maps
+        DEPS: color1 ON graph1, color2 ON graph2
 
 igraph_isomorphic_34:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
