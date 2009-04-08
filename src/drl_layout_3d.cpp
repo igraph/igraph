@@ -38,7 +38,7 @@ using namespace drl3d;
 #include "random.h"
 
 /**
- * \function igraph_layout_drl
+ * \function igraph_layout_drl_3d
  * The DrL layout generator, 3d version.
  * 
  * This function implements the force-directed DrL layout generator.
