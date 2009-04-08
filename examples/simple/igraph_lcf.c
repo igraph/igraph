@@ -31,7 +31,7 @@ int main() {
   igraph_lcf(&g, 12, 5, -5, 6, 0);
   igraph_famous(&g2, "franklin");
   
-  igraph_isomorphic_vf2(&g, &g2, &iso, 0, 0);
+  igraph_isomorphic_vf2(&g, &g2, /*color1=*/0, /*color2=*/0, &iso, 0, 0);
   if (!iso) {
     printf("OOOPS!\n");
     return 1;
