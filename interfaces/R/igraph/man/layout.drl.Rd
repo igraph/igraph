@@ -15,7 +15,7 @@
 \usage{
 layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) * 
     2), nc = 2), options = igraph.drl.default, weights = E(graph)$weight, 
-    fixed = NULL) 
+    fixed = NULL, dim = 2) 
 }
 \arguments{
   \item{graph}{The input graph, in can be directed or undirected.}
@@ -33,6 +33,10 @@ layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) *
     vertices for which it is \code{TRUE} are kept at the coordinates
     supplied in the \code{seed} matrix. It is ignored it \code{NULL} or
     if \code{use.seed} is \code{FALSE}. }
+  \item{dim}{Either \sQuote{2} or \sQuote{3}, it specifies whether we
+    want a two dimensional or a three dimensional layout. Note that
+    because of the nature of the DrL algorithm, the three dimensional
+    layout takes significantly longer to compute.}
 }
 \details{
   This function implements the force-directed DrL layout generator.
@@ -83,7 +87,8 @@ layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) *
   \url{http://www.cs.sandia.gov/~smartin/software.html}
 }
 \author{Shawn Martin \email{google@for.it} and Gabor Csardi
-  \email{csardi@rmki.kfki.hu} for the R/igraph interface}
+  \email{csardi@rmki.kfki.hu} for the R/igraph interface and the three
+    dimensional version.}
 \seealso{\code{\link{layout}} for other layout generators.}
 \examples{
 g <- as.undirected(ba.game(100, m=1))
