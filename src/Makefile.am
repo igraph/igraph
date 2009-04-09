@@ -118,7 +118,9 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  gengraph_degree_sequence.h gengraph_qsort.h \
 		  gengraph_graph_molloy_hash.h gengraph_random.h \
 		  gengraph_graph_molloy_optimized.h gengraph_vertex_cover.h \
-		  gengraph_hash.h igraph_math.h
+		  gengraph_hash.h igraph_math.h \
+		  drl_graph_3d.h drl_layout_3d.h drl_Node_3d.h \
+		  DensityGrid_3d.h
 
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
