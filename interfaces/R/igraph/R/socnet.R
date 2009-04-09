@@ -1899,8 +1899,8 @@ tkigraph <- function() {
                          file=system.file("igraph.gif", package="igraph"))
   logo <- tklabel(dialog, relief="flat", padx=10, pady=10, image=image)
   label <- tklabel(dialog, padx=30, pady=10,
-                   text=paste(sep="", "tkigraph (c) 2009 Gábor Csárdi\n",
-                     "igraph (c) 2003-2009 Gábor Csárdi and Tamás Nepusz\n\n",
+                   text=paste(sep="", "tkigraph (c) 2009 Gabor Csardi\n",
+                     "igraph (c) 2003-2009 Gabor Csardi and Tamas Nepusz\n\n",
                      "This is igraph version ",
                      packageDescription("igraph")$Version, " and\n",
                      R.version$version.string))
