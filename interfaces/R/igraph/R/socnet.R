@@ -229,6 +229,8 @@ tkigraph <- function() {
   tkadd(help.menu, "command", label="Contents", command=function() { .tkigraph.help() })
   tkadd(help.menu, "command", label="In external browser",
         command=function() { .tkigraph.help.external() })
+  tkadd(help.menu, "separator")
+  tkadd(help.menu, "command", label="About", command=function() { .tkigraph.about() })
   tkadd(main.menu, "cascade", label="Help", menu=help.menu)
   
   tkadd(main.menu, "command", label="Quit", command=.tkigraph.close)
@@ -1883,6 +1885,27 @@ tkigraph <- function() {
 .tkigraph.help.external <- function(page="index.html") {
   f <- system.file("tkigraph_help/index.html", package="igraph")
   browseURL(f)
+}
+
+.tkigraph.about <- function() {
+  dialog <- tktoplevel()
+  tktitle(dialog) <- "About tkigraph"
+  image <-tkimage.create("photo", "img", format="gif",
+                         file=system.file("igraph.gif", package="igraph"))
+  logo <- tklabel(dialog, relief="flat", padx=10, pady=10, image=image)
+  label <- tklabel(dialog, padx=30, pady=10,
+                   text=paste(sep="", "tkigraph (c) 2009 Gábor Csárdi\n",
+                     "igraph (c) 2003-2009 Gábor Csárdi and Tamás Nepusz\n\n",
+                     "This is igraph version ",
+                     packageDescription("igraph")$Version, " and\n",
+                     R.version$version.string))
+  close <- tkbutton(dialog, text="Close", command=function() {
+    tkdestroy(dialog); return()
+  })
+
+  tkpack(logo, side="top", anchor="c", expand=0)
+  tkpack(label, side="top", anchor="c", expand=0)
+  tkpack(close, side="bottom", anchor="c", expand=0)
 }
 
 #####################################################
