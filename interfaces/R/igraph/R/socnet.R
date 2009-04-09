@@ -1846,10 +1846,10 @@ tkigraph <- function() {
 
   main.menu <- tkmenu(dialog)
   tkadd(main.menu, "command", label="Back", command=function() {
-    ## TODO
+    tcl("render_back", txt)
   })
   tkadd(main.menu, "command", label="Forw", command=function() {
-    ## TODO
+    tcl("render_forw", txt)
   })
   tkadd(main.menu, "command", label="Home", command=function() {
     tcl("render", txt, "index.html"); return()
@@ -1862,12 +1862,15 @@ tkigraph <- function() {
   tkpack(scr, side="right", fill="y", expand=0)
   tkpack(txt, side="left", fill="both", expand=1)
   
-  tcl("global", "tkigraph_help_root")
+  tcl("global", "tkigraph_help_root", "tkigraph_help_history",
+      "tkigraph_help_history_pos")
   tcl("set", "tkigraph_help_root",
       system.file("tkigraph_help", package="igraph"))
+  
   tcl("source", system.file("html_library.tcl", package="igraph"))
   tcl("source", system.file("my_html_library.tcl", package="igraph"))
   tcl("HMinit_win", txt)
+  tcl("start_history", txt)
   tcl("render", txt, "index.html")
   
   tkconfigure(txt, state="disabled")
