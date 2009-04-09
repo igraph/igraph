@@ -1867,11 +1867,16 @@ tkigraph <- function() {
   
   tkpack(scr, side="right", fill="y", expand=0)
   tkpack(txt, side="left", fill="both", expand=1)
+
+  browser.button <- tkbutton(dialog, command=function() {
+    browseURL(tclvalue("browser_url"))
+  })
   
   tcl("global", "tkigraph_help_root", "tkigraph_help_history",
-      "tkigraph_help_history_pos")
+      "tkigraph_help_history_pos", "browser_button", "browser_url")  
   tcl("set", "tkigraph_help_root",
       system.file("tkigraph_help", package="igraph"))
+  tcl("set", "browser_button", browser.button)
   
   tcl("source", system.file("html_library.tcl", package="igraph"))
   tcl("source", system.file("my_html_library.tcl", package="igraph"))
