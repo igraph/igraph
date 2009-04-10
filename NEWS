@@ -1,4 +1,123 @@
 ============
+igraph 0.5.2
+============
+
+Released April 10, 2009
+
+See also the release notes at
+http://igraph.sf.net/relnotes-0.5.2.html
+
+New in the R interface
+----------------------
+
+- Added progress bar support to beweenness() and
+  betweenness.estimate(), layout.drl()
+- Speeded up betweenness estimation
+- Speeded up are.connected()
+- Johnson's shortest paths algorithm added
+- shortest.paths() has now an 'algorithm' argument to choose from the
+  various implementations manually
+- Always quote symbolic vertex names when printing graphs or edges
+- Average nearest neighbor degree calculation, graph.knn()
+- Weighted degree (also called strength) calculation, graph.strength()
+- Some new functions to support bipartite graphs: graph.bipartite(),
+  is.bipartite(), get.indicence(), graph.incidence(),
+  bipartite.projection(), bipartite.projection.size()
+- Support for plotting curved edges with plot.igraph() and tkplot()
+- Added support for weighted graphs in alpha.centrality()
+- Added the label propagation community detection algorithm by
+  Raghavan et al., label.propagation.community()
+- cohesive.blocks() now has a 'cutsetHeuristic' argument to choose
+  between two cutset algorithms
+- Added a function to "unfold" a tree, unfold.tree()
+- New tkplot() arguments to change the drawing area
+- Added a minimal GUI, invoke it with tkigraph()
+- The DrL layout generator, layout.drl() has a three dimensional mode
+  now.
+
+Bugs corrected in the R interface
+---------------------------------
+
+- Fixed a bug in VF2 graph isomorphism functions
+- Fixed a bug when a sparse adjacency matrix was requested in
+  get.adjacency() and the graph was named
+- VL graph generator in degree.sequence.game() checks now that
+  the sum of the degrees is even
+- Many fixes for supporting various compilers, e.g. GCC 4.4 and Sun's
+  C compiler
+- Fixed memory leaks in graph.automorphisms(), Bellman-Ford
+  shortest.paths(), independent.vertex.sets()
+- Fix a bug when a graph was imported from LGL and exported to NCOL
+  format (#289596)
+- cohesive.blocks() creates its temporary file in the session
+  temporary directory
+- write.graph() and read.graph() now give error messages when unknown
+  arguments are given
+- The GraphML reader checks the name of the attributes to avoid adding
+  a duplicate 'id' attribute
+- It is possible to change the 'ncv' ARPACK parameter for
+  leading.eigenvector.community()
+- Fixed a bug in path.length.hist(), 'unconnected' was wrong
+  for unconnected and undirected graphs
+- Better handling of attribute assingment via iterators, this is now
+  also clarified in the manual
+- Better error messages for unknown vertex shapes
+- Make R package unload cleanly if unloadNamespace() is used
+- Fixed a bug in plotting square shaped vertices (#325244)
+- Fixed a bug in graph.adjacency() when the matrix is a sparse matrix
+  of class "dgTMatrix"
+
+New in the C layer
+------------------
+
+- Added progress bar support to igraph_betweenness() and 
+  igraph_betweenness_estimate(), igraph_layout_drl()
+- Speeded up igraph_betweenness_estimate(), igraph_get_eid(), 
+  igraph_are_connected(), igraph_get_eids()
+- Added igraph_get_eid2()
+- Johnson's shortest path algorithm added:
+  igraph_shortest_paths_johnson() 
+- Average nearest neighbor degree calculation,
+  igraph_avg_nearest_neighbor_degree() 
+- Weighted degree (also called strength) calculation,
+  igraph_strength()
+- Some functions to support bipartite graphs: igraph_full_bipartite(),
+  igraph_bipartite_projection(), igraph_create_bipartite(),
+  igraph_incidence(), igraph_get_incidence(),
+  igraph_bipartite_projection_size(), igraph_is_bipartite()
+- Added the label propagation community detection algorithm by
+  Raghavan et al., igraph_community_label_propagation()
+- Added an example that shows how to set the random number generator's
+  seed from C (examples/simple/random_seed.c)
+- Added a function to "unfold" a tree, igraph_unfold_tree()
+- C attribute handler updates: added functions to query many
+  vertices/edges at once
+- Three dimensional DrL layout, igraph_layout_drl_3d()
+
+Bugs corrected in the C layer
+-----------------------------
+
+- Fixed a bug in igraph_isomorphic_function_vf2(), affecting all VF2
+  graph isomorphism functions
+- VL graph generator in igraph_degree_sequence_game() checks now that
+  the sum of the degrees is even
+- Many small corrections to make igraph compile with Microsoft Visual
+  Studio 2003, 2005 and 2008
+- Many fixes for supporting various compilers, e.g. GCC 4.4 and Sun's
+  C compiler
+- Fix a bug when a graph was imported from LGL and exported to NCOL
+  format (#289596)
+- Fixed memory leaks in igraph_automorphisms(),
+  igraph_shortest_paths_bellman_ford(),
+  igraph_independent_vertex_sets()
+- The GraphML reader checks the name of the attributes to avoid adding
+  a duplicate 'id' attribute
+- It is possible to change the 'ncv' ARPACK parameter for
+  igraph_community_leading_eigenvector()
+- Fixed a bug in igraph_path_length_hist(), 'unconnected' was wrong
+  for unconnected and undirected graphs.
+
+============
 igraph 0.5.1
 ============
 
