@@ -34,6 +34,12 @@ proc render_real {win href} {
 
 proc render {win href} {
     global tkigraph_help_history tkigraph_help_history_pos
+    global browser_button browser_url
+    if { [ regexp ^http:// "$href" ] } { 
+	set browser_url $href
+	$browser_button invoke
+	return
+    }
     lappend tkigraph_help_history($win) $href
     incr tkigraph_help_history_pos($win)
     render_real $win $href
