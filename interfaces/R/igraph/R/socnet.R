@@ -7,25 +7,9 @@
 #   * keyboard shortcuts
 #   * implement min & max in .tkigraph.dialog
 
-.tkigraph.res <- try(library(igraph), silent=TRUE)
-if (class(.tkigraph.res) == "try-error") {
-  cat("Hmmmm, the igraph package is required for this to work, i'll try to install it\n.")
-  install.packages("igraph", repos="http://cran.at.r-project.org")
-}
-if (packageDescription("igraph")$Version != "0.5.1") {
-  warning("******************************************\n  You need igraph 0.5.1 for this version of the GUI.\n  It might work with other versions as well, but please try\n  the suggested version before reporting bugs.\n  ******************************************")
-}
-.tkigraph.res <- try(library(igraph), silent=TRUE)
-if (class(.tkigraph.res) == "try-error") {
-  warning("Hmmm, failed to install igraph. :(")
-}
-
-rm(.tkigraph.res)
-
 tkigraph <- function() {
 
   require(tcltk) || stop("tcl/tk library not available")
-  require(igraph) || stop("igraph library not avilable")
 
   options(scipen=10000)
   
@@ -2304,5 +2288,4 @@ matrix( c(0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,
           0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0), nr=23, nc=23)
 
-tkigraph()
 
