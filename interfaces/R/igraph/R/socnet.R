@@ -225,8 +225,12 @@ tkigraph <- function() {
   })
   tkadd(main.menu, "cascade", label="Motifs", menu=motif.menu)
 
-  tkadd(main.menu, "command", label="Help", command=function() { .tkigraph.help() })
-
+  help.menu <- tkmenu(main.menu)
+  tkadd(help.menu, "command", label="Contents", command=function() { .tkigraph.help() })
+  tkadd(help.menu, "command", label="In external browser",
+        command=function() { .tkigraph.help.external() })
+  tkadd(main.menu, "cascade", label="Help", menu=help.menu)
+  
   tkadd(main.menu, "command", label="Quit", command=.tkigraph.close)
   
   tkconfigure(top, "-menu", main.menu)
@@ -1874,6 +1878,11 @@ tkigraph <- function() {
   tcl("render", txt, "index.html")
   
   tkconfigure(txt, state="disabled")
+}
+
+.tkigraph.help.external <- function(page="index.html") {
+  f <- system.file("tkigraph_help/index.html", package="igraph")
+  browseURL(f)
 }
 
 #####################################################
