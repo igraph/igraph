@@ -1833,24 +1833,35 @@ tkigraph <- function() {
 
 .tkigraph.help <- function(page="index.html") {
   dialog <- tktoplevel()
-  frame <- tkframe(dialog)
-  tkgrid(frame)
   tktitle(dialog) <- "Help (main page)"
 
   close <- function() {
     tkdestroy(dialog)
   }
-  
+
   scr <- tkscrollbar(dialog, repeatinterval=5,
                      command=function(...) tkyview(txt,...))
-  tkgrid(txt <- tktext(dialog, yscrollcommand=function(...) tkset(scr, ...)),
-         sticky="nsew", "in"=frame, padx=10, pady=10, rowspan=5)
-  tkgrid(scr, row=0, column=1, rowspan=5, sticky="ns", "in"=frame, pady=10)
-  
-  tkgrid(tkbutton(dialog, text="Close", command=function() {
-    tkdestroy(dialog); return() }
-                  ),"in"=frame, sticky="ew", column=2, row=0, padx=10, pady=10)
+  txt <- tktext(dialog, yscrollcommand=function(...) tkset(scr, ...),
+                width=80, height=40)
 
+  main.menu <- tkmenu(dialog)
+  tkadd(main.menu, "command", label="Back", command=function() {
+    ## TODO
+  })
+  tkadd(main.menu, "command", label="Forw", command=function() {
+    ## TODO
+  })
+  tkadd(main.menu, "command", label="Home", command=function() {
+    tcl("render", txt, "index.html"); return()
+  })
+  tkadd(main.menu, "command", label="Close", command=function() {
+    tkdestroy(dialog); return()
+  })
+  tkconfigure(dialog, "-menu", main.menu)
+  
+  tkpack(scr, side="right", fill="y", expand=0)
+  tkpack(txt, side="left", fill="both", expand=1)
+  
   tcl("global", "tkigraph_help_root")
   tcl("set", "tkigraph_help_root",
       system.file("tkigraph_help", package="igraph"))

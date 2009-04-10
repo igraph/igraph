@@ -26,6 +26,8 @@ proc render {win href} {
     $win configure -state normal
     HMreset_win $win
     HMparse_html [get_html $Url] "HMrender $win"
+    $win tag add indented 1.0 insert
+    $win tag configure indented -lmargin1 20 -lmargin2 20
     $win configure -state disabled
     update
 }
@@ -48,3 +50,18 @@ proc get_html {file} {
     close $fd
     return $result
 }
+
+proc HMset_image {win handle src} {
+    global tkigraph_help_root
+    set image $tkigraph_help_root/$src
+    update
+    if {[string first " $image " " [image names] "] >= 0} {
+	HMgot_image $handle $image
+    } else {
+	set type photo
+	if {[file extension $image] == ".bmp"} {set type bitmap}
+	catch {image create $type $image -file $image} image
+	HMgot_image $handle $image
+    }
+}
+
