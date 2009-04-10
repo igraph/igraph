@@ -113,6 +113,8 @@ include_HEADERS = igraph.h types.h attributes.h error.h interrupt.h \
 		  walktrap_heap.h matrix.h matrix.pmt stack.h stack.pmt \
 		  dqueue.pmt dqueue.h heap.pmt heap.h arpack.h array.pmt \
 		  array.h arpack_internal.h f2c.h igraph_math.h
+		  drl_graph_3d.h drl_layout_3d.h drl_Node_3d.h \
+		  DensityGrid_3d.h
 
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
