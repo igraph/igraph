@@ -38,4 +38,8 @@
 <!-- doxrox-include igraph_community_fastgreedy -->
 </section>
 
+<section><title>Label propagation</title>
+<!-- doxrox-include igraph_community_label_propagation -->
+</section>
+
 </chapter>
