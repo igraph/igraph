@@ -20,8 +20,8 @@
 #
 ###################################################################
 
-proc render {win href} {
-    global tkigraph_help_root
+proc render_real {win href} {
+    global tkigraph_help_root 
     set Url $tkigraph_help_root/$href
     $win configure -state normal
     HMreset_win $win
@@ -30,6 +30,36 @@ proc render {win href} {
     $win tag configure indented -lmargin1 20 -lmargin2 20
     $win configure -state disabled
     update
+}
+
+proc render {win href} {
+    global tkigraph_help_history tkigraph_help_history_pos
+    lappend tkigraph_help_history($win) $href
+    incr tkigraph_help_history_pos($win)
+    render_real $win $href
+}
+
+proc start_history {win} {
+    global tkigraph_help_history tkigraph_help_history_pos
+    set tkigraph_help_history($win) [ list ]
+    set tkigraph_help_history_pos($win) -1
+}
+
+proc render_back {win} {
+    global tkigraph_help_history tkigraph_help_history_pos
+    if { $tkigraph_help_history_pos($win) > 0 } { 
+	set pos [ incr tkigraph_help_history_pos($win) -1 ]
+	render_real $win [ lindex $tkigraph_help_history($win) $pos ]
+    }
+}
+
+proc render_forw {win} {
+    global tkigraph_help_history tkigraph_help_history_pos
+    if { [ expr $tkigraph_help_history_pos($win) + 1 ] < 
+	 [ llength $tkigraph_help_history($win) ] } {
+	set pos [ incr tkigraph_help_history_pos($win) ]
+	render_real $win [ lindex $tkigraph_help_history($win) $pos ]
+    }
 }
 
 proc HMlink_callback {win href} {
@@ -64,4 +94,3 @@ proc HMset_image {win handle src} {
 	HMgot_image $handle $image
     }
 }
-
