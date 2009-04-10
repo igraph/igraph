@@ -864,6 +864,12 @@ igraph_community_leading_eigenvector_step:
         CLASS-R: igraph.eigencstep
         IGNORE: RR
 
+igraph_community_label_propagation:
+        PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \
+                VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL
+        DEPS: weights ON graph
+        NAME-R: label.propagation.community
+
 #######################################
 # Conversion
 #######################################
