@@ -1,0 +1,93 @@
+<h2>igraph 0.5.2 Release Notes</h2>
+
+<p class="news">
+  This is another bug fix release, with a couple of new features. Here
+  are the important ones. See the <a href="news.html">news page</a> for
+  the complete list of changes.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>
+  Bipartite graphs</h3>
+
+<p class="news">
+Bipartite graphs have two kinds of vertices and edges are only allowed
+to connect opposite kinds. Think of the Hollywood movie graph with
+actors and movies. igraph 0.5.2 now contains some functions to deal
+with these kind of networks.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>
+  The label propagation community finding algorithm</h3>
+
+<p class="news">
+This is a simple and intuitive community finding algorithm, published
+by Raghavan et al. in 2007 (see docs for full citation). It works by
+assigning labels to the vertices and then updating the labels based on
+majority voting among the neighbors.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>
+  3D version of the DrL layout generator</h3>
+
+<p class="news">
+The DrL layout generator was extended to generate three dimensional
+layouts. Albeit slower than the regular 2D version, this is a nice
+addition for those who do visualization in 3D.
+</p>
+
+<h3><img src="images/icon_r.png"/>
+  (Limited) R GUI</h3>
+
+<p class="news">
+A minimal, supported GUI is included now in the R package. It contains
+only a small fraction of igraph capabilities, but can be still useful,
+e.g. in teaching. You can start it by typing <code>tkigraph()</code>,
+after loading the igraph package of course.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>
+  Johnson's shortest path algorithm</h3>
+
+<p class="news">
+Johnson's algorithm is a good choice for finding all shortest paths in
+a network that has some negative edge weights, but no negative
+cycles.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>
+  Average nearest neighbor degree</h3>
+
+<p class="news">
+A new function was added to calculate the average degree of the
+neighbors of all or some vertices. It supports the edge weighted
+version of the measure as well.
+</p>
+
+<h3><img src="images/icon_r.png"/>
+  Curved edges in R plots</h3>
+
+<p class="news">
+Both <code>plot()</code> and <code>tkplot()</code> supports curved
+edges. See <code>?igraph.plotting</code> for more details.
+</p>
+
+<h3><img src="images/icon_c.png"/>
+  <img src="images/icon_r.png"/>
+  <img src="images/icon_python.png"/>
+  Several bugs and memory leaks corrected</h3>
+
+<p>
+See the <a href="news.html">news page</a> for
+the complete list of changes. Apart from the bug fixes, some functions
+were rewritten to speed them up.
+</p>
