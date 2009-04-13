@@ -13,6 +13,7 @@ class BasicTests(unittest.TestCase):
         g=Graph([(0,1), (0,0), (1,2)])
         self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
+
     def testAdjacency(self):
         g=Graph(4, [(0,1), (1,2), (2,0), (2,3)], directed=True)
         self.failUnless(g.neighbors(2) == [0, 1, 3])
@@ -116,10 +117,77 @@ class DatatypeTests(unittest.TestCase):
         self.failUnless(m.data == [[1,0], [0,1], [0,0]])
 
 
+class GraphDictListTests(unittest.TestCase):
+    def setUp(self):
+        self.vertices = [ \
+                {"name": "Alice", "age": 48, "gender": "F"},
+                {"name": "Bob",   "age": 33, "gender": "M"},
+                {"name": "Cecil", "age": 45, "gender": "F"},
+                {"name": "David", "age": 34, "gender": "M"}
+        ]
+        self.edges = [ \
+                {"source": "Alice", "target": "Bob",   "friendship": 4, "advice": 4},
+                {"source": "Cecil", "target": "Bob",   "friendship": 5, "advice": 5},
+                {"source": "Cecil", "target": "Alice", "friendship": 5, "advice": 5},
+                {"source": "David", "target": "Alice", "friendship": 2, "advice": 4},
+                {"source": "David", "target": "Bob",   "friendship": 1, "advice": 2}
+        ]
+
+    def testGraphFromDictList(self):
+        g = Graph.DictList(self.vertices, self.edges)
+        self.checkIfOK(g, "name")
+        g = Graph.DictList(self.vertices, self.edges, iterative=True)
+        self.checkIfOK(g, "name")
+
+    def testGraphFromDictIterator(self):
+        g = Graph.DictList(iter(self.vertices), iter(self.edges))
+        self.checkIfOK(g, "name")
+        g = Graph.DictList(iter(self.vertices), iter(self.edges), iterative=True)
+        self.checkIfOK(g, "name")
+
+    def testGraphFromDictIteratorNoVertices(self):
+        g = Graph.DictList(None, iter(self.edges))
+        self.checkIfOK(g, "name", check_vertex_attrs=False)
+        g = Graph.DictList(None, iter(self.edges), iterative=True)
+        self.checkIfOK(g, "name", check_vertex_attrs=False)
+
+    def testGraphFromDictListExtraVertexName(self):
+        del self.vertices[2:]      # No data for "Cecil" and "David"
+        g = Graph.DictList(self.vertices, self.edges)
+        self.failUnless(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
+        self.failUnless(g.vs["name"] == ["Alice", "Bob", "Cecil", "David"])
+        self.failUnless(g.vs["age"] == [48, 33, None, None])
+        self.failUnless(g.vs["gender"] == ["F", "M", None, None])
+        self.failUnless(g.es["friendship"] == [4, 5, 5, 2, 1])
+        self.failUnless(g.es["advice"] == [4, 5, 5, 4, 2])
+        self.failUnless(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
+
+    def testGraphFromDictListAlternativeName(self):
+        for vdata in self.vertices:
+            vdata["name_alternative"] = vdata["name"]
+            del vdata["name"]
+        g = Graph.DictList(self.vertices, self.edges, vertex_name_attr="name_alternative")
+        self.checkIfOK(g, "name_alternative")
+        g = Graph.DictList(self.vertices, self.edges, vertex_name_attr="name_alternative", \
+                iterative=True)
+        self.checkIfOK(g, "name_alternative")
+
+    def checkIfOK(self, g, name_attr, check_vertex_attrs=True):
+        self.failUnless(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
+        self.failUnless(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
+        self.failUnless(g.vs[name_attr] == ["Alice", "Bob", "Cecil", "David"])
+        if check_vertex_attrs:
+            self.failUnless(g.vs["age"] == [48, 33, 45, 34])
+            self.failUnless(g.vs["gender"] == ["F", "M", "F", "M"])
+        self.failUnless(g.es["friendship"] == [4, 5, 5, 2, 1])
+        self.failUnless(g.es["advice"] == [4, 5, 5, 4, 2])
+
+
 def suite():
     basic_suite = unittest.makeSuite(BasicTests)
     datatype_suite = unittest.makeSuite(DatatypeTests)
-    return unittest.TestSuite([basic_suite, datatype_suite])
+    graph_dict_list_suite = unittest.makeSuite(GraphDictListTests)
+    return unittest.TestSuite([basic_suite, datatype_suite, graph_dict_list_suite])
 
 def test():
     runner = unittest.TextTestRunner()
