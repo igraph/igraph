@@ -1174,6 +1174,117 @@ class Graph(core.GraphBase):
         return writer(f, *args, **kwds)
     save = write
 
+    #####################################################
+    # Constructor for dict-like representation of graphs
+
+    @classmethod
+    def DictList(klass, vertices, edges, directed=False, vertex_name_attr="name", \
+            edge_foreign_keys=("source", "target"), iterative=False):
+        """Constructs a graph from a list-of-dictionaries representation.
+
+        This representation assumes that vertices and edges are encoded in
+        two lists, each list containing a Python dict for each vertex and
+        each edge, respectively. A distinguished element of the vertex dicts
+        contain a vertex ID which is used in the edge dicts to refer to
+        source and target vertices. All the remaining elements of the dict
+        are considered vertex and edge attributes. Note that the implementation
+        does not assume that the objects passed to this method are indeed
+        lists of dicts, but they should be iterable and they should yield
+        objects that behave as dicts. So, for instance, a database query
+        result is likely to be fit as long as it's iterable and yields
+        dict-like objects with every iteration.
+
+        @param vertices: the data source for the vertices or C{None} if
+          there are no special attributes assigned to vertices and we
+          should simply use the edge list of dicts to infer vertex names.
+        @param edges: the data source for the edges.
+        @param directed: whether the constructed graph will be directed
+        @param vertex_name_attr: the name of the distinguished key in the
+          dicts in the vertex data source that contains the vertex names.
+          Ignored if C{vertices} is C{None}.
+        @param edge_foreign_keys: the name of the attributes in the dicts
+          in the edge data source that contain the source and target
+          vertex names.
+        @param iterative: whether to add the edges to the graph one by one,
+          iteratively, or to build a large edge list first and use that to
+          construct the graph. The latter approach is faster but it may
+          not be suitable if your dataset is large. The default is to
+          add the edges in a batch from an edge list.
+        @return: the graph that was constructed
+        """
+        def create_list_from_indices(l, n):
+            result = [None] * n
+            for i, v in l: result[i] = v
+            return result
+
+        # Construct the vertices
+        vertex_attrs, n = {}, 0
+        if vertices:
+            for idx, vertex_data in enumerate(vertices):
+                for k, v in vertex_data.iteritems():
+                    try:
+                        vertex_attrs[k].append((idx, v))
+                    except KeyError:
+                        vertex_attrs[k] = [(idx, v)]
+                n += 1
+            for k, v in vertex_attrs.iteritems():
+                vertex_attrs[k] = create_list_from_indices(v, n)
+        else:
+            vertex_attrs[vertex_name_attr] = []
+
+        vertex_names = vertex_attrs[vertex_name_attr]
+        # Check for duplicates in vertex_names
+        if len(vertex_names) != len(set(vertex_names)):
+            raise ValueError, "vertex names are not unique"
+        # Create a reverse mapping from vertex names to indices
+        vertex_name_map = UniqueIdGenerator(initial = vertex_names)
+
+        # Construct the edges
+        efk_src, efk_dest = edge_foreign_keys
+        if iterative:
+            g = klass(n, [], directed, {}, vertex_attrs)
+            for idx, edge_data in enumerate(edges):
+                src_name, dst_name = edge_data[efk_src], edge_data[efk_dest]
+                v1 = vertex_name_map[src_name]
+                if v1 == n:
+                    g.add_vertices(1)
+                    g.vs[n][vertex_name_attr] = src_name
+                    n += 1
+                v2 = vertex_name_map[dst_name]
+                if v2 == n:
+                    g.add_vertices(1)
+                    g.vs[n][vertex_name_attr] = dst_name
+                    n += 1
+                g.add_edges((v1, v2))
+                for k, v in edge_data.iteritems():
+                    g.es[idx][k] = v
+
+            return g
+        else:
+            edge_list, edge_attrs, m = [], {}, 0
+            for idx, edge_data in enumerate(edges):
+                v1, v2 = vertex_name_map[edge_data[efk_src]], vertex_name_map[edge_data[efk_dest]]
+                edge_list.append((v1, v2))
+                for k, v in edge_data.iteritems():
+                    try:
+                        edge_attrs[k].append((idx, v))
+                    except KeyError:
+                        edge_attrs[k] = [(idx, v)]
+                m += 1
+            for k, v in edge_attrs.iteritems():
+                edge_attrs[k] = create_list_from_indices(v, m)
+
+            # It may have happened that some vertices were added during the process
+            if len(vertex_name_map) > n:
+                diff = len(vertex_name_map) - n
+                more = [None] * diff
+                for k, v in vertex_attrs.iteritems(): v.extend(more)
+                vertex_attrs[vertex_name_attr] = vertex_name_map.values()
+                n = len(vertex_name_map)
+
+            # Create the graph
+            return klass(n, edge_list, directed, {}, vertex_attrs, edge_attrs)
+
     #################################
     # Constructor for graph formulae
     Formula=classmethod(Formula)

@@ -596,11 +596,13 @@ class UniqueIdGenerator(object):
     2
     >>> gen["A"]      # Retrieving already existing ID
     0
-    >>> len(gen)      # Number of already used IDs
+    >>> gen.add("D")  # Synonym of gen["D"]
     3
+    >>> len(gen)      # Number of already used IDs
+    4
     """
 
-    def __init__(self, id_generator=None):
+    def __init__(self, id_generator=None, initial=None):
         """Creates a new unique ID generator. `id_generator` specifies how do we
         assign new IDs to elements that do not have an ID yet. If it is `None`,
         elements will be assigned integer identifiers starting from 0. If it is
@@ -614,6 +616,9 @@ class UniqueIdGenerator(object):
         else:
             self._generator = id_generator
         self._ids = {}
+        if initial:
+            for value in initial:
+                self.add(value)
 
     def __getitem__(self, item):
         """Retrieves the ID corresponding to `item`. Generates a new ID for `item`
@@ -623,4 +628,23 @@ class UniqueIdGenerator(object):
         except KeyError:
             self._ids[item] = self._generator.next()
             return self._ids[item]
+
+    def __len__(self):
+        """"Returns the number of items"""
+        return len(self._ids)
+
+    def reverse_dict(self):
+        """Returns the reverse mapping, i.e., the one that maps from generated
+        IDs to their corresponding objects"""
+        return dict((v, k) for k, v in self._ids.iteritems())
+
+    def values(self):
+        """Returns the values stored so far. If the generator generates items
+        according to the standard sorting order, the values returned will be
+        exactly in the order they were added. This holds for integer IDs for
+        instance (but for many other ID generators as well)."""
+        return sorted(self._ids.keys(), key = lambda x: self._ids[x])
+
+    add = __getitem__
+
 
