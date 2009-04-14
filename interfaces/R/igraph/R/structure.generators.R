@@ -525,6 +525,16 @@ graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
     stop("the data frame should contain at least two columns")
   }
 
+  ## Handle if some elements are 'NA'
+  if (any(is.na(d))) {
+    warning("In `d' `NA' elements were replaced with string \"NA\"")
+    d[ is.na(d) ] <- 'NA'
+  }
+  if (!is.null(vertices) && any(is.na(vertices[,1]))) {
+    warning("In `vertices[,1]' `NA' elements were replaced with string \"NA\"")
+    vertices[,1][is.na(vertices[,1])] <- 'NA'
+  }    
+  
   names <- unique( c(as.character(d[,1]), as.character(d[,2])) )
   if (!is.null(vertices)) {
     names2 <- names

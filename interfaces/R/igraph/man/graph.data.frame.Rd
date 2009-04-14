@@ -38,6 +38,16 @@ graph.data.frame(d, directed=TRUE, vertices=NULL)
   like Excel and are imported into R via \code{\link{read.table}},
   \code{\link{read.delim}} or \code{\link{read.csv}}.
 }
+\note{
+  \code{NA} elements in \sQuote{d} are replaced by the string
+  \dQuote{NA} before creating the graph. This means that all \code{NA}s
+  will correspond to a single vertex.
+
+  \code{NA} elements in the first column of \sQuote{vertices} are also
+  replaced by the string \dQuote{NA}, but the rest of \sQuote{vertices}
+  is not touched. In other words, vertex names (=the first column)
+  cannot be \code{NA}, but other vertex attributes can.
+}
 \value{
   An igraph graph object.
 }
