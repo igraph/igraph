@@ -643,7 +643,7 @@ class UniqueIdGenerator(object):
         according to the standard sorting order, the values returned will be
         exactly in the order they were added. This holds for integer IDs for
         instance (but for many other ID generators as well)."""
-        return sorted(self._ids.keys(), key = lambda x: self._ids[x])
+        return sorted(self._ids.keys(), key = self._ids.__getitem__)
 
     add = __getitem__
 
