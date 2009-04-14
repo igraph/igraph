@@ -127,19 +127,24 @@ zeroone: DIGIT {
   igraph_i_dl_data.to += 1;
 } ;
 
-labeledfullmatrixdata: {} | reallabeledfullmatrixdata {} ;
+labeledfullmatrixdata: reallabeledfullmatrixdata {} ;
 
-reallabeledfullmatrixdata: labelseq newline labeledmatrixlines {} ;
+reallabeledfullmatrixdata: labelseq NEWLINE labeledmatrixlines {} ;
 
-labelseq: {} | labelseq newline LABEL {} ;
+labelseq: | labelseq newline label ;
 
-labeledmatrixlines: labeledmatrixline {} 
+label: LABEL { igraph_i_dl_add_str(igraph_dl_yytext, igraph_dl_yyleng); };
+
+labeledmatrixlines: labeledmatrixline {
+	         igraph_i_dl_data.from += 1; 
+		 igraph_i_dl_data.to = 0;
+               } 
              | labeledmatrixlines labeledmatrixline { 
 	         igraph_i_dl_data.from += 1; 
 		 igraph_i_dl_data.to = 0;
                };
 
-labeledmatrixline: LABEL zerooneseq NEWLINE {} ;
+labeledmatrixline: LABEL zerooneseq NEWLINE { } ;
 
 /*-----------------------------------------------------------*/
 

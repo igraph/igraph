@@ -2758,6 +2758,8 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream) {
   }
 
 /*   igraph_vector_print(&igraph_i_dl_data.edges, stdout); */
+/*   igraph_strvector_print(&igraph_i_dl_data.labels, stdout, ", "); */
+/*   printf("\n"); */
 
   igraph_strvector_destroy(&igraph_i_dl_data.labels);
   igraph_vector_destroy(&igraph_i_dl_data.edges);

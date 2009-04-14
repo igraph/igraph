@@ -47,16 +47,21 @@
 #include "config.h"
 #include "igraph.h"
 #include <stdlib.h>
+#include <stdarg.h>
 #include "foreign-dl-header.h"
 #include "foreign-dl-parser.h"
 extern long int igraph_dl_mylineno;
 extern int igraph_dl_mode;
 extern int igraph_dl_eof;
+extern char *igraph_dl_yytext;
 int igraph_i_dl_mode=0;
 void igraph_i_dl_reset_scanner() {
   YY_FLUSH_BUFFER;
 }
 int myprintf(const char *arg, ...) {
+/*   va_list argptr; */
+/*   va_start(argptr, arg); */
+/*   printf(arg, argptr); */
   return 0;
 }
 %}
@@ -106,8 +111,9 @@ whitespace [ \t\v\f]
 <LABELM>[, ]                               { myprintf(","); /* eaten up */ }
 <LABELM>[^, \t\n\r\f\v]+{whitespace}*      { myprintf("label1\n"); return LABEL; }
 
-<FULLMATRIX>{digit}{whitespace}*          { myprintf("digit "); return DIGIT; }
-<FULLMATRIX>[^ \t\n\r\v\f,]+{whitespace}* { myprintf("label %s", yytext); return LABEL; }
+<FULLMATRIX>{digit}{whitespace}*          { myprintf("digit"); return DIGIT; }
+<FULLMATRIX>[^ \t\n\r\v\f,]+              { myprintf("label"); return LABEL; }
+<FULLMATRIX>{whitespace}                  { }
 
 <EDGELIST>{digit}+{whitespace}*         { myprintf("num "); return NUM; }
 <EDGELIST>[^ \t\n\r\v\f,]+{whitespace}* { myprintf("label "); return LABEL; }
@@ -128,4 +134,4 @@ whitespace [ \t\v\f]
 			  }			  
                         }
 
-<*>. { myprintf("gebasz---%s---", yytext); return 0; }
+<*>. { myprintf("gebasz---%s---", igraph_dl_yytext); return 0; }
