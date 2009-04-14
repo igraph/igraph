@@ -116,6 +116,18 @@ VERTEX_COLOR:
                %I% <- as.integer(%I%) \
             }
 
+EDGE_COLOR:
+    INCONV: if (missing(%I%)) { \
+               if ("color" %in% list.edge.attributes(%I1%)) { \
+                 %I% <- E(%I1%)$color \
+               } else { \
+                 %I% <- NULL \
+               } \
+            } \
+            if (!is.null(%I%)) { \
+               %I% <- as.integer(%I%) \
+            }
+
 NULL:
     CALL:
     HEADER:

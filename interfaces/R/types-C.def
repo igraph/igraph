@@ -418,3 +418,12 @@ VERTEX_COLOR:
   CALL: (isNull(%I%) ? 0 : &%C%)
   INCONV: 
     IN: if (!isNull(%I%)) { R_SEXP_to_vector_long(%I%, &%C%); }
+
+##################################
+# Edge colors
+
+EDGE_COLOR:
+  CTYPE: igraph_vector_long_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV: 
+    IN: if (!isNull(%I%)) { R_SEXP_to_vector_long(%I%, &%C%); }
