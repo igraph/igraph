@@ -1085,6 +1085,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
   
   /* Check color distribution */
   if (color1) {
+    int ret=0;
     igraph_vector_long_t tmp1, tmp2;
     IGRAPH_CHECK(igraph_vector_long_copy(&tmp1, color1));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp1);
@@ -1092,9 +1093,11 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     IGRAPH_FINALLY(igraph_vector_long_destroy, &tmp2);
     igraph_vector_long_sort(&tmp1);
     igraph_vector_long_sort(&tmp2);
-    if (!igraph_vector_long_is_equal(&tmp1, &tmp2)) {
-      return 0;
-    }
+    ret= !igraph_vector_long_is_equal(&tmp1, &tmp2);
+    igraph_vector_long_destroy(&tmp1);
+    igraph_vector_long_destroy(&tmp2);
+    IGRAPH_FINALLY_CLEAN(2);
+    if (ret) { return 0; }
   }
   
   if (map12) {
